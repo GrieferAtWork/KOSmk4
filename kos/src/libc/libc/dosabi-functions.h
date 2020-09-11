@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x422d0d96 */
+/* HASH CRC-32:0x389397d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1163,27 +1163,30 @@ DFUN(".text.crt.dos.sched.signal", libd_pthread_kill, libc_pthread_kill, TD, 2, 
 DFUN(".text.crt.dos.sched.signal", libd_pthread_sigqueue, libc_pthread_sigqueue, TD, 3, TIn(__SIZEOF_PTHREAD_T), TIn(__SIZEOF_SIGNO_T__), TS(__SIZEOF_SIGVAL CONST))
 
 /* spawn */
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn, libc_posix_spawn, TD, 6, TP, TP, TP, TP, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnp, libc_posix_spawnp, TD, 6, TP, TP, TP, TP, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_init, libc_posix_spawnattr_init, TD, 1, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_destroy, libc_posix_spawnattr_destroy, TD, 1, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getsigdefault, libc_posix_spawnattr_getsigdefault, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setsigdefault, libc_posix_spawnattr_setsigdefault, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getsigmask, libc_posix_spawnattr_getsigmask, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setsigmask, libc_posix_spawnattr_setsigmask, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getflags, libc_posix_spawnattr_getflags, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setflags, libc_posix_spawnattr_setflags, TD, 2, TP, TI16)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getpgroup, libc_posix_spawnattr_getpgroup, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setpgroup, libc_posix_spawnattr_setpgroup, TD, 2, TP, TIn(__SIZEOF_PID_T__))
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getschedpolicy, libc_posix_spawnattr_getschedpolicy, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setschedpolicy, libc_posix_spawnattr_setschedpolicy, TD, 2, TP, TD)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getschedparam, libc_posix_spawnattr_getschedparam, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setschedparam, libc_posix_spawnattr_setschedparam, TD, 2, TP, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_init, libc_posix_spawn_file_actions_init, TD, 1, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_destroy, libc_posix_spawn_file_actions_destroy, TD, 1, TP)
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addopen, libc_posix_spawn_file_actions_addopen, TD, 5, TP, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_OFLAG_T__), TIn(__SIZEOF_MODE_T__))
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addclose, libc_posix_spawn_file_actions_addclose, TD, 2, TP, TIn(__SIZEOF_FD_T__))
-DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_adddup2, libc_posix_spawn_file_actions_adddup2, TD, 3, TP, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_fspawn_np, libc_posix_fspawn_np, TIn(__SIZEOF_ERRNO_T__), 6, TP, TIn(__SIZEOF_FD_T__), TP, TP, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn, libc_posix_spawn, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnp, libc_posix_spawnp, TIn(__SIZEOF_ERRNO_T__), 6, TP, TP, TP, TP, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_init, libc_posix_spawnattr_init, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_destroy, libc_posix_spawnattr_destroy, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getflags, libc_posix_spawnattr_getflags, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setflags, libc_posix_spawnattr_setflags, TIn(__SIZEOF_ERRNO_T__), 2, TP, TH)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getsigdefault, libc_posix_spawnattr_getsigdefault, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setsigdefault, libc_posix_spawnattr_setsigdefault, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getsigmask, libc_posix_spawnattr_getsigmask, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setsigmask, libc_posix_spawnattr_setsigmask, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getpgroup, libc_posix_spawnattr_getpgroup, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setpgroup, libc_posix_spawnattr_setpgroup, TIn(__SIZEOF_ERRNO_T__), 2, TP, TIn(__SIZEOF_PID_T__))
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getschedpolicy, libc_posix_spawnattr_getschedpolicy, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setschedpolicy, libc_posix_spawnattr_setschedpolicy, TIn(__SIZEOF_ERRNO_T__), 2, TP, TD)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_getschedparam, libc_posix_spawnattr_getschedparam, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawnattr_setschedparam, libc_posix_spawnattr_setschedparam, TIn(__SIZEOF_ERRNO_T__), 2, TP, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_init, libc_posix_spawn_file_actions_init, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_destroy, libc_posix_spawn_file_actions_destroy, TIn(__SIZEOF_ERRNO_T__), 1, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_alloc, libc_posix_spawn_file_actions_alloc, TP, 1, TP)
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addopen, libc_posix_spawn_file_actions_addopen, TIn(__SIZEOF_ERRNO_T__), 5, TP, TIn(__SIZEOF_FD_T__), TP, TIn(__SIZEOF_OFLAG_T__), TIn(__SIZEOF_MODE_T__))
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addclose, libc_posix_spawn_file_actions_addclose, TIn(__SIZEOF_ERRNO_T__), 2, TP, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_adddup2, libc_posix_spawn_file_actions_adddup2, TIn(__SIZEOF_ERRNO_T__), 3, TP, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addtcsetpgrp_np, libc_posix_spawn_file_actions_addtcsetpgrp_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TIn(__SIZEOF_FD_T__))
 
 /* ssp.string */
 DFUN(".text.crt.dos.ssp.string.memory", libd___memcpy_chk, libc___memcpy_chk, TP, 4, TP, TP, TI, TI)

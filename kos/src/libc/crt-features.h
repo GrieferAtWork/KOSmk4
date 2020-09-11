@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdb3dfd2 */
+/* HASH CRC-32:0xdbc88c21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1814,6 +1814,7 @@
 #define __CRT_HAVE_DOS$posix_fadvise64 1
 #define __CRT_HAVE_DOS$posix_fallocate 1
 #define __CRT_HAVE_DOS$posix_fallocate64 1
+#define __CRT_HAVE_DOS$posix_fspawn_np 1
 #define __CRT_HAVE_DOS$posix_madvise 1
 #define __CRT_HAVE_DOS$posix_memalign 1
 #define __CRT_HAVE_DOS$posix_openpt 1
@@ -1821,6 +1822,8 @@
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addclose 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addopen 1
+#define __CRT_HAVE_DOS$posix_spawn_file_actions_addtcsetpgrp_np 1
+#define __CRT_HAVE_DOS$posix_spawn_file_actions_alloc 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_destroy 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_init 1
 #define __CRT_HAVE_DOS$posix_spawnattr_destroy 1
@@ -4828,6 +4831,7 @@
 #define __CRT_HAVE_posix_fadvise64 1
 #define __CRT_HAVE_posix_fallocate 1
 #define __CRT_HAVE_posix_fallocate64 1
+#define __CRT_HAVE_posix_fspawn_np 1
 #define __CRT_HAVE_posix_madvise 1
 #define __CRT_HAVE_posix_memalign 1
 #define __CRT_HAVE_posix_openpt 1
@@ -4835,6 +4839,8 @@
 #define __CRT_HAVE_posix_spawn_file_actions_addclose 1
 #define __CRT_HAVE_posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_posix_spawn_file_actions_addopen 1
+#define __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np 1
+#define __CRT_HAVE_posix_spawn_file_actions_alloc 1
 #define __CRT_HAVE_posix_spawn_file_actions_destroy 1
 #define __CRT_HAVE_posix_spawn_file_actions_init 1
 #define __CRT_HAVE_posix_spawnattr_destroy 1

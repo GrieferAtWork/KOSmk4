@@ -2611,6 +2611,7 @@
 #define __CRT_HAVE_posix_fadvise64 1
 #define __CRT_HAVE_posix_fallocate 1
 #define __CRT_HAVE_posix_fallocate64 1
+#define __CRT_HAVE_posix_fspawn_np 1
 #define __CRT_HAVE_posix_madvise 1
 #define __CRT_HAVE_posix_memalign 1
 #define __CRT_HAVE_posix_openpt 1
@@ -2618,6 +2619,7 @@
 #define __CRT_HAVE_posix_spawn_file_actions_addclose 1
 #define __CRT_HAVE_posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_posix_spawn_file_actions_addopen 1
+#define __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np 1
 #define __CRT_HAVE_posix_spawn_file_actions_destroy 1
 #define __CRT_HAVE_posix_spawn_file_actions_init 1
 #define __CRT_HAVE_posix_spawnattr_destroy 1
@@ -3506,7 +3508,6 @@
 #define __CRT_HAVE_sys_Xpreadv 1
 #define __CRT_HAVE_sys_Xpreadvf 1
 #define __CRT_HAVE_sys_Xprlimit64 1
-#define __CRT_HAVE_sys_Xprocess_spawnveat 1
 #define __CRT_HAVE_sys_Xprocess_vm_readv 1
 #define __CRT_HAVE_sys_Xprocess_vm_writev 1
 #define __CRT_HAVE_sys_Xpselect6 1
@@ -3881,7 +3882,6 @@
 #define __CRT_HAVE_sys_preadv 1
 #define __CRT_HAVE_sys_preadvf 1
 #define __CRT_HAVE_sys_prlimit64 1
-#define __CRT_HAVE_sys_process_spawnveat 1
 #define __CRT_HAVE_sys_process_vm_readv 1
 #define __CRT_HAVE_sys_process_vm_writev 1
 #define __CRT_HAVE_sys_pselect6 1
@@ -6787,6 +6787,7 @@
 #define __CRT_HAVE_KOS$posix_fadvise64 1
 #define __CRT_HAVE_KOS$posix_fallocate 1
 #define __CRT_HAVE_KOS$posix_fallocate64 1
+#define __CRT_HAVE_KOS$posix_fspawn_np 1
 #define __CRT_HAVE_KOS$posix_madvise 1
 #define __CRT_HAVE_KOS$posix_memalign 1
 #define __CRT_HAVE_KOS$posix_openpt 1
@@ -6794,6 +6795,7 @@
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_addclose 1
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_addopen 1
+#define __CRT_HAVE_KOS$posix_spawn_file_actions_addtcsetpgrp_np 1
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_destroy 1
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_init 1
 #define __CRT_HAVE_KOS$posix_spawnattr_destroy 1
@@ -10162,6 +10164,7 @@
 #define __CRT_HAVE_DOS$posix_fadvise64 1
 #define __CRT_HAVE_DOS$posix_fallocate 1
 #define __CRT_HAVE_DOS$posix_fallocate64 1
+#define __CRT_HAVE_DOS$posix_fspawn_np 1
 #define __CRT_HAVE_DOS$posix_madvise 1
 #define __CRT_HAVE_DOS$posix_memalign 1
 #define __CRT_HAVE_DOS$posix_openpt 1
@@ -10169,6 +10172,7 @@
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addclose 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addopen 1
+#define __CRT_HAVE_DOS$posix_spawn_file_actions_addtcsetpgrp_np 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_destroy 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_init 1
 #define __CRT_HAVE_DOS$posix_spawnattr_destroy 1

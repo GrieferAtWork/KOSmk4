@@ -581,7 +581,9 @@ $pid_t spawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict fi
 [[requires($has_function(fexecve) && $has_function(_Exit) &&
            ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
             ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
-             $has_function(read) && $has_function(write))))]]
+             $has_function(read) && $has_function(write) && $has_function(close))) &&
+           $has_function(fexecve) && $has_function(waitpid)
+)]]
 $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
                 $fd_t execfd,
                 [[nonnull]] __TARGV,
@@ -650,13 +652,9 @@ $pid_t fspawnve(__STDC_INT_AS_UINT_T mode,
 		 * since we overwrote it to be 0 above) */
 		__libc_seterrno(old_errno);
 @@pp_else@@
-@@pp_if $has_function(close)@@
 		close(pipes[1]); /* Close the writer. */
-@@pp_endif@@
 		temp = read(pipes[0], &error, sizeof(error));
-@@pp_if $has_function(close)@@
 		close(pipes[0]); /* Close the reader. */
-@@pp_endif@@
 		if (temp < 0)
 			goto err_join_zombie_child;
 		if (temp == sizeof(error)) {
@@ -701,13 +699,9 @@ read_child_errors:
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
 	 *        closed and read() returns ZERO(0)) */
-@@pp_if $has_function(close)@@
 	close(pipes[1]); /* Close the writer. */
-@@pp_endif@@
 	temp = read(pipes[0], &error, sizeof(error));
-@@pp_if $has_function(close)@@
 	close(pipes[0]); /* Close the reader. */
-@@pp_endif@@
 	if (temp < 0)
 		goto err_join_zombie_child;
 	/* This means that `fexecve()' below closed the pipe during a successful exec(). */

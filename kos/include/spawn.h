@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9edd0df3 */
+/* HASH CRC-32:0x9bb2df9d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,26 +69,6 @@ __SYSDECL_BEGIN
 #endif /* __USE_GNU */
 
 
-/* Comments taken from /usr/include/spawn.h of a linux machine.
- * The following is the copyright notice found in the original file. */
-/* Definitions for POSIX spawn interface.
-   Copyright (C) 2000-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 #ifdef __CC__
 
 #ifndef __sigset_t_defined
@@ -114,75 +94,429 @@ typedef __pid_t pid_t;
 typedef struct __posix_spawnattr posix_spawnattr_t;
 typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
 
-
-/* Spawn a new process executing PATH with the attributes describes in *ATTRP.
- * Before running the process perform the actions described in FILE-ACTIONS.
- * This function is a possible cancellation point and therefore not marked with __THROW */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 5, 6)),int,__NOTHROW_RPC,posix_spawn,(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__path,__file_actions,__attrp,___argv,___envp))
-
-/* Similar to `posix_spawn' but search for FILE in the PATH.
- * This function is a possible cancellation point and therefore not marked with __THROW */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2, 5, 6)),int,__NOTHROW_RPC,posix_spawnp,(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__file,__file_actions,__attrp,___argv,___envp))
-
-/* Initialize data structure with attributes for `spawn' to default values */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_init,(posix_spawnattr_t *__restrict __attr),(__attr))
-
-/* Free resources associated with ATTR */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_destroy,(posix_spawnattr_t *__restrict __attr),(__attr))
-
-/* Store signal mask for signals with default handling from ATTR in SIGDEFAULT */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getsigdefault,(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigdefault),(__attr,__sigdefault))
-
-/* Set signal mask for signals with default handling in ATTR to SIGDEFAULT */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_setsigdefault,(posix_spawnattr_t *__restrict __attr, sigset_t const *__restrict __sigdefault),(__attr,__sigdefault))
-
-/* Store signal mask for the new process from ATTR in SIGMASK */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getsigmask,(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigmask),(__attr,__sigmask))
-
-/* Set signal mask for the new process in ATTR to SIGMASK */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_setsigmask,(posix_spawnattr_t *__restrict __attr, sigset_t const *__restrict __sigmask),(__attr,__sigmask))
-
-/* Get flag word from the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getflags,(posix_spawnattr_t const *__restrict __attr, __INT16_TYPE__ *__restrict __flags),(__attr,__flags))
-
-/* Store flags in the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_setflags,(posix_spawnattr_t *__restrict __attr, __INT16_TYPE__ __flags),(__attr,__flags))
-
-/* Get process group ID from the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getpgroup,(posix_spawnattr_t const *__restrict __attr, pid_t *__restrict __pgroup),(__attr,__pgroup))
-
-/* Store rocess group ID in the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_setpgroup,(posix_spawnattr_t *__restrict __attr, pid_t __pgroup),(__attr,__pgroup))
-
-/* Get scheduling policy from the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getschedpolicy,(posix_spawnattr_t const *__restrict __attr, int *__restrict __schedpolicy),(__attr,__schedpolicy))
-
-/* Store scheduling policy in the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawnattr_setschedpolicy,(posix_spawnattr_t *__restrict __attr, int __schedpolicy),(__attr,__schedpolicy))
-
-/* Get scheduling parameters from the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_getschedparam,(posix_spawnattr_t const *__restrict __attr, struct sched_param *__restrict __schedparam),(__attr,__schedparam))
-
-/* Store scheduling parameters in the attribute structure */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,posix_spawnattr_setschedparam,(posix_spawnattr_t *__restrict __attr, struct sched_param const *__restrict __schedparam),(__attr,__schedparam))
-
-/* Initialize data structure for file attribute for `spawn' call */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_init,(posix_spawn_file_actions_t *__restrict __file_actions),(__file_actions))
-
-/* Free resources associated with FILE-ACTIONS */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_destroy,(posix_spawn_file_actions_t *__restrict __file_actions),(__file_actions))
-
-/* Add an action to FILE-ACTIONS which tells the implementation
- * to call `open' for the given file during the `spawn' call */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,posix_spawn_file_actions_addopen,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, mode_t __mode),(__file_actions,__fd,__path,__oflags,__mode))
-
-/* Add an action to FILE-ACTIONS which tells the implementation to
- * call `close' for the given file descriptor during the `spawn' call */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_addclose,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd),(__file_actions,__fd))
-
-/* Add an action to FILE-ACTIONS which tells the implementation to
- * call `dup2' for the given file descriptors during the `spawn' call */
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_adddup2,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, __fd_t __newfd),(__file_actions,__fd,__newfd))
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE_posix_fspawn_np
+/* >> posix_fspawn_np(3)
+ * Implementation for the fastest possible method of (safely) doing fork(2)+fexecve(2)
+ * in order to spawn a new process from the given `execfd' file descriptor.
+ * For this purpose, any error that may happen during either the fork(3), the fexecve(2)
+ * or any of the numerous additional system calls that may be performed in-between will
+ * be returned by this function to the parent process, while the function itself never
+ * actually returns in the child process.
+ * For this purpose, this function tries to make use of `vfork(2)' in combination
+ * with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
+ * is used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+ * with the pipe having been given that flag, and that a pipe without both ends still open
+ * will always have its read immediately return (which is used to indicate success)
+ * @param: pid:          Store the PID of the newly spawned child process here
+ * @param: execfd:       The file descriptor pointing to the file that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
+ * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error errno-code describing the reason of failure */
+__CDECLARE(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_RPC,posix_fspawn_np,(pid_t *__restrict __pid, __fd_t __execfd, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__execfd,__file_actions,__attrp,___argv,___envp))
+#else /* __CRT_HAVE_posix_fspawn_np */
+#include <asm/vfork.h>
+#if (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))) || defined(__CRT_HAVE_posix_spawn)
+#include <libc/local/spawn/posix_fspawn_np.h>
+/* >> posix_fspawn_np(3)
+ * Implementation for the fastest possible method of (safely) doing fork(2)+fexecve(2)
+ * in order to spawn a new process from the given `execfd' file descriptor.
+ * For this purpose, any error that may happen during either the fork(3), the fexecve(2)
+ * or any of the numerous additional system calls that may be performed in-between will
+ * be returned by this function to the parent process, while the function itself never
+ * actually returns in the child process.
+ * For this purpose, this function tries to make use of `vfork(2)' in combination
+ * with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
+ * is used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+ * with the pipe having been given that flag, and that a pipe without both ends still open
+ * will always have its read immediately return (which is used to indicate success)
+ * @param: pid:          Store the PID of the newly spawned child process here
+ * @param: execfd:       The file descriptor pointing to the file that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
+ * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error errno-code describing the reason of failure */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_fspawn_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 5, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL posix_fspawn_np)(pid_t *__restrict __pid, __fd_t __execfd, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid, __execfd, __file_actions, __attrp, ___argv, ___envp); })
+#endif /* (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid)) || __CRT_HAVE_posix_spawn */
+#endif /* !__CRT_HAVE_posix_fspawn_np */
+#endif /* __USE_KOS */
+#ifdef __CRT_HAVE_posix_spawn
+/* >> posix_spawn(3)
+ * Implementation for the fastest possible method of (safely) doing fork(2)+execve(2)
+ * in order to spawn a new process from the given `path' program.
+ * For this purpose, any error that may happen during either the fork(3), the execve(2)
+ * or any of the numerous additional system calls that may be performed in-between will
+ * be returned by this function to the parent process, while the function itself never
+ * actually returns in the child process.
+ * For this purpose, this function tries to make use of `vfork(2)' in combination
+ * with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
+ * is used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+ * with the pipe having been given that flag, and that a pipe without both ends still open
+ * will always have its read immediately return (which is used to indicate success)
+ * @param: pid:          Store the PID of the newly spawned child process here
+ * @param: path:         The pathname of the program that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `execve(2)'
+ * @param: envp:         Same as the `envp' accepted by `execve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error errno-code describing the reason of failure */
+__CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,posix_spawn,(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__path,__file_actions,__attrp,___argv,___envp))
+#else /* __CRT_HAVE_posix_spawn */
+#include <asm/fcntl.h>
+#include <asm/vfork.h>
+#if (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_posix_fspawn_np) || (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))))
+#include <libc/local/spawn/posix_spawn.h>
+/* >> posix_spawn(3)
+ * Implementation for the fastest possible method of (safely) doing fork(2)+execve(2)
+ * in order to spawn a new process from the given `path' program.
+ * For this purpose, any error that may happen during either the fork(3), the execve(2)
+ * or any of the numerous additional system calls that may be performed in-between will
+ * be returned by this function to the parent process, while the function itself never
+ * actually returns in the child process.
+ * For this purpose, this function tries to make use of `vfork(2)' in combination
+ * with `__ARCH_HAVE_SHARED_VM_VFORK', and if that isn't available, a temporary pipe
+ * is used to communicate process initialization errors, as well as to await a successful
+ * exec call by using the fact that a successful exec will close all `O_CLOEXEC' files,
+ * with the pipe having been given that flag, and that a pipe without both ends still open
+ * will always have its read immediately return (which is used to indicate success)
+ * @param: pid:          Store the PID of the newly spawned child process here
+ * @param: path:         The pathname of the program that should be executed
+ * @param: file_actions: [0..1] A set of additional actions to perform in regards to file-
+ *                              handle operations. Can be used to (e.g.) re-direct stdout
+ *                              for the new process
+ * @param: attrp:        [0..1] Additional process attributes to set for the child process
+ * @param: argv:         Same as the `argv' accepted by `execve(2)'
+ * @param: envp:         Same as the `envp' accepted by `execve(2)'
+ * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
+ * @return: * :          Error errno-code describing the reason of failure */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 5, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL posix_spawn)(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn))(__pid, __path, __file_actions, __attrp, ___argv, ___envp); })
+#endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_posix_fspawn_np || (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))) */
+#endif /* !__CRT_HAVE_posix_spawn */
+#ifdef __CRT_HAVE_posix_spawnp
+/* >> posix_spawnp(3)
+ * Same as `posix_spawn(3)', but search `getenv("PATH")' for `file', rather than
+ * directly making use of `file' as the absolute filename of the file to execute.
+ * Note however that when `file' contains any slashes, `$PATH' won't be searched
+ * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
+__CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,posix_spawnp,(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__file,__file_actions,__attrp,___argv,___envp))
+#else /* __CRT_HAVE_posix_spawnp */
+#include <hybrid/__alloca.h>
+#include <libc/local/environ.h>
+#include <asm/fcntl.h>
+#include <asm/vfork.h>
+#if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_posix_spawn) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_posix_fspawn_np) || (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca)
+#include <libc/local/spawn/posix_spawnp.h>
+/* >> posix_spawnp(3)
+ * Same as `posix_spawn(3)', but search `getenv("PATH")' for `file', rather than
+ * directly making use of `file' as the absolute filename of the file to execute.
+ * Note however that when `file' contains any slashes, `$PATH' won't be searched
+ * either, but instead, `file' is used as-is. (same as with `execve(2)' vs. `execvpe(3)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 5, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL posix_spawnp)(pid_t *__restrict __pid, const char *__restrict __file, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnp))(__pid, __file, __file_actions, __attrp, ___argv, ___envp); })
+#endif /* (__CRT_HAVE_getenv || __LOCAL_environ) && (__CRT_HAVE_posix_spawn || ((__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_posix_fspawn_np || (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))))) && __hybrid_alloca */
+#endif /* !__CRT_HAVE_posix_spawnp */
+#ifdef __CRT_HAVE_posix_spawnattr_init
+/* >> posix_spawnattr_init(3)
+ * Initialize a given set of spawn attributes to all zero
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawnattr_init,(posix_spawnattr_t *__restrict __attr),(__attr))
+#else /* __CRT_HAVE_posix_spawnattr_init */
+#include <libc/local/spawn/posix_spawnattr_init.h>
+/* >> posix_spawnattr_init(3)
+ * Initialize a given set of spawn attributes to all zero
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_init)(posix_spawnattr_t *__restrict __attr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_init))(__attr); })
+#endif /* !__CRT_HAVE_posix_spawnattr_init */
+#ifdef __CRT_HAVE_posix_spawnattr_destroy
+/* >> posix_spawnattr_destroy(3)
+ * Destroy a given set of spawn attributes
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawnattr_destroy,(posix_spawnattr_t *__restrict __attr),(__attr))
+#else /* __CRT_HAVE_posix_spawnattr_destroy */
+#include <libc/local/spawn/posix_spawnattr_destroy.h>
+/* >> posix_spawnattr_destroy(3)
+ * Destroy a given set of spawn attributes
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_destroy)(posix_spawnattr_t *__restrict __attr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_destroy))(__attr); })
+#endif /* !__CRT_HAVE_posix_spawnattr_destroy */
+#ifdef __CRT_HAVE_posix_spawnattr_getflags
+/* >> posix_spawnattr_setflags(3)
+ * Get the set of flags previously specified by `posix_spawnattr_setflags()'
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_getflags,(posix_spawnattr_t const *__restrict __attr, short int *__restrict __pflags),(__attr,__pflags))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_getflags.h>
+/* >> posix_spawnattr_setflags(3)
+ * Get the set of flags previously specified by `posix_spawnattr_setflags()'
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_getflags, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_getflags)(posix_spawnattr_t const *__restrict __attr, short int *__restrict __pflags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_getflags))(__attr, __pflags); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_setflags
+/* >> posix_spawnattr_setflags(3)
+ * Specify the set of additional operations to-be performed by the
+ * child process prior to being started. The given `flags' is a set of:
+ *   - POSIX_SPAWN_RESETIDS:      Perform 2 calls `seteuid(getuid())' and `setegid(getgid())'
+ *   - POSIX_SPAWN_SETSIGDEF:     s.a. posix_spawnattr_setsigdefault(3)
+ *   - POSIX_SPAWN_SETSIGMASK:    s.a. posix_spawnattr_setsigmask(3)
+ *   - POSIX_SPAWN_SETPGROUP:     s.a. posix_spawnattr_setpgroup(3)
+ *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
+ *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawnattr_setflags,(posix_spawnattr_t *__restrict __attr, short int __flags),(__attr,__flags))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_setflags.h>
+/* >> posix_spawnattr_setflags(3)
+ * Specify the set of additional operations to-be performed by the
+ * child process prior to being started. The given `flags' is a set of:
+ *   - POSIX_SPAWN_RESETIDS:      Perform 2 calls `seteuid(getuid())' and `setegid(getgid())'
+ *   - POSIX_SPAWN_SETSIGDEF:     s.a. posix_spawnattr_setsigdefault(3)
+ *   - POSIX_SPAWN_SETSIGMASK:    s.a. posix_spawnattr_setsigmask(3)
+ *   - POSIX_SPAWN_SETPGROUP:     s.a. posix_spawnattr_setpgroup(3)
+ *   - POSIX_SPAWN_SETSCHEDULER:  s.a. posix_spawnattr_setschedpolicy(3)
+ *   - POSIX_SPAWN_SETSCHEDPARAM: s.a. posix_spawnattr_setschedparam(3)
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_setflags, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_setflags)(posix_spawnattr_t *__restrict __attr, short int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_setflags))(__attr, __flags); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_getsigdefault
+/* >> posix_spawnattr_getsigdefault(3)
+ * Get the set of signal handler that are reset of `SIG_DFL' by
+ * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_getsigdefault,(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigdefault),(__attr,__sigdefault))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_getsigdefault.h>
+/* >> posix_spawnattr_getsigdefault(3)
+ * Get the set of signal handler that are reset of `SIG_DFL' by
+ * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_getsigdefault, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_getsigdefault)(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigdefault) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_getsigdefault))(__attr, __sigdefault); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_setsigdefault
+/* >> posix_spawnattr_setsigdefault(3)
+ * Set the set of signal handler that are reset of `SIG_DFL' by
+ * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_setsigdefault,(posix_spawnattr_t *__restrict __attr, sigset_t const *__restrict __sigdefault),(__attr,__sigdefault))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_setsigdefault.h>
+/* >> posix_spawnattr_setsigdefault(3)
+ * Set the set of signal handler that are reset of `SIG_DFL' by
+ * the child process when `POSIX_SPAWN_SETSIGDEF' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_setsigdefault, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_setsigdefault)(posix_spawnattr_t *__restrict __attr, sigset_t const *__restrict __sigdefault) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_setsigdefault))(__attr, __sigdefault); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_getsigmask
+/* >> posix_spawnattr_getsigmask(3)
+ * Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
+ * that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_getsigmask,(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigmask),(__attr,__sigmask))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_getsigmask.h>
+/* >> posix_spawnattr_getsigmask(3)
+ * Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
+ * that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_getsigmask, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_getsigmask)(posix_spawnattr_t const *__restrict __attr, sigset_t *__restrict __sigmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_getsigmask))(__attr, __sigmask); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_setsigmask
+/* >> posix_spawnattr_getsigmask(3)
+ * Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
+ * that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_setsigmask,(posix_spawnattr_t *__restrict __attr, sigset_t const *__restrict __sigmask),(__attr,__sigmask))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_setsigmask.h>
+/* >> posix_spawnattr_getsigmask(3)
+ * Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
+ * that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_setsigmask, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_setsigmask)(posix_spawnattr_t *__restrict __attr, sigset_t const *__restrict __sigmask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_setsigmask))(__attr, __sigmask); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_getpgroup
+/* >> posix_spawnattr_getpgroup(3)
+ * Get the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+ * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_getpgroup,(posix_spawnattr_t const *__restrict __attr, pid_t *__restrict __pgroup),(__attr,__pgroup))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_getpgroup.h>
+/* >> posix_spawnattr_getpgroup(3)
+ * Get the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+ * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_getpgroup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_getpgroup)(posix_spawnattr_t const *__restrict __attr, pid_t *__restrict __pgroup) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_getpgroup))(__attr, __pgroup); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_setpgroup
+/* >> posix_spawnattr_getschedparam(3)
+ * Set the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+ * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
+ * HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawnattr_setpgroup,(posix_spawnattr_t *__restrict __attr, pid_t __pgroup),(__attr,__pgroup))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_setpgroup.h>
+/* >> posix_spawnattr_getschedparam(3)
+ * Set the `pgid' argument of a call `setpgid(getpid(), pgid)' that
+ * the child process will perform when `POSIX_SPAWN_SETPGROUP' is set.
+ * HINT: A call `setpgid(getpid(), 0)' is the same as `setpgid(getpid(), getpid())'!
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_setpgroup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_setpgroup)(posix_spawnattr_t *__restrict __attr, pid_t __pgroup) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_setpgroup))(__attr, __pgroup); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_getschedpolicy
+/* >> posix_spawnattr_getschedparam(3)
+ * Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
+ * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_getschedpolicy,(posix_spawnattr_t const *__restrict __attr, int *__restrict __schedpolicy),(__attr,__schedpolicy))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_getschedpolicy.h>
+/* >> posix_spawnattr_getschedparam(3)
+ * Get the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
+ * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_getschedpolicy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_getschedpolicy)(posix_spawnattr_t const *__restrict __attr, int *__restrict __schedpolicy) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_getschedpolicy))(__attr, __schedpolicy); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_setschedpolicy
+/* >> posix_spawnattr_getschedparam(3)
+ * Set the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
+ * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawnattr_setschedpolicy,(posix_spawnattr_t *__restrict __attr, int __schedpolicy),(__attr,__schedpolicy))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_setschedpolicy.h>
+/* >> posix_spawnattr_getschedparam(3)
+ * Set the `policy' argument of a call `sched_setscheduler(getpid(), policy, param)'
+ * that the child process will perform when `POSIX_SPAWN_SETSCHEDULER' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_setschedpolicy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__restrict __attr, int __schedpolicy) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_setschedpolicy))(__attr, __schedpolicy); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_getschedparam
+/* >> posix_spawnattr_getschedparam(3)
+ * Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
+ * that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_getschedparam,(posix_spawnattr_t const *__restrict __attr, struct sched_param *__restrict __schedparam),(__attr,__schedparam))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_getschedparam.h>
+/* >> posix_spawnattr_getschedparam(3)
+ * Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
+ * that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_getschedparam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_getschedparam)(posix_spawnattr_t const *__restrict __attr, struct sched_param *__restrict __schedparam) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_getschedparam))(__attr, __schedparam); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawnattr_setschedparam
+/* >> posix_spawnattr_setschedparam(3)
+ * Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
+ * that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,posix_spawnattr_setschedparam,(posix_spawnattr_t *__restrict __attr, struct sched_param const *__restrict __schedparam),(__attr,__schedparam))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawnattr_setschedparam.h>
+/* >> posix_spawnattr_setschedparam(3)
+ * Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
+ * that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawnattr_setschedparam, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawnattr_setschedparam)(posix_spawnattr_t *__restrict __attr, struct sched_param const *__restrict __schedparam) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawnattr_setschedparam))(__attr, __schedparam); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawn_file_actions_init
+/* >> posix_spawn_file_actions_init(3)
+ * Initialize the given spawn-file-actions object `file_actions'
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_init,(posix_spawn_file_actions_t *__restrict __file_actions),(__file_actions))
+#else /* __CRT_HAVE_posix_spawn_file_actions_init */
+#include <libc/local/spawn/posix_spawn_file_actions_init.h>
+/* >> posix_spawn_file_actions_init(3)
+ * Initialize the given spawn-file-actions object `file_actions'
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_init)(posix_spawn_file_actions_t *__restrict __file_actions) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_init))(__file_actions); })
+#endif /* !__CRT_HAVE_posix_spawn_file_actions_init */
+#ifdef __CRT_HAVE_posix_spawn_file_actions_destroy
+/* >> posix_spawn_file_actions_destroy(3)
+ * Finalize the given spawn-file-actions object `file_actions'
+ * @return: 0 : Success */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_destroy,(posix_spawn_file_actions_t *__restrict __file_actions),(__file_actions))
+#elif defined(__POSIX_SPAWN_USE_KOS)
+#include <libc/local/spawn/posix_spawn_file_actions_destroy.h>
+/* >> posix_spawn_file_actions_destroy(3)
+ * Finalize the given spawn-file-actions object `file_actions'
+ * @return: 0 : Success */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict __file_actions) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_destroy))(__file_actions); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawn_file_actions_addopen
+/* >> posix_spawn_file_actions_addopen(3)
+ * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
+ * Note though that the intermediate file returned by `open()' will not remain open!
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__CDECLARE(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addopen,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, mode_t __mode),(__file_actions,__fd,__path,__oflags,__mode))
+#elif defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#include <libc/local/spawn/posix_spawn_file_actions_addopen.h>
+/* >> posix_spawn_file_actions_addopen(3)
+ * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
+ * Note though that the intermediate file returned by `open()' will not remain open!
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 3)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen))(__file_actions, __fd, __path, __oflags, __mode); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawn_file_actions_addclose
+/* >> posix_spawn_file_actions_addclose(3)
+ * Enqueue a call `close(fd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addclose,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd),(__file_actions,__fd))
+#elif defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#include <libc/local/spawn/posix_spawn_file_actions_addclose.h>
+/* >> posix_spawn_file_actions_addclose(3)
+ * Enqueue a call `close(fd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addclose, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addclose))(__file_actions, __fd); })
+#endif /* ... */
+#ifdef __CRT_HAVE_posix_spawn_file_actions_adddup2
+/* >> posix_spawn_file_actions_adddup2(3)
+ * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_adddup2,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __oldfd, __fd_t __newfd),(__file_actions,__oldfd,__newfd))
+#elif defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#include <libc/local/spawn/posix_spawn_file_actions_adddup2.h>
+/* >> posix_spawn_file_actions_adddup2(3)
+ * Enqueue a call `dup2(oldfd, newfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_adddup2, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_adddup2)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __oldfd, __fd_t __newfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_adddup2))(__file_actions, __oldfd, __newfd); })
+#endif /* ... */
+#ifdef __USE_KOS
+#ifdef __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np
+/* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
+ * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addtcsetpgrp_np,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd),(__file_actions,__fd))
+#elif defined(__POSIX_SPAWN_ACTION_TCSETPGRP) && defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#include <libc/local/spawn/posix_spawn_file_actions_addtcsetpgrp_np.h>
+/* >> posix_spawn_file_actions_addtcsetpgrp_np(3)
+ * Enqueue a call `tcsetpgrp(fd, getpid())' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addtcsetpgrp_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addtcsetpgrp_np))(__file_actions, __fd); })
+#endif /* ... */
+#endif /* __USE_KOS */
 
 #endif /* __CC__ */
 

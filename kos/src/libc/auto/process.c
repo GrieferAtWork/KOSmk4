@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbb6ff65 */
+/* HASH CRC-32:0xefda67f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,13 +341,9 @@ NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
 		 * since we overwrote it to be 0 above) */
 		__libc_seterrno(old_errno);
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
 		libc_close(pipes[1]); /* Close the writer. */
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 		temp = libc_read(pipes[0], &error, sizeof(error));
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
 		libc_close(pipes[0]); /* Close the reader. */
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 		if (temp < 0)
 			goto err_join_zombie_child;
 		if (temp == sizeof(error)) {
@@ -392,13 +388,9 @@ read_child_errors:
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
 	 *        closed and read() returns ZERO(0)) */
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
 	libc_close(pipes[1]); /* Close the writer. */
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 	temp = libc_read(pipes[0], &error, sizeof(error));
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
 	libc_close(pipes[0]); /* Close the reader. */
-#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
 	if (temp < 0)
 		goto err_join_zombie_child;
 	/* This means that `fexecve()' below closed the pipe during a successful exec(). */

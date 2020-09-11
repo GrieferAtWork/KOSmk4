@@ -22,23 +22,74 @@
 
 #include <__crt.h>
 
-/* Flags to be set in the `posix_spawnattr_t'. */
-#if defined(__CRT_KOS) || defined(__CRT_GLC)
-#define __POSIX_SPAWN_RESETIDS      0x01
-#define __POSIX_SPAWN_SETPGROUP     0x02
-#define __POSIX_SPAWN_SETSIGDEF     0x04
-#define __POSIX_SPAWN_SETSIGMASK    0x08
-#define __POSIX_SPAWN_SETSCHEDPARAM 0x10
-#define __POSIX_SPAWN_SETSCHEDULER  0x20
-#define __POSIX_SPAWN_USEVFORK 0x40
-#elif defined(__CRT_CYG)
-#define __POSIX_SPAWN_RESETIDS      0x01
-#define __POSIX_SPAWN_SETPGROUP     0x02
-#define __POSIX_SPAWN_SETSCHEDPARAM 0x04
-#define __POSIX_SPAWN_SETSCHEDULER  0x08
-#define __POSIX_SPAWN_SETSIGDEF     0x10
-#define __POSIX_SPAWN_SETSIGMASK    0x20
+
+/* Figure out if we should libc's implementation of posix_spawn()
+ * If not, we must implement _everything_ in headers! */
+#if !(defined(__CRT_HAVE_posix_spawn) &&                       \
+      defined(__CRT_HAVE_posix_spawnp) &&                      \
+      defined(__CRT_HAVE_posix_spawnattr_init) &&              \
+      defined(__CRT_HAVE_posix_spawnattr_destroy) &&           \
+      defined(__CRT_HAVE_posix_spawnattr_getsigdefault) &&     \
+      defined(__CRT_HAVE_posix_spawnattr_setsigdefault) &&     \
+      defined(__CRT_HAVE_posix_spawnattr_getsigmask) &&        \
+      defined(__CRT_HAVE_posix_spawnattr_setsigmask) &&        \
+      defined(__CRT_HAVE_posix_spawnattr_getflags) &&          \
+      defined(__CRT_HAVE_posix_spawnattr_setflags) &&          \
+      defined(__CRT_HAVE_posix_spawnattr_getpgroup) &&         \
+      defined(__CRT_HAVE_posix_spawnattr_setpgroup) &&         \
+      defined(__CRT_HAVE_posix_spawnattr_getschedpolicy) &&    \
+      defined(__CRT_HAVE_posix_spawnattr_setschedpolicy) &&    \
+      defined(__CRT_HAVE_posix_spawnattr_getschedparam) &&     \
+      defined(__CRT_HAVE_posix_spawnattr_setschedparam) &&     \
+      defined(__CRT_HAVE_posix_spawn_file_actions_init) &&     \
+      defined(__CRT_HAVE_posix_spawn_file_actions_destroy) &&  \
+      defined(__CRT_HAVE_posix_spawn_file_actions_addopen) &&  \
+      defined(__CRT_HAVE_posix_spawn_file_actions_addclose) && \
+      defined(__CRT_HAVE_posix_spawn_file_actions_adddup2))
+#undef __CRT_HAVE_posix_spawn
+#undef __CRT_HAVE_posix_spawnp
+#undef __CRT_HAVE_posix_spawnattr_init
+#undef __CRT_HAVE_posix_spawnattr_destroy
+#undef __CRT_HAVE_posix_spawnattr_getsigdefault
+#undef __CRT_HAVE_posix_spawnattr_setsigdefault
+#undef __CRT_HAVE_posix_spawnattr_getsigmask
+#undef __CRT_HAVE_posix_spawnattr_setsigmask
+#undef __CRT_HAVE_posix_spawnattr_getflags
+#undef __CRT_HAVE_posix_spawnattr_setflags
+#undef __CRT_HAVE_posix_spawnattr_getpgroup
+#undef __CRT_HAVE_posix_spawnattr_setpgroup
+#undef __CRT_HAVE_posix_spawnattr_getschedpolicy
+#undef __CRT_HAVE_posix_spawnattr_setschedpolicy
+#undef __CRT_HAVE_posix_spawnattr_getschedparam
+#undef __CRT_HAVE_posix_spawnattr_setschedparam
+#undef __CRT_HAVE_posix_spawn_file_actions_init
+#undef __CRT_HAVE_posix_spawn_file_actions_destroy
+#undef __CRT_HAVE_posix_spawn_file_actions_addopen
+#undef __CRT_HAVE_posix_spawn_file_actions_addclose
+#undef __CRT_HAVE_posix_spawn_file_actions_adddup2
+#undef __POSIX_SPAWN_USE_KOS
+#elif defined(__CRT_KOS) || defined(__CRT_GLC)
+#define __POSIX_SPAWN_USE_KOS 1
 #endif /* ... */
+
+/* Flags to be set in the `posix_spawnattr_t'. */
+#ifdef __POSIX_SPAWN_USE_KOS
+#define __POSIX_SPAWN_RESETIDS      0x0001
+#define __POSIX_SPAWN_SETPGROUP     0x0002
+#define __POSIX_SPAWN_SETSIGDEF     0x0004
+#define __POSIX_SPAWN_SETSIGMASK    0x0008
+#define __POSIX_SPAWN_SETSCHEDPARAM 0x0010
+#define __POSIX_SPAWN_SETSCHEDULER  0x0020
+#define __POSIX_SPAWN_USEVFORK      0x0040
+#elif defined(__CRT_CYG)
+#define __POSIX_SPAWN_RESETIDS      0x0001
+#define __POSIX_SPAWN_SETPGROUP     0x0002
+#define __POSIX_SPAWN_SETSCHEDPARAM 0x0004
+#define __POSIX_SPAWN_SETSCHEDULER  0x0008
+#define __POSIX_SPAWN_SETSIGDEF     0x0010
+#define __POSIX_SPAWN_SETSIGMASK    0x0020
+#endif /* ... */
+
 
 
 #endif /* !_ASM_POSIX_SPAWN_H */

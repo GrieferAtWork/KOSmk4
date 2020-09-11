@@ -2615,6 +2615,7 @@
 #define __CRT_HAVE_posix_fadvise64 1
 #define __CRT_HAVE_posix_fallocate 1
 #define __CRT_HAVE_posix_fallocate64 1
+#define __CRT_HAVE_posix_fspawn_np 1
 #define __CRT_HAVE_posix_madvise 1
 #define __CRT_HAVE_posix_memalign 1
 #define __CRT_HAVE_posix_openpt 1
@@ -2622,6 +2623,7 @@
 #define __CRT_HAVE_posix_spawn_file_actions_addclose 1
 #define __CRT_HAVE_posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_posix_spawn_file_actions_addopen 1
+#define __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np 1
 #define __CRT_HAVE_posix_spawn_file_actions_destroy 1
 #define __CRT_HAVE_posix_spawn_file_actions_init 1
 #define __CRT_HAVE_posix_spawnattr_destroy 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37fa7416 */
+/* HASH CRC-32:0x59ed1859 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -386,27 +386,6 @@
 #define __stub_posix_fadvise64 1
 #define __stub_posix_fallocate64 1
 #define __stub_posix_openpt 1
-#define __stub_posix_spawn 1
-#define __stub_posix_spawn_file_actions_addclose 1
-#define __stub_posix_spawn_file_actions_adddup2 1
-#define __stub_posix_spawn_file_actions_addopen 1
-#define __stub_posix_spawn_file_actions_destroy 1
-#define __stub_posix_spawn_file_actions_init 1
-#define __stub_posix_spawnattr_destroy 1
-#define __stub_posix_spawnattr_getflags 1
-#define __stub_posix_spawnattr_getpgroup 1
-#define __stub_posix_spawnattr_getschedparam 1
-#define __stub_posix_spawnattr_getschedpolicy 1
-#define __stub_posix_spawnattr_getsigdefault 1
-#define __stub_posix_spawnattr_getsigmask 1
-#define __stub_posix_spawnattr_init 1
-#define __stub_posix_spawnattr_setflags 1
-#define __stub_posix_spawnattr_setpgroup 1
-#define __stub_posix_spawnattr_setschedparam 1
-#define __stub_posix_spawnattr_setschedpolicy 1
-#define __stub_posix_spawnattr_setsigdefault 1
-#define __stub_posix_spawnattr_setsigmask 1
-#define __stub_posix_spawnp 1
 #define __stub_psiginfo 1
 #define __stub_psignal 1
 #define __stub_pthread_atfork 1

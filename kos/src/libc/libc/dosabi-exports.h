@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91d0c786 */
+/* HASH CRC-32:0xedbf7a89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1474,16 +1474,17 @@ DEFINE_PUBLIC_ALIAS(DOS$pthread_kill, libd_pthread_kill);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_sigqueue, libd_pthread_sigqueue);
 
 /* spawn */
+DEFINE_PUBLIC_ALIAS(DOS$posix_fspawn_np, libd_posix_fspawn_np);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawn, libd_posix_spawn);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnp, libd_posix_spawnp);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_init, libd_posix_spawnattr_init);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_destroy, libd_posix_spawnattr_destroy);
+DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_getflags, libd_posix_spawnattr_getflags);
+DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_setflags, libd_posix_spawnattr_setflags);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_getsigdefault, libd_posix_spawnattr_getsigdefault);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_setsigdefault, libd_posix_spawnattr_setsigdefault);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_getsigmask, libd_posix_spawnattr_getsigmask);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_setsigmask, libd_posix_spawnattr_setsigmask);
-DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_getflags, libd_posix_spawnattr_getflags);
-DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_setflags, libd_posix_spawnattr_setflags);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_getpgroup, libd_posix_spawnattr_getpgroup);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_setpgroup, libd_posix_spawnattr_setpgroup);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawnattr_getschedpolicy, libd_posix_spawnattr_getschedpolicy);
@@ -1495,6 +1496,7 @@ DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_destroy, libd_posix_spawn_file_
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_addopen, libd_posix_spawn_file_actions_addopen);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_addclose, libd_posix_spawn_file_actions_addclose);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_adddup2, libd_posix_spawn_file_actions_adddup2);
+DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_addtcsetpgrp_np, libd_posix_spawn_file_actions_addtcsetpgrp_np);
 
 /* ssp.string */
 DEFINE_PUBLIC_ALIAS(DOS$__memcpy_chk, libd___memcpy_chk);
