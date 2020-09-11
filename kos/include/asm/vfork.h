@@ -61,6 +61,39 @@
  * >> On KOS this problem is handled differently, such that a thread with
  *    the `TASK_FVFORK' flag set is be handled as though `sigmask_getrd()'
  *    always returned a signal mask identical to `&kernel_sigmask_full'
+ * >> As far as semantics go, you can think of `__ARCH_HAVE_SIGMASK_VFORK'
+ *    like this:
+ *    >> #ifdef __ARCH_HAVE_SIGMASK_VFORK
+ *    >> #define vfork_with_sigmask() vfork()
+ *    >> #else // __ARCH_HAVE_SIGMASK_VFORK
+ *    >> // NOTES:
+ *    >> //   - `run_after_exec()' can't be implemented in user-space,
+ *    >> //     but like the name would suggest, this is a piece of code
+ *    >> //     that is run by the kernel after a successful exec(), but
+ *    >> //     before the newly exec'd program first gains control.
+ *    >> //   - Further calls to `sigprocmask()' won't actually be able
+ *    >> //     to alter the effective mask set (which remains equal to
+ *    >> //     `_nmask') until `RUN_AFTER_EXEC()' loads `_omask'.
+ *    >> //     Instead, further call to `sigprocmask()' alter `_omask'.
+ *    >> #define vfork_with_sigmask()                            \
+ *    >>    ({                                                   \
+ *    >>        sigset_t _nmask, _omask;                         \
+ *    >>        pid_t _pid;                                      \
+ *    >>        sigemptyset(&_nmask);                            \
+ *    >>        sigaddset(SIGKILL, &_nmask);                     \
+ *    >>        sigaddset(SIGSTOP, &_nmask);                     \
+ *    >>        sigprocmask(SIG_SETMASK, &_nmask, &_omask);      \
+ *    >>        _pid = vfork();                                  \
+ *    >>        if (_pid == 0) {                                 \
+ *    >>            RUN_AFTER_EXEC({                             \
+ *    >>                sigprocmask(SIG_SETMASK, &_omask, NULL); \
+ *    >>            });                                          \
+ *    >>        } else {                                         \
+ *    >>            sigprocmask(SIG_SETMASK, &_omask, NULL);     \
+ *    >>        }                                                \
+ *    >>        _pid;                                            \
+ *    >>    })
+ *    >> #endif // !__ARCH_HAVE_SIGMASK_VFORK
  */
 
 #if defined(__linux__)
