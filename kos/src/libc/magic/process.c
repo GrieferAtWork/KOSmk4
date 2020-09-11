@@ -744,7 +744,7 @@ do_exec:
 	write(pipes[1], &error, sizeof(error));
 	/* No need to close the pipe, it's auto-closed by the kernel! */
 @@pp_endif@@
-	_Exit(255);
+	_Exit(127);
 }
 %#endif /* __USE_KOS */
 %#endif /* __USE_DOS || __USE_KOS */

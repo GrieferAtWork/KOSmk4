@@ -74,20 +74,24 @@
 
 /* Flags to be set in the `posix_spawnattr_t'. */
 #ifdef __POSIX_SPAWN_USE_KOS
-#define __POSIX_SPAWN_RESETIDS      0x0001
-#define __POSIX_SPAWN_SETPGROUP     0x0002
-#define __POSIX_SPAWN_SETSIGDEF     0x0004
-#define __POSIX_SPAWN_SETSIGMASK    0x0008
-#define __POSIX_SPAWN_SETSCHEDPARAM 0x0010
-#define __POSIX_SPAWN_SETSCHEDULER  0x0020
-#define __POSIX_SPAWN_USEVFORK      0x0040
+#define __POSIX_SPAWN_RESETIDS      0x0001 /* Perform 2 calls `seteuid(getuid())' and `setegid(getgid())' */
+#define __POSIX_SPAWN_SETPGROUP     0x0002 /* s.a. `posix_spawnattr_setpgroup(3)' */
+#define __POSIX_SPAWN_SETSIGDEF     0x0004 /* s.a. `posix_spawnattr_setsigdefault(3)' */
+#define __POSIX_SPAWN_SETSIGMASK    0x0008 /* s.a. `posix_spawnattr_setsigmask(3)' */
+#define __POSIX_SPAWN_SETSCHEDPARAM 0x0010 /* s.a. `posix_spawnattr_setschedparam(3)' */
+#define __POSIX_SPAWN_SETSCHEDULER  0x0020 /* s.a. `posix_spawnattr_setschedpolicy(3)' */
+#define __POSIX_SPAWN_USEVFORK      0x0040 /* Ignored */
+#ifdef __CRT_KOS
+#define __POSIX_SPAWN_NOEXECERR     0x1000 /* Don't propagate exec() error, and leave the
+                                            * child as unreaped with exit status `127' */
+#endif /* __CRT_KOS */
 #elif defined(__CRT_CYG)
-#define __POSIX_SPAWN_RESETIDS      0x0001
-#define __POSIX_SPAWN_SETPGROUP     0x0002
-#define __POSIX_SPAWN_SETSCHEDPARAM 0x0004
-#define __POSIX_SPAWN_SETSCHEDULER  0x0008
-#define __POSIX_SPAWN_SETSIGDEF     0x0010
-#define __POSIX_SPAWN_SETSIGMASK    0x0020
+#define __POSIX_SPAWN_RESETIDS      0x0001 /* Perform 2 calls `seteuid(getuid())' and `setegid(getgid())' */
+#define __POSIX_SPAWN_SETPGROUP     0x0002 /* s.a. `posix_spawnattr_setpgroup(3)' */
+#define __POSIX_SPAWN_SETSCHEDPARAM 0x0004 /* s.a. `posix_spawnattr_setschedparam(3)' */
+#define __POSIX_SPAWN_SETSCHEDULER  0x0008 /* s.a. `posix_spawnattr_setschedpolicy(3)' */
+#define __POSIX_SPAWN_SETSIGDEF     0x0010 /* s.a. `posix_spawnattr_setsigdefault(3)' */
+#define __POSIX_SPAWN_SETSIGMASK    0x0020 /* s.a. `posix_spawnattr_setsigmask(3)' */
 #endif /* ... */
 
 

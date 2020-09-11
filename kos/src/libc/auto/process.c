@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefda67f4 */
+/* HASH CRC-32:0xd7bfb099 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -433,7 +433,7 @@ do_exec:
 	libc_write(pipes[1], &error, sizeof(error));
 	/* No need to close the pipe, it's auto-closed by the kernel! */
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
-	libc__Exit(255);
+	libc__Exit(127);
 }
 #endif /* !__KERNEL__ */
 

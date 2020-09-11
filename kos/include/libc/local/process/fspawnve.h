@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7cafaf2 */
+/* HASH CRC-32:0x2b81128f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -574,7 +574,7 @@ __do_exec:
 	__localdep_write(__pipes[1], &__error, sizeof(__error));
 	/* No need to close the pipe, it's auto-closed by the kernel! */
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
-	__localdep__Exit(255);
+	__localdep__Exit(127);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fspawnve_defined

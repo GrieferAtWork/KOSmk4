@@ -45,29 +45,35 @@
 __SYSDECL_BEGIN
 
 /* Flags to be set in the `posix_spawnattr_t'. */
+
 #ifdef __POSIX_SPAWN_RESETIDS
-#define POSIX_SPAWN_RESETIDS __POSIX_SPAWN_RESETIDS
+#define POSIX_SPAWN_RESETIDS __POSIX_SPAWN_RESETIDS /* Perform 2 calls `seteuid(getuid())' and `setegid(getgid())' */
 #endif /* __POSIX_SPAWN_RESETIDS */
 #ifdef __POSIX_SPAWN_SETPGROUP
-#define POSIX_SPAWN_SETPGROUP __POSIX_SPAWN_SETPGROUP
+#define POSIX_SPAWN_SETPGROUP __POSIX_SPAWN_SETPGROUP /* s.a. `posix_spawnattr_setpgroup(3)' */
 #endif /* __POSIX_SPAWN_SETPGROUP */
 #ifdef __POSIX_SPAWN_SETSIGDEF
-#define POSIX_SPAWN_SETSIGDEF __POSIX_SPAWN_SETSIGDEF
+#define POSIX_SPAWN_SETSIGDEF __POSIX_SPAWN_SETSIGDEF /* s.a. `posix_spawnattr_setsigdefault(3)' */
 #endif /* __POSIX_SPAWN_SETSIGDEF */
 #ifdef __POSIX_SPAWN_SETSIGMASK
-#define POSIX_SPAWN_SETSIGMASK __POSIX_SPAWN_SETSIGMASK
+#define POSIX_SPAWN_SETSIGMASK __POSIX_SPAWN_SETSIGMASK /* s.a. `posix_spawnattr_setsigmask(3)' */
 #endif /* __POSIX_SPAWN_SETSIGMASK */
 #ifdef __POSIX_SPAWN_SETSCHEDPARAM
-#define POSIX_SPAWN_SETSCHEDPARAM __POSIX_SPAWN_SETSCHEDPARAM
+#define POSIX_SPAWN_SETSCHEDPARAM __POSIX_SPAWN_SETSCHEDPARAM /* s.a. `posix_spawnattr_setschedparam(3)' */
 #endif /* __POSIX_SPAWN_SETSCHEDPARAM */
 #ifdef __POSIX_SPAWN_SETSCHEDULER
-#define POSIX_SPAWN_SETSCHEDULER __POSIX_SPAWN_SETSCHEDULER
+#define POSIX_SPAWN_SETSCHEDULER __POSIX_SPAWN_SETSCHEDULER /* s.a. `posix_spawnattr_setschedpolicy(3)' */
 #endif /* __POSIX_SPAWN_SETSCHEDULER */
 #ifdef __USE_GNU
 #ifdef __POSIX_SPAWN_USEVFORK
-#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK
+#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK /* Ignored */
 #endif /* __POSIX_SPAWN_USEVFORK */
 #endif /* __USE_GNU */
+
+#ifdef __POSIX_SPAWN_NOEXECERR
+#define POSIX_SPAWN_NOEXECERR_NP __POSIX_SPAWN_NOEXECERR /* Don't propagate exec() error, and leave the
+                                                          * child as unreaped with exit status `127' */
+#endif /* __POSIX_SPAWN_NOEXECERR */
 
 
 #ifdef __CC__
@@ -419,24 +425,35 @@ do_exec:
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as O_CLOEXEC! */
 	fexecve(execfd, ___argv, ___envp);
+@@pp_ifdef __POSIX_SPAWN_NOEXECERR@@
+	if (attrp && attrp->@__flags@ & __POSIX_SPAWN_NOEXECERR) {
+		/* Suppress the exec error. */
+@@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
+		__libc_seterrno(0);
+@@pp_endif@@
+	} else
+@@pp_endif@@
+	{
 child_error:
 @@pp_if defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)@@
-	/* If the exec fails, it will have modified `errno' to indicate this fact.
-	 * And since we're sharing VMs with our parent process, the error reason
-	 * will have already been written back to our parent's VM, so there's
-	 * actually nothing left for us to do, but to simply exit! */
+		/* If the exec fails, it will have modified `errno' to indicate this fact.
+		 * And since we're sharing VMs with our parent process, the error reason
+		 * will have already been written back to our parent's VM, so there's
+		 * actually nothing left for us to do, but to simply exit! */
+		;
 @@pp_else@@
-	/* Write the exec-error back to our parent. */
+		/* Write the exec-error back to our parent. */
 @@pp_ifdef ENOENT@@
-	error = __libc_geterrno_or(ENOENT);
+		error = __libc_geterrno_or(ENOENT);
 @@pp_else@@
-	error = __libc_geterrno_or(1);
+		error = __libc_geterrno_or(1);
 @@pp_endif@@
-	/* Communicate back why this failed. */
-	write(pipes[1], &error, sizeof(error));
-	/* No need to close the pipe, it's auto-closed by the kernel! */
+		/* Communicate back why this failed. */
+		write(pipes[1], &error, sizeof(error));
+		/* No need to close the pipe, it's auto-closed by the kernel! */
 @@pp_endif@@
-	_Exit(255);
+	}
+	_Exit(127);
 @@pp_else@@
 	char buf[32];
 	sprintf(buf, "/proc/self/fd/%d", execfd);

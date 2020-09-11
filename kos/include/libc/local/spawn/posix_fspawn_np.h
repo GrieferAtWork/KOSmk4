@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x452873b8 */
+/* HASH CRC-32:0xb35ccd9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -919,24 +919,35 @@ __do_exec:
 	/* When the exec succeeds, the pipe is auto-
 	 * closed because it's marked as O_CLOEXEC! */
 	__localdep_fexecve(__execfd, ___argv, ___envp);
+#ifdef __POSIX_SPAWN_NOEXECERR
+	if (__attrp && __attrp->__flags & __POSIX_SPAWN_NOEXECERR) {
+		/* Suppress the exec error. */
+#if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
+		__libc_seterrno(0);
+#endif /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
+	} else
+#endif /* __POSIX_SPAWN_NOEXECERR */
+	{
 __child_error:
 #if defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))
-	/* If the exec fails, it will have modified `errno' to indicate this fact.
-	 * And since we're sharing VMs with our parent process, the error reason
-	 * will have already been written back to our parent's VM, so there's
-	 * actually nothing left for us to do, but to simply exit! */
+		/* If the exec fails, it will have modified `errno' to indicate this fact.
+		 * And since we're sharing VMs with our parent process, the error reason
+		 * will have already been written back to our parent's VM, so there's
+		 * actually nothing left for us to do, but to simply exit! */
+		;
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
-	/* Write the exec-error back to our parent. */
+		/* Write the exec-error back to our parent. */
 #ifdef __ENOENT
-	__error = __libc_geterrno_or(__ENOENT);
+		__error = __libc_geterrno_or(__ENOENT);
 #else /* __ENOENT */
-	__error = __libc_geterrno_or(1);
+		__error = __libc_geterrno_or(1);
 #endif /* !__ENOENT */
-	/* Communicate back why this failed. */
-	__localdep_write(__pipes[1], &__error, sizeof(__error));
-	/* No need to close the pipe, it's auto-closed by the kernel! */
+		/* Communicate back why this failed. */
+		__localdep_write(__pipes[1], &__error, sizeof(__error));
+		/* No need to close the pipe, it's auto-closed by the kernel! */
 #endif /* !__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork) */
-	__localdep__Exit(255);
+	}
+	__localdep__Exit(127);
 #else /* __POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid) */
 	char __buf[32];
 	__localdep_sprintf(__buf, "/proc/self/fd/%d", __execfd);

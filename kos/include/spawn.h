@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bb2df9d */
+/* HASH CRC-32:0x19f87f16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,29 +44,35 @@
 __SYSDECL_BEGIN
 
 /* Flags to be set in the `posix_spawnattr_t'. */
+
 #ifdef __POSIX_SPAWN_RESETIDS
-#define POSIX_SPAWN_RESETIDS __POSIX_SPAWN_RESETIDS
+#define POSIX_SPAWN_RESETIDS __POSIX_SPAWN_RESETIDS /* Perform 2 calls `seteuid(getuid())' and `setegid(getgid())' */
 #endif /* __POSIX_SPAWN_RESETIDS */
 #ifdef __POSIX_SPAWN_SETPGROUP
-#define POSIX_SPAWN_SETPGROUP __POSIX_SPAWN_SETPGROUP
+#define POSIX_SPAWN_SETPGROUP __POSIX_SPAWN_SETPGROUP /* s.a. `posix_spawnattr_setpgroup(3)' */
 #endif /* __POSIX_SPAWN_SETPGROUP */
 #ifdef __POSIX_SPAWN_SETSIGDEF
-#define POSIX_SPAWN_SETSIGDEF __POSIX_SPAWN_SETSIGDEF
+#define POSIX_SPAWN_SETSIGDEF __POSIX_SPAWN_SETSIGDEF /* s.a. `posix_spawnattr_setsigdefault(3)' */
 #endif /* __POSIX_SPAWN_SETSIGDEF */
 #ifdef __POSIX_SPAWN_SETSIGMASK
-#define POSIX_SPAWN_SETSIGMASK __POSIX_SPAWN_SETSIGMASK
+#define POSIX_SPAWN_SETSIGMASK __POSIX_SPAWN_SETSIGMASK /* s.a. `posix_spawnattr_setsigmask(3)' */
 #endif /* __POSIX_SPAWN_SETSIGMASK */
 #ifdef __POSIX_SPAWN_SETSCHEDPARAM
-#define POSIX_SPAWN_SETSCHEDPARAM __POSIX_SPAWN_SETSCHEDPARAM
+#define POSIX_SPAWN_SETSCHEDPARAM __POSIX_SPAWN_SETSCHEDPARAM /* s.a. `posix_spawnattr_setschedparam(3)' */
 #endif /* __POSIX_SPAWN_SETSCHEDPARAM */
 #ifdef __POSIX_SPAWN_SETSCHEDULER
-#define POSIX_SPAWN_SETSCHEDULER __POSIX_SPAWN_SETSCHEDULER
+#define POSIX_SPAWN_SETSCHEDULER __POSIX_SPAWN_SETSCHEDULER /* s.a. `posix_spawnattr_setschedpolicy(3)' */
 #endif /* __POSIX_SPAWN_SETSCHEDULER */
 #ifdef __USE_GNU
 #ifdef __POSIX_SPAWN_USEVFORK
-#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK
+#define POSIX_SPAWN_USEVFORK __POSIX_SPAWN_USEVFORK /* Ignored */
 #endif /* __POSIX_SPAWN_USEVFORK */
 #endif /* __USE_GNU */
+
+#ifdef __POSIX_SPAWN_NOEXECERR
+#define POSIX_SPAWN_NOEXECERR_NP __POSIX_SPAWN_NOEXECERR /* Don't propagate exec() error, and leave the
+                                                          * child as unreaped with exit status `127' */
+#endif /* __POSIX_SPAWN_NOEXECERR */
 
 
 #ifdef __CC__
