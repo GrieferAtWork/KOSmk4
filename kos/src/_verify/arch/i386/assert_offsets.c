@@ -114,8 +114,6 @@ local files = {
 	"../../../../include/i386-kos/kos/bits/exception_data64.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct32.h",
 	"../../../../include/i386-kos/kos/bits/ukern-struct64.h",
-	"../../../../include/i386-kos/kos/bits/spawn-action32.h",
-	"../../../../include/i386-kos/kos/bits/spawn-action64.h",
 	"../../../../include/i386-kos/kos/exec/asm/elf32.h",
 	"../../../../include/i386-kos/kos/exec/asm/elf64.h",
 	"../../../../include/i386-kos/kos/exec/bits/peb32.h",
@@ -1576,112 +1574,6 @@ static_assert(offsetof(struct userkern64, uk_tid) == OFFSET_USERKERN64_TID);
 static_assert(offsetof(struct userkern64, uk_uid) == OFFSET_USERKERN64_UID);
 static_assert(offsetof(struct userkern64, uk_xfpu) == OFFSET_USERKERN64_XFPU);
 static_assert(sizeof(struct userkern64) == SIZEOF_USERKERN64);
-
-
-
-
-
-#include <kos/bits/spawn-action32.h>
-
-/* struct spawn_actionx32 */
-static_assert(offsetof(struct spawn_actionx32, sa_closerange.sa_hifd) == __OFFSET_SPAWN_ACTIONX32_CLOSERANGE_HIFD);
-static_assert(offsetof(struct spawn_actionx32, sa_closerange.sa_lofd) == __OFFSET_SPAWN_ACTIONX32_CLOSERANGE_LOFD);
-static_assert(offsetof(struct spawn_actionx32, sa_close.sa_fd) == __OFFSET_SPAWN_ACTIONX32_CLOSE_FD);
-static_assert(offsetof(struct spawn_actionx32, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTIONX32_DUP2_NEWFD);
-static_assert(offsetof(struct spawn_actionx32, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTIONX32_DUP2_OLDFD);
-static_assert(offsetof(struct spawn_actionx32, sa_fsmode.sa_flag) == __OFFSET_SPAWN_ACTIONX32_FSMODE_FLAG);
-static_assert(offsetof(struct spawn_actionx32, sa_fsmode.sa_mask) == __OFFSET_SPAWN_ACTIONX32_FSMODE_MASK);
-static_assert(offsetof(struct spawn_actionx32, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTIONX32_OPENAT_DFD);
-static_assert(offsetof(struct spawn_actionx32, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTIONX32_OPENAT_FD);
-static_assert(offsetof(struct spawn_actionx32, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTIONX32_OPENAT_FILENAME);
-static_assert(offsetof(struct spawn_actionx32, sa_openat.sa_mode) == __OFFSET_SPAWN_ACTIONX32_OPENAT_MODE);
-static_assert(offsetof(struct spawn_actionx32, sa_openat.sa_oflags) == __OFFSET_SPAWN_ACTIONX32_OPENAT_OFLAGS);
-static_assert(offsetof(struct spawn_actionx32, sa_sched_setparam.sa_param) == __OFFSET_SPAWN_ACTIONX32_SCHED_SETPARAM_PARAM);
-static_assert(offsetof(struct spawn_actionx32, sa_sched_setscheduler.sa_param) == __OFFSET_SPAWN_ACTIONX32_SCHED_SETSCHEDULER_PARAM);
-static_assert(offsetof(struct spawn_actionx32, sa_sched_setscheduler.sa_policy) == __OFFSET_SPAWN_ACTIONX32_SCHED_SETSCHEDULER_POLICY);
-static_assert(offsetof(struct spawn_actionx32, sa_setfsgid.sa_fsgid) == __OFFSET_SPAWN_ACTIONX32_SETFSGID_FSGID);
-static_assert(offsetof(struct spawn_actionx32, sa_setfsuid.sa_fsuid) == __OFFSET_SPAWN_ACTIONX32_SETFSUID_FSUID);
-static_assert(offsetof(struct spawn_actionx32, sa_setgid.sa_gid) == __OFFSET_SPAWN_ACTIONX32_SETGID_GID);
-static_assert(offsetof(struct spawn_actionx32, sa_setgroups.sa_gcnt) == __OFFSET_SPAWN_ACTIONX32_SETGROUPS_GCNT);
-static_assert(offsetof(struct spawn_actionx32, sa_setgroups.sa_gvec) == __OFFSET_SPAWN_ACTIONX32_SETGROUPS_GVEC);
-static_assert(offsetof(struct spawn_actionx32, sa_setpgid.sa_pid) == __OFFSET_SPAWN_ACTIONX32_SETPGID_PID);
-static_assert(offsetof(struct spawn_actionx32, sa_setregid.sa_egid) == __OFFSET_SPAWN_ACTIONX32_SETREGID_EGID);
-static_assert(offsetof(struct spawn_actionx32, sa_setregid.sa_rgid) == __OFFSET_SPAWN_ACTIONX32_SETREGID_RGID);
-static_assert(offsetof(struct spawn_actionx32, sa_setresgid.sa_egid) == __OFFSET_SPAWN_ACTIONX32_SETRESGID_EGID);
-static_assert(offsetof(struct spawn_actionx32, sa_setresgid.sa_rgid) == __OFFSET_SPAWN_ACTIONX32_SETRESGID_RGID);
-static_assert(offsetof(struct spawn_actionx32, sa_setresgid.sa_sgid) == __OFFSET_SPAWN_ACTIONX32_SETRESGID_SGID);
-static_assert(offsetof(struct spawn_actionx32, sa_setresuid.sa_euid) == __OFFSET_SPAWN_ACTIONX32_SETRESUID_EUID);
-static_assert(offsetof(struct spawn_actionx32, sa_setresuid.sa_ruid) == __OFFSET_SPAWN_ACTIONX32_SETRESUID_RUID);
-static_assert(offsetof(struct spawn_actionx32, sa_setresuid.sa_suid) == __OFFSET_SPAWN_ACTIONX32_SETRESUID_SUID);
-static_assert(offsetof(struct spawn_actionx32, sa_setreuid.sa_euid) == __OFFSET_SPAWN_ACTIONX32_SETREUID_EUID);
-static_assert(offsetof(struct spawn_actionx32, sa_setreuid.sa_ruid) == __OFFSET_SPAWN_ACTIONX32_SETREUID_RUID);
-static_assert(offsetof(struct spawn_actionx32, sa_setuid.sa_uid) == __OFFSET_SPAWN_ACTIONX32_SETUID_UID);
-static_assert(offsetof(struct spawn_actionx32, sa_sigdfl.sa_sigset) == __OFFSET_SPAWN_ACTIONX32_SIGDFL_SIGSET);
-static_assert(offsetof(struct spawn_actionx32, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX32_SIGDFL_SIGSETSZ);
-static_assert(offsetof(struct spawn_actionx32, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTIONX32_SIGPROCMASK_SIGSET);
-static_assert(offsetof(struct spawn_actionx32, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX32_SIGPROCMASK_SIGSETSZ);
-static_assert(offsetof(struct spawn_actionx32, sa_tcsetpgrp.sa_ttyfd) == __OFFSET_SPAWN_ACTIONX32_TCSETPGRP_TTYFD);
-static_assert(offsetof(struct spawn_actionx32, sa_type) == __OFFSET_SPAWN_ACTIONX32_TYPE);
-static_assert(offsetof(struct spawn_actionx32, sa_umask.sa_mask) == __OFFSET_SPAWN_ACTIONX32_UMASK_MASK);
-
-/* struct spawn_action_listx32 */
-/* ... */
-
-/* struct spawn_actionsx32 */
-/* ... */
-
-
-
-
-
-#include <kos/bits/spawn-action64.h>
-
-/* struct spawn_actionx64 */
-static_assert(offsetof(struct spawn_actionx64, sa_closerange.sa_hifd) == __OFFSET_SPAWN_ACTIONX64_CLOSERANGE_HIFD);
-static_assert(offsetof(struct spawn_actionx64, sa_closerange.sa_lofd) == __OFFSET_SPAWN_ACTIONX64_CLOSERANGE_LOFD);
-static_assert(offsetof(struct spawn_actionx64, sa_close.sa_fd) == __OFFSET_SPAWN_ACTIONX64_CLOSE_FD);
-static_assert(offsetof(struct spawn_actionx64, sa_dup2.sa_newfd) == __OFFSET_SPAWN_ACTIONX64_DUP2_NEWFD);
-static_assert(offsetof(struct spawn_actionx64, sa_dup2.sa_oldfd) == __OFFSET_SPAWN_ACTIONX64_DUP2_OLDFD);
-static_assert(offsetof(struct spawn_actionx64, sa_fsmode.sa_flag) == __OFFSET_SPAWN_ACTIONX64_FSMODE_FLAG);
-static_assert(offsetof(struct spawn_actionx64, sa_fsmode.sa_mask) == __OFFSET_SPAWN_ACTIONX64_FSMODE_MASK);
-static_assert(offsetof(struct spawn_actionx64, sa_openat.sa_dfd) == __OFFSET_SPAWN_ACTIONX64_OPENAT_DFD);
-static_assert(offsetof(struct spawn_actionx64, sa_openat.sa_fd) == __OFFSET_SPAWN_ACTIONX64_OPENAT_FD);
-static_assert(offsetof(struct spawn_actionx64, sa_openat.sa_filename) == __OFFSET_SPAWN_ACTIONX64_OPENAT_FILENAME);
-static_assert(offsetof(struct spawn_actionx64, sa_openat.sa_mode) == __OFFSET_SPAWN_ACTIONX64_OPENAT_MODE);
-static_assert(offsetof(struct spawn_actionx64, sa_openat.sa_oflags) == __OFFSET_SPAWN_ACTIONX64_OPENAT_OFLAGS);
-static_assert(offsetof(struct spawn_actionx64, sa_sched_setparam.sa_param) == __OFFSET_SPAWN_ACTIONX64_SCHED_SETPARAM_PARAM);
-static_assert(offsetof(struct spawn_actionx64, sa_sched_setscheduler.sa_param) == __OFFSET_SPAWN_ACTIONX64_SCHED_SETSCHEDULER_PARAM);
-static_assert(offsetof(struct spawn_actionx64, sa_sched_setscheduler.sa_policy) == __OFFSET_SPAWN_ACTIONX64_SCHED_SETSCHEDULER_POLICY);
-static_assert(offsetof(struct spawn_actionx64, sa_setfsgid.sa_fsgid) == __OFFSET_SPAWN_ACTIONX64_SETFSGID_FSGID);
-static_assert(offsetof(struct spawn_actionx64, sa_setfsuid.sa_fsuid) == __OFFSET_SPAWN_ACTIONX64_SETFSUID_FSUID);
-static_assert(offsetof(struct spawn_actionx64, sa_setgid.sa_gid) == __OFFSET_SPAWN_ACTIONX64_SETGID_GID);
-static_assert(offsetof(struct spawn_actionx64, sa_setgroups.sa_gcnt) == __OFFSET_SPAWN_ACTIONX64_SETGROUPS_GCNT);
-static_assert(offsetof(struct spawn_actionx64, sa_setgroups.sa_gvec) == __OFFSET_SPAWN_ACTIONX64_SETGROUPS_GVEC);
-static_assert(offsetof(struct spawn_actionx64, sa_setpgid.sa_pid) == __OFFSET_SPAWN_ACTIONX64_SETPGID_PID);
-static_assert(offsetof(struct spawn_actionx64, sa_setregid.sa_egid) == __OFFSET_SPAWN_ACTIONX64_SETREGID_EGID);
-static_assert(offsetof(struct spawn_actionx64, sa_setregid.sa_rgid) == __OFFSET_SPAWN_ACTIONX64_SETREGID_RGID);
-static_assert(offsetof(struct spawn_actionx64, sa_setresgid.sa_egid) == __OFFSET_SPAWN_ACTIONX64_SETRESGID_EGID);
-static_assert(offsetof(struct spawn_actionx64, sa_setresgid.sa_rgid) == __OFFSET_SPAWN_ACTIONX64_SETRESGID_RGID);
-static_assert(offsetof(struct spawn_actionx64, sa_setresgid.sa_sgid) == __OFFSET_SPAWN_ACTIONX64_SETRESGID_SGID);
-static_assert(offsetof(struct spawn_actionx64, sa_setresuid.sa_euid) == __OFFSET_SPAWN_ACTIONX64_SETRESUID_EUID);
-static_assert(offsetof(struct spawn_actionx64, sa_setresuid.sa_ruid) == __OFFSET_SPAWN_ACTIONX64_SETRESUID_RUID);
-static_assert(offsetof(struct spawn_actionx64, sa_setresuid.sa_suid) == __OFFSET_SPAWN_ACTIONX64_SETRESUID_SUID);
-static_assert(offsetof(struct spawn_actionx64, sa_setreuid.sa_euid) == __OFFSET_SPAWN_ACTIONX64_SETREUID_EUID);
-static_assert(offsetof(struct spawn_actionx64, sa_setreuid.sa_ruid) == __OFFSET_SPAWN_ACTIONX64_SETREUID_RUID);
-static_assert(offsetof(struct spawn_actionx64, sa_setuid.sa_uid) == __OFFSET_SPAWN_ACTIONX64_SETUID_UID);
-static_assert(offsetof(struct spawn_actionx64, sa_sigdfl.sa_sigset) == __OFFSET_SPAWN_ACTIONX64_SIGDFL_SIGSET);
-static_assert(offsetof(struct spawn_actionx64, sa_sigdfl.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX64_SIGDFL_SIGSETSZ);
-static_assert(offsetof(struct spawn_actionx64, sa_sigprocmask.sa_sigset) == __OFFSET_SPAWN_ACTIONX64_SIGPROCMASK_SIGSET);
-static_assert(offsetof(struct spawn_actionx64, sa_sigprocmask.sa_sigsetsz) == __OFFSET_SPAWN_ACTIONX64_SIGPROCMASK_SIGSETSZ);
-static_assert(offsetof(struct spawn_actionx64, sa_tcsetpgrp.sa_ttyfd) == __OFFSET_SPAWN_ACTIONX64_TCSETPGRP_TTYFD);
-static_assert(offsetof(struct spawn_actionx64, sa_type) == __OFFSET_SPAWN_ACTIONX64_TYPE);
-static_assert(offsetof(struct spawn_actionx64, sa_umask.sa_mask) == __OFFSET_SPAWN_ACTIONX64_UMASK_MASK);
-
-/* struct spawn_action_listx64 */
-/* ... */
-
-/* struct spawn_actionsx64 */
-/* ... */
 
 
 

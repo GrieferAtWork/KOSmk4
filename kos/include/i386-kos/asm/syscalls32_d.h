@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf017b80f */
+/* HASH CRC-32:0x7381d593 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -939,8 +939,6 @@
  *                       through use of `ftruncate(return)'
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 #define __NR32_userviofd               __UINT32_C(0xffffffe5) /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR32_process_spawnveat       __UINT32_C(0xffffffe6) /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR32(char const) const *argv, __HYBRID_PTR32(char const) const *envp, atflag_t flags, struct spawn_actionsx32 const *actions) */
 #define __NR32_stime64                 __UINT32_C(0xffffffe7) /* errno_t stime64(time64_t const *t) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
@@ -1717,7 +1715,6 @@
 #define __NR32RM_ftime64                 0
 #define __NR32RM_utime64                 0
 #define __NR32RM_userviofd               0
-#define __NR32RM_process_spawnveat       0
 #define __NR32RM_stime64                 0
 #define __NR32RM_coredump                2
 #define __NR32RM_raiseat                 2
@@ -1911,7 +1908,6 @@
 #define __NR32CP_select64                1
 #define __NR32CP_ioctlf                  1
 #define __NR32CP_utime64                 1
-#define __NR32CP_process_spawnveat       1
 #define __NR32CP_lfutexlockexpr          1
 #define __NR32CP_lfutexexpr              1
 #define __NR32CP_lseek64                 1
@@ -2365,7 +2361,6 @@
 #define __NR32RC_ftime64                 1
 #define __NR32RC_utime64                 2
 #define __NR32RC_userviofd               2
-#define __NR32RC_process_spawnveat       6
 #define __NR32RC_stime64                 1
 #define __NR32RC_coredump                6
 #define __NR32RC_raiseat                 2

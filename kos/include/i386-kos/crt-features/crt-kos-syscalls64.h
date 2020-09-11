@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba7db73a */
+/* HASH CRC-32:0x82c249fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -238,7 +238,6 @@
 #define __CRT_HAVE_sys_preadv 1
 #define __CRT_HAVE_sys_preadvf 1
 #define __CRT_HAVE_sys_prlimit64 1
-#define __CRT_HAVE_sys_process_spawnveat 1
 #define __CRT_HAVE_sys_process_vm_readv 1
 #define __CRT_HAVE_sys_process_vm_writev 1
 #define __CRT_HAVE_sys_pselect6 1
@@ -612,7 +611,6 @@
 #define __CRT_HAVE_sys_Xpreadv 1
 #define __CRT_HAVE_sys_Xpreadvf 1
 #define __CRT_HAVE_sys_Xprlimit64 1
-#define __CRT_HAVE_sys_Xprocess_spawnveat 1
 #define __CRT_HAVE_sys_Xprocess_vm_readv 1
 #define __CRT_HAVE_sys_Xprocess_vm_writev 1
 #define __CRT_HAVE_sys_Xpselect6 1

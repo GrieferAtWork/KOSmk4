@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x607be36 */
+/* HASH CRC-32:0x55510df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,6 @@
 #include <kos/bits/except-handler64.h>
 #include <kos/bits/exception_data64.h>
 #include <kos/bits/futex-expr64.h>
-#include <kos/bits/spawn-action64.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
 #include <kos/compat/linux-stat.h>
@@ -124,7 +123,6 @@ struct sched_param;
 struct shmid_ds;
 struct sigevent;
 struct sockaddr;
-struct spawn_actionsx64;
 struct sysinfo;
 struct termios;
 struct timezone;
@@ -1223,10 +1221,6 @@ __CDECLARE_SC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx64 const *__iovec,
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 __CDECLARE_SC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_SC(prlimit64) */
-#if __CRT_HAVE_SC(process_spawnveat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,process_spawnveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *___argv, __HYBRID_PTR64(char const) const *___envp, __atflag_t __flags, struct spawn_actionsx64 const *__actions),(__dirfd,__pathname,___argv,___envp,__flags,__actions))
-#endif /* __CRT_HAVE_SC(process_spawnveat) */
 #if __CRT_HAVE_SC(process_vm_readv)
 /* Read memory from another process's VM
  * @param: flags: Must be `0'
@@ -3077,10 +3071,6 @@ __CDECLARE_XSC(,__ssize_t,preadvf,(__fd_t __fd, struct __iovecx64 const *__iovec
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
 __CDECLARE_XSC(,__errno_t,prlimit64,(__pid_t __pid, __syscall_ulong_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* __CRT_HAVE_XSC(prlimit64) */
-#if __CRT_HAVE_XSC(process_spawnveat)
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,process_spawnveat,(__fd_t __dirfd, char const *__pathname, __HYBRID_PTR64(char const) const *___argv, __HYBRID_PTR64(char const) const *___envp, __atflag_t __flags, struct spawn_actionsx64 const *__actions),(__dirfd,__pathname,___argv,___envp,__flags,__actions))
-#endif /* __CRT_HAVE_XSC(process_spawnveat) */
 #if __CRT_HAVE_XSC(process_vm_readv)
 /* Read memory from another process's VM
  * @param: flags: Must be `0'

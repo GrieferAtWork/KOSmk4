@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf34f1683 */
+/* HASH CRC-32:0x239d5f2b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -383,7 +383,6 @@
 #define __NR64AC_rtm_end                0
 #define __NR64AC_rtm_begin              0
 #define __NR64AC_userviofd              2
-#define __NR64AC_process_spawnveat      6
 #define __NR64AC_coredump               6
 #define __NR64AC_raiseat                2
 #define __NR64AC_mktty                  4
@@ -767,7 +766,6 @@
 #define __NR64RT_rtm_end                (errno_t, __errno_t)
 #define __NR64RT_rtm_begin              (rtm_status_t, __rtm_status_t)
 #define __NR64RT_userviofd              (fd_t, __fd_t)
-#define __NR64RT_process_spawnveat      (errno_t, __errno_t)
 #define __NR64RT_coredump               (errno_t, __errno_t)
 #define __NR64RT_raiseat                (errno_t, __errno_t)
 #define __NR64RT_mktty                  (fd_t, __fd_t)
@@ -1608,12 +1606,6 @@
 #define __NR64AT0_rtm_abort              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_userviofd              (size_t, __size_t)
 #define __NR64AT1_userviofd              (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_process_spawnveat      (fd_t, __fd_t)
-#define __NR64AT1_process_spawnveat      (char const *, char const *)
-#define __NR64AT2_process_spawnveat      (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
-#define __NR64AT3_process_spawnveat      (__HYBRID_PTR64(char const) const *, __HYBRID_PTR64(char const) const *)
-#define __NR64AT4_process_spawnveat      (atflag_t, __atflag_t)
-#define __NR64AT5_process_spawnveat      (struct spawn_actionsx64 const *, struct spawn_actionsx64 const *)
 #define __NR64AT0_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT1_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NR64AT2_coredump               (__HYBRID_PTR64(void) const *, __HYBRID_PTR64(void) const *)
@@ -2067,7 +2059,6 @@
 #define __NR64AM_rtm_end(a, b, c, d, e, f)                /* nothing */
 #define __NR64AM_rtm_begin(a, b, c, d, e, f)              /* nothing */
 #define __NR64AM_userviofd(a, b, c, d, e, f)              (__size_t)a, (__syscall_ulong_t)b
-#define __NR64AM_process_spawnveat(a, b, c, d, e, f)      (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e, (struct spawn_actionsx64 const *)f
 #define __NR64AM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
 #define __NR64AM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfox64_struct const *)b
 #define __NR64AM_mktty(a, b, c, d, e, f)                  (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
@@ -2451,7 +2442,6 @@
 #define __NR64AP_rtm_end()                                /* nothing */
 #define __NR64AP_rtm_begin()                              /* nothing */
 #define __NR64AP_userviofd(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_process_spawnveat(a, b, c, d, e, f)      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_coredump(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_raiseat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_mktty(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d

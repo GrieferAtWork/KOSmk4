@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5be7873 */
+/* HASH CRC-32:0x9139d0d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -816,8 +816,6 @@
  *                       through use of `ftruncate(return)'
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 #define __NR_userviofd              __UINT64_C(0xffffffffffffffe1) /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR_process_spawnveat      __UINT64_C(0xffffffffffffffe2) /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
@@ -1529,7 +1527,6 @@
 #define __NRRM_rtm_end                0
 #define __NRRM_rtm_begin              0
 #define __NRRM_userviofd              0
-#define __NRRM_process_spawnveat      0
 #define __NRRM_coredump               2
 #define __NRRM_raiseat                2
 #define __NRRM_mktty                  0
@@ -1692,7 +1689,6 @@
 #define __NRCP_fchdirat               1
 #define __NRCP_kreaddirf              1
 #define __NRCP_kreaddir               1
-#define __NRCP_process_spawnveat      1
 #define __NRCP_lfutexlockexpr         1
 #define __NRCP_lfutexexpr             1
 #define __NRCP_lfutex                 1
@@ -2068,7 +2064,6 @@
 #define __NRRC_rtm_end                0
 #define __NRRC_rtm_begin              0
 #define __NRRC_userviofd              2
-#define __NRRC_process_spawnveat      6
 #define __NRRC_coredump               6
 #define __NRRC_raiseat                2
 #define __NRRC_mktty                  4

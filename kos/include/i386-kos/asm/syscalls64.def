@@ -78,7 +78,6 @@ sendmsg = sendmsgx64;
 recvmsg = recvmsgx64;
 sendmmsg = sendmmsgx64;
 recvmmsg = recvmmsgx64;
-process_spawnveat = process_spawnveatx64;
 getitimer = getitimerx64;
 setitimer = setitimerx64;
 statfs = statfsx64;
@@ -509,7 +508,7 @@ mq_timedreceive = mq_timedreceivex64;
 -0x000000000000001b:mktty
 -0x000000000000001c:raiseat
 -0x000000000000001d:coredump
--0x000000000000001e:process_spawnveat
+/*x000000000000001e:...*/
 -0x000000000000001f:userviofd
 -0x0000000000000020:rtm_begin
 -0x0000000000000021:rtm_end

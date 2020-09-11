@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbe3e710 */
+/* HASH CRC-32:0xebc1757a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -468,7 +468,6 @@
 #define __NR32AC_ftime64                 1
 #define __NR32AC_utime64                 2
 #define __NR32AC_userviofd               2
-#define __NR32AC_process_spawnveat       6
 #define __NR32AC_stime64                 1
 #define __NR32AC_coredump                6
 #define __NR32AC_raiseat                 2
@@ -932,7 +931,6 @@
 #define __NR32RT_ftime64                 (errno_t, __errno_t)
 #define __NR32RT_utime64                 (errno_t, __errno_t)
 #define __NR32RT_userviofd               (fd_t, __fd_t)
-#define __NR32RT_process_spawnveat       (errno_t, __errno_t)
 #define __NR32RT_stime64                 (errno_t, __errno_t)
 #define __NR32RT_coredump                (errno_t, __errno_t)
 #define __NR32RT_raiseat                 (errno_t, __errno_t)
@@ -1974,12 +1972,6 @@
 #define __NR32AT1_utime64                 (struct utimbufx32_64 const *, struct __utimbufx32_64 const *)
 #define __NR32AT0_userviofd               (size_t, __size_t)
 #define __NR32AT1_userviofd               (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_process_spawnveat       (fd_t, __fd_t)
-#define __NR32AT1_process_spawnveat       (char const *, char const *)
-#define __NR32AT2_process_spawnveat       (__HYBRID_PTR32(char const) const *, __HYBRID_PTR32(char const) const *)
-#define __NR32AT3_process_spawnveat       (__HYBRID_PTR32(char const) const *, __HYBRID_PTR32(char const) const *)
-#define __NR32AT4_process_spawnveat       (atflag_t, __atflag_t)
-#define __NR32AT5_process_spawnveat       (struct spawn_actionsx32 const *, struct spawn_actionsx32 const *)
 #define __NR32AT0_stime64                 (time64_t const *, __time64_t const *)
 #define __NR32AT0_coredump                (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NR32AT1_coredump                (struct ucpustate32 const *, struct ucpustate32 const *)
@@ -2498,7 +2490,6 @@
 #define __NR32AM_ftime64(a, b, c, d, e, f)                 (struct __timebx32_64 *)a
 #define __NR32AM_utime64(a, b, c, d, e, f)                 (char const *)a, (struct __utimbufx32_64 const *)b
 #define __NR32AM_userviofd(a, b, c, d, e, f)               (__size_t)a, (__syscall_ulong_t)b
-#define __NR32AM_process_spawnveat(a, b, c, d, e, f)       (__fd_t)a, (char const *)b, (__HYBRID_PTR32(char const) const *)c, (__HYBRID_PTR32(char const) const *)d, (__atflag_t)e, (struct spawn_actionsx32 const *)f
 #define __NR32AM_stime64(a, b, c, d, e, f)                 (__time64_t const *)a
 #define __NR32AM_coredump(a, b, c, d, e, f)                (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void) const *)c, (__size_t)d, (struct exception_data32 const *)e, (__syscall_ulong_t)f
 #define __NR32AM_raiseat(a, b, c, d, e, f)                 (struct ucpustate32 const *)a, (struct __siginfox32_struct const *)b
@@ -2962,7 +2953,6 @@
 #define __NR32AP_ftime64(a)                                (__syscall_ulong_t)a
 #define __NR32AP_utime64(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_userviofd(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_process_spawnveat(a, b, c, d, e, f)       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_stime64(a)                                (__syscall_ulong_t)a
 #define __NR32AP_coredump(a, b, c, d, e, f)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_raiseat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b

@@ -59,7 +59,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-struct __ucontextx64 /*[NAME(ucontextx64)][PREFIX(uc_)]*/ {
+struct __ATTR_ALIGNED(__ALIGNOF_UCONTEXTX64) __ucontextx64 /*[NAME(ucontextx64)][PREFIX(uc_)]*/ {
 	/* Userlevel context. */
 	struct __mcontextx64                 uc_mcontext;
 	struct __sigset_struct               uc_sigmask;

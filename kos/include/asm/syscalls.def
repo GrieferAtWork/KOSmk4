@@ -228,9 +228,6 @@
 %[typeorg(<librt/bits/aioinit.h>: aioinit)]
 %[typeorg(<librt/bits/mqueue.h>: mq_attr)]
 %[typeorg(<elf.h>: elf32_phdr, elf64_phdr)]
-%[typeorg(<kos/bits/spawn-action.h>: spawn_action, spawn_actions, spawn_action_list)]
-%[typeorg(<kos/bits/spawn-action32.h>: spawn_actionx32, spawn_actionsx32, spawn_action_listx32)]
-%[typeorg(<kos/bits/spawn-action64.h>: spawn_actionx64, spawn_actionsx64, spawn_action_listx64)]
 %[typeorg(<kos/compat/linux-oldselect.h>: sel_arg_struct, sel_arg_structx32, sel_arg_structx64)]
 %[typeorg(<kos/compat/linux-olddirent.h>: old_linux_dirent, old_linux_direntx32, old_linux_direntx64)]
 %[typeorg(<kos/compat/linux-dirent.h>: linux_dirent, linux_direntx32, linux_direntx64)]
@@ -2459,28 +2456,6 @@ coredumpx64:([tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *curr_state,
              [tostr(UNWIND_ERROR)] syscall_ulong_t unwind_error) -> errno_t;
 %[endgroup]
 
-
-%[startgroup]
-@@@param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[cp]
-process_spawnveat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
-                   [tostr(STRING_VECTOR)] char const *const *argv,
-                   [tostr(STRING_VECTOR)] char const *const *envp,
-                   [tostr(ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags,
-                   [tostr(STRUCT_SPAWN_ACTIONS)] struct spawn_actions const *actions) -> pid_t;
-[cp][doc_alias(process_spawnveat)]
-process_spawnveatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
-                      [tostr(STRING_VECTOR32)] __HYBRID_PTR32(char const) const *argv,
-                      [tostr(STRING_VECTOR32)] __HYBRID_PTR32(char const) const *envp,
-                      [tostr(ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags,
-                      [tostr(STRUCT_SPAWN_ACTIONSX32)] struct spawn_actionsx32 const *actions) -> errno_t;
-[cp][doc_alias(process_spawnveat)]
-process_spawnveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
-                      [tostr(STRING_VECTOR64)] __HYBRID_PTR64(char const) const *argv,
-                      [tostr(STRING_VECTOR64)] __HYBRID_PTR64(char const) const *envp,
-                      [tostr(ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags,
-                      [tostr(STRUCT_SPAWN_ACTIONSX64)] struct spawn_actionsx64 const *actions) -> errno_t;
-%[endgroup]
 
 
 @@Construct a user-vio-fd object supporting mmap(2), with actual

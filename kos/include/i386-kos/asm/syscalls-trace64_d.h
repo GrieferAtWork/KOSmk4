@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6229ffe7 */
+/* HASH CRC-32:0xf5251e21 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -828,12 +828,6 @@
 #define __NR64AN0_rtm_abort              code
 #define __NR64AN0_userviofd              initial_size
 #define __NR64AN1_userviofd              flags
-#define __NR64AN0_process_spawnveat      dirfd
-#define __NR64AN1_process_spawnveat      pathname
-#define __NR64AN2_process_spawnveat      argv
-#define __NR64AN3_process_spawnveat      envp
-#define __NR64AN4_process_spawnveat      flags
-#define __NR64AN5_process_spawnveat      actions
 #define __NR64AN0_coredump               curr_state
 #define __NR64AN1_coredump               orig_state
 #define __NR64AN2_coredump               traceback_vector
@@ -2183,14 +2177,6 @@
 #define __NR64ATR0_userviofd              SC_REPR_SIZE_T                                                       /* initial_size */ 
 #define __NR64ATR1_userviofd              SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK                            /* flags */ 
 #define __NR64RTR_userviofd               SC_REPR_FD_T                                                         /* return */
-#define __NR64ATR0_process_spawnveat      SC_REPR_FD_T                                                         /* dirfd */ 
-#define __NR64ATR1_process_spawnveat      SC_REPR_FILENAME                                                     /* pathname */ 
-#define __NR64ATL1_process_spawnveat      0                                                                    /* pathname -> dirfd */ 
-#define __NR64ATR2_process_spawnveat      SC_REPR_STRING_VECTOR64                                              /* argv */ 
-#define __NR64ATR3_process_spawnveat      SC_REPR_STRING_VECTOR64                                              /* envp */ 
-#define __NR64ATR4_process_spawnveat      SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* flags */ 
-#define __NR64ATR5_process_spawnveat      SC_REPR_STRUCT_SPAWN_ACTIONSX64                                      /* actions */ 
-#define __NR64RTR_process_spawnveat       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_coredump               SC_REPR_STRUCT_UCPUSTATE64                                           /* curr_state */ 
 #define __NR64ATR1_coredump               SC_REPR_STRUCT_UCPUSTATE64                                           /* orig_state */ 
 #define __NR64ATR2_coredump               SC_REPR_VOID_VECTOR64                                                /* traceback_vector */ 

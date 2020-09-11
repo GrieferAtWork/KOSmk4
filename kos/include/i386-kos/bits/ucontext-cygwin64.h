@@ -67,7 +67,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-struct __cygwin64_ucontext /*[NAME(cygwin64_ucontext)][PREFIX(uc_)]*/ {
+struct __ATTR_ALIGNED(__ALIGNOF_CYGWIN64_UCONTEXT) __cygwin64_ucontext /*[NAME(cygwin64_ucontext)][PREFIX(uc_)]*/ {
 	/* Userlevel context. */
 	struct __cygwin64_mcontext                 uc_mcontext;
 	__HYBRID_PTR64(struct __cygwin64_ucontext) uc_link;

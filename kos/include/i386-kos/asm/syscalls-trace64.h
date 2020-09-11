@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56da96e5 */
+/* HASH CRC-32:0x864615cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -828,12 +828,6 @@
 #define __NRAN0_rtm_abort              code
 #define __NRAN0_userviofd              initial_size
 #define __NRAN1_userviofd              flags
-#define __NRAN0_process_spawnveat      dirfd
-#define __NRAN1_process_spawnveat      pathname
-#define __NRAN2_process_spawnveat      argv
-#define __NRAN3_process_spawnveat      envp
-#define __NRAN4_process_spawnveat      flags
-#define __NRAN5_process_spawnveat      actions
 #define __NRAN0_coredump               curr_state
 #define __NRAN1_coredump               orig_state
 #define __NRAN2_coredump               traceback_vector
@@ -2183,14 +2177,6 @@
 #define __NRATR0_userviofd              SC_REPR_SIZE_T                                                       /* initial_size */ 
 #define __NRATR1_userviofd              SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK                            /* flags */ 
 #define __NRRTR_userviofd               SC_REPR_FD_T                                                         /* return */
-#define __NRATR0_process_spawnveat      SC_REPR_FD_T                                                         /* dirfd */ 
-#define __NRATR1_process_spawnveat      SC_REPR_FILENAME                                                     /* pathname */ 
-#define __NRATL1_process_spawnveat      0                                                                    /* pathname -> dirfd */ 
-#define __NRATR2_process_spawnveat      SC_REPR_STRING_VECTOR64                                              /* argv */ 
-#define __NRATR3_process_spawnveat      SC_REPR_STRING_VECTOR64                                              /* envp */ 
-#define __NRATR4_process_spawnveat      SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* flags */ 
-#define __NRATR5_process_spawnveat      SC_REPR_STRUCT_SPAWN_ACTIONSX64                                      /* actions */ 
-#define __NRRTR_process_spawnveat       SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_coredump               SC_REPR_STRUCT_UCPUSTATE64                                           /* curr_state */ 
 #define __NRATR1_coredump               SC_REPR_STRUCT_UCPUSTATE64                                           /* orig_state */ 
 #define __NRATR2_coredump               SC_REPR_VOID_VECTOR64                                                /* traceback_vector */ 

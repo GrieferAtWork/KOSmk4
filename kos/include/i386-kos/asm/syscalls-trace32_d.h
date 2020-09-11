@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf482e669 */
+/* HASH CRC-32:0x6f648ba5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1034,12 +1034,6 @@
 #define __NR32AN1_utime64                 times
 #define __NR32AN0_userviofd               initial_size
 #define __NR32AN1_userviofd               flags
-#define __NR32AN0_process_spawnveat       dirfd
-#define __NR32AN1_process_spawnveat       pathname
-#define __NR32AN2_process_spawnveat       argv
-#define __NR32AN3_process_spawnveat       envp
-#define __NR32AN4_process_spawnveat       flags
-#define __NR32AN5_process_spawnveat       actions
 #define __NR32AN0_stime64                 t
 #define __NR32AN0_coredump                curr_state
 #define __NR32AN1_coredump                orig_state
@@ -2680,14 +2674,6 @@
 #define __NR32ATR0_userviofd               SC_REPR_SIZE_T                                                       /* initial_size */ 
 #define __NR32ATR1_userviofd               SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK                            /* flags */ 
 #define __NR32RTR_userviofd                SC_REPR_FD_T                                                         /* return */
-#define __NR32ATR0_process_spawnveat       SC_REPR_FD_T                                                         /* dirfd */ 
-#define __NR32ATR1_process_spawnveat       SC_REPR_FILENAME                                                     /* pathname */ 
-#define __NR32ATL1_process_spawnveat       0                                                                    /* pathname -> dirfd */ 
-#define __NR32ATR2_process_spawnveat       SC_REPR_STRING_VECTOR32                                              /* argv */ 
-#define __NR32ATR3_process_spawnveat       SC_REPR_STRING_VECTOR32                                              /* envp */ 
-#define __NR32ATR4_process_spawnveat       SC_REPR_ATFLAG__EMPTY_PATH__SYMLINK_NOFOLLOW__DOSPATH                /* flags */ 
-#define __NR32ATR5_process_spawnveat       SC_REPR_STRUCT_SPAWN_ACTIONSX32                                      /* actions */ 
-#define __NR32RTR_process_spawnveat        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_stime64                 SC_REPR_TIME64_T_PTR                                                 /* t */ 
 #define __NR32RTR_stime64                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_coredump                SC_REPR_STRUCT_UCPUSTATE32                                           /* curr_state */ 

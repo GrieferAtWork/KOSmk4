@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88a125d2 */
+/* HASH CRC-32:0x1a122946 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9331,34 +9331,6 @@ INTERN_FUNCTION(libc_sys_Xuserviofd)
 	.cfi_endproc
 END(libc_sys_Xuserviofd)
 DEFINE_PUBLIC_ALIAS(sys_Xuserviofd, libc_sys_Xuserviofd)
-
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
-.section .text.crt.syscall.process_spawnveat
-INTERN_FUNCTION(libc_sys_process_spawnveat)
-	.cfi_startproc
-	movq   $(0xffffffffffffffe2), %rax
-	movq   %rcx, %r10
-	clc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_process_spawnveat)
-DEFINE_PUBLIC_ALIAS(sys_process_spawnveat, libc_sys_process_spawnveat)
-
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
-.section .text.crt.syscall.Xprocess_spawnveat
-INTERN_FUNCTION(libc_sys_Xprocess_spawnveat)
-	.cfi_startproc
-	movq   $(0xffffffffffffffe2), %rax
-	movq   %rcx, %r10
-	stc
-	syscall
-	ret
-	.cfi_endproc
-END(libc_sys_Xprocess_spawnveat)
-DEFINE_PUBLIC_ALIAS(sys_Xprocess_spawnveat, libc_sys_Xprocess_spawnveat)
 
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done

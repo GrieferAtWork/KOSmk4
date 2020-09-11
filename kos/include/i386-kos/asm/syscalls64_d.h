@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4f3adb */
+/* HASH CRC-32:0x39d9a05c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -816,8 +816,6 @@
  *                       through use of `ftruncate(return)'
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 #define __NR64_userviofd              __UINT64_C(0xffffffffffffffe1) /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
-/* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR64_process_spawnveat      __UINT64_C(0xffffffffffffffe2) /* errno_t process_spawnveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags, struct spawn_actionsx64 const *actions) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
@@ -1529,7 +1527,6 @@
 #define __NR64RM_rtm_end                0
 #define __NR64RM_rtm_begin              0
 #define __NR64RM_userviofd              0
-#define __NR64RM_process_spawnveat      0
 #define __NR64RM_coredump               2
 #define __NR64RM_raiseat                2
 #define __NR64RM_mktty                  0
@@ -1692,7 +1689,6 @@
 #define __NR64CP_fchdirat               1
 #define __NR64CP_kreaddirf              1
 #define __NR64CP_kreaddir               1
-#define __NR64CP_process_spawnveat      1
 #define __NR64CP_lfutexlockexpr         1
 #define __NR64CP_lfutexexpr             1
 #define __NR64CP_lfutex                 1
@@ -2068,7 +2064,6 @@
 #define __NR64RC_rtm_end                0
 #define __NR64RC_rtm_begin              0
 #define __NR64RC_userviofd              2
-#define __NR64RC_process_spawnveat      6
 #define __NR64RC_coredump               6
 #define __NR64RC_raiseat                2
 #define __NR64RC_mktty                  4

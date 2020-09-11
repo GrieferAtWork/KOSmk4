@@ -698,8 +698,6 @@ incdir("", "../../include");
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
 #include <kos/bits/rtm.h>
-#include <kos/bits/spawn-action.h>
-#include <kos/bits/spawn.h>
 #include <kos/bits/thread.h>
 #include <kos/bits/uaio.h>
 #include <kos/bits/ukern-struct.h>
