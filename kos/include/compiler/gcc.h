@@ -826,7 +826,7 @@ __extension__ typedef unsigned long long __ulonglong_t;
 
 #ifdef __cplusplus
 
-#if !defined(__INTELLISENSE__) || 1
+#ifndef __INTELLISENSE__
 /* Compiler has the gcc-ncx-builtin bug:
  * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=96985
  *

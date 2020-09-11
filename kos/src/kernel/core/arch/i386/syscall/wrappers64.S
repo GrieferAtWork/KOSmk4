@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab0bbba5 */
+/* HASH CRC-32:0xb17f7d9b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10829,17 +10829,18 @@ END(__x86_asm64_syscall_rtm_end)
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
  *   - sys_rtm_begin:  Nested RTM operation
  *   - sys_rtm_end:    End an RTM operation
  *   - sys_rtm_abort:  Abort an RTM operation
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 /* rtm_status_t rtm_begin(void) */
 .section .text.x86.asm64_syscall.rtm_begin
@@ -26494,17 +26495,18 @@ END(__x86_asm32_int80_rtm_end)
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
  *   - sys_rtm_begin:  Nested RTM operation
  *   - sys_rtm_end:    End an RTM operation
  *   - sys_rtm_abort:  Abort an RTM operation
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 /* rtm_status_t rtm_begin(void) */
 .section .text.x86.asm32_syscall_int80.rtm_begin
@@ -31377,17 +31379,18 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rtm_end, __x86_asm32_int80_rtm_end
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
  *   - sys_rtm_begin:  Nested RTM operation
  *   - sys_rtm_end:    End an RTM operation
  *   - sys_rtm_abort:  Abort an RTM operation
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 /* rtm_status_t rtm_begin(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rtm_begin, __x86_asm32_int80_rtm_begin)
@@ -37148,17 +37151,18 @@ END(__x86_asm32_sysrun32_rtm_abort)
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
  *   - sys_rtm_begin:  Nested RTM operation
  *   - sys_rtm_end:    End an RTM operation
  *   - sys_rtm_abort:  Abort an RTM operation
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 /* rtm_status_t rtm_begin(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rtm_begin, sys32_rtm_begin); */

@@ -106,7 +106,20 @@ install_file_nodisk /$TARGET_LIBPATH/libpng$SO_VERSION_MAJOR.a "$OPTPATH/.libs/l
 
 install_rawfile "$KOS_ROOT/kos/include/libpng/png.h" "$SRCPATH/png.h"
 install_rawfile "$KOS_ROOT/kos/include/libpng/pngconf.h" "$SRCPATH/pngconf.h"
-install_rawfile "$KOS_ROOT/kos/include/libpng/pnglibconf.h" "$OPTPATH/pnglibconf.h"
+install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/libpng/pnglibconf.h" "$OPTPATH/pnglibconf.h"
+if ! [ -f "$KOS_ROOT/kos/include/libpng/pnglibconf.h" ]; then
+	echo "Installing file $KOS_ROOT/kos/include/libpng/pnglibconf.h"
+	cat > "$KOS_ROOT/kos/include/libpng/pnglibconf.h" <<EOF
+#ifndef PNGLCONF_H
+#include <libpng/pnglibconf.h> /* arch-specific header */
+#ifndef PNGLCONF_H
+#define PNGLCONF_H
+#endif /* !PNGLCONF_H */
+#endif /* !PNGLCONF_H */
+EOF
+else
+	echo "Installing file $KOS_ROOT/kos/include/libpng/pnglibconf.h (up to date)"
+fi
 
 install_proxy_c_header() {
 	if ! [ -f "$1" ]; then

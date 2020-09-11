@@ -19,5 +19,7 @@
  */
 #ifndef _BITSTRING_H
 #define _BITSTRING_H 1
+
 #include <sys/bitstring.h>
+
 #endif /* !_BITSTRING_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2c485a4 */
+/* HASH CRC-32:0x22ee4c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,36 +30,41 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Begin an RTM operation. Note that if the arch-specific RTM driver
+/* >> rtm_begin(2)
+ * Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
- *   - rtm_begin:  Nested RTM operation
- *   - rtm_end:    End an RTM operation
- *   - rtm_abort:  Abort an RTM operation
- *   - rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
+ *   - rtm_begin(2):  Nested RTM operation
+ *   - rtm_end(2):    End an RTM operation
+ *   - rtm_abort(2):  Abort an RTM operation
+ *   - rtm_test(2):   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 INTDEF rtm_status_t NOTHROW(LIBCCALL libc_rtm_begin)(void);
-/* End a transaction
+/* >> rtm_end(2)
+ * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, the behavior is undefined */
 INTDEF void NOTHROW(LIBCCALL libc_rtm_end)(void);
-/* Abort the current transaction by having `rtm_begin()' return with
+/* >> rtm_abort(2)
+ * Abort the current transaction by having `rtm_begin()' return with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no transaction was in progress, behave as a no-op. Otherwise, this
  * function does not return normally, but returns from the original `rtm_begin()' */
 INTDEF void NOTHROW(__FCALL libc_rtm_abort)(unsigned int code);
-/* Check if a transaction is currently in progress
+/* >> rtm_test(2)
+ * Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
 INTDEF ATTR_PURE WUNUSED int NOTHROW(LIBCCALL libc_rtm_test)(void);

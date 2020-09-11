@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb42a8885 */
+/* HASH CRC-32:0x12d5ff61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,8 @@
 #include <kos/bits/rtm.h>
 #ifdef __arch_rtm_end
 __NAMESPACE_LOCAL_BEGIN
-/* End a transaction
+/* >> rtm_end(2)
+ * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, the behavior is undefined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a890647 */
+/* HASH CRC-32:0x64cd2190 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -791,17 +791,18 @@
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
  *   - sys_rtm_begin:  Nested RTM operation
  *   - sys_rtm_end:    End an RTM operation
  *   - sys_rtm_abort:  Abort an RTM operation
  *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 #define SYS_rtm_begin              __NR_rtm_begin              /* rtm_status_t rtm_begin(void) */
 /* Construct a user-vio-fd object supporting mmap(2), with actual

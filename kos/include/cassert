@@ -19,5 +19,7 @@
  */
 #ifndef _CXX_CASSERT
 #define _CXX_CASSERT 1
-#include <assert.h>
+
+#include "assert.h"
+
 #endif /* !_CXX_CASSERT */

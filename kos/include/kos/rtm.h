@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fb7d758 */
+/* HASH CRC-32:0x3b66b032 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,120 +85,135 @@ typedef __rtm_status_t rtm_status_t;
 #endif /* !__rtm_status_t_defined */
 
 #if defined(__arch_rtm_begin) && defined(__CRT_HAVE_rtm_begin)
-/* Begin an RTM operation. Note that if the arch-specific RTM driver
+/* >> rtm_begin(2)
+ * Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
- *   - rtm_begin:  Nested RTM operation
- *   - rtm_end:    End an RTM operation
- *   - rtm_abort:  Abort an RTM operation
- *   - rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
+ *   - rtm_begin(2):  Nested RTM operation
+ *   - rtm_end(2):    End an RTM operation
+ *   - rtm_abort(2):  Abort an RTM operation
+ *   - rtm_test(2):   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 __CEIDECLARE(,rtm_status_t,__NOTHROW,rtm_begin,(void),{ return __arch_rtm_begin(); })
 #elif defined(__CRT_HAVE_rtm_begin)
-/* Begin an RTM operation. Note that if the arch-specific RTM driver
+/* >> rtm_begin(2)
+ * Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
- *   - rtm_begin:  Nested RTM operation
- *   - rtm_end:    End an RTM operation
- *   - rtm_abort:  Abort an RTM operation
- *   - rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
+ *   - rtm_begin(2):  Nested RTM operation
+ *   - rtm_end(2):    End an RTM operation
+ *   - rtm_abort(2):  Abort an RTM operation
+ *   - rtm_test(2):   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 __CDECLARE(,rtm_status_t,__NOTHROW,rtm_begin,(void),())
 #elif defined(__arch_rtm_begin)
 #include <libc/local/kos.rtm/rtm_begin.h>
-/* Begin an RTM operation. Note that if the arch-specific RTM driver
+/* >> rtm_begin(2)
+ * Begin an RTM operation. Note that if the arch-specific RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
  * though any error that may happen during this will result in `RTM_NOSYS'
  * begin returned.
  * Note that while an RTM operation is in progress, only a very small hand
  * full of system calls are allowed to be used. Attempting to use arbitrary
- * system calls, or attempting to access too much system memory in general
- * will result in this function returning with `RTM_ABORT_CAPACITY', rather
- * than succeeding. The following is a list of system calls which are
- * whitelisted for use during a transaction:
- *   - rtm_begin:  Nested RTM operation
- *   - rtm_end:    End an RTM operation
- *   - rtm_abort:  Abort an RTM operation
- *   - rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * system calls will most likely result in an `RTM_ABORT_FAILED' error, and
+ * attempting to access too much system memory in general will result in this
+ * function returning with `RTM_ABORT_CAPACITY', rather than succeeding.
+ * The following is a list of system calls which are whitelisted for use
+ * during a transaction:
+ *   - rtm_begin(2):  Nested RTM operation
+ *   - rtm_end(2):    End an RTM operation
+ *   - rtm_abort(2):  Abort an RTM operation
+ *   - rtm_test(2):   Check if an RTM operation is in progress (always returns `1')
  * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
  * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the associated driver is missing, or cannot be loaded.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rtm_begin, __FORCELOCAL __ATTR_ARTIFICIAL rtm_status_t __NOTHROW(__LIBCCALL rtm_begin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_begin))(); })
 #endif /* ... */
 #if defined(__arch_rtm_end) && defined(__CRT_HAVE_rtm_end)
-/* End a transaction
+/* >> rtm_end(2)
+ * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, the behavior is undefined */
 __CEIDECLARE(,void,__NOTHROW,rtm_end,(void),{ __arch_rtm_end(); })
 #elif defined(__CRT_HAVE_rtm_end)
-/* End a transaction
+/* >> rtm_end(2)
+ * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, the behavior is undefined */
 __CDECLARE_VOID(,__NOTHROW,rtm_end,(void),())
 #elif defined(__arch_rtm_end)
 #include <libc/local/kos.rtm/rtm_end.h>
-/* End a transaction
+/* >> rtm_end(2)
+ * End a transaction
  * If the transaction was successful, return normally
  * If the transaction failed, `rtm_begin()' returns `RTM_ABORT_*'
  * If no transaction was in progress, the behavior is undefined */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rtm_end, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__LIBCCALL rtm_end)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_end))(); })
 #endif /* ... */
 #if defined(__arch_rtm_abort) && defined(__CRT_HAVE_rtm_abort)
-/* Abort the current transaction by having `rtm_begin()' return with
+/* >> rtm_abort(2)
+ * Abort the current transaction by having `rtm_begin()' return with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no transaction was in progress, behave as a no-op. Otherwise, this
  * function does not return normally, but returns from the original `rtm_begin()' */
 __COMPILER_EIDECLARE(__LIBC,,void,__NOTHROW__FCALL,,rtm_abort,(unsigned int __code),{ __arch_rtm_abort(__code); })
 #elif defined(__CRT_HAVE_rtm_abort)
-/* Abort the current transaction by having `rtm_begin()' return with
+/* >> rtm_abort(2)
+ * Abort the current transaction by having `rtm_begin()' return with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no transaction was in progress, behave as a no-op. Otherwise, this
  * function does not return normally, but returns from the original `rtm_begin()' */
 __LIBC void __NOTHROW(__FCALL rtm_abort)(unsigned int __code) __CASMNAME_SAME("rtm_abort");
 #elif defined(__arch_rtm_abort)
 #include <libc/local/kos.rtm/rtm_abort.h>
-/* Abort the current transaction by having `rtm_begin()' return with
+/* >> rtm_abort(2)
+ * Abort the current transaction by having `rtm_begin()' return with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no transaction was in progress, behave as a no-op. Otherwise, this
  * function does not return normally, but returns from the original `rtm_begin()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rtm_abort, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW(__FCALL rtm_abort)(unsigned int __code) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_abort))(__code); })
 #endif /* ... */
 #if defined(__arch_rtm_test) && defined(__CRT_HAVE_rtm_test)
-/* Check if a transaction is currently in progress
+/* >> rtm_test(2)
+ * Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
 __CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,rtm_test,(void),{ return __arch_rtm_test(); })
 #elif defined(__CRT_HAVE_rtm_test)
-/* Check if a transaction is currently in progress
+/* >> rtm_test(2)
+ * Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW,rtm_test,(void),())
 #elif defined(__arch_rtm_test)
 #include <libc/local/kos.rtm/rtm_test.h>
-/* Check if a transaction is currently in progress
+/* >> rtm_test(2)
+ * Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
 __NAMESPACE_LOCAL_USING_OR_IMPL(rtm_test, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW(__LIBCCALL rtm_test)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rtm_test))(); })

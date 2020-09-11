@@ -51,7 +51,7 @@
 #define ARFMAG "`\n"       /* String in ar_fmag at end of each header. */
 
 #ifdef __CC__
-__SYSDECL_BEGIN
+__DECL_BEGIN
 
 struct ar_hdr {
 	char ar_name[16]; /* Member file name, sometimes / terminated. */
@@ -63,7 +63,7 @@ struct ar_hdr {
 	char ar_fmag[2];  /* Always contains ARFMAG. */
 };
 
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 
 

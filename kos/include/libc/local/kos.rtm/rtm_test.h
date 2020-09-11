@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84ff600f */
+/* HASH CRC-32:0xa9031e80 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,8 @@
 #include <kos/bits/rtm.h>
 #ifdef __arch_rtm_test
 __NAMESPACE_LOCAL_BEGIN
-/* Check if a transaction is currently in progress
+/* >> rtm_test(2)
+ * Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
  * @return: 1 : An RTM operation is currently in progress */
 __LOCAL_LIBC(rtm_test) __ATTR_PURE __ATTR_WUNUSED int

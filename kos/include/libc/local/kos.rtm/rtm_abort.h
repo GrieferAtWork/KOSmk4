@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f833991 */
+/* HASH CRC-32:0x9abc6c45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,8 @@
 #include <kos/bits/rtm.h>
 #ifdef __arch_rtm_abort
 __NAMESPACE_LOCAL_BEGIN
-/* Abort the current transaction by having `rtm_begin()' return with
+/* >> rtm_abort(2)
+ * Abort the current transaction by having `rtm_begin()' return with
  * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
  * If no transaction was in progress, behave as a no-op. Otherwise, this
  * function does not return normally, but returns from the original `rtm_begin()' */

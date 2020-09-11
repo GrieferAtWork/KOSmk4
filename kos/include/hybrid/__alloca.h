@@ -22,6 +22,7 @@
 
 #include "../__stdinc.h"
 
+#ifdef __CC__
 #if defined(__GNUC__) || __has_builtin(__builtin_alloca)
 #define __hybrid_alloca(s)  __builtin_alloca(s)
 #elif defined(_MSC_VER)
@@ -38,7 +39,7 @@ __SYSDECL_END
 #if __has_include(<alloca.h>)
 #include <alloca.h>
 #define __hybrid_alloca(s)  alloca(s)
-#endif
+#endif /* __has_include(<alloca.h>) */
 #endif /* !__NO_has_include && !__KOS_SYSTEM_HEADERS__ */
 
 #ifndef __hybrid_alloca
@@ -47,9 +48,10 @@ __SYSDECL_END
 __SYSDECL_BEGIN
 extern __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *(alloca)(__SIZE_TYPE__ __n_bytes);
 __SYSDECL_END
-#define __hybrid_alloca(s)  (alloca)(s)
+#define __hybrid_alloca(s) (alloca)(s)
 #endif
 #endif /* !__hybrid_alloca */
 #endif /* ... */
+#endif /* __CC__ */
 
 #endif /* !__GUARD_HYBRID___ALLOCA_H */
