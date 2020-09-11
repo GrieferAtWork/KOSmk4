@@ -43,6 +43,7 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
+#include <sched/posix-signal.h>
 #include <sched/rpc.h>
 
 #include <hybrid/atomic.h>
@@ -3046,6 +3047,11 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 			if likely(mypid)
 				sig_broadcast(&mypid->tp_changed);
 		}
+		/* With the VFORK flag cleared, check for pending POSIX signals,
+		 * since this also means that our thread's user-visible signal
+		 * mask has once again come into effect.
+		 * XXX: Use `sigmask_check_s()' (after all: we _do_ have `state') */
+		sigmask_check();
 	} else {
 		state = vm_exec(/* effective_vm:              */ THIS_VM,
 		                /* user_state:                */ state,

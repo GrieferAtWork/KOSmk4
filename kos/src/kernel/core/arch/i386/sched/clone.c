@@ -174,6 +174,12 @@ x86_clone_impl(struct icpustate const *__restrict init_state,
 		REL(FORTASK(result, this_kernel_stacknode_).vn_link.ln_pself);
 		REL(FORTASK(result, this_kernel_stackpart_).dp_srefs);
 #undef REL
+		/* Set the VFORK flag to cause the thread to execute in VFORK-mode.
+		 * This must be done before we start making the thread visible to
+		 * other kernel components, since this also affects things such as
+		 * the thread's effective signal mask. */
+		if (clone_flags & CLONE_VFORK)
+			result->t_flags |= TASK_FVFORK;
 		TRY {
 			vm_datapart_do_allocram(&FORTASK(result, this_kernel_stackpart_));
 			TRY {
@@ -365,9 +371,6 @@ again_lock_vm:
 			REF struct kernel_sigmask *old_sigmask;
 			ATOMIC_REF(struct kernel_sigmask) *mymask;
 
-			/* Set the VFORK flag to cause the thread to execute in VFORK-mode. */
-			ATOMIC_FETCHOR(result->t_flags, TASK_FVFORK);
-
 			/* Actually start execution of the newly created thread. */
 			task_start(result);
 
@@ -393,6 +396,10 @@ again_lock_vm:
 				RETHROW();
 			}
 			mymask->set_inherit_new(old_sigmask);
+			/* With the original signal mask restored, we must check if
+			 * we (the parent) have received any signals while we were
+			 * waiting on the child */
+			sigmask_check();
 		} else {
 			/* Actually start execution of the newly created thread. */
 			task_start(result);

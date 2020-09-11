@@ -83,62 +83,52 @@ task_raisesignalthread(struct task *__restrict target,
 		       return TASK_RAISESIGNALTHREAD_NX_BADSIGNO);
 	}
 	/* Check if the signal is being masked. */
-	{
-		bool ismember;
-		REF struct kernel_sigmask *mask;
-		mask = FORTASK(target, this_sigmask).get();
-		ismember = sigismember(&mask->sm_mask, entry->sqe_info.si_signo);
-		decref_unlikely(mask);
-		if (ismember) {
-			/* Schedule the signal as pending within the target thread. */
-			struct sigqueue *pending;
-			struct sigqueue_entry *next;
-			pending = &FORTASK(target, this_sigqueue);
-			do {
-				next = ATOMIC_READ(pending->sq_queue);
-				if unlikely(next == SIGQUEUE_SQ_QUEUE_TERMINATED) {
-					/* The target thread can no longer receive signals! */
-					kfree(entry);
-					return false;
-				}
-				entry->sqe_next = next;
-				COMPILER_WRITE_BARRIER();
-			} while (!ATOMIC_CMPXCH_WEAK(pending->sq_queue, next, entry));
-			/* Only one thread can ever handle the signal, so use `sig_send()' */
-			sig_send(&pending->sq_newsig);
-			/* Check if the signal is still being masked. - If it isn't, it may have gotten
-			 * unmasked before we inserted our new signal into the queue, in which case the
-			 * target thread may not know about it. - Because of this, send an RPC to have
-			 * the target thread manually check for unmasked signals. */
-			mask = FORTASK(target, this_sigmask).get();
-			ismember = sigismember(&mask->sm_mask, entry->sqe_info.si_signo);
-			decref_unlikely(mask);
-			if unlikely(!ismember) {
-				/* The signal got unmasked */
-#ifdef DELIVER_NX
-				STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_SUCCESS == TASK_SCHEDULE_USER_RPC_SUCCESS);
-				STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_INTERRUPTED == TASK_SCHEDULE_USER_RPC_INTERRUPTED);
-				STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_BADALLOC == TASK_SCHEDULE_USER_RPC_BADALLOC);
-				STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_TERMINATED == TASK_SCHEDULE_USER_RPC_TERMINATED);
-				STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_KERNTHREAD == TASK_SCHEDULE_USER_RPC_KERNTHREAD);
-				result = task_schedule_user_rpc_nx(target,
-				                                   &task_sigmask_check_rpc_handler,
-				                                   NULL,
-				                                   TASK_USER_RPC_FINTR,
-				                                   rpc_flags);
-#else /* DELIVER_NX */
-				result = task_schedule_user_rpc(target,
-				                                &task_sigmask_check_rpc_handler,
-				                                NULL,
-				                                TASK_USER_RPC_FINTR,
-				                                rpc_flags);
-#endif /* !DELIVER_NX */
-				return result;
-				
+	if (sigmask_ismasked_in(target, entry->sqe_info.si_signo)) {
+		/* Schedule the signal as pending within the target thread. */
+		struct sigqueue *pending;
+		struct sigqueue_entry *next;
+		pending = &FORTASK(target, this_sigqueue);
+		do {
+			next = ATOMIC_READ(pending->sq_queue);
+			if unlikely(next == SIGQUEUE_SQ_QUEUE_TERMINATED) {
+				/* The target thread can no longer receive signals! */
+				kfree(entry);
+				return false;
 			}
-			/* The target thread will handle the signal as soon as it gets unmasked! */
-			return true;
+			entry->sqe_next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(pending->sq_queue, next, entry));
+		/* Only one thread can ever handle the signal, so use `sig_send()' */
+		sig_send(&pending->sq_newsig);
+		/* Check if the signal is still being masked. - If it isn't, it may have gotten
+		 * unmasked before we inserted our new signal into the queue, in which case the
+		 * target thread may not know about it. - Because of this, send an RPC to have
+		 * the target thread manually check for unmasked signals. */
+		if unlikely(!sigmask_ismasked_in(target, entry->sqe_info.si_signo)) {
+			/* The signal got unmasked */
+#ifdef DELIVER_NX
+			STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_SUCCESS == TASK_SCHEDULE_USER_RPC_SUCCESS);
+			STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_INTERRUPTED == TASK_SCHEDULE_USER_RPC_INTERRUPTED);
+			STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_BADALLOC == TASK_SCHEDULE_USER_RPC_BADALLOC);
+			STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_TERMINATED == TASK_SCHEDULE_USER_RPC_TERMINATED);
+			STATIC_ASSERT(TASK_RAISESIGNALTHREAD_NX_KERNTHREAD == TASK_SCHEDULE_USER_RPC_KERNTHREAD);
+			result = task_schedule_user_rpc_nx(target,
+			                                   &task_sigmask_check_rpc_handler,
+			                                   NULL,
+			                                   TASK_USER_RPC_FINTR,
+			                                   rpc_flags);
+#else /* DELIVER_NX */
+			result = task_schedule_user_rpc(target,
+			                                &task_sigmask_check_rpc_handler,
+			                                NULL,
+			                                TASK_USER_RPC_FINTR,
+			                                rpc_flags);
+#endif /* !DELIVER_NX */
+			return result;
+			
 		}
+		/* The target thread will handle the signal as soon as it gets unmasked! */
+		return true;
 	}
 	/* Deliver an RPC. */
 #ifdef DELIVER_NX
@@ -188,7 +178,7 @@ NOTHROW_NX(KCALL FUNC(find_thread_in_process_with_unmasked_signal))(struct task 
 	struct taskpid *cpid;
 	assert(!(process_leader->t_flags & TASK_FKERNTHREAD));
 	/* First check: is the leader masking the signal? */
-	if (!is_thread_masking_signal(process_leader, kernel_signo)) {
+	if (!sigmask_ismasked_in(process_leader, kernel_signo)) {
 		return IFELSE(incref(process_leader), (*presult = incref(process_leader), 0));
 	}
 	group = &FORTASK(process_leader, this_taskgroup);
@@ -212,7 +202,7 @@ NOTHROW_NX(KCALL FUNC(find_thread_in_process_with_unmasked_signal))(struct task 
 		/* Only consider child _threads_ (not child processes) */
 		if (task_getprocess_of(child) == process_leader) {
 			/* Check if the thread is masking the given signal. */
-			if (!is_thread_masking_signal(child, kernel_signo)) {
+			if (!sigmask_ismasked_in(child, kernel_signo)) {
 				sync_endread(&group->tg_proc_threads_lock);
 				return IFELSE(child, (*presult = child, 0));
 			}

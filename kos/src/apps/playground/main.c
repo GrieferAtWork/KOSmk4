@@ -269,7 +269,7 @@ int main_fpu(int argc, char *argv[], char *envp[]) {
 int main_fork(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	for (;;) {
-		if (fork() == 0) {
+		if (vfork() == 0) {
 			char buf[64];
 			size_t len;
 			len = sprintf(buf, "child: %u\n", getpid());

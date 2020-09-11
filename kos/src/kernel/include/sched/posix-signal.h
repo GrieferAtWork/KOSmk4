@@ -36,7 +36,8 @@
 #include <bits/sigset.h>         /* struct __sigset_struct */
 #include <sys/wait.h>
 
-#include <signal.h> /* SIG* */
+#include <signal.h>  /* SIG* */
+#include <stdbool.h> /* SIG* */
 
 #include <libc/string.h> /* __libc_memset() */
 
@@ -123,6 +124,15 @@ FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL sigmask_getwr(void) 
 
 /* Check for pending signals that are no longer being masked. */
 FUNDEF void FCALL sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK);
+
+/* Check if the given `signo' is currently masked by `self'. */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self,
+                                   signo_t signo);
+
+/* Same as `sigmask_ismasked_in()', but for the calling thread. */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
+NOTHROW(FCALL sigmask_ismasked)(signo_t signo);
 
 /* Same as `sigmask_check()', but if a signal gets triggered, act as though
  * it was being serviced after the current system call has exited with the

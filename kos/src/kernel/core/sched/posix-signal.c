@@ -177,6 +177,43 @@ print("#endif /" "* ... *" "/");
 PUBLIC ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask)
 this_sigmask = ATOMIC_REF_INIT(&kernel_sigmask_empty);
 
+
+/* Check if the given `signo' is currently masked by `self'. */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self,
+                                     signo_t signo) {
+	bool result;
+	REF struct kernel_sigmask *sm;
+	if unlikely(self->t_flags & TASK_FVFORK) {
+		/* Always behave as though this was `kernel_sigmask_full'. */
+		if (signo == SIGKILL || signo == SIGSTOP)
+			return false; /* Cannot be masked. */
+		return true;
+	}
+	sm     = FORTASK(self, this_sigmask).get();
+	result = sigismember(&sm->sm_mask, signo);
+	decref_unlikely(sm);
+	return result;
+}
+
+/* Same as `sigmask_ismasked_in()', but for the calling thread. */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
+NOTHROW(FCALL sigmask_ismasked)(signo_t signo) {
+	bool result;
+	struct kernel_sigmask *sm;
+	if unlikely(PERTASK_GET(this_task.t_flags) & TASK_FVFORK) {
+		/* Always behave as though this was `kernel_sigmask_full'. */
+		if (signo == SIGKILL || signo == SIGSTOP)
+			return false; /* Cannot be masked. */
+		return true;
+	}
+	sm     = sigmask_getrd();
+	result = sigismember(&sm->sm_mask, signo);
+	return result;
+}
+
+
+
 /* [0..1][valid_if(!TASK_FKERNTHREAD)][lock(PRIVATE(THIS_TASK))]
  * User-space signal handlers for the calling thread. */
 PUBLIC ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr = NULL;
@@ -828,12 +865,10 @@ task_signal_rpc_handler(void *arg,
 	assert(info->sqe_info.si_signo < NSIG);
 	TRY {
 		if likely(reason != TASK_RPC_REASON_SHUTDOWN) {
-			struct kernel_sigmask *mymask;
-			mymask = sigmask_getrd();
 			/* Make sure that the signal isn't being masked (the RPC may have been delivered
 			 * after our current thread masked the signal, meaning that the signal being raised
 			 * still triggered the RPC) */
-			if unlikely(mymask && sigismember(&mymask->sm_mask, info->sqe_info.si_signo)) {
+			if unlikely(sigmask_ismasked(info->sqe_info.si_signo)) {
 				/* Mark the signal as pending within the current thread. */
 				struct sigqueue *pertask_pending;
 				struct sigqueue_entry *next;
@@ -884,14 +919,12 @@ task_signal_rpc_handler_after_syscall(void *arg,
 	assert(info->sqe_info.si_signo < NSIG);
 	TRY {
 		if likely(reason != TASK_RPC_REASON_SHUTDOWN) {
-			struct kernel_sigmask *mymask;
 			if (reason == TASK_RPC_REASON_SYSCALL)
 				state = set_syscall_return(state, (syscall_ulong_t)(uintptr_t)info->sqe_next);
-			mymask = sigmask_getrd();
 			/* Make sure that the signal isn't being masked (the RPC may have been delivered
 			 * after our current thread masked the signal, meaning that the signal being raised
 			 * still triggered the RPC. - Schedule the ) */
-			if unlikely(mymask && sigismember(&mymask->sm_mask, info->sqe_info.si_signo)) {
+			if unlikely(sigmask_ismasked(info->sqe_info.si_signo)) {
 				/* Mark the signal as pending within the current thread. */
 				struct sigqueue *pertask_pending;
 				struct sigqueue_entry *next;
@@ -955,12 +988,10 @@ task_process_signal_rpc_handler(void *arg,
 	assert(info->sqe_info.si_signo < NSIG);
 	TRY {
 		if likely(reason != TASK_RPC_REASON_SHUTDOWN) {
-			struct kernel_sigmask *mymask;
-			mymask = sigmask_getrd();
 			/* Make sure that the signal isn't being masked (the RPC may have been delivered
 			 * after our current thread masked the signal, meaning that the signal being raised
 			 * still triggered the RPC) */
-			if unlikely(mymask && sigismember(&mymask->sm_mask, info->sqe_info.si_signo))
+			if unlikely(sigmask_ismasked(info->sqe_info.si_signo))
 				goto deliver_to_some_thread;
 			/* Actually handle the signal */
 			state = handle_signal(info,
@@ -1044,11 +1075,9 @@ NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myq
 /* Check for pending signals that are no longer being masked. */
 PUBLIC void FCALL
 sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK) {
-	struct kernel_sigmask *mask;
 	struct sigqueue *myqueue;
 	struct process_sigqueue *prqueue;
 	struct sigqueue_entry *pending, **piter, *iter;
-	mask = sigmask_getrd();
 	myqueue = &THIS_SIGQUEUE;
 	/* Temporarily steal all pending per-thread signals. */
 	do {
@@ -1062,7 +1091,7 @@ sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK) {
 	iter  = pending;
 	piter = &pending;
 	do {
-		if (!sigismember(&mask->sm_mask, iter->sqe_info.si_signo)) {
+		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -1081,7 +1110,7 @@ no_perthread_pending:
 	sync_read(prqueue);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
-		if (sigismember(&mask->sm_mask, iter->sqe_info.si_signo))
+		if (sigmask_ismasked(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
 		sync_endread(prqueue);
@@ -1108,11 +1137,9 @@ no_perthread_pending:
 PUBLIC void FCALL
 sigmask_check_after_syscall(syscall_ulong_t syscall_result)
 		THROWS(E_INTERRUPT, E_WOULDBLOCK) {
-	struct kernel_sigmask *mask;
 	struct sigqueue *myqueue;
 	struct process_sigqueue *prqueue;
 	struct sigqueue_entry *pending, **piter, *iter;
-	mask = sigmask_getrd();
 	myqueue = &THIS_SIGQUEUE;
 	/* Temporarily steal all pending per-thread signals. */
 	do {
@@ -1126,7 +1153,7 @@ sigmask_check_after_syscall(syscall_ulong_t syscall_result)
 	iter  = pending;
 	piter = &pending;
 	do {
-		if (!sigismember(&mask->sm_mask, iter->sqe_info.si_signo)) {
+		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -1145,7 +1172,7 @@ no_perthread_pending:
 	sync_read(prqueue);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
-		if (sigismember(&mask->sm_mask, iter->sqe_info.si_signo))
+		if (sigmask_ismasked(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
 		sync_endread(prqueue);
@@ -1190,11 +1217,9 @@ sigmask_check_s(struct icpustate *__restrict state,
                 struct rpc_syscall_info const *sc_info)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	bool did_handle_something = false;
-	struct kernel_sigmask *mask;
 	struct sigqueue *myqueue;
 	struct process_sigqueue *prqueue;
 	struct sigqueue_entry *pending, **piter, *iter;
-	mask = sigmask_getrd();
 	myqueue = &THIS_SIGQUEUE;
 	/* Temporarily steal all pending per-thread signals. */
 	do {
@@ -1209,7 +1234,7 @@ sigmask_check_s(struct icpustate *__restrict state,
 	piter = &pending;
 again_iter:
 	do {
-		if (!sigismember(&mask->sm_mask, iter->sqe_info.si_signo)) {
+		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -1248,7 +1273,7 @@ again_lock_prqueue:
 again_scan_prqueue:
 		for (piter = &prqueue->psq_queue.sq_queue;
 			 (iter = *piter) != NULL; piter = &iter->sqe_next) {
-			if (sigismember(&mask->sm_mask, iter->sqe_info.si_signo))
+			if (sigmask_ismasked(iter->sqe_info.si_signo))
 				continue;
 			/* Found an unmasked signal.
 			 * -> Upgrade our lock to write-mode so we can steal it! */
@@ -1287,20 +1312,6 @@ again_scan_prqueue:
 }
 
 
-
-
-/* Check if the given `thread' is masking `signo' */
-LOCAL NOBLOCK bool
-NOTHROW(KCALL is_thread_masking_signal)(struct task *__restrict thread,
-                                        signo_t signo) {
-	bool result;
-	REF struct kernel_sigmask *mask;
-	assert(!(thread->t_flags & TASK_FKERNTHREAD));
-	mask = FORTASK(thread, this_sigmask).get();
-	result = sigismember(&mask->sm_mask, signo);
-	decref_unlikely(mask);
-	return result;
-}
 
 
 STATIC_ASSERT(SIGACTION_SA_NOCLDSTOP == SA_NOCLDSTOP);
@@ -2223,12 +2234,10 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
  * @return: *    : The accepted signal entry (must be inherited by the caller) */
 PRIVATE struct sigqueue_entry *KCALL
 signal_try_steal_pending(sigset_t const *__restrict these) {
-	struct kernel_sigmask *mask;
 	struct sigqueue *myqueue;
 	struct process_sigqueue *prqueue;
 	struct sigqueue_entry *pending, **piter, *iter;
 	bool has_write_lock = false;
-	mask = sigmask_getrd();
 	myqueue = &THIS_SIGQUEUE;
 	/* Temporarily steal all pending per-thread signals. */
 	do {
@@ -2256,7 +2265,7 @@ signal_try_steal_pending(sigset_t const *__restrict these) {
 	iter  = pending;
 	piter = &pending;
 	do {
-		if (!sigismember(&mask->sm_mask, iter->sqe_info.si_signo)) {
+		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -2294,7 +2303,7 @@ again_scan_prqueue:
 	 * that isn't masked by our active signal mask. */
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
-		if (sigismember(&mask->sm_mask, iter->sqe_info.si_signo))
+		if (sigmask_ismasked(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
 		sync_endread(prqueue);
@@ -2679,11 +2688,9 @@ DEFINE_COMPAT_SYSCALL1(errno_t, sigsuspend,
 /* Gather the set of pending signals. */
 LOCAL void KCALL
 signal_gather_pending(sigset_t *__restrict these) {
-	struct kernel_sigmask *mymask;
 	struct sigqueue *myqueue;
 	struct process_sigqueue *prqueue;
 	struct sigqueue_entry *pending, **piter, *iter;
-	mymask = sigmask_getrd();
 	myqueue = &THIS_SIGQUEUE;
 	/* Temporarily steal all pending per-thread signals. */
 	do {
@@ -2696,7 +2703,7 @@ signal_gather_pending(sigset_t *__restrict these) {
 	iter  = pending;
 	piter = &pending;
 	do {
-		if (!sigismember(&mymask->sm_mask, iter->sqe_info.si_signo)) {
+		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -2715,7 +2722,7 @@ no_perthread_pending:
 	sync_read(prqueue);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
-		if (sigismember(&mymask->sm_mask, iter->sqe_info.si_signo)) {
+		if (sigmask_ismasked(iter->sqe_info.si_signo)) {
 			sigaddset(these, iter->sqe_info.si_signo);
 			continue;
 		}

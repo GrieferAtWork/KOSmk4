@@ -22,9 +22,8 @@
 
 #include <__stdinc.h>
 
-/* 
+/*
  * #define __ARCH_HAVE_VFORK_SHARED_VM
- *
  * >> Defined when the system implements the vfork(2) system call such
  *    that it isn't a shallow alias for fork(2), but rather executes
  *    the child process within the same VM as the parent process, only
@@ -44,12 +43,31 @@
  *    propagation as the result of a failed exec() in situations such as
  *    system(3) or the spawn(3) family of functions (both POSIX and DOS)
  *
+ *
+ *
+ * #define __ARCH_HAVE_SIGMASK_VFORK
+ * >> POSIX signals send to a vfork'd child (except for SIGSTOP/SIGKILL)
+ *    are always masked, no matter what the vfork-process's actual signal
+ *    mask says about the signal!
+ * >> Linux doesn't do this, but handles the problem in user-space in a
+ *    way that essentially requires one to _always_ _unconditionally_ do a
+ *    `sigprocmask()' to mask _all_ signals before the vfork(), such that
+ *    the child process doesn't accidentally run any signal handlers in the
+ *    context of the parent VM (which could result in an inconsistency between
+ *    process contexts such as memory and open file descriptors (where only
+ *    the former is shared, but a signal handler of the vfork()'d child may
+ *    still run the handler, thinking it's the parent) and consequently
+ *    close a file handle that remains open for the parent).
+ * >> On KOS this problem is handled differently, such that a thread with
+ *    the `TASK_FVFORK' flag set is be handled as though `sigmask_getrd()'
+ *    always returned a signal mask identical to `&kernel_sigmask_full'
  */
 
 #if defined(__linux__)
 #define __ARCH_HAVE_SHARED_VM_VFORK 1
 #elif defined(__KOS__)
 #define __ARCH_HAVE_SHARED_VM_VFORK 1 /* Implemented as of 2020-09-08T14:05 */
+#define __ARCH_HAVE_SIGMASK_VFORK   1 /* Implemented as of 2020-09-11T17:58 */
 #endif /* ... */
 
 #endif /* !_ASM_VFORK_H */
