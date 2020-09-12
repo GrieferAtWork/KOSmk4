@@ -245,19 +245,21 @@ pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
 #endif /* POINTER_SET_SENTINAL == 0 */
 		                                flags);
 	}
-#if POINTER_SET_SENTINAL != 0
-	{
-		size_t i;
-		for (i = 0; i <= new_mask; ++i)
-			new_map[i] = POINTER_SET_SENTINAL;
-	}
-#else /* POINTER_SET_SENTINAL != 0 */
+	/* NULL-out pointers from the already-allocated pointer set area. */
+#if __SIZEOF_POINTER__ == 8
+	memsetq(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1);
+#elif __SIZEOF_POINTER__ == 4
+	memsetl(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1);
+#else /* __SIZEOF_POINTER__ == ... */
+	memset(new_map, POINTER_SET_SENTINAL, (self->ps_mask + 1) * sizeof(void *));
+#endif /* __SIZEOF_POINTER__ != ... */
+#ifndef NDEBUG
 	{
 		size_t i;
 		for (i = 0; i <= new_mask; ++i)
 			__hybrid_assert(new_map[i] == POINTER_SET_SENTINAL);
 	}
-#endif /* POINTER_SET_SENTINAL == 0 */
+#endif /* !NDEBUG */
 	self->ps_list = new_map;
 	self->ps_mask = new_mask;
 	self->ps_size = 0;
@@ -296,13 +298,21 @@ NOTHROW(KCALL pointer_set_clear_and_rehash_nx)(struct pointer_set *__restrict se
 		if unlikely(!new_map)
 			return false;
 	}
-#if POINTER_SET_SENTINAL != 0
+	/* NULL-out pointers from the already-allocated pointer set area. */
+#if __SIZEOF_POINTER__ == 8
+	memsetq(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1);
+#elif __SIZEOF_POINTER__ == 4
+	memsetl(new_map, POINTER_SET_SENTINAL, self->ps_mask + 1);
+#else /* __SIZEOF_POINTER__ == ... */
+	memset(new_map, POINTER_SET_SENTINAL, (self->ps_mask + 1) * sizeof(void *));
+#endif /* __SIZEOF_POINTER__ != ... */
+#ifndef NDEBUG
 	{
 		size_t i;
 		for (i = 0; i <= new_mask; ++i)
-			new_map[i] = POINTER_SET_SENTINAL;
+			__hybrid_assert(new_map[i] == POINTER_SET_SENTINAL);
 	}
-#endif /* POINTER_SET_SENTINAL != 0 */
+#endif /* !NDEBUG */
 	self->ps_list = new_map;
 	self->ps_mask = new_mask;
 	self->ps_size = 0;
