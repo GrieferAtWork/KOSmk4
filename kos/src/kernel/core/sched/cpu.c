@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h> /* CONFIG_HAVE_DEBUGGER */
 #include <kernel/debugtrap.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
@@ -43,6 +44,10 @@
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
+
+#ifdef CONFIG_HAVE_DEBUGGER
+#include <debugger/rt.h> /* dbg_active */
+#endif /* CONFIG_HAVE_DEBUGGER */
 
 #ifdef CONFIG_NO_CPU_ASSERT_INTEGRITY
 #undef CONFIG_HAVE_CPU_ASSERT_INTEGRITY
@@ -199,7 +204,17 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 	struct task *iter;
 	struct task *caller;
 	struct cpu *me;
-	bool found_caller = false;
+	bool found_caller;
+
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* Skip scheduler integrity checks while in debugger-mode.
+	 * If the CPU is in an inconsistent state, intentionally crashing
+	 * the debugger isn't going to help with debugging the problem! */
+	if (dbg_active)
+		return;
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+	found_caller = false;
 	caller = THIS_TASK;
 	me     = caller->t_cpu;
 	assertf(cpu_validate_pointer(me),
@@ -366,6 +381,13 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 PUBLIC NOBLOCK void
 NOTHROW(FCALL cpu_assert_running)(struct task *__restrict thread) {
 	pflag_t was;
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* Skip scheduler integrity checks while in debugger-mode.
+	 * If the CPU is in an inconsistent state, intentionally crashing
+	 * the debugger isn't going to help with debugging the problem! */
+	if (dbg_active)
+		return;
+#endif /* CONFIG_HAVE_DEBUGGER */
 again:
 	was = PREEMPTION_PUSHOFF();
 	cpu_do_assert_integrity(true);
@@ -382,6 +404,13 @@ failed:
 PUBLIC NOBLOCK void
 NOTHROW(FCALL cpu_assert_sleeping)(struct task *__restrict thread) {
 	pflag_t was;
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* Skip scheduler integrity checks while in debugger-mode.
+	 * If the CPU is in an inconsistent state, intentionally crashing
+	 * the debugger isn't going to help with debugging the problem! */
+	if (dbg_active)
+		return;
+#endif /* CONFIG_HAVE_DEBUGGER */
 again:
 	was = PREEMPTION_PUSHOFF();
 	cpu_do_assert_integrity(true);
@@ -398,6 +427,13 @@ failed:
 PUBLIC NOBLOCK void
 NOTHROW(FCALL cpu_assert_integrity)(struct task *ignored_thread) {
 	pflag_t was;
+#ifdef CONFIG_HAVE_DEBUGGER
+	/* Skip scheduler integrity checks while in debugger-mode.
+	 * If the CPU is in an inconsistent state, intentionally crashing
+	 * the debugger isn't going to help with debugging the problem! */
+	if (dbg_active)
+		return;
+#endif /* CONFIG_HAVE_DEBUGGER */
 again:
 	was = PREEMPTION_PUSHOFF();
 	cpu_do_assert_integrity(!ignored_thread || ignored_thread != THIS_TASK);
