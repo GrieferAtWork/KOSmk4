@@ -635,7 +635,7 @@ handle_file_hop(struct file *__restrict self,
 
 
 
-#define ONESHOT_DIRENT_ALIGNMENT   alignof(ino_t)
+#define ONESHOT_DIRENT_ALIGNMENT alignof(ino_t)
 
 #define ONESHOT_NEXT_ENTRY(p)                                            \
 	((struct dirent *)(((uintptr_t)((p)->d_name + ((p)->d_namlen + 1)) + \
@@ -682,6 +682,11 @@ oneshot_enum_callback(struct oneshot_generator_data *__restrict data,
 		/* Free unused memory. */
 		struct oneshot_directory_buffer *truncated_buffer;
 		struct oneshot_directory_buffer *new_buffer;
+		/* Finalize the buffer end-pointer to cut-off any trailing data.
+		 * This must be done to prevent the caller from reading beyond the
+		 * heap block when later traversing the directory. */
+		buf->odb_end = data->current_ent;
+		/* Try to reclaim unused memory. */
 		truncated_buffer = (struct oneshot_directory_buffer *)krealign_nx(buf,
 		                                                                  ONESHOT_DIRENT_ALIGNMENT,
 		                                                                  (uintptr_t)data->current_ent -
