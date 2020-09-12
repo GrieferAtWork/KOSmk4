@@ -399,7 +399,7 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 
 
 
-#if !defined(NDEBUG) && 1 /* This isn't thread-safe */
+#if !defined(NDEBUG) && 0 /* This isn't thread-safe */
 #define assert_free(base, num_pages)                                                                               \
 	{                                                                                                              \
 		pagecnt_t i;                                                                                               \
