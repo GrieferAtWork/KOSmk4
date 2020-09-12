@@ -50,6 +50,7 @@
 #include <string.h>
 #include <wait.h>
 
+#include <libcpustate/apply.h> /* cpu_apply_ucpustate() */
 #include <libdebuginfo/dwarf.h>
 #include <libinstrlen/instrlen.h>
 #include <libregdump/x86.h>
@@ -748,6 +749,17 @@ search_fde:
 			 * left as `NULL' here (indicating an async user-space exception). */
 			x86_userexcept_unwind(&ustate, NULL);
 		}
+
+		/* Check for special case: If the unwind location is `x86_rpc_user_redirection',
+		 * then we must still allow the unwind, even though registers might look somewhat
+		 * wrong. (as in: they will look like user-space registers)
+		 * That is intended, and we must handle this case by directly loading the unwound
+		 * register state, thus matching `x86_rpc_user_redirection_personality()' */
+		if (ucpustate_getpc(&ustate) == (uintptr_t)&x86_rpc_user_redirection &&
+		    SEGMENT_IS_VALID_KERNCODE(ustate.ucs_cs) &&
+		    SEGMENT_IS_VALID_KERNDATA(ustate.ucs_ss))
+			cpu_apply_ucpustate(&ustate);
+
 		{
 			u16 expected_gs = __rdgs();
 			u16 expected_fs = __rdfs();
