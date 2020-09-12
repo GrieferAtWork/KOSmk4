@@ -267,16 +267,78 @@ int main_fpu(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 int main_fork(int argc, char *argv[], char *envp[]) {
+	unsigned int depth = 0;
+	unsigned int max_depth = 1;
+	bool in_child = false;
+	bool did_trigger = false;
+	pid_t mygroup = getpgid(0);
+	static char const lockfile[] = "/tmp/.fork-lock";
 	(void)argc, (void)argv, (void)envp;
+	if (argc >= 2)
+		max_depth = (unsigned int)atoi(argv[1]);
+	unlink(lockfile);
 	for (;;) {
-		if (vfork() == 0) {
+		pid_t cpid;
+		if (depth == max_depth && !did_trigger) {
+			fd_t lock;
+			/* Kill the entire process group which should contain about a gazillion
+			 * threads at this point, but use a lock-file to only send a signal once.
+			 *
+			 * This wouldn't actually be necessary, but we want to ensure that a
+			 * single signal is enough to reach everyone, even if some of our sibling
+			 * threads are currently in the process of being created. */
+			lock = open(lockfile, O_WRONLY | O_CREAT | O_EXCL, 0644);
+			if (lock >= 0) {
+				kill(-mygroup, SIGKILL);
+#ifdef __breakpoint
+				__breakpoint();
+#endif /* __breakpoint */
+				abort();
+			}
+		}
+		cpid = fork();
+		if (cpid == 0) {
+			if (!in_child)
+				++depth;
+			in_child = true;
+			continue;
+		}
+		{
 			char buf[64];
 			size_t len;
-			len = sprintf(buf, "child: %u\n", getpid());
+			len = sprintf(buf, "spawned: %d\n", cpid);
 			write(STDOUT_FILENO, buf, len);
-			_Exit(0);
 		}
-		/*sched_yield();*/
+		if (in_child) {
+			in_child = false;
+			++depth;
+			continue;
+		}
+	}
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
+int main_forkbomb(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	/* Just your traditional fork-bomb
+	 * Use CTRL+C to kill all of the created processes at once,
+	 * but don't take too long or else the system may have already
+	 * become unresponsive :) */
+	/* FIXME: After killing a fork-bomb process group, there
+	 *        is a chance that the kernel ends up with some
+	 *        memory leaks in `task_raisesignalprocess()',
+	 *        seemingly related to the signals that get send
+	 *        in order to kill processes... */
+	for (;;) {
+		pid_t cpid;
+		cpid = fork();
+		(void)cpid; /* Prevent compiler warnings. */
 	}
 	return 0;
 }
@@ -755,6 +817,7 @@ PRIVATE DEF defs[] = {
 	{ "color", &main_color },
 	{ "fpu", &main_fpu },
 	{ "fork", &main_fork },
+	{ "forkbomb", &main_forkbomb },
 	{ "logtime", &main_logtime },
 	{ "sleep", &main_sleep },
 	{ "dl", &main_dl },

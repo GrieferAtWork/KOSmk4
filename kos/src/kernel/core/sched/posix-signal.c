@@ -1453,6 +1453,20 @@ done_handptr:
 
 
 
+/* Finalize a pointer set filled with `REF struct task *' elements. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
+	REF struct task *thread;
+	POINTER_SET_FOREACH(thread, self) {
+		/* Arguably a `decref_likely()', but only if the
+		 * total # of threads in the set is extremely high,
+		 * and only if the signal that was send caused most
+		 * if not all of these threads to terminate. */
+		decref(thread);
+	}
+	pointer_set_fini(self);
+}
+
 
 /* Send a signal to every process within the same process group that `target' is apart of.
  * @return: * : The number of processes to which the signal was delivered. */
@@ -1511,7 +1525,6 @@ load_more_threads:
 			while (pending_delivery_procc) {
 				REF struct task *thread;
 				thread = pending_delivery_procv[pending_delivery_procc - 1];
-				pointer_set_insert(&ps, thread, rpc_flags);
 				/* Deliver to this process. */
 				TRY {
 					if (task_raisesignalprocess(thread, info, rpc_flags))
@@ -1521,8 +1534,34 @@ load_more_threads:
 						RETHROW();
 					was_interrupted = true;
 				}
+				/* NOTE: We must insert references to threads which already had
+				 *       a signal get delivered. This is _required_ to prevent
+				 *       the scenario where:
+				 *        - SEND_SIGNAL_TO_THREAD(t1);
+				 *        - ps.insert(t1);
+				 *        - In t1: task_exit();
+				 *        - In t1: decref(THIS_TASK);
+				 *        - In t1: destroy(THIS_TASK);
+				 *        - In t1: free(THIS_TASK);
+				 *        - In t2: clone();
+				 *        - In t2: t3 = kmalloc(struct task);   // addrof(t3) == addrof(t2)
+				 *        - In t2: init(t3);
+				 *        - In t2: task_start(t3);
+				 *       In this case, we'd never end up sending a signal to `t3',
+				 *       since we'd think that that thread already had the signal
+				 *       delivered.
+				 *
+				 * It is kind-of sad that we have to keep references to all of
+				 * the threads that already got the signal, since we really don't
+				 * need those references for anything else. But it's the simplest
+				 * thing we can do here.
+				 *
+				 * NOTE: We don't keep references for the taskpid structures of
+				 * threads that already got the signal, since certain types of
+				 * thread (kernel threads) don't have taskpid descriptors! */
+				pointer_set_insert(&ps, thread, rpc_flags); /* Inherit reference. */
+				/*decref_unlikely(thread);*/ /* Inherited by `ps' */
 				--pending_delivery_procc;
-				decref_unlikely(thread);
 			}
 		} EXCEPT {
 			while (pending_delivery_procc--)
@@ -1532,11 +1571,11 @@ load_more_threads:
 		if (there_are_more_procs)
 			goto load_more_threads;
 	} EXCEPT {
-		pointer_set_fini(&ps);
+		taskref_pointer_set_fini(&ps);
 		decref_unlikely(pgroup);
 		RETHROW();
 	}
-	pointer_set_fini(&ps);
+	taskref_pointer_set_fini(&ps);
 	decref_unlikely(pgroup);
 	if (was_interrupted)
 		THROW(E_INTERRUPT_USER_RPC);

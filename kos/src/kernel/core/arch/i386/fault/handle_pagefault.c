@@ -50,6 +50,7 @@
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/segment.h>
 
 #include <assert.h>
 #include <signal.h>
@@ -335,10 +336,18 @@ nope:
 }
 
 #else /* !CONFIG_NO_SMP */
-
 #define is_iob_node(node) ((node) == &FORCPU(&_bootcpu, thiscpu_x86_iobnode))
-
 #endif /* CONFIG_NO_SMP */
+
+
+#ifndef NDEBUG
+INTDEF NOBLOCK ATTR_RETNONNULL struct task *
+NOTHROW(KCALL x86_repair_broken_tls_state)(void);
+#endif /* !NDEBUG */
+
+
+
+
 
 PRIVATE ATTR_NORETURN void FCALL
 rethrow_exception_from_pf_handler(struct icpustate *__restrict state, uintptr_t pc) {
@@ -434,8 +443,44 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		}
 	}
 	effective_vm = &vm_kernel;
-	if (pageid < PAGEID_ENCODE(KERNELSPACE_BASE) || isuser())
+	if (pageid < PAGEID_ENCODE(KERNELSPACE_BASE) || isuser()) {
+#ifndef NDEBUG
+		/* Special case: When the TLS segment contains an invalid pointer, us
+		 *               trying to obtain THIS_VM at this point is just going
+		 *               to result in a #DF:
+		 *   #1: READ_FROM_BAD_POINTER(%tls:0)
+		 *   #2: Trigger #PF at BAD_POINTERh
+		 *   #3: When `BAD_POINTERh' points into user-space, we get here again
+		 *   #4: Repeat at step #1
+		 * This then eventually results in a stack overflow that cannot be
+		 * inspected properly, so when compiling for a debug-target, we use
+		 * memcpy_nopf() to access the TLS segment. */
+		struct task *mythread;
+#ifdef __x86_64__
+		mythread = (struct task *)__rdgsbaseq();
+#else /* __x86_64__ */
+		mythread = NULL;
+		if likely(__rdfs() == SEGMENT_KERNEL_FSBASE) {
+			struct desctab gdt;
+			__sgdt(&gdt);
+			if likely(gdt.dt_limit > SEGMENT_KERNEL_FSBASE) {
+				struct segment *fsseg;
+				fsseg    = (struct segment *)(gdt.dt_base + SEGMENT_KERNEL_FSBASE);
+				mythread = (struct task *)segment_rdbaseX(fsseg);
+			}
+		}
+#endif /* !__x86_64__ */
+		if unlikely(memcpy_nopf(&effective_vm, &mythread->t_vm, sizeof(effective_vm)) != 0) {
+			assertf(memcpy_nopf(&effective_vm, &mythread->t_vm, sizeof(effective_vm)) == 0,
+			        "Corrupt TLS base pointer: mythread = %p", mythread);
+			/* Allow the user to IGNORE the assertion check, in which case we'll
+			 * try to repair the damage... */
+			effective_vm = x86_repair_broken_tls_state()->t_vm;
+		}
+#else /* !NDEBUG */
 		effective_vm = THIS_VM;
+#endif /* NDEBUG */
+	}
 	{
 		struct task_connections con;
 		task_pushconnections(&con);
