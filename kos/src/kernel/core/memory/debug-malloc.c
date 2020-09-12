@@ -945,8 +945,12 @@ NOTHROW(KCALL slab_unreachable_segment)(void *base, size_t num_bytes) {
 		printk(KERN_RAW "slab: Slab memory leaks don't include tracebacks.\n"
 		                "slab: Consider rebooting with `noslab'\n");
 	}
-	printk(KERN_RAW "slab: Leaked %Iu bytes of heap-memory at %p...%p\n",
-	       num_bytes, base, (byte_t *)base + num_bytes - 1);
+	/* Slabs are always small, to to help at least a little bit, also dump the
+	 * contents of leaked blocks. - Those might still be (somewhat) useful... */
+	printk(KERN_RAW "slab: Leaked %Iu bytes of heap-memory at %p...%p\n"
+	                "%$[hex]",
+	       num_bytes, base, (byte_t *)base + num_bytes - 1,
+	       num_bytes, base);
 	return 1;
 }
 

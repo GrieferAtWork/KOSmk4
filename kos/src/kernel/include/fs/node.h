@@ -1035,7 +1035,7 @@ struct directory_node
 	REF struct directory_node   *d_parent;   /* [0..1][const] Parent directory (or `NULL' for the superblock root). */
 	pos_t                        d_dirend;   /* [lock(this)] Starting address of the next directory entry which hasn't been read yet. */
 	size_t                       d_size;     /* [lock(this)] Amount of directory entries. */
-	size_t                       d_mask;     /* [!0][lock(this)] Allocated directory entry hash-map mask. */
+	size_t                       d_mask;     /* [lock(this)] Allocated directory entry hash-map mask. */
 	REF struct directory_entry **d_map;      /* [0..1][lock(this)][1..d_mask+1][owned] Hash-map of directory entries. */
 	struct directory_entry      *d_bypos;    /* [lock(this)][0..1] Chain of all known directory entries, ordered by address. */
 	struct directory_entry      *d_bypos_end;/* [lock(this)][0..1] Last directory entry that marks the end of the directory. */

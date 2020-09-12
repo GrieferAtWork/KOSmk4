@@ -1366,13 +1366,17 @@ NOTHROW(KCALL directory_rehash_nx)(struct directory_node *__restrict self) {
 	self->d_mask = new_mask;
 }
 
-PRIVATE NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL directory_rehash_smaller_nx)(struct directory_node *__restrict self) {
 	REF struct directory_entry **new_map;
 	REF struct directory_entry *iter, *next;
 	size_t i, new_mask;
 	assert(sync_writing(self));
 	new_mask = (self->d_mask >> 1);
+	/* Don't further reduce the hash size if we're already
+	 * back to where it would have been originally. */
+	if (new_mask < DIRECTORY_DEFAULT_MASK)
+		return;
 	/* Allocate the new directory map. */
 	new_map = (REF struct directory_entry **)kmalloc_nx((new_mask + 1) *
 	                                                    sizeof(REF struct directory_entry *),
@@ -1386,9 +1390,9 @@ NOTHROW(KCALL directory_rehash_smaller_nx)(struct directory_node *__restrict sel
 		while (iter) {
 			next = iter->de_next;
 			/* Insert the entry into the new map. */
-			iter->de_next                     = new_map[iter->de_hash & new_mask];
+			iter->de_next = new_map[iter->de_hash & new_mask];
 			new_map[iter->de_hash & new_mask] = iter;
-			iter                              = next;
+			iter = next;
 		}
 	}
 	/* Free the old map and setup the new mask. */
@@ -1513,7 +1517,6 @@ continue_reading:
 		/* Add the directory entry to the hash-map. */
 		if (self->d_size >= (self->d_mask / 3) * 2) {
 			struct directory_entry *ent;
-			assert(self->d_mask != 0);
 			/* Try to re-hash the directory. */
 			directory_rehash_nx(self);
 			/* Must re-discover the result self-pointer. */
@@ -1643,7 +1646,6 @@ continue_reading:
 		++self->d_size;
 		/* Add the directory entry to the hash-map. */
 		if (self->d_size >= (self->d_mask / 3) * 2) {
-			assert(self->d_mask != 0);
 			/* Try to re-hash the directory. */
 			directory_rehash_nx(self);
 		}
@@ -1681,7 +1683,6 @@ directory_getentry(struct directory_node *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct directory_entry *result;
 	assert(sync_reading(self));
-	assert(self->d_mask != 0); /* TODO: This fails after all files in a directory were deleted! */
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
 			return (*self->i_type->it_directory.d_oneshot.o_lookup)(self,
@@ -1742,7 +1743,6 @@ directory_getcaseentry(struct directory_node *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct directory_entry *result;
 	assert(sync_reading(self));
-	assert(self->d_mask != 0);
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
 			return (*self->i_type->it_directory.d_oneshot.o_lookup)(self,
@@ -1828,7 +1828,6 @@ directory_getentry_p(struct directory_node *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct directory_entry **presult, *result;
 	assert(sync_reading(self));
-	assert(self->d_mask != 0);
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
 			result = (*self->i_type->it_directory.d_oneshot.o_lookup)(self,
@@ -1893,7 +1892,6 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct directory_entry **presult, *result;
 	assert(sync_reading(self));
-	assert(self->d_mask != 0);
 	if (self->i_type->it_directory.d_oneshot.o_lookup) {
 		TRY {
 			result = (*self->i_type->it_directory.d_oneshot.o_lookup)(self,
@@ -2111,10 +2109,8 @@ NOTHROW(KCALL directory_addentry)(struct directory_node *__restrict self,
 	/* Track the total number of directory entires. */
 	++self->d_size;
 
-	if (self->d_size >= (self->d_mask / 3) * 2) {
-		assert(self->d_mask != 0);
+	if (self->d_size >= (self->d_mask / 3) * 2)
 		directory_rehash_nx(self);
-	}
 }
 
 LOCAL NOBLOCK NONNULL((1, 2)) void
@@ -2156,10 +2152,8 @@ NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
 	/* Track the total number of directory entires. */
 	assert(self->d_size);
 	--self->d_size;
-	if (self->d_size <= (self->d_mask / 3)) {
-		assert(self->d_mask != 0);
+	if (self->d_size <= (self->d_mask / 3))
 		directory_rehash_smaller_nx(self);
-	}
 #ifndef NDEBUG
 	memset(&entry->de_bypos, 0xcc, sizeof(entry->de_bypos));
 	memset(&entry->de_next, 0xcc, sizeof(entry->de_next));
@@ -2233,10 +2227,8 @@ NOTHROW(KCALL remove_dirent_from_directory)(struct directory_node *__restrict se
 	assert((self->d_bypos != NULL) == (self->d_bypos_end != NULL));
 	assert((self->d_bypos != NULL) == (self->d_size != 0));
 	/* Rehash the containing directory if the chance to do so comes up. */
-	if (self->d_size <= (self->d_mask / 3)) {
-		assert(self->d_mask != 0);
+	if (self->d_size <= (self->d_mask / 3))
 		directory_rehash_smaller_nx(self);
-	}
 }
 
 
@@ -2946,10 +2938,8 @@ acquire_sourcedir_writelock:
 						--source_directory->d_size;
 						/* Remove the entry from the by-position chain. */
 						directory_delentry_bypos(source_directory, source_entry);
-						if (source_directory->d_size <= (source_directory->d_mask / 3)) {
-							assert(source_directory->d_mask != 0);
+						if (source_directory->d_size <= (source_directory->d_mask / 3))
 							directory_rehash_smaller_nx(source_directory);
-						}
 					} else {
 						assert(source_entry == source_oneshot);
 						/* Prevent the decref() of `source_entry' below. */
