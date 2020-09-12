@@ -277,10 +277,10 @@ NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
                                 PHYS struct p64_pdir *phys_self) {
-#define NOT_SWITCHED ((PHYS uintptr_t)-1)
+#define NOT_SWITCHED ((PHYS pagedir_t *)-1)
 	unsigned int vec4;
 	pflag_t was = 0;
-	PHYS uintptr_t old_cr3 = NOT_SWITCHED;
+	PHYS pagedir_t *old_pagedir = NOT_SWITCHED;
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
 	assertf((self->p_e4[257].p_word & ~(P64_PAGE_FACCESSED | P64_PAGE_FDIRTY)) ==
@@ -297,10 +297,10 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 			unsigned int vec3;
 			/* Switch to the target page directory so we can make
 			 * use of its identity mapping in order to destroy it. */
-			if (old_cr3 == NOT_SWITCHED) {
-				was     = PREEMPTION_PUSHOFF();
-				old_cr3 = __rdcr3();
-				__wrcr3((uintptr_t)phys_self);
+			if (old_pagedir == NOT_SWITCHED) {
+				was         = PREEMPTION_PUSHOFF();
+				old_pagedir = pagedir_get();
+				pagedir_set((PHYS pagedir_t *)phys_self);
 			}
 			for (vec3 = 0; vec3 < 512; ++vec3) {
 				union p64_pdir_e3 e3;
@@ -322,8 +322,8 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 			page_freeone(ppageof(e4.p_word & P64_PAGE_FVECTOR));
 		}
 	}
-	if (old_cr3 != NOT_SWITCHED) {
-		__wrcr3(old_cr3);
+	if (old_pagedir != NOT_SWITCHED) {
+		pagedir_set(old_pagedir);
 		PREEMPTION_POP(was);
 	}
 #undef NOT_SWITCHED

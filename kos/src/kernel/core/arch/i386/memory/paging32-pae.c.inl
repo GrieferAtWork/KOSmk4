@@ -37,7 +37,6 @@
 #include <hybrid/atomic.h>
 
 #include <asm/cpu-cpuid.h>
-#include <asm/intrin.h>
 
 #include <assert.h>
 #include <stdint.h>
@@ -237,17 +236,17 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
                                 PHYS struct pae_pdir *phys_self) {
 	unsigned int vec3;
 	pflag_t was;
-	PHYS uintptr_t old_cr3;
+	PHYS pagedir_t *old_pagedir;
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
 	was = PREEMPTION_PUSHOFF();
-	old_cr3 = __rdcr3();
+	old_pagedir = pagedir_get();
 
 	/* Temporarily switch to the page-directory to-be freed, so we
 	 * can make use of its identity-mapping in order to free its contents.
 	 * The other possibility would be to use the slow vm_copyfromphys()
 	 * function to dereference its memory contents. */
-	__wrcr3((uintptr_t)phys_self);
+	pagedir_set((pagedir_phys_t)phys_self);
 	/* NOTE: Only iterate 0, 1 and 2 here (entry #3 contains) */
 	for (vec3 = 0; vec3 < 3; ++vec3) {
 		union pae_pdir_e3 e3;
@@ -262,7 +261,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 				page_freeone(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
 		}
 	}
-	__wrcr3(old_cr3);
+	pagedir_set(old_pagedir);
 	PREEMPTION_POP(was);
 	/* Free the always-allocated E2-vectors */
 	for (vec3 = 0; vec3 < 4; ++vec3) {
