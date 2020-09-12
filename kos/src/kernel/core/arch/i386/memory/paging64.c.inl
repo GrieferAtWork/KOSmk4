@@ -800,6 +800,7 @@ word_changed_after_e1_vector:
 		/* Now mark all of the remaining pages as prepared. */
 		for (vec1 = 1; vec1 < vec1_prepare_size; ++vec1)
 			p64_pagedir_set_prepared(&e1_p[vec1]);
+		COMPILER_WRITE_BARRIER();
 	}
 	/* And we're done! */
 success:
@@ -991,11 +992,24 @@ NOTHROW(FCALL p64_pagedir_unset_prepared)(union p64_pdir_e1 *__restrict e1_p
 	}
 }
 
-#if 1 /* XXX: This should probably be disabled... */
-#define SYNC_IDENTITY_PAGE(addr) pagedir_syncone(addr)
-#else
-#define SYNC_IDENTITY_PAGE(addr) vm_kernel_syncone(addr)
-#endif
+
+
+/* TODO: Syncing in vm_kernel is overkill here: it would be
+ *       sufficient to only broadcast the IPI to CPUs where
+ *       `CPU->c_vm->v_pdir_phys_ptr == pagedir_get()' (which
+ *       is somewhat different from the `CPU->c_vm == THIS_VM'
+ *       that would be done by `this_vm_sync()', so we'd need
+ *       a dedicated (possibly arch-specific) syncing function)
+ * Note though that we'd still need to broadcast to everyone
+ * if the actual area being synced relates to kernel-space.
+ * This could be determined by having the caller look at the
+ * vec* indices they've been given. */
+#define SYNC_IDENTITY_PAGE(addr) \
+	vm_kernel_syncone(addr)
+#define SYNC_IDENTITY_PAGES(addr, num_bytes) \
+	vm_kernel_sync(addr, num_bytes)
+#define SYNC_IDENTITY_PAGES_ALL() \
+	vm_kernel_syncall()
 
 /* Called after an E1-vector was flattened into an E2-entry
  * that now resides at `P64_PDIR_E2_IDENTITY[vec4][vec3][vec2]' */
@@ -1016,24 +1030,47 @@ NOTHROW(FCALL p64_pagedir_sync_flattened_e1_vector)(unsigned int vec4,
 PRIVATE NOBLOCK void
 NOTHROW(FCALL p64_pagedir_sync_flattened_e2_vector)(unsigned int vec4,
                                                     unsigned int vec3) {
+#if 1 /* It's faster to just sync everything... */
+	(void)vec4;
+	(void)vec3;
+	SYNC_IDENTITY_PAGES_ALL();
+#else
 	/* Even though the in-memory mapping of `P64_PDIR_VECADDR(vec4, vec3, 0..511, 0..511)'
 	 * didn't change, due to being flattened, the contents of our page directory identity
 	 * mapping _have_ changed:
 	 *     UNMAP(P64_PDIR_E2_IDENTITY[vec4][vec3][0..511])  (This is exactly 1 page)
 	 */
 	SYNC_IDENTITY_PAGE(P64_PDIR_E2_IDENTITY[vec4][vec3]);
+	/* Must also sync:
+	 * P64_PDIR_E1_IDENTITY[vec4][vec3][0..511][0..511] */
+	SYNC_IDENTITY_PAGES(P64_PDIR_E1_IDENTITY[vec4][vec3],
+	                    512 * 512 * 8);
+#endif
 }
 
 /* Called after an E3-vector was flattened into an E4-entry
  * that now resides at `P64_PDIR_E4_IDENTITY[vec4]' */
 PRIVATE NOBLOCK void
 NOTHROW(FCALL p64_pagedir_sync_flattened_e3_vector)(unsigned int vec4) {
+#if 1 /* It's faster to just sync everything... */
+	(void)vec4;
+	SYNC_IDENTITY_PAGES_ALL();
+#else
 	/* Even though the in-memory mapping of `P64_PDIR_VECADDR(vec4, 0..511, 0..511, 0..511)'
 	 * didn't change, due to being flattened, the contents of our page directory identity
 	 * mapping _have_ changed:
 	 *     UNMAP(P64_PDIR_E3_IDENTITY[vec4][0..511])  (This is exactly 1 page)
 	 */
 	SYNC_IDENTITY_PAGE(P64_PDIR_E3_IDENTITY[vec4]);
+	/* Must also sync:
+	 * P64_PDIR_E2_IDENTITY[vec4][0..511][0..511] */
+	SYNC_IDENTITY_PAGES(P64_PDIR_E2_IDENTITY[vec4],
+	                    512 * 512 * 8);
+	/* Must also sync:
+	 * P64_PDIR_E1_IDENTITY[vec4][0..511][0..511][0..511] */
+	SYNC_IDENTITY_PAGES(P64_PDIR_E1_IDENTITY[vec4],
+	                    512 * 512 * 512 * 8);
+#endif
 }
 
 
@@ -1567,6 +1604,7 @@ NOTHROW(FCALL p64_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	vec2 = P64_PDIR_VEC2INDEX(addr);
 	vec1 = P64_PDIR_VEC1INDEX(addr);
 	result = p64_pagedir_prepare_impl_widen(vec4, vec3, vec2, vec1, 1);
+	PG_TRACE_PREPARE_IF(result, addr, PAGESIZE);
 	assert_prepared_if(result, addr, PAGESIZE);
 	return result;
 }
@@ -1575,6 +1613,7 @@ INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	unsigned int vec4, vec3, vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
+	PG_TRACE_UNPREPARE(addr, PAGESIZE);
 	vec4 = P64_PDIR_VEC4INDEX(addr);
 	vec3 = P64_PDIR_VEC3INDEX(addr);
 	vec2 = P64_PDIR_VEC2INDEX(addr);
@@ -1607,6 +1646,7 @@ NOTHROW(FCALL p64_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	                                           vec3_min, vec3_max,
 	                                           vec2_min, vec2_max,
 	                                           vec1_min, vec1_max);
+	PG_TRACE_PREPARE_IF(result, addr, num_bytes);
 	assert_prepared_if(result, addr, num_bytes);
 	return result;
 }
@@ -1636,6 +1676,7 @@ NOTHROW(FCALL p64_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	                                                vec3_min, vec3_max,
 	                                                vec2_min, vec2_max,
 	                                                vec1_min, vec1_max);
+	PG_TRACE_PREPARE_IF(result, addr, num_bytes);
 	assert_prepared_if(result, addr, num_bytes);
 	return result;
 }
@@ -1654,6 +1695,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		p64_pagedir_unprepare_mapone(addr);
 		return;
 	}
+	PG_TRACE_UNPREPARE(addr, num_bytes);
 	vec4_min = P64_PDIR_VEC4INDEX(addr);
 	vec4_max = P64_PDIR_VEC4INDEX((byte_t *)addr + num_bytes - 1);
 	vec3_min = P64_PDIR_VEC3INDEX(addr);

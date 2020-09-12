@@ -212,7 +212,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			corepair.cp_part->dp_ramdata.rd_block0.rb_start = block0_addr;
 		} else {
 			/* Must allocate a larger vector for all of the other pages. */
-			struct vm_ramblock *blocks, *new_blocks;
+			struct vm_ramblock *blocks;
 			size_t blockc = 1;
 #ifdef HEAP_NX
 			blocks = (struct vm_ramblock *)kmalloc_nx(2 * sizeof(struct vm_ramblock),
@@ -227,6 +227,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			while (block0_size < (num_bytes / PAGESIZE)) {
 				pagecnt_t new_block_size;
 				if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
+					struct vm_ramblock *new_blocks;
 					new_blocks = (struct vm_ramblock *)krealloc_nx(blocks,
 					                                               (blockc * 2) *
 					                                               sizeof(struct vm_ramblock),
@@ -290,6 +291,7 @@ err_blocks:
 				while (block0_size < (num_bytes / PAGESIZE)) {
 					pagecnt_t new_block_size;
 					if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
+						struct vm_ramblock *new_blocks;
 						new_blocks = (struct vm_ramblock *)krealloc_nx(blocks,
 						                                               (blockc * 2) *
 						                                               sizeof(struct vm_ramblock),

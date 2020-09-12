@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 #include <kernel/types.h>
 #include <kernel/malloc.h>
+#include <hybrid/__assert.h>
 
 #ifdef __CC__
 DECL_BEGIN
@@ -250,7 +251,13 @@ pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
 		for (i = 0; i <= new_mask; ++i)
 			new_map[i] = POINTER_SET_SENTINAL;
 	}
-#endif /* POINTER_SET_SENTINAL != 0 */
+#else /* POINTER_SET_SENTINAL != 0 */
+	{
+		size_t i;
+		for (i = 0; i <= new_mask; ++i)
+			__hybrid_assert(new_map[i] == POINTER_SET_SENTINAL);
+	}
+#endif /* POINTER_SET_SENTINAL == 0 */
 	self->ps_list = new_map;
 	self->ps_mask = new_mask;
 	self->ps_size = 0;

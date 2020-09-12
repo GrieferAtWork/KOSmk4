@@ -28,6 +28,23 @@
 
 #include <assert.h>
 
+
+#if !defined(NDEBUG) && 0
+#include <kernel/printk.h>
+#define PG_TRACE_PREPARE(addr, num_bytes)      \
+	printk(KERN_TRACE "[pd] +prepare:%p-%p\n", \
+	       addr, (byte_t *)(addr) + (num_bytes)-1)
+#define PG_TRACE_UNPREPARE(addr, num_bytes)    \
+	printk(KERN_TRACE "[pd] -prepare:%p-%p\n", \
+	       addr, (byte_t *)(addr) + (num_bytes)-1)
+#define PG_TRACE_PREPARE_IF(cond, addr, num_bytes) \
+	(!(cond) || (PG_TRACE_PREPARE(addr, num_bytes), 0))
+#else /* !NDEBUG */
+#define PG_TRACE_PREPARE(addr, num_bytes)          (void)0
+#define PG_TRACE_UNPREPARE(addr, num_bytes)        (void)0
+#define PG_TRACE_PREPARE_IF(cond, addr, num_bytes) (void)0
+#endif /* NDEBUG */
+
 #if !defined(NDEBUG) && 0
 #include <kernel/printk.h>
 #define PG_TRACE_MAP(addr, num_bytes, phys, perm)                         \
@@ -40,10 +57,10 @@
 #define PG_TRACE_UNMAP(addr, num_bytes)     \
 	printk(KERN_TRACE "[pd] -mmap:%p-%p\n", \
 	       addr, (byte_t *)(addr) + (num_bytes)-1)
-#else
+#else /* !NDEBUG */
 #define PG_TRACE_MAP(addr, num_bytes, phys, perm) (void)0
 #define PG_TRACE_UNMAP(addr, num_bytes) (void)0
-#endif
+#endif /* NDEBUG */
 
 #define PG_ASSERT_ALIGNED_ADDRESS(addr) \
 	__assertf(IS_ALIGNED((uintptr_t)(addr), 4096), "addr = %p", addr)

@@ -245,6 +245,33 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 }
 
 
+/* TODO: Syncing in vm_kernel is overkill here: it would be
+ *       sufficient to only broadcast the IPI to CPUs where
+ *       `CPU->c_vm->v_pdir_phys_ptr == pagedir_get()' (which
+ *       is somewhat different from the `CPU->c_vm == THIS_VM'
+ *       that would be done by `this_vm_sync()', so we'd need
+ *       a dedicated (possibly arch-specific) syncing function)
+ * Note though that we'd still need to broadcast to everyone
+ * if the actual area being synced relates to kernel-space.
+ * This could be determined by having the caller look at the
+ * vec* indices they've been given. */
+#define SYNC_IDENTITY_PAGE(addr) \
+	vm_kernel_syncone(addr)
+
+/* Called after an E1-vector was flattened into an E2-entry
+ * that now resides at `P32_PDIR_E2_IDENTITY[vec4][vec3][vec2]' */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL p32_pagedir_sync_flattened_e1_vector)(unsigned int vec2) {
+	/* Even though the in-memory mapping of `P32_PDIR_VECADDR(vec4, vec3, vec2, 0..511)'
+	 * didn't change, due to being flattened, the contents of our page directory identity
+	 * mapping _have_ changed:
+	 *     UNMAP(P32_PDIR_E1_IDENTITY[vec2][0..1023])  (This is exactly 1 page)
+	 */
+	SYNC_IDENTITY_PAGE(P32_PDIR_E1_IDENTITY[vec2]);
+}
+
+
+
 
 LOCAL NOBLOCK bool
 NOTHROW(KCALL p32_pagedir_can_flatten_e1_vector)(union p32_pdir_e1 const e1_p[1024],
@@ -428,6 +455,8 @@ again_try_exchange_e2_word:
 				return;
 			goto again_try_exchange_e2_word;
 		}
+		/* Sync if necessary. */
+		p32_pagedir_sync_flattened_e1_vector(vec2);
 		/* Successfully merged the vector.
 		 * At this point, all that's left is to free the vector.
 		 * NOTE: No need to Shoot-down anything for this, since the new,
@@ -454,13 +483,16 @@ again_try_exchange_e2_word:
  * @return: false: Insufficient physical memory to change mappings. */
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p32_pagedir_prepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
+	bool result;
 	unsigned int vec2, vec1;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return true;
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
-	return p32_pagedir_prepare_impl_widen(vec2, vec1, 1);
+	result = p32_pagedir_prepare_impl_widen(vec2, vec1, 1);
+	PG_TRACE_PREPARE_IF(result, addr, PAGESIZE);
+	return result;
 }
 
 INTERN NOBLOCK void
@@ -469,6 +501,7 @@ NOTHROW(FCALL p32_pagedir_unprepare_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr)
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	if unlikely((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
 		return;
+	PG_TRACE_UNPREPARE(addr, PAGESIZE);
 	vec2 = P32_PDIR_VEC2INDEX(addr);
 	vec1 = P32_PDIR_VEC1INDEX(addr);
 	p32_pagedir_unprepare_impl_flatten(vec2, vec1, 1);
@@ -493,8 +526,14 @@ NOTHROW(FCALL p32_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P32_PDIR_VEC1INDEX(addr);
 	/* Prepare within the same 4MiB region. */
-	if likely(vec2_min == vec2_max)
-		return p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, num_bytes / 4096);
+	if likely(vec2_min == vec2_max) {
+		bool result;
+		result = p32_pagedir_prepare_impl_widen(vec2_min,
+		                                        vec1_min,
+		                                        num_bytes / 4096);
+		PG_TRACE_PREPARE_IF(result, addr, num_bytes);
+		return result;
+	}
 	vec1_end = P32_PDIR_VEC1INDEX((byte_t *)addr + num_bytes);
 	/* Prepare the partial range of the first 4MiB region. */
 	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, 1024 - vec1_min))
@@ -509,6 +548,7 @@ NOTHROW(FCALL p32_pagedir_prepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 				goto err_2;
 		}
 	}
+	PG_TRACE_PREPARE(addr, num_bytes);
 	return true;
 err_2:
 	while (vec2 > vec2_min + 1) {
@@ -540,8 +580,14 @@ NOTHROW(FCALL p32_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P32_PDIR_VEC1INDEX(addr);
 	/* Prepare within the same 4MiB region. */
-	if likely(vec2_min == vec2_max)
-		return p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, num_bytes / 4096);
+	if likely(vec2_min == vec2_max) {
+		bool result;
+		result = p32_pagedir_prepare_impl_widen(vec2_min,
+		                                        vec1_min,
+		                                        num_bytes / 4096);
+		PG_TRACE_PREPARE_IF(result, addr, num_bytes);
+		return result;
+	}
 	vec1_end = P32_PDIR_VEC1INDEX((byte_t *)addr + num_bytes);
 	/* Prepare the partial range of the first 4MiB region. */
 	if unlikely(!p32_pagedir_prepare_impl_widen(vec2_min, vec1_min, 1024 - vec1_min))
@@ -557,6 +603,7 @@ NOTHROW(FCALL p32_pagedir_prepare_map_keep)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 				goto err;
 		}
 	}
+	PG_TRACE_PREPARE(addr, num_bytes);
 	return true;
 err:
 	return false;
@@ -580,6 +627,7 @@ NOTHROW(FCALL p32_pagedir_unprepare_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 		p32_pagedir_unprepare_mapone(addr);
 		return;
 	}
+	PG_TRACE_UNPREPARE(addr, num_bytes);
 	vec2_min = P32_PDIR_VEC2INDEX(addr);
 	vec2_max = P32_PDIR_VEC2INDEX((byte_t *)addr + num_bytes - 1);
 	vec1_min = P32_PDIR_VEC1INDEX(addr);
