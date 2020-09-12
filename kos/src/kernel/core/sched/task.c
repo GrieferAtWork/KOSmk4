@@ -227,14 +227,14 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(thiscpu_current, offsetof(struct cpu, c_current), sizeof(struct task *));
 	DEFINE_PUBLIC_SYMBOL(thiscpu_override, offsetof(struct cpu, c_override), sizeof(struct task *));
 #ifndef CONFIG_NO_SMP
-	DEFINE_PUBLIC_SYMBOL(thiscpu_vm, offsetof(struct cpu, c_vm), sizeof(struct vm *));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, offsetof(struct cpu, c_pdir), sizeof(struct vm *));
 	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, offsetof(struct cpu, c_pending), sizeof(struct task *));
 #else /* !CONFIG_NO_SMP */
-	DEFINE_PUBLIC_SYMBOL(thiscpu_vm, 0, 0);
+	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, 0, 0);
 	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, 0, 0);
 #endif /* CONFIG_NO_SMP */
 	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
-	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys_ptr, offsetof(struct vm, v_pdir_phys_ptr), sizeof(vm_phys_t));
+	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys, offsetof(struct vm, v_pdir_phys), sizeof(vm_phys_t));
 
 	/* Set kernel boot timestamps.
 	 * These can be used to calculate things such as uptime, etc. */
@@ -417,7 +417,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	        node, &FORTASK(self, this_trampoline_node), self);
 	addr = vm_node_getstart(node);
 	pagedir_unmapone(addr);
-	vm_kernel_syncone(addr);
+	vm_supersyncone(addr);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare_mapone(addr);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
@@ -440,7 +440,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	addr = vm_node_getstart(node);
 	size = vm_node_getsize(node);
 	pagedir_unmap(addr, size);
-	vm_kernel_sync(addr, size);
+	vm_supersync(addr, size);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare_map(addr, size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */

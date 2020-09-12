@@ -569,6 +569,20 @@ again_already_disabled:
 			/* Wake the target CPU, so it can continue working on our sleeping tasks. */
 			cpu_wake(transfer_target);
 		}
+		/* Normally, we'd have to fully invalidate our page directory at this point
+		 * since any of the threads transferred may have had thread-local memory
+		 * mappings which we'd have to forget about.
+		 * But to be more precise, we can do this at any point in time before the
+		 * next time our CPU ends up having to map something into memory.
+		 *
+		 * However, since we're about to enter deep-sleep, we know that our CPU
+		 * can't possible have to map something into memory before deep-sleep mode
+		 * is exited, at which point we'll have already gone through the entire
+		 * boot-strap phase, which includes re-initializing paging, which also
+		 * means that `cpu_enter_deepsleep()' includes a call to `pagedir_syncall()'! */
+#if 0
+		pagedir_syncall();
+#endif
 		cpu_assert_integrity(NULL);
 		/* Enter deep-sleep mode. */
 		printk(KERN_INFO "[sched:cpu#%u][+] Enter deep-sleep\n", (unsigned int)me->c_id);

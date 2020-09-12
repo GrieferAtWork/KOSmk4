@@ -323,7 +323,7 @@ handle_remove_write_error:
 			if (resnode->vn_flags & VM_NODE_FLAG_PREPARED) {
 				/* Try to keep already prepared nodes also prepared within the VM clone.
 				 * However, if this fails, just ignore the error and unset the PREPARED bit. */
-				if (!pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(result),
+				if (!pagedir_prepare_map_p(result->v_pdir_phys,
 				                           vm_node_getstart(resnode),
 				                           vm_node_getsize(resnode)))
 					resnode->vn_flags &= ~VM_NODE_FLAG_PREPARED;

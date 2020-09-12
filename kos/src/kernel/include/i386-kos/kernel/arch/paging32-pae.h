@@ -319,7 +319,7 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self);
 /* Finalize a given page directory. */
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
-                                PHYS vm_phys_t phys_self);
+                                PHYS struct pae_pdir *phys_self);
 
 /* Prepare the page directory for a future map() operation.
  * The full cycle of a single mapping then looks like this:
@@ -410,7 +410,7 @@ NOTHROW(FCALL pae_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
  *       can perform the task without needing to allocate more memory! */
-INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unmap_userspace)(struct vm *__restrict sync_vm);
+INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unmap_userspace)(void);
 INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unmap_userspace_nosync)(void);
 
 /* Translate a virtual address into its physical counterpart. */

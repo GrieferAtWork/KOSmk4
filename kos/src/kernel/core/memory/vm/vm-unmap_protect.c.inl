@@ -157,7 +157,7 @@ do_throw_first_unmapped:
 				    VM_NODE_FLAG_PREPARED) {
 					if unlikely(!((self == myvm || vm_node_iskernelspace(node))
 					              ? pagedir_prepare_map(vm_node_getstart(node), vm_node_getsize(node))
-					              : pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(self),
+					              : pagedir_prepare_map_p(self->v_pdir_phys,
 					                                      vm_node_getstart(node),
 					                                      vm_node_getsize(node)))) {
 						sync_endwrite(self);
@@ -470,7 +470,7 @@ do_update_page_directory:
 						pagedir_unmap(vm_node_getstart(node),
 						              vm_node_getsize(node));
 					} else {
-						pagedir_unmap_p(PAGEDIR_P_SELFOFVM(self),
+						pagedir_unmap_p(self->v_pdir_phys,
 						                vm_node_getstart(node),
 						                vm_node_getsize(node));
 					}

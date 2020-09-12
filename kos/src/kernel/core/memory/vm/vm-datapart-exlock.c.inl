@@ -408,7 +408,7 @@ again_scan_nodes:
 				 * can safely load new physical memory targets. */
 				if unlikely(!(node->vn_vm == v || node->vn_vm == &vm_kernel
 				              ? pagedir_prepare_map(vm_node_getstart(node), vm_node_getsize(node))
-				              : pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(node->vn_vm),
+				              : pagedir_prepare_map_p(node->vn_vm->v_pdir_phys,
 				                                      vm_node_getstart(node),
 				                                      vm_node_getsize(node)))) {
 					vm_set_lockendwrite_all(&vms);
@@ -440,7 +440,7 @@ again_scan_nodes:
 					vm_datapart_map_ram_autoprop(copy, vm_node_getstart(node), perm);
 				} else {
 					vm_datapart_map_ram_autoprop_p(copy,
-					                               PAGEDIR_P_SELFOFVM(node->vn_vm),
+					                               node->vn_vm->v_pdir_phys,
 					                               vm_node_getstart(node),
 					                               perm);
 				}

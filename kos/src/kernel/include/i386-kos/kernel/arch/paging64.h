@@ -465,6 +465,7 @@ typedef struct p64_pdir pagedir_t;
 
 
 #undef ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET
+#ifndef __INTELLISENSE__
 #define ARCH_PAGEDIR_ARCHHEADER_DEFINES_PAGEDIR_GETSET 1
 #ifdef __CC__
 /* Low-level Get/Set the physical address of the currently active page directory. */
@@ -486,6 +487,7 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 	        : "memory");
 }
 #endif /* __CC__ */
+#endif /* !__INTELLISENSE__ */
 
 
 /* When more than `ARCH_PAGEDIR_LARGESYNC_THRESHOLD' need to be synced, rather

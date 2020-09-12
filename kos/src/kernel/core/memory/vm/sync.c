@@ -51,15 +51,15 @@ DECL_BEGIN
  *          dedicated code-path that behaves as though this function had
  *          returned a completely filled cpuset. */
 #if CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER
-PUBLIC NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL vm_getcpus)(struct vm *__restrict self,
-                          cpuset_ptr_t result)
+PUBLIC NOBLOCK NONNULL((2)) void
+NOTHROW(FCALL pagedir_getcpus)(pagedir_phys_t self,
+                               cpuset_ptr_t result)
 #else /* CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) cpuset_t
-NOTHROW(FCALL __vm_getcpus)(struct vm *__restrict self)
-	ASMNAME("vm_getcpus");
-PUBLIC NOBLOCK WUNUSED NONNULL((1)) cpuset_t
-NOTHROW(FCALL __vm_getcpus)(struct vm *__restrict self)
+FUNDEF NOBLOCK WUNUSED cpuset_t
+NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
+	ASMNAME("pagedir_getcpus");
+PUBLIC NOBLOCK WUNUSED cpuset_t
+NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
 #endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
 {
 	cpuid_t i;
@@ -69,7 +69,7 @@ NOTHROW(FCALL __vm_getcpus)(struct vm *__restrict self)
 	/* Find all CPUs that make use of `self' */
 	CPUSET_CLEAR(result);
 	for (i = 0; i < cpu_count; ++i) {
-		if (ATOMIC_READ(cpu_vector[i]->c_vm) == self)
+		if (ATOMIC_READ(cpu_vector[i]->c_pdir) == self)
 			CPUSET_INSERT(result, i);
 	}
 #if CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER
@@ -129,7 +129,7 @@ NOTHROW(FCALL vm_sync)(struct vm *__restrict self,
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
 	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
 #ifdef CONFIG_NO_SMP
-	if (THIS_VM == self)
+	if (self == THIS_VM || self == &vm_kernel)
 		pagedir_sync(addr, num_bytes);
 #else /* CONFIG_NO_SMP */
 	{
@@ -153,7 +153,7 @@ NOTHROW(FCALL vm_syncone)(struct vm *__restrict self,
                           PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
 #ifdef CONFIG_NO_SMP
-	if (THIS_VM == self)
+	if (self == THIS_VM || self == &vm_kernel)
 		pagedir_syncone(addr);
 #else /* CONFIG_NO_SMP */
 	{
@@ -175,24 +175,26 @@ PUBLIC NOBLOCK void
 NOTHROW(FCALL vm_syncall)(struct vm *__restrict self) {
 	/* Check for special case: The kernel VM is being synced. */
 	if (self == &vm_kernel) {
-		vm_kernel_syncall();
-		return;
-	}
+		vm_supersyncall();
+	} else {
 #ifdef CONFIG_NO_SMP
-	if (THIS_VM == self)
-		pagedir_syncall_user();
+		if (self == THIS_VM)
+			pagedir_syncall_user();
 #else /* CONFIG_NO_SMP */
-	{
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
 		vm_getcpus(self, CPUSET_PTR(targets));
-		cpu_sendipi_cpuset(targets, &ipi_invtlb_user, args,
+		cpu_sendipi_cpuset(targets,
+		                   &ipi_invtlb_user,
+		                   args,
 		                   CPU_IPI_FWAITFOR |
 		                   CPU_IPI_FNOINTR);
-	}
 #endif /* !CONFIG_NO_SMP */
+	}
 }
 
+
+#ifndef CONFIG_NO_SMP
 
 /* Sync memory within `THIS_VM' */
 PUBLIC NOBLOCK void
@@ -200,7 +202,6 @@ NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
 	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
-#ifndef CONFIG_NO_SMP
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
@@ -214,18 +215,18 @@ NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 		CPUSET_REMOVE(targets, mycpu->c_id);
 		args[0] = (void *)(uintptr_t)addr;
 		args[1] = (void *)(uintptr_t)num_bytes;
-		cpu_sendipi_cpuset(targets, &ipi_invtlb, args,
+		cpu_sendipi_cpuset(targets,
+		                   &ipi_invtlb,
+		                   args,
 		                   CPU_IPI_FWAITFOR |
 		                   CPU_IPI_FNOINTR);
 	}
-#endif /* !CONFIG_NO_SMP */
 	pagedir_sync(addr, num_bytes);
 }
 
 PUBLIC NOBLOCK void
 NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
-#ifndef CONFIG_NO_SMP
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
@@ -238,21 +239,24 @@ NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, mycpu->c_id);
 		args[0] = (void *)(uintptr_t)addr;
-		cpu_sendipi_cpuset(targets, &ipi_invtlb_one, args,
+		cpu_sendipi_cpuset(targets,
+		                   &ipi_invtlb_one,
+		                   args,
 		                   CPU_IPI_FWAITFOR |
 		                   CPU_IPI_FNOINTR);
 	}
-#endif /* !CONFIG_NO_SMP */
 	pagedir_syncone(addr);
 }
+#endif /* !CONFIG_NO_SMP */
+
 
 PUBLIC NOBLOCK void
 NOTHROW(FCALL this_vm_syncall)(void) {
+	struct vm *myvm = THIS_VM;
 #ifndef CONFIG_NO_SMP
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		struct vm *myvm   = THIS_VM;
 		struct cpu *mycpu = THIS_CPU;
 		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
@@ -260,25 +264,32 @@ NOTHROW(FCALL this_vm_syncall)(void) {
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, mycpu->c_id);
-		cpu_sendipi_cpuset(targets, &ipi_invtlb_all, args,
+		cpu_sendipi_cpuset(targets,
+		                   myvm == &vm_kernel ? &ipi_invtlb_all
+		                                      : &ipi_invtlb_user,
+		                   args,
 		                   CPU_IPI_FWAITFOR |
 		                   CPU_IPI_FNOINTR);
 	}
 #endif /* !CONFIG_NO_SMP */
-	pagedir_syncall();
+	if (myvm == &vm_kernel) {
+		pagedir_syncall();
+	} else {
+		pagedir_syncall_user();
+	}
 }
 
 
 
 
+#ifndef CONFIG_NO_SMP
 /* Same as above, but these functions are specifically designed to optimally
  * sync changes made to the kernel VM. */
 PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_kernel_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+NOTHROW(FCALL vm_supersync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
 	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
-#ifndef CONFIG_NO_SMP
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		args[0] = (void *)(uintptr_t)addr;
@@ -287,14 +298,12 @@ NOTHROW(FCALL vm_kernel_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 		                         CPU_IPI_FWAITFOR |
 		                         CPU_IPI_FNOINTR);
 	}
-#endif /* !CONFIG_NO_SMP */
 	pagedir_sync(addr, num_bytes);
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_kernel_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
+NOTHROW(FCALL vm_supersyncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
-#ifndef CONFIG_NO_SMP
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		args[0] = (void *)(uintptr_t)addr;
@@ -302,20 +311,128 @@ NOTHROW(FCALL vm_kernel_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 		                         CPU_IPI_FWAITFOR |
 		                         CPU_IPI_FNOINTR);
 	}
-#endif /* !CONFIG_NO_SMP */
 	pagedir_syncone(addr);
 }
 
 PUBLIC NOBLOCK void
-NOTHROW(FCALL vm_kernel_syncall)(void) {
-#ifndef CONFIG_NO_SMP
-	void *args[CPU_IPI_ARGCOUNT];
-	cpu_broadcastipi_notthis(&ipi_invtlb_all, args,
-	                         CPU_IPI_FWAITFOR |
-	                         CPU_IPI_FNOINTR);
-#endif /* !CONFIG_NO_SMP */
+NOTHROW(FCALL vm_supersyncall)(void) {
+	if (cpu_online_count > 1) {
+		void *args[CPU_IPI_ARGCOUNT];
+		cpu_broadcastipi_notthis(&ipi_invtlb_all, args,
+		                         CPU_IPI_FWAITFOR |
+		                         CPU_IPI_FNOINTR);
+	}
 	pagedir_syncall();
 }
+
+
+/* Sync memory on every CPU with `CPU->c_vm->v_pdir_phys == pagedir' */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir,
+                                  PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                                  PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	void *args[CPU_IPI_ARGCOUNT];
+	cpuset_t targets;
+	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+	args[0] = (void *)(uintptr_t)addr;
+	args[1] = (void *)(uintptr_t)num_bytes;
+	cpu_sendipi_cpuset(targets, &ipi_invtlb, args,
+	                   CPU_IPI_FWAITFOR |
+	                   CPU_IPI_FNOINTR);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_syncone_smp_p)(pagedir_phys_t pagedir,
+                                     PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
+	void *args[CPU_IPI_ARGCOUNT];
+	cpuset_t targets;
+	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
+	pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+	args[0] = (void *)(uintptr_t)addr;
+	cpu_sendipi_cpuset(targets,
+	                   &ipi_invtlb_one,
+	                   args,
+	                   CPU_IPI_FWAITFOR |
+	                   CPU_IPI_FNOINTR);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_syncall_smp_p)(pagedir_phys_t pagedir) {
+	void *args[CPU_IPI_ARGCOUNT];
+	cpuset_t targets;
+	pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+	cpu_sendipi_cpuset(targets,
+	                   &ipi_invtlb_all,
+	                   args,
+	                   CPU_IPI_FWAITFOR |
+	                   CPU_IPI_FNOINTR);
+}
+
+/* Sync memory on every CPU with `CPU->c_vm->v_pdir_phys == pagedir_get()' */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
+                                PAGEDIR_PAGEALIGNED size_t num_bytes) {
+	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	if (cpu_online_count > 1) {
+		void *args[CPU_IPI_ARGCOUNT];
+		cpuset_t targets;
+		pagedir_phys_t pagedir;
+		pagedir = pagedir_get();
+		pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+		CPUSET_REMOVE(targets, THIS_CPU->c_id);
+		args[0] = (void *)(uintptr_t)addr;
+		args[1] = (void *)(uintptr_t)num_bytes;
+		cpu_sendipi_cpuset(targets,
+		                   &ipi_invtlb,
+		                   args,
+		                   CPU_IPI_FWAITFOR |
+		                   CPU_IPI_FNOINTR);
+	}
+	pagedir_sync(addr, num_bytes);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_syncone_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
+	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
+	if (cpu_online_count > 1) {
+		void *args[CPU_IPI_ARGCOUNT];
+		cpuset_t targets;
+		pagedir_phys_t pagedir;
+		pagedir = pagedir_get();
+		pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+		CPUSET_REMOVE(targets, THIS_CPU->c_id);
+		args[0] = (void *)(uintptr_t)addr;
+		cpu_sendipi_cpuset(targets,
+		                   &ipi_invtlb_one,
+		                   args,
+		                   CPU_IPI_FWAITFOR |
+		                   CPU_IPI_FNOINTR);
+	}
+	pagedir_syncone(addr);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL pagedir_syncall_smp)(void) {
+	if (cpu_online_count > 1) {
+		void *args[CPU_IPI_ARGCOUNT];
+		cpuset_t targets;
+		pagedir_phys_t pagedir = pagedir_get();
+		pagedir_getcpus(pagedir, CPUSET_PTR(targets));
+		CPUSET_REMOVE(targets, THIS_CPU->c_id);
+		cpu_sendipi_cpuset(targets,
+		                   &ipi_invtlb_all,
+		                   args,
+		                   CPU_IPI_FWAITFOR |
+		                   CPU_IPI_FNOINTR);
+	}
+	pagedir_syncall();
+}
+#endif /* !CONFIG_NO_SMP */
+
+
 
 
 DECL_END

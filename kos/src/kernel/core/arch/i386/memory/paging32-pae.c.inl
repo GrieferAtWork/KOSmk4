@@ -37,6 +37,7 @@
 #include <hybrid/atomic.h>
 
 #include <asm/cpu-cpuid.h>
+#include <asm/intrin.h>
 
 #include <assert.h>
 #include <stdint.h>
@@ -225,32 +226,28 @@ pae_pagedir_init(VIRT struct pae_pdir *__restrict self)
 }
 
 /* Because we're omitting the `v_pagedir' field from the start of the VM, we have
- * to adjust for that fact when we're trying to access the `v_pdir_phys_ptr' field! */
+ * to adjust for that fact when we're trying to access the `v_pdir_phys' field! */
 #define VM_GET_V_PDIR_PHYS_PTR(x) \
-	(*(PHYS pagedir_t **)((byte_t *)(x) + sizeof(pagedir_t) + offsetof(struct vm, v_pdir_phys_ptr)))
+	(*(PHYS pagedir_t **)((byte_t *)(x) + sizeof(pagedir_t) + offsetof(struct vm, v_pdir_phys)))
 
 
 /* Finalize a given page directory. */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
-                                PHYS vm_phys_t phys_self) {
+                                PHYS struct pae_pdir *phys_self) {
 	unsigned int vec3;
 	pflag_t was;
-	PHYS pagedir_t *old_pagedir;
+	PHYS uintptr_t old_cr3;
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
-	assert(phys_self <= (vm_phys_t)0xfffff000);
 	was = PREEMPTION_PUSHOFF();
-	old_pagedir = VM_GET_V_PDIR_PHYS_PTR(THIS_VM);
-	assertf(old_pagedir == pagedir_get(),
-	        "Wrong page directory set (%p != %p)",
-	        old_pagedir, pagedir_get());
+	old_cr3 = __rdcr3();
 
 	/* Temporarily switch to the page-directory to-be freed, so we
 	 * can make use of its identity-mapping in order to free its contents.
 	 * The other possibility would be to use the slow vm_copyfromphys()
 	 * function to dereference its memory contents. */
-	pagedir_set((pagedir_t *)(uintptr_t)phys_self);
+	__wrcr3((uintptr_t)phys_self);
 	/* NOTE: Only iterate 0, 1 and 2 here (entry #3 contains) */
 	for (vec3 = 0; vec3 < 3; ++vec3) {
 		union pae_pdir_e3 e3;
@@ -265,7 +262,7 @@ NOTHROW(FCALL pae_pagedir_fini)(VIRT struct pae_pdir *__restrict self,
 				page_freeone(ppageof(e2.p_word & PAE_PAGE_FVECTOR));
 		}
 	}
-	pagedir_set(old_pagedir);
+	__wrcr3(old_cr3);
 	PREEMPTION_POP(was);
 	/* Free the always-allocated E2-vectors */
 	for (vec3 = 0; vec3 < 4; ++vec3) {
@@ -437,19 +434,6 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 
 
 
-/* TODO: Syncing in vm_kernel is overkill here: it would be
- *       sufficient to only broadcast the IPI to CPUs where
- *       `CPU->c_vm->v_pdir_phys_ptr == pagedir_get()' (which
- *       is somewhat different from the `CPU->c_vm == THIS_VM'
- *       that would be done by `this_vm_sync()', so we'd need
- *       a dedicated (possibly arch-specific) syncing function)
- * Note though that we'd still need to broadcast to everyone
- * if the actual area being synced relates to kernel-space.
- * This could be determined by having the caller look at the
- * vec* indices they've been given. */
-#define SYNC_IDENTITY_PAGE(addr) \
-	vm_kernel_syncone(addr)
-
 /* Called after an E1-vector was flattened into an E2-entry
  * that now resides at `PAE_PDIR_E2_IDENTITY[vec4][vec3][vec2]' */
 PRIVATE NOBLOCK void
@@ -460,7 +444,15 @@ NOTHROW(FCALL pae_pagedir_sync_flattened_e1_vector)(unsigned int vec3,
 	 * mapping _have_ changed:
 	 *     UNMAP(PAE_PDIR_E1_IDENTITY[vec3][vec2][0..511])  (This is exactly 1 page)
 	 */
-	SYNC_IDENTITY_PAGE(PAE_PDIR_E1_IDENTITY[vec3][vec2]);
+	void *sync_pageaddr;
+	sync_pageaddr = PAE_PDIR_E1_IDENTITY[vec3][vec2];
+	if (vec3 >= PAE_PDIR_VEC3INDEX(KERNELSPACE_BASE)) {
+		/* Sync as part of the kernel VM */
+		vm_supersyncone(sync_pageaddr);
+	} else {
+		/* Sync as part of the current page directory. */
+		pagedir_syncone_smp(sync_pageaddr);
+	}
 }
 
 
@@ -1353,7 +1345,7 @@ NOTHROW(FCALL pae_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
  *       can perform the task without needing to allocate more memory! */
 INTERN NOBLOCK void
-NOTHROW(FCALL pae_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
+NOTHROW(FCALL pae_pagedir_unmap_userspace)(void) {
 	unsigned int vec3, vec2, free_count = 0;
 	u64 free_pages[64];
 	/* Map all pages before the share-segment as absent. */
@@ -1378,7 +1370,7 @@ again_read_word:
 				 * Otherwise, other CPUs may still be using the mappings after
 				 * they've already been re-designated as general-purpose RAM, at
 				 * which point they'd start reading garbage, or corrupt pointers. */
-				vm_syncall(sync_vm);
+				pagedir_syncall_smp();
 				page_freeone((pageptr_t)pageptr);
 				do {
 					--free_count;
@@ -1391,7 +1383,7 @@ again_read_word:
 	}
 	/* Free any remaining pages. */
 	if (free_count) {
-		vm_syncall(sync_vm);
+		pagedir_syncall_smp();
 		do {
 			--free_count;
 			page_freeone((pageptr_t)free_pages[free_count]);

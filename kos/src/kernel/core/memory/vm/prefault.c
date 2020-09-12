@@ -336,7 +336,7 @@ upgrade_and_recheck_vm_for_node:
 			if (!(node->vn_flags & VM_NODE_FLAG_PREPARED)) {
 				if unlikely(!(self == THIS_VM || self == &vm_kernel
 				              ? pagedir_prepare_map(pageaddr, part_num_vpages * PAGESIZE)
-				              : pagedir_prepare_map_p(PAGEDIR_P_SELFOFVM(self), pageaddr, part_num_vpages * PAGESIZE))) {
+				              : pagedir_prepare_map_p(self->v_pdir_phys, pageaddr, part_num_vpages * PAGESIZE))) {
 					sync_endwrite(self);
 					sync_endwrite(part);
 					free_partilly_initialized_datapart(new_part);
@@ -364,7 +364,7 @@ upgrade_and_recheck_vm_for_node:
 				vm_datapart_map_ram(new_part, pageaddr, pagedir_prot);
 			} else {
 				vm_datapart_map_ram_p(new_part,
-				                      PAGEDIR_P_SELFOFVM(self),
+				                      self->v_pdir_phys,
 				                      pageaddr, pagedir_prot);
 			}
 			vm_sync(self,

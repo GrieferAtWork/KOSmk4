@@ -853,7 +853,7 @@ reset_pdir(struct task *mythread) {
 	myvm = mythread->t_vm;
 	if unlikely((uintptr_t)myvm < KERNELSPACE_BASE)
 		return;
-	if unlikely((vm_phys_t)myvm->v_pdir_phys_ptr != pagedir_translate(&myvm->v_pagedir))
+	if unlikely((vm_phys_t)myvm->v_pdir_phys != pagedir_translate(&myvm->v_pagedir))
 		return;
 	if unlikely(((uintptr_t)myvm->v_pdir_phys & PAGEMASK) != 0)
 		return;
@@ -862,9 +862,9 @@ reset_pdir(struct task *mythread) {
 
 	/* Make sure that the kernel-share segment of `myvm' is initialized correctly! */
 #ifdef __x86_64__
-	reset_pdir_p64(&myvm->v_pagedir, (u64)myvm->v_pdir_phys_ptr);
+	reset_pdir_p64(&myvm->v_pagedir, (u64)myvm->v_pdir_phys);
 #elif defined(CONFIG_NO_PAGING_PAE)
-	reset_pdir_p32(&myvm->v_pagedir.pd_p32, (u32)myvm->v_pdir_phys_ptr);
+	reset_pdir_p32(&myvm->v_pagedir.pd_p32, (u32)myvm->v_pdir_phys);
 #elif defined(CONFIG_NO_PAGING_P32)
 	if (!reset_pdir_pae(&myvm->v_pagedir.pd_pae))
 		return;
@@ -873,14 +873,14 @@ reset_pdir(struct task *mythread) {
 		if (!reset_pdir_pae(&myvm->v_pagedir.pd_pae))
 			return;
 	} else {
-		reset_pdir_p32(&myvm->v_pagedir.pd_p32, (u32)myvm->v_pdir_phys_ptr);
+		reset_pdir_p32(&myvm->v_pagedir.pd_p32, (u32)myvm->v_pdir_phys);
 	}
 #endif
 
 	/* The page directory seems to be consistent. -> Use it instead to
 	 * minimize the number of necessary page directory switches when
 	 * inspecting memory. */
-	pagedir_set(myvm->v_pdir_phys_ptr);
+	pagedir_set(myvm->v_pdir_phys);
 }
 
 

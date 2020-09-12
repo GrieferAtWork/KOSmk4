@@ -60,14 +60,14 @@ STATIC_ASSERT(P32_PDIR_E2_IDENTITY_BASE == (P32_PDIR_E1_IDENTITY_BASE + (P32_PDI
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
-                                PHYS vm_phys_t phys_self) {
+                                PHYS struct p32_pdir *phys_self) {
 	/* Assert some constants assumed below. */
 	STATIC_ASSERT(P32_PDIR_VEC2INDEX(KERNELSPACE_BASE) == 768);
 	STATIC_ASSERT(P32_PDIR_VEC1INDEX(KERNELSPACE_BASE) == 0);
 	STATIC_ASSERT(P32_PDIR_VEC2INDEX(P32_VM_KERNEL_PDIR_IDENTITY_BASE) == 1023);
 	STATIC_ASSERT(P32_PDIR_VEC1INDEX(P32_VM_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
-	assert(IS_ALIGNED(phys_self, PAGESIZE));
+	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
 
 	/* Map all pages before the share-segment as absent. */
 	memsetl(self->p_e2, P32_PAGE_ABSENT, 768);
@@ -245,19 +245,6 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 }
 
 
-/* TODO: Syncing in vm_kernel is overkill here: it would be
- *       sufficient to only broadcast the IPI to CPUs where
- *       `CPU->c_vm->v_pdir_phys_ptr == pagedir_get()' (which
- *       is somewhat different from the `CPU->c_vm == THIS_VM'
- *       that would be done by `this_vm_sync()', so we'd need
- *       a dedicated (possibly arch-specific) syncing function)
- * Note though that we'd still need to broadcast to everyone
- * if the actual area being synced relates to kernel-space.
- * This could be determined by having the caller look at the
- * vec* indices they've been given. */
-#define SYNC_IDENTITY_PAGE(addr) \
-	vm_kernel_syncone(addr)
-
 /* Called after an E1-vector was flattened into an E2-entry
  * that now resides at `P32_PDIR_E2_IDENTITY[vec4][vec3][vec2]' */
 PRIVATE NOBLOCK void
@@ -267,7 +254,15 @@ NOTHROW(FCALL p32_pagedir_sync_flattened_e1_vector)(unsigned int vec2) {
 	 * mapping _have_ changed:
 	 *     UNMAP(P32_PDIR_E1_IDENTITY[vec2][0..1023])  (This is exactly 1 page)
 	 */
-	SYNC_IDENTITY_PAGE(P32_PDIR_E1_IDENTITY[vec2]);
+	void *sync_pageaddr;
+	sync_pageaddr = P32_PDIR_E1_IDENTITY[vec2];
+	if (vec2 >= P32_PDIR_VEC2INDEX(KERNELSPACE_BASE)) {
+		/* Sync as part of the kernel VM */
+		vm_supersyncone(sync_pageaddr);
+	} else {
+		/* Sync as part of the current page directory. */
+		pagedir_syncone_smp(sync_pageaddr);
+	}
 }
 
 
@@ -960,7 +955,7 @@ NOTHROW(FCALL p32_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
  *       can perform the task without needing to allocate more memory! */
 INTERN NOBLOCK void
-NOTHROW(FCALL p32_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
+NOTHROW(FCALL p32_pagedir_unmap_userspace)(void) {
 	unsigned int vec2, free_count = 0;
 	u32 free_pages[64];
 	/* Map all pages before the share-segment as absent. */
@@ -982,7 +977,7 @@ again_read_word:
 			 * Otherwise, other CPUs may still be using the mappings after
 			 * they've already been re-designated as general-purpose RAM, at
 			 * which point they'd start reading garbage, or corrupt pointers. */
-			vm_syncall(sync_vm);
+			pagedir_syncall_smp();
 			page_freeone((pageptr_t)pageptr);
 			do {
 				--free_count;
@@ -994,7 +989,7 @@ again_read_word:
 	}
 	/* Free any remaining pages. */
 	if (free_count) {
-		vm_syncall(sync_vm);
+		pagedir_syncall_smp();
 		do {
 			--free_count;
 			page_freeone((pageptr_t)free_pages[free_count]);

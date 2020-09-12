@@ -103,7 +103,7 @@ NOTHROW(KCALL vm_do_pdir_unmap)(PAGEDIR_PAGEALIGNED void *addr,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	/* Unmap the associated memory, sync it, and unprepare it. */
 	pagedir_unmap(addr, num_bytes);
-	vm_kernel_sync(addr, num_bytes);
+	vm_supersync(addr, num_bytes);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	/* NOTE: Only unprepare the range after all CPUs were notified about the unmap.
 	 *       If we were to free any descriptor pages before then, the pages may

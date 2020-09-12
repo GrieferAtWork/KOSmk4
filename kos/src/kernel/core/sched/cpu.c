@@ -445,7 +445,7 @@ PRIVATE ATTR_USED ATTR_SECTION(".data.percpu.head")
 struct cpu cpu_header = {
 	/* .c_id       = */ 0,
 #ifndef CONFIG_NO_SMP
-	/* .c_vm       = */ &vm_kernel,
+	/* .c_pdir     = */ pagedir_kernel_phys,
 #endif /* !CONFIG_NO_SMP */
 	/* .c_current  = */ NULL,
 	/* .c_sleeping = */ NULL,

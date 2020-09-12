@@ -183,7 +183,7 @@ NOTHROW(KCALL metadata_clearall)(void) {
 	 * Technically, we'd only need to do this for the phys2virt address
 	 * ranges. However, there sadly isn't any instruction that would allow
 	 * us to do this, so it's easier to just blindly invalidate everything. */
-	vm_kernel_syncall();
+	vm_supersyncall();
 }
 
 

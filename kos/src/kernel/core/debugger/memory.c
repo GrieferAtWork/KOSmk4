@@ -46,7 +46,7 @@ DECL_BEGIN
 
 /* Return the page directory of `dbg_current' */
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_getpagedir")
-ATTR_PURE WUNUSED PAGEDIR_P_SELFTYPE
+ATTR_PURE WUNUSED pagedir_phys_t
 NOTHROW(KCALL dbg_getpagedir)(void) {
 	struct vm *v;
 	if (!dbg_current)
@@ -54,22 +54,16 @@ NOTHROW(KCALL dbg_getpagedir)(void) {
 	v = dbg_current->t_vm;
 	if (!v)
 		goto fallback;
-	return PAGEDIR_P_SELFOFVM(v);
+	return v->v_pdir_phys;
 fallback:
-	return PAGEDIR_P_SELFOFVM(&vm_kernel);
+	return pagedir_kernel_phys;
 }
 
 /* Verify that the given page directory isn't corrupt. */
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_verifypagedir") ATTR_PURE WUNUSED bool
-NOTHROW(KCALL dbg_verifypagedir)(PAGEDIR_P_SELFTYPE pdir) {
-	uintptr_t pagedir_ptr;
-#ifdef __INTELLISENSE__
-	pagedir_ptr = (uintptr_t)pdir._m_self;
-#else /* __INTELLISENSE__ */
-	pagedir_ptr = (uintptr_t)pdir;
-#endif /* !__INTELLISENSE__ */
+NOTHROW(KCALL dbg_verifypagedir)(pagedir_phys_t pdir) {
 #if PAGEDIR_ALIGN > 1
-	if (!IS_ALIGNED(pagedir_ptr, PAGEDIR_ALIGN))
+	if (!IS_ALIGNED((uintptr_t)pdir, PAGEDIR_ALIGN))
 		return false; /* Badly aligned. */
 #endif /* PAGEDIR_ALIGN > 1 */
 	/* XXX: Additional (probably arch-specific) checks. */
@@ -85,7 +79,7 @@ NOTHROW(KCALL dbg_verifypagedir)(PAGEDIR_P_SELFTYPE pdir) {
 #else /* __INTELLISENSE__ */
 #define PAGEDIR_P_BEGIN(self)                                 \
 	do {                                                      \
-		PAGEDIR_P_SELFTYPE _old_pdir;                         \
+		pagedir_phys_t _old_pdir;                         \
 		pflag_t _p_was = PREEMPTION_PUSHOFF();                \
 		assert(IS_ALIGNED((uintptr_t)(self), PAGEDIR_ALIGN)); \
 		_old_pdir = pagedir_get();                            \
@@ -111,7 +105,7 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
                               void *__restrict buf,
                               size_t num_bytes) {
 	size_t error;
-	PAGEDIR_P_SELFTYPE pdir;
+	pagedir_phys_t pdir;
 	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes))
 		return memcpy_nopf(buf, addr, num_bytes);
 	pdir = dbg_getpagedir();
@@ -129,7 +123,7 @@ NOTHROW(KCALL dbg_writememory)(void *addr,
                                void const *__restrict buf,
                                size_t num_bytes, bool force) {
 	size_t error;
-	PAGEDIR_P_SELFTYPE pdir;
+	pagedir_phys_t pdir;
 	if (!num_bytes)
 		return 0; /* Nothing to do here. */
 	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes)) {

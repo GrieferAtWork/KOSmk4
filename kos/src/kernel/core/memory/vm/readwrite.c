@@ -159,7 +159,7 @@ NOTHROW(KCALL copy_kernelspace_from_vm_nopf)(struct vm *__restrict self,
 	size_t result;
 	/* Temporarily switch to the foreign VM */
 	/* XXX: What about TLB shootdowns happening while we do this? */
-	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys_ptr) {
+	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys) {
 		result = memcpy_nopf(buf, addr, num_bytes);
 	}
 	DEFINE_PAGEDIR_P_END;
@@ -174,7 +174,7 @@ NOTHROW(KCALL copy_kernelspace_into_vm_nopf)(struct vm *__restrict self,
 	size_t result;
 	/* Temporarily switch to the foreign VM */
 	/* XXX: What about TLB shootdowns happening while we do this? */
-	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys_ptr) {
+	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys) {
 		result = memcpy_nopf(addr, buf, num_bytes);
 	}
 	DEFINE_PAGEDIR_P_END;
@@ -188,7 +188,7 @@ NOTHROW(KCALL memset_into_vm_nopf)(struct vm *__restrict self,
 	size_t result;
 	/* Temporarily switch to the foreign VM */
 	/* XXX: What about TLB shootdowns happening while we do this? */
-	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys_ptr) {
+	DEFINE_PAGEDIR_P_BEGIN(self->v_pdir_phys) {
 		result = memset_nopf(addr, byte, num_bytes);
 	}
 	DEFINE_PAGEDIR_P_END;

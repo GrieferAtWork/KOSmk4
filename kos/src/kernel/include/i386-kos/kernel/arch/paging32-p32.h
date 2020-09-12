@@ -282,7 +282,7 @@ typedef u64 p32_pagedir_pushval_t;
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
-                                PHYS vm_phys_t phys_self);
+                                PHYS struct p32_pdir *phys_self);
 
 /* Finalize a given page directory. */
 INTDEF NOBLOCK NONNULL((1)) void
@@ -378,7 +378,7 @@ NOTHROW(FCALL p32_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 /* Unmap the entirety of user-space.
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
  *       can perform the task without needing to allocate more memory! */
-INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace)(struct vm *__restrict sync_vm);
+INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace)(void);
 INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unmap_userspace_nosync)(void);
 
 /* Translate a virtual address into its physical counterpart. */

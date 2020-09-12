@@ -98,7 +98,7 @@ NOTHROW(FCALL vm_unmap_kernel_mapping_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void
 			break;
 		node = next;
 	}
-	vm_kernel_sync(addr, num_bytes);
+	vm_supersync(addr, num_bytes);
 }
 
 

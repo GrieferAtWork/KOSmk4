@@ -530,7 +530,7 @@ NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
                                    PAGEDIR_PAGEALIGNED VIRT void *addr, u16 perm);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
-                                     PAGEDIR_P_SELFTYPE pdir,
+                                     pagedir_phys_t pdir,
                                      PAGEDIR_PAGEALIGNED VIRT void *addr, u16 perm);
 
 /* Same as `vm_datapart_map_ram()', but automatically restrict permissions:
@@ -545,7 +545,7 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop)(struct vm_datapart *__restrict self,
                                             u16 perm);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict self,
-                                              PAGEDIR_P_SELFTYPE pdir,
+                                              pagedir_phys_t pdir,
                                               PAGEDIR_PAGEALIGNED VIRT void *addr,
                                               u16 perm);
 
@@ -1630,14 +1630,7 @@ struct vm {
 #ifndef __VM_INTERNAL_EXCLUDE_PAGEDIR
 	pagedir_t                  v_pagedir;       /* [lock(v_treelock)] The page directory associated with the VM. */
 #endif /* !__VM_INTERNAL_EXCLUDE_PAGEDIR */
-	union {
-		PHYS pagedir_t        *v_pdir_phys_ptr; /* [1..1][const] Physical pointer of the page directory */
-#ifdef __INTELLISENSE__
-		struct { PHYS vm_phys_t v_pdir_phys;    /* [1..1][const] Physical pointer of the page directory */ };
-#else /* __INTELLISENSE__ */
-		PHYS vm_phys_t         v_pdir_phys;     /* [1..1][const] Physical pointer of the page directory */
-#endif /* !__INTELLISENSE__ */
-	};
+	PHYS pagedir_phys_t        v_pdir_phys;     /* [1..1][const] Physical pointer of the page directory */
 	WEAK refcnt_t              v_refcnt;        /* Reference counter */
 	WEAK refcnt_t              v_weakrefcnt;    /* Weak reference counter */
 	ATREE_HEAD(struct vm_node) v_tree;          /* [lock(v_treelock)] Tree of mapped nodes. */
@@ -1783,6 +1776,44 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm
 /* VM SYNCING FUNCTIONS                                                 */
 /************************************************************************/
 
+/* VM syncing hierarchy / equivalences:
+ *
+ * vm_sync():
+ *    - Sync memory only for the page directory of the given VM.
+ *      Special case when `self == &vm_kernel', in which case
+ *      memory is synced on every online CPU.
+ *    - Aside from that special case, same as
+ *      `pagedir_sync_smp_p(self->v_pdir_phys)'
+ *
+ * this_vm_sync():
+ *    - Same as `vm_sync(THIS_VM)'
+ *
+ * vm_supersync():
+ *    - Same as `vm_sync(&vm_kernel)'
+ *
+ * pagedir_sync_smp_p():
+ *    - Similar to `vm_sync()', but without the special case for the kernel vm
+ *    - Sync memory on every CPU that claims to be using the given page directory.
+ *
+ * pagedir_sync_smp():
+ *    - Same as `pagedir_sync_smp_p(pagedir_get())'
+ *
+ * pagedir_sync():
+ *    - Low-level, arch-specific page directory syncing.
+ *    - Syncs memory within the given page directory, but only does so in
+ *      the context of the calling CPU. May be used for deleting thread-local,
+ *      temporary memory mappings if you can guaranty that these mappings
+ *      never left the view of your current thread. - Else, depending on
+ *      where the mapping was placed, either `pagedir_sync_smp()' or
+ *      `vm_supersync()' must be used instead.
+ *    - Note that when a thread is transfered to a different CPU, the old
+ *      cpu will always perform a call to `pagedir_syncall()', thus ensuring
+ *      that it no longer has any memories of memory mappings that may have
+ *      been private to that thread, and thus should no longer be visible
+ *      to the old CPU.
+ */
+
+
 /* vm syncing functions. These functions must be called when a memory mapping
  * becomes more restrictive, or has been deleted. These functions will
  * automatically send IPIs to all CPUs that are using a given VM, such that
@@ -1797,16 +1828,27 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_sync)(struct vm *__restrict se
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_syncone)(struct vm *__restrict self, PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL vm_syncall)(struct vm *__restrict self);
 
-/* Sync memory within `THIS_VM' */
+#ifndef CONFIG_NO_SMP
+
+/* Same as `vm_sync(THIS_VM)' (The sync is done on every CPU that uses the caller's VM) */
 FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
 FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_syncall)(void);
 
-/* Same as above, but these functions are specifically designed to optimally
- * sync changes made to the kernel VM. */
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
-FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncall)(void);
+/* Same as `vm_sync(&vm_kernel)' (The sync is performed on every CPU, for any VM) */
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_supersync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr, PAGEDIR_PAGEALIGNED size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_supersyncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr);
+FUNDEF NOBLOCK void NOTHROW(FCALL vm_supersyncall)(void);
+
+#else /* !CONFIG_NO_SMP */
+#define this_vm_sync(addr, num_bytes) pagedir_sync(addr, num_bytes)
+#define this_vm_syncone(addr)         pagedir_syncone(addr)
+FUNDEF NOBLOCK void NOTHROW(FCALL this_vm_syncall)(void);
+#define vm_supersync(addr, num_bytes) pagedir_sync(addr, num_bytes)
+#define vm_supersyncone(addr)         pagedir_syncone(addr)
+#define vm_supersyncall()             pagedir_syncall()
+#endif /* CONFIG_NO_SMP */
+
 
 
 

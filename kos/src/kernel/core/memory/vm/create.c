@@ -78,7 +78,11 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	*(u8 *)result = 0;
 	COMPILER_WRITE_BARRIER();
 	/* Setup and initialize the VM's page directory. */
+#ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
+	result->v_pdir_phys = (PHYS pagedir_t *)(uintptr_t)pagedir_translate(result);
+#else /* ARCH_PAGEDIR_GETSET_USES_POINTER */
 	result->v_pdir_phys = pagedir_translate(result);
+#endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
 	result->v_refcnt    = 1;
 	assert(result->v_weakrefcnt == 1);
 	result->v_tree      = &result->v_kernreserve;

@@ -1757,7 +1757,7 @@ driver_disable_textrel(struct driver *__restrict self)
 	if (did_lock_kernel)
 		vm_kernel_treelock_endwrite();
 	if (must_sync_kernel)
-		vm_kernel_syncall();
+		vm_supersyncall();
 }
 
 

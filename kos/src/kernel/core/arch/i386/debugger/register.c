@@ -366,7 +366,7 @@ nocpu:
 	/* Account for register overrides related to some thread-local components. */
 	if (dbg_current->t_vm) {
 		struct vm *v = dbg_current->t_vm;
-		v->v_pdir_phys = (vm_phys_t)x86_dbg_origstate.fcs_coregs.co_cr3;
+		v->v_pdir_phys = (PHYS pagedir_t *)x86_dbg_origstate.fcs_coregs.co_cr3;
 		FORVM(v, thisvm_x86_dr0) = x86_dbg_origstate.fcs_drregs.dr_dr0;
 		FORVM(v, thisvm_x86_dr1) = x86_dbg_origstate.fcs_drregs.dr_dr1;
 		FORVM(v, thisvm_x86_dr2) = x86_dbg_origstate.fcs_drregs.dr_dr2;
@@ -531,7 +531,7 @@ nocpu:
 			/* Account for register overrides related to some thread-local components. */
 			if (dbg_current->t_vm) {
 				struct vm *v = dbg_current->t_vm;
-				x86_dbg_origstate.fcs_coregs.co_cr3 = (uintptr_t)v->v_pdir_phys_ptr;
+				x86_dbg_origstate.fcs_coregs.co_cr3 = (uintptr_t)v->v_pdir_phys;
 				x86_dbg_origstate.fcs_drregs.dr_dr0 = FORVM(v, thisvm_x86_dr0);
 				x86_dbg_origstate.fcs_drregs.dr_dr1 = FORVM(v, thisvm_x86_dr1);
 				x86_dbg_origstate.fcs_drregs.dr_dr2 = FORVM(v, thisvm_x86_dr2);
@@ -1015,17 +1015,17 @@ NOTHROW(KCALL dbg_setallregs)(unsigned int level,
 }
 
 /* Return the page directory of `dbg_current' */
-PUBLIC ATTR_PURE WUNUSED PAGEDIR_P_SELFTYPE
+PUBLIC ATTR_PURE WUNUSED pagedir_phys_t
 NOTHROW(KCALL dbg_getpagedir)(void) {
 	uintptr_t result;
 	result = x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW,
 	                             X86_REGISTER_CONTROL_CR3);
 #ifdef __INTELLISENSE__
-	PAGEDIR_P_SELFTYPE r;
+	pagedir_phys_t r;
 	r._m_self = (PHYS pagedir_t *)result;
 	return r;
 #else /* __INTELLISENSE__ */
-	return (PAGEDIR_P_SELFTYPE)result;
+	return (pagedir_phys_t)result;
 #endif /* !__INTELLISENSE__ */
 }
 

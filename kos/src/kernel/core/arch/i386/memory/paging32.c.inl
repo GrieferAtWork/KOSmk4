@@ -83,19 +83,17 @@ INTDEF byte_t __kernel_pervm_size[];
 /* Define the kernel VM */
 INTERN ATTR_SECTION(".data.pervm.head")
 struct vm vm_kernel_head = {
-	{
-		.v_pdir_phys_ptr = &pagedir_kernel_phys,
-	},
-	/* .v_refcnt     = */ 3,
-	/* .v_weakrefcnt = */ 1,
-	/* .v_tree       = */ NULL,
-	/* .v_byaddr     = */ NULL,
-	/* .v_heap_size  = */ (size_t)__kernel_pervm_size + PAGEDIR_SIZE,
-	/* .v_treelock   = */ ATOMIC_RWLOCK_INIT,
-	/* .v_tasks      = */ NULL,
-	/* .v_tasklock   = */ ATOMIC_RWLOCK_INIT,
-	/* .v_deltasks   = */ NULL,
-	/* .v_kernreserve = */ {
+	/* .v_pdir_phys     = */ pagedir_kernel_phys,
+	/* .v_refcnt        = */ 3,
+	/* .v_weakrefcnt    = */ 1,
+	/* .v_tree          = */ NULL,
+	/* .v_byaddr        = */ NULL,
+	/* .v_heap_size     = */ (size_t)__kernel_pervm_size + PAGEDIR_SIZE,
+	/* .v_treelock      = */ ATOMIC_RWLOCK_INIT,
+	/* .v_tasks         = */ NULL,
+	/* .v_tasklock      = */ ATOMIC_RWLOCK_INIT,
+	/* .v_deltasks      = */ NULL,
+	/* .v_kernreserve   = */ {
 		/* .vn_node   = */ { NULL,
 		                     NULL,
 		                     KERNELSPACE_MINPAGEID,

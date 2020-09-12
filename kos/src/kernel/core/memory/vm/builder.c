@@ -977,15 +977,15 @@ handle_remove_write_error:
 			if (target == THIS_VM)
 				pagedir_unmap_userspace_nosync();
 			else {
-				pagedir_unmap_userspace_nosync_p(PAGEDIR_P_SELFOFVM(target));
+				pagedir_unmap_userspace_nosync_p(target->v_pdir_phys);
 			}
 		} else
 #endif /* !CONFIG_NO_SMP */
 		{
 			if (target == THIS_VM)
-				pagedir_unmap_userspace(target);
+				pagedir_unmap_userspace();
 			else {
-				pagedir_unmap_userspace_p(PAGEDIR_P_SELFOFVM(target), target);
+				pagedir_unmap_userspace_p(target->v_pdir_phys);
 			}
 		}
 

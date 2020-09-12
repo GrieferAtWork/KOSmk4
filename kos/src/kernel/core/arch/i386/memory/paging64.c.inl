@@ -176,19 +176,17 @@ INTDEF byte_t __kernel_pervm_size[];
 /* Define the kernel VM */
 INTERN ATTR_SECTION(".data.pervm.head")
 struct vm vm_kernel_head = {
-	{
-		.v_pdir_phys_ptr = &pagedir_kernel_phys,
-	},
-	/* .v_refcnt     = */ 3,
-	/* .v_weakrefcnt = */ 1,
-	/* .v_tree       = */ NULL,
-	/* .v_byaddr     = */ NULL,
-	/* .v_heap_size  = */ (size_t)__kernel_pervm_size + PAGEDIR_SIZE,
-	/* .v_treelock   = */ ATOMIC_RWLOCK_INIT,
-	/* .v_tasks      = */ NULL,
-	/* .v_tasklock   = */ ATOMIC_RWLOCK_INIT,
-	/* .v_deltasks   = */ NULL,
-	/* .v_kernreserve = */ {
+	/* .v_pdir_phys     = */ pagedir_kernel_phys,
+	/* .v_refcnt        = */ 3,
+	/* .v_weakrefcnt    = */ 1,
+	/* .v_tree          = */ NULL,
+	/* .v_byaddr        = */ NULL,
+	/* .v_heap_size     = */ (size_t)__kernel_pervm_size + PAGEDIR_SIZE,
+	/* .v_treelock      = */ ATOMIC_RWLOCK_INIT,
+	/* .v_tasks         = */ NULL,
+	/* .v_tasklock      = */ ATOMIC_RWLOCK_INIT,
+	/* .v_deltasks      = */ NULL,
+	/* .v_kernreserve   = */ {
 		/* .vn_node   = */ { NULL,
 		                     NULL,
 		                     KERNELSPACE_MINPAGEID,
@@ -246,7 +244,7 @@ kernel_share_t __x86_pagedir_kernel_share = {};
  * according to `PAGEDIR_ALIGN' and `PAGEDIR_SIZE'. */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
-                                PHYS vm_phys_t phys_self) {
+                                PHYS u64 phys_self) {
 	/* Make sure that the page directory identity mapping is located at the proper position.
 	 * Note that this position is `KERNELSPACE_BASE + 512GiB', where KERNELSPACE_BASE is at `0xffff800000000000',
 	 * meaning that the identity mapping is at: `0xffff808000000000 ... 0xffff80ffffffffff'
@@ -270,24 +268,21 @@ NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
 
 
 /* Because we're omitting the `v_pagedir' field from the start of the VM, we have
- * to adjust for that fact when we're trying to access the `v_pdir_phys_ptr' field! */
+ * to adjust for that fact when we're trying to access the `v_pdir_phys' field! */
 #define VM_GET_V_PDIR_PHYS_PTR(x) \
-	(*(PHYS pagedir_t **)((byte_t *)(x) + sizeof(pagedir_t) + offsetof(struct vm, v_pdir_phys_ptr)))
+	(*(PHYS pagedir_t **)((byte_t *)(x) + sizeof(pagedir_t) + offsetof(struct vm, v_pdir_phys)))
 
 
 /* Finalize a given page directory. */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
-                                PHYS vm_phys_t phys_self) {
-#define NOT_SWITCHED ((PHYS pagedir_t *)-1)
+                                PHYS struct p64_pdir *phys_self) {
+#define NOT_SWITCHED ((PHYS uintptr_t)-1)
 	unsigned int vec4;
 	pflag_t was = 0;
-	PHYS pagedir_t *old_pagedir = NOT_SWITCHED;
+	PHYS uintptr_t old_cr3 = NOT_SWITCHED;
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
-	assertf(VM_GET_V_PDIR_PHYS_PTR(THIS_VM) == pagedir_get(),
-	        "Wrong page directory set (%p != %p)",
-	        VM_GET_V_PDIR_PHYS_PTR(THIS_VM), pagedir_get());
 	assertf((self->p_e4[257].p_word & ~(P64_PAGE_FACCESSED | P64_PAGE_FDIRTY)) ==
 	        ((u64)phys_self | P64_PAGE_FWRITE | P64_PAGE_FPRESENT),
 	        "Page directory does not contain a valid identity mapping\n"
@@ -302,10 +297,10 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 			unsigned int vec3;
 			/* Switch to the target page directory so we can make
 			 * use of its identity mapping in order to destroy it. */
-			if (old_pagedir == NOT_SWITCHED) {
-				was         = PREEMPTION_PUSHOFF();
-				old_pagedir = VM_GET_V_PDIR_PHYS_PTR(THIS_VM);
-				pagedir_set((pagedir_t *)(uintptr_t)phys_self);
+			if (old_cr3 == NOT_SWITCHED) {
+				was     = PREEMPTION_PUSHOFF();
+				old_cr3 = __rdcr3();
+				__wrcr3((uintptr_t)phys_self);
 			}
 			for (vec3 = 0; vec3 < 512; ++vec3) {
 				union p64_pdir_e3 e3;
@@ -327,8 +322,8 @@ NOTHROW(FCALL p64_pagedir_fini)(VIRT struct p64_pdir *__restrict self,
 			page_freeone(ppageof(e4.p_word & P64_PAGE_FVECTOR));
 		}
 	}
-	if (old_pagedir != NOT_SWITCHED) {
-		pagedir_set(old_pagedir);
+	if (old_cr3 != NOT_SWITCHED) {
+		__wrcr3(old_cr3);
 		PREEMPTION_POP(was);
 	}
 #undef NOT_SWITCHED
@@ -993,24 +988,6 @@ NOTHROW(FCALL p64_pagedir_unset_prepared)(union p64_pdir_e1 *__restrict e1_p
 }
 
 
-
-/* TODO: Syncing in vm_kernel is overkill here: it would be
- *       sufficient to only broadcast the IPI to CPUs where
- *       `CPU->c_vm->v_pdir_phys_ptr == pagedir_get()' (which
- *       is somewhat different from the `CPU->c_vm == THIS_VM'
- *       that would be done by `this_vm_sync()', so we'd need
- *       a dedicated (possibly arch-specific) syncing function)
- * Note though that we'd still need to broadcast to everyone
- * if the actual area being synced relates to kernel-space.
- * This could be determined by having the caller look at the
- * vec* indices they've been given. */
-#define SYNC_IDENTITY_PAGE(addr) \
-	vm_kernel_syncone(addr)
-#define SYNC_IDENTITY_PAGES(addr, num_bytes) \
-	vm_kernel_sync(addr, num_bytes)
-#define SYNC_IDENTITY_PAGES_ALL() \
-	vm_kernel_syncall()
-
 /* Called after an E1-vector was flattened into an E2-entry
  * that now resides at `P64_PDIR_E2_IDENTITY[vec4][vec3][vec2]' */
 PRIVATE NOBLOCK void
@@ -1022,7 +999,15 @@ NOTHROW(FCALL p64_pagedir_sync_flattened_e1_vector)(unsigned int vec4,
 	 * mapping _have_ changed:
 	 *     UNMAP(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][0..511])  (This is exactly 1 page)
 	 */
-	SYNC_IDENTITY_PAGE(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2]);
+	void *sync_pageaddr;
+	sync_pageaddr = P64_PDIR_E1_IDENTITY[vec4][vec3][vec2];
+	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
+		/* Sync as part of the kernel VM */
+		vm_supersyncone(sync_pageaddr);
+	} else {
+		/* Sync as part of the current page directory. */
+		pagedir_syncone_smp(sync_pageaddr);
+	}
 }
 
 /* Called after an E2-vector was flattened into an E3-entry
@@ -1031,20 +1016,35 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL p64_pagedir_sync_flattened_e2_vector)(unsigned int vec4,
                                                     unsigned int vec3) {
 #if 1 /* It's faster to just sync everything... */
-	(void)vec4;
 	(void)vec3;
-	SYNC_IDENTITY_PAGES_ALL();
+	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
+		vm_supersyncall();
+	} else {
+		pagedir_syncall_smp();
+	}
 #else
 	/* Even though the in-memory mapping of `P64_PDIR_VECADDR(vec4, vec3, 0..511, 0..511)'
 	 * didn't change, due to being flattened, the contents of our page directory identity
 	 * mapping _have_ changed:
 	 *     UNMAP(P64_PDIR_E2_IDENTITY[vec4][vec3][0..511])  (This is exactly 1 page)
 	 */
-	SYNC_IDENTITY_PAGE(P64_PDIR_E2_IDENTITY[vec4][vec3]);
-	/* Must also sync:
-	 * P64_PDIR_E1_IDENTITY[vec4][vec3][0..511][0..511] */
-	SYNC_IDENTITY_PAGES(P64_PDIR_E1_IDENTITY[vec4][vec3],
-	                    512 * 512 * 8);
+	void *sync_pageaddr;
+	sync_pageaddr = P64_PDIR_E2_IDENTITY[vec4][vec3];
+	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
+		/* Sync as part of the kernel VM */
+		vm_supersyncone(sync_pageaddr);
+		/* Must also sync:
+		 * P64_PDIR_E1_IDENTITY[vec4][vec3][0..511][0..511] */
+		vm_supersync(P64_PDIR_E1_IDENTITY[vec4][vec3],
+		               512 * 512 * 8);
+	} else {
+		/* Sync as part of the current page directory. */
+		pagedir_syncone_smp(sync_pageaddr);
+		/* Must also sync:
+		 * P64_PDIR_E1_IDENTITY[vec4][vec3][0..511][0..511] */
+		pagedir_sync_smp(P64_PDIR_E1_IDENTITY[vec4][vec3],
+		                      512 * 512 * 8);
+	}
 #endif
 }
 
@@ -1053,23 +1053,42 @@ NOTHROW(FCALL p64_pagedir_sync_flattened_e2_vector)(unsigned int vec4,
 PRIVATE NOBLOCK void
 NOTHROW(FCALL p64_pagedir_sync_flattened_e3_vector)(unsigned int vec4) {
 #if 1 /* It's faster to just sync everything... */
-	(void)vec4;
-	SYNC_IDENTITY_PAGES_ALL();
+	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
+		vm_supersyncall();
+	} else {
+		pagedir_syncall_smp();
+	}
 #else
 	/* Even though the in-memory mapping of `P64_PDIR_VECADDR(vec4, 0..511, 0..511, 0..511)'
 	 * didn't change, due to being flattened, the contents of our page directory identity
 	 * mapping _have_ changed:
 	 *     UNMAP(P64_PDIR_E3_IDENTITY[vec4][0..511])  (This is exactly 1 page)
 	 */
-	SYNC_IDENTITY_PAGE(P64_PDIR_E3_IDENTITY[vec4]);
-	/* Must also sync:
-	 * P64_PDIR_E2_IDENTITY[vec4][0..511][0..511] */
-	SYNC_IDENTITY_PAGES(P64_PDIR_E2_IDENTITY[vec4],
-	                    512 * 512 * 8);
-	/* Must also sync:
-	 * P64_PDIR_E1_IDENTITY[vec4][0..511][0..511][0..511] */
-	SYNC_IDENTITY_PAGES(P64_PDIR_E1_IDENTITY[vec4],
-	                    512 * 512 * 512 * 8);
+	void *sync_pageaddr;
+	sync_pageaddr = P64_PDIR_E3_IDENTITY[vec4];
+	if (vec4 >= P64_PDIR_VEC4INDEX(KERNELSPACE_BASE)) {
+		/* Sync as part of the kernel VM */
+		vm_supersyncone(sync_pageaddr);
+		/* Must also sync:
+		 * P64_PDIR_E2_IDENTITY[vec4][0..511][0..511] */
+		vm_supersync(P64_PDIR_E2_IDENTITY[vec4],
+		               512 * 512 * 8);
+		/* Must also sync:
+		 * P64_PDIR_E1_IDENTITY[vec4][0..511][0..511][0..511] */
+		vm_supersync(P64_PDIR_E1_IDENTITY[vec4],
+		               512 * 512 * 512 * 8);
+	} else {
+		/* Sync as part of the current page directory. */
+		pagedir_syncone_smp(sync_pageaddr);
+		/* Must also sync:
+		 * P64_PDIR_E2_IDENTITY[vec4][0..511][0..511] */
+		pagedir_sync_smp(P64_PDIR_E2_IDENTITY[vec4],
+		                      512 * 512 * 8);
+		/* Must also sync:
+		 * P64_PDIR_E1_IDENTITY[vec4][0..511][0..511][0..511] */
+		pagedir_sync_smp(P64_PDIR_E1_IDENTITY[vec4],
+		                      512 * 512 * 512 * 8);
+	}
 #endif
 }
 
@@ -2083,7 +2102,7 @@ NOTHROW(FCALL p64_pagedir_unwrite)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * NOTE: Unlike all other unmap() functions, this one guaranties that it
  *       can perform the task without needing to allocate more memory! */
 INTERN NOBLOCK void
-NOTHROW(FCALL p64_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
+NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 	unsigned int free_count = 0;
 	unsigned int vec4;
 	u64 free_pages[64];
@@ -2094,7 +2113,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
 			 * Otherwise, other CPUs may still be using the mappings after       \
 			 * they've already been re-designated as general-purpose RAM, at     \
 			 * which point they'd start reading garbage, or corrupt pointers. */ \
-			vm_syncall(sync_vm);                                                 \
+			pagedir_syncall_smp();                                               \
 			page_freeone(pageptr);                                               \
 			do {                                                                 \
 				--free_count;                                                    \
@@ -2134,7 +2153,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(struct vm *__restrict sync_vm) {
 	}
 	/* Free any remaining pages. */
 	if (free_count) {
-		vm_syncall(sync_vm);
+		pagedir_syncall_smp();
 		do {
 			--free_count;
 			page_freeone((pageptr_t)free_pages[free_count]);
@@ -2835,7 +2854,7 @@ DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
                  " or " AC_WHITE("user") " to select if " AC_WHITE("vm_kernel") "\n"
                  "\tor " AC_WHITE("THIS_VM") " should be dumped\n",
                  argc, argv) {
-	PAGEDIR_P_SELFTYPE pdir;
+	pagedir_phys_t pdir;
 	if (argc == 2) {
 		if (strcmp(argv[1], lspd_str_kernel) == 0)
 			goto do_ls_kernel;
@@ -2846,7 +2865,7 @@ DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
 	pdir = dbg_getpagedir();
-	if (PAGEDIR_P_ISKERNEL(pdir)) {
+	if (pdir == pagedir_kernel_phys) {
 do_ls_kernel:
 		p64_do_ldpd(512);
 		return 0;

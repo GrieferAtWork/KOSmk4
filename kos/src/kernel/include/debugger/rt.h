@@ -157,10 +157,10 @@ NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level) {
 #endif /* !ARCH_DEBUGGER_RT_HAVE_DBG_INSTRLEN_ISA */
 
 /* Return the page directory of `dbg_current' */
-FUNDEF ATTR_PURE WUNUSED PAGEDIR_P_SELFTYPE NOTHROW(KCALL dbg_getpagedir)(void);
+FUNDEF ATTR_PURE WUNUSED pagedir_phys_t NOTHROW(KCALL dbg_getpagedir)(void);
 
 /* Verify that the given page directory isn't corrupt. */
-FUNDEF ATTR_PURE WUNUSED bool NOTHROW(KCALL dbg_verifypagedir)(PAGEDIR_P_SELFTYPE pdir);
+FUNDEF ATTR_PURE WUNUSED bool NOTHROW(KCALL dbg_verifypagedir)(pagedir_phys_t pdir);
 
 /* Get/set memory in the context of `dbg_current'
  * NOTE: These functions will not make use of copy-on-write or lazy memory allocations,

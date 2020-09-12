@@ -22,14 +22,15 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/paging.h> /* pagedir_phys_t */
 #include <sched/arch/cpu.h>
 #include <sched/pertask.h>
 
 #include <hybrid/__bit.h>
+#include <hybrid/__overflow.h>
 #include <hybrid/typecore.h>
 
 #include <kos/kernel/types.h>
-#include <hybrid/__overflow.h>
 
 #include <stdbool.h>
 
@@ -109,12 +110,13 @@ struct vm;
 struct cpu {
 	cpuid_t          c_id;       /* The ID of this CPU. */
 #ifndef CONFIG_NO_SMP
-	WEAK struct vm  *c_vm;       /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
-	                              * The currently used VM. When `vm_sync()' is called, this field
-	                              * is checked for all configured CPUs, and if equal to the VM that
-	                              * is being synced, our CPU will receive an IPI, telling us that
-	                              * we need to (possibly partially) invalidate our VM caches.
-	                              * s.a. `vm_sync()', `pagedir_sync()' */
+	WEAK pagedir_phys_t
+	                 c_pdir;     /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
+	                              * The currently used page directory. When `vm_sync()' is called,
+	                              * this field is checked for all configured CPUs, and if equal to
+	                              * the VM that is being synced, our CPU will receive an IPI, telling
+	                              * us that we need to (possibly partially) invalidate our VM caches.
+	                              * s.a. `vm_sync()', `pagedir_sync_smp_p()', `pagedir_sync()' */
 #endif /* !CONFIG_NO_SMP */
 	REF struct task *c_current;  /* [1..1][lock(PRIVATE(THIS_CPU && PREEMPTION))]
 	                              * [CHAIN(->t_sched.s_running.sr_runnxt)]
@@ -431,8 +433,8 @@ DATDEF ATTR_PERCPU cpuid_t thiscpu_id;            /* ALIAS:THIS_CPU->c_id */
 DATDEF ATTR_PERCPU struct task *thiscpu_current;  /* ALIAS:THIS_CPU->c_current */
 DATDEF ATTR_PERCPU struct task *thiscpu_override; /* ALIAS:THIS_CPU->c_override */
 #ifndef CONFIG_NO_SMP
-DATDEF ATTR_PERCPU struct vm *thiscpu_vm;        /* ALIAS:THIS_CPU->c_vm */
-DATDEF ATTR_PERCPU struct task *thiscpu_pending; /* ALIAS:THIS_CPU->c_pending */
+DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir; /* ALIAS:THIS_CPU->c_pdir */
+DATDEF ATTR_PERCPU struct task *thiscpu_pending;    /* ALIAS:THIS_CPU->c_pending */
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -455,18 +457,20 @@ DATDEF ATTR_PERCPU struct task *thiscpu_pending; /* ALIAS:THIS_CPU->c_pending */
 
 #ifndef CONFIG_NO_SMP
 /* Set the current VM, and update the VM pointer of `self' */
-#define cpu_setvm_ex(mycpu, current_vm)                                  \
-	(__hybrid_atomic_store((mycpu)->c_vm, current_vm, __ATOMIC_RELEASE), \
-	 pagedir_set((current_vm)->v_pdir_phys_ptr))
+#define cpu_setvm_ex(mycpu, current_vm)               \
+	(__hybrid_atomic_store((mycpu)->c_pdir,           \
+	                       (current_vm)->v_pdir_phys, \
+	                       __ATOMIC_RELEASE),         \
+	 pagedir_set((current_vm)->v_pdir_phys))
 #define cpu_setvm(current_vm) cpu_setvm_ex(THIS_CPU, current_vm)
 
 /* Return the set of CPUs that are currently mapped to make use of `self'
  * Note that the returned set of CPUs is only a (possibly inconsistent)
  * snapshot, with the only guaranties being that:
  *   - If a CPU is apart of the returned cpuset, that CPU has at one point
- *     made use of the given vm `self'.
+ *     made use of the given page directory `self'.
  *   - If a CPU is not apart of the returned cpuset, that CPU may have since
- *     switched its VM to the given one. Note however that during this switch,
+ *     switched its pdir to the given one. Note however that during this switch,
  *     additional things may have also happened, such as the CPU invaliding
  *     its TLB cache (where is function is meant to be used to calculate the
  *     bounding set of CPUs that (may) need to have their page directories
@@ -476,24 +480,24 @@ DATDEF ATTR_PERCPU struct task *thiscpu_pending; /* ALIAS:THIS_CPU->c_pending */
  *          dedicated code-path that behaves as though this function had
  *          returned a completely filled cpuset. */
 #if CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER
-FUNDEF NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL vm_getcpus)(struct vm *__restrict self,
-                          cpuset_ptr_t result);
+FUNDEF NOBLOCK NONNULL((2)) void
+NOTHROW(FCALL pagedir_getcpus)(pagedir_phys_t self,
+                               cpuset_ptr_t result);
 #else /* CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER */
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) cpuset_t
-NOTHROW(FCALL __vm_getcpus)(struct vm *__restrict self)
-	ASMNAME("vm_getcpus");
-FORCELOCAL NOBLOCK NONNULL((1, 2)) void
-NOTHROW(FCALL vm_getcpus)(struct vm *__restrict self,
-                          cpuset_ptr_t result) {
-	*result = __vm_getcpus(self);
-}
+FUNDEF NOBLOCK WUNUSED cpuset_t
+NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
+	ASMNAME("pagedir_getcpus");
+#define pagedir_getcpus(self, result) (void)(*(result) = __pagedir_getcpus(self))
 #endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
+
+/* Return the set of CPUs using the page directory of the given VM. */
+#define vm_getcpus(self, result) pagedir_getcpus((self)->v_pdir_phys, result)
+
 #else /* !CONFIG_NO_SMP */
 
 /* Set the current VM, and update the VM pointer of `self' */
-#define cpu_setvm_ex(mycpu, current_vm) pagedir_set((current_vm)->v_pdir_phys_ptr)
-#define cpu_setvm(current_vm)           pagedir_set((current_vm)->v_pdir_phys_ptr)
+#define cpu_setvm_ex(mycpu, current_vm) pagedir_set((current_vm)->v_pdir_phys)
+#define cpu_setvm(current_vm)           pagedir_set((current_vm)->v_pdir_phys)
 
 #endif /* CONFIG_NO_SMP */
 

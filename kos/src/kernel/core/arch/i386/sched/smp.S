@@ -998,15 +998,19 @@ INTERN_FUNCTION(x86_smp_entry64)
 .Ldone_syscall:
 #endif /* __x86_64__ */
 
+	EXTERN(thiscpu_pdir)
+	EXTERN(pagedir_kernel_phys)
+	movP   $(pagedir_kernel_phys), thiscpu_pdir(R_CPU) /* Update the per-cpu current-pdir field. */
+
 	/* Load the VM of the target task. */
 	movP   this_vm(R_TASK), %Pcx
-	EXTERN(thiscpu_vm)
-	movP   %Pcx, thiscpu_vm(R_CPU) /* Update the per-cpu current-vm field. */
 	EXTERN(vm_kernel)
 	cmpP   $(vm_kernel), %Pcx
 	je     1f
-	EXTERN(thisvm_pdir_phys_ptr)
-	movP   thisvm_pdir_phys_ptr(%Pcx), %Pcx
+	EXTERN(thisvm_pdir_phys)
+	movP   thisvm_pdir_phys(%Pcx), %Pcx
+	EXTERN(thiscpu_pdir)
+	movP   %Pcx, thiscpu_pdir(R_CPU) /* Update the per-cpu current-pdir field. */
 	movP   %Pcx, %cr3
 1:
 	/* Set up tracing to appear as though we're nothing but an interrupt originating
