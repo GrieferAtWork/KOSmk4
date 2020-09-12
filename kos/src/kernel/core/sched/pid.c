@@ -580,21 +580,29 @@ task_setprocess(struct task *__restrict self,
 	} else {
 		REF struct taskpid *grouppid;
 		/* Add to an existing process group. */
-		group = task_getprocessgroupleader_srch_of(group);
-		TRY {
-			sync_write(&FORTASK(group, this_taskgroup).tg_pgrp_processes_lock);
-		} EXCEPT {
-			decref(group);
-			RETHROW();
+		grouppid = task_getprocessgroupleaderpid_of(group);
+		/* Take special care to properly handle joining a
+		 * process group where the leader has already died. */
+		group = taskpid_gettask(grouppid);
+		if (group) {
+			TRY {
+				sync_write(&FORTASK(group, this_taskgroup).tg_pgrp_processes_lock);
+			} EXCEPT {
+				decref_unlikely(group);
+				decref_unlikely(grouppid);
+				RETHROW();
+			}
+			/* Add the given thread to this process group! */
+			LLIST_INSERT_P(FORTASK(group, this_taskgroup).tg_pgrp_processes,
+			               self,
+			               PATH_this_taskgroup__tg_proc_group_siblings);
+			assert(grouppid == FORTASK(group, this_taskpid));
+			FORTASK(self, this_taskgroup).tg_proc_group = grouppid; /* Inherit reference */
+			sync_endwrite(&FORTASK(group, this_taskgroup).tg_pgrp_processes_lock);
+			decref_unlikely(group);
+		} else {
+			FORTASK(self, this_taskgroup).tg_proc_group = grouppid; /* Inherit reference */
 		}
-		/* Add the given thread to this process group! */
-		LLIST_INSERT_P(FORTASK(group, this_taskgroup).tg_pgrp_processes,
-		               self,
-		               PATH_this_taskgroup__tg_proc_group_siblings);
-		grouppid = incref(FORTASK(group, this_taskpid));
-		FORTASK(self, this_taskgroup).tg_proc_group = grouppid; /* Inherit reference */
-		sync_endwrite(&FORTASK(group, this_taskgroup).tg_pgrp_processes_lock);
-		decref_unlikely(group);
 	}
 	/* Now to bind the process's parent */
 	if (!parent || parent == self) {
