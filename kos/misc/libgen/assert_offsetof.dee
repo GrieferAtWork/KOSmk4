@@ -126,7 +126,7 @@ got_field:
 		} else {
 			l = l[struct_pos + #"struct":].lstrip();
 		}
-		if (struct_pos >= 0 && "-" !in origLine[:struct_pos]) {
+		if (struct_pos >= 0 && "-" !in origLine[:struct_pos] && "*" !in origLine[:struct_pos]) {
 			for (;;) {
 				local new_l = l;
 				for (local attr: { "__ATTR_PACKED", "ATTR_PACKED" })
