@@ -41,6 +41,7 @@
 #include <kernel/driver.h>
 #include <kernel/handle.h>
 #include <kernel/types.h>
+#include <sched/atomic64.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
@@ -139,68 +140,116 @@ handle_datasize(struct handle const *__restrict self,
 	pos_t value;
 	switch (self->h_type) {
 
-	case HANDLE_TYPE_DATABLOCK:
-		if (!vm_datablock_isinode((struct vm_datablock *)self->h_data))
+	case HANDLE_TYPE_DATABLOCK: {
+		struct inode *me;
+		me = (struct inode *)self->h_data;
+		if (!vm_datablock_isinode(me))
 			goto badtype;
-		inode_loadattr((struct inode *)self->h_data);
-		value = ATOMIC_READ(((struct inode *)self->h_data)->i_filesize);
-		break;
+		inode_loadattr(me);
+#ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
+		value = ATOMIC_READ(me->i_filesize);
+#else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+		{
+			SCOPED_READLOCK(me);
+			value = me->i_filesize;
+		}
+#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+	}	break;
 
-	case HANDLE_TYPE_BLOCKDEVICE:
-		value = ((pos_t)((struct basic_block_device *)self->h_data)->bd_sector_count *
-		         (pos_t)((struct basic_block_device *)self->h_data)->bd_sector_size);
-		break;
+	case HANDLE_TYPE_BLOCKDEVICE: {
+		struct basic_block_device *me;
+		me = (struct basic_block_device *)self->h_data;
+		value = ((pos_t)me->bd_sector_count *
+		         (pos_t)me->bd_sector_size);
+	}	break;
 
-	case HANDLE_TYPE_CHARACTERDEVICE:
-		return character_device_datasize((struct character_device *)self, presult);
+	case HANDLE_TYPE_CHARACTERDEVICE: {
+		struct character_device *me;
+		me = (struct character_device *)self->h_data;
+		return character_device_datasize(me, presult);
+	}	break;
 
-	case HANDLE_TYPE_DIRECTORYENTRY:
-		value = (pos_t)((struct directory_entry *)self->h_data)->de_namelen;
-		break;
+	case HANDLE_TYPE_DIRECTORYENTRY: {
+		struct directory_entry *me;
+		me = (struct directory_entry *)self->h_data;
+		value = (pos_t)me->de_namelen;
+	}	break;
 
 	case HANDLE_TYPE_FILE:
-	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE:
-		inode_loadattr(((struct file *)self->h_data)->f_node);
-		value = ATOMIC_READ(((struct file *)self->h_data)->f_node->i_filesize);
-		break;
+	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
+		struct file *me;
+		me = (struct file *)self->h_data;
+		inode_loadattr(me->f_node);
+#ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
+		value = ATOMIC_READ(me->f_node->i_filesize);
+#else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+		{
+			SCOPED_READLOCK(me->f_node);
+			value = me->f_node->i_filesize;
+		}
+#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+	}	break;
 
 	case HANDLE_TYPE_PATH: {
+		struct path *me;
 		REF struct inode *node;
-		sync_read(((struct path *)self->h_data));
-		node = (REF struct inode *)incref(((struct path *)self->h_data)->p_inode);
-		sync_endread(((struct path *)self->h_data));
+		me = (struct path *)self->h_data;
+		sync_read(me);
+		node = (REF struct inode *)incref(me->p_inode);
+		sync_endread(me);
 		FINALLY_DECREF_UNLIKELY(node);
 		inode_loadattr(node);
+#ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
 		value = ATOMIC_READ(node->i_filesize);
+#else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+		{
+			SCOPED_READLOCK(node);
+			value = node->i_filesize;
+		}
+#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 	}	break;
 
 	case HANDLE_TYPE_VM:
 		value = ((pos_t)(uintptr_t)-1) + 1;
 		break;
 
-	case HANDLE_TYPE_DRIVER:
-		value = (pos_t)(((struct driver *)self->h_data)->d_loadend -
-		                ((struct driver *)self->h_data)->d_loadstart);
-		break;
+	case HANDLE_TYPE_DRIVER: {
+		struct driver *me;
+		me    = (struct driver *)self->h_data;
+		value = (pos_t)(me->d_loadend -
+		                me->d_loadstart);
+	}	break;
 
-	case HANDLE_TYPE_PIPE:
-		value = (pos_t)ATOMIC_READ(((struct pipe *)self->h_data)->p_buffer.rb_avail);
-		break;
+	case HANDLE_TYPE_PIPE: {
+		struct pipe *me;
+		me    = (struct pipe *)self->h_data;
+		value = (pos_t)ATOMIC_READ(me->p_buffer.rb_avail);
+	}	break;
 
 	case HANDLE_TYPE_PIPE_READER:
-	case HANDLE_TYPE_PIPE_WRITER:
-		value = (pos_t)ATOMIC_READ(((struct pipe_reader *)self->h_data)->pr_pipe->p_buffer.rb_avail);
-		break;
+	case HANDLE_TYPE_PIPE_WRITER: {
+		struct pipe_reader *me;
+		me    = (struct pipe_reader *)self->h_data;
+		value = (pos_t)ATOMIC_READ(me->pr_pipe->p_buffer.rb_avail);
+	}	break;
 
-	case HANDLE_TYPE_PIDNS:
-		value = (pos_t)ATOMIC_READ(((struct pidns *)self->h_data)->pn_size);
-		break;
+	case HANDLE_TYPE_PIDNS: {
+		struct pidns *me;
+		me    = (struct pidns *)self->h_data;
+		value = (pos_t)ATOMIC_READ(me->pn_size);
+	}	break;
 
-	case HANDLE_TYPE_DRIVER_STATE:
-		value = (pos_t)((struct driver_state *)self->h_data)->ds_count;
-		break;
+	case HANDLE_TYPE_DRIVER_STATE: {
+		struct driver_state *me;
+		me    = (struct driver_state *)self->h_data;
+		value = (pos_t)me->ds_count;
+	}	break;
 
-		/* TODO: HANDLE_TYPE_FIFO_USER */
+	case HANDLE_TYPE_FIFO_USER: {
+		struct fifo_user *me;
+		me    = (struct fifo_user *)self->h_data;
+		value = (pos_t)ATOMIC_READ(me->fu_fifo->f_fifo.ff_buffer.rb_avail);
+	}	break;
 
 	default:
 badtype:

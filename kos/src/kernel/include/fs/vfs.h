@@ -30,6 +30,8 @@
 #include <kernel/handle.h>
 #endif /* !__INTELLISENSE__ */
 
+#include <sched/atomic64.h>
+
 #include <hybrid/__atomic.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -801,9 +803,17 @@ REF struct vfs *KCALL vfs_alloc(void) THROWS(E_BADALLOC);
 FUNDEF ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct vfs *KCALL
 vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC);
 
-
-
 #define CONFIG_FS_UMASK_DEFAULT   022 /* S_IWGRP|S_IWOTH */
+
+typedef union {
+	struct {
+		WEAK u32    f_atmask; /* File system operations mode mask (Set of negated `FS_MODE_F*'). */
+		WEAK u32    f_atflag; /* File system operations mode flags (Set of negated `FS_MODE_F*'). */
+	};
+	WEAK u64        f_mode;   /* File system operations mode. */
+	WEAK atomic64_t f_atom;   /* File system operations mode. */
+} fs_mask_t;
+
 
 struct fs {
 	WEAK refcnt_t        f_refcnt;               /* Reference counter. */
@@ -819,16 +829,10 @@ struct fs {
 	                                              * NOTE: All bits not masked by `0777' _MUST_ always be ZERO(0)! */
 	WEAK u32             f_lnkmax;               /* The max number of symbolic links allowed during resolution of a path.
 	                                              * This field defaults to `SYMLOOP_MAX'. */
+	fs_mask_t            f_mode;                 /* Filesystem mode */
 	/* TODO: Get rid of these 2. - Use uid/gid from cred instead! */
 	uid_t                f_fsuid;                /* Filesystem user ID */
 	gid_t                f_fsgid;                /* Filesystem group ID */
-	union ATTR_PACKED {
-		struct ATTR_PACKED {
-			WEAK u32 f_atmask; /* File system operations mode mask (Set of negated `FS_MODE_F*'). */
-			WEAK u32 f_atflag; /* File system operations mode flags (Set of negated `FS_MODE_F*'). */
-		};
-		WEAK u64 f_mode; /* File system operations mode. */
-	};
 };
 
 /* Destroy (and free) a given fs `self' */
@@ -921,29 +925,15 @@ DATDEF ATTR_PERTASK REF struct fs *this_fs;
 #define fs_getgid(f) (f)->f_fsgid
 
 LOCAL NOBLOCK WUNUSED fsmode_t
-NOTHROW(KCALL fs_getmode)(atflag_t flags) {
-	union ATTR_PACKED {
-		struct ATTR_PACKED {
-			u32 f_atmask; /* File system operations mode mask (Set of negated `FS_MODE_F*'). */
-			u32 f_atflag; /* File system operations mode flags (Set of negated `FS_MODE_F*'). */
-		};
-		u64 f_mode; /* File system operations mode. */
-	} mode;
-	mode.f_mode = __hybrid_atomic_load(THIS_FS->f_mode, __ATOMIC_ACQUIRE);
+NOTHROW(KCALL fs_getmode_for)(struct fs *__restrict self, atflag_t flags) {
+	fs_mask_t mode;
+	mode.f_mode = atomic64_read(&self->f_mode.f_atom);
 	return (flags & mode.f_atmask) | mode.f_atflag;
 }
 
 LOCAL NOBLOCK WUNUSED fsmode_t
-NOTHROW(KCALL fs_getmode_for)(struct fs *__restrict self, atflag_t flags) {
-	union ATTR_PACKED {
-		struct ATTR_PACKED {
-			u32 f_atmask; /* File system operations mode mask (Set of negated `FS_MODE_F*'). */
-			u32 f_atflag; /* File system operations mode flags (Set of negated `FS_MODE_F*'). */
-		};
-		u64 f_mode; /* File system operations mode. */
-	} mode;
-	mode.f_mode = __hybrid_atomic_load(self->f_mode, __ATOMIC_ACQUIRE);
-	return (flags & mode.f_atmask) | mode.f_atflag;
+NOTHROW(KCALL fs_getmode)(atflag_t flags) {
+	return fs_getmode_for(THIS_FS, flags);
 }
 
 

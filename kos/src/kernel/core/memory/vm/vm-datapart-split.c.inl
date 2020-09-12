@@ -399,8 +399,8 @@ again_lock_datapart:
 			size_t vm_node_reqcount = 0;
 			struct vm_node *iter;
 			for (i = 0; i < 2; ++i) {
-				for (iter       = i ? self->dp_srefs : self->dp_crefs;
-				     iter; iter = iter->vn_link.ln_next) {
+				for (iter = i ? self->dp_srefs : self->dp_crefs; iter;
+				     iter = iter->vn_link.ln_next) {
 					if (!wasdestroyed(iter->vn_vm)) {
 						assert(i ? (iter->vn_prot & VM_PROT_SHARED)
 						         : !(iter->vn_prot & VM_PROT_SHARED));
@@ -1134,24 +1134,20 @@ done_futex:
 
 	/* Update the datablock tree to include the split upper-half part. */
 	incref(result->dp_block);
-	if (self->dp_block->db_parts != VM_DATABLOCK_ANONPARTS) {
-		vm_parttree_remove(&self->dp_block->db_parts,
-		                   self->dp_tree.a_vmin);
-		self->dp_tree.a_vmax = self->dp_tree.a_vmin;
-		self->dp_tree.a_vmax += ((datapage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
-		vm_parttree_insert(&self->dp_block->db_parts, self);
-		vm_parttree_insert(&self->dp_block->db_parts, incref(result));
-		sync_endwrite(self->dp_block);
-	} else {
-#if 1
-		self->dp_tree.a_vmax = self->dp_tree.a_vmin;
-		self->dp_tree.a_vmax += ((datapage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
-#else
-		assert(self->dp_tree.a_vmin == 0);
-		self->dp_tree.a_vmax = ((datapage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
-		result->dp_tree.a_vmax -= result->dp_tree.a_vmin;
-		result->dp_tree.a_vmin = 0;
-#endif
+	{
+		datapage_t new_max_data_page;
+		new_max_data_page = self->dp_tree.a_vmin;
+		new_max_data_page += ((datapage_t)vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block)) - 1;
+		if (self->dp_block->db_parts != VM_DATABLOCK_ANONPARTS) {
+			vm_parttree_remove(&self->dp_block->db_parts,
+			                   self->dp_tree.a_vmin);
+			atomic64_write((atomic64_t *)&self->dp_tree.a_vmax, (u64)new_max_data_page);
+			vm_parttree_insert(&self->dp_block->db_parts, self);
+			vm_parttree_insert(&self->dp_block->db_parts, incref(result));
+			sync_endwrite(self->dp_block);
+		} else {
+			atomic64_write((atomic64_t *)&self->dp_tree.a_vmax, (u64)new_max_data_page);
+		}
 	}
 #ifndef NDEBUG
 	/* Validate that our new part size matches the expectations of all of our nodes! */

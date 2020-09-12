@@ -205,9 +205,9 @@ DEFINE_SYSCALL2(ssize_t, getcwd,
 	sync_endread(&f->f_pathlock);
 	mode = PATH_PRINT_MODE_INCTRAIL;
 #if PATH_PRINT_MODE_DOSPATH == FS_MODE_FDOSPATH
-	mode |= ATOMIC_READ(f->f_atflag) & PATH_PRINT_MODE_DOSPATH;
+	mode |= ATOMIC_READ(f->f_mode.f_atflag) & PATH_PRINT_MODE_DOSPATH;
 #else /* PATH_PRINT_MODE_DOSPATH == FS_MODE_FDOSPATH */
-	if (ATOMIC_READ(f->f_atflag) & FS_MODE_FDOSPATH)
+	if (ATOMIC_READ(f->f_mode.f_atflag) & FS_MODE_FDOSPATH)
 		mode |= PATH_PRINT_MODE_DOSPATH;
 #endif /* PATH_PRINT_MODE_DOSPATH != FS_MODE_FDOSPATH */
 	{
@@ -364,7 +364,7 @@ DEFINE_SYSCALL3(errno_t, mkdirat, fd_t, dirfd,
 	struct fs *f = THIS_FS;
 	REF struct path *p;
 	REF struct directory_node *dir, *result_dir;
-	fsmode_t fsmode = ATOMIC_READ(f->f_atflag);
+	fsmode_t fsmode = ATOMIC_READ(f->f_mode.f_atflag);
 	validate_readable(pathname, 1);
 	VALIDATE_FLAGSET(mode, 07777,
 	                 E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
@@ -406,7 +406,7 @@ DEFINE_SYSCALL2(errno_t, mkdir,
 	struct fs *f = THIS_FS;
 	REF struct path *p;
 	REF struct directory_node *dir, *result_dir;
-	fsmode_t fsmode = ATOMIC_READ(f->f_atflag);
+	fsmode_t fsmode = ATOMIC_READ(f->f_mode.f_atflag);
 	validate_readable(pathname, 1);
 	VALIDATE_FLAGSET(mode, 07777,
 	                 E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
@@ -509,7 +509,7 @@ DEFINE_SYSCALL1(errno_t, unlink, USER UNCHECKED char const *, pathname) {
 	validate_readable(pathname, 1);
 	/* Figure out what should actually be removed. */
 	remove_mode = (DIRECTORY_REMOVE_FREGULAR | DIRECTORY_REMOVE_FCHKACCESS);
-	fsmode      = ATOMIC_READ(f->f_atflag);
+	fsmode      = ATOMIC_READ(f->f_mode.f_atflag);
 	/* Ignore casing when matching files to be removed whilst in DOS-mode. */
 	if (fsmode & FS_MODE_FDOSPATH)
 		remove_mode |= DIRECTORY_REMOVE_FNOCASE;
@@ -546,7 +546,7 @@ DEFINE_SYSCALL1(errno_t, rmdir, USER UNCHECKED char const *, pathname) {
 	validate_readable(pathname, 1);
 	/* Figure out what should actually be removed. */
 	remove_mode = (DIRECTORY_REMOVE_FDIRECTORY | DIRECTORY_REMOVE_FCHKACCESS);
-	fsmode      = ATOMIC_READ(f->f_atflag) | FS_MODE_FIGNORE_TRAILING_SLASHES;
+	fsmode      = ATOMIC_READ(f->f_mode.f_atflag) | FS_MODE_FIGNORE_TRAILING_SLASHES;
 	/* Ignore casing when matching files to be removed whilst in DOS-mode. */
 	if (fsmode & FS_MODE_FDOSPATH)
 		remove_mode |= DIRECTORY_REMOVE_FNOCASE;
@@ -641,7 +641,7 @@ DEFINE_SYSCALL3(errno_t, symlinkat,
 	fsmode_t fsmode;
 	validate_readable(link_text, 1);
 	validate_readable(target_path, 1);
-	fsmode = ATOMIC_READ(f->f_atflag);
+	fsmode = ATOMIC_READ(f->f_mode.f_atflag);
 	p = path_traverse_at_recent(f,
 	                            (unsigned int)target_dirfd,
 	                            target_path,
@@ -687,7 +687,7 @@ DEFINE_SYSCALL2(errno_t, symlink,
 	fsmode_t fsmode;
 	validate_readable(link_text, 1);
 	validate_readable(target_path, 1);
-	fsmode = ATOMIC_READ(f->f_atflag);
+	fsmode = ATOMIC_READ(f->f_mode.f_atflag);
 	p = path_traverse_recent(f,
 	                         target_path,
 	                         &last_seg,
@@ -1142,7 +1142,7 @@ DEFINE_SYSCALL5(errno_t, mount,
                 USER UNCHECKED void const *, data) {
 	struct fs *f = THIS_FS;
 	fsmode_t fsmode;
-	fsmode = ATOMIC_READ(f->f_atflag) | FS_MODE_FIGNORE_TRAILING_SLASHES;
+	fsmode = ATOMIC_READ(f->f_mode.f_atflag) | FS_MODE_FIGNORE_TRAILING_SLASHES;
 	if (mountflags & MS_MOVE) {
 		REF struct path *source_path;
 		REF struct path *target_path;
@@ -1351,7 +1351,7 @@ DEFINE_SYSCALL2(errno_t, truncate,
 	node = path_traversefull(f,
 	                         pathname,
 	                         true,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -1374,7 +1374,7 @@ DEFINE_SYSCALL2(errno_t, truncate64,
 	node = path_traversefull(f,
 	                         pathname,
 	                         true,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -1488,7 +1488,7 @@ DEFINE_SYSCALL1(errno_t, chdir,
 	fsmode_t fsmode;
 again:
 	sync_read(&f->f_pathlock);
-	fsmode  = ATOMIC_READ(f->f_atflag);
+	fsmode  = ATOMIC_READ(f->f_mode.f_atflag);
 	root    = incref(f->f_root);
 	old_cwd = incref(f->f_cwd);
 	sync_endread(&f->f_pathlock);
@@ -1544,7 +1544,7 @@ DEFINE_SYSCALL1(errno_t, chroot,
 	struct fs *f = THIS_FS;
 	fsmode_t fsmode;
 again:
-	fsmode = ATOMIC_READ(f->f_atflag);
+	fsmode = ATOMIC_READ(f->f_mode.f_atflag);
 	sync_read(&f->f_pathlock);
 	old_root = incref(f->f_root);
 	cwd      = incref(f->f_cwd);
@@ -1641,7 +1641,7 @@ DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mod
 	node = path_traversefull(f,
 	                         filename,
 	                         true,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -1780,7 +1780,7 @@ DEFINE_SYSCALL3(errno_t, lchown32,
 	node = path_traversefull(f,
 	                         filename,
 	                         false,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -1811,7 +1811,7 @@ DEFINE_SYSCALL3(errno_t, lchown,
 	node = path_traversefull(f,
 	                         filename,
 	                         false,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -1838,7 +1838,7 @@ DEFINE_SYSCALL3(errno_t, chown32,
 	node = path_traversefull(f,
 	                         filename,
 	                         true,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -1869,7 +1869,7 @@ DEFINE_SYSCALL3(errno_t, chown,
 	node = path_traversefull(f,
 	                         filename,
 	                         true,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -1909,19 +1909,13 @@ DEFINE_SYSCALL1(mode_t, umask, mode_t, mode) {
 #ifdef __ARCH_WANT_SYSCALL_FSMODE
 DEFINE_SYSCALL1(uint64_t, fsmode, uint64_t, mode) {
 	struct fs *f = THIS_FS;
-	union {
-		struct ATTR_PACKED {
-			u32 f_atmask;
-			u32 f_atflag;
-		};
-		u64 f_mode;
-	} new_mode;
+	fs_mask_t new_mode;
 	new_mode.f_mode = mode;
 	new_mode.f_atmask &= ~FS_MODE_FALWAYS0MASK;
 	new_mode.f_atmask |= FS_MODE_FALWAYS1MASK;
 	new_mode.f_atflag &= ~FS_MODE_FALWAYS0FLAG;
 	new_mode.f_atflag |= FS_MODE_FALWAYS1FLAG;
-	return ATOMIC_XCH(f->f_mode, new_mode.f_mode);
+	return atomic64_xch(&f->f_mode.f_atom, new_mode.f_mode);
 }
 #endif /* __ARCH_WANT_SYSCALL_FSMODE */
 
@@ -2388,7 +2382,7 @@ system_lstat(USER UNCHECKED char const *filename,
 	node = path_traversefull(f,
 	                         filename,
 	                         false,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -2408,7 +2402,7 @@ system_stat(USER UNCHECKED char const *filename,
 	node = path_traversefull(f,
 	                         filename,
 	                         true,
-	                         ATOMIC_READ(f->f_atflag),
+	                         ATOMIC_READ(f->f_mode.f_atflag),
 	                         NULL,
 	                         NULL,
 	                         NULL,
@@ -2929,7 +2923,7 @@ DEFINE_SYSCALL4(ssize_t, readlinkat,
 	                                                            (unsigned int)dirfd,
 	                                                            filename,
 	                                                            false,
-	                                                            ATOMIC_READ(f->f_atflag),
+	                                                            ATOMIC_READ(f->f_mode.f_atflag),
 	                                                            NULL,
 	                                                            NULL,
 	                                                            NULL,
@@ -2963,7 +2957,7 @@ DEFINE_SYSCALL3(ssize_t, readlink,
 	link_node = (REF struct symlink_node *)path_traversefull(f,
 	                                                         filename,
 	                                                         false,
-	                                                         ATOMIC_READ(f->f_atflag),
+	                                                         ATOMIC_READ(f->f_mode.f_atflag),
 	                                                         NULL,
 	                                                         NULL,
 	                                                         NULL,
@@ -3693,7 +3687,7 @@ get_superblock_from_path(USER CHECKED char const *filename) {
 	                         filename,
 	                         true,
 	                         /* Ignore trailing slashes to allow stat() with dir-like paths. */
-	                         f->f_atflag | FS_MODE_FIGNORE_TRAILING_SLASHES,
+	                         f->f_mode.f_atflag | FS_MODE_FIGNORE_TRAILING_SLASHES,
 	                         NULL,
 	                         NULL,
 	                         NULL,

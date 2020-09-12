@@ -658,5 +658,8 @@
 #endif /* !... */
 #endif /* __CC__ */
 
+#ifdef __KOS_SYSTEM_HEADERS__
+#include <asm/__stdinc.h>
+#endif /* __KOS_SYSTEM_HEADERS__ */
 
 #endif /* !___STDINC_H */

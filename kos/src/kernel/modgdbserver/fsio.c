@@ -341,7 +341,7 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 			                    filename,
 			                    &last_seg,
 			                    &last_seglen,
-			                    ATOMIC_READ(GDBFs.fi_fs->f_mode),
+			                    ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
 			                    NULL);
 			{
 				FINALLY_DECREF(dir);
@@ -375,7 +375,7 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 			node = path_traversefull(GDBFs.fi_fs,
 			                         filename,
 			                         true,
-			                         ATOMIC_READ(GDBFs.fi_fs->f_mode),
+			                         ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
 			                         NULL,
 			                         NULL,
 			                         NULL,
@@ -457,7 +457,7 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
 		                  filename,
 		                  &last_seg,
 		                  &last_seglen,
-		                  ATOMIC_READ(GDBFs.fi_fs->f_mode),
+		                  ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
 		                  NULL);
 		{
 			FINALLY_DECREF_UNLIKELY(p);
@@ -498,7 +498,7 @@ NOTHROW(KCALL GDBFs_Readlink)(char *filename,
 		link_node = (REF struct symlink_node *)path_traversefull(GDBFs.fi_fs,
 		                                                         filename,
 		                                                         false,
-		                                                         ATOMIC_READ(GDBFs.fi_fs->f_atflag),
+		                                                         ATOMIC_READ(GDBFs.fi_fs->f_mode.f_atflag),
 		                                                         NULL,
 		                                                         NULL,
 		                                                         NULL,

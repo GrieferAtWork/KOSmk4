@@ -209,8 +209,8 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 			 * NOTE: Because we're the ones creating it, we don't have to look
 			 *       out for splitting parts, or anything in that manner. */
 			info->pv_buf[0].pn_part = vm_paged_datablock_createpart(data,
-			                                                  data_start_vpage,
-			                                                  num_pages);
+			                                                        data_start_vpage,
+			                                                        num_pages);
 			/* The caller wants us to give them some write-lock, so let's given them one! */
 			shared_rwlock_init_write(&info->pv_buf[0].pn_part->dp_lock);
 			TRY {
@@ -241,15 +241,12 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 			vm_datapart_decref_and_merge(part);
 			RETHROW();
 		}
-#define vm_datapart_numvpages_atomic(self)                                           \
-	((size_t)((ATOMIC_READ((self)->dp_tree.a_vmax) - (self)->dp_tree.a_vmin) + 1) >> \
-	 VM_DATABLOCK_PAGESHIFT((self)->dp_block))
 		/* Load additional parts which may span the specified range. */
 		total_pages = vm_datapart_numvpages_atomic(part);
 		while (total_pages < num_pages) {
 			part = vm_paged_datablock_locatepart_exact(data,
-			                                     data_start_vpage + total_pages,
-			                                     num_pages - total_pages);
+			                                           data_start_vpage + total_pages,
+			                                           num_pages - total_pages);
 			TRY {
 				partnode_pair_vector_addpart(info, part);
 			} EXCEPT {

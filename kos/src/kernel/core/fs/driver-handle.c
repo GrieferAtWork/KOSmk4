@@ -100,11 +100,14 @@ handle_driver_getstring0(USER UNCHECKED void *arg,
 	USER CHECKED struct hop_driver_string *data;
 	data = (USER CHECKED struct hop_driver_string *)arg;
 	validate_writable(data, sizeof(*data));
-	struct_size = ATOMIC_READ(data->ds_struct_size);
+	COMPILER_READ_BARRIER();
+	struct_size = data->ds_struct_size;
+	COMPILER_READ_BARRIER();
 	if (struct_size != sizeof(*data))
 		THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
 	COMPILER_WRITE_BARRIER();
-	index = ATOMIC_READ(data->ds_index);
+	index = data->ds_index;
+	COMPILER_READ_BARRIER();
 	if unlikely(index != 0) {
 		THROW(E_INVALID_ARGUMENT_RESERVED_ARGUMENT,
 		      E_INVALID_ARGUMENT_CONTEXT_HOP_DRIVER_GETSTRING0,
@@ -130,7 +133,9 @@ handle_driver_hop(struct driver *__restrict self,
 		USER CHECKED struct hop_driver_stat *data;
 		data = (USER CHECKED struct hop_driver_stat *)arg;
 		validate_readwrite(data, sizeof(*data));
-		struct_size = ATOMIC_READ(data->ds_struct_size);
+		COMPILER_READ_BARRIER();
+		struct_size = data->ds_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
 		COMPILER_WRITE_BARRIER();
@@ -180,11 +185,14 @@ handle_driver_hop(struct driver *__restrict self,
 		USER CHECKED struct hop_driver_string *data;
 		data = (USER CHECKED struct hop_driver_string *)arg;
 		validate_readwrite(data, sizeof(*data));
-		struct_size = ATOMIC_READ(data->ds_struct_size);
+		COMPILER_READ_BARRIER();
+		struct_size = data->ds_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
 		COMPILER_WRITE_BARRIER();
-		index = ATOMIC_READ(data->ds_index);
+		index = data->ds_index;
+		COMPILER_READ_BARRIER();
 		if unlikely(index >= (u64)self->d_argc) {
 			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
 			      (intptr_t)(uintptr_t)index,
@@ -216,7 +224,9 @@ handle_driver_hop(struct driver *__restrict self,
 		USER CHECKED struct hop_driver_open_dependency *data;
 		data = (USER CHECKED struct hop_driver_open_dependency *)arg;
 		validate_readable(data, sizeof(*data));
-		struct_size = ATOMIC_READ(data->dod_struct_size);
+		COMPILER_READ_BARRIER();
+		struct_size = data->dod_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
 		require(CAP_DRIVER_QUERY);
@@ -268,7 +278,9 @@ handle_driver_state_hop(struct driver_state *__restrict self,
 		USER CHECKED u64 *dest;
 		dest = (USER CHECKED u64 *)arg;
 		validate_writable(dest, sizeof(*dest));
-		ATOMIC_WRITE(*dest, (u64)self->ds_count);
+		COMPILER_READ_BARRIER();
+		*dest = (u64)self->ds_count;
+		COMPILER_READ_BARRIER();
 	}	break;
 
 	case HOP_DRIVER_STATE_GET_DRIVER: {
@@ -278,7 +290,9 @@ handle_driver_state_hop(struct driver_state *__restrict self,
 		USER CHECKED struct hop_driver_open_dependency *data;
 		data = (USER CHECKED struct hop_driver_open_dependency *)arg;
 		validate_readable(data, sizeof(*data));
-		struct_size = ATOMIC_READ(data->dod_struct_size);
+		COMPILER_READ_BARRIER();
+		struct_size = data->dod_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(*data))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(*data), struct_size);
 		require(CAP_DRIVER_QUERY);

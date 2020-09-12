@@ -196,25 +196,17 @@ struct vm_datapart {
 	struct shared_rwlock     dp_lock;   /* Lock for this data part.
 	                                     * NOTE: A shared lock is used, so-as to allow for preemption when
 	                                     *       this lock is held for the purposes of DMA initialization. */
-	union ATTR_PACKED {
-		struct ATTR_PACKED {
+	union {
+		struct {
 			struct vm_datapart *a_min;      /* [0..1] Lower node. */
 			struct vm_datapart *a_max;      /* [0..1] Upper node. */
-			union ATTR_PACKED {
+			union {
 				uintptr_t       a_vmin_ptr; /* Lower bound. */
-#ifdef __INTELLISENSE__
-				struct { datapage_t a_vmin; /* Lower bound. */ };
-#else /* __INTELLISENSE__ */
 				datapage_t      a_vmin;     /* Lower bound. */
-#endif /* !__INTELLISENSE__ */
 			};
-			union ATTR_PACKED {
+			union {
 				uintptr_t       a_vmax_ptr; /* Upper bound. */
-#ifdef __INTELLISENSE__
-				struct { datapage_t a_vmax; /* Upper bound. */ };
-#else /* __INTELLISENSE__ */
 				datapage_t      a_vmax;     /* Upper bound. */
-#endif /* !__INTELLISENSE__ */
 			};
 		}                              dp_tree_ptr;
 		ATREE_NODE(struct vm_datapart, datapage_t)
@@ -400,37 +392,55 @@ __DEFINE_SYNC_POLL(struct vm_datapart,
  * NOTE: The caller must be holding a read-lock on `self', or `self' must not be shared.
  * DATA-PAGES: Usually same as `virt-pages', but often 512-bytes large for files.
  * VIRT-PAGES: Same as `pageid_t' (PAGESIZE-bytes large) */
-NOBLOCK size_t NOTHROW(KCALL vm_datapart_numbytes)(struct vm_datapart const *__restrict self);  /* TODO: Fix-up users of this macro that cast the return value to u64 */
-NOBLOCK size_t NOTHROW(KCALL vm_datapart_numdpages)(struct vm_datapart const *__restrict self); /* TODO: Fix-up users of this macro that cast the return value to u64 */
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numbytes)(struct vm_datapart const *__restrict self);
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numbytes_atomic)(struct vm_datapart const *__restrict self);
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numdpages)(struct vm_datapart const *__restrict self);
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numdpages_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK size_t NOTHROW(KCALL vm_datapart_numvpages)(struct vm_datapart const *__restrict self);
+NOBLOCK size_t NOTHROW(KCALL vm_datapart_numvpages_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_minbyte)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_mindpage)(struct vm_datapart const *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_minvpage)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_maxbyte)(struct vm_datapart const *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_maxbyte_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_maxdpage)(struct vm_datapart const *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_maxdpage_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_maxvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_maxvpage_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_startbyte)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_startdpage)(struct vm_datapart const *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_startvpage)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_endbyte)(struct vm_datapart const *__restrict self);
+NOBLOCK pos_t NOTHROW(KCALL vm_datapart_endbyte_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_enddpage)(struct vm_datapart const *__restrict self);
+NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_enddpage_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage_atomic)(struct vm_datapart const *__restrict self);
 #else /* __INTELLISENSE__ */
-#define vm_datapart_numbytes(self)   ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
-#define vm_datapart_numdpages(self)  ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1))
-#define vm_datapart_numvpages(self)  ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
-#define vm_datapart_minbyte(self)    ((pos_t)(self)->dp_tree.a_vmin << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
-#define vm_datapart_mindpage(self)   ((datapage_t)(self)->dp_tree.a_vmin)
-#define vm_datapart_minvpage(self)   ((vm_vpage64_t)(self)->dp_tree.a_vmin >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
-#define vm_datapart_maxbyte(self)    ((((pos_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
-#define vm_datapart_maxdpage(self)   ((datapage_t)(self)->dp_tree.a_vmax)
-#define vm_datapart_maxvpage(self)   ((vm_vpage64_t)((self)->dp_tree.a_vmax >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
-#define vm_datapart_startbyte(self)  vm_datapart_minbyte(self)
-#define vm_datapart_startdpage(self) vm_datapart_mindpage(self)
-#define vm_datapart_startvpage(self) vm_datapart_minvpage(self)
-#define vm_datapart_endbyte(self)    (((pos_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
-#define vm_datapart_enddpage(self)   ((datapage_t)(self)->dp_tree.a_vmax + 1)
-#define vm_datapart_endvpage(self)   (vm_datapart_maxvpage(self) + 1)
+#define vm_datapart_numbytes(self)         ((size_t)((vm_datapart_maxdpage(self) - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_numbytes_atomic(self)  ((size_t)((vm_datapart_maxdpage_atomic(self) - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_numdpages(self)        ((size_t)((vm_datapart_maxdpage(self) - (self)->dp_tree.a_vmin) + 1))
+#define vm_datapart_numdpages_atomic(self) ((size_t)((vm_datapart_maxdpage_atomic(self) - (self)->dp_tree.a_vmin) + 1))
+#define vm_datapart_numvpages(self)        ((size_t)((vm_datapart_maxdpage(self) - (self)->dp_tree.a_vmin) + 1) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
+#define vm_datapart_numvpages_atomic(self) ((size_t)((vm_datapart_maxdpage_atomic(self) - (self)->dp_tree.a_vmin) + 1) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
+#define vm_datapart_minbyte(self)          ((pos_t)(self)->dp_tree.a_vmin << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_mindpage(self)         ((datapage_t)(self)->dp_tree.a_vmin)
+#define vm_datapart_minvpage(self)         ((vm_vpage64_t)(self)->dp_tree.a_vmin >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
+#define vm_datapart_maxbyte(self)          ((((pos_t)vm_datapart_maxdpage(self) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
+#define vm_datapart_maxbyte_atomic(self)   ((((pos_t)vm_datapart_maxdpage_atomic(self) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
+#define vm_datapart_maxdpage(self)         (self)->dp_tree.a_vmax
+#define vm_datapart_maxdpage_atomic(self)  atomic64_read((atomic64_t *)&(self)->dp_tree.a_vmax)
+#define vm_datapart_maxvpage(self)         ((vm_vpage64_t)(vm_datapart_maxdpage(self) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
+#define vm_datapart_maxvpage_atomic(self)  ((vm_vpage64_t)(vm_datapart_maxdpage_atomic(self) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
+#define vm_datapart_startbyte(self)        vm_datapart_minbyte(self)
+#define vm_datapart_startdpage(self)       vm_datapart_mindpage(self)
+#define vm_datapart_startvpage(self)       vm_datapart_minvpage(self)
+#define vm_datapart_endbyte(self)          (((pos_t)vm_datapart_maxdpage(self) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_endbyte_atomic(self)   (((pos_t)vm_datapart_maxdpage_atomic(self) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_enddpage(self)         (vm_datapart_maxdpage(self) + 1)
+#define vm_datapart_enddpage_atomic(self)  (vm_datapart_maxdpage_atomic(self) + 1)
+#define vm_datapart_endvpage(self)         (vm_datapart_maxvpage(self) + 1)
+#define vm_datapart_endvpage_atomic(self)  (vm_datapart_maxvpage_atomic(self) + 1)
 #endif /* !__INTELLISENSE__ */
 
 

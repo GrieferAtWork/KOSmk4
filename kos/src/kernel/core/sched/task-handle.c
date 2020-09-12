@@ -96,7 +96,10 @@ handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd,
 			ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
 		} else {
 			struct timespec timeout, *ptimeout = NULL;
-			uint64_t timeout_sec = ATOMIC_READ(data->tj_reltimeout_sec);
+			uint64_t timeout_sec;
+			COMPILER_READ_BARRIER();
+			timeout_sec = data->tj_reltimeout_sec;
+			COMPILER_READ_BARRIER();
 			if (timeout_sec != 0 && timeout_sec != (uint64_t)-1) {
 				timeout = realtime();
 				timeout.tv_sec += timeout_sec;

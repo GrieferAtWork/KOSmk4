@@ -212,9 +212,7 @@ struct taskgroup {
 	/* All of the following fields are only valid when `tg_proc_group == THIS_TASKPID' (Otherwise, they are all `[0..1][const]') */
 	struct atomic_rwlock         tg_pgrp_processes_lock; /* Lock for `tg_pgrp_processes' */
 	LLIST(WEAK struct task)      tg_pgrp_processes;      /* [0..1] Chain of processes within this process group (excluding the calling process)
-	                                                      * NOTE: This list of processes is chained using the `tg_proc_group_siblings' list node.
-	                                                      * NOTE: This chain is set to `TASKGROUP_TG_PGRP_PROCESSES_TERMINATED' to prevent any
-	                                                      *       new processes from being added to the process group. */
+	                                                      * NOTE: This list of processes is chained using the `tg_proc_group_siblings' list node. */
 	struct atomic_rwlock         tg_pgrp_session_lock;   /* Lock for `tg_pgrp_session' */
 	REF struct taskpid          *tg_pgrp_session;        /* [1..1][const_if(== THIS_TASKPID)][lock(tg_pgrp_session_lock)]
 	                                                      * @assume(tg_pgrp_session == FORTASK(taskpid_gettask(tg_pgrp_session), this_taskgroup).tg_pgrp_session)

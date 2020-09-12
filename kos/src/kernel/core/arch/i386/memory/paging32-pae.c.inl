@@ -676,7 +676,7 @@ NOTHROW(FCALL pae_pagedir_isprepared)(VIRT void *addr) {
 	if unlikely(word & PAE_PAGE_F2MIB)
 		return false; /* 2MiB page */
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
-	word = ATOMIC_READ(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word);
+	word = ATOMIC_READ64_ALLOW_CORRUPT(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word);
 	return word & PAE_PAGE_FPREPARED || PAE_PDIR_E1_ISHINT(word);
 }
 #define assert_prepared_if(cond, addr, num_bytes) \

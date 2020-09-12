@@ -100,8 +100,16 @@ typedef u64 atomic64_t;
 	__hybrid_atomic_cmpxch(__atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
 /* Atomically compare-exchange a 64-bit data word from `self' */
+#define atomic64_cmpxch_weak(self, oldval, newval) \
+	__hybrid_atomic_cmpxch_weak(__atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+
+/* Atomically compare-exchange a 64-bit data word from `self' */
 #define atomic64_cmpxch_val(self, oldval, newval) \
 	__hybrid_atomic_cmpxch_val(__atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
+
+/* Atomically compare-exchange a 64-bit data word from `self' */
+#define atomic64_cmpxch_val_weak(self, oldval, newval) \
+	__hybrid_atomic_cmpxch_val_weak(__atomic64_val(*(self)), oldval, newval, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 
 /* Atomically exchange a 64-bit data word from `self' */
 #define atomic64_xch(self, value) \
@@ -164,6 +172,15 @@ FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchxor)(atomic64_t *__restrict self, u64 value);
 #endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 #endif /* !ARCH_ATOMIC64_HAVE_PROTOTYPES */
+
+#ifndef atomic64_cmpxch_weak
+#define atomic64_cmpxch_weak atomic64_cmpxch
+#endif /* !atomic64_cmpxch_weak */
+
+#ifndef atomic64_cmpxch_weak_val
+#define atomic64_cmpxch_weak_val atomic64_cmpxch_val
+#endif /* !atomic64_cmpxch_weak_val */
+
 
 #endif /* __CC__ */
 

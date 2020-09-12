@@ -86,7 +86,7 @@ handle_file_read(struct file *__restrict self,
 	size_t result;
 	TRY {
 		do {
-			old_pos = ATOMIC_READ(self->f_offset);
+			old_pos = (pos_t)atomic64_read(&self->f_offset);
 #ifndef CONFIG_BLOCKING_REGULAR_FILE_READ
 			result  = inode_read(self->f_node, dst, num_bytes, old_pos);
 #else /* !CONFIG_BLOCKING_REGULAR_FILE_READ */
@@ -94,7 +94,10 @@ handle_file_read(struct file *__restrict self,
 			         ? inode_read(self->f_node, dst, num_bytes, old_pos)
 			         : inode_read_blocking(self->f_node, dst, num_bytes, old_pos);
 #endif /* CONFIG_BLOCKING_REGULAR_FILE_READ */
-		} while (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result);
+		} while (unlikely(!atomic64_cmpxch(&self->f_offset,
+		                                   (u64)old_pos,
+		                                   (u64)old_pos + result)) &&
+		         result != 0);
 	} EXCEPT {
 		translate_read_exceptions(self);
 		RETHROW();
@@ -110,11 +113,17 @@ handle_file_write(struct file *__restrict self,
 	pos_t old_pos, dst_pos;
 	inode_loadattr(self->f_node);
 	do {
-		old_pos = ATOMIC_READ(self->f_offset);
+		old_pos = (pos_t)atomic64_read(&self->f_offset);
 		/* TODO: This implementation of `IO_APPEND' isn't thread-safe! */
-		dst_pos = mode & IO_APPEND ? ATOMIC_READ(self->f_node->i_filesize) : old_pos;
+		dst_pos = mode & IO_APPEND
+		          ? self->f_node->i_filesize
+		          : old_pos;
+		COMPILER_READ_BARRIER();
 		inode_write(self->f_node, src, num_bytes, dst_pos);
-	} while (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, dst_pos + num_bytes)) && num_bytes);
+	} while (unlikely(!atomic64_cmpxch(&self->f_offset,
+	                                   (u64)old_pos,
+	                                   (u64)dst_pos + num_bytes)) &&
+	         num_bytes != 0);
 	return num_bytes;
 }
 
@@ -159,7 +168,7 @@ handle_file_readv(struct file *__restrict self,
 	size_t result;
 	TRY {
 		do {
-			old_pos = ATOMIC_READ(self->f_offset);
+			old_pos = (pos_t)atomic64_read(&self->f_offset);
 #ifndef CONFIG_BLOCKING_REGULAR_FILE_READ
 			result  = inode_readv(self->f_node, dst, num_bytes, old_pos);
 #else /* !CONFIG_BLOCKING_REGULAR_FILE_READ */
@@ -167,7 +176,10 @@ handle_file_readv(struct file *__restrict self,
 			         ? inode_readv(self->f_node, dst, num_bytes, old_pos)
 			         : inode_readv_blocking(self->f_node, dst, num_bytes, old_pos);
 #endif /* CONFIG_BLOCKING_REGULAR_FILE_READ */
-		} while (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, old_pos + result)) && result);
+		} while (unlikely(!atomic64_cmpxch(&self->f_offset,
+		                                   (u64)old_pos,
+		                                   (u64)old_pos + result)) &&
+		         result != 0);
 	} EXCEPT {
 		translate_read_exceptions(self);
 		RETHROW();
@@ -183,11 +195,17 @@ handle_file_writev(struct file *__restrict self,
 	pos_t old_pos, dst_pos;
 	inode_loadattr(self->f_node);
 	do {
-		old_pos = ATOMIC_READ(self->f_offset);
+		old_pos = (pos_t)atomic64_read(&self->f_offset);
 		/* TODO: This implementation of `IO_APPEND' isn't thread-safe! */
-		dst_pos = mode & IO_APPEND ? ATOMIC_READ(self->f_node->i_filesize) : old_pos;
+		dst_pos = mode & IO_APPEND
+		          ? self->f_node->i_filesize
+		          : old_pos;
+		COMPILER_READ_BARRIER();
 		inode_writev(self->f_node, src, num_bytes, dst_pos);
-	} while (unlikely(!ATOMIC_CMPXCH(self->f_offset, old_pos, dst_pos + num_bytes)) && num_bytes);
+	} while (unlikely(!atomic64_cmpxch(&self->f_offset,
+	                                   (u64)old_pos,
+	                                   (u64)dst_pos + num_bytes)) &&
+	         num_bytes != 0);
 	return num_bytes;
 }
 
@@ -228,7 +246,7 @@ handle_file_seek(struct file *__restrict self,
                  unsigned int whence) {
 	pos_t oldpos, newpos;
 	do {
-		oldpos = ATOMIC_READ(self->f_offset);
+		oldpos = (pos_t)atomic64_read(&self->f_offset);
 		switch (whence) {
 
 		case SEEK_SET:
@@ -254,7 +272,9 @@ handle_file_seek(struct file *__restrict self,
 			      whence);
 			break;
 		}
-	} while (!ATOMIC_CMPXCH(self->f_offset, oldpos, newpos));
+	} while (!atomic64_cmpxch(&self->f_offset,
+	                          (u64)oldpos,
+	                          (u64)newpos));
 	return newpos;
 }
 
@@ -333,11 +353,12 @@ handle_file_readdir(struct file *__restrict self,
 		      E_FILESYSTEM_NOT_A_DIRECTORY_READDIR);
 again:
 	for (;;) {
-		dirpos = ATOMIC_READ(self->f_offset);
+		dirpos = (pos_t)atomic64_read(&self->f_offset);
 		if (dirpos < (pos_t)2) {
 			if (readdir_mode & READDIR_SKIPREL) {
 				/* Skip special entries. */
-				ATOMIC_CMPXCH_WEAK(self->f_offset, dirpos, 2);
+				atomic64_cmpxch_weak(&self->f_offset,
+				                     (u64)dirpos, 2);
 				continue;
 			}
 			/* Emit special entries. */
@@ -365,7 +386,9 @@ again:
 						 * >> Skip the parent directory. */
 						assert(dirpos == (pos_t)1);
 						assert(req_index == (pos_t)2);
-						ATOMIC_CMPXCH(self->f_offset, dirpos, req_index);
+						atomic64_cmpxch(&self->f_offset,
+						                (u64)dirpos,
+						                (u64)req_index);
 						goto again;
 					}
 					/*  Load the INode number of the parent directory. */
@@ -397,7 +420,9 @@ again:
 				if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
 					req_index = dirpos;
 			}
-			if (!ATOMIC_CMPXCH_WEAK(self->f_offset, dirpos, dirpos + 1))
+			if (!atomic64_cmpxch_weak(&self->f_offset,
+			                          (u64)dirpos,
+			                          (u64)dirpos + 1))
 				continue;
 			break;
 		}
@@ -551,7 +576,9 @@ got_next_entry:
 		 * NOTE: This would be allowed to be a weak access.
 		 *       However, after so much work, let's put some
 		 *       effort into confirming that we've copied data. */
-		if (!ATOMIC_CMPXCH(self->f_offset, dirpos, req_index))
+		if (!atomic64_cmpxch(&self->f_offset,
+		                     (u64)dirpos,
+		                     (u64)req_index))
 			continue;
 
 		break;
@@ -586,7 +613,9 @@ handle_file_hop(struct file *__restrict self,
 		COMPILER_BARRIER();
 
 		/* Apply the new position. */
-		oldpos = (pos64_t)ATOMIC_CMPXCH(self->f_offset, exppos, newpos);
+		oldpos = (pos64_t)atomic64_cmpxch(&self->f_offset,
+		                                  (u64)exppos,
+		                                  (u64)newpos);
 
 		COMPILER_BARRIER();
 		/* write back the actual old position */
@@ -789,11 +818,13 @@ handle_oneshot_directory_file_readdir(struct oneshot_directory_file *__restrict 
 	assert(INODE_ISDIR(self->d_node));
 again:
 	for (;;) {
-		dirpos = ATOMIC_READ(self->d_offset);
+		dirpos = (pos_t)atomic64_read(&self->d_offset);
 		if (dirpos < (pos_t)2) {
 			if (readdir_mode & READDIR_SKIPREL) {
 				/* Skip special entries. */
-				ATOMIC_CMPXCH_WEAK(self->d_offset, dirpos, 2);
+				atomic64_cmpxch_weak(&self->d_offset,
+				                     (u64)dirpos,
+				                     (u64)2);
 				continue;
 			}
 			/* Emit special entries. */
@@ -819,7 +850,9 @@ again:
 						 * >> Skip the parent directory. */
 						assert(dirpos == (pos_t)1);
 						assert(req_index == (pos_t)2);
-						ATOMIC_CMPXCH(self->d_offset, dirpos, req_index);
+						atomic64_cmpxch(&self->d_offset,
+						                (u64)dirpos,
+						                (u64)req_index);
 						goto again;
 					}
 					/*  Load the INode number of the parent directory. */
@@ -851,7 +884,9 @@ again:
 				if ((readdir_mode & READDIR_MODEMASK) != READDIR_CONTINUE)
 					req_index = dirpos;
 			}
-			if (!ATOMIC_CMPXCH_WEAK(self->d_offset, dirpos, dirpos + 1))
+			if (!atomic64_cmpxch_weak(&self->d_offset,
+			                          (u64)dirpos,
+			                          (u64)dirpos + 1))
 				continue;
 			break;
 		}
@@ -943,7 +978,9 @@ read_entry_pos_0:
 		 * NOTE: This would be allowed to be a weak access.
 		 *       However, after so much work, let's put some
 		 *       effort into confirming that we've copied data. */
-		if (!ATOMIC_CMPXCH(self->d_offset, dirpos, req_index))
+		if (!atomic64_cmpxch(&self->d_offset,
+		                     (u64)dirpos,
+		                     (u64)req_index))
 			continue;
 		break;
 	}

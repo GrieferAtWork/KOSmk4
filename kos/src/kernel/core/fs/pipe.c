@@ -193,8 +193,10 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		size_t ps_bufcur;  /* Current buffer size of the pipe */
 		size_t ps_buflim;  /* Max buffer size of the pipe */
 		validate_readwrite(arg, sizeof(struct hop_pipe_stat));
+		COMPILER_READ_BARRIER();
 		data        = (struct hop_pipe_stat *)arg;
-		struct_size = ATOMIC_READ(data->ps_struct_size);
+		struct_size = data->ps_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct hop_pipe_stat))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_stat), struct_size);
 		COMPILER_BARRIER();
@@ -225,10 +227,14 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		u64 *value;
 		size_t temp;
 		value = (u64 *)arg;
-		validate_writable(value, sizeof(*value));
-		temp = (size_t)ATOMIC_READ(*value);
+		validate_readwrite(value, sizeof(*value));
+		COMPILER_BARRIER();
+		temp = (size_t)*value;
+		COMPILER_BARRIER();
 		temp = ringbuffer_set_pipe_limit(self, temp);
-		ATOMIC_WRITE(*value, temp);
+		COMPILER_BARRIER();
+		*value = temp;
+		COMPILER_BARRIER();
 	}	break;
 
 	case HOP_PIPE_WRITESOME: {
@@ -239,13 +245,16 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
 		validate_readwrite(arg, sizeof(struct hop_pipe_writesome));
+		COMPILER_READ_BARRIER();
 		data        = (struct hop_pipe_writesome *)arg;
-		struct_size = ATOMIC_READ(data->pws_struct_size);
+		struct_size = data->pws_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct hop_pipe_writesome))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_writesome), struct_size);
 		COMPILER_BARRIER();
-		buf    = ATOMIC_READ(data->pws_buf);
-		buflen = ATOMIC_READ(data->pws_buflen);
+		buf    = data->pws_buf;
+		buflen = data->pws_buflen;
+		COMPILER_READ_BARRIER();
 		validate_readable(buf, buflen);
 		if (mode & IO_NONBLOCK) {
 			size_t temp;
@@ -268,20 +277,25 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
 		validate_readwrite(arg, sizeof(struct hop_pipe_vwritesome));
+		COMPILER_READ_BARRIER();
 		data        = (struct hop_pipe_vwritesome *)arg;
-		struct_size = ATOMIC_READ(data->pvws_struct_size);
+		struct_size = data->pvws_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct hop_pipe_vwritesome))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_vwritesome), struct_size);
 		COMPILER_BARRIER();
-		buf    = ATOMIC_READ(data->pvws_buf);
-		buflen = ATOMIC_READ(data->pvws_bufcnt);
+		buf    = data->pvws_buf;
+		buflen = data->pvws_bufcnt;
+		COMPILER_READ_BARRIER();
 		validate_readablem(buf, buflen, sizeof(struct iovec));
 		result = 0;
 		for (i = 0; i < buflen; ++i) {
 			struct iovec ent;
 			size_t temp;
-			ent.iov_base = ATOMIC_READ(buf[i].iov_base);
-			ent.iov_len  = ATOMIC_READ(buf[i].iov_len);
+			COMPILER_READ_BARRIER();
+			ent.iov_base = buf[i].iov_base;
+			ent.iov_len  = buf[i].iov_len;
+			COMPILER_READ_BARRIER();
 			validate_readable(ent.iov_base, ent.iov_len);
 			if (result) {
 				temp = ringbuffer_write_nonblock(self, ent.iov_base, ent.iov_len);
@@ -301,59 +315,68 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 
 	case HOP_PIPE_SKIPDATA: {
 		USER CHECKED struct hop_pipe_skipdata *data;
-		size_t struct_size;
+		size_t struct_size, num_bytes;
 		size_t result, new_rdpos;
 		if ((mode & IO_ACCMODE) == IO_WRONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
 		validate_readwrite(arg, sizeof(struct hop_pipe_skipdata));
+		COMPILER_READ_BARRIER();
 		data        = (struct hop_pipe_skipdata *)arg;
-		struct_size = ATOMIC_READ(data->psd_struct_size);
+		struct_size = data->psd_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct hop_pipe_skipdata))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_skipdata), struct_size);
 		COMPILER_BARRIER();
-		result = ringbuffer_skipread(self,
-		                             ATOMIC_READ(data->psd_num_bytes),
-		                             &new_rdpos);
-		ATOMIC_WRITE(data->psd_rdpos, new_rdpos);
-		ATOMIC_WRITE(data->psd_skipped, result);
+		num_bytes = data->psd_num_bytes;
+		COMPILER_READ_BARRIER();
+		result = ringbuffer_skipread(self, num_bytes, &new_rdpos);
+		COMPILER_BARRIER();
+		data->psd_rdpos   = new_rdpos;
+		data->psd_skipped = result;
 	}	break;
 
 	case HOP_PIPE_UNREAD: {
 		USER CHECKED struct hop_pipe_unread *data;
-		size_t struct_size;
+		size_t struct_size, num_bytes;
 		size_t result, new_rdpos;
 		if ((mode & IO_ACCMODE) == IO_WRONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_READ, mode);
 		validate_readwrite(arg, sizeof(struct hop_pipe_unread));
+		COMPILER_READ_BARRIER();
 		data        = (struct hop_pipe_unread *)arg;
-		struct_size = ATOMIC_READ(data->pur_struct_size);
+		struct_size = data->pur_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct hop_pipe_unread))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_unread), struct_size);
 		COMPILER_BARRIER();
-		result = ringbuffer_unread(self,
-		                           ATOMIC_READ(data->pur_num_bytes),
-		                           &new_rdpos);
-		ATOMIC_WRITE(data->pur_rdpos, new_rdpos);
-		ATOMIC_WRITE(data->pur_unread, result);
+		num_bytes = data->pur_num_bytes;
+		COMPILER_READ_BARRIER();
+		result = ringbuffer_unread(self, num_bytes, &new_rdpos);
+		COMPILER_BARRIER();
+		data->pur_rdpos  = new_rdpos;
+		data->pur_unread = result;
 	}	break;
 
 	case HOP_PIPE_UNWRITE: {
 		USER CHECKED struct hop_pipe_unwrite *data;
-		size_t struct_size;
+		size_t struct_size, num_bytes;
 		size_t result, new_wrpos;
 		if ((mode & IO_ACCMODE) == IO_RDONLY)
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
 		validate_readwrite(arg, sizeof(struct hop_pipe_unwrite));
+		COMPILER_READ_BARRIER();
 		data        = (struct hop_pipe_unwrite *)arg;
-		struct_size = ATOMIC_READ(data->puw_struct_size);
+		struct_size = data->puw_struct_size;
+		COMPILER_READ_BARRIER();
 		if (struct_size != sizeof(struct hop_pipe_unwrite))
 			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_pipe_unwrite), struct_size);
 		COMPILER_BARRIER();
-		result = ringbuffer_unread(self,
-		                           ATOMIC_READ(data->puw_num_bytes),
-		                           &new_wrpos);
-		ATOMIC_WRITE(data->puw_wrpos, new_wrpos);
-		ATOMIC_WRITE(data->puw_unwritten, result);
+		num_bytes = data->puw_num_bytes;
+		COMPILER_READ_BARRIER();
+		result = ringbuffer_unread(self, num_bytes, &new_wrpos);
+		COMPILER_WRITE_BARRIER();
+		data->puw_wrpos     = new_wrpos;
+		data->puw_unwritten = result;
 	}	break;
 
 	case HOP_PIPE_SETWRITTEN: {
@@ -363,9 +386,11 @@ ringbuffer_pipe_hop(struct ringbuffer *__restrict self,
 			THROW(E_INVALID_HANDLE_OPERATION, 0, E_INVALID_HANDLE_OPERATION_WRITE, mode);
 		validate_writable(arg, sizeof(u64));
 		data = (USER CHECKED u64 *)arg;
-		temp = ATOMIC_READ(*(size_t *)data);
+		temp = *(size_t *)data;
+		COMPILER_READ_BARRIER();
 		temp = ringbuffer_setwritten(self, temp);
-		ATOMIC_WRITE(*data, temp);
+		COMPILER_WRITE_BARRIER();
+		*data = temp;
 	}	break;
 
 	default:
@@ -552,13 +577,15 @@ handle_pipe_poll(struct pipe *__restrict self, poll_mode_t what) {
 /* Handle operators for pipe reader / pipe writer wrappers. */
 INTERN size_t KCALL
 handle_pipe_reader_read(struct pipe_reader *__restrict self,
-                        USER CHECKED void *dst, size_t num_bytes, iomode_t mode) {
+                        USER CHECKED void *dst,
+                        size_t num_bytes, iomode_t mode) {
 	return handle_pipe_read(self->pr_pipe, dst, num_bytes, mode);
 }
 
 INTERN size_t KCALL
 handle_pipe_reader_readv(struct pipe_reader *__restrict self,
-                         struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) {
+                         struct aio_buffer *__restrict dst,
+                         size_t num_bytes, iomode_t mode) {
 	return handle_pipe_readv(self->pr_pipe, dst, num_bytes, mode);
 }
 
@@ -579,25 +606,31 @@ handle_pipe_reader_stat(struct pipe_reader *__restrict self,
 }
 
 INTERN poll_mode_t KCALL
-handle_pipe_reader_poll(struct pipe_reader *__restrict self, poll_mode_t what) {
+handle_pipe_reader_poll(struct pipe_reader *__restrict self,
+                        poll_mode_t what) {
 	return ringbuffer_poll(&self->pr_pipe->p_buffer, what & POLLIN);
 }
 
 INTERN syscall_slong_t KCALL
 handle_pipe_reader_hop(struct pipe_reader *__restrict self,
-                       syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
-	return handle_pipe_hop(self->pr_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_RDONLY);
+                       syscall_ulong_t cmd,
+                       USER UNCHECKED void *arg, iomode_t mode) {
+	return handle_pipe_hop(self->pr_pipe, cmd, arg,
+	                       (mode & ~IO_ACCMODE) |
+	                       IO_RDONLY);
 }
 
 INTERN size_t KCALL
 handle_pipe_writer_write(struct pipe_writer *__restrict self,
-                         USER CHECKED void const *src, size_t num_bytes, iomode_t mode) {
+                         USER CHECKED void const *src,
+                         size_t num_bytes, iomode_t mode) {
 	return handle_pipe_write(self->pw_pipe, src, num_bytes, mode);
 }
 
 INTERN size_t KCALL
 handle_pipe_writer_writev(struct pipe_writer *__restrict self,
-                          struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) {
+                          struct aio_buffer *__restrict src,
+                          size_t num_bytes, iomode_t mode) {
 	return handle_pipe_writev(self->pw_pipe, src, num_bytes, mode);
 }
 
@@ -630,7 +663,9 @@ handle_pipe_writer_poll(struct pipe_writer *__restrict self, poll_mode_t what) {
 INTERN syscall_slong_t KCALL
 handle_pipe_writer_hop(struct pipe_writer *__restrict self,
                        syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
-	return handle_pipe_hop(self->pw_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_WRONLY);
+	return handle_pipe_hop(self->pw_pipe, cmd, arg,
+	                       (mode & ~IO_ACCMODE) |
+	                       IO_WRONLY);
 }
 
 INTERN size_t KCALL

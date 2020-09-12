@@ -94,10 +94,6 @@ NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self) {
 #endif /* !NDEBUG */
 }
 
-#define vm_datapart_numvpages_atomic(self)                                           \
-	((size_t)((ATOMIC_READ((self)->dp_tree.a_vmax) - (self)->dp_tree.a_vmin) + 1) >> \
-	 VM_DATABLOCK_PAGESHIFT((self)->dp_block))
-
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vmb_do_delete_whole_nodes)(struct vmb *__restrict self,

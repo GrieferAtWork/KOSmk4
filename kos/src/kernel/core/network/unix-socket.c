@@ -539,7 +539,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 	                  addr_len -
 	                  offsetof(struct sockaddr_un, sun_path));
 	/* Traverse the path to the location where we should do the bind. */
-	fsmode    = ATOMIC_READ(f->f_atflag);
+	fsmode    = ATOMIC_READ(f->f_mode.f_atflag);
 	bind_path = path_traversen(f,
 	                           addr_un->sun_path,
 	                           pathlen,
@@ -764,7 +764,7 @@ UnixSocket_Connect(struct socket *__restrict self,
 		                                                         addr_un->sun_path,
 		                                                         pathlen,
 		                                                         true,
-		                                                         f->f_atflag,
+		                                                         f->f_mode.f_atflag,
 		                                                         NULL,
 		                                                         &bind_path,
 		                                                         NULL,

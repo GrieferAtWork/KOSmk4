@@ -62,21 +62,23 @@ PUBLIC struct vfs vfs_kernel = {
 };
 
 PUBLIC struct fs fs_kernel = {
-	.f_refcnt   = 3, /* GLOBAL, BOOT_IDLE, BOOT_TASK */
-	.f_heapsize = sizeof(struct fs),
-	.f_vfs      = &vfs_kernel,
-	.f_pathlock = ATOMIC_RWLOCK_INIT,
-	.f_root     = (struct path *)&vfs_kernel,
-	.f_cwd      = (struct path *)&vfs_kernel,
-	.f_dcwd     = { NULL, },
-	.f_umask    = CONFIG_FS_UMASK_DEFAULT,
-	.f_lnkmax   = SYMLOOP_MAX,
-	.f_fsuid    = 0,
-	.f_fsgid    = 0,
-	{{
-		.f_atmask = FS_MODE_FALWAYS1MASK | (~FS_MODE_FALWAYS0MASK),
-		.f_atflag = FS_MODE_FALWAYS1FLAG,
-	}}
+	/* .f_refcnt   = */ 3, /* GLOBAL, BOOT_IDLE, BOOT_TASK */
+	/* .f_heapsize = */ sizeof(struct fs),
+	/* .f_vfs      = */ &vfs_kernel,
+	/* .f_pathlock = */ ATOMIC_RWLOCK_INIT,
+	/* .f_root     = */ (struct path *)&vfs_kernel,
+	/* .f_cwd      = */ (struct path *)&vfs_kernel,
+	/* .f_dcwd     = */ { NULL, },
+	/* .f_umask    = */ CONFIG_FS_UMASK_DEFAULT,
+	/* .f_lnkmax   = */ SYMLOOP_MAX,
+	/* .f_mode     = */ {
+		{
+			/* .f_atmask = */ FS_MODE_FALWAYS1MASK | (~FS_MODE_FALWAYS0MASK),
+			/* .f_atflag = */ FS_MODE_FALWAYS1FLAG,
+		}
+	},
+	/* .f_fsuid    = */ 0,
+	/* .f_fsgid    = */ 0
 };
 
 DEFINE_DBG_BZERO_OBJECT(vfs_kernel.v_path.p_lock);

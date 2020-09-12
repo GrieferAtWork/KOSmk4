@@ -303,12 +303,12 @@ path_printent(struct path *__restrict self,
 	root = incref(f->f_root);
 	sync_endread(&f->f_pathlock);
 #if PATH_PRINT_MODE_DOSPATH == FS_MODE_FDOSPATH
-	mode = ATOMIC_READ(f->f_atflag) & PATH_PRINT_MODE_DOSPATH;
-#else
+	mode = ATOMIC_READ(f->f_mode.f_atflag) & PATH_PRINT_MODE_DOSPATH;
+#else /* PATH_PRINT_MODE_DOSPATH == FS_MODE_FDOSPATH */
 	mode = PATH_PRINT_MODE_NORMAL;
-	if (ATOMIC_READ(f->f_atflag) & FS_MODE_FDOSPATH)
+	if (ATOMIC_READ(f->f_mode.f_atflag) & FS_MODE_FDOSPATH)
 		mode |= PATH_PRINT_MODE_DOSPATH;
-#endif
+#endif /* PATH_PRINT_MODE_DOSPATH != FS_MODE_FDOSPATH */
 	TRY {
 		result = path_printentex(self,
 		                         dentry_name,
@@ -340,11 +340,11 @@ path_print(struct path *__restrict self,
 	sync_endread(&f->f_pathlock);
 	mode = PATH_PRINT_MODE_INCTRAIL;
 #if PATH_PRINT_MODE_DOSPATH == FS_MODE_FDOSPATH
-	mode |= ATOMIC_READ(f->f_atflag) & PATH_PRINT_MODE_DOSPATH;
-#else
-	if (ATOMIC_READ(f->f_atflag) & FS_MODE_FDOSPATH)
+	mode |= ATOMIC_READ(f->f_mode.f_atflag) & PATH_PRINT_MODE_DOSPATH;
+#else /* PATH_PRINT_MODE_DOSPATH == FS_MODE_FDOSPATH */
+	if (ATOMIC_READ(f->f_mode.f_atflag) & FS_MODE_FDOSPATH)
 		mode |= PATH_PRINT_MODE_DOSPATH;
-#endif
+#endif /* PATH_PRINT_MODE_DOSPATH != FS_MODE_FDOSPATH */
 	TRY {
 		result = path_printex(self,
 		                      printer,
@@ -2071,9 +2071,9 @@ REF struct fs *(KCALL fs_alloc)(void) THROWS(E_BADALLOC) {
 	result->f_umask = CONFIG_FS_UMASK_DEFAULT;
 #endif /* CONFIG_FS_UMASK_DEFAULT != 0 */
 	result->f_lnkmax = SYMLOOP_MAX;
-	result->f_atmask = FS_MODE_FALWAYS1MASK | (~FS_MODE_FALWAYS0MASK);
+	result->f_mode.f_atmask = FS_MODE_FALWAYS1MASK | (~FS_MODE_FALWAYS0MASK);
 #if FS_MODE_FALWAYS1FLAG != 0
-	result->f_atflag = FS_MODE_FALWAYS1FLAG;
+	result->f_mode.f_atflag = FS_MODE_FALWAYS1FLAG;
 #endif /* FS_MODE_FALWAYS1FLAG != 0 */
 	return result;
 }
@@ -2188,14 +2188,14 @@ again_clone:
 		result_vfs = (REF struct vfs *)incref(self->f_vfs);
 		vfs_inc_fscount(result_vfs);
 	}
-	result->f_umask  = ATOMIC_READ(self->f_umask);
-	result->f_lnkmax = ATOMIC_READ(self->f_lnkmax);
-	result->f_fsuid  = ATOMIC_READ(self->f_fsuid);
-	result->f_fsgid  = ATOMIC_READ(self->f_fsgid);
-	result->f_mode   = ATOMIC_READ(self->f_mode);
-	result->f_refcnt   = 1;
-	result->f_heapsize = resptr.hp_siz;
-	result->f_vfs      = result_vfs; /* Inherit reference. */
+	result->f_umask       = ATOMIC_READ(self->f_umask);
+	result->f_lnkmax      = ATOMIC_READ(self->f_lnkmax);
+	result->f_fsuid       = ATOMIC_READ(self->f_fsuid);
+	result->f_fsgid       = ATOMIC_READ(self->f_fsgid);
+	result->f_mode.f_mode = atomic64_read(&self->f_mode.f_atom);
+	result->f_refcnt      = 1;
+	result->f_heapsize    = resptr.hp_siz;
+	result->f_vfs         = result_vfs; /* Inherit reference. */
 	atomic_rwlock_cinit(&result->f_pathlock);
 	return result;
 }

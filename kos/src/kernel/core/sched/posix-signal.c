@@ -1466,11 +1466,7 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 	bool was_interrupted = false;
 	REF struct task *pgroup;
 	struct taskgroup *pgroup_group;
-	struct task *iter;
 	struct pointer_set ps; /* Set of processes already visited. */
-	REF struct task *pending_delivery_procv[8];
-	size_t pending_delivery_procc;
-	bool there_are_more_procs;
 	/* Deliver the first signal to the process group leader. */
 	pgroup = task_getprocessgroupleader_srch_of(target);
 	pgroup_group = &FORTASK(pgroup, this_taskgroup);
@@ -1487,6 +1483,10 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 	}
 	pointer_set_init(&ps);
 	TRY {
+		REF struct task *pending_delivery_procv[8];
+		size_t pending_delivery_procc;
+		bool there_are_more_procs;
+		struct task *iter;
 load_more_threads:
 		pending_delivery_procc = 0;
 		there_are_more_procs = false;

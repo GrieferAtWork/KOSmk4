@@ -4222,7 +4222,9 @@ driver_insmod_file(struct regular_node *__restrict driver_inode,
 
 	/* Map the file into memory, then load it as a blob */
 	inode_loadattr(driver_inode);
-	filesize = ATOMIC_READ(driver_inode->i_filesize);
+	COMPILER_READ_BARRIER();
+	filesize = driver_inode->i_filesize;
+	COMPILER_READ_BARRIER();
 	if (filesize >= (pos_t)0x10000000)
 		THROW(E_NOT_EXECUTABLE_TOOLARGE);
 	num_bytes = CEIL_ALIGN((size_t)filesize, PAGESIZE);
