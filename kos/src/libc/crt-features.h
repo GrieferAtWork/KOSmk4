@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdbc88c21 */
+/* HASH CRC-32:0xde79666d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1820,6 +1820,7 @@
 #define __CRT_HAVE_DOS$posix_openpt 1
 #define __CRT_HAVE_DOS$posix_spawn 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addclose 1
+#define __CRT_HAVE_DOS$posix_spawn_file_actions_addclosefrom_np 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addopen 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addtcsetpgrp_np 1
@@ -4837,6 +4838,7 @@
 #define __CRT_HAVE_posix_openpt 1
 #define __CRT_HAVE_posix_spawn 1
 #define __CRT_HAVE_posix_spawn_file_actions_addclose 1
+#define __CRT_HAVE_posix_spawn_file_actions_addclosefrom_np 1
 #define __CRT_HAVE_posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_posix_spawn_file_actions_addopen 1
 #define __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np 1

@@ -62,6 +62,7 @@ struct __posix_spawnattr {
 #define __POSIX_SPAWN_ACTION_OPEN  2 /* Open a file using `open(2)' */
 #ifdef __CRT_KOS
 #define __POSIX_SPAWN_ACTION_TCSETPGRP 3 /* Call `tcsetpgrp(fd, getpid())' */
+#define __POSIX_SPAWN_ACTION_CLOSEFROM 4 /* Call `closefrom(fd)' */
 #endif /* __CRT_KOS */
 struct __spawn_action {
 	unsigned int __sa_tag; /* Action type (one of `__POSIX_SPAWN_ACTION_*') */
@@ -87,6 +88,10 @@ struct __spawn_action {
 		struct {
 			__fd_t __sa_fd;  /* `tcsetpgrp(__sa_fd, getpid())' */
 		} __sa_tcsetpgrp_action; /* __POSIX_SPAWN_ACTION_TCSETPGRP */
+
+		struct {
+			__fd_t __sa_fd;  /* `closefrom(__sa_fd)' */
+		} __sa_closefrom_action; /* __POSIX_SPAWN_ACTION_CLOSEFROM */
 #endif /* __CRT_KOS */
 
 	} __sa_action; /* Action-specific data. */

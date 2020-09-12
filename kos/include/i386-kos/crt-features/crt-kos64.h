@@ -2617,6 +2617,7 @@
 #define __CRT_HAVE_posix_openpt 1
 #define __CRT_HAVE_posix_spawn 1
 #define __CRT_HAVE_posix_spawn_file_actions_addclose 1
+#define __CRT_HAVE_posix_spawn_file_actions_addclosefrom_np 1
 #define __CRT_HAVE_posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_posix_spawn_file_actions_addopen 1
 #define __CRT_HAVE_posix_spawn_file_actions_addtcsetpgrp_np 1
@@ -6793,6 +6794,7 @@
 #define __CRT_HAVE_KOS$posix_openpt 1
 #define __CRT_HAVE_KOS$posix_spawn 1
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_addclose 1
+#define __CRT_HAVE_KOS$posix_spawn_file_actions_addclosefrom_np 1
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_addopen 1
 #define __CRT_HAVE_KOS$posix_spawn_file_actions_addtcsetpgrp_np 1
@@ -10170,6 +10172,7 @@
 #define __CRT_HAVE_DOS$posix_openpt 1
 #define __CRT_HAVE_DOS$posix_spawn 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addclose 1
+#define __CRT_HAVE_DOS$posix_spawn_file_actions_addclosefrom_np 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_adddup2 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addopen 1
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addtcsetpgrp_np 1

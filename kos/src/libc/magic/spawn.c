@@ -299,6 +299,17 @@ do_exec:
 @@pp_endif@@
 
 
+@@pp_ifdef __POSIX_SPAWN_ACTION_CLOSEFROM@@
+@@pp_if !$has_function(closefrom)@@
+#define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
+@@pp_else@@
+			case __POSIX_SPAWN_ACTION_CLOSEFROM:
+				closefrom(act->@__sa_action@.@__sa_closefrom_action@.@__sa_fd@);
+				break;
+@@pp_endif@@
+@@pp_endif@@
+
+
 @@pp_ifdef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION@@
 #undef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
 			default:
@@ -972,6 +983,35 @@ err:
 @@pp_endif@@
 }
 %#endif /* __USE_KOS */
+
+%#ifdef __USE_SOLARIS
+@@>> posix_spawn_file_actions_addclosefrom_np(3)
+@@Enqueue a call `closefrom(lowfd)' to be performed by the child process
+@@@return: 0     : Success
+@@@return: ENOMEM: Insufficient memory to enqueue the action
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>", "<bits/crt/posix_spawn.h>")]]
+[[requires(defined(__POSIX_SPAWN_USE_KOS) && defined(__POSIX_SPAWN_ACTION_CLOSEFROM) &&
+           $has_function(posix_spawn_file_actions_alloc))]]
+$errno_t posix_spawn_file_actions_addclosefrom_np([[nonnull]] posix_spawn_file_actions_t *__restrict file_actions,
+                                                  $fd_t lowfd) {
+	struct __spawn_action *action;
+	action = posix_spawn_file_actions_alloc(file_actions);
+	if unlikely(!action)
+		goto err;
+	/* Fill in the new mode. */
+	action->@__sa_tag@ = __POSIX_SPAWN_ACTION_CLOSEFROM;
+	action->@__sa_action@.@__sa_closefrom_action@.@__sa_fd@ = lowfd;
+	return 0;
+err:
+@@pp_ifdef ENOMEM@@
+	return ENOMEM;
+@@pp_else@@
+	return 1;
+@@pp_endif@@
+}
+%#endif /* __USE_SOLARIS */
+
 
 
 %{

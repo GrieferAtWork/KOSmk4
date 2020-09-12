@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedbf7a89 */
+/* HASH CRC-32:0xf0296ca1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1497,6 +1497,7 @@ DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_addopen, libd_posix_spawn_file_
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_addclose, libd_posix_spawn_file_actions_addclose);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_adddup2, libd_posix_spawn_file_actions_adddup2);
 DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_addtcsetpgrp_np, libd_posix_spawn_file_actions_addtcsetpgrp_np);
+DEFINE_PUBLIC_ALIAS(DOS$posix_spawn_file_actions_addclosefrom_np, libd_posix_spawn_file_actions_addclosefrom_np);
 
 /* ssp.string */
 DEFINE_PUBLIC_ALIAS(DOS$__memcpy_chk, libd___memcpy_chk);

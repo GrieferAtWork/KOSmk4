@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19f87f16 */
+/* HASH CRC-32:0x894af2c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -523,6 +523,22 @@ __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addtcsetpgrp_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addtcsetpgrp_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addtcsetpgrp_np))(__file_actions, __fd); })
 #endif /* ... */
 #endif /* __USE_KOS */
+#ifdef __USE_SOLARIS
+#ifdef __CRT_HAVE_posix_spawn_file_actions_addclosefrom_np
+/* >> posix_spawn_file_actions_addclosefrom_np(3)
+ * Enqueue a call `closefrom(lowfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addclosefrom_np,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __lowfd),(__file_actions,__lowfd))
+#elif defined(__POSIX_SPAWN_ACTION_CLOSEFROM) && defined(__POSIX_SPAWN_USE_KOS) && defined(__CRT_HAVE_realloc)
+#include <libc/local/spawn/posix_spawn_file_actions_addclosefrom_np.h>
+/* >> posix_spawn_file_actions_addclosefrom_np(3)
+ * Enqueue a call `closefrom(lowfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+__NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addclosefrom_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __lowfd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addclosefrom_np))(__file_actions, __lowfd); })
+#endif /* ... */
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 

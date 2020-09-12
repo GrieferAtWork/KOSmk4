@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e8624f1 */
+/* HASH CRC-32:0xbadafc76 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,6 +203,17 @@ do_exec:
 				break;
 #endif /* __CRT_HAVE_tcsetpgrp */
 #endif /* __POSIX_SPAWN_ACTION_TCSETPGRP */
+
+
+#ifdef __POSIX_SPAWN_ACTION_CLOSEFROM
+#if !defined(__CRT_HAVE_closefrom) && ((!defined(__CRT_HAVE_fcntl) && !defined(__CRT_HAVE___fcntl)) || !defined(__F_CLOSEM))
+#define __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION 1
+#else /* !__CRT_HAVE_closefrom && ((!__CRT_HAVE_fcntl && !__CRT_HAVE___fcntl) || !__F_CLOSEM) */
+			case __POSIX_SPAWN_ACTION_CLOSEFROM:
+				libc_closefrom(act->__sa_action.__sa_closefrom_action.__sa_fd);
+				break;
+#endif /* __CRT_HAVE_closefrom || ((__CRT_HAVE_fcntl || __CRT_HAVE___fcntl) && __F_CLOSEM) */
+#endif /* __POSIX_SPAWN_ACTION_CLOSEFROM */
 
 
 #ifdef __POSIX_SPAWN_HAVE_UNSUPPORTED_FILE_ACTION
@@ -801,6 +812,28 @@ err:
 	return 1;
 #endif /* !ENOMEM */
 }
+/* >> posix_spawn_file_actions_addclosefrom_np(3)
+ * Enqueue a call `closefrom(lowfd)' to be performed by the child process
+ * @return: 0     : Success
+ * @return: ENOMEM: Insufficient memory to enqueue the action */
+INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1)) errno_t
+NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclosefrom_np)(posix_spawn_file_actions_t *__restrict file_actions,
+                                                                    fd_t lowfd) {
+	struct __spawn_action *action;
+	action = libc_posix_spawn_file_actions_alloc(file_actions);
+	if unlikely(!action)
+		goto err;
+	/* Fill in the new mode. */
+	action->__sa_tag = __POSIX_SPAWN_ACTION_CLOSEFROM;
+	action->__sa_action.__sa_closefrom_action.__sa_fd = lowfd;
+	return 0;
+err:
+#ifdef ENOMEM
+	return ENOMEM;
+#else /* ENOMEM */
+	return 1;
+#endif /* !ENOMEM */
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -829,6 +862,7 @@ DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addopen, libc_posix_spawn_file_acti
 DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addclose, libc_posix_spawn_file_actions_addclose);
 DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_adddup2, libc_posix_spawn_file_actions_adddup2);
 DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addtcsetpgrp_np, libc_posix_spawn_file_actions_addtcsetpgrp_np);
+DEFINE_PUBLIC_ALIAS(posix_spawn_file_actions_addclosefrom_np, libc_posix_spawn_file_actions_addclosefrom_np);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_SPAWN_C */

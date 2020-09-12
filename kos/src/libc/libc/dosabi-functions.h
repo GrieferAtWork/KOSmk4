@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x389397d8 */
+/* HASH CRC-32:0x5c637a87 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1187,6 +1187,7 @@ DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addopen,
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addclose, libc_posix_spawn_file_actions_addclose, TIn(__SIZEOF_ERRNO_T__), 2, TP, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_adddup2, libc_posix_spawn_file_actions_adddup2, TIn(__SIZEOF_ERRNO_T__), 3, TP, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addtcsetpgrp_np, libc_posix_spawn_file_actions_addtcsetpgrp_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.fs.exec.posix_spawn", libd_posix_spawn_file_actions_addclosefrom_np, libc_posix_spawn_file_actions_addclosefrom_np, TIn(__SIZEOF_ERRNO_T__), 2, TP, TIn(__SIZEOF_FD_T__))
 
 /* ssp.string */
 DFUN(".text.crt.dos.ssp.string.memory", libd___memcpy_chk, libc___memcpy_chk, TP, 4, TP, TP, TI, TI)
