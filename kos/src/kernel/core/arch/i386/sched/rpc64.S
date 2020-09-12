@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <kernel/except.h>
 #include <kernel/x86/gdt.h>
 #include <sched/rpc.h>
@@ -298,15 +299,35 @@ END(task_rpc_exec_here_onexit)
 
 
 
+#ifdef CONFIG_HAVE_DEBUGGER
+.section .text
+PRIVATE_FUNCTION(noop_task_serve)
+	.cfi_startproc
+	xorl   %eax, %eax
+	ret
+	.cfi_endproc
+END(noop_task_serve)
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+
+
 .section .text
 PUBLIC_FUNCTION(task_serve)
 	.cfi_startproc
+#ifdef CONFIG_HAVE_DEBUGGER
+	EXTERN(dbg_active)
+	cmpb   $(0), dbg_active
+	jne    noop_task_serve
+#endif /* CONFIG_HAVE_DEBUGGER */
+
 	EXTERN(this_rpc_pending_sync_count)
 	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	jne    1f
-#if 1 /* Service blocking cleanup operations. */
+
+	/* Service blocking cleanup operations. */
 	EXTERN(blocking_cleanup_service)
 	call   blocking_cleanup_service
+
 	/* If there are pending X-RPCs, service them below. */
 	cmpq   $(BLOCKING_CLEANUP_SERVICE_XRPC), %rax
 	je     1f
@@ -315,10 +336,7 @@ PUBLIC_FUNCTION(task_serve)
 	sete   %cl
 	movzbq %cl, %rax
 	ret
-#else
-	xorq   %rax, %rax
-	ret
-#endif
+
 1:	/* Must service synchronous RPC functions!
 	 * -> Construct an icpustate. */
 	sti
@@ -351,12 +369,10 @@ PUBLIC_FUNCTION(task_serve)
 	cmpq   $(0), %gs:this_rpc_pending_sync_count
 	jne    1b
 
-#if 1 /* Service blocking cleanup operations. */
 	EXTERN(blocking_cleanup_service)
 	call   blocking_cleanup_service
 	cmpq   $(BLOCKING_CLEANUP_SERVICE_XRPC), %rax
 	je     1b
-#endif
 
 	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	intr_exit
@@ -369,23 +385,17 @@ END(task_serve)
 .section .text
 PUBLIC_FUNCTION(task_serve_nx)
 	.cfi_startproc
+#ifdef CONFIG_HAVE_DEBUGGER
+	EXTERN(dbg_active)
+	cmpb   $(0), dbg_active
+	jne    noop_task_serve
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+	EXTERN(this_rpc_pending_sync_count_nx)
 	cmpq   $(0), %gs:this_rpc_pending_sync_count_nx
-#if 1
+	EXTERN(blocking_cleanup_service)
 	je     blocking_cleanup_service
-#else
-	jne    1f
-#if TASK_SERVE_NX_XPENDING == 1
-	xorq   %rax, %rax
-	cmpq   $(0), %gs:this_rpc_pending_sync_count
-	setne  %al
-#else
-	cmpq   $(0), %gs:this_rpc_pending_sync_count
-	movq   $(TASK_SERVE_NX_DIDRUN), %rcx
-	cmovne %rcx, %rax
-#endif
-	ret
-1:
-#endif
+
 	/* Must service synchronous RPC functions!
 	 * -> Construct an icpustate. */
 	sti
@@ -416,10 +426,9 @@ PUBLIC_FUNCTION(task_serve_nx)
 	cmpq   $(0), %gs:this_rpc_pending_sync_count_nx
 	jne    1b
 
-#if 1 /* Service blocking cleanup operations. */
+	/* Service blocking cleanup operations. */
 	call   blocking_cleanup_service
 	orq    %rax, (OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX)(%rsp)
-#endif
 
 	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 	cmpq   $(0), %gs:this_rpc_pending_sync_count
