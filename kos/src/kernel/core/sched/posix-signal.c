@@ -67,6 +67,11 @@
 #include <compat/signal.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
+/* Need pointer sets for gathering targets of
+ * process-group-wide signal broadcasts. */
+#define POINTER_SET_BUFSIZE 16
+#include <misc/pointer-set.h>
+
 DECL_BEGIN
 
 /* An empty signal mask used to initialize `this_sigmask' */
@@ -1449,6 +1454,101 @@ done_handptr:
 
 
 
+/* Send a signal to every process within the same process group that `target' is apart of.
+ * @return: * : The number of processes to which the signal was delivered. */
+PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
+task_raisesignalprocessgroup(struct task *__restrict target,
+                             USER CHECKED siginfo_t *info,
+                             gfp_t rpc_flags)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
+		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED) {
+	size_t result = 0;
+	bool was_interrupted = false;
+	REF struct task *pgroup;
+	struct taskgroup *pgroup_group;
+	struct task *iter;
+	struct pointer_set ps; /* Set of processes already visited. */
+	REF struct task *pending_delivery_procv[8];
+	size_t pending_delivery_procc;
+	bool there_are_more_procs;
+	/* Deliver the first signal to the process group leader. */
+	pgroup = task_getprocessgroupleader_srch_of(target);
+	pgroup_group = &FORTASK(pgroup, this_taskgroup);
+	TRY {
+		if (task_raisesignalprocess(pgroup, info, rpc_flags))
+			++result;
+	} EXCEPT {
+		if (was_thrown(E_INTERRUPT_USER_RPC))
+			was_interrupted = true;
+		else {
+			decref_unlikely(pgroup);
+			RETHROW();
+		}
+	}
+	pointer_set_init(&ps);
+	TRY {
+load_more_threads:
+		pending_delivery_procc = 0;
+		there_are_more_procs = false;
+		sync_read(&pgroup_group->tg_pgrp_processes_lock);
+		for (iter = pgroup_group->tg_pgrp_processes; iter;
+		     iter = FORTASK(iter, this_taskgroup).tg_proc_group_siblings.ln_next) {
+			assert(iter != pgroup);
+			if (pointer_set_contains(&ps, iter))
+				continue;
+			if (!tryincref(iter))
+				continue;
+			pending_delivery_procv[pending_delivery_procc] = iter;
+			++pending_delivery_procc;
+			if (pending_delivery_procc >= COMPILER_LENOF(pending_delivery_procv)) {
+				if (FORTASK(iter, this_taskgroup).tg_proc_group_siblings.ln_next != NULL)
+					there_are_more_procs = true;
+				break;
+			}
+		}
+		sync_endread(&pgroup_group->tg_pgrp_processes_lock);
+		TRY {
+			while (pending_delivery_procc) {
+				REF struct task *thread;
+				thread = pending_delivery_procv[pending_delivery_procc - 1];
+				pointer_set_insert(&ps, thread, rpc_flags);
+				/* Deliver to this process. */
+				TRY {
+					if (task_raisesignalprocess(thread, info, rpc_flags))
+						++result;
+				} EXCEPT {
+					if (!was_thrown(E_INTERRUPT_USER_RPC))
+						RETHROW();
+					was_interrupted = true;
+				}
+				--pending_delivery_procc;
+				decref_unlikely(thread);
+			}
+		} EXCEPT {
+			while (pending_delivery_procc--)
+				decref_unlikely(pending_delivery_procv[pending_delivery_procc]);
+			RETHROW();
+		}
+		if (there_are_more_procs)
+			goto load_more_threads;
+	} EXCEPT {
+		pointer_set_fini(&ps);
+		decref_unlikely(pgroup);
+		RETHROW();
+	}
+	pointer_set_fini(&ps);
+	decref_unlikely(pgroup);
+	if (was_interrupted)
+		THROW(E_INTERRUPT_USER_RPC);
+	return result;
+}
+
+
+
+
+
+
+
 
 /************************************************************************/
 /* sigaction(), rt_sigaction(), signal()                                */
@@ -2773,11 +2873,14 @@ DEFINE_COMPAT_SYSCALL1(errno_t, sigpending,
 
 
 
+
+
 DECL_END
 
 #ifndef __INTELLISENSE__
 #define DELIVER_NX 1
 #include "posix-signal-deliver.c.inl"
+/**/
 #include "posix-signal-deliver.c.inl"
 #endif /* !__INTELLISENSE__ */
 

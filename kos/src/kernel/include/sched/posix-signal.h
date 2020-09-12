@@ -413,22 +413,6 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED);
 
-/* Noexcept variant of `task_raisesignalprocessgroup()'
- * @return: * : The number of processes to which the signal was delivered,
- *              or one of `TASK_RAISESIGNALPROCESSGROUP_NX_*' */
-FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) ssize_t
-NOTHROW(KCALL task_raisesignalprocessgroup_nx)(struct task *__restrict target,
-                                               USER CHECKED siginfo_t *info,
-                                               gfp_t rpc_flags DFL(GFP_NORMAL));
-#define TASK_RAISESIGNALPROCESSGROUP_NX_SUCCESS       0  /* Successfully raised the signal */
-#define TASK_RAISESIGNALPROCESSGROUP_NX_TERMINATED  (-1) /* The specified target process has terminated */
-#define TASK_RAISESIGNALPROCESSGROUP_NX_KERNTHREAD  (-2) /* The specified target process is apart of the kernel */
-#define TASK_RAISESIGNALPROCESSGROUP_NX_BADALLOC    (-3) /* The allocation failed, or would have blocked. */
-#define TASK_RAISESIGNALPROCESSGROUP_NX_BADSIGNO    (-4) /* The signal number associated with `info' is bad. */
-#define TASK_RAISESIGNALPROCESSGROUP_NX_SEGFAULT    (-5) /* The given `info' structure points to a faulty memory address. */
-#define TASK_RAISESIGNALPROCESSGROUP_NX_WOULDBLOCK  (-6) /* The operation would have blocked. */
-#define TASK_RAISESIGNALPROCESSGROUP_NX_INTERRUPTED (-7) /* Successfully raised the signal (and one of the targets was the caller) */
-
 
 
 #ifdef __cplusplus
@@ -489,17 +473,6 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 	info.si_signo = signo;
 	return task_raisesignalprocessgroup(target, &info, rpc_flags);
 }
-
-LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) ssize_t
-NOTHROW(KCALL task_raisesignalprocessgroup_nx)(struct task *__restrict target,
-                                               signo_t signo,
-                                               gfp_t rpc_flags DFL(GFP_NORMAL)) {
-	siginfo_t info;
-	__libc_memset(&info, 0, sizeof(info));
-	info.si_signo = signo;
-	return task_raisesignalprocessgroup_nx(target, &info, rpc_flags);
-}
-
 
 }
 #endif /* __cplusplus */

@@ -366,6 +366,28 @@ again_lock_vm:
 		}
 #endif
 
+		/* Before we actually start executing the child thread,
+		 * check if there are any pending POSIX signals directed
+		 * at us, and don't actually start the child thread if
+		 * there are any.
+		 *
+		 * This must be done to prevent run-away child processes
+		 * as the result of code like `for (;;) fork();'.
+		 * Consider a user now presses `CTRL+C'.
+		 *
+		 * That signal will have been sent to all threads apart
+		 * of the existing process group. However this may have
+		 * been done before `result' (aka. the new thread/process)
+		 * was added to that process group, meaning that there's
+		 * a chance that it didn't get the signal.
+		 *
+		 * In this scenario, we can't allow the new thread/process
+		 * to start executing, since that would violate the assumption
+		 * that sending a signal to process group means that _all_
+		 * threads that existed at one point within the group had
+		 * the signal delivered. */
+		task_serve();
+
 		/* Deal with vfork() */
 		if (clone_flags & CLONE_VFORK) {
 			REF struct kernel_sigmask *old_sigmask;
