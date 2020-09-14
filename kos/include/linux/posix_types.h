@@ -95,10 +95,12 @@ __DECL_BEGIN
 #define __kernel_old_dev_t __UINT32_TYPE__
 #endif /* !__kernel_old_dev_t */
 #ifndef __kernel_size_t
-#define __kernel_size_t __SIZE_TYPE__
+typedef __SIZE_TYPE__ __kernel_size_t;
+#define __kernel_size_t __kernel_size_t
 #endif /* !__kernel_size_t */
 #ifndef __kernel_ssize_t
-#define __kernel_ssize_t __SSIZE_TYPE__
+typedef __SSIZE_TYPE__ __kernel_ssize_t;
+#define __kernel_ssize_t __kernel_ssize_t
 #endif /* !__kernel_ssize_t */
 #ifndef __kernel_ptrdiff_t
 #define __kernel_ptrdiff_t __PTRDIFF_TYPE__
@@ -141,8 +143,8 @@ typedef struct {
 } __kernel_fd_set;
 
 typedef void (*__kernel_sighandler_t)(int);
-typedef int __kernel_key_t;
-typedef int __kernel_mqd_t;
+#define __kernel_key_t int
+#define __kernel_mqd_t int
 
 __DECL_END
 #endif /* __CC__ */
