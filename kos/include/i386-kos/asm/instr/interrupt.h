@@ -77,9 +77,11 @@ __ASM_L(.endm)
 /* Generate the mandatory suffix for an interrupt handler
  * @param: intr_enabled: When non-zero, EFLAGS.IF may be set when this macro is reached */
 __ASM_L(.macro intr_exit intr_enabled=1)
+#ifdef __KERNEL__
 __ASM_L(.if __ASM_ARG(\intr_enabled))
 __ASM_L(	cli)
 __ASM_L(.endif)
+#endif /* __KERNEL__ */
 __ASM_L(	swapgs_if_user_iret)
 __ASM_L(	iretq)
 __ASM_L(.endm)

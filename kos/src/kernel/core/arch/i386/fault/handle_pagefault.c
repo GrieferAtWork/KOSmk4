@@ -449,8 +449,8 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		 *               trying to obtain THIS_VM at this point is just going
 		 *               to result in a #DF:
 		 *   #1: READ_FROM_BAD_POINTER(%tls:0)
-		 *   #2: Trigger #PF at BAD_POINTERh
-		 *   #3: When `BAD_POINTERh' points into user-space, we get here again
+		 *   #2: Trigger #PF at `%tls.base'
+		 *   #3: When `%tls.base' points into user-space (e.g. is `NULL'), we get here again
 		 *   #4: Repeat at step #1
 		 * This then eventually results in a stack overflow that cannot be
 		 * inspected properly, so when compiling for a debug-target, we use

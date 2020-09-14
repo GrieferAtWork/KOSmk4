@@ -98,6 +98,22 @@ DEFINE_PUBLIC_ALIAS(cpu_apply_scpustate_rsp, libcpu_apply_scpustate_rsp)
 #endif /* __KERNEL__ */
 
 
+.macro wrgs_keepbase reg:req, clobber=%rcx
+#ifdef __KERNEL__
+	/* Special handling required: Must set the new %gs value
+	 * without trashing `%gs.base'. - Same as `__wrgs_keepbase()' */
+	pushfq
+	cli
+	movq   %gs:0, \clobber /* rdgsbaseq \clobber */
+	movw   \reg, %gs
+	wrgsbaseq \clobber
+	popfq
+#else /* __KERNEL__ */
+	movw   \reg, %gs
+#endif /* !__KERNEL__ */
+.endm
+
+
 
 TEXT_SECTION
 	.cfi_startproc simple
@@ -114,26 +130,19 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	pushq  (OFFSET_UCPUSTATE_CS)(%rdi)
 	pushq  (OFFSET_UCPUSTATE_RIP)(%rdi)
 
-	/* Restore IRREGS registers from the stack. */
-	.cfi_reg_offset %rip, OFFSET_IRREGS_RIP, %rsp
-	.cfi_reg_offset %cs, OFFSET_IRREGS_CS, %rsp
-	.cfi_reg_offset %rflags, OFFSET_IRREGS_RFLAGS, %rsp
-	.cfi_reg_offset %rsp, OFFSET_IRREGS_RSP, %rsp
-	.cfi_reg_offset %ss, OFFSET_IRREGS_SS, %rsp
-
 	/* Load segment registers. */
-	movw   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%rdi), %ax
-	movw   %ax, %gs
-	.cfi_same_value %gs
-	movw   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS)(%rdi), %ax
-	movw   %ax, %fs
-	.cfi_same_value %fs
-	movw   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES)(%rdi), %ax
-	movw   %ax, %es
-	.cfi_same_value %es
 	movw   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS)(%rdi), %ax
 	movw   %ax, %ds
 	.cfi_same_value %ds
+	movw   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_ES)(%rdi), %ax
+	movw   %ax, %es
+	.cfi_same_value %es
+	movw   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_FS)(%rdi), %ax
+	movw   %ax, %fs
+	.cfi_same_value %fs
+	movw   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_GS)(%rdi), %ax
+	wrgs_keepbase %ax, %rcx
+	.cfi_same_value %gs
 
 	/* Load segment base registers. */
 #ifdef __KERNEL__
@@ -146,6 +155,13 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	movq   (OFFSET_UCPUSTATE_SGBASE + OFFSET_SGBASE_FSBASE)(%rdi), %rax
 	wrfsbaseq %rax
 	.cfi_same_value %fs.base
+
+	/* Restore IRREGS registers from the stack. */
+	.cfi_reg_offset %rip, OFFSET_IRREGS_RIP, %rsp
+	.cfi_reg_offset %cs, OFFSET_IRREGS_CS, %rsp
+	.cfi_reg_offset %rflags, OFFSET_IRREGS_RFLAGS, %rsp
+	.cfi_reg_offset %rsp, OFFSET_IRREGS_RSP, %rsp
+	.cfi_reg_offset %ss, OFFSET_IRREGS_SS, %rsp
 
 	/* Load GP registers. */
 	movq   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_RAX)(%rdi), %rax
@@ -296,7 +312,7 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 
 	/* Load segment registers. */
 	movw   OFFSET_FCPUSTATE_GS(%rdi), %ax
-	movw   %ax, %gs
+	wrgs_keepbase %ax, %rcx
 	.cfi_same_value %gs
 	movw   OFFSET_FCPUSTATE_FS(%rdi), %ax
 	movw   %ax, %fs
