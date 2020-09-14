@@ -890,8 +890,10 @@ task_signal_rpc_handler(void *arg,
 				/* Only one thread can ever handle the signal, so use `sig_send()' */
 				sig_send(&pertask_pending->sq_newsig);
 				/* Restart the interrupted system call without letting userspace know. */
-				if (reason == TASK_RPC_REASON_SYSCALL)
+				if (reason == TASK_RPC_REASON_SYSCALL) {
+					kfree(info);
 					return TASK_RPC_RESTART_SYSCALL;
+				}
 				goto done;
 			}
 			/* Actually handle the signal */
