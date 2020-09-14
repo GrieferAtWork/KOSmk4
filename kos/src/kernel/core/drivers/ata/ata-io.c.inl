@@ -69,7 +69,7 @@
 #define FUNC_VP(x)  x##_phys
 #define FUNC_VP2(x) x##Phys
 #define FUNC2       FUNC1(Phys)
-#define BUFFER_TYPE vm_phys_t
+#define BUFFER_TYPE physaddr_t
 #elif defined(DEFINE_IO_READ)
 #define FUNC_VP(x)  x
 #define FUNC_VP2(x) x

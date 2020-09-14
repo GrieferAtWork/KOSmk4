@@ -170,7 +170,7 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
                         size_t bss_num_bytes) {
 	struct vm_node *result_node;
 	struct vm_datapart *result_part;
-	pageptr_t overlap_page;
+	physpage_t overlap_page;
 	result_node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
 	                                        GFP_LOCKED | GFP_PREFLT);
 	TRY {
@@ -178,17 +178,17 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
 		                                            GFP_LOCKED | GFP_PREFLT);
 		TRY {
 			overlap_page = page_mallocone();
-			if unlikely(overlap_page == PAGEPTR_INVALID)
+			if unlikely(overlap_page == PHYSPAGE_INVALID)
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 			TRY {
 				/* Load the overlapping file data into memory. */
-				inode_readall_phys(exec_node, page2addr(overlap_page),
+				inode_readall_phys(exec_node, physpage2addr(overlap_page),
 				                   bss_start_page_offset,
 				                   file_data_offset);
 				/* Check if we must zero-initialize the BSS portion. */
 				if (!page_iszero(overlap_page)) {
 					/* Zero-initialize the BSS portion */
-					vm_memsetphys(page2addr(overlap_page) + bss_start_page_offset,
+					vm_memsetphys(physpage2addr(overlap_page) + bss_start_page_offset,
 					              0, bss_num_bytes);
 				}
 			} EXCEPT {

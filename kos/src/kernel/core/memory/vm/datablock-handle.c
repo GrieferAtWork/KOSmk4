@@ -398,10 +398,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		require(CAP_DATABLOCK_OPEN_PART);
 		part = cmd == HOP_DATABLOCK_OPEN_PART_EXACT
 		       ? vm_paged_datablock_locatepart_exact(self,
-		                                             (vm_vpage64_t)data->dop_pageno,
+		                                             (pageid64_t)data->dop_pageno,
 		                                             (size_t)data->dop_pages_hint)
 		       : vm_paged_datablock_locatepart(self,
-		                                       (vm_vpage64_t)data->dop_pageno,
+		                                       (pageid64_t)data->dop_pageno,
 		                                       (size_t)data->dop_pages_hint);
 		FINALLY_DECREF_UNLIKELY(part);
 		COMPILER_WRITE_BARRIER();

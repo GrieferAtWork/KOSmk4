@@ -43,6 +43,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kos/dev.h>
 
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -203,22 +204,15 @@ do_print_part_position:
 		case VM_DATAPART_STATE_INCORE:
 		case VM_DATAPART_STATE_LOCKED:
 			if (part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0) {
-				vm_phys_t maxphys;
-				maxphys = page2addr(part->dp_ramdata.rd_block0.rb_start +
+				physaddr_t maxphys;
+				maxphys = physpage2addr(part->dp_ramdata.rd_block0.rb_start +
 				                    part->dp_ramdata.rd_block0.rb_size) -
 				          1;
-#if __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__
-				if (maxphys > (vm_phys_t)UINTPTR_MAX) {
-					dbg_printf(DBGSTR(" @%I64p-%I64p\n"),
-					           (u64)page2addr(part->dp_ramdata.rd_block0.rb_start),
-					           (u64)maxphys);
-				} else
-#endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__ */
-				{
-					dbg_printf(DBGSTR(" @%p-%p\n"),
-					           (uintptr_t)page2addr(part->dp_ramdata.rd_block0.rb_start),
-					           maxphys);
-				}
+				dbg_printf(DBGSTR(" @"
+				                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
+				                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"),
+				           (uintptr_t)physpage2addr(part->dp_ramdata.rd_block0.rb_start),
+				           maxphys);
 			} else {
 				size_t i;
 				dbg_putc('\n');
@@ -226,8 +220,8 @@ do_print_part_position:
 					struct vm_ramblock *b;
 					b = &part->dp_ramdata.rd_blockv[i];
 					dbg_printf(DBGSTR("\tphys:%I64p-%I64p (%Iu pages)\n"),
-					           (u64)page2addr(b->rb_start),
-					           (u64)page2addr(b->rb_start + b->rb_size) - 1,
+					           (u64)physpage2addr(b->rb_start),
+					           (u64)physpage2addr(b->rb_start + b->rb_size) - 1,
 					           (size_t)b->rb_size);
 				}
 			}

@@ -43,4 +43,16 @@
 #define __SIZEOF_IOMODE_T__         2
 #endif /* !__x86_64__ */
 
+#ifdef __x86_64__
+#define __SIZEOF_PHYSPAGE_T__ 8
+#define __SIZEOF_PHYSADDR_T__ 8
+#else /* __x86_64__ */
+#define __SIZEOF_PHYSPAGE_T__ 4 /* No PAE implementation even allowed for more than 32+12=44 address bits,
+                                 * so it's OK to use a 32-bit data type for physical page indices of i386.
+                                 * Also: By using 32-bit here, only 1 CPU register is needed to represent
+                                 *       a physical page address. */
+#define __SIZEOF_PHYSADDR_T__ 8 /* With PAE, even i386's physical memory is larger than 2**32 */
+#endif /* !__x86_64__ */
+
+
 #endif /* !_I386_KOS_BITS_TYPESIZES_H */

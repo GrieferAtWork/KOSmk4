@@ -61,7 +61,7 @@ DECL_BEGIN
 #define BUFFER_TYPE struct aio_buffer *__restrict
 #define DST_MEMSET(offset, byte, num_bytes) aio_buffer_memset(buf, offset, byte, num_bytes)
 #elif defined(DEFINE_IO_PHYS)
-#define BUFFER_TYPE vm_phys_t
+#define BUFFER_TYPE physaddr_t
 #define DST_MEMSET(offset, byte, num_bytes) vm_memsetphys((buf) + (offset), byte, num_bytes)
 #elif defined(DEFINE_IO_READ)
 #define BUFFER_TYPE CHECKED USER void *

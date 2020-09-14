@@ -60,7 +60,7 @@ ramfs_read(struct inode *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ramfs_pread(struct inode *__restrict UNUSED(self),
-            vm_phys_t dst,
+            physaddr_t dst,
             size_t num_bytes, pos_t UNUSED(file_position),
             struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
@@ -103,7 +103,7 @@ ramfs_write(struct inode *__restrict UNUSED(self),
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ramfs_pwrite(struct inode *__restrict UNUSED(self),
-             vm_phys_t UNUSED(src),
+             physaddr_t UNUSED(src),
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
              struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {

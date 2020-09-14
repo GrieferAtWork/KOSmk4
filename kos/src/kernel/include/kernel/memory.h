@@ -28,36 +28,22 @@
 
 #include <hybrid/__assert.h>
 
+#include <kos/kernel/memory.h>
+
 #include <stdbool.h>
 
 /* Physical memory management. */
 
 DECL_BEGIN
 
-#if defined(__INTELLISENSE__) && defined(__CC__) && defined(__cplusplus)
-extern "C++" {
-vm_phys_t (page2addr)(pageptr_t pageptr);
-pageptr_t (addr2page)(vm_phys_t physaddr);
-pageptr_t (addr2page)(uintptr_t physaddr);
-u32 (page2addr32)(pageptr_t pageptr);
-}
-#define page2addr page2addr
-#define addr2page addr2page
-#define page2addr32 page2addr32
-#else /* __INTELLISENSE__ && __CC__ && __cplusplus */
-#define page2addr(pageptr)   (__CCAST(vm_phys_t)(pageptr) * PAGESIZE)
-#define addr2page(physaddr)  (__CCAST(pageptr_t)((physaddr) / PAGESIZE))
-#define page2addr32(pageptr) (__CCAST(u32)(pageptr) * PAGESIZE)
-#endif /* !__INTELLISENSE__ || !__CC__ || !__cplusplus */
-
-#ifndef PAGEPTR_INVALID
-#define PAGEPTR_INVALID (__CCAST(pageptr_t)-1)
-#endif /* !PAGEPTR_INVALID */
+/* Special page index that is returned on error. */
+#ifndef PHYSPAGE_INVALID
+#define PHYSPAGE_INVALID (__CCAST(physpage_t)-1)
+#endif /* !PHYSPAGE_INVALID */
 
 /* A page pointer is just like a normal physical pointer, but divided by PAGESIZE */
-#define FORMAT_PAGECNT_T "%Iu"
 #ifdef __CC__
-typedef size_t pagecnt_t;
+typedef __physpage_t physpagecnt_t;
 #endif /* __CC__ */
 
 
@@ -80,11 +66,11 @@ typedef size_t pagecnt_t;
 #ifdef __CC__
 struct pmembank {
 	union {
-		uintptr_t mb_startptr; /* Memory block starting address. */
-		vm_phys_t mb_start;    /* Memory block starting address. */
+		uintptr_t  mb_startptr; /* Memory block starting address. */
+		physaddr_t mb_start;    /* Memory block starting address. */
 	};
-	u16           mb_type;     /* Memory bank type. (One of `PMEMBANK_TYPE_*') */
-	u16           mb_pad[(sizeof(vm_phys_t) - 2) / 2]; /* ... */
+	u16            mb_type;     /* Memory bank type. (One of `PMEMBANK_TYPE_*') */
+	u16            mb_pad[(sizeof(physaddr_t) - 2) / 2]; /* ... */
 };
 #define PMEMBANK_INIT(startptr, type) { { startptr }, type, { } }
 
@@ -93,14 +79,14 @@ struct pmembank {
 #define PMEMBANK_MAXADDR(x)   ((&(x))[1].mb_start - 1)
 #define PMEMBANK_ENDADDR(x)   ((&(x))[1].mb_start)
 #define PMEMBANK_SIZE(x)      (PMEMBANK_ENDADDR(x) - PMEMBANK_STARTADDR(x))
-#define PMEMBANK_STARTPAGE(x) ((pageptr_t)((PMEMBANK_STARTADDR(x) + PAGESIZE - 1) / PAGESIZE))
-#define PMEMBANK_MINPAGE(x)   ((pageptr_t)((PMEMBANK_STARTADDR(x) + PAGESIZE - 1) / PAGESIZE))
-#define PMEMBANK_MAXPAGE(x)   ((pageptr_t)((PMEMBANK_ENDADDR(x) / PAGESIZE) - 1))
-#define PMEMBANK_ENDPAGE(x)   ((pageptr_t)(PMEMBANK_ENDADDR(x) / PAGESIZE))
+#define PMEMBANK_STARTPAGE(x) ((physpage_t)((PMEMBANK_STARTADDR(x) + PAGESIZE - 1) / PAGESIZE))
+#define PMEMBANK_MINPAGE(x)   ((physpage_t)((PMEMBANK_STARTADDR(x) + PAGESIZE - 1) / PAGESIZE))
+#define PMEMBANK_MAXPAGE(x)   ((physpage_t)((PMEMBANK_ENDADDR(x) / PAGESIZE) - 1))
+#define PMEMBANK_ENDPAGE(x)   ((physpage_t)(PMEMBANK_ENDADDR(x) / PAGESIZE))
 #define PMEMBANK_NUMPAGES(x)  ((size_t)(PMEMBANK_ENDPAGE(x) - PMEMBANK_STARTPAGE(x)))
 
 struct pmeminfo {
-	vm_phys_t        mb_total[PMEMBANK_TYPE_COUNT]; /* [const] The total number of bytes corresponding to certain banks. */
+	physaddr_t       mb_total[PMEMBANK_TYPE_COUNT]; /* [const] The total number of bytes corresponding to certain banks. */
 	size_t           mb_bankc;                      /* [const] Total number of memory banks. */
 	struct pmembank *mb_banks;                      /* [const] Vector of memory banks. */
 };
@@ -114,7 +100,7 @@ INTDEF FREE ATTR_PURE size_t
 NOTHROW(KCALL minfo_usable_ram_pages)(void);
 
 /* Add information about a new member bank / region. */
-INTDEF FREE void NOTHROW(KCALL minfo_addbank)(vm_phys_t start, vm_phys_t size, u16 type);
+INTDEF FREE void NOTHROW(KCALL minfo_addbank)(physaddr_t start, physaddr_t size, u16 type);
 
 /* Construct memory zones from memory info. */
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_minfo_makezones)(void);
@@ -146,9 +132,9 @@ INTDEF FREE void NOTHROW(KCALL minfo_release_preservations)(void);
 
 
 struct pmemstat {
-	pagecnt_t  ps_free;  /* Amount of free pages (including z-pages). */
-	pagecnt_t  ps_zfree; /* Amount of free zero-pages. */
-	pagecnt_t  ps_used;  /* Amount of used pages. */
+	physpagecnt_t ps_free;  /* Amount of free pages (including z-pages). */
+	physpagecnt_t ps_zfree; /* Amount of free zero-pages. */
+	physpagecnt_t ps_used;  /* Amount of used pages. */
 };
 #endif /* __CC__ */
 
@@ -161,15 +147,15 @@ struct pmemstat {
 
 #ifdef __CC__
 struct pmemzone {
-	struct pmemzone *mz_prev;    /* [0..1][const] Pointer to the previous zone. */
-	struct pmemzone *mz_next;    /* [0..1][const] Pointer to the next zone. */
-	pageptr_t        mz_start;   /* [const] Start page number. */
-	pageptr_t        mz_max;     /* [const] Max page still apart of this zone. */
-	pageptr_t        mz_rmax;    /* [const][== (mz_max - mz_start)] Zone-relative index of the max page. */
-	WEAK pageptr_t   mz_fmax;    /* The zone-relative address of the greatest free page (used as hint to the allocator). */
-	WEAK pagecnt_t   mz_cfree;   /* The number of free pages within this zone. */
-	WEAK pagecnt_t   mz_qfree;   /* The number of free pages within this zone that aren't initialized. */
-	uintptr_t        mz_zero;    /* [const] Always 0 */
+	struct pmemzone   *mz_prev;  /* [0..1][const] Pointer to the previous zone. */
+	struct pmemzone   *mz_next;  /* [0..1][const] Pointer to the next zone. */
+	physpage_t         mz_start; /* [const] Start page number. */
+	physpage_t         mz_max;   /* [const] Max page still apart of this zone. */
+	physpage_t         mz_rmax;  /* [const][== (mz_max - mz_start)] Zone-relative index of the max page. */
+	WEAK physpage_t    mz_fmax;  /* The zone-relative address of the greatest free page (used as hint to the allocator). */
+	WEAK physpagecnt_t mz_cfree; /* The number of free pages within this zone. */
+	WEAK physpagecnt_t mz_qfree; /* The number of free pages within this zone that aren't initialized. */
+	uintptr_t          mz_zero;  /* [const] Always 0 */
 	COMPILER_FLEXIBLE_ARRAY(uintptr_t, mz_free);
 	                             /* [((mz_rmax + 1) * PMEMZONE_BITSPERPAGE) / BITS_PER_POINTER] Bitset of free pages
 	                              * NOTE: Modifications are performed using atomic instructions. */
@@ -194,7 +180,7 @@ struct pmem {
 DATDEF struct pmem mzones;
 
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED struct pmemzone *
-NOTHROW(KCALL page_getzone)(pageptr_t ptr) {
+NOTHROW(KCALL page_getzone)(physpage_t ptr) {
 	struct pmemzone *zone;
 	zone = mzones.pm_last;
 	while (ptr > zone->mz_max) {
@@ -210,18 +196,18 @@ NOTHROW(KCALL page_getzone)(pageptr_t ptr) {
 /* Allocate `num_pages' continuous pages of physical memory and return their page number.
  * WARNING: Physical memory cannot be dereferenced prior to being mapped.
  * @return: * :              The starting page number of the newly allocated memory range.
- * @return: PAGEPTR_INVALID: The allocation failed. */
-FUNDEF NOBLOCK WUNUSED pageptr_t NOTHROW(KCALL page_mallocone)(void);
+ * @return: PHYSPAGE_INVALID: The allocation failed. */
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL page_mallocone)(void);
 #ifndef __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS
-FUNDEF NOBLOCK WUNUSED pageptr_t NOTHROW(KCALL __os_page_malloc)(pagecnt_t num_pages) ASMNAME("page_malloc");
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED pageptr_t
-NOTHROW(KCALL page_malloc)(pagecnt_t num_pages) {
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL __os_page_malloc)(physpagecnt_t num_pages) ASMNAME("page_malloc");
+FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED physpage_t
+NOTHROW(KCALL page_malloc)(physpagecnt_t num_pages) {
 	if (__builtin_constant_p(num_pages) && num_pages == 1)
 		return page_mallocone();
 	return __os_page_malloc(num_pages);
 }
 #else /* !__NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
-FUNDEF NOBLOCK WUNUSED pageptr_t NOTHROW(KCALL page_malloc)(pagecnt_t num_pages);
+FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL page_malloc)(physpagecnt_t num_pages);
 #endif /* __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
 
 
@@ -232,15 +218,15 @@ FUNDEF NOBLOCK WUNUSED pageptr_t NOTHROW(KCALL page_malloc)(pagecnt_t num_pages)
  *    a length of at least `min_pages', thus preventing memory fragmentation by
  *    using up small memory blocks that might otherwise continue going unused.
  * @return: * :              The starting page number of the newly allocated memory range.
- * @return: PAGEPTR_INVALID: The allocation failed. */
-FUNDEF NOBLOCK WUNUSED NONNULL((3)) pageptr_t
-NOTHROW(KCALL page_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
-                                pagecnt_t *__restrict res_pages);
+ * @return: PHYSPAGE_INVALID: The allocation failed. */
+FUNDEF NOBLOCK WUNUSED NONNULL((3)) physpage_t
+NOTHROW(KCALL page_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages,
+                                physpagecnt_t *__restrict res_pages);
 
 /* Try to allocate the given page.
  * @return: * : One of `PAGE_MALLOC_AT_*' */
 FUNDEF NOBLOCK WUNUSED unsigned int
-NOTHROW(KCALL page_malloc_at)(pageptr_t ptr);
+NOTHROW(KCALL page_malloc_at)(physpage_t ptr);
 #endif /* __CC__ */
 #define PAGE_MALLOC_AT_SUCCESS   0 /* Successfully allocated the page. */
 #define PAGE_MALLOC_AT_NOTMAPPED 1 /* The specified page is not mapped. */
@@ -250,35 +236,35 @@ NOTHROW(KCALL page_malloc_at)(pageptr_t ptr);
 /* Similar to `page_malloc()' / `page_malloc_part()', but only
  * allocate memory from between the two given page addresses, such
  * that all allocated pages are located within the specified range.
- * @assume(return == PAGEPTR_INVALID ||
+ * @assume(return == PHYSPAGE_INVALID ||
  *        (return >= min_page &&
  *         return + num_pages - 1 <= max_page)); */
-FUNDEF NOBLOCK WUNUSED pageptr_t
-NOTHROW(KCALL page_malloc_between)(pageptr_t min_page, pageptr_t max_page,
-                                   pagecnt_t num_pages);
-FUNDEF NOBLOCK WUNUSED NONNULL((5)) pageptr_t
-NOTHROW(KCALL page_malloc_part_between)(pageptr_t min_page, pageptr_t max_page,
-                                        pagecnt_t min_pages, pagecnt_t max_pages,
-                                        pagecnt_t *__restrict res_pages);
+FUNDEF NOBLOCK WUNUSED physpage_t
+NOTHROW(KCALL page_malloc_between)(physpage_t min_page, physpage_t max_page,
+                                   physpagecnt_t num_pages);
+FUNDEF NOBLOCK WUNUSED NONNULL((5)) physpage_t
+NOTHROW(KCALL page_malloc_part_between)(physpage_t min_page, physpage_t max_page,
+                                        physpagecnt_t min_pages, physpagecnt_t max_pages,
+                                        physpagecnt_t *__restrict res_pages);
 
-#if __SIZEOF_VM_PHYS_T__ > 4
-#define page_malloc32(num_pages)                           \
-	page_malloc_between(addr2page(__UINT32_C(0x00000000)), \
-	                    addr2page(__UINT32_C(0xffffffff)), \
+#if __SIZEOF_PHYSADDR_T__ > 4
+#define page_malloc32(num_pages)                               \
+	page_malloc_between(physaddr2page(__UINT32_C(0x00000000)), \
+	                    physaddr2page(__UINT32_C(0xffffffff)), \
 	                    num_pages)
 #define page_mallocone32() page_malloc32(1)
-#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+#else /* __SIZEOF_PHYSADDR_T__ > 4 */
 #define page_malloc32(num_pages) page_malloc(num_pages)
 #define page_mallocone32()       page_mallocone()
-#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 
 /* Free a given physical address range.
  * The caller is responsible to ensure that the given range has previously been allocated. */
-FUNDEF NOBLOCK void NOTHROW(KCALL page_freeone)(pageptr_t base);
+FUNDEF NOBLOCK void NOTHROW(KCALL page_freeone)(physpage_t base);
 #ifndef __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS
-FUNDEF NOBLOCK void NOTHROW(KCALL __os_page_free)(pageptr_t base, pagecnt_t num_pages) ASMNAME("page_free");
+FUNDEF NOBLOCK void NOTHROW(KCALL __os_page_free)(physpage_t base, physpagecnt_t num_pages) ASMNAME("page_free");
 FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
-NOTHROW(KCALL page_free)(pageptr_t base, pagecnt_t num_pages) {
+NOTHROW(KCALL page_free)(physpage_t base, physpagecnt_t num_pages) {
 	if (__builtin_constant_p(num_pages) && num_pages == 1) {
 		page_freeone(base);
 	} else {
@@ -286,33 +272,33 @@ NOTHROW(KCALL page_free)(pageptr_t base, pagecnt_t num_pages) {
 	}
 }
 #else /* !__NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
-FUNDEF NOBLOCK void NOTHROW(KCALL page_free)(pageptr_t base, pagecnt_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(KCALL page_free)(physpage_t base, physpagecnt_t num_pages);
 #endif /* __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
 
 /* Similar to `page_free()', however set the is-zero-bit for all pages. */
 FUNDEF NOBLOCK void
-NOTHROW(KCALL page_cfree)(pageptr_t base, pagecnt_t num_pages);
+NOTHROW(KCALL page_cfree)(physpage_t base, physpagecnt_t num_pages);
 
 /* Similar to `page_free()', however set the is-zero-bit for pages where `page_iszero()' is true. */
 FUNDEF NOBLOCK void
-NOTHROW(KCALL page_ccfree)(pageptr_t base, pagecnt_t num_pages);
+NOTHROW(KCALL page_ccfree)(physpage_t base, physpagecnt_t num_pages);
 
 /* Combination of `page_free()' and `page_cfree()' */
 FUNDEF NOBLOCK void
-NOTHROW(KCALL page_ffree)(pageptr_t base, pagecnt_t num_pages, bool is_zero);
+NOTHROW(KCALL page_ffree)(physpage_t base, physpagecnt_t num_pages, bool is_zero);
 
 
 /* Collect volatile statistics about the usage of physical memory */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL page_stat)(struct pmemstat *__restrict result);
 FUNDEF NOBLOCK NONNULL((3)) void
-NOTHROW(KCALL page_stat_between)(pageptr_t base, pagecnt_t num_pages,
+NOTHROW(KCALL page_stat_between)(physpage_t base, physpagecnt_t num_pages,
                                  struct pmemstat *__restrict result);
 
 /* Check if a given `page' is current free.
  * NOTE: Returns `false' when `page_ismapped(page, 1)' is false. */
 FUNDEF NOBLOCK WUNUSED bool
-NOTHROW(KCALL page_isfree)(pageptr_t page);
+NOTHROW(KCALL page_isfree)(physpage_t page);
 
 /* Following a call to one of the `page_malloc()' functions,
  * check if the given `page' contains only zero-bytes.
@@ -325,16 +311,16 @@ NOTHROW(KCALL page_isfree)(pageptr_t page);
  *       >> page = page_malloc(1);
  *       >> pagedir_mapone(dest, page, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
  *       >> if (!page_iszero(page))
- *       >>      vm_memsetphys(page2addr(dest), 0, PAGESIZE);
+ *       >>      vm_memsetphys(physpage2addr(dest), 0, PAGESIZE);
  *       In other words: The information is most useful in freshly
  *       allocated pages, in order to determine if the mapped memory
  *       already contains all zeros. */
 FUNDEF NOBLOCK WUNUSED bool
-NOTHROW(KCALL page_iszero)(pageptr_t page);
+NOTHROW(KCALL page_iszero)(physpage_t page);
 
 /* Check if all pages of a given physical memory range are mapped as available RAM. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(KCALL page_ismapped)(pageptr_t page, pagecnt_t num_pages);
+NOTHROW(KCALL page_ismapped)(physpage_t page, physpagecnt_t num_pages);
 #endif /* __CC__ */
 
 DECL_END

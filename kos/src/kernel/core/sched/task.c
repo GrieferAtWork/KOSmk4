@@ -234,7 +234,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, 0, 0);
 #endif /* CONFIG_NO_SMP */
 	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
-	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys, offsetof(struct vm, v_pdir_phys), sizeof(vm_phys_t));
+	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys, offsetof(struct vm, v_pdir_phys), sizeof(physaddr_t));
 
 	/* Set kernel boot timestamps.
 	 * These can be used to calculate things such as uptime, etc. */
@@ -273,7 +273,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 		FORTASK(&_boottask, this_kernel_stacknode_).vn_node.a_vmin = boottask_stack_pageid;
 		FORTASK(&_boottask, this_kernel_stacknode_).vn_node.a_vmax = boottask_stack_pageid + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
 	}
-	FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_boottask_stack_pageptr);
+	FORTASK(&_boottask, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_boottask_stack_pageptr);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 	{
 		pageid_t boottask_stack_guard_pageid = (pageid_t)loadfarptr(__kernel_boottask_stack_guard_pageid);
@@ -293,7 +293,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 		FORTASK(&_asyncwork, this_kernel_stacknode_).vn_node.a_vmin = asyncwork_stack_pageid;
 		FORTASK(&_asyncwork, this_kernel_stacknode_).vn_node.a_vmax = asyncwork_stack_pageid + CEILDIV(KERNEL_STACKSIZE, PAGESIZE) - 1;
 	}
-	FORTASK(&_asyncwork, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_asyncwork_stack_pageptr);
+	FORTASK(&_asyncwork, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_asyncwork_stack_pageptr);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 	{
 		pageid_t asyncwork_stack_guard_pageid = (pageid_t)loadfarptr(__kernel_asyncwork_stack_guard_pageid);
@@ -312,7 +312,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 		FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmin = bootidle_stack_pageid;
 		FORTASK(&_bootidle, this_kernel_stacknode_).vn_node.a_vmax = bootidle_stack_pageid + CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1;
 	}
-	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_bootidle_stack_pageptr);
+	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_bootidle_stack_pageptr);
 	FORTASK(&_bootidle, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_size  = CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE);
 	FORTASK(&_bootidle, this_kernel_stackpart_).dp_tree.a_vmax                = (datapage_t)(CEILDIV(KERNEL_IDLE_STACKSIZE, PAGESIZE) - 1);
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD

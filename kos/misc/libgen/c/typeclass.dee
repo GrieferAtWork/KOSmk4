@@ -249,6 +249,8 @@ global knownTypeClasses: {string: string} = Dict({
 	"__timer_t"         : "TIn(__SIZEOF_TIMER_T__)",
 	"fsword_t"          : "TIn(__SIZEOF_FSWORD_T__)",
 	"__fsword_t"        : "TIn(__SIZEOF_FSWORD_T__)",
+	"physaddr_t"        : "TIn(__SIZEOF_PHYSADDR_T__)",
+	"__physaddr_t"      : "TIn(__SIZEOF_PHYSADDR_T__)",
 
 	/* __STDC_x_AS_y types */
 	"__STDC_INT_AS_SSIZE_T"   : "TD",

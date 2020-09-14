@@ -41,8 +41,8 @@ struct ioperm_bitmap {
 	WEAK refcnt_t ib_refcnt; /* Reference counter (when > 1, the bitmap becomes read-only/copy-on-write) */
 	WEAK refcnt_t ib_share;  /* Reference counter for how many threads share this I/O permissions bitmap. */
 	union {
-		uintptr_t _ib_pages_ptr[sizeof(vm_phys_t) / sizeof(uintptr_t)];
-		vm_phys_t  ib_pages;  /* [owned(page_free(addr2page(.), 2))][const]
+		uintptr_t _ib_pages_ptr[sizeof(physaddr_t) / sizeof(uintptr_t)];
+		physaddr_t ib_pages;  /* [owned(page_free(physaddr2page(.), 2))][const]
 		                       * First physical page containing io permission bits. */
 	};
 };

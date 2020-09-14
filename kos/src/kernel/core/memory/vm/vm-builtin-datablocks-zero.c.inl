@@ -50,15 +50,15 @@ DECL_BEGIN
 PRIVATE NONNULL((1)) void KCALL
 PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUSED(self),
                                             datapage_t UNUSED(start),
-                                            vm_phys_t buffer,
+                                            physaddr_t buffer,
                                             size_t num_pages) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
-	vm_phys_t phys = buffer & ~PAGEMASK;
+	physaddr_t phys = buffer & ~PAGEMASK;
 	assert(num_pages != 0);
 	for (;;) {
 		/* Skip all pages that are already zero-initialized. */
-		if (page_iszero(addr2page(phys))) {
+		if (page_iszero(physaddr2page(phys))) {
 #if DATA_PAGES_PER_V_PAGE == 1
 			if (!num_pages)
 				break;
@@ -84,7 +84,7 @@ PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUS
 				if (!--num_pages)
 					goto done;
 				phys += PAGESIZE;
-			} while (page_iszero(addr2page(phys)));
+			} while (page_iszero(physaddr2page(phys)));
 #else /* DATA_PAGES_PER_V_PAGE == 1 */
 			{
 				size_t off_pages, max_pages;
@@ -101,7 +101,7 @@ PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUS
 				phys += max_pages * PAGESIZE;
 			}
 			/* Skip pages that have already been zero-initialized. */
-			while (page_iszero(addr2page(phys))) {
+			while (page_iszero(physaddr2page(phys))) {
 				if (num_pages <= DATA_PAGES_PER_V_PAGE)
 					goto done;
 				num_pages -= DATA_PAGES_PER_V_PAGE;

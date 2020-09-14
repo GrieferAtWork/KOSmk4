@@ -38,7 +38,7 @@ DECL_BEGIN
 #else /* DEFINE_FOR_AIO_BUFFER */
 #define STRUCT_AIO_BUFFER       struct aio_pbuffer
 #define STRUCT_AIO_BUFFER_ENTRY struct aio_pbuffer_entry
-#define AIO_ARITH_TYPE          vm_phys_t
+#define AIO_ARITH_TYPE          physaddr_t
 #define AIO_BUFFER_FUNC(name)   aio_pbuffer_##name
 #endif /* !DEFINE_FOR_AIO_BUFFER */
 

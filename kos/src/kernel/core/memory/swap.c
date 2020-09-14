@@ -37,10 +37,10 @@ DECL_BEGIN
 /* Allocate SWAP memory.
  * @return: * :              The base address for the allocated swap segment.
  * @return: SWAPPTR_INVALID: Failed to allocate swap memory. */
-PUBLIC WUNUSED swapptr_t
-NOTHROW(KCALL swap_malloc)(pagecnt_t num_pages) {
-	pagecnt_t res_pages;
-	swapptr_t result;
+PUBLIC WUNUSED swappage_t
+NOTHROW(KCALL swap_malloc)(physpagecnt_t num_pages) {
+	physpagecnt_t res_pages;
+	swappage_t result;
 	result = swap_malloc_part(num_pages,
 	                          num_pages,
 	                          &res_pages);
@@ -49,9 +49,9 @@ NOTHROW(KCALL swap_malloc)(pagecnt_t num_pages) {
 	return result;
 }
 
-PUBLIC WUNUSED NONNULL((3)) swapptr_t
-NOTHROW(KCALL swap_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
-                                pagecnt_t *__restrict res_pages) {
+PUBLIC WUNUSED NONNULL((3)) swappage_t
+NOTHROW(KCALL swap_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages,
+                                physpagecnt_t *__restrict res_pages) {
 	(void)min_pages;
 	(void)max_pages;
 	(void)res_pages;
@@ -62,7 +62,7 @@ NOTHROW(KCALL swap_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
 
 /* Free SWAP memory. */
 PUBLIC NOBLOCK void
-NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages) {
+NOTHROW(KCALL swap_free)(swappage_t start, physpagecnt_t num_pages) {
 	(void)start;
 	(void)num_pages;
 	/* TODO */
@@ -75,9 +75,9 @@ NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages) {
  *       is why operations must be followed by a call to `swap_sync()'
  *       in order to ensure completion. */
 PUBLIC void KCALL
-swap_read(swapptr_t start,
-          pageptr_t buffer,
-          pagecnt_t num_pages) {
+swap_read(swappage_t start,
+          physpage_t buffer,
+          physpagecnt_t num_pages) {
 	(void)start;
 	(void)buffer;
 	(void)num_pages;
@@ -86,9 +86,9 @@ swap_read(swapptr_t start,
 }
 
 PUBLIC void KCALL
-swap_write(swapptr_t start,
-           pageptr_t buffer,
-           pagecnt_t num_pages) {
+swap_write(swappage_t start,
+           physpage_t buffer,
+           physpagecnt_t num_pages) {
 	(void)start;
 	(void)buffer;
 	(void)num_pages;

@@ -72,10 +72,10 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 
 	/* Find the associated RAM block(s) and write them to disk. */
 	if (part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0) {
-		vm_phys_t phys_buf;
+		physaddr_t phys_buf;
 		/* Simple case: physical memory was allocated linearly. */
 		assert(first_ppage_index < part->dp_ramdata.rd_block0.rb_size);
-		phys_buf = page2addr(part->dp_ramdata.rd_block0.rb_start + first_ppage_index);
+		phys_buf = physpage2addr(part->dp_ramdata.rd_block0.rb_start + first_ppage_index);
 		phys_buf += ppage_offset;
 #ifdef DEFINE_IO_READ
 		(*self->i_type->it_file.f_pread)(self,
@@ -97,7 +97,7 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 		count  = part->dp_ramdata.rd_blockc;
 		blocks = part->dp_ramdata.rd_blockv;
 		for (i = 0;; ++i) {
-			vm_phys_t phys_buf;
+			physaddr_t phys_buf;
 			size_t block_size_in_ppages;
 			size_t num_block_bytes;
 			assert(i < count);
@@ -111,7 +111,7 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 			num_block_bytes = (block_size_in_ppages - first_ppage_index) * PAGESIZE;
 			if (num_block_bytes > num_bytes)
 				num_block_bytes = num_bytes;
-			phys_buf = page2addr(blocks[i].rb_start + first_ppage_index);
+			phys_buf = physpage2addr(blocks[i].rb_start + first_ppage_index);
 			phys_buf += ppage_offset;
 #ifdef DEFINE_IO_READ
 			(*self->i_type->it_file.f_pread)(self,

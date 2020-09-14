@@ -85,8 +85,8 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
                                     gfp_t flags) {
 	PAGEDIR_PAGEALIGNED void *mapping_target;
 	struct vm_corepair_ptr corepair;
-	pageptr_t block0_addr;
-	pagecnt_t block0_size;
+	physpage_t block0_addr;
+	physpagecnt_t block0_size;
 	corepair = vm_corepair_alloc(flags, true);
 	if (!corepair.cp_node)
 		return NULL;
@@ -110,7 +110,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_LOCKED;
 	block0_size = num_bytes / PAGESIZE;
 	block0_addr = page_malloc(block0_size);
-	if unlikely(block0_addr == PAGEPTR_INVALID)
+	if unlikely(block0_addr == PHYSPAGE_INVALID)
 		goto err_corepair;
 	/* initialize the did-init bitset. */
 	if (num_bytes <= (BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) * PAGESIZE) {
@@ -138,7 +138,7 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 		goto err_corepair_content;
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_map(mapping_target, num_bytes,
-	            page2addr(block0_addr),
+	            physpage2addr(block0_addr),
 	            PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 	if (flags & GFP_CALLOC)
 		memset(mapping_target, 0, num_bytes);

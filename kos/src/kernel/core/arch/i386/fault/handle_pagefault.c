@@ -53,6 +53,7 @@
 #include <kos/kernel/segment.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stdint.h>
 #include <string.h>
@@ -404,7 +405,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 		if ((hinted_node = (struct vm_node *)pagedir_gethint(addr)) != NULL) {
 			/* This is a hinted node (perform assertions on all
 			 * of the requirements documented for such a node) */
-			pageptr_t ppage;
+			physpage_t ppage;
 			uintptr_half_t pagedir_prot;
 			assert(hinted_node->vn_flags & VM_NODE_FLAG_HINTED);
 			assert(hinted_node->vn_prot & VM_PROT_SHARED);
@@ -438,7 +439,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 			 *       tracking. */
 			if ((hinted_node->vn_part->dp_flags & VM_DATAPART_FLAG_TRKCHNG) && !has_changed)
 				pagedir_prot &= ~PAGEDIR_MAP_FWRITE;
-			pagedir_mapone(pageaddr, page2addr(ppage), pagedir_prot);
+			pagedir_mapone(pageaddr, physpage2addr(ppage), pagedir_prot);
 			goto done;
 		}
 	}
@@ -739,7 +740,7 @@ do_handle_iob_node_access:
 			has_changed = ecode & X86_PAGEFAULT_ECODE_WRITING;
 			/* Acquire a lock to the affected data part. */
 			TRY {
-				pageptr_t ppage;
+				physpage_t ppage;
 				uintptr_half_t pagedir_prot;
 				/* Need at least a read-lock for part initialization */
 #ifdef LIBVIO_CONFIG_ENABLED
@@ -1049,7 +1050,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 					}
 				}
 				/* Actually map the accessed page! */
-				pagedir_mapone(pageaddr, page2addr(ppage), pagedir_prot);
+				pagedir_mapone(pageaddr, physpage2addr(ppage), pagedir_prot);
 
 				/* Make sure that the performed access can now succeed */
 				assertf(ecode & X86_PAGEFAULT_ECODE_WRITING
@@ -1063,7 +1064,7 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 				        "prot          = %p\n"
 				        "node->vn_prot = %p\n"
 				        "addr          = %p (page %p)\n"
-				        "phys          = " FORMAT_VM_PHYS_T " (page " FORMAT_PAGEPTR_T ")\n"
+				        "phys          = %" PRIpN(__SIZEOF_PHYSADDR_T__) " (page %" PRIpN(__SIZEOF_PHYSPAGE_T__) ")\n"
 				        "effective_vm  = %p\n"
 				        "has_changed   = %u\n",
 				        (uintptr_t)ecode,
@@ -1071,8 +1072,8 @@ decref_part_and_pop_connections_and_set_exception_pointers:
 				        (uintptr_t)node->vn_prot,
 				        (uintptr_t)addr,
 				        (uintptr_t)pageaddr,
-				        (vm_phys_t)page2addr(ppage),
-				        (pageptr_t)ppage,
+				        (physaddr_t)physpage2addr(ppage),
+				        (physpage_t)ppage,
 				        (uintptr_t)effective_vm,
 				        (unsigned int)has_changed);
 				sync_endwrite(effective_vm);

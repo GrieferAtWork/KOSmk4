@@ -330,7 +330,7 @@ allocate_from_corepage:
 	} else {
 		/* It's our responsibility to allocate a new corepage. */
 		void *mapping_target;
-		pageptr_t mapping_backend;
+		physpage_t mapping_backend;
 		struct vm_corepage *new_page;
 		/* Safely acquire the VM-lock, while also keeping the COREPAGE lock. */
 		while (!vm_kernel_treelock_trywrite()) {
@@ -397,7 +397,7 @@ again_tryhard_mapping_target:
 		 * data block. Now all that we still need is 1 page of physical memory which
 		 * we can then use to map at that location! */
 		mapping_backend = page_mallocone();
-		if (mapping_backend == PAGEPTR_INVALID) {
+		if (mapping_backend == PHYSPAGE_INVALID) {
 			vm_kernel_treelock_endwrite();
 			sync_endwrite(&vm_corepage_lock);
 			if (!nothrow)
@@ -420,7 +420,7 @@ again_tryhard_mapping_target:
 		}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		pagedir_mapone(mapping_target,
-		               page2addr(mapping_backend),
+		               physpage2addr(mapping_backend),
 		               PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 
 		/* Allocate (reserve) 2 of the remaining corebase components,

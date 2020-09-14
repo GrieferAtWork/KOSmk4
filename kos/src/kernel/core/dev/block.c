@@ -160,7 +160,7 @@ block_device_partition_writev(struct block_device *__restrict self,
 
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_read_phys(struct block_device *__restrict self,
-                                 vm_phys_t dst, size_t num_sectors,
+                                 physaddr_t dst, size_t num_sectors,
                                  lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
@@ -174,7 +174,7 @@ block_device_partition_read_phys(struct block_device *__restrict self,
 
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_write_phys(struct block_device *__restrict self,
-                                  vm_phys_t src, size_t num_sectors,
+                                  physaddr_t src, size_t num_sectors,
                                   lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
@@ -851,8 +851,8 @@ block_device_delparts(struct block_device *__restrict self)
 FUNDEF NONNULL((1, 2)) void KCALL _block_device_read(struct block_device *__restrict self, VIRT CHECKED void *dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_read");
 FUNDEF NONNULL((1, 2)) void KCALL _block_device_write(struct block_device *__restrict self, VIRT CHECKED void const *src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_BADALLOC, ...) ASMNAME("block_device_write");
 FUNDEF NONNULL((1)) size_t KCALL _block_device_sync(struct block_device *__restrict self) THROWS(E_IOERROR, E_IOERROR_READONLY, E_BADALLOC, ...) ASMNAME("block_device_sync");
-FUNDEF NONNULL((1)) void KCALL _block_device_read_phys(struct block_device *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_read_phys");
-FUNDEF NONNULL((1)) void KCALL _block_device_write_phys(struct block_device *__restrict self, vm_phys_t src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_write_phys");
+FUNDEF NONNULL((1)) void KCALL _block_device_read_phys(struct block_device *__restrict self, physaddr_t dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_read_phys");
+FUNDEF NONNULL((1)) void KCALL _block_device_write_phys(struct block_device *__restrict self, physaddr_t src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_write_phys");
 FUNDEF NONNULL((1, 2)) void KCALL _block_device_readv(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_readv");
 FUNDEF NONNULL((1, 2)) void KCALL _block_device_writev(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_writev");
 FUNDEF NONNULL((1, 2)) void KCALL _block_device_readv_phys(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_readv_phys");
@@ -863,24 +863,24 @@ FUNDEF NONNULL((1, 2)) void KCALL _block_device_writev_phys(struct block_device 
 /* Read/write data to/from a block device or partition. */
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_sector)(struct block_device *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_sector");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_sector)(struct block_device *__restrict self, USER CHECKED void const *src, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_phys_sector)(struct block_device *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_phys_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_phys_sector)(struct block_device *__restrict self, vm_phys_t src, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_phys_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_phys_sector)(struct block_device *__restrict self, physaddr_t dst, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_phys_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_phys_sector)(struct block_device *__restrict self, physaddr_t src, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_phys_sector");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_sector)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_sector");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_sector)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_sector");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_phys_sector)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_phys_sector");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_phys_sector)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_phys_sector");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread)(struct block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_phys)(struct block_device *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_phys");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_phys)(struct block_device *__restrict self, vm_phys_t src, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_phys");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_phys)(struct block_device *__restrict self, physaddr_t dst, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_phys");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_phys)(struct block_device *__restrict self, physaddr_t src, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_phys");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_phys)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_phys");
 FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_phys)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_phys");
 FUNDEF NONNULL((1)) void KCALL _block_device_read_sync(struct block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC,E_SEGFAULT, ...) ASMNAME("block_device_read_sync");
 FUNDEF NONNULL((1)) void KCALL _block_device_write_sync(struct block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC,E_SEGFAULT, ...) ASMNAME("block_device_write_sync");
-FUNDEF NONNULL((1)) void KCALL _block_device_read_phys_sync(struct block_device *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_read_phys_sync");
-FUNDEF NONNULL((1)) void KCALL _block_device_write_phys_sync(struct block_device *__restrict self, vm_phys_t src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_write_phys_sync");
+FUNDEF NONNULL((1)) void KCALL _block_device_read_phys_sync(struct block_device *__restrict self, physaddr_t dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_read_phys_sync");
+FUNDEF NONNULL((1)) void KCALL _block_device_write_phys_sync(struct block_device *__restrict self, physaddr_t src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_write_phys_sync");
 FUNDEF NONNULL((1)) void KCALL _block_device_readv_sync(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC,E_SEGFAULT, ...) ASMNAME("block_device_readv_sync");
 FUNDEF NONNULL((1)) void KCALL _block_device_writev_sync(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC,E_SEGFAULT, ...) ASMNAME("block_device_writev_sync");
 FUNDEF NONNULL((1)) void KCALL _block_device_readv_phys_sync(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_readv_phys_sync");
@@ -1245,7 +1245,7 @@ check_handle_state_for_load:
 
 PUBLIC NONNULL((1)) void KCALL
 _block_device_read_phys(struct block_device *__restrict self,
-                        vm_phys_t dst, size_t num_bytes,
+                        physaddr_t dst, size_t num_bytes,
                         pos_t device_position)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	uintptr_t backup;
@@ -1289,7 +1289,7 @@ _block_device_read_phys(struct block_device *__restrict self,
 
 PUBLIC NONNULL((1)) void KCALL
 _block_device_write_phys(struct block_device *__restrict self,
-                         vm_phys_t src, size_t num_bytes,
+                         physaddr_t src, size_t num_bytes,
                          pos_t device_position)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	pagedir_pushval_t backup;

@@ -86,7 +86,7 @@ NOTHROW(KCALL x86_initialize_default_memory_banks)(void) {
 	/* Setup initial memory type totals.
 	 * XXX: This could be done at compile-/link-time */
 	for (i = 0; i < COMPILER_LENOF(default_memory_banks); ++i) {
-		vm_phys_t size;
+		physaddr_t size;
 		u16 type;
 		size = PMEMBANK_SIZE(default_memory_banks[i]);
 		type = default_memory_banks[i].mb_type;
@@ -195,8 +195,8 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 			entry->sm_type = 0;
 		if (memtype_bios_matrix[entry->sm_type] >= PMEMBANK_TYPE_COUNT)
 			continue;
-		minfo_addbank((vm_phys_t)entry->sm_addr_lo | (vm_phys_t)entry->sm_addr_hi << 32,
-		              (vm_phys_t)entry->sm_size_lo | (vm_phys_t)entry->sm_size_hi << 32,
+		minfo_addbank((physaddr_t)entry->sm_addr_lo | (physaddr_t)entry->sm_addr_hi << 32,
+		              (physaddr_t)entry->sm_size_lo | (physaddr_t)entry->sm_size_hi << 32,
 		              memtype_bios_matrix[entry->sm_type]);
 		result = true;
 	} while (state.vr_regs.vr_ebx);
@@ -222,8 +222,8 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e801)(void) {
 		state.vr_regs.vr_edx = state.vr_regs.vr_ebx;
 	if (state.vr_regs.vr_ecx > 0x3c00)
 		return false; /* Don't trust a broken value... */
-	minfo_addbank((vm_phys_t)0x00100000, (vm_phys_t)state.vr_regs.vr_ecx * 1024, PMEMBANK_TYPE_RAM);
-	minfo_addbank((vm_phys_t)0x01000000, (vm_phys_t)state.vr_regs.vr_edx * 64 * 1024, PMEMBANK_TYPE_RAM);
+	minfo_addbank((physaddr_t)0x00100000, (physaddr_t)state.vr_regs.vr_ecx * 1024, PMEMBANK_TYPE_RAM);
+	minfo_addbank((physaddr_t)0x01000000, (physaddr_t)state.vr_regs.vr_edx * 64 * 1024, PMEMBANK_TYPE_RAM);
 	return true;
 }
 
@@ -237,8 +237,8 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_da88)(void) {
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
 	count = ((u32)(state.vr_regs.vr_ebx & 0xffff) << 8 | (u32)(state.vr_regs.vr_ecx & 0xff)) * 1024;
-	minfo_addbank((vm_phys_t)0x00100000,
-	              (vm_phys_t)count,
+	minfo_addbank((physaddr_t)0x00100000,
+	              (physaddr_t)count,
 	              PMEMBANK_TYPE_RAM);
 	return true;
 }
@@ -253,8 +253,8 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_88)(void) {
 	if (state.vr_regs.vr_eflags & EFLAGS_CF)
 		return false;
 	count = (u32)(state.vr_regs.vr_eax & 0xffff) * 1024;
-	minfo_addbank((vm_phys_t)0x00100000,
-	              (vm_phys_t)count,
+	minfo_addbank((physaddr_t)0x00100000,
+	              (physaddr_t)count,
 	              PMEMBANK_TYPE_RAM);
 	return true;
 }
@@ -271,8 +271,8 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_8a)(void) {
 	count = ((u32)(state.vr_regs.vr_edx & 0xffff) |
 	         (u32)(state.vr_regs.vr_eax & 0xffff) << 16) *
 	        1024;
-	minfo_addbank((vm_phys_t)0x00100000,
-	              (vm_phys_t)count,
+	minfo_addbank((physaddr_t)0x00100000,
+	              (physaddr_t)count,
 	              PMEMBANK_TYPE_RAM);
 	return true;
 }
@@ -298,8 +298,8 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_c7)(void) {
 		return false;
 	if (C7_RECORD->r_1x > 0x3c00)
 		return false; /* Don't trust a broken value... */
-	minfo_addbank((vm_phys_t)0x00100000, (vm_phys_t)C7_RECORD->r_1x, PMEMBANK_TYPE_RAM);
-	minfo_addbank((vm_phys_t)0x01000000, (vm_phys_t)C7_RECORD->r_16x, PMEMBANK_TYPE_RAM);
+	minfo_addbank((physaddr_t)0x00100000, (physaddr_t)C7_RECORD->r_1x, PMEMBANK_TYPE_RAM);
+	minfo_addbank((physaddr_t)0x01000000, (physaddr_t)C7_RECORD->r_16x, PMEMBANK_TYPE_RAM);
 	return true;
 }
 
@@ -343,7 +343,7 @@ NOTHROW(KCALL x86_initialize_memory_via_bios)(void) {
 #undef TRY_METHOD
 	printk(FREESTR(KERN_WARNING "[bios] Insufficient memory detected. Try to guess available RAM\n"));
 #define RANGE(min, max) \
-	minfo_addbank((vm_phys_t)(min), (vm_phys_t)((max) - (min)) + 1, PMEMBANK_TYPE_RAM)
+	minfo_addbank((physaddr_t)(min), (physaddr_t)((max) - (min)) + 1, PMEMBANK_TYPE_RAM)
 	/* Most likely that at least this memory exists... */
 	RANGE(0x00000500, 0x0008ffff);
 	/* TODO: Probe linear memory after the kernel core through trial-and-error */

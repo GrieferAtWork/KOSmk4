@@ -90,7 +90,7 @@ typedef struct {
  *                   - Some portion of the given address range(s) isn't mapped (`AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector')
  *                   - Some portion of the given address range(s) maps to VIO memory (`AtaPRD_InitFromVirt' / `AtaPRD_InitFromVirtVector')
  *                   - A physical memory region is located beyond the 32-bit PRD limit and cannot be encoded */
-INTDEF WUNUSED size_t NOTHROW(KCALL AtaPRD_InitFromPhys)(AtaPRD *__restrict prd_buf, size_t prd_siz, vm_phys_t base, size_t num_bytes);
+INTDEF WUNUSED size_t NOTHROW(KCALL AtaPRD_InitFromPhys)(AtaPRD *__restrict prd_buf, size_t prd_siz, physaddr_t base, size_t num_bytes);
 INTDEF WUNUSED size_t NOTHROW(KCALL AtaPRD_InitFromPhysVector)(AtaPRD *__restrict prd_buf, size_t prd_siz, struct aio_pbuffer *__restrict buf, size_t num_bytes);
 
 /* Same as the Phys functions above, however also initialize `handle->hd_dmalock' / `handle->hd_dmalockvec',
@@ -142,47 +142,47 @@ struct ata_dmadrive
 #endif /* !__cplusplus */
 	/* I/O functions for performing non-canonical I/O (i.e. I/O that cannot be performed through use of pure DMA) */
 	NONNULL((1, 5)) void (KCALL *d_noncanon_read)(struct ata_drive *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-	NONNULL((1, 5)) void (KCALL *d_noncanon_read_phys)(struct ata_drive *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+	NONNULL((1, 5)) void (KCALL *d_noncanon_read_phys)(struct ata_drive *__restrict self, physaddr_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 	NONNULL((1, 5)) void (KCALL *d_noncanon_readv)(struct ata_drive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 	NONNULL((1, 5)) void (KCALL *d_noncanon_readv_phys)(struct ata_drive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 	NONNULL((1, 5)) void (KCALL *d_noncanon_write)(struct ata_drive *__restrict self, USER CHECKED void const *src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-	NONNULL((1, 5)) void (KCALL *d_noncanon_write_phys)(struct ata_drive *__restrict self, vm_phys_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+	NONNULL((1, 5)) void (KCALL *d_noncanon_write_phys)(struct ata_drive *__restrict self, physaddr_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 	NONNULL((1, 5)) void (KCALL *d_noncanon_writev)(struct ata_drive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 	NONNULL((1, 5)) void (KCALL *d_noncanon_writev_phys)(struct ata_drive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 };
 
 /* ATA I/O functions */
 INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveRead(struct ata_dmadrive *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveReadPhys(struct ata_dmadrive *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveReadPhys(struct ata_dmadrive *__restrict self, physaddr_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveReadVector(struct ata_dmadrive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveReadVectorPhys(struct ata_dmadrive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveWrite(struct ata_dmadrive *__restrict self, USER CHECKED void const *src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveWritePhys(struct ata_dmadrive *__restrict self, vm_phys_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveWritePhys(struct ata_dmadrive *__restrict self, physaddr_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveWriteVector(struct ata_dmadrive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_DmaDriveWriteVectorPhys(struct ata_dmadrive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 
 INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveRead(struct ata_drive *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveReadPhys(struct ata_drive *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveReadPhys(struct ata_drive *__restrict self, physaddr_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveReadVector(struct ata_drive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveReadVectorPhys(struct ata_drive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveWrite(struct ata_drive *__restrict self, USER CHECKED void const *src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveWritePhys(struct ata_drive *__restrict self, vm_phys_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveWritePhys(struct ata_drive *__restrict self, physaddr_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveWriteVector(struct ata_drive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_ChsDriveWriteVectorPhys(struct ata_drive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveRead(struct ata_drive *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveReadPhys(struct ata_drive *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveReadPhys(struct ata_drive *__restrict self, physaddr_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveReadVector(struct ata_drive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveReadVectorPhys(struct ata_drive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveWrite(struct ata_drive *__restrict self, USER CHECKED void const *src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveWritePhys(struct ata_drive *__restrict self, vm_phys_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveWritePhys(struct ata_drive *__restrict self, physaddr_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveWriteVector(struct ata_drive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba28DriveWriteVectorPhys(struct ata_drive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveRead(struct ata_drive *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveReadPhys(struct ata_drive *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveReadPhys(struct ata_drive *__restrict self, physaddr_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveReadVector(struct ata_drive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveReadVectorPhys(struct ata_drive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveWrite(struct ata_drive *__restrict self, USER CHECKED void const *src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
-INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveWritePhys(struct ata_drive *__restrict self, vm_phys_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
+INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveWritePhys(struct ata_drive *__restrict self, physaddr_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveWriteVector(struct ata_drive *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 INTDEF NONNULL((1, 5)) void KCALL Ata_Lba48DriveWriteVectorPhys(struct ata_drive *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS(E_IOERROR, E_BADALLOC,...);
 

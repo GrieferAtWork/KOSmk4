@@ -24,6 +24,7 @@
 /**/
 
 #include <kos/anno.h>
+#include <kos/kernel/memory.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 
@@ -78,8 +79,8 @@ INTDEF NONNULL((1)) void CC libvio_copyfromvio(struct vio_args *__restrict args,
 INTDEF NONNULL((1)) void CC libvio_copytovio(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void const *buf, size_t num_bytes) __THROWS(E_SEGFAULT, ...);
 INTDEF NONNULL((1)) void CC libvio_memset(struct vio_args *__restrict args, vio_addr_t offset, int byte, size_t num_bytes) __THROWS(E_SEGFAULT, ...);
 #ifdef __KERNEL__
-INTDEF NONNULL((1)) void CC libvio_copyfromvio_to_phys(struct vio_args *__restrict args, vio_addr_t offset, __vm_phys_t buf, size_t num_bytes) __THROWS(...);
-INTDEF NONNULL((1)) void CC libvio_copytovio_from_phys(struct vio_args *__restrict args, vio_addr_t offset, __vm_phys_t buf, size_t num_bytes) __THROWS(...);
+INTDEF NONNULL((1)) void CC libvio_copyfromvio_to_phys(struct vio_args *__restrict args, vio_addr_t offset, physaddr_t buf, size_t num_bytes) __THROWS(...);
+INTDEF NONNULL((1)) void CC libvio_copytovio_from_phys(struct vio_args *__restrict args, vio_addr_t offset, physaddr_t buf, size_t num_bytes) __THROWS(...);
 #endif /* __KERNEL__ */
 
 #if defined(LIBVIO_CONFIG_HAVE_QWORD) || defined(LIBVIO_CONFIG_HAVE_QWORD_CMPXCH)

@@ -71,7 +71,7 @@ PRIVATE u64 p64_page_fglobal_and_p64_page_fnoexec;
 
 /* [const] Base-address of `metadata_size' continuous bytes of physical
  *         memory, allocated for the purpose of maintaining phys2virt meta-data. */
-PRIVATE PAGEDIR_PAGEALIGNED vm_phys_t metadata_base;
+PRIVATE PAGEDIR_PAGEALIGNED physaddr_t metadata_base;
 
 /* [const] The total size of `metadata_base' */
 PRIVATE PAGEDIR_PAGEALIGNED size_t metadata_size = 0;
@@ -126,20 +126,20 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 		/* override `x86_phys2virt64_require()' to become a no-op */
 		((byte_t *)&x86_phys2virt64_require)[0] = 0xc3; /* ret */
 	} else {
-		pageptr_t pp;
+		physpage_t pp;
 		printk(FREESTR(KERN_INFO "[p2v] Use 2MiB pages for the phys2virt memory segment\n"));
 		/* TODO: Add a kernel commandline option to select how much
 		 *       memory should be reserved for the phys2virt mapping! */
 		metadata_size = CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC * PAGESIZE;
 		pp = page_malloc(CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC);
-		if unlikely(pp == PAGEPTR_INVALID) {
+		if unlikely(pp == PHYSPAGE_INVALID) {
 			/* Try again with less memory... */
 			metadata_size = CONFIG_PHYS2VIRT_IDENTITY_MINALLOC * PAGESIZE;
 			pp = page_malloc(CONFIG_PHYS2VIRT_IDENTITY_MINALLOC);
-			if unlikely(pp == PAGEPTR_INVALID)
+			if unlikely(pp == PHYSPAGE_INVALID)
 				kernel_panic(FREESTR("Failed to allocate phys2virt control pages"));
 		}
-		metadata_base  = page2addr(pp);
+		metadata_base  = physpage2addr(pp);
 		metadata_avail = metadata_size;
 	}
 	/* Register the phys2virt VM node. */
@@ -199,7 +199,7 @@ NOTHROW(KCALL metadata_clearall)(void) {
 PUBLIC NOBLOCK NOPREEMPT void KCALL x86_phys2virt64_require(void *addr) {
 	unsigned int vec4, vec3;
 	union p64_pdir_e3 e3;
-	vm_phys_t new_e3_word;
+	physaddr_t new_e3_word;
 	assert(!PREEMPTION_ENABLED());
 	assertf((uintptr_t)addr >= KERNEL_PHYS2VIRT_MIN &&
 	        (uintptr_t)addr <= KERNEL_PHYS2VIRT_MAX,

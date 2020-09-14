@@ -26,6 +26,8 @@
 
 #include <hybrid/align.h>
 
+#include <bits/crt/inttypes.h>
+
 #include <assert.h>
 
 
@@ -47,12 +49,12 @@
 
 #if !defined(NDEBUG) && 0
 #include <kernel/printk.h>
-#define PG_TRACE_MAP(addr, num_bytes, phys, perm)                         \
-	printk(KERN_TRACE "[pd] +mmap:%p-%p " FORMAT_VM_PHYS_T " %c%c%c%c\n", \
-	       addr, (byte_t *)(addr) + (num_bytes)-1, (vm_phys_t)(phys),     \
-	       perm & PAGEDIR_MAP_FEXEC ? 'x' : '-',                          \
-	       perm & PAGEDIR_MAP_FWRITE ? 'w' : '-',                         \
-	       perm & PAGEDIR_MAP_FREAD ? 'r' : '-',                          \
+#define PG_TRACE_MAP(addr, num_bytes, phys, perm)                                       \
+	printk(KERN_TRACE "[pd] +mmap:%p-%p " __PRINP(__SIZEOF_PHYSADDR_T__) " %c%c%c%c\n", \
+	       addr, (byte_t *)(addr) + (num_bytes)-1, (physaddr_t)(phys),                  \
+	       perm & PAGEDIR_MAP_FEXEC ? 'x' : '-',                                        \
+	       perm & PAGEDIR_MAP_FWRITE ? 'w' : '-',                                       \
+	       perm & PAGEDIR_MAP_FREAD ? 'r' : '-',                                        \
 	       perm & PAGEDIR_MAP_FUSER ? 'u' : '-')
 #define PG_TRACE_UNMAP(addr, num_bytes)     \
 	printk(KERN_TRACE "[pd] -mmap:%p-%p\n", \
@@ -64,12 +66,14 @@
 
 #define PG_ASSERT_ALIGNED_ADDRESS(addr) \
 	__assertf(IS_ALIGNED((uintptr_t)(addr), 4096), "addr = %p", addr)
-#define PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes)                                 \
-	(__assertf(IS_ALIGNED((uintptr_t)(addr), 4096), "addr = %p", addr),                  \
-	 __assertf(IS_ALIGNED((uintptr_t)(num_bytes), 4096), "num_bytes = %#Ix", num_bytes), \
-	 __assertf((uintptr_t)(addr) + (num_bytes) >= (uintptr_t)(addr) ||                   \
-	           (uintptr_t)(addr) + (num_bytes) == 0,                                     \
-	           "Invalid range %p...%p",                                                  \
+#define PG_ASSERT_ALIGNED_ADDRESS_RANGE(addr, num_bytes)                \
+	(__assertf(IS_ALIGNED((uintptr_t)(addr), 4096), "addr = %p", addr), \
+	 __assertf(IS_ALIGNED((uintptr_t)(num_bytes), 4096),                \
+	           "num_bytes = %#" __PRIN_PREFIX(__SIZEOF_SIZE_T__) "x",   \
+	           num_bytes),                                              \
+	 __assertf((uintptr_t)(addr) + (num_bytes) >= (uintptr_t)(addr) ||  \
+	           (uintptr_t)(addr) + (num_bytes) == 0,                    \
+	           "Invalid range %p...%p",                                 \
 	           (addr), (uintptr_t)(addr) + (num_bytes)-1))
 
 

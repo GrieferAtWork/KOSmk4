@@ -162,7 +162,7 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 PRIVATE void
 NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
                                   datapage_t UNUSED(start),
-                                  vm_phys_t buffer,
+                                  physaddr_t buffer,
                                   size_t num_data_pages) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;

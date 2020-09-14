@@ -194,7 +194,7 @@ PRIVATE void KCALL
 vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
                                  struct vm *__restrict effective_vm,
                                  struct vm_datablock *__restrict data,
-                                 vm_vpage64_t data_start_vpage,
+                                 pageid64_t data_start_vpage,
                                  size_t num_pages,
                                  uintptr_half_t prot)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
@@ -275,7 +275,7 @@ again_lock_all_parts:
 			size_t i;
 			COMPILER_READ_BARRIER();
 			for (i = 0; i < info->pv_cnt; ++i) {
-				vm_vpage64_t part_end, req_part_end;
+				pageid64_t part_end, req_part_end;
 				req_part_end = i == info->pv_cnt - 1
 				               ? data_start_vpage + num_pages
 				               : vm_datapart_startvpage(info->pv_vec[i + 1].pn_part);
@@ -422,7 +422,7 @@ vm_mapat(struct vm *__restrict self,
 	vm_collect_and_lock_parts_and_vm(&parts,
 	                                 self,
 	                                 data,
-	                                 (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                                 (pageid64_t)(data_start_offset / PAGESIZE),
 	                                 num_pages,
 	                                 prot);
 	/* The rest of this function is already NOEXCEPT at this point.
@@ -598,7 +598,7 @@ again:
 	vm_collect_and_lock_parts_and_vm(&parts,
 	                                 self,
 	                                 data,
-	                                 (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                                 (pageid64_t)(data_start_offset / PAGESIZE),
 	                                 num_bytes / PAGESIZE,
 	                                 prot);
 	/* The rest of this function is already NOEXCEPT at this point.
@@ -818,7 +818,7 @@ PRIVATE void KCALL
 vm_map_subrange_descriptors_init_and_lock_parts_and_vm(struct vm_map_subrange_descriptors *__restrict self,
                                                        struct vm *__restrict effective_vm,
                                                        struct vm_datablock *__restrict data,
-                                                       vm_vpage64_t data_minmappage,
+                                                       pageid64_t data_minmappage,
                                                        size_t num_datavpages,
                                                        size_t num_zerovpages,
                                                        uintptr_half_t prot)
@@ -981,15 +981,15 @@ vm_paged_map_subrange(struct vm *__restrict effective_vm,
                       struct vm_datablock *__restrict data,
                       struct path *fspath,
                       struct directory_entry *fsname,
-                      vm_vpage64_t data_start_vpage,
-                      vm_vpage64_t data_subrange_minvpage,
-                      vm_vpage64_t data_subrange_maxvpage,
+                      pageid64_t data_start_vpage,
+                      pageid64_t data_subrange_minvpage,
+                      pageid64_t data_subrange_maxvpage,
                       uintptr_half_t prot,
                       uintptr_half_t flag,
                       uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	pageid_t result;
-	vm_vpage64_t data_minmappage, data_maxmappage;
+	pageid64_t data_minmappage, data_maxmappage;
 	if unlikely(!num_pages)
 		num_pages = 1;
 	if (OVERFLOW_UADD(data_subrange_minvpage, data_start_vpage, &data_minmappage) ||
@@ -1099,14 +1099,14 @@ vm_paged_mapat_subrange(struct vm *__restrict self,
                         struct vm_datablock *__restrict data,
                         struct path *fspath,
                         struct directory_entry *fsname,
-                        vm_vpage64_t data_start_vpage,
-                        vm_vpage64_t data_subrange_minvpage,
-                        vm_vpage64_t data_subrange_maxvpage,
+                        pageid64_t data_start_vpage,
+                        pageid64_t data_subrange_minvpage,
+                        pageid64_t data_subrange_maxvpage,
                         uintptr_half_t prot,
                         uintptr_half_t flag,
                         uintptr_t guard)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	vm_vpage64_t data_minmappage, data_maxmappage;
+	pageid64_t data_minmappage, data_maxmappage;
 	pageid_t maxvpage;
 	if unlikely(!num_pages)
 		num_pages = 1;

@@ -26,7 +26,7 @@
 #include <bits/types.h>
 #include <hw/video/vga.h>
 #ifdef __KERNEL__
-#include <kos/bits/types.h>
+#include <kos/kernel/memory.h>
 #endif /* __KERNEL__ */
 
 /* libvgastate:
@@ -70,15 +70,15 @@
 __DECL_BEGIN
 
 #ifdef __KERNEL__
-typedef __vm_phys_t vga_bios_buf_t;
+typedef physaddr_t vga_bios_buf_t;
 #else /* __KERNEL__ */
 typedef __byte_t *vga_bios_buf_t;
 #endif /* !__KERNEL__ */
 
 struct vga_bios {
-	__uint16_t     vb_features;      /* Available VGA BIOS features. (Set of `VGA_BIOS_FEAT_*') */
 	vga_bios_buf_t vb_vesa_statebuf; /* [0..vb_vesa_statesiz][owned]   int10:ax=4F04h */
 	__size_t       vb_vesa_statesiz; /* sizeof(vb_vesa_statebuf)       int10:ax=4F04h */
+	__uint16_t     vb_features;      /* Available VGA BIOS features. (Set of `VGA_BIOS_FEAT_*') */
 	__uint16_t     vb_vesa_mode;     /* [valid_if(VGA_BIOS_FEAT_SVGA)] int10:ax=4F03h */
 };
 

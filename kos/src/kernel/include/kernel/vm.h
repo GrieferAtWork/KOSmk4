@@ -74,6 +74,12 @@ struct directory_entry;
 typedef unsigned int gfp_t;
 #endif /* !__gfp_t_defined */
 
+/* 64-bit page ID (used for virtual page indices within dataparts) */
+#ifndef __pageid64_t_defined
+#define __pageid64_t_defined 1
+typedef __UINT64_TYPE__ pageid64_t;
+#endif /* !__pageid64_t_defined */
+
 #ifndef __pageid_t_defined
 #define __pageid_t_defined 1
 typedef __ARCH_PAGEID_TYPE pageid_t;
@@ -140,23 +146,20 @@ __HYBRID_ALTINT_TYPEDEF(u64, datapage_t, false); /* Data part page number. */
 #endif /* !__datapage_t_defined */
 
 struct vm_ramblock {
-	pageptr_t  rb_start; /* Starting page number of physical memory associated with the ram block. */
+	physpage_t rb_start; /* Starting page number of physical memory associated with the ram block. */
 	size_t     rb_size;  /* Number of continuous physical memory pages used by this block. */
-#if __SIZEOF_PAGEPTR_T__ > __SIZEOF_SIZE_T__
-	byte_t     rb_pad[__SIZEOF_PAGEPTR_T__ - __SIZEOF_SIZE_T__];
-#endif /* __SIZEOF_PAGEPTR_T__ > __SIZEOF_SIZE_T__ */
+#if __SIZEOF_PHYSPAGE_T__ > __SIZEOF_SIZE_T__
+	byte_t     rb_pad[__SIZEOF_PHYSPAGE_T__ - __SIZEOF_SIZE_T__];
+#endif /* __SIZEOF_PHYSPAGE_T__ > __SIZEOF_SIZE_T__ */
 };
 
 #ifndef CONFIG_NO_SWAP
-#if __SIZEOF_VM_SPAGE_T__ == __SIZEOF_PAGEPTR_T__
-#define VM_SWPBLOCK_EQUALS_RAMBLOCK 1
-#endif /* __SIZEOF_VM_SPAGE_T__ == __SIZEOF_PAGEPTR_T__ */
 struct vm_swpblock {
-	vm_spage_t  sb_start; /* Starting page number of swap memory associated with the ram block. */
+	physpage_t  sb_start; /* Starting page number of swap memory associated with the ram block. */
 	size_t      sb_size;  /* Number of continuous swap memory pages used by this block. */
-#if __SIZEOF_VM_SPAGE_T__ > __SIZEOF_SIZE_T__
-	byte_t      sb_pad[__SIZEOF_VM_SPAGE_T__ - __SIZEOF_SIZE_T__];
-#endif /* __SIZEOF_VM_SPAGE_T__ > __SIZEOF_SIZE_T__ */
+#if __SIZEOF_PHYSPAGE_T__ > __SIZEOF_SIZE_T__
+	byte_t      sb_pad[__SIZEOF_PHYSPAGE_T__ - __SIZEOF_SIZE_T__];
+#endif /* __SIZEOF_PHYSPAGE_T__ > __SIZEOF_SIZE_T__ */
 };
 #endif /* !CONFIG_NO_SWAP */
 
@@ -166,7 +169,7 @@ struct vm_swpblock {
  * @param: paddr:     The physical memory base address of the range.
  * @param: num_bytes: The number of bytes found within the range.
  * @param: lock:      The lock used to lock the associated DMA range. */
-typedef bool /*NOTHROW*/ (KCALL *vm_dmarangefunc_t)(void *arg, vm_phys_t paddr, size_t num_bytes,
+typedef bool /*NOTHROW*/ (KCALL *vm_dmarangefunc_t)(void *arg, physaddr_t paddr, size_t num_bytes,
                                                     struct vm_dmalock *__restrict lock);
 typedef void /*NOTHROW*/ (KCALL *vm_dmaresetfunc_t)(void *arg);
 #endif /* __CC__ */
@@ -400,22 +403,22 @@ NOBLOCK size_t NOTHROW(KCALL vm_datapart_numvpages)(struct vm_datapart const *__
 NOBLOCK size_t NOTHROW(KCALL vm_datapart_numvpages_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_minbyte)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_mindpage)(struct vm_datapart const *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_minvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK pageid64_t NOTHROW(KCALL vm_datapart_minvpage)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_maxbyte)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_maxbyte_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_maxdpage)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_maxdpage_atomic)(struct vm_datapart const *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_maxvpage)(struct vm_datapart const *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_maxvpage_atomic)(struct vm_datapart const *__restrict self);
+NOBLOCK pageid64_t NOTHROW(KCALL vm_datapart_maxvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK pageid64_t NOTHROW(KCALL vm_datapart_maxvpage_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_startbyte)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_startdpage)(struct vm_datapart const *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_startvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK pageid64_t NOTHROW(KCALL vm_datapart_startvpage)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_endbyte)(struct vm_datapart const *__restrict self);
 NOBLOCK pos_t NOTHROW(KCALL vm_datapart_endbyte_atomic)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_enddpage)(struct vm_datapart const *__restrict self);
 NOBLOCK datapage_t NOTHROW(KCALL vm_datapart_enddpage_atomic)(struct vm_datapart const *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart const *__restrict self);
-NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage_atomic)(struct vm_datapart const *__restrict self);
+NOBLOCK pageid64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart const *__restrict self);
+NOBLOCK pageid64_t NOTHROW(KCALL vm_datapart_endvpage_atomic)(struct vm_datapart const *__restrict self);
 #else /* __INTELLISENSE__ */
 #define vm_datapart_numbytes(self)         ((size_t)((vm_datapart_maxdpage(self) - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
 #define vm_datapart_numbytes_atomic(self)  ((size_t)((vm_datapart_maxdpage_atomic(self) - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
@@ -425,13 +428,13 @@ NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage_atomic)(struct vm_datapa
 #define vm_datapart_numvpages_atomic(self) ((size_t)((vm_datapart_maxdpage_atomic(self) - (self)->dp_tree.a_vmin) + 1) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
 #define vm_datapart_minbyte(self)          ((pos_t)(self)->dp_tree.a_vmin << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
 #define vm_datapart_mindpage(self)         ((datapage_t)(self)->dp_tree.a_vmin)
-#define vm_datapart_minvpage(self)         ((vm_vpage64_t)(self)->dp_tree.a_vmin >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
+#define vm_datapart_minvpage(self)         ((pageid64_t)(self)->dp_tree.a_vmin >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
 #define vm_datapart_maxbyte(self)          ((((pos_t)vm_datapart_maxdpage(self) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
 #define vm_datapart_maxbyte_atomic(self)   ((((pos_t)vm_datapart_maxdpage_atomic(self) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
 #define vm_datapart_maxdpage(self)         (self)->dp_tree.a_vmax
 #define vm_datapart_maxdpage_atomic(self)  atomic64_read((atomic64_t *)&(self)->dp_tree.a_vmax)
-#define vm_datapart_maxvpage(self)         ((vm_vpage64_t)(vm_datapart_maxdpage(self) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
-#define vm_datapart_maxvpage_atomic(self)  ((vm_vpage64_t)(vm_datapart_maxdpage_atomic(self) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
+#define vm_datapart_maxvpage(self)         ((pageid64_t)(vm_datapart_maxdpage(self) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
+#define vm_datapart_maxvpage_atomic(self)  ((pageid64_t)(vm_datapart_maxdpage_atomic(self) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
 #define vm_datapart_startbyte(self)        vm_datapart_minbyte(self)
 #define vm_datapart_startdpage(self)       vm_datapart_mindpage(self)
 #define vm_datapart_startvpage(self)       vm_datapart_minvpage(self)
@@ -508,11 +511,11 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
  * @return: * :       A pointer to a kmalloc()-allocated heap vector of used ram blocks.
  * @return: NULL:    [vm_do_allocram_nx] Failed to allocate physical memory, or the required heap vector. */
 FUNDEF NONNULL((1)) ATTR_RETNONNULL NOBLOCK_IF(flags & GFP_ATOMIC) struct vm_ramblock *KCALL
-vm_do_allocram(struct vm_ramblock *__restrict pblock0, pagecnt_t num_pages, gfp_t flags)
+vm_do_allocram(struct vm_ramblock *__restrict pblock0, physpagecnt_t num_pages, gfp_t flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 FUNDEF NONNULL((1)) NOBLOCK_IF(flags & GFP_ATOMIC) struct vm_ramblock *
 NOTHROW(KCALL vm_do_allocram_nx)(struct vm_ramblock *__restrict pblock0,
-                                 pagecnt_t num_pages, gfp_t flags);
+                                 physpagecnt_t num_pages, gfp_t flags);
 /* Free RAM allocated by `vm_do_allocram(_nx)'
  * NOTE: This function assumes that the allocated memory hasn't been used, yet. */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
@@ -616,8 +619,8 @@ vm_datapart_sync(struct vm_datapart *__restrict self,
  *       that `self' is either INCORE or LOCKED */
 FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, size_t src_offset) THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t dst_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, size_t src_offset) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, size_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read_phys(struct vm_datapart *__restrict self, physaddr_t dst, size_t num_bytes, size_t src_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__restrict self, physaddr_t src, size_t num_bytes, size_t dst_offset) THROWS(...);
 
 /* Same as `vm_datapart_do_read()' / `vm_datapart_do_write()', but copy memory
  * into the supplied user-space buffer `dst' / `src' using `memcpy_nopf()', meaning
@@ -651,8 +654,8 @@ FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *_
  *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, physaddr_t dst, size_t num_bytes, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_phys(struct vm_datapart *__restrict self, physaddr_t src, size_t num_bytes, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t split_bytes, size_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -784,7 +787,7 @@ FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL vm_datapart_lockread_setcore_unsh
 /* Return the address of a physical page at the given `vpage_offset'
  * The caller must be holding a read- or write-lock on `self',
  * as well as guaranty that the part is either INCORE or LOCKED. */
-FUNDEF NOBLOCK NONNULL((1)) pageptr_t
+FUNDEF NOBLOCK NONNULL((1)) physpage_t
 NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
                                     size_t vpage_offset);
 
@@ -801,7 +804,7 @@ NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
  * @return: * : The underlying physical page of memory that is bound to `vpage_offset'
  * @throw: * :  Only throws whatever exception may get thrown by `dt_loadpart', meaning that
  *              when the loadpart function is NOEXCEPT, then so is this function! */
-FUNDEF NONNULL((1, 3)) pageptr_t KCALL
+FUNDEF NONNULL((1, 3)) physpage_t KCALL
 vm_datapart_loadpage(struct vm_datapart *__restrict self,
                      size_t vpage_offset,
                      bool *__restrict pchanged)
@@ -809,7 +812,7 @@ vm_datapart_loadpage(struct vm_datapart *__restrict self,
 
 /* Similar to `vm_datapart_loadpage()', however instead used for accessing only a single data
  * page, rather than a whole virtual memory page. (used to implement `vm_datapart_do_(read|write)[p]') */
-FUNDEF NONNULL((1)) vm_phys_t KCALL
+FUNDEF NONNULL((1)) physaddr_t KCALL
 vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
                          size_t dpage_offset, bool for_writing)
 		THROWS(...);
@@ -956,12 +959,12 @@ struct vm_datablock_type {
 	 * @assume(num_data_pages != 0);
 	 * @assume(IS_ALIGNED(buffer, VM_DATABLOCK_PAGESIZE(self)));
 	 * NOTE: `num_data_pages' refers to data-pages, not physical pages! */
-	NONNULL((1)) void (KCALL *dt_loadpart)(struct vm_datablock *__restrict self, datapage_t start, vm_phys_t buffer, size_t num_data_pages);
+	NONNULL((1)) void (KCALL *dt_loadpart)(struct vm_datablock *__restrict self, datapage_t start, physaddr_t buffer, size_t num_data_pages);
 	/* [0..1] Save the given data buffer.
 	 * @assume(num_data_pages != 0);
 	 * @assume(IS_ALIGNED(buffer, VM_DATABLOCK_PAGESIZE(self)));
 	 * NOTE: `num_data_pages' refers to data-pages, not physical pages! */
-	NONNULL((1)) void (KCALL *dt_savepart)(struct vm_datablock *__restrict self, datapage_t start, vm_phys_t buffer, size_t num_data_pages);
+	NONNULL((1)) void (KCALL *dt_savepart)(struct vm_datablock *__restrict self, datapage_t start, physaddr_t buffer, size_t num_data_pages);
 	/* [0..1] Called the first time the `VM_DATAPART_FLAG_CHANGED' flag is set for `part'.
 	 * WARNING: While this function is allowed to block and throw exceptions,
 	 *          you should rather think of it as being required to be NOBLOCK,
@@ -1316,7 +1319,7 @@ vm_datablock_createpart(struct vm_datablock *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 LOCAL ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_paged_datablock_createpart(struct vm_datablock *__restrict self,
-                              vm_vpage64_t pageno, size_t num_vpages)
+                              pageid64_t pageno, size_t num_vpages)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	return vm_datablock_createpart(self,
 	                               (pos_t)pageno * PAGESIZE,
@@ -1335,7 +1338,7 @@ vm_datablock_locatepart(struct vm_datablock *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 LOCAL ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_paged_datablock_locatepart(struct vm_datablock *__restrict self,
-                              vm_vpage64_t pageno, size_t num_vpages_hint)
+                              pageid64_t pageno, size_t num_vpages_hint)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	return vm_datablock_locatepart(self,
 	                               (pos_t)pageno * PAGESIZE,
@@ -1352,7 +1355,7 @@ vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 LOCAL ATTR_RETNONNULL NONNULL((1)) REF struct vm_datapart *KCALL
 vm_paged_datablock_locatepart_exact(struct vm_datablock *__restrict self,
-                                    vm_vpage64_t pageno, size_t max_num_vpages)
+                                    pageid64_t pageno, size_t max_num_vpages)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	return vm_datablock_locatepart_exact(self,
 	                                     (pos_t)pageno * PAGESIZE,
@@ -1373,8 +1376,8 @@ vm_paged_datablock_locatepart_exact(struct vm_datablock *__restrict self,
  * @return: * : The number of transferred bytes. */
 FUNDEF NONNULL((1)) void KCALL vm_datablock_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL vm_datablock_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_read_phys(struct vm_datablock *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_write_phys(struct vm_datablock *__restrict self, vm_phys_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_read_phys(struct vm_datablock *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_write_phys(struct vm_datablock *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -1391,8 +1394,8 @@ FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_write_unsafe(struct vm_datablock 
 /* Perform datablock access through VIO callbacks. */
 FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read_phys(struct vm_datablock *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t src_offset) THROWS(...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write_phys(struct vm_datablock *__restrict self, vm_phys_t src, size_t num_bytes, pos_t dst_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_read_phys(struct vm_datablock *__restrict self, physaddr_t dst, size_t num_bytes, pos_t src_offset) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL vm_datablock_vio_write_phys(struct vm_datablock *__restrict self, physaddr_t src, size_t num_bytes, pos_t dst_offset) THROWS(...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, pos_t src_offset) THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, pos_t dst_offset) THROWS(E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, pos_t src_offset) THROWS(...);
@@ -1403,7 +1406,7 @@ FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_vio_writev_phys(struct vm_datablo
 
 /* Builtin data blocks */
 
-/* Provide direct access to physical memory (the `pos_t' is actually the `vm_phys_t'). */
+/* Provide direct access to physical memory (the `pos_t' is actually the `physaddr_t'). */
 DATDEF struct vm_datablock vm_datablock_physical;
 DATDEF struct vm_datablock_type vm_datablock_physical_type;
 
@@ -1442,7 +1445,7 @@ struct vm_ramfile {
 /* The datablock type used by `vm_ramfile' */
 DATDEF struct vm_datablock_type vm_ramfile_type;
 
-#define VM_RAMFILE_INIT(/*pageptr_t*/ start, /*size_t*/ num_pages) \
+#define VM_RAMFILE_INIT(/*physpage_t*/ start, /*size_t*/ num_pages) \
 	{ VM_DATABLOCK_INIT(&vm_ramfile_type, NULL, 0), /* .rf_data = */ { start, num_pages } }
 
 
@@ -1891,7 +1894,7 @@ vm_paged_mapat(struct vm *__restrict self,
                struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
                struct path *fspath DFL(__NULLPTR),
                struct directory_entry *fsname DFL(__NULLPTR),
-               vm_vpage64_t data_start_vpage DFL(0),
+               pageid64_t data_start_vpage DFL(0),
                uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
                uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
                uintptr_t guard DFL(0))
@@ -1915,9 +1918,9 @@ vm_paged_mapat_subrange(struct vm *__restrict self,
                         struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
                         struct path *fspath DFL(__NULLPTR),
                         struct directory_entry *fsname DFL(__NULLPTR),
-                        vm_vpage64_t data_start_vpage DFL(0),
-                        vm_vpage64_t data_subrange_minvpage DFL(0),
-                        vm_vpage64_t data_subrange_maxvpage DFL((vm_vpage64_t)-1),
+                        pageid64_t data_start_vpage DFL(0),
+                        pageid64_t data_subrange_minvpage DFL(0),
+                        pageid64_t data_subrange_maxvpage DFL((pageid64_t)-1),
                         uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
                         uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
                         uintptr_t guard DFL(0))
@@ -1946,9 +1949,9 @@ vm_mapat_subrange(struct vm *__restrict self,
 	                               PAGEID_ENCODE(addr),
 	                               num_bytes / PAGESIZE,
 	                               data, fspath, fsname,
-	                               (vm_vpage64_t)(data_start_offset / PAGESIZE),
-	                               (vm_vpage64_t)(data_subrange_minoffset / PAGESIZE),
-	                               (vm_vpage64_t)((data_subrange_minoffset + data_subrange_numbytes - 1) / PAGESIZE),
+	                               (pageid64_t)(data_start_offset / PAGESIZE),
+	                               (pageid64_t)(data_subrange_minoffset / PAGESIZE),
+	                               (pageid64_t)((data_subrange_minoffset + data_subrange_numbytes - 1) / PAGESIZE),
 	                               prot, flag, guard);
 }
 
@@ -2084,7 +2087,7 @@ vm_paged_map(struct vm *__restrict self,
              struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
              struct path *fspath DFL(__NULLPTR),
              struct directory_entry *fsname DFL(__NULLPTR),
-             vm_vpage64_t data_start_vpage DFL(0),
+             pageid64_t data_start_vpage DFL(0),
              uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
              uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
              uintptr_t guard DFL(0))
@@ -2115,9 +2118,9 @@ vm_paged_map_subrange(struct vm *__restrict self,
                       struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
                       struct path *fspath DFL(__NULLPTR),
                       struct directory_entry *fsname DFL(__NULLPTR),
-                      vm_vpage64_t data_start_vpage DFL(0),
-                      vm_vpage64_t data_subrange_minvpage DFL(0),
-                      vm_vpage64_t data_subrange_maxvpage DFL((vm_vpage64_t)-1),
+                      pageid64_t data_start_vpage DFL(0),
+                      pageid64_t data_subrange_minvpage DFL(0),
+                      pageid64_t data_subrange_maxvpage DFL((pageid64_t)-1),
                       uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
                       uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
                       uintptr_t guard DFL(0))
@@ -2151,9 +2154,9 @@ vm_map_subrange(struct vm *__restrict self,
 	                               min_alignment / PAGESIZE,
 	                               getfree_mode,
 	                               data, fspath, fsname,
-	                               (vm_vpage64_t)(data_start_offset / PAGESIZE),
-	                               (vm_vpage64_t)(data_subrange_minoffset / PAGESIZE),
-	                               (vm_vpage64_t)((data_subrange_minoffset + data_subrange_numbytes - 1) / PAGESIZE),
+	                               (pageid64_t)(data_start_offset / PAGESIZE),
+	                               (pageid64_t)(data_subrange_minoffset / PAGESIZE),
+	                               (pageid64_t)((data_subrange_minoffset + data_subrange_numbytes - 1) / PAGESIZE),
 	                               prot, flag, guard);
 	return PAGEID_DECODE(result);
 }

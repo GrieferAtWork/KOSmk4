@@ -28,6 +28,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <hw/video/vga.h>
+#include <kos/kernel/memory.h>
 #include <sys/io.h>
 
 #include <libansitty/ansitty.h>
@@ -122,7 +123,7 @@ typedef struct
 	struct video_device     v_dev;       /* The underlying ansi video device. */
 #endif
 	struct atomic_rwlock    v_lock;      /* Lock for accessing the VGA Hardware. */
-	PHYS vm_phys_t          v_vram_addr; /* [const] VRAM base address (physical). */
+	PHYS physaddr_t         v_vram_addr; /* [const] VRAM base address (physical). */
 	VIRT byte_t            *v_vram;      /* [const] VRAM base address (virtual). */
 	size_t                  v_vram_size; /* [const] VRAM size (in bytes). */
 	/* VGA color/mono registers (Determined by `vga_r(v_mmio, VGA_MIS_R) & VGA_MIS_COLOR') */

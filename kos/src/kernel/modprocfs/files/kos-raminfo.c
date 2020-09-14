@@ -19,41 +19,24 @@
  */
 #ifndef GUARD_MODPROCFS_FILES_KOS_RAMINFO_C
 #define GUARD_MODPROCFS_FILES_KOS_RAMINFO_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/memory.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 
 #include "../procfs.h"
 
 DECL_BEGIN
 
-#if __SIZEOF_PAGEPTR_T__ == __SIZEOF_INT__
-#define FMT_PAGECNT  ""
-#elif __SIZEOF_PAGEPTR_T__ == __SIZEOF_POINTER__
-#define FMT_PAGECNT  "I"
-#elif __SIZEOF_PAGEPTR_T__ == __SIZEOF_LONG_
-#define FMT_PAGECNT  "l"
-#elif __SIZEOF_PAGEPTR_T__ == 1
-#define FMT_PAGECNT  "I8"
-#elif __SIZEOF_PAGEPTR_T__ == 2
-#define FMT_PAGECNT  "I16"
-#elif __SIZEOF_PAGEPTR_T__ == 4
-#define FMT_PAGECNT  "I32"
-#elif __SIZEOF_PAGEPTR_T__ == 8
-#define FMT_PAGECNT  "I64"
-#else
-#error "Unsupported __SIZEOF_PAGEPTR_T__"
-#endif
-
 #define PRINT(str) (*printer)(arg, str, COMPILER_STRLEN(str))
 
-
 PRIVATE NONNULL((1)) void KCALL
-print_pagecount(pformatprinter printer, void *arg, pagecnt_t count) {
-	pagecnt_t adjusted_count;
+print_pagecount(pformatprinter printer, void *arg, physpagecnt_t count) {
+	physpagecnt_t adjusted_count;
 	char const *unit;
 	if (count >= (0x100000 / PAGESIZE)) {
 		adjusted_count = count / (0x100000 / PAGESIZE);
@@ -62,7 +45,8 @@ print_pagecount(pformatprinter printer, void *arg, pagecnt_t count) {
 		adjusted_count = (count * PAGESIZE) / 1024;
 		unit           = "KiB";
 	}
-	format_printf(printer, arg, "%" FMT_PAGECNT "u (%" FMT_PAGECNT "u %s)",
+	format_printf(printer, arg,
+	              "%" PRIuN(__SIZEOF_PHYSPAGE_T__) " (%" PRIuN(__SIZEOF_PHYSPAGE_T__) " %s)",
 	              count, adjusted_count, unit);
 }
 

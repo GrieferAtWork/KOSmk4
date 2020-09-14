@@ -39,6 +39,7 @@
 #include <asm/cpu-cpuid.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -51,7 +52,7 @@
 DECL_BEGIN
 
 /* Return the physical page ID of a given physical address. */
-#define ppageof(paddr) (pageptr_t)((paddr) / PAGESIZE)
+#define ppageof(paddr) (physpage_t)((paddr) / PAGESIZE)
 
 #if defined(__cplusplus) && 0
 extern "C++" {
@@ -157,16 +158,16 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 
 	e3[0] = (u64)page_mallocone();
-	if unlikely((pageptr_t)e3[0] == PAGEPTR_INVALID)
+	if unlikely((physpage_t)e3[0] == PHYSPAGE_INVALID)
 		goto err_0;
 	e3[1] = (u64)page_mallocone();
-	if unlikely((pageptr_t)e3[1] == PAGEPTR_INVALID)
+	if unlikely((physpage_t)e3[1] == PHYSPAGE_INVALID)
 		goto err_1;
 	e3[2] = (u64)page_mallocone();
-	if unlikely((pageptr_t)e3[2] == PAGEPTR_INVALID)
+	if unlikely((physpage_t)e3[2] == PHYSPAGE_INVALID)
 		goto err_2;
 	e3[3] = (u64)page_mallocone();
-	if unlikely((pageptr_t)e3[3] == PAGEPTR_INVALID)
+	if unlikely((physpage_t)e3[3] == PHYSPAGE_INVALID)
 		goto err_3;
 	/* Now to initialize our pre-allocated level#3 vectors.
 	 * For this purpose, we must zero-initialize e3[0...2] and e3[3] like this:
@@ -176,18 +177,18 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	 * >> e3[3].p_e2[510]     = e3[2];        // Identity mapping: 0xffc00000 ... 0xffdfffff
 	 * >> e3[3].p_e2[511]     = e3[3];        // Identity mapping: 0xffe00000 ... 0xffffffff
 	 */
-	e3[0] = (u64)page2addr((pageptr_t)e3[0]);
-	e3[1] = (u64)page2addr((pageptr_t)e3[1]);
-	e3[2] = (u64)page2addr((pageptr_t)e3[2]);
-	e3[3] = (u64)page2addr((pageptr_t)e3[3]);
-	if (!page_iszero((pageptr_t)e3[0]))
-		vm_memsetphyspage((vm_phys_t)e3[0], 0);
-	if (!page_iszero((pageptr_t)e3[1]))
-		vm_memsetphyspage((vm_phys_t)e3[1], 0);
-	if (!page_iszero((pageptr_t)e3[2]))
-		vm_memsetphyspage((vm_phys_t)e3[2], 0);
+	e3[0] = (u64)physpage2addr((physpage_t)e3[0]);
+	e3[1] = (u64)physpage2addr((physpage_t)e3[1]);
+	e3[2] = (u64)physpage2addr((physpage_t)e3[2]);
+	e3[3] = (u64)physpage2addr((physpage_t)e3[3]);
+	if (!page_iszero((physpage_t)e3[0]))
+		vm_memsetphyspage((physaddr_t)e3[0], 0);
+	if (!page_iszero((physpage_t)e3[1]))
+		vm_memsetphyspage((physaddr_t)e3[1], 0);
+	if (!page_iszero((physpage_t)e3[2]))
+		vm_memsetphyspage((physaddr_t)e3[2], 0);
 	/* Kernel share (copy from our own page directory) */
-	vm_copytophys_onepage((vm_phys_t)e3[3], PAE_PDIR_E2_IDENTITY[3], 508 * 8);
+	vm_copytophys_onepage((physaddr_t)e3[3], PAE_PDIR_E2_IDENTITY[3], 508 * 8);
 	self->p_e3[0].p_word = e3[0] | PAE_PAGE_FPRESENT;
 	self->p_e3[1].p_word = e3[1] | PAE_PAGE_FPRESENT;
 	self->p_e3[2].p_word = e3[2] | PAE_PAGE_FPRESENT;
@@ -197,17 +198,17 @@ NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	e3[2] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[3] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	/* Identity mapping */
-	vm_copytophys_onepage((vm_phys_t)(e3[3] & PAE_PAGE_FVECTOR) +
+	vm_copytophys_onepage((physaddr_t)(e3[3] & PAE_PAGE_FVECTOR) +
 	                      508 * 8,
 	                      e3,
 	                      4 * 8);
 	return true;
 err_3:
-	page_ccfree((pageptr_t)e3[2], 1);
+	page_ccfree((physpage_t)e3[2], 1);
 err_2:
-	page_ccfree((pageptr_t)e3[1], 1);
+	page_ccfree((physpage_t)e3[1], 1);
 err_1:
-	page_ccfree((pageptr_t)e3[0], 1);
+	page_ccfree((physpage_t)e3[0], 1);
 err_0:
 	return false;
 }
@@ -301,7 +302,7 @@ NOTHROW(FCALL pae_pagedir_prepare_impl_widen)(unsigned int vec3,
                                               unsigned int vec1_prepare_size) {
 	union pae_pdir_e2 e2, *e2_p;
 	union pae_pdir_e1 e1, *e1_p;
-	pageptr_t new_e1_vector;
+	physpage_t new_e1_vector;
 	u64 new_e2_word;
 	unsigned int vec1;
 	uintptr_t backup;
@@ -320,12 +321,12 @@ again:
 	if (!e2.p_vec1.v_present) {
 		/* Not present */
 		new_e1_vector = page_mallocone();
-		if unlikely(new_e1_vector == PAGEPTR_INVALID)
+		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
 		/* Initialize the inner vector.
 		 * We can safely make use of our trampoline, since kernel-space is always prepared. */
 		e1_p = (union pae_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = pae_pagedir_push_mapone(e1_p, (vm_phys_t)((u64)new_e1_vector * 4096),
+		backup = pae_pagedir_push_mapone(e1_p, (physaddr_t)((u64)new_e1_vector * 4096),
 		                                 PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e1_p);
 		COMPILER_WRITE_BARRIER();
@@ -366,13 +367,13 @@ atomic_set_new_e2_word_or_free_new_e1_vector:
 		 * for initialization (Because the trampoline always uses
 		 * `PAE_PAGE_FNOFLATTEN' when mapping, it is always prepared) */
 		new_e1_vector = page_mallocone();
-		if unlikely(new_e1_vector == PAGEPTR_INVALID)
+		if unlikely(new_e1_vector == PHYSPAGE_INVALID)
 			return false;
 		e1.p_word = e2.p_word & ~(PAE_PAGE_F2MIB | PAE_PAGE_FPAT_2MIB);
 		if (e2.p_word & PAE_PAGE_FPAT_2MIB)
 			e1.p_word |= PAE_PAGE_FPAT_4KIB;
 		e1_p   = (union pae_pdir_e1 *)THIS_TRAMPOLINE_BASE;
-		backup = pae_pagedir_push_mapone(e1_p, (vm_phys_t)((u64)new_e1_vector * 4096),
+		backup = pae_pagedir_push_mapone(e1_p, (physaddr_t)((u64)new_e1_vector * 4096),
 		                                 PAGEDIR_MAP_FWRITE);
 		pagedir_syncone(e1_p);
 		COMPILER_WRITE_BARRIER();
@@ -1122,15 +1123,15 @@ INTERN ATTR_PAGING_READMOSTLY u64 pae_pageperm_matrix[16] = {
 
 LOCAL NOBLOCK u64
 NOTHROW(FCALL pae_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                        u16 perm) {
 	u64 result;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
-	assertf(IS_ALIGNED(phys, 4096), "phys = " FORMAT_VM_PHYS_T, phys);
+	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
 	        "Invalid page permissions: %#.4I16x", perm);
-	assertf(phys <= (vm_phys_t)UINT64_C(0x000ffffffffff000),
-	        "Address cannot be mapped under pae: " FORMAT_VM_PHYS_T,
+	assertf(phys <= (physaddr_t)UINT64_C(0x000ffffffffff000),
+	        "Address cannot be mapped under pae: %" PRIpN(__SIZEOF_PHYSADDR_T__),
 	        phys);
 	result  = (u64)phys;
 #if PAGEDIR_MAP_FMASK == 0xf
@@ -1213,7 +1214,7 @@ NOTHROW(FCALL pae_pagedir_gethint)(VIRT void *addr) {
  * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                  PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                                  PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                   u16 perm) {
 	u64 e1_word;
 	unsigned int vec3, vec2, vec1;
@@ -1228,7 +1229,7 @@ NOTHROW(FCALL pae_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK void
 NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                               PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                u16 perm) {
 	size_t i;
 	u64 e1_word;
@@ -1255,7 +1256,7 @@ NOTHROW(FCALL pae_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
 INTERN NOBLOCK WUNUSED pae_pagedir_pushval_t
 NOTHROW(FCALL pae_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                        u16 perm) {
 	u64 e1_word, result;
 	unsigned int vec3, vec2, vec1;
@@ -1370,10 +1371,10 @@ again_read_word:
 				 * they've already been re-designated as general-purpose RAM, at
 				 * which point they'd start reading garbage, or corrupt pointers. */
 				pagedir_syncall_smp();
-				page_freeone((pageptr_t)pageptr);
+				page_freeone((physpage_t)pageptr);
 				do {
 					--free_count;
-					page_freeone((pageptr_t)free_pages[free_count]);
+					page_freeone((physpage_t)free_pages[free_count]);
 				} while (free_count);
 			} else {
 				free_pages[free_count++] = (u64)pageptr;
@@ -1385,7 +1386,7 @@ again_read_word:
 		pagedir_syncall_smp();
 		do {
 			--free_count;
-			page_freeone((pageptr_t)free_pages[free_count]);
+			page_freeone((physpage_t)free_pages[free_count]);
 		} while (free_count);
 	}
 }
@@ -1410,13 +1411,13 @@ again_read_word:
 			if unlikely(e2.p_word & PAE_PAGE_F2MIB)
 				continue; /* 2MiB page. */
 			pageptr = e2.p_word >> PAE_PAGE_SHIFT;
-			page_freeone((pageptr_t)pageptr);
+			page_freeone((physpage_t)pageptr);
 		}
 	}
 }
 
 /* Translate a virtual address into its physical counterpart. */
-INTERN NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t
+INTERN NOBLOCK ATTR_PURE WUNUSED PHYS physaddr_t
 NOTHROW(FCALL pae_pagedir_translate)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec3, vec2, vec1;
@@ -1426,11 +1427,11 @@ NOTHROW(FCALL pae_pagedir_translate)(VIRT void const *addr) {
 	word = PAE_PDIR_E2_IDENTITY[vec3][vec2].p_word;
 	assertf(word & PAE_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & PAE_PAGE_F2MIB)
-		return (vm_phys_t)((word & PAE_PAGE_FADDR_2MIB) | PAE_PDIR_PAGEINDEX_2MIB(addr));
+		return (physaddr_t)((word & PAE_PAGE_FADDR_2MIB) | PAE_PDIR_PAGEINDEX_2MIB(addr));
 	vec1 = PAE_PDIR_VEC1INDEX(addr);
 	word = PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word;
 	assertf(word & PAE_PAGE_FPRESENT, "Page at %p is not mapped", addr);
-	return (vm_phys_t)((word & PAE_PAGE_FADDR_4KIB) | PAE_PDIR_PAGEINDEX_4KIB(addr));
+	return (physaddr_t)((word & PAE_PAGE_FADDR_4KIB) | PAE_PDIR_PAGEINDEX_4KIB(addr));
 }
 
 /* Check if the given page is mapped. */

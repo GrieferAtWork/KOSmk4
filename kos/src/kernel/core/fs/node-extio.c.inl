@@ -52,12 +52,12 @@ DECL_BEGIN
 #define INODE_READ_LOCKED_DEFINED 1
 INTDEF NONNULL((1)) void (KCALL inode_read_locked)(struct inode *__restrict self, CHECKED USER void *dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 INTDEF NONNULL((1, 2)) void (KCALL inode_read_lockedk)(struct inode *__restrict self, void *__restrict dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
-INTDEF NONNULL((1)) void (KCALL inode_read_lockedp)(struct inode *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,...);
+INTDEF NONNULL((1)) void (KCALL inode_read_lockedp)(struct inode *__restrict self, physaddr_t dst, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,...);
 INTDEF NONNULL((1, 2)) void (KCALL inode_read_lockedv)(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 INTDEF NONNULL((1, 2)) void (KCALL inode_read_lockedvp)(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position) THROWS(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 INTDEF NONNULL((1, 5)) void NOTHROW(KCALL inode_aread_locked)(struct inode *__restrict self, CHECKED USER void *dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 INTDEF NONNULL((1, 2, 5)) void NOTHROW(KCALL inode_aread_lockedk)(struct inode *__restrict self, void *__restrict dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
-INTDEF NONNULL((1, 5)) void NOTHROW(KCALL inode_aread_lockedp)(struct inode *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,...);
+INTDEF NONNULL((1, 5)) void NOTHROW(KCALL inode_aread_lockedp)(struct inode *__restrict self, physaddr_t dst, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,...);
 INTDEF NONNULL((1, 2, 5)) void NOTHROW(KCALL inode_aread_lockedv)(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 INTDEF NONNULL((1, 2, 5)) void NOTHROW(KCALL inode_aread_lockedvp)(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t file_position, struct aio_multihandle *__restrict aio) THROWS_INDIRECT(E_FSERROR_DELETED,E_FSERROR_UNSUPPORTED_OPERATION,E_IOERROR,E_SEGFAULT,...);
 #endif /* !INODE_READ_LOCKED_DEFINED */
@@ -76,7 +76,7 @@ NOTHROW(KCALL FUNC0(inode_areadall))(struct inode *__restrict self,
 #elif defined(DEFINE_IO_VECTOR)
                                      struct aio_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                                     vm_phys_t buf,
+                                     physaddr_t buf,
 #elif defined(DEFINE_IO_KERNEL)
                                      void *__restrict buf,
 #else
@@ -99,7 +99,7 @@ PUBLIC
 #elif defined(DEFINE_IO_VECTOR)
                              struct aio_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                             vm_phys_t buf,
+                             physaddr_t buf,
 #elif defined(DEFINE_IO_KERNEL)
                              void *__restrict buf,
 #else

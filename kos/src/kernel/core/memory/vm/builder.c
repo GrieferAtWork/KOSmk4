@@ -120,7 +120,7 @@ vmb_do_mapat(struct vmb *__restrict self,
              struct vm_datablock *__restrict data,
              struct path *fspath,
              struct directory_entry *fsname,
-             vm_vpage64_t data_start_vpage,
+             pageid64_t data_start_vpage,
              uintptr_half_t prot,
              uintptr_half_t flag,
              uintptr_t guard)
@@ -238,7 +238,7 @@ vmb_paged_mapat(struct vmb *__restrict self,
                 struct vm_datablock *__restrict data,
                 struct path *fspath,
                 struct directory_entry *fsname,
-                vm_vpage64_t data_start_vpage,
+                pageid64_t data_start_vpage,
                 uintptr_half_t prot,
                 uintptr_half_t flag,
                 uintptr_t guard)
@@ -324,7 +324,7 @@ vmb_paged_map(struct vmb *__restrict self,
               struct vm_datablock *__restrict data,
               struct path *fspath,
               struct directory_entry *fsname,
-              vm_vpage64_t data_start_vpage,
+              pageid64_t data_start_vpage,
               uintptr_half_t prot,
               uintptr_half_t flag,
               uintptr_t guard)
@@ -584,7 +584,7 @@ again_lock_parts:
 				 * keep on splitting parts, since they can no longer be split at all! */
 				REF struct vm_datablock *part_block;
 				size_t num_missing_vpages;
-				vm_vpage64_t off_missing_vpages;
+				pageid64_t off_missing_vpages;
 
 				/* NOTE: Use the BLOCK-pointer of the part itself, rather than the BLOCK-pointer of our
 				 *       associated node, just in case the part has since been unshared, in which case

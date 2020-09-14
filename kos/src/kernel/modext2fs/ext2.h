@@ -423,8 +423,8 @@ INTDEF void KCALL Ext2_VReadFromINode(struct inode *__restrict self, CHECKED USE
 INTDEF void KCALL Ext2_VWriteToINode(struct inode *__restrict self, CHECKED USER void const *buf, size_t bufsize, pos_t pos);
 INTDEF void KCALL Ext2_ReadFromINode(struct inode *__restrict self, CHECKED USER void *buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
 INTDEF void KCALL Ext2_WriteToINode(struct inode *__restrict self, CHECKED USER void const *buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
-INTDEF void KCALL Ext2_ReadFromINodePhys(struct inode *__restrict self, vm_phys_t dst, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
-INTDEF void KCALL Ext2_WriteToINodePhys(struct inode *__restrict self, vm_phys_t src, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
+INTDEF void KCALL Ext2_ReadFromINodePhys(struct inode *__restrict self, physaddr_t dst, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
+INTDEF void KCALL Ext2_WriteToINodePhys(struct inode *__restrict self, physaddr_t src, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
 INTDEF void KCALL Ext2_ReadFromINodeVector(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
 INTDEF void KCALL Ext2_WriteToINodeVector(struct inode *__restrict self, struct aio_buffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);
 INTDEF void KCALL Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self, struct aio_pbuffer *__restrict buf, size_t bufsize, pos_t pos, struct aio_multihandle *__restrict aio);

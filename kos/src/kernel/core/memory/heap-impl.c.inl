@@ -147,8 +147,8 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	corepair.cp_part->dp_srefs         = corepair.cp_node;
 	corepair.cp_part->dp_tree.a_vmax   = (datapage_t)((num_bytes / PAGESIZE) - 1);
 	{
-		pageptr_t block0_addr;
-		pagecnt_t block0_size;
+		physpage_t block0_addr;
+		physpagecnt_t block0_size;
 		if (flags & GFP_LOCKED) {
 			corepair.cp_part->dp_state = VM_DATAPART_STATE_LOCKED;
 			corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_LOCKED;
@@ -189,7 +189,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_HEAPPPP;
 		}
 		block0_addr = page_malloc_part(1, num_bytes / PAGESIZE, &block0_size);
-		if unlikely(block0_addr == PAGEPTR_INVALID) {
+		if unlikely(block0_addr == PHYSPAGE_INVALID) {
 			/* Allocation failed. */
 #ifdef HEAP_NX
 			goto err_corepair;
@@ -225,7 +225,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			blocks[0].rb_size  = block0_size;
 			/* Allocate more blocks and populate the block-vector. */
 			while (block0_size < (num_bytes / PAGESIZE)) {
-				pagecnt_t new_block_size;
+				physpagecnt_t new_block_size;
 				if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
 					struct vm_ramblock *new_blocks;
 					new_blocks = (struct vm_ramblock *)krealloc_nx(blocks,
@@ -257,7 +257,7 @@ err_blocks:
 				block0_addr = page_malloc_part(1,
 				                               (num_bytes / PAGESIZE) - block0_size,
 				                               &new_block_size);
-				if unlikely(block0_addr == PAGEPTR_INVALID)
+				if unlikely(block0_addr == PHYSPAGE_INVALID)
 					goto err_blocks;
 #if 1
 				/* Insert new blocks in the front, thus optimizing to better allocate
@@ -289,7 +289,7 @@ err_blocks:
 				blocks[0].rb_size = block0_size;
 				/* Allocate more blocks and populate the block-vector. */
 				while (block0_size < (num_bytes / PAGESIZE)) {
-					pagecnt_t new_block_size;
+					physpagecnt_t new_block_size;
 					if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
 						struct vm_ramblock *new_blocks;
 						new_blocks = (struct vm_ramblock *)krealloc_nx(blocks,
@@ -322,7 +322,7 @@ err_blocks:
 					                               (num_bytes / PAGESIZE) -
 					                               block0_size,
 					                               &new_block_size);
-					if unlikely(block0_addr == PAGEPTR_INVALID) {
+					if unlikely(block0_addr == PHYSPAGE_INVALID) {
 						while (blockc) {
 							--blockc;
 							page_ccfree(blocks[blockc].rb_start,
@@ -473,13 +473,13 @@ again_tryhard_mapping_target:
 				for (i = 0; i < blockc; ++i) {
 					pagedir_map((byte_t *)mapping_target + mapping_offset,
 					            blocks[i].rb_size * PAGESIZE,
-					            page2addr(blocks[i].rb_start),
+					            physpage2addr(blocks[i].rb_start),
 					            PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 					if (flags & GFP_CALLOC) {
 						/* Write zeros to all random-content pages. */
-						pagecnt_t j;
+						physpagecnt_t j;
 						for (j = 0; j < blocks[i].rb_size; ++j) {
-							pageptr_t ppage = blocks[i].rb_start + j;
+							physpage_t ppage = blocks[i].rb_start + j;
 							if (!page_iszero(ppage)) {
 								void *pageaddr;
 								pageaddr = (byte_t *)mapping_target +
@@ -494,7 +494,7 @@ again_tryhard_mapping_target:
 #ifdef CONFIG_DEBUG_HEAP
 					else {
 						/* Fill memory using the fresh-memory pattern. */
-						pagecnt_t j;
+						physpagecnt_t j;
 						for (j = 0; j < blocks[i].rb_size; ++j) {
 							void *pageaddr;
 							pageaddr = (byte_t *)mapping_target +

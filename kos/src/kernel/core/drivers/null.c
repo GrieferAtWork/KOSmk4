@@ -139,7 +139,7 @@ PRIVATE NONNULL((1)) size_t KCALL
 mem_pread(struct character_device *__restrict UNUSED(self),
           USER CHECKED void *dst, size_t num_bytes,
           pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
-	vm_copyfromphys(dst, (vm_phys_t)addr, num_bytes);
+	vm_copyfromphys(dst, (physaddr_t)addr, num_bytes);
 	return num_bytes;
 }
 
@@ -147,7 +147,7 @@ PRIVATE NONNULL((1)) size_t KCALL
 mem_pwrite(struct character_device *__restrict UNUSED(self),
            USER CHECKED void const *src, size_t num_bytes,
            pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
-	vm_copytophys((vm_phys_t)addr, src, num_bytes);
+	vm_copytophys((physaddr_t)addr, src, num_bytes);
 	return num_bytes;
 }
 

@@ -64,7 +64,7 @@ Iso9660_ReadFromINode(struct inode *__restrict self,
 
 INTERN void KCALL
 Iso9660_ReadFromINodePhys(struct inode *__restrict self,
-                          vm_phys_t dst, size_t bufsize,
+                          physaddr_t dst, size_t bufsize,
                           pos_t pos, struct aio_multihandle *__restrict aio) {
 	block_device_aread_phys(self->i_super->s_device,
 	                        dst,

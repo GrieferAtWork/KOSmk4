@@ -69,7 +69,7 @@ NOTHROW(KCALL pagedir_maphintone_p)(pagedir_phys_t self,
 PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_mapone_p") void
 NOTHROW(KCALL pagedir_mapone_p)(pagedir_phys_t self,
                                 PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys, u16 perm) {
+                                PAGEDIR_PAGEALIGNED PHYS physaddr_t phys, u16 perm) {
 	PAGEDIR_P_BEGINUSE(self) {
 		pagedir_mapone(addr, phys, perm);
 	}
@@ -145,7 +145,7 @@ PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_map_p") vo
 NOTHROW(KCALL pagedir_map_p)(pagedir_phys_t self,
                              PAGEDIR_PAGEALIGNED VIRT void *addr,
                              PAGEDIR_PAGEALIGNED size_t num_bytes,
-                             PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                             PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                              u16 perm) {
 	PAGEDIR_P_BEGINUSE(self) {
 		pagedir_map(addr, num_bytes, phys, perm);
@@ -246,10 +246,10 @@ NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(pagedir_phys_t self) {
 	PAGEDIR_P_ENDUSE(self);
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_translate_p") WUNUSED PHYS vm_phys_t
+PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_translate_p") WUNUSED PHYS physaddr_t
 NOTHROW(KCALL pagedir_translate_p)(pagedir_phys_t self,
                                    VIRT void const *virt_addr) {
-	PHYS vm_phys_t result;
+	PHYS physaddr_t result;
 	PAGEDIR_P_BEGINUSE(self) {
 		result = pagedir_translate(virt_addr);
 	}

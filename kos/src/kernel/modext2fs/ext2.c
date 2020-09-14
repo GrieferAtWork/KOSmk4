@@ -94,7 +94,7 @@ Ext2_WriteToINode(struct inode *__restrict self,
 
 INTERN void KCALL
 Ext2_ReadFromINodePhys(struct inode *__restrict self,
-                       vm_phys_t dst, size_t bufsize,
+                       physaddr_t dst, size_t bufsize,
                        pos_t pos, struct aio_multihandle *__restrict aio) {
 	(void)self;
 	(void)dst;
@@ -107,7 +107,7 @@ Ext2_ReadFromINodePhys(struct inode *__restrict self,
 
 INTERN void KCALL
 Ext2_WriteToINodePhys(struct inode *__restrict self,
-                      vm_phys_t src, size_t bufsize,
+                      physaddr_t src, size_t bufsize,
                       pos_t pos, struct aio_multihandle *__restrict aio) {
 	(void)self;
 	(void)src;

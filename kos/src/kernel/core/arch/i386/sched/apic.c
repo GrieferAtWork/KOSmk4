@@ -56,6 +56,7 @@
 #include <sys/param.h> /* HZ */
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -875,12 +876,12 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 #ifndef CONFIG_NO_SMP
 		cpuid_t i;
 		if (_cpu_count > 1) {
-			pageptr_t entry_page;
+			physpage_t entry_page;
 			/* Allocate low physical memory for the SMP initialization entry page. */
-			entry_page = page_malloc_between((pageptr_t)((vm_phys_t)0x00000000 / PAGESIZE),
-			                                 (pageptr_t)((vm_phys_t)0x000fffff / PAGESIZE),
+			entry_page = page_malloc_between((physpage_t)((physaddr_t)0x00000000 / PAGESIZE),
+			                                 (physpage_t)((physaddr_t)0x000fffff / PAGESIZE),
 			                                 CEILDIV(x86_smp_entry_size, PAGESIZE));
-			if unlikely(entry_page == PAGEPTR_INVALID) {
+			if unlikely(entry_page == PHYSPAGE_INVALID) {
 				printk(FREESTR(KERN_WARNING "[apic] Failed to allocate SMP trampoline (re-configure for single-core mode)\n"));
 				_cpu_count = 1;
 #ifdef __HAVE_CPUSET_FULL_MASK
@@ -888,21 +889,21 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 #endif /* __HAVE_CPUSET_FULL_MASK */
 				goto done_early_altcore_init;
 			}
-			printk(FREESTR(KERN_INFO "[apic] Allocating SMP trampoline at " FORMAT_VM_PHYS_T "\n"),
-			       page2addr(entry_page));
+			printk(FREESTR(KERN_INFO "[apic] Allocating SMP trampoline at %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"),
+			       physpage2addr(entry_page));
 			x86_smp_entry_page = (u8)entry_page;
 			/* Apply some custom AP entry relocations. */
 			{
 				u32 gdt_addr;
 				gdt_addr = (u32)(x86_smp_gdt - x86_smp_entry);
-				gdt_addr += page2addr32(entry_page);
+				gdt_addr += physpage2addr32(entry_page);
 				x86_smp_entry_gdt_segment = (gdt_addr & 0xf0000) >> 4;
 				x86_smp_entry_gdt_offset  = (gdt_addr & 0x0ffff);
-				x86_smp_gdt_pointer_base += page2addr32(entry_page);
+				x86_smp_gdt_pointer_base += physpage2addr32(entry_page);
 			}
 			COMPILER_WRITE_BARRIER();
 			/* Copy AP entry code. */
-			vm_copytophys(page2addr(entry_page),
+			vm_copytophys(physpage2addr(entry_page),
 			              x86_smp_entry,
 			              x86_smp_entry_size);
 	

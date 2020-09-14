@@ -274,7 +274,7 @@ again:
 		corepair.cp_part->dp_ramdata.rd_blockv          = &corepair.cp_part->dp_ramdata.rd_block0;
 		corepair.cp_part->dp_ramdata.rd_block0.rb_size  = 1;
 		corepair.cp_part->dp_ramdata.rd_block0.rb_start = page_malloc(1);
-		if unlikely(corepair.cp_part->dp_ramdata.rd_block0.rb_start == PAGEPTR_INVALID)
+		if unlikely(corepair.cp_part->dp_ramdata.rd_block0.rb_start == PHYSPAGE_INVALID)
 			goto err_corepair;
 		{
 			void *next_slab_addr;
@@ -332,7 +332,7 @@ again_next_slab_page_tryhard:
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			/* Map all pre-allocated pages. */
 			pagedir_mapone(next_slab_addr,
-			               page2addr(corepair.cp_part->dp_ramdata.rd_block0.rb_start),
+			               physpage2addr(corepair.cp_part->dp_ramdata.rd_block0.rb_start),
 			               PAGEDIR_MAP_FWRITE | PAGEDIR_MAP_FREAD);
 			if (flags & GFP_CALLOC) {
 				/* Write zeros to all random-content pages. */

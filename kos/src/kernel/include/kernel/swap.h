@@ -31,29 +31,29 @@ DECL_BEGIN
 #ifdef __CC__
 #ifndef CONFIG_NO_SWAP
 
-typedef vm_spage_t swapptr_t;
-#define SWAPPTR_INVALID ((swapptr_t)-1)
+typedef physpage_t swappage_t;
+#define SWAPPTR_INVALID ((swappage_t)-1)
 
 /* Allocate SWAP memory.
  * @return: * :              The base address for the allocated swap segment.
  * @return: SWAPPTR_INVALID: Failed to allocate swap memory. */
-FUNDEF WUNUSED swapptr_t
-NOTHROW(KCALL swap_malloc)(pagecnt_t num_pages);
+FUNDEF WUNUSED swappage_t
+NOTHROW(KCALL swap_malloc)(physpagecnt_t num_pages);
 
-FUNDEF WUNUSED NONNULL((3)) swapptr_t
-NOTHROW(KCALL swap_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
-                                pagecnt_t *__restrict res_pages);
+FUNDEF WUNUSED NONNULL((3)) swappage_t
+NOTHROW(KCALL swap_malloc_part)(physpagecnt_t min_pages, physpagecnt_t max_pages,
+                                physpagecnt_t *__restrict res_pages);
 
 /* Free SWAP memory. */
 FUNDEF NOBLOCK void
-NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages);
+NOTHROW(KCALL swap_free)(swappage_t start, physpagecnt_t num_pages);
 
 /* Issue asynchronous comments to read/write physical memory to/from SWAP.
  * NOTE: By default, swap reads/writes are performed using DMA, which
  *       is why operations must be followed by a call to `swap_sync()'
  *       in order to ensure completion. */
-FUNDEF void (KCALL swap_read)(swapptr_t start, pageptr_t buffer, pagecnt_t num_pages);
-FUNDEF void (KCALL swap_write)(swapptr_t start, pageptr_t buffer, pagecnt_t num_pages);
+FUNDEF void (KCALL swap_read)(swappage_t start, physpage_t buffer, physpagecnt_t num_pages);
+FUNDEF void (KCALL swap_write)(swappage_t start, physpage_t buffer, physpagecnt_t num_pages);
 
 /* Wait for all out-standing swap reads/writes to be completed.
  * @throw: E_IOERROR: The swap back-end has issued an I/O error. */

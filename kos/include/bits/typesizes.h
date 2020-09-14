@@ -74,6 +74,8 @@
 #define __SIZEOF_JTIME_T__          8
 #define __SIZEOF_TIMER_T__          __SIZEOF_POINTER__
 #define __SIZEOF_FSWORD_T__         __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_PHYSADDR_T__       __SIZEOF_POINTER__
+#define __SIZEOF_PHYSPAGE_T__       __SIZEOF_POINTER__
 #endif
 
 #endif /* !_BITS_TYPESIZES_H */

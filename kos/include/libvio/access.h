@@ -21,7 +21,9 @@
 #define _LIBVIO_ACCESS_H 1
 
 #include "api.h"
+/**/
 
+#include <bits/types.h>
 #include <kos/anno.h>
 
 #include "vio.h"
@@ -29,10 +31,6 @@
 #ifdef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
 #include <hybrid/int128.h>
 #endif /* LIBVIO_CONFIG_HAVE_XWORD_CMPXCH */
-
-#ifdef __KERNEL__
-#include <kos/bits/types.h>
-#endif /* __KERNEL__ */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -112,8 +110,8 @@ typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO)(struct vio_args *
 typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYTOVIO)(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void const *buf, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
 typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_MEMSET)(struct vio_args *__restrict args, vio_addr_t offset, int byte, __size_t num_bytes) /*__THROWS(E_SEGFAULT, ...)*/;
 #ifdef __KERNEL__
-typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO_TO_PHYS)(struct vio_args *__restrict args, vio_addr_t offset, __vm_phys_t buf, __size_t num_bytes) /*__THROWS(...)*/;
-typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYTOVIO_FROM_PHYS)(struct vio_args *__restrict args, vio_addr_t offset, __vm_phys_t buf, __size_t num_bytes) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYFROMVIO_TO_PHYS)(struct vio_args *__restrict args, vio_addr_t offset, __physaddr_t buf, __size_t num_bytes) /*__THROWS(...)*/;
+typedef __ATTR_NONNULL((1)) void (LIBVIO_CC *PVIO_COPYTOVIO_FROM_PHYS)(struct vio_args *__restrict args, vio_addr_t offset, __physaddr_t buf, __size_t num_bytes) /*__THROWS(...)*/;
 #endif /* __KERNEL__ */
 #ifdef LIBVIO_WANT_PROTOTYPES
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_xchwithvio(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void *oldbuf, __USER __CHECKED void const *newbuf, __size_t num_bytes, __BOOL atomic) __THROWS(E_SEGFAULT, ...);
@@ -121,8 +119,8 @@ LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copyfromvio(struct vio_args *
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copytovio(struct vio_args *__restrict args, vio_addr_t offset, __USER __CHECKED void const *buf, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
 LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_memset(struct vio_args *__restrict args, vio_addr_t offset, int byte, __size_t num_bytes) __THROWS(E_SEGFAULT, ...);
 #ifdef __KERNEL__
-LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copyfromvio_to_phys(struct vio_args *__restrict args, vio_addr_t offset, __vm_phys_t buf, __size_t num_bytes) __THROWS(...);
-LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copytovio_from_phys(struct vio_args *__restrict args, vio_addr_t offset, __vm_phys_t buf, __size_t num_bytes) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copyfromvio_to_phys(struct vio_args *__restrict args, vio_addr_t offset, __physaddr_t buf, __size_t num_bytes) __THROWS(...);
+LIBVIO_DECL __ATTR_NONNULL((1)) void LIBVIO_CC vio_copytovio_from_phys(struct vio_args *__restrict args, vio_addr_t offset, __physaddr_t buf, __size_t num_bytes) __THROWS(...);
 #endif /* __KERNEL__ */
 #endif /* LIBVIO_WANT_PROTOTYPES */
 

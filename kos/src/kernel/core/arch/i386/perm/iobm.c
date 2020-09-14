@@ -122,22 +122,22 @@ DEFINE_PERTASK_CLONE(clone_this_ioperm_bitmap);
 PUBLIC NOBLOCK void
 NOTHROW(FCALL ioperm_bitmap_destroy)(struct ioperm_bitmap *__restrict self) {
 	assert(PERCPU(thiscpu_x86_ioperm_bitmap) != self);
-	page_free(addr2page(self->ib_pages), 2);
+	page_free(physaddr2page(self->ib_pages), 2);
 	kfree(self);
 }
 
 PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC NOBLOCK_IF(flags & GFP_ATOMIC)
 REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADALLOC) {
-	pageptr_t iob;
+	physpage_t iob;
 	REF struct ioperm_bitmap *result;
 	result = (REF struct ioperm_bitmap *)kmalloc(sizeof(struct ioperm_bitmap), flags);
 	iob = page_malloc(2);
-	if unlikely(iob == PAGEPTR_INVALID) {
+	if unlikely(iob == PHYSPAGE_INVALID) {
 		kfree(result);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2 * PAGESIZE);
 	}
 	/* Fill both pages of memory with all ones (indicating that I/O access is denied) */
-	result->ib_pages  = page2addr(iob);
+	result->ib_pages  = physpage2addr(iob);
 	result->ib_refcnt = 1;
 	result->ib_share  = 1;
 	vm_memsetphyspages(result->ib_pages, 0xff, 2);
@@ -146,17 +146,17 @@ REF struct ioperm_bitmap *KCALL ioperm_bitmap_allocf(gfp_t flags) THROWS(E_BADAL
 
 PUBLIC WUNUSED ATTR_MALLOC NOBLOCK_IF(flags & GFP_ATOMIC)
 REF struct ioperm_bitmap *NOTHROW(KCALL ioperm_bitmap_allocf_nx)(gfp_t flags) {
-	pageptr_t iob;
+	physpage_t iob;
 	REF struct ioperm_bitmap *result;
 	result = (REF struct ioperm_bitmap *)kmalloc_nx(sizeof(struct ioperm_bitmap), flags);
 	if likely(result) {
 		iob = page_malloc(2);
-		if unlikely(iob == PAGEPTR_INVALID) {
+		if unlikely(iob == PHYSPAGE_INVALID) {
 			kfree(result);
 			return NULL;
 		}
 		/* Fill both pages of memory with all ones (indicating that I/O access is denied) */
-		result->ib_pages  = page2addr(iob);
+		result->ib_pages  = physpage2addr(iob);
 		result->ib_refcnt = 1;
 		result->ib_share  = 1;
 		vm_memsetphyspages(result->ib_pages, 0xff, 2);
@@ -176,16 +176,16 @@ ioperm_bitmap_alloc(void) THROWS(E_BADALLOC) {
 /* Create a copy of the given I/O permissions bitmap. */
 PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *KCALL
 ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) THROWS(E_BADALLOC) {
-	pageptr_t iob;
+	physpage_t iob;
 	REF struct ioperm_bitmap *result;
 	result = (REF struct ioperm_bitmap *)kmalloc(sizeof(struct ioperm_bitmap), flags);
 	iob = page_malloc(2);
-	if unlikely(iob == PAGEPTR_INVALID) {
+	if unlikely(iob == PHYSPAGE_INVALID) {
 		kfree(result);
 		THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 2 * PAGESIZE);
 	}
 	/* Copy I/O permission bits. */
-	result->ib_pages  = page2addr(iob);
+	result->ib_pages  = physpage2addr(iob);
 	result->ib_refcnt = 1;
 	result->ib_share  = 1;
 	vm_copypagesinphys(result->ib_pages, self->ib_pages, 2);
@@ -194,17 +194,17 @@ ioperm_bitmap_copyf(struct ioperm_bitmap const *__restrict self, gfp_t flags) TH
 
 PUBLIC WUNUSED ATTR_MALLOC NOBLOCK_IF(flags & GFP_ATOMIC) REF struct ioperm_bitmap *
 NOTHROW(KCALL ioperm_bitmap_copyf_nx)(struct ioperm_bitmap const *__restrict self, gfp_t flags) {
-	pageptr_t iob;
+	physpage_t iob;
 	REF struct ioperm_bitmap *result;
 	result = (REF struct ioperm_bitmap *)kmalloc_nx(sizeof(struct ioperm_bitmap), flags);
 	if likely(result) {
 		iob = page_malloc(2);
-		if unlikely(iob == PAGEPTR_INVALID) {
+		if unlikely(iob == PHYSPAGE_INVALID) {
 			kfree(result);
 			return NULL;
 		}
 		/* Copy I/O permission bits. */
-		result->ib_pages  = page2addr(iob);
+		result->ib_pages  = physpage2addr(iob);
 		result->ib_refcnt = 1;
 		result->ib_share  = 1;
 		vm_copypagesinphys(result->ib_pages, self->ib_pages, 2);
@@ -285,10 +285,12 @@ PUBLIC struct ioperm_bitmap ioperm_bitmap_empty = {
 	/* .ib_refcnt = */ 1, /* _ioperm_bitmap_empty */
 	/* .ib_share  = */ 2, /* Prevent modifications */
 	/* .ib_pages  = */ {
-		{ (uintptr_t)__x86_iob_empty_base - KERNEL_CORE_BASE
-#if __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__
-		, 0
-#endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__ */
+		{
+			(uintptr_t)__x86_iob_empty_base - KERNEL_CORE_BASE
+#if __SIZEOF_PHYSADDR_T__ > __SIZEOF_POINTER__
+			,
+			0
+#endif /* __SIZEOF_PHYSADDR_T__ > __SIZEOF_POINTER__ */
 		}
 	}
 };

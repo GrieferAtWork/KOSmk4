@@ -231,7 +231,7 @@ ms_scsi_read(struct block_device *__restrict self,
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ms_scsi_read_phys(struct block_device *__restrict self,
-                  vm_phys_t dst, size_t num_sectors,
+                  physaddr_t dst, size_t num_sectors,
                   lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct ms_scsi_device *me;
@@ -290,7 +290,7 @@ ms_scsi_write(struct block_device *__restrict self,
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ms_scsi_write_phys(struct block_device *__restrict self,
-                   vm_phys_t src, size_t num_sectors,
+                   physaddr_t src, size_t num_sectors,
                    lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct ms_scsi_device *me;

@@ -25,7 +25,6 @@
 #include <hybrid/__byteorder.h>
 
 #include <bits/types.h>
-#include <kos/bits/types.h>
 
 __DECL_BEGIN
 

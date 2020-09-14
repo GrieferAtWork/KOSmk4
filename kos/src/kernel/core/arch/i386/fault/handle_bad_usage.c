@@ -1616,7 +1616,7 @@ NOTHROW(KCALL patch_fsgsbase_at)(void const *pc) {
 			 * own program segments, so-long as they follow the rules that kernel
 			 * memory can only be altered while holding a lock to the kernel VM. */
 			if (pagedir_ismapped(pc)) {
-				vm_phys_t pc_phys;
+				physaddr_t pc_phys;
 				pc_phys = pagedir_translate(pc);
 				/* Try to patch the instruction at `pc' */
 #ifndef NO_PHYS_IDENTITY

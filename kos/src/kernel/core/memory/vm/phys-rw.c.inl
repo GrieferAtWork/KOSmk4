@@ -90,7 +90,7 @@ DECL_BEGIN
 
 #ifndef DEFINE_PHYS_UNALIGNED
 PUBLIC NOBLOCK WUNUSED RETURN_TYPE(u8)
-NOTHROW(KCALL FUNC(physb))(PHYS vm_phys_t addr VALUE_ARG(u8)) {
+NOTHROW(KCALL FUNC(physb))(PHYS physaddr_t addr VALUE_ARG(u8)) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	IFRD(u8 result);
@@ -111,7 +111,7 @@ NOTHROW(KCALL FUNC(physb))(PHYS vm_phys_t addr VALUE_ARG(u8)) {
 #endif /* !DEFINE_PHYS_UNALIGNED */
 
 PUBLIC NOBLOCK WUNUSED RETURN_TYPE(u16)
-NOTHROW(KCALL FUNC(physw))(PHYS vm_phys_t addr VALUE_ARG(u16)) {
+NOTHROW(KCALL FUNC(physw))(PHYS physaddr_t addr VALUE_ARG(u16)) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	IFRD(u16 result;)
@@ -152,7 +152,7 @@ NOTHROW(KCALL FUNC(physw))(PHYS vm_phys_t addr VALUE_ARG(u16)) {
 }
 
 PUBLIC NOBLOCK WUNUSED RETURN_TYPE(u32)
-NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
+NOTHROW(KCALL FUNC(physl))(PHYS physaddr_t addr VALUE_ARG(u32)) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	IFRD(u32 result;)
@@ -217,7 +217,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS vm_phys_t addr VALUE_ARG(u32)) {
 }
 
 PUBLIC NOBLOCK WUNUSED RETURN_TYPE(u64)
-NOTHROW(KCALL FUNC(physq))(PHYS vm_phys_t addr VALUE_ARG(u64)) {
+NOTHROW(KCALL FUNC(physq))(PHYS physaddr_t addr VALUE_ARG(u64)) {
 	pagedir_pushval_t backup;
 	byte_t *tramp;
 	IFRD(u64 result;)

@@ -20,13 +20,10 @@
 #ifndef _KOS_KERNEL_TYPES_H
 #define _KOS_KERNEL_TYPES_H 1
 
-#include <hybrid/compiler.h>
+#include <__stdinc.h>
 
 #include <bits/types.h>
-#include <kos/bits/types.h>
 #include <kos/types.h>
-
-DECL_BEGIN
 
 #if __SIZEOF_POINTER__ == 4
 #define BITS_PER_POINTER  32
@@ -36,11 +33,12 @@ DECL_BEGIN
 #define BITS_PER_POINTER  16
 #elif __SIZEOF_POINTER__ == 1
 #define BITS_PER_POINTER  8
-#else
+#else /* __SIZEOF_POINTER__ == ... */
 #error "Invalid `__SIZEOF_POINTER__'"
-#endif
+#endif /* __SIZEOF_POINTER__ != ... */
 
 #ifdef __CC__
+__DECL_BEGIN
 
 #ifndef __s8_defined
 #define __s8_defined 1
@@ -77,29 +75,7 @@ typedef __le64 le64;
 typedef __uintptr_t refcnt_t;
 #endif /* !__refcnt_t_defined */
 
-#ifndef __pageptr_t_defined
-#define __pageptr_t_defined 1
-typedef __pageptr_t pageptr_t; /* Physical memory page index (`physical_address / PAGESIZE'). */
-#endif /* !__pageptr_t_defined */
-
-typedef /*VIRT*/ __vm_vpage64_t vm_vpage64_t; /* Virtual memory page index (with at least 64 bits). */ /* DEPRECATED; REMOVE ME */
-typedef /*PHYS*/ __vm_spage_t   vm_spage_t;   /* Swap memory page index (`swap_address / getpagesize()'). */ /* DEPRECATED; REMOVE ME */
-typedef /*PHYS*/ __vm_phys_t    vm_phys_t;    /* A physical memory pointer. */ /* TODO: Rename to `phys_t'; TODO: Move into <kernel/arch/paging.h> */
-
-#if __SIZEOF_VM_PHYS_T__ >= 8
-#define FORMAT_VM_PHYS_T  "%I64p" /* DEPRECATED; REMOVE ME */
-#else
-#define FORMAT_VM_PHYS_T  "%p" /* DEPRECATED; REMOVE ME */
-#endif
-
-#if __SIZEOF_PAGEPTR_T__ >= 8
-#define FORMAT_PAGEPTR_T "%I64p" /* DEPRECATED; REMOVE ME */
-#else
-#define FORMAT_PAGEPTR_T "%p" /* DEPRECATED; REMOVE ME */
-#endif
-
+__DECL_END
 #endif /* __CC__ */
-
-DECL_END
 
 #endif /* !_KOS_KERNEL_TYPES_H */

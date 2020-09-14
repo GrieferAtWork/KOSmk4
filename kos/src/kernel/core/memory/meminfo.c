@@ -40,6 +40,7 @@
 #include <hybrid/overflow.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -109,24 +110,24 @@ PUBLIC_CONST char const pmembank_type_names[PMEMBANK_TYPE_COUNT][16] = {
 INTDEF struct pmembank kernel_membanks_initial[];
 
 LOCAL ATTR_FREETEXT void
-NOTHROW(KCALL minfo_split_bank)(size_t bank_index, vm_phys_t start) {
+NOTHROW(KCALL minfo_split_bank)(size_t bank_index, physaddr_t start) {
 	assertf(bank_index < minfo.mb_bankc,
 	        "bank_index     = %Iu\n"
 	        "minfo.mb_bankc = %Iu\n",
 	        bank_index, minfo.mb_bankc);
 	assertf(start > PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]),
 	        "bank_index                                              = %Iu\n"
-	        "start                                                   = " FORMAT_VM_PHYS_T "\n"
-	        "PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]) = " FORMAT_VM_PHYS_T "\n"
-	        "PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index])   = " FORMAT_VM_PHYS_T "\n",
+	        "start                                                   = %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"
+	        "PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]) = %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"
+	        "PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index])   = %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n",
 	        bank_index, start,
 	        PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]),
 	        PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index]));
 	assertf(start <= PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index]),
 	        "bank_index                                              = %Iu\n"
-	        "start                                                   = " FORMAT_VM_PHYS_T "\n"
-	        "PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]) = " FORMAT_VM_PHYS_T "\n"
-	        "PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index])   = " FORMAT_VM_PHYS_T "\n",
+	        "start                                                   = %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"
+	        "PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]) = %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"
+	        "PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index])   = %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n",
 	        bank_index, start,
 	        PMEMBANK_STARTADDR(kernel_membanks_initial[bank_index]),
 	        PMEMBANK_MAXADDR(kernel_membanks_initial[bank_index]));
@@ -162,16 +163,18 @@ NOTHROW(KCALL minfo_usable_ram_pages)(void) {
 
 /* Add information about a new member bank / region. */
 INTERN ATTR_FREETEXT void
-NOTHROW(KCALL minfo_addbank)(vm_phys_t start, vm_phys_t size, u16 type) {
-	vm_phys_t max;
+NOTHROW(KCALL minfo_addbank)(physaddr_t start, physaddr_t size, u16 type) {
+	physaddr_t max;
 	size_t i;
 	assert(minfo.mb_banks == kernel_membanks_initial);
 	assert(type < PMEMBANK_TYPE_COUNT);
 	if (!size)
 		return;
 	if (OVERFLOW_UADD(start, size - 1, &max))
-		max = (vm_phys_t)-1;
-	printk(FREESTR(KERN_INFO "[mem] Adding memory bank at " FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T " (%s)\n"),
+		max = (physaddr_t)-1;
+	printk(FREESTR(KERN_INFO "[mem] Adding memory bank at "
+	                         "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
+	                         "%" PRIpN(__SIZEOF_PHYSADDR_T__) " (%s)\n"),
 	       start, max, pmembank_type_names[type]);
 	i = 0;
 	while ((assert(i < minfo.mb_bankc),
@@ -225,7 +228,7 @@ continue_type_checks:
 
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL pmemzone_init_bit)(struct pmemzone *__restrict self,
-                                  pageptr_t pageno, uintptr_t mask) {
+                                  physpage_t pageno, uintptr_t mask) {
 	unsigned int j;
 	size_t i;
 	uintptr_t bitmask;
@@ -238,21 +241,23 @@ NOTHROW(KCALL pmemzone_init_bit)(struct pmemzone *__restrict self,
 
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL pmemzone_init_bits)(struct pmemzone *__restrict self,
-                                  pageptr_t start, pagecnt_t num_pages,
+                                  physpage_t start, physpagecnt_t num_pages,
                                   uintptr_t mask) {
 #if 0
-	printk(FREESTR(KERN_DEBUG "INIT: " FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T " as %Ix\n"),
-	       (vm_phys_t)(page2addr(start)),
-	       (vm_phys_t)(page2addr(start + num_pages) - 1),
+	printk(FREESTR(KERN_DEBUG "INIT: "
+	                          "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
+	                          "%" PRIpN(__SIZEOF_PHYSADDR_T__) " as %Ix\n"),
+	       (physaddr_t)(physpage2addr(start)),
+	       (physaddr_t)(physpage2addr(start + num_pages) - 1),
 	       mask);
 #endif
 	assert(start >= self->mz_start);
 	assert(start + num_pages >= start);
 	assertf(!num_pages || start + num_pages - 1 <= self->mz_max,
-	        "start                 = " FORMAT_PAGEPTR_T "\n"
-	        "num_pages             = " FORMAT_PAGEPTR_T "\n"
-	        "start + num_pages - 1 = " FORMAT_PAGEPTR_T "\n"
-	        "self->mz_max          = " FORMAT_PAGEPTR_T "\n",
+	        "start                 = %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+	        "num_pages             = %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+	        "start + num_pages - 1 = %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+	        "self->mz_max          = %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n",
 	        start, num_pages, start + num_pages - 1, self->mz_max);
 	start -= self->mz_start;
 	while (start & (PAGES_PER_WORD - 1)) {
@@ -287,28 +292,28 @@ INTDEF struct vm_node kernel_vm_node_pagedata;
 INTDEF byte_t __kernel_start[];
 #endif /* __i386__ || __x86_64__ */
 
-PRIVATE ATTR_FREETEXT PHYS pageptr_t KCALL
+PRIVATE ATTR_FREETEXT PHYS physpage_t KCALL
 minfo_allocate_part_pagedata(size_t num_bytes) {
 	/* Q: Huh? Candy? What are you talking about
 	 * A: Candy -> Candi -> Candidate */
 	size_t i, candy_bank = (size_t)-1;
-	pageptr_t candy        = (pageptr_t)-1;
-	pageptr_t candy_weight = (pageptr_t)-1;
+	physpage_t candy        = (physpage_t)-1;
+	physpage_t candy_weight = (physpage_t)-1;
 #if defined(__i386__) || defined(__x86_64__)
 	bool allow_beneath_kernel = false;
 again:
 #endif /* __i386__ || __x86_64__ */
 	assert(minfo.mb_banks == kernel_membanks_initial);
 	for (i = 0; i < minfo.mb_bankc; ++i) {
-		vm_phys_t bytes_avail;
-		pageptr_t waste;
-		pageptr_t bank_alloc_page;
+		physaddr_t bytes_avail;
+		physpage_t waste;
+		physpage_t bank_alloc_page;
 		if (kernel_membanks_initial[i].mb_type != PMEMBANK_TYPE_RAM)
 			continue; /* Not suitable for our purposes */
 		bytes_avail = PMEMBANK_SIZE(kernel_membanks_initial[i]);
-		if unlikely(bytes_avail < (vm_phys_t)num_bytes)
+		if unlikely(bytes_avail < (physaddr_t)num_bytes)
 			continue; /* Too small in general (even without alignment) */
-		bank_alloc_page = (pageptr_t)((PMEMBANK_ENDADDR(kernel_membanks_initial[i]) - num_bytes) / PAGESIZE);
+		bank_alloc_page = (physpage_t)((PMEMBANK_ENDADDR(kernel_membanks_initial[i]) - num_bytes) / PAGESIZE);
 		if unlikely(bank_alloc_page < PMEMBANK_STARTPAGE(kernel_membanks_initial[i]))
 			continue; /* Too small with alignment */
 #if defined(__i386__) || defined(__x86_64__)
@@ -316,40 +321,40 @@ again:
 		 * which is already in short supply, and which we'll still be needing for
 		 * initialization of APIC/SMP trampoline code, or other real-mode/BIOS related
 		 * stuff that can only exist below the physical 1MiB (16-bit 0xffff) mark. */
-		if unlikely(bank_alloc_page <= addr2page((uintptr_t)__kernel_start - KERNEL_CORE_BASE) &&
+		if unlikely(bank_alloc_page <= physaddr2page((uintptr_t)__kernel_start - KERNEL_CORE_BASE) &&
 		            !allow_beneath_kernel)
 			continue;
 #endif /* __i386__ || __x86_64__ */
 
-#if __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__
+#if __SIZEOF_PHYSADDR_T__ > __SIZEOF_POINTER__
 		/* Make sure the allocation end doesn't exceed mapped physical memory. */
-		if ((page2addr(bank_alloc_page) + num_bytes - 1) >= (vm_phys_t)((uintptr_t)-1)) {
-			vm_phys_t bank_alloc_addr;
-			bank_alloc_addr = (vm_phys_t)((uintptr_t)-1) - (num_bytes - 1);
+		if ((physpage2addr(bank_alloc_page) + num_bytes - 1) >= (physaddr_t)((uintptr_t)-1)) {
+			physaddr_t bank_alloc_addr;
+			bank_alloc_addr = (physaddr_t)((uintptr_t)-1) - (num_bytes - 1);
 			bank_alloc_addr &= ~PAGEMASK;
 			if (bank_alloc_addr < PMEMBANK_STARTADDR(kernel_membanks_initial[i]))
 				break; /* Bank doesn't cover the last possible mapping location. */
-			waste = (pageptr_t)-2; /* A lot of waste this way... */
+			waste = (physpage_t)-2; /* A lot of waste this way... */
 		} else
-#endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_POINTER__ */
+#endif /* __SIZEOF_PHYSADDR_T__ > __SIZEOF_POINTER__ */
 		{
 			/* See how much memory we're wasting with this allocation. */
 			assert(PMEMBANK_ENDADDR(kernel_membanks_initial[i]) >=
-			       (page2addr(bank_alloc_page) + num_bytes));
-			waste = (pageptr_t)(PMEMBANK_ENDADDR(kernel_membanks_initial[i]) -
-			                    (page2addr(bank_alloc_page) + num_bytes));
+			       (physpage2addr(bank_alloc_page) + num_bytes));
+			waste = (physpage_t)(PMEMBANK_ENDADDR(kernel_membanks_initial[i]) -
+			                    (physpage2addr(bank_alloc_page) + num_bytes));
 #if 0
 			{
 				/* Subtract the number of bytes used by this, that would otherwise go unused from `waste'
 				 * (i.e. `NUMBER_OF_BYTES_UNSED_OF(PAGE_ALIGNED_BANK_END ... BYTE_ALIGNED_BANK_END)') */
-				vm_phys_t gain_min;
-				vm_phys_t gain_end;
+				physaddr_t gain_min;
+				physaddr_t gain_end;
 				gain_end = PMEMBANK_ENDADDR(kernel_membanks_initial[i]);
 				if ((gain_end & PAGEMASK) != 0) {
-					vm_phys_t used_end;
+					physaddr_t used_end;
 					size_t gain;
 					gain_min = gain_end & ~PAGEMASK;
-					used_end = page2addr(bank_alloc_page) + num_bytes;
+					used_end = physpage2addr(bank_alloc_page) + num_bytes;
 					assert(used_end >= gain_min && used_end <= gain_end);
 					gain = (size_t)(used_end - gain_min);
 					if (gain > candy_weight)
@@ -393,8 +398,8 @@ again:
 	}
 	/* Reserve memory from the candy-bank. */
 	{
-		vm_phys_t candy_phys     = page2addr(candy);
-		vm_phys_t candy_phys_max = candy_phys + num_bytes - 1;
+		physaddr_t candy_phys     = physpage2addr(candy);
+		physaddr_t candy_phys_max = candy_phys + num_bytes - 1;
 		assert(candy_phys >= PMEMBANK_MINADDR(kernel_membanks_initial[candy_bank]));
 		assert(candy_phys_max <= PMEMBANK_MAXADDR(kernel_membanks_initial[candy_bank]));
 		assert(kernel_membanks_initial[candy_bank].mb_type == PMEMBANK_TYPE_RAM);
@@ -452,7 +457,7 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	 *       known address space. */
 	req_bytes = (minfo.mb_bankc + 3) * sizeof(struct pmembank);
 	for (i = 0; i < minfo.mb_bankc; ++i) {
-		pageptr_t bank_start_page, bank_end_page;
+		physpage_t bank_start_page, bank_end_page;
 		assertf(kernel_membanks_initial[i].mb_type < PMEMBANK_TYPE_COUNT,
 		        "kernel_membanks_initial[i].mb_type = %u",
 		        kernel_membanks_initial[i].mb_type);
@@ -484,13 +489,15 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	req_pages = CEILDIV(req_bytes, PAGESIZE);
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start = minfo_allocate_part_pagedata(req_bytes);
 	printk(FREESTR(KERN_DEBUG "[mem] Allocate paging control structures at "
-	               FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T " (%Iu bytes in %Iu pages)\n"),
-	       (vm_phys_t)(page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start)),
-	       (vm_phys_t)(page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start) + req_bytes - 1),
+	                          "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
+	                          "%" PRIpN(__SIZEOF_PHYSADDR_T__) " "
+	                          "(%Iu bytes in %Iu pages)\n"),
+	       (physaddr_t)(physpage2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start)),
+	       (physaddr_t)(physpage2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start) + req_bytes - 1),
 	       req_bytes, req_pages);
 	kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size = req_pages;
 	kernel_vm_part_pagedata.dp_tree.a_vmax = (datapage_t)(req_pages - 1);
-	buffer = (byte_t *)(KERNEL_CORE_BASE + page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start));
+	buffer = (byte_t *)(KERNEL_CORE_BASE + physpage2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start));
 	kernel_vm_node_pagedata.vn_node.a_vmin = PAGEID_ENCODE(buffer);
 	kernel_vm_node_pagedata.vn_node.a_vmax = kernel_vm_node_pagedata.vn_node.a_vmin + req_pages - 1;
 	/* With the required buffer now allocated, we can move on to populating it with data.
@@ -505,8 +512,8 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 	/* Now move on to generate the memory zones themself. */
 	zone_count = 0;
 	for (i = 0; i < minfo.mb_bankc; ++i) {
-		pageptr_t bank_start_page, bank_end_page;
-		pageptr_t prev_init_end;
+		physpage_t bank_start_page, bank_end_page;
+		physpage_t prev_init_end;
 		struct pmemzone *zone;
 		size_t zone_bank_start;
 		assertf(kernel_membanks_initial[i].mb_type < PMEMBANK_TYPE_COUNT,
@@ -544,8 +551,8 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 		prev_init_end  = bank_start_page;
 		do {
 			uintptr_t init_mask;
-			pagecnt_t size;
-			pageptr_t startpage, endpage;
+			physpagecnt_t size;
+			physpage_t startpage, endpage;
 			startpage = PMEMBANK_STARTPAGE(minfo.mb_banks[zone_bank_start]);
 			endpage   = PMEMBANK_ENDPAGE(minfo.mb_banks[zone_bank_start]);
 			if unlikely(startpage >= endpage) {
@@ -559,8 +566,8 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 				 * much assume that all pages (at least partially) touched by this mapping
 				 * are entirely undefined (which may not necessarily be so, but is the
 				 * safest thing which we can do). */
-				startpage = (pageptr_t)FLOORDIV(PMEMBANK_MINADDR(minfo.mb_banks[zone_bank_start]), PAGESIZE);
-				endpage   = (pageptr_t)CEILDIV(PMEMBANK_MAXADDR(minfo.mb_banks[zone_bank_start]), PAGESIZE);
+				startpage = (physpage_t)FLOORDIV(PMEMBANK_MINADDR(minfo.mb_banks[zone_bank_start]), PAGESIZE);
+				endpage   = (physpage_t)CEILDIV(PMEMBANK_MAXADDR(minfo.mb_banks[zone_bank_start]), PAGESIZE);
 				if unlikely(startpage < bank_start_page)
 					startpage = bank_start_page;
 				if unlikely(endpage > bank_end_page)
@@ -576,10 +583,10 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 				/* Initialize intermittent pages as undefined. */
 				pmemzone_init_bits(zone,
 				                   prev_init_end,
-				                   (pagecnt_t)(startpage - prev_init_end),
+				                   (physpagecnt_t)(startpage - prev_init_end),
 				                   PMEMBITSET_UNDFMASK);
 			}
-			size = (pagecnt_t)(endpage - startpage);
+			size = (physpagecnt_t)(endpage - startpage);
 			pmemzone_init_bits(zone,
 			                   startpage,
 			                   size,
@@ -592,7 +599,7 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 		/* Initialize trailing pages as undefined. */
 		pmemzone_init_bits(zone,
 		                   prev_init_end,
-		                   (pagecnt_t)(bank_end_page - prev_init_end),
+		                   (physpagecnt_t)(bank_end_page - prev_init_end),
 		                   PMEMBITSET_UNDFMASK);
 		assert(zone->mz_start == bank_start_page);
 		assert(zone->mz_max == bank_end_page - 1);
@@ -602,15 +609,18 @@ NOTHROW(KCALL kernel_initialize_minfo_makezones)(void) {
 		        "zone->mz_rmax = %Iu",
 		        zone->mz_fmax,
 		        zone->mz_rmax);
-		assertf(zone->mz_cfree <= (pagecnt_t)zone->mz_rmax + 1,
+		assertf(zone->mz_cfree <= (physpagecnt_t)zone->mz_rmax + 1,
 		        "zone->mz_cfree = %Iu\n"
 		        "zone->mz_rmax  = %Iu",
 		        (size_t)zone->mz_cfree,
 		        (size_t)zone->mz_rmax);
-		printk(FREESTR(KERN_INFO "[mem] Define memory zone %Iu at " FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T " (%Iu/%Iu free pages)\n"),
+		printk(FREESTR(KERN_INFO "[mem] Define memory zone %Iu at "
+		                         "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
+		                         "%" PRIpN(__SIZEOF_PHYSADDR_T__) " "
+		                         "(%Iu/%Iu free pages)\n"),
 		       (size_t)(zone_count - 1),
-		       (vm_phys_t)(page2addr(zone->mz_start)),
-		       (vm_phys_t)(page2addr(bank_end_page) - 1),
+		       (physaddr_t)(physpage2addr(zone->mz_start)),
+		       (physaddr_t)(physpage2addr(bank_end_page) - 1),
 		       (size_t)zone->mz_cfree,
 		       (size_t)zone->mz_rmax + 1);
 		zone->mz_qfree = zone->mz_cfree; /* Everything is undefined in the beginning */
@@ -699,7 +709,7 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 	assert(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_size == num_bytes / PAGESIZE);
 	/* Create a new page directory mapping. */
 	pagedir_map(dest, num_bytes,
-	            page2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start),
+	            physpage2addr(kernel_vm_part_pagedata.dp_ramdata.rd_block0.rb_start),
 	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_unprepare_map(dest, num_bytes);
@@ -736,31 +746,31 @@ NOTHROW(KCALL kernel_initialize_minfo_relocate)(void) {
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL minfo_release_preservations)(void) {
 	size_t i, num_banks = 0;
-	pagecnt_t num_released    = 0;
-	pageptr_t freed_pages_end = 0;
+	physpagecnt_t num_released    = 0;
+	physpage_t freed_pages_end = 0;
 	assert(minfo.mb_banks[minfo.mb_bankc].mb_start == 0);
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		/* Search for PRESERVE and ALLOCATED memory banks. */
 		u16 type;
 		type = minfo.mb_banks[i].mb_type;
 		if (type == PMEMBANK_TYPE_PRESERVE) {
-			pageptr_t minpage;
-			pageptr_t maxpage;
+			physpage_t minpage;
+			physpage_t maxpage;
 			/* Figure out how many page we're allowed to free */
 			minpage = i == 0
 			          ? 0
 			          : minfo.mb_banks[i - 1].mb_type == PMEMBANK_TYPE_RAM
-			            ? (pageptr_t)FLOORDIV(minfo.mb_banks[i].mb_start, PAGESIZE)
-			            : (pageptr_t)CEILDIV(minfo.mb_banks[i].mb_start, PAGESIZE);
+			            ? (physpage_t)FLOORDIV(minfo.mb_banks[i].mb_start, PAGESIZE)
+			            : (physpage_t)CEILDIV(minfo.mb_banks[i].mb_start, PAGESIZE);
 			if (i == minfo.mb_bankc - 1) {
-				maxpage = (pageptr_t)-1;
+				maxpage = (physpage_t)-1;
 			} else if (minfo.mb_banks[i + 1].mb_type == PMEMBANK_TYPE_RAM) {
 				size_t j = i + 1;
 				/* Scan ahead to make sure that all memory banks overlapping with the page
 				 * at `maxpage' are either `PMEMBANK_TYPE_RAM' or `PMEMBANK_TYPE_PRESERVE' */
-				maxpage = (pageptr_t)CEILDIV(minfo.mb_banks[i + 1].mb_start, PAGESIZE) - 1;
+				maxpage = (physpage_t)CEILDIV(minfo.mb_banks[i + 1].mb_start, PAGESIZE) - 1;
 				while (j < minfo.mb_bankc - 1 &&
-				       (((pageptr_t)CEILDIV(minfo.mb_banks[j + 1].mb_start, PAGESIZE) - 1) == maxpage)) {
+				       (((physpage_t)CEILDIV(minfo.mb_banks[j + 1].mb_start, PAGESIZE) - 1) == maxpage)) {
 					if (minfo.mb_banks[j + 1].mb_type == PMEMBANK_TYPE_RAM ||
 					    minfo.mb_banks[j + 1].mb_type == PMEMBANK_TYPE_PRESERVE)
 						++j;
@@ -770,16 +780,18 @@ NOTHROW(KCALL minfo_release_preservations)(void) {
 				}
 			} else {
 use_floordiv_maxpage:
-				maxpage = (pageptr_t)FLOORDIV(minfo.mb_banks[i + 1].mb_start, PAGESIZE) - 1;
+				maxpage = (physpage_t)FLOORDIV(minfo.mb_banks[i + 1].mb_start, PAGESIZE) - 1;
 			}
 			if (minpage < freed_pages_end)
 				minpage = freed_pages_end; /* Prevent problems resulting from very small reserved pages */
 			if (minpage <= maxpage) {
-				pagecnt_t temp;
-				temp = (pagecnt_t)(maxpage - minpage) + 1;
-				printk(FREESTR(KERN_DEBUG "[mem] Free preseved memory at " FORMAT_VM_PHYS_T "-" FORMAT_VM_PHYS_T "\n"),
-				       (vm_phys_t)(page2addr(minpage)),
-				       (vm_phys_t)(page2addr(maxpage + 1) - 1));
+				physpagecnt_t temp;
+				temp = (physpagecnt_t)(maxpage - minpage) + 1;
+				printk(FREESTR(KERN_DEBUG "[mem] Free preseved memory at "
+				                          "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
+				                          "%" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"),
+				       (physaddr_t)(physpage2addr(minpage)),
+				       (physaddr_t)(physpage2addr(maxpage + 1) - 1));
 				page_free(minpage, temp);
 				freed_pages_end = maxpage + 1;
 				num_released += temp;
@@ -857,8 +869,8 @@ kernel_handle_ram_cmdline(char *__restrict arg) {
 			goto next_definition;
 		}
 got_bank_type:
-		minfo_addbank((vm_phys_t)ramdef.rd_start,
-		              (vm_phys_t)ramdef.rd_size,
+		minfo_addbank((physaddr_t)ramdef.rd_start,
+		              (physaddr_t)ramdef.rd_size,
 		              bank_type);
 next_definition:
 		if (*parser.jp_pos != ',')
@@ -911,7 +923,9 @@ DBG_COMMAND(lsmem,
 	for (i = 0; i < minfo.mb_bankc; ++i) {
 		struct pmembank *bank;
 		bank = &minfo.mb_banks[i];
-		dbg_printf(DBGSTR(AC_WHITE(FORMAT_VM_PHYS_T) "-" AC_WHITE(FORMAT_VM_PHYS_T) " %s%-11s" AC_DEFATTR " %I64u\n"),
+		dbg_printf(DBGSTR(AC_WHITE("%" PRIpN(__SIZEOF_PHYSADDR_T__)) "-"
+		                  AC_WHITE("%" PRIpN(__SIZEOF_PHYSADDR_T__)) " "
+		                  "%s%-11s" AC_DEFATTR " %" PRIuN(__SIZEOF_PHYSADDR_T__) "\n"),
 		           PMEMBANK_MINADDR(*bank),
 		           PMEMBANK_MAXADDR(*bank),
 		           bank->mb_type < PMEMBANK_TYPE_COUNT ? pmembank_type_colors[bank->mb_type] : "",

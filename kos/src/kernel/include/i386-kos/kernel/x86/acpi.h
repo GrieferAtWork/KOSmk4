@@ -129,7 +129,7 @@ typedef struct ATTR_PACKED {
 #define ACPI_MODE_RSDT 4 /* RSDT was found. */
 #define ACPI_MODE_XSDT 8 /* XSDT was found (preferred over `ACPI_MODE_RSDT'). */
 DATDEF unsigned int acpi_mode;
-DATDEF vm_phys_t    acpi_root; /* [valid_if(acpi_mode != ACPI_MODE_NONE)]
+DATDEF physaddr_t    acpi_root; /* [valid_if(acpi_mode != ACPI_MODE_NONE)]
                                 * pointer to the RSDT or XSDT (based on `acpi_mode') */
 DATDEF size_t acpi_sdt_count;  /* Length of the vector `((ACPISDTHeader *)acpi_root)->rsdp_sdts' */
 #define ACPI_POINTER_SIZE  ((size_t)acpi_mode)
@@ -147,7 +147,7 @@ DATDEF size_t acpi_sdt_count;  /* Length of the vector `((ACPISDTHeader *)acpi_r
 FUNDEF size_t
 NOTHROW(KCALL acpi_lookup)(char const signature[4],
                            void *buf, size_t buflen,
-                           vm_phys_t *ptableaddr DFL(__NULLPTR));
+                           physaddr_t *ptableaddr DFL(__NULLPTR));
 
 #endif /* __CC__ */
 

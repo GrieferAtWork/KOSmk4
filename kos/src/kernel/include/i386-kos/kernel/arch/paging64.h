@@ -24,6 +24,7 @@
 
 #include <kernel/types.h>
 
+#include <kos/kernel/memory.h>
 #include <kos/kernel/paging.h>
 
 #include <stdbool.h>

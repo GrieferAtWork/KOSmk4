@@ -24,8 +24,6 @@
 
 #include <hybrid/typecore.h>
 
-#include <kos/bits/types.h>
-
 
 #undef KERNELSPACE_BASE
 #undef KERNEL_CORE_BASE

@@ -119,7 +119,7 @@ INTDEF s8 x86_syscall_emulate_r_redirection[2];
 INTDEF byte_t x86_syscall_emulate_traced_r[];
 INTDEF byte_t x86_syscall_emulate_r_redirection_jmp[];
 
-#define V2P(addr) (vm_phys_t)((uintptr_t)(addr) - KERNEL_CORE_BASE)
+#define V2P(addr) (physaddr_t)((uintptr_t)(addr) - KERNEL_CORE_BASE)
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL setpcrel32)(s32 *pcrel, void *dest) {

@@ -100,14 +100,102 @@
 
 #define __PRIN2_PREFIX(n) __PRI##n##_PREFIX
 #define __PRIN_PREFIX(n)  __PRIN2_PREFIX(n)
-#define __PRIL1_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_LEAST8_T__)
-#define __PRIL2_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_LEAST16_T__)
-#define __PRIL4_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_LEAST32_T__)
-#define __PRIL8_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_LEAST64_T__)
-#define __PRIF1_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_FAST8_T__)
-#define __PRIF2_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_FAST16_T__)
-#define __PRIF4_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_FAST32_T__)
-#define __PRIF8_PREFIX    __PRIN_PREFIX(__SIZEOF_INT_FAST64_T__)
+
+#define __PRIL1_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST8_T__)
+#define __PRIL2_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST16_T__)
+#define __PRIL4_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST32_T__)
+#define __PRIL8_PREFIX __PRIN_PREFIX(__SIZEOF_INT_LEAST64_T__)
+#define __PRIF1_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST8_T__)
+#define __PRIF2_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST16_T__)
+#define __PRIF4_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST32_T__)
+#define __PRIF8_PREFIX __PRIN_PREFIX(__SIZEOF_INT_FAST64_T__)
+
+
+#ifdef __CRT_KOS /* FEATURE: CRT's printf() supports fixed-length pointers */
+#if __SIZEOF_POINTER__ == 1
+#define __PRINP_1 "p"
+#elif __SIZEOF_LONG__ == 1
+#define __PRINP_1 "lp"
+#elif __SIZEOF_SHORT__ == 1
+#define __PRINP_1 "hp"
+#elif __SIZEOF_INTMAX_T__ == 1
+#define __PRINP_1 "jp"
+#elif __SIZEOF_CHAR__ == 1
+#define __PRINP_1 "hhp"
+#elif __SIZEOF_LONG_LONG__ == 1
+#define __PRINP_1 "llp"
+#else /* ... == 1 */
+#define __PRINP_1 "I8p"
+#endif /* ... != 1 */
+
+#if __SIZEOF_POINTER__ == 2
+#define __PRINP_2 "p"
+#elif __SIZEOF_LONG__ == 2
+#define __PRINP_2 "lp"
+#elif __SIZEOF_SHORT__ == 2
+#define __PRINP_2 "hp"
+#elif __SIZEOF_INTMAX_T__ == 2
+#define __PRINP_2 "jp"
+#elif __SIZEOF_CHAR__ == 2
+#define __PRINP_2 "hhp"
+#elif __SIZEOF_LONG_LONG__ == 2
+#define __PRINP_2 "llp"
+#else /* ... == 2 */
+#define __PRINP_2 "I16p"
+#endif /* ... != 2 */
+
+#if __SIZEOF_POINTER__ == 4
+#define __PRINP_4 "p"
+#elif __SIZEOF_LONG__ == 4
+#define __PRINP_4 "lp"
+#elif __SIZEOF_SHORT__ == 4
+#define __PRINP_4 "hp"
+#elif __SIZEOF_INTMAX_T__ == 4
+#define __PRINP_4 "jp"
+#elif __SIZEOF_CHAR__ == 4
+#define __PRINP_4 "hhp"
+#elif __SIZEOF_LONG_LONG__ == 4
+#define __PRINP_4 "llp"
+#else /* ... == 4 */
+#define __PRINP_4 "I32p"
+#endif /* ... != 4 */
+
+#if __SIZEOF_POINTER__ == 8
+#define __PRINP_8 "p"
+#elif __SIZEOF_LONG__ == 8
+#define __PRINP_8 "lp"
+#elif __SIZEOF_SHORT__ == 8
+#define __PRINP_8 "hp"
+#elif __SIZEOF_INTMAX_T__ == 8
+#define __PRINP_8 "jp"
+#elif __SIZEOF_CHAR__ == 8
+#define __PRINP_8 "hhp"
+#elif __SIZEOF_LONG_LONG__ == 8
+#define __PRINP_8 "llp"
+#else /* ... == 8 */
+#define __PRINP_8 "I64p"
+#endif /* ... != 8 */
+
+#else /* __CRT_KOS */
+
+#ifdef __PRI1_PREFIX
+#define __PRINP_1 ".2" __PRI1_PREFIX "X"
+#endif /* __PRI1_PREFIX */
+#ifdef __PRI2_PREFIX
+#define __PRINP_2 ".4" __PRI2_PREFIX "X"
+#endif /* __PRI2_PREFIX */
+#ifdef __PRI4_PREFIX
+#define __PRINP_4 ".8" __PRI4_PREFIX "X"
+#endif /* __PRI4_PREFIX */
+#ifdef __PRI8_PREFIX
+#define __PRINP_8 ".16" __PRI8_PREFIX "X"
+#endif /* __PRI8_PREFIX */
+
+#endif /* !__CRT_KOS */
+
+
+#define __PRINP2(n) __PRINP_##n
+#define __PRINP(n) __PRINP2(n)
 
 
 #ifndef __SCA1_PREFIX

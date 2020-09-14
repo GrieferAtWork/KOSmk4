@@ -52,14 +52,14 @@ DECL_BEGIN
 INTDEF byte_t elfexec_system_rtld_startpageptr[];
 INTDEF byte_t elfexec_system_rtld_numpages[];
 PUBLIC struct vm_ramfile elfexec_system_rtld_file =
-	VM_RAMFILE_INIT((pageptr_t)elfexec_system_rtld_startpageptr,
+	VM_RAMFILE_INIT((physpage_t)elfexec_system_rtld_startpageptr,
 	                (size_t)elfexec_system_rtld_numpages);
 
 #ifdef __x86_64__
 INTDEF byte_t elfexec_system_rtld32_startpageptr[];
 INTDEF byte_t elfexec_system_rtld32_numpages[];
 PUBLIC struct vm_ramfile elfexec_system_rtld32_file =
-	VM_RAMFILE_INIT((pageptr_t)elfexec_system_rtld32_startpageptr,
+	VM_RAMFILE_INIT((physpage_t)elfexec_system_rtld32_startpageptr,
 	                (size_t)elfexec_system_rtld32_numpages);
 #endif /* __x86_64__ */
 

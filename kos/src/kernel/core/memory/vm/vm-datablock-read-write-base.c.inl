@@ -126,7 +126,7 @@ KCALL vm_datablock_write
 #elif defined(DEFINE_IO_VECTOR)
                            struct aio_buffer const *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                           vm_phys_t buf,
+                           physaddr_t buf,
 #elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_UNSAFE)
                            void *buf,
 #elif defined(DEFINE_IO_UNSAFE)
@@ -167,7 +167,7 @@ KCALL vm_datablock_write
 		size_t temp;
 		REF struct vm_datapart *part;
 		part = vm_paged_datablock_locatepart(self,
-		                                     (vm_vpage64_t)(src_offset >> VM_DATABLOCK_ADDRSHIFT(self)),
+		                                     (pageid64_t)(src_offset >> VM_DATABLOCK_ADDRSHIFT(self)),
 		                                     CEILDIV(num_bytes + (src_offset & (VM_DATABLOCK_PAGESIZE(self) - 1)),
 		                                             PAGESIZE));
 		TRY {
@@ -243,7 +243,7 @@ KCALL vm_datablock_vio_write
 #elif defined(DEFINE_IO_VECTOR)
                                struct aio_buffer const *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                               vm_phys_t buf,
+                               physaddr_t buf,
                                size_t num_bytes,
 #elif defined(DEFINE_IO_READ)
                                USER CHECKED void *buf,

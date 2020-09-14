@@ -45,14 +45,14 @@ DECL_BEGIN
 
 /* Implementation for `f_pwrite' that uses `f_write' */
 PUBLIC NONNULL((1, 5)) void KCALL
-inode_file_pwrite_with_write(struct inode *__restrict self, vm_phys_t src,
+inode_file_pwrite_with_write(struct inode *__restrict self, physaddr_t src,
                              size_t num_bytes, pos_t file_position,
                              struct aio_multihandle *__restrict aio)
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
 		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
 		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 		       E_IOERROR, ...) {
-	vm_phys_t minpageaddr, maxpageaddr;
+	physaddr_t minpageaddr, maxpageaddr;
 	assert(self->i_type->it_file.f_write);
 	if (file_position != 0)
 		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);

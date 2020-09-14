@@ -417,7 +417,7 @@ NOTHROW(CC vga_vm86_state_init)(vga_vm86_state_t *__restrict self) {
 	if (dbg_onstack()) {
 		unsigned int i;
 		byte_t *virt;
-		vm_phys_t phys;
+		physaddr_t phys;
 		self->vv_biosbase = (byte_t *)KERNEL_CORE_BASE;
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 		if (!pagedir_prepare_map(self->vv_biosbase, VGA_VM86_BIOS_SIZE))
@@ -539,9 +539,9 @@ NOTHROW_KERNEL(CC bios_interrupt)(vga_vm86_state_t *__restrict self, u8 intno) {
 
 
 #ifdef __KERNEL__
-#define BIOS_BUF_NULL                                page2addr(PAGEPTR_INVALID)
-#define BIOS_BUF_ALLOC(num_bytes)                    page2addr(page_malloc(CEILDIV(num_bytes, PAGESIZE)))
-#define BIOS_BUF_FREE(buf, num_bytes)                page_free(addr2page(buf), CEILDIV(num_bytes, PAGESIZE))
+#define BIOS_BUF_NULL                                physpage2addr(PHYSPAGE_INVALID)
+#define BIOS_BUF_ALLOC(num_bytes)                    physpage2addr(page_malloc(CEILDIV(num_bytes, PAGESIZE)))
+#define BIOS_BUF_FREE(buf, num_bytes)                page_free(physaddr2page(buf), CEILDIV(num_bytes, PAGESIZE))
 #define BIOS_BUF_PREAD(buf, dst, num_bytes, offset)  vm_copyfromphys(dst, (buf) + (offset), num_bytes)
 #define BIOS_BUF_PWRITE(buf, src, num_bytes, offset) vm_copytophys((buf) + (offset), src, num_bytes)
 #else /* __KERNEL__ */

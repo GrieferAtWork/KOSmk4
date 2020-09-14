@@ -44,7 +44,7 @@
 #define ENTRY_TYPE          struct aio_buffer_entry
 #elif defined(DEFINE_IO_PHYS)
 #define FUNC_VECTORPHYS(x)  x##Phys
-#define BUFFER_TYPE         vm_phys_t
+#define BUFFER_TYPE         physaddr_t
 #elif defined(DEFINE_IO_READ)
 #define FUNC_VECTORPHYS(x)  x
 #define BUFFER_TYPE         USER CHECKED byte_t *
@@ -60,11 +60,11 @@ DECL_BEGIN
 #ifdef DEFINE_IO_READ
 #define INSW_PHYS_DEFINED 1
 LOCAL NOBLOCK void
-NOTHROW(KCALL vm_insw_phys)(port_t port, vm_phys_t buf, size_t count)
+NOTHROW(KCALL vm_insw_phys)(port_t port, physaddr_t buf, size_t count)
 #else /* DEFINE_IO_READ */
 #define OUTSW_PHYS_DEFINED 1
 LOCAL NOBLOCK void
-NOTHROW(KCALL vm_outsw_phys)(port_t port, vm_phys_t buf, size_t count)
+NOTHROW(KCALL vm_outsw_phys)(port_t port, physaddr_t buf, size_t count)
 #endif /* !DEFINE_IO_READ */
 {
 #ifdef DEFINE_IO_READ
@@ -201,13 +201,13 @@ LOCAL errr_t
 #ifdef DEFINE_IO_READ
 						data.word = inw(bus->b_busio + ATA_DATA);
 #ifdef DEFINE_IO_PHYS
-						vm_writephysb((vm_phys_t)(ent.ab_base + ent.ab_size - 1), data.bytes[0]);
+						vm_writephysb((physaddr_t)(ent.ab_base + ent.ab_size - 1), data.bytes[0]);
 #else /* DEFINE_IO_PHYS */
 						((u8 *)ent.ab_base)[ent.ab_size - 1] = data.bytes[0];
 #endif /* !DEFINE_IO_PHYS */
 #else /* DEFINE_IO_READ */
 #ifdef DEFINE_IO_PHYS
-						data.bytes[0] = vm_readphysb((vm_phys_t)(ent.ab_base + ent.ab_size - 1));
+						data.bytes[0] = vm_readphysb((physaddr_t)(ent.ab_base + ent.ab_size - 1));
 #else /* DEFINE_IO_PHYS */
 						data.bytes[0] = ((u8 *)ent.ab_base)[ent.ab_size - 1];
 #endif /* !DEFINE_IO_PHYS */

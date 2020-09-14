@@ -67,7 +67,7 @@ PUBLIC NONNULL((1)) void KCALL
 #endif /* !DEFINE_IO_NOPF */
 FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 #ifdef DEFINE_IO_PHYS
-                       vm_phys_t buf,
+                       physaddr_t buf,
 #elif defined(DEFINE_IO_READ)
                        USER CHECKED void *buf,
 #else
@@ -93,7 +93,7 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 			size_t transferr_error;
 #endif /* DEFINE_IO_NOPF */
 			size_t max_io, page_offset;
-			vm_phys_t data_base;
+			physaddr_t data_base;
 			page_offset = (size_t)(offset & (data_pagesize - 1));
 			max_io      = data_pagesize - page_offset;
 			if (max_io > num_bytes)
@@ -103,11 +103,11 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 			                                     IFELSE_RW(false, true));
 			/* Copy data to/from the data part memory back-end */
 #ifdef DEFINE_IO_PHYS
-			IFELSE_RW(vm_copyinphys(buf, (vm_phys_t)(data_base + page_offset), max_io),
-			          vm_copyinphys((vm_phys_t)(data_base + page_offset), buf, max_io));
+			IFELSE_RW(vm_copyinphys(buf, (physaddr_t)(data_base + page_offset), max_io),
+			          vm_copyinphys((physaddr_t)(data_base + page_offset), buf, max_io));
 #elif defined(DEFINE_IO_NOPF)
-			transferr_error = IFELSE_RW(vm_copyfromphys_nopf(buf, (vm_phys_t)(data_base + page_offset), max_io),
-			                            vm_copytophys_nopf((vm_phys_t)(data_base + page_offset), buf, max_io));
+			transferr_error = IFELSE_RW(vm_copyfromphys_nopf(buf, (physaddr_t)(data_base + page_offset), max_io),
+			                            vm_copytophys_nopf((physaddr_t)(data_base + page_offset), buf, max_io));
 			/* Check if the data transfer failed. */
 			if unlikely(transferr_error != 0) {
 				size_t transfer_ok;
@@ -119,8 +119,8 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 				return num_bytes - transfer_ok;
 			}
 #else /* ... */
-			IFELSE_RW(vm_copyfromphys(buf, (vm_phys_t)(data_base + page_offset), max_io),
-			          vm_copytophys((vm_phys_t)(data_base + page_offset), buf, max_io));
+			IFELSE_RW(vm_copyfromphys(buf, (physaddr_t)(data_base + page_offset), max_io),
+			          vm_copytophys((physaddr_t)(data_base + page_offset), buf, max_io));
 #endif /* !... */
 			if (max_io >= num_bytes)
 				break;
@@ -194,7 +194,7 @@ vm_datapart_write_nopf(struct vm_datapart *__restrict self,
  *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
 PUBLIC NONNULL((1)) size_t KCALL
 FUNC0(vm_datapart_)(struct vm_datapart *__restrict self,
-                    vm_phys_t buf,
+                    physaddr_t buf,
                     size_t num_bytes,
 #ifdef DEFINE_IO_WRITE
                     size_t split_bytes,
@@ -233,10 +233,10 @@ vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
 	if likely(!self->dp_crefs) {
 		incref(self);
 	} else {
-		vm_vpage64_t part_start_vpage;
+		pageid64_t part_start_vpage;
 		REF struct vm_datapart *newpart;
 		size_t num_vpages;
-		vm_vpage64_t base_vpage = (vm_vpage64_t)(offset / PAGESIZE);
+		pageid64_t base_vpage = (pageid64_t)(offset / PAGESIZE);
 		part_start_vpage      = vm_datapart_startvpage(self);
 		if (part_start_vpage != base_vpage) {
 			size_t diff;

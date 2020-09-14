@@ -149,7 +149,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #elif defined(DEFINE_IO_VECTOR)
                              struct aio_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                             vm_phys_t buf,
+                             physaddr_t buf,
 #elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_KERNEL)
                              void *__restrict buf,
 #elif defined(DEFINE_IO_READ)
@@ -168,7 +168,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #elif defined(DEFINE_IO_VECTOR)
                       struct aio_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                      vm_phys_t buf,
+                      physaddr_t buf,
 #elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_KERNEL)
                       void *__restrict buf,
 #elif defined(DEFINE_IO_READ)
@@ -414,7 +414,7 @@ load_next_part:
 #define INODE_FLEX_READ_PHYS_DEFINED 1
 PRIVATE size_t KCALL
 do_inode_flexread_phys(struct inode *__restrict self,
-                       vm_phys_t buf, size_t num_bytes,
+                       physaddr_t buf, size_t num_bytes,
                        pos_t file_position) {
 	size_t temp, result = 0;
 	pagedir_pushval_t backup;
@@ -486,7 +486,7 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #elif defined(DEFINE_IO_VECTOR)
                                   struct aio_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                                  vm_phys_t buf,
+                                  physaddr_t buf,
 #else
                                   CHECKED USER void *buf,
 #endif
@@ -499,7 +499,7 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #elif defined(DEFINE_IO_VECTOR)
                            struct aio_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                           vm_phys_t buf,
+                           physaddr_t buf,
 #else
                            CHECKED USER void *buf,
 #endif
@@ -640,7 +640,7 @@ eof:
 #elif defined(DEFINE_IO_VECTOR)
                                              struct aio_buffer *__restrict buf,
 #elif defined(DEFINE_IO_PHYS)
-                                             vm_phys_t buf,
+                                             physaddr_t buf,
 #else
                                              CHECKED USER void *buf,
 #endif

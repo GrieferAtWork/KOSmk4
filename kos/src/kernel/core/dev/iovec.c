@@ -56,7 +56,7 @@ STATIC_ASSERT(sizeof(struct aio_pbuffer) == SIZEOF_AIO_PBUFFER);
 /* Read/write/set data associated with AIO buffers. */
 PUBLIC NONNULL((1)) void KCALL
 aio_buffer_copyfromphys(struct aio_buffer const *__restrict self,
-                        uintptr_t dst_offset, vm_phys_t src, size_t num_bytes)
+                        uintptr_t dst_offset, physaddr_t src, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	struct aio_buffer_entry ent;
 	AIO_BUFFER_FOREACH_N(ent, self) {
@@ -77,7 +77,7 @@ aio_buffer_copyfromphys(struct aio_buffer const *__restrict self,
 
 PUBLIC NONNULL((1)) void KCALL
 aio_buffer_copytophys(struct aio_buffer const *__restrict self,
-                      vm_phys_t dst, uintptr_t src_offset, size_t num_bytes)
+                      physaddr_t dst, uintptr_t src_offset, size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	struct aio_buffer_entry ent;
 	AIO_BUFFER_FOREACH_N(ent, self) {
@@ -215,7 +215,7 @@ aio_pbuffer_copytomem(struct aio_pbuffer const *__restrict self,
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		vm_copyfromphys(dst, (vm_phys_t)(ent.ab_base + src_offset), ent.ab_size);
+		vm_copyfromphys(dst, (physaddr_t)(ent.ab_base + src_offset), ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		dst = (byte_t *)dst + ent.ab_size;
@@ -227,7 +227,7 @@ aio_pbuffer_copytomem(struct aio_pbuffer const *__restrict self,
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_pbuffer_copyfromphys)(struct aio_pbuffer const *__restrict self,
                                         uintptr_t dst_offset,
-                                        vm_phys_t src, size_t num_bytes) {
+                                        physaddr_t src, size_t num_bytes) {
 	struct aio_pbuffer_entry ent;
 	AIO_PBUFFER_FOREACH_N(ent, self) {
 		if (dst_offset >= ent.ab_size) {
@@ -247,7 +247,7 @@ NOTHROW(KCALL aio_pbuffer_copyfromphys)(struct aio_pbuffer const *__restrict sel
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_pbuffer_copytophys)(struct aio_pbuffer const *__restrict self,
-                                      vm_phys_t dst,
+                                      physaddr_t dst,
                                       uintptr_t src_offset, size_t num_bytes) {
 	struct aio_pbuffer_entry ent;
 	AIO_PBUFFER_FOREACH_N(ent, self) {

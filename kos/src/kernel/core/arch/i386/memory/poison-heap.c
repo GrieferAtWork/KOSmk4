@@ -133,7 +133,7 @@ INTERN ATTR_COLDTEXT NOBLOCK void NOTHROW(KCALL ph_install)(void) {
 			}
 		}
 		/* Write the modified instruction */
-		vm_copytophys((vm_phys_t)((uintptr_t)item->pi_loc -
+		vm_copytophys((physaddr_t)((uintptr_t)item->pi_loc -
 		                          KERNEL_CORE_BASE),
 		              buf, buflen);
 	}

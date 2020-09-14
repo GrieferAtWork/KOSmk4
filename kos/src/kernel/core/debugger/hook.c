@@ -76,7 +76,7 @@ dbg_overwrite_bytes(void const *dst,
                     void const *src,
                     size_t num_bytes) {
 	bool result = false;
-	vm_phys_t phys;
+	physaddr_t phys;
 	if (!dbg_active)
 		sync_write(&vm_kernel);
 	if (!pagedir_ismapped(dst))

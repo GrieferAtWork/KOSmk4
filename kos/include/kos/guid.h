@@ -25,7 +25,7 @@
 #include <hybrid/__byteorder.h>
 #include <hybrid/__byteswap.h>
 
-#include <kos/bits/types.h>
+#include <bits/types.h>
 
 #define __OFFSET_GUID_A    0
 #define __OFFSET_GUID_B    4
@@ -94,9 +94,9 @@ typedef union __ATTR_PACKED {
 #define GUID_C(x) __hybrid_betoh16((x).g_data.g_c)
 #define GUID_D(x) __hybrid_betoh16((x).g_data.g_d)
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define GUID_E(x) (((u64)__hybrid_betoh32((x).g_data.g_e_1) << 16) | (u64)__hybrid_betoh16((x).g_data.g_e_2))
+#define GUID_E(x) (((__u64)__hybrid_betoh32((x).g_data.g_e_1) << 16) | (__u64)__hybrid_betoh16((x).g_data.g_e_2))
 #else
-#define GUID_E(x) ((u64)__hybrid_betoh32((x).g_data.g_e_1) | ((u64)__hybrid_betoh16((x).g_data.g_e_2) << 32))
+#define GUID_E(x) ((__u64)__hybrid_betoh32((x).g_data.g_e_1) | ((__u64)__hybrid_betoh16((x).g_data.g_e_2) << 32))
 #endif
 
 /* Printf helpers for GUID printing */
@@ -104,44 +104,44 @@ typedef union __ATTR_PACKED {
 #define FORMAT_GUID_T_ARGS(x) GUID_A(x), GUID_B(x), GUID_C(x), GUID_D(x), GUID_E(x)
 
 /* Compare `self' against the given, constant GUID */
-#define GUID_EQUALS(self, a, b, c, d, e)                                                  \
-	((self).g_guid[0] == (u8)((__UINT32_C(0x##a) & __UINT32_C(0xff000000)) >> 24) &&      \
-	 (self).g_guid[1] == (u8)((__UINT32_C(0x##a) & __UINT32_C(0x00ff0000)) >> 16) &&      \
-	 (self).g_guid[2] == (u8)((__UINT32_C(0x##a) & __UINT32_C(0x0000ff00)) >> 8) &&       \
-	 (self).g_guid[3] == (u8)((__UINT32_C(0x##a) & __UINT32_C(0x000000ff))) &&            \
-	 (self).g_guid[4] == (u8)((__UINT16_C(0x##b) & __UINT16_C(0xff00)) >> 8) &&           \
-	 (self).g_guid[5] == (u8)((__UINT16_C(0x##b) & __UINT16_C(0x00ff))) &&                \
-	 (self).g_guid[6] == (u8)((__UINT16_C(0x##c) & __UINT16_C(0xff00)) >> 8) &&           \
-	 (self).g_guid[7] == (u8)((__UINT16_C(0x##c) & __UINT16_C(0x00ff))) &&                \
-	 (self).g_guid[8] == (u8)((__UINT16_C(0x##d) & __UINT16_C(0xff00)) >> 8) &&           \
-	 (self).g_guid[9] == (u8)((__UINT16_C(0x##d) & __UINT16_C(0x00ff))) &&                \
-	 (self).g_guid[10] == (u8)((__UINT64_C(0x##e) & __UINT64_C(0xff0000000000)) >> 40) && \
-	 (self).g_guid[11] == (u8)((__UINT64_C(0x##e) & __UINT64_C(0x00ff00000000)) >> 32) && \
-	 (self).g_guid[12] == (u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000ff000000)) >> 24) && \
-	 (self).g_guid[13] == (u8)((__UINT64_C(0x##e) & __UINT64_C(0x000000ff0000)) >> 16) && \
-	 (self).g_guid[14] == (u8)((__UINT64_C(0x##e) & __UINT64_C(0x00000000ff00)) >> 8) &&  \
-	 (self).g_guid[15] == (u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000000000ff))))
+#define GUID_EQUALS(self, a, b, c, d, e)                                                    \
+	((self).g_guid[0] == (__u8)((__UINT32_C(0x##a) & __UINT32_C(0xff000000)) >> 24) &&      \
+	 (self).g_guid[1] == (__u8)((__UINT32_C(0x##a) & __UINT32_C(0x00ff0000)) >> 16) &&      \
+	 (self).g_guid[2] == (__u8)((__UINT32_C(0x##a) & __UINT32_C(0x0000ff00)) >> 8) &&       \
+	 (self).g_guid[3] == (__u8)((__UINT32_C(0x##a) & __UINT32_C(0x000000ff))) &&            \
+	 (self).g_guid[4] == (__u8)((__UINT16_C(0x##b) & __UINT16_C(0xff00)) >> 8) &&           \
+	 (self).g_guid[5] == (__u8)((__UINT16_C(0x##b) & __UINT16_C(0x00ff))) &&                \
+	 (self).g_guid[6] == (__u8)((__UINT16_C(0x##c) & __UINT16_C(0xff00)) >> 8) &&           \
+	 (self).g_guid[7] == (__u8)((__UINT16_C(0x##c) & __UINT16_C(0x00ff))) &&                \
+	 (self).g_guid[8] == (__u8)((__UINT16_C(0x##d) & __UINT16_C(0xff00)) >> 8) &&           \
+	 (self).g_guid[9] == (__u8)((__UINT16_C(0x##d) & __UINT16_C(0x00ff))) &&                \
+	 (self).g_guid[10] == (__u8)((__UINT64_C(0x##e) & __UINT64_C(0xff0000000000)) >> 40) && \
+	 (self).g_guid[11] == (__u8)((__UINT64_C(0x##e) & __UINT64_C(0x00ff00000000)) >> 32) && \
+	 (self).g_guid[12] == (__u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000ff000000)) >> 24) && \
+	 (self).g_guid[13] == (__u8)((__UINT64_C(0x##e) & __UINT64_C(0x000000ff0000)) >> 16) && \
+	 (self).g_guid[14] == (__u8)((__UINT64_C(0x##e) & __UINT64_C(0x00000000ff00)) >> 8) &&  \
+	 (self).g_guid[15] == (__u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000000000ff))))
 
 
 /* Static initializer for GUIDs */
-#define GUID_INIT(a, b, c, d, e)                                      \
-	{{                                                                \
-		(u8)((__UINT32_C(0x##a) & __UINT32_C(0xff000000)) >> 24),     \
-		(u8)((__UINT32_C(0x##a) & __UINT32_C(0x00ff0000)) >> 16),     \
-		(u8)((__UINT32_C(0x##a) & __UINT32_C(0x0000ff00)) >> 8),      \
-		(u8)((__UINT32_C(0x##a) & __UINT32_C(0x000000ff))),           \
-		(u8)((__UINT16_C(0x##b) & __UINT16_C(0xff00)) >> 8),          \
-		(u8)((__UINT16_C(0x##b) & __UINT16_C(0x00ff))),               \
-		(u8)((__UINT16_C(0x##c) & __UINT16_C(0xff00)) >> 8),          \
-		(u8)((__UINT16_C(0x##c) & __UINT16_C(0x00ff))),               \
-		(u8)((__UINT16_C(0x##d) & __UINT16_C(0xff00)) >> 8),          \
-		(u8)((__UINT16_C(0x##d) & __UINT16_C(0x00ff))),               \
-		(u8)((__UINT64_C(0x##e) & __UINT64_C(0xff0000000000)) >> 40), \
-		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x00ff00000000)) >> 32), \
-		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000ff000000)) >> 24), \
-		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x000000ff0000)) >> 16), \
-		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x00000000ff00)) >> 8),  \
-		(u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000000000ff)))        \
+#define GUID_INIT(a, b, c, d, e)                                        \
+	{{                                                                  \
+		(__u8)((__UINT32_C(0x##a) & __UINT32_C(0xff000000)) >> 24),     \
+		(__u8)((__UINT32_C(0x##a) & __UINT32_C(0x00ff0000)) >> 16),     \
+		(__u8)((__UINT32_C(0x##a) & __UINT32_C(0x0000ff00)) >> 8),      \
+		(__u8)((__UINT32_C(0x##a) & __UINT32_C(0x000000ff))),           \
+		(__u8)((__UINT16_C(0x##b) & __UINT16_C(0xff00)) >> 8),          \
+		(__u8)((__UINT16_C(0x##b) & __UINT16_C(0x00ff))),               \
+		(__u8)((__UINT16_C(0x##c) & __UINT16_C(0xff00)) >> 8),          \
+		(__u8)((__UINT16_C(0x##c) & __UINT16_C(0x00ff))),               \
+		(__u8)((__UINT16_C(0x##d) & __UINT16_C(0xff00)) >> 8),          \
+		(__u8)((__UINT16_C(0x##d) & __UINT16_C(0x00ff))),               \
+		(__u8)((__UINT64_C(0x##e) & __UINT64_C(0xff0000000000)) >> 40), \
+		(__u8)((__UINT64_C(0x##e) & __UINT64_C(0x00ff00000000)) >> 32), \
+		(__u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000ff000000)) >> 24), \
+		(__u8)((__UINT64_C(0x##e) & __UINT64_C(0x000000ff0000)) >> 16), \
+		(__u8)((__UINT64_C(0x##e) & __UINT64_C(0x00000000ff00)) >> 8),  \
+		(__u8)((__UINT64_C(0x##e) & __UINT64_C(0x0000000000ff)))        \
 	}}
 
 __DECL_END

@@ -50,6 +50,7 @@
 #include <asm/farptr.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -58,7 +59,7 @@
 DECL_BEGIN
 
 /* Return the physical page ID of a given physical address. */
-#define ppageof(paddr) (pageptr_t)((paddr) / PAGESIZE)
+#define ppageof(paddr) (physpage_t)((paddr) / PAGESIZE)
 
 /* Feature tests helpers */
 #define HAVE_PAGE_GLOBAL_BIT       X86_HAVE_PAGE_GLOBAL_BIT
@@ -138,7 +139,7 @@ again_calculate_vecN:
 	assert(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_2mib.d_2mib_1);
 	/* Figure out the physical address surrounding the trampoline's E1-vector. */
 	e1_word = (u64)trampoline_addr - KERNEL_CORE_BASE;
-	assertf(pagedir_translate(trampoline_addr) == (vm_phys_t)e1_word,
+	assertf(pagedir_translate(trampoline_addr) == (physaddr_t)e1_word,
 	        "%p != %p",
 	        (uintptr_t)pagedir_translate(trampoline_addr),
 	        (uintptr_t)e1_word);
@@ -397,15 +398,15 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 	} __WHILE0
 
 
-LOCAL NOBLOCK pageptr_t
+LOCAL NOBLOCK physpage_t
 NOTHROW(FCALL p64_create_e1_vector_from_e2_word)(struct vm_ptram *__restrict ptram,
                                                  u64 e2_word,
                                                  unsigned int vec1_prepare_start,
                                                  unsigned int vec1_prepare_size) {
 	union p64_pdir_e1 e1, *e1_p;
-	pageptr_t result;
+	physpage_t result;
 	result = page_mallocone();
-	if unlikely(result == PAGEPTR_INVALID)
+	if unlikely(result == PHYSPAGE_INVALID)
 		goto done;
 	/* Fill in the E1 vector. */
 	e1_p = (union p64_pdir_e1 *)vm_ptram_mappage(ptram, result);
@@ -455,17 +456,17 @@ done:
 }
 
 /* Create an E2-vector from a given E3-word  */
-LOCAL NOBLOCK pageptr_t
+LOCAL NOBLOCK physpage_t
 NOTHROW(FCALL p64_create_e2_vector_from_e3_word_and_e1_vector)(struct vm_ptram *__restrict ptram,
                                                                u64 e3_word,
                                                                unsigned int vec2,
-                                                               pageptr_t e1_vector,
+                                                               physpage_t e1_vector,
                                                                bool is_userspace) {
-	pageptr_t result;
+	physpage_t result;
 	union p64_pdir_e2 e2, *e2_p;
 	/* Fill in the E2 vector. */
 	result = page_mallocone();
-	if unlikely(result == PAGEPTR_INVALID)
+	if unlikely(result == PHYSPAGE_INVALID)
 		goto done;
 	e2_p = (union p64_pdir_e2 *)vm_ptram_mappage(ptram, result);
 	if (e3_word & P64_PAGE_FPRESENT) {
@@ -566,9 +567,9 @@ NOTHROW(FCALL p64_pagedir_prepare_impl_widen)(unsigned int vec4,
 again:
 	e4.p_word = ATOMIC_READ(P64_PDIR_E4_IDENTITY[vec4].p_word);
 	if (!P64_PDIR_E4_ISVEC3(e4.p_word)) {
-		pageptr_t e3_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC2 */
-		pageptr_t e2_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC1 */
-		pageptr_t e1_vector; /* 512 * P64_PAGE_ABSENT */
+		physpage_t e3_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC2 */
+		physpage_t e2_vector; /* 511 * P64_PAGE_ABSENT + 1 * VEC1 */
+		physpage_t e1_vector; /* 512 * P64_PAGE_ABSENT */
 		u64 new_e4_word;
 		union p64_pdir_e3 *e3_p;
 		union p64_pdir_e2 *e2_p;
@@ -623,7 +624,7 @@ err_e3_vector:
 		{
 			memsetq(e2_p, P64_PAGE_ABSENT, 512);
 		}
-		e2_p[vec2].p_word = (u64)page2addr(e1_vector) | P64_PAGE_FPRESENT |
+		e2_p[vec2].p_word = (u64)physpage2addr(e1_vector) | P64_PAGE_FPRESENT |
 		                    P64_PAGE_FWRITE | P64_PAGE_FUSER;
 		/* Initialize the E3-vector. */
 		e3_p = (union p64_pdir_e3 *)vm_ptram_mappage(&ptram, e3_vector);
@@ -633,12 +634,12 @@ err_e3_vector:
 		{
 			memsetq(e3_p, P64_PAGE_ABSENT, 512);
 		}
-		e3_p[vec3].p_word = (u64)page2addr(e2_vector) | P64_PAGE_FPRESENT |
+		e3_p[vec3].p_word = (u64)physpage2addr(e2_vector) | P64_PAGE_FPRESENT |
 		                    P64_PAGE_FWRITE | P64_PAGE_FUSER;
 		COMPILER_BARRIER();
 		vm_ptram_fini(&ptram);
 		/* Try to install the new E3-vector as an E4-word. */
-		new_e4_word = (u64)page2addr(e3_vector) | P64_PAGE_FPRESENT |
+		new_e4_word = (u64)physpage2addr(e3_vector) | P64_PAGE_FPRESENT |
 		              P64_PAGE_FWRITE | P64_PAGE_FUSER;
 		if unlikely(!ATOMIC_CMPXCH(P64_PDIR_E4_IDENTITY[vec4].p_word,
 		                           e4.p_word, new_e4_word)) {
@@ -669,8 +670,8 @@ err_e3_vector:
 		/* Convert the 1GiB mapping into
 		 *  - 511 * 2MiB mappings + 512 * 4KiB mappings (the later being `vec2') */
 		struct vm_ptram ptram;
-		pageptr_t e1_vector; /* 512 * 4KiB */
-		pageptr_t e2_vector; /* 511 * 2MiB + 1 * VEC1 */
+		physpage_t e1_vector; /* 512 * 4KiB */
+		physpage_t e2_vector; /* 511 * 2MiB + 1 * VEC1 */
 		union p64_pdir_e2 e2_word;
 		u64 new_word, new_e3_word;
 		if (VEC4_IS_USERSPACE)
@@ -691,7 +692,7 @@ err_e3_vector:
 		                                              e2_word.p_word,
 		                                              vec1_prepare_start,
 		                                              vec1_prepare_size);
-		if (e1_vector == PAGEPTR_INVALID) {
+		if (e1_vector == PHYSPAGE_INVALID) {
 			vm_ptram_fini(&ptram);
 			goto err;
 		}
@@ -701,7 +702,7 @@ err_e3_vector:
 		                                                            VEC4_IS_USERSPACE);
 		COMPILER_BARRIER();
 		vm_ptram_fini(&ptram);
-		if (e2_vector == PAGEPTR_INVALID) {
+		if (e2_vector == PHYSPAGE_INVALID) {
 			page_freeone(e1_vector);
 			goto err;
 		}
@@ -743,7 +744,7 @@ word_changed_after_e2_vector:
 		/* Convert the 2MiB mapping into
 		 *  - 512 * 4KiB mappings */
 		struct vm_ptram ptram;
-		pageptr_t e1_vector;
+		physpage_t e1_vector;
 		u64 new_word, new_e2_word;
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_READ(was);
 		vm_ptram_init(&ptram);
@@ -752,7 +753,7 @@ word_changed_after_e2_vector:
 		                                              vec1_prepare_size);
 		COMPILER_BARRIER();
 		vm_ptram_fini(&ptram);
-		if unlikely(e1_vector == PAGEPTR_INVALID)
+		if unlikely(e1_vector == PHYSPAGE_INVALID)
 			goto err;
 		/* Re-acquire the prepare lock and make sure that the vectors
 		 * leading up to the one we've just allocated haven't changed. */
@@ -767,7 +768,7 @@ word_changed_after_e1_vector:
 		new_word = ATOMIC_READ(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word);
 		if unlikely(e3.p_word != new_word)
 			goto word_changed_after_e1_vector;
-		new_e2_word = (u64)page2addr(e1_vector);
+		new_e2_word = (u64)physpage2addr(e1_vector);
 		new_e2_word |= P64_PAGE_FPRESENT | P64_PAGE_FWRITE | P64_PAGE_FACCESSED;
 		new_e2_word |= e2.p_word & (P64_PAGE_FUSER | P64_PAGE_FPWT |
 		                            P64_PAGE_FPCD | P64_PAGE_FGLOBAL);
@@ -1864,15 +1865,15 @@ INTERN u64 p64_pageperm_matrix[16] = {
 
 LOCAL NOBLOCK u64
 NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                        u16 perm) {
 	u64 result;
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
-	assertf(IS_ALIGNED(phys, 4096), "phys = " FORMAT_VM_PHYS_T, phys);
+	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
 	        "Invalid page permissions: %#.4I16x", perm);
-	assertf(phys <= (vm_phys_t)UINT64_C(0x000ffffffffff000),
-	        "Address cannot be mapped under p64: " FORMAT_VM_PHYS_T,
+	assertf(phys <= (physaddr_t)UINT64_C(0x000ffffffffff000),
+	        "Address cannot be mapped under p64: %" PRIpN(__SIZEOF_PHYSADDR_T__),
 	        phys);
 	result  = (u64)phys;
 #if PAGEDIR_MAP_FMASK == 0xf
@@ -1964,7 +1965,7 @@ NOTHROW(FCALL p64_pagedir_gethint)(VIRT void *addr) {
  * @param: perm: A set of `PAGEDIR_MAP_F*' detailing how memory should be mapped. */
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                  PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                                  PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                   u16 perm) {
 	u64 e1_word;
 	unsigned int vec4, vec3, vec2, vec1;
@@ -1980,7 +1981,7 @@ NOTHROW(FCALL p64_pagedir_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 INTERN NOBLOCK void
 NOTHROW(FCALL p64_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes,
-                               PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                               PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                u16 perm) {
 	size_t i;
 	u64 e1_word;
@@ -2008,7 +2009,7 @@ NOTHROW(FCALL p64_pagedir_map)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * NOTE: If the page had been mapped, `pagedir_pop_mapone()' will automatically sync the page. */
 INTERN NOBLOCK WUNUSED pagedir_pushval_t
 NOTHROW(FCALL p64_pagedir_push_mapone)(PAGEDIR_PAGEALIGNED VIRT void *addr,
-                                       PAGEDIR_PAGEALIGNED PHYS vm_phys_t phys,
+                                       PAGEDIR_PAGEALIGNED PHYS physaddr_t phys,
                                        u16 perm) {
 	u64 e1_word, result;
 	unsigned int vec4, vec3, vec2, vec1;
@@ -2117,7 +2118,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 			page_freeone(pageptr);                                               \
 			do {                                                                 \
 				--free_count;                                                    \
-				page_freeone((pageptr_t)free_pages[free_count]);                 \
+				page_freeone((physpage_t)free_pages[free_count]);                 \
 			} while (free_count);                                                \
 		}                                                                        \
 		else {                                                                   \
@@ -2143,20 +2144,20 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 				if (!P64_PDIR_E2_ISVEC1(e2.p_word))
 					continue;
 				ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
-				FREEPAGE((pageptr_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
+				FREEPAGE((physpage_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
 			}
 			ATOMIC_WRITE(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
-			FREEPAGE((pageptr_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
+			FREEPAGE((physpage_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
 		}
 		ATOMIC_WRITE(P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
-		FREEPAGE((pageptr_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
+		FREEPAGE((physpage_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
 	}
 	/* Free any remaining pages. */
 	if (free_count) {
 		pagedir_syncall_smp();
 		do {
 			--free_count;
-			page_freeone((pageptr_t)free_pages[free_count]);
+			page_freeone((physpage_t)free_pages[free_count]);
 		} while (free_count);
 	}
 #undef FREEPAGE
@@ -2184,19 +2185,19 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace_nosync)(void) {
 				if (!P64_PDIR_E2_ISVEC1(e2.p_word))
 					continue;
 				ATOMIC_WRITE(P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word, P64_PAGE_ABSENT);
-				page_freeone((pageptr_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
+				page_freeone((physpage_t)((e2.p_word & P64_PAGE_FVECTOR) / 4096));
 			}
 			ATOMIC_WRITE(P64_PDIR_E3_IDENTITY[vec4][vec3].p_word, P64_PAGE_ABSENT);
-			page_freeone((pageptr_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
+			page_freeone((physpage_t)((e3.p_word & P64_PAGE_FVECTOR) / 4096));
 		}
 		ATOMIC_WRITE(P64_PDIR_E4_IDENTITY[vec4].p_word, P64_PAGE_ABSENT);
-		page_freeone((pageptr_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
+		page_freeone((physpage_t)((e4.p_word & P64_PAGE_FVECTOR) / 4096));
 	}
 }
 
 
 /* Translate a virtual address into its physical counterpart. */
-INTERN NOBLOCK ATTR_PURE WUNUSED PHYS vm_phys_t
+INTERN NOBLOCK ATTR_PURE WUNUSED PHYS physaddr_t
 NOTHROW(FCALL p64_pagedir_translate)(VIRT void const *addr) {
 	u64 word;
 	unsigned int vec4, vec3, vec2, vec1;
@@ -2207,16 +2208,16 @@ NOTHROW(FCALL p64_pagedir_translate)(VIRT void const *addr) {
 	word = P64_PDIR_E3_IDENTITY[vec4][vec3].p_word;
 	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & P64_PAGE_F1GIB)
-		return (vm_phys_t)((word & P64_PAGE_FADDR_1GIB) | P64_PDIR_PAGEINDEX_1GIB(addr));
+		return (physaddr_t)((word & P64_PAGE_FADDR_1GIB) | P64_PDIR_PAGEINDEX_1GIB(addr));
 	vec2 = P64_PDIR_VEC2INDEX(addr);
 	word = P64_PDIR_E2_IDENTITY[vec4][vec3][vec2].p_word;
 	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
 	if unlikely(word & P64_PAGE_F2MIB)
-		return (vm_phys_t)((word & P64_PAGE_FADDR_2MIB) | P64_PDIR_PAGEINDEX_2MIB(addr));
+		return (physaddr_t)((word & P64_PAGE_FADDR_2MIB) | P64_PDIR_PAGEINDEX_2MIB(addr));
 	vec1 = P64_PDIR_VEC1INDEX(addr);
 	word = P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word;
 	assertf(word & P64_PAGE_FPRESENT, "Page at %p is not mapped", addr);
-	return (vm_phys_t)((word & P64_PAGE_FADDR_4KIB) | P64_PDIR_PAGEINDEX_4KIB(addr));
+	return (physaddr_t)((word & P64_PAGE_FADDR_4KIB) | P64_PDIR_PAGEINDEX_4KIB(addr));
 }
 
 /* Check if the given page is mapped. */

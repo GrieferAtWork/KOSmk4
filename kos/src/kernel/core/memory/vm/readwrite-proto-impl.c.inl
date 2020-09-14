@@ -230,7 +230,7 @@ throw_segfault:
 #endif /* !IS_WRITING */
 			{
 				bool has_changed;
-				pageptr_t ppage;
+				physpage_t ppage;
 				size_t page_remainder;
 				uintptr_t page_offset;
 				page_offset    = (uintptr_t)addr & PAGEMASK;
@@ -254,14 +254,14 @@ throw_segfault:
 				/* Actually transfer low-level RAM data. */
 #ifdef IS_READING
 				vm_copyfromphys(buf,
-				                page2addr(ppage) + page_offset,
+				                physpage2addr(ppage) + page_offset,
 				                transfer_bytes);
 #elif !defined(VM_MEMSET_IMPL)
-				vm_copytophys(page2addr(ppage) + page_offset,
+				vm_copytophys(physpage2addr(ppage) + page_offset,
 				              buf,
 				              transfer_bytes);
 #else /* IS_READING */
-				vm_memsetphys(page2addr(ppage) + page_offset,
+				vm_memsetphys(physpage2addr(ppage) + page_offset,
 				              byte,
 				              transfer_bytes);
 #endif /* !IS_READING */

@@ -149,7 +149,7 @@ NOTHROW(KCALL _block_device_areadv_sector)(struct block_device *__restrict self,
 #elif defined(DEFINE_IO_PHYS)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread_phys_sector)(struct block_device *__restrict self,
-                                               vm_phys_t buf, size_t num_sectors, lba_t addr,
+                                               physaddr_t buf, size_t num_sectors, lba_t addr,
                                                /*out*/ struct aio_handle *__restrict aio)
 #else /* ... */
 PUBLIC NONNULL((1, 5)) void
@@ -173,7 +173,7 @@ NOTHROW(KCALL _block_device_areadv)(struct block_device *__restrict self,
 #elif defined(DEFINE_IO_PHYS)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread_phys)(struct block_device *__restrict self,
-                                        vm_phys_t buf, size_t num_bytes,
+                                        physaddr_t buf, size_t num_bytes,
                                         pos_t device_position,
                                         /*out*/ struct aio_handle *__restrict aio)
 #else /* ... */
@@ -201,7 +201,7 @@ NOTHROW(KCALL _block_device_awritev_sector)(struct block_device *__restrict self
 #elif defined(DEFINE_IO_PHYS)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite_phys_sector)(struct block_device *__restrict self,
-                                                vm_phys_t buf, size_t num_sectors,
+                                                physaddr_t buf, size_t num_sectors,
                                                 lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 #else /* ... */
 PUBLIC NONNULL((1, 5)) void
@@ -225,7 +225,7 @@ NOTHROW(KCALL _block_device_awritev)(struct block_device *__restrict self,
 #elif defined(DEFINE_IO_PHYS)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite_phys)(struct block_device *__restrict self,
-                                         vm_phys_t buf, size_t num_bytes,
+                                         physaddr_t buf, size_t num_bytes,
                                          pos_t device_position,
                                          /*out*/ struct aio_handle *__restrict aio)
 #else /* ... */
@@ -485,7 +485,7 @@ PUBLIC NONNULL((1)) void
                                  size_t num_bytes, pos_t device_position)
 #elif defined(DEFINE_IO_PHYS)
 (KCALL _block_device_read_phys_sync)(struct block_device *__restrict self,
-                                     vm_phys_t buf, size_t num_bytes,
+                                     physaddr_t buf, size_t num_bytes,
                                      pos_t device_position)
 #else /* ... */
 (KCALL _block_device_read_sync)(struct block_device *__restrict self,
@@ -503,7 +503,7 @@ PUBLIC NONNULL((1)) void
                                   size_t num_bytes, pos_t device_position)
 #elif defined(DEFINE_IO_PHYS)
 (KCALL _block_device_write_phys_sync)(struct block_device *__restrict self,
-                                      vm_phys_t buf, size_t num_bytes,
+                                      physaddr_t buf, size_t num_bytes,
                                       pos_t device_position)
 #else /* ... */
 (KCALL _block_device_write_sync)(struct block_device *__restrict self,

@@ -146,8 +146,8 @@ struct hop_datablock_openpart /*[PREFIX(dop_)]*/ {
 	                                    * this value is too small or doesn't match any recognized
 	                                    * structure version. */
 	__uint32_t      __dop_pad;         /* ... */
-	__uint64_t        dop_pageno;      /* [IN]  The page-index (vm_vpage64_t) of the first page that should be opened.
-	                                    * [OUT] The page-index (vm_vpage64_t) of the first page that was opened.
+	__uint64_t        dop_pageno;      /* [IN]  The page-index (pageid64_t) of the first page that should be opened.
+	                                    * [OUT] The page-index (pageid64_t) of the first page that was opened.
 	                                    *       This is equal to the `ds_minpage' field return by `HOP_DATAPART_STAT',
 	                                    *       and may be lower than the originally given `dop_pageno' when
 	                                    *       `HOP_DATABLOCK_OPEN_PART' was used, but guarantied to be equal to the

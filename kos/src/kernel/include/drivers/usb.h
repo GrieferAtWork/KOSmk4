@@ -24,14 +24,15 @@
 
 #include <dev/char.h>
 #include <kernel/types.h>
-#include <sched/mutex.h>
 #include <misc/atomic-ref.h>
+#include <sched/mutex.h>
 
-#include <hybrid/__atomic.h>
 #include <hybrid/__assert.h>
+#include <hybrid/__atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/format-printer.h>
+#include <kos/kernel/memory.h>
 
 #include <stdbool.h>
 
@@ -147,7 +148,7 @@ struct usb_transfer {
 	size_t               ut_buflen; /* Buffer length. */
 	union { /* Used input/output buffer. */
 		void                     *ut_buf;   /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_VIRT)] */
-		vm_phys_t                 ut_bufp;  /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_PHYS)] */
+		physaddr_t                ut_bufp;  /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_PHYS)] */
 		struct aio_buffer  const *ut_vbuf;  /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_VIRTVEC)] */
 		struct aio_pbuffer const *ut_vbufp; /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC)] */
 	};

@@ -106,7 +106,7 @@ vmb_paged_mapat(struct vmb *__restrict self,
                 struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
                 struct path *fspath DFL(__NULLPTR),
                 struct directory_entry *fsname DFL(__NULLPTR),
-                vm_vpage64_t data_start_vpage DFL(0),
+                pageid64_t data_start_vpage DFL(0),
                 uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
                 uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
                 uintptr_t guard DFL(0))
@@ -128,7 +128,7 @@ vmb_mapat(struct vmb *__restrict self,
 	__hybrid_assert((data_start_offset & PAGEMASK) == 0);
 	return vmb_paged_mapat(self, PAGEID_ENCODE(addr),
 	                       num_bytes / PAGESIZE, data, fspath, fsname,
-	                       (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                       (pageid64_t)(data_start_offset / PAGESIZE),
 	                       prot, flag, guard);
 }
 
@@ -194,7 +194,7 @@ vmb_paged_map(struct vmb *__restrict self,
               struct vm_datablock *__restrict data DFL(&vm_datablock_anonymous_zero),
               struct path *fspath DFL(__NULLPTR),
               struct directory_entry *fsname DFL(__NULLPTR),
-              vm_vpage64_t data_start_vpage DFL(0),
+              pageid64_t data_start_vpage DFL(0),
               uintptr_half_t prot DFL(VM_PROT_READ | VM_PROT_WRITE | VM_PROT_SHARED),
               uintptr_half_t flag DFL(VM_NODE_FLAG_NORMAL),
               uintptr_t guard DFL(0))
@@ -222,7 +222,7 @@ vmb_map(struct vmb *__restrict self,
 	                       num_bytes / PAGESIZE,
 	                       min_alignment / PAGESIZE, getfree_mode,
 	                       data, fspath, fsname,
-	                       (vm_vpage64_t)(data_start_offset / PAGESIZE),
+	                       (pageid64_t)(data_start_offset / PAGESIZE),
 	                       prot, flag, guard);
 	return __ARCH_PAGEID_DECODE(result);
 }

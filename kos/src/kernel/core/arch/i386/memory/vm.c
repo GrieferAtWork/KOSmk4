@@ -158,7 +158,7 @@ INTDEF struct vm_node x86_vmnode_transition_reserve;
 				/* .rd_blockv = */ &(self).dp_ramdata.rd_block0,                   \
 				{                                                                  \
 					/* .rd_block0 = */ {                                           \
-						/* .rb_start = */ (pageptr_t)(uintptr_t)(pageptr),         \
+						/* .rb_start = */ (physpage_t)(uintptr_t)(pageptr),         \
 						/* .rb_size  = */ (size_t)(numpages)                       \
 					}                                                              \
 				}                                                                  \
@@ -364,7 +364,7 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 	}
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	pagedir_map(addr, part->dp_ramdata.rd_block0.rb_size * PAGESIZE,
-	            page2addr(part->dp_ramdata.rd_block0.rb_start), prot);
+	            physpage2addr(part->dp_ramdata.rd_block0.rb_start), prot);
 	assertf(part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0,
 	        "part->dp_ramdata.rd_blockv  = %p\n"
 	        "&part->dp_ramdata.rd_block0 = %p\n",
@@ -530,11 +530,11 @@ NOTHROW(KCALL x86_initialize_kernel_vm_readonly)(void) {
 	 * appropriate version. */
 	pagedir_map(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin),
 	            x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_size * PAGESIZE,
-	            page2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_start),
+	            physpage2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_TEXT].dp_ramdata.rd_block0.rb_start),
 	            PAGEDIR_MAP_FEXEC | PAGEDIR_MAP_FREAD);
 	pagedir_map(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin),
 	            x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_size * PAGESIZE,
-	            page2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_start),
+	            physpage2addr(x86_kernel_vm_parts[X86_KERNEL_VMMAPPING_CORE_RODATA].dp_ramdata.rd_block0.rb_start),
 	            PAGEDIR_MAP_FREAD);
 	assert(!pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_TEXT].vn_node.a_vmin)));
 	assert(!pagedir_iswritable(PAGEID_DECODE_KERNEL(x86_kernel_vm_nodes[X86_KERNEL_VMMAPPING_CORE_RODATA].vn_node.a_vmin)));
@@ -611,7 +611,7 @@ void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 
 	/* Release all pages of the .free section, as well as those
 	 * previously used by BRK data to the physical memory allocator. */
-	page_free((pageptr_t)__kernel_pfree_startpageptr,
+	page_free((physpage_t)__kernel_pfree_startpageptr,
 	          (size_t)__kernel_pfree_numpages);
 
 	/* TODO: Go through memory information and find the first `PMEMBANK_TYPE_KFREE'

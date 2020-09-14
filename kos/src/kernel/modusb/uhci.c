@@ -1538,22 +1538,22 @@ uhci_controller_addqueue(struct uhci_controller *__restrict self,
 }
 
 /* Construct new TDs for  */
-#if __SIZEOF_VM_PHYS_T__ > 4
+#if __SIZEOF_PHYSADDR_T__ > 4
 LOCAL bool KCALL
-#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+#else /* __SIZEOF_PHYSADDR_T__ > 4 */
 LOCAL void KCALL
-#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 uhci_construct_tds(struct uhci_ostd ***__restrict ppnexttd,
                    struct usb_endpoint *__restrict endp,
                    struct usb_transfer const *__restrict tx,
-                   vm_phys_t start, size_t num_bytes) {
+                   physaddr_t start, size_t num_bytes) {
 	u32 tok, cs;
-#if __SIZEOF_VM_PHYS_T__ > 4
+#if __SIZEOF_PHYSADDR_T__ > 4
 	if unlikely(num_bytes != 0 &&
-	            (start > (vm_phys_t)0xffffffff ||
-	             (start + num_bytes) > (vm_phys_t)0xffffffff))
+	            (start > (physaddr_t)0xffffffff ||
+	             (start + num_bytes) > (physaddr_t)0xffffffff))
 		return false; /* Need a 32-bit buffer. */
-#endif /* __SIZEOF_VM_PHYS_T__ > 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ > 4 */
 	assert(tx->ut_type < USB_TRANSFER_TYPE_COUNT);
 	cs = UHCI_TDCS_ACTIVE |
 	     ((3 << UHCI_TDCS_ERRCNTS) & UHCI_TDCS_ERRCNTM);
@@ -1625,9 +1625,9 @@ uhci_construct_tds(struct uhci_ostd ***__restrict ppnexttd,
 		start     += mysize;
 		num_bytes -= mysize;
 	} while (num_bytes);
-#if __SIZEOF_VM_PHYS_T__ > 4
+#if __SIZEOF_PHYSADDR_T__ > 4
 	return true;
-#endif /* __SIZEOF_VM_PHYS_T__ > 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ > 4 */
 }
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
@@ -1636,27 +1636,27 @@ uhci_transfer(struct usb_controller *__restrict self,
               /*out*/ struct aio_handle *__restrict aio);
 
 struct uhci_syncheap_page {
-	pageptr_t shp_next;  /* Pointer to the next page (or `PAGEPTR_INVALID') */
+	physpage_t shp_next;  /* Pointer to the next page (or `PHYSPAGE_INVALID') */
 	size_t     shp_count; /* Number of consecutively allocated pages. */
 };
 
 struct uhci_syncheap {
-	pageptr_t sh_current; /* Physical address of a `struct uhci_syncheap_page' structure
-	                       * describing the next allocated page (or `PAGEPTR_INVALID'). */
-	size_t    sh_free;    /* Number of bytes, starting at `page2addr(sh_current) +
+	physpage_t sh_current; /* Physical address of a `struct uhci_syncheap_page' structure
+	                       * describing the next allocated page (or `PHYSPAGE_INVALID'). */
+	size_t    sh_free;    /* Number of bytes, starting at `physpage2addr(sh_current) +
 	                       * sizeof(struct uhci_syncheap_page)'. */
 };
 
-#define UHCI_SYNCHEAP_INIT  { PAGEPTR_INVALID, 0 }
+#define UHCI_SYNCHEAP_INIT  { PHYSPAGE_INVALID, 0 }
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL uhci_syncheap_fini)(struct uhci_syncheap *__restrict self) {
-	pageptr_t page;
+	physpage_t page;
 	/* Free all allocated pages of physical memory. */
 	page = self->sh_current;
-	while (page != PAGEPTR_INVALID) {
+	while (page != PHYSPAGE_INVALID) {
 		struct uhci_syncheap_page next;
-		vm_copyfromphys_onepage(&next, page2addr(self->sh_current),
+		vm_copyfromphys_onepage(&next, physpage2addr(self->sh_current),
 		                        sizeof(struct uhci_syncheap_page));
 		page_free(page, next.shp_count);
 		page = next.shp_next;
@@ -1675,22 +1675,22 @@ NOTHROW(KCALL uhci_syncheap_alloc)(struct uhci_syncheap *__restrict self,
 	u32 result;
 	if (num_bytes > self->sh_free) {
 		/* Must allocate a new page block. */
-		pageptr_t pg;
+		physpage_t pg;
 		struct uhci_syncheap_page header;
 		header.shp_count = CEILDIV(num_bytes +
 		                           sizeof(struct uhci_syncheap_page),
 		                           PAGESIZE);
 		pg = page_malloc32(header.shp_count);
-		if (pg == PAGEPTR_INVALID)
+		if (pg == PHYSPAGE_INVALID)
 			return UHCI_SYNCHEAP_ALLOC_FAILED;
 		header.shp_next = self->sh_current;
-		vm_copytophys_onepage(page2addr(pg), &header, sizeof(header));
+		vm_copytophys_onepage(physpage2addr(pg), &header, sizeof(header));
 		self->sh_free = (header.shp_count * PAGESIZE) -
 		                sizeof(struct uhci_syncheap_page);
 		self->sh_current = pg;
 	}
 	assert(num_bytes < self->sh_free);
-	result = page2addr32(self->sh_current);
+	result = physpage2addr32(self->sh_current);
 	result += sizeof(struct uhci_syncheap_page);
 	result += self->sh_free;
 	result -= num_bytes;
@@ -1723,7 +1723,7 @@ usb_transfer_allocate_pbuffer(struct uhci_syncheap *__restrict heap,
 			addr = uhci_syncheap_alloc(heap, reqbytes);
 			if unlikely(addr == UHCI_SYNCHEAP_ALLOC_FAILED)
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, reqbytes);
-			entv[i].ab_base = (vm_phys_t)addr;
+			entv[i].ab_base = (physaddr_t)addr;
 			entv[i].ab_size = reqbytes;
 		}
 		result->ab_head = entv[0];
@@ -1742,7 +1742,7 @@ usb_transfer_allocate_physbuf(struct usb_transfer *__restrict tx,
 	u32 bufaddr;
 	bufaddr = uhci_syncheap_alloc(heap, tx->ut_buflen);
 	if likely(bufaddr != UHCI_SYNCHEAP_ALLOC_FAILED) {
-		tx->ut_bufp   = (vm_phys_t)bufaddr;
+		tx->ut_bufp   = (physaddr_t)bufaddr;
 		tx->ut_buftyp = USB_TRANSFER_BUFTYP_PHYS;
 		return;
 	}
@@ -1787,26 +1787,26 @@ uhci_transfer_sync_with_phys(struct uhci_controller *__restrict self,
 				goto copy_next_tx;
 			/* Allocate the buffer for the output TX */
 			if (tx_iter->ut_buftyp == USB_TRANSFER_BUFTYP_PHYS) {
-#if __SIZEOF_VM_PHYS_T__ > 4
-				if (tx_iter->ut_bufp > (vm_phys_t)0xffffffff ||
-				    (tx_iter->ut_bufp + tx_iter->ut_buflen) > (vm_phys_t)0xffffffff)
+#if __SIZEOF_PHYSADDR_T__ > 4
+				if (tx_iter->ut_bufp > (physaddr_t)0xffffffff ||
+				    (tx_iter->ut_bufp + tx_iter->ut_buflen) > (physaddr_t)0xffffffff)
 					goto do_alloc_new_buffer;
-#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 				tx_copy->ut_bufp = tx_iter->ut_bufp;
 			} else if (tx_iter->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
-#if __SIZEOF_VM_PHYS_T__ > 4
+#if __SIZEOF_PHYSADDR_T__ > 4
 				struct aio_pbuffer_entry ent;
 				AIO_PBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
-					if (ent.ab_base > (vm_phys_t)0xffffffff ||
-					    (ent.ab_base + ent.ab_size) > (vm_phys_t)0xffffffff)
+					if (ent.ab_base > (physaddr_t)0xffffffff ||
+					    (ent.ab_base + ent.ab_size) > (physaddr_t)0xffffffff)
 						goto do_alloc_new_buffer;
 				}
-#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 				tx_copy->ut_vbufp = tx_iter->ut_vbufp;
 			} else {
-#if __SIZEOF_VM_PHYS_T__ > 4
+#if __SIZEOF_PHYSADDR_T__ > 4
 do_alloc_new_buffer:
-#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 				usb_transfer_allocate_physbuf(tx_copy, &heap);
 			}
 			/* Copy outgoing packet data into the physical memory buffers. */
@@ -2081,39 +2081,39 @@ uhci_transfer(struct usb_controller *__restrict self,
 
 				case USB_TRANSFER_BUFTYP_PHYS:
 do_configure_simple_empty:
-#if __SIZEOF_VM_PHYS_T__ > 4
+#if __SIZEOF_PHYSADDR_T__ > 4
 					if unlikely(!uhci_construct_tds(&pnexttd,
 					                                tx_iter->ut_endp,
 					                                tx_iter,
 					                                tx_iter->ut_bufp,
 					                                tx_iter->ut_buflen))
 						goto cleanup_configured_and_do_syncio;
-#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+#else /* __SIZEOF_PHYSADDR_T__ > 4 */
 					uhci_construct_tds(&pnexttd,
 					                   tx_iter->ut_endp,
 					                   tx_iter,
 					                   tx_iter->ut_bufp,
 					                   tx_iter->ut_buflen);
-#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 					break;
 
 				case USB_TRANSFER_BUFTYP_PHYSVEC: {
 					struct aio_pbuffer_entry ent;
 					AIO_PBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
-#if __SIZEOF_VM_PHYS_T__ > 4
+#if __SIZEOF_PHYSADDR_T__ > 4
 						if unlikely(!uhci_construct_tds(&pnexttd,
 						                                tx_iter->ut_endp,
 						                                tx_iter,
 						                                ent.ab_base,
 						                                ent.ab_size))
 							goto cleanup_configured_and_do_syncio;
-#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+#else /* __SIZEOF_PHYSADDR_T__ > 4 */
 						uhci_construct_tds(&pnexttd,
 						                   tx_iter->ut_endp,
 						                   tx_iter,
 						                   ent.ab_base,
 						                   ent.ab_size);
-#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+#endif /* __SIZEOF_PHYSADDR_T__ <= 4 */
 					}
 				}	break;
 
@@ -2244,12 +2244,12 @@ NOTHROW(KCALL uhci_interrupt_fini)(struct usb_interrupt *__restrict self) {
 LOCAL void KCALL
 uhci_construct_tds_for_interrupt(struct uhci_ostd ***__restrict ppnexttd,
                                  u32 *__restrict ptok, u32 cs, u16 maxpck,
-                                 vm_phys_t start, size_t num_bytes) {
-#if __SIZEOF_VM_PHYS_T__ > 4
+                                 physaddr_t start, size_t num_bytes) {
+#if __SIZEOF_PHYSADDR_T__ > 4
 	assert(!(num_bytes != 0 &&
-	         (start > (vm_phys_t)0xffffffff ||
-	          (start + num_bytes) > (vm_phys_t)0xffffffff)));
-#endif /* __SIZEOF_VM_PHYS_T__ > 4 */
+	         (start > (physaddr_t)0xffffffff ||
+	          (start + num_bytes) > (physaddr_t)0xffffffff)));
+#endif /* __SIZEOF_PHYSADDR_T__ > 4 */
 	/* Construct TD entires of up to `endp->ue_maxpck' bytes. */
 	do {
 		u16 mysize;
@@ -2280,7 +2280,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 	if likely(buflen < PAGESIZE) {
 		struct heapptr ptr;
 		size_t min_align;
-		vm_phys_t addr;
+		physaddr_t addr;
 		min_align = 1;
 		while (min_align < buflen)
 			min_align <<= 1;
@@ -2321,7 +2321,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 			size_t i;
 			i = 0;
 			while (i < num_pages) {
-				vm_phys_t start;
+				physaddr_t start;
 				size_t num_cont, num_remaining;
 				size_t maxlen;
 				num_cont      = 1;

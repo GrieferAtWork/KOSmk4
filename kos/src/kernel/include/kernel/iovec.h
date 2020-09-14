@@ -26,11 +26,22 @@
 
 #include <hybrid/__assert.h>
 
+#include <kos/kernel/memory.h>
+
 #ifndef __INTELLISENSE__
 #include <libc/string.h>
 #endif /* !__INTELLISENSE__ */
 
 DECL_BEGIN
+
+
+#ifndef __ALIGNOF_PHYSADDR_T__
+#if __SIZEOF_PHYSADDR_T__ == 8
+#define __ALIGNOF_PHYSADDR_T__ __ALIGNOF_INT64__
+#else /* __SIZEOF_PHYSADDR_T__ == 8 */
+#define __ALIGNOF_PHYSADDR_T__ __SIZEOF_PHYSADDR_T__
+#endif /* __SIZEOF_PHYSADDR_T__ != 8 */
+#endif /* !__ALIGNOF_PHYSADDR_T__ */
 
 
 #define OFFSET_AIO_BUFFER_ENTRY_BASE 0
@@ -44,24 +55,24 @@ DECL_BEGIN
 #define SIZEOF_AIO_BUFFER      ((__SIZEOF_SIZE_T__ * 2) + __SIZEOF_POINTER__ + SIZEOF_AIO_BUFFER_ENTRY)
 
 #define OFFSET_AIO_PBUFFER_ENTRY_BASE 0
-#if __SIZEOF_VM_PHYS_T__ > __SIZEOF_SIZE_T__
-#define OFFSET_AIO_PBUFFER_ENTRY_SIZE __SIZEOF_VM_PHYS_T__
-#define SIZEOF_AIO_PBUFFER_ENTRY      (2 * __SIZEOF_VM_PHYS_T__)
-#else /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_SIZE_T__ */
+#if __SIZEOF_PHYSADDR_T__ > __SIZEOF_SIZE_T__
+#define OFFSET_AIO_PBUFFER_ENTRY_SIZE __SIZEOF_PHYSADDR_T__
+#define SIZEOF_AIO_PBUFFER_ENTRY      (2 * __SIZEOF_PHYSADDR_T__)
+#else /* __SIZEOF_PHYSADDR_T__ > __SIZEOF_SIZE_T__ */
 #define OFFSET_AIO_PBUFFER_ENTRY_SIZE __SIZEOF_SIZE_T__
 #define SIZEOF_AIO_PBUFFER_ENTRY      (2 * __SIZEOF_SIZE_T__)
-#endif /* __SIZEOF_VM_PHYS_T__ <= __SIZEOF_SIZE_T__ */
+#endif /* __SIZEOF_PHYSADDR_T__ <= __SIZEOF_SIZE_T__ */
 
 #define OFFSET_AIO_PBUFFER_ENTC 0
 #define OFFSET_AIO_PBUFFER_ENTV __SIZEOF_SIZE_T__
 #define OFFSET_AIO_PBUFFER_HEAD (__SIZEOF_SIZE_T__ + __SIZEOF_POINTER__)
 #define OFFSET_AIO_PBUFFER_LAST (__SIZEOF_SIZE_T__ + __SIZEOF_POINTER__ + SIZEOF_AIO_PBUFFER_ENTRY)
 #define __SIZEOF_AIO_PBUFFER    ((__SIZEOF_SIZE_T__ * 2) + __SIZEOF_POINTER__ + SIZEOF_AIO_PBUFFER_ENTRY)
-#if (__SIZEOF_AIO_PBUFFER % __ALIGNOF_VM_PHYS_T__) != 0
-#define SIZEOF_AIO_PBUFFER ((__SIZEOF_AIO_PBUFFER + (__ALIGNOF_VM_PHYS_T__ - 1)) & ~(__ALIGNOF_VM_PHYS_T__ - 1))
-#else /* (__SIZEOF_AIO_PBUFFER % __ALIGNOF_VM_PHYS_T__) != 0 */
+#if (__SIZEOF_AIO_PBUFFER % __ALIGNOF_PHYSADDR_T__) != 0
+#define SIZEOF_AIO_PBUFFER ((__SIZEOF_AIO_PBUFFER + (__ALIGNOF_PHYSADDR_T__ - 1)) & ~(__ALIGNOF_PHYSADDR_T__ - 1))
+#else /* (__SIZEOF_AIO_PBUFFER % __ALIGNOF_PHYSADDR_T__) != 0 */
 #define SIZEOF_AIO_PBUFFER __SIZEOF_AIO_PBUFFER
-#endif /* (__SIZEOF_AIO_PBUFFER % __ALIGNOF_VM_PHYS_T__) == 0 */
+#endif /* (__SIZEOF_AIO_PBUFFER % __ALIGNOF_PHYSADDR_T__) == 0 */
 
 #ifdef __CC__
 
@@ -81,11 +92,11 @@ struct aio_buffer {
 };
 
 struct aio_pbuffer_entry {
-	vm_phys_t ab_base; /* [?..ab_size] Physical base address of the target buffer. */
-	size_t    ab_size; /* Number of bytes that should be written at `ab_base' */
-#if __SIZEOF_VM_PHYS_T__ > __SIZEOF_SIZE_T__
-	byte_t   _ab_pad[__SIZEOF_VM_PHYS_T__ - __SIZEOF_SIZE_T__]; /* ... */
-#endif /* __SIZEOF_VM_PHYS_T__ > __SIZEOF_SIZE_T__ */
+	physaddr_t ab_base; /* [?..ab_size] Physical base address of the target buffer. */
+	size_t     ab_size; /* Number of bytes that should be written at `ab_base' */
+#if __SIZEOF_PHYSADDR_T__ > __SIZEOF_SIZE_T__
+	byte_t    _ab_pad[__SIZEOF_PHYSADDR_T__ - __SIZEOF_SIZE_T__]; /* ... */
+#endif /* __SIZEOF_PHYSADDR_T__ > __SIZEOF_SIZE_T__ */
 };
 
 struct aio_pbuffer {
@@ -93,9 +104,9 @@ struct aio_pbuffer {
 	struct aio_pbuffer_entry const *ab_entv; /* [1..ab_entc] Vector of entries. */
 	struct aio_pbuffer_entry        ab_head; /* Override for `ab_entv[0]' */
 	size_t                          ab_last; /* Override for `ab_entv[ab_entc - 1].ab_size' */
-#if (__SIZEOF_AIO_PBUFFER % __ALIGNOF_VM_PHYS_T__) != 0
-	__byte_t _ab_pad[__ALIGNOF_VM_PHYS_T__ - (__SIZEOF_AIO_PBUFFER % __ALIGNOF_VM_PHYS_T__)]; /* ... */
-#endif /* (__SIZEOF_AIO_PBUFFER % __ALIGNOF_VM_PHYS_T__) != 0 */
+#if (__SIZEOF_AIO_PBUFFER % __ALIGNOF_PHYSADDR_T__) != 0
+	__byte_t _ab_pad[__ALIGNOF_PHYSADDR_T__ - (__SIZEOF_AIO_PBUFFER % __ALIGNOF_PHYSADDR_T__)]; /* ... */
+#endif /* (__SIZEOF_AIO_PBUFFER % __ALIGNOF_PHYSADDR_T__) != 0 */
 };
 
 /* >> struct aio_buffer_entry ent;
@@ -159,15 +170,15 @@ FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(KCALL aio_pbuffer_init_view)(struct 
 FUNDEF NONNULL((1)) void KCALL aio_buffer_memset(struct aio_buffer const *__restrict self, uintptr_t dst_offset, int byte, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL aio_buffer_copyfrommem(struct aio_buffer const *__restrict self, uintptr_t dst_offset, USER CHECKED void const *__restrict src, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL aio_buffer_copytomem(struct aio_buffer const *__restrict self, USER CHECKED void *__restrict dst, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF NONNULL((1)) void KCALL aio_buffer_copyfromphys(struct aio_buffer const *__restrict self, uintptr_t dst_offset, vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF NONNULL((1)) void KCALL aio_buffer_copytophys(struct aio_buffer const *__restrict self, vm_phys_t dst, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NONNULL((1)) void KCALL aio_buffer_copyfromphys(struct aio_buffer const *__restrict self, uintptr_t dst_offset, physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NONNULL((1)) void KCALL aio_buffer_copytophys(struct aio_buffer const *__restrict self, physaddr_t dst, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL aio_buffer_copytovphys(struct aio_buffer const *__restrict src, struct aio_pbuffer const *__restrict dst, uintptr_t dst_offset, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_memset)(struct aio_pbuffer const *__restrict self, uintptr_t dst_offset, int byte, size_t num_bytes);
 FUNDEF NONNULL((1)) void KCALL aio_pbuffer_copyfrommem(struct aio_pbuffer const *__restrict self, uintptr_t dst_offset, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL aio_pbuffer_copytomem(struct aio_pbuffer const *__restrict self, USER CHECKED void *dst, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NONNULL((1)) void KCALL aio_pbuffer_copytovmem(struct aio_pbuffer const *__restrict src, struct aio_buffer const *__restrict dst, uintptr_t dst_offset, uintptr_t src_offset, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_copyfromphys)(struct aio_pbuffer const *__restrict self, uintptr_t dst_offset, vm_phys_t src, size_t num_bytes);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_copytophys)(struct aio_pbuffer const *__restrict self, vm_phys_t dst, uintptr_t src_offset, size_t num_bytes);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_copyfromphys)(struct aio_pbuffer const *__restrict self, uintptr_t dst_offset, physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_copytophys)(struct aio_pbuffer const *__restrict self, physaddr_t dst, uintptr_t src_offset, size_t num_bytes);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL aio_pbuffer_copytovphys)(struct aio_pbuffer const *__restrict src, struct aio_pbuffer const *__restrict dst, uintptr_t dst_offset, uintptr_t src_offset, size_t num_bytes);
 
 #endif /* __CC__ */

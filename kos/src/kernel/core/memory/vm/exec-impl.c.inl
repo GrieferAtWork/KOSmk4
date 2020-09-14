@@ -133,7 +133,7 @@ MY_FUNC(vm_exec_impl)(struct vm *__restrict effective_vm,
 					                         exec_node,
 					                         exec_path,
 					                         exec_dentry,
-					                         (vm_vpage64_t)(phdr_vector[i].p_offset / PAGESIZE),
+					                         (pageid64_t)(phdr_vector[i].p_offset / PAGESIZE),
 					                         prot | VM_PROT_PRIVATE);
 					if unlikely(!map_ok) {
 err_overlap:

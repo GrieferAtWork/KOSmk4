@@ -45,7 +45,7 @@ DECL_BEGIN
 PUBLIC unsigned int acpi_mode = ACPI_MODE_NONE;
 
 /* [valid_if(acpi_mode != ACPI_MODE_NONE)] pointer to the RSDT or XSDT (based on `acpi_mode') */
-PUBLIC vm_phys_t acpi_root = 0;
+PUBLIC physaddr_t acpi_root = 0;
 
 /* [valid_if(acpi_mode == ACPI_MODE_RSDT)] Length of the vector `((ACPISDTHeader *)acpi_root)->rsdp_sdts' */
 PUBLIC size_t acpi_sdt_count = 0;
@@ -55,7 +55,7 @@ PUBLIC size_t acpi_sdt_count = 0;
 #else /* NO_PHYS_IDENTITY */
 PRIVATE ATTR_FREETEXT size_t
 NOTHROW(KCALL vm_copyfromphys_noidentity_partial)(void *__restrict dst,
-                                                  PHYS vm_phys_t src,
+                                                  PHYS physaddr_t src,
                                                   size_t num_bytes) {
 	uintptr_t offset;
 	size_t result;
@@ -92,7 +92,7 @@ NOTHROW(KCALL vm_copyfromphys_noidentity_partial)(void *__restrict dst,
  * will not make use of the phys2virt identity segment. */
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL vm_copyfromphys_noidentity)(void *__restrict dst,
-                                          PHYS vm_phys_t src,
+                                          PHYS physaddr_t src,
                                           size_t num_bytes) {
 	for (;;) {
 		size_t temp;
@@ -117,7 +117,7 @@ NOTHROW(KCALL acpi_memsum)(void const *__restrict p, size_t n_bytes) {
 }
 
 PRIVATE ATTR_FREETEXT ATTR_PURE byte_t
-NOTHROW(KCALL acpi_memsum_phys)(vm_phys_t p, size_t n_bytes) {
+NOTHROW(KCALL acpi_memsum_phys)(physaddr_t p, size_t n_bytes) {
 	u8 buf[256];
 	byte_t result = 0;
 	while (n_bytes) {
@@ -211,7 +211,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	       rsdp->rsdp_oemid,
 	       rsdp->rsdp_revision);
 	acpi_mode = ACPI_MODE_RSDT;
-	acpi_root = (vm_phys_t)rsdp->rsdp_rsdtaddr;
+	acpi_root = (physaddr_t)rsdp->rsdp_rsdtaddr;
 	if (rsdp->rsdp_revision >= 2) {
 		/* Use XSDT (but validate it first) */
 		if (rsdp->rsdp_length < offsetof(RSDPDescriptor,rsdp_reserved) ||
@@ -219,7 +219,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 			printk(FREESTR(KERN_ERR "[acpi] XSDT table extension is corrupted (using RSDT instead)\n"));
 		} else {
 			acpi_mode = ACPI_MODE_XSDT;
-			acpi_root = (vm_phys_t)rsdp->rsdp_xsdtaddr;
+			acpi_root = (physaddr_t)rsdp->rsdp_xsdtaddr;
 		}
 	}
 	vm_copyfromphys_noidentity(&header, acpi_root, sizeof(ACPISDTHeader));
@@ -244,7 +244,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 
 	/* Preserve the contents of the RSDT table. */
 	minfo_addbank(acpi_root,
-	              (vm_phys_t)header.rsdp_length,
+	              (physaddr_t)header.rsdp_length,
 	              PMEMBANK_TYPE_DEVICE);
 
 	/* Go through all available tables, enumerating them and validating their checksum
@@ -255,7 +255,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	{
 		size_t i;
 		for (i = 0; i < acpi_sdt_count; ++i) {
-			vm_phys_t addr, base;
+			physaddr_t addr, base;
 			addr = acpi_root + sizeof(ACPISDTHeader) + i * ACPI_POINTER_SIZE;
 			/* Dereference the base pointer. */
 			base = 0;
@@ -279,7 +279,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 			       (u64)base, (u64)base + header.rsdp_length - 1,
 			       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
 			       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
-			minfo_addbank(base, (vm_phys_t)header.rsdp_length, PMEMBANK_TYPE_DEVICE);
+			minfo_addbank(base, (physaddr_t)header.rsdp_length, PMEMBANK_TYPE_DEVICE);
 		}
 	}
 
@@ -297,16 +297,16 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 PUBLIC size_t
 NOTHROW(KCALL acpi_lookup)(char const signature[4],
                            void *buf, size_t buflen,
-                           vm_phys_t *ptableaddr) {
+                           physaddr_t *ptableaddr) {
 	size_t i, result;
 	assert(buflen >= sizeof(ACPISDTHeader));
 	for (i = 0; i < acpi_sdt_count; ++i) {
-		vm_phys_t addr, base;
+		physaddr_t addr, base;
 		size_t missing;
 		addr = acpi_root + sizeof(ACPISDTHeader) + i * ACPI_POINTER_SIZE;
 		base = ACPI_POINTER_SIZE == 4
-		       ? (vm_phys_t)vm_readphysl_unaligned(addr)
-		       : (vm_phys_t)vm_readphysq_unaligned(addr);
+		       ? (physaddr_t)vm_readphysl_unaligned(addr)
+		       : (physaddr_t)vm_readphysq_unaligned(addr);
 		vm_copyfromphys(buf, base, sizeof(ACPISDTHeader));
 		if (*(u32 *)((ACPISDTHeader *)buf)->rsdp_signature != *(u32 *)signature)
 			continue;
@@ -321,7 +321,7 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 		if (missing > sizeof(ACPISDTHeader)) {
 			/* Copy additional data. */
 			vm_copyfromphys((byte_t *)buf + sizeof(ACPISDTHeader),
-			                (vm_phys_t)(base + sizeof(ACPISDTHeader)),
+			                (physaddr_t)(base + sizeof(ACPISDTHeader)),
 			                missing - sizeof(ACPISDTHeader));
 		}
 		if (ptableaddr)

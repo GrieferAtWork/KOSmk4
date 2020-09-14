@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/paging.h> /* `pagedir_pushval_t' */
-#include <kernel/memory.h>      /* page2addr() */
+#include <kernel/memory.h>      /* physpage2addr() */
 #include <kernel/paging.h>      /* `pagedir_push_mapone()' */
 #include <kernel/types.h>
 #include <sched/pertask.h> /* PERTASK_GET() */
@@ -46,8 +46,8 @@ DECL_BEGIN
 #endif /* !PHYS_IS_IDENTITY */
 
 #ifndef PHYS_IS_IDENTITY_PAGE
-#define PHYS_IS_IDENTITY_PAGE(pageno) PHYS_IS_IDENTITY(page2addr(pageno), PAGESIZE)
-#define PHYS_TO_IDENTITY_PAGE(addr)   PHYS_TO_IDENTITY(page2addr(pageno))
+#define PHYS_IS_IDENTITY_PAGE(pageno) PHYS_IS_IDENTITY(physpage2addr(pageno), PAGESIZE)
+#define PHYS_TO_IDENTITY_PAGE(addr)   PHYS_TO_IDENTITY(physpage2addr(pageno))
 #endif /* !PHYS_IS_IDENTITY_PAGE */
 
 
@@ -71,36 +71,36 @@ typedef uintptr_t pagedir_pushval_t;
  *          However any memory outside that region (or any memory at all if no such
  *          region is defined by the arch (as is the case for `i386'), will need to
  *          be accessed through use of `THIS_TRAMPOLINE_PAGE'!) */
-FUNDEF NOBLOCK WUNUSED u8 NOTHROW(KCALL vm_readphysb)(PHYS vm_phys_t addr);
-FUNDEF NOBLOCK WUNUSED u16 NOTHROW(KCALL vm_readphysw)(/*aligned(2)*/ PHYS vm_phys_t addr);
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL vm_readphysl)(/*aligned(4)*/ PHYS vm_phys_t addr);
-FUNDEF NOBLOCK WUNUSED u16 NOTHROW(KCALL vm_readphysw_unaligned)(PHYS vm_phys_t addr);
-FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL vm_readphysl_unaligned)(PHYS vm_phys_t addr);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysb)(PHYS vm_phys_t addr, u8 value);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysw)(/*aligned(2)*/ PHYS vm_phys_t addr, u16 value);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysl)(/*aligned(4)*/ PHYS vm_phys_t addr, u32 value);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysw_unaligned)(PHYS vm_phys_t addr, u16 value);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysl_unaligned)(PHYS vm_phys_t addr, u32 value);
+FUNDEF NOBLOCK WUNUSED u8 NOTHROW(KCALL vm_readphysb)(PHYS physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u16 NOTHROW(KCALL vm_readphysw)(/*aligned(2)*/ PHYS physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL vm_readphysl)(/*aligned(4)*/ PHYS physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u16 NOTHROW(KCALL vm_readphysw_unaligned)(PHYS physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u32 NOTHROW(KCALL vm_readphysl_unaligned)(PHYS physaddr_t addr);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysb)(PHYS physaddr_t addr, u8 value);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysw)(/*aligned(2)*/ PHYS physaddr_t addr, u16 value);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysl)(/*aligned(4)*/ PHYS physaddr_t addr, u32 value);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysw_unaligned)(PHYS physaddr_t addr, u16 value);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysl_unaligned)(PHYS physaddr_t addr, u32 value);
 #ifdef __UINT64_TYPE__
-FUNDEF NOBLOCK WUNUSED u64 NOTHROW(KCALL vm_readphysq)(/*aligned(8)*/ PHYS vm_phys_t addr);
-FUNDEF NOBLOCK WUNUSED u64 NOTHROW(KCALL vm_readphysq_unaligned)(PHYS vm_phys_t addr);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq)(/*aligned(8)*/ PHYS vm_phys_t addr, u64 value);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq_unaligned)(PHYS vm_phys_t addr, u64 value);
+FUNDEF NOBLOCK WUNUSED u64 NOTHROW(KCALL vm_readphysq)(/*aligned(8)*/ PHYS physaddr_t addr);
+FUNDEF NOBLOCK WUNUSED u64 NOTHROW(KCALL vm_readphysq_unaligned)(PHYS physaddr_t addr);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq)(/*aligned(8)*/ PHYS physaddr_t addr, u64 value);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq_unaligned)(PHYS physaddr_t addr, u64 value);
 #endif /* __UINT64_TYPE__ */
 
 
 
 /* Copy memory to/from the physical address space. */
 #ifdef __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS
-FUNDEF void KCALL vm_copyfromphys(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL vm_copytophys(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copyfromphys(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copytophys(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
 #else /* __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS */
-FUNDEF void KCALL __os_vm_copyfromphys(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("vm_copyfromphys");
-FUNDEF void KCALL __os_vm_copytophys(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("vm_copytophys");
+FUNDEF void KCALL __os_vm_copyfromphys(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("vm_copyfromphys");
+FUNDEF void KCALL __os_vm_copytophys(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT) ASMNAME("vm_copytophys");
 
 FORCELOCAL ATTR_ARTIFICIAL void KCALL
 vm_copyfromphys(USER CHECKED void *dst,
-                PHYS vm_phys_t src,
+                PHYS physaddr_t src,
                 size_t num_bytes)
 		THROWS(E_SEGFAULT) {
 	if (__builtin_constant_p(num_bytes)) {
@@ -129,7 +129,7 @@ vm_copyfromphys(USER CHECKED void *dst,
 }
 
 FORCELOCAL ATTR_ARTIFICIAL void KCALL
-vm_copytophys(PHYS vm_phys_t dst,
+vm_copytophys(PHYS physaddr_t dst,
               USER CHECKED void const *src,
               size_t num_bytes)
 		THROWS(E_SEGFAULT) {
@@ -159,8 +159,8 @@ vm_copytophys(PHYS vm_phys_t dst,
 }
 #endif /* !__OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS */
 
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copyinphys)(PHYS vm_phys_t dst, PHYS vm_phys_t src, size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copyinphys)(PHYS physaddr_t dst, PHYS physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys)(PHYS physaddr_t dst, int byte, size_t num_bytes);
 
 
 
@@ -170,27 +170,27 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, s
  * @return: * : The number of bytes that could not be transfered.
  *              The affected memory range is:
  *               - `(dst|src) + num_bytes - return ... (dst|src) + num_bytes - 1' */
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_nopf)(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* Same as the functions above, however all memory accesses are guarantied to happen within the same page.
  * In other words: `(PHYS & ~PAGEMASK) == ((PHYS + num_bytes - 1) & ~PAGEMASK)' */
-FUNDEF void KCALL vm_copyfromphys_onepage(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF void KCALL vm_copytophys_onepage(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copyinphys_onepage)(PHYS vm_phys_t dst, PHYS vm_phys_t src, size_t num_bytes);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys_onepage)(PHYS vm_phys_t dst, int byte, size_t num_bytes);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
+FUNDEF void KCALL vm_copyfromphys_onepage(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copytophys_onepage(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copyinphys_onepage)(PHYS physaddr_t dst, PHYS physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys_onepage)(PHYS physaddr_t dst, int byte, size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copyfromphys_onepage_nopf)(USER CHECKED void *dst, PHYS physaddr_t src, size_t num_bytes);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS physaddr_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* Copy a whole page to/from physical memory. (s.a. `PAGESIZE') */
-FUNDEF void KCALL vm_copypagefromphys(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS vm_phys_t src) THROWS(E_SEGFAULT);
-FUNDEF void KCALL vm_copypagetophys(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypageinphys)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, PAGEDIR_PAGEALIGNED PHYS vm_phys_t src);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypagesinphys)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, PAGEDIR_PAGEALIGNED PHYS vm_phys_t src, size_t num_pages);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspage)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, int byte);
-FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, int byte, size_t num_pages);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS vm_phys_t src);
-FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS vm_phys_t dst, USER CHECKED void const *src);
+FUNDEF void KCALL vm_copypagefromphys(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copypagetophys(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, USER CHECKED void const *src) THROWS(E_SEGFAULT);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypageinphys)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_copypagesinphys)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src, size_t num_pages);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspage)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, int byte);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphyspages)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, int byte, size_t num_pages);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagefromphys_nopf)(USER CHECKED void *dst, PAGEDIR_PAGEALIGNED PHYS physaddr_t src);
+FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL vm_copypagetophys_nopf)(PAGEDIR_PAGEALIGNED PHYS physaddr_t dst, USER CHECKED void const *src);
 
 /* A single page of virtual memory in the kernel VM, that is always
  * prepared for being used for whatever purposes a thread has in mind.
@@ -233,15 +233,15 @@ struct vm_ptram {
 
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
-                                           pageptr_t page, __BOOL writable DFL(true)) {
+                                           physpage_t page, __BOOL writable DFL(true)) {
 	byte_t *tramp;
 	tramp = THIS_TRAMPOLINE_BASE;
 	if (self->pt_pushval == PAGEDIR_PUSHVAL_INVALID) {
-		self->pt_pushval = pagedir_push_mapone(tramp, page2addr(page),
+		self->pt_pushval = pagedir_push_mapone(tramp, physpage2addr(page),
 		                                       writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
 		                                                : PAGEDIR_MAP_FREAD);
 	} else {
-		pagedir_mapone(tramp, page2addr(page),
+		pagedir_mapone(tramp, physpage2addr(page),
 		               writable ? PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE
 		                        : PAGEDIR_MAP_FREAD);
 	}
@@ -253,7 +253,7 @@ NOTHROW(KCALL vm_ptram_mappage_noidentity)(struct vm_ptram *__restrict self,
 #ifndef NO_PHYS_IDENTITY
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_mappage)(struct vm_ptram *__restrict self,
-                                pageptr_t page, __BOOL writable DFL(true)) {
+                                physpage_t page, __BOOL writable DFL(true)) {
 	if (PHYS_IS_IDENTITY_PAGE(page))
 		return (byte_t *)PHYS_TO_IDENTITY_PAGE(page);
 	return vm_ptram_mappage_noidentity(self, page, writable);
@@ -264,22 +264,22 @@ NOTHROW(KCALL vm_ptram_mappage)(struct vm_ptram *__restrict self,
 
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_map)(struct vm_ptram *__restrict self,
-                            vm_phys_t addr, __BOOL writable DFL(true)) {
+                            physaddr_t addr, __BOOL writable DFL(true)) {
 	byte_t *result;
 #ifndef NO_PHYS_IDENTITY
 	if (PHYS_IS_IDENTITY(addr, 1))
 		return (byte_t *)PHYS_TO_IDENTITY(addr);
 #endif /* !NO_PHYS_IDENTITY */
-	result = vm_ptram_mappage_noidentity(self, addr2page(addr), writable);
+	result = vm_ptram_mappage_noidentity(self, physaddr2page(addr), writable);
 	result += (uintptr_t)(addr & PAGEMASK);
 	return result;
 }
 
 LOCAL NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
 NOTHROW(KCALL vm_ptram_map_noidentity)(struct vm_ptram *__restrict self,
-                                       vm_phys_t addr, __BOOL writable DFL(true)) {
+                                       physaddr_t addr, __BOOL writable DFL(true)) {
 	byte_t *result;
-	result = vm_ptram_mappage_noidentity(self, addr2page(addr), writable);
+	result = vm_ptram_mappage_noidentity(self, physaddr2page(addr), writable);
 	result += (uintptr_t)(addr & PAGEMASK);
 	return result;
 }

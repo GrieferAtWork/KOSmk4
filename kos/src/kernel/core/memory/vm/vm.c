@@ -648,7 +648,7 @@ NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
 		assert(vm_datapart_numvpages(self) == self->dp_ramdata.rd_block0.rb_size);
 		pagedir_map(addr,
 		            self->dp_ramdata.rd_block0.rb_size * PAGESIZE,
-		            page2addr(self->dp_ramdata.rd_block0.rb_start),
+		            physpage2addr(self->dp_ramdata.rd_block0.rb_start),
 		            perm);
 	} else {
 		size_t i;
@@ -657,7 +657,7 @@ NOTHROW(KCALL vm_datapart_map_ram)(struct vm_datapart *__restrict self,
 		for (i = 0; i < self->dp_ramdata.rd_blockc; ++i) {
 			pagedir_map(addr,
 			            blocks[i].rb_size * PAGESIZE,
-			            page2addr(blocks[i].rb_start),
+			            physpage2addr(blocks[i].rb_start),
 			            perm);
 			addr = (byte_t *)addr + blocks[i].rb_size * PAGESIZE;
 		}
@@ -675,7 +675,7 @@ NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
 		pagedir_map_p(pdir,
 		              addr,
 		              self->dp_ramdata.rd_block0.rb_size * PAGESIZE,
-		              page2addr(self->dp_ramdata.rd_block0.rb_start),
+		              physpage2addr(self->dp_ramdata.rd_block0.rb_start),
 		              perm);
 	} else {
 		size_t i;
@@ -685,7 +685,7 @@ NOTHROW(KCALL vm_datapart_map_ram_p)(struct vm_datapart *__restrict self,
 			pagedir_map_p(pdir,
 			              addr,
 			              blocks[i].rb_size * PAGESIZE,
-			              page2addr(blocks[i].rb_start),
+			              physpage2addr(blocks[i].rb_start),
 			              perm);
 			addr = (byte_t *)addr + blocks[i].rb_size * PAGESIZE;
 		}
@@ -756,7 +756,7 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop)(struct vm_datapart *__restrict self,
 			}
 			pagedir_map((byte_t *)addr + (start_offset * PAGESIZE),
 			            (vpage_offset - start_offset) * PAGESIZE,
-			            page2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
+			            physpage2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
 			            use_perm);
 		} while (vpage_offset < count);
 	} else {
@@ -776,7 +776,7 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop)(struct vm_datapart *__restrict self,
 				}
 				pagedir_map((byte_t *)addr + (start_offset * PAGESIZE),
 				            (vpage_offset - start_offset) * PAGESIZE,
-				            page2addr(blocks[i].rb_start + start_offset),
+				            physpage2addr(blocks[i].rb_start + start_offset),
 				            use_perm);
 			} while (vpage_offset < count);
 			assert(vpage_offset == count);
@@ -810,7 +810,7 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
 			pagedir_map_p(pdir,
 			              (byte_t *)addr + (start_offset * PAGESIZE),
 			              (vpage_offset - start_offset) * PAGESIZE,
-			              page2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
+			              physpage2addr(self->dp_ramdata.rd_block0.rb_start + start_offset),
 			              use_perm);
 		} while (vpage_offset < count);
 	} else {
@@ -831,7 +831,7 @@ NOTHROW(KCALL vm_datapart_map_ram_autoprop_p)(struct vm_datapart *__restrict sel
 				pagedir_map_p(pdir,
 				              (byte_t *)addr + (start_offset * PAGESIZE),
 				              (vpage_offset - start_offset) * PAGESIZE,
-				              page2addr(blocks[i].rb_start + start_offset),
+				              physpage2addr(blocks[i].rb_start + start_offset),
 				              use_perm);
 			} while (vpage_offset < count);
 			assert(vpage_offset == count);
@@ -862,7 +862,7 @@ NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
 	if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
 		/* Simple case: Single-block ram data. */
 		(*prange)(arg,
-		          page2addr(self->dp_ramdata.rd_block0.rb_start) + partrel_start,
+		          physpage2addr(self->dp_ramdata.rd_block0.rb_start) + partrel_start,
 		          num_bytes,
 		          lock);
 	} else {
@@ -883,7 +883,7 @@ NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
 			if (copysize > blocksize)
 				copysize = blocksize;
 			(*prange)(arg,
-			          page2addr(blocks[i].rb_start) + partrel_start,
+			          physpage2addr(blocks[i].rb_start) + partrel_start,
 			          copysize,
 			          lock);
 			if (copysize >= num_bytes)
@@ -1050,21 +1050,21 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 			/* SINGLE --> SINGLE */
 			assert(dst->dp_ramdata.rd_block0.rb_size ==
 			       src->dp_ramdata.rd_block0.rb_size);
-			vm_copypagesinphys(page2addr(dst->dp_ramdata.rd_block0.rb_start),
-			                   page2addr(src->dp_ramdata.rd_block0.rb_start),
+			vm_copypagesinphys(physpage2addr(dst->dp_ramdata.rd_block0.rb_start),
+			                   physpage2addr(src->dp_ramdata.rd_block0.rb_start),
 			                   src->dp_ramdata.rd_block0.rb_size);
 		} else {
 			/* SINGLE --> MULTIPLE */
 			size_t i;
-			pageptr_t src_page;
+			physpage_t src_page;
 			struct vm_ramblock *dst_blocks;
 			src_page   = src->dp_ramdata.rd_block0.rb_start;
 			dst_blocks = dst->dp_ramdata.rd_blockv;
 			for (i = 0; i < dst->dp_ramdata.rd_blockc; ++i) {
 				size_t num_pages;
 				num_pages = dst_blocks[i].rb_size;
-				vm_copypagesinphys(page2addr(dst_blocks[i].rb_start),
-				                   page2addr(src_page),
+				vm_copypagesinphys(physpage2addr(dst_blocks[i].rb_start),
+				                   physpage2addr(src_page),
 				                   num_pages);
 				src_page += num_pages;
 			}
@@ -1075,15 +1075,15 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 	} else if (dst->dp_ramdata.rd_blockv == &dst->dp_ramdata.rd_block0) {
 		/* MULTIPLE --> SINGLE */
 		size_t i;
-		pageptr_t dst_page;
+		physpage_t dst_page;
 		struct vm_ramblock *src_blocks;
 		dst_page   = dst->dp_ramdata.rd_block0.rb_start;
 		src_blocks = src->dp_ramdata.rd_blockv;
 		for (i = 0; i < src->dp_ramdata.rd_blockc; ++i) {
 			size_t num_pages;
 			num_pages = src_blocks[i].rb_size;
-			vm_copypagesinphys(page2addr(dst_page),
-			                   page2addr(src_blocks[i].rb_start),
+			vm_copypagesinphys(physpage2addr(dst_page),
+			                   physpage2addr(src_blocks[i].rb_start),
 			                   num_pages);
 			dst_page += num_pages;
 		}
@@ -1111,8 +1111,8 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
 				assert(src_block.rb_size != 0);
 				if (pagecount > src_block.rb_size)
 					pagecount = src_block.rb_size;
-				vm_copypagesinphys(page2addr(b.rb_start),
-				                   page2addr(src_block.rb_start),
+				vm_copypagesinphys(physpage2addr(b.rb_start),
+				                   physpage2addr(src_block.rb_start),
 				                   pagecount);
 				src_block.rb_start += pagecount;
 				src_block.rb_size -= pagecount;
@@ -1424,10 +1424,10 @@ do_unshare_cow:
 /* Return the address of a physical page at the given `vpage_offset'
  * The caller must be holding a read- or write-lock on `self',
  * as well as guaranty that the part is either INCORE or LOCKED. */
-PUBLIC NOBLOCK NONNULL((1)) pageptr_t
+PUBLIC NOBLOCK NONNULL((1)) physpage_t
 NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
                                     size_t vpage_offset) {
-	pageptr_t result;
+	physpage_t result;
 	assertf(vpage_offset < vm_datapart_numvpages(self),
 	        "vpage_offset                = %Iu\n"
 	        "vm_datapart_numvpages(self) = %Iu\n",
@@ -1462,13 +1462,13 @@ NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
  * @param: pchanged: [OUT] Set to true if all associated data-pages are marked as changed.
  * @throw: * : Only throws whatever exception may get thrown by `dt_loadpart', meaning that
  *             when the loadpart function is NOEXCEPT, then so is this function! */
-PUBLIC NONNULL((1, 3)) pageptr_t KCALL
+PUBLIC NONNULL((1, 3)) physpage_t KCALL
 vm_datapart_loadpage(struct vm_datapart *__restrict self,
                      size_t vpage_offset,
                      bool *__restrict pchanged)
 		THROWS(...) {
 	unsigned int page_shift;
-	pageptr_t result;
+	physpage_t result;
 	uintptr_t page_state;
 	assert(sync_reading(self) || !isshared(self) ||
 	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
@@ -1497,14 +1497,14 @@ again_readstate:
 				goto again_readstate;
 			TRY {
 				void (KCALL *dt_loadpart)(struct vm_datablock *__restrict,
-				                          datapage_t, vm_phys_t, size_t);
+				                          datapage_t, physaddr_t, size_t);
 				/* Invoke a custom load protocol of the associated datablock. */
 				dt_loadpart = self->dp_block->db_type->dt_loadpart;
 				if likely(dt_loadpart) {
 					assert(!wasdestroyed(self));
 					(*dt_loadpart)(self->dp_block,
 					               vm_datapart_startdpage(self) + vpage_offset,
-					               page2addr(result),
+					               physpage2addr(result),
 					               1);
 					assert(!wasdestroyed(self));
 				}
@@ -1594,14 +1594,14 @@ again_readstate_multi:
 					++num_init_pages;
 				TRY {
 					void (KCALL *dt_loadpart)(struct vm_datablock *__restrict,
-					                          datapage_t, vm_phys_t, size_t);
+					                          datapage_t, physaddr_t, size_t);
 					/* Invoke a custom load protocol of the associated datablock. */
 					dt_loadpart = self->dp_block->db_type->dt_loadpart;
 					if likely(dt_loadpart) {
 						assert(!wasdestroyed(self));
 						(*dt_loadpart)(self->dp_block,
 						               vm_datapart_startdpage(self) + starting_data_page,
-						               page2addr(result) + ((uintptr_t)(starting_data_page & pagemask) << addrshift),
+						               physpage2addr(result) + ((uintptr_t)(starting_data_page & pagemask) << addrshift),
 						               num_init_pages);
 						assert(!wasdestroyed(self));
 					}
@@ -1706,12 +1706,12 @@ done_init:
 
 /* Similar to `vm_datapart_loadpage()', however instead used for accessing only a single data
  * page, rather than a whole virtual memory page. (used to implement `vm_datapart_do_(read|write)[p]') */
-PUBLIC NONNULL((1)) vm_phys_t KCALL
+PUBLIC NONNULL((1)) physaddr_t KCALL
 vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
                          size_t dpage_offset, bool for_writing)
 		THROWS(...) {
 	struct vm_datablock *block;
-	vm_phys_t result;
+	physaddr_t result;
 	uintptr_t page_state;
 	assert(sync_reading(self) || !isshared(self) ||
 	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
@@ -1724,7 +1724,7 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 	        vm_datapart_numvpages(self));
 	/* Figure out the address of the associated physical memory page. */
 	block  = self->dp_block;
-	result = (vm_phys_t)vm_datapart_pageaddr(self,
+	result = (physaddr_t)vm_datapart_pageaddr(self,
 	                                         (size_t)(dpage_offset >> VM_DATABLOCK_PAGESHIFT(block))) *
 	         PAGESIZE;
 	result += (uintptr_t)(dpage_offset & VM_DATABLOCK_PAGEMASK(block)) << VM_DATABLOCK_ADDRSHIFT(block);
@@ -1741,7 +1741,7 @@ again_readstate:
 			goto again_readstate;
 		TRY {
 			void (KCALL *dt_loadpart)(struct vm_datablock *__restrict,
-			                          datapage_t, vm_phys_t, size_t);
+			                          datapage_t, physaddr_t, size_t);
 			/* Invoke a custom load protocol of the associated datablock. */
 			dt_loadpart = block->db_type->dt_loadpart;
 			if (dt_loadpart) {
@@ -2128,7 +2128,7 @@ do_next_node:
 LOCAL NONNULL((1)) void KCALL
 vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock *__restrict block,
                         NONNULL((1)) void(KCALL *dt_savepart)(struct vm_datablock *__restrict,
-                                                              datapage_t, vm_phys_t, size_t),
+                                                              datapage_t, physaddr_t, size_t),
                         size_t partrel_min_dpage, size_t partrel_num_dpage)
 		THROWS(...) {
 	unsigned int addrshift;
@@ -2139,8 +2139,8 @@ vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock
 	if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
 		(*dt_savepart)(block,
 		               vm_datapart_mindpage(self) + partrel_min_dpage,
-		               page2addr(self->dp_ramdata.rd_block0.rb_start) +
-		               ((vm_phys_t)partrel_min_dpage << addrshift),
+		               physpage2addr(self->dp_ramdata.rd_block0.rb_start) +
+		               ((physaddr_t)partrel_min_dpage << addrshift),
 		               partrel_num_dpage);
 	} else {
 		size_t i, dpage_pos = partrel_min_dpage;
@@ -2162,8 +2162,8 @@ vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock
 				block_dpages = partrel_num_dpage;
 			(*dt_savepart)(block,
 			               vm_datapart_mindpage(self) + dpage_pos,
-			               page2addr(blocks[i].rb_start) +
-			               ((vm_phys_t)partrel_min_dpage << addrshift),
+			               physpage2addr(blocks[i].rb_start) +
+			               ((physaddr_t)partrel_min_dpage << addrshift),
 			               (size_t)block_dpages); /* XXX: Overflow? */
 			partrel_min_dpage = 0;
 			dpage_pos += block_dpages;
@@ -2218,7 +2218,7 @@ vm_datapart_sync(struct vm_datapart *__restrict self,
 again_lock_datapart:
 	TRY {
 		void (KCALL *dt_savepart)(struct vm_datablock *__restrict,
-		                          datapage_t, vm_phys_t, size_t);
+		                          datapage_t, physaddr_t, size_t);
 		size_t vms_count;
 		vm_datapart_lockread_setcore(self);
 		assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
@@ -2853,7 +2853,7 @@ vm_datablock_locatepart_exact(struct vm_datablock *__restrict self,
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct vm_datapart *result;
 	REF struct vm_datapart *new_result;
-	vm_vpage64_t start_page, part_start_page;
+	pageid64_t start_page, part_start_page;
 	size_t max_pages;
 	assert((start_offset & PAGEMASK) == 0);
 	assert((max_num_bytes & PAGEMASK) == 0);
@@ -2869,7 +2869,7 @@ again:
 	result = vm_datablock_do_locatepart(self,
 	                                    start_offset,
 	                                    max_num_bytes);
-	start_page      = (vm_vpage64_t)(start_offset / PAGESIZE);
+	start_page      = (pageid64_t)(start_offset / PAGESIZE);
 	part_start_page = vm_datapart_minvpage(result);
 	assert(start_page >= part_start_page);
 	if (start_page > part_start_page) {

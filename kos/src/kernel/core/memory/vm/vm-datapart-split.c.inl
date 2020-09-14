@@ -668,9 +668,9 @@ again_lock_datapart:
 
 		case VM_DATAPART_STATE_INCORE: /* The part is currently loaded into main memory. */
 		case VM_DATAPART_STATE_LOCKED: /* The part has been locked in main memory. */
-#if !defined(CONFIG_NO_SWAP) && defined(VM_SWPBLOCK_EQUALS_RAMBLOCK)
+#ifndef CONFIG_NO_SWAP
 		case VM_DATAPART_STATE_INSWAP:
-#endif /* !CONFIG_NO_SWAP && VM_SWPBLOCK_EQUALS_RAMBLOCK */
+#endif /* !CONFIG_NO_SWAP */
 			/* Split the ram / swap data vectors. */
 			if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
 				/* Simple case: Split a single ram block */
@@ -813,12 +813,6 @@ again_lock_datapart:
 				}
 			}
 			break;
-
-#if !defined(CONFIG_NO_SWAP) && !defined(VM_SWPBLOCK_EQUALS_RAMBLOCK)
-		case VM_DATAPART_STATE_INSWAP:
-#error TODO
-			break;
-#endif /* !CONFIG_NO_SWAP && !VM_SWPBLOCK_EQUALS_RAMBLOCK */
 
 		default:
 			if unlikely(result_pagevec_allocated) {

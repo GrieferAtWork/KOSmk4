@@ -102,13 +102,13 @@ NOTHROW(KCALL ata_dma_reset_func)(void *arg) {
 	data->ad_siz = data->ad_max;
 }
 PRIVATE NOBLOCK bool
-NOTHROW(KCALL ata_dma_acquire_func)(void *arg, vm_phys_t paddr, size_t num_bytes,
+NOTHROW(KCALL ata_dma_acquire_func)(void *arg, physaddr_t paddr, size_t num_bytes,
                                     struct vm_dmalock *__restrict UNUSED(lock) DFL(NULL)) {
 	struct ata_dma_acquire_data *data;
 	data = (struct ata_dma_acquire_data *)arg;
 	assert(num_bytes != 0);
-	assert((vm_phys_t)(paddr + num_bytes) > paddr);
-	if ((paddr + num_bytes - 1) > (vm_phys_t)__UINT32_C(0xffffffff))
+	assert((physaddr_t)(paddr + num_bytes) > paddr);
+	if ((paddr + num_bytes - 1) > (physaddr_t)__UINT32_C(0xffffffff))
 		return false; /* Cannot be encoded. */
 	if ((paddr & 1) || (num_bytes & 1))
 		return false; /* Cannot be encoded. */
@@ -198,7 +198,7 @@ AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *ba
 		return 0; /* Not encodable as PRD physical memory. */
 	req_prd = (size_t)(data.ad_buf - data.ad_base);
 	assert(req_prd != 0);
-	assertf(pagedir_translate(base) == (vm_phys_t)prd_buf->p_bufaddr,
+	assertf(pagedir_translate(base) == (physaddr_t)prd_buf->p_bufaddr,
 	        "prd_buf->p_bufaddr      = %I64p\n"
 	        "pagedir_translate(base) = %I64p\n",
 	        (u64)prd_buf->p_bufaddr,
@@ -389,7 +389,7 @@ set_lock_vec:
 INTERN WUNUSED size_t
 NOTHROW(KCALL AtaPRD_InitFromPhys)(AtaPRD *__restrict prd_buf,
                                    size_t prd_siz,
-                                   vm_phys_t base,
+                                   physaddr_t base,
                                    size_t num_bytes) {
 	size_t result;
 	struct ata_dma_acquire_data data;
@@ -437,11 +437,11 @@ typedef u32 errr_t; /* ERRor and Reason */
 
 /* PIO-based data transfer helpers for passing data to/from an ATA drive. */
 LOCAL errr_t KCALL Ata_ReceiveDataSectors(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, USER CHECKED byte_t *buffer, u16 num_sectors);
-LOCAL errr_t KCALL Ata_ReceiveDataSectorsPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, vm_phys_t buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_ReceiveDataSectorsPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, physaddr_t buffer, u16 num_sectors);
 LOCAL errr_t KCALL Ata_ReceiveDataSectorsVector(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_buffer *__restrict buffer, u16 num_sectors);
 LOCAL errr_t KCALL Ata_ReceiveDataSectorsVectorPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_pbuffer *__restrict buffer, u16 num_sectors);
 LOCAL errr_t KCALL Ata_TransmitDataSectors(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, USER CHECKED byte_t const *buffer, u16 num_sectors);
-LOCAL errr_t KCALL Ata_TransmitDataSectorsPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, vm_phys_t buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_TransmitDataSectorsPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, physaddr_t buffer, u16 num_sectors);
 LOCAL errr_t KCALL Ata_TransmitDataSectorsVector(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_buffer *__restrict buffer, u16 num_sectors);
 LOCAL errr_t KCALL Ata_TransmitDataSectorsVectorPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_pbuffer *__restrict buffer, u16 num_sectors);
 
@@ -740,10 +740,10 @@ handle_io_error:
 	       self->b_busio, self->b_ctrlio, self->b_dmaio);
 	Ata_ResetBus(self->b_ctrlio);
 	{
-		vm_phys_t phys;
+		physaddr_t phys;
 		/* Re-set the PRDT address. */
 		phys = pagedir_translate(self->b_prdt);
-		assert(phys <= (vm_phys_t)0xffffffff);
+		assert(phys <= (physaddr_t)0xffffffff);
 		outl(self->b_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 	}
 	if (reset_counter < 3) { /* TODO: Make this `3' configurable */
@@ -1233,10 +1233,10 @@ PRIVATE NOBLOCK void
 NOTHROW(KCALL Ata_ResetAndReinitializeBus)(struct ata_bus *__restrict self) {
 	Ata_ResetBus(self->b_ctrlio);
 	if (self->b_dmaio != (port_t)-1) {
-		vm_phys_t phys;
+		physaddr_t phys;
 		/* Re-set the PRDT address. */
 		phys = pagedir_translate(self->b_prdt);
-		assert(phys <= (vm_phys_t)0xffffffff);
+		assert(phys <= (physaddr_t)0xffffffff);
 		outl(self->b_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 	}
 }
@@ -1576,20 +1576,20 @@ got_identify_signal:
 				if (specs.capability & HD_DRIVEID_CAPABILITY_DMA) {
 					struct ata_dmadrive *ddrive = (struct ata_dmadrive *)drive;
 					if (!bus->b_prdt) {
-						vm_phys_t phys;
+						physaddr_t phys;
 						bus->b_prdt = (AtaPRD *)vpage_alloc_untraced(1, 1, GFP_LOCKED | GFP_PREFLT);
 						/* Re-set the PRDT address. */
 						phys = pagedir_translate(bus->b_prdt);
 						/* TODO: Ensure that a physical page <= 0xfffff000 is allocated for this VPAGE */
-						assertf(phys <= (vm_phys_t)0xffffffff, "TODO");
+						assertf(phys <= (physaddr_t)0xffffffff, "TODO");
 						outl(bus->b_dmaio + DMA_PRIMARY_PRDT, (u32)phys);
 					}
 					ddrive->bd_type.dt_read        = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveRead;
-					ddrive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, vm_phys_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveReadPhys;
+					ddrive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveReadPhys;
 					ddrive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveReadVector;
 					ddrive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveReadVectorPhys;
 					ddrive->bd_type.dt_write       = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void const *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveWrite;
-					ddrive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, vm_phys_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveWritePhys;
+					ddrive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveWritePhys;
 					ddrive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveWriteVector;
 					ddrive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_DmaDriveWriteVectorPhys;
 					if (specs.command_set_2 & HD_DRIVEID_COMMAND_SET_2_LBA48) {
@@ -1633,11 +1633,11 @@ use_28bit_dma:
 						    (u64)specs.lba_capacity_2 == (u64)specs.lba_capacity)
 							goto use_28bit_lba;
 						drive->bd_type.dt_read        = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveRead;
-						drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, vm_phys_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveReadPhys;
+						drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveReadPhys;
 						drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveReadVector;
 						drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveReadVectorPhys;
 						drive->bd_type.dt_write       = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void const *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveWrite;
-						drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, vm_phys_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveWritePhys;
+						drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveWritePhys;
 						drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveWriteVector;
 						drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba48DriveWriteVectorPhys;
 calculate_lba48:
@@ -1645,22 +1645,22 @@ calculate_lba48:
 					} else if (specs.capability & HD_DRIVEID_CAPABILITY_LBA) {
 use_28bit_lba:
 						drive->bd_type.dt_read        = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveRead;
-						drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, vm_phys_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveReadPhys;
+						drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveReadPhys;
 						drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveReadVector;
 						drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveReadVectorPhys;
 						drive->bd_type.dt_write       = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void const *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveWrite;
-						drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, vm_phys_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveWritePhys;
+						drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveWritePhys;
 						drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveWriteVector;
 						drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_Lba28DriveWriteVectorPhys;
 calculate_lba28:
 						drive->bd_sector_count = (lba_t)specs.lba_capacity;
 					} else {
 						drive->bd_type.dt_read        = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveRead;
-						drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, vm_phys_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveReadPhys;
+						drive->bd_type.dt_read_phys   = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveReadPhys;
 						drive->bd_type.dt_readv       = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveReadVector;
 						drive->bd_type.dt_readv_phys  = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveReadVectorPhys;
 						drive->bd_type.dt_write       = (void(KCALL *)(struct block_device *__restrict, USER CHECKED void const *, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveWrite;
-						drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, vm_phys_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveWritePhys;
+						drive->bd_type.dt_write_phys  = (void(KCALL *)(struct block_device *__restrict, physaddr_t, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveWritePhys;
 						drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveWriteVector;
 						drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveWriteVectorPhys;
 calculate_chs:

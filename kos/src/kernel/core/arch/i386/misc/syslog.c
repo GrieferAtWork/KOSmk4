@@ -124,7 +124,7 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
 			pagedir_pushval_t pv;
 			byte_t *addr = (byte_t *)0xc0000000 + (DBG_MONITOR_MEMORY & ~PAGEMASK);
 			DBG_MONITOR_TYPE value;
-			pv = pagedir_push_mapone(addr, (vm_phys_t)(DBG_MONITOR_MEMORY & ~PAGEMASK), PAGEDIR_MAP_FREAD);
+			pv = pagedir_push_mapone(addr, (physaddr_t)(DBG_MONITOR_MEMORY & ~PAGEMASK), PAGEDIR_MAP_FREAD);
 			pagedir_syncone(addr);
 			value = *(DBG_MONITOR_TYPE volatile *)(0xc0000000 + DBG_MONITOR_MEMORY);
 			pagedir_pop_mapone((void *)addr, pv);

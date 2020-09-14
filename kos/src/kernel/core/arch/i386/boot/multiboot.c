@@ -120,8 +120,8 @@ INTERN_CONST ATTR_FREERODATA u8 const memtype_bios_matrix[6] = {
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL memory_load_mb_lower_upper)(u32 mem_lower, u32 mem_upper) {
-	minfo_addbank((vm_phys_t)0x00000000, (vm_phys_t)mem_lower * 1024, PMEMBANK_TYPE_RAM);
-	minfo_addbank((vm_phys_t)0x00100000, (vm_phys_t)mem_upper * 1024, PMEMBANK_TYPE_RAM);
+	minfo_addbank((physaddr_t)0x00000000, (physaddr_t)mem_lower * 1024, PMEMBANK_TYPE_RAM);
+	minfo_addbank((physaddr_t)0x00100000, (physaddr_t)mem_upper * 1024, PMEMBANK_TYPE_RAM);
 }
 
 
@@ -141,7 +141,7 @@ NOTHROW(KCALL x86_initialize_commandline_himem)(void) {
 		/* Copy the kernel commandline from physical memory. */
 		cmdline_copy = (char *)kmalloc((x86_kernel_cmdline_length + 2) * sizeof(char), GFP_LOCKED);
 		vm_copyfromphys(cmdline_copy,
-		                (vm_phys_t)((uintptr_t)kernel_driver.d_cmdline - KERNEL_CORE_BASE),
+		                (physaddr_t)((uintptr_t)kernel_driver.d_cmdline - KERNEL_CORE_BASE),
 		                x86_kernel_cmdline_length * sizeof(char));
 		cmdline_copy[x86_kernel_cmdline_length + 0] = '\0';
 		cmdline_copy[x86_kernel_cmdline_length + 1] = '\0';
@@ -194,7 +194,7 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		/* Map the driver blob into virtual memory. */
 		pagedir_map(blob,
 		            aligned_blob_size,
-		            (vm_phys_t)(blob_addr & ~PAGEMASK),
+		            (physaddr_t)(blob_addr & ~PAGEMASK),
 		            PAGEDIR_MAP_FREAD);
 		/* Load the mapped driver blob as a driver module.
 		 * NOTE: We pass the `DRIVER_INSMOD_FLAG_NOINIT' flag so-as to allow
@@ -233,7 +233,7 @@ load_bootloader_driver(PHYS u32 blob_addr, size_t blob_size,
 		TRY {
 			/* Copy the commandline into our buffer. */
 			vm_copyfromphys(cmdline,
-			                (vm_phys_t)cmdline_addr,
+			                (physaddr_t)cmdline_addr,
 			                cmdline_maxsize);
 			cmdline[cmdline_maxsize] = '\0';
 			/* Load the driver blob. */
@@ -259,7 +259,7 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 		size_t i;
 		for (i = 0; i < x86_boot_driver_size; ++i) {
 			vm_copyfromphys(&driver_descriptor,
-			                (vm_phys_t)((uintptr_t)&((PHYS mb_module_t *)x86_boot_driver_base)[i]),
+			                (physaddr_t)((uintptr_t)&((PHYS mb_module_t *)x86_boot_driver_base)[i]),
 			                sizeof(driver_descriptor));
 			if unlikely(driver_descriptor.mod_start >= driver_descriptor.mod_end)
 				continue;
@@ -284,7 +284,7 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 		tag_end   = (struct mb2_tag *)((byte_t *)tag_begin + x86_boot_driver_size);
 		for (tag_iter = tag_begin; tag_iter < tag_end;) {
 			struct mb2_tag_module_no_cmdline tag;
-			vm_copyfromphys(&tag, (vm_phys_t)(uintptr_t)tag_iter, sizeof(tag));
+			vm_copyfromphys(&tag, (physaddr_t)(uintptr_t)tag_iter, sizeof(tag));
 			if (tag.type == MB2_TAG_TYPE_MODULE) {
 				/* Got a driver tag. */
 				if unlikely(tag.mod_start >= tag.mod_end)
@@ -329,8 +329,8 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 	}
 	if (vinfo->flags & MB_INFO_MEM_MAP) {
 		mb_memory_map_t *iter, *end;
-		minfo_addbank((vm_phys_t)vinfo->mmap_addr,
-		              (vm_phys_t)vinfo->mmap_length,
+		minfo_addbank((physaddr_t)vinfo->mmap_addr,
+		              (physaddr_t)vinfo->mmap_length,
 		              PMEMBANK_TYPE_PRESERVE);
 		TRY {
 			iter = (struct mb_mmap_entry *)(uintptr_t)vinfo->mmap_addr;
@@ -342,8 +342,8 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 					iter->type = 0;
 				if (memtype_bios_matrix[iter->type] >= PMEMBANK_TYPE_COUNT)
 					continue;
-				minfo_addbank((vm_phys_t)iter->addr,
-				              (vm_phys_t)iter->len,
+				minfo_addbank((physaddr_t)iter->addr,
+				              (physaddr_t)iter->len,
 				              memtype_bios_matrix[iter->type]);
 			}
 		} EXCEPT {
@@ -365,8 +365,8 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 				x86_kernel_cmdline_length = strlen(kernel_driver.d_cmdline);
 				/* Split the kernel commandline into arguments. */
 				kernel_driver.d_argc = cmdline_split(kernel_driver.d_cmdline, &cmdline_end);
-				minfo_addbank((vm_phys_t)((uintptr_t)kernel_driver.d_cmdline - KERNEL_CORE_BASE),
-				              (vm_phys_t)(size_t)(cmdline_end - kernel_driver.d_cmdline),
+				minfo_addbank((physaddr_t)((uintptr_t)kernel_driver.d_cmdline - KERNEL_CORE_BASE),
+				              (physaddr_t)(size_t)(cmdline_end - kernel_driver.d_cmdline),
 				              PMEMBANK_TYPE_PRESERVE);
 			}
 		}
@@ -383,8 +383,8 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 			if unlikely(start >= end)
 				continue;
 			/* Preserve memory for the driver memory blob. */
-			minfo_addbank((vm_phys_t)start,
-			              (vm_phys_t)end - (vm_phys_t)start,
+			minfo_addbank((physaddr_t)start,
+			              (physaddr_t)end - (physaddr_t)start,
 			              PMEMBANK_TYPE_PRESERVE);
 			if (base[i].cmdline) {
 				char *cmdline;
@@ -392,8 +392,8 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 				cmdline = (char *)((uintptr_t)base[i].cmdline + KERNEL_CORE_BASE);
 				/* Abuse the padding data entry to store the length of the cmdline. */
 				base[i].pad = (u32)(cmdline_length = strlen(cmdline));
-				minfo_addbank((vm_phys_t)((uintptr_t)cmdline - KERNEL_CORE_BASE),
-				              (vm_phys_t)(uintptr_t)cmdline_length + 1,
+				minfo_addbank((physaddr_t)((uintptr_t)cmdline - KERNEL_CORE_BASE),
+				              (physaddr_t)(uintptr_t)cmdline_length + 1,
 				              PMEMBANK_TYPE_PRESERVE);
 			} else {
 				base[i].pad = 0;
@@ -427,8 +427,8 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 	       (uintptr_t)info, (uintptr_t)info + mbt_min_size - 1);
 
 	/* Protect the multiboot information buffer from being overwritten too early. */
-	minfo_addbank((vm_phys_t)info,
-	              (vm_phys_t)mbt_min_size,
+	minfo_addbank((physaddr_t)info,
+	              (physaddr_t)mbt_min_size,
 	              PMEMBANK_TYPE_PRESERVE);
 
 	for (tag_iter = tag_begin; tag_iter < tag_end;
@@ -473,8 +473,8 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 							iter->type = 0;
 						if (memtype_bios_matrix[iter->type] >= PMEMBANK_TYPE_COUNT)
 							continue;
-						minfo_addbank((vm_phys_t)iter->addr,
-						              (vm_phys_t)iter->len,
+						minfo_addbank((physaddr_t)iter->addr,
+						              (physaddr_t)iter->len,
 						              memtype_bios_matrix[iter->type]);
 					}
 				}
@@ -484,8 +484,8 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 				if unlikely(TAG(mb2_tag_module)->mod_start >= TAG(mb2_tag_module)->mod_end)
 					break;
 				/* Preserve memory image of the driver file */
-				minfo_addbank((vm_phys_t)(TAG(mb2_tag_module)->mod_start),
-				              (vm_phys_t)(TAG(mb2_tag_module)->mod_end - TAG(mb2_tag_module)->mod_start),
+				minfo_addbank((physaddr_t)(TAG(mb2_tag_module)->mod_start),
+				              (physaddr_t)(TAG(mb2_tag_module)->mod_end - TAG(mb2_tag_module)->mod_start),
 				              PMEMBANK_TYPE_PRESERVE);
 				/* Save the fact that MB2-compliant driver definitions are available. */
 				if (x86_boot_driver_format == X86_BOOT_DRIVER_FORMAT_NONE) {

@@ -599,13 +599,13 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 	FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_blockv = &FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0;
 	if (thread == &_boottask) {
 		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_boottask_stack_pageid);
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_boottask_stack_pageptr);
+		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_boottask_stack_pageptr);
 	} else if (thread == &_bootidle) {
 		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_bootidle_stack_pageid);
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_bootidle_stack_pageptr);
+		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_bootidle_stack_pageptr);
 	} else if (thread == &_asyncwork) {
 		FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin = (pageid_t)loadfarptr(__kernel_asyncwork_stack_pageid);
-		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (pageptr_t)loadfarptr(__kernel_asyncwork_stack_pageptr);
+		FORTASK(thread, this_kernel_stackpart_).dp_ramdata.rd_block0.rb_start = (physpage_t)loadfarptr(__kernel_asyncwork_stack_pageptr);
 	}
 	FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmax = FORTASK(thread, this_kernel_stacknode_).vn_node.a_vmin +
 	                                                         CEILDIV(stack_size, PAGESIZE) - 1;
@@ -818,14 +818,14 @@ reset_pdir_pae(struct pae_pdir *__restrict self) {
 			return false;
 	}
 	/* Kernel share (copy from our own page directory) */
-	vm_copytophys_onepage((vm_phys_t)e3[3] & PAE_PAGE_FVECTOR,
+	vm_copytophys_onepage((physaddr_t)e3[3] & PAE_PAGE_FVECTOR,
 	                      PAE_PDIR_E2_IDENTITY[3], 508 * 8);
 	e3[0] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[1] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[2] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	e3[3] |= PAE_PAGE_FACCESSED | PAE_PAGE_FWRITE | PAE_PAGE_FPRESENT;
 	/* Identity mapping */
-	vm_copytophys_onepage((vm_phys_t)(e3[3] & PAE_PAGE_FVECTOR) +
+	vm_copytophys_onepage((physaddr_t)(e3[3] & PAE_PAGE_FVECTOR) +
 	                      508 * 8,
 	                      e3,
 	                      4 * 8); /* Identity mapping */
@@ -853,7 +853,7 @@ reset_pdir(struct task *mythread) {
 	myvm = mythread->t_vm;
 	if unlikely((uintptr_t)myvm < KERNELSPACE_BASE)
 		return;
-	if unlikely((vm_phys_t)myvm->v_pdir_phys != pagedir_translate(&myvm->v_pagedir))
+	if unlikely((physaddr_t)myvm->v_pdir_phys != pagedir_translate(&myvm->v_pagedir))
 		return;
 	if unlikely(((uintptr_t)myvm->v_pdir_phys & PAGEMASK) != 0)
 		return;

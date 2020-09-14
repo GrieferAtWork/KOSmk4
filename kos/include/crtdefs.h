@@ -28,6 +28,7 @@
 
 #include <hybrid/typecore.h>
 
+#include <bits/types.h>
 #include <bits/crt/wctype.h> /* __wctype_t */
 
 #include <sal.h>
@@ -353,18 +354,12 @@ typedef int errno_t;
 
 #ifndef _TIME32_T_DEFINED
 #define _TIME32_T_DEFINED 1
-#ifndef ____time32_t_defined
-#define ____time32_t_defined 1
-typedef __ATTR_W64 __LONG32_TYPE__ __time32_t;
-#endif /* !____time32_t_defined */
+/* Defined in <bits/types.h> */
 #endif /* !_TIME32_T_DEFINED */
 
 #ifndef _TIME64_T_DEFINED
 #define _TIME64_T_DEFINED 1
-#ifndef ____time64_t_defined
-#define ____time64_t_defined 1
-typedef __INT64_TYPE__ __time64_t;
-#endif /* !____time64_t_defined */
+/* Defined in <bits/types.h> */
 #endif /* !_TIME64_T_DEFINED */
 
 

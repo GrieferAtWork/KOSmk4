@@ -37,12 +37,12 @@ DECL_BEGIN
 #ifdef DEFINE_IO_READ
 INTERN NONNULL((1)) void KCALL
 libvio_copyfromvio_to_phys(struct vio_args *__restrict args,
-                           vio_addr_t offset, vm_phys_t buf,
+                           vio_addr_t offset, physaddr_t buf,
                            size_t num_bytes)
 #elif defined(DEFINE_IO_WRITE)
 INTERN NONNULL((1)) void KCALL
 libvio_copytovio_from_phys(struct vio_args *__restrict args,
-                           vio_addr_t offset, vm_phys_t buf,
+                           vio_addr_t offset, physaddr_t buf,
                            size_t num_bytes)
 #endif /* ... */
 		__THROWS(...) {

@@ -36,7 +36,7 @@ DECL_BEGIN
 #define PART_RD_BLOCKC        rd_blockc
 #define PART_RB_START         rb_start
 #define PART_RB_SIZE          rb_size
-#define PART_PAGEPTR_T        pageptr_t
+#define PART_PAGEPTR_T        physpage_t
 #define PART_PAGE_MALLOC_PART page_malloc_part
 #define PART_PAGE_CCFREE      page_ccfree
 #define PART_STRUCT_VM_BLOCK  struct vm_ramblock
@@ -48,7 +48,7 @@ DECL_BEGIN
 #define PART_RD_BLOCKC        sd_blockc
 #define PART_RB_START         sb_start
 #define PART_RB_SIZE          sb_size
-#define PART_PAGEPTR_T        swapptr_t
+#define PART_PAGEPTR_T        swappage_t
 #define PART_PAGE_MALLOC_PART swap_malloc_part
 #define PART_PAGE_CCFREE      swap_free
 #define PART_STRUCT_VM_BLOCK  struct vm_swpblock
@@ -61,21 +61,21 @@ DECL_BEGIN
 #ifdef ALLOC_NX
 PUBLIC NONNULL((1)) struct vm_ramblock *
 NOTHROW(KCALL vm_do_allocram_nx)(struct vm_ramblock *__restrict pblock0,
-                                 pagecnt_t num_pages, gfp_t flags)
+                                 physpagecnt_t num_pages, gfp_t flags)
 #else /* ALLOC_NX */
 PUBLIC NONNULL((1)) ATTR_RETNONNULL struct vm_ramblock *KCALL
 vm_do_allocram(struct vm_ramblock *__restrict pblock0,
-               pagecnt_t num_pages, gfp_t flags)
+               physpagecnt_t num_pages, gfp_t flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC)
 #endif /* !ALLOC_NX */
 {
-	pageptr_t block0_addr;
-	pagecnt_t block0_size;
+	physpage_t block0_addr;
+	physpagecnt_t block0_size;
 	struct vm_ramblock *blocks;
 	struct vm_ramblock *new_blocks;
 	size_t blockc;
 	block0_addr = page_malloc_part(1, num_pages, &block0_size);
-	if unlikely(block0_addr == PAGEPTR_INVALID) {
+	if unlikely(block0_addr == PHYSPAGE_INVALID) {
 #ifdef ALLOC_NX
 		return NULL;
 #else /* ALLOC_NX */
@@ -110,7 +110,7 @@ vm_do_allocram(struct vm_ramblock *__restrict pblock0,
 		blocks[0].rb_size  = block0_size;
 		/* Allocate more blocks and populate the block-vector. */
 		while (block0_size < num_pages) {
-			pagecnt_t new_block_size;
+			physpagecnt_t new_block_size;
 			if (blockc >= (kmalloc_usable_size(blocks) / sizeof(struct vm_ramblock))) {
 				new_blocks = (struct vm_ramblock *)krealloc_nx(blocks,
 				                                               (blockc * 2) * sizeof(struct vm_ramblock),
@@ -134,7 +134,7 @@ vm_do_allocram(struct vm_ramblock *__restrict pblock0,
 			block0_addr = page_malloc_part(1,
 			                               num_pages - block0_size,
 			                               &new_block_size);
-			if unlikely(block0_addr == PAGEPTR_INVALID) {
+			if unlikely(block0_addr == PHYSPAGE_INVALID) {
 #ifdef ALLOC_NX
 				goto err_blocks;
 #else /* ALLOC_NX */
@@ -212,13 +212,13 @@ KCALL vm_datapart_allocswap(struct vm_datapart *__restrict self)
 #endif /* !ALLOC_NX */
 {
 	PART_PAGEPTR_T block0_addr;
-	pagecnt_t block0_size, num_pages;
+	physpagecnt_t block0_size, num_pages;
 	assert(sync_writing(self) || !isshared(self) ||
 	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
 	assert(self->dp_state == VM_DATAPART_STATE_ABSENT);
 	num_pages   = vm_datapart_numvpages(self);
 	block0_addr = PART_PAGE_MALLOC_PART(1, num_pages, &block0_size);
-	if unlikely(block0_addr == IE(PAGEPTR_INVALID, SWAPPTR_INVALID)) {
+	if unlikely(block0_addr == IE(PHYSPAGE_INVALID, SWAPPTR_INVALID)) {
 		sync_endwrite(self);
 		THROW(IE(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 		         E_BADALLOC_INSUFFICIENT_SWAP_SPACE),
@@ -265,7 +265,7 @@ realloc_without_locks:
 			{
 				/* Allocate more blocks and populate the block-vector. */
 				while (block0_size < num_pages) {
-					pagecnt_t new_block_size;
+					physpagecnt_t new_block_size;
 					if (blockc >= (kmalloc_usable_size(blocks) / sizeof(PART_STRUCT_VM_BLOCK))) {
 						new_blocks = (PART_STRUCT_VM_BLOCK *)krealloc_nx(blocks, (blockc * 2) * sizeof(PART_STRUCT_VM_BLOCK),
 						                                                 GFP_LOCKED | GFP_PREFLT | GFP_VCBASE |
@@ -289,7 +289,7 @@ realloc_without_locks:
 					block0_addr = PART_PAGE_MALLOC_PART(1,
 					                                    num_pages - block0_size,
 					                                    &new_block_size);
-					if unlikely(block0_addr == PAGEPTR_INVALID) {
+					if unlikely(block0_addr == PHYSPAGE_INVALID) {
 #ifdef ALLOC_NX
 						goto err_blocks;
 #else /* ALLOC_NX */
@@ -358,7 +358,7 @@ err_blocks:
 			blocks[0].PART_RB_SIZE  = block0_size;
 			/* Allocate more blocks and populate the block-vector. */
 			while (block0_size < num_pages) {
-				pagecnt_t new_block_size;
+				physpagecnt_t new_block_size;
 				if (blockc >= (kmalloc_usable_size(blocks) / sizeof(PART_STRUCT_VM_BLOCK))) {
 					new_blocks = (PART_STRUCT_VM_BLOCK *)krealloc_nx(blocks, (blockc * 2) * sizeof(PART_STRUCT_VM_BLOCK),
 					                                                 GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT | GFP_VCBASE |
@@ -378,7 +378,7 @@ err_blocks:
 				block0_addr = PART_PAGE_MALLOC_PART(1,
 				                                    num_pages - block0_size,
 				                                    &new_block_size);
-				if unlikely(block0_addr == PAGEPTR_INVALID) {
+				if unlikely(block0_addr == PHYSPAGE_INVALID) {
 					sync_endwrite(self);
 #ifdef ALLOC_NX
 					goto err_blocks;

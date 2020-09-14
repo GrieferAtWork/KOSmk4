@@ -140,7 +140,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 	       ((uintptr_t)fps - KERNEL_CORE_BASE), fps->mp_specrev, fps->mp_defcfg);
 	if (fps->mp_defcfg) {
 		/* Default configuration. */
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (pageptr_t)(UINT32_C(0xfee00000) / PAGESIZE);
+		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (physpage_t)(UINT32_C(0xfee00000) / PAGESIZE);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
 		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)0;
@@ -161,12 +161,12 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 	/* Remember the LAPIC base address. */
 	if (table->tab_lapicaddr & PAGEMASK) {
 		_x86_lapicbase = (byte_t *)(uintptr_t)(table->tab_lapicaddr & PAGEMASK);
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (pageptr_t)(table->tab_lapicaddr / PAGESIZE);
+		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (physpage_t)(table->tab_lapicaddr / PAGESIZE);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 2;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
 		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)1;
 	} else {
-		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (pageptr_t)(table->tab_lapicaddr / PAGESIZE);
+		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (physpage_t)(table->tab_lapicaddr / PAGESIZE);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
 		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)0;

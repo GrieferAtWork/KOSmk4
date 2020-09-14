@@ -23,17 +23,18 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/panic.h>
-#include <kernel/vm.h>
-#include <kernel/printk.h>
-#include <kernel/malloc.h>
 #include <kernel/except.h>
+#include <kernel/malloc.h>
+#include <kernel/panic.h>
+#include <kernel/printk.h>
+#include <kernel/vm.h>
+#include <sched/pid.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
-#include <sched/pid.h>
 
 #include <assert.h>
+#include <inttypes.h>
 
 #include "vm-nodeapi.h"
 
@@ -266,7 +267,8 @@ upgrade_and_recheck_vm_for_node:
 				            node->vn_prot != node_prot) {
 					sync_endread(self);
 					kfree(new_part);
-					printk(KERN_DEBUG "[vm] Race condition: Mapping target at %p (%p) has changed during unshare (#1)\n",
+					printk(KERN_DEBUG "[vm] Race condition: Mapping target at "
+					                  "%p (%p) has changed during unshare (#1)\n",
 					       pageaddr, addr);
 					return 0;
 				}
@@ -304,10 +306,10 @@ upgrade_and_recheck_vm_for_node:
 			new_part->dp_ramdata.rd_blockv = NULL;
 			missing_part_num_vpages = part_num_vpages;
 			for (;;) {
-				pageptr_t alloc_start;
-				pagecnt_t alloc_count;
+				physpage_t alloc_start;
+				physpagecnt_t alloc_count;
 				alloc_start = page_malloc_part(1, missing_part_num_vpages, &alloc_count);
-				if unlikely(alloc_start == PAGEPTR_INVALID) {
+				if unlikely(alloc_start == PHYSPAGE_INVALID) {
 					sync_endwrite(part);
 					free_partilly_initialized_datapart(new_part);
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
@@ -404,7 +406,8 @@ did_alloc_ramdata_in_new_part:
 				sync_endwrite(self);
 				sync_endwrite(part);
 				free_partilly_initialized_datapart(new_part);
-				printk(KERN_DEBUG "[vm] Race condition: Mapping target at %p (%p) has changed during unshare (#2)\n",
+				printk(KERN_DEBUG "[vm] Race condition: Mapping target at "
+				                  "%p (%p) has changed during unshare (#2)\n",
 				       pageaddr, addr);
 				return 0;
 			}
@@ -649,7 +652,7 @@ vm_forcefault(struct vm *__restrict self,
 	uintptr_half_t node_prot;
 	pageid_t minpageid, maxpageid;
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
-	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#" PRIxSIZ, num_bytes);
 	minpageid = PAGEID_ENCODE((byte_t *)addr);
 	maxpageid = PAGEID_ENCODE((byte_t *)addr + num_bytes - 1);
 	result = 0;
@@ -764,7 +767,7 @@ again_acquire_part_lock:
 		/* At this point, we update the page directory mappings for all of the pages
 		 * within the range specified by `node_prefault_vpage_offset ... += fault_count' */
 		for (fault_index = 0; fault_index < fault_count; ++fault_index) {
-			pageptr_t ppage;
+			physpage_t ppage;
 			uintptr_half_t pagedir_prot;
 			bool has_changed;
 			has_changed = (flags & VM_FORCEFAULT_FLAG_WRITE) != 0;
@@ -794,8 +797,8 @@ again_acquire_part_lock:
 			        "shouldn't have been able to change\n"
 			        "node: %p..%p (%p...%p)\n"
 			        "minpageid                  = %p\n"
-			        "node_prefault_vpage_offset = %Iu\n"
-			        "fault_count                = %Iu\n"
+			        "node_prefault_vpage_offset = %" PRIuSIZ "\n"
+			        "fault_count                = %" PRIuSIZ "\n"
 			        "minpageid - ... + ... - 1  = %p\n",
 			        (uintptr_t)vm_node_getminpageid(node),
 			        (uintptr_t)vm_node_getmaxpageid(node),
@@ -837,7 +840,7 @@ again_acquire_part_lock:
 				}
 			}
 			/* Actually map the accessed page! */
-			pagedir_mapone(addr, page2addr(ppage), pagedir_prot);
+			pagedir_mapone(addr, physpage2addr(ppage), pagedir_prot);
 
 			/* Make sure that the performed access can now succeed */
 			assertf(flags & VM_FORCEFAULT_FLAG_WRITE
@@ -851,15 +854,15 @@ again_acquire_part_lock:
 			        "prot          = %p\n"
 			        "node->vn_prot = %p\n"
 			        "addr          = %p\n"
-			        "phys          = " FORMAT_VM_PHYS_T " (page " FORMAT_PAGEPTR_T ")\n"
+			        "phys          = %" PRIpN(__SIZEOF_PHYSADDR_T__) " (page %" PRIpN(__SIZEOF_PHYSPAGE_T__) ")\n"
 			        "self          = %p\n"
 			        "has_changed   = %u\n",
-			        (uintptr_t)flags,
+			        (unsigned int)flags,
 			        (uintptr_t)pagedir_prot,
 			        (uintptr_t)node->vn_prot,
 			        (uintptr_t)addr,
-			        (vm_phys_t)page2addr(ppage),
-			        (pageptr_t)ppage,
+			        (physaddr_t)physpage2addr(ppage),
+			        (physpage_t)ppage,
 			        (uintptr_t)self,
 			        (unsigned int)has_changed);
 			sync_endwrite(self);
