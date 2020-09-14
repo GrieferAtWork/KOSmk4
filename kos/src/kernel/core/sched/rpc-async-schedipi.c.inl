@@ -43,22 +43,16 @@ DECL_BEGIN
 PRIVATE NOBLOCK struct icpustate *
 NOTHROW(FCALL FUNC(ipi_schedule_asynchronous_rpc))(struct icpustate *__restrict state,
                                                    void *args[CPU_IPI_ARGCOUNT]) {
-	struct task *target    = (struct task *)args[0];
-	task_rpc_t func        = (task_rpc_t)args[1];
-	void *arg              = args[2];
-	struct task *caller    = THIS_TASK;
-	struct cpu *mycpu      = caller->t_cpu;
-	struct cpu *target_cpu = ATOMIC_READ(target->t_cpu);
+	REF struct task *target;
+	struct cpu *mycpu, *target_cpu;
+	struct task *caller;
+	task_rpc_t func;
+	void *arg;
 	uintptr_t target_flags;
-	if unlikely(target_cpu != mycpu) {
-		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
-		while (!cpu_sendipi(target_cpu,
-		                    &FUNC(ipi_schedule_asynchronous_rpc),
-		                    args,
-		                    CPU_IPI_FWAKEUP))
-			task_pause();
-		return state;
-	}
+	func   = (task_rpc_t)args[1];
+	arg    = args[2];
+	caller = THIS_TASK;
+	target = (REF struct task *)args[0];
 	if (target == caller) {
 		struct icpustate *result;
 		result = (*func)(arg, state,
@@ -66,11 +60,24 @@ NOTHROW(FCALL FUNC(ipi_schedule_asynchronous_rpc))(struct icpustate *__restrict 
 		                 ? TASK_RPC_REASON_ASYNCUSER
 		                 : TASK_RPC_REASON_ASYNC,
 		                 NULL);
+		decref_nokill(target);
 		return result;
 	}
 	target_flags = ATOMIC_READ(target->t_flags);
 	if unlikely(target_flags & TASK_FTERMINATED) {
 		state = (*func)(arg, state, TASK_RPC_REASON_SHUTDOWN, NULL);
+		decref(target);
+		return state;
+	}
+	target_cpu = ATOMIC_READ(target->t_cpu);
+	mycpu      = caller->t_cpu;
+	if unlikely(target_cpu != mycpu) {
+		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
+		while (!cpu_sendipi(target_cpu,
+		                    &FUNC(ipi_schedule_asynchronous_rpc),
+		                    args,
+		                    CPU_IPI_FWAKEUP))
+			task_pause();
 		return state;
 	}
 	target->t_sched.s_state = task_push_asynchronous_rpc(target->t_sched.s_state,
@@ -129,7 +136,8 @@ insert_target_after_caller:
 		}
 		goto insert_target_after_caller;
 	}
-#endif
+#endif /* ... */
+	decref_unlikely(target);
 	return state;
 }
 
@@ -138,20 +146,11 @@ insert_target_after_caller:
 PRIVATE NOBLOCK struct icpustate *
 NOTHROW(FCALL FUNC(ipi_redirect_usercode_rpc))(struct icpustate *__restrict state,
                                                void *args[CPU_IPI_ARGCOUNT]) {
-	struct task *target    = (struct task *)args[0];
-	struct task *caller    = THIS_TASK;
-	struct cpu *mycpu      = caller->t_cpu;
-	struct cpu *target_cpu = ATOMIC_READ(target->t_cpu);
+	REF struct task *target;
+	struct cpu *mycpu, *target_cpu;
+	struct task *caller;
 	uintptr_t target_flags;
-	if unlikely(target_cpu != mycpu) {
-		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
-		while (!cpu_sendipi(target_cpu,
-		                    &FUNC(ipi_redirect_usercode_rpc),
-		                    args,
-		                    CPU_IPI_FWAKEUP))
-			task_pause();
-		return state;
-	}
+	target       = (REF struct task *)args[0];
 	target_flags = ATOMIC_READ(target->t_flags);
 	if unlikely(target_flags & TASK_FTERMINATED) {
 		/* TODO: What now?
@@ -159,6 +158,19 @@ NOTHROW(FCALL FUNC(ipi_redirect_usercode_rpc))(struct icpustate *__restrict stat
 		 *       to indicate this error condition. However since this IPI is serviced
 		 *       asynchronously, we only get here when that function has already returned
 		 *       to its caller, indicating success... */
+		decref(target);
+		return state;
+	}
+	caller     = THIS_TASK;
+	mycpu      = caller->t_cpu;
+	target_cpu = ATOMIC_READ(target->t_cpu);
+	if unlikely(target_cpu != mycpu) {
+		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
+		while (!cpu_sendipi(target_cpu,
+		                    &FUNC(ipi_redirect_usercode_rpc),
+		                    args, /* inherit:reference:target */
+		                    CPU_IPI_FWAKEUP))
+			task_pause();
 		return state;
 	}
 	task_enable_redirect_usercode_rpc(target);
@@ -202,6 +214,7 @@ insert_target_after_caller:
 			cpu_assert_running(target);
 #ifdef DEFINE_SCHEDIPI_RPC_HP
 			mycpu->c_current = target;
+			decref_nokill(target); /* nokill, since also scheduled */
 			return CPU_IPI_MODE_SWITCH_TASKS;
 #endif /* DEFINE_SCHEDIPI_RPC_HP */
 		}
@@ -218,7 +231,8 @@ insert_target_after_caller:
 		}
 		goto insert_target_after_caller;
 	}
-#endif
+#endif /* ... */
+	decref_unlikely(target);
 	return state;
 }
 #endif /* !CONFIG_NO_SMP */

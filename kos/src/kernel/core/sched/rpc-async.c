@@ -124,7 +124,7 @@ NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintpt
 	if (mycpu != target_cpu) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpu_ipi_t ipifunc;
-		args[0] = (void *)target;
+		args[0] = (void *)incref(target);
 		args[1] = (void *)mode;
 		ipifunc = IPI_FUNCTION_OF_MODE(mode, ipi_redirect_usercode_rpc);
 		while (!cpu_sendipi(target_cpu,
@@ -222,7 +222,7 @@ NOTHROW(KCALL task_schedule_asynchronous_rpc)(struct task *__restrict target,
 	if (mycpu != target_cpu) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpu_ipi_t ipifunc;
-		args[0] = target;
+		args[0] = incref(target);
 		args[1] = (void *)func;
 		args[2] = arg;
 		ipifunc = IPI_FUNCTION_OF_MODE(mode, ipi_schedule_asynchronous_rpc);
