@@ -52,7 +52,7 @@
 #ifdef CONFIG_NO_CPU_ASSERT_INTEGRITY
 #undef CONFIG_HAVE_CPU_ASSERT_INTEGRITY
 #elif !defined(CONFIG_HAVE_CPU_ASSERT_INTEGRITY)
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #define CONFIG_HAVE_CPU_ASSERT_INTEGRITY 1
 #endif /* ... */
 #endif /* ... */

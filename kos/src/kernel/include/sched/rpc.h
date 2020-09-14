@@ -153,7 +153,9 @@ typedef WUNUSED NONNULL((2)) struct icpustate *
                                              *          successfully, while being re-directed somewhere along the way. */
 #define TASK_RPC_REASON_SHUTDOWN     0x0004 /* The RPC is being serviced because the hosting thread is currently exiting.
                                              * This reason is given in one of two cases:
-                                             *  - To service any remaining synchronous RPC that is when `task_exit()' is called
+                                             *  - To service any remaining synchronous RPC that is when `task_exit()' is called,
+                                             *    or when task_destroy() was called for a thread that was never actually started.
+                                             *    WARNING: In this case, the RPC is executed by an arbitrary thread on an arbitrary CPU.
                                              *  - To service an asynchronous RPC when the target thread has terminated, but wasn't
                                              *    yet terminated when `task_schedule_asynchronous_rpc()' already returned `true'
                                              *    WARNING: In this case, the RPC is executed by an arbitrary thread on the same

@@ -89,13 +89,43 @@ NOTHROW(KCALL cleanup_pending_rpcs)(void) {
 	while (chain) {
 		next = chain->re_next;
 		TRY {
-			task_rpc_exec_here_onexit(chain->re_func, chain->re_arg);
+			task_rpc_exec_here_onexit(chain->re_func,
+			                          chain->re_arg);
 		} EXCEPT {
 			/* Dump the exception if it is non-signaling */
 			error_class_t cls = error_class();
 			if (!ERRORCODE_ISLOWPRIORITY(cls) &&
 			    !ERRORCODE_ISRTLPRIORITY(cls))
 				error_printf("Unhandled exception in RPC function during thread termination");
+		}
+		rpcentry_free(chain);
+		chain = next;
+	}
+}
+
+
+DEFINE_PERTASK_FINI(fini_pending_rpcs);
+PRIVATE ATTR_USED void
+NOTHROW(KCALL fini_pending_rpcs)(struct task *__restrict thread) {
+	struct rpc_entry *chain, *next;
+	/* Serve all remaining RPC functions, discarding all exceptions they may throw.
+	 * NOTE: Finding remaining RPCs at this point is _very_ unlikely,
+	 *       and can only happen when:
+	 * #1: The thread got a synchronous RPC delivered before it (would have) been started
+	 * #2: The thread never ended up being started. */
+	chain = FORTASK(thread, this_rpcs_pending);
+	if likely(chain == RPC_PENDING_TERMINATED)
+		return;
+	while (chain) {
+		next = chain->re_next;
+		TRY {
+			task_rpc_exec_here_onexit(chain->re_func,
+			                          chain->re_arg);
+		} EXCEPT {
+			/* Dump the exception if it is non-signaling */
+			error_class_t cls = error_class();
+			if (!ERRORCODE_ISLOWPRIORITY(cls) && !ERRORCODE_ISRTLPRIORITY(cls))
+				error_printf("Unhandled exception in RPC function during thread destroy");
 		}
 		rpcentry_free(chain);
 		chain = next;

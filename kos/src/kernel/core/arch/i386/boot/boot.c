@@ -473,6 +473,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Trigger `DEBUGTRAP_REASON_VFORK' and `DEBUGTRAP_REASON_VFORKDONE'
 	 *       at appropriate locations within the kernel. */
 
+	/* TODO: Many places check for RTL exceptions by explicitly checking for E_EXIT_THREAD
+	 *       and E_EXIT_PROCESS, when they should instead use `ERRORCODE_ISRTLPRIORITY()' */
+
 	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
 	 *      the instruction stream to figure out how to unwind the stack.
 	 *      This unwinder should assume the default calling convention for every

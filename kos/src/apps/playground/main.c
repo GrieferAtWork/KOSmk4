@@ -330,11 +330,6 @@ int main_forkbomb(int argc, char *argv[], char *envp[]) {
 	 * Use CTRL+C to kill all of the created processes at once,
 	 * but don't take too long or else the system may have already
 	 * become unresponsive :) */
-	/* FIXME: After killing a fork-bomb process group, there
-	 *        is a chance that the kernel ends up with some
-	 *        memory leaks in `task_raisesignalprocess()',
-	 *        seemingly related to the signals that get send
-	 *        in order to kill processes... */
 	for (;;) {
 		pid_t cpid;
 		cpid = fork();
