@@ -40,18 +40,59 @@
 DECL_BEGIN
 
 PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vm_ramblock_vector_free_pages)(struct vm_ramblock *__restrict vector,
+                                             size_t count) {
+	size_t i;
+	for (i = 0; i < count; ++i) {
+		page_free(vector[i].rb_start,
+		          vector[i].rb_size);
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL free_partilly_initialized_datapart)(struct vm_datapart *__restrict self) {
 	if (self->dp_ramdata.rd_blockv != NULL) {
-		size_t i, count;
-		count = vm_datablock_ramdata_getblockcount(self);
-		for (i = 0; i < count; ++i) {
-			page_free(self->dp_ramdata.rd_blockv[i].rb_start,
-			          self->dp_ramdata.rd_blockv[i].rb_size);
-		}
+		size_t count = vm_datablock_ramdata_getblockcount(self);
+		vm_ramblock_vector_free_pages(self->dp_ramdata.rd_blockv, count);
 		if (self->dp_ramdata.rd_blockv != &self->dp_ramdata.rd_block0)
 			kfree(self->dp_ramdata.rd_blockv);
 	}
 	kfree(self);
+}
+
+/* Truncate `vector' to only encompass a total
+ * of `num_pages' pages of physical memory. */
+PRIVATE NOBLOCK NONNULL((1)) size_t
+NOTHROW(KCALL vm_ramblock_vector_truncate)(struct vm_ramblock *__restrict vector,
+                                           size_t count, size_t num_pages) {
+	size_t i;
+	for (i = 0;; ++i) {
+		assert(i < count);
+		if (vector[i].rb_size >= num_pages) {
+			num_pages -= vector[i].rb_size;
+			if (!num_pages) {
+				/* Simple case: Split between blocks */
+				++i;
+				vm_ramblock_vector_free_pages(vector + i, count - i);
+				break;
+			}
+			continue;
+		}
+		/* Difficult case: Split in the middle of a block. */
+		vm_ramblock_vector_free_pages(vector + i, count - i);
+		page_free(vector[i].rb_start + num_pages,
+		          vector[i].rb_size - num_pages);
+		vector[i].rb_size = num_pages;
+		++i;
+		break;
+	}
+	if (i > 1) {
+		/* Try to truncate the vector. */
+		krealloc_in_place_nx(vector,
+		                     i * sizeof(struct vm_ramblock),
+		                     GFP_ATOMIC);
+	}
+	return i;
 }
 
 
@@ -214,7 +255,12 @@ do_unshare_cow:
 			} else if (!sync_tryupgrade(part)) {
 				sync_endread(part);
 upgrade_and_recheck_vm_for_node:
-				sync_read(self);
+				TRY {
+					sync_read(self);
+				} EXCEPT {
+					kfree(new_part);
+					RETHROW();
+				}
 				if unlikely(vm_getnodeofpageid(self, addr_pageid) != node ||
 				            node->vn_part != part ||
 				            node->vn_prot != node_prot) {
@@ -225,7 +271,12 @@ upgrade_and_recheck_vm_for_node:
 					return 0;
 				}
 				sync_endread(self);
-				vm_datapart_lockwrite_setcore(part);
+				TRY {
+					vm_datapart_lockwrite_setcore(part);
+				} EXCEPT {
+					kfree(new_part);
+					RETHROW();
+				}
 				part_num_vpages = vm_datapart_numvpages(part);
 				assert(part_num_vpages <= node_vpage_count);
 				assert(part_num_vpages != 0);
@@ -289,24 +340,48 @@ upgrade_and_recheck_vm_for_node:
 							/* Must allocate more heap memory without holding a lock to `part' */
 							size_t new_part_num_vpages;
 							sync_endwrite(part);
+							TRY {
+								newvec = (struct vm_ramblock *)krealloc(oldvec,
+								                                        needed_size *
+								                                        sizeof(struct vm_ramblock),
+								                                        GFP_LOCKED | GFP_VCBASE);
+							} EXCEPT {
+								free_partilly_initialized_datapart(new_part);
+								RETHROW();
+							}
 							vm_datapart_lockwrite_setcore(part);
 							new_part_num_vpages = vm_datapart_numvpages(part);
 							assert(new_part_num_vpages <= part_num_vpages);
-							if (new_part_num_vpages < part_num_vpages) {
+							if unlikely(new_part_num_vpages < part_num_vpages) {
 								/* The part grew smaller. - We may already have what we need! */
 								size_t done_part_num_vpages;
 								done_part_num_vpages = part_num_vpages - missing_part_num_vpages;
 								if (done_part_num_vpages >= new_part_num_vpages) {
-
+									/* Truncate the ramblock-vector to only encompass the needed pages. */
+									needed_size = vm_ramblock_vector_truncate(newvec, needed_size - 1,
+									                                          new_part_num_vpages);
+									new_part->dp_ramdata.rd_blockv = newvec;
+									assert(needed_size >= 1);
+									if (needed_size == 1) {
+										/* Don't actually need a dynamically allocated ram-block vector. */
+										new_part->dp_ramdata.rd_blockv          = &new_part->dp_ramdata.rd_block0;
+										new_part->dp_ramdata.rd_block0.rb_start = newvec[0].rb_start;
+										new_part->dp_ramdata.rd_block0.rb_size  = newvec[0].rb_size;
+										kfree(newvec);
+									}
+									part_num_vpages = new_part_num_vpages;
+									goto did_alloc_ramdata_in_new_part;
 								}
 								part_num_vpages = new_part_num_vpages;
 								missing_part_num_vpages = part_num_vpages - done_part_num_vpages;
+							} else {
+								assert(new_part_num_vpages == part_num_vpages);
 							}
 						}
 					}
 					new_part->dp_ramdata.rd_blockv = newvec;
 					new_part->dp_ramdata.rd_blockc = needed_size;
-					newvec += needed_size;
+					newvec += needed_size - 1;
 					newvec->rb_start = alloc_start;
 					newvec->rb_size  = alloc_count;
 				}
@@ -314,6 +389,7 @@ upgrade_and_recheck_vm_for_node:
 					break;
 				missing_part_num_vpages -= alloc_count;
 			}
+did_alloc_ramdata_in_new_part:
 			assert(part_num_vpages != 0);
 			if (!sync_trywrite(self)) {
 				sync_endwrite(part);
