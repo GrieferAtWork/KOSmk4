@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd577bf90 */
+/* HASH CRC-32:0xf7ea54bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -331,7 +331,7 @@ __SYSDECL_BEGIN
  *       "1234":      Decimal
  *       "0777":      Octal
  *       "0xDEAD":    Hex    (casing is ignored)
- *       "0b010011":  Binary (extension; casing is ignored) */
+ *       "0b010011":  Binary (extension; casing is ignored (on the `b' / `B')) */
 #define SCNU8          __SCA1_PREFIX "U"
 #define SCNU16         __SCA2_PREFIX "U"
 #define SCNU32         __SCA4_PREFIX "U"

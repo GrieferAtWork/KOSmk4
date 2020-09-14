@@ -159,7 +159,8 @@ NOTHROW_NCX(LIBCCALL libc___fpecode)(void)
 
 
 
-/*[[[head:libc__fpclass,hash:CRC-32=0xa0b27141]]]*/
+/*[[[head:libc__fpclass,hash:CRC-32=0x53bd24cc]]]*/
+/* @return: * : Set of `_FPCLASS_*' */
 INTERN ATTR_SECTION(".text.crt.math.float") ATTR_CONST WUNUSED int
 NOTHROW(LIBCCALL libc__fpclass)(double x)
 /*[[[body:libc__fpclass]]]*/

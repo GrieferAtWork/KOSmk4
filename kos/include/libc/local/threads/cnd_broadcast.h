@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe58efbea */
+/* HASH CRC-32:0x1b55ff61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_cond_broadcast_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wake up all threads waiting for condition variables COND
  * @return: EOK: Success */

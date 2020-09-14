@@ -166,10 +166,11 @@ err:
 }
 
 
-/*[[[head:libc_fgetpwent,hash:CRC-32=0x815cc1f5]]]*/
+/*[[[head:libc_fgetpwent,hash:CRC-32=0x314e17d]]]*/
 /* Read an entry from STREAM
  * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read (use `rewind(stream)' to rewind the database)
+ * return: NULL: (errno = <unchanged>) The last entry has already been read
+ *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") NONNULL((1)) struct passwd *
 NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream)
@@ -217,10 +218,11 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name)
 }
 /*[[[end:libc_getpwnam]]]*/
 
-/*[[[head:libc_getpwent,hash:CRC-32=0x654eca5e]]]*/
+/*[[[head:libc_getpwent,hash:CRC-32=0x4be55cf4]]]*/
 /* Read an entry from the password-file stream, opening it if necessary
  * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read (use `setpwent()' to rewind the database)
+ * return: NULL: (errno = <unchanged>) The last entry has already been read
+ *                                     (use `setpwent()' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.database.pwd") struct passwd *
 NOTHROW_RPC(LIBCCALL libc_getpwent)(void)

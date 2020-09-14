@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7127c88b */
+/* HASH CRC-32:0x4d0f6b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,8 @@
 #ifndef __local_forkpty_defined
 #define __local_forkpty_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_openpty) && (defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)) && defined(__CRT_HAVE_login_tty) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit))
+#include <asm/ioctls/tty.h>
+#if defined(__CRT_HAVE_openpty) && (defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)) && (defined(__CRT_HAVE_login_tty) || (defined(TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)))) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit))
 struct termios;
 struct winsize;
 #include <bits/types.h>
@@ -128,20 +129,50 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_fork,(void),__fork,(
 /* Dependency: login_tty from utmp */
 #ifndef __local___localdep_login_tty_defined
 #define __local___localdep_login_tty_defined 1
+#ifdef __CRT_HAVE_login_tty
 /* Make FD be the controlling terminal, stdin, stdout, and stderr;
  * then close FD. Returns 0 on success, nonzero on error */
 __CREDIRECT(,int,__NOTHROW_RPC_KOS,__localdep_login_tty,(__fd_t __fd),login_tty,(__fd))
+#elif defined(TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2))
+__NAMESPACE_LOCAL_END
+#include <libc/local/utmp/login_tty.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Make FD be the controlling terminal, stdin, stdout, and stderr;
+ * then close FD. Returns 0 on success, nonzero on error */
+#define __localdep_login_tty __LIBC_LOCAL_NAME(login_tty)
+#else /* ... */
+#undef __local___localdep_login_tty_defined
+#endif /* !... */
 #endif /* !__local___localdep_login_tty_defined */
 /* Dependency: openpty from pty */
 #ifndef __local___localdep_openpty_defined
 #define __local___localdep_openpty_defined 1
-/* Create pseudo tty master slave pair with NAME and set terminal
- * attributes according to TERMP and WINP and return handles for
- * both ends in AMASTER and ASLAVE */
+/* >> openpty(2)
+ * Create a new ptty (psuedo tty), storing the handles for the
+ * master/slave adapters in `*amaster' and `*aslave'. Additionally,
+ * the caller may specific the initial terminial settings `termp'
+ * and window size `winp', as well as a location where the kernel
+ * should store the filename of the PTY master socket (as already
+ * returned in `*amaster'). Note that the max length of this filename
+ * is implementation defined, with no way for the use to specify how
+ * much space is is available in the passed buffer. As such, a
+ * portable application can only ever pass `NULL' for this value.
+ * On KOS, the value written to `name' is the absolute filename of
+ * the master-device in the `/dev' filesystem, which usually means
+ * that the written filename is something like `/dev/ptyp0'.
+ * NOTE: On KOS, this function is a system call, though in other
+ *       operating system it is often implemented via `open(2)',
+ *       possibly combined with `ioctl(2)'. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),openpty,(__amaster,__aslave,__name,__termp,__winp))
 #endif /* !__local___localdep_openpty_defined */
-/* Create child process and establish the slave pseudo
- * terminal as the child's controlling terminal */
+/* >> forkpty(3)
+ * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
+ * such that the newly created PTY is open under all std-handles in
+ * the newly created child process.
+ * Aside from this, this function returns the same as fork(2), that is
+ * it returns in both the parent and child processes, returning `0'
+ * for the child, and the child's PID for the parent (or -1 in only the
+ * parent if something went wrong) */
 __LOCAL_LIBC(forkpty) __ATTR_NONNULL((1)) __pid_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(forkpty))(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp) {
 	int __error;
@@ -173,7 +204,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_forkpty_defined 1
 #define __localdep_forkpty __LIBC_LOCAL_NAME(forkpty)
 #endif /* !__local___localdep_forkpty_defined */
-#else /* __CRT_HAVE_openpty && (__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) && __CRT_HAVE_login_tty && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) */
+#else /* __CRT_HAVE_openpty && (__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) && (__CRT_HAVE_login_tty || (TIOCSCTTY && __CRT_HAVE_ioctl && __CRT_HAVE_setsid && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2))) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) */
 #undef __local_forkpty_defined
-#endif /* !__CRT_HAVE_openpty || (!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) || !__CRT_HAVE_login_tty || (!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) */
+#endif /* !__CRT_HAVE_openpty || (!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) || (!__CRT_HAVE_login_tty && (!TIOCSCTTY || !__CRT_HAVE_ioctl || !__CRT_HAVE_setsid || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2))) || (!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) */
 #endif /* !__local_forkpty_defined */

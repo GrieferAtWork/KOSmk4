@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9a8318b */
+/* HASH CRC-32:0xfc2b0137 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ether_ntoa_r_defined
 #define __local_ether_ntoa_r_defined 1
 #include <__crt.h>
+struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
@@ -58,7 +59,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Convert 48 bit Ethernet ADDRess to ASCII */
+/* Convert `addr' into a 20-character-long string that
+ * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
 __LOCAL_LIBC(ether_ntoa_r) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_ntoa_r))(struct ether_addr const *__restrict __addr, char *__restrict __buf) {
 	__localdep_sprintf(__buf, "%x:%x:%x:%x:%x:%x",

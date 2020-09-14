@@ -51,6 +51,7 @@ __SYSDECL_BEGIN
 
 /* The `getifaddrs' function generates a linked list of these structures.
  * Each element of the list describes one network interface. */
+/* TODO: These structures should go into <bits/crt/ifaddrs.h> */
 struct ifaddrs {
 	struct ifaddrs  *ifa_next;    /* Pointer to the next structure. */
 	char            *ifa_name;    /* Name of this network interface. */

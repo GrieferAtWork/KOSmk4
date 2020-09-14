@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1323f39f */
+/* HASH CRC-32:0x4aa24a1b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strend __LIBC_LOCAL_NAME(strend)
 #endif /* !__CRT_HAVE_strend */
 #endif /* !__local___localdep_strend_defined */
-/* Remove entries that have no value attached */
+/* Remove all entries from `penvz' that don't have a value-portion. */
 __LOCAL_LIBC(envz_strip) __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_strip))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len) {
 	char *__start, *__ptr, *__end;

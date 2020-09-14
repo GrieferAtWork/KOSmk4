@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69cc82a6 */
+/* HASH CRC-32:0x7228407d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,9 +119,11 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32aprintf_printer))(void *__a
 	__CHAR32_TYPE__ *__buf;
 	__buf = __localdep_format_c32aprintf_alloc((struct format_c32aprintf_data *)__arg, __datalen);
 	if __unlikely(!__buf)
-		return -1;
+		goto __err;
 	(__CHAR32_TYPE__ *)__localdep_memcpyl(__buf, __data, __datalen);
 	return (__SSIZE_TYPE__)__datalen;
+__err:
+	return -1;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_format_c32aprintf_printer_defined

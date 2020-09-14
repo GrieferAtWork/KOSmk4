@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe205f43c */
+/* HASH CRC-32:0xbb03c3e1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -564,7 +564,8 @@ INTDEF ATTR_CONST ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(voi
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
  * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
@@ -587,7 +588,8 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
  * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66166d5f */
+/* HASH CRC-32:0xb7b56c7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,13 +58,14 @@ __SYSDECL_BEGIN
 /* Length of interface name. */
 #ifndef IF_NAMESIZE
 #ifdef IFNAMSIZ
-#define IF_NAMESIZE    IFNAMSIZ
+#define IF_NAMESIZE IFNAMSIZ
 #else /* IFNAMSIZ */
-#define IF_NAMESIZE    16
+#define IF_NAMESIZE 16
 #endif /* !IFNAMSIZ */
 #endif /* !IF_NAMESIZE */
 
 #ifdef __CC__
+/* TODO: This structure should go into <bits/crt/if_nameindex-struct.h> */
 struct if_nameindex {
 	__STDC_UINT32_AS_SIZE_T if_index; /* 1, 2, ... */
 	char                   *if_name;  /* null terminated name: "eth0", ... */
@@ -74,6 +75,7 @@ struct if_nameindex {
 #ifdef __USE_MISC
 #ifndef IFF_UP
 /* Standard interface flags. */
+/* TODO: These constants should go into <asm/os/if.h> */
 #define IFF_UP          0x0001  /* Interface is up. */
 #define IFF_BROADCAST   0x0002  /* Broadcast address valid. */
 #define IFF_DEBUG       0x0004  /* Turn on debugging. */
@@ -101,10 +103,12 @@ struct if_nameindex {
 #ifdef __CC__
 #undef ifa_broadaddr
 #undef ifa_dstaddr
+/* TODO: This structure should go into <bits/ifaddr-struct.h> */
 struct ifaddr {
 	struct sockaddr     ifa_addr; /* Address of interface. */
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {
+		/* TODO: Get rid of the member redundancy where when `__USE_KOS_PURE' is defined */
 		struct sockaddr ifa_broadaddr; /* broadcast address. */
 		struct sockaddr ifa_dstaddr;   /* other end of link. */
 		union {
@@ -148,9 +152,10 @@ struct ifaddr {
 #undef irq
 #undef dma
 #undef port
+/* TODO: This structure should go into <bits/ifmap-struct.h> */
 struct ifmap {
-	__UINTPTR_TYPE__  mem_start;
-	__UINTPTR_TYPE__  mem_end;
+	__ULONGPTR_TYPE__ mem_start;
+	__ULONGPTR_TYPE__ mem_end;
 	__UINT16_TYPE__   base_addr;
 	__UINT8_TYPE__    irq;
 	__UINT8_TYPE__    dma;
@@ -180,9 +185,11 @@ struct ifmap {
 #ifndef __ifreq_defined
 #define __ifreq_defined 1
 #ifdef __CC__
+/* TODO: This structure should go into <bits/ifreq-struct.h> */
 struct ifreq {
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {
+		/* TODO: Get rid of the member redundancy where when `__USE_KOS_PURE' is defined */
 		char ifr_name[IFNAMSIZ]; /* if name, e.g. "en0" */
 		union {
 			char ifrn_name[IFNAMSIZ]; /* if name, e.g. "en0" */
@@ -197,6 +204,7 @@ struct ifreq {
 #if defined(__COMPILER_HAVE_TRANSPARENT_UNION) && defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
 	union {
 		struct {
+			/* TODO: Get rid of the member redundancy where when `__USE_KOS_PURE' is defined */
 			struct sockaddr     ifr_addr;
 			struct sockaddr     ifr_dstaddr;
 			struct sockaddr     ifr_broadaddr;
@@ -304,10 +312,12 @@ struct ifreq {
 #ifdef __CC__
 #ifndef __ifconf_defined
 #define __ifconf_defined 1
+/* TODO: This structure should go into <bits/ifconf-struct.h> */
 struct ifconf {
 	__INT32_TYPE__    ifc_len; /* size of buffer */
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {
+		/* TODO: Get rid of the member redundancy where when `__USE_KOS_PURE' is defined */
 		char         *ifc_buf; /* buffer address */
 		struct ifreq *ifc_req; /* array of structures */
 		union {

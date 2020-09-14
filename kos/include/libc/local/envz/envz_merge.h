@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7b7b3b */
+/* HASH CRC-32:0x312322fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,16 +91,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_envz_entry_defined
 #define __local___localdep_envz_entry_defined 1
 #ifdef __CRT_HAVE_envz_entry
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,__localdep_envz_entry,(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name),envz_entry,(__envz,__envz_len,__name))
 #else /* __CRT_HAVE_envz_entry */
 __NAMESPACE_LOCAL_END
 #include <libc/local/envz/envz_entry.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 #define __localdep_envz_entry __LIBC_LOCAL_NAME(envz_entry)
 #endif /* !__CRT_HAVE_envz_entry */
@@ -119,9 +119,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
-/* Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
- * If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
- * with the same name in `ENV', otherwise they don't */
+/* Add all entries from `envz2' to `penvz', as though `envz_add()' was
+ * called for each contained `name=value' pair (using `NULL' for value
+ * on pairs that doesn't have a value-portion.
+ * If individual entries already existed in `penvz', behavior depends
+ * on `override_', which if non-zero will cause existing entries to be
+ * overwritten, and otherwise if zero, will cause them to stay. */
 __LOCAL_LIBC(envz_merge) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_merge))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __envz2, __SIZE_TYPE__ __envz2_len, int __override_) {
 	__errno_t __result = 0;

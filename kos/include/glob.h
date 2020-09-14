@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f4da63 */
+/* HASH CRC-32:0x3f38db1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,6 +60,7 @@ typedef __size_t size_t;
 
 
 /* Bits set in the FLAGS argument to `glob'.  */
+/* TODO: These constants should go into <asm/crt/glob.h> */
 #define GLOB_ERR      (1 << 0) /* Return on read errors.  */
 #define GLOB_MARK     (1 << 1) /* Append a slash to each name.  */
 #define GLOB_NOSORT   (1 << 2) /* Don't sort the names.  */
@@ -70,6 +71,7 @@ typedef __size_t size_t;
 #define GLOB_PERIOD   (1 << 7) /* Leading `.' can be matched by metachars.  */
 
 #if !defined(__USE_POSIX2) || defined(__USE_MISC)
+/* TODO: These constants should go into <asm/crt/glob.h> */
 #define GLOB_MAGCHAR      (1 << 8)  /* Set in gl_flags if any metachars seen.  */
 #define GLOB_ALTDIRFUNC   (1 << 9)  /* Use gl_opendir et al functions.  */
 #define GLOB_BRACE        (1 << 10) /* Expand "{a,b}" to "a" "b".  */
@@ -105,6 +107,7 @@ typedef __size_t size_t;
 struct dirent;
 struct stat;
 #endif /* __USE_GNU */
+/* TODO: These structures should go into <bits/crt/glob.h> */
 typedef struct __glob_struct {
 	__size_t gl_pathc; /* Count of paths matched by the pattern.  */
 	char   **gl_pathv; /* List of matched pathnames.  */
@@ -133,6 +136,7 @@ typedef struct __glob_struct {
 struct dirent64;
 struct stat64;
 #endif /* __USE_GNU */
+/* TODO: These structures should go into <bits/crt/glob.h> */
 typedef struct __glob64_struct {
 	__size_t gl_pathc;
 	char   **gl_pathv;

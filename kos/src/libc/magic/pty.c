@@ -24,30 +24,13 @@
 
 %{
 #include <features.h>
-#include <termios.h>
+
 #include <bits/types.h>
 #include <sys/ioctl.h>
 
+#include <termios.h>
+
 __SYSDECL_BEGIN
-
-/* Documentation taken from Glibc /usr/include/pty.h */
-/* Functions for pseudo TTY handling.
-   Copyright (C) 1996-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
 
 #ifdef __CC__
 
@@ -56,9 +39,22 @@ struct winsize;
 
 }
 
-@@Create pseudo tty master slave pair with NAME and set terminal
-@@attributes according to TERMP and WINP and return handles for
-@@both ends in AMASTER and ASLAVE
+@@>> openpty(2)
+@@Create a new ptty (psuedo tty), storing the handles for the
+@@master/slave adapters in `*amaster' and `*aslave'. Additionally,
+@@the caller may specific the initial terminial settings `termp'
+@@and window size `winp', as well as a location where the kernel
+@@should store the filename of the PTY master socket (as already
+@@returned in `*amaster'). Note that the max length of this filename
+@@is implementation defined, with no way for the use to specify how
+@@much space is is available in the passed buffer. As such, a
+@@portable application can only ever pass `NULL' for this value.
+@@On KOS, the value written to `name' is the absolute filename of
+@@the master-device in the `/dev' filesystem, which usually means
+@@that the written filename is something like `/dev/ptyp0'.
+@@NOTE: On KOS, this function is a system call, though in other
+@@      operating system it is often implemented via `open(2)',
+@@      possibly combined with `ioctl(2)'.
 [[guard, decl_prefix(struct termios;)]]
 [[decl_prefix(struct winsize;)]]
 [[decl_include("<bits/types.h>")]]
@@ -68,8 +64,14 @@ int openpty([[nonnull]] $fd_t *amaster,
             [[nullable]] struct termios const *termp,
             [[nullable]] struct winsize const *winp);
 
-@@Create child process and establish the slave pseudo
-@@terminal as the child's controlling terminal
+@@>> forkpty(3)
+@@A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
+@@such that the newly created PTY is open under all std-handles in
+@@the newly created child process.
+@@Aside from this, this function returns the same as fork(2), that is
+@@it returns in both the parent and child processes, returning `0'
+@@for the child, and the child's PID for the parent (or -1 in only the
+@@parent if something went wrong)
 [[guard, decl_prefix(struct termios;)]]
 [[decl_prefix(struct winsize;)]]
 [[decl_include("<bits/types.h>")]]

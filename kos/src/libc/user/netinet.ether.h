@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7bbe74d */
+/* HASH CRC-32:0xc0e5b5aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,14 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Map 48 bit Ethernet number ADDR to HOSTNAME */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname, struct ether_addr const *addr);
-/* Map HOSTNAME to 48 bit Ethernet address */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname, struct ether_addr *addr);
+/* Map a given `addr' to its corresponding hostname from `/etc/ethers'
+ * @return: 0 : Success
+ * @return: * : No entry for `addr' found, or `/etc/ethers' doesn't exist. */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname, struct ether_addr const *addr);
+/* Map a given `hostname' into its corresponding address from `/etc/ethers'
+ * @return: 0 : Success
+ * @return: * : No entry for `hostname' found, or `/etc/ethers' doesn't exist. */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname, struct ether_addr *addr);
 #endif /* !__KERNEL__ */
 
 DECL_END

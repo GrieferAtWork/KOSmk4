@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa479cc8f */
+/* HASH CRC-32:0xed2b2ee1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Make FD be the controlling terminal, stdin, stdout, and stderr;
- * then close FD. Returns 0 on success, nonzero on error */
-INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd);
 /* Write the given entry into utmp and wtmp */
 INTDEF NONNULL((1)) void NOTHROW_RPC_KOS(LIBCCALL libc_login)(struct utmp const *entry);
 /* Write the utmp entry to say the user on UT_LINE has logged out */

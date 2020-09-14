@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6bf369c */
+/* HASH CRC-32:0x5bab7236 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_pthread_spin_lock_defined 1
 #include <__crt.h>
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_spin_trylock from pthread */
 #ifndef __local___localdep_pthread_spin_trylock_defined

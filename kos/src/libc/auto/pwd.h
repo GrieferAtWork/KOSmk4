@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1891b6f8 */
+/* HASH CRC-32:0x42507299 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,8 @@ INTDEF struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwuid)(uid_t uid);
 INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_getpwnam)(const char *name);
 /* Read an entry from STREAM
  * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read (use `rewind(stream)' to rewind the database)
+ * return: NULL: (errno = <unchanged>) The last entry has already been read
+ *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 INTDEF NONNULL((1)) struct passwd *NOTHROW_RPC(LIBDCALL libd_fgetpwent)(FILE *__restrict stream);
 /* Write the given entry `ent' into the given `stream' */

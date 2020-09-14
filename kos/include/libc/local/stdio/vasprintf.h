@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab0cfa3 */
+/* HASH CRC-32:0x4c234210 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
  * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
@@ -56,7 +57,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
  * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {

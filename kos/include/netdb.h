@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2169b7f */
+/* HASH CRC-32:0xaebf45d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,9 @@
 #include <bits/sigevent.h> /* struct sigevent */
 #include <bits/timespec.h>
 #endif /* __USE_GNU */
+
+/* TODO: Constants and structs from this header should
+ *       be moved into <asm/> and <bits/> headers! */
 
 __SYSDECL_BEGIN
 

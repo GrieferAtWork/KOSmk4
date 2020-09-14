@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab563939 */
+/* HASH CRC-32:0x2c757184 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,19 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Match NAME against the filename pattern PATTERN,
- * returning zero if it matches, FNM_NOMATCH if not */
+/* Match the given `name' against `pattern', returning
+ * `0' if they match, and `FNM_NOMATCH' otherwise.
+ * @param: match_flags:   Set of `FNM_*'
+ * @return: 0           : `name' is matched by `pattern'
+ * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
 INTERN ATTR_SECTION(".text.crt.string.match") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
                                    char const *name,
                                    __STDC_INT_AS_UINT_T match_flags) {
 	char card_post;
+	/* TODO: Support for `FNM_NOESCAPE' */
+	/* TODO: Support for `FNM_LEADING_DIR' */
+	/* TODO: Support for `FNM_EXTMATCH' */
 	for (;;) {
 		if (!*name) {
 			/* End of name (if the patter is empty, or only contains '*', we have a match) */

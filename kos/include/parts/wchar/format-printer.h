@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee10c80f */
+/* HASH CRC-32:0xc37ee771 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,10 +35,12 @@
 #ifndef _WCHAR_H
 #include <wchar.h>
 #endif /* !_WCHAR_H */
-#include <bits/wformat-printer.h>
-#include <libc/malloc.h>
 #include <hybrid/__assert.h>
+
+#include <bits/wformat-printer.h>
 #include <kos/anno.h>
+
+#include <libc/malloc.h>
 
 __SYSDECL_BEGIN
 
@@ -525,8 +527,11 @@ struct format_wsnprintf_data {
 	__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
 };
 #endif /* !__format_wsnprintf_data_defined */
-#define FORMAT_WSNPRINTF_INIT(buf, bufsize)       { buf, bufsize }
-#define format_wsnprintf_init(self, buf, bufsize) ((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
+#define FORMAT_WSNPRINTF_INIT(buf, bufsize) \
+	{ buf, bufsize }
+#define format_wsnprintf_init(self, buf, bufsize) \
+	((self)->sd_buffer = (buf),                   \
+	 (self)->sd_bufsiz = (bufsize))
 
 #ifdef __CRT_HAVE_format_wsnprintf_printer
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
@@ -574,14 +579,17 @@ struct format_waprintf_data {
 };
 #endif /* !__format_waprintf_data_defined */
 
-#define FORMAT_WAPRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
-#define format_waprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define FORMAT_WAPRINTF_DATA_INIT \
+	{ __NULLPTR, 0, 0 }
+#define format_waprintf_data_init(self) \
+	((self)->ap_base  = __NULLPTR,      \
+	 (self)->ap_avail = (self)->ap_used = 0)
 #define format_waprintf_data_cinit(self)            \
 	(__hybrid_assert((self)->ap_base == __NULLPTR), \
 	 __hybrid_assert((self)->ap_avail == 0),        \
 	 __hybrid_assert((self)->ap_used == 0))
 #ifdef NDEBUG
-#define format_waprintf_data_fini(self)  (__libc_free((self)->ap_base))
+#define format_waprintf_data_fini(self) __libc_free((self)->ap_base)
 #else /* NDEBUG */
 #if __SIZEOF_POINTER__ == 4
 #define format_waprintf_data_fini(self)                 \
@@ -596,7 +604,7 @@ struct format_waprintf_data {
 	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),         \
 	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
 #else /* __SIZEOF_POINTER__ == ... */
-#define format_waprintf_data_fini(self) (__libc_free((self)->ap_base))
+#define format_waprintf_data_fini(self) __libc_free((self)->ap_base)
 #endif /* __SIZEOF_POINTER__ != ... */
 #endif /* !NDEBUG */
 
@@ -604,7 +612,8 @@ struct format_waprintf_data {
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
@@ -627,7 +636,8 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {

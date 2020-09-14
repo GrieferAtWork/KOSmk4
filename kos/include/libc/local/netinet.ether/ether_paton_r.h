@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14879bbe */
+/* HASH CRC-32:0x95c2fd0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_ether_paton_r_defined
 #define __local_ether_paton_r_defined 1
 #include <__crt.h>
+struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: isspace from ctype */
 #ifndef __local___localdep_isspace_defined
@@ -39,7 +40,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <net/ethernet.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Convert ASCII string S to 48 bit Ethernet address */
+/* To the reverse of `ether_ntoa()' and convert
+ * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 __LOCAL_LIBC(ether_paton_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) struct ether_addr *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_paton_r))(char const **__restrict __pasc, struct ether_addr *__restrict __addr) {
 	unsigned int __i;

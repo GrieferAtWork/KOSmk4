@@ -30,14 +30,14 @@
 #define DEV_UNSET      __CCAST(dev_t)(0) /* Unset device number */
 #define DEV_MAJOR_AUTO 256               /* The first automatically assigned device major-number */
 
-#define MINORBITS      20
-#define MAJORBITS      12
-#define MINORMASK    ((1 << MINORBITS)-1)
-#define MAJORMASK    ((1 << MAJORBITS)-1)
+#define MINORBITS 20
+#define MAJORBITS 12
+#define MINORMASK ((1 << MINORBITS) - 1)
+#define MAJORMASK ((1 << MAJORBITS) - 1)
 
-#define MAJOR(dev)   (__CCAST(__major_t)(__CCAST(__uintptr_t)(dev) >> MINORBITS))
-#define MINOR(dev)   (__CCAST(__minor_t)(__CCAST(__uintptr_t)(dev) &  MINORMASK))
-#define MKDEV(ma,mi) (__CCAST(dev_t)((ma) << MINORBITS | (mi)))
+#define MAJOR(dev)    (__CCAST(__major_t)(__CCAST(__uintptr_t)(dev) >> MINORBITS))
+#define MINOR(dev)    (__CCAST(__minor_t)(__CCAST(__uintptr_t)(dev) & MINORMASK))
+#define MKDEV(ma, mi) (__CCAST(dev_t)((ma) << MINORBITS | (mi)))
 
 #ifdef __CC__
 __DECL_BEGIN

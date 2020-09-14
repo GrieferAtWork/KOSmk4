@@ -31,19 +31,6 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_login_tty,hash:CRC-32=0x36f215a5]]]*/
-/* Make FD be the controlling terminal, stdin, stdout, and stderr;
- * then close FD. Returns 0 on success, nonzero on error */
-INTERN ATTR_SECTION(".text.crt.io.tty") int
-NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd)
-/*[[[body:libc_login_tty]]]*/
-/*AUTO*/{
-	(void)fd;
-	CRT_UNIMPLEMENTEDF("login_tty(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_login_tty]]]*/
 
 /*[[[head:libc_login,hash:CRC-32=0xbe7a4316]]]*/
 /* Write the given entry into utmp and wtmp */
@@ -241,8 +228,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getutline_r)(struct utmp const *line,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x726e9e3f]]]*/
-DEFINE_PUBLIC_ALIAS(login_tty, libc_login_tty);
+/*[[[start:exports,hash:CRC-32=0x254d0c4b]]]*/
 DEFINE_PUBLIC_ALIAS(login, libc_login);
 DEFINE_PUBLIC_ALIAS(logout, libc_logout);
 DEFINE_PUBLIC_ALIAS(logwtmp, libc_logwtmp);

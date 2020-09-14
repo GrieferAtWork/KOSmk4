@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0eb50f2 */
+/* HASH CRC-32:0xc6cf05d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_setspecific_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Store POINTER in the thread-specific data slot identified by KEY
  * @return: EOK:    Success

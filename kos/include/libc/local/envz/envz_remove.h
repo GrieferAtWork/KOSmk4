@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb44ebfd0 */
+/* HASH CRC-32:0xa906024f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,21 +59,22 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_envz_entry_defined
 #define __local___localdep_envz_entry_defined 1
 #ifdef __CRT_HAVE_envz_entry
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,__localdep_envz_entry,(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name),envz_entry,(__envz,__envz_len,__name))
 #else /* __CRT_HAVE_envz_entry */
 __NAMESPACE_LOCAL_END
 #include <libc/local/envz/envz_entry.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 #define __localdep_envz_entry __LIBC_LOCAL_NAME(envz_entry)
 #endif /* !__CRT_HAVE_envz_entry */
 #endif /* !__local___localdep_envz_entry_defined */
-/* Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any */
+/* Remove an entry matching `name' from `penvz',
+ * or do nothing if no such entry exists. */
 __LOCAL_LIBC(envz_remove) __ATTR_NONNULL((1, 2, 3)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_remove))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name) {
 	char *__entry;

@@ -238,7 +238,7 @@ NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid,
 #endif /* MAGIC:alias */
 /*[[[end:libc_wait4_64]]]*/
 
-/*[[[head:libc_detach,hash:CRC-32=0x6a409005]]]*/
+/*[[[head:libc_detach,hash:CRC-32=0xe982e23b]]]*/
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -288,7 +288,7 @@ NOTHROW_NCX(LIBCCALL libc_wait4_64)(pid_t pid,
  *   - Even if the thread doesn't deliver a signal upon it terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
- *                      or you had to have been assigned as its child.
+ *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
  * the signal if the thread dies without being detached first, then
  * the call fails by throwing an `E_ILLEGAL_OPERATION'.

@@ -453,7 +453,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_RDWR       0x0002 /* Read/write access */
 #define IO_RDWR_ALT   0x0003 /* Read/write access */
 #define IO_CLOEXEC    0x0004 /* Close during exec() */
-#define IO_CLOFORK    0x0008 /* Close during fork() */
+#define IO_CLOFORK    0x0008 /* Close during fork() (or rather: `unshare(CLONE_FILES)') */
 #define IO_APPEND     0x0400 /* Append newly written data at the end */
 #define IO_NONBLOCK   0x0800 /* Don't block in I/O */
 #define IO_SYNC       0x1000 /* Ensure that all modified caches are flushed during write() */
@@ -481,7 +481,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 /* NOTE: The following flags don't affect I/O, but are stored in the same field.
  *       Additionally, their `O_*' equivalent have different values. */
 #define IO_HANDLE_CLOEXEC           IO_CLOEXEC /* Close during exec() */
-#define IO_HANDLE_CLOFORK           IO_CLOFORK /* Close during fork() */
+#define IO_HANDLE_CLOFORK           IO_CLOFORK /* Close during fork() (or rather: `unshare(CLONE_FILES)') */
 #define IO_HANDLE_FFROM_OPENFLAG(x) (__CCAST(__iomode_t)(((x) & 0x180000) >> 17))
 #define IO_HANDLE_FTO_OPENFLAG(x)   ((__CCAST(__oflag_t)(x) & 0xc) << 17)
 /* Similar to `IO_HANDLE_FFROM_O()' / `IO_HANDLE_FTO_O()', but used for converting `FD_*' flags. */

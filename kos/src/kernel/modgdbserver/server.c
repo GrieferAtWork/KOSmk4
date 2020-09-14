@@ -2168,7 +2168,8 @@ do_return_attached_everything:
 				o += sprintf(o, "%.8" PRIx32, (newThread.ts_thread->t_flags & (TASK_FTERMINATED | TASK_FTERMINATING)) ? 0 : 1);
 			}
 			if (mode & TAG_THREADNAME) {
-				char *namebuf; ssize_t namelen;
+				char *namebuf;
+				ssize_t namelen;
 				o += sprintf(o, "%.8" PRIx32, TAG_THREADNAME);
 				namebuf = o + 8;
 				namelen = GDBInfo_PrintThreadName(&format_sprintf_printer,

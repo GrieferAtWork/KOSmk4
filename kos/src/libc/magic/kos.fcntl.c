@@ -36,7 +36,7 @@ __STDC_INT_AS_SSIZE_T Fcntl($fd_t fd, int cmd, ...);
 
 %[default:section(".text.crt{|.dos}.except.io.access")]
 
-[[ignore, nocrt, alias(Open)]]
+[[ignore, nocrt, alias("Open")]]
 [[cp, wunused, vartypes($mode_t), throws, decl_include("<bits/types.h>")]]
 $fd_t Open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 
@@ -102,12 +102,14 @@ $fd_t Creat64([[nonnull]] char const *filename, $mode_t mode) {
 %
 %#ifdef __USE_ATFILE
 
-[[cp, throws, wunused, vartypes($mode_t), decl_include("<bits/types.h>"), ignore, nocrt, alias(OpenAt)]]
+[[cp, throws, wunused, vartypes($mode_t)]]
+[[ignore, nocrt, alias("OpenAt")]]
+[[decl_include("<bits/types.h>")]]
 $fd_t OpenAt32($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...);
 
 [[decl_include("<bits/types.h>")]]
 [[cp, throws, guard, wunused, vartypes($mode_t), no_crt_self_import]]
-[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("Openat64")]]
+[[if(defined(__USE_FILE_OFFSET64)), preferred_alias("OpenAt64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("OpenAt")]]
 [[userimpl, requires($has_function(OpenAt32) || $has_function(OpenAt64))]]
 $fd_t OpenAt($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
@@ -127,7 +129,7 @@ $fd_t OpenAt($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...
 [[cp, throws, guard, wunused, vartypes($mode_t)]]
 [[largefile64_variant_of(OpenAt), doc_alias("OpenAt")]]
 [[decl_include("<bits/types.h>"), impl_include("<asm/oflags.h>")]]
-[[userimpl, requires($has_function(OpenAt32))]]
+[[userimpl, requires_function(OpenAt32)]]
 $fd_t OpenAt64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
 	va_list args;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b94055b */
+/* HASH CRC-32:0xc2649294 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,8 +77,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_stroff __LIBC_LOCAL_NAME(stroff)
 #endif /* !__CRT_HAVE_stroff */
 #endif /* !__local___localdep_stroff_defined */
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 __LOCAL_LIBC(envz_entry) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_entry))(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name) {

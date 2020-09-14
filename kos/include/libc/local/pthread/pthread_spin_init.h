@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x398f74d0 */
+/* HASH CRC-32:0x3b29ec8f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_pthread_spin_init_defined 1
 #include <__crt.h>
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Initialize the spinlock LOCK. If PSHARED is nonzero the

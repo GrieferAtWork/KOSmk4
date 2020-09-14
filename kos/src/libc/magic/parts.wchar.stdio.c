@@ -49,7 +49,8 @@ $FILE *wfopen([[nonnull]] wchar_t const *filename,
 [[wchar, wunused, dos_export_alias("_wfreopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
 $FILE *wfreopen([[nonnull]] wchar_t const *filename,
-                [[nonnull]] wchar_t const *mode, $FILE *stream);
+                [[nonnull]] wchar_t const *mode,
+                $FILE *stream);
 
 [[guard, wchar, wunused, dos_export_alias("_wpopen")]]
 [[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]

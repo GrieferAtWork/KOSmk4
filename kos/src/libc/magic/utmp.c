@@ -65,7 +65,46 @@ __SYSDECL_BEGIN
 @@Make FD be the controlling terminal, stdin, stdout, and stderr;
 @@then close FD. Returns 0 on success, nonzero on error
 [[guard, cp_kos, section(".text.crt{|.dos}.io.tty")]]
-int login_tty($fd_t fd);
+[[impl_include("<asm/ioctls/tty.h>")]]
+[[impl_include("<asm/stdio.h>")]]
+[[requires_include("<asm/ioctls/tty.h>")]]
+[[requires(defined(@TIOCSCTTY@) && $has_function(ioctl) &&
+           $has_function(setsid) && $has_function(dup2) &&
+           $has_function(close))]]
+int login_tty($fd_t fd) {
+	if unlikely(setsid() < 0)
+		goto err;
+	if unlikely(ioctl(fd, @TIOCSCTTY@) < 0)
+		goto err;
+@@pp_if STDIN_FILENO == 0 && STDOUT_FILENO == 1 && STDERR_FILENO == 2@@
+	{
+		fd_t i;
+		for (i = 0; i <= 2; ++i) {
+			if likely(fd != i) {
+				if unlikely(dup2(fd, i))
+					goto err;
+			}
+		}
+	}
+	if likely(fd >= 3)
+		close(fd);
+@@pp_else@@
+	if (likely(fd != STDIN_FILENO) && unlikely(dup2(fd, STDIN_FILENO)))
+		goto err;
+	if (likely(fd != STDOUT_FILENO) && unlikely(dup2(fd, STDOUT_FILENO)))
+		goto err;
+	if (likely(fd != STDERR_FILENO) && unlikely(dup2(fd, STDERR_FILENO)))
+		goto err;
+	if likely(fd != STDIN_FILENO &&
+	          fd != STDOUT_FILENO &&
+	          fd != STDERR_FILENO)
+		close(fd);
+@@pp_endif@@
+	return 0;
+err:
+	return -1;
+}
+
 
 @@Write the given entry into utmp and wtmp
 [[guard, cp_kos, decl_include("<bits/crt/db/utmp.h>")]]

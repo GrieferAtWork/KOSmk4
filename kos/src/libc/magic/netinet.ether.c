@@ -21,40 +21,25 @@
 
 %{
 #include <features.h>
+
+#include <net/ethernet.h>
 #include <netinet/if_ether.h>
 
-__SYSDECL_BEGIN
-
-/* Documentation taken from Glibc /usr/include/netinet/ether.h */
-/* Functions for storing Ethernet addresses in ASCII and mapping to hostnames.
-   Copyright (C) 1996-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
-@@Convert 48 bit Ethernet ADDRess to ASCII
-[[impl_include("<net/ethernet.h>")]]
-[[nonnull]] char *ether_ntoa([[nonnull]] struct ether_addr const *__restrict addr) {
+@@Convert `addr' into a 20-character-long string that
+@@uses the the standard `AA:BB:CC:DD:EE:FF' notation.
+[[decl_prefix(struct ether_addr;)]]
+[[nonnull, wunused, impl_include("<net/ethernet.h>")]]
+char *ether_ntoa([[nonnull]] struct ether_addr const *__restrict addr) {
 	static char buf[21];
 	return ether_ntoa_r(addr, buf);
 }
 
+[[decl_prefix(struct ether_addr;)]]
 [[doc_alias("ether_ntoa"), impl_include("<net/ethernet.h>")]]
 [[nonnull]] char *ether_ntoa_r([[nonnull]] struct ether_addr const *__restrict addr,
                                [[nonnull]] char *__restrict buf) {
@@ -65,13 +50,16 @@ __SYSDECL_BEGIN
 	return buf;
 }
 
-@@Convert ASCII string S to 48 bit Ethernet address
-[[impl_include("<net/ethernet.h>")]]
-[[nonnull]] struct ether_addr *ether_aton([[nonnull]] char const *__restrict asc) {
+@@To the reverse of `ether_ntoa()' and convert
+@@a `AA:BB:CC:DD:EE:FF'-string into an ethernet address.
+[[decl_prefix(struct ether_addr;)]]
+[[wunused, nonnull, impl_include("<net/ethernet.h>")]]
+struct ether_addr *ether_aton([[nonnull]] char const *__restrict asc) {
 	static struct @ether_addr@ addr;
 	return ether_aton_r(asc, &addr);
 }
 
+[[decl_prefix(struct ether_addr;)]]
 [[wunused, doc_alias("ether_aton"), impl_include("<net/ethernet.h>")]]
 struct ether_addr *ether_aton_r([[nonnull]] char const *__restrict asc,
                                 [[nonnull]] struct ether_addr *__restrict addr) {
@@ -79,6 +67,7 @@ struct ether_addr *ether_aton_r([[nonnull]] char const *__restrict asc,
 }
 
 %#ifdef __USE_KOS
+[[decl_prefix(struct ether_addr;)]]
 [[wunused, doc_alias("ether_aton"), impl_include("<net/ethernet.h>")]]
 struct ether_addr *ether_paton_r([[nonnull]] char const **__restrict pasc,
                                  [[nonnull]] struct ether_addr *__restrict addr) {
@@ -125,7 +114,14 @@ struct ether_addr *ether_paton_r([[nonnull]] char const **__restrict pasc,
 }
 %#endif /* __USE_KOS */
 
-@@Scan LINE and set ADDR and HOSTNAME
+@@Scan a given `line', as read from `/etc/ethers' for
+@@its `addr' and `hostname' parts. For this purpose, the given
+@@`line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
+@@@return: 0 : Success
+@@@return: -1: Failed to parse the `addr'-portion
+@@             (`ether_paton_r()' returned `NULL')
+[[decl_prefix(struct ether_addr;)]]
+[[wunused, impl_include("<net/ethernet.h>")]]
 int ether_line([[nonnull]] char const *line,
                [[nonnull]] struct ether_addr *addr,
                [[nonnull]] char *hostname) {
@@ -137,7 +133,11 @@ int ether_line([[nonnull]] char const *line,
 	while (isspace(*line) && *line != '\r' && *line != '\n')
 		++line;
 	/* The remainder of the line is the hostname. */
-	for (hnlen = 0; line[hnlen] && line[hnlen] != '\r' && line[hnlen] != '\n'; ++hnlen)
+	for (hnlen = 0;
+	     line[hnlen] &&
+	     line[hnlen] != '\r' &&
+	     line[hnlen] != '\n';
+	     ++hnlen)
 		;
 	while (hnlen && isspace(line[hnlen - 1]))
 		--hnlen;
@@ -148,19 +148,27 @@ int ether_line([[nonnull]] char const *line,
 	return 0;
 }
 
-@@Map 48 bit Ethernet number ADDR to HOSTNAME
-[[cp_kos]]
-int ether_ntohost(char *hostname, struct ether_addr const *addr);
+@@Map a given `addr' to its corresponding hostname from `/etc/ethers'
+@@@return: 0 : Success
+@@@return: * : No entry for `addr' found, or `/etc/ethers' doesn't exist.
+[[cp_kos, decl_prefix(struct ether_addr;)]]
+int ether_ntohost([[nonnull]] char *hostname,
+                  [[nonnull]] struct ether_addr const *addr);
+/* TODO: Implement `ether_ntohost()' inline */
 
-@@Map HOSTNAME to 48 bit Ethernet address
-[[cp_kos]]
-int ether_hostton(char const *hostname, struct ether_addr *addr);
+
+@@Map a given `hostname' into its corresponding address from `/etc/ethers'
+@@@return: 0 : Success
+@@@return: * : No entry for `hostname' found, or `/etc/ethers' doesn't exist.
+[[cp_kos, decl_prefix(struct ether_addr;)]]
+int ether_hostton([[nonnull]] char const *hostname,
+                  [[nonnull]] struct ether_addr *addr);
+/* TODO: Implement `ether_hostton()' inline */
 
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

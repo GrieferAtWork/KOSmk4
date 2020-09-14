@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30ad3c48 */
+/* HASH CRC-32:0xf8622375 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1174,7 +1174,7 @@
  *   - Even if the thread doesn't deliver a signal upon it terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
- *                      or you had to have been assigned as its child.
+ *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
  * the signal if the thread dies without being detached first, then
  * the call fails by throwing an `E_ILLEGAL_OPERATION'.

@@ -89,7 +89,7 @@ NOTHROW_NCX(LIBCCALL libc_reallocarray)(void *ptr,
 /*[[[body:libc_reallocarray]]]*/
 /*AUTO*/{
 	size_t total_bytes;
-	if (__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
+	if unlikely(__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
 		total_bytes = (size_t)-1; /* Force down-stream failure */
 	return realloc(ptr, total_bytes);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc392d834 */
+/* HASH CRC-32:0x38e8eb6b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,14 +33,16 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <net/ethernet.h>
-/* Convert 48 bit Ethernet ADDRess to ASCII */
-INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL NONNULL((1)) char *
+/* Convert `addr' into a 20-character-long string that
+ * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa)(struct ether_addr const *__restrict addr) {
 	static char buf[21];
 	return libc_ether_ntoa_r(addr, buf);
 }
 #include <net/ethernet.h>
-/* Convert 48 bit Ethernet ADDRess to ASCII */
+/* Convert `addr' into a 20-character-long string that
+ * uses the the standard `AA:BB:CC:DD:EE:FF' notation. */
 INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr,
                                         char *__restrict buf) {
@@ -51,21 +53,24 @@ NOTHROW_NCX(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *__restrict addr
 	return buf;
 }
 #include <net/ethernet.h>
-/* Convert ASCII string S to 48 bit Ethernet address */
-INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL NONNULL((1)) struct ether_addr *
+/* To the reverse of `ether_ntoa()' and convert
+ * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
+INTERN ATTR_SECTION(".text.crt.net.ether") ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton)(char const *__restrict asc) {
 	static struct ether_addr addr;
 	return libc_ether_aton_r(asc, &addr);
 }
 #include <net/ethernet.h>
-/* Convert ASCII string S to 48 bit Ethernet address */
+/* To the reverse of `ether_ntoa()' and convert
+ * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2)) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_aton_r)(char const *__restrict asc,
                                         struct ether_addr *__restrict addr) {
 	return libc_ether_paton_r((char const **)&asc, addr);
 }
 #include <net/ethernet.h>
-/* Convert ASCII string S to 48 bit Ethernet address */
+/* To the reverse of `ether_ntoa()' and convert
+ * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2)) struct ether_addr *
 NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
                                          struct ether_addr *__restrict addr) {
@@ -110,8 +115,14 @@ NOTHROW_NCX(LIBCCALL libc_ether_paton_r)(char const **__restrict pasc,
 	*pasc = asc;
 	return addr;
 }
-/* Scan LINE and set ADDR and HOSTNAME */
-INTERN ATTR_SECTION(".text.crt.net.ether") NONNULL((1, 2, 3)) int
+#include <net/ethernet.h>
+/* Scan a given `line', as read from `/etc/ethers' for
+ * its `addr' and `hostname' parts. For this purpose, the given
+ * `line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
+ * @return: 0 : Success
+ * @return: -1: Failed to parse the `addr'-portion
+ *              (`ether_paton_r()' returned `NULL') */
+INTERN ATTR_SECTION(".text.crt.net.ether") WUNUSED NONNULL((1, 2, 3)) int
 NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line,
                                       struct ether_addr *addr,
                                       char *hostname) {
@@ -123,7 +134,11 @@ NOTHROW_NCX(LIBCCALL libc_ether_line)(char const *line,
 	while (libc_isspace(*line) && *line != '\r' && *line != '\n')
 		++line;
 	/* The remainder of the line is the hostname. */
-	for (hnlen = 0; line[hnlen] && line[hnlen] != '\r' && line[hnlen] != '\n'; ++hnlen)
+	for (hnlen = 0;
+	     line[hnlen] &&
+	     line[hnlen] != '\r' &&
+	     line[hnlen] != '\n';
+	     ++hnlen)
 		;
 	while (hnlen && libc_isspace(line[hnlen - 1]))
 		--hnlen;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d37c964 */
+/* HASH CRC-32:0xfb14ae65 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -468,7 +468,8 @@ INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wwidth)(v
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
@@ -489,7 +490,8 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char16_t *NOTH
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {

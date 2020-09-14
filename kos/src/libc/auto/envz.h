@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b09a090 */
+/* HASH CRC-32:0xb9176572 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,71 +30,77 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 INTDEF ATTR_PURE WUNUSED NONNULL((3)) char *NOTHROW_NCX(LIBDCALL libd_envz_entry)(char const *__restrict envz, size_t envz_len, char const *__restrict name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 INTDEF ATTR_PURE WUNUSED NONNULL((3)) char *NOTHROW_NCX(LIBCCALL libc_envz_entry)(char const *__restrict envz, size_t envz_len, char const *__restrict name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Returns a pointer to the value portion of the entry
- * in `ENVZ' for `NAME', or `NULL' if there is none. */
+/* Return the value in `envz' attached to `name', or `NULL'
+ * if no such entry exists, or the entry doesn't have a value
+ * portion (i.e. doesn't contain a `='-character) */
 INTDEF ATTR_PURE WUNUSED NONNULL((3)) char *NOTHROW_NCX(LIBDCALL libd_envz_get)(char const *__restrict envz, size_t envz_len, char const *__restrict name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Returns a pointer to the value portion of the entry
- * in `ENVZ' for `NAME', or `NULL' if there is none. */
+/* Return the value in `envz' attached to `name', or `NULL'
+ * if no such entry exists, or the entry doesn't have a value
+ * portion (i.e. doesn't contain a `='-character) */
 INTDEF ATTR_PURE WUNUSED NONNULL((3)) char *NOTHROW_NCX(LIBCCALL libc_envz_get)(char const *__restrict envz, size_t envz_len, char const *__restrict name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Adds an entry for `NAME' with value `VALUE' to `ENVZ & ENVZ_LEN'. If an entry
- * with the same name already exists in `ENVZ', it is removed. If `VALUE' is
- * `NULL', then the new entry will not have a value portion, meaning that `envz_get()'
- * will return `NULL', although `envz_entry()' will still return an entry. This is handy
- * because when merging with another envz, the null entry can override an
- * entry in the other one. Such entries can be removed with `envz_strip()' */
+/* Add an entry `name=value' to `penvz'. If another entry for `name'
+ * already existed before, that entry is removed. If `name' is NULL,
+ * the entry created doesn't have a value-portion (i.e. `name' is
+ * added to `penvz' as-is, without the trailing `=value') */
 INTDEF NONNULL((1, 2, 3)) error_t NOTHROW_NCX(LIBDCALL libd_envz_add)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict name, char const *value);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Adds an entry for `NAME' with value `VALUE' to `ENVZ & ENVZ_LEN'. If an entry
- * with the same name already exists in `ENVZ', it is removed. If `VALUE' is
- * `NULL', then the new entry will not have a value portion, meaning that `envz_get()'
- * will return `NULL', although `envz_entry()' will still return an entry. This is handy
- * because when merging with another envz, the null entry can override an
- * entry in the other one. Such entries can be removed with `envz_strip()' */
+/* Add an entry `name=value' to `penvz'. If another entry for `name'
+ * already existed before, that entry is removed. If `name' is NULL,
+ * the entry created doesn't have a value-portion (i.e. `name' is
+ * added to `penvz' as-is, without the trailing `=value') */
 INTDEF NONNULL((1, 2, 3)) error_t NOTHROW_NCX(LIBCCALL libc_envz_add)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict name, char const *value);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
- * If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
- * with the same name in `ENV', otherwise they don't */
+/* Add all entries from `envz2' to `penvz', as though `envz_add()' was
+ * called for each contained `name=value' pair (using `NULL' for value
+ * on pairs that doesn't have a value-portion.
+ * If individual entries already existed in `penvz', behavior depends
+ * on `override_', which if non-zero will cause existing entries to be
+ * overwritten, and otherwise if zero, will cause them to stay. */
 INTDEF NONNULL((1, 2, 3)) error_t NOTHROW_NCX(LIBDCALL libd_envz_merge)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict envz2, size_t envz2_len, int override_);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
- * If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
- * with the same name in `ENV', otherwise they don't */
+/* Add all entries from `envz2' to `penvz', as though `envz_add()' was
+ * called for each contained `name=value' pair (using `NULL' for value
+ * on pairs that doesn't have a value-portion.
+ * If individual entries already existed in `penvz', behavior depends
+ * on `override_', which if non-zero will cause existing entries to be
+ * overwritten, and otherwise if zero, will cause them to stay. */
 INTDEF NONNULL((1, 2, 3)) error_t NOTHROW_NCX(LIBCCALL libc_envz_merge)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict envz2, size_t envz2_len, int override_);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any */
+/* Remove an entry matching `name' from `penvz',
+ * or do nothing if no such entry exists. */
 INTDEF NONNULL((1, 2, 3)) void NOTHROW_NCX(LIBDCALL libd_envz_remove)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any */
+/* Remove an entry matching `name' from `penvz',
+ * or do nothing if no such entry exists. */
 INTDEF NONNULL((1, 2, 3)) void NOTHROW_NCX(LIBCCALL libc_envz_remove)(char **__restrict penvz, size_t *__restrict penvz_len, char const *__restrict name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Remove entries that have no value attached */
+/* Remove all entries from `penvz' that don't have a value-portion. */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_envz_strip)(char **__restrict penvz, size_t *__restrict penvz_len);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Remove entries that have no value attached */
+/* Remove all entries from `penvz' that don't have a value-portion. */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz, size_t *__restrict penvz_len);
 #endif /* !__KERNEL__ */
 

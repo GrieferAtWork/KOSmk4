@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69d9923b */
+/* HASH CRC-32:0xb327fcfa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_join_defined
 #define __local___localdep_pthread_join_defined 1
 __NAMESPACE_LOCAL_END
-#include <bits/crt/pthreadtypes.h>
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN

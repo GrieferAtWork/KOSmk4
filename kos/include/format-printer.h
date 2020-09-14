@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x610dd945 */
+/* HASH CRC-32:0x7f162c5a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,6 +84,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_repeat,(pformatp
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_repeat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_repeat)(pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_repeat))(__printer, __arg, __ch, __num_repetitions); })
 #endif /* !__CRT_HAVE_format_repeat */
 
+/* TODO: These constants should go into <asm/crt/format-printer.h> */
 #define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
 #define FORMAT_ESCAPE_FFORCEHEX 0x0002 /* Force hex encoding of all control characters without special strings (`"\n"', etc.). */
@@ -139,6 +140,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_escape,(pformat
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_escape, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_escape)(pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_escape))(__printer, __arg, __text, __textlen, __flags); })
 #endif /* !... */
+/* TODO: These constants should go into <asm/crt/format-printer.h> */
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
 #define FORMAT_HEXDUMP_FNOADDRESS 0x0002 /* Don't include the absolute address at the start of every line. */
@@ -756,7 +758,8 @@ struct format_aprintf_data {
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
  * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
@@ -779,7 +782,8 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
  * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {

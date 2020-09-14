@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc49baabd */
+/* HASH CRC-32:0x7c761116 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_mutex_trylock_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Try locking a mutex
  * @return: EOK:   Success

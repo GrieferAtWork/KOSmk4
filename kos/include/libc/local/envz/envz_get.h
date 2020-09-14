@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x140407ad */
+/* HASH CRC-32:0x49b3afec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,16 +27,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_envz_entry_defined
 #define __local___localdep_envz_entry_defined 1
 #ifdef __CRT_HAVE_envz_entry
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,__localdep_envz_entry,(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name),envz_entry,(__envz,__envz_len,__name))
 #else /* __CRT_HAVE_envz_entry */
 __NAMESPACE_LOCAL_END
 #include <libc/local/envz/envz_entry.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
- * Note that if `name' contains a `=' character, only characters leading up to this
+/* Find and return the entry for `name' in `envz', or `NULL' if not found.
+ * If `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
 #define __localdep_envz_entry __LIBC_LOCAL_NAME(envz_entry)
 #endif /* !__CRT_HAVE_envz_entry */
@@ -58,8 +58,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
-/* Returns a pointer to the value portion of the entry
- * in `ENVZ' for `NAME', or `NULL' if there is none. */
+/* Return the value in `envz' attached to `name', or `NULL'
+ * if no such entry exists, or the entry doesn't have a value
+ * portion (i.e. doesn't contain a `='-character) */
 __LOCAL_LIBC(envz_get) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_get))(char const *__restrict __envz, __SIZE_TYPE__ __envz_len, char const *__restrict __name) {
 	char *__result;

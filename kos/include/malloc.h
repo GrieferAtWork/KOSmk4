@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf62eac5a */
+/* HASH CRC-32:0x875f37b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -316,7 +316,7 @@ __NAMESPACE_LOCAL_BEGIN
 __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2))
 void *__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallocv))(size_t __elem_count, size_t __elem_size) {
 	size_t __total_size;
-	if (__hybrid_overflow_umul(__elem_count, __elem_size, &__total_size))
+	if __unlikely(__hybrid_overflow_umul(__elem_count, __elem_size, &__total_size))
 		__total_size = (size_t)-1; /* Force down-stream failure */
 	return (malloc)(__total_size);
 }

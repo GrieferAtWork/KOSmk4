@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6199ac28 */
+/* HASH CRC-32:0xfdfa0143 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,34 +18,63 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_FNMATCH_H
-#define GUARD_LIBC_AUTO_FNMATCH_H 1
+#ifndef GUARD_LIBC_AUTO_UTMP_C
+#define GUARD_LIBC_AUTO_UTMP_C 1
 
 #include "../api.h"
-
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <fnmatch.h>
+#include "../user/utmp.h"
+#include "../user/sys.ioctl.h"
+#include "../user/unistd.h"
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Match the given `name' against `pattern', returning
- * `0' if they match, and `FNM_NOMATCH' otherwise.
- * @param: match_flags:   Set of `FNM_*'
- * @return: 0           : `name' is matched by `pattern'
- * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_fnmatch)(char const *pattern, char const *name, __STDC_INT_AS_UINT_T match_flags);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Match the given `name' against `pattern', returning
- * `0' if they match, and `FNM_NOMATCH' otherwise.
- * @param: match_flags:   Set of `FNM_*'
- * @return: 0           : `name' is matched by `pattern'
- * @return: FNM_NOMATCH : `name' is not matched by `pattern' */
-INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern, char const *name, __STDC_INT_AS_UINT_T match_flags);
+#include <asm/ioctls/tty.h>
+#include <asm/stdio.h>
+/* Make FD be the controlling terminal, stdin, stdout, and stderr;
+ * then close FD. Returns 0 on success, nonzero on error */
+INTERN ATTR_SECTION(".text.crt.io.tty") int
+NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
+	if unlikely(libc_setsid() < 0)
+		goto err;
+	if unlikely(libc_ioctl(fd, TIOCSCTTY) < 0)
+		goto err;
+#if !STDIN_FILENO && STDOUT_FILENO == 1 && STDERR_FILENO == 2
+	{
+		fd_t i;
+		for (i = 0; i <= 2; ++i) {
+			if likely(fd != i) {
+				if unlikely(libc_dup2(fd, i))
+					goto err;
+			}
+		}
+	}
+	if likely(fd >= 3)
+		libc_close(fd);
+#else /* !STDIN_FILENO && STDOUT_FILENO == 1 && STDERR_FILENO == 2 */
+	if (likely(fd != STDIN_FILENO) && unlikely(libc_dup2(fd, STDIN_FILENO)))
+		goto err;
+	if (likely(fd != STDOUT_FILENO) && unlikely(libc_dup2(fd, STDOUT_FILENO)))
+		goto err;
+	if (likely(fd != STDERR_FILENO) && unlikely(libc_dup2(fd, STDERR_FILENO)))
+		goto err;
+	if likely(fd != STDIN_FILENO &&
+	          fd != STDOUT_FILENO &&
+	          fd != STDERR_FILENO)
+		libc_close(fd);
+#endif /* STDIN_FILENO || STDOUT_FILENO != 1 || STDERR_FILENO != 2 */
+	return 0;
+err:
+	return -1;
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_AUTO_FNMATCH_H */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(login_tty, libc_login_tty);
+#endif /* !__KERNEL__ */
+
+#endif /* !GUARD_LIBC_AUTO_UTMP_C */

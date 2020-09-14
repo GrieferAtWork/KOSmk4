@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcb30335 */
+/* HASH CRC-32:0x9deec9d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -279,6 +279,10 @@ __SYSDECL_BEGIN
  * NOTE: Of course this auto-generated stack will also be automatically
  *       munmap()'ed once the thread exists, meaning it's the perfect solution
  *       for simple user-space multithreading that doesn't want to use <pthread.h>. */
+/* TODO: KOSmk4 no longer supports automatic user-space stacks, but this
+ *       functionality is currently assumed and made use of by `_beginthreadex(3)'.
+ *     > Fix this by restricting this constant to __KOS_VERSION__ < 400, and re-write
+ *       said function to simply make use of `pthread_create()' */
 #ifndef CLONE_CHILDSTACK_AUTO
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 #define CLONE_CHILDSTACK_AUTO ((void *)0)
@@ -326,8 +330,7 @@ __SYSDECL_BEGIN
 /* Generic set of clone flags implementing behavior
  * that one would expect for a thread or process. */
 #define CLONE_NEW_THREAD       \
-	(0 |                       \
-	 __PRIVATE_CLONE_THREAD |  \
+	(__PRIVATE_CLONE_THREAD |  \
 	 __PRIVATE_CLONE_VM |      \
 	 __PRIVATE_CLONE_FS |      \
 	 __PRIVATE_CLONE_FILES |   \

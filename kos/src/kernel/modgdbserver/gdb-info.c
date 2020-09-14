@@ -248,7 +248,8 @@ err:
 
 PRIVATE NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) {
-	size_t i; ssize_t temp, result = 0;
+	size_t i;
+	ssize_t temp, result = 0;
 	REF struct driver_state *state;
 	state = driver_get_state();
 	for (i = 0; i < state->ds_count; ++i) {

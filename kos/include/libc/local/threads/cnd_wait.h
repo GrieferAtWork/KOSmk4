@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3782acd */
+/* HASH CRC-32:0x9293e09b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_pthread_cond_wait_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait for condition variable COND to be signaled or broadcast.
  * MUTEX is assumed to be locked before.

@@ -36,13 +36,13 @@ __SYSDECL_BEGIN
 
 }
 
-c16ftime(*) %{uchar("wcsftime")}
-c32ftime(*) %{uchar("wcsftime")}
+c16ftime(*) %{uchar16("wcsftime")}
+c32ftime(*) %{uchar32("wcsftime")}
 
 %
 %#ifdef __USE_GNU
-c16ftime_l(*) %{uchar("wcsftime_l")}
-c32ftime_l(*) %{uchar("wcsftime_l")}
+c16ftime_l(*) %{uchar16("wcsftime_l")}
+c32ftime_l(*) %{uchar32("wcsftime_l")}
 %#endif /* __USE_GNU */
 
 

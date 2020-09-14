@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e2f5894 */
+/* HASH CRC-32:0xe8250d41 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,6 +49,10 @@
 #include <endian.h>
 #include <stdint.h>
 #endif /* __USE_GLIBC */
+
+/* TODO: Constants and structs from this header should
+ *       be moved into <asm/> and <bits/> headers! */
+
 
 /* Documentation taken from Glibc /usr/include/netinet/in.h */
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -242,53 +246,47 @@ struct group_filter {
 #endif /* __USE_MISC */
 
 #ifdef __CRT_HAVE_htons
-__CDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),(__hostword))
+__CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #elif defined(__CRT_HAVE_ntohs) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),ntohs,(__hostword))
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,htons,(__UINT16_TYPE__ __hostword),ntohs,{ return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); })
 #else /* ... */
-#include <libc/local/netinet.in/htons.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(htons, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htons))(__hostword); })
+__LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL htons)(__UINT16_TYPE__ __hostword) { return (__UINT16_TYPE__)__hybrid_htobe32(__hostword); }
 #endif /* !... */
 #ifdef __CRT_HAVE_ntohs
-__CDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),(__netshort))
+__CEIDECLARE(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #elif defined(__CRT_HAVE_htons) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),htons,(__netshort))
+__CEIREDIRECT(__ATTR_CONST,__UINT16_TYPE__,__NOTHROW_NCX,ntohs,(__UINT16_TYPE__ __netshort),htons,{ return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); })
 #else /* ... */
-#include <libc/local/netinet.in/ntohs.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ntohs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohs))(__netshort); })
+__LOCAL __ATTR_CONST __UINT16_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohs)(__UINT16_TYPE__ __netshort) { return (__UINT16_TYPE__)__hybrid_betoh16(__netshort); }
 #endif /* !... */
 #ifdef __CRT_HAVE_htonl
-__CDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),(__hostlong))
+__CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #elif defined(__CRT_HAVE_ntohl) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),ntohl,(__hostlong))
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,htonl,(__UINT32_TYPE__ __hostlong),ntohl,{ return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); })
 #else /* ... */
-#include <libc/local/netinet.in/htonl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(htonl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TYPE__ __hostlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonl))(__hostlong); })
+__LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL htonl)(__UINT32_TYPE__ __hostlong) { return (__UINT32_TYPE__)__hybrid_htobe32(__hostlong); }
 #endif /* !... */
 #ifdef __CRT_HAVE_ntohl
-__CDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),(__netlong))
+__CEIDECLARE(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #elif defined(__CRT_HAVE_htonl) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),htonl,(__netlong))
+__CEIREDIRECT(__ATTR_CONST,__UINT32_TYPE__,__NOTHROW_NCX,ntohl,(__UINT32_TYPE__ __netlong),htonl,{ return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); })
 #else /* ... */
-#include <libc/local/netinet.in/ntohl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ntohl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohl)(__UINT32_TYPE__ __netlong) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohl))(__netlong); })
+__LOCAL __ATTR_CONST __UINT32_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohl)(__UINT32_TYPE__ __netlong) { return (__UINT32_TYPE__)__hybrid_betoh32(__netlong); }
 #endif /* !... */
 #if defined(__USE_KOS) && defined(__UINT64_TYPE__)
 #ifdef __CRT_HAVE_htonq
-__CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),(__hostquad))
+__CEIDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),{ return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); })
 #elif defined(__CRT_HAVE_ntohq) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),ntohq,(__hostquad))
+__CEIREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,htonq,(__UINT64_TYPE__ __hostquad),ntohq,{ return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); })
 #else /* ... */
-#include <libc/local/netinet.in/htonq.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(htonq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL htonq)(__UINT64_TYPE__ __hostquad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(htonq))(__hostquad); })
+__LOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL htonq)(__UINT64_TYPE__ __hostquad) { return (__UINT64_TYPE__)__hybrid_htobe64(__hostquad); }
 #endif /* !... */
 #ifdef __CRT_HAVE_ntohq
-__CDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),(__netquad))
+__CEIDECLARE(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),{ return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); })
 #elif defined(__CRT_HAVE_htonq) && defined(__HYBRID_HTOBE_IS_BETOH)
-__CREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),htonq,(__netquad))
+__CEIREDIRECT(__ATTR_CONST,__UINT64_TYPE__,__NOTHROW_NCX,ntohq,(__UINT64_TYPE__ __netquad),htonq,{ return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); })
 #else /* ... */
-#include <libc/local/netinet.in/ntohq.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ntohq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohq)(__UINT64_TYPE__ __netquad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ntohq))(__netquad); })
+__LOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohq)(__UINT64_TYPE__ __netquad) { return (__UINT64_TYPE__)__hybrid_betoh64(__netquad); }
 #endif /* !... */
 #endif /* __USE_KOS && __UINT64_TYPE__ */
 

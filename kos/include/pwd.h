@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ad0b686 */
+/* HASH CRC-32:0xc6631ad0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,31 +32,18 @@
 #include <bits/types.h>
 #include <bits/crt/db/passwd.h>
 
-/* Documentation taken from Glibc /usr/include/pwd.h */
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
 __SYSDECL_BEGIN
 
 #if defined(__USE_POSIX) && defined(__USE_MISC)
-/* Reasonable value for the buffer sized used in the
- * reentrant functions below. But better use `sysconf'. */
-#define NSS_BUFLEN_PASSWD  1024
+/* Ignore this value. It's just some nonsensical constant here
+ * for historic purposes and posix compliance. All functions
+ * found in this header are able to operate on arbitrarily-sized
+ * user password database entires, and so should your program,
+ * meaning this value is entirely pointless and should actually
+ * be considered as INFINITE.
+ * Also: there's a `_SC_GETPW_R_SIZE_MAX' which also just returns
+ *       this value, so it's just as useless. */
+#define NSS_BUFLEN_PASSWD 1024
 #endif /* __USE_POSIX && __USE_MISC */
 
 #ifdef __CC__
@@ -98,7 +85,8 @@ __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setpwent,(void),())
 __CDECLARE_VOID_OPT(,__NOTHROW_RPC_NOKOS,endpwent,(void),())
 /* Read an entry from the password-file stream, opening it if necessary
  * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read (use `setpwent()' to rewind the database)
+ * return: NULL: (errno = <unchanged>) The last entry has already been read
+ *                                     (use `setpwent()' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(,struct passwd *,__NOTHROW_RPC,getpwent,(void),())
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
@@ -116,7 +104,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,getpwnam,(const
 #ifdef __USE_MISC
 /* Read an entry from STREAM
  * return: * :                         A pointer to the read password entry
- * return: NULL: (errno = <unchanged>) The last entry has already been read (use `rewind(stream)' to rewind the database)
+ * return: NULL: (errno = <unchanged>) The last entry has already been read
+ *                                     (use `rewind(stream)' to rewind the database)
  * return: NULL: (errno = <changed>)   Error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),struct passwd *,__NOTHROW_RPC,fgetpwent,(__FILE *__restrict __stream),(__stream))
 #ifdef __CRT_HAVE_putpwent

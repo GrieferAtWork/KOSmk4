@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60253b2b */
+/* HASH CRC-32:0xfb8afee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -619,7 +619,7 @@ __DECL_BEGIN
 
 /* Signal codes. */
 #ifndef E_INTERRUPT
-/* The thread has been interrupted by a PRC function,
+/* The thread has been interrupted by a RPC function,
  * causing a premature return to user-space.
  * NOTE: If the system communication facility that was used for the interrupt
  *       supports restarting (e.g. loadcore() following a #PF on X86), or if the

@@ -968,7 +968,7 @@ class E_UNICODE_ERROR = 0x0091 {
 %#ifndef E_INTERRUPT
 [errno(EINTR)]
 [message("Interrupt")]
-@@The thread has been interrupted by a PRC function,
+@@The thread has been interrupted by a RPC function,
 @@causing a premature return to user-space.
 @@NOTE: If the system communication facility that was used for the interrupt
 @@      supports restarting (e.g. loadcore() following a #PF on X86), or if the

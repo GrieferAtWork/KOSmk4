@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d33de4a */
+/* HASH CRC-32:0x789426f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,42 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Create pseudo tty master slave pair with NAME and set terminal
- * attributes according to TERMP and WINP and return handles for
- * both ends in AMASTER and ASLAVE */
+/* >> openpty(2)
+ * Create a new ptty (psuedo tty), storing the handles for the
+ * master/slave adapters in `*amaster' and `*aslave'. Additionally,
+ * the caller may specific the initial terminial settings `termp'
+ * and window size `winp', as well as a location where the kernel
+ * should store the filename of the PTY master socket (as already
+ * returned in `*amaster'). Note that the max length of this filename
+ * is implementation defined, with no way for the use to specify how
+ * much space is is available in the passed buffer. As such, a
+ * portable application can only ever pass `NULL' for this value.
+ * On KOS, the value written to `name' is the absolute filename of
+ * the master-device in the `/dev' filesystem, which usually means
+ * that the written filename is something like `/dev/ptyp0'.
+ * NOTE: On KOS, this function is a system call, though in other
+ *       operating system it is often implemented via `open(2)',
+ *       possibly combined with `ioctl(2)'. */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_openpty)(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp);
-/* Create child process and establish the slave pseudo
- * terminal as the child's controlling terminal */
+/* >> forkpty(3)
+ * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
+ * such that the newly created PTY is open under all std-handles in
+ * the newly created child process.
+ * Aside from this, this function returns the same as fork(2), that is
+ * it returns in both the parent and child processes, returning `0'
+ * for the child, and the child's PID for the parent (or -1 in only the
+ * parent if something went wrong) */
 INTDEF NONNULL((1)) pid_t NOTHROW_NCX(LIBDCALL libd_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Create child process and establish the slave pseudo
- * terminal as the child's controlling terminal */
+/* >> forkpty(3)
+ * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
+ * such that the newly created PTY is open under all std-handles in
+ * the newly created child process.
+ * Aside from this, this function returns the same as fork(2), that is
+ * it returns in both the parent and child processes, returning `0'
+ * for the child, and the child's PID for the parent (or -1 in only the
+ * parent if something went wrong) */
 INTDEF NONNULL((1)) pid_t NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster, char *name, struct termios const *termp, struct winsize const *winp);
 #endif /* !__KERNEL__ */
 

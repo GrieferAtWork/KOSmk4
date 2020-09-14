@@ -470,6 +470,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Replace `NONNULL((1)) ATTR_RETNONNULL' -> `ATTR_RETNONNULL NONNULL((1))' */
 
+	/* TODO: Trigger `DEBUGTRAP_REASON_VFORK' and `DEBUGTRAP_REASON_VFORKDONE'
+	 *       at appropriate locations within the kernel. */
+
 	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
 	 *      the instruction stream to figure out how to unwind the stack.
 	 *      This unwinder should assume the default calling convention for every

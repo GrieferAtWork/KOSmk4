@@ -212,7 +212,7 @@ void *memcdup([[nonnull]] void const *__restrict ptr, int needle, size_t n_bytes
 reallocarray(void *ptr, $size_t elem_count, $size_t elem_size)
 		-> [[realloc(mallptr, elem_count * elem_size)]] void * {
 	size_t total_bytes;
-	if (__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
+	if unlikely(__hybrid_overflow_umul(elem_count, elem_size, &total_bytes))
 		total_bytes = (size_t)-1; /* Force down-stream failure */
 	return realloc(ptr, total_bytes);
 }
@@ -266,7 +266,7 @@ __NAMESPACE_LOCAL_BEGIN
 __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2))
 void *__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallocv))(size_t __elem_count, size_t __elem_size) {
 	size_t __total_size;
-	if (__hybrid_overflow_umul(__elem_count, __elem_size, &__total_size))
+	if __unlikely(__hybrid_overflow_umul(__elem_count, __elem_size, &__total_size))
 		__total_size = (size_t)-1; /* Force down-stream failure */
 	return (malloc)(__total_size);
 }

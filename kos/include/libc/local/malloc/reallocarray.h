@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ec30139 */
+/* HASH CRC-32:0xaecbe630 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(reallocarray) __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_SIZE((2, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(reallocarray))(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) {
 	__SIZE_TYPE__ __total_bytes;
-	if (__hybrid_overflow_umul(__elem_count, __elem_size, &__total_bytes))
+	if __unlikely(__hybrid_overflow_umul(__elem_count, __elem_size, &__total_bytes))
 		__total_bytes = (__SIZE_TYPE__)-1; /* Force down-stream failure */
 	return __localdep_realloc(__ptr, __total_bytes);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6eb27332 */
+/* HASH CRC-32:0x70eef7d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11761,7 +11761,7 @@ END(__x86_asm64_syscall_getdrives)
  *   - Even if the thread doesn't deliver a signal upon it terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
- *                      or you had to have been assigned as its child.
+ *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
  * the signal if the thread dies without being detached first, then
  * the call fails by throwing an `E_ILLEGAL_OPERATION'.
@@ -27450,7 +27450,7 @@ END(__x86_asm32_int80_getdrives)
  *   - Even if the thread doesn't deliver a signal upon it terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
- *                      or you had to have been assigned as its child.
+ *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
  * the signal if the thread dies without being detached first, then
  * the call fails by throwing an `E_ILLEGAL_OPERATION'.
@@ -31818,7 +31818,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getdrives, __x86_asm32_int80_getdr
  *   - Even if the thread doesn't deliver a signal upon it terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
- *                      or you had to have been assigned as its child.
+ *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
  * the signal if the thread dies without being detached first, then
  * the call fails by throwing an `E_ILLEGAL_OPERATION'.
@@ -37542,7 +37542,7 @@ END(__x86_asm32_sysrun32_frealpath4)
  *   - Even if the thread doesn't deliver a signal upon it terminating,
  *     the process that would have received such a signal is still relevant.
  *   -> In other words: The thread `PID' must be one of your children,
- *                      or you had to have been assigned as its child.
+ *                      or had you assigned as its parent.
  * If the calling thread isn't part of that process that will receive
  * the signal if the thread dies without being detached first, then
  * the call fails by throwing an `E_ILLEGAL_OPERATION'.

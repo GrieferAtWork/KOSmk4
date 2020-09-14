@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9503e696 */
+/* HASH CRC-32:0x7f1d1388 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,11 @@ __SYSDECL_BEGIN
 
 
 #ifndef TSS_DTOR_ITERATIONS
+#ifdef __TSS_DTOR_ITERATIONS
+#define TSS_DTOR_ITERATIONS __TSS_DTOR_ITERATIONS
+#else /* __TSS_DTOR_ITERATIONS */
 #define TSS_DTOR_ITERATIONS 4
+#endif /* !__TSS_DTOR_ITERATIONS */
 #endif /* !TSS_DTOR_ITERATIONS */
 
 

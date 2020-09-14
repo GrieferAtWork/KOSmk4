@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb74e94cd */
+/* HASH CRC-32:0x49869044 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,8 +26,8 @@
 #define ____pthread_once_routine_t_defined 1
 typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 #endif /* !____pthread_once_routine_t_defined */
-#include <bits/crt/pthreadtypes.h>
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 #include <asm/crt/pthreadvalues.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>

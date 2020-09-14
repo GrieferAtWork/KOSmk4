@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe68f4b0c */
+/* HASH CRC-32:0x1ae74b0f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,6 +57,7 @@ __SYSDECL_BEGIN
 
 /* The `getifaddrs' function generates a linked list of these structures.
  * Each element of the list describes one network interface. */
+/* TODO: These structures should go into <bits/crt/ifaddrs.h> */
 struct ifaddrs {
 	struct ifaddrs  *ifa_next;    /* Pointer to the next structure. */
 	char            *ifa_name;    /* Name of this network interface. */

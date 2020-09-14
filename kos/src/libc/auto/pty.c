@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82c6021c */
+/* HASH CRC-32:0x3ac87b20 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,8 +32,14 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Create child process and establish the slave pseudo
- * terminal as the child's controlling terminal */
+/* >> forkpty(3)
+ * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
+ * such that the newly created PTY is open under all std-handles in
+ * the newly created child process.
+ * Aside from this, this function returns the same as fork(2), that is
+ * it returns in both the parent and child processes, returning `0'
+ * for the child, and the child's PID for the parent (or -1 in only the
+ * parent if something went wrong) */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) pid_t
 NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster,
                                    char *name,

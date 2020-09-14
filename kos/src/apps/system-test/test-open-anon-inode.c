@@ -65,6 +65,7 @@ DECL_BEGIN
  *
  * Behavior without special handling:
  *    `open("/proc/self/fd/0")' acts as `open(readlink("/proc/self/fd/0"))'
+ *                              acts as `open(frealpath(fd: 0))'
  *
  */
 DEFINE_TEST(open_anon_inode) {

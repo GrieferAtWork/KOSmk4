@@ -27,7 +27,7 @@
 #include <features.h>
 
 #include <hybrid/floatcore.h>
-#include <hybrid/host.h>
+#include <hybrid/host.h> /* TODO: Get rid of this #include! */
 #include <hybrid/typecore.h>
 
 #ifdef __USE_DOS
@@ -36,103 +36,198 @@
 
 __SYSDECL_BEGIN
 
-/* Mostly taken from GCC's fixinclude <float.h> header, but still
- * required due to several extensions DOS puts in this header.
- * The following disclaimer can be found in GCC's header. */
-
-/* Copyright (C) 2002-2016 Free Software Foundation, Inc.
-
-This file is part of GCC.
-
-GCC is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 3, or (at your option)
-any later version.
-
-GCC is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-Under Section 7 of GPL version 3, you are granted additional
-permissions described in the GCC Runtime Library Exception, version
-3.1, as published by the Free Software Foundation.
-
-You should have received a copy of the GNU General Public License and
-a copy of the GCC Runtime Library Exception along with this program;
-see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
-<http://www.gnu.org/licenses/>.  */
-
+#ifdef __FLT_RADIX__
 #define FLT_RADIX        __FLT_RADIX__
+#endif /* __FLT_RADIX__ */
+#ifdef __FLT_MANT_DIG__
 #define FLT_MANT_DIG     __FLT_MANT_DIG__
+#endif /* __FLT_MANT_DIG__ */
+#ifdef __DBL_MANT_DIG__
 #define DBL_MANT_DIG     __DBL_MANT_DIG__
+#endif /* __DBL_MANT_DIG__ */
+#ifdef __LDBL_MANT_DIG__
 #define LDBL_MANT_DIG    __LDBL_MANT_DIG__
+#endif /* __LDBL_MANT_DIG__ */
+#ifdef __FLT_DIG__
 #define FLT_DIG          __FLT_DIG__
+#endif /* __FLT_DIG__ */
+#ifdef __DBL_DIG__
 #define DBL_DIG          __DBL_DIG__
+#endif /* __DBL_DIG__ */
+#ifdef __LDBL_DIG__
 #define LDBL_DIG         __LDBL_DIG__
+#endif /* __LDBL_DIG__ */
+#ifdef __FLT_MIN_EXP__
 #define FLT_MIN_EXP      __FLT_MIN_EXP__
+#endif /* __FLT_MIN_EXP__ */
+#ifdef __DBL_MIN_EXP__
 #define DBL_MIN_EXP      __DBL_MIN_EXP__
+#endif /* __DBL_MIN_EXP__ */
+#ifdef __LDBL_MIN_EXP__
 #define LDBL_MIN_EXP     __LDBL_MIN_EXP__
+#endif /* __LDBL_MIN_EXP__ */
+#ifdef __FLT_MIN_10_EXP__
 #define FLT_MIN_10_EXP   __FLT_MIN_10_EXP__
+#endif /* __FLT_MIN_10_EXP__ */
+#ifdef __DBL_MIN_10_EXP__
 #define DBL_MIN_10_EXP   __DBL_MIN_10_EXP__
+#endif /* __DBL_MIN_10_EXP__ */
+#ifdef __LDBL_MIN_10_EXP__
 #define LDBL_MIN_10_EXP  __LDBL_MIN_10_EXP__
+#endif /* __LDBL_MIN_10_EXP__ */
+#ifdef __FLT_MAX_EXP__
 #define FLT_MAX_EXP      __FLT_MAX_EXP__
+#endif /* __FLT_MAX_EXP__ */
+#ifdef __DBL_MAX_EXP__
 #define DBL_MAX_EXP      __DBL_MAX_EXP__
+#endif /* __DBL_MAX_EXP__ */
+#ifdef __LDBL_MAX_EXP__
 #define LDBL_MAX_EXP     __LDBL_MAX_EXP__
+#endif /* __LDBL_MAX_EXP__ */
+#ifdef __FLT_MAX_10_EXP__
 #define FLT_MAX_10_EXP   __FLT_MAX_10_EXP__
+#endif /* __FLT_MAX_10_EXP__ */
+#ifdef __DBL_MAX_10_EXP__
 #define DBL_MAX_10_EXP   __DBL_MAX_10_EXP__
+#endif /* __DBL_MAX_10_EXP__ */
+#ifdef __LDBL_MAX_10_EXP__
 #define LDBL_MAX_10_EXP  __LDBL_MAX_10_EXP__
+#endif /* __LDBL_MAX_10_EXP__ */
+#ifdef __FLT_MAX__
 #define FLT_MAX          __FLT_MAX__
+#endif /* __FLT_MAX__ */
+#ifdef __DBL_MAX__
 #define DBL_MAX          __DBL_MAX__
+#endif /* __DBL_MAX__ */
+#ifdef __LDBL_MAX__
 #define LDBL_MAX         __LDBL_MAX__
+#endif /* __LDBL_MAX__ */
+#ifdef __FLT_EPSILON__
 #define FLT_EPSILON      __FLT_EPSILON__
+#endif /* __FLT_EPSILON__ */
+#ifdef __DBL_EPSILON__
 #define DBL_EPSILON      __DBL_EPSILON__
+#endif /* __DBL_EPSILON__ */
+#ifdef __LDBL_EPSILON__
 #define LDBL_EPSILON     __LDBL_EPSILON__
+#endif /* __LDBL_EPSILON__ */
+#ifdef __FLT_MIN__
 #define FLT_MIN          __FLT_MIN__
+#endif /* __FLT_MIN__ */
+#ifdef __DBL_MIN__
 #define DBL_MIN          __DBL_MIN__
+#endif /* __DBL_MIN__ */
+#ifdef __LDBL_MIN__
 #define LDBL_MIN         __LDBL_MIN__
+#endif /* __LDBL_MIN__ */
 #define FLT_ROUNDS       1
 
 #if defined(__USE_ISOC99) || defined(__USE_ISOCXX11)
+#ifdef __FLT_EVAL_METHOD__
 #define FLT_EVAL_METHOD  __FLT_EVAL_METHOD__
+#endif /* __FLT_EVAL_METHOD__ */
+#ifdef __DECIMAL_DIG__
 #define DECIMAL_DIG      __DECIMAL_DIG__
+#endif /* __DECIMAL_DIG__ */
 #endif /* __USE_ISOC99 || __USE_ISOCXX11 */
 
 #ifdef __USE_ISOC11
+#ifdef __FLT_DECIMAL_DIG__
 #define FLT_DECIMAL_DIG  __FLT_DECIMAL_DIG__
+#endif /* __FLT_DECIMAL_DIG__ */
+#ifdef __DBL_DECIMAL_DIG__
 #define DBL_DECIMAL_DIG  __DBL_DECIMAL_DIG__
+#endif /* __DBL_DECIMAL_DIG__ */
+#ifdef __DECIMAL_DIG__
 #define LDBL_DECIMAL_DIG __DECIMAL_DIG__
+#endif /* __DECIMAL_DIG__ */
+#ifdef __FLT_HAS_DENORM__
 #define FLT_HAS_SUBNORM  __FLT_HAS_DENORM__
+#endif /* __FLT_HAS_DENORM__ */
+#ifdef __DBL_HAS_DENORM__
 #define DBL_HAS_SUBNORM  __DBL_HAS_DENORM__
+#endif /* __DBL_HAS_DENORM__ */
+#ifdef __LDBL_HAS_DENORM__
 #define LDBL_HAS_SUBNORM __LDBL_HAS_DENORM__
+#endif /* __LDBL_HAS_DENORM__ */
+#ifdef __FLT_DENORM_MIN__
 #define FLT_TRUE_MIN     __FLT_DENORM_MIN__
+#endif /* __FLT_DENORM_MIN__ */
+#ifdef __DBL_DENORM_MIN__
 #define DBL_TRUE_MIN     __DBL_DENORM_MIN__
+#endif /* __DBL_DENORM_MIN__ */
+#ifdef __LDBL_DENORM_MIN__
 #define LDBL_TRUE_MIN    __LDBL_DENORM_MIN__
+#endif /* __LDBL_DENORM_MIN__ */
 #endif /* __USE_ISOC11 */
 
 #ifdef __STDC_WANT_DEC_FP__
+#ifdef __DEC32_EPSILON__
 #define DEC32_EPSILON        __DEC32_EPSILON__
+#endif /* __DEC32_EPSILON__ */
+#ifdef __DEC32_MANT_DIG__
 #define DEC32_MANT_DIG       __DEC32_MANT_DIG__
+#endif /* __DEC32_MANT_DIG__ */
+#ifdef __DEC32_MAX__
 #define DEC32_MAX            __DEC32_MAX__
+#endif /* __DEC32_MAX__ */
+#ifdef __DEC32_MAX_EXP__
 #define DEC32_MAX_EXP        __DEC32_MAX_EXP__
+#endif /* __DEC32_MAX_EXP__ */
+#ifdef __DEC32_MIN__
 #define DEC32_MIN            __DEC32_MIN__
+#endif /* __DEC32_MIN__ */
+#ifdef __DEC32_MIN_EXP__
 #define DEC32_MIN_EXP        __DEC32_MIN_EXP__
+#endif /* __DEC32_MIN_EXP__ */
+#ifdef __DEC32_SUBNORMAL_MIN__
 #define DEC32_SUBNORMAL_MIN  __DEC32_SUBNORMAL_MIN__
+#endif /* __DEC32_SUBNORMAL_MIN__ */
+#ifdef __DEC64_EPSILON__
 #define DEC64_EPSILON        __DEC64_EPSILON__
+#endif /* __DEC64_EPSILON__ */
+#ifdef __DEC64_MANT_DIG__
 #define DEC64_MANT_DIG       __DEC64_MANT_DIG__
+#endif /* __DEC64_MANT_DIG__ */
+#ifdef __DEC64_MAX__
 #define DEC64_MAX            __DEC64_MAX__
+#endif /* __DEC64_MAX__ */
+#ifdef __DEC64_MAX_EXP__
 #define DEC64_MAX_EXP        __DEC64_MAX_EXP__
+#endif /* __DEC64_MAX_EXP__ */
+#ifdef __DEC64_MIN__
 #define DEC64_MIN            __DEC64_MIN__
+#endif /* __DEC64_MIN__ */
+#ifdef __DEC64_MIN_EXP__
 #define DEC64_MIN_EXP        __DEC64_MIN_EXP__
+#endif /* __DEC64_MIN_EXP__ */
+#ifdef __DEC64_SUBNORMAL_MIN__
 #define DEC64_SUBNORMAL_MIN  __DEC64_SUBNORMAL_MIN__
+#endif /* __DEC64_SUBNORMAL_MIN__ */
+#ifdef __DEC128_EPSILON__
 #define DEC128_EPSILON       __DEC128_EPSILON__
+#endif /* __DEC128_EPSILON__ */
+#ifdef __DEC128_MANT_DIG__
 #define DEC128_MANT_DIG      __DEC128_MANT_DIG__
+#endif /* __DEC128_MANT_DIG__ */
+#ifdef __DEC128_MAX__
 #define DEC128_MAX           __DEC128_MAX__
+#endif /* __DEC128_MAX__ */
+#ifdef __DEC128_MAX_EXP__
 #define DEC128_MAX_EXP       __DEC128_MAX_EXP__
+#endif /* __DEC128_MAX_EXP__ */
+#ifdef __DEC128_MIN__
 #define DEC128_MIN           __DEC128_MIN__
+#endif /* __DEC128_MIN__ */
+#ifdef __DEC128_MIN_EXP__
 #define DEC128_MIN_EXP       __DEC128_MIN_EXP__
+#endif /* __DEC128_MIN_EXP__ */
+#ifdef __DEC128_SUBNORMAL_MIN__
 #define DEC128_SUBNORMAL_MIN __DEC128_SUBNORMAL_MIN__
+#endif /* __DEC128_SUBNORMAL_MIN__ */
+#ifdef __DEC_EVAL_METHOD__
 #define DEC_EVAL_METHOD      __DEC_EVAL_METHOD__
+#endif /* __DEC_EVAL_METHOD__ */
 #endif /* __STDC_WANT_DEC_FP__ */
 
 
@@ -162,9 +257,12 @@ void _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 
 %#endif /* __CC__ */
 %{
+
+/* TODO: This stuff is most definitely x86-specific! */
 #define _clear87        _clearfp
 #define _status87       _statusfp
 
+/* TODO: This stuff is most definitely x86-specific! */
 #define _SW_INEXACT     0x00000001 /* Inexact precision. */
 #define _SW_UNDERFLOW   0x00000002 /* Underflow. */
 #define _SW_OVERFLOW    0x00000004 /* Overflow. */
@@ -174,6 +272,7 @@ void _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 #define _EM_AMBIGUIOUS  0x80000000
 #define _EM_AMBIGUOUS   0x80000000
 
+/* TODO: This stuff is most definitely x86-specific! */
 #define _MCW_EM         0x0008001f     /* Interrupt exception masks. */
 #define _EM_INEXACT     _SW_INEXACT    /* Inexact precision. */
 #define _EM_UNDERFLOW   _SW_UNDERFLOW  /* Underflow. */
@@ -182,21 +281,25 @@ void _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 #define _EM_INVALID     _SW_INVALID    /* Invalid. */
 #define _EM_DENORMAL    _SW_DENORMAL   /* Denormal exception bit.) */
 
+/* TODO: This stuff is most definitely x86-specific! */
 #define _MCW_RC         0x00000300 /* Rounding mode mask. */
 #define _RC_NEAR        0x00000000 /* Round to nearest. */
 #define _RC_DOWN        0x00000100 /* Round down. */
 #define _RC_UP          0x00000200 /* Round up. */
 #define _RC_CHOP        0x00000300 /* Truncate result. */
 
+/* TODO: This stuff is most definitely x86-specific! */
 #define _MCW_PC         0x00030000 /* Precision width mask. */
 #define _PC_64          0x00000000 /* 64-bit precision. */
 #define _PC_53          0x00010000 /* 53-bit precision. */
 #define _PC_24          0x00020000 /* 24-bit precision. */
 
+/* TODO: This stuff is most definitely x86-specific! */
 #define _MCW_IC         0x00040000 /* Infinity mode mask. */
 #define _IC_AFFINE      0x00040000 /* Affine mode. */
 #define _IC_PROJECTIVE  0x00000000 /* Projective mode. */
 
+/* TODO: This stuff is most definitely x86-specific! */
 #define _MCW_DN         0x03000000 /* Denormal control mask. */
 #define _DN_SAVE        0x00000000 /* Save. */
 #define _DN_FLUSH       0x01000000 /* Flush to zero. */
@@ -212,9 +315,11 @@ void _statusfp2($uint32_t *x86_stat, $uint32_t *sse2_stat);
 #ifdef __CC__
 }
 
+%/* TODO: This function is most definitely x86-specific! */
 [[decl_include("<hybrid/typecore.h>")]]
 $uint32_t _control87($uint32_t newval, $uint32_t mask);
 
+%/* TODO: This function is most definitely x86-specific! */
 %#if defined(__x86_64__) || defined(__i386__)
 [[decl_include("<hybrid/typecore.h>")]]
 int __control87_2($uint32_t newval, $uint32_t mask,
@@ -222,6 +327,7 @@ int __control87_2($uint32_t newval, $uint32_t mask,
                   $uint32_t *sse2_control_word);
 %#endif /* X64... */
 
+%/* TODO: This function is most definitely x86-specific! */
 [[guard]] int *__fpecode();
 %{
 #ifdef ____fpecode_defined
@@ -232,6 +338,7 @@ int __control87_2($uint32_t newval, $uint32_t mask,
 %{
 #endif /* __CC__ */
 
+/* TODO: This stuff is most definitely x86-specific! */
 #define _SW_UNEMULATED          0x0040
 #define _SW_SQRTNEG             0x0080
 #define _SW_STACKOVERFLOW       0x0200
@@ -266,6 +373,7 @@ double _chgsign(double x) {
 %[insert:function(_finite = finite)]
 %[insert:function(_isnan = isnan)]
 
+@@@return: * : Set of `_FPCLASS_*'
 [[wunused, nothrow, ATTR_CONST]]
 int _fpclass(double x);
 
@@ -276,6 +384,7 @@ int _fpclass(double x);
 %{
 #endif /* __CC__ */
 
+/* TODO: This stuff belongs in <asm/crt/float.h> */
 #define _FPCLASS_SNAN   0x0001 /* signaling NaN. */
 #define _FPCLASS_QNAN   0x0002 /* quiet NaN. */
 #define _FPCLASS_NINF   0x0004 /* negative infinity. */

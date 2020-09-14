@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1a30767 */
+/* HASH CRC-32:0x62b2b7b3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_create_defined
 #define __local___localdep_pthread_create_defined 1
 __NAMESPACE_LOCAL_END
-#include <bits/crt/pthreadtypes.h>
 #include <bits/types.h>
+#include <bits/crt/pthreadtypes.h>
 #ifndef ____pthread_start_routine_t_defined
 #define ____pthread_start_routine_t_defined 1
 typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);

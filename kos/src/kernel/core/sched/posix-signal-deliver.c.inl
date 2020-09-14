@@ -242,7 +242,7 @@ NOTHROW_NX(KCALL FUNC(deliver_signal_to_some_thread_in_process))(struct task *__
 
 	/* Search the process for a thread that isn't masking the signal.
 	 * If we can find one, send the signal to it by using a
-	 * `task_process_signal_rpc_handler' PRC to have it handled.
+	 * `task_process_signal_rpc_handler' RPC to have it handled.
 	 *
 	 * If we can't find one, schedule the signal as pending and re-check
 	 * all threads. - If at this point we find one that isn't masking it,

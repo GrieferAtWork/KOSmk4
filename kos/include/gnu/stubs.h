@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59ed1859 */
+/* HASH CRC-32:0xf8e6141a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,7 +341,6 @@
 #define __stub__logb 1
 #define __stub_logb 1
 #define __stub_login 1
-#define __stub_login_tty 1
 #define __stub_logout 1
 #define __stub_logwtmp 1
 #define __stub_lrand48 1

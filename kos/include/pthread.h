@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf88e1c1 */
+/* HASH CRC-32:0x73799430 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,25 +41,6 @@
 #include <time.h>
 
 __SYSDECL_BEGIN
-
-/* (some) documentation take from Glibc /usr/include/pthread.h: */
-/* Copyright (C) 2002-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 
 /* Detach state. */
 #ifndef __PTHREAD_ENUM_DETACH_STATE_DEFINED
@@ -137,17 +118,17 @@ enum {
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 #ifdef __USE_GNU
 #ifdef __PTHREAD_MUTEX_TIMED
-	PTHREAD_MUTEX_FAST_NP = __PTHREAD_MUTEX_TIMED, /* For compatibility. */
+	PTHREAD_MUTEX_FAST_NP = __PTHREAD_MUTEX_TIMED, /* Compatibility alias. */
 #endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_GNU */
 #ifdef __USE_XOPEN2K
 #ifdef __PTHREAD_MUTEX_STALLED
-	PTHREAD_MUTEX_STALLED    = __PTHREAD_MUTEX_STALLED, /* Robust mutex or not flags. */
-	PTHREAD_MUTEX_STALLED_NP = __PTHREAD_MUTEX_STALLED, /* Robust mutex or not flags. */
+	PTHREAD_MUTEX_STALLED    = __PTHREAD_MUTEX_STALLED, /* Not a robust mutex. */
+	PTHREAD_MUTEX_STALLED_NP = __PTHREAD_MUTEX_STALLED, /* Not a robust mutex. */
 #endif /* __PTHREAD_MUTEX_STALLED */
 #ifdef __PTHREAD_MUTEX_ROBUST
-	PTHREAD_MUTEX_ROBUST     = __PTHREAD_MUTEX_ROBUST,  /* ... */
-	PTHREAD_MUTEX_ROBUST_NP  = __PTHREAD_MUTEX_ROBUST,  /* ... */
+	PTHREAD_MUTEX_ROBUST     = __PTHREAD_MUTEX_ROBUST,  /* Robust mutex. */
+	PTHREAD_MUTEX_ROBUST_NP  = __PTHREAD_MUTEX_ROBUST,  /* Robust mutex. */
 #endif /* __PTHREAD_MUTEX_ROBUST */
 #endif /* __USE_XOPEN2K */
 };
@@ -182,17 +163,17 @@ enum {
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 #ifdef __USE_GNU
 #ifdef __PTHREAD_MUTEX_TIMED
-#define PTHREAD_MUTEX_FAST_NP       PTHREAD_MUTEX_FAST_NP       /* For compatibility. */
+#define PTHREAD_MUTEX_FAST_NP       PTHREAD_MUTEX_FAST_NP       /* Compatibility alias. */
 #endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_GNU */
 #ifdef __USE_XOPEN2K
 #ifdef __PTHREAD_MUTEX_STALLED
-#define PTHREAD_MUTEX_STALLED       PTHREAD_MUTEX_STALLED       /* Robust mutex or not flags. */
-#define PTHREAD_MUTEX_STALLED_NP    PTHREAD_MUTEX_STALLED_NP    /* Robust mutex or not flags. */
+#define PTHREAD_MUTEX_STALLED       PTHREAD_MUTEX_STALLED       /* Not a robust mutex. */
+#define PTHREAD_MUTEX_STALLED_NP    PTHREAD_MUTEX_STALLED_NP    /* Not a robust mutex. */
 #endif /* __PTHREAD_MUTEX_STALLED */
 #ifdef __PTHREAD_MUTEX_ROBUST
-#define PTHREAD_MUTEX_ROBUST        PTHREAD_MUTEX_ROBUST        /* ... */
-#define PTHREAD_MUTEX_ROBUST_NP     PTHREAD_MUTEX_ROBUST_NP     /* ... */
+#define PTHREAD_MUTEX_ROBUST        PTHREAD_MUTEX_ROBUST        /* Robust mutex. */
+#define PTHREAD_MUTEX_ROBUST_NP     PTHREAD_MUTEX_ROBUST_NP     /* Robust mutex. */
 #endif /* __PTHREAD_MUTEX_ROBUST */
 #endif /* __USE_XOPEN2K */
 #else /* __COMPILER_PREFERR_ENUMS */
@@ -224,17 +205,17 @@ enum {
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 #ifdef __USE_GNU
 #ifdef __PTHREAD_MUTEX_TIMED
-#define PTHREAD_MUTEX_FAST_NP       __PTHREAD_MUTEX_TIMED      /* For compatibility. */
+#define PTHREAD_MUTEX_FAST_NP       __PTHREAD_MUTEX_TIMED      /* Compatibility alias. */
 #endif /* __PTHREAD_MUTEX_TIMED */
 #endif /* __USE_GNU */
 #ifdef __USE_XOPEN2K
 #ifdef __PTHREAD_MUTEX_STALLED
-#define PTHREAD_MUTEX_STALLED       __PTHREAD_MUTEX_STALLED    /* Robust mutex or not flags. */
-#define PTHREAD_MUTEX_STALLED_NP    __PTHREAD_MUTEX_STALLED    /* Robust mutex or not flags. */
+#define PTHREAD_MUTEX_STALLED       __PTHREAD_MUTEX_STALLED    /* Not a robust mutex. */
+#define PTHREAD_MUTEX_STALLED_NP    __PTHREAD_MUTEX_STALLED    /* Not a robust mutex. */
 #endif /* __PTHREAD_MUTEX_STALLED */
 #ifdef __PTHREAD_MUTEX_ROBUST
-#define PTHREAD_MUTEX_ROBUST        __PTHREAD_MUTEX_ROBUST     /* ... */
-#define PTHREAD_MUTEX_ROBUST_NP     __PTHREAD_MUTEX_ROBUST     /* ... */
+#define PTHREAD_MUTEX_ROBUST        __PTHREAD_MUTEX_ROBUST     /* Robust mutex. */
+#define PTHREAD_MUTEX_ROBUST_NP     __PTHREAD_MUTEX_ROBUST     /* Robust mutex. */
 #endif /* __PTHREAD_MUTEX_ROBUST */
 #endif /* __USE_XOPEN2K */
 #endif /* !__COMPILER_PREFERR_ENUMS */
@@ -516,9 +497,8 @@ enum {
 #endif /* __PTHREAD_ONCE_INIT */
 
 #ifdef __USE_XOPEN2K
-/* Value returned by 'pthread_barrier_wait' for one of the threads
- * after the required number of threads have called this function.
- * -1 is distinct from 0 and all errno constants */
+/* Special value returned by 'pthread_barrier_wait' for one of the threads
+ * after the required number of threads have called this function. */
 #ifdef __PTHREAD_BARRIER_SERIAL_THREAD
 #define PTHREAD_BARRIER_SERIAL_THREAD __PTHREAD_BARRIER_SERIAL_THREAD
 #endif /* __PTHREAD_BARRIER_SERIAL_THREAD */
@@ -528,6 +508,7 @@ enum {
 
 #ifdef __CC__
 
+/* Static initializer for `pthread_mutex_t'. */
 #ifdef __PTHREAD_MUTEX_INITIALIZER
 #define PTHREAD_MUTEX_INITIALIZER               __PTHREAD_MUTEX_INITIALIZER
 #endif /* __PTHREAD_MUTEX_INITIALIZER */
@@ -543,10 +524,9 @@ enum {
 #endif /* __PTHREAD_ADAPTIVE_MUTEX_INITIALIZER */
 #endif /* __USE_GNU */
 
-/* Read-write lock types. */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 
-/* Read-write lock initializers. */
+/* Static initializer for `pthread_rwlock_t'. */
 #ifdef __PTHREAD_RWLOCK_INITIALIZER
 #define PTHREAD_RWLOCK_INITIALIZER __PTHREAD_RWLOCK_INITIALIZER
 #endif /* __PTHREAD_RWLOCK_INITIALIZER */
@@ -557,12 +537,12 @@ enum {
 #endif /* __USE_GNU */
 #endif  /* __USE_UNIX98 || __USE_XOPEN2K */
 
-/* Conditional variable handling. */
+/* Static initializer for `pthread_cond_t'. */
 #ifdef __PTHREAD_COND_INITIALIZER
 #define PTHREAD_COND_INITIALIZER __PTHREAD_COND_INITIALIZER
 #endif /* __PTHREAD_COND_INITIALIZER */
 
-/* Cleanup buffers */
+/* Cleanup callback buffers */
 struct _pthread_cleanup_buffer {
 	void                          (*__routine)(void *); /* Function to call. */
 	void                           *__arg;              /* Its argument. */

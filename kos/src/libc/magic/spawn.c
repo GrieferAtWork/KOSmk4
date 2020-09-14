@@ -1013,6 +1013,14 @@ err:
 %#endif /* __USE_SOLARIS */
 
 
+/* XXX:
+ *   - POSIX_SPAWN_NOSIGCHLD_NP
+ *   - POSIX_SPAWN_WAITPID_NP
+ *   - POSIX_SPAWN_SETSIGIGN_NP 
+ *   - posix_spawnattr_getsigignore_np
+ *   - posix_spawnattr_setsigignore_np
+ */
+
 
 %{
 

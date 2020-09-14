@@ -22,36 +22,19 @@
 %{
 #include <features.h>
 
-/* Documentation taken from Glibc /usr/include/fnmatch.h */
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-#define FNM_PATHNAME    0x01 /* No wildcard can ever match '/'. */
-#define FNM_NOESCAPE    0x02 /* Backslashes don't quote special chars. */
-#define FNM_PERIOD      0x04 /* Leading '.' is matched only explicitly. */
+/* TODO: These constants should go into <asm/crt/fnmatch.h> */
+#define FNM_PATHNAME    0x01 /* The wildcard character ('*') doesn't match slashes ('/') */
+#define FNM_NOESCAPE    0x02 /* Backslashes characters ('\\') don't escape the follow-up character. */
+#define FNM_PERIOD      0x04 /* A leading '.' can only be matched explicitly. */
 #if (!defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 2 || defined(__USE_GNU))
-#define FNM_FILE_NAME   FNM_PATHNAME /* Preferred GNU name. */
-#define FNM_LEADING_DIR 0x08 /* Ignore '/...' after a match. */
-#define FNM_CASEFOLD    0x10 /* Compare without regard to case. */
-#define FNM_EXTMATCH    0x20 /* Use ksh-like extended matching. */
+#define FNM_FILE_NAME   FNM_PATHNAME /* GNU alias. */
+#define FNM_LEADING_DIR 0x08 /* Ignore a sub-string '/...' when a match was already made. */
+#define FNM_CASEFOLD    0x10 /* Ignore casing during character compares. */
+#define FNM_EXTMATCH    0x20 /* Make use of ksh-like extended matching. */
 #endif /* !_POSIX_C_SOURCE || _POSIX_C_SOURCE < 2 || __USE_GNU */
-#define FNM_NOMATCH      1 /* Value returned by 'fnmatch' if STRING does not match PATTERN. */
+#define FNM_NOMATCH      1 /* The given `pattern' isn't matched. */
 #ifdef __USE_XOPEN
-#define FNM_NOSYS      (-1)
+#define FNM_NOSYS (-1) /* Never returned (would indicate that `fnmatch()' is not implemented) */
 #endif /* __USE_XOPEN */
 
 #ifdef __CC__
@@ -60,23 +43,29 @@ __SYSDECL_BEGIN
 }
 
 
-%[define(FNM_PATHNAME    = 0x01)] /* No wildcard can ever match '/'. */
-%[define(FNM_NOESCAPE    = 0x02)] /* Backslashes don't quote special chars. */
-%[define(FNM_PERIOD      = 0x04)] /* Leading '.' is matched only explicitly. */
-%[define(FNM_LEADING_DIR = 0x08)] /* Ignore '/...' after a match. */
-%[define(FNM_CASEFOLD    = 0x10)] /* Compare without regard to case. */
-%[define(FNM_EXTMATCH    = 0x20)] /* Use ksh-like extended matching. */
-%[define(FNM_NOMATCH     = 1)]    /* Value returned by 'fnmatch' if STRING does not match PATTERN. */
+%[define(FNM_PATHNAME    = 0x01)]
+%[define(FNM_NOESCAPE    = 0x02)]
+%[define(FNM_PERIOD      = 0x04)]
+%[define(FNM_LEADING_DIR = 0x08)]
+%[define(FNM_CASEFOLD    = 0x10)]
+%[define(FNM_EXTMATCH    = 0x20)]
+%[define(FNM_NOMATCH     = 1)]
 
 
 
-@@Match NAME against the filename pattern PATTERN,
-@@returning zero if it matches, FNM_NOMATCH if not
+@@Match the given `name' against `pattern', returning
+@@`0' if they match, and `FNM_NOMATCH' otherwise.
+@@@param: match_flags:   Set of `FNM_*'
+@@@return: 0           : `name' is matched by `pattern'
+@@@return: FNM_NOMATCH : `name' is not matched by `pattern'
 [[wunused, ATTR_PURE, decl_include("<features.h>")]]
 int fnmatch([[nonnull]] char const *pattern,
             [[nonnull]] char const *name,
             __STDC_INT_AS_UINT_T match_flags) {
 	char card_post;
+	/* TODO: Support for `FNM_NOESCAPE' */
+	/* TODO: Support for `FNM_LEADING_DIR' */
+	/* TODO: Support for `FNM_EXTMATCH' */
 	for (;;) {
 		if (!*name) {
 			/* End of name (if the patter is empty, or only contains '*', we have a match) */

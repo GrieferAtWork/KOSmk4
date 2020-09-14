@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ee4175a */
+/* HASH CRC-32:0xe20c83a5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,9 @@
 #define __local_pthread_timedjoin64_np_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_pthread_timedjoin_np
+#include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/timespec.h>
-#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_timedjoin32_np from pthread */
 #ifndef __local___localdep_pthread_timedjoin32_np_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeeb87a6e */
+/* HASH CRC-32:0x19531352 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,18 +21,21 @@
 #ifndef __local_ether_line_defined
 #define __local_ether_line_defined 1
 #include <__crt.h>
+struct ether_addr;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ether_paton_r from netinet.ether */
 #ifndef __local___localdep_ether_paton_r_defined
 #define __local___localdep_ether_paton_r_defined 1
 #ifdef __CRT_HAVE_ether_paton_r
-/* Convert ASCII string S to 48 bit Ethernet address */
+/* To the reverse of `ether_ntoa()' and convert
+ * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),struct ether_addr *,__NOTHROW_NCX,__localdep_ether_paton_r,(char const **__restrict __pasc, struct ether_addr *__restrict __addr),ether_paton_r,(__pasc,__addr))
 #else /* __CRT_HAVE_ether_paton_r */
 __NAMESPACE_LOCAL_END
 #include <libc/local/netinet.ether/ether_paton_r.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Convert ASCII string S to 48 bit Ethernet address */
+/* To the reverse of `ether_ntoa()' and convert
+ * a `AA:BB:CC:DD:EE:FF'-string into an ethernet address. */
 #define __localdep_ether_paton_r __LIBC_LOCAL_NAME(ether_paton_r)
 #endif /* !__CRT_HAVE_ether_paton_r */
 #endif /* !__local___localdep_ether_paton_r_defined */
@@ -73,8 +76,16 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
 #endif /* !... */
 #endif /* !__local___localdep_mempcpy_defined */
-/* Scan LINE and set ADDR and HOSTNAME */
-__LOCAL_LIBC(ether_line) __ATTR_NONNULL((1, 2, 3)) int
+__NAMESPACE_LOCAL_END
+#include <net/ethernet.h>
+__NAMESPACE_LOCAL_BEGIN
+/* Scan a given `line', as read from `/etc/ethers' for
+ * its `addr' and `hostname' parts. For this purpose, the given
+ * `line' must be formatted as `AA:BB:CC:DD:EE:FF  hostname  \n'
+ * @return: 0 : Success
+ * @return: -1: Failed to parse the `addr'-portion
+ *              (`ether_paton_r()' returned `NULL') */
+__LOCAL_LIBC(ether_line) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, struct ether_addr *__addr, char *__hostname) {
 	__SIZE_TYPE__ __hnlen;
 	while (__localdep_isspace(*__line) && *__line != '\r' && *__line != '\n')
@@ -84,7 +95,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ether_line))(char const *__line, stru
 	while (__localdep_isspace(*__line) && *__line != '\r' && *__line != '\n')
 		++__line;
 	/* The remainder of the line is the hostname. */
-	for (__hnlen = 0; __line[__hnlen] && __line[__hnlen] != '\r' && __line[__hnlen] != '\n'; ++__hnlen)
+	for (__hnlen = 0;
+	     __line[__hnlen] &&
+	     __line[__hnlen] != '\r' &&
+	     __line[__hnlen] != '\n';
+	     ++__hnlen)
 		;
 	while (__hnlen && __localdep_isspace(__line[__hnlen - 1]))
 		--__hnlen;

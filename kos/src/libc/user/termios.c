@@ -31,12 +31,6 @@
 
 DECL_BEGIN
 
-
-
-
-
-/*[[[start:implementation]]]*/
-
 /*[[[head:libc_tcgetattr,hash:CRC-32=0x24560589]]]*/
 /* Get terminal attributes */
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((2)) int
@@ -73,8 +67,7 @@ NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd,
 		break;
 
 	default:
-		libc_seterrno(EINVAL);
-		return -1;
+		return libc_seterrno(EINVAL);
 	}
 	return (int)ioctl(fd, cmd, termios_p);
 }
@@ -127,7 +120,7 @@ NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd)
 /*[[[body:libc_tcgetsid]]]*/
 {
 	pid_t result;
-	if (ioctl(fd, TIOCGSID, &result) < 0)
+	if unlikely(ioctl(fd, TIOCGSID, &result) < 0)
 		result = -1;
 	return result;
 }
@@ -140,18 +133,14 @@ NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
 /*[[[body:libc_tcsetsid]]]*/
 {
 	int result;
-	if (pid != getsid(0)) {
-		libc_seterrno(EINVAL);
-		result = -1;
+	if unlikely(pid != getsid(0)) {
+		result = libc_seterrno(EINVAL);
 	} else {
 		result = ioctl(fd, TIOCSCTTY, NULL);
 	}
 	return result;
 }
 /*[[[end:libc_tcsetsid]]]*/
-
-/*[[[end:implementation]]]*/
-
 
 
 /*[[[start:exports,hash:CRC-32=0x8ab10d80]]]*/

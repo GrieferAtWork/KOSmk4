@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7673fc99 */
+/* HASH CRC-32:0xe4460c4b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1105,7 +1105,8 @@ struct format_aprintf_data {
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
  * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
@@ -1193,7 +1194,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__re
 			new_alloc = min_alloc;
 			newbuf    = (char *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char));
 			if unlikely(!newbuf)
-				return NULL;
+				goto err;
 		}
 		__hybrid_assert(new_alloc >= self->ap_used + num_chars);
 		self->ap_base  = newbuf;
@@ -1203,6 +1204,8 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__re
 	self->ap_avail -= num_chars;
 	self->ap_used  += num_chars;
 	return result;
+err:
+	return NULL;
 }
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
@@ -1214,9 +1217,11 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg,
 	buf = libc_format_aprintf_alloc((struct format_aprintf_data *)arg,
 	                           datalen);
 	if unlikely(!buf)
-		return -1;
+		goto err;
 	libc_memcpyc(buf, data, datalen, sizeof(char));
 	return (ssize_t)datalen;
+err:
+	return -1;
 }
 #endif /* !__KERNEL__ */
 

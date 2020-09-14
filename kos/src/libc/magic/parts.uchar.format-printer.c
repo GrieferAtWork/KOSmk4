@@ -33,6 +33,8 @@
 #include <bits/uformat-printer.h>
 #include <kos/anno.h>
 
+#include <libc/malloc.h>
+
 __SYSDECL_BEGIN
 
 #ifdef __CC__
@@ -68,29 +70,29 @@ typedef __pc32formatprinter pc32formatprinter;
 
 }
 
-format_c16repeat(*) %{uchar("format_wrepeat")}
-format_c32repeat(*) %{uchar("format_wrepeat")}
-format_c16escape(*) %{uchar("format_wescape")}
-format_c32escape(*) %{uchar("format_wescape")}
-format_c16hexdump(*) %{uchar("format_whexdump")}
-format_c32hexdump(*) %{uchar("format_whexdump")}
+format_c16repeat(*) %{uchar16("format_wrepeat")}
+format_c32repeat(*) %{uchar32("format_wrepeat")}
+format_c16escape(*) %{uchar16("format_wescape")}
+format_c32escape(*) %{uchar32("format_wescape")}
+format_c16hexdump(*) %{uchar16("format_whexdump")}
+format_c32hexdump(*) %{uchar32("format_whexdump")}
 
 %
 %
 %
 
-format_vc16printf(*) %{uchar("format_vwprintf")}
-format_vc32printf(*) %{uchar("format_vwprintf")}
-format_c16printf(*) %{uchar("format_wprintf")}
-format_c32printf(*) %{uchar("format_wprintf")}
+format_vc16printf(*) %{uchar16("format_vwprintf")}
+format_vc32printf(*) %{uchar32("format_vwprintf")}
+format_c16printf(*) %{uchar16("format_wprintf")}
+format_c32printf(*) %{uchar32("format_wprintf")}
 
 %
 %
 %
-$ssize_t format_c16sprintf_printer(/*char16_t ***/ void *arg, char16_t const *__restrict data, $size_t datalen)
-	%{uchar("format_wsprintf_printer")}
+$ssize_t format_c16sprintf_printer(/*char16_t ***/ void *arg,char16_t const *__restrict data, $size_t datalen)
+	%{uchar16("format_wsprintf_printer")}
 $ssize_t format_c32sprintf_printer(/*char32_t ***/ void *arg, char32_t const *__restrict data, $size_t datalen)
-	%{uchar("format_wsprintf_printer")}
+	%{uchar32("format_wsprintf_printer")}
 
 
 %{
@@ -110,18 +112,22 @@ struct format_c32snprintf_data {
 };
 #endif /* !__format_c16snprintf_data_defined */
 
-#define FORMAT_C16SNPRINTF_INIT(buf,bufsize)       { buf, bufsize }
-#define FORMAT_C32SNPRINTF_INIT(buf,bufsize)       { buf, bufsize }
-#define format_c16snprintf_init(self,buf,bufsize) ((self)->sd_buffer = (buf),(self)->sd_bufsiz = (bufsize))
-#define format_c32snprintf_init(self,buf,bufsize) ((self)->sd_buffer = (buf),(self)->sd_bufsiz = (bufsize))
+#define FORMAT_C16SNPRINTF_INIT(buf, bufsize) \
+	{ buf, bufsize }
+#define FORMAT_C32SNPRINTF_INIT(buf, bufsize) \
+	{ buf, bufsize }
+#define format_c16snprintf_init(self, buf, bufsize) \
+	((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
+#define format_c32snprintf_init(self, buf, bufsize) \
+	((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
 
 }
 
-format_c16snprintf_printer(*) %{uchar("format_wsnprintf_printer")}
-format_c32snprintf_printer(*) %{uchar("format_wsnprintf_printer")}
+format_c16snprintf_printer(*) %{uchar16("format_wsnprintf_printer")}
+format_c32snprintf_printer(*) %{uchar32("format_wsnprintf_printer")}
 
-format_c16width(*) %{uchar("format_wwidth")}
-format_c32width(*) %{uchar("format_wwidth")}
+format_c16width(*) %{uchar16("format_wwidth")}
+format_c32width(*) %{uchar32("format_wwidth")}
 
 [[ATTR_CONST, cc(__C16FORMATPRINTER_CC), decl_include("<bits/uformat-printer.h>")]]
 $ssize_t format_c16length(void *arg, char16_t const *__restrict data, $size_t datalen) = format_length;
@@ -157,10 +163,16 @@ struct format_c32aprintf_data {
 };
 #endif /* !__format_c32aprintf_data_defined */
 
-#define FORMAT_C16APRINTF_DATA_INIT        { (char16_t *)__NULLPTR, 0, 0 }
-#define FORMAT_C32APRINTF_DATA_INIT        { (char32_t *)__NULLPTR, 0, 0 }
-#define format_c16aprintf_data_init(self)  ((self)->ap_base = (char16_t *)__NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
-#define format_c32aprintf_data_init(self)  ((self)->ap_base = (char32_t *)__NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define FORMAT_C16APRINTF_DATA_INIT \
+	{ (char16_t *)__NULLPTR, 0, 0 }
+#define FORMAT_C32APRINTF_DATA_INIT \
+	{ (char32_t *)__NULLPTR, 0, 0 }
+#define format_c16aprintf_data_init(self)      \
+	((self)->ap_base  = (char16_t *)__NULLPTR, \
+	 (self)->ap_avail = (self)->ap_used = 0)
+#define format_c32aprintf_data_init(self)      \
+	((self)->ap_base  = (char32_t *)__NULLPTR, \
+	 (self)->ap_avail = (self)->ap_used = 0)
 #define format_c16aprintf_data_cinit(self)                      \
 	(__hybrid_assert((self)->ap_base == (char16_t *)__NULLPTR), \
 	 __hybrid_assert((self)->ap_avail == 0),                    \
@@ -170,10 +182,9 @@ struct format_c32aprintf_data {
 	 __hybrid_assert((self)->ap_avail == 0),                    \
 	 __hybrid_assert((self)->ap_used == 0))
 #ifdef NDEBUG
-#define format_c16aprintf_data_fini(self)  (__libc_free((self)->ap_base))
-#define format_c32aprintf_data_fini(self)  (__libc_free((self)->ap_base))
-#else /* NDEBUG */
-#if __SIZEOF_POINTER__ == 4
+#define format_c16aprintf_data_fini(self) __libc_free((self)->ap_base)
+#define format_c32aprintf_data_fini(self) __libc_free((self)->ap_base)
+#elif __SIZEOF_POINTER__ == 4
 #define format_c16aprintf_data_fini(self)                   \
 	(__libc_free((self)->ap_base),                          \
 	 (self)->ap_base  = (char16_t *)__UINT32_C(0xcccccccc), \
@@ -196,20 +207,19 @@ struct format_c32aprintf_data {
 	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),             \
 	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
 #else /* __SIZEOF_POINTER__ == ... */
-#define format_c16aprintf_data_fini(self) (__libc_free((self)->ap_base))
-#define format_c32aprintf_data_fini(self) (__libc_free((self)->ap_base))
-#endif /* __SIZEOF_POINTER__ != ... */
-#endif /* !NDEBUG */
+#define format_c16aprintf_data_fini(self) __libc_free((self)->ap_base)
+#define format_c32aprintf_data_fini(self) __libc_free((self)->ap_base)
+#endif /* ... */
 
 }
 
 
-format_c16aprintf_pack(*) %{uchar("format_waprintf_pack")}
-format_c32aprintf_pack(*) %{uchar("format_waprintf_pack")}
-format_c16aprintf_alloc(*) %{uchar("format_waprintf_alloc")}
-format_c32aprintf_alloc(*) %{uchar("format_waprintf_alloc")}
-format_c16aprintf_printer(*) %{uchar("format_waprintf_printer")}
-format_c32aprintf_printer(*) %{uchar("format_waprintf_printer")}
+format_c16aprintf_pack(*) %{uchar16("format_waprintf_pack")}
+format_c32aprintf_pack(*) %{uchar32("format_waprintf_pack")}
+format_c16aprintf_alloc(*) %{uchar16("format_waprintf_alloc")}
+format_c32aprintf_alloc(*) %{uchar32("format_waprintf_alloc")}
+format_c16aprintf_printer(*) %{uchar16("format_waprintf_printer")}
+format_c32aprintf_printer(*) %{uchar32("format_waprintf_printer")}
 
 
 

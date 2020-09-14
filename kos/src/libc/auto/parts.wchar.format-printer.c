@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83d0f776 */
+/* HASH CRC-32:0x98f73bec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1704,7 +1704,8 @@ NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
@@ -1767,7 +1768,8 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
- * >> char *result; ssize_t error;
+ * >> char *result;
+ * >> ssize_t error;
  * >> struct format_waprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
  * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
@@ -1849,7 +1851,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *
 			new_alloc = min_alloc;
 			newbuf    = (char16_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char16_t));
 			if unlikely(!newbuf)
-				return NULL;
+				goto err;
 		}
 		__hybrid_assert(new_alloc >= self->ap_used + num_wchars);
 		self->ap_base  = newbuf;
@@ -1859,6 +1861,8 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_alloc)(struct format_c16aprintf_data *
 	self->ap_avail -= num_wchars;
 	self->ap_used  += num_wchars;
 	return result;
+err:
+	return NULL;
 }
 #include <hybrid/__assert.h>
 /* Allocate a buffer of `num_wchars' wide-characters at the end of `self'
@@ -1883,7 +1887,7 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *
 			new_alloc = min_alloc;
 			newbuf    = (char32_t *)libc_realloc(self->ap_base, (new_alloc + 1) * sizeof(char32_t));
 			if unlikely(!newbuf)
-				return NULL;
+				goto err;
 		}
 		__hybrid_assert(new_alloc >= self->ap_used + num_wchars);
 		self->ap_base  = newbuf;
@@ -1893,6 +1897,8 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_alloc)(struct format_c32aprintf_data *
 	self->ap_avail -= num_wchars;
 	self->ap_used  += num_wchars;
 	return result;
+err:
+	return NULL;
 }
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.format") WUNUSED NONNULL((1, 2)) ssize_t
@@ -1902,9 +1908,11 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(void *arg,
 	char16_t *buf;
 	buf = libd_format_waprintf_alloc((struct format_c16aprintf_data *)arg, datalen);
 	if unlikely(!buf)
-		return -1;
+		goto err;
 	(char16_t *)libc_memcpyw(buf, data, datalen);
 	return (ssize_t)datalen;
+err:
+	return -1;
 }
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTERN ATTR_SECTION(".text.crt.wchar.string.format") WUNUSED NONNULL((1, 2)) ssize_t
@@ -1914,9 +1922,11 @@ NOTHROW_NCX(LIBKCALL libc_format_waprintf_printer)(void *arg,
 	char32_t *buf;
 	buf = libc_format_waprintf_alloc((struct format_c32aprintf_data *)arg, datalen);
 	if unlikely(!buf)
-		return -1;
+		goto err;
 	(char32_t *)libc_memcpyl(buf, data, datalen);
 	return (ssize_t)datalen;
+err:
+	return -1;
 }
 #endif /* !__KERNEL__ */
 

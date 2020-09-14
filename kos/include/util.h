@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fda8d31 */
+/* HASH CRC-32:0xd177927e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,7 +104,15 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC_KOS,login,(struct utmp const *
  * then close FD. Returns 0 on success, nonzero on error */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,login_tty,(__fd_t __fd),(__fd))
 #else /* __CRT_HAVE_login_tty */
+#include <asm/ioctls/tty.h>
+#if defined(TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close))
+#include <libc/local/utmp/login_tty.h>
+/* Make FD be the controlling terminal, stdin, stdout, and stderr;
+ * then close FD. Returns 0 on success, nonzero on error */
+__NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC_KOS(__LIBCCALL login_tty)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(login_tty))(__fd); })
+#else /* TIOCSCTTY && __CRT_HAVE_ioctl && __CRT_HAVE_setsid && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) */
 #undef __login_tty_defined
+#endif /* !TIOCSCTTY || !__CRT_HAVE_ioctl || !__CRT_HAVE_setsid || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) */
 #endif /* !__CRT_HAVE_login_tty */
 #endif /* !__login_tty_defined */
 #ifndef __logout_defined
@@ -130,9 +138,22 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,opendev,(
 #ifndef __openpty_defined
 #define __openpty_defined 1
 #ifdef __CRT_HAVE_openpty
-/* Create pseudo tty master slave pair with NAME and set terminal
- * attributes according to TERMP and WINP and return handles for
- * both ends in AMASTER and ASLAVE */
+/* >> openpty(2)
+ * Create a new ptty (psuedo tty), storing the handles for the
+ * master/slave adapters in `*amaster' and `*aslave'. Additionally,
+ * the caller may specific the initial terminial settings `termp'
+ * and window size `winp', as well as a location where the kernel
+ * should store the filename of the PTY master socket (as already
+ * returned in `*amaster'). Note that the max length of this filename
+ * is implementation defined, with no way for the use to specify how
+ * much space is is available in the passed buffer. As such, a
+ * portable application can only ever pass `NULL' for this value.
+ * On KOS, the value written to `name' is the absolute filename of
+ * the master-device in the `/dev' filesystem, which usually means
+ * that the written filename is something like `/dev/ptyp0'.
+ * NOTE: On KOS, this function is a system call, though in other
+ *       operating system it is often implemented via `open(2)',
+ *       possibly combined with `ioctl(2)'. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #else /* __CRT_HAVE_openpty */
 #undef __openpty_defined
@@ -141,17 +162,32 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, 
 #ifndef __forkpty_defined
 #define __forkpty_defined 1
 #ifdef __CRT_HAVE_forkpty
-/* Create child process and establish the slave pseudo
- * terminal as the child's controlling terminal */
+/* >> forkpty(3)
+ * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
+ * such that the newly created PTY is open under all std-handles in
+ * the newly created child process.
+ * Aside from this, this function returns the same as fork(2), that is
+ * it returns in both the parent and child processes, returning `0'
+ * for the child, and the child's PID for the parent (or -1 in only the
+ * parent if something went wrong) */
 __CDECLARE(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,forkpty,(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__name,__termp,__winp))
-#elif defined(__CRT_HAVE_openpty) && (defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)) && defined(__CRT_HAVE_login_tty) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit))
+#else /* __CRT_HAVE_forkpty */
+#include <asm/ioctls/tty.h>
+#if defined(__CRT_HAVE_openpty) && (defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)) && (defined(__CRT_HAVE_login_tty) || (defined(TIOCSCTTY) && defined(__CRT_HAVE_ioctl) && defined(__CRT_HAVE_setsid) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)))) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit))
 #include <libc/local/pty/forkpty.h>
-/* Create child process and establish the slave pseudo
- * terminal as the child's controlling terminal */
+/* >> forkpty(3)
+ * A helper for combining `openpty(2)' with `fork(2)' and `login_tty(3)',
+ * such that the newly created PTY is open under all std-handles in
+ * the newly created child process.
+ * Aside from this, this function returns the same as fork(2), that is
+ * it returns in both the parent and child processes, returning `0'
+ * for the child, and the child's PID for the parent (or -1 in only the
+ * parent if something went wrong) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(forkpty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__LIBCCALL forkpty)(__fd_t *__amaster, char *__name, struct termios const *__termp, struct winsize const *__winp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(forkpty))(__amaster, __name, __termp, __winp); })
-#else /* ... */
+#else /* __CRT_HAVE_openpty && (__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close) && (__CRT_HAVE_login_tty || (TIOCSCTTY && __CRT_HAVE_ioctl && __CRT_HAVE_setsid && (__CRT_HAVE_dup2 || __CRT_HAVE__dup2 || __CRT_HAVE___dup2))) && (__CRT_HAVE__Exit || __CRT_HAVE__exit || __CRT_HAVE_quick_exit || __CRT_HAVE_exit) */
 #undef __forkpty_defined
-#endif /* !... */
+#endif /* !__CRT_HAVE_openpty || (!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) || (!__CRT_HAVE_login_tty && (!TIOCSCTTY || !__CRT_HAVE_ioctl || !__CRT_HAVE_setsid || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2))) || (!__CRT_HAVE__Exit && !__CRT_HAVE__exit && !__CRT_HAVE_quick_exit && !__CRT_HAVE_exit) */
+#endif /* !__CRT_HAVE_forkpty */
 #endif /* !__forkpty_defined */
 #ifdef __CRT_HAVE_fparseln
 /* Parse one line of text from `stream', whilst accounting for

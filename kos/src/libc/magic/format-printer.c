@@ -181,6 +181,7 @@ err:
 
 %{
 
+/* TODO: These constants should go into <asm/crt/format-printer.h> */
 #define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
 #define FORMAT_ESCAPE_FPRINTRAW 0x0001 /* Don't surround the quoted text with "..."; */
 #define FORMAT_ESCAPE_FFORCEHEX 0x0002 /* Force hex encoding of all control characters without special strings (`"\n"', etc.). */
@@ -493,6 +494,7 @@ err:
 %[define(FORMAT_HEXDUMP_SIZEMASK   = 0x3000)] /* Mask for the dump size. */
 
 %{
+/* TODO: These constants should go into <asm/crt/format-printer.h> */
 #define FORMAT_HEXDUMP_FNORMAL    0x0000 /* Normal hexdump flags. */
 #define FORMAT_HEXDUMP_FHEXLOWER  0x0001 /* Print hex text of the dump in lowercase (does not affect address/offset). */
 #define FORMAT_HEXDUMP_FNOADDRESS 0x0002 /* Don't include the absolute address at the start of every line. */
@@ -1071,7 +1073,8 @@ struct format_aprintf_data {
 @@Pack and finalize a given aprintf format printer
 @@Together with `format_aprintf_printer()', the aprintf
 @@format printer sub-system should be used as follows:
-@@>> char *result; ssize_t error;
+@@>> char *result;
+@@>> ssize_t error;
 @@>> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
 @@>> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
 @@>> if unlikely(error < 0) {
@@ -1165,7 +1168,7 @@ format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
 			new_alloc = min_alloc;
 			newbuf    = (char *)realloc(self->@ap_base@, (new_alloc + 1) * sizeof(char));
 			if unlikely(!newbuf)
-				return NULL;
+				goto err;
 		}
 		__hybrid_assert(new_alloc >= self->@ap_used@ + num_chars);
 		self->@ap_base@  = newbuf;
@@ -1175,6 +1178,8 @@ format_aprintf_alloc:([[nonnull]] struct format_aprintf_data *__restrict self,
 	self->@ap_avail@ -= num_chars;
 	self->@ap_used@  += num_chars;
 	return result;
+err:
+	return NULL;
 }
 
 
@@ -1189,9 +1194,11 @@ $ssize_t format_aprintf_printer([[nonnull]] /*struct format_aprintf_data **/ voi
 	buf = format_aprintf_alloc((struct format_aprintf_data *)arg,
 	                           datalen);
 	if unlikely(!buf)
-		return -1;
+		goto err;
 	memcpyc(buf, data, datalen, sizeof(char));
 	return (ssize_t)datalen;
+err:
+	return -1;
 }
 
 

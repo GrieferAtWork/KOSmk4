@@ -59,7 +59,7 @@
 #define DEBUGTRAP_REASON_MESSAGE   0x0010 /* [dtr_strarg = message, dtr_signo = length]
                                            * Output a human-readable message to the debugger.
                                            * NOTE: This command is special, in that (on output), it will
-                                           *       store the number of written bytes within `dtr_signo' */
+                                           *       store the number of characters written in `dtr_signo' */
 #define DEBUGTRAP_REASON_MAX DEBUGTRAP_REASON_MESSAGE
 
 #endif /* !_KOS_DEBUGTRAP_H */

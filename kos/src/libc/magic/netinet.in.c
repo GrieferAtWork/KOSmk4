@@ -23,9 +23,13 @@
 %{
 #include <features.h>
 
+}%[insert:prefix(
 #include <hybrid/__byteorder.h>
+)]%[insert:prefix(
 #include <hybrid/__byteswap.h>
+)]%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
 #include <bits/sockaddr-struct.h>
 #include <bits/sockaddr.h>
@@ -42,6 +46,10 @@
 #include <endian.h>
 #include <stdint.h>
 #endif /* __USE_GLIBC */
+
+/* TODO: Constants and structs from this header should
+ *       be moved into <asm/> and <bits/> headers! */
+
 
 /* Documentation taken from Glibc /usr/include/netinet/in.h */
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
@@ -238,40 +246,40 @@ struct group_filter {
 
 %[default:section(".text.crt{|.dos}.net.convert")]
 [[ATTR_CONST, impl_include("<hybrid/__byteswap.h>")]]
-[[if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohs")]]
+[[extern_inline, if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohs")]]
 $uint16_t htons($uint16_t hostword) {
-	return (uint16_t)__hybrid_htobe32(hostword);
+	return ($uint16_t)__hybrid_htobe32(hostword);
 }
 
 [[ATTR_CONST, impl_include("<hybrid/__byteswap.h>")]]
-[[alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htons)]]
+[[extern_inline, alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htons)]]
 $uint16_t ntohs($uint16_t netshort) {
-	return (uint16_t)__hybrid_betoh16(netshort);
+	return ($uint16_t)__hybrid_betoh16(netshort);
 }
 
 [[ATTR_CONST, impl_include("<hybrid/__byteswap.h>")]]
-[[if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohl")]]
+[[extern_inline, if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohl")]]
 $uint32_t htonl($uint32_t hostlong) {
-	return (uint32_t)__hybrid_htobe32(hostlong);
+	return ($uint32_t)__hybrid_htobe32(hostlong);
 }
 
 [[ATTR_CONST, impl_include("<hybrid/__byteswap.h>")]]
-[[alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonl)]]
+[[extern_inline, alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonl)]]
 $uint32_t ntohl($uint32_t netlong) {
-	return (uint32_t)__hybrid_betoh32(netlong);
+	return ($uint32_t)__hybrid_betoh32(netlong);
 }
 
 %#if defined(__USE_KOS) && defined(__UINT64_TYPE__)
 [[ATTR_CONST, impl_include("<hybrid/__byteswap.h>")]]
-[[if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohq")]]
+[[extern_inline, if(defined(__HYBRID_HTOBE_IS_BETOH)), alias("ntohq")]]
 $uint64_t htonq($uint64_t hostquad) {
-	return (uint64_t)__hybrid_htobe64(hostquad);
+	return ($uint64_t)__hybrid_htobe64(hostquad);
 }
 
 [[ATTR_CONST, impl_include("<hybrid/__byteswap.h>")]]
-[[alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonq)]]
+[[extern_inline, alt_variant_of(defined(__HYBRID_HTOBE_IS_BETOH), htonq)]]
 $uint64_t ntohq($uint64_t netquad) {
-	return (uint64_t)__hybrid_betoh64(netquad);
+	return ($uint64_t)__hybrid_betoh64(netquad);
 }
 %#endif /* __USE_KOS && __UINT64_TYPE__ */
 

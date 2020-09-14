@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72304b3d */
+/* HASH CRC-32:0xf6b669a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,13 +60,15 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_envz_remove_defined
 #define __local___localdep_envz_remove_defined 1
 #ifdef __CRT_HAVE_envz_remove
-/* Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any */
+/* Remove an entry matching `name' from `penvz',
+ * or do nothing if no such entry exists. */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_NCX,__localdep_envz_remove,(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name),envz_remove,(__penvz,__penvz_len,__name))
 #else /* __CRT_HAVE_envz_remove */
 __NAMESPACE_LOCAL_END
 #include <libc/local/envz/envz_remove.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any */
+/* Remove an entry matching `name' from `penvz',
+ * or do nothing if no such entry exists. */
 #define __localdep_envz_remove __LIBC_LOCAL_NAME(envz_remove)
 #endif /* !__CRT_HAVE_envz_remove */
 #endif /* !__local___localdep_envz_remove_defined */
@@ -110,12 +112,10 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Adds an entry for `NAME' with value `VALUE' to `ENVZ & ENVZ_LEN'. If an entry
- * with the same name already exists in `ENVZ', it is removed. If `VALUE' is
- * `NULL', then the new entry will not have a value portion, meaning that `envz_get()'
- * will return `NULL', although `envz_entry()' will still return an entry. This is handy
- * because when merging with another envz, the null entry can override an
- * entry in the other one. Such entries can be removed with `envz_strip()' */
+/* Add an entry `name=value' to `penvz'. If another entry for `name'
+ * already existed before, that entry is removed. If `name' is NULL,
+ * the entry created doesn't have a value-portion (i.e. `name' is
+ * added to `penvz' as-is, without the trailing `=value') */
 __LOCAL_LIBC(envz_add) __ATTR_NONNULL((1, 2, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_add))(char **__restrict __penvz, __SIZE_TYPE__ *__restrict __penvz_len, char const *__restrict __name, char const *__value) {
 	char *__new_envz;
