@@ -49,11 +49,27 @@ PRIVATE ATTR_BSS ATTR_ALIGNED(PAGESIZE)
 struct vm_corepage vm_corepage_start;
 
 
-/* Core page controller globals. */
-INTERN DEFINE_ATOMIC_RWLOCK(vm_corepage_lock);
+/************************************************************************/
+/* Core page controller globals.                                        */
+/************************************************************************/
+/* Lock for the corepage subsystem. */
+INTERN struct atomic_rwlock vm_corepage_lock = ATOMIC_RWLOCK_INIT;
+
+/* [1..1] Pointer to the first page containing free elements. */
 INTERN struct vm_corepage *vm_corepage_head = &vm_corepage_start;
+
+/* [>= 2] Amount of free parts.
+ * NOTE: At all times, there must at least be 2 available
+ *       parts, so-as to allow for self-replication. */
 INTERN size_t vm_corepage_free = VM_COREPAIRS_PER_PAGE;
+
+#ifdef CONFIG_COREBASE_HAVE_FULLPAGES
+/* [0..1] Chain of fully allocated core pages. */
+INTERN struct vm_corepage *vm_corepage_full = NULL;
+#endif /* CONFIG_COREBASE_HAVE_FULLPAGES */
+
 PRIVATE ATTR_READMOSTLY struct pending_free_part *pending_free = NULL;
+/************************************************************************/
 
 
 /* The mask of the last word of the is-used bitset that must be
@@ -100,6 +116,36 @@ NOTHROW(KCALL corepage_reachable)(struct vm_corepage const *__restrict self) {
 #endif /* !NDEBUG */
 
 
+/* Insert/Remove a given core-page from the full-page queue */
+#ifdef CONFIG_COREBASE_HAVE_FULLPAGES
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL corepage_insfull)(struct vm_corepage *__restrict self) {
+	/* Insert into the chain. */
+	self->cp_ctrl.cpc_prev = vm_corepage_full;
+	vm_corepage_full       = self;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL corepage_remfull)(struct vm_corepage *__restrict self) {
+	struct vm_corepage **pself;
+	pself = &vm_corepage_full;
+	/* Find the predecessor of `self' */
+	for (;;) {
+		struct vm_corepage *elem;
+		elem = *pself;
+		assert(elem);
+		if (elem == self)
+			break;
+		pself = &elem->cp_ctrl.cpc_prev;
+	}
+	/* Unlink from the chain. */
+	*pself = self->cp_ctrl.cpc_prev;
+}
+#endif /* CONFIG_COREBASE_HAVE_FULLPAGES */
+
+
+
+
 
 PRIVATE NONNULL((1)) void
 NOTHROW(KCALL do_free_part)(void *__restrict part) {
@@ -126,8 +172,20 @@ NOTHROW(KCALL do_free_part)(void *__restrict part) {
 	 *               re-enter it into the chain to the core pages containing
 	 *               free core parts. */
 	if (!corepage_hasfree(page)) {
+#ifdef CONFIG_COREBASE_HAVE_FULLPAGES
+		pflag_t was;
+		/* Must disable preemption to prevent the page from becoming
+		 * invisible at any point, in case another CPU/thread tries
+		 * to call `mall_search_leaks_impl()' */
+		was = PREEMPTION_PUSHOFF();
+		corepage_remfull(page);
 		page->cp_ctrl.cpc_prev = vm_corepage_head;
 		vm_corepage_head       = page;
+		PREEMPTION_POP(was);
+#else /* CONFIG_COREBASE_HAVE_FULLPAGES */
+		page->cp_ctrl.cpc_prev = vm_corepage_head;
+		vm_corepage_head       = page;
+#endif /* !CONFIG_COREBASE_HAVE_FULLPAGES */
 	}
 	page->cp_ctrl.cpc_used[i] &= ~mask;
 	++vm_corepage_free;
@@ -188,6 +246,24 @@ NOTHROW(KCALL corepage_alloc_part)(struct vm_corepage *__restrict self) {
 }
 
 
+PRIVATE NOBLOCK void
+NOTHROW(KCALL vm_corepage_pophead)(void) {
+#ifdef CONFIG_COREBASE_HAVE_FULLPAGES
+	pflag_t was;
+	struct vm_corepage *fullpage;
+	/* Must disable preemption to prevent the page from becoming
+	 * invisible at any point, in case another CPU/thread tries
+	 * to call `mall_search_leaks_impl()' */
+	was = PREEMPTION_PUSHOFF();
+	fullpage         = vm_corepage_head;
+	vm_corepage_head = fullpage->cp_ctrl.cpc_prev;
+	corepage_insfull(fullpage);
+	PREEMPTION_POP(was);
+#else /* CONFIG_COREBASE_HAVE_FULLPAGES */
+	vm_corepage_head = vm_corepage_head->cp_ctrl.cpc_prev;
+#endif /* !CONFIG_COREBASE_HAVE_FULLPAGES */
+}
+
 PRIVATE struct vm_corepair_ptr
 NOTHROW(KCALL vm_corepair_alloc_impl)(void) {
 	struct vm_corepair_ptr result;
@@ -197,14 +273,14 @@ NOTHROW(KCALL vm_corepair_alloc_impl)(void) {
 	memset(result.cp_part, 0, sizeof(*result.cp_part));
 	result.cp_part->dp_flags |= VM_DATAPART_FLAG_COREPRT;
 	if (!corepage_hasfree(vm_corepage_head)) {
-		vm_corepage_head = vm_corepage_head->cp_ctrl.cpc_prev;
+		vm_corepage_pophead();
 		assert(vm_corepage_head);
 	}
 	result.cp_node = (struct vm_node *)corepage_alloc_part(vm_corepage_head);
 	memset(result.cp_node, 0, sizeof(*result.cp_node));
 	result.cp_node->vn_flags |= VM_NODE_FLAG_COREPRT;
 	if (!corepage_hasfree(vm_corepage_head)) {
-		vm_corepage_head = vm_corepage_head->cp_ctrl.cpc_prev;
+		vm_corepage_pophead();
 		assert((vm_corepage_head != NULL) ==
 		       (vm_corepage_free > 2));
 	}

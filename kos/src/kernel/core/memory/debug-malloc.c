@@ -1269,6 +1269,18 @@ PRIVATE ATTR_COLDBSS struct icpustate *mall_other_cpu_states[CONFIG_MAX_CPU_COUN
 
 INTDEF atomic_ref<struct driver_state> current_driver_state ASMNAME("current_driver_state");
 
+
+#ifndef CONFIG_COREBASE_HAVE_FULLPAGES
+#error "Bad configuration"
+#endif /* !CONFIG_COREBASE_HAVE_FULLPAGES */
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL mall_search_corepage_chain)(struct vm_corepage *chain) {
+	for (; chain; chain = chain->cp_ctrl.cpc_prev)
+		mall_reachable_data((byte_t *)chain->cp_parts, sizeof(chain->cp_parts));
+}
+
+
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_search_leaks_impl)(void) {
 	cpuid_t i;
@@ -1371,11 +1383,15 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 	 *       tried to allocate a new recursion descriptor.
 	 */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #3: Scan core base\n");
-	{
-		struct vm_corepage *iter = vm_corepage_head;
-		for (; iter; iter = iter->cp_ctrl.cpc_prev)
-			mall_reachable_data((byte_t *)iter->cp_parts, sizeof(iter->cp_parts));
-	}
+	mall_search_corepage_chain(vm_corepage_head);
+	/* `vm_corepage_head' only chains core-base pages
+	 * that contain at least one non-allocated page-slot!
+	 *
+	 * As such, we must also search a secondary chain of
+	 * pages that is used to represent ones that are fully
+	 * allocated. */
+	mall_search_corepage_chain(vm_corepage_full);
+	
 
 	PRINT_LEAKS_SEARCH_PHASE("Phase #4: Scan loaded drivers\n");
 	{
