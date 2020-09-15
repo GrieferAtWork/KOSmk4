@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x309cb5ec */
+/* HASH CRC-32:0x3bb65432 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1610,7 +1610,7 @@
 #define __NRAT1_coredump               (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT2_coredump               (__HYBRID_PTR64(void) const *, __HYBRID_PTR64(void) const *)
 #define __NRAT3_coredump               (size_t, __size_t)
-#define __NRAT4_coredump               (struct exception_data64 const *, struct exception_data64 const *)
+#define __NRAT4_coredump               (struct __exception_data64 const *, struct __exception_data64 const *)
 #define __NRAT5_coredump               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_raiseat                (struct ucpustate64 const *, struct ucpustate64 const *)
 #define __NRAT1_raiseat                (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
@@ -2059,7 +2059,7 @@
 #define __NRAM_rtm_end(a, b, c, d, e, f)                /* nothing */
 #define __NRAM_rtm_begin(a, b, c, d, e, f)              /* nothing */
 #define __NRAM_userviofd(a, b, c, d, e, f)              (__size_t)a, (__syscall_ulong_t)b
-#define __NRAM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct exception_data64 const *)e, (__syscall_ulong_t)f
+#define __NRAM_coredump(a, b, c, d, e, f)               (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void) const *)c, (__size_t)d, (struct __exception_data64 const *)e, (__syscall_ulong_t)f
 #define __NRAM_raiseat(a, b, c, d, e, f)                (struct ucpustate64 const *)a, (struct __siginfox64_struct const *)b
 #define __NRAM_mktty(a, b, c, d, e, f)                  (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
 #define __NRAM_lfutexlockexpr(a, b, c, d, e, f)         (__uint64_t *)a, (void *)b, (__size_t)c, (struct lfutexexprx64 const *)d, (struct __timespecx64 const *)e, (__syscall_ulong_t)f

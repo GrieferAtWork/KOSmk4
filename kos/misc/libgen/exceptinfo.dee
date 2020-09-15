@@ -1,0 +1,909 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import fs;
+import util;
+import functools;
+import * from deemon;
+import .c.ppexpr as ppexpr;
+
+function printPreprocessorExpressionIf(fp: File, cond: string): File {
+	cond = cond.strip();
+again:
+	if (cond.startswith("!")) {
+		local negCond = cond[1:].lstrip();
+		if (negCond.startswith("!")) {
+			cond = negCond[1:].lstrip();
+			goto again;
+		}
+		if (negCond.startswith("defined(") && negCond.endswith(")") &&
+		    negCond.findmatch("(", ")", 8) == #negCond - 1) {
+			return fp << "#ifndef " << cond[8:-1].strip() << "\n";
+		}
+	} else {
+		if (cond.startswith("defined(") && cond.endswith(")") &&
+		    cond.findmatch("(", ")", 8) == #cond - 1) {
+			return fp << "#ifdef " << cond[8:-1].strip() << "\n";
+		}
+	}
+	return fp << "#if " << cond << "\n";
+}
+
+function printPreprocessorExpressionEndif(fp: File, cond: string): File {
+	for (;;) {
+		final local PREFIX = "defined(";
+		final local SUFFIX = ")";
+		local i = cond.find(PREFIX);
+		if (i < 0)
+			break;
+		local end = cond.find(SUFFIX, i + #PREFIX);
+		if (end < 0)
+			break;
+		cond = cond[:i] + cond[i+#PREFIX:end] + cond[end+#SUFFIX:];
+	}
+	return fp << "#endif /* " << cond << " */\n";
+}
+
+
+
+class ExceptClass: WeakRefAble {
+	this = default;
+	public operator str(): string -> name;
+
+	@@Exception name (e.g. `E_BADALLOC')
+	public member name: string;
+
+	@@Exception message
+	public member message: string = "";
+
+	@@Exception code (either `ERROR_CLASS()`
+	@@when @baseClass is @none, or `ERROR_SUBCLASS()`)
+	public member code: string;
+
+	@@Exception errno expression
+	public member errnoExpr: string = none;
+
+	@@Exception base class (or @none if this one's a normal class)
+	public member baseClass: ExceptClass | none = none;
+
+	@@A preprocessor expression that must hold true for this class to be defined
+	public member ppCond: string = "1";
+
+	@@Sub-classes of this @ExceptClass
+	public member _subClasses: {WeakRef with ExceptClass...} = [];
+	public property subClasses: {ExceptClass...} = {
+		get(): {ExceptClass...} {
+			for (local c: _subClasses)
+				yield c.value;
+		}
+	}
+
+	@@Exception pointer bindings (name, typ, doc)
+	public member fields: {(string, string, string)...} = [];
+
+	@@Short-hand field-prefix for this exception (e.g. `ba_' for `E_BADALLOC')
+	public member _prefix: string;
+	public property prefix: string = {
+		get(): string {
+			if (_prefix !is bound) {
+				local usedPrefix = "";
+				local usedName = name;
+				if (baseClass !is none) {
+					local baseName = baseClass.name;
+					local commonTextLength = 0;
+					while (commonTextLength < #baseName &&
+						   commonTextLength < #usedName &&
+						   baseName[commonTextLength] == usedName[commonTextLength])
+						++commonTextLength;
+					usedName = usedName[commonTextLength:];
+				}
+				if (#usedName >= 2) {
+					for (local i: [:#usedName - 1]) {
+						if (usedName[i] == "_") {
+							usedPrefix += usedName[i + 1];
+						}
+					}
+				}
+				_prefix = usedPrefix.lower() + "_";
+			}
+			return _prefix;
+		}
+	}
+
+	@@The name for the containing exception data struct
+	@@e.g. E_BADALLOC uses `exception_badalloc_data`
+	public member _exceptionDataStructName: string;
+	public property exceptionDataStructName: string = {
+		get(): string {
+			if (_exceptionDataStructName !is bound) {
+				_exceptionDataStructName = baseClass !is none
+					? baseClass.exceptionDataStructName
+					: "exception_{}_data"
+						.format({ name.lower().lsstrip("e_") });
+			}
+			return _exceptionDataStructName;
+		}
+	}
+
+	private member _hasExceptionDataStruct: bool;
+	@@Returns @true if @this @ExceptClass has an exception-data-struct
+	public property hasExceptionDataStruct: bool = {
+		get(): bool {
+			if (_hasExceptionDataStruct !is bound) {
+				if (baseClass is none) {
+					if (fields)
+						goto yes;
+					for (local c: subClasses) {
+						if (c.fields)
+							goto yes;
+					}
+				}
+				_hasExceptionDataStruct = false;
+			}
+			return _hasExceptionDataStruct;
+yes:
+			_hasExceptionDataStruct = true;
+			return true;
+		}
+	}
+
+
+	@@Return the exception info member name of @this @ExceptClass
+	@@e.g. E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.getClassMemberName()
+	@@     returns: "ba_insufficient_heap_memory"
+	public function getClassMemberName(): string {
+		if (baseClass is none)
+			return name.lower();
+		local baseName = baseClass.name;
+		local thisName = name;
+		local commonTextLength = 0;
+		while (commonTextLength < #baseName &&
+		       commonTextLength < #thisName &&
+		       baseName[commonTextLength] == thisName[commonTextLength])
+			++commonTextLength;
+		return baseClass.prefix +
+			thisName[commonTextLength:]
+			.lstrip("_").lower();
+	}
+
+	@@Return the prefix for fields of this exception
+	@@e.g. E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.getFieldPrefix()
+	@@     returns: "e_badalloc.ba_insufficient_heap_memory.ihm_"
+	public function getFieldPrefix(): string {
+		if (baseClass is none)
+			return "{}.{}".format({ name.lower(), prefix });
+		return "{}.{}.{}".format({
+			baseClass.getFieldPrefix(),
+			getClassMemberName(),
+			prefix });
+	}
+
+
+	@@Find a field and exception-pointer-index, given its raw @name
+	@@e.g. E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.findFieldByName("num_bytes")
+	@@     returns: ("e_badalloc.ba_insufficient_heap_memory.ihm_num_bytes", 0)
+	public function findFieldByName(name: string): (string, int) {
+		/* Search the base classes fields. */
+		local index = 0;
+		if (baseClass !is none) {
+			for (local baseFieldName, none, none: baseClass.fields) {
+				if (baseFieldName == name)
+					return (baseClass.getFieldPrefix() + name, index);
+				++index;
+			}
+		}
+		/* Search my own fields. */
+		for (local fieldName, none, none: fields) {
+			if (fieldName == name)
+				return (getFieldPrefix() + name, index);
+			++index;
+		}
+		throw Error("Error class {} does not have a field {!r}"
+			.format({ this, name }));
+	}
+
+	@@Print the errno expression. The given @cbField is called
+	@@to print $fieldName references, where the argument is @"fieldName"
+	public function printErrnoExpr(
+			fp: File, cbField: Callable with string = none)
+			: File {
+		if (cbField is none) {
+			cbField = [](name: string): string {
+				fp << "error_data()->e_args." << findFieldByName(name)[0];
+			};
+		}
+		local expr = errnoExpr;
+		local flushStart = 0;
+		local len = #expr;
+		local i = 0;
+		while (i < len - 1) {
+			if (expr[i] != "$") {
+				++i;
+				continue;
+			}
+			local nameStart = i + 1;
+			if (!expr.issymstrt(nameStart)) {
+				++i;
+				continue;
+			}
+			local nameEnd = nameStart + 1;
+			while (nameEnd < len && expr.issymcont(nameEnd))
+				++nameEnd;
+			fp << expr[flushStart:i];
+			cbField(expr[nameStart:nameEnd]);
+			flushStart = nameEnd;
+		}
+		return fp << expr[flushStart:];
+	}
+
+	@@Print the exception-data struct for @this @ExceptClass
+	@@@param: escapeTypename: Called to escape type names.
+	@@                        Should return the escaped type name.
+	@@E.g. for E_INVALID_ARGUMENT:
+	@@>> struct exception_invalid_argument_data {
+	@@>>     syscall_ulong_t ia_context; /* Argument context (One of `E_INVALID_ARGUMENT_CONTEXT_*') */
+	@@>>     union {
+	@@>>         struct {
+	@@>>             uintptr_t uf_value;  /* The value that was given */
+	@@>>             uintptr_t uf_mask;   /* The mask of illegal & fixed bits */
+	@@>>             uintptr_t uf_result; /* The mask of fixed bits */
+	@@>>         }           ia_unknown_flag;
+	@@>>         ...
+	@@>>     }
+	@@>> #ifndef __COMPILER_HAVE_TRANSPARENT_UNION
+	@@>>     ...
+	@@>> #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	@@>>     ;
+	@@>> };
+	public function printExceptionDataStruct(
+			fp: File = none,
+			escapeTypename: Callable with string = none,
+			structName: string = none): File {
+		if (fp is none)
+			fp = File.stdout;
+		if (escapeTypename is none)
+			escapeTypename = functools.identity;
+		assert baseClass is none;
+		assert hasExceptionDataStruct;
+		if (ppCond != "1")
+			printPreprocessorExpressionIf(fp, ppCond);
+		if (structName is none)
+			structName = exceptionDataStructName;
+		fp << "struct " << structName << " {\n";
+		printExceptionDataStructFields(fp, escapeTypename, "\t");
+		local subClassesWithFields = [];
+		for (local c: subClasses) {
+			if (c.fields)
+				subClassesWithFields.append(c);
+		}
+		if (subClassesWithFields) {
+			fp << "\tunion {\n";
+			local classNames = List(
+				for (local c: subClassesWithFields)
+					c.getClassMemberName());
+			for (local name: classNames)
+				fp << "#undef " << name << "\n";
+			local hasUnconditionalSubClass = false;
+			for (local c: subClassesWithFields) {
+				fp << "\n";
+				if (c.ppCond == "1" || c.ppCond == ppCond) {
+					hasUnconditionalSubClass = true;
+				} else {
+					printPreprocessorExpressionIf(fp, c.ppCond);
+				}
+				fp << "\t\tstruct {\n";
+				c.printExceptionDataStructFields(fp, escapeTypename, "\t\t\t");
+				fp << "\t\t} " << c.getClassMemberName()
+					<< "; /* " << c.name << " */\n";
+				if (c.ppCond != "1" && c.ppCond != ppCond)
+					printPreprocessorExpressionEndif(fp, c.ppCond);
+			}
+			if (!hasUnconditionalSubClass) {
+				fp << "\n";
+				fp << "int _" << prefix << "placeholder;\n";
+			}
+			fp << "\n"
+				"\t}\n"
+				"#ifndef __COMPILER_HAVE_TRANSPARENT_UNION\n";
+			local subClassUnionName = "_" + prefix + "classes";
+			fp << "\t" << subClassUnionName << "\n";
+			local longestClassName = classNames.each.length > ...;
+			for (local name: classNames) {
+				fp << "#define " << name << (" " * (longestClassName - #name))
+					<< " " << subClassUnionName << "." << name << "\n";
+			}
+			fp << "#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */\n"
+				"\t;\n";
+		}
+		fp << "};\n";
+		if (ppCond != "1")
+			printPreprocessorExpressionEndif(fp, ppCond);
+		return fp;
+	}
+
+	public function printExceptionDataStructFields(
+			fp: File, escapeTypename: Callable with string,
+			linePrefix: string): File {
+		local effectiveFields = [];
+		local myFieldPrefix = prefix;
+		for (local name, typ, doc: fields) {
+			effectiveFields.append((
+				myFieldPrefix + name,
+				escapeTypename(typ),
+				doc));
+		}
+		local longestFieldName = effectiveFields.each[0].length > ...;
+		local longestFieldType = effectiveFields.each[1].length > ...;
+		for (local name, typ, doc: effectiveFields) {
+			fp << linePrefix << typ
+				<< (" " * (longestFieldType - #typ))
+				<< " " << name << ";";
+			doc = doc.rstrip();
+			if (doc) {
+				fp << (" " * (longestFieldName - #name))
+					<< " /* ";
+				local docPrefix = "\n{}{}    * ".format({
+					linePrefix,
+					" " * (longestFieldType + longestFieldName)
+				});
+				fp << docPrefix.join(
+					for (local l: doc.splitlines(false))
+						l.rstrip());
+
+				fp << "*/";
+			}
+			fp << "\n";
+		}
+		return fp;
+	}
+}
+
+
+function skipWhitespaceAndComments(text: string, i: int, end: int): int {
+again:
+	while (i < end && text.isspace(i))
+		++i;
+	if (i + 1 < end) {
+		local ch = text[i];
+		if (ch == "/") {
+			ch = text[i + 1];
+			if (ch == "/") {
+				i = text.find("\n", i, end);
+				if (i < 0)
+					i = end;
+				else {
+					++i;
+				}
+				goto again;
+			} else if (ch == "*") {
+				i = text.find("*/", i, end);
+				if (i < 0)
+					i = end;
+				else {
+					i += 2;
+				}
+				goto again;
+			}
+		}
+	}
+	return i;
+}
+
+function skipWhitespaceAndCommentsNoLf(text: string, i: int, end: int): int {
+again:
+	while (i < end && text.isspace(i) && !text.islf(i))
+		++i;
+	if (i + 1 < end) {
+		local ch = text[i];
+		if (ch == "/") {
+			ch = text[i + 1];
+			if (ch == "/") {
+				i = text.find("\n", i, end);
+				if (i < 0)
+					i = end;
+				else {
+					++i;
+				}
+				goto again;
+			} else if (ch == "*") {
+				i = text.find("*/", i, end);
+				if (i < 0)
+					i = end;
+				else {
+					i += 2;
+				}
+				goto again;
+			}
+		}
+	}
+	return i;
+}
+
+function decodeMultiPartCString(s: string): string {
+	File.Writer result;
+	local partStart = 0;
+	local len = #s;
+	for (;;) {
+		while (partStart < len && s.isspace(partStart))
+			++partStart;
+		if (partStart >= len)
+			break;
+		local ch = s[partStart];
+		if (ch !in "\"\'")
+			throw Error.ValueError("Bad string character {!r}"
+				.format({ ch }));
+		++partStart;
+		local partEnd = s.find(ch, partStart);
+		if (partEnd < 0)
+			throw Error.ValueError("Unmatched {!r} in {!r}"
+				.format({ ch, s[partStart:] }));
+		result << s[partStart:partEnd].decode("c-escape");
+		partStart = partEnd + 1;
+	}
+	return result.string;
+}
+
+
+global _cachedExceptionClasses = Dict();
+
+
+@@Parse all exception classes described by `fp' and
+@@return them as a mapping for name->ppCond->ExceptClass
+@@e.g. parseExceptionClasses("include/kos/except/codes.h")
+function parseExceptionClasses(
+		fp: File | string = none, filename: string = none)
+		: {string: {string: ExceptClass}} {
+	if (fp is none) {
+		fp = fs.joinpath(fs.headof(__FILE__),
+			"../../include/kos/except/codes.h");
+	}
+	local result: {string: {string: ExceptClass}} = Dict();
+	if (fp is string) {
+		local newResult = _cachedExceptionClasses.get(fp);
+		if (newResult !is none)
+			return newResult;
+		filename = fp;
+		_cachedExceptionClasses[filename] = result;
+		fp = File.open(filename);
+	}
+	if (filename is none)
+		filename = fp.filename;
+	local text = fp.read().unifylines().decode("utf-8");
+	local textEnd = #text;
+	local i = 0;
+	function lcAt(index: int): (int, int) {
+		local lineStart = text.rfind("\n", 0, index) + 1;
+		return (
+			1 + text.count("\n", 0, lineStart),
+			1 + (index - lineStart));
+	}
+	function errAt(index: int, message: string) {
+		local line, col = lcAt(index)...;
+		print File.stderr: (filename, "(", line, ",", col, ") : Error : ", message);
+		throw Error(message);
+	}
+	@@Stack of expressions that must hold true
+	local ppExpressionStack = [];
+	for (;;) {
+		final local BEGIN = "/*[[[begin]]]*/";
+		final local END   = "/*[[[end]]]*/";
+		i = text.find(BEGIN, i);
+		if (i < 0)
+			break;
+		local end = text.find(END, i);
+		if (end < 0)
+			errAt(i, "Tag not closed");
+		i += #BEGIN;
+		for (;;) {
+			i = skipWhitespaceAndComments(text, i, end);
+			if (i >= end)
+				break;
+			local ch = text[i];
+			if (ch != "#") {
+				errAt(i, "Unexpected character {!r} in exception-code region"
+					.format({ ch }));
+			}
+			i = skipWhitespaceAndCommentsNoLf(text, i + 1, end);
+			if (i >= end)
+				break;
+			if (text.islf(i))
+				continue;
+			if (!text.issymstrt(i))
+				errAt(i, "Unexpected character {!r} after '#'"
+					.format({ text[i] }));
+			local directiveStart = i;
+			++i;
+			while (i < end && text.issymcont(i))
+				++i;
+			local directive = text[directiveStart:i];
+			i = skipWhitespaceAndCommentsNoLf(text, i, end);
+			switch (directive) {
+
+			case "if":
+			case "ifdef":
+			case "ifndef":
+			case "else":
+			case "elif":
+			case "endif": {
+				local lineEnd = text.find("\n", i, end);
+				if (lineEnd < 0)
+					errAt(directiveStart, "Unterminated directive");
+				local expr = text[i:lineEnd].strip();
+				switch (directive) {
+				case "if":
+do_pp_if:
+					ppExpressionStack.append(expr);
+					break;
+				case "ifdef":
+					expr = "defined({})".format({ expr });
+					goto do_pp_if;
+				case "ifndef":
+					expr = "!defined({})".format({ expr });
+					goto do_pp_if;
+				case "elif":
+					if (!ppExpressionStack)
+						errAt(directiveStart, "Empty pp-stack");
+					expr = "!({}) && ({})".format({
+						ppExpressionStack.popback(),
+						expr });
+					goto do_pp_if;
+				case "else":
+					if (!ppExpressionStack)
+						errAt(directiveStart, "Empty pp-stack");
+					expr = "!({})".format({ ppExpressionStack.popback() });
+					goto do_pp_if;
+				case "endif":
+					if (!ppExpressionStack)
+						errAt(directiveStart, "Empty pp-stack");
+					ppExpressionStack.popback();
+					break;
+				}
+				i = lineEnd + 1;
+			}	break;
+
+			case "define": {
+				local macroNameStart = i;
+				if (i >= end || !text.issymstrt(i))
+					errAt(i, "Unexpected character {!r} after #define"
+						.format({ text.substr(i, i + 1) }));
+				++i;
+				while (i < end && text.issymcont(i))
+					++i;
+				local macroNameEnd = i;
+				local macroName = text[macroNameStart:macroNameEnd];
+				local ifNdefMacroName = "!defined({})".format({ macroName });
+				local ppCond = "&&".join(
+					for (local e: ppExpressionStack)
+						if (e != ifNdefMacroName)
+							"({})".format({ e }));
+				if (!ppCond)
+					ppCond = "1";
+				if (ppCond != "1") {
+					try {
+						ppCond = ppexpr.optimize(ppCond);
+					} catch (Error as e) {
+						errAt(macroNameStart, "Error while parsing pp expression {!r}: {}"
+							.format({ ppCond, e.message }));
+					}
+				}
+				local map = result.get(macroName);
+				if (map is none)
+					result[macroName] = map = Dict();
+				else {
+					if (ppCond in map)
+						errAt(macroNameStart, "Duplicate exception class: {!r} with {!r}"
+							.format({ macroName, ppCond }));
+				}
+				local e_class: ExceptClass = ExceptClass(
+					name:   macroName,
+					ppCond: ppCond);
+				map[ppCond] = e_class;
+				i = skipWhitespaceAndCommentsNoLf(text, i, end);
+				if (i >= end || text[i] != "(")
+					errAt(i, "Expected '(' after '#define {}', but got {!r}"
+						.format({ macroName, text.substr(i, i + 1) }));
+				++i;
+				local rParenIndex = text.findmatch("(", ")", i, end);
+				if (rParenIndex < 0)
+					errAt(i, "Missing ')' after '#define {} ('"
+						.format({ macroName }));
+				local baseAndCode = text[i:rParenIndex].strip();
+				if ("," in baseAndCode) {
+					local baseName, none, resultCode = baseAndCode.partition(",")...;
+					baseName = baseName.strip();
+					e_class.code = resultCode.strip();
+					e_class.baseClass = result.get(baseName).get(ppCond);
+					if (e_class.baseClass is none)
+						e_class.baseClass = result.get(baseName).get("1");
+					if (e_class.baseClass is none)
+						errAt(i, "Unknown base class name: {!r}"
+							.format({ baseName }));
+					e_class.baseClass._subClasses.append(WeakRef(e_class));
+				} else {
+					e_class.code = baseAndCode.strip();
+				}
+				i = rParenIndex + 1;
+				while (i < end && text.isspace(i) && !text.islf(i))
+					++i;
+				if (i + 1 < end && text[i] == "/" && text[i + 1] in "/*") {
+					@@Triples of (textStart, textEnd)
+					local commentLines: (int, int) = [];
+					local commentLineStart = i + 2;
+					if (text[i + 1] == "*") {
+						local commentEnd = text.find("*/", commentLineStart, end);
+						if (commentEnd < 0)
+							errAt(i, "Comment not terminated");
+						while (commentLineStart < commentEnd) {
+							local lineEnd = text.find("\n", commentLineStart, commentEnd);
+							if (lineEnd < 0)
+								lineEnd = commentEnd;
+							commentLines.append((commentLineStart, lineEnd));
+							commentLineStart = lineEnd;
+							while (commentLineStart < commentEnd && text.isspace(commentLineStart))
+								++commentLineStart;
+							if (commentLineStart < commentEnd && text[commentLineStart] == "*")
+								++commentLineStart;
+						}
+						i = commentEnd + 2;
+					} else {
+						for (;;) {
+							i = text.find("\n", commentLineStart, end);
+							if (i < 0)
+								i = end;
+							commentLines.append((commentLineStart, i));
+							if (i >= end)
+								break;
+							++i;
+							while (i < end && text.isspace(i))
+								++i;
+							if (i + 2 >= end)
+								break;
+							if (text.substr(i, i + 2) != "//")
+								break;
+							i += 2;
+							commentLineStart = i;
+						}
+					}
+					local commentText = File.Writer();
+					local isFirst = true;
+					for (local start, end: commentLines) {
+						if (!isFirst)
+							commentText << "\n";
+						commentText << text[start:end];
+						isFirst = false;
+					}
+					commentText = commentText.string;
+					function errAtComment(index: int, message: string) {
+						for (local start, end: commentLines) {
+							local len = end - start;
+							if (index < len)
+								return errAt(start + index, message);
+							index -= len;
+						}
+						return errAt(i, message);
+					}
+					local commentIndex = 0;
+					local commentLen = #commentText;
+					while (commentIndex < commentLen) {
+						if (commentText[commentIndex] != "[") {
+							++commentIndex;
+							continue;
+						}
+						local tagStart = commentIndex + 1;
+						local tagEnd = commentText.findmatch("[", "]", tagStart);
+						if (tagEnd < 0)
+							errAtComment(commentIndex, "Unmatched '['");
+						while (tagEnd > tagStart && commentText.isspace(tagEnd - 1))
+							--tagEnd;
+again_parse_tag_directive:
+						while (tagStart < tagEnd && commentText.isspace(tagStart))
+							++tagStart;
+						if (tagStart < tagEnd) {
+							if (!commentText.issymstrt(tagStart))
+								errAtComment(tagStart, "Unexpected character {!r} after '['"
+									.format({ commentText[tagStart] }));
+							local tagDirectiveEnd = tagStart + 1;
+							while (tagDirectiveEnd < tagEnd && commentText.issymcont(tagDirectiveEnd))
+								++tagDirectiveEnd;
+							local tagDirective = commentText[tagStart:tagDirectiveEnd];
+							while (tagDirectiveEnd < tagEnd && commentText.isspace(tagDirectiveEnd))
+								++tagDirectiveEnd;
+							local tagArgsStart = tagDirectiveEnd;
+							local tagArgsEnd   = tagDirectiveEnd;
+							if (tagDirectiveEnd < tagEnd && commentText[tagDirectiveEnd] == "(") {
+								tagArgsStart = tagDirectiveEnd + 1;
+								tagArgsEnd   = commentText.findmatch(
+									"(", ")", tagArgsStart, tagEnd);
+								if (tagArgsEnd < 0)
+									errAtComment(tagDirectiveEnd, "Unmatched '('");
+							}
+							commentIndex = tagArgsEnd + 1;
+							while (commentIndex < tagEnd && commentText.isspace(commentIndex))
+								++commentIndex;
+							while (tagArgsStart < tagArgsEnd && commentText.isspace(tagArgsStart))
+								++tagArgsStart;
+							while (tagArgsEnd > tagArgsStart && commentText.isspace(tagArgsEnd - 1))
+								--tagArgsEnd;
+							local tagArgs = commentText[tagArgsStart:tagArgsEnd];
+							try {
+								switch (tagDirective) {
+
+								case "errno":
+									/* Errno expression */
+									e_class.errnoExpr = tagArgs;
+									break;
+
+								case "msg":
+								case "message":
+									/* Exception message */
+									e_class.message = decodeMultiPartCString(tagArgs);
+									break;
+
+								case "prefix":
+									e_class._prefix = decodeMultiPartCString(tagArgs);
+									break;
+
+								case "fld":
+								case "field": {
+									/* [fld(num_bytes: size_t, "The number of bytes that could not be allocated")] */
+									local fieldNameEnd = tagArgs.find(":");
+									if (fieldNameEnd < 0)
+										errAtComment(tagArgsStart, "Missing ':' in argument {!r}"
+											.format({ tagArgs }));
+									local fieldTypeEnd = tagArgs.find(",", fieldNameEnd);
+									local fieldCommentStart = #tagArgs;
+									if (fieldTypeEnd < 0)
+										fieldTypeEnd = fieldCommentStart;
+									else {
+										fieldCommentStart = fieldTypeEnd + 1;
+									}
+									local fieldName = tagArgs[:fieldNameEnd].strip();
+									local fieldType = tagArgs[fieldNameEnd+1:fieldTypeEnd].strip();
+									local fieldDoc  = decodeMultiPartCString(tagArgs[fieldCommentStart:]).strip();
+									e_class.fields.append((fieldName, fieldType, fieldDoc));
+								}	break;
+
+								default:
+									errAtComment(tagStart, "Unrecognized tag directive {}({})"
+										.format({ tagDirective, tagArgs }));
+								}
+							} catch (Error as e) {
+								if (e is Error && type(e) !== Error)
+									errAtComment(tagStart, "Error during {}-directive: {}"
+										.format({ tagDirective, e.message }));
+								throw;
+							}
+							if (commentIndex < tagEnd && commentText[commentIndex] == ",") {
+								tagStart = commentIndex + 1;
+								goto again_parse_tag_directive;
+							}
+						}
+						commentIndex = tagEnd + 1;
+					}
+				}
+			}	break;
+
+			default:
+				errAt(directiveStart, "Unexpected directive {!r}"
+					.format({ directive }));
+			}
+		}
+		i = end + #END;
+	}
+	return result;
+}
+
+
+@@Print all exception data structures, as well as the
+@@combinatory `union exception_data_pointers'
+@@@param: keyStructName: A key function which may be used to skew struct names
+function printExceptionDataStructs(
+		fp: File = none,
+		classes: {string: {string: ExceptClass}} = none,
+		escapeTypename: Callable with string = none,
+		keyStructName: Callable with string = none,
+		exceptionDataPointerType: string = "__ULONGPTR_TYPE__",
+		exceptionDataPointerCount: string = "EXCEPTION_DATA_POINTERS") {
+	if (fp is none)
+		fp = File.stdout;
+	if (classes is none)
+		classes = parseExceptionClasses();
+	if (keyStructName is none)
+		keyStructName = functools.identity;
+	if (escapeTypename is none)
+		escapeTypename = functools.identity;
+	local isFirst = true;
+	@@List of (ppCond, structName, e_name) for all defined exception data struct names
+	local exceptionDataStructNames: {(string, string, string)...} = [];
+	for (local name, ppCondToCls: classes) {
+		for (local ppCond, cls: ppCondToCls) {
+			if (!cls.hasExceptionDataStruct)
+				continue;
+			if (!isFirst)
+				fp << "\n";
+			isFirst = false;
+			fp << "/* " << cls.name << " */\n";
+			local usedStructName = keyStructName(cls.exceptionDataStructName);
+			assert cls.ppCond === ppCond;
+			cls.printExceptionDataStruct(
+				fp:             fp,
+				escapeTypename: escapeTypename,
+				structName:     usedStructName);
+			exceptionDataStructNames.append((
+				ppCond, "struct " + usedStructName, cls.name));
+		}
+	}
+	if (!isFirst)
+		fp << "\n";
+	/* Print the combinatory `union exception_data_pointers' */
+	fp << "union " << keyStructName("exception_data_pointers") << " {\n";
+	local longestDataStructName = exceptionDataStructNames.each[1].length > ...;
+	local longestErrorClassName = exceptionDataStructNames.each[2].length > ...;
+	if (longestDataStructName < #exceptionDataPointerType)
+		longestDataStructName = #exceptionDataPointerType;
+	fp << "\t" << exceptionDataPointerType
+		<< (" " * (longestDataStructName - #exceptionDataPointerType))
+		<< " e_pointers[" << exceptionDataPointerCount << "];\n";
+	for (local ppCond, name, e_name: exceptionDataStructNames) {
+		if (ppCond != "1")
+			printPreprocessorExpressionIf(fp, ppCond);
+		fp << "\t" << name
+			<< (" " * (longestDataStructName - #name))
+			<< " " << e_name.lower() << ";"
+			<< (" " * (longestErrorClassName - #e_name))
+			<< " /* " << e_name << " */\n";
+		if (ppCond != "1")
+			printPreprocessorExpressionEndif(fp, ppCond);
+	}
+	fp << "};\n";
+}
+
+
+
+
+
+
+#ifdef __MAIN__
+for (local name, ppCondToCls: parseExceptionClasses()) {
+	for (local none, cls: ppCondToCls) {
+		if (cls.hasExceptionDataStruct) {
+			print(cls.name, ":[msg(", repr cls.message, ")]");
+			cls.printExceptionDataStruct();
+		}
+	}
+}
+#endif /* __MAIN__ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

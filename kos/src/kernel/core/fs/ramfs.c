@@ -33,7 +33,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/except/fs.h>
+#include <kos/except/reason/fs.h>
 #include <linux/magic.h>
 
 #include <assert.h>

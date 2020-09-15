@@ -39,7 +39,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/io.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
@@ -117,7 +117,7 @@ uvio_request_impl(struct uvio *__restrict self,
 		/* Fill in the exception code and exception pointers. */
 		PERTASK_SET(this_exception_data.e_code, slot->kur_except.kue_code);
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
-			PERTASK_SET(this_exception_data.e_pointers[i],
+			PERTASK_SET(this_exception_data.e_args.e_pointers[i],
 			            slot->kur_except.kue_pointers[i]);
 		}
 		error_throw_current();

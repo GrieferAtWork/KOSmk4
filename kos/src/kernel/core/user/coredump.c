@@ -125,10 +125,10 @@ dbg_coredump(void const *const *traceback_vector,
 		                        NULL);
 		dbg_putc('\n');
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
-			if (!reason_error->e_pointers[i])
+			if (!reason_error->e_args.e_pointers[i])
 				continue;
 			dbg_printf(DBGSTR("\tpointer[%u] = %p\n"),
-			           i, reason_error->e_pointers[i]);
+			           i, reason_error->e_args.e_pointers[i]);
 		}
 	}
 	if (reason_signal) {
@@ -320,10 +320,10 @@ coredump_create(struct ucpustate const *curr_ustate,
 		print_exception_desc_of(reason_error, &syslog_printer, SYSLOG_LEVEL_ERR);
 		printk(KERN_ERR "\n");
 		for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
-			if (!reason_error->e_pointers[i])
+			if (!reason_error->e_args.e_pointers[i])
 				continue;
 			printk(KERN_ERR "\tpointer[%u] = %p\n",
-			       i, reason_error->e_pointers[i]);
+			       i, reason_error->e_args.e_pointers[i]);
 		}
 	}
 	if (reason_signal) {

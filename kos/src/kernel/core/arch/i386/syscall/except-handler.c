@@ -70,7 +70,7 @@ NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict
 	(void)state;
 	(void)sc_info;
 	while (pointer_count != 0 &&
-	       data->e_pointers[pointer_count - 1] == 0)
+	       data->e_args.e_pointers[pointer_count - 1] == 0)
 		--pointer_count;
 	printk(KERN_TRACE "[except] Translate exception "
 	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
@@ -81,7 +81,7 @@ NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict
 		for (i = 0; i < pointer_count; ++i) {
 			printk(KERN_TRACE "%c%#" PRIxPTR,
 			       i == 0 ? '[' : ',',
-			       data->e_pointers[i]);
+			       data->e_args.e_pointers[i]);
 		}
 		printk(KERN_TRACE "]");
 	}
@@ -100,7 +100,7 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 	(void)state;
 	(void)sc_info;
 	while (pointer_count != 0 &&
-	       data->e_pointers[pointer_count - 1] == 0)
+	       data->e_args.e_pointers[pointer_count - 1] == 0)
 		--pointer_count;
 	printk(KERN_TRACE "[except] Propagate exception "
 	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
@@ -111,7 +111,7 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 		for (i = 0; i < pointer_count; ++i) {
 			printk(KERN_TRACE "%c%#" PRIxPTR "",
 			       i == 0 ? '[' : ',',
-			       data->e_pointers[i]);
+			       data->e_args.e_pointers[i]);
 		}
 		printk(KERN_TRACE "]");
 	}
@@ -163,7 +163,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	USER CHECKED void *stack;
 	USER CHECKED __except_handler64_t handler;
 	USER CHECKED struct kcpustate64 *user_state;
-	USER CHECKED struct exception_data64 *user_error;
+	USER CHECKED struct __exception_data64 *user_error;
 	struct exception_data *mydata;
 	unsigned int i;
 	/* Call the user-space exception handler */
@@ -180,17 +180,17 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	stack = (void *)((uintptr_t)stack & ~7);
 	/* Allocate structures */
 	user_state = (struct kcpustate64 *)((byte_t *)stack - sizeof(struct kcpustate64));
-	user_error = (struct exception_data64 *)((byte_t *)user_state - sizeof(struct exception_data64));
+	user_error = (struct __exception_data64 *)((byte_t *)user_state - sizeof(struct __exception_data64));
 	/* Ensure that we can write to the given stack. */
-	validate_writable(user_error, sizeof(struct exception_data64) + sizeof(struct kcpustate64));
+	validate_writable(user_error, sizeof(struct __exception_data64) + sizeof(struct kcpustate64));
 	COMPILER_WRITE_BARRIER();
 	/* Fill in user-space context information */
 	icpustate_user_to_kcpustate64(state, user_state);
 	/* Copy exception data onto the user-space stack. */
 	mydata = &THIS_EXCEPTION_DATA;
-	user_error->e_code = (error_code64_t)mydata->e_code;
+	user_error->e_code = (__error_code64_t)mydata->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		user_error->e_pointers[i] = (u64)mydata->e_pointers[i];
+		user_error->e_args.e_pointers[i] = (u64)mydata->e_args.e_pointers[i];
 	/* In case of a system call, set the fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
@@ -199,7 +199,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	log_userexcept_error_propagate(state, sc_info, mydata, mode, (void *)handler, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpdi(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate64 *__restrict state */
-	gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_error); /* struct exception_data64 *__restrict error */
+	gpregs_setpsi(&state->ics_gpregs, (uintptr_t)user_error); /* struct __exception_data64 *__restrict error */
 	icpustate_setuserpsp(state, (uintptr_t)user_error);
 	icpustate_setpc(state, (uintptr_t)(void *)handler);
 	{
@@ -234,7 +234,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	USER CHECKED void *stack;
 	USER CHECKED __except_handler32_t handler;
 	USER CHECKED struct kcpustate32 *user_state;
-	USER CHECKED struct exception_data32 *user_error;
+	USER CHECKED struct __exception_data32 *user_error;
 	struct exception_data *mydata;
 	unsigned int i;
 	/* Call the user-space exception handler */
@@ -249,9 +249,9 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	stack = (void *)((uintptr_t)stack & ~3);
 	/* Allocate structures */
 	user_state = (struct kcpustate32 *)((byte_t *)stack - sizeof(struct kcpustate32));
-	user_error = (struct exception_data32 *)((byte_t *)user_state - sizeof(struct exception_data32));
+	user_error = (struct __exception_data32 *)((byte_t *)user_state - sizeof(struct __exception_data32));
 	/* Ensure that we can write to the given stack. */
-	validate_writable(user_error, sizeof(struct exception_data32) + sizeof(struct kcpustate32));
+	validate_writable(user_error, sizeof(struct __exception_data32) + sizeof(struct kcpustate32));
 	COMPILER_WRITE_BARRIER();
 	/* Fill in user-space context information */
 	icpustate_user_to_kcpustate32(state, user_state);
@@ -260,13 +260,13 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 #ifdef __x86_64__
 	/* Propagate class & sub-class individually, since the way in
 	 * which they form e_code is different in x32 and x64 mode. */
-	user_error->e_class    = (error_class32_t)mydata->e_class;
-	user_error->e_subclass = (error_subclass32_t)mydata->e_subclass;
+	user_error->e_class    = (__error_class32_t)mydata->e_class;
+	user_error->e_subclass = (__error_subclass32_t)mydata->e_subclass;
 #else /* __x86_64__ */
-	user_error->e_code = (error_code32_t)mydata->e_code;
+	user_error->e_code = (__error_code32_t)mydata->e_code;
 #endif /* !__x86_64__ */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		user_error->e_pointers[i] = (u32)mydata->e_pointers[i];
+		user_error->e_args.e_pointers[i] = (u32)mydata->e_args.e_pointers[i];
 	/* In case of a system call, set the fault
 	 * address as the system call return address. */
 	user_error->e_faultaddr = sc_info != NULL
@@ -275,7 +275,7 @@ x86_userexcept_callhandler(struct icpustate *__restrict state,
 	log_userexcept_error_propagate(state, sc_info, mydata, mode, (void *)handler, user_error);
 	/* Redirect the given CPU state to return to the user-space handler. */
 	gpregs_setpcx(&state->ics_gpregs, (uintptr_t)user_state); /* struct kcpustate32 *__restrict state */
-	gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_error); /* struct exception_data32 *__restrict error */
+	gpregs_setpdx(&state->ics_gpregs, (uintptr_t)user_error); /* struct __exception_data32 *__restrict error */
 	icpustate_setuserpsp(state, (uintptr_t)user_error);
 	icpustate_setpc(state, (uintptr_t)(void *)handler);
 	{

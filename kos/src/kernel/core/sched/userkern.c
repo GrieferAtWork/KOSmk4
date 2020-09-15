@@ -36,7 +36,7 @@
 
 #include <compat/config.h>
 #include <kos/bits/ukern-struct.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/ukern.h>

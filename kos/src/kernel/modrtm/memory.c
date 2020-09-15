@@ -42,7 +42,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/bsearch.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 
 #include <assert.h>
 #include <stdbool.h>

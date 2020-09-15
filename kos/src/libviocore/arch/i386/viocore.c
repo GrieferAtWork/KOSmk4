@@ -110,27 +110,27 @@ libviocore_complete_except(struct vio_emulate_args *__restrict self,
 	struct exception_data *data;
 	data = error_data();
 	if (data->e_class == E_ILLEGAL_INSTRUCTION) {
-		if (!data->e_pointers[0])
-			data->e_pointers[0] = opcode;
-		if (!data->e_pointers[1])
-			data->e_pointers[1] = op_flags;
+		if (!data->e_args.e_illegal_instruction.ii_opcode)
+			data->e_args.e_illegal_instruction.ii_opcode = opcode;
+		if (!data->e_args.e_illegal_instruction.ii_op_flags)
+			data->e_args.e_illegal_instruction.ii_op_flags = op_flags;
 	} else if (data->e_class == E_SEGFAULT) {
 		/* Fix-up the context code for the segmentation fault. */
 		/* We're the VIO handler, so check if the fault happened during VIO */
-		if ((byte_t *)data->e_pointers[0] >= (byte_t *)self->vea_ptrlo &&
-		    (byte_t *)data->e_pointers[0] <= (byte_t *)self->vea_ptrhi)
-			data->e_pointers[1] |= E_SEGFAULT_CONTEXT_VIO;
+		if ((byte_t *)data->e_args.e_segfault.s_addr >= (byte_t *)self->vea_ptrlo &&
+		    (byte_t *)data->e_args.e_segfault.s_addr <= (byte_t *)self->vea_ptrhi)
+			data->e_args.e_segfault.s_context |= E_SEGFAULT_CONTEXT_VIO;
 #ifdef __KERNEL__
 		if (icpustate_isuser(self->vea_args.va_state))
 #endif /* __KERNEL__ */
 		{
 			/* The fault happened due to a user-space access */
-			data->e_pointers[1] |= E_SEGFAULT_CONTEXT_USERCODE;
+			data->e_args.e_segfault.s_context |= E_SEGFAULT_CONTEXT_USERCODE;
 		}
 #ifdef __x86_64__
 		/* The fault uses a non-canonical address (shouldn't actually happen...) */
-		if (ADDR_IS_NONCANON(data->e_pointers[0]))
-			data->e_pointers[1] |= E_SEGFAULT_CONTEXT_NONCANON;
+		if (ADDR_IS_NONCANON(data->e_args.e_segfault.s_addr))
+			data->e_args.e_segfault.s_context |= E_SEGFAULT_CONTEXT_NONCANON;
 #endif /* __x86_64__ */
 	}
 	/* Fix-up the PC register and fill in the fault address */
@@ -2233,18 +2233,18 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
 	       ERROR_CLASS(code), ERROR_SUBCLASS(code));
 #endif /* !__KERNEL__ */
 	/* Throw an exception detailing an unsupported opcode. */
-	data                = error_data();
-	data->e_code        = code;
-	data->e_faultaddr   = (void *)pc;
-	data->e_pointers[0] = opcode;
-	data->e_pointers[1] = op_flags;
-	data->e_pointers[2] = ptr2;
-	data->e_pointers[3] = ptr3;
-	data->e_pointers[4] = ptr4;
-	data->e_pointers[5] = ptr5;
-	data->e_pointers[6] = ptr6;
+	data = error_data();
+	data->e_code               = code;
+	data->e_faultaddr          = (void *)pc;
+	data->e_args.e_pointers[0] = opcode;
+	data->e_args.e_pointers[1] = op_flags;
+	data->e_args.e_pointers[2] = ptr2;
+	data->e_args.e_pointers[3] = ptr3;
+	data->e_args.e_pointers[4] = ptr4;
+	data->e_args.e_pointers[5] = ptr5;
+	data->e_args.e_pointers[6] = ptr6;
 	for (i = 7; i < EXCEPTION_DATA_POINTERS; ++i)
-		data->e_pointers[i] = 0;
+		data->e_args.e_pointers[i] = 0;
 	error_throw_current();
 }
 
@@ -2259,14 +2259,14 @@ libviocore_throw_exception(struct vio_emulate_args *__restrict self,
 	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, (uintptr_t)next_pc);
-	data                = error_data();
-	data->e_code        = code;
-	data->e_faultaddr   = (void *)pc;
-	data->e_pointers[0] = ptr0;
-	data->e_pointers[1] = ptr1;
-	data->e_pointers[2] = ptr2;
+	data = error_data();
+	data->e_code               = code;
+	data->e_faultaddr          = (void *)pc;
+	data->e_args.e_pointers[0] = ptr0;
+	data->e_args.e_pointers[1] = ptr1;
+	data->e_args.e_pointers[2] = ptr2;
 	for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
-		data->e_pointers[i] = 0;
+		data->e_args.e_pointers[i] = 0;
 	error_throw_current();
 }
 

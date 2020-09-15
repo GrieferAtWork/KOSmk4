@@ -193,8 +193,8 @@
 %[typeorg(<kos/bits/debugtrap32.h>: debugtrap_reason32)]
 %[typeorg(<kos/bits/debugtrap64.h>: debugtrap_reason64)]
 %[typeorg(<kos/bits/exception_data.h>: exception_data)]
-%[typeorg(<kos/bits/exception_data32.h>: exception_data32)]
-%[typeorg(<kos/bits/exception_data64.h>: exception_data64)]
+%[typeorg(<kos/bits/exception_data32.h>: __exception_data32)]
+%[typeorg(<kos/bits/exception_data64.h>: __exception_data64)]
 %[typeorg(<kos/exec/bits/peb.h>: process_peb)]
 %[typeorg(<kos/exec/bits/peb32.h>: process_peb32)]
 %[typeorg(<kos/exec/bits/peb64.h>: process_peb64)]
@@ -2446,13 +2446,13 @@ coredump:([tostr(STRUCT_UCPUSTATE)] struct ucpustate const *curr_state,
 coredumpx32:([tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *curr_state,
              [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *orig_state,
              [tostr(VOID_VECTOR32:traceback_length)] __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length,
-             [tostr(STRUCT_EXCEPTION_DATA32)] struct exception_data32 const *exception,
+             [tostr(STRUCT_EXCEPTION_DATA32)] struct __exception_data32 const *exception,
              [tostr(UNWIND_ERROR)] syscall_ulong_t unwind_error) -> errno_t;
 [doc_alias(coredump)][restart(must)]
 coredumpx64:([tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *curr_state,
              [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *orig_state,
              [tostr(VOID_VECTOR64:traceback_length)] __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length,
-             [tostr(STRUCT_EXCEPTION_DATA64)] struct exception_data64 const *exception,
+             [tostr(STRUCT_EXCEPTION_DATA64)] struct __exception_data64 const *exception,
              [tostr(UNWIND_ERROR)] syscall_ulong_t unwind_error) -> errno_t;
 %[endgroup]
 

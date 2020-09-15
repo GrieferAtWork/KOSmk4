@@ -215,7 +215,9 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(this_exception_state, &this_exception_info.ei_state, sizeof(this_exception_info.ei_state));
 	DEFINE_PUBLIC_SYMBOL(this_exception_class, &this_exception_info.ei_class, sizeof(this_exception_info.ei_class));
 	DEFINE_PUBLIC_SYMBOL(this_exception_subclass, &this_exception_info.ei_subclass, sizeof(this_exception_info.ei_subclass));
-	DEFINE_PUBLIC_SYMBOL(this_exception_pointers, &this_exception_info.ei_data.e_pointers[0], sizeof(this_exception_info.ei_data.e_pointers));
+	DEFINE_PUBLIC_SYMBOL(this_exception_pointers,
+	                     &this_exception_info.ei_data.e_args.e_pointers[0],
+	                     sizeof(this_exception_info.ei_data.e_args.e_pointers));
 	DEFINE_PUBLIC_SYMBOL(this_exception_flags, &this_exception_info.ei_flags, sizeof(this_exception_info.ei_flags));
 	DEFINE_PUBLIC_SYMBOL(this_exception_faultaddr, &this_exception_info.ei_data.e_faultaddr, sizeof(this_exception_info.ei_data.e_faultaddr));
 #if EXCEPT_BACKTRACE_SIZE != 0

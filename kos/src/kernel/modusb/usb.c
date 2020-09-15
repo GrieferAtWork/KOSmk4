@@ -39,7 +39,7 @@
 #include <hybrid/minmax.h>
 
 #include <hw/usb/usb.h>
-#include <kos/except/io.h>
+#include <kos/except/reason/io.h>
 
 #include <assert.h>
 #include <format-printer.h>

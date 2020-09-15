@@ -36,7 +36,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 
 #include <assert.h>
 #include <errno.h>

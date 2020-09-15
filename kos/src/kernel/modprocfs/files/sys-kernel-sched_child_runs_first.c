@@ -27,7 +27,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 
 #include <unicode.h>
 

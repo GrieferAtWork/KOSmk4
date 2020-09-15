@@ -38,12 +38,12 @@ __SYSDECL_END
 #include <hybrid/__pointer.h>
 __SYSDECL_BEGIN
 struct kcpustate32;
-struct exception_data32;
+struct __exception_data32;
 #define __EXCEPT_HANDLER32_CC /*__ATTR_FASTCALL*/
 typedef /*__ATTR_NORETURN*/
 __HYBRID_FUNCPTR32(void, /*__ATTR_FASTCALL*/, __except_handler32_t,
                    (struct kcpustate32 * __restrict state,
-                    struct exception_data32 *__restrict error));
+                    struct __exception_data32 *__restrict error));
 __SYSDECL_END
 #endif /* !__x86_64__ */
 #endif /* !__CC__ */

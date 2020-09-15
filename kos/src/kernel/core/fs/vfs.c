@@ -42,8 +42,8 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <kos/except/fs.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/inval.h>
 #include <kos/hop/path.h>
 #include <limits.h> /* SYMLOOP_MAX */
 

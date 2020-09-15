@@ -5799,6 +5799,8 @@
 #define __CRT_HAVE_KOS$err 1
 #define __CRT_HAVE_KOS$errc 1
 #define __CRT_HAVE_KOS$error 1
+#define __CRT_HAVE_KOS$error_as_errno 1
+#define __CRT_HAVE_KOS$error_as_signal 1
 #define __CRT_HAVE_KOS$error_at_line 1
 #define __CRT_HAVE_KOS$errx 1
 #define __CRT_HAVE_KOS$ether_aton 1
@@ -9182,6 +9184,8 @@
 #define __CRT_HAVE_DOS$err 1
 #define __CRT_HAVE_DOS$errc 1
 #define __CRT_HAVE_DOS$error 1
+#define __CRT_HAVE_DOS$error_as_errno 1
+#define __CRT_HAVE_DOS$error_as_signal 1
 #define __CRT_HAVE_DOS$error_at_line 1
 #define __CRT_HAVE_DOS$errx 1
 #define __CRT_HAVE_DOS$ether_aton 1

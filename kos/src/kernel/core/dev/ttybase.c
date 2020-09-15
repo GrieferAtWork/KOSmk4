@@ -40,8 +40,8 @@
 #include <bits/ioctls/termiox.h> /* struct termiox */
 #include <compat/config.h>
 #include <compat/kos/types.h>
-#include <kos/except/inval.h>
-#include <kos/except/io.h>
+#include <kos/except/reason/inval.h>
+#include <kos/except/reason/io.h>
 #include <kos/ioctl/tty.h>
 #include <sys/stat.h>
 #include <sys/types.h> /* loff_t */

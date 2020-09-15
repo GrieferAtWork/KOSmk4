@@ -34,32 +34,32 @@
 __DECL_BEGIN
 
 /* Convert between 32-bit and 64-bit siginfo_t structures */
-#define exception_data32_to_exception_data32(self, result)                   \
-	__libc_memcpy(__COMPILER_REQTYPE(struct exception_data32 *, result),     \
-	              __COMPILER_REQTYPE(struct exception_data32 const *, self), \
-	              sizeof(struct exception_data32))
-#define exception_data64_to_exception_data64(self, result)                   \
-	__libc_memcpy(__COMPILER_REQTYPE(struct exception_data64 *, result),     \
-	              __COMPILER_REQTYPE(struct exception_data64 const *, self), \
-	              sizeof(struct exception_data64))
+#define exception_data32_to_exception_data32(self, result)                     \
+	__libc_memcpy(__COMPILER_REQTYPE(struct __exception_data32 *, result),     \
+	              __COMPILER_REQTYPE(struct __exception_data32 const *, self), \
+	              sizeof(struct __exception_data32))
+#define exception_data64_to_exception_data64(self, result)                     \
+	__libc_memcpy(__COMPILER_REQTYPE(struct __exception_data64 *, result),     \
+	              __COMPILER_REQTYPE(struct __exception_data64 const *, self), \
+	              sizeof(struct __exception_data64))
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(exception_data32_to_exception_data64)(struct exception_data32 const *__restrict __self,
-                                                    struct exception_data64 *__restrict __result) {
+__NOTHROW_NCX(exception_data32_to_exception_data64)(struct __exception_data32 const *__restrict __self,
+                                                    struct __exception_data64 *__restrict __result) {
 	unsigned int i;
-	__result->e_code = (error_code64_t)__self->e_code;
+	__result->e_code = (__error_code64_t)__self->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		__result->e_pointers[i] = (__UINT64_TYPE__)__self->e_pointers[i];
+		__result->e_args.e_pointers[i] = (__ULONG64_TYPE__)__self->e_args.e_pointers[i];
 	__result->e_faultaddr = (__HYBRID_PTR64(void))__self->e_faultaddr;
 }
 
 __LOCAL __ATTR_LEAF __ATTR_NONNULL((1, 2)) void
-__NOTHROW_NCX(exception_data64_to_exception_data32)(struct exception_data64 const *__restrict __self,
-                                                    struct exception_data32 *__restrict __result) {
+__NOTHROW_NCX(exception_data64_to_exception_data32)(struct __exception_data64 const *__restrict __self,
+                                                    struct __exception_data32 *__restrict __result) {
 	unsigned int i;
-	__result->e_code = (error_code32_t)__self->e_code;
+	__result->e_code = (__error_code32_t)__self->e_code;
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-		__result->e_pointers[i] = (__UINT32_TYPE__)__self->e_pointers[i];
+		__result->e_args.e_pointers[i] = (__ULONG32_TYPE__)__self->e_args.e_pointers[i];
 	__result->e_faultaddr = (__HYBRID_PTR32(void))__self->e_faultaddr;
 }
 

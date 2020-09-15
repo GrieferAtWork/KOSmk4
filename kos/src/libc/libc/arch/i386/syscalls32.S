@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98ea3e21 */
+/* HASH CRC-32:0x853fdf4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8370,7 +8370,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xstime64, libc_sys_Xstime64)
  *                           allowing coredumps to also be triggerred for unhandled signals.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct __exception_data32 const *exception, syscall_ulong_t unwind_error) */
 .section .text.crt.syscall.coredump
 INTERN_FUNCTION(libc_sys_coredump)
 	movl   $(0xffffffe8), %eax
@@ -8402,7 +8402,7 @@ DEFINE_PUBLIC_ALIAS(sys_coredump, libc_sys_coredump)
  *                           allowing coredumps to also be triggerred for unhandled signals.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct exception_data32 const *exception, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void) const *traceback_vector, size_t traceback_length, struct __exception_data32 const *exception, syscall_ulong_t unwind_error) */
 .section .text.crt.syscall.Xcoredump
 INTERN_FUNCTION(libc_sys_Xcoredump)
 	movl   $(0xffffffe8), %eax

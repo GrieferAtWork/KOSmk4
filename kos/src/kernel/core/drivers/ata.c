@@ -46,8 +46,8 @@
 #include <hybrid/overflow.h>
 
 #include <kos/dev.h>
-#include <kos/except/inval.h>
-#include <kos/except/io.h>
+#include <kos/except/reason/inval.h>
+#include <kos/except/reason/io.h>
 #include <linux/hdreg.h>
 #include <sys/io.h>
 
@@ -605,9 +605,9 @@ NOTHROW(FCALL handle_completion_ioerror)(struct aio_handle *__restrict self,
 	struct exception_data *mydata = &THIS_EXCEPTION_DATA;
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	memset(mydata, 0, sizeof(struct exception_data));
-	mydata->e_code        = ERROR_CODE(ERRR_C(errr), ERRR_S(errr));
-	mydata->e_pointers[0] = E_IOERROR_SUBSYSTEM_HARDDISK;
-	mydata->e_pointers[1] = ERRR_R(errr);
+	mydata->e_code                       = ERROR_CODE(ERRR_C(errr), ERRR_S(errr));
+	mydata->e_args.e_ioerror.i_subsystem = E_IOERROR_SUBSYSTEM_HARDDISK;
+	mydata->e_args.e_ioerror.i_reason    = ERRR_R(errr);
 	COMPILER_WRITE_BARRIER();
 	ata_handle_signal(self, AIO_COMPLETION_FAILURE);
 	COMPILER_WRITE_BARRIER();
@@ -623,9 +623,9 @@ NOTHROW(FCALL handle_completion_ioerror_generic)(struct aio_handle *__restrict s
 	       self->ah_type == &aio_noop_type);
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	memset(mydata, 0, sizeof(struct exception_data));
-	mydata->e_code        = ERROR_CODE(ERRR_C(errr), ERRR_S(errr));
-	mydata->e_pointers[0] = E_IOERROR_SUBSYSTEM_HARDDISK;
-	mydata->e_pointers[1] = ERRR_R(errr);
+	mydata->e_code                       = ERROR_CODE(ERRR_C(errr), ERRR_S(errr));
+	mydata->e_args.e_ioerror.i_subsystem = E_IOERROR_SUBSYSTEM_HARDDISK;
+	mydata->e_args.e_ioerror.i_reason    = ERRR_R(errr);
 	COMPILER_WRITE_BARRIER();
 	aio_handle_complete(self, AIO_COMPLETION_FAILURE);
 	COMPILER_WRITE_BARRIER();

@@ -28,7 +28,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/udp.h>

@@ -33,7 +33,7 @@
 #include <hybrid/atomic.h>
 
 #include <asm/cpu-flags.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 
 #include <string.h>
 #include <unicode.h>

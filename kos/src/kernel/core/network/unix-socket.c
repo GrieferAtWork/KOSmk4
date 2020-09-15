@@ -40,8 +40,8 @@ gcc_opt.removeif([](x) -> x.startswith("-O"));
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
-#include <kos/except/inval.h>
-#include <kos/except/net.h>
+#include <kos/except/reason/inval.h>
+#include <kos/except/reason/net.h>
 #include <network/unix-socket.h>
 #include <sys/un.h> /* sockaddr_un  */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x416fd857 */
+/* HASH CRC-32:0xcad73b23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -322,6 +322,10 @@ DEFINE_PUBLIC_ALIAS(DOS$_sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$sopen, libd_sopen);
 DEFINE_PUBLIC_ALIAS(DOS$_filelength, libd__filelength);
 DEFINE_PUBLIC_ALIAS(DOS$_eof, libd__eof);
+
+/* kos.except */
+DEFINE_PUBLIC_ALIAS(DOS$error_as_errno, libd_error_as_errno);
+DEFINE_PUBLIC_ALIAS(DOS$error_as_signal, libd_error_as_signal);
 
 /* kos.except-handler */
 DEFINE_PUBLIC_ALIAS(DOS$set_exception_handler, libd_set_exception_handler);

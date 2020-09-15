@@ -25,7 +25,7 @@
 
 #include <kernel/except.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <network/socket.h>
 #include <network/udp-socket.h>
 #include <network/unix-socket.h>

@@ -35,7 +35,7 @@
 
 #include <compat/config.h>
 #include <kos/except-handler.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 
 #include <errno.h>
 #include <signal.h>

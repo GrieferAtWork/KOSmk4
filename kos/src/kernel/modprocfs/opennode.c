@@ -26,7 +26,7 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 
-#include <kos/except/fs.h>
+#include <kos/except/reason/fs.h>
 
 #include <assert.h>
 

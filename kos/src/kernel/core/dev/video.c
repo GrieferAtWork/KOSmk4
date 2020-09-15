@@ -30,7 +30,7 @@
 #include <kernel/user.h>
 
 #include <kos/except.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/ioctl/video.h>
 #include <linux/kd.h>
 #include <linux/vt.h>

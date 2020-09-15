@@ -67,14 +67,14 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
                     USER UNCHECKED struct NAME(ucpustate) const *curr_state,
                     USER UNCHECKED struct NAME(ucpustate) const *orig_state,
                     USER UNCHECKED NAME(u) const *const *traceback_vector, size_t traceback_length,
-                    USER UNCHECKED struct NAME(exception_data) const *exception,
+                    USER UNCHECKED struct NAME(__exception_data) const *exception,
                     syscall_ulong_t unwind_error) {
 	struct ucpustate curr_ustate, orig_ustate;
 	void **utb_vector;
 	signo_t signo = SIGABRT;
 	validate_readable_opt(exception,
 	                      unwind_error == UNWIND_SUCCESS
-	                      ? sizeof(struct NAME(exception_data))
+	                      ? sizeof(struct NAME(__exception_data))
 	                      : sizeof(struct NAME2(__siginfox, _struct)));
 	if (!curr_state && !orig_state) {
 		icpustate_user_to_ucpustate(return_state, &curr_ustate);
@@ -193,7 +193,7 @@ NAME(coredump_rpc)(void *UNUSED(arg),
 	                           (USER UNCHECKED struct NAME(ucpustate) const *)sc_info->rsi_regs[1],
 	                           (USER UNCHECKED NAME(u) const *const *)sc_info->rsi_regs[2],
 	                           (size_t)sc_info->rsi_regs[3],
-	                           (USER UNCHECKED struct NAME(exception_data) const *)sc_info->rsi_regs[4],
+	                           (USER UNCHECKED struct NAME(__exception_data) const *)sc_info->rsi_regs[4],
 	                           (syscall_ulong_t)sc_info->rsi_regs[5]);
 }
 
@@ -204,7 +204,7 @@ NAME2(DEFINE_SYSCALL, _6)(errno_t, coredump,
                           USER UNCHECKED struct NAME(ucpustate) const *, curr_state,
                           USER UNCHECKED struct NAME(ucpustate) const *, orig_state,
                           USER UNCHECKED NAME(PTR)(void) const *, traceback_vector, size_t, traceback_length,
-                          USER UNCHECKED struct NAME(exception_data) const *, exception,
+                          USER UNCHECKED struct NAME(__exception_data) const *, exception,
                           syscall_ulong_t, unwind_error) {
 	(void)curr_state;
 	(void)orig_state;

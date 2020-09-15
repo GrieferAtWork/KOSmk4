@@ -30,7 +30,7 @@
 #include <kernel/vm.h>
 #include <kernel/vm/phys.h>
 
-#include <kos/except/io.h>
+#include <kos/except/reason/io.h>
 
 #include <assert.h>
 

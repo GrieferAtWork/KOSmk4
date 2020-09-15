@@ -45,7 +45,7 @@
 #include <hybrid/minmax.h>
 
 #include <compat/config.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <sys/param.h>
 #include <sys/wait.h>
 

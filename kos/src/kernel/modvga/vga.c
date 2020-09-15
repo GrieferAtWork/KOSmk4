@@ -37,7 +37,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/dev.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <linux/kd.h>
 
 #include <assert.h>

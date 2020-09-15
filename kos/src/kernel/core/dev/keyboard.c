@@ -37,7 +37,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/ioctl/keyboard.h>
 #include <kos/kernel/handle.h>
 #include <linux/kd.h> /* Needed to emulate the linux keyboard interface */

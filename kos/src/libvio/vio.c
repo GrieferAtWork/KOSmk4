@@ -412,7 +412,7 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 			resp.rx.ur_opcode      = UVIO_OPCODE_EXCEPT;
 			resp.rx.ur_except_code = data->e_code;
 			for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
-				resp.rx.ur_except_ptrs[i] = data->e_pointers[i];
+				resp.rx.ur_except_ptrs[i] = data->e_args.e_pointers[i];
 			resp_size = sizeof(resp.rx);
 		}
 		sys_write(fd, &resp, resp_size);

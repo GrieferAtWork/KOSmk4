@@ -41,7 +41,7 @@
 #include <hybrid/wordbits.h>
 
 #include <asm/cpu-flags.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>

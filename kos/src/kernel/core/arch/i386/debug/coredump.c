@@ -39,7 +39,7 @@
 #include <kos/bits/exception_data-convert.h>
 #include <kos/bits/exception_data.h>
 #include <kos/bits/exception_data32.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>

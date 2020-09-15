@@ -28,6 +28,8 @@ global knownTypeClasses: {string: string} = Dict({
 	"int"                    : "TD",
 	"signed"                 : "TD",
 	"unsigned"               : "TD",
+	"bool"                   : "TD",
+	"__BOOL"                 : "TD",
 	"long"                   : "TL",
 	"long long"              : "TLL",
 	"long int long"          : "TLL",

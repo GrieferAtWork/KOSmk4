@@ -27,8 +27,8 @@
 #include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 
-#include <kos/except/fs.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/inval.h>
 #include <network/socket.h>
 #include <sys/stat.h>
 

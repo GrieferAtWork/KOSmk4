@@ -315,27 +315,27 @@ print_exception_desc_of(struct exception_data const *__restrict data,
 	case E_SEGFAULT:
 		/* TODO: Print extended information for SEGFAULT sub-classes */
 		format_printf(printer, arg, " [cr2=%p] [%c%c%c%c]",
-		              data->e_pointers[0],
-		              data->e_pointers[1] & E_SEGFAULT_CONTEXT_FAULT ? 'f' : '-',
-		              data->e_pointers[1] & E_SEGFAULT_CONTEXT_WRITING ? 'w' : '-',
-		              data->e_pointers[1] & E_SEGFAULT_CONTEXT_USERCODE ? 'u' : '-',
-		              data->e_pointers[1] & E_SEGFAULT_CONTEXT_NONCANON ? 'c' : '-');
+		              data->e_args.e_segfault.s_addr,
+		              data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_FAULT ? 'f' : '-',
+		              data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_WRITING ? 'w' : '-',
+		              data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_USERCODE ? 'u' : '-',
+		              data->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_NONCANON ? 'c' : '-');
 		break;
 
 	case E_ILLEGAL_INSTRUCTION:
-		print_opcode(printer, arg, data->e_pointers[0]);
+		print_opcode(printer, arg, data->e_args.e_illegal_instruction.ii_opcode);
 		switch (data->e_subclass) {
 
 		case E_ILLEGAL_INSTRUCTION_X86_INTERRUPT:
 			format_printf(printer, arg, " [int=%#.2" PRIxPTR ":%#" PRIxPTR "] [seg=%#" PRIxPTR "]",
-			              data->e_pointers[1],
-			              data->e_pointers[2],
-			              data->e_pointers[3]);
+			              data->e_args.e_illegal_instruction.ii_x86_interrupt.xi_intno,
+			              data->e_args.e_illegal_instruction.ii_x86_interrupt.xi_ecode,
+			              data->e_args.e_illegal_instruction.ii_x86_interrupt.xi_segval);
 			break;
 
 		case E_ILLEGAL_INSTRUCTION_BAD_OPERAND: {
 			char const *what_name;
-			switch (data->e_pointers[2]) {
+			switch (data->e_args.e_illegal_instruction.ii_bad_operand.bo_what) {
 
 			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY:
 			case E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER:
@@ -354,13 +354,13 @@ print_exception_desc_of(struct exception_data const *__restrict data,
 				format_printf(printer, arg, " [what=%s]", what_name);
 			} else {
 				format_printf(printer, arg, " [what=?(%#" PRIxPTR ")]",
-				              data->e_pointers[2]);
+				              data->e_args.e_illegal_instruction.ii_bad_operand.bo_what);
 			}
 		}	break;
 
 		case E_ILLEGAL_INSTRUCTION_REGISTER: {
 			char const *name;
-			switch (data->e_pointers[2]) {
+			switch (data->e_args.e_illegal_instruction.ii_register.r_how) {
 			case E_ILLEGAL_INSTRUCTION_REGISTER_RDINV: name = "rdinv"; break; /* Read from invalid register */
 			case E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV: name = "rdprv"; break; /* Read from privileged register */
 			case E_ILLEGAL_INSTRUCTION_REGISTER_WRINV: name = "wrinv"; break; /* Write to invalid register */
@@ -371,21 +371,24 @@ print_exception_desc_of(struct exception_data const *__restrict data,
 			if (name) {
 				format_printf(printer, arg, " [%s:", name);
 			} else {
-				format_printf(printer, arg, " [?(%#" PRIxPTR "):", data->e_pointers[2]);
+				format_printf(printer, arg, " [?(%#" PRIxPTR "):",
+				              data->e_args.e_illegal_instruction.ii_register.r_how);
 			}
-			if (data->e_pointers[3] == X86_REGISTER_MSR) {
+			if (data->e_args.e_illegal_instruction.ii_register.r_regno == X86_REGISTER_MSR) {
 				format_printf(printer, arg, "%%msr(%#" PRIxPTR "),%#" PRIx64 "]",
-				              data->e_pointers[4],
-				              (uint64_t)data->e_pointers[5] |
-				              (uint64_t)data->e_pointers[6] << 32);
+				              data->e_args.e_illegal_instruction.ii_register.r_offset,
+				              (uint64_t)data->e_args.e_illegal_instruction.ii_register.r_regval |
+				              (uint64_t)data->e_args.e_illegal_instruction.ii_register.r_regval2 << 32);
 			} else {
-				name = register_name(data->e_pointers[3]);
+				name = register_name(data->e_args.e_illegal_instruction.ii_register.r_regno);
 				if (name)
 					format_printf(printer, arg, "%%%s,", name);
 				else {
-					format_printf(printer, arg, "?(%#x),", data->e_pointers[3]);
+					format_printf(printer, arg, "?(%#x),",
+					              data->e_args.e_illegal_instruction.ii_register.r_regno);
 				}
-				format_printf(printer, arg, "%#" PRIxPTR "]", data->e_pointers[4]);
+				format_printf(printer, arg, "%#" PRIxPTR "]",
+				              data->e_args.e_illegal_instruction.ii_register.r_regval);
 			}
 		}	break;
 
@@ -442,7 +445,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	is_first_pointer = true;
 	/* Print exception pointers. */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
-		if (info->ei_data.e_pointers[i] == 0)
+		if (info->ei_data.e_args.e_pointers[i] == 0)
 			continue;
 		if (is_first_pointer) {
 			(*printer)(arg, "Exception pointers:\n", COMPILER_STRLEN("Exception pointers:\n"));
@@ -451,8 +454,8 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 		format_printf(printer, arg,
 		              "    [%u] = %p (%" PRIuPTR ")\n",
 		              i,
-		              info->ei_data.e_pointers[i],
-		              info->ei_data.e_pointers[i]);
+		              info->ei_data.e_args.e_pointers[i],
+		              info->ei_data.e_args.e_pointers[i]);
 	}
 	addr2line_printf(tb_printer, tb_arg,
 	                 instruction_trypred((void const *)kcpustate_getpc(&info->ei_state),
@@ -520,7 +523,7 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	is_first_pointer = true;
 	/* Print exception pointers. */
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i) {
-		if (info->ei_data.e_pointers[i] == 0)
+		if (info->ei_data.e_args.e_pointers[i] == 0)
 			continue;
 		if (is_first_pointer) {
 			dbg_print(DBGSTR("Exception pointers:\n"));
@@ -528,8 +531,8 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 		}
 		dbg_printf(DBGSTR("    [" AC_WHITE("%u") "] = " AC_WHITE("%p") " (" AC_WHITE("%" PRIuPTR) ")\n"),
 		           i,
-		           info->ei_data.e_pointers[i],
-		           info->ei_data.e_pointers[i]);
+		           info->ei_data.e_args.e_pointers[i],
+		           info->ei_data.e_args.e_pointers[i]);
 	}
 	isa = instrlen_isa_from_kcpustate(&info->ei_state);
 	dbg_addr2line_printf(instruction_trypred((void const *)kcpustate_getpc(&info->ei_state), isa),

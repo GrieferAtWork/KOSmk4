@@ -38,8 +38,8 @@
 #include <hybrid/pointer.h>
 
 #include <compat/config.h>
-#include <kos/except/fs.h>
-#include <kos/except/noexec.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/noexec.h>
 #include <kos/exec/elf.h>
 #include <kos/exec/peb.h>
 

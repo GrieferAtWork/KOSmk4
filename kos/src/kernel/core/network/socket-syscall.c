@@ -35,7 +35,7 @@
 #include <bits/iovec-struct.h>
 #include <bits/timespec.h>
 #include <compat/config.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <network/socket.h>
 #include <sys/socket.h>
 

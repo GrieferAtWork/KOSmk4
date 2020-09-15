@@ -54,9 +54,9 @@
 #include <hybrid/overflow.h>
 
 #include <bits/dirent.h>
-#include <kos/except/fs.h>
-#include <kos/except/inval.h>
-#include <kos/except/io.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/inval.h>
+#include <kos/except/reason/io.h>
 #include <linux/magic.h>
 #include <sys/stat.h>
 #include <sys/statfs.h>

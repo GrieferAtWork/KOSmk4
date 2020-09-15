@@ -31,7 +31,7 @@
 #include <sched/pid.h>
 #include <sched/task.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/hop/pidns.h>
 
 DECL_BEGIN

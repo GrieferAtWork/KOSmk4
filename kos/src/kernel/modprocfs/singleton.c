@@ -29,7 +29,7 @@
 #include <kernel/paging.h>
 #include <kernel/vm.h>
 
-#include <kos/except/io.h>
+#include <kos/except/reason/io.h>
 #include <sys/stat.h>
 
 #include <assert.h>

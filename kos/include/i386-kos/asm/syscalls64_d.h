@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3546526 */
+/* HASH CRC-32:0xb473b792 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -840,7 +840,7 @@
  *                           allowing coredumps to also be triggerred for unhandled signals.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-#define __NR64_coredump               __UINT64_C(0xffffffffffffffe3) /* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct exception_data64 const *exception, syscall_ulong_t unwind_error) */
+#define __NR64_coredump               __UINT64_C(0xffffffffffffffe3) /* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void) const *traceback_vector, size_t traceback_length, struct __exception_data64 const *exception, syscall_ulong_t unwind_error) */
 /* Raise a signal within the calling thread alongside the given CPU state
  * This system call is used when translating exceptions into POSIX signal in error mode #4
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should

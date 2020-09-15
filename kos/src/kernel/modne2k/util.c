@@ -31,7 +31,7 @@
 #include <sched/cpu.h>
 
 #include <hw/net/ne2k.h>
-#include <kos/except/io.h>
+#include <kos/except/reason/io.h>
 #include <sys/io.h>
 
 #include <stddef.h>

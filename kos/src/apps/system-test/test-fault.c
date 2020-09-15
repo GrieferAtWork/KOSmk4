@@ -406,7 +406,7 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 			 * in order to service the request. Because of this, fault pointer
 			 * may be scattered around the actually accessed location by the
 			 * max # number of bytes on the data-bus minus 1 */
-			assert_range(error_data()->e_pointers[0], addr, WORDMASK);
+			assert_range(error_data()->e_args.e_segfault.s_addr, addr, WORDMASK);
 			/* VIO writes may first perform reads in order to then write-back
 			 * a larger data word (i.e. `pokeb(addr, v)' may be dispatched as:
 			 * >> a.word = peekw(addr & ~1);
@@ -422,9 +422,9 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 			exp_mask    |= E_SEGFAULT_CONTEXT_VIO;
 			exp_context |= E_SEGFAULT_CONTEXT_VIO;
 		} else {
-			assert_eq_ptr(error_data()->e_pointers[0], addr);
+			assert_eq_ptr(error_data()->e_args.e_segfault.s_addr, addr);
 		}
-		assert_eq_msk(error_data()->e_pointers[1], exp_mask, exp_context);
+		assert_eq_msk(error_data()->e_args.e_segfault.s_context, exp_mask, exp_context);
 	}
 	return true;
 }
@@ -447,12 +447,12 @@ PRIVATE void test_addr(void *addr, bool is_canon, bool is_vio) {
 		/* Special case: The access test for `0xbfffffff' behaves slightly different
 		 *               when a memory mapping exists at `0xbffff000' (which can happen
 		 *               randomly as the result of ASLR).
-		 * When this happens, the access to `0xbfffffff' will not actually fault before
-		 * then faulting for real when trying to access `0xc0000000'!
+		 * When this happens, the 4-byte access to `0xbfffffff' will not actually
+		 * fault, before then faulting for real when trying to access `0xc0000000'!
 		 * If this happens, then the error can match what is checked here. */
 		if (addr == (void *)UINT32_C(0xbfffffff)) {
-			if (error_data()->e_pointers[0] == UINT32_C(0xc0000000) &&
-			    error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_VIO)
+			if (error_data()->e_args.e_segfault.s_addr == UINT32_C(0xc0000000) &&
+			    error_data()->e_args.e_segfault.s_context & E_SEGFAULT_CONTEXT_VIO)
 				return;
 		}
 #endif /* !__x86_64__ */
@@ -461,11 +461,11 @@ PRIVATE void test_addr(void *addr, bool is_canon, bool is_vio) {
 			 * in order to service the request. Because of this, fault pointer
 			 * may be scattered around the actually accessed location by the
 			 * max # number of bytes on the data-bus minus 1 */
-			assert_range(error_data()->e_pointers[0], addr, WORDMASK);
+			assert_range(error_data()->e_args.e_segfault.s_addr, addr, WORDMASK);
 		} else {
-			assert_eq_ptr(error_data()->e_pointers[0], addr);
+			assert_eq_ptr(error_data()->e_args.e_segfault.s_addr, addr);
 		}
-		assert_eq_msk(error_data()->e_pointers[1],
+		assert_eq_msk(error_data()->e_args.e_segfault.s_context,
 		              E_SEGFAULT_CONTEXT_NONCANON |
 		              E_SEGFAULT_CONTEXT_VIO,
 		              exp_canon);

@@ -38,12 +38,12 @@ __SYSDECL_END
 #include <hybrid/__pointer.h>
 __SYSDECL_BEGIN
 struct kcpustate64;
-struct exception_data64;
+struct __exception_data64;
 #define __EXCEPT_HANDLER64_CC /*__ATTR_SYSVABI*/
 typedef /*__ATTR_NORETURN*/
 __HYBRID_FUNCPTR64(void, /*__ATTR_SYSVABI*/, __except_handler64_t,
                    (struct kcpustate64 * __restrict state,
-                    struct exception_data64 *__restrict error));
+                    struct __exception_data64 *__restrict error));
 __SYSDECL_END
 #endif /* !__x86_64__ */
 #endif /* !__CC__ */

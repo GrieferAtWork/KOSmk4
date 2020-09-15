@@ -19,6 +19,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+/* TODO: Get rid of this header, and use [[[deemon]]] to automate its current users */
+
 #ifndef CLASS
 #define __ERROR_CODES_DEF_DEFINES_CLASS 1
 #define CLASS(name, message, errno, members) /* nothing */

@@ -43,7 +43,7 @@
 #include <hybrid/unaligned.h>
 
 #include <kos/dev.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <linux/magic.h>
 #include <linux/msdos_fs.h>
 #include <sys/stat.h>

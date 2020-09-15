@@ -27,11 +27,11 @@
 /**/
 
 #include <kos/except.h>
-#include <kos/except/fs.h>
-#include <kos/except/inval.h>
-#include <kos/except/io.h>
-#include <kos/except/net.h>
-#include <kos/except/noexec.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/inval.h>
+#include <kos/except/reason/io.h>
+#include <kos/except/reason/net.h>
+#include <kos/except/reason/noexec.h>
 #include <kos/kernel/handle.h>
 
 #include <signal.h>
@@ -70,7 +70,7 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_errno)(struct exception_data const *__
 	default: break; \
 		}           \
 		break;
-#define GET_EXCEPTION_POINTER(i) data->e_pointers[i]
+#define GET_EXCEPTION_POINTER(i) data->e_args.e_pointers[i]
 #ifndef __INTELLISENSE__
 #include <kos/except-codes.def>
 #endif
@@ -128,9 +128,9 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 	case E_UNKNOWN_SYSTEMCALL:
 		result->si_signo   = SIGSYS;
 		result->si_errno   = ENOSYS;
-		result->si_syscall = data->e_pointers[1];
+		result->si_syscall = data->e_args.e_unknown_systemcall.us_sysno;
 		/* TODO: `si_arch' could be determined by
-		 *       `data->e_pointers[0] & RPC_SYSCALL_INFO_FMETHOD'! */
+		 *       `data->e_args.e_unknown_systemcall.us_flags & RPC_SYSCALL_INFO_FMETHOD'! */
 		break;
 
 	case E_DIVIDE_BY_ZERO:
@@ -181,7 +181,7 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 
 		default: break;
 		}
-		result->si_addr  = (void *)data->e_pointers[0];
+		result->si_addr  = (void *)data->e_args.e_segfault.s_addr;
 		result->si_lower = result->si_addr;
 		result->si_upper = result->si_addr;
 		break;
@@ -192,8 +192,8 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 
 		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND):
 			result->si_code = ILL_ILLOPN;
-			if (data->e_pointers[2] == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY ||
-			    data->e_pointers[2] == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER)
+			if (data->e_args.e_illegal_instruction.ii_bad_operand.bo_what == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY ||
+			    data->e_args.e_illegal_instruction.ii_bad_operand.bo_what == E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER)
 				result->si_code = ILL_ILLADR;
 			break;
 
@@ -208,11 +208,13 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 			break;
 
 		case ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER):
-			switch (data->e_pointers[2]) { /* how */
+			switch (data->e_args.e_illegal_instruction.ii_register.r_how) {
+
 			case E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV:
 			case E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV:
 				result->si_code = ILL_PRVREG;
 				break;
+
 			default:
 				result->si_code = ILL_ILLOPN;
 				break;

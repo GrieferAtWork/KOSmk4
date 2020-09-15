@@ -36,8 +36,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/unaligned.h>
 
-#include <kos/except/inval.h>
-#include <kos/except/net.h>
+#include <kos/except/reason/inval.h>
+#include <kos/except/reason/net.h>
 #include <network/socket.h>
 
 #include <alloca.h>

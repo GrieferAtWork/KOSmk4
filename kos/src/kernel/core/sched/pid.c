@@ -47,7 +47,7 @@
 #include <bits/rusage-struct.h>
 #include <bits/timespec.h>
 #include <compat/config.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <sys/poll.h>
 #include <sys/resource.h>
 #include <sys/stat.h>

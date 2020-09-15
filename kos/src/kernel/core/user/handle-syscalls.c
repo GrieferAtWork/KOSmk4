@@ -47,8 +47,8 @@
 #include <asm/ioctls/tty.h>
 #include <bits/iovec-struct.h> /* struct iovec */
 #include <compat/config.h>
-#include <kos/except/fs.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/fs.h>
+#include <kos/except/reason/inval.h>
 #include <kos/hop/handle.h>
 #include <kos/io.h>
 #include <sys/mount.h>
@@ -129,8 +129,8 @@ DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
 	} EXCEPT {
 		if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
 			struct exception_data *d = error_data();
-			if (d->e_pointers[0] == (uintptr_t)-1)
-				d->e_pointers[0] = (uintptr_t)(intptr_t)oldfd;
+			if (d->e_args.e_invalid_handle.ih_fd == (uintptr_t)-1)
+				d->e_args.e_invalid_handle.ih_fd = (uintptr_t)(intptr_t)oldfd;
 		}
 		decref(hand);
 		RETHROW();

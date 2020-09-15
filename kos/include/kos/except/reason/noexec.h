@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_EXCEPT_NOEXEC_H
-#define _KOS_EXCEPT_NOEXEC_H 1
+#ifndef _KOS_EXCEPT_REASON_NOEXEC_H
+#define _KOS_EXCEPT_REASON_NOEXEC_H 1
 
 #include <__stdinc.h>
 
@@ -174,4 +174,4 @@ enum {
 
 __DECL_END
 
-#endif /* !_KOS_EXCEPT_NOEXEC_H */
+#endif /* !_KOS_EXCEPT_REASON_NOEXEC_H */

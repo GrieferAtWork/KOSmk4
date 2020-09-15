@@ -286,7 +286,7 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
 			 * in case we have to unmap our own stack. */
 			RETHROW();
 		}
-		exitcode = error_data()->e_pointers[0];
+		exitcode = error_data()->e_args.e_exit_thread.et_exit_code;
 		me->pt_retval = NULL;
 	}
 	/* Perform cleanup & terminate the current thread. */

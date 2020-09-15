@@ -41,7 +41,7 @@
 #include <asm/registers.h>
 #include <kos/bits/debugtrap32.h>
 #include <kos/debugtrap.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>

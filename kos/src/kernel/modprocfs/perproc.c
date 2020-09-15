@@ -27,7 +27,7 @@
 #include <kernel/driver.h>
 #include <sched/pid.h>
 
-#include <kos/except/io.h>
+#include <kos/except/reason/io.h>
 #include <sys/stat.h>
 
 #include <assert.h>

@@ -38,7 +38,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/ksysctl.h>
 
 #include <errno.h>

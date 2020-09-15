@@ -61,17 +61,6 @@ function listQueryFiles(query: string): {string...} {
 	}
 }
 
-function runGenerateErrors(xarch_path: string): (string, ipc.Process) | none {
-	return doRunDeemonScriptIfFilesAreOutOfDate(
-		script: "kos/misc/magicgenerator/generate_error.dee",
-		inputs: {
-			"kos/include/kos/except.def",
-			"kos/include/kos/asm/except.def",
-			xarch_path + "/kos/asm/except.def",
-		}
-	);
-}
-
 function runGenerateSyscalls(
 		xarch_path: string, TARGET_ARCH: string,
 		TARGET: Module): (string, ipc.Process) | none {
@@ -103,7 +92,6 @@ function updateAutomaticSourcesOnDemand(TARGET_ARCH: string, TARGET: Module) {
 	}
 	local xarch_path = "kos/include/{}-kos".format({ TARGET.XARCH });
 
-	collect(runGenerateErrors(xarch_path));
 	collect(runGenerateSyscalls(xarch_path, TARGET_ARCH, TARGET));
 	collect(runGenerateHeaders());
 

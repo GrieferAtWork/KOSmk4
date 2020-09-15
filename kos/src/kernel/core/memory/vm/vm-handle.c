@@ -31,7 +31,7 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/hop/vm.h>
 
 #include <assert.h>

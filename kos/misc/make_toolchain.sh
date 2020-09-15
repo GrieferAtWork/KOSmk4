@@ -35,8 +35,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- Change the yield() backend on Windows
-DEEMON_VERSION="f6350a843c14f7344b6f4a1735d9fe4b17bcae5c"
+#     v -- Fix some problems related to relative module imports
+DEEMON_VERSION="78a9bba0093c9b8e12a4b40ca234f03d89f5664a"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 

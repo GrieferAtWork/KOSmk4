@@ -62,7 +62,7 @@ STATIC_ASSERT(offsetof(struct exception_info, ei_trace) == OFFSET_EXCEPTION_INFO
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 STATIC_ASSERT(offsetof(struct exception_info, ei_flags) == OFFSET_EXCEPTION_INFO_FLAGS);
 STATIC_ASSERT(offsetof(struct exception_info, ei_code)  == OFFSET_EXCEPTION_INFO_CODE);
-STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_pointers) == OFFSET_EXCEPTION_INFO_POINTERS);
+STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFSET_EXCEPTION_INFO_POINTERS);
 
 
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
@@ -407,11 +407,11 @@ handle_special_exception(error_register_state_t *__restrict state,
 	switch (error->e_code) {
 
 	case ERROR_CODEOF(E_EXIT_THREAD):
-		exit_thread((int)error->e_pointers[0]);
+		exit_thread((int)error->e_args.e_exit_thread.et_exit_code);
 		break;
 
 	case ERROR_CODEOF(E_EXIT_PROCESS):
-		exit((int)error->e_pointers[0]);
+		exit((int)error->e_args.e_exit_process.ep_exit_code);
 		break;
 
 	default:

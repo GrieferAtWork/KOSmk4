@@ -29,7 +29,7 @@
 #include <sched/task.h>     /* task_tryyield_or_pause */
 
 #include <hw/hid/ps2.h>    /* PS2_* */
-#include <kos/except/io.h> /* E_IOERROR_SUBSYSTEM_* */
+#include <kos/except/reason/io.h> /* E_IOERROR_SUBSYSTEM_* */
 #include <sys/io.h>        /* (in|out)(b|w|l)[_p]() */
 
 DECL_BEGIN

@@ -45,7 +45,7 @@
 #include <i386-kos/asm/registers.h>
 #include <i386-kos/asm/rtm.h>
 #include <kos/except.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd40b032e */
+/* HASH CRC-32:0xce83fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,6 +94,7 @@ __SYSDECL_BEGIN
 #undef timezone
 
 struct __cpu_set_struct;
+struct __exception_data32;
 struct __fd_set_struct;
 struct __iovecx32;
 struct __itimerspecx32;
@@ -123,7 +124,6 @@ struct debugtrap_reason32;
 struct dirent;
 struct elf32_phdr;
 struct epoll_event;
-struct exception_data32;
 struct file_handle;
 struct fpustate32;
 struct getcpu_cache;
@@ -314,7 +314,7 @@ __CDECLARE_SC(,__errno_t,connect,(__fd_t __sockfd, struct sockaddr const *__addr
  *                           allowing coredumps to also be triggerred for unhandled signals.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-__CDECLARE_SC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void) const *__traceback_vector, __size_t __traceback_length, struct exception_data32 const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
+__CDECLARE_SC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void) const *__traceback_vector, __size_t __traceback_length, struct __exception_data32 const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
 #endif /* __CRT_HAVE_SC(coredump) */
 #if __CRT_HAVE_SC(creat)
 __CDECLARE_SC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
@@ -2427,7 +2427,7 @@ __CDECLARE_XSC(,__errno_t,connect,(__fd_t __sockfd, struct sockaddr const *__add
  *                           allowing coredumps to also be triggerred for unhandled signals.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_SUCCESS' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-__CDECLARE_XSC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void) const *__traceback_vector, __size_t __traceback_length, struct exception_data32 const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
+__CDECLARE_XSC(,__errno_t,coredump,(struct ucpustate32 const *__curr_state, struct ucpustate32 const *__orig_state, __HYBRID_PTR32(void) const *__traceback_vector, __size_t __traceback_length, struct __exception_data32 const *__exception, __syscall_ulong_t __unwind_error),(__curr_state,__orig_state,__traceback_vector,__traceback_length,__exception,__unwind_error))
 #endif /* __CRT_HAVE_XSC(coredump) */
 #if __CRT_HAVE_XSC(creat)
 __CDECLARE_XSC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))

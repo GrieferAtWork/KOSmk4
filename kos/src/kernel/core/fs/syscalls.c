@@ -53,7 +53,7 @@
 #include <bits/statfs.h>
 #include <compat/config.h>
 #include <kos/debugtrap.h>
-#include <kos/except/inval.h>
+#include <kos/except/reason/inval.h>
 #include <kos/kernel/handle.h>
 #include <sys/mount.h>
 #include <sys/statfs.h>
@@ -3196,10 +3196,9 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 		 * E_EXIT_THREAD exception to them. */
 		if unlikely(reason == TASK_RPC_REASON_SHUTDOWN) {
 			assert(THIS_TASKPID);
-			data->er_except.e_code        = ERROR_CODEOF(E_EXIT_THREAD);
-			data->er_except.e_pointers[0] = (uintptr_t)(unsigned int)THIS_TASKPID->tp_status.w_status;
-			memset(&data->er_except.e_pointers[1], 0,
-			       (EXCEPTION_DATA_POINTERS - 1) * sizeof(void *));
+			bzero(&data->er_except.e_args, sizeof(data->er_except.e_args));
+			data->er_except.e_code                            = ERROR_CODEOF(E_EXIT_THREAD);
+			data->er_except.e_args.e_exit_thread.et_exit_code = (uintptr_t)(unsigned int)THIS_TASKPID->tp_status.w_status;
 			goto done_signal_exception;
 		}
 		/* Actually map the specified file into memory!
