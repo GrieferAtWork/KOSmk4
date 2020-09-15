@@ -98,7 +98,7 @@ clone_fpustate(struct task *__restrict new_thread, uintptr_t UNUSED(flags)) {
 #endif
 
 
-PRIVATE ATTR_RETNONNULL WUNUSED ATTR_MALLOC struct fpustate *KCALL
+PRIVATE ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct fpustate *KCALL
 fpustate_alloc_noinit(void) {
 	/* TODO: Slab-style cache */
 	return (struct fpustate *)kmemalign(ALIGNOF_FPUSTATE,
@@ -106,7 +106,7 @@ fpustate_alloc_noinit(void) {
 	                                    FPU_GFP);
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC struct fpustate *KCALL
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct fpustate *KCALL
 fpustate_alloc(void) {
 	struct fpustate *result;
 	/* TODO: Slab-style cache */
@@ -117,7 +117,7 @@ fpustate_alloc(void) {
 	return result;
 }
 
-PUBLIC WUNUSED ATTR_MALLOC struct fpustate *
+PUBLIC ATTR_MALLOC WUNUSED struct fpustate *
 NOTHROW(KCALL fpustate_alloc_nx)(void) {
 	struct fpustate *result;
 	/* TODO: Slab-style cache */

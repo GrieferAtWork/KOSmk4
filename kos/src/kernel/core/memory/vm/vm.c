@@ -308,7 +308,7 @@ NOTHROW(KCALL vm_datapart_lock_upgrade_nx)(struct vm_datapart *__restrict self) 
 	return result;
 }
 
-PUBLIC NOBLOCK NONNULL((1)) WUNUSED bool
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_lock_tryread)(struct vm_datapart *__restrict self) {
 	bool result;
 	result = sync_tryread(&self->dp_lock);
@@ -321,7 +321,7 @@ NOTHROW(KCALL vm_datapart_lock_tryread)(struct vm_datapart *__restrict self) {
 	return result;
 }
 
-PUBLIC NOBLOCK NONNULL((1)) WUNUSED bool
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_lock_trywrite)(struct vm_datapart *__restrict self) {
 	bool result;
 	result = sync_trywrite(&self->dp_lock);
@@ -330,7 +330,7 @@ NOTHROW(KCALL vm_datapart_lock_trywrite)(struct vm_datapart *__restrict self) {
 	return result;
 }
 
-PUBLIC NOBLOCK NONNULL((1)) WUNUSED bool
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_lock_tryupgrade)(struct vm_datapart *__restrict self) {
 	bool result;
 	result = sync_tryupgrade(&self->dp_lock);

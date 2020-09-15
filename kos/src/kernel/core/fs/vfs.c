@@ -2017,7 +2017,7 @@ DECL_BEGIN
 
 
 /* Allocate a new VFS object */
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED
 REF struct vfs *(KCALL vfs_alloc)(void) THROWS(E_BADALLOC) {
 	REF struct vfs *result;
 	result = (REF struct vfs *)kmalloc(sizeof(struct vfs),
@@ -2035,7 +2035,7 @@ REF struct vfs *(KCALL vfs_alloc)(void) THROWS(E_BADALLOC) {
 
 
 /* Clone the given VFS */
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct vfs *KCALL
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct vfs *KCALL
 vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC) {
 	(void)self;
 	COMPILER_IMPURE();
@@ -2045,7 +2045,7 @@ vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC) {
 
 
 /* Allocate a new FS object. */
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED
 REF struct fs *(KCALL fs_alloc)(void) THROWS(E_BADALLOC) {
 	struct heapptr resptr;
 	REF struct fs *result;
@@ -2107,7 +2107,7 @@ NOTHROW(KCALL vfs_findpath_nolock)(struct vfs *__restrict new_vfs,
 
 /* Clone the given FS
  * @param: clone_vfs: When true, clone the VFS, else share the same one. */
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct fs *KCALL
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct fs *KCALL
 fs_clone(struct fs *__restrict self, bool clone_vfs) THROWS(E_BADALLOC) {
 	struct heapptr resptr;
 	REF struct fs *result;

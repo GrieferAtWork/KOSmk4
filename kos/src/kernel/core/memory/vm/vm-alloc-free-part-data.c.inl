@@ -63,7 +63,7 @@ PUBLIC NONNULL((1)) struct vm_ramblock *
 NOTHROW(KCALL vm_do_allocram_nx)(struct vm_ramblock *__restrict pblock0,
                                  physpagecnt_t num_pages, gfp_t flags)
 #else /* ALLOC_NX */
-PUBLIC NONNULL((1)) ATTR_RETNONNULL struct vm_ramblock *KCALL
+PUBLIC ATTR_RETNONNULL NONNULL((1)) struct vm_ramblock *KCALL
 vm_do_allocram(struct vm_ramblock *__restrict pblock0,
                physpagecnt_t num_pages, gfp_t flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC)

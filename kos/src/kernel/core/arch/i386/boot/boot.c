@@ -473,8 +473,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       with system calls that were added to linux in the mean time.
 	 *       Specifically: 64-bit time system calls. */
 
-	/* TODO: Replace `NONNULL((1)) ATTR_RETNONNULL' -> `ATTR_RETNONNULL NONNULL((1))' */
-
 	/* TODO: Trigger `DEBUGTRAP_REASON_VFORK' and `DEBUGTRAP_REASON_VFORKDONE'
 	 *       at appropriate locations within the kernel. */
 

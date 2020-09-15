@@ -1199,7 +1199,7 @@ pidns_upgrade(struct pidns *__restrict self) THROWS(E_WOULDBLOCK) {
 	return result;
 }
 
-PUBLIC NONNULL((1)) WUNUSED bool
+PUBLIC WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL pidns_read_nx)(struct pidns *__restrict self) {
 	bool result;
 	result = sync_read_nx(&self->pn_lock);
@@ -1215,7 +1215,7 @@ NOTHROW(KCALL pidns_read_nx)(struct pidns *__restrict self) {
 	return result;
 }
 
-PUBLIC NONNULL((1)) WUNUSED bool
+PUBLIC WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL pidns_write_nx)(struct pidns *__restrict self) {
 	bool result;
 	result = sync_write_nx(&self->pn_lock);
@@ -1225,7 +1225,7 @@ NOTHROW(KCALL pidns_write_nx)(struct pidns *__restrict self) {
 	return result;
 }
 
-PUBLIC NONNULL((1)) WUNUSED unsigned int
+PUBLIC WUNUSED NONNULL((1)) unsigned int
 NOTHROW(KCALL pidns_upgrade_nx)(struct pidns *__restrict self) {
 	unsigned int result;
 	result = sync_upgrade_nx(&self->pn_lock);

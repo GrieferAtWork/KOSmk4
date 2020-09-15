@@ -35,7 +35,7 @@
 DECL_BEGIN
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-PUBLIC WUNUSED ATTR_MALLOC ATTR_WEAK VIRT void *
+PUBLIC ATTR_MALLOC WUNUSED ATTR_WEAK VIRT void *
 NOTHROW_NX(KCALL FUNC(kmalloc_noslab))(size_t n_bytes, gfp_t flags) {
 	struct heapptr hptr;
 	struct mptr *result;
@@ -58,7 +58,7 @@ IFELSE_NX(err:, err_overflow:)
 #define kmalloc_noslab     kmalloc
 #endif /* !... */
 
-PUBLIC WUNUSED ATTR_MALLOC ATTR_WEAK VIRT void *
+PUBLIC ATTR_MALLOC WUNUSED ATTR_WEAK VIRT void *
 NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
 	struct heapptr hptr;
 	struct mptr *result;
@@ -84,7 +84,7 @@ IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-PUBLIC WUNUSED ATTR_MALLOC ATTR_WEAK VIRT void *
+PUBLIC ATTR_MALLOC WUNUSED ATTR_WEAK VIRT void *
 NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
                                   size_t n_bytes,
                                   gfp_t flags) {
@@ -105,7 +105,7 @@ IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 
-PUBLIC WUNUSED ATTR_MALLOC ATTR_WEAK VIRT void *
+PUBLIC ATTR_MALLOC WUNUSED ATTR_WEAK VIRT void *
 NOTHROW_NX(KCALL FUNC(kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
                                          size_t n_bytes, gfp_t flags) {
 	struct heapptr hptr;

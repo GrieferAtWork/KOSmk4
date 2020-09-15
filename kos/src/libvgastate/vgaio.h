@@ -52,17 +52,17 @@ typedef __IOPORT_T port_t;
 
 
 /* generic VGA port read/write */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK u8
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL u8
 NOTHROW_KERNEL(CC vga_r)(port_t port) {
 	return inb_p(port);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW_KERNEL(CC vga_w)(port_t port, u8 val) {
 	outb_p(port, val);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW_KERNEL(CC vga_w_fast)(port_t port, u8 reg, u8 val) {
 	outw(port, VGA_OUT16VAL(val, reg));
 }

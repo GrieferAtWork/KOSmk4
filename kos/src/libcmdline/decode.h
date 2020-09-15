@@ -41,7 +41,7 @@ DECL_BEGIN
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
-INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
+INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char **CC
 libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline,
                        size_t *pargc _os_heap_gfparg(gfp));
 

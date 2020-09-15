@@ -91,7 +91,7 @@ taskpid_gettask_srch(struct taskpid *__restrict self) THROWS(E_PROCESS_EXITED);
 
 
 /* Return the PID of `self' within the given PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
 NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self,
                               struct pidns const *__restrict ns);
 FORCELOCAL ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
@@ -99,13 +99,13 @@ NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
                                 struct pidns const *__restrict ns);
 
 /* Return the PID of `self' within its own PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getselfpid)(struct taskpid const *__restrict self);
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getselfpid_s)(struct taskpid const *__restrict self);
 
 /* Return the PID of `self' within the root PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self);
 
 /* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
@@ -471,9 +471,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pidns_tryservice)(struct pidns *_
 FUNDEF NONNULL((1)) void (KCALL pidns_read)(struct pidns *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF NONNULL((1)) void (KCALL pidns_write)(struct pidns *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF NONNULL((1)) bool (KCALL pidns_upgrade)(struct pidns *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) WUNUSED bool NOTHROW(KCALL pidns_read_nx)(struct pidns *__restrict self);
-FUNDEF NONNULL((1)) WUNUSED bool NOTHROW(KCALL pidns_write_nx)(struct pidns *__restrict self);
-FUNDEF NONNULL((1)) WUNUSED unsigned int NOTHROW(KCALL pidns_upgrade_nx)(struct pidns *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL pidns_read_nx)(struct pidns *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL pidns_write_nx)(struct pidns *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL pidns_upgrade_nx)(struct pidns *__restrict self);
 #define pidns_reading(self)  sync_reading(&(self)->pn_lock)
 #define pidns_writing(self)  sync_writing(&(self)->pn_lock)
 #define pidns_canread(self)  sync_canread(&(self)->pn_lock)
@@ -582,11 +582,11 @@ FUNDEF ATTR_RETNONNULL NONNULL((1)) struct task *
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self) {
 	return taskpid_getpid(self, THIS_PIDNS);
 }
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self) {
 	return taskpid_getpid_s(self, THIS_PIDNS);
 }
@@ -596,14 +596,14 @@ NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self) {
 #ifndef __INTELLISENSE__
 
 /* Return the PID of `self' within the given PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
 NOTHROW(KCALL taskpid_getpid)(struct taskpid const *__restrict self,
                               struct pidns const *__restrict ns) {
 	__hybrid_assert(self->tp_pidns->pn_indirection >= ns->pn_indirection);
 	return self->tp_pids[ns->pn_indirection];
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1, 2)) upid_t
 NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
                                 struct pidns const *__restrict ns) {
 	if likely(self->tp_pidns->pn_indirection >= ns->pn_indirection)
@@ -611,19 +611,19 @@ NOTHROW(KCALL taskpid_getpid_s)(struct taskpid const *__restrict self,
 	return 0;
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getselfpid)(struct taskpid const *__restrict self) {
 	return taskpid_getpid(self, self->tp_pidns);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getselfpid_s)(struct taskpid const *__restrict self) {
 	return taskpid_getpid_s(self, self->tp_pidns);
 }
 
 
 /* Return the PID of `self' within the root PID namespace. */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) upid_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) upid_t
 NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self) {
 	return self->tp_pids[0];
 }

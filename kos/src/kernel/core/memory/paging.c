@@ -36,7 +36,7 @@ DECL_BEGIN
 
 /* Implement page-directory specific operations using `PAGEDIR_P_(BEGIN|END)USE' */
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_prepare_mapone_p") WUNUSED bool
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_prepare_mapone_p") bool
 NOTHROW(KCALL pagedir_prepare_mapone_p)(pagedir_phys_t self,
                                         PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	bool result;
@@ -96,7 +96,7 @@ NOTHROW(KCALL pagedir_unwriteone_p)(pagedir_phys_t self,
 }
 #endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_prepare_map_p") WUNUSED bool
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_prepare_map_p") bool
 NOTHROW(KCALL pagedir_prepare_map_p)(pagedir_phys_t self,
                                      PAGEDIR_PAGEALIGNED VIRT void *addr,
                                      PAGEDIR_PAGEALIGNED size_t num_bytes) {
@@ -108,7 +108,7 @@ NOTHROW(KCALL pagedir_prepare_map_p)(pagedir_phys_t self,
 	return result;
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_prepare_map_p_keep") WUNUSED bool
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_prepare_map_p_keep") bool
 NOTHROW(KCALL pagedir_prepare_map_keep_p)(pagedir_phys_t self,
                                           PAGEDIR_PAGEALIGNED VIRT void *addr,
                                           PAGEDIR_PAGEALIGNED size_t num_bytes) {
@@ -175,7 +175,7 @@ NOTHROW(KCALL pagedir_unwrite_p)(pagedir_phys_t self,
 }
 #endif /* ARCH_PAGEDIR_HAVE_UNWRITE */
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_ismapped_p") WUNUSED bool
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_ismapped_p") bool
 NOTHROW(KCALL pagedir_ismapped_p)(pagedir_phys_t self,
                                   VIRT void const *addr) {
 	bool result;
@@ -186,7 +186,7 @@ NOTHROW(KCALL pagedir_ismapped_p)(pagedir_phys_t self,
 	return result;
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_iswritable_p") WUNUSED bool
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_iswritable_p") bool
 NOTHROW(KCALL pagedir_iswritable_p)(pagedir_phys_t self,
                                     VIRT void *addr) {
 	bool result;
@@ -197,7 +197,7 @@ NOTHROW(KCALL pagedir_iswritable_p)(pagedir_phys_t self,
 	return result;
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_isuseraccessible_p") WUNUSED bool
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_isuseraccessible_p") bool
 NOTHROW(KCALL pagedir_isuseraccessible_p)(pagedir_phys_t self,
                                           VIRT void const *addr) {
 	bool result;
@@ -209,7 +209,7 @@ NOTHROW(KCALL pagedir_isuseraccessible_p)(pagedir_phys_t self,
 }
 
 #ifdef ARCH_PAGEDIR_HAVE_CHANGED
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_haschanged_p") WUNUSED bool
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_haschanged_p") bool
 NOTHROW(KCALL pagedir_haschanged_p)(pagedir_phys_t self,
                                     VIRT void *addr) {
 	bool result;
@@ -246,7 +246,7 @@ NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(pagedir_phys_t self) {
 	PAGEDIR_P_ENDUSE(self);
 }
 
-PUBLIC NOBLOCK ATTR_WEAK ATTR_SECTION(".text.kernel.pagedir_p.pagedir_translate_p") WUNUSED PHYS physaddr_t
+PUBLIC NOBLOCK ATTR_WEAK WUNUSED ATTR_SECTION(".text.kernel.pagedir_p.pagedir_translate_p") PHYS physaddr_t
 NOTHROW(KCALL pagedir_translate_p)(pagedir_phys_t self,
                                    VIRT void const *virt_addr) {
 	PHYS physaddr_t result;

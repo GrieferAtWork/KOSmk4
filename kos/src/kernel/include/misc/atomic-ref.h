@@ -101,7 +101,7 @@ template<class T> struct atomic_ref {
 #endif /* !CONFIG_NO_SMP */
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK ATTR_RETNONNULL WUNUSED REF T *KCALL get() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF ATTR_RETNONNULL WUNUSED REF T *KCALL get() __CXX_NOEXCEPT {
 		REF T *result;
 		pflag_t was;
 		was = PREEMPTION_PUSHOFF();
@@ -120,7 +120,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER NOPREEMPT ATTR_LEAF NOBLOCK ATTR_RETNONNULL WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER NOPREEMPT NOBLOCK ATTR_LEAF ATTR_RETNONNULL WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT {
 		REF T *result;
 		__hybrid_assert(!PREEMPTION_ENABLED());
 #ifndef CONFIG_NO_SMP
@@ -137,7 +137,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER NONNULL_CXX((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED()) NONNULL_CXX((1))
 	void KCALL set(T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;
 		old_pointer = this->exchange(new_pointer);
@@ -145,7 +145,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER NONNULL_CXX((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED()) NONNULL_CXX((1))
 	void KCALL set_inherit_new(REF T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;
 		old_pointer = this->exchange_inherit_new(new_pointer);
@@ -153,14 +153,14 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER ATTR_LEAF ATTR_RETNONNULL WUNUSED NONNULL_CXX((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED()) ATTR_LEAF ATTR_RETNONNULL WUNUSED NONNULL_CXX((1))
 	REF T *KCALL exchange(T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REFCNT_METHODS(T)::incref(new_pointer);
 		return exchange_inherit_new(new_pointer);
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER ATTR_LEAF ATTR_RETNONNULL WUNUSED NONNULL_CXX((1)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED()) ATTR_LEAF ATTR_RETNONNULL WUNUSED NONNULL_CXX((1))
 	REF T *KCALL exchange_inherit_new(REF T *__restrict new_pointer) __CXX_NOEXCEPT {
 		REF T *old_pointer;
 #ifdef CONFIG_NO_SMP
@@ -179,7 +179,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Atomic compare-exchange */
-	__CXX_CLASSMEMBER NONNULL_CXX((1, 2)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED()) NONNULL_CXX((1, 2))
 	bool KCALL cmpxch(T *__restrict old_pointer,
 	                  T *__restrict new_pointer) __CXX_NOEXCEPT {
 #ifdef CONFIG_NO_SMP
@@ -211,7 +211,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Atomic compare-exchange */
-	__CXX_CLASSMEMBER NONNULL_CXX((1, 2)) NOBLOCK_IF(!PREEMPTION_ENABLED())
+	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED()) NONNULL_CXX((1, 2))
 	bool KCALL cmpxch_inherit_new(T *__restrict old_pointer,
 	                              /*inherit(on_success)*/ REF T *__restrict new_pointer) __CXX_NOEXCEPT {
 #ifdef CONFIG_NO_SMP
@@ -271,7 +271,7 @@ template<class T> struct xatomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK WUNUSED REF T *KCALL get() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF WUNUSED REF T *KCALL get() __CXX_NOEXCEPT {
 		REF T *result;
 		pflag_t was;
 		was = PREEMPTION_PUSHOFF();
@@ -291,7 +291,7 @@ template<class T> struct xatomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT {
 		REF T *result;
 #ifndef CONFIG_NO_SMP
 		__hybrid_atomic_fetchinc(this->m_inuse, __ATOMIC_SEQ_CST);
@@ -464,16 +464,16 @@ template<class T> struct xatomic_weaklyref {
 #endif /* !CONFIG_NO_SMP */
 
 	/* Clear the pointed-to value. */
-	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK void KCALL clear() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF void KCALL clear() __CXX_NOEXCEPT {
 		set(__NULLPTR);
 	}
 
-	__CXX_CLASSMEMBER ATTR_LEAF WUNUSED NOBLOCK bool KCALL is_nonnull() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF WUNUSED bool KCALL is_nonnull() __CXX_NOEXCEPT {
 		return __hybrid_atomic_load(m_pointer, __ATOMIC_ACQUIRE) != __NULLPTR;
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK WUNUSED REF T *KCALL get() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF WUNUSED REF T *KCALL get() __CXX_NOEXCEPT {
 		REF T *result;
 		pflag_t was;
 		was = PREEMPTION_PUSHOFF();

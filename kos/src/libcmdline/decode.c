@@ -86,7 +86,7 @@ argv_append(void *__restrict arg,
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
-INTERN WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
+INTERN ATTR_MALLOC WUNUSED NONNULL((1)) /*utf-8*/ char **CC
 libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline,
                        size_t *pargc _os_heap_gfparg(gfp)) {
 	struct argv_append_data buf;

@@ -474,7 +474,7 @@ block_device_lookup_name(USER CHECKED char const *name)
 
 
 /* Allocate and initialize a new block device. */
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct block_device *KCALL
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct block_device *KCALL
 block_device_alloc(size_t sector_size, size_t structure_size)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct block_device *result;

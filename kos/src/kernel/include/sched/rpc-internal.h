@@ -81,7 +81,7 @@ ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
                             uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_USER_RPC_FNORMAL),
                             gfp_t rpc_gfp DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
+FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) ATTR_MALLOC WUNUSED NONNULL((1)) struct rpc_entry *
 NOTHROW(KCALL task_alloc_user_rpc_nx)(task_rpc_t func,
                                       void *arg DFL(__NULLPTR),
                                       uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_USER_RPC_FNORMAL),
@@ -93,7 +93,7 @@ ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
                                    uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_SYNC_RPC_FNORMAL),
                                    gfp_t rpc_gfp DFL(GFP_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
+FUNDEF NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) ATTR_MALLOC WUNUSED NONNULL((1)) struct rpc_entry *
 NOTHROW(KCALL task_alloc_synchronous_rpc_nx)(task_rpc_t func,
                                              void *arg DFL(__NULLPTR),
                                              uintptr_t mode DFL(TASK_RPC_FNORMAL | TASK_SYNC_RPC_FNORMAL),

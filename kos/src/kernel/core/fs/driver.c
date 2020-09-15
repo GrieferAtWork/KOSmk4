@@ -2877,7 +2877,7 @@ done:
 
 
 /* kmalloc() a string containing the absolute filename of `pth' + `dent' */
-PRIVATE WUNUSED ATTR_MALLOC NONNULL((1, 2)) char *KCALL
+PRIVATE ATTR_MALLOC WUNUSED NONNULL((1, 2)) char *KCALL
 print_kernel_path_malloc(struct path *__restrict pth,
                          struct directory_entry *__restrict dent) {
 	char *buf;

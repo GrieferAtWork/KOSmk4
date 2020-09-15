@@ -351,9 +351,9 @@ FUNDEF NONNULL((1)) bool KCALL vm_datapart_lock_upgrade(struct vm_datapart *__re
 FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_datapart_lock_read_nx)(struct vm_datapart *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_datapart_lock_write_nx)(struct vm_datapart *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL vm_datapart_lock_upgrade_nx)(struct vm_datapart *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) WUNUSED bool NOTHROW(KCALL vm_datapart_lock_tryread)(struct vm_datapart *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) WUNUSED bool NOTHROW(KCALL vm_datapart_lock_trywrite)(struct vm_datapart *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) WUNUSED bool NOTHROW(KCALL vm_datapart_lock_tryupgrade)(struct vm_datapart *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_datapart_lock_tryread)(struct vm_datapart *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_datapart_lock_trywrite)(struct vm_datapart *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_datapart_lock_tryupgrade)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_endwrite)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_endread)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_end)(struct vm_datapart *__restrict self);
@@ -472,7 +472,7 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_freeswap)(struct vm_d
 FUNDEF NONNULL((1)) void KCALL
 vm_datapart_do_allocram(struct vm_datapart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NONNULL((1)) NOBLOCK_IF(flags & GFP_ATOMIC) bool
+FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) bool
 NOTHROW(KCALL vm_datapart_do_allocram_nx)(struct vm_datapart *__restrict self, gfp_t flags);
 #ifdef __INTELLISENSE__
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -510,10 +510,10 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
  * @return: pblock0:  A single block was used.
  * @return: * :       A pointer to a kmalloc()-allocated heap vector of used ram blocks.
  * @return: NULL:    [vm_do_allocram_nx] Failed to allocate physical memory, or the required heap vector. */
-FUNDEF NONNULL((1)) ATTR_RETNONNULL NOBLOCK_IF(flags & GFP_ATOMIC) struct vm_ramblock *KCALL
+FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) ATTR_RETNONNULL NONNULL((1)) struct vm_ramblock *KCALL
 vm_do_allocram(struct vm_ramblock *__restrict pblock0, physpagecnt_t num_pages, gfp_t flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
-FUNDEF NONNULL((1)) NOBLOCK_IF(flags & GFP_ATOMIC) struct vm_ramblock *
+FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) NONNULL((1)) struct vm_ramblock *
 NOTHROW(KCALL vm_do_allocram_nx)(struct vm_ramblock *__restrict pblock0,
                                  physpagecnt_t num_pages, gfp_t flags);
 /* Free RAM allocated by `vm_do_allocram(_nx)'
@@ -1773,9 +1773,9 @@ FUNDEF NONNULL((1)) bool KCALL vm_tasklock_upgrade(struct vm *__restrict self) T
 FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_read_nx)(struct vm *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_write_nx)(struct vm *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL vm_tasklock_upgrade_nx)(struct vm *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) WUNUSED bool NOTHROW(KCALL vm_tasklock_tryread)(struct vm *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) WUNUSED bool NOTHROW(KCALL vm_tasklock_trywrite)(struct vm *__restrict self);
-FUNDEF NOBLOCK NONNULL((1)) WUNUSED bool NOTHROW(KCALL vm_tasklock_tryupgrade)(struct vm *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_tryread)(struct vm *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_trywrite)(struct vm *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL vm_tasklock_tryupgrade)(struct vm *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_endwrite)(struct vm *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_endread)(struct vm *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_end)(struct vm *__restrict self);

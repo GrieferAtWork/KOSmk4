@@ -44,13 +44,13 @@ NOTHROW(FCALL pci_readaddr)(pci_addr_t addr);
 FUNDEF NOBLOCK void
 NOTHROW(FCALL pci_writeaddr)(pci_addr_t addr, u32 value);
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK u32
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL u32
 NOTHROW(FCALL pci_read)(pci_addr_t base, pci_reg_t reg) {
 	__hybrid_assert(!(base & PCI_ADDR_REGMASK));
 	return pci_readaddr(base | reg);
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(FCALL pci_write)(pci_addr_t base, pci_reg_t reg, u32 value) {
 	__hybrid_assert(!(base & PCI_ADDR_REGMASK));
 	pci_writeaddr(base | reg, value);

@@ -171,7 +171,7 @@ NOTHROW(KCALL vm_tasklock_upgrade_nx)(struct vm *__restrict self) {
 	return result;
 }
 
-PUBLIC NOBLOCK NONNULL((1)) WUNUSED bool
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL vm_tasklock_tryread)(struct vm *__restrict self) {
 	bool result;
 	result = sync_tryread(&self->v_tasklock);
@@ -186,7 +186,7 @@ NOTHROW(KCALL vm_tasklock_tryread)(struct vm *__restrict self) {
 	return result;
 }
 
-PUBLIC NOBLOCK NONNULL((1)) WUNUSED bool
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL vm_tasklock_tryupgrade)(struct vm *__restrict self) {
 	bool result;
 	result = sync_tryupgrade(&self->v_tasklock);

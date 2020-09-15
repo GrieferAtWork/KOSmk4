@@ -64,7 +64,7 @@ libc_uchar_freevn(/*utf-8*/ char **ptr, size_t count) {
 	free(ptr);
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR16_TEXT("uchar_c16tombs") /*utf-8*/ char *LIBDCALL
 libc_uchar_c16tombs(char16_t const *__restrict str) {
 	size_t len;
@@ -76,7 +76,7 @@ libc_uchar_c16tombs(char16_t const *__restrict str) {
 	return libc_uchar_c16tombsn(str, len, NULL);
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR32_TEXT("uchar_c32tombs") /*utf-8*/ char *LIBCCALL
 libc_uchar_c32tombs(char32_t const *__restrict str) {
 	size_t len;
@@ -88,7 +88,7 @@ libc_uchar_c32tombs(char32_t const *__restrict str) {
 	return libc_uchar_c32tombsn(str, len, NULL);
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR16_TEXT("uchar_c16tombsn") /*utf-8*/ char *LIBDCALL
 libc_uchar_c16tombsn(char16_t const *__restrict str, size_t len, size_t *preslen) {
 	struct format_aprintf_data printer_data = FORMAT_APRINTF_DATA_INIT;
@@ -103,7 +103,7 @@ libc_uchar_c16tombsn(char16_t const *__restrict str, size_t len, size_t *preslen
 	return format_aprintf_pack(&printer_data, preslen);
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR32_TEXT("uchar_c32tombsn") /*utf-8*/ char *LIBCCALL
 libc_uchar_c32tombsn(char32_t const *__restrict str, size_t len, size_t *preslen) {
 	struct format_aprintf_data printer_data = FORMAT_APRINTF_DATA_INIT;
@@ -117,7 +117,7 @@ libc_uchar_c32tombsn(char32_t const *__restrict str, size_t len, size_t *preslen
 	return format_aprintf_pack(&printer_data, preslen);
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR16_TEXT("uchar_c16tombsv") /*utf-8*/ char **LIBDCALL
 libc_uchar_c16tombsv(char16_t const *const *__restrict vector) {
 	size_t i, count = 0;
@@ -146,7 +146,7 @@ err:
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR32_TEXT("uchar_c32tombsv") /*utf-8*/ char **LIBCCALL
 libc_uchar_c32tombsv(char32_t const *const *__restrict vector) {
 	size_t i, count = 0;
@@ -176,7 +176,7 @@ err:
 }
 
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR16_TEXT("uchar_c16tombsvn") /*utf-8*/ char **LIBDCALL
 libc_uchar_c16tombsvn(char16_t const *const *__restrict vector, size_t count) {
 	size_t i;
@@ -205,7 +205,7 @@ err:
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR32_TEXT("uchar_c32tombsvn") /*utf-8*/ char **LIBCCALL
 libc_uchar_c32tombsvn(char32_t const *const *__restrict vector, size_t count) {
 	size_t i;
@@ -236,21 +236,21 @@ err:
 
 
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR16_TEXT("uchar_mbstoc16") char16_t *LIBDCALL
 libc_uchar_mbstoc16(/*utf-8*/ char const *__restrict str) {
 	size_t len = strlen(str);
 	return libc_uchar_mbstoc16n(str, len, NULL);
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR32_TEXT("uchar_mbstoc32") char32_t *LIBCCALL
 libc_uchar_mbstoc32(/*utf-8*/ char const *__restrict str) {
 	size_t len = strlen(str);
 	return libc_uchar_mbstoc32n(str, len, NULL);
 }
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR16_TEXT("uchar_mbstoc16n") char16_t *LIBDCALL
 libc_uchar_mbstoc16n(/*utf-8*/ char const *__restrict str,
                      size_t len, size_t *preslen) {
@@ -267,7 +267,7 @@ libc_uchar_mbstoc16n(/*utf-8*/ char const *__restrict str,
 }
 
 
-INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC WUNUSED NONNULL((1))
 UCHAR32_TEXT("uchar_mbstoc32n") char32_t *LIBCCALL
 libc_uchar_mbstoc32n(/*utf-8*/ char const *__restrict str,
                      size_t len, size_t *preslen) {

@@ -801,7 +801,7 @@ heap_printer(/*struct heap_printer_data **/ void *arg,
 /* Helper wrapper for `usb_controller_printstring()'
  * This function returns a heap-allocated string, or NULL under the same
  * circumstances where `usb_controller_printstring()' would return `0' */
-PUBLIC WUNUSED ATTR_MALLOC NONNULL((1, 2)) /*utf-8*/ char *KCALL
+PUBLIC ATTR_MALLOC WUNUSED NONNULL((1, 2)) /*utf-8*/ char *KCALL
 usb_controller_allocstring(struct usb_controller *__restrict self,
                            struct usb_device *__restrict dev, u8 index) {
 	char *result;
@@ -835,7 +835,7 @@ usb_controller_allocstring(struct usb_controller *__restrict self,
 }
 
 
-PRIVATE WUNUSED ATTR_MALLOC struct usb_configuration_descriptor *KCALL
+PRIVATE ATTR_MALLOC WUNUSED struct usb_configuration_descriptor *KCALL
 usb_controller_lookup_configuration(struct usb_controller *__restrict self,
                                     struct usb_device *__restrict dev,
                                     u8 confno) {

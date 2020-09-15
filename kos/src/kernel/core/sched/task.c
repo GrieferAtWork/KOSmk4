@@ -518,7 +518,7 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	}
 }
 
-PUBLIC WUNUSED ATTR_MALLOC ATTR_RETNONNULL REF struct task *
+PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *
 (KCALL task_alloc)(struct vm *__restrict task_vm) THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	REF struct task *result;
 	struct heapptr resptr;

@@ -186,7 +186,7 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
  * As well as optionally:
  *   >> return->cd_name
  */
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct character_device *KCALL
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct character_device *KCALL
 character_device_alloc(struct driver *__restrict owner,
                        size_t structure_size,
                        size_t structure_align)

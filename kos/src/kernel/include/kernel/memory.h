@@ -200,7 +200,7 @@ NOTHROW(KCALL page_getzone)(physpage_t ptr) {
 FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL page_mallocone)(void);
 #ifndef __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS
 FUNDEF NOBLOCK WUNUSED physpage_t NOTHROW(KCALL __os_page_malloc)(physpagecnt_t num_pages) ASMNAME("page_malloc");
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED physpage_t
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED physpage_t
 NOTHROW(KCALL page_malloc)(physpagecnt_t num_pages) {
 	if (__builtin_constant_p(num_pages) && num_pages == 1)
 		return page_mallocone();
@@ -263,7 +263,7 @@ NOTHROW(KCALL page_malloc_part_between)(physpage_t min_page, physpage_t max_page
 FUNDEF NOBLOCK void NOTHROW(KCALL page_freeone)(physpage_t base);
 #ifndef __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_page_free)(physpage_t base, physpagecnt_t num_pages) ASMNAME("page_free");
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(KCALL page_free)(physpage_t base, physpagecnt_t num_pages) {
 	if (__builtin_constant_p(num_pages) && num_pages == 1) {
 		page_freeone(base);

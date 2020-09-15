@@ -475,7 +475,7 @@ usb_controller_printstring(struct usb_controller *__restrict self,
 /* Helper wrapper for `usb_controller_printstring()'
  * This function returns a heap-allocated string, or NULL under the same
  * circumstances where `usb_controller_printstring()' would return `0' */
-FUNDEF WUNUSED ATTR_MALLOC NONNULL((1, 2)) /*utf-8*/ char *KCALL
+FUNDEF ATTR_MALLOC WUNUSED NONNULL((1, 2)) /*utf-8*/ char *KCALL
 usb_controller_allocstring(struct usb_controller *__restrict self,
                            struct usb_device *__restrict dev, u8 index);
 

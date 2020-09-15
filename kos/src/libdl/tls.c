@@ -283,7 +283,7 @@ INTERN void CC DlModule_RunAllTlsFinalizers(void) {
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-INTERN WUNUSED ATTR_MALLOC void *DLFCN_CC
+INTERN ATTR_MALLOC WUNUSED void *DLFCN_CC
 libdl_dltlsallocseg(void) {
 	struct tls_segment *result;
 	result = (struct tls_segment *)memalign(static_tls_align,

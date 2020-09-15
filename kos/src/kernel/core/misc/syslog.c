@@ -136,7 +136,7 @@ PRIVATE ATOMIC_REF(struct syslog_sink_array) syslog_sinks =
 ATOMIC_REF_INIT(&default_syslog_sink_array);
 
 
-PRIVATE WUNUSED NOBLOCK ATTR_PURE bool
+PRIVATE NOBLOCK WUNUSED ATTR_PURE bool
 NOTHROW(KCALL syslog_sink_array_contains)(struct syslog_sink_array *__restrict self,
                                           struct syslog_sink const *__restrict sink) {
 	size_t i;

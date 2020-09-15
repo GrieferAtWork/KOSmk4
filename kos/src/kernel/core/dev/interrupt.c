@@ -1193,7 +1193,7 @@ NOTHROW(KCALL isr_unhandled)(size_t index) {
 	       (size_t)ISR_INDEX_TO_VECTOR(index));
 }
 
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
 NOTHROW(KCALL isr_handler)(size_t index) {
 	if unlikely_untraced(!isr_vector_trigger_impl(index)) {
 		isr_unhandled(index);

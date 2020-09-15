@@ -987,7 +987,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct directory_entry, de_refcnt, directory_entry_des
  */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct directory_entry *KCALL
 directory_entry_alloc(u16 namelen) THROWS(E_BADALLOC);
-FUNDEF ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) WUNUSED REF struct directory_entry *KCALL
+FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct directory_entry *KCALL
 directory_entry_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen) THROWS(E_BADALLOC,E_SEGFAULT);
 
 
@@ -1196,7 +1196,7 @@ inode_preadv_blocking(struct inode *__restrict self,
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL inode_changed)(struct inode *__restrict self,
                              uintptr_t what DFL(INODE_FCHANGED));
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) bool
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) bool
 NOTHROW(KCALL inode_changedattr)(struct inode *__restrict self) {
 	return inode_changed(self, INODE_FATTRCHANGED);
 }
@@ -2078,9 +2078,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL superblock_nodeslock_tryservice)(
 FUNDEF NONNULL((1)) void KCALL superblock_nodeslock_read(struct superblock *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF NONNULL((1)) void KCALL superblock_nodeslock_write(struct superblock *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF NONNULL((1)) bool KCALL superblock_nodeslock_upgrade(struct superblock *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) WUNUSED bool NOTHROW(KCALL superblock_nodeslock_read_nx)(struct superblock *__restrict self);
-FUNDEF NONNULL((1)) WUNUSED bool NOTHROW(KCALL superblock_nodeslock_write_nx)(struct superblock *__restrict self);
-FUNDEF NONNULL((1)) WUNUSED unsigned int NOTHROW(KCALL superblock_nodeslock_upgrade_nx)(struct superblock *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL superblock_nodeslock_read_nx)(struct superblock *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL superblock_nodeslock_write_nx)(struct superblock *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL superblock_nodeslock_upgrade_nx)(struct superblock *__restrict self);
 
 /* Functions for acquiring the `s_mount_lock' for reading/writing. */
 FUNDEF NOBLOCK WUNUSED NONNULL((1)) bool NOTHROW(KCALL superblock_mountlock_tryread)(struct superblock *__restrict self);
@@ -2093,9 +2093,9 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL superblock_mountlock_tryservice)(
 FUNDEF NONNULL((1)) void KCALL superblock_mountlock_read(struct superblock *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF NONNULL((1)) void KCALL superblock_mountlock_write(struct superblock *__restrict self) THROWS(E_WOULDBLOCK);
 FUNDEF NONNULL((1)) bool KCALL superblock_mountlock_upgrade(struct superblock *__restrict self) THROWS(E_WOULDBLOCK);
-FUNDEF NONNULL((1)) WUNUSED bool NOTHROW(KCALL superblock_mountlock_read_nx)(struct superblock *__restrict self);
-FUNDEF NONNULL((1)) WUNUSED bool NOTHROW(KCALL superblock_mountlock_write_nx)(struct superblock *__restrict self);
-FUNDEF NONNULL((1)) WUNUSED unsigned int NOTHROW(KCALL superblock_mountlock_upgrade_nx)(struct superblock *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL superblock_mountlock_read_nx)(struct superblock *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(KCALL superblock_mountlock_write_nx)(struct superblock *__restrict self);
+FUNDEF WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL superblock_mountlock_upgrade_nx)(struct superblock *__restrict self);
 
 
 

@@ -1183,7 +1183,7 @@ NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict prev,
 	/* TODO: Allow this call to wake up threads, and change `cpu_quantum_end_nopr()'
 	 *       to be the function to select the next thread to-be executed in case of
 	 *       a yield-style preemption:
-	 * >> ATTR_RETNONNULL NONNULL((1)) WUNUSED struct task *
+	 * >> ATTR_RETNONNULL WUNUSED NONNULL((1)) struct task *
 	 * >> NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict caller); */
 	cpu_add_quantum_offset(me, elapsed, false);
 

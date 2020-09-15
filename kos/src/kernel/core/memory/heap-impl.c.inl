@@ -1465,7 +1465,7 @@ err:
 }
 
 
-PUBLIC WUNUSED ATTR_MALLOC IFELSE_NX(, ATTR_RETNONNULL)
+PUBLIC ATTR_MALLOC WUNUSED IFELSE_NX(, ATTR_RETNONNULL)
 ATTR_ASSUME_ALIGNED(PAGESIZE) VIRT /*page-aligned*/ void *
 NOTHROW_NX(KCALL FUNC(vpage_alloc_untraced))(size_t num_pages, /* TODO: This function should take byte counts! */
                                              size_t alignment_in_pages,

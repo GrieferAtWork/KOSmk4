@@ -95,7 +95,7 @@ PRIVATE DEFINE_ATOMIC_RWLOCK(osqh_free_lock);
 PRIVATE struct uhci_ostd *ostd_free = NULL;
 PRIVATE struct uhci_osqh *osqh_free = NULL;
 
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC struct uhci_ostd *FCALL
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct uhci_ostd *FCALL
 uhci_ostd_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct uhci_ostd *result;
 	sync_write(&ostd_free_lock);
@@ -117,7 +117,7 @@ again_read:
 	return result;
 }
 
-PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC struct uhci_osqh *FCALL
+PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED struct uhci_osqh *FCALL
 uhci_osqh_alloc(void) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct uhci_osqh *result;
 	sync_write(&osqh_free_lock);

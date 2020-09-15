@@ -151,7 +151,7 @@ DATDEF ATTR_PERTASK struct task *this_sched_runnxt;     /* ALIAS:THIS_TASK->t_sc
 /* Allocate + initialize a new task.
  * TODO: Re-design this function so we don't leak uninitialized tasks through the VM
  * @param: task_vm: The vm inside of which the start will start initially. */
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL REF struct task *KCALL
+FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *KCALL
 task_alloc(struct vm *__restrict task_vm)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
@@ -202,7 +202,7 @@ DATDEF unsigned int task_start_default_flags;
 
 #ifdef __cplusplus
 extern "C++" {
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_RETNONNULL NONNULL((1)) struct task *
 NOTHROW(FCALL task_start)(struct task *__restrict thread) {
 	return task_start(thread, task_start_default_flags);
 }
@@ -380,7 +380,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 #ifndef CONFIG_NO_SMP
 FUNDEF NOBLOCK void NOTHROW(KCALL task_pause)(void);
 #else /* !CONFIG_NO_SMP */
-FORCELOCAL ATTR_ARTIFICIAL NOBLOCK void NOTHROW(KCALL task_pause)(void) { }
+FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void NOTHROW(KCALL task_pause)(void) { }
 #endif /* CONFIG_NO_SMP */
 
 /* Try to yield execution in the calling thread, but never thrown an exception.
@@ -445,7 +445,7 @@ FUNDEF WUNUSED __BOOL NOTHROW(KCALL task_yield_nx)(void);
 #if 0
 /* High-level kernel interface for the clone(2) system call.
  * @param: clone_flags: Set of `TASK_CLONE_*' */
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL REF struct task *
+FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *
 (KCALL task_create)(struct ucpustate const *__restrict init_state,
                     uintptr_t clone_flags, void *tls_val,
                     USER CHECKED pid_t *parent_tidptr,

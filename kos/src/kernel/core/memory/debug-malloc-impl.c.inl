@@ -357,7 +357,7 @@ err:
 
 
 
-PUBLIC WUNUSED ATTR_MALLOC VIRT void *
+PUBLIC ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
 	struct heapptr result;
 	LOAD_CALLER_CONTEXT
@@ -393,7 +393,7 @@ NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
 IFELSE_NX(err: return NULL;, )
 }
 
-PUBLIC WUNUSED ATTR_MALLOC VIRT void *
+PUBLIC ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
                                   size_t n_bytes, gfp_t flags) {
 	struct heapptr result;
@@ -432,7 +432,7 @@ NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
 IFELSE_NX(err: return NULL;, )
 }
 
-PUBLIC WUNUSED ATTR_MALLOC VIRT void *
+PUBLIC ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW_NX(KCALL FUNC(kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
                                          size_t n_bytes, gfp_t flags) {
 	struct heapptr result;

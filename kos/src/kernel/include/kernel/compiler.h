@@ -334,17 +334,17 @@ public:
 	static WUNUSED NONNULL((1)) bool (KCALL read_nx)(T *__restrict self) __CXX_NOEXCEPT;
 	static WUNUSED NONNULL((1)) bool (KCALL write_nx)(T *__restrict self) __CXX_NOEXCEPT;
 	static WUNUSED NONNULL((1)) unsigned int (KCALL upgrade_nx)(T *__restrict self) __CXX_NOEXCEPT;
-	static WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT;
-	static WUNUSED NOBLOCK NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT;
-	static WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK WUNUSED NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK WUNUSED NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK WUNUSED NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict self) __CXX_NOEXCEPT;
 	static NOBLOCK NONNULL((1)) void (KCALL downgrade)(T *__restrict self) __CXX_NOEXCEPT;
 	static NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT;
 	static NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT;
 	static NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT;
-	static WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT;
-	static WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT;
-	static WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT;
-	static WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT;
+	static NOBLOCK WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT;
 };
 #else /* __INTELLISENSE__ */
 template<class T> class sync_methods;
@@ -357,13 +357,13 @@ template<class T> class _sync_reader {
 private:
 	T &m_lock;
 public:
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK _sync_reader(T &_lock): m_lock(_lock) {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL _sync_reader(T &_lock): m_lock(_lock) {
 		sync_methods<T>::read(&_lock);
 	}
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK ~_sync_reader() __CXX_NOEXCEPT {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ~_sync_reader() __CXX_NOEXCEPT {
 		sync_methods<T>::endread(&m_lock);
 	}
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK operator bool() const __CXX_NOEXCEPT {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL operator bool() const __CXX_NOEXCEPT {
 		return true;
 	}
 };
@@ -374,13 +374,13 @@ template<class T> class _sync_writer {
 private:
 	T &m_lock;
 public:
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK _sync_writer(T &_lock): m_lock(_lock) {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL _sync_writer(T &_lock): m_lock(_lock) {
 		sync_methods<T>::write(&_lock);
 	}
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK ~_sync_writer() __CXX_NOEXCEPT {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ~_sync_writer() __CXX_NOEXCEPT {
 		sync_methods<T>::endwrite(&m_lock);
 	}
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK operator bool() const __CXX_NOEXCEPT {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL operator bool() const __CXX_NOEXCEPT {
 		return true;
 	}
 };
@@ -391,12 +391,12 @@ template<class T> class _finally_endread {
 private:
 	T &m_lock;
 public:
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK _finally_endread(T &_lock) __CXX_NOEXCEPT
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL _finally_endread(T &_lock) __CXX_NOEXCEPT
 	    : m_lock(_lock) { }
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK ~_finally_endread() __CXX_NOEXCEPT {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ~_finally_endread() __CXX_NOEXCEPT {
 		sync_methods<T>::endread(&m_lock);
 	}
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK operator bool() const __CXX_NOEXCEPT {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL operator bool() const __CXX_NOEXCEPT {
 		return true;
 	}
 };
@@ -407,12 +407,12 @@ template<class T> class _finally_endwrite {
 private:
 	T &m_lock;
 public:
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK _finally_endwrite(T &_lock) __CXX_NOEXCEPT
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL _finally_endwrite(T &_lock) __CXX_NOEXCEPT
 	    : m_lock(_lock) { }
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK ~_finally_endwrite() __CXX_NOEXCEPT {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ~_finally_endwrite() __CXX_NOEXCEPT {
 		sync_methods<T>::endwrite(&m_lock);
 	}
-	__CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK operator bool() const __CXX_NOEXCEPT {
+	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL operator bool() const __CXX_NOEXCEPT {
 		return true;
 	}
 };
@@ -426,15 +426,15 @@ __NAMESPACE_INT_END
 
 #define __DEFINE_SYNC_PROXY(T, field)                                                                                                                                          \
 	extern "C++" {                                                                                                                                                             \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryread)(T *__restrict self) { return sync_tryread(&(self)->field); }                    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_trywrite)(T *__restrict self) { return sync_trywrite(&(self)->field); }                  \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryupgrade)(T *__restrict self) { return sync_tryupgrade(&(self)->field); }              \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryread)(T *__restrict self) { return sync_tryread(&(self)->field); }                    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_trywrite)(T *__restrict self) { return sync_trywrite(&(self)->field); }                  \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryupgrade)(T *__restrict self) { return sync_tryupgrade(&(self)->field); }              \
 	/* Returns true if the lock could be upgraded without having to temporarily release all locks.                                                                             \
 	 * NOTE: When this function returns by throwing an exception, the                                                                                                          \
 	 *       previously acquired read-lock has already been released! */                                                                                                       \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) __BOOL (KCALL sync_upgrade)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { return sync_upgrade(&(self)->field); }       \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL sync_read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_read(&(self)->field); }                      \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL sync_write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_write(&(self)->field); }                    \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) __BOOL (KCALL sync_upgrade)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { return sync_upgrade(&(self)->field); }       \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_read(&(self)->field); }                      \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_write(&(self)->field); }                    \
 	/* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,                                                                                          \
 	 *       no lock may have been held temporarily, meaning that the caller should                                                                                            \
 	 *       re-load local copies of affected resources.                                                                                                                       \
@@ -442,36 +442,36 @@ __NAMESPACE_INT_END
 	 * @return: 1 : Successfully upgraded the read-only to a write-lock.                                                                                                       \
 	 * @return: 2 : Successfully upgraded the read-only to a write-lock,                                                                                                       \
 	 *              but at one point, no lock at all was being held. */                                                                                                        \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED unsigned int NOTHROW(KCALL sync_upgrade_nx)(T *__restrict self) { return sync_upgrade_nx(&(self)->field); }      \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED __BOOL NOTHROW(KCALL sync_read_nx)(T *__restrict self) { return sync_read_nx(&(self)->field); }                  \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED __BOOL NOTHROW(KCALL sync_write_nx)(T *__restrict self) { return sync_write_nx(&(self)->field); }                \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_downgrade)(T *__restrict self) { sync_downgrade(&(self)->field); }                                 \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { sync_endread(&(self)->field); }                                     \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { sync_endwrite(&(self)->field); }                                   \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { sync_end(&(self)->field); }                                             \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return sync_reading(&(self)->field); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return sync_writing(&(self)->field); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return sync_canread(&(self)->field); }              \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return sync_canwrite(&(self)->field); }            \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL sync_upgrade_nx)(T *__restrict self) { return sync_upgrade_nx(&(self)->field); }      \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_read_nx)(T *__restrict self) { return sync_read_nx(&(self)->field); }                  \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_write_nx)(T *__restrict self) { return sync_write_nx(&(self)->field); }                \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_downgrade)(T *__restrict self) { sync_downgrade(&(self)->field); }                                 \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { sync_endread(&(self)->field); }                                     \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { sync_endwrite(&(self)->field); }                                   \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { sync_end(&(self)->field); }                                             \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return sync_reading(&(self)->field); }    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return sync_writing(&(self)->field); }    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return sync_canread(&(self)->field); }              \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return sync_canwrite(&(self)->field); }            \
 	template<> class sync_methods< T > {                                                                                                                                       \
 	public:                                                                                                                                                                    \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_read(&(self)->field); }         \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_write(&(self)->field); }       \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) bool (KCALL upgrade)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { return sync_upgrade(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) bool (KCALL read_nx)(T *__restrict self) __CXX_NOEXCEPT { return sync_read_nx(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) bool (KCALL write_nx)(T *__restrict self) __CXX_NOEXCEPT { return sync_write_nx(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) unsigned int (KCALL upgrade_nx)(T *__restrict self) __CXX_NOEXCEPT { return sync_upgrade_nx(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT { return sync_tryread(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT { return sync_trywrite(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict self) __CXX_NOEXCEPT { return sync_tryupgrade(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL downgrade)(T *__restrict self) __CXX_NOEXCEPT { sync_downgrade(&(self)->field); }            \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { sync_endread(&(self)->field); }                \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { sync_endwrite(&(self)->field); }              \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { sync_end(&(self)->field); }                        \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return sync_reading(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return sync_writing(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canread(&(self)->field); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canwrite(&(self)->field); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_read(&(self)->field); }         \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { sync_write(&(self)->field); }       \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) bool (KCALL upgrade)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { return sync_upgrade(&(self)->field); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL read_nx)(T *__restrict self) __CXX_NOEXCEPT { return sync_read_nx(&(self)->field); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL write_nx)(T *__restrict self) __CXX_NOEXCEPT { return sync_write_nx(&(self)->field); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) unsigned int (KCALL upgrade_nx)(T *__restrict self) __CXX_NOEXCEPT { return sync_upgrade_nx(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT { return sync_tryread(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT { return sync_trywrite(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict self) __CXX_NOEXCEPT { return sync_tryupgrade(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL downgrade)(T *__restrict self) __CXX_NOEXCEPT { sync_downgrade(&(self)->field); }            \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { sync_endread(&(self)->field); }                \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { sync_endwrite(&(self)->field); }              \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { sync_end(&(self)->field); }                        \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return sync_reading(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return sync_writing(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canread(&(self)->field); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return sync_canwrite(&(self)->field); } \
 	};                                                                                                                                                                         \
 	}
 
@@ -480,15 +480,15 @@ __NAMESPACE_INT_END
                              _trywrite, _write, _write_nx, _endwrite, _writing, _canwrite,                                                                       \
                              _end, _tryupgrade, _upgrade, _upgrade_nx, _downgrade)                                                                               \
 	extern "C++" {                                                                                                                                               \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryread)(T *__restrict self) { return _tryread(self); }                    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_trywrite)(T *__restrict self) { return _trywrite(self); }                  \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryupgrade)(T *__restrict self) { return _tryupgrade(self); }              \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryread)(T *__restrict self) { return _tryread(self); }                    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_trywrite)(T *__restrict self) { return _trywrite(self); }                  \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryupgrade)(T *__restrict self) { return _tryupgrade(self); }              \
 	/* Returns true if the lock could be upgraded without having to temporarily release all locks.                                                               \
 	 * NOTE: When this function returns by throwing an exception, the                                                                                            \
 	 *       previously acquired read-lock has already been released! */                                                                                         \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) __BOOL (KCALL sync_upgrade)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { return _upgrade(self); }       \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL sync_read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _read(self); }                      \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL sync_write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _write(self); }                    \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) __BOOL (KCALL sync_upgrade)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { return _upgrade(self); }       \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _read(self); }                      \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _write(self); }                    \
 	/* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,                                                                            \
 	 *       no lock may have been held temporarily, meaning that the caller should                                                                              \
 	 *       re-load local copies of affected resources.                                                                                                         \
@@ -496,51 +496,51 @@ __NAMESPACE_INT_END
 	 * @return: 1 : Successfully upgraded the read-only to a write-lock.                                                                                         \
 	 * @return: 2 : Successfully upgraded the read-only to a write-lock,                                                                                         \
 	 *              but at one point, no lock at all was being held. */                                                                                          \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED unsigned int NOTHROW(KCALL sync_upgrade_nx)(T *__restrict self) { return _upgrade_nx(self); }      \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED __BOOL NOTHROW(KCALL sync_read_nx)(T *__restrict self) { return _read_nx(self); }                  \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED __BOOL NOTHROW(KCALL sync_write_nx)(T *__restrict self) { return _write_nx(self); }                \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_downgrade)(T *__restrict self) { _downgrade(self); }                                 \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _endread(self); }                                     \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _endwrite(self); }                                   \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _end(self); }                                             \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _reading(self); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _writing(self); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _canread(self); }    \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _canwrite(self); }  \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) unsigned int NOTHROW(KCALL sync_upgrade_nx)(T *__restrict self) { return _upgrade_nx(self); }      \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_read_nx)(T *__restrict self) { return _read_nx(self); }                  \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_write_nx)(T *__restrict self) { return _write_nx(self); }                \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_downgrade)(T *__restrict self) { _downgrade(self); }                                 \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _endread(self); }                                     \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _endwrite(self); }                                   \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _end(self); }                                             \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _reading(self); }    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _writing(self); }    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _canread(self); }    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _canwrite(self); }  \
 	template<> class sync_methods< T > {                                                                                                                         \
 	public:                                                                                                                                                      \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _read(self); }         \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _write(self); }       \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) bool (KCALL upgrade)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { return _upgrade(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) bool (KCALL read_nx)(T *__restrict self) __CXX_NOEXCEPT { return _read_nx(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) bool (KCALL write_nx)(T *__restrict self) __CXX_NOEXCEPT { return _write_nx(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) unsigned int (KCALL upgrade_nx)(T *__restrict self) __CXX_NOEXCEPT { return _upgrade_nx(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT { return _tryread(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT { return _trywrite(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict self) __CXX_NOEXCEPT { return _tryupgrade(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL downgrade)(T *__restrict self) __CXX_NOEXCEPT { _downgrade(self); }            \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _endread(self); }                \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _endwrite(self); }              \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _end(self); }                        \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _reading(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _writing(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _canread(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _canwrite(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _read(self); }         \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _write(self); }       \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) bool (KCALL upgrade)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { return _upgrade(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL read_nx)(T *__restrict self) __CXX_NOEXCEPT { return _read_nx(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL write_nx)(T *__restrict self) __CXX_NOEXCEPT { return _write_nx(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) unsigned int (KCALL upgrade_nx)(T *__restrict self) __CXX_NOEXCEPT { return _upgrade_nx(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT { return _tryread(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT { return _trywrite(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict self) __CXX_NOEXCEPT { return _tryupgrade(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL downgrade)(T *__restrict self) __CXX_NOEXCEPT { _downgrade(self); }            \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _endread(self); }                \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _endwrite(self); }              \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _end(self); }                        \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _reading(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _writing(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _canread(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _canwrite(self); } \
 	};                                                                                                                                                           \
 	}
 
 #define __DEFINE_SYNC_MUTEX(T, _tryacquire, _acquire, _acquire_nx, _release, _acquired, _available)                                                       \
 	extern "C++" {                                                                                                                                        \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryread)(T *__restrict self) { return _tryacquire(self); }          \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_trywrite)(T *__restrict self) { return _tryacquire(self); }         \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryupgrade)(T *__restrict UNUSED(self)) { return true; }            \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_downgrade)(T *__restrict UNUSED(self)) { }                                    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryread)(T *__restrict self) { return _tryacquire(self); }          \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_trywrite)(T *__restrict self) { return _tryacquire(self); }         \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryupgrade)(T *__restrict UNUSED(self)) { return true; }            \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_downgrade)(T *__restrict UNUSED(self)) { }                                    \
 	/* Returns true if the lock could be upgraded without having to temporarily release all locks.                                                        \
 	 * NOTE: When this function returns by throwing an exception, the                                                                                     \
 	 *       previously acquired read-lock has already been released! */                                                                                  \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) __BOOL NOTHROW(KCALL sync_upgrade)(T *__restrict UNUSED(self)) { return true; }                     \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL sync_read)(T *__restrict self) { _acquire(self); }                                      \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL sync_write)(T *__restrict self) { _acquire(self); }                                     \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) __BOOL NOTHROW(KCALL sync_upgrade)(T *__restrict UNUSED(self)) { return true; }                     \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_read)(T *__restrict self) { _acquire(self); }                                      \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_write)(T *__restrict self) { _acquire(self); }                                     \
 	/* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,                                                                     \
 	 *       no lock may have been held temporarily, meaning that the caller should                                                                       \
 	 *       re-load local copies of affected resources.                                                                                                  \
@@ -548,50 +548,50 @@ __NAMESPACE_INT_END
 	 * @return: 1 : Successfully upgraded the read-only to a write-lock.                                                                                  \
 	 * @return: 2 : Successfully upgraded the read-only to a write-lock,                                                                                  \
 	 *              but at one point, no lock at all was being held. */                                                                                   \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) unsigned int NOTHROW(KCALL sync_upgrade_nx)(T *__restrict UNUSED(self)) { return 1; }               \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED __BOOL NOTHROW(KCALL sync_read_nx)(T *__restrict self) { return _acquire_nx(self); }        \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED __BOOL NOTHROW(KCALL sync_write_nx)(T *__restrict self) { return _acquire_nx(self); }       \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _release(self); }                              \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _release(self); }                             \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _release(self); }                                  \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _acquired(self); } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _acquired(self); } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); } \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) unsigned int NOTHROW(KCALL sync_upgrade_nx)(T *__restrict UNUSED(self)) { return 1; }               \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_read_nx)(T *__restrict self) { return _acquire_nx(self); }        \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_write_nx)(T *__restrict self) { return _acquire_nx(self); }       \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _release(self); }                              \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _release(self); }                             \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _release(self); }                                  \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict self) { return _acquired(self); } \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict self) { return _acquired(self); } \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); } \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); } \
 	template<> class sync_methods< T > {                                                                                                                  \
 	public:                                                                                                                                               \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _acquire(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _acquire(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) bool (KCALL upgrade)(T *__restrict UNUSED(self)) THROWS(E_WOULDBLOCK, ...) { return true; } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) bool (KCALL read_nx)(T *__restrict self) __CXX_NOEXCEPT { return _acquire_nx(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) bool (KCALL write_nx)(T *__restrict self) __CXX_NOEXCEPT { return _acquire_nx(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT WUNUSED NONNULL((1)) unsigned int (KCALL upgrade_nx)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { return 1; } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT { return _tryacquire(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT { return _tryacquire(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL downgrade)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { }               \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }         \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }        \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }             \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _acquire(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _acquire(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) bool (KCALL upgrade)(T *__restrict UNUSED(self)) THROWS(E_WOULDBLOCK, ...) { return true; } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL read_nx)(T *__restrict self) __CXX_NOEXCEPT { return _acquire_nx(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL write_nx)(T *__restrict self) __CXX_NOEXCEPT { return _acquire_nx(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) unsigned int (KCALL upgrade_nx)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { return 1; } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT { return _tryacquire(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT { return _tryacquire(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL downgrade)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { }               \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }         \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }        \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _release(self); }             \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict self) __CXX_NOEXCEPT { return _acquired(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
 	};                                                                                                                                                    \
 	}
 
 #define __DEFINE_SYNC_SEMAPHORE(T, _trywait, _wait, _wait_nx, _post, _available)                                                                          \
 	extern "C++" {                                                                                                                                        \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryread)(T *__restrict self) { return _trywait(self); }             \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_trywrite)(T *__restrict self) { return _trywait(self); }            \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryupgrade)(T *__restrict UNUSED(self)) { return true; }            \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_downgrade)(T *__restrict UNUSED(self)) { }                                    \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryread)(T *__restrict self) { return _trywait(self); }             \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_trywrite)(T *__restrict self) { return _trywait(self); }            \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_tryupgrade)(T *__restrict UNUSED(self)) { return true; }            \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_downgrade)(T *__restrict UNUSED(self)) { }                                    \
 	/* Returns true if the lock could be upgraded without having to temporarily release all locks.                                                        \
 	 * NOTE: When this function returns by throwing an exception, the                                                                                     \
 	 *       previously acquired read-lock has already been released! */                                                                                  \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) __BOOL NOTHROW(KCALL sync_upgrade)(T *__restrict UNUSED(self)) { return true; }                     \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL sync_read)(T *__restrict self) { _wait(self); }                                         \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL sync_write)(T *__restrict self) { _wait(self); }                                        \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) __BOOL NOTHROW(KCALL sync_upgrade)(T *__restrict UNUSED(self)) { return true; }                     \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_read)(T *__restrict self) { _wait(self); }                                         \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL sync_write)(T *__restrict self) { _wait(self); }                                        \
 	/* NOTE: The lock is always upgraded for `return != 0', but when `2' is returned,                                                                     \
 	 *       no lock may have been held temporarily, meaning that the caller should                                                                       \
 	 *       re-load local copies of affected resources.                                                                                                  \
@@ -599,35 +599,35 @@ __NAMESPACE_INT_END
 	 * @return: 1 : Successfully upgraded the read-only to a write-lock.                                                                                  \
 	 * @return: 2 : Successfully upgraded the read-only to a write-lock,                                                                                  \
 	 *              but at one point, no lock at all was being held. */                                                                                   \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) unsigned int NOTHROW(KCALL sync_upgrade_nx)(T *__restrict UNUSED(self)) { return 1; }               \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED __BOOL NOTHROW(KCALL sync_read_nx)(T *__restrict self) { return _wait_nx(self); }           \
-	FORCELOCAL ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) WUNUSED __BOOL NOTHROW(KCALL sync_write_nx)(T *__restrict self) { return _wait_nx(self); }          \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _post(self); }                                 \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _post(self); }                                \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _post(self); }                                     \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict UNUSED(self)) { return true; } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict UNUSED(self)) { return true; } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); } \
-	FORCELOCAL ATTR_ARTIFICIAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); } \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) unsigned int NOTHROW(KCALL sync_upgrade_nx)(T *__restrict UNUSED(self)) { return 1; }               \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_read_nx)(T *__restrict self) { return _wait_nx(self); }           \
+	FORCELOCAL NOCONNECT ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_write_nx)(T *__restrict self) { return _wait_nx(self); }          \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_endread)(T *__restrict self) { _post(self); }                                 \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_endwrite)(T *__restrict self) { _post(self); }                                \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void NOTHROW(KCALL sync_end)(T *__restrict self) { _post(self); }                                     \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_reading)(T const *__restrict UNUSED(self)) { return true; } \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_writing)(T const *__restrict UNUSED(self)) { return true; } \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canread)(T const *__restrict self) { return _available(self); } \
+	FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_PURE WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL sync_canwrite)(T const *__restrict self) { return _available(self); } \
 	template<> class sync_methods< T > {                                                                                                                  \
 	public:                                                                                                                                               \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _wait(self); }  \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) void (KCALL write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _wait(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOCONNECT NONNULL((1)) bool (KCALL upgrade)(T *__restrict UNUSED(self)) THROWS(E_WOULDBLOCK, ...) { return true; } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL read)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _wait(self); }  \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) void (KCALL write)(T *__restrict self) THROWS(E_WOULDBLOCK, ...) { _wait(self); } \
+		static __CXX_FORCEINLINE NOCONNECT ATTR_ARTIFICIAL NONNULL((1)) bool (KCALL upgrade)(T *__restrict UNUSED(self)) THROWS(E_WOULDBLOCK, ...) { return true; } \
 		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOCONNECT NONNULL((1)) bool (KCALL read_nx)(T *__restrict self) __CXX_NOEXCEPT { return _wait_nx(self); } \
 		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOCONNECT NONNULL((1)) bool (KCALL write_nx)(T *__restrict self) __CXX_NOEXCEPT { return _wait_nx(self); } \
 		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOCONNECT NONNULL((1)) unsigned int (KCALL upgrade_nx)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { return 1; } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT { return _trywait(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT { return _trywait(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL downgrade)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { }               \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }            \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }           \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL NOBLOCK NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }                \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
-		static __CXX_FORCEINLINE ATTR_ARTIFICIAL WUNUSED NOBLOCK ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL tryread)(T *__restrict self) __CXX_NOEXCEPT { return _trywait(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL trywrite)(T *__restrict self) __CXX_NOEXCEPT { return _trywait(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED NONNULL((1)) bool (KCALL tryupgrade)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL downgrade)(T *__restrict UNUSED(self)) __CXX_NOEXCEPT { }               \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endread)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }            \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL endwrite)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }           \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL NONNULL((1)) void (KCALL end)(T *__restrict self) __CXX_NOEXCEPT { _post(self); }                \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL reading)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL writing)(T const *__restrict UNUSED(self)) __CXX_NOEXCEPT { return true; } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canread)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
+		static __CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL WUNUSED ATTR_PURE NONNULL((1)) bool (KCALL canwrite)(T const *__restrict self) __CXX_NOEXCEPT { return _available(self); } \
 	};                                                                                                                                                    \
 	}
 

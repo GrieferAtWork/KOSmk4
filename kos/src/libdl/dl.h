@@ -297,9 +297,9 @@ DlModule *DLFCN_CC libdl_dlgethandle(void const *static_pointer, unsigned int fl
 INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF))
 DlModule *DLFCN_CC libdl_dlgetmodule(char const *name, unsigned int flags);
 INTDEF NONNULL((2)) int DLFCN_CC libdl_dladdr(void const *address, Dl_info *info);
-INTDEF NONNULL((1)) WUNUSED fd_t DLFCN_CC libdl_dlmodulefd(DlModule *self);
-INTDEF NONNULL((1)) WUNUSED char const *DLFCN_CC libdl_dlmodulename(DlModule *self);
-INTDEF NONNULL((1)) WUNUSED void *DLFCN_CC libdl_dlmodulebase(DlModule *self);
+INTDEF WUNUSED NONNULL((1)) fd_t DLFCN_CC libdl_dlmodulefd(DlModule *self);
+INTDEF WUNUSED NONNULL((1)) char const *DLFCN_CC libdl_dlmodulename(DlModule *self);
+INTDEF WUNUSED NONNULL((1)) void *DLFCN_CC libdl_dlmodulebase(DlModule *self);
 INTDEF WUNUSED REF DlSection *DLFCN_CC libdl_dllocksection(DlModule *self, char const *__restrict name, unsigned int flags);
 INTDEF NONNULL((1)) int DLFCN_CC libdl_dlunlocksection(REF DlSection *sect);
 INTDEF NONNULL((1)) char const *DLFCN_CC libdl_dlsectionname(DlSection *sect);
@@ -318,7 +318,7 @@ INTDEF void *LIBCCALL libdl___tls_get_addr(void);
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-INTDEF WUNUSED ATTR_MALLOC void *DLFCN_CC libdl_dltlsallocseg(void);
+INTDEF ATTR_MALLOC WUNUSED void *DLFCN_CC libdl_dltlsallocseg(void);
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 INTDEF NONNULL((1)) int DLFCN_CC libdl_dltlsfreeseg(void *ptr);

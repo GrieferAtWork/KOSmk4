@@ -235,7 +235,7 @@ PUBLIC NONNULL((1, 2)) bool
  * NOTE: The *_nx variants return `NULL' if the allocation failed. */
 #ifdef RPC_USER
 #ifdef RPC_NOEXCEPT
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
+PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) ATTR_MALLOC WUNUSED NONNULL((1)) struct rpc_entry *
 NOTHROW(KCALL task_alloc_user_rpc_nx)(task_rpc_t func,
                                       void *arg,
                                       uintptr_t mode,
@@ -251,7 +251,7 @@ ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) struct rpc_entry *
 #endif /* !RPC_NOEXCEPT */
 #else /* RPC_USER */
 #ifdef RPC_NOEXCEPT
-PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) WUNUSED ATTR_MALLOC NONNULL((1)) struct rpc_entry *
+PUBLIC NOBLOCK_IF(rpc_gfp & GFP_ATOMIC) ATTR_MALLOC WUNUSED NONNULL((1)) struct rpc_entry *
 NOTHROW(KCALL task_alloc_synchronous_rpc_nx)(task_rpc_t func,
                                              void *arg,
                                              uintptr_t mode,
