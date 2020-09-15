@@ -1406,14 +1406,14 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 /* Handle the current exception by returning the `_XABORT_*' exit code. */
 PRIVATE u32 KCALL rtm_handle_exception(void) {
 	u32 result;
-	if (was_thrown(E_EXIT_THREAD) ||
-	    was_thrown(E_EXIT_PROCESS))
+	error_code_t code = error_code();
+	if (ERRORCODE_ISRTLPRIORITY(code))
 		RETHROW();
 #ifndef NDEBUG
 	error_printf("Emulating RTM");
 #endif /* !NDEBUG */
 	result = _XABORT_FAILED;
-	if (was_thrown(E_BADALLOC))
+	if (ERROR_CLASS(code) == ERROR_CLASS(ERROR_CODEOF(E_BADALLOC)))
 		result = _XABORT_CAPACITY;
 	return result;
 }

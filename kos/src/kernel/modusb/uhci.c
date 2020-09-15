@@ -2673,10 +2673,10 @@ NOTHROW(FCALL uhci_controller_reset_port)(struct uhci_controller *__restrict sel
 }
 
 /* NOTE: This function _always_ release a lock to `&self->uc_disclock' */
-PRIVATE void
-NOTHROW(FCALL uhci_controller_device_attached)(struct uhci_controller *__restrict self,
-                                               unsigned int portno,
-                                               u16 portsc_status) {
+PRIVATE void FCALL
+uhci_controller_device_attached(struct uhci_controller *__restrict self,
+                                unsigned int portno,
+                                u16 portsc_status) {
 	uintptr_t flags;
 	printk(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Device attached on uhci:%#I16x\n",
 	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
@@ -2688,8 +2688,7 @@ NOTHROW(FCALL uhci_controller_device_attached)(struct uhci_controller *__restric
 		usb_device_discovered(self, flags);
 	} EXCEPT {
 		error_code_t code = error_code();
-		if (code == ERROR_CODEOF(E_EXIT_THREAD) ||
-		    code == ERROR_CODEOF(E_EXIT_PROCESS))
+		if (ERRORCODE_ISRTLPRIORITY(code))
 			RETHROW();
 		error_printf("discovering usb device on uhci[pci:%I32p,io:%#Ix] port #%I16u",
 		             self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);

@@ -1332,8 +1332,8 @@ sys_recvmmsg_impl(fd_t sockfd,
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully is returned instead. */
 				if (i != 0) {
-					if (was_thrown(E_EXIT_PROCESS) ||
-					    was_thrown(E_EXIT_THREAD))
+					error_code_t code = error_code();
+					if (ERRORCODE_ISRTLPRIORITY(code))
 						RETHROW();
 					freea(iov_vec);
 					goto done;
@@ -1517,8 +1517,8 @@ compat_sys_recvmmsg_impl(fd_t sockfd,
 				 *               is discarded, and the number of messages that
 				 *               were sent successfully is returned instead. */
 				if (i != 0) {
-					if (was_thrown(E_EXIT_PROCESS) ||
-					    was_thrown(E_EXIT_THREAD))
+					error_code_t code = error_code();
+					if (ERRORCODE_ISRTLPRIORITY(code))
 						RETHROW();
 					freea(iov_vec);
 					goto done;

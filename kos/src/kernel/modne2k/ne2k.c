@@ -1405,8 +1405,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL Ne2k_InitDriver(void) {
 			Ne2k_ProbePciDevice(dev);
 		} EXCEPT {
 			error_code_t code = error_code();
-			if (code == ERROR_CODEOF(E_EXIT_THREAD) ||
-			    code == ERROR_CODEOF(E_EXIT_PROCESS))
+			if (ERRORCODE_ISRTLPRIORITY(code))
 				RETHROW();
 			error_printf(FREESTR("Initializing ne2k at pci:%#I32x"),
 			             dev->pd_base);

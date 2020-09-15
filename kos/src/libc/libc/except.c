@@ -1050,8 +1050,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	if (dlexceptaware(dlopen(NULL, 0)) > 0)
 		goto handle_mode_3;
 	/* Check for special exceptions that are always handled in mode #3 */
-	if (error->e_code == ERROR_CODEOF(E_EXIT_THREAD) ||
-	    error->e_code == ERROR_CODEOF(E_EXIT_PROCESS))
+	if (ERRORCODE_ISRTLPRIORITY(error->e_code))
 		goto handle_mode_3;
 	COMPILER_BARRIER();
 	memcpy(&saved_info, info, sizeof(*info));
