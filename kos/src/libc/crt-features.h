@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde79666d */
+/* HASH CRC-32:0x13782fa4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1809,6 +1809,11 @@
 #define __CRT_HAVE_DOS$pkey_mprotect 1
 #define __CRT_HAVE_DOS$pkey_set 1
 #define __CRT_HAVE_DOS$poll 1
+#define __CRT_HAVE_DOS$popcount 1
+#define __CRT_HAVE_DOS$popcount32 1
+#define __CRT_HAVE_DOS$popcount64 1
+#define __CRT_HAVE_DOS$popcountl 1
+#define __CRT_HAVE_DOS$popcountll 1
 #define __CRT_HAVE_DOS$popen 1
 #define __CRT_HAVE_DOS$posix_fadvise 1
 #define __CRT_HAVE_DOS$posix_fadvise64 1
@@ -4827,6 +4832,11 @@
 #define __CRT_HAVE_pkey_mprotect 1
 #define __CRT_HAVE_pkey_set 1
 #define __CRT_HAVE_poll 1
+#define __CRT_HAVE_popcount 1
+#define __CRT_HAVE_popcount32 1
+#define __CRT_HAVE_popcount64 1
+#define __CRT_HAVE_popcountl 1
+#define __CRT_HAVE_popcountll 1
 #define __CRT_HAVE_popen 1
 #define __CRT_HAVE_posix_fadvise 1
 #define __CRT_HAVE_posix_fadvise64 1

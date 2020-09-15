@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61088ca1 */
+/* HASH CRC-32:0xee4dc18b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -196,9 +196,6 @@ __SYSDECL_BEGIN
 #ifdef __SIGCHLD
 #define SIGCHLD   __SIGCHLD    /* Child status has changed (POSIX). */
 #endif /* __SIGCHLD */
-#ifdef __SIGCLD
-#define SIGCLD    __SIGCLD     /* Same as SIGCHLD (System V). */
-#endif /* __SIGCLD */
 #ifdef __SIGCONT
 #define SIGCONT   __SIGCONT    /* Continue (POSIX). */
 #endif /* __SIGCONT */
@@ -244,6 +241,9 @@ __SYSDECL_BEGIN
 #ifdef __SIGSYS
 #define SIGSYS    __SIGSYS     /* Bad system call. */
 #endif /* __SIGSYS */
+#ifdef __SIGCHLD
+#define SIGCLD    __SIGCHLD    /* Same as SIGCHLD (System V). */
+#endif /* __SIGCHLD */
 #ifdef __SIGUNUSED
 #define SIGUNUSED __SIGUNUSED
 #elif defined(__SIGSYS)

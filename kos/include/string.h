@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb336ae30 */
+/* HASH CRC-32:0xbd10ab4b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1496,16 +1496,23 @@ __CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHR
 __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strncasecmp)(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncasecmp))(__s1, __s2, __maxlen); })
 #endif /* !... */
 #endif /* !__strncasecmp_defined */
+#ifndef __ffs_defined
+#define __ffs_defined 1
 #if __has_builtin(__builtin_ffs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ffs)
-__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,ffs,(int __i),{ return __builtin_ffs(__i); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),{ return __builtin_ffs(__i); })
 #elif defined(__CRT_HAVE_ffs)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,ffs,(int __i),(__i))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),(__i))
+#elif defined(__CRT_HAVE_ffsl) && __SIZEOF_INT__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),ffsl,(__i))
+#elif defined(__CRT_HAVE_ffsll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),ffsll,(__i))
 #elif defined(__CRT_HAVE___ffs)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,ffs,(int __i),__ffs,(__i))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),__ffs,(__i))
 #else /* ... */
 #include <libc/local/string/ffs.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL ffs)(int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffs))(__i); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffs)(int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffs))(__i); })
 #endif /* !... */
+#endif /* !__ffs_defined */
 #ifdef __USE_KOS
 #include <hybrid/__bit.h>
 /* unsigned int FFS(INTEGER i):
@@ -1518,20 +1525,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST
 #endif /* !__USE_KOS */
 #ifdef __USE_GNU
 #if __has_builtin(__builtin_ffsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ffsl)
-__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,ffsl,(long __i),{ return __builtin_ffsl(__i); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),{ return __builtin_ffsl(__i); })
 #elif defined(__CRT_HAVE_ffsl)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,ffsl,(long __i),(__i))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),(__i))
+#elif defined(__CRT_HAVE_ffs) && __SIZEOF_LONG__ == __SIZEOF_INT__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),ffs,(__i))
+#elif defined(__CRT_HAVE_ffsll) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsl,(long __i),ffsll,(__i))
 #else /* ... */
 #include <libc/local/string/ffsl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ffsl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL ffsl)(long __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffsl))(__i); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ffsl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffsl)(long __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffsl))(__i); })
 #endif /* !... */
 #if __has_builtin(__builtin_ffsll) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ffsll)
-__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,ffsll,(__LONGLONG __i),{ return __builtin_ffsll(__i); })
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),{ return __builtin_ffsll(__i); })
 #elif defined(__CRT_HAVE_ffsll)
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_SIZE_T,__NOTHROW,ffsll,(__LONGLONG __i),(__i))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),(__i))
+#elif defined(__CRT_HAVE_ffs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),ffs,(__i))
+#elif defined(__CRT_HAVE_ffsl) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffsll,(__LONGLONG __i),ffsl,(__i))
 #else /* ... */
 #include <libc/local/string/ffsll.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ffsll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL ffsll)(__LONGLONG __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffsll))(__i); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ffsll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffsll)(__LONGLONG __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffsll))(__i); })
 #endif /* !... */
 #endif /* __USE_GNU */
 #ifdef __CRT_HAVE_strlcat

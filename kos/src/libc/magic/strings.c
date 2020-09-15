@@ -37,6 +37,12 @@ __SYSDECL_BEGIN
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
+#ifdef __USE_NETBSD
+#ifndef NULL
+#define NULL __NULLPTR
+#endif /* !NULL */
+#endif /* __USE_NETBSD */
+
 }
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 
@@ -110,6 +116,111 @@ __SYSDECL_BEGIN
 #endif /* __USE_MISC */
 #endif /* !__cplusplus && __USE_STRING_OVERLOADS */
 }
+
+%
+%#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8) || defined(__USE_XOPEN2K8XSI)
+%[insert:extern(ffs)]
+%{
+#ifdef __USE_KOS
+#include <hybrid/__bit.h>
+/* unsigned int FFS(INTEGER i):
+ *     FindFirstSet
+ *     Returns the index (starting at 1 for 0x01) of the first
+ *     1-bit in given value, or ZERO(0) if the given value is ZERO(0).
+ *     >> assert(!x ||  (x &  (1 << (ffs(x)-1))));    // FFS-bit is set
+ *     >> assert(!x || !(x & ((1 << (ffs(x)-1))-1))); // Less significant bits are clear */
+#define ffs(i) __hybrid_ffs(i)
+#endif /* !__USE_KOS */
+}
+%#endif /* __USE_MISC || !__USE_XOPEN2K8 || __USE_XOPEN2K8XSI */
+
+%
+%#if defined(__USE_NETBSD)
+%[default:section(".text.crt{|.dos}.string.memory")]
+
+@@POPulationCOUNT
+@@Return the number of 1-bits in `i'
+[[wunused, nothrow, ATTR_CONST, crtbuiltin]]
+[[if(__SIZEOF_INT__ == 4), alias("popcount32")]]
+[[if(__SIZEOF_INT__ == 8), alias("popcount64")]]
+[[if(__SIZEOF_INT__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)), crt_intern_kos_alias(libc_popcount32)]]
+[[if(__SIZEOF_INT__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)), crt_intern_kos_alias(libc_popcount64)]]
+[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("popcountl")]]
+[[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("popcountll")]]
+[[if(__SIZEOF_INT__ == 4), bind_local_function(popcount32)]]
+[[if(__SIZEOF_INT__ == 8), bind_local_function(popcount64)]]
+[[impl_include("<hybrid/__bit.h>")]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNT))]]
+unsigned int popcount(unsigned int i) {
+	return __hybrid_popcount(i);
+}
+
+[[wunused, nothrow, ATTR_CONST, crtbuiltin, doc_alias(popcount)]]
+[[if(__SIZEOF_LONG__ == 4), alias("popcount32")]]
+[[if(__SIZEOF_LONG__ == 8), alias("popcount64")]]
+[[if(__SIZEOF_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)), crt_intern_kos_alias(libc_popcount32)]]
+[[if(__SIZEOF_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)), crt_intern_kos_alias(libc_popcount64)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("popcount")]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("popcountll")]]
+[[if(__SIZEOF_LONG__ == 4), bind_local_function(popcount32)]]
+[[if(__SIZEOF_LONG__ == 8), bind_local_function(popcount64)]]
+[[impl_include("<hybrid/__bit.h>")]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNTL))]]
+unsigned int popcountl(unsigned long i) {
+	return __hybrid_popcount(i);
+}
+
+%#ifdef __ULONGLONG
+[[wunused, nothrow, ATTR_CONST, crtbuiltin, doc_alias(popcount)]]
+[[if(__SIZEOF_LONG_LONG__ == 4), alias("popcount32")]]
+[[if(__SIZEOF_LONG_LONG__ == 8), alias("popcount64")]]
+[[if(__SIZEOF_LONG_LONG__ == 4 && !defined(LIBC_ARCH_HAVE_POPCOUNT32)), crt_intern_kos_alias(libc_popcount32)]]
+[[if(__SIZEOF_LONG_LONG__ == 8 && !defined(LIBC_ARCH_HAVE_POPCOUNT64)), crt_intern_kos_alias(libc_popcount64)]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("popcount")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("popcountl")]]
+[[if(__SIZEOF_LONG_LONG__ == 4), bind_local_function(popcount32)]]
+[[if(__SIZEOF_LONG_LONG__ == 8), bind_local_function(popcount64)]]
+[[impl_include("<hybrid/__bit.h>")]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNTLL))]]
+unsigned int popcountll(__ULONGLONG i) {
+	return __hybrid_popcount(i);
+}
+%#endif /* __ULONGLONG */
+
+[[wunused, nothrow, ATTR_CONST, crtbuiltin, doc_alias(popcount)]]
+[[if(__SIZEOF_INT__ == 4), alias("popcount")]]
+[[if(__SIZEOF_LONG__ == 4), alias("popcountl")]]
+[[if(__SIZEOF_LONG_LONG__ == 4), alias("popcountll")]]
+[[impl_include("<hybrid/__bit.h>")]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNT32))]]
+unsigned int popcount32($uint32_t i) {
+	return __hybrid_popcount(i);
+}
+
+%#ifdef __UINT64_TYPE__
+[[wunused, nothrow, ATTR_CONST, crtbuiltin, doc_alias(popcount)]]
+[[if(__SIZEOF_INT__ == 8), alias("popcount")]]
+[[if(__SIZEOF_LONG__ == 8), alias("popcountl")]]
+[[if(__SIZEOF_LONG_LONG__ == 8), alias("popcountll")]]
+[[impl_include("<hybrid/__bit.h>")]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_POPCOUNT64))]]
+unsigned int popcount64($uint64_t i) {
+	return __hybrid_popcount(i);
+}
+%#endif /* __UINT64_TYPE__ */
+
+
+%{
+#ifdef __USE_KOS
+#include <hybrid/__bit.h>
+/* unsigned int POPCOUNT(unsigned Integer i):
+ *     POPulationCOUNT
+ *     Return the number of 1-bits in `i' */
+#define popcount(i) __hybrid_popcount(i)
+#endif /* !__USE_KOS */
+}
+%#endif /* __USE_NETBSD */
+
 
 %{
 #endif /* __CC__ */

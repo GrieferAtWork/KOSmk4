@@ -3374,7 +3374,7 @@ again_parse_annotations:
 					 * or [[if(cond), alt_variant_of(name)]]
 					 * Same as:
 					 * [[if(cond), alias(name)]]
-					 * [[if(cond), crt_intern_alias(name)]]
+					 * [[if(cond), crt_intern_kos_alias(name)]]
 					 * In other words: When "cond" is true, link the current function
 					 *                 against some other function "name" in both the
 					 *                 system header, as well as the internal libc

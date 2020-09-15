@@ -9599,7 +9599,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 	                                         __SIZE_TYPE__ __elem_count,                                    \
 	                                         __SIZE_TYPE__ __elem_size) {                                   \
 		if __untraced(__builtin_constant_p(__elem_size)) {                                                  \
-			switch __untraced(__elem_size) {                                                                          \
+			switch __untraced(__elem_size) {                                                                \
 			case 1: return (memcpy)(__dst, __src, __elem_count);                                            \
 			case 2: return (memcpyw)(__dst, __src, __elem_count);                                           \
 			case 4: return (memcpyl)(__dst, __src, __elem_count);                                           \
@@ -9614,7 +9614,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 				return (memcpyw)(__dst, __src, __elem_count * (__elem_size / 2));                           \
 		}                                                                                                   \
 		if __untraced(__builtin_constant_p(__elem_count)) {                                                 \
-			switch __untraced(__elem_count) {                                                                         \
+			switch __untraced(__elem_count) {                                                               \
 			case 1: return (memcpy)(__dst, __src, __elem_size);                                             \
 			case 2: return (memcpyw)(__dst, __src, __elem_size);                                            \
 			case 4: return (memcpyl)(__dst, __src, __elem_size);                                            \
@@ -9638,7 +9638,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 	                                         __SIZE_TYPE__ __elem_count,                                    \
 	                                         __SIZE_TYPE__ __elem_size) {                                   \
 		if __untraced(__builtin_constant_p(__elem_size)) {                                                  \
-			switch __untraced(__elem_size) {                                                                          \
+			switch __untraced(__elem_size) {                                                                \
 			case 1: return (memcpy)(__dst, __src, __elem_count);                                            \
 			case 2: return (memcpyw)(__dst, __src, __elem_count);                                           \
 			case 4: return (memcpyl)(__dst, __src, __elem_count);                                           \
@@ -9650,7 +9650,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 				return (memcpyw)(__dst, __src, __elem_count * (__elem_size / 2));                           \
 		}                                                                                                   \
 		if __untraced(__builtin_constant_p(__elem_count)) {                                                 \
-			switch __untraced(__elem_count) {                                                                         \
+			switch __untraced(__elem_count) {                                                               \
 			case 1: return (memcpy)(__dst, __src, __elem_size);                                             \
 			case 2: return (memcpyw)(__dst, __src, __elem_size);                                            \
 			case 4: return (memcpyl)(__dst, __src, __elem_size);                                            \

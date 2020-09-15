@@ -25,7 +25,7 @@
 #include "__stdinc.h"
 
 /* kind-of weird, non-portable alias for `offsetof()' from <stddef.h> */
-#define	fldoff(type, m) __builtin_offsetof(struct type, m)
+#define	fldoff(type, member) __builtin_offsetof(struct type, member)
 
 /* Return the size of a member within some given struct. */
 #define	fldsiz(type, member) sizeof(((struct type *)0)->member)

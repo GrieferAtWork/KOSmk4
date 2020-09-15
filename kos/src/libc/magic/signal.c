@@ -183,9 +183,6 @@ __SYSDECL_BEGIN
 #ifdef __SIGCHLD
 #define SIGCHLD   __SIGCHLD    /* Child status has changed (POSIX). */
 #endif /* __SIGCHLD */
-#ifdef __SIGCLD
-#define SIGCLD    __SIGCLD     /* Same as SIGCHLD (System V). */
-#endif /* __SIGCLD */
 #ifdef __SIGCONT
 #define SIGCONT   __SIGCONT    /* Continue (POSIX). */
 #endif /* __SIGCONT */
@@ -231,6 +228,9 @@ __SYSDECL_BEGIN
 #ifdef __SIGSYS
 #define SIGSYS    __SIGSYS     /* Bad system call. */
 #endif /* __SIGSYS */
+#ifdef __SIGCHLD
+#define SIGCLD    __SIGCHLD    /* Same as SIGCHLD (System V). */
+#endif /* __SIGCHLD */
 #ifdef __SIGUNUSED
 #define SIGUNUSED __SIGUNUSED
 #elif defined(__SIGSYS)

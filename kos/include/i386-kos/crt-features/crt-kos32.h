@@ -2610,6 +2610,11 @@
 #define __CRT_HAVE_pkey_mprotect 1
 #define __CRT_HAVE_pkey_set 1
 #define __CRT_HAVE_poll 1
+#define __CRT_HAVE_popcount 1
+#define __CRT_HAVE_popcount32 1
+#define __CRT_HAVE_popcount64 1
+#define __CRT_HAVE_popcountl 1
+#define __CRT_HAVE_popcountll 1
 #define __CRT_HAVE_popen 1
 #define __CRT_HAVE_posix_fadvise 1
 #define __CRT_HAVE_posix_fadvise64 1

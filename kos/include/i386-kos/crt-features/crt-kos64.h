@@ -2606,6 +2606,11 @@
 #define __CRT_HAVE_pkey_mprotect 1
 #define __CRT_HAVE_pkey_set 1
 #define __CRT_HAVE_poll 1
+#define __CRT_HAVE_popcount 1
+#define __CRT_HAVE_popcount32 1
+#define __CRT_HAVE_popcount64 1
+#define __CRT_HAVE_popcountl 1
+#define __CRT_HAVE_popcountll 1
 #define __CRT_HAVE_popen 1
 #define __CRT_HAVE_posix_fadvise 1
 #define __CRT_HAVE_posix_fadvise64 1
@@ -6783,6 +6788,11 @@
 #define __CRT_HAVE_KOS$pkey_mprotect 1
 #define __CRT_HAVE_KOS$pkey_set 1
 #define __CRT_HAVE_KOS$poll 1
+#define __CRT_HAVE_KOS$popcount 1
+#define __CRT_HAVE_KOS$popcount32 1
+#define __CRT_HAVE_KOS$popcount64 1
+#define __CRT_HAVE_KOS$popcountl 1
+#define __CRT_HAVE_KOS$popcountll 1
 #define __CRT_HAVE_KOS$popen 1
 #define __CRT_HAVE_KOS$posix_fadvise 1
 #define __CRT_HAVE_KOS$posix_fadvise64 1
@@ -10161,6 +10171,11 @@
 #define __CRT_HAVE_DOS$pkey_mprotect 1
 #define __CRT_HAVE_DOS$pkey_set 1
 #define __CRT_HAVE_DOS$poll 1
+#define __CRT_HAVE_DOS$popcount 1
+#define __CRT_HAVE_DOS$popcount32 1
+#define __CRT_HAVE_DOS$popcount64 1
+#define __CRT_HAVE_DOS$popcountl 1
+#define __CRT_HAVE_DOS$popcountll 1
 #define __CRT_HAVE_DOS$popen 1
 #define __CRT_HAVE_DOS$posix_fadvise 1
 #define __CRT_HAVE_DOS$posix_fadvise64 1

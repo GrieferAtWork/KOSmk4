@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ce301c3 */
+/* HASH CRC-32:0xda271fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -779,6 +779,19 @@ NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src,
 	libc_memmove(dst, src, num_bytes);
 }
 #endif /* !__KERNEL__ */
+/* Prevent bzero()'s call to memset() from being routed back to bzero itself! */
+#ifndef LIBC_ARCH_HAVE_BZERO
+#undef libc_memset
+#endif /* !LIBC_ARCH_HAVE_BZERO */
+#ifndef LIBC_ARCH_HAVE_BZEROW
+#undef libc_memsetw
+#endif /* !LIBC_ARCH_HAVE_BZEROW */
+#ifndef LIBC_ARCH_HAVE_BZEROL
+#undef libc_memsetl
+#endif /* !LIBC_ARCH_HAVE_BZEROL */
+#ifndef LIBC_ARCH_HAVE_BZEROQ
+#undef libc_memsetq
+#endif /* !LIBC_ARCH_HAVE_BZEROQ */
 #ifndef LIBC_ARCH_HAVE_BZERO
 INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst,
@@ -811,6 +824,19 @@ NOTHROW_NCX(LIBCCALL libc_bzeroq)(void *__restrict dst,
 #endif /* !__UINT64_TYPE__ */
 }
 #endif /* !LIBC_ARCH_HAVE_BZEROQ */
+/* Restore optimized libc string functions */
+#if !defined(LIBC_ARCH_HAVE_BZERO) && defined(__fast_memset_defined)
+#define libc_memset(dst, byte, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))(dst, byte, n_bytes)
+#endif /* !LIBC_ARCH_HAVE_BZERO && __fast_memset_defined */
+#if !defined(LIBC_ARCH_HAVE_BZEROW) && defined(__fast_memsetw_defined)
+#define libc_memsetw(dst, word, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetw))(dst, word, n_words)
+#endif /* !LIBC_ARCH_HAVE_BZEROW && __fast_memsetw_defined */
+#if !defined(LIBC_ARCH_HAVE_BZEROL) && defined(__fast_memsetl_defined)
+#define libc_memsetl(dst, dword, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetl))(dst, dword, n_dwords)
+#endif /* !LIBC_ARCH_HAVE_BZEROL && __fast_memsetl_defined */
+#if !defined(LIBC_ARCH_HAVE_BZEROQ) && defined(__fast_memsetq_defined)
+#define libc_memsetq(dst, qword, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetq))(dst, qword, n_qwords)
+#endif /* !LIBC_ARCH_HAVE_BZEROQ && __fast_memsetq_defined */
 #include <hybrid/host.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_bzeroc)(void *__restrict dst,
@@ -894,25 +920,31 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1,
 	} while (c1);
 	return 0;
 }
-#ifndef LIBC_ARCH_HAVE_FFS
+#if __SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)
+DEFINE_INTERN_ALIAS(libc_ffs, libc_ffsl);
+#elif __SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)
+DEFINE_INTERN_ALIAS(libc_ffs, libc_ffsll);
+#elif !defined(LIBC_ARCH_HAVE_FFS)
 #include <hybrid/__bit.h>
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_UINT_T
 NOTHROW(LIBCCALL libc_ffs)(int i) {
-	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned int)i);
+	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)i);
 }
-#endif /* !LIBC_ARCH_HAVE_FFS */
-#ifndef LIBC_ARCH_HAVE_FFSL
+#endif /* ... */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)
+DEFINE_INTERN_ALIAS(libc_ffsl, libc_ffsll);
+#elif !defined(LIBC_ARCH_HAVE_FFSL)
 #include <hybrid/__bit.h>
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_UINT_T
 NOTHROW(LIBCCALL libc_ffsl)(long i) {
-	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned long)i);
+	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)i);
 }
-#endif /* !LIBC_ARCH_HAVE_FFSL */
+#endif /* ... */
 #ifndef LIBC_ARCH_HAVE_FFSLL
 #include <hybrid/__bit.h>
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_UINT_T
 NOTHROW(LIBCCALL libc_ffsll)(__LONGLONG i) {
-	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((__ULONGLONG)i);
+	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)i);
 }
 #endif /* !LIBC_ARCH_HAVE_FFSLL */
 #ifndef LIBC_ARCH_HAVE_STRLCAT
@@ -4396,13 +4428,13 @@ DEFINE_PUBLIC_ALIAS(_strncmpi, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncmpi, libc_strncasecmp);
 DEFINE_PUBLIC_ALIAS(strncasecmp, libc_strncasecmp);
 #endif /* !__KERNEL__ */
-#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_FFS)
+#if !defined(__KERNEL__) && ((__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)) || (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)) || !defined(LIBC_ARCH_HAVE_FFS))
 DEFINE_PUBLIC_ALIAS(__ffs, libc_ffs);
 DEFINE_PUBLIC_ALIAS(ffs, libc_ffs);
-#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_FFS */
-#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_FFSL)
+#endif /* !__KERNEL__ && ((__SIZEOF_INT__ == __SIZEOF_LONG__ && !LIBC_ARCH_HAVE_FFSL) || (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !LIBC_ARCH_HAVE_FFSLL) || !LIBC_ARCH_HAVE_FFS) */
+#if !defined(__KERNEL__) && ((__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)) || !defined(LIBC_ARCH_HAVE_FFSL))
 DEFINE_PUBLIC_ALIAS(ffsl, libc_ffsl);
-#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_FFSL */
+#endif /* !__KERNEL__ && ((__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !LIBC_ARCH_HAVE_FFSLL) || !LIBC_ARCH_HAVE_FFSL) */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_FFSLL)
 DEFINE_PUBLIC_ALIAS(ffsll, libc_ffsll);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_FFSLL */

@@ -419,7 +419,8 @@ usb_create_strange_device_nowarn(struct usb_controller *__restrict self,
 PRIVATE void KCALL
 usb_create_strange_device(struct usb_controller *__restrict self,
                           struct usb_device *__restrict dev) {
-	printk(KERN_WARNING "[usb] Creating device file for strange USB device %q:%q:%q (interface:%q, endpoint:%I8u)\n",
+	printk(KERN_WARNING "[usb] Creating device file for strange USB "
+	                    "device %q:%q:%q (interface:%q, endpoint:%I8u)\n",
 	       dev->ue_interface->ui_device->ud_str_vendor,
 	       dev->ue_interface->ui_device->ud_str_product,
 	       dev->ue_interface->ui_device->ud_str_serial,
@@ -505,7 +506,8 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 				break;
 		}
 	
-		printk(KERN_NOTICE "[usb] Failed to identify device %q:%q:%q with interface %q(%#x.%#x.%#x) (config %q)\n",
+		printk(KERN_NOTICE "[usb] Failed to identify device %q:%q:%q "
+		                   "with interface %q(%#x.%#x.%#x) (config %q)\n",
 		       intf->ui_device->ud_str_vendor,
 		       intf->ui_device->ud_str_product,
 		       intf->ui_device->ud_str_serial,
@@ -1130,14 +1132,15 @@ strange_device_without_configs:
 #endif /* !NDEBUG */
 				if ((*probes->upv_elem[i].c_device)(self, dev)) {
 #ifndef NDEBUG
-					unsigned int j;
-					for (j = 0; j < dev->ud_configc; ++j) {
-						if (dev->ud_config == &dev->ud_configv[j])
-							goto did_find_correct_config;
-					}
-					__assertion_failedf("dev->ud_config in dev->ud_configv",
-					                    "Device config %p is not a valid configuration",
-					                    dev->ud_config);
+					do  {
+						unsigned int j;
+						for (j = 0; j < dev->ud_configc; ++j) {
+							if (dev->ud_config == &dev->ud_configv[j])
+								goto did_find_correct_config;
+						}
+					} while (__assertion_checkf("dev->ud_config in dev->ud_configv",
+					                            "Device config %p is not a valid configuration",
+					                            dev->ud_config));
 did_find_correct_config:
 #endif /* !NDEBUG */
 					goto done;
@@ -1147,7 +1150,8 @@ did_find_correct_config:
 		/* XXX: Change the API to allow for simultaneous use of multi-function
 		 *      USB devices, by switching between configurations on-the-fly? */
 		used_conf = 0; /* ??? (Maybe prioritize certain options over others?) */
-		printk(KERN_WARNING "[usb] Multi-function device %q:%q:%q not recognized. Available configurations are:\n",
+		printk(KERN_WARNING "[usb] Multi-function device %q:%q:%q not "
+		                    "recognized. Available configurations are:\n",
 		       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial);
 		{
 			u8 i;
@@ -1322,7 +1326,8 @@ search_for_next_intf:
 		 * for the endpoint, but just not being able to figure out what's
 		 * the deal with the thing. */
 		if unlikely(!interface_count) {
-			printk(KERN_WARNING "[usb] Device %q:%q:%q doesn't seem to have any interfaces when configured for %q\n",
+			printk(KERN_WARNING "[usb] Device %q:%q:%q doesn't seem to have "
+			                    "any interfaces when configured for %q\n",
 			       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial,
 			       dev->ud_config->uc_desc);
 			goto strange_device;
@@ -1378,7 +1383,7 @@ usb_register_character_device(struct usb_device *__restrict usb_dev,
 
 
 /* Destroy the given USB interrupt descriptor. */
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self) {
 	assert(self->ui_fini);
 	(*self->ui_fini)(self);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e3688aa */
+/* HASH CRC-32:0x460c3927 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #include <features.h>
 #include <hybrid/__bit.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ffsl) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(ffsl) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ffsl))(long __i) {
-	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned long)__i);
+	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)__i);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_ffsl_defined

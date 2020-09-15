@@ -26,20 +26,326 @@
 
 
 %(auto_header){
+/* Bind optimized variants of various string functions,
+ * so those get used when building the automatic portions
+ * of libc. */
+#include <optimized/string.h>
+/*[[[deemon
+local funcs = {
+	"mempmovedownc(dst, src, elem_count, elem_size)",
+	"mempmovedownc(dst, src, elem_count, elem_size)",
+	"memmovedownc(dst, src, elem_count, elem_size)",
+	"mempmoveupc(dst, src, elem_count, elem_size)",
+	"memmoveupc(dst, src, elem_count, elem_size)",
+	"mempmovec(dst, src, elem_count, elem_size)",
+	"memmovec(dst, src, elem_count, elem_size)",
+	"mempcpyc(dst, src, elem_count, elem_size)",
+	"memcpyc(dst, src, elem_count, elem_size)",
+	"mempatq(dst, pattern, n_bytes)",
+	"mempatl(dst, pattern, n_bytes)",
+	"mempatw(dst, pattern, n_bytes)",
+	"mempmove(dst, src, n_bytes)",
+	"mempmovew(dst, src, n_words)",
+	"mempmovel(dst, src, n_dwords)",
+	"mempmoveq(dst, src, n_qwords)",
+	"memmove(dst, src, n_bytes)",
+	"memmovew(dst, src, n_words)",
+	"memmovel(dst, src, n_dwords)",
+	"memmoveq(dst, src, n_qwords)",
+	"mempmoveup(dst, src, n_bytes)",
+	"mempmoveupw(dst, src, n_words)",
+	"mempmoveupl(dst, src, n_dwords)",
+	"mempmoveupq(dst, src, n_qwords)",
+	"memmoveup(dst, src, n_bytes)",
+	"memmoveupw(dst, src, n_words)",
+	"memmoveupl(dst, src, n_dwords)",
+	"memmoveupq(dst, src, n_qwords)",
+	"mempmovedown(dst, src, n_bytes)",
+	"mempmovedownw(dst, src, n_words)",
+	"mempmovedownl(dst, src, n_dwords)",
+	"mempmovedownq(dst, src, n_qwords)",
+	"memmovedown(dst, src, n_bytes)",
+	"memmovedownw(dst, src, n_words)",
+	"memmovedownl(dst, src, n_dwords)",
+	"memmovedownq(dst, src, n_qwords)",
+	"memcmp(s1, s2, n_bytes)",
+	"memcmpw(s1, s2, n_words)",
+	"memcmpl(s1, s2, n_dwords)",
+	"memcmpq(s1, s2, n_qwords)",
+	"memchr(haystack, needle, n_bytes)",
+	"memchrw(haystack, needle, n_words)",
+	"memchrl(haystack, needle, n_dwords)",
+	"memchrq(haystack, needle, n_qwords)",
+	"memrchr(haystack, needle, n_bytes)",
+	"memrchrw(haystack, needle, n_words)",
+	"memrchrl(haystack, needle, n_dwords)",
+	"memrchrq(haystack, needle, n_qwords)",
+	"memset(dst, byte, n_bytes)",
+	"memsetw(dst, word, n_words)",
+	"memsetl(dst, dword, n_dwords)",
+	"memsetq(dst, qword, n_qwords)",
+	"mempset(dst, byte, n_bytes)",
+	"mempsetw(dst, word, n_words)",
+	"mempsetl(dst, dword, n_dwords)",
+	"mempsetq(dst, qword, n_qwords)",
+	"bzero(dst, n_bytes)",
+	"bzerow(dst, n_words)",
+	"bzerol(dst, n_dwords)",
+	"bzeroq(dst, n_qwords)",
+	"mempcpy(dst, src, n_bytes)",
+	"mempcpyw(dst, src, n_words)",
+	"mempcpyl(dst, src, n_dwords)",
+	"mempcpyq(dst, src, n_qwords)",
+	"memcpy(dst, src, n_bytes)",
+	"memcpyw(dst, src, n_words)",
+	"memcpyl(dst, src, n_dwords)",
+	"memcpyq(dst, src, n_qwords)",
+};
+for (local f: funcs) {
+	local i = f.index("(");
+	local name = f[:i];
+	local args = f[i:];
+	print("#ifdef __fast_", name, "_defined");
+	print("#define libc_", name, args, " (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(", name, "))", args);
+	print("#endif /" "* __fast_", name, "_defined *" "/");
+}
+]]]*/
+#ifdef __fast_mempmovedownc_defined
+#define libc_mempmovedownc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownc))(dst, src, elem_count, elem_size)
+#endif /* __fast_mempmovedownc_defined */
+#ifdef __fast_mempmovedownc_defined
+#define libc_mempmovedownc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownc))(dst, src, elem_count, elem_size)
+#endif /* __fast_mempmovedownc_defined */
+#ifdef __fast_memmovedownc_defined
+#define libc_memmovedownc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownc))(dst, src, elem_count, elem_size)
+#endif /* __fast_memmovedownc_defined */
+#ifdef __fast_mempmoveupc_defined
+#define libc_mempmoveupc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupc))(dst, src, elem_count, elem_size)
+#endif /* __fast_mempmoveupc_defined */
+#ifdef __fast_memmoveupc_defined
+#define libc_memmoveupc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupc))(dst, src, elem_count, elem_size)
+#endif /* __fast_memmoveupc_defined */
+#ifdef __fast_mempmovec_defined
+#define libc_mempmovec(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovec))(dst, src, elem_count, elem_size)
+#endif /* __fast_mempmovec_defined */
+#ifdef __fast_memmovec_defined
+#define libc_memmovec(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovec))(dst, src, elem_count, elem_size)
+#endif /* __fast_memmovec_defined */
+#ifdef __fast_mempcpyc_defined
+#define libc_mempcpyc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyc))(dst, src, elem_count, elem_size)
+#endif /* __fast_mempcpyc_defined */
+#ifdef __fast_memcpyc_defined
+#define libc_memcpyc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))(dst, src, elem_count, elem_size)
+#endif /* __fast_memcpyc_defined */
+#ifdef __fast_mempatq_defined
+#define libc_mempatq(dst, pattern, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatq))(dst, pattern, n_bytes)
+#endif /* __fast_mempatq_defined */
+#ifdef __fast_mempatl_defined
+#define libc_mempatl(dst, pattern, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatl))(dst, pattern, n_bytes)
+#endif /* __fast_mempatl_defined */
+#ifdef __fast_mempatw_defined
+#define libc_mempatw(dst, pattern, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatw))(dst, pattern, n_bytes)
+#endif /* __fast_mempatw_defined */
+#ifdef __fast_mempmove_defined
+#define libc_mempmove(dst, src, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove))(dst, src, n_bytes)
+#endif /* __fast_mempmove_defined */
+#ifdef __fast_mempmovew_defined
+#define libc_mempmovew(dst, src, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovew))(dst, src, n_words)
+#endif /* __fast_mempmovew_defined */
+#ifdef __fast_mempmovel_defined
+#define libc_mempmovel(dst, src, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovel))(dst, src, n_dwords)
+#endif /* __fast_mempmovel_defined */
+#ifdef __fast_mempmoveq_defined
+#define libc_mempmoveq(dst, src, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveq))(dst, src, n_qwords)
+#endif /* __fast_mempmoveq_defined */
+#ifdef __fast_memmove_defined
+#define libc_memmove(dst, src, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))(dst, src, n_bytes)
+#endif /* __fast_memmove_defined */
+#ifdef __fast_memmovew_defined
+#define libc_memmovew(dst, src, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovew))(dst, src, n_words)
+#endif /* __fast_memmovew_defined */
+#ifdef __fast_memmovel_defined
+#define libc_memmovel(dst, src, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovel))(dst, src, n_dwords)
+#endif /* __fast_memmovel_defined */
+#ifdef __fast_memmoveq_defined
+#define libc_memmoveq(dst, src, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveq))(dst, src, n_qwords)
+#endif /* __fast_memmoveq_defined */
+#ifdef __fast_mempmoveup_defined
+#define libc_mempmoveup(dst, src, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveup))(dst, src, n_bytes)
+#endif /* __fast_mempmoveup_defined */
+#ifdef __fast_mempmoveupw_defined
+#define libc_mempmoveupw(dst, src, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupw))(dst, src, n_words)
+#endif /* __fast_mempmoveupw_defined */
+#ifdef __fast_mempmoveupl_defined
+#define libc_mempmoveupl(dst, src, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupl))(dst, src, n_dwords)
+#endif /* __fast_mempmoveupl_defined */
+#ifdef __fast_mempmoveupq_defined
+#define libc_mempmoveupq(dst, src, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmoveupq))(dst, src, n_qwords)
+#endif /* __fast_mempmoveupq_defined */
+#ifdef __fast_memmoveup_defined
+#define libc_memmoveup(dst, src, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveup))(dst, src, n_bytes)
+#endif /* __fast_memmoveup_defined */
+#ifdef __fast_memmoveupw_defined
+#define libc_memmoveupw(dst, src, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupw))(dst, src, n_words)
+#endif /* __fast_memmoveupw_defined */
+#ifdef __fast_memmoveupl_defined
+#define libc_memmoveupl(dst, src, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupl))(dst, src, n_dwords)
+#endif /* __fast_memmoveupl_defined */
+#ifdef __fast_memmoveupq_defined
+#define libc_memmoveupq(dst, src, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmoveupq))(dst, src, n_qwords)
+#endif /* __fast_memmoveupq_defined */
+#ifdef __fast_mempmovedown_defined
+#define libc_mempmovedown(dst, src, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedown))(dst, src, n_bytes)
+#endif /* __fast_mempmovedown_defined */
+#ifdef __fast_mempmovedownw_defined
+#define libc_mempmovedownw(dst, src, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownw))(dst, src, n_words)
+#endif /* __fast_mempmovedownw_defined */
+#ifdef __fast_mempmovedownl_defined
+#define libc_mempmovedownl(dst, src, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownl))(dst, src, n_dwords)
+#endif /* __fast_mempmovedownl_defined */
+#ifdef __fast_mempmovedownq_defined
+#define libc_mempmovedownq(dst, src, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovedownq))(dst, src, n_qwords)
+#endif /* __fast_mempmovedownq_defined */
+#ifdef __fast_memmovedown_defined
+#define libc_memmovedown(dst, src, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedown))(dst, src, n_bytes)
+#endif /* __fast_memmovedown_defined */
+#ifdef __fast_memmovedownw_defined
+#define libc_memmovedownw(dst, src, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownw))(dst, src, n_words)
+#endif /* __fast_memmovedownw_defined */
+#ifdef __fast_memmovedownl_defined
+#define libc_memmovedownl(dst, src, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownl))(dst, src, n_dwords)
+#endif /* __fast_memmovedownl_defined */
+#ifdef __fast_memmovedownq_defined
+#define libc_memmovedownq(dst, src, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovedownq))(dst, src, n_qwords)
+#endif /* __fast_memmovedownq_defined */
+#ifdef __fast_memcmp_defined
+#define libc_memcmp(s1, s2, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(s1, s2, n_bytes)
+#endif /* __fast_memcmp_defined */
+#ifdef __fast_memcmpw_defined
+#define libc_memcmpw(s1, s2, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(s1, s2, n_words)
+#endif /* __fast_memcmpw_defined */
+#ifdef __fast_memcmpl_defined
+#define libc_memcmpl(s1, s2, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(s1, s2, n_dwords)
+#endif /* __fast_memcmpl_defined */
+#ifdef __fast_memcmpq_defined
+#define libc_memcmpq(s1, s2, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(s1, s2, n_qwords)
+#endif /* __fast_memcmpq_defined */
+#ifdef __fast_memchr_defined
+#define libc_memchr(haystack, needle, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchr))(haystack, needle, n_bytes)
+#endif /* __fast_memchr_defined */
+#ifdef __fast_memchrw_defined
+#define libc_memchrw(haystack, needle, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchrw))(haystack, needle, n_words)
+#endif /* __fast_memchrw_defined */
+#ifdef __fast_memchrl_defined
+#define libc_memchrl(haystack, needle, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchrl))(haystack, needle, n_dwords)
+#endif /* __fast_memchrl_defined */
+#ifdef __fast_memchrq_defined
+#define libc_memchrq(haystack, needle, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchrq))(haystack, needle, n_qwords)
+#endif /* __fast_memchrq_defined */
+#ifdef __fast_memrchr_defined
+#define libc_memrchr(haystack, needle, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchr))(haystack, needle, n_bytes)
+#endif /* __fast_memrchr_defined */
+#ifdef __fast_memrchrw_defined
+#define libc_memrchrw(haystack, needle, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchrw))(haystack, needle, n_words)
+#endif /* __fast_memrchrw_defined */
+#ifdef __fast_memrchrl_defined
+#define libc_memrchrl(haystack, needle, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchrl))(haystack, needle, n_dwords)
+#endif /* __fast_memrchrl_defined */
+#ifdef __fast_memrchrq_defined
+#define libc_memrchrq(haystack, needle, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrchrq))(haystack, needle, n_qwords)
+#endif /* __fast_memrchrq_defined */
+#ifdef __fast_memset_defined
+#define libc_memset(dst, byte, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))(dst, byte, n_bytes)
+#endif /* __fast_memset_defined */
+#ifdef __fast_memsetw_defined
+#define libc_memsetw(dst, word, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetw))(dst, word, n_words)
+#endif /* __fast_memsetw_defined */
+#ifdef __fast_memsetl_defined
+#define libc_memsetl(dst, dword, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetl))(dst, dword, n_dwords)
+#endif /* __fast_memsetl_defined */
+#ifdef __fast_memsetq_defined
+#define libc_memsetq(dst, qword, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetq))(dst, qword, n_qwords)
+#endif /* __fast_memsetq_defined */
+#ifdef __fast_mempset_defined
+#define libc_mempset(dst, byte, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempset))(dst, byte, n_bytes)
+#endif /* __fast_mempset_defined */
+#ifdef __fast_mempsetw_defined
+#define libc_mempsetw(dst, word, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))(dst, word, n_words)
+#endif /* __fast_mempsetw_defined */
+#ifdef __fast_mempsetl_defined
+#define libc_mempsetl(dst, dword, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetl))(dst, dword, n_dwords)
+#endif /* __fast_mempsetl_defined */
+#ifdef __fast_mempsetq_defined
+#define libc_mempsetq(dst, qword, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetq))(dst, qword, n_qwords)
+#endif /* __fast_mempsetq_defined */
+#ifdef __fast_bzero_defined
+#define libc_bzero(dst, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(dst, n_bytes)
+#endif /* __fast_bzero_defined */
+#ifdef __fast_bzerow_defined
+#define libc_bzerow(dst, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerow))(dst, n_words)
+#endif /* __fast_bzerow_defined */
+#ifdef __fast_bzerol_defined
+#define libc_bzerol(dst, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzerol))(dst, n_dwords)
+#endif /* __fast_bzerol_defined */
+#ifdef __fast_bzeroq_defined
+#define libc_bzeroq(dst, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroq))(dst, n_qwords)
+#endif /* __fast_bzeroq_defined */
+#ifdef __fast_mempcpy_defined
+#define libc_mempcpy(dst, src, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))(dst, src, n_bytes)
+#endif /* __fast_mempcpy_defined */
+#ifdef __fast_mempcpyw_defined
+#define libc_mempcpyw(dst, src, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyw))(dst, src, n_words)
+#endif /* __fast_mempcpyw_defined */
+#ifdef __fast_mempcpyl_defined
+#define libc_mempcpyl(dst, src, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyl))(dst, src, n_dwords)
+#endif /* __fast_mempcpyl_defined */
+#ifdef __fast_mempcpyq_defined
+#define libc_mempcpyq(dst, src, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpyq))(dst, src, n_qwords)
+#endif /* __fast_mempcpyq_defined */
+#ifdef __fast_memcpy_defined
+#define libc_memcpy(dst, src, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))(dst, src, n_bytes)
+#endif /* __fast_memcpy_defined */
+#ifdef __fast_memcpyw_defined
+#define libc_memcpyw(dst, src, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyw))(dst, src, n_words)
+#endif /* __fast_memcpyw_defined */
+#ifdef __fast_memcpyl_defined
+#define libc_memcpyl(dst, src, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyl))(dst, src, n_dwords)
+#endif /* __fast_memcpyl_defined */
+#ifdef __fast_memcpyq_defined
+#define libc_memcpyq(dst, src, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyq))(dst, src, n_qwords)
+#endif /* __fast_memcpyq_defined */
+/*[[[end]]]*/
+
+
 #ifdef __KERNEL__
 /* The kernel isn't exporting these functions, but they're still
  * used by a couple of function that _are_ exported by the kernel! */
-#define _libc_CMEM(func, dst, src, elem_count, elem_size) \
-	func(dst, src, (elem_count) * (elem_size))
-#define libc_memcpyc(dst, src, elem_count, elem_size)       _libc_CMEM(libc_memcpy, dst, src, elem_count, elem_size)
-#define libc_mempcpyc(dst, src, elem_count, elem_size)      _libc_CMEM(libc_mempcpy, dst, src, elem_count, elem_size)
-#define libc_memmovec(dst, src, elem_count, elem_size)      _libc_CMEM(libc_memmove, dst, src, elem_count, elem_size)
-#define libc_mempmovec(dst, src, elem_count, elem_size)     _libc_CMEM(libc_mempmove, dst, src, elem_count, elem_size)
-#define libc_memmoveupc(dst, src, elem_count, elem_size)    _libc_CMEM(libc_memmoveup, dst, src, elem_count, elem_size)
-#define libc_mempmoveupc(dst, src, elem_count, elem_size)   _libc_CMEM(libc_mempmoveup, dst, src, elem_count, elem_size)
-#define libc_memmovedownc(dst, src, elem_count, elem_size)  _libc_CMEM(libc_memmovedown, dst, src, elem_count, elem_size)
-#define libc_mempmovedownc(dst, src, elem_count, elem_size) _libc_CMEM(libc_mempmovedown, dst, src, elem_count, elem_size)
+#ifndef libc_mempmovedownc
+#define libc_mempmovedownc(dst, src, elem_count, elem_size) libc_mempmovedown(dst, src, (elem_count) * (elem_size))
+#endif /* !libc_mempmovedownc */
+#ifndef libc_memmovedownc
+#define libc_memmovedownc(dst, src, elem_count, elem_size) libc_memmovedown(dst, src, (elem_count) * (elem_size))
+#endif /* !libc_memmovedownc */
+#ifndef libc_mempmoveupc
+#define libc_mempmoveupc(dst, src, elem_count, elem_size) libc_mempmoveup(dst, src, (elem_count) * (elem_size))
+#endif /* !libc_mempmoveupc */
+#ifndef libc_memmoveupc
+#define libc_memmoveupc(dst, src, elem_count, elem_size) libc_memmoveup(dst, src, (elem_count) * (elem_size))
+#endif /* !libc_memmoveupc */
+#ifndef libc_mempmovec
+#define libc_mempmovec(dst, src, elem_count, elem_size) libc_mempmove(dst, src, (elem_count) * (elem_size))
+#endif /* !libc_mempmovec */
+#ifndef libc_memmovec
+#define libc_memmovec(dst, src, elem_count, elem_size) libc_memmove(dst, src, (elem_count) * (elem_size))
+#endif /* !libc_memmovec */
+#ifndef libc_mempcpyc
+#define libc_mempcpyc(dst, src, elem_count, elem_size) libc_mempcpy(dst, src, (elem_count) * (elem_size))
+#endif /* !libc_mempcpyc */
+#ifndef libc_memcpyc
+#define libc_memcpyc(dst, src, elem_count, elem_size) libc_memcpy(dst, src, (elem_count) * (elem_size))
+#endif /* !libc_memcpyc */
 #endif /* __KERNEL__ */
+
 }
 
 %{
@@ -1015,6 +1321,22 @@ void bcopy([[nonnull]] void const *src,
 	memmove(dst, src, num_bytes);
 }
 
+%(auto_source){
+/* Prevent bzero()'s call to memset() from being routed back to bzero itself! */
+#ifndef LIBC_ARCH_HAVE_BZERO
+#undef libc_memset
+#endif /* !LIBC_ARCH_HAVE_BZERO */
+#ifndef LIBC_ARCH_HAVE_BZEROW
+#undef libc_memsetw
+#endif /* !LIBC_ARCH_HAVE_BZEROW */
+#ifndef LIBC_ARCH_HAVE_BZEROL
+#undef libc_memsetl
+#endif /* !LIBC_ARCH_HAVE_BZEROL */
+#ifndef LIBC_ARCH_HAVE_BZEROQ
+#undef libc_memsetq
+#endif /* !LIBC_ARCH_HAVE_BZEROQ */
+}
+
 
 %#ifndef __bzero_defined
 %#define __bzero_defined 1
@@ -1079,6 +1401,25 @@ void bzeroq([[nonnull]] void *__restrict dst, $size_t num_qwords) {
 }
 
 %#endif /* __USE_STRING_BWLQ */
+
+
+%(auto_source){
+/* Restore optimized libc string functions */
+#if !defined(LIBC_ARCH_HAVE_BZERO) && defined(__fast_memset_defined)
+#define libc_memset(dst, byte, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))(dst, byte, n_bytes)
+#endif /* !LIBC_ARCH_HAVE_BZERO && __fast_memset_defined */
+#if !defined(LIBC_ARCH_HAVE_BZEROW) && defined(__fast_memsetw_defined)
+#define libc_memsetw(dst, word, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetw))(dst, word, n_words)
+#endif /* !LIBC_ARCH_HAVE_BZEROW && __fast_memsetw_defined */
+#if !defined(LIBC_ARCH_HAVE_BZEROL) && defined(__fast_memsetl_defined)
+#define libc_memsetl(dst, dword, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetl))(dst, dword, n_dwords)
+#endif /* !LIBC_ARCH_HAVE_BZEROL && __fast_memsetl_defined */
+#if !defined(LIBC_ARCH_HAVE_BZEROQ) && defined(__fast_memsetq_defined)
+#define libc_memsetq(dst, qword, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetq))(dst, qword, n_qwords)
+#endif /* !LIBC_ARCH_HAVE_BZEROQ && __fast_memsetq_defined */
+}
+
+
 
 %
 %#ifdef __USE_KOS
@@ -1179,11 +1520,15 @@ int strncasecmp([[nonnull]] char const *s1, [[nonnull]] char const *s2, $size_t 
 
 
 [[decl_include("<features.h>")]]
-[[wunused, nothrow, ATTR_CONST, crtbuiltin]]
+[[guard, wunused, nothrow, ATTR_CONST, crtbuiltin]]
+[[if(__SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)), crt_intern_kos_alias(libc_ffsl)]]
+[[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias(libc_ffsll)]]
+[[if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ffsl")]]
+[[if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("ffsll")]]
 [[impl_include("<hybrid/__bit.h>"), export_alias("__ffs")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFS))]]
-__STDC_INT_AS_SIZE_T ffs(int i) {
-	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned int)i);
+__STDC_INT_AS_UINT_T ffs(int i) {
+	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)i);
 }
 
 %{
@@ -1202,18 +1547,23 @@ __STDC_INT_AS_SIZE_T ffs(int i) {
 %#ifdef __USE_GNU
 [[decl_include("<features.h>")]]
 [[wunused, nothrow, ATTR_CONST, crtbuiltin]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)), crt_intern_kos_alias(libc_ffsll)]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias("ffs")]]
+[[if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("ffsll")]]
 [[impl_include("<hybrid/__bit.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFSL))]]
-__STDC_INT_AS_SIZE_T ffsl(long i) {
-	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned long)i);
+__STDC_INT_AS_UINT_T ffsl(long i) {
+	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned long)i);
 }
 
 [[decl_include("<features.h>")]]
 [[wunused, nothrow, ATTR_CONST, crtbuiltin]]
 [[impl_include("<hybrid/__bit.h>")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias("ffs")]]
+[[if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias("ffsl")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_FFSLL))]]
-__STDC_INT_AS_SIZE_T ffsll(__LONGLONG i) {
-	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((__ULONGLONG)i);
+__STDC_INT_AS_UINT_T ffsll(__LONGLONG i) {
+	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((__ULONGLONG)i);
 }
 %#endif /* __USE_GNU */
 

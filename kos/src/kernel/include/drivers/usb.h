@@ -166,9 +166,11 @@ struct block_device;
  *                 was returned.
  * @param: status: One of `USB_INTERRUPT_HANDLER_STATUS_*'
  * @return: * :    One of `USB_INTERRUPT_HANDLER_RETURN_*' */
-typedef NOBLOCK unsigned int
-/*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER)(void *__restrict self, unsigned int status,
-                                           void const *data, size_t datalen);
+typedef NOBLOCK NONNULL((1)) unsigned int
+/*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER)(void *__restrict self,
+                                            unsigned int status,
+                                            void const *data,
+                                            size_t datalen);
 #define USB_INTERRUPT_HANDLER_STATUS_OK    0 /* Data was successfully received. */
 #define USB_INTERRUPT_HANDLER_STATUS_ERROR 1 /* The USB controller has indicated an error.
                                               * In this case, error_data() has been filled in with additional
@@ -186,8 +188,14 @@ typedef NOBLOCK unsigned int
                                               * from the set of those that the USB controller will use for polling
                                               * connected devices for incoming data. */
 
-typedef NOBLOCK unsigned int /*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER_CHR)(struct character_device *__restrict self, unsigned int status, void const *data, size_t datalen);
-typedef NOBLOCK unsigned int /*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER_BLK)(struct block_device *__restrict self, unsigned int status, void const *data, size_t datalen);
+typedef NOBLOCK NONNULL((1)) unsigned int
+/*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER_CHR)(struct character_device *__restrict self,
+                                                unsigned int status,
+                                                void const *data, size_t datalen);
+typedef NOBLOCK NONNULL((1)) unsigned int
+/*NOTHROW*/ (KCALL *PUSB_INTERRUPT_HANDLER_BLK)(struct block_device *__restrict self,
+                                                unsigned int status,
+                                                void const *data, size_t datalen);
 
 
 
@@ -196,7 +204,8 @@ struct usb_interrupt {
 	 * and interrupt-driven (e.g. a keyboard) USB devices. */
 	WEAK refcnt_t            ui_refcnt; /* Reference counter. */
 	/* [1..1][const] Finalizer for controller-specific data. */
-	void             (KCALL *ui_fini)(struct usb_interrupt *__restrict self);
+	NOBLOCK NONNULL((1)) void
+	/*NOTHROW*/ (KCALL *ui_fini)(struct usb_interrupt *__restrict self);
 #define USB_INTERRUPT_FLAG_NORMAL      0x0000 /* Normal flags. */
 #define USB_INTERRUPT_FLAG_ISACHR      0x0000 /* [const] The bound device is a `struct character_device'. */
 #define USB_INTERRUPT_FLAG_ISABLK      0x0001 /* [const] The bound device is a `struct block_device'. */
@@ -221,7 +230,8 @@ struct usb_interrupt {
 
 
 /* Destroy the given USB interrupt descriptor. */
-FUNDEF NOBLOCK void NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct usb_interrupt, ui_refcnt, usb_interrupt_destroy)
 
 /* Similar to `decref()', but simultaneously prevent the interrupt for ever firing again.

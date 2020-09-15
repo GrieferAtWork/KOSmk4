@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c637a87 */
+/* HASH CRC-32:0xda7cf1fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1853,6 +1853,13 @@ DFUN(".text.crt.dos.bsd.stringlist", libd_sl_add, libc_sl_add, TD, 2, TP, TP)
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_free, libc_sl_free, TV, 2, TP, TD)
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_find, libc_sl_find, TP, 2, TP, TP)
 DFUN(".text.crt.dos.bsd.stringlist", libd_sl_delete, libc_sl_delete, TD, 3, TP, TP, TD)
+
+/* strings */
+DFUN(".text.crt.dos.string.memory", libd_popcount, libc_popcount, TD, 1, TD)
+DFUN(".text.crt.dos.string.memory", libd_popcountl, libc_popcountl, TD, 1, TL)
+DFUN(".text.crt.dos.string.memory", libd_popcountll, libc_popcountll, TD, 1, TLL)
+DFUN(".text.crt.dos.string.memory", libd_popcount32, libc_popcount32, TD, 1, TI32)
+DFUN(".text.crt.dos.string.memory", libd_popcount64, libc_popcount64, TD, 1, TI64)
 
 /* stropts */
 DFUN(".text.crt.dos.io.stropts", libd_isastream, libc_isastream, TD, 1, TIn(__SIZEOF_FD_T__))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x417224bf */
+/* HASH CRC-32:0x2bab31ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,19 +18,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_ffs_defined
-#define __local_ffs_defined 1
+#ifndef __local_popcount64_defined
+#define __local_popcount64_defined 1
 #include <__crt.h>
-#include <features.h>
 #include <hybrid/__bit.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ffs) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ffs))(int __i) {
-	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)__i);
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__LOCAL_LIBC(popcount64) __ATTR_CONST __ATTR_WUNUSED unsigned int
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(popcount64))(__UINT64_TYPE__ __i) {
+	return __hybrid_popcount(__i);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_ffs_defined
-#define __local___localdep_ffs_defined 1
-#define __localdep_ffs __LIBC_LOCAL_NAME(ffs)
-#endif /* !__local___localdep_ffs_defined */
-#endif /* !__local_ffs_defined */
+#ifndef __local___localdep_popcount64_defined
+#define __local___localdep_popcount64_defined 1
+#define __localdep_popcount64 __LIBC_LOCAL_NAME(popcount64)
+#endif /* !__local___localdep_popcount64_defined */
+#endif /* !__local_popcount64_defined */

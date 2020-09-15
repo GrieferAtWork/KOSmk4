@@ -411,7 +411,8 @@ typedef __bitwise__ __UINT64_TYPE__ __be64;
 #define __blksize_t  __CRT_PRIVATE_SLNG(__SIZEOF_BLKSIZE_T__)
 #endif /* !__USE_KOS_ALTERATIONS */
 
-#ifdef __USE_DOS /* Simple enough: DOS defines this one as signed, rather than unsigned. */
+#if defined(__USE_DOS) && !defined(__USE_KOS_ALTERATIONS)
+/* Simple enough: DOS defines this one as signed, rather than unsigned. */
 #define __mode_t __CRT_PRIVATE_SINT(__SIZEOF_MODE_T__)
 #else /* __USE_DOS */
 #define __mode_t __CRT_PRIVATE_UINT(__SIZEOF_MODE_T__)

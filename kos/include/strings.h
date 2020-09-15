@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x496d023e */
+/* HASH CRC-32:0x65762de5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,12 @@ __SYSDECL_BEGIN
 #define __size_t_defined 1
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
+
+#ifdef __USE_NETBSD
+#ifndef NULL
+#define NULL __NULLPTR
+#endif /* !NULL */
+#endif /* __USE_NETBSD */
 
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 #ifndef __bcopy_defined
@@ -372,6 +378,222 @@ __SYSDECL_BEGIN
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
 #endif /* __USE_MISC */
 #endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+
+#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8) || defined(__USE_XOPEN2K8XSI)
+#ifndef __ffs_defined
+#define __ffs_defined 1
+#if __has_builtin(__builtin_ffs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ffs)
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),{ return __builtin_ffs(__i); })
+#elif defined(__CRT_HAVE_ffs)
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),(__i))
+#elif defined(__CRT_HAVE_ffsl) && __SIZEOF_INT__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),ffsl,(__i))
+#elif defined(__CRT_HAVE_ffsll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),ffsll,(__i))
+#elif defined(__CRT_HAVE___ffs)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__STDC_INT_AS_UINT_T,__NOTHROW,ffs,(int __i),__ffs,(__i))
+#else /* ... */
+#include <libc/local/string/ffs.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_UINT_T __NOTHROW(__LIBCCALL ffs)(int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffs))(__i); })
+#endif /* !... */
+#endif /* !__ffs_defined */
+#ifdef __USE_KOS
+#include <hybrid/__bit.h>
+/* unsigned int FFS(INTEGER i):
+ *     FindFirstSet
+ *     Returns the index (starting at 1 for 0x01) of the first
+ *     1-bit in given value, or ZERO(0) if the given value is ZERO(0).
+ *     >> assert(!x ||  (x &  (1 << (ffs(x)-1))));    // FFS-bit is set
+ *     >> assert(!x || !(x & ((1 << (ffs(x)-1))-1))); // Less significant bits are clear */
+#define ffs(i) __hybrid_ffs(i)
+#endif /* !__USE_KOS */
+#endif /* __USE_MISC || !__USE_XOPEN2K8 || __USE_XOPEN2K8XSI */
+
+#if defined(__USE_NETBSD)
+#if __has_builtin(__builtin_popcount) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_popcount)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount,(unsigned int __i),{ return __builtin_popcount(__i); })
+#elif defined(__CRT_HAVE_popcount)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount,(unsigned int __i),(__i))
+#elif defined(__CRT_HAVE_popcount32) && __SIZEOF_INT__ == 4
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount,(unsigned int __i),popcount32,(__i))
+#elif defined(__CRT_HAVE_popcount64) && __SIZEOF_INT__ == 8
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount,(unsigned int __i),popcount64,(__i))
+#elif defined(__CRT_HAVE_popcountl) && __SIZEOF_INT__ == __SIZEOF_LONG__
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount,(unsigned int __i),popcountl,(__i))
+#elif defined(__CRT_HAVE_popcountll) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount,(unsigned int __i),popcountll,(__i))
+#elif __SIZEOF_INT__ == 4
+#include <libc/local/strings/popcount32.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcount)(unsigned int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount32))((__UINT32_TYPE__)__i); }
+#elif __SIZEOF_INT__ == 8
+#include <libc/local/strings/popcount64.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcount)(unsigned int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount64))((__UINT64_TYPE__)__i); }
+#else /* ... */
+#include <libc/local/strings/popcount.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(popcount, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcount)(unsigned int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount))(__i); })
+#endif /* !... */
+#if __has_builtin(__builtin_popcountl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_popcountl)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountl,(unsigned long __i),{ return __builtin_popcountl(__i); })
+#elif defined(__CRT_HAVE_popcountl)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountl,(unsigned long __i),(__i))
+#elif defined(__CRT_HAVE_popcount32) && __SIZEOF_LONG__ == 4
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountl,(unsigned long __i),popcount32,(__i))
+#elif defined(__CRT_HAVE_popcount64) && __SIZEOF_LONG__ == 8
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountl,(unsigned long __i),popcount64,(__i))
+#elif defined(__CRT_HAVE_popcount) && __SIZEOF_LONG__ == __SIZEOF_INT__
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountl,(unsigned long __i),popcount,(__i))
+#elif defined(__CRT_HAVE_popcountll) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountl,(unsigned long __i),popcountll,(__i))
+#elif __SIZEOF_LONG__ == 4
+#include <libc/local/strings/popcount32.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcountl)(unsigned long __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount32))((__UINT32_TYPE__)__i); }
+#elif __SIZEOF_LONG__ == 8
+#include <libc/local/strings/popcount64.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcountl)(unsigned long __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount64))((__UINT64_TYPE__)__i); }
+#else /* ... */
+#include <libc/local/strings/popcountl.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(popcountl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcountl)(unsigned long __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcountl))(__i); })
+#endif /* !... */
+#ifdef __ULONGLONG
+#if __has_builtin(__builtin_popcountll) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_popcountll)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountll,(__ULONGLONG __i),{ return __builtin_popcountll(__i); })
+#elif defined(__CRT_HAVE_popcountll)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountll,(__ULONGLONG __i),(__i))
+#elif defined(__CRT_HAVE_popcount32) && __SIZEOF_LONG_LONG__ == 4
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountll,(__ULONGLONG __i),popcount32,(__i))
+#elif defined(__CRT_HAVE_popcount64) && __SIZEOF_LONG_LONG__ == 8
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountll,(__ULONGLONG __i),popcount64,(__i))
+#elif defined(__CRT_HAVE_popcount) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountll,(__ULONGLONG __i),popcount,(__i))
+#elif defined(__CRT_HAVE_popcountl) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcountll,(__ULONGLONG __i),popcountl,(__i))
+#elif __SIZEOF_LONG_LONG__ == 4
+#include <libc/local/strings/popcount32.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcountll)(__ULONGLONG __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount32))((__UINT32_TYPE__)__i); }
+#elif __SIZEOF_LONG_LONG__ == 8
+#include <libc/local/strings/popcount64.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcountll)(__ULONGLONG __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount64))((__UINT64_TYPE__)__i); }
+#else /* ... */
+#include <libc/local/strings/popcountll.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(popcountll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcountll)(__ULONGLONG __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcountll))(__i); })
+#endif /* !... */
+#endif /* __ULONGLONG */
+#if __has_builtin(__builtin_popcount32) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_popcount32)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount32,(__UINT32_TYPE__ __i),{ return __builtin_popcount32(__i); })
+#elif defined(__CRT_HAVE_popcount32)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount32,(__UINT32_TYPE__ __i),(__i))
+#elif defined(__CRT_HAVE_popcount) && __SIZEOF_INT__ == 4
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount32,(__UINT32_TYPE__ __i),popcount,(__i))
+#elif defined(__CRT_HAVE_popcountl) && __SIZEOF_LONG__ == 4
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount32,(__UINT32_TYPE__ __i),popcountl,(__i))
+#elif defined(__CRT_HAVE_popcountll) && __SIZEOF_LONG_LONG__ == 4
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount32,(__UINT32_TYPE__ __i),popcountll,(__i))
+#else /* ... */
+#include <libc/local/strings/popcount32.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(popcount32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcount32)(__UINT32_TYPE__ __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount32))(__i); })
+#endif /* !... */
+#ifdef __UINT64_TYPE__
+#if __has_builtin(__builtin_popcount64) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_popcount64)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount64,(__UINT64_TYPE__ __i),{ return __builtin_popcount64(__i); })
+#elif defined(__CRT_HAVE_popcount64)
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount64,(__UINT64_TYPE__ __i),(__i))
+#elif defined(__CRT_HAVE_popcount) && __SIZEOF_INT__ == 8
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount64,(__UINT64_TYPE__ __i),popcount,(__i))
+#elif defined(__CRT_HAVE_popcountl) && __SIZEOF_LONG__ == 8
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount64,(__UINT64_TYPE__ __i),popcountl,(__i))
+#elif defined(__CRT_HAVE_popcountll) && __SIZEOF_LONG_LONG__ == 8
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,unsigned int,__NOTHROW,popcount64,(__UINT64_TYPE__ __i),popcountll,(__i))
+#else /* ... */
+#include <libc/local/strings/popcount64.h>
+/* POPulationCOUNT
+ * Return the number of 1-bits in `i' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(popcount64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBCCALL popcount64)(__UINT64_TYPE__ __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(popcount64))(__i); })
+#endif /* !... */
+#endif /* __UINT64_TYPE__ */
+#ifdef __USE_KOS
+#include <hybrid/__bit.h>
+/* unsigned int POPCOUNT(unsigned Integer i):
+ *     POPulationCOUNT
+ *     Return the number of 1-bits in `i' */
+#define popcount(i) __hybrid_popcount(i)
+#endif /* !__USE_KOS */
+#endif /* __USE_NETBSD */
 #endif /* __CC__ */
 
 __SYSDECL_END

@@ -914,6 +914,16 @@
 #define XML_ATTR_MALLOC
 #define XML_ATTR_ALLOC_SIZE(x)
 #define XMLPARSEAPI(type) type
+#define PyAPI_FUNC(RTYPE) RTYPE
+#define PyAPI_DATA(RTYPE) RTYPE
+#define PyMODINIT_FUNC void
+#define DL_IMPORT(RTYPE) RTYPE
+#define DL_EXPORT(RTYPE) RTYPE
+#define Py_DEPRECATED(VERSION_UNUSED)
+#define Py_LOCAL(type) type
+#define Py_LOCAL_INLINE(type) type
+#define Py_PROTO(x) x
+#define Py_FPROTO(x) x
 
 
 /* All of these are only here to make code navigation use non-escaped type names */
