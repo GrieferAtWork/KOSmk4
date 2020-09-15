@@ -767,7 +767,7 @@ do_handle_iob_node_access:
 						/* Make sure that memory mapping has execute permissions! */
 						if unlikely(!(node_prot & VM_PROT_EXEC)) {
 							PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE));
-							PERTASK_SET(this_exception_pointers[1],
+							PERTASK_SET(this_exception_args.e_segfault.s_context,
 							            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
 							                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
 cleanup_vio_and_pop_connections_and_set_exception_pointers2:
@@ -838,12 +838,12 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 						} EXCEPT {
 							/* Ensure that a the VIO flag is set if necessary */
 							if (was_thrown(E_SEGFAULT)) {
-								void *faultaddr = (void *)PERTASK_GET(this_exception_pointers[0]);
+								void *faultaddr = (void *)PERTASK_GET(this_exception_args.e_segfault.s_addr);
 								if (faultaddr == addr) {
 									uintptr_t flags;
-									flags = PERTASK_GET(this_exception_pointers[1]);
+									flags = PERTASK_GET(this_exception_args.e_segfault.s_context);
 									flags |= E_SEGFAULT_CONTEXT_VIO;
-									PERTASK_SET(this_exception_pointers[1], flags);
+									PERTASK_SET(this_exception_args.e_segfault.s_context, flags);
 								}
 							}
 							decref_unlikely(args.vea_args.va_block);
@@ -871,7 +871,7 @@ do_normal_vio:
 						PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_WRITING)
 						                                 ? ERROR_CODEOF(E_SEGFAULT_READONLY)
 						                                 : ERROR_CODEOF(E_SEGFAULT_NOTREADABLE));
-						PERTASK_SET(this_exception_pointers[1],
+						PERTASK_SET(this_exception_args.e_segfault.s_context,
 						            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_EXEC |
 						                        E_SEGFAULT_CONTEXT_VIO | GET_PF_CONTEXT_UW_BITS()));
 						goto cleanup_vio_and_pop_connections_and_set_exception_pointers2;
@@ -1179,15 +1179,15 @@ throw_segfault:
 		PERTASK_SET(this_exception_code, (ecode & X86_PAGEFAULT_ECODE_PRESENT)
 		                                 ? ERROR_CODEOF(E_SEGFAULT_NOTEXECUTABLE)
 		                                 : ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
-		PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
-		PERTASK_SET(this_exception_pointers[1],
+		PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)addr);
+		PERTASK_SET(this_exception_args.e_segfault.s_context,
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT |
 		                        E_SEGFAULT_CONTEXT_EXEC |
 		                        GET_PF_CONTEXT_UW_BITS()));
 		{
 			unsigned int i;
 			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+				PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 		}
 		printk(KERN_DEBUG "[segfault] PC-Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
 		       addr, pageaddr, callsite_pc, icpustate_getpc(state), ecode);
@@ -1204,7 +1204,7 @@ not_a_badcall:
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
 	}
 set_exception_pointers:
-	PERTASK_SET(this_exception_pointers[1],
+	PERTASK_SET(this_exception_args.e_segfault.s_context,
 	            (uintptr_t)(E_SEGFAULT_CONTEXT_FAULT |
 	                        ((ecode & X86_PAGEFAULT_ECODE_INSTRFETCH) ||
 	                         (pc == (uintptr_t)addr)
@@ -1212,11 +1212,11 @@ set_exception_pointers:
 	                         : 0) |
 	                        GET_PF_CONTEXT_UW_BITS()));
 set_exception_pointers2:
-	PERTASK_SET(this_exception_pointers[0], (uintptr_t)addr);
+	PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)addr);
 	{
 		unsigned int i;
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 			PERTASK_SET(this_exception_trace[i], (void *)0);

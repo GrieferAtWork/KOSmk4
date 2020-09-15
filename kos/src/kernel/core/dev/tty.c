@@ -251,8 +251,8 @@ tty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
 			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    PERTASK_GET(this_exception_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
-			    PERTASK_GET(this_exception_pointers[1]) != cmd)
+			    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    PERTASK_GET(this_exception_args.e_invalid_argument.ia_unknown_command.uc_command) != cmd)
 				RETHROW();
 		}
 		/* Try to have the input device handle the command. */
@@ -270,8 +270,8 @@ predict_input_device_command:
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
 			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    PERTASK_GET(this_exception_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
-			    PERTASK_GET(this_exception_pointers[1]) != cmd)
+			    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    PERTASK_GET(this_exception_args.e_invalid_argument.ia_unknown_command.uc_command) != cmd)
 				RETHROW();
 		}
 		result = ttybase_device_tryioctl(self, cmd, arg, mode);
@@ -289,8 +289,8 @@ predict_output_device_command:
 			/* Rethrow everything that isn't
 			 *    E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND:cmd */
 			if (!was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) ||
-			    PERTASK_GET(this_exception_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
-			    PERTASK_GET(this_exception_pointers[1]) != cmd)
+			    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) != E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND ||
+			    PERTASK_GET(this_exception_args.e_invalid_argument.ia_unknown_command.uc_command) != cmd)
 				RETHROW();
 		}
 		result = ttybase_device_tryioctl(self, cmd, arg, mode);

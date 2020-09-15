@@ -520,8 +520,8 @@ handle_as(/*inherit(on_success)*/ REF struct handle const *__restrict self,
 PRIVATE ATTR_COLD ATTR_NOINLINE ATTR_NORETURN void FCALL
 handle_getas_complete_except(unsigned int fd) {
 	if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
-		if (!PERTASK_GET(this_exception_pointers[0]))
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)fd);
+		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd))
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd);
 	}
 	RETHROW();
 }

@@ -366,7 +366,7 @@ yes:
 					for (local l: doc.splitlines(false))
 						l.rstrip());
 
-				fp << "*/";
+				fp << " */";
 			}
 			fp << "\n";
 		}
@@ -818,7 +818,7 @@ function printExceptionDataStructs(
 		classes: {string: {string: ExceptClass}} = none,
 		escapeTypename: Callable with string = none,
 		keyStructName: Callable with string = none,
-		exceptionDataPointerType: string = "__ULONGPTR_TYPE__",
+		exceptionDataPointerType: string = "__UINTPTR_TYPE__",
 		exceptionDataPointerCount: string = "EXCEPTION_DATA_POINTERS") {
 	if (fp is none)
 		fp = File.stdout;

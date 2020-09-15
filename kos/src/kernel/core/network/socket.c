@@ -116,7 +116,7 @@ socket_isconnected(struct socket *__restrict self) {
 	} EXCEPT {
 		task_popconnections(&cons);
 		if (was_thrown(E_INVALID_ARGUMENT_BAD_STATE) &&
-		    PERTASK_GET(this_exception_pointers[0]) ==
+		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) ==
 		    E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED)
 			return false; /* Not connected. */
 		RETHROW();
@@ -1315,18 +1315,18 @@ again_read_ncon:
 				                                   optval, optlen, mode);
 				if (result != 0)
 					goto done;
-				if (!PERTASK_GET(this_exception_pointers[0]))
-					PERTASK_SET(this_exception_pointers[0], (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT);
-				if (!PERTASK_GET(this_exception_pointers[1]))
-					PERTASK_SET(this_exception_pointers[1], (uintptr_t)level);
-				if (!PERTASK_GET(this_exception_pointers[2]))
-					PERTASK_SET(this_exception_pointers[2], (uintptr_t)optname);
-				if (!PERTASK_GET(this_exception_pointers[3]))
-					PERTASK_SET(this_exception_pointers[3], (uintptr_t)socket_getfamily(self));
-				if (!PERTASK_GET(this_exception_pointers[4]))
-					PERTASK_SET(this_exception_pointers[4], (uintptr_t)socket_gettype(self));
-				if (!PERTASK_GET(this_exception_pointers[5]))
-					PERTASK_SET(this_exception_pointers[5], (uintptr_t)socket_getprotocol(self));
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_context))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT);
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, (uintptr_t)level);
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, (uintptr_t)optname);
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, (uintptr_t)socket_getfamily(self));
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, (uintptr_t)socket_gettype(self));
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, (uintptr_t)socket_getprotocol(self));
 			}
 			RETHROW();
 		}
@@ -1409,18 +1409,18 @@ socket_setsockopt(struct socket *__restrict self,
 			                               optval, optlen, mode);
 		} EXCEPT {
 			if (was_thrown(E_INVALID_ARGUMENT_SOCKET_OPT)) {
-				if (!PERTASK_GET(this_exception_pointers[0]))
-					PERTASK_SET(this_exception_pointers[0], (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT);
-				if (!PERTASK_GET(this_exception_pointers[1]))
-					PERTASK_SET(this_exception_pointers[1], (uintptr_t)level);
-				if (!PERTASK_GET(this_exception_pointers[2]))
-					PERTASK_SET(this_exception_pointers[2], (uintptr_t)optname);
-				if (!PERTASK_GET(this_exception_pointers[3]))
-					PERTASK_SET(this_exception_pointers[3], (uintptr_t)socket_getfamily(self));
-				if (!PERTASK_GET(this_exception_pointers[4]))
-					PERTASK_SET(this_exception_pointers[4], (uintptr_t)socket_gettype(self));
-				if (!PERTASK_GET(this_exception_pointers[5]))
-					PERTASK_SET(this_exception_pointers[5], (uintptr_t)socket_getprotocol(self));
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_context))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_context, (uintptr_t)E_INVALID_ARGUMENT_CONTEXT_SETSOCKOPT);
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_level, (uintptr_t)level);
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_optname, (uintptr_t)optname);
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_address_family, (uintptr_t)socket_getfamily(self));
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_socket_type, (uintptr_t)socket_gettype(self));
+				if (!PERTASK_GET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol))
+					PERTASK_SET(this_exception_args.e_invalid_argument.ia_socket_opt.so_protocol, (uintptr_t)socket_getprotocol(self));
 			}
 			RETHROW();
 		}

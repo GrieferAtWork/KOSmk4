@@ -170,8 +170,8 @@ PUBLIC_FUNCTION(__x86_64_syscall_iret)
 .Lsysret64_probe_error:
 	/* Only handle if the `E_SEGFAULT_CONTEXT_NONCANON' flag was set.
 	 * RETHROW() the exception if that flag isn't set. */
-	EXTERN(this_exception_pointers)
-	ttest  mask=E_SEGFAULT_CONTEXT_NONCANON, loc=this_exception_pointers + 8, seg=%gs
+	EXTERN(this_exception_args)
+	ttest  mask=E_SEGFAULT_CONTEXT_NONCANON, loc=this_exception_args + 8, seg=%gs
 	jnz    .Ldo_iret
 	/* RETHROW() the exception. */
 	EXTERN(error_rethrow)

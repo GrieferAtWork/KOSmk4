@@ -594,19 +594,19 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
 	switch (code) {
 
 	case ERROR_CODEOF(E_EXIT_PROCESS):
-		process_exit((int)PERTASK_GET(this_exception_pointers[0]));
+		process_exit((int)PERTASK_GET(this_exception_args.e_exit_process.ep_exit_code));
 
 	case ERROR_CODEOF(E_EXIT_THREAD):
-		task_exit((int)PERTASK_GET(this_exception_pointers[0]));
+		task_exit((int)PERTASK_GET(this_exception_args.e_exit_thread.et_exit_code));
 
 	case ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL): {
 		enum { MMASK = RPC_SYSCALL_INFO_FMETHOD & ~RPC_SYSCALL_INFO_METHOD_F3264 };
 		uintptr_t flags;
 		/* Amend missing information about how a system call was invoked. */
-		flags = PERTASK_GET(this_exception_pointers[0]);
+		flags = PERTASK_GET(this_exception_args.e_unknown_systemcall.us_flags);
 		if ((flags & MMASK) == (RPC_SYSCALL_INFO_METHOD_OTHER & ~RPC_SYSCALL_INFO_METHOD_F3264)) {
 			flags = (flags & ~MMASK) | (sc_info->rsi_flags & MMASK);
-			PERTASK_SET(this_exception_pointers[0], flags);
+			PERTASK_SET(this_exception_args.e_unknown_systemcall.us_flags, flags);
 		}
 	}	break;
 

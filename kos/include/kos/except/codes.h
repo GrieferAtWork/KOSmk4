@@ -20,7 +20,7 @@
 #ifndef _KOS_EXCEPT_CODES_H
 #define _KOS_EXCEPT_CODES_H 1
 
-/* NOTE: After makeing modifications to this file, you must re-run the following commands:
+/* NOTE: After making modifications to this file, you must re-run the following commands:
  * $ deemon -F kos/include/kos/bits/exception_data.h
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data32.h
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data64.h
@@ -363,7 +363,7 @@
 /* E_WOULDBLOCK                                                         */
 /************************************************************************/
 #ifndef E_WOULDBLOCK
-#define E_WOULDBLOCK                              (0x0005)               /* [errno(EAGAIN), msg("Operation would have blocked")] */
+#define E_WOULDBLOCK                              (0x0005)               /* [errno(EAGAIN), prefix("wb_"), msg("Operation would have blocked")] */
 #endif /* !E_WOULDBLOCK */
 #ifndef E_WOULDBLOCK_PREEMPTED
 #define E_WOULDBLOCK_PREEMPTED                    (E_WOULDBLOCK, 0x0001) /* [msg("Operation cannot be preempted")] */
@@ -836,7 +836,8 @@
                                                                          *      or if it was caused by a posix_signal with the `SA_RESTART' flag set. */
 #endif /* !E_INTERRUPT */
 #ifndef E_INTERRUPT_USER_RPC
-#define E_INTERRUPT_USER_RPC                      (E_INTERRUPT, 0x0001) /* [msg("Interrupt from user RPC")] Unwind in order to execute an RPC callback before returning to user-space */
+#define E_INTERRUPT_USER_RPC                      (E_INTERRUPT, 0x0001) /* [msg("Interrupt from user RPC")] Unwind in order to
+                                                                         * execute an RPC callback before returning to user-space */
 #endif /* !E_INTERRUPT_USER_RPC */
 
 
@@ -908,7 +909,7 @@
 #endif /* !E_SEGFAULT_NOTEXECUTABLE */
 #ifndef E_SEGFAULT_NOTATOMIC
 #define E_SEGFAULT_NOTATOMIC                      (E_SEGFAULT, 0x0005) /* [msg("Attempted to perform an impossible atomic operation")]
-                                                                        * [fld(size: size_t, "The number of consecutive bytes accessed")]
+                                                                        * [fld(size:      size_t,    "The number of consecutive bytes accessed")]
                                                                         * [fld(oldval_lo: uintptr_t, "Low data word of the expected old value")]
                                                                         * [fld(oldval_hi: uintptr_t, "High data word of the expected old value")]
                                                                         * [fld(newval_lo: uintptr_t, "Low data word of the intended new value")]

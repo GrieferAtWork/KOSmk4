@@ -46,14 +46,14 @@
 EXTERN(this_exception_code)
 EXTERN(this_exception_flags)
 EXTERN(this_exception_trace)
-EXTERN(this_exception_pointers)
+EXTERN(this_exception_args)
 EXTERN(this_exception_faultaddr)
 EXTERN(this_exception_state)
 
 #define FIELD_ERROR_CODE           %gs:this_exception_code
 #define FIELD_ERROR_FLAGS          %gs:this_exception_flags
 #define FIELD_ERROR_TRACE(off)     %gs:this_exception_trace + (off)
-#define FIELD_ERROR_POINTERS(off)  %gs:this_exception_pointers + (off)
+#define FIELD_ERROR_POINTERS(off)  %gs:this_exception_args + (off)
 #define FIELD_ERROR_FAULTADDR      %gs:this_exception_faultaddr
 #define FIELD_ERROR_REGISTERS(off) %gs:this_exception_state + (off)
 #define S_EXCEPT_TEXT(name)    .text
@@ -401,8 +401,8 @@ IU(	movq   OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R9(%rsp), %r9)
 	movq   %rsi, %rdx
 	leaq   -4(%rsi), %rcx
 	leaq   SIZEOF_KCPUSTATE(%rsp), %rsi /* %rsi = &ptr4 */
-IK(	movq   $(this_exception_pointers + (4 * 8)), %rdi)
-IK(	addq   %gs:0, %rdi  /* %rdi = &%gs:this_exception_pointers */)
+IK(	movq   $(this_exception_args + (4 * 8)), %rdi)
+IK(	addq   %gs:0, %rdi  /* %rdi = &%gs:this_exception_args */)
 IU(	leaq   (OFFSET_EXCEPTION_INFO_POINTERS + (4 * 8))(%rax), %rdi /* %rdi = &libc_error_info()->ei_pointers */)
 	rep    movsq
 	movq   %rdx, %rsi
@@ -413,8 +413,8 @@ IU(	leaq   (OFFSET_EXCEPTION_INFO_POINTERS + (4 * 8))(%rax), %rdi /* %rdi = &lib
 	cmpq   $(EXCEPTION_DATA_POINTERS), %rsi
 	jae    .Ldo_unwind_rsp_maybe_fill_trace
 
-IK(	movq   $(this_exception_pointers), %rdi)
-IK(	addq   %gs:0, %rdi                                /* %rdi = &%gs:this_exception_pointers */)
+IK(	movq   $(this_exception_args), %rdi)
+IK(	addq   %gs:0, %rdi                                /* %rdi = &%gs:this_exception_args */)
 IU(	leaq   OFFSET_EXCEPTION_INFO_POINTERS(%rax), %rdi /* %rdi = &libc_error_info()->ei_pointers */)
 	leaq   (%rdi, %rsi, 8), %rdi
 	movq   $(EXCEPTION_DATA_POINTERS), %rcx

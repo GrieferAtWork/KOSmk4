@@ -66,7 +66,7 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
  *        >>         vm_futex_broadcast(addr);
  *        >>     } EXCEPT {
  *        >>         if (!was_thrown(E_SEGFAULT) ||
- *        >>             (PERTASK_GET(this_exception_pointers[0]) != (uintptr_t)addr))
+ *        >>             (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr))
  *        >>             error_printf("...");
  *        >>     }
  *        >> }
@@ -85,7 +85,7 @@ INTERN ATTR_USED void NOTHROW(KCALL onexit_this_tid_address)(void) {
 		} EXCEPT {
 			/* Explicitly handle E_SEGFAULT:addr as a no-op */
 			if (!was_thrown(E_SEGFAULT) ||
-			    (PERTASK_GET(this_exception_pointers[0]) != (uintptr_t)addr)) {
+			    (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr)) {
 				/* We can't RETHROW() the exception since our function
 				 * has to be NOTHROW() (especially so since we're called
 				 * as part of thread cleanup)

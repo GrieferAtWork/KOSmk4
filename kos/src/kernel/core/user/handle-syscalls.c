@@ -194,8 +194,8 @@ NOTHROW(KCALL ioctl_complete_exception_info)(unsigned int fd) {
 	switch (code) {
 
 	case ERROR_CODEOF(E_INVALID_HANDLE_OPERATION):
-		if (!PERTASK_GET(this_exception_pointers[0])) /* fd */
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)fd);
+		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd)) /* fd */
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd);
 		break;
 
 	default: break;
@@ -333,7 +333,7 @@ DEFINE_SYSCALL3(syscall_slong_t, ioctl,
 		                      arg);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
-		    PERTASK_GET(this_exception_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
+		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
 			TRY {
 				if (ioctl_generic(command, fd, &hand, arg, &result))
 					goto done;
@@ -371,7 +371,7 @@ DEFINE_SYSCALL4(syscall_slong_t, ioctlf,
 		                       mode);
 	} EXCEPT {
 		if (was_thrown(E_INVALID_ARGUMENT_UNKNOWN_COMMAND) &&
-		    PERTASK_GET(this_exception_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
+		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) == E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND) {
 			TRY {
 				if (ioctl_generic(command, fd, &hand, arg, &result))
 					goto done;
@@ -1331,16 +1331,16 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 	switch (code) {
 
 	case ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE):
-		if (!PERTASK_GET(this_exception_pointers[0])) /* fd */
-			PERTASK_SET(this_exception_pointers[0], (uintptr_t)fd);
-		if (!PERTASK_GET(this_exception_pointers[2])) /* actual_handle_type */
-			PERTASK_SET(this_exception_pointers[2], (uintptr_t)hand->h_type);
-		if (!PERTASK_GET(this_exception_pointers[4])) /* actual_handle_kind */
-			PERTASK_SET(this_exception_pointers[4], (uintptr_t)handle_typekind(hand));
+		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd))
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd);
+		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type))
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type, (uintptr_t)hand->h_type);
+		if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind))
+			PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind, (uintptr_t)handle_typekind(hand));
 		break;
 
 	case ERROR_CODEOF(E_INVALID_ARGUMENT_UNKNOWN_COMMAND):
-		if (PERTASK_GET(this_exception_pointers[0]) != E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND)
+		if (PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) != E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND)
 			break;
 		if ((hop_command >> 16) == HANDLE_TYPE_UNDEFINED ||
 		    (hop_command >> 16) >= HANDLE_TYPE_COUNT)
@@ -1351,11 +1351,11 @@ NOTHROW(KCALL hop_complete_exception_info)(struct handle *__restrict hand,
 		 * associated handle type, translate the exception to `E_INVALID_HANDLE_FILETYPE',
 		 * with the required file type set there. */
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE));
-		PERTASK_SET(this_exception_pointers[0], (uintptr_t)fd);
-		PERTASK_SET(this_exception_pointers[1], (uintptr_t)(hop_command >> 16)); /* HOP Commands encode the required type like this */
-		PERTASK_SET(this_exception_pointers[2], (uintptr_t)hand->h_type);
-		PERTASK_SET(this_exception_pointers[4], (uintptr_t)handle_typekind(hand));
-		PERTASK_SET(this_exception_pointers[3], (uintptr_t)HANDLE_TYPEKIND_GENERIC); /* XXX: Not necessarily correct... */
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd);
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_needed_handle_type, (uintptr_t)(hop_command >> 16)); /* HOP Commands encode the required type like this */
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_type, (uintptr_t)hand->h_type);
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_needed_handle_kind, (uintptr_t)HANDLE_TYPEKIND_GENERIC); /* XXX: Not necessarily correct... */
+		PERTASK_SET(this_exception_args.e_invalid_handle.ih_filetype.f_actual_handle_kind, (uintptr_t)handle_typekind(hand));
 		break;
 
 	default: break;
@@ -1661,7 +1661,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 		result = handle_poll(hnd, what);
 	} EXCEPT {
 		if (was_thrown(E_FSERROR_UNSUPPORTED_OPERATION) &&
-		    PERTASK_GET(this_exception_pointers[0]) == E_FILESYSTEM_OPERATION_POLL)
+		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) == E_FILESYSTEM_OPERATION_POLL)
 			result = POLLHUP; /* Poll is unsupported. */
 		else {
 			/* XXX: Are there other exceptions that should yield POLLERR? */

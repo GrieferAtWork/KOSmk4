@@ -99,13 +99,13 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 	}
 	PERTASK_SET(this_exception_code,
 	            ERROR_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS));
-	PERTASK_SET(this_exception_pointers[0], bound_index);
-	PERTASK_SET(this_exception_pointers[1], bound_min);
-	PERTASK_SET(this_exception_pointers[2], bound_max);
+	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_index, bound_index);
+	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_min, bound_min);
+	PERTASK_SET(this_exception_args.e_index_error.ie_out_of_bounds.oob_max, bound_max);
 	{
 		unsigned int i;
 		for (i = 3; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 #if EXCEPT_BACKTRACE_SIZE != 0
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 			PERTASK_SET(this_exception_trace[i], (void *)0);

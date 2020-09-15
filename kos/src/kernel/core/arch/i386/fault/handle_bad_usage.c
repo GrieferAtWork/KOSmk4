@@ -444,21 +444,21 @@ PRIVATE ATTR_NORETURN NOBLOCK void FCALL
 complete_except(struct icpustate *__restrict self) {
 	error_class_t cls = PERTASK_GET(this_exception_class);
 	if (cls == E_SEGFAULT) {
-		uintptr_t flags;
-		flags = PERTASK_GET(this_exception_pointers[1]);
+		uintptr_t context;
+		context = PERTASK_GET(this_exception_args.e_segfault.s_context);
 #ifdef __KERNEL__
 		if (icpustate_isuser(self))
 #endif /* __KERNEL__ */
 		{
 			/* The fault happened due to a user-space access */
-			flags |= E_SEGFAULT_CONTEXT_USERCODE;
+			context |= E_SEGFAULT_CONTEXT_USERCODE;
 		}
 #ifdef __x86_64__
 		/* The fault uses a non-canonical address (shouldn't actually happen...) */
-		if (ADDR_IS_NONCANON(PERTASK_GET(this_exception_pointers[0])))
-			flags |= E_SEGFAULT_CONTEXT_NONCANON;
+		if (ADDR_IS_NONCANON(PERTASK_GET(this_exception_args.e_segfault.s_addr)))
+			context |= E_SEGFAULT_CONTEXT_NONCANON;
 #endif /* __x86_64__ */
-		PERTASK_SET(this_exception_pointers[1], flags);
+		PERTASK_SET(this_exception_args.e_segfault.s_context, context);
 	}
 	/* Fill in the fault address. */
 	{
@@ -478,10 +478,10 @@ complete_except_switch(struct icpustate *__restrict self,
                        uintptr_t opcode, uintptr_t op_flags) {
 	error_class_t cls = PERTASK_GET(this_exception_class);
 	if (cls == E_ILLEGAL_INSTRUCTION) {
-		if (!PERTASK_GET(this_exception_pointers[0]))
-			PERTASK_SET(this_exception_pointers[0], opcode);
-		if (!PERTASK_GET(this_exception_pointers[1]))
-			PERTASK_SET(this_exception_pointers[1], op_flags);
+		if (!PERTASK_GET(this_exception_args.e_illegal_instruction.ii_opcode))
+			PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, opcode);
+		if (!PERTASK_GET(this_exception_args.e_illegal_instruction.ii_op_flags))
+			PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
 	}
 	complete_except(self);
 }
@@ -500,15 +500,15 @@ throw_illegal_instruction_exception(struct icpustate *__restrict state,
 		icpustate_setpc(state, (uintptr_t)next_pc);
 	PERTASK_SET(this_exception_code, code);
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
-	PERTASK_SET(this_exception_pointers[0], opcode);
-	PERTASK_SET(this_exception_pointers[1], op_flags);
-	PERTASK_SET(this_exception_pointers[2], ptr2);
-	PERTASK_SET(this_exception_pointers[3], ptr3);
-	PERTASK_SET(this_exception_pointers[4], ptr4);
-	PERTASK_SET(this_exception_pointers[5], ptr5);
-	PERTASK_SET(this_exception_pointers[6], ptr6);
+	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_opcode, opcode);
+	PERTASK_SET(this_exception_args.e_illegal_instruction.ii_op_flags, op_flags);
+	PERTASK_SET(this_exception_args.e_pointers[2], ptr2);
+	PERTASK_SET(this_exception_args.e_pointers[3], ptr3);
+	PERTASK_SET(this_exception_args.e_pointers[4], ptr4);
+	PERTASK_SET(this_exception_args.e_pointers[5], ptr5);
+	PERTASK_SET(this_exception_args.e_pointers[6], ptr6);
 	for (i = 7; i < EXCEPTION_DATA_POINTERS; ++i)
-		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_ILLEGAL_INSTRUCTION))
 		kernel_debugtrap(state, SIGILL);
@@ -526,10 +526,10 @@ throw_exception(struct icpustate *__restrict state,
 		icpustate_setpc(state, (uintptr_t)next_pc);
 	PERTASK_SET(this_exception_code, code);
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
-	PERTASK_SET(this_exception_pointers[0], ptr0);
-	PERTASK_SET(this_exception_pointers[1], ptr1);
+	PERTASK_SET(this_exception_args.e_pointers[0], ptr0);
+	PERTASK_SET(this_exception_args.e_pointers[1], ptr1);
 	for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-		PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+		PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 	unwind(state);
 }
 
@@ -1088,18 +1088,18 @@ assert_canonical_pc(struct icpustate *__restrict state,
 set_noncanon_pc_exception:
 		PERTASK_SET(this_exception_faultaddr, (void *)callsite_pc);
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
-		PERTASK_SET(this_exception_pointers[0], (uintptr_t)pc);
-		PERTASK_SET(this_exception_pointers[1],
+		PERTASK_SET(this_exception_args.e_segfault.s_addr, (uintptr_t)pc);
+		PERTASK_SET(this_exception_args.e_segfault.s_context,
 		            (uintptr_t)(E_SEGFAULT_CONTEXT_USERCODE |
 		                        E_SEGFAULT_CONTEXT_NONCANON |
 		                        E_SEGFAULT_CONTEXT_EXEC));
 		if (!icpustate_isuser(state)) {
-			PERTASK_SET(this_exception_pointers[1],
+			PERTASK_SET(this_exception_args.e_segfault.s_context,
 			            (uintptr_t)(E_SEGFAULT_CONTEXT_NONCANON |
 			                        E_SEGFAULT_CONTEXT_EXEC));
 		}
 		for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
-			PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
+			PERTASK_SET(this_exception_args.e_pointers[i], (uintptr_t)0);
 		icpustate_setpc(state, callsite_pc);
 		printk(KERN_DEBUG "[segfault] PC-Fault at %p [pc=%p] [#GPF]\n",
 		       pc, callsite_pc);

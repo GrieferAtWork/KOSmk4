@@ -68,11 +68,12 @@ NOTHROW(KCALL file_destroy)(struct file *__restrict self) {
 LOCAL NOBLOCK void
 NOTHROW(KCALL translate_read_exceptions)(struct file *__restrict self) {
 	if (error_code() == ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) &&
-	    PERTASK_GET(this_exception_pointers[0]) == E_FILESYSTEM_OPERATION_READ &&
+	    PERTASK_GET(this_exception_args.e_fserror.f_unsupported_operation.uo_operation_id) == E_FILESYSTEM_OPERATION_READ &&
 	    INODE_ISDIR(self->f_node)) {
 		/* Posix wants us to return -EISDIR when trying to read from a directory... */
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_FSERROR_IS_A_DIRECTORY));
-		PERTASK_SET(this_exception_pointers[0], (uintptr_t)E_FILESYSTEM_IS_A_DIRECTORY_READ);
+		PERTASK_SET(this_exception_args.e_fserror.f_is_a_directory.iad_action_context,
+		            (uintptr_t)E_FILESYSTEM_IS_A_DIRECTORY_READ);
 	}
 }
 

@@ -43,14 +43,14 @@
 EXTERN(this_exception_code)
 EXTERN(this_exception_flags)
 EXTERN(this_exception_trace)
-EXTERN(this_exception_pointers)
+EXTERN(this_exception_args)
 EXTERN(this_exception_faultaddr)
 EXTERN(this_exception_state)
 
 #define FIELD_ERROR_CODE           %fs:this_exception_code
 #define FIELD_ERROR_FLAGS          %fs:this_exception_flags
 #define FIELD_ERROR_TRACE(off)     %fs:this_exception_trace + (off)
-#define FIELD_ERROR_POINTERS(off)  %fs:this_exception_pointers + (off)
+#define FIELD_ERROR_POINTERS(off)  %fs:this_exception_args + (off)
 #define FIELD_ERROR_FAULTADDR      %fs:this_exception_faultaddr
 #define FIELD_ERROR_REGISTERS(off) %fs:this_exception_state + (off)
 #define S_EXCEPT_TEXT(name)    .text
@@ -371,7 +371,7 @@ IU(	pushl_cfi %eax)
 2:	/* Fill in undefined pointers with NULL */
 	movl   %edi, %eax
 	subl   %edx, %eax
-	shrl   $(2), %eax  /* EAX = (P - this_exception_pointers) / 4 */
+	shrl   $(2), %eax  /* EAX = (P - this_exception_args) / 4 */
 	movl   $EXCEPTION_DATA_POINTERS, %ecx
 	subl   %eax, %ecx  /* ECX = EXCEPTION_DATA_POINTERS - EAX; (Number of unset pointers) */
 	xorl   %eax, %eax
