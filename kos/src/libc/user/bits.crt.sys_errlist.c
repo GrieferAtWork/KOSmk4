@@ -70,11 +70,11 @@ NOTHROW(LIBDCALL libd___sys_errlist)(void)
 		unsigned int i = DOS_ECOUNT;
 		/* Lazily initialize */
 		for (;;) {
+			--i;
 			result[i] = libd_strerror_s(i);
 			COMPILER_WRITE_BARRIER();
 			if (!i)
 				break;
-			--i;
 		}
 	}
 	return result;
@@ -91,11 +91,11 @@ NOTHROW(LIBCCALL libc___sys_errlist)(void)
 		unsigned int i = ECOUNT;
 		/* Lazily initialize */
 		for (;;) {
+			--i;
 			result[i] = libc_strerror_s(i);
 			COMPILER_WRITE_BARRIER();
 			if (!i)
 				break;
-			--i;
 		}
 	}
 	return result;
