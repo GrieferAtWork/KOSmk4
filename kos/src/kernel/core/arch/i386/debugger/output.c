@@ -49,6 +49,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <assert.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -320,8 +321,8 @@ NOTHROW(FCALL vga_backlog_setscrollpos)(unsigned int pos) {
 			size_t num_leading, num_trailing;
 			num_leading  = (size_t)(visible_end - vga_terminal_backlog);
 			num_trailing = (size_t)(vga_terminal_backlog - visible_start);
-			assertf(num_trailing < COMPILER_LENOF(vga_terminal_backlog), "num_trailing = %Iu\n", num_trailing);
-			assertf(num_leading < COMPILER_LENOF(vga_terminal_backlog), "num_leading = %Iu\n", num_leading);
+			assertf(num_trailing < COMPILER_LENOF(vga_terminal_backlog), "num_trailing = %" PRIuSIZ, num_trailing);
+			assertf(num_leading < COMPILER_LENOF(vga_terminal_backlog), "num_leading = %" PRIuSIZ, num_leading);
 			memcpyw(vga_terminal_start, vga_terminal_backlog_end - num_trailing, num_trailing);
 			memcpyw(vga_terminal_start + num_trailing, vga_terminal_backlog, num_leading);
 		}

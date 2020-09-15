@@ -26,6 +26,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define GUARD_KERNEL_SRC_DEBUGGER_UTIL_C 1
 #define DISABLE_BRANCH_PROFILING 1
 #define _GNU_SOURCE 1 /* strchrnul() */
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -42,6 +43,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/keyboard.h>
 
 #include <alloca.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -90,7 +92,7 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
 		dbg_putc('+');
 		dbg_savecolor();
 		dbg_setfgcolor(normal_fgcolor);
-		dbg_printf(DBGSTR("%-4Iu"),
+		dbg_printf(DBGSTR("%-4" PRIuSIZ),
 		           (size_t)((byte_t *)end_pc -
 		                    (byte_t *)start_pc));
 		dbg_loadcolor();
@@ -132,7 +134,7 @@ again_printlevel:
 		dbg_putc('+');
 		dbg_savecolor();
 		dbg_setfgcolor(fgcolor);
-		dbg_printf(DBGSTR("%-4Iu"),
+		dbg_printf(DBGSTR("%-4" PRIuSIZ),
 		           level == 0 ? (size_t)((byte_t *)end_pc - (byte_t *)start_pc)
 		                      : (size_t)(info.al_lineend - info.al_linestart));
 		dbg_loadcolor();
@@ -152,7 +154,7 @@ again_printlevel:
 		dbg_putc('+');
 		dbg_savecolor();
 		dbg_setfgcolor(fgcolor);
-		dbg_printf(DBGSTR("%Iu"),
+		dbg_printf(DBGSTR("%" PRIuSIZ),
 		           level == 0 ? (size_t)(module_relative_start_pc - info.al_symstart)
 		                      : (size_t)(info.al_linestart - info.al_symstart));
 		dbg_loadcolor();
@@ -178,13 +180,13 @@ again_printlevel:
 				dbg_putc(':');
 				dbg_savecolor();
 				dbg_setfgcolor(fgcolor);
-				dbg_printf(DBGSTR("%Iu"), info.al_srcline);
+				dbg_printf(DBGSTR("%" PRIuSIZ), info.al_srcline);
 				dbg_loadcolor();
 				if (info.al_srccol) {
 					dbg_putc(':');
 					dbg_savecolor();
 					dbg_setfgcolor(fgcolor);
-					dbg_printf(DBGSTR("%Iu"), info.al_srccol);
+					dbg_printf(DBGSTR("%" PRIuSIZ), info.al_srccol);
 					dbg_loadcolor();
 				}
 			}

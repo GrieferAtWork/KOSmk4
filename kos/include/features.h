@@ -232,6 +232,8 @@
 #define __USE_TIME_BITS64 1
 #elif defined(__USE_DOS) || defined(__USE_KOS_KERNEL)
 #define __USE_TIME_BITS64 1
+#elif defined(__KOS__) && defined(__KERNEL__)
+#define __USE_TIME_BITS64 1
 #endif /* ... */
 
 
@@ -484,6 +486,8 @@
 #define __USE_FILE_OFFSET64 1
 #endif /* _FILE_OFFSET_BITS == 64 */
 #elif defined(__USE_KOS_KERNEL)
+#define __USE_FILE_OFFSET64 1
+#elif defined(__KOS__) && defined(__KERNEL__)
 #define __USE_FILE_OFFSET64 1
 #endif /* ... */
 

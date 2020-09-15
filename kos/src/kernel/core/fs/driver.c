@@ -59,6 +59,7 @@
 #include <ctype.h>
 #include <elf.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <malloca.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -1708,7 +1709,7 @@ driver_enable_textrel(struct driver *__restrict self)
 		}
 		node = vm_getnodeofaddress(&vm_kernel,
 		                    (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
-		assertf(node, "Missing node for driver %q's program segment #%I16u mapped at %p",
+		assertf(node, "Missing node for driver %q's program segment #%" PRIu16 " mapped at %p",
 		        self->d_name, (uint16_t)i, (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		/* By simply adding write permissions here, a future #PF for nodes within this
 		 * memory range will simply propagate this permission bit into the page directory. */

@@ -35,6 +35,7 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -426,8 +427,9 @@ isr_try_register_at_impl(/*inherit(on_success)*/ REF struct driver *__restrict f
 			if unlikely(!func_driver)
 				func_driver = incref(&drv_self); /* Shouldn't happen... */
 		}
-		printk(KERN_INFO "[isr] Register handler for vector %#Ix (%p with %p in driver %q)\n",
-		       (size_t)ISR_INDEX_TO_VECTOR(index), real_func, real_arg, func_driver->d_name);
+		printk(KERN_INFO "[isr] Register handler for vector %#" PRIxSIZ " (%p with %p in driver %q)\n",
+		       (size_t)ISR_INDEX_TO_VECTOR(index),
+		       real_func, real_arg, func_driver->d_name);
 		decref_unlikely(func_driver); /* Inherit on success. */
 		isr_vector_state_cleanup_noop_hisr(old_state, new_state, ignored_hisr_arg);
 		decref_unlikely(new_state);
@@ -630,8 +632,9 @@ assign_new_state:
 		}
 		isr_vector_state_cleanup_noop_hisr(old_state, new_state, NULL);
 		decref_unlikely(new_state);
-		printk(KERN_INFO "[isr] Delete handler for vector %#Ix (%p with %p in driver %q)\n",
-		       (size_t)ISR_INDEX_TO_VECTOR(index), func, arg, declaring_driver->d_name);
+		printk(KERN_INFO "[isr] Delete handler for vector %#" PRIxSIZ " (%p with %p in driver %q)\n",
+		       (size_t)ISR_INDEX_TO_VECTOR(index),
+		       func, arg, declaring_driver->d_name);
 		decref(old_state);
 		return true;
 	}
@@ -921,8 +924,9 @@ shortcut_success:
 				declaring_driver = driver_at_address(func);
 				if unlikely(!declaring_driver)
 					declaring_driver = incref(&drv_self);
-				printk(KERN_INFO "[isr] Delete handler for vector %#Ix (%p with %p in driver %q)\n",
-				       (size_t)ISR_INDEX_TO_VECTOR(index), func, ob_pointer, declaring_driver->d_name);
+				printk(KERN_INFO "[isr] Delete handler for vector %#" PRIxSIZ " (%p with %p in driver %q)\n",
+				       (size_t)ISR_INDEX_TO_VECTOR(index),
+				       func, ob_pointer, declaring_driver->d_name);
 				decref_unlikely(declaring_driver);
 			}
 			decref(old_state);
@@ -1118,7 +1122,8 @@ NOTHROW(KCALL isr_try_reorder_handlers)(size_t vector_index,
 	if (isr_vectors[i].cmpxch(old_state, new_state)) {
 		isr_vector_state_cleanup_noop_hisr(old_state, new_state, NULL);
 		destroy(new_state);
-		printk(KERN_INFO "[isr] Reorder handlers for vector %#Ix (%Iu -> %Iu)\n",
+		printk(KERN_INFO "[isr] Reorder handlers for vector "
+		                 "%#" PRIxSIZ " (%" PRIuSIZ " -> %" PRIuSIZ ")\n",
 		       (size_t)ISR_INDEX_TO_VECTOR(vector_index),
 		       src_handler_index, dst_handler_index);
 		return true;
@@ -1184,7 +1189,7 @@ NOTHROW(KCALL isr_vector_trigger)(isr_vector_t vector) {
 
 PRIVATE ATTR_NOINLINE ATTR_COLD void
 NOTHROW(KCALL isr_unhandled)(size_t index) {
-	printk(KERN_ERR "[isr] Unhandled interrupt %#Ix\n",
+	printk(KERN_ERR "[isr] Unhandled interrupt %#" PRIxSIZ "\n",
 	       (size_t)ISR_INDEX_TO_VECTOR(index));
 }
 

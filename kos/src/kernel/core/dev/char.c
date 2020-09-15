@@ -56,6 +56,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -315,7 +316,8 @@ character_device_add_to_devfs(struct character_device *__restrict self) {
 	if (!self->cd_name[0]) {
 		/* Auto-generate the name */
 		sprintf(self->cd_name,
-		        "%.2x:%.2x",
+		        "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+		        "%.2" PRIxN(__SIZEOF_MINOR_T__),
 		        MAJOR(self->cd_devlink.a_vaddr),
 		        MINOR(self->cd_devlink.a_vaddr));
 	}
@@ -403,7 +405,7 @@ pty_assign_name(struct character_device *__restrict self,
 		 * NOTE: The 12345 is the hex value of the minor device number, using lower-case letters.
 		 */
 		STATIC_ASSERT(MINORBITS / 4 == 5);
-		sprintf(self->cd_name, "%ctyX%.5I16x", prefix, (u16)id);
+		sprintf(self->cd_name, "%ctyX%.5" PRIx16, prefix, (u16)id);
 	} else {
 		/* Old (BSD-style) PTY master/slave device names. */
 		self->cd_name[0] = prefix;
@@ -491,7 +493,8 @@ pty_register(struct pty_master *__restrict master,
 
 /* Automatically register the given character-device, assigning it an auto-generated device ID.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
- * NOTE: When empty, `cd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
+ * NOTE: When empty, `cd_name' will be set to
+ *       `"%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 PUBLIC NONNULL((1)) void KCALL
 character_device_register_auto(struct character_device *__restrict self)

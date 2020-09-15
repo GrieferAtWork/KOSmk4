@@ -21,7 +21,7 @@
 #include "vm.c"
 #define VM_DEFINE_UNMAP 1
 //#define VM_DEFINE_PROTECT 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #if (defined(VM_DEFINE_UNMAP) + defined(VM_DEFINE_PROTECT)) != 1
 #error "Invalid configuration"
@@ -82,9 +82,9 @@ vm_protect(struct vm *__restrict self,
 	assert((num_bytes & PAGEMASK) == 0);
 #ifdef VM_DEFINE_PROTECT
 	assertf(!(prot_mask & ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)),
-	        "prot_mask = %#Ix", (uintptr_t)prot_mask);
+	        "prot_mask = %#" PRIxSIZ, (uintptr_t)prot_mask);
 	assertf(!(prot_flags & ~(VM_PROT_EXEC | VM_PROT_WRITE | VM_PROT_READ | VM_PROT_LOOSE | VM_PROT_SHARED)),
-	        "prot_flags = %#Ix", (uintptr_t)prot_flags);
+	        "prot_flags = %#" PRIxSIZ, (uintptr_t)prot_flags);
 #endif /* VM_DEFINE_PROTECT */
 	if unlikely(!num_bytes)
 		return 0; /* No-op */

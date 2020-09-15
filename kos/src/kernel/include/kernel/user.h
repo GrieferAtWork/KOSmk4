@@ -28,6 +28,22 @@
 
 DECL_BEGIN
 
+/* Skew a kernel pointer such that it remains unique, continues to
+ * point into kernel-space, but doesn't necessarily indicate the proper
+ * address of the pointed-to kernel object.
+ * For this purpose, these functions usually just:
+ *   - xor the pointer with some key-mask.
+ *   - switch bits at random positions within the pointer with each other.
+ * Note that what exactly is done depends on how the kernel was configured,
+ * and a one-time-initialized blob of random data that will not change ever
+ * until the next reboot.
+ * Also note that these functions may simply not do anything at all, or do
+ * something 100% predictable, especially in situations where the kernel was
+ * configured for debugging, rather than security. */
+#define skew_kernel_pointer(p)   (void *)(p) /* TODO */
+#define unskew_kernel_pointer(p) (void *)(p) /* TODO */
+
+
 #ifdef __CC__
 /* Validate user-pointers for being allowed to be used for the specified operations.
  * Since the kernel is allowed to access memory that is marked as `PROT_NOUSER',

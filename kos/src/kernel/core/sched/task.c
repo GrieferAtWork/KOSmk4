@@ -412,7 +412,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	node = vm_paged_node_remove(&vm_kernel, FORTASK(self, this_trampoline_node).vn_node.a_vmin);
 	assertf(node == &FORTASK(self, this_trampoline_node),
 	        "node                                 = %p\n"
-	        "&FORTASK(self,this_trampoline_node) = %p\n"
+	        "&FORTASK(self, this_trampoline_node) = %p\n"
 	        "self                                 = %p\n",
 	        node, &FORTASK(self, this_trampoline_node), self);
 	addr = vm_node_getstart(node);
@@ -426,16 +426,16 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 #ifdef CONFIG_HAVE_KERNEL_STACK_GUARD
 	node = vm_paged_node_remove(&vm_kernel, FORTASK(self, this_kernel_stackguard_).vn_node.a_vmin);
 	assertf(node == &FORTASK(self, this_kernel_stackguard_),
-	        "node                                    = %p\n"
-	        "&FORTASK(self, this_kernel_stackguard_) = %p\n"
-	        "self                                    = %p\n",
+	        "node                                   = %p\n"
+	        "&FORTASK(self, this_kernel_stackguard) = %p\n"
+	        "self                                   = %p\n",
 	        node, &FORTASK(self, this_kernel_stackguard_), self);
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 	node = vm_paged_node_remove(&vm_kernel, FORTASK(self, this_kernel_stacknode_).vn_node.a_vmin);
 	assertf(node == &FORTASK(self, this_kernel_stacknode_),
-	        "node                                   = %p\n"
-	        "&FORTASK(self, this_kernel_stacknode_) = %p\n"
-	        "self                                   = %p\n",
+	        "node                                  = %p\n"
+	        "&FORTASK(self, this_kernel_stacknode) = %p\n"
+	        "self                                  = %p\n",
 	        node, &FORTASK(self, this_kernel_stacknode_), self);
 	addr = vm_node_getstart(node);
 	size = vm_node_getsize(node);

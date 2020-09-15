@@ -41,6 +41,7 @@
 #include <kernel/driver.h>
 #include <kernel/handle.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 #include <sched/atomic64.h>
 #include <sched/pid.h>
 
@@ -50,6 +51,7 @@
 
 #include <assert.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdint.h> /* UINT64_C */
 #include <string.h>
 
@@ -270,12 +272,12 @@ handle_print(struct handle const *__restrict self,
 		struct vm_datablock *b = (struct vm_datablock *)self->h_data;
 		if (vm_datablock_isinode(b)) {
 			result = format_printf(printer, arg,
-			                       "anon_inode:[inode:%I64u]",
+			                       "anon_inode:[inode:%" PRIuN(__SIZEOF_INO_T__) "]",
 			                       ((struct inode *)b)->i_fileino);
 		} else {
 			result = format_printf(printer, arg,
-			                       "anon_inode:[datablock:%Iu]",
-			                       b);
+			                       "anon_inode:[datablock:%" PRIuPTR "]",
+			                       skew_kernel_pointer(b));
 		}
 	}	break;
 
@@ -319,7 +321,7 @@ handle_print(struct handle const *__restrict self,
 			                       printer, arg);
 		} else {
 			result = format_printf(printer, arg,
-			                       "anon_inode:[file:inode:%I64u]",
+			                       "anon_inode:[file:inode:%" PRIuN(__SIZEOF_INO_T__) "]",
 			                       f->f_node->i_fileino);
 		}
 	}	break;
@@ -332,8 +334,10 @@ handle_print(struct handle const *__restrict self,
 			                       f->d_dirent->de_namelen,
 			                       printer, arg);
 		} else {
-			result = format_printf(printer, arg, "anon_inode:[oneshot_directory_file:inode:%I64u]",
-			                  f->d_node->i_fileino);
+			result = format_printf(printer, arg,
+			                       "anon_inode:[oneshot_directory_file:"
+			                       "inode:%" PRIuN(__SIZEOF_INO_T__) "]",
+			                       f->d_node->i_fileino);
 		}
 	}	break;
 
@@ -345,29 +349,29 @@ handle_print(struct handle const *__restrict self,
 	case HANDLE_TYPE_FS: {
 		struct fs *f = (struct fs *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[fs:%Iu]",
-		                       f);
+		                       "anon_inode:[fs:%" PRIuPTR "]",
+		                       skew_kernel_pointer(f));
 	}	break;
 
 	case HANDLE_TYPE_VM: {
 		struct vm *f = (struct vm *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[vm:%Iu]",
-		                       f);
+		                       "anon_inode:[vm:%" PRIuPTR "]",
+		                       skew_kernel_pointer(f));
 	}	break;
 
 	case HANDLE_TYPE_TASK: {
 		struct taskpid *t = (struct taskpid *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[task:%u]",
+		                       "anon_inode:[task:%" PRIuN(__SIZEOF_PID_T__) "]",
 		                       taskpid_getpid_s(t));
 	}	break;
 
 	case HANDLE_TYPE_CLOCK: {
 		struct wall_clock *c = (struct wall_clock *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[wall_clock:%Iu]",
-		                       c);
+		                       "anon_inode:[wall_clock:%" PRIuPTR "]",
+		                       skew_kernel_pointer(c));
 	}	break;
 
 	case HANDLE_TYPE_DRIVER: {
@@ -381,22 +385,22 @@ handle_print(struct handle const *__restrict self,
 	case HANDLE_TYPE_PIPE: {
 		struct pipe *p = (struct pipe *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[pipe:%Iu]",
-		                       p);
+		                       "anon_inode:[pipe:%" PRIuPTR "]",
+		                       skew_kernel_pointer(p));
 	}	break;
 
 	case HANDLE_TYPE_PIPE_READER: {
 		struct pipe_reader *p = (struct pipe_reader *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[reader:pipe:%Iu]",
-		                       p->pr_pipe);
+		                       "anon_inode:[reader:pipe:%" PRIuPTR "]",
+		                       skew_kernel_pointer(p->pr_pipe));
 	}	break;
 
 	case HANDLE_TYPE_PIPE_WRITER: {
 		struct pipe_writer *p = (struct pipe_writer *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[writer:pipe:%Iu]",
-		                       p->pw_pipe);
+		                       "anon_inode:[writer:pipe:%" PRIuPTR "]",
+		                       skew_kernel_pointer(p->pw_pipe));
 	}	break;
 
 	case HANDLE_TYPE_FIFO_USER: {
@@ -408,7 +412,7 @@ handle_print(struct handle const *__restrict self,
 			                       printer, arg);
 		} else {
 			result = format_printf(printer, arg,
-			                       "anon_inode:[%s:pipe:%Iu]",
+			                       "anon_inode:[%s:named_pipe:%" PRIuN(__SIZEOF_INO_T__) "]",
 			                       f->fu_accmode == IO_RDONLY
 			                       ? "reader"
 			                       : f->fu_accmode == IO_WRONLY
@@ -421,36 +425,36 @@ handle_print(struct handle const *__restrict self,
 	case HANDLE_TYPE_PIDNS: {
 		struct pidns *ns = (struct pidns *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[pidns:%Iu]",
-		                       ns);
+		                       "anon_inode:[pidns:%" PRIuPTR "]",
+		                       skew_kernel_pointer(ns));
 	}	break;
 
 	case HANDLE_TYPE_DRIVER_STATE: {
 		struct driver_state *st = (struct driver_state *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[driver_state:%Iu]",
-		                       st);
+		                       "anon_inode:[driver_state:%" PRIuPTR "]",
+		                       skew_kernel_pointer(st));
 	}	break;
 
 	case HANDLE_TYPE_EVENTFD_FENCE: {
 		struct eventfd *efd = (struct eventfd *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[eventfd:fence:%Iu]",
-		                       efd);
+		                       "anon_inode:[eventfd:fence:%" PRIuPTR "]",
+		                       skew_kernel_pointer(efd));
 	}	break;
 
 	case HANDLE_TYPE_EVENTFD_SEMA: {
 		struct eventfd *efd = (struct eventfd *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[eventfd:semaphore:%Iu]",
-		                       efd);
+		                       "anon_inode:[eventfd:semaphore:%" PRIuPTR "]",
+		                       skew_kernel_pointer(efd));
 	}	break;
 
 	case HANDLE_TYPE_SIGNALFD: {
 		struct signalfd *sfd = (struct signalfd *)self->h_data;
 		result = format_printf(printer, arg,
-		                       "anon_inode:[signalfd:%Iu]",
-		                       sfd);
+		                       "anon_inode:[signalfd:%" PRIuPTR "]",
+		                       skew_kernel_pointer(sfd));
 	}	break;
 
 	case HANDLE_TYPE_DRIVER_SECTION: {
@@ -470,8 +474,9 @@ handle_print(struct handle const *__restrict self,
 	}	break;
 
 	default:
-		result = format_printf(printer, arg, "anon_inode:[%s]",
-		                       handle_typename(*self));
+		result = format_printf(printer, arg, "anon_inode:[%s:%" PRIuPTR "]",
+		                       handle_typename(*self),
+		                       skew_kernel_pointer(self->h_data));
 		break;
 	}
 	return result;

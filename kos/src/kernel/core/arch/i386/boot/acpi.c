@@ -36,6 +36,7 @@
 #include <hybrid/minmax.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -205,7 +206,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 		printk(FREESTR(KERN_DEBUG "[acpi] RSDPDescriptor not found\n"));
 		return;
 	}
-	printk(FREESTR(KERN_DEBUG "[acpi] RSDPDescriptor located at %p [oem: %.?q, rev: %I8u]\n"),
+	printk(FREESTR(KERN_DEBUG "[acpi] RSDPDescriptor located at %p [oem: %.?q, rev: %" PRIu8 "]\n"),
 	       (uintptr_t)rsdp - KERNEL_CORE_BASE,
 	       COMPILER_LENOF(rsdp->rsdp_oemid),
 	       rsdp->rsdp_oemid,
@@ -225,20 +226,24 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	vm_copyfromphys_noidentity(&header, acpi_root, sizeof(ACPISDTHeader));
 	/* Validate the header. */
 	if unlikely(acpi_memsum_phys(acpi_root, header.rsdp_length) != 0) {
-		printk(FREESTR(KERN_ERR "[acpi] Corrupted %cSDT checksum [table: %I64p...%I64p]\n"),
+		printk(FREESTR(KERN_ERR "[acpi] Corrupted %cSDT checksum [table: "
+		                        "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."
+		                        "%" PRIpN(__SIZEOF_PHYSADDR_T__) "]\n"),
 		       acpi_mode == ACPI_MODE_RSDT ? 'R' : 'X',
-		       (u64)acpi_root,
-		       (u64)acpi_root + header.rsdp_length - 1);
+		       (physaddr_t)acpi_root,
+		       (physaddr_t)acpi_root + header.rsdp_length - 1);
 		return;
 	}
 
 	/* Figure out how many tables there are. */
 	acpi_sdt_count = (header.rsdp_length - sizeof(ACPISDTHeader)) / ACPI_POINTER_SIZE;
 	if unlikely(!acpi_sdt_count) {
-		printk(FREESTR(KERN_ERR "[acpi] %cSDT contains no SDTs [table: %I64p...%I64p]\n"),
+		printk(FREESTR(KERN_ERR "[acpi] %cSDT contains no SDTs [table: "
+		                        "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."
+		                        "%" PRIpN(__SIZEOF_PHYSADDR_T__) "]\n"),
 		       acpi_mode == ACPI_MODE_RSDT ? 'R' : 'X',
-		       (u64)acpi_root,
-		       (u64)acpi_root + header.rsdp_length - 1);
+		       (physaddr_t)acpi_root,
+		       (physaddr_t)acpi_root + header.rsdp_length - 1);
 		return;
 	}
 
@@ -264,9 +269,13 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 			vm_copyfromphys_noidentity(&header, base, sizeof(header));
 			/* Validate the table. */
 			if unlikely(acpi_memsum_phys(base, header.rsdp_length) != 0) {
-				printk(FREESTR(KERN_ERR "[acpi:sdt:%Iu:%.?q] corrupted table [table: %I64p...%I64p, oem: %.?q, oemtab: %.?q]\n"),
+				printk(FREESTR(KERN_ERR "[acpi:sdt:%" PRIuSIZ ":%.?q] corrupted table [table: "
+				                        "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."
+				                        "%" PRIpN(__SIZEOF_PHYSADDR_T__) ", "
+				                        "oem: %.?q, oemtab: %.?q]\n"),
 				       i, COMPILER_LENOF(header.rsdp_signature), header.rsdp_signature,
-				       (u64)base, (u64)base + header.rsdp_length - 1,
+				       (physaddr_t)base,
+				       (physaddr_t)base + header.rsdp_length - 1,
 				       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
 				       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
 				memset(header.rsdp_signature, 0, sizeof(header.rsdp_signature));
@@ -274,9 +283,13 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 				              &header.rsdp_signature[0], sizeof(header.rsdp_signature));
 				continue;
 			}
-			printk(FREESTR(KERN_INFO "[acpi:sdt:%Iu:%.?q] found table [table: %I64p...%I64p, oem: %.?q, oemtab: %.?q]\n"),
+			printk(FREESTR(KERN_INFO "[acpi:sdt:%" PRIuSIZ ":%.?q] found table [table: "
+			                         "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."
+			                         "%" PRIpN(__SIZEOF_PHYSADDR_T__) ", "
+			                         "oem: %.?q, oemtab: %.?q]\n"),
 			       i, COMPILER_LENOF(header.rsdp_signature), header.rsdp_signature,
-			       (u64)base, (u64)base + header.rsdp_length - 1,
+			       (physaddr_t)base,
+			       (physaddr_t)base + header.rsdp_length - 1,
 			       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
 			       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
 			minfo_addbank(base, (physaddr_t)header.rsdp_length, PMEMBANK_TYPE_DEVICE);
@@ -287,7 +300,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	{
 		FADT fadt;
 		if (acpi_lookup("FACP", &fadt, sizeof(fadt))) {
-			printk(FREESTR(KERN_DEBUG "[acpi] fadt_Dsdt = %I32p\n"),fadt.fadt_Dsdt);
+			printk(FREESTR(KERN_DEBUG "[acpi] fadt_Dsdt = %" PRIp32 "\n"),fadt.fadt_Dsdt);
 		}
 	}
 #endif

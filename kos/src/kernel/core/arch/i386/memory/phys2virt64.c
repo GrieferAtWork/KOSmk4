@@ -42,6 +42,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <assert.h>
+#include <inttypes.h>
 
 #define KiB(n) ((n) * 1024)
 #define MiB(n) ((n) * 1024 * 1024)
@@ -167,8 +168,8 @@ NOTHROW(KCALL metadata_clearall)(void) {
 				continue; /* Not allocated. */
 			assertf((e3.p_word & P64_PAGE_FVECTOR) >= (u64)metadata_base &&
 			        (e3.p_word & P64_PAGE_FVECTOR) < (u64)metadata_base + metadata_size,
-			        "E2-vector at phys:%I64p from phys2virt segment isn't apart of "
-			        "the metadata page vector at %I64p-%I64p",
+			        "E2-vector at phys:%" PRIp64 " from phys2virt segment isn't apart of "
+			        "the metadata page vector at %" PRIp64 "-%" PRIp64,
 			        (u64)(e3.p_word & P64_PAGE_FVECTOR),
 			        (u64)metadata_base,
 			        (u64)metadata_base + metadata_size - 1);

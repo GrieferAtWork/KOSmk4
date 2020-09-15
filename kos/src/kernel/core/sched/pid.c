@@ -55,6 +55,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <sched.h>
 #include <signal.h>
@@ -498,9 +499,12 @@ task_setthread(struct task *__restrict self,
 	struct taskpid *pid = FORTASK(self, this_taskpid);
 	struct rpc_entry *exit_rpc;
 	assertf(pid, "Must call `task_setpid()' before `task_setthread()'");
-	assertf(leader && leader != self, "Must use `task_setprocess()' to create a new process");
-	assertf(FORTASK(self, this_taskgroup).tg_process == NULL, "`task_setthread()' and `task_setprocess()' may only be called once");
-	assertf(!(self->t_flags & TASK_FKERNTHREAD), "`task_setthread()' and `task_setprocess()' may not be used with kernel threads");
+	assertf(leader && leader != self,
+	        "Must use `task_setprocess()' to create a new process");
+	assertf(FORTASK(self, this_taskgroup).tg_process == NULL,
+	        "`task_setthread()' and `task_setprocess()' may only be called once");
+	assertf(!(self->t_flags & TASK_FKERNTHREAD),
+	        "`task_setthread()' and `task_setprocess()' may not be used with kernel threads");
 	leader   = task_getprocess_of(leader);
 	exit_rpc = task_alloc_synchronous_rpc(&rpc_propagate_exit_state_to_worker);
 	TRY {
@@ -512,7 +516,7 @@ task_setthread(struct task *__restrict self,
 	FORTASK(self, this_taskgroup).tg_process     = incref(leader);
 	FORTASK(self, this_taskgroup).tg_thread_exit = exit_rpc;
 	assertf(FORTASK(self, this_taskgroup).tg_thread_detached == TASKGROUP_TG_THREAD_DETACHED_NO,
-	        "tg_thread_detached = %Iu", FORTASK(self, this_taskgroup).tg_thread_detached);
+	        "tg_thread_detached = %" PRIuPTR, FORTASK(self, this_taskgroup).tg_thread_detached);
 	pid->tp_siblings.ln_pself = &FORTASK(leader, this_taskgroup).tg_proc_threads;
 	incref(pid); /* The reference for the child chain */
 	COMPILER_WRITE_BARRIER();
@@ -556,8 +560,10 @@ task_setprocess(struct task *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	struct taskpid *pid = FORTASK(self, this_taskpid);
 	assertf(pid, "Must call `task_setpid()' before `task_setthread()'");
-	assertf(FORTASK(self, this_taskgroup).tg_process == NULL, "`task_setthread()' and `task_setprocess()' may only be called once");
-	assertf(!(self->t_flags & TASK_FKERNTHREAD), "`task_setthread()' and `task_setprocess()' may not be used with kernel threads");
+	assertf(FORTASK(self, this_taskgroup).tg_process == NULL,
+	        "`task_setthread()' and `task_setprocess()' may only be called once");
+	assertf(!(self->t_flags & TASK_FKERNTHREAD),
+	        "`task_setthread()' and `task_setprocess()' may not be used with kernel threads");
 	FORTASK(self, this_taskgroup).tg_process = self; /* We're our own process */
 	if (!group || group == self) {
 		REF struct taskpid *grouppid;

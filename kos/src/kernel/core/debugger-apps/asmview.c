@@ -45,6 +45,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/keyboard.h>
 
 #include <alloca.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -448,7 +449,7 @@ NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
 		/* Include the symbol offset (if non-zero) */
 		symbol_offset = (uintptr_t)symbol_addr - sym->s_start;
 		if (symbol_offset != 0)
-			disasm_printf(self, "+%#Ix", symbol_offset);
+			disasm_printf(self, "+%#" PRIxPTR, symbol_offset);
 		disasm_print(self, ">", 1);
 	} else {
 		disasm_printf(self, "%#p", symbol_addr);
@@ -503,7 +504,7 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 			for (i = 0; i < maxbytes - 1; ++i) {
 				byte_t value;
 				if (av_getbyte(da.d_pc + i, &value))
-					dbg_printf(DBGSTR("%.2I8x "), value);
+					dbg_printf(DBGSTR("%.2" PRIx8 " "), value);
 				else {
 					dbg_print(DBGSTR("?? "));
 				}
@@ -513,7 +514,7 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 			for (i = 0; i < ilen; ++i) {
 				byte_t value;
 				if (av_getbyte(da.d_pc + i, &value))
-					dbg_printf(DBGSTR("%.2I8x "), value);
+					dbg_printf(DBGSTR("%.2" PRIx8 " "), value);
 				else {
 					dbg_print(DBGSTR("?? "));
 				}
@@ -545,7 +546,7 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 			if (i != 0)
 				dbg_putc(' ');
 			if (av_getbyte(current_line_base + i, &value))
-				dbg_printf(DBGSTR("%.2I8x"), value);
+				dbg_printf(DBGSTR("%.2" PRIx8), value);
 			else {
 				dbg_print(DBGSTR("??"));
 			}
@@ -558,9 +559,9 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
 			dbg_setcur(0, 0);
 			dbg_print(a2l.al_srcfile ? a2l.al_srcfile : DBGSTR("?"));
 			if (a2l.al_srcline) {
-				dbg_printf(DBGSTR(":%3Iu"), a2l.al_srcline);
+				dbg_printf(DBGSTR(":%3" PRIuPTR), a2l.al_srcline);
 				if (a2l.al_srccol)
-					dbg_printf(DBGSTR(":%2Iu"), a2l.al_srccol);
+					dbg_printf(DBGSTR(":%2" PRIuPTR), a2l.al_srccol);
 			}
 			if (!a2l.al_name)
 				a2l.al_name = a2l.al_rawname;

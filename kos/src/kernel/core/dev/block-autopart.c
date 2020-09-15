@@ -27,12 +27,12 @@
 
 #include <dev/block.h>
 #include <fs/vfs.h>
-#include <hybrid/atomic.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/byteswap.h>
 #include <hybrid/overflow.h>
@@ -40,6 +40,7 @@
 #include <kos/dev.h>
 #include <kos/guid.h>
 
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -56,7 +57,10 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 	    efi.gpt_signature[2] != EFIMAG2 || efi.gpt_signature[3] != EFIMAG3 ||
 	    efi.gpt_signature[4] != EFIMAG4 || efi.gpt_signature[5] != EFIMAG5 ||
 	    efi.gpt_signature[6] != EFIMAG6 || efi.gpt_signature[7] != EFIMAG7) {
-		printk(KERN_WARNING "[blk] Invalid EFI signature in EFI partition at %#I64x...%#I64x on %.2x:%.2x (%q)\n",
+		printk(KERN_WARNING "[blk] Invalid EFI signature in EFI partition at "
+		                    "%#" PRIx64 "...%#" PRIx64 " on "
+		                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+		                    "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
 		       (u64)part_min, (u64)part_max,
 		       MAJOR(block_device_devno(self)),
 		       MINOR(block_device_devno(self)),
@@ -64,7 +68,9 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 		/* Load the supposed EFI partition as a normal partition. */
 		return (REF struct block_device_partition *)-2;
 	}
-	printk(KERN_INFO "[blk] EFI partition found at %#I64x...%#I64x on %.2x:%.2x (%q)\n",
+	printk(KERN_INFO "[blk] EFI partition found at %#" PRIx64 "...%#" PRIx64 " on "
+	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                 "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
 	       (u64)part_min, (u64)part_max,
 	       MAJOR(block_device_devno(self)),
 	       MINOR(block_device_devno(self)),
@@ -81,7 +87,9 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 	efi.gpt_partition_entsz = (le32)LETOH32(efi.gpt_partition_entsz);
 	efi.gpt_partition_crc32 = (le32)LETOH32(efi.gpt_partition_crc32);
 	if ((u32)efi.gpt_hdrsize < offsetafter(struct efi_descriptor, gpt_partition_count)) {
-		printk(KERN_ERR "[blk] EFI header table at %#I64x...%#I64x on %.2x:%.2x (%q) is too small (%I32u bytes)\n",
+		printk(KERN_ERR "[blk] EFI header table at %#" PRIx64 "...%#" PRIx64 " on "
+		                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+		                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) is too small (%" PRIu32 " bytes)\n",
 		       (u64)part_min, (u64)part_max,
 		       MAJOR(block_device_devno(self)),
 		       MINOR(block_device_devno(self)),
@@ -92,7 +100,9 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 	if ((u32)efi.gpt_hdrsize < offsetafter(struct efi_descriptor, gpt_partition_entsz))
 		efi.gpt_partition_entsz = (le32)128;
 	else if ((u32)efi.gpt_partition_entsz < offsetafter(struct efi_partition, p_part_end)) {
-		printk(KERN_ERR "[blk] EFI partition entires in %#I64x...%#I64x on %.2x:%.2x (%q) are too small (%I32u bytes)\n",
+		printk(KERN_ERR "[blk] EFI partition entires in %#" PRIx64 "...%#" PRIx64 " on "
+		                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+		                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) are too small (%" PRIu32 " bytes)\n",
 		       (u64)part_min, (u64)part_max,
 		       MAJOR(block_device_devno(self)),
 		       MINOR(block_device_devno(self)),
@@ -103,7 +113,10 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 		u32 vecsize, entsize;
 		pos_t vecaddr;
 		if (OVERFLOW_UMUL((u64)efi.gpt_partition_start, self->bd_sector_size, &vecaddr)) {
-			printk(KERN_ERR "[blk] EFI partition table address in %#I64x...%#I64x on %.2x:%.2x (%q) overflows (sector %I64u * %Iu bytes per sector)\n",
+			printk(KERN_ERR "[blk] EFI partition table address in %#" PRIx64 "...%#" PRIx64 " on "
+			                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+			                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) overflows "
+			                "(sector %" PRIu64 " * %" PRIuSIZ " bytes per sector)\n",
 			       (u64)part_min, (u64)part_max,
 			       MAJOR(block_device_devno(self)),
 			       MINOR(block_device_devno(self)),
@@ -127,7 +140,10 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 			part.p_part_min = (le64)LETOH64(part.p_part_min);
 			part.p_part_end = (le64)LETOH64(part.p_part_end);
 			if ((u64)part.p_part_end < (u64)part.p_part_min) {
-				printk(KERN_ERR "[blk] EFI partition from EFI table in %#I64x...%#I64x on %.2x:%.2x (%q) ends at %I64u before it starts at %I64u\n",
+				printk(KERN_ERR "[blk] EFI partition from EFI table in %#" PRIx64 "...%#" PRIx64 " on "
+				                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+				                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) "
+				                "ends at %" PRIu64 " before it starts at %" PRIu64 "\n",
 				       (u64)part_min, (u64)part_max,
 				       MAJOR(block_device_devno(self)),
 				       MINOR(block_device_devno(self)),
@@ -178,7 +194,10 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 					result = new_result; /* First active partition. */
 				else {
 					if (result != (REF struct block_device_partition *)-1) {
-						printk(KERN_WARNING "[blk] Secondary active EFI partition %.2x:%.2x collides with %.2x:%.2x on %.2x:%.2x\n",
+						printk(KERN_WARNING "[blk] Secondary active EFI partition "
+						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " collides with "
+						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " on "
+						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "\n",
 						       MAJOR(block_device_devno(new_result)),
 						       MINOR(block_device_devno(new_result)),
 						       MAJOR(block_device_devno(result)),
@@ -188,7 +207,9 @@ block_device_autopart_efi_impl(struct basic_block_device *__restrict self,
 						decref(result);
 						result = (REF struct block_device_partition *)-1;
 					} else {
-						printk(KERN_WARNING "[blk] Three or more active EFI partition %.2x:%.2x on %.2x:%.2x\n",
+						printk(KERN_WARNING "[blk] Three or more active EFI partition "
+						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " on "
+						                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "\n",
 						       MAJOR(block_device_devno(new_result)),
 						       MINOR(block_device_devno(new_result)),
 						       MAJOR(block_device_devno(self)),
@@ -272,7 +293,8 @@ block_device_autopart_impl(struct basic_block_device *__restrict self,
 				lba_max = (lba_t)-1;
 			if unlikely(lba_max > part_max) {
 				printk(KERN_WARNING "[blk] Partition #%u of %q expands past the end of the "
-				                    "disk (part:%#I64x...%#I64x,disk:%#I64x...%#I64x) (truncate it)\n",
+				                    "disk (part:%#" PRIx64 "...%#" PRIx64 ","
+				                    "disk:%#" PRIx64 "...%#" PRIx64 ") (truncate it)\n",
 				       i, self->bd_name,
 				       (u64)lba_min, (u64)lba_max,
 				       (u64)part_min, (u64)part_max);
@@ -309,7 +331,10 @@ load_normal_partition:
 				 *       (log a warning, and indicate that the
 				 *        active partition cannot be determined) */
 				if (result != (REF struct block_device_partition *)-1) {
-					printk(KERN_WARNING "[blk] Secondary active partition %.2x:%.2x collides with %.2x:%.2x on %.2x:%.2x\n",
+					printk(KERN_WARNING "[blk] Secondary active partition "
+					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " collides with "
+					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " on "
+					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "\n",
 					       MAJOR(block_device_devno(new_result)),
 					       MINOR(block_device_devno(new_result)),
 					       MAJOR(block_device_devno(result)),
@@ -319,7 +344,9 @@ load_normal_partition:
 					decref(result);
 					result = (REF struct block_device_partition *)-1;
 				} else {
-					printk(KERN_WARNING "[blk] Three or more active partition %.2x:%.2x on %.2x:%.2x\n",
+					printk(KERN_WARNING "[blk] Three or more active partition "
+					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " on "
+					                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "\n",
 					       MAJOR(block_device_devno(new_result)),
 					       MINOR(block_device_devno(new_result)),
 					       MAJOR(block_device_devno(self)),
@@ -355,7 +382,9 @@ block_device_autopart(struct basic_block_device *__restrict self)
 		 * In that case, simply ignore any possible active partition. */
 		if (ATOMIC_READ(vfs_kernel.p_inode) != NULL)
 			goto do_decref_active_part;
-		printk(FREESTR(KERN_INFO "[boot] Found boot partition: %.2x:%.2x (%q)\n"),
+		printk(FREESTR(KERN_INFO "[boot] Found boot partition: "
+		                         "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+		                         "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n"),
 		       MAJOR(active_part->bd_devlink.a_vaddr),
 		       MINOR(active_part->bd_devlink.a_vaddr),
 		       active_part->bd_name);
@@ -365,7 +394,9 @@ block_device_autopart(struct basic_block_device *__restrict self)
 do_decref_active_part:
 			decref_unlikely(active_part);
 		} else {
-			printk(FREESTR(KERN_WARNING "[boot] Ambigous boot partition: could be %.2x:%.2x (%q) or %.2x:%.2x (%q)\n"),
+			printk(FREESTR(KERN_WARNING "[boot] Ambigous boot partition: could be "
+			                            "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) or "
+			                            "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n"),
 			       MAJOR(active_part->bd_devlink.a_vaddr),
 			       MINOR(active_part->bd_devlink.a_vaddr),
 			       active_part->bd_name,

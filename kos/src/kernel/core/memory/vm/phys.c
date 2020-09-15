@@ -33,6 +33,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -386,9 +387,12 @@ NOTHROW(KCALL vm_memsetphys)(PHYS physaddr_t dst, int byte, size_t num_bytes) {
 #define ASSERT_ONEPAGE_RANGE(start, num_bytes, PAGESIZE)                                  \
 	assertf(!(num_bytes) ||                                                               \
 	        ((start) & ~((PAGESIZE)-1)) == (((start) + (num_bytes)-1) & ~((PAGESIZE)-1)), \
-	        "Address range %I64p...%I64p crosses a page boundry at %I64p",                \
-	        (u64)(start), (u64)(start) + (num_bytes)-1,                                   \
-	        (u64)((start) + (num_bytes)-1) & ~((PAGESIZE)-1))
+	        "Address range "                                                              \
+	        "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."                                        \
+	        "%" PRIpN(__SIZEOF_PHYSADDR_T__) " crosses a page boundry at "                \
+	        "%" PRIpN(__SIZEOF_PHYSADDR_T__),                                             \
+	        (physaddr_t)(start), (physaddr_t)(start) + (num_bytes)-1,                     \
+	        (physaddr_t)((start) + (num_bytes)-1) & ~((PAGESIZE)-1))
 
 
 

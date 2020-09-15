@@ -550,7 +550,7 @@ open_result_inode:
 						result_file->d_node   = (REF struct directory_node *)result_inode; /* Inherit reference */
 						result_file->d_path   = result_containing_path;                    /* Inherit reference */
 						result_file->d_dirent = result_containing_dirent;                  /* Inherit reference */
-						result_file->d_offset = 0;
+						atomic64_init(&result_file->d_offset, 0);
 						atomic_rwlock_init(&result_file->d_curlck);
 						result_file->d_curidx = 0;
 						result_file->d_curent = NULL;
@@ -570,7 +570,7 @@ open_result_inode:
 					result_file->f_node   = result_inode;                /* Inherit reference */
 					result_file->f_path   = result_containing_path;      /* Inherit reference */
 					result_file->f_dirent = result_containing_dirent;    /* Inherit reference */
-					result_file->f_offset = 0;
+					atomic64_init(&result_file->f_offset, 0);
 					atomic_rwlock_init(&result_file->f_curlck);
 					result_file->f_curidx = 0;
 					result_file->f_curent = NULL;

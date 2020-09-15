@@ -63,9 +63,9 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 	assert(index < SEGMENT_COUNT);
 	assert(index == (size_t)((struct FUNC(segment) *)ptr - SEGMENTS(self)));
 	assertf(BITSET(self)[_SLAB_SEGMENT_STATUS_WORD(index)] & SLAB_SEGMENT_STATUS_ALLOC_N(index),
-	        "Double free of %Iu-byte segment at %p, in page at %p\n"
-	        "index        = %Iu\n"
-	        "self->s_free = %Iu\n",
+	        "Double free of %" PRIuSIZ "-byte segment at %p, in page at %p\n"
+	        "index        = %" PRIuSIZ "\n"
+	        "self->s_free = %" PRIuSIZ,
 	        (size_t)SEGMENT_SIZE, ptr, self, index,
 	        (size_t)self->s_free);
 	assert(self->s_free < SEGMENT_COUNT);

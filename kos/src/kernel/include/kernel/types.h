@@ -30,6 +30,8 @@
 
 DECL_BEGIN
 
+#define __SIZEOF_PORT_T__ 2
+
 #ifdef __CC__
 #ifndef __port_t_defined
 #define __port_t_defined 1

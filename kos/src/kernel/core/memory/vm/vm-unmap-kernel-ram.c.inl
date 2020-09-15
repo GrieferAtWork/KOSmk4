@@ -33,6 +33,7 @@
 #include <sys/mmio.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "../corebase.h"
@@ -507,8 +508,8 @@ again:
 	        vm_node_getmin(node), vm_node_getmax(node));
 	assertf(part->dp_tree.a_vmin == 0,
 	        "Data parts must be allocated with offset=0 to be usable as RAM\n"
-	        "part->dp_tree.a_vmin = %I64u(%#I64x)\n"
-	        "part->dp_tree.a_vmax = %I64u(%#I64x)\n",
+	        "part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
+	        "part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n",
 	        (u64)part->dp_tree.a_vmin, (u64)part->dp_tree.a_vmin,
 	        (u64)part->dp_tree.a_vmax, (u64)part->dp_tree.a_vmax);
 

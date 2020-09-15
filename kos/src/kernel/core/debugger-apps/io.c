@@ -25,6 +25,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_APPS_IO_C
 #define GUARD_KERNEL_SRC_DEBUGGER_APPS_IO_C 1
 #define DISABLE_BRANCH_PROFILING 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -45,6 +46,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/keyboard.h>
 #include <sys/io.h>
 
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -110,7 +112,8 @@ DBG_COMMAND(inb,
 	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	val = inb((port_t)port);
-	dbg_printf(DBGSTR("inb %#.4I16x: %#.2I8x (%I8u)\n"), (u16)port, val, val);
+	dbg_printf(DBGSTR("inb %#.4" PRIxN(__SIZEOF_PORT_T__) ": %#.2" PRIx8 " (%" PRIu8 ")\n"),
+	          (port_t)port, val, val);
 	return (uintptr_t)val;
 }
 
@@ -125,7 +128,8 @@ DBG_COMMAND(inw,
 	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	val = inw((port_t)port);
-	dbg_printf(DBGSTR("inw %#.4I16x: %#.4I16x (%I16u)\n"), (u16)port, val, val);
+	dbg_printf(DBGSTR("inw %#.4" PRIxN(__SIZEOF_PORT_T__) ": %#.4" PRIx16 " (%" PRIu16 ")\n"),
+	           (port_t)port, val, val);
 	return (uintptr_t)val;
 }
 
@@ -140,7 +144,8 @@ DBG_COMMAND(inl,
 	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	val = inl((port_t)port);
-	dbg_printf(DBGSTR("inl %#.4I16x: %#.8I32x (%I32u)\n"), (u16)port, val, val);
+	dbg_printf(DBGSTR("inl %#.4" PRIxN(__SIZEOF_PORT_T__) ": %#.8" PRIx32 " (%" PRIu32 ")\n"),
+	           (port_t)port, val, val);
 	return (uintptr_t)val;
 }
 
@@ -153,7 +158,8 @@ DBG_COMMAND(outb,
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outb %#.4I16x, %#.2I8x (%I8u)\n"), (u16)port, (u8)val, (u8)val);
+	dbg_printf(DBGSTR("outb %#.4" PRIxN(__SIZEOF_PORT_T__) ", %#.2" PRIx8 " (%" PRIu8 ")\n"),
+	           (port_t)port, (u8)val, (u8)val);
 	outb((port_t)port, (u8)val);
 	return val;
 }
@@ -167,7 +173,8 @@ DBG_COMMAND(outw,
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outw %#.4I16x, %#.4I16x (%I16u)\n"), (u16)port, (u16)val, (u16)val);
+	dbg_printf(DBGSTR("outw %#.4" PRIxN(__SIZEOF_PORT_T__) ", %#.4" PRIx16 " (%" PRIu16 ")\n"),
+	           (port_t)port, (u16)val, (u16)val);
 	outw((port_t)port, (u16)val);
 	return val;
 }
@@ -181,7 +188,8 @@ DBG_COMMAND(outl,
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outl %#.4I16x, %#.8I32x (%I32u)\n"), (u16)port, (u32)val, (u32)val);
+	dbg_printf(DBGSTR("outl %#.4" PRIxN(__SIZEOF_PORT_T__) ", %#.8" PRIx32 " (%" PRIu32 ")\n"),
+	           (port_t)port, (u32)val, (u32)val);
 	outl((port_t)port, (u32)val);
 	return val;
 }
@@ -486,7 +494,7 @@ DBG_COMMAND(eval,
 		char *expr = argv[0];
 		if (!dbg_evalexpr(expr, &result))
 			return 1;
-		dbg_printf("%q: " AC_WHITE("%#Ix") " (" AC_WHITE("%Iu") ")\n",
+		dbg_printf("%q: " AC_WHITE("%#" PRIxSIZ) " (" AC_WHITE("%" PRIuSIZ) ")\n",
 		           expr, result, result);
 	}
 	return 0;

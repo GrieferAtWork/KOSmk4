@@ -47,6 +47,7 @@
 #include <kos/kernel/fpu-state32.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -268,7 +269,10 @@ x86_handle_device_not_available(struct icpustate *__restrict state) {
 		__clts();
 	} else {
 		struct fpustate *mystate;
-		printk(KERN_TRACE "Switch FPU context from task %p[pid=%u] to %p[pid=%u] [pc=%p]\n",
+		printk(KERN_TRACE "Switch FPU context from task "
+		                  "%p[pid=%" PRIuN(__SIZEOF_PID_T__) "] to "
+		                  "%p[pid=%" PRIuN(__SIZEOF_PID_T__) "] "
+		                  "[pc=%p]\n",
 		       old_task, old_task ? task_getroottid_of_s(old_task) : 0,
 		       new_task, task_getroottid_of_s(new_task),
 		       state->ics_irregs.ir_pip);

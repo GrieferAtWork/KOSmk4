@@ -33,6 +33,7 @@
 #include <network/packet.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -403,9 +404,9 @@ done_payload:
 		RETHROW();
 	}
 	assertf(self->npl_cnt == old_size + result,
-	        "self->npl_cnt = %Iu\n"
-	        "old_size      = %Iu\n"
-	        "result        = %Iu\n",
+	        "self->npl_cnt = %" PRIuSIZ "\n"
+	        "old_size      = %" PRIuSIZ "\n"
+	        "result        = %" PRIuSIZ "\n",
 	        self->npl_cnt, old_size, result);
 #ifndef NDEBUG
 	{

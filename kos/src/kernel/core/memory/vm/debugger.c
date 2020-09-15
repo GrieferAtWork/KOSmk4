@@ -195,7 +195,7 @@ DBG_COMMAND_AUTO(lsvm, DBG_HOOKFLAG_NORMAL,
 		} else {
 			dbg_printf(DBGSTR(" -> db:%p"), block);
 do_print_part_position:
-			dbg_printf(DBGSTR("@%I64x-%I64x"),
+			dbg_printf(DBGSTR("@%" PRIx64 "-%" PRIx64),
 			           (u64)vm_datapart_minbyte(part),
 			           (u64)vm_datapart_maxbyte(part));
 		}
@@ -211,7 +211,7 @@ do_print_part_position:
 				dbg_printf(DBGSTR(" @"
 				                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
 				                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"),
-				           (uintptr_t)physpage2addr(part->dp_ramdata.rd_block0.rb_start),
+				           physpage2addr(part->dp_ramdata.rd_block0.rb_start),
 				           maxphys);
 			} else {
 				size_t i;
@@ -219,9 +219,11 @@ do_print_part_position:
 				for (i = 0; i < part->dp_ramdata.rd_blockc; ++i) {
 					struct vm_ramblock *b;
 					b = &part->dp_ramdata.rd_blockv[i];
-					dbg_printf(DBGSTR("\tphys:%I64p-%I64p (%Iu pages)\n"),
-					           (u64)physpage2addr(b->rb_start),
-					           (u64)physpage2addr(b->rb_start + b->rb_size) - 1,
+					dbg_printf(DBGSTR("\tphys:"
+					                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "-"
+					                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) " (%" PRIuSIZ " pages)\n"),
+					           physpage2addr(b->rb_start),
+					           physpage2addr(b->rb_start + b->rb_size) - 1,
 					           (size_t)b->rb_size);
 				}
 			}

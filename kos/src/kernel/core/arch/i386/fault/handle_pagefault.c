@@ -395,7 +395,7 @@ x86_handle_pagefault(struct icpustate *__restrict state, uintptr_t ecode) {
 	pageid   = PAGEID_ENCODE(addr);
 	pageaddr = (void *)((uintptr_t)addr & ~PAGEMASK);
 #if 0
-	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#x]\n",
+	printk(KERN_DEBUG "Page fault at %p (page %p) [pc=%p,sp=%p] [ecode=%#" PRIxPTR "]\n",
 	       (uintptr_t)addr, pageaddr, pc, icpustate_getsp(state));
 #endif
 	if ((ecode & (X86_PAGEFAULT_ECODE_PRESENT | X86_PAGEFAULT_ECODE_USERSPACE)) == 0 &&
@@ -1189,7 +1189,7 @@ throw_segfault:
 			for (i = 2; i < EXCEPTION_DATA_POINTERS; ++i)
 				PERTASK_SET(this_exception_pointers[i], (uintptr_t)0);
 		}
-		printk(KERN_DEBUG "[segfault] PC-Fault at %p (page %p) [pc=%p,%p] [ecode=%#x]\n",
+		printk(KERN_DEBUG "[segfault] PC-Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
 		       addr, pageaddr, callsite_pc, icpustate_getpc(state), ecode);
 		goto do_unwind_state;
 	}
@@ -1225,7 +1225,7 @@ set_exception_pointers2:
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, (void *)pc);
 	pc = (uintptr_t)instruction_trysucc((void const *)pc, instrlen_isa_from_icpustate(state));
-	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#x]\n",
+	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
 	       addr, pageaddr, icpustate_getpc(state), pc, ecode);
 	icpustate_setpc(state, pc);
 do_unwind_state:

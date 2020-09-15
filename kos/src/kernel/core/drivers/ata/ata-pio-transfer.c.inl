@@ -260,7 +260,10 @@ LOCAL errr_t
 	} EXCEPT {
 		/* Must reset the bus, so-as to abort the current I/O operation. */
 		task_disconnectall();
-		printk(KERN_NOTICE "Reseting IDE to abort PIO-I/O operation (bus:%#I16x;ctrl:%#I16x;dma:%#I16x)\n",
+		printk(KERN_NOTICE "Reseting IDE to abort PIO-I/O operation ("
+		                   "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		                   "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		                   "dma:%#" PRIxN(__SIZEOF_PORT_T__) ")\n",
 		       bus->b_busio, bus->b_ctrlio, bus->b_dmaio);
 		Ata_ResetAndReinitializeBus(bus);
 		RETHROW();

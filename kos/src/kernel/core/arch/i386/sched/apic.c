@@ -206,7 +206,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	num_ticks /= HZ;
 	if unlikely(!num_ticks)
 		num_ticks = 1;
-	printk(/*FREESTR*/ (KERN_INFO "[apic] CPU #%u has a quantum length of %I32u units\n"),
+	printk(/*FREESTR*/ (KERN_INFO "[apic] CPU #%u has a quantum length of %" PRIu32 " units\n"),
 	       me->c_id, num_ticks);
 	/* TODO: If `num_ticks' differs from `FORCPU(&_bootcpu,_thiscpu_quantum_length)'
 	 *       by more than 1%, re-try the calibration up to 2 more times.
@@ -1000,7 +1000,7 @@ done_early_altcore_init:
 		num_ticks /= HZ;
 		if unlikely(!num_ticks)
 			num_ticks = 1;
-		printk(FREESTR(KERN_INFO "[apic] Boot CPU has a quantum length of %I32u units\n"), num_ticks);
+		printk(FREESTR(KERN_INFO "[apic] Boot CPU has a quantum length of %" PRIu32 " units\n"), num_ticks);
 
 		lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
 		lapic_write(APIC_TIMER,
@@ -1037,7 +1037,7 @@ done_early_altcore_init:
 			for (i = 1; i < _cpu_count; ++i) {
 				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8))))
 					continue;
-				printk(FREESTR(KERN_WARNING "[apic] Re-attempting startup of processor #%u (LAPIC id %#.2I8x)\n"),
+				printk(FREESTR(KERN_WARNING "[apic] Re-attempting startup of processor #%u (LAPIC id %#.2" PRIx8 ")\n"),
 				       i, FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
 				apic_send_startup(FORCPU(cpu_vector[i], thiscpu_x86_lapicid),
 				                  x86_smp_entry_page);
@@ -1061,7 +1061,7 @@ done_early_altcore_init:
 					++i;
 					continue;
 				}
-				printk(FREESTR(KERN_ERR "[apic] CPU with LAPIC id %#.2I8x doesn't want to "
+				printk(FREESTR(KERN_ERR "[apic] CPU with LAPIC id %#.2" PRIx8 " doesn't want to "
 				                        "come online (removing it from the configuration)\n"),
 				       i, FORCPU(_cpu_vector[i], thiscpu_x86_lapicid));
 				cpu_destroy(_cpu_vector[i]);

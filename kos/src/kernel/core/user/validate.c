@@ -23,21 +23,13 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
-#include <kernel/paging.h>
+#include <kernel/paging.h> /* ADDR_ISUSER, ADDRRANGE_ISUSER */
 #include <kernel/types.h>
 #include <kernel/user.h>
 
 #include <hybrid/overflow.h>
 
 DECL_BEGIN
-
-#ifdef KERNELSPACE_HIGHMEM
-#define VALID_USER_PTR(p)            ((uintptr_t)(p) < KERNELSPACE_BASE)
-#define VALID_USER_RANGE(start, end) ((uintptr_t)(end) <= KERNELSPACE_BASE)
-#else /* KERNELSPACE_HIGHMEM */
-#define VALID_USER_PTR(p)            ((uintptr_t)(p) >= KERNELSPACE_END)
-#define VALID_USER_RANGE(start, end) ((uintptr_t)(start) >= KERNELSPACE_END)
-#endif /* !KERNELSPACE_HIGHMEM */
 
 /* Validate user-pointers for being allowed to be used for the specified operations.
  * Since the kernel is allowed to access memory that is marked as `PROT_NOUSER',
@@ -49,7 +41,7 @@ PUBLIC void KCALL
 validate_user(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT) {
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UADD((uintptr_t)base, num_bytes, &endaddr) ||
-	            !VALID_USER_RANGE(base, endaddr)) {
+	            !ADDRRANGE_ISUSER(base, endaddr)) {
 		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE);
 	}
 }
@@ -60,7 +52,7 @@ validate_userm(UNCHECKED USER void const *base, size_t num_items, size_t item_si
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UMUL(num_items, item_size_in_bytes, &total_size) ||
 	            OVERFLOW_UADD((uintptr_t)base, total_size, &endaddr) ||
-	            !VALID_USER_RANGE(base, endaddr)) {
+	            !ADDRRANGE_ISUSER(base, endaddr)) {
 		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE);
 	}
 }
@@ -74,7 +66,7 @@ PUBLIC void KCALL
 validate_writable(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT) {
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UADD((uintptr_t)base, num_bytes, &endaddr) ||
-	            !VALID_USER_RANGE(base, endaddr)) {
+	            !ADDRRANGE_ISUSER(base, endaddr)) {
 		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING);
 	}
 }
@@ -85,18 +77,18 @@ validate_writablem(UNCHECKED USER void *base, size_t num_items, size_t item_size
 	uintptr_t endaddr;
 	if unlikely(OVERFLOW_UMUL(num_items, item_size_in_bytes, &total_size) ||
 	            OVERFLOW_UADD((uintptr_t)base, total_size, &endaddr) ||
-	            !VALID_USER_RANGE(base, endaddr)) {
+	            !ADDRRANGE_ISUSER(base, endaddr)) {
 		THROW(E_SEGFAULT_UNMAPPED, base, E_SEGFAULT_CONTEXT_USERCODE | E_SEGFAULT_CONTEXT_WRITING);
 	}
 }
 
 PUBLIC void KCALL
 validate_executable(UNCHECKED USER void const *base) THROWS(E_SEGFAULT) {
-	if unlikely(!VALID_USER_PTR(base))
+	if unlikely(!ADDR_ISUSER(base))
 		THROW(E_SEGFAULT_NOTEXECUTABLE, base, E_SEGFAULT_CONTEXT_USERCODE);
 }
 
-#ifdef KERNELSPACE_HIGHMEM
+#ifndef KERNELSPACE_LOWMEM
 DEFINE_PUBLIC_ALIAS(validate_readable_opt, validate_readable);
 DEFINE_PUBLIC_ALIAS(validate_readablem_opt, validate_readablem);
 DEFINE_PUBLIC_ALIAS(validate_writable_opt, validate_writable);
@@ -104,40 +96,49 @@ DEFINE_PUBLIC_ALIAS(validate_writablem_opt, validate_writablem);
 DEFINE_PUBLIC_ALIAS(validate_executable_opt, validate_executable);
 DEFINE_PUBLIC_ALIAS(validate_readwrite_opt, validate_readwrite);
 DEFINE_PUBLIC_ALIAS(validate_readwritem_opt, validate_readwritem);
-#else /* KERNELSPACE_HIGHMEM */
+#else /* KERNELSPACE_LOWMEM */
 
 PUBLIC void KCALL
-validate_readable_opt(UNCHECKED USER void const *base, size_t num_bytes) THROWS(E_SEGFAULT) {
+validate_readable_opt(UNCHECKED USER void const *base,
+                      size_t num_bytes) THROWS(E_SEGFAULT) {
 	if (base)
 		validate_readable(base, num_bytes);
 }
 
 PUBLIC void KCALL
-validate_readablem_opt(UNCHECKED USER void const *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
+validate_readablem_opt(UNCHECKED USER void const *base,
+                       size_t num_items,
+                       size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
 	if (base)
 		validate_readablem(base, num_items, item_size_in_bytes);
 }
 
 PUBLIC void KCALL
-validate_writable_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT) {
+validate_writable_opt(UNCHECKED USER void *base,
+                      size_t num_bytes) THROWS(E_SEGFAULT) {
 	if (base)
 		validate_writable(base, num_bytes);
 }
 
 PUBLIC void KCALL
-validate_writablem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
+validate_writablem_opt(UNCHECKED USER void *base,
+                       size_t num_items,
+                       size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
 	if (base)
 		validate_writablem(base, num_items, item_size_in_bytes);
 }
 
 PUBLIC void KCALL
-validate_readwrite_opt(UNCHECKED USER void *base, size_t num_bytes) THROWS(E_SEGFAULT) {
+validate_readwrite_opt(UNCHECKED USER void *base,
+                       size_t num_bytes) THROWS(E_SEGFAULT) {
 	if (base)
 		validate_readwrite(base, num_bytes);
 }
 
 PUBLIC void KCALL
-validate_readwritem_opt(UNCHECKED USER void *base, size_t num_items, size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
+validate_readwritem_opt(UNCHECKED USER void *base,
+                        size_t num_items,
+                        size_t item_size_in_bytes) THROWS(E_SEGFAULT) {
 	if (base)
 		validate_readwritem(base, num_items, item_size_in_bytes);
 }
@@ -148,7 +149,7 @@ validate_executable_opt(UNCHECKED USER void const *base) THROWS(E_SEGFAULT) {
 		validate_executable(base);
 }
 
-#endif /* !KERNELSPACE_HIGHMEM */
+#endif /* !KERNELSPACE_LOWMEM */
 
 
 DECL_END

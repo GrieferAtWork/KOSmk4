@@ -37,6 +37,7 @@
 #include <hybrid/align.h>
 #include <hybrid/unaligned.h>
 
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -136,7 +137,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		printk(FREESTR(KERN_DEBUG "[smp] MpFloatingPointerStructure not found\n"));
 		return;
 	}
-	printk(FREESTR(KERN_DEBUG "[smp] MpFloatingPointerStructure located at %p (v1.%I8u; defcfg %I8u)\n"),
+	printk(FREESTR(KERN_DEBUG "[smp] MpFloatingPointerStructure located at %p (v1.%" PRIu8 "; defcfg %" PRIu8 ")\n"),
 	       ((uintptr_t)fps - KERNEL_CORE_BASE), fps->mp_specrev, fps->mp_defcfg);
 	if (fps->mp_defcfg) {
 		/* Default configuration. */
@@ -186,20 +187,21 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 				if (entry->mp_processor.p_cpuflag &
 				    (MP_PROCESSOR_FENABLED | MP_PROCESSOR_FBOOTPROCESSOR)) {
 					if (entry->mp_processor.p_cpuflag & MP_PROCESSOR_FBOOTPROCESSOR) {
-						printk(FREESTR(KERN_INFO "[smp] Found boot processor with lapic id %#.2I8x\n"),
+						printk(FREESTR(KERN_INFO "[smp] Found boot processor with lapic id %#.2" PRIx8 "\n"),
 						       entry->mp_processor.p_lapicid);
 						FORCPU(&_bootcpu, _thiscpu_x86_lapicid) = entry->mp_processor.p_lapicid;
 					}
 #ifndef CONFIG_NO_SMP
 					else if unlikely(_cpu_count >= x86_config_max_cpu_count) {
-						printk(FREESTR(KERN_WARNING "[smp] Cannot configure additional Processor with lapic id %#.2I8x\n"),
+						printk(FREESTR(KERN_WARNING "[smp] Cannot configure additional "
+						                            "processor with lapic id %#.2" PRIx8 "\n"),
 						       entry->mp_processor.p_lapicid);
 					} else {
 						/* Remember this additional CPU's LAPIC id.
 						 * NOTE: The CPU controller itself will then be allocated and initialized
 						 *       later on. - For right now, we only save its LAPIC id where its
 						 *       controller point will go later (s.a. `x86_initialize_apic()'). */
-						printk(FREESTR(KERN_INFO "[smp] Found secondary processor #%u with lapic id %#.2I8x\n"),
+						printk(FREESTR(KERN_INFO "[smp] Found secondary processor #%u with lapic id %#.2" PRIx8 "\n"),
 						       _cpu_count, entry->mp_processor.p_lapicid);
 						/* This entry will later be replaced by a proper `struct cpu' structure! */
 						_cpu_vector[_cpu_count] = (struct cpu *)(uintptr_t)(((u16)entry->mp_processor.p_lapicid) |
@@ -213,7 +215,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 
 			case MPCFG_IOAPIC:
 				if (entry->mp_ioapic.io_flags & MP_IOAPIC_FENABLED) {
-					printk(FREESTR(KERN_INFO "[smp] IoApic %#.2I8x:%#.2I8x found at %#.8I32x\n"),
+					printk(FREESTR(KERN_INFO "[smp] IoApic %#.2" PRIx8 ":%#.2" PRIx8 " found at %#.8" PRIx32 "\n"),
 					       entry->mp_ioapic.io_apicid,
 					       entry->mp_ioapic.io_apicver,
 					       entry->mp_ioapic.io_apicaddr);

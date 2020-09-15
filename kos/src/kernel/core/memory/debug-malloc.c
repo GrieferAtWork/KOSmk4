@@ -65,6 +65,7 @@
 
 #include <assert.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -137,9 +138,9 @@ DECL_END
 	/* TODO: Also print the node's traceback. */                                                                 \
 	PANIC_CALL("The pointer %p passed to kmalloc_usable_size() isn't the malloc base address of node %p...%p\n", \
 	           pointer, (node)->m_tree.a_vmin, (node)->m_tree.a_vmax)
-#define PANIC_SIZEOF_NODES_MISSMATCH(node, pointer, expected, found) \
-	/* TODO: Also print the node's traceback. */                                                         \
-	PANIC_CALL("Corrupted size field of malloc-pointer %p (node %p...%p) (is %Iu, but should be %Iu)\n", \
+#define PANIC_SIZEOF_NODES_MISSMATCH(node, pointer, expected, found)                                                       \
+	/* TODO: Also print the node's traceback. */                                                                           \
+	PANIC_CALL("Corrupted size field of malloc-pointer %p (node %p...%p) (is %" PRIuSIZ ", but should be %" PRIuSIZ ")\n", \
 	           pointer, (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, found, expected)
 #define PANIC_INVALID_MALL_POINTER_WITH_CALLER_TRACEBACK(pointer) \
 	PANIC_CALL("Invalid mall pointer: %p\n", pointer)
@@ -947,7 +948,7 @@ NOTHROW(KCALL slab_unreachable_segment)(void *base, size_t num_bytes) {
 	}
 	/* Slabs are always small, to to help at least a little bit, also dump the
 	 * contents of leaked blocks. - Those might still be (somewhat) useful... */
-	printk(KERN_RAW "slab: Leaked %Iu bytes of heap-memory at %p...%p\n"
+	printk(KERN_RAW "slab: Leaked %" PRIuSIZ " bytes of heap-memory at %p...%p\n"
 	                "%$[hex]\n",
 	       num_bytes, base, (byte_t *)base + num_bytes - 1,
 	       num_bytes, base);
@@ -1425,7 +1426,7 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 		 * The recursion takes place because we keep scanning until nothing new shows up. */
 		do {
 			num_found = scan_reachable(mall_tree);
-			PRINT_LEAKS_SEARCH_PHASE("Phase #5: Reached %Iu pointers\n", num_found);
+			PRINT_LEAKS_SEARCH_PHASE("Phase #5: Reached %" PRIuSIZ " pointers\n", num_found);
 		} while (num_found);
 	}
 }
@@ -1445,7 +1446,7 @@ again:
 			                 instruction_trypred(node->m_trace[0],
 			                                     INSTRLEN_ISA_DEFAULT),
 			                 node->m_trace[0],
-			                 "Leaked %Iu bytes of heap-memory at %p...%p [tid=%u]",
+			                 "Leaked %" PRIuSIZ " bytes of heap-memory at %p...%p [tid=%u]",
 			                 MALLNODE_SIZE(node),
 			                 MALLNODE_MIN(node), MALLNODE_MAX(node),
 			                 node->m_tracetid);
@@ -1454,7 +1455,7 @@ again:
 			                 instruction_trypred(node->m_trace[0],
 			                                     INSTRLEN_ISA_DEFAULT),
 			                 node->m_trace[0],
-			                 "Leaked %Iu bytes of kmalloc-memory at %p...%p [tid=%u]",
+			                 "Leaked %" PRIuSIZ " bytes of kmalloc-memory at %p...%p [tid=%u]",
 			                 MALLNODE_SIZE(node) - (CONFIG_MALL_PREFIX_SIZE +
 			                                        CONFIG_MALL_HEAD_SIZE +
 			                                        CONFIG_MALL_TAIL_SIZE),
@@ -1707,7 +1708,7 @@ NOTHROW(KCALL mallnode_print_traceback)(struct mallnode *__restrict self,
 			                 "Called here");
 		} else {
 			addr2line_printf(printer, arg, prev_pc, pc,
-			                 "Allocated from here [tid=%u]",
+			                 "Allocated from here [tid=%" PRIuN(__SIZEOF_PID_T__) "]",
 			                 self->m_tracetid);
 		}
 	}
@@ -1726,7 +1727,10 @@ NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 	                  CONFIG_MALL_HEAD_SIZE +
 	                  CONFIG_MALL_TAIL_SIZE)) {
 		printk(KERN_CRIT
-		       "\n\nCorrupted MALL header in at %p (offset %Id from %p...%p) (expected %Iu as user-size, but got %Iu)\n",
+		       "\n"
+		       "\n"
+		       "Corrupted MALL header in at %p (offset %" PRIdSIZ " from %p...%p) "
+		       "(expected %" PRIuSIZ " as user-size, but got %" PRIuSIZ ")\n",
 		       base, -(ssize_t)(CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_PREFIX_SIZE),
 		       self->m_tree.a_vmin + CONFIG_MALL_HEAD_SIZE,
 		       self->m_tree.a_vmax + 1 - CONFIG_MALL_TAIL_SIZE,
@@ -1749,7 +1753,7 @@ NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 			while (*(u8 *)base == ((u8 *)&word)[(uintptr_t)base & 3])
 				++*(uintptr_t *)&base;
 			printk(KERN_CRIT
-			       "\n\nCorrupted MALL header in at %p (offset %Id from %p...%p)\n",
+			       "\n\nCorrupted MALL header in at %p (offset %" PRIdSIZ " from %p...%p)\n",
 			       base,
 			       (uintptr_t)base -
 			       (self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE +
@@ -1775,7 +1779,10 @@ NOTHROW(KCALL mallnode_verify_padding)(struct mallnode *__restrict self) {
 			while (*(u8 *)base == ((u8 *)&word)[(uintptr_t)base & 3])
 				base = (u32 *)((byte_t *)base + 1);
 			printk(KERN_CRIT
-			       "\n\nCorrupted MALL tail in at %p (offset %Id from %p...%p; offset %Iu from end of usable memory)\n",
+			       "\n"
+			       "\n"
+			       "Corrupted MALL tail in at %p (offset %" PRIdSIZ " from %p...%p; "
+			       "offset %" PRIuSIZ " from end of usable memory)\n",
 			       base,
 			       (uintptr_t)base -
 			       (self->m_tree.a_vmin + (CONFIG_MALL_HEAD_SIZE +
@@ -2140,13 +2147,13 @@ NOTHROW(KCALL heap_truncate)(struct heap *__restrict self, void *base,
                              size_t old_size, size_t new_size, gfp_t free_flags) {
 	size_t free_bytes;
 	assertf(!old_size || old_size >= HEAP_MINSIZE,
-	        "Invalid heap_truncate(): Too few bytes (%Iu < %Iu)",
+	        "Invalid heap_truncate(): Too few bytes (%" PRIuSIZ " < %" PRIuSIZ ")",
 	        old_size, HEAP_MINSIZE);
 	assertf(!old_size || IS_ALIGNED((uintptr_t)base, HEAP_ALIGNMENT),
 	        "Invalid heap_truncate(): Unaligned base pointer %p",
 	        base);
 	assertf(IS_ALIGNED(old_size, HEAP_ALIGNMENT),
-	        "Invalid heap_truncate(): Unaligned old_size size %Iu (%#Ix)",
+	        "Invalid heap_truncate(): Unaligned old_size size %" PRIuSIZ " (%#" PRIxSIZ ")",
 	        old_size, old_size);
 	if unlikely(OVERFLOW_UADD(new_size, (size_t)(HEAP_ALIGNMENT - 1), &new_size))
 		goto return_old_size;
@@ -2225,6 +2232,7 @@ DECL_END
 #ifndef __INTELLISENSE__
 #define MALLOC_NX 1
 #include "debug-malloc-impl.c.inl"
+/**/
 #include "debug-malloc-impl.c.inl"
 #endif /* !__INTELLISENSE__ */
 

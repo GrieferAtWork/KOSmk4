@@ -41,6 +41,7 @@
 #include <sys/io.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -275,7 +276,7 @@ NOTHROW(FCALL x86_serve_ipi)(struct icpustate *__restrict state) {
 #endif /* !NDEBUG */
 			ATOMIC_FETCHAND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
 			/* Execute the IPI callback. */
-			IPI_DEBUG("x86_serve_ipi:%p [slot=%u,i=%u,mask=%#Ix]\n",
+			IPI_DEBUG("x86_serve_ipi:%p [slot=%u,i=%u,mask=%#" PRIxPTR "]\n",
 			          ipi.pi_func, slot, i, mask);
 			new_state = (*ipi.pi_func)(state, ipi.pi_args);
 			if (CPU_IPI_MODE_ISSPECIAL(new_state)) {
@@ -362,7 +363,7 @@ again_i:
 		if (i == 0 && word == 0) {
 			if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING) {
 				/* Indicate that the IPI is now ready for handling by the core. */
-				IPI_DEBUG("cpu_sendipi:ipi_first [slot=%u,i=%u,mask=%#Ix]\n", slot, i, mask);
+				IPI_DEBUG("cpu_sendipi:ipi_first [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
 				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_send_ipi:
 				IPI_DEBUG("cpu_sendipi:do_send_ipi\n");
@@ -383,7 +384,7 @@ do_send_ipi:
 				}
 			} else if (flags & CPU_IPI_FWAKEUP) {
 				/* Indicate that the IPI is now ready for handling by the core. */
-				IPI_DEBUG("cpu_sendipi:ipi_wakeup [slot=%u,i=%u,mask=%#Ix]\n", slot, i, mask);
+				IPI_DEBUG("cpu_sendipi:ipi_wakeup [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
 				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_wake_target:
 				IPI_DEBUG("cpu_sendipi:cpu_wake\n");
@@ -395,7 +396,7 @@ do_wake_target:
 			}
 		} else {
 			/* Indicate that the IPI is now ready for handling by the core. */
-			IPI_DEBUG("cpu_sendipi:ipi_secondary [slot=%u,i=%u,mask=%#Ix]\n", slot, i, mask);
+			IPI_DEBUG("cpu_sendipi:ipi_secondary [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
 			ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 			if (flags & CPU_IPI_FWAITFOR) {
 				/* Must still synchronize with the target CPU's reception of the IPI... */
@@ -472,7 +473,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL cpu_wake)(struct cpu *__restrict target) {
 	for (;;) {
 		u16 state = ATOMIC_READ(target->c_state);
-		IPI_DEBUG("cpu_wake:%I16u\n", state);
+		IPI_DEBUG("cpu_wake:%" PRIu16 "\n", state);
 		switch (state) {
 
 		case CPU_STATE_DREAMING:

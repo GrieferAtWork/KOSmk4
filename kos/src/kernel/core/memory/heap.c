@@ -45,6 +45,7 @@
 #include <hybrid/sequence/list.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -122,19 +123,19 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 
 
 #if !defined(NDEBUG) && 0
-#define HEAP_ADD_DANGLE(self, count)                             \
-	(((count) && (self) == &kernel_locked_heap)                  \
-	 ? printk(KERN_RAW "%s(%d) : Add dangle %Iu + %Iu -> %Iu\n", \
-	          __FILE__, __LINE__, (self)->h_dangle,              \
-	          count, (self)->h_dangle + (count))                 \
-	 : (void)0,                                                  \
+#define HEAP_ADD_DANGLE(self, count)                                                        \
+	(((count) && (self) == &kernel_locked_heap)                                             \
+	 ? printk(KERN_RAW "%s(%d) : Add dangle %" PRIuSIZ " + %" PRIuSIZ " -> %" PRIuSIZ "\n", \
+	          __FILE__, __LINE__, (self)->h_dangle,                                         \
+	          count, (self)->h_dangle + (count))                                            \
+	 : (void)0,                                                                             \
 	 ATOMIC_FETCHADD((self)->h_dangle, count))
-#define HEAP_SUB_DANGLE(self, count)                             \
-	(((count) && (self) == &kernel_locked_heap)                  \
-	 ? printk(KERN_RAW "%s(%d) : Sub dangle %Iu - %Iu -> %Iu\n", \
-	          __FILE__, __LINE__, (self)->h_dangle,              \
-	          count, (self)->h_dangle - (count))                 \
-	 : (void)0,                                                  \
+#define HEAP_SUB_DANGLE(self, count)                                                        \
+	(((count) && (self) == &kernel_locked_heap)                                             \
+	 ? printk(KERN_RAW "%s(%d) : Sub dangle %" PRIuSIZ " - %" PRIuSIZ " -> %" PRIuSIZ "\n", \
+	          __FILE__, __LINE__, (self)->h_dangle,                                         \
+	          count, (self)->h_dangle - (count))                                            \
+	 : (void)0,                                                                             \
 	 ATOMIC_FETCHSUB((self)->h_dangle, count))
 #else /* !NDEBUG */
 #define HEAP_ADD_DANGLE(self,count) ATOMIC_FETCHADD((self)->h_dangle,count)
@@ -338,7 +339,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	if (!sync_tryread(&self->h_lock))
 		return;
 #if 0
-	printk(KERN_TRACE "[heap] Begin validate %p (%Iu, from %p)\n",
+	printk(KERN_TRACE "[heap] Begin validate %p (%" PRIuSIZ ", from %p)\n",
 	       self, self->h_lock.arw_lock, THIS_TASK);
 #endif
 	for (i = 0; i < COMPILER_LENOF(self->h_size); ++i) {
@@ -353,19 +354,22 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        piter, (uintptr_t)piter + sizeof(void *) - 1, iter, piter);
 			assertf(iter->mf_size >= HEAP_MINSIZE,
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Free node at %p is too small (%Iu=%#Ix bytes) (size bucket %Iu/%Iu)\n",
+			        "Free node at %p is too small (%" PRIuSIZ "=%#" PRIxSIZ " bytes) "
+			        "(size bucket %" PRIuSIZ "/%" PRIuSIZ ")\n",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
 			        iter, iter->mf_size, iter->mf_size, i, COMPILER_LENOF(self->h_size));
 			assertf((uintptr_t)iter + iter->mf_size > (uintptr_t)iter,
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Free node at %p is too large (%Iu=%#Ix bytes) (size bucket %Iu/%Iu)\n"
+			        "Free node at %p is too large (%" PRIuSIZ "=%#" PRIxSIZ " bytes) "
+			        "(size bucket %" PRIuSIZ "/%" PRIuSIZ ")\n"
 			        "PHYS: %I64p",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
 			        iter, iter->mf_size, iter->mf_size, i, COMPILER_LENOF(self->h_size),
 			        (u64)pagedir_translate(&iter->mf_size));
 			assertf(IS_ALIGNED(iter->mf_size, HEAP_ALIGNMENT),
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Size of free node at %p...%p (%Iu=%#Ix bytes) isn't aligned by `HEAP_ALIGNMENT'",
+			        "Size of free node at %p...%p (%" PRIuSIZ "=%#" PRIxSIZ " bytes) "
+			        "isn't aligned by `HEAP_ALIGNMENT'",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
 			        MFREE_MIN(iter), MFREE_MAX(iter), iter->mf_size, iter->mf_size);
 			assertf(!(iter->mf_flags & ~MFREE_FMASK),
@@ -393,7 +397,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        MFREE_MIN(iter), MFREE_MAX(iter), piter, iter->mf_lsize.ln_pself);
 			assertf(iter->mf_szchk == mfree_get_checksum(iter),
 			        "\tPotential USE-AFTER-FREE of <%p...%p> or %p\n"
-			        "Invalid checksum in free node %p...%p (expected %#.2I8x, but got %#.2I8x)",
+			        "Invalid checksum in free node %p...%p (expected %#.2" PRIx8 ", but got %#.2" PRIx8 ")",
 			        (uintptr_t)&iter->mf_size, (uintptr_t)(&iter->mf_size + 1) - 1,
 			        (uintptr_t)&iter->mf_szchk,
 			        MFREE_MIN(iter), MFREE_MAX(iter),
@@ -413,9 +417,9 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 				kernel_panic("%$[hex]\n"
 				             "\tIllegal USE-AFTER-FREE of <%p>\n"
 				             "Free node:     %p...%p\n"
-				             "Node offset:   %Iu (%#Ix)\n"
-				             "Expected byte: %.2I8x\n"
-				             "Found byte:    %.2I8x",
+				             "Node offset:   %" PRIuSIZ " (%#" PRIxSIZ ")\n"
+				             "Expected byte: %.2" PRIx8 "\n"
+				             "Found byte:    %.2" PRIx8,
 				             (size_t)((size_t)16 + 2 * (size_t)((u8 *)faulting_address - fault_start)), fault_start,
 				             faulting_address,
 				             MFREE_MIN(iter), MFREE_MAX(iter),
@@ -427,7 +431,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 		}
 	}
 #if 0
-	printk(KERN_TRACE "[heap] End validate %p (%Iu, from %p)\n",
+	printk(KERN_TRACE "[heap] End validate %p (%" PRIuSIZ ", from %p)\n",
 	       self, self->h_lock.arw_lock, THIS_TASK);
 #endif
 	sync_endread(&self->h_lock);
@@ -703,13 +707,13 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 #endif /* CONFIG_DEBUG_HEAP */
 	HEAP_ASSERTF(num_bytes >= HEAP_MINSIZE,
-	             "Invalid heap_free(): Too few bytes (%Iu < %Iu)",
+	             "Invalid heap_free(): Too few bytes (%" PRIuSIZ " < %" PRIuSIZ ")",
 	             num_bytes, HEAP_MINSIZE);
 	HEAP_ASSERTF(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT),
 	             "Invalid heap_free(): Unaligned base pointer %p",
 	             ptr);
 	HEAP_ASSERTF(IS_ALIGNED(num_bytes, HEAP_ALIGNMENT),
-	             "Invalid heap_free(): Unaligned free size %Iu (%#Ix)",
+	             "Invalid heap_free(): Unaligned free size %" PRIuSIZ " (%#" PRIxSIZ ")",
 	             num_bytes, num_bytes);
 	HEAP_ASSERTF(((uintptr_t)ptr + num_bytes) > (uintptr_t)ptr,
 	             "Address space overflow when freeing %p...%p",
@@ -950,7 +954,7 @@ load_new_slot:
 				}
 #endif /* CONFIG_DEBUG_HEAP */
 			}
-			PRINTK_SYSTEM_ALLOCATION("[heap] Release kernel heap: [%p+%#Ix head] %p...%p [%p+%#Ix tail]\n",
+			PRINTK_SYSTEM_ALLOCATION("[heap] Release kernel heap: [%p+%#" PRIxSIZ " head] %p...%p [%p+%#" PRIxSIZ " tail]\n",
 			                         hkeep, hkeep_size,
 			                         (byte_t *)free_minaddr,
 			                         (byte_t *)free_endaddr - 1,
@@ -1007,15 +1011,15 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL heap_free_untraced)(struct heap *__restrict self,
                                   VIRT void *ptr, size_t num_bytes,
                                   gfp_t flags) {
-	TRACE("heap_free_untraced(%p,%p,%Iu,%#x)\n", self, ptr, num_bytes, flags);
+	TRACE("heap_free_untraced(%p,%p,%" PRIuSIZ ",%#x)\n", self, ptr, num_bytes, flags);
 	HEAP_ASSERTF(num_bytes >= HEAP_MINSIZE,
-	             "Invalid heap_free(): Too few bytes (%Iu < %Iu)",
+	             "Invalid heap_free(): Too few bytes (%" PRIuSIZ " < %" PRIuSIZ ")",
 	             num_bytes, HEAP_MINSIZE);
 	HEAP_ASSERTF(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT),
 	             "Invalid heap_free(): Unaligned base pointer %p",
 	             ptr);
 	HEAP_ASSERTF(IS_ALIGNED(num_bytes, HEAP_ALIGNMENT),
-	             "Invalid heap_free(): Unaligned free size %Iu (%#Ix)",
+	             "Invalid heap_free(): Unaligned free size %" PRIuSIZ " (%#" PRIxSIZ ")",
 	             num_bytes, num_bytes);
 	/* Reset debug information. */
 #ifdef CONFIG_DEBUG_HEAP
@@ -1030,16 +1034,16 @@ NOTHROW(KCALL heap_truncate_untraced)(struct heap *__restrict self,
                                       void *base, size_t old_size,
                                       size_t new_size, gfp_t free_flags) {
 	size_t free_bytes;
-	TRACE("heap_truncate_untraced(%p,%p,%Iu,%Iu,%#x)\n",
+	TRACE("heap_truncate_untraced(%p,%p,%" PRIuSIZ ",%" PRIuSIZ ",%#x)\n",
 	      self, base, old_size, new_size, flags);
 	HEAP_ASSERTF(!old_size || old_size >= HEAP_MINSIZE,
-	             "Invalid heap_truncate(): Too few bytes (%Iu < %Iu)",
+	             "Invalid heap_truncate(): Too few bytes (%" PRIuSIZ " < %" PRIuSIZ ")",
 	             old_size, HEAP_MINSIZE);
 	HEAP_ASSERTF(!old_size || IS_ALIGNED((uintptr_t)base, HEAP_ALIGNMENT),
 	             "Invalid heap_truncate(): Unaligned base pointer %p",
 	             base);
 	HEAP_ASSERTF(IS_ALIGNED(old_size, HEAP_ALIGNMENT),
-	             "Invalid heap_truncate(): Unaligned old_size size %Iu (%#Ix)",
+	             "Invalid heap_truncate(): Unaligned old_size size %" PRIuSIZ " (%#" PRIxSIZ ")",
 	             old_size, old_size);
 	if unlikely(OVERFLOW_UADD(new_size, (size_t)(HEAP_ALIGNMENT - 1), &new_size))
 		goto return_old_size;
@@ -1093,7 +1097,7 @@ again:
 		chain = *iter;
 		while (chain &&
 		       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
-		                     "MFREE_SIZE(chain) = %#Ix",
+		                     "MFREE_SIZE(chain) = %#" PRIxSIZ,
 		                     MFREE_SIZE(chain)),
 		        MFREE_SIZE(chain) < threshold))
 			chain = LLIST_NEXT(chain, mf_lsize);

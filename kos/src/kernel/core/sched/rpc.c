@@ -49,6 +49,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -293,7 +294,7 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 	uintptr_t rpc_mode;
 	struct rpc_entry *next;
 	assertf(!(priority & ~TASK_WAKE_FMASK),
-	        "priority = %#Ix", priority);
+	        "priority = %#" PRIxPTR, priority);
 	target_flags = ATOMIC_READ(target->t_flags);
 
 	/* Check if the target thread is currently -, or has already terminated. */

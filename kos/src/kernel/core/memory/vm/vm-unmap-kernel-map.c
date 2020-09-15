@@ -27,6 +27,7 @@
 #include <kernel/vm.h>
 
 #include <assert.h>
+#include <inttypes.h>
 
 #include "vm-nodeapi.h"
 
@@ -46,7 +47,7 @@ NOTHROW(FCALL vm_unmap_kernel_mapping_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void
 	assertf(((uintptr_t)addr & PAGEMASK) == 0,
 	        "Badly aligned addr:%p", addr);
 	assertf((num_bytes & PAGEMASK) == 0,
-	        "Badly aligned num_bytes:%#Ix",
+	        "Badly aligned num_bytes:%#" PRIxSIZ,
 	        num_bytes);
 	if unlikely(!num_bytes)
 		return;
@@ -77,8 +78,9 @@ NOTHROW(FCALL vm_unmap_kernel_mapping_locked)(PAGEDIR_PAGEALIGNED UNCHECKED void
 		assertf((node->vn_flags & (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE)) ==
 		        /*             */ (VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE),
 		        "node: %p...%p\n"
-		        "node->vn_flags = %#Ix\n",
-		        vm_node_getmin(node), vm_node_getmax(node),
+		        "node->vn_flags = %#" PRIxSIZ,
+		        vm_node_getmin(node),
+		        vm_node_getmax(node),
 		        node->vn_flags);
 		next = VM_NODE_NEXT(node);
 		assert(vm_node_getminpageid(node) >= minpageid);

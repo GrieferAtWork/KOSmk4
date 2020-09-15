@@ -78,24 +78,30 @@ NOTHROW(KCALL do_trace_external)(char const *method,
 #endif /* NDEBUG */
 
 
-#define TRACE_ALLOC(zone, min, max)                                        \
-	(TRACE_EXTERNAL("alloc", min, max),                                    \
-	 PRINT_ALLOCATION("Allocate physical ram "                             \
-	                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."               \
-	                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) " [%Iu-%Iu=%Iu]\n", \
-	                  physpage2addr(min),                                  \
-	                  physpage2addr((max) + 1) - 1,                        \
-	                  (zone)->mz_cfree + (((max) - (min)) + 1),            \
+#define TRACE_ALLOC(zone, min, max)                             \
+	(TRACE_EXTERNAL("alloc", min, max),                         \
+	 PRINT_ALLOCATION("Allocate physical ram "                  \
+	                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."    \
+	                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) " ["     \
+	                  "%" PRIuN(__SIZEOF_PHYSPAGE_T__) "-"      \
+	                  "%" PRIuN(__SIZEOF_PHYSPAGE_T__) "="      \
+	                  "%" PRIuN(__SIZEOF_PHYSPAGE_T__) "]\n",   \
+	                  physpage2addr(min),                       \
+	                  physpage2addr((max) + 1) - 1,             \
+	                  (zone)->mz_cfree + (((max) - (min)) + 1), \
 	                  ((max) - (min)) + 1, (zone)->mz_cfree))
-#define TRACE_FREE(zone, min, max)                                         \
-	(TRACE_EXTERNAL("free", min, max),                                     \
-	 PRINT_ALLOCATION("Free physical ram "                                 \
-	                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."               \
-	                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) " [%Iu+%Iu=%Iu]\n", \
-	                  physpage2addr(min),                                  \
-	                  physpage2addr((max) + 1) - 1,                        \
-	                  (zone)->mz_cfree,                                    \
-	                  ((max) - (min)) + 1,                                 \
+#define TRACE_FREE(zone, min, max)                            \
+	(TRACE_EXTERNAL("free", min, max),                        \
+	 PRINT_ALLOCATION("Free physical ram "                    \
+	                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."  \
+	                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) " ["   \
+	                  "%" PRIuN(__SIZEOF_PHYSPAGE_T__) "-"    \
+	                  "%" PRIuN(__SIZEOF_PHYSPAGE_T__) "="    \
+	                  "%" PRIuN(__SIZEOF_PHYSPAGE_T__) "]\n", \
+	                  physpage2addr(min),                     \
+	                  physpage2addr((max) + 1) - 1,           \
+	                  (zone)->mz_cfree,                       \
+	                  ((max) - (min)) + 1,                    \
 	                  (zone)->mz_cfree + (((max) - (min)) + 1)))
 
 
@@ -190,9 +196,9 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 			oldval = ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & mask),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n",
-			        "oldval        = %IX\n"
-			        "masked_oldval = %IX\n"
-			        "mask          = %IX\n",
+			        "oldval        = %" PRIXPTR "\n"
+			        "masked_oldval = %" PRIXPTR "\n"
+			        "mask          = %" PRIXPTR,
 			        (physpage_t)(self->mz_start + zone_relative_base),
 			        oldval, oldval & PMEMBITSET_FREEMASK, mask);
 			num_qpages += POPCOUNT(oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
@@ -206,8 +212,8 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 			oldval = ATOMIC_FETCHOR(self->mz_free[i], PMEMBITSET_FREEMASK);
 			assertf(!(oldval & PMEMBITSET_FREEMASK),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
-			        "oldval      = %IX\n"
-			        "mask_oldval = %IX\n",
+			        "oldval      = %" PRIXPTR "\n"
+			        "mask_oldval = %" PRIXPTR,
 			        (physpage_t)(self->mz_start + (i * PAGES_PER_WORD)),
 			        oldval, oldval & PMEMBITSET_FREEMASK);
 			num_qpages += POPCOUNT(oldval & PMEMBITSET_UNDFMASK);
@@ -221,9 +227,9 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 			oldval = ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & mask),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
-			        "oldval        = %IX\n"
-			        "masked_oldval = %IX\n"
-			        "mask          = %IX\n",
+			        "oldval        = %" PRIXPTR "\n"
+			        "masked_oldval = %" PRIXPTR "\n"
+			        "mask          = %" PRIXPTR,
 			        (physpage_t)(self->mz_start + (i * PAGES_PER_WORD)),
 			        oldval, oldval & PMEMBITSET_FREEMASK, mask);
 			num_qpages += POPCOUNT(oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
@@ -279,9 +285,9 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 			ASSIGN_OLDVAL ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n",
-			        "oldval        = %IX\n"
-			        "masked_oldval = %IX\n"
-			        "mask          = %IX\n",
+			        "oldval        = %" PRIXPTR "\n"
+			        "masked_oldval = %" PRIXPTR "\n"
+			        "mask          = %" PRIXPTR,
 			        (physpage_t)(self->mz_start + zone_relative_base),
 			        oldval, oldval & PMEMBITSET_FREEMASK,
 			        mask & PMEMBITSET_FREEMASK);
@@ -297,8 +303,8 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 			                              PMEMBITSET_UNDFMASK));
 			assertf(!(oldval & PMEMBITSET_FREEMASK),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
-			        "oldval      = %IX\n"
-			        "mask_oldval = %IX\n",
+			        "oldval      = %" PRIXPTR "\n"
+			        "mask_oldval = %" PRIXPTR,
 			        (physpage_t)(self->mz_start + (i * PAGES_PER_WORD)),
 			        oldval, oldval & PMEMBITSET_FREEMASK);
 			num_pages -= PAGES_PER_WORD;
@@ -312,9 +318,9 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 			ASSIGN_OLDVAL ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
-			        "oldval        = %IX\n"
-			        "masked_oldval = %IX\n"
-			        "mask          = %IX\n",
+			        "oldval        = %" PRIXPTR "\n"
+			        "masked_oldval = %" PRIXPTR "\n"
+			        "mask          = %" PRIXPTR,
 			        (physpage_t)(self->mz_start + (i * PAGES_PER_WORD)),
 			        oldval, oldval & PMEMBITSET_FREEMASK,
 			        mask & PMEMBITSET_FREEMASK);
@@ -348,9 +354,9 @@ NOTHROW(KCALL set_cfree_word)(uintptr_t *__restrict pword,
 	                             (PMEMBITSET_FREEMASK & mask)));
 	assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 	        "Double free near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
-	        "oldval        = %IX\n"
-	        "masked_oldval = %IX\n"
-	        "mask          = %IX\n",
+	        "oldval        = %" PRIXPTR "\n"
+	        "masked_oldval = %" PRIXPTR "\n"
+	        "mask          = %" PRIXPTR,
 	        (physpage_t)(self->mz_start + (physpagecnt_t)(pword - self->mz_free) * PAGES_PER_WORD),
 	        oldval, oldval & PMEMBITSET_FREEMASK,
 	        mask & PMEMBITSET_FREEMASK);
@@ -1178,7 +1184,9 @@ DBG_COMMAND(lsram,
 		total_pages = (size_t)zone->mz_rmax + 1;
 		used_pages  = total_pages - (size_t)zone->mz_cfree;
 		usage_percent = (unsigned int)(((u64)used_pages * 100 * 100000) / total_pages);
-		dbg_printf(DBGSTR("%Iu " AC_WHITE(PRIpN(__SIZEOF_PHYSADDR_T__)) "-" AC_WHITE(PRIpN(__SIZEOF_PHYSADDR_T__)) " %3u.%.5u%% (%Iu/%Iu)\n"),
+		dbg_printf(DBGSTR("%" PRIuSIZ " " AC_WHITE(PRIpN(__SIZEOF_PHYSADDR_T__)) "-"
+		                  /*           */ AC_WHITE(PRIpN(__SIZEOF_PHYSADDR_T__)) " "
+		                  "%3u.%.5u%% (%" PRIuSIZ "/%" PRIuSIZ ")\n"),
 		           i,
 		           physpage2addr(zone->mz_start),
 		           physpage2addr(zone->mz_max + 1) - 1,

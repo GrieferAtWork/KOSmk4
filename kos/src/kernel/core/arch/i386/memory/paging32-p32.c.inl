@@ -756,7 +756,7 @@ NOTHROW(FCALL p32_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
-	        "Invalid page permissions: %#.4I16x", perm);
+	        "Invalid page permissions: %#.4" PRIx16, perm);
 #if __SIZEOF_PHYSADDR_T__ > 4
 	assertf(phys <= (physaddr_t)0xfffff000,
 	        "Address cannot be mapped under p32: %" PRIpN(__SIZEOF_PHYSADDR_T__),

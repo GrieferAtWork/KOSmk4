@@ -37,6 +37,7 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stdint.h>
 
@@ -380,7 +381,7 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 		struct task *caller, *next;
 		uintptr_t flags = thread->t_flags;
 		/* Check if the thread has already terminated (in which case it can't be re-awoken) */
-		IPI_DEBUG("task_wake_ipi:%#Ix\n", state);
+		IPI_DEBUG("task_wake_ipi:%#" PRIxPTR "\n", state);
 		if (flags & TASK_FTERMINATED)
 			return state;
 		caller = THIS_TASK;
@@ -552,7 +553,8 @@ again_already_disabled:
 				assert(!(pending_last->t_flags & TASK_FRUNNING));
 				ATOMIC_FETCHOR(pending_last->t_flags, TASK_FPENDING);
 				ATOMIC_WRITE(pending_last->t_cpu, transfer_target);
-				printk(KERN_INFO "[sched:cpu#%u] Transfer sleeping thread %p [pid=%u] to cpu #%u\n",
+				printk(KERN_INFO "[sched:cpu#%u] Transfer sleeping thread %p "
+				                 "[tid=%" PRIuN(__SIZEOF_PID_T__) "] to cpu #%u\n",
 				       (unsigned int)me->c_id, pending_last, task_getroottid_of_s(pending_last),
 				       (unsigned int)transfer_target->c_id);
 				pending_next = pending_last->t_sched.s_asleep.ss_tmonxt;
@@ -777,14 +779,14 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 			old_flags = ATOMIC_READ(thread->t_flags);
 			if (old_flags & (TASK_FSTARTED | TASK_FPENDING | TASK_FRUNNING)) {
 				assertf(!(old_flags & (TASK_FRUNNING | TASK_FPENDING)) || (old_flags & TASK_FSTARTED),
-				        "old_flags = %#Ix", old_flags);
+				        "old_flags = %#" PRIxPTR, old_flags);
 				goto done_pop_preemption;
 			}
 			thread->t_ctime = realtime();
 		} while (!ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags,
 		                             old_flags | (TASK_FSTARTED |
 		                                          TASK_FPENDING)));
-		printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
+		printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 		       (unsigned int)target_cpu->c_id, thread,
 		       (unsigned int)task_getroottid_of_s(thread));
 #ifndef NDEBUG
@@ -810,7 +812,7 @@ done_pop_preemption:
 			old_flags = ATOMIC_READ(thread->t_flags);
 			if (old_flags & (TASK_FSTARTED | TASK_FRUNNING)) {
 				assertf(!(old_flags & TASK_FRUNNING) || (old_flags & TASK_FSTARTED),
-				        "old_flags = %#Ix", old_flags);
+				        "old_flags = %#" PRIxPTR, old_flags);
 #ifdef CONFIG_NO_SMP
 				goto done_pop_preemption;
 #else /* CONFIG_NO_SMP */
@@ -822,7 +824,7 @@ done_pop_preemption:
 		} while (!ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags,
 		                             old_flags | (TASK_FSTARTED |
 		                                          TASK_FRUNNING)));
-		printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
+		printk(KERN_TRACE "[sched:cpu#%u] Starting thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 		       (unsigned int)target_cpu->c_id, thread,
 		       (unsigned int)task_getroottid_of_s(thread));
 		caller = THIS_TASK;

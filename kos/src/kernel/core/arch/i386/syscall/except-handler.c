@@ -52,6 +52,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
@@ -71,12 +72,14 @@ NOTHROW(FCALL log_userexcept_errno_propagate)(struct icpustate const *__restrict
 	while (pointer_count != 0 &&
 	       data->e_pointers[pointer_count - 1] == 0)
 		--pointer_count;
-	printk(KERN_TRACE "[except] Translate exception %#x:%#x",
+	printk(KERN_TRACE "[except] Translate exception "
+	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+	                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
 	       data->e_class, data->e_subclass);
 	if (pointer_count != 0) {
 		unsigned int i;
 		for (i = 0; i < pointer_count; ++i) {
-			printk(KERN_TRACE "%c%#Ix",
+			printk(KERN_TRACE "%c%#" PRIxPTR,
 			       i == 0 ? '[' : ',',
 			       data->e_pointers[i]);
 		}
@@ -99,18 +102,23 @@ NOTHROW(FCALL log_userexcept_error_propagate)(struct icpustate const *__restrict
 	while (pointer_count != 0 &&
 	       data->e_pointers[pointer_count - 1] == 0)
 		--pointer_count;
-	printk(KERN_TRACE "[except] Propagate exception %#x:%#x",
+	printk(KERN_TRACE "[except] Propagate exception "
+	                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+	                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
 	       data->e_class, data->e_subclass);
 	if (pointer_count != 0) {
 		unsigned int i;
 		for (i = 0; i < pointer_count; ++i) {
-			printk(KERN_TRACE "%c%#Ix",
+			printk(KERN_TRACE "%c%#" PRIxPTR "",
 			       i == 0 ? '[' : ',',
 			       data->e_pointers[i]);
 		}
 		printk(KERN_TRACE "]");
 	}
-	printk(KERN_TRACE " hand:[pc=%IX,sp=%IX] orig:[pc=%IX,sp=%IX] fault:[pc=%IX] [mode=%#Ix]\n",
+	printk(KERN_TRACE " hand:[pc=%" PRIXPTR ",sp=%" PRIXPTR "]"
+	                  " orig:[pc=%" PRIXPTR ",sp=%" PRIXPTR "]"
+	                  " fault:[pc=%" PRIXPTR "]"
+	                  " [mode=%#" PRIxPTR "]\n",
 	       handler, stack,
 	       icpustate_getpc(state),
 	       icpustate_getuserpsp(state),

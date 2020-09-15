@@ -774,20 +774,20 @@ again_lock_datapart:
 				assertf(blocks[i].rb_start + blocks[i].rb_size ==
 				        result->dp_ramdata.rd_blockv[0].rb_start,
 				        "The upper half of the split doesn't start where the lower half ends!\n"
-				        "END_OF_FIRST_PART                        = %I64p\n"
-				        "START_OF_SECOND_PART                     = %I64p\n"
-				        "blocks[i].rb_start                       = %I64p\n"
-				        "blocks[i].rb_size                        = %Iup\n"
-				        "result->dp_ramdata.rd_blockv[0].rb_start = %I64p\n"
-				        "result->dp_ramdata.rd_blockv[0].rb_size  = %Iup\n"
-				        "vpage_offset                             = %Iu\n"
-				        "total                                    = %Iu\n",
-				        (u64)(blocks[i].rb_start + blocks[i].rb_size),
-				        (u64)result->dp_ramdata.rd_blockv[0].rb_start,
-				        (u64)blocks[i].rb_start,
-				        (size_t)blocks[i].rb_size,
-				        (u64)result->dp_ramdata.rd_blockv[0].rb_start,
-				        (size_t)result->dp_ramdata.rd_blockv[0].rb_size,
+				        "END_OF_FIRST_PART                        = %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+				        "START_OF_SECOND_PART                     = %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+				        "blocks[i].rb_start                       = %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+				        "blocks[i].rb_size                        = %" PRIuSIZ "\n"
+				        "result->dp_ramdata.rd_blockv[0].rb_start = %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
+				        "result->dp_ramdata.rd_blockv[0].rb_size  = %" PRIuSIZ "\n"
+				        "vpage_offset                             = %" PRIuSIZ "\n"
+				        "total                                    = %" PRIuSIZ,
+				        blocks[i].rb_start + blocks[i].rb_size,
+				        result->dp_ramdata.rd_blockv[0].rb_start,
+				        blocks[i].rb_start,
+				        blocks[i].rb_size,
+				        result->dp_ramdata.rd_blockv[0].rb_start,
+				        result->dp_ramdata.rd_blockv[0].rb_size,
 				        vpage_offset, total);
 				/* Figure out how many blocks the lower part should be left with.
 				 *  -> If the split happened somewhere into the lower part's block,
@@ -1121,8 +1121,8 @@ done_futex:
 			}
 		}
 		assertf(node_index == vm_node_count,
-		        "node_index    = %Iu\n"
-		        "vm_node_count = %Iu\n",
+		        "node_index    = %" PRIuSIZ "\n"
+		        "vm_node_count = %" PRIuSIZ,
 		        node_index, vm_node_count);
 	}
 
@@ -1157,7 +1157,7 @@ done_futex:
 				         : !(iter->vn_prot & VM_PROT_SHARED));
 				assert(iter->vn_part == self);
 				assertf(vm_node_getpagecount(iter) == vm_datapart_numvpages(self),
-				        "Node size missmatch (%Iu != %Iu)",
+				        "Node size missmatch (%" PRIuSIZ " != %" PRIuSIZ ")",
 				        vm_node_getpagecount(iter), vm_datapart_numvpages(self));
 			}
 		}

@@ -272,7 +272,8 @@ path_printentex(struct path *__restrict self,
                 unsigned int mode,
                 struct path *__restrict root) {
 	ssize_t result, temp;
-	assertf(!(mode & ~(PATH_PRINT_MODE_DOSPATH | PATH_PRINT_MODE_EXCDRIVE)), "mode = %x", mode);
+	assertf(!(mode & ~(PATH_PRINT_MODE_DOSPATH | PATH_PRINT_MODE_EXCDRIVE)),
+	        "mode = %x", mode);
 	result = path_printex(self, printer, arg,
 	                      mode | PATH_PRINT_MODE_INCTRAIL,
 	                      root);

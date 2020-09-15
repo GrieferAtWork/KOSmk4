@@ -44,6 +44,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <inttypes.h>
+
 /**/
 #include <dev/block.h>    /* TODO: Remove me; Only used for boot_partition-init */
 #include <fs/node.h>      /* TODO: Remove me; Only used for boot_partition-init */
@@ -187,7 +189,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 			x86_initialize_memory_via_bios();
 			total_pages = minfo_usable_ram_pages();
 		}
-		printk(FREESTR(KERN_INFO "[mem] Located %Iu (%#Ix) bytes (%Iu %s) of usable RAM\n"),
+		printk(FREESTR(KERN_INFO "[mem] Located %" PRIuSIZ " (%#" PRIxSIZ ") "
+		                         "bytes (%" PRIuSIZ " %s) of usable RAM\n"),
 		       total_pages * PAGESIZE,
 		       total_pages * PAGESIZE,
 		       total_pages >= (0x100000 / PAGESIZE)
@@ -218,9 +221,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	{
 		size_t i;
 		for (i = 0; i < minfo.mb_bankc; ++i) {
-			printk(KERN_DEBUG "[boot] MEMORY: %I64p...%I64p (%s)\n",
-			       (u64)PMEMBANK_MINADDR(minfo.mb_banks[i]),
-			       (u64)PMEMBANK_MAXADDR(minfo.mb_banks[i]),
+			printk(KERN_DEBUG "[boot] MEMORY: "
+			                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."
+			                  "%" PRIpN(__SIZEOF_PHYSADDR_T__) " (%s)\n",
+			       (physaddr_t)PMEMBANK_MINADDR(minfo.mb_banks[i]),
+			       (physaddr_t)PMEMBANK_MAXADDR(minfo.mb_banks[i]),
 			       pmembank_type_names[minfo.mb_banks[i].mb_type]);
 		}
 	}
@@ -244,7 +249,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Since `kernel_initialize_commandline_options_early()' may have overwritten
 	 * the initial seed set by `x86_initialize_rand_entropy()', only log the actually
 	 * used seed now so that the system logs remain consistent with the user's expectation. */
-	printk(FREESTR(KERN_INFO "[rand] Set pseudo RNG seed to %#.8I32x\n"), krand_seed);
+	printk(FREESTR(KERN_INFO "[rand] Set pseudo RNG seed to %#.8" PRIx32 "\n"), krand_seed);
 
 	/* Initialize the x86_64 physical memory identity memory mapping.
 	 * This can only be done _after_ we've loaded available RAM, since
@@ -335,11 +340,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: If we weren't able to figure out the boot device, check if we can
 	 *       somehow make use of the `boot_device' information which was given
 	 *       to us by the bootloader... */
-	printk(KERN_INFO "boot_device = { %#I8x, %#I8x, %#I8x, %#I8x }\n",
-	       boot_device.bdi_biosdev,
-	       boot_device.bdi_partition,
-	       boot_device.bdi_sub_partition,
-	       boot_device.bdi_sub_sub_partition);
+	printk(KERN_INFO "boot_device = { %#" PRIx8 ", %#" PRIx8 ", %#" PRIx8 ", %#" PRIx8 " }\n",
+	       (u8)boot_device.bdi_biosdev,
+	       (u8)boot_device.bdi_partition,
+	       (u8)boot_device.bdi_sub_partition,
+	       (u8)boot_device.bdi_sub_sub_partition);
 
 	/* Make sure that we've managed to detect a single, valid boot partition, or
 	 * that the user started the kernel with a boot=... commandline parameter. */
@@ -364,11 +369,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 			SCOPED_READLOCK((struct vm_datablock *)cd);
 			REF struct directory_entry *ent;
 			while ((ent = directory_readnext(cd)) != NULL) {
-				printk("ENTRY: %$q, %u, %I64u\n",
+				printk("ENTRY: %$q, %u, %" PRIuN(__SIZEOF_INO_T__) "\n",
 				       (size_t)ent->de_namelen,
 				       ent->de_name,
 				       (unsigned int)ent->de_type,
-				       (u64)ent->de_ino);
+				       (ino_t)ent->de_ino);
 			}
 		}
 		superblock_set_unmounted(cd);

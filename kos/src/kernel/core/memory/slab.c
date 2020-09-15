@@ -42,6 +42,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -666,8 +667,13 @@ NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 #endif /* !__INTELLISENSE__ */
 	default:
 #ifndef NDEBUG
-		kernel_panic("Corrupted SLAB page at %p has an invalid size of %I8u",
+#if __SIZEOF_POINTER__ >= 8
+		kernel_panic("Corrupted SLAB page at %p has an invalid size of %" PRIu16,
 		             self, self->s_size);
+#else /* __SIZEOF_POINTER__ >= 8 */
+		kernel_panic("Corrupted SLAB page at %p has an invalid size of %" PRIu8,
+		             self, self->s_size);
+#endif /* __SIZEOF_POINTER__ < 8 */
 #else /* !NDEBUG */
 		__builtin_unreachable();
 #endif /* NDEBUG */
@@ -691,8 +697,13 @@ NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags) {
 #endif /* !__INTELLISENSE__ */
 	default:
 #ifndef NDEBUG
-		kernel_panic("Corrupted SLAB page at %p has an invalid size of %I8u",
+#if __SIZEOF_POINTER__ >= 8
+		kernel_panic("Corrupted SLAB page at %p has an invalid size of %" PRIu16,
 		             self, self->s_size);
+#else /* __SIZEOF_POINTER__ >= 8 */
+		kernel_panic("Corrupted SLAB page at %p has an invalid size of %" PRIu8,
+		             self, self->s_size);
+#endif /* __SIZEOF_POINTER__ < 8 */
 #else /* !NDEBUG */
 		__builtin_unreachable();
 #endif /* NDEBUG */
@@ -710,7 +721,7 @@ NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
-	kernel_panic("Invalid slab size %Iu", num_bytes);
+	kernel_panic("Invalid slab size %" PRIuSIZ, num_bytes);
 	return NULL;
 #else /* !NDEBUG */
 	__builtin_unreachable();
@@ -727,7 +738,7 @@ __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
-	kernel_panic("Invalid slab size %Iu", num_bytes);
+	kernel_panic("Invalid slab size %" PRIuSIZ, num_bytes);
 	return NULL;
 #else /* !NDEBUG */
 	__builtin_unreachable();
@@ -744,7 +755,7 @@ NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 #undef CASE_SLAB_MALLOC
 #endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
-	kernel_panic("Invalid slab size %Iu", num_bytes);
+	kernel_panic("Invalid slab size %" PRIuSIZ, num_bytes);
 	return NULL;
 #else /* !NDEBUG */
 	__builtin_unreachable();

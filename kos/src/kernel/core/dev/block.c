@@ -56,6 +56,7 @@
 #include <kos/guid.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -539,14 +540,15 @@ block_device_add_to_devfs(struct basic_block_device *__restrict self) {
 		if (block_device_ispartition(self) &&
 		    (master = ((struct block_device_partition *)self)->bp_master,
 		     master->bd_name[0])) {
-			snprintf(self->bd_name, sizeof(self->bd_name), "%s%u",
+			snprintf(self->bd_name, sizeof(self->bd_name),
+			         "%s%" PRIuN(__SIZEOF_MINOR_T__),
 			         master->bd_name,
 			         MINOR(block_device_devno(self)) -
 			         MINOR(block_device_devno(master)));
 			self->bd_name[COMPILER_LENOF(self->bd_name) - 1] = 0;
 		} else {
 			sprintf(self->bd_name,
-			        "%.2x:%.2x",
+			        "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__),
 			        MAJOR(self->bd_devlink.a_vaddr),
 			        MINOR(self->bd_devlink.a_vaddr));
 		}
@@ -963,10 +965,12 @@ DECL_BEGIN
 
 LOCAL NOBLOCK void
 NOTHROW(KCALL log_sync)(struct block_device *__restrict self, lba_t sector_id) {
-	printk(KERN_INFO "[blk:\"/dev/%#q\",devno=%u:%u] Syncing sector %#I64x (%#I64x-%#I64x)\n",
+	printk(KERN_INFO "[blk:\"/dev/%#q\",devno="
+	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) "]"
+	                 " Syncing sector %#" PRIx64 " (%#" PRIx64 "-%#" PRIx64 ")\n",
 	       self->bd_name,
-	       (unsigned int)MAJOR(block_device_devno(self)),
-	       (unsigned int)MINOR(block_device_devno(self)),
+	       MAJOR(block_device_devno(self)),
+	       MINOR(block_device_devno(self)),
 	       (u64)sector_id, (u64)(sector_id * self->bd_sector_size),
 	       (u64)(((sector_id + 1) * self->bd_sector_size) - 1));
 }
@@ -1030,10 +1034,13 @@ _block_device_sync(struct block_device *__restrict self)
 				continue;
 			self->bd_cache[i].cs_flags &= ~BD_CACHED_SECTOR_FCHANGED;
 		}
-		printk(KERN_NOTICE "[blk:\"/dev/%#q\",devno=%u:%u] Block device was synced\n",
+		printk(KERN_NOTICE "[blk:\"/dev/%#q\",devno="
+		                   "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+		                   "%.2" PRIxN(__SIZEOF_MINOR_T__) "] "
+		                   "Block device was synced\n",
 		       self->bd_name,
-		       (unsigned int)MAJOR(block_device_devno(self)),
-		       (unsigned int)MINOR(block_device_devno(self)));
+		       MAJOR(block_device_devno(self)),
+		       MINOR(block_device_devno(self)));
 	}
 	return result;
 }
@@ -1557,7 +1564,13 @@ do_dump_block_device(struct basic_block_device *__restrict self) {
 	drv = driver_at_address(block_device_ispartition(self)
 	                        ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
 	                        : (void *)self->bd_type.dt_read);
-	dbg_printf(DBGSTR("/dev/" AC_WHITE("%s") "\t%u:%-2u\t%s\t%I64u%s\t%I64u\t%Iu\n"),
+	dbg_printf(DBGSTR("/dev/" AC_WHITE("%s") "\t"
+	                  "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                  "%-2" PRIxN(__SIZEOF_MINOR_T__) "\t"
+	                  "%s\t"
+	                  "%" PRIu64 "%s\t"
+	                  "%" PRIu64 "\t"
+	                  "%" PRIuSIZ "\n"),
 	           self->bd_name,
 	           (unsigned int)MAJOR(block_device_devno(self)),
 	           (unsigned int)MINOR(block_device_devno(self)),

@@ -332,13 +332,13 @@ done_success:
 #ifdef DEFINE_IO_VECTOR
 #ifdef DEFINE_IO_PHYS
 	assertf(aio_pbuffer_size(buf) == num_bytes,
-	        "aio_pbuffer_size(buf) = %Iu\n"
-	        "num_bytes             = %Iu\n",
+	        "aio_pbuffer_size(buf) = %" PRIuSIZ "\n"
+	        "num_bytes             = %" PRIuSIZ "\n",
 	        (size_t)aio_pbuffer_size(buf), (size_t)num_bytes);
 #else /* DEFINE_IO_PHYS */
 	assertf(aio_buffer_size(buf) == num_bytes,
-	        "aio_buffer_size(buf) = %Iu\n"
-	        "num_bytes            = %Iu\n",
+	        "aio_buffer_size(buf) = %" PRIuSIZ "\n"
+	        "num_bytes            = %" PRIuSIZ "\n",
 	        (size_t)aio_buffer_size(buf), (size_t)num_bytes);
 #endif /* !DEFINE_IO_PHYS */
 #endif /* !DEFINE_IO_VECTOR */

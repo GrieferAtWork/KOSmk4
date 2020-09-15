@@ -208,7 +208,8 @@ character_device_register(struct character_device *__restrict self, dev_t devno)
 
 /* Automatically register the given character-device, assigning it an auto-generated device ID.
  * All other devices are assigned some unique major device number `>= DEV_MAJOR_AUTO' with MINOR set to `0'.
- * NOTE: When empty, `cd_name' will be set to `"%.2x:%.2x" % (MAJOR(devno),MINOR(devno))'
+ * NOTE: When empty, `cd_name' will be set to
+ *       `"%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__) % (MAJOR(devno),MINOR(devno))'
  * NOTE: This function will also cause the device to appear in `/dev' (unless the device's name is already taken) */
 FUNDEF NONNULL((1)) void KCALL
 character_device_register_auto(struct character_device *__restrict self)

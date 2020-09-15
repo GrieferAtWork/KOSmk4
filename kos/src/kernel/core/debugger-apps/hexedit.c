@@ -52,6 +52,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <alloca.h>
 #include <ctype.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
@@ -451,25 +452,25 @@ hd_printscreen(void *start_addr, void *sel_addr,
 		switch (hd_bytes_per_word) {
 
 		default:
-			dbg_printf(DBGSTR("%.2I8x"), *(u8 *)sel_word);
+			dbg_printf(DBGSTR("%.2" PRIx8), *(u8 *)sel_word);
 			break;
 
 		case 2:
-			dbg_printf(DBGSTR("%.4I16x"),
+			dbg_printf(DBGSTR("%.4" PRIx16),
 			           hd_hex_le
 			           ? UNALIGNED_GETLE16((u16 *)sel_word)
 			           : UNALIGNED_GETBE16((u16 *)sel_word));
 			break;
 
 		case 4:
-			dbg_printf(DBGSTR("%.8I32x"),
+			dbg_printf(DBGSTR("%.8" PRIx32),
 			           hd_hex_le
 			           ? UNALIGNED_GETLE32((u32 *)sel_word)
 			           : UNALIGNED_GETBE32((u32 *)sel_word));
 			break;
 
 		case 8:
-			dbg_printf(DBGSTR("%.16I64x"),
+			dbg_printf(DBGSTR("%.16" PRIx64),
 			           hd_hex_le
 			           ? UNALIGNED_GETLE64((u64 *)sel_word)
 			           : UNALIGNED_GETBE64((u64 *)sel_word));

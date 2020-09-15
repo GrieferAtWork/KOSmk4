@@ -25,6 +25,8 @@
 #include <kernel/driver.h>
 #include <kernel/rand.h>
 
+#include <inttypes.h>
+
 #include "corebase.h"
 
 
@@ -75,7 +77,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	               *   `1 >= 1', meaning we'll never get here! */                \
 	)
 	struct vm_corepair_ptr corepair;
-	TRACE(PP_STR(FUNC(core_page_alloc)) "(%p, %p, %Iu, %Iu, %#x)\n",
+	TRACE(PP_STR(FUNC(core_page_alloc)) "(%p, %p, %" PRIuSIZ ", %" PRIuSIZ ", %#x)\n",
 	      self, mapping_target, num_bytes, min_alignment, flags);
 	HEAP_ASSERT(num_bytes != 0);
 	HEAP_ASSERT(((uintptr_t)mapping_target & PAGEMASK) == 0 || mapping_target == CORE_PAGE_MALLOC_AUTO);
@@ -203,7 +205,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, num_bytes);
 #endif /* !HEAP_NX */
 		}
-		HEAP_ASSERTF(block0_size >= 1, "num_bytes = %Iu", num_bytes);
+		HEAP_ASSERTF(block0_size >= 1, "num_bytes = %" PRIuSIZ, num_bytes);
 		HEAP_ASSERT(block0_size <= num_bytes / PAGESIZE);
 		if likely(block0_size >= num_bytes / PAGESIZE) {
 			/* All requested memory could be served as part of a single block. */
@@ -614,7 +616,7 @@ NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
                                             size_t num_bytes, gfp_t flags) {
 	struct heapptr result;
 	struct mfree **iter, **end;
-	TRACE(PP_STR(FUNC(heap_alloc_untraced)) "(%p, %Iu, %#x)\n", self, num_bytes, flags);
+	TRACE(PP_STR(FUNC(heap_alloc_untraced)) "(%p, %" PRIuSIZ ", %#x)\n", self, num_bytes, flags);
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result.hp_siz))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	result.hp_siz &= ~(HEAP_ALIGNMENT - 1);
@@ -624,7 +626,7 @@ NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
 	end  = COMPILER_ENDOF(self->h_size);
 	HEAP_ASSERTF(iter >= self->h_size &&
 	             iter < COMPILER_ENDOF(self->h_size),
-	             "HEAP_BUCKET_OF(%Iu) = %Iu/%Iu",
+	             "HEAP_BUCKET_OF(%" PRIuSIZ ") = %" PRIuSIZ "/%" PRIuSIZ,
 	             result.hp_siz, HEAP_BUCKET_OF(result.hp_siz),
 	             COMPILER_LENOF(self->h_size));
 search_heap:
@@ -641,7 +643,7 @@ search_heap:
 		chain = *iter;
 		while (chain &&
 		       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
-		                     "MFREE_SIZE(chain) = %#Ix\n",
+		                     "MFREE_SIZE(chain) = %#" PRIxSIZ "\n",
 		                     MFREE_SIZE(chain)),
 		        MFREE_SIZE(chain) < result.hp_siz))
 			chain = LLIST_NEXT(chain, mf_lsize);
@@ -1032,7 +1034,7 @@ NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
                                             size_t num_bytes, gfp_t flags) {
 	size_t unused_size, alloc_size;
 	size_t result = 0;
-	TRACE(PP_STR(FUNC(heap_allat_untraced)) "(%p, %p, %Iu, %#x)\n", self, ptr, num_bytes, flags);
+	TRACE(PP_STR(FUNC(heap_allat_untraced)) "(%p, %p, %" PRIuSIZ ", %#x)\n", self, ptr, num_bytes, flags);
 	if unlikely(!IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT))
 		goto err; /* Badly aligned pointer (can't allocate anything here...) */
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &alloc_size))
@@ -1088,7 +1090,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	size_t heap_alloc_bytes;
 	assert(min_alignment != 0);
 	assertf(!(min_alignment & (min_alignment - 1)),
-	        "Invalid min_alignment: %IX",
+	        "Invalid min_alignment: %#" PRIxSIZ,
 	        min_alignment);
 	/* Truncate the offset, if it was a multiple of `min_alignment'
 	 * HINT: This also ensures that `offset' is positive. */
@@ -1108,7 +1110,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 		end  = COMPILER_ENDOF(self->h_size);
 		HEAP_ASSERTF(iter >= self->h_size &&
 		             iter < COMPILER_ENDOF(self->h_size),
-		             "HEAP_BUCKET_OF(%Iu) = %Iu/%Iu",
+		             "HEAP_BUCKET_OF(%" PRIuSIZ ") = %" PRIuSIZ "/%" PRIuSIZ,
 		             alloc_bytes, HEAP_BUCKET_OF(alloc_bytes),
 		             COMPILER_LENOF(self->h_size));
 		if (!FUNC(heap_acquirelock)(self, flags))
@@ -1128,7 +1130,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			chain = *iter;
 			while (chain &&
 			       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
-			                     "MFREE_SIZE(chain) = %#Ix",
+			                     "MFREE_SIZE(chain) = %#" PRIxSIZ,
 			                     MFREE_SIZE(chain)),
 			        MFREE_SIZE(chain) < alloc_bytes))
 				chain = LLIST_NEXT(chain, mf_lsize);
@@ -1277,10 +1279,10 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	            (uintptr_t)result_base.hp_ptr + result_base.hp_siz);
 	nouse_size = (uintptr_t)result.hp_ptr - (uintptr_t)result_base.hp_ptr;
 	HEAP_ASSERT(nouse_size + alloc_bytes <= result_base.hp_siz);
-	HEAP_ASSERTF(nouse_size >= HEAP_MINSIZE, "nouse_size = %Iu", nouse_size);
+	HEAP_ASSERTF(nouse_size >= HEAP_MINSIZE, "nouse_size = %" PRIuSIZ, nouse_size);
 	HEAP_ASSERTF(IS_ALIGNED(nouse_size, HEAP_ALIGNMENT),
-	             "Invalid offset (%Id) / alignment (%Iu)\n"
-	             "nouse_size = %Iu",
+	             "Invalid offset (%" PRIdSIZ ") / alignment (%" PRIuSIZ ")\n"
+	             "nouse_size = %" PRIuSIZ,
 	             offset, min_alignment, nouse_size);
 
 	/* Release lower memory (This _MUST_ work because we've overallocated by `HEAP_MINSIZE'). */
@@ -1489,8 +1491,8 @@ NOTHROW_NX(KCALL FUNC(vpage_realloc_untraced))(VIRT /*page-aligned*/ void *old_b
                                                gfp_t alloc_flags, gfp_t free_flags) {
 	void *result;
 	assertf(!old_pages || IS_ALIGNED((uintptr_t)old_base, PAGESIZE),
-	        "old_base = %p\n"
-	        "old_pages = %Iu (%#Ix)",
+	        "old_base  = %p\n"
+	        "old_pages = %" PRIuSIZ " (%#" PRIxSIZ ")",
 	        old_base, old_pages, old_pages);
 	if (new_pages <= old_pages) {
 		/* Special case: Free trailing memory. */

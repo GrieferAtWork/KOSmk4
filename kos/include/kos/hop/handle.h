@@ -70,7 +70,7 @@ struct hop_handle_stat /*[PREFIX(hs_)]*/ {
 #define HOP_HANDLE_NOOP                0xffff0002 /* Do nothing other than verifying that `fd' is a valid handle. */
 #define HOP_HANDLE_REOPEN              0xffff0003 /* [struct hop_openfd *result] Re-open the given handle
                                                    * NOTE: The value returned by `hop()' is identical to the value written to `result->of_hint'. */
-#define HOP_HANDLE_GET_REFCNT          0xffff0004 /* [uintptr_t *result] Return the reference counter for the given handle. */
+#define HOP_HANDLE_GET_REFCNT          0xffff0004 /* [uint64_t *result] Return the reference counter for the given handle. */
 #define HOP_HANDLE_GET_ADDRESS         0xffff0005 /* [uint64_t *result] Return the kernel-space address of the handle (s.a. `struct hop_handle_stat::hs_address'). */
 #define HOP_HANDLE_GET_TYPE            0xffff0006 /* [uint16_t *result] Return the handle's type. */
 #define HOP_HANDLE_GET_KIND            0xffff0007 /* [uint16_t *result] Return the handle's kind. */

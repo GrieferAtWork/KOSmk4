@@ -52,6 +52,7 @@
 
 #include <assert.h>
 #include <ctype.h>
+#include <inttypes.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -586,7 +587,8 @@ create_more_clusters_already_locked:
 			next      = data->i_clusterv[i + 1];
 			real_next = Fat_GetFatIndirection(fat, curr);
 			assertf(next == real_next,
-			        "Invalid indirection on cluster#%Iu (expected %#Ix -> %#Ix, but was %#Ix -> %#Ix)",
+			        "Invalid indirection on cluster#%" PRIuSIZ " (expected "
+			        "%#" PRIxSIZ " -> %#" PRIxSIZ ", but was %#" PRIxSIZ " -> %#" PRIxSIZ ")",
 			        i, curr, next, curr, real_next);
 		}
 	}
@@ -907,7 +909,9 @@ dos_8dot3:
 		/* Check for entries that we're supposed to skip over. */
 		if (name_length <= 2) {
 			if unlikely(!name_length) {
-				printk(KERN_ERR "[fat] Unnamed directory entry at ino:%#I64x,off=%I64u\n",
+				printk(KERN_ERR "[fat] Unnamed directory entry at "
+				                "ino:%#" PRIxN(__SIZEOF_INO_T__) ","
+				                "off=%" PRIuN(__SIZEOF_POS_T__) "\n",
 				       self->i_fileino, pos - sizeof(FatFile));
 				goto continue_reading; /* Empty name? (well... this shouldn't happen!) */
 			}
@@ -933,7 +937,8 @@ dos_8dot3:
 		       sizeof(char));
 		assertf(!memchr(result->de_name, 0, result->de_namelen),
 		        "%$[hex]\n"
-		        "orig_name:\n%$[hex]\n",
+		        "orig_name:\n"
+		        "%$[hex]\n",
 		        (size_t)result->de_namelen, result->de_name,
 		        (8 + 3) * sizeof(char), orig_name);
 	}
@@ -2309,7 +2314,7 @@ Fat12_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	u16 val;
 	assertf(index < self->f_fat_length,
-	        "Out-of-bounds FAT index: %I32u >= %I32u",
+	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->f_fat_length);
 	val = *(u16 *)((uintptr_t)self->f_fat_table + (index + (index >> 1)));
 	if (index & 1)
@@ -2325,7 +2330,7 @@ Fat12_SetFatIndirection(FatSuperblock *__restrict self,
                         FatClusterIndex indirection_target) {
 	u16 *pval;
 	assertf(index < self->f_fat_length,
-	        "Out-of-bounds FAT index: %I32u >= %I32u",
+	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->f_fat_length);
 	pval = ((u16 *)((uintptr_t)self->f_fat_table + (index + (index / 2))));
 	if (index & 1)
@@ -2338,7 +2343,7 @@ PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat16_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	assertf(index < self->f_fat_length,
-	        "Out-of-bounds FAT index: %I32u >= %I32u",
+	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->f_fat_length);
 	return ((u16 *)self->f_fat_table)[index];
 }
@@ -2348,7 +2353,7 @@ Fat16_SetFatIndirection(FatSuperblock *__restrict self,
                         FatClusterIndex index,
                         FatClusterIndex indirection_target) {
 	assertf(index < self->f_fat_length,
-	        "Out-of-bounds FAT index: %I32u >= %I32u",
+	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->f_fat_length);
 	((u16 *)self->f_fat_table)[index] = (u16)indirection_target;
 }
@@ -2357,7 +2362,7 @@ PRIVATE ATTR_PURE WUNUSED NONNULL((1)) FatClusterIndex KCALL
 Fat32_GetFatIndirection(FatSuperblock const *__restrict self,
                         FatClusterIndex index) {
 	assertf(index < self->f_fat_length,
-	        "Out-of-bounds FAT index: %I32u >= %I32u",
+	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->f_fat_length);
 	return ((u32 *)self->f_fat_table)[index];
 }
@@ -2367,7 +2372,7 @@ Fat32_SetFatIndirection(FatSuperblock *__restrict self,
                         FatClusterIndex index,
                         FatClusterIndex indirection_target) {
 	assertf(index < self->f_fat_length,
-	        "Out-of-bounds FAT index: %I32u >= %I32u",
+	        "Out-of-bounds FAT index: %" PRIu32 " >= %" PRIu32 "",
 	        index, self->f_fat_length);
 	((u32 *)self->f_fat_table)[index] = indirection_target;
 }
@@ -2378,7 +2383,7 @@ Fat_GetFatIndirection(FatSuperblock *__restrict self,
 	FatSectorIndex table_sector;
 	table_sector = (*self->f_fat_sector)(self, index);
 	assertf(table_sector < self->f_sec4fat,
-	        "Out-of-bounds FAT sector index: %I32u >= %I32u",
+	        "Out-of-bounds FAT sector index: %" PRIu32 " >= %" PRIu32 "",
 	        table_sector, self->f_sec4fat);
 	if (!FAT_META_GTLOAD(self, table_sector)) {
 		/* Must load missing table sectors. */
@@ -2404,7 +2409,7 @@ Fat_SetFatIndirection(FatSuperblock *__restrict self,
 	assert(sync_writing(&self->f_fat_lock));
 	table_sector = (*self->f_fat_sector)(self, index);
 	assertf(table_sector < self->f_sec4fat,
-	        "Out-of-bounds FAT sector index: %I32u >= %I32u",
+	        "Out-of-bounds FAT sector index: %" PRIu32 " >= %" PRIu32 "",
 	        table_sector, self->f_sec4fat);
 	if (!FAT_META_GTLOAD(self, table_sector)) {
 		/* Must load missing table sectors. */
@@ -2673,7 +2678,10 @@ Fat_OpenSuperblock(FatSuperblock *__restrict self, UNCHECKED USER char *args)
 		RETHROW();
 	}
 	rwlock_cinit(&self->f_fat_lock);
-	printk(KERN_INFO "[fat] Load FAT%u-filesystem on %.2x:%.2x (%q) [oem=%q] [label=%q] [sysname=%q]\n",
+	printk(KERN_INFO "[fat] Load FAT%u-filesystem on "
+	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                 "%.2" PRIxN(__SIZEOF_MINOR_T__) " "
+	                 "(%q) [oem=%q] [label=%q] [sysname=%q]\n",
 	       self->f_type == FAT12 ? 12 : self->f_type == FAT16 ? 16 : 32,
 	       MAJOR(block_device_devno(self->s_device)),
 	       MINOR(block_device_devno(self->s_device)),
@@ -2735,13 +2743,14 @@ Fat_WriteFatIndirectionTableSegment(FatSuperblock *__restrict self,
 	u8 i;
 	assert(num_sectors != 0);
 	assertf(fat_sector_index + num_sectors <= self->f_sec4fat,
-	        "Out-of-bounds FAT sector index: %I32u+%I32u(%I32u) > %I32u",
+	        "Out-of-bounds FAT sector index: %" PRIu32 "+%" PRIu32 "(%" PRIu32 ") > %" PRIu32 "",
 	        fat_sector_index, num_sectors, fat_sector_index + num_sectors, self->f_sec4fat);
 	sector_buffer = (byte_t *)self->f_fat_table + (fat_sector_index *
 	                                               self->f_sectorsize);
 	sector_bytes  = (size_t)(num_sectors * self->f_sectorsize);
 	sector_start  = self->f_fat_start + fat_sector_index;
-	printk(KERN_INFO "[fat] Saving modified meta-sectors %I32u..%I32u of 0..%I32u (%I32u..%I32u)\n",
+	printk(KERN_INFO "[fat] Saving modified meta-sectors "
+	                 "%" PRIu32 "..%" PRIu32 " of 0..%" PRIu32 " (%" PRIu32 "..%" PRIu32 ")\n",
 	       fat_sector_index, fat_sector_index + num_sectors - 1, self->f_sec4fat - 1,
 	       sector_start, sector_start + num_sectors - 1);
 	/* Write to all redundant FAT copies. */

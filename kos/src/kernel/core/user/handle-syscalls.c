@@ -1227,9 +1227,6 @@ PRIVATE syscall_slong_t
                                  USER UNCHECKED void *arg) {
 	switch (hop_command) {
 
-#define MANGLE_HANDLE_DATA_POINTER(p) \
-	(u64)(uintptr_t)(p) /* TODO: Option to mangle kernel-space pointers! */
-
 	case HOP_HANDLE_STAT: {
 		USER CHECKED struct hop_handle_stat *info;
 		struct hop_handle_stat st;
@@ -1241,7 +1238,7 @@ PRIVATE syscall_slong_t
 		st.hs_type        = hand->h_type;
 		st.hs_kind        = handle_typekind(hand);
 		st.hs_refcnt      = (*handle_type_db.h_refcnt[hand->h_type])(hand->h_data);
-		st.hs_address     = MANGLE_HANDLE_DATA_POINTER(hand->h_data);
+		st.hs_address     = (u64)(uintptr_t)skew_kernel_pointer(hand->h_data);
 		name              = handle_type_db.h_typename[hand->h_type];
 		memcpy(st.hs_typename, name,
 		       strnlen(name, COMPILER_LENOF(st.hs_typename) - 1),
@@ -1263,13 +1260,13 @@ PRIVATE syscall_slong_t
 		break;
 
 	case HOP_HANDLE_GET_REFCNT:
-		validate_writable(arg, sizeof(uintptr_t));
-		*(uintptr_t *)arg = handle_refcnt(*hand);
+		validate_writable(arg, sizeof(u64));
+		*(u64 *)arg = (u64)handle_refcnt(*hand);
 		break;
 
 	case HOP_HANDLE_GET_ADDRESS:
 		validate_writable(arg, sizeof(u64));
-		*(USER CHECKED u64 *)arg = MANGLE_HANDLE_DATA_POINTER(hand->h_data);
+		*(USER CHECKED u64 *)arg = (u64)(uintptr_t)skew_kernel_pointer(hand->h_data);
 		break;
 
 	case HOP_HANDLE_GET_TYPE:

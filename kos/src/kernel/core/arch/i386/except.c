@@ -44,6 +44,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 #include <signal.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -294,11 +295,11 @@ PRIVATE NONNULL((1)) void KCALL
 print_opcode(pformatprinter printer, void *arg, uintptr_t opcode) {
 	uintptr_t opno = E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(opcode);
 	if (opno <= 0xff) {
-		format_printf(printer, arg, " [opcode=%#.2Ix", opno);
+		format_printf(printer, arg, " [opcode=%#.2" PRIxPTR, opno);
 	} else if (opno <= 0xffff) {
-		format_printf(printer, arg, " [opcode=%#.4Ix", opno);
+		format_printf(printer, arg, " [opcode=%#.4" PRIxPTR, opno);
 	} else {
-		format_printf(printer, arg, " [opcode=%#Ix", opno);
+		format_printf(printer, arg, " [opcode=%#" PRIxPTR, opno);
 	}
 	if (E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(opcode))
 		format_printf(printer, arg, "/%u",
@@ -326,7 +327,7 @@ print_exception_desc_of(struct exception_data const *__restrict data,
 		switch (data->e_subclass) {
 
 		case E_ILLEGAL_INSTRUCTION_X86_INTERRUPT:
-			format_printf(printer, arg, " [int=%#.2Ix:%#Ix] [seg=%#Ix]",
+			format_printf(printer, arg, " [int=%#.2" PRIxPTR ":%#" PRIxPTR "] [seg=%#" PRIxPTR "]",
 			              data->e_pointers[1],
 			              data->e_pointers[2],
 			              data->e_pointers[3]);
@@ -352,7 +353,7 @@ print_exception_desc_of(struct exception_data const *__restrict data,
 			if (what_name) {
 				format_printf(printer, arg, " [what=%s]", what_name);
 			} else {
-				format_printf(printer, arg, " [what=?(%#Ix)]",
+				format_printf(printer, arg, " [what=?(%#" PRIxPTR ")]",
 				              data->e_pointers[2]);
 			}
 		}	break;
@@ -370,10 +371,10 @@ print_exception_desc_of(struct exception_data const *__restrict data,
 			if (name) {
 				format_printf(printer, arg, " [%s:", name);
 			} else {
-				format_printf(printer, arg, " [?(%#Ix):", data->e_pointers[2]);
+				format_printf(printer, arg, " [?(%#" PRIxPTR "):", data->e_pointers[2]);
 			}
 			if (data->e_pointers[3] == X86_REGISTER_MSR) {
-				format_printf(printer, arg, "%%msr(%#Ix),%#I64x]",
+				format_printf(printer, arg, "%%msr(%#" PRIxPTR "),%#" PRIx64 "]",
 				              data->e_pointers[4],
 				              (uint64_t)data->e_pointers[5] |
 				              (uint64_t)data->e_pointers[6] << 32);
@@ -384,7 +385,7 @@ print_exception_desc_of(struct exception_data const *__restrict data,
 				else {
 					format_printf(printer, arg, "?(%#x),", data->e_pointers[3]);
 				}
-				format_printf(printer, arg, "%#Ix]", data->e_pointers[4]);
+				format_printf(printer, arg, "%#" PRIxPTR "]", data->e_pointers[4]);
 			}
 		}	break;
 
@@ -415,8 +416,12 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	struct regdump_printer rd_printer;
 
 	/* Dump the exception that occurred. */
-	format_printf(printer, arg, "Unhandled exception %.4I16X:%.4I16X",
-	              info->ei_class, info->ei_subclass);
+	format_printf(printer, arg,
+	              "Unhandled exception "
+	              "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+	              "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) "",
+	              info->ei_class,
+	              info->ei_subclass);
 	name = get_exception_name(info->ei_code);
 	if (name)
 		format_printf(printer, arg, " [%s]", name);
@@ -443,7 +448,9 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 			(*printer)(arg, "Exception pointers:\n", COMPILER_STRLEN("Exception pointers:\n"));
 			is_first_pointer = false;
 		}
-		format_printf(printer, arg, "    [%u] = %p (%Iu)\n", i,
+		format_printf(printer, arg,
+		              "    [%u] = %p (%" PRIuPTR ")\n",
+		              i,
 		              info->ei_data.e_pointers[i],
 		              info->ei_data.e_pointers[i]);
 	}
@@ -499,8 +506,10 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	char const *name;
 	instrlen_isa_t isa;
 	dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Unhandled exception") " "
-	                  AC_WHITE("%.4I16X") " " AC_WHITE("%.4I16X")),
-	           info->ei_class, info->ei_subclass);
+	                  AC_WHITE("%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) "") " "
+	                  AC_WHITE("%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) "")),
+	           info->ei_class,
+	           info->ei_subclass);
 
 	/* Dump the exception that occurred. */
 	name = get_exception_name(info->ei_code);
@@ -517,7 +526,7 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 			dbg_print(DBGSTR("Exception pointers:\n"));
 			is_first_pointer = false;
 		}
-		dbg_printf(DBGSTR("    [" AC_WHITE("%u") "] = " AC_WHITE("%p") " (" AC_WHITE("%Iu") ")\n"),
+		dbg_printf(DBGSTR("    [" AC_WHITE("%u") "] = " AC_WHITE("%p") " (" AC_WHITE("%" PRIuPTR) ")\n"),
 		           i,
 		           info->ei_data.e_pointers[i],
 		           info->ei_data.e_pointers[i]);
@@ -771,19 +780,19 @@ search_fde:
 			            ustate.ucs_sgregs.sg_fs != expected_fs ||
 			            ustate.ucs_sgregs.sg_es != expected_es ||
 			            ustate.ucs_sgregs.sg_ds != expected_ds) {
-#define LOG_SEGMENT_INCONSISTENCY(name, isval, wantval)                                            \
-				do {                                                                               \
-					if (isval != wantval) {                                                        \
-						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#I16x != %#I16x\n", \
-						       name, isval, wantval);                                              \
-					}                                                                              \
+#define LOG_SEGMENT_INCONSISTENCY(name, isval, wantval)                                                        \
+				do {                                                                                           \
+					if (isval != wantval) {                                                                    \
+						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#" PRIx16 " != %#" PRIx16 "\n", \
+						       name, isval, wantval);                                                          \
+					}                                                                                          \
 				} __WHILE0
-#define LOG_SEGMENT_INCONSISTENCY_CHK(name, isval, isok)                                 \
-				do {                                                                     \
-					if (!isok(isval)) {                                                  \
-						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#I16x\n", \
-						       name, isval);                                             \
-					}                                                                    \
+#define LOG_SEGMENT_INCONSISTENCY_CHK(name, isval, isok)                                       \
+				do {                                                                           \
+					if (!isok(isval)) {                                                        \
+						printk(KERN_CRIT "[except] Inconsistent unwind %%%cs: %#" PRIx16 "\n", \
+						       name, isval);                                                   \
+					}                                                                          \
 				} __WHILE0
 				/* NOTE: Some x86 processors behave kind-of weird:
 				 * [warn  ] [except] Inconsistent unwind %cs: 0x80000008 != 0x8

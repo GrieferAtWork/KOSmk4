@@ -46,6 +46,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sys/io.h>
 
 #include <ctype.h>
+#include <inttypes.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -1355,7 +1356,7 @@ NOTHROW(FCALL ps2_keyboard_assertbyte)(u8 expected) {
 	if likely(got == expected)
 		return true;
 	while (got) {
-		printk(KERN_ERR "[dbg] Unexpected init response byte (got: %#I8x, expected: %#I8x)\n",
+		printk(KERN_ERR "[dbg] Unexpected init response byte (got: %#" PRIx8 ", expected: %#" PRIx8 ")\n",
 		       got, expected);
 		got = ps2_keyboard_getbyte_nb();
 		if likely(got == expected)

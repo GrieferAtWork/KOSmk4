@@ -97,6 +97,7 @@ opt.append("-Os");
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <limits.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -611,7 +612,8 @@ PRIVATE ATTR_NORETURN NONNULL((1)) void
 		 * Also: we don't know if it was a write that caused the problem, so we just
 		 *       always act like it was an unspecific access to an unmapped page. */
 		if (BAD_USAGE_REASON(usage) == BAD_USAGE_REASON_GFP && BAD_USAGE_ECODE(usage) == 0) {
-			printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? [pc=%p,opcode=%#Ix,opflags=%#I32x]\n",
+			printk(KERN_WARNING "[gpf] Assuming Segmentation fault at ? "
+			                    "[pc=%p,opcode=%#" PRIxPTR ",opflags=%#" PRIx32 "]\n",
 			       (void *)icpustate_getpc(state), opcode, op_flags);
 			throw_exception(state,
 			                ERROR_CODEOF(E_SEGFAULT_UNMAPPED),

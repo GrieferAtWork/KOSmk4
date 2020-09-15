@@ -52,6 +52,7 @@
 #include <sys/io.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 #include <time.h>
@@ -199,10 +200,10 @@ AtaPRD_InitFromVirt(AtaPRD *__restrict prd_buf, size_t prd_siz, CHECKED void *ba
 	req_prd = (size_t)(data.ad_buf - data.ad_base);
 	assert(req_prd != 0);
 	assertf(pagedir_translate(base) == (physaddr_t)prd_buf->p_bufaddr,
-	        "prd_buf->p_bufaddr      = %I64p\n"
-	        "pagedir_translate(base) = %I64p\n",
-	        (u64)prd_buf->p_bufaddr,
-	        (u64)pagedir_translate(base));
+	        "prd_buf->p_bufaddr      = %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"
+	        "pagedir_translate(base) = %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n",
+	        (physaddr_t)prd_buf->p_bufaddr,
+	        (physaddr_t)pagedir_translate(base));
 	if (req_locks == 1) {
 		/* Simple case: only a single lock is required! */
 		if unlikely(req_prd > prd_siz) {
@@ -641,7 +642,8 @@ NOTHROW(FCALL dostart_dma_operation)(struct ata_bus *__restrict self,
 	unsigned int reset_counter = 0;
 	data = (AtaAIOHandleData *)handle->ah_data;
 again:
-	ATA_VERBOSE("[ata] Starting %s-DMA operation [lba=%I64u] [sector_count=%I16u] [prd0:%I32p+%I32u]\n",
+	ATA_VERBOSE("[ata] Starting %s-DMA operation [lba=%" PRIu64 "] [sector_count=%" PRIu16 "] "
+	            "[prd0:%" PRIp32 "+%" PRIu32 "]\n",
 	            data->hd_flags & ATA_AIO_HANDLE_FWRITING ? "Write" : "Read",
 	            (u64)((u64)data->hd_io_lbaaddr[0] |
 	                  (u64)data->hd_io_lbaaddr[1] << 8 |
@@ -735,7 +737,11 @@ again:
 	return true;
 handle_io_error:
 	/* Always reset the bus (even if merely done for the next access) */
-	printk(KERN_ERR "[ata] Reseting IDE on DMA-I/O error code %#I16x:%#I16x:%#I16x (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
+	printk(KERN_ERR "[ata] Reseting IDE on DMA-I/O error code "
+	                "%#" PRIx16 ":%#" PRIx16 ":%#" PRIx16 " ("
+	                "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                "dma:%#" PRIxN(__SIZEOF_PORT_T__) ")\n",
 	       (u16)ERRR_C(error), (u16)ERRR_S(error), (u16)ERRR_R(error),
 	       self->b_busio, self->b_ctrlio, self->b_dmaio);
 	Ata_ResetBus(self->b_ctrlio);
@@ -783,7 +789,10 @@ again:
 	assert(self->b_state == ATA_BUS_STATE_INDMA_SWITCH);
 	if (ATOMIC_READ(self->b_flags) & ATA_BUS_FSUSPEND) {
 		ATA_VERBOSE("[ata] Switching `ATA_BUS_STATE_INDMA_SWITCH' -> `ATA_BUS_STATE_READY' "
-		            "because of suspend request (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
+		            "because of suspend request ("
+		            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		            "dma:%#" PRIxN(__SIZEOF_PORT_T__) ")\n",
 		            self->b_busio, self->b_ctrlio, self->b_dmaio);
 		ATOMIC_WRITE(self->b_state, ATA_BUS_STATE_READY);
 		/* Only one thread can hold the `ATA_BUS_STATE_INPIO'-lock, so use `sig_send()'! */
@@ -821,13 +830,19 @@ again:
 		 * NOTE: If this fails, immediately switch to another operation! */
 		if (!start_dma_operation(self, handle))
 			goto again;
-		ATA_VERBOSE("[ata] Chain-loaded secondary DMA command on bus:%#I16x,ctrl:%#I16x,dma:%#I16x\n",
+		ATA_VERBOSE("[ata] Chain-loaded secondary DMA command on "
+		            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		            "dma:%#" PRIxN(__SIZEOF_PORT_T__) "\n",
 		            self->b_busio, self->b_ctrlio, self->b_dmaio);
 		return;
 	}
 	/* Nothing left for us to do! - Switch to READY mode. */
 	ATA_VERBOSE("[ata] Switching `ATA_BUS_STATE_INDMA_SWITCH' -> `ATA_BUS_STATE_READY' because "
-	            "there are no more DMA commands (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
+	            "there are no more DMA commands ("
+	            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	            "dma:%#" PRIxN(__SIZEOF_PORT_T__) ")\n",
 	            self->b_busio, self->b_ctrlio, self->b_dmaio);
 	ATOMIC_WRITE(self->b_state, ATA_BUS_STATE_READY);
 	/* Only one thread can hold the `ATA_BUS_STATE_INPIO'-lock, so use `sig_send()'! */
@@ -856,7 +871,11 @@ NOTHROW(FCALL handle_ata_bus_interrupt)(struct ata_bus *__restrict self) {
 		     DMA_STATUS_FDMARUNNING |
 		     DMA_STATUS_FINTERRUPTED);
 		status = inb(self->b_busio + ATA_STATUS); /* Must always be read... */
-		ATA_VERBOSE("[ata] IDE interrupt on bus:%#I16x,ctrl:%#I16x,dma:%#I16x [bus_status=%#.2I8x,dma_status=%#.2I8x]\n",
+		ATA_VERBOSE("[ata] IDE interrupt on "
+		            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		            "dma:%#" PRIxN(__SIZEOF_PORT_T__) " "
+		            "[bus_status=%#.2" PRIx8 ",dma_status=%#.2" PRIx8 "]\n",
 		            self->b_busio, self->b_ctrlio, self->b_dmaio, status, dma_status);
 again_readstate:
 		switch (ATOMIC_READ(self->b_state)) {
@@ -864,7 +883,11 @@ again_readstate:
 		case ATA_BUS_STATE_INDMA_CANCEL:
 			/* A DMA operation is being canceled. - Somewhere else, someone is trying
 			 * to stop this DMA operation, meaning we mustn't handle this interrupt! */
-			ATA_VERBOSE("[ata] IDE interrupt on bus:%#I16x,ctrl:%#I16x,dma:%#I16x during `ATA_BUS_STATE_INDMA_CANCEL'\n",
+			ATA_VERBOSE("[ata] IDE interrupt on "
+			            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+			            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+			            "dma:%#" PRIxN(__SIZEOF_PORT_T__) " "
+			            "during `ATA_BUS_STATE_INDMA_CANCEL'\n",
 			            self->b_busio, self->b_ctrlio, self->b_dmaio);
 			ATOMIC_WRITE(self->b_cancel_intr_dma_status, dma_status);
 			ATOMIC_WRITE(self->b_cancel_intr_bus_status, status);
@@ -892,7 +915,10 @@ again_readstate:
 				                               E_IOERROR_REASON_ATA_DMA_ERR));
 			} else {
 				/* Indicate a successful completion of the data transfer */
-				ATA_VERBOSE("[ata] Signal DMA success on bus:%#I16x,ctrl:%#I16x,dma:%#I16x\n",
+				ATA_VERBOSE("[ata] Signal DMA success on "
+				            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+				            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+				            "dma:%#" PRIxN(__SIZEOF_PORT_T__) "\n",
 				            self->b_busio, self->b_ctrlio, self->b_dmaio);
 				ata_handle_signal(handle, AIO_COMPLETION_SUCCESS);
 			}
@@ -907,14 +933,18 @@ again_readstate:
 			break;
 
 		default:
-			printk(KERN_WARNING "[ata] Bus in unexpected state %I16u\n",
+			printk(KERN_WARNING "[ata] Bus in unexpected state %" PRIu16 "\n",
 			       (u16)ATOMIC_READ(self->b_state));
 			goto err_unexpected_interrupt;
 		}
 	} else {
 		/* BUS without DMA support */
 		status = inb(self->b_busio + ATA_STATUS);
-		ATA_VERBOSE("[ata] IDE interrupt on bus:%#I16x,ctrl:%#I16x,dma:%#I16x [bus_status=%#.2I8x]\n",
+		ATA_VERBOSE("[ata] IDE interrupt on "
+		            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+		            "dma:%#" PRIxN(__SIZEOF_PORT_T__) " "
+		            "[bus_status=%#.2" PRIx8 "]\n",
 		            self->b_busio, self->b_ctrlio, self->b_dmaio, status);
 		switch (ATOMIC_READ(self->b_state)) {
 
@@ -929,7 +959,10 @@ again_readstate:
 	}
 	return true;
 err_unexpected_interrupt:
-	printk(KERN_WARNING "[ata] Unexpected IDE interrupt (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
+	printk(KERN_WARNING "[ata] Unexpected IDE interrupt ("
+	                    "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                    "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                    "dma:%#" PRIxN(__SIZEOF_PORT_T__) ")\n",
 	       self->b_busio, self->b_ctrlio, self->b_dmaio);
 	return true;
 }
@@ -1008,7 +1041,10 @@ again_cancel:
 			 * drive to stop DMA-ing, so we can switch execution to the next pending return
 			 * DMA operation, and indicate to the caller that the operation was successfully
 			 * canceled. */
-			ATA_VERBOSE("[ata] Cancel active DMA on IDE (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
+			ATA_VERBOSE("[ata] Cancel active DMA on IDE ("
+			            "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
+			            "ctrl:%#" PRIxN(__SIZEOF_PORT_T__) ","
+			            "dma:%#" PRIxN(__SIZEOF_PORT_T__) ")\n",
 			            bus->b_busio, bus->b_ctrlio, bus->b_dmaio);
 			do {
 				outb(bus->b_dmaio + DMA_PRIMARY_COMMAND, 0);
@@ -1428,7 +1464,10 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 	struct hd_driveid specs;
 	assert(drive_id == ATA_DRIVE_MASTER ||
 	       drive_id == ATA_DRIVE_SLAVE);
-	printk(FREESTR(KERN_INFO "[ata] Attempting to initialize %s %s ATA device {%x,%x,%x} (default_ide: %u)\n"),
+	printk(FREESTR(KERN_INFO "[ata] Attempting to initialize %s %s ATA device {"
+	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "%#" PRIxN(__SIZEOF_PORT_T__) "} (default_ide: %u)\n"),
 	       is_primary_ata ? FREESTR("primary") : FREESTR("secondary"),
 	       drive_id == ATA_DRIVE_MASTER ? FREESTR("master") : FREESTR("slave"),
 	       ports->a_bus, ports->a_ctrl,
@@ -1527,7 +1566,7 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 					}
 					if (!signal) {
 						printk(FREESTR(KERN_ERR "[ata] Timeout while waiting for ATA_COMMAND_IDENTIFY "
-						                        "[status={then:%#I8x,now:%#I8x}]\n"),
+						                        "[status={then:%#" PRIx8 ",now:%#" PRIx8 "}]\n"),
 						       status, inb(bus->b_ctrlio));
 reset_bus_and_fail:
 						if (busptr.hp_siz) {
@@ -1743,7 +1782,13 @@ PRIVATE ATTR_NOINLINE ATTR_FREETEXT bool
 NOTHROW(KCALL initialize_ide)(struct ide_ports *__restrict self, bool is_default_ide) {
 	struct ata_ports a;
 	bool result;
-	printk(FREESTR(KERN_INFO "[ata] Attempting to initialize IDE device {%x,%x,%x,%x,%x} (default_ide: %u)\n"),
+	printk(FREESTR(KERN_INFO "[ata] Attempting to initialize IDE device {"
+	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "%#" PRIxN(__SIZEOF_PORT_T__) ","
+	                         "%#" PRIxN(__SIZEOF_PORT_T__) "} "
+	                         "(default_ide: %u)\n"),
 	       self->i_primary_bus, self->i_primary_ctrl,
 	       self->i_secondary_bus, self->i_secondary_ctrl,
 	       self->i_dma_ctrl, is_default_ide ? 1 : 0);
@@ -1779,7 +1824,8 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 		result          = true;
 	} else {
 		if (!(dev->pd_res[PD_RESOURCE_BAR0].pr_flags & PCI_RESOURCE_FIO)) {
-			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %I32p uses a memory mapping for BAR0 (primary bus)\n"),
+			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %" PRIp32 " uses a "
+			                            "memory mapping for BAR0 (primary bus)\n"),
 			       dev->pd_base);
 			return false;
 		}
@@ -1792,7 +1838,8 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 		result           = true;
 	} else {
 		if (!(dev->pd_res[PD_RESOURCE_BAR1].pr_flags & PCI_RESOURCE_FIO)) {
-			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %I32p uses a memory mapping for BAR1 (primary control)\n"),
+			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %" PRIp32 " uses a "
+			                            "memory mapping for BAR1 (primary control)\n"),
 			       dev->pd_base);
 			return false;
 		}
@@ -1805,7 +1852,8 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 		result            = true;
 	} else {
 		if (!(dev->pd_res[PD_RESOURCE_BAR2].pr_flags & PCI_RESOURCE_FIO)) {
-			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %I32p uses a memory mapping for BAR2 (secondary bus)\n"),
+			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %" PRIp32 " uses a "
+			                            "memory mapping for BAR2 (secondary bus)\n"),
 			       dev->pd_base);
 			return false;
 		}
@@ -1818,7 +1866,8 @@ NOTHROW(KCALL kernel_load_pci_ide)(struct pci_device *__restrict dev) {
 		result             = true;
 	} else {
 		if (!(dev->pd_res[PD_RESOURCE_BAR3].pr_flags & PCI_RESOURCE_FIO)) {
-			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %I32p uses a memory mapping for BAR3 (secondary control)\n"),
+			printk(FREESTR(KERN_WARNING "[ata] PCI IDE device at %" PRIp32 " uses a "
+			                            "memory mapping for BAR3 (secondary control)\n"),
 			       dev->pd_base);
 			return false;
 		}

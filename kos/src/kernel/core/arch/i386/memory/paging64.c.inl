@@ -1871,7 +1871,7 @@ NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
-	        "Invalid page permissions: %#.4I16x", perm);
+	        "Invalid page permissions: %#.4" PRIx16, perm);
 	assertf(phys <= (physaddr_t)UINT64_C(0x000ffffffffff000),
 	        "Address cannot be mapped under p64: %" PRIpN(__SIZEOF_PHYSADDR_T__),
 	        phys);
@@ -2118,7 +2118,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 			page_freeone(pageptr);                                               \
 			do {                                                                 \
 				--free_count;                                                    \
-				page_freeone((physpage_t)free_pages[free_count]);                 \
+				page_freeone((physpage_t)free_pages[free_count]);                \
 			} while (free_count);                                                \
 		}                                                                        \
 		else {                                                                   \
@@ -2694,7 +2694,7 @@ struct p64_enumdat {
 
 PRIVATE ATTR_DBGTEXT void KCALL
 p64_printident(struct p64_enumdat *__restrict data) {
-	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%Iu") " identity mappings\n"),
+	dbg_printf(DBGSTR(AC_WHITE("%p") "-" AC_WHITE("%p") ": " AC_WHITE("%" PRIuSIZ) " identity mappings\n"),
 	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE,
 	           (byte_t *)P64_VM_KERNEL_PDIR_IDENTITY_BASE + P64_VM_KERNEL_PDIR_IDENTITY_SIZE - 1,
 	           data->ed_identcnt);
@@ -2715,22 +2715,22 @@ p64_doenum(struct p64_enumdat *__restrict data,
 		           word & P64_PAGE_FADDR_4KIB);
 		if ((num_bytes >= ((u64)1024 * 1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "TiB"),
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "TiB"),
 			                    (size_t)(num_bytes / ((u64)1024 * 1024 * 1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024 * 1024 * 1024)) &&
 		    (num_bytes % ((u64)1024 * 1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "GiB"),
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "GiB"),
 			                    (size_t)(num_bytes / ((u64)1024 * 1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024 * 1024)) &&
 		           (num_bytes % ((u64)1024 * 1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "MiB"),
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "MiB"),
 			                    (size_t)(num_bytes / ((u64)1024 * 1024)));
 		} else if ((num_bytes >= ((u64)1024)) &&
 		           (num_bytes % ((u64)1024)) == 0) {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "KiB"),
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "KiB"),
 			                    (size_t)(num_bytes / ((u64)1024)));
 		} else {
-			indent = dbg_printf(DBGSTR("%Iu" AC_DEFATTR "B"),
+			indent = dbg_printf(DBGSTR("%" PRIuSIZ AC_DEFATTR "B"),
 			                    num_bytes);
 		}
 #define COMMON_INDENT (9 + 3)

@@ -30,6 +30,7 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -127,7 +128,7 @@ NOTHROW(FCALL vm_sync)(struct vm *__restrict self,
                        PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                        PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
-	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#" PRIxSIZ, num_bytes);
 #ifdef CONFIG_NO_SMP
 	if (self == THIS_VM || self == &vm_kernel)
 		pagedir_sync(addr, num_bytes);
@@ -201,7 +202,7 @@ PUBLIC NOBLOCK void
 NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                             PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
-	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#" PRIxSIZ, num_bytes);
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
@@ -289,7 +290,7 @@ PUBLIC NOBLOCK void
 NOTHROW(FCALL vm_supersync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                               PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
-	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#" PRIxSIZ, num_bytes);
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		args[0] = (void *)(uintptr_t)addr;
@@ -334,7 +335,7 @@ NOTHROW(FCALL pagedir_sync_smp_p)(pagedir_phys_t pagedir,
 	void *args[CPU_IPI_ARGCOUNT];
 	cpuset_t targets;
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
-	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#" PRIxSIZ, num_bytes);
 	pagedir_getcpus(pagedir, CPUSET_PTR(targets));
 	args[0] = (void *)(uintptr_t)addr;
 	args[1] = (void *)(uintptr_t)num_bytes;
@@ -375,7 +376,7 @@ PUBLIC NOBLOCK void
 NOTHROW(FCALL pagedir_sync_smp)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
                                 PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
-	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#Ix", num_bytes);
+	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#" PRIxSIZ, num_bytes);
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;

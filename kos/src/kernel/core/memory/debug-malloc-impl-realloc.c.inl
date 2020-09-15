@@ -126,7 +126,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr,
 	if unlikely(KERNEL_SLAB_CHECKPTR(ptr)) {
 		old_user_size = SLAB_GET(ptr)->s_size;
 		assertf((old_user_size & (HEAP_ALIGNMENT - 1)) == 0,
-		        "Invalid slab size: %Iu", old_user_size);
+		        "Invalid slab size: %" PRIuSIZ, old_user_size);
 #ifdef IS_INPLACE
 		if (old_user_size >= result.hp_siz)
 			return ptr; /* The slab is still large enough */

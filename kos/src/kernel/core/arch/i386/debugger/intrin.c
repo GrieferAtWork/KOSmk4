@@ -46,6 +46,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sys/io.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -59,10 +60,10 @@ DECL_BEGIN
 
 PRIVATE ATTR_DBGTEXT void KCALL
 print_cpuid_reg(u32 leaf, char reg_acdb, u32 reg_value) {
-	dbg_printf(DBGSTR("cpuid "    AC_FG(ANSITTY_CL_WHITE) "%#.8I32x" AC_FGDEF
-	                  ": %%e%cx=" AC_FG(ANSITTY_CL_WHITE) "%#.8I32x" AC_FGDEF
+	dbg_printf(DBGSTR("cpuid "    AC_FG(ANSITTY_CL_WHITE) "%#.8" PRIx32 AC_FGDEF
+	                  ": %%e%cx=" AC_FG(ANSITTY_CL_WHITE) "%#.8" PRIx32 AC_FGDEF
 	                  " (" AC_FG(ANSITTY_CL_YELLOW) "%$q" AC_FGDEF ")"
-	                  " (" AC_FG(ANSITTY_CL_WHITE) "%I32u" AC_FGDEF ")" "\n"),
+	                  " (" AC_FG(ANSITTY_CL_WHITE) "%" PRIu32 AC_FGDEF ")" "\n"),
 	           leaf, reg_acdb, reg_value, 4, &reg_value, reg_value);
 }
 
@@ -72,11 +73,11 @@ DBG_COMMAND(cpuid,
             "for the given LEAF and display its returned values\n",
             argc, argv) {
 	u32 leaf, a, c, d, b;
-	if (argc <= 1 || sscanf(argv[1], DBGSTR("%I32U"), &leaf) != 1)
+	if (argc <= 1 || sscanf(argv[1], DBGSTR("%" SCNU32), &leaf) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (argc >= 3) {
 		u32 leaf2;
-		if (sscanf(argv[2], DBGSTR("%I32U"), &leaf2) != 1)
+		if (sscanf(argv[2], DBGSTR("%" SCNU32), &leaf2) != 1)
 			return DBG_STATUS_INVALID_ARGUMENTS;
 		__cpuid2(leaf, leaf2, &a, &c, &d, &b);
 	} else {
@@ -190,10 +191,10 @@ DBG_COMMAND(lgdt,
 	uintptr_t base;
 	struct fcpustate fst;
 	if (argc != 3 ||
-	    sscanf(argv[1], DBGSTR("%I16U"), &limit) != 1 ||
-	    sscanf(argv[2], DBGSTR("%Ix"), &base) != 1)
+	    sscanf(argv[1], DBGSTR("%" SCNU16), &limit) != 1 ||
+	    sscanf(argv[2], DBGSTR("%" SCNxPTR), &base) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	dbg_printf("lgdt #%.4I16x (%I16u), %p\n", limit, limit, base);
+	dbg_printf("lgdt #%.4" PRIx16 " (%" PRIu16 "), %p\n", limit, limit, base);
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	fst.fcs_gdt.dt_limit = limit;
 	fst.fcs_gdt.dt_base  = base;
@@ -206,7 +207,7 @@ DBG_COMMAND(sgdt,
             "\tPrint the base and limit of the current Global Descriptor Table\n") {
 	struct fcpustate fst;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
-	dbg_printf(DBGSTR("sgdt %#.4I16x (%I16u), %p\n"),
+	dbg_printf(DBGSTR("sgdt %#.4" PRIx16 " (%" PRIu16 "), %p\n"),
 	           fst.fcs_gdt.dt_limit,
 	           fst.fcs_gdt.dt_limit,
 	           fst.fcs_gdt.dt_base);
@@ -221,10 +222,10 @@ DBG_COMMAND(lidt,
 	uintptr_t base;
 	struct fcpustate fst;
 	if (argc != 3 ||
-	    sscanf(argv[1], "%I16U", &limit) != 1 ||
-	    sscanf(argv[2], "%Ix", &base) != 1)
+	    sscanf(argv[1], "%" SCNU16, &limit) != 1 ||
+	    sscanf(argv[2], "%" SCNxPTR, &base) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("lidt %#.4I16x (%I16u), %p\n"),
+	dbg_printf(DBGSTR("lidt %#.4" PRIx16 " (%" PRIu16 "), %p\n"),
 	           limit, limit, base);
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	fst.fcs_idt.dt_limit = limit;
@@ -238,7 +239,7 @@ DBG_COMMAND(sidt,
             "\tPrint the base and limit of the current Interrupt Descriptor Table\n") {
 	struct fcpustate fst;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
-	dbg_printf(DBGSTR("sidt %#.4I16x (%I16u), %p\n"),
+	dbg_printf(DBGSTR("sidt %#.4" PRIx16 " (%" PRIu16 "), %p\n"),
 	           fst.fcs_idt.dt_limit,
 	           fst.fcs_idt.dt_limit,
 	           fst.fcs_idt.dt_base);
@@ -358,11 +359,11 @@ DBG_COMMAND(rdmsr,
             argc, argv) {
 	u32 id; u64 val;
 	if (argc != 2 ||
-	    sscanf(argv[1], DBGSTR("%I32x"), &id) != 1)
+	    sscanf(argv[1], DBGSTR("%" SCNx32), &id) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	val = __rdmsr(id);
-	dbg_printf(DBGSTR("rdmsr " AC_WHITE("%#.8I32x") " (" AC_WHITE("%I32u") "): "
-	                  AC_WHITE("%#.16I64x") " (" AC_WHITE("%I64u") ")\n"),
+	dbg_printf(DBGSTR("rdmsr " AC_WHITE("%#.8" PRIx32) " (" AC_WHITE("%" PRIu32 "") "): "
+	                  AC_WHITE("%#.16" PRIx64) " (" AC_WHITE("%" PRIu64) ")\n"),
 	           id, id, val, val);
 	return 0;
 }
@@ -373,11 +374,11 @@ DBG_COMMAND(wrmsr,
             argc, argv) {
 	u32 id; u64 val;
 	if (argc != 3 ||
-	    sscanf(argv[1], DBGSTR("%I32x"), &id) != 1 ||
-	    sscanf(argv[2], DBGSTR("%I64U"), &val) != 1)
+	    sscanf(argv[1], DBGSTR("%" SCNx32), &id) != 1 ||
+	    sscanf(argv[2], DBGSTR("%" SCNU64), &val) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("wrmsr " AC_WHITE("%#.8I32x") " (" AC_WHITE("%I32u") "): "
-	                  AC_WHITE("%#.16I64x") " (" AC_WHITE("%I64u") ")\n"),
+	dbg_printf(DBGSTR("wrmsr " AC_WHITE("%#.8" PRIx32) " (" AC_WHITE("%" PRIu32) "): "
+	                  AC_WHITE("%#.16" PRIx64) " (" AC_WHITE("%" PRIu64) ")\n"),
 	           id, id, val, val);
 	__wrmsr(id, val);
 	return 0;

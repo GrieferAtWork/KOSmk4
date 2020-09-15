@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_MISC_PROFILER_C
 #define GUARD_KERNEL_SRC_MISC_PROFILER_C 1
 #define DISABLE_BRANCH_PROFILING 1 /* Don't profile ourself! */
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -29,6 +30,7 @@
 #include <kernel/profiler.h>
 #include <kernel/types.h>
 
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -198,13 +200,17 @@ dump_branch_stats_for(struct branch_prediction *start,
 		printk(KERN_RAW "%[vinfo:%f(%l,%c) : %n : %p : ]", start->bp_addr);
 #endif
 		if (annotated) {
-			printk(KERN_RAW "%u%% correct (%Iu/%Iu) (expects: %Iu)\n",
+			printk(KERN_RAW "%u%% correct ("
+			                "%" PRIuN(__BRANCH_PREDITION_RIGHT_WRONG_SIZE) "Iu/"
+			                "%" PRIuN(__BRANCH_PREDITION_RIGHT_WRONG_SIZE) ") "
+			                "(expects: %" PRIuN(__BRANCH_PREDITION_EXPECTED_SIZE) ")\n",
 			       (unsigned int)((start->bp_right * 100) / (start->bp_right + start->bp_wrong)),
 			       start->bp_right,
 			       start->bp_right + start->bp_wrong,
 			       start->bp_expect);
 		} else {
-			printk(KERN_RAW "tt:%Iu, ff:%Iu\n",
+			printk(KERN_RAW "tt:%" PRIuN(__BRANCH_PREDITION_RIGHT_WRONG_SIZE) ", "
+			                "ff:%" PRIuN(__BRANCH_PREDITION_RIGHT_WRONG_SIZE) "\n",
 			       start->bp_hit, start->bp_miss);
 		}
 	}

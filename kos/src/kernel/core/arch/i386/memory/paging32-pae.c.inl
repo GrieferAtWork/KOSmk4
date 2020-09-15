@@ -1020,20 +1020,20 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 	assert(vec2 < 512);
 	assert(vec1 < 512);
 	assertf((e1_word & PAE_PAGE_FPREPARED) || PAE_PDIR_E1_ISHINT(e1_word),
-	        "Cannot set invalid E1 word %I64p for prepared entry",
+	        "Cannot set invalid E1 word %" PRIp64 " for prepared entry",
 	        (u64)e1_word);
 	assert(PAE_PDIR_E3_IDENTITY[vec3].p_word & PAE_PAGE_FPRESENT);
 	e2 = PAE_PDIR_E2_IDENTITY[vec3][vec2];
 	assertf(e2.p_word & PAE_PAGE_FPRESENT,
 	        "Page vector #%u:%u for page %p...%p isn't allocated\n"
-	        "e2.p_word = %I64p",
+	        "e2.p_word = %" PRIp64,
 	        (unsigned int)vec3, (unsigned int)vec2,
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
 	        e2.p_word);
 	assertf(!(e2.p_word & PAE_PAGE_F2MIB),
 	        "Page %p...%p exists as a present 2MiB page #%u:%u\n"
-	        "e2.p_word = %I64p",
+	        "e2.p_word = %" PRIp64,
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
 	        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
 	        (unsigned int)vec3, (unsigned int)vec2, e2.p_word);
@@ -1042,7 +1042,7 @@ NOTHROW(FCALL pae_pagedir_assert_e1_word_prepared)(unsigned int vec3,
 		e1 = PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1];
 		assertf(e1.p_word & PAE_PAGE_FPREPARED || PAE_PDIR_E1_ISHINT(e1.p_word),
 		        "Page %p...%p [vec3=%u,vec2=%u,vec1=%u] hasn't been prepared\n"
-		        "e1.p_word = %I64p",
+		        "e1.p_word = %" PRIp64,
 		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1)),
 		        (uintptr_t)(PAE_PDIR_VECADDR(vec3, vec2, vec1) + PAGESIZE - 1),
 		        vec3, vec2, vec1, e1.p_word);
@@ -1129,7 +1129,7 @@ NOTHROW(FCALL pae_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 	PG_ASSERT_ALIGNED_ADDRESS(addr);
 	assertf(IS_ALIGNED(phys, 4096), "phys = %" PRIpN(__SIZEOF_PHYSADDR_T__), phys);
 	assertf(!(perm & ~PAGEDIR_MAP_FMASK),
-	        "Invalid page permissions: %#.4I16x", perm);
+	        "Invalid page permissions: %#.4" PRIx16, perm);
 	assertf(phys <= (physaddr_t)UINT64_C(0x000ffffffffff000),
 	        "Address cannot be mapped under pae: %" PRIpN(__SIZEOF_PHYSADDR_T__),
 	        phys);

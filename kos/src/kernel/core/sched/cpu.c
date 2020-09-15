@@ -42,6 +42,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -87,7 +88,7 @@ NOTHROW(FCALL cpu_do_assert_running)(struct task *__restrict thread,
 	assertf(DO_FLAGS_INDICATE_RUNNING(thread->t_flags),
 	        "Flags do not indicate that the thread is running\n"
 	        "thread          = %p\n"
-	        "thread->t_flags = %#Ix\n",
+	        "thread->t_flags = %#" PRIxPTR "\n",
 	        thread, thread->t_flags);
 	me = THIS_CPU;
 	iter = me->c_current;
@@ -96,13 +97,13 @@ NOTHROW(FCALL cpu_do_assert_running)(struct task *__restrict thread,
 			return true;
 	} while ((iter = iter->t_sched.s_running.sr_runnxt) != me->c_current);
 	assertf(cpu_validate_pointer(thread->t_cpu),
-	        "CPU Pointer %p of thread %p [tid=%u] is invalid",
+	        "CPU Pointer %p of thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "] is invalid",
 	        thread->t_cpu, thread, task_getroottid_of_s(thread));
 	assertf(thread->t_cpu == me,
 	        "Thread is loaded onto a different CPU\n"
 	        "me            = %p [cid=%u]\n"
 	        "thread->t_cpu = %p [cid=%u]\n"
-	        "thread        = %p [cid=%u]\n",
+	        "thread        = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 	        me, (unsigned int)me->c_id,
 	        thread->t_cpu, (unsigned int)thread->t_cpu->c_id,
 	        thread, task_getroottid_of_s(thread));
@@ -110,7 +111,7 @@ NOTHROW(FCALL cpu_do_assert_running)(struct task *__restrict thread,
 	if (thread == &FORCPU(me, thiscpu_idle))
 		return true;
 	if (__assertion_checkf("thread in THIS_CPU->c_current",
-	                       "Thread %p [tid=%u] is not running on cpu %p [cid=%u]\n",
+	                       "Thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "] is not running on cpu %p [cid=%u]\n",
 	                       thread, task_getroottid_of_s(thread),
 	                       me, (unsigned int)me->c_id))
 		return false;
@@ -123,8 +124,8 @@ NOTHROW(FCALL cpu_do_assert_sleeping)(struct task *__restrict thread,
 	struct task *iter;
 	assertf(DO_FLAGS_INDICATE_SLEEPING(thread->t_flags),
 	        "Flags do not indicate that the thread is sleeping\n"
-	        "thread          = %p [tid=%u]\n"
-	        "thread->t_flags = %#Ix\n",
+	        "thread          = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+	        "thread->t_flags = %#" PRIxPTR "\n",
 	        thread, task_getroottid_of_s(thread), thread->t_flags);
 	me = THIS_CPU;
 	for (iter = me->c_sleeping; iter != NULL;
@@ -133,7 +134,7 @@ NOTHROW(FCALL cpu_do_assert_sleeping)(struct task *__restrict thread,
 			return true;
 	}
 	assertf(cpu_validate_pointer(thread->t_cpu),
-	        "CPU Pointer %p of thread %p [tid=%u] is invalid",
+	        "CPU Pointer %p of thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "] is invalid",
 	        thread->t_cpu, thread, task_getroottid_of_s(thread));
 	assertf(thread->t_cpu == me,
 	        "Thread is loaded onto a different CPU\n"
@@ -147,7 +148,7 @@ NOTHROW(FCALL cpu_do_assert_sleeping)(struct task *__restrict thread,
 	if (thread == &FORCPU(me, thiscpu_idle))
 		return true;
 	if (__assertion_checkf("thread in THIS_CPU->c_sleeping",
-	                       "Thread %p [tid=%u] is not running on cpu %p [cid=%u]\n",
+	                       "Thread %p [tid=%" PRIuN(__SIZEOF_PID_T__) "] is not running on cpu %p [cid=%u]\n",
 	                       thread, task_getroottid_of_s(thread),
 	                       me, (unsigned int)me->c_id))
 		return false;
@@ -230,12 +231,12 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 			assertf(other->t_sched.s_asleep.ss_pself == pother,
 			        "Broken list of sleeping thread\n"
 			        "me                               = %p [cid=%u]\n"
-			        "caller                           = %p [tid=%u]\n"
-			        "other                            = %p [tid=%u]\n"
+			        "caller                           = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "other                            = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
 			        "other->t_sched.s_asleep.ss_pself = %p\n"
 			        "pother                           = %p\n"
-			        "PREV_SLEEPER(other)              = %p [tid=%u]\n"
-			        "NEXT_SLEEPER(other)              = %p [tid=%u]\n",
+			        "PREV_SLEEPER(other)              = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "NEXT_SLEEPER(other)              = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 			        me, (unsigned int)me->c_id,
 			        caller, task_getroottid_of_s(caller),
 			        other, task_getroottid_of_s(other),
@@ -248,11 +249,11 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 			assertf(other != iter,
 			        "Running thread also appears as sleeper\n"
 			        "me                  = %p [cid=%u]\n"
-			        "caller              = %p [tid=%u]\n"
-			        "iter                = %p [tid=%u]\n"
-			        "other               = %p [tid=%u]\n"
-			        "PREV_SLEEPER(other) = %p [tid=%u]\n"
-			        "NEXT_SLEEPER(other) = %p [tid=%u]\n",
+			        "caller              = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "iter                = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "other               = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "PREV_SLEEPER(other) = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "NEXT_SLEEPER(other) = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 			        me, (unsigned int)me->c_id,
 			        caller, task_getroottid_of_s(caller),
 			        iter, task_getroottid_of_s(iter),
@@ -264,11 +265,11 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 			assertf(DO_FLAGS_INDICATE_SLEEPING(other->t_flags),
 			        "Sleeping thread has incorrect flags\n"
 			        "me                  = %p [cid=%u]\n"
-			        "caller              = %p [tid=%u]\n"
-			        "other               = %p [tid=%u]\n"
-			        "other->t_flags      = %#Ix\n"
-			        "PREV_PENDING(other) = %p [tid=%u]\n"
-			        "NEXT_PENDING(other) = %p [tid=%u]\n",
+			        "caller              = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "other               = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "other->t_flags      = %#" PRIxPTR "\n"
+			        "PREV_PENDING(other) = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "NEXT_PENDING(other) = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 			        me, (unsigned int)me->c_id,
 			        caller, task_getroottid_of_s(caller),
 			        other, task_getroottid_of_s(other),
@@ -288,11 +289,11 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 			assertf(other != iter,
 			        "Running thread also appears as pending\n"
 			        "me                  = %p [cid=%u]\n"
-			        "caller              = %p [tid=%u]\n"
-			        "iter                = %p [tid=%u]\n"
-			        "other               = %p [tid=%u]\n"
-			        "PREV_PENDING(other) = %p [tid=%u]\n"
-			        "NEXT_PENDING(other) = %p [tid=%u]\n",
+			        "caller              = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "iter                = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "other               = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "PREV_PENDING(other) = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "NEXT_PENDING(other) = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 			        me, (unsigned int)me->c_id,
 			        caller, task_getroottid_of_s(caller),
 			        iter, task_getroottid_of_s(iter),
@@ -304,11 +305,11 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 			assertf((other->t_flags & (TASK_FPENDING | TASK_FRUNNING)) == TASK_FPENDING,
 			        "Pending thread has incorrect flags\n"
 			        "me                  = %p [cid=%u]\n"
-			        "caller              = %p [tid=%u]\n"
-			        "other               = %p [tid=%u]\n"
-			        "other->t_flags      = %#Ix\n"
-			        "PREV_PENDING(other) = %p [tid=%u]\n"
-			        "NEXT_PENDING(other) = %p [tid=%u]\n",
+			        "caller              = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "other               = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "other->t_flags      = %#" PRIxPTR "\n"
+			        "PREV_PENDING(other) = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+			        "NEXT_PENDING(other) = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 			        me, (unsigned int)me->c_id,
 			        caller, task_getroottid_of_s(caller),
 			        other, task_getroottid_of_s(other),
@@ -331,13 +332,13 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 		        ? (iter->t_sched.s_running.sr_runprv == iter) && (me->c_current == iter)
 		        : 1,
 		        "me               = %p [cid=%u]\n"
-		        "caller           = %p [tid=%u]\n"
-		        "me->c_current    = %p [tid=%u]\n"
-		        "iter             = %p [tid=%u]\n"
-		        "iter->PREV       = %p [tid=%u]\n"
-		        "iter->PREV->NEXT = %p [tid=%u]\n"
-		        "iter->NEXT       = %p [tid=%u]\n"
-		        "iter->NEXT->PREV = %p [tid=%u]\n",
+		        "caller           = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "me->c_current    = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter             = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter->PREV       = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter->PREV->NEXT = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter->NEXT       = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter->NEXT->PREV = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 		        me, (unsigned int)me->c_id,
 		        caller, task_getroottid_of_s(caller),
 		        me->c_current, task_getroottid_of_s(me->c_current),
@@ -353,11 +354,11 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 		assertf(DO_FLAGS_INDICATE_RUNNING(iter->t_flags),
 		        "Task apart of the ring of running threads is lacking the TASK_FRUNNING flag\n"
 		        "me            = %p [cid=%u]\n"
-		        "caller        = %p [tid=%u]\n"
-		        "iter          = %p [tid=%u]\n"
-		        "iter->PREV    = %p [tid=%u]\n"
-		        "iter->NEXT    = %p [tid=%u]\n"
-		        "iter->t_flags = %#Ix\n",
+		        "caller        = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter          = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter->PREV    = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter->NEXT    = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+		        "iter->t_flags = %#" PRIxPTR "\n",
 		        me, (unsigned int)me->c_id,
 		        caller, task_getroottid_of_s(caller),
 		        iter, task_getroottid_of_s(iter),
@@ -370,8 +371,8 @@ NOTHROW(FCALL cpu_do_assert_integrity)(bool need_caller) {
 	assertf(found_caller || !need_caller,
 	        "failed to find calling thread\n"
 	        "me            = %p [cid=%u]\n"
-	        "caller        = %p [tid=%u]\n"
-	        "me->c_current = %p [tid=%u]\n",
+	        "caller        = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n"
+	        "me->c_current = %p [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 	        me, (unsigned int)me->c_id,
 	        caller, task_getroottid_of_s(caller),
 	        me->c_current, task_getroottid_of_s(me->c_current));

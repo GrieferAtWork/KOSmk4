@@ -447,9 +447,10 @@ typedef void *__timer_t;
 #endif /* __CC__ */
 
 
-#define __SIZEOF_INO_T__ __FS_SIZEOF(INO) /* == sizeof(ino_t) */
-#define __SIZEOF_OFF_T__ __FS_SIZEOF(OFF) /* == sizeof(off_t) */
-#define __SIZEOF_POS_T__ __FS_SIZEOF(OFF) /* == sizeof(pos_t) */
+#define __SIZEOF_INO_T__  __FS_SIZEOF(INO)  /* == sizeof(ino_t) */
+#define __SIZEOF_OFF_T__  __FS_SIZEOF(OFF)  /* == sizeof(off_t) */
+#define __SIZEOF_POS_T__  __FS_SIZEOF(OFF)  /* == sizeof(pos_t) */
+#define __SIZEOF_TIME_T__ __TM_SIZEOF(TIME) /* == sizeof(time_t) */
 
 
 

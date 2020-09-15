@@ -55,7 +55,7 @@ DECL_BEGIN
 #ifdef VM_GETFREE_VMB
 INTDEF NOBLOCK uintptr_t
 NOTHROW(KCALL krand_exponential)(uintptr_t rand_limit, uintptr_t rand_avg);
-#else
+#else /* VM_GETFREE_VMB */
 INTERN NOBLOCK uintptr_t
 NOTHROW(KCALL krand_exponential)(uintptr_t rand_limit, uintptr_t rand_avg) {
 	uintptr_t result;
@@ -70,38 +70,38 @@ NOTHROW(KCALL krand_exponential)(uintptr_t rand_limit, uintptr_t rand_avg) {
 	result %= rand_limit; /* Prevent overflow. */
 	return result;
 }
-#endif
+#endif /* !VM_GETFREE_VMB */
 
 #ifdef VM_GETFREE_VMB
 #define VM_FUNCTION(x) vmb_##x
-#else
+#else /* VM_GETFREE_VMB */
 #define VM_FUNCTION(x) vm_##x
-#endif
+#endif /* !VM_GETFREE_VMB */
 
 
 #if !defined(NDEBUG) && 1
 #define ASSERT_RESULT(result)                                                  \
 	(assertf(!(result & (min_alignment_in_pages - 1)),                         \
 	        #result "                = %p (%p)\n"                              \
-	         "num_pages              = %Iu\n"                                  \
+	         "num_pages              = %" PRIuSIZ "\n"                         \
 	        #result " + num_pages    = %p (%p)\n"                              \
 	         "mode                   = %#x\n"                                  \
-	         "min_alignment_in_pages = %Iu\n",                                 \
+	         "min_alignment_in_pages = %" PRIuSIZ "\n",                        \
 	         PAGEID_DECODE(result), result, num_pages,                         \
 	         PAGEID_DECODE(result + num_pages), result + num_pages,            \
 	         mode, min_alignment_in_pages),                                    \
 	 assertf(!VM_FUNCTION(paged_isused)(self, result, result + num_pages - 1), \
 	        #result "                = %p (%p)\n"                              \
-	         "num_pages              = %Iu\n"                                  \
+	         "num_pages              = %" PRIuSIZ "\n"                         \
 	        #result " + num_pages    = %p (%p)\n"                              \
 	         "mode                   = %#x\n"                                  \
-	         "min_alignment_in_pages = %Iu\n",                                 \
+	         "min_alignment_in_pages = %" PRIuSIZ "\n",                        \
 	         PAGEID_DECODE(result), result, num_pages,                         \
 	         PAGEID_DECODE(result + num_pages), result + num_pages,            \
 	         mode, min_alignment_in_pages))
-#else
+#else /* !NDEBUG */
 #define ASSERT_RESULT(result) (void)0
-#endif
+#endif /* NDEBUG */
 
 #ifndef VM_ASLR_DISABLED_DEFINED
 #define VM_ASLR_DISABLED_DEFINED 1
@@ -192,7 +192,7 @@ NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
 #endif /* VM_GETFREE_VM */
 	assertf(min_alignment_in_pages != 0, "min_alignment_in_pages must be non-zero");
 	assertf((min_alignment_in_pages & (min_alignment_in_pages - 1)) == 0,
-	        "min_alignment_in_pages must be power-of-2, but is actually %Iu (%#Iu)",
+	        "min_alignment_in_pages must be power-of-2, but is actually %" PRIuSIZ " (%#" PRIuSIZ ")",
 	        min_alignment_in_pages, min_alignment_in_pages);
 	if unlikely(!num_pages)
 		num_pages = 1;
@@ -257,19 +257,19 @@ again:
 					}
 					assertf(!VM_FUNCTION(paged_isused)(self, minpage, minpage + num_pages - 1),
 					        "minpage                = %p (%p)\n"
-					        "num_pages              = %Iu\n"
+					        "num_pages              = %" PRIuSIZ "\n"
 					        "minpage + num_pages    = %p (%p)\n"
 					        "mode                   = %#x\n"
-					        "min_alignment_in_pages = %Iu\n",
+					        "min_alignment_in_pages = %" PRIuSIZ "\n",
 					        PAGEID_DECODE(minpage), minpage, num_pages,
 					        PAGEID_DECODE(minpage + num_pages), minpage + num_pages,
 					        mode, min_alignment_in_pages);
 					assertf(!(minpage & (min_alignment_in_pages - 1)),
 					        "minpage                = %p (%p)\n"
-					        "num_pages              = %Iu\n"
+					        "num_pages              = %" PRIuSIZ "\n"
 					        "minpage + num_pages    = %p (%p)\n"
 					        "mode                   = %#x\n"
-					        "min_alignment_in_pages = %Iu\n",
+					        "min_alignment_in_pages = %" PRIuSIZ "\n",
 					        PAGEID_DECODE(minpage), minpage, num_pages,
 					        PAGEID_DECODE(minpage + num_pages), minpage + num_pages,
 					        mode, min_alignment_in_pages);

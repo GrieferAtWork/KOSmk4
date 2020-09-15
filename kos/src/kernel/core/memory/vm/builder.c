@@ -41,6 +41,7 @@
 #include <sys/wait.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "vm-nodeapi.h"
@@ -165,15 +166,15 @@ again:
 	num_vpages = vm_datapart_numvpages_atomic(part);
 	assertf(num_vpages != 0,
 	        "part                      = %p\n"
-	        "part->dp_tree.a_vmin      = %I64p\n"
-	        "part->dp_tree.a_vmax      = %I64p\n"
-	        "vm_datapart_minbyte(part) = %I64p\n"
-	        "vm_datapart_maxbyte(part) = %I64p\n"
+	        "part->dp_tree.a_vmin      = %" PRIp64 "\n"
+	        "part->dp_tree.a_vmax      = %" PRIp64 "\n"
+	        "vm_datapart_minbyte(part) = %" PRIp64 "\n"
+	        "vm_datapart_maxbyte(part) = %" PRIp64 "\n"
 	        "VM_DATABLOCK_PAGESHIFT(.) = %u\n"
 	        "VM_DATABLOCK_ADDRSHIFT(.) = %u\n"
-	        "VM_DATABLOCK_PAGEALIGN(.) = %Iu\n"
-	        "VM_DATABLOCK_PAGEMASK(.)  = %Iu\n"
-	        "VM_DATABLOCK_PAGESIZE(.)  = %Iu",
+	        "VM_DATABLOCK_PAGEALIGN(.) = %" PRIuSIZ "\n"
+	        "VM_DATABLOCK_PAGEMASK(.)  = %" PRIuSIZ "\n"
+	        "VM_DATABLOCK_PAGESIZE(.)  = %" PRIuSIZ,
 	        (uintptr_t)part,
 	        (u64)part->dp_tree.a_vmin,
 	        (u64)part->dp_tree.a_vmax,
@@ -380,10 +381,14 @@ NOTHROW(KCALL vmb_node_insert)(struct vmb *__restrict self,
 	        node->vn_node.a_vmax < insert_before->vn_node.a_vmin,
 	        "insert_before  = %p:%p...%p\n"
 	        "node           = %p:%p...%p\n"
-	        "node->vn_flags = %#.4I16x\n",
-	        insert_before, vm_node_getmin(insert_before), vm_node_getmax(insert_before),
-	        node, vm_node_getmin(node), vm_node_getmax(node),
-	        node->vn_flags);
+	        "node->vn_flags = %#x\n",
+	        insert_before,
+	        vm_node_getmin(insert_before),
+	        vm_node_getmax(insert_before),
+	        node,
+	        vm_node_getmin(node),
+	        vm_node_getmax(node),
+	        (unsigned int)node->vn_flags);
 	/* Insert the node before `insert' at `pinsert' */
 	node->vn_byaddr.ln_pself = pinsert;
 	node->vn_byaddr.ln_next  = insert_before;
@@ -572,8 +577,8 @@ again_lock_parts:
 			size_t part_vpages;
 			part_vpages = vm_datapart_numvpages(node->vn_part);
 			assertf(part_vpages <= vm_node_getpagecount(node),
-			        "part_vpages        = %Iu\n"
-			        "vm_node_getpagecount(node) = %Iu\n",
+			        "part_vpages                = %" PRIuSIZ "\n"
+			        "vm_node_getpagecount(node) = %" PRIuSIZ "\n",
 			        part_vpages, vm_node_getpagecount(node));
 			if unlikely(part_vpages < vm_node_getpagecount(node)) {
 				/* Must create an additional node in order to map the missing portion.

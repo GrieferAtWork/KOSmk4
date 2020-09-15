@@ -34,6 +34,7 @@
 #include <hybrid/overflow.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "vm-nodeapi.h"
@@ -289,8 +290,8 @@ handle_remove_write_error:
 				continue; /* Ignore this node! */
 			resnode = result_nodes;
 			assertf(resnode,
-			        "node_alloc_count = %Iu\n"
-			        "node_req_count   = %Iu\n",
+			        "node_alloc_count = %" PRIuSIZ "\n"
+			        "node_req_count   = %" PRIuSIZ,
 			        node_alloc_count, node_req_count);
 			result_nodes            = resnode->vn_byaddr.ln_next;
 			resnode->vn_node.a_vmin = node->vn_node.a_vmin;

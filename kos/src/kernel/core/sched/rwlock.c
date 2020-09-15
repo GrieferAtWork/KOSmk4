@@ -31,13 +31,14 @@
 #include <sched/cpu.h>
 #include <sched/pertask.h>
 #include <sched/rpc.h>
-#include <sched/rwlock.h>
 #include <sched/rwlock-intern.h>
+#include <sched/rwlock.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -67,9 +68,9 @@ DECL_BEGIN
 
 #if !defined(NDEBUG) && 0
 #define RWLOCK_TRACE(...) (printk(KERN_TRACE __VA_ARGS__))
-#else
+#else /* !NDEBUG */
 #define RWLOCK_TRACE(...) (void)0
-#endif
+#endif /* NDEBUG */
 #define RWLOCK_TRACE_F(name)                             \
 	RWLOCK_TRACE("%s(%p) (task:%p,pc:%p)\n", name, self, \
 	             THIS_TASK, __builtin_return_address(0))
@@ -102,7 +103,7 @@ NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread) {
 	ASSERT_VECTOR_INITIALIZED(locks);
 	assertf(locks->rls_use == 0,
 	        "Thread %p died with read locks still held\n"
-	        "locks->rls_use = %Iu (rls_cnt = %Iu)\n"
+	        "locks->rls_use = %" PRIuSIZ " (rls_cnt = %" PRIuSIZ ")\n"
 	        "%$I[hex]",
 	        thread,
 	        locks->rls_use, locks->rls_cnt,
@@ -381,7 +382,7 @@ NOTHROW(FCALL __os_rwlock_tryread)(struct rwlock *__restrict self) {
 		        "You can't be holding read locks when another thread is writing\n"
 		        "THIS_TASK       = %p\n"
 		        "self->rw_xowner = %p\n"
-		        "self->rw_xind   = %I16u\n",
+		        "self->rw_xind   = %" PRIu16 "\n",
 		        THIS_TASK, self->rw_xowner,
 		        self->rw_xind);
 		return false;
@@ -435,7 +436,7 @@ NOTHROW(FCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 		        "You can't be holding read locks when another thread is writing\n"
 		        "THIS_TASK       = %p\n"
 		        "self->rw_xowner = %p\n"
-		        "self->rw_xind   = %I16u\n",
+		        "self->rw_xind   = %" PRIu16 "\n",
 		        THIS_TASK, self->rw_xowner,
 		        self->rw_xind);
 		return false;
@@ -1338,8 +1339,8 @@ again:
 		assertf(desc,
 		        "You're not holding any read-locks\n"
 		        "self                             = %p\n"
-		        "PERTASK(this_read_locks).rls_use = %Iu\n"
-		        "PERTASK(this_read_locks).rls_cnt = %Iu",
+		        "PERTASK(this_read_locks).rls_use = %" PRIuSIZ "\n"
+		        "PERTASK(this_read_locks).rls_cnt = %" PRIuSIZ,
 		        self,
 		        PERTASK_GET(this_read_locks.rls_use),
 		        PERTASK_GET(this_read_locks.rls_cnt));
@@ -1548,8 +1549,8 @@ NOTHROW(FCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 		assertf(desc,
 		        "You're not holding any read-locks\n"
 		        "self                             = %p\n"
-		        "PERTASK(this_read_locks).rls_use = %Iu\n"
-		        "PERTASK(this_read_locks).rls_cnt = %Iu",
+		        "PERTASK(this_read_locks).rls_use = %" PRIuSIZ "\n"
+		        "PERTASK(this_read_locks).rls_cnt = %" PRIuSIZ,
 		        self,
 		        PERTASK_GET(this_read_locks.rls_use),
 		        PERTASK_GET(this_read_locks.rls_cnt));
@@ -1657,8 +1658,8 @@ TEST(rwlock_recursion)
 #define ASSERT_LOCKS(rlocks, wlocks)             \
 	assertf(rwlock_reading_r(&test) == rlocks && \
 	        rwlock_writing_r(&test) == wlocks,   \
-	        "rwlock_reading_r: %Iu\n"            \
-	        "rwlock_writing_r: %Iu\n",           \
+	        "rwlock_reading_r: %" PRIuSIZ "\n"   \
+	        "rwlock_writing_r: %" PRIuSIZ,       \
 	        rwlock_reading_r(&test),             \
 	        rwlock_writing_r(&test))
 

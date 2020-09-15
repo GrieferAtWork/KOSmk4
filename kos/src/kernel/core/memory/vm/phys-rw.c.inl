@@ -142,7 +142,7 @@ NOTHROW(KCALL FUNC(physw))(PHYS physaddr_t addr VALUE_ARG(u16)) {
 #endif /* DEFINE_PHYS_UNALIGNED */
 	{
 #ifndef DEFINE_PHYS_UNALIGNED
-		assertf((addr & 1) == 0, "Unaligned address %I64p", (u64)addr);
+		assertf((addr & 1) == 0, "Unaligned address %" PRIpN(__SIZEOF_PHYSADDR_T__), addr);
 #endif /* !DEFINE_PHYS_UNALIGNED */
 		/* Copy memory. */
 		DORW_AND_CONTINUE(16, tramp + ((ptrdiff_t)addr & PAGEMASK));
@@ -207,7 +207,7 @@ NOTHROW(KCALL FUNC(physl))(PHYS physaddr_t addr VALUE_ARG(u32)) {
 #endif /* DEFINE_PHYS_UNALIGNED */
 	{
 #ifndef DEFINE_PHYS_UNALIGNED
-		assertf((addr & 3) == 0, "Unaligned address %I64p", (u64)addr);
+		assertf((addr & 3) == 0, "Unaligned address %" PRIpN(__SIZEOF_PHYSADDR_T__), addr);
 #endif /* !DEFINE_PHYS_UNALIGNED */
 		/* Copy memory. */
 		DORW_AND_CONTINUE(32, tramp + ((ptrdiff_t)addr & PAGEMASK));
@@ -256,7 +256,7 @@ NOTHROW(KCALL FUNC(physq))(PHYS physaddr_t addr VALUE_ARG(u64)) {
 #endif /* DEFINE_PHYS_UNALIGNED */
 	{
 #ifndef DEFINE_PHYS_UNALIGNED
-		assertf((addr & 7) == 0, "Unaligned address %I64p", (u64)addr);
+		assertf((addr & 7) == 0, "Unaligned address %" PRIpN(__SIZEOF_PHYSADDR_T__), addr);
 #endif /* !DEFINE_PHYS_UNALIGNED */
 		/* Copy memory. */
 		DORW_AND_CONTINUE(64, tramp + ((ptrdiff_t)addr & PAGEMASK));

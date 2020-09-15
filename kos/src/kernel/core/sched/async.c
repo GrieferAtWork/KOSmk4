@@ -40,6 +40,7 @@
 #include <hybrid/minmax.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdalign.h>
 #include <string.h>
 
@@ -941,7 +942,8 @@ async_job_alloc(struct async_job_callbacks const *__restrict cb) {
 	assert(cb->jc_poll);
 	assert(cb->jc_work);
 	assertf((cb->jc_jobalign & (cb->jc_jobalign - 1)) == 0,
-	        "Not a pointer-of-2: %Iu", cb->jc_jobalign);
+	        "Not a pointer-of-2: %#" PRIxSIZ,
+	        cb->jc_jobalign);
 	result = (struct async_job *)kmemalign_offset(MAX(alignof(struct async_job), cb->jc_jobalign),
 	                                              sizeof(struct async_job),
 	                                              sizeof(struct async_job) + cb->jc_jobsize,

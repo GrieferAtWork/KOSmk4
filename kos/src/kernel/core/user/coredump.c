@@ -101,10 +101,10 @@ dbg_coredump(void const *const *traceback_vector,
 	{
 		pid_t tid, pid;
 		tid = task_getroottid_of_s(dbg_current);
-		dbg_printf(DBGSTR("tid:%u"), tid);
+		dbg_printf(DBGSTR("tid:%" PRIuN(__SIZEOF_PID_T__)), tid);
 		pid = task_getrootpid_of_s(dbg_current);
 		if (pid != tid)
-			dbg_printf(DBGSTR(" pid:%u"), pid);
+			dbg_printf(DBGSTR(" pid:%" PRIuN(__SIZEOF_PID_T__)), pid);
 	}
 	dbg_loadcolor();
 	dbg_putc('\n');
@@ -112,7 +112,9 @@ dbg_coredump(void const *const *traceback_vector,
 	if (reason_error) {
 		unsigned int i;
 		char const *name;
-		dbg_printf(DBGSTR("exception %#x:%#x"),
+		dbg_printf(DBGSTR("exception "
+		                  "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+		                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__)),
 		           reason_error->e_class,
 		           reason_error->e_subclass);
 		name = get_exception_name(reason_error->e_code);
@@ -130,11 +132,16 @@ dbg_coredump(void const *const *traceback_vector,
 		}
 	}
 	if (reason_signal) {
-		dbg_printf(DBGSTR("signal %u\n"), reason_signal->si_signo);
-		if (reason_signal->si_code != 0)
-			dbg_printf(DBGSTR("\tcode:  %u\n"), reason_signal->si_code);
-		if (reason_signal->si_errno != 0)
-			dbg_printf(DBGSTR("\terrno: %u\n"), reason_signal->si_errno);
+		dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n"),
+		           reason_signal->si_signo);
+		if (reason_signal->si_code != 0) {
+			dbg_printf(DBGSTR("\tcode:  %u\n"),
+			           (unsigned int)reason_signal->si_code);
+		}
+		if (reason_signal->si_errno != 0) {
+			dbg_printf(DBGSTR("\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n"),
+			           reason_signal->si_errno);
+		}
 	}
 #define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
 	if (reason_error) {
@@ -164,7 +171,8 @@ dbg_coredump(void const *const *traceback_vector,
 		dbg_addr2line_printf(traceback_vector[tbi],
 		                     instruction_trysucc(traceback_vector[tbi],
 		                                         userspace_isa),
-		                     "traceback_vector[%" PRIuSIZ "]\n", tbi);
+		                     "traceback_vector[%" PRIuSIZ "]\n",
+		                     tbi);
 	}
 	current_pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_TRAP);
 	if (current_pc != (void const *)ucpustate_getpc(orig_ustate) &&
@@ -302,7 +310,9 @@ coredump_create(struct ucpustate const *curr_ustate,
 	if (reason_error) {
 		unsigned int i;
 		char const *name;
-		printk(KERN_ERR "exception %#x:%#x",
+		printk(KERN_ERR "exception "
+		                "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+		                "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
 		       reason_error->e_class, reason_error->e_subclass);
 		name = get_exception_name(reason_error->e_code);
 		if (name)
@@ -317,11 +327,16 @@ coredump_create(struct ucpustate const *curr_ustate,
 		}
 	}
 	if (reason_signal) {
-		printk(KERN_ERR "signal %u\n", reason_signal->si_signo);
-		if (reason_signal->si_code != 0)
-			printk(KERN_ERR "\tcode:  %u\n", reason_signal->si_code);
-		if (reason_signal->si_errno != 0)
-			printk(KERN_ERR "\terrno: %u\n", reason_signal->si_errno);
+		printk(KERN_ERR "signal %" PRIuN(__SIZEOF_SIGNO_T__) "\n",
+		       reason_signal->si_signo);
+		if (reason_signal->si_code != 0) {
+			printk(KERN_ERR "\tcode:  %u\n",
+			       (unsigned int)reason_signal->si_code);
+		}
+		if (reason_signal->si_errno != 0) {
+			printk(KERN_ERR "\terrno: %" PRIuN(__SIZEOF_ERRNO_T__) "\n",
+			       reason_signal->si_errno);
+		}
 	}
 #define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
 	if (reason_error)
@@ -339,7 +354,8 @@ coredump_create(struct ucpustate const *curr_ustate,
 	}
 	if (ucpustate_getpc(curr_ustate) != ucpustate_getpc(orig_ustate) &&
 	    (traceback_length == 0 || ucpustate_getpc(curr_ustate) != (uintptr_t)traceback_vector[traceback_length - 1])) {
-		printk(KERN_RAW VINFO_FORMAT " curr_ustate\n", ucpustate_getpc(curr_ustate));
+		printk(KERN_RAW VINFO_FORMAT " curr_ustate\n",
+		       ucpustate_getpc(curr_ustate));
 	}
 
 	/* Try to trigger a debugger trap (if enabled) */

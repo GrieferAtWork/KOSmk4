@@ -2436,8 +2436,9 @@ DECL_END
 #include "handle-install.c.inl"
 #define INSTALL_AT 1
 #include "handle-install.c.inl"
+/**/
 #include "handle-install.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 #endif /* !GUARD_KERNEL_SRC_USER_HANDLE_C */

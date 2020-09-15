@@ -1020,13 +1020,7 @@ NOTHROW(KCALL dbg_getpagedir)(void) {
 	uintptr_t result;
 	result = x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW,
 	                             X86_REGISTER_CONTROL_CR3);
-#ifdef __INTELLISENSE__
-	pagedir_phys_t r;
-	r._m_self = (PHYS pagedir_t *)result;
-	return r;
-#else /* __INTELLISENSE__ */
 	return (pagedir_phys_t)result;
-#endif /* !__INTELLISENSE__ */
 }
 
 

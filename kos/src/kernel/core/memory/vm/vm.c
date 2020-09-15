@@ -46,6 +46,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include <libvio/api.h>
@@ -913,7 +914,7 @@ NOTHROW(KCALL vm_node_insert_ignore_missmatch)(struct vm_node *__restrict self) 
 #if 0
 	assertf(!self->vn_part ||
 	        vm_node_getpagecount(self) == vm_datapart_numvpages(self->vn_part),
-	        "Node size missmatch (%Iu != %Iu)",
+	        "Node size missmatch (%" PRIuSIZ " != %" PRIuSIZ ")",
 	        vm_node_getpagecount(self), vm_datapart_numvpages(self->vn_part));
 #endif
 	assert((v->v_tree != NULL) == (v->v_byaddr != NULL));
@@ -928,10 +929,14 @@ NOTHROW(KCALL vm_node_insert_ignore_missmatch)(struct vm_node *__restrict self) 
 	        self->vn_node.a_vmax < insert_before->vn_node.a_vmin,
 	        "insert_before  = %p (%p-%p)\n"
 	        "self           = %p (%p-%p)\n"
-	        "self->vn_flags = %#.4I16x\n",
-	        insert_before, vm_node_getmin(insert_before), vm_node_getmax(insert_before),
-	        self, vm_node_getmin(self), vm_node_getmax(self),
-	        self->vn_flags);
+	        "self->vn_flags = %#x\n",
+	        insert_before,
+	        vm_node_getmin(insert_before),
+	        vm_node_getmax(insert_before),
+	        self,
+	        vm_node_getmin(self),
+	        vm_node_getmax(self),
+	        (unsigned int)self->vn_flags);
 	/* Insert the self before `insert' at `pinsert' */
 	self->vn_byaddr.ln_pself = pinsert;
 	self->vn_byaddr.ln_next  = insert_before;
@@ -946,10 +951,11 @@ DECL_END
 
 #define SPLIT_NX 1
 #include "vm-datapart-split.c.inl"
+/**/
 #include "vm-datapart-split.c.inl"
 
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* Free RAM allocated by `vm_do_allocram(_nx)'
  * NOTE: This function assumes that the allocated memory hasn't been used, yet. */
@@ -1036,13 +1042,13 @@ NOTHROW(KCALL vm_datapart_do_copyram)(struct vm_datapart *__restrict dst,
                                       struct vm_datapart *__restrict src) {
 	assertf(dst->dp_state == VM_DATAPART_STATE_INCORE ||
 	        dst->dp_state == VM_DATAPART_STATE_LOCKED,
-	        "dst->dp_state = %Iu", (uintptr_t)dst->dp_state);
+	        "dst->dp_state = %" PRIuSIZ "", (uintptr_t)dst->dp_state);
 	assertf(src->dp_state == VM_DATAPART_STATE_INCORE ||
 	        src->dp_state == VM_DATAPART_STATE_LOCKED,
-	        "src->dp_state = %Iu", (uintptr_t)src->dp_state);
+	        "src->dp_state = %" PRIuSIZ "", (uintptr_t)src->dp_state);
 	assertf(vm_datapart_numvpages(dst) == vm_datapart_numvpages(src),
-	        "vm_datapart_numvpages(dst) = %Iu\n"
-	        "vm_datapart_numvpages(src) = %Iu\n",
+	        "vm_datapart_numvpages(dst) = %" PRIuSIZ "\n"
+	        "vm_datapart_numvpages(src) = %" PRIuSIZ "\n",
 	        vm_datapart_numvpages(dst),
 	        vm_datapart_numvpages(src));
 	if (src->dp_ramdata.rd_blockv == &src->dp_ramdata.rd_block0) {
@@ -1145,15 +1151,16 @@ PRIVATE NONNULL((1)) unsigned int FCALL vm_datapart_do_setcore(struct vm_datapar
 PRIVATE NONNULL((1)) unsigned int FCALL vm_datapart_do_unshare_cow(struct vm_datapart *__restrict self) THROWS(E_WOULDBLOCK, E_BADALLOC);
 PRIVATE NONNULL((1)) unsigned int NOTHROW(FCALL vm_datapart_do_setcore_nx)(struct vm_datapart *__restrict self);
 PRIVATE NONNULL((1)) unsigned int NOTHROW(FCALL vm_datapart_do_unshare_cow_nx)(struct vm_datapart *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 DECL_END
 
 #define EXLOCK_NX 1
 #include "vm-datapart-exlock.c.inl"
+/**/
 #include "vm-datapart-exlock.c.inl"
 
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 /* Acquire a write-lock on `self', and ensure that the part's
@@ -1429,10 +1436,12 @@ NOTHROW(KCALL vm_datapart_pageaddr)(struct vm_datapart *__restrict self,
                                     size_t vpage_offset) {
 	physpage_t result;
 	assertf(vpage_offset < vm_datapart_numvpages(self),
-	        "vpage_offset                = %Iu\n"
-	        "vm_datapart_numvpages(self) = %Iu\n",
+	        "vpage_offset                = %" PRIuSIZ "\n"
+	        "vm_datapart_numvpages(self) = %" PRIuSIZ "\n",
 	        vpage_offset, vm_datapart_numvpages(self));
-	assertf(self->dp_ramdata.rd_blockv, "Unset `rd_blockv' in datapart at %p", self);
+	assertf(self->dp_ramdata.rd_blockv,
+	        "Unset `rd_blockv' in datapart at %p",
+	        self);
 	if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
 		result = self->dp_ramdata.rd_block0.rb_start + vpage_offset;
 	} else {
@@ -1474,10 +1483,11 @@ vm_datapart_loadpage(struct vm_datapart *__restrict self,
 	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
 	assertf(self->dp_state == VM_DATAPART_STATE_INCORE ||
 	        self->dp_state == VM_DATAPART_STATE_LOCKED,
-	        "self->dp_state = %Iu", (uintptr_t)self->dp_state);
+	        "self->dp_state = %" PRIuPTR,
+	        (uintptr_t)self->dp_state);
 	assertf(vpage_offset < vm_datapart_numvpages(self),
-	        "vpage_offset                = %Iu\n"
-	        "vm_datapart_numvpages(self) = %Iu\n",
+	        "vpage_offset                = %" PRIuSIZ "\n"
+	        "vm_datapart_numvpages(self) = %" PRIuSIZ "\n",
 	        vpage_offset, vm_datapart_numvpages(self));
 	/* Figure out the address of the associated physical memory page. */
 	result     = vm_datapart_pageaddr(self, vpage_offset);
@@ -1578,13 +1588,13 @@ again_readstate_multi:
 					goto again_readstate_multi;
 				num_init_pages = 1;
 				assertf(starting_data_page < vm_datapart_numdpages(self),
-				        "starting_data_page          = %Iu\n"
-				        "vm_datapart_numdpages(self) = %Iu\n",
+				        "starting_data_page          = %" PRIuPTR "\n"
+				        "vm_datapart_numdpages(self) = %" PRIuSIZ "\n",
 				        starting_data_page, vm_datapart_numdpages(self));
 				assertf((starting_data_page + n_data_pages) <= vm_datapart_numdpages(self),
-				        "starting_data_page          = %Iu\n"
+				        "starting_data_page          = %" PRIuPTR "\n"
 				        "n_data_pages                = %u\n"
-				        "vm_datapart_numdpages(self) = %Iu\n",
+				        "vm_datapart_numdpages(self) = %" PRIuSIZ "\n",
 				        starting_data_page, n_data_pages, vm_datapart_numdpages(self));
 				while (num_init_pages < n_data_pages &&
 				       vm_datapart_cmpxchstate(self,
@@ -1653,8 +1663,8 @@ again_readstate_multi:
 				        vm_datapart_getstate(self, starting_data_page) != VM_DATAPART_PPP_INITIALIZING,
 				        "Dangling `VM_DATAPART_PPP_INITIALIZING' part with only a single running thread\n"
 				        "self               = %p\n"
-				        "self->dp_flags     = %#Ix\n"
-				        "starting_data_page = %Iu (%#Ix)\n"
+				        "self->dp_flags     = %#" PRIxSIZ "\n"
+				        "starting_data_page = %" PRIuSIZ " (%#" PRIxSIZ ")\n"
 				        "%I$[hex]\n",
 				        self, (uintptr_t)self->dp_flags,
 				        starting_data_page, starting_data_page,
@@ -1718,8 +1728,8 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 	assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
 	       self->dp_state == VM_DATAPART_STATE_LOCKED);
 	assertf(dpage_offset < vm_datapart_numdpages(self),
-	        "dpage_offset                = %Iu\n"
-	        "vm_datapart_numdpages(self) = %Iu\n",
+	        "dpage_offset                = %" PRIuSIZ "\n"
+	        "vm_datapart_numdpages(self) = %" PRIuSIZ "\n",
 	        dpage_offset,
 	        vm_datapart_numvpages(self));
 	/* Figure out the address of the associated physical memory page. */
@@ -1827,10 +1837,11 @@ DECL_END
 #include "vm-dma.c.inl"
 #define DMA_ENUM   1
 #include "vm-dma.c.inl"
+/**/
 #include "vm-dma.c.inl"
 
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* Stop DMAing by releasing all of the specified DMA locks.
  * NOTE: The caller must ensure that `lockcnt == return(vm_startdma*())', and
@@ -2837,7 +2848,7 @@ vm_datablock_locatepart(struct vm_datablock *__restrict self,
 		                                    num_bytes_hint);
 	}
 	assertf((vm_datapart_startdpage(result) & VM_DATABLOCK_PAGEMASK(self)) == 0,
-	        "Invalid data part (start at %#I64x, end at %#I64x)\n",
+	        "Invalid data part (start at %#" PRIx64 ", end at %#" PRIx64 ")\n",
 	        (u64)vm_datapart_startdpage(result),
 	        (u64)vm_datapart_enddpage(result));
 	return result;
@@ -2916,7 +2927,7 @@ again_check_result_num_vpages:
 	}
 done:
 	assertf((vm_datapart_startdpage(result) & VM_DATABLOCK_PAGEMASK(self)) == 0,
-	        "Invalid data part (start at %#I64x, end at %#I64x)\n",
+	        "Invalid data part (start at %#" PRIx64 ", end at %#" PRIx64 ")\n",
 	        (u64)vm_datapart_startdpage(result),
 	        (u64)vm_datapart_enddpage(result));
 	return result;
@@ -3223,8 +3234,8 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part                 = %p\n"
 	        "self->vn_block                = %p\n"
 	        "self->vn_part->dp_block       = %p\n"
-	        "self->vn_part->dp_tree.a_vmin = %I64u(%#I64x)\n"
-	        "self->vn_part->dp_tree.a_vmax = %I64u(%#I64x)\n",
+	        "self->vn_part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
+	        "self->vn_part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n",
 	        self, vm_node_getmin(self), vm_node_getmax(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
@@ -3237,8 +3248,8 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part                 = %p\n"
 	        "self->vn_block                = %p\n"
 	        "self->vn_part->dp_block       = %p\n"
-	        "self->vn_part->dp_tree.a_vmin = %I64u(%#I64x)\n"
-	        "self->vn_part->dp_tree.a_vmax = %I64u(%#I64x)\n",
+	        "self->vn_part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
+	        "self->vn_part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n",
 	        self, vm_node_getmin(self), vm_node_getmax(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
@@ -3249,8 +3260,8 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part                 = %p\n"
 	        "self->vn_block                = %p\n"
 	        "self->vn_part->dp_block       = %p\n"
-	        "self->vn_part->dp_tree.a_vmin = %I64u(%#I64x)\n"
-	        "self->vn_part->dp_tree.a_vmax = %I64u(%#I64x)\n",
+	        "self->vn_part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
+	        "self->vn_part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n",
 	        self, vm_node_getmin(self), vm_node_getmax(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
 	        self->vn_part->dp_tree.a_vmin, self->vn_part->dp_tree.a_vmin,
@@ -3272,8 +3283,8 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        "self->vn_part                 = %p\n"
 	        "self->vn_block                = %p\n"
 	        "self->vn_part->dp_block       = %p\n"
-	        "self->vn_part->dp_tree.a_vmin = %I64u(%#I64x)\n"
-	        "self->vn_part->dp_tree.a_vmax = %I64u(%#I64x)\n"
+	        "self->vn_part->dp_tree.a_vmin = %" PRIu64 "(%#" PRIx64 ")\n"
+	        "self->vn_part->dp_tree.a_vmax = %" PRIu64 "(%#" PRIx64 ")\n"
 	        "vm_datablock_anonymous_zero_vec = { %p-%p }\n",
 	        self, vm_node_getmin(self), vm_node_getmax(self),
 	        self->vn_part, self->vn_block, self->vn_part->dp_block,
@@ -3283,12 +3294,12 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        (byte_t *)COMPILER_ENDOF(vm_datablock_anonymous_zero_vec) - 1);
 	assertf(!self->vn_part ||
 	        vm_node_getpagecount(self) == vm_datapart_numvpages(self->vn_part),
-	        "Node size missmatch (%Iu(%#Ix) != %Iu(%#Ix))\n"
+	        "Node size missmatch (%" PRIuSIZ "(%#" PRIxSIZ ") != %" PRIuSIZ "(%#" PRIxSIZ "))\n"
 	        "self = %p (%p-%p)\n"
 	        "self->vn_part                         = %p\n"
 	        "self->vn_part->dp_block               = %p\n"
-	        "self->vn_part->dp_tree.a_vmin         = %I64u(%#I64x)\n"
-	        "self->vn_part->dp_tree.a_vmax         = %I64u(%#I64x)\n"
+	        "self->vn_part->dp_tree.a_vmin         = %" PRIu64 "(%#" PRIx64 ")\n"
+	        "self->vn_part->dp_tree.a_vmax         = %" PRIu64 "(%#" PRIx64 ")\n"
 	        "self->vn_part->dp_block->db_pageshift = %u\n",
 	        vm_node_getpagecount(self), vm_node_getpagecount(self),
 	        vm_datapart_numvpages(self->vn_part), vm_datapart_numvpages(self->vn_part),
@@ -3308,10 +3319,10 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        self->vn_node.a_vmax < insert_before->vn_node.a_vmin,
 	        "insert_before  = %p (%p-%p)\n"
 	        "self           = %p (%p-%p)\n"
-	        "self->vn_flags = %#.4I16x\n",
+	        "self->vn_flags = %#x\n",
 	        insert_before, vm_node_getmin(insert_before), vm_node_getmax(insert_before),
 	        self, vm_node_getmin(self), vm_node_getmax(self),
-	        self->vn_flags);
+	        (unsigned int)self->vn_flags);
 	/* Insert the self before `insert' at `pinsert' */
 	self->vn_byaddr.ln_pself = pinsert;
 	self->vn_byaddr.ln_next  = insert_before;
@@ -3563,7 +3574,8 @@ DECL_END
 
 #ifndef __INTELLISENSE__
 #include "vm-unmap-kernel-ram.c.inl"
+/**/
 #include "vm-service-tasklock.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_VM_VM_C */

@@ -43,12 +43,13 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
 
+#include <libdebuginfo/unwind.h>
 #include <libinstrlen/instrlen.h>
 #include <libregdump/cpu-state.h>
-#include <libdebuginfo/unwind.h>
 #include <libregdump/x86.h>
 #include <libunwind/unwind.h>
 
@@ -191,11 +192,11 @@ panic_uhi_dbg_main(void *arg) {
 	char const *name;
 	args = (struct panic_args *)arg;
 	dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Unhandled interrupt")
-	                  " [int: " AC_WHITE("%#.2I8x") " (" AC_WHITE("%I8u") ")]"),
+	                  " [int: " AC_WHITE("%#.2" PRIx8) " (" AC_WHITE("%" PRIu8) ")]"),
 	           (u8)args->intno,
 	           (u8)args->intno);
 	if (args->ecode)
-		dbg_printf(DBGSTR(" [ecode=" AC_WHITE("%#.8I32x") "]"), (u32)args->ecode);
+		dbg_printf(DBGSTR(" [ecode=" AC_WHITE("%#.8" PRIx32) "]"), (u32)args->ecode);
 	name = get_interrupt_name(args->intno);
 	if (name != NULL) {
 		char const *desc;
@@ -235,7 +236,7 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 		}
 	}
 	if (ecode != 0)
-		printk(KERN_EMERG " [ecode=%#Ix]", ecode);
+		printk(KERN_EMERG " [ecode=%#" PRIxPTR "]", ecode);
 	if (intno == 0xe)
 		printk(KERN_EMERG " [%%cr2=%p]", __rdcr2());
 	printk(KERN_EMERG "\n");

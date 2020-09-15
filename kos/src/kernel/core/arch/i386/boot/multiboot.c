@@ -37,6 +37,7 @@
 
 #include <hybrid/align.h>
 
+#include <inttypes.h>
 #include <malloca.h>
 #include <string.h>
 
@@ -270,9 +271,9 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 				                       driver_descriptor.cmdline,
 				                       (size_t)driver_descriptor.pad);
 			} EXCEPT {
-				error_printf(FREESTR("Loading bootloader driver from %I64p...%I64p"),
-				             (u64)driver_descriptor.mod_start,
-				             (u64)driver_descriptor.mod_end - 1);
+				error_printf(FREESTR("Loading bootloader driver from %" PRIp32 "...%" PRIp32),
+				             (u32)driver_descriptor.mod_start,
+				             (u32)driver_descriptor.mod_end - 1);
 			}
 		}
 	}	break;
@@ -301,9 +302,9 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 					                       (PHYS u32)(PHYS uintptr_t)&mod->cmdline[0],
 					                       cmdline_max_length);
 				} EXCEPT {
-					error_printf(FREESTR("Loading bootloader driver from %I64p...%I64p"),
-					             (u64)tag.mod_start,
-					             (u64)tag.mod_end - 1);
+					error_printf(FREESTR("Loading bootloader driver from %" PRIp32 "...%" PRIp32),
+					             (u32)tag.mod_start,
+					             (u32)tag.mod_end - 1);
 				}
 			}
 			tag_iter = (PHYS struct mb2_tag *)((byte_t *)tag_iter + CEIL_ALIGN(tag.size, MB2_TAG_ALIGN));
@@ -419,7 +420,8 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 		;
 	temp = (uintptr_t)tag_end - (uintptr_t)tag_begin;
 	if unlikely(mbt_min_size < temp) {
-		printk(FREESTR(KERN_WARNING "Announced MBT size %Iu is smaller than actual size %Iu\n"),
+		printk(FREESTR(KERN_WARNING "Announced MBT size %" PRIuSIZ " is smaller "
+		                            "than actual size %" PRIuSIZ "\n"),
 		       mbt_min_size, temp);
 	}
 	mbt_min_size = temp;
@@ -507,8 +509,8 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 				break;
 
 			default:
-				printk(FREESTR(KERN_WARNING "Unrecognized MB2 TAG: %I32u\n"),
-				       tag_iter->type);
+				printk(FREESTR(KERN_WARNING "Unrecognized MB2 TAG: %" PRIu32 " (%#" PRIx32 ")\n"),
+				       tag_iter->type, tag_iter->type);
 				break;
 			}
 		} EXCEPT {

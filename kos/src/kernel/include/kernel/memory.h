@@ -83,7 +83,7 @@ struct pmembank {
 #define PMEMBANK_MINPAGE(x)   ((physpage_t)((PMEMBANK_STARTADDR(x) + PAGESIZE - 1) / PAGESIZE))
 #define PMEMBANK_MAXPAGE(x)   ((physpage_t)((PMEMBANK_ENDADDR(x) / PAGESIZE) - 1))
 #define PMEMBANK_ENDPAGE(x)   ((physpage_t)(PMEMBANK_ENDADDR(x) / PAGESIZE))
-#define PMEMBANK_NUMPAGES(x)  ((size_t)(PMEMBANK_ENDPAGE(x) - PMEMBANK_STARTPAGE(x)))
+#define PMEMBANK_NUMPAGES(x)  ((physpagecnt_t)(PMEMBANK_ENDPAGE(x) - PMEMBANK_STARTPAGE(x)))
 
 struct pmeminfo {
 	physaddr_t       mb_total[PMEMBANK_TYPE_COUNT]; /* [const] The total number of bytes corresponding to certain banks. */

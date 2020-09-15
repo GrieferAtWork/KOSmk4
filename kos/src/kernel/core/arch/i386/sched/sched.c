@@ -53,6 +53,7 @@
 #include <sys/io.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -519,7 +520,7 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict self) {
 			        (!(result->ir_eflags & EFLAGS_VM) &&
 			         result->ir_eip == (uintptr_t)&x86_rpc_user_redirection &&
 			         SEGMENT_IS_VALID_KERNCODE(result->ir_cs)),
-			        "Unexpected eflags at %p (found: %#Ix, expected: %#Ix)",
+			        "Unexpected eflags at %p (found: %#" PRIxPTR ", expected: %#" PRIxPTR ")",
 			        &result->ir_eflags, result->ir_eflags, userspace_eflags);
 			printk(KERN_TRACE "[x86] Detected iret.vm86 tail at %p\n", result);
 		}

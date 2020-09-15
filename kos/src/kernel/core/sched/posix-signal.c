@@ -51,6 +51,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <sched.h>
 #include <signal.h>
 #include <string.h>
@@ -596,8 +597,7 @@ NOTHROW(KCALL sighand_default_action)(signo_t signo) {
 PUBLIC void KCALL task_sigstop(int stop_code)
 		THROWS(E_WOULDBLOCK, E_INTERRUPT) {
 	struct taskpid *pid = THIS_TASKPID;
-	printk(KERN_DEBUG "[sig] Stop execution of thread %u\n",
-	       (unsigned int)task_getrootpid_s());
+	printk(KERN_DEBUG "[sig] Stop execution of thread\n");
 	/* NOTE: The write order here is highly important! */
 	ATOMIC_STORE(pid->tp_status.w_status, stop_code);    /* #1: Set the stop status */
 	ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FSUSPENDED); /* #2: Set the suspended flag */
@@ -636,8 +636,8 @@ NOTHROW(KCALL task_sigcont)(struct task *__restrict thread) {
 	struct taskpid *pid;
 	if (!(ATOMIC_FETCHAND(thread->t_flags, ~TASK_FSUSPENDED) & TASK_FSUSPENDED))
 		return false; /* Not suspended */
-	printk(KERN_DEBUG "[sig] Resume execution of thread %u\n",
-	       (unsigned int)task_getrootpid_of_s(thread));
+	printk(KERN_DEBUG "[sig] Resume execution of thread [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
+	       task_getrootpid_of_s(thread));
 	/* Now we must wake up the thread! */
 	pid = FORTASK(thread, this_taskpid);
 	ATOMIC_STORE(pid->tp_status.w_status, __W_CONTINUED);

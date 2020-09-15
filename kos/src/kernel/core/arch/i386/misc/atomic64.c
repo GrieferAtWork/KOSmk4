@@ -41,6 +41,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <asm/intrin.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -121,16 +122,16 @@ NOTHROW(KCALL x86_initialize_atomic64)(void) {
 #if !defined(NDEBUG) && 1
 	{
 		atomic64_t a = ATOMIC64_INIT(16);
-		assertf(atomic64_read(&a) == 16, "%I64u", __atomic64_val(a));
+		assertf(atomic64_read(&a) == 16, "%" PRIu64, __atomic64_val(a));
 		atomic64_write(&a, 12);
-		assertf(atomic64_read(&a) == 12, "%I64u", __atomic64_val(a));
-		assertf(atomic64_cmpxch_val(&a, 12, 14) == 12, "%I64u", __atomic64_val(a));
-		assertf(atomic64_cmpxch_val(&a, 12, 14) == 14, "%I64u", __atomic64_val(a));
-		assertf(atomic64_cmpxch(&a, 14, 13) == true, "%I64u", __atomic64_val(a));
-		assertf(atomic64_cmpxch(&a, 14, 13) == false, "%I64u", __atomic64_val(a));
-		assertf(atomic64_read(&a) == 13, "%I64u", __atomic64_val(a));
-		assertf(atomic64_fetchadd(&a, 7) == 13, "%I64u", __atomic64_val(a));
-		assertf(atomic64_read(&a) == 20, "%I64u", __atomic64_val(a));
+		assertf(atomic64_read(&a) == 12, "%" PRIu64, __atomic64_val(a));
+		assertf(atomic64_cmpxch_val(&a, 12, 14) == 12, "%" PRIu64, __atomic64_val(a));
+		assertf(atomic64_cmpxch_val(&a, 12, 14) == 14, "%" PRIu64, __atomic64_val(a));
+		assertf(atomic64_cmpxch(&a, 14, 13) == true, "%" PRIu64, __atomic64_val(a));
+		assertf(atomic64_cmpxch(&a, 14, 13) == false, "%" PRIu64, __atomic64_val(a));
+		assertf(atomic64_read(&a) == 13, "%" PRIu64, __atomic64_val(a));
+		assertf(atomic64_fetchadd(&a, 7) == 13, "%" PRIu64, __atomic64_val(a));
+		assertf(atomic64_read(&a) == 20, "%" PRIu64, __atomic64_val(a));
 	}
 #endif
 }

@@ -387,7 +387,9 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict me,
 			assert(new_cpu_qsize <= cpu_qsize);
 			if (new_cpu_qsize < cpu_qsize) {
 				if (log_messages) {
-					printk(KERN_INFO "[cpu#%u][-] Adjust quantum length %I32u -> %I32u "
+					printk(KERN_INFO "[cpu#%u][-] Adjust quantum length "
+					                 "%" PRIuN(__SIZEOF_QUANTUM_DIFF_T__) " -> "
+					                 "%" PRIuN(__SIZEOF_QUANTUM_DIFF_T__) " "
 					                 "(cpu clock was running too slow)\n",
 					       me->c_id, cpu_qsize, new_cpu_qsize);
 				}
@@ -448,7 +450,9 @@ NOTHROW(FCALL cpu_resync_realtime)(struct cpu *__restrict me,
 					struct timespec cputime_since_nts;
 					u64 quantum_since_nts;
 					if (log_messages) {
-						printk(KERN_INFO "[cpu#%u][+] Adjust quantum length %I32u -> %I32u "
+						printk(KERN_INFO "[cpu#%u][+] Adjust quantum length "
+						                 "%" PRIuN(__SIZEOF_QUANTUM_DIFF_T__) " -> "
+						                 "%" PRIuN(__SIZEOF_QUANTUM_DIFF_T__) " "
 						                 "(cpu clock was running too fast)\n",
 						       me->c_id, cpu_qsize, new_cpu_qsize);
 					}
@@ -539,6 +543,20 @@ done:
 }
 
 
+#define ASSERT_BACKWARDS_REALTIME(before, after)                                                 \
+	assertf((before) <= (after) || kernel_poisoned(),                                            \
+	        "Backwards realtime: { "                                                             \
+	        "{ %" PRIdN(__SIZEOF_TIME_T__) ", %" PRIuN(__SIZEOF_SYSCALL_LONG_T__) " }, "         \
+	        "{ %" PRIdN(__SIZEOF_TIME_T__) ", %" PRIuN(__SIZEOF_SYSCALL_LONG_T__) " } } (diff: " \
+	        "{ %" PRIdN(__SIZEOF_TIME_T__) ", %" PRIuN(__SIZEOF_SYSCALL_LONG_T__) " })\n",       \
+	        before.tv_sec, before.tv_nsec,                                                       \
+	        after.tv_sec, after.tv_nsec,                                                         \
+	        (before - after).tv_sec,                                                             \
+	        (before - after).tv_nsec)
+
+
+
+
 #ifdef NDEBUG
 #define cpu_resync_realtime_chk cpu_resync_realtime
 #else /* NDEBUG */
@@ -558,12 +576,7 @@ NOTHROW(FCALL cpu_resync_realtime_chk)(struct cpu *__restrict me,
 	                    nts_qelapsed,
 	                    log_messages);
 	after = realtime();
-	assertf(before <= after || kernel_poisoned(),
-	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
-	        (s64)(before - after).tv_sec,
-	        (uintptr_t)(before - after).tv_nsec);
+	ASSERT_BACKWARDS_REALTIME(before, after);
 }
 #endif /* !NDEBUG */
 
@@ -1039,12 +1052,7 @@ PUBLIC NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void) {
 		 * file: kos/src/kernel/core/sched/time.c (line 1047)
 		 * func: realtime
 		 * mesg: Backwards realtime: { { 1597331420, 470717184 }, { 1597331420, 442622109 } } (diff: { 0, 28095075 }) */
-		assertf(before <= resync_real,
-		        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-		        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-		        (s64)resync_real.tv_sec, (uintptr_t)resync_real.tv_nsec,
-		        (s64)(before - resync_real).tv_sec,
-		        (uintptr_t)(before - resync_real).tv_nsec);
+		ASSERT_BACKWARDS_REALTIME(before, resync_real);
 		FORCPU(me, last_realtime) = resync_real;
 	}
 	PREEMPTION_POP(was);
@@ -1188,12 +1196,7 @@ NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict prev,
 
 #ifndef NDEBUG
 	after = realtime();
-	assertf(before <= after || kernel_poisoned(),
-	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
-	        (s64)(before - after).tv_sec,
-	        (uintptr_t)(before - after).tv_nsec);
+	ASSERT_BACKWARDS_REALTIME(before, after);
 #endif /* !NDEBUG */
 }
 
@@ -1240,8 +1243,8 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 		new_elapsed = arch_cpu_quantum_elapsed_nopr(me);
 		assertf(new_elapsed == 0,
 		        "So-long as preemptive interrupts are disabled, this must be 0!\n"
-		        "elapsed                                 = %I32u\n"
-		        "new_elapsed                             = %I32u\n"
+		        "elapsed                                 = %" PRIuN(__SIZEOF_QUANTUM_DIFF_T__) "\n"
+		        "new_elapsed                             = %" PRIuN(__SIZEOF_QUANTUM_DIFF_T__) "\n"
 		        "arch_cpu_preemptive_interrupts_disabled = %d\n",
 		        elapsed, new_elapsed,
 		        (int)FORCPU(me, arch_cpu_preemptive_interrupts_disabled));
@@ -1253,12 +1256,7 @@ NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void) {
 
 #ifndef NDEBUG
 	after = realtime();
-	assertf(before <= after || kernel_poisoned(),
-	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
-	        (s64)(before - after).tv_sec,
-	        (uintptr_t)(before - after).tv_nsec);
+	ASSERT_BACKWARDS_REALTIME(before, after);
 #endif /* !NDEBUG */
 }
 
@@ -1284,12 +1282,7 @@ NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void) {
 	arch_cpu_enable_preemptive_interrupts_nopr(me);
 #ifndef NDEBUG
 	after = realtime();
-	assertf(before <= after || kernel_poisoned(),
-	        "Backwards realtime: { { %I64d, %Iu }, { %I64d, %Iu } } (diff: { %I64d, %Iu })\n",
-	        (s64)before.tv_sec, (uintptr_t)before.tv_nsec,
-	        (s64)after.tv_sec, (uintptr_t)after.tv_nsec,
-	        (s64)(before - after).tv_sec,
-	        (uintptr_t)(before - after).tv_nsec);
+	ASSERT_BACKWARDS_REALTIME(before, after);
 #endif /* !NDEBUG */
 }
 

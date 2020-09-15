@@ -35,6 +35,7 @@
 #include <hybrid/overflow.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <string.h>
 
 #include "vm-nodeapi.h"
@@ -436,7 +437,7 @@ vm_mapat(struct vm *__restrict self,
 		partnode_pair_vector_fini_and_unlock_parts(&parts);
 		return false;
 	}
-	printk(KERN_DEBUG "[vm] Map %p...%p against %Iu data parts\n",
+	printk(KERN_DEBUG "[vm] Map %p...%p against %" PRIuSIZ " data parts\n",
 	       (byte_t *)addr,
 	       (byte_t *)addr + num_bytes - 1,
 	       parts.pv_cnt);
@@ -619,7 +620,7 @@ again:
 	assertf(!vm_isused(self, result, num_bytes),
 	        "result = %p...%p\n",
 	        result, (byte_t *)result + num_bytes - 1);
-	printk(KERN_DEBUG "[vm] Map %p...%p against %Iu data parts\n",
+	printk(KERN_DEBUG "[vm] Map %p...%p against %" PRIuSIZ " data parts\n",
 	       result, (byte_t *)result + num_bytes - 1,
 	       parts.pv_cnt);
 	/* Must prepare the given address range beforehand! */
@@ -648,14 +649,14 @@ again:
 		part_pages = vm_datapart_numvpages(part);
 		assertf(offset_pageid + part_pages <=
 		        result_pageid + num_bytes / PAGESIZE,
-		        "offset = %p...%p (%Iu pages)\n"
-		        "result = %p...%p (%Iu pages)\n",
+		        "offset = %p...%p (%" PRIuSIZ " pages)\n"
+		        "result = %p...%p (%" PRIuSIZ " pages)\n",
 		        (byte_t *)PAGEID_DECODE(offset_pageid),
 		        (byte_t *)PAGEID_DECODE(offset_pageid + part_pages) - 1, part_pages,
 		        result, (byte_t *)result + num_bytes - 1, num_bytes / PAGESIZE);
 		assertf(!vm_paged_isused(self, offset_pageid, offset_pageid + part_pages - 1),
-		        "offset = %p...%p (%Iu pages)\n"
-		        "result = %p...%p (%Iu pages)\n",
+		        "offset = %p...%p (%" PRIuSIZ " pages)\n"
+		        "result = %p...%p (%" PRIuSIZ " pages)\n",
 		        (byte_t *)PAGEID_DECODE(offset_pageid),
 		        (byte_t *)PAGEID_DECODE(offset_pageid + part_pages) - 1, part_pages,
 		        result, (byte_t *)result + num_bytes - 1, num_bytes / PAGESIZE);
@@ -684,7 +685,7 @@ again:
 	        "offset             = %p\n"
 	        "result + num_bytes = %p\n"
 	        "result             = %p\n"
-	        "num_bytes          = %Iu\n",
+	        "num_bytes          = %" PRIuSIZ "\n",
 	        PAGEID_DECODE(offset_pageid),
 	        (byte_t *)result + num_bytes,
 	        (byte_t *)result, num_bytes);
@@ -923,7 +924,7 @@ NOTHROW(KCALL vm_map_subrange_descriptors_insert_into_vm)(struct vm_map_subrange
 		node_minpage += part_vpages;
 	}
 	assertf(node_minpage == base_offset + num_datavpages,
-	        "Miss-matching data size (is:%Iu != expected:%Iu)",
+	        "Miss-matching data size (is:%" PRIuSIZ " != expected:%" PRIuSIZ ")",
 	        (size_t)(node_minpage - base_offset),
 	        (size_t)(num_datavpages));
 	/* Map the zero-node. */

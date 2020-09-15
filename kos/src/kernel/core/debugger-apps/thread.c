@@ -239,7 +239,7 @@ evalthreadexpr(char *expr, struct task **presult) {
 		pid = lookup_taskpid(pidno);
 		if (!pid || !pid->tp_thread.m_pointer ||
 		    wasdestroyed(pid->tp_thread.m_pointer)) {
-			dbg_printf(DBGSTR("Error: Invalid PID %u\n"), pidno);
+			dbg_printf(DBGSTR("Error: Invalid PID %lu\n"), pidno);
 			break;
 		}
 		*presult = pid->tp_thread.m_pointer;

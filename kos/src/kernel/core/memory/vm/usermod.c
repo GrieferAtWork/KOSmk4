@@ -1531,7 +1531,9 @@ lslib_enum_cb(void *exec_file,
 		++len;
 	}
 	dbg_printf(DBGSTR(" %.8" PRIxPTR " %.8" PRIxPTR " %.8" PRIxPTR "\n"),
-	           um->um_loadaddr, um->um_loadstart, um->um_loadend);
+	           um->um_loadaddr,
+	           um->um_loadstart,
+	           um->um_loadend);
 	dbg_loadcolor();
 	return 0;
 }

@@ -37,6 +37,7 @@
 #include <network/network.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -238,8 +239,8 @@ nic_rpacket_alloc(size_t max_packet_size) THROWS(E_BADALLOC) {
 	struct heapptr resptr;
 	assertf(max_packet_size >= ETH_ZLEN,
 	        "Packets must always have a max size of at least "
-	        "ETH_ZLEN(%Iu) bytes (but %Iu is less than that)",
-	        ETH_ZLEN, max_packet_size);
+	        "ETH_ZLEN(%" PRIuSIZ ") bytes (but %" PRIuSIZ " is less than that)",
+	        (size_t)ETH_ZLEN, max_packet_size);
 	/* XXX: Pre-cache a certain number of specifically-sized packets. */
 	resptr = heap_alloc(&kernel_default_heap,
 	                    offsetof(struct nic_rpacket, rp_data) +

@@ -39,6 +39,7 @@
 #include <sys/io.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -230,9 +231,9 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 			if (!class_name)
 				class_name = FREESTR("?");
 			printk(FREESTR(KERN_INFO
-			               "[pci] Device at %I32p located "
-			               "(vendor/device %.4I16x:%.4I16x) "
-			               "(class: %s:%.2I8x.%.2I8x.%.2I8x.%.2I8x)\n"),
+			               "[pci] Device at %" PRIp32 " located "
+			               "(vendor/device %.4" PRIx16 ":%.4" PRIx16 ") "
+			               "(class: %s:%.2" PRIx8 ".%.2" PRIx8 ".%.2" PRIx8 ".%.2" PRIx8 ")\n"),
 			       addr,
 			       result->pd_vendorid,
 			       result->pd_deviceid,

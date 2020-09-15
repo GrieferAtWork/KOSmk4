@@ -34,6 +34,7 @@
 
 #include <elf.h>
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <string.h>
 
@@ -241,7 +242,7 @@ do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
 #ifdef CONFIG_HAVE_USERMOD
 unknown_module:
 #endif /* CONFIG_HAVE_USERMOD */
-			result = format_printf(printer, arg, "%p+%Iu",
+			result = format_printf(printer, arg, "%p+%" PRIuSIZ,
 			                       start_pc,
 			                       (size_t)((byte_t *)end_pc -
 			                                (byte_t *)start_pc));
@@ -274,17 +275,17 @@ again_printlevel:
 		result = debug_addr2line_print_filename(printer, arg, info.al_cubase, info.al_srcpath, info.al_srcfile);
 		if unlikely(result < 0)
 			goto done;
-		temp = format_printf(printer, arg, "(%Iu", info.al_srcline);
+		temp = format_printf(printer, arg, "(%" PRIuPTR, info.al_srcline);
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 		if (info.al_srccol > 0) {
-			temp = format_printf(printer, arg, ",%Iu", info.al_srccol);
+			temp = format_printf(printer, arg, ",%" PRIuPTR, info.al_srccol);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
 		}
-		temp = format_printf(printer, arg, ") : %s+%Iu : %p+%Iu",
+		temp = format_printf(printer, arg, ") : %s+%" PRIuPTR " : %p+%" PRIuPTR,
 		                     info.al_rawname,
 		                     level == 0 ? (module_relative_start_pc - info.al_symstart)
 		                                : (info.al_linestart - info.al_symstart),

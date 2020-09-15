@@ -45,6 +45,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <inttypes.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -802,7 +803,7 @@ again_getkey:
 				len = keyboard_device_do_translate(self, packet.kp_key, packet.kp_mod);
 				len = keyboard_device_encode_cp(self, len);
 				if (len == 0) {
-					printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): <empty>\n",
+					printk(KERN_DEBUG "[keyboard:%q] translate(%#" PRIx16 ",%#" PRIx16 "): <empty>\n",
 					       self->cd_name, packet.kp_key, packet.kp_mod);
 check_led_and_try_again:
 					sync_endwrite(&self->kd_map_lock);
@@ -812,7 +813,7 @@ check_led_and_try_again:
 						sync_leds(self);
 					goto again;
 				}
-				printk(KERN_DEBUG "[keyboard:%q] translate(%#I16x,%#I16x): %$q\n",
+				printk(KERN_DEBUG "[keyboard:%q] translate(%#" PRIx16 ",%#" PRIx16 "): %$q\n",
 				       self->cd_name, packet.kp_key, packet.kp_mod,
 				       len, self->kd_pend);
 				break;
