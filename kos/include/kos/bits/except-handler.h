@@ -21,7 +21,14 @@
 #define _KOS_BITS_EXCEPT_HANDLER_H 1
 
 #include <__stdinc.h>
-#include <kos/asm/except.h>
+#ifndef __error_register_state_t_defined
+#include <kos/bits/except.h> /* __ERROR_REGISTER_STATE_TYPE */
+#ifndef __ERROR_REGISTER_STATE_TYPE
+#include <bits/mcontext.h>
+#define __ERROR_REGISTER_STATE_TYPE   struct mcontext
+#define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
+#endif /* !__ERROR_REGISTER_STATE_TYPE */
+#endif /* !__error_register_state_t_defined */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

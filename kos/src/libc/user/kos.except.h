@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4717fc9c */
+/* HASH CRC-32:0xf0e1a1d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,14 +36,6 @@ INTDEF ATTR_PURE WUNUSED bool NOTHROW_NCX(LIBKCALL libc_error_active)(void);
 INTDEF ATTR_PURE WUNUSED error_class_t NOTHROW_NCX(LIBKCALL libc_error_class)(void);
 INTDEF ATTR_PURE WUNUSED error_subclass_t NOTHROW_NCX(LIBKCALL libc_error_subclass)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED error_register_state_t *NOTHROW_NCX(LIBKCALL libc_error_register_state)(void);
-#ifndef __KERNEL__
-/* Transform the given exception into a posix errno value */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_error_as_errno)(struct exception_data const *__restrict data);
-/* Transform the given exception into a posix signal.
- * If doing this is possible, fill in `*result' and return `true'.
- * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
-INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBCCALL libc_error_as_signal)(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result);
-#endif /* !__KERNEL__ */
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW_NCX(LIBKCALL libc_error_info)(void);
 /* Unwind the given register state to propagate the currently set error.
  * Following this, the returned register state should then be loaded. */

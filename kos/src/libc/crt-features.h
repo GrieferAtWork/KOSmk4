@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f383f6d */
+/* HASH CRC-32:0x13782fa4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -791,8 +791,6 @@
 #define __CRT_HAVE_DOS$err 1
 #define __CRT_HAVE_DOS$errc 1
 #define __CRT_HAVE_DOS$error 1
-#define __CRT_HAVE_DOS$error_as_errno 1
-#define __CRT_HAVE_DOS$error_as_signal 1
 #define __CRT_HAVE_DOS$error_at_line 1
 #define __CRT_HAVE_DOS$errx 1
 #define __CRT_HAVE_DOS$ether_aton 1

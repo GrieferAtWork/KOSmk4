@@ -19,15 +19,23 @@
  */
 %[default:section(".text.crt{|.dos}.except.io.utility")]
 
+%(auto_source){
+#include <signal.h>
+}
+
+
 %{
 #include <features.h>
 
 #include <hybrid/pp/__va_nargs.h>
 
 #include <bits/types.h>
-#include <kos/asm/except.h>          /* __ERROR_REGISTER_STATE_TYPE */
+#include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
 #include <kos/except/codes.h>        /* E_OK, ... */
+}%[insert:prefix(
+#include <optimized/kos.except.h>
+)]%{
 
 #ifndef EXCEPTION_DATA_POINTERS
 #define EXCEPTION_DATA_POINTERS  8
@@ -79,7 +87,9 @@
 
 
 
-#ifdef __CC__
+}
+%#ifdef __CC__
+%{
 __SYSDECL_BEGIN
 
 #ifndef __error_register_state_t_defined
@@ -177,12 +187,11 @@ struct exception_info;
 	"error_code", "error_active", "error_class", "error_subclass",
 	"error_unwind", "__cxa_begin_catch", "__cxa_end_catch",
 	"__gxx_personality_v0", "__gcc_personality_v0",
-	"error_as_errno", "error_as_signal",
 )]
 
 
 
-/* TODO: Add [[preferred_fastbind]] variants that become available
+/* TODO: Add [[preferred_fastbind_always]] variants that become available
  *       when compiling for kernel-space, and that are implemented
  *       to directly access the TLS exception storage. */
 
@@ -193,40 +202,44 @@ struct exception_info;
 %[define_replacement(error_class_t = __error_class_t)]
 %[define_replacement(error_subclass_t = __error_subclass_t)]
 %[define_replacement(bool = __BOOL)]
+%[define_replacement(true = 1)]
+%[define_replacement(false = 0)]
 
 
 /* Returns non-zero if there is an active exception. */
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
 [[wunused, const, nonnull, decl_prefix(struct exception_data;)]]
 struct exception_data *error_data(void);
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
 [[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
 error_code_t error_code(void);
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
 [[wunused, pure, userimpl, requires_function(error_code)]]
 [[impl_include("<kos/except/codes.h>")]]
 $bool error_active(void) {
 	return error_code() != @E_OK@;
 }
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
 [[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
+[[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_function(error_code)]]
 error_class_t error_class(void) {
 	return @ERROR_CLASS@(error_code());
 }
 
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
 [[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
+[[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_function(error_code)]]
 error_subclass_t error_subclass(void) {
 	return @ERROR_SUBCLASS@(error_code());
 }
 
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
-[[wunused, const, nonnull, decl_include("<kos/asm/except.h>")]]
+[[wunused, const, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
 #ifndef __ERROR_REGISTER_STATE_TYPE
 #include <bits/mcontext.h>
@@ -237,24 +250,765 @@ error_subclass_t error_subclass(void) {
 error_register_state_t *error_register_state(void);
 
 @@Transform the given exception into a posix errno value
-[[wunused, pure]]
-$errno_t error_as_errno([[nonnull]] struct exception_data const *__restrict data);
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[wunused, pure, decl_include("<bits/types.h>")]]
+[[decl_prefix(struct exception_data;)]]
+[[impl_include("<asm/os/errno.h>")]]
+[[impl_include("<kos/bits/exception_data.h>")]]
+[[impl_include("<kos/except/reason/fs.h>")]]
+[[impl_include("<kos/except/reason/inval.h>")]]
+[[impl_include("<kos/except/reason/io.h>")]]
+[[impl_include("<kos/except/reason/net.h>")]]
+[[impl_include("<kos/except/reason/noexec.h>")]]
+[[impl_include("<kos/except/codes.h>")]]
+[[impl_include("<kos/kernel/handle.h>")]]
+$errno_t error_as_errno([[nonnull]] struct exception_data const *__restrict self) {
+@@pp_ifdef EPERM@@
+	errno_t result = EPERM;
+@@pp_else@@
+	errno_t result = 1;
+@@pp_endif@@
+	switch (self->@e_class@) {
+/*[[[deemon
+final local DEFAULT_ERRNO = "EPERM";
+import * from deemon;
+import * from ....misc.libgen.exceptinfo;
+function isCustomErrnoExpr(s) -> s !is none && s != "DEFAULT_ERRNO";
+
+@@Returns (formattedExpr, listOfMacrosThatMustBeDefined)
+function formatErrnoExpr(cls: ExceptClass): (string, {string...}) {
+	local expr = File.Writer();
+	cls.printErrnoExpr(expr, cbField: [](name) ->
+		expr << "self->e_args." << cls.findFieldByName(name)[0]);
+	expr = expr.string;
+	local reqMacros = [];
+	File.Writer resultExpr;
+	local flushStart = 0, i = 0, len = #expr;
+	while (i < len) {
+		if (!expr.issymstrt(i)) {
+			++i;
+			continue;
+		}
+		local symStart = i;
+		++i;
+		while (i < len && expr.issymcont(i))
+			++i;
+		local symb = expr[symStart:i];
+		if (symb !in ["self"]) {
+			resultExpr << expr[flushStart:symStart];
+			if (symb.startswith("E") && "_" !in symb) {
+				resultExpr << symb;
+				if (symb !in reqMacros)
+					reqMacros.append(symb);
+			} else {
+				resultExpr << "@" << symb << "@";
+			}
+			flushStart = i;
+		}
+	}
+	resultExpr << expr[flushStart:];
+	return (resultExpr.string, reqMacros);
+}
+
+for (local name, ppCondToCls: parseExceptionClasses()) {
+	for (local ppCond, cls: ppCondToCls) {
+		if (cls.baseClass !is none)
+			continue;
+		local hasErrnoExpr = isCustomErrnoExpr(cls.errnoExpr);
+		local hasSubClassErrnoExpr = false;
+		for (local c: cls.subClasses) {
+			if (isCustomErrnoExpr(c.errnoExpr)) {
+				hasSubClassErrnoExpr = true;
+				hasErrnoExpr = true;
+				break;
+			}
+		}
+		if (!hasErrnoExpr)
+			continue;
+		if (!hasSubClassErrnoExpr) {
+			local expr, reqMacros = formatErrnoExpr(cls)...;
+			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
+			if (!reqMacros)
+				reqMacros = cls.ppCond;
+			else if (cls.ppCond != "1") {
+				reqMacros = "({}) && ({})".format({ reqMacros, cls.ppCond });
+			}
+			if (reqMacros != "1")
+				print("@@pp_if ", reqMacros, "@@");
+			print("\tcase @", cls.name, "@:");
+			print("\t\tresult = ", expr.replace("\n", "\n\t\t"), ";");
+			print("\t\tbreak;");
+			if (reqMacros != "1")
+				print("@@pp_endif@@");
+			print;
+			continue;
+		}
+		if (cls.ppCond != "1")
+			print("@@pp_if ", cls.ppCond, "@@");
+		print("\tcase @", cls.name, "@:");
+		if (isCustomErrnoExpr(cls.errnoExpr)) {
+			local expr, reqMacros = formatErrnoExpr(cls)...;
+			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
+			if (reqMacros)
+				print("@@pp_if ", reqMacros, "@@");
+			print("\t\tresult = ", expr.replace("\n", "\n\t\t"), ";");
+			if (reqMacros)
+				print("@@pp_endif@@");
+		}
+		// Deal with sub-classes
+		print("\t\tswitch(self->@e_subclass@) {");
+		for (local c: cls.subClasses) {
+			if (!isCustomErrnoExpr(c.errnoExpr))
+				continue;
+			local expr, reqMacros = formatErrnoExpr(c)...;
+			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
+			if (reqMacros)
+				print("@@pp_if ", reqMacros, "@@");
+			print("\t\tcase @ERROR_SUBCLASS@(@ERROR_CODEOF@(@", c.name, "@)):");
+			print("\t\t\tresult = ", expr.replace("\n", "\n\t\t\t"), ";");
+			print("\t\t\tbreak;");
+			if (reqMacros)
+				print("@@pp_endif@@");
+		}
+		print("\t\tdefault: break;");
+		print("\t\t}");
+		print("\t\tbreak;");
+		if (cls.ppCond != "1")
+			print("@@pp_endif@@");
+		print;
+	}
+}
+]]]*/
+@@pp_if defined(EACCES)@@
+	case @E_INSUFFICIENT_RIGHTS@:
+		result = EACCES;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EIO)@@
+	case @E_IOERROR@:
+		result = EIO;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EOK)@@
+	case @E_OK@:
+		result = EOK;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EINTR)@@
+	case @E_INTERRUPT@:
+		result = EINTR;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EFAULT)@@
+	case @E_SEGFAULT@:
+		result = EFAULT;
+		break;
+@@pp_endif@@
+
+	case @E_BADALLOC@:
+@@pp_if defined(ENOMEM)@@
+		result = ENOMEM;
+@@pp_endif@@
+		switch(self->@e_subclass@) {
+@@pp_if defined(EMFILE)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS@)):
+			result = EMFILE;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENFILE)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_HANDLE_RANGE@)):
+			result = ENFILE;
+			break;
+@@pp_endif@@
+@@pp_if defined(EADDRNOTAVAIL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_BADALLOC_INSUFFICIENT_PORT_NUMBERS@)):
+			result = EADDRNOTAVAIL;
+			break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+
+@@pp_if defined(ENOSYS)@@
+	case @E_UNKNOWN_SYSTEMCALL@:
+		result = ENOSYS;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EFAULT)@@
+	case @E_UNHANDLED_INTERRUPT@:
+		result = EFAULT;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ENODEV)@@
+	case @E_NO_DEVICE@:
+		result = ENODEV;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EAGAIN)@@
+	case @E_WOULDBLOCK@:
+		result = EAGAIN;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ERANGE)@@
+	case @E_BUFFER_TOO_SMALL@:
+		result = ERANGE;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EINVAL)@@
+	case @E_DIVIDE_BY_ZERO@:
+		result = EINVAL;
+		break;
+@@pp_endif@@
+
+	case @E_INVALID_HANDLE@:
+@@pp_if defined(EBADF)@@
+		result = EBADF;
+@@pp_endif@@
+		switch(self->@e_subclass@) {
+@@pp_if defined(ENOTSOCK) && defined(EBADFD)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_FILETYPE@)):
+			result = self->@e_args@.@e_invalid_handle@.@ih_filetype@.@f_needed_handle_type@ == @HANDLE_TYPE_SOCKET@ ? ENOTSOCK : EBADFD;
+			break;
+@@pp_endif@@
+@@pp_if defined(EINVAL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_OPERATION@)):
+			result = EINVAL;
+			break;
+@@pp_endif@@
+@@pp_if defined(EOPNOTSUPP)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_NET_OPERATION@)):
+			result = EOPNOTSUPP;
+			break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+
+@@pp_if defined(EOVERFLOW)@@
+	case @E_OVERFLOW@:
+		result = EOVERFLOW;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EILSEQ)@@
+	case @E_UNICODE_ERROR@:
+		result = EILSEQ;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EINVAL)@@
+	case @E_BREAKPOINT@:
+		result = EINVAL;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EFAULT)@@
+	case @E_STACK_OVERFLOW@:
+		result = EFAULT;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ESRCH)@@
+	case @E_PROCESS_EXITED@:
+		result = ESRCH;
+		break;
+@@pp_endif@@
+
+@@pp_if (defined(EPERM)) && (!defined(__i386__) && !defined(__x86_64__))@@
+	case @E_ILLEGAL_INSTRUCTION@:
+		result = EPERM;
+		break;
+@@pp_endif@@
+
+@@pp_if (defined(EPERM)) && (defined(__i386__) || defined(__x86_64__))@@
+	case @E_ILLEGAL_INSTRUCTION@:
+		result = EPERM;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ERANGE)@@
+	case @E_INDEX_ERROR@:
+		result = ERANGE;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EPERM)@@
+	case @E_NOT_IMPLEMENTED@:
+		result = EPERM;
+		break;
+@@pp_endif@@
+
+	case @E_FSERROR@:
+		switch(self->@e_subclass@) {
+@@pp_if defined(ENOENT)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DELETED@)):
+			result = ENOENT;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOENT)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_FILE_NOT_FOUND@)):
+			result = ENOENT;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOENT)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_PATH_NOT_FOUND@)):
+			result = ENOENT;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENAMETOOLONG)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_ILLEGAL_PATH@)):
+			result = ENAMETOOLONG;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOTDIR)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_NOT_A_DIRECTORY@)):
+			result = ENOTDIR;
+			break;
+@@pp_endif@@
+@@pp_if defined(ELOOP)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_TOO_MANY_SYMBOLIC_LINKS@)):
+			result = ELOOP;
+			break;
+@@pp_endif@@
+@@pp_if defined(EACCES)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_ACCESS_DENIED@)):
+			result = EACCES;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOSPC)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DISK_FULL@)):
+			result = ENOSPC;
+			break;
+@@pp_endif@@
+@@pp_if defined(EROFS)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_READONLY@)):
+			result = EROFS;
+			break;
+@@pp_endif@@
+@@pp_if defined(EMLINK)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_TOO_MANY_HARD_LINKS@)):
+			result = EMLINK;
+			break;
+@@pp_endif@@
+@@pp_if defined(EISDIR)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_IS_A_DIRECTORY@)):
+			result = EISDIR;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOENT)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_NOT_A_SYMBOLIC_LINK@)):
+			result = ENOENT;
+			break;
+@@pp_endif@@
+@@pp_if defined(ELOOP)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_IS_A_SYMBOLIC_LINK@)):
+			result = ELOOP;
+			break;
+@@pp_endif@@
+@@pp_if defined(EEXIST)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_FILE_ALREADY_EXISTS@)):
+			result = EEXIST;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOTEMPTY)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DIRECTORY_NOT_EMPTY@)):
+			result = ENOTEMPTY;
+			break;
+@@pp_endif@@
+@@pp_if defined(EXDEV)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_CROSS_DEVICE_LINK@)):
+			result = EXDEV;
+			break;
+@@pp_endif@@
+@@pp_if defined(EINVAL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DIRECTORY_MOVE_TO_CHILD@)):
+			result = EINVAL;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOTBLK)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_NOT_A_BLOCK_DEVICE@)):
+			result = ENOTBLK;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOTBLK)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_NO_BLOCK_DEVICE@)):
+			result = ENOTBLK;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENODEV)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_WRONG_FILE_SYSTEM@)):
+			result = ENODEV;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENODEV)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_UNKNOWN_FILE_SYSTEM@)):
+			result = ENODEV;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENODEV)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_CORRUPTED_FILE_SYSTEM@)):
+			result = ENODEV;
+			break;
+@@pp_endif@@
+@@pp_if defined(EBUSY)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_DEVICE_ALREADY_MOUNTED@)):
+			result = EBUSY;
+			break;
+@@pp_endif@@
+@@pp_if defined(EBUSY)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_PATH_ALREADY_MOUNTED@)):
+			result = EBUSY;
+			break;
+@@pp_endif@@
+@@pp_if defined(EINVAL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_NOT_A_MOUNTING_POINT@)):
+			result = EINVAL;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOTDIR)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_IS_A_MOUNTING_POINT@)):
+			result = ENOTDIR;
+			break;
+@@pp_endif@@
+@@pp_if defined(ESPIPE) && defined(EINVAL) && defined(EPERM)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_FSERROR_UNSUPPORTED_OPERATION@)):
+			result = self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_SEEK@ ? ESPIPE :
+			        (self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_READ@ || self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_WRITE@ ||
+			         self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_TRUNC@ || self->@e_args@.@e_fserror@.@f_unsupported_operation@.@uo_operation_id@ == @E_FILESYSTEM_OPERATION_READDIR@)
+			         ? EINVAL : EPERM;
+			break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+
+@@pp_if defined(EPERM)@@
+	case @E_INVALID_CONTEXT@:
+		result = EPERM;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ENOEXEC)@@
+	case @E_NOT_EXECUTABLE@:
+		result = ENOEXEC;
+		break;
+@@pp_endif@@
+
+	case @E_INVALID_ARGUMENT@:
+@@pp_if defined(EINVAL)@@
+		result = EINVAL;
+@@pp_endif@@
+		switch(self->@e_subclass@) {
+@@pp_if defined(EAFNOSUPPORT) && defined(ESOCKTNOSUPPORT) && defined(EPROTONOSUPPORT) && defined(EINVAL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_UNKNOWN_COMMAND@)):
+			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_FAMILY@ ? EAFNOSUPPORT :
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_TYPE@ ? ESOCKTNOSUPPORT :
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SOCKET_BAD_PROTOCOL@ ? EPROTONOSUPPORT :
+			        EINVAL;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOTCONN) && defined(EDESTADDRREQ) && defined(EISCONN) && defined(ENXIO) && defined(EPIPE) && defined(EINVAL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_BAD_STATE@)):
+			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SHUTDOWN_NOT_CONNECTED@ ||
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED@ ||
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_RECV_NOT_CONNECTED@ ? ENOTCONN :
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_SEND_NOT_CONNECTED@ ? EDESTADDRREQ :
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CONNECT_ALREADY_CONNECTED@ ? EISCONN :
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS@ ? ENXIO :
+			        self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS@ ? EPIPE :
+			        EINVAL;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENOPROTOOPT)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_SOCKET_OPT@)):
+			result = ENOPROTOOPT;
+			break;
+@@pp_endif@@
+@@pp_if defined(EAFNOSUPPORT) && defined(EINVAL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_ARGUMENT_UNEXPECTED_COMMAND@)):
+			result = self->@e_args@.@e_invalid_argument@.@ia_context@ == @E_INVALID_ARGUMENT_CONTEXT_CONNECT_WRONG_ADDRESS_FAMILY@ ? EAFNOSUPPORT : EINVAL;
+			break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+
+	case @E_NET_ERROR@:
+		switch(self->@e_subclass@) {
+@@pp_if defined(EHOSTUNREACH)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_HOST_UNREACHABLE@)):
+			result = EHOSTUNREACH;
+			break;
+@@pp_endif@@
+@@pp_if defined(EADDRINUSE)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_ADDRESS_IN_USE@)):
+			result = EADDRINUSE;
+			break;
+@@pp_endif@@
+@@pp_if defined(EMSGSIZE)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_MESSAGE_TOO_LONG@)):
+			result = EMSGSIZE;
+			break;
+@@pp_endif@@
+@@pp_if defined(ECONNABORTED)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_CONNECTION_ABORT@)):
+			result = ECONNABORTED;
+			break;
+@@pp_endif@@
+@@pp_if defined(ECONNREFUSED)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_CONNECTION_REFUSED@)):
+			result = ECONNREFUSED;
+			break;
+@@pp_endif@@
+@@pp_if defined(ECONNRESET)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_CONNECTION_RESET@)):
+			result = ECONNRESET;
+			break;
+@@pp_endif@@
+@@pp_if defined(ETIMEDOUT)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_TIMEOUT@)):
+			result = ETIMEDOUT;
+			break;
+@@pp_endif@@
+@@pp_if defined(ENETUNREACH)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_UNREACHABLE@)):
+			result = ENETUNREACH;
+			break;
+@@pp_endif@@
+@@pp_if defined(EADDRNOTAVAIL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_ADDRESS_NOT_AVAILABLE@)):
+			result = EADDRNOTAVAIL;
+			break;
+@@pp_endif@@
+@@pp_if defined(EPIPE)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_NET_SHUTDOWN@)):
+			result = EPIPE;
+			break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+/*[[[end]]]*/
+	default:
+		break;
+	}
+	return result;
+}
 
 
 %struct __siginfo_struct;
 @@Transform the given exception into a posix signal.
 @@If doing this is possible, fill in `*result' and return `true'.
 @@Otherwise, `*result' is left in an undefined state, and `false' is returned.
-[[wunused, decl_prefix(struct __siginfo_struct;)]]
-$bool error_as_signal([[nonnull]] struct exception_data const *__restrict data,
-                      [[nonnull]] struct __siginfo_struct *__restrict result);
+[[wunused, kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[decl_prefix(struct exception_data;)]]
+[[decl_prefix(struct __siginfo_struct;)]]
+[[impl_include("<asm/siginfo.h>")]]
+[[impl_include("<asm/os/signal.h>")]]
+[[impl_include("<bits/siginfo-struct.h>")]]
+[[impl_include("<kos/bits/exception_data.h>")]]
+[[impl_include("<kos/except/codes.h>")]]
+[[impl_include("<kos/kernel/handle.h>")]]
+$bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
+                      [[nonnull]] struct __siginfo_struct *__restrict result) {
+	error_code_t code = self->@e_code@;
+	bzero(result, sizeof(*result));
+	/* TODO: Make sure that this matches the sysv abi386 requirements:
+	 *       Figure 3-27:  Hardware Exceptions and Signals
+	 *       0   divide error fault             SIGFPE
+	 *       1   single step trap/fault         SIGTRAP
+	 *       2   nonmaskable interrupt          none
+	 *       3   breakpoint trap                SIGTRAP
+	 *       4   overflow trap                  SIGSEGV
+	 *       5   bounds check fault             SIGSEGV
+	 *       6   invalid opcode fault           SIGILL
+	 *       7   no coprocessor fault           SIGFPE
+	 *       8   double fault abort             none
+	 *       9   coprocessor overrun abort      SIGSEGV
+	 *       10  invalid TSS fault              none
+	 *       11  segment not present fault      none
+	 *       12  stack exception fault          SIGSEGV
+	 *       13  general protection fault/abort SIGSEGV
+	 *       14  page fault                     SIGSEGV
+	 *       15 (reserved)
+	 *       16 coprocessor error fault         SIGFPE
+	 *       other (unspecified)                SIGILL */
+	switch (@ERROR_CLASS@(code)) {
+
+@@pp_ifdef SIGQUIT@@
+	case @E_EXIT_THREAD@:
+	case @E_EXIT_PROCESS@:
+		result->@si_signo@ = SIGQUIT;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGBUS) && defined(BUS_OBJERR)@@
+	case @E_IOERROR@:
+		result->@si_signo@ = SIGBUS;
+		result->@si_code@  = BUS_OBJERR;
+		break;
+@@pp_endif@@
+
+@@pp_ifdef SIGSYS@@
+	case @E_UNKNOWN_SYSTEMCALL@:
+		result->@si_signo@   = SIGSYS;
+		result->@si_syscall@ = self->@e_args@.@e_unknown_systemcall@.@us_sysno@;
+		/* TODO: `si_arch' could be determined by
+		 *       `self->e_args.e_unknown_systemcall.us_flags & RPC_SYSCALL_INFO_FMETHOD'! */
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGFPE) && defined(FPE_INTDIV)@@
+	case @E_DIVIDE_BY_ZERO@:
+		result->@si_signo@ = SIGFPE;
+		result->@si_code@  = FPE_INTDIV;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGFPE) && defined(FPE_INTOVF)@@
+	case @E_OVERFLOW@:
+		result->@si_signo@ = SIGFPE;
+		result->@si_code@  = FPE_INTOVF;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGTRAP) && defined(TRAP_BRKPT)@@
+	case @E_BREAKPOINT@:
+		result->@si_signo@ = SIGTRAP;
+		result->@si_code@  = TRAP_BRKPT;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGINT)@@
+	case @E_INTERRUPT@:
+		result->@si_signo@ = SIGINT;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGFPE) && defined(FPE_FLTSUB)@@
+	case @E_INDEX_ERROR@:
+		result->@si_signo@ = SIGFPE;
+		result->@si_code@  = FPE_FLTSUB;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGSEGV) && defined(SEGV_MAPERR)@@
+	case @E_SEGFAULT@:
+	case @E_STACK_OVERFLOW@:
+		result->@si_signo@ = SIGSEGV;
+		result->@si_code@  = SEGV_MAPERR;
+		switch (code) {
+
+@@pp_if defined(SEGV_ACCERR)@@
+		case @ERROR_CODEOF@(@E_SEGFAULT_READONLY@):
+		case @ERROR_CODEOF@(@E_SEGFAULT_NOTREADABLE@):
+		case @ERROR_CODEOF@(@E_SEGFAULT_NOTEXECUTABLE@):
+			result->@si_code@ = SEGV_ACCERR;
+			break;
+@@pp_endif@@
+
+@@pp_if defined(SIGBUS) && defined(BUS_OBJERR)@@
+		case @ERROR_CODEOF@(@E_SEGFAULT_NOTATOMIC@):
+			result->@si_signo@ = SIGBUS;
+			result->@si_code@  = BUS_OBJERR;
+			break;
+@@pp_endif@@
+
+@@pp_if defined(SIGBUS) && defined(BUS_ADRALN)@@
+		case @ERROR_CODEOF@(@E_SEGFAULT_UNALIGNED@):
+			result->@si_signo@ = SIGBUS;
+			result->@si_code@  = BUS_ADRALN;
+			break;
+@@pp_endif@@
+
+		default: break;
+		}
+		result->@si_addr@  = (void *)self->@e_args@.@e_segfault@.@s_addr@;
+		result->@si_lower@ = result->@si_addr@;
+		result->@si_upper@ = result->@si_addr@;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(SIGILL)@@
+	case @E_ILLEGAL_INSTRUCTION@:
+		result->@si_signo@ = SIGILL;
+		switch (code) {
+
+@@pp_if defined(ILL_ILLOPN)@@
+		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_BAD_OPERAND@):
+			result->@si_code@ = ILL_ILLOPN;
+@@pp_if defined(ILL_ILLADR)@@
+			if (self->@e_args@.@e_illegal_instruction@.@ii_bad_operand@.@bo_what@ == @E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_MEMORY@ ||
+			    self->@e_args@.@e_illegal_instruction@.@ii_bad_operand@.@bo_what@ == @E_ILLEGAL_INSTRUCTION_BAD_OPERAND_UNEXPECTED_REGISTER@)
+				result->@si_code@ = ILL_ILLADR;
+@@pp_endif@@
+			break;
+@@pp_endif@@
+
+@@pp_if defined(ILL_PRVOPC)@@
+		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE@):
+			result->@si_code@ = ILL_PRVOPC;
+			break;
+@@pp_endif@@
+
+@@pp_if defined(ILL_ILLOPN)@@
+		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_REGISTER@):
+			result->@si_code@ = ILL_ILLOPN;
+@@pp_if defined(ILL_PRVREG)@@
+			if (self->@e_args@.@e_illegal_instruction@.@ii_register@.@r_how@ == @E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV@ ||
+			    self->@e_args@.@e_illegal_instruction@.@ii_register@.@r_how@ == @E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV@)
+				result->@si_code@ = ILL_PRVREG;
+@@pp_endif@@
+			break;
+@@pp_endif@@
+
+@@pp_if defined(ILL_ILLADR) && defined(@E_ILLEGAL_INSTRUCTION_X86_INTERRUPT@)@@
+		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_INTERRUPT@):
+			result->@si_code@ = ILL_ILLADR;
+			break;
+@@pp_endif@@
+
+@@pp_if defined(ILL_ILLOPC)@@
+		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_BAD_OPCODE@):
+@@pp_if defined(@E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX@)@@
+		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX@):
+@@pp_endif@@
+@@pp_if defined(@E_ILLEGAL_INSTRUCTION_X86_TOO_LONG@)@@
+		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_X86_TOO_LONG@):
+@@pp_endif@@
+		case @ERROR_CODEOF@(@E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE@):
+			result->@si_code@ = ILL_ILLOPC;
+			break;
+@@pp_endif@@
+
+		default:
+			break;
+		}
+		break;
+@@pp_endif@@
+
+	default:
+		return false;
+	}
+	result->@si_errno@ = error_as_errno(self);
+	return true;
+}
 
 
 
 
 %#ifdef __USE_KOS_KERNEL
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
-[[wunused, const, nonnull]]
+[[wunused, const, nonnull, preferred_fastbind_always]]
 [[decl_prefix(struct exception_info;)]]
 struct exception_info *error_info(void);
 
@@ -267,7 +1021,7 @@ struct exception_info *error_info(void);
 @@Unwind the given register state to propagate the currently set error.
 @@Following this, the returned register state should then be loaded.
 [[kernel, no_crt_dos_wrapper, cc(__ERROR_UNWIND_CC)]]
-[[wunused, nonnull, decl_include("<kos/asm/except.h>")]]
+[[wunused, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
 #ifndef __ERROR_UNWIND_CC
 #define __ERROR_UNWIND_CC __LIBKCALL
@@ -393,9 +1147,13 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 #endif /* !THROW */
 
 #ifndef was_thrown
+#ifndef __PRIVATE_WAS_THROWN_PACKAGE_CODE1
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE1(code) \
 	((__builtin_constant_p(code) && (code) <= 0xffff) ? error_class() == (code) : error_code() == (code))
+#endif /* !__PRIVATE_WAS_THROWN_PACKAGE_CODE1 */
+#ifndef __PRIVATE_WAS_THROWN_PACKAGE_CODE2
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE2(class, subclass) (error_code() == ERROR_CODE(class, subclass))
+#endif /* !__PRIVATE_WAS_THROWN_PACKAGE_CODE2 */
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)              __PRIVATE_WAS_THROWN_PACKAGE_CODE##n
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN(n)               __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE(...)              __PRIVATE_WAS_THROWN_PACKAGE_CODEX(__PRIVATE_WAS_THROWN_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__))
@@ -433,6 +1191,8 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 %{
 
 __SYSDECL_END
-#endif /* __CC__ */
+}
+%#endif /* __CC__ */
+%{
 
 }

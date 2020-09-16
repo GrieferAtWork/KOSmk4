@@ -1920,4 +1920,15 @@ static_assert(sizeof(struct udphdr) == __SIZEOF_UDPHDR);
 //[[[end]]]
 
 
+#include <kos/except.h>
+
+/* Make sure that none of the exception-structs cause the
+ * exception-data-pointer-union to grow beyond its arch-
+ * specific pointer-count-limit */
+static_assert(sizeof(union exception_data_pointers) ==
+              EXCEPTION_DATA_POINTERS * sizeof(void *));
+
+
+
+
 #endif /* !GUARD__VERIFY_ASSERT_TYPES_C */

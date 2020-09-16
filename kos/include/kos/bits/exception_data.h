@@ -26,7 +26,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <kos/asm/except.h> /* Optional: EXCEPTION_DATA_POINTERS */
+#include <kos/bits/except.h> /* Optional: EXCEPTION_DATA_POINTERS */
 
 #ifndef EXCEPTION_DATA_POINTERS
 #define EXCEPTION_DATA_POINTERS  8 /* Default value */

@@ -183,7 +183,7 @@ PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_save)(void) {
  * The main purpose of this function is to aid in implementing FPU support
  * in debuggers, where this function is called when suspending execution of
  * the associated CPU, after which the debugger can read/write FPU information
- * for any thread by simply looking at `PERTASK(thread, this_fpustate)' */
+ * for any thread by simply looking at `FORTASK(thread, this_fpustate)' */
 PUBLIC NOBLOCK void NOTHROW(KCALL fpustate_savecpu)(void) {
 	pflag_t was;
 	struct task *holder;

@@ -33,8 +33,6 @@ DECL_BEGIN
 /*[[[skip:libc_error_class]]]*/
 /*[[[skip:libc_error_subclass]]]*/
 /*[[[skip:libc_error_register_state]]]*/
-/*[[[skip:libc_error_as_errno]]]*/
-/*[[[skip:libc_error_as_signal]]]*/
 /*[[[skip:libc_error_info]]]*/
 /*[[[skip:libc_error_unwind]]]*/
 /*[[[skip:libc_error_throw_current]]]*/

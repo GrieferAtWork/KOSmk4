@@ -24,11 +24,14 @@
  * $ deemon -F kos/include/kos/bits/exception_data.h
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data32.h
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data64.h
+ * $ deemon -F kos/src/libc/magic/kos.except.c
  * Or the one-liner
- * $ deemon -F kos/include/kos/bits/exception_data.h kos/include/i386-kos/kos/bits/exception_data32.h kos/include/i386-kos/kos/bits/exception_data64.h
+ * $ deemon -F kos/include/kos/bits/exception_data.h kos/include/i386-kos/kos/bits/exception_data32.h kos/include/i386-kos/kos/bits/exception_data64.h kos/src/libc/magic/kos.except.c
  */
 
 #include <__stdinc.h>
+
+#include <hybrid/pp/__va_nargs.h>
 
 #include <kos/except/asm/codes.h> /* Pull in arch-specific code overrides */
 

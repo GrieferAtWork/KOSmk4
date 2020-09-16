@@ -208,6 +208,7 @@ incdir("", "../../include");
 #include <ar.h>
 #include <argz.h>
 #include <arpa/inet.h>
+#include <asm/__stdinc.h>
 #include <asm/asmword.h>
 #include <asm/cacheline.h>
 #include <asm/crt/confname.h>
@@ -227,7 +228,6 @@ incdir("", "../../include");
 #include <asm/crt/util.h>
 #include <asm/dirent.h>
 #include <asm/epoll.h>
-#include <asm/errno.h>
 #include <asm/eventfd.h>
 #include <asm/fcntl.h>
 #include <asm/fp_type.h>
@@ -688,12 +688,12 @@ incdir("", "../../include");
 #include <io.h>
 #include <iso646.h>
 #include <kos/anno.h>
-#include <kos/asm/except.h>
 #include <kos/asm/rtm.h>
 #include <kos/asm/syscall.h>
 #include <kos/asm/uaio.h>
 #include <kos/bits/debugtrap.h>
 #include <kos/bits/except-handler.h>
+#include <kos/bits/except.h>
 #include <kos/bits/exception_data.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
@@ -710,6 +710,8 @@ incdir("", "../../include");
 #include <kos/compat/linux-stat.h>
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
+#include <kos/except/asm/codes.h>
+#include <kos/except/codes.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
@@ -756,6 +758,7 @@ incdir("", "../../include");
 #include <kos/ioctl/tty.h>
 #include <kos/ioctl/video.h>
 #include <kos/kernel/handle.h>
+#include <kos/kernel/memory.h>
 #include <kos/kernel/syscalls.h>
 #include <kos/kernel/types.h>
 #include <kos/keyboard.h>
@@ -1442,6 +1445,7 @@ incdir("", "../../include");
 #endif /* __has_include(<openssl/x509v3err.h>) */
 #include <optimized/error.h>
 #include <optimized/fenv.h>
+#include <optimized/kos.except.h>
 #include <optimized/ssp.string.h>
 #include <optimized/string.h>
 #include <osfcn.h>
@@ -1515,6 +1519,7 @@ incdir("", "../../include");
 #include <ssp/chk.h>
 #include <ssp/ssp.h>
 #include <ssp/string.h>
+#include <stack_unwind.h>
 #include <std.h>
 #include <stdalign.h>
 #include <stdarg.h>
@@ -1571,6 +1576,7 @@ incdir("", "../../include");
 #include <sys/mount.h>
 #include <sys/msg.h>
 #include <sys/ndir.h>
+#include <sys/null.h>
 #include <sys/param.h>
 #include <sys/pci.h>
 #include <sys/perm.h>

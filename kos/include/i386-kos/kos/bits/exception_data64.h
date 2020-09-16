@@ -26,7 +26,7 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <kos/asm/except.h> /* Optional: EXCEPTION_DATA_POINTERS */
+#include <kos/bits/except.h> /* Optional: EXCEPTION_DATA_POINTERS */
 
 #ifdef __x86_64__
 #define __OFFSET_EXCEPTION_DATA_CODE      __OFFSET_EXCEPTION_DATA64_CODE

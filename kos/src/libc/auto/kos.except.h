@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57756e6d */
+/* HASH CRC-32:0x98c55ce6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,14 +29,12 @@
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Transform the given exception into a posix errno value */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_error_as_errno)(struct exception_data const *__restrict data);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_error_as_errno)(struct exception_data const *__restrict self);
 /* Transform the given exception into a posix signal.
  * If doing this is possible, fill in `*result' and return `true'.
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
-INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBDCALL libd_error_as_signal)(struct exception_data const *__restrict data, struct __siginfo_struct *__restrict result);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result);
 
 DECL_END
 

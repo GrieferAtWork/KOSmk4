@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa16b1f98 */
+/* HASH CRC-32:0xda7cf1fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -308,10 +308,6 @@ DFUN(".text.crt.dos.fs.io", libd_setmode, libc_setmode, TIn(__SIZEOF_OFLAG_T__),
 DFUN(".text.crt.dos.fs.io", libd_sopen, libc_sopen, TIn(__SIZEOF_FD_T__), 4, TP, TIn(__SIZEOF_OFLAG_T__), TD, TIn(__SIZEOF_MODE_T__))
 DFUN(".text.crt.dos.fs.utility", libd__filelength, libc__filelength, TI32, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.fs.utility", libd__eof, libc__eof, TD, 1, TIn(__SIZEOF_FD_T__))
-
-/* kos.except */
-DFUN(".text.crt.dos.except.io.utility", libd_error_as_errno, libc_error_as_errno, TIn(__SIZEOF_ERRNO_T__), 1, TP)
-DFUN(".text.crt.dos.except.io.utility", libd_error_as_signal, libc_error_as_signal, TD, 2, TP, TP)
 
 /* kos.except-handler */
 DFUN(".text.crt.dos.unsorted", libd_set_exception_handler, libc_set_exception_handler, TD, 3, TD, TP, TP)

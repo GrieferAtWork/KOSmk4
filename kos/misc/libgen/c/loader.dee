@@ -60,6 +60,9 @@ global final IF_FAST_DEFINED_PATTERN = "$extended_prefix("
                                        "#include <optimized/{}.h>\n"
                                        "#endif /* __LIBC_BIND_OPTIMIZATIONS */"
                                        ")defined(@__fast_{}_defined@)";
+global final IF_ALWAYS_FAST_DEFINED_PATTERN = "$extended_prefix("
+                                              "#include <optimized/{}.h>\n"
+                                              ")defined(@__fast_{}_defined@)";
 
 @@Simple return type annotations which (when used) will be converted into attributes
 global final SIMPLE_RETURN_TYPE_ATTRIBUTE_ANNOTATIONS: {string: string} = {
@@ -2948,7 +2951,9 @@ again_parse_annotations:
 					break;
 
 				case "fastbind":
-				case "preferred_fastbind": {
+				case "fastbind_always":
+				case "preferred_fastbind":
+				case "preferred_fastbind_always": {
 					/* Simplified binding for compile-time inline-optimizations
 					 *
 					 * >> [[fastbind]]
@@ -2982,8 +2987,10 @@ again_parse_annotations:
 						/* Most simplified case: deduce everything automatically */
 						local bindingsGenerator = []{
 							local fastFunctionName = current.name;
-							local baseCond = IF_FAST_DEFINED_PATTERN
-								.format({ headerName, fastFunctionName });
+							local baseCond = IF_FAST_DEFINED_PATTERN;
+							if (tok.endswith("_always"))
+								baseCond = IF_ALWAYS_FAST_DEFINED_PATTERN;
+							baseCond = baseCond.format({ headerName, fastFunctionName });
 							if (currentConditions !is none)
 								baseCond = "({})&&{}".format({ currentConditions, baseCond });
 							File.Writer bodyFp;
@@ -3069,8 +3076,10 @@ again_parse_annotations:
 					} else {
 						externInlineAssemblyNames = { fastFunctionName };
 					}
-					local baseCond = IF_FAST_DEFINED_PATTERN
-						.format({ headerName, fastFunctionName });
+					local baseCond = IF_FAST_DEFINED_PATTERN;
+					if (tok.endswith("_always"))
+						baseCond = IF_ALWAYS_FAST_DEFINED_PATTERN;
+					baseCond = baseCond.format({ headerName, fastFunctionName });
 					if (currentConditions !is none)
 						baseCond = "({})&&{}".format({ currentConditions, baseCond });
 					local inlineImplementationCell: Cell with FunctionImplementation = Cell();

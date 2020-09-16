@@ -17,39 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_HYBRID_EXCEPT_TO_POSIX_H
-#define GUARD_LIBC_HYBRID_EXCEPT_TO_POSIX_H 1
+#ifndef _KOS_BITS_EXCEPT_H
+#define _KOS_BITS_EXCEPT_H 1
 
-/* Keep this one the first */
-#include "../api.h"
-/**/
+/* Helper macros for portably working with error register state,
+ * as well as specifying how an error register state even looks
+ * like. */
 
-#include <kos/except.h>
-#include <stdbool.h>
+/*
+ * #define EXCEPTION_DATA_POINTERS ...
+ *
+ * #define __ERROR_REGISTER_STATE_TYPE ...
+ *
+ * #ifdef __USE_KOS_KERNEL
+ * #define __SIZEOF_ERROR_REGISTER_STATE ...
+ * #endif
+ *
+ * #define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                       ...
+ * #define __ERROR_REGISTER_STATE_TYPE_WRPC(x, value)                ...
+ * #define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                       ...
+ * #define __ERROR_REGISTER_STATE_TYPE_WRSP(x, value)                ...
+ * #define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ...
+ * #define __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ...
+ *
+ */
 
-#ifdef __KERNEL__
-#define NOTHROW_NCX_KERNEL  __NOTHROW_NCX
-#else /* __KERNEL__ */
-#define NOTHROW_NCX_KERNEL  __NOTHROW
-#endif /* !__KERNEL__ */
-
-
-DECL_BEGIN
-
-struct __siginfo_struct;
-
-/* Transform the given exception into a posix errno value. */
-INTDEF WUNUSED errno_t
-NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_errno)(struct exception_data const *__restrict data);
-
-/* Transform the currently thrown exception into a posix signal.
- * If doing this is possible, fill in `*result' and return `true'.
- * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
-INTDEF WUNUSED bool 
-NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *__restrict data,
-                                                  struct __siginfo_struct *__restrict result);
-
-
-DECL_END
-
-#endif /* !GUARD_LIBC_HYBRID_EXCEPT_TO_POSIX_H */
+#endif /* !_KOS_BITS_EXCEPT_H */

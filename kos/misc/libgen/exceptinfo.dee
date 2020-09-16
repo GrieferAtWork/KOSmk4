@@ -164,10 +164,10 @@ yes:
 	}
 
 
-	@@Return the exception info member name of @this @ExceptClass
+	@@Return the short exception info member name of @this @ExceptClass
 	@@e.g. E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.getClassMemberName()
-	@@     returns: "ba_insufficient_heap_memory"
-	public function getClassMemberName(): string {
+	@@     returns: "insufficient_heap_memory"
+	public function getClassMemberShortName(): string {
 		if (baseClass is none)
 			return name.lower();
 		local baseName = baseClass.name;
@@ -177,9 +177,17 @@ yes:
 		       commonTextLength < #thisName &&
 		       baseName[commonTextLength] == thisName[commonTextLength])
 			++commonTextLength;
-		return baseClass.prefix +
-			thisName[commonTextLength:]
+		return thisName[commonTextLength:]
 			.lstrip("_").lower();
+	}
+
+	@@Return the exception info member name of @this @ExceptClass
+	@@e.g. E_BADALLOC_INSUFFICIENT_HEAP_MEMORY.getClassMemberName()
+	@@     returns: "ba_insufficient_heap_memory"
+	public function getClassMemberName(): string {
+		if (baseClass is none)
+			return name.lower();
+		return baseClass.prefix + getClassMemberShortName();
 	}
 
 	@@Return the prefix for fields of this exception
@@ -188,9 +196,9 @@ yes:
 	public function getFieldPrefix(): string {
 		if (baseClass is none)
 			return "{}.{}".format({ name.lower(), prefix });
-		return "{}.{}.{}".format({
+		return "{}{}.{}".format({
 			baseClass.getFieldPrefix(),
-			getClassMemberName(),
+			getClassMemberShortName(),
 			prefix });
 	}
 
@@ -248,6 +256,7 @@ yes:
 			fp << expr[flushStart:i];
 			cbField(expr[nameStart:nameEnd]);
 			flushStart = nameEnd;
+			i = nameEnd;
 		}
 		return fp << expr[flushStart:];
 	}

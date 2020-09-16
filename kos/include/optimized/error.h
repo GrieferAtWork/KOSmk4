@@ -22,9 +22,9 @@
 
 #include <__stdinc.h>
 
-#if !defined(__NO_ATTR_FORCEINLINE) && \
-    !defined(__NO_builtin_constant_p) && \
-     __has_builtin(__builtin_va_arg_pack)
+#if (!defined(__NO_ATTR_FORCEINLINE) &&   \
+     !defined(__NO_builtin_constant_p) && \
+     __has_builtin(__builtin_va_arg_pack))
 #include <libc/core/error.h>
 
 __SYSDECL_BEGIN

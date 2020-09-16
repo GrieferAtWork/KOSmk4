@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x91e789d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_error_active_defined
-#define __local_error_active_defined 1
-#include <__crt.h>
-#include <optimized/kos.except.h>
-#if defined(__fast_error_code_defined) || defined(__CRT_HAVE_error_code)
-__NAMESPACE_LOCAL_BEGIN
-/* Dependency: error_code from kos.except */
-#if !defined(__local___localdep_error_code_defined) && defined(__CRT_HAVE_error_code)
-#define __local___localdep_error_code_defined 1
-__NAMESPACE_LOCAL_END
-#include <kos/bits/exception_data.h>
-__NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__error_code_t,__NOTHROW_NCX,__LIBKCALL,__localdep_error_code,(void),error_code,())
-#endif /* !__local___localdep_error_code_defined && __CRT_HAVE_error_code */
-__NAMESPACE_LOCAL_END
-#include <kos/except/codes.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(error_active) __ATTR_PURE __ATTR_WUNUSED __BOOL
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_active))(void) {
-	return __localdep_error_code() != E_OK;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_error_active_defined
-#define __local___localdep_error_active_defined 1
-#define __localdep_error_active __LIBC_LOCAL_NAME(error_active)
-#endif /* !__local___localdep_error_active_defined */
-#else /* __fast_error_code_defined || __CRT_HAVE_error_code */
-#undef __local_error_active_defined
-#endif /* !__fast_error_code_defined && !__CRT_HAVE_error_code */
-#endif /* !__local_error_active_defined */
+#ifndef _OPTIMIZED_KOS_EXCEPT_H
+#define _OPTIMIZED_KOS_EXCEPT_H 1
+
+#include <__stdinc.h>
+
+#if defined(__KOS__) && defined(__KERNEL__)
+__SYSDECL_BEGIN
+__NAMESPACE_FAST_BEGIN
+
+/* TODO */
+
+__NAMESPACE_FAST_END
+__SYSDECL_END
+#endif /* __KOS__ && __KERNEL__ */
+
+#endif /* !_OPTIMIZED_KOS_EXCEPT_H */

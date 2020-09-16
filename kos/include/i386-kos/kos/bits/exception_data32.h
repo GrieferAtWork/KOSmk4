@@ -26,7 +26,7 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <kos/asm/except.h> /* Optional: EXCEPTION_DATA_POINTERS */
+#include <kos/bits/except.h> /* Optional: EXCEPTION_DATA_POINTERS */
 
 
 #if defined(__i386__) && !defined(__x86_64__)
