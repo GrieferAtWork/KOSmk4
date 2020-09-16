@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4acb26b2 */
+/* HASH CRC-32:0x2d64eb94 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_error_code_defined
 #define __local___localdep_error_code_defined 1
 #ifdef __CRT_HAVE_error_code
-__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__error_code_t,__NOTHROW_NCX,__LIBKCALL,__localdep_error_code,(void),error_code,())
+__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__error_code_t,__NOTHROW,__LIBKCALL,__localdep_error_code,(void),error_code,())
 #elif defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.except/error_code.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/except/codes.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(error_subclass) __ATTR_PURE __ATTR_WUNUSED __error_subclass_t
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_subclass))(void) {
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_subclass))(void) {
 #ifdef __arch_error_subclass
 	return __arch_error_subclass();
 #else /* __arch_error_subclass */

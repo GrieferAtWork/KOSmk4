@@ -100,68 +100,28 @@ print("#endif /" "* __i386__ && !__x86_64__ *" "/");
 print(tempfp.string),;
 ]]]*/
 #if defined(__i386__) && !defined(__x86_64__)
-#define __exception_insufficient_rights_data32 exception_insufficient_rights_data
-#define __exception_ioerror_data32             exception_ioerror_data
-#define __exception_segfault_data32            exception_segfault_data
 #define __exception_badalloc_data32            exception_badalloc_data
-#define __exception___e_retry_rwlock_data32    exception___e_retry_rwlock_data
-#define __exception_exit_thread_data32         exception_exit_thread_data
-#define __exception_exit_process_data32        exception_exit_process_data
-#define __exception_unknown_systemcall_data32  exception_unknown_systemcall_data
-#define __exception_unhandled_interrupt_data32 exception_unhandled_interrupt_data
-#define __exception_no_device_data32           exception_no_device_data
 #define __exception_buffer_too_small_data32    exception_buffer_too_small_data
-#define __exception_invalid_handle_data32      exception_invalid_handle_data
-#define __exception_illegal_operation_data32   exception_illegal_operation_data
-#define __exception_process_exited_data32      exception_process_exited_data
-#define __exception_illegal_instruction_data32 exception_illegal_instruction_data
-#define __exception_index_error_data32         exception_index_error_data
+#define __exception_exit_process_data32        exception_exit_process_data
+#define __exception_exit_thread_data32         exception_exit_thread_data
 #define __exception_fserror_data32             exception_fserror_data
-#define __exception_not_executable_data32      exception_not_executable_data
+#define __exception_illegal_instruction_data32 exception_illegal_instruction_data
+#define __exception_illegal_operation_data32   exception_illegal_operation_data
+#define __exception_index_error_data32         exception_index_error_data
+#define __exception_insufficient_rights_data32 exception_insufficient_rights_data
 #define __exception_invalid_argument_data32    exception_invalid_argument_data
+#define __exception_invalid_handle_data32      exception_invalid_handle_data
+#define __exception_ioerror_data32             exception_ioerror_data
 #define __exception_net_error_data32           exception_net_error_data
+#define __exception_not_executable_data32      exception_not_executable_data
+#define __exception_no_device_data32           exception_no_device_data
+#define __exception_process_exited_data32      exception_process_exited_data
+#define __exception_segfault_data32            exception_segfault_data
+#define __exception_unhandled_interrupt_data32 exception_unhandled_interrupt_data
+#define __exception_unknown_systemcall_data32  exception_unknown_systemcall_data
+#define __exception___e_retry_rwlock_data32    exception___e_retry_rwlock_data
 #define __exception_data_pointers32            exception_data_pointers
 #endif /* __i386__ && !__x86_64__ */
-/* E_INSUFFICIENT_RIGHTS */
-struct __exception_insufficient_rights_data32 {
-	__UINT32_TYPE__ /*intptr_t*/ ir_capability; /* The missing capability (one of `CAP_*' from `<kos/capability.h>') */
-};
-
-/* E_IOERROR */
-struct __exception_ioerror_data32 {
-	__UINT32_TYPE__ /*uintptr_t*/ i_subsystem; /* The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*') */
-	__UINT32_TYPE__ /*uintptr_t*/ i_reason;    /* A more precise description of the error (One of `E_IOERROR_REASON_*') */
-};
-
-/* E_SEGFAULT */
-struct __exception_segfault_data32 {
-	__UINT32_TYPE__ /*void **/    s_addr;    /* The virtual memory address where the fault happened */
-	__UINT32_TYPE__ /*uintptr_t*/ s_context; /* Fault context (Set of `E_SEGFAULT_CONTEXT_*') */
-	union {
-#undef s_notatomic
-#undef s_unaligned
-
-		struct {
-			__UINT32_TYPE__ /*size_t*/    n_size;      /* The number of consecutive bytes accessed */
-			__UINT32_TYPE__ /*uintptr_t*/ n_oldval_lo; /* Low data word of the expected old value */
-			__UINT32_TYPE__ /*uintptr_t*/ n_oldval_hi; /* High data word of the expected old value */
-			__UINT32_TYPE__ /*uintptr_t*/ n_newval_lo; /* Low data word of the intended new value */
-			__UINT32_TYPE__ /*uintptr_t*/ n_newval_hi; /* High data word of the intended new value */
-		} s_notatomic; /* E_SEGFAULT_NOTATOMIC */
-
-		struct {
-			__UINT32_TYPE__ /*size_t*/ u_required_alignemnt; /* The required alignment of `addr' (power-of-2) */
-		} s_unaligned; /* E_SEGFAULT_UNALIGNED */
-
-	}
-#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	_s_classes
-#define s_notatomic _s_classes.s_notatomic
-#define s_unaligned _s_classes.s_unaligned
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	;
-};
-
 /* E_BADALLOC */
 struct __exception_badalloc_data32 {
 	union {
@@ -234,14 +194,10 @@ struct __exception_badalloc_data32 {
 	;
 };
 
-/* __E_RETRY_RWLOCK */
-struct __exception___e_retry_rwlock_data32 {
-	__UINT32_TYPE__ /*struct rwlock **/ _err_lock;
-};
-
-/* E_EXIT_THREAD */
-struct __exception_exit_thread_data32 {
-	__UINT32_TYPE__ /*uintptr_t*/ et_exit_code; /* The thread exit status */
+/* E_BUFFER_TOO_SMALL */
+struct __exception_buffer_too_small_data32 {
+	__UINT32_TYPE__ /*size_t*/ bts_req_size;   /* The required buffer size */
+	__UINT32_TYPE__ /*size_t*/ bts_given_size; /* The given buffer size */
 };
 
 /* E_EXIT_PROCESS */
@@ -249,104 +205,66 @@ struct __exception_exit_process_data32 {
 	__UINT32_TYPE__ /*uintptr_t*/ ep_exit_code; /* The process exit status */
 };
 
-/* E_UNKNOWN_SYSTEMCALL */
-struct __exception_unknown_systemcall_data32 {
-	__UINT32_TYPE__ /*syscall_ulong_t*/ us_flags; /* System call invocation flags (Set of `RPC_SYSCALL_INFO_*') */
-	__UINT32_TYPE__ /*syscall_ulong_t*/ us_sysno;
-	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg0;
-	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg1;
-	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg2;
-	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg3;
-	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg4;
-	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg5;
+/* E_EXIT_THREAD */
+struct __exception_exit_thread_data32 {
+	__UINT32_TYPE__ /*uintptr_t*/ et_exit_code; /* The thread exit status */
 };
 
-/* E_UNHANDLED_INTERRUPT */
-struct __exception_unhandled_interrupt_data32 {
-	__UINT32_TYPE__ /*uintptr_t*/ ui_opcode;
-	__UINT32_TYPE__ /*uintptr_t*/ ui_intno;
-	__UINT32_TYPE__ /*uintptr_t*/ ui_ecode;
-};
-
-/* E_NO_DEVICE */
-struct __exception_no_device_data32 {
-	__UINT32_TYPE__ /*uintptr_t*/ nd_kind;  /* The kind of device (One of `E_NO_DEVICE_KIND_*') */
-	__UINT32_TYPE__ /*dev_t*/     nd_devno; /* The number for the named device */
-};
-
-/* E_BUFFER_TOO_SMALL */
-struct __exception_buffer_too_small_data32 {
-	__UINT32_TYPE__ /*size_t*/ bts_req_size;   /* The required buffer size */
-	__UINT32_TYPE__ /*size_t*/ bts_given_size; /* The given buffer size */
-};
-
-/* E_INVALID_HANDLE */
-struct __exception_invalid_handle_data32 {
-	__UINT32_TYPE__ /*fd_t*/ ih_fd; /* The FD number that was accessed */
+/* E_FSERROR */
+struct __exception_fserror_data32 {
 	union {
-#undef ih_file
-#undef ih_filetype
-#undef ih_operation
-#undef ih_net_operation
+#undef f_deleted
+#undef f_path_not_found
+#undef f_not_a_directory
+#undef f_is_a_directory
+#undef f_not_a_symbolic_link
+#undef f_is_a_symbolic_link
+#undef f_unsupported_operation
 
 		struct {
-			__UINT32_TYPE__ /*syscall_ulong_t*/ f_reason;   /* One of `E_INVALID_HANDLE_FILE_*' */
-			__UINT32_TYPE__ /*unsigned int*/    f_fd_max;   /* 1+ the max FD number that is currently in use */
-			__UINT32_TYPE__ /*unsigned int*/    f_fd_limit; /* The max allowed FD number that may be assigned */
-		} ih_file; /* E_INVALID_HANDLE_FILE */
+			__UINT32_TYPE__ /*unsigned int*/ d_reason; /* The reason/context in which the file was deleted (One of `E_FILESYSTEM_DELETED_*') */
+		} f_deleted; /* E_FSERROR_DELETED */
 
 		struct {
-			__UINT32_TYPE__ /*syscall_ulong_t*/ f_needed_handle_type; /* The type of handle that was needed (One of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
-			__UINT32_TYPE__ /*syscall_ulong_t*/ f_actual_handle_type; /* The type of handle that was found (One of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
-			__UINT32_TYPE__ /*syscall_ulong_t*/ f_needed_handle_kind; /* The type-kind of handle that was needed (One of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
-			__UINT32_TYPE__ /*syscall_ulong_t*/ f_actual_handle_kind; /* The type-kind of handle that was found (One of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
-		} ih_filetype; /* E_INVALID_HANDLE_FILETYPE */
+			__UINT32_TYPE__ /*unsigned int*/ pnf_reason; /* The reason/context why the path wasn't found (One of `E_FILESYSTEM_PATH_NOT_FOUND_*') */
+		} f_path_not_found; /* E_FSERROR_PATH_NOT_FOUND */
 
 		struct {
-			__UINT32_TYPE__ /*unsigned int*/ o_op;          /* One of `E_INVALID_HANDLE_OPERATION_*' */
-			__UINT32_TYPE__ /*iomode_t*/     o_handle_mode; /* The access permissions of the handle */
-		} ih_operation; /* E_INVALID_HANDLE_OPERATION */
+			__UINT32_TYPE__ /*uintptr_t*/ nad_action_context; /* The context in which a filesystem component was required to be
+			                                                   * a directory, but wasn't (One of `E_FILESYSTEM_NOT_A_DIRECTORY_*') */
+		} f_not_a_directory; /* E_FSERROR_NOT_A_DIRECTORY */
 
 		struct {
-			__UINT32_TYPE__ /*syscall_ulong_t*/ no_operation_id;   /* The attempted network operation (One of `E_NET_OPERATION_*') */
-			__UINT32_TYPE__ /*syscall_ulong_t*/ no_address_family; /* The socket's address family (one of `AF_*') */
-			__UINT32_TYPE__ /*syscall_ulong_t*/ no_socket_type;    /* The socket's type (one of `SOCK_*') */
-			__UINT32_TYPE__ /*syscall_ulong_t*/ no_protocol;       /* The socket's protocol (dependent on `address_family' and `socket_type') */
-		} ih_net_operation; /* E_INVALID_HANDLE_NET_OPERATION */
+			__UINT32_TYPE__ /*uintptr_t*/ iad_action_context; /* The context in which a filesystem component was required to not be
+			                                                   * a directory, but was one (One of `E_FILESYSTEM_IS_A_DIRECTORY_*') */
+		} f_is_a_directory; /* E_FSERROR_IS_A_DIRECTORY */
+
+		struct {
+			__UINT32_TYPE__ /*uintptr_t*/ nasl_action_context; /* The context in which a filesystem component was required to be a
+			                                                    * symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*') */
+		} f_not_a_symbolic_link; /* E_FSERROR_NOT_A_SYMBOLIC_LINK */
+
+		struct {
+			__UINT32_TYPE__ /*uintptr_t*/ iasl_action_context; /* The context in which a filesystem component was required to not be
+			                                                    * a symlink, but was one (One of `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_*') */
+		} f_is_a_symbolic_link; /* E_FSERROR_IS_A_SYMBOLIC_LINK */
+
+		struct {
+			__UINT32_TYPE__ /*uintptr_t*/ uo_operation_id; /* The unsupported operation (One of `E_FILESYSTEM_OPERATION_*') */
+		} f_unsupported_operation; /* E_FSERROR_UNSUPPORTED_OPERATION */
 
 	}
 #ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	_ih_classes
-#define ih_file          _ih_classes.ih_file
-#define ih_filetype      _ih_classes.ih_filetype
-#define ih_operation     _ih_classes.ih_operation
-#define ih_net_operation _ih_classes.ih_net_operation
+	_f_classes
+#define f_deleted               _f_classes.f_deleted
+#define f_path_not_found        _f_classes.f_path_not_found
+#define f_not_a_directory       _f_classes.f_not_a_directory
+#define f_is_a_directory        _f_classes.f_is_a_directory
+#define f_not_a_symbolic_link   _f_classes.f_not_a_symbolic_link
+#define f_is_a_symbolic_link    _f_classes.f_is_a_symbolic_link
+#define f_unsupported_operation _f_classes.f_unsupported_operation
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 	;
-};
-
-/* E_ILLEGAL_OPERATION */
-struct __exception_illegal_operation_data32 {
-	union {
-#undef io_process_operation
-
-		struct {
-			__UINT32_TYPE__ /*pid_t*/           o_pid;    /* The Pid of the process in question */
-			__UINT32_TYPE__ /*syscall_ulong_t*/ o_action; /* The illegal action that was attempted (One of `E_ILLEGAL_PROCESS_OPERATION_*') */
-			__UINT32_TYPE__ /*pid_t*/           o_pid2;   /* A second pid, or 0 if unused */
-		} io_process_operation; /* E_ILLEGAL_PROCESS_OPERATION */
-
-	}
-#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	_io_classes
-#define io_process_operation _io_classes.io_process_operation
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	;
-};
-
-/* E_PROCESS_EXITED */
-struct __exception_process_exited_data32 {
-	__UINT32_TYPE__ /*pid_t*/ pe_pid; /* The pid of the exited process */
 };
 
 /* E_ILLEGAL_INSTRUCTION */
@@ -429,6 +347,25 @@ struct __exception_illegal_instruction_data32 {
 };
 #endif /* __i386__ || __x86_64__ */
 
+/* E_ILLEGAL_OPERATION */
+struct __exception_illegal_operation_data32 {
+	union {
+#undef io_process_operation
+
+		struct {
+			__UINT32_TYPE__ /*pid_t*/           o_pid;    /* The Pid of the process in question */
+			__UINT32_TYPE__ /*syscall_ulong_t*/ o_action; /* The illegal action that was attempted (One of `E_ILLEGAL_PROCESS_OPERATION_*') */
+			__UINT32_TYPE__ /*pid_t*/           o_pid2;   /* A second pid, or 0 if unused */
+		} io_process_operation; /* E_ILLEGAL_PROCESS_OPERATION */
+
+	}
+#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
+	_io_classes
+#define io_process_operation _io_classes.io_process_operation
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	;
+};
+
 /* E_INDEX_ERROR */
 struct __exception_index_error_data32 {
 	union {
@@ -448,79 +385,9 @@ struct __exception_index_error_data32 {
 	;
 };
 
-/* E_FSERROR */
-struct __exception_fserror_data32 {
-	union {
-#undef f_deleted
-#undef f_path_not_found
-#undef f_not_a_directory
-#undef f_is_a_directory
-#undef f_not_a_symbolic_link
-#undef f_is_a_symbolic_link
-#undef f_unsupported_operation
-
-		struct {
-			__UINT32_TYPE__ /*unsigned int*/ d_reason; /* The reason/context in which the file was deleted (One of `E_FILESYSTEM_DELETED_*') */
-		} f_deleted; /* E_FSERROR_DELETED */
-
-		struct {
-			__UINT32_TYPE__ /*unsigned int*/ pnf_reason; /* The reason/context why the path wasn't found (One of `E_FILESYSTEM_PATH_NOT_FOUND_*') */
-		} f_path_not_found; /* E_FSERROR_PATH_NOT_FOUND */
-
-		struct {
-			__UINT32_TYPE__ /*uintptr_t*/ nad_action_context; /* The context in which a filesystem component was required to be
-			                                                   * a directory, but wasn't (One of `E_FILESYSTEM_NOT_A_DIRECTORY_*') */
-		} f_not_a_directory; /* E_FSERROR_NOT_A_DIRECTORY */
-
-		struct {
-			__UINT32_TYPE__ /*uintptr_t*/ iad_action_context; /* The context in which a filesystem component was required to not be
-			                                                   * a directory, but was one (One of `E_FILESYSTEM_IS_A_DIRECTORY_*') */
-		} f_is_a_directory; /* E_FSERROR_IS_A_DIRECTORY */
-
-		struct {
-			__UINT32_TYPE__ /*uintptr_t*/ nasl_action_context; /* The context in which a filesystem component was required to be a
-			                                                    * symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*') */
-		} f_not_a_symbolic_link; /* E_FSERROR_NOT_A_SYMBOLIC_LINK */
-
-		struct {
-			__UINT32_TYPE__ /*uintptr_t*/ iasl_action_context; /* The context in which a filesystem component was required to not be
-			                                                    * a symlink, but was one (One of `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_*') */
-		} f_is_a_symbolic_link; /* E_FSERROR_IS_A_SYMBOLIC_LINK */
-
-		struct {
-			__UINT32_TYPE__ /*uintptr_t*/ uo_operation_id; /* The unsupported operation (One of `E_FILESYSTEM_OPERATION_*') */
-		} f_unsupported_operation; /* E_FSERROR_UNSUPPORTED_OPERATION */
-
-	}
-#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	_f_classes
-#define f_deleted               _f_classes.f_deleted
-#define f_path_not_found        _f_classes.f_path_not_found
-#define f_not_a_directory       _f_classes.f_not_a_directory
-#define f_is_a_directory        _f_classes.f_is_a_directory
-#define f_not_a_symbolic_link   _f_classes.f_not_a_symbolic_link
-#define f_is_a_symbolic_link    _f_classes.f_is_a_symbolic_link
-#define f_unsupported_operation _f_classes.f_unsupported_operation
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	;
-};
-
-/* E_NOT_EXECUTABLE */
-struct __exception_not_executable_data32 {
-	union {
-#undef ne_faulty
-
-		struct {
-			__UINT32_TYPE__ /*uintptr_t*/ f_format; /* The binary format (One of `E_NOT_EXECUTABLE_FAULTY_FORMAT_*') */
-			__UINT32_TYPE__ /*uintptr_t*/ f_reason; /* The format-specific reason why the load failed (One of `E_NOT_EXECUTABLE_FAULTY_REASON_*_*') */
-		} ne_faulty; /* E_NOT_EXECUTABLE_FAULTY */
-
-	}
-#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	_ne_classes
-#define ne_faulty _ne_classes.ne_faulty
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	;
+/* E_INSUFFICIENT_RIGHTS */
+struct __exception_insufficient_rights_data32 {
+	__UINT32_TYPE__ /*intptr_t*/ ir_capability; /* The missing capability (one of `CAP_*' from `<kos/capability.h>') */
 };
 
 /* E_INVALID_ARGUMENT */
@@ -603,6 +470,57 @@ struct __exception_invalid_argument_data32 {
 	;
 };
 
+/* E_INVALID_HANDLE */
+struct __exception_invalid_handle_data32 {
+	__UINT32_TYPE__ /*fd_t*/ ih_fd; /* The FD number that was accessed */
+	union {
+#undef ih_file
+#undef ih_filetype
+#undef ih_operation
+#undef ih_net_operation
+
+		struct {
+			__UINT32_TYPE__ /*syscall_ulong_t*/ f_reason;   /* One of `E_INVALID_HANDLE_FILE_*' */
+			__UINT32_TYPE__ /*unsigned int*/    f_fd_max;   /* 1+ the max FD number that is currently in use */
+			__UINT32_TYPE__ /*unsigned int*/    f_fd_limit; /* The max allowed FD number that may be assigned */
+		} ih_file; /* E_INVALID_HANDLE_FILE */
+
+		struct {
+			__UINT32_TYPE__ /*syscall_ulong_t*/ f_needed_handle_type; /* The type of handle that was needed (One of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
+			__UINT32_TYPE__ /*syscall_ulong_t*/ f_actual_handle_type; /* The type of handle that was found (One of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
+			__UINT32_TYPE__ /*syscall_ulong_t*/ f_needed_handle_kind; /* The type-kind of handle that was needed (One of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
+			__UINT32_TYPE__ /*syscall_ulong_t*/ f_actual_handle_kind; /* The type-kind of handle that was found (One of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
+		} ih_filetype; /* E_INVALID_HANDLE_FILETYPE */
+
+		struct {
+			__UINT32_TYPE__ /*unsigned int*/ o_op;          /* One of `E_INVALID_HANDLE_OPERATION_*' */
+			__UINT32_TYPE__ /*iomode_t*/     o_handle_mode; /* The access permissions of the handle */
+		} ih_operation; /* E_INVALID_HANDLE_OPERATION */
+
+		struct {
+			__UINT32_TYPE__ /*syscall_ulong_t*/ no_operation_id;   /* The attempted network operation (One of `E_NET_OPERATION_*') */
+			__UINT32_TYPE__ /*syscall_ulong_t*/ no_address_family; /* The socket's address family (one of `AF_*') */
+			__UINT32_TYPE__ /*syscall_ulong_t*/ no_socket_type;    /* The socket's type (one of `SOCK_*') */
+			__UINT32_TYPE__ /*syscall_ulong_t*/ no_protocol;       /* The socket's protocol (dependent on `address_family' and `socket_type') */
+		} ih_net_operation; /* E_INVALID_HANDLE_NET_OPERATION */
+
+	}
+#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
+	_ih_classes
+#define ih_file          _ih_classes.ih_file
+#define ih_filetype      _ih_classes.ih_filetype
+#define ih_operation     _ih_classes.ih_operation
+#define ih_net_operation _ih_classes.ih_net_operation
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	;
+};
+
+/* E_IOERROR */
+struct __exception_ioerror_data32 {
+	__UINT32_TYPE__ /*uintptr_t*/ i_subsystem; /* The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*') */
+	__UINT32_TYPE__ /*uintptr_t*/ i_reason;    /* A more precise description of the error (One of `E_IOERROR_REASON_*') */
+};
+
 /* E_NET_ERROR */
 struct __exception_net_error_data32 {
 	union {
@@ -627,33 +545,115 @@ struct __exception_net_error_data32 {
 	;
 };
 
+/* E_NOT_EXECUTABLE */
+struct __exception_not_executable_data32 {
+	union {
+#undef ne_faulty
+
+		struct {
+			__UINT32_TYPE__ /*uintptr_t*/ f_format; /* The binary format (One of `E_NOT_EXECUTABLE_FAULTY_FORMAT_*') */
+			__UINT32_TYPE__ /*uintptr_t*/ f_reason; /* The format-specific reason why the load failed (One of `E_NOT_EXECUTABLE_FAULTY_REASON_*_*') */
+		} ne_faulty; /* E_NOT_EXECUTABLE_FAULTY */
+
+	}
+#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
+	_ne_classes
+#define ne_faulty _ne_classes.ne_faulty
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	;
+};
+
+/* E_NO_DEVICE */
+struct __exception_no_device_data32 {
+	__UINT32_TYPE__ /*uintptr_t*/ nd_kind;  /* The kind of device (One of `E_NO_DEVICE_KIND_*') */
+	__UINT32_TYPE__ /*dev_t*/     nd_devno; /* The number for the named device */
+};
+
+/* E_PROCESS_EXITED */
+struct __exception_process_exited_data32 {
+	__UINT32_TYPE__ /*pid_t*/ pe_pid; /* The pid of the exited process */
+};
+
+/* E_SEGFAULT */
+struct __exception_segfault_data32 {
+	__UINT32_TYPE__ /*void **/    s_addr;    /* The virtual memory address where the fault happened */
+	__UINT32_TYPE__ /*uintptr_t*/ s_context; /* Fault context (Set of `E_SEGFAULT_CONTEXT_*') */
+	union {
+#undef s_notatomic
+#undef s_unaligned
+
+		struct {
+			__UINT32_TYPE__ /*size_t*/    n_size;      /* The number of consecutive bytes accessed */
+			__UINT32_TYPE__ /*uintptr_t*/ n_oldval_lo; /* Low data word of the expected old value */
+			__UINT32_TYPE__ /*uintptr_t*/ n_oldval_hi; /* High data word of the expected old value */
+			__UINT32_TYPE__ /*uintptr_t*/ n_newval_lo; /* Low data word of the intended new value */
+			__UINT32_TYPE__ /*uintptr_t*/ n_newval_hi; /* High data word of the intended new value */
+		} s_notatomic; /* E_SEGFAULT_NOTATOMIC */
+
+		struct {
+			__UINT32_TYPE__ /*size_t*/ u_required_alignemnt; /* The required alignment of `addr' (power-of-2) */
+		} s_unaligned; /* E_SEGFAULT_UNALIGNED */
+
+	}
+#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
+	_s_classes
+#define s_notatomic _s_classes.s_notatomic
+#define s_unaligned _s_classes.s_unaligned
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	;
+};
+
+/* E_UNHANDLED_INTERRUPT */
+struct __exception_unhandled_interrupt_data32 {
+	__UINT32_TYPE__ /*uintptr_t*/ ui_opcode;
+	__UINT32_TYPE__ /*uintptr_t*/ ui_intno;
+	__UINT32_TYPE__ /*uintptr_t*/ ui_ecode;
+};
+
+/* E_UNKNOWN_SYSTEMCALL */
+struct __exception_unknown_systemcall_data32 {
+	__UINT32_TYPE__ /*syscall_ulong_t*/ us_flags; /* System call invocation flags (Set of `RPC_SYSCALL_INFO_*') */
+	__UINT32_TYPE__ /*syscall_ulong_t*/ us_sysno;
+	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg0;
+	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg1;
+	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg2;
+	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg3;
+	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg4;
+	__UINT32_TYPE__ /*syscall_ulong_t*/ us_arg5;
+};
+
+/* __E_RETRY_RWLOCK */
+struct __exception___e_retry_rwlock_data32 {
+	__UINT32_TYPE__ /*struct rwlock **/ _err_lock;
+};
+
 union __exception_data_pointers32 {
 	__UINT32_TYPE__                               e_pointers[EXCEPTION_DATA_POINTERS];
-	struct __exception_insufficient_rights_data32 e_insufficient_rights; /* E_INSUFFICIENT_RIGHTS */
-	struct __exception_ioerror_data32             e_ioerror;             /* E_IOERROR */
-	struct __exception_segfault_data32            e_segfault;            /* E_SEGFAULT */
 	struct __exception_badalloc_data32            e_badalloc;            /* E_BADALLOC */
-	struct __exception___e_retry_rwlock_data32    __e_retry_rwlock;      /* __E_RETRY_RWLOCK */
-	struct __exception_exit_thread_data32         e_exit_thread;         /* E_EXIT_THREAD */
-	struct __exception_exit_process_data32        e_exit_process;        /* E_EXIT_PROCESS */
-	struct __exception_unknown_systemcall_data32  e_unknown_systemcall;  /* E_UNKNOWN_SYSTEMCALL */
-	struct __exception_unhandled_interrupt_data32 e_unhandled_interrupt; /* E_UNHANDLED_INTERRUPT */
-	struct __exception_no_device_data32           e_no_device;           /* E_NO_DEVICE */
 	struct __exception_buffer_too_small_data32    e_buffer_too_small;    /* E_BUFFER_TOO_SMALL */
-	struct __exception_invalid_handle_data32      e_invalid_handle;      /* E_INVALID_HANDLE */
-	struct __exception_illegal_operation_data32   e_illegal_operation;   /* E_ILLEGAL_OPERATION */
-	struct __exception_process_exited_data32      e_process_exited;      /* E_PROCESS_EXITED */
+	struct __exception_exit_process_data32        e_exit_process;        /* E_EXIT_PROCESS */
+	struct __exception_exit_thread_data32         e_exit_thread;         /* E_EXIT_THREAD */
+	struct __exception_fserror_data32             e_fserror;             /* E_FSERROR */
 #if !defined(__i386__) && !defined(__x86_64__)
 	struct __exception_illegal_instruction_data32 e_illegal_instruction; /* E_ILLEGAL_INSTRUCTION */
 #endif /* !__i386__ && !__x86_64__ */
 #if defined(__i386__) || defined(__x86_64__)
 	struct __exception_illegal_instruction_data32 e_illegal_instruction; /* E_ILLEGAL_INSTRUCTION */
 #endif /* __i386__ || __x86_64__ */
+	struct __exception_illegal_operation_data32   e_illegal_operation;   /* E_ILLEGAL_OPERATION */
 	struct __exception_index_error_data32         e_index_error;         /* E_INDEX_ERROR */
-	struct __exception_fserror_data32             e_fserror;             /* E_FSERROR */
-	struct __exception_not_executable_data32      e_not_executable;      /* E_NOT_EXECUTABLE */
+	struct __exception_insufficient_rights_data32 e_insufficient_rights; /* E_INSUFFICIENT_RIGHTS */
 	struct __exception_invalid_argument_data32    e_invalid_argument;    /* E_INVALID_ARGUMENT */
+	struct __exception_invalid_handle_data32      e_invalid_handle;      /* E_INVALID_HANDLE */
+	struct __exception_ioerror_data32             e_ioerror;             /* E_IOERROR */
 	struct __exception_net_error_data32           e_net_error;           /* E_NET_ERROR */
+	struct __exception_not_executable_data32      e_not_executable;      /* E_NOT_EXECUTABLE */
+	struct __exception_no_device_data32           e_no_device;           /* E_NO_DEVICE */
+	struct __exception_process_exited_data32      e_process_exited;      /* E_PROCESS_EXITED */
+	struct __exception_segfault_data32            e_segfault;            /* E_SEGFAULT */
+	struct __exception_unhandled_interrupt_data32 e_unhandled_interrupt; /* E_UNHANDLED_INTERRUPT */
+	struct __exception_unknown_systemcall_data32  e_unknown_systemcall;  /* E_UNKNOWN_SYSTEMCALL */
+	struct __exception___e_retry_rwlock_data32    __e_retry_rwlock;      /* __E_RETRY_RWLOCK */
 };
 /*[[[end]]]*/
 

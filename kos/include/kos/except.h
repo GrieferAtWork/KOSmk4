@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87aa17b4 */
+/* HASH CRC-32:0xba7adca6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 #include <hybrid/pp/__va_nargs.h>
 
 #include <bits/types.h>
+#include <kos/anno.h>
 #include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
 #include <kos/except/codes.h>        /* E_OK, ... */
@@ -90,6 +91,19 @@
 
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+#ifndef __ERROR_THROW_CC
+#define __ERROR_THROW_CC __LIBKCALL
+#endif /* !__ERROR_THROW_CC */
+
+#ifndef __ERROR_THROWN_CC
+#define __ERROR_THROWN_CC __LIBKCALL
+#endif /* !__ERROR_THROWN_CC */
+
+#ifndef __ERROR_UNWIND_CC
+#define __ERROR_UNWIND_CC __LIBKCALL
+#endif /* !__ERROR_UNWIND_CC */
+
 
 #ifndef __error_register_state_t_defined
 #define __error_register_state_t_defined 1
@@ -178,52 +192,52 @@ struct exception_info;
 
 
 #if defined(__arch_error_data) && defined(__CRT_HAVE_error_data)
-__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW_NCX,__LIBKCALL,error_data,(void),{ return __arch_error_data(); })
+__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,error_data,(void),{ return __arch_error_data(); })
 #elif defined(__CRT_HAVE_error_data)
-__LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *__NOTHROW_NCX(__LIBKCALL error_data)(void) __CASMNAME_SAME("error_data");
+__LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *__NOTHROW(__LIBKCALL error_data)(void) __CASMNAME_SAME("error_data");
 #elif defined(__arch_error_data)
 #include <libc/local/kos.except/error_data.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_data, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *__NOTHROW_NCX(__LIBKCALL error_data)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_data))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_data, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *__NOTHROW(__LIBKCALL error_data)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_data))(); })
 #endif /* ... */
 #if defined(__arch_error_code) && defined(__CRT_HAVE_error_code)
-__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,error_code_t,__NOTHROW_NCX,__LIBKCALL,error_code,(void),{ return __arch_error_code(); })
+__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,error_code_t,__NOTHROW,__LIBKCALL,error_code,(void),{ return __arch_error_code(); })
 #elif defined(__CRT_HAVE_error_code)
-__LIBC __ATTR_PURE __ATTR_WUNUSED error_code_t __NOTHROW_NCX(__LIBKCALL error_code)(void) __CASMNAME_SAME("error_code");
+__LIBC __ATTR_PURE __ATTR_WUNUSED error_code_t __NOTHROW(__LIBKCALL error_code)(void) __CASMNAME_SAME("error_code");
 #elif defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 #include <libc/local/kos.except/error_code.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_code, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED error_code_t __NOTHROW_NCX(__LIBKCALL error_code)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_code))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_code, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED error_code_t __NOTHROW(__LIBKCALL error_code)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_code))(); })
 #endif /* ... */
 #if defined(__arch_error_active) && defined(__CRT_HAVE_error_active)
-__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,__BOOL,__NOTHROW_NCX,__LIBKCALL,error_active,(void),{ return __arch_error_active(); })
+__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,__BOOL,__NOTHROW,__LIBKCALL,error_active,(void),{ return __arch_error_active(); })
 #elif defined(__CRT_HAVE_error_active)
-__LIBC __ATTR_PURE __ATTR_WUNUSED __BOOL __NOTHROW_NCX(__LIBKCALL error_active)(void) __CASMNAME_SAME("error_active");
+__LIBC __ATTR_PURE __ATTR_WUNUSED __BOOL __NOTHROW(__LIBKCALL error_active)(void) __CASMNAME_SAME("error_active");
 #elif defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 #include <libc/local/kos.except/error_active.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_active, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __BOOL __NOTHROW_NCX(__LIBKCALL error_active)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_active))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_active, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __BOOL __NOTHROW(__LIBKCALL error_active)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_active))(); })
 #endif /* ... */
 #if defined(__arch_error_class) && defined(__CRT_HAVE_error_class)
-__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,error_class_t,__NOTHROW_NCX,__LIBKCALL,error_class,(void),{ return __arch_error_class(); })
+__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,error_class_t,__NOTHROW,__LIBKCALL,error_class,(void),{ return __arch_error_class(); })
 #elif defined(__CRT_HAVE_error_class)
-__LIBC __ATTR_PURE __ATTR_WUNUSED error_class_t __NOTHROW_NCX(__LIBKCALL error_class)(void) __CASMNAME_SAME("error_class");
+__LIBC __ATTR_PURE __ATTR_WUNUSED error_class_t __NOTHROW(__LIBKCALL error_class)(void) __CASMNAME_SAME("error_class");
 #elif defined(__arch_error_class) || defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 #include <libc/local/kos.except/error_class.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_class, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED error_class_t __NOTHROW_NCX(__LIBKCALL error_class)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_class))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_class, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED error_class_t __NOTHROW(__LIBKCALL error_class)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_class))(); })
 #endif /* ... */
 #if defined(__arch_error_subclass) && defined(__CRT_HAVE_error_subclass)
-__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,error_subclass_t,__NOTHROW_NCX,__LIBKCALL,error_subclass,(void),{ return __arch_error_subclass(); })
+__COMPILER_EIDECLARE(__ATTR_PURE __ATTR_WUNUSED,error_subclass_t,__NOTHROW,__LIBKCALL,error_subclass,(void),{ return __arch_error_subclass(); })
 #elif defined(__CRT_HAVE_error_subclass)
-__LIBC __ATTR_PURE __ATTR_WUNUSED error_subclass_t __NOTHROW_NCX(__LIBKCALL error_subclass)(void) __CASMNAME_SAME("error_subclass");
+__LIBC __ATTR_PURE __ATTR_WUNUSED error_subclass_t __NOTHROW(__LIBKCALL error_subclass)(void) __CASMNAME_SAME("error_subclass");
 #elif defined(__arch_error_subclass) || defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 #include <libc/local/kos.except/error_subclass.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_subclass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED error_subclass_t __NOTHROW_NCX(__LIBKCALL error_subclass)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_subclass))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_subclass, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED error_subclass_t __NOTHROW(__LIBKCALL error_subclass)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_subclass))(); })
 #endif /* ... */
 #if defined(__arch_error_register_state) && defined(__CRT_HAVE_error_register_state)
-__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,error_register_state_t *,__NOTHROW_NCX,__LIBKCALL,error_register_state,(void),{ return __arch_error_register_state(); })
+__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,error_register_state_t *,__NOTHROW,__LIBKCALL,error_register_state,(void),{ return __arch_error_register_state(); })
 #elif defined(__CRT_HAVE_error_register_state)
-__LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED error_register_state_t *__NOTHROW_NCX(__LIBKCALL error_register_state)(void) __CASMNAME_SAME("error_register_state");
+__LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED error_register_state_t *__NOTHROW(__LIBKCALL error_register_state)(void) __CASMNAME_SAME("error_register_state");
 #elif defined(__arch_error_register_state)
 #include <libc/local/kos.except/error_register_state.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_register_state, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED error_register_state_t *__NOTHROW_NCX(__LIBKCALL error_register_state)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_register_state))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_register_state, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED error_register_state_t *__NOTHROW(__LIBKCALL error_register_state)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_register_state))(); })
 #endif /* ... */
 #ifdef __CRT_HAVE_error_as_errno
 /* Transform the given exception into a posix errno value */
@@ -246,18 +260,27 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL err
  * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_as_signal, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(__LIBKCALL error_as_signal)(struct exception_data const *__restrict __self, struct __siginfo_struct *__restrict __result) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_as_signal))(__self, __result); })
 #endif /* !__CRT_HAVE_error_as_signal */
+#ifdef __CRT_HAVE_error_name
+/* Return the name of the given error, or `NULL` if unknown.
+ * This name is the same as the `E_*` identifier.
+ * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
+__LIBC __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL error_name)(error_code_t __code) __CASMNAME_SAME("error_name");
+#else /* __CRT_HAVE_error_name */
+#include <libc/local/kos.except/error_name.h>
+/* Return the name of the given error, or `NULL` if unknown.
+ * This name is the same as the `E_*` identifier.
+ * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL error_name)(error_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_name))(__code); })
+#endif /* !__CRT_HAVE_error_name */
 #ifdef __USE_KOS_KERNEL
 #if defined(__arch_error_info) && defined(__CRT_HAVE_error_info)
-__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_info *,__NOTHROW_NCX,__LIBKCALL,error_info,(void),{ return __arch_error_info(); })
+__COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_info *,__NOTHROW,__LIBKCALL,error_info,(void),{ return __arch_error_info(); })
 #elif defined(__CRT_HAVE_error_info)
-__LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *__NOTHROW_NCX(__LIBKCALL error_info)(void) __CASMNAME_SAME("error_info");
+__LIBC __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *__NOTHROW(__LIBKCALL error_info)(void) __CASMNAME_SAME("error_info");
 #elif defined(__arch_error_info)
 #include <libc/local/kos.except/error_info.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(error_info, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *__NOTHROW_NCX(__LIBKCALL error_info)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_info))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_info, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *__NOTHROW(__LIBKCALL error_info)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_info))(); })
 #endif /* ... */
-#ifndef __ERROR_UNWIND_CC
-#define __ERROR_UNWIND_CC __LIBKCALL
-#endif /* !__ERROR_UNWIND_CC */
 #ifdef __CRT_HAVE_error_unwind
 /* Unwind the given register state to propagate the currently set error.
  * Following this, the returned register state should then be loaded. */
@@ -266,13 +289,13 @@ __LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) error_register_state
 #endif /* __USE_KOS_KERNEL */
 #ifdef __CRT_HAVE_error_throw_current
 /* Throw the currently set (in `error_data()') exception. */
-__LIBC __ATTR_COLD __ATTR_NORETURN void __NOTHROW_NCX(__LIBKCALL error_throw_current)(void) __CASMNAME_SAME("error_throw_current");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_throw_current)(void) __THROWS(...) __CASMNAME_SAME("error_throw_current");
 #endif /* __CRT_HAVE_error_throw_current */
 #ifndef __error_rethrow_defined
 #define __error_rethrow_defined 1
 #ifdef __CRT_HAVE_error_rethrow
 /* Rethrow the current exception (same as a c++ `throw;' expression) */
-__LIBC __ATTR_COLD __ATTR_NORETURN void __NOTHROW_NCX(__LIBKCALL error_rethrow)(void) __CASMNAME_SAME("error_rethrow");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_rethrow)(void) __THROWS(...) __CASMNAME_SAME("error_rethrow");
 #else /* __CRT_HAVE_error_rethrow */
 #undef __error_rethrow_defined
 #endif /* !__CRT_HAVE_error_rethrow */
@@ -308,18 +331,11 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 #else /* __INTELLISENSE__ */
 
 #ifndef THROW
-#ifndef __ERROR_THROW_CC
-#define __ERROR_THROW_CC __LIBKCALL
-#endif /* !__ERROR_THROW_CC */
-
-#ifndef __ERROR_THROWN_CC
-#define __ERROR_THROWN_CC __LIBKCALL
-#endif /* !__ERROR_THROWN_CC */
 #ifndef __error_throw_defined
 #define __error_throw_defined 1
 #ifdef __CRT_HAVE_error_throw
 /* Throw an exception and fill exception pointers with all zeroes */
-__LIBC __ATTR_COLD __ATTR_NORETURN void __NOTHROW_NCX(__ERROR_THROW_CC error_throw)(error_code_t __code) __CASMNAME_SAME("error_throw");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROW_CC error_throw)(error_code_t __code) __THROWS(...) __CASMNAME_SAME("error_throw");
 #else /* __CRT_HAVE_error_throw */
 #undef __error_throw_defined
 #endif /* !__CRT_HAVE_error_throw */
@@ -328,7 +344,7 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void __NOTHROW_NCX(__ERROR_THROW_CC error_thr
 #define __error_thrown_defined 1
 #ifdef __CRT_HAVE_error_thrown
 /* Throw an exception and load `argc' pointers from varargs */
-__LIBC __ATTR_COLD __ATTR_NORETURN void __NOTHROW_NCX(__ERROR_THROWN_CC error_thrown)(error_code_t __code, unsigned int ___argc, ...) __CASMNAME_SAME("error_thrown");
+__LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME_SAME("error_thrown");
 #else /* __CRT_HAVE_error_thrown */
 #undef __error_thrown_defined
 #endif /* !__CRT_HAVE_error_thrown */

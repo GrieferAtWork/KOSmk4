@@ -27,7 +27,6 @@
 #include <sched/pertask.h>
 
 #include <bits/format-printer.h>
-#include <bits/types.h>
 #include <kos/except.h>
 
 DECL_BEGIN
@@ -55,21 +54,6 @@ DATDEF ATTR_PERTASK void *this_exception_faultaddr;                    /* ALIAS:
 DATDEF ATTR_PERTASK void *this_exception_trace[EXCEPT_BACKTRACE_SIZE]; /* ALIAS:this_exception_trace */
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 
-#ifndef __INTELLISENSE__
-#undef error_info
-#undef error_data
-#undef error_active
-#undef error_code
-#undef error_class
-#undef error_subclass
-#define error_info()     (&THIS_EXCEPTION_INFO)
-#define error_data()     (&THIS_EXCEPTION_DATA)
-#define error_active()   (PERTASK_GET(this_exception_code) != 0)
-#define error_code()     PERTASK_GET(this_exception_code)
-#define error_class()    PERTASK_GET(this_exception_class)
-#define error_subclass() PERTASK_GET(this_exception_subclass)
-#endif /* !__INTELLISENSE__ */
-
 /* Dump the current exception to printk(), using the target prefixed by `reason' */
 FUNDEF void NOTHROW(VCALL error_printf)(char const *__restrict reason, ...);
 FUNDEF void NOTHROW(KCALL error_vprintf)(char const *__restrict reason, __builtin_va_list args);
@@ -88,25 +72,6 @@ typedef __errno_t errno_t;
 	(unlikely((input) & ~(allowed))                                              \
 	 ? THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG, context, input, ~(allowed) /*,0*/) \
 	 : (void)0)
-
-/* Enable nested exception handling, such that the
- * original exception is always restored, even when
- * exception handling code caused another exception,
- * when that exception has already been handled:
- * >> TRY {
- * >>     ...
- * >> } EXCEPT {
- * >>     EXCEPT_ALLOW_NESTING;
- * >>     TRY {
- * >>         ...         // Some other code that can cause further excepetions
- * >>     } EXCEPT {
- * >>     }
- * >>     RETHROW();
- * >>     // The original exception (from the first TRY-block) will be restored here
- * >> }
- */
-#define EXCEPT_ALLOW_NESTING  \
-	(void)0 /* TODO: Copy the current exception context into a local variable w/ RAII used to restore it once the scope is left. */
 
 #endif /* __CC__ */
 

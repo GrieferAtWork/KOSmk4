@@ -816,6 +816,7 @@ have_non_boolean_in_brt_all:
 							nonConstants.append(e);
 						}
 					}
+					constantsProd = int(constantsProd);
 					if (!nonConstants)
 						return PPBranch(BRT_CONST, constantsProd);
 					if (constantsProd == 0)
@@ -931,6 +932,7 @@ have_non_boolean_in_brt_any:
 							nonConstants.append(e);
 						}
 					}
+					constantsSum = int(constantsSum);
 					if (!nonConstants)
 						return PPBranch(BRT_CONST, constantsSum);
 					if (constantsSum == 0) {
@@ -1535,8 +1537,11 @@ function ppParse(self: string | UserString | CParser | File): PPBranch {
 
 @@A simple wrapper function that may be used
 @@for optimization of preprocessor expressions
-function optimize(expr: string): string {
-	return ppParse(expr).optimize().tostr();
+function optimize(expr: string, assumedExpr: string = none): string {
+	local assume: PPAssume = none;
+	if (assumedExpr !is none)
+		assume = createPPAssume().withAssumption(ppParse(assumedExpr).optimize());
+	return ppParse(expr).optimize(assume).tostr();
 }
 
 
@@ -1544,6 +1549,22 @@ function optimize(expr: string): string {
 
 #ifdef __MAIN__
 
+assert optimize("0 && 0") == "0";
+assert optimize("1 && 0") == "0";
+assert optimize("0 && 1") == "0";
+assert optimize("1 && 1") == "1";
+assert optimize("0 || 0") == "0";
+assert optimize("1 || 0") == "1";
+assert optimize("0 || 1") == "1";
+assert optimize("1 || 1") == "1";
+assert optimize("(0) && (0)") == "0";
+assert optimize("(1) && (0)") == "0";
+assert optimize("(0) && (1)") == "0";
+assert optimize("(1) && (1)") == "1";
+assert optimize("(0) || (0)") == "0";
+assert optimize("(1) || (0)") == "1";
+assert optimize("(0) || (1)") == "1";
+assert optimize("(1) || (1)") == "1";
 assert optimize("2 == 2") == "1";
 assert optimize("2 == 1") == "0";
 assert optimize("!a && (a || a)") == "0";

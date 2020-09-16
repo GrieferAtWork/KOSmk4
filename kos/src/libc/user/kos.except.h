@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0e1a1d0 */
+/* HASH CRC-32:0x441e6d7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,24 +30,24 @@
 
 DECL_BEGIN
 
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_data *NOTHROW_NCX(LIBKCALL libc_error_data)(void);
-INTDEF ATTR_PURE WUNUSED error_code_t NOTHROW_NCX(LIBKCALL libc_error_code)(void);
-INTDEF ATTR_PURE WUNUSED bool NOTHROW_NCX(LIBKCALL libc_error_active)(void);
-INTDEF ATTR_PURE WUNUSED error_class_t NOTHROW_NCX(LIBKCALL libc_error_class)(void);
-INTDEF ATTR_PURE WUNUSED error_subclass_t NOTHROW_NCX(LIBKCALL libc_error_subclass)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED error_register_state_t *NOTHROW_NCX(LIBKCALL libc_error_register_state)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW_NCX(LIBKCALL libc_error_info)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_data *NOTHROW(LIBKCALL libc_error_data)(void);
+INTDEF ATTR_PURE WUNUSED error_code_t NOTHROW(LIBKCALL libc_error_code)(void);
+INTDEF ATTR_PURE WUNUSED bool NOTHROW(LIBKCALL libc_error_active)(void);
+INTDEF ATTR_PURE WUNUSED error_class_t NOTHROW(LIBKCALL libc_error_class)(void);
+INTDEF ATTR_PURE WUNUSED error_subclass_t NOTHROW(LIBKCALL libc_error_subclass)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED error_register_state_t *NOTHROW(LIBKCALL libc_error_register_state)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED struct exception_info *NOTHROW(LIBKCALL libc_error_info)(void);
 /* Unwind the given register state to propagate the currently set error.
  * Following this, the returned register state should then be loaded. */
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) error_register_state_t *NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restrict state);
 /* Throw the currently set (in `error_data()') exception. */
-INTDEF ATTR_COLD ATTR_NORETURN void NOTHROW_NCX(LIBKCALL libc_error_throw_current)(void);
+INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_error_throw_current)(void) THROWS(...);
 /* Rethrow the current exception (same as a c++ `throw;' expression) */
-INTDEF ATTR_COLD ATTR_NORETURN void NOTHROW_NCX(LIBKCALL libc_error_rethrow)(void);
+INTDEF ATTR_COLD ATTR_NORETURN void (LIBKCALL libc_error_rethrow)(void) THROWS(...);
 /* Throw an exception and fill exception pointers with all zeroes */
-INTDEF ATTR_COLD ATTR_NORETURN void NOTHROW_NCX(__ERROR_THROW_CC libc_error_throw)(error_code_t code);
+INTDEF ATTR_COLD ATTR_NORETURN void (__ERROR_THROW_CC libc_error_throw)(error_code_t code) THROWS(...);
 /* Throw an exception and load `argc' pointers from varargs */
-INTDEF ATTR_COLD ATTR_NORETURN void NOTHROW_NCX(__ERROR_THROWN_CC libc_error_thrown)(error_code_t code, unsigned int _argc, ...);
+INTDEF ATTR_COLD ATTR_NORETURN void (__ERROR_THROWN_CC libc_error_thrown)(error_code_t code, unsigned int _argc, ...) THROWS(...);
 
 DECL_END
 

@@ -42,8 +42,8 @@ struct kcpustate;
  * @return: * :  One of `DWARF_PERSO_*' */
 typedef NONNULL((1, 2)) unsigned int
 /*NOTHROW*/ (KCALL *dwarf_perso_t)(struct unwind_fde_struct *__restrict fde,
-                                  struct kcpustate *__restrict state,
-                                  void *lsda);
+                                   struct kcpustate *__restrict state,
+                                   void *lsda);
 #endif /* __CC__ */
 #define DWARF_PERSO_EXECUTE_HANDLER     0x0000 /* An exception handler was found, and `state' was updated */
 #define DWARF_PERSO_EXECUTE_HANDLER_NOW 0x0001 /* Same as `DWARF_PERSO_EXECUTE_HANDLER', but don't adjust for `DW_CFA_GNU_args_size' */

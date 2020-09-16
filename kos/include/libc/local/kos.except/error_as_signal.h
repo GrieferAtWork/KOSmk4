@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e2f126f */
+/* HASH CRC-32:0x44a67695 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,6 +67,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_error_as_errno */
 #endif /* !__local___localdep_error_as_errno_defined */
 __NAMESPACE_LOCAL_END
+#include <hybrid/host.h>
 #include <asm/siginfo.h>
 #include <asm/os/signal.h>
 #include <bits/siginfo-struct.h>

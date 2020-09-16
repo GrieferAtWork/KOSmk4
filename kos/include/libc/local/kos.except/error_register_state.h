@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8fac589 */
+/* HASH CRC-32:0xf25f25f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #endif /* !__ERROR_REGISTER_STATE_TYPE */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(error_register_state) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED __ERROR_REGISTER_STATE_TYPE *
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_register_state))(void) {
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_register_state))(void) {
 	return __arch_error_register_state();
 }
 __NAMESPACE_LOCAL_END

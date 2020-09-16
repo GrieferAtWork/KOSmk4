@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfff153d8 */
+/* HASH CRC-32:0x38347466 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 #include <bits/types.h>
 struct exception_data;
 #include <asm/os/errno.h>
+#include <hybrid/host.h>
 #include <kos/bits/exception_data.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
@@ -83,8 +84,11 @@ function formatErrnoExpr(cls: ExceptClass): (string, {string...}) {
 	return (resultExpr.string, reqMacros);
 }
 
-for (local name, ppCondToCls: parseExceptionClasses()) {
-	for (local ppCond, cls: ppCondToCls) {
+local classes = parseExceptionClasses();
+for (local name: classes.keys.sorted()) {
+	local ppCondToCls = classes[name];
+	for (local ppCond: ppCondToCls.keys.sorted()) {
+		local cls = ppCondToCls[ppCond];
 		if (cls.baseClass !is none)
 			continue;
 		local hasErrnoExpr = isCustomErrnoExpr(cls.errnoExpr);
@@ -152,36 +156,6 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 	}
 }
 ]]]*/
-#ifdef __EACCES
-	case E_INSUFFICIENT_RIGHTS:
-		__result = __EACCES;
-		break;
-#endif /* __EACCES */
-
-#ifdef __EIO
-	case E_IOERROR:
-		__result = __EIO;
-		break;
-#endif /* __EIO */
-
-#ifdef __EOK
-	case E_OK:
-		__result = __EOK;
-		break;
-#endif /* __EOK */
-
-#ifdef __EINTR
-	case E_INTERRUPT:
-		__result = __EINTR;
-		break;
-#endif /* __EINTR */
-
-#ifdef __EFAULT
-	case E_SEGFAULT:
-		__result = __EFAULT;
-		break;
-#endif /* __EFAULT */
-
 	case E_BADALLOC:
 #ifdef __ENOMEM
 		__result = __ENOMEM;
@@ -206,29 +180,11 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		}
 		break;
 
-#ifdef __ENOSYS
-	case E_UNKNOWN_SYSTEMCALL:
-		__result = __ENOSYS;
+#ifdef __EINVAL
+	case E_BREAKPOINT:
+		__result = __EINVAL;
 		break;
-#endif /* __ENOSYS */
-
-#ifdef __EFAULT
-	case E_UNHANDLED_INTERRUPT:
-		__result = __EFAULT;
-		break;
-#endif /* __EFAULT */
-
-#ifdef __ENODEV
-	case E_NO_DEVICE:
-		__result = __ENODEV;
-		break;
-#endif /* __ENODEV */
-
-#ifdef __EAGAIN
-	case E_WOULDBLOCK:
-		__result = __EAGAIN;
-		break;
-#endif /* __EAGAIN */
+#endif /* __EINVAL */
 
 #ifdef __ERANGE
 	case E_BUFFER_TOO_SMALL:
@@ -241,84 +197,6 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		__result = __EINVAL;
 		break;
 #endif /* __EINVAL */
-
-	case E_INVALID_HANDLE:
-#ifdef __EBADF
-		__result = __EBADF;
-#endif /* __EBADF */
-		switch(__self->e_subclass) {
-#if defined(__ENOTSOCK) && defined(__EBADFD)
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE)):
-			__result = __self->e_args.e_invalid_handle.ih_filetype.f_needed_handle_type == HANDLE_TYPE_SOCKET ? __ENOTSOCK : __EBADFD;
-			break;
-#endif /* __ENOTSOCK && __EBADFD */
-#ifdef __EINVAL
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_OPERATION)):
-			__result = __EINVAL;
-			break;
-#endif /* __EINVAL */
-#ifdef __EOPNOTSUPP
-		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_NET_OPERATION)):
-			__result = __EOPNOTSUPP;
-			break;
-#endif /* __EOPNOTSUPP */
-		default: break;
-		}
-		break;
-
-#ifdef __EOVERFLOW
-	case E_OVERFLOW:
-		__result = __EOVERFLOW;
-		break;
-#endif /* __EOVERFLOW */
-
-#ifdef __EILSEQ
-	case E_UNICODE_ERROR:
-		__result = __EILSEQ;
-		break;
-#endif /* __EILSEQ */
-
-#ifdef __EINVAL
-	case E_BREAKPOINT:
-		__result = __EINVAL;
-		break;
-#endif /* __EINVAL */
-
-#ifdef __EFAULT
-	case E_STACK_OVERFLOW:
-		__result = __EFAULT;
-		break;
-#endif /* __EFAULT */
-
-#ifdef __ESRCH
-	case E_PROCESS_EXITED:
-		__result = __ESRCH;
-		break;
-#endif /* __ESRCH */
-
-#if defined(__EPERM) && !defined(__i386__) && !defined(__x86_64__)
-	case E_ILLEGAL_INSTRUCTION:
-		__result = __EPERM;
-		break;
-#endif /* __EPERM && !__i386__ && !__x86_64__ */
-
-#if defined(__EPERM) && (defined(__i386__) || defined(__x86_64__))
-	case E_ILLEGAL_INSTRUCTION:
-		__result = __EPERM;
-		break;
-#endif /* __EPERM && (__i386__ || __x86_64__) */
-
-#ifdef __ERANGE
-	case E_INDEX_ERROR:
-		__result = __ERANGE;
-		break;
-#endif /* __ERANGE */
-
-#ifdef __EPERM
-	case E_NOT_IMPLEMENTED:
-		__result = __EPERM;
-		break;
-#endif /* __EPERM */
 
 	case E_FSERROR:
 		switch(__self->e_subclass) {
@@ -452,17 +330,35 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		}
 		break;
 
-#ifdef __EPERM
-	case E_INVALID_CONTEXT:
+#if defined(__EPERM) && !defined(__i386__) && !defined(__x86_64__)
+	case E_ILLEGAL_INSTRUCTION:
 		__result = __EPERM;
 		break;
-#endif /* __EPERM */
+#endif /* __EPERM && !__i386__ && !__x86_64__ */
 
-#ifdef __ENOEXEC
-	case E_NOT_EXECUTABLE:
-		__result = __ENOEXEC;
+#if defined(__EPERM) && (defined(__i386__) || defined(__x86_64__))
+	case E_ILLEGAL_INSTRUCTION:
+		__result = __EPERM;
 		break;
-#endif /* __ENOEXEC */
+#endif /* __EPERM && (__i386__ || __x86_64__) */
+
+#ifdef __ERANGE
+	case E_INDEX_ERROR:
+		__result = __ERANGE;
+		break;
+#endif /* __ERANGE */
+
+#ifdef __EACCES
+	case E_INSUFFICIENT_RIGHTS:
+		__result = __EACCES;
+		break;
+#endif /* __EACCES */
+
+#ifdef __EINTR
+	case E_INTERRUPT:
+		__result = __EINTR;
+		break;
+#endif /* __EINTR */
 
 	case E_INVALID_ARGUMENT:
 #ifdef __EINVAL
@@ -502,6 +398,42 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		default: break;
 		}
 		break;
+
+#ifdef __EPERM
+	case E_INVALID_CONTEXT:
+		__result = __EPERM;
+		break;
+#endif /* __EPERM */
+
+	case E_INVALID_HANDLE:
+#ifdef __EBADF
+		__result = __EBADF;
+#endif /* __EBADF */
+		switch(__self->e_subclass) {
+#if defined(__ENOTSOCK) && defined(__EBADFD)
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_FILETYPE)):
+			__result = __self->e_args.e_invalid_handle.ih_filetype.f_needed_handle_type == HANDLE_TYPE_SOCKET ? __ENOTSOCK : __EBADFD;
+			break;
+#endif /* __ENOTSOCK && __EBADFD */
+#ifdef __EINVAL
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_OPERATION)):
+			__result = __EINVAL;
+			break;
+#endif /* __EINVAL */
+#ifdef __EOPNOTSUPP
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_INVALID_HANDLE_NET_OPERATION)):
+			__result = __EOPNOTSUPP;
+			break;
+#endif /* __EOPNOTSUPP */
+		default: break;
+		}
+		break;
+
+#ifdef __EIO
+	case E_IOERROR:
+		__result = __EIO;
+		break;
+#endif /* __EIO */
 
 	case E_NET_ERROR:
 		switch(__self->e_subclass) {
@@ -558,6 +490,78 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		default: break;
 		}
 		break;
+
+#ifdef __ENOEXEC
+	case E_NOT_EXECUTABLE:
+		__result = __ENOEXEC;
+		break;
+#endif /* __ENOEXEC */
+
+#ifdef __EPERM
+	case E_NOT_IMPLEMENTED:
+		__result = __EPERM;
+		break;
+#endif /* __EPERM */
+
+#ifdef __ENODEV
+	case E_NO_DEVICE:
+		__result = __ENODEV;
+		break;
+#endif /* __ENODEV */
+
+#ifdef __EOK
+	case E_OK:
+		__result = __EOK;
+		break;
+#endif /* __EOK */
+
+#ifdef __EOVERFLOW
+	case E_OVERFLOW:
+		__result = __EOVERFLOW;
+		break;
+#endif /* __EOVERFLOW */
+
+#ifdef __ESRCH
+	case E_PROCESS_EXITED:
+		__result = __ESRCH;
+		break;
+#endif /* __ESRCH */
+
+#ifdef __EFAULT
+	case E_SEGFAULT:
+		__result = __EFAULT;
+		break;
+#endif /* __EFAULT */
+
+#ifdef __EFAULT
+	case E_STACK_OVERFLOW:
+		__result = __EFAULT;
+		break;
+#endif /* __EFAULT */
+
+#ifdef __EFAULT
+	case E_UNHANDLED_INTERRUPT:
+		__result = __EFAULT;
+		break;
+#endif /* __EFAULT */
+
+#ifdef __EILSEQ
+	case E_UNICODE_ERROR:
+		__result = __EILSEQ;
+		break;
+#endif /* __EILSEQ */
+
+#ifdef __ENOSYS
+	case E_UNKNOWN_SYSTEMCALL:
+		__result = __ENOSYS;
+		break;
+#endif /* __ENOSYS */
+
+#ifdef __EAGAIN
+	case E_WOULDBLOCK:
+		__result = __EAGAIN;
+		break;
+#endif /* __EAGAIN */
 /*[[[end]]]*/
 	default:
 		break;

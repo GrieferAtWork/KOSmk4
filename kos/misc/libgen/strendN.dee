@@ -155,7 +155,36 @@ function getMacroIntValue(macroValue: string): int | none {
 }
 
 
-#define REPR_SPLIT_THRESHOLD 24
+global final REPR_SPLIT_THRESHOLD = 24;
+
+
+@@Parition a given set of @ids into continous segments that
+@@cover all given @ids, and possibly a little bit more.
+function parititionIds(ids: {int...}): {(int, int)...} {
+	ids = ids.sorted();
+	local result = [];
+	local count = #ids;
+	local i = 0;
+	while (i < count) {
+		local startIdIndex = i;
+		local minElem = ids[i];
+		local maxElem = minElem;
+		local prevElem = minElem;
+		++i;
+		while (i < count) {
+			local nextElem = ids[i];
+			if (prevElem + REPR_SPLIT_THRESHOLD < nextElem)
+				break; /* Gap is too large. */
+			/* Span the gap! */
+			prevElem = nextElem;
+			maxElem  = nextElem;
+			++i;
+		}
+		result.append((minElem, maxElem));
+	}
+	return result;
+}
+
 
 @@Split a given set of @values to prevent large holes within the data-set
 function splitValues(values: {string...}): {(int, {string...})...} {

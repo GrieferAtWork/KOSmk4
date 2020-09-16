@@ -21,6 +21,7 @@ import fs;
 import util;
 import functools;
 import * from deemon;
+import parititionIds from .strendN;
 import .c.ppexpr as ppexpr;
 
 function printPreprocessorExpressionIf(fp: File, cond: string): File {
@@ -72,9 +73,15 @@ class ExceptClass: WeakRefAble {
 	@@Exception message
 	public member message: string = "";
 
-	@@Exception code (either `ERROR_CLASS()`
+	@@Default exception code (either `ERROR_CLASS()`
 	@@when @baseClass is @none, or `ERROR_SUBCLASS()`)
-	public member code: string;
+	public member code: int;
+
+	@@Set to @true if the code of this @ExceptClass can be overwritten
+	public member allowExceptionCodeOverrides: bool = false;
+
+	@@Additional overrides for @code, as a mapping `ppCond: overrideCode'
+	public member codeOverrides: {string: int} = none;
 
 	@@Exception errno expression
 	public member errnoExpr: string = none;
@@ -84,6 +91,22 @@ class ExceptClass: WeakRefAble {
 
 	@@A preprocessor expression that must hold true for this class to be defined
 	public member ppCond: string = "1";
+
+	@@Enumerate all known exception codes as (ppCond, code) pairs
+	public property allCodes: {(string, int)...} = {
+		get(): {(string, int)...} {
+			yield ("1", code);
+			yield codeOverrides...;
+		}
+	}
+
+	public function getCodeForPPCond(cond: string): int {
+		for (local ppCond, codeOverride: codeOverrides) {
+			if (cond == ppCond)
+				return codeOverride;
+		}
+		return code;
+	}
 
 	@@Sub-classes of this @ExceptClass
 	public member _subClasses: {WeakRef with ExceptClass...} = [];
@@ -622,6 +645,14 @@ do_pp_if:
 				local e_class: ExceptClass = ExceptClass(
 					name:   macroName,
 					ppCond: ppCond);
+				/* Check if the code for this exception can be overwritten.
+				 * This is the case if we're surrounded by `#ifndef E_MYNAME' */
+				for (local e: ppExpressionStack) {
+					if (e == ifNdefMacroName) {
+						e_class.allowExceptionCodeOverrides = true;
+						break;
+					}
+				}
 				map[ppCond] = e_class;
 				i = skipWhitespaceAndCommentsNoLf(text, i, end);
 				if (i >= end || text[i] != "(")
@@ -646,6 +677,12 @@ do_pp_if:
 					e_class.baseClass._subClasses.append(WeakRef(e_class));
 				} else {
 					e_class.code = baseAndCode.strip();
+				}
+				try {
+					e_class.code = int(e_class.code);
+				} catch (Error as e) {
+					errAt(i, "Bad exception code {!r}: {}"
+						.format({ e_class.code, e.message }));
 				}
 				i = rParenIndex + 1;
 				while (i < end && text.isspace(i) && !text.islf(i))
@@ -840,8 +877,10 @@ function printExceptionDataStructs(
 	local isFirst = true;
 	@@List of (ppCond, structName, e_name) for all defined exception data struct names
 	local exceptionDataStructNames: {(string, string, string)...} = [];
-	for (local name, ppCondToCls: classes) {
-		for (local ppCond, cls: ppCondToCls) {
+	for (local name: classes.keys.sorted()) {
+		local ppCondToCls = classes[name];
+		for (local ppCond: ppCondToCls.keys.sorted()) {
+			local cls = ppCondToCls[ppCond];
 			if (!cls.hasExceptionDataStruct)
 				continue;
 			if (!isFirst)
@@ -882,6 +921,508 @@ function printExceptionDataStructs(
 	}
 	fp << "};\n";
 }
+
+
+@@Parse additional overrides for exception codes
+@@@param: classes: The class mappings that should be updated to include overrides
+@@@param: files:   The set of files to scan for overrides, given as pairs of (ppCond, filename)
+function parseExceptionCodeOverrides(
+		classes: {string: {string: ExceptClass}} = none,
+		files: {(string, string)...} = none)
+		: {string: {string: ExceptClass}} {
+	if (classes is none)
+		classes = parseExceptionClasses();
+	local filesCwd;
+	if (files is none) {
+		filesCwd = fs.headof(__FILE__);
+		files = {
+			("defined(__i386__) || defined(__x86_64__)", "../../include/i386-kos/kos/except/asm/codes.h"),
+			/* NOTE: exception code overrides for other architectures (if applicable)
+			 *       should be added here, alongside preprocessor-expressions which may
+			 *       be used to detect these architectures in portable code. */
+		};
+	} else {
+		filesCwd = fs.getcwd();
+	}
+	for (local ppCond, filename: files) {
+		/* Make sure to only work with optimized pp-expression,
+		 * so-as to ensure that we can safely compare the resulting
+		 * strings for equality, where the optimization phase will
+		 * have ensure that the expressions are canonical with each
+		 * other. */
+		ppCond = ppexpr.optimize(ppCond);
+		filename = fs.abspath(filename, filesCwd);
+		local knownMacros: {string: string} = Dict();
+		with (local fp = File.open(filename)) {
+			for (local l: fp) {
+				local macroName, macroValue;
+				try {
+					macroName, macroValue = l.scanf(" # define %[^ ] %[^]")...;
+				} catch (...) {
+					continue;
+				}
+				for (;;) {
+					local i = macroValue.find("/*");
+					if (i < 0)
+						break;
+					local j = macroValue.find("*/", i);
+					if (j < 0)
+						j = #macroValue;
+					else {
+						j += 2;
+					}
+					macroValue = macroValue[:i] + macroValue[j:];
+				}
+				local i = macroValue.find("//");
+				if (i >= 0)
+					macroValue = macroValue[:i];
+				macroValue = macroValue.strip();
+				local oldval = knownMacros.get(macroName);
+				if (oldval !is none) {
+					if (oldval === false)
+						continue;
+					if (oldval == macroValue)
+						continue;
+					knownMacros[macroValue] = false;
+					continue;
+				}
+				knownMacros[macroName] = macroValue;
+			}
+		}
+		function resolveMacroValue(value: string): int {
+again:
+			while (value.startswith("(") && value.endswith(")") &&
+			       value.findmatch("(", ")", 1) == #value - 1)
+				value = value[1:-1].strip();
+			if ("," in value) {
+				/* XXX: Assert that the base class didn't change? */
+				value = value.rpartition(",")[2].lstrip();
+				goto again;
+			}
+			try {
+				return int(value);
+			} catch (...) {
+				value = knownMacros.get(value);
+				if (value !is none)
+					goto again;
+				throw;
+			}
+		}
+		/* Now search for macros that share names with ExceptClass-es */
+		for (local name, ppCondToCls: classes) {
+			if (name !in knownMacros)
+				continue; /* Not overwritten */
+			local newOverride = resolveMacroValue(knownMacros[name]);
+			/* Found an override! */
+			for (local none, cls: ppCondToCls) {
+				if (cls.codeOverrides is none)
+					cls.codeOverrides = Dict();
+				if (ppCond in cls.codeOverrides) {
+					if (cls.codeOverrides[ppCond] != newOverride)
+						throw Error("Incompatible error code overrides for {!r} (old: {}, new: {})"
+							.format({ name, cls.codeOverrides[ppCond].hex(), newOverride.hex() }));
+					continue;
+				}
+				cls.codeOverrides[ppCond] = newOverride;
+			}
+		}
+	}
+	return classes;
+}
+
+
+@@Return a mapping for {ppCond:{errorClass:{errorSubClass:{ExceptClass}}}}
+function getExceptionCodeMappings(
+		classes: {string: {string: ExceptClass}} = none)
+		: {string: {int: {int: ExceptClass}}} {
+	if (classes is none)
+		classes = parseExceptionCodeOverrides();
+	@@Mapping for ppCond->ErrorClass->ErrorSubClass->ExceptClass
+	@@NOTE: An exception base-class has the sub-class code `0'!
+	local nameMappings: {string: {int: {int: ExceptClass}}} = Dict();
+	local alreadyDefinedNames: {string: HashSet with string} = Dict();
+	function addClass(
+			fullPpCond: string, cls: ExceptClass, code: int,
+			skipIfAlreadyExists: bool = false) {
+		local map = nameMappings.get(fullPpCond);
+		if (map is none)
+			nameMappings[fullPpCond] = map = Dict();
+		if (cls.allowExceptionCodeOverrides) {
+			local alreadyDefinedSet = alreadyDefinedNames.get(fullPpCond);
+			if (alreadyDefinedSet is none)
+				alreadyDefinedNames[fullPpCond] = alreadyDefinedSet = HashSet();
+			if (cls.name in alreadyDefinedSet)
+				return; /* Already defined */
+			alreadyDefinedSet.insert(cls.name);
+		}
+		local errorClass, errorSubClass;
+		if (cls.baseClass is none) {
+			errorClass    = code;
+			errorSubClass = 0x0000;
+		} else {
+			/* Lookup the proper code for our namespace.
+			 * This is required to ensure that we use the correct
+			 * base-class code for our current pp-condition namespace,
+			 * in situations where an arch-specific header only
+			 * overrides the code of a base-class, without overriding
+			 * sub-class codes. */
+			errorClass    = cls.baseClass.getCodeForPPCond(fullPpCond);
+			errorSubClass = code;
+		}
+		local errorSubClassToName = map.get(errorClass);
+		if (errorSubClassToName is none)
+			map[errorClass] = errorSubClassToName = Dict();
+		local existingEntry = errorSubClassToName.get(errorSubClass);
+		if (existingEntry !is none) {
+			if (!skipIfAlreadyExists && existingEntry.name != cls.name) {
+				throw Error("Inconsistent mapping with {!r} for "
+				            "0x{}:0x{} (is both {!r} and {!r})"
+				.format({
+					fullPpCond,
+					errorClass.hex()[2:].zfill(4),
+					errorSubClass.hex()[2:].zfill(4),
+					existingEntry.name,
+					cls.name
+				}));
+			}
+			return;
+		}
+		errorSubClassToName[errorSubClass] = cls;
+	}
+	/* Step #1: Load a codes for which arch-specific overrides exist */
+	for (local name, ppCondToCls: classes) {
+		for (local classPpCond, cls: ppCondToCls) {
+			for (local codePpCond, code: cls.allCodes) {
+				if (codePpCond == "1")
+					continue;
+				local fullPpCond = ppexpr.optimize("({}) && ({})"
+					.format({ classPpCond, codePpCond }));
+				if (fullPpCond == "0")
+					continue;
+				addClass(fullPpCond, cls, code);
+			}
+		}
+	}
+	/* Step #2: Fill in default codes whereever arch-specific
+	 *          overrides didn't define them already */
+	for (local name, ppCondToCls: classes) {
+		for (local classPpCond, cls: ppCondToCls) {
+			assert classPpCond != "0";
+			for (local codePpCond, code: cls.allCodes) {
+				if (codePpCond != "1")
+					continue;
+				addClass(classPpCond, cls, code, true);
+				if (classPpCond == "1" && cls.baseClass !is none) {
+					/* Also add the class for all of the pp-conditions */
+					for (local ppCond2, none: nameMappings) {
+						if (ppCond2 != "1")
+							addClass(ppCond2, cls, code, true);
+					}
+				}
+			}
+		}
+	}
+	/* Step #3: Automatically complete missing codes from the `#if 1'-namespace. */
+	local universalMappings: {int: {int: string}} = nameMappings.get("1");
+	if (universalMappings !is none) {
+		for (local mappingsPpCond, mappings: nameMappings) {
+			if (mappings === universalMappings)
+				continue;
+			for (local errorClass, errorSubClassToName: universalMappings) {
+				for (local errorSubClass, cls: errorSubClassToName)
+					addClass(mappingsPpCond, cls, cls.code, true);
+			}
+		}
+	}
+	/* Merge duplicate ppCond->xxx mappings */
+again_merge_dups:
+	for (local ppCond, mappings: nameMappings) {
+		for (local ppCond2, mappings2: nameMappings) {
+			if (ppCond === ppCond2)
+				continue;
+			if (mappings != mappings2)
+				continue;
+			// Merge ppCond and ppCond2
+			ppCond = ppexpr.optimize("({}) || ({})".format({ ppCond, ppCond2 }));
+			del nameMappings[ppCond];
+			del nameMappings[ppCond2];
+			if (ppCond == "0")
+				goto again_merge_dups;
+			if (ppCond in nameMappings)
+				goto again_merge_dups;
+			nameMappings[ppCond] = mappings;
+		}
+	}
+	/* Check if we can get rid of nameMappings["1"]
+	 * We can do this if the ||-sum of all the other
+	 * mappings also equals "1" */
+	if ("1" in nameMappings) {
+		local allConditions = [];
+		for (local ppCond, none: nameMappings) {
+			if (ppCond != "1")
+				allConditions.append(ppCond);
+		}
+		allConditions = ppexpr.optimize("||".join(
+			for (local cond: allConditions)
+				"({})".format({ cond })));
+		if (allConditions == "1") {
+			/* All right! we don't need nameMappings["1"] */
+			del nameMappings["1"];
+		}
+	}
+	return nameMappings;
+}
+
+
+
+function printExceptNameFunctionBodyForMappings(
+		fp: File, mappings: {int: {int: ExceptClass}},
+		classVariableName: string, subClassVariableName: string,
+		linePrefix: string) {
+
+	function hex4(v: int): string {
+		return v.hex()[2:].zfill(4);
+	}
+
+	@@Min/max bounds for continous error sub-class ranges
+	local subClassPartitions: {int: {(int, int)...}} = Dict();
+
+	@@Mappings for @ERROR_CLASS(...) where @(#subClassPartitions[ERROR_CLASS(...)] >= 2)
+	local nonLinearMappings: {int: {int: ExceptClass}} = Dict();
+
+	@@Same as @mappings, but doesn't contain class
+	local linearMappings: {int: {int: ExceptClass}} = Dict();
+
+	for (local errorClass, subClassMappings: mappings) {
+		local partitions = parititionIds(subClassMappings.keys);
+		subClassPartitions[errorClass] = partitions;
+		if (#partitions >= 2 || partitions.first.first != 0) {
+			nonLinearMappings[errorClass] = subClassMappings;
+		} else {
+			linearMappings[errorClass] = subClassMappings;
+		}
+	}
+
+	@@Min/max bound partitions for @linearMappings
+	local classParitions: {(int, int)...} = parititionIds(linearMappings.keys);
+
+	/* Generate the string table(s) for linear partitions.
+	 * This table is designed as:
+	 * >> "[1234:0000]\0[1234:0001]\0\0[1234:0003]\1"
+	 * >> "\1"
+	 * >> "[1236:0000]\0\1"
+	 * >> "[1237:0000]\0\1"
+	 * Meaning that '\1'-characters indicate the end of an error-sub-class, as
+	 * well as introduce the start of the next error-class. */
+	for (local min, max: classParitions) {
+		File.Writer text;
+		for (local errorClass: [min:max+1]) {
+			local subClasses = linearMappings.get(errorClass);
+			if (subClasses !is none) {
+				local mySubClassPartitions = subClassPartitions[errorClass];
+				assert #mySubClassPartitions == 1;
+				assert mySubClassPartitions.first.first == 0;
+				local maxSubClass = mySubClassPartitions.first.last;
+				for (local errorSubClass: [0:maxSubClass+1]) {
+					local name = subClasses.get(errorSubClass).name;
+					if (name is none)
+						name = "";
+					text << name << "\0";
+				}
+			}
+			text << "\1";
+		}
+		fp << linePrefix << "static char const e_linear_"
+			<< hex4(min) << "h_" << hex4(max) << "h[] =\n"
+			<< linePrefix;
+		local isFirst = true;
+		for (local l: text.string.segments(64)) {
+			if (!isFirst)
+				fp << "\n" << linePrefix;
+			isFirst = false;
+			fp << repr(l);
+		}
+		if (isFirst)
+			fp << "\"\"";
+		fp << ";\n";
+	}
+	/* Generate code to select the correct range from `classParitions' */
+	fp	<< linePrefix << "char const *result;\n"
+		<< linePrefix << "error_class_t class_offset;\n"
+		<< linePrefix << "error_subclass_t subclass_offset;\n"
+		<< linePrefix;
+	local isFirst = true;
+	for (local min, max: classParitions) {
+		isFirst = false;
+		fp << "if (";
+		if (min != 0)
+			fp << classVariableName << " >= 0x" << hex4(min) << " && ";
+		fp << classVariableName << " <= 0x" << hex4(max) << ") {\n"
+			<< linePrefix << "	result = e_linear_" << hex4(min) << "h_" << hex4(max) << "h;\n"
+			<< linePrefix << "	class_offset = " << classVariableName;
+		if (min != 0)
+			fp << " - 0x" << hex4(min);
+		fp << ";\n"
+			<< linePrefix << "} else ";
+	}
+	if (!isFirst) {
+		fp << "{\n"
+			<< linePrefix << "	goto non_linear_prefix;\n"
+			<< linePrefix << "}\n"
+			<< linePrefix << "while (class_offset) {\n"
+			<< linePrefix << "	--class_offset;\n"
+			<< linePrefix << "	result = (char *)rawmemchr(result, '\\1') + 1;\n"
+			<< linePrefix << "}\n"
+			<< linePrefix << "subclass_offset = " << subClassVariableName << ";\n"
+			<< linePrefix << "for (;;) {\n"
+			<< linePrefix << "	if (*result == '\\1')\n"
+			<< linePrefix << "		break; /* End-of-class */\n"
+			<< linePrefix << "	if (!subclass_offset) {\n"
+			<< linePrefix << "		if (!*result)\n"
+			<< linePrefix << "			result = NULL;\n"
+			<< linePrefix << "		return result;\n"
+			<< linePrefix << "	}\n"
+			<< linePrefix << "	--subclass_offset;\n"
+			<< linePrefix << "	result = strend(result) + 1;\n"
+			<< linePrefix << "}\n";
+		fp << "non_linear_prefix:\n";
+	}
+	if (nonLinearMappings) {
+		fp << linePrefix << "switch(" << classVariableName << ") {\n";
+		for (local classId: nonLinearMappings.keys.sorted()) {
+			fp << "\n" << linePrefix << "case 0x" << hex4(classId) << ": {\n";
+			/* Deal with `nonLinearMappings' by generating a conventional STREND^N table. */
+			local mySubClassPartitions = subClassPartitions[classId];
+			assert #mySubClassPartitions >= 2 || mySubClassPartitions.first.first != 0;
+			for (local min, max: mySubClassPartitions) {
+				File.Writer text;
+				local isFirst = true;
+				for (local subClassId: [min:max+1]) {
+					local subClassName = mappings[classId].get(subClassId).name;
+					if (subClassName is none)
+						subClassName = "";
+					if (!isFirst)
+						text << "\0";
+					isFirst = false;
+					text << subClassName;
+				}
+				fp << linePrefix << "\tstatic char const e_" << hex4(classId) << "h_linear_"
+					<< hex4(min) << "h_" << hex4(max) << "h[] =\n"
+					<< linePrefix << "\t";
+				local isFirst = true;
+				for (local l: text.string.segments(64)) {
+					if (!isFirst)
+						fp << "\n" << linePrefix << "\t";
+					isFirst = false;
+					fp << repr(l);
+				}
+				if (isFirst)
+					fp << "\"\"";
+				fp << ";\n";
+			}
+			/* Generate code to select the correct string table. */
+			local isFirst = true;
+			fp << linePrefix << "\t";
+			for (local min, max: mySubClassPartitions) {
+				isFirst = false;
+				fp << "if (";
+				if (min != 0)
+					fp << subClassVariableName << " >= 0x" << hex4(min) << " && ";
+				fp << subClassVariableName << " <= 0x" << hex4(max) << ") {\n"
+					<< linePrefix << "		result = e_" << hex4(classId)
+						<< "h_linear_" << hex4(min) << "h_" << hex4(max) << "h;\n"
+					<< linePrefix << "		subclass_offset = "
+						<< subClassVariableName;
+				if (min != 0)
+					fp << " - 0x" << hex4(min);
+				fp	<< ";\n"
+					<< linePrefix << "	} else ";
+			}
+			if (!isFirst) {
+				fp << "{\n"
+					<< linePrefix << "		return NULL;\n"
+					<< linePrefix << "	}\n";
+			}
+			fp << linePrefix << "}	break;\n";
+		}
+		fp	<< "\n" << linePrefix << "default:\n"
+			<< linePrefix << "	return NULL;\n"
+			<< linePrefix << "}\n";
+	}
+	fp	<< linePrefix << "while (subclass_offset) {\n"
+		<< linePrefix << "	--subclass_offset;\n"
+		<< linePrefix << "	result = strend(result) + 1;\n"
+		<< linePrefix << "}\n"
+		<< linePrefix << "if (!*result)\n"
+		<< linePrefix << "	result = NULL;\n"
+		<< linePrefix << "return result;\n"
+	;
+}
+
+
+function printExceptNameFunctionBody(
+		fp: File = none,
+		ppCondMappings: {string: {int: {int: ExceptClass}}} = none,
+		classVariableName: string = "err_class",
+		subClassVariableName: string = "err_subclass",
+		linePrefix: string = "\t") {
+	if (fp is none)
+		fp = File.stdout;
+	if (ppCondMappings is none)
+		ppCondMappings = getExceptionCodeMappings();
+	/* Use ppexpr optimizations to turn a sequence of:
+	 * >> #if FOO
+	 * >> a
+	 * >> #endif
+	 * >> #if !FOO
+	 * >> b
+	 * >> #endif
+	 *
+	 * into:
+	 * >> #if FOO
+	 * >> a
+	 * >> #else
+	 * >> b
+	 * >> #endif */
+	local assumptions: ppexpr.PPAssume = none;
+	local didEncounter1: bool = false;
+	for (local ppCond, mappings: ppCondMappings) {
+		if (didEncounter1) {
+			print File.stderr: ("Warning: Impossible mappings for:", repr ppCond);
+			continue;
+		}
+		ppCond = ppexpr.ppParse(ppCond).optimize(assume: assumptions);
+		local strCond = ppCond.tostr();
+		if (strCond == "1") {
+			didEncounter1 = true;
+			if (assumptions !is none) {
+				fp << "#else /* ... */\n";
+				assumptions = none;
+			}
+			printExceptNameFunctionBodyForMappings(
+				fp, mappings, classVariableName,
+				subClassVariableName, linePrefix);
+			continue;
+		}
+		if (assumptions !is none) {
+			fp << "#elif " << strCond << "\n";
+		} else {
+			printPreprocessorExpressionIf(File.stdout, strCond);
+			assumptions = ppexpr.createPPAssume();
+		}
+		ppCond = ppexpr.PPBranch(ppexpr.BRT_NOT, ppCond).optimize(assume: assumptions);
+		assumptions.addAssumption(ppCond);
+		printExceptNameFunctionBodyForMappings(
+			fp, mappings, classVariableName,
+			subClassVariableName, linePrefix);
+	}
+	if (assumptions !is none) {
+		fp << "#endif /* ... */\n";
+	} else if (didEncounter1) {
+		fp << "#endif /* !... */\n";
+	}
+}
+
 
 
 

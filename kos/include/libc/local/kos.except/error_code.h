@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24e55ef3 */
+/* HASH CRC-32:0x1db3871d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 struct exception_data;
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW_NCX,__LIBKCALL,__localdep_error_data,(void),error_data,())
+__COMPILER_REDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,__localdep_error_data,(void),error_data,())
 #elif defined(__arch_error_data)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.except/error_data.h>
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_error_data_defined */
 __LOCAL_LIBC(error_code) __ATTR_PURE __ATTR_WUNUSED __error_code_t
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_code))(void) {
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_code))(void) {
 #ifdef __arch_error_code
 	return __arch_error_code();
 #else /* __arch_error_code */

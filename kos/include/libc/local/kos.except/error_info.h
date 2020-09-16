@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7842e854 */
+/* HASH CRC-32:0xf79c3519 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 struct exception_info;
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(error_info) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_info))(void) {
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_info))(void) {
 	return __arch_error_info();
 }
 __NAMESPACE_LOCAL_END

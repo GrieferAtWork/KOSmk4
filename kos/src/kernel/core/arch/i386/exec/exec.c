@@ -75,11 +75,12 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 	switch (ehdr->e_ident[EI_OSABI]) {
 
 	case ELFOSABI_SYSV:
+	case ELFOSABI_LINUX:
 		if (ehdr->e_ident[EI_ABIVERSION] != 0) {
 			THROW(E_NOT_EXECUTABLE_FAULTY,
 			      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 			      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,
-			      ELFOSABI_SYSV,
+			      ehdr->e_ident[EI_OSABI],
 			      ehdr->e_ident[EI_ABIVERSION]);
 		}
 		break;
@@ -130,11 +131,12 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 	switch (ehdr->e_ident[EI_OSABI]) {
 
 	case ELFOSABI_SYSV:
+	case ELFOSABI_LINUX:
 		if (ehdr->e_ident[EI_ABIVERSION] != 0) {
 			THROW(E_NOT_EXECUTABLE_FAULTY,
 			      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 			      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,
-			      ELFOSABI_SYSV,
+			      ehdr->e_ident[EI_OSABI],
 			      ehdr->e_ident[EI_ABIVERSION]);
 		}
 		break;
@@ -219,11 +221,12 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 	switch (ehdr->e_ident[EI_OSABI]) {
 
 	case ELFOSABI_SYSV:
+	case ELFOSABI_LINUX:
 		if (ehdr->e_ident[EI_ABIVERSION] != 0) {
 			THROW(E_NOT_EXECUTABLE_FAULTY,
 			      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 			      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,
-			      ELFOSABI_SYSV,
+			      ehdr->e_ident[EI_OSABI],
 			      ehdr->e_ident[EI_ABIVERSION]);
 		}
 		/* Work-around to get applications compiled for linux running.
@@ -290,11 +293,12 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 	switch (ehdr->e_ident[EI_OSABI]) {
 
 	case ELFOSABI_SYSV:
+	case ELFOSABI_LINUX:
 		if (ehdr->e_ident[EI_ABIVERSION] != 0) {
 			THROW(E_NOT_EXECUTABLE_FAULTY,
 			      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
 			      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,
-			      ELFOSABI_SYSV,
+			      ehdr->e_ident[EI_OSABI],
 			      ehdr->e_ident[EI_ABIVERSION]);
 		}
 		/* Work-around to get applications compiled for linux running.

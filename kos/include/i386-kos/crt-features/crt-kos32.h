@@ -1529,6 +1529,7 @@
 #define __CRT_HAVE_error_data 1
 #define __CRT_HAVE_error_info 1
 #define __CRT_HAVE_error_message_count 1
+#define __CRT_HAVE_error_name 1
 #define __CRT_HAVE_error_one_per_line 1
 #define __CRT_HAVE_error_print_progname 1
 #define __CRT_HAVE_error_register_state 1

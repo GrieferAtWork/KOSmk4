@@ -25,6 +25,7 @@
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data32.h
  * $ deemon -F kos/include/i386-kos/kos/bits/exception_data64.h
  * $ deemon -F kos/src/libc/magic/kos.except.c
+ * $ deemon -F kos/src/libc/hybrid/except.c
  * Or the one-liner
  * $ deemon -F kos/include/kos/bits/exception_data.h kos/include/i386-kos/kos/bits/exception_data32.h kos/include/i386-kos/kos/bits/exception_data64.h kos/src/libc/magic/kos.except.c
  */

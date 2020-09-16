@@ -30,6 +30,7 @@
 #include <hybrid/pp/__va_nargs.h>
 
 #include <bits/types.h>
+#include <kos/anno.h>
 #include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
 #include <kos/except/codes.h>        /* E_OK, ... */
@@ -91,6 +92,19 @@
 %#ifdef __CC__
 %{
 __SYSDECL_BEGIN
+
+#ifndef __ERROR_THROW_CC
+#define __ERROR_THROW_CC __LIBKCALL
+#endif /* !__ERROR_THROW_CC */
+
+#ifndef __ERROR_THROWN_CC
+#define __ERROR_THROWN_CC __LIBKCALL
+#endif /* !__ERROR_THROWN_CC */
+
+#ifndef __ERROR_UNWIND_CC
+#define __ERROR_UNWIND_CC __LIBKCALL
+#endif /* !__ERROR_UNWIND_CC */
+
 
 #ifndef __error_register_state_t_defined
 #define __error_register_state_t_defined 1
@@ -204,7 +218,7 @@ struct exception_info;
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_data)),
   preferred_fast_extern_inline("error_data", { return __arch_error_data(); })]]
-[[wunused, const, nonnull, decl_prefix(struct exception_data;)]]
+[[wunused, const, nothrow, nonnull, decl_prefix(struct exception_data;)]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>"), requires(defined(__arch_error_data))]]
 struct exception_data *error_data(void) {
 	return __arch_error_data();
@@ -213,7 +227,7 @@ struct exception_data *error_data(void) {
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_code)),
   preferred_fast_extern_inline("error_code", { return __arch_error_code(); })]]
-[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
+[[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_code) || $has_function(error_data))]]
 error_code_t error_code(void) {
@@ -227,7 +241,7 @@ error_code_t error_code(void) {
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_active)),
   preferred_fast_extern_inline("error_active", { return __arch_error_active(); })]]
-[[wunused, pure, userimpl, requires_function(error_code)]]
+[[wunused, pure, nothrow, userimpl, requires_function(error_code)]]
 [[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_active) || $has_function(error_code))]]
@@ -242,7 +256,7 @@ $bool error_active(void) {
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_class)),
   preferred_fast_extern_inline("error_class", { return __arch_error_class(); })]]
-[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
+[[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_class) || $has_function(error_code))]]
@@ -257,7 +271,7 @@ error_class_t error_class(void) {
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_subclass)),
   preferred_fast_extern_inline("error_subclass", { return __arch_error_subclass(); })]]
-[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
+[[wunused, pure, nothrow, decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_subclass) || $has_function(error_code))]]
@@ -272,7 +286,7 @@ error_subclass_t error_subclass(void) {
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_register_state)),
   preferred_fast_extern_inline("error_register_state", { return __arch_error_register_state(); })]]
-[[wunused, const, nonnull, decl_include("<kos/bits/except.h>")]]
+[[wunused, const, nothrow, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
 #ifndef __ERROR_REGISTER_STATE_TYPE
 #include <bits/mcontext.h>
@@ -291,6 +305,7 @@ error_register_state_t *error_register_state(void) {
 [[wunused, pure, decl_include("<bits/types.h>")]]
 [[decl_prefix(struct exception_data;)]]
 [[impl_include("<asm/os/errno.h>")]]
+[[impl_include("<hybrid/host.h>")]]
 [[impl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/reason/fs.h>")]]
 [[impl_include("<kos/except/reason/inval.h>")]]
@@ -347,8 +362,11 @@ function formatErrnoExpr(cls: ExceptClass): (string, {string...}) {
 	return (resultExpr.string, reqMacros);
 }
 
-for (local name, ppCondToCls: parseExceptionClasses()) {
-	for (local ppCond, cls: ppCondToCls) {
+local classes = parseExceptionClasses();
+for (local name: classes.keys.sorted()) {
+	local ppCondToCls = classes[name];
+	for (local ppCond: ppCondToCls.keys.sorted()) {
+		local cls = ppCondToCls[ppCond];
 		if (cls.baseClass !is none)
 			continue;
 		local hasErrnoExpr = isCustomErrnoExpr(cls.errnoExpr);
@@ -416,36 +434,6 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 	}
 }
 ]]]*/
-@@pp_if defined(EACCES)@@
-	case @E_INSUFFICIENT_RIGHTS@:
-		result = EACCES;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EIO)@@
-	case @E_IOERROR@:
-		result = EIO;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EOK)@@
-	case @E_OK@:
-		result = EOK;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EINTR)@@
-	case @E_INTERRUPT@:
-		result = EINTR;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EFAULT)@@
-	case @E_SEGFAULT@:
-		result = EFAULT;
-		break;
-@@pp_endif@@
-
 	case @E_BADALLOC@:
 @@pp_if defined(ENOMEM)@@
 		result = ENOMEM;
@@ -470,27 +458,9 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		}
 		break;
 
-@@pp_if defined(ENOSYS)@@
-	case @E_UNKNOWN_SYSTEMCALL@:
-		result = ENOSYS;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EFAULT)@@
-	case @E_UNHANDLED_INTERRUPT@:
-		result = EFAULT;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(ENODEV)@@
-	case @E_NO_DEVICE@:
-		result = ENODEV;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EAGAIN)@@
-	case @E_WOULDBLOCK@:
-		result = EAGAIN;
+@@pp_if defined(EINVAL)@@
+	case @E_BREAKPOINT@:
+		result = EINVAL;
 		break;
 @@pp_endif@@
 
@@ -503,84 +473,6 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 @@pp_if defined(EINVAL)@@
 	case @E_DIVIDE_BY_ZERO@:
 		result = EINVAL;
-		break;
-@@pp_endif@@
-
-	case @E_INVALID_HANDLE@:
-@@pp_if defined(EBADF)@@
-		result = EBADF;
-@@pp_endif@@
-		switch(self->@e_subclass@) {
-@@pp_if defined(ENOTSOCK) && defined(EBADFD)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_FILETYPE@)):
-			result = self->@e_args@.@e_invalid_handle@.@ih_filetype@.@f_needed_handle_type@ == @HANDLE_TYPE_SOCKET@ ? ENOTSOCK : EBADFD;
-			break;
-@@pp_endif@@
-@@pp_if defined(EINVAL)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_OPERATION@)):
-			result = EINVAL;
-			break;
-@@pp_endif@@
-@@pp_if defined(EOPNOTSUPP)@@
-		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_NET_OPERATION@)):
-			result = EOPNOTSUPP;
-			break;
-@@pp_endif@@
-		default: break;
-		}
-		break;
-
-@@pp_if defined(EOVERFLOW)@@
-	case @E_OVERFLOW@:
-		result = EOVERFLOW;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EILSEQ)@@
-	case @E_UNICODE_ERROR@:
-		result = EILSEQ;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EINVAL)@@
-	case @E_BREAKPOINT@:
-		result = EINVAL;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EFAULT)@@
-	case @E_STACK_OVERFLOW@:
-		result = EFAULT;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(ESRCH)@@
-	case @E_PROCESS_EXITED@:
-		result = ESRCH;
-		break;
-@@pp_endif@@
-
-@@pp_if (defined(EPERM)) && (!defined(__i386__) && !defined(__x86_64__))@@
-	case @E_ILLEGAL_INSTRUCTION@:
-		result = EPERM;
-		break;
-@@pp_endif@@
-
-@@pp_if (defined(EPERM)) && (defined(__i386__) || defined(__x86_64__))@@
-	case @E_ILLEGAL_INSTRUCTION@:
-		result = EPERM;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(ERANGE)@@
-	case @E_INDEX_ERROR@:
-		result = ERANGE;
-		break;
-@@pp_endif@@
-
-@@pp_if defined(EPERM)@@
-	case @E_NOT_IMPLEMENTED@:
-		result = EPERM;
 		break;
 @@pp_endif@@
 
@@ -728,15 +620,33 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		}
 		break;
 
-@@pp_if defined(EPERM)@@
-	case @E_INVALID_CONTEXT@:
+@@pp_if (defined(EPERM)) && (!defined(__i386__) && !defined(__x86_64__))@@
+	case @E_ILLEGAL_INSTRUCTION@:
 		result = EPERM;
 		break;
 @@pp_endif@@
 
-@@pp_if defined(ENOEXEC)@@
-	case @E_NOT_EXECUTABLE@:
-		result = ENOEXEC;
+@@pp_if (defined(EPERM)) && (defined(__i386__) || defined(__x86_64__))@@
+	case @E_ILLEGAL_INSTRUCTION@:
+		result = EPERM;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ERANGE)@@
+	case @E_INDEX_ERROR@:
+		result = ERANGE;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EACCES)@@
+	case @E_INSUFFICIENT_RIGHTS@:
+		result = EACCES;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EINTR)@@
+	case @E_INTERRUPT@:
+		result = EINTR;
 		break;
 @@pp_endif@@
 
@@ -778,6 +688,42 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		default: break;
 		}
 		break;
+
+@@pp_if defined(EPERM)@@
+	case @E_INVALID_CONTEXT@:
+		result = EPERM;
+		break;
+@@pp_endif@@
+
+	case @E_INVALID_HANDLE@:
+@@pp_if defined(EBADF)@@
+		result = EBADF;
+@@pp_endif@@
+		switch(self->@e_subclass@) {
+@@pp_if defined(ENOTSOCK) && defined(EBADFD)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_FILETYPE@)):
+			result = self->@e_args@.@e_invalid_handle@.@ih_filetype@.@f_needed_handle_type@ == @HANDLE_TYPE_SOCKET@ ? ENOTSOCK : EBADFD;
+			break;
+@@pp_endif@@
+@@pp_if defined(EINVAL)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_OPERATION@)):
+			result = EINVAL;
+			break;
+@@pp_endif@@
+@@pp_if defined(EOPNOTSUPP)@@
+		case @ERROR_SUBCLASS@(@ERROR_CODEOF@(@E_INVALID_HANDLE_NET_OPERATION@)):
+			result = EOPNOTSUPP;
+			break;
+@@pp_endif@@
+		default: break;
+		}
+		break;
+
+@@pp_if defined(EIO)@@
+	case @E_IOERROR@:
+		result = EIO;
+		break;
+@@pp_endif@@
 
 	case @E_NET_ERROR@:
 		switch(self->@e_subclass@) {
@@ -834,6 +780,78 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 		default: break;
 		}
 		break;
+
+@@pp_if defined(ENOEXEC)@@
+	case @E_NOT_EXECUTABLE@:
+		result = ENOEXEC;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EPERM)@@
+	case @E_NOT_IMPLEMENTED@:
+		result = EPERM;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ENODEV)@@
+	case @E_NO_DEVICE@:
+		result = ENODEV;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EOK)@@
+	case @E_OK@:
+		result = EOK;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EOVERFLOW)@@
+	case @E_OVERFLOW@:
+		result = EOVERFLOW;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ESRCH)@@
+	case @E_PROCESS_EXITED@:
+		result = ESRCH;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EFAULT)@@
+	case @E_SEGFAULT@:
+		result = EFAULT;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EFAULT)@@
+	case @E_STACK_OVERFLOW@:
+		result = EFAULT;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EFAULT)@@
+	case @E_UNHANDLED_INTERRUPT@:
+		result = EFAULT;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EILSEQ)@@
+	case @E_UNICODE_ERROR@:
+		result = EILSEQ;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(ENOSYS)@@
+	case @E_UNKNOWN_SYSTEMCALL@:
+		result = ENOSYS;
+		break;
+@@pp_endif@@
+
+@@pp_if defined(EAGAIN)@@
+	case @E_WOULDBLOCK@:
+		result = EAGAIN;
+		break;
+@@pp_endif@@
 /*[[[end]]]*/
 	default:
 		break;
@@ -849,6 +867,7 @@ for (local name, ppCondToCls: parseExceptionClasses()) {
 [[wunused, kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[decl_prefix(struct exception_data;)]]
 [[decl_prefix(struct __siginfo_struct;)]]
+[[impl_include("<hybrid/host.h>")]]
 [[impl_include("<asm/siginfo.h>")]]
 [[impl_include("<asm/os/signal.h>")]]
 [[impl_include("<bits/siginfo-struct.h>")]]
@@ -1042,22 +1061,300 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 
 
 
+@@Return the name of the given error, or `NULL` if unknown.
+@@This name is the same as the `E_*` identifier.
+@@E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC"
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[wunused, const, nothrow, decl_include("<kos/bits/exception_data.h>")]]
+[[impl_include("<hybrid/host.h>", "<kos/except/codes.h>")]]
+char const *error_name(error_code_t code) {
+	error_class_t err_class       = @ERROR_CLASS@(code);
+	error_subclass_t err_subclass = @ERROR_SUBCLASS@(code);
+/*[[[deemon
+(printExceptNameFunctionBody from ....misc.libgen.exceptinfo)(
+	classVariableName:    "err_class",
+	subClassVariableName: "err_subclass");
+]]]*/
+#if !defined(__i386__) && !defined(__x86_64__)
+	static char const e_linear_0000h_000ah[] =
+	"E_OK\0\1E_BADALLOC\0E_BADALLOC_INSUFFICIENT_HEAP_MEMORY\0E_BADALLOC_"
+	"INSUFFICIENT_VIRTUAL_MEMORY\0E_BADALLOC_INSUFFICIENT_PHYSICAL_MEM"
+	"ORY\0E_BADALLOC_INSUFFICIENT_SWAP_SPACE\0E_BADALLOC_INSUFFICIENT_H"
+	"ANDLE_NUMBERS\0E_BADALLOC_INSUFFICIENT_HANDLE_RANGE\0E_BADALLOC_IN"
+	"SUFFICIENT_DEVICE_NUMBERS\0E_BADALLOC_INSUFFICIENT_INTERRUPT_VECT"
+	"ORS\0E_BADALLOC_INSUFFICIENT_PORT_NUMBERS\0\1E_INVALID_ARGUMENT\0E_I"
+	"NVALID_ARGUMENT_UNKNOWN_FLAG\0E_INVALID_ARGUMENT_RESERVED_FLAG\0E_"
+	"INVALID_ARGUMENT_BAD_FLAG_COMBINATION\0E_INVALID_ARGUMENT_BAD_FLA"
+	"G_MASK\0E_INVALID_ARGUMENT_BAD_ALIGNMENT\0E_INVALID_ARGUMENT_BAD_V"
+	"ALUE\0E_INVALID_ARGUMENT_RESERVED_ARGUMENT\0E_INVALID_ARGUMENT_UNK"
+	"NOWN_COMMAND\0E_INVALID_ARGUMENT_BAD_STATE\0E_INVALID_ARGUMENT_SOC"
+	"KET_OPT\0E_INVALID_ARGUMENT_UNEXPECTED_COMMAND\0\1E_NOT_IMPLEMENTED"
+	"\0E_NOT_IMPLEMENTED_UNSUPPORTED\0E_NOT_IMPLEMENTED_TODO\0\1E_INVALID"
+	"_HANDLE\0E_INVALID_HANDLE_FILE\0E_INVALID_HANDLE_FILETYPE\0E_INVALI"
+	"D_HANDLE_OPERATION\0E_INVALID_HANDLE_NET_OPERATION\0\1E_WOULDBLOCK\0"
+	"E_WOULDBLOCK_PREEMPTED\0E_WOULDBLOCK_WAITFORSIGNAL\0\1E_PROCESS_EXI"
+	"TED\0\1E_NO_DEVICE\0\1E_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJECT\0E_NO_SU"
+	"CH_BLOCKDEVICE\0E_NO_SUCH_PROCESS\0E_NO_SUCH_PIDNS\0E_NO_CTTY\0\1E_IL"
+	"LEGAL_OPERATION\0E_ILLEGAL_PROCESS_OPERATION\0\1";
+	static char const e_linear_0081h_0091h[] =
+	"E_NET_ERROR\0E_NET_HOST_UNREACHABLE\0E_NET_ADDRESS_IN_USE\0E_NET_ME"
+	"SSAGE_TOO_LONG\0E_NET_CONNECTION_ABORT\0E_NET_CONNECTION_REFUSED\0E"
+	"_NET_CONNECTION_RESET\0E_NET_TIMEOUT\0E_NET_UNREACHABLE\0E_NET_ADDR"
+	"ESS_NOT_AVAILABLE\0E_NET_SHUTDOWN\0\1E_IOERROR\0E_IOERROR_ERRORBIT\0E"
+	"_IOERROR_TIMEOUT\0E_IOERROR_READONLY\0E_IOERROR_BADBOUNDS\0E_IOERRO"
+	"R_NODATA\0\1E_NOT_EXECUTABLE\0E_NOT_EXECUTABLE_NOEXEC\0E_NOT_EXECUTA"
+	"BLE_NOT_REGULAR\0E_NOT_EXECUTABLE_NOT_A_BINARY\0E_NOT_EXECUTABLE_F"
+	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
+	"UFFICIENT_RIGHTS\0\1E_INVALID_CONTEXT\0E_INVALID_CONTEXT_NOT_SESSIO"
+	"N_LEADER\0E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED\0E_INVALID_CONTE"
+	"XT_CTTY_DIFFERS\0\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR\0\1";
+	static char const e_linear_f000h_f001h[] =
+	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
+	static char const e_linear_fe00h_fe01h[] =
+	"E_EXIT_THREAD\0\1E_EXIT_PROCESS\0\1";
+	static char const e_linear_feffh_ff07h[] =
+	"E_UNHANDLED_INTERRUPT\0\1\1E_SEGFAULT\0E_SEGFAULT_UNMAPPED\0E_SEGFAUL"
+	"T_READONLY\0E_SEGFAULT_NOTREADABLE\0E_SEGFAULT_NOTEXECUTABLE\0E_SEG"
+	"FAULT_NOTATOMIC\0E_SEGFAULT_UNALIGNED\0\1E_BREAKPOINT\0\1E_DIVIDE_BY_"
+	"ZERO\0\1E_OVERFLOW\0\1E_ILLEGAL_INSTRUCTION\0E_ILLEGAL_INSTRUCTION_BA"
+	"D_OPCODE\0E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE\0E_ILLEGAL_INST"
+	"RUCTION_PRIVILEGED_OPCODE\0E_ILLEGAL_INSTRUCTION_BAD_OPERAND\0\0\0\0\0"
+	"\0\0\0\0\0\0\0\0E_ILLEGAL_INSTRUCTION_REGISTER\0\1E_STACK_OVERFLOW\0\1E_INDE"
+	"X_ERROR\0E_INDEX_ERROR_OUT_OF_BOUNDS\0\1";
+	char const *result;
+	error_class_t class_offset;
+	error_subclass_t subclass_offset;
+	if (err_class <= 0x000a) {
+		result = e_linear_0000h_000ah;
+		class_offset = err_class;
+	} else if (err_class >= 0x0081 && err_class <= 0x0091) {
+		result = e_linear_0081h_0091h;
+		class_offset = err_class - 0x0081;
+	} else if (err_class >= 0xf000 && err_class <= 0xf001) {
+		result = e_linear_f000h_f001h;
+		class_offset = err_class - 0xf000;
+	} else if (err_class >= 0xfe00 && err_class <= 0xfe01) {
+		result = e_linear_fe00h_fe01h;
+		class_offset = err_class - 0xfe00;
+	} else if (err_class >= 0xfeff && err_class <= 0xff07) {
+		result = e_linear_feffh_ff07h;
+		class_offset = err_class - 0xfeff;
+	} else {
+		goto non_linear_prefix;
+	}
+	while (class_offset) {
+		--class_offset;
+		result = (char *)rawmemchr(result, '\1') + 1;
+	}
+	subclass_offset = err_subclass;
+	for (;;) {
+		if (*result == '\1')
+			break; /* End-of-class */
+		if (!subclass_offset) {
+			if (!*result)
+				result = NULL;
+			return result;
+		}
+		--subclass_offset;
+		result = strend(result) + 1;
+	}
+non_linear_prefix:
+	switch(err_class) {
+
+	case 0x0080: {
+		static char const e_0080h_linear_0000h_001ah[] =
+		"E_FSERROR\0E_FSERROR_DELETED\0E_FSERROR_FILE_NOT_FOUND\0E_FSERROR_P"
+		"ATH_NOT_FOUND\0E_FSERROR_ILLEGAL_PATH\0E_FSERROR_NOT_A_DIRECTORY\0E"
+		"_FSERROR_TOO_MANY_SYMBOLIC_LINKS\0E_FSERROR_ACCESS_DENIED\0E_FSERR"
+		"OR_DISK_FULL\0E_FSERROR_READONLY\0E_FSERROR_TOO_MANY_HARD_LINKS\0E_"
+		"FSERROR_IS_A_DIRECTORY\0E_FSERROR_NOT_A_SYMBOLIC_LINK\0E_FSERROR_I"
+		"S_A_SYMBOLIC_LINK\0E_FSERROR_FILE_ALREADY_EXISTS\0E_FSERROR_DIRECT"
+		"ORY_NOT_EMPTY\0E_FSERROR_CROSS_DEVICE_LINK\0E_FSERROR_DIRECTORY_MO"
+		"VE_TO_CHILD\0E_FSERROR_NOT_A_BLOCK_DEVICE\0E_FSERROR_NO_BLOCK_DEVI"
+		"CE\0E_FSERROR_WRONG_FILE_SYSTEM\0E_FSERROR_UNKNOWN_FILE_SYSTEM\0E_F"
+		"SERROR_CORRUPTED_FILE_SYSTEM\0E_FSERROR_DEVICE_ALREADY_MOUNTED\0E_"
+		"FSERROR_PATH_ALREADY_MOUNTED\0E_FSERROR_NOT_A_MOUNTING_POINT\0E_FS"
+		"ERROR_IS_A_MOUNTING_POINT";
+		static char const e_0080h_linear_0100h_0100h[] =
+		"E_FSERROR_UNSUPPORTED_OPERATION";
+		if (err_subclass <= 0x001a) {
+			result = e_0080h_linear_0000h_001ah;
+			subclass_offset = err_subclass;
+		} else if (err_subclass >= 0x0100 && err_subclass <= 0x0100) {
+			result = e_0080h_linear_0100h_0100h;
+			subclass_offset = err_subclass - 0x0100;
+		} else {
+			return NULL;
+		}
+	}	break;
+
+	default:
+		return NULL;
+	}
+	while (subclass_offset) {
+		--subclass_offset;
+		result = strend(result) + 1;
+	}
+	if (!*result)
+		result = NULL;
+	return result;
+#else /* ... */
+	static char const e_linear_0000h_000ah[] =
+	"E_OK\0\1E_BADALLOC\0E_BADALLOC_INSUFFICIENT_HEAP_MEMORY\0E_BADALLOC_"
+	"INSUFFICIENT_VIRTUAL_MEMORY\0E_BADALLOC_INSUFFICIENT_PHYSICAL_MEM"
+	"ORY\0E_BADALLOC_INSUFFICIENT_SWAP_SPACE\0E_BADALLOC_INSUFFICIENT_H"
+	"ANDLE_NUMBERS\0E_BADALLOC_INSUFFICIENT_HANDLE_RANGE\0E_BADALLOC_IN"
+	"SUFFICIENT_DEVICE_NUMBERS\0E_BADALLOC_INSUFFICIENT_INTERRUPT_VECT"
+	"ORS\0E_BADALLOC_INSUFFICIENT_PORT_NUMBERS\0\1E_INVALID_ARGUMENT\0E_I"
+	"NVALID_ARGUMENT_UNKNOWN_FLAG\0E_INVALID_ARGUMENT_RESERVED_FLAG\0E_"
+	"INVALID_ARGUMENT_BAD_FLAG_COMBINATION\0E_INVALID_ARGUMENT_BAD_FLA"
+	"G_MASK\0E_INVALID_ARGUMENT_BAD_ALIGNMENT\0E_INVALID_ARGUMENT_BAD_V"
+	"ALUE\0E_INVALID_ARGUMENT_RESERVED_ARGUMENT\0E_INVALID_ARGUMENT_UNK"
+	"NOWN_COMMAND\0E_INVALID_ARGUMENT_BAD_STATE\0E_INVALID_ARGUMENT_SOC"
+	"KET_OPT\0E_INVALID_ARGUMENT_UNEXPECTED_COMMAND\0\1E_NOT_IMPLEMENTED"
+	"\0E_NOT_IMPLEMENTED_UNSUPPORTED\0E_NOT_IMPLEMENTED_TODO\0\1E_INVALID"
+	"_HANDLE\0E_INVALID_HANDLE_FILE\0E_INVALID_HANDLE_FILETYPE\0E_INVALI"
+	"D_HANDLE_OPERATION\0E_INVALID_HANDLE_NET_OPERATION\0\1E_WOULDBLOCK\0"
+	"E_WOULDBLOCK_PREEMPTED\0E_WOULDBLOCK_WAITFORSIGNAL\0\1E_PROCESS_EXI"
+	"TED\0\1E_NO_DEVICE\0\1E_UNKNOWN_SYSTEMCALL\0\1E_NO_SUCH_OBJECT\0E_NO_SU"
+	"CH_BLOCKDEVICE\0E_NO_SUCH_PROCESS\0E_NO_SUCH_PIDNS\0E_NO_CTTY\0\1E_IL"
+	"LEGAL_OPERATION\0E_ILLEGAL_PROCESS_OPERATION\0\1";
+	static char const e_linear_0081h_0091h[] =
+	"E_NET_ERROR\0E_NET_HOST_UNREACHABLE\0E_NET_ADDRESS_IN_USE\0E_NET_ME"
+	"SSAGE_TOO_LONG\0E_NET_CONNECTION_ABORT\0E_NET_CONNECTION_REFUSED\0E"
+	"_NET_CONNECTION_RESET\0E_NET_TIMEOUT\0E_NET_UNREACHABLE\0E_NET_ADDR"
+	"ESS_NOT_AVAILABLE\0E_NET_SHUTDOWN\0\1E_IOERROR\0E_IOERROR_ERRORBIT\0E"
+	"_IOERROR_TIMEOUT\0E_IOERROR_READONLY\0E_IOERROR_BADBOUNDS\0E_IOERRO"
+	"R_NODATA\0\1E_NOT_EXECUTABLE\0E_NOT_EXECUTABLE_NOEXEC\0E_NOT_EXECUTA"
+	"BLE_NOT_REGULAR\0E_NOT_EXECUTABLE_NOT_A_BINARY\0E_NOT_EXECUTABLE_F"
+	"AULTY\0E_NOT_EXECUTABLE_TOOLARGE\0E_NOT_EXECUTABLE_TOOSMALL\0\1E_INS"
+	"UFFICIENT_RIGHTS\0\1E_INVALID_CONTEXT\0E_INVALID_CONTEXT_NOT_SESSIO"
+	"N_LEADER\0E_INVALID_CONTEXT_CTTY_ALREADY_ASSIGNED\0E_INVALID_CONTE"
+	"XT_CTTY_DIFFERS\0\1\1\1\1\1\1\1\1\1\1\1E_BUFFER_TOO_SMALL\0\1E_UNICODE_ERROR\0\1";
+	static char const e_linear_f000h_f001h[] =
+	"E_INTERRUPT\0E_INTERRUPT_USER_RPC\0\1__E_RETRY_RWLOCK\0\1";
+	static char const e_linear_fe00h_fe01h[] =
+	"E_EXIT_THREAD\0\1E_EXIT_PROCESS\0\1";
+	static char const e_linear_feffh_ff0eh[] =
+	"E_UNHANDLED_INTERRUPT\0\1E_DIVIDE_BY_ZERO\0\1\1\1E_BREAKPOINT\0\1E_OVERF"
+	"LOW\0\1E_INDEX_ERROR\0E_INDEX_ERROR_OUT_OF_BOUNDS\0\1\1\1E_STACK_OVERFL"
+	"OW\0\1\1\1\1\1\1E_SEGFAULT\0E_SEGFAULT_UNMAPPED\0E_SEGFAULT_READONLY\0E_SE"
+	"GFAULT_NOTREADABLE\0E_SEGFAULT_NOTEXECUTABLE\0E_SEGFAULT_NOTATOMIC"
+	"\0E_SEGFAULT_UNALIGNED\0\1";
+	char const *result;
+	error_class_t class_offset;
+	error_subclass_t subclass_offset;
+	if (err_class <= 0x000a) {
+		result = e_linear_0000h_000ah;
+		class_offset = err_class;
+	} else if (err_class >= 0x0081 && err_class <= 0x0091) {
+		result = e_linear_0081h_0091h;
+		class_offset = err_class - 0x0081;
+	} else if (err_class >= 0xf000 && err_class <= 0xf001) {
+		result = e_linear_f000h_f001h;
+		class_offset = err_class - 0xf000;
+	} else if (err_class >= 0xfe00 && err_class <= 0xfe01) {
+		result = e_linear_fe00h_fe01h;
+		class_offset = err_class - 0xfe00;
+	} else if (err_class >= 0xfeff && err_class <= 0xff0e) {
+		result = e_linear_feffh_ff0eh;
+		class_offset = err_class - 0xfeff;
+	} else {
+		goto non_linear_prefix;
+	}
+	while (class_offset) {
+		--class_offset;
+		result = (char *)rawmemchr(result, '\1') + 1;
+	}
+	subclass_offset = err_subclass;
+	for (;;) {
+		if (*result == '\1')
+			break; /* End-of-class */
+		if (!subclass_offset) {
+			if (!*result)
+				result = NULL;
+			return result;
+		}
+		--subclass_offset;
+		result = strend(result) + 1;
+	}
+non_linear_prefix:
+	switch(err_class) {
+
+	case 0x0080: {
+		static char const e_0080h_linear_0000h_001ah[] =
+		"E_FSERROR\0E_FSERROR_DELETED\0E_FSERROR_FILE_NOT_FOUND\0E_FSERROR_P"
+		"ATH_NOT_FOUND\0E_FSERROR_ILLEGAL_PATH\0E_FSERROR_NOT_A_DIRECTORY\0E"
+		"_FSERROR_TOO_MANY_SYMBOLIC_LINKS\0E_FSERROR_ACCESS_DENIED\0E_FSERR"
+		"OR_DISK_FULL\0E_FSERROR_READONLY\0E_FSERROR_TOO_MANY_HARD_LINKS\0E_"
+		"FSERROR_IS_A_DIRECTORY\0E_FSERROR_NOT_A_SYMBOLIC_LINK\0E_FSERROR_I"
+		"S_A_SYMBOLIC_LINK\0E_FSERROR_FILE_ALREADY_EXISTS\0E_FSERROR_DIRECT"
+		"ORY_NOT_EMPTY\0E_FSERROR_CROSS_DEVICE_LINK\0E_FSERROR_DIRECTORY_MO"
+		"VE_TO_CHILD\0E_FSERROR_NOT_A_BLOCK_DEVICE\0E_FSERROR_NO_BLOCK_DEVI"
+		"CE\0E_FSERROR_WRONG_FILE_SYSTEM\0E_FSERROR_UNKNOWN_FILE_SYSTEM\0E_F"
+		"SERROR_CORRUPTED_FILE_SYSTEM\0E_FSERROR_DEVICE_ALREADY_MOUNTED\0E_"
+		"FSERROR_PATH_ALREADY_MOUNTED\0E_FSERROR_NOT_A_MOUNTING_POINT\0E_FS"
+		"ERROR_IS_A_MOUNTING_POINT";
+		static char const e_0080h_linear_0100h_0100h[] =
+		"E_FSERROR_UNSUPPORTED_OPERATION";
+		if (err_subclass <= 0x001a) {
+			result = e_0080h_linear_0000h_001ah;
+			subclass_offset = err_subclass;
+		} else if (err_subclass >= 0x0100 && err_subclass <= 0x0100) {
+			result = e_0080h_linear_0100h_0100h;
+			subclass_offset = err_subclass - 0x0100;
+		} else {
+			return NULL;
+		}
+	}	break;
+
+	case 0xff06: {
+		static char const e_ff06h_linear_0000h_0011h[] =
+		"E_ILLEGAL_INSTRUCTION\0E_ILLEGAL_INSTRUCTION_BAD_OPCODE\0E_ILLEGAL"
+		"_INSTRUCTION_UNSUPPORTED_OPCODE\0E_ILLEGAL_INSTRUCTION_PRIVILEGED"
+		"_OPCODE\0E_ILLEGAL_INSTRUCTION_BAD_OPERAND\0\0\0\0\0\0\0\0\0\0\0\0\0E_ILLEGAL_"
+		"INSTRUCTION_REGISTER";
+		static char const e_ff06h_linear_8601h_8603h[] =
+		"E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX\0E_ILLEGAL_INSTRUCTION_X86_T"
+		"OO_LONG\0E_ILLEGAL_INSTRUCTION_X86_INTERRUPT";
+		if (err_subclass <= 0x0011) {
+			result = e_ff06h_linear_0000h_0011h;
+			subclass_offset = err_subclass;
+		} else if (err_subclass >= 0x8601 && err_subclass <= 0x8603) {
+			result = e_ff06h_linear_8601h_8603h;
+			subclass_offset = err_subclass - 0x8601;
+		} else {
+			return NULL;
+		}
+	}	break;
+
+	default:
+		return NULL;
+	}
+	while (subclass_offset) {
+		--subclass_offset;
+		result = strend(result) + 1;
+	}
+	if (!*result)
+		result = NULL;
+	return result;
+#endif /* !... */
+/*[[[end]]]*/
+}
+
+
+
+
 
 %#ifdef __USE_KOS_KERNEL
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_info)),
   preferred_fast_extern_inline("error_info", { return __arch_error_info(); })]]
-[[wunused, const, nonnull, decl_prefix(struct exception_info;)]]
+[[wunused, const, nothrow, nonnull, decl_prefix(struct exception_info;)]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
 [[requires(defined(__arch_error_info))]]
 struct exception_info *error_info(void) {
 	return __arch_error_info();
-}
-
-%{
-#ifndef __ERROR_UNWIND_CC
-#define __ERROR_UNWIND_CC __LIBKCALL
-#endif /* !__ERROR_UNWIND_CC */
 }
 
 @@Unwind the given register state to propagate the currently set error.
@@ -1082,12 +1379,12 @@ error_register_state_t *error_unwind([[nonnull]] error_register_state_t *__restr
 
 
 @@Throw the currently set (in `error_data()') exception.
-[[noreturn, cold]]
+[[noreturn, cold, throws]]
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 void error_throw_current(void);
 
 @@Rethrow the current exception (same as a c++ `throw;' expression)
-[[guard, noreturn, cold]]
+[[guard, noreturn, cold, throws]]
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
 void error_rethrow(void);
 
@@ -1130,13 +1427,6 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 %{
 
 #ifndef THROW
-#ifndef __ERROR_THROW_CC
-#define __ERROR_THROW_CC __LIBKCALL
-#endif /* !__ERROR_THROW_CC */
-
-#ifndef __ERROR_THROWN_CC
-#define __ERROR_THROWN_CC __LIBKCALL
-#endif /* !__ERROR_THROWN_CC */
 }
 
 
@@ -1146,7 +1436,7 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 #define __ERROR_THROW_CC __LIBKCALL
 #endif /* !__ERROR_THROW_CC */
 )]]
-[[noreturn, cold, cc(__ERROR_THROW_CC)]]
+[[noreturn, cold, throws]]
 [[kernel, no_crt_dos_wrapper, cc(__ERROR_THROW_CC)]]
 void error_throw(error_code_t code);
 
@@ -1156,7 +1446,7 @@ void error_throw(error_code_t code);
 #define __ERROR_THROWN_CC __LIBKCALL
 #endif /* !__ERROR_THROWN_CC */
 )]]
-[[noreturn, cold, cc(__ERROR_THROWN_CC)]]
+[[noreturn, cold, throws]]
 [[kernel, no_crt_dos_wrapper, cc(__ERROR_THROWN_CC)]]
 void error_thrown(error_code_t code, unsigned int _argc, ...);
 

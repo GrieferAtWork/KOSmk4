@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd5973be */
+/* HASH CRC-32:0xb92b4ed8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
-__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__error_code_t,__NOTHROW_NCX,__LIBKCALL,__localdep_error_code,(void),error_code,())
+__COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__error_code_t,__NOTHROW,__LIBKCALL,__localdep_error_code,(void),error_code,())
 #elif defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 __NAMESPACE_LOCAL_END
 #include <libc/local/kos.except/error_code.h>
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_END
 #include <kos/except/codes.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(error_active) __ATTR_PURE __ATTR_WUNUSED __BOOL
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_active))(void) {
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_active))(void) {
 #ifdef __arch_error_active
 	return __arch_error_active();
 #else /* __arch_error_active */

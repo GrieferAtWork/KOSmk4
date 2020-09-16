@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13782fa4 */
+/* HASH CRC-32:0xc20625b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3742,6 +3742,7 @@
 #define __CRT_HAVE_error_code 1
 #define __CRT_HAVE_error_data 1
 #define __CRT_HAVE_error_info 1
+#define __CRT_HAVE_error_name 1
 #define __CRT_HAVE_error_register_state 1
 #define __CRT_HAVE_error_rethrow 1
 #define __CRT_HAVE_error_subclass 1
