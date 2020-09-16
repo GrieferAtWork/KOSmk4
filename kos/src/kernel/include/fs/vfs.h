@@ -306,6 +306,7 @@ path_printex(struct path *__restrict self,
                                              *       with `\\unix\', indicative of it being relative to
                                              *       the UNIX filesystem root. */
 #define PATH_PRINT_MODE_EXCDRIVE 0x00000002 /* Exclude the name of the associated drive in `PATH_PRINT_MODE_DOSPATH' mode. */
+#define PATH_PRINT_MODE_CANREACH 0x00000004 /* Assume that `root' is reachable from `self' */
 
 /* Same as path_printex() with `PATH_PRINT_MODE_INCTRAIL',
  * and using the current FS-mode & root. */

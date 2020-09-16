@@ -367,6 +367,26 @@ path_printex(struct path *__restrict self,
              unsigned int mode,
              struct path *__restrict root) {
 	ssize_t temp, result;
+	if (!(mode & PATH_PRINT_MODE_CANREACH) && root != &vfs_kernel) {
+		/* Verify that `root' is reachable from `self'.
+		 * If it's not, then we should print something like
+		 * !PATH_PRINT_MODE_DOSPATH: \\?\
+		 * PATH_PRINT_MODE_DOSPATH:  //?/
+		 */
+		struct path *iter = self;
+		do {
+			if (iter == root)
+				goto is_reachable;
+			iter = iter->p_parent;
+		} while likely(iter);
+		result = (*printer)(arg,
+		                    mode & PATH_PRINT_MODE_DOSPATH
+		                    ? "\\\\?\\" /* Bad path: \\?\ */
+		                    : "//?/",   /* Bad path: //?/ */
+		                    4);
+		goto done;
+	}
+is_reachable:
 	if ((mode & PATH_PRINT_MODE_DOSPATH) &&
 	    ATOMIC_READ(self->p_isdrive) != 0) {
 		struct vfs *v = self->p_vfs;
@@ -406,7 +426,8 @@ got_drive_root:
 		return (*printer)(arg, "/", 1);
 	}
 	result = path_printex(self->p_parent, printer, arg,
-	                      mode | PATH_PRINT_MODE_INCTRAIL,
+	                      mode | (PATH_PRINT_MODE_INCTRAIL |
+	                              PATH_PRINT_MODE_CANREACH),
 	                      root);
 	if unlikely(result < 0)
 		goto done;
