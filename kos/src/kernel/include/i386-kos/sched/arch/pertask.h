@@ -112,10 +112,10 @@ extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_
 #define __pertask_set16(x, v)                 __asm__("movw %w0, %%gs:%p1" : : "r" (v), "mi" (x))
 #define __pertask_set32(x, v)                 __asm__("movl %k0, %%gs:%p1" : : "r" (v), "mi" (x))
 #define __pertask_set64(x, v)                 __asm__("movq %q0, %%gs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %%fs:%p2, %b1" : "=@cc" #cc : "q" (rhs) : "mi" (x))
-#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %%fs:%p2, %w1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
-#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %%fs:%p2, %k1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
-#define __pertask_cmp64_r(x, rhs, cc, result) __asm__("cmpq %%fs:%p2, %q1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
+#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %%gs:%p2, %b1" : "=@cc" #cc (result) : "q" (rhs), "mi" (x))
+#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %%gs:%p2, %w1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
+#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %%gs:%p2, %k1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
+#define __pertask_cmp64_r(x, rhs, cc, result) __asm__("cmpq %%gs:%p2, %q1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
 #else /* __x86_64__ */
 #define __pertask_get8_r(x, result)           __asm__("movb %%fs:%p1, %b0" : "=q" (result) : "mi" (x))
 #define __pertask_get16_r(x, result)          __asm__("movw %%fs:%p1, %w0" : "=r" (result) : "mi" (x))
@@ -123,9 +123,9 @@ extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_
 #define __pertask_set8(x, v)                  __asm__("movb %b0, %%fs:%p1" : : "q" (v), "mi" (x))
 #define __pertask_set16(x, v)                 __asm__("movw %w0, %%fs:%p1" : : "r" (v), "mi" (x))
 #define __pertask_set32(x, v)                 __asm__("movl %k0, %%fs:%p1" : : "r" (v), "mi" (x))
-#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %%fs:%p2, %b1" : "=@cc" #cc : "q" (rhs) : "mi" (x))
-#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %%fs:%p2, %w1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
-#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %%fs:%p2, %k1" : "=@cc" #cc : "r" (rhs) : "mi" (x))
+#define __pertask_cmp8_r(x, rhs, cc, result)  __asm__("cmpb %%fs:%p2, %b1" : "=@cc" #cc (result) : "q" (rhs), "mi" (x))
+#define __pertask_cmp16_r(x, rhs, cc, result) __asm__("cmpw %%fs:%p2, %w1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
+#define __pertask_cmp32_r(x, rhs, cc, result) __asm__("cmpl %%fs:%p2, %k1" : "=@cc" #cc (result) : "r" (rhs), "mi" (x))
 #endif /* !__x86_64__ */
 
 /************************************************************************/

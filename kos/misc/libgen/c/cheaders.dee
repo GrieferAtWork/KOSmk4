@@ -1227,8 +1227,8 @@ class FunctionPrototype {
 				fp << "_GCCNCX";
 		}
 		fp << "(";
-		if (!isLcl)
-			fp << decl << ","; /* Declaration linkage */
+//		if (!isLcl)
+//			fp << decl << ","; /* Declaration linkage */
 		/* Attribute list */
 		cprintAttributeList(fp, escapeMode);
 		fp << ",";
@@ -1240,7 +1240,7 @@ class FunctionPrototype {
 			? nothrowThrowingSpec
 			: nothrow, escapeMode);
 		if (!isLcl)
-			fp << cc << ","; /* Calling convention */
+			escapeTextIntoFile(fp << ",", cc, escapeMode); /* Calling convention */
 		/* Exposed name */
 		fp << "," << exposedName << ",";
 		cprintArgumentListWithTypes(fp, escapeMode);

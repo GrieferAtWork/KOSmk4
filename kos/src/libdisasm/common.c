@@ -54,9 +54,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #ifndef __KERNEL__
 #include <dlfcn.h>
-#else /* !__KERNEL__ */
-#include <kernel/except.h>
-#endif /* __KERNEL__ */
+#endif /* !__KERNEL__ */
 
 
 DECL_BEGIN

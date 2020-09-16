@@ -37,10 +37,6 @@
 
 #include "instrlen.h"
 
-#ifdef __KERNEL__
-#include <kernel/except.h>
-#endif /* __KERNEL__ */
-
 #ifndef __INTELLISENSE__
 #ifdef ARCH_INSTRLEN_SOURCE_FILE
 #include ARCH_INSTRLEN_SOURCE_FILE

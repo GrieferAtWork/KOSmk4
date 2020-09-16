@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x7842e854 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,19 +18,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _OPTIMIZED_KOS_EXCEPT_H
-#define _OPTIMIZED_KOS_EXCEPT_H 1
-
-#include <__stdinc.h>
-
-#if defined(__KOS__) && defined(__KERNEL__)
-__SYSDECL_BEGIN
-__NAMESPACE_FAST_BEGIN
-
-/* TODO */
-
-__NAMESPACE_FAST_END
-__SYSDECL_END
-#endif /* __KOS__ && __KERNEL__ */
-
-#endif /* !_OPTIMIZED_KOS_EXCEPT_H */
+#ifndef __local_error_info_defined
+#define __local_error_info_defined 1
+#include <__crt.h>
+#include <kos/bits/fastexcept.h>
+#ifdef __arch_error_info
+struct exception_info;
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(error_info) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_info *
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_info))(void) {
+	return __arch_error_info();
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_error_info_defined
+#define __local___localdep_error_info_defined 1
+#define __localdep_error_info __LIBC_LOCAL_NAME(error_info)
+#endif /* !__local___localdep_error_info_defined */
+#else /* __arch_error_info */
+#undef __local_error_info_defined
+#endif /* !__arch_error_info */
+#endif /* !__local_error_info_defined */

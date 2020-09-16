@@ -48,7 +48,6 @@
 #include "x86.h"
 
 #ifdef __KERNEL__
-#include <kernel/except.h>
 #include <kernel/x86/gdt.h>
 #else /* __KERNEL__ */
 #include <hybrid/atomic.h>

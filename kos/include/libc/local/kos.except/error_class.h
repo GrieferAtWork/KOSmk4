@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd4312d2 */
+/* HASH CRC-32:0xe636dad6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,28 +21,41 @@
 #ifndef __local_error_class_defined
 #define __local_error_class_defined 1
 #include <__crt.h>
-#include <optimized/kos.except.h>
-#if defined(__fast_error_code_defined) || defined(__CRT_HAVE_error_code)
+#include <kos/bits/fastexcept.h>
+#if defined(__arch_error_class) || defined(__CRT_HAVE_error_code) || defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
 #include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: error_code from kos.except */
-#if !defined(__local___localdep_error_code_defined) && defined(__CRT_HAVE_error_code)
+#ifndef __local___localdep_error_code_defined
 #define __local___localdep_error_code_defined 1
+#ifdef __CRT_HAVE_error_code
 __COMPILER_REDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED,__error_code_t,__NOTHROW_NCX,__LIBKCALL,__localdep_error_code,(void),error_code,())
-#endif /* !__local___localdep_error_code_defined && __CRT_HAVE_error_code */
+#elif defined(__arch_error_code) || defined(__CRT_HAVE_error_data) || defined(__arch_error_data)
+__NAMESPACE_LOCAL_END
+#include <libc/local/kos.except/error_code.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_error_code __LIBC_LOCAL_NAME(error_code)
+#else /* ... */
+#undef __local___localdep_error_code_defined
+#endif /* !... */
+#endif /* !__local___localdep_error_code_defined */
 __NAMESPACE_LOCAL_END
 #include <kos/except/codes.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(error_class) __ATTR_PURE __ATTR_WUNUSED __error_class_t
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(error_class))(void) {
+#ifdef __arch_error_class
+	return __arch_error_class();
+#else /* __arch_error_class */
 	return ERROR_CLASS(__localdep_error_code());
+#endif /* !__arch_error_class */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_error_class_defined
 #define __local___localdep_error_class_defined 1
 #define __localdep_error_class __LIBC_LOCAL_NAME(error_class)
 #endif /* !__local___localdep_error_class_defined */
-#else /* __fast_error_code_defined || __CRT_HAVE_error_code */
+#else /* __arch_error_class || __CRT_HAVE_error_code || __arch_error_code || __CRT_HAVE_error_data || __arch_error_data */
 #undef __local_error_class_defined
-#endif /* !__fast_error_code_defined && !__CRT_HAVE_error_code */
+#endif /* !__arch_error_class && !__CRT_HAVE_error_code && !__arch_error_code && !__CRT_HAVE_error_data && !__arch_error_data */
 #endif /* !__local_error_class_defined */

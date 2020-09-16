@@ -37,10 +37,6 @@
 
 #include "emulator.h"
 
-#ifdef __KERNEL__
-#include <kernel/except.h>
-#endif /* __KERNEL__ */
-
 DECL_BEGIN
 
 /* Execute VM86 emulator code until that code finishes execution. */

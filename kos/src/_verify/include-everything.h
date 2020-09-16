@@ -695,6 +695,7 @@ incdir("", "../../include");
 #include <kos/bits/except-handler.h>
 #include <kos/bits/except.h>
 #include <kos/bits/exception_data.h>
+#include <kos/bits/fastexcept.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
 #include <kos/bits/rtm.h>
@@ -1445,7 +1446,6 @@ incdir("", "../../include");
 #endif /* __has_include(<openssl/x509v3err.h>) */
 #include <optimized/error.h>
 #include <optimized/fenv.h>
-#include <optimized/kos.except.h>
 #include <optimized/ssp.string.h>
 #include <optimized/string.h>
 #include <osfcn.h>

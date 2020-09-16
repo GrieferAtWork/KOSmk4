@@ -96,7 +96,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef __KERNEL__
 #include <dev/block.h>
 #include <dev/char.h>
-#include <kernel/except.h>
 #include <kernel/user.h>
 #else /* __KERNEL__ */
 #define validate_readable(base, num_bytes)                          (void)0

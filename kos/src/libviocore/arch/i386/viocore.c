@@ -78,7 +78,6 @@ opt.append("-Os");
 #include "../../viocore.h"
 
 #ifdef __KERNEL__
-#include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
 #include <sched/except-handler.h>

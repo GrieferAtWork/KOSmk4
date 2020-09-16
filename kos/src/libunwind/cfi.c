@@ -57,7 +57,6 @@
 #include <dlfcn.h>
 #include <malloc.h>
 #else /* !__KERNEL__ */
-#include <kernel/except.h>
 #include <sched/task.h> /* get_stack_avail() */
 #endif /* !__KERNEL__ */
 

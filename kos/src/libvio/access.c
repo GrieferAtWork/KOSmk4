@@ -42,7 +42,6 @@ opt.append("-Os");
 #include "access.h"
 
 #ifdef __KERNEL__
-#include <kernel/except.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
 #else /* __KERNEL__ */

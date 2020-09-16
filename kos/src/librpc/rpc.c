@@ -35,10 +35,6 @@
 
 #include <librpc/rpc.h>
 
-#ifdef __KERNEL__
-#include <kernel/except.h>
-#endif /* __KERNEL__ */
-
 DECL_BEGIN
 
 /* >> rpc_service(2)

@@ -34,7 +34,7 @@
 #include <kos/bits/exception_data.h> /* struct exception_data */
 #include <kos/except/codes.h>        /* E_OK, ... */
 }%[insert:prefix(
-#include <optimized/kos.except.h>
+#include <kos/bits/fastexcept.h>
 )]%{
 
 #ifndef EXCEPTION_DATA_POINTERS
@@ -191,12 +191,6 @@ struct exception_info;
 
 
 
-/* TODO: Add [[preferred_fastbind_always]] variants that become available
- *       when compiling for kernel-space, and that are implemented
- *       to directly access the TLS exception storage. */
-
-
-
 %[define_replacement(error_register_state_t = __ERROR_REGISTER_STATE_TYPE)]
 %[define_replacement(error_code_t = __error_code_t)]
 %[define_replacement(error_class_t = __error_class_t)]
@@ -207,38 +201,77 @@ struct exception_info;
 
 
 /* Returns non-zero if there is an active exception. */
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_data)),
+  preferred_fast_extern_inline("error_data", { return __arch_error_data(); })]]
 [[wunused, const, nonnull, decl_prefix(struct exception_data;)]]
-struct exception_data *error_data(void);
-
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
-[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
-error_code_t error_code(void);
-
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
-[[wunused, pure, userimpl, requires_function(error_code)]]
-[[impl_include("<kos/except/codes.h>")]]
-$bool error_active(void) {
-	return error_code() != @E_OK@;
-}
-
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
-[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
-[[impl_include("<kos/except/codes.h>")]]
-[[userimpl, requires_function(error_code)]]
-error_class_t error_class(void) {
-	return @ERROR_CLASS@(error_code());
-}
-
-[[kernel, no_crt_dos_wrapper, cc(LIBKCALL), preferred_fastbind_always]]
-[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
-[[impl_include("<kos/except/codes.h>")]]
-[[userimpl, requires_function(error_code)]]
-error_subclass_t error_subclass(void) {
-	return @ERROR_SUBCLASS@(error_code());
+[[userimpl, requires_include("<kos/bits/fastexcept.h>"), requires(defined(__arch_error_data))]]
+struct exception_data *error_data(void) {
+	return __arch_error_data();
 }
 
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_code)),
+  preferred_fast_extern_inline("error_code", { return __arch_error_code(); })]]
+[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
+[[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
+[[requires(defined(__arch_error_code) || $has_function(error_data))]]
+error_code_t error_code(void) {
+@@pp_ifdef __arch_error_code@@
+	return __arch_error_code();
+@@pp_else@@
+	return error_data()->@e_code@;
+@@pp_endif@@
+}
+
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_active)),
+  preferred_fast_extern_inline("error_active", { return __arch_error_active(); })]]
+[[wunused, pure, userimpl, requires_function(error_code)]]
+[[impl_include("<kos/except/codes.h>")]]
+[[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
+[[requires(defined(__arch_error_active) || $has_function(error_code))]]
+$bool error_active(void) {
+@@pp_ifdef __arch_error_active@@
+	return __arch_error_active();
+@@pp_else@@
+	return error_code() != @E_OK@;
+@@pp_endif@@
+}
+
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_class)),
+  preferred_fast_extern_inline("error_class", { return __arch_error_class(); })]]
+[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
+[[impl_include("<kos/except/codes.h>")]]
+[[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
+[[requires(defined(__arch_error_class) || $has_function(error_code))]]
+error_class_t error_class(void) {
+@@pp_ifdef __arch_error_class@@
+	return __arch_error_class();
+@@pp_else@@
+	return @ERROR_CLASS@(error_code());
+@@pp_endif@@
+}
+
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_subclass)),
+  preferred_fast_extern_inline("error_subclass", { return __arch_error_subclass(); })]]
+[[wunused, pure, decl_include("<kos/bits/exception_data.h>")]]
+[[impl_include("<kos/except/codes.h>")]]
+[[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
+[[requires(defined(__arch_error_subclass) || $has_function(error_code))]]
+error_subclass_t error_subclass(void) {
+@@pp_ifdef __arch_error_subclass@@
+	return __arch_error_subclass();
+@@pp_else@@
+	return @ERROR_SUBCLASS@(error_code());
+@@pp_endif@@
+}
+
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_register_state)),
+  preferred_fast_extern_inline("error_register_state", { return __arch_error_register_state(); })]]
 [[wunused, const, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
 #ifndef __ERROR_REGISTER_STATE_TYPE
@@ -247,7 +280,11 @@ error_subclass_t error_subclass(void) {
 #define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__ERROR_REGISTER_STATE_TYPE */
 )]]
-error_register_state_t *error_register_state(void);
+[[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
+[[requires(defined(__arch_error_register_state))]]
+error_register_state_t *error_register_state(void) {
+	return __arch_error_register_state();
+}
 
 @@Transform the given exception into a posix errno value
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
@@ -1008,9 +1045,14 @@ $bool error_as_signal([[nonnull]] struct exception_data const *__restrict self,
 
 %#ifdef __USE_KOS_KERNEL
 [[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
-[[wunused, const, nonnull, preferred_fastbind_always]]
-[[decl_prefix(struct exception_info;)]]
-struct exception_info *error_info(void);
+[[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_error_info)),
+  preferred_fast_extern_inline("error_info", { return __arch_error_info(); })]]
+[[wunused, const, nonnull, decl_prefix(struct exception_info;)]]
+[[userimpl, requires_include("<kos/bits/fastexcept.h>")]]
+[[requires(defined(__arch_error_info))]]
+struct exception_info *error_info(void) {
+	return __arch_error_info();
+}
 
 %{
 #ifndef __ERROR_UNWIND_CC
@@ -1147,12 +1189,18 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 #endif /* !THROW */
 
 #ifndef was_thrown
+#ifndef __arch_error_code_eq
+#define __arch_error_code_eq(x) (error_code() == (x))
+#endif /* !__arch_error_code_eq */
+#ifndef __arch_error_class_eq
+#define __arch_error_class_eq(x) (error_class() == (x))
+#endif /* !__arch_error_class_eq */
 #ifndef __PRIVATE_WAS_THROWN_PACKAGE_CODE1
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE1(code) \
-	((__builtin_constant_p(code) && (code) <= 0xffff) ? error_class() == (code) : error_code() == (code))
+	((__builtin_constant_p(code) && (code) <= 0xffff) ? __arch_error_class_eq(code) : __arch_error_code_eq(code))
 #endif /* !__PRIVATE_WAS_THROWN_PACKAGE_CODE1 */
 #ifndef __PRIVATE_WAS_THROWN_PACKAGE_CODE2
-#define __PRIVATE_WAS_THROWN_PACKAGE_CODE2(class, subclass) (error_code() == ERROR_CODE(class, subclass))
+#define __PRIVATE_WAS_THROWN_PACKAGE_CODE2(class, subclass) __arch_error_code_eq(ERROR_CODE(class, subclass))
 #endif /* !__PRIVATE_WAS_THROWN_PACKAGE_CODE2 */
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)              __PRIVATE_WAS_THROWN_PACKAGE_CODE##n
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN(n)               __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)
@@ -1185,10 +1233,35 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 #define EXCEPT   __EXCEPT
 #endif /* !EXCEPT */
 #endif /* __cplusplus */
-}
 
 
-%{
+#ifndef __INTELLISENSE__
+/* Use macros to directly invoke __arch_* variants (if they've been defined) */
+#ifdef __arch_error_data
+#define error_data() __arch_error_data()
+#endif /* __arch_error_data */
+#ifdef __arch_error_code
+#define error_code() __arch_error_code()
+#endif /* __arch_error_code */
+#ifdef __arch_error_active
+#define error_active() __arch_error_active()
+#endif /* __arch_error_active */
+#ifdef __arch_error_class
+#define error_class() __arch_error_class()
+#endif /* __arch_error_class */
+#ifdef __arch_error_subclass
+#define error_subclass() __arch_error_subclass()
+#endif /* __arch_error_subclass */
+#ifdef __arch_error_register_state
+#define error_register_state() __arch_error_register_state()
+#endif /* __arch_error_register_state */
+#ifdef __USE_KOS_KERNEL
+#ifdef __arch_error_info
+#define error_info() __arch_error_info()
+#endif /* __arch_error_info */
+#endif /* __USE_KOS_KERNEL */
+#endif /* !__INTELLISENSE__ */
+
 
 __SYSDECL_END
 }
