@@ -3779,8 +3779,9 @@ DEFINE_COMPAT_SYSCALL2(errno_t, statfs64,
 
 
 /* TODO: Missing system calls: */
-//#define __NR_utimensat                  320        /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
-//#define __NR_utimensat64                0x80000140 /* errno_t utimensat64(fd_t dirfd, char const *filename, [2-3]struct timespec64 const *times, atflag_t flags) */
+//#define __NR_utimensat        ... /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
+//#define __NR_utimensat64      ... /* errno_t utimensat64(fd_t dirfd, char const *filename, [2-3]struct timespec64 const *times, atflag_t flags) */
+//#define __NR_utimensat_time64 ... /* errno_t utimensat64(fd_t dirfd, char const *filename, [2-3]struct timespec64 const *times, atflag_t flags) */
 
 DECL_END
 

@@ -393,11 +393,21 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
 /*[[[body:libc_recvmmsg64]]]*/
 {
 	ssize_t error;
+#ifdef SYS_recvmmsg64
 	error = sys_recvmmsg64(sockfd,
 	                       vmessages,
 	                       (size_t)vlen,
 	                       (syscall_ulong_t)msg_flags,
 	                       tmo);
+#elif defined(SYS_recvmmsg_time64)
+	error = sys_recvmmsg_time64(sockfd,
+	                            vmessages,
+	                            (size_t)vlen,
+	                            (syscall_ulong_t)msg_flags,
+	                            tmo);
+#else /* ... */
+#error "No way to implement `recvmmsg64()'"
+#endif /* !... */
 	return (int)libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */

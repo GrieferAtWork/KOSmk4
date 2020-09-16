@@ -32,6 +32,7 @@
 
 #include <fcntl.h>
 #include <malloc.h>
+#include <syscall.h>
 #include <unistd.h>
 
 #include "../libc/uchar.h"
@@ -702,10 +703,19 @@ NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
 /*[[[body:libc_utimensat64]]]*/
 {
 	errno_t result;
+#ifdef SYS_utimensat64
 	result = sys_utimensat64(dirfd,
 	                         filename,
 	                         times,
 	                         flags);
+#elif defined(SYS_utimensat_time64)
+	result = sys_utimensat_time64(dirfd,
+	                              filename,
+	                              times,
+	                              flags);
+#else /* ... */
+#error "No way to implement `utimensat64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
@@ -736,10 +746,19 @@ NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
 /*[[[body:libc_futimens64]]]*/
 {
 	errno_t result;
+#ifdef SYS_utimensat64
 	result = sys_utimensat64(fd,
 	                         NULL,
 	                         times,
 	                         0);
+#elif defined(SYS_utimensat_time64)
+	result = sys_utimensat_time64(fd,
+	                              NULL,
+	                              times,
+	                              0);
+#else /* ... */
+#error "No way to implement `futimens64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */

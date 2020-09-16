@@ -92,7 +92,7 @@ sendmsg = sendmsgx32;
 recvmsg = recvmsgx32;
 sendmmsg = sendmmsgx32;
 recvmmsg = recvmmsgx32;
-recvmmsg64 = recvmmsgx32_64;
+recvmmsg_time64 = recvmmsgx32_64;
 sendfile = sendfile32;
 statfs = statfsx32;
 statfs64 = statfsx32_64;
@@ -140,26 +140,26 @@ utimes64 = utimesx32_64;
 futimesat = futimesatx32;
 futimesat64 = futimesatx32_64;
 sched_rr_get_interval = sched_rr_get_intervalx32;
-sched_rr_get_interval64 = sched_rr_get_intervalx32_64;
+sched_rr_get_interval_time64 = sched_rr_get_intervalx32_64;
 nanosleep = nanosleepx32;
 nanosleep64 = nanosleepx32_64;
 rt_sigtimedwait = rt_sigtimedwaitx32;
-rt_sigtimedwait64 = rt_sigtimedwaitx32_64;
+rt_sigtimedwait_time64 = rt_sigtimedwaitx32_64;
 futex = futexx32;
 clock_settime = clock_settimex32;
 clock_settime64 = clock_settimex32_64;
 clock_gettime = clock_gettimex32;
 clock_gettime64 = clock_gettimex32_64;
 clock_getres = clock_getresx32;
-clock_getres64 = clock_getresx32_64;
+clock_getres_time64 = clock_getresx32_64;
 clock_nanosleep = clock_nanosleepx32;
-clock_nanosleep64 = clock_nanosleepx32_64;
+clock_nanosleep_time64 = clock_nanosleepx32_64;
 pselect6 = pselect6_x32;
-pselect6_64 = pselect6_x32_64;
+pselect6_time64 = pselect6_x32_64;
 ppoll = ppollx32;
-ppoll64 = ppollx32_64;
+ppoll_time64 = ppollx32_64;
 utimensat = utimensatx32;
-utimensat64 = utimensatx32_64;
+utimensat_time64 = utimensatx32_64;
 rt_sigqueueinfo = rt_sigqueueinfox32;
 rt_tgsigqueueinfo = rt_tgsigqueueinfox32;
 raiseat = raiseatx32;
@@ -190,9 +190,9 @@ timer_settime64 = timer_settimex32_64;
 timer_gettime = timer_gettimex32;
 timer_gettime64 = timer_gettimex32_64;
 mq_timedsend = mq_timedsendx32;
-mq_timedsend64 = mq_timedsendx32_64;
+mq_timedsend_time64 = mq_timedsendx32_64;
 mq_timedreceive = mq_timedreceivex32;
-mq_timedreceive64 = mq_timedreceivex32_64;
+mq_timedreceive_time64 = mq_timedreceivex32_64;
 rt_sigreturn = sigreturn;
 
 /* Deal with the whole new-vs-old select issue. */
@@ -623,24 +623,24 @@ select64 = selectx32_64;
 //TODO:0x00000192:msgctl
 0x00000193:clock_gettime64
 0x00000194:clock_settime64
-//TODO:0x00000195:clock_adjtime64
-//TODO:0x00000196:clock_getres_time64
-//TODO:0x00000197:clock_nanosleep_time64
+0x00000195:clock_adjtime64
+0x00000196:clock_getres_time64
+0x00000197:clock_nanosleep_time64
 0x00000198:timer_gettime64
 0x00000199:timer_settime64
 0x0000019a:timerfd_gettime64
 0x0000019b:timerfd_settime64
-//TODO:0x0000019c:utimensat_time64
-//TODO:0x0000019d:pselect6_time64
-//TODO:0x0000019e:ppoll_time64
+0x0000019c:utimensat_time64
+0x0000019d:pselect6_time64
+0x0000019e:ppoll_time64
 //TODO:0x000001a0:io_pgetevents_time64
-//TODO:0x000001a1:recvmmsg_time64
-//TODO:0x000001a2:mq_timedsend_time64
-//TODO:0x000001a3:mq_timedreceive_time64
+0x000001a1:recvmmsg_time64
+0x000001a2:mq_timedsend_time64
+0x000001a3:mq_timedreceive_time64
 //TODO:0x000001a4:semtimedop_time64
-//TODO:0x000001a5:rt_sigtimedwait_time64
+0x000001a5:rt_sigtimedwait_time64
 //TODO:0x000001a6:futex_time64
-//TODO:0x000001a7:sched_rr_get_interval_time64
+0x000001a7:sched_rr_get_interval_time64
 //TODO:0x000001a8:pidfd_send_signal
 //TODO:0x000001a9:io_uring_setup
 //TODO:0x000001aa:io_uring_enter
@@ -705,9 +705,25 @@ select64 = selectx32_64;
 -0x00000092:writevf
 -0x00000095:ksysctl
 -0x0000009e:rpc_service
--0x000000a1:sched_rr_get_interval64
+/*x0000009f:...*/
+/*x000000a0:...*/
+/*x000000a1:...*/
 -0x000000a2:nanosleep64
--0x000000b1:rt_sigtimedwait64
+/*x000000a3:...*/
+/*x000000a4:...*/
+/*x000000a5:...*/
+/*x000000a6:...*/
+/*x000000a7:...*/
+/*x000000a8:...*/
+/*x000000a9:...*/
+/*x000000aa:...*/
+/*x000000ab:...*/
+/*x000000ac:...*/
+/*x000000ad:...*/
+/*x000000ae:...*/
+/*x000000af:...*/
+/*x000000b0:...*/
+/*x000000b1:...*/
 -0x000000b4:pread64f
 -0x000000b5:pwrite64f
 -0x000000c3:kstat
@@ -718,25 +734,64 @@ select64 = selectx32_64;
 /*x00000105:...*/
 /*x00000108:...*/
 /*x00000109:...*/
--0x0000010a:clock_getres64
--0x0000010b:clock_nanosleep64
+/*x0000010a:...*/
+/*x0000010b:...*/
 -0x0000010f:utimes64
+/*x00000110:...*/
+/*x00000111:...*/
+/*x00000112:...*/
+/*x00000113:...*/
+/*x00000114:...*/
+/*x00000115:...*/
+/*x00000116:...*/
+/*x00000117:...*/
+/*x00000118:...*/
+/*x00000119:...*/
+/*x0000011a:...*/
+/*x0000011b:...*/
 -0x0000011c:waitid64
--0x00000117:mq_timedsend64
--0x00000118:mq_timedreceive64
+/*x0000011d:...*/
+/*x0000011e:...*/
+/*x0000011f:...*/
+/*x00000120:...*/
+/*x00000121:...*/
+/*x00000122:...*/
+/*x00000123:...*/
+/*x00000124:...*/
+/*x00000125:...*/
+/*x00000126:...*/
+/*x00000127:...*/
 -0x00000128:fmkdirat
 -0x00000129:fmknodat
+/*x0000012a:...*/
 -0x0000012b:futimesat64
 -0x0000012c:kfstatat
+/*x0000012d:...*/
 -0x0000012e:frenameat
+/*x0000012f:...*/
 -0x00000130:fsymlinkat
 -0x00000131:freadlinkat
--0x00000134:pselect6_64
--0x00000135:ppoll64
--0x00000140:utimensat64
+/*x00000132:...*/
+/*x00000133:...*/
+/*x00000134:...*/
+/*x00000135:...*/
+/*x00000136:...*/
+/*x00000137:...*/
+/*x00000138:...*/
+/*x00000139:...*/
+/*x00000140:...*/
+/*x00000141:...*/
+/*x00000142:...*/
+/*x00000143:...*/
 -0x00000144:fallocate64
 /*x00000145:...*/
 /*x00000146:...*/
+/*x00000147:...*/
+/*x00000148:...*/
+/*x00000149:...*/
+/*x0000014a:...*/
+/*x0000014b:...*/
+/*x0000014c:...*/
 -0x0000014d:preadvf
 -0x0000014e:pwritevf
--0x00000151:recvmmsg64
+/*x0000014f:...*/

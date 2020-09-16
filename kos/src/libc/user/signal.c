@@ -32,6 +32,7 @@
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
+#include <syscall.h>
 #include <unistd.h>
 
 #include "../libc/compat.h"
@@ -426,10 +427,19 @@ NOTHROW_RPC(LIBCCALL libc_sigtimedwait64)(sigset_t const *__restrict set,
 /*[[[body:libc_sigtimedwait64]]]*/
 {
 	errno_t result;
+#ifdef SYS_rt_sigtimedwait64
 	result = sys_rt_sigtimedwait64(set,
 	                               info,
 	                               timeout,
 	                               sizeof(sigset_t));
+#elif defined(SYS_rt_sigtimedwait_time64)
+	result = sys_rt_sigtimedwait_time64(set,
+	                                    info,
+	                                    timeout,
+	                                    sizeof(sigset_t));
+#else /* ... */
+#error "No way to implement `sigtimedwait64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */

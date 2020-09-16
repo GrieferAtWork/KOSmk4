@@ -21,9 +21,13 @@
 #define GUARD_LIBC_USER_SYS_POLL_C 1
 
 #include "../api.h"
-#include "sys.poll.h"
+/**/
 
 #include <kos/syscalls.h>
+
+#include <syscall.h>
+
+#include "sys.poll.h"
 
 DECL_BEGIN
 
@@ -76,7 +80,13 @@ NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
 /*[[[body:libc_ppoll64]]]*/
 {
 	syscall_slong_t result;
+#ifdef SYS_ppoll64
 	result = sys_ppoll64(fds, (size_t)nfds, timeout, ss, sizeof(sigset_t));
+#elif defined(SYS_ppoll_time64)
+	result = sys_ppoll_time64(fds, (size_t)nfds, timeout, ss, sizeof(sigset_t));
+#else /* ... */
+#error "No way to implement `ppoll64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */

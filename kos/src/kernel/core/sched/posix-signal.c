@@ -2361,12 +2361,14 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 
 
 /************************************************************************/
-/* rt_sigtimedwait(), rt_sigtimedwait64()                               */
+/* rt_sigtimedwait(), rt_sigtimedwait_time64()                          */
 /************************************************************************/
-#if (defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT) ||        \
-     defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64) ||      \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64))
+#if (defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT) ||          \
+     defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64) ||        \
+     defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT_TIME64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT_TIME64))
 #define WANT_SIGTIMEDWAIT 1
 #endif /* ... */
 
@@ -2546,12 +2548,22 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 }
 #endif /* __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT */
 
+#if (defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64) || \
+     defined(__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64
 DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
                 UNCHECKED USER sigset_t const *, uthese,
                 UNCHECKED USER siginfo_t *, uinfo,
                 UNCHECKED USER struct timespec64 const *, uts,
-                size_t, sigsetsize) {
+                size_t, sigsetsize)
+#else /* __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 */
+DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
+                UNCHECKED USER sigset_t const *, uthese,
+                UNCHECKED USER siginfo_t *, uinfo,
+                UNCHECKED USER struct timespec64 const *, uts,
+                size_t, sigsetsize)
+#endif /* !__ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 */
+{
 	syscall_slong_t result;
 	/* Validate user-structure pointers. */
 	validate_readable(uthese, sigsetsize);
@@ -2573,7 +2585,7 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
 	return result;
 }
-#endif /* __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 */
+#endif /* __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT64 || __ARCH_WANT_SYSCALL_RT_SIGTIMEDWAIT_TIME64 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT
 DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
@@ -2606,12 +2618,22 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT */
 
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64
 DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
                        UNCHECKED USER compat_sigset_t const *, uthese,
                        UNCHECKED USER compat_siginfo_t *, uinfo,
                        UNCHECKED USER struct compat_timespec64 const *, uts,
-                       size_t, sigsetsize) {
+                       size_t, sigsetsize)
+#else /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
+DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
+                       UNCHECKED USER compat_sigset_t const *, uthese,
+                       UNCHECKED USER compat_siginfo_t *, uinfo,
+                       UNCHECKED USER struct compat_timespec64 const *, uts,
+                       size_t, sigsetsize)
+#endif /* !__ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
+{
 	syscall_slong_t result;
 	siginfo_t info;
 	/* Validate user-structure pointers. */
@@ -2635,7 +2657,7 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
 	return result;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT64 || __ARCH_WANT_COMPAT_SYSCALL_RT_SIGTIMEDWAIT_TIME64 */
 
 
 

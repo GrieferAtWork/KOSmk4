@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1353af70 */
+/* HASH CRC-32:0xb9abe8be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,12 +245,15 @@ __CDECLARE_SC(,__errno_t,chroot,(char const *__path),(__path))
 #if __CRT_HAVE_SC(clock_adjtime)
 __CDECLARE_SC(,__errno_t,clock_adjtime,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(clock_adjtime) */
+#if __CRT_HAVE_SC(clock_adjtime64)
+__CDECLARE_SC(,__errno_t,clock_adjtime64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(clock_adjtime64) */
 #if __CRT_HAVE_SC(clock_getres)
 __CDECLARE_SC(,__errno_t,clock_getres,(__clockid_t __clock_id, struct __timespecx32 *__res),(__clock_id,__res))
 #endif /* __CRT_HAVE_SC(clock_getres) */
-#if __CRT_HAVE_SC(clock_getres64)
-__CDECLARE_SC(,__errno_t,clock_getres64,(__clockid_t __clock_id, struct __timespecx32_64 *__res),(__clock_id,__res))
-#endif /* __CRT_HAVE_SC(clock_getres64) */
+#if __CRT_HAVE_SC(clock_getres_time64)
+__CDECLARE_SC(,__errno_t,clock_getres_time64,(__clockid_t __clock_id, struct __timespecx32_64 *__res),(__clock_id,__res))
+#endif /* __CRT_HAVE_SC(clock_getres_time64) */
 #if __CRT_HAVE_SC(clock_gettime)
 __CDECLARE_SC(,__errno_t,clock_gettime,(__clockid_t __clock_id, struct __timespecx32 *__tp),(__clock_id,__tp))
 #endif /* __CRT_HAVE_SC(clock_gettime) */
@@ -260,9 +263,9 @@ __CDECLARE_SC(,__errno_t,clock_gettime64,(__clockid_t __clock_id, struct __times
 #if __CRT_HAVE_SC(clock_nanosleep)
 __CDECLARE_SC(,__errno_t,clock_nanosleep,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct __timespecx32 const *__requested_time, struct __timespecx32 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
 #endif /* __CRT_HAVE_SC(clock_nanosleep) */
-#if __CRT_HAVE_SC(clock_nanosleep64)
-__CDECLARE_SC(,__errno_t,clock_nanosleep64,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct __timespecx32_64 const *__requested_time, struct __timespecx32_64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
-#endif /* __CRT_HAVE_SC(clock_nanosleep64) */
+#if __CRT_HAVE_SC(clock_nanosleep_time64)
+__CDECLARE_SC(,__errno_t,clock_nanosleep_time64,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct __timespecx32_64 const *__requested_time, struct __timespecx32_64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
+#endif /* __CRT_HAVE_SC(clock_nanosleep_time64) */
 #if __CRT_HAVE_SC(clock_settime)
 __CDECLARE_SC(,__errno_t,clock_settime,(__clockid_t __clock_id, struct __timespecx32 const *__tp),(__clock_id,__tp))
 #endif /* __CRT_HAVE_SC(clock_settime) */
@@ -1197,15 +1200,15 @@ __CDECLARE_SC(,__fd_t,mq_open,(char const *__name, __oflag_t __oflags, __mode_t 
 #if __CRT_HAVE_SC(mq_timedreceive)
 __CDECLARE_SC(,__ssize_t,mq_timedreceive,(__fd_t __mqdes, char *__msg_ptr, __size_t __msg_len, __uint32_t *__pmsg_prio, struct __timespecx32 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #endif /* __CRT_HAVE_SC(mq_timedreceive) */
-#if __CRT_HAVE_SC(mq_timedreceive64)
-__CDECLARE_SC(,__ssize_t,mq_timedreceive64,(__fd_t __mqdes, char *__msg_ptr, __size_t __msg_len, __uint32_t *__pmsg_prio, struct __timespecx32_64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
-#endif /* __CRT_HAVE_SC(mq_timedreceive64) */
+#if __CRT_HAVE_SC(mq_timedreceive_time64)
+__CDECLARE_SC(,__ssize_t,mq_timedreceive_time64,(__fd_t __mqdes, char *__msg_ptr, __size_t __msg_len, __uint32_t *__pmsg_prio, struct __timespecx32_64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+#endif /* __CRT_HAVE_SC(mq_timedreceive_time64) */
 #if __CRT_HAVE_SC(mq_timedsend)
 __CDECLARE_SC(,__errno_t,mq_timedsend,(__fd_t __mqdes, char const *__msg_ptr, __size_t __msg_len, __uint32_t __msg_prio, struct __timespecx32 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #endif /* __CRT_HAVE_SC(mq_timedsend) */
-#if __CRT_HAVE_SC(mq_timedsend64)
-__CDECLARE_SC(,__errno_t,mq_timedsend64,(__fd_t __mqdes, char const *__msg_ptr, __size_t __msg_len, __uint32_t __msg_prio, struct __timespecx32_64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
-#endif /* __CRT_HAVE_SC(mq_timedsend64) */
+#if __CRT_HAVE_SC(mq_timedsend_time64)
+__CDECLARE_SC(,__errno_t,mq_timedsend_time64,(__fd_t __mqdes, char const *__msg_ptr, __size_t __msg_len, __uint32_t __msg_prio, struct __timespecx32_64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+#endif /* __CRT_HAVE_SC(mq_timedsend_time64) */
 #if __CRT_HAVE_SC(mq_unlink)
 __CDECLARE_SC(,__errno_t,mq_unlink,(char const *__name),(__name))
 #endif /* __CRT_HAVE_SC(mq_unlink) */
@@ -1320,9 +1323,9 @@ __CDECLARE_SC(,__ssize_t,poll,(struct pollfd *__fds, __size_t __nfds, __syscall_
 #if __CRT_HAVE_SC(ppoll)
 __CDECLARE_SC(,__ssize_t,ppoll,(struct pollfd *__fds, __size_t __nfds, struct __timespecx32 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
 #endif /* __CRT_HAVE_SC(ppoll) */
-#if __CRT_HAVE_SC(ppoll64)
-__CDECLARE_SC(,__ssize_t,ppoll64,(struct pollfd *__fds, __size_t __nfds, struct __timespecx32_64 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
-#endif /* __CRT_HAVE_SC(ppoll64) */
+#if __CRT_HAVE_SC(ppoll_time64)
+__CDECLARE_SC(,__ssize_t,ppoll_time64,(struct pollfd *__fds, __size_t __nfds, struct __timespecx32_64 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
+#endif /* __CRT_HAVE_SC(ppoll_time64) */
 #if __CRT_HAVE_SC(prctl)
 __CDECLARE_SC(,__errno_t,prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(prctl) */
@@ -1369,9 +1372,9 @@ __CDECLARE_SC(,__errno_t,profil,(__uint16_t *__sample_buffer, __size_t __size, _
 #if __CRT_HAVE_SC(pselect6)
 __CDECLARE_SC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
 #endif /* __CRT_HAVE_SC(pselect6) */
-#if __CRT_HAVE_SC(pselect6_64)
-__CDECLARE_SC(,__ssize_t,pselect6_64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32_64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
-#endif /* __CRT_HAVE_SC(pselect6_64) */
+#if __CRT_HAVE_SC(pselect6_time64)
+__CDECLARE_SC(,__ssize_t,pselect6_time64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32_64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+#endif /* __CRT_HAVE_SC(pselect6_time64) */
 #if __CRT_HAVE_SC(ptrace)
 __CDECLARE_SC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __pid, void *__addr, void *__data),(__request,__pid,__addr,__data))
 #endif /* __CRT_HAVE_SC(ptrace) */
@@ -1502,7 +1505,7 @@ __CDECLARE_SC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufs
  * @return: * : The # of datagrams successfully received. */
 __CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespecx32 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_SC(recvmmsg) */
-#if __CRT_HAVE_SC(recvmmsg64)
+#if __CRT_HAVE_SC(recvmmsg_time64)
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -1511,8 +1514,8 @@ __CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmess
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-__CDECLARE_SC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespecx32_64 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
-#endif /* __CRT_HAVE_SC(recvmmsg64) */
+__CDECLARE_SC(,__ssize_t,recvmmsg_time64,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespecx32_64 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+#endif /* __CRT_HAVE_SC(recvmmsg_time64) */
 #if __CRT_HAVE_SC(recvmsg)
 /* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
  * data as well as for data buffers to be represented by an IOV vector.
@@ -1592,9 +1595,9 @@ __CDECLARE_SC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __s
 #if __CRT_HAVE_SC(rt_sigtimedwait)
 __CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigtimedwait) */
-#if __CRT_HAVE_SC(rt_sigtimedwait64)
-__CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait64,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32_64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
-#endif /* __CRT_HAVE_SC(rt_sigtimedwait64) */
+#if __CRT_HAVE_SC(rt_sigtimedwait_time64)
+__CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait_time64,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32_64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
+#endif /* __CRT_HAVE_SC(rt_sigtimedwait_time64) */
 #if __CRT_HAVE_SC(rt_tgsigqueueinfo)
 __CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_tgsigqueueinfo) */
@@ -1662,9 +1665,9 @@ __CDECLARE_SC(,__syscall_slong_t,sched_getscheduler,(__pid_t __pid),(__pid))
 #if __CRT_HAVE_SC(sched_rr_get_interval)
 __CDECLARE_SC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct __timespecx32 *__tms),(__pid,__tms))
 #endif /* __CRT_HAVE_SC(sched_rr_get_interval) */
-#if __CRT_HAVE_SC(sched_rr_get_interval64)
-__CDECLARE_SC(,__errno_t,sched_rr_get_interval64,(__pid_t __pid, struct __timespecx32_64 *__tms),(__pid,__tms))
-#endif /* __CRT_HAVE_SC(sched_rr_get_interval64) */
+#if __CRT_HAVE_SC(sched_rr_get_interval_time64)
+__CDECLARE_SC(,__errno_t,sched_rr_get_interval_time64,(__pid_t __pid, struct __timespecx32_64 *__tms),(__pid,__tms))
+#endif /* __CRT_HAVE_SC(sched_rr_get_interval_time64) */
 #if __CRT_HAVE_SC(sched_setaffinity)
 __CDECLARE_SC(,__errno_t,sched_setaffinity,(__pid_t __pid, __size_t __cpusetsize, struct __cpu_set_struct const *__cpuset),(__pid,__cpusetsize,__cpuset))
 #endif /* __CRT_HAVE_SC(sched_setaffinity) */
@@ -2144,10 +2147,10 @@ __CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct __utimbufx32_64
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct __timespecx32 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_SC(utimensat) */
-#if __CRT_HAVE_SC(utimensat64)
+#if __CRT_HAVE_SC(utimensat_time64)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-__CDECLARE_SC(,__errno_t,utimensat64,(__fd_t __dirfd, char const *__filename, struct __timespecx32_64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
-#endif /* __CRT_HAVE_SC(utimensat64) */
+__CDECLARE_SC(,__errno_t,utimensat_time64,(__fd_t __dirfd, char const *__filename, struct __timespecx32_64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+#endif /* __CRT_HAVE_SC(utimensat_time64) */
 #if __CRT_HAVE_SC(utimes)
 __CDECLARE_SC(,__errno_t,utimes,(char const *__filename, struct __timevalx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utimes) */
@@ -2358,12 +2361,15 @@ __CDECLARE_XSC(,__errno_t,chroot,(char const *__path),(__path))
 #if __CRT_HAVE_XSC(clock_adjtime)
 __CDECLARE_XSC(,__errno_t,clock_adjtime,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(clock_adjtime) */
+#if __CRT_HAVE_XSC(clock_adjtime64)
+__CDECLARE_XSC(,__errno_t,clock_adjtime64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(clock_adjtime64) */
 #if __CRT_HAVE_XSC(clock_getres)
 __CDECLARE_XSC(,__errno_t,clock_getres,(__clockid_t __clock_id, struct __timespecx32 *__res),(__clock_id,__res))
 #endif /* __CRT_HAVE_XSC(clock_getres) */
-#if __CRT_HAVE_XSC(clock_getres64)
-__CDECLARE_XSC(,__errno_t,clock_getres64,(__clockid_t __clock_id, struct __timespecx32_64 *__res),(__clock_id,__res))
-#endif /* __CRT_HAVE_XSC(clock_getres64) */
+#if __CRT_HAVE_XSC(clock_getres_time64)
+__CDECLARE_XSC(,__errno_t,clock_getres_time64,(__clockid_t __clock_id, struct __timespecx32_64 *__res),(__clock_id,__res))
+#endif /* __CRT_HAVE_XSC(clock_getres_time64) */
 #if __CRT_HAVE_XSC(clock_gettime)
 __CDECLARE_XSC(,__errno_t,clock_gettime,(__clockid_t __clock_id, struct __timespecx32 *__tp),(__clock_id,__tp))
 #endif /* __CRT_HAVE_XSC(clock_gettime) */
@@ -2373,9 +2379,9 @@ __CDECLARE_XSC(,__errno_t,clock_gettime64,(__clockid_t __clock_id, struct __time
 #if __CRT_HAVE_XSC(clock_nanosleep)
 __CDECLARE_XSC(,__errno_t,clock_nanosleep,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct __timespecx32 const *__requested_time, struct __timespecx32 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
 #endif /* __CRT_HAVE_XSC(clock_nanosleep) */
-#if __CRT_HAVE_XSC(clock_nanosleep64)
-__CDECLARE_XSC(,__errno_t,clock_nanosleep64,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct __timespecx32_64 const *__requested_time, struct __timespecx32_64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
-#endif /* __CRT_HAVE_XSC(clock_nanosleep64) */
+#if __CRT_HAVE_XSC(clock_nanosleep_time64)
+__CDECLARE_XSC(,__errno_t,clock_nanosleep_time64,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct __timespecx32_64 const *__requested_time, struct __timespecx32_64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
+#endif /* __CRT_HAVE_XSC(clock_nanosleep_time64) */
 #if __CRT_HAVE_XSC(clock_settime)
 __CDECLARE_XSC(,__errno_t,clock_settime,(__clockid_t __clock_id, struct __timespecx32 const *__tp),(__clock_id,__tp))
 #endif /* __CRT_HAVE_XSC(clock_settime) */
@@ -3310,15 +3316,15 @@ __CDECLARE_XSC(,__fd_t,mq_open,(char const *__name, __oflag_t __oflags, __mode_t
 #if __CRT_HAVE_XSC(mq_timedreceive)
 __CDECLARE_XSC(,__ssize_t,mq_timedreceive,(__fd_t __mqdes, char *__msg_ptr, __size_t __msg_len, __uint32_t *__pmsg_prio, struct __timespecx32 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
 #endif /* __CRT_HAVE_XSC(mq_timedreceive) */
-#if __CRT_HAVE_XSC(mq_timedreceive64)
-__CDECLARE_XSC(,__ssize_t,mq_timedreceive64,(__fd_t __mqdes, char *__msg_ptr, __size_t __msg_len, __uint32_t *__pmsg_prio, struct __timespecx32_64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
-#endif /* __CRT_HAVE_XSC(mq_timedreceive64) */
+#if __CRT_HAVE_XSC(mq_timedreceive_time64)
+__CDECLARE_XSC(,__ssize_t,mq_timedreceive_time64,(__fd_t __mqdes, char *__msg_ptr, __size_t __msg_len, __uint32_t *__pmsg_prio, struct __timespecx32_64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__pmsg_prio,__abs_timeout))
+#endif /* __CRT_HAVE_XSC(mq_timedreceive_time64) */
 #if __CRT_HAVE_XSC(mq_timedsend)
 __CDECLARE_XSC(,__errno_t,mq_timedsend,(__fd_t __mqdes, char const *__msg_ptr, __size_t __msg_len, __uint32_t __msg_prio, struct __timespecx32 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
 #endif /* __CRT_HAVE_XSC(mq_timedsend) */
-#if __CRT_HAVE_XSC(mq_timedsend64)
-__CDECLARE_XSC(,__errno_t,mq_timedsend64,(__fd_t __mqdes, char const *__msg_ptr, __size_t __msg_len, __uint32_t __msg_prio, struct __timespecx32_64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
-#endif /* __CRT_HAVE_XSC(mq_timedsend64) */
+#if __CRT_HAVE_XSC(mq_timedsend_time64)
+__CDECLARE_XSC(,__errno_t,mq_timedsend_time64,(__fd_t __mqdes, char const *__msg_ptr, __size_t __msg_len, __uint32_t __msg_prio, struct __timespecx32_64 const *__abs_timeout),(__mqdes,__msg_ptr,__msg_len,__msg_prio,__abs_timeout))
+#endif /* __CRT_HAVE_XSC(mq_timedsend_time64) */
 #if __CRT_HAVE_XSC(mq_unlink)
 __CDECLARE_XSC(,__errno_t,mq_unlink,(char const *__name),(__name))
 #endif /* __CRT_HAVE_XSC(mq_unlink) */
@@ -3433,9 +3439,9 @@ __CDECLARE_XSC(,__ssize_t,poll,(struct pollfd *__fds, __size_t __nfds, __syscall
 #if __CRT_HAVE_XSC(ppoll)
 __CDECLARE_XSC(,__ssize_t,ppoll,(struct pollfd *__fds, __size_t __nfds, struct __timespecx32 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(ppoll) */
-#if __CRT_HAVE_XSC(ppoll64)
-__CDECLARE_XSC(,__ssize_t,ppoll64,(struct pollfd *__fds, __size_t __nfds, struct __timespecx32_64 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
-#endif /* __CRT_HAVE_XSC(ppoll64) */
+#if __CRT_HAVE_XSC(ppoll_time64)
+__CDECLARE_XSC(,__ssize_t,ppoll_time64,(struct pollfd *__fds, __size_t __nfds, struct __timespecx32_64 const *__timeout_ts, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fds,__nfds,__timeout_ts,__sigmask,__sigsetsize))
+#endif /* __CRT_HAVE_XSC(ppoll_time64) */
 #if __CRT_HAVE_XSC(prctl)
 __CDECLARE_XSC(,__errno_t,prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(prctl) */
@@ -3482,9 +3488,9 @@ __CDECLARE_XSC(,__errno_t,profil,(__uint16_t *__sample_buffer, __size_t __size, 
 #if __CRT_HAVE_XSC(pselect6)
 __CDECLARE_XSC(,__ssize_t,pselect6,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
 #endif /* __CRT_HAVE_XSC(pselect6) */
-#if __CRT_HAVE_XSC(pselect6_64)
-__CDECLARE_XSC(,__ssize_t,pselect6_64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32_64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
-#endif /* __CRT_HAVE_XSC(pselect6_64) */
+#if __CRT_HAVE_XSC(pselect6_time64)
+__CDECLARE_XSC(,__ssize_t,pselect6_time64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timespecx32_64 const *__timeout, void const *__sigmask_sigset_and_len),(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask_sigset_and_len))
+#endif /* __CRT_HAVE_XSC(pselect6_time64) */
 #if __CRT_HAVE_XSC(ptrace)
 __CDECLARE_XSC(,__syscall_slong_t,ptrace,(__syscall_ulong_t __request, __pid_t __pid, void *__addr, void *__data),(__request,__pid,__addr,__data))
 #endif /* __CRT_HAVE_XSC(ptrace) */
@@ -3615,7 +3621,7 @@ __CDECLARE_XSC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __buf
  * @return: * : The # of datagrams successfully received. */
 __CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespecx32 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_XSC(recvmmsg) */
-#if __CRT_HAVE_XSC(recvmmsg64)
+#if __CRT_HAVE_XSC(recvmmsg_time64)
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -3624,8 +3630,8 @@ __CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct __mmsghdrx32 *__vmes
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-__CDECLARE_XSC(,__ssize_t,recvmmsg64,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespecx32_64 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
-#endif /* __CRT_HAVE_XSC(recvmmsg64) */
+__CDECLARE_XSC(,__ssize_t,recvmmsg_time64,(__fd_t __sockfd, struct __mmsghdrx32 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespecx32_64 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+#endif /* __CRT_HAVE_XSC(recvmmsg_time64) */
 #if __CRT_HAVE_XSC(recvmsg)
 /* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
  * data as well as for data buffers to be represented by an IOV vector.
@@ -3696,9 +3702,9 @@ __CDECLARE_XSC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __
 #if __CRT_HAVE_XSC(rt_sigtimedwait)
 __CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigtimedwait) */
-#if __CRT_HAVE_XSC(rt_sigtimedwait64)
-__CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait64,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32_64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
-#endif /* __CRT_HAVE_XSC(rt_sigtimedwait64) */
+#if __CRT_HAVE_XSC(rt_sigtimedwait_time64)
+__CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait_time64,(struct __sigset_struct const *__set, struct __siginfox32_struct *__info, struct __timespecx32_64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
+#endif /* __CRT_HAVE_XSC(rt_sigtimedwait_time64) */
 #if __CRT_HAVE_XSC(rt_tgsigqueueinfo)
 __CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, struct __siginfox32_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_tgsigqueueinfo) */
@@ -3766,9 +3772,9 @@ __CDECLARE_XSC(,__syscall_slong_t,sched_getscheduler,(__pid_t __pid),(__pid))
 #if __CRT_HAVE_XSC(sched_rr_get_interval)
 __CDECLARE_XSC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct __timespecx32 *__tms),(__pid,__tms))
 #endif /* __CRT_HAVE_XSC(sched_rr_get_interval) */
-#if __CRT_HAVE_XSC(sched_rr_get_interval64)
-__CDECLARE_XSC(,__errno_t,sched_rr_get_interval64,(__pid_t __pid, struct __timespecx32_64 *__tms),(__pid,__tms))
-#endif /* __CRT_HAVE_XSC(sched_rr_get_interval64) */
+#if __CRT_HAVE_XSC(sched_rr_get_interval_time64)
+__CDECLARE_XSC(,__errno_t,sched_rr_get_interval_time64,(__pid_t __pid, struct __timespecx32_64 *__tms),(__pid,__tms))
+#endif /* __CRT_HAVE_XSC(sched_rr_get_interval_time64) */
 #if __CRT_HAVE_XSC(sched_setaffinity)
 __CDECLARE_XSC(,__errno_t,sched_setaffinity,(__pid_t __pid, __size_t __cpusetsize, struct __cpu_set_struct const *__cpuset),(__pid,__cpusetsize,__cpuset))
 #endif /* __CRT_HAVE_XSC(sched_setaffinity) */
@@ -4239,10 +4245,10 @@ __CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct __utimbufx32_6
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, struct __timespecx32 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_XSC(utimensat) */
-#if __CRT_HAVE_XSC(utimensat64)
+#if __CRT_HAVE_XSC(utimensat_time64)
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-__CDECLARE_XSC(,__errno_t,utimensat64,(__fd_t __dirfd, char const *__filename, struct __timespecx32_64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
-#endif /* __CRT_HAVE_XSC(utimensat64) */
+__CDECLARE_XSC(,__errno_t,utimensat_time64,(__fd_t __dirfd, char const *__filename, struct __timespecx32_64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
+#endif /* __CRT_HAVE_XSC(utimensat_time64) */
 #if __CRT_HAVE_XSC(utimes)
 __CDECLARE_XSC(,__errno_t,utimes,(char const *__filename, struct __timevalx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utimes) */

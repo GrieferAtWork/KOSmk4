@@ -28,6 +28,8 @@
 #include <syscall.h>
 
 #include "time.h"
+
+/**/
 #include "../libc/globals.h"
 
 DECL_BEGIN
@@ -372,7 +374,13 @@ NOTHROW_NCX(LIBCCALL libc_clock_getres64)(clockid_t clock_id,
 /*[[[body:libc_clock_getres64]]]*/
 {
 	errno_t error;
+#ifdef SYS_clock_getres64
 	error = sys_clock_getres64(clock_id, res);
+#elif defined(SYS_clock_getres_time64)
+	error = sys_clock_getres_time64(clock_id, res);
+#else /* ... */
+#error "No way to implement `clock_getres64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
@@ -408,9 +416,17 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id,
 /*[[[body:libc_clock_nanosleep64]]]*/
 {
 	errno_t error;
+#ifdef SYS_clock_nanosleep64
 	error = sys_clock_nanosleep64(clock_id,
 	                              (syscall_ulong_t)(unsigned int)flags,
 	                              requested_time, remaining);
+#elif defined(SYS_clock_nanosleep_time64)
+	error = sys_clock_nanosleep_time64(clock_id,
+                                       (syscall_ulong_t)(unsigned int)flags,
+                                       requested_time, remaining);
+#else /* ... */
+#error "No way to implement `clock_nanosleep64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */

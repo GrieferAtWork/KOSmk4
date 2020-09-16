@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7833fe3b */
+/* HASH CRC-32:0x6d5252eb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24559,6 +24559,417 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+.section .text.x86.asm32_syscall_int80.clock_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x193
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_clock_gettime64)
+	call   sys32_clock_gettime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_clock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+.section .text.x86.asm32_syscall_int80.clock_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x194
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_clock_settime64)
+	call   sys32_clock_settime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_clock_settime64)
+
+/* errno_t clock_adjtime64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.clock_adjtime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_adjtime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x195
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_clock_adjtime64)
+	call   sys32_clock_adjtime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_clock_adjtime64)
+
+/* errno_t clock_getres_time64(clockid_t clock_id, struct timespecx32_64 *res) */
+.section .text.x86.asm32_syscall_int80.clock_getres_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x196
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_clock_getres_time64)
+	call   sys32_clock_getres_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_clock_getres_time64)
+
+/* errno_t clock_nanosleep_time64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
+.section .text.x86.asm32_syscall_int80.clock_nanosleep_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x197
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_clock_nanosleep_time64)
+	call   sys32_clock_nanosleep_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_clock_nanosleep_time64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+.section .text.x86.asm32_syscall_int80.timer_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x198
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_timer_gettime64)
+	call   sys32_timer_gettime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_timer_gettime64)
+
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+.section .text.x86.asm32_syscall_int80.timer_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x199
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_timer_settime64)
+	call   sys32_timer_settime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_timer_settime64)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_int80.timerfd_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x19a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_timerfd_gettime64)
+	call   sys32_timerfd_gettime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_timerfd_gettime64)
+
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_int80.timerfd_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x19b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_timerfd_settime64)
+	call   sys32_timerfd_settime64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_timerfd_settime64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.utimensat_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x19c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_utimensat_time64)
+	call   sys32_utimensat_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_utimensat_time64)
+
+/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.x86.asm32_syscall_int80.pselect6_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x19d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pselect6_time64)
+	call   sys32_pselect6_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_pselect6_time64)
+
+/* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_int80.ppoll_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x19e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_ppoll_time64)
+	call   sys32_ppoll_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_ppoll_time64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -24567,12 +24978,12 @@ END(__x86_asm32_int80_mlock2)
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
-.section .text.x86.asm32_syscall_int80.recvmmsg64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
+/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
+.section .text.x86.asm32_syscall_int80.recvmmsg_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffeaf
+	.cfi_lsda 0, 0x1a1
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -24589,8 +25000,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	movslq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_recvmmsg64)
-	call   sys32_recvmmsg64
+	EXTERN(sys32_recvmmsg_time64)
+	call   sys32_recvmmsg_time64
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -24601,7 +25012,146 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_recvmmsg64)
 	popq_cfi_r %rcx
 	intr_exit
 	.cfi_endproc
-END(__x86_asm32_int80_recvmmsg64)
+END(__x86_asm32_int80_recvmmsg_time64)
+
+/* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_int80.mq_timedsend_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedsend_time64)
+	call   sys32_mq_timedsend_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_mq_timedsend_time64)
+
+/* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_int80.mq_timedreceive_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedreceive_time64)
+	call   sys32_mq_timedreceive_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_mq_timedreceive_time64)
+
+/* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_int80.rt_sigtimedwait_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	EXTERN(sys32_rt_sigtimedwait_time64)
+	call   sys32_rt_sigtimedwait_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_rt_sigtimedwait_time64)
+
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+.section .text.x86.asm32_syscall_int80.sched_rr_get_interval_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	EXTERN(sys32_sched_rr_get_interval_time64)
+	call   sys32_sched_rr_get_interval_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_sched_rr_get_interval_time64)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -24687,78 +25237,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	.cfi_endproc
 END(__x86_asm32_int80_preadvf)
 
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_int80.timerfd_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffeba
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_timerfd_gettime64)
-	call   sys32_timerfd_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_timerfd_gettime64)
-
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_int80.timerfd_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffebb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_timerfd_settime64)
-	call   sys32_timerfd_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_timerfd_settime64)
-
 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 .section .text.x86.asm32_syscall_int80.fallocate64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
@@ -24799,115 +25277,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fallocate64)
 	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_fallocate64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.utimensat64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimensat64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffec0
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_utimensat64)
-	call   sys32_utimensat64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_utimensat64)
-
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_int80.ppoll64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffecb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_ppoll64)
-	call   sys32_ppoll64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_ppoll64)
-
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
-.section .text.x86.asm32_syscall_int80.pselect6_64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_pselect6_64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffecc
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %ebp, %r9 /* ARG5 = REG5 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_pselect6_64)
-	call   sys32_pselect6_64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_pselect6_64)
 
 /* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
 /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
@@ -25200,78 +25569,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	.cfi_endproc
 END(__x86_asm32_int80_waitid64)
 
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_int80.mq_timedreceive64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffee8
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_mq_timedreceive64)
-	call   sys32_mq_timedreceive64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_mq_timedreceive64)
-
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_int80.mq_timedsend64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedsend64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffee9
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %edi, %r8 /* ARG4 = REG4 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_mq_timedsend64)
-	call   sys32_mq_timedsend64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_mq_timedsend64)
-
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_int80.utimes64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
@@ -25303,205 +25600,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_utimes64)
-
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
-.section .text.x86.asm32_syscall_int80.clock_nanosleep64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffef5
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_clock_nanosleep64)
-	call   sys32_clock_nanosleep64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_clock_nanosleep64)
-
-/* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
-.section .text.x86.asm32_syscall_int80.clock_getres64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffef6
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_clock_getres64)
-	call   sys32_clock_getres64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_clock_getres64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-.section .text.x86.asm32_syscall_int80.clock_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffef7
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_clock_gettime64)
-	call   sys32_clock_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_clock_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-.section .text.x86.asm32_syscall_int80.clock_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffef8
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_clock_settime64)
-	call   sys32_clock_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_clock_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-.section .text.x86.asm32_syscall_int80.timer_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffefb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_timer_gettime64)
-	call   sys32_timer_gettime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_timer_gettime64)
-
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
-.section .text.x86.asm32_syscall_int80.timer_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffefc
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_timer_settime64)
-	call   sys32_timer_settime64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_timer_settime64)
 
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
@@ -25715,41 +25813,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pread64f)
 	.cfi_endproc
 END(__x86_asm32_int80_pread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_int80.rt_sigtimedwait64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffff4f
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	EXTERN(sys32_rt_sigtimedwait64)
-	call   sys32_rt_sigtimedwait64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_rt_sigtimedwait64)
-
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.x86.asm32_syscall_int80.nanosleep64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
@@ -25781,38 +25844,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
 	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_nanosleep64)
-
-/* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
-.section .text.x86.asm32_syscall_int80.sched_rr_get_interval64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffff5f
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	movzlq %ecx, %rsi /* ARG1 = REG1 */
-	EXTERN(sys32_sched_rr_get_interval64)
-	call   sys32_sched_rr_get_interval64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	intr_exit
-	.cfi_endproc
-END(__x86_asm32_int80_sched_rr_get_interval64)
 
 /* syscall_slong_t rpc_service(void) */
 .section .text.x86.asm32_syscall_int80.rpc_service
@@ -30487,6 +30518,116 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_membarrier, __x86_asm32_int80_memb
 /* errno_t mlock2(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock2, __x86_asm32_int80_mlock2)
 
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_gettime64, __x86_asm32_int80_clock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_settime64, __x86_asm32_int80_clock_settime64)
+
+/* errno_t clock_adjtime64(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_adjtime64, __x86_asm32_int80_clock_adjtime64)
+
+/* errno_t clock_getres_time64(clockid_t clock_id, struct timespecx32_64 *res) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_getres_time64, __x86_asm32_int80_clock_getres_time64)
+
+/* errno_t clock_nanosleep_time64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_nanosleep_time64, __x86_asm32_int80_clock_nanosleep_time64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_gettime64, __x86_asm32_int80_timer_gettime64)
+
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_settime64, __x86_asm32_int80_timer_settime64)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime64, __x86_asm32_int80_timerfd_gettime64)
+
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime64, __x86_asm32_int80_timerfd_settime64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimensat_time64, __x86_asm32_int80_utimensat_time64)
+
+/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.x86.asm32_syscall_sysenter.pselect6_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x19d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pselect6_time64)
+	call   sys32_pselect6_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_pselect6_time64)
+
+/* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysenter.ppoll_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x19e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_ppoll_time64)
+	call   sys32_ppoll_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_ppoll_time64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -30495,12 +30636,12 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock2, __x86_asm32_int80_mlock2)
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
-.section .text.x86.asm32_syscall_sysenter.recvmmsg64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
+/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
+.section .text.x86.asm32_syscall_sysenter.recvmmsg_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg_time64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffeaf
+	.cfi_lsda 0, 0x1a1
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
 	pushq_cfi_r %rcx
@@ -30517,8 +30658,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
 	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	movslq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_recvmmsg64)
-	call   sys32_recvmmsg64
+	EXTERN(sys32_recvmmsg_time64)
+	call   sys32_recvmmsg_time64
 	popq_cfi_r %r11
 	popq_cfi_r %r10
 	popq_cfi_r %r9
@@ -30529,7 +30670,85 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_recvmmsg64)
 	popq_cfi_r %rcx
 	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
-END(__x86_asm32_sysenter_recvmmsg64)
+END(__x86_asm32_sysenter_recvmmsg_time64)
+
+/* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedsend_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1a2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedsend_time64)
+	call   sys32_mq_timedsend_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedsend_time64)
+
+/* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysenter.mq_timedreceive_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1a3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_mq_timedreceive_time64)
+	call   sys32_mq_timedreceive_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_mq_timedreceive_time64)
+
+/* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait_time64, __x86_asm32_int80_rt_sigtimedwait_time64)
+
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_rr_get_interval_time64, __x86_asm32_int80_sched_rr_get_interval_time64)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -30615,17 +30834,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	.cfi_endproc
 END(__x86_asm32_sysenter_preadvf)
 
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_gettime64, __x86_asm32_int80_timerfd_gettime64)
-
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timerfd_settime64, __x86_asm32_int80_timerfd_settime64)
-
 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 .section .text.x86.asm32_syscall_sysenter.fallocate64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
@@ -30666,83 +30874,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fallocate64)
 	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_fallocate64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimensat64, __x86_asm32_int80_utimensat64)
-
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_sysenter.ppoll64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffecb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_ppoll64)
-	call   sys32_ppoll64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET32
-	.cfi_endproc
-END(__x86_asm32_sysenter_ppoll64)
-
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
-.section .text.x86.asm32_syscall_sysenter.pselect6_64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pselect6_64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffecc
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movzlq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_pselect6_64)
-	call   sys32_pselect6_64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET32
-	.cfi_endproc
-END(__x86_asm32_sysenter_pselect6_64)
 
 /* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
 /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
@@ -30909,99 +31040,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_waitid64)
 
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_sysenter.mq_timedreceive64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffee8
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_mq_timedreceive64)
-	call   sys32_mq_timedreceive64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET32
-	.cfi_endproc
-END(__x86_asm32_sysenter_mq_timedreceive64)
-
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_sysenter.mq_timedsend64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedsend64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffee9
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	pushq_cfi_r %rcx
-	pushq_cfi_r %rdx
-	pushq_cfi_r %rsi
-	pushq_cfi_r %rdi
-	pushq_cfi_r %r8
-	pushq_cfi_r %r9
-	pushq_cfi_r %r10
-	pushq_cfi_r %r11
-	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
-	movzlq %edx, %rdx /* ARG2 = REG2 */
-	movzlq %esi, %rsi /* ARG1 = REG3 */
-	movzlq %ecx, %rcx /* ARG3 = REG1 */
-	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
-	movslq %ebx, %rdi /* ARG0 = REG0 */
-	EXTERN(sys32_mq_timedsend64)
-	call   sys32_mq_timedsend64
-	popq_cfi_r %r11
-	popq_cfi_r %r10
-	popq_cfi_r %r9
-	popq_cfi_r %r8
-	popq_cfi_r %rdi
-	popq_cfi_r %rsi
-	popq_cfi_r %rdx
-	popq_cfi_r %rcx
-	X86_IRET_BUT_PREFER_SYSRET32
-	.cfi_endproc
-END(__x86_asm32_sysenter_mq_timedsend64)
-
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimes64, __x86_asm32_int80_utimes64)
-
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_nanosleep64, __x86_asm32_int80_clock_nanosleep64)
-
-/* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_getres64, __x86_asm32_int80_clock_getres64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_gettime64, __x86_asm32_int80_clock_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_settime64, __x86_asm32_int80_clock_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_gettime64, __x86_asm32_int80_timer_gettime64)
-
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_timer_settime64, __x86_asm32_int80_timer_settime64)
 
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
@@ -31128,14 +31168,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pread64f)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait64, __x86_asm32_int80_rt_sigtimedwait64)
-
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_nanosleep64, __x86_asm32_int80_nanosleep64)
-
-/* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
-DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_rr_get_interval64, __x86_asm32_int80_sched_rr_get_interval64)
 
 /* syscall_slong_t rpc_service(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rpc_service, __x86_asm32_int80_rpc_service)
@@ -36302,6 +36336,159 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlock2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_mlock2)
 
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+.section .text.x86.asm32_syscall_sysrun32.clock_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_gettime64)
+	jmp    sys32_clock_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+.section .text.x86.asm32_syscall_sysrun32.clock_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_settime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_settime64)
+	jmp    sys32_clock_settime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_settime64)
+
+/* errno_t clock_adjtime64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.clock_adjtime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_adjtime64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_adjtime64)
+	jmp    sys32_clock_adjtime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_adjtime64)
+
+/* errno_t clock_getres_time64(clockid_t clock_id, struct timespecx32_64 *res) */
+.section .text.x86.asm32_syscall_sysrun32.clock_getres_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_getres_time64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_getres_time64)
+	jmp    sys32_clock_getres_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_getres_time64)
+
+/* errno_t clock_nanosleep_time64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
+.section .text.x86.asm32_syscall_sysrun32.clock_nanosleep_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_nanosleep_time64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clock_nanosleep_time64)
+	jmp    sys32_clock_nanosleep_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clock_nanosleep_time64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+.section .text.x86.asm32_syscall_sysrun32.timer_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_gettime64)
+	jmp    sys32_timer_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_gettime64)
+
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+.section .text.x86.asm32_syscall_sysrun32.timer_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_settime64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timer_settime64)
+	jmp    sys32_timer_settime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timer_settime64)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timerfd_gettime64)
+	jmp    sys32_timerfd_gettime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timerfd_gettime64)
+
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_sysrun32.timerfd_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_timerfd_settime64)
+	jmp    sys32_timerfd_settime64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_timerfd_settime64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysrun32.utimensat_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat_time64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_utimensat_time64)
+	jmp    sys32_utimensat_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_utimensat_time64)
+
+/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.x86.asm32_syscall_sysrun32.pselect6_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pselect6_time64)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pselect6_time64)
+	jmp    sys32_pselect6_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pselect6_time64)
+
+/* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.ppoll_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ppoll_time64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_ppoll_time64)
+	jmp    sys32_ppoll_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_ppoll_time64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -36310,19 +36497,71 @@ END(__x86_asm32_sysrun32_mlock2)
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
-.section .text.x86.asm32_syscall_sysrun32.recvmmsg64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg64)
+/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
+.section .text.x86.asm32_syscall_sysrun32.recvmmsg_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_recvmmsg_time64)
 	.cfi_startproc
 	movzlq 32(%rdi), %r8
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
 	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_recvmmsg64)
-	jmp    sys32_recvmmsg64
+	EXTERN(sys32_recvmmsg_time64)
+	jmp    sys32_recvmmsg_time64
 	.cfi_endproc
-END(__x86_asm32_sysrun32_recvmmsg64)
+END(__x86_asm32_sysrun32_recvmmsg_time64)
+
+/* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysrun32.mq_timedsend_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedsend_time64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_timedsend_time64)
+	jmp    sys32_mq_timedsend_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_timedsend_time64)
+
+/* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.x86.asm32_syscall_sysrun32.mq_timedreceive_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedreceive_time64)
+	.cfi_startproc
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_mq_timedreceive_time64)
+	jmp    sys32_mq_timedreceive_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_mq_timedreceive_time64)
+
+/* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+.section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait_time64)
+	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rt_sigtimedwait_time64)
+	jmp    sys32_rt_sigtimedwait_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rt_sigtimedwait_time64)
+
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+.section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval_time64)
+	.cfi_startproc
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_sched_rr_get_interval_time64)
+	jmp    sys32_sched_rr_get_interval_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_sched_rr_get_interval_time64)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -36364,35 +36603,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadvf)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_preadvf)
 
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_sysrun32.timerfd_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_gettime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_timerfd_gettime64)
-	jmp    sys32_timerfd_gettime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_timerfd_gettime64)
-
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_sysrun32.timerfd_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timerfd_settime64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_timerfd_settime64)
-	jmp    sys32_timerfd_settime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_timerfd_settime64)
-
 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 .section .text.x86.asm32_syscall_sysrun32.fallocate64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fallocate64)
@@ -36411,49 +36621,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fallocate64)
 	jmp    sys32_fallocate64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fallocate64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysrun32.utimensat64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimensat64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_utimensat64)
-	jmp    sys32_utimensat64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_utimensat64)
-
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_sysrun32.ppoll64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ppoll64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_ppoll64)
-	jmp    sys32_ppoll64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_ppoll64)
-
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
-.section .text.x86.asm32_syscall_sysrun32.pselect6_64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pselect6_64)
-	.cfi_startproc
-	movzlq 40(%rdi), %r9
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_pselect6_64)
-	jmp    sys32_pselect6_64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_pselect6_64)
 
 /* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
 /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
@@ -36571,34 +36738,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_waitid64)
 
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_sysrun32.mq_timedreceive64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedreceive64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_mq_timedreceive64)
-	jmp    sys32_mq_timedreceive64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_mq_timedreceive64)
-
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.x86.asm32_syscall_sysrun32.mq_timedsend64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedsend64)
-	.cfi_startproc
-	movzlq 32(%rdi), %r8
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_mq_timedsend64)
-	jmp    sys32_mq_timedsend64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_mq_timedsend64)
-
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_sysrun32.utimes64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes64)
@@ -36609,77 +36748,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes64)
 	jmp    sys32_utimes64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_utimes64)
-
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
-.section .text.x86.asm32_syscall_sysrun32.clock_nanosleep64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_nanosleep64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_clock_nanosleep64)
-	jmp    sys32_clock_nanosleep64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_clock_nanosleep64)
-
-/* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
-.section .text.x86.asm32_syscall_sysrun32.clock_getres64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_getres64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_clock_getres64)
-	jmp    sys32_clock_getres64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_clock_getres64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-.section .text.x86.asm32_syscall_sysrun32.clock_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_gettime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_clock_gettime64)
-	jmp    sys32_clock_gettime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_clock_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-.section .text.x86.asm32_syscall_sysrun32.clock_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_settime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_clock_settime64)
-	jmp    sys32_clock_settime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_clock_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-.section .text.x86.asm32_syscall_sysrun32.timer_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_gettime64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_timer_gettime64)
-	jmp    sys32_timer_gettime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_timer_gettime64)
-
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
-.section .text.x86.asm32_syscall_sysrun32.timer_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_timer_settime64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_timer_settime64)
-	jmp    sys32_timer_settime64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_timer_settime64)
 
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
@@ -36764,19 +36832,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pread64f)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
-.section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait64)
-	.cfi_startproc
-	movzlq 24(%rdi), %rcx
-	movzlq 16(%rdi), %rdx
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_rt_sigtimedwait64)
-	jmp    sys32_rt_sigtimedwait64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_rt_sigtimedwait64)
-
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.x86.asm32_syscall_sysrun32.nanosleep64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nanosleep64)
@@ -36787,17 +36842,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_nanosleep64)
 	jmp    sys32_nanosleep64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_nanosleep64)
-
-/* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
-.section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval64)
-	.cfi_startproc
-	movzlq 8(%rdi), %rsi
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_sched_rr_get_interval64)
-	jmp    sys32_sched_rr_get_interval64
-	.cfi_endproc
-END(__x86_asm32_sysrun32_sched_rr_get_interval64)
 
 /* syscall_slong_t rpc_service(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_rpc_service, sys32_rpc_service); */

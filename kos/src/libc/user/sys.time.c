@@ -21,11 +21,16 @@
 #define GUARD_LIBC_USER_SYS_TIME_C 1
 
 #include "../api.h"
-#include "sys.time.h"
+/**/
+
 #include <kos/syscalls.h>
 #include <sys/stat.h>
 #include <sys/timex.h>
+
 #include <fcntl.h>
+#include <syscall.h>
+
+#include "sys.time.h"
 
 DECL_BEGIN
 
@@ -355,13 +360,25 @@ NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd,
 /*[[[body:libc_futimes64]]]*/
 {
 	errno_t result;
-	if (!tvp)
+	if (!tvp) {
+#ifdef SYS_utimensat64
 		result = sys_utimensat64(fd, NULL, NULL, AT_SYMLINK_NOFOLLOW);
-	else {
+#elif defined(SYS_utimensat_time64)
+		result = sys_utimensat_time64(fd, NULL, NULL, AT_SYMLINK_NOFOLLOW);
+#else /* ... */
+#error "No way to implement `futimes64()'"
+#endif /* !... */
+	} else {
 		struct timespec64 ts[2];
 		TIMEVAL_TO_TIMESPEC(&tvp[0], &ts[0]);
 		TIMEVAL_TO_TIMESPEC(&tvp[1], &ts[1]);
+#ifdef SYS_utimensat64
 		result = sys_utimensat64(fd, NULL, ts, AT_SYMLINK_NOFOLLOW);
+#elif defined(SYS_utimensat_time64)
+		result = sys_utimensat_time64(fd, NULL, ts, AT_SYMLINK_NOFOLLOW);
+#else /* ... */
+#error "No way to implement `futimes64()'"
+#endif /* !... */
 	}
 	return libc_seterrno_syserr(result);
 }

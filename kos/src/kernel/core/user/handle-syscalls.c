@@ -1599,14 +1599,16 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 
 /************************************************************************/
 /* poll(), ppoll(), ppoll64()                                           */
-/* select(), select64(), pselect6(), pselect6_64()                      */
+/* select(), select64(), pselect6(), pselect6_time64()                  */
 /************************************************************************/
 #undef WANT_SYS_POLL
-#if (defined(__ARCH_WANT_SYSCALL_POLL) ||         \
-     defined(__ARCH_WANT_SYSCALL_PPOLL) ||        \
-     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||      \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64))
+#if (defined(__ARCH_WANT_SYSCALL_POLL) ||           \
+     defined(__ARCH_WANT_SYSCALL_PPOLL) ||          \
+     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||        \
+     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64))
 #define WANT_SYS_POLL 1
 #endif /* poll... */
 #undef WANT_SYS_SELECT
@@ -1620,26 +1622,34 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
      defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64))
 #define WANT_SYS_SELECT 1
 #endif /* select... */
-#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||           \
-     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||         \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||     \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||    \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) ||  \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64))
+#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||               \
+     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||             \
+     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6) ||            \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||         \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) ||     \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) ||     \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64) ||  \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64))
 #define WANT_SYS_POLLSELECT_SIGSET 1
 #endif /* p(poll|select)... */
-#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||        \
-     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||      \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64))
+#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||          \
+     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||        \
+     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64))
 #define WANT_SYS_POLL_SIGSET 1
 #endif /* ppoll... */
-#if (defined(__ARCH_WANT_SYSCALL_PSELECT6) ||        \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||     \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64))
+#if (defined(__ARCH_WANT_SYSCALL_PSELECT6) ||           \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||        \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) ||    \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) ||    \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64))
 #define WANT_SYS_SELECT_SIGSET 1
 #endif /* pselect... */
 
@@ -2021,12 +2031,22 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL */
 
+#if (defined(__ARCH_WANT_SYSCALL_PPOLL64) || \
+     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_PPOLL64
 DEFINE_SYSCALL5(ssize_t, ppoll64,
                 USER UNCHECKED struct pollfd *, fds, size_t, nfds,
                 USER UNCHECKED struct timespec64 const *, timeout_ts,
                 USER UNCHECKED sigset_t const *, sigmask,
-                size_t, sigsetsize) {
+                size_t, sigsetsize)
+#else /* __ARCH_WANT_SYSCALL_PPOLL64 */
+DEFINE_SYSCALL5(ssize_t, ppoll_time64,
+                USER UNCHECKED struct pollfd *, fds, size_t, nfds,
+                USER UNCHECKED struct timespec64 const *, timeout_ts,
+                USER UNCHECKED sigset_t const *, sigmask,
+                size_t, sigsetsize)
+#endif /* !__ARCH_WANT_SYSCALL_PPOLL64 */
+{
 	size_t result;
 	if unlikely(sigsetsize != sizeof(sigset_t))
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -2049,14 +2069,24 @@ DEFINE_SYSCALL5(ssize_t, ppoll64,
 	}
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_SYSCALL_PPOLL64 */
+#endif /* __ARCH_WANT_SYSCALL_PPOLL64 || __ARCH_WANT_SYSCALL_PPOLL_TIME64 */
 
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PPOLL64
 DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll64,
                        USER UNCHECKED struct pollfd *, fds, size_t, nfds,
                        USER UNCHECKED struct compat_timespec64 const *, timeout_ts,
                        USER UNCHECKED compat_sigset_t const *, sigmask,
-                size_t, sigsetsize) {
+                       size_t, sigsetsize)
+#else /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL64 */
+DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll_time64,
+                       USER UNCHECKED struct pollfd *, fds, size_t, nfds,
+                       USER UNCHECKED struct compat_timespec64 const *, timeout_ts,
+                       USER UNCHECKED compat_sigset_t const *, sigmask,
+                       size_t, sigsetsize)
+#endif /* !__ARCH_WANT_COMPAT_SYSCALL_PPOLL64 */
+{
 	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
 	size_t result;
 	if unlikely(sigsetsize != sizeof(compat_sigset_t))
@@ -2080,7 +2110,7 @@ DEFINE_COMPAT_SYSCALL5(ssize_t, ppoll64,
 	}
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PPOLL64 || __ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64 */
 
 #if (defined(__ARCH_WANT_SYSCALL_SELECT) || \
      defined(__ARCH_WANT_SYSCALL__NEWSELECT))
@@ -2140,12 +2170,22 @@ DEFINE_SYSCALL1(ssize_t, select,
 #endif /* __ARCH_WANT_SYSCALL_SELECT && __ARCH_WANT_SYSCALL__NEWSELECT */
 #endif /* __ARCH_WANT_SYSCALL_SELECT || __ARCH_WANT_SYSCALL__NEWSELECT */
 
+#if (defined(__ARCH_WANT_SYSCALL_SELECT64) || \
+     defined(__ARCH_WANT_SYSCALL_SELECT_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_SELECT64
 DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
-                USER UNCHECKED struct timeval64 *, timeout) {
+                USER UNCHECKED struct timeval64 *, timeout)
+#else /* __ARCH_WANT_SYSCALL_SELECT64 */
+DEFINE_SYSCALL5(ssize_t, select_time64, size_t, nfds,
+                USER UNCHECKED fd_set *, readfds,
+                USER UNCHECKED fd_set *, writefds,
+                USER UNCHECKED fd_set *, exceptfds,
+                USER UNCHECKED struct timeval64 *, timeout)
+#endif /* !__ARCH_WANT_SYSCALL_SELECT64 */
+{
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	validate_readwrite_opt(readfds, nfd_size);
@@ -2173,7 +2213,7 @@ DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_SYSCALL_SELECT64 */
+#endif /* __ARCH_WANT_SYSCALL_SELECT64 || __ARCH_WANT_SYSCALL_SELECT_TIME64 */
 
 #if (defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL__NEWSELECT))
@@ -2254,12 +2294,22 @@ DEFINE_COMPAT_SYSCALL1(ssize_t, select,
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT && __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SELECT || __ARCH_WANT_COMPAT_SYSCALL__NEWSELECT */
 
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_SELECT_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SELECT64
 DEFINE_COMPAT_SYSCALL5(ssize_t, select64, size_t, nfds,
                        USER UNCHECKED fd_set *, readfds,
                        USER UNCHECKED fd_set *, writefds,
                        USER UNCHECKED fd_set *, exceptfds,
-                       USER UNCHECKED struct compat_timeval64 *, timeout) {
+                       USER UNCHECKED struct compat_timeval64 *, timeout)
+#else /* __ARCH_WANT_COMPAT_SYSCALL_SELECT64 */
+DEFINE_COMPAT_SYSCALL5(ssize_t, select_time64, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timeval64 *, timeout)
+#endif /* !__ARCH_WANT_COMPAT_SYSCALL_SELECT64 */
+{
 	size_t result, nfd_size;
 	nfd_size = CEILDIV(nfds, __NFDBITS);
 	compat_validate_readwrite_opt(readfds, nfd_size);
@@ -2342,13 +2392,24 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 }
 #endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
 
+#if (defined(__ARCH_WANT_SYSCALL_PSELECT6_64) || \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_PSELECT6_64
 DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
                 USER UNCHECKED fd_set *, readfds,
                 USER UNCHECKED fd_set *, writefds,
                 USER UNCHECKED fd_set *, exceptfds,
                 USER UNCHECKED struct timespec64 const *, timeout,
-                USER UNCHECKED void const *, sigmask_sigset_and_len) {
+                USER UNCHECKED void const *, sigmask_sigset_and_len)
+#else /* __ARCH_WANT_SYSCALL_PSELECT6_64 */
+DEFINE_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
+                USER UNCHECKED fd_set *, readfds,
+                USER UNCHECKED fd_set *, writefds,
+                USER UNCHECKED fd_set *, exceptfds,
+                USER UNCHECKED struct timespec64 const *, timeout,
+                USER UNCHECKED void const *, sigmask_sigset_and_len)
+#endif /* !__ARCH_WANT_SYSCALL_PSELECT6_64 */
+{
 	struct sigset_and_len {
 		sigset_t const *ss_ptr;
 		size_t          ss_len;
@@ -2393,7 +2454,7 @@ DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
+#endif /* __ARCH_WANT_SYSCALL_PSELECT6_64 || __ARCH_WANT_SYSCALL_PSELECT6_TIME64 */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6
 DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
@@ -2449,13 +2510,24 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6 */
 
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64
 DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
                        USER UNCHECKED fd_set *, readfds,
                        USER UNCHECKED fd_set *, writefds,
                        USER UNCHECKED fd_set *, exceptfds,
                        USER UNCHECKED struct compat_timespec64 const *, timeout,
-                       USER UNCHECKED void const *, sigmask_sigset_and_len) {
+                       USER UNCHECKED void const *, sigmask_sigset_and_len)
+#else /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64 */
+DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
+                       USER UNCHECKED fd_set *, readfds,
+                       USER UNCHECKED fd_set *, writefds,
+                       USER UNCHECKED fd_set *, exceptfds,
+                       USER UNCHECKED struct compat_timespec64 const *, timeout,
+                       USER UNCHECKED void const *, sigmask_sigset_and_len)
+#endif /* !__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64 */
+{
 	STATIC_ASSERT(sizeof(compat_sigset_t) == sizeof(sigset_t));
 	struct sigset_and_len {
 		compat_sigset_t const *ss_ptr;
@@ -2501,7 +2573,7 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 	}
 	return (ssize_t)result;
 }
-#endif /* __ARCH_WANT_SYSCALL_PSELECT6 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64 || __ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64 */
 
 
 

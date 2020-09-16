@@ -21,8 +21,13 @@
 #define GUARD_LIBC_USER_SCHED_C 1
 
 #include "../api.h"
-#include "sched.h"
+/**/
+
 #include <kos/syscalls.h>
+
+#include <syscall.h>
+
+#include "sched.h"
 
 DECL_BEGIN
 
@@ -269,7 +274,13 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 /*[[[body:libc_sched_rr_get_interval64]]]*/
 {
 	errno_t result;
+#ifdef SYS_sched_rr_get_interval64
 	result = sys_sched_rr_get_interval64(pid, tms);
+#elif defined(SYS_sched_rr_get_interval_time64)
+	result = sys_sched_rr_get_interval_time64(pid, tms);
+#else /* ... */
+#error "No way to implement `sched_rr_get_interval64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */

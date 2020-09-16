@@ -2030,6 +2030,7 @@ get_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 perf_event_open:(int TODO_PROTOTYPE) -> errno_t;
 
 clock_adjtime:(int TODO_PROTOTYPE) -> errno_t;
+clock_adjtime64:(int TODO_PROTOTYPE) -> errno_t;
 
 sched_setattr:(int TODO_PROTOTYPE) -> errno_t;
 sched_getattr:(int TODO_PROTOTYPE) -> errno_t;

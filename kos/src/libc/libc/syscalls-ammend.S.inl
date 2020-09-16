@@ -148,9 +148,9 @@ DEFINE_XSYSCALL_EXPORT(Truncate, sys_Xtruncate)
 DEFINE_XSYSCALL_EXPORT(Truncate64, sys_Xtruncate)
 DEFINE_XSYSCALL_EXPORT(FTruncate, sys_Xftruncate)
 DEFINE_XSYSCALL_EXPORT(FTruncate64, sys_Xftruncate)
-#else
+#else /* ... */
 #error "Invalid configuration"
-#endif
+#endif /* !... */
 
 #ifdef SYS_lseek64
 DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek)
@@ -158,16 +158,18 @@ DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek64)
 #elif __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_XSYSCALL_EXPORT(LSeek, sys_Xlseek)
 DEFINE_XSYSCALL_EXPORT(LSeek64, sys_Xlseek)
-#else
+#else /* ... */
 #error "Invalid configuration"
-#endif
+#endif /* !... */
 
 #ifdef SYS_utimensat64
 DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat64)
+#elif defined(SYS_utimensat_time64)
+DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat_time64)
 #elif __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_XSYSCALL_EXPORT(UTimensAt64, sys_Xutimensat)
-#else
+#else /* ... */
 #error "Invalid configuration"
-#endif
+#endif /* !... */
 
 #undef DEFINE_XSYSCALL_EXPORT

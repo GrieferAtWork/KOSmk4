@@ -21,9 +21,14 @@
 #define GUARD_LIBC_USER_KOS_SYS_STAT_C 1
 
 #include "../api.h"
-#include "kos.sys.stat.h"
-#include <fcntl.h>
+/**/
+
 #include <kos/syscalls.h>
+
+#include <fcntl.h>
+#include <syscall.h>
+
+#include "kos.sys.stat.h"
 
 DECL_BEGIN
 
@@ -47,7 +52,13 @@ INTERN ATTR_SECTION(".text.crt.except.fs.modify_time") void
                            struct timespec64 const times[2 /*or:3*/]) THROWS(...)
 /*[[[body:libc_FUtimens64]]]*/
 {
+#ifdef SYS_utimensat64
 	sys_Xutimensat64(fd, NULL, times, 0);
+#elif defined(SYS_utimensat_time64)
+	sys_Xutimensat_time64(fd, NULL, times, 0);
+#else /* ... */
+#error "No way to implement `FUtimens64()'"
+#endif /* !... */
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_FUtimens64]]]*/

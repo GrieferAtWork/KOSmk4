@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe387f07f */
+/* HASH CRC-32:0x58a0da98 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,12 +41,13 @@
 #define __CRT_HAVE_sys_chown32 1
 #define __CRT_HAVE_sys_chroot 1
 #define __CRT_HAVE_sys_clock_adjtime 1
+#define __CRT_HAVE_sys_clock_adjtime64 1
 #define __CRT_HAVE_sys_clock_getres 1
-#define __CRT_HAVE_sys_clock_getres64 1
+#define __CRT_HAVE_sys_clock_getres_time64 1
 #define __CRT_HAVE_sys_clock_gettime 1
 #define __CRT_HAVE_sys_clock_gettime64 1
 #define __CRT_HAVE_sys_clock_nanosleep 1
-#define __CRT_HAVE_sys_clock_nanosleep64 1
+#define __CRT_HAVE_sys_clock_nanosleep_time64 1
 #define __CRT_HAVE_sys_clock_settime 1
 #define __CRT_HAVE_sys_clock_settime64 1
 #define __CRT_HAVE_sys_clone 1
@@ -238,9 +239,9 @@
 #define __CRT_HAVE_sys_mq_notify 1
 #define __CRT_HAVE_sys_mq_open 1
 #define __CRT_HAVE_sys_mq_timedreceive 1
-#define __CRT_HAVE_sys_mq_timedreceive64 1
+#define __CRT_HAVE_sys_mq_timedreceive_time64 1
 #define __CRT_HAVE_sys_mq_timedsend 1
-#define __CRT_HAVE_sys_mq_timedsend64 1
+#define __CRT_HAVE_sys_mq_timedsend_time64 1
 #define __CRT_HAVE_sys_mq_unlink 1
 #define __CRT_HAVE_sys_mremap 1
 #define __CRT_HAVE_sys_msync 1
@@ -269,7 +270,7 @@
 #define __CRT_HAVE_sys_pivot_root 1
 #define __CRT_HAVE_sys_poll 1
 #define __CRT_HAVE_sys_ppoll 1
-#define __CRT_HAVE_sys_ppoll64 1
+#define __CRT_HAVE_sys_ppoll_time64 1
 #define __CRT_HAVE_sys_prctl 1
 #define __CRT_HAVE_sys_pread64 1
 #define __CRT_HAVE_sys_pread64f 1
@@ -281,7 +282,7 @@
 #define __CRT_HAVE_sys_prof 1
 #define __CRT_HAVE_sys_profil 1
 #define __CRT_HAVE_sys_pselect6 1
-#define __CRT_HAVE_sys_pselect6_64 1
+#define __CRT_HAVE_sys_pselect6_time64 1
 #define __CRT_HAVE_sys_ptrace 1
 #define __CRT_HAVE_sys_putpmsg 1
 #define __CRT_HAVE_sys_pwrite64 1
@@ -302,7 +303,7 @@
 #define __CRT_HAVE_sys_reboot 1
 #define __CRT_HAVE_sys_recvfrom 1
 #define __CRT_HAVE_sys_recvmmsg 1
-#define __CRT_HAVE_sys_recvmmsg64 1
+#define __CRT_HAVE_sys_recvmmsg_time64 1
 #define __CRT_HAVE_sys_recvmsg 1
 #define __CRT_HAVE_sys_remap_file_pages 1
 #define __CRT_HAVE_sys_removexattr 1
@@ -321,7 +322,7 @@
 #define __CRT_HAVE_sys_rt_sigreturn 1
 #define __CRT_HAVE_sys_rt_sigsuspend 1
 #define __CRT_HAVE_sys_rt_sigtimedwait 1
-#define __CRT_HAVE_sys_rt_sigtimedwait64 1
+#define __CRT_HAVE_sys_rt_sigtimedwait_time64 1
 #define __CRT_HAVE_sys_rt_tgsigqueueinfo 1
 #define __CRT_HAVE_sys_rtm_abort 1
 #define __CRT_HAVE_sys_rtm_begin 1
@@ -334,7 +335,7 @@
 #define __CRT_HAVE_sys_sched_getparam 1
 #define __CRT_HAVE_sys_sched_getscheduler 1
 #define __CRT_HAVE_sys_sched_rr_get_interval 1
-#define __CRT_HAVE_sys_sched_rr_get_interval64 1
+#define __CRT_HAVE_sys_sched_rr_get_interval_time64 1
 #define __CRT_HAVE_sys_sched_setaffinity 1
 #define __CRT_HAVE_sys_sched_setattr 1
 #define __CRT_HAVE_sys_sched_setparam 1
@@ -453,7 +454,7 @@
 #define __CRT_HAVE_sys_utime 1
 #define __CRT_HAVE_sys_utime64 1
 #define __CRT_HAVE_sys_utimensat 1
-#define __CRT_HAVE_sys_utimensat64 1
+#define __CRT_HAVE_sys_utimensat_time64 1
 #define __CRT_HAVE_sys_utimes 1
 #define __CRT_HAVE_sys_utimes64 1
 #define __CRT_HAVE_sys_vfork 1
@@ -494,12 +495,13 @@
 #define __CRT_HAVE_sys_Xchown32 1
 #define __CRT_HAVE_sys_Xchroot 1
 #define __CRT_HAVE_sys_Xclock_adjtime 1
+#define __CRT_HAVE_sys_Xclock_adjtime64 1
 #define __CRT_HAVE_sys_Xclock_getres 1
-#define __CRT_HAVE_sys_Xclock_getres64 1
+#define __CRT_HAVE_sys_Xclock_getres_time64 1
 #define __CRT_HAVE_sys_Xclock_gettime 1
 #define __CRT_HAVE_sys_Xclock_gettime64 1
 #define __CRT_HAVE_sys_Xclock_nanosleep 1
-#define __CRT_HAVE_sys_Xclock_nanosleep64 1
+#define __CRT_HAVE_sys_Xclock_nanosleep_time64 1
 #define __CRT_HAVE_sys_Xclock_settime 1
 #define __CRT_HAVE_sys_Xclock_settime64 1
 #define __CRT_HAVE_sys_Xclone 1
@@ -691,9 +693,9 @@
 #define __CRT_HAVE_sys_Xmq_notify 1
 #define __CRT_HAVE_sys_Xmq_open 1
 #define __CRT_HAVE_sys_Xmq_timedreceive 1
-#define __CRT_HAVE_sys_Xmq_timedreceive64 1
+#define __CRT_HAVE_sys_Xmq_timedreceive_time64 1
 #define __CRT_HAVE_sys_Xmq_timedsend 1
-#define __CRT_HAVE_sys_Xmq_timedsend64 1
+#define __CRT_HAVE_sys_Xmq_timedsend_time64 1
 #define __CRT_HAVE_sys_Xmq_unlink 1
 #define __CRT_HAVE_sys_Xmremap 1
 #define __CRT_HAVE_sys_Xmsync 1
@@ -722,7 +724,7 @@
 #define __CRT_HAVE_sys_Xpivot_root 1
 #define __CRT_HAVE_sys_Xpoll 1
 #define __CRT_HAVE_sys_Xppoll 1
-#define __CRT_HAVE_sys_Xppoll64 1
+#define __CRT_HAVE_sys_Xppoll_time64 1
 #define __CRT_HAVE_sys_Xprctl 1
 #define __CRT_HAVE_sys_Xpread64 1
 #define __CRT_HAVE_sys_Xpread64f 1
@@ -734,7 +736,7 @@
 #define __CRT_HAVE_sys_Xprof 1
 #define __CRT_HAVE_sys_Xprofil 1
 #define __CRT_HAVE_sys_Xpselect6 1
-#define __CRT_HAVE_sys_Xpselect6_64 1
+#define __CRT_HAVE_sys_Xpselect6_time64 1
 #define __CRT_HAVE_sys_Xptrace 1
 #define __CRT_HAVE_sys_Xputpmsg 1
 #define __CRT_HAVE_sys_Xpwrite64 1
@@ -755,7 +757,7 @@
 #define __CRT_HAVE_sys_Xreboot 1
 #define __CRT_HAVE_sys_Xrecvfrom 1
 #define __CRT_HAVE_sys_Xrecvmmsg 1
-#define __CRT_HAVE_sys_Xrecvmmsg64 1
+#define __CRT_HAVE_sys_Xrecvmmsg_time64 1
 #define __CRT_HAVE_sys_Xrecvmsg 1
 #define __CRT_HAVE_sys_Xremap_file_pages 1
 #define __CRT_HAVE_sys_Xremovexattr 1
@@ -773,7 +775,7 @@
 #define __CRT_HAVE_sys_Xrt_sigqueueinfo 1
 #define __CRT_HAVE_sys_Xrt_sigsuspend 1
 #define __CRT_HAVE_sys_Xrt_sigtimedwait 1
-#define __CRT_HAVE_sys_Xrt_sigtimedwait64 1
+#define __CRT_HAVE_sys_Xrt_sigtimedwait_time64 1
 #define __CRT_HAVE_sys_Xrt_tgsigqueueinfo 1
 #define __CRT_HAVE_sys_Xrtm_abort 1
 #define __CRT_HAVE_sys_Xrtm_begin 1
@@ -786,7 +788,7 @@
 #define __CRT_HAVE_sys_Xsched_getparam 1
 #define __CRT_HAVE_sys_Xsched_getscheduler 1
 #define __CRT_HAVE_sys_Xsched_rr_get_interval 1
-#define __CRT_HAVE_sys_Xsched_rr_get_interval64 1
+#define __CRT_HAVE_sys_Xsched_rr_get_interval_time64 1
 #define __CRT_HAVE_sys_Xsched_setaffinity 1
 #define __CRT_HAVE_sys_Xsched_setattr 1
 #define __CRT_HAVE_sys_Xsched_setparam 1
@@ -904,7 +906,7 @@
 #define __CRT_HAVE_sys_Xutime 1
 #define __CRT_HAVE_sys_Xutime64 1
 #define __CRT_HAVE_sys_Xutimensat 1
-#define __CRT_HAVE_sys_Xutimensat64 1
+#define __CRT_HAVE_sys_Xutimensat_time64 1
 #define __CRT_HAVE_sys_Xutimes 1
 #define __CRT_HAVE_sys_Xutimes64 1
 #define __CRT_HAVE_sys_Xvfork 1

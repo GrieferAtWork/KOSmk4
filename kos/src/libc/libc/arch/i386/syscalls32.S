@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x169245b8 */
+/* HASH CRC-32:0xd7f707db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7232,6 +7232,54 @@ INTERN_FUNCTION(libc_sys_Xclock_settime64)
 END(libc_sys_Xclock_settime64)
 DEFINE_PUBLIC_ALIAS(sys_Xclock_settime64, libc_sys_Xclock_settime64)
 
+/* errno_t clock_adjtime64(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.clock_adjtime64
+INTERN_FUNCTION(libc_sys_clock_adjtime64)
+	movl   $(0x195), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_clock_adjtime64)
+DEFINE_PUBLIC_ALIAS(sys_clock_adjtime64, libc_sys_clock_adjtime64)
+
+/* errno_t clock_adjtime64(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xclock_adjtime64
+INTERN_FUNCTION(libc_sys_Xclock_adjtime64)
+	movl   $(0x195), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xclock_adjtime64)
+DEFINE_PUBLIC_ALIAS(sys_Xclock_adjtime64, libc_sys_Xclock_adjtime64)
+
+/* errno_t clock_getres_time64(clockid_t clock_id, struct timespecx32_64 *res) */
+.section .text.crt.syscall.clock_getres_time64
+INTERN_FUNCTION(libc_sys_clock_getres_time64)
+	movl   $(0x196), %eax
+	jmp    libc_x86_exec_syscall2
+END(libc_sys_clock_getres_time64)
+DEFINE_PUBLIC_ALIAS(sys_clock_getres_time64, libc_sys_clock_getres_time64)
+
+/* errno_t clock_getres_time64(clockid_t clock_id, struct timespecx32_64 *res) */
+.section .text.crt.syscall.Xclock_getres_time64
+INTERN_FUNCTION(libc_sys_Xclock_getres_time64)
+	movl   $(0x196), %eax
+	jmp    libc_x86_exec_Xsyscall2
+END(libc_sys_Xclock_getres_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xclock_getres_time64, libc_sys_Xclock_getres_time64)
+
+/* errno_t clock_nanosleep_time64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
+.section .text.crt.syscall.clock_nanosleep_time64
+INTERN_FUNCTION(libc_sys_clock_nanosleep_time64)
+	movl   $(0x197), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_clock_nanosleep_time64)
+DEFINE_PUBLIC_ALIAS(sys_clock_nanosleep_time64, libc_sys_clock_nanosleep_time64)
+
+/* errno_t clock_nanosleep_time64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
+.section .text.crt.syscall.Xclock_nanosleep_time64
+INTERN_FUNCTION(libc_sys_Xclock_nanosleep_time64)
+	movl   $(0x197), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xclock_nanosleep_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xclock_nanosleep_time64, libc_sys_Xclock_nanosleep_time64)
+
 /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
 .section .text.crt.syscall.timer_gettime64
 INTERN_FUNCTION(libc_sys_timer_gettime64)
@@ -7308,21 +7356,55 @@ INTERN_FUNCTION(libc_sys_Xtimerfd_settime64)
 END(libc_sys_Xtimerfd_settime64)
 DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_settime64, libc_sys_Xtimerfd_settime64)
 
-/* Same as `recvmsg(2)', but may be used to receive many
- * messages (datagrams) with a single system call.
- * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
- *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
- *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
- *                            MSG_WAITFORONE'
- * @throw: Error (s.a. `recvmsg(2)')
- * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
-.section .text.crt.syscall.recvmmsg64
-INTERN_FUNCTION(libc_sys_recvmmsg64)
-	movl   $(0xfffffeaf), %eax
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
+.section .text.crt.syscall.utimensat_time64
+INTERN_FUNCTION(libc_sys_utimensat_time64)
+	movl   $(0x19c), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_utimensat_time64)
+DEFINE_PUBLIC_ALIAS(sys_utimensat_time64, libc_sys_utimensat_time64)
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+/* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
+.section .text.crt.syscall.Xutimensat_time64
+INTERN_FUNCTION(libc_sys_Xutimensat_time64)
+	movl   $(0x19c), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xutimensat_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xutimensat_time64, libc_sys_Xutimensat_time64)
+
+/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.crt.syscall.pselect6_time64
+INTERN_FUNCTION(libc_sys_pselect6_time64)
+	movl   $(0x19d), %eax
+	jmp    libc_x86_exec_syscall6
+END(libc_sys_pselect6_time64)
+DEFINE_PUBLIC_ALIAS(sys_pselect6_time64, libc_sys_pselect6_time64)
+
+/* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
+.section .text.crt.syscall.Xpselect6_time64
+INTERN_FUNCTION(libc_sys_Xpselect6_time64)
+	movl   $(0x19d), %eax
+	jmp    libc_x86_exec_Xsyscall6
+END(libc_sys_Xpselect6_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xpselect6_time64, libc_sys_Xpselect6_time64)
+
+/* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.crt.syscall.ppoll_time64
+INTERN_FUNCTION(libc_sys_ppoll_time64)
+	movl   $(0x19e), %eax
 	jmp    libc_x86_exec_syscall5
-END(libc_sys_recvmmsg64)
-DEFINE_PUBLIC_ALIAS(sys_recvmmsg64, libc_sys_recvmmsg64)
+END(libc_sys_ppoll_time64)
+DEFINE_PUBLIC_ALIAS(sys_ppoll_time64, libc_sys_ppoll_time64)
+
+/* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+.section .text.crt.syscall.Xppoll_time64
+INTERN_FUNCTION(libc_sys_Xppoll_time64)
+	movl   $(0x19e), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xppoll_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xppoll_time64, libc_sys_Xppoll_time64)
 
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
@@ -7332,13 +7414,93 @@ DEFINE_PUBLIC_ALIAS(sys_recvmmsg64, libc_sys_recvmmsg64)
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
-.section .text.crt.syscall.Xrecvmmsg64
-INTERN_FUNCTION(libc_sys_Xrecvmmsg64)
-	movl   $(0xfffffeaf), %eax
+/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
+.section .text.crt.syscall.recvmmsg_time64
+INTERN_FUNCTION(libc_sys_recvmmsg_time64)
+	movl   $(0x1a1), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_recvmmsg_time64)
+DEFINE_PUBLIC_ALIAS(sys_recvmmsg_time64, libc_sys_recvmmsg_time64)
+
+/* Same as `recvmsg(2)', but may be used to receive many
+ * messages (datagrams) with a single system call.
+ * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
+ *                            MSG_DONTWAIT | MSG_ERRQUEUE | MSG_OOB |
+ *                            MSG_PEEK | MSG_TRUNC | MSG_WAITALL |
+ *                            MSG_WAITFORONE'
+ * @throw: Error (s.a. `recvmsg(2)')
+ * @return: * : The # of datagrams successfully received. */
+/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
+.section .text.crt.syscall.Xrecvmmsg_time64
+INTERN_FUNCTION(libc_sys_Xrecvmmsg_time64)
+	movl   $(0x1a1), %eax
 	jmp    libc_x86_exec_Xsyscall5
-END(libc_sys_Xrecvmmsg64)
-DEFINE_PUBLIC_ALIAS(sys_Xrecvmmsg64, libc_sys_Xrecvmmsg64)
+END(libc_sys_Xrecvmmsg_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xrecvmmsg_time64, libc_sys_Xrecvmmsg_time64)
+
+/* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.crt.syscall.mq_timedsend_time64
+INTERN_FUNCTION(libc_sys_mq_timedsend_time64)
+	movl   $(0x1a2), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_mq_timedsend_time64)
+DEFINE_PUBLIC_ALIAS(sys_mq_timedsend_time64, libc_sys_mq_timedsend_time64)
+
+/* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.crt.syscall.Xmq_timedsend_time64
+INTERN_FUNCTION(libc_sys_Xmq_timedsend_time64)
+	movl   $(0x1a2), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xmq_timedsend_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xmq_timedsend_time64, libc_sys_Xmq_timedsend_time64)
+
+/* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.crt.syscall.mq_timedreceive_time64
+INTERN_FUNCTION(libc_sys_mq_timedreceive_time64)
+	movl   $(0x1a3), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_mq_timedreceive_time64)
+DEFINE_PUBLIC_ALIAS(sys_mq_timedreceive_time64, libc_sys_mq_timedreceive_time64)
+
+/* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+.section .text.crt.syscall.Xmq_timedreceive_time64
+INTERN_FUNCTION(libc_sys_Xmq_timedreceive_time64)
+	movl   $(0x1a3), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xmq_timedreceive_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xmq_timedreceive_time64, libc_sys_Xmq_timedreceive_time64)
+
+/* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+.section .text.crt.syscall.rt_sigtimedwait_time64
+INTERN_FUNCTION(libc_sys_rt_sigtimedwait_time64)
+	movl   $(0x1a5), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_rt_sigtimedwait_time64)
+DEFINE_PUBLIC_ALIAS(sys_rt_sigtimedwait_time64, libc_sys_rt_sigtimedwait_time64)
+
+/* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+.section .text.crt.syscall.Xrt_sigtimedwait_time64
+INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait_time64)
+	movl   $(0x1a5), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xrt_sigtimedwait_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xrt_sigtimedwait_time64, libc_sys_Xrt_sigtimedwait_time64)
+
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+.section .text.crt.syscall.sched_rr_get_interval_time64
+INTERN_FUNCTION(libc_sys_sched_rr_get_interval_time64)
+	movl   $(0x1a7), %eax
+	jmp    libc_x86_exec_syscall2
+END(libc_sys_sched_rr_get_interval_time64)
+DEFINE_PUBLIC_ALIAS(sys_sched_rr_get_interval_time64, libc_sys_sched_rr_get_interval_time64)
+
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+.section .text.crt.syscall.Xsched_rr_get_interval_time64
+INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval_time64)
+	movl   $(0x1a7), %eax
+	jmp    libc_x86_exec_Xsyscall2
+END(libc_sys_Xsched_rr_get_interval_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xsched_rr_get_interval_time64, libc_sys_Xsched_rr_get_interval_time64)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -7399,56 +7561,6 @@ INTERN_FUNCTION(libc_sys_Xfallocate64)
 	jmp    libc_x86_exec_Xsyscall6
 END(libc_sys_Xfallocate64)
 DEFINE_PUBLIC_ALIAS(sys_Xfallocate64, libc_sys_Xfallocate64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
-.section .text.crt.syscall.utimensat64
-INTERN_FUNCTION(libc_sys_utimensat64)
-	movl   $(0xfffffec0), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_utimensat64)
-DEFINE_PUBLIC_ALIAS(sys_utimensat64, libc_sys_utimensat64)
-
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-/* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
-.section .text.crt.syscall.Xutimensat64
-INTERN_FUNCTION(libc_sys_Xutimensat64)
-	movl   $(0xfffffec0), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xutimensat64)
-DEFINE_PUBLIC_ALIAS(sys_Xutimensat64, libc_sys_Xutimensat64)
-
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-.section .text.crt.syscall.ppoll64
-INTERN_FUNCTION(libc_sys_ppoll64)
-	movl   $(0xfffffecb), %eax
-	jmp    libc_x86_exec_syscall5
-END(libc_sys_ppoll64)
-DEFINE_PUBLIC_ALIAS(sys_ppoll64, libc_sys_ppoll64)
-
-/* ssize_t ppoll64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-.section .text.crt.syscall.Xppoll64
-INTERN_FUNCTION(libc_sys_Xppoll64)
-	movl   $(0xfffffecb), %eax
-	jmp    libc_x86_exec_Xsyscall5
-END(libc_sys_Xppoll64)
-DEFINE_PUBLIC_ALIAS(sys_Xppoll64, libc_sys_Xppoll64)
-
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
-.section .text.crt.syscall.pselect6_64
-INTERN_FUNCTION(libc_sys_pselect6_64)
-	movl   $(0xfffffecc), %eax
-	jmp    libc_x86_exec_syscall6
-END(libc_sys_pselect6_64)
-DEFINE_PUBLIC_ALIAS(sys_pselect6_64, libc_sys_pselect6_64)
-
-/* ssize_t pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
-.section .text.crt.syscall.Xpselect6_64
-INTERN_FUNCTION(libc_sys_Xpselect6_64)
-	movl   $(0xfffffecc), %eax
-	jmp    libc_x86_exec_Xsyscall6
-END(libc_sys_Xpselect6_64)
-DEFINE_PUBLIC_ALIAS(sys_Xpselect6_64, libc_sys_Xpselect6_64)
 
 /* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
 /* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
@@ -7596,38 +7708,6 @@ INTERN_FUNCTION(libc_sys_Xwaitid64)
 END(libc_sys_Xwaitid64)
 DEFINE_PUBLIC_ALIAS(sys_Xwaitid64, libc_sys_Xwaitid64)
 
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.crt.syscall.mq_timedreceive64
-INTERN_FUNCTION(libc_sys_mq_timedreceive64)
-	movl   $(0xfffffee8), %eax
-	jmp    libc_x86_exec_syscall5
-END(libc_sys_mq_timedreceive64)
-DEFINE_PUBLIC_ALIAS(sys_mq_timedreceive64, libc_sys_mq_timedreceive64)
-
-/* ssize_t mq_timedreceive64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.crt.syscall.Xmq_timedreceive64
-INTERN_FUNCTION(libc_sys_Xmq_timedreceive64)
-	movl   $(0xfffffee8), %eax
-	jmp    libc_x86_exec_Xsyscall5
-END(libc_sys_Xmq_timedreceive64)
-DEFINE_PUBLIC_ALIAS(sys_Xmq_timedreceive64, libc_sys_Xmq_timedreceive64)
-
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.crt.syscall.mq_timedsend64
-INTERN_FUNCTION(libc_sys_mq_timedsend64)
-	movl   $(0xfffffee9), %eax
-	jmp    libc_x86_exec_syscall5
-END(libc_sys_mq_timedsend64)
-DEFINE_PUBLIC_ALIAS(sys_mq_timedsend64, libc_sys_mq_timedsend64)
-
-/* errno_t mq_timedsend64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
-.section .text.crt.syscall.Xmq_timedsend64
-INTERN_FUNCTION(libc_sys_Xmq_timedsend64)
-	movl   $(0xfffffee9), %eax
-	jmp    libc_x86_exec_Xsyscall5
-END(libc_sys_Xmq_timedsend64)
-DEFINE_PUBLIC_ALIAS(sys_Xmq_timedsend64, libc_sys_Xmq_timedsend64)
-
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.crt.syscall.utimes64
 INTERN_FUNCTION(libc_sys_utimes64)
@@ -7643,38 +7723,6 @@ INTERN_FUNCTION(libc_sys_Xutimes64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xutimes64)
 DEFINE_PUBLIC_ALIAS(sys_Xutimes64, libc_sys_Xutimes64)
-
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
-.section .text.crt.syscall.clock_nanosleep64
-INTERN_FUNCTION(libc_sys_clock_nanosleep64)
-	movl   $(0xfffffef5), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_clock_nanosleep64)
-DEFINE_PUBLIC_ALIAS(sys_clock_nanosleep64, libc_sys_clock_nanosleep64)
-
-/* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
-.section .text.crt.syscall.Xclock_nanosleep64
-INTERN_FUNCTION(libc_sys_Xclock_nanosleep64)
-	movl   $(0xfffffef5), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xclock_nanosleep64)
-DEFINE_PUBLIC_ALIAS(sys_Xclock_nanosleep64, libc_sys_Xclock_nanosleep64)
-
-/* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
-.section .text.crt.syscall.clock_getres64
-INTERN_FUNCTION(libc_sys_clock_getres64)
-	movl   $(0xfffffef6), %eax
-	jmp    libc_x86_exec_syscall2
-END(libc_sys_clock_getres64)
-DEFINE_PUBLIC_ALIAS(sys_clock_getres64, libc_sys_clock_getres64)
-
-/* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
-.section .text.crt.syscall.Xclock_getres64
-INTERN_FUNCTION(libc_sys_Xclock_getres64)
-	movl   $(0xfffffef6), %eax
-	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xclock_getres64)
-DEFINE_PUBLIC_ALIAS(sys_Xclock_getres64, libc_sys_Xclock_getres64)
 
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
@@ -7776,22 +7824,6 @@ INTERN_FUNCTION(libc_sys_Xpread64f)
 END(libc_sys_Xpread64f)
 DEFINE_PUBLIC_ALIAS(sys_Xpread64f, libc_sys_Xpread64f)
 
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
-.section .text.crt.syscall.rt_sigtimedwait64
-INTERN_FUNCTION(libc_sys_rt_sigtimedwait64)
-	movl   $(0xffffff4f), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_rt_sigtimedwait64)
-DEFINE_PUBLIC_ALIAS(sys_rt_sigtimedwait64, libc_sys_rt_sigtimedwait64)
-
-/* syscall_slong_t rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
-.section .text.crt.syscall.Xrt_sigtimedwait64
-INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait64)
-	movl   $(0xffffff4f), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xrt_sigtimedwait64)
-DEFINE_PUBLIC_ALIAS(sys_Xrt_sigtimedwait64, libc_sys_Xrt_sigtimedwait64)
-
 /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
 .section .text.crt.syscall.nanosleep64
 INTERN_FUNCTION(libc_sys_nanosleep64)
@@ -7807,22 +7839,6 @@ INTERN_FUNCTION(libc_sys_Xnanosleep64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xnanosleep64)
 DEFINE_PUBLIC_ALIAS(sys_Xnanosleep64, libc_sys_Xnanosleep64)
-
-/* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
-.section .text.crt.syscall.sched_rr_get_interval64
-INTERN_FUNCTION(libc_sys_sched_rr_get_interval64)
-	movl   $(0xffffff5f), %eax
-	jmp    libc_x86_exec_syscall2
-END(libc_sys_sched_rr_get_interval64)
-DEFINE_PUBLIC_ALIAS(sys_sched_rr_get_interval64, libc_sys_sched_rr_get_interval64)
-
-/* errno_t sched_rr_get_interval64(pid_t pid, struct timespecx32_64 *tms) */
-.section .text.crt.syscall.Xsched_rr_get_interval64
-INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval64)
-	movl   $(0xffffff5f), %eax
-	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xsched_rr_get_interval64)
-DEFINE_PUBLIC_ALIAS(sys_Xsched_rr_get_interval64, libc_sys_Xsched_rr_get_interval64)
 
 /* syscall_slong_t rpc_service(void) */
 .section .text.crt.syscall.rpc_service

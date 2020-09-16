@@ -114,7 +114,13 @@ NOTHROW_RPC(LIBCCALL libc_select64)(__STDC_INT_AS_SIZE_T nfds,
 /*[[[body:libc_select64]]]*/
 {
 	ssize_t result;
+#ifdef SYS_select64
 	result = sys_select64(nfds, readfds, writefds, exceptfds, timeout);
+#elif defined(SYS_select_time64)
+	result = sys_select_time64(nfds, readfds, writefds, exceptfds, timeout);
+#else /* ... */
+#error "No way to implement `select64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
@@ -137,7 +143,13 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
 	struct sigset_and_len ss;
 	ss.ss_ptr = sigmask;
 	ss.ss_len = sizeof(sigset_t);
+#ifdef SYS_pselect6_64
 	result = sys_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, &ss);
+#elif defined(SYS_pselect6_time64)
+	result = sys_pselect6_time64(nfds, readfds, writefds, exceptfds, timeout, &ss);
+#else /* ... */
+#error "No way to implement `pselect64()'"
+#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
