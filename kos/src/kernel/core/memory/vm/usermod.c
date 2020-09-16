@@ -77,6 +77,7 @@ STATIC_ASSERT(offsetof(struct usermod_section, us_entsize) == offsetof(struct dr
 STATIC_ASSERT(offsetof(struct usermod_section, us_link) == offsetof(struct driver_section, ds_link));
 STATIC_ASSERT(offsetof(struct usermod_section, us_info) == offsetof(struct driver_section, ds_info));
 STATIC_ASSERT(offsetof(struct usermod_section, us_flags) == offsetof(struct driver_section, ds_flags));
+STATIC_ASSERT(offsetof(struct usermod_section, _us_pad2) == offsetof(struct driver_section, ds_sectflags));
 STATIC_ASSERT(offsetof(struct usermod_section, us_index) == offsetof(struct driver_section, ds_index));
 STATIC_ASSERT(offsetof(struct usermod_section, us_cdata) == offsetof(struct driver_section, ds_cdata));
 STATIC_ASSERT(offsetof(struct usermod_section, us_csize) == offsetof(struct driver_section, ds_csize));
@@ -416,6 +417,7 @@ return_existing_result:
 				result->us_link    = ElfV_field(*shdr, self->um_modtype, sh_info);
 				result->us_info    = ElfV_field(*shdr, self->um_modtype, sh_info);
 				result->us_flags   = ElfV_field(*shdr, self->um_modtype, sh_flags);
+				result->_us_pad2   = 0xffff;
 				result->us_index   = section_index;
 #ifndef CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA
 				result->us_modtype = self->um_modtype;

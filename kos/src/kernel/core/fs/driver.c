@@ -25,8 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/hook.h>
-#include <debugger/io.h>
+#include <debugger/debugger.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
@@ -35,6 +34,7 @@
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/module.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
@@ -733,6 +733,53 @@ NOTHROW(KCALL decompress_section_data)(void *dst, size_t dst_size,
 	return ZLIB_ERROR_OK;
 }
 
+#ifdef CONFIG_HAVE_DEBUGGER
+PRIVATE ATTR_NOINLINE int
+NOTHROW(KCALL decompress_section_data_with_log)(struct driver_section *self,
+                                                void *dst, size_t dst_size,
+                                                void const *src, size_t src_size) {
+	int result;
+	/* Tell the user that we're decompressing section data if we're in
+	 * debugger mode. Do this because the act of decompressing may take
+	 * 1 to 2 seconds, and the user may otherwise be confused about what's
+	 * taking so long the first time they try to run some command that
+	 * makes use of debug information. */
+	if (dbg_active && self && self->ds_sectflags != 0xffff && self->ds_module) {
+		struct driver *d = self->ds_module;
+		char const *driver_name  = NULL;
+		char const *section_name = NULL;
+		void *screen_buffer;
+		driver_name = d->d_filename;
+		if (!driver_name)
+			driver_name = d->d_name;
+		if (self->ds_index < d->d_shnum && d->d_shstrtab && d->d_shdr) {
+			section_name = d->d_shstrtab + d->d_shdr[self->ds_index].sh_name;
+			if unlikely(section_name < d->d_shstrtab || section_name >= d->d_shstrtab_end)
+				section_name = NULL;
+		}
+		screen_buffer = alloca(dbg_screen_width * dbg_screen_cellsize);
+		dbg_getscreendata(0, dbg_screen_height - 1, dbg_screen_width, 1, screen_buffer);
+		dbg_beginupdate();
+		dbg_savecolor();
+		dbg_setcolor(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
+		dbg_hline(0, dbg_screen_height - 1, dbg_screen_width, ' ');
+		dbg_pprintf(0, dbg_screen_height - 1, DBGSTR("Decompressing %s:%s..."), driver_name, section_name);
+		dbg_loadcolor();
+		dbg_endupdate();
+		result = decompress_section_data(dst, dst_size, src, src_size);
+		dbg_setscreendata(0, dbg_screen_height - 1, dbg_screen_width, 1, screen_buffer);
+	} else {
+		result = decompress_section_data(dst, dst_size, src, src_size);
+	}
+	return result;
+}
+#else /* CONFIG_HAVE_DEBUGGER */
+#define decompress_section_data_with_log(self, dst, dst_size, src, src_size) \
+	decompress_section_data(dst, dst_size, src, src_size)
+#endif /* !CONFIG_HAVE_DEBUGGER */
+
+
+
 #if (defined(CONFIG_HAVE_USERMOD) && !defined(CONFIG_USERMOD_SECTION_CDATA_IS_DRIVER_SECTION_CDATA))
 #define ElfV_NEED_MODDTYPE
 #if !(defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64))
@@ -787,9 +834,9 @@ driver_section_cdata(struct driver_section *__restrict self, gfp_t gfp)
 
 	/* Allocate a blob for decompressed section data. */
 	result = vpage_alloc(ch_pages, 1, gfp | GFP_PREFLT);
-	if unlikely(decompress_section_data(result, ch_size,
-	                                    (byte_t *)chdr + sizeof_chdr,
-	                                    self->ds_size - sizeof_chdr) !=
+	if unlikely(decompress_section_data_with_log(self, result, ch_size,
+	                                             (byte_t *)chdr + sizeof_chdr,
+	                                             self->ds_size - sizeof_chdr) !=
 	            ZLIB_ERROR_OK) {
 		/* Inflate error. */
 		vpage_free(result, ch_pages);
@@ -839,9 +886,9 @@ NOTHROW(KCALL driver_section_cdata_nx)(struct driver_section *__restrict self, g
 	result = vpage_alloc_nx(ch_pages, 1, gfp | GFP_PREFLT);
 	if unlikely(!result)
 		goto err;
-	if unlikely(decompress_section_data(result, ch_size,
-	                                    (byte_t *)chdr + sizeof_chdr,
-	                                    self->ds_size - sizeof_chdr) !=
+	if unlikely(decompress_section_data_with_log(self, result, ch_size,
+	                                             (byte_t *)chdr + sizeof_chdr,
+	                                             self->ds_size - sizeof_chdr) !=
 	            ZLIB_ERROR_OK) {
 		/* Inflate error. */
 		vpage_free(result, ch_pages);

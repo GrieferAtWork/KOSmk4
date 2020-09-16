@@ -25,7 +25,21 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* Structure describing a mount table entry.  */
+/*
+ * C structure for describing a mounted filesystem
+ * entry from /etc/fstab or /proc/self/mounts.
+ *
+ * Every line that isn't empty, or a comment will match:
+ *
+ *    mnt_fsname mnt_dir mnt_type mnt_opts mnt_freq mnt_passno
+ *
+ * For processing, libc uses `fparseln()' with default with `delim = "\0\0#"'
+ *
+ * FILES:
+ *   - /proc/self/mounts       (Currently mounted filesystems)
+ *   - /etc/fstab              (Filesystems mounted by /bin/init)
+ *   - /etc/mtab               (Alias for /proc/self/mounts
+ */
 struct mntent {
 	char *mnt_fsname; /* Device or server for filesystem. */
 	char *mnt_dir;    /* Directory mounted on. */

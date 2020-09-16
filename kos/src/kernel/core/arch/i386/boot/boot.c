@@ -476,6 +476,19 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Trigger `DEBUGTRAP_REASON_VFORK' and `DEBUGTRAP_REASON_VFORKDONE'
 	 *       at appropriate locations within the kernel. */
 
+	/* TODO: Add special files to /proc, and add symlinks to /dev to implement:
+	 *       /dev/                   -- Just like right now, contains system devices by-name
+	 *       /dev/block/             -- Contains symlinks for the /dev device, such as 8:0 -> ../sda
+	 *       /dev/char/              -- Contains symlinks for the /dev device, such as 1:1 -> ../mem
+	 *       /dev/cpu/[id]/cpuid     -- A readable file to access `cpuid' data for a given CPU.
+	 *       /dev/disk/by-id/        -- Symlinks for block-devices
+	 *       /dev/disk/by-label/     -- Symlinks for block-devices
+	 *       /dev/disk/by-partlabel/ -- Symlinks for block-devices
+	 *       /dev/disk/by-partuuid/  -- Symlinks for block-devices
+	 *       /dev/disk/by-path/      -- Symlinks for block-devices
+	 *       /dev/disk/by-uuid/      -- Symlinks for block-devices
+	 */
+
 	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
 	 *      the instruction stream to figure out how to unwind the stack.
 	 *      This unwinder should assume the default calling convention for every

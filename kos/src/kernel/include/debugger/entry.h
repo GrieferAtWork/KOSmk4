@@ -182,10 +182,10 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 4)) struct scpustate *FCALL dbg_en
  *       are enabled, only a debug trap will be generated upon a coredump, but
  *       the builtin debugger will only be entered when `KERNEL_DEBUGTRAP_ON_COREDUMP'
  *       isn't set, or `kernel_debugtrap_enabled() == false'
- * Also note that certain conditions _always_ core the builtin debugger to be entered,
+ * Also note that certain conditions _always_ cause the builtin debugger to be entered,
  * possibly even if a debug trap was generated before then. Such conditions include
  * assertion checks/failures, stack segment faults, unhandled exceptions, and of course,
- * calls to `kernel_panic()' */
+ * calls to `kernel_panic()' and `dbg()' or kernel-space instruction breakpoints (int3) */
 #define KERNEL_DEBUG_ON_COREDUMP 0x0008
 #define KERNEL_DEBUG_ON_DEFAULT  (KERNEL_DEBUG_ON_COREDUMP)
 

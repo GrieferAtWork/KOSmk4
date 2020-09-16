@@ -32,6 +32,7 @@
 #define _PATH_DEFPATH "/bin:/usr/bin"
 #define _PATH_STDPATH "/bin:/usr/bin:/usr/sbin:/sbin"
 #define _PATH_MAILDIR "/var/mail"
+#define _PATH_MOUNTED "/proc/self/mounts"
 #define _PATH_VI      "/bin/busybox"
 #else /* ... */
 #define _PATH_MAILDIR "/var/mail"
