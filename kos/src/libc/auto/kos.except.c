@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d7cb535 */
+/* HASH CRC-32:0xa6fde8ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 
 DECL_BEGIN
 
+#include <errno.h>
 #include <signal.h>
 #include <asm/os/errno.h>
 #include <hybrid/host.h>

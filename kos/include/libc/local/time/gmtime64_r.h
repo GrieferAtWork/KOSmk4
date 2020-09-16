@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfd26eb2 */
+/* HASH CRC-32:0xfaa9b7e4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,7 +116,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gmtime64_r))(__time64_t const *__rest
 	__tp->tm_min  = (int)((__t/60) % 60);
 	__tp->tm_hour = (int)((__t/(60*60)) % 24);
 	__t /= 86400; /* SECONDS_PER_DAY */
-	__t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	__t += __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	__tp->tm_wday = (int)(__t % 7); /* DAYS_PER_WEEK */
 	__tp->tm_year = (int)__daystoyears(__t);
 	__t -= __yearstodays(__tp->tm_year);

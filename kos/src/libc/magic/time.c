@@ -381,7 +381,7 @@ double difftime(time_t time1, time_t time0) {
 time_t mktime([[nonnull]] struct tm __KOS_FIXED_CONST *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
 	__TM_TYPE(@time@) result;
-	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->@tm_hour@*60*60;
@@ -394,7 +394,7 @@ time_t mktime([[nonnull]] struct tm __KOS_FIXED_CONST *tp) {
 	return (time_t)mktime32(tp);
 @@pp_else@@
 	__TM_TYPE(@time@) result;
-	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->@tm_hour@*60*60;
@@ -609,7 +609,7 @@ double difftime64($time64_t time1, $time64_t time0) {
 $time64_t mktime64([[nonnull]] struct $tm __KOS_FIXED_CONST *tp) {
 @@pp_ifdef __BUILDING_LIBC@@
 	time64_t result;
-	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->@tm_hour@*60*60;
@@ -620,7 +620,7 @@ $time64_t mktime64([[nonnull]] struct $tm __KOS_FIXED_CONST *tp) {
 	return (time64_t)mktime32(tp);
 @@pp_else@@
 	time64_t result;
-	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->@tm_year@) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	result += tp->@tm_yday@;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->@tm_hour@*60*60;
@@ -1519,7 +1519,7 @@ struct $tm *gmtime_r([[nonnull]] $time_t const *__restrict timer,
 	tp->@tm_min@  = (int)((t / 60) % 60);
 	tp->@tm_hour@ = (int)((t / (60 * 60)) % 24);
 	t /= 86400; /* SECONDS_PER_DAY */
-	t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	t += __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	tp->@tm_wday@ = (int)(t % 7); /* DAYS_PER_WEEK */
 	tp->@tm_year@ = (int)__daystoyears(t);
 	t -= __yearstodays(tp->@tm_year@);
@@ -1618,7 +1618,7 @@ struct $tm *gmtime64_r([[nonnull]] $time64_t const *__restrict timer,
 	tp->@tm_min@  = (int)((t/60) % 60);
 	tp->@tm_hour@ = (int)((t/(60*60)) % 24);
 	t /= 86400; /* SECONDS_PER_DAY */
-	t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	t += __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	tp->@tm_wday@ = (int)(t % 7); /* DAYS_PER_WEEK */
 	tp->@tm_year@ = (int)__daystoyears(t);
 	t -= __yearstodays(tp->@tm_year@);
@@ -1661,7 +1661,7 @@ struct $tm *gmtime64_r([[nonnull]] $time64_t const *__restrict timer,
 	tp->@tm_min@  = (int)((t/60) % 60);
 	tp->@tm_hour@ = (int)((t/(60*60)) % 24);
 	t /= 86400; /* SECONDS_PER_DAY */
-	t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	t += __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	tp->@tm_wday@ = (int)(t % 7); /* DAYS_PER_WEEK */
 	tp->@tm_year@ = (int)__daystoyears(t);
 	t -= __yearstodays(tp->@tm_year@);

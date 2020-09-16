@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e4758a0 */
+/* HASH CRC-32:0x5d5ce92b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -319,12 +319,12 @@
 #define __NRAC_sendfile               4
 #define __NRAC_ftruncate              2
 #define __NRAC_truncate               2
-#define __NRAC_linux_stat             2
-#define __NRAC_linux_lstat            2
-#define __NRAC_linux_fstat            2
+#define __NRAC_stat                   2
+#define __NRAC_lstat                  2
+#define __NRAC_fstat                  2
 #define __NRAC_fcntl                  3
 #define __NRAC_fadvise64              1
-#define __NRAC_linux_newfstatat       4
+#define __NRAC_newfstatat             4
 #define __NRAC_fstatfs                2
 #define __NRAC_statfs                 2
 #define __NRAC_lseek                  3
@@ -641,12 +641,12 @@
 #define __NRRT_sendfile               (ssize_t, __ssize_t)
 #define __NRRT_ftruncate              (errno_t, __errno_t)
 #define __NRRT_truncate               (errno_t, __errno_t)
-#define __NRRT_linux_stat             (errno_t, __errno_t)
-#define __NRRT_linux_lstat            (errno_t, __errno_t)
-#define __NRRT_linux_fstat            (errno_t, __errno_t)
+#define __NRRT_stat                   (errno_t, __errno_t)
+#define __NRRT_lstat                  (errno_t, __errno_t)
+#define __NRRT_fstat                  (errno_t, __errno_t)
 #define __NRRT_fcntl                  (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_fadvise64              (errno_t, __errno_t)
-#define __NRRT_linux_newfstatat       (errno_t, __errno_t)
+#define __NRRT_newfstatat             (errno_t, __errno_t)
 #define __NRRT_fstatfs                (errno_t, __errno_t)
 #define __NRRT_statfs                 (errno_t, __errno_t)
 #define __NRRT_lseek                  (syscall_slong_t, __syscall_slong_t)
@@ -1344,20 +1344,20 @@
 #define __NRAT1_ftruncate              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_truncate               (char const *, char const *)
 #define __NRAT1_truncate               (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_linux_stat             (char const *, char const *)
-#define __NRAT1_linux_stat             (struct linux_stat *, struct linux_stat *)
-#define __NRAT0_linux_lstat            (char const *, char const *)
-#define __NRAT1_linux_lstat            (struct linux_stat *, struct linux_stat *)
-#define __NRAT0_linux_fstat            (fd_t, __fd_t)
-#define __NRAT1_linux_fstat            (struct linux_stat *, struct linux_stat *)
+#define __NRAT0_stat                   (char const *, char const *)
+#define __NRAT1_stat                   (struct linux_stat *, struct linux_stat *)
+#define __NRAT0_lstat                  (char const *, char const *)
+#define __NRAT1_lstat                  (struct linux_stat *, struct linux_stat *)
+#define __NRAT0_fstat                  (fd_t, __fd_t)
+#define __NRAT1_fstat                  (struct linux_stat *, struct linux_stat *)
 #define __NRAT0_fcntl                  (fd_t, __fd_t)
 #define __NRAT1_fcntl                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_fcntl                  (void *, void *)
 #define __NRAT0_fadvise64              (int, int)
-#define __NRAT0_linux_newfstatat       (fd_t, __fd_t)
-#define __NRAT1_linux_newfstatat       (char const *, char const *)
-#define __NRAT2_linux_newfstatat       (struct linux64_stat32 *, struct linux64_stat32 *)
-#define __NRAT3_linux_newfstatat       (atflag_t, __atflag_t)
+#define __NRAT0_newfstatat             (fd_t, __fd_t)
+#define __NRAT1_newfstatat             (char const *, char const *)
+#define __NRAT2_newfstatat             (struct linux64_stat32 *, struct linux64_stat32 *)
+#define __NRAT3_newfstatat             (atflag_t, __atflag_t)
 #define __NRAT0_fstatfs                (fd_t, __fd_t)
 #define __NRAT1_fstatfs                (struct statfs *, struct statfs *)
 #define __NRAT0_statfs                 (char const *, char const *)
@@ -1704,12 +1704,12 @@
 #define __NRAM_sendfile(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (__fd_t)b, (__syscall_ulong_t *)c, (__size_t)d
 #define __NRAM_ftruncate(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (__syscall_ulong_t)b
 #define __NRAM_truncate(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (char const *)a, (__syscall_ulong_t)b
-#define __NRAM_linux_stat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (char const *)a, (struct linux_stat *)b
-#define __NRAM_linux_lstat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (char const *)a, (struct linux_stat *)b
-#define __NRAM_linux_fstat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__fd_t)a, (struct linux_stat *)b
+#define __NRAM_stat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (char const *)a, (struct linux_stat *)b
+#define __NRAM_lstat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (char const *)a, (struct linux_stat *)b
+#define __NRAM_fstat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (struct linux_stat *)b
 #define __NRAM_fcntl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__syscall_ulong_t)b, (void *)c
 #define __NRAM_fadvise64(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (int)a
-#define __NRAM_linux_newfstatat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)       (__fd_t)a, (char const *)b, (struct linux64_stat32 *)c, (__atflag_t)d
+#define __NRAM_newfstatat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__fd_t)a, (char const *)b, (struct linux64_stat32 *)c, (__atflag_t)d
 #define __NRAM_fstatfs(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                (__fd_t)a, (struct statfs *)b
 #define __NRAM_statfs(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char const *)a, (struct statfs *)b
 #define __NRAM_lseek(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__fd_t)a, (__syscall_slong_t)b, (__syscall_ulong_t)c
@@ -2026,12 +2026,12 @@
 #define __NRAP_sendfile(a, b, c, d)                                                                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_ftruncate(a, b)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_truncate(a, b)                                                                                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_linux_stat(a, b)                                                                                     (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_linux_lstat(a, b)                                                                                    (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NRAP_linux_fstat(a, b)                                                                                    (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_stat(a, b)                                                                                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_lstat(a, b)                                                                                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAP_fstat(a, b)                                                                                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_fcntl(a, b, c)                                                                                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_fadvise64(a)                                                                                         (__syscall_ulong_t)a
-#define __NRAP_linux_newfstatat(a, b, c, d)                                                                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_newfstatat(a, b, c, d)                                                                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_fstatfs(a, b)                                                                                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_statfs(a, b)                                                                                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_lseek(a, b, c)                                                                                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

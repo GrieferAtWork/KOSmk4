@@ -1174,11 +1174,25 @@ again_merge_dups:
 }
 
 
+function printStrendExpr(fp: File, arg: string, marker: string): File {
+	if (marker == "\0") {
+		fp	<< "strend(" << arg << ")";
+	} else {
+		fp	<< "rawmemchr(" << arg << ", '"
+			<< marker.encode("c-escape")
+			<< "')";
+	}
+	return fp;
+}
+
 
 function printExceptNameFunctionBodyForMappings(
 		fp: File, mappings: {int: {int: ExceptClass}},
 		classVariableName: string, subClassVariableName: string,
-		linePrefix: string) {
+		linePrefix: string,
+		keyExceptClassName: Callable with ExceptClass,
+		exceptClassEndMarker: string = "\1",
+		exceptSubClassEndMarker: string = "\0") {
 
 	function hex4(v: int): string {
 		return v.hex()[2:].zfill(4);
@@ -1224,13 +1238,15 @@ function printExceptNameFunctionBodyForMappings(
 				assert mySubClassPartitions.first.first == 0;
 				local maxSubClass = mySubClassPartitions.first.last;
 				for (local errorSubClass: [0:maxSubClass+1]) {
-					local name = subClasses.get(errorSubClass).name;
+					local name = subClasses.get(errorSubClass);
+					if (name !is none)
+						name = keyExceptClassName(name);
 					if (name is none)
 						name = "";
-					text << name << "\0";
+					text << name << exceptSubClassEndMarker;
 				}
 			}
-			text << "\1";
+			text << exceptClassEndMarker;
 		}
 		fp << linePrefix << "static char const e_linear_"
 			<< hex4(min) << "h_" << hex4(max) << "h[] =\n"
@@ -1266,12 +1282,14 @@ function printExceptNameFunctionBodyForMappings(
 			<< linePrefix << "} else ";
 	}
 	if (!isFirst) {
-		fp << "{\n"
+		fp	<< "{\n"
 			<< linePrefix << "	goto non_linear_prefix;\n"
 			<< linePrefix << "}\n"
 			<< linePrefix << "while (class_offset) {\n"
 			<< linePrefix << "	--class_offset;\n"
-			<< linePrefix << "	result = (char *)rawmemchr(result, '\\1') + 1;\n"
+			<< linePrefix << "	result = (char *)";
+		printStrendExpr(fp, "result", exceptClassEndMarker);
+		fp	<< " + 1;\n"
 			<< linePrefix << "}\n"
 			<< linePrefix << "subclass_offset = " << subClassVariableName << ";\n"
 			<< linePrefix << "for (;;) {\n"
@@ -1283,9 +1301,11 @@ function printExceptNameFunctionBodyForMappings(
 			<< linePrefix << "		return result;\n"
 			<< linePrefix << "	}\n"
 			<< linePrefix << "	--subclass_offset;\n"
-			<< linePrefix << "	result = strend(result) + 1;\n"
-			<< linePrefix << "}\n";
-		fp << "non_linear_prefix:\n";
+			<< linePrefix << "	result = ";
+		printStrendExpr(fp, "result", exceptSubClassEndMarker);
+		fp	<< " + 1;\n"
+			<< linePrefix << "}\n"
+			<< "non_linear_prefix:\n";
 	}
 	if (nonLinearMappings) {
 		fp << linePrefix << "switch(" << classVariableName << ") {\n";
@@ -1298,14 +1318,18 @@ function printExceptNameFunctionBodyForMappings(
 				File.Writer text;
 				local isFirst = true;
 				for (local subClassId: [min:max+1]) {
-					local subClassName = mappings[classId].get(subClassId).name;
+					local subClassName = mappings[classId].get(subClassId);
+					if (subClassName !is none)
+						subClassName = keyExceptClassName(subClassName);
 					if (subClassName is none)
 						subClassName = "";
 					if (!isFirst)
-						text << "\0";
+						text << exceptSubClassEndMarker;
 					isFirst = false;
 					text << subClassName;
 				}
+				if (exceptSubClassEndMarker != "\0" && !isFirst)
+					text << exceptSubClassEndMarker;
 				fp << linePrefix << "\tstatic char const e_" << hex4(classId) << "h_linear_"
 					<< hex4(min) << "h_" << hex4(max) << "h[] =\n"
 					<< linePrefix << "\t";
@@ -1351,7 +1375,9 @@ function printExceptNameFunctionBodyForMappings(
 	}
 	fp	<< linePrefix << "while (subclass_offset) {\n"
 		<< linePrefix << "	--subclass_offset;\n"
-		<< linePrefix << "	result = strend(result) + 1;\n"
+		<< linePrefix << "	result = ";
+	printStrendExpr(fp, "result", exceptSubClassEndMarker);
+	fp	<< " + 1;\n"
 		<< linePrefix << "}\n"
 		<< linePrefix << "if (!*result)\n"
 		<< linePrefix << "	result = NULL;\n"
@@ -1365,11 +1391,14 @@ function printExceptNameFunctionBody(
 		ppCondMappings: {string: {int: {int: ExceptClass}}} = none,
 		classVariableName: string = "err_class",
 		subClassVariableName: string = "err_subclass",
-		linePrefix: string = "\t") {
+		linePrefix: string = "\t",
+		keyExceptClassName: Callable with ExceptClass = none) {
 	if (fp is none)
 		fp = File.stdout;
 	if (ppCondMappings is none)
 		ppCondMappings = getExceptionCodeMappings();
+	if (keyExceptClassName is none)
+		keyExceptClassName = [](x: ExceptClass) -> x.name;
 	/* Use ppexpr optimizations to turn a sequence of:
 	 * >> #if FOO
 	 * >> a
@@ -1401,7 +1430,8 @@ function printExceptNameFunctionBody(
 			}
 			printExceptNameFunctionBodyForMappings(
 				fp, mappings, classVariableName,
-				subClassVariableName, linePrefix);
+				subClassVariableName, linePrefix,
+				keyExceptClassName);
 			continue;
 		}
 		if (assumptions !is none) {
@@ -1414,7 +1444,8 @@ function printExceptNameFunctionBody(
 		assumptions.addAssumption(ppCond);
 		printExceptNameFunctionBodyForMappings(
 			fp, mappings, classVariableName,
-			subClassVariableName, linePrefix);
+			subClassVariableName, linePrefix,
+			keyExceptClassName);
 	}
 	if (assumptions !is none) {
 		fp << "#endif /* ... */\n";

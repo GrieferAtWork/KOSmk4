@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0439d92 */
+/* HASH CRC-32:0xad5bf3fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -627,12 +627,12 @@
 #define __NR_sendfile               0x416 /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 #define __NR_ftruncate              0x417 /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
 #define __NR_truncate               0x418 /* errno_t truncate(char const *filename, syscall_ulong_t length) */
-#define __NR_linux_stat             0x419 /* errno_t linux_stat(char const *filename, struct linux_stat *statbuf) */
-#define __NR_linux_lstat            0x41a /* errno_t linux_lstat(char const *filename, struct linux_stat *statbuf) */
-#define __NR_linux_fstat            0x41b /* errno_t linux_fstat(fd_t fd, struct linux_stat *statbuf) */
+#define __NR_stat                   0x419 /* errno_t stat(char const *filename, struct linux_stat *statbuf) */
+#define __NR_lstat                  0x41a /* errno_t lstat(char const *filename, struct linux_stat *statbuf) */
+#define __NR_fstat                  0x41b /* errno_t fstat(fd_t fd, struct linux_stat *statbuf) */
 #define __NR_fcntl                  0x41c /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
 #define __NR_fadvise64              0x41d /* errno_t fadvise64(int TODO_PROTOTYPE) */
-#define __NR_linux_newfstatat       0x41e /* errno_t linux_newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
+#define __NR_newfstatat             0x41e /* errno_t newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
 #define __NR_fstatfs                0x41f /* errno_t fstatfs(fd_t file, struct statfs *buf) */
 #define __NR_statfs                 0x420 /* errno_t statfs(char const *file, struct statfs *buf) */
 #define __NR_lseek                  0x421 /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
@@ -1044,12 +1044,12 @@
 #define __NRRM_sendfile               1
 #define __NRRM_ftruncate              0
 #define __NRRM_truncate               0
-#define __NRRM_linux_stat             0
-#define __NRRM_linux_lstat            0
-#define __NRRM_linux_fstat            0
+#define __NRRM_stat                   0
+#define __NRRM_lstat                  0
+#define __NRRM_fstat                  0
 #define __NRRM_fcntl                  0
 #define __NRRM_fadvise64              0
-#define __NRRM_linux_newfstatat       0
+#define __NRRM_newfstatat             0
 #define __NRRM_fstatfs                0
 #define __NRRM_statfs                 0
 #define __NRRM_lseek                  0
@@ -1180,11 +1180,11 @@
 #define __NRCP_symlink                1
 #define __NRCP_utimes                 1
 #define __NRCP_sendfile               1
-#define __NRCP_linux_stat             1
-#define __NRCP_linux_lstat            1
-#define __NRCP_linux_fstat            1
+#define __NRCP_stat                   1
+#define __NRCP_lstat                  1
+#define __NRCP_fstat                  1
 #define __NRCP_fcntl                  1
-#define __NRCP_linux_newfstatat       1
+#define __NRCP_newfstatat             1
 #define __NRCP_lseek                  1
 #define __NRCP_pause                  1
 #define __NRCP_utime                  1
@@ -1491,12 +1491,12 @@
 #define __NRRC_sendfile               4
 #define __NRRC_ftruncate              2
 #define __NRRC_truncate               2
-#define __NRRC_linux_stat             2
-#define __NRRC_linux_lstat            2
-#define __NRRC_linux_fstat            2
+#define __NRRC_stat                   2
+#define __NRRC_lstat                  2
+#define __NRRC_fstat                  2
 #define __NRRC_fcntl                  3
 #define __NRRC_fadvise64              1
-#define __NRRC_linux_newfstatat       4
+#define __NRRC_newfstatat             4
 #define __NRRC_fstatfs                2
 #define __NRRC_statfs                 2
 #define __NRRC_lseek                  3

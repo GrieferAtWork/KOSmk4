@@ -66,36 +66,6 @@
 
 DECL_BEGIN
 
-INTERN ATTR_CONST char const *
-NOTHROW(FCALL get_exception_name)(error_code_t code) {
-	char const *result;
-#undef END
-#undef CLASS
-#undef SUBCLASS
-	switch (code) {
-#define SUBCLASS(name, ...) \
-	case ERROR_CODE name:   \
-		result = #name;     \
-		break;
-#include <kos/except-codes.def>
-#undef SUBCLASS
-	default:
-		switch (ERROR_CLASS(code)) {
-#define CLASS(name, ...) \
-	case name:           \
-		result = #name;  \
-		break;
-#include <kos/except-codes.def>
-#undef SUBCLASS
-		default:
-			result = NULL;
-			break;
-		}
-	}
-	return result;
-}
-
-
 PRIVATE char const gp32_names[8][4] = {
 	/* [X86_REGISTER_GENERAL_PURPOSE_EAX & 7] = */ "eax",
 	/* [X86_REGISTER_GENERAL_PURPOSE_ECX & 7] = */ "ecx",
@@ -425,7 +395,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	              "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) "",
 	              info->ei_class,
 	              info->ei_subclass);
-	name = get_exception_name(info->ei_code);
+	name = error_name(info->ei_code);
 	if (name)
 		format_printf(printer, arg, " [%s]", name);
 	print_exception_desc(printer, arg);
@@ -515,7 +485,7 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	           info->ei_subclass);
 
 	/* Dump the exception that occurred. */
-	name = get_exception_name(info->ei_code);
+	name = error_name(info->ei_code);
 	if (name)
 		dbg_printf(DBGSTR(" [" AC_WHITE("%s") "]"), name);
 	print_exception_desc(&dbg_printer, NULL);
@@ -970,7 +940,7 @@ PUBLIC ATTR_CONST void *__cxa_begin_catch(void *ptr) {
 	 * >>     printk("exc @ %p\n", &exc); // Prints the address that this function returns.
 	 * >> }
 	 * The given `ptr' is what `libc_error_unwind()' originally set as value
-	 * for the `UNWIND_REGISTER_EXCEPTION' register. */
+	 * for the `CFI_UNWIND_REGISTER_EXCEPTION' register. */
 	return ptr;
 }
 

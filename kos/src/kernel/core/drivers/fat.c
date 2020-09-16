@@ -961,9 +961,9 @@ NOTHROW(KCALL Fat_FinalizeNode)(struct inode *__restrict self) {
 	}
 }
 
-#define LINUX_TIME_START_YEAR  1970
+#define UNIX_TIME_START_YEAR 1970
 
-#define SECONDS_PER_DAY        86400
+#define SECONDS_PER_DAY 86400
 
 #define DAYS2YEARS(n_days)  ((400 * ((n_days) + 1)) / 146097)
 #define YEARS2DAYS(n_years) (((146097 * (n_years)) / 400) /*-1*/) // rounding error?
@@ -988,7 +988,7 @@ Fat_DecodeFileDate(FatFileDate self)
 	time_t result;
 	unsigned int year;
 	year   = self.fd_year + 1980;
-	result = YEARS2DAYS(year - LINUX_TIME_START_YEAR);
+	result = YEARS2DAYS(year - UNIX_TIME_START_YEAR);
 	result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (self.fd_month - 1) % 12);
 	result += self.fd_day - 1;
 	return result * SECONDS_PER_DAY;
@@ -1001,7 +1001,7 @@ NOTHROW(KCALL Fat_EncodeFileDate)(time_t tmt) {
 	u8 i;
 	time_t const *monthvec;
 	tmt /= SECONDS_PER_DAY;
-	tmt += YEARS2DAYS(LINUX_TIME_START_YEAR);
+	tmt += YEARS2DAYS(UNIX_TIME_START_YEAR);
 	year     = DAYS2YEARS(tmt);
 	monthvec = time_monthstart_yday[ISLEAPYEAR(year)];
 	tmt -= YEARS2DAYS(year);

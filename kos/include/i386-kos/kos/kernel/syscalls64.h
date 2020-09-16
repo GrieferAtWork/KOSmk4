@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6d84859 */
+/* HASH CRC-32:0x92d375b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,6 +95,7 @@
 #define __ARCH_WANT_SYSCALL_FRENAMEAT                      1
 #define __ARCH_WANT_SYSCALL_FSETXATTR                      1
 #define __ARCH_WANT_SYSCALL_FSMODE                         1
+#define __ARCH_WANT_SYSCALL_FSTAT                          1
 #define __ARCH_WANT_SYSCALL_FSTATFS                        1
 #define __ARCH_WANT_SYSCALL_FSYMLINKAT                     1
 #define __ARCH_WANT_SYSCALL_FSYNC                          1
@@ -172,10 +173,6 @@
 #define __ARCH_WANT_SYSCALL_LGETXATTR                      1
 #define __ARCH_WANT_SYSCALL_LINK                           1
 #define __ARCH_WANT_SYSCALL_LINKAT                         1
-#define __ARCH_WANT_SYSCALL_LINUX_FSTAT                    1
-#define __ARCH_WANT_SYSCALL_LINUX_FSTATAT                  1
-#define __ARCH_WANT_SYSCALL_LINUX_LSTAT                    1
-#define __ARCH_WANT_SYSCALL_LINUX_STAT                     1
 #define __ARCH_WANT_SYSCALL_LISTEN                         1
 #define __ARCH_WANT_SYSCALL_LISTXATTR                      1
 #define __ARCH_WANT_SYSCALL_LLISTXATTR                     1
@@ -183,6 +180,7 @@
 #define __ARCH_WANT_SYSCALL_LREMOVEXATTR                   1
 #define __ARCH_WANT_SYSCALL_LSEEK                          1
 #define __ARCH_WANT_SYSCALL_LSETXATTR                      1
+#define __ARCH_WANT_SYSCALL_LSTAT                          1
 #define __ARCH_WANT_SYSCALL_MADVISE                        1
 #define __ARCH_WANT_SYSCALL_MAPLIBRARY                     1
 #define __ARCH_WANT_SYSCALL_MBIND                          1
@@ -220,6 +218,7 @@
 #define __ARCH_WANT_SYSCALL_MUNMAP                         1
 #define __ARCH_WANT_SYSCALL_NAME_TO_HANDLE_AT              1
 #define __ARCH_WANT_SYSCALL_NANOSLEEP                      1
+#define __ARCH_WANT_SYSCALL_NEWFSTATAT                     1
 #define __ARCH_WANT_SYSCALL_NFSSERVCTL                     1
 #define __ARCH_WANT_SYSCALL_OPEN                           1
 #define __ARCH_WANT_SYSCALL_OPEN_BY_HANDLE_AT              1
@@ -343,6 +342,7 @@
 #define __ARCH_WANT_SYSCALL_SOCKET                         1
 #define __ARCH_WANT_SYSCALL_SOCKETPAIR                     1
 #define __ARCH_WANT_SYSCALL_SPLICE                         1
+#define __ARCH_WANT_SYSCALL_STAT                           1
 #define __ARCH_WANT_SYSCALL_STATFS                         1
 #define __ARCH_WANT_SYSCALL_SWAPOFF                        1
 #define __ARCH_WANT_SYSCALL_SWAPON                         1
@@ -414,6 +414,9 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_EXECVEAT                1
 #define __ARCH_WANT_COMPAT_SYSCALL_FADVISE64_64            1
 #define __ARCH_WANT_COMPAT_SYSCALL_FCNTL64                 1
+#define __ARCH_WANT_COMPAT_SYSCALL_FSTAT                   1
+#define __ARCH_WANT_COMPAT_SYSCALL_FSTAT64                 1
+#define __ARCH_WANT_COMPAT_SYSCALL_FSTATAT64               1
 #define __ARCH_WANT_COMPAT_SYSCALL_FSTATFS                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_FSTATFS64               1
 #define __ARCH_WANT_COMPAT_SYSCALL_FTIME                   1
@@ -444,17 +447,9 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEX                  1
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEXEXPR              1
 #define __ARCH_WANT_COMPAT_SYSCALL_LFUTEXLOCKEXPR          1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT             1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT64           1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT64         1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT             1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64           1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTAT          1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDLSTAT          1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDSTAT           1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT              1
-#define __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64            1
 #define __ARCH_WANT_COMPAT_SYSCALL_LOCK                    1
+#define __ARCH_WANT_COMPAT_SYSCALL_LSTAT                   1
+#define __ARCH_WANT_COMPAT_SYSCALL_LSTAT64                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_MAPLIBRARY              1
 #define __ARCH_WANT_COMPAT_SYSCALL_MMAP2                   1
 #define __ARCH_WANT_COMPAT_SYSCALL_MPX                     1
@@ -468,7 +463,10 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP               1
 #define __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP64             1
 #define __ARCH_WANT_COMPAT_SYSCALL_NICE                    1
+#define __ARCH_WANT_COMPAT_SYSCALL_OLDFSTAT                1
+#define __ARCH_WANT_COMPAT_SYSCALL_OLDLSTAT                1
 #define __ARCH_WANT_COMPAT_SYSCALL_OLDOLDUNAME             1
+#define __ARCH_WANT_COMPAT_SYSCALL_OLDSTAT                 1
 #define __ARCH_WANT_COMPAT_SYSCALL_OLDUNAME                1
 #define __ARCH_WANT_COMPAT_SYSCALL_OPEN_BY_HANDLE_AT       1
 #define __ARCH_WANT_COMPAT_SYSCALL_PPOLL                   1
@@ -526,6 +524,8 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_SIGSUSPEND              1
 #define __ARCH_WANT_COMPAT_SYSCALL_SOCKETCALL              1
 #define __ARCH_WANT_COMPAT_SYSCALL_SSETMASK                1
+#define __ARCH_WANT_COMPAT_SYSCALL_STAT                    1
+#define __ARCH_WANT_COMPAT_SYSCALL_STAT64                  1
 #define __ARCH_WANT_COMPAT_SYSCALL_STATFS                  1
 #define __ARCH_WANT_COMPAT_SYSCALL_STATFS64                1
 #define __ARCH_WANT_COMPAT_SYSCALL_STIME                   1

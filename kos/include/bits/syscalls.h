@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xabff8390 */
+/* HASH CRC-32:0x5098201 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -630,12 +630,12 @@
 #define SYS_sendfile               __NR_sendfile               /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *pin_offset, size_t num_bytes) */
 #define SYS_ftruncate              __NR_ftruncate              /* errno_t ftruncate(fd_t fd, syscall_ulong_t length) */
 #define SYS_truncate               __NR_truncate               /* errno_t truncate(char const *filename, syscall_ulong_t length) */
-#define SYS_linux_stat             __NR_linux_stat             /* errno_t linux_stat(char const *filename, struct linux_stat *statbuf) */
-#define SYS_linux_lstat            __NR_linux_lstat            /* errno_t linux_lstat(char const *filename, struct linux_stat *statbuf) */
-#define SYS_linux_fstat            __NR_linux_fstat            /* errno_t linux_fstat(fd_t fd, struct linux_stat *statbuf) */
+#define SYS_stat                   __NR_stat                   /* errno_t stat(char const *filename, struct linux_stat *statbuf) */
+#define SYS_lstat                  __NR_lstat                  /* errno_t lstat(char const *filename, struct linux_stat *statbuf) */
+#define SYS_fstat                  __NR_fstat                  /* errno_t fstat(fd_t fd, struct linux_stat *statbuf) */
 #define SYS_fcntl                  __NR_fcntl                  /* syscall_slong_t fcntl(fd_t fd, syscall_ulong_t command, void *arg) */
 #define SYS_fadvise64              __NR_fadvise64              /* errno_t fadvise64(int TODO_PROTOTYPE) */
-#define SYS_linux_newfstatat       __NR_linux_newfstatat       /* errno_t linux_newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
+#define SYS_newfstatat             __NR_newfstatat             /* errno_t newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
 #define SYS_fstatfs                __NR_fstatfs                /* errno_t fstatfs(fd_t file, struct statfs *buf) */
 #define SYS_statfs                 __NR_statfs                 /* errno_t statfs(char const *file, struct statfs *buf) */
 #define SYS_lseek                  __NR_lseek                  /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */

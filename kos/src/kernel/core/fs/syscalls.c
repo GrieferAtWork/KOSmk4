@@ -77,36 +77,36 @@
 #include <compat/pointer.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
-#if (defined(__ARCH_WANT_SYSCALL_LINUX_OLDFSTATAT) ||        \
-     defined(__ARCH_WANT_SYSCALL_LINUX_OLDFSTAT) ||          \
-     defined(__ARCH_WANT_SYSCALL_LINUX_OLDLSTAT) ||          \
-     defined(__ARCH_WANT_SYSCALL_LINUX_OLDSTAT) ||           \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTATAT) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTAT) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDLSTAT) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDSTAT))
+#if (defined(__ARCH_WANT_SYSCALL_OLDFSTATAT) ||        \
+     defined(__ARCH_WANT_SYSCALL_OLDFSTAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_OLDLSTAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_OLDSTAT) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_OLDFSTATAT) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_OLDFSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_OLDLSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_OLDSTAT))
 #define WANT_LINUX_OLDSTAT 1
 #endif /* linux_oldstat()... */
 
-#if (defined(__ARCH_WANT_SYSCALL_LINUX_FSTATAT) ||        \
-     defined(__ARCH_WANT_SYSCALL_LINUX_FSTAT) ||          \
-     defined(__ARCH_WANT_SYSCALL_LINUX_LSTAT) ||          \
-     defined(__ARCH_WANT_SYSCALL_LINUX_STAT) ||           \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT))
+#if (defined(__ARCH_WANT_SYSCALL_FSTATAT) ||        \
+     defined(__ARCH_WANT_SYSCALL_FSTAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_LSTAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_STAT) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FSTATAT) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LSTAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_STAT))
 #define WANT_LINUX_STAT 1
 #endif /* linux_stat()... */
 
-#if (defined(__ARCH_WANT_SYSCALL_LINUX_FSTATAT64) ||        \
-     defined(__ARCH_WANT_SYSCALL_LINUX_FSTAT64) ||          \
-     defined(__ARCH_WANT_SYSCALL_LINUX_LSTAT64) ||          \
-     defined(__ARCH_WANT_SYSCALL_LINUX_STAT64) ||           \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT64) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT64) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64) ||   \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64))
+#if (defined(__ARCH_WANT_SYSCALL_FSTATAT64) ||        \
+     defined(__ARCH_WANT_SYSCALL_FSTAT64) ||          \
+     defined(__ARCH_WANT_SYSCALL_LSTAT64) ||          \
+     defined(__ARCH_WANT_SYSCALL_STAT64) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FSTATAT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FSTAT64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_LSTAT64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_STAT64))
 #define WANT_LINUX_STAT64 1
 #endif /* linux_stat64()... */
 
@@ -2555,10 +2555,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, kstat,
 
 
 /************************************************************************/
-/* linux_oldfstatat(), linux_oldfstat(), linux_oldlstat(), linux_oldstat() */
+/* oldfstatat(), oldfstat(), oldlstat(), oldstat() */
 /************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_LINUX_OLDFSTATAT
-DEFINE_SYSCALL4(errno_t, linux_oldfstatat, fd_t, dirfd,
+#ifdef __ARCH_WANT_SYSCALL_OLDFSTATAT
+DEFINE_SYSCALL4(errno_t, oldfstatat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_oldstat *, statbuf,
                 atflag_t, flags) {
@@ -2568,10 +2568,10 @@ DEFINE_SYSCALL4(errno_t, linux_oldfstatat, fd_t, dirfd,
 	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_OLDFSTATAT */
+#endif /* __ARCH_WANT_SYSCALL_OLDFSTATAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTATAT
-DEFINE_COMPAT_SYSCALL4(errno_t, linux_oldfstatat, fd_t, dirfd,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDFSTATAT
+DEFINE_COMPAT_SYSCALL4(errno_t, oldfstatat, fd_t, dirfd,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct linux_oldstat *, statbuf,
                        atflag_t, flags) {
@@ -2581,10 +2581,10 @@ DEFINE_COMPAT_SYSCALL4(errno_t, linux_oldfstatat, fd_t, dirfd,
 	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTATAT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_OLDFSTATAT */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_OLDFSTAT
-DEFINE_SYSCALL2(errno_t, linux_oldfstat, fd_t, fd,
+#ifdef __ARCH_WANT_SYSCALL_OLDFSTAT
+DEFINE_SYSCALL2(errno_t, oldfstat, fd_t, fd,
                 USER UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
@@ -2592,10 +2592,10 @@ DEFINE_SYSCALL2(errno_t, linux_oldfstat, fd_t, fd,
 	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_OLDFSTAT */
+#endif /* __ARCH_WANT_SYSCALL_OLDFSTAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTAT
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldfstat, fd_t, fd,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDFSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, oldfstat, fd_t, fd,
                        USER UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
@@ -2603,10 +2603,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldfstat, fd_t, fd,
 	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDFSTAT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_OLDFSTAT */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_OLDLSTAT
-DEFINE_SYSCALL2(errno_t, linux_oldlstat,
+#ifdef __ARCH_WANT_SYSCALL_OLDLSTAT
+DEFINE_SYSCALL2(errno_t, oldlstat,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
@@ -2615,10 +2615,10 @@ DEFINE_SYSCALL2(errno_t, linux_oldlstat,
 	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_OLDLSTAT */
+#endif /* __ARCH_WANT_SYSCALL_OLDLSTAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDLSTAT
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldlstat,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDLSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, oldlstat,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
@@ -2627,10 +2627,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldlstat,
 	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDLSTAT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_OLDLSTAT */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_OLDSTAT
-DEFINE_SYSCALL2(errno_t, linux_oldstat,
+#ifdef __ARCH_WANT_SYSCALL_OLDSTAT
+DEFINE_SYSCALL2(errno_t, oldstat,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
@@ -2639,10 +2639,10 @@ DEFINE_SYSCALL2(errno_t, linux_oldstat,
 	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_OLDSTAT */
+#endif /* __ARCH_WANT_SYSCALL_OLDSTAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDSTAT
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldstat,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_OLDSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, oldstat,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct linux_oldstat *, statbuf) {
 	struct stat st;
@@ -2651,18 +2651,18 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_oldstat,
 	stat_to_linux_oldstat(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_OLDSTAT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_OLDSTAT */
 
 
 
 
 
 /************************************************************************/
-/* linux_fstatat(), linux_fstat(), linux_lstat(), linux_stat()          */
-/* linux_fstatat64(), linux_fstat64(), linux_lstat64(), linux_stat64()  */
+/* fstatat(), fstat(), lstat(), stat()          */
+/* fstatat64(), fstat64(), lstat64(), stat64()  */
 /************************************************************************/
-#ifdef __ARCH_WANT_SYSCALL_LINUX_FSTATAT
-DEFINE_SYSCALL4(errno_t, linux_fstatat, fd_t, dirfd,
+#ifdef __ARCH_WANT_SYSCALL_FSTATAT
+DEFINE_SYSCALL4(errno_t, fstatat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat32 *, statbuf,
                 atflag_t, flags) {
@@ -2672,10 +2672,10 @@ DEFINE_SYSCALL4(errno_t, linux_fstatat, fd_t, dirfd,
 	stat_to_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_FSTATAT */
+#endif /* __ARCH_WANT_SYSCALL_FSTATAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT
-DEFINE_COMPAT_SYSCALL4(errno_t, linux_fstatat, fd_t, dirfd,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTATAT
+DEFINE_COMPAT_SYSCALL4(errno_t, fstatat, fd_t, dirfd,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_linux_stat32 *, statbuf,
                        atflag_t, flags) {
@@ -2685,10 +2685,10 @@ DEFINE_COMPAT_SYSCALL4(errno_t, linux_fstatat, fd_t, dirfd,
 	stat_to_compat_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FSTATAT */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_FSTATAT64
-DEFINE_SYSCALL4(errno_t, linux_fstatat64, fd_t, dirfd,
+#ifdef __ARCH_WANT_SYSCALL_FSTATAT64
+DEFINE_SYSCALL4(errno_t, fstatat64, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat64 *, statbuf,
                 atflag_t, flags) {
@@ -2698,10 +2698,10 @@ DEFINE_SYSCALL4(errno_t, linux_fstatat64, fd_t, dirfd,
 	stat_to_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_FSTATAT64 */
+#endif /* __ARCH_WANT_SYSCALL_FSTATAT64 */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT64
-DEFINE_COMPAT_SYSCALL4(errno_t, linux_fstatat64, fd_t, dirfd,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTATAT64
+DEFINE_COMPAT_SYSCALL4(errno_t, fstatat64, fd_t, dirfd,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_linux_stat64 *, statbuf,
                        atflag_t, flags) {
@@ -2711,10 +2711,10 @@ DEFINE_COMPAT_SYSCALL4(errno_t, linux_fstatat64, fd_t, dirfd,
 	stat_to_compat_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTATAT64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FSTATAT64 */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_FSTAT
-DEFINE_SYSCALL2(errno_t, linux_fstat, fd_t, fd,
+#ifdef __ARCH_WANT_SYSCALL_FSTAT
+DEFINE_SYSCALL2(errno_t, fstat, fd_t, fd,
                 USER UNCHECKED struct linux_stat32 *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
@@ -2722,10 +2722,10 @@ DEFINE_SYSCALL2(errno_t, linux_fstat, fd_t, fd,
 	stat_to_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_FSTAT */
+#endif /* __ARCH_WANT_SYSCALL_FSTAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_fstat, fd_t, fd,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, fstat, fd_t, fd,
                        USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
@@ -2733,10 +2733,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_fstat, fd_t, fd,
 	stat_to_compat_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FSTAT */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_FSTAT64
-DEFINE_SYSCALL2(errno_t, linux_fstat64, fd_t, fd,
+#ifdef __ARCH_WANT_SYSCALL_FSTAT64
+DEFINE_SYSCALL2(errno_t, fstat64, fd_t, fd,
                 USER UNCHECKED struct linux_stat64 *, statbuf) {
 	struct stat st;
 	validate_writable(statbuf, sizeof(*statbuf));
@@ -2744,10 +2744,10 @@ DEFINE_SYSCALL2(errno_t, linux_fstat64, fd_t, fd,
 	stat_to_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_FSTAT64 */
+#endif /* __ARCH_WANT_SYSCALL_FSTAT64 */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT64
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_fstat64, fd_t, fd,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_FSTAT64
+DEFINE_COMPAT_SYSCALL2(errno_t, fstat64, fd_t, fd,
                        USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
 	struct stat st;
 	compat_validate_writable(statbuf, sizeof(*statbuf));
@@ -2755,10 +2755,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_fstat64, fd_t, fd,
 	stat_to_compat_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_FSTAT64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FSTAT64 */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_LSTAT
-DEFINE_SYSCALL2(errno_t, linux_lstat,
+#ifdef __ARCH_WANT_SYSCALL_LSTAT
+DEFINE_SYSCALL2(errno_t, lstat,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat32 *, statbuf) {
 	struct stat st;
@@ -2767,10 +2767,10 @@ DEFINE_SYSCALL2(errno_t, linux_lstat,
 	stat_to_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_LSTAT */
+#endif /* __ARCH_WANT_SYSCALL_LSTAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_lstat,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LSTAT
+DEFINE_COMPAT_SYSCALL2(errno_t, lstat,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
 	struct stat st;
@@ -2779,10 +2779,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_lstat,
 	stat_to_compat_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LSTAT */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_LSTAT64
-DEFINE_SYSCALL2(errno_t, linux_lstat64,
+#ifdef __ARCH_WANT_SYSCALL_LSTAT64
+DEFINE_SYSCALL2(errno_t, lstat64,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat64 *, statbuf) {
 	struct stat st;
@@ -2791,10 +2791,10 @@ DEFINE_SYSCALL2(errno_t, linux_lstat64,
 	stat_to_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_LSTAT64 */
+#endif /* __ARCH_WANT_SYSCALL_LSTAT64 */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_lstat64,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_LSTAT64
+DEFINE_COMPAT_SYSCALL2(errno_t, lstat64,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
 	struct stat st;
@@ -2803,10 +2803,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_lstat64,
 	stat_to_compat_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_LSTAT64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_LSTAT64 */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_STAT
-DEFINE_SYSCALL2(errno_t, linux_stat,
+#ifdef __ARCH_WANT_SYSCALL_STAT
+DEFINE_SYSCALL2(errno_t, stat,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat32 *, statbuf) {
 	struct stat st;
@@ -2815,10 +2815,10 @@ DEFINE_SYSCALL2(errno_t, linux_stat,
 	stat_to_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_STAT */
+#endif /* __ARCH_WANT_SYSCALL_STAT */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_stat,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_STAT
+DEFINE_COMPAT_SYSCALL2(errno_t, stat,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_linux_stat32 *, statbuf) {
 	struct stat st;
@@ -2827,10 +2827,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_stat,
 	stat_to_compat_linux_stat32(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_STAT */
 
-#ifdef __ARCH_WANT_SYSCALL_LINUX_STAT64
-DEFINE_SYSCALL2(errno_t, linux_stat64,
+#ifdef __ARCH_WANT_SYSCALL_STAT64
+DEFINE_SYSCALL2(errno_t, stat64,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct linux_stat64 *, statbuf) {
 	struct stat st;
@@ -2839,10 +2839,10 @@ DEFINE_SYSCALL2(errno_t, linux_stat64,
 	stat_to_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_LINUX_STAT64 */
+#endif /* __ARCH_WANT_SYSCALL_STAT64 */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64
-DEFINE_COMPAT_SYSCALL2(errno_t, linux_stat64,
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_STAT64
+DEFINE_COMPAT_SYSCALL2(errno_t, stat64,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_linux_stat64 *, statbuf) {
 	struct stat st;
@@ -2851,7 +2851,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, linux_stat64,
 	stat_to_compat_linux_stat64(&st, statbuf);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_LINUX_STAT64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_STAT64 */
 
 
 

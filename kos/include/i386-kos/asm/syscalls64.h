@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6798fc13 */
+/* HASH CRC-32:0xad24f7f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,9 +53,9 @@
 #define __NR_open                   0x2                            /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 /* Close a given file descriptor/handle `FD' */
 #define __NR_close                  0x3                            /* errno_t close(fd_t fd) */
-#define __NR_linux_stat             0x4                            /* errno_t linux_stat(char const *filename, struct linux_statx64 *statbuf) */
-#define __NR_linux_fstat            0x5                            /* errno_t linux_fstat(fd_t fd, struct linux_statx64 *statbuf) */
-#define __NR_linux_lstat            0x6                            /* errno_t linux_lstat(char const *filename, struct linux_statx64 *statbuf) */
+#define __NR_stat                   0x4                            /* errno_t stat(char const *filename, struct linux_statx64 *statbuf) */
+#define __NR_fstat                  0x5                            /* errno_t fstat(fd_t fd, struct linux_statx64 *statbuf) */
+#define __NR_lstat                  0x6                            /* errno_t lstat(char const *filename, struct linux_statx64 *statbuf) */
 #define __NR_poll                   0x7                            /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 #define __NR_lseek                  0x8                            /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
@@ -585,8 +585,7 @@
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define __NR_fchownat               0x104                          /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define __NR_futimesat              0x105                          /* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx64 const[2] times) */
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR_linux_fstatat          0x106                          /* errno_t linux_fstatat(fd_t dirfd, char const *filename, struct linux_statx64 *statbuf, atflag_t flags) */
+#define __NR_newfstatat             0x106                          /* errno_t newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 #define __NR_unlinkat               0x107                          /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define __NR_renameat               0x108                          /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
@@ -1186,9 +1185,9 @@
 #define __NRRM_write                  0
 #define __NRRM_open                   0
 #define __NRRM_close                  2
-#define __NRRM_linux_stat             0
-#define __NRRM_linux_fstat            0
-#define __NRRM_linux_lstat            0
+#define __NRRM_stat                   0
+#define __NRRM_fstat                  0
+#define __NRRM_lstat                  0
 #define __NRRM_poll                   1
 #define __NRRM_lseek                  0
 #define __NRRM_mmap                   0
@@ -1444,7 +1443,7 @@
 #define __NRRM_mknodat                0
 #define __NRRM_fchownat               0
 #define __NRRM_futimesat              0
-#define __NRRM_linux_fstatat          0
+#define __NRRM_newfstatat             0
 #define __NRRM_unlinkat               0
 #define __NRRM_renameat               0
 #define __NRRM_linkat                 0
@@ -1569,9 +1568,9 @@
 #define __NRCP_read                   1
 #define __NRCP_write                  1
 #define __NRCP_open                   1
-#define __NRCP_linux_stat             1
-#define __NRCP_linux_fstat            1
-#define __NRCP_linux_lstat            1
+#define __NRCP_stat                   1
+#define __NRCP_fstat                  1
+#define __NRCP_lstat                  1
 #define __NRCP_poll                   1
 #define __NRCP_lseek                  1
 #define __NRCP_ioctl                  1
@@ -1651,7 +1650,7 @@
 #define __NRCP_mknodat                1
 #define __NRCP_fchownat               1
 #define __NRCP_futimesat              1
-#define __NRCP_linux_fstatat          1
+#define __NRCP_newfstatat             1
 #define __NRCP_unlinkat               1
 #define __NRCP_renameat               1
 #define __NRCP_linkat                 1
@@ -1723,9 +1722,9 @@
 #define __NRRC_write                  3
 #define __NRRC_open                   3
 #define __NRRC_close                  1
-#define __NRRC_linux_stat             2
-#define __NRRC_linux_fstat            2
-#define __NRRC_linux_lstat            2
+#define __NRRC_stat                   2
+#define __NRRC_fstat                  2
+#define __NRRC_lstat                  2
 #define __NRRC_poll                   3
 #define __NRRC_lseek                  3
 #define __NRRC_mmap                   6
@@ -1981,7 +1980,7 @@
 #define __NRRC_mknodat                4
 #define __NRRC_fchownat               5
 #define __NRRC_futimesat              3
-#define __NRRC_linux_fstatat          4
+#define __NRRC_newfstatat             4
 #define __NRRC_unlinkat               3
 #define __NRRC_renameat               4
 #define __NRRC_linkat                 5

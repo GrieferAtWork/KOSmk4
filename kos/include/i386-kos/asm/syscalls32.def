@@ -108,14 +108,14 @@ kfstatat = kfstatatx32;
 kfstat = kfstatx32;
 klstat = klstatx32;
 kstat = kstatx32;
-linux_fstatat = linux_fstatatx32; /* Not exported */
-linux_fstatat64 = linux_fstatatx32_64;
-linux_fstat = linux_fstatx32;
-linux_fstat64 = linux_fstatx32_64;
-linux_lstat = linux_lstatx32;
-linux_lstat64 = linux_lstatx32_64;
-linux_stat = linux_statx32;
-linux_stat64 = linux_statx32_64;
+fstatat = fstatatx32; /* Not exported */
+fstatat64 = fstatatx32_64;
+fstat = fstatx32;
+fstat64 = fstatx32_64;
+lstat = lstatx32;
+lstat64 = lstatx32_64;
+stat = statx32;
+stat64 = statx32_64;
 
 getitimer = getitimerx32;
 getitimer64 = getitimerx32_64;
@@ -242,7 +242,7 @@ select64 = selectx32_64;
 0x0000000f:chmod
 0x00000010:lchown
 0x00000011:break
-0x00000012:linux_oldstat
+0x00000012:oldstat
 0x00000013:lseek
 0x00000014:getpid
 0x00000015:mount
@@ -252,7 +252,7 @@ select64 = selectx32_64;
 0x00000019:stime
 0x0000001a:ptrace
 0x0000001b:alarm
-0x0000001c:linux_oldfstat
+0x0000001c:oldfstat
 0x0000001d:pause
 0x0000001e:utime
 0x0000001f:stty
@@ -308,7 +308,7 @@ select64 = selectx32_64;
 0x00000051:setgroups
 0x00000052:select
 0x00000053:symlink
-0x00000054:linux_oldlstat
+0x00000054:oldlstat
 0x00000055:readlink
 0x00000056:uselib
 0x00000057:swapon
@@ -330,9 +330,9 @@ select64 = selectx32_64;
 0x00000067:syslog
 0x00000068:setitimer
 0x00000069:getitimer
-0x0000006a:linux_stat
-0x0000006b:linux_lstat
-0x0000006c:linux_fstat
+0x0000006a:stat
+0x0000006b:lstat
+0x0000006c:fstat
 0x0000006d:olduname
 0x0000006e:iopl
 0x0000006f:vhangup
@@ -419,9 +419,9 @@ select64 = selectx32_64;
 0x000000c0:mmap2
 0x000000c1:truncate64
 0x000000c2:ftruncate64
-0x000000c3:linux_stat64
-0x000000c4:linux_lstat64
-0x000000c5:linux_fstat64
+0x000000c3:stat64
+0x000000c4:lstat64
+0x000000c5:fstat64
 0x000000c6:lchown32
 0x000000c7:getuid32
 0x000000c8:getgid32
@@ -446,6 +446,8 @@ select64 = selectx32_64;
 0x000000db:madvise
 0x000000dc:getdents64
 0x000000dd:fcntl64
+/*000000de:break*/
+/*000000df:break*/
 0x000000e0:gettid
 0x000000e1:readahead
 0x000000e2:setxattr
@@ -473,6 +475,7 @@ select64 = selectx32_64;
 0x000000f8:io_submit
 0x000000f9:io_cancel
 0x000000fa:fadvise64
+/*000000fb:break*/
 0x000000fc:exit_group
 0x000000fd:lookup_dcookie
 0x000000fe:epoll_create
@@ -506,6 +509,7 @@ select64 = selectx32_64;
 0x0000011a:mq_getsetattr
 0x0000011b:kexec_load
 0x0000011c:waitid
+/*0000011d:break*/
 0x0000011e:add_key
 0x0000011f:request_key
 0x00000120:keyctl
@@ -520,7 +524,7 @@ select64 = selectx32_64;
 0x00000129:mknodat
 0x0000012a:fchownat
 0x0000012b:futimesat
-0x0000012c:linux_fstatat64
+0x0000012c:fstatat64
 0x0000012d:unlinkat
 0x0000012e:renameat
 0x0000012f:linkat
@@ -597,6 +601,62 @@ select64 = selectx32_64;
 0x00000176:userfaultfd
 0x00000177:membarrier
 0x00000178:mlock2
+//TODO:0x00000179:copy_file_range
+//TODO:0x0000017a:preadv2
+//TODO:0x0000017b:pwritev2
+//TODO:0x0000017c:pkey_mprotect
+//TODO:0x0000017d:pkey_alloc
+//TODO:0x0000017e:pkey_free
+//TODO:0x0000017f:statx
+//TODO:0x00000180:arch_prctl
+//TODO:0x00000181:io_pgetevents
+//TODO:0x00000182:rseq
+//TODO:0x00000189:semget
+//TODO:0x0000018a:semctl
+//TODO:0x0000018b:shmget
+//TODO:0x0000018c:shmctl
+//TODO:0x0000018d:shmat
+//TODO:0x0000018e:shmdt
+//TODO:0x0000018f:msgget
+//TODO:0x00000190:msgsnd
+//TODO:0x00000191:msgrcv
+//TODO:0x00000192:msgctl
+0x00000193:clock_gettime64
+0x00000194:clock_settime64
+//TODO:0x00000195:clock_adjtime64
+//TODO:0x00000196:clock_getres_time64
+//TODO:0x00000197:clock_nanosleep_time64
+0x00000198:timer_gettime64
+0x00000199:timer_settime64
+0x0000019a:timerfd_gettime64
+0x0000019b:timerfd_settime64
+//TODO:0x0000019c:utimensat_time64
+//TODO:0x0000019d:pselect6_time64
+//TODO:0x0000019e:ppoll_time64
+//TODO:0x000001a0:io_pgetevents_time64
+//TODO:0x000001a1:recvmmsg_time64
+//TODO:0x000001a2:mq_timedsend_time64
+//TODO:0x000001a3:mq_timedreceive_time64
+//TODO:0x000001a4:semtimedop_time64
+//TODO:0x000001a5:rt_sigtimedwait_time64
+//TODO:0x000001a6:futex_time64
+//TODO:0x000001a7:sched_rr_get_interval_time64
+//TODO:0x000001a8:pidfd_send_signal
+//TODO:0x000001a9:io_uring_setup
+//TODO:0x000001aa:io_uring_enter
+//TODO:0x000001ab:io_uring_register
+//TODO:0x000001ac:open_tree
+//TODO:0x000001ad:move_mount
+//TODO:0x000001ae:fsopen
+//TODO:0x000001af:fsconfig
+//TODO:0x000001b0:fsmount
+//TODO:0x000001b1:fspick
+//TODO:0x000001b2:pidfd_open
+//TODO:0x000001b3:clone3
+//TODO:0x000001b4:close_range
+//TODO:0x000001b5:openat2
+//TODO:0x000001b6:pidfd_getfd
+//TODO:0x000001b7:faccessat2
 
 -0x00000001:hop
 -0x00000002:hopf
@@ -654,10 +714,10 @@ select64 = selectx32_64;
 -0x000000c4:klstat
 -0x000000c5:kfstat
 -0x000000dc:kreaddirf
--0x00000104:timer_settime64
--0x00000105:timer_gettime64
--0x00000108:clock_settime64
--0x00000109:clock_gettime64
+/*x00000104:...*/
+/*x00000105:...*/
+/*x00000108:...*/
+/*x00000109:...*/
 -0x0000010a:clock_getres64
 -0x0000010b:clock_nanosleep64
 -0x0000010f:utimes64
@@ -675,8 +735,8 @@ select64 = selectx32_64;
 -0x00000135:ppoll64
 -0x00000140:utimensat64
 -0x00000144:fallocate64
--0x00000145:timerfd_settime64
--0x00000146:timerfd_gettime64
+/*x00000145:...*/
+/*x00000146:...*/
 -0x0000014d:preadvf
 -0x0000014e:pwritevf
 -0x00000151:recvmmsg64

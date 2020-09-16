@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83ba67cd */
+/* HASH CRC-32:0x55de8f89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -732,9 +732,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_break)
 	.cfi_endproc
 END(__x86_asm32_int80_break)
 
-/* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_oldstat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldstat)
+/* errno_t oldstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_int80.oldstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12
@@ -754,8 +754,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_oldstat)
-	call   sys_linux_oldstat
+	EXTERN(sys_oldstat)
+	call   sys_oldstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -767,7 +767,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldstat)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_oldstat)
+END(__x86_asm32_int80_oldstat)
 
 /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 .section .text.x86.asm32_syscall_int80.lseek
@@ -1104,9 +1104,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_alarm)
 	.cfi_endproc
 END(__x86_asm32_int80_alarm)
 
-/* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_oldfstat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldfstat)
+/* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_int80.oldfstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldfstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x1c
@@ -1126,8 +1126,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldfstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_oldfstat)
-	call   sys_linux_oldfstat
+	EXTERN(sys_oldfstat)
+	call   sys_oldfstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -1139,7 +1139,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldfstat)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_oldfstat)
+END(__x86_asm32_int80_oldfstat)
 
 /* errno_t pause(void) */
 .section .text.x86.asm32_syscall_int80.pause
@@ -3153,9 +3153,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_symlink)
 	.cfi_endproc
 END(__x86_asm32_int80_symlink)
 
-/* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_oldlstat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldlstat)
+/* errno_t oldlstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_int80.oldlstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldlstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x54
@@ -3175,8 +3175,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldlstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_oldlstat)
-	call   sys_linux_oldlstat
+	EXTERN(sys_oldlstat)
+	call   sys_oldlstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -3188,7 +3188,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_oldlstat)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_oldlstat)
+END(__x86_asm32_int80_oldlstat)
 
 /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
 .section .text.x86.asm32_syscall_int80.readlink
@@ -3991,9 +3991,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getitimer)
 	.cfi_endproc
 END(__x86_asm32_int80_getitimer)
 
-/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_stat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat)
+/* errno_t stat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.stat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_stat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6a
@@ -4013,8 +4013,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_stat)
-	call   sys_linux_stat
+	EXTERN(sys_stat)
+	call   sys_stat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -4026,11 +4026,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_stat)
+END(__x86_asm32_int80_stat)
 
-/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_lstat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat)
+/* errno_t lstat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.lstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_lstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6b
@@ -4050,8 +4050,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_lstat)
-	call   sys_linux_lstat
+	EXTERN(sys_lstat)
+	call   sys_lstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -4063,11 +4063,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_lstat)
+END(__x86_asm32_int80_lstat)
 
-/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_fstat
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat)
+/* errno_t fstat(fd_t fd, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_int80.fstat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x6c
@@ -4087,8 +4087,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_fstat)
-	call   sys_linux_fstat
+	EXTERN(sys_fstat)
+	call   sys_fstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -4100,7 +4100,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_fstat)
+END(__x86_asm32_int80_fstat)
 
 /* errno_t olduname(struct linux_olduname *name) */
 .section .text.x86.asm32_syscall_int80.olduname
@@ -7389,9 +7389,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftruncate64)
 	.cfi_endproc
 END(__x86_asm32_int80_ftruncate64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_stat64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat64)
+/* errno_t stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+.section .text.x86.asm32_syscall_int80.stat64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_stat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc3
@@ -7411,8 +7411,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat64)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_stat64)
-	call   sys_linux_stat64
+	EXTERN(sys_stat64)
+	call   sys_stat64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -7424,11 +7424,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_stat64)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_stat64)
+END(__x86_asm32_int80_stat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_lstat64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat64)
+/* errno_t lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+.section .text.x86.asm32_syscall_int80.lstat64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_lstat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc4
@@ -7448,8 +7448,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat64)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_lstat64)
-	call   sys_linux_lstat64
+	EXTERN(sys_lstat64)
+	call   sys_lstat64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -7461,11 +7461,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_lstat64)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_lstat64)
+END(__x86_asm32_int80_lstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
-.section .text.x86.asm32_syscall_int80.linux_fstat64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat64)
+/* errno_t fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
+.section .text.x86.asm32_syscall_int80.fstat64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xc5
@@ -7485,8 +7485,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat64)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_fstat64)
-	call   sys_linux_fstat64
+	EXTERN(sys_fstat64)
+	call   sys_fstat64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -7498,7 +7498,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstat64)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_fstat64)
+END(__x86_asm32_int80_fstat64)
 
 /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
 .section .text.x86.asm32_syscall_int80.lchown32
@@ -11198,9 +11198,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futimesat)
 END(__x86_asm32_int80_futimesat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.linux_fstatat64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstatat64)
+/* errno_t fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.fstatat64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0x12c
@@ -11221,8 +11221,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstatat64)
 	pushl_cfi_r %edx  /* Arg #2 */
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_fstatat64)
-	call   sys_linux_fstatat64
+	EXTERN(sys_fstatat64)
+	call   sys_fstatat64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -11235,7 +11235,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_linux_fstatat64)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_linux_fstatat64)
+END(__x86_asm32_int80_fstatat64)
 
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
@@ -14369,6 +14369,238 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+.section .text.x86.asm32_syscall_int80.clock_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x193
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_clock_gettime64)
+	call   sys_clock_gettime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_clock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+.section .text.x86.asm32_syscall_int80.clock_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x194
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_clock_settime64)
+	call   sys_clock_settime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_clock_settime64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+.section .text.x86.asm32_syscall_int80.timer_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x198
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_timer_gettime64)
+	call   sys_timer_gettime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_timer_gettime64)
+
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+.section .text.x86.asm32_syscall_int80.timer_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x199
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_timer_settime64)
+	call   sys_timer_settime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_timer_settime64)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_int80.timerfd_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x19a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_timerfd_gettime64)
+	call   sys_timerfd_gettime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_timerfd_gettime64)
+
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_int80.timerfd_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x19b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_timerfd_settime64)
+	call   sys_timerfd_settime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_timerfd_settime64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -14507,87 +14739,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadvf)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_preadvf)
-
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_int80.timerfd_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffeba
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_timerfd_gettime64)
-	call   sys_timerfd_gettime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_timerfd_gettime64)
-
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_int80.timerfd_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timerfd_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffebb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_timerfd_settime64)
-	call   sys_timerfd_settime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_timerfd_settime64)
 
 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 .section .text.x86.asm32_syscall_int80.fallocate64
@@ -15275,157 +15426,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_getres64)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_clock_getres64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-.section .text.x86.asm32_syscall_int80.clock_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffef7
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_clock_gettime64)
-	call   sys_clock_gettime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_clock_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-.section .text.x86.asm32_syscall_int80.clock_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffef8
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_clock_settime64)
-	call   sys_clock_settime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_clock_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-.section .text.x86.asm32_syscall_int80.timer_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffefb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_timer_gettime64)
-	call   sys_timer_gettime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_timer_gettime64)
-
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
-.section .text.x86.asm32_syscall_int80.timer_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_timer_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffefc
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_timer_settime64)
-	call   sys_timer_settime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_timer_settime64)
 
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
@@ -18534,9 +18534,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_break)
 	.cfi_endproc
 END(__x86_asm32_sysenter_break)
 
-/* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_oldstat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldstat)
+/* errno_t oldstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.oldstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_oldstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12
@@ -18556,8 +18556,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_oldstat)
-	call   sys_linux_oldstat
+	EXTERN(sys_oldstat)
+	call   sys_oldstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -18569,7 +18569,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldstat)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_oldstat)
+END(__x86_asm32_sysenter_oldstat)
 
 /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 .section .text.x86.asm32_syscall_sysenter.lseek
@@ -18908,9 +18908,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_alarm)
 	.cfi_endproc
 END(__x86_asm32_sysenter_alarm)
 
-/* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_oldfstat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldfstat)
+/* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.oldfstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_oldfstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x1c
@@ -18930,8 +18930,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldfstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_oldfstat)
-	call   sys_linux_oldfstat
+	EXTERN(sys_oldfstat)
+	call   sys_oldfstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -18943,7 +18943,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldfstat)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_oldfstat)
+END(__x86_asm32_sysenter_oldfstat)
 
 /* errno_t pause(void) */
 .section .text.x86.asm32_syscall_sysenter.pause
@@ -20957,9 +20957,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_symlink)
 	.cfi_endproc
 END(__x86_asm32_sysenter_symlink)
 
-/* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_oldlstat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldlstat)
+/* errno_t oldlstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.oldlstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_oldlstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x54
@@ -20979,8 +20979,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldlstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_oldlstat)
-	call   sys_linux_oldlstat
+	EXTERN(sys_oldlstat)
+	call   sys_oldlstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -20992,7 +20992,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_oldlstat)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_oldlstat)
+END(__x86_asm32_sysenter_oldlstat)
 
 /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
 .section .text.x86.asm32_syscall_sysenter.readlink
@@ -21797,9 +21797,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getitimer)
 	.cfi_endproc
 END(__x86_asm32_sysenter_getitimer)
 
-/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_stat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_stat)
+/* errno_t stat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.stat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6a
@@ -21819,8 +21819,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_stat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_stat)
-	call   sys_linux_stat
+	EXTERN(sys_stat)
+	call   sys_stat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -21832,11 +21832,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_stat)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_stat)
+END(__x86_asm32_sysenter_stat)
 
-/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_lstat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_lstat)
+/* errno_t lstat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.lstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6b
@@ -21856,8 +21856,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_lstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_lstat)
-	call   sys_linux_lstat
+	EXTERN(sys_lstat)
+	call   sys_lstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -21869,11 +21869,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_lstat)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_lstat)
+END(__x86_asm32_sysenter_lstat)
 
-/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_fstat
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstat)
+/* errno_t fstat(fd_t fd, struct linux_statx32 *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.fstat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fstat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x6c
@@ -21893,8 +21893,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstat)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_fstat)
-	call   sys_linux_fstat
+	EXTERN(sys_fstat)
+	call   sys_fstat
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -21906,7 +21906,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstat)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_fstat)
+END(__x86_asm32_sysenter_fstat)
 
 /* errno_t olduname(struct linux_olduname *name) */
 .section .text.x86.asm32_syscall_sysenter.olduname
@@ -25213,9 +25213,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftruncate64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ftruncate64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_stat64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_stat64)
+/* errno_t stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.stat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc3
@@ -25235,8 +25235,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_stat64)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_stat64)
-	call   sys_linux_stat64
+	EXTERN(sys_stat64)
+	call   sys_stat64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -25248,11 +25248,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_stat64)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_stat64)
+END(__x86_asm32_sysenter_stat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_lstat64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_lstat64)
+/* errno_t lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.lstat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lstat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc4
@@ -25272,8 +25272,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_lstat64)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_lstat64)
-	call   sys_linux_lstat64
+	EXTERN(sys_lstat64)
+	call   sys_lstat64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -25285,11 +25285,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_lstat64)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_lstat64)
+END(__x86_asm32_sysenter_lstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
-.section .text.x86.asm32_syscall_sysenter.linux_fstat64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstat64)
+/* errno_t fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
+.section .text.x86.asm32_syscall_sysenter.fstat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fstat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xc5
@@ -25309,8 +25309,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstat64)
 	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_fstat64)
-	call   sys_linux_fstat64
+	EXTERN(sys_fstat64)
+	call   sys_fstat64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -25322,7 +25322,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstat64)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_fstat64)
+END(__x86_asm32_sysenter_fstat64)
 
 /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
 .section .text.x86.asm32_syscall_sysenter.lchown32
@@ -29040,9 +29040,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futimesat)
 END(__x86_asm32_sysenter_futimesat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysenter.linux_fstatat64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstatat64)
+/* errno_t fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysenter.fstatat64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fstatat64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0x12c
@@ -29063,8 +29063,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstatat64)
 	pushl_cfi_r %edx  /* Arg #2 */
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_linux_fstatat64)
-	call   sys_linux_fstatat64
+	EXTERN(sys_fstatat64)
+	call   sys_fstatat64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
@@ -29077,7 +29077,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_linux_fstatat64)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_linux_fstatat64)
+END(__x86_asm32_sysenter_fstatat64)
 
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
@@ -32249,6 +32249,238 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mlock2)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mlock2)
 
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+.section .text.x86.asm32_syscall_sysenter.clock_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x193
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_clock_gettime64)
+	call   sys_clock_gettime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_clock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+.section .text.x86.asm32_syscall_sysenter.clock_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x194
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_clock_settime64)
+	call   sys_clock_settime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_clock_settime64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+.section .text.x86.asm32_syscall_sysenter.timer_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x198
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_timer_gettime64)
+	call   sys_timer_gettime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_timer_gettime64)
+
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+.section .text.x86.asm32_syscall_sysenter.timer_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x199
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_timer_settime64)
+	call   sys_timer_settime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_timer_settime64)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_sysenter.timerfd_gettime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_gettime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x19a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_timerfd_gettime64)
+	call   sys_timerfd_gettime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_timerfd_gettime64)
+
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+.section .text.x86.asm32_syscall_sysenter.timerfd_settime64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_settime64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x19b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_timerfd_settime64)
+	call   sys_timerfd_settime64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_timerfd_settime64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -32393,87 +32625,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadvf)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_preadvf)
-
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_sysenter.timerfd_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffeba
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_timerfd_gettime64)
-	call   sys_timerfd_gettime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_timerfd_gettime64)
-
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
-.section .text.x86.asm32_syscall_sysenter.timerfd_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timerfd_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffebb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_timerfd_settime64)
-	call   sys_timerfd_settime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_timerfd_settime64)
 
 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 .section .text.x86.asm32_syscall_sysenter.fallocate64
@@ -33179,157 +33330,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_getres64)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_clock_getres64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-.section .text.x86.asm32_syscall_sysenter.clock_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffef7
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_clock_gettime64)
-	call   sys_clock_gettime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_clock_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-.section .text.x86.asm32_syscall_sysenter.clock_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffef8
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_clock_settime64)
-	call   sys_clock_settime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_clock_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-.section .text.x86.asm32_syscall_sysenter.timer_gettime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_gettime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffefb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_timer_gettime64)
-	call   sys_timer_gettime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_timer_gettime64)
-
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
-.section .text.x86.asm32_syscall_sysenter.timer_settime64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_timer_settime64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffefc
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_timer_settime64)
-	call   sys_timer_settime64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_timer_settime64)
 
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */

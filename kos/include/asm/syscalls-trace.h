@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5650b71d */
+/* HASH CRC-32:0x99748201 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -688,20 +688,20 @@
 #define __NRAN1_ftruncate              length
 #define __NRAN0_truncate               filename
 #define __NRAN1_truncate               length
-#define __NRAN0_linux_stat             filename
-#define __NRAN1_linux_stat             statbuf
-#define __NRAN0_linux_lstat            filename
-#define __NRAN1_linux_lstat            statbuf
-#define __NRAN0_linux_fstat            fd
-#define __NRAN1_linux_fstat            statbuf
+#define __NRAN0_stat                   filename
+#define __NRAN1_stat                   statbuf
+#define __NRAN0_lstat                  filename
+#define __NRAN1_lstat                  statbuf
+#define __NRAN0_fstat                  fd
+#define __NRAN1_fstat                  statbuf
 #define __NRAN0_fcntl                  fd
 #define __NRAN1_fcntl                  command
 #define __NRAN2_fcntl                  arg
 #define __NRAN0_fadvise64              TODO_PROTOTYPE
-#define __NRAN0_linux_newfstatat       dirfd
-#define __NRAN1_linux_newfstatat       filename
-#define __NRAN2_linux_newfstatat       statbuf
-#define __NRAN3_linux_newfstatat       flags
+#define __NRAN0_newfstatat             dirfd
+#define __NRAN1_newfstatat             filename
+#define __NRAN2_newfstatat             statbuf
+#define __NRAN3_newfstatat             flags
 #define __NRAN0_fstatfs                file
 #define __NRAN1_fstatfs                buf
 #define __NRAN0_statfs                 file
@@ -1784,15 +1784,15 @@
 #define __NRATR0_truncate               SC_REPR_FILENAME                                        /* filename */ 
 #define __NRATR1_truncate               SC_REPR_SYSCALL_ULONG_T                                 /* length */ 
 #define __NRRTR_truncate                SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_linux_stat             SC_REPR_FILENAME                                        /* filename */ 
-#define __NRATR1_linux_stat             SC_REPR_POINTER                                         /* statbuf */ 
-#define __NRRTR_linux_stat              SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_linux_lstat            SC_REPR_FILENAME                                        /* filename */ 
-#define __NRATR1_linux_lstat            SC_REPR_POINTER                                         /* statbuf */ 
-#define __NRRTR_linux_lstat             SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_linux_fstat            SC_REPR_FD_T                                            /* fd */ 
-#define __NRATR1_linux_fstat            SC_REPR_POINTER                                         /* statbuf */ 
-#define __NRRTR_linux_fstat             SC_REPR_ERRNO_T                                         /* return */
+#define __NRATR0_stat                   SC_REPR_FILENAME                                        /* filename */ 
+#define __NRATR1_stat                   SC_REPR_POINTER                                         /* statbuf */ 
+#define __NRRTR_stat                    SC_REPR_ERRNO_T                                         /* return */
+#define __NRATR0_lstat                  SC_REPR_FILENAME                                        /* filename */ 
+#define __NRATR1_lstat                  SC_REPR_POINTER                                         /* statbuf */ 
+#define __NRRTR_lstat                   SC_REPR_ERRNO_T                                         /* return */
+#define __NRATR0_fstat                  SC_REPR_FD_T                                            /* fd */ 
+#define __NRATR1_fstat                  SC_REPR_POINTER                                         /* statbuf */ 
+#define __NRRTR_fstat                   SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_fcntl                  SC_REPR_FD_T                                            /* fd */ 
 #define __NRATR1_fcntl                  SC_REPR_FCNTL_COMMAND                                   /* command */ 
 #define __NRATR2_fcntl                  SC_REPR_FCNTL_ARG                                       /* arg */ 
@@ -1800,12 +1800,12 @@
 #define __NRRTR_fcntl                   SC_REPR_SYSCALL_SLONG_T                                 /* return */
 #define __NRATR0_fadvise64              SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_fadvise64               SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_linux_newfstatat       SC_REPR_FD_T                                            /* dirfd */ 
-#define __NRATR1_linux_newfstatat       SC_REPR_FILENAME                                        /* filename */ 
-#define __NRATL1_linux_newfstatat       0                                                       /* filename -> dirfd */ 
-#define __NRATR2_linux_newfstatat       SC_REPR_POINTER                                         /* statbuf */ 
-#define __NRATR3_linux_newfstatat       SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH               /* flags */ 
-#define __NRRTR_linux_newfstatat        SC_REPR_ERRNO_T                                         /* return */
+#define __NRATR0_newfstatat             SC_REPR_FD_T                                            /* dirfd */ 
+#define __NRATR1_newfstatat             SC_REPR_FILENAME                                        /* filename */ 
+#define __NRATL1_newfstatat             0                                                       /* filename -> dirfd */ 
+#define __NRATR2_newfstatat             SC_REPR_POINTER                                         /* statbuf */ 
+#define __NRATR3_newfstatat             SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH               /* flags */ 
+#define __NRRTR_newfstatat              SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_fstatfs                SC_REPR_FD_T                                            /* file */ 
 #define __NRATR1_fstatfs                SC_REPR_POINTER                                         /* buf */ 
 #define __NRRTR_fstatfs                 SC_REPR_ERRNO_T                                         /* return */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19e77fa2 */
+/* HASH CRC-32:0x38d6c424 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,9 +56,9 @@
 #define SYS_open                   __NR_open                   /* fd_t open(char const *filename, oflag_t oflags, mode_t mode) */
 /* Close a given file descriptor/handle `FD' */
 #define SYS_close                  __NR_close                  /* errno_t close(fd_t fd) */
-#define SYS_linux_stat             __NR_linux_stat             /* errno_t linux_stat(char const *filename, struct linux_statx64 *statbuf) */
-#define SYS_linux_fstat            __NR_linux_fstat            /* errno_t linux_fstat(fd_t fd, struct linux_statx64 *statbuf) */
-#define SYS_linux_lstat            __NR_linux_lstat            /* errno_t linux_lstat(char const *filename, struct linux_statx64 *statbuf) */
+#define SYS_stat                   __NR_stat                   /* errno_t stat(char const *filename, struct linux_statx64 *statbuf) */
+#define SYS_fstat                  __NR_fstat                  /* errno_t fstat(fd_t fd, struct linux_statx64 *statbuf) */
+#define SYS_lstat                  __NR_lstat                  /* errno_t lstat(char const *filename, struct linux_statx64 *statbuf) */
 #define SYS_poll                   __NR_poll                   /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 #define SYS_lseek                  __NR_lseek                  /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 /* @param: prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
@@ -588,8 +588,7 @@
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 #define SYS_fchownat               __NR_fchownat               /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define SYS_futimesat              __NR_futimesat              /* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx64 const[2] times) */
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_linux_fstatat          __NR_linux_fstatat          /* errno_t linux_fstatat(fd_t dirfd, char const *filename, struct linux_statx64 *statbuf, atflag_t flags) */
+#define SYS_newfstatat             __NR_newfstatat             /* errno_t newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 #define SYS_unlinkat               __NR_unlinkat               /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define SYS_renameat               __NR_renameat               /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */

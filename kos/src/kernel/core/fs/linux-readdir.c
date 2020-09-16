@@ -54,11 +54,11 @@
 #endif /* __ARCH_HAVE_COMPAT */
 
 #undef WANT_LINUX_READDIR
-#if (defined(__ARCH_WANT_SYSCALL_READDIR) ||         \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_READDIR) ||  \
-     defined(__ARCH_WANT_SYSCALL_GETDENTS) ||        \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_GETDENTS) || \
-     defined(__ARCH_WANT_SYSCALL_GETDENTS64))
+#if (defined(__ARCH_WANT_SYSCALL_READDIR) ||        \
+     defined(__ARCH_WANT_SYSCALL_GETDENTS) ||       \
+     defined(__ARCH_WANT_SYSCALL_GETDENTS64) ||     \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_READDIR) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_GETDENTS))
 #define WANT_LINUX_READDIR 1
 #endif /* __ARCH_WANT_... */
 

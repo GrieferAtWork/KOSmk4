@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf50404e1 */
+/* HASH CRC-32:0xcf97507 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,8 +58,8 @@
 #define __NRAN0_lchown                  filename
 #define __NRAN1_lchown                  owner
 #define __NRAN2_lchown                  group
-#define __NRAN0_linux_oldstat           filename
-#define __NRAN1_linux_oldstat           statbuf
+#define __NRAN0_oldstat                 filename
+#define __NRAN1_oldstat                 statbuf
 #define __NRAN0_lseek                   fd
 #define __NRAN1_lseek                   offset
 #define __NRAN2_lseek                   whence
@@ -76,8 +76,8 @@
 #define __NRAN2_ptrace                  addr
 #define __NRAN3_ptrace                  data
 #define __NRAN0_alarm                   seconds
-#define __NRAN0_linux_oldfstat          fd
-#define __NRAN1_linux_oldfstat          statbuf
+#define __NRAN0_oldfstat                fd
+#define __NRAN1_oldfstat                statbuf
 #define __NRAN0_utime                   filename
 #define __NRAN1_utime                   times
 #define __NRAN0_access                  filename
@@ -145,8 +145,8 @@
 #define __NRAN0_select                  arg
 #define __NRAN0_symlink                 link_text
 #define __NRAN1_symlink                 target_path
-#define __NRAN0_linux_oldlstat          filename
-#define __NRAN1_linux_oldlstat          statbuf
+#define __NRAN0_oldlstat                filename
+#define __NRAN1_oldlstat                statbuf
 #define __NRAN0_readlink                path
 #define __NRAN1_readlink                buf
 #define __NRAN2_readlink                buflen
@@ -199,12 +199,12 @@
 #define __NRAN2_setitimer               oldval
 #define __NRAN0_getitimer               which
 #define __NRAN1_getitimer               curr_value
-#define __NRAN0_linux_stat              filename
-#define __NRAN1_linux_stat              statbuf
-#define __NRAN0_linux_lstat             filename
-#define __NRAN1_linux_lstat             statbuf
-#define __NRAN0_linux_fstat             fd
-#define __NRAN1_linux_fstat             statbuf
+#define __NRAN0_stat                    filename
+#define __NRAN1_stat                    statbuf
+#define __NRAN0_lstat                   filename
+#define __NRAN1_lstat                   statbuf
+#define __NRAN0_fstat                   fd
+#define __NRAN1_fstat                   statbuf
 #define __NRAN0_olduname                name
 #define __NRAN0_iopl                    level
 #define __NRAN0_vm86old                 TODO_PROTOTYPE
@@ -381,12 +381,12 @@
 #define __NRAN1_truncate64              length
 #define __NRAN0_ftruncate64             fd
 #define __NRAN1_ftruncate64             length
-#define __NRAN0_linux_stat64            filename
-#define __NRAN1_linux_stat64            statbuf
-#define __NRAN0_linux_lstat64           filename
-#define __NRAN1_linux_lstat64           statbuf
-#define __NRAN0_linux_fstat64           fd
-#define __NRAN1_linux_fstat64           statbuf
+#define __NRAN0_stat64                  filename
+#define __NRAN1_stat64                  statbuf
+#define __NRAN0_lstat64                 filename
+#define __NRAN1_lstat64                 statbuf
+#define __NRAN0_fstat64                 fd
+#define __NRAN1_fstat64                 statbuf
 #define __NRAN0_lchown32                filename
 #define __NRAN1_lchown32                owner
 #define __NRAN2_lchown32                group
@@ -612,10 +612,10 @@
 #define __NRAN0_futimesat               dirfd
 #define __NRAN1_futimesat               filename
 #define __NRAN2_futimesat               times
-#define __NRAN0_linux_fstatat64         dirfd
-#define __NRAN1_linux_fstatat64         filename
-#define __NRAN2_linux_fstatat64         statbuf
-#define __NRAN3_linux_fstatat64         flags
+#define __NRAN0_fstatat64               dirfd
+#define __NRAN1_fstatat64               filename
+#define __NRAN2_fstatat64               statbuf
+#define __NRAN3_fstatat64               flags
 #define __NRAN0_unlinkat                dirfd
 #define __NRAN1_unlinkat                name
 #define __NRAN2_unlinkat                flags
@@ -852,6 +852,22 @@
 #define __NRAN0_userfaultfd             TODO_PROTOTYPE
 #define __NRAN0_membarrier              TODO_PROTOTYPE
 #define __NRAN0_mlock2                  TODO_PROTOTYPE
+#define __NRAN0_clock_gettime64         clock_id
+#define __NRAN1_clock_gettime64         tp
+#define __NRAN0_clock_settime64         clock_id
+#define __NRAN1_clock_settime64         tp
+#define __NRAN0_timer_gettime64         timerid
+#define __NRAN1_timer_gettime64         value
+#define __NRAN0_timer_settime64         timerid
+#define __NRAN1_timer_settime64         flags
+#define __NRAN2_timer_settime64         value
+#define __NRAN3_timer_settime64         ovalue
+#define __NRAN0_timerfd_gettime64       timerfd
+#define __NRAN1_timerfd_gettime64       otmr
+#define __NRAN0_timerfd_settime64       timerfd
+#define __NRAN1_timerfd_settime64       flags
+#define __NRAN2_timerfd_settime64       utmr
+#define __NRAN3_timerfd_settime64       otmr
 #define __NRAN0_recvmmsg64              sockfd
 #define __NRAN1_recvmmsg64              vmessages
 #define __NRAN2_recvmmsg64              vlen
@@ -867,12 +883,6 @@
 #define __NRAN2_preadvf                 count
 #define __NRAN3_preadvf                 offset
 #define __NRAN4_preadvf                 mode
-#define __NRAN0_timerfd_gettime64       timerfd
-#define __NRAN1_timerfd_gettime64       otmr
-#define __NRAN0_timerfd_settime64       timerfd
-#define __NRAN1_timerfd_settime64       flags
-#define __NRAN2_timerfd_settime64       utmr
-#define __NRAN3_timerfd_settime64       otmr
 #define __NRAN0_fallocate64             fd
 #define __NRAN1_fallocate64             mode
 #define __NRAN2_fallocate64             offset
@@ -945,16 +955,6 @@
 #define __NRAN3_clock_nanosleep64       remaining
 #define __NRAN0_clock_getres64          clock_id
 #define __NRAN1_clock_getres64          res
-#define __NRAN0_clock_gettime64         clock_id
-#define __NRAN1_clock_gettime64         tp
-#define __NRAN0_clock_settime64         clock_id
-#define __NRAN1_clock_settime64         tp
-#define __NRAN0_timer_gettime64         timerid
-#define __NRAN1_timer_gettime64         value
-#define __NRAN0_timer_settime64         timerid
-#define __NRAN1_timer_settime64         flags
-#define __NRAN2_timer_settime64         value
-#define __NRAN3_timer_settime64         ovalue
 #define __NRAN0_kreaddirf               fd
 #define __NRAN1_kreaddirf               buf
 #define __NRAN2_kreaddirf               bufsize
@@ -1178,9 +1178,9 @@
 #define __NRATR2_lchown                  SC_REPR_GID_T                                                        /* group */ 
 #define __NRRTR_lchown                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_break                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_oldstat           SC_REPR_FILENAME                                                     /* filename */ 
-#define __NRATR1_linux_oldstat           SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_oldstat            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_oldstat                 SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_oldstat                 SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_oldstat                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_lseek                   SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_lseek                   SC_REPR_SYSCALL_SLONG_T                                              /* offset */ 
 #define __NRATR2_lseek                   SC_REPR_SEEK_WHENCE                                                  /* whence */ 
@@ -1206,9 +1206,9 @@
 #define __NRRTR_ptrace                   SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_alarm                   SC_REPR_SYSCALL_ULONG_T                                              /* seconds */ 
 #define __NRRTR_alarm                    SC_REPR_SYSCALL_ULONG_T                                              /* return */
-#define __NRATR0_linux_oldfstat          SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_linux_oldfstat          SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_oldfstat           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_oldfstat                SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_oldfstat                SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_oldfstat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRRTR_pause                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_utime                   SC_REPR_FILENAME                                                     /* filename */ 
 #define __NRATR1_utime                   SC_REPR_STRUCT_UTIMBUFX32                                            /* times */ 
@@ -1335,9 +1335,9 @@
 #define __NRATR0_symlink                 SC_REPR_STRING                                                       /* link_text */ 
 #define __NRATR1_symlink                 SC_REPR_FILENAME                                                     /* target_path */ 
 #define __NRRTR_symlink                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_oldlstat          SC_REPR_FILENAME                                                     /* filename */ 
-#define __NRATR1_linux_oldlstat          SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_oldlstat           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_oldlstat                SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_oldlstat                SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_oldlstat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_readlink                SC_REPR_FILENAME                                                     /* path */ 
 #define __NRATR1_readlink                SC_REPR_POINTER                                                      /* buf */ 
 #define __NRATR2_readlink                SC_REPR_SIZE_T                                                       /* buflen */ 
@@ -1413,15 +1413,15 @@
 #define __NRATR0_getitimer               SC_REPR_ITIMER_WHICH                                                 /* which */ 
 #define __NRATR1_getitimer               SC_REPR_POINTER                                                      /* curr_value */ 
 #define __NRRTR_getitimer                SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_stat              SC_REPR_FILENAME                                                     /* filename */ 
-#define __NRATR1_linux_stat              SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_stat               SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_lstat             SC_REPR_FILENAME                                                     /* filename */ 
-#define __NRATR1_linux_lstat             SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_lstat              SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_fstat             SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_linux_fstat             SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_fstat              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_stat                    SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_stat                    SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_stat                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lstat                   SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_lstat                   SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_lstat                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fstat                   SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fstat                   SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_fstat                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_olduname                SC_REPR_POINTER                                                      /* name */ 
 #define __NRRTR_olduname                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_iopl                    SC_REPR_SYSCALL_ULONG_T                                              /* level */ 
@@ -1696,15 +1696,15 @@
 #define __NRATR0_ftruncate64             SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_ftruncate64             SC_REPR_UINT64_T                                                     /* length */ 
 #define __NRRTR_ftruncate64              SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_stat64            SC_REPR_FILENAME                                                     /* filename */ 
-#define __NRATR1_linux_stat64            SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_stat64             SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_lstat64           SC_REPR_FILENAME                                                     /* filename */ 
-#define __NRATR1_linux_lstat64           SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_lstat64            SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_fstat64           SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR1_linux_fstat64           SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRRTR_linux_fstat64            SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_stat64                  SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_stat64                  SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_stat64                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_lstat64                 SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATR1_lstat64                 SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_lstat64                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fstat64                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_fstat64                 SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRRTR_fstat64                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_lchown32                SC_REPR_FILENAME                                                     /* filename */ 
 #define __NRATR1_lchown32                SC_REPR_UID_T                                                        /* owner */ 
 #define __NRATR2_lchown32                SC_REPR_GID_T                                                        /* group */ 
@@ -2047,12 +2047,12 @@
 #define __NRATL1_futimesat               0                                                                    /* filename -> dirfd */ 
 #define __NRATR2_futimesat               SC_REPR_STRUCT_TIMEVALX32_VEC2                                       /* times */ 
 #define __NRRTR_futimesat                SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_linux_fstatat64         SC_REPR_FD_T                                                         /* dirfd */ 
-#define __NRATR1_linux_fstatat64         SC_REPR_FILENAME                                                     /* filename */ 
-#define __NRATL1_linux_fstatat64         0                                                                    /* filename -> dirfd */ 
-#define __NRATR2_linux_fstatat64         SC_REPR_POINTER                                                      /* statbuf */ 
-#define __NRATR3_linux_fstatat64         SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* flags */ 
-#define __NRRTR_linux_fstatat64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fstatat64               SC_REPR_FD_T                                                         /* dirfd */ 
+#define __NRATR1_fstatat64               SC_REPR_FILENAME                                                     /* filename */ 
+#define __NRATL1_fstatat64               0                                                                    /* filename -> dirfd */ 
+#define __NRATR2_fstatat64               SC_REPR_POINTER                                                      /* statbuf */ 
+#define __NRATR3_fstatat64               SC_REPR_ATFLAG__SYMLINK_NOFOLLOW__DOSPATH                            /* flags */ 
+#define __NRRTR_fstatat64                SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_unlinkat                SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NRATR1_unlinkat                SC_REPR_FILENAME                                                     /* name */ 
 #define __NRATL1_unlinkat                0                                                                    /* name -> dirfd */ 
@@ -2405,6 +2405,28 @@
 #define __NRRTR_membarrier               SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_mlock2                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_mlock2                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_gettime64         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_gettime64         SC_REPR_POINTER                                                      /* tp */ 
+#define __NRRTR_clock_gettime64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clock_settime64         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
+#define __NRATR1_clock_settime64         SC_REPR_STRUCT_TIMESPECX32_64                                        /* tp */ 
+#define __NRRTR_clock_settime64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timer_gettime64         SC_REPR_TIMER_T                                                      /* timerid */ 
+#define __NRATR1_timer_gettime64         SC_REPR_POINTER                                                      /* value */ 
+#define __NRRTR_timer_gettime64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timer_settime64         SC_REPR_TIMER_T                                                      /* timerid */ 
+#define __NRATR1_timer_settime64         SC_REPR_TIMER_FLAGS                                                  /* flags */ 
+#define __NRATR2_timer_settime64         SC_REPR_STRUCT_ITIMERSPECX32_64                                      /* value */ 
+#define __NRATR3_timer_settime64         SC_REPR_POINTER                                                      /* ovalue */ 
+#define __NRRTR_timer_settime64          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timerfd_gettime64       SC_REPR_FD_T                                                         /* timerfd */ 
+#define __NRATR1_timerfd_gettime64       SC_REPR_POINTER                                                      /* otmr */ 
+#define __NRRTR_timerfd_gettime64        SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_timerfd_settime64       SC_REPR_FD_T                                                         /* timerfd */ 
+#define __NRATR1_timerfd_settime64       SC_REPR_TIMERFD_TIMER_FLAGS                                          /* flags */ 
+#define __NRATR2_timerfd_settime64       SC_REPR_STRUCT_ITIMERSPECX32_64                                      /* utmr */ 
+#define __NRATR3_timerfd_settime64       SC_REPR_POINTER                                                      /* otmr */ 
+#define __NRRTR_timerfd_settime64        SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_recvmmsg64              SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NRATR1_recvmmsg64              SC_REPR_POINTER                                                      /* vmessages */ 
 #define __NRATR2_recvmmsg64              SC_REPR_SIZE_T                                                       /* vlen */ 
@@ -2425,14 +2447,6 @@
 #define __NRATR3_preadvf                 SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NRATR4_preadvf                 SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NRRTR_preadvf                  SC_REPR_SSIZE_T                                                      /* return */
-#define __NRATR0_timerfd_gettime64       SC_REPR_FD_T                                                         /* timerfd */ 
-#define __NRATR1_timerfd_gettime64       SC_REPR_POINTER                                                      /* otmr */ 
-#define __NRRTR_timerfd_gettime64        SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_timerfd_settime64       SC_REPR_FD_T                                                         /* timerfd */ 
-#define __NRATR1_timerfd_settime64       SC_REPR_TIMERFD_TIMER_FLAGS                                          /* flags */ 
-#define __NRATR2_timerfd_settime64       SC_REPR_STRUCT_ITIMERSPECX32_64                                      /* utmr */ 
-#define __NRATR3_timerfd_settime64       SC_REPR_POINTER                                                      /* otmr */ 
-#define __NRRTR_timerfd_settime64        SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_fallocate64             SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_fallocate64             SC_REPR_FALLOCATE_MODE                                               /* mode */ 
 #define __NRATR2_fallocate64             SC_REPR_UINT64_T                                                     /* offset */ 
@@ -2540,20 +2554,6 @@
 #define __NRATR0_clock_getres64          SC_REPR_CLOCKID_T                                                    /* clock_id */ 
 #define __NRATR1_clock_getres64          SC_REPR_POINTER                                                      /* res */ 
 #define __NRRTR_clock_getres64           SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_clock_gettime64         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
-#define __NRATR1_clock_gettime64         SC_REPR_POINTER                                                      /* tp */ 
-#define __NRRTR_clock_gettime64          SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_clock_settime64         SC_REPR_CLOCKID_T                                                    /* clock_id */ 
-#define __NRATR1_clock_settime64         SC_REPR_STRUCT_TIMESPECX32_64                                        /* tp */ 
-#define __NRRTR_clock_settime64          SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_timer_gettime64         SC_REPR_TIMER_T                                                      /* timerid */ 
-#define __NRATR1_timer_gettime64         SC_REPR_POINTER                                                      /* value */ 
-#define __NRRTR_timer_gettime64          SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_timer_settime64         SC_REPR_TIMER_T                                                      /* timerid */ 
-#define __NRATR1_timer_settime64         SC_REPR_TIMER_FLAGS                                                  /* flags */ 
-#define __NRATR2_timer_settime64         SC_REPR_STRUCT_ITIMERSPECX32_64                                      /* value */ 
-#define __NRATR3_timer_settime64         SC_REPR_POINTER                                                      /* ovalue */ 
-#define __NRRTR_timer_settime64          SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_kreaddirf               SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_kreaddirf               SC_REPR_POINTER                                                      /* buf */ 
 #define __NRATR2_kreaddirf               SC_REPR_SIZE_T                                                       /* bufsize */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb167105 */
+/* HASH CRC-32:0x788bbc66 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1144,12 +1144,12 @@ __TSYSCALL0(signalfd, 0x415, 0x415)
 __TSYSCALL0(sendfile, 0x416, 0x416)
 __TSYSCALL0(ftruncate, 0x417, 0x417)
 __TSYSCALL0(truncate, 0x418, 0x418)
-__TSYSCALL0(linux_stat, 0x419, 0x419)
-__TSYSCALL0(linux_lstat, 0x41a, 0x41a)
-__TSYSCALL0(linux_fstat, 0x41b, 0x41b)
+__TSYSCALL0(stat, 0x419, 0x419)
+__TSYSCALL0(lstat, 0x41a, 0x41a)
+__TSYSCALL0(fstat, 0x41b, 0x41b)
 __TSYSCALL0(fcntl, 0x41c, 0x41c)
 __TSYSCALL0(fadvise64, 0x41d, 0x41d)
-__TSYSCALL0(linux_newfstatat, 0x41e, 0x41e)
+__TSYSCALL0(newfstatat, 0x41e, 0x41e)
 __TSYSCALL0(fstatfs, 0x41f, 0x41f)
 __TSYSCALL0(statfs, 0x420, 0x420)
 __TSYSCALL0(lseek, 0x421, 0x421)

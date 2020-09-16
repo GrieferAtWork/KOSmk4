@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75b6eae */
+/* HASH CRC-32:0x32a6ec25 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@
 #define SYS_chmod                   __NR_chmod                   /* errno_t chmod(char const *filename, mode_t mode) */
 #define SYS_lchown                  __NR_lchown                  /* errno_t lchown(char const *filename, uint16_t owner, uint16_t group) */
 #define SYS_break                   __NR_break                   /* errno_t break(void) */
-#define SYS_linux_oldstat           __NR_linux_oldstat           /* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
+#define SYS_oldstat                 __NR_oldstat                 /* errno_t oldstat(char const *filename, struct linux_oldstat *statbuf) */
 #define SYS_lseek                   __NR_lseek                   /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 #define SYS_getpid                  __NR_getpid                  /* pid_t getpid(void) */
 #define SYS_mount                   __NR_mount                   /* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t mountflags, void const *data) */
@@ -99,7 +99,7 @@
 #define SYS_stime                   __NR_stime                   /* errno_t stime(time32_t const *t) */
 #define SYS_ptrace                  __NR_ptrace                  /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
 #define SYS_alarm                   __NR_alarm                   /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
-#define SYS_linux_oldfstat          __NR_linux_oldfstat          /* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+#define SYS_oldfstat                __NR_oldfstat                /* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
 #define SYS_pause                   __NR_pause                   /* errno_t pause(void) */
 #define SYS_utime                   __NR_utime                   /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 #define SYS_stty                    __NR_stty                    /* errno_t stty(void) */
@@ -162,7 +162,7 @@
 #define SYS_setgroups               __NR_setgroups               /* errno_t setgroups(size_t count, uint16_t const *groups) */
 #define SYS_select                  __NR_select                  /* ssize_t select(struct sel_arg_structx32 const *arg) */
 #define SYS_symlink                 __NR_symlink                 /* errno_t symlink(char const *link_text, char const *target_path) */
-#define SYS_linux_oldlstat          __NR_linux_oldlstat          /* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
+#define SYS_oldlstat                __NR_oldlstat                /* errno_t oldlstat(char const *filename, struct linux_oldstat *statbuf) */
 #define SYS_readlink                __NR_readlink                /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
 #define SYS_uselib                  __NR_uselib                  /* errno_t uselib(char const *library) */
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
@@ -201,9 +201,9 @@
 #define SYS_setitimer               __NR_setitimer               /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 #define SYS_getitimer               __NR_getitimer               /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
-#define SYS_linux_stat              __NR_linux_stat              /* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
-#define SYS_linux_lstat             __NR_linux_lstat             /* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
-#define SYS_linux_fstat             __NR_linux_fstat             /* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
+#define SYS_stat                    __NR_stat                    /* errno_t stat(char const *filename, struct linux_statx32 *statbuf) */
+#define SYS_lstat                   __NR_lstat                   /* errno_t lstat(char const *filename, struct linux_statx32 *statbuf) */
+#define SYS_fstat                   __NR_fstat                   /* errno_t fstat(fd_t fd, struct linux_statx32 *statbuf) */
 #define SYS_olduname                __NR_olduname                /* errno_t olduname(struct linux_olduname *name) */
 #define SYS_iopl                    __NR_iopl                    /* errno_t iopl(syscall_ulong_t level) */
 #define SYS_vhangup                 __NR_vhangup                 /* errno_t vhangup(void) */
@@ -356,9 +356,9 @@
 #define SYS_mmap2                   __NR_mmap2                   /* void *mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) */
 #define SYS_truncate64              __NR_truncate64              /* errno_t truncate64(char const *filename, uint64_t length) */
 #define SYS_ftruncate64             __NR_ftruncate64             /* errno_t ftruncate64(fd_t fd, uint64_t length) */
-#define SYS_linux_stat64            __NR_linux_stat64            /* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
-#define SYS_linux_lstat64           __NR_linux_lstat64           /* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
-#define SYS_linux_fstat64           __NR_linux_fstat64           /* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
+#define SYS_stat64                  __NR_stat64                  /* errno_t stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define SYS_lstat64                 __NR_lstat64                 /* errno_t lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define SYS_fstat64                 __NR_fstat64                 /* errno_t fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 #define SYS_lchown32                __NR_lchown32                /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
 #define SYS_getuid32                __NR_getuid32                /* uint32_t getuid32(void) */
 #define SYS_getgid32                __NR_getgid32                /* uint32_t getgid32(void) */
@@ -492,7 +492,7 @@
 #define SYS_fchownat                __NR_fchownat                /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define SYS_futimesat               __NR_futimesat               /* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx32 const[2] times) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define SYS_linux_fstatat64         __NR_linux_fstatat64         /* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
+#define SYS_fstatat64               __NR_fstatat64               /* errno_t fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 #define SYS_unlinkat                __NR_unlinkat                /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define SYS_renameat                __NR_renameat                /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
@@ -776,6 +776,18 @@
 #define SYS_userfaultfd             __NR_userfaultfd             /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier              __NR_membarrier              /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                  __NR_mlock2                  /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define SYS_clock_gettime64         __NR_clock_gettime64         /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+#define SYS_clock_settime64         __NR_clock_settime64         /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+#define SYS_timer_gettime64         __NR_timer_gettime64         /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+#define SYS_timer_settime64         __NR_timer_settime64         /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+/* Return the next expiration time of UFD */
+#define SYS_timerfd_gettime64       __NR_timerfd_gettime64       /* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+#define SYS_timerfd_settime64       __NR_timerfd_settime64       /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -793,13 +805,6 @@
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 #define SYS_preadvf                 __NR_preadvf                 /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-/* Return the next expiration time of UFD */
-#define SYS_timerfd_gettime64       __NR_timerfd_gettime64       /* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-#define SYS_timerfd_settime64       __NR_timerfd_settime64       /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 #define SYS_fallocate64             __NR_fallocate64             /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 #define SYS_utimensat64             __NR_utimensat64             /* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
@@ -827,11 +832,6 @@
 #define SYS_utimes64                __NR_utimes64                /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 #define SYS_clock_nanosleep64       __NR_clock_nanosleep64       /* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
 #define SYS_clock_getres64          __NR_clock_getres64          /* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
-#define SYS_clock_gettime64         __NR_clock_gettime64         /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-#define SYS_clock_settime64         __NR_clock_settime64         /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-#define SYS_timer_gettime64         __NR_timer_gettime64         /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-#define SYS_timer_settime64         __NR_timer_settime64         /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 #define SYS_kreaddirf               __NR_kreaddirf               /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */

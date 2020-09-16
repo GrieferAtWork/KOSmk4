@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e6fc8f8 */
+/* HASH CRC-32:0x4f70281a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@
 #define __NR_chmod                   0xf                    /* errno_t chmod(char const *filename, mode_t mode) */
 #define __NR_lchown                  0x10                   /* errno_t lchown(char const *filename, uint16_t owner, uint16_t group) */
 #define __NR_break                   0x11                   /* errno_t break(void) */
-#define __NR_linux_oldstat           0x12                   /* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
+#define __NR_oldstat                 0x12                   /* errno_t oldstat(char const *filename, struct linux_oldstat *statbuf) */
 #define __NR_lseek                   0x13                   /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 #define __NR_getpid                  0x14                   /* pid_t getpid(void) */
 #define __NR_mount                   0x15                   /* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t mountflags, void const *data) */
@@ -96,7 +96,7 @@
 #define __NR_stime                   0x19                   /* errno_t stime(time32_t const *t) */
 #define __NR_ptrace                  0x1a                   /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
 #define __NR_alarm                   0x1b                   /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
-#define __NR_linux_oldfstat          0x1c                   /* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+#define __NR_oldfstat                0x1c                   /* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
 #define __NR_pause                   0x1d                   /* errno_t pause(void) */
 #define __NR_utime                   0x1e                   /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 #define __NR_stty                    0x1f                   /* errno_t stty(void) */
@@ -159,7 +159,7 @@
 #define __NR_setgroups               0x51                   /* errno_t setgroups(size_t count, uint16_t const *groups) */
 #define __NR_select                  0x52                   /* ssize_t select(struct sel_arg_structx32 const *arg) */
 #define __NR_symlink                 0x53                   /* errno_t symlink(char const *link_text, char const *target_path) */
-#define __NR_linux_oldlstat          0x54                   /* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
+#define __NR_oldlstat                0x54                   /* errno_t oldlstat(char const *filename, struct linux_oldstat *statbuf) */
 #define __NR_readlink                0x55                   /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
 #define __NR_uselib                  0x56                   /* errno_t uselib(char const *library) */
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
@@ -198,9 +198,9 @@
 #define __NR_setitimer               0x68                   /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 #define __NR_getitimer               0x69                   /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
-#define __NR_linux_stat              0x6a                   /* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
-#define __NR_linux_lstat             0x6b                   /* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
-#define __NR_linux_fstat             0x6c                   /* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
+#define __NR_stat                    0x6a                   /* errno_t stat(char const *filename, struct linux_statx32 *statbuf) */
+#define __NR_lstat                   0x6b                   /* errno_t lstat(char const *filename, struct linux_statx32 *statbuf) */
+#define __NR_fstat                   0x6c                   /* errno_t fstat(fd_t fd, struct linux_statx32 *statbuf) */
 #define __NR_olduname                0x6d                   /* errno_t olduname(struct linux_olduname *name) */
 #define __NR_iopl                    0x6e                   /* errno_t iopl(syscall_ulong_t level) */
 #define __NR_vhangup                 0x6f                   /* errno_t vhangup(void) */
@@ -353,9 +353,9 @@
 #define __NR_mmap2                   0xc0                   /* void *mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) */
 #define __NR_truncate64              0xc1                   /* errno_t truncate64(char const *filename, uint64_t length) */
 #define __NR_ftruncate64             0xc2                   /* errno_t ftruncate64(fd_t fd, uint64_t length) */
-#define __NR_linux_stat64            0xc3                   /* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
-#define __NR_linux_lstat64           0xc4                   /* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
-#define __NR_linux_fstat64           0xc5                   /* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
+#define __NR_stat64                  0xc3                   /* errno_t stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define __NR_lstat64                 0xc4                   /* errno_t lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define __NR_fstat64                 0xc5                   /* errno_t fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 #define __NR_lchown32                0xc6                   /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
 #define __NR_getuid32                0xc7                   /* uint32_t getuid32(void) */
 #define __NR_getgid32                0xc8                   /* uint32_t getgid32(void) */
@@ -489,7 +489,7 @@
 #define __NR_fchownat                0x12a                  /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define __NR_futimesat               0x12b                  /* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx32 const[2] times) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR_linux_fstatat64         0x12c                  /* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
+#define __NR_fstatat64               0x12c                  /* errno_t fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 #define __NR_unlinkat                0x12d                  /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define __NR_renameat                0x12e                  /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
@@ -773,6 +773,18 @@
 #define __NR_userfaultfd             0x176                  /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR_membarrier              0x177                  /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR_mlock2                  0x178                  /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define __NR_clock_gettime64         0x193                  /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+#define __NR_clock_settime64         0x194                  /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+#define __NR_timer_gettime64         0x198                  /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+#define __NR_timer_settime64         0x199                  /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+/* Return the next expiration time of UFD */
+#define __NR_timerfd_gettime64       0x19a                  /* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+#define __NR_timerfd_settime64       0x19b                  /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -790,13 +802,6 @@
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 #define __NR_preadvf                 __UINT32_C(0xfffffeb3) /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-/* Return the next expiration time of UFD */
-#define __NR_timerfd_gettime64       __UINT32_C(0xfffffeba) /* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-#define __NR_timerfd_settime64       __UINT32_C(0xfffffebb) /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 #define __NR_fallocate64             __UINT32_C(0xfffffebc) /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 #define __NR_utimensat64             __UINT32_C(0xfffffec0) /* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
@@ -824,11 +829,6 @@
 #define __NR_utimes64                __UINT32_C(0xfffffef1) /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 #define __NR_clock_nanosleep64       __UINT32_C(0xfffffef5) /* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
 #define __NR_clock_getres64          __UINT32_C(0xfffffef6) /* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
-#define __NR_clock_gettime64         __UINT32_C(0xfffffef7) /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-#define __NR_clock_settime64         __UINT32_C(0xfffffef8) /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-#define __NR_timer_gettime64         __UINT32_C(0xfffffefb) /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-#define __NR_timer_settime64         __UINT32_C(0xfffffefc) /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 #define __NR_kreaddirf               __UINT32_C(0xffffff24) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
@@ -1240,8 +1240,8 @@
 	callback(0)                                  \
 	callback(1) 
 #define __NR_syscall0_min 0x0
-#define __NR_syscall0_max 0x178
-#define __NR_syscall0_cnt 0x179
+#define __NR_syscall0_max 0x19b
+#define __NR_syscall0_cnt 0x19c
 #define __NR_syscall1_min __UINT32_C(0xfffffeaf)
 #define __NR_syscall1_max __UINT32_C(0xffffffff)
 #define __NR_syscall1_cnt 0x151
@@ -1303,7 +1303,7 @@
 #define __NRRM_chmod                   0
 #define __NRRM_lchown                  0
 #define __NRRM_break                   0
-#define __NRRM_linux_oldstat           0
+#define __NRRM_oldstat                 0
 #define __NRRM_lseek                   0
 #define __NRRM_getpid                  2
 #define __NRRM_mount                   0
@@ -1313,7 +1313,7 @@
 #define __NRRM_stime                   0
 #define __NRRM_ptrace                  0
 #define __NRRM_alarm                   0
-#define __NRRM_linux_oldfstat          0
+#define __NRRM_oldfstat                0
 #define __NRRM_pause                   1
 #define __NRRM_utime                   0
 #define __NRRM_stty                    0
@@ -1369,7 +1369,7 @@
 #define __NRRM_setgroups               2
 #define __NRRM_select                  1
 #define __NRRM_symlink                 0
-#define __NRRM_linux_oldlstat          0
+#define __NRRM_oldlstat                0
 #define __NRRM_readlink                0
 #define __NRRM_uselib                  0
 #define __NRRM_swapon                  0
@@ -1391,9 +1391,9 @@
 #define __NRRM_syslog                  2
 #define __NRRM_setitimer               0
 #define __NRRM_getitimer               0
-#define __NRRM_linux_stat              0
-#define __NRRM_linux_lstat             0
-#define __NRRM_linux_fstat             0
+#define __NRRM_stat                    0
+#define __NRRM_lstat                   0
+#define __NRRM_fstat                   0
 #define __NRRM_olduname                0
 #define __NRRM_iopl                    0
 #define __NRRM_vhangup                 0
@@ -1480,9 +1480,9 @@
 #define __NRRM_mmap2                   0
 #define __NRRM_truncate64              0
 #define __NRRM_ftruncate64             0
-#define __NRRM_linux_stat64            0
-#define __NRRM_linux_lstat64           0
-#define __NRRM_linux_fstat64           0
+#define __NRRM_stat64                  0
+#define __NRRM_lstat64                 0
+#define __NRRM_fstat64                 0
 #define __NRRM_lchown32                0
 #define __NRRM_getuid32                2
 #define __NRRM_getgid32                2
@@ -1581,7 +1581,7 @@
 #define __NRRM_mknodat                 0
 #define __NRRM_fchownat                0
 #define __NRRM_futimesat               0
-#define __NRRM_linux_fstatat64         0
+#define __NRRM_fstatat64               0
 #define __NRRM_unlinkat                0
 #define __NRRM_renameat                0
 #define __NRRM_linkat                  0
@@ -1658,11 +1658,15 @@
 #define __NRRM_userfaultfd             0
 #define __NRRM_membarrier              0
 #define __NRRM_mlock2                  0
+#define __NRRM_clock_gettime64         0
+#define __NRRM_clock_settime64         0
+#define __NRRM_timer_gettime64         0
+#define __NRRM_timer_settime64         0
+#define __NRRM_timerfd_gettime64       0
+#define __NRRM_timerfd_settime64       0
 #define __NRRM_recvmmsg64              1
 #define __NRRM_pwritevf                0
 #define __NRRM_preadvf                 0
-#define __NRRM_timerfd_gettime64       0
-#define __NRRM_timerfd_settime64       0
 #define __NRRM_fallocate64             0
 #define __NRRM_utimensat64             0
 #define __NRRM_ppoll64                 1
@@ -1680,10 +1684,6 @@
 #define __NRRM_utimes64                0
 #define __NRRM_clock_nanosleep64       1
 #define __NRRM_clock_getres64          0
-#define __NRRM_clock_gettime64         0
-#define __NRRM_clock_settime64         0
-#define __NRRM_timer_gettime64         0
-#define __NRRM_timer_settime64         0
 #define __NRRM_kreaddirf               0
 #define __NRRM_kfstat                  0
 #define __NRRM_klstat                  0
@@ -1761,11 +1761,11 @@
 #define __NRCP_mknod                   1
 #define __NRCP_chmod                   1
 #define __NRCP_lchown                  1
-#define __NRCP_linux_oldstat           1
+#define __NRCP_oldstat                 1
 #define __NRCP_lseek                   1
 #define __NRCP_mount                   1
 #define __NRCP_umount                  1
-#define __NRCP_linux_oldfstat          1
+#define __NRCP_oldfstat                1
 #define __NRCP_pause                   1
 #define __NRCP_utime                   1
 #define __NRCP_access                  1
@@ -1778,15 +1778,15 @@
 #define __NRCP_sigsuspend              1
 #define __NRCP_select                  1
 #define __NRCP_symlink                 1
-#define __NRCP_linux_oldlstat          1
+#define __NRCP_oldlstat                1
 #define __NRCP_readlink                1
 #define __NRCP_readdir                 1
 #define __NRCP_fchmod                  1
 #define __NRCP_fchown                  1
 #define __NRCP_syslog                  1
-#define __NRCP_linux_stat              1
-#define __NRCP_linux_lstat             1
-#define __NRCP_linux_fstat             1
+#define __NRCP_stat                    1
+#define __NRCP_lstat                   1
+#define __NRCP_fstat                   1
 #define __NRCP_wait4                   1
 #define __NRCP_sysinfo                 1
 #define __NRCP_fsync                   1
@@ -1809,9 +1809,9 @@
 #define __NRCP_sendfile                1
 #define __NRCP_getpmsg                 1
 #define __NRCP_putpmsg                 1
-#define __NRCP_linux_stat64            1
-#define __NRCP_linux_lstat64           1
-#define __NRCP_linux_fstat64           1
+#define __NRCP_stat64                  1
+#define __NRCP_lstat64                 1
+#define __NRCP_fstat64                 1
 #define __NRCP_lchown32                1
 #define __NRCP_fchown32                1
 #define __NRCP_chown32                 1
@@ -1842,7 +1842,7 @@
 #define __NRCP_mknodat                 1
 #define __NRCP_fchownat                1
 #define __NRCP_futimesat               1
-#define __NRCP_linux_fstatat64         1
+#define __NRCP_fstatat64               1
 #define __NRCP_unlinkat                1
 #define __NRCP_renameat                1
 #define __NRCP_linkat                  1
@@ -1949,7 +1949,7 @@
 #define __NRRC_chmod                   2
 #define __NRRC_lchown                  3
 #define __NRRC_break                   0
-#define __NRRC_linux_oldstat           2
+#define __NRRC_oldstat                 2
 #define __NRRC_lseek                   3
 #define __NRRC_getpid                  0
 #define __NRRC_mount                   5
@@ -1959,7 +1959,7 @@
 #define __NRRC_stime                   1
 #define __NRRC_ptrace                  4
 #define __NRRC_alarm                   1
-#define __NRRC_linux_oldfstat          2
+#define __NRRC_oldfstat                2
 #define __NRRC_pause                   0
 #define __NRRC_utime                   2
 #define __NRRC_stty                    0
@@ -2015,7 +2015,7 @@
 #define __NRRC_setgroups               2
 #define __NRRC_select                  1
 #define __NRRC_symlink                 2
-#define __NRRC_linux_oldlstat          2
+#define __NRRC_oldlstat                2
 #define __NRRC_readlink                3
 #define __NRRC_uselib                  1
 #define __NRRC_swapon                  2
@@ -2037,9 +2037,9 @@
 #define __NRRC_syslog                  3
 #define __NRRC_setitimer               3
 #define __NRRC_getitimer               2
-#define __NRRC_linux_stat              2
-#define __NRRC_linux_lstat             2
-#define __NRRC_linux_fstat             2
+#define __NRRC_stat                    2
+#define __NRRC_lstat                   2
+#define __NRRC_fstat                   2
 #define __NRRC_olduname                1
 #define __NRRC_iopl                    1
 #define __NRRC_vhangup                 0
@@ -2126,9 +2126,9 @@
 #define __NRRC_mmap2                   6
 #define __NRRC_truncate64              3 /* __NRAC_truncate64 + 1 */
 #define __NRRC_ftruncate64             3 /* __NRAC_ftruncate64 + 1 */
-#define __NRRC_linux_stat64            2
-#define __NRRC_linux_lstat64           2
-#define __NRRC_linux_fstat64           2
+#define __NRRC_stat64                  2
+#define __NRRC_lstat64                 2
+#define __NRRC_fstat64                 2
 #define __NRRC_lchown32                3
 #define __NRRC_getuid32                0
 #define __NRRC_getgid32                0
@@ -2227,7 +2227,7 @@
 #define __NRRC_mknodat                 4
 #define __NRRC_fchownat                5
 #define __NRRC_futimesat               3
-#define __NRRC_linux_fstatat64         4
+#define __NRRC_fstatat64               4
 #define __NRRC_unlinkat                3
 #define __NRRC_renameat                4
 #define __NRRC_linkat                  5
@@ -2304,11 +2304,15 @@
 #define __NRRC_userfaultfd             1
 #define __NRRC_membarrier              1
 #define __NRRC_mlock2                  1
+#define __NRRC_clock_gettime64         2
+#define __NRRC_clock_settime64         2
+#define __NRRC_timer_gettime64         2
+#define __NRRC_timer_settime64         4
+#define __NRRC_timerfd_gettime64       2
+#define __NRRC_timerfd_settime64       4
 #define __NRRC_recvmmsg64              5
 #define __NRRC_pwritevf                6 /* __NRAC_pwritevf + 1 */
 #define __NRRC_preadvf                 6 /* __NRAC_preadvf + 1 */
-#define __NRRC_timerfd_gettime64       2
-#define __NRRC_timerfd_settime64       4
 #define __NRRC_fallocate64             6 /* __NRAC_fallocate64 + 2 */
 #define __NRRC_utimensat64             4
 #define __NRRC_ppoll64                 5
@@ -2326,10 +2330,6 @@
 #define __NRRC_utimes64                2
 #define __NRRC_clock_nanosleep64       4
 #define __NRRC_clock_getres64          2
-#define __NRRC_clock_gettime64         2
-#define __NRRC_clock_settime64         2
-#define __NRRC_timer_gettime64         2
-#define __NRRC_timer_settime64         4
 #define __NRRC_kreaddirf               5
 #define __NRRC_kfstat                  2
 #define __NRRC_klstat                  2

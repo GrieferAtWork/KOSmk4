@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a841ba4 */
+/* HASH CRC-32:0xe36bec0c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@
 #define __NR32AC_chmod                   2
 #define __NR32AC_lchown                  3
 #define __NR32AC_break                   0
-#define __NR32AC_linux_oldstat           2
+#define __NR32AC_oldstat                 2
 #define __NR32AC_lseek                   3
 #define __NR32AC_getpid                  0
 #define __NR32AC_mount                   5
@@ -66,7 +66,7 @@
 #define __NR32AC_stime                   1
 #define __NR32AC_ptrace                  4
 #define __NR32AC_alarm                   1
-#define __NR32AC_linux_oldfstat          2
+#define __NR32AC_oldfstat                2
 #define __NR32AC_pause                   0
 #define __NR32AC_utime                   2
 #define __NR32AC_stty                    0
@@ -122,7 +122,7 @@
 #define __NR32AC_setgroups               2
 #define __NR32AC_select                  1
 #define __NR32AC_symlink                 2
-#define __NR32AC_linux_oldlstat          2
+#define __NR32AC_oldlstat                2
 #define __NR32AC_readlink                3
 #define __NR32AC_uselib                  1
 #define __NR32AC_swapon                  2
@@ -144,9 +144,9 @@
 #define __NR32AC_syslog                  3
 #define __NR32AC_setitimer               3
 #define __NR32AC_getitimer               2
-#define __NR32AC_linux_stat              2
-#define __NR32AC_linux_lstat             2
-#define __NR32AC_linux_fstat             2
+#define __NR32AC_stat                    2
+#define __NR32AC_lstat                   2
+#define __NR32AC_fstat                   2
 #define __NR32AC_olduname                1
 #define __NR32AC_iopl                    1
 #define __NR32AC_vhangup                 0
@@ -233,9 +233,9 @@
 #define __NR32AC_mmap2                   6
 #define __NR32AC_truncate64              2
 #define __NR32AC_ftruncate64             2
-#define __NR32AC_linux_stat64            2
-#define __NR32AC_linux_lstat64           2
-#define __NR32AC_linux_fstat64           2
+#define __NR32AC_stat64                  2
+#define __NR32AC_lstat64                 2
+#define __NR32AC_fstat64                 2
 #define __NR32AC_lchown32                3
 #define __NR32AC_getuid32                0
 #define __NR32AC_getgid32                0
@@ -334,7 +334,7 @@
 #define __NR32AC_mknodat                 4
 #define __NR32AC_fchownat                5
 #define __NR32AC_futimesat               3
-#define __NR32AC_linux_fstatat64         4
+#define __NR32AC_fstatat64               4
 #define __NR32AC_unlinkat                3
 #define __NR32AC_renameat                4
 #define __NR32AC_linkat                  5
@@ -411,11 +411,15 @@
 #define __NR32AC_userfaultfd             1
 #define __NR32AC_membarrier              1
 #define __NR32AC_mlock2                  1
+#define __NR32AC_clock_gettime64         2
+#define __NR32AC_clock_settime64         2
+#define __NR32AC_timer_gettime64         2
+#define __NR32AC_timer_settime64         4
+#define __NR32AC_timerfd_gettime64       2
+#define __NR32AC_timerfd_settime64       4
 #define __NR32AC_recvmmsg64              5
 #define __NR32AC_pwritevf                5
 #define __NR32AC_preadvf                 5
-#define __NR32AC_timerfd_gettime64       2
-#define __NR32AC_timerfd_settime64       4
 #define __NR32AC_fallocate64             4
 #define __NR32AC_utimensat64             4
 #define __NR32AC_ppoll64                 5
@@ -433,10 +437,6 @@
 #define __NR32AC_utimes64                2
 #define __NR32AC_clock_nanosleep64       4
 #define __NR32AC_clock_getres64          2
-#define __NR32AC_clock_gettime64         2
-#define __NR32AC_clock_settime64         2
-#define __NR32AC_timer_gettime64         2
-#define __NR32AC_timer_settime64         4
 #define __NR32AC_kreaddirf               5
 #define __NR32AC_kfstat                  2
 #define __NR32AC_klstat                  2
@@ -519,7 +519,7 @@
 #define __NR32RT_chmod                   (errno_t, __errno_t)
 #define __NR32RT_lchown                  (errno_t, __errno_t)
 #define __NR32RT_break                   (errno_t, __errno_t)
-#define __NR32RT_linux_oldstat           (errno_t, __errno_t)
+#define __NR32RT_oldstat                 (errno_t, __errno_t)
 #define __NR32RT_lseek                   (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_getpid                  (pid_t, __pid_t)
 #define __NR32RT_mount                   (errno_t, __errno_t)
@@ -529,7 +529,7 @@
 #define __NR32RT_stime                   (errno_t, __errno_t)
 #define __NR32RT_ptrace                  (syscall_slong_t, __syscall_slong_t)
 #define __NR32RT_alarm                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32RT_linux_oldfstat          (errno_t, __errno_t)
+#define __NR32RT_oldfstat                (errno_t, __errno_t)
 #define __NR32RT_pause                   (errno_t, __errno_t)
 #define __NR32RT_utime                   (errno_t, __errno_t)
 #define __NR32RT_stty                    (errno_t, __errno_t)
@@ -585,7 +585,7 @@
 #define __NR32RT_setgroups               (errno_t, __errno_t)
 #define __NR32RT_select                  (ssize_t, __ssize_t)
 #define __NR32RT_symlink                 (errno_t, __errno_t)
-#define __NR32RT_linux_oldlstat          (errno_t, __errno_t)
+#define __NR32RT_oldlstat                (errno_t, __errno_t)
 #define __NR32RT_readlink                (ssize_t, __ssize_t)
 #define __NR32RT_uselib                  (errno_t, __errno_t)
 #define __NR32RT_swapon                  (errno_t, __errno_t)
@@ -607,9 +607,9 @@
 #define __NR32RT_syslog                  (ssize_t, __ssize_t)
 #define __NR32RT_setitimer               (errno_t, __errno_t)
 #define __NR32RT_getitimer               (errno_t, __errno_t)
-#define __NR32RT_linux_stat              (errno_t, __errno_t)
-#define __NR32RT_linux_lstat             (errno_t, __errno_t)
-#define __NR32RT_linux_fstat             (errno_t, __errno_t)
+#define __NR32RT_stat                    (errno_t, __errno_t)
+#define __NR32RT_lstat                   (errno_t, __errno_t)
+#define __NR32RT_fstat                   (errno_t, __errno_t)
 #define __NR32RT_olduname                (errno_t, __errno_t)
 #define __NR32RT_iopl                    (errno_t, __errno_t)
 #define __NR32RT_vhangup                 (errno_t, __errno_t)
@@ -696,9 +696,9 @@
 #define __NR32RT_mmap2                   (void *, void *)
 #define __NR32RT_truncate64              (errno_t, __errno_t)
 #define __NR32RT_ftruncate64             (errno_t, __errno_t)
-#define __NR32RT_linux_stat64            (errno_t, __errno_t)
-#define __NR32RT_linux_lstat64           (errno_t, __errno_t)
-#define __NR32RT_linux_fstat64           (errno_t, __errno_t)
+#define __NR32RT_stat64                  (errno_t, __errno_t)
+#define __NR32RT_lstat64                 (errno_t, __errno_t)
+#define __NR32RT_fstat64                 (errno_t, __errno_t)
 #define __NR32RT_lchown32                (errno_t, __errno_t)
 #define __NR32RT_getuid32                (uint32_t, __uint32_t)
 #define __NR32RT_getgid32                (uint32_t, __uint32_t)
@@ -797,7 +797,7 @@
 #define __NR32RT_mknodat                 (errno_t, __errno_t)
 #define __NR32RT_fchownat                (errno_t, __errno_t)
 #define __NR32RT_futimesat               (errno_t, __errno_t)
-#define __NR32RT_linux_fstatat64         (errno_t, __errno_t)
+#define __NR32RT_fstatat64               (errno_t, __errno_t)
 #define __NR32RT_unlinkat                (errno_t, __errno_t)
 #define __NR32RT_renameat                (errno_t, __errno_t)
 #define __NR32RT_linkat                  (errno_t, __errno_t)
@@ -874,11 +874,15 @@
 #define __NR32RT_userfaultfd             (errno_t, __errno_t)
 #define __NR32RT_membarrier              (errno_t, __errno_t)
 #define __NR32RT_mlock2                  (errno_t, __errno_t)
+#define __NR32RT_clock_gettime64         (errno_t, __errno_t)
+#define __NR32RT_clock_settime64         (errno_t, __errno_t)
+#define __NR32RT_timer_gettime64         (errno_t, __errno_t)
+#define __NR32RT_timer_settime64         (errno_t, __errno_t)
+#define __NR32RT_timerfd_gettime64       (errno_t, __errno_t)
+#define __NR32RT_timerfd_settime64       (errno_t, __errno_t)
 #define __NR32RT_recvmmsg64              (ssize_t, __ssize_t)
 #define __NR32RT_pwritevf                (ssize_t, __ssize_t)
 #define __NR32RT_preadvf                 (ssize_t, __ssize_t)
-#define __NR32RT_timerfd_gettime64       (errno_t, __errno_t)
-#define __NR32RT_timerfd_settime64       (errno_t, __errno_t)
 #define __NR32RT_fallocate64             (errno_t, __errno_t)
 #define __NR32RT_utimensat64             (errno_t, __errno_t)
 #define __NR32RT_ppoll64                 (ssize_t, __ssize_t)
@@ -896,10 +900,6 @@
 #define __NR32RT_utimes64                (errno_t, __errno_t)
 #define __NR32RT_clock_nanosleep64       (errno_t, __errno_t)
 #define __NR32RT_clock_getres64          (errno_t, __errno_t)
-#define __NR32RT_clock_gettime64         (errno_t, __errno_t)
-#define __NR32RT_clock_settime64         (errno_t, __errno_t)
-#define __NR32RT_timer_gettime64         (errno_t, __errno_t)
-#define __NR32RT_timer_settime64         (errno_t, __errno_t)
 #define __NR32RT_kreaddirf               (ssize_t, __ssize_t)
 #define __NR32RT_kfstat                  (errno_t, __errno_t)
 #define __NR32RT_klstat                  (errno_t, __errno_t)
@@ -996,8 +996,8 @@
 #define __NR32AT0_lchown                  (char const *, char const *)
 #define __NR32AT1_lchown                  (uint16_t, __uint16_t)
 #define __NR32AT2_lchown                  (uint16_t, __uint16_t)
-#define __NR32AT0_linux_oldstat           (char const *, char const *)
-#define __NR32AT1_linux_oldstat           (struct linux_oldstat *, struct linux_oldstat *)
+#define __NR32AT0_oldstat                 (char const *, char const *)
+#define __NR32AT1_oldstat                 (struct linux_oldstat *, struct linux_oldstat *)
 #define __NR32AT0_lseek                   (fd_t, __fd_t)
 #define __NR32AT1_lseek                   (syscall_slong_t, __syscall_slong_t)
 #define __NR32AT2_lseek                   (syscall_ulong_t, __syscall_ulong_t)
@@ -1014,8 +1014,8 @@
 #define __NR32AT2_ptrace                  (void *, void *)
 #define __NR32AT3_ptrace                  (void *, void *)
 #define __NR32AT0_alarm                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_linux_oldfstat          (fd_t, __fd_t)
-#define __NR32AT1_linux_oldfstat          (struct linux_oldstat *, struct linux_oldstat *)
+#define __NR32AT0_oldfstat                (fd_t, __fd_t)
+#define __NR32AT1_oldfstat                (struct linux_oldstat *, struct linux_oldstat *)
 #define __NR32AT0_utime                   (char const *, char const *)
 #define __NR32AT1_utime                   (struct utimbufx32 const *, struct __utimbufx32 const *)
 #define __NR32AT0_access                  (char const *, char const *)
@@ -1083,8 +1083,8 @@
 #define __NR32AT0_select                  (struct sel_arg_structx32 const *, struct sel_arg_structx32 const *)
 #define __NR32AT0_symlink                 (char const *, char const *)
 #define __NR32AT1_symlink                 (char const *, char const *)
-#define __NR32AT0_linux_oldlstat          (char const *, char const *)
-#define __NR32AT1_linux_oldlstat          (struct linux_oldstat *, struct linux_oldstat *)
+#define __NR32AT0_oldlstat                (char const *, char const *)
+#define __NR32AT1_oldlstat                (struct linux_oldstat *, struct linux_oldstat *)
 #define __NR32AT0_readlink                (char const *, char const *)
 #define __NR32AT1_readlink                (char *, char *)
 #define __NR32AT2_readlink                (size_t, __size_t)
@@ -1137,12 +1137,12 @@
 #define __NR32AT2_setitimer               (struct __itimervalx32 *, struct __itimervalx32 *)
 #define __NR32AT0_getitimer               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_getitimer               (struct __itimervalx32 *, struct __itimervalx32 *)
-#define __NR32AT0_linux_stat              (char const *, char const *)
-#define __NR32AT1_linux_stat              (struct linux_statx32 *, struct linux_statx32 *)
-#define __NR32AT0_linux_lstat             (char const *, char const *)
-#define __NR32AT1_linux_lstat             (struct linux_statx32 *, struct linux_statx32 *)
-#define __NR32AT0_linux_fstat             (fd_t, __fd_t)
-#define __NR32AT1_linux_fstat             (struct linux_statx32 *, struct linux_statx32 *)
+#define __NR32AT0_stat                    (char const *, char const *)
+#define __NR32AT1_stat                    (struct linux_statx32 *, struct linux_statx32 *)
+#define __NR32AT0_lstat                   (char const *, char const *)
+#define __NR32AT1_lstat                   (struct linux_statx32 *, struct linux_statx32 *)
+#define __NR32AT0_fstat                   (fd_t, __fd_t)
+#define __NR32AT1_fstat                   (struct linux_statx32 *, struct linux_statx32 *)
 #define __NR32AT0_olduname                (struct linux_olduname *, struct linux_olduname *)
 #define __NR32AT0_iopl                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_vm86old                 (int, int)
@@ -1319,12 +1319,12 @@
 #define __NR32AT1_truncate64              (uint64_t, __uint64_t)
 #define __NR32AT0_ftruncate64             (fd_t, __fd_t)
 #define __NR32AT1_ftruncate64             (uint64_t, __uint64_t)
-#define __NR32AT0_linux_stat64            (char const *, char const *)
-#define __NR32AT1_linux_stat64            (struct linux_statx32_64 *, struct linux_statx32_64 *)
-#define __NR32AT0_linux_lstat64           (char const *, char const *)
-#define __NR32AT1_linux_lstat64           (struct linux_statx32_64 *, struct linux_statx32_64 *)
-#define __NR32AT0_linux_fstat64           (fd_t, __fd_t)
-#define __NR32AT1_linux_fstat64           (struct linux_statx32_64 *, struct linux_statx32_64 *)
+#define __NR32AT0_stat64                  (char const *, char const *)
+#define __NR32AT1_stat64                  (struct linux_statx32_64 *, struct linux_statx32_64 *)
+#define __NR32AT0_lstat64                 (char const *, char const *)
+#define __NR32AT1_lstat64                 (struct linux_statx32_64 *, struct linux_statx32_64 *)
+#define __NR32AT0_fstat64                 (fd_t, __fd_t)
+#define __NR32AT1_fstat64                 (struct linux_statx32_64 *, struct linux_statx32_64 *)
 #define __NR32AT0_lchown32                (char const *, char const *)
 #define __NR32AT1_lchown32                (uint32_t, __uint32_t)
 #define __NR32AT2_lchown32                (uint32_t, __uint32_t)
@@ -1550,10 +1550,10 @@
 #define __NR32AT0_futimesat               (fd_t, __fd_t)
 #define __NR32AT1_futimesat               (char const *, char const *)
 #define __NR32AT2_futimesat               (struct timevalx32 const *, struct __timevalx32 const *)
-#define __NR32AT0_linux_fstatat64         (fd_t, __fd_t)
-#define __NR32AT1_linux_fstatat64         (char const *, char const *)
-#define __NR32AT2_linux_fstatat64         (struct linux_statx32_64 *, struct linux_statx32_64 *)
-#define __NR32AT3_linux_fstatat64         (atflag_t, __atflag_t)
+#define __NR32AT0_fstatat64               (fd_t, __fd_t)
+#define __NR32AT1_fstatat64               (char const *, char const *)
+#define __NR32AT2_fstatat64               (struct linux_statx32_64 *, struct linux_statx32_64 *)
+#define __NR32AT3_fstatat64               (atflag_t, __atflag_t)
 #define __NR32AT0_unlinkat                (fd_t, __fd_t)
 #define __NR32AT1_unlinkat                (char const *, char const *)
 #define __NR32AT2_unlinkat                (atflag_t, __atflag_t)
@@ -1790,6 +1790,22 @@
 #define __NR32AT0_userfaultfd             (int, int)
 #define __NR32AT0_membarrier              (int, int)
 #define __NR32AT0_mlock2                  (int, int)
+#define __NR32AT0_clock_gettime64         (clockid_t, __clockid_t)
+#define __NR32AT1_clock_gettime64         (struct timespecx32_64 *, struct __timespecx32_64 *)
+#define __NR32AT0_clock_settime64         (clockid_t, __clockid_t)
+#define __NR32AT1_clock_settime64         (struct timespecx32_64 const *, struct __timespecx32_64 const *)
+#define __NR32AT0_timer_gettime64         (timer_t, __timer_t)
+#define __NR32AT1_timer_gettime64         (struct itimerspecx32_64 *, struct __itimerspecx32_64 *)
+#define __NR32AT0_timer_settime64         (timer_t, __timer_t)
+#define __NR32AT1_timer_settime64         (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT2_timer_settime64         (struct itimerspecx32_64 const *, struct __itimerspecx32_64 const *)
+#define __NR32AT3_timer_settime64         (struct itimerspecx32_64 *, struct __itimerspecx32_64 *)
+#define __NR32AT0_timerfd_gettime64       (fd_t, __fd_t)
+#define __NR32AT1_timerfd_gettime64       (struct itimerspecx32_64 *, struct __itimerspecx32_64 *)
+#define __NR32AT0_timerfd_settime64       (fd_t, __fd_t)
+#define __NR32AT1_timerfd_settime64       (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT2_timerfd_settime64       (struct itimerspecx32_64 const *, struct __itimerspecx32_64 const *)
+#define __NR32AT3_timerfd_settime64       (struct itimerspecx32_64 *, struct __itimerspecx32_64 *)
 #define __NR32AT0_recvmmsg64              (fd_t, __fd_t)
 #define __NR32AT1_recvmmsg64              (struct mmsghdrx32 *, struct __mmsghdrx32 *)
 #define __NR32AT2_recvmmsg64              (size_t, __size_t)
@@ -1805,12 +1821,6 @@
 #define __NR32AT2_preadvf                 (size_t, __size_t)
 #define __NR32AT3_preadvf                 (uint64_t, __uint64_t)
 #define __NR32AT4_preadvf                 (iomode_t, __iomode_t)
-#define __NR32AT0_timerfd_gettime64       (fd_t, __fd_t)
-#define __NR32AT1_timerfd_gettime64       (struct itimerspecx32_64 *, struct __itimerspecx32_64 *)
-#define __NR32AT0_timerfd_settime64       (fd_t, __fd_t)
-#define __NR32AT1_timerfd_settime64       (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT2_timerfd_settime64       (struct itimerspecx32_64 const *, struct __itimerspecx32_64 const *)
-#define __NR32AT3_timerfd_settime64       (struct itimerspecx32_64 *, struct __itimerspecx32_64 *)
 #define __NR32AT0_fallocate64             (fd_t, __fd_t)
 #define __NR32AT1_fallocate64             (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_fallocate64             (uint64_t, __uint64_t)
@@ -1883,16 +1893,6 @@
 #define __NR32AT3_clock_nanosleep64       (struct timespecx32_64 *, struct __timespecx32_64 *)
 #define __NR32AT0_clock_getres64          (clockid_t, __clockid_t)
 #define __NR32AT1_clock_getres64          (struct timespecx32_64 *, struct __timespecx32_64 *)
-#define __NR32AT0_clock_gettime64         (clockid_t, __clockid_t)
-#define __NR32AT1_clock_gettime64         (struct timespecx32_64 *, struct __timespecx32_64 *)
-#define __NR32AT0_clock_settime64         (clockid_t, __clockid_t)
-#define __NR32AT1_clock_settime64         (struct timespecx32_64 const *, struct __timespecx32_64 const *)
-#define __NR32AT0_timer_gettime64         (timer_t, __timer_t)
-#define __NR32AT1_timer_gettime64         (struct itimerspecx32_64 *, struct __itimerspecx32_64 *)
-#define __NR32AT0_timer_settime64         (timer_t, __timer_t)
-#define __NR32AT1_timer_settime64         (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT2_timer_settime64         (struct itimerspecx32_64 const *, struct __itimerspecx32_64 const *)
-#define __NR32AT3_timer_settime64         (struct itimerspecx32_64 *, struct __itimerspecx32_64 *)
 #define __NR32AT0_kreaddirf               (fd_t, __fd_t)
 #define __NR32AT1_kreaddirf               (struct dirent *, struct dirent *)
 #define __NR32AT2_kreaddirf               (size_t, __size_t)
@@ -2078,7 +2078,7 @@
 #define __NR32AM_chmod(a, b, c, d, e, f)                   (char const *)a, (__mode_t)b
 #define __NR32AM_lchown(a, b, c, d, e, f)                  (char const *)a, (__uint16_t)b, (__uint16_t)c
 #define __NR32AM_break(a, b, c, d, e, f)                   /* nothing */
-#define __NR32AM_linux_oldstat(a, b, c, d, e, f)           (char const *)a, (struct linux_oldstat *)b
+#define __NR32AM_oldstat(a, b, c, d, e, f)                 (char const *)a, (struct linux_oldstat *)b
 #define __NR32AM_lseek(a, b, c, d, e, f)                   (__fd_t)a, (__syscall_slong_t)b, (__syscall_ulong_t)c
 #define __NR32AM_getpid(a, b, c, d, e, f)                  /* nothing */
 #define __NR32AM_mount(a, b, c, d, e, f)                   (char const *)a, (char const *)b, (char const *)c, (__syscall_ulong_t)d, (void const *)e
@@ -2088,7 +2088,7 @@
 #define __NR32AM_stime(a, b, c, d, e, f)                   (__time32_t const *)a
 #define __NR32AM_ptrace(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__pid_t)b, (void *)c, (void *)d
 #define __NR32AM_alarm(a, b, c, d, e, f)                   (__syscall_ulong_t)a
-#define __NR32AM_linux_oldfstat(a, b, c, d, e, f)          (__fd_t)a, (struct linux_oldstat *)b
+#define __NR32AM_oldfstat(a, b, c, d, e, f)                (__fd_t)a, (struct linux_oldstat *)b
 #define __NR32AM_pause(a, b, c, d, e, f)                   /* nothing */
 #define __NR32AM_utime(a, b, c, d, e, f)                   (char const *)a, (struct __utimbufx32 const *)b
 #define __NR32AM_stty(a, b, c, d, e, f)                    /* nothing */
@@ -2144,7 +2144,7 @@
 #define __NR32AM_setgroups(a, b, c, d, e, f)               (__size_t)a, (__uint16_t const *)b
 #define __NR32AM_select(a, b, c, d, e, f)                  (struct sel_arg_structx32 const *)a
 #define __NR32AM_symlink(a, b, c, d, e, f)                 (char const *)a, (char const *)b
-#define __NR32AM_linux_oldlstat(a, b, c, d, e, f)          (char const *)a, (struct linux_oldstat *)b
+#define __NR32AM_oldlstat(a, b, c, d, e, f)                (char const *)a, (struct linux_oldstat *)b
 #define __NR32AM_readlink(a, b, c, d, e, f)                (char const *)a, (char *)b, (__size_t)c
 #define __NR32AM_uselib(a, b, c, d, e, f)                  (char const *)a
 #define __NR32AM_swapon(a, b, c, d, e, f)                  (char const *)a, (__syscall_ulong_t)b
@@ -2166,9 +2166,9 @@
 #define __NR32AM_syslog(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (char const *)b, (__size_t)c
 #define __NR32AM_setitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimervalx32 const *)b, (struct __itimervalx32 *)c
 #define __NR32AM_getitimer(a, b, c, d, e, f)               (__syscall_ulong_t)a, (struct __itimervalx32 *)b
-#define __NR32AM_linux_stat(a, b, c, d, e, f)              (char const *)a, (struct linux_statx32 *)b
-#define __NR32AM_linux_lstat(a, b, c, d, e, f)             (char const *)a, (struct linux_statx32 *)b
-#define __NR32AM_linux_fstat(a, b, c, d, e, f)             (__fd_t)a, (struct linux_statx32 *)b
+#define __NR32AM_stat(a, b, c, d, e, f)                    (char const *)a, (struct linux_statx32 *)b
+#define __NR32AM_lstat(a, b, c, d, e, f)                   (char const *)a, (struct linux_statx32 *)b
+#define __NR32AM_fstat(a, b, c, d, e, f)                   (__fd_t)a, (struct linux_statx32 *)b
 #define __NR32AM_olduname(a, b, c, d, e, f)                (struct linux_olduname *)a
 #define __NR32AM_iopl(a, b, c, d, e, f)                    (__syscall_ulong_t)a
 #define __NR32AM_vhangup(a, b, c, d, e, f)                 /* nothing */
@@ -2255,9 +2255,9 @@
 #define __NR32AM_mmap2(a, b, c, d, e, f)                   (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__fd_t)e, (__syscall_ulong_t)f
 #define __NR32AM_truncate64(a, b, c, d, e, f)              (char const *)a, (__uint64_t)((__uint64_t)b | (__uint64_t)c << 32)
 #define __NR32AM_ftruncate64(a, b, c, d, e, f)             (__fd_t)a, (__uint64_t)((__uint64_t)b | (__uint64_t)c << 32)
-#define __NR32AM_linux_stat64(a, b, c, d, e, f)            (char const *)a, (struct linux_statx32_64 *)b
-#define __NR32AM_linux_lstat64(a, b, c, d, e, f)           (char const *)a, (struct linux_statx32_64 *)b
-#define __NR32AM_linux_fstat64(a, b, c, d, e, f)           (__fd_t)a, (struct linux_statx32_64 *)b
+#define __NR32AM_stat64(a, b, c, d, e, f)                  (char const *)a, (struct linux_statx32_64 *)b
+#define __NR32AM_lstat64(a, b, c, d, e, f)                 (char const *)a, (struct linux_statx32_64 *)b
+#define __NR32AM_fstat64(a, b, c, d, e, f)                 (__fd_t)a, (struct linux_statx32_64 *)b
 #define __NR32AM_lchown32(a, b, c, d, e, f)                (char const *)a, (__uint32_t)b, (__uint32_t)c
 #define __NR32AM_getuid32(a, b, c, d, e, f)                /* nothing */
 #define __NR32AM_getgid32(a, b, c, d, e, f)                /* nothing */
@@ -2356,7 +2356,7 @@
 #define __NR32AM_mknodat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d
 #define __NR32AM_fchownat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__uid_t)c, (__gid_t)d, (__atflag_t)e
 #define __NR32AM_futimesat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct __timevalx32 const *)c
-#define __NR32AM_linux_fstatat64(a, b, c, d, e, f)         (__fd_t)a, (char const *)b, (struct linux_statx32_64 *)c, (__atflag_t)d
+#define __NR32AM_fstatat64(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (struct linux_statx32_64 *)c, (__atflag_t)d
 #define __NR32AM_unlinkat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR32AM_renameat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d
 #define __NR32AM_linkat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
@@ -2433,11 +2433,15 @@
 #define __NR32AM_userfaultfd(a, b, c, d, e, f)             (int)a
 #define __NR32AM_membarrier(a, b, c, d, e, f)              (int)a
 #define __NR32AM_mlock2(a, b, c, d, e, f)                  (int)a
+#define __NR32AM_clock_gettime64(a, b, c, d, e, f)         (__clockid_t)a, (struct __timespecx32_64 *)b
+#define __NR32AM_clock_settime64(a, b, c, d, e, f)         (__clockid_t)a, (struct __timespecx32_64 const *)b
+#define __NR32AM_timer_gettime64(a, b, c, d, e, f)         (__timer_t)a, (struct __itimerspecx32_64 *)b
+#define __NR32AM_timer_settime64(a, b, c, d, e, f)         (__timer_t)a, (__syscall_ulong_t)b, (struct __itimerspecx32_64 const *)c, (struct __itimerspecx32_64 *)d
+#define __NR32AM_timerfd_gettime64(a, b, c, d, e, f)       (__fd_t)a, (struct __itimerspecx32_64 *)b
+#define __NR32AM_timerfd_settime64(a, b, c, d, e, f)       (__fd_t)a, (__syscall_ulong_t)b, (struct __itimerspecx32_64 const *)c, (struct __itimerspecx32_64 *)d
 #define __NR32AM_recvmmsg64(a, b, c, d, e, f)              (__fd_t)a, (struct __mmsghdrx32 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespecx32_64 const *)e
 #define __NR32AM_pwritevf(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NR32AM_preadvf(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
-#define __NR32AM_timerfd_gettime64(a, b, c, d, e, f)       (__fd_t)a, (struct __itimerspecx32_64 *)b
-#define __NR32AM_timerfd_settime64(a, b, c, d, e, f)       (__fd_t)a, (__syscall_ulong_t)b, (struct __itimerspecx32_64 const *)c, (struct __itimerspecx32_64 *)d
 #define __NR32AM_fallocate64(a, b, c, d, e, f)             (__fd_t)a, (__syscall_ulong_t)b, (__uint64_t)((__uint64_t)c | (__uint64_t)d << 32), (__uint64_t)((__uint64_t)e | (__uint64_t)f << 32)
 #define __NR32AM_utimensat64(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (struct __timespecx32_64 const *)c, (__atflag_t)d
 #define __NR32AM_ppoll64(a, b, c, d, e, f)                 (struct pollfd *)a, (__size_t)b, (struct __timespecx32_64 const *)c, (struct __sigset_struct const *)d, (__size_t)e
@@ -2455,10 +2459,6 @@
 #define __NR32AM_utimes64(a, b, c, d, e, f)                (char const *)a, (struct __timevalx32_64 const *)b
 #define __NR32AM_clock_nanosleep64(a, b, c, d, e, f)       (__clockid_t)a, (__syscall_ulong_t)b, (struct __timespecx32_64 const *)c, (struct __timespecx32_64 *)d
 #define __NR32AM_clock_getres64(a, b, c, d, e, f)          (__clockid_t)a, (struct __timespecx32_64 *)b
-#define __NR32AM_clock_gettime64(a, b, c, d, e, f)         (__clockid_t)a, (struct __timespecx32_64 *)b
-#define __NR32AM_clock_settime64(a, b, c, d, e, f)         (__clockid_t)a, (struct __timespecx32_64 const *)b
-#define __NR32AM_timer_gettime64(a, b, c, d, e, f)         (__timer_t)a, (struct __itimerspecx32_64 *)b
-#define __NR32AM_timer_settime64(a, b, c, d, e, f)         (__timer_t)a, (__syscall_ulong_t)b, (struct __itimerspecx32_64 const *)c, (struct __itimerspecx32_64 *)d
 #define __NR32AM_kreaddirf(a, b, c, d, e, f)               (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
 #define __NR32AM_kfstat(a, b, c, d, e, f)                  (__fd_t)a, (struct __kos_statx32 *)b
 #define __NR32AM_klstat(a, b, c, d, e, f)                  (char const *)a, (struct __kos_statx32 *)b
@@ -2541,7 +2541,7 @@
 #define __NR32AP_chmod(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_lchown(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_break()                                   /* nothing */
-#define __NR32AP_linux_oldstat(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_oldstat(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_lseek(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_getpid()                                  /* nothing */
 #define __NR32AP_mount(a, b, c, d, e)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
@@ -2551,7 +2551,7 @@
 #define __NR32AP_stime(a)                                  (__syscall_ulong_t)a
 #define __NR32AP_ptrace(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_alarm(a)                                  (__syscall_ulong_t)a
-#define __NR32AP_linux_oldfstat(a, b)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_oldfstat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_pause()                                   /* nothing */
 #define __NR32AP_utime(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_stty()                                    /* nothing */
@@ -2607,7 +2607,7 @@
 #define __NR32AP_setgroups(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_select(a)                                 (__syscall_ulong_t)a
 #define __NR32AP_symlink(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_linux_oldlstat(a, b)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_oldlstat(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_readlink(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_uselib(a)                                 (__syscall_ulong_t)a
 #define __NR32AP_swapon(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
@@ -2629,9 +2629,9 @@
 #define __NR32AP_syslog(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_setitimer(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_getitimer(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_linux_stat(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_linux_lstat(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_linux_fstat(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_stat(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_lstat(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_fstat(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_olduname(a)                               (__syscall_ulong_t)a
 #define __NR32AP_iopl(a)                                   (__syscall_ulong_t)a
 #define __NR32AP_vhangup()                                 /* nothing */
@@ -2718,9 +2718,9 @@
 #define __NR32AP_mmap2(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_truncate64(a, b)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32)
 #define __NR32AP_ftruncate64(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32)
-#define __NR32AP_linux_stat64(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_linux_lstat64(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_linux_fstat64(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_stat64(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_lstat64(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_fstat64(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_lchown32(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_getuid32()                                /* nothing */
 #define __NR32AP_getgid32()                                /* nothing */
@@ -2819,7 +2819,7 @@
 #define __NR32AP_mknodat(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_fchownat(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_futimesat(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AP_linux_fstatat64(a, b, c, d)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_fstatat64(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_unlinkat(a, b, c)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_renameat(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_linkat(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
@@ -2896,11 +2896,15 @@
 #define __NR32AP_userfaultfd(a)                            (__syscall_ulong_t)a
 #define __NR32AP_membarrier(a)                             (__syscall_ulong_t)a
 #define __NR32AP_mlock2(a)                                 (__syscall_ulong_t)a
+#define __NR32AP_clock_gettime64(a, b)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_clock_settime64(a, b)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_timer_gettime64(a, b)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_timer_settime64(a, b, c, d)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_timerfd_gettime64(a, b)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_timerfd_settime64(a, b, c, d)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_recvmmsg64(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_pwritevf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
 #define __NR32AP_preadvf(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32), (__syscall_ulong_t)e
-#define __NR32AP_timerfd_gettime64(a, b)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_timerfd_settime64(a, b, c, d)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_fallocate64(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)((__uint64_t)c >> 32), (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32)
 #define __NR32AP_utimensat64(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_ppoll64(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
@@ -2918,10 +2922,6 @@
 #define __NR32AP_utimes64(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_clock_nanosleep64(a, b, c, d)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_clock_getres64(a, b)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_clock_gettime64(a, b)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_clock_settime64(a, b)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_timer_gettime64(a, b)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_timer_settime64(a, b, c, d)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_kreaddirf(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_kfstat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_klstat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b

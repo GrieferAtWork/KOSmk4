@@ -1122,50 +1122,50 @@ sigaltstackx64:([tostr(STRUCT_SIGALTSTACKX64)] struct __sigaltstackx64 const *ss
 %[typeorg(<kos/compat/linux-stat.h>: linux_stat, linux_stat32, linux_stat64)]
 %[typeorg(<kos/compat/linux-stat.h>: linux_statx32, linux_statx64, linux_statx32_64)]
 
-[cp] linux_oldfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
-                       [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf,
-                       [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp] linux_oldfstat:(fd_t fd, [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
-[cp] linux_oldlstat:([tostr(FILENAME)] char const *filename,
-                     [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
-[cp] linux_oldstat:([tostr(FILENAME)] char const *filename,
-                    [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
+[cp] oldfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
+                 [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf,
+                 [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] oldfstat:(fd_t fd, [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
+[cp] oldlstat:([tostr(FILENAME)] char const *filename,
+               [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
+[cp] oldstat:([tostr(FILENAME)] char const *filename,
+              [tostr(out:STRUCT_LINUX_OLDSTAT)] struct linux_oldstat *statbuf) -> errno_t;
 
 %[startgroup]
 @@@param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
-[cp] linux_fstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(linux_fstatat)] linux_fstatat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(linux_fstatat)] linux_fstatat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(linux_fstatat)] linux_fstatatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(linux_fstatat)] linux_fstatatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
-[cp][doc_alias(linux_fstatat)] linux_fstatatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] fstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(fstatat)] fstatat32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(fstatat)] fstatat64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(fstatat)] fstatatx32:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(fstatat)] fstatatx32_64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp][doc_alias(fstatat)] fstatatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf, [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] linux_fstat:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
-[cp] linux_fstat32:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
-[cp] linux_fstat64:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
-[cp] linux_fstatx32:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
-[cp] linux_fstatx32_64:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
-[cp] linux_fstatx64:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
+[cp] fstat:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
+[cp] fstat32:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
+[cp] fstat64:(fd_t fd, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
+[cp] fstatx32:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
+[cp] fstatx32_64:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] fstatx64:(fd_t fd, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] linux_lstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
-[cp] linux_lstat32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
-[cp] linux_lstat64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
-[cp] linux_lstatx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
-[cp] linux_lstatx32_64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
-[cp] linux_lstatx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
+[cp] lstat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
+[cp] lstat32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
+[cp] lstat64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
+[cp] lstatx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
+[cp] lstatx32_64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] lstatx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-[cp] linux_stat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
-[cp] linux_stat32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
-[cp] linux_stat64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
-[cp] linux_statx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
-[cp] linux_statx32_64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
-[cp] linux_statx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
+[cp] stat:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT)] struct linux_stat *statbuf) -> errno_t;
+[cp] stat32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT32)] struct linux_stat32 *statbuf) -> errno_t;
+[cp] stat64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STAT64)] struct linux_stat64 *statbuf) -> errno_t;
+[cp] statx32:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32)] struct linux_statx32 *statbuf) -> errno_t;
+[cp] statx32_64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX32_64)] struct linux_statx32_64 *statbuf) -> errno_t;
+[cp] statx64:([tostr(FILENAME)] char const *filename, [tostr(out:STRUCT_LINUX_STATX64)] struct linux_statx64 *statbuf) -> errno_t;
 %[endgroup]
 
 
@@ -1182,9 +1182,9 @@ sigaltstackx64:([tostr(STRUCT_SIGALTSTACKX64)] struct __sigaltstackx64 const *ss
                                        [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 %[endgroup]
 
-[cp] linux_newfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
-                       [tostr(out:STRUCT_LINUX64_STAT32)] struct linux64_stat32 *statbuf,
-                       [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
+[cp] newfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,
+                 [tostr(out:STRUCT_LINUX64_STAT32)] struct linux64_stat32 *statbuf,
+                 [tostr(ATFLAG__SYMLINK_NOFOLLOW__DOSPATH)] atflag_t flags) -> errno_t;
 
 %[startgroup]
 [cp] kfstat:(fd_t fd, [tostr(out:STRUCT_KOS_STAT)] struct __kos_stat *statbuf) -> errno_t;
@@ -2810,12 +2810,12 @@ rtm_test:() -> syscall_ulong_t;
 1046:sendfile
 1047:ftruncate
 1048:truncate
-1049:linux_stat
-1050:linux_lstat
-1051:linux_fstat
+1049:stat
+1050:lstat
+1051:fstat
 1052:fcntl
 1053:fadvise64
-1054:linux_newfstatat
+1054:newfstatat
 1055:fstatfs
 1056:statfs
 1057:lseek

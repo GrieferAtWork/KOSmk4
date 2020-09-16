@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x853fdf4 */
+/* HASH CRC-32:0x169245b8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -884,21 +884,21 @@ INTERN_FUNCTION(libc_sys_Xbreak)
 END(libc_sys_Xbreak)
 DEFINE_PUBLIC_ALIAS(sys_Xbreak, libc_sys_Xbreak)
 
-/* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
-.section .text.crt.syscall.linux_oldstat
-INTERN_FUNCTION(libc_sys_linux_oldstat)
+/* errno_t oldstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.crt.syscall.oldstat
+INTERN_FUNCTION(libc_sys_oldstat)
 	movl   $(0x12), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_oldstat)
-DEFINE_PUBLIC_ALIAS(sys_linux_oldstat, libc_sys_linux_oldstat)
+END(libc_sys_oldstat)
+DEFINE_PUBLIC_ALIAS(sys_oldstat, libc_sys_oldstat)
 
-/* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
-.section .text.crt.syscall.Xlinux_oldstat
-INTERN_FUNCTION(libc_sys_Xlinux_oldstat)
+/* errno_t oldstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.crt.syscall.Xoldstat
+INTERN_FUNCTION(libc_sys_Xoldstat)
 	movl   $(0x12), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_oldstat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_oldstat, libc_sys_Xlinux_oldstat)
+END(libc_sys_Xoldstat)
+DEFINE_PUBLIC_ALIAS(sys_Xoldstat, libc_sys_Xoldstat)
 
 /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 .section .text.crt.syscall.lseek
@@ -1044,21 +1044,21 @@ INTERN_FUNCTION(libc_sys_Xalarm)
 END(libc_sys_Xalarm)
 DEFINE_PUBLIC_ALIAS(sys_Xalarm, libc_sys_Xalarm)
 
-/* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
-.section .text.crt.syscall.linux_oldfstat
-INTERN_FUNCTION(libc_sys_linux_oldfstat)
+/* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+.section .text.crt.syscall.oldfstat
+INTERN_FUNCTION(libc_sys_oldfstat)
 	movl   $(0x1c), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_oldfstat)
-DEFINE_PUBLIC_ALIAS(sys_linux_oldfstat, libc_sys_linux_oldfstat)
+END(libc_sys_oldfstat)
+DEFINE_PUBLIC_ALIAS(sys_oldfstat, libc_sys_oldfstat)
 
-/* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
-.section .text.crt.syscall.Xlinux_oldfstat
-INTERN_FUNCTION(libc_sys_Xlinux_oldfstat)
+/* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+.section .text.crt.syscall.Xoldfstat
+INTERN_FUNCTION(libc_sys_Xoldfstat)
 	movl   $(0x1c), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_oldfstat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_oldfstat, libc_sys_Xlinux_oldfstat)
+END(libc_sys_Xoldfstat)
+DEFINE_PUBLIC_ALIAS(sys_Xoldfstat, libc_sys_Xoldfstat)
 
 /* errno_t pause(void) */
 .section .text.crt.syscall.pause
@@ -1954,21 +1954,21 @@ INTERN_FUNCTION(libc_sys_Xsymlink)
 END(libc_sys_Xsymlink)
 DEFINE_PUBLIC_ALIAS(sys_Xsymlink, libc_sys_Xsymlink)
 
-/* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
-.section .text.crt.syscall.linux_oldlstat
-INTERN_FUNCTION(libc_sys_linux_oldlstat)
+/* errno_t oldlstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.crt.syscall.oldlstat
+INTERN_FUNCTION(libc_sys_oldlstat)
 	movl   $(0x54), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_oldlstat)
-DEFINE_PUBLIC_ALIAS(sys_linux_oldlstat, libc_sys_linux_oldlstat)
+END(libc_sys_oldlstat)
+DEFINE_PUBLIC_ALIAS(sys_oldlstat, libc_sys_oldlstat)
 
-/* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
-.section .text.crt.syscall.Xlinux_oldlstat
-INTERN_FUNCTION(libc_sys_Xlinux_oldlstat)
+/* errno_t oldlstat(char const *filename, struct linux_oldstat *statbuf) */
+.section .text.crt.syscall.Xoldlstat
+INTERN_FUNCTION(libc_sys_Xoldlstat)
 	movl   $(0x54), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_oldlstat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_oldlstat, libc_sys_Xlinux_oldlstat)
+END(libc_sys_Xoldlstat)
+DEFINE_PUBLIC_ALIAS(sys_Xoldlstat, libc_sys_Xoldlstat)
 
 /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
 .section .text.crt.syscall.readlink
@@ -2340,53 +2340,53 @@ INTERN_FUNCTION(libc_sys_Xgetitimer)
 END(libc_sys_Xgetitimer)
 DEFINE_PUBLIC_ALIAS(sys_Xgetitimer, libc_sys_Xgetitimer)
 
-/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
-.section .text.crt.syscall.linux_stat
-INTERN_FUNCTION(libc_sys_linux_stat)
+/* errno_t stat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.stat
+INTERN_FUNCTION(libc_sys_stat)
 	movl   $(0x6a), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_stat)
-DEFINE_PUBLIC_ALIAS(sys_linux_stat, libc_sys_linux_stat)
+END(libc_sys_stat)
+DEFINE_PUBLIC_ALIAS(sys_stat, libc_sys_stat)
 
-/* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
-.section .text.crt.syscall.Xlinux_stat
-INTERN_FUNCTION(libc_sys_Xlinux_stat)
+/* errno_t stat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.Xstat
+INTERN_FUNCTION(libc_sys_Xstat)
 	movl   $(0x6a), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_stat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_stat, libc_sys_Xlinux_stat)
+END(libc_sys_Xstat)
+DEFINE_PUBLIC_ALIAS(sys_Xstat, libc_sys_Xstat)
 
-/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
-.section .text.crt.syscall.linux_lstat
-INTERN_FUNCTION(libc_sys_linux_lstat)
+/* errno_t lstat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.lstat
+INTERN_FUNCTION(libc_sys_lstat)
 	movl   $(0x6b), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_lstat)
-DEFINE_PUBLIC_ALIAS(sys_linux_lstat, libc_sys_linux_lstat)
+END(libc_sys_lstat)
+DEFINE_PUBLIC_ALIAS(sys_lstat, libc_sys_lstat)
 
-/* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
-.section .text.crt.syscall.Xlinux_lstat
-INTERN_FUNCTION(libc_sys_Xlinux_lstat)
+/* errno_t lstat(char const *filename, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.Xlstat
+INTERN_FUNCTION(libc_sys_Xlstat)
 	movl   $(0x6b), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_lstat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_lstat, libc_sys_Xlinux_lstat)
+END(libc_sys_Xlstat)
+DEFINE_PUBLIC_ALIAS(sys_Xlstat, libc_sys_Xlstat)
 
-/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
-.section .text.crt.syscall.linux_fstat
-INTERN_FUNCTION(libc_sys_linux_fstat)
+/* errno_t fstat(fd_t fd, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.fstat
+INTERN_FUNCTION(libc_sys_fstat)
 	movl   $(0x6c), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_fstat)
-DEFINE_PUBLIC_ALIAS(sys_linux_fstat, libc_sys_linux_fstat)
+END(libc_sys_fstat)
+DEFINE_PUBLIC_ALIAS(sys_fstat, libc_sys_fstat)
 
-/* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
-.section .text.crt.syscall.Xlinux_fstat
-INTERN_FUNCTION(libc_sys_Xlinux_fstat)
+/* errno_t fstat(fd_t fd, struct linux_statx32 *statbuf) */
+.section .text.crt.syscall.Xfstat
+INTERN_FUNCTION(libc_sys_Xfstat)
 	movl   $(0x6c), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_fstat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_fstat, libc_sys_Xlinux_fstat)
+END(libc_sys_Xfstat)
+DEFINE_PUBLIC_ALIAS(sys_Xfstat, libc_sys_Xfstat)
 
 /* errno_t olduname(struct linux_olduname *name) */
 .section .text.crt.syscall.olduname
@@ -3868,53 +3868,53 @@ INTERN_FUNCTION(libc_sys_Xftruncate64)
 END(libc_sys_Xftruncate64)
 DEFINE_PUBLIC_ALIAS(sys_Xftruncate64, libc_sys_Xftruncate64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
-.section .text.crt.syscall.linux_stat64
-INTERN_FUNCTION(libc_sys_linux_stat64)
+/* errno_t stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+.section .text.crt.syscall.stat64
+INTERN_FUNCTION(libc_sys_stat64)
 	movl   $(0xc3), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_stat64)
-DEFINE_PUBLIC_ALIAS(sys_linux_stat64, libc_sys_linux_stat64)
+END(libc_sys_stat64)
+DEFINE_PUBLIC_ALIAS(sys_stat64, libc_sys_stat64)
 
-/* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
-.section .text.crt.syscall.Xlinux_stat64
-INTERN_FUNCTION(libc_sys_Xlinux_stat64)
+/* errno_t stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+.section .text.crt.syscall.Xstat64
+INTERN_FUNCTION(libc_sys_Xstat64)
 	movl   $(0xc3), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_stat64)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_stat64, libc_sys_Xlinux_stat64)
+END(libc_sys_Xstat64)
+DEFINE_PUBLIC_ALIAS(sys_Xstat64, libc_sys_Xstat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
-.section .text.crt.syscall.linux_lstat64
-INTERN_FUNCTION(libc_sys_linux_lstat64)
+/* errno_t lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+.section .text.crt.syscall.lstat64
+INTERN_FUNCTION(libc_sys_lstat64)
 	movl   $(0xc4), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_lstat64)
-DEFINE_PUBLIC_ALIAS(sys_linux_lstat64, libc_sys_linux_lstat64)
+END(libc_sys_lstat64)
+DEFINE_PUBLIC_ALIAS(sys_lstat64, libc_sys_lstat64)
 
-/* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
-.section .text.crt.syscall.Xlinux_lstat64
-INTERN_FUNCTION(libc_sys_Xlinux_lstat64)
+/* errno_t lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+.section .text.crt.syscall.Xlstat64
+INTERN_FUNCTION(libc_sys_Xlstat64)
 	movl   $(0xc4), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_lstat64)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_lstat64, libc_sys_Xlinux_lstat64)
+END(libc_sys_Xlstat64)
+DEFINE_PUBLIC_ALIAS(sys_Xlstat64, libc_sys_Xlstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
-.section .text.crt.syscall.linux_fstat64
-INTERN_FUNCTION(libc_sys_linux_fstat64)
+/* errno_t fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
+.section .text.crt.syscall.fstat64
+INTERN_FUNCTION(libc_sys_fstat64)
 	movl   $(0xc5), %eax
 	jmp    libc_x86_exec_syscall2
-END(libc_sys_linux_fstat64)
-DEFINE_PUBLIC_ALIAS(sys_linux_fstat64, libc_sys_linux_fstat64)
+END(libc_sys_fstat64)
+DEFINE_PUBLIC_ALIAS(sys_fstat64, libc_sys_fstat64)
 
-/* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
-.section .text.crt.syscall.Xlinux_fstat64
-INTERN_FUNCTION(libc_sys_Xlinux_fstat64)
+/* errno_t fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
+.section .text.crt.syscall.Xfstat64
+INTERN_FUNCTION(libc_sys_Xfstat64)
 	movl   $(0xc5), %eax
 	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xlinux_fstat64)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_fstat64, libc_sys_Xlinux_fstat64)
+END(libc_sys_Xfstat64)
+DEFINE_PUBLIC_ALIAS(sys_Xfstat64, libc_sys_Xfstat64)
 
 /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
 .section .text.crt.syscall.lchown32
@@ -5553,22 +5553,22 @@ END(libc_sys_Xfutimesat)
 DEFINE_PUBLIC_ALIAS(sys_Xfutimesat, libc_sys_Xfutimesat)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
-.section .text.crt.syscall.linux_fstatat64
-INTERN_FUNCTION(libc_sys_linux_fstatat64)
+/* errno_t fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
+.section .text.crt.syscall.fstatat64
+INTERN_FUNCTION(libc_sys_fstatat64)
 	movl   $(0x12c), %eax
 	jmp    libc_x86_exec_syscall4
-END(libc_sys_linux_fstatat64)
-DEFINE_PUBLIC_ALIAS(sys_linux_fstatat64, libc_sys_linux_fstatat64)
+END(libc_sys_fstatat64)
+DEFINE_PUBLIC_ALIAS(sys_fstatat64, libc_sys_fstatat64)
 
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
-.section .text.crt.syscall.Xlinux_fstatat64
-INTERN_FUNCTION(libc_sys_Xlinux_fstatat64)
+/* errno_t fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
+.section .text.crt.syscall.Xfstatat64
+INTERN_FUNCTION(libc_sys_Xfstatat64)
 	movl   $(0x12c), %eax
 	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xlinux_fstatat64)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_fstatat64, libc_sys_Xlinux_fstatat64)
+END(libc_sys_Xfstatat64)
+DEFINE_PUBLIC_ALIAS(sys_Xfstatat64, libc_sys_Xfstatat64)
 
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
@@ -7200,6 +7200,114 @@ INTERN_FUNCTION(libc_sys_Xmlock2)
 END(libc_sys_Xmlock2)
 DEFINE_PUBLIC_ALIAS(sys_Xmlock2, libc_sys_Xmlock2)
 
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+.section .text.crt.syscall.clock_gettime64
+INTERN_FUNCTION(libc_sys_clock_gettime64)
+	movl   $(0x193), %eax
+	jmp    libc_x86_exec_syscall2
+END(libc_sys_clock_gettime64)
+DEFINE_PUBLIC_ALIAS(sys_clock_gettime64, libc_sys_clock_gettime64)
+
+/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+.section .text.crt.syscall.Xclock_gettime64
+INTERN_FUNCTION(libc_sys_Xclock_gettime64)
+	movl   $(0x193), %eax
+	jmp    libc_x86_exec_Xsyscall2
+END(libc_sys_Xclock_gettime64)
+DEFINE_PUBLIC_ALIAS(sys_Xclock_gettime64, libc_sys_Xclock_gettime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+.section .text.crt.syscall.clock_settime64
+INTERN_FUNCTION(libc_sys_clock_settime64)
+	movl   $(0x194), %eax
+	jmp    libc_x86_exec_syscall2
+END(libc_sys_clock_settime64)
+DEFINE_PUBLIC_ALIAS(sys_clock_settime64, libc_sys_clock_settime64)
+
+/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+.section .text.crt.syscall.Xclock_settime64
+INTERN_FUNCTION(libc_sys_Xclock_settime64)
+	movl   $(0x194), %eax
+	jmp    libc_x86_exec_Xsyscall2
+END(libc_sys_Xclock_settime64)
+DEFINE_PUBLIC_ALIAS(sys_Xclock_settime64, libc_sys_Xclock_settime64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+.section .text.crt.syscall.timer_gettime64
+INTERN_FUNCTION(libc_sys_timer_gettime64)
+	movl   $(0x198), %eax
+	jmp    libc_x86_exec_syscall2
+END(libc_sys_timer_gettime64)
+DEFINE_PUBLIC_ALIAS(sys_timer_gettime64, libc_sys_timer_gettime64)
+
+/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+.section .text.crt.syscall.Xtimer_gettime64
+INTERN_FUNCTION(libc_sys_Xtimer_gettime64)
+	movl   $(0x198), %eax
+	jmp    libc_x86_exec_Xsyscall2
+END(libc_sys_Xtimer_gettime64)
+DEFINE_PUBLIC_ALIAS(sys_Xtimer_gettime64, libc_sys_Xtimer_gettime64)
+
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+.section .text.crt.syscall.timer_settime64
+INTERN_FUNCTION(libc_sys_timer_settime64)
+	movl   $(0x199), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_timer_settime64)
+DEFINE_PUBLIC_ALIAS(sys_timer_settime64, libc_sys_timer_settime64)
+
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+.section .text.crt.syscall.Xtimer_settime64
+INTERN_FUNCTION(libc_sys_Xtimer_settime64)
+	movl   $(0x199), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xtimer_settime64)
+DEFINE_PUBLIC_ALIAS(sys_Xtimer_settime64, libc_sys_Xtimer_settime64)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+.section .text.crt.syscall.timerfd_gettime64
+INTERN_FUNCTION(libc_sys_timerfd_gettime64)
+	movl   $(0x19a), %eax
+	jmp    libc_x86_exec_syscall2
+END(libc_sys_timerfd_gettime64)
+DEFINE_PUBLIC_ALIAS(sys_timerfd_gettime64, libc_sys_timerfd_gettime64)
+
+/* Return the next expiration time of UFD */
+/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+.section .text.crt.syscall.Xtimerfd_gettime64
+INTERN_FUNCTION(libc_sys_Xtimerfd_gettime64)
+	movl   $(0x19a), %eax
+	jmp    libc_x86_exec_Xsyscall2
+END(libc_sys_Xtimerfd_gettime64)
+DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_gettime64, libc_sys_Xtimerfd_gettime64)
+
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+.section .text.crt.syscall.timerfd_settime64
+INTERN_FUNCTION(libc_sys_timerfd_settime64)
+	movl   $(0x19b), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_timerfd_settime64)
+DEFINE_PUBLIC_ALIAS(sys_timerfd_settime64, libc_sys_timerfd_settime64)
+
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
+.section .text.crt.syscall.Xtimerfd_settime64
+INTERN_FUNCTION(libc_sys_Xtimerfd_settime64)
+	movl   $(0x19b), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xtimerfd_settime64)
+DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_settime64, libc_sys_Xtimerfd_settime64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -7275,48 +7383,6 @@ INTERN_FUNCTION(libc_sys_Xpreadvf)
 	jmp    libc_x86_exec_Xsyscall6
 END(libc_sys_Xpreadvf)
 DEFINE_PUBLIC_ALIAS(sys_Xpreadvf, libc_sys_Xpreadvf)
-
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-.section .text.crt.syscall.timerfd_gettime64
-INTERN_FUNCTION(libc_sys_timerfd_gettime64)
-	movl   $(0xfffffeba), %eax
-	jmp    libc_x86_exec_syscall2
-END(libc_sys_timerfd_gettime64)
-DEFINE_PUBLIC_ALIAS(sys_timerfd_gettime64, libc_sys_timerfd_gettime64)
-
-/* Return the next expiration time of UFD */
-/* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-.section .text.crt.syscall.Xtimerfd_gettime64
-INTERN_FUNCTION(libc_sys_Xtimerfd_gettime64)
-	movl   $(0xfffffeba), %eax
-	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xtimerfd_gettime64)
-DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_gettime64, libc_sys_Xtimerfd_gettime64)
-
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
-.section .text.crt.syscall.timerfd_settime64
-INTERN_FUNCTION(libc_sys_timerfd_settime64)
-	movl   $(0xfffffebb), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_timerfd_settime64)
-DEFINE_PUBLIC_ALIAS(sys_timerfd_settime64, libc_sys_timerfd_settime64)
-
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-/* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
-.section .text.crt.syscall.Xtimerfd_settime64
-INTERN_FUNCTION(libc_sys_Xtimerfd_settime64)
-	movl   $(0xfffffebb), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xtimerfd_settime64)
-DEFINE_PUBLIC_ALIAS(sys_Xtimerfd_settime64, libc_sys_Xtimerfd_settime64)
 
 /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 .section .text.crt.syscall.fallocate64
@@ -7609,72 +7675,6 @@ INTERN_FUNCTION(libc_sys_Xclock_getres64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xclock_getres64)
 DEFINE_PUBLIC_ALIAS(sys_Xclock_getres64, libc_sys_Xclock_getres64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-.section .text.crt.syscall.clock_gettime64
-INTERN_FUNCTION(libc_sys_clock_gettime64)
-	movl   $(0xfffffef7), %eax
-	jmp    libc_x86_exec_syscall2
-END(libc_sys_clock_gettime64)
-DEFINE_PUBLIC_ALIAS(sys_clock_gettime64, libc_sys_clock_gettime64)
-
-/* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-.section .text.crt.syscall.Xclock_gettime64
-INTERN_FUNCTION(libc_sys_Xclock_gettime64)
-	movl   $(0xfffffef7), %eax
-	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xclock_gettime64)
-DEFINE_PUBLIC_ALIAS(sys_Xclock_gettime64, libc_sys_Xclock_gettime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-.section .text.crt.syscall.clock_settime64
-INTERN_FUNCTION(libc_sys_clock_settime64)
-	movl   $(0xfffffef8), %eax
-	jmp    libc_x86_exec_syscall2
-END(libc_sys_clock_settime64)
-DEFINE_PUBLIC_ALIAS(sys_clock_settime64, libc_sys_clock_settime64)
-
-/* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-.section .text.crt.syscall.Xclock_settime64
-INTERN_FUNCTION(libc_sys_Xclock_settime64)
-	movl   $(0xfffffef8), %eax
-	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xclock_settime64)
-DEFINE_PUBLIC_ALIAS(sys_Xclock_settime64, libc_sys_Xclock_settime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-.section .text.crt.syscall.timer_gettime64
-INTERN_FUNCTION(libc_sys_timer_gettime64)
-	movl   $(0xfffffefb), %eax
-	jmp    libc_x86_exec_syscall2
-END(libc_sys_timer_gettime64)
-DEFINE_PUBLIC_ALIAS(sys_timer_gettime64, libc_sys_timer_gettime64)
-
-/* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-.section .text.crt.syscall.Xtimer_gettime64
-INTERN_FUNCTION(libc_sys_Xtimer_gettime64)
-	movl   $(0xfffffefb), %eax
-	jmp    libc_x86_exec_Xsyscall2
-END(libc_sys_Xtimer_gettime64)
-DEFINE_PUBLIC_ALIAS(sys_Xtimer_gettime64, libc_sys_Xtimer_gettime64)
-
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
-.section .text.crt.syscall.timer_settime64
-INTERN_FUNCTION(libc_sys_timer_settime64)
-	movl   $(0xfffffefc), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_timer_settime64)
-DEFINE_PUBLIC_ALIAS(sys_timer_settime64, libc_sys_timer_settime64)
-
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-/* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
-.section .text.crt.syscall.Xtimer_settime64
-INTERN_FUNCTION(libc_sys_Xtimer_settime64)
-	movl   $(0xfffffefc), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xtimer_settime64)
-DEFINE_PUBLIC_ALIAS(sys_Xtimer_settime64, libc_sys_Xtimer_settime64)
 
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */

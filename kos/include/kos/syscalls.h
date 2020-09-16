@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd18afe09 */
+/* HASH CRC-32:0xa9247fc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -376,6 +376,9 @@ __CDECLARE_SC(,__errno_t,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 __CDECLARE_SC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__fd,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_SC(fsetxattr) */
+#if __CRT_HAVE_SC(fstat)
+__CDECLARE_SC(,__errno_t,fstat,(__fd_t __fd, struct linux_stat *__statbuf),(__fd,__statbuf))
+#endif /* __CRT_HAVE_SC(fstat) */
 #if __CRT_HAVE_SC(fstatfs)
 __CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(fstatfs) */
@@ -592,18 +595,6 @@ __CDECLARE_SC(,__errno_t,link,(char const *__existing_file, char const *__link_f
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,linkat,(__fd_t __fromfd, char const *__existing_file, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__fromfd,__existing_file,__tofd,__target_path,__flags))
 #endif /* __CRT_HAVE_SC(linkat) */
-#if __CRT_HAVE_SC(linux_fstat)
-__CDECLARE_SC(,__errno_t,linux_fstat,(__fd_t __fd, struct linux_stat *__statbuf),(__fd,__statbuf))
-#endif /* __CRT_HAVE_SC(linux_fstat) */
-#if __CRT_HAVE_SC(linux_lstat)
-__CDECLARE_SC(,__errno_t,linux_lstat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
-#endif /* __CRT_HAVE_SC(linux_lstat) */
-#if __CRT_HAVE_SC(linux_newfstatat)
-__CDECLARE_SC(,__errno_t,linux_newfstatat,(__fd_t __dirfd, char const *__filename, struct linux64_stat32 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
-#endif /* __CRT_HAVE_SC(linux_newfstatat) */
-#if __CRT_HAVE_SC(linux_stat)
-__CDECLARE_SC(,__errno_t,linux_stat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
-#endif /* __CRT_HAVE_SC(linux_stat) */
 #if __CRT_HAVE_SC(listen)
 /* Begin to listen for incoming client (aka. peer) connection requests.
  * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
@@ -634,6 +625,9 @@ __CDECLARE_SC(,__syscall_slong_t,lseek,(__fd_t __fd, __syscall_slong_t __offset,
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 __CDECLARE_SC(,__errno_t,lsetxattr,(char const *__path, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__path,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_SC(lsetxattr) */
+#if __CRT_HAVE_SC(lstat)
+__CDECLARE_SC(,__errno_t,lstat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
+#endif /* __CRT_HAVE_SC(lstat) */
 #if __CRT_HAVE_SC(madvise)
 __CDECLARE_SC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong_t __advice),(__addr,__len,__advice))
 #endif /* __CRT_HAVE_SC(madvise) */
@@ -746,6 +740,9 @@ __CDECLARE_SC(,__errno_t,name_to_handle_at,(__fd_t __dirfd, char const *__filena
 #if __CRT_HAVE_SC(nanosleep)
 __CDECLARE_SC(,__errno_t,nanosleep,(struct timespec const *__req, struct timespec *__rem),(__req,__rem))
 #endif /* __CRT_HAVE_SC(nanosleep) */
+#if __CRT_HAVE_SC(newfstatat)
+__CDECLARE_SC(,__errno_t,newfstatat,(__fd_t __dirfd, char const *__filename, struct linux64_stat32 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
+#endif /* __CRT_HAVE_SC(newfstatat) */
 #if __CRT_HAVE_SC(nfsservctl)
 __CDECLARE_SC(,__errno_t,nfsservctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(nfsservctl) */
@@ -1241,6 +1238,9 @@ __CDECLARE_SC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulong
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 __CDECLARE_SC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fdout, __uint64_t *__offout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* __CRT_HAVE_SC(splice) */
+#if __CRT_HAVE_SC(stat)
+__CDECLARE_SC(,__errno_t,stat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
+#endif /* __CRT_HAVE_SC(stat) */
 #if __CRT_HAVE_SC(statfs)
 __CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(statfs) */
@@ -1689,6 +1689,9 @@ __CDECLARE_XSC(,__errno_t,fremovexattr,(__fd_t __fd, char const *__name),(__fd,_
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 __CDECLARE_XSC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__fd,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_XSC(fsetxattr) */
+#if __CRT_HAVE_XSC(fstat)
+__CDECLARE_XSC(,__errno_t,fstat,(__fd_t __fd, struct linux_stat *__statbuf),(__fd,__statbuf))
+#endif /* __CRT_HAVE_XSC(fstat) */
 #if __CRT_HAVE_XSC(fstatfs)
 __CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(fstatfs) */
@@ -1905,18 +1908,6 @@ __CDECLARE_XSC(,__errno_t,link,(char const *__existing_file, char const *__link_
 /* @param: flags: Set of `0 | AT_EMPTY_PATH | AT_SYMLINK_FOLLOW | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,linkat,(__fd_t __fromfd, char const *__existing_file, __fd_t __tofd, char const *__target_path, __atflag_t __flags),(__fromfd,__existing_file,__tofd,__target_path,__flags))
 #endif /* __CRT_HAVE_XSC(linkat) */
-#if __CRT_HAVE_XSC(linux_fstat)
-__CDECLARE_XSC(,__errno_t,linux_fstat,(__fd_t __fd, struct linux_stat *__statbuf),(__fd,__statbuf))
-#endif /* __CRT_HAVE_XSC(linux_fstat) */
-#if __CRT_HAVE_XSC(linux_lstat)
-__CDECLARE_XSC(,__errno_t,linux_lstat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
-#endif /* __CRT_HAVE_XSC(linux_lstat) */
-#if __CRT_HAVE_XSC(linux_newfstatat)
-__CDECLARE_XSC(,__errno_t,linux_newfstatat,(__fd_t __dirfd, char const *__filename, struct linux64_stat32 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
-#endif /* __CRT_HAVE_XSC(linux_newfstatat) */
-#if __CRT_HAVE_XSC(linux_stat)
-__CDECLARE_XSC(,__errno_t,linux_stat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
-#endif /* __CRT_HAVE_XSC(linux_stat) */
 #if __CRT_HAVE_XSC(listen)
 /* Begin to listen for incoming client (aka. peer) connection requests.
  * @param: max_backlog: The max number of clients pending to be accept(2)-ed, before
@@ -1947,6 +1938,9 @@ __CDECLARE_XSC(,__syscall_slong_t,lseek,(__fd_t __fd, __syscall_slong_t __offset
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 __CDECLARE_XSC(,__errno_t,lsetxattr,(char const *__path, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__path,__name,__buf,__bufsize,__flags))
 #endif /* __CRT_HAVE_XSC(lsetxattr) */
+#if __CRT_HAVE_XSC(lstat)
+__CDECLARE_XSC(,__errno_t,lstat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
+#endif /* __CRT_HAVE_XSC(lstat) */
 #if __CRT_HAVE_XSC(madvise)
 __CDECLARE_XSC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong_t __advice),(__addr,__len,__advice))
 #endif /* __CRT_HAVE_XSC(madvise) */
@@ -2059,6 +2053,9 @@ __CDECLARE_XSC(,__errno_t,name_to_handle_at,(__fd_t __dirfd, char const *__filen
 #if __CRT_HAVE_XSC(nanosleep)
 __CDECLARE_XSC(,__errno_t,nanosleep,(struct timespec const *__req, struct timespec *__rem),(__req,__rem))
 #endif /* __CRT_HAVE_XSC(nanosleep) */
+#if __CRT_HAVE_XSC(newfstatat)
+__CDECLARE_XSC(,__errno_t,newfstatat,(__fd_t __dirfd, char const *__filename, struct linux64_stat32 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
+#endif /* __CRT_HAVE_XSC(newfstatat) */
 #if __CRT_HAVE_XSC(nfsservctl)
 __CDECLARE_XSC(,__errno_t,nfsservctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(nfsservctl) */
@@ -2551,6 +2548,9 @@ __CDECLARE_XSC(,__errno_t,socketpair,(__syscall_ulong_t __domain, __syscall_ulon
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 __CDECLARE_XSC(,__ssize_t,splice,(__fd_t __fdin, __uint64_t *__offin, __fd_t __fdout, __uint64_t *__offout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* __CRT_HAVE_XSC(splice) */
+#if __CRT_HAVE_XSC(stat)
+__CDECLARE_XSC(,__errno_t,stat,(char const *__filename, struct linux_stat *__statbuf),(__filename,__statbuf))
+#endif /* __CRT_HAVE_XSC(stat) */
 #if __CRT_HAVE_XSC(statfs)
 __CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct statfs *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(statfs) */

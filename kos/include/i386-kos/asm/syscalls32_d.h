@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35d1ee4f */
+/* HASH CRC-32:0x11b04c7d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@
 #define __NR32_chmod                   0xf                    /* errno_t chmod(char const *filename, mode_t mode) */
 #define __NR32_lchown                  0x10                   /* errno_t lchown(char const *filename, uint16_t owner, uint16_t group) */
 #define __NR32_break                   0x11                   /* errno_t break(void) */
-#define __NR32_linux_oldstat           0x12                   /* errno_t linux_oldstat(char const *filename, struct linux_oldstat *statbuf) */
+#define __NR32_oldstat                 0x12                   /* errno_t oldstat(char const *filename, struct linux_oldstat *statbuf) */
 #define __NR32_lseek                   0x13                   /* syscall_slong_t lseek(fd_t fd, syscall_slong_t offset, syscall_ulong_t whence) */
 #define __NR32_getpid                  0x14                   /* pid_t getpid(void) */
 #define __NR32_mount                   0x15                   /* errno_t mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t mountflags, void const *data) */
@@ -96,7 +96,7 @@
 #define __NR32_stime                   0x19                   /* errno_t stime(time32_t const *t) */
 #define __NR32_ptrace                  0x1a                   /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
 #define __NR32_alarm                   0x1b                   /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
-#define __NR32_linux_oldfstat          0x1c                   /* errno_t linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+#define __NR32_oldfstat                0x1c                   /* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
 #define __NR32_pause                   0x1d                   /* errno_t pause(void) */
 #define __NR32_utime                   0x1e                   /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 #define __NR32_stty                    0x1f                   /* errno_t stty(void) */
@@ -159,7 +159,7 @@
 #define __NR32_setgroups               0x51                   /* errno_t setgroups(size_t count, uint16_t const *groups) */
 #define __NR32_select                  0x52                   /* ssize_t select(struct sel_arg_structx32 const *arg) */
 #define __NR32_symlink                 0x53                   /* errno_t symlink(char const *link_text, char const *target_path) */
-#define __NR32_linux_oldlstat          0x54                   /* errno_t linux_oldlstat(char const *filename, struct linux_oldstat *statbuf) */
+#define __NR32_oldlstat                0x54                   /* errno_t oldlstat(char const *filename, struct linux_oldstat *statbuf) */
 #define __NR32_readlink                0x55                   /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
 #define __NR32_uselib                  0x56                   /* errno_t uselib(char const *library) */
 /* @param: swapflags: Set of `SWAP_FLAG_*' */
@@ -198,9 +198,9 @@
 #define __NR32_setitimer               0x68                   /* errno_t setitimer(syscall_ulong_t which, struct __itimervalx32 const *newval, struct __itimervalx32 *oldval) */
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
 #define __NR32_getitimer               0x69                   /* errno_t getitimer(syscall_ulong_t which, struct __itimervalx32 *curr_value) */
-#define __NR32_linux_stat              0x6a                   /* errno_t linux_stat(char const *filename, struct linux_statx32 *statbuf) */
-#define __NR32_linux_lstat             0x6b                   /* errno_t linux_lstat(char const *filename, struct linux_statx32 *statbuf) */
-#define __NR32_linux_fstat             0x6c                   /* errno_t linux_fstat(fd_t fd, struct linux_statx32 *statbuf) */
+#define __NR32_stat                    0x6a                   /* errno_t stat(char const *filename, struct linux_statx32 *statbuf) */
+#define __NR32_lstat                   0x6b                   /* errno_t lstat(char const *filename, struct linux_statx32 *statbuf) */
+#define __NR32_fstat                   0x6c                   /* errno_t fstat(fd_t fd, struct linux_statx32 *statbuf) */
 #define __NR32_olduname                0x6d                   /* errno_t olduname(struct linux_olduname *name) */
 #define __NR32_iopl                    0x6e                   /* errno_t iopl(syscall_ulong_t level) */
 #define __NR32_vhangup                 0x6f                   /* errno_t vhangup(void) */
@@ -353,9 +353,9 @@
 #define __NR32_mmap2                   0xc0                   /* void *mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset) */
 #define __NR32_truncate64              0xc1                   /* errno_t truncate64(char const *filename, uint64_t length) */
 #define __NR32_ftruncate64             0xc2                   /* errno_t ftruncate64(fd_t fd, uint64_t length) */
-#define __NR32_linux_stat64            0xc3                   /* errno_t linux_stat64(char const *filename, struct linux_statx32_64 *statbuf) */
-#define __NR32_linux_lstat64           0xc4                   /* errno_t linux_lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
-#define __NR32_linux_fstat64           0xc5                   /* errno_t linux_fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
+#define __NR32_stat64                  0xc3                   /* errno_t stat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define __NR32_lstat64                 0xc4                   /* errno_t lstat64(char const *filename, struct linux_statx32_64 *statbuf) */
+#define __NR32_fstat64                 0xc5                   /* errno_t fstat64(fd_t fd, struct linux_statx32_64 *statbuf) */
 #define __NR32_lchown32                0xc6                   /* errno_t lchown32(char const *filename, uint32_t owner, uint32_t group) */
 #define __NR32_getuid32                0xc7                   /* uint32_t getuid32(void) */
 #define __NR32_getgid32                0xc8                   /* uint32_t getgid32(void) */
@@ -489,7 +489,7 @@
 #define __NR32_fchownat                0x12a                  /* errno_t fchownat(fd_t dirfd, char const *filename, uid_t owner, gid_t group, atflag_t flags) */
 #define __NR32_futimesat               0x12b                  /* errno_t futimesat(fd_t dirfd, char const *filename, struct timevalx32 const[2] times) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-#define __NR32_linux_fstatat64         0x12c                  /* errno_t linux_fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
+#define __NR32_fstatat64               0x12c                  /* errno_t fstatat64(fd_t dirfd, char const *filename, struct linux_statx32_64 *statbuf, atflag_t flags) */
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 #define __NR32_unlinkat                0x12d                  /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */
 #define __NR32_renameat                0x12e                  /* errno_t renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path) */
@@ -773,6 +773,18 @@
 #define __NR32_userfaultfd             0x176                  /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR32_membarrier              0x177                  /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR32_mlock2                  0x178                  /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define __NR32_clock_gettime64         0x193                  /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
+#define __NR32_clock_settime64         0x194                  /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
+#define __NR32_timer_gettime64         0x198                  /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
+/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+#define __NR32_timer_settime64         0x199                  /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
+/* Return the next expiration time of UFD */
+#define __NR32_timerfd_gettime64       0x19a                  /* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
+/* Set next expiration time of interval timer source `timerfd' to `utmr'.
+ * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
+ * is absolute. Optionally return the old expiration time in `otmr''
+ * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
+#define __NR32_timerfd_settime64       0x19b                  /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -790,13 +802,6 @@
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 #define __NR32_preadvf                 __UINT32_C(0xfffffeb3) /* ssize_t preadvf(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-/* Return the next expiration time of UFD */
-#define __NR32_timerfd_gettime64       __UINT32_C(0xfffffeba) /* errno_t timerfd_gettime64(fd_t timerfd, struct itimerspecx32_64 *otmr) */
-/* Set next expiration time of interval timer source `timerfd' to `utmr'.
- * If `flags' has the `TFD_TIMER_ABSTIME' flag set the timeout value
- * is absolute. Optionally return the old expiration time in `otmr''
- * @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
-#define __NR32_timerfd_settime64       __UINT32_C(0xfffffebb) /* errno_t timerfd_settime64(fd_t timerfd, syscall_ulong_t flags, struct itimerspecx32_64 const *utmr, struct itimerspecx32_64 *otmr) */
 #define __NR32_fallocate64             __UINT32_C(0xfffffebc) /* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 #define __NR32_utimensat64             __UINT32_C(0xfffffec0) /* errno_t utimensat64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
@@ -824,11 +829,6 @@
 #define __NR32_utimes64                __UINT32_C(0xfffffef1) /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 #define __NR32_clock_nanosleep64       __UINT32_C(0xfffffef5) /* errno_t clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32_64 const *requested_time, struct timespecx32_64 *remaining) */
 #define __NR32_clock_getres64          __UINT32_C(0xfffffef6) /* errno_t clock_getres64(clockid_t clock_id, struct timespecx32_64 *res) */
-#define __NR32_clock_gettime64         __UINT32_C(0xfffffef7) /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
-#define __NR32_clock_settime64         __UINT32_C(0xfffffef8) /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
-#define __NR32_timer_gettime64         __UINT32_C(0xfffffefb) /* errno_t timer_gettime64(timer_t timerid, struct itimerspecx32_64 *value) */
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
-#define __NR32_timer_settime64         __UINT32_C(0xfffffefc) /* errno_t timer_settime64(timer_t timerid, syscall_ulong_t flags, struct itimerspecx32_64 const *value, struct itimerspecx32_64 *ovalue) */
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
 #define __NR32_kreaddirf               __UINT32_C(0xffffff24) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
@@ -1240,8 +1240,8 @@
 	callback(0)                                    \
 	callback(1) 
 #define __NR32_syscall0_min 0x0
-#define __NR32_syscall0_max 0x178
-#define __NR32_syscall0_cnt 0x179
+#define __NR32_syscall0_max 0x19b
+#define __NR32_syscall0_cnt 0x19c
 #define __NR32_syscall1_min __UINT32_C(0xfffffeaf)
 #define __NR32_syscall1_max __UINT32_C(0xffffffff)
 #define __NR32_syscall1_cnt 0x151
@@ -1303,7 +1303,7 @@
 #define __NR32RM_chmod                   0
 #define __NR32RM_lchown                  0
 #define __NR32RM_break                   0
-#define __NR32RM_linux_oldstat           0
+#define __NR32RM_oldstat                 0
 #define __NR32RM_lseek                   0
 #define __NR32RM_getpid                  2
 #define __NR32RM_mount                   0
@@ -1313,7 +1313,7 @@
 #define __NR32RM_stime                   0
 #define __NR32RM_ptrace                  0
 #define __NR32RM_alarm                   0
-#define __NR32RM_linux_oldfstat          0
+#define __NR32RM_oldfstat                0
 #define __NR32RM_pause                   1
 #define __NR32RM_utime                   0
 #define __NR32RM_stty                    0
@@ -1369,7 +1369,7 @@
 #define __NR32RM_setgroups               2
 #define __NR32RM_select                  1
 #define __NR32RM_symlink                 0
-#define __NR32RM_linux_oldlstat          0
+#define __NR32RM_oldlstat                0
 #define __NR32RM_readlink                0
 #define __NR32RM_uselib                  0
 #define __NR32RM_swapon                  0
@@ -1391,9 +1391,9 @@
 #define __NR32RM_syslog                  2
 #define __NR32RM_setitimer               0
 #define __NR32RM_getitimer               0
-#define __NR32RM_linux_stat              0
-#define __NR32RM_linux_lstat             0
-#define __NR32RM_linux_fstat             0
+#define __NR32RM_stat                    0
+#define __NR32RM_lstat                   0
+#define __NR32RM_fstat                   0
 #define __NR32RM_olduname                0
 #define __NR32RM_iopl                    0
 #define __NR32RM_vhangup                 0
@@ -1480,9 +1480,9 @@
 #define __NR32RM_mmap2                   0
 #define __NR32RM_truncate64              0
 #define __NR32RM_ftruncate64             0
-#define __NR32RM_linux_stat64            0
-#define __NR32RM_linux_lstat64           0
-#define __NR32RM_linux_fstat64           0
+#define __NR32RM_stat64                  0
+#define __NR32RM_lstat64                 0
+#define __NR32RM_fstat64                 0
 #define __NR32RM_lchown32                0
 #define __NR32RM_getuid32                2
 #define __NR32RM_getgid32                2
@@ -1581,7 +1581,7 @@
 #define __NR32RM_mknodat                 0
 #define __NR32RM_fchownat                0
 #define __NR32RM_futimesat               0
-#define __NR32RM_linux_fstatat64         0
+#define __NR32RM_fstatat64               0
 #define __NR32RM_unlinkat                0
 #define __NR32RM_renameat                0
 #define __NR32RM_linkat                  0
@@ -1658,11 +1658,15 @@
 #define __NR32RM_userfaultfd             0
 #define __NR32RM_membarrier              0
 #define __NR32RM_mlock2                  0
+#define __NR32RM_clock_gettime64         0
+#define __NR32RM_clock_settime64         0
+#define __NR32RM_timer_gettime64         0
+#define __NR32RM_timer_settime64         0
+#define __NR32RM_timerfd_gettime64       0
+#define __NR32RM_timerfd_settime64       0
 #define __NR32RM_recvmmsg64              1
 #define __NR32RM_pwritevf                0
 #define __NR32RM_preadvf                 0
-#define __NR32RM_timerfd_gettime64       0
-#define __NR32RM_timerfd_settime64       0
 #define __NR32RM_fallocate64             0
 #define __NR32RM_utimensat64             0
 #define __NR32RM_ppoll64                 1
@@ -1680,10 +1684,6 @@
 #define __NR32RM_utimes64                0
 #define __NR32RM_clock_nanosleep64       1
 #define __NR32RM_clock_getres64          0
-#define __NR32RM_clock_gettime64         0
-#define __NR32RM_clock_settime64         0
-#define __NR32RM_timer_gettime64         0
-#define __NR32RM_timer_settime64         0
 #define __NR32RM_kreaddirf               0
 #define __NR32RM_kfstat                  0
 #define __NR32RM_klstat                  0
@@ -1761,11 +1761,11 @@
 #define __NR32CP_mknod                   1
 #define __NR32CP_chmod                   1
 #define __NR32CP_lchown                  1
-#define __NR32CP_linux_oldstat           1
+#define __NR32CP_oldstat                 1
 #define __NR32CP_lseek                   1
 #define __NR32CP_mount                   1
 #define __NR32CP_umount                  1
-#define __NR32CP_linux_oldfstat          1
+#define __NR32CP_oldfstat                1
 #define __NR32CP_pause                   1
 #define __NR32CP_utime                   1
 #define __NR32CP_access                  1
@@ -1778,15 +1778,15 @@
 #define __NR32CP_sigsuspend              1
 #define __NR32CP_select                  1
 #define __NR32CP_symlink                 1
-#define __NR32CP_linux_oldlstat          1
+#define __NR32CP_oldlstat                1
 #define __NR32CP_readlink                1
 #define __NR32CP_readdir                 1
 #define __NR32CP_fchmod                  1
 #define __NR32CP_fchown                  1
 #define __NR32CP_syslog                  1
-#define __NR32CP_linux_stat              1
-#define __NR32CP_linux_lstat             1
-#define __NR32CP_linux_fstat             1
+#define __NR32CP_stat                    1
+#define __NR32CP_lstat                   1
+#define __NR32CP_fstat                   1
 #define __NR32CP_wait4                   1
 #define __NR32CP_sysinfo                 1
 #define __NR32CP_fsync                   1
@@ -1809,9 +1809,9 @@
 #define __NR32CP_sendfile                1
 #define __NR32CP_getpmsg                 1
 #define __NR32CP_putpmsg                 1
-#define __NR32CP_linux_stat64            1
-#define __NR32CP_linux_lstat64           1
-#define __NR32CP_linux_fstat64           1
+#define __NR32CP_stat64                  1
+#define __NR32CP_lstat64                 1
+#define __NR32CP_fstat64                 1
 #define __NR32CP_lchown32                1
 #define __NR32CP_fchown32                1
 #define __NR32CP_chown32                 1
@@ -1842,7 +1842,7 @@
 #define __NR32CP_mknodat                 1
 #define __NR32CP_fchownat                1
 #define __NR32CP_futimesat               1
-#define __NR32CP_linux_fstatat64         1
+#define __NR32CP_fstatat64               1
 #define __NR32CP_unlinkat                1
 #define __NR32CP_renameat                1
 #define __NR32CP_linkat                  1
@@ -1949,7 +1949,7 @@
 #define __NR32RC_chmod                   2
 #define __NR32RC_lchown                  3
 #define __NR32RC_break                   0
-#define __NR32RC_linux_oldstat           2
+#define __NR32RC_oldstat                 2
 #define __NR32RC_lseek                   3
 #define __NR32RC_getpid                  0
 #define __NR32RC_mount                   5
@@ -1959,7 +1959,7 @@
 #define __NR32RC_stime                   1
 #define __NR32RC_ptrace                  4
 #define __NR32RC_alarm                   1
-#define __NR32RC_linux_oldfstat          2
+#define __NR32RC_oldfstat                2
 #define __NR32RC_pause                   0
 #define __NR32RC_utime                   2
 #define __NR32RC_stty                    0
@@ -2015,7 +2015,7 @@
 #define __NR32RC_setgroups               2
 #define __NR32RC_select                  1
 #define __NR32RC_symlink                 2
-#define __NR32RC_linux_oldlstat          2
+#define __NR32RC_oldlstat                2
 #define __NR32RC_readlink                3
 #define __NR32RC_uselib                  1
 #define __NR32RC_swapon                  2
@@ -2037,9 +2037,9 @@
 #define __NR32RC_syslog                  3
 #define __NR32RC_setitimer               3
 #define __NR32RC_getitimer               2
-#define __NR32RC_linux_stat              2
-#define __NR32RC_linux_lstat             2
-#define __NR32RC_linux_fstat             2
+#define __NR32RC_stat                    2
+#define __NR32RC_lstat                   2
+#define __NR32RC_fstat                   2
 #define __NR32RC_olduname                1
 #define __NR32RC_iopl                    1
 #define __NR32RC_vhangup                 0
@@ -2126,9 +2126,9 @@
 #define __NR32RC_mmap2                   6
 #define __NR32RC_truncate64              3 /* __NR32AC_truncate64 + 1 */
 #define __NR32RC_ftruncate64             3 /* __NR32AC_ftruncate64 + 1 */
-#define __NR32RC_linux_stat64            2
-#define __NR32RC_linux_lstat64           2
-#define __NR32RC_linux_fstat64           2
+#define __NR32RC_stat64                  2
+#define __NR32RC_lstat64                 2
+#define __NR32RC_fstat64                 2
 #define __NR32RC_lchown32                3
 #define __NR32RC_getuid32                0
 #define __NR32RC_getgid32                0
@@ -2227,7 +2227,7 @@
 #define __NR32RC_mknodat                 4
 #define __NR32RC_fchownat                5
 #define __NR32RC_futimesat               3
-#define __NR32RC_linux_fstatat64         4
+#define __NR32RC_fstatat64               4
 #define __NR32RC_unlinkat                3
 #define __NR32RC_renameat                4
 #define __NR32RC_linkat                  5
@@ -2304,11 +2304,15 @@
 #define __NR32RC_userfaultfd             1
 #define __NR32RC_membarrier              1
 #define __NR32RC_mlock2                  1
+#define __NR32RC_clock_gettime64         2
+#define __NR32RC_clock_settime64         2
+#define __NR32RC_timer_gettime64         2
+#define __NR32RC_timer_settime64         4
+#define __NR32RC_timerfd_gettime64       2
+#define __NR32RC_timerfd_settime64       4
 #define __NR32RC_recvmmsg64              5
 #define __NR32RC_pwritevf                6 /* __NR32AC_pwritevf + 1 */
 #define __NR32RC_preadvf                 6 /* __NR32AC_preadvf + 1 */
-#define __NR32RC_timerfd_gettime64       2
-#define __NR32RC_timerfd_settime64       4
 #define __NR32RC_fallocate64             6 /* __NR32AC_fallocate64 + 2 */
 #define __NR32RC_utimensat64             4
 #define __NR32RC_ppoll64                 5
@@ -2326,10 +2330,6 @@
 #define __NR32RC_utimes64                2
 #define __NR32RC_clock_nanosleep64       4
 #define __NR32RC_clock_getres64          2
-#define __NR32RC_clock_gettime64         2
-#define __NR32RC_clock_settime64         2
-#define __NR32RC_timer_gettime64         2
-#define __NR32RC_timer_settime64         4
 #define __NR32RC_kreaddirf               5
 #define __NR32RC_kfstat                  2
 #define __NR32RC_klstat                  2

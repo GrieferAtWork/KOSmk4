@@ -55,8 +55,7 @@
 
 DECL_BEGIN
 
-/* TODO: These 2 functions are current implemented as arch-specific. - Change that! */
-INTDEF char const *NOTHROW(FCALL get_exception_name)(error_code_t code);
+/* TODO: This function is current implemented as arch-specific. - Change that! */
 INTDEF void NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict data,
                                                    pformatprinter printer, void *arg);
 
@@ -117,7 +116,7 @@ dbg_coredump(void const *const *traceback_vector,
 		                  "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__)),
 		           reason_error->e_class,
 		           reason_error->e_subclass);
-		name = get_exception_name(reason_error->e_code);
+		name = error_name(reason_error->e_code);
 		if (name)
 			dbg_printf(DBGSTR(" [%s]"), name);
 		print_exception_desc_of(reason_error,
@@ -314,7 +313,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 		                "%#" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
 		                "%#" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__),
 		       reason_error->e_class, reason_error->e_subclass);
-		name = get_exception_name(reason_error->e_code);
+		name = error_name(reason_error->e_code);
 		if (name)
 			printk(KERN_ERR " [%s]", name);
 		print_exception_desc_of(reason_error, &syslog_printer, SYSLOG_LEVEL_ERR);

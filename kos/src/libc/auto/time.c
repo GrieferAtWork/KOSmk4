@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9194794b */
+/* HASH CRC-32:0xbd251b8e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time_t
 NOTHROW_NCX(LIBCCALL libc_mktime)(struct tm __KOS_FIXED_CONST *tp) {
 
 	__TM_TYPE(time) result;
-	result = __yearstodays(tp->tm_year) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->tm_year) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	result += tp->tm_yday;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->tm_hour*60*60;
@@ -221,7 +221,7 @@ INTERN ATTR_SECTION(".text.crt.time") ATTR_PURE WUNUSED NONNULL((1)) time64_t
 NOTHROW_NCX(LIBCCALL libc_mktime64)(struct tm __KOS_FIXED_CONST *tp) {
 
 	time64_t result;
-	result = __yearstodays(tp->tm_year) - __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	result = __yearstodays(tp->tm_year) - __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	result += tp->tm_yday;
 	result *= 86400; /* SECONDS_PER_DAY */
 	result += tp->tm_hour*60*60;
@@ -446,7 +446,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime_r)(time_t const *__restrict timer,
 	tp->tm_min  = (int)((t / 60) % 60);
 	tp->tm_hour = (int)((t / (60 * 60)) % 24);
 	t /= 86400; /* SECONDS_PER_DAY */
-	t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	t += __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	tp->tm_wday = (int)(t % 7); /* DAYS_PER_WEEK */
 	tp->tm_year = (int)__daystoyears(t);
 	t -= __yearstodays(tp->tm_year);
@@ -555,7 +555,7 @@ NOTHROW_NCX(LIBCCALL libc_gmtime64_r)(time64_t const *__restrict timer,
 	tp->tm_min  = (int)((t/60) % 60);
 	tp->tm_hour = (int)((t/(60*60)) % 24);
 	t /= 86400; /* SECONDS_PER_DAY */
-	t += __yearstodays(1970); /* LINUX_TIME_START_YEAR */
+	t += __yearstodays(1970); /* UNIX_TIME_START_YEAR */
 	tp->tm_wday = (int)(t % 7); /* DAYS_PER_WEEK */
 	tp->tm_year = (int)__daystoyears(t);
 	t -= __yearstodays(tp->tm_year);

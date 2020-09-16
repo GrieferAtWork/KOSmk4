@@ -20,6 +20,7 @@
 %[default:section(".text.crt{|.dos}.except.io.utility")]
 
 %(auto_source){
+#include <errno.h>
 #include <signal.h>
 }
 

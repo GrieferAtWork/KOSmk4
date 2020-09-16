@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5263b447 */
+/* HASH CRC-32:0x75b6fdc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,77 +172,77 @@ INTERN_FUNCTION(libc_sys_Xclose)
 END(libc_sys_Xclose)
 DEFINE_PUBLIC_ALIAS(sys_Xclose, libc_sys_Xclose)
 
-/* errno_t linux_stat(char const *filename, struct linux_statx64 *statbuf) */
-.section .text.crt.syscall.linux_stat
-INTERN_FUNCTION(libc_sys_linux_stat)
+/* errno_t stat(char const *filename, struct linux_statx64 *statbuf) */
+.section .text.crt.syscall.stat
+INTERN_FUNCTION(libc_sys_stat)
 	.cfi_startproc
 	movq   $(0x4), %rax
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_linux_stat)
-DEFINE_PUBLIC_ALIAS(sys_linux_stat, libc_sys_linux_stat)
+END(libc_sys_stat)
+DEFINE_PUBLIC_ALIAS(sys_stat, libc_sys_stat)
 
-/* errno_t linux_stat(char const *filename, struct linux_statx64 *statbuf) */
-.section .text.crt.syscall.Xlinux_stat
-INTERN_FUNCTION(libc_sys_Xlinux_stat)
+/* errno_t stat(char const *filename, struct linux_statx64 *statbuf) */
+.section .text.crt.syscall.Xstat
+INTERN_FUNCTION(libc_sys_Xstat)
 	.cfi_startproc
 	movq   $(0x4), %rax
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xlinux_stat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_stat, libc_sys_Xlinux_stat)
+END(libc_sys_Xstat)
+DEFINE_PUBLIC_ALIAS(sys_Xstat, libc_sys_Xstat)
 
-/* errno_t linux_fstat(fd_t fd, struct linux_statx64 *statbuf) */
-.section .text.crt.syscall.linux_fstat
-INTERN_FUNCTION(libc_sys_linux_fstat)
+/* errno_t fstat(fd_t fd, struct linux_statx64 *statbuf) */
+.section .text.crt.syscall.fstat
+INTERN_FUNCTION(libc_sys_fstat)
 	.cfi_startproc
 	movq   $(0x5), %rax
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_linux_fstat)
-DEFINE_PUBLIC_ALIAS(sys_linux_fstat, libc_sys_linux_fstat)
+END(libc_sys_fstat)
+DEFINE_PUBLIC_ALIAS(sys_fstat, libc_sys_fstat)
 
-/* errno_t linux_fstat(fd_t fd, struct linux_statx64 *statbuf) */
-.section .text.crt.syscall.Xlinux_fstat
-INTERN_FUNCTION(libc_sys_Xlinux_fstat)
+/* errno_t fstat(fd_t fd, struct linux_statx64 *statbuf) */
+.section .text.crt.syscall.Xfstat
+INTERN_FUNCTION(libc_sys_Xfstat)
 	.cfi_startproc
 	movq   $(0x5), %rax
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xlinux_fstat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_fstat, libc_sys_Xlinux_fstat)
+END(libc_sys_Xfstat)
+DEFINE_PUBLIC_ALIAS(sys_Xfstat, libc_sys_Xfstat)
 
-/* errno_t linux_lstat(char const *filename, struct linux_statx64 *statbuf) */
-.section .text.crt.syscall.linux_lstat
-INTERN_FUNCTION(libc_sys_linux_lstat)
+/* errno_t lstat(char const *filename, struct linux_statx64 *statbuf) */
+.section .text.crt.syscall.lstat
+INTERN_FUNCTION(libc_sys_lstat)
 	.cfi_startproc
 	movq   $(0x6), %rax
 	clc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_linux_lstat)
-DEFINE_PUBLIC_ALIAS(sys_linux_lstat, libc_sys_linux_lstat)
+END(libc_sys_lstat)
+DEFINE_PUBLIC_ALIAS(sys_lstat, libc_sys_lstat)
 
-/* errno_t linux_lstat(char const *filename, struct linux_statx64 *statbuf) */
-.section .text.crt.syscall.Xlinux_lstat
-INTERN_FUNCTION(libc_sys_Xlinux_lstat)
+/* errno_t lstat(char const *filename, struct linux_statx64 *statbuf) */
+.section .text.crt.syscall.Xlstat
+INTERN_FUNCTION(libc_sys_Xlstat)
 	.cfi_startproc
 	movq   $(0x6), %rax
 	stc
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xlinux_lstat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_lstat, libc_sys_Xlinux_lstat)
+END(libc_sys_Xlstat)
+DEFINE_PUBLIC_ALIAS(sys_Xlstat, libc_sys_Xlstat)
 
 /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 .section .text.crt.syscall.poll
@@ -6962,10 +6962,9 @@ INTERN_FUNCTION(libc_sys_Xfutimesat)
 END(libc_sys_Xfutimesat)
 DEFINE_PUBLIC_ALIAS(sys_Xfutimesat, libc_sys_Xfutimesat)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat(fd_t dirfd, char const *filename, struct linux_statx64 *statbuf, atflag_t flags) */
-.section .text.crt.syscall.linux_fstatat
-INTERN_FUNCTION(libc_sys_linux_fstatat)
+/* errno_t newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
+.section .text.crt.syscall.newfstatat
+INTERN_FUNCTION(libc_sys_newfstatat)
 	.cfi_startproc
 	movq   $(0x106), %rax
 	movq   %rcx, %r10
@@ -6973,13 +6972,12 @@ INTERN_FUNCTION(libc_sys_linux_fstatat)
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_linux_fstatat)
-DEFINE_PUBLIC_ALIAS(sys_linux_fstatat, libc_sys_linux_fstatat)
+END(libc_sys_newfstatat)
+DEFINE_PUBLIC_ALIAS(sys_newfstatat, libc_sys_newfstatat)
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t linux_fstatat(fd_t dirfd, char const *filename, struct linux_statx64 *statbuf, atflag_t flags) */
-.section .text.crt.syscall.Xlinux_fstatat
-INTERN_FUNCTION(libc_sys_Xlinux_fstatat)
+/* errno_t newfstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, atflag_t flags) */
+.section .text.crt.syscall.Xnewfstatat
+INTERN_FUNCTION(libc_sys_Xnewfstatat)
 	.cfi_startproc
 	movq   $(0x106), %rax
 	movq   %rcx, %r10
@@ -6987,8 +6985,8 @@ INTERN_FUNCTION(libc_sys_Xlinux_fstatat)
 	syscall
 	ret
 	.cfi_endproc
-END(libc_sys_Xlinux_fstatat)
-DEFINE_PUBLIC_ALIAS(sys_Xlinux_fstatat, libc_sys_Xlinux_fstatat)
+END(libc_sys_Xnewfstatat)
+DEFINE_PUBLIC_ALIAS(sys_Xnewfstatat, libc_sys_Xnewfstatat)
 
 /* @param: flags: Set of `0 | AT_REMOVEDIR | AT_REMOVEREG | AT_DOSPATH' */
 /* errno_t unlinkat(fd_t dirfd, char const *name, atflag_t flags) */

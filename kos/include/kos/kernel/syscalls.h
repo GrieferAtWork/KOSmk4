@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb83589a4 */
+/* HASH CRC-32:0x8a6ba0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,6 +80,7 @@
 #define __ARCH_WANT_SYSCALL_FORK                   1
 #define __ARCH_WANT_SYSCALL_FREMOVEXATTR           1
 #define __ARCH_WANT_SYSCALL_FSETXATTR              1
+#define __ARCH_WANT_SYSCALL_FSTAT                  1
 #define __ARCH_WANT_SYSCALL_FSTATFS                1
 #define __ARCH_WANT_SYSCALL_FSYNC                  1
 #define __ARCH_WANT_SYSCALL_FTRUNCATE              1
@@ -135,10 +136,6 @@
 #define __ARCH_WANT_SYSCALL_LGETXATTR              1
 #define __ARCH_WANT_SYSCALL_LINK                   1
 #define __ARCH_WANT_SYSCALL_LINKAT                 1
-#define __ARCH_WANT_SYSCALL_LINUX_FSTAT            1
-#define __ARCH_WANT_SYSCALL_LINUX_LSTAT            1
-#define __ARCH_WANT_SYSCALL_LINUX_NEWFSTATAT       1
-#define __ARCH_WANT_SYSCALL_LINUX_STAT             1
 #define __ARCH_WANT_SYSCALL_LISTEN                 1
 #define __ARCH_WANT_SYSCALL_LISTXATTR              1
 #define __ARCH_WANT_SYSCALL_LLISTXATTR             1
@@ -146,6 +143,7 @@
 #define __ARCH_WANT_SYSCALL_LREMOVEXATTR           1
 #define __ARCH_WANT_SYSCALL_LSEEK                  1
 #define __ARCH_WANT_SYSCALL_LSETXATTR              1
+#define __ARCH_WANT_SYSCALL_LSTAT                  1
 #define __ARCH_WANT_SYSCALL_MADVISE                1
 #define __ARCH_WANT_SYSCALL_MBIND                  1
 #define __ARCH_WANT_SYSCALL_MEMBARRIER             1
@@ -180,6 +178,7 @@
 #define __ARCH_WANT_SYSCALL_MUNMAP                 1
 #define __ARCH_WANT_SYSCALL_NAME_TO_HANDLE_AT      1
 #define __ARCH_WANT_SYSCALL_NANOSLEEP              1
+#define __ARCH_WANT_SYSCALL_NEWFSTATAT             1
 #define __ARCH_WANT_SYSCALL_NFSSERVCTL             1
 #define __ARCH_WANT_SYSCALL_OLDWAIT4               1
 #define __ARCH_WANT_SYSCALL_OPEN                   1
@@ -287,6 +286,7 @@
 #define __ARCH_WANT_SYSCALL_SOCKET                 1
 #define __ARCH_WANT_SYSCALL_SOCKETPAIR             1
 #define __ARCH_WANT_SYSCALL_SPLICE                 1
+#define __ARCH_WANT_SYSCALL_STAT                   1
 #define __ARCH_WANT_SYSCALL_STATFS                 1
 #define __ARCH_WANT_SYSCALL_SWAPOFF                1
 #define __ARCH_WANT_SYSCALL_SWAPON                 1

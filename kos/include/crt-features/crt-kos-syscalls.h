@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce31b469 */
+/* HASH CRC-32:0xae1e1aee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,6 +79,7 @@
 #define __CRT_HAVE_sys_fork 1
 #define __CRT_HAVE_sys_fremovexattr 1
 #define __CRT_HAVE_sys_fsetxattr 1
+#define __CRT_HAVE_sys_fstat 1
 #define __CRT_HAVE_sys_fstatfs 1
 #define __CRT_HAVE_sys_fsync 1
 #define __CRT_HAVE_sys_ftruncate 1
@@ -134,10 +135,6 @@
 #define __CRT_HAVE_sys_lgetxattr 1
 #define __CRT_HAVE_sys_link 1
 #define __CRT_HAVE_sys_linkat 1
-#define __CRT_HAVE_sys_linux_fstat 1
-#define __CRT_HAVE_sys_linux_lstat 1
-#define __CRT_HAVE_sys_linux_newfstatat 1
-#define __CRT_HAVE_sys_linux_stat 1
 #define __CRT_HAVE_sys_listen 1
 #define __CRT_HAVE_sys_listxattr 1
 #define __CRT_HAVE_sys_llistxattr 1
@@ -145,6 +142,7 @@
 #define __CRT_HAVE_sys_lremovexattr 1
 #define __CRT_HAVE_sys_lseek 1
 #define __CRT_HAVE_sys_lsetxattr 1
+#define __CRT_HAVE_sys_lstat 1
 #define __CRT_HAVE_sys_madvise 1
 #define __CRT_HAVE_sys_mbind 1
 #define __CRT_HAVE_sys_membarrier 1
@@ -179,6 +177,7 @@
 #define __CRT_HAVE_sys_munmap 1
 #define __CRT_HAVE_sys_name_to_handle_at 1
 #define __CRT_HAVE_sys_nanosleep 1
+#define __CRT_HAVE_sys_newfstatat 1
 #define __CRT_HAVE_sys_nfsservctl 1
 #define __CRT_HAVE_sys_oldwait4 1
 #define __CRT_HAVE_sys_open 1
@@ -286,6 +285,7 @@
 #define __CRT_HAVE_sys_socket 1
 #define __CRT_HAVE_sys_socketpair 1
 #define __CRT_HAVE_sys_splice 1
+#define __CRT_HAVE_sys_stat 1
 #define __CRT_HAVE_sys_statfs 1
 #define __CRT_HAVE_sys_swapoff 1
 #define __CRT_HAVE_sys_swapon 1
@@ -391,6 +391,7 @@
 #define __CRT_HAVE_sys_Xfork 1
 #define __CRT_HAVE_sys_Xfremovexattr 1
 #define __CRT_HAVE_sys_Xfsetxattr 1
+#define __CRT_HAVE_sys_Xfstat 1
 #define __CRT_HAVE_sys_Xfstatfs 1
 #define __CRT_HAVE_sys_Xfsync 1
 #define __CRT_HAVE_sys_Xftruncate 1
@@ -446,10 +447,6 @@
 #define __CRT_HAVE_sys_Xlgetxattr 1
 #define __CRT_HAVE_sys_Xlink 1
 #define __CRT_HAVE_sys_Xlinkat 1
-#define __CRT_HAVE_sys_Xlinux_fstat 1
-#define __CRT_HAVE_sys_Xlinux_lstat 1
-#define __CRT_HAVE_sys_Xlinux_newfstatat 1
-#define __CRT_HAVE_sys_Xlinux_stat 1
 #define __CRT_HAVE_sys_Xlisten 1
 #define __CRT_HAVE_sys_Xlistxattr 1
 #define __CRT_HAVE_sys_Xllistxattr 1
@@ -457,6 +454,7 @@
 #define __CRT_HAVE_sys_Xlremovexattr 1
 #define __CRT_HAVE_sys_Xlseek 1
 #define __CRT_HAVE_sys_Xlsetxattr 1
+#define __CRT_HAVE_sys_Xlstat 1
 #define __CRT_HAVE_sys_Xmadvise 1
 #define __CRT_HAVE_sys_Xmbind 1
 #define __CRT_HAVE_sys_Xmembarrier 1
@@ -491,6 +489,7 @@
 #define __CRT_HAVE_sys_Xmunmap 1
 #define __CRT_HAVE_sys_Xname_to_handle_at 1
 #define __CRT_HAVE_sys_Xnanosleep 1
+#define __CRT_HAVE_sys_Xnewfstatat 1
 #define __CRT_HAVE_sys_Xnfsservctl 1
 #define __CRT_HAVE_sys_Xoldwait4 1
 #define __CRT_HAVE_sys_Xopen 1
@@ -597,6 +596,7 @@
 #define __CRT_HAVE_sys_Xsocket 1
 #define __CRT_HAVE_sys_Xsocketpair 1
 #define __CRT_HAVE_sys_Xsplice 1
+#define __CRT_HAVE_sys_Xstat 1
 #define __CRT_HAVE_sys_Xstatfs 1
 #define __CRT_HAVE_sys_Xswapoff 1
 #define __CRT_HAVE_sys_Xswapon 1

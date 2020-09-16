@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2ba317 */
+/* HASH CRC-32:0xb77f2b49 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,9 +42,9 @@
 #define __NR64AC_write                  3
 #define __NR64AC_open                   3
 #define __NR64AC_close                  1
-#define __NR64AC_linux_stat             2
-#define __NR64AC_linux_fstat            2
-#define __NR64AC_linux_lstat            2
+#define __NR64AC_stat                   2
+#define __NR64AC_fstat                  2
+#define __NR64AC_lstat                  2
 #define __NR64AC_poll                   3
 #define __NR64AC_lseek                  3
 #define __NR64AC_mmap                   6
@@ -300,7 +300,7 @@
 #define __NR64AC_mknodat                4
 #define __NR64AC_fchownat               5
 #define __NR64AC_futimesat              3
-#define __NR64AC_linux_fstatat          4
+#define __NR64AC_newfstatat             4
 #define __NR64AC_unlinkat               3
 #define __NR64AC_renameat               4
 #define __NR64AC_linkat                 5
@@ -425,9 +425,9 @@
 #define __NR64RT_write                  (ssize_t, __ssize_t)
 #define __NR64RT_open                   (fd_t, __fd_t)
 #define __NR64RT_close                  (errno_t, __errno_t)
-#define __NR64RT_linux_stat             (errno_t, __errno_t)
-#define __NR64RT_linux_fstat            (errno_t, __errno_t)
-#define __NR64RT_linux_lstat            (errno_t, __errno_t)
+#define __NR64RT_stat                   (errno_t, __errno_t)
+#define __NR64RT_fstat                  (errno_t, __errno_t)
+#define __NR64RT_lstat                  (errno_t, __errno_t)
 #define __NR64RT_poll                   (ssize_t, __ssize_t)
 #define __NR64RT_lseek                  (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_mmap                   (void *, void *)
@@ -683,7 +683,7 @@
 #define __NR64RT_mknodat                (errno_t, __errno_t)
 #define __NR64RT_fchownat               (errno_t, __errno_t)
 #define __NR64RT_futimesat              (errno_t, __errno_t)
-#define __NR64RT_linux_fstatat          (errno_t, __errno_t)
+#define __NR64RT_newfstatat             (errno_t, __errno_t)
 #define __NR64RT_unlinkat               (errno_t, __errno_t)
 #define __NR64RT_renameat               (errno_t, __errno_t)
 #define __NR64RT_linkat                 (errno_t, __errno_t)
@@ -814,12 +814,12 @@
 #define __NR64AT1_open                   (oflag_t, __oflag_t)
 #define __NR64AT2_open                   (mode_t, __mode_t)
 #define __NR64AT0_close                  (fd_t, __fd_t)
-#define __NR64AT0_linux_stat             (char const *, char const *)
-#define __NR64AT1_linux_stat             (struct linux_statx64 *, struct linux_statx64 *)
-#define __NR64AT0_linux_fstat            (fd_t, __fd_t)
-#define __NR64AT1_linux_fstat            (struct linux_statx64 *, struct linux_statx64 *)
-#define __NR64AT0_linux_lstat            (char const *, char const *)
-#define __NR64AT1_linux_lstat            (struct linux_statx64 *, struct linux_statx64 *)
+#define __NR64AT0_stat                   (char const *, char const *)
+#define __NR64AT1_stat                   (struct linux_statx64 *, struct linux_statx64 *)
+#define __NR64AT0_fstat                  (fd_t, __fd_t)
+#define __NR64AT1_fstat                  (struct linux_statx64 *, struct linux_statx64 *)
+#define __NR64AT0_lstat                  (char const *, char const *)
+#define __NR64AT1_lstat                  (struct linux_statx64 *, struct linux_statx64 *)
 #define __NR64AT0_poll                   (struct pollfd *, struct pollfd *)
 #define __NR64AT1_poll                   (size_t, __size_t)
 #define __NR64AT2_poll                   (syscall_slong_t, __syscall_slong_t)
@@ -1356,10 +1356,10 @@
 #define __NR64AT0_futimesat              (fd_t, __fd_t)
 #define __NR64AT1_futimesat              (char const *, char const *)
 #define __NR64AT2_futimesat              (struct timevalx64 const *, struct __timevalx64 const *)
-#define __NR64AT0_linux_fstatat          (fd_t, __fd_t)
-#define __NR64AT1_linux_fstatat          (char const *, char const *)
-#define __NR64AT2_linux_fstatat          (struct linux_statx64 *, struct linux_statx64 *)
-#define __NR64AT3_linux_fstatat          (atflag_t, __atflag_t)
+#define __NR64AT0_newfstatat             (fd_t, __fd_t)
+#define __NR64AT1_newfstatat             (char const *, char const *)
+#define __NR64AT2_newfstatat             (struct linux64_stat32 *, struct linux64_stat32 *)
+#define __NR64AT3_newfstatat             (atflag_t, __atflag_t)
 #define __NR64AT0_unlinkat               (fd_t, __fd_t)
 #define __NR64AT1_unlinkat               (char const *, char const *)
 #define __NR64AT2_unlinkat               (atflag_t, __atflag_t)
@@ -1718,9 +1718,9 @@
 #define __NR64AM_write(a, b, c, d, e, f)                  (__fd_t)a, (void const *)b, (__size_t)c
 #define __NR64AM_open(a, b, c, d, e, f)                   (char const *)a, (__oflag_t)b, (__mode_t)c
 #define __NR64AM_close(a, b, c, d, e, f)                  (__fd_t)a
-#define __NR64AM_linux_stat(a, b, c, d, e, f)             (char const *)a, (struct linux_statx64 *)b
-#define __NR64AM_linux_fstat(a, b, c, d, e, f)            (__fd_t)a, (struct linux_statx64 *)b
-#define __NR64AM_linux_lstat(a, b, c, d, e, f)            (char const *)a, (struct linux_statx64 *)b
+#define __NR64AM_stat(a, b, c, d, e, f)                   (char const *)a, (struct linux_statx64 *)b
+#define __NR64AM_fstat(a, b, c, d, e, f)                  (__fd_t)a, (struct linux_statx64 *)b
+#define __NR64AM_lstat(a, b, c, d, e, f)                  (char const *)a, (struct linux_statx64 *)b
 #define __NR64AM_poll(a, b, c, d, e, f)                   (struct pollfd *)a, (__size_t)b, (__syscall_slong_t)c
 #define __NR64AM_lseek(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_slong_t)b, (__syscall_ulong_t)c
 #define __NR64AM_mmap(a, b, c, d, e, f)                   (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__fd_t)e, (__syscall_ulong_t)f
@@ -1976,7 +1976,7 @@
 #define __NR64AM_mknodat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__mode_t)c, (__dev_t)d
 #define __NR64AM_fchownat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__uid_t)c, (__gid_t)d, (__atflag_t)e
 #define __NR64AM_futimesat(a, b, c, d, e, f)              (__fd_t)a, (char const *)b, (struct __timevalx64 const *)c
-#define __NR64AM_linux_fstatat(a, b, c, d, e, f)          (__fd_t)a, (char const *)b, (struct linux_statx64 *)c, (__atflag_t)d
+#define __NR64AM_newfstatat(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (struct linux64_stat32 *)c, (__atflag_t)d
 #define __NR64AM_unlinkat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__atflag_t)c
 #define __NR64AM_renameat(a, b, c, d, e, f)               (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d
 #define __NR64AM_linkat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__atflag_t)e
@@ -2101,9 +2101,9 @@
 #define __NR64AP_write(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_open(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_close(a)                                 (__syscall_ulong_t)a
-#define __NR64AP_linux_stat(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_linux_fstat(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR64AP_linux_lstat(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_stat(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_fstat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_lstat(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_poll(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_lseek(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_mmap(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
@@ -2359,7 +2359,7 @@
 #define __NR64AP_mknodat(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_fchownat(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_futimesat(a, b, c)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AP_linux_fstatat(a, b, c, d)                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_newfstatat(a, b, c, d)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_unlinkat(a, b, c)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_renameat(a, b, c, d)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_linkat(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
