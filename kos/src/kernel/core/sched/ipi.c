@@ -111,7 +111,7 @@ again_check_cpu_state:
 					        "Without `CPU_IPI_FWAKEUP' and preemption disabled, including your own "
 					        "CPU as target for a cpuset IPI also requires you to set the `CPU_IPI_FNOINTR' "
 					        "flag since the IPI can only be executed on your own CPU while keeping interrupts "
-					        "disabled. By setting `CPU_IPI_FWAKEUP', this szenario is instead ignored.");
+					        "disabled. By setting `CPU_IPI_FWAKEUP', this scenario is instead ignored.");
 					task_pause();
 					goto again_check_cpu_state;
 				}

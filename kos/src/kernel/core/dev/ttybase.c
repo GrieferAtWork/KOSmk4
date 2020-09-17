@@ -174,7 +174,7 @@ do_throw_ttou:
 			 * calling process only. */
 			task_raisesignalprocess(task_getprocess(), SIGTTOU);
 			/* We might get here if `SIGTTOU' is being ignored by the calling thread.
-			 * -> As described by POSIX, allow the process to write in this szenario. */
+			 * -> As described by POSIX, allow the process to write in this scenario. */
 		} else {
 			printk(KERN_INFO "[tty:%q] Background process group %p [pgid=%" PRIuN(__SIZEOF_PID_T__) "] tried to read\n",
 			       term->cd_name, my_leader_pid,

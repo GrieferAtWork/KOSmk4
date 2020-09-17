@@ -95,15 +95,6 @@
  *    >>    })
  *    >> #endif // !__ARCH_HAVE_SIGBLOCK_VFORK
  *
- *
- *
- * #define __ARCH_HAVE_SHARED_SIGMASK_VFORK
- * >> When defined, a vfork()'d child process will be sharing its signal mask
- *    with its parent process until it performs a successful call to exec(2),
- *    or _Exit(2). This caveat is a necessary evil caused by KOS's userprocmask,
- *    which essentially allows user-space programs to modify their signal masks
- *    without having to do invoke any system calls when there are no unmasked,
- *    pending signals.
  */
 
 #if defined(__linux__)
@@ -111,7 +102,6 @@
 #elif defined(__KOS__)
 #define __ARCH_HAVE_SHARED_VM_VFORK 1 /* Implemented as of 2020-09-08T14:05 */
 #define __ARCH_HAVE_SIGBLOCK_VFORK  1 /* Implemented as of 2020-09-11T17:58 */
-//#define __ARCH_HAVE_SHARED_SIGMASK_VFORK 1 /* TODO */
 #endif /* ... */
 
 #endif /* !_ASM_VFORK_H */

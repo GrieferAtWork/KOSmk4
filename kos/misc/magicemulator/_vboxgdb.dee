@@ -348,7 +348,7 @@ function vmReadMemoryAt(addr: int | string): Bytes {
 				 * an unaligned address by re-attempting the read with an
 				 * aligned address, thus allowing VirtualBox to at least
 				 * read one line of memory successfully.
-				 * HINT: In such a szenario, VirtualBox's response might look like:
+				 * HINT: In such a scenario, VirtualBox's response might look like:
 				 * >> "%00000000ffffffe8: 07fa5023 00000000 07fa4023 00000000\r\n"
 				 * >> "%00000000fffffff8: 07fa3023 00000000\r\n
 				 * >> error: VERR_PAGE_TABLE_NOT_PRESENT:  Reading memory at %0000000100000000.\r\n"

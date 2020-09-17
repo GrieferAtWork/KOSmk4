@@ -566,54 +566,46 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      hadn't been using by the original process.
 	 *
 	 *    - During a call to fork() or clone() (w/o CLONE_VM, or w/ CLONE_VFORK), the
-	 *      parent thread's IS_A_USERPROCMASK_THREAD attribute is inherited unconditionally.
+	 *      parent thread's TASK_FUSERPROCMASK attribute is inherited unconditionally.
 	 *      During a call to clone(CLONE_VM), where the parent is a userprocmask thread,
 	 *      prior to clone() returning in either the parent or child, the parent thread's
 	 *      user-space `pm_sigmask' is copied into the kernel-space buffer of the child
-	 *      thread, while the child thread itself will not be started in userprocmask mode.
+	 *      thread, while the child thread will start with TASK_FUSERPROCMASK=0.
 	 *
-	 *    - One caveat exists with userprocmask that cannot be resolved by the kernel being smart:
-	 *      In a vfork() szenario, both the parent and child processes will continue to share VMs,
-	 *      meaning that if the parent has the IS_A_USERPROCMASK_THREAD attribute set, the child
-	 *      will also have the IS_A_USERPROCMASK_THREAD attribute set (see above). We can't simply
-	 *      clear the IS_A_USERPROCMASK_THREAD attribute since user-space's libc will not have set
-	 *      up a new TLS context for the vfork()'d child, meaning that the child will share its TLS
-	 *      state with its parent (and as such, also has to share its IS_A_USERPROCMASK_THREAD).
-	 *      As such, if a vfork()'d child makes use of sigprocmask(), the changes will be mirrored
-	 *      in the parent thread as well.
-	 *      The user-space `posix_spawn(3)' function from kos's libc.so is aware of this caveat and
-	 *      can still be used execute a new program with an altered signal mask, however 3rd party
-	 *      programs using vfork(), where the child process then calls sigprocmask() must be modified:
-	 *      Old (unmodified) code:
-	 *          >> ...
-	 *          >> if ((cpid = vfork()) == 0) {
-	 *          >>     ...
-	 *          >>     sigprocmask(SIG_SETMASK, &child_mask, NULL);
-	 *          >>     ...
-	 *          >>     execl("/bin/some-program", "some-program", (char *)0);
-	 *          >>     _Exit(127);
-	 *          >> }
-	 *          >> ...
-	 *      New (fixed) code:
-	 *          >> ...
-	 *          >> sigset_t saved;
-	 *          >> sigprocmask(0, NULL, &saved);
-	 *          >> if ((cpid = vfork()) == 0) {
-	 *          >>     ...
-	 *          >>     sigprocmask(SIG_SETMASK, &child_mask, NULL);
-	 *          >>     ...
-	 *          >>     execl("/bin/some-program", "some-program", (char *)0);
-	 *          >>     _Exit(127);
-	 *          >> }
-	 *          >> sigprocmask(SIG_SETMASK, &saved, NULL);
-	 *          >> ...
-	 *      Essentially, you just have to preserve the parent process's signal mask
-	 *      before/after a call to vfork(2), essentially matching the assumption that
-	 *      you're sharing your signal mask with the child process until it performs
-	 *      a successful call to exec(2), or simply _Exit(2)'s
-	 *      Portable code may also test if a macro `__ARCH_HAVE_SHARED_SIGMASK_VFORK'
-	 *      is defined before using `vfork(2)', if they wish to support both types of
-	 *      vfork flavors without having to include workarounds for one with the other.
+	 *    - During a vfork(2), where the parent thread has the TASK_FUSERPROCMASK
+	 *      attribute set, the parent's process's `pm_sigmask' will be copied into a
+	 *      temporary kernel-space buffer prior to starting the child thread. Then,
+	 *      until the child thread indicates that it has successfully called exec(2)
+	 *      or _Exit(2), the parent thread's TASK_FUSERPROCMASK attribute is
+	 *      cleared, and the internal kernel-space signal mask is set to block all
+	 *      signals (except SIGKILL and SIGSTOP), thus mirroring the behavior of
+	 *      vfork() without userprocmask.
+	 *      The child thread is started with the `TASK_FUSERPROCMASK' attribute set,
+	 *      which will be cleared the normal way once the child performs a successful call
+	 *      to either exec(2) or _Exit(2), at which pointer the process will once again
+	 *      wake up.
+	 *      Back in the parent process, the kernel will now perform 2 copy operations:
+	 *       - memcpy(orig_pm_sigmask, &saved_sigmask, sizeof(sigset_t));
+	 *       - THIS_USERPROCMASK_POINTER->pm_sigmask = orig_pm_sigmask;
+	 *      Where `THIS_USERPROCMASK_POINTER' is the pointer that the parent thread originally
+	 *      passed to `sys_set_userprocmask_address()', `orig_pm_sigmask' was the value of
+	 *      `THIS_USERPROCMASK_POINTER->pm_sigmask' prior to the child process being started,
+	 *      and `saved_sigmask' were the contents of `*orig_pm_sigmask' prior to the child
+	 *      process being started.
+	 *
+	 *    - During a vfork(2), where the parent thread didn't have then `TASK_FUSERPROCMASK'
+	 *      attribute set, but the child process performs a call to `sys_set_userprocmask_address()'
+	 *      before eventually performing a successful call to exec(2) or exit(2), the parent thread's
+	 *      TLS state (which at this point is assumed to be shared with the child process) is fixed
+	 *      up to indicate that `sys_set_userprocmask_address()' had yet to be called in its context.
+	 *      This is done by having the vfork child do `THIS_USERPROCMASK_POINTER->pm_sigmask = NULL',
+	 *      thus indicating to the parent thread that `sys_set_userprocmask_address(2)' wasn't called
+	 *      yet.
+	 *      For this purpose, the kernel will set a thread flag `TASK_FUSERPROCMASK_AFTER_VFORK' when
+	 *      a call `sys_set_userprocmask_address(<not-NULL>)' is performed by a thread that doesn't
+	 *      already have the `TASK_FUSERPROCMASK' attribute set, but does have the `TASK_FVFORK'
+	 *      attribute set.
+	 *
 	 *
 	 *
 	 * Example code:
@@ -627,9 +619,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * >> struct userprocmask {
 	 * >>     pid_t     pm_mytid;    // [const] TID of the thread (same as `set_tid_address(2)')
 	 * >>     size_t    pm_sigsize;  // [const] == sizeof(sigset_t)
-	 * >>     sigset_t *pm_sigmask;  // [KERNEL:READ|WRITE(1), USER:WRITE] Pointer to the current signal mask
+	 * >>     sigset_t *pm_sigmask;  // [KERNEL:READ|WRITE(1), USER:WRITE][0..1] Pointer to the current signal mask
 	 * >>                            // The kernel may or' this with another mask when a signal handler
 	 * >>                            // is invoked that contains a non-empty `sa_mask'
+	 * >>                            // Set to `NULL' to indicate that `sys_set_userprocmask_address()' wasn't called, yet.
 	 * >>     sigset_t  pm_pending;  // [KERNEL:WRITE,     USER:READWRITE] Set of pending signals
 	 * >>                            // When a currently masked signal arrives, it's associated
 	 * >>                            // bit is set to 1 in here.
@@ -679,14 +672,16 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * >>     sigset_t *oldset, *newset;
 	 * >>     oldset = mymask.pm_sigmask;
 	 * >>
+	 * >>     if (os)
+	 * >>         memcpy(os, oldset, sizeof(sigset_t));
+	 * >>     if (!ns)
+	 * >>         return 0;
+	 * >>
 	 * >>     // Select a storage location for the new mask
 	 * >>     newset = oldset + 1;
 	 * >>     if (newset != &mymask.pm_masks[0] &&
 	 * >>         newset != &mymask.pm_masks[1])
 	 * >>         newset = &mymask.pm_masks[0];
-	 * >>
-	 * >>     if (os)
-	 * >>         memcpy(os, oldset, sizeof(sigset_t));
 	 * >>
 	 * >>     // Initialize a new signal mask from the old one, `how', and the new one
 	 * >>     init_sigset_for_sigprocmask(newset, how, oldset, ns);
