@@ -40,7 +40,7 @@ DECL_BEGIN
  * @return: * : One of `TASK_RAISESIGNALTHREAD_NX_*' */
 PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
 NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
-                                         USER CHECKED siginfo_t *info,
+                                         USER CHECKED siginfo_t const *info,
                                          gfp_t rpc_flags)
 #else /* DELIVER_NX */
 /* Raise a posix signal within a given thread `target'
@@ -50,7 +50,7 @@ NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
  * @throw: E_INTERRUPT_USER_RPC:        `target' is the calling thread, and the signal isn't being blocked at the moment. */
 PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
 task_raisesignalthread(struct task *__restrict target,
-                       USER CHECKED siginfo_t *info,
+                       USER CHECKED siginfo_t const *info,
                        gfp_t rpc_flags)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT)
@@ -382,7 +382,7 @@ again_find_late_target:
  *                                       and the signal isn't being blocked at the moment. */
 PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) IFELSE(bool, int)
 NOTHROW_NX(KCALL FUNC(task_raisesignalprocess))(struct task *__restrict target,
-                                                USER CHECKED siginfo_t *info,
+                                                USER CHECKED siginfo_t const *info,
                                                 gfp_t rpc_flags)
 #ifndef DELIVER_NX
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a6dba90 */
+/* HASH CRC-32:0x1d4ced1d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,7 +343,7 @@
 #define __NRAN2_rt_sigtimedwait              timeout
 #define __NRAN3_rt_sigtimedwait              sigsetsize
 #define __NRAN0_rt_sigqueueinfo              tgid
-#define __NRAN1_rt_sigqueueinfo              signo
+#define __NRAN1_rt_sigqueueinfo              usigno
 #define __NRAN2_rt_sigqueueinfo              uinfo
 #define __NRAN0_rt_sigsuspend                set
 #define __NRAN1_rt_sigsuspend                sigsetsize
@@ -727,7 +727,7 @@
 #define __NRAN3_pwritev                      offset
 #define __NRAN0_rt_tgsigqueueinfo            tgid
 #define __NRAN1_rt_tgsigqueueinfo            tid
-#define __NRAN2_rt_tgsigqueueinfo            signo
+#define __NRAN2_rt_tgsigqueueinfo            usigno
 #define __NRAN3_rt_tgsigqueueinfo            uinfo
 #define __NRAN0_perf_event_open              TODO_PROTOTYPE
 #define __NRAN0_recvmmsg                     sockfd
@@ -945,7 +945,10 @@
 #define __NRAN5_futex_time64                 val3
 #define __NRAN0_sched_rr_get_interval_time64 pid
 #define __NRAN1_sched_rr_get_interval_time64 tms
-#define __NRAN0_pidfd_send_signal            TODO_PROTOTYPE
+#define __NRAN0_pidfd_send_signal            pidfd
+#define __NRAN1_pidfd_send_signal            usigno
+#define __NRAN2_pidfd_send_signal            uinfo
+#define __NRAN3_pidfd_send_signal            flags
 #define __NRAN0_io_uring_setup               TODO_PROTOTYPE
 #define __NRAN0_io_uring_enter               TODO_PROTOTYPE
 #define __NRAN0_io_uring_register            TODO_PROTOTYPE
@@ -955,11 +958,14 @@
 #define __NRAN0_fsconfig                     TODO_PROTOTYPE
 #define __NRAN0_fsmount                      TODO_PROTOTYPE
 #define __NRAN0_fspick                       TODO_PROTOTYPE
-#define __NRAN0_pidfd_open                   TODO_PROTOTYPE
+#define __NRAN0_pidfd_open                   pid
+#define __NRAN1_pidfd_open                   flags
 #define __NRAN0_clone3                       TODO_PROTOTYPE
 #define __NRAN0_close_range                  TODO_PROTOTYPE
 #define __NRAN0_openat2                      TODO_PROTOTYPE
-#define __NRAN0_pidfd_getfd                  TODO_PROTOTYPE
+#define __NRAN0_pidfd_getfd                  pidfd
+#define __NRAN1_pidfd_getfd                  foreign_fd
+#define __NRAN2_pidfd_getfd                  flags
 #define __NRAN0_faccessat2                   TODO_PROTOTYPE
 #define __NRAN0_pwritevf                     fd
 #define __NRAN1_pwritevf                     iovec
@@ -1690,7 +1696,7 @@
 #define __NRATR3_rt_sigtimedwait              SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NRRTR_rt_sigtimedwait               SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_rt_sigqueueinfo              SC_REPR_PID_T                                                        /* tgid */ 
-#define __NRATR1_rt_sigqueueinfo              SC_REPR_SIGNO_T                                                      /* signo */ 
+#define __NRATR1_rt_sigqueueinfo              SC_REPR_SIGNO_T                                                      /* usigno */ 
 #define __NRATR2_rt_sigqueueinfo              SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
 #define __NRRTR_rt_sigqueueinfo               SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_rt_sigsuspend                SC_REPR_STRUCT_SIGSET                                                /* set */ 
@@ -2270,7 +2276,7 @@
 #define __NRRTR_pwritev                       SC_REPR_SSIZE_T                                                      /* return */
 #define __NRATR0_rt_tgsigqueueinfo            SC_REPR_PID_T                                                        /* tgid */ 
 #define __NRATR1_rt_tgsigqueueinfo            SC_REPR_PID_T                                                        /* tid */ 
-#define __NRATR2_rt_tgsigqueueinfo            SC_REPR_SIGNO_T                                                      /* signo */ 
+#define __NRATR2_rt_tgsigqueueinfo            SC_REPR_SIGNO_T                                                      /* usigno */ 
 #define __NRATR3_rt_tgsigqueueinfo            SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
 #define __NRRTR_rt_tgsigqueueinfo             SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_perf_event_open              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
@@ -2599,7 +2605,10 @@
 #define __NRATR0_sched_rr_get_interval_time64 SC_REPR_PID_T                                                        /* pid */ 
 #define __NRATR1_sched_rr_get_interval_time64 SC_REPR_POINTER                                                      /* tms */ 
 #define __NRRTR_sched_rr_get_interval_time64  SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_pidfd_send_signal            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_pidfd_send_signal            SC_REPR_FD_T                                                         /* pidfd */ 
+#define __NRATR1_pidfd_send_signal            SC_REPR_SIGNO_T                                                      /* usigno */ 
+#define __NRATR2_pidfd_send_signal            SC_REPR_POINTER                                                      /* uinfo */ 
+#define __NRATR3_pidfd_send_signal            SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NRRTR_pidfd_send_signal             SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_io_uring_setup               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_io_uring_setup                SC_REPR_ERRNO_T                                                      /* return */
@@ -2619,16 +2628,19 @@
 #define __NRRTR_fsmount                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_fspick                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_fspick                        SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_pidfd_open                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_pidfd_open                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pidfd_open                   SC_REPR_PID_T                                                        /* pid */ 
+#define __NRATR1_pidfd_open                   SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_pidfd_open                    SC_REPR_FD_T                                                         /* return */
 #define __NRATR0_clone3                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_clone3                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_close_range                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_close_range                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_openat2                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_openat2                       SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_pidfd_getfd                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_pidfd_getfd                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pidfd_getfd                  SC_REPR_FD_T                                                         /* pidfd */ 
+#define __NRATR1_pidfd_getfd                  SC_REPR_FD_T                                                         /* foreign_fd */ 
+#define __NRATR2_pidfd_getfd                  SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRRTR_pidfd_getfd                   SC_REPR_FD_T                                                         /* return */
 #define __NRATR0_faccessat2                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_faccessat2                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_pwritevf                     SC_REPR_FD_T                                                         /* fd */ 

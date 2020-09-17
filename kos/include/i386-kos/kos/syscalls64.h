@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1b89c22 */
+/* HASH CRC-32:0x807e0196 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1224,13 +1224,46 @@ __CDECLARE_SC(,__errno_t,perf_event_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 __CDECLARE_SC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(personality) */
 #if __CRT_HAVE_SC(pidfd_getfd)
-__CDECLARE_SC(,__errno_t,pidfd_getfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Duplicate the handle of a foreign process into a handle for the caller.
+ * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
+ * which may also be used to duplicate file handles from another process.
+ * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: fd:    The FD-number of the handle to clone
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   The duplicated handle number
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                            [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+__CDECLARE_SC(,__fd_t,pidfd_getfd,(__fd_t __pidfd, __fd_t __foreign_fd, __syscall_ulong_t __flags),(__pidfd,__foreign_fd,__flags))
 #endif /* __CRT_HAVE_SC(pidfd_getfd) */
 #if __CRT_HAVE_SC(pidfd_open)
-__CDECLARE_SC(,__errno_t,pidfd_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+ * This system call exists for compatibility with linux, which does not allow
+ * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   A handle for the process `pid'
+ * @throw: E_PROCESS_EXITED:                                                                 [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
+__CDECLARE_SC(,__fd_t,pidfd_open,(__pid_t __pid, __syscall_ulong_t __flags),(__pid,__flags))
 #endif /* __CRT_HAVE_SC(pidfd_open) */
 #if __CRT_HAVE_SC(pidfd_send_signal)
-__CDECLARE_SC(,__errno_t,pidfd_send_signal,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Send a signal to the process of a given pidfd
+ * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @param: flags:  Must always be `0' (for now)
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO:    [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:               [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:     [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+__CDECLARE_SC(,__errno_t,pidfd_send_signal,(__fd_t __pidfd, __signo_t __usigno, struct __siginfox64_struct const *__uinfo, __syscall_ulong_t __flags),(__pidfd,__usigno,__uinfo,__flags))
 #endif /* __CRT_HAVE_SC(pidfd_send_signal) */
 #if __CRT_HAVE_SC(pipe)
 __CDECLARE_SC(,__errno_t,pipe,(__fd_t *__pipedes),(__pipedes))
@@ -1488,7 +1521,13 @@ __CDECLARE_SC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t 
 __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset, __size_t __sigsetsize),(__how,__set,__oset,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigprocmask) */
 #if __CRT_HAVE_SC(rt_sigqueueinfo)
-__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __signo_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__signo,__uinfo))
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __signo_t __usigno, struct __siginfox64_struct const *__uinfo),(__tgid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
 /* Restore the given CPU/FPU context descriptors, as well as signal mask
@@ -1514,7 +1553,13 @@ __CDECLARE_SC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __s
 __CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfox64_struct *__info, struct __timespecx64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigtimedwait) */
 #if __CRT_HAVE_SC(rt_tgsigqueueinfo)
-__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __usigno, struct __siginfox64_struct const *__uinfo),(__tgid,__tid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_SC(rtm_abort)
 /* Abort the current transaction by having `sys_rtm_begin()' return with
@@ -3148,13 +3193,46 @@ __CDECLARE_XSC(,__errno_t,perf_event_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 __CDECLARE_XSC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(personality) */
 #if __CRT_HAVE_XSC(pidfd_getfd)
-__CDECLARE_XSC(,__errno_t,pidfd_getfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Duplicate the handle of a foreign process into a handle for the caller.
+ * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
+ * which may also be used to duplicate file handles from another process.
+ * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: fd:    The FD-number of the handle to clone
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   The duplicated handle number
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                            [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+__CDECLARE_XSC(,__fd_t,pidfd_getfd,(__fd_t __pidfd, __fd_t __foreign_fd, __syscall_ulong_t __flags),(__pidfd,__foreign_fd,__flags))
 #endif /* __CRT_HAVE_XSC(pidfd_getfd) */
 #if __CRT_HAVE_XSC(pidfd_open)
-__CDECLARE_XSC(,__errno_t,pidfd_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+ * This system call exists for compatibility with linux, which does not allow
+ * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   A handle for the process `pid'
+ * @throw: E_PROCESS_EXITED:                                                                 [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
+__CDECLARE_XSC(,__fd_t,pidfd_open,(__pid_t __pid, __syscall_ulong_t __flags),(__pid,__flags))
 #endif /* __CRT_HAVE_XSC(pidfd_open) */
 #if __CRT_HAVE_XSC(pidfd_send_signal)
-__CDECLARE_XSC(,__errno_t,pidfd_send_signal,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Send a signal to the process of a given pidfd
+ * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @param: flags:  Must always be `0' (for now)
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO:    [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:               [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:     [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+__CDECLARE_XSC(,__errno_t,pidfd_send_signal,(__fd_t __pidfd, __signo_t __usigno, struct __siginfox64_struct const *__uinfo, __syscall_ulong_t __flags),(__pidfd,__usigno,__uinfo,__flags))
 #endif /* __CRT_HAVE_XSC(pidfd_send_signal) */
 #if __CRT_HAVE_XSC(pipe)
 __CDECLARE_XSC(,__errno_t,pipe,(__fd_t *__pipedes),(__pipedes))
@@ -3412,7 +3490,13 @@ __CDECLARE_XSC(,__errno_t,rt_sigpending,(struct __sigset_struct *__set, __size_t
 __CDECLARE_XSC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset, __size_t __sigsetsize),(__how,__set,__oset,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigprocmask) */
 #if __CRT_HAVE_XSC(rt_sigqueueinfo)
-__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __signo_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__signo,__uinfo))
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __signo_t __usigno, struct __siginfox64_struct const *__uinfo),(__tgid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_sigqueueinfo) */
 #if __CRT_HAVE_XSC(rt_sigsuspend)
 __CDECLARE_XSC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -3421,7 +3505,13 @@ __CDECLARE_XSC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __
 __CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *__set, struct __siginfox64_struct *__info, struct __timespecx64 const *__timeout, __size_t __sigsetsize),(__set,__info,__timeout,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigtimedwait) */
 #if __CRT_HAVE_XSC(rt_tgsigqueueinfo)
-__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __signo, struct __siginfox64_struct const *__uinfo),(__tgid,__tid,__signo,__uinfo))
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __usigno, struct __siginfox64_struct const *__uinfo),(__tgid,__tid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_XSC(rtm_abort)
 /* Abort the current transaction by having `sys_rtm_begin()' return with

@@ -357,7 +357,7 @@ struct sigqueue_entry {
  * @throw: E_INTERRUPT_USER_RPC:        `target' is the calling thread, and the signal isn't being blocked at the moment. */
 FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
 task_raisesignalthread(struct task *__restrict target,
-                       USER CHECKED siginfo_t *info,
+                       USER CHECKED siginfo_t const *info,
                        gfp_t rpc_flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT);
@@ -366,7 +366,7 @@ task_raisesignalthread(struct task *__restrict target,
  * @return: * : One of `TASK_RAISESIGNALTHREAD_NX_*' */
 FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
 NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
-                                         USER CHECKED siginfo_t *info,
+                                         USER CHECKED siginfo_t const *info,
                                          gfp_t rpc_flags DFL(GFP_NORMAL));
 #define TASK_RAISESIGNALTHREAD_NX_INTERRUPTED   1  /* Successfully raised the signal (and the target is the caller) */
 #define TASK_RAISESIGNALTHREAD_NX_SUCCESS       0  /* Successfully raised the signal */
@@ -388,7 +388,7 @@ NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
  *                                       and the signal isn't being blocked at the moment. */
 FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
 task_raisesignalprocess(struct task *__restrict target,
-                        USER CHECKED siginfo_t *info,
+                        USER CHECKED siginfo_t const *info,
                         gfp_t rpc_flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT);
@@ -399,7 +399,7 @@ task_raisesignalprocess(struct task *__restrict target,
  * @return: * : One of `TASK_RAISESIGNALTHREAD_NX_*' */
 FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
 NOTHROW(KCALL task_raisesignalprocess_nx)(struct task *__restrict target,
-                                          USER CHECKED siginfo_t *info,
+                                          USER CHECKED siginfo_t const *info,
                                           gfp_t rpc_flags DFL(GFP_NORMAL));
 
 
@@ -408,7 +408,7 @@ NOTHROW(KCALL task_raisesignalprocess_nx)(struct task *__restrict target,
  * @return: * : The number of processes to which the signal was delivered. */
 FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
 task_raisesignalprocessgroup(struct task *__restrict target,
-                             USER CHECKED siginfo_t *info,
+                             USER CHECKED siginfo_t const *info,
                              gfp_t rpc_flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED);

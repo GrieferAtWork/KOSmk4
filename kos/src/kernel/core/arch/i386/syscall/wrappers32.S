@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e247f70 */
+/* HASH CRC-32:0x86fd389f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6724,7 +6724,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigtimedwait)
 
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_int80.rt_sigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigqueueinfo)
 	.cfi_startproc simple
@@ -12582,7 +12588,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev)
 	.cfi_endproc
 END(__x86_asm32_int80_pwritev)
 
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_int80.rt_tgsigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_tgsigqueueinfo)
 	.cfi_startproc simple
@@ -15901,7 +15913,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_sched_rr_get_interval_time64)
 
-/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+/* Send a signal to the process of a given pidfd
+ * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @param: flags:  Must always be `0' (for now)
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO:    [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:               [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:     [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+/* errno_t pidfd_send_signal(fd_t pidfd, signo_t usigno, struct __siginfox32_struct const *uinfo, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.pidfd_send_signal
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_send_signal)
 	.cfi_startproc simple
@@ -15920,14 +15944,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_send_signal)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pidfd_send_signal)
 	call   sys_pidfd_send_signal
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -16271,7 +16297,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fspick)
 	.cfi_endproc
 END(__x86_asm32_int80_fspick)
 
-/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+ * This system call exists for compatibility with linux, which does not allow
+ * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   A handle for the process `pid'
+ * @throw: E_PROCESS_EXITED:                                                                 [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
+/* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.pidfd_open
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_open)
 	.cfi_startproc simple
@@ -16290,14 +16325,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_open)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pidfd_open)
 	call   sys_pidfd_open
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -16419,7 +16454,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat2)
 	.cfi_endproc
 END(__x86_asm32_int80_openat2)
 
-/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+/* Duplicate the handle of a foreign process into a handle for the caller.
+ * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
+ * which may also be used to duplicate file handles from another process.
+ * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: fd:    The FD-number of the handle to clone
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   The duplicated handle number
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                            [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+/* fd_t pidfd_getfd(fd_t pidfd, fd_t foreign_fd, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.pidfd_getfd
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_getfd)
 	.cfi_startproc simple
@@ -16438,14 +16485,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_getfd)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pidfd_getfd)
 	call   sys_pidfd_getfd
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -26028,7 +26075,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigtimedwait)
 	.cfi_endproc
 END(__x86_asm32_sysenter_rt_sigtimedwait)
 
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_sysenter.rt_sigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigqueueinfo)
 	.cfi_startproc simple
@@ -31926,7 +31979,13 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwritev)
 
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_sysenter.rt_tgsigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_tgsigqueueinfo)
 	.cfi_startproc simple
@@ -35279,7 +35338,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_rr_get_interval_time64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sched_rr_get_interval_time64)
 
-/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+/* Send a signal to the process of a given pidfd
+ * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @param: flags:  Must always be `0' (for now)
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO:    [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:               [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:     [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+/* errno_t pidfd_send_signal(fd_t pidfd, signo_t usigno, struct __siginfox32_struct const *uinfo, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.pidfd_send_signal
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_send_signal)
 	.cfi_startproc simple
@@ -35298,14 +35369,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_send_signal)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pidfd_send_signal)
 	call   sys_pidfd_send_signal
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -35649,7 +35722,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fspick)
 	.cfi_endproc
 END(__x86_asm32_sysenter_fspick)
 
-/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+ * This system call exists for compatibility with linux, which does not allow
+ * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   A handle for the process `pid'
+ * @throw: E_PROCESS_EXITED:                                                                 [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
+/* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.pidfd_open
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_open)
 	.cfi_startproc simple
@@ -35668,14 +35750,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_open)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pidfd_open)
 	call   sys_pidfd_open
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -35797,7 +35879,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openat2)
 	.cfi_endproc
 END(__x86_asm32_sysenter_openat2)
 
-/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+/* Duplicate the handle of a foreign process into a handle for the caller.
+ * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
+ * which may also be used to duplicate file handles from another process.
+ * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: fd:    The FD-number of the handle to clone
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   The duplicated handle number
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                            [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+/* fd_t pidfd_getfd(fd_t pidfd, fd_t foreign_fd, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.pidfd_getfd
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_getfd)
 	.cfi_startproc simple
@@ -35816,14 +35910,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_getfd)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pidfd_getfd)
 	call   sys_pidfd_getfd
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es

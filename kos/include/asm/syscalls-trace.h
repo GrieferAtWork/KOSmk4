@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99748201 */
+/* HASH CRC-32:0xadd9e957 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -354,7 +354,7 @@
 #define __NRAN2_rt_sigtimedwait        timeout
 #define __NRAN3_rt_sigtimedwait        sigsetsize
 #define __NRAN0_rt_sigqueueinfo        tgid
-#define __NRAN1_rt_sigqueueinfo        signo
+#define __NRAN1_rt_sigqueueinfo        usigno
 #define __NRAN2_rt_sigqueueinfo        uinfo
 #define __NRAN0_rt_sigreturn           restore_fpu
 #define __NRAN1_rt_sigreturn           restore_sigmask
@@ -562,7 +562,7 @@
 #define __NRAN0_move_pages             TODO_PROTOTYPE
 #define __NRAN0_rt_tgsigqueueinfo      tgid
 #define __NRAN1_rt_tgsigqueueinfo      tid
-#define __NRAN2_rt_tgsigqueueinfo      signo
+#define __NRAN2_rt_tgsigqueueinfo      usigno
 #define __NRAN3_rt_tgsigqueueinfo      uinfo
 #define __NRAN0_perf_event_open        TODO_PROTOTYPE
 #define __NRAN0_accept4                sockfd
@@ -1271,7 +1271,7 @@
 #define __NRATR3_rt_sigtimedwait        SC_REPR_SIZE_T                                          /* sigsetsize */ 
 #define __NRRTR_rt_sigtimedwait         SC_REPR_SYSCALL_SLONG_T                                 /* return */
 #define __NRATR0_rt_sigqueueinfo        SC_REPR_PID_T                                           /* tgid */ 
-#define __NRATR1_rt_sigqueueinfo        SC_REPR_SIGNO_T                                         /* signo */ 
+#define __NRATR1_rt_sigqueueinfo        SC_REPR_SIGNO_T                                         /* usigno */ 
 #define __NRATR2_rt_sigqueueinfo        SC_REPR_STRUCT_SIGINFO                                  /* uinfo */ 
 #define __NRRTR_rt_sigqueueinfo         SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_rt_sigreturn           SC_REPR_STRUCT_FPUSTATE                                 /* restore_fpu */ 
@@ -1594,7 +1594,7 @@
 #define __NRRTR_move_pages              SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_rt_tgsigqueueinfo      SC_REPR_PID_T                                           /* tgid */ 
 #define __NRATR1_rt_tgsigqueueinfo      SC_REPR_PID_T                                           /* tid */ 
-#define __NRATR2_rt_tgsigqueueinfo      SC_REPR_SIGNO_T                                         /* signo */ 
+#define __NRATR2_rt_tgsigqueueinfo      SC_REPR_SIGNO_T                                         /* usigno */ 
 #define __NRATR3_rt_tgsigqueueinfo      SC_REPR_STRUCT_SIGINFO                                  /* uinfo */ 
 #define __NRRTR_rt_tgsigqueueinfo       SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_perf_event_open        SC_REPR_INT                                             /* TODO_PROTOTYPE */ 

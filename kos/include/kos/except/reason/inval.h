@@ -179,6 +179,12 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS,                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 	E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS,        /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `open(O_WRONLY | O_NONBLOCK)' a fifo without any readers already connected. */
 	E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS,              /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
+	E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS,                   /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_open(2)' was non-zero. */
+	E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS,                  /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_getfd(2)' was non-zero. */
+	E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS,      /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_send_signal(2)' was non-zero. */
+	E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER,              /* E_INVALID_ARGUMENT_BAD_STATE: The thread specified by `pid' in a call to `pidfd_open(2)' isn't a process leader. */
+	E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO,                      /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: In a call to `rt_sigqueueinfo(2)', `rt_tgsigqueueinfo(2)' or `pidfd_send_signal(2)',
+	                                                                *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -333,6 +339,12 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS        E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS        /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `open(O_WRONLY | O_NONBLOCK)' a fifo without any readers already connected. */
 #define E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS                   /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_open(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS                  /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_getfd(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS      E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS      /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_send_signal(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER              E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER              /* E_INVALID_ARGUMENT_BAD_STATE: The thread specified by `pid' in a call to `pidfd_open(2)' isn't a process leader. */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO                      E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO                      /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: In a call to `rt_sigqueueinfo(2)', `rt_tgsigqueueinfo(2)' or `pidfd_send_signal(2)',
+                                                                                                                                     *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -484,6 +496,12 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_USERVIOFD_FLAGS                    133 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `userviofd(2)' isn't a set of `O_NONBLOCK | O_CLOEXEC | O_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_OPEN_FIFO_WRITER_NO_READERS        134 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `open(O_WRONLY | O_NONBLOCK)' a fifo without any readers already connected. */
 #define E_INVALID_ARGUMENT_CONTEXT_WRITE_FIFO_NO_READERS              135 /* E_INVALID_ARGUMENT_BAD_STATE: Attempted to `write(2)' to a fifo without any connected readers. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS                   136 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_open(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS                  137 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_getfd(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_PIDFD_SEND_SIGNAL_FLAGS      138 /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: The `flags' argument passed to `pidfd_send_signal(2)' was non-zero. */
+#define E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER              139 /* E_INVALID_ARGUMENT_BAD_STATE: The thread specified by `pid' in a call to `pidfd_open(2)' isn't a process leader. */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO                      140 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: In a call to `rt_sigqueueinfo(2)', `rt_tgsigqueueinfo(2)' or `pidfd_send_signal(2)',
+                                                                           *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

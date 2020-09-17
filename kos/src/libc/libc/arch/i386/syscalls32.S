@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87c8b002 */
+/* HASH CRC-32:0x6dcd7697 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3550,7 +3550,13 @@ INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait)
 END(libc_sys_Xrt_sigtimedwait)
 DEFINE_PUBLIC_ALIAS(sys_Xrt_sigtimedwait, libc_sys_Xrt_sigtimedwait)
 
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.rt_sigqueueinfo
 INTERN_FUNCTION(libc_sys_rt_sigqueueinfo)
 	movl   $(0xb2), %eax
@@ -3558,7 +3564,13 @@ INTERN_FUNCTION(libc_sys_rt_sigqueueinfo)
 END(libc_sys_rt_sigqueueinfo)
 DEFINE_PUBLIC_ALIAS(sys_rt_sigqueueinfo, libc_sys_rt_sigqueueinfo)
 
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.Xrt_sigqueueinfo
 INTERN_FUNCTION(libc_sys_Xrt_sigqueueinfo)
 	movl   $(0xb2), %eax
@@ -6178,7 +6190,13 @@ INTERN_FUNCTION(libc_sys_Xpwritev)
 END(libc_sys_Xpwritev)
 DEFINE_PUBLIC_ALIAS(sys_Xpwritev, libc_sys_Xpwritev)
 
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.rt_tgsigqueueinfo
 INTERN_FUNCTION(libc_sys_rt_tgsigqueueinfo)
 	movl   $(0x14f), %eax
@@ -6186,7 +6204,13 @@ INTERN_FUNCTION(libc_sys_rt_tgsigqueueinfo)
 END(libc_sys_rt_tgsigqueueinfo)
 DEFINE_PUBLIC_ALIAS(sys_rt_tgsigqueueinfo, libc_sys_rt_tgsigqueueinfo)
 
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.Xrt_tgsigqueueinfo
 INTERN_FUNCTION(libc_sys_Xrt_tgsigqueueinfo)
 	movl   $(0x14f), %eax
@@ -7872,19 +7896,43 @@ INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval_time64)
 END(libc_sys_Xsched_rr_get_interval_time64)
 DEFINE_PUBLIC_ALIAS(sys_Xsched_rr_get_interval_time64, libc_sys_Xsched_rr_get_interval_time64)
 
-/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+/* Send a signal to the process of a given pidfd
+ * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @param: flags:  Must always be `0' (for now)
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO:    [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:               [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:     [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+/* errno_t pidfd_send_signal(fd_t pidfd, signo_t usigno, struct __siginfox32_struct const *uinfo, syscall_ulong_t flags) */
 .section .text.crt.syscall.pidfd_send_signal
 INTERN_FUNCTION(libc_sys_pidfd_send_signal)
 	movl   $(0x1a8), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall4
 END(libc_sys_pidfd_send_signal)
 DEFINE_PUBLIC_ALIAS(sys_pidfd_send_signal, libc_sys_pidfd_send_signal)
 
-/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+/* Send a signal to the process of a given pidfd
+ * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @param: flags:  Must always be `0' (for now)
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO:    [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:               [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:     [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+/* errno_t pidfd_send_signal(fd_t pidfd, signo_t usigno, struct __siginfox32_struct const *uinfo, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xpidfd_send_signal
 INTERN_FUNCTION(libc_sys_Xpidfd_send_signal)
 	movl   $(0x1a8), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall4
 END(libc_sys_Xpidfd_send_signal)
 DEFINE_PUBLIC_ALIAS(sys_Xpidfd_send_signal, libc_sys_Xpidfd_send_signal)
 
@@ -8032,19 +8080,37 @@ INTERN_FUNCTION(libc_sys_Xfspick)
 END(libc_sys_Xfspick)
 DEFINE_PUBLIC_ALIAS(sys_Xfspick, libc_sys_Xfspick)
 
-/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+ * This system call exists for compatibility with linux, which does not allow
+ * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   A handle for the process `pid'
+ * @throw: E_PROCESS_EXITED:                                                                 [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
+/* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 .section .text.crt.syscall.pidfd_open
 INTERN_FUNCTION(libc_sys_pidfd_open)
 	movl   $(0x1b2), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall2
 END(libc_sys_pidfd_open)
 DEFINE_PUBLIC_ALIAS(sys_pidfd_open, libc_sys_pidfd_open)
 
-/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+ * This system call exists for compatibility with linux, which does not allow
+ * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   A handle for the process `pid'
+ * @throw: E_PROCESS_EXITED:                                                                 [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
+/* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xpidfd_open
 INTERN_FUNCTION(libc_sys_Xpidfd_open)
 	movl   $(0x1b2), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xpidfd_open)
 DEFINE_PUBLIC_ALIAS(sys_Xpidfd_open, libc_sys_Xpidfd_open)
 
@@ -8096,19 +8162,43 @@ INTERN_FUNCTION(libc_sys_Xopenat2)
 END(libc_sys_Xopenat2)
 DEFINE_PUBLIC_ALIAS(sys_Xopenat2, libc_sys_Xopenat2)
 
-/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+/* Duplicate the handle of a foreign process into a handle for the caller.
+ * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
+ * which may also be used to duplicate file handles from another process.
+ * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: fd:    The FD-number of the handle to clone
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   The duplicated handle number
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                            [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+/* fd_t pidfd_getfd(fd_t pidfd, fd_t foreign_fd, syscall_ulong_t flags) */
 .section .text.crt.syscall.pidfd_getfd
 INTERN_FUNCTION(libc_sys_pidfd_getfd)
 	movl   $(0x1b6), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall3
 END(libc_sys_pidfd_getfd)
 DEFINE_PUBLIC_ALIAS(sys_pidfd_getfd, libc_sys_pidfd_getfd)
 
-/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+/* Duplicate the handle of a foreign process into a handle for the caller.
+ * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
+ * which may also be used to duplicate file handles from another process.
+ * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: fd:    The FD-number of the handle to clone
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   The duplicated handle number
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                            [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+/* fd_t pidfd_getfd(fd_t pidfd, fd_t foreign_fd, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xpidfd_getfd
 INTERN_FUNCTION(libc_sys_Xpidfd_getfd)
 	movl   $(0x1b6), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xpidfd_getfd)
 DEFINE_PUBLIC_ALIAS(sys_Xpidfd_getfd, libc_sys_Xpidfd_getfd)
 

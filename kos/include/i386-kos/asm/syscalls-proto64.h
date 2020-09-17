@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc27e6c7c */
+/* HASH CRC-32:0x2324674b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -373,7 +373,7 @@
 #define __NRAC_statx                  1
 #define __NRAC_io_pgetevents          1
 #define __NRAC_rseq                   1
-#define __NRAC_pidfd_send_signal      1
+#define __NRAC_pidfd_send_signal      4
 #define __NRAC_io_uring_setup         1
 #define __NRAC_io_uring_enter         1
 #define __NRAC_io_uring_register      1
@@ -383,11 +383,11 @@
 #define __NRAC_fsconfig               1
 #define __NRAC_fsmount                1
 #define __NRAC_fspick                 1
-#define __NRAC_pidfd_open             1
+#define __NRAC_pidfd_open             2
 #define __NRAC_clone3                 1
 #define __NRAC_close_range            1
 #define __NRAC_openat2                1
-#define __NRAC_pidfd_getfd            1
+#define __NRAC_pidfd_getfd            3
 #define __NRAC_faccessat2             1
 #define __NRAC_pwritevf               5
 #define __NRAC_preadvf                5
@@ -791,11 +791,11 @@
 #define __NRRT_fsconfig               (errno_t, __errno_t)
 #define __NRRT_fsmount                (errno_t, __errno_t)
 #define __NRRT_fspick                 (errno_t, __errno_t)
-#define __NRRT_pidfd_open             (errno_t, __errno_t)
+#define __NRRT_pidfd_open             (fd_t, __fd_t)
 #define __NRRT_clone3                 (errno_t, __errno_t)
 #define __NRRT_close_range            (errno_t, __errno_t)
 #define __NRRT_openat2                (errno_t, __errno_t)
-#define __NRRT_pidfd_getfd            (errno_t, __errno_t)
+#define __NRRT_pidfd_getfd            (fd_t, __fd_t)
 #define __NRRT_faccessat2             (errno_t, __errno_t)
 #define __NRRT_pwritevf               (ssize_t, __ssize_t)
 #define __NRRT_preadvf                (ssize_t, __ssize_t)
@@ -1605,7 +1605,10 @@
 #define __NRAT0_statx                  (int, int)
 #define __NRAT0_io_pgetevents          (int, int)
 #define __NRAT0_rseq                   (int, int)
-#define __NRAT0_pidfd_send_signal      (int, int)
+#define __NRAT0_pidfd_send_signal      (fd_t, __fd_t)
+#define __NRAT1_pidfd_send_signal      (signo_t, __signo_t)
+#define __NRAT2_pidfd_send_signal      (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
+#define __NRAT3_pidfd_send_signal      (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_io_uring_setup         (int, int)
 #define __NRAT0_io_uring_enter         (int, int)
 #define __NRAT0_io_uring_register      (int, int)
@@ -1615,11 +1618,14 @@
 #define __NRAT0_fsconfig               (int, int)
 #define __NRAT0_fsmount                (int, int)
 #define __NRAT0_fspick                 (int, int)
-#define __NRAT0_pidfd_open             (int, int)
+#define __NRAT0_pidfd_open             (pid_t, __pid_t)
+#define __NRAT1_pidfd_open             (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_clone3                 (int, int)
 #define __NRAT0_close_range            (int, int)
 #define __NRAT0_openat2                (int, int)
-#define __NRAT0_pidfd_getfd            (int, int)
+#define __NRAT0_pidfd_getfd            (fd_t, __fd_t)
+#define __NRAT1_pidfd_getfd            (fd_t, __fd_t)
+#define __NRAT2_pidfd_getfd            (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_faccessat2             (int, int)
 #define __NRAT0_pwritevf               (fd_t, __fd_t)
 #define __NRAT1_pwritevf               (struct iovecx64 const *, struct __iovecx64 const *)
@@ -2124,7 +2130,7 @@
 #define __NRAM_statx(a, b, c, d, e, f)                  (int)a
 #define __NRAM_io_pgetevents(a, b, c, d, e, f)          (int)a
 #define __NRAM_rseq(a, b, c, d, e, f)                   (int)a
-#define __NRAM_pidfd_send_signal(a, b, c, d, e, f)      (int)a
+#define __NRAM_pidfd_send_signal(a, b, c, d, e, f)      (__fd_t)a, (__signo_t)b, (struct __siginfox64_struct const *)c, (__syscall_ulong_t)d
 #define __NRAM_io_uring_setup(a, b, c, d, e, f)         (int)a
 #define __NRAM_io_uring_enter(a, b, c, d, e, f)         (int)a
 #define __NRAM_io_uring_register(a, b, c, d, e, f)      (int)a
@@ -2134,11 +2140,11 @@
 #define __NRAM_fsconfig(a, b, c, d, e, f)               (int)a
 #define __NRAM_fsmount(a, b, c, d, e, f)                (int)a
 #define __NRAM_fspick(a, b, c, d, e, f)                 (int)a
-#define __NRAM_pidfd_open(a, b, c, d, e, f)             (int)a
+#define __NRAM_pidfd_open(a, b, c, d, e, f)             (__pid_t)a, (__syscall_ulong_t)b
 #define __NRAM_clone3(a, b, c, d, e, f)                 (int)a
 #define __NRAM_close_range(a, b, c, d, e, f)            (int)a
 #define __NRAM_openat2(a, b, c, d, e, f)                (int)a
-#define __NRAM_pidfd_getfd(a, b, c, d, e, f)            (int)a
+#define __NRAM_pidfd_getfd(a, b, c, d, e, f)            (__fd_t)a, (__fd_t)b, (__syscall_ulong_t)c
 #define __NRAM_faccessat2(a, b, c, d, e, f)             (int)a
 #define __NRAM_pwritevf(a, b, c, d, e, f)               (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NRAM_preadvf(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
@@ -2532,7 +2538,7 @@
 #define __NRAP_statx(a)                                 (__syscall_ulong_t)a
 #define __NRAP_io_pgetevents(a)                         (__syscall_ulong_t)a
 #define __NRAP_rseq(a)                                  (__syscall_ulong_t)a
-#define __NRAP_pidfd_send_signal(a)                     (__syscall_ulong_t)a
+#define __NRAP_pidfd_send_signal(a, b, c, d)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_io_uring_setup(a)                        (__syscall_ulong_t)a
 #define __NRAP_io_uring_enter(a)                        (__syscall_ulong_t)a
 #define __NRAP_io_uring_register(a)                     (__syscall_ulong_t)a
@@ -2542,11 +2548,11 @@
 #define __NRAP_fsconfig(a)                              (__syscall_ulong_t)a
 #define __NRAP_fsmount(a)                               (__syscall_ulong_t)a
 #define __NRAP_fspick(a)                                (__syscall_ulong_t)a
-#define __NRAP_pidfd_open(a)                            (__syscall_ulong_t)a
+#define __NRAP_pidfd_open(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_clone3(a)                                (__syscall_ulong_t)a
 #define __NRAP_close_range(a)                           (__syscall_ulong_t)a
 #define __NRAP_openat2(a)                               (__syscall_ulong_t)a
-#define __NRAP_pidfd_getfd(a)                           (__syscall_ulong_t)a
+#define __NRAP_pidfd_getfd(a, b, c)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_faccessat2(a)                            (__syscall_ulong_t)a
 #define __NRAP_pwritevf(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_preadvf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

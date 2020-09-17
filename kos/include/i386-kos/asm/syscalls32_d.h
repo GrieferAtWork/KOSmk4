@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb938942 */
+/* HASH CRC-32:0xcb573b2c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -313,7 +313,13 @@
 #define __NR32_rt_sigprocmask               0xaf                   /* errno_t rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize) */
 #define __NR32_rt_sigpending                0xb0                   /* errno_t rt_sigpending(struct __sigset_struct *set, size_t sigsetsize) */
 #define __NR32_rt_sigtimedwait              0xb1                   /* syscall_slong_t rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32 const *timeout, size_t sigsetsize) */
-#define __NR32_rt_sigqueueinfo              0xb2                   /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+#define __NR32_rt_sigqueueinfo              0xb2                   /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 #define __NR32_rt_sigsuspend                0xb3                   /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define __NR32_pread64                      0xb4                   /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define __NR32_pwrite64                     0xb5                   /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
@@ -556,7 +562,13 @@
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 #define __NR32_pwritev                      0x14e                  /* ssize_t pwritev(fd_t fd, struct iovecx32 const *iovec, size_t count, uint64_t offset) */
-#define __NR32_rt_tgsigqueueinfo            0x14f                  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t signo, struct __siginfox32_struct const *uinfo) */
+/* @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
+#define __NR32_rt_tgsigqueueinfo            0x14f                  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 #define __NR32_perf_event_open              0x150                  /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
@@ -829,7 +841,19 @@
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 #define __NR32_futex_time64                 0x1a6                  /* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define __NR32_sched_rr_get_interval_time64 0x1a7                  /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
-#define __NR32_pidfd_send_signal            0x1a8                  /* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+/* Send a signal to the process of a given pidfd
+ * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
+ * @param: usigno: The signal that should be sent
+ * @param: uinfo:  [0..1] Additional signal information
+ * @param: flags:  Must always be `0' (for now)
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_UNEXPECTED_COMMAND:E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO:    [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:               [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:     [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+#define __NR32_pidfd_send_signal            0x1a8                  /* errno_t pidfd_send_signal(fd_t pidfd, signo_t usigno, struct __siginfox32_struct const *uinfo, syscall_ulong_t flags) */
 #define __NR32_io_uring_setup               0x1a9                  /* errno_t io_uring_setup(int TODO_PROTOTYPE) */
 #define __NR32_io_uring_enter               0x1aa                  /* errno_t io_uring_enter(int TODO_PROTOTYPE) */
 #define __NR32_io_uring_register            0x1ab                  /* errno_t io_uring_register(int TODO_PROTOTYPE) */
@@ -839,11 +863,32 @@
 #define __NR32_fsconfig                     0x1af                  /* errno_t fsconfig(int TODO_PROTOTYPE) */
 #define __NR32_fsmount                      0x1b0                  /* errno_t fsmount(int TODO_PROTOTYPE) */
 #define __NR32_fspick                       0x1b1                  /* errno_t fspick(int TODO_PROTOTYPE) */
-#define __NR32_pidfd_open                   0x1b2                  /* errno_t pidfd_open(int TODO_PROTOTYPE) */
+/* Return a `HANDLE_TYPE_TASK' handle for the given `pid'
+ * This system call exists for compatibility with linux, which does not allow
+ * this call to succeed when `pid' isn't a process leader (i.e. main() thread)
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   A handle for the process `pid'
+ * @throw: E_PROCESS_EXITED:                                                                 [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_FLAGS: [...]
+ * @throw: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_PIDFD_OPEN_NOTALEADER:    [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                           [...] */
+#define __NR32_pidfd_open                   0x1b2                  /* fd_t pidfd_open(pid_t pid, syscall_ulong_t flags) */
 #define __NR32_clone3                       0x1b3                  /* errno_t clone3(int TODO_PROTOTYPE) */
 #define __NR32_close_range                  0x1b4                  /* errno_t close_range(int TODO_PROTOTYPE) */
 #define __NR32_openat2                      0x1b5                  /* errno_t openat2(int TODO_PROTOTYPE) */
-#define __NR32_pidfd_getfd                  0x1b6                  /* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+/* Duplicate the handle of a foreign process into a handle for the caller.
+ * This system call duplicates the functionality of `open("/proc/[pid]/fd/[fdno]")',
+ * which may also be used to duplicate file handles from another process.
+ * @param: pidfd: A `HANDLE_TYPE_TASK'-handle
+ * @param: fd:    The FD-number of the handle to clone
+ * @param: flags: Must always be `0' (for now)
+ * @return: * :   The duplicated handle number
+ * @throw: E_PROCESS_EXITED:                                                                  [...]
+ * @throw: E_INVALID_ARGUMENT_RESERVED_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_PIDFD_GETFD_FLAGS: [...]
+ * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS:                                            [...]
+ * @throw: E_INVALID_HANDLE_FILE:                                                             [...]
+ * @throw: E_ILLEGAL_OPERATION:                                                               [...] */
+#define __NR32_pidfd_getfd                  0x1b6                  /* fd_t pidfd_getfd(fd_t pidfd, fd_t foreign_fd, syscall_ulong_t flags) */
 #define __NR32_faccessat2                   0x1b7                  /* errno_t faccessat2(int TODO_PROTOTYPE) */
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -2428,7 +2473,7 @@
 #define __NR32RC_rt_sigtimedwait_time64       4
 #define __NR32RC_futex_time64                 6
 #define __NR32RC_sched_rr_get_interval_time64 2
-#define __NR32RC_pidfd_send_signal            1
+#define __NR32RC_pidfd_send_signal            4
 #define __NR32RC_io_uring_setup               1
 #define __NR32RC_io_uring_enter               1
 #define __NR32RC_io_uring_register            1
@@ -2438,11 +2483,11 @@
 #define __NR32RC_fsconfig                     1
 #define __NR32RC_fsmount                      1
 #define __NR32RC_fspick                       1
-#define __NR32RC_pidfd_open                   1
+#define __NR32RC_pidfd_open                   2
 #define __NR32RC_clone3                       1
 #define __NR32RC_close_range                  1
 #define __NR32RC_openat2                      1
-#define __NR32RC_pidfd_getfd                  1
+#define __NR32RC_pidfd_getfd                  3
 #define __NR32RC_faccessat2                   1
 #define __NR32RC_pwritevf                     6 /* __NR32AC_pwritevf + 1 */
 #define __NR32RC_preadvf                      6 /* __NR32AC_preadvf + 1 */

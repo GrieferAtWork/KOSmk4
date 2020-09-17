@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56f80ea6 */
+/* HASH CRC-32:0x77c62ad8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -373,7 +373,7 @@
 #define __NR64AC_statx                  1
 #define __NR64AC_io_pgetevents          1
 #define __NR64AC_rseq                   1
-#define __NR64AC_pidfd_send_signal      1
+#define __NR64AC_pidfd_send_signal      4
 #define __NR64AC_io_uring_setup         1
 #define __NR64AC_io_uring_enter         1
 #define __NR64AC_io_uring_register      1
@@ -383,11 +383,11 @@
 #define __NR64AC_fsconfig               1
 #define __NR64AC_fsmount                1
 #define __NR64AC_fspick                 1
-#define __NR64AC_pidfd_open             1
+#define __NR64AC_pidfd_open             2
 #define __NR64AC_clone3                 1
 #define __NR64AC_close_range            1
 #define __NR64AC_openat2                1
-#define __NR64AC_pidfd_getfd            1
+#define __NR64AC_pidfd_getfd            3
 #define __NR64AC_faccessat2             1
 #define __NR64AC_pwritevf               5
 #define __NR64AC_preadvf                5
@@ -791,11 +791,11 @@
 #define __NR64RT_fsconfig               (errno_t, __errno_t)
 #define __NR64RT_fsmount                (errno_t, __errno_t)
 #define __NR64RT_fspick                 (errno_t, __errno_t)
-#define __NR64RT_pidfd_open             (errno_t, __errno_t)
+#define __NR64RT_pidfd_open             (fd_t, __fd_t)
 #define __NR64RT_clone3                 (errno_t, __errno_t)
 #define __NR64RT_close_range            (errno_t, __errno_t)
 #define __NR64RT_openat2                (errno_t, __errno_t)
-#define __NR64RT_pidfd_getfd            (errno_t, __errno_t)
+#define __NR64RT_pidfd_getfd            (fd_t, __fd_t)
 #define __NR64RT_faccessat2             (errno_t, __errno_t)
 #define __NR64RT_pwritevf               (ssize_t, __ssize_t)
 #define __NR64RT_preadvf                (ssize_t, __ssize_t)
@@ -1605,7 +1605,10 @@
 #define __NR64AT0_statx                  (int, int)
 #define __NR64AT0_io_pgetevents          (int, int)
 #define __NR64AT0_rseq                   (int, int)
-#define __NR64AT0_pidfd_send_signal      (int, int)
+#define __NR64AT0_pidfd_send_signal      (fd_t, __fd_t)
+#define __NR64AT1_pidfd_send_signal      (signo_t, __signo_t)
+#define __NR64AT2_pidfd_send_signal      (struct __siginfox64_struct const *, struct __siginfox64_struct const *)
+#define __NR64AT3_pidfd_send_signal      (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_io_uring_setup         (int, int)
 #define __NR64AT0_io_uring_enter         (int, int)
 #define __NR64AT0_io_uring_register      (int, int)
@@ -1615,11 +1618,14 @@
 #define __NR64AT0_fsconfig               (int, int)
 #define __NR64AT0_fsmount                (int, int)
 #define __NR64AT0_fspick                 (int, int)
-#define __NR64AT0_pidfd_open             (int, int)
+#define __NR64AT0_pidfd_open             (pid_t, __pid_t)
+#define __NR64AT1_pidfd_open             (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_clone3                 (int, int)
 #define __NR64AT0_close_range            (int, int)
 #define __NR64AT0_openat2                (int, int)
-#define __NR64AT0_pidfd_getfd            (int, int)
+#define __NR64AT0_pidfd_getfd            (fd_t, __fd_t)
+#define __NR64AT1_pidfd_getfd            (fd_t, __fd_t)
+#define __NR64AT2_pidfd_getfd            (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_faccessat2             (int, int)
 #define __NR64AT0_pwritevf               (fd_t, __fd_t)
 #define __NR64AT1_pwritevf               (struct iovecx64 const *, struct __iovecx64 const *)
@@ -2124,7 +2130,7 @@
 #define __NR64AM_statx(a, b, c, d, e, f)                  (int)a
 #define __NR64AM_io_pgetevents(a, b, c, d, e, f)          (int)a
 #define __NR64AM_rseq(a, b, c, d, e, f)                   (int)a
-#define __NR64AM_pidfd_send_signal(a, b, c, d, e, f)      (int)a
+#define __NR64AM_pidfd_send_signal(a, b, c, d, e, f)      (__fd_t)a, (__signo_t)b, (struct __siginfox64_struct const *)c, (__syscall_ulong_t)d
 #define __NR64AM_io_uring_setup(a, b, c, d, e, f)         (int)a
 #define __NR64AM_io_uring_enter(a, b, c, d, e, f)         (int)a
 #define __NR64AM_io_uring_register(a, b, c, d, e, f)      (int)a
@@ -2134,11 +2140,11 @@
 #define __NR64AM_fsconfig(a, b, c, d, e, f)               (int)a
 #define __NR64AM_fsmount(a, b, c, d, e, f)                (int)a
 #define __NR64AM_fspick(a, b, c, d, e, f)                 (int)a
-#define __NR64AM_pidfd_open(a, b, c, d, e, f)             (int)a
+#define __NR64AM_pidfd_open(a, b, c, d, e, f)             (__pid_t)a, (__syscall_ulong_t)b
 #define __NR64AM_clone3(a, b, c, d, e, f)                 (int)a
 #define __NR64AM_close_range(a, b, c, d, e, f)            (int)a
 #define __NR64AM_openat2(a, b, c, d, e, f)                (int)a
-#define __NR64AM_pidfd_getfd(a, b, c, d, e, f)            (int)a
+#define __NR64AM_pidfd_getfd(a, b, c, d, e, f)            (__fd_t)a, (__fd_t)b, (__syscall_ulong_t)c
 #define __NR64AM_faccessat2(a, b, c, d, e, f)             (int)a
 #define __NR64AM_pwritevf(a, b, c, d, e, f)               (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NR64AM_preadvf(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
@@ -2532,7 +2538,7 @@
 #define __NR64AP_statx(a)                                 (__syscall_ulong_t)a
 #define __NR64AP_io_pgetevents(a)                         (__syscall_ulong_t)a
 #define __NR64AP_rseq(a)                                  (__syscall_ulong_t)a
-#define __NR64AP_pidfd_send_signal(a)                     (__syscall_ulong_t)a
+#define __NR64AP_pidfd_send_signal(a, b, c, d)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_io_uring_setup(a)                        (__syscall_ulong_t)a
 #define __NR64AP_io_uring_enter(a)                        (__syscall_ulong_t)a
 #define __NR64AP_io_uring_register(a)                     (__syscall_ulong_t)a
@@ -2542,11 +2548,11 @@
 #define __NR64AP_fsconfig(a)                              (__syscall_ulong_t)a
 #define __NR64AP_fsmount(a)                               (__syscall_ulong_t)a
 #define __NR64AP_fspick(a)                                (__syscall_ulong_t)a
-#define __NR64AP_pidfd_open(a)                            (__syscall_ulong_t)a
+#define __NR64AP_pidfd_open(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_clone3(a)                                (__syscall_ulong_t)a
 #define __NR64AP_close_range(a)                           (__syscall_ulong_t)a
 #define __NR64AP_openat2(a)                               (__syscall_ulong_t)a
-#define __NR64AP_pidfd_getfd(a)                           (__syscall_ulong_t)a
+#define __NR64AP_pidfd_getfd(a, b, c)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_faccessat2(a)                            (__syscall_ulong_t)a
 #define __NR64AP_pwritevf(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_preadvf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

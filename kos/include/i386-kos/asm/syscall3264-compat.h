@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91c84e6d */
+/* HASH CRC-32:0x62161515 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,7 +200,6 @@
 #define __NR3264COMPAT_personality            1(personality)
 #define __NR3264COMPAT_pidfd_getfd            1(pidfd_getfd)
 #define __NR3264COMPAT_pidfd_open             1(pidfd_open)
-#define __NR3264COMPAT_pidfd_send_signal      1(pidfd_send_signal)
 #define __NR3264COMPAT_pipe                   1(pipe)
 #define __NR3264COMPAT_pipe2                  1(pipe2)
 #define __NR3264COMPAT_pivot_root             1(pivot_root)

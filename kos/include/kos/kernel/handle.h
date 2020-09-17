@@ -62,7 +62,8 @@
                                             * Castable into: HANDLE_TYPE_DATABLOCK, HANDLE_TYPE_DIRECTORYENTRY */
 #define HANDLE_TYPE_FS              0x0007 /* `struct fs' */
 #define HANDLE_TYPE_VM              0x0008 /* `struct vm' */
-#define HANDLE_TYPE_TASK            0x0009 /* `struct taskpid' */
+#define HANDLE_TYPE_TASK            0x0009 /* `struct taskpid'
+                                            * Castable into: HANDLE_TYPE_FS, HANDLE_TYPE_VM, HANDLE_TYPE_PIDNS */
 #define HANDLE_TYPE_CLOCK           0x000a /* `struct realtime_clock_struct' */
 #define HANDLE_TYPE_DRIVER          0x000b /* `struct driver' */
 #define HANDLE_TYPE_PIPE            0x000c /* `struct pipe' */

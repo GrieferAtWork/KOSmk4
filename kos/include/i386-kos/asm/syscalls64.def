@@ -141,6 +141,7 @@ timer_gettime = timer_gettimex64;
 mq_timedsend = mq_timedsendx64;
 mq_timedreceive = mq_timedreceivex64;
 io_pgetevents = io_pgeteventsx64;
+pidfd_send_signal = pidfd_send_signalx64;
 
 
 /* Syscall definition syntax

@@ -1474,7 +1474,7 @@ NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
  * @return: * : The number of processes to which the signal was delivered. */
 PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
 task_raisesignalprocessgroup(struct task *__restrict target,
-                             USER CHECKED siginfo_t *info,
+                             USER CHECKED siginfo_t const *info,
                              gfp_t rpc_flags)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED) {
@@ -2111,7 +2111,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 	info.si_signo = signo;
 	info.si_errno = 0;
 	info.si_code  = SI_USER;
-	info.si_uid   = (typeof(info.si_uid))cred_geteuid();
+	info.si_uid   = (__uid_t)cred_geteuid();
 	mypid         = THIS_TASKPID;
 	if (pid > 0) {
 		/* Kill the thread matching `pid'. */
@@ -2171,8 +2171,8 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 		info.si_signo = signo;
 		info.si_errno = 0;
 		info.si_code  = SI_TKILL;
-		info.si_uid   = (typeof(info.si_uid))cred_geteuid();
-		info.si_pid   = taskpid_getpid_ind(THIS_TASKPID, get_pid_indirection(target));
+		info.si_uid   = (__uid_t)cred_geteuid();
+		info.si_pid   = (__pid_t)taskpid_getpid_ind(THIS_TASKPID, get_pid_indirection(target));
 		if (!task_raisesignalthread(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	}
@@ -2198,8 +2198,8 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, signo_t, signo) {
 		info.si_signo = signo;
 		info.si_errno = 0;
 		info.si_code  = SI_TKILL;
-		info.si_uid   = (typeof(info.si_uid))cred_geteuid();
-		info.si_pid   = taskpid_getpid_ind(THIS_TASKPID, get_pid_indirection(target));
+		info.si_uid   = (__uid_t)cred_geteuid();
+		info.si_pid   = (__pid_t)taskpid_getpid_ind(THIS_TASKPID, get_pid_indirection(target));
 		if (!task_raisesignalthread(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	}
@@ -2214,23 +2214,77 @@ DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, signo_t, signo) {
 /************************************************************************/
 /* rt_sigqueueinfo(), rt_tgsigqueueinfo()                               */
 /************************************************************************/
+
+/* Fill in `info' from `usigno' + `uinfo' */
+INTERN NONNULL((1)) void KCALL
+siginfo_from_user(siginfo_t *__restrict info, signo_t usigno,
+                  USER UNCHECKED siginfo_t const *uinfo) {
+	if unlikely(usigno < 0 || usigno >= NSIG) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      usigno);
+	}
+	if (uinfo) {
+		validate_readable(uinfo, sizeof(siginfo_t));
+		COMPILER_READ_BARRIER();
+		memcpy(info, uinfo, sizeof(siginfo_t));
+		COMPILER_READ_BARRIER();
+		if unlikely(usigno != info->si_signo) {
+			THROW(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO,
+			      usigno, info->si_signo);
+		}
+	} else {
+		memset(info, 0, sizeof(*info));
+		info->si_signo = usigno;
+		info->si_errno = 0;
+		info->si_code  = SI_USER;
+		info->si_pid   = (__pid_t)task_getpid();
+		info->si_uid   = (__uid_t)cred_geteuid();
+	}
+}
+
+#ifdef __ARCH_HAVE_COMPAT
+INTERN NONNULL((1)) void KCALL
+siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
+                         USER UNCHECKED compat_siginfo_t const *uinfo) {
+	if unlikely(usigno < 0 || usigno >= NSIG) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+		      usigno);
+	}
+	if (uinfo) {
+		compat_validate_readable(uinfo, sizeof(compat_siginfo_t));
+		compat_siginfo_to_siginfo(uinfo, info);
+		if (usigno != info->si_signo) {
+			THROW(E_INVALID_ARGUMENT_UNEXPECTED_COMMAND,
+			      E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO,
+			      usigno, info->si_signo);
+		}
+	} else {
+		memset(info, 0, sizeof(*info));
+		info->si_signo = usigno;
+		info->si_errno = 0;
+		info->si_code  = SI_USER;
+		info->si_pid   = (__pid_t)task_getpid();
+		info->si_uid   = (__uid_t)cred_geteuid();
+	}
+}
+#endif /* __ARCH_HAVE_COMPAT */
+
+
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGQUEUEINFO
 DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
                 pid_t, tgid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
 	REF struct task *target;
 	siginfo_t info;
-	if unlikely(tgid <= 0)
+	if unlikely(tgid <= 0) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
-	if unlikely(signo < 0 || signo >= NSIG)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
-	validate_readable(uinfo, sizeof(siginfo_t));
-	memcpy(&info, uinfo, sizeof(siginfo_t));
-	COMPILER_READ_BARRIER();
-	info.si_signo = signo;
-	target        = pidns_lookup_task(THIS_PIDNS, (upid_t)tgid);
+	}
+	siginfo_from_user(&info, signo, uinfo);
+	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tgid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
@@ -2259,13 +2313,7 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tid);
-	if unlikely(signo < 0 || signo >= NSIG)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
-	validate_readable(uinfo, sizeof(siginfo_t));
-	memcpy(&info, uinfo, sizeof(siginfo_t));
-	COMPILER_READ_BARRIER();
-	info.si_signo = signo;
+	siginfo_from_user(&info, signo, uinfo);
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
@@ -2294,14 +2342,8 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 	if unlikely(tgid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
-	if unlikely(signo < 0 || signo >= NSIG)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
-	validate_readable(uinfo, sizeof(compat_siginfo_t));
-	compat_siginfo_to_siginfo(uinfo, &info);
-	COMPILER_READ_BARRIER();
-	info.si_signo = signo;
-	target        = pidns_lookup_task(THIS_PIDNS, (upid_t)tgid);
+	siginfo_from_compat_user(&info, signo, uinfo);
+	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tgid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
@@ -2330,13 +2372,7 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tid);
-	if unlikely(signo < 0 || signo >= NSIG)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
-	validate_readable(uinfo, sizeof(compat_siginfo_t));
-	compat_siginfo_to_siginfo(uinfo, &info);
-	COMPILER_READ_BARRIER();
-	info.si_signo = signo;
+	siginfo_from_compat_user(&info, signo, uinfo);
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */

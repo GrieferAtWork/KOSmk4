@@ -461,11 +461,6 @@ handle_task_tryas(struct taskpid *__restrict self,
 			break;
 		return incref(THIS_FS);
 
-	case HANDLE_TYPE_PATH:
-		if (self != THIS_TASKPID)
-			break;
-		return incref(THIS_VFS);
-
 	case HANDLE_TYPE_PIDNS:
 		if (self != THIS_TASKPID)
 			break;
