@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c9c2bf0 */
+/* HASH CRC-32:0x6faa9064 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11516,6 +11516,94 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kreaddir)
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_kreaddir)
+
+/* Check for pending signals, and keep on handling them until none are left
+ * The [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until none are left, in case more than one signal
+ * became available.
+ * This system call is only needed when `set_userprocmask_address(2)' was used. */
+/* errno_t sigmask_check(void) */
+.section .text.x86.asm64_syscall.sigmask_check
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigmask_check)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffdb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_sigmask_check)
+	call   sys_sigmask_check
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_sigmask_check)
+
+/* Register the address of the calling thread's userprocmask controller.
+ * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(&ctl, sizeof(struct userprocmask));
+ *       >> ctl.pm_sigsize = sizeof(sigset_t);
+ *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional, arch-specific fields to all zeroes.
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the `pm_sigmask'
+ *       of the previously set controller into its internal signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
+ * Note also that this function replaces `set_tid_address(2)', such that
+ * it negates a prior call to said function, while a future call to said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+.section .text.x86.asm64_syscall.set_userprocmask_address
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_set_userprocmask_address)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0xffffffffffffffdc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_set_userprocmask_address)
+	call   sys_set_userprocmask_address
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_set_userprocmask_address)
 
 /* Check if a transaction is currently in progress
  * @return: 0 : No RTM operation in progress
@@ -28639,6 +28727,95 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	.cfi_endproc
 END(__x86_asm32_int80_ftime64)
 
+/* Check for pending signals, and keep on handling them until none are left
+ * The [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until none are left, in case more than one signal
+ * became available.
+ * This system call is only needed when `set_userprocmask_address(2)' was used. */
+/* errno_t sigmask_check(void) */
+.section .text.x86.asm32_syscall_int80.sigmask_check
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigmask_check)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffdf
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys32_sigmask_check)
+	call   sys32_sigmask_check
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_sigmask_check)
+
+/* Register the address of the calling thread's userprocmask controller.
+ * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(&ctl, sizeof(struct userprocmask));
+ *       >> ctl.pm_sigsize = sizeof(sigset_t);
+ *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional, arch-specific fields to all zeroes.
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the `pm_sigmask'
+ *       of the previously set controller into its internal signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
+ * Note also that this function replaces `set_tid_address(2)', such that
+ * it negates a prior call to said function, while a future call to said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+.section .text.x86.asm32_syscall_int80.set_userprocmask_address
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_userprocmask_address)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_set_userprocmask_address)
+	call   sys32_set_userprocmask_address
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_set_userprocmask_address)
+
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_int80.utime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
@@ -33630,6 +33807,40 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rtm_begin, __x86_asm32_int80_rtm_b
 
 /* errno_t ftime64(struct timebx32_64 *tp) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_ftime64, __x86_asm32_int80_ftime64)
+
+/* Check for pending signals, and keep on handling them until none are left
+ * The [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until none are left, in case more than one signal
+ * became available.
+ * This system call is only needed when `set_userprocmask_address(2)' was used. */
+/* errno_t sigmask_check(void) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigmask_check, __x86_asm32_int80_sigmask_check)
+
+/* Register the address of the calling thread's userprocmask controller.
+ * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(&ctl, sizeof(struct userprocmask));
+ *       >> ctl.pm_sigsize = sizeof(sigset_t);
+ *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional, arch-specific fields to all zeroes.
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the `pm_sigmask'
+ *       of the previously set controller into its internal signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
+ * Note also that this function replaces `set_tid_address(2)', such that
+ * it negates a prior call to said function, while a future call to said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_userprocmask_address, __x86_asm32_int80_set_userprocmask_address)
 
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
@@ -39835,6 +40046,47 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ftime64)
 	jmp    sys32_ftime64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ftime64)
+
+/* Check for pending signals, and keep on handling them until none are left
+ * The [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until none are left, in case more than one signal
+ * became available.
+ * This system call is only needed when `set_userprocmask_address(2)' was used. */
+/* errno_t sigmask_check(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_sigmask_check, sys32_sigmask_check); */
+
+/* Register the address of the calling thread's userprocmask controller.
+ * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(&ctl, sizeof(struct userprocmask));
+ *       >> ctl.pm_sigsize = sizeof(sigset_t);
+ *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional, arch-specific fields to all zeroes.
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the `pm_sigmask'
+ *       of the previously set controller into its internal signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
+ * Note also that this function replaces `set_tid_address(2)', such that
+ * it negates a prior call to said function, while a future call to said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+.section .text.x86.asm32_syscall_sysrun32.set_userprocmask_address
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_userprocmask_address)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_set_userprocmask_address)
+	jmp    sys32_set_userprocmask_address
+	.cfi_endproc
+END(__x86_asm32_sysrun32_set_userprocmask_address)
 
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_sysrun32.utime64

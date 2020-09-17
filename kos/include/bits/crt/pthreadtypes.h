@@ -37,6 +37,15 @@
 #include <bits/sched_param.h> /* `struct sched_param' */
 #include <bits/types.h>       /* __pid_t, etc... */
 #include <kos/anno.h>         /* __WEAK */
+#include <asm/unistd.h>       /* __WEAK */
+#undef __LIBC_CONFIG_HAVE_USERPROCMASK
+#ifdef __NR_set_userprocmask_address
+#define __LIBC_CONFIG_HAVE_USERPROCMASK 1
+#endif /* __NR_set_userprocmask_address */
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+#include <kos/bits/userprocmask.h>
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+
 #endif /* __USE_PTHREAD_INTERNALS */
 
 __DECL_BEGIN
@@ -48,13 +57,19 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
 
 #ifdef __USE_PTHREAD_INTERNALS
 #ifdef __KOS__
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+#define __OFFSET_PTHREAD_PMASK     0
+#define __OFFSET_PTHREAD_TID       (__OFFSET_PTHREAD_PMASK + __OFFSET_USERPROCMASK_MYTID)
+#define __OFFSET_PTHREAD_REFCNT    (__SIZEOF_USERPROCMASK + (__SIZEOF_SIGSET_T__ * 2))
+#else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 #define __OFFSET_PTHREAD_TID       0
-#define __OFFSET_PTHREAD_REFCNT    (__SIZEOF_POINTER__ * 1)
-#define __OFFSET_PTHREAD_RETVAL    (__SIZEOF_POINTER__ * 2)
-#define __OFFSET_PTHREAD_TLS       (__SIZEOF_POINTER__ * 3)
-#define __OFFSET_PTHREAD_STACKADDR (__SIZEOF_POINTER__ * 4)
-#define __OFFSET_PTHREAD_STACKSIZE (__SIZEOF_POINTER__ * 5)
-#define __OFFSET_PTHREAD_FLAGS     (__SIZEOF_POINTER__ * 6)
+#define __OFFSET_PTHREAD_REFCNT    __SIZEOF_POINTER__ 
+#endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
+#define __OFFSET_PTHREAD_RETVAL    (__OFFSET_PTHREAD_REFCNT + __SIZEOF_POINTER__)
+#define __OFFSET_PTHREAD_TLS       (__OFFSET_PTHREAD_REFCNT + __SIZEOF_POINTER__ * 2)
+#define __OFFSET_PTHREAD_STACKADDR (__OFFSET_PTHREAD_REFCNT + __SIZEOF_POINTER__ * 3)
+#define __OFFSET_PTHREAD_STACKSIZE (__OFFSET_PTHREAD_REFCNT + __SIZEOF_POINTER__ * 4)
+#define __OFFSET_PTHREAD_FLAGS     (__OFFSET_PTHREAD_REFCNT + __SIZEOF_POINTER__ * 5)
 
 #define PTHREAD_FNORMAL    0x0000 /* Normal pthread flags. */
 #define PTHREAD_FUSERSTACK 0x0001 /* The thread's stack was provided by the user
@@ -64,13 +79,26 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
 
 #ifdef __CC__
 struct __cpu_set_struct;
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+struct libc_userprocmask {
+	struct userprocmask    lpm_pmask;    /* The underlying userprocmask controller. */
+	struct __sigset_struct lpm_masks[2]; /* Static signal masks buffers that sigprocmask() will cycle between. */
+};
+#endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
+
 struct pthread {
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+#define _pthread_tid(self) (self)->pt_pmask.lpm_pmask.pm_mytid
+	struct libc_userprocmask pt_pmask;      /* User-space sigprocmask address */
+#else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+#define _pthread_tid(self) (self)->pt_tid
 	__pid_t                  pt_tid;        /* Thread TID (filled in by the kernel as the PTID and CTID)
 	                                         * Cleared to ZERO(0) (by the kernel) when the thread terminates.
 	                                         * s.a. `set_tid_address(2)' */
 #if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
 	__byte_t               __pt_pad[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
 #endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
+#endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 	__WEAK __uintptr_t       pt_refcnt;     /* Reference counter for this control structure. */
 	void                    *pt_retval;     /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit()') (also used as argument for `pt_start') */
 	void                    *pt_tls;        /* [const] TLS segment base address (allocated by `dltlsallocseg()', freed in `pthread_exit()') */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fd988c0 */
+/* HASH CRC-32:0x7dd7eeac */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -506,6 +506,8 @@
 #define __NR32AC_rtm_end                      0
 #define __NR32AC_rtm_begin                    0
 #define __NR32AC_ftime64                      1
+#define __NR32AC_sigmask_check                0
+#define __NR32AC_set_userprocmask_address     1
 #define __NR32AC_utime64                      2
 #define __NR32AC_userviofd                    2
 #define __NR32AC_stime64                      1
@@ -1009,6 +1011,8 @@
 #define __NR32RT_rtm_end                      (errno_t, __errno_t)
 #define __NR32RT_rtm_begin                    (rtm_status_t, __rtm_status_t)
 #define __NR32RT_ftime64                      (errno_t, __errno_t)
+#define __NR32RT_sigmask_check                (errno_t, __errno_t)
+#define __NR32RT_set_userprocmask_address     (errno_t, __errno_t)
 #define __NR32RT_utime64                      (errno_t, __errno_t)
 #define __NR32RT_userviofd                    (fd_t, __fd_t)
 #define __NR32RT_stime64                      (errno_t, __errno_t)
@@ -2105,6 +2109,7 @@
 #define __NR32AT3_ioctlf                       (void *, void *)
 #define __NR32AT0_rtm_abort                    (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_ftime64                      (struct timebx32_64 *, struct __timebx32_64 *)
+#define __NR32AT0_set_userprocmask_address     (struct userprocmask *, struct userprocmask *)
 #define __NR32AT0_utime64                      (char const *, char const *)
 #define __NR32AT1_utime64                      (struct utimbufx32_64 const *, struct __utimbufx32_64 const *)
 #define __NR32AT0_userviofd                    (size_t, __size_t)
@@ -2665,6 +2670,8 @@
 #define __NR32AM_rtm_end(a, b, c, d, e, f)                      /* nothing */
 #define __NR32AM_rtm_begin(a, b, c, d, e, f)                    /* nothing */
 #define __NR32AM_ftime64(a, b, c, d, e, f)                      (struct __timebx32_64 *)a
+#define __NR32AM_sigmask_check(a, b, c, d, e, f)                /* nothing */
+#define __NR32AM_set_userprocmask_address(a, b, c, d, e, f)     (struct userprocmask *)a
 #define __NR32AM_utime64(a, b, c, d, e, f)                      (char const *)a, (struct __utimbufx32_64 const *)b
 #define __NR32AM_userviofd(a, b, c, d, e, f)                    (__size_t)a, (__syscall_ulong_t)b
 #define __NR32AM_stime64(a, b, c, d, e, f)                      (__time64_t const *)a
@@ -3168,6 +3175,8 @@
 #define __NR32AP_rtm_end()                                      /* nothing */
 #define __NR32AP_rtm_begin()                                    /* nothing */
 #define __NR32AP_ftime64(a)                                     (__syscall_ulong_t)a
+#define __NR32AP_sigmask_check()                                /* nothing */
+#define __NR32AP_set_userprocmask_address(a)                    (__syscall_ulong_t)a
 #define __NR32AP_utime64(a, b)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_userviofd(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_stime64(a)                                     (__syscall_ulong_t)a

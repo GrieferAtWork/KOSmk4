@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56f0fd94 */
+/* HASH CRC-32:0xcdc52629 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18123,6 +18123,106 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_ftime64)
+
+/* Check for pending signals, and keep on handling them until none are left
+ * The [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until none are left, in case more than one signal
+ * became available.
+ * This system call is only needed when `set_userprocmask_address(2)' was used. */
+/* errno_t sigmask_check(void) */
+.section .text.x86.asm32_syscall_int80.sigmask_check
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigmask_check)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffdf
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	EXTERN(sys_sigmask_check)
+	call   sys_sigmask_check
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_sigmask_check)
+
+/* Register the address of the calling thread's userprocmask controller.
+ * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(&ctl, sizeof(struct userprocmask));
+ *       >> ctl.pm_sigsize = sizeof(sigset_t);
+ *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional, arch-specific fields to all zeroes.
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the `pm_sigmask'
+ *       of the previously set controller into its internal signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
+ * Note also that this function replaces `set_tid_address(2)', such that
+ * it negates a prior call to said function, while a future call to said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+.section .text.x86.asm32_syscall_int80.set_userprocmask_address
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_userprocmask_address)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffffe0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_set_userprocmask_address)
+	call   sys_set_userprocmask_address
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_set_userprocmask_address)
 
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_int80.utime64
@@ -37573,6 +37673,106 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime64)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_ftime64)
+
+/* Check for pending signals, and keep on handling them until none are left
+ * The [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until none are left, in case more than one signal
+ * became available.
+ * This system call is only needed when `set_userprocmask_address(2)' was used. */
+/* errno_t sigmask_check(void) */
+.section .text.x86.asm32_syscall_sysenter.sigmask_check
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigmask_check)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffdf
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	EXTERN(sys_sigmask_check)
+	call   sys_sigmask_check
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_sigmask_check)
+
+/* Register the address of the calling thread's userprocmask controller.
+ * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(&ctl, sizeof(struct userprocmask));
+ *       >> ctl.pm_sigsize = sizeof(sigset_t);
+ *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional, arch-specific fields to all zeroes.
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the `pm_sigmask'
+ *       of the previously set controller into its internal signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
+ * Note also that this function replaces `set_tid_address(2)', such that
+ * it negates a prior call to said function, while a future call to said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+.section .text.x86.asm32_syscall_sysenter.set_userprocmask_address
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_userprocmask_address)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffffe0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_set_userprocmask_address)
+	call   sys_set_userprocmask_address
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_set_userprocmask_address)
 
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_sysenter.utime64

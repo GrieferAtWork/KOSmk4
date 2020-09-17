@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15e0e8f8 */
+/* HASH CRC-32:0x1943e1f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -334,6 +334,7 @@
 #define __CRT_HAVE_sys_set_robust_list 1
 #define __CRT_HAVE_sys_set_thread_area 1
 #define __CRT_HAVE_sys_set_tid_address 1
+#define __CRT_HAVE_sys_set_userprocmask_address 1
 #define __CRT_HAVE_sys_setdomainname 1
 #define __CRT_HAVE_sys_setfsgid 1
 #define __CRT_HAVE_sys_setfsuid 1
@@ -360,6 +361,7 @@
 #define __CRT_HAVE_sys_shmget 1
 #define __CRT_HAVE_sys_shutdown 1
 #define __CRT_HAVE_sys_sigaltstack 1
+#define __CRT_HAVE_sys_sigmask_check 1
 #define __CRT_HAVE_sys_signalfd 1
 #define __CRT_HAVE_sys_signalfd4 1
 #define __CRT_HAVE_sys_socket 1
@@ -731,6 +733,7 @@
 #define __CRT_HAVE_sys_Xset_robust_list 1
 #define __CRT_HAVE_sys_Xset_thread_area 1
 #define __CRT_HAVE_sys_Xset_tid_address 1
+#define __CRT_HAVE_sys_Xset_userprocmask_address 1
 #define __CRT_HAVE_sys_Xsetdomainname 1
 #define __CRT_HAVE_sys_Xsetfsgid 1
 #define __CRT_HAVE_sys_Xsetfsuid 1
@@ -757,6 +760,7 @@
 #define __CRT_HAVE_sys_Xshmget 1
 #define __CRT_HAVE_sys_Xshutdown 1
 #define __CRT_HAVE_sys_Xsigaltstack 1
+#define __CRT_HAVE_sys_Xsigmask_check 1
 #define __CRT_HAVE_sys_Xsignalfd 1
 #define __CRT_HAVE_sys_Xsignalfd4 1
 #define __CRT_HAVE_sys_Xsocket 1

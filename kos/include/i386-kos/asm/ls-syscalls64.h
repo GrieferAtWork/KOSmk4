@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff42c4bb */
+/* HASH CRC-32:0x4d6442a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -832,8 +832,8 @@ __TSYSCALL1_UNUSED(0xffffffffffffffd7, 0xff, 0xff)
 __TSYSCALL1_UNUSED(0xffffffffffffffd8, 0x100, 0x100)
 __TSYSCALL1_UNUSED(0xffffffffffffffd9, 0x101, 0x101)
 __TSYSCALL1_UNUSED(0xffffffffffffffda, 0x102, 0x102)
-__TSYSCALL1_UNUSED(0xffffffffffffffdb, 0x103, 0x103)
-__TSYSCALL1_UNUSED(0xffffffffffffffdc, 0x104, 0x104)
+__TSYSCALL1(sigmask_check, 0x103, 0x103)
+__TSYSCALL1(set_userprocmask_address, 0x104, 0x104)
 __TSYSCALL1(rtm_test, 0x105, 0x105)
 __TSYSCALL1(rtm_abort, 0x106, 0x106)
 __TSYSCALL1(rtm_end, 0x107, 0x107)

@@ -420,6 +420,7 @@ local files = {
 	"../../include/elf.h",
 	"../../include/kos/bits/debugtrap.h",
 	"../../include/kos/bits/ukern-struct.h",
+	"../../include/kos/bits/userprocmask.h",
 	"../../include/kos/exec/bits/peb.h",
 	"../../include/kos/exec/elf.h",
 	"../../include/kos/hop/api.h",
@@ -1387,6 +1388,19 @@ static_assert(offsetof(struct userkern, uk_suid) == OFFSET_USERKERN_SUID);
 static_assert(offsetof(struct userkern, uk_tid) == OFFSET_USERKERN_TID);
 static_assert(offsetof(struct userkern, uk_uid) == OFFSET_USERKERN_UID);
 static_assert(sizeof(struct userkern) == SIZEOF_USERKERN);
+
+
+
+
+
+#include <kos/bits/userprocmask.h>
+
+/* struct userprocmask */
+static_assert(offsetof(struct userprocmask, pm_mytid) == __OFFSET_USERPROCMASK_MYTID);
+static_assert(offsetof(struct userprocmask, pm_pending) == __OFFSET_USERPROCMASK_PENDING);
+static_assert(offsetof(struct userprocmask, pm_sigmask) == __OFFSET_USERPROCMASK_SIGMASK);
+static_assert(offsetof(struct userprocmask, pm_sigsize) == __OFFSET_USERPROCMASK_SIGSIZE);
+static_assert(sizeof(struct userprocmask) == __SIZEOF_USERPROCMASK);
 
 
 

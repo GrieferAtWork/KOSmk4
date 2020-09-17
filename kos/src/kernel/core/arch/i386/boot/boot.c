@@ -607,7 +607,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      attribute set.
 	 *
 	 *
-	 *
 	 * Example code:
 	 * >> sigset_t os, ns;
 	 * >> sigfillset(&ns);
@@ -615,17 +614,18 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * >> ...
 	 * >> sigprocmask(SIG_SETMASK, &os, NULL);
 	 *
+	 *
 	 * Implementation of libc's `sigprocmask()':
 	 * >> struct userprocmask {
 	 * >>     pid_t     pm_mytid;    // [const] TID of the thread (same as `set_tid_address(2)')
 	 * >>     size_t    pm_sigsize;  // [const] == sizeof(sigset_t)
 	 * >>     sigset_t *pm_sigmask;  // [KERNEL:READ|WRITE(1), USER:WRITE][0..1] Pointer to the current signal mask
-	 * >>                            // The kernel may or' this with another mask when a signal handler
-	 * >>                            // is invoked that contains a non-empty `sa_mask'
+	 * >>                            // The kernel may or' this with another mask when a signal handler is invoked
+	 * >>                            // that contains a non-empty `sa_mask'.
 	 * >>                            // Set to `NULL' to indicate that `sys_set_userprocmask_address()' wasn't called, yet.
-	 * >>     sigset_t  pm_pending;  // [KERNEL:WRITE,     USER:READWRITE] Set of pending signals
-	 * >>                            // When a currently masked signal arrives, it's associated
-	 * >>                            // bit is set to 1 in here.
+	 * >>     sigset_t  pm_pending;  // [KERNEL:WRITE, USER:READWRITE] Set of pending signals
+	 * >>                            // When a currently masked signal arrives, the kernel
+	 * >>                            // will set its associated bit to 1 within this set
 	 * >>     // === End of user-kernel-ABI (below is only used by libc!)
 	 * >>     sigset_t  pm_masks[2]; // Buffer for user-space signal masks
 	 * >> };
@@ -730,11 +730,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * >> }
 	 * >>
 	 * >> // New user-space function:
-	 * >> sigset_t *setsigmaskptr(sigset_t *ptr) {
+	 * >> sigset_t *setsigmaskptr(sigset_t *sigmaskptr) {
 	 * >>     sigset_t *result = mymask.pm_sigmask;
-	 * >>     mymask.pm_sigmask = ptr;
+	 * >>     mymask.pm_sigmask = sigmaskptr;
 	 * >>     for (signo_t i = 1; i < NSIG; ++i) {
-	 * >>         if (sigismember(&mymask.pm_pending, i) && !sigismember(ptr, i)) {
+	 * >>         if (sigismember(&mymask.pm_pending, i) && !sigismember(sigmaskptr, i)) {
 	 * >>             sigemptyset(&mymask.pm_pending);
 	 * >>             sys_sigmask_check();
 	 * >>         }

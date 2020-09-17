@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1513e5c0 */
+/* HASH CRC-32:0x4dda05b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,6 +50,7 @@
 #include <kos/bits/except-handler32.h>
 #include <kos/bits/exception_data32.h>
 #include <kos/bits/futex-expr32.h>
+#include <kos/bits/userprocmask.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
 #include <kos/compat/linux-olddirent.h>
@@ -151,6 +152,7 @@ struct termios;
 struct timezone;
 struct tms;
 struct ucpustate32;
+struct userprocmask;
 struct ustat;
 struct utsname;
 struct winsize;
@@ -1912,6 +1914,32 @@ __CDECLARE_SC(,__errno_t,set_thread_area,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 #if __CRT_HAVE_SC(set_tid_address)
 __CDECLARE_SC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 #endif /* __CRT_HAVE_SC(set_tid_address) */
+#if __CRT_HAVE_SC(set_userprocmask_address)
+/* Register the address of the calling thread's userprocmask controller.
+ * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(&ctl, sizeof(struct userprocmask));
+ *       >> ctl.pm_sigsize = sizeof(sigset_t);
+ *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional, arch-specific fields to all zeroes.
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the `pm_sigmask'
+ *       of the previously set controller into its internal signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
+ * Note also that this function replaces `set_tid_address(2)', such that
+ * it negates a prior call to said function, while a future call to said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+__CDECLARE_SC(,__errno_t,set_userprocmask_address,(struct userprocmask *__ctl),(__ctl))
+#endif /* __CRT_HAVE_SC(set_userprocmask_address) */
 #if __CRT_HAVE_SC(setdomainname)
 __CDECLARE_SC(,__errno_t,setdomainname,(char const *__name, __size_t __len),(__name,__len))
 #endif /* __CRT_HAVE_SC(setdomainname) */
@@ -2048,6 +2076,14 @@ __CDECLARE_SC(,__errno_t,sigaction,(__signo_t __signo, struct __sigactionx32 con
 #if __CRT_HAVE_SC(sigaltstack)
 __CDECLARE_SC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struct __sigaltstackx32 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_SC(sigaltstack) */
+#if __CRT_HAVE_SC(sigmask_check)
+/* Check for pending signals, and keep on handling them until none are left
+ * The [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until none are left, in case more than one signal
+ * became available.
+ * This system call is only needed when `set_userprocmask_address(2)' was used. */
+__CDECLARE_SC(,__errno_t,sigmask_check,(void),())
+#endif /* __CRT_HAVE_SC(sigmask_check) */
 #if __CRT_HAVE_SC(signal)
 __CDECLARE_SC(,__sighandler_t,signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
 #endif /* __CRT_HAVE_SC(signal) */
@@ -4183,6 +4219,32 @@ __CDECLARE_XSC(,__errno_t,set_thread_area,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 #if __CRT_HAVE_XSC(set_tid_address)
 __CDECLARE_XSC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 #endif /* __CRT_HAVE_XSC(set_tid_address) */
+#if __CRT_HAVE_XSC(set_userprocmask_address)
+/* Register the address of the calling thread's userprocmask controller.
+ * This also initializes `*ctl->pm_sigmask' and `ctl->pm_pending', such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally, the address of `&ctl->pm_mytid' is stored as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using atomic-or for the later) from this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(&ctl, sizeof(struct userprocmask));
+ *       >> ctl.pm_sigsize = sizeof(sigset_t);
+ *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional, arch-specific fields to all zeroes.
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the `pm_sigmask'
+ *       of the previously set controller into its internal signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though that `pm_sigmask' is ignored for `SIGKILL' and `SIGSTOP'
+ * Note also that this function replaces `set_tid_address(2)', such that
+ * it negates a prior call to said function, while a future call to said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+__CDECLARE_XSC(,__errno_t,set_userprocmask_address,(struct userprocmask *__ctl),(__ctl))
+#endif /* __CRT_HAVE_XSC(set_userprocmask_address) */
 #if __CRT_HAVE_XSC(setdomainname)
 __CDECLARE_XSC(,__errno_t,setdomainname,(char const *__name, __size_t __len),(__name,__len))
 #endif /* __CRT_HAVE_XSC(setdomainname) */
@@ -4319,6 +4381,14 @@ __CDECLARE_XSC(,__errno_t,sigaction,(__signo_t __signo, struct __sigactionx32 co
 #if __CRT_HAVE_XSC(sigaltstack)
 __CDECLARE_XSC(,__errno_t,sigaltstack,(struct __sigaltstackx32 const *__ss, struct __sigaltstackx32 *__oss),(__ss,__oss))
 #endif /* __CRT_HAVE_XSC(sigaltstack) */
+#if __CRT_HAVE_XSC(sigmask_check)
+/* Check for pending signals, and keep on handling them until none are left
+ * The [restart(must)] is necessary in order to ensure that _all_ unmasked
+ * signals get handled until none are left, in case more than one signal
+ * became available.
+ * This system call is only needed when `set_userprocmask_address(2)' was used. */
+__CDECLARE_XSC(,__errno_t,sigmask_check,(void),())
+#endif /* __CRT_HAVE_XSC(sigmask_check) */
 #if __CRT_HAVE_XSC(signal)
 __CDECLARE_XSC(,__sighandler_t,signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
 #endif /* __CRT_HAVE_XSC(signal) */

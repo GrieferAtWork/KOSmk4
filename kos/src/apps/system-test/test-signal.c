@@ -25,10 +25,14 @@
 
 #include <hybrid/compiler.h>
 
-#include <assert.h>
-#include <signal.h>
 #include <kos/types.h>
 #include <system-test/ctest.h>
+
+#include <assert.h>
+#include <errno.h>
+#include <signal.h>
+#include <stddef.h>
+#include <string.h>
 
 DECL_BEGIN
 
@@ -40,11 +44,19 @@ PRIVATE void myhand(signo_t signo) {
 }
 
 DEFINE_TEST(signal_works_correctly) {
-	sighandler_t ohand;
+	sigset_t oldset, newset;
+	struct sigaction old_action;
+	struct sigaction new_action;
+	int error;
 	hand_called = 0;
 
 	/* Install the signal handler. */
-	ohand = sysv_signal(SIGUSR1, &myhand);
+	memset(&new_action, 0, sizeof(new_action));
+	new_action.sa_handler = &myhand;
+	new_action.sa_flags   = SA_NOMASK;
+	error = sigaction(SIGUSR1, &new_action, &old_action);
+	assertf(error == 0, "%d:%s", errno, strerror(errno));
+
 	assert(hand_called == 0);
 
 	/* Raise the signal. */
@@ -53,8 +65,28 @@ DEFINE_TEST(signal_works_correctly) {
 	/* Make sure that our handler got called. */
 	assert(hand_called == 1);
 
+	/* Also test raising signals while they are masked. */
+	hand_called = 0;
+	sigemptyset(&newset);
+	sigaddset(&newset, SIGUSR1);
+	error = sigprocmask(SIG_BLOCK, &newset, &oldset);
+	assertf(error == 0, "%d:%s", errno, strerror(errno));
+
+	/* Raise the signal again. */
+	assert(hand_called == 0);
+	raise(SIGUSR1);
+	assert(hand_called == 0);
+
+	/* Unmask the signal */
+	error = sigprocmask(SIG_SETMASK, &oldset, NULL);
+	assertf(error == 0, "%d:%s", errno, strerror(errno));
+
+	/* Make sure that the handler was called after the signal was unmasked. */
+	assert(hand_called == 1);
+
 	/* Restore the previous handler. */
-	sysv_signal(SIGUSR1, ohand);
+	error = sigaction(SIGUSR1, &old_action, NULL);
+	assertf(error == 0, "%d:%s", errno, strerror(errno));
 }
 
 

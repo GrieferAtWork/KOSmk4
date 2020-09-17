@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d4ced1d */
+/* HASH CRC-32:0x2162476a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1087,6 +1087,7 @@
 #define __NRAN3_ioctlf                       arg
 #define __NRAN0_rtm_abort                    code
 #define __NRAN0_ftime64                      tp
+#define __NRAN0_set_userprocmask_address     ctl
 #define __NRAN0_utime64                      filename
 #define __NRAN1_utime64                      times
 #define __NRAN0_userviofd                    initial_size
@@ -2823,6 +2824,9 @@
 #define __NRRTR_rtm_begin                     SC_REPR_SIGHANDLER_T                                                 /* return */
 #define __NRATR0_ftime64                      SC_REPR_POINTER                                                      /* tp */ 
 #define __NRRTR_ftime64                       SC_REPR_ERRNO_T                                                      /* return */
+#define __NRRTR_sigmask_check                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_set_userprocmask_address     SC_REPR_POINTER                                                      /* ctl */ 
+#define __NRRTR_set_userprocmask_address      SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_utime64                      SC_REPR_FILENAME                                                     /* filename */ 
 #define __NRATR1_utime64                      SC_REPR_STRUCT_UTIMBUFX32_64                                         /* times */ 
 #define __NRRTR_utime64                       SC_REPR_ERRNO_T                                                      /* return */

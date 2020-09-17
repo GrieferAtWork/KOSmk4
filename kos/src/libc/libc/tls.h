@@ -31,6 +31,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 
+
 /* The different kinds of errno codes known to libc */
 #define LIBC_ERRNO_KIND_KOS 0 /* __GEN_E* */
 #define LIBC_ERRNO_KIND_DOS 1 /* __DOS_E* */

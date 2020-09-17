@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcad0c8f9 */
+/* HASH CRC-32:0xbcd14927 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -389,6 +389,7 @@
 #define __ARCH_WANT_SYSCALL_SET_ROBUST_LIST              1
 #define __ARCH_WANT_SYSCALL_SET_THREAD_AREA              1
 #define __ARCH_WANT_SYSCALL_SET_TID_ADDRESS              1
+#define __ARCH_WANT_SYSCALL_SET_USERPROCMASK_ADDRESS     1
 #define __ARCH_WANT_SYSCALL_SETDOMAINNAME                1
 #define __ARCH_WANT_SYSCALL_SETFSGID                     1
 #define __ARCH_WANT_SYSCALL_SETFSGID32                   1
@@ -428,6 +429,7 @@
 #define __ARCH_WANT_SYSCALL_SHUTDOWN                     1
 #define __ARCH_WANT_SYSCALL_SIGACTION                    1
 #define __ARCH_WANT_SYSCALL_SIGALTSTACK                  1
+#define __ARCH_WANT_SYSCALL_SIGMASK_CHECK                1
 #define __ARCH_WANT_SYSCALL_SIGNAL                       1
 #define __ARCH_WANT_SYSCALL_SIGNALFD                     1
 #define __ARCH_WANT_SYSCALL_SIGNALFD4                    1

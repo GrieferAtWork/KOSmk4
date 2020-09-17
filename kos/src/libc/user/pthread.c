@@ -43,6 +43,7 @@
 #include <limits.h>
 #include <malloc.h>
 #include <sched.h>
+#include <signal.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -61,6 +62,10 @@
 DECL_BEGIN
 
 /* Verify that pthread offset constants are correct */
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+#define pt_tid pt_pmask.lpm_pmask.pm_mytid
+STATIC_ASSERT(offsetof(struct pthread, pt_pmask) == __OFFSET_PTHREAD_PMASK);
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 STATIC_ASSERT(offsetof(struct pthread, pt_tid) == __OFFSET_PTHREAD_TID);
 STATIC_ASSERT(offsetof(struct pthread, pt_refcnt) == __OFFSET_PTHREAD_REFCNT);
 STATIC_ASSERT(offsetof(struct pthread, pt_retval) == __OFFSET_PTHREAD_RETVAL);
@@ -316,6 +321,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	pt->pt_tls = dltlsallocseg();
 	if unlikely(!pt->pt_tls)
 		goto err_nomem_pt;
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+	/* Initialize the new thread's initial userprocmask structure,
+	 * such that it will lazily initialize it the first time it
+	 * performs a call to `sigprocmask(2)'. */
+	memset(&pt->pt_pmask, 0, offsetof(struct userprocmask, pm_pending));
+	pt->pt_pmask.lpm_pmask.pm_sigsize = sizeof(sigset_t);
+/*	pt->pt_pmask.lpm_pmask.pm_sigmask = NULL; */ /* Already done by the memset (NULL means not-yet-initialized) */
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 	pt->pt_refcnt    = 2;
 	pt->pt_flags     = PTHREAD_FNORMAL;
 	pt->pt_stackaddr = attr->pa_stackaddr;
@@ -605,6 +618,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 	struct pthread *result;
 	result = tls.t_pthread;
 	if unlikely(!result) {
+		/* TODO: Don't lazily allocate! - Lazy init is ok, but this function
+		 *       needs to be async-safe, since it's used by `sigprocmask()' */
 		result = (struct pthread *)malloc(sizeof(struct pthread));
 		if unlikely(!result) {
 			PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.pthread_self_error_message") char const
@@ -612,6 +627,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 			syslog(LOG_ERR, message);
 			exit(EXIT_FAILURE);
 		}
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+		/* Initialize the thread's initial userprocmask structure,
+		 * such that it will lazily initialize it the first time it
+		 * performs a call to `sigprocmask(2)'. */
+		memset(&result->pt_pmask, 0, offsetof(struct userprocmask, pm_pending));
+		result->pt_pmask.lpm_pmask.pm_sigsize = sizeof(sigset_t);
+/*		result->pt_pmask.lpm_pmask.pm_sigmask = NULL; */ /* Already done by the memset (NULL means not-yet-initialized) */
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 		result->pt_tid       = sys_set_tid_address(&result->pt_tid);
 		result->pt_refcnt    = 1;
 		result->pt_retval    = NULL;

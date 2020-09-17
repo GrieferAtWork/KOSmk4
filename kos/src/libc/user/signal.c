@@ -24,9 +24,11 @@
 /**/
 
 #include <hybrid/atomic.h>
+#include <hybrid/bit.h>
 
 #include <kos/exec/idata.h>
 #include <kos/syscalls.h>
+#include <sys/param.h>
 
 #include <assert.h>
 #include <signal.h>
@@ -276,6 +278,13 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
 }
 /*[[[end:libc_kill]]]*/
 
+
+#ifndef __NR_sigprocmask
+#define sys_sigprocmask(how, set, oset) \
+	sys_rt_sigprocmask(how, set, oset, sizeof(sigset_t));
+#endif /* !__NR_sigprocmask */
+
+
 /*[[[head:libc_sigprocmask,hash:CRC-32=0xf8ce3e0d]]]*/
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
@@ -284,15 +293,99 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
                                        sigset_t *oset)
 /*[[[body:libc_sigprocmask]]]*/
 {
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 	errno_t result;
-#ifdef __NR_sigprocmask
+	struct pthread *pt = pthread_self();
+	sigset_t *old_set, *new_set;
+	old_set = pt->pt_pmask.lpm_pmask.pm_sigmask;
+	if unlikely(!old_set) {
+		/* Special case: The userprocmask sub-system isn't initialized, yet.
+		 * So initialize it now. */
+		old_set = &pt->pt_pmask.lpm_masks[0];
+		pt->pt_pmask.lpm_pmask.pm_sigmask = old_set;
+		result = sys_set_userprocmask_address(&pt->pt_pmask.lpm_pmask);
+		if unlikely(E_ISERR(result)) {
+			/* Fallback: Use the legacy sigprocmask(2) system call. */
+			goto do_legacy_sigprocmask;
+		}
+	}
+	if (oset)
+		memcpy(oset, old_set, sizeof(sigset_t));
+	/* Check for special case: do we even need to set a new procmask? */
+	if (!set)
+		return 0;
+
+	/* Select the new storage location. */
+	new_set = old_set + 1;
+	if (new_set != &pt->pt_pmask.lpm_masks[0] &&
+	    new_set != &pt->pt_pmask.lpm_masks[1])
+		new_set = &pt->pt_pmask.lpm_masks[0];
+	/* Initialize `new_set' based on `how', `old_set' and `set' */
+	switch (how) {
+
+	case SIG_SETMASK:
+		memcpy(new_set, set, sizeof(sigset_t));
+		break;
+
+	case SIG_BLOCK:
+		sigorset(new_set, old_set, set);
+		break;
+
+	case SIG_UNBLOCK: {
+		unsigned int i;
+		for (i = 0; i < __SIGSET_NWORDS; ++i)
+			new_set->__val[i] = old_set->__val[i] & ~set->__val[i];
+	}	break;
+
+	default:
+		return libc_seterrno(EINVAL);
+	}
+
+	/* Atomically enable use of the new, updated mask
+	 * From this point forth, signals sent to our thread will be masked by `new_set' */
+	ATOMIC_WRITE(pt->pt_pmask.lpm_pmask.pm_sigmask, new_set);
+
+	/* Optimization: If we know that no signal became unmasked, we don't
+	 *               have to search for any pending, unmasked signals! */
+	if (how == SIG_BLOCK)
+		return 0;
+
+	/* Check previously pending signals became available */
+	{
+		unsigned int i;
+		for (i = 0; i < __SIGSET_NWORDS; ++i) {
+			ulongptr_t pending_word;
+			ulongptr_t newmask_word;
+			pending_word = ATOMIC_READ(pt->pt_pmask.lpm_pmask.pm_pending.__val[i]);
+			if (!pending_word)
+				continue; /* Nothing pending in here. */
+			newmask_word = new_set->__val[i];
+			/* Check if any of the pending signals are currently unmasked. */
+			if ((pending_word & ~newmask_word) != 0) {
+				/* Clear the set of pending signals (because the kernel won't do this)
+				 * Also note that there is no guaranty that the signal that became
+				 * available in the mean time is still available now. - The signal may
+				 * have been directed at our process as a whole, and another thread
+				 * may have already handled it. */
+				sigemptyset(&pt->pt_pmask.lpm_pmask.pm_pending);
+				/* Calls the kernel's `sigmask_check()' function */
+				sys_sigmask_check();
+				break;
+			}
+		}
+	}
+	return 0;
+do_legacy_sigprocmask:
+	pt->pt_pmask.lpm_pmask.pm_sigmask = NULL;
 	result = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
 	                         set, oset);
-#else /* __NR_sigprocmask */
-	result = sys_rt_sigprocmask((syscall_ulong_t)(unsigned int)how,
-	                            set, oset, sizeof(sigset_t));
-#endif /* !__NR_sigprocmask */
 	return libc_seterrno_syserr(result);
+#else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+	errno_t result;
+	result = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
+	                         set, oset);
+	return libc_seterrno_syserr(result);
+#endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 }
 /*[[[end:libc_sigprocmask]]]*/
 
@@ -692,7 +785,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
 	struct pthread *pt = (struct pthread *)threadid;
 	pid_t tid;
 	errno_t result;
-	tid = ATOMIC_READ(pt->pt_tid);
+	tid = ATOMIC_READ(_pthread_tid(pt));
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* No way to handle the case where `pt_tid' got set
@@ -716,7 +809,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
 	memset(&info, 0, sizeof(siginfo_t));
 	info.si_value = value;
 	info.si_code  = SI_QUEUE;
-	tid = ATOMIC_READ(pt->pt_tid);
+	tid = ATOMIC_READ(_pthread_tid(pt));
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* No way to handle the case where `pt_tid' got set
