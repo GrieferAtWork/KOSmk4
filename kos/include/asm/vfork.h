@@ -45,7 +45,7 @@
  *
  *
  *
- * #define __ARCH_HAVE_SIGMASK_VFORK
+ * #define __ARCH_HAVE_SIGBLOCK_VFORK
  * >> POSIX signals send to a vfork'd child (except for SIGSTOP/SIGKILL)
  *    are always masked, no matter what the vfork-process's actual signal
  *    mask says about the signal!
@@ -61,11 +61,11 @@
  * >> On KOS this problem is handled differently, such that a thread with
  *    the `TASK_FVFORK' flag set is be handled as though `sigmask_getrd()'
  *    always returned a signal mask identical to `&kernel_sigmask_full'
- * >> As far as semantics go, you can think of `__ARCH_HAVE_SIGMASK_VFORK'
+ * >> As far as semantics go, you can think of `__ARCH_HAVE_SIGBLOCK_VFORK'
  *    like this:
- *    >> #ifdef __ARCH_HAVE_SIGMASK_VFORK
+ *    >> #ifdef __ARCH_HAVE_SIGBLOCK_VFORK
  *    >> #define vfork_with_sigmask() vfork()
- *    >> #else // __ARCH_HAVE_SIGMASK_VFORK
+ *    >> #else // __ARCH_HAVE_SIGBLOCK_VFORK
  *    >> // NOTES:
  *    >> //   - `run_after_exec()' can't be implemented in user-space,
  *    >> //     but like the name would suggest, this is a piece of code
@@ -93,14 +93,25 @@
  *    >>        }                                                \
  *    >>        _pid;                                            \
  *    >>    })
- *    >> #endif // !__ARCH_HAVE_SIGMASK_VFORK
+ *    >> #endif // !__ARCH_HAVE_SIGBLOCK_VFORK
+ *
+ *
+ *
+ * #define __ARCH_HAVE_SHARED_SIGMASK_VFORK
+ * >> When defined, a vfork()'d child process will be sharing its signal mask
+ *    with its parent process until it performs a successful call to exec(2),
+ *    or _Exit(2). This caveat is a necessary evil caused by KOS's userprocmask,
+ *    which essentially allows user-space programs to modify their signal masks
+ *    without having to do invoke any system calls when there are no unmasked,
+ *    pending signals.
  */
 
 #if defined(__linux__)
 #define __ARCH_HAVE_SHARED_VM_VFORK 1
 #elif defined(__KOS__)
 #define __ARCH_HAVE_SHARED_VM_VFORK 1 /* Implemented as of 2020-09-08T14:05 */
-#define __ARCH_HAVE_SIGMASK_VFORK   1 /* Implemented as of 2020-09-11T17:58 */
+#define __ARCH_HAVE_SIGBLOCK_VFORK  1 /* Implemented as of 2020-09-11T17:58 */
+//#define __ARCH_HAVE_SHARED_SIGMASK_VFORK 1 /* TODO */
 #endif /* ... */
 
 #endif /* !_ASM_VFORK_H */
