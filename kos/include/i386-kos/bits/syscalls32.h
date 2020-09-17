@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45f82836 */
+/* HASH CRC-32:0x1ce1ebc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -100,6 +100,7 @@
 #define SYS_ptrace                       __NR_ptrace                       /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
 #define SYS_alarm                        __NR_alarm                        /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define SYS_oldfstat                     __NR_oldfstat                     /* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define SYS_pause                        __NR_pause                        /* errno_t pause(void) */
 #define SYS_utime                        __NR_utime                        /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 #define SYS_stty                         __NR_stty                         /* errno_t stty(void) */

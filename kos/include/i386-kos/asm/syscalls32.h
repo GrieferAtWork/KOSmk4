@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4134214e */
+/* HASH CRC-32:0xe69b8456 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,6 +97,7 @@
 #define __NR_ptrace                       0x1a                   /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
 #define __NR_alarm                        0x1b                   /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define __NR_oldfstat                     0x1c                   /* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define __NR_pause                        0x1d                   /* errno_t pause(void) */
 #define __NR_utime                        0x1e                   /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 #define __NR_stty                         0x1f                   /* errno_t stty(void) */
@@ -1626,7 +1627,7 @@
 #define __NRRM_epoll_ctl                    0
 #define __NRRM_epoll_wait                   1
 #define __NRRM_remap_file_pages             0
-#define __NRRM_set_tid_address              0
+#define __NRRM_set_tid_address              2
 #define __NRRM_timer_create                 0
 #define __NRRM_timer_settime                0
 #define __NRRM_timer_gettime                0
@@ -1928,6 +1929,7 @@
 #define __NRCP_nanosleep                    1
 #define __NRCP_poll                         1
 #define __NRCP_rt_sigtimedwait              1
+#define __NRCP_rt_sigsuspend                1
 #define __NRCP_pread64                      1
 #define __NRCP_pwrite64                     1
 #define __NRCP_chown                        1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x818e4c85 */
+/* HASH CRC-32:0xd8b9daa4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1130,6 +1130,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_dup2)
 	.cfi_endproc
 END(__x86_asm64_syscall_dup2)
 
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 /* errno_t pause(void) */
 .section .text.x86.asm64_syscall.pause
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pause)
@@ -13828,6 +13829,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldfstat)
 	.cfi_endproc
 END(__x86_asm32_int80_oldfstat)
 
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 /* errno_t pause(void) */
 .section .text.x86.asm32_syscall_int80.pause
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
@@ -29944,6 +29946,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_alarm, __x86_asm32_int80_alarm)
 /* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_oldfstat, __x86_asm32_int80_oldfstat)
 
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 /* errno_t pause(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pause, __x86_asm32_int80_pause)
 
@@ -34521,6 +34524,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_oldfstat)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_oldfstat)
 
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 /* errno_t pause(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_pause, sys32_pause); */
 

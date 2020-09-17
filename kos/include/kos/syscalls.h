@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88335e45 */
+/* HASH CRC-32:0xfb08bee3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -786,6 +786,7 @@ __CDECLARE_SC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle
 __CDECLARE_SC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(openat) */
 #if __CRT_HAVE_SC(pause)
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 __CDECLARE_SC(,__errno_t,pause,(void),())
 #endif /* __CRT_HAVE_SC(pause) */
 #if __CRT_HAVE_SC(perf_event_open)
@@ -2111,6 +2112,7 @@ __CDECLARE_XSC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handl
 __CDECLARE_XSC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(openat) */
 #if __CRT_HAVE_XSC(pause)
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 __CDECLARE_XSC(,__errno_t,pause,(void),())
 #endif /* __CRT_HAVE_XSC(pause) */
 #if __CRT_HAVE_XSC(perf_event_open)

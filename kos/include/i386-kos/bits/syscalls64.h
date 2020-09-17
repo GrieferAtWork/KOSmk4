@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3a07317 */
+/* HASH CRC-32:0x1b2ea5ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,6 +125,7 @@
 #define SYS_shmctl                 __NR_shmctl                 /* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
 #define SYS_dup                    __NR_dup                    /* fd_t dup(fd_t fd) */
 #define SYS_dup2                   __NR_dup2                   /* fd_t dup2(fd_t oldfd, fd_t newfd) */
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define SYS_pause                  __NR_pause                  /* errno_t pause(void) */
 #define SYS_nanosleep              __NR_nanosleep              /* errno_t nanosleep(struct timespecx64 const *req, struct timespecx64 *rem) */
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */

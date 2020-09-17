@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6dcd7697 */
+/* HASH CRC-32:0xdb612b3a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1060,6 +1060,7 @@ INTERN_FUNCTION(libc_sys_Xoldfstat)
 END(libc_sys_Xoldfstat)
 DEFINE_PUBLIC_ALIAS(sys_Xoldfstat, libc_sys_Xoldfstat)
 
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 /* errno_t pause(void) */
 .section .text.crt.syscall.pause
 INTERN_FUNCTION(libc_sys_pause)
@@ -1068,6 +1069,7 @@ INTERN_FUNCTION(libc_sys_pause)
 END(libc_sys_pause)
 DEFINE_PUBLIC_ALIAS(sys_pause, libc_sys_pause)
 
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 /* errno_t pause(void) */
 .section .text.crt.syscall.Xpause
 INTERN_FUNCTION(libc_sys_Xpause)

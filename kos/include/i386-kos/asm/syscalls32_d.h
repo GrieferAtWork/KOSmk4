@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb573b2c */
+/* HASH CRC-32:0x8b8f8edc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,6 +97,7 @@
 #define __NR32_ptrace                       0x1a                   /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
 #define __NR32_alarm                        0x1b                   /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define __NR32_oldfstat                     0x1c                   /* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define __NR32_pause                        0x1d                   /* errno_t pause(void) */
 #define __NR32_utime                        0x1e                   /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 #define __NR32_stty                         0x1f                   /* errno_t stty(void) */
@@ -1626,7 +1627,7 @@
 #define __NR32RM_epoll_ctl                    0
 #define __NR32RM_epoll_wait                   1
 #define __NR32RM_remap_file_pages             0
-#define __NR32RM_set_tid_address              0
+#define __NR32RM_set_tid_address              2
 #define __NR32RM_timer_create                 0
 #define __NR32RM_timer_settime                0
 #define __NR32RM_timer_gettime                0
@@ -1928,6 +1929,7 @@
 #define __NR32CP_nanosleep                    1
 #define __NR32CP_poll                         1
 #define __NR32CP_rt_sigtimedwait              1
+#define __NR32CP_rt_sigsuspend                1
 #define __NR32CP_pread64                      1
 #define __NR32CP_pwrite64                     1
 #define __NR32CP_chown                        1

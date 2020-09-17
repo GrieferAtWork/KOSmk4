@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86fd389f */
+/* HASH CRC-32:0x56f0fd94 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1141,6 +1141,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_oldfstat)
 	.cfi_endproc
 END(__x86_asm32_int80_oldfstat)
 
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 /* errno_t pause(void) */
 .section .text.x86.asm32_syscall_int80.pause
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
@@ -20478,6 +20479,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_oldfstat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_oldfstat)
 
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 /* errno_t pause(void) */
 .section .text.x86.asm32_syscall_sysenter.pause
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pause)

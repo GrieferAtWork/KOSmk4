@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11a09e6 */
+/* HASH CRC-32:0x1513e5c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1368,6 +1368,7 @@ __CDECLARE_SC(,__errno_t,openat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__errno_t,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #endif /* __CRT_HAVE_SC(openpty) */
 #if __CRT_HAVE_SC(pause)
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 __CDECLARE_SC(,__errno_t,pause,(void),())
 #endif /* __CRT_HAVE_SC(pause) */
 #if __CRT_HAVE_SC(perf_event_open)
@@ -3647,6 +3648,7 @@ __CDECLARE_XSC(,__errno_t,openat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__errno_t,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
 #endif /* __CRT_HAVE_XSC(openpty) */
 #if __CRT_HAVE_XSC(pause)
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 __CDECLARE_XSC(,__errno_t,pause,(void),())
 #endif /* __CRT_HAVE_XSC(pause) */
 #if __CRT_HAVE_XSC(perf_event_open)

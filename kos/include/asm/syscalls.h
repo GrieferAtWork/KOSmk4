@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1407f311 */
+/* HASH CRC-32:0x6b9b70a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -656,6 +656,7 @@
 #define __NR_mmap                   0x422 /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 #define __NR_alarm                  0x423 /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define __NR_getpgrp                0x424 /* pid_t getpgrp(void) */
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define __NR_pause                  0x425 /* errno_t pause(void) */
 #define __NR_time                   0x426 /* time32_t time(time32_t *timer) */
 #define __NR_utime                  0x427 /* errno_t utime(char const *filename, struct utimbuf const *times) */
@@ -862,7 +863,7 @@
 #define __NRRM_exit                   2
 #define __NRRM_exit_group             2
 #define __NRRM_waitid                 1
-#define __NRRM_set_tid_address        0
+#define __NRRM_set_tid_address        2
 #define __NRRM_unshare                0
 #define __NRRM_futex                  0
 #define __NRRM_set_robust_list        0
@@ -1155,6 +1156,7 @@
 #define __NRCP_nanosleep              1
 #define __NRCP_clock_nanosleep        1
 #define __NRCP_syslog                 1
+#define __NRCP_rt_sigsuspend          1
 #define __NRCP_rt_sigtimedwait        1
 #define __NRCP_sysinfo                1
 #define __NRCP_mq_timedsend           1

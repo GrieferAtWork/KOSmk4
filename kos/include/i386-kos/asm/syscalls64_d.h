@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd1404c6 */
+/* HASH CRC-32:0x3794f078 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,6 +122,7 @@
 #define __NR64_shmctl                 0x1f                           /* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
 #define __NR64_dup                    0x20                           /* fd_t dup(fd_t fd) */
 #define __NR64_dup2                   0x21                           /* fd_t dup2(fd_t oldfd, fd_t newfd) */
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define __NR64_pause                  0x22                           /* errno_t pause(void) */
 #define __NR64_nanosleep              0x23                           /* errno_t nanosleep(struct timespecx64 const *req, struct timespecx64 *rem) */
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
@@ -1469,7 +1470,7 @@
 #define __NR64RM_epoll_wait_old         1
 #define __NR64RM_remap_file_pages       0
 #define __NR64RM_getdents64             0
-#define __NR64RM_set_tid_address        0
+#define __NR64RM_set_tid_address        2
 #define __NR64RM_restart_syscall        0
 #define __NR64RM_semtimedop             1
 #define __NR64RM_fadvise64              0
@@ -1712,6 +1713,7 @@
 #define __NR64CP_sysinfo                1
 #define __NR64CP_syslog                 1
 #define __NR64CP_rt_sigtimedwait        1
+#define __NR64CP_rt_sigsuspend          1
 #define __NR64CP_utime                  1
 #define __NR64CP_mknod                  1
 #define __NR64CP_sync                   1

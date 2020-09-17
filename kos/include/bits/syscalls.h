@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0b2f1ff */
+/* HASH CRC-32:0x93ec6c1c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -659,6 +659,7 @@
 #define SYS_mmap                   __NR_mmap                   /* void *mmap(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t offset) */
 #define SYS_alarm                  __NR_alarm                  /* syscall_ulong_t alarm(syscall_ulong_t seconds) */
 #define SYS_getpgrp                __NR_getpgrp                /* pid_t getpgrp(void) */
+/* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define SYS_pause                  __NR_pause                  /* errno_t pause(void) */
 #define SYS_time                   __NR_time                   /* time32_t time(time32_t *timer) */
 #define SYS_utime                  __NR_utime                  /* errno_t utime(char const *filename, struct utimbuf const *times) */
