@@ -242,6 +242,18 @@ libc_pthread_unmap_stack_and_exit(void *stackaddr,
 /* Perform cleanup & terminate the current thread `me'. */
 PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_exit_thread") void
 NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode) {
+	/* TODO: Mask _all_ posix signals for our thread.
+	 *
+	 * We don't want to accidentally invoke signal handlers
+	 * once our TLS-state is broken, or once we've unmapped
+	 * our stack. Note that in regards to the former, POSIX
+	 * requires that access to `errno' be async-signal-safe,
+	 * meaning that since we use ATTR_THREAD-memory to implement
+	 * errno, we mustn't run any more signal handlers once TLS
+	 * has been torn down! */
+	/* TODO: Use `setsigmaskptr()' here, once that function's
+	 *       been added. */
+
 	if ((me->pt_flags & (PTHREAD_FUSERSTACK | PTHREAD_FNOSTACK)) == 0) {
 		/* Must unmap our own stack. */
 		void *stack_addr;
@@ -368,7 +380,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		/* The clone() system call failed. */
 		if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
 			free(pt->pt_cpuset);
-		dltlsfreeseg(pt->pt_tls);
+		dltlsfreeseg(tls);
 		return (errno_t)-cpid;
 	}
 	*newthread = pt;
@@ -377,7 +389,7 @@ err_nomem_tls_cpuset:
 	if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
 		free(pt->pt_cpuset);
 err_nomem_tls:
-	dltlsfreeseg(pt->pt_tls);
+	dltlsfreeseg(tls);
 err_nomem:
 	return ENOMEM;
 }

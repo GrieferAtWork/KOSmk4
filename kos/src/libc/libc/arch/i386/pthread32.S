@@ -72,7 +72,11 @@ INTERN_FUNCTION(libc_pthread_clone)
 	/* Perform the system call with `lcall', since `int $0x80' would clobber all registers
 	 * except for %ebp, however we need 2 registers to pass both `fn' and `arg' to the child
 	 * thread. */
+#if __OFFSET_PTHREAD_TID == 0
+	movl   %ecx, %eax                       /* pid_t *ctid */
+#else /* __OFFSET_PTHREAD_TID == 0 */
 	leal   __OFFSET_PTHREAD_TID(%ecx), %eax /* pid_t *ctid */
+#endif /* __OFFSET_PTHREAD_TID != 0 */
 	pushl_cfi %eax                          /* ... */
 	pushl_cfi __OFFSET_PTHREAD_TLS(%ecx)    /* void *newtls */
 	pushl_cfi %eax                          /* pid_t *ptid */

@@ -73,7 +73,11 @@ INTERN_FUNCTION(libc_pthread_clone)
 	movq   %rsi, %r15 /* __pthread_start_routine_t start */
 
 	movq   __OFFSET_PTHREAD_TLS(%rdi), %r8        /* void *newtls */
+#if __OFFSET_PTHREAD_TID == 0
+	movq   %rdi, %rdx                             /* pid_t *ptid */
+#else /* __OFFSET_PTHREAD_TID == 0 */
 	leaq   __OFFSET_PTHREAD_TID(%rdi), %rdx       /* pid_t *ptid */
+#endif /* __OFFSET_PTHREAD_TID != 0 */
 	movq   %rdx, %r10                             /* pid_t *ctid */
 	movq   __OFFSET_PTHREAD_STACKADDR(%rdi), %rsi
 	addq   __OFFSET_PTHREAD_STACKSIZE(%rdi), %rsi /* void *child_stack */
