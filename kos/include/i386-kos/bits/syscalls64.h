@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b2ea5ff */
+/* HASH CRC-32:0x284702ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -485,7 +485,7 @@
 #define SYS_getpmsg                __NR_getpmsg                /* errno_t getpmsg(int TODO_PROTOTYPE) */
 #define SYS_putpmsg                __NR_putpmsg                /* errno_t putpmsg(int TODO_PROTOTYPE) */
 #define SYS_afs_syscall            __NR_afs_syscall            /* errno_t afs_syscall(int TODO_PROTOTYPE) */
-#define SYS_tuxcall                __NR_tuxcall                /* errno_t tuxcall(int TODO_PROTOTYPE) */
+#define SYS_tuxcall                __NR_tuxcall                /* errno_t tuxcall(void) */
 #define SYS_security               __NR_security               /* errno_t security(int TODO_PROTOTYPE) */
 #define SYS_gettid                 __NR_gettid                 /* pid_t gettid(void) */
 #define SYS_readahead              __NR_readahead              /* ssize_t readahead(fd_t fd, uint64_t offset, size_t count) */

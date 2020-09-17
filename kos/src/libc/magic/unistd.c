@@ -47,7 +47,7 @@
 
 #include <asm/crt/confname.h>
 #include <asm/stdio.h>
-#include <asm/vfork.h> /* __ARCH_HAVE_VFORK_SHARED_VM */
+#include <asm/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
 #include <bits/posix_opt.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/types.h>

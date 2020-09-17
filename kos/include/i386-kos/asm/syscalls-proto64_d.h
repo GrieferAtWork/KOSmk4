@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77c62ad8 */
+/* HASH CRC-32:0x26c1b0a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,7 +222,7 @@
 #define __NR64AC_getpmsg                1
 #define __NR64AC_putpmsg                1
 #define __NR64AC_afs_syscall            1
-#define __NR64AC_tuxcall                1
+#define __NR64AC_tuxcall                0
 #define __NR64AC_security               1
 #define __NR64AC_gettid                 0
 #define __NR64AC_readahead              3
@@ -1221,7 +1221,6 @@
 #define __NR64AT0_getpmsg                (int, int)
 #define __NR64AT0_putpmsg                (int, int)
 #define __NR64AT0_afs_syscall            (int, int)
-#define __NR64AT0_tuxcall                (int, int)
 #define __NR64AT0_security               (int, int)
 #define __NR64AT0_readahead              (fd_t, __fd_t)
 #define __NR64AT1_readahead              (uint64_t, __uint64_t)
@@ -1979,7 +1978,7 @@
 #define __NR64AM_getpmsg(a, b, c, d, e, f)                (int)a
 #define __NR64AM_putpmsg(a, b, c, d, e, f)                (int)a
 #define __NR64AM_afs_syscall(a, b, c, d, e, f)            (int)a
-#define __NR64AM_tuxcall(a, b, c, d, e, f)                (int)a
+#define __NR64AM_tuxcall(a, b, c, d, e, f)                /* nothing */
 #define __NR64AM_security(a, b, c, d, e, f)               (int)a
 #define __NR64AM_gettid(a, b, c, d, e, f)                 /* nothing */
 #define __NR64AM_readahead(a, b, c, d, e, f)              (__fd_t)a, (__uint64_t)b, (__size_t)c
@@ -2387,7 +2386,7 @@
 #define __NR64AP_getpmsg(a)                               (__syscall_ulong_t)a
 #define __NR64AP_putpmsg(a)                               (__syscall_ulong_t)a
 #define __NR64AP_afs_syscall(a)                           (__syscall_ulong_t)a
-#define __NR64AP_tuxcall(a)                               (__syscall_ulong_t)a
+#define __NR64AP_tuxcall()                                /* nothing */
 #define __NR64AP_security(a)                              (__syscall_ulong_t)a
 #define __NR64AP_gettid()                                 /* nothing */
 #define __NR64AP_readahead(a, b, c)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

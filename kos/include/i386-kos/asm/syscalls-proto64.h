@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2324674b */
+/* HASH CRC-32:0x9b7cbdb2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -222,7 +222,7 @@
 #define __NRAC_getpmsg                1
 #define __NRAC_putpmsg                1
 #define __NRAC_afs_syscall            1
-#define __NRAC_tuxcall                1
+#define __NRAC_tuxcall                0
 #define __NRAC_security               1
 #define __NRAC_gettid                 0
 #define __NRAC_readahead              3
@@ -1221,7 +1221,6 @@
 #define __NRAT0_getpmsg                (int, int)
 #define __NRAT0_putpmsg                (int, int)
 #define __NRAT0_afs_syscall            (int, int)
-#define __NRAT0_tuxcall                (int, int)
 #define __NRAT0_security               (int, int)
 #define __NRAT0_readahead              (fd_t, __fd_t)
 #define __NRAT1_readahead              (uint64_t, __uint64_t)
@@ -1979,7 +1978,7 @@
 #define __NRAM_getpmsg(a, b, c, d, e, f)                (int)a
 #define __NRAM_putpmsg(a, b, c, d, e, f)                (int)a
 #define __NRAM_afs_syscall(a, b, c, d, e, f)            (int)a
-#define __NRAM_tuxcall(a, b, c, d, e, f)                (int)a
+#define __NRAM_tuxcall(a, b, c, d, e, f)                /* nothing */
 #define __NRAM_security(a, b, c, d, e, f)               (int)a
 #define __NRAM_gettid(a, b, c, d, e, f)                 /* nothing */
 #define __NRAM_readahead(a, b, c, d, e, f)              (__fd_t)a, (__uint64_t)b, (__size_t)c
@@ -2387,7 +2386,7 @@
 #define __NRAP_getpmsg(a)                               (__syscall_ulong_t)a
 #define __NRAP_putpmsg(a)                               (__syscall_ulong_t)a
 #define __NRAP_afs_syscall(a)                           (__syscall_ulong_t)a
-#define __NRAP_tuxcall(a)                               (__syscall_ulong_t)a
+#define __NRAP_tuxcall()                                /* nothing */
 #define __NRAP_security(a)                              (__syscall_ulong_t)a
 #define __NRAP_gettid()                                 /* nothing */
 #define __NRAP_readahead(a, b, c)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

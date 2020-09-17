@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee4dc18b */
+/* HASH CRC-32:0xc4f52313 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1365,8 +1365,8 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_sigqueue,(__pthread_t __threadid, __signo_
 #define SIGSET_INIT_EMPTY __SIGSET_INIT(0)
 
 /* Initialize a `sigset_t' as filled:
- * >> static sigset_t myset = SIGSET_INIT_FILL; */
-#define SIGSET_INIT_FILL __SIGSET_INIT((__ULONGPTR_TYPE__)-1)
+ * >> static sigset_t myset = SIGSET_INIT_FULL; */
+#define SIGSET_INIT_FULL __SIGSET_INIT((__ULONGPTR_TYPE__)-1)
 #endif /* __USE_KOS */
 
 /* GLibc function aliases originally found in <bits/sigset.h>

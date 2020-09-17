@@ -1449,8 +1449,8 @@ int pthread_sigqueue($pthread_t threadid,
 #define SIGSET_INIT_EMPTY __SIGSET_INIT(0)
 
 /* Initialize a `sigset_t' as filled:
- * >> static sigset_t myset = SIGSET_INIT_FILL; */
-#define SIGSET_INIT_FILL __SIGSET_INIT((__ULONGPTR_TYPE__)-1)
+ * >> static sigset_t myset = SIGSET_INIT_FULL; */
+#define SIGSET_INIT_FULL __SIGSET_INIT((__ULONGPTR_TYPE__)-1)
 #endif /* __USE_KOS */
 }
 

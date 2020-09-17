@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b714744 */
+/* HASH CRC-32:0xd44afbc9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5000,7 +5000,7 @@ INTERN_FUNCTION(libc_sys_Xafs_syscall)
 END(libc_sys_Xafs_syscall)
 DEFINE_PUBLIC_ALIAS(sys_Xafs_syscall, libc_sys_Xafs_syscall)
 
-/* errno_t tuxcall(int TODO_PROTOTYPE) */
+/* errno_t tuxcall(void) */
 .section .text.crt.syscall.tuxcall
 INTERN_FUNCTION(libc_sys_tuxcall)
 	.cfi_startproc
@@ -5012,7 +5012,7 @@ INTERN_FUNCTION(libc_sys_tuxcall)
 END(libc_sys_tuxcall)
 DEFINE_PUBLIC_ALIAS(sys_tuxcall, libc_sys_tuxcall)
 
-/* errno_t tuxcall(int TODO_PROTOTYPE) */
+/* errno_t tuxcall(void) */
 .section .text.crt.syscall.Xtuxcall
 INTERN_FUNCTION(libc_sys_Xtuxcall)
 	.cfi_startproc

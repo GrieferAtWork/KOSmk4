@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5bb6f45 */
+/* HASH CRC-32:0x3f03d1ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -393,7 +393,6 @@
 #define __NRAN0_getpmsg                TODO_PROTOTYPE
 #define __NRAN0_putpmsg                TODO_PROTOTYPE
 #define __NRAN0_afs_syscall            TODO_PROTOTYPE
-#define __NRAN0_tuxcall                TODO_PROTOTYPE
 #define __NRAN0_security               TODO_PROTOTYPE
 #define __NRAN0_readahead              fd
 #define __NRAN1_readahead              offset
@@ -1551,7 +1550,6 @@
 #define __NRRTR_putpmsg                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_afs_syscall            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_afs_syscall             SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_tuxcall                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_tuxcall                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_security               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_security                SC_REPR_ERRNO_T                                                      /* return */

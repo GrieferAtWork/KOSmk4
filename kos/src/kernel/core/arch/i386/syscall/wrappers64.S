@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8b9daa4 */
+/* HASH CRC-32:0x1c9c2bf0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5851,7 +5851,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_afs_syscall)
 	.cfi_endproc
 END(__x86_asm64_syscall_afs_syscall)
 
-/* errno_t tuxcall(int TODO_PROTOTYPE) */
+/* errno_t tuxcall(void) */
 .section .text.x86.asm64_syscall.tuxcall
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tuxcall)
 	.cfi_startproc simple

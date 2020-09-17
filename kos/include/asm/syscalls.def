@@ -311,6 +311,7 @@ lock:() -> errno_t;
 mpx:() -> errno_t;
 ulimit:() -> errno_t;
 idle:() -> errno_t;
+tuxcall:() -> errno_t; /* Used-to-be implemented, but no longer is. */
 
 
 
@@ -2718,7 +2719,6 @@ personality:(int TODO_PROTOTYPE) -> errno_t;
 seccomp:(int TODO_PROTOTYPE) -> errno_t;
 security:(int TODO_PROTOTYPE) -> errno_t;
 sysfs:(int TODO_PROTOTYPE) -> errno_t;
-tuxcall:(int TODO_PROTOTYPE) -> errno_t;
 rseq:(int TODO_PROTOTYPE) -> errno_t;
 statx:(int TODO_PROTOTYPE) -> errno_t;
 pkey_alloc:(int TODO_PROTOTYPE) -> errno_t;

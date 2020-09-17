@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57693bbb */
+/* HASH CRC-32:0x45a9758a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1959,7 +1959,7 @@ __CDECLARE_SC(,__errno_t,tkill,(__pid_t __tid, __signo_t __signo),(__tid,__signo
 __CDECLARE_SC(,__errno_t,truncate,(char const *__filename, __syscall_ulong_t __length),(__filename,__length))
 #endif /* __CRT_HAVE_SC(truncate) */
 #if __CRT_HAVE_SC(tuxcall)
-__CDECLARE_SC(,__errno_t,tuxcall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,tuxcall,(void),())
 #endif /* __CRT_HAVE_SC(tuxcall) */
 #if __CRT_HAVE_SC(umask)
 __CDECLARE_SC(,__mode_t,umask,(__mode_t __mode),(__mode))
@@ -3912,7 +3912,7 @@ __CDECLARE_XSC(,__errno_t,tkill,(__pid_t __tid, __signo_t __signo),(__tid,__sign
 __CDECLARE_XSC(,__errno_t,truncate,(char const *__filename, __syscall_ulong_t __length),(__filename,__length))
 #endif /* __CRT_HAVE_XSC(truncate) */
 #if __CRT_HAVE_XSC(tuxcall)
-__CDECLARE_XSC(,__errno_t,tuxcall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,tuxcall,(void),())
 #endif /* __CRT_HAVE_XSC(tuxcall) */
 #if __CRT_HAVE_XSC(umask)
 __CDECLARE_XSC(,__mode_t,umask,(__mode_t __mode),(__mode))
