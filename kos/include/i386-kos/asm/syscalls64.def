@@ -140,6 +140,7 @@ timer_settime = timer_settimex64;
 timer_gettime = timer_gettimex64;
 mq_timedsend = mq_timedsendx64;
 mq_timedreceive = mq_timedreceivex64;
+io_pgetevents = io_pgeteventsx64;
 
 
 /* Syscall definition syntax
@@ -477,15 +478,15 @@ mq_timedreceive = mq_timedreceivex64;
 0x0000000000000143:userfaultfd
 0x0000000000000144:membarrier
 0x0000000000000145:mlock2
-//TODO:0x0000000000000146:copy_file_range
-//TODO:0x0000000000000147:preadv2
-//TODO:0x0000000000000148:pwritev2
-//TODO:0x0000000000000149:pkey_mprotect
-//TODO:0x000000000000014a:pkey_alloc
-//TODO:0x000000000000014b:pkey_free
-//TODO:0x000000000000014c:statx
-//TODO:0x000000000000014d:io_pgetevents
-//TODO:0x000000000000014e:rseq
+0x0000000000000146:copy_file_range
+0x0000000000000147:preadv2
+0x0000000000000148:pwritev2
+0x0000000000000149:pkey_mprotect
+0x000000000000014a:pkey_alloc
+0x000000000000014b:pkey_free
+0x000000000000014c:statx
+0x000000000000014d:io_pgetevents
+0x000000000000014e:rseq
 /*000000000000014f:break*/
 /*0000000000000150:break*/
 /*0000000000000151:break*/
@@ -575,22 +576,22 @@ mq_timedreceive = mq_timedreceivex64;
 /*00000000000001a5:break*/
 /*00000000000001a6:break*/
 /*00000000000001a7:break*/
-//TODO:0x00000000000001a8:pidfd_send_signal
-//TODO:0x00000000000001a9:io_uring_setup
-//TODO:0x00000000000001aa:io_uring_enter
-//TODO:0x00000000000001ab:io_uring_register
-//TODO:0x00000000000001ac:open_tree
-//TODO:0x00000000000001ad:move_mount
-//TODO:0x00000000000001ae:fsopen
-//TODO:0x00000000000001af:fsconfig
-//TODO:0x00000000000001b0:fsmount
-//TODO:0x00000000000001b1:fspick
-//TODO:0x00000000000001b2:pidfd_open
-//TODO:0x00000000000001b3:clone3
-//TODO:0x00000000000001b4:close_range
-//TODO:0x00000000000001b5:openat2
-//TODO:0x00000000000001b6:pidfd_getfd
-//TODO:0x00000000000001b7:faccessat2
+0x00000000000001a8:pidfd_send_signal
+0x00000000000001a9:io_uring_setup
+0x00000000000001aa:io_uring_enter
+0x00000000000001ab:io_uring_register
+0x00000000000001ac:open_tree
+0x00000000000001ad:move_mount
+0x00000000000001ae:fsopen
+0x00000000000001af:fsconfig
+0x00000000000001b0:fsmount
+0x00000000000001b1:fspick
+0x00000000000001b2:pidfd_open
+0x00000000000001b3:clone3
+0x00000000000001b4:close_range
+0x00000000000001b5:openat2
+0x00000000000001b6:pidfd_getfd
+0x00000000000001b7:faccessat2
 /*00000000000001a8:break*/
 /*00000000000001a9:break*/
 /*00000000000001aa:break*/

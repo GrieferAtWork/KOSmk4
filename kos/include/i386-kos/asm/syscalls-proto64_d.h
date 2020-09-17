@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb77f2b49 */
+/* HASH CRC-32:0x56f80ea6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -364,6 +364,31 @@
 #define __NR64AC_userfaultfd            1
 #define __NR64AC_membarrier             1
 #define __NR64AC_mlock2                 1
+#define __NR64AC_copy_file_range        1
+#define __NR64AC_preadv2                1
+#define __NR64AC_pwritev2               1
+#define __NR64AC_pkey_mprotect          1
+#define __NR64AC_pkey_alloc             1
+#define __NR64AC_pkey_free              1
+#define __NR64AC_statx                  1
+#define __NR64AC_io_pgetevents          1
+#define __NR64AC_rseq                   1
+#define __NR64AC_pidfd_send_signal      1
+#define __NR64AC_io_uring_setup         1
+#define __NR64AC_io_uring_enter         1
+#define __NR64AC_io_uring_register      1
+#define __NR64AC_open_tree              1
+#define __NR64AC_move_mount             1
+#define __NR64AC_fsopen                 1
+#define __NR64AC_fsconfig               1
+#define __NR64AC_fsmount                1
+#define __NR64AC_fspick                 1
+#define __NR64AC_pidfd_open             1
+#define __NR64AC_clone3                 1
+#define __NR64AC_close_range            1
+#define __NR64AC_openat2                1
+#define __NR64AC_pidfd_getfd            1
+#define __NR64AC_faccessat2             1
 #define __NR64AC_pwritevf               5
 #define __NR64AC_preadvf                5
 #define __NR64AC_freadlinkat            5
@@ -747,6 +772,31 @@
 #define __NR64RT_userfaultfd            (errno_t, __errno_t)
 #define __NR64RT_membarrier             (errno_t, __errno_t)
 #define __NR64RT_mlock2                 (errno_t, __errno_t)
+#define __NR64RT_copy_file_range        (errno_t, __errno_t)
+#define __NR64RT_preadv2                (errno_t, __errno_t)
+#define __NR64RT_pwritev2               (errno_t, __errno_t)
+#define __NR64RT_pkey_mprotect          (errno_t, __errno_t)
+#define __NR64RT_pkey_alloc             (errno_t, __errno_t)
+#define __NR64RT_pkey_free              (errno_t, __errno_t)
+#define __NR64RT_statx                  (errno_t, __errno_t)
+#define __NR64RT_io_pgetevents          (errno_t, __errno_t)
+#define __NR64RT_rseq                   (errno_t, __errno_t)
+#define __NR64RT_pidfd_send_signal      (errno_t, __errno_t)
+#define __NR64RT_io_uring_setup         (errno_t, __errno_t)
+#define __NR64RT_io_uring_enter         (errno_t, __errno_t)
+#define __NR64RT_io_uring_register      (errno_t, __errno_t)
+#define __NR64RT_open_tree              (errno_t, __errno_t)
+#define __NR64RT_move_mount             (errno_t, __errno_t)
+#define __NR64RT_fsopen                 (errno_t, __errno_t)
+#define __NR64RT_fsconfig               (errno_t, __errno_t)
+#define __NR64RT_fsmount                (errno_t, __errno_t)
+#define __NR64RT_fspick                 (errno_t, __errno_t)
+#define __NR64RT_pidfd_open             (errno_t, __errno_t)
+#define __NR64RT_clone3                 (errno_t, __errno_t)
+#define __NR64RT_close_range            (errno_t, __errno_t)
+#define __NR64RT_openat2                (errno_t, __errno_t)
+#define __NR64RT_pidfd_getfd            (errno_t, __errno_t)
+#define __NR64RT_faccessat2             (errno_t, __errno_t)
 #define __NR64RT_pwritevf               (ssize_t, __ssize_t)
 #define __NR64RT_preadvf                (ssize_t, __ssize_t)
 #define __NR64RT_freadlinkat            (ssize_t, __ssize_t)
@@ -1546,6 +1596,31 @@
 #define __NR64AT0_userfaultfd            (int, int)
 #define __NR64AT0_membarrier             (int, int)
 #define __NR64AT0_mlock2                 (int, int)
+#define __NR64AT0_copy_file_range        (int, int)
+#define __NR64AT0_preadv2                (int, int)
+#define __NR64AT0_pwritev2               (int, int)
+#define __NR64AT0_pkey_mprotect          (int, int)
+#define __NR64AT0_pkey_alloc             (int, int)
+#define __NR64AT0_pkey_free              (int, int)
+#define __NR64AT0_statx                  (int, int)
+#define __NR64AT0_io_pgetevents          (int, int)
+#define __NR64AT0_rseq                   (int, int)
+#define __NR64AT0_pidfd_send_signal      (int, int)
+#define __NR64AT0_io_uring_setup         (int, int)
+#define __NR64AT0_io_uring_enter         (int, int)
+#define __NR64AT0_io_uring_register      (int, int)
+#define __NR64AT0_open_tree              (int, int)
+#define __NR64AT0_move_mount             (int, int)
+#define __NR64AT0_fsopen                 (int, int)
+#define __NR64AT0_fsconfig               (int, int)
+#define __NR64AT0_fsmount                (int, int)
+#define __NR64AT0_fspick                 (int, int)
+#define __NR64AT0_pidfd_open             (int, int)
+#define __NR64AT0_clone3                 (int, int)
+#define __NR64AT0_close_range            (int, int)
+#define __NR64AT0_openat2                (int, int)
+#define __NR64AT0_pidfd_getfd            (int, int)
+#define __NR64AT0_faccessat2             (int, int)
 #define __NR64AT0_pwritevf               (fd_t, __fd_t)
 #define __NR64AT1_pwritevf               (struct iovecx64 const *, struct __iovecx64 const *)
 #define __NR64AT2_pwritevf               (size_t, __size_t)
@@ -2040,6 +2115,31 @@
 #define __NR64AM_userfaultfd(a, b, c, d, e, f)            (int)a
 #define __NR64AM_membarrier(a, b, c, d, e, f)             (int)a
 #define __NR64AM_mlock2(a, b, c, d, e, f)                 (int)a
+#define __NR64AM_copy_file_range(a, b, c, d, e, f)        (int)a
+#define __NR64AM_preadv2(a, b, c, d, e, f)                (int)a
+#define __NR64AM_pwritev2(a, b, c, d, e, f)               (int)a
+#define __NR64AM_pkey_mprotect(a, b, c, d, e, f)          (int)a
+#define __NR64AM_pkey_alloc(a, b, c, d, e, f)             (int)a
+#define __NR64AM_pkey_free(a, b, c, d, e, f)              (int)a
+#define __NR64AM_statx(a, b, c, d, e, f)                  (int)a
+#define __NR64AM_io_pgetevents(a, b, c, d, e, f)          (int)a
+#define __NR64AM_rseq(a, b, c, d, e, f)                   (int)a
+#define __NR64AM_pidfd_send_signal(a, b, c, d, e, f)      (int)a
+#define __NR64AM_io_uring_setup(a, b, c, d, e, f)         (int)a
+#define __NR64AM_io_uring_enter(a, b, c, d, e, f)         (int)a
+#define __NR64AM_io_uring_register(a, b, c, d, e, f)      (int)a
+#define __NR64AM_open_tree(a, b, c, d, e, f)              (int)a
+#define __NR64AM_move_mount(a, b, c, d, e, f)             (int)a
+#define __NR64AM_fsopen(a, b, c, d, e, f)                 (int)a
+#define __NR64AM_fsconfig(a, b, c, d, e, f)               (int)a
+#define __NR64AM_fsmount(a, b, c, d, e, f)                (int)a
+#define __NR64AM_fspick(a, b, c, d, e, f)                 (int)a
+#define __NR64AM_pidfd_open(a, b, c, d, e, f)             (int)a
+#define __NR64AM_clone3(a, b, c, d, e, f)                 (int)a
+#define __NR64AM_close_range(a, b, c, d, e, f)            (int)a
+#define __NR64AM_openat2(a, b, c, d, e, f)                (int)a
+#define __NR64AM_pidfd_getfd(a, b, c, d, e, f)            (int)a
+#define __NR64AM_faccessat2(a, b, c, d, e, f)             (int)a
 #define __NR64AM_pwritevf(a, b, c, d, e, f)               (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NR64AM_preadvf(a, b, c, d, e, f)                (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__uint64_t)d, (__iomode_t)e
 #define __NR64AM_freadlinkat(a, b, c, d, e, f)            (__fd_t)a, (char const *)b, (char *)c, (__size_t)d, (__atflag_t)e
@@ -2423,6 +2523,31 @@
 #define __NR64AP_userfaultfd(a)                           (__syscall_ulong_t)a
 #define __NR64AP_membarrier(a)                            (__syscall_ulong_t)a
 #define __NR64AP_mlock2(a)                                (__syscall_ulong_t)a
+#define __NR64AP_copy_file_range(a)                       (__syscall_ulong_t)a
+#define __NR64AP_preadv2(a)                               (__syscall_ulong_t)a
+#define __NR64AP_pwritev2(a)                              (__syscall_ulong_t)a
+#define __NR64AP_pkey_mprotect(a)                         (__syscall_ulong_t)a
+#define __NR64AP_pkey_alloc(a)                            (__syscall_ulong_t)a
+#define __NR64AP_pkey_free(a)                             (__syscall_ulong_t)a
+#define __NR64AP_statx(a)                                 (__syscall_ulong_t)a
+#define __NR64AP_io_pgetevents(a)                         (__syscall_ulong_t)a
+#define __NR64AP_rseq(a)                                  (__syscall_ulong_t)a
+#define __NR64AP_pidfd_send_signal(a)                     (__syscall_ulong_t)a
+#define __NR64AP_io_uring_setup(a)                        (__syscall_ulong_t)a
+#define __NR64AP_io_uring_enter(a)                        (__syscall_ulong_t)a
+#define __NR64AP_io_uring_register(a)                     (__syscall_ulong_t)a
+#define __NR64AP_open_tree(a)                             (__syscall_ulong_t)a
+#define __NR64AP_move_mount(a)                            (__syscall_ulong_t)a
+#define __NR64AP_fsopen(a)                                (__syscall_ulong_t)a
+#define __NR64AP_fsconfig(a)                              (__syscall_ulong_t)a
+#define __NR64AP_fsmount(a)                               (__syscall_ulong_t)a
+#define __NR64AP_fspick(a)                                (__syscall_ulong_t)a
+#define __NR64AP_pidfd_open(a)                            (__syscall_ulong_t)a
+#define __NR64AP_clone3(a)                                (__syscall_ulong_t)a
+#define __NR64AP_close_range(a)                           (__syscall_ulong_t)a
+#define __NR64AP_openat2(a)                               (__syscall_ulong_t)a
+#define __NR64AP_pidfd_getfd(a)                           (__syscall_ulong_t)a
+#define __NR64AP_faccessat2(a)                            (__syscall_ulong_t)a
 #define __NR64AP_pwritevf(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_preadvf(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_freadlinkat(a, b, c, d, e)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

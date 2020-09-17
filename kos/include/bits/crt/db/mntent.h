@@ -38,7 +38,7 @@ __DECL_BEGIN
  * FILES:
  *   - /proc/self/mounts       (Currently mounted filesystems)
  *   - /etc/fstab              (Filesystems mounted by /bin/init)
- *   - /etc/mtab               (Alias for /proc/self/mounts
+ *   - /etc/mtab               (Alias for /proc/self/mounts)
  */
 struct mntent {
 	char *mnt_fsname; /* Device or server for filesystem. */

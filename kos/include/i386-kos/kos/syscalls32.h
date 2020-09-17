@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9abe8be */
+/* HASH CRC-32:0x242075f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,6 +143,7 @@ struct rlimit64;
 struct rpc_syscall_info32;
 struct sched_param;
 struct sel_arg_structx32;
+struct shmid_ds;
 struct sigevent;
 struct sockaddr;
 struct sysinfo;
@@ -199,6 +200,9 @@ __CDECLARE_SC(,__errno_t,afs_syscall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(alarm)
 __CDECLARE_SC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
 #endif /* __CRT_HAVE_SC(alarm) */
+#if __CRT_HAVE_SC(arch_prctl)
+__CDECLARE_SC(,__errno_t,arch_prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(arch_prctl) */
 #if __CRT_HAVE_SC(bdflush)
 __CDECLARE_SC(,__errno_t,bdflush,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(bdflush) */
@@ -275,10 +279,16 @@ __CDECLARE_SC(,__errno_t,clock_settime64,(__clockid_t __clock_id, struct __times
 #if __CRT_HAVE_SC(clone)
 __CDECLARE_SC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __pid_t *__ptid, __uintptr_t __newtls, __pid_t *__ctid),(__flags,__child_stack,__ptid,__newtls,__ctid))
 #endif /* __CRT_HAVE_SC(clone) */
+#if __CRT_HAVE_SC(clone3)
+__CDECLARE_SC(,__errno_t,clone3,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(clone3) */
 #if __CRT_HAVE_SC(close)
 /* Close a given file descriptor/handle `FD' */
 __CDECLARE_SC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(close) */
+#if __CRT_HAVE_SC(close_range)
+__CDECLARE_SC(,__errno_t,close_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(close_range) */
 #if __CRT_HAVE_SC(connect)
 /* Connect to the specified address.
  * If the given `sockfd' isn't connection-oriented, this will set the address
@@ -292,6 +302,9 @@ __CDECLARE_SC(,__errno_t,close,(__fd_t __fd),(__fd))
  * @return: 0 : Success */
 __CDECLARE_SC(,__errno_t,connect,(__fd_t __sockfd, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_SC(connect) */
+#if __CRT_HAVE_SC(copy_file_range)
+__CDECLARE_SC(,__errno_t,copy_file_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(copy_file_range) */
 #if __CRT_HAVE_SC(coredump)
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
@@ -491,6 +504,9 @@ __CDECLARE_VOID_SC(__ATTR_NORETURN,exit_group,(__syscall_ulong_t __exit_code),(_
  * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,faccessat,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type, __atflag_t __flags),(__dirfd,__filename,__type,__flags))
 #endif /* __CRT_HAVE_SC(faccessat) */
+#if __CRT_HAVE_SC(faccessat2)
+__CDECLARE_SC(,__errno_t,faccessat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(faccessat2) */
 #if __CRT_HAVE_SC(fadvise64)
 __CDECLARE_SC(,__errno_t,fadvise64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(fadvise64) */
@@ -604,6 +620,9 @@ __CDECLARE_SC(,__errno_t,fremovexattr,(__fd_t __fd, char const *__name),(__fd,__
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_SC(,__errno_t,frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #endif /* __CRT_HAVE_SC(frenameat) */
+#if __CRT_HAVE_SC(fsconfig)
+__CDECLARE_SC(,__errno_t,fsconfig,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(fsconfig) */
 #if __CRT_HAVE_SC(fsetxattr)
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 __CDECLARE_SC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__fd,__name,__buf,__bufsize,__flags))
@@ -611,6 +630,15 @@ __CDECLARE_SC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const 
 #if __CRT_HAVE_SC(fsmode)
 __CDECLARE_SC(,__uint64_t,fsmode,(__uint64_t __mode),(__mode))
 #endif /* __CRT_HAVE_SC(fsmode) */
+#if __CRT_HAVE_SC(fsmount)
+__CDECLARE_SC(,__errno_t,fsmount,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(fsmount) */
+#if __CRT_HAVE_SC(fsopen)
+__CDECLARE_SC(,__errno_t,fsopen,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(fsopen) */
+#if __CRT_HAVE_SC(fspick)
+__CDECLARE_SC(,__errno_t,fspick,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(fspick) */
 #if __CRT_HAVE_SC(fstat)
 __CDECLARE_SC(,__errno_t,fstat,(__fd_t __fd, struct linux_statx32 *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_SC(fstat) */
@@ -652,6 +680,10 @@ __CDECLARE_SC(,__errno_t,ftruncate64,(__fd_t __fd, __uint64_t __length),(__fd,__
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 __CDECLARE_SC(,__syscall_slong_t,futex,(__uint32_t *__uaddr, __syscall_ulong_t __futex_op, __uint32_t __val, struct __timespecx32 const *__timeout_or_val2, __uint32_t *__uaddr2, __uint32_t __val3),(__uaddr,__futex_op,__val,__timeout_or_val2,__uaddr2,__val3))
 #endif /* __CRT_HAVE_SC(futex) */
+#if __CRT_HAVE_SC(futex_time64)
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+__CDECLARE_SC(,__syscall_slong_t,futex_time64,(__uint32_t *__uaddr, __syscall_ulong_t __futex_op, __uint32_t __val, struct __timespecx32_64 const *__timeout_or_val2, __uint32_t *__uaddr2, __uint32_t __val3),(__uaddr,__futex_op,__val,__timeout_or_val2,__uaddr2,__val3))
+#endif /* __CRT_HAVE_SC(futex_time64) */
 #if __CRT_HAVE_SC(futimesat)
 __CDECLARE_SC(,__errno_t,futimesat,(__fd_t __dirfd, char const *__filename, struct __timevalx32 const *__times),(__dirfd,__filename,__times))
 #endif /* __CRT_HAVE_SC(futimesat) */
@@ -886,12 +918,27 @@ __CDECLARE_SC(,__errno_t,io_destroy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(io_getevents)
 __CDECLARE_SC(,__errno_t,io_getevents,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(io_getevents) */
+#if __CRT_HAVE_SC(io_pgetevents)
+__CDECLARE_SC(,__errno_t,io_pgetevents,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(io_pgetevents) */
+#if __CRT_HAVE_SC(io_pgetevents_time64)
+__CDECLARE_SC(,__errno_t,io_pgetevents_time64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(io_pgetevents_time64) */
 #if __CRT_HAVE_SC(io_setup)
 __CDECLARE_SC(,__errno_t,io_setup,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(io_setup) */
 #if __CRT_HAVE_SC(io_submit)
 __CDECLARE_SC(,__errno_t,io_submit,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(io_submit) */
+#if __CRT_HAVE_SC(io_uring_enter)
+__CDECLARE_SC(,__errno_t,io_uring_enter,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(io_uring_enter) */
+#if __CRT_HAVE_SC(io_uring_register)
+__CDECLARE_SC(,__errno_t,io_uring_register,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(io_uring_register) */
+#if __CRT_HAVE_SC(io_uring_setup)
+__CDECLARE_SC(,__errno_t,io_uring_setup,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(io_uring_setup) */
 #if __CRT_HAVE_SC(ioctl)
 __CDECLARE_SC(,__syscall_slong_t,ioctl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_SC(ioctl) */
@@ -1178,6 +1225,9 @@ __CDECLARE_SC(,__syscall_slong_t,modify_ldt,(__syscall_ulong_t __func, void *__p
 #if __CRT_HAVE_SC(mount)
 __CDECLARE_SC(,__errno_t,mount,(char const *__special_file, char const *__dir, char const *__fstype, __syscall_ulong_t __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
 #endif /* __CRT_HAVE_SC(mount) */
+#if __CRT_HAVE_SC(move_mount)
+__CDECLARE_SC(,__errno_t,move_mount,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(move_mount) */
 #if __CRT_HAVE_SC(move_pages)
 __CDECLARE_SC(,__errno_t,move_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(move_pages) */
@@ -1216,6 +1266,18 @@ __CDECLARE_SC(,__errno_t,mq_unlink,(char const *__name),(__name))
 /* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 __CDECLARE_SC(,void *,mremap,(void *__addr, __size_t __old_len, __size_t __new_len, __syscall_ulong_t __flags, void *__new_address),(__addr,__old_len,__new_len,__flags,__new_address))
 #endif /* __CRT_HAVE_SC(mremap) */
+#if __CRT_HAVE_SC(msgctl)
+__CDECLARE_SC(,__errno_t,msgctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(msgctl) */
+#if __CRT_HAVE_SC(msgget)
+__CDECLARE_SC(,__errno_t,msgget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(msgget) */
+#if __CRT_HAVE_SC(msgrcv)
+__CDECLARE_SC(,__errno_t,msgrcv,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(msgrcv) */
+#if __CRT_HAVE_SC(msgsnd)
+__CDECLARE_SC(,__errno_t,msgsnd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(msgsnd) */
 #if __CRT_HAVE_SC(msync)
 __CDECLARE_SC(,__errno_t,msync,(void *__addr, __size_t __len, __syscall_ulong_t __flags),(__addr,__len,__flags))
 #endif /* __CRT_HAVE_SC(msync) */
@@ -1278,6 +1340,9 @@ __CDECLARE_SC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_t
 #if __CRT_HAVE_SC(open_by_handle_at)
 __CDECLARE_SC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle const *__handle, __oflag_t __flags),(__mountdirfd,__handle,__flags))
 #endif /* __CRT_HAVE_SC(open_by_handle_at) */
+#if __CRT_HAVE_SC(open_tree)
+__CDECLARE_SC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(open_tree) */
 #if __CRT_HAVE_SC(openat)
 /* Open a new file handle to the file specified by `FILENAME'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -1294,6 +1359,9 @@ __CDECLARE_SC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CDECLARE_SC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_SC(openat) */
+#if __CRT_HAVE_SC(openat2)
+__CDECLARE_SC(,__errno_t,openat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(openat2) */
 #if __CRT_HAVE_SC(openpty)
 /* Create a new pseudo-terminal driver and store handles to both the
  * master and slave ends of the connection in the given pointers. */
@@ -1308,6 +1376,15 @@ __CDECLARE_SC(,__errno_t,perf_event_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 #if __CRT_HAVE_SC(personality)
 __CDECLARE_SC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(personality) */
+#if __CRT_HAVE_SC(pidfd_getfd)
+__CDECLARE_SC(,__errno_t,pidfd_getfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(pidfd_getfd) */
+#if __CRT_HAVE_SC(pidfd_open)
+__CDECLARE_SC(,__errno_t,pidfd_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(pidfd_open) */
+#if __CRT_HAVE_SC(pidfd_send_signal)
+__CDECLARE_SC(,__errno_t,pidfd_send_signal,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(pidfd_send_signal) */
 #if __CRT_HAVE_SC(pipe)
 __CDECLARE_SC(,__errno_t,pipe,(__fd_t *__pipedes),(__pipedes))
 #endif /* __CRT_HAVE_SC(pipe) */
@@ -1317,6 +1394,15 @@ __CDECLARE_SC(,__errno_t,pipe2,(__fd_t *__pipedes, __oflag_t __flags),(__pipedes
 #if __CRT_HAVE_SC(pivot_root)
 __CDECLARE_SC(,__errno_t,pivot_root,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(pivot_root) */
+#if __CRT_HAVE_SC(pkey_alloc)
+__CDECLARE_SC(,__errno_t,pkey_alloc,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(pkey_alloc) */
+#if __CRT_HAVE_SC(pkey_free)
+__CDECLARE_SC(,__errno_t,pkey_free,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(pkey_free) */
+#if __CRT_HAVE_SC(pkey_mprotect)
+__CDECLARE_SC(,__errno_t,pkey_mprotect,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(pkey_mprotect) */
 #if __CRT_HAVE_SC(poll)
 __CDECLARE_SC(,__ssize_t,poll,(struct pollfd *__fds, __size_t __nfds, __syscall_slong_t __timeout),(__fds,__nfds,__timeout))
 #endif /* __CRT_HAVE_SC(poll) */
@@ -1341,6 +1427,9 @@ __CDECLARE_SC(,__ssize_t,pread64f,(__fd_t __fd, void *__buf, __size_t __bufsize,
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CDECLARE_SC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_SC(preadv) */
+#if __CRT_HAVE_SC(preadv2)
+__CDECLARE_SC(,__errno_t,preadv2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(preadv2) */
 #if __CRT_HAVE_SC(preadvf)
 /* Same as `readv(2)', but read data from a file at a
  * specific `offset', rather than the current R/W position
@@ -1393,6 +1482,9 @@ __CDECLARE_SC(,__ssize_t,pwrite64f,(__fd_t __fd, void const *__buf, __size_t __b
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CDECLARE_SC(,__ssize_t,pwritev,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_SC(pwritev) */
+#if __CRT_HAVE_SC(pwritev2)
+__CDECLARE_SC(,__errno_t,pwritev2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(pwritev2) */
 #if __CRT_HAVE_SC(pwritevf)
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -1567,6 +1659,9 @@ __CDECLARE_SC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulong
 #if __CRT_HAVE_SC(rpc_service)
 __CDECLARE_SC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_SC(rpc_service) */
+#if __CRT_HAVE_SC(rseq)
+__CDECLARE_SC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(rseq) */
 #if __CRT_HAVE_SC(rt_sigaction)
 __CDECLARE_SC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_SC(rt_sigaction) */
@@ -1694,6 +1789,15 @@ __CDECLARE_SC(,__ssize_t,select,(struct sel_arg_structx32 const *__arg),(__arg))
 #if __CRT_HAVE_SC(select64)
 __CDECLARE_SC(,__ssize_t,select64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timevalx32_64 *__timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #endif /* __CRT_HAVE_SC(select64) */
+#if __CRT_HAVE_SC(semctl)
+__CDECLARE_SC(,__errno_t,semctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(semctl) */
+#if __CRT_HAVE_SC(semget)
+__CDECLARE_SC(,__errno_t,semget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(semget) */
+#if __CRT_HAVE_SC(semtimedop_time64)
+__CDECLARE_SC(,__errno_t,semtimedop_time64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(semtimedop_time64) */
 #if __CRT_HAVE_SC(sendfile)
 __CDECLARE_SC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __ULONG32_TYPE__ *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_SC(sendfile) */
@@ -1871,6 +1975,18 @@ __CDECLARE_SC(,__errno_t,setxattr,(char const *__path, char const *__name, void 
 #if __CRT_HAVE_SC(sgetmask)
 __CDECLARE_SC(,__syscall_ulong_t,sgetmask,(void),())
 #endif /* __CRT_HAVE_SC(sgetmask) */
+#if __CRT_HAVE_SC(shmat)
+__CDECLARE_SC(,__errno_t,shmat,(__syscall_ulong_t __shmid, void const *__shmaddr, __syscall_ulong_t __shmflg),(__shmid,__shmaddr,__shmflg))
+#endif /* __CRT_HAVE_SC(shmat) */
+#if __CRT_HAVE_SC(shmctl)
+__CDECLARE_SC(,__errno_t,shmctl,(__syscall_ulong_t __shmid, __syscall_ulong_t __cmd, struct shmid_ds *__buf),(__shmid,__cmd,__buf))
+#endif /* __CRT_HAVE_SC(shmctl) */
+#if __CRT_HAVE_SC(shmdt)
+__CDECLARE_SC(,__errno_t,shmdt,(void const *__shmaddr),(__shmaddr))
+#endif /* __CRT_HAVE_SC(shmdt) */
+#if __CRT_HAVE_SC(shmget)
+__CDECLARE_SC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulong_t __shmflg),(__key,__size,__shmflg))
+#endif /* __CRT_HAVE_SC(shmget) */
 #if __CRT_HAVE_SC(shutdown)
 /* Disallow further reception of data (causing `recv(2)' to return `0' as soon
  * as all currently queued data has been read), and/or further transmission
@@ -1967,6 +2083,9 @@ __CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct __statfsx32 *__buf),
 #if __CRT_HAVE_SC(statfs64)
 __CDECLARE_SC(,__errno_t,statfs64,(char const *__file, struct __statfsx32_64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(statfs64) */
+#if __CRT_HAVE_SC(statx)
+__CDECLARE_SC(,__errno_t,statx,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_SC(statx) */
 #if __CRT_HAVE_SC(stime)
 __CDECLARE_SC(,__errno_t,stime,(__time32_t const *__t),(__t))
 #endif /* __CRT_HAVE_SC(stime) */
@@ -2315,6 +2434,9 @@ __CDECLARE_XSC(,__errno_t,afs_syscall,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(alarm)
 __CDECLARE_XSC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds))
 #endif /* __CRT_HAVE_XSC(alarm) */
+#if __CRT_HAVE_XSC(arch_prctl)
+__CDECLARE_XSC(,__errno_t,arch_prctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(arch_prctl) */
 #if __CRT_HAVE_XSC(bdflush)
 __CDECLARE_XSC(,__errno_t,bdflush,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(bdflush) */
@@ -2391,10 +2513,16 @@ __CDECLARE_XSC(,__errno_t,clock_settime64,(__clockid_t __clock_id, struct __time
 #if __CRT_HAVE_XSC(clone)
 __CDECLARE_XSC(,__pid_t,clone,(__syscall_ulong_t __flags, void *__child_stack, __pid_t *__ptid, __uintptr_t __newtls, __pid_t *__ctid),(__flags,__child_stack,__ptid,__newtls,__ctid))
 #endif /* __CRT_HAVE_XSC(clone) */
+#if __CRT_HAVE_XSC(clone3)
+__CDECLARE_XSC(,__errno_t,clone3,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(clone3) */
 #if __CRT_HAVE_XSC(close)
 /* Close a given file descriptor/handle `FD' */
 __CDECLARE_XSC(,__errno_t,close,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(close) */
+#if __CRT_HAVE_XSC(close_range)
+__CDECLARE_XSC(,__errno_t,close_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(close_range) */
 #if __CRT_HAVE_XSC(connect)
 /* Connect to the specified address.
  * If the given `sockfd' isn't connection-oriented, this will set the address
@@ -2408,6 +2536,9 @@ __CDECLARE_XSC(,__errno_t,close,(__fd_t __fd),(__fd))
  * @return: 0 : Success */
 __CDECLARE_XSC(,__errno_t,connect,(__fd_t __sockfd, struct sockaddr const *__addr, __socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* __CRT_HAVE_XSC(connect) */
+#if __CRT_HAVE_XSC(copy_file_range)
+__CDECLARE_XSC(,__errno_t,copy_file_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(copy_file_range) */
 #if __CRT_HAVE_XSC(coredump)
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
@@ -2607,6 +2738,9 @@ __CDECLARE_VOID_XSC(__ATTR_NORETURN,exit_group,(__syscall_ulong_t __exit_code),(
  * @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,faccessat,(__fd_t __dirfd, char const *__filename, __syscall_ulong_t __type, __atflag_t __flags),(__dirfd,__filename,__type,__flags))
 #endif /* __CRT_HAVE_XSC(faccessat) */
+#if __CRT_HAVE_XSC(faccessat2)
+__CDECLARE_XSC(,__errno_t,faccessat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(faccessat2) */
 #if __CRT_HAVE_XSC(fadvise64)
 __CDECLARE_XSC(,__errno_t,fadvise64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(fadvise64) */
@@ -2720,6 +2854,9 @@ __CDECLARE_XSC(,__errno_t,fremovexattr,(__fd_t __fd, char const *__name),(__fd,_
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 __CDECLARE_XSC(,__errno_t,frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #endif /* __CRT_HAVE_XSC(frenameat) */
+#if __CRT_HAVE_XSC(fsconfig)
+__CDECLARE_XSC(,__errno_t,fsconfig,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(fsconfig) */
 #if __CRT_HAVE_XSC(fsetxattr)
 /* @param: flags: One of `0', `XATTR_CREATE' or `XATTR_REPLACE' */
 __CDECLARE_XSC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const *__buf, __size_t __bufsize, __syscall_ulong_t __flags),(__fd,__name,__buf,__bufsize,__flags))
@@ -2727,6 +2864,15 @@ __CDECLARE_XSC(,__errno_t,fsetxattr,(__fd_t __fd, char const *__name, void const
 #if __CRT_HAVE_XSC(fsmode)
 __CDECLARE_XSC(,__uint64_t,fsmode,(__uint64_t __mode),(__mode))
 #endif /* __CRT_HAVE_XSC(fsmode) */
+#if __CRT_HAVE_XSC(fsmount)
+__CDECLARE_XSC(,__errno_t,fsmount,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(fsmount) */
+#if __CRT_HAVE_XSC(fsopen)
+__CDECLARE_XSC(,__errno_t,fsopen,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(fsopen) */
+#if __CRT_HAVE_XSC(fspick)
+__CDECLARE_XSC(,__errno_t,fspick,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(fspick) */
 #if __CRT_HAVE_XSC(fstat)
 __CDECLARE_XSC(,__errno_t,fstat,(__fd_t __fd, struct linux_statx32 *__statbuf),(__fd,__statbuf))
 #endif /* __CRT_HAVE_XSC(fstat) */
@@ -2768,6 +2914,10 @@ __CDECLARE_XSC(,__errno_t,ftruncate64,(__fd_t __fd, __uint64_t __length),(__fd,_
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 __CDECLARE_XSC(,__syscall_slong_t,futex,(__uint32_t *__uaddr, __syscall_ulong_t __futex_op, __uint32_t __val, struct __timespecx32 const *__timeout_or_val2, __uint32_t *__uaddr2, __uint32_t __val3),(__uaddr,__futex_op,__val,__timeout_or_val2,__uaddr2,__val3))
 #endif /* __CRT_HAVE_XSC(futex) */
+#if __CRT_HAVE_XSC(futex_time64)
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+__CDECLARE_XSC(,__syscall_slong_t,futex_time64,(__uint32_t *__uaddr, __syscall_ulong_t __futex_op, __uint32_t __val, struct __timespecx32_64 const *__timeout_or_val2, __uint32_t *__uaddr2, __uint32_t __val3),(__uaddr,__futex_op,__val,__timeout_or_val2,__uaddr2,__val3))
+#endif /* __CRT_HAVE_XSC(futex_time64) */
 #if __CRT_HAVE_XSC(futimesat)
 __CDECLARE_XSC(,__errno_t,futimesat,(__fd_t __dirfd, char const *__filename, struct __timevalx32 const *__times),(__dirfd,__filename,__times))
 #endif /* __CRT_HAVE_XSC(futimesat) */
@@ -3002,12 +3152,27 @@ __CDECLARE_XSC(,__errno_t,io_destroy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(io_getevents)
 __CDECLARE_XSC(,__errno_t,io_getevents,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(io_getevents) */
+#if __CRT_HAVE_XSC(io_pgetevents)
+__CDECLARE_XSC(,__errno_t,io_pgetevents,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(io_pgetevents) */
+#if __CRT_HAVE_XSC(io_pgetevents_time64)
+__CDECLARE_XSC(,__errno_t,io_pgetevents_time64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(io_pgetevents_time64) */
 #if __CRT_HAVE_XSC(io_setup)
 __CDECLARE_XSC(,__errno_t,io_setup,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(io_setup) */
 #if __CRT_HAVE_XSC(io_submit)
 __CDECLARE_XSC(,__errno_t,io_submit,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(io_submit) */
+#if __CRT_HAVE_XSC(io_uring_enter)
+__CDECLARE_XSC(,__errno_t,io_uring_enter,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(io_uring_enter) */
+#if __CRT_HAVE_XSC(io_uring_register)
+__CDECLARE_XSC(,__errno_t,io_uring_register,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(io_uring_register) */
+#if __CRT_HAVE_XSC(io_uring_setup)
+__CDECLARE_XSC(,__errno_t,io_uring_setup,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(io_uring_setup) */
 #if __CRT_HAVE_XSC(ioctl)
 __CDECLARE_XSC(,__syscall_slong_t,ioctl,(__fd_t __fd, __syscall_ulong_t __command, void *__arg),(__fd,__command,__arg))
 #endif /* __CRT_HAVE_XSC(ioctl) */
@@ -3294,6 +3459,9 @@ __CDECLARE_XSC(,__syscall_slong_t,modify_ldt,(__syscall_ulong_t __func, void *__
 #if __CRT_HAVE_XSC(mount)
 __CDECLARE_XSC(,__errno_t,mount,(char const *__special_file, char const *__dir, char const *__fstype, __syscall_ulong_t __mountflags, void const *__data),(__special_file,__dir,__fstype,__mountflags,__data))
 #endif /* __CRT_HAVE_XSC(mount) */
+#if __CRT_HAVE_XSC(move_mount)
+__CDECLARE_XSC(,__errno_t,move_mount,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(move_mount) */
 #if __CRT_HAVE_XSC(move_pages)
 __CDECLARE_XSC(,__errno_t,move_pages,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(move_pages) */
@@ -3332,6 +3500,18 @@ __CDECLARE_XSC(,__errno_t,mq_unlink,(char const *__name),(__name))
 /* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 __CDECLARE_XSC(,void *,mremap,(void *__addr, __size_t __old_len, __size_t __new_len, __syscall_ulong_t __flags, void *__new_address),(__addr,__old_len,__new_len,__flags,__new_address))
 #endif /* __CRT_HAVE_XSC(mremap) */
+#if __CRT_HAVE_XSC(msgctl)
+__CDECLARE_XSC(,__errno_t,msgctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(msgctl) */
+#if __CRT_HAVE_XSC(msgget)
+__CDECLARE_XSC(,__errno_t,msgget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(msgget) */
+#if __CRT_HAVE_XSC(msgrcv)
+__CDECLARE_XSC(,__errno_t,msgrcv,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(msgrcv) */
+#if __CRT_HAVE_XSC(msgsnd)
+__CDECLARE_XSC(,__errno_t,msgsnd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(msgsnd) */
 #if __CRT_HAVE_XSC(msync)
 __CDECLARE_XSC(,__errno_t,msync,(void *__addr, __size_t __len, __syscall_ulong_t __flags),(__addr,__len,__flags))
 #endif /* __CRT_HAVE_XSC(msync) */
@@ -3394,6 +3574,9 @@ __CDECLARE_XSC(,__fd_t,open,(char const *__filename, __oflag_t __oflags, __mode_
 #if __CRT_HAVE_XSC(open_by_handle_at)
 __CDECLARE_XSC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle const *__handle, __oflag_t __flags),(__mountdirfd,__handle,__flags))
 #endif /* __CRT_HAVE_XSC(open_by_handle_at) */
+#if __CRT_HAVE_XSC(open_tree)
+__CDECLARE_XSC(,__errno_t,open_tree,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(open_tree) */
 #if __CRT_HAVE_XSC(openat)
 /* Open a new file handle to the file specified by `FILENAME'
  * When `oflags & O_CREAT', then `mode' specifies the initial
@@ -3410,6 +3593,9 @@ __CDECLARE_XSC(,__fd_t,open_by_handle_at,(__fd_t __mountdirfd, struct file_handl
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CDECLARE_XSC(,__fd_t,openat,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, __mode_t __mode),(__dirfd,__filename,__oflags,__mode))
 #endif /* __CRT_HAVE_XSC(openat) */
+#if __CRT_HAVE_XSC(openat2)
+__CDECLARE_XSC(,__errno_t,openat2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(openat2) */
 #if __CRT_HAVE_XSC(openpty)
 /* Create a new pseudo-terminal driver and store handles to both the
  * master and slave ends of the connection in the given pointers. */
@@ -3424,6 +3610,15 @@ __CDECLARE_XSC(,__errno_t,perf_event_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 #if __CRT_HAVE_XSC(personality)
 __CDECLARE_XSC(,__errno_t,personality,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(personality) */
+#if __CRT_HAVE_XSC(pidfd_getfd)
+__CDECLARE_XSC(,__errno_t,pidfd_getfd,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(pidfd_getfd) */
+#if __CRT_HAVE_XSC(pidfd_open)
+__CDECLARE_XSC(,__errno_t,pidfd_open,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(pidfd_open) */
+#if __CRT_HAVE_XSC(pidfd_send_signal)
+__CDECLARE_XSC(,__errno_t,pidfd_send_signal,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(pidfd_send_signal) */
 #if __CRT_HAVE_XSC(pipe)
 __CDECLARE_XSC(,__errno_t,pipe,(__fd_t *__pipedes),(__pipedes))
 #endif /* __CRT_HAVE_XSC(pipe) */
@@ -3433,6 +3628,15 @@ __CDECLARE_XSC(,__errno_t,pipe2,(__fd_t *__pipedes, __oflag_t __flags),(__pipede
 #if __CRT_HAVE_XSC(pivot_root)
 __CDECLARE_XSC(,__errno_t,pivot_root,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(pivot_root) */
+#if __CRT_HAVE_XSC(pkey_alloc)
+__CDECLARE_XSC(,__errno_t,pkey_alloc,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(pkey_alloc) */
+#if __CRT_HAVE_XSC(pkey_free)
+__CDECLARE_XSC(,__errno_t,pkey_free,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(pkey_free) */
+#if __CRT_HAVE_XSC(pkey_mprotect)
+__CDECLARE_XSC(,__errno_t,pkey_mprotect,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(pkey_mprotect) */
 #if __CRT_HAVE_XSC(poll)
 __CDECLARE_XSC(,__ssize_t,poll,(struct pollfd *__fds, __size_t __nfds, __syscall_slong_t __timeout),(__fds,__nfds,__timeout))
 #endif /* __CRT_HAVE_XSC(poll) */
@@ -3457,6 +3661,9 @@ __CDECLARE_XSC(,__ssize_t,pread64f,(__fd_t __fd, void *__buf, __size_t __bufsize
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
 __CDECLARE_XSC(,__ssize_t,preadv,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_XSC(preadv) */
+#if __CRT_HAVE_XSC(preadv2)
+__CDECLARE_XSC(,__errno_t,preadv2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(preadv2) */
 #if __CRT_HAVE_XSC(preadvf)
 /* Same as `readv(2)', but read data from a file at a
  * specific `offset', rather than the current R/W position
@@ -3509,6 +3716,9 @@ __CDECLARE_XSC(,__ssize_t,pwrite64f,(__fd_t __fd, void const *__buf, __size_t __
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
 __CDECLARE_XSC(,__ssize_t,pwritev,(__fd_t __fd, struct __iovecx32 const *__iovec, __size_t __count, __uint64_t __offset),(__fd,__iovec,__count,__offset))
 #endif /* __CRT_HAVE_XSC(pwritev) */
+#if __CRT_HAVE_XSC(pwritev2)
+__CDECLARE_XSC(,__errno_t,pwritev2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(pwritev2) */
 #if __CRT_HAVE_XSC(pwritevf)
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -3683,6 +3893,9 @@ __CDECLARE_XSC(,__syscall_slong_t,rpc_schedule,(__pid_t __target, __syscall_ulon
 #if __CRT_HAVE_XSC(rpc_service)
 __CDECLARE_XSC(,__syscall_slong_t,rpc_service,(void),())
 #endif /* __CRT_HAVE_XSC(rpc_service) */
+#if __CRT_HAVE_XSC(rseq)
+__CDECLARE_XSC(,__errno_t,rseq,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(rseq) */
 #if __CRT_HAVE_XSC(rt_sigaction)
 __CDECLARE_XSC(,__errno_t,rt_sigaction,(__signo_t __signo, struct __sigactionx32 const *__act, struct __sigactionx32 *__oact, __size_t __sigsetsize),(__signo,__act,__oact,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(rt_sigaction) */
@@ -3801,6 +4014,15 @@ __CDECLARE_XSC(,__ssize_t,select,(struct sel_arg_structx32 const *__arg),(__arg)
 #if __CRT_HAVE_XSC(select64)
 __CDECLARE_XSC(,__ssize_t,select64,(__size_t __nfds, struct __fd_set_struct *__readfds, struct __fd_set_struct *__writefds, struct __fd_set_struct *__exceptfds, struct __timevalx32_64 *__timeout),(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #endif /* __CRT_HAVE_XSC(select64) */
+#if __CRT_HAVE_XSC(semctl)
+__CDECLARE_XSC(,__errno_t,semctl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(semctl) */
+#if __CRT_HAVE_XSC(semget)
+__CDECLARE_XSC(,__errno_t,semget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(semget) */
+#if __CRT_HAVE_XSC(semtimedop_time64)
+__CDECLARE_XSC(,__errno_t,semtimedop_time64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(semtimedop_time64) */
 #if __CRT_HAVE_XSC(sendfile)
 __CDECLARE_XSC(,__ssize_t,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __ULONG32_TYPE__ *__pin_offset, __size_t __num_bytes),(__out_fd,__in_fd,__pin_offset,__num_bytes))
 #endif /* __CRT_HAVE_XSC(sendfile) */
@@ -3978,6 +4200,18 @@ __CDECLARE_XSC(,__errno_t,setxattr,(char const *__path, char const *__name, void
 #if __CRT_HAVE_XSC(sgetmask)
 __CDECLARE_XSC(,__syscall_ulong_t,sgetmask,(void),())
 #endif /* __CRT_HAVE_XSC(sgetmask) */
+#if __CRT_HAVE_XSC(shmat)
+__CDECLARE_XSC(,__errno_t,shmat,(__syscall_ulong_t __shmid, void const *__shmaddr, __syscall_ulong_t __shmflg),(__shmid,__shmaddr,__shmflg))
+#endif /* __CRT_HAVE_XSC(shmat) */
+#if __CRT_HAVE_XSC(shmctl)
+__CDECLARE_XSC(,__errno_t,shmctl,(__syscall_ulong_t __shmid, __syscall_ulong_t __cmd, struct shmid_ds *__buf),(__shmid,__cmd,__buf))
+#endif /* __CRT_HAVE_XSC(shmctl) */
+#if __CRT_HAVE_XSC(shmdt)
+__CDECLARE_XSC(,__errno_t,shmdt,(void const *__shmaddr),(__shmaddr))
+#endif /* __CRT_HAVE_XSC(shmdt) */
+#if __CRT_HAVE_XSC(shmget)
+__CDECLARE_XSC(,__errno_t,shmget,(__key_t __key, __size_t __size, __syscall_ulong_t __shmflg),(__key,__size,__shmflg))
+#endif /* __CRT_HAVE_XSC(shmget) */
 #if __CRT_HAVE_XSC(shutdown)
 /* Disallow further reception of data (causing `recv(2)' to return `0' as soon
  * as all currently queued data has been read), and/or further transmission
@@ -4065,6 +4299,9 @@ __CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct __statfsx32 *__buf)
 #if __CRT_HAVE_XSC(statfs64)
 __CDECLARE_XSC(,__errno_t,statfs64,(char const *__file, struct __statfsx32_64 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(statfs64) */
+#if __CRT_HAVE_XSC(statx)
+__CDECLARE_XSC(,__errno_t,statx,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+#endif /* __CRT_HAVE_XSC(statx) */
 #if __CRT_HAVE_XSC(stime)
 __CDECLARE_XSC(,__errno_t,stime,(__time32_t const *__t),(__t))
 #endif /* __CRT_HAVE_XSC(stime) */

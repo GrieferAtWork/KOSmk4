@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c921aa1 */
+/* HASH CRC-32:0xcb938942 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -773,6 +773,26 @@
 #define __NR32_userfaultfd                  0x176                  /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR32_membarrier                   0x177                  /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR32_mlock2                       0x178                  /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define __NR32_copy_file_range              0x179                  /* errno_t copy_file_range(int TODO_PROTOTYPE) */
+#define __NR32_preadv2                      0x17a                  /* errno_t preadv2(int TODO_PROTOTYPE) */
+#define __NR32_pwritev2                     0x17b                  /* errno_t pwritev2(int TODO_PROTOTYPE) */
+#define __NR32_pkey_mprotect                0x17c                  /* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+#define __NR32_pkey_alloc                   0x17d                  /* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+#define __NR32_pkey_free                    0x17e                  /* errno_t pkey_free(int TODO_PROTOTYPE) */
+#define __NR32_statx                        0x17f                  /* errno_t statx(int TODO_PROTOTYPE) */
+#define __NR32_arch_prctl                   0x180                  /* errno_t arch_prctl(int TODO_PROTOTYPE) */
+#define __NR32_io_pgetevents                0x181                  /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+#define __NR32_rseq                         0x182                  /* errno_t rseq(int TODO_PROTOTYPE) */
+#define __NR32_semget                       0x189                  /* errno_t semget(int TODO_PROTOTYPE) */
+#define __NR32_semctl                       0x18a                  /* errno_t semctl(int TODO_PROTOTYPE) */
+#define __NR32_shmget                       0x18b                  /* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+#define __NR32_shmctl                       0x18c                  /* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+#define __NR32_shmat                        0x18d                  /* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+#define __NR32_shmdt                        0x18e                  /* errno_t shmdt(void const *shmaddr) */
+#define __NR32_msgget                       0x18f                  /* errno_t msgget(int TODO_PROTOTYPE) */
+#define __NR32_msgsnd                       0x190                  /* errno_t msgsnd(int TODO_PROTOTYPE) */
+#define __NR32_msgrcv                       0x191                  /* errno_t msgrcv(int TODO_PROTOTYPE) */
+#define __NR32_msgctl                       0x192                  /* errno_t msgctl(int TODO_PROTOTYPE) */
 #define __NR32_clock_gettime64              0x193                  /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 #define __NR32_clock_settime64              0x194                  /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
 #define __NR32_clock_adjtime64              0x195                  /* errno_t clock_adjtime64(int TODO_PROTOTYPE) */
@@ -792,6 +812,7 @@
 #define __NR32_utimensat_time64             0x19c                  /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 #define __NR32_pselect6_time64              0x19d                  /* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
 #define __NR32_ppoll_time64                 0x19e                  /* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+#define __NR32_io_pgetevents_time64         0x1a0                  /* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -803,8 +824,27 @@
 #define __NR32_recvmmsg_time64              0x1a1                  /* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 #define __NR32_mq_timedsend_time64          0x1a2                  /* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
 #define __NR32_mq_timedreceive_time64       0x1a3                  /* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+#define __NR32_semtimedop_time64            0x1a4                  /* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
 #define __NR32_rt_sigtimedwait_time64       0x1a5                  /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+#define __NR32_futex_time64                 0x1a6                  /* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define __NR32_sched_rr_get_interval_time64 0x1a7                  /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+#define __NR32_pidfd_send_signal            0x1a8                  /* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+#define __NR32_io_uring_setup               0x1a9                  /* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+#define __NR32_io_uring_enter               0x1aa                  /* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+#define __NR32_io_uring_register            0x1ab                  /* errno_t io_uring_register(int TODO_PROTOTYPE) */
+#define __NR32_open_tree                    0x1ac                  /* errno_t open_tree(int TODO_PROTOTYPE) */
+#define __NR32_move_mount                   0x1ad                  /* errno_t move_mount(int TODO_PROTOTYPE) */
+#define __NR32_fsopen                       0x1ae                  /* errno_t fsopen(int TODO_PROTOTYPE) */
+#define __NR32_fsconfig                     0x1af                  /* errno_t fsconfig(int TODO_PROTOTYPE) */
+#define __NR32_fsmount                      0x1b0                  /* errno_t fsmount(int TODO_PROTOTYPE) */
+#define __NR32_fspick                       0x1b1                  /* errno_t fspick(int TODO_PROTOTYPE) */
+#define __NR32_pidfd_open                   0x1b2                  /* errno_t pidfd_open(int TODO_PROTOTYPE) */
+#define __NR32_clone3                       0x1b3                  /* errno_t clone3(int TODO_PROTOTYPE) */
+#define __NR32_close_range                  0x1b4                  /* errno_t close_range(int TODO_PROTOTYPE) */
+#define __NR32_openat2                      0x1b5                  /* errno_t openat2(int TODO_PROTOTYPE) */
+#define __NR32_pidfd_getfd                  0x1b6                  /* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+#define __NR32_faccessat2                   0x1b7                  /* errno_t faccessat2(int TODO_PROTOTYPE) */
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
@@ -1241,8 +1281,8 @@
 	callback(0)                                    \
 	callback(1) 
 #define __NR32_syscall0_min 0x0
-#define __NR32_syscall0_max 0x1a7
-#define __NR32_syscall0_cnt 0x1a8
+#define __NR32_syscall0_max 0x1b7
+#define __NR32_syscall0_cnt 0x1b8
 #define __NR32_syscall1_min __UINT32_C(0xfffffeb2)
 #define __NR32_syscall1_max __UINT32_C(0xffffffff)
 #define __NR32_syscall1_cnt 0x14e
@@ -1659,6 +1699,26 @@
 #define __NR32RM_userfaultfd                  0
 #define __NR32RM_membarrier                   0
 #define __NR32RM_mlock2                       0
+#define __NR32RM_copy_file_range              0
+#define __NR32RM_preadv2                      0
+#define __NR32RM_pwritev2                     0
+#define __NR32RM_pkey_mprotect                0
+#define __NR32RM_pkey_alloc                   0
+#define __NR32RM_pkey_free                    0
+#define __NR32RM_statx                        0
+#define __NR32RM_arch_prctl                   0
+#define __NR32RM_io_pgetevents                1
+#define __NR32RM_rseq                         0
+#define __NR32RM_semget                       0
+#define __NR32RM_semctl                       0
+#define __NR32RM_shmget                       0
+#define __NR32RM_shmctl                       0
+#define __NR32RM_shmat                        0
+#define __NR32RM_shmdt                        0
+#define __NR32RM_msgget                       0
+#define __NR32RM_msgsnd                       1
+#define __NR32RM_msgrcv                       1
+#define __NR32RM_msgctl                       0
 #define __NR32RM_clock_gettime64              0
 #define __NR32RM_clock_settime64              0
 #define __NR32RM_clock_adjtime64              0
@@ -1671,11 +1731,30 @@
 #define __NR32RM_utimensat_time64             0
 #define __NR32RM_pselect6_time64              1
 #define __NR32RM_ppoll_time64                 1
+#define __NR32RM_io_pgetevents_time64         1
 #define __NR32RM_recvmmsg_time64              1
 #define __NR32RM_mq_timedsend_time64          0
 #define __NR32RM_mq_timedreceive_time64       0
+#define __NR32RM_semtimedop_time64            1
 #define __NR32RM_rt_sigtimedwait_time64       1
+#define __NR32RM_futex_time64                 0
 #define __NR32RM_sched_rr_get_interval_time64 0
+#define __NR32RM_pidfd_send_signal            0
+#define __NR32RM_io_uring_setup               0
+#define __NR32RM_io_uring_enter               0
+#define __NR32RM_io_uring_register            0
+#define __NR32RM_open_tree                    0
+#define __NR32RM_move_mount                   0
+#define __NR32RM_fsopen                       0
+#define __NR32RM_fsconfig                     0
+#define __NR32RM_fsmount                      0
+#define __NR32RM_fspick                       0
+#define __NR32RM_pidfd_open                   0
+#define __NR32RM_clone3                       0
+#define __NR32RM_close_range                  0
+#define __NR32RM_openat2                      0
+#define __NR32RM_pidfd_getfd                  0
+#define __NR32RM_faccessat2                   0
 #define __NR32RM_pwritevf                     0
 #define __NR32RM_preadvf                      0
 #define __NR32RM_fallocate64                  0
@@ -1875,6 +1954,8 @@
 #define __NR32CP_sendmsg                      1
 #define __NR32CP_recvfrom                     1
 #define __NR32CP_recvmsg                      1
+#define __NR32CP_msgsnd                       1
+#define __NR32CP_msgrcv                       1
 #define __NR32CP_clock_nanosleep_time64       1
 #define __NR32CP_utimensat_time64             1
 #define __NR32CP_pselect6_time64              1
@@ -1883,6 +1964,7 @@
 #define __NR32CP_mq_timedsend_time64          1
 #define __NR32CP_mq_timedreceive_time64       1
 #define __NR32CP_rt_sigtimedwait_time64       1
+#define __NR32CP_futex_time64                 1
 #define __NR32CP_pwritevf                     1
 #define __NR32CP_preadvf                      1
 #define __NR32CP_freadlinkat                  1
@@ -2306,6 +2388,26 @@
 #define __NR32RC_userfaultfd                  1
 #define __NR32RC_membarrier                   1
 #define __NR32RC_mlock2                       1
+#define __NR32RC_copy_file_range              1
+#define __NR32RC_preadv2                      1
+#define __NR32RC_pwritev2                     1
+#define __NR32RC_pkey_mprotect                1
+#define __NR32RC_pkey_alloc                   1
+#define __NR32RC_pkey_free                    1
+#define __NR32RC_statx                        1
+#define __NR32RC_arch_prctl                   1
+#define __NR32RC_io_pgetevents                1
+#define __NR32RC_rseq                         1
+#define __NR32RC_semget                       1
+#define __NR32RC_semctl                       1
+#define __NR32RC_shmget                       3
+#define __NR32RC_shmctl                       3
+#define __NR32RC_shmat                        3
+#define __NR32RC_shmdt                        1
+#define __NR32RC_msgget                       1
+#define __NR32RC_msgsnd                       1
+#define __NR32RC_msgrcv                       1
+#define __NR32RC_msgctl                       1
 #define __NR32RC_clock_gettime64              2
 #define __NR32RC_clock_settime64              2
 #define __NR32RC_clock_adjtime64              1
@@ -2318,11 +2420,30 @@
 #define __NR32RC_utimensat_time64             4
 #define __NR32RC_pselect6_time64              6
 #define __NR32RC_ppoll_time64                 5
+#define __NR32RC_io_pgetevents_time64         1
 #define __NR32RC_recvmmsg_time64              5
 #define __NR32RC_mq_timedsend_time64          5
 #define __NR32RC_mq_timedreceive_time64       5
+#define __NR32RC_semtimedop_time64            1
 #define __NR32RC_rt_sigtimedwait_time64       4
+#define __NR32RC_futex_time64                 6
 #define __NR32RC_sched_rr_get_interval_time64 2
+#define __NR32RC_pidfd_send_signal            1
+#define __NR32RC_io_uring_setup               1
+#define __NR32RC_io_uring_enter               1
+#define __NR32RC_io_uring_register            1
+#define __NR32RC_open_tree                    1
+#define __NR32RC_move_mount                   1
+#define __NR32RC_fsopen                       1
+#define __NR32RC_fsconfig                     1
+#define __NR32RC_fsmount                      1
+#define __NR32RC_fspick                       1
+#define __NR32RC_pidfd_open                   1
+#define __NR32RC_clone3                       1
+#define __NR32RC_close_range                  1
+#define __NR32RC_openat2                      1
+#define __NR32RC_pidfd_getfd                  1
+#define __NR32RC_faccessat2                   1
 #define __NR32RC_pwritevf                     6 /* __NR32AC_pwritevf + 1 */
 #define __NR32RC_preadvf                      6 /* __NR32AC_preadvf + 1 */
 #define __NR32RC_fallocate64                  6 /* __NR32AC_fallocate64 + 2 */

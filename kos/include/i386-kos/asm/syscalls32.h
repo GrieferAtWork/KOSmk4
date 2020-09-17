@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b3a9ce1 */
+/* HASH CRC-32:0xbf44b406 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -773,6 +773,26 @@
 #define __NR_userfaultfd                  0x176                  /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR_membarrier                   0x177                  /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR_mlock2                       0x178                  /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define __NR_copy_file_range              0x179                  /* errno_t copy_file_range(int TODO_PROTOTYPE) */
+#define __NR_preadv2                      0x17a                  /* errno_t preadv2(int TODO_PROTOTYPE) */
+#define __NR_pwritev2                     0x17b                  /* errno_t pwritev2(int TODO_PROTOTYPE) */
+#define __NR_pkey_mprotect                0x17c                  /* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+#define __NR_pkey_alloc                   0x17d                  /* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+#define __NR_pkey_free                    0x17e                  /* errno_t pkey_free(int TODO_PROTOTYPE) */
+#define __NR_statx                        0x17f                  /* errno_t statx(int TODO_PROTOTYPE) */
+#define __NR_arch_prctl                   0x180                  /* errno_t arch_prctl(int TODO_PROTOTYPE) */
+#define __NR_io_pgetevents                0x181                  /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+#define __NR_rseq                         0x182                  /* errno_t rseq(int TODO_PROTOTYPE) */
+#define __NR_semget                       0x189                  /* errno_t semget(int TODO_PROTOTYPE) */
+#define __NR_semctl                       0x18a                  /* errno_t semctl(int TODO_PROTOTYPE) */
+#define __NR_shmget                       0x18b                  /* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+#define __NR_shmctl                       0x18c                  /* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+#define __NR_shmat                        0x18d                  /* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+#define __NR_shmdt                        0x18e                  /* errno_t shmdt(void const *shmaddr) */
+#define __NR_msgget                       0x18f                  /* errno_t msgget(int TODO_PROTOTYPE) */
+#define __NR_msgsnd                       0x190                  /* errno_t msgsnd(int TODO_PROTOTYPE) */
+#define __NR_msgrcv                       0x191                  /* errno_t msgrcv(int TODO_PROTOTYPE) */
+#define __NR_msgctl                       0x192                  /* errno_t msgctl(int TODO_PROTOTYPE) */
 #define __NR_clock_gettime64              0x193                  /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 #define __NR_clock_settime64              0x194                  /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
 #define __NR_clock_adjtime64              0x195                  /* errno_t clock_adjtime64(int TODO_PROTOTYPE) */
@@ -792,6 +812,7 @@
 #define __NR_utimensat_time64             0x19c                  /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 #define __NR_pselect6_time64              0x19d                  /* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
 #define __NR_ppoll_time64                 0x19e                  /* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+#define __NR_io_pgetevents_time64         0x1a0                  /* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -803,8 +824,27 @@
 #define __NR_recvmmsg_time64              0x1a1                  /* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 #define __NR_mq_timedsend_time64          0x1a2                  /* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
 #define __NR_mq_timedreceive_time64       0x1a3                  /* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+#define __NR_semtimedop_time64            0x1a4                  /* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
 #define __NR_rt_sigtimedwait_time64       0x1a5                  /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+#define __NR_futex_time64                 0x1a6                  /* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define __NR_sched_rr_get_interval_time64 0x1a7                  /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+#define __NR_pidfd_send_signal            0x1a8                  /* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+#define __NR_io_uring_setup               0x1a9                  /* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+#define __NR_io_uring_enter               0x1aa                  /* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+#define __NR_io_uring_register            0x1ab                  /* errno_t io_uring_register(int TODO_PROTOTYPE) */
+#define __NR_open_tree                    0x1ac                  /* errno_t open_tree(int TODO_PROTOTYPE) */
+#define __NR_move_mount                   0x1ad                  /* errno_t move_mount(int TODO_PROTOTYPE) */
+#define __NR_fsopen                       0x1ae                  /* errno_t fsopen(int TODO_PROTOTYPE) */
+#define __NR_fsconfig                     0x1af                  /* errno_t fsconfig(int TODO_PROTOTYPE) */
+#define __NR_fsmount                      0x1b0                  /* errno_t fsmount(int TODO_PROTOTYPE) */
+#define __NR_fspick                       0x1b1                  /* errno_t fspick(int TODO_PROTOTYPE) */
+#define __NR_pidfd_open                   0x1b2                  /* errno_t pidfd_open(int TODO_PROTOTYPE) */
+#define __NR_clone3                       0x1b3                  /* errno_t clone3(int TODO_PROTOTYPE) */
+#define __NR_close_range                  0x1b4                  /* errno_t close_range(int TODO_PROTOTYPE) */
+#define __NR_openat2                      0x1b5                  /* errno_t openat2(int TODO_PROTOTYPE) */
+#define __NR_pidfd_getfd                  0x1b6                  /* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+#define __NR_faccessat2                   0x1b7                  /* errno_t faccessat2(int TODO_PROTOTYPE) */
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
@@ -1241,8 +1281,8 @@
 	callback(0)                                  \
 	callback(1) 
 #define __NR_syscall0_min 0x0
-#define __NR_syscall0_max 0x1a7
-#define __NR_syscall0_cnt 0x1a8
+#define __NR_syscall0_max 0x1b7
+#define __NR_syscall0_cnt 0x1b8
 #define __NR_syscall1_min __UINT32_C(0xfffffeb2)
 #define __NR_syscall1_max __UINT32_C(0xffffffff)
 #define __NR_syscall1_cnt 0x14e
@@ -1659,6 +1699,26 @@
 #define __NRRM_userfaultfd                  0
 #define __NRRM_membarrier                   0
 #define __NRRM_mlock2                       0
+#define __NRRM_copy_file_range              0
+#define __NRRM_preadv2                      0
+#define __NRRM_pwritev2                     0
+#define __NRRM_pkey_mprotect                0
+#define __NRRM_pkey_alloc                   0
+#define __NRRM_pkey_free                    0
+#define __NRRM_statx                        0
+#define __NRRM_arch_prctl                   0
+#define __NRRM_io_pgetevents                1
+#define __NRRM_rseq                         0
+#define __NRRM_semget                       0
+#define __NRRM_semctl                       0
+#define __NRRM_shmget                       0
+#define __NRRM_shmctl                       0
+#define __NRRM_shmat                        0
+#define __NRRM_shmdt                        0
+#define __NRRM_msgget                       0
+#define __NRRM_msgsnd                       1
+#define __NRRM_msgrcv                       1
+#define __NRRM_msgctl                       0
 #define __NRRM_clock_gettime64              0
 #define __NRRM_clock_settime64              0
 #define __NRRM_clock_adjtime64              0
@@ -1671,11 +1731,30 @@
 #define __NRRM_utimensat_time64             0
 #define __NRRM_pselect6_time64              1
 #define __NRRM_ppoll_time64                 1
+#define __NRRM_io_pgetevents_time64         1
 #define __NRRM_recvmmsg_time64              1
 #define __NRRM_mq_timedsend_time64          0
 #define __NRRM_mq_timedreceive_time64       0
+#define __NRRM_semtimedop_time64            1
 #define __NRRM_rt_sigtimedwait_time64       1
+#define __NRRM_futex_time64                 0
 #define __NRRM_sched_rr_get_interval_time64 0
+#define __NRRM_pidfd_send_signal            0
+#define __NRRM_io_uring_setup               0
+#define __NRRM_io_uring_enter               0
+#define __NRRM_io_uring_register            0
+#define __NRRM_open_tree                    0
+#define __NRRM_move_mount                   0
+#define __NRRM_fsopen                       0
+#define __NRRM_fsconfig                     0
+#define __NRRM_fsmount                      0
+#define __NRRM_fspick                       0
+#define __NRRM_pidfd_open                   0
+#define __NRRM_clone3                       0
+#define __NRRM_close_range                  0
+#define __NRRM_openat2                      0
+#define __NRRM_pidfd_getfd                  0
+#define __NRRM_faccessat2                   0
 #define __NRRM_pwritevf                     0
 #define __NRRM_preadvf                      0
 #define __NRRM_fallocate64                  0
@@ -1875,6 +1954,8 @@
 #define __NRCP_sendmsg                      1
 #define __NRCP_recvfrom                     1
 #define __NRCP_recvmsg                      1
+#define __NRCP_msgsnd                       1
+#define __NRCP_msgrcv                       1
 #define __NRCP_clock_nanosleep_time64       1
 #define __NRCP_utimensat_time64             1
 #define __NRCP_pselect6_time64              1
@@ -1883,6 +1964,7 @@
 #define __NRCP_mq_timedsend_time64          1
 #define __NRCP_mq_timedreceive_time64       1
 #define __NRCP_rt_sigtimedwait_time64       1
+#define __NRCP_futex_time64                 1
 #define __NRCP_pwritevf                     1
 #define __NRCP_preadvf                      1
 #define __NRCP_freadlinkat                  1
@@ -2306,6 +2388,26 @@
 #define __NRRC_userfaultfd                  1
 #define __NRRC_membarrier                   1
 #define __NRRC_mlock2                       1
+#define __NRRC_copy_file_range              1
+#define __NRRC_preadv2                      1
+#define __NRRC_pwritev2                     1
+#define __NRRC_pkey_mprotect                1
+#define __NRRC_pkey_alloc                   1
+#define __NRRC_pkey_free                    1
+#define __NRRC_statx                        1
+#define __NRRC_arch_prctl                   1
+#define __NRRC_io_pgetevents                1
+#define __NRRC_rseq                         1
+#define __NRRC_semget                       1
+#define __NRRC_semctl                       1
+#define __NRRC_shmget                       3
+#define __NRRC_shmctl                       3
+#define __NRRC_shmat                        3
+#define __NRRC_shmdt                        1
+#define __NRRC_msgget                       1
+#define __NRRC_msgsnd                       1
+#define __NRRC_msgrcv                       1
+#define __NRRC_msgctl                       1
 #define __NRRC_clock_gettime64              2
 #define __NRRC_clock_settime64              2
 #define __NRRC_clock_adjtime64              1
@@ -2318,11 +2420,30 @@
 #define __NRRC_utimensat_time64             4
 #define __NRRC_pselect6_time64              6
 #define __NRRC_ppoll_time64                 5
+#define __NRRC_io_pgetevents_time64         1
 #define __NRRC_recvmmsg_time64              5
 #define __NRRC_mq_timedsend_time64          5
 #define __NRRC_mq_timedreceive_time64       5
+#define __NRRC_semtimedop_time64            1
 #define __NRRC_rt_sigtimedwait_time64       4
+#define __NRRC_futex_time64                 6
 #define __NRRC_sched_rr_get_interval_time64 2
+#define __NRRC_pidfd_send_signal            1
+#define __NRRC_io_uring_setup               1
+#define __NRRC_io_uring_enter               1
+#define __NRRC_io_uring_register            1
+#define __NRRC_open_tree                    1
+#define __NRRC_move_mount                   1
+#define __NRRC_fsopen                       1
+#define __NRRC_fsconfig                     1
+#define __NRRC_fsmount                      1
+#define __NRRC_fspick                       1
+#define __NRRC_pidfd_open                   1
+#define __NRRC_clone3                       1
+#define __NRRC_close_range                  1
+#define __NRRC_openat2                      1
+#define __NRRC_pidfd_getfd                  1
+#define __NRRC_faccessat2                   1
 #define __NRRC_pwritevf                     6 /* __NRAC_pwritevf + 1 */
 #define __NRRC_preadvf                      6 /* __NRAC_preadvf + 1 */
 #define __NRRC_fallocate64                  6 /* __NRAC_fallocate64 + 2 */

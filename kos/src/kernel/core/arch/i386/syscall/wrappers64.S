@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d5252eb */
+/* HASH CRC-32:0xd92f418e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10261,6 +10261,756 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock2)
 	X86_IRET_BUT_PREFER_SYSRET64
 	.cfi_endproc
 END(__x86_asm64_syscall_mlock2)
+
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.copy_file_range
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_copy_file_range)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x146
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_copy_file_range)
+	call   sys_copy_file_range
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_copy_file_range)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.preadv2
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_preadv2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x147
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_preadv2)
+	call   sys_preadv2
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_preadv2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.pwritev2
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritev2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x148
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_pwritev2)
+	call   sys_pwritev2
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_pwritev2)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.pkey_mprotect
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_mprotect)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x149
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_pkey_mprotect)
+	call   sys_pkey_mprotect
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_pkey_mprotect)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.pkey_alloc
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_alloc)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x14a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_pkey_alloc)
+	call   sys_pkey_alloc
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_pkey_alloc)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.pkey_free
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_free)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x14b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_pkey_free)
+	call   sys_pkey_free
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_pkey_free)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.statx
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_statx)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x14c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_statx)
+	call   sys_statx
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_statx)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.io_pgetevents
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_pgetevents)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x14d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_io_pgetevents)
+	call   sys_io_pgetevents
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_io_pgetevents)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.rseq
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rseq)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x14e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_rseq)
+	call   sys_rseq
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_rseq)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.pidfd_send_signal
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pidfd_send_signal)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1a8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_pidfd_send_signal)
+	call   sys_pidfd_send_signal
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_pidfd_send_signal)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.io_uring_setup
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_uring_setup)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1a9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_io_uring_setup)
+	call   sys_io_uring_setup
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_io_uring_setup)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.io_uring_enter
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_uring_enter)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1aa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_io_uring_enter)
+	call   sys_io_uring_enter
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_io_uring_enter)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.io_uring_register
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_io_uring_register)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1ab
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_io_uring_register)
+	call   sys_io_uring_register
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_io_uring_register)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.open_tree
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_open_tree)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1ac
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_open_tree)
+	call   sys_open_tree
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_open_tree)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.move_mount
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_move_mount)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1ad
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_move_mount)
+	call   sys_move_mount
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_move_mount)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.fsopen
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsopen)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1ae
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_fsopen)
+	call   sys_fsopen
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_fsopen)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.fsconfig
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsconfig)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1af
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_fsconfig)
+	call   sys_fsconfig
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_fsconfig)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.fsmount
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fsmount)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1b0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_fsmount)
+	call   sys_fsmount
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_fsmount)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.fspick
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fspick)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1b1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_fspick)
+	call   sys_fspick
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_fspick)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.pidfd_open
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pidfd_open)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1b2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_pidfd_open)
+	call   sys_pidfd_open
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_pidfd_open)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.clone3
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_clone3)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1b3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_clone3)
+	call   sys_clone3
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_clone3)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.close_range
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_close_range)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1b4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_close_range)
+	call   sys_close_range
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_close_range)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.openat2
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_openat2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1b5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_openat2)
+	call   sys_openat2
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_openat2)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.pidfd_getfd
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pidfd_getfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1b6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_pidfd_getfd)
+	call   sys_pidfd_getfd
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_pidfd_getfd)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm64_syscall.faccessat2
+INTERN_WEAK_FUNCTION(__x86_asm64_syscall_faccessat2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm64_syscall
+	.cfi_lsda 0, 0x1b7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	EXTERN(sys_faccessat2)
+	call   sys_faccessat2
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET64
+	.cfi_endproc
+END(__x86_asm64_syscall_faccessat2)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -24559,6 +25309,632 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.copy_file_range
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_copy_file_range)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x179
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_copy_file_range)
+	call   sys32_copy_file_range
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_copy_file_range)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.preadv2
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_preadv2)
+	call   sys32_preadv2
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_preadv2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pwritev2
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pwritev2)
+	call   sys32_pwritev2
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_pwritev2)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pkey_mprotect
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pkey_mprotect)
+	call   sys32_pkey_mprotect
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_pkey_mprotect)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pkey_alloc
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pkey_alloc)
+	call   sys32_pkey_alloc
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_pkey_alloc)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pkey_free
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_free)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pkey_free)
+	call   sys32_pkey_free
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_pkey_free)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.statx
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_statx)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_statx)
+	call   sys32_statx
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_statx)
+
+/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.arch_prctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x180
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_arch_prctl)
+	call   sys32_arch_prctl
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_arch_prctl)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_pgetevents
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_pgetevents)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x181
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_io_pgetevents)
+	call   sys32_io_pgetevents
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_io_pgetevents)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.rseq
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rseq)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x182
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_rseq)
+	call   sys32_rseq
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_rseq)
+
+/* errno_t semget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.semget
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_semget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x189
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_semget)
+	call   sys32_semget
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_semget)
+
+/* errno_t semctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.semctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_semctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_semctl)
+	call   sys32_semctl
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_semctl)
+
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+.section .text.x86.asm32_syscall_int80.shmget
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	EXTERN(sys32_shmget)
+	call   sys32_shmget
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_shmget)
+
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+.section .text.x86.asm32_syscall_int80.shmctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	EXTERN(sys32_shmctl)
+	call   sys32_shmctl
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_shmctl)
+
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+.section .text.x86.asm32_syscall_int80.shmat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	EXTERN(sys32_shmat)
+	call   sys32_shmat
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_shmat)
+
+/* errno_t shmdt(void const *shmaddr) */
+.section .text.x86.asm32_syscall_int80.shmdt
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmdt)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_shmdt)
+	call   sys32_shmdt
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_shmdt)
+
+/* errno_t msgget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.msgget
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_msgget)
+	call   sys32_msgget
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_msgget)
+
+/* errno_t msgsnd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.msgsnd
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgsnd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x190
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_msgsnd)
+	call   sys32_msgsnd
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_msgsnd)
+
+/* errno_t msgrcv(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.msgrcv
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgrcv)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x191
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_msgrcv)
+	call   sys32_msgrcv
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_msgrcv)
+
+/* errno_t msgctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.msgctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x192
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_msgctl)
+	call   sys32_msgctl
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_msgctl)
+
 /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 .section .text.x86.asm32_syscall_int80.clock_gettime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
@@ -24970,6 +26346,37 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_ppoll_time64)
 
+/* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_pgetevents_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_pgetevents_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_io_pgetevents_time64)
+	call   sys32_io_pgetevents_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_io_pgetevents_time64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -25086,6 +26493,37 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedreceive_time64)
 
+/* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.semtimedop_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_semtimedop_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_semtimedop_time64)
+	call   sys32_semtimedop_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_semtimedop_time64)
+
 /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigtimedwait_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait_time64)
@@ -25121,6 +26559,44 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigtimedwait_time64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+/* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+.section .text.x86.asm32_syscall_int80.futex_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_futex_time64)
+	call   sys32_futex_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_futex_time64)
+
 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
 .section .text.x86.asm32_syscall_int80.sched_rr_get_interval_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
@@ -25152,6 +26628,502 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
 	intr_exit
 	.cfi_endproc
 END(__x86_asm32_int80_sched_rr_get_interval_time64)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pidfd_send_signal
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_send_signal)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pidfd_send_signal)
+	call   sys32_pidfd_send_signal
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_pidfd_send_signal)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_uring_setup
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_setup)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_io_uring_setup)
+	call   sys32_io_uring_setup
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_io_uring_setup)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_uring_enter
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_enter)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1aa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_io_uring_enter)
+	call   sys32_io_uring_enter
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_io_uring_enter)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_uring_register
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_register)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1ab
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_io_uring_register)
+	call   sys32_io_uring_register
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_io_uring_register)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.open_tree
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_tree)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1ac
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_open_tree)
+	call   sys32_open_tree
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_open_tree)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.move_mount
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_move_mount)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1ad
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_move_mount)
+	call   sys32_move_mount
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_move_mount)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.fsopen
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsopen)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1ae
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_fsopen)
+	call   sys32_fsopen
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_fsopen)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.fsconfig
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsconfig)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1af
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_fsconfig)
+	call   sys32_fsconfig
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_fsconfig)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.fsmount
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmount)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_fsmount)
+	call   sys32_fsmount
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_fsmount)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.fspick
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fspick)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_fspick)
+	call   sys32_fspick
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_fspick)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pidfd_open
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_open)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pidfd_open)
+	call   sys32_pidfd_open
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_pidfd_open)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.clone3
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone3)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_clone3)
+	call   sys32_clone3
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_clone3)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.close_range
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_close_range)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_close_range)
+	call   sys32_close_range
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_close_range)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.openat2
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_openat2)
+	call   sys32_openat2
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_openat2)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pidfd_getfd
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_getfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_pidfd_getfd)
+	call   sys32_pidfd_getfd
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_pidfd_getfd)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.faccessat2
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movslq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_faccessat2)
+	call   sys32_faccessat2
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	intr_exit
+	.cfi_endproc
+END(__x86_asm32_int80_faccessat2)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -30518,6 +32490,66 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_membarrier, __x86_asm32_int80_memb
 /* errno_t mlock2(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock2, __x86_asm32_int80_mlock2)
 
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_copy_file_range, __x86_asm32_int80_copy_file_range)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_preadv2, __x86_asm32_int80_preadv2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pwritev2, __x86_asm32_int80_pwritev2)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_mprotect, __x86_asm32_int80_pkey_mprotect)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_alloc, __x86_asm32_int80_pkey_alloc)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_free, __x86_asm32_int80_pkey_free)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_statx, __x86_asm32_int80_statx)
+
+/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_arch_prctl, __x86_asm32_int80_arch_prctl)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_io_pgetevents, __x86_asm32_int80_io_pgetevents)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rseq, __x86_asm32_int80_rseq)
+
+/* errno_t semget(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_semget, __x86_asm32_int80_semget)
+
+/* errno_t semctl(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_semctl, __x86_asm32_int80_semctl)
+
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_shmget, __x86_asm32_int80_shmget)
+
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_shmctl, __x86_asm32_int80_shmctl)
+
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_shmat, __x86_asm32_int80_shmat)
+
+/* errno_t shmdt(void const *shmaddr) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_shmdt, __x86_asm32_int80_shmdt)
+
+/* errno_t msgget(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_msgget, __x86_asm32_int80_msgget)
+
+/* errno_t msgsnd(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_msgsnd, __x86_asm32_int80_msgsnd)
+
+/* errno_t msgrcv(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_msgrcv, __x86_asm32_int80_msgrcv)
+
+/* errno_t msgctl(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_msgctl, __x86_asm32_int80_msgctl)
+
 /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_gettime64, __x86_asm32_int80_clock_gettime64)
 
@@ -30627,6 +32659,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll_time64)
 	X86_IRET_BUT_PREFER_SYSRET32
 	.cfi_endproc
 END(__x86_asm32_sysenter_ppoll_time64)
+
+/* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_io_pgetevents_time64, __x86_asm32_int80_io_pgetevents_time64)
 
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
@@ -30744,11 +32779,100 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive_time64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedreceive_time64)
 
+/* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_semtimedop_time64, __x86_asm32_int80_semtimedop_time64)
+
 /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait_time64, __x86_asm32_int80_rt_sigtimedwait_time64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+/* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+.section .text.x86.asm32_syscall_sysenter.futex_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1a6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %rsp, 0
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	EXTERN(sys32_futex_time64)
+	call   sys32_futex_time64
+	popq_cfi_r %r11
+	popq_cfi_r %r10
+	popq_cfi_r %r9
+	popq_cfi_r %r8
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	X86_IRET_BUT_PREFER_SYSRET32
+	.cfi_endproc
+END(__x86_asm32_sysenter_futex_time64)
+
 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_rr_get_interval_time64, __x86_asm32_int80_sched_rr_get_interval_time64)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pidfd_send_signal, __x86_asm32_int80_pidfd_send_signal)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_io_uring_setup, __x86_asm32_int80_io_uring_setup)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_io_uring_enter, __x86_asm32_int80_io_uring_enter)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_io_uring_register, __x86_asm32_int80_io_uring_register)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_open_tree, __x86_asm32_int80_open_tree)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_move_mount, __x86_asm32_int80_move_mount)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsopen, __x86_asm32_int80_fsopen)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsconfig, __x86_asm32_int80_fsconfig)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fsmount, __x86_asm32_int80_fsmount)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fspick, __x86_asm32_int80_fspick)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pidfd_open, __x86_asm32_int80_pidfd_open)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clone3, __x86_asm32_int80_clone3)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_close_range, __x86_asm32_int80_close_range)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_openat2, __x86_asm32_int80_openat2)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pidfd_getfd, __x86_asm32_int80_pidfd_getfd)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_faccessat2, __x86_asm32_int80_faccessat2)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -36336,6 +38460,212 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlock2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_mlock2)
 
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.copy_file_range
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_copy_file_range)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_copy_file_range)
+	jmp    sys32_copy_file_range
+	.cfi_endproc
+END(__x86_asm32_sysrun32_copy_file_range)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.preadv2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_preadv2)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_preadv2)
+	jmp    sys32_preadv2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_preadv2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.pwritev2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritev2)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pwritev2)
+	jmp    sys32_pwritev2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pwritev2)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.pkey_mprotect
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pkey_mprotect)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pkey_mprotect)
+	jmp    sys32_pkey_mprotect
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pkey_mprotect)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.pkey_alloc
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pkey_alloc)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pkey_alloc)
+	jmp    sys32_pkey_alloc
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pkey_alloc)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.pkey_free
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pkey_free)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pkey_free)
+	jmp    sys32_pkey_free
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pkey_free)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.statx
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statx)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_statx)
+	jmp    sys32_statx
+	.cfi_endproc
+END(__x86_asm32_sysrun32_statx)
+
+/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.arch_prctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_arch_prctl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_arch_prctl)
+	jmp    sys32_arch_prctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_arch_prctl)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_pgetevents
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_pgetevents)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_pgetevents)
+	jmp    sys32_io_pgetevents
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_pgetevents)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.rseq
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rseq)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_rseq)
+	jmp    sys32_rseq
+	.cfi_endproc
+END(__x86_asm32_sysrun32_rseq)
+
+/* errno_t semget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.semget
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_semget)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_semget)
+	jmp    sys32_semget
+	.cfi_endproc
+END(__x86_asm32_sysrun32_semget)
+
+/* errno_t semctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.semctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_semctl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_semctl)
+	jmp    sys32_semctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_semctl)
+
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+.section .text.x86.asm32_syscall_sysrun32.shmget
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_shmget)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_shmget)
+	jmp    sys32_shmget
+	.cfi_endproc
+END(__x86_asm32_sysrun32_shmget)
+
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+.section .text.x86.asm32_syscall_sysrun32.shmctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_shmctl)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_shmctl)
+	jmp    sys32_shmctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_shmctl)
+
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+.section .text.x86.asm32_syscall_sysrun32.shmat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_shmat)
+	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_shmat)
+	jmp    sys32_shmat
+	.cfi_endproc
+END(__x86_asm32_sysrun32_shmat)
+
+/* errno_t shmdt(void const *shmaddr) */
+.section .text.x86.asm32_syscall_sysrun32.shmdt
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_shmdt)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_shmdt)
+	jmp    sys32_shmdt
+	.cfi_endproc
+END(__x86_asm32_sysrun32_shmdt)
+
+/* errno_t msgget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.msgget
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_msgget)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_msgget)
+	jmp    sys32_msgget
+	.cfi_endproc
+END(__x86_asm32_sysrun32_msgget)
+
+/* errno_t msgsnd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.msgsnd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_msgsnd)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_msgsnd)
+	jmp    sys32_msgsnd
+	.cfi_endproc
+END(__x86_asm32_sysrun32_msgsnd)
+
+/* errno_t msgrcv(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.msgrcv
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_msgrcv)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_msgrcv)
+	jmp    sys32_msgrcv
+	.cfi_endproc
+END(__x86_asm32_sysrun32_msgrcv)
+
+/* errno_t msgctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.msgctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_msgctl)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_msgctl)
+	jmp    sys32_msgctl
+	.cfi_endproc
+END(__x86_asm32_sysrun32_msgctl)
+
 /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 .section .text.x86.asm32_syscall_sysrun32.clock_gettime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_gettime64)
@@ -36489,6 +38819,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ppoll_time64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ppoll_time64)
 
+/* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_pgetevents_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_pgetevents_time64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_pgetevents_time64)
+	jmp    sys32_io_pgetevents_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_pgetevents_time64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -36539,6 +38879,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mq_timedreceive_time64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_mq_timedreceive_time64)
 
+/* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.semtimedop_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_semtimedop_time64)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_semtimedop_time64)
+	jmp    sys32_semtimedop_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_semtimedop_time64)
+
 /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigtimedwait_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait_time64)
@@ -36552,6 +38902,22 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigtimedwait_time64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_rt_sigtimedwait_time64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+/* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+.section .text.x86.asm32_syscall_sysrun32.futex_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futex_time64)
+	.cfi_startproc
+	movzlq 40(%rdi), %r9
+	movzlq 32(%rdi), %r8
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_futex_time64)
+	jmp    sys32_futex_time64
+	.cfi_endproc
+END(__x86_asm32_sysrun32_futex_time64)
+
 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
 .section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval_time64)
@@ -36562,6 +38928,166 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval_time64)
 	jmp    sys32_sched_rr_get_interval_time64
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sched_rr_get_interval_time64)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.pidfd_send_signal
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pidfd_send_signal)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pidfd_send_signal)
+	jmp    sys32_pidfd_send_signal
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pidfd_send_signal)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_uring_setup
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_uring_setup)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_uring_setup)
+	jmp    sys32_io_uring_setup
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_uring_setup)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_uring_enter
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_uring_enter)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_uring_enter)
+	jmp    sys32_io_uring_enter
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_uring_enter)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.io_uring_register
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_io_uring_register)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_io_uring_register)
+	jmp    sys32_io_uring_register
+	.cfi_endproc
+END(__x86_asm32_sysrun32_io_uring_register)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.open_tree
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_open_tree)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_open_tree)
+	jmp    sys32_open_tree
+	.cfi_endproc
+END(__x86_asm32_sysrun32_open_tree)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.move_mount
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_move_mount)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_move_mount)
+	jmp    sys32_move_mount
+	.cfi_endproc
+END(__x86_asm32_sysrun32_move_mount)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.fsopen
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsopen)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fsopen)
+	jmp    sys32_fsopen
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fsopen)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.fsconfig
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsconfig)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fsconfig)
+	jmp    sys32_fsconfig
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fsconfig)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.fsmount
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fsmount)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fsmount)
+	jmp    sys32_fsmount
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fsmount)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.fspick
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fspick)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_fspick)
+	jmp    sys32_fspick
+	.cfi_endproc
+END(__x86_asm32_sysrun32_fspick)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.pidfd_open
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pidfd_open)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pidfd_open)
+	jmp    sys32_pidfd_open
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pidfd_open)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.clone3
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clone3)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_clone3)
+	jmp    sys32_clone3
+	.cfi_endproc
+END(__x86_asm32_sysrun32_clone3)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.close_range
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_close_range)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_close_range)
+	jmp    sys32_close_range
+	.cfi_endproc
+END(__x86_asm32_sysrun32_close_range)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.openat2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_openat2)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_openat2)
+	jmp    sys32_openat2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_openat2)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.pidfd_getfd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pidfd_getfd)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_pidfd_getfd)
+	jmp    sys32_pidfd_getfd
+	.cfi_endproc
+END(__x86_asm32_sysrun32_pidfd_getfd)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysrun32.faccessat2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_faccessat2)
+	.cfi_startproc
+	movzlq 0(%rdi), %rdi
+	EXTERN(sys32_faccessat2)
+	jmp    sys32_faccessat2
+	.cfi_endproc
+END(__x86_asm32_sysrun32_faccessat2)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position

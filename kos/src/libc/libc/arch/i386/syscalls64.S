@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75b6fdc3 */
+/* HASH CRC-32:0xf0c31f00 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8709,6 +8709,606 @@ INTERN_FUNCTION(libc_sys_Xmlock2)
 	.cfi_endproc
 END(libc_sys_Xmlock2)
 DEFINE_PUBLIC_ALIAS(sys_Xmlock2, libc_sys_Xmlock2)
+
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.copy_file_range
+INTERN_FUNCTION(libc_sys_copy_file_range)
+	.cfi_startproc
+	movq   $(0x146), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_copy_file_range)
+DEFINE_PUBLIC_ALIAS(sys_copy_file_range, libc_sys_copy_file_range)
+
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xcopy_file_range
+INTERN_FUNCTION(libc_sys_Xcopy_file_range)
+	.cfi_startproc
+	movq   $(0x146), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xcopy_file_range)
+DEFINE_PUBLIC_ALIAS(sys_Xcopy_file_range, libc_sys_Xcopy_file_range)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.preadv2
+INTERN_FUNCTION(libc_sys_preadv2)
+	.cfi_startproc
+	movq   $(0x147), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_preadv2)
+DEFINE_PUBLIC_ALIAS(sys_preadv2, libc_sys_preadv2)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpreadv2
+INTERN_FUNCTION(libc_sys_Xpreadv2)
+	.cfi_startproc
+	movq   $(0x147), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpreadv2)
+DEFINE_PUBLIC_ALIAS(sys_Xpreadv2, libc_sys_Xpreadv2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pwritev2
+INTERN_FUNCTION(libc_sys_pwritev2)
+	.cfi_startproc
+	movq   $(0x148), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pwritev2)
+DEFINE_PUBLIC_ALIAS(sys_pwritev2, libc_sys_pwritev2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpwritev2
+INTERN_FUNCTION(libc_sys_Xpwritev2)
+	.cfi_startproc
+	movq   $(0x148), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpwritev2)
+DEFINE_PUBLIC_ALIAS(sys_Xpwritev2, libc_sys_Xpwritev2)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pkey_mprotect
+INTERN_FUNCTION(libc_sys_pkey_mprotect)
+	.cfi_startproc
+	movq   $(0x149), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pkey_mprotect)
+DEFINE_PUBLIC_ALIAS(sys_pkey_mprotect, libc_sys_pkey_mprotect)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpkey_mprotect
+INTERN_FUNCTION(libc_sys_Xpkey_mprotect)
+	.cfi_startproc
+	movq   $(0x149), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpkey_mprotect)
+DEFINE_PUBLIC_ALIAS(sys_Xpkey_mprotect, libc_sys_Xpkey_mprotect)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pkey_alloc
+INTERN_FUNCTION(libc_sys_pkey_alloc)
+	.cfi_startproc
+	movq   $(0x14a), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pkey_alloc)
+DEFINE_PUBLIC_ALIAS(sys_pkey_alloc, libc_sys_pkey_alloc)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpkey_alloc
+INTERN_FUNCTION(libc_sys_Xpkey_alloc)
+	.cfi_startproc
+	movq   $(0x14a), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpkey_alloc)
+DEFINE_PUBLIC_ALIAS(sys_Xpkey_alloc, libc_sys_Xpkey_alloc)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pkey_free
+INTERN_FUNCTION(libc_sys_pkey_free)
+	.cfi_startproc
+	movq   $(0x14b), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pkey_free)
+DEFINE_PUBLIC_ALIAS(sys_pkey_free, libc_sys_pkey_free)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpkey_free
+INTERN_FUNCTION(libc_sys_Xpkey_free)
+	.cfi_startproc
+	movq   $(0x14b), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpkey_free)
+DEFINE_PUBLIC_ALIAS(sys_Xpkey_free, libc_sys_Xpkey_free)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.statx
+INTERN_FUNCTION(libc_sys_statx)
+	.cfi_startproc
+	movq   $(0x14c), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_statx)
+DEFINE_PUBLIC_ALIAS(sys_statx, libc_sys_statx)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xstatx
+INTERN_FUNCTION(libc_sys_Xstatx)
+	.cfi_startproc
+	movq   $(0x14c), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xstatx)
+DEFINE_PUBLIC_ALIAS(sys_Xstatx, libc_sys_Xstatx)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_pgetevents
+INTERN_FUNCTION(libc_sys_io_pgetevents)
+	.cfi_startproc
+	movq   $(0x14d), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_io_pgetevents)
+DEFINE_PUBLIC_ALIAS(sys_io_pgetevents, libc_sys_io_pgetevents)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_pgetevents
+INTERN_FUNCTION(libc_sys_Xio_pgetevents)
+	.cfi_startproc
+	movq   $(0x14d), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xio_pgetevents)
+DEFINE_PUBLIC_ALIAS(sys_Xio_pgetevents, libc_sys_Xio_pgetevents)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.rseq
+INTERN_FUNCTION(libc_sys_rseq)
+	.cfi_startproc
+	movq   $(0x14e), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_rseq)
+DEFINE_PUBLIC_ALIAS(sys_rseq, libc_sys_rseq)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xrseq
+INTERN_FUNCTION(libc_sys_Xrseq)
+	.cfi_startproc
+	movq   $(0x14e), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xrseq)
+DEFINE_PUBLIC_ALIAS(sys_Xrseq, libc_sys_Xrseq)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pidfd_send_signal
+INTERN_FUNCTION(libc_sys_pidfd_send_signal)
+	.cfi_startproc
+	movq   $(0x1a8), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pidfd_send_signal)
+DEFINE_PUBLIC_ALIAS(sys_pidfd_send_signal, libc_sys_pidfd_send_signal)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpidfd_send_signal
+INTERN_FUNCTION(libc_sys_Xpidfd_send_signal)
+	.cfi_startproc
+	movq   $(0x1a8), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpidfd_send_signal)
+DEFINE_PUBLIC_ALIAS(sys_Xpidfd_send_signal, libc_sys_Xpidfd_send_signal)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_uring_setup
+INTERN_FUNCTION(libc_sys_io_uring_setup)
+	.cfi_startproc
+	movq   $(0x1a9), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_io_uring_setup)
+DEFINE_PUBLIC_ALIAS(sys_io_uring_setup, libc_sys_io_uring_setup)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_uring_setup
+INTERN_FUNCTION(libc_sys_Xio_uring_setup)
+	.cfi_startproc
+	movq   $(0x1a9), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xio_uring_setup)
+DEFINE_PUBLIC_ALIAS(sys_Xio_uring_setup, libc_sys_Xio_uring_setup)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_uring_enter
+INTERN_FUNCTION(libc_sys_io_uring_enter)
+	.cfi_startproc
+	movq   $(0x1aa), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_io_uring_enter)
+DEFINE_PUBLIC_ALIAS(sys_io_uring_enter, libc_sys_io_uring_enter)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_uring_enter
+INTERN_FUNCTION(libc_sys_Xio_uring_enter)
+	.cfi_startproc
+	movq   $(0x1aa), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xio_uring_enter)
+DEFINE_PUBLIC_ALIAS(sys_Xio_uring_enter, libc_sys_Xio_uring_enter)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_uring_register
+INTERN_FUNCTION(libc_sys_io_uring_register)
+	.cfi_startproc
+	movq   $(0x1ab), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_io_uring_register)
+DEFINE_PUBLIC_ALIAS(sys_io_uring_register, libc_sys_io_uring_register)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_uring_register
+INTERN_FUNCTION(libc_sys_Xio_uring_register)
+	.cfi_startproc
+	movq   $(0x1ab), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xio_uring_register)
+DEFINE_PUBLIC_ALIAS(sys_Xio_uring_register, libc_sys_Xio_uring_register)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.open_tree
+INTERN_FUNCTION(libc_sys_open_tree)
+	.cfi_startproc
+	movq   $(0x1ac), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_open_tree)
+DEFINE_PUBLIC_ALIAS(sys_open_tree, libc_sys_open_tree)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xopen_tree
+INTERN_FUNCTION(libc_sys_Xopen_tree)
+	.cfi_startproc
+	movq   $(0x1ac), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xopen_tree)
+DEFINE_PUBLIC_ALIAS(sys_Xopen_tree, libc_sys_Xopen_tree)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.move_mount
+INTERN_FUNCTION(libc_sys_move_mount)
+	.cfi_startproc
+	movq   $(0x1ad), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_move_mount)
+DEFINE_PUBLIC_ALIAS(sys_move_mount, libc_sys_move_mount)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xmove_mount
+INTERN_FUNCTION(libc_sys_Xmove_mount)
+	.cfi_startproc
+	movq   $(0x1ad), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xmove_mount)
+DEFINE_PUBLIC_ALIAS(sys_Xmove_mount, libc_sys_Xmove_mount)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.fsopen
+INTERN_FUNCTION(libc_sys_fsopen)
+	.cfi_startproc
+	movq   $(0x1ae), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_fsopen)
+DEFINE_PUBLIC_ALIAS(sys_fsopen, libc_sys_fsopen)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfsopen
+INTERN_FUNCTION(libc_sys_Xfsopen)
+	.cfi_startproc
+	movq   $(0x1ae), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfsopen)
+DEFINE_PUBLIC_ALIAS(sys_Xfsopen, libc_sys_Xfsopen)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.fsconfig
+INTERN_FUNCTION(libc_sys_fsconfig)
+	.cfi_startproc
+	movq   $(0x1af), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_fsconfig)
+DEFINE_PUBLIC_ALIAS(sys_fsconfig, libc_sys_fsconfig)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfsconfig
+INTERN_FUNCTION(libc_sys_Xfsconfig)
+	.cfi_startproc
+	movq   $(0x1af), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfsconfig)
+DEFINE_PUBLIC_ALIAS(sys_Xfsconfig, libc_sys_Xfsconfig)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.fsmount
+INTERN_FUNCTION(libc_sys_fsmount)
+	.cfi_startproc
+	movq   $(0x1b0), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_fsmount)
+DEFINE_PUBLIC_ALIAS(sys_fsmount, libc_sys_fsmount)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfsmount
+INTERN_FUNCTION(libc_sys_Xfsmount)
+	.cfi_startproc
+	movq   $(0x1b0), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfsmount)
+DEFINE_PUBLIC_ALIAS(sys_Xfsmount, libc_sys_Xfsmount)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.fspick
+INTERN_FUNCTION(libc_sys_fspick)
+	.cfi_startproc
+	movq   $(0x1b1), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_fspick)
+DEFINE_PUBLIC_ALIAS(sys_fspick, libc_sys_fspick)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfspick
+INTERN_FUNCTION(libc_sys_Xfspick)
+	.cfi_startproc
+	movq   $(0x1b1), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfspick)
+DEFINE_PUBLIC_ALIAS(sys_Xfspick, libc_sys_Xfspick)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pidfd_open
+INTERN_FUNCTION(libc_sys_pidfd_open)
+	.cfi_startproc
+	movq   $(0x1b2), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pidfd_open)
+DEFINE_PUBLIC_ALIAS(sys_pidfd_open, libc_sys_pidfd_open)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpidfd_open
+INTERN_FUNCTION(libc_sys_Xpidfd_open)
+	.cfi_startproc
+	movq   $(0x1b2), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpidfd_open)
+DEFINE_PUBLIC_ALIAS(sys_Xpidfd_open, libc_sys_Xpidfd_open)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.clone3
+INTERN_FUNCTION(libc_sys_clone3)
+	.cfi_startproc
+	movq   $(0x1b3), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_clone3)
+DEFINE_PUBLIC_ALIAS(sys_clone3, libc_sys_clone3)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xclone3
+INTERN_FUNCTION(libc_sys_Xclone3)
+	.cfi_startproc
+	movq   $(0x1b3), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xclone3)
+DEFINE_PUBLIC_ALIAS(sys_Xclone3, libc_sys_Xclone3)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.close_range
+INTERN_FUNCTION(libc_sys_close_range)
+	.cfi_startproc
+	movq   $(0x1b4), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_close_range)
+DEFINE_PUBLIC_ALIAS(sys_close_range, libc_sys_close_range)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xclose_range
+INTERN_FUNCTION(libc_sys_Xclose_range)
+	.cfi_startproc
+	movq   $(0x1b4), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xclose_range)
+DEFINE_PUBLIC_ALIAS(sys_Xclose_range, libc_sys_Xclose_range)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.openat2
+INTERN_FUNCTION(libc_sys_openat2)
+	.cfi_startproc
+	movq   $(0x1b5), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_openat2)
+DEFINE_PUBLIC_ALIAS(sys_openat2, libc_sys_openat2)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xopenat2
+INTERN_FUNCTION(libc_sys_Xopenat2)
+	.cfi_startproc
+	movq   $(0x1b5), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xopenat2)
+DEFINE_PUBLIC_ALIAS(sys_Xopenat2, libc_sys_Xopenat2)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pidfd_getfd
+INTERN_FUNCTION(libc_sys_pidfd_getfd)
+	.cfi_startproc
+	movq   $(0x1b6), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_pidfd_getfd)
+DEFINE_PUBLIC_ALIAS(sys_pidfd_getfd, libc_sys_pidfd_getfd)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpidfd_getfd
+INTERN_FUNCTION(libc_sys_Xpidfd_getfd)
+	.cfi_startproc
+	movq   $(0x1b6), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xpidfd_getfd)
+DEFINE_PUBLIC_ALIAS(sys_Xpidfd_getfd, libc_sys_Xpidfd_getfd)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.faccessat2
+INTERN_FUNCTION(libc_sys_faccessat2)
+	.cfi_startproc
+	movq   $(0x1b7), %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_faccessat2)
+DEFINE_PUBLIC_ALIAS(sys_faccessat2, libc_sys_faccessat2)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfaccessat2
+INTERN_FUNCTION(libc_sys_Xfaccessat2)
+	.cfi_startproc
+	movq   $(0x1b7), %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xfaccessat2)
+DEFINE_PUBLIC_ALIAS(sys_Xfaccessat2, libc_sys_Xfaccessat2)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position

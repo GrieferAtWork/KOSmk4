@@ -468,11 +468,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       the functionality of the `lsthread', `thread', `trace', `l' and `r'
 	 *       commands. */
 
-	/* TODO: Update the linux syscall compatibility list.
-	 *       Also merge system calls that are currently KOS extensions
-	 *       with system calls that were added to linux in the mean time.
-	 *       Specifically: 64-bit time system calls. */
-
 	/* TODO: Trigger `DEBUGTRAP_REASON_VFORK' and `DEBUGTRAP_REASON_VFORKDONE'
 	 *       at appropriate locations within the kernel. */
 
@@ -487,7 +482,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       /dev/disk/by-partuuid/  -- Symlinks for block-devices
 	 *       /dev/disk/by-path/      -- Symlinks for block-devices
 	 *       /dev/disk/by-uuid/      -- Symlinks for block-devices
-	 */
+	 * Alternatively (and arguably even better), make /dev a dynamic file system, similar to /proc */
 
 	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
 	 *      the instruction stream to figure out how to unwind the stack.

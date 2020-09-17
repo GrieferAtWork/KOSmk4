@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x106bcbcc */
+/* HASH CRC-32:0x15e0e8f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,8 +43,11 @@
 #define __CRT_HAVE_sys_clock_nanosleep 1
 #define __CRT_HAVE_sys_clock_settime 1
 #define __CRT_HAVE_sys_clone 1
+#define __CRT_HAVE_sys_clone3 1
 #define __CRT_HAVE_sys_close 1
+#define __CRT_HAVE_sys_close_range 1
 #define __CRT_HAVE_sys_connect 1
+#define __CRT_HAVE_sys_copy_file_range 1
 #define __CRT_HAVE_sys_coredump 1
 #define __CRT_HAVE_sys_creat 1
 #define __CRT_HAVE_sys_create_module 1
@@ -68,6 +71,7 @@
 #define __CRT_HAVE_sys_exit 1
 #define __CRT_HAVE_sys_exit_group 1
 #define __CRT_HAVE_sys_faccessat 1
+#define __CRT_HAVE_sys_faccessat2 1
 #define __CRT_HAVE_sys_fadvise64 1
 #define __CRT_HAVE_sys_fallocate 1
 #define __CRT_HAVE_sys_fanotify_init 1
@@ -92,8 +96,12 @@
 #define __CRT_HAVE_sys_frealpathat 1
 #define __CRT_HAVE_sys_fremovexattr 1
 #define __CRT_HAVE_sys_frenameat 1
+#define __CRT_HAVE_sys_fsconfig 1
 #define __CRT_HAVE_sys_fsetxattr 1
 #define __CRT_HAVE_sys_fsmode 1
+#define __CRT_HAVE_sys_fsmount 1
+#define __CRT_HAVE_sys_fsopen 1
+#define __CRT_HAVE_sys_fspick 1
 #define __CRT_HAVE_sys_fstat 1
 #define __CRT_HAVE_sys_fstatfs 1
 #define __CRT_HAVE_sys_fsymlinkat 1
@@ -145,8 +153,12 @@
 #define __CRT_HAVE_sys_io_cancel 1
 #define __CRT_HAVE_sys_io_destroy 1
 #define __CRT_HAVE_sys_io_getevents 1
+#define __CRT_HAVE_sys_io_pgetevents 1
 #define __CRT_HAVE_sys_io_setup 1
 #define __CRT_HAVE_sys_io_submit 1
+#define __CRT_HAVE_sys_io_uring_enter 1
+#define __CRT_HAVE_sys_io_uring_register 1
+#define __CRT_HAVE_sys_io_uring_setup 1
 #define __CRT_HAVE_sys_ioctl 1
 #define __CRT_HAVE_sys_ioctlf 1
 #define __CRT_HAVE_sys_ioperm 1
@@ -198,6 +210,7 @@
 #define __CRT_HAVE_sys_mmap 1
 #define __CRT_HAVE_sys_modify_ldt 1
 #define __CRT_HAVE_sys_mount 1
+#define __CRT_HAVE_sys_move_mount 1
 #define __CRT_HAVE_sys_move_pages 1
 #define __CRT_HAVE_sys_mprotect 1
 #define __CRT_HAVE_sys_mq_getsetattr 1
@@ -221,20 +234,29 @@
 #define __CRT_HAVE_sys_nfsservctl 1
 #define __CRT_HAVE_sys_open 1
 #define __CRT_HAVE_sys_open_by_handle_at 1
+#define __CRT_HAVE_sys_open_tree 1
 #define __CRT_HAVE_sys_openat 1
+#define __CRT_HAVE_sys_openat2 1
 #define __CRT_HAVE_sys_openpty 1
 #define __CRT_HAVE_sys_pause 1
 #define __CRT_HAVE_sys_perf_event_open 1
 #define __CRT_HAVE_sys_personality 1
+#define __CRT_HAVE_sys_pidfd_getfd 1
+#define __CRT_HAVE_sys_pidfd_open 1
+#define __CRT_HAVE_sys_pidfd_send_signal 1
 #define __CRT_HAVE_sys_pipe 1
 #define __CRT_HAVE_sys_pipe2 1
 #define __CRT_HAVE_sys_pivot_root 1
+#define __CRT_HAVE_sys_pkey_alloc 1
+#define __CRT_HAVE_sys_pkey_free 1
+#define __CRT_HAVE_sys_pkey_mprotect 1
 #define __CRT_HAVE_sys_poll 1
 #define __CRT_HAVE_sys_ppoll 1
 #define __CRT_HAVE_sys_prctl 1
 #define __CRT_HAVE_sys_pread64 1
 #define __CRT_HAVE_sys_pread64f 1
 #define __CRT_HAVE_sys_preadv 1
+#define __CRT_HAVE_sys_preadv2 1
 #define __CRT_HAVE_sys_preadvf 1
 #define __CRT_HAVE_sys_prlimit64 1
 #define __CRT_HAVE_sys_process_vm_readv 1
@@ -245,6 +267,7 @@
 #define __CRT_HAVE_sys_pwrite64 1
 #define __CRT_HAVE_sys_pwrite64f 1
 #define __CRT_HAVE_sys_pwritev 1
+#define __CRT_HAVE_sys_pwritev2 1
 #define __CRT_HAVE_sys_pwritevf 1
 #define __CRT_HAVE_sys_query_module 1
 #define __CRT_HAVE_sys_quotactl 1
@@ -270,6 +293,7 @@
 #define __CRT_HAVE_sys_rmdir 1
 #define __CRT_HAVE_sys_rpc_schedule 1
 #define __CRT_HAVE_sys_rpc_service 1
+#define __CRT_HAVE_sys_rseq 1
 #define __CRT_HAVE_sys_rt_sigaction 1
 #define __CRT_HAVE_sys_rt_sigpending 1
 #define __CRT_HAVE_sys_rt_sigprocmask 1
@@ -343,6 +367,7 @@
 #define __CRT_HAVE_sys_splice 1
 #define __CRT_HAVE_sys_stat 1
 #define __CRT_HAVE_sys_statfs 1
+#define __CRT_HAVE_sys_statx 1
 #define __CRT_HAVE_sys_swapoff 1
 #define __CRT_HAVE_sys_swapon 1
 #define __CRT_HAVE_sys_symlink 1
@@ -416,8 +441,11 @@
 #define __CRT_HAVE_sys_Xclock_nanosleep 1
 #define __CRT_HAVE_sys_Xclock_settime 1
 #define __CRT_HAVE_sys_Xclone 1
+#define __CRT_HAVE_sys_Xclone3 1
 #define __CRT_HAVE_sys_Xclose 1
+#define __CRT_HAVE_sys_Xclose_range 1
 #define __CRT_HAVE_sys_Xconnect 1
+#define __CRT_HAVE_sys_Xcopy_file_range 1
 #define __CRT_HAVE_sys_Xcoredump 1
 #define __CRT_HAVE_sys_Xcreat 1
 #define __CRT_HAVE_sys_Xcreate_module 1
@@ -441,6 +469,7 @@
 #define __CRT_HAVE_sys_Xexit 1
 #define __CRT_HAVE_sys_Xexit_group 1
 #define __CRT_HAVE_sys_Xfaccessat 1
+#define __CRT_HAVE_sys_Xfaccessat2 1
 #define __CRT_HAVE_sys_Xfadvise64 1
 #define __CRT_HAVE_sys_Xfallocate 1
 #define __CRT_HAVE_sys_Xfanotify_init 1
@@ -465,8 +494,12 @@
 #define __CRT_HAVE_sys_Xfrealpathat 1
 #define __CRT_HAVE_sys_Xfremovexattr 1
 #define __CRT_HAVE_sys_Xfrenameat 1
+#define __CRT_HAVE_sys_Xfsconfig 1
 #define __CRT_HAVE_sys_Xfsetxattr 1
 #define __CRT_HAVE_sys_Xfsmode 1
+#define __CRT_HAVE_sys_Xfsmount 1
+#define __CRT_HAVE_sys_Xfsopen 1
+#define __CRT_HAVE_sys_Xfspick 1
 #define __CRT_HAVE_sys_Xfstat 1
 #define __CRT_HAVE_sys_Xfstatfs 1
 #define __CRT_HAVE_sys_Xfsymlinkat 1
@@ -518,8 +551,12 @@
 #define __CRT_HAVE_sys_Xio_cancel 1
 #define __CRT_HAVE_sys_Xio_destroy 1
 #define __CRT_HAVE_sys_Xio_getevents 1
+#define __CRT_HAVE_sys_Xio_pgetevents 1
 #define __CRT_HAVE_sys_Xio_setup 1
 #define __CRT_HAVE_sys_Xio_submit 1
+#define __CRT_HAVE_sys_Xio_uring_enter 1
+#define __CRT_HAVE_sys_Xio_uring_register 1
+#define __CRT_HAVE_sys_Xio_uring_setup 1
 #define __CRT_HAVE_sys_Xioctl 1
 #define __CRT_HAVE_sys_Xioctlf 1
 #define __CRT_HAVE_sys_Xioperm 1
@@ -571,6 +608,7 @@
 #define __CRT_HAVE_sys_Xmmap 1
 #define __CRT_HAVE_sys_Xmodify_ldt 1
 #define __CRT_HAVE_sys_Xmount 1
+#define __CRT_HAVE_sys_Xmove_mount 1
 #define __CRT_HAVE_sys_Xmove_pages 1
 #define __CRT_HAVE_sys_Xmprotect 1
 #define __CRT_HAVE_sys_Xmq_getsetattr 1
@@ -594,20 +632,29 @@
 #define __CRT_HAVE_sys_Xnfsservctl 1
 #define __CRT_HAVE_sys_Xopen 1
 #define __CRT_HAVE_sys_Xopen_by_handle_at 1
+#define __CRT_HAVE_sys_Xopen_tree 1
 #define __CRT_HAVE_sys_Xopenat 1
+#define __CRT_HAVE_sys_Xopenat2 1
 #define __CRT_HAVE_sys_Xopenpty 1
 #define __CRT_HAVE_sys_Xpause 1
 #define __CRT_HAVE_sys_Xperf_event_open 1
 #define __CRT_HAVE_sys_Xpersonality 1
+#define __CRT_HAVE_sys_Xpidfd_getfd 1
+#define __CRT_HAVE_sys_Xpidfd_open 1
+#define __CRT_HAVE_sys_Xpidfd_send_signal 1
 #define __CRT_HAVE_sys_Xpipe 1
 #define __CRT_HAVE_sys_Xpipe2 1
 #define __CRT_HAVE_sys_Xpivot_root 1
+#define __CRT_HAVE_sys_Xpkey_alloc 1
+#define __CRT_HAVE_sys_Xpkey_free 1
+#define __CRT_HAVE_sys_Xpkey_mprotect 1
 #define __CRT_HAVE_sys_Xpoll 1
 #define __CRT_HAVE_sys_Xppoll 1
 #define __CRT_HAVE_sys_Xprctl 1
 #define __CRT_HAVE_sys_Xpread64 1
 #define __CRT_HAVE_sys_Xpread64f 1
 #define __CRT_HAVE_sys_Xpreadv 1
+#define __CRT_HAVE_sys_Xpreadv2 1
 #define __CRT_HAVE_sys_Xpreadvf 1
 #define __CRT_HAVE_sys_Xprlimit64 1
 #define __CRT_HAVE_sys_Xprocess_vm_readv 1
@@ -618,6 +665,7 @@
 #define __CRT_HAVE_sys_Xpwrite64 1
 #define __CRT_HAVE_sys_Xpwrite64f 1
 #define __CRT_HAVE_sys_Xpwritev 1
+#define __CRT_HAVE_sys_Xpwritev2 1
 #define __CRT_HAVE_sys_Xpwritevf 1
 #define __CRT_HAVE_sys_Xquery_module 1
 #define __CRT_HAVE_sys_Xquotactl 1
@@ -643,6 +691,7 @@
 #define __CRT_HAVE_sys_Xrmdir 1
 #define __CRT_HAVE_sys_Xrpc_schedule 1
 #define __CRT_HAVE_sys_Xrpc_service 1
+#define __CRT_HAVE_sys_Xrseq 1
 #define __CRT_HAVE_sys_Xrt_sigaction 1
 #define __CRT_HAVE_sys_Xrt_sigpending 1
 #define __CRT_HAVE_sys_Xrt_sigprocmask 1
@@ -715,6 +764,7 @@
 #define __CRT_HAVE_sys_Xsplice 1
 #define __CRT_HAVE_sys_Xstat 1
 #define __CRT_HAVE_sys_Xstatfs 1
+#define __CRT_HAVE_sys_Xstatx 1
 #define __CRT_HAVE_sys_Xswapoff 1
 #define __CRT_HAVE_sys_Xswapon 1
 #define __CRT_HAVE_sys_Xsymlink 1

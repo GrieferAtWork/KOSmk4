@@ -2045,7 +2045,24 @@ kexec_file_load:(int TODO_PROTOTYPE) -> errno_t;
 semget:(int TODO_PROTOTYPE) -> errno_t;
 semctl:(int TODO_PROTOTYPE) -> errno_t;
 [restart(dont)] semop:(int TODO_PROTOTYPE) -> errno_t;
+
+%[startgroup]
 [restart(dont)] semtimedop:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] semtimedop32:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] semtimedop64:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] semtimedopx32:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] semtimedopx32_64:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] semtimedopx64:(int TODO_PROTOTYPE) -> errno_t;
+%[endgroup]
+
+%[startgroup]
+[restart(dont)] io_pgetevents:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_pgetevents32:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_pgetevents64:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_pgeteventsx32:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_pgeteventsx32_64:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_pgeteventsx64:(int TODO_PROTOTYPE) -> errno_t;
+%[endgroup]
 
 msgctl:(int TODO_PROTOTYPE) -> errno_t;
 msgget:(int TODO_PROTOTYPE) -> errno_t;
@@ -2064,6 +2081,30 @@ seccomp:(int TODO_PROTOTYPE) -> errno_t;
 security:(int TODO_PROTOTYPE) -> errno_t;
 sysfs:(int TODO_PROTOTYPE) -> errno_t;
 tuxcall:(int TODO_PROTOTYPE) -> errno_t;
+rseq:(int TODO_PROTOTYPE) -> errno_t;
+statx:(int TODO_PROTOTYPE) -> errno_t;
+pkey_alloc:(int TODO_PROTOTYPE) -> errno_t;
+pkey_free:(int TODO_PROTOTYPE) -> errno_t;
+pkey_mprotect:(int TODO_PROTOTYPE) -> errno_t;
+copy_file_range:(int TODO_PROTOTYPE) -> errno_t;
+preadv2:(int TODO_PROTOTYPE) -> errno_t;
+pwritev2:(int TODO_PROTOTYPE) -> errno_t;
+io_uring_setup:(int TODO_PROTOTYPE) -> errno_t;
+io_uring_enter:(int TODO_PROTOTYPE) -> errno_t;
+io_uring_register:(int TODO_PROTOTYPE) -> errno_t;
+open_tree:(int TODO_PROTOTYPE) -> errno_t;
+move_mount:(int TODO_PROTOTYPE) -> errno_t;
+fsopen:(int TODO_PROTOTYPE) -> errno_t;
+fsconfig:(int TODO_PROTOTYPE) -> errno_t;
+fsmount:(int TODO_PROTOTYPE) -> errno_t;
+fspick:(int TODO_PROTOTYPE) -> errno_t;
+clone3:(int TODO_PROTOTYPE) -> errno_t;
+close_range:(int TODO_PROTOTYPE) -> errno_t;
+openat2:(int TODO_PROTOTYPE) -> errno_t;
+faccessat2:(int TODO_PROTOTYPE) -> errno_t;
+pidfd_open:(int TODO_PROTOTYPE) -> errno_t;
+pidfd_send_signal:(int TODO_PROTOTYPE) -> errno_t;
+pidfd_getfd:(int TODO_PROTOTYPE) -> errno_t;
 
 
 

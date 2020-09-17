@@ -146,6 +146,7 @@ nanosleep64 = nanosleepx32_64;
 rt_sigtimedwait = rt_sigtimedwaitx32;
 rt_sigtimedwait_time64 = rt_sigtimedwaitx32_64;
 futex = futexx32;
+futex_time64 = futexx32_64;
 clock_settime = clock_settimex32;
 clock_settime64 = clock_settimex32_64;
 clock_gettime = clock_gettimex32;
@@ -194,6 +195,9 @@ mq_timedsend_time64 = mq_timedsendx32_64;
 mq_timedreceive = mq_timedreceivex32;
 mq_timedreceive_time64 = mq_timedreceivex32_64;
 rt_sigreturn = sigreturn;
+semtimedop_time64 = semtimedopx32_64;
+io_pgetevents = io_pgeteventsx32;
+io_pgetevents_time64 = io_pgeteventsx32_64;
 
 /* Deal with the whole new-vs-old select issue. */
 _newselect = selectx32;
@@ -601,26 +605,26 @@ select64 = selectx32_64;
 0x00000176:userfaultfd
 0x00000177:membarrier
 0x00000178:mlock2
-//TODO:0x00000179:copy_file_range
-//TODO:0x0000017a:preadv2
-//TODO:0x0000017b:pwritev2
-//TODO:0x0000017c:pkey_mprotect
-//TODO:0x0000017d:pkey_alloc
-//TODO:0x0000017e:pkey_free
-//TODO:0x0000017f:statx
-//TODO:0x00000180:arch_prctl
-//TODO:0x00000181:io_pgetevents
-//TODO:0x00000182:rseq
-//TODO:0x00000189:semget
-//TODO:0x0000018a:semctl
-//TODO:0x0000018b:shmget
-//TODO:0x0000018c:shmctl
-//TODO:0x0000018d:shmat
-//TODO:0x0000018e:shmdt
-//TODO:0x0000018f:msgget
-//TODO:0x00000190:msgsnd
-//TODO:0x00000191:msgrcv
-//TODO:0x00000192:msgctl
+0x00000179:copy_file_range
+0x0000017a:preadv2
+0x0000017b:pwritev2
+0x0000017c:pkey_mprotect
+0x0000017d:pkey_alloc
+0x0000017e:pkey_free
+0x0000017f:statx
+0x00000180:arch_prctl
+0x00000181:io_pgetevents
+0x00000182:rseq
+0x00000189:semget
+0x0000018a:semctl
+0x0000018b:shmget
+0x0000018c:shmctl
+0x0000018d:shmat
+0x0000018e:shmdt
+0x0000018f:msgget
+0x00000190:msgsnd
+0x00000191:msgrcv
+0x00000192:msgctl
 0x00000193:clock_gettime64
 0x00000194:clock_settime64
 0x00000195:clock_adjtime64
@@ -633,30 +637,30 @@ select64 = selectx32_64;
 0x0000019c:utimensat_time64
 0x0000019d:pselect6_time64
 0x0000019e:ppoll_time64
-//TODO:0x000001a0:io_pgetevents_time64
+0x000001a0:io_pgetevents_time64
 0x000001a1:recvmmsg_time64
 0x000001a2:mq_timedsend_time64
 0x000001a3:mq_timedreceive_time64
-//TODO:0x000001a4:semtimedop_time64
+0x000001a4:semtimedop_time64
 0x000001a5:rt_sigtimedwait_time64
-//TODO:0x000001a6:futex_time64
+0x000001a6:futex_time64
 0x000001a7:sched_rr_get_interval_time64
-//TODO:0x000001a8:pidfd_send_signal
-//TODO:0x000001a9:io_uring_setup
-//TODO:0x000001aa:io_uring_enter
-//TODO:0x000001ab:io_uring_register
-//TODO:0x000001ac:open_tree
-//TODO:0x000001ad:move_mount
-//TODO:0x000001ae:fsopen
-//TODO:0x000001af:fsconfig
-//TODO:0x000001b0:fsmount
-//TODO:0x000001b1:fspick
-//TODO:0x000001b2:pidfd_open
-//TODO:0x000001b3:clone3
-//TODO:0x000001b4:close_range
-//TODO:0x000001b5:openat2
-//TODO:0x000001b6:pidfd_getfd
-//TODO:0x000001b7:faccessat2
+0x000001a8:pidfd_send_signal
+0x000001a9:io_uring_setup
+0x000001aa:io_uring_enter
+0x000001ab:io_uring_register
+0x000001ac:open_tree
+0x000001ad:move_mount
+0x000001ae:fsopen
+0x000001af:fsconfig
+0x000001b0:fsmount
+0x000001b1:fspick
+0x000001b2:pidfd_open
+0x000001b3:clone3
+0x000001b4:close_range
+0x000001b5:openat2
+0x000001b6:pidfd_getfd
+0x000001b7:faccessat2
 
 -0x00000001:hop
 -0x00000002:hopf

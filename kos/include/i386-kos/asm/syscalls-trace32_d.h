@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2768aa1b */
+/* HASH CRC-32:0x1e090264 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -852,6 +852,32 @@
 #define __NR32AN0_userfaultfd                  TODO_PROTOTYPE
 #define __NR32AN0_membarrier                   TODO_PROTOTYPE
 #define __NR32AN0_mlock2                       TODO_PROTOTYPE
+#define __NR32AN0_copy_file_range              TODO_PROTOTYPE
+#define __NR32AN0_preadv2                      TODO_PROTOTYPE
+#define __NR32AN0_pwritev2                     TODO_PROTOTYPE
+#define __NR32AN0_pkey_mprotect                TODO_PROTOTYPE
+#define __NR32AN0_pkey_alloc                   TODO_PROTOTYPE
+#define __NR32AN0_pkey_free                    TODO_PROTOTYPE
+#define __NR32AN0_statx                        TODO_PROTOTYPE
+#define __NR32AN0_arch_prctl                   TODO_PROTOTYPE
+#define __NR32AN0_io_pgetevents                TODO_PROTOTYPE
+#define __NR32AN0_rseq                         TODO_PROTOTYPE
+#define __NR32AN0_semget                       TODO_PROTOTYPE
+#define __NR32AN0_semctl                       TODO_PROTOTYPE
+#define __NR32AN0_shmget                       key
+#define __NR32AN1_shmget                       size
+#define __NR32AN2_shmget                       shmflg
+#define __NR32AN0_shmctl                       shmid
+#define __NR32AN1_shmctl                       cmd
+#define __NR32AN2_shmctl                       buf
+#define __NR32AN0_shmat                        shmid
+#define __NR32AN1_shmat                        shmaddr
+#define __NR32AN2_shmat                        shmflg
+#define __NR32AN0_shmdt                        shmaddr
+#define __NR32AN0_msgget                       TODO_PROTOTYPE
+#define __NR32AN0_msgsnd                       TODO_PROTOTYPE
+#define __NR32AN0_msgrcv                       TODO_PROTOTYPE
+#define __NR32AN0_msgctl                       TODO_PROTOTYPE
 #define __NR32AN0_clock_gettime64              clock_id
 #define __NR32AN1_clock_gettime64              tp
 #define __NR32AN0_clock_settime64              clock_id
@@ -890,6 +916,7 @@
 #define __NR32AN2_ppoll_time64                 timeout_ts
 #define __NR32AN3_ppoll_time64                 sigmask
 #define __NR32AN4_ppoll_time64                 sigsetsize
+#define __NR32AN0_io_pgetevents_time64         TODO_PROTOTYPE
 #define __NR32AN0_recvmmsg_time64              sockfd
 #define __NR32AN1_recvmmsg_time64              vmessages
 #define __NR32AN2_recvmmsg_time64              vlen
@@ -905,12 +932,35 @@
 #define __NR32AN2_mq_timedreceive_time64       msg_len
 #define __NR32AN3_mq_timedreceive_time64       pmsg_prio
 #define __NR32AN4_mq_timedreceive_time64       abs_timeout
+#define __NR32AN0_semtimedop_time64            TODO_PROTOTYPE
 #define __NR32AN0_rt_sigtimedwait_time64       set
 #define __NR32AN1_rt_sigtimedwait_time64       info
 #define __NR32AN2_rt_sigtimedwait_time64       timeout
 #define __NR32AN3_rt_sigtimedwait_time64       sigsetsize
+#define __NR32AN0_futex_time64                 uaddr
+#define __NR32AN1_futex_time64                 futex_op
+#define __NR32AN2_futex_time64                 val
+#define __NR32AN3_futex_time64                 timeout_or_val2
+#define __NR32AN4_futex_time64                 uaddr2
+#define __NR32AN5_futex_time64                 val3
 #define __NR32AN0_sched_rr_get_interval_time64 pid
 #define __NR32AN1_sched_rr_get_interval_time64 tms
+#define __NR32AN0_pidfd_send_signal            TODO_PROTOTYPE
+#define __NR32AN0_io_uring_setup               TODO_PROTOTYPE
+#define __NR32AN0_io_uring_enter               TODO_PROTOTYPE
+#define __NR32AN0_io_uring_register            TODO_PROTOTYPE
+#define __NR32AN0_open_tree                    TODO_PROTOTYPE
+#define __NR32AN0_move_mount                   TODO_PROTOTYPE
+#define __NR32AN0_fsopen                       TODO_PROTOTYPE
+#define __NR32AN0_fsconfig                     TODO_PROTOTYPE
+#define __NR32AN0_fsmount                      TODO_PROTOTYPE
+#define __NR32AN0_fspick                       TODO_PROTOTYPE
+#define __NR32AN0_pidfd_open                   TODO_PROTOTYPE
+#define __NR32AN0_clone3                       TODO_PROTOTYPE
+#define __NR32AN0_close_range                  TODO_PROTOTYPE
+#define __NR32AN0_openat2                      TODO_PROTOTYPE
+#define __NR32AN0_pidfd_getfd                  TODO_PROTOTYPE
+#define __NR32AN0_faccessat2                   TODO_PROTOTYPE
 #define __NR32AN0_pwritevf                     fd
 #define __NR32AN1_pwritevf                     iovec
 #define __NR32AN2_pwritevf                     count
@@ -2406,6 +2456,52 @@
 #define __NR32RTR_membarrier                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_mlock2                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_mlock2                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_copy_file_range              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_copy_file_range               SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_preadv2                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_preadv2                       SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_pwritev2                     SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_pwritev2                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_pkey_mprotect                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_pkey_mprotect                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_pkey_alloc                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_pkey_alloc                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_pkey_free                    SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_pkey_free                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_statx                        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_statx                         SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_arch_prctl                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_arch_prctl                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_io_pgetevents                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_io_pgetevents                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_rseq                         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_rseq                          SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_semget                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_semget                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_semctl                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_semctl                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_shmget                       SC_REPR_SIGHANDLER_T                                                 /* key */ 
+#define __NR32ATR1_shmget                       SC_REPR_SIZE_T                                                       /* size */ 
+#define __NR32ATR2_shmget                       SC_REPR_SYSCALL_ULONG_T                                              /* shmflg */ 
+#define __NR32RTR_shmget                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_shmctl                       SC_REPR_SYSCALL_ULONG_T                                              /* shmid */ 
+#define __NR32ATR1_shmctl                       SC_REPR_SYSCALL_ULONG_T                                              /* cmd */ 
+#define __NR32ATR2_shmctl                       SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32RTR_shmctl                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_shmat                        SC_REPR_SYSCALL_ULONG_T                                              /* shmid */ 
+#define __NR32ATR1_shmat                        SC_REPR_POINTER                                                      /* shmaddr */ 
+#define __NR32ATR2_shmat                        SC_REPR_SYSCALL_ULONG_T                                              /* shmflg */ 
+#define __NR32RTR_shmat                         SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_shmdt                        SC_REPR_POINTER                                                      /* shmaddr */ 
+#define __NR32RTR_shmdt                         SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_msgget                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_msgget                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_msgsnd                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_msgsnd                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_msgrcv                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_msgrcv                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_msgctl                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_msgctl                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_clock_gettime64              SC_REPR_CLOCKID_T                                                    /* clock_id */ 
 #define __NR32ATR1_clock_gettime64              SC_REPR_POINTER                                                      /* tp */ 
 #define __NR32RTR_clock_gettime64               SC_REPR_ERRNO_T                                                      /* return */
@@ -2463,6 +2559,8 @@
 #define __NR32ATL3_ppoll_time64                 4                                                                    /* sigmask -> sigsetsize */ 
 #define __NR32ATR4_ppoll_time64                 SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_ppoll_time64                  SC_REPR_SSIZE_T                                                      /* return */
+#define __NR32ATR0_io_pgetevents_time64         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_io_pgetevents_time64          SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_recvmmsg_time64              SC_REPR_FD_T                                                         /* sockfd */ 
 #define __NR32ATR1_recvmmsg_time64              SC_REPR_POINTER                                                      /* vmessages */ 
 #define __NR32ATR2_recvmmsg_time64              SC_REPR_SIZE_T                                                       /* vlen */ 
@@ -2482,15 +2580,57 @@
 #define __NR32ATR3_mq_timedreceive_time64       SC_REPR_POINTER                                                      /* pmsg_prio */ 
 #define __NR32ATR4_mq_timedreceive_time64       SC_REPR_STRUCT_TIMESPECX32_64                                        /* abs_timeout */ 
 #define __NR32RTR_mq_timedreceive_time64        SC_REPR_SSIZE_T                                                      /* return */
+#define __NR32ATR0_semtimedop_time64            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_semtimedop_time64             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_rt_sigtimedwait_time64       SC_REPR_STRUCT_SIGSET                                                /* set */ 
 #define __NR32ATL0_rt_sigtimedwait_time64       3                                                                    /* set -> sigsetsize */ 
 #define __NR32ATR1_rt_sigtimedwait_time64       SC_REPR_POINTER                                                      /* info */ 
 #define __NR32ATR2_rt_sigtimedwait_time64       SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
 #define __NR32ATR3_rt_sigtimedwait_time64       SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_rt_sigtimedwait_time64        SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NR32ATR0_futex_time64                 SC_REPR_POINTER                                                      /* uaddr */ 
+#define __NR32ATR1_futex_time64                 SC_REPR_FUTEX_OP                                                     /* futex_op */ 
+#define __NR32ATR2_futex_time64                 SC_REPR_UINT32_T                                                     /* val */ 
+#define __NR32ATR3_futex_time64                 SC_REPR_STRUCT_TIMESPECX32_64_OR_UINT32                              /* timeout_or_val2 */ 
+#define __NR32ATL3_futex_time64                 1                                                                    /* timeout_or_val2 -> futex_op */ 
+#define __NR32ATR4_futex_time64                 SC_REPR_POINTER                                                      /* uaddr2 */ 
+#define __NR32ATR5_futex_time64                 SC_REPR_UINT32_T                                                     /* val3 */ 
+#define __NR32RTR_futex_time64                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_sched_rr_get_interval_time64 SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_sched_rr_get_interval_time64 SC_REPR_POINTER                                                      /* tms */ 
 #define __NR32RTR_sched_rr_get_interval_time64  SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_pidfd_send_signal            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_pidfd_send_signal             SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_io_uring_setup               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_io_uring_setup                SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_io_uring_enter               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_io_uring_enter                SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_io_uring_register            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_io_uring_register             SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_open_tree                    SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_open_tree                     SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_move_mount                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_move_mount                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_fsopen                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_fsopen                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_fsconfig                     SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_fsconfig                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_fsmount                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_fsmount                       SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_fspick                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_fspick                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_pidfd_open                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_pidfd_open                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_clone3                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_clone3                        SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_close_range                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_close_range                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_openat2                      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_openat2                       SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_pidfd_getfd                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_pidfd_getfd                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_faccessat2                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32RTR_faccessat2                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_pwritevf                     SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_pwritevf                     SC_REPR_STRUCT_IOVECX32_C                                            /* iovec */ 
 #define __NR32ATL1_pwritevf                     2                                                                    /* iovec -> count */ 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeaacd1a */
+/* HASH CRC-32:0x706cc605 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -776,6 +776,26 @@
 #define SYS_userfaultfd                  __NR_userfaultfd                  /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier                   __NR_membarrier                   /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                       __NR_mlock2                       /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define SYS_copy_file_range              __NR_copy_file_range              /* errno_t copy_file_range(int TODO_PROTOTYPE) */
+#define SYS_preadv2                      __NR_preadv2                      /* errno_t preadv2(int TODO_PROTOTYPE) */
+#define SYS_pwritev2                     __NR_pwritev2                     /* errno_t pwritev2(int TODO_PROTOTYPE) */
+#define SYS_pkey_mprotect                __NR_pkey_mprotect                /* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+#define SYS_pkey_alloc                   __NR_pkey_alloc                   /* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+#define SYS_pkey_free                    __NR_pkey_free                    /* errno_t pkey_free(int TODO_PROTOTYPE) */
+#define SYS_statx                        __NR_statx                        /* errno_t statx(int TODO_PROTOTYPE) */
+#define SYS_arch_prctl                   __NR_arch_prctl                   /* errno_t arch_prctl(int TODO_PROTOTYPE) */
+#define SYS_io_pgetevents                __NR_io_pgetevents                /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+#define SYS_rseq                         __NR_rseq                         /* errno_t rseq(int TODO_PROTOTYPE) */
+#define SYS_semget                       __NR_semget                       /* errno_t semget(int TODO_PROTOTYPE) */
+#define SYS_semctl                       __NR_semctl                       /* errno_t semctl(int TODO_PROTOTYPE) */
+#define SYS_shmget                       __NR_shmget                       /* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+#define SYS_shmctl                       __NR_shmctl                       /* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+#define SYS_shmat                        __NR_shmat                        /* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+#define SYS_shmdt                        __NR_shmdt                        /* errno_t shmdt(void const *shmaddr) */
+#define SYS_msgget                       __NR_msgget                       /* errno_t msgget(int TODO_PROTOTYPE) */
+#define SYS_msgsnd                       __NR_msgsnd                       /* errno_t msgsnd(int TODO_PROTOTYPE) */
+#define SYS_msgrcv                       __NR_msgrcv                       /* errno_t msgrcv(int TODO_PROTOTYPE) */
+#define SYS_msgctl                       __NR_msgctl                       /* errno_t msgctl(int TODO_PROTOTYPE) */
 #define SYS_clock_gettime64              __NR_clock_gettime64              /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 #define SYS_clock_settime64              __NR_clock_settime64              /* errno_t clock_settime64(clockid_t clock_id, struct timespecx32_64 const *tp) */
 #define SYS_clock_adjtime64              __NR_clock_adjtime64              /* errno_t clock_adjtime64(int TODO_PROTOTYPE) */
@@ -795,6 +815,7 @@
 #define SYS_utimensat_time64             __NR_utimensat_time64             /* errno_t utimensat_time64(fd_t dirfd, char const *filename, struct timespecx32_64 const[2] times, atflag_t flags) */
 #define SYS_pselect6_time64              __NR_pselect6_time64              /* ssize_t pselect6_time64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx32_64 const *timeout, void const *sigmask_sigset_and_len) */
 #define SYS_ppoll_time64                 __NR_ppoll_time64                 /* ssize_t ppoll_time64(struct pollfd *fds, size_t nfds, struct timespecx32_64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
+#define SYS_io_pgetevents_time64         __NR_io_pgetevents_time64         /* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -806,8 +827,27 @@
 #define SYS_recvmmsg_time64              __NR_recvmmsg_time64              /* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdrx32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespecx32_64 const *tmo) */
 #define SYS_mq_timedsend_time64          __NR_mq_timedsend_time64          /* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespecx32_64 const *abs_timeout) */
 #define SYS_mq_timedreceive_time64       __NR_mq_timedreceive_time64       /* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespecx32_64 const *abs_timeout) */
+#define SYS_semtimedop_time64            __NR_semtimedop_time64            /* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
 #define SYS_rt_sigtimedwait_time64       __NR_rt_sigtimedwait_time64       /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+#define SYS_futex_time64                 __NR_futex_time64                 /* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define SYS_sched_rr_get_interval_time64 __NR_sched_rr_get_interval_time64 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+#define SYS_pidfd_send_signal            __NR_pidfd_send_signal            /* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+#define SYS_io_uring_setup               __NR_io_uring_setup               /* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+#define SYS_io_uring_enter               __NR_io_uring_enter               /* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+#define SYS_io_uring_register            __NR_io_uring_register            /* errno_t io_uring_register(int TODO_PROTOTYPE) */
+#define SYS_open_tree                    __NR_open_tree                    /* errno_t open_tree(int TODO_PROTOTYPE) */
+#define SYS_move_mount                   __NR_move_mount                   /* errno_t move_mount(int TODO_PROTOTYPE) */
+#define SYS_fsopen                       __NR_fsopen                       /* errno_t fsopen(int TODO_PROTOTYPE) */
+#define SYS_fsconfig                     __NR_fsconfig                     /* errno_t fsconfig(int TODO_PROTOTYPE) */
+#define SYS_fsmount                      __NR_fsmount                      /* errno_t fsmount(int TODO_PROTOTYPE) */
+#define SYS_fspick                       __NR_fspick                       /* errno_t fspick(int TODO_PROTOTYPE) */
+#define SYS_pidfd_open                   __NR_pidfd_open                   /* errno_t pidfd_open(int TODO_PROTOTYPE) */
+#define SYS_clone3                       __NR_clone3                       /* errno_t clone3(int TODO_PROTOTYPE) */
+#define SYS_close_range                  __NR_close_range                  /* errno_t close_range(int TODO_PROTOTYPE) */
+#define SYS_openat2                      __NR_openat2                      /* errno_t openat2(int TODO_PROTOTYPE) */
+#define SYS_pidfd_getfd                  __NR_pidfd_getfd                  /* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+#define SYS_faccessat2                   __NR_faccessat2                   /* errno_t faccessat2(int TODO_PROTOTYPE) */
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */

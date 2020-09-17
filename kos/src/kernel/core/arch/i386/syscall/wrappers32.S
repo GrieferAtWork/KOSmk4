@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e0ad4e9 */
+/* HASH CRC-32:0x2e247f70 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -14369,6 +14369,746 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_endproc
 END(__x86_asm32_int80_mlock2)
 
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.copy_file_range
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_copy_file_range)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x179
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_copy_file_range)
+	call   sys_copy_file_range
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_copy_file_range)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.preadv2
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_preadv2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_preadv2)
+	call   sys_preadv2
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_preadv2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pwritev2
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pwritev2)
+	call   sys_pwritev2
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_pwritev2)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pkey_mprotect
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pkey_mprotect)
+	call   sys_pkey_mprotect
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_pkey_mprotect)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pkey_alloc
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pkey_alloc)
+	call   sys_pkey_alloc
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_pkey_alloc)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pkey_free
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_free)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pkey_free)
+	call   sys_pkey_free
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_pkey_free)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.statx
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_statx)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x17f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_statx)
+	call   sys_statx
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_statx)
+
+/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.arch_prctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_arch_prctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x180
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_arch_prctl)
+	call   sys_arch_prctl
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_arch_prctl)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_pgetevents
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_pgetevents)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x181
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_pgetevents)
+	call   sys_io_pgetevents
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_io_pgetevents)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.rseq
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rseq)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x182
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_rseq)
+	call   sys_rseq
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_rseq)
+
+/* errno_t semget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.semget
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_semget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x189
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_semget)
+	call   sys_semget
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_semget)
+
+/* errno_t semctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.semctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_semctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_semctl)
+	call   sys_semctl
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_semctl)
+
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+.section .text.x86.asm32_syscall_int80.shmget
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_shmget)
+	call   sys_shmget
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_shmget)
+
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+.section .text.x86.asm32_syscall_int80.shmctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_shmctl)
+	call   sys_shmctl
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_shmctl)
+
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+.section .text.x86.asm32_syscall_int80.shmat
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_shmat)
+	call   sys_shmat
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_shmat)
+
+/* errno_t shmdt(void const *shmaddr) */
+.section .text.x86.asm32_syscall_int80.shmdt
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_shmdt)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_shmdt)
+	call   sys_shmdt
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_shmdt)
+
+/* errno_t msgget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.msgget
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x18f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_msgget)
+	call   sys_msgget
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_msgget)
+
+/* errno_t msgsnd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.msgsnd
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgsnd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x190
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_msgsnd)
+	call   sys_msgsnd
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_msgsnd)
+
+/* errno_t msgrcv(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.msgrcv
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgrcv)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x191
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_msgrcv)
+	call   sys_msgrcv
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_msgrcv)
+
+/* errno_t msgctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.msgctl
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_msgctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x192
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_msgctl)
+	call   sys_msgctl
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_msgctl)
+
 /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 .section .text.x86.asm32_syscall_int80.clock_gettime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_gettime64)
@@ -14837,6 +15577,43 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_ppoll_time64)
 
+/* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_pgetevents_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_pgetevents_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_pgetevents_time64)
+	call   sys_io_pgetevents_time64
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_io_pgetevents_time64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -14968,6 +15745,43 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mq_timedreceive_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_mq_timedreceive_time64)
 
+/* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.semtimedop_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_semtimedop_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_semtimedop_time64)
+	call   sys_semtimedop_time64
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_semtimedop_time64)
+
 /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.rt_sigtimedwait_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait_time64)
@@ -15007,6 +15821,49 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigtimedwait_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_rt_sigtimedwait_time64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+/* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+.section .text.x86.asm32_syscall_int80.futex_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ebp  /* Arg #5 */
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_futex_time64)
+	call   sys_futex_time64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(12), %esp
+	.cfi_adjust_cfa_offset -12
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_futex_time64)
+
 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
 .section .text.x86.asm32_syscall_int80.sched_rr_get_interval_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
@@ -15043,6 +15900,598 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_sched_rr_get_interval_time64)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pidfd_send_signal
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_send_signal)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pidfd_send_signal)
+	call   sys_pidfd_send_signal
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_pidfd_send_signal)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_uring_setup
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_setup)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1a9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_uring_setup)
+	call   sys_io_uring_setup
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_io_uring_setup)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_uring_enter
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_enter)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1aa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_uring_enter)
+	call   sys_io_uring_enter
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_io_uring_enter)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.io_uring_register
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_io_uring_register)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1ab
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_uring_register)
+	call   sys_io_uring_register
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_io_uring_register)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.open_tree
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_open_tree)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1ac
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_open_tree)
+	call   sys_open_tree
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_open_tree)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.move_mount
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_move_mount)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1ad
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_move_mount)
+	call   sys_move_mount
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_move_mount)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.fsopen
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsopen)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1ae
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_fsopen)
+	call   sys_fsopen
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_fsopen)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.fsconfig
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsconfig)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1af
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_fsconfig)
+	call   sys_fsconfig
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_fsconfig)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.fsmount
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fsmount)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_fsmount)
+	call   sys_fsmount
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_fsmount)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.fspick
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_fspick)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_fspick)
+	call   sys_fspick
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_fspick)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pidfd_open
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_open)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pidfd_open)
+	call   sys_pidfd_open
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_pidfd_open)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.clone3
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_clone3)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_clone3)
+	call   sys_clone3
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_clone3)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.close_range
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_close_range)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_close_range)
+	call   sys_close_range
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_close_range)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.openat2
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_openat2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_openat2)
+	call   sys_openat2
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_openat2)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.pidfd_getfd
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_pidfd_getfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pidfd_getfd)
+	call   sys_pidfd_getfd
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_pidfd_getfd)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_int80.faccessat2
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_faccessat2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0x1b7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_faccessat2)
+	call   sys_faccessat2
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_faccessat2)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
@@ -32286,6 +33735,746 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mlock2)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mlock2)
 
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.copy_file_range
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_copy_file_range)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x179
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_copy_file_range)
+	call   sys_copy_file_range
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_copy_file_range)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.preadv2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_preadv2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x17a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_preadv2)
+	call   sys_preadv2
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_preadv2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.pwritev2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x17b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pwritev2)
+	call   sys_pwritev2
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_pwritev2)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.pkey_mprotect
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_mprotect)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x17c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pkey_mprotect)
+	call   sys_pkey_mprotect
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_pkey_mprotect)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.pkey_alloc
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_alloc)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x17d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pkey_alloc)
+	call   sys_pkey_alloc
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_pkey_alloc)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.pkey_free
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_free)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x17e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pkey_free)
+	call   sys_pkey_free
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_pkey_free)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.statx
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_statx)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x17f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_statx)
+	call   sys_statx
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_statx)
+
+/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.arch_prctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_arch_prctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x180
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_arch_prctl)
+	call   sys_arch_prctl
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_arch_prctl)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.io_pgetevents
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_pgetevents)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x181
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_pgetevents)
+	call   sys_io_pgetevents
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_io_pgetevents)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.rseq
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rseq)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x182
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_rseq)
+	call   sys_rseq
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_rseq)
+
+/* errno_t semget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.semget
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_semget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x189
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_semget)
+	call   sys_semget
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_semget)
+
+/* errno_t semctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.semctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_semctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x18a
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_semctl)
+	call   sys_semctl
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_semctl)
+
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+.section .text.x86.asm32_syscall_sysenter.shmget
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shmget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x18b
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_shmget)
+	call   sys_shmget
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_shmget)
+
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+.section .text.x86.asm32_syscall_sysenter.shmctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shmctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x18c
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_shmctl)
+	call   sys_shmctl
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_shmctl)
+
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+.section .text.x86.asm32_syscall_sysenter.shmat
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shmat)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x18d
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_shmat)
+	call   sys_shmat
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_shmat)
+
+/* errno_t shmdt(void const *shmaddr) */
+.section .text.x86.asm32_syscall_sysenter.shmdt
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_shmdt)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x18e
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_shmdt)
+	call   sys_shmdt
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_shmdt)
+
+/* errno_t msgget(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.msgget
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msgget)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x18f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_msgget)
+	call   sys_msgget
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_msgget)
+
+/* errno_t msgsnd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.msgsnd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msgsnd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x190
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_msgsnd)
+	call   sys_msgsnd
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_msgsnd)
+
+/* errno_t msgrcv(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.msgrcv
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msgrcv)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x191
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_msgrcv)
+	call   sys_msgrcv
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_msgrcv)
+
+/* errno_t msgctl(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.msgctl
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msgctl)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x192
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_msgctl)
+	call   sys_msgctl
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_msgctl)
+
 /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 .section .text.x86.asm32_syscall_sysenter.clock_gettime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clock_gettime64)
@@ -32758,6 +34947,43 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll_time64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ppoll_time64)
 
+/* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.io_pgetevents_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_pgetevents_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1a0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_pgetevents_time64)
+	call   sys_io_pgetevents_time64
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_io_pgetevents_time64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -32895,6 +35121,43 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mq_timedreceive_time64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_mq_timedreceive_time64)
 
+/* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.semtimedop_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_semtimedop_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1a4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_semtimedop_time64)
+	call   sys_semtimedop_time64
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_semtimedop_time64)
+
 /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysenter.rt_sigtimedwait_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigtimedwait_time64)
@@ -32934,6 +35197,51 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rt_sigtimedwait_time64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_rt_sigtimedwait_time64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+/* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+.section .text.x86.asm32_syscall_sysenter.futex_time64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex_time64)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1a6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_futex_time64)
+	call   sys_futex_time64
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(12), %esp
+	.cfi_adjust_cfa_offset -12
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_futex_time64)
+
 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
 .section .text.x86.asm32_syscall_sysenter.sched_rr_get_interval_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_rr_get_interval_time64)
@@ -32970,6 +35278,598 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sched_rr_get_interval_time64)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_sched_rr_get_interval_time64)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.pidfd_send_signal
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_send_signal)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1a8
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pidfd_send_signal)
+	call   sys_pidfd_send_signal
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_pidfd_send_signal)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.io_uring_setup
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_uring_setup)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1a9
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_uring_setup)
+	call   sys_io_uring_setup
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_io_uring_setup)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.io_uring_enter
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_uring_enter)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1aa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_uring_enter)
+	call   sys_io_uring_enter
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_io_uring_enter)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.io_uring_register
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_io_uring_register)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1ab
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_io_uring_register)
+	call   sys_io_uring_register
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_io_uring_register)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.open_tree
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_open_tree)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1ac
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_open_tree)
+	call   sys_open_tree
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_open_tree)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.move_mount
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_move_mount)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1ad
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_move_mount)
+	call   sys_move_mount
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_move_mount)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.fsopen
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsopen)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1ae
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_fsopen)
+	call   sys_fsopen
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_fsopen)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.fsconfig
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsconfig)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1af
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_fsconfig)
+	call   sys_fsconfig
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_fsconfig)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.fsmount
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fsmount)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1b0
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_fsmount)
+	call   sys_fsmount
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_fsmount)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.fspick
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_fspick)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1b1
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_fspick)
+	call   sys_fspick
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_fspick)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.pidfd_open
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_open)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1b2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pidfd_open)
+	call   sys_pidfd_open
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_pidfd_open)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.clone3
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_clone3)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1b3
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_clone3)
+	call   sys_clone3
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_clone3)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.close_range
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_close_range)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1b4
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_close_range)
+	call   sys_close_range
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_close_range)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.openat2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_openat2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1b5
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_openat2)
+	call   sys_openat2
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_openat2)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.pidfd_getfd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pidfd_getfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1b6
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_pidfd_getfd)
+	call   sys_pidfd_getfd
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_pidfd_getfd)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.x86.asm32_syscall_sysenter.faccessat2
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_faccessat2)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0x1b7
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_faccessat2)
+	call   sys_faccessat2
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_faccessat2)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d066b78 */
+/* HASH CRC-32:0x27d88610 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -768,6 +768,31 @@
 #define __NRAN0_userfaultfd            TODO_PROTOTYPE
 #define __NRAN0_membarrier             TODO_PROTOTYPE
 #define __NRAN0_mlock2                 TODO_PROTOTYPE
+#define __NRAN0_copy_file_range        TODO_PROTOTYPE
+#define __NRAN0_preadv2                TODO_PROTOTYPE
+#define __NRAN0_pwritev2               TODO_PROTOTYPE
+#define __NRAN0_pkey_mprotect          TODO_PROTOTYPE
+#define __NRAN0_pkey_alloc             TODO_PROTOTYPE
+#define __NRAN0_pkey_free              TODO_PROTOTYPE
+#define __NRAN0_statx                  TODO_PROTOTYPE
+#define __NRAN0_io_pgetevents          TODO_PROTOTYPE
+#define __NRAN0_rseq                   TODO_PROTOTYPE
+#define __NRAN0_pidfd_send_signal      TODO_PROTOTYPE
+#define __NRAN0_io_uring_setup         TODO_PROTOTYPE
+#define __NRAN0_io_uring_enter         TODO_PROTOTYPE
+#define __NRAN0_io_uring_register      TODO_PROTOTYPE
+#define __NRAN0_open_tree              TODO_PROTOTYPE
+#define __NRAN0_move_mount             TODO_PROTOTYPE
+#define __NRAN0_fsopen                 TODO_PROTOTYPE
+#define __NRAN0_fsconfig               TODO_PROTOTYPE
+#define __NRAN0_fsmount                TODO_PROTOTYPE
+#define __NRAN0_fspick                 TODO_PROTOTYPE
+#define __NRAN0_pidfd_open             TODO_PROTOTYPE
+#define __NRAN0_clone3                 TODO_PROTOTYPE
+#define __NRAN0_close_range            TODO_PROTOTYPE
+#define __NRAN0_openat2                TODO_PROTOTYPE
+#define __NRAN0_pidfd_getfd            TODO_PROTOTYPE
+#define __NRAN0_faccessat2             TODO_PROTOTYPE
 #define __NRAN0_pwritevf               fd
 #define __NRAN1_pwritevf               iovec
 #define __NRAN2_pwritevf               count
@@ -2085,6 +2110,56 @@
 #define __NRRTR_membarrier              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_mlock2                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_mlock2                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_copy_file_range        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_copy_file_range         SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_preadv2                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_preadv2                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pwritev2               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_pwritev2                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pkey_mprotect          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_pkey_mprotect           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pkey_alloc             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_pkey_alloc              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pkey_free              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_pkey_free               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_statx                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_statx                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_pgetevents          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_pgetevents           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_rseq                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_rseq                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pidfd_send_signal      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_pidfd_send_signal       SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_uring_setup         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_uring_setup          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_uring_enter         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_uring_enter          SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_io_uring_register      SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_io_uring_register       SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_open_tree              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_open_tree               SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_move_mount             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_move_mount              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fsopen                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_fsopen                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fsconfig               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_fsconfig                SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fsmount                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_fsmount                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_fspick                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_fspick                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pidfd_open             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_pidfd_open              SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_clone3                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_clone3                  SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_close_range            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_close_range             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_openat2                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_openat2                 SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_pidfd_getfd            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_pidfd_getfd             SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_faccessat2             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRRTR_faccessat2              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_pwritevf               SC_REPR_FD_T                                                         /* fd */ 
 #define __NRATR1_pwritevf               SC_REPR_STRUCT_IOVECX64_C                                            /* iovec */ 
 #define __NRATL1_pwritevf               2                                                                    /* iovec -> count */ 

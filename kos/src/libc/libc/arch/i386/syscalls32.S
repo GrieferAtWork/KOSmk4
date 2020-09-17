@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7f707db */
+/* HASH CRC-32:0x87c8b002 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7200,6 +7200,326 @@ INTERN_FUNCTION(libc_sys_Xmlock2)
 END(libc_sys_Xmlock2)
 DEFINE_PUBLIC_ALIAS(sys_Xmlock2, libc_sys_Xmlock2)
 
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.copy_file_range
+INTERN_FUNCTION(libc_sys_copy_file_range)
+	movl   $(0x179), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_copy_file_range)
+DEFINE_PUBLIC_ALIAS(sys_copy_file_range, libc_sys_copy_file_range)
+
+/* errno_t copy_file_range(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xcopy_file_range
+INTERN_FUNCTION(libc_sys_Xcopy_file_range)
+	movl   $(0x179), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xcopy_file_range)
+DEFINE_PUBLIC_ALIAS(sys_Xcopy_file_range, libc_sys_Xcopy_file_range)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.preadv2
+INTERN_FUNCTION(libc_sys_preadv2)
+	movl   $(0x17a), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_preadv2)
+DEFINE_PUBLIC_ALIAS(sys_preadv2, libc_sys_preadv2)
+
+/* errno_t preadv2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpreadv2
+INTERN_FUNCTION(libc_sys_Xpreadv2)
+	movl   $(0x17a), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xpreadv2)
+DEFINE_PUBLIC_ALIAS(sys_Xpreadv2, libc_sys_Xpreadv2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pwritev2
+INTERN_FUNCTION(libc_sys_pwritev2)
+	movl   $(0x17b), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_pwritev2)
+DEFINE_PUBLIC_ALIAS(sys_pwritev2, libc_sys_pwritev2)
+
+/* errno_t pwritev2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpwritev2
+INTERN_FUNCTION(libc_sys_Xpwritev2)
+	movl   $(0x17b), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xpwritev2)
+DEFINE_PUBLIC_ALIAS(sys_Xpwritev2, libc_sys_Xpwritev2)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pkey_mprotect
+INTERN_FUNCTION(libc_sys_pkey_mprotect)
+	movl   $(0x17c), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_pkey_mprotect)
+DEFINE_PUBLIC_ALIAS(sys_pkey_mprotect, libc_sys_pkey_mprotect)
+
+/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpkey_mprotect
+INTERN_FUNCTION(libc_sys_Xpkey_mprotect)
+	movl   $(0x17c), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xpkey_mprotect)
+DEFINE_PUBLIC_ALIAS(sys_Xpkey_mprotect, libc_sys_Xpkey_mprotect)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pkey_alloc
+INTERN_FUNCTION(libc_sys_pkey_alloc)
+	movl   $(0x17d), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_pkey_alloc)
+DEFINE_PUBLIC_ALIAS(sys_pkey_alloc, libc_sys_pkey_alloc)
+
+/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpkey_alloc
+INTERN_FUNCTION(libc_sys_Xpkey_alloc)
+	movl   $(0x17d), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xpkey_alloc)
+DEFINE_PUBLIC_ALIAS(sys_Xpkey_alloc, libc_sys_Xpkey_alloc)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pkey_free
+INTERN_FUNCTION(libc_sys_pkey_free)
+	movl   $(0x17e), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_pkey_free)
+DEFINE_PUBLIC_ALIAS(sys_pkey_free, libc_sys_pkey_free)
+
+/* errno_t pkey_free(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpkey_free
+INTERN_FUNCTION(libc_sys_Xpkey_free)
+	movl   $(0x17e), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xpkey_free)
+DEFINE_PUBLIC_ALIAS(sys_Xpkey_free, libc_sys_Xpkey_free)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.statx
+INTERN_FUNCTION(libc_sys_statx)
+	movl   $(0x17f), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_statx)
+DEFINE_PUBLIC_ALIAS(sys_statx, libc_sys_statx)
+
+/* errno_t statx(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xstatx
+INTERN_FUNCTION(libc_sys_Xstatx)
+	movl   $(0x17f), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xstatx)
+DEFINE_PUBLIC_ALIAS(sys_Xstatx, libc_sys_Xstatx)
+
+/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.arch_prctl
+INTERN_FUNCTION(libc_sys_arch_prctl)
+	movl   $(0x180), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_arch_prctl)
+DEFINE_PUBLIC_ALIAS(sys_arch_prctl, libc_sys_arch_prctl)
+
+/* errno_t arch_prctl(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xarch_prctl
+INTERN_FUNCTION(libc_sys_Xarch_prctl)
+	movl   $(0x180), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xarch_prctl)
+DEFINE_PUBLIC_ALIAS(sys_Xarch_prctl, libc_sys_Xarch_prctl)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_pgetevents
+INTERN_FUNCTION(libc_sys_io_pgetevents)
+	movl   $(0x181), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_io_pgetevents)
+DEFINE_PUBLIC_ALIAS(sys_io_pgetevents, libc_sys_io_pgetevents)
+
+/* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_pgetevents
+INTERN_FUNCTION(libc_sys_Xio_pgetevents)
+	movl   $(0x181), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xio_pgetevents)
+DEFINE_PUBLIC_ALIAS(sys_Xio_pgetevents, libc_sys_Xio_pgetevents)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.rseq
+INTERN_FUNCTION(libc_sys_rseq)
+	movl   $(0x182), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_rseq)
+DEFINE_PUBLIC_ALIAS(sys_rseq, libc_sys_rseq)
+
+/* errno_t rseq(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xrseq
+INTERN_FUNCTION(libc_sys_Xrseq)
+	movl   $(0x182), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xrseq)
+DEFINE_PUBLIC_ALIAS(sys_Xrseq, libc_sys_Xrseq)
+
+/* errno_t semget(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.semget
+INTERN_FUNCTION(libc_sys_semget)
+	movl   $(0x189), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_semget)
+DEFINE_PUBLIC_ALIAS(sys_semget, libc_sys_semget)
+
+/* errno_t semget(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xsemget
+INTERN_FUNCTION(libc_sys_Xsemget)
+	movl   $(0x189), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xsemget)
+DEFINE_PUBLIC_ALIAS(sys_Xsemget, libc_sys_Xsemget)
+
+/* errno_t semctl(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.semctl
+INTERN_FUNCTION(libc_sys_semctl)
+	movl   $(0x18a), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_semctl)
+DEFINE_PUBLIC_ALIAS(sys_semctl, libc_sys_semctl)
+
+/* errno_t semctl(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xsemctl
+INTERN_FUNCTION(libc_sys_Xsemctl)
+	movl   $(0x18a), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xsemctl)
+DEFINE_PUBLIC_ALIAS(sys_Xsemctl, libc_sys_Xsemctl)
+
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+.section .text.crt.syscall.shmget
+INTERN_FUNCTION(libc_sys_shmget)
+	movl   $(0x18b), %eax
+	jmp    libc_x86_exec_syscall3
+END(libc_sys_shmget)
+DEFINE_PUBLIC_ALIAS(sys_shmget, libc_sys_shmget)
+
+/* errno_t shmget(key_t key, size_t size, syscall_ulong_t shmflg) */
+.section .text.crt.syscall.Xshmget
+INTERN_FUNCTION(libc_sys_Xshmget)
+	movl   $(0x18b), %eax
+	jmp    libc_x86_exec_Xsyscall3
+END(libc_sys_Xshmget)
+DEFINE_PUBLIC_ALIAS(sys_Xshmget, libc_sys_Xshmget)
+
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+.section .text.crt.syscall.shmctl
+INTERN_FUNCTION(libc_sys_shmctl)
+	movl   $(0x18c), %eax
+	jmp    libc_x86_exec_syscall3
+END(libc_sys_shmctl)
+DEFINE_PUBLIC_ALIAS(sys_shmctl, libc_sys_shmctl)
+
+/* errno_t shmctl(syscall_ulong_t shmid, syscall_ulong_t cmd, struct shmid_ds *buf) */
+.section .text.crt.syscall.Xshmctl
+INTERN_FUNCTION(libc_sys_Xshmctl)
+	movl   $(0x18c), %eax
+	jmp    libc_x86_exec_Xsyscall3
+END(libc_sys_Xshmctl)
+DEFINE_PUBLIC_ALIAS(sys_Xshmctl, libc_sys_Xshmctl)
+
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+.section .text.crt.syscall.shmat
+INTERN_FUNCTION(libc_sys_shmat)
+	movl   $(0x18d), %eax
+	jmp    libc_x86_exec_syscall3
+END(libc_sys_shmat)
+DEFINE_PUBLIC_ALIAS(sys_shmat, libc_sys_shmat)
+
+/* errno_t shmat(syscall_ulong_t shmid, void const *shmaddr, syscall_ulong_t shmflg) */
+.section .text.crt.syscall.Xshmat
+INTERN_FUNCTION(libc_sys_Xshmat)
+	movl   $(0x18d), %eax
+	jmp    libc_x86_exec_Xsyscall3
+END(libc_sys_Xshmat)
+DEFINE_PUBLIC_ALIAS(sys_Xshmat, libc_sys_Xshmat)
+
+/* errno_t shmdt(void const *shmaddr) */
+.section .text.crt.syscall.shmdt
+INTERN_FUNCTION(libc_sys_shmdt)
+	movl   $(0x18e), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_shmdt)
+DEFINE_PUBLIC_ALIAS(sys_shmdt, libc_sys_shmdt)
+
+/* errno_t shmdt(void const *shmaddr) */
+.section .text.crt.syscall.Xshmdt
+INTERN_FUNCTION(libc_sys_Xshmdt)
+	movl   $(0x18e), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xshmdt)
+DEFINE_PUBLIC_ALIAS(sys_Xshmdt, libc_sys_Xshmdt)
+
+/* errno_t msgget(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.msgget
+INTERN_FUNCTION(libc_sys_msgget)
+	movl   $(0x18f), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_msgget)
+DEFINE_PUBLIC_ALIAS(sys_msgget, libc_sys_msgget)
+
+/* errno_t msgget(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xmsgget
+INTERN_FUNCTION(libc_sys_Xmsgget)
+	movl   $(0x18f), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xmsgget)
+DEFINE_PUBLIC_ALIAS(sys_Xmsgget, libc_sys_Xmsgget)
+
+/* errno_t msgsnd(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.msgsnd
+INTERN_FUNCTION(libc_sys_msgsnd)
+	movl   $(0x190), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_msgsnd)
+DEFINE_PUBLIC_ALIAS(sys_msgsnd, libc_sys_msgsnd)
+
+/* errno_t msgsnd(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xmsgsnd
+INTERN_FUNCTION(libc_sys_Xmsgsnd)
+	movl   $(0x190), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xmsgsnd)
+DEFINE_PUBLIC_ALIAS(sys_Xmsgsnd, libc_sys_Xmsgsnd)
+
+/* errno_t msgrcv(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.msgrcv
+INTERN_FUNCTION(libc_sys_msgrcv)
+	movl   $(0x191), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_msgrcv)
+DEFINE_PUBLIC_ALIAS(sys_msgrcv, libc_sys_msgrcv)
+
+/* errno_t msgrcv(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xmsgrcv
+INTERN_FUNCTION(libc_sys_Xmsgrcv)
+	movl   $(0x191), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xmsgrcv)
+DEFINE_PUBLIC_ALIAS(sys_Xmsgrcv, libc_sys_Xmsgrcv)
+
+/* errno_t msgctl(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.msgctl
+INTERN_FUNCTION(libc_sys_msgctl)
+	movl   $(0x192), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_msgctl)
+DEFINE_PUBLIC_ALIAS(sys_msgctl, libc_sys_msgctl)
+
+/* errno_t msgctl(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xmsgctl
+INTERN_FUNCTION(libc_sys_Xmsgctl)
+	movl   $(0x192), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xmsgctl)
+DEFINE_PUBLIC_ALIAS(sys_Xmsgctl, libc_sys_Xmsgctl)
+
 /* errno_t clock_gettime64(clockid_t clock_id, struct timespecx32_64 *tp) */
 .section .text.crt.syscall.clock_gettime64
 INTERN_FUNCTION(libc_sys_clock_gettime64)
@@ -7406,6 +7726,22 @@ INTERN_FUNCTION(libc_sys_Xppoll_time64)
 END(libc_sys_Xppoll_time64)
 DEFINE_PUBLIC_ALIAS(sys_Xppoll_time64, libc_sys_Xppoll_time64)
 
+/* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_pgetevents_time64
+INTERN_FUNCTION(libc_sys_io_pgetevents_time64)
+	movl   $(0x1a0), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_io_pgetevents_time64)
+DEFINE_PUBLIC_ALIAS(sys_io_pgetevents_time64, libc_sys_io_pgetevents_time64)
+
+/* errno_t io_pgetevents_time64(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_pgetevents_time64
+INTERN_FUNCTION(libc_sys_Xio_pgetevents_time64)
+	movl   $(0x1a0), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xio_pgetevents_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xio_pgetevents_time64, libc_sys_Xio_pgetevents_time64)
+
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.
  * @param: msg_flags: Set of `MSG_CMSG_CLOEXEC | MSG_CMSG_CLOFORK |
@@ -7470,6 +7806,22 @@ INTERN_FUNCTION(libc_sys_Xmq_timedreceive_time64)
 END(libc_sys_Xmq_timedreceive_time64)
 DEFINE_PUBLIC_ALIAS(sys_Xmq_timedreceive_time64, libc_sys_Xmq_timedreceive_time64)
 
+/* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.semtimedop_time64
+INTERN_FUNCTION(libc_sys_semtimedop_time64)
+	movl   $(0x1a4), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_semtimedop_time64)
+DEFINE_PUBLIC_ALIAS(sys_semtimedop_time64, libc_sys_semtimedop_time64)
+
+/* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xsemtimedop_time64
+INTERN_FUNCTION(libc_sys_Xsemtimedop_time64)
+	movl   $(0x1a4), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xsemtimedop_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xsemtimedop_time64, libc_sys_Xsemtimedop_time64)
+
 /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 .section .text.crt.syscall.rt_sigtimedwait_time64
 INTERN_FUNCTION(libc_sys_rt_sigtimedwait_time64)
@@ -7486,6 +7838,24 @@ INTERN_FUNCTION(libc_sys_Xrt_sigtimedwait_time64)
 END(libc_sys_Xrt_sigtimedwait_time64)
 DEFINE_PUBLIC_ALIAS(sys_Xrt_sigtimedwait_time64, libc_sys_Xrt_sigtimedwait_time64)
 
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+/* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+.section .text.crt.syscall.futex_time64
+INTERN_FUNCTION(libc_sys_futex_time64)
+	movl   $(0x1a6), %eax
+	jmp    libc_x86_exec_syscall6
+END(libc_sys_futex_time64)
+DEFINE_PUBLIC_ALIAS(sys_futex_time64, libc_sys_futex_time64)
+
+/* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
+/* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
+.section .text.crt.syscall.Xfutex_time64
+INTERN_FUNCTION(libc_sys_Xfutex_time64)
+	movl   $(0x1a6), %eax
+	jmp    libc_x86_exec_Xsyscall6
+END(libc_sys_Xfutex_time64)
+DEFINE_PUBLIC_ALIAS(sys_Xfutex_time64, libc_sys_Xfutex_time64)
+
 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
 .section .text.crt.syscall.sched_rr_get_interval_time64
 INTERN_FUNCTION(libc_sys_sched_rr_get_interval_time64)
@@ -7501,6 +7871,262 @@ INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval_time64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xsched_rr_get_interval_time64)
 DEFINE_PUBLIC_ALIAS(sys_Xsched_rr_get_interval_time64, libc_sys_Xsched_rr_get_interval_time64)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pidfd_send_signal
+INTERN_FUNCTION(libc_sys_pidfd_send_signal)
+	movl   $(0x1a8), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_pidfd_send_signal)
+DEFINE_PUBLIC_ALIAS(sys_pidfd_send_signal, libc_sys_pidfd_send_signal)
+
+/* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpidfd_send_signal
+INTERN_FUNCTION(libc_sys_Xpidfd_send_signal)
+	movl   $(0x1a8), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xpidfd_send_signal)
+DEFINE_PUBLIC_ALIAS(sys_Xpidfd_send_signal, libc_sys_Xpidfd_send_signal)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_uring_setup
+INTERN_FUNCTION(libc_sys_io_uring_setup)
+	movl   $(0x1a9), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_io_uring_setup)
+DEFINE_PUBLIC_ALIAS(sys_io_uring_setup, libc_sys_io_uring_setup)
+
+/* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_uring_setup
+INTERN_FUNCTION(libc_sys_Xio_uring_setup)
+	movl   $(0x1a9), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xio_uring_setup)
+DEFINE_PUBLIC_ALIAS(sys_Xio_uring_setup, libc_sys_Xio_uring_setup)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_uring_enter
+INTERN_FUNCTION(libc_sys_io_uring_enter)
+	movl   $(0x1aa), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_io_uring_enter)
+DEFINE_PUBLIC_ALIAS(sys_io_uring_enter, libc_sys_io_uring_enter)
+
+/* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_uring_enter
+INTERN_FUNCTION(libc_sys_Xio_uring_enter)
+	movl   $(0x1aa), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xio_uring_enter)
+DEFINE_PUBLIC_ALIAS(sys_Xio_uring_enter, libc_sys_Xio_uring_enter)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.io_uring_register
+INTERN_FUNCTION(libc_sys_io_uring_register)
+	movl   $(0x1ab), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_io_uring_register)
+DEFINE_PUBLIC_ALIAS(sys_io_uring_register, libc_sys_io_uring_register)
+
+/* errno_t io_uring_register(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xio_uring_register
+INTERN_FUNCTION(libc_sys_Xio_uring_register)
+	movl   $(0x1ab), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xio_uring_register)
+DEFINE_PUBLIC_ALIAS(sys_Xio_uring_register, libc_sys_Xio_uring_register)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.open_tree
+INTERN_FUNCTION(libc_sys_open_tree)
+	movl   $(0x1ac), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_open_tree)
+DEFINE_PUBLIC_ALIAS(sys_open_tree, libc_sys_open_tree)
+
+/* errno_t open_tree(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xopen_tree
+INTERN_FUNCTION(libc_sys_Xopen_tree)
+	movl   $(0x1ac), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xopen_tree)
+DEFINE_PUBLIC_ALIAS(sys_Xopen_tree, libc_sys_Xopen_tree)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.move_mount
+INTERN_FUNCTION(libc_sys_move_mount)
+	movl   $(0x1ad), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_move_mount)
+DEFINE_PUBLIC_ALIAS(sys_move_mount, libc_sys_move_mount)
+
+/* errno_t move_mount(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xmove_mount
+INTERN_FUNCTION(libc_sys_Xmove_mount)
+	movl   $(0x1ad), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xmove_mount)
+DEFINE_PUBLIC_ALIAS(sys_Xmove_mount, libc_sys_Xmove_mount)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.fsopen
+INTERN_FUNCTION(libc_sys_fsopen)
+	movl   $(0x1ae), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_fsopen)
+DEFINE_PUBLIC_ALIAS(sys_fsopen, libc_sys_fsopen)
+
+/* errno_t fsopen(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfsopen
+INTERN_FUNCTION(libc_sys_Xfsopen)
+	movl   $(0x1ae), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xfsopen)
+DEFINE_PUBLIC_ALIAS(sys_Xfsopen, libc_sys_Xfsopen)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.fsconfig
+INTERN_FUNCTION(libc_sys_fsconfig)
+	movl   $(0x1af), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_fsconfig)
+DEFINE_PUBLIC_ALIAS(sys_fsconfig, libc_sys_fsconfig)
+
+/* errno_t fsconfig(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfsconfig
+INTERN_FUNCTION(libc_sys_Xfsconfig)
+	movl   $(0x1af), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xfsconfig)
+DEFINE_PUBLIC_ALIAS(sys_Xfsconfig, libc_sys_Xfsconfig)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.fsmount
+INTERN_FUNCTION(libc_sys_fsmount)
+	movl   $(0x1b0), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_fsmount)
+DEFINE_PUBLIC_ALIAS(sys_fsmount, libc_sys_fsmount)
+
+/* errno_t fsmount(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfsmount
+INTERN_FUNCTION(libc_sys_Xfsmount)
+	movl   $(0x1b0), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xfsmount)
+DEFINE_PUBLIC_ALIAS(sys_Xfsmount, libc_sys_Xfsmount)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.fspick
+INTERN_FUNCTION(libc_sys_fspick)
+	movl   $(0x1b1), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_fspick)
+DEFINE_PUBLIC_ALIAS(sys_fspick, libc_sys_fspick)
+
+/* errno_t fspick(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfspick
+INTERN_FUNCTION(libc_sys_Xfspick)
+	movl   $(0x1b1), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xfspick)
+DEFINE_PUBLIC_ALIAS(sys_Xfspick, libc_sys_Xfspick)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pidfd_open
+INTERN_FUNCTION(libc_sys_pidfd_open)
+	movl   $(0x1b2), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_pidfd_open)
+DEFINE_PUBLIC_ALIAS(sys_pidfd_open, libc_sys_pidfd_open)
+
+/* errno_t pidfd_open(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpidfd_open
+INTERN_FUNCTION(libc_sys_Xpidfd_open)
+	movl   $(0x1b2), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xpidfd_open)
+DEFINE_PUBLIC_ALIAS(sys_Xpidfd_open, libc_sys_Xpidfd_open)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.clone3
+INTERN_FUNCTION(libc_sys_clone3)
+	movl   $(0x1b3), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_clone3)
+DEFINE_PUBLIC_ALIAS(sys_clone3, libc_sys_clone3)
+
+/* errno_t clone3(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xclone3
+INTERN_FUNCTION(libc_sys_Xclone3)
+	movl   $(0x1b3), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xclone3)
+DEFINE_PUBLIC_ALIAS(sys_Xclone3, libc_sys_Xclone3)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.close_range
+INTERN_FUNCTION(libc_sys_close_range)
+	movl   $(0x1b4), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_close_range)
+DEFINE_PUBLIC_ALIAS(sys_close_range, libc_sys_close_range)
+
+/* errno_t close_range(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xclose_range
+INTERN_FUNCTION(libc_sys_Xclose_range)
+	movl   $(0x1b4), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xclose_range)
+DEFINE_PUBLIC_ALIAS(sys_Xclose_range, libc_sys_Xclose_range)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.openat2
+INTERN_FUNCTION(libc_sys_openat2)
+	movl   $(0x1b5), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_openat2)
+DEFINE_PUBLIC_ALIAS(sys_openat2, libc_sys_openat2)
+
+/* errno_t openat2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xopenat2
+INTERN_FUNCTION(libc_sys_Xopenat2)
+	movl   $(0x1b5), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xopenat2)
+DEFINE_PUBLIC_ALIAS(sys_Xopenat2, libc_sys_Xopenat2)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.pidfd_getfd
+INTERN_FUNCTION(libc_sys_pidfd_getfd)
+	movl   $(0x1b6), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_pidfd_getfd)
+DEFINE_PUBLIC_ALIAS(sys_pidfd_getfd, libc_sys_pidfd_getfd)
+
+/* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xpidfd_getfd
+INTERN_FUNCTION(libc_sys_Xpidfd_getfd)
+	movl   $(0x1b6), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xpidfd_getfd)
+DEFINE_PUBLIC_ALIAS(sys_Xpidfd_getfd, libc_sys_Xpidfd_getfd)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.faccessat2
+INTERN_FUNCTION(libc_sys_faccessat2)
+	movl   $(0x1b7), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_faccessat2)
+DEFINE_PUBLIC_ALIAS(sys_faccessat2, libc_sys_faccessat2)
+
+/* errno_t faccessat2(int TODO_PROTOTYPE) */
+.section .text.crt.syscall.Xfaccessat2
+INTERN_FUNCTION(libc_sys_Xfaccessat2)
+	movl   $(0x1b7), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xfaccessat2)
+DEFINE_PUBLIC_ALIAS(sys_Xfaccessat2, libc_sys_Xfaccessat2)
 
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position

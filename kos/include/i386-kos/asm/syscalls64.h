@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad24f7f0 */
+/* HASH CRC-32:0xebbc8616 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -725,6 +725,31 @@
 #define __NR_userfaultfd            0x143                          /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR_membarrier             0x144                          /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define __NR_mlock2                 0x145                          /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define __NR_copy_file_range        0x146                          /* errno_t copy_file_range(int TODO_PROTOTYPE) */
+#define __NR_preadv2                0x147                          /* errno_t preadv2(int TODO_PROTOTYPE) */
+#define __NR_pwritev2               0x148                          /* errno_t pwritev2(int TODO_PROTOTYPE) */
+#define __NR_pkey_mprotect          0x149                          /* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+#define __NR_pkey_alloc             0x14a                          /* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+#define __NR_pkey_free              0x14b                          /* errno_t pkey_free(int TODO_PROTOTYPE) */
+#define __NR_statx                  0x14c                          /* errno_t statx(int TODO_PROTOTYPE) */
+#define __NR_io_pgetevents          0x14d                          /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+#define __NR_rseq                   0x14e                          /* errno_t rseq(int TODO_PROTOTYPE) */
+#define __NR_pidfd_send_signal      0x1a8                          /* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+#define __NR_io_uring_setup         0x1a9                          /* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+#define __NR_io_uring_enter         0x1aa                          /* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+#define __NR_io_uring_register      0x1ab                          /* errno_t io_uring_register(int TODO_PROTOTYPE) */
+#define __NR_open_tree              0x1ac                          /* errno_t open_tree(int TODO_PROTOTYPE) */
+#define __NR_move_mount             0x1ad                          /* errno_t move_mount(int TODO_PROTOTYPE) */
+#define __NR_fsopen                 0x1ae                          /* errno_t fsopen(int TODO_PROTOTYPE) */
+#define __NR_fsconfig               0x1af                          /* errno_t fsconfig(int TODO_PROTOTYPE) */
+#define __NR_fsmount                0x1b0                          /* errno_t fsmount(int TODO_PROTOTYPE) */
+#define __NR_fspick                 0x1b1                          /* errno_t fspick(int TODO_PROTOTYPE) */
+#define __NR_pidfd_open             0x1b2                          /* errno_t pidfd_open(int TODO_PROTOTYPE) */
+#define __NR_clone3                 0x1b3                          /* errno_t clone3(int TODO_PROTOTYPE) */
+#define __NR_close_range            0x1b4                          /* errno_t close_range(int TODO_PROTOTYPE) */
+#define __NR_openat2                0x1b5                          /* errno_t openat2(int TODO_PROTOTYPE) */
+#define __NR_pidfd_getfd            0x1b6                          /* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+#define __NR_faccessat2             0x1b7                          /* errno_t faccessat2(int TODO_PROTOTYPE) */
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
@@ -1136,8 +1161,8 @@
 	callback(0)                                  \
 	callback(1) 
 #define __NR_syscall0_min 0x0
-#define __NR_syscall0_max 0x145
-#define __NR_syscall0_cnt 0x146
+#define __NR_syscall0_max 0x1b7
+#define __NR_syscall0_cnt 0x1b8
 #define __NR_syscall1_min __UINT64_C(0xfffffffffffffed8)
 #define __NR_syscall1_max __UINT64_C(0xffffffffffffffff)
 #define __NR_syscall1_cnt 0x128
@@ -1507,6 +1532,31 @@
 #define __NRRM_userfaultfd            0
 #define __NRRM_membarrier             0
 #define __NRRM_mlock2                 0
+#define __NRRM_copy_file_range        0
+#define __NRRM_preadv2                0
+#define __NRRM_pwritev2               0
+#define __NRRM_pkey_mprotect          0
+#define __NRRM_pkey_alloc             0
+#define __NRRM_pkey_free              0
+#define __NRRM_statx                  0
+#define __NRRM_io_pgetevents          1
+#define __NRRM_rseq                   0
+#define __NRRM_pidfd_send_signal      0
+#define __NRRM_io_uring_setup         0
+#define __NRRM_io_uring_enter         0
+#define __NRRM_io_uring_register      0
+#define __NRRM_open_tree              0
+#define __NRRM_move_mount             0
+#define __NRRM_fsopen                 0
+#define __NRRM_fsconfig               0
+#define __NRRM_fsmount                0
+#define __NRRM_fspick                 0
+#define __NRRM_pidfd_open             0
+#define __NRRM_clone3                 0
+#define __NRRM_close_range            0
+#define __NRRM_openat2                0
+#define __NRRM_pidfd_getfd            0
+#define __NRRM_faccessat2             0
 #define __NRRM_pwritevf               0
 #define __NRRM_preadvf                0
 #define __NRRM_freadlinkat            0
@@ -2044,6 +2094,31 @@
 #define __NRRC_userfaultfd            1
 #define __NRRC_membarrier             1
 #define __NRRC_mlock2                 1
+#define __NRRC_copy_file_range        1
+#define __NRRC_preadv2                1
+#define __NRRC_pwritev2               1
+#define __NRRC_pkey_mprotect          1
+#define __NRRC_pkey_alloc             1
+#define __NRRC_pkey_free              1
+#define __NRRC_statx                  1
+#define __NRRC_io_pgetevents          1
+#define __NRRC_rseq                   1
+#define __NRRC_pidfd_send_signal      1
+#define __NRRC_io_uring_setup         1
+#define __NRRC_io_uring_enter         1
+#define __NRRC_io_uring_register      1
+#define __NRRC_open_tree              1
+#define __NRRC_move_mount             1
+#define __NRRC_fsopen                 1
+#define __NRRC_fsconfig               1
+#define __NRRC_fsmount                1
+#define __NRRC_fspick                 1
+#define __NRRC_pidfd_open             1
+#define __NRRC_clone3                 1
+#define __NRRC_close_range            1
+#define __NRRC_openat2                1
+#define __NRRC_pidfd_getfd            1
+#define __NRRC_faccessat2             1
 #define __NRRC_pwritevf               5
 #define __NRRC_preadvf                5
 #define __NRRC_freadlinkat            5

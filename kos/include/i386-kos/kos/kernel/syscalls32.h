@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8be0c8c */
+/* HASH CRC-32:0xcad0c8f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #define __ARCH_WANT_SYSCALL_ADJTIMEX                     1
 #define __ARCH_WANT_SYSCALL_AFS_SYSCALL                  1
 #define __ARCH_WANT_SYSCALL_ALARM                        1
+#define __ARCH_WANT_SYSCALL_ARCH_PRCTL                   1
 #define __ARCH_WANT_SYSCALL_BDFLUSH                      1
 #define __ARCH_WANT_SYSCALL_BIND                         1
 #define __ARCH_WANT_SYSCALL_BPF                          1
@@ -52,8 +53,11 @@
 #define __ARCH_WANT_SYSCALL_CLOCK_SETTIME                1
 #define __ARCH_WANT_SYSCALL_CLOCK_SETTIME64              1
 #define __ARCH_WANT_SYSCALL_CLONE                        1
+#define __ARCH_WANT_SYSCALL_CLONE3                       1
 #define __ARCH_WANT_SYSCALL_CLOSE                        1
+#define __ARCH_WANT_SYSCALL_CLOSE_RANGE                  1
 #define __ARCH_WANT_SYSCALL_CONNECT                      1
+#define __ARCH_WANT_SYSCALL_COPY_FILE_RANGE              1
 #define __ARCH_WANT_SYSCALL_COREDUMP                     1
 #define __ARCH_WANT_SYSCALL_CREAT                        1
 #define __ARCH_WANT_SYSCALL_CREATE_MODULE                1
@@ -75,6 +79,7 @@
 #define __ARCH_WANT_SYSCALL_EXIT                         1
 #define __ARCH_WANT_SYSCALL_EXIT_GROUP                   1
 #define __ARCH_WANT_SYSCALL_FACCESSAT                    1
+#define __ARCH_WANT_SYSCALL_FACCESSAT2                   1
 #define __ARCH_WANT_SYSCALL_FADVISE64                    1
 #define __ARCH_WANT_SYSCALL_FADVISE64_64                 1
 #define __ARCH_WANT_SYSCALL_FALLOCATE                    1
@@ -103,8 +108,12 @@
 #define __ARCH_WANT_SYSCALL_FREALPATHAT                  1
 #define __ARCH_WANT_SYSCALL_FREMOVEXATTR                 1
 #define __ARCH_WANT_SYSCALL_FRENAMEAT                    1
+#define __ARCH_WANT_SYSCALL_FSCONFIG                     1
 #define __ARCH_WANT_SYSCALL_FSETXATTR                    1
 #define __ARCH_WANT_SYSCALL_FSMODE                       1
+#define __ARCH_WANT_SYSCALL_FSMOUNT                      1
+#define __ARCH_WANT_SYSCALL_FSOPEN                       1
+#define __ARCH_WANT_SYSCALL_FSPICK                       1
 #define __ARCH_WANT_SYSCALL_FSTAT                        1
 #define __ARCH_WANT_SYSCALL_FSTAT64                      1
 #define __ARCH_WANT_SYSCALL_FSTATAT64                    1
@@ -117,6 +126,7 @@
 #define __ARCH_WANT_SYSCALL_FTRUNCATE                    1
 #define __ARCH_WANT_SYSCALL_FTRUNCATE64                  1
 #define __ARCH_WANT_SYSCALL_FUTEX                        1
+#define __ARCH_WANT_SYSCALL_FUTEX_TIME64                 1
 #define __ARCH_WANT_SYSCALL_FUTIMESAT                    1
 #define __ARCH_WANT_SYSCALL_FUTIMESAT64                  1
 #define __ARCH_WANT_SYSCALL_GET_EXCEPTION_HANDLER        1
@@ -175,8 +185,13 @@
 #define __ARCH_WANT_SYSCALL_IO_CANCEL                    1
 #define __ARCH_WANT_SYSCALL_IO_DESTROY                   1
 #define __ARCH_WANT_SYSCALL_IO_GETEVENTS                 1
+#define __ARCH_WANT_SYSCALL_IO_PGETEVENTS                1
+#define __ARCH_WANT_SYSCALL_IO_PGETEVENTS_TIME64         1
 #define __ARCH_WANT_SYSCALL_IO_SETUP                     1
 #define __ARCH_WANT_SYSCALL_IO_SUBMIT                    1
+#define __ARCH_WANT_SYSCALL_IO_URING_ENTER               1
+#define __ARCH_WANT_SYSCALL_IO_URING_REGISTER            1
+#define __ARCH_WANT_SYSCALL_IO_URING_SETUP               1
 #define __ARCH_WANT_SYSCALL_IOCTL                        1
 #define __ARCH_WANT_SYSCALL_IOCTLF                       1
 #define __ARCH_WANT_SYSCALL_IOPERM                       1
@@ -233,6 +248,7 @@
 #define __ARCH_WANT_SYSCALL_MMAP2                        1
 #define __ARCH_WANT_SYSCALL_MODIFY_LDT                   1
 #define __ARCH_WANT_SYSCALL_MOUNT                        1
+#define __ARCH_WANT_SYSCALL_MOVE_MOUNT                   1
 #define __ARCH_WANT_SYSCALL_MOVE_PAGES                   1
 #define __ARCH_WANT_SYSCALL_MPROTECT                     1
 #define __ARCH_WANT_SYSCALL_MPX                          1
@@ -245,6 +261,10 @@
 #define __ARCH_WANT_SYSCALL_MQ_TIMEDSEND_TIME64          1
 #define __ARCH_WANT_SYSCALL_MQ_UNLINK                    1
 #define __ARCH_WANT_SYSCALL_MREMAP                       1
+#define __ARCH_WANT_SYSCALL_MSGCTL                       1
+#define __ARCH_WANT_SYSCALL_MSGGET                       1
+#define __ARCH_WANT_SYSCALL_MSGRCV                       1
+#define __ARCH_WANT_SYSCALL_MSGSND                       1
 #define __ARCH_WANT_SYSCALL_MSYNC                        1
 #define __ARCH_WANT_SYSCALL_MUNLOCK                      1
 #define __ARCH_WANT_SYSCALL_MUNLOCKALL                   1
@@ -261,14 +281,22 @@
 #define __ARCH_WANT_SYSCALL_OLDUNAME                     1
 #define __ARCH_WANT_SYSCALL_OPEN                         1
 #define __ARCH_WANT_SYSCALL_OPEN_BY_HANDLE_AT            1
+#define __ARCH_WANT_SYSCALL_OPEN_TREE                    1
 #define __ARCH_WANT_SYSCALL_OPENAT                       1
+#define __ARCH_WANT_SYSCALL_OPENAT2                      1
 #define __ARCH_WANT_SYSCALL_OPENPTY                      1
 #define __ARCH_WANT_SYSCALL_PAUSE                        1
 #define __ARCH_WANT_SYSCALL_PERF_EVENT_OPEN              1
 #define __ARCH_WANT_SYSCALL_PERSONALITY                  1
+#define __ARCH_WANT_SYSCALL_PIDFD_GETFD                  1
+#define __ARCH_WANT_SYSCALL_PIDFD_OPEN                   1
+#define __ARCH_WANT_SYSCALL_PIDFD_SEND_SIGNAL            1
 #define __ARCH_WANT_SYSCALL_PIPE                         1
 #define __ARCH_WANT_SYSCALL_PIPE2                        1
 #define __ARCH_WANT_SYSCALL_PIVOT_ROOT                   1
+#define __ARCH_WANT_SYSCALL_PKEY_ALLOC                   1
+#define __ARCH_WANT_SYSCALL_PKEY_FREE                    1
+#define __ARCH_WANT_SYSCALL_PKEY_MPROTECT                1
 #define __ARCH_WANT_SYSCALL_POLL                         1
 #define __ARCH_WANT_SYSCALL_PPOLL                        1
 #define __ARCH_WANT_SYSCALL_PPOLL_TIME64                 1
@@ -276,6 +304,7 @@
 #define __ARCH_WANT_SYSCALL_PREAD64                      1
 #define __ARCH_WANT_SYSCALL_PREAD64F                     1
 #define __ARCH_WANT_SYSCALL_PREADV                       1
+#define __ARCH_WANT_SYSCALL_PREADV2                      1
 #define __ARCH_WANT_SYSCALL_PREADVF                      1
 #define __ARCH_WANT_SYSCALL_PRLIMIT64                    1
 #define __ARCH_WANT_SYSCALL_PROCESS_VM_READV             1
@@ -289,6 +318,7 @@
 #define __ARCH_WANT_SYSCALL_PWRITE64                     1
 #define __ARCH_WANT_SYSCALL_PWRITE64F                    1
 #define __ARCH_WANT_SYSCALL_PWRITEV                      1
+#define __ARCH_WANT_SYSCALL_PWRITEV2                     1
 #define __ARCH_WANT_SYSCALL_PWRITEVF                     1
 #define __ARCH_WANT_SYSCALL_QUERY_MODULE                 1
 #define __ARCH_WANT_SYSCALL_QUOTACTL                     1
@@ -316,6 +346,7 @@
 #define __ARCH_WANT_SYSCALL_RMDIR                        1
 #define __ARCH_WANT_SYSCALL_RPC_SCHEDULE                 1
 #define __ARCH_WANT_SYSCALL_RPC_SERVICE                  1
+#define __ARCH_WANT_SYSCALL_RSEQ                         1
 #define __ARCH_WANT_SYSCALL_RT_SIGACTION                 1
 #define __ARCH_WANT_SYSCALL_RT_SIGPENDING                1
 #define __ARCH_WANT_SYSCALL_RT_SIGPROCMASK               1
@@ -345,6 +376,9 @@
 #define __ARCH_WANT_SYSCALL_SECCOMP                      1
 #define __ARCH_WANT_SYSCALL_SELECT                       1
 #define __ARCH_WANT_SYSCALL_SELECT64                     1
+#define __ARCH_WANT_SYSCALL_SEMCTL                       1
+#define __ARCH_WANT_SYSCALL_SEMGET                       1
+#define __ARCH_WANT_SYSCALL_SEMTIMEDOP_TIME64            1
 #define __ARCH_WANT_SYSCALL_SENDFILE                     1
 #define __ARCH_WANT_SYSCALL_SENDFILE64                   1
 #define __ARCH_WANT_SYSCALL_SENDMMSG                     1
@@ -387,6 +421,10 @@
 #define __ARCH_WANT_SYSCALL_SETUID32                     1
 #define __ARCH_WANT_SYSCALL_SETXATTR                     1
 #define __ARCH_WANT_SYSCALL_SGETMASK                     1
+#define __ARCH_WANT_SYSCALL_SHMAT                        1
+#define __ARCH_WANT_SYSCALL_SHMCTL                       1
+#define __ARCH_WANT_SYSCALL_SHMDT                        1
+#define __ARCH_WANT_SYSCALL_SHMGET                       1
 #define __ARCH_WANT_SYSCALL_SHUTDOWN                     1
 #define __ARCH_WANT_SYSCALL_SIGACTION                    1
 #define __ARCH_WANT_SYSCALL_SIGALTSTACK                  1
@@ -406,6 +444,7 @@
 #define __ARCH_WANT_SYSCALL_STAT64                       1
 #define __ARCH_WANT_SYSCALL_STATFS                       1
 #define __ARCH_WANT_SYSCALL_STATFS64                     1
+#define __ARCH_WANT_SYSCALL_STATX                        1
 #define __ARCH_WANT_SYSCALL_STIME                        1
 #define __ARCH_WANT_SYSCALL_STIME64                      1
 #define __ARCH_WANT_SYSCALL_STTY                         1

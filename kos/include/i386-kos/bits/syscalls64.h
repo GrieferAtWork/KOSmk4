@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38d6c424 */
+/* HASH CRC-32:0x4a07f320 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -728,6 +728,31 @@
 #define SYS_userfaultfd            __NR_userfaultfd            /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier             __NR_membarrier             /* errno_t membarrier(int TODO_PROTOTYPE) */
 #define SYS_mlock2                 __NR_mlock2                 /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define SYS_copy_file_range        __NR_copy_file_range        /* errno_t copy_file_range(int TODO_PROTOTYPE) */
+#define SYS_preadv2                __NR_preadv2                /* errno_t preadv2(int TODO_PROTOTYPE) */
+#define SYS_pwritev2               __NR_pwritev2               /* errno_t pwritev2(int TODO_PROTOTYPE) */
+#define SYS_pkey_mprotect          __NR_pkey_mprotect          /* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+#define SYS_pkey_alloc             __NR_pkey_alloc             /* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+#define SYS_pkey_free              __NR_pkey_free              /* errno_t pkey_free(int TODO_PROTOTYPE) */
+#define SYS_statx                  __NR_statx                  /* errno_t statx(int TODO_PROTOTYPE) */
+#define SYS_io_pgetevents          __NR_io_pgetevents          /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
+#define SYS_rseq                   __NR_rseq                   /* errno_t rseq(int TODO_PROTOTYPE) */
+#define SYS_pidfd_send_signal      __NR_pidfd_send_signal      /* errno_t pidfd_send_signal(int TODO_PROTOTYPE) */
+#define SYS_io_uring_setup         __NR_io_uring_setup         /* errno_t io_uring_setup(int TODO_PROTOTYPE) */
+#define SYS_io_uring_enter         __NR_io_uring_enter         /* errno_t io_uring_enter(int TODO_PROTOTYPE) */
+#define SYS_io_uring_register      __NR_io_uring_register      /* errno_t io_uring_register(int TODO_PROTOTYPE) */
+#define SYS_open_tree              __NR_open_tree              /* errno_t open_tree(int TODO_PROTOTYPE) */
+#define SYS_move_mount             __NR_move_mount             /* errno_t move_mount(int TODO_PROTOTYPE) */
+#define SYS_fsopen                 __NR_fsopen                 /* errno_t fsopen(int TODO_PROTOTYPE) */
+#define SYS_fsconfig               __NR_fsconfig               /* errno_t fsconfig(int TODO_PROTOTYPE) */
+#define SYS_fsmount                __NR_fsmount                /* errno_t fsmount(int TODO_PROTOTYPE) */
+#define SYS_fspick                 __NR_fspick                 /* errno_t fspick(int TODO_PROTOTYPE) */
+#define SYS_pidfd_open             __NR_pidfd_open             /* errno_t pidfd_open(int TODO_PROTOTYPE) */
+#define SYS_clone3                 __NR_clone3                 /* errno_t clone3(int TODO_PROTOTYPE) */
+#define SYS_close_range            __NR_close_range            /* errno_t close_range(int TODO_PROTOTYPE) */
+#define SYS_openat2                __NR_openat2                /* errno_t openat2(int TODO_PROTOTYPE) */
+#define SYS_pidfd_getfd            __NR_pidfd_getfd            /* errno_t pidfd_getfd(int TODO_PROTOTYPE) */
+#define SYS_faccessat2             __NR_faccessat2             /* errno_t faccessat2(int TODO_PROTOTYPE) */
 /* Same as `writev(2)', but write data to a file at a
  * specific `offset', rather than the current R/W position
  * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
