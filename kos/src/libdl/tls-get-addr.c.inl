@@ -43,17 +43,22 @@ libdl_dltlsbase(DlModule *__restrict self)
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
-INTERN WUNUSED NONNULL((1)) void *DLFCN_CC
-libdl_dltlsaddr(DlModule *self)
+INTERN WUNUSED NONNULL((1, 2)) void *__DLFCN_DLTLSADDR2_CC
+libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
 #endif /* !FAIL_ON_ERROR */
 {
+#ifdef FAIL_ON_ERROR
 	struct tls_segment *seg;
+#endif /* FAIL_ON_ERROR */
 	struct dtls_extension *extab;
 #ifndef FAIL_ON_ERROR
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_badmodule;
-#endif /* !FAIL_ON_ERROR */
+	if unlikely(!DL_VERIFY_TLS_SEGMENT(seg))
+		goto err_badseg;
+#else /* !FAIL_ON_ERROR */
 	seg = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+#endif /* FAIL_ON_ERROR */
 	/* Simple case: Static TLS, and special case: Empty TLS */
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
 		return (byte_t *)seg + self->dm_tlsstoff;
@@ -164,6 +169,9 @@ err:
 	return NULL;
 err_badmodule:
 	dl_seterror_badmodule(self);
+	goto err;
+err_badseg:
+	dl_seterror_badptr(seg);
 	goto err;
 #endif /* !FAIL_ON_ERROR */
 }

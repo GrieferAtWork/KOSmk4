@@ -196,6 +196,9 @@
 /* void ASMCALL libc_sig_restore(void); */
 #define LIBC_ARCH_HAVE_SIG_RESTORE 1
 
+/* void *LIBCCALL libc_handle(void); */
+#define LIBC_ARCH_HAVE_LIBC_HANDLE 1
+
 /* Arch-specific RTM optimizations do exist on x86
  * (in the form of a dedicated instruction set) */
 #define LIBC_ARCH_HAVE_RTM_BEGIN 1

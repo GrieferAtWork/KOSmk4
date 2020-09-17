@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf70fee85 */
+/* HASH CRC-32:0x3f17da2d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1280,7 +1280,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_allbits64, __FORCELOCAL __A
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
-__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__os_gettid,(void),gettid,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__os_gettid,(void),gettid,())
 #else /* __CRT_HAVE_gettid */
 #undef ____os_gettid_defined
 #endif /* !__CRT_HAVE_gettid */

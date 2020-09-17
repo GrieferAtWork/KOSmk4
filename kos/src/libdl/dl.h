@@ -63,6 +63,11 @@
 
 DECL_BEGIN
 
+#ifndef DL_VERIFY_TLS_SEGMENT
+#define DL_VERIFY_TLS_SEGMENT(p) \
+	((p) && ((uintptr_t)(p) & (sizeof(void *) - 1)) == 0)
+#endif /* !DL_VERIFY_TLS_SEGMENT */
+
 #ifndef DL_VERIFY_MODULE_HANDLE
 #define DL_VERIFY_MODULE_HANDLE(p) \
 	((p) && ((uintptr_t)(p) & (sizeof(void *) - 1)) == 0)
@@ -312,16 +317,18 @@ INTDEF void *LIBCCALL libdl____tls_get_addr(void);
 INTDEF void *LIBCCALL libdl___tls_get_addr(void);
 
 
+struct tls_segment;
+
 /* Allocate/Free a static TLS segment
  * These functions are called by by libc in order to safely create a new thread, such that
  * all current and future modules are able to store thread-local storage within that thread.
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-INTDEF ATTR_MALLOC WUNUSED void *DLFCN_CC libdl_dltlsallocseg(void);
+INTDEF ATTR_MALLOC WUNUSED struct tls_segment *DLFCN_CC libdl_dltlsallocseg(void);
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
-INTDEF NONNULL((1)) int DLFCN_CC libdl_dltlsfreeseg(void *ptr);
+INTDEF NONNULL((1)) int DLFCN_CC libdl_dltlsfreeseg(struct tls_segment *ptr);
 
 /* Return a pointer to the base of the given module's
  * TLS segment, as seen form the calling thread.
@@ -382,6 +389,14 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
 /* Free a TLS segment previously allocated with `dltlsalloc()' */
 INTDEF WUNUSED NONNULL((1)) int DLFCN_CC libdl_dltlsfree(DlModule *self);
 
+#ifndef __DLFCN_DLTLSADDR_CC
+#define __DLFCN_DLTLSADDR_CC  __DLFCN_CC
+#endif /* !__DLFCN_DLTLSADDR_CC */
+#ifndef __DLFCN_DLTLSADDR2_CC
+#define __DLFCN_DLTLSADDR2_CC __DLFCN_CC
+#endif /* !__DLFCN_DLTLSADDR2_CC */
+
+
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
  *       passed to `dltlsalloc()' will be called by this function upon the first use of
@@ -393,7 +408,19 @@ INTDEF WUNUSED NONNULL((1)) int DLFCN_CC libdl_dltlsfree(DlModule *self);
  *       the calling thread (e.g.: Such a pointer is needed by `unwind_emulator_t::sm_tlsbase')
  * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE' within the calling thread.
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
-INTDEF WUNUSED NONNULL((1)) void *DLFCN_CC libdl_dltlsaddr(DlModule *self);
+INTDEF WUNUSED NONNULL((1)) void *__DLFCN_DLTLSADDR_CC
+libdl_dltlsaddr(DlModule *self);
+
+/* Same as `dltlsaddr()', but used to lookup a TLS block relative to a given `TLS_SEGMENT',
+ * where the later was previously allocated using `dltlsallocseg()'. This function allows
+ * the caller to get a pointer to the TLS data of another thread, and is used to initialize
+ * the `pthread_self()' of a newly created thread from within `pthread_create()'.
+ * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE'
+ *                within the given `TLS_SEGMENT'.
+ * @return: NULL: Invalid `TLS_HANDLE' or `TLS_SEGMENT', or
+ *                allocation/initialization failed. (s.a. `dlerror()') */
+INTDEF WUNUSED NONNULL((1, 2)) void *__DLFCN_DLTLSADDR2_CC
+libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg);
 
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
  * and return NULL if the module doesn't have a TLS segment. */

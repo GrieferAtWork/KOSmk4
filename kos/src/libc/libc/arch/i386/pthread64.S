@@ -35,6 +35,25 @@
 
 
 
+.section .text.crt.sched.pthread.libc_handle
+INTERN_FUNCTION(libc_handle)
+	.cfi_startproc
+	/* The `current@tlsgd' symbol points to a `tls_index' structure,
+	 * which consists of 16 bytes total, where the first 8 are filled
+	 * with a module handle pointer by libdl.
+	 * Note that this is a KOS-specific implementation detail. As far
+	 * as the standard is concerned, libdl is allowed to make up some
+	 * arbitrary module index for those 4 bytes, however KOS's libdl
+	 * simply re-uses the regular module handle for this purpose,
+	 * meaning that we can simply (ab-)use that fact to quickly get a
+	 * handle for libc itself. */
+	INTERN(current)
+	movq   current@tlsgd(%rip), %rax
+	ret
+	.cfi_endproc
+END(libc_handle)
+
+
 /* Assembly-side for the process of cloning a thread.
  * This function simply clones the calling thread before invoking
  * `libc_pthread_main()' within the context of the newly spawned thread.

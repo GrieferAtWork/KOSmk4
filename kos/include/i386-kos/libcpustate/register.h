@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LIBCPUSTATE_APPLY_H
-#define _I386_KOS_LIBCPUSTATE_APPLY_H 1
+#ifndef _I386_KOS_LIBCPUSTATE_REGISTER_H
+#define _I386_KOS_LIBCPUSTATE_REGISTER_H 1
 
 #include <bits/types.h>
 
@@ -231,4 +231,4 @@ __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,
 
 __SYSDECL_END
 
-#endif /* !_I386_KOS_LIBCPUSTATE_APPLY_H */
+#endif /* !_I386_KOS_LIBCPUSTATE_REGISTER_H */

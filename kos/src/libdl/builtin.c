@@ -2109,6 +2109,7 @@ DEFINE_PUBLIC_ALIAS(dl_iterate_phdr, libdl_iterate_phdr);
 		"dltlsalloc"      : "result = (void *)&libdl_dltlsalloc;",        \
 		"dltlsfree"       : "result = (void *)&libdl_dltlsfree;",         \
 		"dltlsaddr"       : "result = (void *)&libdl_dltlsaddr;",         \
+		"dltlsaddr2"      : "result = (void *)&libdl_dltlsaddr2;",        \
 		"dlauxctrl"       : "result = (void *)&libdl_dlauxctrl;",         \
 		"dl_iterate_phdr" : "result = (void *)&libdl_iterate_phdr;",      \
 		"__peb"           : "result = (void *)root_peb;",                 \
@@ -2448,9 +2449,18 @@ stringSwitch("name",
 					if (name[4] == 's') {
 						if (name[5] == 'a') {
 							if (name[6] == 'd') {
-								if (name[7] == 'd' && name[8] == 'r' && name[9] == '\0') {
-									/* case "dltlsaddr": ... */
-									result = (void *)&libdl_dltlsaddr;
+								if (name[7] == 'd') {
+									if (name[8] == 'r') {
+										if (name[9] == '\0') {
+											/* case "dltlsaddr": ... */
+											result = (void *)&libdl_dltlsaddr;
+										} else if (name[9] == '2') {
+											if (name[10] == '\0') {
+												/* case "dltlsaddr2": ... */
+												result = (void *)&libdl_dltlsaddr2;
+											}
+										}
+									}
 								}
 							} else if (name[6] == 'l') {
 								if (name[7] == 'l') {

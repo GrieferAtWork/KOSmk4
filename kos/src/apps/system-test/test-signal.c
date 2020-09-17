@@ -53,7 +53,7 @@ DEFINE_TEST(signal_works_correctly) {
 	/* Install the signal handler. */
 	memset(&new_action, 0, sizeof(new_action));
 	new_action.sa_handler = &myhand;
-	new_action.sa_flags   = SA_NOMASK;
+	new_action.sa_flags   = 0;
 	error = sigaction(SIGUSR1, &new_action, &old_action);
 	assertf(error == 0, "%d:%s", errno, strerror(errno));
 

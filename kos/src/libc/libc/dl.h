@@ -37,6 +37,11 @@ DECL_BEGIN
 #endif
 
 #ifdef HAVE_LAZY_LIBDL_RELOCATIONS
+
+#ifndef __DLFCN_DLTLSADDR2_CC
+#define __DLFCN_DLTLSADDR2_CC __DLFCN_CC
+#endif /* !__DLFCN_DLTLSADDR2_CC */
+
 /* In order to minimize relocations within the final libc binary, we
  * use a custom, lazily initialized function table against functions
  * from libdl (though excluding the function we need to fill in that
@@ -79,6 +84,7 @@ DECL_BEGIN
 #define LIBC_DLERROR_SECTION       ".crt.heap.utility"  /* Used by `sbrk()' */
 #define LIBC_DLMODULEBASE_SECTION  ".crt.system.auxv"   /* Used by `getauxval()' */
 #define LIBC_DLEXCEPTAWARE_SECTION ".crt.except"        /* Used by `except_handler4()' */
+#define LIBC_DLTLSADDR2_SECTION    ".crt.sched.pthread" /* Used by pthread */
 
 typedef WUNUSED void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLOPEN)(char const *filename, int mode);
 typedef NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLCLOSE)(void *handle);
@@ -91,6 +97,7 @@ typedef void * /*NOTHROW_NCX*/ (__DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned 
 typedef WUNUSED char * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLERROR)(void);
 typedef WUNUSED NONNULL((1)) void * /*NOTHROW_NCX*/ (__DLFCN_CC *PDLMODULEBASE)(void *handle);
 typedef WUNUSED NONNULL((1)) int /*NOTHROW_NCX*/ (__DLFCN_CC *PDLEXCEPTAWARE)(void *handle);
+typedef WUNUSED NONNULL((1, 2)) void * /*NOTHROW_NCX*/ (__DLFCN_DLTLSADDR2_CC *PDLTLSADDR2)(void *tls_handle, void *tls_segment);
 
 INTDEF ATTR_RETNONNULL WUNUSED PDLOPEN NOTHROW_NCX(LIBCCALL libc_get_dlopen)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLCLOSE NOTHROW_NCX(LIBCCALL libc_get_dlclose)(void);
@@ -103,18 +110,20 @@ INTDEF ATTR_RETNONNULL WUNUSED PDLAUXCTRL NOTHROW_NCX(LIBCCALL libc_get_dlauxctr
 INTDEF ATTR_RETNONNULL WUNUSED PDLERROR NOTHROW_NCX(LIBCCALL libc_get_dlerror)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLMODULEBASE NOTHROW_NCX(LIBCCALL libc_get_dlmodulebase)(void);
 INTDEF ATTR_RETNONNULL WUNUSED PDLEXCEPTAWARE NOTHROW_NCX(LIBCCALL libc_get_dlexceptaware)(void);
+INTDEF ATTR_RETNONNULL WUNUSED PDLTLSADDR2 NOTHROW_NCX(LIBCCALL libc_get_dltlsaddr2)(void);
 
-#define dlopen(filename, mode)             (*libc_get_dlopen())(filename, mode)
-#define dlclose(handle)                    (*libc_get_dlclose())(handle)
-#define dltlsallocseg()                    (*libc_get_dltlsallocseg())()
-#define dltlsfreeseg(ptr)                  (*libc_get_dltlsfreeseg())(ptr)
-#define dlgethandle(static_pointer, flags) (*libc_get_dlgethandle())(static_pointer, flags)
-#define dlgetmodule(name, flags)           (*libc_get_dlgetmodule())(name, flags)
-#define dlmodulefd(handle)                 (*libc_get_dlmodulefd())(handle)
-#define dlauxctrl(handle, ...)             (*libc_get_dlauxctrl())(handle, __VA_ARGS__)
-#define dlerror()                          (*libc_get_dlerror())()
-#define dlmodulebase(handle)               (*libc_get_dlmodulebase())(handle)
-#define dlexceptaware(handle)              (*libc_get_dlexceptaware())(handle)
+#define dlopen(filename, mode)              (*libc_get_dlopen())(filename, mode)
+#define dlclose(handle)                     (*libc_get_dlclose())(handle)
+#define dltlsallocseg()                     (*libc_get_dltlsallocseg())()
+#define dltlsfreeseg(ptr)                   (*libc_get_dltlsfreeseg())(ptr)
+#define dlgethandle(static_pointer, flags)  (*libc_get_dlgethandle())(static_pointer, flags)
+#define dlgetmodule(name, flags)            (*libc_get_dlgetmodule())(name, flags)
+#define dlmodulefd(handle)                  (*libc_get_dlmodulefd())(handle)
+#define dlauxctrl(handle, ...)              (*libc_get_dlauxctrl())(handle, __VA_ARGS__)
+#define dlerror()                           (*libc_get_dlerror())()
+#define dlmodulebase(handle)                (*libc_get_dlmodulebase())(handle)
+#define dlexceptaware(handle)               (*libc_get_dlexceptaware())(handle)
+#define dltlsaddr2(tls_handle, tls_segment) (*libc_get_dltlsaddr2())(tls_handle, tls_segment)
 #endif /* HAVE_LAZY_LIBDL_RELOCATIONS */
 
 #endif /* __CC__ */

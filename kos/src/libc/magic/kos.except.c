@@ -39,55 +39,19 @@
 #include <kos/bits/fastexcept.h>
 )]%{
 
+#ifdef __USE_KOS_KERNEL
+#include <kos/bits/exception_info.h>
+#endif /* __USE_KOS_KERNEL */
+
 #ifndef EXCEPTION_DATA_POINTERS
 #define EXCEPTION_DATA_POINTERS  8
 #endif /* !EXCEPTION_DATA_POINTERS */
-
-
-#ifdef __USE_KOS_KERNEL
-#include <hybrid/byteorder.h>
-
-#ifndef EXCEPT_BACKTRACE_SIZE
-#ifdef NDEBUG
-#define EXCEPT_BACKTRACE_SIZE 0
-#else /* NDEBUG */
-#define EXCEPT_BACKTRACE_SIZE 16
-#endif /* !NDEBUG */
-#endif /* !EXCEPT_BACKTRACE_SIZE */
-#define EXCEPT_FNORMAL    0x0000 /* Normal exception handler flags. */
-#define EXCEPT_FRETHROW   0x0001 /* FLAG: The exception should be rethrown.
-                                  * Unless set when `__cxa_end_catch()' is called, `ei_code'
-                                  * will be changed to `E_OK', indicating no exception. */
-#ifndef __KERNEL__
-#define EXCEPT_FINEXCEPT  0x0002 /* FLAG: Currently within `libc_except_handler(3|4)()' (used to prevent
-                                  *       an infinite loop when the exception handler itself is faulting) */
-#define EXCEPT_FINEXCEPT2 0x0004 /* FLAG: Same as `EXCEPT_FINEXCEPT', but set when that flag was already set.
-                                  *       When both flags are already set, a coredump is triggered.
-                                  *       Using this double-indirection mechanism, it becomes possible to handle
-                                  *       things such as segmentation faults when accessing memory during unwinding,
-                                  *       and ensuring that the correct unwind error codes (in this case `UNWIND_SEGFAULT')
-                                  *       get produced instead of always causing `UNWIND_USER_RECURSION' (which should only
-                                  *       be produced if the unwind machinery itself has become faulty) */
-#define EXCEPT_FMAYSIGNAL 0x0008 /* FLAG: The exception may be converted into a signal when `error_unwind(3)' cannot find
-                                  *       a handler apart of some except-aware module (s.a. set_exception_handler:#4).
-                                  *       If the exception cannot be translated, a coredump is performed. */
-#endif /* !__KERNEL__ */
-#define OFFSET_EXCEPTION_INFO_STATE    0
-#define OFFSET_EXCEPTION_INFO_TRACE    __SIZEOF_ERROR_REGISTER_STATE
-#define OFFSET_EXCEPTION_INFO_FLAGS    (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * EXCEPT_BACKTRACE_SIZE))
-#define OFFSET_EXCEPTION_INFO_CODE     (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE + 1)))
-#define OFFSET_EXCEPTION_INFO_DATA     (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE + 1)))
-#define OFFSET_EXCEPTION_INFO_POINTERS (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE + 2)))
-#endif /* __USE_KOS_KERNEL */
 
 #ifndef __ERROR_REGISTER_STATE_TYPE
 #include <bits/mcontext.h>
 #define __ERROR_REGISTER_STATE_TYPE   struct mcontext
 #define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__ERROR_REGISTER_STATE_TYPE */
-
-
-
 
 }
 %#ifdef __CC__
@@ -115,83 +79,6 @@ typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
 typedef __error_code_t error_code_t;
 typedef __error_class_t error_class_t;
 typedef __error_subclass_t error_subclass_t;
-
-#ifdef __USE_KOS_KERNEL
-#undef ei_data
-#undef ei_code
-#undef ei_class
-#undef ei_subclass
-struct exception_info {
-	/* The CPU state at the time the exception was originally thrown.
-	 * NOTE: The PC register of this state represents the program
-	 *       location _AFTER_ the instruction that caused the exception.
-	 *       In the case of the exception being caused by a `THROW()',
-	 *       this is the return address of the call to the throw-function.
-	 *       In the case of cpu-specific exceptions, it points after the
-	 *       instruction responsible for the exception.
-	 *    -> With that in mind, when querying for special properties of PC,
-	 *       you must always subtract `1' from the address, such as when
-	 *       calling `unwind_at()', which requires you to provide `PC - 1'
-	 *       for its `abs_pc' argument. */
-	error_register_state_t    ei_state;
-#if EXCEPT_BACKTRACE_SIZE != 0
-	/* Exception backtrace (from least-recent[0] to most-recent[EXCEPT_BACKTRACE_SIZE - 1])
-	 * This vector is populated as the stack is unwound, until it is either full, or until
-	 * a new exception is thrown.
-	 * The vector's ends either when `EXCEPT_BACKTRACE_SIZE' were found, or upon the first
-	 * entry that evaluates to `NULL'. If a `NULL' entry was found, and the caller is currently
-	 * in the process of unwinding the stack, the traceback continues where their CPU context
-	 * meets with the next unwind location.
-	 * NOTE: In order to prevent redundancy, this trace only starts with the first unwind
-	 *       location of the exception, with the exception's original throw-location found
-	 *       stored within the PC register of `ei_state'
-	 * NOTE: The pointers in this traceback have not been adjusted, meaning that they probably
-	 *       point to the first instruction after some `call' instruction (i.e. they're the
-	 *       return addresses loaded during unwinding) */
-	void                     *ei_trace[EXCEPT_BACKTRACE_SIZE];
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	__uintptr_t               ei_flags;    /* Flags describing the current exception state (Set of `EXCEPT_F*'). */
-	union {
-		error_code_t          ei_code;     /* Current exception code. */
-		struct {
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			error_class_t     ei_class;    /* Current exception class. */
-			error_subclass_t  ei_subclass; /* Current exception sub-class. */
-#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-			error_subclass_t  ei_subclass; /* Current exception sub-class. */
-			error_class_t     ei_class;    /* Current exception class. */
-#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
-		}
-#ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
-		_ei_class_subclass
-#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
-		;
-		struct exception_data ei_data;     /* Exception data. */
-	}
-#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
-	_ei_code_data
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	;
-};
-#if !defined(__COMPILER_HAVE_TRANSPARENT_UNION) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-#define ei_data      _ei_code_data.ei_data
-#define ei_code      _ei_code_data.ei_code
-#define ei_class     _ei_code_data._ei_class_subclass.ei_class
-#define ei_subclass  _ei_code_data._ei_class_subclass.ei_subclass
-#elif !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#define ei_data      _ei_code_data.ei_data
-#define ei_code      _ei_code_data.ei_code
-#define ei_class     _ei_code_data.ei_class
-#define ei_subclass  _ei_code_data.ei_subclass
-#elif !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
-#define ei_class     _ei_class_subclass.ei_class
-#define ei_subclass  _ei_class_subclass.ei_subclass
-#endif
-
-#else /* __USE_KOS_KERNEL */
-struct exception_info;
-#endif /* !__USE_KOS_KERNEL */
-
 
 }
 

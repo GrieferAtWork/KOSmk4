@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21952dcf */
+/* HASH CRC-32:0x7fda68fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,7 +71,7 @@ INTDEF errno_t NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthre
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread);
 /* Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-INTDEF ATTR_CONST pthread_t NOTHROW_NCX(LIBCCALL libc_pthread_self)(void);
+INTDEF ATTR_CONST pthread_t NOTHROW(LIBCCALL libc_pthread_self)(void);
 /* Initialize thread attribute *ATTR with default attributes (detachstate is
  * PTHREAD_JOINABLE, scheduling policy is SCHED_OTHER, no user-provided stack)
  * @return: EOK: Success */
@@ -200,7 +200,7 @@ INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthrea
  * If the given `target_thread' has already terminated, 0 is returned
  * @return: * : The PID OF the given thread
  * @return: 0 : The given `target_thread' has already terminated */
-INTDEF ATTR_CONST WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread);
+INTDEF ATTR_PURE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread);
 /* Determine level of concurrency
  * @return: * : The current concurrency level */
 INTDEF ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9af85cb */
+/* HASH CRC-32:0x587d759e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,11 +39,11 @@ INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_execve)(char const *__re
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
-INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_getpid)(void);
+INTDEF ATTR_CONST WUNUSED pid_t NOTHROW(LIBCCALL libc_getpid)(void);
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
-INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_gettid)(void);
+INTDEF ATTR_CONST WUNUSED pid_t NOTHROW(LIBCCALL libc_gettid)(void);
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2]);

@@ -61,6 +61,9 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 	                                     * will set its associated bit to 1 within this set. */
 };
 
+#define USERPROCMASK_INIT(mytid, sigsize, sigmask, pending) \
+	{ mytid, sigsize, sigmask, pending }
+
 
 __DECL_END
 #endif /* __CC__ */

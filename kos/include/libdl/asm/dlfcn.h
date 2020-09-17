@@ -75,7 +75,13 @@ __DECL_BEGIN
 #define __CRT_HAVE_dltlsalloc 1
 #define __CRT_HAVE_dltlsfree 1
 #define __CRT_HAVE_dltlsaddr 1
+#define __CRT_HAVE_dltlsaddr2 1
 #define __CRT_HAVE_dlauxctrl 1
+#if defined(__i386__) && !defined(__x86_64__)
+#define __DLFCN_DLTLSADDR_CC  __ATTR_FASTCALL
+#define __DLFCN_DLTLSADDR2_CC __ATTR_FASTCALL
+#endif /* __i386__ && !__x86_64__ */
+
 #else /* __KOS_VERSION__ >= 400 */
 #define __CRT_HAVE_fdlopen 1 /* WARNING: In KOS v300, `fdlopen()' didn't inherit the given `FD' on success! */
 #endif /* __KOS_VERSION__ < 400 */

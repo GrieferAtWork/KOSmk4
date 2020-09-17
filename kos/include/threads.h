@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f1d1388 */
+/* HASH CRC-32:0xc4711640 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -622,7 +622,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thr_min_stack, __FORCELOCAL __ATTR_ARTIFICIAL __
  * created by one of the pthread- or threads-related init functions.
  * Internally, this is the return value if the caller doesn't have a
  * proper pthread-controller attached. */
-__CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,thr_main,(void),pthread_main_np,())
+__CREDIRECT(__ATTR_CONST,int,__NOTHROW,thr_main,(void),pthread_main_np,())
 #elif defined(__CRT_HAVE_thr_main)
 /* Another one of these non-restricted, but solaris-specific functions:
  * This one returns 1 if the calling thread is the main() thread (i.e.
@@ -632,7 +632,7 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,thr_main,(void),pthread_main_np,())
  * created by one of the pthread- or threads-related init functions.
  * Internally, this is the return value if the caller doesn't have a
  * proper pthread-controller attached. */
-__CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,thr_main,(void),())
+__CDECLARE(__ATTR_CONST,int,__NOTHROW,thr_main,(void),())
 #elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
 #include <libc/local/pthread/pthread_main_np.h>
 /* Another one of these non-restricted, but solaris-specific functions:
@@ -643,7 +643,7 @@ __CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,thr_main,(void),())
  * created by one of the pthread- or threads-related init functions.
  * Internally, this is the return value if the caller doesn't have a
  * proper pthread-controller attached. */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL thr_main)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL thr_main)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); }
 #endif /* ... */
 #endif /* __USE_SOLARIS */
 

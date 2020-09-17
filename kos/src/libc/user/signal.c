@@ -38,6 +38,7 @@
 #include <unistd.h>
 
 #include "../libc/compat.h"
+#include "../libc/tls.h"
 #include "signal.h"
 #include "string.h"
 
@@ -295,15 +296,15 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 {
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 	errno_t result;
-	struct pthread *pt = pthread_self();
+	struct pthread *me = &current;
 	sigset_t *old_set, *new_set;
-	old_set = pt->pt_pmask.lpm_pmask.pm_sigmask;
+	old_set = me->pt_pmask.lpm_pmask.pm_sigmask;
 	if unlikely(!old_set) {
 		/* Special case: The userprocmask sub-system isn't initialized, yet.
 		 * So initialize it now. */
-		old_set = &pt->pt_pmask.lpm_masks[0];
-		pt->pt_pmask.lpm_pmask.pm_sigmask = old_set;
-		result = sys_set_userprocmask_address(&pt->pt_pmask.lpm_pmask);
+		old_set = &me->pt_pmask.lpm_masks[0];
+		me->pt_pmask.lpm_pmask.pm_sigmask = old_set;
+		result = sys_set_userprocmask_address(&me->pt_pmask.lpm_pmask);
 		if unlikely(E_ISERR(result)) {
 			/* Fallback: Use the legacy sigprocmask(2) system call. */
 			goto do_legacy_sigprocmask;
@@ -317,9 +318,9 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 
 	/* Select the new storage location. */
 	new_set = old_set + 1;
-	if (new_set != &pt->pt_pmask.lpm_masks[0] &&
-	    new_set != &pt->pt_pmask.lpm_masks[1])
-		new_set = &pt->pt_pmask.lpm_masks[0];
+	if (new_set != &me->pt_pmask.lpm_masks[0] &&
+	    new_set != &me->pt_pmask.lpm_masks[1])
+		new_set = &me->pt_pmask.lpm_masks[0];
 	/* Initialize `new_set' based on `how', `old_set' and `set' */
 	switch (how) {
 
@@ -343,7 +344,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 
 	/* Atomically enable use of the new, updated mask
 	 * From this point forth, signals sent to our thread will be masked by `new_set' */
-	ATOMIC_WRITE(pt->pt_pmask.lpm_pmask.pm_sigmask, new_set);
+	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, new_set);
 
 	/* Optimization: If we know that no signal became unmasked, we don't
 	 *               have to search for any pending, unmasked signals! */
@@ -356,7 +357,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 		for (i = 0; i < __SIGSET_NWORDS; ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
-			pending_word = ATOMIC_READ(pt->pt_pmask.lpm_pmask.pm_pending.__val[i]);
+			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
 			if (!pending_word)
 				continue; /* Nothing pending in here. */
 			newmask_word = new_set->__val[i];
@@ -367,7 +368,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 				 * available in the mean time is still available now. - The signal may
 				 * have been directed at our process as a whole, and another thread
 				 * may have already handled it. */
-				sigemptyset(&pt->pt_pmask.lpm_pmask.pm_pending);
+				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
 				/* Calls the kernel's `sigmask_check()' function */
 				sys_sigmask_check();
 				break;
@@ -376,7 +377,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 	}
 	return 0;
 do_legacy_sigprocmask:
-	pt->pt_pmask.lpm_pmask.pm_sigmask = NULL;
+	me->pt_pmask.lpm_pmask.pm_sigmask = NULL;
 	result = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
 	                         set, oset);
 	return libc_seterrno_syserr(result);

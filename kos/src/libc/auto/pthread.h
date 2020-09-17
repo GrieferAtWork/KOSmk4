@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0310646 */
+/* HASH CRC-32:0xf0e7fcaa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,13 +71,13 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_detach)(pthread_t pthread);
 /* Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-INTDEF ATTR_CONST int NOTHROW_NCX(LIBDCALL libd_pthread_equal)(pthread_t thr1, pthread_t thr2);
+INTDEF ATTR_CONST int NOTHROW(LIBDCALL libd_pthread_equal)(pthread_t thr1, pthread_t thr2);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-INTDEF ATTR_CONST int NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1, pthread_t thr2);
+INTDEF ATTR_CONST int NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1, pthread_t thr2);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Initialize thread attribute *ATTR with default attributes (detachstate is
@@ -208,7 +208,7 @@ INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setname_np)(pthrea
  * If the given `target_thread' has already terminated, 0 is returned
  * @return: * : The PID OF the given thread
  * @return: 0 : The given `target_thread' has already terminated */
-INTDEF ATTR_CONST WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_pthread_gettid_np)(pthread_t target_thread);
+INTDEF ATTR_PURE WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_pthread_gettid_np)(pthread_t target_thread);
 /* Set new concurrency level to LEVEL
  * @return: EOK:    Success
  * @return: EINVAL: The given `level' is negative */
@@ -610,7 +610,7 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n);
  * calling program), and 0 otherwise. Additionally, -1 is returned
  * if the calling thread "hasn't been initialized", though this
  * isn't a case that can actually happen under KOS's implementation. */
-INTDEF ATTR_CONST int NOTHROW_NCX(LIBCCALL libc_pthread_main_np)(void);
+INTDEF ATTR_CONST int NOTHROW(LIBCCALL libc_pthread_main_np)(void);
 #endif /* !__KERNEL__ */
 
 DECL_END

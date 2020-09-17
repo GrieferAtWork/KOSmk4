@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b3962af */
+/* HASH CRC-32:0x20d33c2f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@ DECL_BEGIN
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST int
-NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t thr1,
-                                         pthread_t thr2) {
+NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
+                                     pthread_t thr2) {
 	return thr1 == thr2;
 }
 #include <asm/crt/pthreadvalues.h>
@@ -176,7 +176,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
  * if the calling thread "hasn't been initialized", though this
  * isn't a case that can actually happen under KOS's implementation. */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") ATTR_CONST int
-NOTHROW_NCX(LIBCCALL libc_pthread_main_np)(void) {
+NOTHROW(LIBCCALL libc_pthread_main_np)(void) {
 	return libc_gettid() == libc_getpid();
 }
 #endif /* !__KERNEL__ */

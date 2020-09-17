@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73799430 */
+/* HASH CRC-32:0x23ae45fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -697,27 +697,27 @@ __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),(__
 #ifdef __CRT_HAVE_pthread_self
 /* Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-__CDECLARE(__ATTR_CONST,pthread_t,__NOTHROW_NCX,pthread_self,(void),())
+__CDECLARE(__ATTR_CONST,pthread_t,__NOTHROW,pthread_self,(void),())
 #elif defined(__CRT_HAVE_thrd_current)
 /* Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
-__CREDIRECT(__ATTR_CONST,pthread_t,__NOTHROW_NCX,pthread_self,(void),thrd_current,())
+__CREDIRECT(__ATTR_CONST,pthread_t,__NOTHROW,pthread_self,(void),thrd_current,())
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
 /* Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-__CEIDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,pthread_equal,(pthread_t __thr1, pthread_t __thr2),{ return __thr1 == __thr2; })
+__CEIDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_equal,(pthread_t __thr1, pthread_t __thr2),{ return __thr1 == __thr2; })
 #elif defined(__CRT_HAVE_thrd_equal)
 /* Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-__CEIREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,pthread_equal,(pthread_t __thr1, pthread_t __thr2),thrd_equal,{ return __thr1 == __thr2; })
+__CEIREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_equal,(pthread_t __thr1, pthread_t __thr2),thrd_equal,{ return __thr1 == __thr2; })
 #else /* ... */
 /* Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
-__LOCAL __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL pthread_equal)(pthread_t __thr1, pthread_t __thr2) { return __thr1 == __thr2; }
+__LOCAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_equal)(pthread_t __thr1, pthread_t __thr2) { return __thr1 == __thr2; }
 #endif /* !... */
 
 /* Thread attribute handling. */
@@ -863,7 +863,7 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(p
  * If the given `target_thread' has already terminated, 0 is returned
  * @return: * : The PID OF the given thread
  * @return: 0 : The given `target_thread' has already terminated */
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
 #else /* __CRT_HAVE_pthread_gettid_np */
 #undef __pthread_gettid_np_defined
 #endif /* !__CRT_HAVE_pthread_gettid_np */
@@ -1825,14 +1825,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_set_num_processors_np, __FORCELOCAL __AT
  * calling program), and 0 otherwise. Additionally, -1 is returned
  * if the calling thread "hasn't been initialized", though this
  * isn't a case that can actually happen under KOS's implementation. */
-__CDECLARE(__ATTR_CONST,int,__NOTHROW_NCX,pthread_main_np,(void),())
+__CDECLARE(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),())
 #elif defined(__CRT_HAVE_thr_main)
 /* Returns 1 if the calling thread is the main() thread (i.e. the
  * thread that was started by the kernel in order to execute the
  * calling program), and 0 otherwise. Additionally, -1 is returned
  * if the calling thread "hasn't been initialized", though this
  * isn't a case that can actually happen under KOS's implementation. */
-__CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,pthread_main_np,(void),thr_main,())
+__CREDIRECT(__ATTR_CONST,int,__NOTHROW,pthread_main_np,(void),thr_main,())
 #elif defined(__CRT_HAVE_gettid) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid))
 #include <libc/local/pthread/pthread_main_np.h>
 /* Returns 1 if the calling thread is the main() thread (i.e. the
@@ -1840,7 +1840,7 @@ __CREDIRECT(__ATTR_CONST,int,__NOTHROW_NCX,pthread_main_np,(void),thr_main,())
  * calling program), and 0 otherwise. Additionally, -1 is returned
  * if the calling thread "hasn't been initialized", though this
  * isn't a case that can actually happen under KOS's implementation. */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_main_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST int __NOTHROW(__LIBCCALL pthread_main_np)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_main_np))(); })
 #endif /* ... */
 #endif /* __USE_BSD */
 #endif /* __CC__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5a94cd5 */
+/* HASH CRC-32:0xd1baaf0b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9042,11 +9042,15 @@ DEFINE_PUBLIC_ALIAS(sys_Xsigmask_check, libc_sys_Xsigmask_check)
  * and write to `ctl->pm_pending' (using atomic-or for the later) from this
  * point forth.
  * NOTE: Before calling this function, the caller must:
- *       >> bzero(&ctl, sizeof(struct userprocmask));
- *       >> ctl.pm_sigsize = sizeof(sigset_t);
- *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       >> bzero(ctl, sizeof(struct userprocmask));
+ *       >> ctl->pm_sigsize = sizeof(sigset_t);
+ *       >> ctl->pm_sigmask = &initial_sigmask;
  *       Where the initial bzero() is needed to initialize potential
  *       additional, arch-specific fields to all zeroes.
+ * NOTE: This system call will then initialize:
+ *       >> ctl->pm_mytid = gettid();
+ *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
+ *       >> sigpending(&ctl->pm_pending);
  * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
  *       before this is done, the kernel will copy the `pm_sigmask'
  *       of the previously set controller into its internal signal
@@ -9073,11 +9077,15 @@ DEFINE_PUBLIC_ALIAS(sys_set_userprocmask_address, libc_sys_set_userprocmask_addr
  * and write to `ctl->pm_pending' (using atomic-or for the later) from this
  * point forth.
  * NOTE: Before calling this function, the caller must:
- *       >> bzero(&ctl, sizeof(struct userprocmask));
- *       >> ctl.pm_sigsize = sizeof(sigset_t);
- *       >> ctl.pm_sigmask = &initial_sigmask;
+ *       >> bzero(ctl, sizeof(struct userprocmask));
+ *       >> ctl->pm_sigsize = sizeof(sigset_t);
+ *       >> ctl->pm_sigmask = &initial_sigmask;
  *       Where the initial bzero() is needed to initialize potential
  *       additional, arch-specific fields to all zeroes.
+ * NOTE: This system call will then initialize:
+ *       >> ctl->pm_mytid = gettid();
+ *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
+ *       >> sigpending(&ctl->pm_pending);
  * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
  *       before this is done, the kernel will copy the `pm_sigmask'
  *       of the previously set controller into its internal signal

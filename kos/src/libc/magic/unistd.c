@@ -466,7 +466,8 @@ int execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, (
 @@>> getpid(2)
 @@Return the PID of the calling process (that is the TID of the calling thread group's leader)
 @@THIS_THREAD->LEADER->PID
-[[guard, wunused, export_alias("_getpid", "__getpid")]]
+[[guard, wunused, const, nothrow]]
+[[export_alias("_getpid", "__getpid")]]
 $pid_t getpid();
 
 %
@@ -474,7 +475,8 @@ $pid_t getpid();
 @@>> gettid(2)
 @@Return the TID of the calling thread
 @@THIS_THREAD->PID
-[[guard, wunused, section(".text.crt{|.dos}.sched.thread")]]
+[[guard, wunused, const, nothrow]]
+[[section(".text.crt{|.dos}.sched.thread")]]
 $pid_t gettid();
 %#endif /* __USE_KOS */
 

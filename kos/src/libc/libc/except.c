@@ -67,31 +67,31 @@ STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFS
 
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
 struct exception_info *NOTHROW_NCX(LIBCCALL libc_error_info)(void) {
-	return &tls.t_except;
+	return &current.pt_except;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
 struct exception_data *NOTHROW_NCX(LIBCCALL libc_error_data)(void) {
-	return &tls.t_except.ei_data;
+	return &current.pt_except.ei_data;
 }
 INTERN SECTION_EXCEPT_TEXT WUNUSED ATTR_CONST ATTR_RETNONNULL
 error_register_state_t *NOTHROW_NCX(LIBCCALL libc_error_register_state)(void) {
-	return &tls.t_except.ei_state;
+	return &current.pt_except.ei_state;
 }
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED error_code_t
 NOTHROW_NCX(LIBCCALL libc_error_code)(void) {
-	return tls.t_except.ei_code;
+	return current.pt_except.ei_code;
 }
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED bool
 NOTHROW_NCX(LIBCCALL libc_error_active)(void) {
-	return tls.t_except.ei_code != E_OK;
+	return current.pt_except.ei_code != E_OK;
 }
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED error_class_t
 NOTHROW_NCX(LIBCCALL libc_error_class)(void) {
-	return ERROR_CLASS(tls.t_except.ei_code);
+	return ERROR_CLASS(current.pt_except.ei_code);
 }
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED error_subclass_t
 NOTHROW_NCX(LIBCCALL libc_error_subclass)(void) {
-	return ERROR_SUBCLASS(tls.t_except.ei_code);
+	return ERROR_SUBCLASS(current.pt_except.ei_code);
 }
 
 #undef error_info
@@ -200,7 +200,7 @@ PRIVATE SECTION_EXCEPT_TEXT void LIBCCALL
 kos_unwind_exception_cleanup(_Unwind_Reason_Code UNUSED(reason),
                              struct _Unwind_Exception *UNUSED(exc)) {
 	/* Clear the active error code */
-	error_info()->ei_code = ERROR_CODEOF(E_OK);
+	current.pt_except.ei_code = ERROR_CODEOF(E_OK);
 }
 
 PRIVATE SECTION_EXCEPT_DATA struct _Unwind_Exception kos_unwind_exception = {
@@ -271,7 +271,7 @@ libc_cxa_end_catch(void) {
 
 	/* For our purposes, we only get here when an EXCEPT block reaches
 	 * its end without the associated exception having been re-thrown. */
-	struct exception_info *info = error_info();
+	struct exception_info *info = &current.pt_except;
 	if (!(info->ei_flags & EXCEPT_FRETHROW))
 		info->ei_code = E_OK;
 	info->ei_flags &= ~EXCEPT_FRETHROW;
@@ -494,7 +494,7 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_error_unwind)(error_register_state_t *__restr
 #if EXCEPT_BACKTRACE_SIZE != 0
 	unsigned int orig_tracecount;
 	for (orig_tracecount = 0; orig_tracecount < EXCEPT_BACKTRACE_SIZE - 1; ++orig_tracecount) {
-		if (!tls.t_except.ei_trace[orig_tracecount])
+		if (!current.pt_except.ei_trace[orig_tracecount])
 			break;
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -558,16 +558,16 @@ search_fde:
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	/* Remember the current state PC as a new entry in the exception's traceback. */
-	if (tls.t_except.ei_trace[EXCEPT_BACKTRACE_SIZE - 1] == NULL) {
+	if (current.pt_except.ei_trace[EXCEPT_BACKTRACE_SIZE - 1] == NULL) {
 #if EXCEPT_BACKTRACE_SIZE > 1
 		unsigned int i;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE - 1; ++i) {
-			if (!tls.t_except.ei_trace[i])
+			if (!current.pt_except.ei_trace[i])
 				break;
 		}
-		tls.t_except.ei_trace[i] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+		current.pt_except.ei_trace[i] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
 #else /* EXCEPT_BACKTRACE_SIZE > 1 */
-		tls.t_except.ei_trace[0] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+		current.pt_except.ei_trace[0] = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
 #endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -575,7 +575,7 @@ search_fde:
 	goto search_fde;
 err:
 	{
-		struct exception_info *info = error_info();
+		struct exception_info *info = &current.pt_except;
 		if (unwind_error == UNWIND_NO_FRAME || unwind_error == UNWIND_USER_NOTHROW) {
 			error_register_state_t *new_state;
 			/* Try to handle special exceptions (E_EXIT_THREAD and E_EXIT_PROCESS) */
@@ -595,7 +595,7 @@ err:
 		}
 		/* Use the original state that the caller of `libc_error_unwind()' provided
 		 * in order to minimize the stack portion which can only be re-constructed
-		 * by walking the stack trace stored in `error_info()->ei_trace' */
+		 * by walking the stack trace stored in `&current.pt_except->ei_trace' */
 #if EXCEPT_BACKTRACE_SIZE != 0
 		if (orig_tracecount < EXCEPT_BACKTRACE_SIZE) {
 			/* Mark the traceback as complete by setting LAST_PC == CURR_PC */
@@ -998,7 +998,7 @@ libc_except_handler3_impl(error_register_state_t *__restrict state,
                           struct exception_data *__restrict error) {
 	struct exception_info *info;
 	uintptr_t recursion_flag = EXCEPT_FINEXCEPT;
-	info = error_info();
+	info = &current.pt_except;
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {
 		if unlikely(info->ei_flags & EXCEPT_FINEXCEPT2)
@@ -1037,7 +1037,7 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 	bool got_first_handler;
 	uintptr_t recursion_flag = EXCEPT_FINEXCEPT;
 	void *pc;
-	info = error_info();
+	info = &current.pt_except;
 	/* Prevent recursion if we're already within the kernel-level exception handler. */
 	if unlikely(info->ei_flags & EXCEPT_FINEXCEPT) {
 		if unlikely(info->ei_flags & EXCEPT_FINEXCEPT2)

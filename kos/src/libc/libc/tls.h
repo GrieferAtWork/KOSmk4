@@ -24,44 +24,39 @@
 #include "../api.h"
 /**/
 
-#include <kos/except.h>
-#include <kos/types.h>
-
-DECL_BEGIN
-
 #ifndef __KERNEL__
+#include <bits/crt/pthreadtypes.h>
 
-
-/* The different kinds of errno codes known to libc */
-#define LIBC_ERRNO_KIND_KOS 0 /* __GEN_E* */
-#define LIBC_ERRNO_KIND_DOS 1 /* __DOS_E* */
-#define LIBC_ERRNO_KIND_NT  2 /* NT error codes */
-#define LIBC_ERRNO_KIND_CYG 3 /* __CYG_E* */
-
-#undef CONFIG_LIBC_HAVE_CACHED_TID
-#if 1
-#define CONFIG_LIBC_HAVE_CACHED_TID 1
-#endif
+#include "dl.h"
 
 #ifdef __CC__
+DECL_BEGIN
 
-struct pthread;
-struct libc_tls {
-	errno_t               t_errno_value; /* Errno value */
-	unsigned int          t_errno_kind;  /* Errno kind (one of `LIBC_ERRNO_KIND_*') */
-	struct pthread       *t_pthread;     /* [0..1] pthread_self() (lazily allocated) */
-	struct exception_info t_except;      /* Exception information */
-#ifdef CONFIG_LIBC_HAVE_CACHED_TID
-	pid_t                 t_tid;         /* Calling thread TID (lazily initialized) */
-#endif /* CONFIG_LIBC_HAVE_CACHED_TID */
-};
+/* LIBC per-thread data instance.
+ * NOTE: This _must_ be the _only_ ATTR_THREAD variable in all of libc!
+ *       If this assumption is violated, then `current_from_tls()' will
+ *       break, as it assumes that the in-library TLS offset of `current'
+ *       is equal to `0'!
+ * Also: By making this be the only TLS variable, we can further minimize
+ *       the number of relocations within the resulting libc.so! */
+INTDEF ATTR_THREAD struct pthread current;
 
-/* LIBC per-thread data instance. */
-INTDEF ATTR_THREAD struct libc_tls tls;
+#ifdef LIBC_ARCH_HAVE_LIBC_HANDLE
+INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(LIBCCALL libc_handle)(void);
+#else /* LIBC_ARCH_HAVE_LIBC_HANDLE */
+#define libc_handle() dlgethandle((void *)&libc_get_dltlsaddr2, DLGETHANDLE_FNORMAL)
+#endif /* !LIBC_ARCH_HAVE_LIBC_HANDLE */
 
-#endif /* __CC__ */
-#endif /* !__KERNEL__ */
+/* Return a pointer to `current', given a tls_segment
+ * pointer, as allocated by `dltlsallocseg()' */
+FORCELOCAL WUNUSED ATTR_PURE ATTR_RETNONNULL NONNULL((1))
+struct pthread *LIBCCALL current_from_tls(void *tls_segment) {
+	return (struct pthread *)dltlsaddr2(libc_handle(), tls_segment);
+}
+
 
 DECL_END
+#endif /* __CC__ */
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_LIBC_TLS_H */

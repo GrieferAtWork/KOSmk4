@@ -198,7 +198,7 @@ err_nolib:
 /* Destroy a given `pthread' `self' */
 LOCAL NONNULL((1)) void
 NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
-	free(self);
+	dltlsfreeseg(self->pt_tls);
 }
 
 
@@ -215,8 +215,6 @@ PRIVATE DEFINE_ATOMIC_RWLOCK(pthread_default_attr_lock);
  * `pthread_self' structure in case the thread was detached) */
 INTERN ATTR_SECTION(".text.crt.sched.pthread.pthread_onexit") void
 NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
-	void *tls;
-	tls = me->pt_tls;
 	if (ATOMIC_FETCHDEC(me->pt_refcnt) == 1) {
 		/* At some point, our thread got detached from its creator,
 		 * so it is left up to us to destroy() our own descriptor.
@@ -224,10 +222,16 @@ NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 		 * to write into our TID address field (since we're freeing
 		 * the associated structure right now). */
 		sys_set_tid_address(NULL);
+#if 1 /* Same as code below, but a bit smaller. */
+		/* Free our own TLS segment. */
+		dltlsfreeseg(RD_TLS_BASE_REGISTER());
+#else
+		/* Make sure that our TLS pointer was initialized. */
+		if (!me->pt_tls)
+			me->pt_tls = RD_TLS_BASE_REGISTER();
 		destroy(me);
+#endif
 	}
-	/* Free our thread's TLS segment. */
-	dltlsfreeseg(tls);
 }
 
 INTDEF ATTR_NORETURN void __FCALL
@@ -236,8 +240,8 @@ libc_pthread_unmap_stack_and_exit(void *stackaddr,
                                   int exitcode);
 
 /* Perform cleanup & terminate the current thread `me'. */
-INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_exit_thread") void
-NOTHROW(__FCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode) {
+PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_exit_thread") void
+NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode) {
 	if ((me->pt_flags & (PTHREAD_FUSERSTACK | PTHREAD_FNOSTACK)) == 0) {
 		/* Must unmap our own stack. */
 		void *stack_addr;
@@ -260,10 +264,8 @@ NOTHROW(__FCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode
 INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_main") void
 NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
                                    __pthread_start_routine_t start) {
+	/* NOTE: At this point, me == &current */
 	int exitcode = 0;
-	/* Set the TLS variable for `pthread_self' to `me' */
-	tls.t_pthread = me;
-	COMPILER_BARRIER();
 	/* Apply the initial affinity mask (if given) */
 	if (me->pt_cpuset) {
 		size_t cpuset_size;
@@ -312,15 +314,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
                                              pthread_attr_t const *__restrict attr,
                                              __pthread_start_routine_t start_routine,
                                              void *__restrict arg) {
+	void *tls;
 	pid_t cpid;
 	struct pthread *pt;
-	pt = (struct pthread *)malloc(sizeof(struct pthread));
-	if unlikely(!pt)
-		goto err_nomem;
 	/* Allocate the DL TLS segment */
-	pt->pt_tls = dltlsallocseg();
-	if unlikely(!pt->pt_tls)
-		goto err_nomem_pt;
+	tls = dltlsallocseg();
+	if unlikely(!tls)
+		goto err_nomem;
+	pt = current_from_tls(tls);
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 	/* Initialize the new thread's initial userprocmask structure,
 	 * such that it will lazily initialize it the first time it
@@ -334,6 +335,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	pt->pt_stackaddr = attr->pa_stackaddr;
 	pt->pt_stacksize = attr->pa_stacksize;
 	pt->pt_cpuset    = NULL;
+	pt->pt_tls       = tls;
 	/* Copy affinity cpuset information. */
 	if (attr->pa_cpuset) {
 		pt->pt_cpusetsize = attr->pa_cpusetsize;
@@ -342,7 +344,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		} else {
 			pt->pt_cpuset = (cpu_set_t *)malloc(pt->pt_cpusetsize);
 			if unlikely(!pt->pt_cpuset)
-				goto err_nomem_pt_tls;
+				goto err_nomem_tls;
 			memcpy(pt->pt_cpuset, attr->pa_cpuset, pt->pt_cpusetsize);
 		}
 	}
@@ -355,7 +357,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		                        MAP_PRIVATE | MAP_STACK | MAP_ANONYMOUS,
 		                        -1, 0);
 		if (pt->pt_stackaddr == MAP_FAILED)
-			goto err_nomem_pt_tls_cpuset;
+			goto err_nomem_tls_cpuset;
 	} else {
 		/* The thread uses a custom, user-provided stack. */
 		pt->pt_flags |= PTHREAD_FUSERSTACK;
@@ -364,21 +366,18 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	cpid = libc_pthread_clone(pt, start_routine);
 	if unlikely(E_ISERR(cpid)) {
 		/* The clone() system call failed. */
-		dltlsfreeseg(pt->pt_tls);
 		if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
 			free(pt->pt_cpuset);
-		free(pt);
+		dltlsfreeseg(pt->pt_tls);
 		return (errno_t)-cpid;
 	}
 	*newthread = pt;
 	return EOK;
-err_nomem_pt_tls_cpuset:
+err_nomem_tls_cpuset:
 	if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
 		free(pt->pt_cpuset);
-err_nomem_pt_tls:
+err_nomem_tls:
 	dltlsfreeseg(pt->pt_tls);
-err_nomem_pt:
-	free(pt);
 err_nomem:
 	return ENOMEM;
 }
@@ -426,17 +425,10 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_NORETURN void
 (LIBCCALL libc_pthread_exit)(void *retval) THROWS(...)
 /*[[[body:libc_pthread_exit]]]*/
 {
-	__REF struct pthread *me = tls.t_pthread;
-	if (me) {
-		me->pt_retval = retval;
-		/* Perform cleanup & terminate the current thread. */
-		pthread_exit_thread(me, 0);
-		__builtin_unreachable();
-	}
-	/* XXX: THROW(E_EXIT_THREAD)? */
-	/* Reminder: `sys_exit()' only terminates the calling thread.
-	 * To terminate the calling process, you'd have to call `sys_exit_group()'! */
-	sys_exit(0);
+	__REF struct pthread *me = &current;
+	me->pt_retval = retval;
+	/* Perform cleanup & terminate the current thread. */
+	pthread_exit_thread(me, 0);
 }
 /*[[[end:libc_pthread_exit]]]*/
 
@@ -475,7 +467,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t pthread,
 			destroy(pthread);
 		return EOK;
 	}
-	if unlikely(pthread == tls.t_pthread)
+	if unlikely(pthread == &current)
 		return EDEADLK;
 	return EBUSY;
 }
@@ -501,7 +493,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread,
 		tid = ATOMIC_READ(pthread->pt_tid);
 		if (tid == 0)
 			break;
-		if unlikely(pthread == tls.t_pthread)
+		if unlikely(pthread == &current)
 			return EDEADLK;
 		/* >> wait_while(pthread->pt_tid == tid) */
 		result = sys_futex((uint32_t *)&pthread->pt_tid,
@@ -542,7 +534,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthread,
 		tid = ATOMIC_READ(pthread->pt_tid);
 		if (tid == 0)
 			break;
-		if unlikely(pthread == tls.t_pthread)
+		if unlikely(pthread == &current)
 			return EDEADLK;
 		/* >> wait_while(pthread->pt_tid == tid) */
 		result = sys_lfutex((uint32_t *)&pthread->pt_tid,
@@ -608,53 +600,33 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 }
 /*[[[end:libc_pthread_detach]]]*/
 
-/*[[[head:libc_pthread_self,hash:CRC-32=0xe9554f99]]]*/
+/*[[[head:libc_pthread_self,hash:CRC-32=0x63cc93f4]]]*/
 /* Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST pthread_t
-NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
+NOTHROW(LIBCCALL libc_pthread_self)(void)
 /*[[[body:libc_pthread_self]]]*/
 {
 	struct pthread *result;
-	result = tls.t_pthread;
-	if unlikely(!result) {
-		/* TODO: Don't lazily allocate! - Lazy init is ok, but this function
-		 *       needs to be async-safe, since it's used by `sigprocmask()' */
-		result = (struct pthread *)malloc(sizeof(struct pthread));
-		if unlikely(!result) {
-			PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.pthread_self_error_message") char const
-				message[] = "[libc] Failed to allocate descriptor for pthread_self()\n";
-			syslog(LOG_ERR, message);
-			exit(EXIT_FAILURE);
-		}
-#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
-		/* Initialize the thread's initial userprocmask structure,
-		 * such that it will lazily initialize it the first time it
-		 * performs a call to `sigprocmask(2)'. */
-		memset(&result->pt_pmask, 0, offsetof(struct userprocmask, pm_pending));
-		result->pt_pmask.lpm_pmask.pm_sigsize = sizeof(sigset_t);
-/*		result->pt_pmask.lpm_pmask.pm_sigmask = NULL; */ /* Already done by the memset (NULL means not-yet-initialized) */
-#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
-		result->pt_tid       = sys_set_tid_address(&result->pt_tid);
-		result->pt_refcnt    = 1;
-		result->pt_retval    = NULL;
-		result->pt_tls       = RD_TLS_BASE_REGISTER();
-		result->pt_stackaddr = NULL;
-		result->pt_stacksize = 0;
-		result->pt_flags     = PTHREAD_FNOSTACK;
-		COMPILER_WRITE_BARRIER();
-		tls.t_pthread = result;
+	result = &current;
+	if unlikely(!result->pt_tid) {
+		/* Lazily initialize the thread descriptor's TID field.
+		 *
+		 * We get here if the calling thread was created by some API other
+		 * than pthread that still made proper use of dltlsallocseg(), or
+		 * if the caller is the program's main() thread. */
+		result->pt_tid = sys_set_tid_address(&result->pt_tid);
 	}
 	return result;
 }
 /*[[[end:libc_pthread_self]]]*/
 
-/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0xa88f585e]]]*/
+/*[[[head:libc_pthread_gettid_np,hash:CRC-32=0x6fd472b1]]]*/
 /* Return the TID of the given `target_thread'.
  * If the given `target_thread' has already terminated, 0 is returned
  * @return: * : The PID OF the given thread
  * @return: 0 : The given `target_thread' has already terminated */
-INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST WUNUSED pid_t
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_PURE WUNUSED pid_t
 NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread)
 /*[[[body:libc_pthread_gettid_np]]]*/
 {

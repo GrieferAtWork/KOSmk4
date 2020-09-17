@@ -728,13 +728,13 @@ $errno_t pthread_detach(pthread_t pthread);
 
 @@Obtain the identifier of the current thread
 @@@return: * : Handle for the calling thread
-[[ATTR_CONST, export_alias("thrd_current")]]
+[[const, nothrow, export_alias("thrd_current")]]
 pthread_t pthread_self();
 
 @@Compare two thread identifiers
 @@@return: 0 : Given threads are non-equal
 @@@return: * : Given threads are equal
-[[extern_inline, ATTR_CONST, export_alias("thrd_equal")]]
+[[extern_inline, const, nothrow, export_alias("thrd_equal")]]
 [[decl_include("<bits/crt/pthreadtypes.h>")]]
 int pthread_equal(pthread_t thr1, pthread_t thr2) {
 	return thr1 == thr2;
@@ -965,7 +965,7 @@ $errno_t pthread_setname_np(pthread_t target_thread,
 @@If the given `target_thread' has already terminated, 0 is returned
 @@@return: * : The PID OF the given thread
 @@@return: 0 : The given `target_thread' has already terminated
-[[guard, wunused, ATTR_CONST]]
+[[guard, wunused, pure]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $pid_t pthread_gettid_np(pthread_t target_thread);
 %#endif /* __USE_KOS */
@@ -2119,7 +2119,7 @@ $errno_t pthread_set_num_processors_np(int n) {
 @@calling program), and 0 otherwise. Additionally, -1 is returned
 @@if the calling thread "hasn't been initialized", though this
 @@isn't a case that can actually happen under KOS's implementation.
-[[ATTR_CONST, export_alias("thr_main")]]
+[[const, nothrow, export_alias("thr_main")]]
 [[requires_function(gettid, getpid)]]
 int pthread_main_np() {
 	return gettid() == getpid();

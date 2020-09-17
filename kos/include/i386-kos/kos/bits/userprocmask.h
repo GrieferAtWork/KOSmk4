@@ -66,6 +66,16 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 	                                     * will set its associated bit to 1 within this set. */
 };
 
+#ifdef __x86_64__
+#define USERPROCMASK_INIT(mytid, sigsize, sigmask, pending) \
+	{ mytid, 0, sigsize, sigmask, pending }
+#else /* __x86_64__ */
+#define USERPROCMASK_INIT(mytid, sigsize, sigmask, pending) \
+	{ mytid, 0, sigsize, 0, sigmask, 0, pending }
+#endif /* !__x86_64__ */
+
+
+
 
 __DECL_END
 #endif /* __CC__ */

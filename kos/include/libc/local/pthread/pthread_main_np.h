@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa958bc0e */
+/* HASH CRC-32:0x52d1e735 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,17 @@ __NAMESPACE_LOCAL_BEGIN
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
-__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getpid,(void),getpid,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),getpid,())
 #elif defined(__CRT_HAVE__getpid)
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
-__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getpid,(void),_getpid,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),_getpid,())
 #elif defined(__CRT_HAVE___getpid)
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
-__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getpid,(void),__getpid,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(void),__getpid,())
 #else /* ... */
 #undef __local___localdep_getpid_defined
 #endif /* !... */
@@ -51,7 +51,7 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_getpid,(void),__getp
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
-__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_gettid,(void),gettid,())
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(void),gettid,())
 #endif /* !__local___localdep_gettid_defined */
 /* Returns 1 if the calling thread is the main() thread (i.e. the
  * thread that was started by the kernel in order to execute the
@@ -59,7 +59,7 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__localdep_gettid,(void),gettid
  * if the calling thread "hasn't been initialized", though this
  * isn't a case that can actually happen under KOS's implementation. */
 __LOCAL_LIBC(pthread_main_np) __ATTR_CONST int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_main_np))(void) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pthread_main_np))(void) {
 	return __localdep_gettid() == __localdep_getpid();
 }
 __NAMESPACE_LOCAL_END

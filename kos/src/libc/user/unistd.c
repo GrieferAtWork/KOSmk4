@@ -60,6 +60,7 @@
 #include "../libc/dl.h"
 #include "../libc/globals.h"
 #include "../libc/tls.h"
+#include "pthread.h"
 #include "stdlib.h"
 #include "unistd.h"
 
@@ -102,12 +103,12 @@ NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path,
 }
 /*[[[end:libc_execve]]]*/
 
-/*[[[head:libc_getpid,hash:CRC-32=0xcec36af6]]]*/
+/*[[[head:libc_getpid,hash:CRC-32=0xf750987b]]]*/
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
-INTERN ATTR_SECTION(".text.crt.sched.process") WUNUSED pid_t
-NOTHROW_NCX(LIBCCALL libc_getpid)(void)
+INTERN ATTR_SECTION(".text.crt.sched.process") ATTR_CONST WUNUSED pid_t
+NOTHROW(LIBCCALL libc_getpid)(void)
 /*[[[body:libc_getpid]]]*/
 {
 	pid_t result = sys_getpid();
@@ -3497,29 +3498,19 @@ NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_pwriteall64]]]*/
 
-/*[[[head:libc_gettid,hash:CRC-32=0xccb67c13]]]*/
+/*[[[head:libc_gettid,hash:CRC-32=0x530df3fd]]]*/
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
-INTERN ATTR_SECTION(".text.crt.sched.thread") WUNUSED pid_t
-NOTHROW_NCX(LIBCCALL libc_gettid)(void)
+INTERN ATTR_SECTION(".text.crt.sched.thread") ATTR_CONST WUNUSED pid_t
+NOTHROW(LIBCCALL libc_gettid)(void)
 /*[[[body:libc_gettid]]]*/
 {
-#ifdef CONFIG_LIBC_HAVE_CACHED_TID
-	pid_t result;
-	/* Cache the TID as a thread-local variable */
-	result = tls.t_tid;
-	if (!result) {
-		result = sys_gettid();
-		if unlikely(E_ISERR(result))
-			return (pid_t)libc_seterrno(-result);
-		tls.t_tid = result;
-	}
-	return result;
-#else /* CONFIG_LIBC_HAVE_CACHED_TID */
-	pid_t result = sys_gettid();
-	return libc_seterrno_syserr(result);
-#endif /* !CONFIG_LIBC_HAVE_CACHED_TID */
+	struct pthread *me;
+	/* Use pthread_self(), since that one will already
+	 * do all of the lazy TID initialization for us! */
+	me = libc_pthread_self();
+	return _pthread_tid(me);
 }
 /*[[[end:libc_gettid]]]*/
 

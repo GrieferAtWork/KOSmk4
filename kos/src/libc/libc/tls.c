@@ -27,16 +27,40 @@
 #include <kos/except.h>
 #include <kos/types.h>
 
+#include <signal.h>
+
 #include "tls.h"
 
 DECL_BEGIN
 
 /* LIBC per-thread data instance. */
-INTERN ATTR_THREAD struct libc_tls tls = {
-	/* .t_errno_value = */ 0,
-	/* .t_errno_kind  = */ LIBC_ERRNO_KIND_KOS,
-	/* .t_pthread     = */ NULL,
-	/* .t_except      = */ {
+INTERN ATTR_THREAD struct pthread current = {
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+	/* .pt_pmask       = */ {
+		/* .lpm_pmask = */ USERPROCMASK_INIT(/* mytid:   */ 0,
+		                                     /* sigsize: */ sizeof(sigset_t),
+		                                     /* sigmask: */ NULL,
+		                                     /* pending: */ SIGSET_INIT_EMPTY),
+		/* .lpm_masks = */ {
+			/* [0] = */ SIGSET_INIT_EMPTY,
+			/* [1] = */ SIGSET_INIT_EMPTY
+		}
+	},
+#else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+	/* .pt_tid         = */ 0,
+#if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
+	/* .__pt_pad       = */ { 0, },
+#endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
+#endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
+	/* .pt_refcnt      = */ 2,
+	/* .pt_retval      = */ NULL,
+	/* .pt_tls         = */ NULL,
+	/* .pt_stackaddr   = */ NULL,
+	/* .pt_stacksize   = */ 0,
+	/* .pt_flags       = */ PTHREAD_FUSERSTACK | PTHREAD_FNOSTACK,
+	/* .pt_cpuset      = */ NULL,
+	/* .pt_cpusetsize  = */ 0,
+	/* .pt_except      = */ {
 		/* .ei_state = */ {},
 #if EXCEPT_BACKTRACE_SIZE != 0
 		/* .ei_trace = */ {},
@@ -46,9 +70,8 @@ INTERN ATTR_THREAD struct libc_tls tls = {
 			/* .ei_code = */ ERROR_CODEOF(E_OK)
 		}
 	},
-#ifdef CONFIG_LIBC_HAVE_CACHED_TID
-	/* .t_tid         = */ 0
-#endif /* CONFIG_LIBC_HAVE_CACHED_TID */
+	/* .pt_errno_kind  = */ LIBC_ERRNO_KIND_KOS,
+	/* .pt_errno_value = */ 0
 };
 
 

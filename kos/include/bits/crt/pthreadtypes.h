@@ -29,15 +29,16 @@
 #include <bits/crt/pthreadtypesizes.h>
 
 #undef __USE_PTHREAD_INTERNALS
-#if (defined(__BUILDING_LIBC) && defined(__KOS__)) || defined(_LIBC_SOURCE)
+#if defined(__KOS__) && (defined(__BUILDING_LIBC) || defined(_LIBC_SOURCE))
 #define __USE_PTHREAD_INTERNALS 1
-#endif /* (__BUILDING_LIBC && __KOS__) || _LIBC_SOURCE */
+#endif /* __KOS__ && (__BUILDING_LIBC || _LIBC_SOURCE) */
 
 #ifdef __USE_PTHREAD_INTERNALS
-#include <bits/sched_param.h> /* `struct sched_param' */
-#include <bits/types.h>       /* __pid_t, etc... */
-#include <kos/anno.h>         /* __WEAK */
-#include <asm/unistd.h>       /* __WEAK */
+#include <asm/unistd.h>              /* __NR_set_userprocmask_address */
+#include <bits/sched_param.h>        /* `struct sched_param' */
+#include <bits/types.h>              /* __pid_t, etc... */
+#include <kos/anno.h>                /* __WEAK */
+#include <kos/bits/exception_info.h> /* __WEAK */
 #undef __LIBC_CONFIG_HAVE_USERPROCMASK
 #ifdef __NR_set_userprocmask_address
 #define __LIBC_CONFIG_HAVE_USERPROCMASK 1
@@ -77,6 +78,12 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
 #define PTHREAD_FNOSTACK   0x0002 /* The thread's stack area is unknown (this is the case for
                                    * the main thread, and any thread created by `clone()'). */
 
+/* The different kinds of errno codes known to libc */
+#define LIBC_ERRNO_KIND_KOS 0 /* E* */
+#define LIBC_ERRNO_KIND_DOS 1 /* DOS_E* */
+#define LIBC_ERRNO_KIND_CYG 2 /* CYG_E* */
+#define LIBC_ERRNO_KIND_NT  3 /* NT error codes */
+
 #ifdef __CC__
 struct __cpu_set_struct;
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
@@ -89,24 +96,32 @@ struct libc_userprocmask {
 struct pthread {
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 #define _pthread_tid(self) (self)->pt_pmask.lpm_pmask.pm_mytid
-	struct libc_userprocmask pt_pmask;      /* User-space sigprocmask address */
+	struct libc_userprocmask pt_pmask;       /* User-space sigprocmask address */
 #else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 #define _pthread_tid(self) (self)->pt_tid
-	__pid_t                  pt_tid;        /* Thread TID (filled in by the kernel as the PTID and CTID)
-	                                         * Cleared to ZERO(0) (by the kernel) when the thread terminates.
-	                                         * s.a. `set_tid_address(2)' */
+	__pid_t                  pt_tid;         /* Thread TID (filled in by the kernel as the PTID and CTID)
+	                                          * Cleared to ZERO(0) (by the kernel) when the thread terminates.
+	                                          * s.a. `set_tid_address(2)' */
 #if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
 	__byte_t               __pt_pad[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
 #endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
-	__WEAK __uintptr_t       pt_refcnt;     /* Reference counter for this control structure. */
-	void                    *pt_retval;     /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit()') (also used as argument for `pt_start') */
-	void                    *pt_tls;        /* [const] TLS segment base address (allocated by `dltlsallocseg()', freed in `pthread_exit()') */
-	void                    *pt_stackaddr;  /* [const] Thread stack address */
-	__size_t                 pt_stacksize;  /* [const] Thread stack size */
-	__uintptr_t              pt_flags;      /* [const] Flags (Set of `PTHREAD_F*') */
-	struct __cpu_set_struct *pt_cpuset;     /* Initial affinity cpuset. */
-	__size_t                 pt_cpusetsize; /* Initial affinity cpuset size. */
+	__WEAK __uintptr_t       pt_refcnt;      /* Reference counter for this control structure.
+	                                          * When this hits ZERO, you must call `dltlsfreeseg(pt_tls)',
+	                                          * which will also delete our structure, since we're embedded
+	                                          * within the associated thread's TLS segment. */
+	void                    *pt_retval;      /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit()') (also used as argument for `pt_start') */
+	void                    *pt_tls;         /* [const] TLS segment base address (allocated by `dltlsallocseg()', freed in `pthread_exit()')
+	                                          *         (or NULL if not lazily initialized within the main() thread). */
+	void                    *pt_stackaddr;   /* [const] Thread stack address (or NULL if not lazily initialized within the main() thread) */
+	__size_t                 pt_stacksize;   /* [const] Thread stack size (or 0 if not lazily initialized within the main() thread) */
+	__uintptr_t              pt_flags;       /* [const] Flags (Set of `PTHREAD_F*') */
+	/* TODO: Get rid of the following 2 members. - They're only used during `libc_pthread_main()'! */
+	struct __cpu_set_struct *pt_cpuset;      /* [0..pt_cpusetsize] Initial affinity cpuset. */
+	__size_t                 pt_cpusetsize;  /* Initial affinity cpuset size. */
+	struct exception_info    pt_except;      /* Exception information */
+	unsigned int             pt_errno_kind;  /* Errno kind (one of `LIBC_ERRNO_KIND_*') */
+	__errno_t                pt_errno_value; /* Errno value */
 };
 typedef struct pthread *__pthread_t;
 #endif /* __CC__ */

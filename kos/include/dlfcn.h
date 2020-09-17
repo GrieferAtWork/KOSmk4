@@ -664,6 +664,14 @@ __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dltlsfree)(void *__tls_handle);
 #endif /* __CRT_HAVE_dltlsfree */
 
+#ifndef __DLFCN_DLTLSADDR_CC
+#define __DLFCN_DLTLSADDR_CC  __DLFCN_CC
+#endif /* !__DLFCN_DLTLSADDR_CC */
+#ifndef __DLFCN_DLTLSADDR2_CC
+#define __DLFCN_DLTLSADDR2_CC __DLFCN_CC
+#endif /* !__DLFCN_DLTLSADDR2_CC */
+
+
 /* Return the calling thread's base address of the TLS segment associated with `TLS_HANDLE'
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
  *       passed to `dltlsalloc()' will be called by this function upon the first use of
@@ -677,8 +685,22 @@ __NOTHROW_NCX(__DLFCN_CC dltlsfree)(void *__tls_handle);
  * @return: NULL: Invalid `TLS_HANDLE', or allocation/initialization failed. (s.a. `dlerror()') */
 #ifdef __CRT_HAVE_dltlsaddr
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
-__NOTHROW_NCX(__DLFCN_CC dltlsaddr)(void *__tls_handle);
+__NOTHROW_NCX(__DLFCN_DLTLSADDR_CC dltlsaddr)(void *__tls_handle);
 #endif /* __CRT_HAVE_dltlsaddr */
+
+/* Same as `dltlsaddr()', but used to lookup a TLS block relative to a given `TLS_SEGMENT',
+ * where the later was previously allocated using `dltlsallocseg()'. This function allows
+ * the caller to get a pointer to the TLS data of another thread, and is used to initialize
+ * the `pthread_self()' of a newly created thread from within `pthread_create()'.
+ * @return: * :   Pointer to the base of the TLS segment associated with `TLS_HANDLE'
+ *                within the given `TLS_SEGMENT'.
+ * @return: NULL: Invalid `TLS_HANDLE' or `TLS_SEGMENT', or
+ *                allocation/initialization failed. (s.a. `dlerror()') */
+#ifdef __CRT_HAVE_dltlsaddr2
+__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) void *
+__NOTHROW_NCX(__DLFCN_DLTLSADDR2_CC dltlsaddr2)(void *__tls_handle,
+                                                void *__tls_segment);
+#endif /* __CRT_HAVE_dltlsaddr2 */
 
 
 /* Perform an auxiliary control command about a given module `HANDLE'

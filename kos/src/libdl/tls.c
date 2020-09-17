@@ -283,7 +283,7 @@ INTERN void CC DlModule_RunAllTlsFinalizers(void) {
  * NOTE: The caller is responsible to store the returned segment to the appropriate TLS register.
  * @return: * :   Pointer to the newly allocated TLS segment.
  * @return: NULL: Error (s.a. dlerror()) */
-INTERN ATTR_MALLOC WUNUSED void *DLFCN_CC
+INTERN ATTR_MALLOC WUNUSED struct tls_segment *DLFCN_CC
 libdl_dltlsallocseg(void) {
 	struct tls_segment *result;
 	result = (struct tls_segment *)memalign(static_tls_align,
@@ -357,19 +357,17 @@ clear_extension_table(struct tls_segment *__restrict self) {
 
 /* Free a previously allocated static TLS segment (usually called by `pthread_exit()' and friends). */
 INTERN NONNULL((1)) int DLFCN_CC
-libdl_dltlsfreeseg(void *ptr) {
-	struct tls_segment *seg;
-	if unlikely(!ptr)
+libdl_dltlsfreeseg(struct tls_segment *seg) {
+	if unlikely(!DL_VERIFY_TLS_SEGMENT(seg))
 		goto err_badptr;
-	seg = (struct tls_segment *)ptr;
 	atomic_rwlock_write(&static_tls_lock);
 	LLIST_REMOVE(seg, ts_threads);
 	atomic_rwlock_endwrite(&static_tls_lock);
 	clear_extension_table(seg);
-	free((byte_t *)ptr - static_tls_size_no_segment);
+	free((byte_t *)seg - static_tls_size_no_segment);
 	return 0;
 err_badptr:
-	return dl_seterror_badptr(ptr);
+	return dl_seterror_badptr(seg);
 }
 
 
@@ -520,6 +518,7 @@ DEFINE_PUBLIC_ALIAS(dltlsfreeseg, libdl_dltlsfreeseg);
 DEFINE_PUBLIC_ALIAS(dltlsalloc, libdl_dltlsalloc);
 DEFINE_PUBLIC_ALIAS(dltlsfree, libdl_dltlsfree);
 DEFINE_PUBLIC_ALIAS(dltlsaddr, libdl_dltlsaddr);
+DEFINE_PUBLIC_ALIAS(dltlsaddr2, libdl_dltlsaddr2);
 
 
 /* Similar to `libdl_dltlsaddr()', but do no lazy allocation
@@ -539,6 +538,17 @@ DlModule_TryGetTLSAddr(DlModule *__restrict self) {
 	extab  = dtls_extension_tree_locate(tls->ts_extree, (uintptr_t)self);
 	result = extab ? extab->te_data : NULL;
 	atomic_rwlock_endread(&tls->ts_exlock);
+	return result;
+}
+
+
+
+INTERN WUNUSED NONNULL((1)) void *__DLFCN_DLTLSADDR_CC
+libdl_dltlsaddr(DlModule *self) {
+	void *result;
+	struct tls_segment *seg;
+	seg    = (struct tls_segment *)RD_TLS_BASE_REGISTER();
+	result = libdl_dltlsaddr2(self, seg);
 	return result;
 }
 

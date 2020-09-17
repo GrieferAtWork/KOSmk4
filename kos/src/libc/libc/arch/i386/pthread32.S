@@ -34,6 +34,30 @@
 #include <sched.h>
 
 
+.section .text.crt.sched.pthread.libc_handle
+INTERN_FUNCTION(libc_handle)
+	.cfi_startproc
+	/* Hacky code to quickly get a DL handle for libc itself. */
+	call   1f
+	.cfi_adjust_cfa_offset 4
+1:	popl_cfi %eax
+	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %eax
+
+	/* The `current@tlsgd' symbol points to a `tls_index' structure,
+	 * which consists of 8 bytes total, where the first 4 are filled
+	 * with a module handle pointer by libdl.
+	 * Note that this is a KOS-specific implementation detail. As far
+	 * as the standard is concerned, libdl is allowed to make up some
+	 * arbitrary module index for those 4 bytes, however KOS's libdl
+	 * simply re-uses the regular module handle for this purpose,
+	 * meaning that we can simply (ab-)use that fact to quickly get a
+	 * handle for libc itself. */
+	INTERN(current)
+	movl   current@tlsgd(,%eax,1), %eax
+	ret
+	.cfi_endproc
+END(libc_handle)
+
 
 /* Assembly-side for the process of cloning a thread.
  * This function simply clones the calling thread before invoking
