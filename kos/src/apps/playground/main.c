@@ -799,6 +799,49 @@ int main_vfork(int argc, char *argv[], char *envp[]) {
 
 
 
+/************************************************************************/
+PRIVATE sigset_t const full_sigset = SIGSET_INIT_FULL;
+PRIVATE void *sigbound_theradmain(void *) {
+	/* Block _all_ signals.
+	 * The implementation function will also ensure
+	 * that we're using the userprocmask mechanism. */
+	setsigmaskptr((sigset_t *)&full_sigset);
+	for (;;) {
+		printf("sigbound_theradmain(): %d\n", gettid());
+		pause();
+	}
+	return NULL;
+}
+
+int main_sigbounce(int argc, char *argv[], char *envp[]) {
+	(void)argc, (void)argv, (void)envp;
+	pthread_t pt;
+
+	/* Block _all_ signals.
+	 * The implementation function will also ensure
+	 * that we're using the userprocmask mechanism. */
+	setsigmaskptr((sigset_t *)&full_sigset);
+
+	/* Create an additional thread, thus bumping our process's total
+	 * thread count up to 2, which is needed to get the two threads
+	 * between which the signal will end up bouncing. */
+	pthread_create(&pt, NULL, &sigbound_theradmain, NULL);
+
+	/* A test program to trigger the problem detailed in `sigmask_ismasked_in()'
+	 * To trigger the problem, press CTRL+C after running `playground sigbounce'
+	 *
+	 * At that point, the kernel will send a signal to our process, which will
+	 * then keep on bouncing between thread. THIS IS NOT INTENDED!
+	 *
+	 * This test program is only here to consistently trigger the problem! */
+	while (getchar() != '\n')
+		;
+	return 0;
+}
+/************************************************************************/
+
+
+
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -831,6 +874,7 @@ PRIVATE DEF defs[] = {
 	{ "fault", &main_fault },
 	{ "leak", &main_leak },
 	{ "vfork", &main_vfork },
+	{ "sigbounce", &main_sigbounce },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall

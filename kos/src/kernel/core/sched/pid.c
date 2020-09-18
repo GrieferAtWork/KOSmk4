@@ -209,7 +209,7 @@ NOTHROW(KCALL task_send_sigcld_to_parent_process)(struct task *__restrict parent
 	sig_altbroadcast(&FORTASK(parent, this_taskgroup).tg_proc_threads_change,
 	                 (struct sig *)origin_pid);
 	/* TODO: Send a `SIGCLD' to `parent' */
-	/*task_raisesignalprocess_nx(parent, SIGCLD, GFP_ATOMIC);*/
+	/*task_raisesignalprocess(parent, SIGCLD, GFP_ATOMIC);*/
 	(void)parent;
 	(void)origin;
 	(void)origin_pid;

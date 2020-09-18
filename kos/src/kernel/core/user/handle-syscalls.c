@@ -1856,24 +1856,24 @@ again:
 #ifdef WANT_SYS_POLLSELECT_SIGSET
 /* POLL/SELECT Helper functions */
 PRIVATE void KCALL
-atomic_sigmask_begin(struct kernel_sigmask *__restrict mymask,
+atomic_sigmask_begin(USER CHECKED sigset_t *mymask,
                      sigset_t *__restrict oldmask,
                      USER CHECKED sigset_t const *newmask) {
-	memcpy(oldmask, &mymask->sm_mask, sizeof(sigset_t));
+	memcpy(oldmask, mymask, sizeof(sigset_t));
 	TRY {
-		memcpy(&mymask->sm_mask, &newmask, sizeof(sigset_t));
-		if unlikely(sigismember(&mymask->sm_mask, SIGKILL) ||
-		            sigismember(&mymask->sm_mask, SIGSTOP)) {
-			sigdelset(&mymask->sm_mask, SIGKILL);
-			sigdelset(&mymask->sm_mask, SIGSTOP);
+		memcpy(mymask, &newmask, sizeof(sigset_t));
+		if unlikely(sigismember(mymask, SIGKILL) ||
+		            sigismember(mymask, SIGSTOP)) {
+			sigdelset(mymask, SIGKILL);
+			sigdelset(mymask, SIGSTOP);
 			COMPILER_BARRIER();
 			sigmask_check();
 		}
 	} EXCEPT {
 		bool mandatory_were_masked;
-		mandatory_were_masked = sigismember(&mymask->sm_mask, SIGKILL) ||
-		                        sigismember(&mymask->sm_mask, SIGSTOP);
-		memcpy(&mymask->sm_mask, oldmask, sizeof(sigset_t));
+		mandatory_were_masked = sigismember(mymask, SIGKILL) ||
+		                        sigismember(mymask, SIGSTOP);
+		memcpy(mymask, oldmask, sizeof(sigset_t));
 		if (mandatory_were_masked)
 			sigmask_check_after_except();
 		RETHROW();
@@ -1881,17 +1881,17 @@ atomic_sigmask_begin(struct kernel_sigmask *__restrict mymask,
 }
 
 PRIVATE void KCALL
-atomic_sigmask_except(struct kernel_sigmask *__restrict mymask,
+atomic_sigmask_except(USER CHECKED sigset_t *mymask,
                       sigset_t const *__restrict oldmask) {
-	memcpy(&mymask->sm_mask, oldmask, sizeof(sigset_t));
+	memcpy(mymask, oldmask, sizeof(sigset_t));
 	sigmask_check_after_except();
 }
 
 PRIVATE void KCALL
-atomic_sigmask_return(struct kernel_sigmask *__restrict mymask,
+atomic_sigmask_return(USER CHECKED sigset_t *mymask,
                       sigset_t const *__restrict oldmask,
                       syscall_ulong_t syscall_result) {
-	memcpy(&mymask->sm_mask, oldmask, sizeof(sigset_t));
+	memcpy(mymask, oldmask, sizeof(sigset_t));
 	sigmask_check_after_syscall(syscall_result);
 }
 #endif /* WANT_SYS_POLLSELECT_SIGSET */
@@ -1905,7 +1905,7 @@ do_ppoll(USER CHECKED struct pollfd *fds,
 	size_t result;
 	if (sigmask) {
 		sigset_t oldmask;
-		struct kernel_sigmask *mymask;
+		USER CHECKED sigset_t *mymask;
 		mymask = sigmask_getwr();
 		atomic_sigmask_begin(mymask, &oldmask, sigmask);
 		TRY {
@@ -1933,7 +1933,7 @@ do_pselect(size_t nfds,
 	size_t result;
 	if (sigmask) {
 		sigset_t oldmask;
-		struct kernel_sigmask *mymask;
+		USER CHECKED sigset_t *mymask;
 		mymask = sigmask_getwr();
 		atomic_sigmask_begin(mymask, &oldmask, sigmask);
 		TRY {

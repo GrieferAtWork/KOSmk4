@@ -206,17 +206,17 @@ again:
 		validate_readable_opt(sc_info, sizeof(*sc_info));
 		/* Restore the given signal mask. */
 		if (restore_sigmask) {
-			struct kernel_sigmask *sigmask;
+			USER CHECKED sigset_t *mymask;
 			COMPILER_READ_BARRIER();
-			sigmask = sigmask_getwr();
-			memcpy(&sigmask->sm_mask, restore_sigmask, sizeof(sigmask->sm_mask));
+			mymask = sigmask_getwr();
+			memcpy(mymask, restore_sigmask, sizeof(sigset_t));
 			COMPILER_WRITE_BARRIER();
 			/* Make sure that mandatory signals always remain unmasked.
 			 * In case we just escaped an RPC attempt by another thread sending
 			 * either one of these signals, not to worry, as code below will always
 			 * check for `sigmask_check_s()' when `restore_sigmask' is non-NULL. */
-			sigdelset(&sigmask->sm_mask, SIGKILL);
-			sigdelset(&sigmask->sm_mask, SIGSTOP);
+			sigdelset(mymask, SIGKILL);
+			sigdelset(mymask, SIGSTOP);
 		}
 		/* Restore the FPU context */
 		if (restore_fpu)
@@ -412,17 +412,17 @@ again:
 		validate_readable_opt(sc_info, sizeof(*sc_info));
 		/* Restore the given signal mask. */
 		if (restore_sigmask) {
-			struct kernel_sigmask *sigmask;
+			USER CHECKED sigset_t *sigmask;
 			COMPILER_READ_BARRIER();
 			sigmask = sigmask_getwr();
-			memcpy(&sigmask->sm_mask, restore_sigmask, sizeof(sigmask->sm_mask));
+			memcpy(sigmask, restore_sigmask, sizeof(sigset_t));
 			COMPILER_WRITE_BARRIER();
 			/* Make sure that mandatory signals always remain unmasked.
 			 * In case we just escaped an RPC attempt by another thread sending
 			 * either one of these signals, not to worry, as code below will always
 			 * check for `sigmask_check_s()' when `restore_sigmask' is non-NULL. */
-			sigdelset(&sigmask->sm_mask, SIGKILL);
-			sigdelset(&sigmask->sm_mask, SIGSTOP);
+			sigdelset(sigmask, SIGKILL);
+			sigdelset(sigmask, SIGSTOP);
 		}
 		/* Restore the FPU context */
 		if (restore_fpu)

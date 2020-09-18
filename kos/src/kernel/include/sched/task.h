@@ -27,6 +27,7 @@
 #include <sched/pertask.h>
 
 #include <hybrid/sequence/list.h>
+#include <hybrid/typecore.h>
 
 #ifdef __cplusplus
 #include <asm/wait.h> /* `__W_EXITCODE()' */
@@ -56,32 +57,51 @@ DECL_BEGIN
  * Note that any code is allowed to assume that these mappings between thread flags,
  * and scheduler association always hold true. - As a matter of fact: These relations
  * are asserted by `cpu_assert_integrity()' */
-#define TASK_FNORMAL      0x0000 /* Normal task flags. */
-#define TASK_FKEEPCORE    0x0001 /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
-#define TASK_FKERNTHREAD  0x0002 /* [const] The thread is running exclusively in kernel-space, and can never return to user-space. */
-#define TASK_FVFORK       0x0004 /* [lock(CLEAR_ONCE(THIS_TASK))] This is a child-after-vfork() thread.
-                                  * When set, this causes exec() to create a new VM, rather than clear
-                                  * an existing one, alongside both exec() and task_exit() causing the
-                                  * thread to broadcast `THIS_TASKPID->tp_changed' after clearing this
-                                  * flag following a successful exec(), or a call to task_exit() */
-#define TASK_FTERMINATING 0x0010 /* [lock(WRITE_ONCE)] The task has started the process of being terminated.
-                                  *                  - No further synchronous RPCs may be scheduled for execution
-                                  *                  - Implies `TASK_FKEEPCORE' (the task may no longer change its hosting CPU) */
-#define TASK_FTERMINATED  0x0020 /* [lock(WRITE_ONCE)] The task has been fully terminated.
-                                  *                  - No further RPCs of any kind may be scheduled for execution
-                                  *                  - The thread must no longer appear in the CURRENT/SLEEPING or PENDING chain of any CPU. */
-#define TASK_FWAKING      0x0040 /* [lock(WAKE_OWNER)] The task is currently being re-awoken (may not be set once `TASK_FTERMINATING' has been set). */
-#define TASK_FRUNNING     0x0080 /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
+#define TASK_FNORMAL       __UINT32_C(0x00000000) /* Normal task flags. */
+#define TASK_FKEEPCORE     __UINT32_C(0x00000001) /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
+#define TASK_FKERNTHREAD   __UINT32_C(0x00000002) /* [const] The thread is running exclusively in kernel-space, and can never return to user-space. */
+/*      TASK_F             __UINT32_C(0x00000004)  * ... */
+/*      TASK_F             __UINT32_C(0x00000008)  * ... */
+#define TASK_FTERMINATING  __UINT32_C(0x00000010) /* [lock(WRITE_ONCE)] The task has started the process of being terminated.
+                                                   *                  - No further synchronous RPCs may be scheduled for execution
+                                                   *                  - Implies `TASK_FKEEPCORE' (the task may no longer change its hosting CPU) */
+#define TASK_FTERMINATED   __UINT32_C(0x00000020) /* [lock(WRITE_ONCE)] The task has been fully terminated.
+                                                   *                  - No further RPCs of any kind may be scheduled for execution
+                                                   *                  - The thread must no longer appear in the CURRENT/SLEEPING or PENDING chain of any CPU. */
+#define TASK_FWAKING       __UINT32_C(0x00000040) /* [lock(WAKE_OWNER)] The task is currently being re-awoken (may not be set once `TASK_FTERMINATING' has been set). */
+#define TASK_FRUNNING      __UINT32_C(0x00000080) /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
 #ifndef CONFIG_NO_SMP
-#define TASK_FPENDING     0x0100 /* [lock(WRITE_ONCE(OLD_CPU_OR_CREATOR),CLEAR(THIS_CPU))]
-                                  * The task is currently pending execution on its associated CPU. */
+#define TASK_FPENDING      __UINT32_C(0x00000100) /* [lock(WRITE_ONCE(OLD_CPU_OR_CREATOR),CLEAR(THIS_CPU))]
+                                                   * The task is currently pending execution on its associated CPU. */
 #endif /* !CONFIG_NO_SMP */
-#define TASK_FSTARTING    0x0400 /* [lock(WRITE_ONCE)] The thread is currently starting. */
-#define TASK_FSTARTED     0x0800 /* [lock(WRITE_ONCE)] The thread has been started. */
-#define TASK_FCRITICAL    0x1000 /* The thread is critical, and any attempting to task_exit() it causes kernel panic. */
-#define TASK_FGDB_STOPPED 0x2000 /* Used internally by the gdbserver driver */
-#define TASK_FSUSPENDED   0x4000 /* Used internally to implement of SIGSTOP/SIGCONT */
-#define TASK_FTIMEOUT     0x8000 /* Set by the scheduler when waking a task due to a timeout. */
+/*      TASK_F             __UINT32_C(0x00000200)  * ... */
+#define TASK_FSTARTING     __UINT32_C(0x00000400) /* [lock(WRITE_ONCE)] The thread is currently starting. */
+#define TASK_FSTARTED      __UINT32_C(0x00000800) /* [lock(WRITE_ONCE)] The thread has been started. */
+/*      TASK_F             __UINT32_C(0x00001000)  * ... */
+/*      TASK_F             __UINT32_C(0x00002000)  * ... */
+/*      TASK_F             __UINT32_C(0x00004000)  * ... */
+/*      TASK_F             __UINT32_C(0x00008000)  * ... */
+#define TASK_FVFORK        __UINT32_C(0x00010000) /* [lock(CLEAR_ONCE(THIS_TASK))] This is a child-after-vfork() thread.
+                                                   * When set, this causes exec() to create a new VM, rather than clear
+                                                   * an existing one, alongside both exec() and task_exit() causing the
+                                                   * thread to broadcast `THIS_TASKPID->tp_changed' after clearing this
+                                                   * flag following a successful exec(), or a call to task_exit() */
+#define TASK_FUSERPROCMASK __UINT32_C(0x00020000) /* [lock(READ(ATOMIC), WRITE(THIS_TASK))] Task has a `userprocmask'. (s.a. `this_userprocmask_address') */
+#define TASK_FUSERPROCMASK_AFTER_VFORK \
+                           __UINT32_C(0x00040000) /* [lock(PRIVATE(THIS_TASK))] `TASK_FUSERPROCMASK' was set after `TASK_FVFORK'. (s.a. `this_userprocmask_address') */
+/*      TASK_F             __UINT32_C(0x00080000)  * ... */
+/*      TASK_F             __UINT32_C(0x00100000)  * ... */
+/*      TASK_F             __UINT32_C(0x00200000)  * ... */
+/*      TASK_F             __UINT32_C(0x00400000)  * ... */
+/*      TASK_F             __UINT32_C(0x00800000)  * ... */
+/*      TASK_F             __UINT32_C(0x01000000)  * ... */
+/*      TASK_F             __UINT32_C(0x02000000)  * ... */
+/*      TASK_F             __UINT32_C(0x04000000)  * ... */
+/*      TASK_F             __UINT32_C(0x08000000)  * ... */
+#define TASK_FCRITICAL     __UINT32_C(0x10000000) /* The thread is critical, and any attempting to task_exit() it causes kernel panic. */
+#define TASK_FGDB_STOPPED  __UINT32_C(0x20000000) /* Used internally by the gdbserver driver */
+#define TASK_FSUSPENDED    __UINT32_C(0x40000000) /* Used internally to implement of SIGSTOP/SIGCONT */
+#define TASK_FTIMEOUT      __UINT32_C(0x80000000) /* [lock(CLEAR(THIS_TASK))] Set by the scheduler when waking a task due to a timeout. */
 
 
 #define OFFSET_TASK_SELF         0

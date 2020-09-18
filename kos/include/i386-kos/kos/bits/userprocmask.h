@@ -48,14 +48,14 @@ struct userprocmask /*[PREFIX(pm_)]*/ {
 	__UINT32_TYPE__        _pm_pad0;    /* ... */
 #ifdef __x86_64__
 	__UINT64_TYPE__         pm_sigsize; /* [const] == sizeof(sigset_t) */
-	struct __sigset_struct *pm_sigmask; /* [KERNEL:READ|WRITE(1), USER:WRITE][0..1] Pointer to the current signal mask
+	struct __sigset_struct *pm_sigmask; /* [KERNEL:READ|WRITE(1), USER:WRITE][1..1] Pointer to the current signal mask
 	                                     * The kernel may or' this with another mask when a signal handler is invoked
 	                                     * that contains a non-empty `sa_mask'.
 	                                     * Set to `NULL' to indicate that `sys_set_userprocmask_address(2)' wasn't called, yet. */
 #else /* __x86_64__ */
 	__UINT32_TYPE__         pm_sigsize; /* [const] == sizeof(sigset_t) */
 	__UINT32_TYPE__        _pm_pad1;    /* ... */
-	struct __sigset_struct *pm_sigmask; /* [KERNEL:READ|WRITE(1), USER:WRITE][0..1] Pointer to the current signal mask
+	struct __sigset_struct *pm_sigmask; /* [KERNEL:READ|WRITE(1), USER:WRITE][1..1] Pointer to the current signal mask
 	                                     * The kernel may or' this with another mask when a signal handler is invoked
 	                                     * that contains a non-empty `sa_mask'.
 	                                     * Set to `NULL' to indicate that `sys_set_userprocmask_address(2)' wasn't called, yet. */

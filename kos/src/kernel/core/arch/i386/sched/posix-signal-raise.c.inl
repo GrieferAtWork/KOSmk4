@@ -104,27 +104,19 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	/* Figure out how, and if we need to mask signals. */
 	must_restore_sigmask = false;
 	if (action->sa_mask || !(action->sa_flags & SIGACTION_SA_NODEFER)) {
-		struct kernel_sigmask *sigmask;
+		USER CHECKED sigset_t *sigmask;
 		sigmask = sigmask_getwr();
-		memcpy(&old_sigmask,
-		       &sigmask->sm_mask,
-		       sizeof(old_sigmask));
+		memcpy(&old_sigmask, sigmask, sizeof(sigset_t));
 		if (!(action->sa_flags & SIGACTION_SA_NODEFER))
-			sigaddset(&sigmask->sm_mask, (int)signo);
-		if (action->sa_mask) {
-			sigorset(&sigmask->sm_mask,
-			         &sigmask->sm_mask,
-			         &action->sa_mask->sm_mask);
-		}
-		must_restore_sigmask = memcmp(&old_sigmask,
-		                              &sigmask->sm_mask,
-		                              sizeof(old_sigmask)) != 0;
+			sigaddset(sigmask, (int)signo);
+		if (action->sa_mask)
+			sigorset(sigmask, sigmask, &action->sa_mask->sm_mask);
+		must_restore_sigmask = memcmp(&old_sigmask, sigmask,
+		                              sizeof(sigset_t)) != 0;
 	} else {
-		struct kernel_sigmask *sigmask;
+		USER CHECKED sigset_t *sigmask;
 		sigmask = sigmask_getrd();
-		memcpy(&old_sigmask,
-		       &sigmask->sm_mask,
-		       sizeof(old_sigmask));
+		memcpy(&old_sigmask, sigmask, sizeof(sigset_t));
 	}
 
 	/* Figure out which stack we should write data to. */

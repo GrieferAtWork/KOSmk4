@@ -36,6 +36,7 @@
 #include <misc/atomic-ref.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
+#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
@@ -184,17 +185,100 @@ PUBLIC ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask)
 this_sigmask = ATOMIC_REF_INIT(&kernel_sigmask_empty);
 
 
-/* Check if the given `signo' is currently masked by `self'. */
-PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self,
-                                     signo_t signo) {
+PRIVATE ATTR_PURE WUNUSED bool FCALL
+usersigmask_ismasked_chk(signo_t signo) {
+	ulongptr_t mask, word;
+	USER CHECKED struct userprocmask *umask;
+	USER UNCHECKED sigset_t *usigset;
+
+	/* Load the address of the userprocmask descriptor. */
+	umask = PERTASK_GET(this_userprocmask_address);
+	assert(umask && ADDR_ISUSER(umask));
+
+	/* Mark the signal as pending for this thread. */
+	word = __sigset_word(signo);
+	mask = __sigset_mask(signo);
+	if ((ATOMIC_READ(umask->pm_pending.__val[word]) & mask) == 0) {
+		if ((ATOMIC_FETCHOR(umask->pm_pending.__val[word], mask) & mask) == 0) {
+			printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending\n",
+			       umask, signo);
+		}
+	}
+
+	/* First user-space memory access: read our current signal mask. */
+	usigset = ATOMIC_READ(umask->pm_sigmask);
+
+	/* Make sure that the user-space pointer is valid. */
+	validate_readable(usigset, sizeof(sigset_t));
+
+	/* Check if `signo' is a member.
+	 * NOTE: This call contains the second user-space memory access! */
+	return sigismember(usigset, signo);
+}
+
+
+/* Check if the given `signo' is currently masked by `self'.
+ * If `self' has the `TASK_FUSERPROCMASK' flag set, assume that all signals
+ * are unmasked, unless `self' _is_ the calling thread, in which case check
+ * for sure if they're unmasked. */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool FCALL
+sigmask_ismasked_in(struct task *__restrict self,
+                    signo_t signo) {
 	bool result;
 	REF struct kernel_sigmask *sm;
-	if unlikely(self->t_flags & TASK_FVFORK) {
+	uintptr_t thread_flags = ATOMIC_READ(self->t_flags);
+	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK)) {
 		/* Always behave as though this was `kernel_sigmask_full'. */
 		if (signo == SIGKILL || signo == SIGSTOP)
 			return false; /* Cannot be masked. */
-		return true;
+		/* A vfork'd thread always has all signals masked. */
+		if unlikely(thread_flags & TASK_FVFORK)
+			return true;
+		/* Special handling for when `self' is the caller. */
+		if (self == THIS_TASK)
+			return usersigmask_ismasked_chk(signo);
+		/* TODO: USERPROCMASK currently has a soft-lock scenario, where a
+		 *       signal sent to a process containing at least 2 threads,
+		 *       with the first (in terms of checking-order when determining
+		 *       who should receive a posix signal send to the process as a
+		 *       whole) 2 of those threads both using userprocmask.
+		 *
+		 *  [tid=1]: fork()  -> tid=2
+		 *
+		 *  [tid=2]: set_userprocmask_address(UM1)
+		 *  [tid=2]: sigdelset(UM1->pm_sigmask, SIGUSR1)
+		 *  [tid=2]: clone() -> tid=3
+		 *
+		 *  [tid=3]: set_userprocmask_address(UM2)
+		 *  [tid=3]: sigdelset(UM2->pm_sigmask, SIGUSR1)
+		 *
+		 *  [tid=1]: kill(-2, SIGUSR1)
+		 *
+		 * That last kill() call will get here, and notice that [tid=2]
+		 * uses USERPROCMASK, but isn't equal to the sender, so the sender
+		 * can't determine if the target thread is masking the signal.
+		 *
+		 * As such, it will assume that [tid=2] isn't masking it, and send
+		 * an RPC `task_process_signal_rpc_handler' to that thread.
+		 *
+		 * That RPC will then be able to confirm if the signal is masked
+		 * for sure, at which point it will notice that the signal is
+		 * masked, and try to forward the signal to some other thread in its
+		 * current process, using `deliver_signal_to_some_thread_in_process()'
+		 *
+		 * At that point, `deliver_signal_to_some_thread_in_process()' will
+		 * once again check if [tid=2] is masking the signal, but can confirm
+		 * that it is since at that point THIS_TASK==[tid=2], so it will send
+		 * the signal to [tid=3]
+		 *
+		 * In [tid=3], the same will happen, but now the signal will get
+		 * forwarded back to [tid=2], forming a soft-lock of 2 threads sending
+		 * each other RPC for all of eternity.
+		 *
+		 * This problem can be reproduced via `playground sigbounce'
+		 */
+
+		return false;
 	}
 	sm     = FORTASK(self, this_sigmask).get();
 	result = sigismember(&sm->sm_mask, signo);
@@ -202,19 +286,50 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self,
 	return result;
 }
 
-/* Same as `sigmask_ismasked_in()', but for the calling thread. */
-PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
+/* Same as `sigmask_ismasked_in()', but for the calling thread.
+ * This function doesn't perform any special checks for VFORK
+ * or USERPROCMASK scenarios. Use `sigmask_ismasked_chk()' if
+ * these situations must also be handled. */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL sigmask_ismasked)(signo_t signo) {
 	bool result;
 	struct kernel_sigmask *sm;
-	if unlikely(PERTASK_GET(this_task.t_flags) & TASK_FVFORK) {
+	sm     = sigmask_kernel_getrd();
+	result = sigismember(&sm->sm_mask, signo);
+	return result;
+}
+
+/* Same as `sigmask_ismasked()', but also handle VFORK and
+ * USERPROCMASK scenarios. As such, this function may access
+ * user-space memory, which can include VIO memory!
+ * NOTE: If the thread uses USERPROCMASK, this function will also mark the
+ *       given `signo' as pending within `this_userprocmask_address->pm_pending' */
+PRIVATE ATTR_PURE WUNUSED bool FCALL
+sigmask_ismasked_chk(signo_t signo) {
+	bool result;
+	uintptr_t thread_flags;
+	thread_flags = PERTASK_GET(this_task.t_flags);
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK))
+#else /* CONFIG_HAVE_USERPROCMASK */
+	if (thread_flags & TASK_FVFORK)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	{
 		/* Always behave as though this was `kernel_sigmask_full'. */
 		if (signo == SIGKILL || signo == SIGSTOP)
 			return false; /* Cannot be masked. */
+		/* A vfork'd thread always has all signals masked. */
+#ifndef CONFIG_HAVE_USERPROCMASK
 		return true;
+#else /* !CONFIG_HAVE_USERPROCMASK */
+		if unlikely(thread_flags & TASK_FVFORK)
+			return true;
+		/* The nitty-gritty case: The thread is using a userprocmask... */
+		result = usersigmask_ismasked_chk(signo);
+		return result;
+#endif /* CONFIG_HAVE_USERPROCMASK */
 	}
-	sm     = sigmask_getrd();
-	result = sigismember(&sm->sm_mask, signo);
+	result = sigmask_ismasked(signo);
 	return result;
 }
 
@@ -229,16 +344,79 @@ DEFINE_PERTASK_CLONE(clone_posix_signals);
 PRIVATE ATTR_USED void KCALL
 clone_posix_signals(struct task *__restrict new_thread, uintptr_t flags) {
 	/* Clone the current signal mask. */
-	if (sigmask_getrd() == &kernel_sigmask_empty) {
-		/* Nothing to do here! */
-	} else {
-		REF struct kernel_sigmask *mask;
-		mask = PERTASK(this_sigmask).get();
-		assert(mask != &kernel_sigmask_empty);
-		ATOMIC_FETCHINC(mask->sm_share);
-		COMPILER_WRITE_BARRIER();
-		FORTASK(new_thread, this_sigmask).m_pointer = mask; /* Inherit reference. */
-		COMPILER_WRITE_BARRIER();
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+		struct userprocmask *um;
+		um = PERTASK_GET(this_userprocmask_address);
+		if (!(flags & CLONE_VM)) {
+			/* Special case:
+			 * ```
+			 *  During a call to fork() or clone() (w/o CLONE_VM), the parent thread's
+			 *  TASK_FUSERPROCMASK attribute is inherited unconditionally.
+			 * ```
+			 */
+inherit_parent_userprocmask:
+			FORTASK(new_thread, this_userprocmask_address) = um;
+			new_thread->t_flags |= TASK_FUSERPROCMASK;
+			/* The static initialization for the kernel-space `this_sigmask' is sufficient in this case! */
+			/*FORTASK(new_thread, this_sigmask) = ATOMIC_REF_INIT(&kernel_sigmask_empty);*/
+		} else if (flags & CLONE_VFORK) {
+			/* Special case:
+			 * ```
+			 *  During a vfork(2), where the parent thread has the TASK_FUSERPROCMASK
+			 *  attribute set [...]
+			 *  The child thread is started with the `TASK_FUSERPROCMASK' attribute set,
+			 *  which will be cleared the normal way once the child performs a successful call
+			 *  to either exec(2) or _Exit(2), at which pointer the process will once again
+			 *  wake up.
+			 * ```
+			 */
+			goto inherit_parent_userprocmask;
+		} else {
+			/* Special case:
+			 * ```
+			 *  During a call to clone(CLONE_VM), where the parent is a userprocmask thread,
+			 *  prior to clone() returning in either the parent or child, the parent thread's
+			 *  user-space `pm_sigmask' is copied into the kernel-space buffer of the child
+			 *  thread, while the child thread will start with TASK_FUSERPROCMASK=0.
+			 * ```
+			 *
+			 * In other words: We must copy `um->pm_sigmask' into `FORTASK(new_thread, this_sigmask)'
+			 */
+			struct kernel_sigmask *new_thread_mask;
+			new_thread_mask = (struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
+			                                                   GFP_NORMAL);
+			TRY {
+				USER UNCHECKED sigset_t *parent_umask;
+				parent_umask = ATOMIC_READ(um->pm_sigmask);
+				validate_readable(parent_umask, sizeof(sigset_t));
+				memcpy(&new_thread_mask->sm_mask,
+				       parent_umask,
+				       sizeof(sigset_t));
+			} EXCEPT {
+				kfree(new_thread_mask);
+				RETHROW();
+			}
+			new_thread_mask->sm_refcnt = 1;
+			new_thread_mask->sm_share  = 1;
+			/* Initialize the new thread's signal mask with
+			 * the copy of the parent's current userprocmask. */
+			atomic_ref_init(&FORTASK(new_thread, this_sigmask), new_thread_mask);
+		}
+	} else
+#endif /* CONFIG_HAVE_USERPROCMASK */
+	{
+		if (sigmask_kernel_getrd() == &kernel_sigmask_empty) {
+			/* Nothing to do here! */
+		} else {
+			REF struct kernel_sigmask *mask;
+			mask = PERTASK(this_sigmask).get();
+			assert(mask != &kernel_sigmask_empty);
+			ATOMIC_FETCHINC(mask->sm_share);
+			COMPILER_WRITE_BARRIER();
+			FORTASK(new_thread, this_sigmask).m_pointer = mask; /* Inherit reference. */
+			COMPILER_WRITE_BARRIER();
+		}
 	}
 	if (flags & CLONE_SIGHAND) {
 		/* Must share signal handlers. */
@@ -314,29 +492,63 @@ NOTHROW(KCALL fini_posix_signals)(struct task *__restrict thread) {
 
 
 
+/* Return a pointer to the signal mask of the calling thread. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PUBLIC WUNUSED USER CHECKED sigset_t *KCALL
+sigmask_getrd(void) THROWS(...) {
+	if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+		USER CHECKED sigset_t *result;
+		result = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
+		validate_readable(result, sizeof(sigset_t));
+		return result;
+	}
+	return &sigmask_kernel_getrd()->sm_mask;
+}
+#endif /* CONFIG_HAVE_USERPROCMASK */
+
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)' */
-PUBLIC ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL
-sigmask_getwr(void) THROWS(E_BADALLOC) {
-	struct kernel_sigmask *result;
-	result = sigmask_getrd();
-	if (ATOMIC_READ(result->sm_share) > 1) {
+PUBLIC WUNUSED ATTR_RETNONNULL struct kernel_sigmask *KCALL
+sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
+	struct kernel_sigmask *mymask;
+	mymask = sigmask_kernel_getrd();
+	if (ATOMIC_READ(mymask->sm_share) > 1) {
 		/* Unshare. */
 		struct kernel_sigmask *copy;
 		copy = (struct kernel_sigmask *)kmalloc(sizeof(struct kernel_sigmask),
 		                                        GFP_CALLOC);
-		memcpy(&copy->sm_mask, &result->sm_mask, sizeof(copy->sm_mask));
+		memcpy(&copy->sm_mask, &mymask->sm_mask, sizeof(copy->sm_mask));
 		copy->sm_refcnt = 1;
 		copy->sm_share  = 1;
-		result = PERTASK(this_sigmask).exchange_inherit_new(copy);
-		if (result != &kernel_sigmask_empty) {
-			ATOMIC_FETCHDEC(result->sm_share);
-			decref_unlikely(result);
+		mymask = PERTASK(this_sigmask).exchange_inherit_new(copy);
+		if (mymask != &kernel_sigmask_empty) {
+			ATOMIC_FETCHDEC(mymask->sm_share);
+			decref_unlikely(mymask);
 		}
-		result = copy;
+		mymask = copy;
+	}
+	return mymask;
+}
+
+#ifdef CONFIG_HAVE_USERPROCMASK
+/* Make sure that `this_sigmask' is allocated, and isn't being shared.
+ * Then, always return `PERTASK_GET(this_sigmask)'
+ * NOTE: When calling thread has the `TASK_FUSERPROCMASK' flag set,
+ *       then this function will return the address of the currently-
+ *       assigned user-space signal mask, rather than its in-kernel
+ *       counterpart! */
+PUBLIC WUNUSED USER CHECKED sigset_t *KCALL
+sigmask_getwr(void) THROWS(E_BADALLOC, ...) {
+	USER CHECKED sigset_t *result;
+	if (PERTASK_GET(this_task.t_flags) & TASK_FUSERPROCMASK) {
+		result = ATOMIC_READ(PERTASK_GET(this_userprocmask_address)->pm_sigmask);
+		validate_readwrite(result, sizeof(sigset_t));
+	} else {
+		result = &sigmask_kernel_getwr()->sm_mask;
 	}
 	return result;
 }
+#endif /* CONFIG_HAVE_USERPROCMASK */
 
 
 
@@ -823,7 +1035,8 @@ default_action:
 		goto dont_handle;
 
 	case KERNEL_SIG_STOP:
-		/* TODO: Mask additional signals by looking at `SIGACTION_SA_NODEFER' and `action.sa_mask' */
+		/* XXX: Should we mask additional signals by looking
+		 *      at `SIGACTION_SA_NODEFER' and `action.sa_mask'? */
 		xdecref_unlikely(action.sa_mask);
 #if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
 		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
@@ -873,7 +1086,7 @@ task_signal_rpc_handler(void *arg,
 			/* Make sure that the signal isn't being masked (the RPC may have been delivered
 			 * after our current thread masked the signal, meaning that the signal being raised
 			 * still triggered the RPC) */
-			if unlikely(sigmask_ismasked(info->sqe_info.si_signo)) {
+			if unlikely(sigmask_ismasked_chk(info->sqe_info.si_signo)) {
 				/* Mark the signal as pending within the current thread. */
 				struct sigqueue *pertask_pending;
 				struct sigqueue_entry *next;
@@ -931,7 +1144,7 @@ task_signal_rpc_handler_after_syscall(void *arg,
 			/* Make sure that the signal isn't being masked (the RPC may have been delivered
 			 * after our current thread masked the signal, meaning that the signal being raised
 			 * still triggered the RPC. - Schedule the ) */
-			if unlikely(sigmask_ismasked(info->sqe_info.si_signo)) {
+			if unlikely(sigmask_ismasked_chk(info->sqe_info.si_signo)) {
 				/* Mark the signal as pending within the current thread. */
 				struct sigqueue *pertask_pending;
 				struct sigqueue_entry *next;
@@ -998,7 +1211,7 @@ task_process_signal_rpc_handler(void *arg,
 			/* Make sure that the signal isn't being masked (the RPC may have been delivered
 			 * after our current thread masked the signal, meaning that the signal being raised
 			 * still triggered the RPC) */
-			if unlikely(sigmask_ismasked(info->sqe_info.si_signo))
+			if unlikely(sigmask_ismasked_chk(info->sqe_info.si_signo))
 				goto deliver_to_some_thread;
 			/* Actually handle the signal */
 			state = handle_signal(info,
@@ -1061,7 +1274,7 @@ send_signal_rpc_to_self_after_syscall(/*inherit(always)*/ struct sigqueue_entry 
 	}
 }
 
-LOCAL NOBLOCK NONNULL((1, 2)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,
                                                  struct sigqueue_entry *__restrict pending) {
 	/* Restore all signals pending for the calling thread. */
@@ -1098,7 +1311,10 @@ sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK) {
 	iter  = pending;
 	piter = &pending;
 	do {
-		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (!sigmask_ismasked_chk(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -1117,7 +1333,10 @@ no_perthread_pending:
 	sync_read(prqueue);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
-		if (sigmask_ismasked(iter->sqe_info.si_signo))
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (sigmask_ismasked_chk(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
 		sync_endread(prqueue);
@@ -1141,6 +1360,52 @@ no_perthread_pending:
 }
 
 
+/* Same as `sigmask_check()', but if a signal gets triggered, act as though
+ * it was being serviced after the current system call has exited with the
+ * given `syscall_result' return value. (preventing system call restarting,
+ * or indicating an interrupt exception to user-space)
+ * If no signal was triggered, simply return normally.
+ * This function is meant to be used to check for pending signals after the
+ * original signal mask got restored following the completion of a `pselect()'
+ * or `ppoll()' system call. (at which point a previously masked signal should
+ * no longer cause the system call to fail and error out with -EINTR (to be
+ * restarted), but instead return its normal value once returning from its
+ * associated user-space signal handler (if any))
+ * With this in mind, the call order for temporarily overriding the signal mask
+ * for the purpose of a single system call looks like this:
+ * >> sigset_t oldmask;
+ * >> USER CHECKED sigset_t *mymask;
+ * >> mymask = sigmask_getwr();
+ * >> memcpy(&oldmask, mymask, sizeof(sigset_t));
+ * >> TRY {
+ * >>     memcpy(mymask, &newmask, sizeof(sigset_t));
+ * >>     if unlikely(sigismember(mymask, SIGKILL) ||
+ * >>                 sigismember(mymask, SIGSTOP)) {
+ * >>         sigdelset(mymask, SIGKILL);
+ * >>         sigdelset(mymask, SIGSTOP);
+ * >>         COMPILER_BARRIER();
+ * >>         sigmask_check();
+ * >>     }
+ * >> } EXCEPT {
+ * >>     bool mandatory_were_masked;
+ * >>     mandatory_were_masked = sigismember(mymask, SIGKILL) ||
+ * >>                             sigismember(mymask, SIGSTOP);
+ * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
+ * >>     if (mandatory_were_masked)
+ * >>         sigmask_check_after_except();
+ * >>     RETHROW();
+ * >> }
+ * >> TRY {
+ * >>     result = do_my_system_call();
+ * >> } EXCEPT {
+ * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
+ * >>     sigmask_check_after_except();
+ * >>     RETHROW();
+ * >> }
+ * >> memcpy(mymask, &oldmask, sizeof(sigset_t));
+ * >> sigmask_check_after_syscall(result);
+ * >> return result;
+ */
 PUBLIC void FCALL
 sigmask_check_after_syscall(syscall_ulong_t syscall_result)
 		THROWS(E_INTERRUPT, E_WOULDBLOCK) {
@@ -1160,7 +1425,10 @@ sigmask_check_after_syscall(syscall_ulong_t syscall_result)
 	iter  = pending;
 	piter = &pending;
 	do {
-		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (!sigmask_ismasked_chk(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -1179,7 +1447,10 @@ no_perthread_pending:
 	sync_read(prqueue);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
-		if (sigmask_ismasked(iter->sqe_info.si_signo))
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (sigmask_ismasked_chk(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
 		sync_endread(prqueue);
@@ -1241,7 +1512,10 @@ sigmask_check_s(struct icpustate *__restrict state,
 	piter = &pending;
 again_iter:
 	do {
-		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (!sigmask_ismasked_chk(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -1280,7 +1554,10 @@ again_lock_prqueue:
 again_scan_prqueue:
 		for (piter = &prqueue->psq_queue.sq_queue;
 			 (iter = *piter) != NULL; piter = &iter->sqe_next) {
-			if (sigmask_ismasked(iter->sqe_info.si_signo))
+			/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+			 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+			 *      for every signal! */
+			if (sigmask_ismasked_chk(iter->sqe_info.si_signo))
 				continue;
 			/* Found an unmasked signal.
 			 * -> Upgrade our lock to write-mode so we can steal it! */
@@ -1467,6 +1744,294 @@ NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
 		decref(thread);
 	}
 	pointer_set_fini(self);
+}
+
+
+
+/* Raise a posix signal within a given thread `target'
+ * @return: true:   Successfully scheduled/enqueued the signal for delivery to `target'
+ * @return: false:  The given thread `target' has already terminated execution.
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG'
+ * @throw: E_INTERRUPT_USER_RPC:        `target' is the calling thread, and the signal isn't being blocked at the moment. */
+PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+task_raisesignalthread(struct task *__restrict target,
+                       USER CHECKED siginfo_t const *info,
+                       gfp_t rpc_flags)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
+		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
+	bool result;
+	struct sigqueue_entry *entry;
+	bool is_masked;
+	/* The signal is being masked.
+	 * Allocate a queue entry which is going to be scheduled. */
+	entry = (struct sigqueue_entry *)kmalloc(sizeof(struct sigqueue_entry),
+	                                         rpc_flags);
+	TRY {
+		memcpy(&entry->sqe_info, info, sizeof(siginfo_t));
+		if unlikely(entry->sqe_info.si_signo <= 0 ||
+		            entry->sqe_info.si_signo >= NSIG) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+			      entry->sqe_info.si_signo);
+		}
+		is_masked = sigmask_ismasked_in(target, entry->sqe_info.si_signo);
+	} EXCEPT {
+		kfree(entry);
+		RETHROW();
+	}
+	/* Check if the signal is being masked. */
+	if (is_masked) {
+		/* Schedule the signal as pending within the target thread. */
+		struct sigqueue *pending;
+		struct sigqueue_entry *next;
+		pending = &FORTASK(target, this_sigqueue);
+		do {
+			next = ATOMIC_READ(pending->sq_queue);
+			if unlikely(next == SIGQUEUE_SQ_QUEUE_TERMINATED) {
+				/* The target thread can no longer receive signals! */
+				kfree(entry);
+				return false;
+			}
+			entry->sqe_next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(pending->sq_queue, next, entry));
+		/* Only one thread can ever handle the signal, so use `sig_send()' */
+		sig_send(&pending->sq_newsig);
+		/* Check if the signal is still being masked. - If it isn't, it may have gotten
+		 * unmasked before we inserted our new signal into the queue, in which case the
+		 * target thread may not know about it. - Because of this, send an RPC to have
+		 * the target thread manually check for unmasked signals. */
+		if unlikely(!sigmask_ismasked_in(target, entry->sqe_info.si_signo)) {
+			/* The signal got unmasked */
+			result = task_schedule_user_rpc(target,
+			                                &task_sigmask_check_rpc_handler,
+			                                NULL,
+			                                TASK_USER_RPC_FINTR,
+			                                rpc_flags);
+			return result;
+			
+		}
+		/* The target thread will handle the signal as soon as it gets unmasked! */
+		return true;
+	}
+	/* Deliver an RPC. */
+	TRY {
+		result = task_schedule_user_rpc(target,
+		                                &task_signal_rpc_handler,
+		                                entry,
+		                                TASK_USER_RPC_FINTR,
+		                                rpc_flags);
+	} EXCEPT {
+		if (!was_thrown(E_INTERRUPT_USER_RPC))
+			kfree(entry);
+		RETHROW();
+	}
+	if (!result)
+		kfree(entry);
+	return result;
+
+}
+
+
+
+
+/* Find a thread within the process lead by `process_leader' that isn't
+ * masking `signo'. If no such thread exists, return `NULL' instead. */
+PRIVATE REF struct task *KCALL
+find_thread_in_process_with_unmasked_signal(struct task *__restrict process_leader,
+                                            signo_t signo)
+#ifndef DELIVER_NX
+		THROWS(E_WOULDBLOCK)
+#endif /* !DELIVER_NX */
+{
+	struct taskgroup *group;
+	struct taskpid *cpid;
+	assert(!(process_leader->t_flags & TASK_FKERNTHREAD));
+	/* First check: is the leader masking the signal? */
+	if (!sigmask_ismasked_in(process_leader, signo))
+		return incref(process_leader);
+	group = &FORTASK(process_leader, this_taskgroup);
+	sync_read(&group->tg_proc_threads_lock);
+	cpid = ATOMIC_READ(group->tg_proc_threads);
+	if unlikely(cpid == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
+		sync_endread(&group->tg_proc_threads_lock);
+		/* Terminated thread... */
+		return NULL;
+	}
+	for (; cpid; cpid = cpid->tp_siblings.ln_next) {
+		REF struct task *child;
+		child = cpid->tp_thread.get();
+		if (!child)
+			continue;
+		/* Only consider child _threads_ (not child processes) */
+		if (task_getprocess_of(child) == process_leader) {
+			/* Check if the thread is masking the given signal. */
+			bool is_masked;
+			TRY {
+				is_masked = sigmask_ismasked_in(child, signo);
+			} EXCEPT {
+				decref_unlikely(child);
+				RETHROW();
+			}
+			if (!is_masked) {
+				sync_endread(&group->tg_proc_threads_lock);
+				return child;
+			}
+		}
+		decref_unlikely(child);
+	}
+	sync_endread(&group->tg_proc_threads_lock);
+	/* The signal is being masked everywhere. */
+	return NULL;
+}
+
+
+
+
+
+/* Deliver the given signal `info' to some thread apart of the process lead by `process_leader'
+ * If all threads are masking the given signal, schedule the signal as pending for the process.
+ * @return: true:  Success (either delivered, or scheduled as pending).
+ * @return: false: The given process has terminated. */
+PRIVATE bool KCALL
+deliver_signal_to_some_thread_in_process(struct task *__restrict process_leader,
+                                         /*inherit(always)*/ struct sigqueue_entry *__restrict info,
+                                         gfp_t rpc_flags)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC) {
+	bool result;
+	REF struct task *target;
+	struct process_sigqueue *procqueue;
+	u32 kernel_signo;
+	assert(!(process_leader->t_flags & TASK_FKERNTHREAD));
+	assert(!(info->sqe_info.si_signo <= 0 || info->sqe_info.si_signo >= NSIG));
+	if unlikely(ATOMIC_READ(process_leader->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED)) {
+		kfree(info);
+		/* No possible receiver in a terminating process. */
+		return false;
+	}
+
+	/* Search the process for a thread that isn't masking the signal.
+	 * If we can find one, send the signal to it by using a
+	 * `task_process_signal_rpc_handler' RPC to have it handled.
+	 *
+	 * If we can't find one, schedule the signal as pending and re-check
+	 * all threads. - If at this point we find one that isn't masking it,
+	 * we must deliver a `task_sigmask_check_rpc_handler' RPC to it so it
+	 * can be the one to handle the signal. */
+	kernel_signo = info->sqe_info.si_signo;
+	COMPILER_READ_BARRIER();
+	TRY {
+		target = find_thread_in_process_with_unmasked_signal(process_leader,
+		                                                     kernel_signo);
+	} EXCEPT {
+		kfree(info);
+		RETHROW();
+	}
+	if (target) {
+		FINALLY_DECREF_UNLIKELY(target);
+		TRY {
+			result = task_schedule_user_rpc(target,
+			                                &task_process_signal_rpc_handler,
+			                                info,
+			                                TASK_USER_RPC_FINTR,
+			                                rpc_flags);
+		} EXCEPT {
+			if (!was_thrown(E_INTERRUPT_USER_RPC))
+				kfree(info);
+			RETHROW();
+		}
+		if unlikely(!result)
+			kfree(info);
+		return result;
+	}
+
+	/* No thread seems to exist that isn't masking the given signal.
+	 * Schedule the signal as pending within the process signal queue. */
+	procqueue = &FORTASK(process_leader, this_taskgroup.tg_proc_signals);
+	TRY {
+		sync_write(procqueue);
+	} EXCEPT {
+		kfree(info);
+		RETHROW();
+	}
+	{
+		struct sigqueue_entry *next;
+		do {
+			next = ATOMIC_READ(procqueue->psq_queue.sq_queue);
+			if unlikely(next == SIGQUEUE_SQ_QUEUE_TERMINATED) {
+				/* The target process has terminated. */
+				sync_endwrite(procqueue);
+				kfree(info);
+				return false;
+			}
+			info->sqe_next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(procqueue->psq_queue.sq_queue,
+		                             next, info));
+	}
+	sync_endwrite(procqueue);
+	/* Signal the arrival of a new pending signal.
+	 * Only one thread can ever handle the signal, so use `sig_send()' */
+	sig_send(&procqueue->psq_queue.sq_newsig);
+again_find_late_target:
+	/* Check for a potential target thread one more time. */
+	if unlikely(ATOMIC_READ(process_leader->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED))
+		return false; /* No possible receiver in a terminating process. */
+
+	target = find_thread_in_process_with_unmasked_signal(process_leader,
+	                                                     kernel_signo);
+	if (target) {
+		/* Deliver a `task_sigmask_check_rpc_handler' RPC to the target thread. */
+		FINALLY_DECREF_UNLIKELY(target);
+		if unlikely(!task_schedule_user_rpc(target,
+		                                    &task_sigmask_check_rpc_handler,
+		                                    NULL,
+		                                    TASK_USER_RPC_FINTR,
+		                                    rpc_flags)) {
+			/* The chosen target has terminated. - Try to find another candidate. */
+			goto again_find_late_target;
+		}
+	}
+	return true;
+}
+
+
+/* Raise a posix signal within a given process that `target' is apart of
+ * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
+ * @return: false: The given process `target' has already terminated execution.
+ * @return: false: The given process `target' is a kernel thread.
+ * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG'
+ * @throw: E_INTERRUPT_USER_RPC:         The calling thread is apart of the same process,
+ *                                       and the signal isn't being blocked at the moment. */
+PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+task_raisesignalprocess(struct task *__restrict target,
+                        USER CHECKED siginfo_t const *info,
+                        gfp_t rpc_flags)
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
+		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
+	struct sigqueue_entry *entry;
+	bool result;
+	target = task_getprocess_of(target);
+	if unlikely(target->t_flags & TASK_FKERNTHREAD)
+		return false;
+	/* Allocate the queue entry for the given signal. */
+	entry = (struct sigqueue_entry *)kmalloc(sizeof(struct sigqueue_entry),
+	                                         rpc_flags);
+	TRY {
+		memcpy(&entry->sqe_info, info, sizeof(siginfo_t));
+		if unlikely(entry->sqe_info.si_signo <= 0 || entry->sqe_info.si_signo >= NSIG) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
+			      entry->sqe_info.si_signo);
+		}
+	} EXCEPT {
+		kfree(entry);
+		RETHROW();
+	}
+	result = deliver_signal_to_some_thread_in_process(target,
+	                                                  entry,
+	                                                  rpc_flags);
+	return result;
 }
 
 
@@ -1855,9 +2420,8 @@ DEFINE_COMPAT_SYSCALL2(sighandler_t, signal,
 /* sigprocmask(), rt_sigprocmask()                                      */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGPROCMASK
-#undef sigmask
 LOCAL void KCALL
-sigmask_ensure_unmasked_mandatory_after_syscall(struct kernel_sigmask *__restrict sigmask,
+sigmask_ensure_unmasked_mandatory_after_syscall(USER CHECKED sigset_t *mymask,
                                                 syscall_ulong_t syscall_result) {
 	/* Make sure that everything got written. */
 	COMPILER_BARRIER();
@@ -1865,27 +2429,27 @@ sigmask_ensure_unmasked_mandatory_after_syscall(struct kernel_sigmask *__restric
 	 * If either got accidentally (or intentionally) got masked, unmask them
 	 * and manually check for pending signals (in case some got delivered between
 	 * the point when they got masked, and the point when we unmask them below) */
-	if unlikely(sigismember(&sigmask->sm_mask, SIGKILL) ||
-	            sigismember(&sigmask->sm_mask, SIGSTOP)) {
-		sigdelset(&sigmask->sm_mask, SIGKILL);
-		sigdelset(&sigmask->sm_mask, SIGSTOP);
+	if unlikely(sigismember(mymask, SIGKILL) ||
+	            sigismember(mymask, SIGSTOP)) {
+		sigdelset(mymask, SIGKILL);
+		sigdelset(mymask, SIGSTOP);
 		COMPILER_BARRIER();
 		sigmask_check_after_syscall(syscall_result);
 	}
 }
 
 LOCAL void KCALL
-sigmask_ensure_unmasked_mandatory_after_except(struct kernel_sigmask *__restrict sigmask) {
+sigmask_ensure_unmasked_mandatory_after_except(USER CHECKED sigset_t *mymask) {
 	/* Make sure that everything got written. */
 	COMPILER_BARRIER();
 	/* Ensure that SIGKILL and SIGSTOP aren't masked.
 	 * If either got accidentally (or intentionally) got masked, unmask them
 	 * and manually check for pending signals (in case some got delivered between
 	 * the point when they got masked, and the point when we unmask them below) */
-	if unlikely(sigismember(&sigmask->sm_mask, SIGKILL) ||
-	            sigismember(&sigmask->sm_mask, SIGSTOP)) {
-		sigdelset(&sigmask->sm_mask, SIGKILL);
-		sigdelset(&sigmask->sm_mask, SIGSTOP);
+	if unlikely(sigismember(mymask, SIGKILL) ||
+	            sigismember(mymask, SIGSTOP)) {
+		sigdelset(mymask, SIGKILL);
+		sigdelset(mymask, SIGSTOP);
 		COMPILER_BARRIER();
 		sigmask_check_after_except();
 	}
@@ -1894,7 +2458,7 @@ sigmask_ensure_unmasked_mandatory_after_except(struct kernel_sigmask *__restrict
 DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
                 UNCHECKED USER sigset_t const *, set,
                 UNCHECKED USER sigset_t *, oset, size_t, sigsetsize) {
-	struct kernel_sigmask *sigmask;
+	sigset_t *mymask;
 	if unlikely(sigsetsize != sizeof(sigset_t))
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
@@ -1903,39 +2467,37 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 	validate_writable_opt(oset, sizeof(*oset));
 	if (!set) {
 		if (oset) {
-			sigmask = sigmask_getrd();
-			assert(sigmask);
-			memcpy(oset, &sigmask->sm_mask, sizeof(sigset_t));
+			mymask = sigmask_getrd();
+			memcpy(oset, mymask, sizeof(sigset_t));
 		}
 	} else {
-		sigmask = sigmask_getwr();
-		assert(sigmask);
+		mymask = sigmask_getwr();
 		if (oset)
-			memcpy(oset, &sigmask->sm_mask, sizeof(sigset_t));
+			memcpy(oset, mymask, sizeof(sigset_t));
 		switch (how) {
 
 		case SIG_BLOCK:
 			TRY {
-				sigorset(&sigmask->sm_mask, &sigmask->sm_mask, set);
+				sigorset(mymask, mymask, set);
 			} EXCEPT {
 				/* Also check for unmasked signals on error.
 				 * User-space may have intentionally set up the mask such that
 				 * it generates a #PF after some of the mandatory signals got
 				 * masked, in which case they would remain masked if we didn't
 				 * check for them here as well. */
-				sigmask_ensure_unmasked_mandatory_after_except(sigmask);
+				sigmask_ensure_unmasked_mandatory_after_except(mymask);
 				RETHROW();
 			}
-			sigmask_ensure_unmasked_mandatory_after_syscall(sigmask, -EOK);
+			sigmask_ensure_unmasked_mandatory_after_syscall(mymask, -EOK);
 			break;
 
 		case SIG_UNBLOCK: {
 			size_t i;
 			/* No need to check for mandatory masks being clear, since
 			 * this command is only able to clear masks from the get-go. */
-			/* sigandnset(&sigmask->sm_mask, &sigmask->sm_mask, set); */
-			for (i = 0; i < COMPILER_LENOF(sigmask->sm_mask.__val); ++i)
-				sigmask->sm_mask.__val[i] &= ~set->__val[i];
+			/* sigandnset(&mymask->sm_mask, &mymask->sm_mask, set); */
+			for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i)
+				mymask->__val[i] &= ~set->__val[i];
 			/* Since signals (may) have just gotten unmasked, check if we're
 			 * now able to handle any of the pending signals. */
 			sigmask_check_after_syscall(-EOK);
@@ -1943,15 +2505,15 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 
 		case SIG_SETMASK:
 			TRY {
-				memcpy(&sigmask->sm_mask, set, sizeof(sigset_t));
+				memcpy(mymask, set, sizeof(sigset_t));
 			} EXCEPT {
 				/* Same as with `SIG_BLOCK': Check that mandatory signals remain under control. */
-				sigmask_ensure_unmasked_mandatory_after_except(sigmask);
+				sigmask_ensure_unmasked_mandatory_after_except(mymask);
 				RETHROW();
 			}
 			/* Make sure that mandatory signals are in check */
-			sigdelset(&sigmask->sm_mask, SIGKILL);
-			sigdelset(&sigmask->sm_mask, SIGSTOP);
+			sigdelset(mymask, SIGKILL);
+			sigdelset(mymask, SIGSTOP);
 			COMPILER_BARRIER();
 			/* Always check for pending signals, since
 			 * anything may have happened to our mask. */
@@ -1994,15 +2556,12 @@ DEFINE_COMPAT_SYSCALL3(errno_t, sigprocmask, syscall_ulong_t, how,
 #ifdef __ARCH_WANT_SYSCALL_SGETMASK
 DEFINE_SYSCALL0(syscall_ulong_t, sgetmask) {
 	syscall_ulong_t result;
-	struct kernel_sigmask *mymask;
+	USER CHECKED sigset_t *mymask;
 	mymask = sigmask_getrd();
-	assert(mymask);
 #if __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__
 	result = 0;
 #endif /* __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__ */
-	memcpy(&result, &mymask->sm_mask,
-	       MIN_C(sizeof(mymask->sm_mask),
-	             sizeof(result)));
+	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_SGETMASK */
@@ -2010,68 +2569,57 @@ DEFINE_SYSCALL0(syscall_ulong_t, sgetmask) {
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SGETMASK
 DEFINE_COMPAT_SYSCALL0(syscall_ulong_t, sgetmask) {
 	compat_syscall_ulong_t result;
-	struct kernel_sigmask *mymask;
+	USER CHECKED sigset_t *mymask;
 	mymask = sigmask_getrd();
-	assert(mymask);
 #if __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
 	result = 0;
 #endif /* __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
-	memcpy(&result, &mymask->sm_mask,
-	       MIN_C(sizeof(mymask->sm_mask),
-	             sizeof(result)));
+	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SGETMASK */
 
 #ifdef __ARCH_WANT_SYSCALL_SSETMASK
-DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
+DEFINE_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
 	syscall_ulong_t result;
-	struct kernel_sigmask *mymask;
+	sigset_t *mymask;
 	mymask = sigmask_getwr();
 #if __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__
 	result = 0;
 #endif /* __SIZEOF_SIGSET_T__ < __SIZEOF_SYSCALL_LONG_T__ */
-	memcpy(&result, &mymask->sm_mask,
-	       MIN_C(sizeof(mymask->sm_mask),
-	             sizeof(result)));
-	memcpy(&mymask->sm_mask, &sigmask,
-	       MIN_C(sizeof(mymask->sm_mask),
-	             sizeof(sigmask)));
+	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
+	memcpy(mymask, &new_sigmask, MIN_C(sizeof(sigset_t), sizeof(new_sigmask)));
 #if __SIZEOF_SIGSET_T__ > __SIZEOF_SYSCALL_LONG_T__
-	memset((byte_t *)&mymask->sm_mask + sizeof(sigmask),
-	       0, sizeof(mymask->sm_mask) - sizeof(sigmask));
+	memset((byte_t *)mymask + sizeof(new_sigmask),
+	       0, sizeof(sigset_t) - sizeof(new_sigmask));
 #endif /* __SIZEOF_SIGSET_T__ > __SIZEOF_SYSCALL_LONG_T__ */
 	/* Make sure that these two signals aren't being masked! */
-	sigdelset(&mymask->sm_mask, SIGKILL);
-	sigdelset(&mymask->sm_mask, SIGSTOP);
+	sigdelset(mymask, SIGKILL);
+	sigdelset(mymask, SIGSTOP);
 	sigmask_check_after_syscall(result);
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_SSETMASK */
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_SSETMASK
-DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, sigmask) {
+DEFINE_COMPAT_SYSCALL1(syscall_ulong_t, ssetmask, syscall_ulong_t, new_sigmask) {
 	compat_syscall_ulong_t result;
 	compat_syscall_ulong_t used_sigmask;
-	struct kernel_sigmask *mymask;
+	USER CHECKED sigset_t *mymask;
 	mymask = sigmask_getwr();
-	used_sigmask = (compat_syscall_ulong_t)sigmask;
+	used_sigmask = (compat_syscall_ulong_t)new_sigmask;
 #if __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
 	result = 0;
 #endif /* __SIZEOF_SIGSET_T__ < __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
-	memcpy(&result, &mymask->sm_mask,
-	       MIN_C(sizeof(mymask->sm_mask),
-	             sizeof(result)));
-	memcpy(&mymask->sm_mask, &used_sigmask,
-	       MIN_C(sizeof(mymask->sm_mask),
-	             sizeof(used_sigmask)));
+	memcpy(&result, mymask, MIN_C(sizeof(sigset_t), sizeof(result)));
+	memcpy(mymask, &used_sigmask, MIN_C(sizeof(sigset_t), sizeof(used_sigmask)));
 #if __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T
-	memset((byte_t *)&mymask->sm_mask + sizeof(used_sigmask),
-	       0, sizeof(mymask->sm_mask) - sizeof(used_sigmask));
+	memset((byte_t *)mymask+ sizeof(used_sigmask),
+	       0, sizeof(sigset_t) - sizeof(used_sigmask));
 #endif /* __SIZEOF_SIGSET_T__ > __ARCH_COMPAT_SIZEOF_SYSCALL_LONG_T */
 	/* Make sure that these two signals aren't being masked! */
-	sigdelset(&mymask->sm_mask, SIGKILL);
-	sigdelset(&mymask->sm_mask, SIGSTOP);
+	sigdelset(mymask, SIGKILL);
+	sigdelset(mymask, SIGSTOP);
 	sigmask_check_after_syscall(result);
 	return result;
 }
@@ -2444,7 +2992,10 @@ signal_try_steal_pending(sigset_t const *__restrict these) {
 	iter  = pending;
 	piter = &pending;
 	do {
-		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (!sigmask_ismasked_chk(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -2482,7 +3033,10 @@ again_scan_prqueue:
 	 * that isn't masked by our active signal mask. */
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
-		if (sigmask_ismasked(iter->sqe_info.si_signo))
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (sigmask_ismasked_chk(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
 		sync_endread(prqueue);
@@ -2703,19 +3257,18 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 /* rt_sigsuspend(), sigsuspend()                                        */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGSUSPEND
-#undef sigmask
 LOCAL void KCALL
-sigmask_ensure_unmasked_mandatory(struct kernel_sigmask *__restrict sigmask) {
+sigmask_ensure_unmasked_mandatory(USER CHECKED sigset_t *mymask) {
 	/* Make sure that everything got written. */
 	COMPILER_BARRIER();
 	/* Ensure that SIGKILL and SIGSTOP aren't masked.
 	 * If either got accidentally (or intentionally) got masked, unmask them
 	 * and manually check for pending signals (in case some got delivered between
 	 * the point when they got masked, and the point when we unmask them below) */
-	if unlikely(sigismember(&sigmask->sm_mask, SIGKILL) ||
-	            sigismember(&sigmask->sm_mask, SIGSTOP)) {
-		sigdelset(&sigmask->sm_mask, SIGKILL);
-		sigdelset(&sigmask->sm_mask, SIGSTOP);
+	if unlikely(sigismember(mymask, SIGKILL) ||
+	            sigismember(mymask, SIGSTOP)) {
+		sigdelset(mymask, SIGKILL);
+		sigdelset(mymask, SIGSTOP);
 		COMPILER_BARRIER();
 		sigmask_check();
 	}
@@ -2725,18 +3278,18 @@ PRIVATE struct icpustate *FCALL
 sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
                        USER UNCHECKED sigset_t const *uthese,
                        struct rpc_syscall_info const *sc_info) {
-	struct kernel_sigmask *mymask;
+	USER CHECKED sigset_t *mymask;
 	sigset_t oldmask;
 	validate_readable(uthese, sizeof(sigset_t));
 	mymask = sigmask_getwr();
-	memcpy(&oldmask, &mymask->sm_mask, sizeof(sigset_t));
+	memcpy(&oldmask, mymask, sizeof(sigset_t));
 	TRY {
-		memcpy(&mymask->sm_mask, uthese, sizeof(sigset_t));
+		memcpy(mymask, uthese, sizeof(sigset_t));
 	} EXCEPT {
 		/* Always restore the old signal mask and check for signals,
 		 * so-as to prevent signals that always have to be masked from
 		 * ever being unmasked. */
-		memcpy(&mymask->sm_mask, &oldmask, sizeof(sigset_t));
+		memcpy(mymask, &oldmask, sizeof(sigset_t));
 		sigmask_check();
 		RETHROW();
 	}
@@ -2810,7 +3363,7 @@ sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
 		}
 	} EXCEPT {
 		/* Restore the old mask. */
-		memcpy(&mymask->sm_mask, &oldmask, sizeof(sigset_t));
+		memcpy(mymask, &oldmask, sizeof(sigset_t));
 		sigmask_check_after_except();
 		RETHROW();
 	}
@@ -2822,9 +3375,8 @@ sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
 	 *     -> The correct thing to do here would be not to use `sigmask_check_s()'
 	 *        above, but instead use a custom function that will restore `oldmask'
 	 *        _before_ calling `handle_signal()' for the first time. */
-	memcpy(&mymask->sm_mask, &oldmask, sizeof(sigset_t));
+	memcpy(mymask, &oldmask, sizeof(sigset_t));
 	sigmask_check();
-
 	return state;
 }
 
@@ -2902,7 +3454,10 @@ signal_gather_pending(sigset_t *__restrict these) {
 	iter  = pending;
 	piter = &pending;
 	do {
-		if (!sigmask_ismasked(iter->sqe_info.si_signo)) {
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (!sigmask_ismasked_chk(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
 			if (pending)
@@ -2921,7 +3476,10 @@ no_perthread_pending:
 	sync_read(prqueue);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
-		if (sigmask_ismasked(iter->sqe_info.si_signo)) {
+		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
+		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
+		 *      for every signal! */
+		if (sigmask_ismasked_chk(iter->sqe_info.si_signo)) {
 			sigaddset(these, iter->sqe_info.si_signo);
 			continue;
 		}
@@ -2969,19 +3527,24 @@ DEFINE_COMPAT_SYSCALL1(errno_t, sigpending,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_SIGPENDING */
 
+#ifdef __ARCH_WANT_SYSCALL_SIGMASK_CHECK
+DEFINE_SYSCALL0(errno_t, sigmask_check) {
+	/* XXX:  An arch-specific version could be implemented to directly
+	 *       call `sigmask_check_s()', which would be way faster than
+	 *       this function is! */
 
-
-
-
+	/* TODO: Calling this function from user-space as the result of a
+	 *       prior `Mark signal [signo] as pending' event (see the printk
+	 *       for this event above), will once mark those same signals as
+	 *       pending.
+	 * Solution: When this system call is used to check for pending signals,
+	 *           that test should _not_ re-add those signals to our thread's
+	 *           userprocmask's pending set. */
+	sigmask_check();
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_SIGMASK_CHECK */
 
 DECL_END
-
-#ifndef __INTELLISENSE__
-#define DELIVER_NX 1
-#include "posix-signal-deliver.c.inl"
-/**/
-#include "posix-signal-deliver.c.inl"
-#endif /* !__INTELLISENSE__ */
-
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_POSIX_SIGNAL_C */

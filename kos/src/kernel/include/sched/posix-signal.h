@@ -26,6 +26,7 @@
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
 #include <sched/arch/posix-signal.h>
+#include <sched/except-handler.h> /* CONFIG_HAVE_USERPROCMASK */
 #include <sched/pertask.h>
 #include <sched/signal.h>
 
@@ -111,28 +112,34 @@ DATDEF struct kernel_sigmask kernel_sigmask_full;
  * NOTE: Only ever NULL for kernel-space threads! */
 DATDEF ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask) this_sigmask;
 
-/* Return a pointer to the signal mask of the calling thread. */
-#ifdef __INTELLISENSE__
-FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL sigmask_getrd(void);
-#else /* __INTELLISENSE__ */
-#define sigmask_getrd() PERTASK_GET(this_sigmask.m_pointer)
-#endif /* !__INTELLISENSE__ */
+/* Return a pointer to the kernel signal mask of the calling thread. */
+#define sigmask_kernel_getrd() PERTASK_GET(this_sigmask.m_pointer)
 
 /* Make sure that `this_sigmask' is allocated, and isn't being shared.
  * Then, always return `PERTASK_GET(this_sigmask)' */
-FUNDEF ATTR_RETNONNULL WUNUSED struct kernel_sigmask *KCALL sigmask_getwr(void) THROWS(E_BADALLOC);
+FUNDEF WUNUSED ATTR_RETNONNULL struct kernel_sigmask *KCALL
+sigmask_kernel_getwr(void) THROWS(E_BADALLOC);
+
+
+#if defined(__INTELLISENSE__) || defined(CONFIG_HAVE_USERPROCMASK)
+
+/* Return a pointer to the signal mask of the calling thread. */
+FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getrd(void) THROWS(...);
+
+/* Make sure that `this_sigmask' is allocated, and isn't being shared.
+ * Then, always return `PERTASK_GET(this_sigmask)'
+ * NOTE: When calling thread has the `TASK_FUSERPROCMASK' flag set,
+ *       then this function will return the address of the currently-
+ *       assigned user-space signal mask, rather than its in-kernel
+ *       counterpart! */
+FUNDEF WUNUSED USER CHECKED sigset_t *KCALL sigmask_getwr(void) THROWS(E_BADALLOC, ...);
+#else /* __INTELLISENSE__ || CONFIG_HAVE_USERPROCMASK */
+#define sigmask_getrd() (&sigmask_kernel_getrd()->sm_mask)
+#define sigmask_getwr() (&sigmask_kernel_getwr()->sm_mask)
+#endif /* !__INTELLISENSE__ && !CONFIG_HAVE_USERPROCMASK */
 
 /* Check for pending signals that are no longer being masked. */
 FUNDEF void FCALL sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK);
-
-/* Check if the given `signo' is currently masked by `self'. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
-NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self,
-                                   signo_t signo);
-
-/* Same as `sigmask_ismasked_in()', but for the calling thread. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(FCALL sigmask_ismasked)(signo_t signo);
 
 /* Same as `sigmask_check()', but if a signal gets triggered, act as though
  * it was being serviced after the current system call has exited with the
@@ -148,23 +155,23 @@ NOTHROW(FCALL sigmask_ismasked)(signo_t signo);
  * With this in mind, the call order for temporarily overriding the signal mask
  * for the purpose of a single system call looks like this:
  * >> sigset_t oldmask;
- * >> struct kernel_sigmask *mymask;
+ * >> USER CHECKED sigset_t *mymask;
  * >> mymask = sigmask_getwr();
- * >> memcpy(&oldmask, &mymask->sm_mask, sizeof(sigset_t));
+ * >> memcpy(&oldmask, mymask, sizeof(sigset_t));
  * >> TRY {
- * >>     memcpy(&mymask->sm_mask, &newmask, sizeof(sigset_t));
- * >>     if unlikely(sigismember(&mymask->sm_mask, SIGKILL) ||
- * >>                 sigismember(&mymask->sm_mask, SIGSTOP)) {
- * >>         sigdelset(&mymask->sm_mask, SIGKILL);
- * >>         sigdelset(&mymask->sm_mask, SIGSTOP);
+ * >>     memcpy(mymask, &newmask, sizeof(sigset_t));
+ * >>     if unlikely(sigismember(mymask, SIGKILL) ||
+ * >>                 sigismember(mymask, SIGSTOP)) {
+ * >>         sigdelset(mymask, SIGKILL);
+ * >>         sigdelset(mymask, SIGSTOP);
  * >>         COMPILER_BARRIER();
  * >>         sigmask_check();
  * >>     }
  * >> } EXCEPT {
  * >>     bool mandatory_were_masked;
- * >>     mandatory_were_masked = sigismember(&mymask->sm_mask, SIGKILL) ||
- * >>                             sigismember(&mymask->sm_mask, SIGSTOP);
- * >>     memcpy(&mymask->sm_mask, &oldmask, sizeof(sigset_t));
+ * >>     mandatory_were_masked = sigismember(mymask, SIGKILL) ||
+ * >>                             sigismember(mymask, SIGSTOP);
+ * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
  * >>     if (mandatory_were_masked)
  * >>         sigmask_check_after_except();
  * >>     RETHROW();
@@ -172,11 +179,11 @@ NOTHROW(FCALL sigmask_ismasked)(signo_t signo);
  * >> TRY {
  * >>     result = do_my_system_call();
  * >> } EXCEPT {
- * >>     memcpy(&mymask->sm_mask, &oldmask, sizeof(sigset_t));
+ * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
  * >>     sigmask_check_after_except();
  * >>     RETHROW();
  * >> }
- * >> memcpy(&mymask->sm_mask, &oldmask, sizeof(sigset_t));
+ * >> memcpy(mymask, &oldmask, sizeof(sigset_t));
  * >> sigmask_check_after_syscall(result);
  * >> return result;
  */
@@ -362,23 +369,6 @@ task_raisesignalthread(struct task *__restrict target,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT);
 
-/* Noexcept variant of `task_raisesignalthread()'
- * @return: * : One of `TASK_RAISESIGNALTHREAD_NX_*' */
-FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
-NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
-                                         USER CHECKED siginfo_t const *info,
-                                         gfp_t rpc_flags DFL(GFP_NORMAL));
-#define TASK_RAISESIGNALTHREAD_NX_INTERRUPTED   1  /* Successfully raised the signal (and the target is the caller) */
-#define TASK_RAISESIGNALTHREAD_NX_SUCCESS       0  /* Successfully raised the signal */
-#define TASK_RAISESIGNALTHREAD_NX_TERMINATED  (-1) /* The specified target thread has terminated */
-#define TASK_RAISESIGNALTHREAD_NX_KERNTHREAD  (-2) /* The specified target thread is a kernel thread */
-#define TASK_RAISESIGNALTHREAD_NX_BADALLOC    (-3) /* The allocation failed, or would have blocked. */
-#define TASK_RAISESIGNALTHREAD_NX_BADSIGNO    (-4) /* The signal number associated with `info' is bad. */
-#define TASK_RAISESIGNALTHREAD_NX_SEGFAULT    (-5) /* The given `info' structure points to a faulty memory address. */
-#define TASK_RAISESIGNALTHREAD_NX_WOULDBLOCK  (-6) /* The operation would have blocked. */
-
-
-
 /* Raise a posix signal within a given process that `target' is apart of
  * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
  * @return: false: The given process `target' has already terminated execution.
@@ -392,16 +382,6 @@ task_raisesignalprocess(struct task *__restrict target,
                         gfp_t rpc_flags DFL(GFP_NORMAL))
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT);
-
-
-
-/* Noexcept variant of `task_raisesignalprocess()'
- * @return: * : One of `TASK_RAISESIGNALTHREAD_NX_*' */
-FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
-NOTHROW(KCALL task_raisesignalprocess_nx)(struct task *__restrict target,
-                                          USER CHECKED siginfo_t const *info,
-                                          gfp_t rpc_flags DFL(GFP_NORMAL));
-
 
 
 /* Send a signal to every process within the same process group that `target' is apart of.
@@ -430,16 +410,6 @@ task_raisesignalthread(struct task *__restrict target,
 	return task_raisesignalthread(target, &info, rpc_flags);
 }
 
-LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
-NOTHROW(KCALL task_raisesignalthread_nx)(struct task *__restrict target,
-                                         signo_t signo,
-                                         gfp_t rpc_flags DFL(GFP_NORMAL)) {
-	siginfo_t info;
-	__libc_memset(&info, 0, sizeof(info));
-	info.si_signo = signo;
-	return task_raisesignalthread_nx(target, &info, rpc_flags);
-}
-
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
 task_raisesignalprocess(struct task *__restrict target,
                         signo_t signo,
@@ -450,16 +420,6 @@ task_raisesignalprocess(struct task *__restrict target,
 	__libc_memset(&info, 0, sizeof(info));
 	info.si_signo = signo;
 	return task_raisesignalprocess(target, &info, rpc_flags);
-}
-
-LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) int
-NOTHROW(KCALL task_raisesignalprocess_nx)(struct task *__restrict target,
-                                          signo_t signo,
-                                          gfp_t rpc_flags DFL(GFP_NORMAL)) {
-	siginfo_t info;
-	__libc_memset(&info, 0, sizeof(info));
-	info.si_signo = signo;
-	return task_raisesignalprocess_nx(target, &info, rpc_flags);
 }
 
 LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL

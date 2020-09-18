@@ -42,6 +42,7 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
+#include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
@@ -3008,8 +3009,32 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
                         USER UNCHECKED char const *USER CHECKED const *envp
 #endif /* !__ARCH_HAVE_COMPAT */
                         ) {
+	uintptr_t thread_flags;
+	thread_flags = PERTASK_GET(this_task.t_flags);
+#ifdef CONFIG_HAVE_USERPROCMASK
+	/* If the calling thread uses userprocmask, we must copy
+	 * their final process mask into kernel-space before we do
+	 * the exec. Note that the `TASK_FUSERPROCMASK' flag itself
+	 * is later unset by `reset_user_except_handler()' */
+	if (thread_flags & TASK_FUSERPROCMASK) {
+		struct kernel_sigmask *mymask;
+		USER CHECKED struct userprocmask *um;
+		USER UNCHECKED sigset_t *um_sigset;
+		um        = PERTASK_GET(this_userprocmask_address);
+		um_sigset = ATOMIC_READ(um->pm_sigmask);
+		validate_readable(um_sigset, sizeof(sigset_t));
+
+		/* Copy the final user-space signal mask into kernel-space.
+		 * If the exec() ends up succeeding, then this will be the
+		 * signal mask that the new program will start execution
+		 * under. */
+		mymask = sigmask_kernel_getwr();
+		memcpy(mymask, um_sigset, sizeof(sigset_t));
+	}
+#endif /* CONFIG_HAVE_USERPROCMASK */
+
 	/* Deal with the special VFORK mode. */
-	if (PERTASK_GET(this_task.t_flags) & TASK_FVFORK) {
+	if (thread_flags & TASK_FVFORK) {
 		REF struct vm *newvm;
 		/* Construct the new VM for the process after the exec. */
 		newvm = vm_alloc();
@@ -3035,7 +3060,33 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 		}
 		/* ==== Point of no return: This is where we
 		 *      indicate success to our parent process. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+		{
+			uintptr_t old_flags;
+			old_flags = ATOMIC_FETCHAND(THIS_TASK->t_flags,
+			                            ~(TASK_FVFORK | TASK_FUSERPROCMASK |
+			                              TASK_FUSERPROCMASK_AFTER_VFORK));
+			/* Special case: If userprocmask was enabled after vfork(), then
+			 *               we must write-back a NULL to its `pm_sigmask' field
+			 *               in order to indicate to the parent process that
+			 *               their userprocmask hasn't been enabled, yet. */
+			if (old_flags & TASK_FUSERPROCMASK_AFTER_VFORK) {
+				USER CHECKED struct userprocmask *um;
+				um = PERTASK_GET(this_userprocmask_address);
+				printk(KERN_DEBUG "[userprocmask:%p] Uninstall during exec after vfork\n", um);
+				TRY {
+					ATOMIC_WRITE(um->pm_sigmask, NULL);
+				} EXCEPT {
+					error_code_t code = error_code();
+					if (ERRORCODE_ISRTLPRIORITY(code))
+						RETHROW();
+					error_printf("Handling TASK_FUSERPROCMASK_AFTER_VFORK");
+				}
+			}
+		}
+#else /* CONFIG_HAVE_USERPROCMASK */
 		ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FVFORK);
+#endif /* !CONFIG_HAVE_USERPROCMASK */
 		{
 			struct taskpid *mypid = THIS_TASKPID;
 			if likely(mypid)
@@ -3062,6 +3113,18 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 		                /* argv_is_compat:            */ argv_is_compat
 #endif /* __ARCH_HAVE_COMPAT */
 		                );
+#ifdef CONFIG_HAVE_USERPROCMASK
+		/* If the previous process used to have a userprocmask, and didn't make proper
+		 * use of calling `sys_sigmask_check()', we check for pending signals in the
+		 * context of the new process, just so it gets to start out with a clean slate.
+		 *
+		 * Note though that assuming the original program used the userprocmask API
+		 * correctly, there shouldn't be any unmasked, pending signals from before
+		 * the call to exec() at this point (of course, there could always be some
+		 * from during the call...) */
+		if (thread_flags & TASK_FUSERPROCMASK)
+			sigmask_check();
+#endif /* CONFIG_HAVE_USERPROCMASK */
 	}
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 	run_pervm_onexec();

@@ -135,6 +135,22 @@ NOTHROW(KCALL x86_get_random_userkern_address32)(void) {
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
 
 
+PRIVATE void KCALL
+waitfor_vfork_completion(struct task *__restrict thread) {
+	while ((ATOMIC_READ(thread->t_flags) & TASK_FVFORK) != 0) {
+		struct taskpid *pid;
+		pid = FORTASK(thread, this_taskpid);
+		assert(pid);
+		task_connect(&pid->tp_changed);
+		if unlikely((ATOMIC_READ(thread->t_flags) & TASK_FVFORK) == 0) {
+			task_disconnectall();
+			break;
+		}
+		task_waitfor();
+	}
+}
+
+
 INTERN pid_t KCALL
 x86_clone_impl(struct icpustate const *__restrict init_state,
                uintptr_t clone_flags,
@@ -392,32 +408,74 @@ again_lock_vm:
 		if (clone_flags & CLONE_VFORK) {
 			REF struct kernel_sigmask *old_sigmask;
 			ATOMIC_REF(struct kernel_sigmask) *mymask;
+			mymask = &PERTASK(this_sigmask);
 
-			/* Actually start execution of the newly created thread. */
-			task_start(result);
-
-			/* The specs say that we should ignore (mask) all POSIX
-			 * signals until the child indicate VFORK completion. */
-			mymask      = &PERTASK(this_sigmask);
-			old_sigmask = mymask->exchange(&kernel_sigmask_full);
-			TRY {
-				/* Wait for the thread to clear its VFORK flag. */
-				while ((ATOMIC_READ(result->t_flags) & TASK_FVFORK) != 0) {
-					struct taskpid *pid;
-					pid = FORTASK(result, this_taskpid);
-					assert(pid);
-					task_connect(&pid->tp_changed);
-					if unlikely((ATOMIC_READ(result->t_flags) & TASK_FVFORK) == 0) {
-						task_disconnectall();
-						break;
-					}
-					task_waitfor();
+#ifdef CONFIG_HAVE_USERPROCMASK
+			/* Special case for when the parent thread was using USERPROCMASK.
+			 * In this case we must essentially disable the USERPROCMASK until
+			 * our child process indicates that they're done using our VM
+			 *
+			 * This way, the child process can freely (and unknowingly) modify
+			 * the parent process's signal mask, without actually affecting
+			 * anything, and without those changes remaining visible once the
+			 * parent process is resumed. */
+			if (caller->t_flags & TASK_FUSERPROCMASK) {
+				sigset_t saved_user_sigset;
+				USER UNCHECKED sigset_t *user_sigmask;
+				USER CHECKED struct userprocmask *um;
+				um = PERTASK_GET(this_userprocmask_address);
+				user_sigmask = ATOMIC_READ(um->pm_sigmask);
+				validate_readwrite(user_sigmask, sizeof(sigset_t));
+				memcpy(&saved_user_sigset, user_sigmask, sizeof(sigset_t));
+				/* Switch over to a completely filled, kernel-space
+				 * signal mask to-be used by the calling thread. */
+				old_sigmask = mymask->exchange(&kernel_sigmask_full);
+				ATOMIC_FETCHAND(caller->t_flags, ~TASK_FUSERPROCMASK);
+				TRY {
+					/* Actually start execution of the newly created thread. */
+					task_start(result);
+					/* Wait for the thread to clear its VFORK flag. */
+					waitfor_vfork_completion(result);
+				} EXCEPT {
+					mymask->set_inherit_new(old_sigmask);
+					ATOMIC_FETCHOR(caller->t_flags, TASK_FUSERPROCMASK);
+					memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
+					ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
+					sigmask_check_after_except();
+					RETHROW();
 				}
-			} EXCEPT {
+				/* Restore our old kernel-space signal mask. */
 				mymask->set_inherit_new(old_sigmask);
-				RETHROW();
+				/* Re-enable userprocmask-mode. */
+				ATOMIC_FETCHOR(caller->t_flags, TASK_FUSERPROCMASK);
+
+				/* Restore the old (saved) state of the user-space signal
+				 * mask, as it was prior to the vfork-child being started.
+				 * NOTE: Do this _after_ we've already restored the kernel-side
+				 *       of the calling thread's TLS state. That way, if something
+				 *       goes wrong while we're restoring the user-space side of
+				 *       things, it won't actually our fault! */
+				memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
+				ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
+			} else
+#endif /* CONFIG_HAVE_USERPROCMASK */
+			{
+				/* Actually start execution of the newly created thread. */
+				task_start(result);
+	
+				/* The specs say that we should ignore (mask) all POSIX
+				 * signals until the child indicate VFORK completion. */
+				old_sigmask = mymask->exchange(&kernel_sigmask_full);
+				TRY {
+					/* Wait for the thread to clear its VFORK flag. */
+					waitfor_vfork_completion(result);
+				} EXCEPT {
+					mymask->set_inherit_new(old_sigmask);
+					sigmask_check_after_except();
+					RETHROW();
+				}
+				mymask->set_inherit_new(old_sigmask);
 			}
-			mymask->set_inherit_new(old_sigmask);
 			/* With the original signal mask restored, we must check if
 			 * we (the parent) have received any signals while we were
 			 * waiting on the child */
