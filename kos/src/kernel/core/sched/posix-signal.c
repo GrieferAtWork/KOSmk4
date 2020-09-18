@@ -219,14 +219,41 @@ usersigmask_ismasked_chk(signo_t signo) {
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
 
+
+
+#define SIGMASK_ISMASKED_NO  0 /* The signal isn't masked */
+#define SIGMASK_ISMASKED_YES 1 /* The signal is masked */
+#ifdef CONFIG_HAVE_USERPROCMASK
+/* The signal may be masked, or it may not be, however due to
+ * the target thread running on a different CPU, or using VIO,
+ * a faulty pointer, or memory currently not loaded into the
+ * core for the backing memory of its usersigmask, the calling
+ * thread cannot conclusively determine this. */
+#define SIGMASK_ISMASKED_MAYBE (-2)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+
+STATIC_ASSERT(SIGMASK_ISMASKED_NO == (int)false);
+STATIC_ASSERT(SIGMASK_ISMASKED_YES == (int)true);
+
+
 /* Check if the given `signo' is currently masked by `self'.
- * If `self' has the `TASK_FUSERPROCMASK' flag set, assume that all signals
- * are unmasked, unless `self' _is_ the calling thread, in which case check
- * for sure if they're unmasked. */
-PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool FCALL
-sigmask_ismasked_in(struct task *__restrict self,
-                    signo_t signo) {
-	bool result;
+ * @param: allow_blocking_and_exception_when_self_is_THIS_TASK:
+ *              Like the argument name says: When self == THIS_TASK,
+ *              and this argument is true, then this call is allowed
+ *              to block, as well as throw exceptions.
+ * @return: * : One of `SIGMASK_ISMASKED_*' (see above) */
+#ifdef CONFIG_HAVE_USERPROCMASK
+PRIVATE NOBLOCK_IF(!allow_blocking_and_exception_when_self_is_THIS_TASK || self != THIS_TASK)
+ATTR_PURE WUNUSED NONNULL((1)) int FCALL
+sigmask_ismasked_in(struct task *__restrict self, signo_t signo,
+                    bool allow_blocking_and_exception_when_self_is_THIS_TASK)
+#else /* CONFIG_HAVE_USERPROCMASK */
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo
+#define sigmask_ismasked_in(self, signo, x) sigmask_ismasked_in(self, signo)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+{
+	int result;
 	REF struct kernel_sigmask *sm;
 	uintptr_t thread_flags = ATOMIC_READ(self->t_flags);
 #ifdef CONFIG_HAVE_USERPROCMASK
@@ -239,21 +266,21 @@ sigmask_ismasked_in(struct task *__restrict self,
 		 * always be unmasked, no matter what the thread's userprocmask
 		 * may say. */
 		if (signo == SIGKILL || signo == SIGSTOP)
-			return false; /* Cannot be masked. */
+			return SIGMASK_ISMASKED_NO; /* Cannot be masked. */
 		/* A vfork'd thread always has all signals masked. */
 #ifndef CONFIG_HAVE_USERPROCMASK
-		return true;
+		return SIGMASK_ISMASKED_YES;
 #else /* !CONFIG_HAVE_USERPROCMASK */
 		if unlikely(thread_flags & TASK_FVFORK)
-			return true;
+			return SIGMASK_ISMASKED_YES;
 		/* Special handling for when `self' is the caller. */
-		if (self == THIS_TASK)
-			return usersigmask_ismasked_chk(signo);
-		/* TODO: USERPROCMASK currently has a soft-lock scenario, where a
-		 *       signal sent to a process containing at least 2 threads,
-		 *       with the first (in terms of checking-order when determining
-		 *       who should receive a posix signal send to the process as a
-		 *       whole) 2 of those threads both using userprocmask.
+		if (self == THIS_TASK && allow_blocking_and_exception_when_self_is_THIS_TASK)
+			return (int)usersigmask_ismasked_chk(signo);
+		/* USERPROCMASK would have a soft-lock scenario, where a
+		 * signal sent to a process containing at least 2 threads,
+		 * with the first (in terms of checking-order when determining
+		 * who should receive a posix signal send to the process as a
+		 * whole) 2 of those threads both using userprocmask.
 		 *
 		 *  [tid=1]: fork()  -> tid=2
 		 *
@@ -324,11 +351,15 @@ sigmask_ismasked_in(struct task *__restrict self,
 		 *     will have marked the signal as pending within their respective's user-space
 		 *     pending-signal-set)
 		 */
-		return false;
+		/* TODO: When `self' is running on the same CPU as we are, then we can
+		 *       try to gain insight into their user-space memory state by
+		 *       disabling preemption, temporarily switching page directories,
+		 *       and finally using memcpy_nopf() to access memory. */
+		return SIGMASK_ISMASKED_MAYBE;
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
 	sm     = FORTASK(self, this_sigmask).get();
-	result = sigismember(&sm->sm_mask, signo);
+	result = (int)sigismember(&sm->sm_mask, signo);
 	decref_unlikely(sm);
 	return result;
 }
@@ -1234,8 +1265,7 @@ done:
  * @return: false: The given process has terminated. */
 PRIVATE bool KCALL
 deliver_signal_to_some_thread_in_process(struct task *__restrict process_leader,
-                                         /*inherit(always)*/ struct sigqueue_entry *__restrict info,
-                                         gfp_t rpc_flags)
+                                         /*inherit(always)*/ struct sigqueue_entry *__restrict info)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC);
 
 
@@ -1275,8 +1305,7 @@ done:
 deliver_to_some_thread:
 	/* Deliver the signal to some other thread... */
 	deliver_signal_to_some_thread_in_process(task_getprocess(),
-	                                         info,
-	                                         GFP_NORMAL);
+	                                         info);
 	/* Restart the interrupted system call without letting userspace know. */
 	if (reason == TASK_RPC_REASON_SYSCALL)
 		return TASK_RPC_RESTART_SYSCALL;
@@ -1779,9 +1808,9 @@ done_handptr:
 
 
 
-/* Finalize a pointer set filled with `REF struct task *' elements. */
+/* Decref every task-object from `self'. */
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
+NOTHROW(FCALL taskref_pointer_set_decref_all)(struct pointer_set *__restrict self) {
 	REF struct task *thread;
 	POINTER_SET_FOREACH(thread, self) {
 		/* Arguably a `decref_likely()', but only if the
@@ -1790,6 +1819,12 @@ NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
 		 * if not all of these threads to terminate. */
 		decref(thread);
 	}
+}
+
+/* Finalize a pointer set filled with `REF struct task *' elements. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
+	taskref_pointer_set_decref_all(self);
 	pointer_set_fini(self);
 }
 
@@ -1800,10 +1835,9 @@ NOTHROW(FCALL taskref_pointer_set_fini)(struct pointer_set *__restrict self) {
  * @return: false:  The given thread `target' has already terminated execution.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG'
  * @throw: E_INTERRUPT_USER_RPC:        `target' is the calling thread, and the signal isn't being blocked at the moment. */
-PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+PUBLIC NONNULL((1)) bool KCALL
 task_raisesignalthread(struct task *__restrict target,
-                       USER CHECKED siginfo_t const *info,
-                       gfp_t rpc_flags)
+                       USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
 	bool result;
@@ -1812,7 +1846,7 @@ task_raisesignalthread(struct task *__restrict target,
 	/* The signal is being masked.
 	 * Allocate a queue entry which is going to be scheduled. */
 	entry = (struct sigqueue_entry *)kmalloc(sizeof(struct sigqueue_entry),
-	                                         rpc_flags);
+	                                         GFP_NORMAL);
 	TRY {
 		memcpy(&entry->sqe_info, info, sizeof(siginfo_t));
 		if unlikely(entry->sqe_info.si_signo <= 0 ||
@@ -1821,7 +1855,10 @@ task_raisesignalthread(struct task *__restrict target,
 			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 			      entry->sqe_info.si_signo);
 		}
-		is_masked = sigmask_ismasked_in(target, entry->sqe_info.si_signo);
+		is_masked = sigmask_ismasked_in(target,
+		                                entry->sqe_info.si_signo,
+		                                true) !=
+		            SIGMASK_ISMASKED_NO;
 	} EXCEPT {
 		kfree(entry);
 		RETHROW();
@@ -1848,13 +1885,15 @@ task_raisesignalthread(struct task *__restrict target,
 		 * unmasked before we inserted our new signal into the queue, in which case the
 		 * target thread may not know about it. - Because of this, send an RPC to have
 		 * the target thread manually check for unmasked signals. */
-		if unlikely(!sigmask_ismasked_in(target, entry->sqe_info.si_signo)) {
+		if unlikely(sigmask_ismasked_in(target,
+		                                entry->sqe_info.si_signo,
+		                                true) !=
+		            SIGMASK_ISMASKED_NO) {
 			/* The signal got unmasked */
 			result = task_schedule_user_rpc(target,
 			                                &task_sigmask_check_rpc_handler,
 			                                NULL,
-			                                TASK_USER_RPC_FINTR,
-			                                rpc_flags);
+			                                TASK_USER_RPC_FINTR);
 			return result;
 			
 		}
@@ -1866,8 +1905,7 @@ task_raisesignalthread(struct task *__restrict target,
 		result = task_schedule_user_rpc(target,
 		                                &task_signal_rpc_handler,
 		                                entry,
-		                                TASK_USER_RPC_FINTR,
-		                                rpc_flags);
+		                                TASK_USER_RPC_FINTR);
 	} EXCEPT {
 		if (!was_thrown(E_INTERRUPT_USER_RPC))
 			kfree(entry);
@@ -1884,18 +1922,15 @@ task_raisesignalthread(struct task *__restrict target,
 
 /* Find a thread within the process lead by `process_leader' that isn't
  * masking `signo'. If no such thread exists, return `NULL' instead. */
-PRIVATE REF struct task *KCALL
+PRIVATE WUNUSED NONNULL((1)) REF struct task *KCALL
 find_thread_in_process_with_unmasked_signal(struct task *__restrict process_leader,
                                             signo_t signo)
-#ifndef DELIVER_NX
-		THROWS(E_WOULDBLOCK)
-#endif /* !DELIVER_NX */
-{
+		THROWS(E_WOULDBLOCK) {
 	struct taskgroup *group;
 	struct taskpid *cpid;
 	assert(!(process_leader->t_flags & TASK_FKERNTHREAD));
 	/* First check: is the leader masking the signal? */
-	if (!sigmask_ismasked_in(process_leader, signo))
+	if (sigmask_ismasked_in(process_leader, signo, true) == SIGMASK_ISMASKED_NO)
 		return incref(process_leader);
 	group = &FORTASK(process_leader, this_taskgroup);
 	sync_read(&group->tg_proc_threads_lock);
@@ -1913,14 +1948,7 @@ find_thread_in_process_with_unmasked_signal(struct task *__restrict process_lead
 		/* Only consider child _threads_ (not child processes) */
 		if (task_getprocess_of(child) == process_leader) {
 			/* Check if the thread is masking the given signal. */
-			bool is_masked;
-			TRY {
-				is_masked = sigmask_ismasked_in(child, signo);
-			} EXCEPT {
-				decref_unlikely(child);
-				RETHROW();
-			}
-			if (!is_masked) {
+			if (sigmask_ismasked_in(child, signo, false) == SIGMASK_ISMASKED_NO) {
 				sync_endread(&group->tg_proc_threads_lock);
 				return child;
 			}
@@ -1934,6 +1962,142 @@ find_thread_in_process_with_unmasked_signal(struct task *__restrict process_lead
 
 
 
+#ifdef SIGMASK_ISMASKED_MAYBE
+/* Same as `find_thread_in_process_with_unmasked_signal()', but in the event
+ * that NULL ends up being returned, initialize `pmaybe_maskers' as a pointer
+ * set of references (to-be finalized by `taskref_pointer_set_fini()') of all
+ * the threads for which `sigmask_ismasked_in()' returned `SIGMASK_ISMASKED_MAYBE' */
+PRIVATE WUNUSED NONNULL((1, 3)) REF struct task *KCALL
+find_thread_in_process_with_unmasked_signal_and_gather_maybe_maskers(struct task *__restrict process_leader, signo_t signo,
+                                                                     /*[out_if(return == NULL)]*/ struct pointer_set *__restrict pmaybe_maskers)
+		THROWS(E_WOULDBLOCK) {
+	struct taskgroup *group;
+	struct taskpid *cpid;
+	int is_masked;
+	size_t has_maybe_masked;
+	assert(!(process_leader->t_flags & TASK_FKERNTHREAD));
+	/* First check: is the leader masking the signal? */
+	is_masked = sigmask_ismasked_in(process_leader, signo, true);
+	if (is_masked == SIGMASK_ISMASKED_NO)
+		return incref(process_leader);
+	has_maybe_masked = is_masked == SIGMASK_ISMASKED_MAYBE ? 1 : 0;
+	group = &FORTASK(process_leader, this_taskgroup);
+	sync_read(&group->tg_proc_threads_lock);
+	cpid = ATOMIC_READ(group->tg_proc_threads);
+	if unlikely(cpid == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
+		sync_endread(&group->tg_proc_threads_lock);
+		/* Terminated thread... */
+		return NULL;
+	}
+	for (; cpid; cpid = cpid->tp_siblings.ln_next) {
+		REF struct task *child;
+		child = cpid->tp_thread.get();
+		if (!child)
+			continue;
+		/* Only consider child _threads_ (not child processes) */
+		if (task_getprocess_of(child) == process_leader) {
+			/* Check if the thread is masking the given signal. */
+			int is_masked = sigmask_ismasked_in(child, signo, false);
+			if (is_masked == SIGMASK_ISMASKED_NO) {
+				sync_endread(&group->tg_proc_threads_lock);
+				return child;
+			}
+			if (is_masked == SIGMASK_ISMASKED_MAYBE)
+				++has_maybe_masked;
+		}
+		decref_unlikely(child);
+	}
+	pointer_set_init(pmaybe_maskers);
+	if (has_maybe_masked != 0) {
+		/* If there are threads that ~may~ be masking the signal,
+		 * gather them up now. */
+		sync_endread(&group->tg_proc_threads_lock);
+		if (has_maybe_masked > pmaybe_maskers->ps_mask) {
+			/* The buffer won't be large enough... */
+			pointer_set_clear_and_rehash(pmaybe_maskers,
+			                             has_maybe_masked);
+		}
+again_search_for_maybe_maskers:
+		TRY {
+			is_masked = sigmask_ismasked_in(process_leader, signo, true);
+			if (is_masked == SIGMASK_ISMASKED_NO) {
+				pointer_set_fini(pmaybe_maskers);
+				return incref(process_leader);
+			}
+			if (is_masked == SIGMASK_ISMASKED_MAYBE) {
+				pointer_set_insert(pmaybe_maskers, process_leader);
+				incref(process_leader); /* The reference inherited by `pointer_set_insert()' */
+			}
+			sync_read(&group->tg_proc_threads_lock);
+		} EXCEPT {
+			taskref_pointer_set_fini(pmaybe_maskers);
+			RETHROW();
+		}
+		cpid = ATOMIC_READ(group->tg_proc_threads);
+		if unlikely(cpid == TASKGROUP_TG_PROC_THREADS_TERMINATED) {
+			sync_endread(&group->tg_proc_threads_lock);
+			taskref_pointer_set_fini(pmaybe_maskers);
+			/* Terminated thread... */
+			return NULL;
+		}
+		for (; cpid; cpid = cpid->tp_siblings.ln_next) {
+			REF struct task *child;
+			int is_masked;
+			int insert_error;
+			child = cpid->tp_thread.get();
+			if (!child)
+				continue;
+			/* Only consider child _threads_ (not child processes) */
+			if (task_getprocess_of(child) != process_leader) {
+				decref_unlikely(child);
+				continue;
+			}
+			/* Check if the thread is masking the given signal. */
+			is_masked = sigmask_ismasked_in(child, signo, false);
+			if unlikely(is_masked == SIGMASK_ISMASKED_NO) {
+				/* This really shouldn't happen, but better be safe! */
+				sync_endread(&group->tg_proc_threads_lock);
+				taskref_pointer_set_fini(pmaybe_maskers);
+				return child;
+			}
+			if (is_masked != SIGMASK_ISMASKED_MAYBE) {
+			}
+			/* Add this thread to the pointer set.
+			 * If the set is full, and we can't increase its size atomically,
+			 * then we must release all locks, clear the set, and start over
+			 * from scratch. */
+			insert_error = pointer_set_insert_nx(pmaybe_maskers, child, GFP_ATOMIC);
+			if (insert_error != POINTER_SET_INSERT_NX_SUCCESS) {
+				assertf(insert_error != POINTER_SET_INSERT_NX_EXISTS,
+				        "This would indicate a loop in the child chain of `process_leader'");
+				sync_endread(&group->tg_proc_threads_lock);
+				decref_unlikely(child);
+				taskref_pointer_set_decref_all(pmaybe_maskers);
+				/* Increase the buffer size of `pmaybe_maskers' to have
+				 * at least enough space for +1 additional thread from
+				 * the number of thread that (were) contained until now. */
+				TRY {
+					pointer_set_clear_and_rehash(pmaybe_maskers,
+					                             pmaybe_maskers->ps_size + 1);
+				} EXCEPT {
+					pointer_set_fini(pmaybe_maskers);
+					RETHROW();
+				}
+				goto again_search_for_maybe_maskers;
+			}
+			/* In this case, the `pointer_set_insert_nx()' will have inherited
+			 * a reference to `child', meaning that we mustn't decref it here! */
+			/*decref_unlikely(child);*/
+		}
+	}
+	sync_endread(&group->tg_proc_threads_lock);
+	/* The signal is being masked everywhere. */
+	return NULL;
+}
+#endif /* SIGMASK_ISMASKED_MAYBE */
+
+
+
 
 
 /* Deliver the given signal `info' to some thread apart of the process lead by `process_leader'
@@ -1942,8 +2106,7 @@ find_thread_in_process_with_unmasked_signal(struct task *__restrict process_lead
  * @return: false: The given process has terminated. */
 PRIVATE bool KCALL
 deliver_signal_to_some_thread_in_process(struct task *__restrict process_leader,
-                                         /*inherit(always)*/ struct sigqueue_entry *__restrict info,
-                                         gfp_t rpc_flags)
+                                         /*inherit(always)*/ struct sigqueue_entry *__restrict info)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_INTERRUPT_USER_RPC) {
 	bool result;
 	REF struct task *target;
@@ -1980,8 +2143,7 @@ deliver_signal_to_some_thread_in_process(struct task *__restrict process_leader,
 			result = task_schedule_user_rpc(target,
 			                                &task_process_signal_rpc_handler,
 			                                info,
-			                                TASK_USER_RPC_FINTR,
-			                                rpc_flags);
+			                                TASK_USER_RPC_FINTR);
 		} EXCEPT {
 			if (!was_thrown(E_INTERRUPT_USER_RPC))
 				kfree(info);
@@ -2024,20 +2186,47 @@ again_find_late_target:
 	/* Check for a potential target thread one more time. */
 	if unlikely(ATOMIC_READ(process_leader->t_flags) & (TASK_FTERMINATING | TASK_FTERMINATED))
 		return false; /* No possible receiver in a terminating process. */
-
-	target = find_thread_in_process_with_unmasked_signal(process_leader,
-	                                                     kernel_signo);
-	if (target) {
-		/* Deliver a `task_sigmask_check_rpc_handler' RPC to the target thread. */
-		FINALLY_DECREF_UNLIKELY(target);
-		if unlikely(!task_schedule_user_rpc(target,
-		                                    &task_sigmask_check_rpc_handler,
-		                                    NULL,
-		                                    TASK_USER_RPC_FINTR,
-		                                    rpc_flags)) {
-			/* The chosen target has terminated. - Try to find another candidate. */
-			goto again_find_late_target;
+	{
+#ifdef SIGMASK_ISMASKED_MAYBE
+		struct pointer_set maybe_blocking_threads;
+		target = find_thread_in_process_with_unmasked_signal_and_gather_maybe_maskers(process_leader,
+		                                                                              kernel_signo,
+		                                                                              &maybe_blocking_threads);
+#else /* SIGMASK_ISMASKED_MAYBE */
+		target = find_thread_in_process_with_unmasked_signal(process_leader,
+		                                                     kernel_signo);
+#endif /* !SIGMASK_ISMASKED_MAYBE */
+		if (target) {
+			/* Deliver a `task_sigmask_check_rpc_handler' RPC to the target thread. */
+			FINALLY_DECREF_UNLIKELY(target);
+			if unlikely(!task_schedule_user_rpc(target,
+			                                    &task_sigmask_check_rpc_handler,
+			                                    NULL,
+			                                    TASK_USER_RPC_FINTR)) {
+				/* The chosen target has terminated. - Try to find another candidate. */
+				goto again_find_late_target;
+			}
 		}
+#ifdef SIGMASK_ISMASKED_MAYBE
+		else {
+			/* Send the `task_sigmask_check_rpc_handler' to every thread
+			 * from `maybe_blocking_threads'. - Since we can't figure out
+			 * if each one of them is currently masking the signal, they'll
+			 * just have to figure that out for themselves. */
+			TRY {
+				POINTER_SET_FOREACH(target, &maybe_blocking_threads) {
+					task_schedule_user_rpc(target,
+					                       &task_sigmask_check_rpc_handler,
+					                       NULL,
+					                       TASK_USER_RPC_FINTR);
+				}
+			} EXCEPT {
+				taskref_pointer_set_fini(&maybe_blocking_threads);
+				RETHROW();
+			}
+			taskref_pointer_set_fini(&maybe_blocking_threads);
+		}
+#endif /* SIGMASK_ISMASKED_MAYBE */
 	}
 	return true;
 }
@@ -2050,10 +2239,9 @@ again_find_late_target:
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `NSIG'
  * @throw: E_INTERRUPT_USER_RPC:         The calling thread is apart of the same process,
  *                                       and the signal isn't being blocked at the moment. */
-PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+PUBLIC NONNULL((1)) bool KCALL
 task_raisesignalprocess(struct task *__restrict target,
-                        USER CHECKED siginfo_t const *info,
-                        gfp_t rpc_flags)
+                        USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
 	struct sigqueue_entry *entry;
@@ -2063,7 +2251,7 @@ task_raisesignalprocess(struct task *__restrict target,
 		return false;
 	/* Allocate the queue entry for the given signal. */
 	entry = (struct sigqueue_entry *)kmalloc(sizeof(struct sigqueue_entry),
-	                                         rpc_flags);
+	                                         GFP_NORMAL);
 	TRY {
 		memcpy(&entry->sqe_info, info, sizeof(siginfo_t));
 		if unlikely(entry->sqe_info.si_signo <= 0 || entry->sqe_info.si_signo >= NSIG) {
@@ -2076,18 +2264,16 @@ task_raisesignalprocess(struct task *__restrict target,
 		RETHROW();
 	}
 	result = deliver_signal_to_some_thread_in_process(target,
-	                                                  entry,
-	                                                  rpc_flags);
+	                                                  entry);
 	return result;
 }
 
 
 /* Send a signal to every process within the same process group that `target' is apart of.
  * @return: * : The number of processes to which the signal was delivered. */
-PUBLIC NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
+PUBLIC NONNULL((1)) size_t KCALL
 task_raisesignalprocessgroup(struct task *__restrict target,
-                             USER CHECKED siginfo_t const *info,
-                             gfp_t rpc_flags)
+                             USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED) {
 	size_t result = 0;
@@ -2099,7 +2285,7 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 	pgroup = task_getprocessgroupleader_srch_of(target);
 	pgroup_group = &FORTASK(pgroup, this_taskgroup);
 	TRY {
-		if (task_raisesignalprocess(pgroup, info, rpc_flags))
+		if (task_raisesignalprocess(pgroup, info))
 			++result;
 	} EXCEPT {
 		if (was_thrown(E_INTERRUPT_USER_RPC))
@@ -2141,7 +2327,7 @@ load_more_threads:
 				thread = pending_delivery_procv[pending_delivery_procc - 1];
 				/* Deliver to this process. */
 				TRY {
-					if (task_raisesignalprocess(thread, info, rpc_flags))
+					if (task_raisesignalprocess(thread, info))
 						++result;
 				} EXCEPT {
 					if (!was_thrown(E_INTERRUPT_USER_RPC))
@@ -2173,7 +2359,7 @@ load_more_threads:
 				 * NOTE: We don't keep references for the taskpid structures of
 				 * threads that already got the signal, since certain types of
 				 * thread (kernel threads) don't have taskpid descriptors! */
-				pointer_set_insert(&ps, thread, rpc_flags); /* Inherit reference. */
+				pointer_set_insert(&ps, thread, GFP_NORMAL); /* Inherit reference. */
 				/*decref_unlikely(thread);*/ /* Inherited by `ps' */
 				--pending_delivery_procc;
 			}

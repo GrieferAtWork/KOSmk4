@@ -358,14 +358,13 @@ struct sigqueue_entry {
 };
 
 /* Raise a posix signal within a given thread `target'
- * @return: true:   Successfully scheduled/enqueued the signal for delivery to `target'
- * @return: false:  The given thread `target' has already terminated execution.
+ * @return: true:  Successfully scheduled/enqueued the signal for delivery to `target'
+ * @return: false: The given thread `target' has already terminated execution.
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or > `_NSIG'
  * @throw: E_INTERRUPT_USER_RPC:        `target' is the calling thread, and the signal isn't being blocked at the moment. */
-FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+FUNDEF NONNULL((1)) bool KCALL
 task_raisesignalthread(struct task *__restrict target,
-                       USER CHECKED siginfo_t const *info,
-                       gfp_t rpc_flags DFL(GFP_NORMAL))
+                       USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT);
 
@@ -376,20 +375,18 @@ task_raisesignalthread(struct task *__restrict target,
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE: The signal number in `info' is ZERO(0) or >= `_NSIG+1'
  * @throw: E_INTERRUPT_USER_RPC:         The calling thread is apart of the same process,
  *                                       and the signal isn't being blocked at the moment. */
-FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
+FUNDEF NONNULL((1)) bool KCALL
 task_raisesignalprocess(struct task *__restrict target,
-                        USER CHECKED siginfo_t const *info,
-                        gfp_t rpc_flags DFL(GFP_NORMAL))
+                        USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT);
 
 
 /* Send a signal to every process within the same process group that `target' is apart of.
  * @return: * : The number of processes to which the signal was delivered. */
-FUNDEF NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
+FUNDEF NONNULL((1)) size_t KCALL
 task_raisesignalprocessgroup(struct task *__restrict target,
-                             USER CHECKED siginfo_t const *info,
-                             gfp_t rpc_flags DFL(GFP_NORMAL))
+                             USER CHECKED siginfo_t const *info)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_PROCESS_EXITED);
 
@@ -398,40 +395,34 @@ task_raisesignalprocessgroup(struct task *__restrict target,
 #ifdef __cplusplus
 extern "C++" {
 /* Simplified variants of the functions above that directly take a kernel-space SIGNO */
-LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
-task_raisesignalthread(struct task *__restrict target,
-                       signo_t signo,
-                       gfp_t rpc_flags DFL(GFP_NORMAL))
+LOCAL ATTR_ARTIFICIAL NONNULL((1)) bool KCALL
+task_raisesignalthread(struct task *__restrict target, signo_t signo)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
 	siginfo_t info;
 	__libc_memset(&info, 0, sizeof(info));
 	info.si_signo = signo;
-	return task_raisesignalthread(target, &info, rpc_flags);
+	return task_raisesignalthread(target, &info);
 }
 
-LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) bool KCALL
-task_raisesignalprocess(struct task *__restrict target,
-                        signo_t signo,
-                        gfp_t rpc_flags DFL(GFP_NORMAL))
+LOCAL ATTR_ARTIFICIAL NONNULL((1)) bool KCALL
+task_raisesignalprocess(struct task *__restrict target, signo_t signo)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
 	siginfo_t info;
 	__libc_memset(&info, 0, sizeof(info));
 	info.si_signo = signo;
-	return task_raisesignalprocess(target, &info, rpc_flags);
+	return task_raisesignalprocess(target, &info);
 }
 
-LOCAL ATTR_ARTIFICIAL NOBLOCK_IF(rpc_flags & GFP_ATOMIC) NONNULL((1)) size_t KCALL
-task_raisesignalprocessgroup(struct task *__restrict target,
-                             signo_t signo,
-                             gfp_t rpc_flags DFL(GFP_NORMAL))
+LOCAL ATTR_ARTIFICIAL NONNULL((1)) size_t KCALL
+task_raisesignalprocessgroup(struct task *__restrict target, signo_t signo)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_VALUE,
 		       E_INTERRUPT_USER_RPC) {
 	siginfo_t info;
 	__libc_memset(&info, 0, sizeof(info));
 	info.si_signo = signo;
-	return task_raisesignalprocessgroup(target, &info, rpc_flags);
+	return task_raisesignalprocessgroup(target, &info);
 }
 
 }
