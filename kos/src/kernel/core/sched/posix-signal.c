@@ -185,6 +185,7 @@ PUBLIC ATTR_PERTASK ATOMIC_REF(struct kernel_sigmask)
 this_sigmask = ATOMIC_REF_INIT(&kernel_sigmask_empty);
 
 
+#ifdef CONFIG_HAVE_USERPROCMASK
 PRIVATE ATTR_PURE WUNUSED bool FCALL
 usersigmask_ismasked_chk(signo_t signo) {
 	ulongptr_t mask, word;
@@ -215,6 +216,7 @@ usersigmask_ismasked_chk(signo_t signo) {
 	 * NOTE: This call contains the second user-space memory access! */
 	return sigismember(usigset, signo);
 }
+#endif /* CONFIG_HAVE_USERPROCMASK */
 
 
 /* Check if the given `signo' is currently masked by `self'.
@@ -227,11 +229,21 @@ sigmask_ismasked_in(struct task *__restrict self,
 	bool result;
 	REF struct kernel_sigmask *sm;
 	uintptr_t thread_flags = ATOMIC_READ(self->t_flags);
-	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK)) {
-		/* Always behave as though this was `kernel_sigmask_full'. */
+#ifdef CONFIG_HAVE_USERPROCMASK
+	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK))
+#else /* CONFIG_HAVE_USERPROCMASK */
+	if (thread_flags & TASK_FVFORK)
+#endif /* !CONFIG_HAVE_USERPROCMASK */
+	{
+		/* Special case for SIGKILL and SIGSTOP, which are assumed to
+		 * always be unmasked, no matter what the thread's userprocmask
+		 * may say. */
 		if (signo == SIGKILL || signo == SIGSTOP)
 			return false; /* Cannot be masked. */
 		/* A vfork'd thread always has all signals masked. */
+#ifndef CONFIG_HAVE_USERPROCMASK
+		return true;
+#else /* !CONFIG_HAVE_USERPROCMASK */
 		if unlikely(thread_flags & TASK_FVFORK)
 			return true;
 		/* Special handling for when `self' is the caller. */
@@ -276,9 +288,44 @@ sigmask_ismasked_in(struct task *__restrict self,
 		 * each other RPC for all of eternity.
 		 *
 		 * This problem can be reproduced via `playground sigbounce'
+		 *
+		 *
+		 * Solution:
+		 *   - There needs to be a way for the kernel to read the USERPROCMASK of
+		 *     a thread different than THIS_TASK. For this purpose, we'd need to:
+		 *     - Ensure that `self' doesn't change `FORTASK(self, this_userprocmask_address)'
+		 *       This is doable, since the only way to change that value is through use of
+		 *       the set_tid_address(2) or set_userprocmask_address(2)
+		 *   - With this, we'd be able to safely do:
+		 *     ATOMIC_READ(FORTASK(self, this_userprocmask_address)->pm_sigmask)
+		 *     Note though that since this is a user-space memory access, we also
+		 *     need to deal with VIO, meaning that whatever is used to prevent
+		 *     the thread from changing `FORTASK(self, this_userprocmask_address)'
+		 *     can't be an atomic lock.
+		 *
+		 *   - But now what do we do? Once we've read `pm_sigmask', nothing's stopping
+		 *     the user-space side of `self' from setting a new signal mask, and writing
+		 *     unrelated garbage to the pointer we've read before.
+		 *   - We can do this test when `self' is running on the same CPU as we are,
+		 *     at which point we could do all of the memory access via memcpy_nopf,
+		 *     and only return is-masked if all of the reads were OK. Since this test
+		 *     should work in most cases, then not accounting for one of the threads
+		 *     using VIO for its sigmask, we'd end up with at most `cpu_count - 1'
+		 *     threads for which we still won't know
+		 *   - `sigmask_ismasked_in()' needs to return a tri-state boolean:
+		 *         `true', `false', `maybe'
+		 *     Where `maybe' means that the is-masked state could not be determined.
+		 *     When this happens, and our caller is `deliver_signal_to_some_thread_in_process',
+		 *     then they must gather references to all threads for which this happens
+		 *     into a `pointer_set', schedule the signal within the process's signal
+		 *     queue, and send a `task_sigmask_check_rpc_handler' RPC to each of them.
+		 *     Since that RPC won't try to forward itself onto other threads, the signal
+		 *     forwarding loop will have been broken. (and each of the process's threads
+		 *     will have marked the signal as pending within their respective's user-space
+		 *     pending-signal-set)
 		 */
-
 		return false;
+#endif /* CONFIG_HAVE_USERPROCMASK */
 	}
 	sm     = FORTASK(self, this_sigmask).get();
 	result = sigismember(&sm->sm_mask, signo);

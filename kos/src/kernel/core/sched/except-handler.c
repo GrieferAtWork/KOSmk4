@@ -401,7 +401,7 @@ load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 	struct kernel_sigmask *kernel_mask;
 	/* Read the old userprocmask descriptor's final signal mask into
 	 * the kernel mask buffer of the current thread. Once we've done
-	 * that we'll no longer need to access `old_ctl' */
+	 * that we'll no longer need to access `ctl' */
 	old_sigset = ATOMIC_READ(ctl->pm_sigmask);
 	validate_readable(old_sigset, sizeof(sigset_t));
 	kernel_mask = sigmask_kernel_getwr();
