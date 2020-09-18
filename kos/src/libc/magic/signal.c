@@ -1243,7 +1243,7 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 }
 
 @@@param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>"), export_alias("pthread_sigmask")]]
 int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 
 [[cp, export_alias("__sigsuspend")]]
@@ -1425,10 +1425,13 @@ $signo_t __libc_current_sigrtmax() {
 
 %
 %#if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
+
 [[guard, decl_include("<features.h>", "<bits/sigset.h>")]]
+[[nocrt, alias("pthread_sigmask", "sigprocmask")]]
 int pthread_sigmask(__STDC_INT_AS_UINT_T how,
                     [[nullable]] $sigset_t const *newmask,
                     [[nullable]] $sigset_t *oldmask);
+
 
 [[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 int pthread_kill($pthread_t threadid, $signo_t signo);

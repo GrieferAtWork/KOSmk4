@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbadafc76 */
+/* HASH CRC-32:0xe74f330f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -297,10 +297,10 @@ do_exec:
 #endif /* (!__CRT_HAVE_sigaction && !__CRT_HAVE___sigaction) || !__SIG_DFL */
 		}
 		if (attrp->__flags & __POSIX_SPAWN_SETSIGMASK) {
-#if defined(__CRT_HAVE_sigprocmask) && defined(__SIG_SETMASK)
+#if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && defined(__SIG_SETMASK)
 			if unlikely(libc_sigprocmask(__SIG_SETMASK, &attrp->__ss, NULL))
 				goto child_error;
-#else /* __CRT_HAVE_sigprocmask && __SIG_SETMASK */
+#else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) && __SIG_SETMASK */
 #ifdef ENOSYS
 			__libc_seterrno(ENOSYS);
 #elif defined(EPERM)
@@ -309,7 +309,7 @@ do_exec:
 			__libc_seterrno(1);
 #endif /* !... */
 			goto child_error;
-#endif /* !__CRT_HAVE_sigprocmask || !__SIG_SETMASK */
+#endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE_pthread_sigmask) || !__SIG_SETMASK */
 		}
 		if (attrp->__flags & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
 #if (defined(__CRT_HAVE_sched_setscheduler) || defined(__CRT_HAVE___sched_setscheduler)) && defined(__CRT_HAVE_sched_setparam) && (defined(__CRT_HAVE_sched_getparam) || defined(__CRT_HAVE___sched_getparam))

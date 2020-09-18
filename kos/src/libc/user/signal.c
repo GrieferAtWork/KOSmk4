@@ -758,25 +758,6 @@ err:
 }
 /*[[[end:libc_sigset]]]*/
 
-/*[[[head:libc_pthread_sigmask,hash:CRC-32=0xc2fbcd33]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(__STDC_INT_AS_UINT_T how,
-                                           sigset_t const *newmask,
-                                           sigset_t *oldmask)
-/*[[[body:libc_pthread_sigmask]]]*/
-{
-	errno_t result;
-#ifdef __NR_sigprocmask
-	result = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
-	                         newmask, oldmask);
-#else /* __NR_sigprocmask */
-	result = sys_rt_sigprocmask((syscall_ulong_t)(unsigned int)how,
-	                            newmask, oldmask, sizeof(sigset_t));
-#endif /* !__NR_sigprocmask */
-	return -result;
-}
-/*[[[end:libc_pthread_sigmask]]]*/
-
 /*[[[head:libc_pthread_kill,hash:CRC-32=0x7438a00e]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
@@ -836,7 +817,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x35c2142d]]]*/
+/*[[[start:exports,hash:CRC-32=0xecd00e04]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -859,6 +840,7 @@ DEFINE_PUBLIC_ALIAS(DOS$bsd_signal, libd_bsd_signal);
 DEFINE_PUBLIC_ALIAS(bsd_signal, libc_bsd_signal);
 DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
 DEFINE_PUBLIC_ALIAS(kill, libc_kill);
+DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(sigprocmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(__sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(sigsuspend, libc_sigsuspend);
@@ -882,7 +864,6 @@ DEFINE_PUBLIC_ALIAS(sighold, libc_sighold);
 DEFINE_PUBLIC_ALIAS(sigrelse, libc_sigrelse);
 DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
 DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
-DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_pthread_sigmask);
 DEFINE_PUBLIC_ALIAS(pthread_kill, libc_pthread_kill);
 DEFINE_PUBLIC_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);
 /*[[[end:exports]]]*/

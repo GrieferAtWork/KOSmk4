@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e753f7 */
+/* HASH CRC-32:0x84255d73 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,7 +96,6 @@ INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrt
 INTDEF ATTR_CONST WUNUSED signo_t NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_sigmask)(__STDC_INT_AS_UINT_T how, sigset_t const *newmask, sigset_t *oldmask);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_kill)(pthread_t threadid, signo_t signo);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_pthread_sigqueue)(pthread_t threadid, signo_t signo, union sigval const value);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1610e07e */
+/* HASH CRC-32:0x73717d34 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -486,11 +486,18 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sigismember_defined */
 /* Dependency: sigprocmask from signal */
-#if !defined(__local___localdep_sigprocmask_defined) && defined(__CRT_HAVE_sigprocmask)
+#ifndef __local___localdep_sigprocmask_defined
 #define __local___localdep_sigprocmask_defined 1
+#ifdef __CRT_HAVE_sigprocmask
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
-#endif /* !__local___localdep_sigprocmask_defined && __CRT_HAVE_sigprocmask */
+#elif defined(__CRT_HAVE_pthread_sigmask)
+/* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
+#else /* ... */
+#undef __local___localdep_sigprocmask_defined
+#endif /* !... */
+#endif /* !__local___localdep_sigprocmask_defined */
 /* Dependency: sprintf from stdio */
 #ifndef __local___localdep_sprintf_defined
 #define __local___localdep_sprintf_defined 1
@@ -906,10 +913,10 @@ __do_exec:
 #endif /* (!__CRT_HAVE_sigaction && !__CRT_HAVE___sigaction) || !__SIG_DFL */
 		}
 		if (__attrp->__flags & __POSIX_SPAWN_SETSIGMASK) {
-#if defined(__CRT_HAVE_sigprocmask) && defined(__SIG_SETMASK)
+#if (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && defined(__SIG_SETMASK)
 			if __unlikely(__localdep_sigprocmask(__SIG_SETMASK, &__attrp->__ss, __NULLPTR))
 				goto __child_error;
-#else /* __CRT_HAVE_sigprocmask && __SIG_SETMASK */
+#else /* (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) && __SIG_SETMASK */
 #ifdef __ENOSYS
 			__libc_seterrno(__ENOSYS);
 #elif defined(__EPERM)
@@ -918,7 +925,7 @@ __do_exec:
 			__libc_seterrno(1);
 #endif /* !... */
 			goto __child_error;
-#endif /* !__CRT_HAVE_sigprocmask || !__SIG_SETMASK */
+#endif /* (!__CRT_HAVE_sigprocmask && !__CRT_HAVE_pthread_sigmask) || !__SIG_SETMASK */
 		}
 		if (__attrp->__flags & (__POSIX_SPAWN_SETSCHEDPARAM | __POSIX_SPAWN_SETSCHEDULER)) {
 #if (defined(__CRT_HAVE_sched_setscheduler) || defined(__CRT_HAVE___sched_setscheduler)) && defined(__CRT_HAVE_sched_setparam) && (defined(__CRT_HAVE_sched_getparam) || defined(__CRT_HAVE___sched_getparam))

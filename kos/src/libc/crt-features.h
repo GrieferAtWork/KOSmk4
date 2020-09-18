@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc20625b9 */
+/* HASH CRC-32:0x15e89bce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1982,7 +1982,6 @@
 #define __CRT_HAVE_DOS$pthread_setschedparam 1
 #define __CRT_HAVE_DOS$pthread_setschedprio 1
 #define __CRT_HAVE_DOS$pthread_setspecific 1
-#define __CRT_HAVE_DOS$pthread_sigmask 1
 #define __CRT_HAVE_DOS$pthread_sigqueue 1
 #define __CRT_HAVE_DOS$pthread_spin_destroy 1
 #define __CRT_HAVE_DOS$pthread_spin_init 1
@@ -5012,7 +5011,6 @@
 #define __CRT_HAVE_pthread_setschedparam 1
 #define __CRT_HAVE_pthread_setschedprio 1
 #define __CRT_HAVE_pthread_setspecific 1
-#define __CRT_HAVE_pthread_sigmask 1
 #define __CRT_HAVE_pthread_sigqueue 1
 #define __CRT_HAVE_pthread_spin_destroy 1
 #define __CRT_HAVE_pthread_spin_init 1
