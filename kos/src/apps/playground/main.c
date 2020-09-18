@@ -803,7 +803,7 @@ int main_vfork(int argc, char *argv[], char *envp[]) {
 PRIVATE sigset_t const full_sigset = SIGSET_INIT_FULL;
 PRIVATE void *sigbound_theradmain(void *) {
 	/* Block _all_ signals.
-	 * The implementation function will also ensure
+	 * This function's implementation will also ensure
 	 * that we're using the userprocmask mechanism. */
 	setsigmaskptr((sigset_t *)&full_sigset);
 	for (;;) {
@@ -818,22 +818,24 @@ int main_sigbounce(int argc, char *argv[], char *envp[]) {
 	pthread_t pt;
 
 	/* Block _all_ signals.
-	 * The implementation function will also ensure
+	 * This function's implementation will also ensure
 	 * that we're using the userprocmask mechanism. */
 	setsigmaskptr((sigset_t *)&full_sigset);
 
 	/* Create an additional thread, thus bumping our process's total
 	 * thread count up to 2, which is needed to get the two threads
-	 * between which the signal will end up bouncing. */
+	 * the signal used to end up bouncing between. */
 	pthread_create(&pt, NULL, &sigbound_theradmain, NULL);
 
-	/* A test program to trigger the problem detailed in `sigmask_ismasked_in()'
-	 * To trigger the problem, press CTRL+C after running `playground sigbounce'
+	/* A test program to test the corner-case detailed in `sigmask_ismasked_in()'
+	 * To trigger the corner-case, press CTRL+C after running `playground sigbounce'
 	 *
-	 * At that point, the kernel will send a signal to our process, which will
-	 * then keep on bouncing between thread. THIS IS NOT INTENDED!
+	 * At that point, the kernel will send a signal to our process, which used
+	 * to keep on bouncing between thread. This was not intended, and has since
+	 * been fixed!
 	 *
-	 * This test program is only here to consistently trigger the problem! */
+	 * This test program was written to consistently trigger the problem and
+	 * test that it no longer happens! */
 	while (getchar() != '\n')
 		;
 	return 0;
