@@ -1494,7 +1494,13 @@ sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK) {
 	do {
 		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
 		 *      instead of having to re-read `this_userprocmask_address->pm_sigmask'
-		 *      for every signal! */
+		 *      for every signal!
+		 * Do this via a new helper function:
+		 *    >> NONNULL((1)) struct sigqueue_entry *KCALL
+		 *    >> sigqueue_pop_unmasked_entry(struct sigqueue_entry **piter);
+		 * That function essentially just contains this do...while loop,
+		 * returning NULL if all pending signals are masked, and the popped
+		 * signal when one was found that isn't masked. */
 		if (!sigmask_ismasked_chk(iter->sqe_info.si_signo)) {
 			/* Found one that's not being masked. */
 			*piter = iter->sqe_next;
@@ -1947,7 +1953,7 @@ task_raisesignalthread(struct task *__restrict target,
 		       E_INTERRUPT_USER_RPC, E_SEGFAULT) {
 	bool result;
 	struct sigqueue_entry *entry;
-	bool is_masked;
+	bool maybe_masked;
 	/* The signal is being masked.
 	 * Allocate a queue entry which is going to be scheduled. */
 	entry = (struct sigqueue_entry *)kmalloc(sizeof(struct sigqueue_entry),
@@ -1960,16 +1966,16 @@ task_raisesignalthread(struct task *__restrict target,
 			      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO,
 			      entry->sqe_info.si_signo);
 		}
-		is_masked = sigmask_ismasked_in(target,
-		                                entry->sqe_info.si_signo,
-		                                true) !=
-		            SIGMASK_ISMASKED_NO;
+		maybe_masked = sigmask_ismasked_in(target,
+		                                   entry->sqe_info.si_signo,
+		                                   true) !=
+		               SIGMASK_ISMASKED_NO;
 	} EXCEPT {
 		kfree(entry);
 		RETHROW();
 	}
 	/* Check if the signal is being masked. */
-	if (is_masked) {
+	if (maybe_masked) {
 		/* Schedule the signal as pending within the target thread. */
 		struct sigqueue *pending;
 		struct sigqueue_entry *next;
@@ -1993,8 +1999,8 @@ task_raisesignalthread(struct task *__restrict target,
 		if unlikely(sigmask_ismasked_in(target,
 		                                entry->sqe_info.si_signo,
 		                                true) !=
-		            SIGMASK_ISMASKED_NO) {
-			/* The signal got unmasked */
+		            SIGMASK_ISMASKED_YES) {
+			/* The signal is (maybe) unmasked */
 			result = task_schedule_user_rpc(target,
 			                                &task_sigmask_check_rpc_handler,
 			                                NULL,
