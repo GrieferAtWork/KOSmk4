@@ -61,19 +61,20 @@ PUBLIC ATTR_PERTASK struct user_except_handler this_user_except_handler = {
 	/* .ueh_stack   = */ EXCEPT_HANDLER_SP_CURRENT,
 };
 
-/* [0..1] User-space TID address used to implement functionality such as `pthread_join()'
- *        When the associated thread exits, it will:
- *        >> pid_t *addr = PERTASK_GET(this_tid_address);
- *        >> if (addr) {
- *        >>     TRY {
- *        >>         *addr = 0;
- *        >>         vm_futex_broadcast(addr);
- *        >>     } EXCEPT {
- *        >>         if (!was_thrown(E_SEGFAULT) ||
- *        >>             (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr))
- *        >>             error_printf("...");
- *        >>     }
- *        >> }
+/* [0..1][lock(PRIVATE(THIS_TASK))]
+ * User-space TID address used to implement functionality such as `pthread_join()'
+ * When the associated thread exits, it will:
+ *     >> pid_t *addr = PERTASK_GET(this_tid_address);
+ *     >> if (addr) {
+ *     >>     TRY {
+ *     >>         *addr = 0;
+ *     >>         vm_futex_broadcast(addr);
+ *     >>     } EXCEPT {
+ *     >>         if (!was_thrown(E_SEGFAULT) ||
+ *     >>             (PERTASK_GET(this_exception_args.e_segfault.s_addr) != (uintptr_t)addr))
+ *     >>             error_printf("...");
+ *     >>     }
+ *     >> }
  * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will cause
  * the given `ctid' to be used as the initial value for `this_tid_address', while the
  * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's

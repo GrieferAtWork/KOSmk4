@@ -232,8 +232,111 @@ usersigmask_ismasked_chk(signo_t signo) {
 #define SIGMASK_ISMASKED_MAYBE (-2)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 
+/* Make sure that casting boolean expressions to
+ * integers yields the expected results of 0/1.
+ * This is assumed by code below */
 STATIC_ASSERT(SIGMASK_ISMASKED_NO == (int)false);
+STATIC_ASSERT(SIGMASK_ISMASKED_NO == (int)(10 == 0));
 STATIC_ASSERT(SIGMASK_ISMASKED_YES == (int)true);
+STATIC_ASSERT(SIGMASK_ISMASKED_YES == (int)(10 != 0));
+
+#ifdef CONFIG_HAVE_USERPROCMASK
+/* Try to switch page directory to that of `self', and make use
+ * of memcpy_nopf() to try to read its user-space userprocmask
+ * to determine if the given `signo' is currently being masked.
+ * If any of these steps fail, simply return `SIGMASK_ISMASKED_MAYBE'
+ * NOTE: The caller is responsible to ensure that `self->t_cpu == THIS_CPU',
+ *       as well as that preemption has been disabled. */
+PRIVATE NOPREEMPT NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict self,
+                                                     signo_t signo) {
+	int result = SIGMASK_ISMASKED_MAYBE;
+	USER CHECKED struct userprocmask *um;
+	USER UNCHECKED sigset_t *current_sigmask;
+	struct vm *myvm, *threadvm;
+	/* NOTE: This read is safe, since `self' is running on THIS_CPU,
+	 *       the `this_userprocmask_address' field is write-private
+	 *       to `self', and preemption is disabled, meaning that we
+	 *       know that nothing can change `this_userprocmask_address' */
+	um = FORTASK(self, this_userprocmask_address);
+
+	/* Make sure we're operating in the context of `self->t_vm'
+	 * Note that we don't use task_setvm() to change our's, since
+	 * that function may throw an exception, and would already be
+	 * complete overkill for our purposes. */
+	myvm     = THIS_VM;
+	threadvm = self->t_vm;
+	if (myvm != threadvm)
+		pagedir_set(threadvm->v_pdir_phys);
+
+	/* Use memcpy_nopf() to read the thread's current signal mask pointer. */
+	if (memcpy_nopf(&current_sigmask, &um->pm_sigmask, sizeof(current_sigmask)) != 0)
+		goto done;
+
+	/* Verify that `current_sigmask' points into user-space. */
+	if unlikely(!ADDR_ISUSER(current_sigmask))
+		goto done;
+
+	/* Now dereference `current_sigmask' at an appropriate location
+	 * in relation to `signo' */
+	{
+		ulongptr_t user_sigmask_word;
+		ulongptr_t word, mask;
+		word = __sigset_word(signo);
+		mask = __sigset_mask(signo);
+		if (memcpy_nopf(&user_sigmask_word,
+		                &current_sigmask->__val[word],
+		                sizeof(user_sigmask_word)) != 0)
+			goto done;
+		/* If we manage to get to this point, then we know that `user_sigmask_word'
+		 * is the correct mask value that we were after. - Use it now to determine
+		 * the masking-state of `signo' in `self' */
+		result = (user_sigmask_word & mask) != 0;
+
+		if (result == SIGMASK_ISMASKED_YES) {
+			/* If the signal _is_ being masked, then we still have to turn on the
+			 * corresponding bit in `um->pm_pending'! */
+			for (;;) {
+				if (memcpy_nopf(&user_sigmask_word,
+				                &um->pm_pending.__val[word],
+				                sizeof(user_sigmask_word)) != 0)
+					goto done;
+				if ((user_sigmask_word & mask) != 0)
+					break; /* Already marked as pending. -> Nothing to do here! */
+#if 0 /* TODO: This needs arch-specific backing! */
+				{
+					int error;
+					error = atomic_cmpxch_nopf(&um->pm_pending.__val[word],
+					                           user_sigmask_word,
+					                           user_sigmask_word | mask);
+					if (error == ATOMIC_CMPXCH_NX_DIFFERS)
+						continue;
+					if (error == ATOMIC_CMPXCH_NX_FAULT)
+						goto done;
+				}
+				printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
+				       um, signo, task_getroottid_of_s(self));
+#else
+				/* If the architecture doesn't support `atomic_cmpxch_nopf()',
+				 * and the signal hasn't been marked as pending, yet, then we
+				 * must act like we weren't able to figure out the is-masked
+				 * state of the thread, and have our caller send an RPC to
+				 * the given thread `self' to do all of this outside of NOPF
+				 * mode. */
+				result = SIGMASK_ISMASKED_MAYBE;
+#endif
+				break;
+			}
+		}
+	}
+
+done:
+	/* Switch back to our own VM */
+	if (myvm != threadvm)
+		pagedir_set(myvm->v_pdir_phys);
+	return result;
+}
+#endif /* CONFIG_HAVE_USERPROCMASK */
 
 
 /* Check if the given `signo' is currently masked by `self'.
@@ -249,7 +352,7 @@ sigmask_ismasked_in(struct task *__restrict self, signo_t signo,
                     bool allow_blocking_and_exception_when_self_is_THIS_TASK)
 #else /* CONFIG_HAVE_USERPROCMASK */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo
+NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 #define sigmask_ismasked_in(self, signo, x) sigmask_ismasked_in(self, signo)
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 {
@@ -316,8 +419,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo
 		 *
 		 * This problem can be reproduced via `playground sigbounce'
 		 *
-		 *
-		 * Solution:
+		 * Problem with the direct approach of just doing the check for a foreign thread:
 		 *   - There needs to be a way for the kernel to read the USERPROCMASK of
 		 *     a thread different than THIS_TASK. For this purpose, we'd need to:
 		 *     - Ensure that `self' doesn't change `FORTASK(self, this_userprocmask_address)'
@@ -329,10 +431,11 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo
 		 *     need to deal with VIO, meaning that whatever is used to prevent
 		 *     the thread from changing `FORTASK(self, this_userprocmask_address)'
 		 *     can't be an atomic lock.
-		 *
-		 *   - But now what do we do? Once we've read `pm_sigmask', nothing's stopping
+		 *   - But how would we do that? Once we've read `pm_sigmask', nothing's stopping
 		 *     the user-space side of `self' from setting a new signal mask, and writing
 		 *     unrelated garbage to the pointer we've read before.
+		 *
+		 * Solution:
 		 *   - We can do this test when `self' is running on the same CPU as we are,
 		 *     at which point we could do all of the memory access via memcpy_nopf,
 		 *     and only return is-masked if all of the reads were OK. Since this test
@@ -351,11 +454,20 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo
 		 *     will have marked the signal as pending within their respective's user-space
 		 *     pending-signal-set)
 		 */
-		/* TODO: When `self' is running on the same CPU as we are, then we can
-		 *       try to gain insight into their user-space memory state by
-		 *       disabling preemption, temporarily switching page directories,
-		 *       and finally using memcpy_nopf() to access memory. */
-		return SIGMASK_ISMASKED_MAYBE;
+		result = SIGMASK_ISMASKED_MAYBE;
+		if (ATOMIC_READ(self->t_cpu) == THIS_CPU) {
+			/* When `self' is running on the same CPU as we are, then we can
+			 * try to gain insight into their user-space memory state by
+			 * disabling preemption, temporarily switching page directories,
+			 * and finally using memcpy_nopf() to access memory. */
+			pflag_t was;
+			was = PREEMPTION_PUSHOFF();
+			/* Check again, how that our CPU won't change. */
+			if likely(ATOMIC_READ(self->t_cpu) == THIS_CPU)
+				result = sigmask_ismasked_in_userprocmask_nopf(self, signo);
+			PREEMPTION_POP(was);
+		}
+		return result;
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	}
 	sm     = FORTASK(self, this_sigmask).get();
