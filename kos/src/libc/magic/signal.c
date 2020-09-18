@@ -1242,17 +1242,63 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 	return (set->__val[word] & mask) != 0;
 }
 
+@@Change the signal mask for the calling thread. Note that portable
+@@programs that also make use of multithreading must instead use the
+@@pthread-specific `pthread_sigmask()' function instead, as POSIX
+@@states that this function behaves undefined in such szenarios.
+@@However, on KOS, `pthread_sigmask()' is imply an alias for this
+@@function, and `sigprocmask()' always operates thread-local.
+@@Note also that on KOS 2 additional functions `getsigmaskptr()'
+@@and `setsigmaskptr()' exist, which can be used to get/set the
+@@address of the signal mask used by the kernel.
 @@@param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 [[decl_include("<features.h>"), export_alias("pthread_sigmask")]]
+[[decl_prefix(struct __sigset_struct;)]]
 int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 
+%#ifdef __USE_KOS
+@@>> getsigmaskptr(3)
+@@Return the current signal mask pointer.
+@@See the documentation of `setsigmaskptr(3)' for
+@@what this function is all about. 
+[[nonnull, wunused, decl_include("<bits/sigset.h>")]]
+sigset_t *getsigmaskptr(void);
+
+@@>> setsigmaskptr(3)
+@@Set the current signal mask pointer to `sigmaskptr'
+@@This is a kos-specific function that can be used to 
+@@speed up/replace calls to `sigprocmask()'. But using
+@@this function safely requires knowledge of its underlying
+@@semantics. If you're unsure on those, you should instead
+@@just use the portable `sigprocmask()' and forget you ever
+@@read this comment :)
+@@Example usage:
+@@>> static sigset_t const fullset = SIGSET_INIT_FULL;
+@@>> sigset_t *oldset = setsigmaskptr((sigset_t *)&fullset);
+@@>> // Code in here executes with all maskable signals masked
+@@>> // Note however that code in here also musn't call sigprocmask()
+@@>> setsigmaskptr(oldset);
+@@Equivalent code using sigprocmask (which has way more overhead):
+@@>> static sigset_t const fullset = SIGSET_INIT_FULL;
+@@>> sigset_t oldset;
+@@>> sigprocmask(SIG_SETMASK, &fullset, &oldset);
+@@>> // Code in here executes with all maskable signals masked
+@@>> sigprocmask(SIG_SETMASK, &oldset, NULL);
+@@@param: sigmaskptr: Address of the signal mask to use from now on.
+@@@return: * : Address of the previously used signal mask.
+[[nonnull, decl_include("<bits/sigset.h>")]]
+sigset_t *setsigmaskptr([[nonnull]] sigset_t *sigmaskptr);
+%#endif /* __USE_KOS */
+
 [[cp, export_alias("__sigsuspend")]]
+[[decl_include("<bits/sigset.h>")]]
 int sigsuspend([[nonnull]] sigset_t const *set);
 
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__sigaction"), decl_prefix(struct sigaction;)]]
 int sigaction($signo_t signo, struct sigaction const *act, struct sigaction *oact);
 
+[[decl_include("<bits/sigset.h>")]]
 int sigpending([[nonnull]] sigset_t *__restrict set);
 
 [[cp, decl_include("<bits/types.h>")]]

@@ -125,7 +125,8 @@ INTERN_FUNCTION(libc_sigsetjmp)
 	pushl_cfi %eax             /* sigset_t *oset */
 	pushl_cfi $(0)             /* sigset_t const *set */
 	pushl_cfi $(SIG_SETMASK)   /* syscall_ulong_t how */
-	call   libc_sys_sigprocmask
+	EXTERN(libc_sigprocmask)
+	call   libc_sigprocmask
 	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 1:	xorl   %eax, %eax
@@ -150,7 +151,8 @@ INTERN_FUNCTION(libc_siglongjmp)
 	pushl_cfi $(0)             /* sigset_t *oset */
 	pushl_cfi %eax             /* sigset_t *set */
 	pushl_cfi $(SIG_SETMASK)   /* syscall_ulong_t how */
-	call   libc_sys_sigprocmask
+	EXTERN(libc_sigprocmask)
+	call   libc_sigprocmask
 	addl   $(12), %esp
 	.cfi_adjust_cfa_offset -12
 	jmp    libc_longjmp

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7117d50 */
+/* HASH CRC-32:0xf4d4f3db */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1445,6 +1445,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__sigismember, libd_sigismember);
 DEFINE_PUBLIC_ALIAS(DOS$sigismember, libd_sigismember);
 DEFINE_PUBLIC_ALIAS(DOS$pthread_sigmask, libd_sigprocmask);
 DEFINE_PUBLIC_ALIAS(DOS$sigprocmask, libd_sigprocmask);
+DEFINE_PUBLIC_ALIAS(DOS$setsigmaskptr, libd_setsigmaskptr);
 DEFINE_PUBLIC_ALIAS(DOS$__sigsuspend, libd_sigsuspend);
 DEFINE_PUBLIC_ALIAS(DOS$sigsuspend, libd_sigsuspend);
 DEFINE_PUBLIC_ALIAS(DOS$__sigaction, libd_sigaction);

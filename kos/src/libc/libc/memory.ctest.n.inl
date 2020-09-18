@@ -22,6 +22,7 @@
 #define N 1
 #endif /* __INTELLISENSE__ */
 
+#include <inttypes.h>
 #include <stdint.h>
 
 #if N == 0
@@ -70,7 +71,7 @@ DECL_BEGIN
 			                    _a, _b);              \
 	})
 #define ASSERT_EQ_PTR(a, b)    _ASSERT_EQ(a, b, void const *, "%p")
-#define ASSERT_EQ_SIZE_T(a, b) _ASSERT_EQ(a, b, size_t, "%Iu")
+#define ASSERT_EQ_SIZE_T(a, b) _ASSERT_EQ(a, b, size_t, "%" PRIuSIZ)
 #endif /* !_ASSERT_EQ */
 
 

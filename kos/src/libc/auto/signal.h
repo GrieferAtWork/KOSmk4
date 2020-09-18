@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84255d73 */
+/* HASH CRC-32:0xc69aa801 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,8 +56,40 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigismember)
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, signo_t signo);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+/* Change the signal mask for the calling thread. Note that portable
+ * programs that also make use of multithreading must instead use the
+ * pthread-specific `pthread_sigmask()' function instead, as POSIX
+ * states that this function behaves undefined in such szenarios.
+ * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * function, and `sigprocmask()' always operates thread-local.
+ * Note also that on KOS 2 additional functions `getsigmaskptr()'
+ * and `setsigmaskptr()' exist, which can be used to get/set the
+ * address of the signal mask used by the kernel.
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigprocmask)(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
+/* >> setsigmaskptr(3)
+ * Set the current signal mask pointer to `sigmaskptr'
+ * This is a kos-specific function that can be used to
+ * speed up/replace calls to `sigprocmask()'. But using
+ * this function safely requires knowledge of its underlying
+ * semantics. If you're unsure on those, you should instead
+ * just use the portable `sigprocmask()' and forget you ever
+ * read this comment :)
+ * Example usage:
+ * >> static sigset_t const fullset = SIGSET_INIT_FULL;
+ * >> sigset_t *oldset = setsigmaskptr((sigset_t *)&fullset);
+ * >> // Code in here executes with all maskable signals masked
+ * >> // Note however that code in here also musn't call sigprocmask()
+ * >> setsigmaskptr(oldset);
+ * Equivalent code using sigprocmask (which has way more overhead):
+ * >> static sigset_t const fullset = SIGSET_INIT_FULL;
+ * >> sigset_t oldset;
+ * >> sigprocmask(SIG_SETMASK, &fullset, &oldset);
+ * >> // Code in here executes with all maskable signals masked
+ * >> sigprocmask(SIG_SETMASK, &oldset, NULL);
+ * @param: sigmaskptr: Address of the signal mask to use from now on.
+ * @return: * : Address of the previously used signal mask. */
+INTDEF ATTR_RETNONNULL NONNULL((1)) sigset_t *NOTHROW_NCX(LIBDCALL libd_setsigmaskptr)(sigset_t *sigmaskptr);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_sigsuspend)(sigset_t const *set);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaction)(signo_t signo, struct sigaction const *act, struct sigaction *oact);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigpending)(sigset_t *__restrict set);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73717d34 */
+/* HASH CRC-32:0x5411c7a3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -489,10 +489,34 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigprocmask_defined
 #define __local___localdep_sigprocmask_defined 1
 #ifdef __CRT_HAVE_sigprocmask
-/* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+__NAMESPACE_LOCAL_BEGIN
+/* Change the signal mask for the calling thread. Note that portable
+ * programs that also make use of multithreading must instead use the
+ * pthread-specific `pthread_sigmask()' function instead, as POSIX
+ * states that this function behaves undefined in such szenarios.
+ * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * function, and `sigprocmask()' always operates thread-local.
+ * Note also that on KOS 2 additional functions `getsigmaskptr()'
+ * and `setsigmaskptr()' exist, which can be used to get/set the
+ * address of the signal mask used by the kernel.
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE_pthread_sigmask)
-/* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+__NAMESPACE_LOCAL_END
+struct __sigset_struct;
+__NAMESPACE_LOCAL_BEGIN
+/* Change the signal mask for the calling thread. Note that portable
+ * programs that also make use of multithreading must instead use the
+ * pthread-specific `pthread_sigmask()' function instead, as POSIX
+ * states that this function behaves undefined in such szenarios.
+ * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * function, and `sigprocmask()' always operates thread-local.
+ * Note also that on KOS 2 additional functions `getsigmaskptr()'
+ * and `setsigmaskptr()' exist, which can be used to get/set the
+ * address of the signal mask used by the kernel.
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
 #else /* ... */
 #undef __local___localdep_sigprocmask_defined

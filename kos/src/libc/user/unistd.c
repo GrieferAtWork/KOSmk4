@@ -1140,7 +1140,8 @@ NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid)
 #else /* !NGROUPS_MAX || NGROUPS_MAX > 32 */
 	unsigned int size = NGROUPS_MAX;
 #endif /* NGROUPS_MAX && NGROUPS_MAX <= 32 */
-	while ((result = group_member_impl(gid, size)) < 0 && libc_geterrno() == EINVAL)
+	while ((result = group_member_impl(gid, size)) < 0 &&
+	       libc_geterrno() == EINVAL)
 		size *= 2;
 	return result;
 }
@@ -1488,10 +1489,8 @@ NOTHROW_NCX(LIBCCALL libc_sethostid)(longptr_t id)
 	ssize_t count;
 	uint32_t id32;
 #if __SIZEOF_LONG__ > 4
-	if (id & ~UINT32_C(0xffffffff)) {
-		libc_seterrno(EOVERFLOW);
-		return -1;
-	}
+	if (id & ~UINT32_C(0xffffffff))
+		return libc_seterrno(EOVERFLOW);
 #endif /* __SIZEOF_LONG__ > 4 */
 	fd = sys_open(hostid_filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 	if (fd < 0) {
@@ -1731,8 +1730,7 @@ NOTHROW_NCX(LIBCCALL libc_profil)(uint16_t *sample_buffer,
 	(void)size;
 	(void)offset;
 	(void)scale;
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_seterrno(ENOSYS);
 #endif /* !SYS_profil */
 }
 /*[[[end:libc_profil]]]*/
@@ -3563,8 +3561,7 @@ NOTHROW_NCX(LIBCCALL libc_nice)(int inc)
 #endif /* !__sys_Xnice_defined */
 	return 20 - error;
 err:
-	libc_seterrno(-error);
-	return -1;
+	return libc_seterrno(-error);
 }
 /*[[[end:libc_nice]]]*/
 

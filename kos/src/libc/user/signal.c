@@ -282,12 +282,21 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
 
 #ifndef __NR_sigprocmask
 #define sys_sigprocmask(how, set, oset) \
-	sys_rt_sigprocmask(how, set, oset, sizeof(sigset_t));
+	sys_rt_sigprocmask(how, set, oset, sizeof(sigset_t))
 #endif /* !__NR_sigprocmask */
 
 
-/*[[[head:libc_sigprocmask,hash:CRC-32=0xf8ce3e0d]]]*/
-/* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+/*[[[head:libc_sigprocmask,hash:CRC-32=0x3c90cbea]]]*/
+/* Change the signal mask for the calling thread. Note that portable
+ * programs that also make use of multithreading must instead use the
+ * pthread-specific `pthread_sigmask()' function instead, as POSIX
+ * states that this function behaves undefined in such szenarios.
+ * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * function, and `sigprocmask()' always operates thread-local.
+ * Note also that on KOS 2 additional functions `getsigmaskptr()'
+ * and `setsigmaskptr()' exist, which can be used to get/set the
+ * address of the signal mask used by the kernel.
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
                                        sigset_t const *set,
@@ -295,7 +304,6 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 /*[[[body:libc_sigprocmask]]]*/
 {
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
-	errno_t result;
 	struct pthread *me = &current;
 	sigset_t *old_set, *new_set;
 	old_set = me->pt_pmask.lpm_pmask.pm_sigmask;
@@ -304,8 +312,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 		 * So initialize it now. */
 		old_set = &me->pt_pmask.lpm_masks[0];
 		me->pt_pmask.lpm_pmask.pm_sigmask = old_set;
-		result = sys_set_userprocmask_address(&me->pt_pmask.lpm_pmask);
-		if unlikely(E_ISERR(result)) {
+		if unlikely(sys_set_userprocmask_address(&me->pt_pmask.lpm_pmask) != EOK) {
 			/* Fallback: Use the legacy sigprocmask(2) system call. */
 			goto do_legacy_sigprocmask;
 		}
@@ -376,19 +383,145 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 		}
 	}
 	return 0;
+	{
+		errno_t error;
 do_legacy_sigprocmask:
-	me->pt_pmask.lpm_pmask.pm_sigmask = NULL;
-	result = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
-	                         set, oset);
-	return libc_seterrno_syserr(result);
+		me->pt_pmask.lpm_pmask.pm_sigmask = NULL;
+		error = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
+		                         set, oset);
+		return libc_seterrno_syserr(error);
+	}
 #else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
-	errno_t result;
-	result = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
+	errno_t error;
+	error = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
 	                         set, oset);
-	return libc_seterrno_syserr(result);
+	return libc_seterrno_syserr(error);
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 }
 /*[[[end:libc_sigprocmask]]]*/
+
+
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+STATIC_ASSERT(sizeof(sigset_t) >= sizeof(void *));
+#define FALLBACK_SIGMASKPTR(me) (*(struct __sigset_struct **)((byte_t *)(me) + __OFFSET_PTHREAD_PMASK + __OFFSET_USERPROCMASK_PENDING))
+#define INITIAL_SIGMASKBUF(me)  ((me)->pt_pmask.lpm_masks[0])
+#else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+#define FALLBACK_SIGMASKPTR(me) (me)->pt_emumaskptr
+#define INITIAL_SIGMASKBUF(me)  (me)->pt_emumask
+#endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
+
+/*[[[head:libc_getsigmaskptr,hash:CRC-32=0x3573e7f9]]]*/
+/* >> getsigmaskptr(3)
+ * Return the current signal mask pointer.
+ * See the documentation of `setsigmaskptr(3)' for
+ * what this function is all about. */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_RETNONNULL WUNUSED sigset_t *
+NOTHROW_NCX(LIBCCALL libc_getsigmaskptr)(void)
+/*[[[body:libc_getsigmaskptr]]]*/
+{
+	sigset_t *result;
+	struct pthread *me = &current;
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+	result = me->pt_pmask.lpm_pmask.pm_sigmask;
+	if unlikely(!result) {
+		/* Lazily initialize the userprocmask sub-system. */
+		result = &me->pt_pmask.lpm_masks[0];
+		me->pt_pmask.lpm_pmask.pm_sigmask = result;
+		if unlikely(sys_set_userprocmask_address(&me->pt_pmask.lpm_pmask) != -EOK)
+			goto do_legacy_sigprocmask;
+	}
+	return result;
+do_legacy_sigprocmask:
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+	result = FALLBACK_SIGMASKPTR(me);
+	if (!result) {
+		result = &INITIAL_SIGMASKBUF(me);
+		FALLBACK_SIGMASKPTR(me) = result;
+	}
+	/* Read the current signal mask from the kernel. */
+	if unlikely(sys_sigprocmask(0, NULL, result) != -EOK)
+		sigemptyset(result);
+	return result;
+}
+/*[[[end:libc_getsigmaskptr]]]*/
+
+/*[[[head:libc_setsigmaskptr,hash:CRC-32=0x88053a96]]]*/
+/* >> setsigmaskptr(3)
+ * Set the current signal mask pointer to `sigmaskptr'
+ * This is a kos-specific function that can be used to
+ * speed up/replace calls to `sigprocmask()'. But using
+ * this function safely requires knowledge of its underlying
+ * semantics. If you're unsure on those, you should instead
+ * just use the portable `sigprocmask()' and forget you ever
+ * read this comment :)
+ * Example usage:
+ * >> static sigset_t const fullset = SIGSET_INIT_FULL;
+ * >> sigset_t *oldset = setsigmaskptr((sigset_t *)&fullset);
+ * >> // Code in here executes with all maskable signals masked
+ * >> // Note however that code in here also musn't call sigprocmask()
+ * >> setsigmaskptr(oldset);
+ * Equivalent code using sigprocmask (which has way more overhead):
+ * >> static sigset_t const fullset = SIGSET_INIT_FULL;
+ * >> sigset_t oldset;
+ * >> sigprocmask(SIG_SETMASK, &fullset, &oldset);
+ * >> // Code in here executes with all maskable signals masked
+ * >> sigprocmask(SIG_SETMASK, &oldset, NULL);
+ * @param: sigmaskptr: Address of the signal mask to use from now on.
+ * @return: * : Address of the previously used signal mask. */
+INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_RETNONNULL NONNULL((1)) sigset_t *
+NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
+/*[[[body:libc_setsigmaskptr]]]*/
+{
+#ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
+	sigset_t *result;
+	struct pthread *me = &current;
+	result = me->pt_pmask.lpm_pmask.pm_sigmask;
+	if unlikely(!result) {
+		/* Lazily initialize the userprocmask sub-system. */
+		result = &me->pt_pmask.lpm_masks[0];
+		me->pt_pmask.lpm_pmask.pm_sigmask = result;
+		if unlikely(sys_set_userprocmask_address(&me->pt_pmask.lpm_pmask) != -EOK)
+			goto do_legacy_sigprocmask;
+	}
+	/* Atomically switch over to the new signal mask. */
+	ATOMIC_WRITE(me->pt_pmask.lpm_pmask.pm_sigmask, sigmaskptr);
+	/* Check previously pending signals became available */
+	{
+		unsigned int i;
+		for (i = 0; i < __SIGSET_NWORDS; ++i) {
+			ulongptr_t pending_word;
+			ulongptr_t newmask_word;
+			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
+			if (!pending_word)
+				continue; /* Nothing pending in here. */
+			newmask_word = sigmaskptr->__val[i];
+			/* Check if any of the pending signals are currently unmasked. */
+			if ((pending_word & ~newmask_word) != 0) {
+				/* Clear the set of pending signals (because the kernel won't do this)
+				 * Also note that there is no guaranty that the signal that became
+				 * available in the mean time is still available now. - The signal may
+				 * have been directed at our process as a whole, and another thread
+				 * may have already handled it. */
+				sigemptyset(&me->pt_pmask.lpm_pmask.pm_pending);
+				/* Calls the kernel's `sigmask_check()' function */
+				sys_sigmask_check();
+				break;
+			}
+		}
+	}
+	return result;
+do_legacy_sigprocmask:
+#endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
+	result = FALLBACK_SIGMASKPTR(me);
+	if (!result)
+		result = &INITIAL_SIGMASKBUF(me);
+	FALLBACK_SIGMASKPTR(me) = sigmaskptr;
+	/* Load the new signal mask into the kernel. */
+	if unlikely(sys_sigprocmask(SIG_SETMASK, sigmaskptr, result) != -EOK)
+		sigemptyset(result);
+	return result;
+}
+/*[[[end:libc_setsigmaskptr]]]*/
 
 /*[[[head:libc_sigsuspend,hash:CRC-32=0xf8598483]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
@@ -817,7 +950,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xecd00e04]]]*/
+/*[[[start:exports,hash:CRC-32=0x36f105f1]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -842,6 +975,8 @@ DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
 DEFINE_PUBLIC_ALIAS(kill, libc_kill);
 DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(sigprocmask, libc_sigprocmask);
+DEFINE_PUBLIC_ALIAS(getsigmaskptr, libc_getsigmaskptr);
+DEFINE_PUBLIC_ALIAS(setsigmaskptr, libc_setsigmaskptr);
 DEFINE_PUBLIC_ALIAS(__sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_ALIAS(__sigaction, libc_sigaction);

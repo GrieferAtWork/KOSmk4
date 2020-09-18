@@ -334,6 +334,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	if unlikely(!tls)
 		goto err_nomem;
 	pt = current_from_tls(tls);
+	/* This should only be able to fail when libc isn't part of the static TLS
+	 * segment, which can only happen when libc was loaded by dlopen(), rather
+	 * can coming pre-loaded by the initial application. */
+	if unlikely(!pt)
+		goto err_nomem_tls;
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 	/* Initialize the new thread's initial userprocmask structure,
 	 * such that it will lazily initialize it the first time it

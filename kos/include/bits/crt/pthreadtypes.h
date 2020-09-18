@@ -64,7 +64,7 @@ typedef __TYPEFOR_INTIB(__SIZEOF_PTHREAD_ONCE_T) __pthread_once_t;
 #define __OFFSET_PTHREAD_REFCNT    (__SIZEOF_USERPROCMASK + (__SIZEOF_SIGSET_T__ * 2))
 #else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 #define __OFFSET_PTHREAD_TID       0
-#define __OFFSET_PTHREAD_REFCNT    __SIZEOF_POINTER__ 
+#define __OFFSET_PTHREAD_REFCNT    ((__SIZEOF_POINTER__ * 2) + __SIZEOF_SIGSET_T__)
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 #define __OFFSET_PTHREAD_RETVAL    (__OFFSET_PTHREAD_REFCNT + __SIZEOF_POINTER__)
 #define __OFFSET_PTHREAD_TLS       (__OFFSET_PTHREAD_REFCNT + __SIZEOF_POINTER__ * 2)
@@ -105,6 +105,8 @@ struct pthread {
 #if __SIZEOF_PID_T__ < __SIZEOF_POINTER__
 	__byte_t               __pt_pad[__SIZEOF_POINTER__ - __SIZEOF_PID_T__];
 #endif /* __SIZEOF_PID_T__ < __SIZEOF_POINTER__ */
+	struct __sigset_struct  *pt_emumaskptr;  /* Address of the current, emulated userprocmask */
+	struct __sigset_struct   pt_emumask;     /* TLS buffer for the initial, emulated userprocmask */
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 	__WEAK __uintptr_t       pt_refcnt;      /* Reference counter for this control structure.
 	                                          * When this hits ZERO, you must call `dltlsfreeseg(pt_tls)',

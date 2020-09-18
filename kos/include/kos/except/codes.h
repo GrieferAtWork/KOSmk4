@@ -725,18 +725,18 @@
 #endif /* !E_NOT_EXECUTABLE */
 #ifndef E_NOT_EXECUTABLE_NOEXEC
 #define E_NOT_EXECUTABLE_NOEXEC                   (E_NOT_EXECUTABLE, 0x0001) /* [msg("File does not have execute permissions")]
-                                                                              * Cannot execute a file with the X file permission (s.a. `chmod') */
+                                                                              * Cannot execute a file without execute permission (s.a. `chmod(2)') */
 #endif /* !E_NOT_EXECUTABLE_NOEXEC */
 #ifndef E_NOT_EXECUTABLE_NOT_REGULAR
 #define E_NOT_EXECUTABLE_NOT_REGULAR              (E_NOT_EXECUTABLE, 0x0002) /* [msg("Can only execute regular files")]
-                                                                              * Cannot execute anything other than a regular file */
+                                                                              * Cannot execute anything other than a regular (S_IFREG) file */
 #endif /* !E_NOT_EXECUTABLE_NOT_REGULAR */
 #ifndef E_NOT_EXECUTABLE_NOT_A_BINARY
 #define E_NOT_EXECUTABLE_NOT_A_BINARY             (E_NOT_EXECUTABLE, 0x0003) /* [msg("Can only execute binary files, or unknown/unsupported binary format")]
                                                                               * The given file's contents weren't recognized as a known/valid binary format */
 #endif /* !E_NOT_EXECUTABLE_NOT_A_BINARY */
 #ifndef E_NOT_EXECUTABLE_FAULTY
-#define E_NOT_EXECUTABLE_FAULTY                   (E_NOT_EXECUTABLE, 0x0004) /* [msg("The executable's binary state is faulty")]
+#define E_NOT_EXECUTABLE_FAULTY                   (E_NOT_EXECUTABLE, 0x0004) /* [msg("The executable's binary file is faulty")]
                                                                               * [fld(format: uintptr_t, "The binary format (One of `E_NOT_EXECUTABLE_FAULTY_FORMAT_*')")]
                                                                               * [fld(reason: uintptr_t, "The format-specific reason why the load failed (One of `E_NOT_EXECUTABLE_FAULTY_REASON_*_*')")] */
 #endif /* !E_NOT_EXECUTABLE_FAULTY */

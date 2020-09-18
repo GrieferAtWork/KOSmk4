@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedb4e893 */
+/* HASH CRC-32:0xf467b5f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1228,12 +1228,60 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sig
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(struct __sigset_struct const *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
 #endif /* !... */
 #ifdef __CRT_HAVE_sigprocmask
-/* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+/* Change the signal mask for the calling thread. Note that portable
+ * programs that also make use of multithreading must instead use the
+ * pthread-specific `pthread_sigmask()' function instead, as POSIX
+ * states that this function behaves undefined in such szenarios.
+ * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * function, and `sigprocmask()' always operates thread-local.
+ * Note also that on KOS 2 additional functions `getsigmaskptr()'
+ * and `setsigmaskptr()' exist, which can be used to get/set the
+ * address of the signal mask used by the kernel.
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 __CDECLARE(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t const *__set, sigset_t *__oset),(__how,__set,__oset))
 #elif defined(__CRT_HAVE_pthread_sigmask)
-/* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+/* Change the signal mask for the calling thread. Note that portable
+ * programs that also make use of multithreading must instead use the
+ * pthread-specific `pthread_sigmask()' function instead, as POSIX
+ * states that this function behaves undefined in such szenarios.
+ * However, on KOS, `pthread_sigmask()' is imply an alias for this
+ * function, and `sigprocmask()' always operates thread-local.
+ * Note also that on KOS 2 additional functions `getsigmaskptr()'
+ * and `setsigmaskptr()' exist, which can be used to get/set the
+ * address of the signal mask used by the kernel.
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 __CREDIRECT(,int,__NOTHROW_NCX,sigprocmask,(__STDC_INT_AS_UINT_T __how, sigset_t const *__set, sigset_t *__oset),pthread_sigmask,(__how,__set,__oset))
 #endif /* ... */
+#ifdef __USE_KOS
+/* >> getsigmaskptr(3)
+ * Return the current signal mask pointer.
+ * See the documentation of `setsigmaskptr(3)' for
+ * what this function is all about. */
+__CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_WUNUSED,sigset_t *,__NOTHROW_NCX,getsigmaskptr,(void),())
+/* >> setsigmaskptr(3)
+ * Set the current signal mask pointer to `sigmaskptr'
+ * This is a kos-specific function that can be used to
+ * speed up/replace calls to `sigprocmask()'. But using
+ * this function safely requires knowledge of its underlying
+ * semantics. If you're unsure on those, you should instead
+ * just use the portable `sigprocmask()' and forget you ever
+ * read this comment :)
+ * Example usage:
+ * >> static sigset_t const fullset = SIGSET_INIT_FULL;
+ * >> sigset_t *oldset = setsigmaskptr((sigset_t *)&fullset);
+ * >> // Code in here executes with all maskable signals masked
+ * >> // Note however that code in here also musn't call sigprocmask()
+ * >> setsigmaskptr(oldset);
+ * Equivalent code using sigprocmask (which has way more overhead):
+ * >> static sigset_t const fullset = SIGSET_INIT_FULL;
+ * >> sigset_t oldset;
+ * >> sigprocmask(SIG_SETMASK, &fullset, &oldset);
+ * >> // Code in here executes with all maskable signals masked
+ * >> sigprocmask(SIG_SETMASK, &oldset, NULL);
+ * @param: sigmaskptr: Address of the signal mask to use from now on.
+ * @return: * : Address of the previously used signal mask. */
+__CDECLARE_OPT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),sigset_t *,__NOTHROW_NCX,setsigmaskptr,(sigset_t *__sigmaskptr),(__sigmaskptr))
+#endif /* __USE_KOS */
 #ifdef __CRT_HAVE_sigsuspend
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),(__set))
 #elif defined(__CRT_HAVE___sigsuspend)

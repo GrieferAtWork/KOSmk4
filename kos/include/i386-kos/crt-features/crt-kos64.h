@@ -2052,6 +2052,7 @@
 #define __CRT_HAVE_getservent 1
 #define __CRT_HAVE_getservent_r 1
 #define __CRT_HAVE_getsid 1
+#define __CRT_HAVE_getsigmaskptr 1
 #define __CRT_HAVE_getsockname 1
 #define __CRT_HAVE_getsockopt 1
 #define __CRT_HAVE_getsourcefilter 1
@@ -3054,6 +3055,7 @@
 #define __CRT_HAVE_setrpcent 1
 #define __CRT_HAVE_setservent 1
 #define __CRT_HAVE_setsid 1
+#define __CRT_HAVE_setsigmaskptr 1
 #define __CRT_HAVE_setsockopt 1
 #define __CRT_HAVE_setsourcefilter 1
 #define __CRT_HAVE_setspent 1
@@ -7266,6 +7268,7 @@
 #define __CRT_HAVE_KOS$setrlimit64 1
 #define __CRT_HAVE_KOS$setrpcent 1
 #define __CRT_HAVE_KOS$setservent 1
+#define __CRT_HAVE_KOS$setsigmaskptr 1
 #define __CRT_HAVE_KOS$setsockopt 1
 #define __CRT_HAVE_KOS$setsourcefilter 1
 #define __CRT_HAVE_KOS$setstate 1
@@ -10649,6 +10652,7 @@
 #define __CRT_HAVE_DOS$setrlimit64 1
 #define __CRT_HAVE_DOS$setrpcent 1
 #define __CRT_HAVE_DOS$setservent 1
+#define __CRT_HAVE_DOS$setsigmaskptr 1
 #define __CRT_HAVE_DOS$setsockopt 1
 #define __CRT_HAVE_DOS$setsourcefilter 1
 #define __CRT_HAVE_DOS$setstate 1

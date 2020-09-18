@@ -27,6 +27,7 @@
 #include <kos/except.h>
 #include <kos/types.h>
 
+#include <errno.h>
 #include <signal.h>
 
 #include "tls.h"
@@ -71,7 +72,7 @@ INTERN ATTR_THREAD struct pthread current = {
 		}
 	},
 	/* .pt_errno_kind  = */ LIBC_ERRNO_KIND_KOS,
-	/* .pt_errno_value = */ 0
+	/* .pt_errno_value = */ EOK
 };
 
 
