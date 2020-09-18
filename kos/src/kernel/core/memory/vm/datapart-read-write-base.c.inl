@@ -23,9 +23,10 @@
 #define DEFINE_IO_WRITE 1
 //#define DEFINE_IO_PHYS 1
 #define DEFINE_IO_NOPF 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #include <kernel/except.h>
+#include <kernel/vm/nopf.h>
 #include <kernel/vm/phys.h>
 
 #include <limits.h> /* SSIZE_MAX */

@@ -33,6 +33,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
+#include <kernel/vm/nopf.h>
 #include <misc/atomic-ref.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
@@ -270,7 +271,7 @@ NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict sel
 		pagedir_set(threadvm->v_pdir_phys);
 
 	/* Use memcpy_nopf() to read the thread's current signal mask pointer. */
-	if (memcpy_nopf(&current_sigmask, &um->pm_sigmask, sizeof(current_sigmask)) != 0)
+	if (!read_nopf(&um->pm_sigmask, &current_sigmask))
 		goto done;
 
 	/* Verify that `current_sigmask' points into user-space. */
@@ -284,48 +285,40 @@ NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict sel
 		ulongptr_t word, mask;
 		word = __sigset_word(signo);
 		mask = __sigset_mask(signo);
-		if (memcpy_nopf(&user_sigmask_word,
-		                &current_sigmask->__val[word],
-		                sizeof(user_sigmask_word)) != 0)
+		if (!read_nopf(&current_sigmask->__val[word], &user_sigmask_word))
 			goto done;
+
 		/* If we manage to get to this point, then we know that `user_sigmask_word'
 		 * is the correct mask value that we were after. - Use it now to determine
 		 * the masking-state of `signo' in `self' */
 		result = (user_sigmask_word & mask) != 0;
 
 		if (result == SIGMASK_ISMASKED_YES) {
-			/* If the signal _is_ being masked, then we still have to turn on the
-			 * corresponding bit in `um->pm_pending'! */
-			for (;;) {
-				if (memcpy_nopf(&user_sigmask_word,
-				                &um->pm_pending.__val[word],
-				                sizeof(user_sigmask_word)) != 0)
-					goto done;
-				if ((user_sigmask_word & mask) != 0)
-					break; /* Already marked as pending. -> Nothing to do here! */
-#if 0 /* TODO: This needs arch-specific backing! */
-				{
-					int error;
-					error = atomic_cmpxch_nopf(&um->pm_pending.__val[word],
-					                           user_sigmask_word,
-					                           user_sigmask_word | mask);
-					if (error == ATOMIC_CMPXCH_NX_DIFFERS)
-						continue;
-					if (error == ATOMIC_CMPXCH_NX_FAULT)
-						goto done;
-				}
-				printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending [tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
+			/* The signal _is_ being masked! */
+			if unlikely(!read_nopf(&um->pm_pending.__val[word], &user_sigmask_word)) {
+set_maybe_and_return:
+				result = SIGMASK_ISMASKED_MAYBE;
+				goto done;
+			}
+			if ((user_sigmask_word & mask) == 0) {
+				/* The signal _is_ being masked, but isn't marked as pending.
+				 * As such, we then we still have to turn on the corresponding
+				 * bit in `um->pm_pending'! */
+#ifdef atomic_or_nopf
+				if unlikely(!atomic_or_nopf(&um->pm_pending.__val[word], mask))
+					goto set_maybe_and_return;
+				printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending "
+				                  "[tid=%" PRIuN(__SIZEOF_PID_T__) "]\n",
 				       um, signo, task_getroottid_of_s(self));
-#else
+#else /* atomic_or_nopf */
 				/* If the architecture doesn't support `atomic_cmpxch_nopf()',
 				 * and the signal hasn't been marked as pending, yet, then we
 				 * must act like we weren't able to figure out the is-masked
 				 * state of the thread, and have our caller send an RPC to
 				 * the given thread `self' to do all of this outside of NOPF
 				 * mode. */
-				result = SIGMASK_ISMASKED_MAYBE;
-#endif
-				break;
+				goto set_maybe_and_return;
+#endif /* !atomic_or_nopf */
 			}
 		}
 	}

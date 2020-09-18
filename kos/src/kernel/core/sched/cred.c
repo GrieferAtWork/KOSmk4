@@ -35,6 +35,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <kernel/vm/nopf.h>
 #include <sched/cred.h>
 
 #include <hybrid/atomic.h>

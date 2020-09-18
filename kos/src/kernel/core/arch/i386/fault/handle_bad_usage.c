@@ -68,6 +68,7 @@ opt.append("-Os");
 
 #include <kernel/compiler.h>
 
+#include <kernel/arch/vm/nopf.h>
 #include <kernel/debugtrap.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>

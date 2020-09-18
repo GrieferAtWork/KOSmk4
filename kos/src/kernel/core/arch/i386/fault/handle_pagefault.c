@@ -23,7 +23,6 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/vm.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
@@ -31,6 +30,7 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+#include <kernel/vm/nopf.h>
 #include <kernel/vm/phys.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */

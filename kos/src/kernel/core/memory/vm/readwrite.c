@@ -27,6 +27,7 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+#include <kernel/vm/nopf.h>
 
 #include <hybrid/align.h>
 

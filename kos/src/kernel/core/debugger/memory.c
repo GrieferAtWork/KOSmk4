@@ -35,6 +35,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/rt.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
+#include <kernel/vm/nopf.h>
 #include <kernel/vm/phys.h>
 
 #include <hybrid/align.h>

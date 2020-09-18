@@ -99,6 +99,8 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <kos/except.h>
+
 #include <libvio/userviofd.h>
 
 /* Max # of UVIO requests that can be in use at the

@@ -28,6 +28,7 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+#include <kernel/vm/nopf.h>
 #include <sched/pid.h>
 
 #include <hybrid/align.h>

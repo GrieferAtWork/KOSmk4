@@ -83,6 +83,159 @@ PUBLIC_FUNCTION(x86_nopf_movq_rax_Pcx)
 END(x86_nopf_movq_rax_Pcx)
 #endif /* __x86_64__ */
 
+
+
+/* Atomic *_nopf operations. */
+PUBLIC_FUNCTION(x86_nopf_lock_xchgb_al_Pcx)
+	clc
+	/*lock*/ xchgb    %al, (%Pcx)
+	ret
+END(x86_nopf_lock_xchgb_al_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xchgw_ax_Pcx)
+	clc
+	/*lock*/ xchgw    %ax, (%Pcx)
+	ret
+END(x86_nopf_lock_xchgw_ax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xchgl_eax_Pcx)
+	clc
+	/*lock*/ xchgl    %eax, (%Pcx)
+	ret
+END(x86_nopf_lock_xchgl_eax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xaddb_al_Pcx)
+	lock xaddb    %al, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_xaddb_al_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xaddw_ax_Pcx)
+	lock xaddw    %ax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_xaddw_ax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xaddl_eax_Pcx)
+	lock xaddl    %eax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_xaddl_eax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_cmpxchgb_dl_Pcx)
+	lock cmpxchgb %dl, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_cmpxchgb_dl_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_cmpxchgw_dx_Pcx)
+	lock cmpxchgw %dx, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_cmpxchgw_dx_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_cmpxchgl_edx_Pcx)
+	lock cmpxchgl %edx, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_cmpxchgl_edx_Pcx)
+
+
+PUBLIC_FUNCTION(x86_nopf_lock_andb_al_Pcx)
+	lock andb     %al, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_andb_al_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_andw_ax_Pcx)
+	lock andw     %ax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_andw_ax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_andl_eax_Pcx)
+	lock andl     %eax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_andl_eax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_orb_al_Pcx)
+	lock orb      %al, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_orb_al_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_orw_ax_Pcx)
+	lock orw      %ax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_orw_ax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_orl_eax_Pcx)
+	lock orl      %eax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_orl_eax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xorb_al_Pcx)
+	lock xorb     %al, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_xorb_al_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xorw_ax_Pcx)
+	lock xorw     %ax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_xorw_ax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xorl_eax_Pcx)
+	lock xorl     %eax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_xorl_eax_Pcx)
+
+#ifdef __x86_64__
+PUBLIC_FUNCTION(x86_nopf_lock_xchgq_rax_Pcx)
+	clc
+	/*lock*/ xchgq    %rax, (%Pcx)
+	ret
+END(x86_nopf_lock_xchgq_rax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xaddq_rax_Pcx)
+	lock xaddq    %rax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_xaddq_rax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_cmpxchgq_rdx_Pcx)
+	lock cmpxchgq %rdx, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_cmpxchgq_rdx_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_andq_rax_Pcx)
+	lock andq     %rax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_andq_rax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_orq_rax_Pcx)
+	lock orq      %rax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_orq_rax_Pcx)
+
+PUBLIC_FUNCTION(x86_nopf_lock_xorq_rax_Pcx)
+	lock xorq     %rax, (%Pcx)
+	clc
+	ret
+END(x86_nopf_lock_xorq_rax_Pcx)
+#endif /* __x86_64__ */
+
+
+
+
 PUBLIC_LABEL(x86_nopf_end_clc):
 
 

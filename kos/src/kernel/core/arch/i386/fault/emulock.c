@@ -27,6 +27,7 @@
 #include <kernel/except.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <kernel/vm/nopf.h>
 #include <kernel/x86/emulock.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
