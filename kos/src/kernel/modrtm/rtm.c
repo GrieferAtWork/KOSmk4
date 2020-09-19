@@ -36,8 +36,6 @@ PRIVATE DRIVER_INIT void KCALL rtm_init(void) {
 	 * If RTM hooks had already been installed, throw an exception */
 	if (!vm_rtm_hooks.cmpxch(NULL, &rtm_hooks))
 		THROW(E_ILLEGAL_OPERATION);
-
-	incref(&drv_self); /* TODO: REMOVE_ME: Intentional leak! */
 }
 
 PRIVATE DRIVER_FINI void KCALL rtm_fini(void) {

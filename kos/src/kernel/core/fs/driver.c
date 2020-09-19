@@ -460,7 +460,7 @@ again:
 	}
 	assert(i <= new_state->ds_count - 1);
 	/* Add the new driver. */
-	new_state->ds_drivers[i] = incref(self);
+	new_state->ds_drivers[i] = weakincref(self);
 	new_state->ds_count      = i + 1;
 	/* Try to set the new state via an atomic compare-exchange */
 	if unlikely(!current_driver_state.cmpxch_inherit_new(old_state,
