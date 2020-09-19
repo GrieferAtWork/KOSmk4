@@ -1993,12 +1993,15 @@ again_search_for_depending_drivers:
 						 * with the fact that it is being unloaded.
 						 * If everything works out, we'll still be able to destroy our driver
 						 * in the final ATOMIC_CMPXCH() below. */
+						goto find_next_dependent_driver;
 					} EXCEPT {
 						decref_unlikely(ds);
 						RETHROW();
 					}
 				}
 				decref_unlikely(d);
+find_next_dependent_driver:
+				;
 			}
 			/* If the set of loaded drivers has changed, then
 			 * we have to check for more depending drivers. */
