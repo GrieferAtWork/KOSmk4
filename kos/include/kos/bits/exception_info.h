@@ -21,6 +21,7 @@
 #define _KOS_BITS_EXCEPTION_INFO_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
 #include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
@@ -74,7 +75,9 @@ __DECL_BEGIN
 #define __error_register_state_t_defined 1
 typedef __ERROR_REGISTER_STATE_TYPE error_register_state_t;
 #endif /* !__error_register_state_t_defined */
+struct exception_info;
 
+#ifdef __USE_KOS_KERNEL
 #undef ei_data
 #undef ei_code
 #undef ei_class
@@ -145,6 +148,7 @@ struct exception_info {
 #define ei_class     _ei_class_subclass.ei_class
 #define ei_subclass  _ei_class_subclass.ei_subclass
 #endif /* ... */
+#endif /* __USE_KOS_KERNEL */
 
 
 __DECL_END

@@ -38,7 +38,7 @@
 #include <bits/sched_param.h>        /* `struct sched_param' */
 #include <bits/types.h>              /* __pid_t, etc... */
 #include <kos/anno.h>                /* __WEAK */
-#include <kos/bits/exception_info.h> /* __WEAK */
+#include <kos/bits/exception_info.h> /* `struct exception_info' */
 #undef __LIBC_CONFIG_HAVE_USERPROCMASK
 #ifdef __NR_set_userprocmask_address
 #define __LIBC_CONFIG_HAVE_USERPROCMASK 1

@@ -245,10 +245,12 @@ incdir("", "../../include");
 #include <asm/mount.h>
 #include <asm/oflags.h>
 #include <asm/os/errno.h>
+#include <asm/os/paths.h>
 #include <asm/os/signal.h>
 #include <asm/page.h>
 #include <asm/pageid.h>
 #include <asm/pagesize.h>
+#include <asm/pkey.h>
 #include <asm/poll.h>
 #include <asm/ptrace.h>
 #include <asm/random.h>
@@ -695,6 +697,7 @@ incdir("", "../../include");
 #include <kos/bits/except-handler.h>
 #include <kos/bits/except.h>
 #include <kos/bits/exception_data.h>
+#include <kos/bits/exception_info.h>
 #include <kos/bits/fastexcept.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>
@@ -703,6 +706,7 @@ incdir("", "../../include");
 #include <kos/bits/uaio.h>
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
+#include <kos/bits/userprocmask.h>
 #include <kos/capability.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
@@ -989,6 +993,7 @@ incdir("", "../../include");
 #include <linux/if_ether.h>
 #include <linux/if_fddi.h>
 #include <linux/ioctl.h>
+#include <linux/kcmp.h>
 #include <linux/kd.h>
 #include <linux/kernel.h>
 #include <linux/limits.h>

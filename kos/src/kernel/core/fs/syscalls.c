@@ -22,6 +22,7 @@
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 #define _LARGEFILE64_SOURCE 1
+#define _TIME64_SOURCE 1
 
 #include <kernel/compiler.h>
 
