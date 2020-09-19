@@ -2643,9 +2643,9 @@ get_exception_handlerx64:([tostr(out:EXCEPTION_HANDLER_MODE64)] __ULONG64_TYPE__
 
 modify_ldt:(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) -> syscall_slong_t;
 
-pkey_alloc:(syscall_ulong_t flags, syscall_ulong_t access_rights) -> syscall_slong_t;
-pkey_free:(syscall_ulong_t key) -> errno_t;
-pkey_mprotect:(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) -> errno_t;
+pkey_alloc:(syscall_ulong_t flags, syscall_ulong_t access_rights) -> syscall_slong_t;          /* UNIMPLEMENTED! */
+pkey_free:(syscall_ulong_t key) -> errno_t;                                                    /* UNIMPLEMENTED! */
+pkey_mprotect:(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) -> errno_t; /* UNIMPLEMENTED! */
 
 
 
