@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_APPS_INSMOD_RMMOD_C
 #define GUARD_APPS_INSMOD_RMMOD_C 1
-#define _KOS_SOURCE 1
+#define _KOS_SOURCE               1
 
 #include <hybrid/compiler.h>
 
@@ -32,16 +32,48 @@
 DECL_BEGIN
 
 int main(int argc, char *argv[]) {
-	if (argc != 2 || strcmp(argv[1], "--help") == 0) {
-		fprintf(stderr, "Usage: rmmod NAME\n");
-		return EXIT_FAILURE;
+	unsigned int flags = KSYSCTL_DRIVER_DELMOD_FNORMAL;
+	if (argc) {
+		--argc;
+		++argv;
 	}
-	/* TODO: Temporarily re-direct syslog() for this process to stdout
-	 *      (or capture all syslog() messages written by this process
-	 *       after this call to `KSysctlDelmod()', and then print everything
-	 *       to stdout) */
-	KSysctlDelmod(argv[1]);
+	while (argc) {
+		char *arg = *argv;
+		if (*arg != '-')
+			break;
+		--argc;
+		++argv;
+		++arg;
+		if (strcmp(arg, "-") == 0) {
+			/* Support for `--' to break the commandline */
+			break;
+		} else if (strcmp(arg, "d") == 0 || strcmp(arg, "-depend") == 0) {
+			flags |= KSYSCTL_DRIVER_DELMOD_FDEPEND;
+		} else if (strcmp(arg, "f") == 0 || strcmp(arg, "-force") == 0) {
+			flags |= KSYSCTL_DRIVER_DELMOD_FFORCE;
+		} else if (strcmp(arg, "a") == 0 || strcmp(arg, "-async") == 0) {
+			flags |= KSYSCTL_DRIVER_DELMOD_FNONBLOCK;
+		} else {
+			goto usage;
+		}
+	}
+	if (!argc)
+		goto usage;
+	do {
+		/* TODO: Temporarily re-direct syslog() for this process to stdout
+		 *      (or capture all syslog() messages written by this process
+		 *       after this call to `KSysctlDelmod()', and then print everything
+		 *       to stdout) */
+		KSysctlDelmod(*argv++, flags);
+	} while (--argc);
 	return EXIT_SUCCESS;
+usage:
+	fprintf(stderr,
+	        "Usage: rmmod [FLAGS...] NAME\n"
+	        "    -d --depend    Also unload dependent drivers\n"
+	        "    -f --force     Force unload\n"
+	        "    -a --async     Don't wait for completion\n");
+	return EXIT_FAILURE;
 }
 
 

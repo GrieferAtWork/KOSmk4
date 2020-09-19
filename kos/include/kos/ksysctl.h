@@ -462,11 +462,12 @@ KSysctlInsmodb(void const *__driver_blob, __size_t __driver_size,
 	KSysctl(KSYSCTL_DRIVER_INSMOD, &__args);
 }
 
-__LOCAL void __LIBCCALL KSysctlDelmod(char const *__driver_name) {
+__LOCAL void __LIBCCALL KSysctlDelmod(char const *__driver_name,
+                                      unsigned int __flags __DFL(KSYSCTL_DRIVER_DELMOD_FNORMAL)) {
 	struct ksysctl_driver_delmod __args;
 	__libc_memset(&__args, 0, sizeof(__args));
 	__args.dm_struct_size = sizeof(__args);
-	__args.dm_flags       = KSYSCTL_DRIVER_DELMOD_FNORMAL;
+	__args.dm_flags       = __flags;
 	__args.dm_format      = KSYSCTL_DRIVER_FORMAT_NAME;
 	__args.dm_name        = __driver_name;
 	KSysctl(KSYSCTL_DRIVER_DELMOD, &__args);
