@@ -60,6 +60,65 @@ INTDEF struct driver_library_path_string default_library_path;
 /************************************************************************/
 /* ksysctl()                                                            */
 /************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_KSYSCTL) ||     \
+     defined(__ARCH_WANT_SYSCALL_FINIT_MODULE))
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct driver *KCALL
+load_driver_from_file_handles(unsigned int fd_node,
+                              unsigned int fd_path,
+                              unsigned int fd_dent,
+                              USER CHECKED char const *driver_cmdline,
+                              bool *pnew_driver_loaded,
+                              unsigned int flags) {
+	REF struct driver *result;
+	REF struct regular_node *driver_node;
+	REF struct path *driver_path;
+	REF struct directory_entry *driver_dentry;
+	driver_path   = NULL;
+	driver_dentry = NULL;
+	driver_node   = NULL;
+	if (fd_path != (unsigned int)-1)
+		driver_path = handle_get_path(fd_path);
+	TRY {
+		REF struct handle nodehand;
+		if (fd_dent != (unsigned int)-1)
+			driver_dentry = handle_get_directory_entry(fd_dent);
+		nodehand = handle_lookup(fd_node);
+		TRY {
+			/* (Try to) fill in missing filesystem information from `f_node' */
+			if (!driver_path)
+				driver_path = (REF struct path *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_PATH);
+			if (!driver_dentry)
+				driver_dentry = (REF struct directory_entry *)handle_tryas_noinherit(nodehand, HANDLE_TYPE_DIRECTORYENTRY);
+			/* Lookup the actual INode from which to load the driver. */
+			driver_node = handle_as_regular_node(nodehand);
+		} EXCEPT {
+			if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
+				if (!PERTASK_GET(this_exception_args.e_invalid_handle.ih_fd))
+					PERTASK_SET(this_exception_args.e_invalid_handle.ih_fd, (uintptr_t)fd_node);
+			}
+			RETHROW();
+		}
+		require(CAP_SYS_MODULE);
+		result = driver_insmod(driver_node,
+		                       driver_path,
+		                       driver_dentry,
+		                       driver_cmdline,
+		                       pnew_driver_loaded,
+		                       flags);
+	} EXCEPT {
+		xdecref_unlikely(driver_path);
+		xdecref_unlikely(driver_dentry);
+		xdecref_unlikely(driver_node);
+		RETHROW();
+	}
+	xdecref_unlikely(driver_path);
+	xdecref_unlikely(driver_dentry);
+	decref_unlikely(driver_node);
+	return result;
+}
+
+#endif /* ... */
+
 #ifdef __ARCH_WANT_SYSCALL_KSYSCTL
 DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
                 syscall_ulong_t, command,
@@ -177,31 +236,13 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 			                    insmod_flags);
 		}	break;
 
-		case KSYSCTL_DRIVER_FORMAT_FILE: {
-			REF struct regular_node *ino;
-			REF struct path *driver_path;
-			REF struct directory_entry *driver_dentry;
-			uint32_t temp;
-			ino = handle_get_regular_node((unsigned int)ATOMIC_READ(data->im_file.f_node));
-			FINALLY_DECREF_UNLIKELY(ino);
-			driver_path = NULL;
-			temp        = ATOMIC_READ(data->im_file.f_path);
-			if (temp != (uint32_t)-1)
-				driver_path = handle_get_path((unsigned int)temp);
-			FINALLY_XDECREF_UNLIKELY(driver_path);
-			driver_dentry = NULL;
-			temp          = ATOMIC_READ(data->im_file.f_dentry);
-			if (temp != (uint32_t)-1)
-				driver_dentry = handle_get_directory_entry((unsigned int)temp);
-			FINALLY_XDECREF_UNLIKELY(driver_dentry);
-			require(CAP_SYS_MODULE);
-			drv = driver_insmod(ino,
-			                    driver_path,
-			                    driver_dentry,
-			                    commandline,
-			                    &new_driver_loaded,
-			                    insmod_flags);
-		}	break;
+		case KSYSCTL_DRIVER_FORMAT_FILE:
+			drv = load_driver_from_file_handles((unsigned int)ATOMIC_READ(data->im_file.f_node),
+			                                    (unsigned int)ATOMIC_READ(data->im_file.f_path),
+			                                    (unsigned int)ATOMIC_READ(data->im_file.f_dentry),
+			                                    commandline, &new_driver_loaded,
+			                                    insmod_flags);
+			break;
 
 		case KSYSCTL_DRIVER_FORMAT_NAME: {
 			USER CHECKED char const *name;
@@ -254,8 +295,10 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		delmod_flags = ATOMIC_READ(data->dm_flags);
 		VALIDATE_FLAGSET(delmod_flags,
 		                 KSYSCTL_DRIVER_DELMOD_FNORMAL |
-		                 KSYSCTL_DRIVER_DELMOD_FDEPEND,
+		                 KSYSCTL_DRIVER_DELMOD_FDEPEND |
+		                 KSYSCTL_DRIVER_DELMOD_FFORCE,
 		                 E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS);
+		/* TODO: KSYSCTL_DRIVER_DELMOD_FFORCE */
 		switch (format) {
 
 		case KSYSCTL_DRIVER_FORMAT_FILE: {
@@ -515,6 +558,56 @@ again_get_oldpath:
 	return 0;
 }
 #endif /* __ARCH_WANT_SYSCALL_KSYSCTL */
+
+#ifdef __ARCH_WANT_SYSCALL_INIT_MODULE
+DEFINE_SYSCALL3(errno_t, init_module,
+                USER UNCHECKED void const *, module_image, size_t, len,
+                USER UNCHECKED char const *, uargs) {
+	REF struct driver *drv;
+	validate_readable(module_image, len);
+	validate_readable(uargs, 1);
+	require(CAP_SYS_MODULE);
+	drv = driver_insmod_blob((byte_t *)module_image, len, uargs,
+	                         NULL, DRIVER_INSMOD_FLAG_NORMAL);
+	decref_unlikely(drv);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_INIT_MODULE */
+
+#ifdef __ARCH_WANT_SYSCALL_FINIT_MODULE
+DEFINE_SYSCALL3(errno_t, finit_module, fd_t, fd,
+                USER UNCHECKED char const *, uargs,
+                syscall_ulong_t, flags) {
+	REF struct driver *drv;
+	(void)flags; /* Ignored... (for now) */
+	validate_readable(uargs, 1);
+	drv = load_driver_from_file_handles((unsigned int)fd,
+	                                    (unsigned int)-1,
+	                                    (unsigned int)-1,
+	                                    uargs,
+	                                    NULL,
+	                                    DRIVER_INSMOD_FLAG_NORMAL);
+	decref_unlikely(drv);
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_FINIT_MODULE */
+
+#ifdef __ARCH_WANT_SYSCALL_DELETE_MODULE
+DEFINE_SYSCALL2(errno_t, delete_module,
+                USER UNCHECKED char const *, name,
+                oflag_t, flags) {
+	unsigned int error;
+	validate_readable(name, 1);
+	(void)flags;
+	/* TODO: (flags & O_TRUNC) -> KSYSCTL_DRIVER_DELMOD_FFORCE */
+	require(CAP_SYS_MODULE);
+	error = driver_delmod(name, 0);
+	if (error == DRIVER_DELMOD_UNKNOWN)
+		return -ENOENT;
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_DELETE_MODULE */
+
 
 DECL_END
 

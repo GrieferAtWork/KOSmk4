@@ -111,8 +111,10 @@ struct ksysctl_driver_insmod /*[PREFIX(im_)]*/ {
 		                                       * Data blob from which to load the driver. */
 		struct {
 			__uint32_t f_node;                /* [1..1] Handle to an INode from which the driver should be loaded. */
-			__uint32_t f_path;                /* [0..1] Handle to the path containing `f_node', or (uint32_t)-1 if not given */
-			__uint32_t f_dentry;              /* [0..1] Handle to the directory entry describing `f_node', or (uint32_t)-1 if not given */
+			__uint32_t f_path;                /* [0..1] Handle to the path containing `f_node', or (uint32_t)-1 if not given
+			                                   * When not given, the kernel will try to retrieve the path from `f_node' */
+			__uint32_t f_dentry;              /* [0..1] Handle to the directory entry describing `f_node', or (uint32_t)-1 if not given
+			                                   * When not given, the kernel will try to retrieve the directory entry from `f_node' */
 		}              im_file;               /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_FILE)]
 		                                       * File handle data. */
 		char const    *im_name;               /* [valid_if(im_format == KSYSCTL_DRIVER_FORMAT_NAME)]
@@ -136,8 +138,10 @@ struct ksysctl_driver_insmod /*[PREFIX(im_)]*/ {
                                           *       a static pointer apart of the driver's binary image. */
 
 /* Delmod flags. */
-#define KSYSCTL_DRIVER_DELMOD_FNORMAL  0x0000 /* Normal delmod flags. */
-#define KSYSCTL_DRIVER_DELMOD_FDEPEND  0x0001 /* Also delete drivers that have dependencies on the given driver */
+#define KSYSCTL_DRIVER_DELMOD_FNORMAL 0x0000 /* Normal delmod flags. */
+#define KSYSCTL_DRIVER_DELMOD_FDEPEND 0x0001 /* Also delete drivers that have dependencies on the given driver */
+#define KSYSCTL_DRIVER_DELMOD_FFORCE  0x0002 /* Force unload the driver, even if unaccounted references remain
+                                              * WARNING: Doing this may compromise system integrity! */
 #define __OFFSET_KSYSCTL_DRIVER_DELMOD_STRUCT_SIZE 0
 #define __OFFSET_KSYSCTL_DRIVER_DELMOD_FORMAT      4
 #define __OFFSET_KSYSCTL_DRIVER_DELMOD_FLAGS       6

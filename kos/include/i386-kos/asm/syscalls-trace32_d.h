@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88fac80b */
+/* HASH CRC-32:0xa414f650 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -240,10 +240,11 @@
 #define __NR32AN0_sigprocmask                  how
 #define __NR32AN1_sigprocmask                  set
 #define __NR32AN2_sigprocmask                  oset
-#define __NR32AN0_create_module                TODO_PROTOTYPE
-#define __NR32AN0_init_module                  TODO_PROTOTYPE
-#define __NR32AN0_delete_module                TODO_PROTOTYPE
-#define __NR32AN0_get_kernel_syms              TODO_PROTOTYPE
+#define __NR32AN0_init_module                  module_image
+#define __NR32AN1_init_module                  len
+#define __NR32AN2_init_module                  uargs
+#define __NR32AN0_delete_module                name
+#define __NR32AN1_delete_module                flags
 #define __NR32AN0_quotactl                     TODO_PROTOTYPE
 #define __NR32AN0_getpgid                      pid
 #define __NR32AN0_fchdir                       fd
@@ -310,7 +311,6 @@
 #define __NR32AN1_getresuid                    euid
 #define __NR32AN2_getresuid                    suid
 #define __NR32AN0_vm86                         TODO_PROTOTYPE
-#define __NR32AN0_query_module                 TODO_PROTOTYPE
 #define __NR32AN0_poll                         fds
 #define __NR32AN1_poll                         nfds
 #define __NR32AN2_poll                         timeout
@@ -774,7 +774,9 @@
 #define __NR32AN2_kcmp                         type
 #define __NR32AN3_kcmp                         idx1
 #define __NR32AN4_kcmp                         idx2
-#define __NR32AN0_finit_module                 TODO_PROTOTYPE
+#define __NR32AN0_finit_module                 fd
+#define __NR32AN1_finit_module                 uargs
+#define __NR32AN2_finit_module                 flags
 #define __NR32AN0_sched_setattr                TODO_PROTOTYPE
 #define __NR32AN0_sched_getattr                TODO_PROTOTYPE
 #define __NR32AN0_renameat2                    olddirfd
@@ -1540,13 +1542,14 @@
 #define __NR32ATR1_sigprocmask                  SC_REPR_STRUCT_SIGSET                                                /* set */ 
 #define __NR32ATR2_sigprocmask                  SC_REPR_POINTER                                                      /* oset */ 
 #define __NR32RTR_sigprocmask                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_create_module                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_create_module                 SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_init_module                  SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32ATR0_init_module                  SC_REPR_POINTER                                                      /* module_image */ 
+#define __NR32ATR1_init_module                  SC_REPR_SIZE_T                                                       /* len */ 
+#define __NR32ATR2_init_module                  SC_REPR_STRING                                                       /* uargs */ 
 #define __NR32RTR_init_module                   SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_delete_module                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32ATR0_delete_module                SC_REPR_STRING                                                       /* name */ 
+#define __NR32ATR1_delete_module                SC_REPR_OFLAG_T                                                      /* flags */ 
 #define __NR32RTR_delete_module                 SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_get_kernel_syms              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_get_kernel_syms               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_quotactl                     SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_quotactl                      SC_REPR_ERRNO_T                                                      /* return */
@@ -1655,7 +1658,6 @@
 #define __NR32RTR_getresuid                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_vm86                         SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_vm86                          SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_query_module                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_query_module                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_poll                         SC_REPR_STRUCT_POLLFD                                                /* fds */ 
 #define __NR32ATL0_poll                         1                                                                    /* fds -> nfds */ 
@@ -2351,7 +2353,9 @@
 #define __NR32ATR3_kcmp                         SC_REPR_SYSCALL_ULONG_T                                              /* idx1 */ 
 #define __NR32ATR4_kcmp                         SC_REPR_SYSCALL_ULONG_T                                              /* idx2 */ 
 #define __NR32RTR_kcmp                          SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_finit_module                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32ATR0_finit_module                 SC_REPR_FD_T                                                         /* fd */ 
+#define __NR32ATR1_finit_module                 SC_REPR_STRING                                                       /* uargs */ 
+#define __NR32ATR2_finit_module                 SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NR32RTR_finit_module                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_sched_setattr                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_sched_setattr                 SC_REPR_ERRNO_T                                                      /* return */

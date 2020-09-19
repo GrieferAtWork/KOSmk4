@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e8a6ae5 */
+/* HASH CRC-32:0xa9a51a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -233,10 +233,32 @@
 #define __NR32_mprotect                     0x7d                   /* errno_t mprotect(void *addr, size_t len, syscall_ulong_t prot) */
 /* @param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 #define __NR32_sigprocmask                  0x7e                   /* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
-#define __NR32_create_module                0x7f                   /* errno_t create_module(int TODO_PROTOTYPE) */
-#define __NR32_init_module                  0x80                   /* errno_t init_module(int TODO_PROTOTYPE) */
-#define __NR32_delete_module                0x81                   /* errno_t delete_module(int TODO_PROTOTYPE) */
-#define __NR32_get_kernel_syms              0x82                   /* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+#define __NR32_create_module                0x7f                   /* errno_t create_module(void) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+#define __NR32_init_module                  0x80                   /* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+#define __NR32_delete_module                0x81                   /* errno_t delete_module(char const *name, oflag_t flags) */
+#define __NR32_get_kernel_syms              0x82                   /* errno_t get_kernel_syms(void) */
 #define __NR32_quotactl                     0x83                   /* errno_t quotactl(int TODO_PROTOTYPE) */
 #define __NR32_getpgid                      0x84                   /* pid_t getpgid(pid_t pid) */
 #define __NR32_fchdir                       0x85                   /* errno_t fchdir(fd_t fd) */
@@ -297,7 +319,7 @@
 #define __NR32_setresuid                    0xa4                   /* errno_t setresuid(uint16_t ruid, uint16_t euid, uint16_t suid) */
 #define __NR32_getresuid                    0xa5                   /* errno_t getresuid(uint16_t *ruid, uint16_t *euid, uint16_t *suid) */
 #define __NR32_vm86                         0xa6                   /* errno_t vm86(int TODO_PROTOTYPE) */
-#define __NR32_query_module                 0xa7                   /* errno_t query_module(int TODO_PROTOTYPE) */
+#define __NR32_query_module                 0xa7                   /* errno_t query_module(void) */
 #define __NR32_poll                         0xa8                   /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 #define __NR32_nfsservctl                   0xa9                   /* errno_t nfsservctl(int TODO_PROTOTYPE) */
 #define __NR32_setresgid                    0xaa                   /* errno_t setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid) */
@@ -612,7 +634,16 @@
 /* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
  *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 #define __NR32_kcmp                         0x15d                  /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
-#define __NR32_finit_module                 0x15e                  /* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+#define __NR32_finit_module                 0x15e                  /* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 #define __NR32_sched_setattr                0x15f                  /* errno_t sched_setattr(int TODO_PROTOTYPE) */
 #define __NR32_sched_getattr                0x160                  /* errno_t sched_getattr(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
@@ -2233,10 +2264,10 @@
 #define __NR32RC_adjtimex                     1
 #define __NR32RC_mprotect                     3
 #define __NR32RC_sigprocmask                  3
-#define __NR32RC_create_module                1
-#define __NR32RC_init_module                  1
-#define __NR32RC_delete_module                1
-#define __NR32RC_get_kernel_syms              1
+#define __NR32RC_create_module                0
+#define __NR32RC_init_module                  3
+#define __NR32RC_delete_module                2
+#define __NR32RC_get_kernel_syms              0
 #define __NR32RC_quotactl                     1
 #define __NR32RC_getpgid                      1
 #define __NR32RC_fchdir                       1
@@ -2273,7 +2304,7 @@
 #define __NR32RC_setresuid                    3
 #define __NR32RC_getresuid                    3
 #define __NR32RC_vm86                         1
-#define __NR32RC_query_module                 1
+#define __NR32RC_query_module                 0
 #define __NR32RC_poll                         3
 #define __NR32RC_nfsservctl                   1
 #define __NR32RC_setresgid                    3
@@ -2452,7 +2483,7 @@
 #define __NR32RC_process_vm_readv             6
 #define __NR32RC_process_vm_writev            6
 #define __NR32RC_kcmp                         5
-#define __NR32RC_finit_module                 1
+#define __NR32RC_finit_module                 3
 #define __NR32RC_sched_setattr                1
 #define __NR32RC_sched_getattr                1
 #define __NR32RC_renameat2                    5

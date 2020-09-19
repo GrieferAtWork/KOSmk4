@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbedaf101 */
+/* HASH CRC-32:0xaf8baa72 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -165,10 +165,10 @@
 #define __NR32AC_adjtimex                     1
 #define __NR32AC_mprotect                     3
 #define __NR32AC_sigprocmask                  3
-#define __NR32AC_create_module                1
-#define __NR32AC_init_module                  1
-#define __NR32AC_delete_module                1
-#define __NR32AC_get_kernel_syms              1
+#define __NR32AC_create_module                0
+#define __NR32AC_init_module                  3
+#define __NR32AC_delete_module                2
+#define __NR32AC_get_kernel_syms              0
 #define __NR32AC_quotactl                     1
 #define __NR32AC_getpgid                      1
 #define __NR32AC_fchdir                       1
@@ -205,7 +205,7 @@
 #define __NR32AC_setresuid                    3
 #define __NR32AC_getresuid                    3
 #define __NR32AC_vm86                         1
-#define __NR32AC_query_module                 1
+#define __NR32AC_query_module                 0
 #define __NR32AC_poll                         3
 #define __NR32AC_nfsservctl                   1
 #define __NR32AC_setresgid                    3
@@ -384,7 +384,7 @@
 #define __NR32AC_process_vm_readv             6
 #define __NR32AC_process_vm_writev            6
 #define __NR32AC_kcmp                         5
-#define __NR32AC_finit_module                 1
+#define __NR32AC_finit_module                 3
 #define __NR32AC_sched_setattr                1
 #define __NR32AC_sched_getattr                1
 #define __NR32AC_renameat2                    5
@@ -1262,10 +1262,11 @@
 #define __NR32AT0_sigprocmask                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_sigprocmask                  (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NR32AT2_sigprocmask                  (struct __sigset_struct *, struct __sigset_struct *)
-#define __NR32AT0_create_module                (int, int)
-#define __NR32AT0_init_module                  (int, int)
-#define __NR32AT0_delete_module                (int, int)
-#define __NR32AT0_get_kernel_syms              (int, int)
+#define __NR32AT0_init_module                  (void const *, void const *)
+#define __NR32AT1_init_module                  (size_t, __size_t)
+#define __NR32AT2_init_module                  (char const *, char const *)
+#define __NR32AT0_delete_module                (char const *, char const *)
+#define __NR32AT1_delete_module                (oflag_t, __oflag_t)
 #define __NR32AT0_quotactl                     (int, int)
 #define __NR32AT0_getpgid                      (pid_t, __pid_t)
 #define __NR32AT0_fchdir                       (fd_t, __fd_t)
@@ -1332,7 +1333,6 @@
 #define __NR32AT1_getresuid                    (uint16_t *, __uint16_t *)
 #define __NR32AT2_getresuid                    (uint16_t *, __uint16_t *)
 #define __NR32AT0_vm86                         (int, int)
-#define __NR32AT0_query_module                 (int, int)
 #define __NR32AT0_poll                         (struct pollfd *, struct pollfd *)
 #define __NR32AT1_poll                         (size_t, __size_t)
 #define __NR32AT2_poll                         (syscall_slong_t, __syscall_slong_t)
@@ -1796,7 +1796,9 @@
 #define __NR32AT2_kcmp                         (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT3_kcmp                         (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT4_kcmp                         (syscall_ulong_t, __syscall_ulong_t)
-#define __NR32AT0_finit_module                 (int, int)
+#define __NR32AT0_finit_module                 (fd_t, __fd_t)
+#define __NR32AT1_finit_module                 (char const *, char const *)
+#define __NR32AT2_finit_module                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_sched_setattr                (int, int)
 #define __NR32AT0_sched_getattr                (int, int)
 #define __NR32AT0_renameat2                    (fd_t, __fd_t)
@@ -2335,10 +2337,10 @@
 #define __NR32AM_adjtimex(a, b, c, d, e, f)                     (int)a
 #define __NR32AM_mprotect(a, b, c, d, e, f)                     (void *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR32AM_sigprocmask(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (struct __sigset_struct const *)b, (struct __sigset_struct *)c
-#define __NR32AM_create_module(a, b, c, d, e, f)                (int)a
-#define __NR32AM_init_module(a, b, c, d, e, f)                  (int)a
-#define __NR32AM_delete_module(a, b, c, d, e, f)                (int)a
-#define __NR32AM_get_kernel_syms(a, b, c, d, e, f)              (int)a
+#define __NR32AM_create_module(a, b, c, d, e, f)                /* nothing */
+#define __NR32AM_init_module(a, b, c, d, e, f)                  (void const *)a, (__size_t)b, (char const *)c
+#define __NR32AM_delete_module(a, b, c, d, e, f)                (char const *)a, (__oflag_t)b
+#define __NR32AM_get_kernel_syms(a, b, c, d, e, f)              /* nothing */
 #define __NR32AM_quotactl(a, b, c, d, e, f)                     (int)a
 #define __NR32AM_getpgid(a, b, c, d, e, f)                      (__pid_t)a
 #define __NR32AM_fchdir(a, b, c, d, e, f)                       (__fd_t)a
@@ -2375,7 +2377,7 @@
 #define __NR32AM_setresuid(a, b, c, d, e, f)                    (__uint16_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NR32AM_getresuid(a, b, c, d, e, f)                    (__uint16_t *)a, (__uint16_t *)b, (__uint16_t *)c
 #define __NR32AM_vm86(a, b, c, d, e, f)                         (int)a
-#define __NR32AM_query_module(a, b, c, d, e, f)                 (int)a
+#define __NR32AM_query_module(a, b, c, d, e, f)                 /* nothing */
 #define __NR32AM_poll(a, b, c, d, e, f)                         (struct pollfd *)a, (__size_t)b, (__syscall_slong_t)c
 #define __NR32AM_nfsservctl(a, b, c, d, e, f)                   (int)a
 #define __NR32AM_setresgid(a, b, c, d, e, f)                    (__uint16_t)a, (__uint16_t)b, (__uint16_t)c
@@ -2554,7 +2556,7 @@
 #define __NR32AM_process_vm_readv(a, b, c, d, e, f)             (__pid_t)a, (struct __iovecx32 const *)b, (__size_t)c, (struct __iovecx32 const *)d, (__size_t)e, (__syscall_ulong_t)f
 #define __NR32AM_process_vm_writev(a, b, c, d, e, f)            (__pid_t)a, (struct __iovecx32 const *)b, (__size_t)c, (struct __iovecx32 const *)d, (__size_t)e, (__syscall_ulong_t)f
 #define __NR32AM_kcmp(a, b, c, d, e, f)                         (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR32AM_finit_module(a, b, c, d, e, f)                 (int)a
+#define __NR32AM_finit_module(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NR32AM_sched_setattr(a, b, c, d, e, f)                (int)a
 #define __NR32AM_sched_getattr(a, b, c, d, e, f)                (int)a
 #define __NR32AM_renameat2(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
@@ -2840,10 +2842,10 @@
 #define __NR32AP_adjtimex(a)                                    (__syscall_ulong_t)a
 #define __NR32AP_mprotect(a, b, c)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_sigprocmask(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AP_create_module(a)                               (__syscall_ulong_t)a
-#define __NR32AP_init_module(a)                                 (__syscall_ulong_t)a
-#define __NR32AP_delete_module(a)                               (__syscall_ulong_t)a
-#define __NR32AP_get_kernel_syms(a)                             (__syscall_ulong_t)a
+#define __NR32AP_create_module()                                /* nothing */
+#define __NR32AP_init_module(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR32AP_delete_module(a, b)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_get_kernel_syms()                              /* nothing */
 #define __NR32AP_quotactl(a)                                    (__syscall_ulong_t)a
 #define __NR32AP_getpgid(a)                                     (__syscall_ulong_t)a
 #define __NR32AP_fchdir(a)                                      (__syscall_ulong_t)a
@@ -2880,7 +2882,7 @@
 #define __NR32AP_setresuid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_getresuid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_vm86(a)                                        (__syscall_ulong_t)a
-#define __NR32AP_query_module(a)                                (__syscall_ulong_t)a
+#define __NR32AP_query_module()                                 /* nothing */
 #define __NR32AP_poll(a, b, c)                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_nfsservctl(a)                                  (__syscall_ulong_t)a
 #define __NR32AP_setresgid(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -3059,7 +3061,7 @@
 #define __NR32AP_process_vm_readv(a, b, c, d, e, f)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_process_vm_writev(a, b, c, d, e, f)            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_kcmp(a, b, c, d, e)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR32AP_finit_module(a)                                (__syscall_ulong_t)a
+#define __NR32AP_finit_module(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_sched_setattr(a)                               (__syscall_ulong_t)a
 #define __NR32AP_sched_getattr(a)                               (__syscall_ulong_t)a
 #define __NR32AP_renameat2(a, b, c, d, e)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

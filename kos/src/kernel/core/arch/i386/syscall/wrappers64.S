@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe88935f4 */
+/* HASH CRC-32:0x83240f2c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5552,7 +5552,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ioperm)
 	.cfi_endproc
 END(__x86_asm64_syscall_ioperm)
 
-/* errno_t create_module(int TODO_PROTOTYPE) */
+/* errno_t create_module(void) */
 .section .text.x86.asm64_syscall.create_module
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_create_module)
 	.cfi_startproc simple
@@ -5582,7 +5582,16 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_create_module)
 	.cfi_endproc
 END(__x86_asm64_syscall_create_module)
 
-/* errno_t init_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 .section .text.x86.asm64_syscall.init_module
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_init_module)
 	.cfi_startproc simple
@@ -5612,7 +5621,20 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_init_module)
 	.cfi_endproc
 END(__x86_asm64_syscall_init_module)
 
-/* errno_t delete_module(int TODO_PROTOTYPE) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+/* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.x86.asm64_syscall.delete_module
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_delete_module)
 	.cfi_startproc simple
@@ -5642,7 +5664,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_delete_module)
 	.cfi_endproc
 END(__x86_asm64_syscall_delete_module)
 
-/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+/* errno_t get_kernel_syms(void) */
 .section .text.x86.asm64_syscall.get_kernel_syms
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_kernel_syms)
 	.cfi_startproc simple
@@ -5672,7 +5694,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_get_kernel_syms)
 	.cfi_endproc
 END(__x86_asm64_syscall_get_kernel_syms)
 
-/* errno_t query_module(int TODO_PROTOTYPE) */
+/* errno_t query_module(void) */
 .section .text.x86.asm64_syscall.query_module
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_query_module)
 	.cfi_startproc simple
@@ -9881,7 +9903,16 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_kcmp)
 	.cfi_endproc
 END(__x86_asm64_syscall_kcmp)
 
-/* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.finit_module
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_finit_module)
 	.cfi_startproc simple
@@ -17071,7 +17102,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigprocmask)
 	.cfi_endproc
 END(__x86_asm32_int80_sigprocmask)
 
-/* errno_t create_module(int TODO_PROTOTYPE) */
+/* errno_t create_module(void) */
 .section .text.x86.asm32_syscall_int80.create_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	.cfi_startproc simple
@@ -17087,7 +17118,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_create_module)
 	call   sys32_create_module
 	popq_cfi_r %r11
@@ -17102,7 +17132,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	.cfi_endproc
 END(__x86_asm32_int80_create_module)
 
-/* errno_t init_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 .section .text.x86.asm32_syscall_int80.init_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	.cfi_startproc simple
@@ -17118,7 +17157,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_init_module)
 	call   sys32_init_module
 	popq_cfi_r %r11
@@ -17133,7 +17174,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	.cfi_endproc
 END(__x86_asm32_int80_init_module)
 
-/* errno_t delete_module(int TODO_PROTOTYPE) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+/* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.x86.asm32_syscall_int80.delete_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	.cfi_startproc simple
@@ -17149,7 +17203,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movslq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_delete_module)
 	call   sys32_delete_module
 	popq_cfi_r %r11
@@ -17164,7 +17219,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	.cfi_endproc
 END(__x86_asm32_int80_delete_module)
 
-/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+/* errno_t get_kernel_syms(void) */
 .section .text.x86.asm32_syscall_int80.get_kernel_syms
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_kernel_syms)
 	.cfi_startproc simple
@@ -17180,7 +17235,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_kernel_syms)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_get_kernel_syms)
 	call   sys32_get_kernel_syms
 	popq_cfi_r %r11
@@ -18371,7 +18425,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86)
 	.cfi_endproc
 END(__x86_asm32_int80_vm86)
 
-/* errno_t query_module(int TODO_PROTOTYPE) */
+/* errno_t query_module(void) */
 .section .text.x86.asm32_syscall_int80.query_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_query_module)
 	.cfi_startproc simple
@@ -18387,7 +18441,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_query_module)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_query_module)
 	call   sys32_query_module
 	popq_cfi_r %r11
@@ -24423,7 +24476,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	.cfi_endproc
 END(__x86_asm32_int80_kcmp)
 
-/* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.finit_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_finit_module)
 	.cfi_startproc simple
@@ -24440,6 +24502,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_finit_module)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_finit_module)
 	call   sys32_finit_module
 	popq_cfi_r %r11
@@ -30584,16 +30648,38 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mprotect, __x86_asm32_int80_mprote
 /* errno_t sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigprocmask, __x86_asm32_int80_sigprocmask)
 
-/* errno_t create_module(int TODO_PROTOTYPE) */
+/* errno_t create_module(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_create_module, __x86_asm32_int80_create_module)
 
-/* errno_t init_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_init_module, __x86_asm32_int80_init_module)
 
-/* errno_t delete_module(int TODO_PROTOTYPE) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+/* errno_t delete_module(char const *name, oflag_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_delete_module, __x86_asm32_int80_delete_module)
 
-/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+/* errno_t get_kernel_syms(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_get_kernel_syms, __x86_asm32_int80_get_kernel_syms)
 
 /* errno_t quotactl(int TODO_PROTOTYPE) */
@@ -30829,7 +30915,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getresuid, __x86_asm32_int80_getre
 /* errno_t vm86(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_vm86, __x86_asm32_int80_vm86)
 
-/* errno_t query_module(int TODO_PROTOTYPE) */
+/* errno_t query_module(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_query_module, __x86_asm32_int80_query_module)
 
 /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
@@ -32380,7 +32466,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
 	.cfi_endproc
 END(__x86_asm32_sysenter_kcmp)
 
-/* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_finit_module, __x86_asm32_int80_finit_module)
 
 /* errno_t sched_setattr(int TODO_PROTOTYPE) */
@@ -35755,45 +35850,56 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sigprocmask)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sigprocmask)
 
-/* errno_t create_module(int TODO_PROTOTYPE) */
-.section .text.x86.asm32_syscall_sysrun32.create_module
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_create_module)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_create_module)
-	jmp    sys32_create_module
-	.cfi_endproc
-END(__x86_asm32_sysrun32_create_module)
+/* errno_t create_module(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_create_module, sys32_create_module); */
 
-/* errno_t init_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 .section .text.x86.asm32_syscall_sysrun32.init_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_init_module)
 	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_init_module)
 	jmp    sys32_init_module
 	.cfi_endproc
 END(__x86_asm32_sysrun32_init_module)
 
-/* errno_t delete_module(int TODO_PROTOTYPE) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+/* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.delete_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_delete_module)
 	.cfi_startproc
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_delete_module)
 	jmp    sys32_delete_module
 	.cfi_endproc
 END(__x86_asm32_sysrun32_delete_module)
 
-/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
-.section .text.x86.asm32_syscall_sysrun32.get_kernel_syms
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_get_kernel_syms)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_get_kernel_syms)
-	jmp    sys32_get_kernel_syms
-	.cfi_endproc
-END(__x86_asm32_sysrun32_get_kernel_syms)
+/* errno_t get_kernel_syms(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_get_kernel_syms, sys32_get_kernel_syms); */
 
 /* errno_t quotactl(int TODO_PROTOTYPE) */
 .section .text.x86.asm32_syscall_sysrun32.quotactl
@@ -36200,15 +36306,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_vm86)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_vm86)
 
-/* errno_t query_module(int TODO_PROTOTYPE) */
-.section .text.x86.asm32_syscall_sysrun32.query_module
-INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_query_module)
-	.cfi_startproc
-	movzlq 0(%rdi), %rdi
-	EXTERN(sys32_query_module)
-	jmp    sys32_query_module
-	.cfi_endproc
-END(__x86_asm32_sysrun32_query_module)
+/* errno_t query_module(void) */
+/* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_query_module, sys32_query_module); */
 
 /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
 .section .text.x86.asm32_syscall_sysrun32.poll
@@ -38402,10 +38501,21 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_kcmp)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_kcmp)
 
-/* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.finit_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_finit_module)
 	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_finit_module)
 	jmp    sys32_finit_module

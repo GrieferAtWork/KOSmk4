@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb003a4bc */
+/* HASH CRC-32:0xcbf2d966 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4789,7 +4789,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sigprocmask)
 	.cfi_endproc
 END(__x86_asm32_int80_sigprocmask)
 
-/* errno_t create_module(int TODO_PROTOTYPE) */
+/* errno_t create_module(void) */
 .section .text.x86.asm32_syscall_int80.create_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	.cfi_startproc simple
@@ -4810,10 +4810,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_create_module)
 	call   sys_create_module
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -4826,7 +4824,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_create_module)
 	.cfi_endproc
 END(__x86_asm32_int80_create_module)
 
-/* errno_t init_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 .section .text.x86.asm32_syscall_int80.init_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	.cfi_startproc simple
@@ -4845,14 +4852,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_init_module)
 	call   sys_init_module
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -4863,7 +4870,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_init_module)
 	.cfi_endproc
 END(__x86_asm32_int80_init_module)
 
-/* errno_t delete_module(int TODO_PROTOTYPE) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+/* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.x86.asm32_syscall_int80.delete_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	.cfi_startproc simple
@@ -4882,14 +4902,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_delete_module)
 	call   sys_delete_module
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -4900,7 +4920,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_delete_module)
 	.cfi_endproc
 END(__x86_asm32_int80_delete_module)
 
-/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+/* errno_t get_kernel_syms(void) */
 .section .text.x86.asm32_syscall_int80.get_kernel_syms
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_kernel_syms)
 	.cfi_startproc simple
@@ -4921,10 +4941,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_kernel_syms)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_get_kernel_syms)
 	call   sys_get_kernel_syms
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -6301,7 +6319,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_vm86)
 	.cfi_endproc
 END(__x86_asm32_int80_vm86)
 
-/* errno_t query_module(int TODO_PROTOTYPE) */
+/* errno_t query_module(void) */
 .section .text.x86.asm32_syscall_int80.query_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_query_module)
 	.cfi_startproc simple
@@ -6322,10 +6340,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_query_module)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_query_module)
 	call   sys_query_module
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -13206,7 +13222,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kcmp)
 	.cfi_endproc
 END(__x86_asm32_int80_kcmp)
 
-/* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.finit_module
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_finit_module)
 	.cfi_startproc simple
@@ -13225,14 +13250,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_finit_module)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_finit_module)
 	call   sys_finit_module
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -24247,7 +24272,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_sigprocmask)
 	.cfi_endproc
 END(__x86_asm32_sysenter_sigprocmask)
 
-/* errno_t create_module(int TODO_PROTOTYPE) */
+/* errno_t create_module(void) */
 .section .text.x86.asm32_syscall_sysenter.create_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_create_module)
 	.cfi_startproc simple
@@ -24268,10 +24293,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_create_module)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_create_module)
 	call   sys_create_module
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -24284,7 +24307,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_create_module)
 	.cfi_endproc
 END(__x86_asm32_sysenter_create_module)
 
-/* errno_t init_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 .section .text.x86.asm32_syscall_sysenter.init_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_init_module)
 	.cfi_startproc simple
@@ -24303,14 +24335,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_init_module)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_init_module)
 	call   sys_init_module
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -24321,7 +24353,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_init_module)
 	.cfi_endproc
 END(__x86_asm32_sysenter_init_module)
 
-/* errno_t delete_module(int TODO_PROTOTYPE) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+/* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.x86.asm32_syscall_sysenter.delete_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_delete_module)
 	.cfi_startproc simple
@@ -24340,14 +24385,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_delete_module)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_delete_module)
 	call   sys_delete_module
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -24358,7 +24403,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_delete_module)
 	.cfi_endproc
 END(__x86_asm32_sysenter_delete_module)
 
-/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+/* errno_t get_kernel_syms(void) */
 .section .text.x86.asm32_syscall_sysenter.get_kernel_syms
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_kernel_syms)
 	.cfi_startproc simple
@@ -24379,10 +24424,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_kernel_syms)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_get_kernel_syms)
 	call   sys_get_kernel_syms
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -25765,7 +25808,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_vm86)
 	.cfi_endproc
 END(__x86_asm32_sysenter_vm86)
 
-/* errno_t query_module(int TODO_PROTOTYPE) */
+/* errno_t query_module(void) */
 .section .text.x86.asm32_syscall_sysenter.query_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_query_module)
 	.cfi_startproc simple
@@ -25786,10 +25829,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_query_module)
 	movw   %ax, %fs
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_query_module)
 	call   sys_query_module
-	popl_cfi_r %ebx
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
 	popl_cfi %fs
@@ -32722,7 +32763,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kcmp)
 	.cfi_endproc
 END(__x86_asm32_sysenter_kcmp)
 
-/* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.finit_module
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_finit_module)
 	.cfi_startproc simple
@@ -32741,14 +32791,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_finit_module)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_finit_module)
 	call   sys_finit_module
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es

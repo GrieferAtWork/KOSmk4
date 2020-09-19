@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72e30d16 */
+/* HASH CRC-32:0xbfd6a188 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -383,11 +383,11 @@
 #define __NR64AN0_ioperm                   from
 #define __NR64AN1_ioperm                   num
 #define __NR64AN2_ioperm                   turn_on
-#define __NR64AN0_create_module            TODO_PROTOTYPE
-#define __NR64AN0_init_module              TODO_PROTOTYPE
-#define __NR64AN0_delete_module            TODO_PROTOTYPE
-#define __NR64AN0_get_kernel_syms          TODO_PROTOTYPE
-#define __NR64AN0_query_module             TODO_PROTOTYPE
+#define __NR64AN0_init_module              module_image
+#define __NR64AN1_init_module              len
+#define __NR64AN2_init_module              uargs
+#define __NR64AN0_delete_module            name
+#define __NR64AN1_delete_module            flags
 #define __NR64AN0_quotactl                 TODO_PROTOTYPE
 #define __NR64AN0_nfsservctl               TODO_PROTOTYPE
 #define __NR64AN0_getpmsg                  TODO_PROTOTYPE
@@ -743,7 +743,9 @@
 #define __NR64AN2_kcmp                     type
 #define __NR64AN3_kcmp                     idx1
 #define __NR64AN4_kcmp                     idx2
-#define __NR64AN0_finit_module             TODO_PROTOTYPE
+#define __NR64AN0_finit_module             fd
+#define __NR64AN1_finit_module             uargs
+#define __NR64AN2_finit_module             flags
 #define __NR64AN0_sched_setattr            TODO_PROTOTYPE
 #define __NR64AN0_sched_getattr            TODO_PROTOTYPE
 #define __NR64AN0_renameat2                olddirfd
@@ -1537,15 +1539,15 @@
 #define __NR64ATR1_ioperm                   SC_REPR_SYSCALL_ULONG_T                                              /* num */ 
 #define __NR64ATR2_ioperm                   SC_REPR_SYSCALL_ULONG_T                                              /* turn_on */ 
 #define __NR64RTR_ioperm                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_create_module            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_create_module             SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_init_module              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64ATR0_init_module              SC_REPR_POINTER                                                      /* module_image */ 
+#define __NR64ATR1_init_module              SC_REPR_SIZE_T                                                       /* len */ 
+#define __NR64ATR2_init_module              SC_REPR_STRING                                                       /* uargs */ 
 #define __NR64RTR_init_module               SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_delete_module            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64ATR0_delete_module            SC_REPR_STRING                                                       /* name */ 
+#define __NR64ATR1_delete_module            SC_REPR_OFLAG_T                                                      /* flags */ 
 #define __NR64RTR_delete_module             SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_get_kernel_syms          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_get_kernel_syms           SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_query_module             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_query_module              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_quotactl                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_quotactl                  SC_REPR_ERRNO_T                                                      /* return */
@@ -2081,7 +2083,9 @@
 #define __NR64ATR3_kcmp                     SC_REPR_SYSCALL_ULONG_T                                              /* idx1 */ 
 #define __NR64ATR4_kcmp                     SC_REPR_SYSCALL_ULONG_T                                              /* idx2 */ 
 #define __NR64RTR_kcmp                      SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR64ATR0_finit_module             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR64ATR0_finit_module             SC_REPR_FD_T                                                         /* fd */ 
+#define __NR64ATR1_finit_module             SC_REPR_STRING                                                       /* uargs */ 
+#define __NR64ATR2_finit_module             SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NR64RTR_finit_module              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_sched_setattr            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR64RTR_sched_setattr             SC_REPR_ERRNO_T                                                      /* return */

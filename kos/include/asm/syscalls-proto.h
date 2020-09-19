@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x972a53cc */
+/* HASH CRC-32:0xd77249d2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,8 +134,8 @@
 #define __NRAC_getitimer              2
 #define __NRAC_setitimer              3
 #define __NRAC_kexec_load             1
-#define __NRAC_init_module            1
-#define __NRAC_delete_module          1
+#define __NRAC_init_module            3
+#define __NRAC_delete_module          2
 #define __NRAC_timer_create           3
 #define __NRAC_timer_gettime          2
 #define __NRAC_timer_getoverrun       1
@@ -284,7 +284,7 @@
 #define __NRAC_process_vm_readv       6
 #define __NRAC_process_vm_writev      6
 #define __NRAC_kcmp                   5
-#define __NRAC_finit_module           1
+#define __NRAC_finit_module           3
 #define __NRAC_sched_setattr          1
 #define __NRAC_sched_getattr          1
 #define __NRAC_renameat2              5
@@ -936,8 +936,11 @@
 #define __NRAT1_setitimer              (struct itimerval const *, struct itimerval const *)
 #define __NRAT2_setitimer              (struct itimerval *, struct itimerval *)
 #define __NRAT0_kexec_load             (int, int)
-#define __NRAT0_init_module            (int, int)
-#define __NRAT0_delete_module          (int, int)
+#define __NRAT0_init_module            (void const *, void const *)
+#define __NRAT1_init_module            (size_t, __size_t)
+#define __NRAT2_init_module            (char const *, char const *)
+#define __NRAT0_delete_module          (char const *, char const *)
+#define __NRAT1_delete_module          (oflag_t, __oflag_t)
 #define __NRAT0_timer_create           (clockid_t, __clockid_t)
 #define __NRAT1_timer_create           (struct sigevent *, struct sigevent *)
 #define __NRAT2_timer_create           (timer_t *, __timer_t *)
@@ -1273,7 +1276,9 @@
 #define __NRAT2_kcmp                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT3_kcmp                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT4_kcmp                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_finit_module           (int, int)
+#define __NRAT0_finit_module           (fd_t, __fd_t)
+#define __NRAT1_finit_module           (char const *, char const *)
+#define __NRAT2_finit_module           (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_sched_setattr          (int, int)
 #define __NRAT0_sched_getattr          (int, int)
 #define __NRAT0_renameat2              (fd_t, __fd_t)
@@ -1521,8 +1526,8 @@
 #define __NRAM_getitimer(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct itimerval *)b
 #define __NRAM_setitimer(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__syscall_ulong_t)a, (struct itimerval const *)b, (struct itimerval *)c
 #define __NRAM_kexec_load(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
-#define __NRAM_init_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (int)a
-#define __NRAM_delete_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
+#define __NRAM_init_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (void const *)a, (__size_t)b, (char const *)c
+#define __NRAM_delete_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (char const *)a, (__oflag_t)b
 #define __NRAM_timer_create(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__clockid_t)a, (struct sigevent *)b, (__timer_t *)c
 #define __NRAM_timer_gettime(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__timer_t)a, (struct itimerspec *)b
 #define __NRAM_timer_getoverrun(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)       (__timer_t)a
@@ -1671,7 +1676,7 @@
 #define __NRAM_process_vm_readv(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)       (__pid_t)a, (struct iovec const *)b, (__size_t)c, (struct iovec const *)d, (__size_t)e, (__syscall_ulong_t)f
 #define __NRAM_process_vm_writev(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)      (__pid_t)a, (struct iovec const *)b, (__size_t)c, (struct iovec const *)d, (__size_t)e, (__syscall_ulong_t)f
 #define __NRAM_kcmp(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAM_finit_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (int)a
+#define __NRAM_finit_module(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)           (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NRAM_sched_setattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_sched_getattr(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
 #define __NRAM_renameat2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
@@ -1843,8 +1848,8 @@
 #define __NRAP_getitimer(a, b)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_setitimer(a, b, c)                                                                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_kexec_load(a)                                                                                        (__syscall_ulong_t)a
-#define __NRAP_init_module(a)                                                                                       (__syscall_ulong_t)a
-#define __NRAP_delete_module(a)                                                                                     (__syscall_ulong_t)a
+#define __NRAP_init_module(a, b, c)                                                                                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_delete_module(a, b)                                                                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_timer_create(a, b, c)                                                                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_timer_gettime(a, b)                                                                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_timer_getoverrun(a)                                                                                  (__syscall_ulong_t)a
@@ -1993,7 +1998,7 @@
 #define __NRAP_process_vm_readv(a, b, c, d, e, f)                                                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_process_vm_writev(a, b, c, d, e, f)                                                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_kcmp(a, b, c, d, e)                                                                                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NRAP_finit_module(a)                                                                                      (__syscall_ulong_t)a
+#define __NRAP_finit_module(a, b, c)                                                                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_sched_setattr(a)                                                                                     (__syscall_ulong_t)a
 #define __NRAP_sched_getattr(a)                                                                                     (__syscall_ulong_t)a
 #define __NRAP_renameat2(a, b, c, d, e)                                                                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

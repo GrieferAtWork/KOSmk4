@@ -328,17 +328,17 @@ pidfd_send_signal = pidfd_send_signalx64;
 0x00000000000000ab:setdomainname
 0x00000000000000ac:iopl
 0x00000000000000ad:ioperm
-0x00000000000000ae:create_module
+0x00000000000000ae:create_module /* unimplemented by linux */
 0x00000000000000af:init_module
 0x00000000000000b0:delete_module
-0x00000000000000b1:get_kernel_syms
-0x00000000000000b2:query_module
+0x00000000000000b1:get_kernel_syms /* unimplemented by linux */
+0x00000000000000b2:query_module /* unimplemented by linux */
 0x00000000000000b3:quotactl
 0x00000000000000b4:nfsservctl
 0x00000000000000b5:getpmsg
 0x00000000000000b6:putpmsg
 0x00000000000000b7:afs_syscall
-0x00000000000000b8:tuxcall
+0x00000000000000b8:tuxcall /* unimplemented by linux */
 0x00000000000000b9:security
 0x00000000000000ba:gettid
 0x00000000000000bb:readahead
@@ -373,7 +373,7 @@ pidfd_send_signal = pidfd_send_signalx64;
 0x00000000000000d8:remap_file_pages
 0x00000000000000d9:getdents64
 0x00000000000000da:set_tid_address
-0x00000000000000db:restart_syscall
+0x00000000000000db:restart_syscall /* Used internally by the linux kernel, but not needed on KOS */
 0x00000000000000dc:semtimedop
 0x00000000000000dd:fadvise64
 0x00000000000000de:timer_create

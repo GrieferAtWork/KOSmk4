@@ -217,7 +217,7 @@ select64 = selectx32_64;
  * >> int <name>(...);                  // In <kos/syscalls.h>
  */
 
-0x00000000:restart_syscall
+0x00000000:restart_syscall /* Used internally by the linux kernel, but not needed on KOS */
 /* NOTE: exit() _always_ has to be vector #1 to comply with SysV abi386-4:3-24
  *       specs, which describe the full implementation of the `_exit':
  * >> .globl _exit
@@ -260,8 +260,8 @@ select64 = selectx32_64;
 0x0000001c:oldfstat
 0x0000001d:pause
 0x0000001e:utime
-0x0000001f:stty
-0x00000020:gtty
+0x0000001f:stty /* unimplemented by linux */
+0x00000020:gtty /* unimplemented by linux */
 0x00000021:access
 0x00000022:nice
 0x00000023:ftime
@@ -273,7 +273,7 @@ select64 = selectx32_64;
 0x00000029:dup
 0x0000002a:pipe
 0x0000002b:times
-0x0000002c:prof
+0x0000002c:prof /* unimplemented by linux */
 0x0000002d:brk
 0x0000002e:setgid
 0x0000002f:getgid
@@ -282,12 +282,12 @@ select64 = selectx32_64;
 0x00000032:getegid
 0x00000033:acct
 0x00000034:umount2
-0x00000035:lock
+0x00000035:lock /* unimplemented by linux */
 0x00000036:ioctl
 0x00000037:fcntl
-0x00000038:mpx
+0x00000038:mpx /* unimplemented by linux */
 0x00000039:setpgid
-0x0000003a:ulimit
+0x0000003a:ulimit /* unimplemented by linux */
 0x0000003b:oldolduname
 0x0000003c:umask
 0x0000003d:chroot
@@ -341,7 +341,7 @@ select64 = selectx32_64;
 0x0000006d:olduname
 0x0000006e:iopl
 0x0000006f:vhangup
-0x00000070:idle
+0x00000070:idle /* unimplemented by linux */
 0x00000071:vm86old
 0x00000072:wait4
 0x00000073:swapoff
@@ -356,10 +356,10 @@ select64 = selectx32_64;
 0x0000007c:adjtimex
 0x0000007d:mprotect
 0x0000007e:sigprocmask
-0x0000007f:create_module
+0x0000007f:create_module /* unimplemented by linux */
 0x00000080:init_module
 0x00000081:delete_module
-0x00000082:get_kernel_syms
+0x00000082:get_kernel_syms /* unimplemented by linux */
 0x00000083:quotactl
 0x00000084:getpgid
 0x00000085:fchdir
@@ -396,7 +396,7 @@ select64 = selectx32_64;
 0x000000a4:setresuid
 0x000000a5:getresuid
 0x000000a6:vm86
-0x000000a7:query_module
+0x000000a7:query_module /* unimplemented by linux */
 0x000000a8:poll
 0x000000a9:nfsservctl
 0x000000aa:setresgid

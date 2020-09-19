@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc18378e9 */
+/* HASH CRC-32:0xdf1503e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4762,7 +4762,7 @@ INTERN_FUNCTION(libc_sys_Xioperm)
 END(libc_sys_Xioperm)
 DEFINE_PUBLIC_ALIAS(sys_Xioperm, libc_sys_Xioperm)
 
-/* errno_t create_module(int TODO_PROTOTYPE) */
+/* errno_t create_module(void) */
 .section .text.crt.syscall.create_module
 INTERN_FUNCTION(libc_sys_create_module)
 	.cfi_startproc
@@ -4774,7 +4774,7 @@ INTERN_FUNCTION(libc_sys_create_module)
 END(libc_sys_create_module)
 DEFINE_PUBLIC_ALIAS(sys_create_module, libc_sys_create_module)
 
-/* errno_t create_module(int TODO_PROTOTYPE) */
+/* errno_t create_module(void) */
 .section .text.crt.syscall.Xcreate_module
 INTERN_FUNCTION(libc_sys_Xcreate_module)
 	.cfi_startproc
@@ -4786,7 +4786,16 @@ INTERN_FUNCTION(libc_sys_Xcreate_module)
 END(libc_sys_Xcreate_module)
 DEFINE_PUBLIC_ALIAS(sys_Xcreate_module, libc_sys_Xcreate_module)
 
-/* errno_t init_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 .section .text.crt.syscall.init_module
 INTERN_FUNCTION(libc_sys_init_module)
 	.cfi_startproc
@@ -4798,7 +4807,16 @@ INTERN_FUNCTION(libc_sys_init_module)
 END(libc_sys_init_module)
 DEFINE_PUBLIC_ALIAS(sys_init_module, libc_sys_init_module)
 
-/* errno_t init_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
 .section .text.crt.syscall.Xinit_module
 INTERN_FUNCTION(libc_sys_Xinit_module)
 	.cfi_startproc
@@ -4810,7 +4828,20 @@ INTERN_FUNCTION(libc_sys_Xinit_module)
 END(libc_sys_Xinit_module)
 DEFINE_PUBLIC_ALIAS(sys_Xinit_module, libc_sys_Xinit_module)
 
-/* errno_t delete_module(int TODO_PROTOTYPE) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+/* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.crt.syscall.delete_module
 INTERN_FUNCTION(libc_sys_delete_module)
 	.cfi_startproc
@@ -4822,7 +4853,20 @@ INTERN_FUNCTION(libc_sys_delete_module)
 END(libc_sys_delete_module)
 DEFINE_PUBLIC_ALIAS(sys_delete_module, libc_sys_delete_module)
 
-/* errno_t delete_module(int TODO_PROTOTYPE) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+/* errno_t delete_module(char const *name, oflag_t flags) */
 .section .text.crt.syscall.Xdelete_module
 INTERN_FUNCTION(libc_sys_Xdelete_module)
 	.cfi_startproc
@@ -4834,7 +4878,7 @@ INTERN_FUNCTION(libc_sys_Xdelete_module)
 END(libc_sys_Xdelete_module)
 DEFINE_PUBLIC_ALIAS(sys_Xdelete_module, libc_sys_Xdelete_module)
 
-/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+/* errno_t get_kernel_syms(void) */
 .section .text.crt.syscall.get_kernel_syms
 INTERN_FUNCTION(libc_sys_get_kernel_syms)
 	.cfi_startproc
@@ -4846,7 +4890,7 @@ INTERN_FUNCTION(libc_sys_get_kernel_syms)
 END(libc_sys_get_kernel_syms)
 DEFINE_PUBLIC_ALIAS(sys_get_kernel_syms, libc_sys_get_kernel_syms)
 
-/* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
+/* errno_t get_kernel_syms(void) */
 .section .text.crt.syscall.Xget_kernel_syms
 INTERN_FUNCTION(libc_sys_Xget_kernel_syms)
 	.cfi_startproc
@@ -4858,7 +4902,7 @@ INTERN_FUNCTION(libc_sys_Xget_kernel_syms)
 END(libc_sys_Xget_kernel_syms)
 DEFINE_PUBLIC_ALIAS(sys_Xget_kernel_syms, libc_sys_Xget_kernel_syms)
 
-/* errno_t query_module(int TODO_PROTOTYPE) */
+/* errno_t query_module(void) */
 .section .text.crt.syscall.query_module
 INTERN_FUNCTION(libc_sys_query_module)
 	.cfi_startproc
@@ -4870,7 +4914,7 @@ INTERN_FUNCTION(libc_sys_query_module)
 END(libc_sys_query_module)
 DEFINE_PUBLIC_ALIAS(sys_query_module, libc_sys_query_module)
 
-/* errno_t query_module(int TODO_PROTOTYPE) */
+/* errno_t query_module(void) */
 .section .text.crt.syscall.Xquery_module
 INTERN_FUNCTION(libc_sys_Xquery_module)
 	.cfi_startproc
@@ -8416,7 +8460,16 @@ INTERN_FUNCTION(libc_sys_Xkcmp)
 END(libc_sys_Xkcmp)
 DEFINE_PUBLIC_ALIAS(sys_Xkcmp, libc_sys_Xkcmp)
 
-/* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 .section .text.crt.syscall.finit_module
 INTERN_FUNCTION(libc_sys_finit_module)
 	.cfi_startproc
@@ -8428,7 +8481,16 @@ INTERN_FUNCTION(libc_sys_finit_module)
 END(libc_sys_finit_module)
 DEFINE_PUBLIC_ALIAS(sys_finit_module, libc_sys_finit_module)
 
-/* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+/* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xfinit_module
 INTERN_FUNCTION(libc_sys_Xfinit_module)
 	.cfi_startproc

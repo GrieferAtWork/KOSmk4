@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb977a0fe */
+/* HASH CRC-32:0x9bf398d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -383,11 +383,11 @@
 #define __NRAN0_ioperm                   from
 #define __NRAN1_ioperm                   num
 #define __NRAN2_ioperm                   turn_on
-#define __NRAN0_create_module            TODO_PROTOTYPE
-#define __NRAN0_init_module              TODO_PROTOTYPE
-#define __NRAN0_delete_module            TODO_PROTOTYPE
-#define __NRAN0_get_kernel_syms          TODO_PROTOTYPE
-#define __NRAN0_query_module             TODO_PROTOTYPE
+#define __NRAN0_init_module              module_image
+#define __NRAN1_init_module              len
+#define __NRAN2_init_module              uargs
+#define __NRAN0_delete_module            name
+#define __NRAN1_delete_module            flags
 #define __NRAN0_quotactl                 TODO_PROTOTYPE
 #define __NRAN0_nfsservctl               TODO_PROTOTYPE
 #define __NRAN0_getpmsg                  TODO_PROTOTYPE
@@ -743,7 +743,9 @@
 #define __NRAN2_kcmp                     type
 #define __NRAN3_kcmp                     idx1
 #define __NRAN4_kcmp                     idx2
-#define __NRAN0_finit_module             TODO_PROTOTYPE
+#define __NRAN0_finit_module             fd
+#define __NRAN1_finit_module             uargs
+#define __NRAN2_finit_module             flags
 #define __NRAN0_sched_setattr            TODO_PROTOTYPE
 #define __NRAN0_sched_getattr            TODO_PROTOTYPE
 #define __NRAN0_renameat2                olddirfd
@@ -1537,15 +1539,15 @@
 #define __NRATR1_ioperm                   SC_REPR_SYSCALL_ULONG_T                                              /* num */ 
 #define __NRATR2_ioperm                   SC_REPR_SYSCALL_ULONG_T                                              /* turn_on */ 
 #define __NRRTR_ioperm                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_create_module            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_create_module             SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_init_module              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_init_module              SC_REPR_POINTER                                                      /* module_image */ 
+#define __NRATR1_init_module              SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRATR2_init_module              SC_REPR_STRING                                                       /* uargs */ 
 #define __NRRTR_init_module               SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_delete_module            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_delete_module            SC_REPR_STRING                                                       /* name */ 
+#define __NRATR1_delete_module            SC_REPR_OFLAG_T                                                      /* flags */ 
 #define __NRRTR_delete_module             SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_get_kernel_syms          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_get_kernel_syms           SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_query_module             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_query_module              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_quotactl                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_quotactl                  SC_REPR_ERRNO_T                                                      /* return */
@@ -2081,7 +2083,9 @@
 #define __NRATR3_kcmp                     SC_REPR_SYSCALL_ULONG_T                                              /* idx1 */ 
 #define __NRATR4_kcmp                     SC_REPR_SYSCALL_ULONG_T                                              /* idx2 */ 
 #define __NRRTR_kcmp                      SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NRATR0_finit_module             SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_finit_module             SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_finit_module             SC_REPR_STRING                                                       /* uargs */ 
+#define __NRATR2_finit_module             SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NRRTR_finit_module              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_sched_setattr            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_sched_setattr             SC_REPR_ERRNO_T                                                      /* return */

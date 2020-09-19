@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97f2316 */
+/* HASH CRC-32:0x89fe1882 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -212,11 +212,11 @@
 #define __NR64AC_setdomainname            2
 #define __NR64AC_iopl                     1
 #define __NR64AC_ioperm                   3
-#define __NR64AC_create_module            1
-#define __NR64AC_init_module              1
-#define __NR64AC_delete_module            1
-#define __NR64AC_get_kernel_syms          1
-#define __NR64AC_query_module             1
+#define __NR64AC_create_module            0
+#define __NR64AC_init_module              3
+#define __NR64AC_delete_module            2
+#define __NR64AC_get_kernel_syms          0
+#define __NR64AC_query_module             0
 #define __NR64AC_quotactl                 1
 #define __NR64AC_nfsservctl               1
 #define __NR64AC_getpmsg                  1
@@ -351,7 +351,7 @@
 #define __NR64AC_process_vm_readv         6
 #define __NR64AC_process_vm_writev        6
 #define __NR64AC_kcmp                     5
-#define __NR64AC_finit_module             1
+#define __NR64AC_finit_module             3
 #define __NR64AC_sched_setattr            1
 #define __NR64AC_sched_getattr            1
 #define __NR64AC_renameat2                5
@@ -1215,11 +1215,11 @@
 #define __NR64AT0_ioperm                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_ioperm                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT2_ioperm                   (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_create_module            (int, int)
-#define __NR64AT0_init_module              (int, int)
-#define __NR64AT0_delete_module            (int, int)
-#define __NR64AT0_get_kernel_syms          (int, int)
-#define __NR64AT0_query_module             (int, int)
+#define __NR64AT0_init_module              (void const *, void const *)
+#define __NR64AT1_init_module              (size_t, __size_t)
+#define __NR64AT2_init_module              (char const *, char const *)
+#define __NR64AT0_delete_module            (char const *, char const *)
+#define __NR64AT1_delete_module            (oflag_t, __oflag_t)
 #define __NR64AT0_quotactl                 (int, int)
 #define __NR64AT0_nfsservctl               (int, int)
 #define __NR64AT0_getpmsg                  (int, int)
@@ -1575,7 +1575,9 @@
 #define __NR64AT2_kcmp                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT3_kcmp                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT4_kcmp                     (syscall_ulong_t, __syscall_ulong_t)
-#define __NR64AT0_finit_module             (int, int)
+#define __NR64AT0_finit_module             (fd_t, __fd_t)
+#define __NR64AT1_finit_module             (char const *, char const *)
+#define __NR64AT2_finit_module             (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_sched_setattr            (int, int)
 #define __NR64AT0_sched_getattr            (int, int)
 #define __NR64AT0_renameat2                (fd_t, __fd_t)
@@ -1979,11 +1981,11 @@
 #define __NR64AM_setdomainname(a, b, c, d, e, f)            (char const *)a, (__size_t)b
 #define __NR64AM_iopl(a, b, c, d, e, f)                     (__syscall_ulong_t)a
 #define __NR64AM_ioperm(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AM_create_module(a, b, c, d, e, f)            (int)a
-#define __NR64AM_init_module(a, b, c, d, e, f)              (int)a
-#define __NR64AM_delete_module(a, b, c, d, e, f)            (int)a
-#define __NR64AM_get_kernel_syms(a, b, c, d, e, f)          (int)a
-#define __NR64AM_query_module(a, b, c, d, e, f)             (int)a
+#define __NR64AM_create_module(a, b, c, d, e, f)            /* nothing */
+#define __NR64AM_init_module(a, b, c, d, e, f)              (void const *)a, (__size_t)b, (char const *)c
+#define __NR64AM_delete_module(a, b, c, d, e, f)            (char const *)a, (__oflag_t)b
+#define __NR64AM_get_kernel_syms(a, b, c, d, e, f)          /* nothing */
+#define __NR64AM_query_module(a, b, c, d, e, f)             /* nothing */
 #define __NR64AM_quotactl(a, b, c, d, e, f)                 (int)a
 #define __NR64AM_nfsservctl(a, b, c, d, e, f)               (int)a
 #define __NR64AM_getpmsg(a, b, c, d, e, f)                  (int)a
@@ -2118,7 +2120,7 @@
 #define __NR64AM_process_vm_readv(a, b, c, d, e, f)         (__pid_t)a, (struct __iovecx64 const *)b, (__size_t)c, (struct __iovecx64 const *)d, (__size_t)e, (__syscall_ulong_t)f
 #define __NR64AM_process_vm_writev(a, b, c, d, e, f)        (__pid_t)a, (struct __iovecx64 const *)b, (__size_t)c, (struct __iovecx64 const *)d, (__size_t)e, (__syscall_ulong_t)f
 #define __NR64AM_kcmp(a, b, c, d, e, f)                     (__pid_t)a, (__pid_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AM_finit_module(a, b, c, d, e, f)             (int)a
+#define __NR64AM_finit_module(a, b, c, d, e, f)             (__fd_t)a, (char const *)b, (__syscall_ulong_t)c
 #define __NR64AM_sched_setattr(a, b, c, d, e, f)            (int)a
 #define __NR64AM_sched_getattr(a, b, c, d, e, f)            (int)a
 #define __NR64AM_renameat2(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (__fd_t)c, (char const *)d, (__syscall_ulong_t)e
@@ -2389,11 +2391,11 @@
 #define __NR64AP_setdomainname(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_iopl(a)                                    (__syscall_ulong_t)a
 #define __NR64AP_ioperm(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR64AP_create_module(a)                           (__syscall_ulong_t)a
-#define __NR64AP_init_module(a)                             (__syscall_ulong_t)a
-#define __NR64AP_delete_module(a)                           (__syscall_ulong_t)a
-#define __NR64AP_get_kernel_syms(a)                         (__syscall_ulong_t)a
-#define __NR64AP_query_module(a)                            (__syscall_ulong_t)a
+#define __NR64AP_create_module()                            /* nothing */
+#define __NR64AP_init_module(a, b, c)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR64AP_delete_module(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AP_get_kernel_syms()                          /* nothing */
+#define __NR64AP_query_module()                             /* nothing */
 #define __NR64AP_quotactl(a)                                (__syscall_ulong_t)a
 #define __NR64AP_nfsservctl(a)                              (__syscall_ulong_t)a
 #define __NR64AP_getpmsg(a)                                 (__syscall_ulong_t)a
@@ -2528,7 +2530,7 @@
 #define __NR64AP_process_vm_readv(a, b, c, d, e, f)         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_process_vm_writev(a, b, c, d, e, f)        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_kcmp(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
-#define __NR64AP_finit_module(a)                            (__syscall_ulong_t)a
+#define __NR64AP_finit_module(a, b, c)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_sched_setattr(a)                           (__syscall_ulong_t)a
 #define __NR64AP_sched_getattr(a)                           (__syscall_ulong_t)a
 #define __NR64AP_renameat2(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

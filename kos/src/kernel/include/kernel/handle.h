@@ -703,6 +703,15 @@ handle_tryas(/*inherit(on_success)*/ REF struct handle const *__restrict self, u
 	return result;
 }
 
+FORCELOCAL WUNUSED REF void *FCALL
+handle_tryas_noinherit(struct handle const *__restrict self,
+                       uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	if unlikely(self->h_type == wanted_type)
+		return self->h_data; /* Inherit reference */
+	return _handle_tryas(*self, wanted_type);
+}
+
 /* Extended handle converted functions */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *FCALL
 handle_as_inode(/*inherit(on_success)*/ REF struct handle const *__restrict self)
@@ -770,6 +779,13 @@ handle_tryas(/*inherit(on_success)*/ REF struct handle const &__restrict self,
              uintptr_half_t wanted_type)
 		THROWS(E_WOULDBLOCK) {
 	return handle_tryas(&self, wanted_type);
+}
+
+FORCELOCAL WUNUSED REF void *FCALL
+handle_tryas_noinherit(struct handle const &__restrict self,
+                       uintptr_half_t wanted_type)
+		THROWS(E_WOULDBLOCK) {
+	return handle_tryas_noinherit(&self, wanted_type);
 }
 
 FUNDEF ATTR_RETNONNULL WUNUSED REF struct inode *FCALL

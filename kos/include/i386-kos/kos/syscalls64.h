@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x584c0a25 */
+/* HASH CRC-32:0x6950235a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -302,7 +302,7 @@ __CDECLARE_SC(,__errno_t,coredump,(struct ucpustate64 const *__curr_state, struc
 __CDECLARE_SC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #endif /* __CRT_HAVE_SC(creat) */
 #if __CRT_HAVE_SC(create_module)
-__CDECLARE_SC(,__errno_t,create_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,create_module,(void),())
 #endif /* __CRT_HAVE_SC(create_module) */
 #if __CRT_HAVE_SC(debugtrap)
 /* Trigger a debugger trap `trapno', optionally extended with `regs'
@@ -318,7 +318,20 @@ __CDECLARE_SC(,__errno_t,create_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE)
 __CDECLARE_SC(,__errno_t,debugtrap,(struct ucpustate64 const *__state, struct debugtrap_reason64 const *__reason),(__state,__reason))
 #endif /* __CRT_HAVE_SC(debugtrap) */
 #if __CRT_HAVE_SC(delete_module)
-__CDECLARE_SC(,__errno_t,delete_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+__CDECLARE_SC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_SC(delete_module) */
 #if __CRT_HAVE_SC(detach)
 /* >> detach(2)
@@ -526,7 +539,16 @@ __CDECLARE_SC(,__errno_t,fdatasync,(__fd_t __fd),(__fd))
 __CDECLARE_SC(,__ssize_t,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, __size_t __bufsize),(__fd,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_SC(fgetxattr) */
 #if __CRT_HAVE_SC(finit_module)
-__CDECLARE_SC(,__errno_t,finit_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+__CDECLARE_SC(,__errno_t,finit_module,(__fd_t __fd, char const *__uargs, __syscall_ulong_t __flags),(__fd,__uargs,__flags))
 #endif /* __CRT_HAVE_SC(finit_module) */
 #if __CRT_HAVE_SC(flistxattr)
 __CDECLARE_SC(,__ssize_t,flistxattr,(__fd_t __fd, char *__listbuf, __size_t __listbufsize),(__fd,__listbuf,__listbufsize))
@@ -642,7 +664,7 @@ __CDECLARE_SC(,__errno_t,futimesat,(__fd_t __dirfd, char const *__filename, stru
 __CDECLARE_SC(,__errno_t,get_exception_handler,(__ULONG64_TYPE__ *__pmode, __except_handler64_t *__phandler, __HYBRID_PTR64(void) *__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #endif /* __CRT_HAVE_SC(get_exception_handler) */
 #if __CRT_HAVE_SC(get_kernel_syms)
-__CDECLARE_SC(,__errno_t,get_kernel_syms,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,get_kernel_syms,(void),())
 #endif /* __CRT_HAVE_SC(get_kernel_syms) */
 #if __CRT_HAVE_SC(get_mempolicy)
 __CDECLARE_SC(,__errno_t,get_mempolicy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -789,7 +811,16 @@ __CDECLARE_SC(,__syscall_slong_t,hop,(__fd_t __fd, __syscall_ulong_t __command, 
 __CDECLARE_SC(,__syscall_slong_t,hopf,(__fd_t __fd, __syscall_ulong_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
 #endif /* __CRT_HAVE_SC(hopf) */
 #if __CRT_HAVE_SC(init_module)
-__CDECLARE_SC(,__errno_t,init_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+__CDECLARE_SC(,__errno_t,init_module,(void const *__module_image, __size_t __len, char const *__uargs),(__module_image,__len,__uargs))
 #endif /* __CRT_HAVE_SC(init_module) */
 #if __CRT_HAVE_SC(inotify_add_watch)
 __CDECLARE_SC(,__errno_t,inotify_add_watch,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -1363,7 +1394,7 @@ __CDECLARE_SC(,__errno_t,pwritev2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_SC(,__ssize_t,pwritevf,(__fd_t __fd, struct __iovecx64 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_SC(pwritevf) */
 #if __CRT_HAVE_SC(query_module)
-__CDECLARE_SC(,__errno_t,query_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,query_module,(void),())
 #endif /* __CRT_HAVE_SC(query_module) */
 #if __CRT_HAVE_SC(quotactl)
 __CDECLARE_SC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -2314,7 +2345,7 @@ __CDECLARE_XSC(,__errno_t,coredump,(struct ucpustate64 const *__curr_state, stru
 __CDECLARE_XSC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #endif /* __CRT_HAVE_XSC(creat) */
 #if __CRT_HAVE_XSC(create_module)
-__CDECLARE_XSC(,__errno_t,create_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,create_module,(void),())
 #endif /* __CRT_HAVE_XSC(create_module) */
 #if __CRT_HAVE_XSC(debugtrap)
 /* Trigger a debugger trap `trapno', optionally extended with `regs'
@@ -2330,7 +2361,20 @@ __CDECLARE_XSC(,__errno_t,create_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE
 __CDECLARE_XSC(,__errno_t,debugtrap,(struct ucpustate64 const *__state, struct debugtrap_reason64 const *__reason),(__state,__reason))
 #endif /* __CRT_HAVE_XSC(debugtrap) */
 #if __CRT_HAVE_XSC(delete_module)
-__CDECLARE_XSC(,__errno_t,delete_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+__CDECLARE_XSC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(__name,__flags))
 #endif /* __CRT_HAVE_XSC(delete_module) */
 #if __CRT_HAVE_XSC(detach)
 /* >> detach(2)
@@ -2538,7 +2582,16 @@ __CDECLARE_XSC(,__errno_t,fdatasync,(__fd_t __fd),(__fd))
 __CDECLARE_XSC(,__ssize_t,fgetxattr,(__fd_t __fd, char const *__name, void *__buf, __size_t __bufsize),(__fd,__name,__buf,__bufsize))
 #endif /* __CRT_HAVE_XSC(fgetxattr) */
 #if __CRT_HAVE_XSC(finit_module)
-__CDECLARE_XSC(,__errno_t,finit_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+__CDECLARE_XSC(,__errno_t,finit_module,(__fd_t __fd, char const *__uargs, __syscall_ulong_t __flags),(__fd,__uargs,__flags))
 #endif /* __CRT_HAVE_XSC(finit_module) */
 #if __CRT_HAVE_XSC(flistxattr)
 __CDECLARE_XSC(,__ssize_t,flistxattr,(__fd_t __fd, char *__listbuf, __size_t __listbufsize),(__fd,__listbuf,__listbufsize))
@@ -2654,7 +2707,7 @@ __CDECLARE_XSC(,__errno_t,futimesat,(__fd_t __dirfd, char const *__filename, str
 __CDECLARE_XSC(,__errno_t,get_exception_handler,(__ULONG64_TYPE__ *__pmode, __except_handler64_t *__phandler, __HYBRID_PTR64(void) *__phandler_sp),(__pmode,__phandler,__phandler_sp))
 #endif /* __CRT_HAVE_XSC(get_exception_handler) */
 #if __CRT_HAVE_XSC(get_kernel_syms)
-__CDECLARE_XSC(,__errno_t,get_kernel_syms,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,get_kernel_syms,(void),())
 #endif /* __CRT_HAVE_XSC(get_kernel_syms) */
 #if __CRT_HAVE_XSC(get_mempolicy)
 __CDECLARE_XSC(,__errno_t,get_mempolicy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -2801,7 +2854,16 @@ __CDECLARE_XSC(,__syscall_slong_t,hop,(__fd_t __fd, __syscall_ulong_t __command,
 __CDECLARE_XSC(,__syscall_slong_t,hopf,(__fd_t __fd, __syscall_ulong_t __command, __iomode_t __mode, void *__arg),(__fd,__command,__mode,__arg))
 #endif /* __CRT_HAVE_XSC(hopf) */
 #if __CRT_HAVE_XSC(init_module)
-__CDECLARE_XSC(,__errno_t,init_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+__CDECLARE_XSC(,__errno_t,init_module,(void const *__module_image, __size_t __len, char const *__uargs),(__module_image,__len,__uargs))
 #endif /* __CRT_HAVE_XSC(init_module) */
 #if __CRT_HAVE_XSC(inotify_add_watch)
 __CDECLARE_XSC(,__errno_t,inotify_add_watch,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -3375,7 +3437,7 @@ __CDECLARE_XSC(,__errno_t,pwritev2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 __CDECLARE_XSC(,__ssize_t,pwritevf,(__fd_t __fd, struct __iovecx64 const *__iovec, __size_t __count, __uint64_t __offset, __iomode_t __mode),(__fd,__iovec,__count,__offset,__mode))
 #endif /* __CRT_HAVE_XSC(pwritevf) */
 #if __CRT_HAVE_XSC(query_module)
-__CDECLARE_XSC(,__errno_t,query_module,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,query_module,(void),())
 #endif /* __CRT_HAVE_XSC(query_module) */
 #if __CRT_HAVE_XSC(quotactl)
 __CDECLARE_XSC(,__errno_t,quotactl,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfad5315b */
+/* HASH CRC-32:0xfe0fe040 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -473,11 +473,33 @@
 #define __NR64_setdomainname            0xab                           /* errno_t setdomainname(char const *name, size_t len) */
 #define __NR64_iopl                     0xac                           /* errno_t iopl(syscall_ulong_t level) */
 #define __NR64_ioperm                   0xad                           /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
-#define __NR64_create_module            0xae                           /* errno_t create_module(int TODO_PROTOTYPE) */
-#define __NR64_init_module              0xaf                           /* errno_t init_module(int TODO_PROTOTYPE) */
-#define __NR64_delete_module            0xb0                           /* errno_t delete_module(int TODO_PROTOTYPE) */
-#define __NR64_get_kernel_syms          0xb1                           /* errno_t get_kernel_syms(int TODO_PROTOTYPE) */
-#define __NR64_query_module             0xb2                           /* errno_t query_module(int TODO_PROTOTYPE) */
+#define __NR64_create_module            0xae                           /* errno_t create_module(void) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_BLOB'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+#define __NR64_init_module              0xaf                           /* errno_t init_module(void const *module_image, size_t len, char const *uargs) */
+/* Try to unload a driver, given its `name'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_DELMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * @param: name:  The name of the driver
+ * @param: flags: Set of `O_NONBLOCK | O_TRUNC', where:
+ *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
+ *                               Currently, KOS simply ignores this flag,
+ *                               since drivers on KOS should always be unloaded
+ *                               immediatly. - However, driver finalizers may
+ *                               do blocking operations before then...
+ *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                               (may compromise system integrity)
+ *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
+#define __NR64_delete_module            0xb0                           /* errno_t delete_module(char const *name, oflag_t flags) */
+#define __NR64_get_kernel_syms          0xb1                           /* errno_t get_kernel_syms(void) */
+#define __NR64_query_module             0xb2                           /* errno_t query_module(void) */
 #define __NR64_quotactl                 0xb3                           /* errno_t quotactl(int TODO_PROTOTYPE) */
 #define __NR64_nfsservctl               0xb4                           /* errno_t nfsservctl(int TODO_PROTOTYPE) */
 #define __NR64_getpmsg                  0xb5                           /* errno_t getpmsg(int TODO_PROTOTYPE) */
@@ -723,7 +745,16 @@
 /* @param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
  *               `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD' */
 #define __NR64_kcmp                     0x138                          /* syscall_slong_t kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2) */
-#define __NR64_finit_module             0x139                          /* errno_t finit_module(int TODO_PROTOTYPE) */
+/* Load a kernel driver from an ELF image `module_image...+=len'
+ * This system call exists for linux compatiblity, and is implemented
+ * as an alias for `KSYSCTL_DRIVER_INSMOD:KSYSCTL_DRIVER_FORMAT_FILE'
+ * 
+ * Note however that that is where linux compatiblity ends. Since the
+ * linux kernel does not implement any semblance of a stable ABI, you
+ * have to realize that on KOS, this system call can only load drivers
+ * specifically built to run within the KOS kernel!
+ * @param: uargs: The driver commandline */
+#define __NR64_finit_module             0x139                          /* errno_t finit_module(fd_t fd, char const *uargs, syscall_ulong_t flags) */
 #define __NR64_sched_setattr            0x13a                          /* errno_t sched_setattr(int TODO_PROTOTYPE) */
 #define __NR64_sched_getattr            0x13b                          /* errno_t sched_getattr(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `RENAME_EXCHANGE | RENAME_NOREPLACE | RENAME_WHITEOUT' */
@@ -2029,11 +2060,11 @@
 #define __NR64RC_setdomainname            2
 #define __NR64RC_iopl                     1
 #define __NR64RC_ioperm                   3
-#define __NR64RC_create_module            1
-#define __NR64RC_init_module              1
-#define __NR64RC_delete_module            1
-#define __NR64RC_get_kernel_syms          1
-#define __NR64RC_query_module             1
+#define __NR64RC_create_module            0
+#define __NR64RC_init_module              3
+#define __NR64RC_delete_module            2
+#define __NR64RC_get_kernel_syms          0
+#define __NR64RC_query_module             0
 #define __NR64RC_quotactl                 1
 #define __NR64RC_nfsservctl               1
 #define __NR64RC_getpmsg                  1
@@ -2168,7 +2199,7 @@
 #define __NR64RC_process_vm_readv         6
 #define __NR64RC_process_vm_writev        6
 #define __NR64RC_kcmp                     5
-#define __NR64RC_finit_module             1
+#define __NR64RC_finit_module             3
 #define __NR64RC_sched_setattr            1
 #define __NR64RC_sched_getattr            1
 #define __NR64RC_renameat2                5
