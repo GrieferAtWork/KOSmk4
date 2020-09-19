@@ -303,7 +303,7 @@ do_become_gdb_host_notif:
 do_become_gdb_host:
 
 	/* Set the `TASK_FGDB_STOPPED' flag of the host thread. */
-	ATOMIC_FETCHOR(stop_event.tse_thread->t_flags, TASK_FGDB_STOPPED);
+	ATOMIC_OR(stop_event.tse_thread->t_flags, TASK_FGDB_STOPPED);
 
 	/* Make sure that preemption is enabled while inside of GDB_Main() */
 	was_preemption_enabled = PREEMPTION_PUSHON();

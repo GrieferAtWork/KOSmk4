@@ -25,8 +25,12 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/__atomic.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/sync/atomic-rwlock.h>
 #include <hybrid/typecore.h>
 
+#include <kos/anno.h>
+#include <kos/exec/elf.h> /* ElfW */
 #include <kos/kernel/types.h>
 #include <kos/refcnt.h>
 #include <kos/types.h>
@@ -68,11 +72,11 @@ struct dlsection {
 	uintptr_t            ds_link;        /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t            ds_info;        /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t            ds_elfflags;    /* [const] ELF section flags (Set of `SHF_*') */
-	WEAK refcnt_t        ds_refcnt;      /* Reference counter. */
+	__WEAK refcnt_t      ds_refcnt;      /* Reference counter. */
 	struct atomic_rwlock ds_module_lock; /* Lock for `ds_module' */
-	REF DlModule        *ds_module;      /* [0..1][ref_if(!(ds_flags & DLSECTION_FLAG_OWNED))]
+	__REF DlModule      *ds_module;      /* [0..1][ref_if(!(ds_flags & DLSECTION_FLAG_OWNED))]
 	                                      * Pointer to the module (or NULL if section data is owned, and the module was destroyed) */
-	REF DlSection       *ds_dangling;    /* [0..1][lock(ds_module->dm_sections_lock))] Chain of dangling sections.
+	__REF DlSection     *ds_dangling;    /* [0..1][lock(ds_module->dm_sections_lock))] Chain of dangling sections.
 	                                      * NOTE: Set to `(REF DlSection *)-1' if the section isn't dangling. */
 	uintptr_half_t       ds_flags;       /* [const] Section flags (Set of `ELF_DLSECTION_FLAG_*') */
 	uintptr_half_t       ds_index;       /* [const] Index of this section. */
@@ -88,10 +92,10 @@ INTDEF NONNULL((1)) void LIBDL_CC DlSection_Incref(DlSection *__restrict self);
 INTDEF NONNULL((1)) void LIBDL_CC DlSection_Decref(DlSection *__restrict self);
 #else /* __INTELLISENSE__ */
 #define DlSection_Incref(self) \
-	(__hybrid_atomic_fetchinc((self)->ds_refcnt, __ATOMIC_SEQ_CST))
-#define DlSection_Decref(self)                                        \
-	(__hybrid_atomic_decfetch((self)->ds_refcnt, __ATOMIC_SEQ_CST) || \
-	 (DL_API_SYMBOL(DlSection_Destroy)(self), 0))
+	__hybrid_atomic_inc((self)->ds_refcnt, __ATOMIC_SEQ_CST)
+#define DlSection_Decref(self)                                              \
+	(void)(__hybrid_atomic_decfetch((self)->ds_refcnt, __ATOMIC_SEQ_CST) || \
+	       (DL_API_SYMBOL(DlSection_Destroy)(self), 0))
 #endif /* !__INTELLISENSE__ */
 
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool LIBDL_CC
@@ -202,8 +206,8 @@ struct dlmodule {
 	                                            * WARNING: This field is ELF-only! Other module formats must keep this
 	                                            *          field set to NULL (it only has to be ~here~ because of binary
 	                                            *          compatibility with GNU's `struct link_map') */
-	WEAK DlModule            *dm_modules_next; /* [0..1][lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
-	WEAK DlModule            *dm_modules_prev; /* [0..1][lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
+	__WEAK DlModule          *dm_modules_next; /* [0..1][lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
+	__WEAK DlModule          *dm_modules_prev; /* [0..1][lock(DlModule_AllLock)] Link entry in the chain of loaded modules. */
 	/* --- End of `struct link_map' emulation --- */
 
 	/* TLS variables (PT_TLS). */
@@ -223,10 +227,10 @@ struct dlmodule {
 	/* All of the above was just so that `dltlsalloc()' doesn't
 	 * have to allocate the full DlModule structure. The rest following
 	 * below is what should be considered the actual module structure. */
-	WEAK refcnt_t             dm_refcnt;     /* Reference counter. */
+	__WEAK refcnt_t           dm_refcnt;     /* Reference counter. */
 
 	/* Module global binding. */
-	LLIST_NODE(WEAK DlModule) dm_globals;    /* [lock(DlModule_GlobalLock)][valid_if(dm_flags & RTLD_GLOBAL)]
+	LLIST_NODE(__WEAK DlModule) dm_globals;    /* [lock(DlModule_GlobalLock)][valid_if(dm_flags & RTLD_GLOBAL)]
 	                                          * Link entry in the chain of global modules. */
 
 	/* Module identification / data accessor. */
@@ -241,13 +245,13 @@ struct dlmodule {
 
 	/* Module dependencies (DT_NEEDED). */
 	size_t                    dm_depcnt;     /* [const] Number of dynamic definition headers. */
-	REF_IF(!(->de_flags & RTLD_NODELETE))
+	__REF_IF(!(->de_flags & RTLD_NODELETE))
 	    DlModule            **dm_depvec;     /* [1..1][const][0..dm_depcnt][owned][const] Vector of dependencies of this module. */
 
 	/* Named data sections of the module (for use with `dllocksection()'). */
 	struct atomic_rwlock      dm_sections_lock; /* Lock for `dm_sections' */
 	DlSection               **dm_sections;   /* [0..1][weak][0..dm_shnum][owned][lock(dm_sections_lock)] Vector of locked sections. */
-	REF DlSection            *dm_sections_dangling; /* [0..1][lock(dm_sections_lock))] Chain of dangling sections. */
+	__REF DlSection          *dm_sections_dangling; /* [0..1][lock(dm_sections_lock))] Chain of dangling sections. */
 	size_t                    dm_shnum;      /* (Max) number of section headers (or `(size_t)-1' if unknown). */
 
 	/* [0..1] Module operations V-table (or `NULL' for ELF modules)
@@ -272,11 +276,11 @@ __DEFINE_REFCNT_FUNCTIONS(DlModule, dm_refcnt, DlModule_Destroy)
 #ifdef __INTELLISENSE__
 INTDEF NONNULL((1)) void LIBDL_CC DlModule_Incref(DlModule *__restrict self);
 INTDEF NONNULL((1)) bool LIBDL_CC DlModule_Decref(DlModule *__restrict self);
-INTDEF NONNULL((1)) bool LIBDL_CC DlModule_DecrefNoKill(DlModule *__restrict self);
+INTDEF NONNULL((1)) void LIBDL_CC DlModule_DecrefNoKill(DlModule *__restrict self);
 #else /* __INTELLISENSE__ */
-#define DlModule_Incref(self)       (__hybrid_atomic_fetchinc((self)->dm_refcnt, __ATOMIC_SEQ_CST))
+#define DlModule_Incref(self)       __hybrid_atomic_inc((self)->dm_refcnt, __ATOMIC_SEQ_CST)
 #define DlModule_Decref(self)       (__hybrid_atomic_decfetch((self)->dm_refcnt, __ATOMIC_SEQ_CST) || (DlModule_Destroy(self),0))
-#define DlModule_DecrefNoKill(self) (__hybrid_atomic_fetchdec((self)->dm_refcnt, __ATOMIC_SEQ_CST))
+#define DlModule_DecrefNoKill(self) __hybrid_atomic_dec((self)->dm_refcnt, __ATOMIC_SEQ_CST)
 #endif /* !__INTELLISENSE__ */
 
 FORCELOCAL ATTR_ARTIFICIAL NONNULL((1)) bool LIBDL_CC

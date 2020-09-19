@@ -430,7 +430,7 @@ again_lock_vm:
 				/* Switch over to a completely filled, kernel-space
 				 * signal mask to-be used by the calling thread. */
 				old_sigmask = mymask->exchange(&kernel_sigmask_full);
-				ATOMIC_FETCHAND(caller->t_flags, ~TASK_FUSERPROCMASK);
+				ATOMIC_AND(caller->t_flags, ~TASK_FUSERPROCMASK);
 				TRY {
 					/* Actually start execution of the newly created thread. */
 					task_start(result);
@@ -438,7 +438,7 @@ again_lock_vm:
 					waitfor_vfork_completion(result);
 				} EXCEPT {
 					mymask->set_inherit_new(old_sigmask);
-					ATOMIC_FETCHOR(caller->t_flags, TASK_FUSERPROCMASK);
+					ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 					memcpy(user_sigmask, &saved_user_sigset, sizeof(sigset_t));
 					ATOMIC_WRITE(um->pm_sigmask, user_sigmask);
 					sigmask_check_after_except();
@@ -447,7 +447,7 @@ again_lock_vm:
 				/* Restore our old kernel-space signal mask. */
 				mymask->set_inherit_new(old_sigmask);
 				/* Re-enable userprocmask-mode. */
-				ATOMIC_FETCHOR(caller->t_flags, TASK_FUSERPROCMASK);
+				ATOMIC_OR(caller->t_flags, TASK_FUSERPROCMASK);
 
 				/* Restore the old (saved) state of the user-space signal
 				 * mask, as it was prior to the vfork-child being started.

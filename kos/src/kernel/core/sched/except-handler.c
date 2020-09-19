@@ -148,7 +148,7 @@ NOTHROW(KCALL reset_user_except_handler)(void) {
 	 * final process mask into our kernel-space sigmask buffer.
 	 *
 	 * s.a. `kernel_do_execveat_impl()' */
-	ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FUSERPROCMASK);
+	ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FUSERPROCMASK);
 #endif /* CONFIG_HAVE_USERPROCMASK */
 }
 
@@ -445,8 +445,9 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 		/* Clear the userprocmask flag(s), the same way a
 		 * call `sys_set_userprocmask_address(NULL)' would
 		 * have. */
-		ATOMIC_FETCHAND(THIS_TASK->t_flags, ~(TASK_FUSERPROCMASK |
-		                                      TASK_FUSERPROCMASK_AFTER_VFORK));
+		ATOMIC_AND(THIS_TASK->t_flags,
+		           ~(TASK_FUSERPROCMASK |
+		             TASK_FUSERPROCMASK_AFTER_VFORK));
 	}
 #endif /* CONFIG_HAVE_USERPROCMASK */
 	PERTASK_SET(this_tid_address, tidptr);
@@ -522,8 +523,9 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 	if unlikely(!ctl) {
 		/* Disable USERPROCMASK mode. */
 		PERTASK_SET(this_userprocmask_address, (struct userprocmask *)NULL);
-		ATOMIC_FETCHAND(THIS_TASK->t_flags, ~(TASK_FUSERPROCMASK |
-		                                      TASK_FUSERPROCMASK_AFTER_VFORK));
+		ATOMIC_AND(THIS_TASK->t_flags,
+		           ~(TASK_FUSERPROCMASK |
+		             TASK_FUSERPROCMASK_AFTER_VFORK));
 	} else {
 		size_t sigsetsize;
 		USER UNCHECKED sigset_t *new_sigset;
@@ -580,7 +582,7 @@ DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
 			 * such that the process of clearing the `TASK_FVFORK' flag during
 			 * exec() or exit() will also write NULL to `ctl->pm_sigmask' */
 			if ((old_flags & (TASK_FUSERPROCMASK | TASK_FVFORK)) == TASK_FVFORK)
-				ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FUSERPROCMASK_AFTER_VFORK);
+				ATOMIC_OR(THIS_TASK->t_flags, TASK_FUSERPROCMASK_AFTER_VFORK);
 		}
 
 		/* NOTE: ___Don't___ call `sigmask_check()' here! Assuming that the user

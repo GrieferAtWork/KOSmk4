@@ -203,7 +203,7 @@ void LIBCCALL file_incref(FILE *__restrict self) {
 	assert(self);
 	ex = self->if_exdata;
 	assert(ex);
-	ATOMIC_FETCHINC(ex->io_refcnt);
+	ATOMIC_INC(ex->io_refcnt);
 #else /* NDEBUG */
 	bool ok;
 	ok = file_tryincref(self);

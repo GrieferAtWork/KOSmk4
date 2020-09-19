@@ -776,7 +776,7 @@ NOTHROW(FCALL cpu_timeout_sleeping_threads)(struct cpu *__restrict me,
 		for (rsleeper = lsleeper;;) {
 			STATIC_ASSERT(offsetof(struct task, t_sched.s_running.sr_runprv) !=
 			              offsetof(struct task, t_sched.s_asleep.ss_tmonxt));
-			ATOMIC_FETCHOR(rsleeper->t_flags, TASK_FTIMEOUT | TASK_FRUNNING);
+			ATOMIC_OR(rsleeper->t_flags, TASK_FTIMEOUT | TASK_FRUNNING);
 			next = rsleeper->t_sched.s_asleep.ss_tmonxt;
 			if (!next)
 				break; /* No more threads to wake up. */
@@ -1414,14 +1414,14 @@ wait_a_bit:
 		/* Check if the IDLE thread had been sleeping. */
 		if (idle->t_sched.s_asleep.ss_pself) {
 			/* The IDLE thread had been sleeping (time it out) */
-			ATOMIC_FETCHOR(idle->t_flags, TASK_FTIMEOUT);
+			ATOMIC_OR(idle->t_flags, TASK_FTIMEOUT);
 			if ((*idle->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_tmonxt) != NULL)
 				idle->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_pself;
 		}
 		/* Unschedule the caller, and instead schedule the IDLE thread. */
 		idle->t_sched.s_running.sr_runprv = idle;
 		idle->t_sched.s_running.sr_runnxt = idle;
-		ATOMIC_FETCHOR(idle->t_flags, TASK_FRUNNING);
+		ATOMIC_OR(idle->t_flags, TASK_FRUNNING);
 		mycpu->c_current = idle;
 	} else {
 		/* Schedule the next task. */
@@ -1444,7 +1444,7 @@ wait_a_bit:
 	me->t_sched.s_running.sr_runprv = NULL;
 	me->t_sched.s_running.sr_runnxt = NULL;
 	assert(me->t_flags & TASK_FRUNNING);
-	ATOMIC_FETCHAND(me->t_flags, ~(TASK_FRUNNING | TASK_FTIMEOUT));
+	ATOMIC_AND(me->t_flags, ~(TASK_FRUNNING | TASK_FTIMEOUT));
 
 	/* Register the calling task as a sleeper within the CPU. */
 	cpu_addsleepingtask_nopr(me);

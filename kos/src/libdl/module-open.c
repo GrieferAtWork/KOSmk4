@@ -486,7 +486,7 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self) {
 	                                   : DL_MODULE_ELF_INITIALIZE_FNORMAL))
 		goto err;
 	/* And with that, we've successfully initialize the module! */
-	ATOMIC_FETCHAND(self->dm_flags, ~RTLD_LOADING);
+	ATOMIC_AND(self->dm_flags, ~RTLD_LOADING);
 	return 0;
 err:
 	return -1;

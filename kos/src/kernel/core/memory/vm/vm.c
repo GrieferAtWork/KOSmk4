@@ -2404,7 +2404,7 @@ again_lock_datapart:
 						goto done_unlock_write; /* Further changes happened in the mean time. */
 				}
 				/* Unset the CHANGED bit, now that we're certain there aren't any further changes. */
-				ATOMIC_FETCHAND(self->dp_flags, ~VM_DATAPART_FLAG_CHANGED);
+				ATOMIC_AND(self->dp_flags, ~VM_DATAPART_FLAG_CHANGED);
 			}
 done_unlock_write:
 			sync_endwrite(self);

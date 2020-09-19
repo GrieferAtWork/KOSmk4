@@ -880,9 +880,9 @@ LOCAL bool NOTHROW(FCALL GDB_GetNoAckModeEnabled)(void) {
 
 LOCAL void NOTHROW(FCALL GDB_SetNoAckModeEnabled)(bool enabled) {
 	if (enabled) {
-		ATOMIC_FETCHOR(GDBServer_Features, GDB_SERVER_FEATURE_NOACK);
+		ATOMIC_OR(GDBServer_Features, GDB_SERVER_FEATURE_NOACK);
 	} else {
-		ATOMIC_FETCHAND(GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
+		ATOMIC_AND(GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
 	}
 }
 
@@ -918,9 +918,9 @@ LOCAL bool NOTHROW(FCALL GDB_GetThreadEventsEnabled)(void) {
 
 LOCAL void NOTHROW(FCALL GDB_SetThreadEventsEnabled)(bool enabled) {
 	if (enabled) {
-		ATOMIC_FETCHOR(GDBRemote_Features, GDB_REMOTE_FEATURE_THREADEVENTS);
+		ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_THREADEVENTS);
 	} else {
-		ATOMIC_FETCHAND(GDBRemote_Features, ~GDB_REMOTE_FEATURE_THREADEVENTS);
+		ATOMIC_AND(GDBRemote_Features, ~GDB_REMOTE_FEATURE_THREADEVENTS);
 	}
 }
 
@@ -2185,7 +2185,7 @@ do_return_attached_everything:
 		} else if (ISNAME("Supported")) {
 			i = nameEnd;
 			GDBRemote_Features = 0;
-			ATOMIC_FETCHAND(GDBServer_Features, ~(GDB_SERVER_FEATURE_MULTIPROCESS));
+			ATOMIC_AND(GDBServer_Features, ~(GDB_SERVER_FEATURE_MULTIPROCESS));
 			if (*i == ':') {
 				++i;
 				for (;;) {
@@ -2194,17 +2194,17 @@ do_return_attached_everything:
 					if (nameEnd[-1] == '+') {
 						--nameLen;
 						if (ISNAME("multiprocess"))
-							ATOMIC_FETCHOR(GDBServer_Features, GDB_SERVER_FEATURE_MULTIPROCESS);
+							ATOMIC_OR(GDBServer_Features, GDB_SERVER_FEATURE_MULTIPROCESS);
 						else if (ISNAME("swbreak"))
-							ATOMIC_FETCHOR(GDBRemote_Features, GDB_REMOTE_FEATURE_SWBREAK);
+							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_SWBREAK);
 						else if (ISNAME("hwbreak"))
-							ATOMIC_FETCHOR(GDBRemote_Features, GDB_REMOTE_FEATURE_HWBREAK);
+							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_HWBREAK);
 						else if (ISNAME("fork-events"))
-							ATOMIC_FETCHOR(GDBRemote_Features, GDB_REMOTE_FEATURE_FORKEVENTS);
+							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_FORKEVENTS);
 						else if (ISNAME("vfork-events"))
-							ATOMIC_FETCHOR(GDBRemote_Features, GDB_REMOTE_FEATURE_VFORKEVENTS);
+							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_VFORKEVENTS);
 						else if (ISNAME("exec-events")) {
-							ATOMIC_FETCHOR(GDBRemote_Features, GDB_REMOTE_FEATURE_EXECEVENTS);
+							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_EXECEVENTS);
 						}
 					}
 					i = nameEnd;
@@ -2656,7 +2656,7 @@ check_for_notif_or_remote_byte:
 		if (b != '$') {
 			printk(KERN_WARNING "[gdb] Unrecognized out-of-band byte: %Q (%#.2I8x)\n", b, b);
 			if (b == '+' || b == '-') {
-				ATOMIC_FETCHAND(GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
+				ATOMIC_AND(GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
 			}
 			continue;
 		}

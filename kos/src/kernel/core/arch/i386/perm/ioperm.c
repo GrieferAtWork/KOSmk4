@@ -152,7 +152,7 @@ DEFINE_SYSCALL3(errno_t, ioperm,
 		}
 	} EXCEPT {
 		if (!(old_thread_flags & TASK_FKEEPCORE))
-			ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
+			ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
 		RETHROW();
 	}
 	return -EOK;

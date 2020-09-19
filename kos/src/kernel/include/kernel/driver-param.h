@@ -165,7 +165,7 @@ struct kernel_commandline_option {
  * >> flagname = has_option("<parname>") ? true : false; */
 #ifdef __INTELLISENSE__
 #define DEFINE_CMDLINE_FLAG(flagname, parname)   /* nothing */
-#define DEFINE_CMDLINE_FLAG_VAR(flagname, parname) bool const flagname;
+#define DEFINE_CMDLINE_FLAG_VAR(flagname, parname) extern bool const flagname;
 #elif defined(CONFIG_BUILDING_KERNEL_CORE)
 #define DEFINE_CMDLINE_FLAG(flagname, parname) \
 	DEFINE_KERNEL_COMMANDLINE_OPTION(flagname, KERNEL_COMMANDLINE_OPTION_TYPE_BOOL, parname)

@@ -538,7 +538,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	assert(caller->t_flags & TASK_FRUNNING);
 	if unlikely(caller->t_flags & TASK_FCRITICAL) {
 		panic_critical_thread_exited();
-		ATOMIC_FETCHAND(caller->t_flags, ~TASK_FCRITICAL);
+		ATOMIC_AND(caller->t_flags, ~TASK_FCRITICAL);
 	}
 	/* Fill in the exit status */
 	if (pid)
@@ -587,7 +587,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		/* Last caller (load the IDLE caller now). */
 		FORCPU(mycpu, thiscpu_idle).t_sched.s_running.sr_runprv = &FORCPU(mycpu, thiscpu_idle);
 		FORCPU(mycpu, thiscpu_idle).t_sched.s_running.sr_runnxt = &FORCPU(mycpu, thiscpu_idle);
-		ATOMIC_FETCHOR(FORCPU(mycpu, thiscpu_idle).t_flags, TASK_FRUNNING);
+		ATOMIC_OR(FORCPU(mycpu, thiscpu_idle).t_flags, TASK_FRUNNING);
 		mycpu->c_current = next = &FORCPU(mycpu, thiscpu_idle);
 	} else {
 		/* Unlink and load the next task. */

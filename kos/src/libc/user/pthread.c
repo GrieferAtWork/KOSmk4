@@ -2866,7 +2866,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we're released `mutex', else there'd be a race condition! */
-		ATOMIC_FETCHOR(cond->c_futex, FUTEX_WAITERS);
+		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
@@ -2900,7 +2900,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict con
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we're released `mutex', else there'd be a race condition! */
-		ATOMIC_FETCHOR(cond->c_futex, FUTEX_WAITERS);
+		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */
@@ -2941,7 +2941,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict c
 	if (!(lock & FUTEX_WAITERS)) {
 		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
 		 *       we're released `mutex', else there'd be a race condition! */
-		ATOMIC_FETCHOR(cond->c_futex, FUTEX_WAITERS);
+		ATOMIC_OR(cond->c_futex, FUTEX_WAITERS);
 		lock |= FUTEX_WAITERS;
 	}
 	/* Interlocked:wait */

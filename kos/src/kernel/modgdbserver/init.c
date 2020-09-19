@@ -103,7 +103,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		GDBServer_FallbackHost = task_alloc(&vm_kernel);
 		task_setup_kernel(GDBServer_FallbackHost, (thread_main_t)&GDBFallbackHost_Main, 0);
 		/* Set the Stopped flag to that the fallback-host can't be stopped by GDB. */
-		ATOMIC_FETCHOR(GDBServer_FallbackHost->t_flags, TASK_FGDB_STOPPED);
+		ATOMIC_OR(GDBServer_FallbackHost->t_flags, TASK_FGDB_STOPPED);
 		task_start(GDBServer_FallbackHost, TASK_START_FNORMAL);
 
 		printk(FREESTR(KERN_INFO "[gdb] Wait for remote to attach itself\n"));
@@ -133,7 +133,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 		 * #2:fork(): [1:kernel] -> [1:kernel,7fffffff:kernel]
 		 * #3:exec(): [1:kernel,7fffffff:kernel] -> [1:/bin/init,7fffffff:kernel]
 		 */
-		ATOMIC_FETCHOR(GDBServer_Features, GDB_SERVER_FEATURE_SHOWKERNEL);
+		ATOMIC_OR(GDBServer_Features, GDB_SERVER_FEATURE_SHOWKERNEL);
 		{
 			struct debugtrap_reason r;
 			r.dtr_signo  = SIGTRAP;

@@ -193,9 +193,9 @@ handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
 		require(CAP_SET_BLOCKDEV_READONLY);
 		value = *(USER CHECKED int *)arg;
 		if (value)
-			ATOMIC_FETCHOR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
+			ATOMIC_OR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
 		else {
-			ATOMIC_FETCHAND(self->bd_flags, ~BLOCK_DEVICE_FLAG_READONLY);
+			ATOMIC_AND(self->bd_flags, ~BLOCK_DEVICE_FLAG_READONLY);
 		}
 	}	break;
 
@@ -497,9 +497,9 @@ INTERN syscall_slong_t
 	case HOP_BLOCKDEVICE_WRREADONLY:
 		require(CAP_SET_BLOCKDEV_READONLY);
 		if (arg)
-			ATOMIC_FETCHOR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
+			ATOMIC_OR(self->bd_flags, BLOCK_DEVICE_FLAG_READONLY);
 		else {
-			ATOMIC_FETCHAND(self->bd_flags, ~BLOCK_DEVICE_FLAG_READONLY);
+			ATOMIC_AND(self->bd_flags, ~BLOCK_DEVICE_FLAG_READONLY);
 		}
 		break;
 

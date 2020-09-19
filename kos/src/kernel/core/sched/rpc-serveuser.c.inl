@@ -101,8 +101,8 @@ restore_rpc:
 #endif /* RPC_SERVE_ALL */
 		if ((chain->re_kind & RPC_KIND_MASK) != RPC_KIND_USER) {
 			if (chain->re_kind & RPC_KIND_NOTHROW)
-				ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count_nx));
-			ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count));
+				ATOMIC_DEC(PERTASK(this_rpc_pending_sync_count_nx));
+			ATOMIC_DEC(PERTASK(this_rpc_pending_sync_count));
 		}
 		{
 			struct rpc_entry *more, *last;

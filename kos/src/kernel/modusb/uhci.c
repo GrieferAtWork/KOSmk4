@@ -1457,12 +1457,12 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 		 *  - Some TD got one of its error bits set. */
 		if (!sync_trywrite(&self->uc_lock)) {
 			/* Whoever is holding the lock must handle this interrupt, then... */
-			ATOMIC_FETCHOR(self->uc_flags, UHCI_CONTROLLER_FLAG_INTERRUPTED);
+			ATOMIC_OR(self->uc_flags, UHCI_CONTROLLER_FLAG_INTERRUPTED);
 			/* Try to acquire the lock again, so the `UHCI_CONTROLLER_FLAG_INTERRUPTED'
 			 * flag becomes interlocked on our end. */
 			if (!sync_trywrite(&self->uc_lock))
 				goto done_tdint;
-			ATOMIC_FETCHAND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_INTERRUPTED);
+			ATOMIC_AND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_INTERRUPTED);
 		}
 		uhci_finish_completed(self);
 		/* No need to use `uhci_controller_unlock()' here. - We're the only place
@@ -2750,7 +2750,7 @@ uhci_handle_resume_detect(struct uhci_controller *__restrict self) {
 	u16 cmd;
 	/* Resume detected.
 	 * -> Check for changes in port attachments. */
-	ATOMIC_FETCHAND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_RESDECT);
+	ATOMIC_AND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_RESDECT);
 	sync_write(&self->uc_lock);
 	TRY {
 		/* Check if the FGR command flag was set.

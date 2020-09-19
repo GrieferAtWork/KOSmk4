@@ -146,7 +146,7 @@ do_exchange:
  * @return: false: There were no waiting threads, but the ticket was added. */
 LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
-	__hybrid_atomic_fetchinc(self->s_count, __ATOMIC_SEQ_CST);
+	__hybrid_atomic_inc(self->s_count, __ATOMIC_SEQ_CST);
 	/* Wake up exactly one thread for every ticket added. */
 	return sig_send(&self->s_avail);
 }
@@ -155,7 +155,7 @@ NOTHROW(FCALL semaphore_post)(struct semaphore *__restrict self) {
  * @return: * : The # of tickets that will (likely) be consumed immediatly. */
 LOCAL NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL semaphore_postmany)(struct semaphore *__restrict self, size_t count) {
-	__hybrid_atomic_fetchadd(self->s_count, count, __ATOMIC_SEQ_CST);
+	__hybrid_atomic_add(self->s_count, count, __ATOMIC_SEQ_CST);
 	/* Wake up exactly one thread for every ticket added. */
 	return sig_sendmany(&self->s_avail, count);
 }

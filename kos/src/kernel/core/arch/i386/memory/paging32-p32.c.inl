@@ -699,7 +699,7 @@ NOTHROW(FCALL p32_pagedir_andl_e1_word)(unsigned int vec2,
                                         unsigned int vec1,
                                         u32 e1_kept_bits_mask) {
 	p32_pagedir_assert_e1_word_prepared(vec2, vec1, e1_kept_bits_mask);
-	ATOMIC_FETCHAND(P32_PDIR_E1_IDENTITY[vec2][vec1].p_word, e1_kept_bits_mask);
+	ATOMIC_AND(P32_PDIR_E1_IDENTITY[vec2][vec1].p_word, e1_kept_bits_mask);
 }
 
 LOCAL NOBLOCK u32

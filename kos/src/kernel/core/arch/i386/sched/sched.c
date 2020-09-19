@@ -169,7 +169,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 #undef PUSH
 #endif /* !__x86_64__ */
 	/* TODO: Must also execute thread startup callbacks! */
-	ATOMIC_FETCHOR(thread->t_flags, TASK_FKERNTHREAD);
+	thread->t_flags |= TASK_FKERNTHREAD;
 	thread->t_sched.s_state = state;
 	if (!FORTASK(thread, this_fs))
 		FORTASK(thread, this_fs) = incref(&fs_kernel);

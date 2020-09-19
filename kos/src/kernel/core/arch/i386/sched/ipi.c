@@ -274,7 +274,7 @@ NOTHROW(FCALL x86_serve_ipi)(struct icpustate *__restrict state) {
 #ifndef NDEBUG
 			memset(&FORCPU(me, thiscpu_x86_ipi_pending[slot]), 0xcc, sizeof(ipi));
 #endif /* !NDEBUG */
-			ATOMIC_FETCHAND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
+			ATOMIC_AND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
 			/* Execute the IPI callback. */
 			IPI_DEBUG("x86_serve_ipi:%p [slot=%u,i=%u,mask=%#" PRIxPTR "]\n",
 			          ipi.pi_func, slot, i, mask);
@@ -364,7 +364,7 @@ again_i:
 			if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING) {
 				/* Indicate that the IPI is now ready for handling by the core. */
 				IPI_DEBUG("cpu_sendipi:ipi_first [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
-				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
+				ATOMIC_OR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_send_ipi:
 				IPI_DEBUG("cpu_sendipi:do_send_ipi\n");
 				/* Make sure that no other IPI is still pending to be delivered by our LAPIC */
@@ -385,19 +385,19 @@ do_send_ipi:
 			} else if (flags & CPU_IPI_FWAKEUP) {
 				/* Indicate that the IPI is now ready for handling by the core. */
 				IPI_DEBUG("cpu_sendipi:ipi_wakeup [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
-				ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
+				ATOMIC_OR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 do_wake_target:
 				IPI_DEBUG("cpu_sendipi:cpu_wake\n");
 				cpu_wake(target);
 			} else {
 				/* Failed to wake the task (deallocate the IPI) */
-				ATOMIC_FETCHAND(FORCPU(target, thiscpu_x86_ipi_alloc[i]), ~mask);
+				ATOMIC_AND(FORCPU(target, thiscpu_x86_ipi_alloc[i]), ~mask);
 				goto done_failure;
 			}
 		} else {
 			/* Indicate that the IPI is now ready for handling by the core. */
 			IPI_DEBUG("cpu_sendipi:ipi_secondary [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
-			ATOMIC_FETCHOR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
+			ATOMIC_OR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
 			if (flags & CPU_IPI_FWAITFOR) {
 				/* Must still synchronize with the target CPU's reception of the IPI... */
 				if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING)

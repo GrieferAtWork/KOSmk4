@@ -364,7 +364,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 	do {                                                              \
 		was = PREEMPTION_PUSHOFF();                                   \
 		if likely(atomic_rwlock_tryread(&x86_pagedir_prepare_lock)) { \
-			ATOMIC_FETCHINC(x86_pagedir_prepare_version);             \
+			ATOMIC_INC(x86_pagedir_prepare_version);                  \
 			break;                                                    \
 		}                                                             \
 		PREEMPTION_POP(was);                                          \
@@ -1809,7 +1809,7 @@ NOTHROW(FCALL p64_pagedir_and_e1_word)(unsigned int vec4,
                                        unsigned int vec1,
                                        u64 e1_kept_bits_mask) {
 	p64_pagedir_assert_e1_word_prepared(vec4, vec3, vec2, vec1, e1_kept_bits_mask);
-	ATOMIC_FETCHAND(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_kept_bits_mask);
+	ATOMIC_AND(P64_PDIR_E1_IDENTITY[vec4][vec3][vec2][vec1].p_word, e1_kept_bits_mask);
 }
 
 LOCAL NOBLOCK u64

@@ -107,40 +107,40 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 		case 0x0006: WO; *(u32 *)addr = (u32)p; break;
 		case 0x0007: WO; I64(*(u64 *)addr = (u64)p); break;
 
-		case 0x0008: ATOMIC_FETCHINC(*(u8 *)addr); break;
-		case 0x0009: ATOMIC_FETCHINC(*(u16 *)addr); break;
-		case 0x000a: ATOMIC_FETCHINC(*(u32 *)addr); break;
-		case 0x000b: I64(ATOMIC_FETCHINC(*(u64 *)addr)); break;
+		case 0x0008: ATOMIC_INC(*(u8 *)addr); break;
+		case 0x0009: ATOMIC_INC(*(u16 *)addr); break;
+		case 0x000a: ATOMIC_INC(*(u32 *)addr); break;
+		case 0x000b: I64(ATOMIC_INC(*(u64 *)addr)); break;
 
-		case 0x000c: ATOMIC_FETCHDEC(*(u8 *)addr); break;
-		case 0x000d: ATOMIC_FETCHDEC(*(u16 *)addr); break;
-		case 0x000e: ATOMIC_FETCHDEC(*(u32 *)addr); break;
-		case 0x000f: I64(ATOMIC_FETCHDEC(*(u64 *)addr)); break;
+		case 0x000c: ATOMIC_DEC(*(u8 *)addr); break;
+		case 0x000d: ATOMIC_DEC(*(u16 *)addr); break;
+		case 0x000e: ATOMIC_DEC(*(u32 *)addr); break;
+		case 0x000f: I64(ATOMIC_DEC(*(u64 *)addr)); break;
 
-		case 0x0010: ATOMIC_FETCHADD(*(u8 *)addr, (u8)p); break;
-		case 0x0011: ATOMIC_FETCHADD(*(u16 *)addr, (u16)p); break;
-		case 0x0012: ATOMIC_FETCHADD(*(u32 *)addr, (u32)p); break;
-		case 0x0013: I64(ATOMIC_FETCHADD(*(u64 *)addr, (u64)p)); break;
+		case 0x0010: ATOMIC_ADD(*(u8 *)addr, (u8)p); break;
+		case 0x0011: ATOMIC_ADD(*(u16 *)addr, (u16)p); break;
+		case 0x0012: ATOMIC_ADD(*(u32 *)addr, (u32)p); break;
+		case 0x0013: I64(ATOMIC_ADD(*(u64 *)addr, (u64)p)); break;
 
-		case 0x0014: ATOMIC_FETCHSUB(*(u8 *)addr, (u8)p); break;
-		case 0x0015: ATOMIC_FETCHSUB(*(u16 *)addr, (u16)p); break;
-		case 0x0016: ATOMIC_FETCHSUB(*(u32 *)addr, (u32)p); break;
-		case 0x0017: I64(ATOMIC_FETCHSUB(*(u64 *)addr, (u64)p)); break;
+		case 0x0014: ATOMIC_SUB(*(u8 *)addr, (u8)p); break;
+		case 0x0015: ATOMIC_SUB(*(u16 *)addr, (u16)p); break;
+		case 0x0016: ATOMIC_SUB(*(u32 *)addr, (u32)p); break;
+		case 0x0017: I64(ATOMIC_SUB(*(u64 *)addr, (u64)p)); break;
 
-		case 0x0018: ATOMIC_FETCHAND(*(u8 *)addr, (u8)p); break;
-		case 0x0019: ATOMIC_FETCHAND(*(u16 *)addr, (u16)p); break;
-		case 0x001a: ATOMIC_FETCHAND(*(u32 *)addr, (u32)p); break;
-		case 0x001b: I64(ATOMIC_FETCHAND(*(u64 *)addr, (u64)p)); break;
+		case 0x0018: ATOMIC_AND(*(u8 *)addr, (u8)p); break;
+		case 0x0019: ATOMIC_AND(*(u16 *)addr, (u16)p); break;
+		case 0x001a: ATOMIC_AND(*(u32 *)addr, (u32)p); break;
+		case 0x001b: I64(ATOMIC_AND(*(u64 *)addr, (u64)p)); break;
 
-		case 0x001c: ATOMIC_FETCHOR(*(u8 *)addr, (u8)p); break;
-		case 0x001d: ATOMIC_FETCHOR(*(u16 *)addr, (u16)p); break;
-		case 0x001e: ATOMIC_FETCHOR(*(u32 *)addr, (u32)p); break;
-		case 0x001f: I64(ATOMIC_FETCHOR(*(u64 *)addr, (u64)p)); break;
+		case 0x001c: ATOMIC_OR(*(u8 *)addr, (u8)p); break;
+		case 0x001d: ATOMIC_OR(*(u16 *)addr, (u16)p); break;
+		case 0x001e: ATOMIC_OR(*(u32 *)addr, (u32)p); break;
+		case 0x001f: I64(ATOMIC_OR(*(u64 *)addr, (u64)p)); break;
 
-		case 0x0020: ATOMIC_FETCHXOR(*(u8 *)addr, (u8)p); break;
-		case 0x0021: ATOMIC_FETCHXOR(*(u16 *)addr, (u16)p); break;
-		case 0x0022: ATOMIC_FETCHXOR(*(u32 *)addr, (u32)p); break;
-		case 0x0023: I64(ATOMIC_FETCHXOR(*(u64 *)addr, (u64)p)); break;
+		case 0x0020: ATOMIC_XOR(*(u8 *)addr, (u8)p); break;
+		case 0x0021: ATOMIC_XOR(*(u16 *)addr, (u16)p); break;
+		case 0x0022: ATOMIC_XOR(*(u32 *)addr, (u32)p); break;
+		case 0x0023: I64(ATOMIC_XOR(*(u64 *)addr, (u64)p)); break;
 
 		case 0x0024: ATOMIC_XCH(*(u8 *)addr, (u8)p); break;
 		case 0x0025: ATOMIC_XCH(*(u16 *)addr, (u16)p); break;

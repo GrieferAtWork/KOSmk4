@@ -431,22 +431,22 @@ FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xaddl_eax_Pcx)();    /* lock x
 FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_cmpxchgb_dl_Pcx)();  /* lock cmpxchgb %dl, (%Pcx)  -- ATOMIC_CMPXCH(*(u8 *)%Pcx, %al, %dl) */
 FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_cmpxchgw_dx_Pcx)();  /* lock cmpxchgw %dx, (%Pcx)  -- ATOMIC_CMPXCH(*(u16 *)%Pcx, %ax, %dx) */
 FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_cmpxchgl_edx_Pcx)(); /* lock cmpxchgl %edx, (%Pcx) -- ATOMIC_CMPXCH(*(u32 *)%Pcx, %eax, %edx) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_andb_al_Pcx)();      /* lock andb     %al, (%Pcx)  -- (void)ATOMIC_FETCHAND(*(u8 *)%Pcx, %al) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_andw_ax_Pcx)();      /* lock andw     %ax, (%Pcx)  -- (void)ATOMIC_FETCHAND(*(u16 *)%Pcx, %ax) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_andl_eax_Pcx)();     /* lock andl     %eax, (%Pcx) -- (void)ATOMIC_FETCHAND(*(u32 *)%Pcx, %eax) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orb_al_Pcx)();       /* lock orb      %al, (%Pcx)  -- (void)ATOMIC_FETCHOR(*(u8 *)%Pcx, %al) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orw_ax_Pcx)();       /* lock orw      %ax, (%Pcx)  -- (void)ATOMIC_FETCHOR(*(u16 *)%Pcx, %ax) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orl_eax_Pcx)();      /* lock orl      %eax, (%Pcx) -- (void)ATOMIC_FETCHOR(*(u32 *)%Pcx, %eax) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorb_al_Pcx)();      /* lock xorb     %al, (%Pcx)  -- (void)ATOMIC_FETCHXOR(*(u8 *)%Pcx, %al) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorw_ax_Pcx)();      /* lock xorw     %ax, (%Pcx)  -- (void)ATOMIC_FETCHXOR(*(u16 *)%Pcx, %ax) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorl_eax_Pcx)();     /* lock xorl     %eax, (%Pcx) -- (void)ATOMIC_FETCHXOR(*(u32 *)%Pcx, %eax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_andb_al_Pcx)();      /* lock andb     %al, (%Pcx)  -- ATOMIC_AND(*(u8 *)%Pcx, %al) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_andw_ax_Pcx)();      /* lock andw     %ax, (%Pcx)  -- ATOMIC_AND(*(u16 *)%Pcx, %ax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_andl_eax_Pcx)();     /* lock andl     %eax, (%Pcx) -- ATOMIC_AND(*(u32 *)%Pcx, %eax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orb_al_Pcx)();       /* lock orb      %al, (%Pcx)  -- ATOMIC_OR(*(u8 *)%Pcx, %al) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orw_ax_Pcx)();       /* lock orw      %ax, (%Pcx)  -- ATOMIC_OR(*(u16 *)%Pcx, %ax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orl_eax_Pcx)();      /* lock orl      %eax, (%Pcx) -- ATOMIC_OR(*(u32 *)%Pcx, %eax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorb_al_Pcx)();      /* lock xorb     %al, (%Pcx)  -- ATOMIC_XOR(*(u8 *)%Pcx, %al) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorw_ax_Pcx)();      /* lock xorw     %ax, (%Pcx)  -- ATOMIC_XOR(*(u16 *)%Pcx, %ax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorl_eax_Pcx)();     /* lock xorl     %eax, (%Pcx) -- ATOMIC_XOR(*(u32 *)%Pcx, %eax) */
 #ifdef __x86_64__
 FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xchgq_rax_Pcx)();    /* lock xchgq    %rax, (%Pcx) -- ATOMIC_XCH(*(u64 *)%Pcx, %rax) */
 FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xaddq_rax_Pcx)();    /* lock xaddq    %rax, (%Pcx) -- ATOMIC_FETCHADD(*(u64 *)%Pcx, %rax) */
 FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_cmpxchgq_rdx_Pcx)(); /* lock cmpxchgq %rdx, (%Pcx) -- ATOMIC_CMPXCH(*(u64 *)%Pcx, %rax, %rdx) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_andq_rax_Pcx)();     /* lock andq     %rax, (%Pcx) -- (void)ATOMIC_FETCHAND(*(u64 *)%Pcx, %rax) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orq_rax_Pcx)();      /* lock orq      %rax, (%Pcx) -- (void)ATOMIC_FETCHOR(*(u64 *)%Pcx, %rax) */
-FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorq_rax_Pcx)();     /* lock xorq     %rax, (%Pcx) -- (void)ATOMIC_FETCHXOR(*(u64 *)%Pcx, %rax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_andq_rax_Pcx)();     /* lock andq     %rax, (%Pcx) -- ATOMIC_AND(*(u64 *)%Pcx, %rax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_orq_rax_Pcx)();      /* lock orq      %rax, (%Pcx) -- ATOMIC_OR(*(u64 *)%Pcx, %rax) */
+FUNDEF NOBLOCK void NOTHROW(ASMCALL x86_nopf_lock_xorq_rax_Pcx)();     /* lock xorq     %rax, (%Pcx) -- ATOMIC_XOR(*(u64 *)%Pcx, %rax) */
 #endif /* __x86_64__ */
 
 /* Try to ATOMIC_XCH at a possibly faulty `addr', storing the

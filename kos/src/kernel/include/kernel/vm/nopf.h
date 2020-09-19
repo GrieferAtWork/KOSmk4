@@ -106,126 +106,126 @@ LOCAL NOBLOCK WUNUSED bool NOTHROW(KCALL writeq_nopf)(USER CHECKED void *addr, u
 
 
 #define read_nopf(addr, presult)                          \
-	(sizeof(*(presult)) == 1                              \
+	(sizeof(*(addr)) == 1                                 \
 	 ? readb_nopf(addr, (__UINT8_TYPE__ *)(presult))      \
-	 : sizeof(*(presult)) == 2                            \
+	 : sizeof(*(addr)) == 2                               \
 	   ? readw_nopf(addr, (__UINT16_TYPE__ *)(presult))   \
-	   : sizeof(*(presult)) == 4                          \
+	   : sizeof(*(addr)) == 4                             \
 	     ? readl_nopf(addr, (__UINT32_TYPE__ *)(presult)) \
 	     : readq_nopf(addr, (__UINT64_TYPE__ *)(presult)))
 #define write_nopf(addr, value)                        \
-	(sizeof(value) == 1                                \
+	(sizeof(*(addr)) == 1                              \
 	 ? writeb_nopf(addr, (__UINT8_TYPE__)(value))      \
-	 : sizeof(value) == 2                              \
+	 : sizeof(va * (addr)lue) == 2                     \
 	   ? writew_nopf(addr, (__UINT16_TYPE__)(value))   \
-	   : sizeof(value) == 4                            \
+	   : sizeof(*(addr)) == 4                          \
 	     ? writel_nopf(addr, (__UINT32_TYPE__)(value)) \
 	     : writeq_nopf(addr, (__UINT64_TYPE__)(value)))
 
 #ifdef CONFIG_VM_ARCH_DEFINES_ATOMIC_XCHBWLQ_NOPF
 #define atomic_xch_nopf(addr, newval, poldval)                                             \
-	(sizeof(*(poldval)) == 1                                                               \
+	(sizeof(*(addr)) == 1                                                                  \
 	 ? atomic_xchb_nopf(addr, (__UINT8_TYPE__)(newval), (__UINT8_TYPE__ *)(poldval))       \
-	 : sizeof(*(poldval)) == 2                                                             \
+	 : sizeof(*(addr)) == 2                                                                \
 	   ? atomic_xchw_nopf(addr, (__UINT16_TYPE__)(newval), (__UINT16_TYPE__ *)(poldval))   \
-	   : sizeof(*(poldval)) == 4                                                           \
+	   : sizeof(*(addr)) == 4                                                              \
 	     ? atomic_xchl_nopf(addr, (__UINT32_TYPE__)(newval), (__UINT32_TYPE__ *)(poldval)) \
 	     : atomic_xchq_nopf(addr, (__UINT64_TYPE__)(newval), (__UINT64_TYPE__ *)(poldval)))
 #elif defined(CONFIG_VM_ARCH_DEFINES_ATOMIC_XCHBWL_NOPF)
 #define atomic_xch_nopf(addr, newval, poldval)                                           \
-	(sizeof(*(poldval)) == 1                                                             \
+	(sizeof(*(addr)) == 1                                                                \
 	 ? atomic_xchb_nopf(addr, (__UINT8_TYPE__)(newval), (__UINT8_TYPE__ *)(poldval))     \
-	 : sizeof(*(poldval)) == 2                                                           \
+	 : sizeof(*(addr)) == 2                                                              \
 	   ? atomic_xchw_nopf(addr, (__UINT16_TYPE__)(newval), (__UINT16_TYPE__ *)(poldval)) \
 	   : atomic_xchl_nopf(addr, (__UINT32_TYPE__)(newval), (__UINT32_TYPE__ *)(poldval)))
 #endif /* ... */
 
 #ifdef CONFIG_VM_ARCH_DEFINES_ATOMIC_FETCHADDBWLQ_NOPF
 #define atomic_fetchadd_nopf(addr, newval, poldval)                                             \
-	(sizeof(*(poldval)) == 1                                                                    \
+	(sizeof(*(addr)) == 1                                                                       \
 	 ? atomic_fetchaddb_nopf(addr, (__UINT8_TYPE__)(newval), (__UINT8_TYPE__ *)(poldval))       \
-	 : sizeof(*(poldval)) == 2                                                                  \
+	 : sizeof(*(addr)) == 2                                                                     \
 	   ? atomic_fetchaddw_nopf(addr, (__UINT16_TYPE__)(newval), (__UINT16_TYPE__ *)(poldval))   \
-	   : sizeof(*(poldval)) == 4                                                                \
+	   : sizeof(*(addr)) == 4                                                                   \
 	     ? atomic_fetchaddl_nopf(addr, (__UINT32_TYPE__)(newval), (__UINT32_TYPE__ *)(poldval)) \
 	     : atomic_fetchaddq_nopf(addr, (__UINT64_TYPE__)(newval), (__UINT64_TYPE__ *)(poldval)))
 #elif defined(CONFIG_VM_ARCH_DEFINES_ATOMIC_FETCHADDBWL_NOPF)
 #define atomic_fetchadd_nopf(addr, newval, poldval)                                           \
-	(sizeof(*(poldval)) == 1                                                                  \
+	(sizeof(*(addr)) == 1                                                                     \
 	 ? atomic_fetchaddb_nopf(addr, (__UINT8_TYPE__)(newval), (__UINT8_TYPE__ *)(poldval))     \
-	 : sizeof(*(poldval)) == 2                                                                \
+	 : sizeof(*(addr)) == 2                                                                   \
 	   ? atomic_fetchaddw_nopf(addr, (__UINT16_TYPE__)(newval), (__UINT16_TYPE__ *)(poldval)) \
 	   : atomic_fetchaddl_nopf(addr, (__UINT32_TYPE__)(newval), (__UINT32_TYPE__ *)(poldval)))
 #endif /* ... */
 
 #ifdef CONFIG_VM_ARCH_DEFINES_ATOMIC_ORBWLQ_NOPF
 #define atomic_or_nopf(addr, value)                        \
-	(sizeof(value) == 1                                    \
+	(sizeof(*(addr)) == 1                                  \
 	 ? atomic_orb_nopf(addr, (__UINT8_TYPE__)(value))      \
-	 : sizeof(value) == 2                                  \
+	 : sizeof(*(addr)) == 2                                \
 	   ? atomic_orw_nopf(addr, (__UINT16_TYPE__)(value))   \
-	   : sizeof(value) == 4                                \
+	   : sizeof(*(addr)) == 4                              \
 	     ? atomic_orl_nopf(addr, (__UINT32_TYPE__)(value)) \
 	     : atomic_orq_nopf(addr, (__UINT64_TYPE__)(value)))
 #elif defined(CONFIG_VM_ARCH_DEFINES_ATOMIC_ORBWL_NOPF)
 #define atomic_or_nopf(addr, value)                      \
-	(sizeof(value) == 1                                  \
+	(sizeof(*(addr)) == 1                                \
 	 ? atomic_orb_nopf(addr, (__UINT8_TYPE__)(value))    \
-	 : sizeof(value) == 2                                \
+	 : sizeof(*(addr)) == 2                              \
 	   ? atomic_orw_nopf(addr, (__UINT16_TYPE__)(value)) \
 	   : atomic_orl_nopf(addr, (__UINT32_TYPE__)(value)))
 #endif /* ... */
 
 #ifdef CONFIG_VM_ARCH_DEFINES_ATOMIC_ANDBWLQ_NOPF
 #define atomic_and_nopf(addr, value)                        \
-	(sizeof(value) == 1                                     \
+	(sizeof(*(addr)) == 1                                   \
 	 ? atomic_andb_nopf(addr, (__UINT8_TYPE__)(value))      \
-	 : sizeof(value) == 2                                   \
+	 : sizeof(*(addr)) == 2                                 \
 	   ? atomic_andw_nopf(addr, (__UINT16_TYPE__)(value))   \
-	   : sizeof(value) == 4                                 \
+	   : sizeof(*(addr)) == 4                               \
 	     ? atomic_andl_nopf(addr, (__UINT32_TYPE__)(value)) \
 	     : atomic_andq_nopf(addr, (__UINT64_TYPE__)(value)))
 #elif defined(CONFIG_VM_ARCH_DEFINES_ATOMIC_ANDBWL_NOPF)
 #define atomic_and_nopf(addr, value)                      \
-	(sizeof(value) == 1                                   \
+	(sizeof(*(addr)) == 1                                 \
 	 ? atomic_andb_nopf(addr, (__UINT8_TYPE__)(value))    \
-	 : sizeof(value) == 2                                 \
+	 : sizeof(*(addr)) == 2                               \
 	   ? atomic_andw_nopf(addr, (__UINT16_TYPE__)(value)) \
 	   : atomic_andl_nopf(addr, (__UINT32_TYPE__)(value)))
 #endif /* ... */
 
 #ifdef CONFIG_VM_ARCH_DEFINES_ATOMIC_XORBWLQ_NOPF
 #define atomic_xor_nopf(addr, value)                        \
-	(sizeof(value) == 1                                     \
+	(sizeof(*(addr)) == 1                                   \
 	 ? atomic_xorb_nopf(addr, (__UINT8_TYPE__)(value))      \
-	 : sizeof(value) == 2                                   \
+	 : sizeof(*(addr)) == 2                                 \
 	   ? atomic_xorw_nopf(addr, (__UINT16_TYPE__)(value))   \
-	   : sizeof(value) == 4                                 \
+	   : sizeof(*(addr)) == 4                               \
 	     ? atomic_xorl_nopf(addr, (__UINT32_TYPE__)(value)) \
 	     : atomic_xorq_nopf(addr, (__UINT64_TYPE__)(value)))
 #elif defined(CONFIG_VM_ARCH_DEFINES_ATOMIC_XORBWL_NOPF)
 #define atomic_xor_nopf(addr, value)                      \
-	(sizeof(value) == 1                                   \
+	(sizeof(*(addr)) == 1                                 \
 	 ? atomic_xorb_nopf(addr, (__UINT8_TYPE__)(value))    \
-	 : sizeof(value) == 2                                 \
+	 : sizeof(*(addr)) == 2                               \
 	   ? atomic_xorw_nopf(addr, (__UINT16_TYPE__)(value)) \
 	   : atomic_xorl_nopf(addr, (__UINT32_TYPE__)(value)))
 #endif /* ... */
 
 #ifdef CONFIG_VM_ARCH_DEFINES_ATOMIC_CMPXCHBWLQ_NOPF
 #define atomic_cmpxch_nopf(addr, oldval, newval, preal_oldval)                                                                \
-	(sizeof(*(preal_oldval)) == 1                                                                                             \
+	(sizeof(*(addr)) == 1                                                                                                     \
 	 ? atomic_cmpxchb_nopf(addr, (__UINT8_TYPE__)(oldval), (__UINT8_TYPE__)(newval), (__UINT8_TYPE__ *)(preal_oldval))        \
-	 : sizeof(*(preal_oldval)) == 2                                                                                           \
+	 : sizeof(*(addr)) == 2                                                                                                   \
 	   ? atomic_cmpxchw_nopf(addr, (__UINT16_TYPE__)(oldval), (__UINT16_TYPE__)(newval), (__UINT16_TYPE__ *)(preal_oldval))   \
-	   : sizeof(*(preal_oldval)) == 4                                                                                         \
+	   : sizeof(*(addr)) == 4                                                                                                 \
 	     ? atomic_cmpxchl_nopf(addr, (__UINT32_TYPE__)(oldval), (__UINT32_TYPE__)(newval), (__UINT32_TYPE__ *)(preal_oldval)) \
 	     : atomic_cmpxchq_nopf(addr, (__UINT64_TYPE__)(oldval), (__UINT64_TYPE__)(newval), (__UINT64_TYPE__ *)(preal_oldval)))
 #elif defined(CONFIG_VM_ARCH_DEFINES_ATOMIC_CMPXCHBWL_NOPF)
 #define atomic_cmpxch_nopf(addr, oldval, newval, preal_oldval)                                                              \
-	(sizeof(*(preal_oldval)) == 1                                                                                           \
+	(sizeof(*(addr)) == 1                                                                                                   \
 	 ? atomic_cmpxchb_nopf(addr, (__UINT8_TYPE__)(oldval), (__UINT8_TYPE__)(newval), (__UINT8_TYPE__ *)(preal_oldval))      \
-	 : sizeof(*(preal_oldval)) == 2                                                                                         \
+	 : sizeof(*(addr)) == 2                                                                                                 \
 	   ? atomic_cmpxchw_nopf(addr, (__UINT16_TYPE__)(oldval), (__UINT16_TYPE__)(newval), (__UINT16_TYPE__ *)(preal_oldval)) \
 	   : atomic_cmpxchl_nopf(addr, (__UINT32_TYPE__)(oldval), (__UINT32_TYPE__)(newval), (__UINT32_TYPE__ *)(preal_oldval)))
 #endif /* ... */

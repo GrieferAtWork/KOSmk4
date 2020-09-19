@@ -49,9 +49,9 @@ ProcFS_Sys_Kernel_SchedChildRunsFirst_Write(struct regular_node *__restrict UNUS
 	bool mode;
 	mode = ProcFS_ParseBool(buf, bufsize);
 	if (mode) {
-		ATOMIC_FETCHOR(task_start_default_flags, TASK_START_FHIGHPRIO);
+		ATOMIC_OR(task_start_default_flags, TASK_START_FHIGHPRIO);
 	} else {
-		ATOMIC_FETCHAND(task_start_default_flags, ~TASK_START_FHIGHPRIO);
+		ATOMIC_AND(task_start_default_flags, ~TASK_START_FHIGHPRIO);
 	}
 }
 

@@ -1238,7 +1238,7 @@ AtaBus_LockPIO(struct ata_bus *__restrict self) THROWS(E_WOULDBLOCK,...) {
 	/* Remove the suspension request which was made above in
 	 * order to try and get the bus to stop DMAing, so we can
 	 * get PIO access (which we now have). */
-	ATOMIC_FETCHDEC(self->b_flags);
+	ATOMIC_DEC(self->b_flags);
 }
 
 
@@ -1410,9 +1410,9 @@ got_identify_signal:
 		COMPILER_READ_BARRIER();
 		if (cache_mode) {
 			/* WARNING: The drive may not actually support this... */
-			ATOMIC_FETCHOR(self->d_features, ATA_DRIVE_FEATURE_FFLUSH);
+			ATOMIC_OR(self->d_features, ATA_DRIVE_FEATURE_FFLUSH);
 		} else {
-			ATOMIC_FETCHAND(self->d_features, ~ATA_DRIVE_FEATURE_FFLUSH);
+			ATOMIC_AND(self->d_features, ~ATA_DRIVE_FEATURE_FFLUSH);
 		}
 	}	break;
 

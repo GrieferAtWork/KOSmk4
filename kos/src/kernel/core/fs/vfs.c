@@ -1698,7 +1698,7 @@ NOTHROW(KCALL vfs_clearmounts)(struct vfs *__restrict self) {
 		if likely(!path)
 			continue;
 		assert(path->p_isdrive != 0);
-		ATOMIC_FETCHDEC(path->p_isdrive);
+		ATOMIC_DEC(path->p_isdrive);
 		decref(path);
 	}
 	/* Clear all recently used paths. */

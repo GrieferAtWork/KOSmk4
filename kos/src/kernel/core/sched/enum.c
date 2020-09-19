@@ -370,7 +370,7 @@ NOTHROW(KCALL task_enum_cpu_nb)(task_enum_cb_t cb, void *arg,
 	if (c == THIS_CPU) {
 		result = task_enum_mycpu_nb(cb, arg, c);
 		if (!(old_flags & TASK_FKEEPCORE))
-			ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
+			ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
 	} else if (!cpu_isrunning(c)) {
 cpu_not_running:
 		/* The CPU only contains a single thread: it's IDLE thread. */

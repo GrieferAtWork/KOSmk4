@@ -277,7 +277,7 @@ do_normal_stop:
 
 	/* Clear our thread's KEEPCORE flags */
 	if likely(!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_FETCHAND(stop_event.e.tse_thread->t_flags, ~TASK_FKEEPCORE);
+		ATOMIC_AND(stop_event.e.tse_thread->t_flags, ~TASK_FKEEPCORE);
 	task_popconnections(&stop_event.e.tse_oldcon);
 	return (struct icpustate *)stop_event.e.tse_state;
 }
@@ -324,7 +324,7 @@ PRIVATE void NOTHROW(FCALL GDBThread_ReenablePreemptionForHostCPU)(void) {
 	GDBServer_Host->t_cpu->c_override = GDBThread_StopAll_Host_Old_override;
 	/* Restore the old KEEPCORE flag. */
 	if (!(GDBThread_StopAll_Host_Old_flags & TASK_FKEEPCORE))
-		ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
+		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
 	/* Re-enable preemptive interrupts */
 	cpu_enable_preemptive_interrupts_nopr();
 	PREEMPTION_POP(was);
@@ -384,7 +384,7 @@ NOTHROW(FCALL GDBThread_ResumeSingleStopEvent)(GDBThreadStopEvent *__restrict se
 	          task_getroottid_of_s(self->tse_thread));
 	assert(self->tse_mayresume == GDB_THREAD_MAYRESUME_NASYNC);
 	COMPILER_BARRIER();
-	ATOMIC_FETCHAND(self->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
+	ATOMIC_AND(self->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
 	ATOMIC_WRITE(self->tse_mayresume, GDB_THREAD_MAYRESUME_RESUME);
 	COMPILER_BARRIER();
 	sig_broadcast(&self->tse_sigresume);
@@ -694,7 +694,7 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 		/* Make sure that the thread is explicitly stopped, in case
 		 * it was implicitly stopped by a whole-cpu stop event before. */
 		if (GDBThread_FindStopEvent(thread))
-			ATOMIC_FETCHOR(thread->t_flags, TASK_FGDB_STOPPED);
+			ATOMIC_OR(thread->t_flags, TASK_FGDB_STOPPED);
 		else {
 			if (generateAsyncStopEvents)
 				GDBThread_CreateMissingAsyncStopNotification(thread);
@@ -744,7 +744,7 @@ NOTHROW(FCALL GDBThread_Resume)(struct task *__restrict thread) {
 		if (iter->tse_thread != thread)
 			continue;
 		if (iter->tse_isacpu) {
-			ATOMIC_FETCHAND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
+			ATOMIC_AND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
 			break; /* whole-cpu stop events are resumed later. */
 		}
 		assert(iter->tse_mayresume == GDB_THREAD_MAYRESUME_NASYNC);
@@ -823,7 +823,7 @@ again_piter_kern:
 			if (!GDBThread_IsKernelThread(iter->tse_thread))
 				continue; /* Different process. */
 			if (iter->tse_isacpu) {
-				ATOMIC_FETCHAND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
+				ATOMIC_AND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
 				continue; /* whole-cpu stop events are resumed later. */
 			}
 			/* Unlink the stop event */
@@ -841,7 +841,7 @@ again_piter:
 			if (task_getprocess_of(iter->tse_thread) != proc)
 				continue; /* Different process. */
 			if (iter->tse_isacpu) {
-				ATOMIC_FETCHAND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
+				ATOMIC_AND(iter->tse_thread->t_flags, ~TASK_FGDB_STOPPED);
 				continue; /* whole-cpu stop events are resumed later. */
 			}
 			/* Unlink the stop event */

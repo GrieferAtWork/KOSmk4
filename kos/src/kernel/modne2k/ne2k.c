@@ -908,7 +908,7 @@ tx_switch_to_idle:
 			nic_device_routepacket(me, packet, hdr.ph_count);
 		}
 		/* Clear the RX-PENDING bit. */
-		ATOMIC_FETCHAND(me->nk_state.ns_flags, ~NE2K_FLAG_RXPEND);
+		ATOMIC_AND(me->nk_state.ns_flags, ~NE2K_FLAG_RXPEND);
 		COMPILER_BARRIER();
 		/* Re-enable packet-receive interrupts */
 		outb(E8390_CMD(me->nk_iobase), E8390_PAGE0 | E8390_NODMA | E8390_START);

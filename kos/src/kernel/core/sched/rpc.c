@@ -208,8 +208,8 @@ task_serve_one_impl(struct icpustate *__restrict state) {
 	 * are visible in nested calls to `task_serve()' */
 	reinsert_pending_rpcs(chain, iter);
 	if (my_entry->re_kind & RPC_KIND_NOTHROW)
-		ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count_nx));
-	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count));
+		ATOMIC_DEC(PERTASK(this_rpc_pending_sync_count_nx));
+	ATOMIC_DEC(PERTASK(this_rpc_pending_sync_count));
 	TRY {
 		/* Service the RPC. */
 		state = (*my_entry->re_func)(my_entry->re_arg,
@@ -249,8 +249,8 @@ NOTHROW(FCALL task_serve_one_nx_impl)(struct icpustate *__restrict state) {
 	/* Re-schedule all other pending RPCs, so they
 	 * are visible in nested calls to `task_serve()' */
 	reinsert_pending_rpcs(chain, iter);
-	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count_nx));
-	ATOMIC_FETCHDEC(PERTASK(this_rpc_pending_sync_count));
+	ATOMIC_DEC(PERTASK(this_rpc_pending_sync_count_nx));
+	ATOMIC_DEC(PERTASK(this_rpc_pending_sync_count));
 	assert(my_entry->re_kind & RPC_KIND_NOTHROW);
 	/* Service the RPC. */
 	state = (*my_entry->re_func)(my_entry->re_arg,
@@ -321,8 +321,8 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 	if ((rpc_mode & RPC_KIND_MASK) != RPC_KIND_USER) {
 		/* `RPC_KIND_SYNC', `RPC_KIND_USER_INTR' or `RPC_KIND_USER_INTR_SYNC' */
 		if (rpc_mode & RPC_KIND_NOTHROW)
-			ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count_nx));
-		ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count));
+			ATOMIC_INC(FORTASK(target, this_rpc_pending_sync_count_nx));
+		ATOMIC_INC(FORTASK(target, this_rpc_pending_sync_count));
 	}
 	/* At this point our RPC has been scheduled and
 	 * can potentially be executed at any moment. */

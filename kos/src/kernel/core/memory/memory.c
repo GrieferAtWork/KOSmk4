@@ -241,9 +241,11 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 
 
 #ifdef NDEBUG
-#define ASSIGN_OLDVAL  /* nothing */
+#define ASSIGN_OLDVAL                /* nothing */
+#define ASSIGN_OLDVAL_ATOMIC_FETCHOR ATOMIC_OR
 #else /* NDEBUG */
-#define ASSIGN_OLDVAL  oldval =
+#define ASSIGN_OLDVAL                oldval =
+#define ASSIGN_OLDVAL_ATOMIC_FETCHOR oldval = ATOMIC_FETCHOR
 #endif /* !NDEBUG */
 
 PRIVATE NOBLOCK void
@@ -266,7 +268,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 		mask = (uintptr_t)(PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFBIT)
 		       << (unsigned int)((zone_relative_base % PAGES_PER_WORD) *
 		                         PMEMZONE_BITSPERPAGE);
-		ASSIGN_OLDVAL ATOMIC_FETCHOR(self->mz_free[i], mask);
+		ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i], mask);
 		assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 		        "Double free at %" PRIpN(__SIZEOF_PHYSPAGE_T__),
 		        (physpage_t)(self->mz_start + zone_relative_base));
@@ -282,7 +284,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 				mask &= (((uintptr_t)1 << (num_free * PMEMZONE_BITSPERPAGE)) - 1);
 			}
 			mask <<= missalignment * PMEMZONE_BITSPERPAGE;
-			ASSIGN_OLDVAL ATOMIC_FETCHOR(self->mz_free[i], mask);
+			ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n",
 			        "oldval        = %" PRIXPTR "\n"
@@ -298,7 +300,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 		}
 		while (num_pages >= PAGES_PER_WORD) {
 			/* Free full words. */
-			ASSIGN_OLDVAL ATOMIC_FETCHOR(self->mz_free[i],
+			ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i],
 			                             (PMEMBITSET_FREEMASK |
 			                              PMEMBITSET_UNDFMASK));
 			assertf(!(oldval & PMEMBITSET_FREEMASK),
@@ -315,7 +317,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 		if (num_pages) {
 			mask = (PMEMBITSET_FREEMASK | PMEMBITSET_UNDFMASK);
 			mask &= ((uintptr_t)1 << ((unsigned int)num_pages * PMEMZONE_BITSPERPAGE)) - 1;
-			ASSIGN_OLDVAL ATOMIC_FETCHOR(self->mz_free[i], mask);
+			ASSIGN_OLDVAL_ATOMIC_FETCHOR(self->mz_free[i], mask);
 			assertf(!(oldval & (mask & PMEMBITSET_FREEMASK)),
 			        "Double free at near %" PRIpN(__SIZEOF_PHYSPAGE_T__) "\n"
 			        "oldval        = %" PRIXPTR "\n"
@@ -454,10 +456,10 @@ NOTHROW(KCALL page_freeone)(physpage_t page) {
 			continue;
 		TRACE_FREE(zone, page, page);
 		page -= zone->mz_start;
-		i      = (size_t)(page / PAGES_PER_WORD);
-		j      = (unsigned int)(page % PAGES_PER_WORD);
-		ATOMIC_FETCHINC(zone->mz_cfree);
-		ATOMIC_FETCHINC(zone->mz_qfree);
+		i = (size_t)(page / PAGES_PER_WORD);
+		j = (unsigned int)(page % PAGES_PER_WORD);
+		ATOMIC_INC(zone->mz_cfree);
+		ATOMIC_INC(zone->mz_qfree);
 		mask = (uintptr_t)(PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFMASK)
 		       << (j * PMEMZONE_BITSPERPAGE);
 #ifndef NDEBUG
@@ -466,7 +468,7 @@ NOTHROW(KCALL page_freeone)(physpage_t page) {
 		        "Double free at %" PRIpN(__SIZEOF_PHYSPAGE_T__),
 		        (physpage_t)page);
 #else /* !NDEBUG */
-		ATOMIC_FETCHOR(zone->mz_free[i], mask);
+		ATOMIC_OR(zone->mz_free[i], mask);
 #endif /* NDEBUG */
 		assert_free(page + zone->mz_start, 1);
 		break;
@@ -879,9 +881,9 @@ again:
 			if (!(oldval & mask))
 				return PAGE_MALLOC_AT_NOTFREE; /* Page was already allocated */
 			TRACE_ALLOC(zone, ptr ,ptr);
-			ATOMIC_FETCHDEC(zone->mz_cfree);
+			ATOMIC_DEC(zone->mz_cfree);
 			if (oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
-				ATOMIC_FETCHDEC(zone->mz_qfree);
+				ATOMIC_DEC(zone->mz_qfree);
 			return PAGE_MALLOC_AT_SUCCESS;
 		}
 	} while ((zone = zone->mz_prev) != NULL);

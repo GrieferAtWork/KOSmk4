@@ -850,9 +850,9 @@ mouse_device_ioctl(struct character_device *__restrict self,
 		mode = *(int *)arg;
 		COMPILER_READ_BARRIER();
 		if (mode == 0) {
-			ATOMIC_FETCHAND(me->md_flags, ~MOUSE_DEVICE_FLAG_GENABS);
+			ATOMIC_AND(me->md_flags, ~MOUSE_DEVICE_FLAG_GENABS);
 		} else if (mode == 1) {
-			ATOMIC_FETCHOR(me->md_flags, MOUSE_DEVICE_FLAG_GENABS);
+			ATOMIC_OR(me->md_flags, MOUSE_DEVICE_FLAG_GENABS);
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 			      E_INVALID_ARGUMENT_CONTEXT_IOCTL_MOUSEIO_SETABSMODE_BADMODE,

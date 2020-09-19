@@ -148,7 +148,7 @@ PRIVATE ATTR_COLDTEXT NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL x86_idt_setcurrent_ipi)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
 	__lidt_p(args[0]);
-	ATOMIC_FETCHINC(x86_idt_setcurrent_ack);
+	ATOMIC_INC(x86_idt_setcurrent_ack);
 	printk(KERN_DEBUG "[idt#%u] Acknowledge new IDT\n",
 	       THIS_CPU->c_id);
 	return state;

@@ -125,7 +125,7 @@ libterminal_do_iwrite_direct(struct terminal *__restrict self,
 FORCELOCAL void CC
 libterminal_do_iwrite_set_eofing(struct terminal *__restrict self) {
 	/* Set the EOFing bit */
-	ATOMIC_FETCHOR(self->t_ios.c_lflag, __IEOFING);
+	ATOMIC_OR(self->t_ios.c_lflag, __IEOFING);
 	/* Broadcast the signal send when the input buffer becomes non-empty,
 	 * thus causing any thread waiting on input data to wake up. */
 	sched_signal_broadcast(&self->t_ibuf.rb_nempty);
@@ -971,14 +971,14 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 						goto err;
 					result += temp;
 					if unlikely((size_t)temp < count) {
-						ATOMIC_FETCHOR(self->t_ios.c_lflag, __IESCAPING);
+						ATOMIC_OR(self->t_ios.c_lflag, __IESCAPING);
 						goto done;
 					}
 				}
 				++result; /* Account for the control character */
 				flush_start = iter + 1;
 				if (iter == end - 1) {
-					ATOMIC_FETCHOR(self->t_ios.c_lflag, __IESCAPING);
+					ATOMIC_OR(self->t_ios.c_lflag, __IESCAPING);
 				} else {
 					ch = *++iter;
 					/* Directly escape the next character */
@@ -1017,13 +1017,13 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 				result += temp;
 				/* Enable suspended output */
 				if unlikely((size_t)temp < count) {
-					ATOMIC_FETCHOR(self->t_ios.c_iflag, IXOFF);
+					ATOMIC_OR(self->t_ios.c_iflag, IXOFF);
 					goto done;
 				}
 				/* If this is the last character, or not just any sort of input
 				 * can disable XOFF-mode then disable output processing. */
 				if (iter == end - 1 || !(iflag & IXANY))
-					ATOMIC_FETCHOR(self->t_ios.c_iflag, IXOFF);
+					ATOMIC_OR(self->t_ios.c_iflag, IXOFF);
 				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VSTART] && (iflag & IXON)) {

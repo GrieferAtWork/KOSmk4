@@ -79,7 +79,7 @@ again_read_flags:
 		}
 	} else if ((key & ~(KEY_FRELEASED | KEY_FREPEAT)) != KEY_F12) {
 		/* Clear the F12 counter mask. */
-		ATOMIC_FETCHAND(self->kd_flags, ~KEYBOARD_DEVICE_FLAG_DBGF12_MASK);
+		ATOMIC_AND(self->kd_flags, ~KEYBOARD_DEVICE_FLAG_DBGF12_MASK);
 	}
 	return keyboard_buffer_putkey_nopr(&self->kd_buf, key);
 }
@@ -1289,10 +1289,10 @@ continue_copy_keymap:
 		COMPILER_READ_BARRIER();
 		if (f12_mode == 0) {
 #ifdef KEYBOARD_DEVICE_FLAG_DBGF12
-			ATOMIC_FETCHAND(me->kd_flags, ~(KEYBOARD_DEVICE_FLAG_DBGF12 |
-			                                KEYBOARD_DEVICE_FLAG_DBGF12_MASK));
+			ATOMIC_AND(me->kd_flags, ~(KEYBOARD_DEVICE_FLAG_DBGF12 |
+			                           KEYBOARD_DEVICE_FLAG_DBGF12_MASK));
 		} else if (f12_mode == 1) {
-			ATOMIC_FETCHOR(me->kd_flags, KEYBOARD_DEVICE_FLAG_DBGF12);
+			ATOMIC_OR(me->kd_flags, KEYBOARD_DEVICE_FLAG_DBGF12);
 #endif /* KEYBOARD_DEVICE_FLAG_DBGF12 */
 		} else {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

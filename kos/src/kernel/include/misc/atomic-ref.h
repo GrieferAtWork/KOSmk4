@@ -106,14 +106,14 @@ template<class T> struct atomic_ref {
 		pflag_t was;
 		was = PREEMPTION_PUSHOFF();
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchinc(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_inc(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		COMPILER_READ_BARRIER();
 		result = this->m_pointer;
 		COMPILER_READ_BARRIER();
 		REFCNT_METHODS(T)::incref(result);
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_dec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		PREEMPTION_POP(was);
 		return result;
@@ -124,14 +124,14 @@ template<class T> struct atomic_ref {
 		REF T *result;
 		__hybrid_assert(!PREEMPTION_ENABLED());
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchinc(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_inc(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		COMPILER_READ_BARRIER();
 		result = this->m_pointer;
 		COMPILER_READ_BARRIER();
 		REFCNT_METHODS(T)::incref(result);
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_dec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		return result;
 	}
@@ -276,7 +276,7 @@ template<class T> struct xatomic_ref {
 		pflag_t was;
 		was = PREEMPTION_PUSHOFF();
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchinc(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_inc(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		COMPILER_READ_BARRIER();
 		result = this->m_pointer;
@@ -284,7 +284,7 @@ template<class T> struct xatomic_ref {
 		if (result)
 			REFCNT_METHODS(T)::incref(result);
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_dec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		PREEMPTION_POP(was);
 		return result;
@@ -294,7 +294,7 @@ template<class T> struct xatomic_ref {
 	__CXX_CLASSMEMBER NOBLOCK ATTR_LEAF WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT {
 		REF T *result;
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchinc(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_inc(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		COMPILER_READ_BARRIER();
 		result = this->m_pointer;
@@ -302,7 +302,7 @@ template<class T> struct xatomic_ref {
 		if (result)
 			REFCNT_METHODS(T)::incref(result);
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_dec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		return result;
 	}
@@ -478,7 +478,7 @@ template<class T> struct xatomic_weaklyref {
 		pflag_t was;
 		was = PREEMPTION_PUSHOFF();
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchinc(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_inc(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		COMPILER_READ_BARRIER();
 		result = this->m_pointer;
@@ -486,7 +486,7 @@ template<class T> struct xatomic_weaklyref {
 		if (result && !REFCNT_METHODS(T)::tryincref(result))
 			result = __NULLPTR;
 #ifndef CONFIG_NO_SMP
-		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
+		__hybrid_atomic_dec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
 		PREEMPTION_POP(was);
 		return result;

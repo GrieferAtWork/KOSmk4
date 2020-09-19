@@ -1808,7 +1808,7 @@ handle_tryclose_symolic(unsigned int fd)
 		v->v_drives[id] = NULL;
 		if (oldp) {
 			assert(oldp->p_isdrive != 0);
-			ATOMIC_FETCHDEC(oldp->p_isdrive);
+			ATOMIC_DEC(oldp->p_isdrive);
 		}
 		sync_endwrite(&v->v_drives_lock);
 		if unlikely(!oldp)
@@ -1924,12 +1924,12 @@ handle_installinto_sym(unsigned int dst_fd, struct handle const *__restrict hnd)
 			decref(p);
 			RETHROW();
 		}
-		ATOMIC_FETCHINC(p->p_isdrive);
+		ATOMIC_INC(p->p_isdrive);
 		oldp = v->v_drives[id];
 		v->v_drives[id] = p; /* Inherit reference */
 		if (oldp) {
 			assert(oldp->p_isdrive != 0);
-			ATOMIC_FETCHDEC(oldp->p_isdrive);
+			ATOMIC_DEC(oldp->p_isdrive);
 		}
 		sync_endread(&v->v_drives_lock);
 		xdecref(oldp);

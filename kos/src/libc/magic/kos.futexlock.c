@@ -157,8 +157,10 @@ $ssize_t futexlock_wake([[nonnull]] lfutex_t *ulockaddr, $size_t max_wake) {
 [[impl_include("<hybrid/__atomic.h>", "<kos/bits/futex.h>")]]
 [[userimpl, requires_function(futex_wakeall)]]
 $ssize_t futexlock_wakeall([[nonnull]] lfutex_t *ulockaddr) {
+@@pp_ifndef __OPTIMIZE_SIZE__@@
 	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
+@@pp_endif@@
 	if (!(__hybrid_atomic_fetchand(*ulockaddr, ~LFUTEX_WAIT_LOCK_WAITERS, __ATOMIC_SEQ_CST) & LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
 	return futex_wakeall(ulockaddr);

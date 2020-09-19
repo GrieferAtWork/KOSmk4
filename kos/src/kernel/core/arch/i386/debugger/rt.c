@@ -263,7 +263,7 @@ again:
 			unsigned int index;
 			mask  = (u8)1 << (job.ai_vector % 8);
 			index = job.ai_vector / 8;
-			ATOMIC_FETCHOR(sender_ammend->dca_intr[index], mask);
+			ATOMIC_OR(sender_ammend->dca_intr[index], mask);
 		}
 		did_something = true;
 	}
@@ -403,7 +403,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 
 	/* Restore the old state of the KEEPCORE flag. */
 	if (!(ammend.dca_taskflags & TASK_FKEEPCORE))
-		ATOMIC_FETCHAND(ammend.dca_thread->t_flags, ~TASK_FKEEPCORE);
+		ATOMIC_AND(ammend.dca_thread->t_flags, ~TASK_FKEEPCORE);
 
 	/* Restore the previous override. */
 	ammend.dca_cpu->c_override = ammend.dca_override;
@@ -666,7 +666,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		x86_dbg_hostbackup.dhs_taskflags = ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
 		initok |= INITOK_TASKFLAGS;
 	} else {
-		ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
+		ATOMIC_OR(mythread->t_flags, TASK_FKEEPCORE);
 	}
 	if (!(initok & INITOK_PSP0)) {
 		x86_save_psp0(mycpu, mythread);
@@ -965,7 +965,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 
 	/* Re-configure the hosting cpu/thread */
 	mythread->t_self = mythread;
-	ATOMIC_FETCHOR(mythread->t_flags, TASK_FKEEPCORE);
+	ATOMIC_OR(mythread->t_flags, TASK_FKEEPCORE);
 	mycpu->c_override = mythread;
 	x86_init_psp0(mycpu, mythread);
 	pertask_readlocks_init(mythread);
@@ -1062,7 +1062,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 		mythread->t_self = x86_dbg_hostbackup.dhs_taskself;
 	if (initok & INITOK_TASKFLAGS) {
 		if (!(x86_dbg_hostbackup.dhs_taskflags & TASK_FKEEPCORE))
-			ATOMIC_FETCHAND(mythread->t_flags, ~TASK_FKEEPCORE);
+			ATOMIC_AND(mythread->t_flags, ~TASK_FKEEPCORE);
 	}
 	if (initok & INITOK_PSP0)
 		x86_load_psp0(mycpu, mythread);

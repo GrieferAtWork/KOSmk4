@@ -85,14 +85,14 @@ LOCAL WUNUSED NONNULL((1)) /*nullable*/ REF void *
 NOTHROW(FCALL sct_entry_getref)(struct sct_entry *__restrict self) {
 	REF void *result;
 	PREEMPTION_DISABLE();
-	IF_SMP(ATOMIC_FETCHINC(self->te_inuse));
+	IF_SMP(ATOMIC_INC(self->te_inuse));
 	COMPILER_READ_BARRIER();
 	result = self->te_object;
 	COMPILER_READ_BARRIER();
 	/* Try to acquire a reference. */
 	if (likely(result) && unlikely(!(*handle_type_db.h_tryincref[self->te_obtype])(result)))
 		result = NULL;
-	IF_SMP(ATOMIC_FETCHDEC(self->te_inuse));
+	IF_SMP(ATOMIC_DEC(self->te_inuse));
 	PREEMPTION_ENABLE();
 	return result;
 }

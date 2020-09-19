@@ -657,7 +657,7 @@ inode_loadattr(struct inode *__restrict self)
 	if likely(!(ATOMIC_READ(self->i_flags) & INODE_FATTRLOADED)) {
 		(*self->i_type->it_attr.a_loadattr)(self);
 		/* Set the attributes-loaded flag. */
-		ATOMIC_FETCHOR(self->i_flags, INODE_FATTRLOADED);
+		ATOMIC_OR(self->i_flags, INODE_FATTRLOADED);
 	}
 }
 
@@ -819,7 +819,7 @@ inode_loadattr_and_check_deleted(struct inode *__restrict self,
 	if likely(!(ATOMIC_READ(self->i_flags) & INODE_FATTRLOADED)) {
 		(*self->i_type->it_attr.a_loadattr)(self);
 		/* Set the attributes-loaded flag. */
-		ATOMIC_FETCHOR(self->i_flags, INODE_FATTRLOADED);
+		ATOMIC_OR(self->i_flags, INODE_FATTRLOADED);
 	}
 }
 
@@ -976,14 +976,14 @@ inode_chmod(struct inode *__restrict self,
 		assert(!(new_mode & ~07777));
 		if (old_mode != new_mode) {
 			/* Set the new file mode. */
-			ATOMIC_FETCHAND(self->i_filemode, ~07777);
-			ATOMIC_FETCHOR(self->i_filemode, new_mode);
+			OATOMIC_AND(self->i_filemode, ~07777, __ATOMIC_RELAXED);
+			OATOMIC_OR(self->i_filemode, new_mode, __ATOMIC_RELAXED);
 			/* Mask unsupported bits if necessary. */
 			if (tp_self->it_attr.a_maskattr) {
 				(*tp_self->it_attr.a_maskattr)(self);
 				if ((self->i_filemode & 07777) != new_mode) {
-					ATOMIC_FETCHAND(self->i_filemode, ~07777);
-					ATOMIC_FETCHOR(self->i_filemode, old_mode);
+					OATOMIC_AND(self->i_filemode, ~07777, __ATOMIC_RELAXED);
+					OATOMIC_OR(self->i_filemode, old_mode, __ATOMIC_RELAXED);
 					THROW(E_FSERROR_UNSUPPORTED_OPERATION,
 					      (uintptr_t)E_FILESYSTEM_OPERATION_ATTRIB);
 				}
@@ -1053,7 +1053,7 @@ inode_chown(struct inode *__restrict self,
 				} else {
 					mask = ~(S_ISUID);
 				}
-				ATOMIC_FETCHAND(self->i_filemode, mask);
+				ATOMIC_AND(self->i_filemode, mask);
 				new_mode &= mask;
 			}
 			self->i_fileuid = owner;
@@ -1427,7 +1427,7 @@ directory_readnext_p(struct directory_node *__restrict self)
 	/* Make sure that we've got a readdir() operator to work with. */
 	if unlikely(!self->i_type->it_directory.d_readdir) {
 set_unimplemented:
-		ATOMIC_FETCHOR(self->i_flags, INODE_FDIRLOADED);
+		ATOMIC_OR(self->i_flags, INODE_FDIRLOADED);
 		return NULL;
 	}
 continue_reading:
@@ -1453,7 +1453,7 @@ continue_reading:
 	if (!result) {
 		/* End of directory. (Set the flag for that) */
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
-		ATOMIC_FETCHOR(self->i_flags, INODE_FDIRLOADED);
+		ATOMIC_OR(self->i_flags, INODE_FDIRLOADED);
 		return NULL;
 	}
 	assert(result->de_namelen != 0);
@@ -1556,7 +1556,7 @@ directory_readnext(struct directory_node *__restrict self)
 	/* Make sure that we've got a readdir() operator to work with. */
 	if unlikely(!self->i_type->it_directory.d_readdir) {
 set_unimplemented:
-		ATOMIC_FETCHOR(self->i_flags, INODE_FDIRLOADED);
+		ATOMIC_OR(self->i_flags, INODE_FDIRLOADED);
 		return NULL;
 	}
 continue_reading:
@@ -1582,7 +1582,7 @@ continue_reading:
 	if (!result) {
 		/* End of directory. (Set the flag for that) */
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
-		ATOMIC_FETCHOR(self->i_flags, INODE_FDIRLOADED);
+		ATOMIC_OR(self->i_flags, INODE_FDIRLOADED);
 		return NULL;
 	}
 	assert(result->de_namelen != 0);
@@ -2186,7 +2186,7 @@ NOTHROW(KCALL superblock_delete_inode)(struct superblock *__restrict super,
 		error = inode_try_remove_from_superblock_changed(self);
 		if (error != INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_REMOVED)
 			return;
-		ATOMIC_FETCHAND(self->i_flags, ~(INODE_FCHANGED | INODE_FATTRCHANGED));
+		ATOMIC_AND(self->i_flags, ~(INODE_FCHANGED | INODE_FATTRCHANGED));
 		decref_nokill(self); /* The reference contained in the changed-inode list. */
 	}
 	if (superblock_nodeslock_trywrite(super)) {
@@ -2735,7 +2735,7 @@ acquire_sourcedir_writelock:
 								        target_inode->i_fileino, source_inode->i_fileino);
 								assert(!(ATOMIC_READ(source_inode->i_flags) & (INODE_FCHANGED | INODE_FATTRCHANGED)));
 								/* Remove the old node from the superblock's file-tree, and replace it with the new one. */
-								ATOMIC_FETCHOR(source_inode->i_flags, INODE_FDELETED);
+								ATOMIC_OR(source_inode->i_flags, INODE_FDELETED);
 								delnode = inode_tree_remove(&super->s_nodes, source_inode->i_fileino);
 								if (unlikely(delnode != source_inode) && delnode)
 									inode_tree_insert(&super->s_nodes, delnode);
@@ -3449,7 +3449,7 @@ superblock_set_unmounted_impl(struct superblock *__restrict self)
 		/* Undo what we did so far. */
 		assert(self->s_nodes != NULL);
 		inode_unset_closed_tree(self->s_nodes);
-		ATOMIC_FETCHAND(self->s_flags, ~SUPERBLOCK_FUNMOUNTED);
+		ATOMIC_AND(self->s_flags, ~SUPERBLOCK_FUNMOUNTED);
 		RETHROW();
 	}
 	assert(self->s_nodes);

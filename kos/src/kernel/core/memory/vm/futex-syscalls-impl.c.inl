@@ -154,9 +154,9 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		do {                                                        \
 			COMPILER_WRITE_BARRIER();                               \
 			if likely(!mask_or) {                                   \
-				ATOMIC_FETCHAND(*uaddr, mask_and);                  \
+				ATOMIC_AND(*uaddr, mask_and);                       \
 			} else if (mask_and == (FUNC(lfutex_t))-1) {            \
-				ATOMIC_FETCHOR(*uaddr, mask_or);                    \
+				ATOMIC_OR(*uaddr, mask_or);                         \
 			} else {                                                \
 				FUNC(lfutex_t) _oldval;                             \
 				do {                                                \

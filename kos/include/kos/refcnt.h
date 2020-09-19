@@ -258,7 +258,7 @@ public:
 		}                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(incref))(T *__restrict __self) {          \
-			__hybrid_atomic_fetchinc(__self->field, __ATOMIC_SEQ_CST);                               \
+			__hybrid_atomic_inc(__self->field, __ATOMIC_SEQ_CST);                                    \
 		}                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL              \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(tryincref))(T *__restrict __self) {       \
@@ -309,7 +309,7 @@ public:
 		}                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(incref))(T *__restrict __self) {          \
-			__hybrid_atomic_fetchinc(getfield(__self), __ATOMIC_SEQ_CST);                            \
+			__hybrid_atomic_inc(getfield(__self), __ATOMIC_SEQ_CST);                                 \
 		}                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL              \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(tryincref))(T *__restrict __self) {       \
@@ -360,7 +360,7 @@ public:
 		}                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(incref))(T *__restrict __self) {          \
-			__hybrid_atomic_fetchinc(__self->field, __ATOMIC_SEQ_CST);                               \
+			__hybrid_atomic_inc(__self->field, __ATOMIC_SEQ_CST);                                    \
 		}                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL              \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(tryincref))(T *__restrict __self) {       \
@@ -411,7 +411,7 @@ public:
 		}                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) void                \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(incref))(T *__restrict __self) {          \
-			__hybrid_atomic_fetchinc(getfield(__self), __ATOMIC_SEQ_CST);                            \
+			__hybrid_atomic_inc(getfield(__self), __ATOMIC_SEQ_CST);                                 \
 		}                                                                                            \
 		static __CXX_FORCEINLINE __ATTR_ARTIFICIAL __NOBLOCK __ATTR_NONNULL((1)) __BOOL              \
 		__REFCNT_NOTHROW(__REFCNT_CC __PRIVATE_REFCNT_NAME(tryincref))(T *__restrict __self) {       \

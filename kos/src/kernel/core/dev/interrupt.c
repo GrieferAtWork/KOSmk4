@@ -79,7 +79,7 @@ NOTHROW(KCALL hisr_getref_nopr)(struct hisr *__restrict self) {
 	assert(!PREEMPTION_ENABLED());
 	/* Try to acquire a reference to the handle object. */
 #ifndef CONFIG_NO_SMP
-	ATOMIC_FETCHINC(self->hi_inuse);
+	ATOMIC_INC(self->hi_inuse);
 #endif /* !CONFIG_NO_SMP */
 	COMPILER_READ_BARRIER();
 	obj = self->hi_obj;
@@ -88,7 +88,7 @@ NOTHROW(KCALL hisr_getref_nopr)(struct hisr *__restrict self) {
 	if (likely(obj) && unlikely(!(*handle_type_db.h_tryincref[self->hi_typ])(obj)))
 		obj = NULL;
 #ifndef CONFIG_NO_SMP
-	ATOMIC_FETCHDEC(self->hi_inuse);
+	ATOMIC_DEC(self->hi_inuse);
 #endif /* !CONFIG_NO_SMP */
 	return obj;
 }
@@ -1141,11 +1141,11 @@ NOTHROW(KCALL isr_vector_trigger_impl)(size_t index) {
 	assert(self);
 	for (i = 0; i < self->ivs_handc; ++i) {
 		if (!(*self->ivs_handv[i].ivh_fun)(self->ivs_handv[i].ivh_arg)) {
-			ATOMIC_FETCHINC(self->ivs_handv[i].ivh_mis);
+			ATOMIC_INC(self->ivs_handv[i].ivh_mis);
 			continue;
 		}
 		/* Handler successfully invoked. */
-		ATOMIC_FETCHINC(self->ivs_handv[i].ivh_hit);
+		ATOMIC_INC(self->ivs_handv[i].ivh_hit);
 		if unlikely_untraced(i != 0) { /* Don't trace, since this should be kept as unlikely! */
 			/* Check if our hit/miss ratio is now greater than that of i-1
 			 * If so, try to allocate a new vector state with a more optimized handler order. */
@@ -1168,11 +1168,11 @@ NOTHROW(KCALL isr_vector_trigger_impl)(size_t index) {
 	/* Fallback: Invoke the greedy handler (if defined). */
 	if (self->ivs_greedy_drv) {
 		(*self->ivs_greedy_fun)(self->ivs_greedy_arg);
-		ATOMIC_FETCHINC(self->ivs_greedy_cnt);
+		ATOMIC_INC(self->ivs_greedy_cnt);
 		decref_unlikely(self);
 		return true;
 	}
-	ATOMIC_FETCHINC(self->ivs_unhandled);
+	ATOMIC_INC(self->ivs_unhandled);
 	decref_unlikely(self);
 	return false;
 }

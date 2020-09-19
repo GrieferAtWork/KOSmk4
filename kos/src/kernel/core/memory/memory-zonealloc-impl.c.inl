@@ -116,9 +116,9 @@ again_word_i:
 						if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~page_mask))
 							goto again_word_i;
 						assert(POPCOUNT(page_mask) == 1);
-						ATOMIC_FETCHDEC(self->mz_cfree);
+						ATOMIC_DEC(self->mz_cfree);
 						if (word & (page_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
-							ATOMIC_FETCHDEC(self->mz_qfree);
+							ATOMIC_DEC(self->mz_qfree);
 					}
 #ifdef ALLOC_MINMAX
 					*res_pages = 1;

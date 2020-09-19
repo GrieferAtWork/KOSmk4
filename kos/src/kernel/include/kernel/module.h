@@ -277,7 +277,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 
 /* Module section reference count control. */
 #define module_section_incref(self, typ) \
-	(void)__hybrid_atomic_fetchinc(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_inc(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)
 #define module_section_decref(self, typ)                                                    \
 	(void)(__hybrid_atomic_decfetch(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST) || \
 	       (module_section_destroy(self, typ), 0))
@@ -288,7 +288,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 	(void)(likely(__hybrid_atomic_decfetch(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)) || \
 	       (module_section_destroy(self, typ), 0))
 #define module_section_decref_nokill(self, typ) \
-	(void)__hybrid_atomic_decfetch(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_dec(_module_section_refcnt(self, typ), __ATOMIC_SEQ_CST)
 #define module_section_xincref(self, typ)          (void)(!(self) || (module_section_incref(self, typ), 0))
 #define module_section_xdecref(self, typ)          (void)(!(self) || (module_section_decref(self, typ), 0))
 #define module_section_xdecref_likely(self, typ)   (void)(!(self) || (module_section_decref_likely(self, typ), 0))
@@ -296,7 +296,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 
 /* Module reference count control. */
 #define module_incref(self, typ) \
-	(void)__hybrid_atomic_fetchinc(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_inc(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)
 #define module_decref(self, typ)                                                    \
 	(void)(__hybrid_atomic_decfetch(_module_refcnt(self, typ), __ATOMIC_SEQ_CST) || \
 	       (module_destroy(self, typ), 0))
@@ -307,7 +307,7 @@ NOTHROW(module_locksection_nx)(module_t *__restrict self, module_type_t typ,
 	(void)(likely(__hybrid_atomic_decfetch(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)) || \
 	       (module_destroy(self, typ), 0))
 #define module_decref_nokill(self, typ) \
-	(void)__hybrid_atomic_decfetch(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)
+	__hybrid_atomic_dec(_module_refcnt(self, typ), __ATOMIC_SEQ_CST)
 #define module_xincref(self, typ)          (void)(!(self) || (module_incref(self, typ), 0))
 #define module_xdecref(self, typ)          (void)(!(self) || (module_decref(self, typ), 0))
 #define module_xdecref_likely(self, typ)   (void)(!(self) || (module_decref_likely(self, typ), 0))

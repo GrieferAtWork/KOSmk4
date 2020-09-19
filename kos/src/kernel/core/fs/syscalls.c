@@ -3085,7 +3085,7 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 			}
 		}
 #else /* CONFIG_HAVE_USERPROCMASK */
-		ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FVFORK);
+		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FVFORK);
 #endif /* !CONFIG_HAVE_USERPROCMASK */
 		{
 			struct taskpid *mypid = THIS_TASKPID;

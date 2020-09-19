@@ -64,9 +64,9 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL ps2_keyboard_do_handle_isr)(struct ps2_keyboard *__restrict self) {
 	u8 data = inb(PS2_DATA);
 	if (data == 0xfa)
-		ATOMIC_FETCHOR(self->pk_errors, PS2_KEYBOARD_ERROR_ACK);
+		ATOMIC_OR(self->pk_errors, PS2_KEYBOARD_ERROR_ACK);
 	else if (data == 0xfe)
-		ATOMIC_FETCHOR(self->pk_errors, PS2_KEYBOARD_ERROR_RESEND);
+		ATOMIC_OR(self->pk_errors, PS2_KEYBOARD_ERROR_RESEND);
 	else {
 		u16 key;
 		switch (self->pk_state) {

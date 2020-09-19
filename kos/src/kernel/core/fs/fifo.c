@@ -87,16 +87,16 @@ fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
 		require(CAP_PIPE_CREATE_WRAPPERS);
 		temp.h_type = HANDLE_TYPE_PIPE_READER;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_RDONLY;
-		ATOMIC_FETCHINC(self->p_rdcnt); /* Prevent the PIPE from being closed on error */
+		ATOMIC_INC(self->p_rdcnt); /* Prevent the PIPE from being closed on error */
 		TRY {
 			temp.h_data = pipe_reader_create(self);
 			FINALLY_DECREF((struct pipe_reader *)temp.h_data);
 			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 		} EXCEPT {
-			ATOMIC_FETCHDEC(self->p_rdcnt);
+			ATOMIC_DEC(self->p_rdcnt);
 			RETHROW();
 		}
-		ATOMIC_FETCHDEC(self->p_rdcnt);
+		ATOMIC_DEC(self->p_rdcnt);
 		return result;
 	}	break;
 
@@ -106,16 +106,16 @@ fifo_hop(struct fifo_node *__restrict self, syscall_ulong_t cmd,
 		require(CAP_PIPE_CREATE_WRAPPERS);
 		temp.h_type = HANDLE_TYPE_PIPE_WRITER;
 		temp.h_mode = (mode & ~IO_ACCMODE) | IO_WRONLY;
-		ATOMIC_FETCHINC(self->p_wrcnt); /* Prevent the PIPE from being closed on error */
+		ATOMIC_INC(self->p_wrcnt); /* Prevent the PIPE from being closed on error */
 		TRY {
 			temp.h_data = pipe_writer_create(self);
 			FINALLY_DECREF((struct pipe_writer *)temp.h_data);
 			result = handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 		} EXCEPT {
-			ATOMIC_FETCHDEC(self->p_wrcnt);
+			ATOMIC_DEC(self->p_wrcnt);
 			RETHROW();
 		}
-		ATOMIC_FETCHDEC(self->p_wrcnt);
+		ATOMIC_DEC(self->p_wrcnt);
 		return result;
 	}	break;
 #endif

@@ -131,6 +131,22 @@ typedef u64 atomic64_t;
 #define atomic64_fetchxor(self, value) \
 	__hybrid_atomic_fetchxor(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
+/* Atomically add a 64-bit data word from `self' */
+#define atomic64_add(self, value) \
+	__hybrid_atomic_add(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+
+/* Atomically and a 64-bit data word from `self' */
+#define atomic64_and(self, value) \
+	__hybrid_atomic_and(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+
+/* Atomically or a 64-bit data word from `self' */
+#define atomic64_or(self, value) \
+	__hybrid_atomic_or(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+
+/* Atomically xor a 64-bit data word from `self' */
+#define atomic64_xor(self, value) \
+	__hybrid_atomic_xor(__atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
+
 #else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 
 /* Atomically read a 64-bit data word from `self' */
@@ -156,20 +172,36 @@ FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
 NOTHROW(FCALL atomic64_xch)(atomic64_t *__restrict self, u64 value);
 
 /* Atomically fetch-and-add a 64-bit data word from `self' */
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+FUNDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchadd)(atomic64_t *__restrict self, u64 value);
 
 /* Atomically fetch-and-and a 64-bit data word from `self' */
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+FUNDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchand)(atomic64_t *__restrict self, u64 value);
 
 /* Atomically fetch-and-or a 64-bit data word from `self' */
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+FUNDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchor)(atomic64_t *__restrict self, u64 value);
 
 /* Atomically fetch-and-xor a 64-bit data word from `self' */
-FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) u64
+FUNDEF NOBLOCK ATTR_LEAF WUNUSED NONNULL((1)) u64
 NOTHROW(FCALL atomic64_fetchxor)(atomic64_t *__restrict self, u64 value);
+
+/* Atomically add a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) void
+NOTHROW(FCALL atomic64_add)(atomic64_t *__restrict self, u64 value);
+
+/* Atomically and a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) void
+NOTHROW(FCALL atomic64_and)(atomic64_t *__restrict self, u64 value);
+
+/* Atomically or a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) void
+NOTHROW(FCALL atomic64_or)(atomic64_t *__restrict self, u64 value);
+
+/* Atomically xor a 64-bit data word from `self' */
+FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) void
+NOTHROW(FCALL atomic64_xor)(atomic64_t *__restrict self, u64 value);
 #endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
 #endif /* !ARCH_ATOMIC64_HAVE_PROTOTYPES */
 

@@ -178,7 +178,7 @@ handle_iob_access(struct cpu *__restrict mycpu,
 			}
 		} else {
 			iob = incref(&ioperm_bitmap_empty);
-			ATOMIC_FETCHINC(iob->ib_share);
+			ATOMIC_INC(iob->ib_share);
 		}
 		/* NOTE: The following line causes an inconsistency that is fixed by
 		 *       assigning `FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob'
@@ -222,7 +222,7 @@ handle_iob_access(struct cpu *__restrict mycpu,
 				        ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)));
 			}
 			PERTASK_SET(this_x86_ioperm_bitmap, cow);
-			ATOMIC_FETCHDEC(iob->ib_share);
+			ATOMIC_DEC(iob->ib_share);
 			decref(iob);
 			return false;
 		}
@@ -231,7 +231,7 @@ handle_iob_access(struct cpu *__restrict mycpu,
 		 *       below. Because preemption is currently off, this inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, cow);
-		ATOMIC_FETCHDEC(iob->ib_share);
+		ATOMIC_DEC(iob->ib_share);
 		decref(iob);
 		iob = cow;
 	}

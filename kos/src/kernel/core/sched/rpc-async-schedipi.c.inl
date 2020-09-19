@@ -87,7 +87,7 @@ NOTHROW(FCALL FUNC(ipi_schedule_asynchronous_rpc))(struct icpustate *__restrict 
 		struct task *next;
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
-		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+		ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 			assert(target == &FORCPU(mycpu, thiscpu_idle));
@@ -100,7 +100,7 @@ NOTHROW(FCALL FUNC(ipi_schedule_asynchronous_rpc))(struct icpustate *__restrict 
 		target->t_sched.s_running.sr_runnxt = next;
 		caller->t_sched.s_running.sr_runnxt = target;
 		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+		ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(target);
 	}
 #elif defined(DEFINE_SCHEDIPI_RPC_HP) || defined(DEFINE_SCHEDIPI_RPC)
@@ -117,7 +117,7 @@ insert_target_after_caller:
 		target->t_sched.s_running.sr_runnxt = next;
 		caller->t_sched.s_running.sr_runnxt = target;
 		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+		ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(target);
 #ifdef DEFINE_SCHEDIPI_RPC_HP
 		mycpu->c_current = target;
@@ -126,7 +126,7 @@ insert_target_after_caller:
 	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
-		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+		ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 			assert(target == &FORCPU(mycpu, thiscpu_idle));
@@ -179,7 +179,7 @@ NOTHROW(FCALL FUNC(ipi_redirect_usercode_rpc))(struct icpustate *__restrict stat
 		struct task *next;
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
-		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+		ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 			assert(target == &FORCPU(mycpu, thiscpu_idle));
@@ -192,7 +192,7 @@ NOTHROW(FCALL FUNC(ipi_redirect_usercode_rpc))(struct icpustate *__restrict stat
 		target->t_sched.s_running.sr_runnxt = next;
 		caller->t_sched.s_running.sr_runnxt = target;
 		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+		ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(target);
 	}
 #elif defined(DEFINE_SCHEDIPI_RPC_HP) || defined(DEFINE_SCHEDIPI_RPC)
@@ -210,7 +210,7 @@ insert_target_after_caller:
 			target->t_sched.s_running.sr_runnxt = next;
 			caller->t_sched.s_running.sr_runnxt = target;
 			next->t_sched.s_running.sr_runprv   = target;
-			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 			cpu_assert_running(target);
 #ifdef DEFINE_SCHEDIPI_RPC_HP
 			mycpu->c_current = target;
@@ -221,7 +221,7 @@ insert_target_after_caller:
 	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
-		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+		ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 			assert(target == &FORCPU(mycpu, thiscpu_idle));

@@ -96,14 +96,14 @@ LOCAL WUNUSED NONNULL((1)) /*nullable*/ REF void *
 NOTHROW(FCALL aworker_getref)(struct aworker *__restrict self) {
 	REF void *result;
 	PREEMPTION_DISABLE();
-	IF_SMP(ATOMIC_FETCHINC(self->aw_inuse));
+	IF_SMP(ATOMIC_INC(self->aw_inuse));
 	COMPILER_READ_BARRIER();
 	result = self->aw_obj;
 	COMPILER_READ_BARRIER();
 	/* Try to acquire a reference. */
 	if (likely(result) && unlikely(!(*handle_type_db.h_tryincref[self->aw_typ])(result)))
 		result = NULL;
-	IF_SMP(ATOMIC_FETCHDEC(self->aw_inuse));
+	IF_SMP(ATOMIC_DEC(self->aw_inuse));
 	PREEMPTION_ENABLE();
 	return result;
 }
@@ -299,13 +299,13 @@ again:
 			w = workers->av_workv[i];
 			assert(w->aw_cb.awc_test);
 			PREEMPTION_DISABLE();
-			IF_SMP(ATOMIC_FETCHINC(w->aw_inuse));
+			IF_SMP(ATOMIC_INC(w->aw_inuse));
 			COMPILER_READ_BARRIER();
 			obj = w->aw_obj;
 			COMPILER_READ_BARRIER();
 			if unlikely(!obj) {
 				unsigned int error;
-				IF_SMP(ATOMIC_FETCHDEC(w->aw_inuse));
+				IF_SMP(ATOMIC_DEC(w->aw_inuse));
 				PREEMPTION_ENABLE();
 				error = try_delete_async_worker(workers, i, GFP_NORMAL);
 				if (error == TRY_DELETE_ASYNC_WORKER_SUCCESS ||
@@ -317,11 +317,11 @@ again:
 			}
 			/* Try to acquire a reference. */
 			if unlikely(!(*handle_type_db.h_tryincref[w->aw_typ])(obj)) {
-				IF_SMP(ATOMIC_FETCHDEC(w->aw_inuse));
+				IF_SMP(ATOMIC_DEC(w->aw_inuse));
 				PREEMPTION_ENABLE();
 				continue; /* Skip dead objects. */
 			}
-			IF_SMP(ATOMIC_FETCHDEC(w->aw_inuse));
+			IF_SMP(ATOMIC_DEC(w->aw_inuse));
 			PREEMPTION_ENABLE();
 			assert(!task_isconnected());
 			if (aworker_calltest(w, obj)) {
@@ -341,13 +341,13 @@ again:
 			REF void *obj;
 			w = workers->av_workv[i];
 			PREEMPTION_DISABLE();
-			IF_SMP(ATOMIC_FETCHINC(w->aw_inuse));
+			IF_SMP(ATOMIC_INC(w->aw_inuse));
 			COMPILER_READ_BARRIER();
 			obj = w->aw_obj;
 			COMPILER_READ_BARRIER();
 			if unlikely(!obj) {
 				unsigned int error;
-				IF_SMP(ATOMIC_FETCHDEC(w->aw_inuse));
+				IF_SMP(ATOMIC_DEC(w->aw_inuse));
 				PREEMPTION_ENABLE();
 				error = try_delete_async_worker(workers, i, GFP_NORMAL);
 				if (error == TRY_DELETE_ASYNC_WORKER_SUCCESS ||
@@ -359,11 +359,11 @@ again:
 			}
 			/* Try to acquire a reference. */
 			if unlikely(!(*handle_type_db.h_tryincref[w->aw_typ])(obj)) {
-				IF_SMP(ATOMIC_FETCHDEC(w->aw_inuse));
+				IF_SMP(ATOMIC_DEC(w->aw_inuse));
 				PREEMPTION_ENABLE();
 				continue; /* Skip dead objects. */
 			}
-			IF_SMP(ATOMIC_FETCHDEC(w->aw_inuse));
+			IF_SMP(ATOMIC_DEC(w->aw_inuse));
 			PREEMPTION_ENABLE();
 			if (aworker_callpoll(w, obj)) {
 				/* Service this worker. */

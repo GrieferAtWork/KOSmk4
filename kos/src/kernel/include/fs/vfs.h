@@ -789,8 +789,8 @@ struct vfs
 };
 
 /* Increment/decrement the `v_fscount' reference counter. */
-#define vfs_inc_fscount(x) (__hybrid_atomic_fetchinc((x)->v_fscount, __ATOMIC_SEQ_CST))
-#define vfs_dec_fscount(x) (__hybrid_atomic_decfetch((x)->v_fscount, __ATOMIC_SEQ_CST) || (vfs_clearmounts(x), 0))
+#define vfs_inc_fscount(x) __hybrid_atomic_inc((x)->v_fscount, __ATOMIC_SEQ_CST)
+#define vfs_dec_fscount(x) (void)(__hybrid_atomic_decfetch((x)->v_fscount, __ATOMIC_SEQ_CST) || (vfs_clearmounts(x), 0))
 
 /* Called when `v_fscount' reaches ZERO(0): Clear all remaining mounting points.
  * NOTE: This function also sets `v_mount' to `VFS_MOUNT_ILLEGAL'. */

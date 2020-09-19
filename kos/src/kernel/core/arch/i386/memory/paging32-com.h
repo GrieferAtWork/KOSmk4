@@ -99,7 +99,7 @@ PRIVATE ATTR_WRITEMOSTLY WEAK uintptr_t x86_pagedir_prepare_version = 0;
 	do {                                                              \
 		was = PREEMPTION_PUSHOFF();                                   \
 		if likely(atomic_rwlock_tryread(&x86_pagedir_prepare_lock)) { \
-			ATOMIC_FETCHINC(x86_pagedir_prepare_version);             \
+			ATOMIC_INC(x86_pagedir_prepare_version);                  \
 			break;                                                    \
 		}                                                             \
 		PREEMPTION_POP(was);                                          \

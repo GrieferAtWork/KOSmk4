@@ -1363,9 +1363,9 @@ socket_setsockopt(struct socket *__restrict self,
 			if (optlen != sizeof(int))
 				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
 			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
-				ATOMIC_FETCHOR(self->sk_msgflags, MSG_NOSIGNAL);
+				ATOMIC_OR(self->sk_msgflags, MSG_NOSIGNAL);
 			} else {
-				ATOMIC_FETCHAND(self->sk_msgflags, ~MSG_NOSIGNAL);
+				ATOMIC_AND(self->sk_msgflags, ~MSG_NOSIGNAL);
 			}
 			return;
 
@@ -1373,9 +1373,9 @@ socket_setsockopt(struct socket *__restrict self,
 			if (optlen != sizeof(int))
 				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
 			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
-				ATOMIC_FETCHOR(self->sk_msgflags, MSG_DONTROUTE);
+				ATOMIC_OR(self->sk_msgflags, MSG_DONTROUTE);
 			} else {
-				ATOMIC_FETCHAND(self->sk_msgflags, ~MSG_DONTROUTE);
+				ATOMIC_AND(self->sk_msgflags, ~MSG_DONTROUTE);
 			}
 			return;
 
@@ -1383,9 +1383,9 @@ socket_setsockopt(struct socket *__restrict self,
 			if (optlen != sizeof(int))
 				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
 			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
-				ATOMIC_FETCHOR(self->sk_msgflags, MSG_OOB);
+				ATOMIC_OR(self->sk_msgflags, MSG_OOB);
 			} else {
-				ATOMIC_FETCHAND(self->sk_msgflags, ~MSG_OOB);
+				ATOMIC_AND(self->sk_msgflags, ~MSG_OOB);
 			}
 			break;
 
@@ -1393,9 +1393,9 @@ socket_setsockopt(struct socket *__restrict self,
 			if (optlen != sizeof(int))
 				THROW(E_BUFFER_TOO_SMALL, sizeof(int), optlen);
 			if (UNALIGNED_GET((USER CHECKED unsigned int *)optval)) {
-				ATOMIC_FETCHOR(self->sk_msgflags, MSG_DONTWAIT);
+				ATOMIC_OR(self->sk_msgflags, MSG_DONTWAIT);
 			} else {
-				ATOMIC_FETCHAND(self->sk_msgflags, ~MSG_DONTWAIT);
+				ATOMIC_AND(self->sk_msgflags, ~MSG_DONTWAIT);
 			}
 			break;
 

@@ -235,8 +235,11 @@ struct sighand {
 __DEFINE_SYNC_PROXY(struct sighand, sh_lock)
 
 FUNDEF NOBLOCK void NOTHROW(KCALL sighand_destroy)(struct sighand *__restrict self);
-#define sighand_incshare(self) __hybrid_atomic_incfetch((self)->sh_share, __ATOMIC_SEQ_CST)
-#define sighand_decshare(self) (__hybrid_atomic_decfetch((self)->sh_share, __ATOMIC_SEQ_CST) || (sighand_destroy(self), 0))
+#define sighand_incshare(self) \
+	__hybrid_atomic_inc((self)->sh_share, __ATOMIC_SEQ_CST)
+#define sighand_decshare(self)                                             \
+	(void)(__hybrid_atomic_decfetch((self)->sh_share, __ATOMIC_SEQ_CST) || \
+	       (sighand_destroy(self), 0))
 
 struct sighand_ptr {
 	/* Secondary indirection for sighand that allows

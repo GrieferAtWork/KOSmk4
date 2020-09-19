@@ -146,7 +146,7 @@ again:
 	if unlikely(total_size != ATOMIC_READ(dmesg_size))
 		goto again;
 	/* Subtract `rel_seconds' form all packet timestamps and add it to `dmesg_secondsbase' */
-	ATOMIC_FETCHINC(dmesg_consistent);
+	ATOMIC_INC(dmesg_consistent);
 	COMPILER_BARRIER();
 	read_offset  = oldest_packet_start;
 	write_offset = oldest_packet_start;
@@ -186,7 +186,7 @@ done:
 	dmesg_size = write_offset;
 	dmesg_secondsbase += seconds_diff;
 	COMPILER_BARRIER();
-	ATOMIC_FETCHDEC(dmesg_consistent);
+	ATOMIC_DEC(dmesg_consistent);
 }
 
 INTERN NOBLOCK void

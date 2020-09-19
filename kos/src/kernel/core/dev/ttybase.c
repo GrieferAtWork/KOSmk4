@@ -600,7 +600,7 @@ do_TCSETA: {
 		switch ((uintptr_t)arg) {
 
 		case TCOOFF:
-			ATOMIC_FETCHOR(me->t_term.t_ios.c_iflag, IXOFF);
+			ATOMIC_OR(me->t_term.t_ios.c_iflag, IXOFF);
 			break;
 
 		case TCOON:
@@ -609,7 +609,7 @@ do_TCSETA: {
 			break;
 
 		case TCIOFF:
-			ATOMIC_FETCHOR(me->t_term.t_ios.c_iflag, __IIOFF);
+			ATOMIC_OR(me->t_term.t_ios.c_iflag, __IIOFF);
 			break;
 
 		case TCION:
@@ -677,9 +677,9 @@ do_TCSETA: {
 		lcmode = *(USER CHECKED int *)arg;
 		COMPILER_READ_BARRIER();
 		if (lcmode) {
-			ATOMIC_FETCHOR(me->t_term.t_ios.c_cflag, CLOCAL);
+			ATOMIC_OR(me->t_term.t_ios.c_cflag, CLOCAL);
 		} else {
-			ATOMIC_FETCHAND(me->t_term.t_ios.c_cflag, ~CLOCAL);
+			ATOMIC_AND(me->t_term.t_ios.c_cflag, ~CLOCAL);
 		}
 	}	break;
 

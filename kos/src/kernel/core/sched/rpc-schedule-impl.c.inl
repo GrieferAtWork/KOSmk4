@@ -187,13 +187,13 @@ PUBLIC NONNULL((1, 2)) bool
 #ifdef RPC_USER
 	if (mode & TASK_USER_RPC_FINTR) {
 		if (mode & TASK_USER_RPC_FNOTHROW)
-			ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count_nx));
-		ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count));
+			ATOMIC_INC(FORTASK(target, this_rpc_pending_sync_count_nx));
+		ATOMIC_INC(FORTASK(target, this_rpc_pending_sync_count));
 	}
 #else /* RPC_USER */
 	if (mode & TASK_SYNC_RPC_FNOTHROW)
-		ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count_nx));
-	ATOMIC_FETCHINC(FORTASK(target, this_rpc_pending_sync_count));
+		ATOMIC_INC(FORTASK(target, this_rpc_pending_sync_count_nx));
+	ATOMIC_INC(FORTASK(target, this_rpc_pending_sync_count));
 #endif /* !RPC_USER */
 
 	/* At this point our RPC has been scheduled and

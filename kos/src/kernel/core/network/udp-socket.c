@@ -108,10 +108,10 @@ again:
 	TRY {
 		udp_autobind_impl(me);
 	} EXCEPT {
-		ATOMIC_FETCHAND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
+		ATOMIC_AND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
 		RETHROW();
 	}
-	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
+	ATOMIC_OR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -187,11 +187,11 @@ udp_bind(struct socket *__restrict self,
 		 *       evaluated to `0' (reminder: ffs(x) is FindFirstSet, such that
 		 *       `(x & (1 << ffs(x))) != 0' so-long as `x != 0') */
 	} EXCEPT {
-		ATOMIC_FETCHAND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
+		ATOMIC_AND(me->us_state, ~UDP_SOCKET_STATE_F_BINDING);
 		RETHROW();
 	}
 	/* Indicate that the socket has now been fully bound. */
-	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
+	ATOMIC_OR(me->us_state, UDP_SOCKET_STATE_F_BOUND);
 }
 
 
@@ -209,7 +209,7 @@ udp_connect(struct socket *__restrict self,
 	me->us_peerport      = in->sin_port;
 	COMPILER_BARRIER();
 	/* Mark the socket as having a peer */
-	ATOMIC_FETCHOR(me->us_state, UDP_SOCKET_STATE_F_HASPEER);
+	ATOMIC_OR(me->us_state, UDP_SOCKET_STATE_F_HASPEER);
 	/* The man page for ip(7) says that connect() will also
 	 * cause the socket to become bound to some local port. */
 	if unlikely(!(me->us_state & UDP_SOCKET_STATE_F_BOUND))

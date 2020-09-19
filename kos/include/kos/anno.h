@@ -68,10 +68,10 @@
 #elif defined(__INTELLISENSE__) && defined(__cplusplus)
 /* Highlight invalid use of this annotation in intellisense! */
 #undef __THROWS
-#define __THROWS(...) noexcept
+#define __THROWS(...) noexcept(false)
 #undef __THROWING
 #define __THROWING(...) (__VA_ARGS__) __PRIVATE_THROWING
-#define __PRIVATE_THROWING(...) (__VA_ARGS__) noexcept
+#define __PRIVATE_THROWING(...) (__VA_ARGS__) noexcept(false)
 #endif /* __clang_tidy__ && __cplusplus */
 
 

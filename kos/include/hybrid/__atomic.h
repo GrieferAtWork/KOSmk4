@@ -683,6 +683,32 @@ __INLINE_hybrid_atomic_fetchop_seqcst(fetchnand, __hybrid_opfun_nand)
 #define __hybrid_atomic_fetchdec(x, order) __hybrid_atomic_fetchsub(x, 1, order)
 #endif /* !__hybrid_atomic_decfetch */
 
+/* Same as the other operations, but these don't return anything */
+#ifndef __hybrid_atomic_inc
+#define __hybrid_atomic_inc(x, order) (void)__hybrid_atomic_fetchinc(x, order)
+#endif /* !__hybrid_atomic_inc */
+#ifndef __hybrid_atomic_dec
+#define __hybrid_atomic_dec(x, order) (void)__hybrid_atomic_fetchdec(x, order)
+#endif /* !__hybrid_atomic_dec */
+#ifndef __hybrid_atomic_add
+#define __hybrid_atomic_add(x, v, order) (void)__hybrid_atomic_fetchadd(x, v, order)
+#endif /* !__hybrid_atomic_add */
+#ifndef __hybrid_atomic_sub
+#define __hybrid_atomic_sub(x, v, order) (void)__hybrid_atomic_fetchsub(x, v, order)
+#endif /* !__hybrid_atomic_sub */
+#ifndef __hybrid_atomic_and
+#define __hybrid_atomic_and(x, v, order) (void)__hybrid_atomic_fetchand(x, v, order)
+#endif /* !__hybrid_atomic_and */
+#ifndef __hybrid_atomic_or
+#define __hybrid_atomic_or(x, v, order) (void)__hybrid_atomic_fetchor(x, v, order)
+#endif /* !__hybrid_atomic_or */
+#ifndef __hybrid_atomic_xor
+#define __hybrid_atomic_xor(x, v, order) (void)__hybrid_atomic_fetchxor(x, v, order)
+#endif /* !__hybrid_atomic_xor */
+#ifndef __hybrid_atomic_nand
+#define __hybrid_atomic_nand(x, v, order) (void)__hybrid_atomic_fetchnand(x, v, order)
+#endif /* !__hybrid_atomic_nand */
+
 #endif /* __CC__ */
 
 #ifndef __GCC_ATOMIC_BOOL_LOCK_FREE

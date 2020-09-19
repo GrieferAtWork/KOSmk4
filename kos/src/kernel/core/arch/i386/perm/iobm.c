@@ -87,7 +87,7 @@ NOTHROW(KCALL fini_this_ioperm_bitmap)(struct task *__restrict self) {
 	iob = FORTASK(self, this_x86_ioperm_bitmap);
 	if (iob) {
 		assert(iob->ib_share >= 1);
-		ATOMIC_FETCHDEC(iob->ib_share);
+		ATOMIC_DEC(iob->ib_share);
 		decref_likely(iob);
 	}
 }

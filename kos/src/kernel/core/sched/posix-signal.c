@@ -216,7 +216,7 @@ usersigmask_ismasked_chk(signo_t signo) {
 		/* The is the signal is masked, we must tell user-space that we've
 		 * checked, and that the signal may be pending at this point. */
 		if ((ATOMIC_READ(umask->pm_pending.__val[word]) & mask) == 0) {
-			ATOMIC_FETCHOR(umask->pm_pending.__val[word], mask);
+			ATOMIC_OR(umask->pm_pending.__val[word], mask);
 			printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending\n",
 			       umask, signo);
 		}
@@ -601,7 +601,7 @@ inherit_parent_userprocmask:
 			REF struct kernel_sigmask *mask;
 			mask = PERTASK(this_sigmask).get();
 			assert(mask != &kernel_sigmask_empty);
-			ATOMIC_FETCHINC(mask->sm_share);
+			ATOMIC_INC(mask->sm_share);
 			COMPILER_WRITE_BARRIER();
 			FORTASK(new_thread, this_sigmask).m_pointer = mask; /* Inherit reference. */
 			COMPILER_WRITE_BARRIER();
@@ -711,7 +711,7 @@ sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
 		copy->sm_share  = 1;
 		mymask = PERTASK(this_sigmask).exchange_inherit_new(copy);
 		if (mymask != &kernel_sigmask_empty) {
-			ATOMIC_FETCHDEC(mymask->sm_share);
+			ATOMIC_DEC(mymask->sm_share);
 			decref_unlikely(mymask);
 		}
 		mymask = copy;
@@ -1000,9 +1000,9 @@ PUBLIC void KCALL task_sigstop(int stop_code)
 	struct taskpid *pid = THIS_TASKPID;
 	printk(KERN_DEBUG "[sig] Stop execution of thread\n");
 	/* NOTE: The write order here is highly important! */
-	ATOMIC_STORE(pid->tp_status.w_status, stop_code);    /* #1: Set the stop status */
-	ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FSUSPENDED); /* #2: Set the suspended flag */
-	sig_broadcast(&pid->tp_changed);                     /* #3: Broadcast that our status changed. */
+	ATOMIC_STORE(pid->tp_status.w_status, stop_code); /* #1: Set the stop status */
+	ATOMIC_OR(THIS_TASK->t_flags, TASK_FSUSPENDED);   /* #2: Set the suspended flag */
+	sig_broadcast(&pid->tp_changed);                  /* #3: Broadcast that our status changed. */
 	/* #4: Wait for the SUSPENDED flag to go away */
 	TRY {
 		do {

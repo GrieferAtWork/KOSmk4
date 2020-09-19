@@ -164,7 +164,7 @@ insert_target_after_caller:
 				target->t_sched.s_running.sr_runnxt = next;
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
-				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+				ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
@@ -183,7 +183,7 @@ insert_target_after_caller:
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			assert(target != caller);
 			cpu_assert_sleeping(target);
-			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+			ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 #ifndef CONFIG_NO_SMP
@@ -272,7 +272,7 @@ insert_target_after_caller:
 				target->t_sched.s_running.sr_runnxt = next;
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
-				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+				ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
@@ -290,7 +290,7 @@ insert_target_after_caller:
 		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			cpu_assert_sleeping(target);
-			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+			ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 #ifndef CONFIG_NO_SMP
@@ -382,7 +382,7 @@ insert_target_after_caller:
 			target->t_sched.s_running.sr_runnxt = next;
 			caller->t_sched.s_running.sr_runnxt = target;
 			next->t_sched.s_running.sr_runprv   = target;
-			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 			cpu_assert_running(target);
 			if (data->ar_mode & TASK_RPC_FHIGHPRIO) {
 				COMPILER_BARRIER();
@@ -395,7 +395,7 @@ insert_target_after_caller:
 	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
-		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+		ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 			assert(target == &FORCPU(mycpu, thiscpu_idle));
@@ -484,7 +484,7 @@ insert_target_after_caller:
 				target->t_sched.s_running.sr_runnxt = next;
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
-				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+				ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
@@ -502,7 +502,7 @@ insert_target_after_caller:
 		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			cpu_assert_sleeping(target);
-			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+			ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 			assert(target->t_sched.s_asleep.ss_pself);
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
@@ -595,7 +595,7 @@ insert_target_after_caller:
 			target->t_sched.s_running.sr_runnxt = next;
 			caller->t_sched.s_running.sr_runnxt = target;
 			next->t_sched.s_running.sr_runprv   = target;
-			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 			cpu_assert_running(target);
 			if (data->ar_mode & TASK_RPC_FHIGHPRIO) {
 				COMPILER_BARRIER();
@@ -608,7 +608,7 @@ insert_target_after_caller:
 	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
-		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+		ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 		if unlikely(!target->t_sched.s_asleep.ss_pself) {
 			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 			assert(target == &FORCPU(mycpu, thiscpu_idle));
@@ -708,7 +708,7 @@ insert_target_after_caller:
 				target->t_sched.s_running.sr_runnxt = next;
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
-				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+				ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if ((mode & TASK_RPC_FHIGHPRIO) &&
@@ -726,7 +726,7 @@ insert_target_after_caller:
 		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			cpu_assert_sleeping(target);
-			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
+			ATOMIC_OR(target->t_flags, TASK_FRUNNING);
 			if unlikely(!target->t_sched.s_asleep.ss_pself) {
 				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
 #ifndef CONFIG_NO_SMP

@@ -647,7 +647,7 @@ NOTHROW(KCALL system_clearcaches)(void) {
 	 *      It is OK if this function cannot be executed in parallel with
 	 *      itself, meaning that such a stack could easily be allocated
 	 *      statically. */
-	ATOMIC_FETCHINC(system_clearcaches_isinside);
+	ATOMIC_INC(system_clearcaches_isinside);
 	{
 		REF struct driver_state *state;
 		/* Invoke the `drv_clearcache()' function of every loaded driver. */
@@ -685,8 +685,8 @@ NOTHROW(KCALL system_clearcaches)(void) {
 	if (OVERFLOW_UADD(result, temp, &result))
 		result = (size_t)-1;
 	if (result != 0) /* Managed to do something: Increment the cache-version */
-		ATOMIC_FETCHINC(system_clearcaches_version);
-	ATOMIC_FETCHDEC(system_clearcaches_isinside);
+		ATOMIC_INC(system_clearcaches_version);
+	ATOMIC_DEC(system_clearcaches_isinside);
 	return result;
 }
 
@@ -1760,7 +1760,7 @@ driver_enable_textrel(struct driver *__restrict self)
 		        self->d_name, (uint16_t)i, (void *)(self->d_loadaddr + self->d_phdr[i].p_vaddr));
 		/* By simply adding write permissions here, a future #PF for nodes within this
 		 * memory range will simply propagate this permission bit into the page directory. */
-		ATOMIC_FETCHOR(node->vn_prot, VM_PROT_WRITE);
+		ATOMIC_OR(node->vn_prot, VM_PROT_WRITE);
 	}
 	if (did_lock_kernel)
 		vm_kernel_treelock_endwrite();
@@ -1878,7 +1878,7 @@ do_start_finalization:
 				sync_write(&self->d_sections_lock);
 			} EXCEPT {
 				/* If this acquire failed, still indicate that callbacks were executed. */
-				ATOMIC_FETCHOR(self->d_flags, DRIVER_FLAG_FINALIZED_C);
+				ATOMIC_OR(self->d_flags, DRIVER_FLAG_FINALIZED_C);
 				RETHROW();
 			}
 			/* Clear locked sections. */
@@ -1887,12 +1887,12 @@ do_start_finalization:
 			sync_endwrite(&self->d_sections_lock);
 		} EXCEPT {
 			/* Unset the is-finalizing flag to indicate that we've failed. */
-			ATOMIC_FETCHAND(self->d_flags, ~DRIVER_FLAG_FINALIZING);
+			ATOMIC_AND(self->d_flags, ~DRIVER_FLAG_FINALIZING);
 			RETHROW();
 		}
 		/* Indicate that finalization is complete! */
 		assert(!(ATOMIC_READ(self->d_flags) & DRIVER_FLAG_FINALIZED));
-		ATOMIC_FETCHOR(self->d_flags, DRIVER_FLAG_FINALIZED);
+		ATOMIC_OR(self->d_flags, DRIVER_FLAG_FINALIZED);
 		decref_nokill(self); /* The reference held by the absence of the `DRIVER_FLAG_FINALIZED' flag */
 		result = true;
 	}
@@ -3318,12 +3318,12 @@ again:
 			driver_do_load_dependencies(self);
 		} EXCEPT {
 			self->d_initthread = NULL;
-			ATOMIC_FETCHAND(self->d_flags, ~DRIVER_FLAG_DEPLOADING);
+			ATOMIC_AND(self->d_flags, ~DRIVER_FLAG_DEPLOADING);
 			RETHROW();
 		}
 		self->d_initthread = NULL;
 	}
-	ATOMIC_FETCHOR(self->d_flags, DRIVER_FLAG_DEPLOADED);
+	ATOMIC_OR(self->d_flags, DRIVER_FLAG_DEPLOADED);
 	return true;
 }
 
@@ -3351,12 +3351,12 @@ again:
 			driver_do_apply_relocations(self);
 		} EXCEPT {
 			self->d_initthread = NULL;
-			ATOMIC_FETCHAND(self->d_flags, ~DRIVER_FLAG_RELOCATING);
+			ATOMIC_AND(self->d_flags, ~DRIVER_FLAG_RELOCATING);
 			RETHROW();
 		}
 		self->d_initthread = NULL;
 	}
-	ATOMIC_FETCHOR(self->d_flags, DRIVER_FLAG_RELOCATED);
+	ATOMIC_OR(self->d_flags, DRIVER_FLAG_RELOCATED);
 	return true;
 }
 
@@ -3486,19 +3486,20 @@ again:
 			 *            turned out to be important for freeing some resource
 			 *            that had already been allocated successfully. */
 #if 1
-			ATOMIC_FETCHOR(self->d_flags, DRIVER_FLAG_INITIALIZED);
+			ATOMIC_OR(self->d_flags, DRIVER_FLAG_INITIALIZED);
 #else
-			ATOMIC_FETCHAND(self->d_flags, ~DRIVER_FLAG_INITIALIZING);
+			ATOMIC_AND(self->d_flags, ~DRIVER_FLAG_INITIALIZING);
 #endif
 			RETHROW();
 		}
 		self->d_initthread = NULL;
-		ATOMIC_FETCHOR(self->d_flags, DRIVER_FLAG_INITIALIZED);
+		ATOMIC_OR(self->d_flags, DRIVER_FLAG_INITIALIZED);
 	} else {
 		/* Also set the `DRIVER_FLAG_FINALIZED_C' flag,
 		 * so-as to prevent finalizers from being run. */
-		ATOMIC_FETCHOR(self->d_flags,
-		               (DRIVER_FLAG_INITIALIZED | DRIVER_FLAG_FINALIZED_C));
+		ATOMIC_OR(self->d_flags,
+		          DRIVER_FLAG_INITIALIZED |
+		          DRIVER_FLAG_FINALIZED_C);
 	}
 	return true;
 }

@@ -369,9 +369,9 @@ again:
 			mall_pending_untrace[j].pu_base = ptr;
 			mall_pending_untrace[j].pu_size = num_bytes;
 			/* Mark our entry as being valid. */
-			ATOMIC_FETCHOR(mall_pending_isval[i], alloc_mask);
+			ATOMIC_OR(mall_pending_isval[i], alloc_mask);
 			/* Keep track of the number of pending untrace operations. */
-			ATOMIC_FETCHINC(mall_pending_untrace_count);
+			ATOMIC_INC(mall_pending_untrace_count);
 			return;
 		}
 	}
@@ -639,7 +639,7 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 #undef REMAIN_RESET
 #endif /* Header + block + (optionally) tail */
 #undef PREFIX_OVERFLOW
-			ATOMIC_FETCHDEC(mall_inconsistent_head_exist);
+			ATOMIC_DEC(mall_inconsistent_head_exist);
 			next = pend->mf_next;
 			mall_do_free((byte_t *)pend +
 			             (CONFIG_MALL_PREFIX_SIZE +
@@ -687,8 +687,8 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 				/* Mark the slot as no longer being in-use (consuming the untrace task). */
 				if (!(ATOMIC_FETCHAND(mall_pending_isval[i], ~mask) & mask))
 					continue;
-				ATOMIC_FETCHAND(mall_pending_inuse[i], ~mask); /* Mark the slot as being free again. */
-				ATOMIC_FETCHDEC(mall_pending_untrace_count);   /* Keep track of the number of valid blocks. */
+				ATOMIC_AND(mall_pending_inuse[i], ~mask); /* Mark the slot as being free again. */
+				ATOMIC_DEC(mall_pending_untrace_count);   /* Keep track of the number of valid blocks. */
 				/* Actually do the untrace. */
 				if (pend.pu_size == 0) {
 					struct mallnode *node;
@@ -807,7 +807,7 @@ NOTHROW(KCALL mall_add_pending_free)(void *__restrict ptr,
 	                                      (CONFIG_MALL_PREFIX_SIZE +
 	                                       CONFIG_MALL_HEAD_SIZE));
 	/* Indicate that headers are about to become inconsistent (at least for a while) */
-	ATOMIC_FETCHINC(mall_inconsistent_head_exist);
+	ATOMIC_INC(mall_inconsistent_head_exist);
 	COMPILER_WRITE_BARRIER();
 	pend->mf_gfp = flags;
 	do {
@@ -1533,7 +1533,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 	COMPILER_BARRIER();
 
 	/* Report that we can now be considered to be suspended. */
-	ATOMIC_FETCHINC(mall_suspended_cpu_count);
+	ATOMIC_INC(mall_suspended_cpu_count);
 
 	/* Wait for the unlock to be signaled. */
 	task_pushconnections(&new_cons);
@@ -1554,13 +1554,13 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 	task_popconnections(&new_cons);
 
 	/* Report that we've resumed execution. */
-	ATOMIC_FETCHDEC(mall_suspended_cpu_count);
+	ATOMIC_DEC(mall_suspended_cpu_count);
 
 	/* Restore the old preemption behavior. */
 	COMPILER_BARRIER();
 	me->t_cpu->c_override = old_override;
 	if (!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_FETCHAND(me->t_flags, ~TASK_FKEEPCORE);
+		ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
 	COMPILER_BARRIER();
 
 	return state;
@@ -1649,7 +1649,7 @@ again:
 			was = PREEMPTION_PUSHOFF();
 			me->t_cpu->c_override = old_override;
 			if (!(old_flags & TASK_FKEEPCORE))
-				ATOMIC_FETCHAND(me->t_flags, ~TASK_FKEEPCORE);
+				ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
 			PREEMPTION_POP(was);
 			vm_kernel_treelock_endwrite();
 			mall_release();
@@ -1685,7 +1685,7 @@ again:
 		was = PREEMPTION_PUSHOFF();
 		me->t_cpu->c_override = old_override;
 		if (!(old_flags & TASK_FKEEPCORE))
-			ATOMIC_FETCHAND(me->t_flags, ~TASK_FKEEPCORE);
+			ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
 		PREEMPTION_POP(was);
 	}
 	return result;

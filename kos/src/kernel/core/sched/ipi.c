@@ -155,7 +155,7 @@ NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCO
 	CPUSET_REMOVE(set, THIS_CPU->c_id);
 	result = cpu_sendipi_cpuset(set, func, args, flags);
 	if (!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_FETCHAND(me->t_flags, ~TASK_FKEEPCORE);
+		ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
 	return result;
 }
 
@@ -230,14 +230,14 @@ NOTHROW(FCALL cpu_delrunningtask_nopr)(/*out*/ REF struct task *__restrict threa
 			/* Check if the IDLE thread had been sleeping. */
 			if (idle->t_sched.s_asleep.ss_pself) {
 				/* The IDLE thread had been sleeping (time it out) */
-				ATOMIC_FETCHOR(idle->t_flags, TASK_FTIMEOUT);
+				ATOMIC_OR(idle->t_flags, TASK_FTIMEOUT);
 				if ((*idle->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_tmonxt) != NULL)
 					idle->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_pself;
 			}
 			/* Remove the last thread (replacing it with the IDLE thread) */
 			idle->t_sched.s_running.sr_runprv = idle;
 			idle->t_sched.s_running.sr_runnxt = idle;
-			ATOMIC_FETCHOR(idle->t_flags, TASK_FRUNNING);
+			ATOMIC_OR(idle->t_flags, TASK_FRUNNING);
 			me->c_current = idle;
 			goto done;
 		}
@@ -321,10 +321,10 @@ NOTHROW(FCALL cpu_loadpending_chain_nopr)(struct cpu *__restrict me,
 		 * any prior call to `task_wake()', which may have gotten lost in
 		 * the associated `task_wake_ipi()' when the hosting CPU no longer
 		 * matched the expected host. */
-		ATOMIC_FETCHAND(chain->t_flags, ~(TASK_FPENDING | TASK_FWAKING));
+		ATOMIC_AND(chain->t_flags, ~(TASK_FPENDING | TASK_FWAKING));
 		/* Set the RUNNING bit to indicate that the thread will be part
 		 * of the chain of tasks that are actively executed by our CPU. */
-		ATOMIC_FETCHOR(chain->t_flags, TASK_FRUNNING);
+		ATOMIC_OR(chain->t_flags, TASK_FRUNNING);
 		chain = next;
 		if (chain == CPU_PENDING_ENDOFCHAIN)
 			break;
@@ -389,7 +389,7 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 			cpu_assert_running(thread);
 			if unlikely(caller == thread) {
 				/* Special case: We _are_ the thread that is being targeted! */
-				ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+				ATOMIC_AND(thread->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(thread);
 				return state;
 			}
@@ -402,7 +402,7 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 		} else {
 			assert(thread != caller);
 			cpu_assert_sleeping(thread);
-			ATOMIC_FETCHOR(thread->t_flags, TASK_FRUNNING);
+			ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
 			/* The thread was sleeping. - Wake it up (before you go go...) */
 			if ((*thread->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_tmonxt) != NULL)
 				thread->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_pself;
@@ -413,7 +413,7 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 		caller->t_sched.s_running.sr_runnxt = thread;
 		next->t_sched.s_running.sr_runprv   = thread;
 unset_waking:
-		ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+		ATOMIC_AND(thread->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(thread);
 		/* Indicate that we wish to switch tasks. */
 		if ((unsigned int)(uintptr_t)args[1] & TASK_WAKE_FHIGHPRIO) {
@@ -551,7 +551,7 @@ again_already_disabled:
 			assert(transfer_target != me);
 			for (;;) {
 				assert(!(pending_last->t_flags & TASK_FRUNNING));
-				ATOMIC_FETCHOR(pending_last->t_flags, TASK_FPENDING);
+				ATOMIC_OR(pending_last->t_flags, TASK_FPENDING);
 				ATOMIC_WRITE(pending_last->t_cpu, transfer_target);
 				printk(KERN_INFO "[sched:cpu#%u] Transfer sleeping thread %p "
 				                 "[tid=%" PRIuN(__SIZEOF_PID_T__) "] to cpu #%u\n",
@@ -701,7 +701,7 @@ yield_and_return:
 	cpu_assert_integrity(NULL);
 	me->c_current = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt;
 	assert(FORCPU(me, thiscpu_idle).t_flags & TASK_FRUNNING);
-	ATOMIC_FETCHAND(FORCPU(me, thiscpu_idle).t_flags, ~TASK_FRUNNING);
+	ATOMIC_AND(FORCPU(me, thiscpu_idle).t_flags, ~TASK_FRUNNING);
 	assert(me->c_current != &FORCPU(me, thiscpu_idle));
 	FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runprv;
 	FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = FORCPU(me, thiscpu_idle).t_sched.s_running.sr_runnxt;

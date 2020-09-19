@@ -1852,7 +1852,7 @@ done_add_finalizer:
 		if unlikely(!extmod)
 			goto err;
 		/* Mark the declaring module as NODELETE. */
-		ATOMIC_FETCHOR(extmod->dm_flags, RTLD_NODELETE);
+		ATOMIC_OR(extmod->dm_flags, RTLD_NODELETE);
 		/* Fill in the coreops V-table pointer. */
 		extension->df_core = dl_getcoreops();
 		/* Register the extension. */

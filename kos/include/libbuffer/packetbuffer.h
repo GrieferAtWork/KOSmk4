@@ -420,11 +420,11 @@ struct pb_buffer {
 #define pb_buffer_psta_broadcast(self) sig_broadcast(&(self)->pb_psta)
 #define pb_buffer_psta_send(self)      sig_send(&(self)->pb_psta)
 #else /* __KERNEL__ */
-#define pb_buffer_psta_broadcast(self)                            \
-	(__hybrid_atomic_fetchinc((self)->pb_psta, __ATOMIC_SEQ_CST), \
+#define pb_buffer_psta_broadcast(self)                       \
+	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_broadcast(&(self)->pb_psta))
-#define pb_buffer_psta_send(self)                                 \
-	(__hybrid_atomic_fetchinc((self)->pb_psta, __ATOMIC_SEQ_CST), \
+#define pb_buffer_psta_send(self)                            \
+	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_send(&(self)->pb_psta))
 #endif /* !__KERNEL__ */
 

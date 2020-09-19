@@ -1068,7 +1068,7 @@ NOTHROW(FCALL pae_pagedir_and_e1_word)(unsigned int vec3,
                                        unsigned int vec1,
                                        u64 e1_kept_bits_mask) {
 	pae_pagedir_assert_e1_word_prepared(vec3, vec2, vec1, e1_kept_bits_mask);
-	ATOMIC_FETCHAND(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word, e1_kept_bits_mask);
+	ATOMIC_AND(PAE_PDIR_E1_IDENTITY[vec3][vec2][vec1].p_word, e1_kept_bits_mask);
 }
 
 LOCAL NOBLOCK u64

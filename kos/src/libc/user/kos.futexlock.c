@@ -253,8 +253,10 @@ NOTHROW_NCX(LIBCCALL libc_futexlock_wakeall)(lfutex_t *ulockaddr)
 /*[[[body:libc_futexlock_wakeall]]]*/
 {
 	ssize_t result;
+#ifndef __OPTIMIZE_SIZE__
 	if (!(__hybrid_atomic_load(*ulockaddr, __ATOMIC_ACQUIRE) & LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
+#endif /* !__OPTIMIZE_SIZE__ */
 	if (!(__hybrid_atomic_fetchand(*ulockaddr, ~LFUTEX_WAIT_LOCK_WAITERS, __ATOMIC_SEQ_CST) & LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
 	result = sys_lfutex(ulockaddr, LFUTEX_WAKE, (uintptr_t)-1, NULL, 0);

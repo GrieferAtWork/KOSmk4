@@ -192,7 +192,7 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 	printk(/*FREESTR*/ (KERN_INFO "[smp] Begin CPU #%u initialization\n"), id);
 
 	/* Tell the boot-cpu that we're now online. */
-	ATOMIC_FETCHAND(cpu_offline_mask[id / 8], ~(1 << (id % 8)));
+	ATOMIC_AND(cpu_offline_mask[id / 8], ~(1 << (id % 8)));
 
 	/* Same as what the BOOT processor does to configure its LAPIC. */
 	while (!sync_trywrite(&x86_pit_lock))

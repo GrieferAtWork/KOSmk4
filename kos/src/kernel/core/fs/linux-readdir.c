@@ -200,7 +200,7 @@ NOTHROW(KCALL readdir_lock_release)(void *h_data) {
 	index = readdir_lock_index(h_data);
 	word  = readdir_lockbits_word(index);
 	mask  = readdir_lockbits_mask(index);
-	ATOMIC_FETCHAND(readdir_lockbits[word], ~mask);
+	ATOMIC_AND(readdir_lockbits[word], ~mask);
 }
 
 

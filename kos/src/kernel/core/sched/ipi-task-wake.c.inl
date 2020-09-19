@@ -168,9 +168,9 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 				 * flag. */
 #ifdef NDEBUG
 				PREEMPTION_POP(was);
-				ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+				ATOMIC_AND(thread->t_flags, ~TASK_FWAKING);
 #else /* NDEBUG */
-				ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+				ATOMIC_AND(thread->t_flags, ~TASK_FWAKING);
 #ifndef DEFINE_task_wake_as
 				cpu_assert_running(thread);
 #endif /* !DEFINE_task_wake_as */
@@ -187,7 +187,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 #ifndef DEFINE_task_wake_as
 			cpu_assert_sleeping(thread);
 #endif /* !DEFINE_task_wake_as */
-			ATOMIC_FETCHOR(thread->t_flags, TASK_FRUNNING);
+			ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
 			/* The thread was sleeping. - Wake it up */
 			if ((*thread->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_tmonxt) != NULL)
 				thread->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_pself;
@@ -203,7 +203,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 		assert(thread->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == thread &&
 		       thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == thread);
 unset_waking:
-		ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+		ATOMIC_AND(thread->t_flags, ~TASK_FWAKING);
 #ifndef DEFINE_task_wake_as
 		cpu_assert_running(thread);
 #endif /* !DEFINE_task_wake_as */

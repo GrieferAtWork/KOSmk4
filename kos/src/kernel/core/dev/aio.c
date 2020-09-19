@@ -231,7 +231,7 @@ fill_in_result:
 	/* Required by `aio_multihandle_cancel()'
 	 * Used to ensure that the handle was actually initialized. */
 	result->ah_type = NULL;
-	ATOMIC_FETCHINC(self->am_status); /* Increment the run counter. */
+	ATOMIC_INC(self->am_status); /* Increment the run counter. */
 	return result;
 }
 
@@ -291,7 +291,7 @@ fill_in_result:
 	/* Required by `aio_multihandle_cancel()'
 	 * Used to ensure that the handle was actually initialized. */
 	result->ah_type = NULL;
-	ATOMIC_FETCHINC(self->am_status); /* Increment the run counter. */
+	ATOMIC_INC(self->am_status); /* Increment the run counter. */
 	return result;
 err:
 	return NULL;

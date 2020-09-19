@@ -193,9 +193,9 @@ NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *fp,
 #ifdef IO_NOLOCK
 	if (type != FSETLOCKING_QUERY) {
 		if (type == FSETLOCKING_BYCALLER) {
-			ATOMIC_FETCHOR(fp->if_flag, IO_NOLOCK);
+			ATOMIC_OR(fp->if_flag, IO_NOLOCK);
 		} else {
-			ATOMIC_FETCHAND(fp->if_flag, ~IO_NOLOCK);
+			ATOMIC_AND(fp->if_flag, ~IO_NOLOCK);
 		}
 	}
 #endif /* IO_NOLOCK */

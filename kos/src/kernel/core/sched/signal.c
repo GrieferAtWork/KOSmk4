@@ -66,7 +66,7 @@ NOTHROW(FCALL _sig_smp_lock_acquire)(struct sig *__restrict self) {
 		task_pause();
 }
 #define _sig_smp_lock_release(self) \
-	ATOMIC_FETCHAND((self)->s_ctl, ~SIG_SMPLOCK_BIT)
+	ATOMIC_AND((self)->s_ctl, ~SIG_SMPLOCK_BIT)
 #else /* SIG_SMPLOCK_BIT != 0 */
 #define _sig_smp_lock_acquire(self) (void)0
 #define _sig_smp_lock_release(self) (void)0
@@ -401,7 +401,7 @@ again:
 		*pchain = chain->tc_signext;
 		COMPILER_WRITE_BARRIER();
 		/* Clear the SMP-lock bit. */
-		ATOMIC_FETCHAND(self->s_ctl, ~SIG_SMPLOCK_BIT);
+		ATOMIC_AND(self->s_ctl, ~SIG_SMPLOCK_BIT);
 	}
 }
 #endif /* SIG_SMPLOCK_BIT != 0 */
@@ -499,7 +499,7 @@ no_cons:
 	target_thread = ATOMIC_READ(target_cons->tcs_thread);
 #if SIG_SMPLOCK_BIT != 0
 	xincref(target_thread);
-	ATOMIC_FETCHAND(self->s_ctl, ~SIG_SMPLOCK_BIT);
+	ATOMIC_AND(self->s_ctl, ~SIG_SMPLOCK_BIT);
 #endif /* SIG_SMPLOCK_BIT != 0 */
 	if likely(target_thread) {
 		task_wake(target_thread);
