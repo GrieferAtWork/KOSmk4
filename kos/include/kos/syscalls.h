@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ac680e7 */
+/* HASH CRC-32:0x5790bc44 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -663,7 +663,7 @@ __CDECLARE_SC(,__errno_t,mknodat,(__fd_t __dirfd, char const *__nodename, __mode
 __CDECLARE_SC(,__errno_t,mlock,(void const *__addr, __size_t __len),(__addr,__len))
 #endif /* __CRT_HAVE_SC(mlock) */
 #if __CRT_HAVE_SC(mlock2)
-__CDECLARE_SC(,__errno_t,mlock2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,mlock2,(void const *__addr, __size_t __length, __syscall_ulong_t __flags),(__addr,__length,__flags))
 #endif /* __CRT_HAVE_SC(mlock2) */
 #if __CRT_HAVE_SC(mlockall)
 /* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
@@ -1993,7 +1993,7 @@ __CDECLARE_XSC(,__errno_t,mknodat,(__fd_t __dirfd, char const *__nodename, __mod
 __CDECLARE_XSC(,__errno_t,mlock,(void const *__addr, __size_t __len),(__addr,__len))
 #endif /* __CRT_HAVE_XSC(mlock) */
 #if __CRT_HAVE_XSC(mlock2)
-__CDECLARE_XSC(,__errno_t,mlock2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,mlock2,(void const *__addr, __size_t __length, __syscall_ulong_t __flags),(__addr,__length,__flags))
 #endif /* __CRT_HAVE_XSC(mlock2) */
 #if __CRT_HAVE_XSC(mlockall)
 /* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */

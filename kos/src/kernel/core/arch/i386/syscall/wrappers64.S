@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x518fcc5a */
+/* HASH CRC-32:0xe88935f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10249,7 +10249,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_membarrier)
 	.cfi_endproc
 END(__x86_asm64_syscall_membarrier)
 
-/* errno_t mlock2(int TODO_PROTOTYPE) */
+/* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.mlock2
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_mlock2)
 	.cfi_startproc simple
@@ -10369,7 +10369,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pwritev2)
 	.cfi_endproc
 END(__x86_asm64_syscall_pwritev2)
 
-/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+/* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
 .section .text.x86.asm64_syscall.pkey_mprotect
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_mprotect)
 	.cfi_startproc simple
@@ -10385,6 +10385,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_mprotect)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
+	movq   %r10, %rcx
 	EXTERN(sys_pkey_mprotect)
 	call   sys_pkey_mprotect
 	popq_cfi_r %r11
@@ -10399,7 +10400,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_mprotect)
 	.cfi_endproc
 END(__x86_asm64_syscall_pkey_mprotect)
 
-/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+/* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 .section .text.x86.asm64_syscall.pkey_alloc
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_alloc)
 	.cfi_startproc simple
@@ -10429,7 +10430,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_alloc)
 	.cfi_endproc
 END(__x86_asm64_syscall_pkey_alloc)
 
-/* errno_t pkey_free(int TODO_PROTOTYPE) */
+/* errno_t pkey_free(syscall_ulong_t key) */
 .section .text.x86.asm64_syscall.pkey_free
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_pkey_free)
 	.cfi_startproc simple
@@ -25438,7 +25439,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_membarrier)
 	.cfi_endproc
 END(__x86_asm32_int80_membarrier)
 
-/* errno_t mlock2(int TODO_PROTOTYPE) */
+/* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.mlock2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_startproc simple
@@ -25454,7 +25455,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
 	EXTERN(sys32_mlock2)
 	call   sys32_mlock2
 	popq_cfi_r %r11
@@ -25562,7 +25565,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev2)
 	.cfi_endproc
 END(__x86_asm32_int80_pwritev2)
 
-/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+/* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
 .section .text.x86.asm32_syscall_int80.pkey_mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	.cfi_startproc simple
@@ -25578,7 +25581,11 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %edx, %rdx /* ARG2 = REG2 */
+	movzlq %esi, %rsi /* ARG1 = REG3 */
+	movzlq %ecx, %rcx /* ARG3 = REG1 */
+	xchgq  %rcx, %rsi /* ARG1 = ARG3, ARG3 = ARG1 */
 	EXTERN(sys32_pkey_mprotect)
 	call   sys32_pkey_mprotect
 	popq_cfi_r %r11
@@ -25593,7 +25600,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	.cfi_endproc
 END(__x86_asm32_int80_pkey_mprotect)
 
-/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+/* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 .section .text.x86.asm32_syscall_int80.pkey_alloc
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
 	.cfi_startproc simple
@@ -25609,7 +25616,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ecx, %rsi /* ARG1 = REG1 */
 	EXTERN(sys32_pkey_alloc)
 	call   sys32_pkey_alloc
 	popq_cfi_r %r11
@@ -25624,7 +25632,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
 	.cfi_endproc
 END(__x86_asm32_int80_pkey_alloc)
 
-/* errno_t pkey_free(int TODO_PROTOTYPE) */
+/* errno_t pkey_free(syscall_ulong_t key) */
 .section .text.x86.asm32_syscall_int80.pkey_free
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_free)
 	.cfi_startproc simple
@@ -25640,7 +25648,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_free)
 	pushq_cfi_r %r9
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
-	movslq %ebx, %rdi /* ARG0 = REG0 */
+	movzlq %ebx, %rdi /* ARG0 = REG0 */
 	EXTERN(sys32_pkey_free)
 	call   sys32_pkey_free
 	popq_cfi_r %r11
@@ -32801,7 +32809,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_userfaultfd, __x86_asm32_int80_use
 /* errno_t membarrier(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_membarrier, __x86_asm32_int80_membarrier)
 
-/* errno_t mlock2(int TODO_PROTOTYPE) */
+/* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_mlock2, __x86_asm32_int80_mlock2)
 
 /* errno_t copy_file_range(int TODO_PROTOTYPE) */
@@ -32813,13 +32821,13 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_preadv2, __x86_asm32_int80_preadv2
 /* errno_t pwritev2(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pwritev2, __x86_asm32_int80_pwritev2)
 
-/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+/* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_mprotect, __x86_asm32_int80_pkey_mprotect)
 
-/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+/* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_alloc, __x86_asm32_int80_pkey_alloc)
 
-/* errno_t pkey_free(int TODO_PROTOTYPE) */
+/* errno_t pkey_free(syscall_ulong_t key) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pkey_free, __x86_asm32_int80_pkey_free)
 
 /* errno_t statx(int TODO_PROTOTYPE) */
@@ -38856,10 +38864,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_membarrier)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_membarrier)
 
-/* errno_t mlock2(int TODO_PROTOTYPE) */
+/* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.mlock2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_mlock2)
 	.cfi_startproc
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_mlock2)
 	jmp    sys32_mlock2
@@ -38896,27 +38906,31 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pwritev2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pwritev2)
 
-/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+/* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
 .section .text.x86.asm32_syscall_sysrun32.pkey_mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pkey_mprotect)
 	.cfi_startproc
+	movzlq 24(%rdi), %rcx
+	movzlq 16(%rdi), %rdx
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_pkey_mprotect)
 	jmp    sys32_pkey_mprotect
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pkey_mprotect)
 
-/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+/* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 .section .text.x86.asm32_syscall_sysrun32.pkey_alloc
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pkey_alloc)
 	.cfi_startproc
+	movzlq 8(%rdi), %rsi
 	movzlq 0(%rdi), %rdi
 	EXTERN(sys32_pkey_alloc)
 	jmp    sys32_pkey_alloc
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pkey_alloc)
 
-/* errno_t pkey_free(int TODO_PROTOTYPE) */
+/* errno_t pkey_free(syscall_ulong_t key) */
 .section .text.x86.asm32_syscall_sysrun32.pkey_free
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pkey_free)
 	.cfi_startproc

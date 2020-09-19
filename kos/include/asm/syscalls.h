@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec574146 */
+/* HASH CRC-32:0x41e94ae5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -599,7 +599,7 @@
 #define __NR_execveat               0x119 /* errno_t execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp, atflag_t flags) */
 #define __NR_userfaultfd            0x11a /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR_membarrier             0x11b /* errno_t membarrier(int TODO_PROTOTYPE) */
-#define __NR_mlock2                 0x11c /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define __NR_mlock2                 0x11c /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 /* Open a new file handle to the file specified by `FILENAME'
  * When `oflags & O_CREAT', then `mode' specifies the initial
  * file access permissions with which the file should be opened.
@@ -1485,7 +1485,7 @@
 #define __NRRC_execveat               5
 #define __NRRC_userfaultfd            1
 #define __NRRC_membarrier             1
-#define __NRRC_mlock2                 1
+#define __NRRC_mlock2                 3
 #define __NRRC_open                   3
 #define __NRRC_link                   2
 #define __NRRC_unlink                 1

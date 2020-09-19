@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe80421ae */
+/* HASH CRC-32:0xc353f383 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,12 +363,12 @@
 #define __NRAC_execveat                 5
 #define __NRAC_userfaultfd              1
 #define __NRAC_membarrier               1
-#define __NRAC_mlock2                   1
+#define __NRAC_mlock2                   3
 #define __NRAC_copy_file_range          1
 #define __NRAC_preadv2                  1
 #define __NRAC_pwritev2                 1
-#define __NRAC_pkey_mprotect            1
-#define __NRAC_pkey_alloc               1
+#define __NRAC_pkey_mprotect            4
+#define __NRAC_pkey_alloc               2
 #define __NRAC_pkey_free                1
 #define __NRAC_statx                    1
 #define __NRAC_io_pgetevents            1
@@ -778,7 +778,7 @@
 #define __NRRT_preadv2                  (errno_t, __errno_t)
 #define __NRRT_pwritev2                 (errno_t, __errno_t)
 #define __NRRT_pkey_mprotect            (errno_t, __errno_t)
-#define __NRRT_pkey_alloc               (errno_t, __errno_t)
+#define __NRRT_pkey_alloc               (syscall_slong_t, __syscall_slong_t)
 #define __NRRT_pkey_free                (errno_t, __errno_t)
 #define __NRRT_statx                    (errno_t, __errno_t)
 #define __NRRT_io_pgetevents            (errno_t, __errno_t)
@@ -1598,13 +1598,19 @@
 #define __NRAT4_execveat                 (atflag_t, __atflag_t)
 #define __NRAT0_userfaultfd              (int, int)
 #define __NRAT0_membarrier               (int, int)
-#define __NRAT0_mlock2                   (int, int)
+#define __NRAT0_mlock2                   (void const *, void const *)
+#define __NRAT1_mlock2                   (size_t, __size_t)
+#define __NRAT2_mlock2                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_copy_file_range          (int, int)
 #define __NRAT0_preadv2                  (int, int)
 #define __NRAT0_pwritev2                 (int, int)
-#define __NRAT0_pkey_mprotect            (int, int)
-#define __NRAT0_pkey_alloc               (int, int)
-#define __NRAT0_pkey_free                (int, int)
+#define __NRAT0_pkey_mprotect            (void *, void *)
+#define __NRAT1_pkey_mprotect            (size_t, __size_t)
+#define __NRAT2_pkey_mprotect            (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT3_pkey_mprotect            (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_pkey_alloc               (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT1_pkey_alloc               (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT0_pkey_free                (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_statx                    (int, int)
 #define __NRAT0_io_pgetevents            (int, int)
 #define __NRAT0_rseq                     (int, int)
@@ -2124,13 +2130,13 @@
 #define __NRAM_execveat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e
 #define __NRAM_userfaultfd(a, b, c, d, e, f)              (int)a
 #define __NRAM_membarrier(a, b, c, d, e, f)               (int)a
-#define __NRAM_mlock2(a, b, c, d, e, f)                   (int)a
+#define __NRAM_mlock2(a, b, c, d, e, f)                   (void const *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_copy_file_range(a, b, c, d, e, f)          (int)a
 #define __NRAM_preadv2(a, b, c, d, e, f)                  (int)a
 #define __NRAM_pwritev2(a, b, c, d, e, f)                 (int)a
-#define __NRAM_pkey_mprotect(a, b, c, d, e, f)            (int)a
-#define __NRAM_pkey_alloc(a, b, c, d, e, f)               (int)a
-#define __NRAM_pkey_free(a, b, c, d, e, f)                (int)a
+#define __NRAM_pkey_mprotect(a, b, c, d, e, f)            (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAM_pkey_alloc(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NRAM_pkey_free(a, b, c, d, e, f)                (__syscall_ulong_t)a
 #define __NRAM_statx(a, b, c, d, e, f)                    (int)a
 #define __NRAM_io_pgetevents(a, b, c, d, e, f)            (int)a
 #define __NRAM_rseq(a, b, c, d, e, f)                     (int)a
@@ -2534,12 +2540,12 @@
 #define __NRAP_execveat(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_userfaultfd(a)                             (__syscall_ulong_t)a
 #define __NRAP_membarrier(a)                              (__syscall_ulong_t)a
-#define __NRAP_mlock2(a)                                  (__syscall_ulong_t)a
+#define __NRAP_mlock2(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_copy_file_range(a)                         (__syscall_ulong_t)a
 #define __NRAP_preadv2(a)                                 (__syscall_ulong_t)a
 #define __NRAP_pwritev2(a)                                (__syscall_ulong_t)a
-#define __NRAP_pkey_mprotect(a)                           (__syscall_ulong_t)a
-#define __NRAP_pkey_alloc(a)                              (__syscall_ulong_t)a
+#define __NRAP_pkey_mprotect(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_pkey_alloc(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_pkey_free(a)                               (__syscall_ulong_t)a
 #define __NRAP_statx(a)                                   (__syscall_ulong_t)a
 #define __NRAP_io_pgetevents(a)                           (__syscall_ulong_t)a

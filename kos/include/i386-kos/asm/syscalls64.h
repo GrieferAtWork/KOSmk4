@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29a01516 */
+/* HASH CRC-32:0x145776d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -741,13 +741,13 @@
 #define __NR_execveat                 0x142                          /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 #define __NR_userfaultfd              0x143                          /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define __NR_membarrier               0x144                          /* errno_t membarrier(int TODO_PROTOTYPE) */
-#define __NR_mlock2                   0x145                          /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define __NR_mlock2                   0x145                          /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 #define __NR_copy_file_range          0x146                          /* errno_t copy_file_range(int TODO_PROTOTYPE) */
 #define __NR_preadv2                  0x147                          /* errno_t preadv2(int TODO_PROTOTYPE) */
 #define __NR_pwritev2                 0x148                          /* errno_t pwritev2(int TODO_PROTOTYPE) */
-#define __NR_pkey_mprotect            0x149                          /* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
-#define __NR_pkey_alloc               0x14a                          /* errno_t pkey_alloc(int TODO_PROTOTYPE) */
-#define __NR_pkey_free                0x14b                          /* errno_t pkey_free(int TODO_PROTOTYPE) */
+#define __NR_pkey_mprotect            0x149                          /* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
+#define __NR_pkey_alloc               0x14a                          /* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
+#define __NR_pkey_free                0x14b                          /* errno_t pkey_free(syscall_ulong_t key) */
 #define __NR_statx                    0x14c                          /* errno_t statx(int TODO_PROTOTYPE) */
 #define __NR_io_pgetevents            0x14d                          /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
 #define __NR_rseq                     0x14e                          /* errno_t rseq(int TODO_PROTOTYPE) */
@@ -2180,12 +2180,12 @@
 #define __NRRC_execveat                 5
 #define __NRRC_userfaultfd              1
 #define __NRRC_membarrier               1
-#define __NRRC_mlock2                   1
+#define __NRRC_mlock2                   3
 #define __NRRC_copy_file_range          1
 #define __NRRC_preadv2                  1
 #define __NRRC_pwritev2                 1
-#define __NRRC_pkey_mprotect            1
-#define __NRRC_pkey_alloc               1
+#define __NRRC_pkey_mprotect            4
+#define __NRRC_pkey_alloc               2
 #define __NRRC_pkey_free                1
 #define __NRRC_statx                    1
 #define __NRRC_io_pgetevents            1

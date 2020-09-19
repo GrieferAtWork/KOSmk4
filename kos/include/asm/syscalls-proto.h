@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d5ce92b */
+/* HASH CRC-32:0x972a53cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -295,7 +295,7 @@
 #define __NRAC_execveat               5
 #define __NRAC_userfaultfd            1
 #define __NRAC_membarrier             1
-#define __NRAC_mlock2                 1
+#define __NRAC_mlock2                 3
 #define __NRAC_open                   3
 #define __NRAC_link                   2
 #define __NRAC_unlink                 1
@@ -1295,7 +1295,9 @@
 #define __NRAT4_execveat               (atflag_t, __atflag_t)
 #define __NRAT0_userfaultfd            (int, int)
 #define __NRAT0_membarrier             (int, int)
-#define __NRAT0_mlock2                 (int, int)
+#define __NRAT0_mlock2                 (void const *, void const *)
+#define __NRAT1_mlock2                 (size_t, __size_t)
+#define __NRAT2_mlock2                 (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_open                   (char const *, char const *)
 #define __NRAT1_open                   (oflag_t, __oflag_t)
 #define __NRAT2_open                   (mode_t, __mode_t)
@@ -1680,7 +1682,7 @@
 #define __NRAM_execveat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__fd_t)a, (char const *)b, (char const *const *)c, (char const *const *)d, (__atflag_t)e
 #define __NRAM_userfaultfd(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (int)a
 #define __NRAM_membarrier(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
-#define __NRAM_mlock2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (int)a
+#define __NRAM_mlock2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (void const *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NRAM_open(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (char const *)a, (__oflag_t)b, (__mode_t)c
 #define __NRAM_link(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (char const *)a, (char const *)b
 #define __NRAM_unlink(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (char const *)a
@@ -2002,7 +2004,7 @@
 #define __NRAP_execveat(a, b, c, d, e)                                                                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_userfaultfd(a)                                                                                       (__syscall_ulong_t)a
 #define __NRAP_membarrier(a)                                                                                        (__syscall_ulong_t)a
-#define __NRAP_mlock2(a)                                                                                            (__syscall_ulong_t)a
+#define __NRAP_mlock2(a, b, c)                                                                                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_open(a, b, c)                                                                                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_link(a, b)                                                                                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_unlink(a)                                                                                            (__syscall_ulong_t)a

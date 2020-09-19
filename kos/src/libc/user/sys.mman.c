@@ -22,19 +22,18 @@
 #define _KOS_KERNEL_SOURCE 1 /* MAP_OFFSET64_POINTER */
 
 #include "../api.h"
-#include "sys.mman.h"
+/**/
 
+#include <asm/pkey.h>
 #include <kos/syscalls.h>
-#include <stdint.h>
 #include <sys/mman.h>
 
+#include <stdint.h>
+#include <syscall.h>
+
+#include "sys.mman.h"
+
 DECL_BEGIN
-
-
-
-
-
-/*[[[start:implementation]]]*/
 
 /*[[[head:libc_mmap,hash:CRC-32=0xd7707631]]]*/
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
@@ -70,8 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
 /*[[[body:libc_munmap]]]*/
 {
 	errno_t result;
-	result = sys_munmap(addr,
-	                    len);
+	result = sys_munmap(addr, len);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_munmap]]]*/
@@ -87,9 +85,7 @@ NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
 /*[[[body:libc_mprotect]]]*/
 {
 	errno_t result;
-	result = sys_mprotect(addr,
-	                      len,
-	                      (syscall_ulong_t)(unsigned int)prot);
+	result = sys_mprotect(addr, len, (syscall_ulong_t)(unsigned int)prot);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_mprotect]]]*/
@@ -103,9 +99,7 @@ NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
 /*[[[body:libc_msync]]]*/
 {
 	errno_t result;
-	result = sys_msync(addr,
-	                   len,
-	                   (syscall_ulong_t)(unsigned int)flags);
+	result = sys_msync(addr, len, (syscall_ulong_t)(unsigned int)flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_msync]]]*/
@@ -117,8 +111,11 @@ NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr,
 /*[[[body:libc_mlock]]]*/
 {
 	errno_t result;
-	result = sys_mlock(addr,
-	                   len);
+#ifdef SYS_mlock
+	result = sys_mlock(addr, len);
+#else /* SYS_mlock */
+	result = sys_mlock2(addr, len, 0);
+#endif /* !SYS_mlock */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_mlock]]]*/
@@ -130,8 +127,7 @@ NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr,
 /*[[[body:libc_munlock]]]*/
 {
 	errno_t result;
-	result = sys_munlock(addr,
-	                     len);
+	result = sys_munlock(addr, len);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_munlock]]]*/
@@ -158,34 +154,6 @@ NOTHROW_NCX(LIBCCALL libc_munlockall)(void)
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_munlockall]]]*/
-
-/*[[[head:libc_shm_open,hash:CRC-32=0xaa615a35]]]*/
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
-                                    oflag_t oflags,
-                                    mode_t mode)
-/*[[[body:libc_shm_open]]]*/
-/*AUTO*/{
-	(void)name;
-	(void)oflags;
-	(void)mode;
-	CRT_UNIMPLEMENTEDF("shm_open(%q, %" PRIxN(__SIZEOF_OFLAG_T__) ", %" PRIxN(__SIZEOF_MODE_T__) ")", name, oflags, mode); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_shm_open]]]*/
-
-/*[[[head:libc_shm_unlink,hash:CRC-32=0x21646eee]]]*/
-INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name)
-/*[[[body:libc_shm_unlink]]]*/
-/*AUTO*/{
-	(void)name;
-	CRT_UNIMPLEMENTEDF("shm_unlink(%q)", name); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_shm_unlink]]]*/
 
 /*[[[head:libc_madvise,hash:CRC-32=0x6ab3bd0b]]]*/
 INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) int
@@ -290,9 +258,7 @@ NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
 	void *result;
 	va_list args;
 	va_start(args, flags);
-	result = sys_mremap(addr,
-	                    old_len,
-	                    new_len,
+	result = sys_mremap(addr, old_len, new_len,
 	                    (syscall_ulong_t)(unsigned int)flags,
 	                    va_arg(args, void *));
 	va_end(args);
@@ -324,12 +290,10 @@ INTERN ATTR_SECTION(".text.crt.system.mman") fd_t
 NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name,
                                         unsigned int flags)
 /*[[[body:libc_memfd_create]]]*/
-/*AUTO*/{
-	(void)name;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("memfd_create(%q, %x)", name, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	fd_t result;
+	result = sys_memfd_create(name, (syscall_ulong_t)flags);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_memfd_create]]]*/
 
@@ -339,91 +303,63 @@ NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr,
                                   size_t length,
                                   unsigned int flags)
 /*[[[body:libc_mlock2]]]*/
-/*AUTO*/{
-	(void)addr;
-	(void)length;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("mlock2(%p, %Ix, %x)", addr, length, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	errno_t result;
+	result = sys_mlock2(addr, length, (syscall_ulong_t)flags);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_mlock2]]]*/
 
-/*[[[head:libc_pkey_alloc,hash:CRC-32=0x365873c6]]]*/
+/*[[[head:libc_pkey_alloc,hash:CRC-32=0xc828dc13]]]*/
+#ifdef __ARCH_HAVE_PKEY
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags,
                                       unsigned int access_rights)
 /*[[[body:libc_pkey_alloc]]]*/
-/*AUTO*/{
-	(void)flags;
-	(void)access_rights;
-	CRT_UNIMPLEMENTEDF("pkey_alloc(%x, %x)", flags, access_rights); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	syscall_slong_t result;
+	result = sys_pkey_alloc((syscall_ulong_t)flags,
+	                        (syscall_ulong_t)access_rights);
+	return (int)libc_seterrno_syserr(result);
 }
+#endif /* MAGIC:impl_if */
 /*[[[end:libc_pkey_alloc]]]*/
 
-/*[[[head:libc_pkey_set,hash:CRC-32=0xe240f11a]]]*/
-INTERN ATTR_SECTION(".text.crt.system.mman") int
-NOTHROW_NCX(LIBCCALL libc_pkey_set)(int key,
-                                    unsigned int access_rights)
-/*[[[body:libc_pkey_set]]]*/
-/*AUTO*/{
-	(void)key;
-	(void)access_rights;
-	CRT_UNIMPLEMENTEDF("pkey_set(%x, %x)", key, access_rights); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_pkey_set]]]*/
 
-/*[[[head:libc_pkey_get,hash:CRC-32=0x2f2b16ef]]]*/
-INTERN ATTR_SECTION(".text.crt.system.mman") int
-NOTHROW_NCX(LIBCCALL libc_pkey_get)(int key)
-/*[[[body:libc_pkey_get]]]*/
-/*AUTO*/{
-	(void)key;
-	CRT_UNIMPLEMENTEDF("pkey_get(%x)", key); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_pkey_get]]]*/
 
-/*[[[head:libc_pkey_free,hash:CRC-32=0x1832d1ee]]]*/
+/*[[[head:libc_pkey_free,hash:CRC-32=0x75ef0f67]]]*/
+#ifdef __ARCH_HAVE_PKEY
 INTERN ATTR_SECTION(".text.crt.system.mman") int
-NOTHROW_NCX(LIBCCALL libc_pkey_free)(int key)
+NOTHROW_NCX(LIBCCALL libc_pkey_free)(int pkey)
 /*[[[body:libc_pkey_free]]]*/
-/*AUTO*/{
-	(void)key;
-	CRT_UNIMPLEMENTEDF("pkey_free(%x)", key); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	errno_t error;
+	error = sys_pkey_free((syscall_ulong_t)(unsigned int)pkey);
+	return libc_seterrno_syserr(error);
 }
+#endif /* MAGIC:impl_if */
 /*[[[end:libc_pkey_free]]]*/
 
-/*[[[head:libc_pkey_mprotect,hash:CRC-32=0x831af7f4]]]*/
+/*[[[head:libc_pkey_mprotect,hash:CRC-32=0x51b21a55]]]*/
+#ifdef __ARCH_HAVE_PKEY
 INTERN ATTR_SECTION(".text.crt.system.mman") int
 NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr,
                                          size_t len,
                                          __STDC_INT_AS_UINT_T prot,
                                          int pkey)
 /*[[[body:libc_pkey_mprotect]]]*/
-/*AUTO*/{
-	(void)addr;
-	(void)len;
-	(void)prot;
-	(void)pkey;
-	CRT_UNIMPLEMENTEDF("pkey_mprotect(%p, %Ix, %x, %x)", addr, len, prot, pkey); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+{
+	errno_t error;
+	error = sys_pkey_mprotect(addr, len, (syscall_ulong_t)prot,
+	                          (syscall_ulong_t)(unsigned int)pkey);
+	return libc_seterrno_syserr(error);
 }
+#endif /* MAGIC:impl_if */
 /*[[[end:libc_pkey_mprotect]]]*/
 
-/*[[[end:implementation]]]*/
 
 
-
-/*[[[start:exports,hash:CRC-32=0xf500e6d3]]]*/
+/*[[[start:exports,hash:CRC-32=0x5df15eb4]]]*/
 DEFINE_PUBLIC_ALIAS(mmap, libc_mmap);
 DEFINE_PUBLIC_ALIAS(munmap, libc_munmap);
 DEFINE_PUBLIC_ALIAS(mprotect, libc_mprotect);
@@ -432,8 +368,6 @@ DEFINE_PUBLIC_ALIAS(mlock, libc_mlock);
 DEFINE_PUBLIC_ALIAS(munlock, libc_munlock);
 DEFINE_PUBLIC_ALIAS(mlockall, libc_mlockall);
 DEFINE_PUBLIC_ALIAS(munlockall, libc_munlockall);
-DEFINE_PUBLIC_ALIAS(shm_open, libc_shm_open);
-DEFINE_PUBLIC_ALIAS(shm_unlink, libc_shm_unlink);
 DEFINE_PUBLIC_ALIAS(__madvise, libc_madvise);
 DEFINE_PUBLIC_ALIAS(madvise, libc_madvise);
 DEFINE_PUBLIC_ALIAS(mincore, libc_mincore);
@@ -443,11 +377,12 @@ DEFINE_PUBLIC_ALIAS(mremap, libc_mremap);
 DEFINE_PUBLIC_ALIAS(remap_file_pages, libc_remap_file_pages);
 DEFINE_PUBLIC_ALIAS(memfd_create, libc_memfd_create);
 DEFINE_PUBLIC_ALIAS(mlock2, libc_mlock2);
+#include <asm/pkey.h>
+#ifdef __ARCH_HAVE_PKEY
 DEFINE_PUBLIC_ALIAS(pkey_alloc, libc_pkey_alloc);
-DEFINE_PUBLIC_ALIAS(pkey_set, libc_pkey_set);
-DEFINE_PUBLIC_ALIAS(pkey_get, libc_pkey_get);
 DEFINE_PUBLIC_ALIAS(pkey_free, libc_pkey_free);
 DEFINE_PUBLIC_ALIAS(pkey_mprotect, libc_pkey_mprotect);
+#endif /* __ARCH_HAVE_PKEY */
 /*[[[end:exports]]]*/
 
 DECL_END

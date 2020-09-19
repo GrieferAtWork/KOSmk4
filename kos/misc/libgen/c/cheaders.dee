@@ -90,15 +90,17 @@ function CWriter_ppIfEscaped(
 	local extendedPrefixes = [];
 	local usedCond = escapeText(
 		ppCond, escapeMode, extendedPrefixes: extendedPrefixes);
+	if (usedCond !in ["0", "1"]) {
 again:
-	local newExtendedPrefixes = [];
-	for (local x: extendedPrefixes) {
-		escapeNonRepeatingTextIntoFile(fp, x, escapeMode,
-			extendedPrefixes: newExtendedPrefixes);
-	}
-	if (newExtendedPrefixes) {
-		extendedPrefixes = newExtendedPrefixes;
-		goto again;
+		local newExtendedPrefixes = [];
+		for (local x: extendedPrefixes) {
+			escapeNonRepeatingTextIntoFile(fp, x, escapeMode,
+				extendedPrefixes: newExtendedPrefixes);
+		}
+		if (newExtendedPrefixes) {
+			extendedPrefixes = newExtendedPrefixes;
+			goto again;
+		}
 	}
 	fp.ppIf(usedCond);
 }
@@ -3093,7 +3095,7 @@ class LibraryFunction {
 			return;
 		if (ppCond == "0")
 			return;
-		fp.ppIf(ppCond);
+		CWriter_ppIfEscaped(fp, ppCond, escapeMode);
 		local doc = documentationString;
 		if (doc)
 			fp.printComment(doc);
@@ -3110,7 +3112,7 @@ class LibraryFunction {
 			local usedBindings = functionBindings;
 			if (!usedBindings)
 				return;
-			fp.ppIf(ppCond);
+			CWriter_ppIfEscaped(fp, ppCond, escapeMode);
 			local isFirst = true;
 			local doc = documentationString;
 			local proto = functionPrototype;
@@ -3186,7 +3188,7 @@ class LibraryFunction {
 		if (!hasUsableExport)
 			return;
 		local usedBindings = functionBindings;
-		fp.ppIf(ppCond);
+		CWriter_ppIfEscaped(fp, ppCond, escapeMode);
 		local hasUniversalBinding = false;
 		for (local bind: usedBindings) {
 			if (bind.ppCond == "1") {
@@ -3203,10 +3205,10 @@ class LibraryFunction {
 				mergedCond << "(" << bind.ppCond << ")";
 				isFirst = false;
 			}
-			fp.ppIf(mergedCond.string);
+			CWriter_ppIfEscaped(fp, mergedCond.string, escapeMode);
 		}
 		for (local ppCond, symbolName: exportSymbolNames) {
-			fp.ppIf(ppCond);
+			CWriter_ppIfEscaped(fp, ppCond, escapeMode);
 			if (!symbolName.issymbol())
 				symbolName = repr(symbolName);
 			fp << "DEFINE_PUBLIC_ALIAS(" << symbolName << ", " << this.name << ");\n";
@@ -3499,7 +3501,7 @@ class SystemHeader {
 		}
 		/* Include declaration headers of all dependent functions */
 		for (local cond: dependentFunctionHeaders.keys.sorted()) {
-			fp.ppIf(cond);
+			CWriter_ppIfEscaped(fp, cond, ESCAPE_MODE_NONE);
 			for (local hdr: dependentFunctionHeaders[cond].sorted()) {
 				local shdr: SystemHeader = allSystemHeaders[hdr];
 				if (shdr === this)
@@ -3533,9 +3535,9 @@ class SystemHeader {
 				continue;
 			if (!part.exportSymbolNames)
 				continue;
-			fp.ppIf(part.implementationPpCond);
+			CWriter_ppIfEscaped(fp, part.implementationPpCond, ESCAPE_MODE_NONE);
 			for (local ppCond, asmname: part.exportSymbolNames) {
-				fp.ppIf(ppCond);
+				CWriter_ppIfEscaped(fp, ppCond, ESCAPE_MODE_NONE);
 				if (!asmname.issymbol())
 					asmname = repr(asmname);
 				fp << "DEFINE_PUBLIC_ALIAS("

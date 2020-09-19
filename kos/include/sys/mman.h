@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80d669b7 */
+/* HASH CRC-32:0xd2b3db3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -571,8 +571,24 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munlock,(void const *__addr
 /* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,mlockall,(__STDC_INT_AS_UINT_T __flags),(__flags))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,munlockall,(void),())
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))
+#ifdef __CRT_HAVE_shm_open
+__CDECLARE(__ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
+#else /* __CRT_HAVE_shm_open */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <libc/local/sys.mman/shm_open.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(shm_open, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL shm_open)(char const *__name, __oflag_t __oflags, mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_open))(__name, __oflags, __mode); })
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+#endif /* !__CRT_HAVE_shm_open */
+#ifdef __CRT_HAVE_shm_unlink
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))
+#else /* __CRT_HAVE_shm_unlink */
+#include <asm/fcntl.h>
+#if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
+#include <libc/local/sys.mman/shm_unlink.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(shm_unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL shm_unlink)(char const *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(shm_unlink))(__name); })
+#endif /* __CRT_HAVE_unlink || __CRT_HAVE__unlink || (__AT_FDCWD && __CRT_HAVE_unlinkat) */
+#endif /* !__CRT_HAVE_shm_unlink */
 
 #ifdef __USE_MISC
 #ifdef __CRT_HAVE_madvise
@@ -630,9 +646,25 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,remap_file_pages,(void *__start, size_t __size
 __CDECLARE_OPT(,__fd_t,__NOTHROW_NCX,memfd_create,(char const *__name, unsigned int __flags),(__name,__flags))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,mlock2,(void const *__addr, size_t __length, unsigned int __flags),(__addr,__length,__flags))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_alloc,(unsigned int __flags, unsigned int __access_rights),(__flags,__access_rights))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_set,(int __key, unsigned int __access_rights),(__key,__access_rights))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_get,(int __key),(__key))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_free,(int __key),(__key))
+#ifdef __CRT_HAVE_pkey_set
+__CDECLARE(,int,__NOTHROW_NCX,pkey_set,(int __pkey, unsigned int __access_rights),(__pkey,__access_rights))
+#else /* __CRT_HAVE_pkey_set */
+#include <asm/pkey.h>
+#ifdef __ARCH_HAVE_PKEY
+#include <libc/local/sys.mman/pkey_set.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pkey_set, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pkey_set)(int __pkey, unsigned int __access_rights) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pkey_set))(__pkey, __access_rights); })
+#endif /* __ARCH_HAVE_PKEY */
+#endif /* !__CRT_HAVE_pkey_set */
+#ifdef __CRT_HAVE_pkey_get
+__CDECLARE(,int,__NOTHROW_NCX,pkey_get,(int __pkey),(__pkey))
+#else /* __CRT_HAVE_pkey_get */
+#include <asm/pkey.h>
+#ifdef __ARCH_HAVE_PKEY
+#include <libc/local/sys.mman/pkey_get.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(pkey_get, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL pkey_get)(int __pkey) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pkey_get))(__pkey); })
+#endif /* __ARCH_HAVE_PKEY */
+#endif /* !__CRT_HAVE_pkey_get */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_free,(int __pkey),(__pkey))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,pkey_mprotect,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, int __pkey),(__addr,__len,__prot,__pkey))
 #endif /* __USE_GNU */
 

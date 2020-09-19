@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b552999 */
+/* HASH CRC-32:0xb977a0fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -766,13 +766,19 @@
 #define __NRAN4_execveat                 flags
 #define __NRAN0_userfaultfd              TODO_PROTOTYPE
 #define __NRAN0_membarrier               TODO_PROTOTYPE
-#define __NRAN0_mlock2                   TODO_PROTOTYPE
+#define __NRAN0_mlock2                   addr
+#define __NRAN1_mlock2                   length
+#define __NRAN2_mlock2                   flags
 #define __NRAN0_copy_file_range          TODO_PROTOTYPE
 #define __NRAN0_preadv2                  TODO_PROTOTYPE
 #define __NRAN0_pwritev2                 TODO_PROTOTYPE
-#define __NRAN0_pkey_mprotect            TODO_PROTOTYPE
-#define __NRAN0_pkey_alloc               TODO_PROTOTYPE
-#define __NRAN0_pkey_free                TODO_PROTOTYPE
+#define __NRAN0_pkey_mprotect            addr
+#define __NRAN1_pkey_mprotect            len
+#define __NRAN2_pkey_mprotect            prot
+#define __NRAN3_pkey_mprotect            pkey
+#define __NRAN0_pkey_alloc               flags
+#define __NRAN1_pkey_alloc               access_rights
+#define __NRAN0_pkey_free                key
 #define __NRAN0_statx                    TODO_PROTOTYPE
 #define __NRAN0_io_pgetevents            TODO_PROTOTYPE
 #define __NRAN0_rseq                     TODO_PROTOTYPE
@@ -2113,7 +2119,9 @@
 #define __NRRTR_userfaultfd               SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_membarrier               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_membarrier                SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_mlock2                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_mlock2                   SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_mlock2                   SC_REPR_SIZE_T                                                       /* length */ 
+#define __NRATR2_mlock2                   SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NRRTR_mlock2                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_copy_file_range          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_copy_file_range           SC_REPR_ERRNO_T                                                      /* return */
@@ -2121,11 +2129,15 @@
 #define __NRRTR_preadv2                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_pwritev2                 SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_pwritev2                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_pkey_mprotect            SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_pkey_mprotect            SC_REPR_POINTER                                                      /* addr */ 
+#define __NRATR1_pkey_mprotect            SC_REPR_SIZE_T                                                       /* len */ 
+#define __NRATR2_pkey_mprotect            SC_REPR_SYSCALL_ULONG_T                                              /* prot */ 
+#define __NRATR3_pkey_mprotect            SC_REPR_SYSCALL_ULONG_T                                              /* pkey */ 
 #define __NRRTR_pkey_mprotect             SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_pkey_alloc               SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_pkey_alloc                SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_pkey_free                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NRATR0_pkey_alloc               SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NRATR1_pkey_alloc               SC_REPR_SYSCALL_ULONG_T                                              /* access_rights */ 
+#define __NRRTR_pkey_alloc                SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NRATR0_pkey_free                SC_REPR_SYSCALL_ULONG_T                                              /* key */ 
 #define __NRRTR_pkey_free                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_statx                    SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_statx                     SC_REPR_ERRNO_T                                                      /* return */

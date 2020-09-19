@@ -768,11 +768,12 @@ remap_file_pages:(void *start, size_t size,
                   [tostr(MMAP_PROT)] syscall_ulong_t prot,
                   size_t pgoff, syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
 
-mincore:(void *start, size_t len, uint8_t *vec) -> errno_t;            /* UNIMPLEMENTED! */
-madvise:(void *addr, size_t len, syscall_ulong_t advice) -> errno_t;   /* UNIMPLEMENTED! */
-mlock:(void const *addr, size_t len) -> errno_t;                       /* UNIMPLEMENTED! */
-munlock:(void const *addr, size_t len) -> errno_t;                     /* UNIMPLEMENTED! */
-[cp] msync:(void *addr, size_t len, syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
+mincore:(void *start, size_t len, uint8_t *vec) -> errno_t;                 /* UNIMPLEMENTED! */
+madvise:(void *addr, size_t len, syscall_ulong_t advice) -> errno_t;        /* UNIMPLEMENTED! */
+mlock:(void const *addr, size_t len) -> errno_t;                            /* UNIMPLEMENTED! */
+mlock2:(void const *addr, size_t length, syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
+munlock:(void const *addr, size_t len) -> errno_t;                          /* UNIMPLEMENTED! */
+[cp] msync:(void *addr, size_t len, syscall_ulong_t flags) -> errno_t;      /* UNIMPLEMENTED! */
 
 @@@param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT'
 mlockall:([tostr(MLOCKALL_FLAGS)] syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
@@ -2642,6 +2643,11 @@ get_exception_handlerx64:([tostr(out:EXCEPTION_HANDLER_MODE64)] __ULONG64_TYPE__
 
 modify_ldt:(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount) -> syscall_slong_t;
 
+pkey_alloc:(syscall_ulong_t flags, syscall_ulong_t access_rights) -> syscall_slong_t;
+pkey_free:(syscall_ulong_t key) -> errno_t;
+pkey_mprotect:(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) -> errno_t;
+
+
 
 
 
@@ -2718,7 +2724,6 @@ sched_getattr:(int TODO_PROTOTYPE) -> errno_t;
 
 userfaultfd:(int TODO_PROTOTYPE) -> errno_t;
 membarrier:(int TODO_PROTOTYPE) -> errno_t;
-mlock2:(int TODO_PROTOTYPE) -> errno_t;
 
 kexec_load:(int TODO_PROTOTYPE) -> errno_t;
 kexec_file_load:(int TODO_PROTOTYPE) -> errno_t;
@@ -2763,9 +2768,6 @@ security:(int TODO_PROTOTYPE) -> errno_t;
 sysfs:(int TODO_PROTOTYPE) -> errno_t;
 rseq:(int TODO_PROTOTYPE) -> errno_t;
 statx:(int TODO_PROTOTYPE) -> errno_t;
-pkey_alloc:(int TODO_PROTOTYPE) -> errno_t;
-pkey_free:(int TODO_PROTOTYPE) -> errno_t;
-pkey_mprotect:(int TODO_PROTOTYPE) -> errno_t;
 copy_file_range:(int TODO_PROTOTYPE) -> errno_t;
 preadv2:(int TODO_PROTOTYPE) -> errno_t;
 pwritev2:(int TODO_PROTOTYPE) -> errno_t;

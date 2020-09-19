@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xa8b33c6b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,6 +18,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-
-/* Placeholder... */
-
+#ifndef __local_pkey_set_defined
+#define __local_pkey_set_defined 1
+#include <__crt.h>
+#include <asm/pkey.h>
+#ifdef __ARCH_HAVE_PKEY
+#include <libc/errno.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(pkey_set) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pkey_set))(int __pkey, unsigned int __access_rights) {
+	if __unlikely(!__arch_pkey_verify_key(__pkey) ||
+	            !__arch_pkey_verify_rights(__access_rights))
+		goto __badkey_or_rights;
+	__arch_pkey_set(__pkey, __access_rights);
+	return 0;
+__badkey_or_rights:
+#ifdef __EINVAL
+	return __libc_seterrno(__EINVAL);
+#else /* __EINVAL */
+	return -1;
+#endif /* !__EINVAL */
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_pkey_set_defined
+#define __local___localdep_pkey_set_defined 1
+#define __localdep_pkey_set __LIBC_LOCAL_NAME(pkey_set)
+#endif /* !__local___localdep_pkey_set_defined */
+#else /* __ARCH_HAVE_PKEY */
+#undef __local_pkey_set_defined
+#endif /* !__ARCH_HAVE_PKEY */
+#endif /* !__local_pkey_set_defined */

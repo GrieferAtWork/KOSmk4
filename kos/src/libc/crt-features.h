@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a41efaf */
+/* HASH CRC-32:0xf877edab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1803,11 +1803,16 @@
 #define __CRT_HAVE_DOS$perror 1
 #define __CRT_HAVE_DOS$pipe 1
 #define __CRT_HAVE_DOS$pipe2 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#include <asm/pkey.h>
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
 #define __CRT_HAVE_DOS$pkey_alloc 1
 #define __CRT_HAVE_DOS$pkey_free 1
 #define __CRT_HAVE_DOS$pkey_get 1
 #define __CRT_HAVE_DOS$pkey_mprotect 1
 #define __CRT_HAVE_DOS$pkey_set 1
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __ARCH_HAVE_PKEY */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$poll 1
 #define __CRT_HAVE_DOS$popcount 1
 #define __CRT_HAVE_DOS$popcount32 1
@@ -4828,11 +4833,15 @@
 #define __CRT_HAVE_perror 1
 #define __CRT_HAVE_pipe 1
 #define __CRT_HAVE_pipe2 1
+#endif /* !__KERNEL__ */
+#if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
 #define __CRT_HAVE_pkey_alloc 1
 #define __CRT_HAVE_pkey_free 1
 #define __CRT_HAVE_pkey_get 1
 #define __CRT_HAVE_pkey_mprotect 1
 #define __CRT_HAVE_pkey_set 1
+#endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
+#ifndef __KERNEL__
 #define __CRT_HAVE_poll 1
 #define __CRT_HAVE_popcount 1
 #define __CRT_HAVE_popcount32 1

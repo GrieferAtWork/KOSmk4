@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5703410f */
+/* HASH CRC-32:0xd01ffba2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7218,19 +7218,19 @@ INTERN_FUNCTION(libc_sys_Xmembarrier)
 END(libc_sys_Xmembarrier)
 DEFINE_PUBLIC_ALIAS(sys_Xmembarrier, libc_sys_Xmembarrier)
 
-/* errno_t mlock2(int TODO_PROTOTYPE) */
+/* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 .section .text.crt.syscall.mlock2
 INTERN_FUNCTION(libc_sys_mlock2)
 	movl   $(0x178), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall3
 END(libc_sys_mlock2)
 DEFINE_PUBLIC_ALIAS(sys_mlock2, libc_sys_mlock2)
 
-/* errno_t mlock2(int TODO_PROTOTYPE) */
+/* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 .section .text.crt.syscall.Xmlock2
 INTERN_FUNCTION(libc_sys_Xmlock2)
 	movl   $(0x178), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xmlock2)
 DEFINE_PUBLIC_ALIAS(sys_Xmlock2, libc_sys_Xmlock2)
 
@@ -7282,39 +7282,39 @@ INTERN_FUNCTION(libc_sys_Xpwritev2)
 END(libc_sys_Xpwritev2)
 DEFINE_PUBLIC_ALIAS(sys_Xpwritev2, libc_sys_Xpwritev2)
 
-/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+/* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
 .section .text.crt.syscall.pkey_mprotect
 INTERN_FUNCTION(libc_sys_pkey_mprotect)
 	movl   $(0x17c), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall4
 END(libc_sys_pkey_mprotect)
 DEFINE_PUBLIC_ALIAS(sys_pkey_mprotect, libc_sys_pkey_mprotect)
 
-/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+/* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
 .section .text.crt.syscall.Xpkey_mprotect
 INTERN_FUNCTION(libc_sys_Xpkey_mprotect)
 	movl   $(0x17c), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall4
 END(libc_sys_Xpkey_mprotect)
 DEFINE_PUBLIC_ALIAS(sys_Xpkey_mprotect, libc_sys_Xpkey_mprotect)
 
-/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+/* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 .section .text.crt.syscall.pkey_alloc
 INTERN_FUNCTION(libc_sys_pkey_alloc)
 	movl   $(0x17d), %eax
-	jmp    libc_x86_exec_syscall1
+	jmp    libc_x86_exec_syscall2
 END(libc_sys_pkey_alloc)
 DEFINE_PUBLIC_ALIAS(sys_pkey_alloc, libc_sys_pkey_alloc)
 
-/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+/* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 .section .text.crt.syscall.Xpkey_alloc
 INTERN_FUNCTION(libc_sys_Xpkey_alloc)
 	movl   $(0x17d), %eax
-	jmp    libc_x86_exec_Xsyscall1
+	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xpkey_alloc)
 DEFINE_PUBLIC_ALIAS(sys_Xpkey_alloc, libc_sys_Xpkey_alloc)
 
-/* errno_t pkey_free(int TODO_PROTOTYPE) */
+/* errno_t pkey_free(syscall_ulong_t key) */
 .section .text.crt.syscall.pkey_free
 INTERN_FUNCTION(libc_sys_pkey_free)
 	movl   $(0x17e), %eax
@@ -7322,7 +7322,7 @@ INTERN_FUNCTION(libc_sys_pkey_free)
 END(libc_sys_pkey_free)
 DEFINE_PUBLIC_ALIAS(sys_pkey_free, libc_sys_pkey_free)
 
-/* errno_t pkey_free(int TODO_PROTOTYPE) */
+/* errno_t pkey_free(syscall_ulong_t key) */
 .section .text.crt.syscall.Xpkey_free
 INTERN_FUNCTION(libc_sys_Xpkey_free)
 	movl   $(0x17e), %eax

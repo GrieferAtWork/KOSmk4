@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf466ec58 */
+/* HASH CRC-32:0xc746a8f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -639,7 +639,9 @@
 #define __NRAN4_execveat               flags
 #define __NRAN0_userfaultfd            TODO_PROTOTYPE
 #define __NRAN0_membarrier             TODO_PROTOTYPE
-#define __NRAN0_mlock2                 TODO_PROTOTYPE
+#define __NRAN0_mlock2                 addr
+#define __NRAN1_mlock2                 length
+#define __NRAN2_mlock2                 flags
 #define __NRAN0_open                   filename
 #define __NRAN1_open                   oflags
 #define __NRAN2_open                   mode
@@ -1708,7 +1710,9 @@
 #define __NRRTR_userfaultfd             SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_membarrier             SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_membarrier              SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_mlock2                 SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
+#define __NRATR0_mlock2                 SC_REPR_POINTER                                         /* addr */ 
+#define __NRATR1_mlock2                 SC_REPR_SIZE_T                                          /* length */ 
+#define __NRATR2_mlock2                 SC_REPR_SYSCALL_ULONG_T                                 /* flags */ 
 #define __NRRTR_mlock2                  SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_open                   SC_REPR_FILENAME                                        /* filename */ 
 #define __NRATR1_open                   SC_REPR_OFLAG_T                                         /* oflags */ 

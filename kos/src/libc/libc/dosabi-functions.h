@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x388dec4b */
+/* HASH CRC-32:0x47c2556 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1912,7 +1912,7 @@ DFUN(".text.crt.dos.system.mman", libd_msync, libc_msync, TD, 3, TP, TI, TD)
 DFUN(".text.crt.dos.system.mman", libd_mlock, libc_mlock, TD, 2, TP, TI)
 DFUN(".text.crt.dos.system.mman", libd_munlock, libc_munlock, TD, 2, TP, TI)
 DFUN(".text.crt.dos.system.mman", libd_mlockall, libc_mlockall, TD, 1, TD)
-DFUN(".text.crt.dos.system.mman", libd_shm_open, libc_shm_open, TD, 3, TP, TIn(__SIZEOF_OFLAG_T__), TIn(__SIZEOF_MODE_T__))
+DFUN(".text.crt.dos.system.mman", libd_shm_open, libc_shm_open, TIn(__SIZEOF_FD_T__), 3, TP, TIn(__SIZEOF_OFLAG_T__), TIn(__SIZEOF_MODE_T__))
 DFUN(".text.crt.dos.system.mman", libd_shm_unlink, libc_shm_unlink, TD, 1, TP)
 DFUN(".text.crt.dos.system.mman", libd_madvise, libc_madvise, TD, 3, TP, TI, TD)
 DFUN(".text.crt.dos.system.mman", libd_mincore, libc_mincore, TD, 3, TP, TI, TP)
@@ -1922,11 +1922,14 @@ DFUN(".text.crt.dos.heap.mman", libd_mremap, libc_mremap, TP, 5, TP, TI, TI, TD,
 DFUN(".text.crt.dos.system.mman", libd_remap_file_pages, libc_remap_file_pages, TD, 5, TP, TI, TD, TI, TD)
 DFUN(".text.crt.dos.system.mman", libd_memfd_create, libc_memfd_create, TIn(__SIZEOF_FD_T__), 2, TP, TD)
 DFUN(".text.crt.dos.system.mman", libd_mlock2, libc_mlock2, TD, 3, TP, TI, TD)
+#include <asm/pkey.h>
+#ifdef __ARCH_HAVE_PKEY
 DFUN(".text.crt.dos.system.mman", libd_pkey_alloc, libc_pkey_alloc, TD, 2, TD, TD)
 DFUN(".text.crt.dos.system.mman", libd_pkey_set, libc_pkey_set, TD, 2, TD, TD)
 DFUN(".text.crt.dos.system.mman", libd_pkey_get, libc_pkey_get, TD, 1, TD)
 DFUN(".text.crt.dos.system.mman", libd_pkey_free, libc_pkey_free, TD, 1, TD)
 DFUN(".text.crt.dos.system.mman", libd_pkey_mprotect, libc_pkey_mprotect, TD, 4, TP, TI, TD, TD)
+#endif /* __ARCH_HAVE_PKEY */
 
 /* sys.mount */
 DFUN(".text.crt.dos.fs.mount", libd_mount, libc_mount, TD, 5, TP, TP, TP, TP, TP)

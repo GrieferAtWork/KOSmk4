@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae5df212 */
+/* HASH CRC-32:0x584c0a25 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1081,7 +1081,7 @@ __CDECLARE_SC(,__fd_t,mktty,(char const *__name, __fd_t __keyboard, __fd_t __dis
 __CDECLARE_SC(,__errno_t,mlock,(void const *__addr, __size_t __len),(__addr,__len))
 #endif /* __CRT_HAVE_SC(mlock) */
 #if __CRT_HAVE_SC(mlock2)
-__CDECLARE_SC(,__errno_t,mlock2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,mlock2,(void const *__addr, __size_t __length, __syscall_ulong_t __flags),(__addr,__length,__flags))
 #endif /* __CRT_HAVE_SC(mlock2) */
 #if __CRT_HAVE_SC(mlockall)
 /* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
@@ -1278,13 +1278,13 @@ __CDECLARE_SC(,__errno_t,pipe2,(__fd_t *__pipedes, __oflag_t __flags),(__pipedes
 __CDECLARE_SC(,__errno_t,pivot_root,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(pivot_root) */
 #if __CRT_HAVE_SC(pkey_alloc)
-__CDECLARE_SC(,__errno_t,pkey_alloc,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__syscall_slong_t,pkey_alloc,(__syscall_ulong_t __flags, __syscall_ulong_t __access_rights),(__flags,__access_rights))
 #endif /* __CRT_HAVE_SC(pkey_alloc) */
 #if __CRT_HAVE_SC(pkey_free)
-__CDECLARE_SC(,__errno_t,pkey_free,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,pkey_free,(__syscall_ulong_t __key),(__key))
 #endif /* __CRT_HAVE_SC(pkey_free) */
 #if __CRT_HAVE_SC(pkey_mprotect)
-__CDECLARE_SC(,__errno_t,pkey_mprotect,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_SC(,__errno_t,pkey_mprotect,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __pkey),(__addr,__len,__prot,__pkey))
 #endif /* __CRT_HAVE_SC(pkey_mprotect) */
 #if __CRT_HAVE_SC(poll)
 __CDECLARE_SC(,__ssize_t,poll,(struct pollfd *__fds, __size_t __nfds, __syscall_slong_t __timeout),(__fds,__nfds,__timeout))
@@ -3093,7 +3093,7 @@ __CDECLARE_XSC(,__fd_t,mktty,(char const *__name, __fd_t __keyboard, __fd_t __di
 __CDECLARE_XSC(,__errno_t,mlock,(void const *__addr, __size_t __len),(__addr,__len))
 #endif /* __CRT_HAVE_XSC(mlock) */
 #if __CRT_HAVE_XSC(mlock2)
-__CDECLARE_XSC(,__errno_t,mlock2,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,mlock2,(void const *__addr, __size_t __length, __syscall_ulong_t __flags),(__addr,__length,__flags))
 #endif /* __CRT_HAVE_XSC(mlock2) */
 #if __CRT_HAVE_XSC(mlockall)
 /* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
@@ -3290,13 +3290,13 @@ __CDECLARE_XSC(,__errno_t,pipe2,(__fd_t *__pipedes, __oflag_t __flags),(__pipede
 __CDECLARE_XSC(,__errno_t,pivot_root,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(pivot_root) */
 #if __CRT_HAVE_XSC(pkey_alloc)
-__CDECLARE_XSC(,__errno_t,pkey_alloc,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__syscall_slong_t,pkey_alloc,(__syscall_ulong_t __flags, __syscall_ulong_t __access_rights),(__flags,__access_rights))
 #endif /* __CRT_HAVE_XSC(pkey_alloc) */
 #if __CRT_HAVE_XSC(pkey_free)
-__CDECLARE_XSC(,__errno_t,pkey_free,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,pkey_free,(__syscall_ulong_t __key),(__key))
 #endif /* __CRT_HAVE_XSC(pkey_free) */
 #if __CRT_HAVE_XSC(pkey_mprotect)
-__CDECLARE_XSC(,__errno_t,pkey_mprotect,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
+__CDECLARE_XSC(,__errno_t,pkey_mprotect,(void *__addr, __size_t __len, __syscall_ulong_t __prot, __syscall_ulong_t __pkey),(__addr,__len,__prot,__pkey))
 #endif /* __CRT_HAVE_XSC(pkey_mprotect) */
 #if __CRT_HAVE_XSC(poll)
 __CDECLARE_XSC(,__ssize_t,poll,(struct pollfd *__fds, __size_t __nfds, __syscall_slong_t __timeout),(__fds,__nfds,__timeout))

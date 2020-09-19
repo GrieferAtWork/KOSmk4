@@ -17,6 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef _ASM_OS_PATHS_H
+#define _ASM_OS_PATHS_H 1
 
-/* Placeholder... */
+#include <__stdinc.h>
 
+
+
+#ifndef __PATH_SHM
+#define __PATH_SHM "/dev/shm" /* Must _not_ include a trailing slash! */
+#endif /* !__PATH_SHM */
+
+#endif /* !_ASM_OS_PATHS_H */

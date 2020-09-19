@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5196c200 */
+/* HASH CRC-32:0xb003a4bc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -14349,7 +14349,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_membarrier)
 	.cfi_endproc
 END(__x86_asm32_int80_membarrier)
 
-/* errno_t mlock2(int TODO_PROTOTYPE) */
+/* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.mlock2
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	.cfi_startproc simple
@@ -14368,14 +14368,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_mlock2)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mlock2)
 	call   sys_mlock2
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -14497,7 +14497,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pwritev2)
 	.cfi_endproc
 END(__x86_asm32_int80_pwritev2)
 
-/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+/* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
 .section .text.x86.asm32_syscall_int80.pkey_mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	.cfi_startproc simple
@@ -14516,14 +14516,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pkey_mprotect)
 	call   sys_pkey_mprotect
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -14534,7 +14536,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_mprotect)
 	.cfi_endproc
 END(__x86_asm32_int80_pkey_mprotect)
 
-/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+/* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 .section .text.x86.asm32_syscall_int80.pkey_alloc
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
 	.cfi_startproc simple
@@ -14553,14 +14555,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pkey_alloc)
 	call   sys_pkey_alloc
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -14571,7 +14573,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_alloc)
 	.cfi_endproc
 END(__x86_asm32_int80_pkey_alloc)
 
-/* errno_t pkey_free(int TODO_PROTOTYPE) */
+/* errno_t pkey_free(syscall_ulong_t key) */
 .section .text.x86.asm32_syscall_int80.pkey_free
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_pkey_free)
 	.cfi_startproc simple
@@ -33875,7 +33877,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_membarrier)
 	.cfi_endproc
 END(__x86_asm32_sysenter_membarrier)
 
-/* errno_t mlock2(int TODO_PROTOTYPE) */
+/* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysenter.mlock2
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mlock2)
 	.cfi_startproc simple
@@ -33894,14 +33896,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mlock2)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_mlock2)
 	call   sys_mlock2
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -34023,7 +34025,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pwritev2)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pwritev2)
 
-/* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
+/* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
 .section .text.x86.asm32_syscall_sysenter.pkey_mprotect
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_mprotect)
 	.cfi_startproc simple
@@ -34042,14 +34044,16 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_mprotect)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pkey_mprotect)
 	call   sys_pkey_mprotect
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -34060,7 +34064,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_mprotect)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pkey_mprotect)
 
-/* errno_t pkey_alloc(int TODO_PROTOTYPE) */
+/* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
 .section .text.x86.asm32_syscall_sysenter.pkey_alloc
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_alloc)
 	.cfi_startproc simple
@@ -34079,14 +34083,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_alloc)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
+	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
 	EXTERN(sys_pkey_alloc)
 	call   sys_pkey_alloc
 	popl_cfi_r %ebx
-	popl_cfi_r %edx
 	popl_cfi_r %ecx
+	popl_cfi_r %edx
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -34097,7 +34101,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_alloc)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pkey_alloc)
 
-/* errno_t pkey_free(int TODO_PROTOTYPE) */
+/* errno_t pkey_free(syscall_ulong_t key) */
 .section .text.x86.asm32_syscall_sysenter.pkey_free
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pkey_free)
 	.cfi_startproc simple

@@ -586,12 +586,85 @@ int mlockall(__STDC_INT_AS_UINT_T flags);
 
 int munlockall();
 
-[[cp]]
-int shm_open([[nonnull]] char const *name,
-             $oflag_t oflags, mode_t mode);
+[[cp, requires_function(open)]]
+[[impl_include("<asm/os/paths.h>", "<asm/oflags.h>")]]
+[[impl_include("<parts/malloca.h>", "<libc/errno.h>")]]
+$fd_t shm_open([[nonnull]] char const *name,
+               $oflag_t oflags, mode_t mode) {
+	fd_t result;
+	char *fullname;
+	size_t namelen;
+@@pp_if defined(O_DOSPATH)@@
+	if (oflags & O_DOSPATH) {
+		while (*name == '/' || *name == '\\')
+			++name;
+	} else {
+		while (*name == '/')
+			++name;
+	}
+@@pp_elif defined(_WIN32)@@
+	while (*name == '/' || *name == '\\')
+		++name;
+@@pp_else@@
+	while (*name == '/')
+		++name;
+@@pp_endif@@
+	namelen  = strlen(name);
+	fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
+	                              namelen + 1) *
+	                             sizeof(char));
+	if unlikely(!fullname)
+		return -1;
+	memcpy(mempcpy(fullname, __PATH_SHM "/",
+	               (__COMPILER_STRLEN(__PATH_SHM) + 1) *
+	               sizeof(char)),
+	       fullname,
+	       (namelen + 1) *
+	       sizeof(char));
+	result = open(fullname, oflags, mode);
+@@pp_if defined(ENOENT) && defined(O_CREAT) && $has_function(mkdir)@@
+	if (result < 0 && (oflags & O_CREAT) != 0 && __libc_geterrno_or(ENOENT) == ENOENT) {
+		/* Lazily create the SHM directory (/dev/shm), if it hadn't been created already.
+		 * XXX: This assumes that `headof(__PATH_SHM)' already exists... */
+		mkdir(__PATH_SHM, 0777);
+		result = open(fullname, oflags, mode);
+	}
+@@pp_endif@@
+	__freea(fullname);
+	return result;
+}
 
-[[cp]]
-int shm_unlink([[nonnull]] char const *name);
+[[cp, requires_function(unlink)]]
+[[impl_include("<asm/os/paths.h>")]]
+[[impl_include("<parts/malloca.h>")]]
+int shm_unlink([[nonnull]] char const *name) {
+	int result;
+	char *fullname;
+	size_t namelen;
+@@pp_ifdef _WIN32@@
+	while (*name == '/' || *name == '\\')
+		++name;
+@@pp_else@@
+	while (*name == '/')
+		++name;
+@@pp_endif@@
+	namelen  = strlen(name);
+	fullname = (char *)__malloca((__COMPILER_STRLEN(__PATH_SHM) + 1 +
+	                              namelen + 1) *
+	                             sizeof(char));
+	if unlikely(!fullname)
+		return -1;
+	memcpy(mempcpy(fullname, __PATH_SHM "/",
+	               (__COMPILER_STRLEN(__PATH_SHM) + 1) *
+	               sizeof(char)),
+	       fullname,
+	       (namelen + 1) *
+	       sizeof(char));
+	result = unlink(fullname);
+	__freea(fullname);
+	return result;
+}
+
 
 %
 %#ifdef __USE_MISC
@@ -658,12 +731,44 @@ int remap_file_pages(void *start, size_t size,
 $fd_t memfd_create(char const *name, unsigned int flags);
 int mlock2(void const *addr, size_t length, unsigned int flags);
 
+[[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 int pkey_alloc(unsigned int flags, unsigned int access_rights);
-int pkey_set(int key, unsigned int access_rights);
-int pkey_get(int key);
-int pkey_free(int key);
+
+[[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
+[[impl_include("<libc/errno.h>"), requires_include("<asm/pkey.h>"), requires(defined(__ARCH_HAVE_PKEY))]]
+int pkey_set(int pkey, unsigned int access_rights) {
+	if unlikely(!__arch_pkey_verify_key(pkey) ||
+	            !__arch_pkey_verify_rights(access_rights))
+		goto badkey_or_rights;
+	__arch_pkey_set(pkey, access_rights);
+	return 0;
+badkey_or_rights:
+@@pp_ifdef EINVAL@@
+	return __libc_seterrno(EINVAL);
+@@pp_else@@
+	return -1;
+@@pp_endif@@
+}
+
+[[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
+[[impl_include("<libc/errno.h>"), requires_include("<asm/pkey.h>"), requires(defined(__ARCH_HAVE_PKEY))]]
+int pkey_get(int pkey) {
+	if unlikely(!__arch_pkey_verify_key(pkey))
+		goto badkey;
+	return __arch_pkey_get(pkey);
+badkey:
+@@pp_ifdef EINVAL@@
+	return __libc_seterrno(EINVAL);
+@@pp_else@@
+	return -1;
+@@pp_endif@@
+}
+
+[[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
+int pkey_free(int pkey);
 
 [[decl_include("<features.h>")]]
+[[crt_impl_if($extended_include_prefix("<asm/pkey.h>")!defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY))]]
 int pkey_mprotect(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 
 

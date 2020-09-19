@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x974a7e96 */
+/* HASH CRC-32:0x16cc2a5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,8 +50,6 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr, siz
 /* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mlockall)(__STDC_INT_AS_UINT_T flags);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_munlockall)(void);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name, oflag_t oflags, mode_t mode);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mincore)(void *start, size_t len, unsigned char *vec);
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
@@ -66,12 +64,13 @@ INTDEF void *NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr, size_t old_len, size
 INTDEF int NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_memfd_create)(char const *name, unsigned int flags);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mlock2)(void const *addr, size_t length, unsigned int flags);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags, unsigned int access_rights);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_set)(int key, unsigned int access_rights);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_get)(int key);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_free)(int key);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 #endif /* !__KERNEL__ */
+#include <asm/pkey.h>
+#if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_alloc)(unsigned int flags, unsigned int access_rights);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_free)(int pkey);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
+#endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd39f6c0f */
+/* HASH CRC-32:0x97f2316 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -363,12 +363,12 @@
 #define __NR64AC_execveat                 5
 #define __NR64AC_userfaultfd              1
 #define __NR64AC_membarrier               1
-#define __NR64AC_mlock2                   1
+#define __NR64AC_mlock2                   3
 #define __NR64AC_copy_file_range          1
 #define __NR64AC_preadv2                  1
 #define __NR64AC_pwritev2                 1
-#define __NR64AC_pkey_mprotect            1
-#define __NR64AC_pkey_alloc               1
+#define __NR64AC_pkey_mprotect            4
+#define __NR64AC_pkey_alloc               2
 #define __NR64AC_pkey_free                1
 #define __NR64AC_statx                    1
 #define __NR64AC_io_pgetevents            1
@@ -778,7 +778,7 @@
 #define __NR64RT_preadv2                  (errno_t, __errno_t)
 #define __NR64RT_pwritev2                 (errno_t, __errno_t)
 #define __NR64RT_pkey_mprotect            (errno_t, __errno_t)
-#define __NR64RT_pkey_alloc               (errno_t, __errno_t)
+#define __NR64RT_pkey_alloc               (syscall_slong_t, __syscall_slong_t)
 #define __NR64RT_pkey_free                (errno_t, __errno_t)
 #define __NR64RT_statx                    (errno_t, __errno_t)
 #define __NR64RT_io_pgetevents            (errno_t, __errno_t)
@@ -1598,13 +1598,19 @@
 #define __NR64AT4_execveat                 (atflag_t, __atflag_t)
 #define __NR64AT0_userfaultfd              (int, int)
 #define __NR64AT0_membarrier               (int, int)
-#define __NR64AT0_mlock2                   (int, int)
+#define __NR64AT0_mlock2                   (void const *, void const *)
+#define __NR64AT1_mlock2                   (size_t, __size_t)
+#define __NR64AT2_mlock2                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_copy_file_range          (int, int)
 #define __NR64AT0_preadv2                  (int, int)
 #define __NR64AT0_pwritev2                 (int, int)
-#define __NR64AT0_pkey_mprotect            (int, int)
-#define __NR64AT0_pkey_alloc               (int, int)
-#define __NR64AT0_pkey_free                (int, int)
+#define __NR64AT0_pkey_mprotect            (void *, void *)
+#define __NR64AT1_pkey_mprotect            (size_t, __size_t)
+#define __NR64AT2_pkey_mprotect            (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT3_pkey_mprotect            (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_pkey_alloc               (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT1_pkey_alloc               (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT0_pkey_free                (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_statx                    (int, int)
 #define __NR64AT0_io_pgetevents            (int, int)
 #define __NR64AT0_rseq                     (int, int)
@@ -2124,13 +2130,13 @@
 #define __NR64AM_execveat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (__HYBRID_PTR64(char const) const *)c, (__HYBRID_PTR64(char const) const *)d, (__atflag_t)e
 #define __NR64AM_userfaultfd(a, b, c, d, e, f)              (int)a
 #define __NR64AM_membarrier(a, b, c, d, e, f)               (int)a
-#define __NR64AM_mlock2(a, b, c, d, e, f)                   (int)a
+#define __NR64AM_mlock2(a, b, c, d, e, f)                   (void const *)a, (__size_t)b, (__syscall_ulong_t)c
 #define __NR64AM_copy_file_range(a, b, c, d, e, f)          (int)a
 #define __NR64AM_preadv2(a, b, c, d, e, f)                  (int)a
 #define __NR64AM_pwritev2(a, b, c, d, e, f)                 (int)a
-#define __NR64AM_pkey_mprotect(a, b, c, d, e, f)            (int)a
-#define __NR64AM_pkey_alloc(a, b, c, d, e, f)               (int)a
-#define __NR64AM_pkey_free(a, b, c, d, e, f)                (int)a
+#define __NR64AM_pkey_mprotect(a, b, c, d, e, f)            (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AM_pkey_alloc(a, b, c, d, e, f)               (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR64AM_pkey_free(a, b, c, d, e, f)                (__syscall_ulong_t)a
 #define __NR64AM_statx(a, b, c, d, e, f)                    (int)a
 #define __NR64AM_io_pgetevents(a, b, c, d, e, f)            (int)a
 #define __NR64AM_rseq(a, b, c, d, e, f)                     (int)a
@@ -2534,12 +2540,12 @@
 #define __NR64AP_execveat(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_userfaultfd(a)                             (__syscall_ulong_t)a
 #define __NR64AP_membarrier(a)                              (__syscall_ulong_t)a
-#define __NR64AP_mlock2(a)                                  (__syscall_ulong_t)a
+#define __NR64AP_mlock2(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_copy_file_range(a)                         (__syscall_ulong_t)a
 #define __NR64AP_preadv2(a)                                 (__syscall_ulong_t)a
 #define __NR64AP_pwritev2(a)                                (__syscall_ulong_t)a
-#define __NR64AP_pkey_mprotect(a)                           (__syscall_ulong_t)a
-#define __NR64AP_pkey_alloc(a)                              (__syscall_ulong_t)a
+#define __NR64AP_pkey_mprotect(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR64AP_pkey_alloc(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_pkey_free(a)                               (__syscall_ulong_t)a
 #define __NR64AP_statx(a)                                   (__syscall_ulong_t)a
 #define __NR64AP_io_pgetevents(a)                           (__syscall_ulong_t)a

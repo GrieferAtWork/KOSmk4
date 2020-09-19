@@ -244,7 +244,7 @@ INTDEF void VLIBCCALL libc_unimplementedf(char const *__restrict format, ...);
 #undef __libc_seterrno
 #undef __errno_location
 #define __libc_geterrno_or(alt) alt
-#define __libc_seterrno(v)      (void)0
+#define __libc_seterrno(v)      ((void)0, -1)
 #endif /* __KERNEL__ */
 
 

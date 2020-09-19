@@ -662,6 +662,11 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdrandq)(__UINT64_TYPE
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (__rdseedq)(__UINT64_TYPE__ *__restrict __presult) { __BOOL __ok; __asm__ __volatile__("rdseed %q0" : "=r" (*__presult), "=@ccc" (__ok)); return __ok; }
 #endif /* __x86_64__ */
 
+/* Read/Write the protection key control register */
+__FORCELOCAL __UINT32_TYPE__ (__rdpkru)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__(".byte 0x0f, 0x01, 0xee" /* rdpkru */ : "=a" (__res) : "c"(0), "d"(0)); return __res; }
+__FORCELOCAL void (__wrpkru)(__UINT32_TYPE__ __val) { __asm__ __volatile__(".byte 0x0f, 0x01, 0xef" /* wrpkru */ : : "a"(__val), "c"(0), "d"(0)); }
+
+
 
 /* Extended process state save/restore */
 #ifdef __x86_64__

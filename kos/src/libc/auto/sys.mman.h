@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47bdd6e9 */
+/* HASH CRC-32:0x240ddf82 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,8 +48,18 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mlock)(void const *addr, size_
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_munlock)(void const *addr, size_t len);
 /* @param flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_mlockall)(__STDC_INT_AS_UINT_T flags);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_shm_open)(char const *name, oflag_t oflags, mode_t mode);
+INTDEF NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_shm_open)(char const *name, oflag_t oflags, mode_t mode);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name, oflag_t oflags, mode_t mode);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_shm_unlink)(char const *name);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_madvise)(void *addr, size_t len, __STDC_INT_AS_UINT_T advice);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mincore)(void *start, size_t len, unsigned char *vec);
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_LOOSE | PROT_SHARED'
@@ -64,12 +74,25 @@ INTDEF void *NOTHROW_NCX(VLIBDCALL libd_mremap)(void *addr, size_t old_len, size
 INTDEF int NOTHROW_NCX(LIBDCALL libd_remap_file_pages)(void *start, size_t size, __STDC_INT_AS_UINT_T prot, size_t pgoff, __STDC_INT_AS_UINT_T flags);
 INTDEF fd_t NOTHROW_NCX(LIBDCALL libd_memfd_create)(char const *name, unsigned int flags);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_mlock2)(void const *addr, size_t length, unsigned int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_alloc)(unsigned int flags, unsigned int access_rights);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_set)(int key, unsigned int access_rights);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_get)(int key);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_free)(int key);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#include <asm/pkey.h>
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_alloc)(unsigned int flags, unsigned int access_rights);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_set)(int pkey, unsigned int access_rights);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __ARCH_HAVE_PKEY */
+#if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_set)(int pkey, unsigned int access_rights);
+#endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_get)(int pkey);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __ARCH_HAVE_PKEY */
+#if !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
+INTDEF int NOTHROW_NCX(LIBCCALL libc_pkey_get)(int pkey);
+#endif /* !__KERNEL__ && __ARCH_HAVE_PKEY */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && defined(__ARCH_HAVE_PKEY)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_free)(int pkey);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *addr, size_t len, __STDC_INT_AS_UINT_T prot, int pkey);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __ARCH_HAVE_PKEY */
 
 DECL_END
 

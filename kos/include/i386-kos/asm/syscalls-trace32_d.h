@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9ff55c4 */
+/* HASH CRC-32:0x88fac80b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -851,13 +851,19 @@
 #define __NR32AN1_shutdown                     how
 #define __NR32AN0_userfaultfd                  TODO_PROTOTYPE
 #define __NR32AN0_membarrier                   TODO_PROTOTYPE
-#define __NR32AN0_mlock2                       TODO_PROTOTYPE
+#define __NR32AN0_mlock2                       addr
+#define __NR32AN1_mlock2                       length
+#define __NR32AN2_mlock2                       flags
 #define __NR32AN0_copy_file_range              TODO_PROTOTYPE
 #define __NR32AN0_preadv2                      TODO_PROTOTYPE
 #define __NR32AN0_pwritev2                     TODO_PROTOTYPE
-#define __NR32AN0_pkey_mprotect                TODO_PROTOTYPE
-#define __NR32AN0_pkey_alloc                   TODO_PROTOTYPE
-#define __NR32AN0_pkey_free                    TODO_PROTOTYPE
+#define __NR32AN0_pkey_mprotect                addr
+#define __NR32AN1_pkey_mprotect                len
+#define __NR32AN2_pkey_mprotect                prot
+#define __NR32AN3_pkey_mprotect                pkey
+#define __NR32AN0_pkey_alloc                   flags
+#define __NR32AN1_pkey_alloc                   access_rights
+#define __NR32AN0_pkey_free                    key
 #define __NR32AN0_statx                        TODO_PROTOTYPE
 #define __NR32AN0_arch_prctl                   TODO_PROTOTYPE
 #define __NR32AN0_io_pgetevents                TODO_PROTOTYPE
@@ -2461,7 +2467,9 @@
 #define __NR32RTR_userfaultfd                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_membarrier                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_membarrier                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_mlock2                       SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32ATR0_mlock2                       SC_REPR_POINTER                                                      /* addr */ 
+#define __NR32ATR1_mlock2                       SC_REPR_SIZE_T                                                       /* length */ 
+#define __NR32ATR2_mlock2                       SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
 #define __NR32RTR_mlock2                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_copy_file_range              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_copy_file_range               SC_REPR_ERRNO_T                                                      /* return */
@@ -2469,11 +2477,15 @@
 #define __NR32RTR_preadv2                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_pwritev2                     SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_pwritev2                      SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_pkey_mprotect                SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32ATR0_pkey_mprotect                SC_REPR_POINTER                                                      /* addr */ 
+#define __NR32ATR1_pkey_mprotect                SC_REPR_SIZE_T                                                       /* len */ 
+#define __NR32ATR2_pkey_mprotect                SC_REPR_SYSCALL_ULONG_T                                              /* prot */ 
+#define __NR32ATR3_pkey_mprotect                SC_REPR_SYSCALL_ULONG_T                                              /* pkey */ 
 #define __NR32RTR_pkey_mprotect                 SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_pkey_alloc                   SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NR32RTR_pkey_alloc                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_pkey_free                    SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
+#define __NR32ATR0_pkey_alloc                   SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR1_pkey_alloc                   SC_REPR_SYSCALL_ULONG_T                                              /* access_rights */ 
+#define __NR32RTR_pkey_alloc                    SC_REPR_SYSCALL_SLONG_T                                              /* return */
+#define __NR32ATR0_pkey_free                    SC_REPR_SYSCALL_ULONG_T                                              /* key */ 
 #define __NR32RTR_pkey_free                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_statx                        SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_statx                         SC_REPR_ERRNO_T                                                      /* return */

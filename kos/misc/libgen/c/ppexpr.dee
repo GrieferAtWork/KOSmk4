@@ -1538,10 +1538,11 @@ function ppParse(self: string | UserString | CParser | File): PPBranch {
 @@A simple wrapper function that may be used
 @@for optimization of preprocessor expressions
 function optimize(expr: string, assumedExpr: string = none): string {
-	local assume: PPAssume = none;
-	if (assumedExpr !is none)
-		assume = createPPAssume().withAssumption(ppParse(assumedExpr).optimize());
-	return ppParse(expr).optimize(assume).tostr();
+	return ppParse(expr)
+		.optimize(assume: assumedExpr is none
+			? none
+			: createPPAssume().withAssumption(ppParse(assumedExpr).optimize()))
+		.tostr();
 }
 
 

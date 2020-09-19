@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e519a86 */
+/* HASH CRC-32:0xc48ac99 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -744,13 +744,13 @@
 #define SYS_execveat                 __NR_execveat                 /* errno_t execveat(fd_t dirfd, char const *pathname, __HYBRID_PTR64(char const) const *argv, __HYBRID_PTR64(char const) const *envp, atflag_t flags) */
 #define SYS_userfaultfd              __NR_userfaultfd              /* errno_t userfaultfd(int TODO_PROTOTYPE) */
 #define SYS_membarrier               __NR_membarrier               /* errno_t membarrier(int TODO_PROTOTYPE) */
-#define SYS_mlock2                   __NR_mlock2                   /* errno_t mlock2(int TODO_PROTOTYPE) */
+#define SYS_mlock2                   __NR_mlock2                   /* errno_t mlock2(void const *addr, size_t length, syscall_ulong_t flags) */
 #define SYS_copy_file_range          __NR_copy_file_range          /* errno_t copy_file_range(int TODO_PROTOTYPE) */
 #define SYS_preadv2                  __NR_preadv2                  /* errno_t preadv2(int TODO_PROTOTYPE) */
 #define SYS_pwritev2                 __NR_pwritev2                 /* errno_t pwritev2(int TODO_PROTOTYPE) */
-#define SYS_pkey_mprotect            __NR_pkey_mprotect            /* errno_t pkey_mprotect(int TODO_PROTOTYPE) */
-#define SYS_pkey_alloc               __NR_pkey_alloc               /* errno_t pkey_alloc(int TODO_PROTOTYPE) */
-#define SYS_pkey_free                __NR_pkey_free                /* errno_t pkey_free(int TODO_PROTOTYPE) */
+#define SYS_pkey_mprotect            __NR_pkey_mprotect            /* errno_t pkey_mprotect(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t pkey) */
+#define SYS_pkey_alloc               __NR_pkey_alloc               /* syscall_slong_t pkey_alloc(syscall_ulong_t flags, syscall_ulong_t access_rights) */
+#define SYS_pkey_free                __NR_pkey_free                /* errno_t pkey_free(syscall_ulong_t key) */
 #define SYS_statx                    __NR_statx                    /* errno_t statx(int TODO_PROTOTYPE) */
 #define SYS_io_pgetevents            __NR_io_pgetevents            /* errno_t io_pgetevents(int TODO_PROTOTYPE) */
 #define SYS_rseq                     __NR_rseq                     /* errno_t rseq(int TODO_PROTOTYPE) */

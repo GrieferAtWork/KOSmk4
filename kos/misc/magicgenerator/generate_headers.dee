@@ -75,6 +75,16 @@ final global ppAssumeDosAbiSourceFiles: PPAssume = createPPAssume({
 	"__KOS_VERSION__"        : 400,
 });
 
+@@Macro definition assumptions that may be made in crt-kos-kernel.h
+final global ppAssumeCrtKosKernelFeatures: PPAssume = createPPAssume({
+	"__LIBCCALL_IS_LIBDCALL" : false, /* not defined */
+	"__LIBDCALL_IS_LIBKCALL" : false, /* not defined */
+	"__KERNEL__"             : true,  /* is defined */
+	"__SIZEOF_CHAR__"        : 1,
+	"__KOS__"                : 1,
+	"__KOS_VERSION__"        : 400,
+});
+
 
 
 @@The max # of tasks that may be run in parallel
@@ -492,7 +502,7 @@ function doPrint_src_libc_crtFeatures(fp: File) {
 			/* Speed up file printing in this simple case */
 			wrt << "#define __CRT_HAVE_" << name << " 1\n";
 		} else {
-			wrt.ppIf(cond);
+			CWriter_ppIfEscaped(wrt, cond, ESCAPE_MODE_NONE);
 			wrt << "#define __CRT_HAVE_" << name << " 1\n";
 			wrt.ppEndif();
 		}
@@ -547,14 +557,14 @@ function doPrint_include_crtFeatures_crtKosKernel(fp: File) {
 			}
 		}
 	}
-	local wrt = CWriter(fp);
+	local wrt = CWriter(fp, ppAssume: ppAssumeCrtKosKernelFeatures);
 	for (local name: crtFeatureConditions.keys.sorted()) {
 		local cond = crtFeatureConditions[name];
 		if (cond == "1") {
 			/* Speed up file printing in this simple case */
 			wrt << "#define __CRT_HAVE_" << name << " 1\n";
 		} else {
-			wrt.ppIf(cond);
+			CWriter_ppIfEscaped(wrt, cond, ESCAPE_MODE_FULL);
 			wrt << "#define __CRT_HAVE_" << name << " 1\n";
 			wrt.ppEndif();
 		}
@@ -660,11 +670,11 @@ function doPrint_src_libc_libc_dosabiFunctions(fp: File) {
 				local usedBindings: {LibraryFunctionBinding...} = part.functionBindings;
 				if (!usedBindings)
 					continue;
-				cWriter.ppIf(part.ppCond);
+				CWriter_ppIfEscaped(cWriter, part.ppCond, ESCAPE_MODE_NONE);
 				local proto: FunctionPrototype = part.functionPrototype;
 				for (local b /*: LibraryFunctionBinding */: usedBindings) {
 					local bind = b.functionBinding;
-					cWriter.ppIf(b.ppCond);
+					CWriter_ppIfEscaped(cWriter, b.ppCond, ESCAPE_MODE_NONE);
 					if (bind is FunctionImplementation) {
 						local baseFunction = bind.name;
 						/* #define DFUN(section, libd_name, libc_name, returnType, argc, argvTypes...) */
@@ -724,9 +734,9 @@ function doPrint_src_libc_libc_dosabiExports(fp: File) {
 		for (local part: header.order_libcDosabiSource) {
 			if (!part.exportSymbolNames)
 				continue;
-			cWriter.ppIf(part.implementationPpCond);
+			CWriter_ppIfEscaped(cWriter, part.implementationPpCond, ESCAPE_MODE_NONE);
 			for (local ppCond, asmname: part.exportSymbolNames) {
-				cWriter.ppIf(ppCond);
+				CWriter_ppIfEscaped(cWriter, ppCond, ESCAPE_MODE_NONE);
 				if (!asmname.issymbol())
 					asmname = repr(asmname);
 				cWriter << "DEFINE_PUBLIC_ALIAS("
@@ -749,9 +759,9 @@ function doPrint_include_gnu_stubs(fp: File) {
 		stubsByName[f.name] = f;
 	for (local name: stubsByName.keys.sorted()) {
 		local f = stubsByName[name];
-		cWriter.ppIf(f.implementationPpCond);
+		CWriter_ppIfEscaped(cWriter, f.implementationPpCond, ESCAPE_MODE_FULL);
 		for (local ppCond, symbolName: f.exportSymbolNames) {
-			cWriter.ppIf(ppCond);
+			CWriter_ppIfEscaped(cWriter, ppCond, ESCAPE_MODE_FULL);
 			if (symbolName.startswith("?"))
 				symbolName = symbolName.replace("?", "$Q").replace("@", "$A");
 			cWriter << "#define __stub_" << symbolName << " 1\n";

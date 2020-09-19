@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4d4f3db */
+/* HASH CRC-32:0x660d0e3e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2402,11 +2402,14 @@ DEFINE_PUBLIC_ALIAS(DOS$mremap, libd_mremap);
 DEFINE_PUBLIC_ALIAS(DOS$remap_file_pages, libd_remap_file_pages);
 DEFINE_PUBLIC_ALIAS(DOS$memfd_create, libd_memfd_create);
 DEFINE_PUBLIC_ALIAS(DOS$mlock2, libd_mlock2);
+#include <asm/pkey.h>
+#ifdef __ARCH_HAVE_PKEY
 DEFINE_PUBLIC_ALIAS(DOS$pkey_alloc, libd_pkey_alloc);
 DEFINE_PUBLIC_ALIAS(DOS$pkey_set, libd_pkey_set);
 DEFINE_PUBLIC_ALIAS(DOS$pkey_get, libd_pkey_get);
 DEFINE_PUBLIC_ALIAS(DOS$pkey_free, libd_pkey_free);
 DEFINE_PUBLIC_ALIAS(DOS$pkey_mprotect, libd_pkey_mprotect);
+#endif /* __ARCH_HAVE_PKEY */
 
 /* sys.mount */
 DEFINE_PUBLIC_ALIAS(DOS$mount, libd_mount);
