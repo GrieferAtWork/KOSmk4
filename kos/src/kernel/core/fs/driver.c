@@ -406,7 +406,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL driver_state_destroy)(struct driver_state *__restrict self) {
 	size_t i;
 	for (i = 0; i < self->ds_count; ++i)
-		decref_unlikely(self->ds_drivers[i]);
+		weakdecref_unlikely(self->ds_drivers[i]);
 	kfree(self);
 }
 
@@ -422,20 +422,25 @@ REF struct driver_state *NOTHROW(KCALL driver_get_state)(void) {
  * a reference to it. - Else, add `self' and return NULL. */
 PRIVATE REF struct driver *KCALL
 add_global_driver(struct driver *__restrict self) THROWS(E_BADALLOC) {
-	size_t i;
+	size_t i, j;
 	REF struct driver_state *old_state;
 	REF struct driver_state *new_state;
 again:
 	old_state = current_driver_state.get();
 	for (i = 0; i < old_state->ds_count; ++i) {
-		assert(old_state->ds_drivers[i] != self);
-		if unlikely(strcmp(old_state->ds_drivers[i]->d_name, self->d_name) == 0) {
-			REF struct driver *result;
-			/* The driver has already been loaded! */
-			result = incref(old_state->ds_drivers[i]);
-			decref_unlikely(old_state);
-			return result;
+		struct driver *other_driver;
+		other_driver = old_state->ds_drivers[i];
+		assert(other_driver != self);
+		if unlikely(!tryincref(other_driver))
+			continue; /* Dead driver */
+		if unlikely(strcmp(other_driver->d_name, self->d_name) != 0) {
+			/* Driver's name differs from our's (-> Not the same driver) */
+			decref_unlikely(other_driver);
+			continue;
 		}
+		/* Oops... duplicate driver! */
+		decref_unlikely(old_state);
+		return other_driver;
 	}
 	FINALLY_DECREF(old_state);
 	/* Create a copy of `old_state' that includes `self' */
@@ -446,29 +451,33 @@ again:
 	new_state->ds_refcnt = 1; /* Inherited by `current_driver_state.cmpxch_inherit_new()' */
 	new_state->ds_count  = old_state->ds_count + 1;
 	/* Copy existing drivers. */
-	for (i = 0; i < old_state->ds_count; ++i)
-		new_state->ds_drivers[i] = incref(old_state->ds_drivers[i]);
+	for (i = j = 0; j < old_state->ds_count; ++j) {
+		struct driver *other_driver;
+		other_driver = old_state->ds_drivers[i];
+		if (wasdestroyed(other_driver))
+			continue; /* Skip dead drivers. */
+		new_state->ds_drivers[i++] = weakincref(other_driver);
+	}
+	assert(i <= new_state->ds_count - 1);
 	/* Add the new driver. */
-	assert(i == new_state->ds_count - 1);
 	new_state->ds_drivers[i] = incref(self);
+	new_state->ds_count      = i + 1;
 	/* Try to set the new state via an atomic compare-exchange */
-	if unlikely(!current_driver_state.cmpxch_inherit_new(old_state, new_state)) {
+	if unlikely(!current_driver_state.cmpxch_inherit_new(old_state,
+	                                                     new_state)) {
 		destroy(new_state);
 		goto again;
 	}
 	return NULL;
 }
 
-/* This is the one downside of the whole atomic-driver-state system:
- * Removing drivers from the global list cannot be done as NOEXCEPT.
- * Even worse: the one thing that _can_ go wrong when deleting a
- *             driver is an E_BADALLOC exception being thrown.
- *             However, since this function gets called by `driver_finalize()',
- *             the problem is kind-of remedied, since that function was already
- *             able to throw E_WOULDBLOCK prior to the driver state becoming an
- *             atomic reference. */
-PRIVATE bool KCALL
-remove_global_driver(struct driver *__restrict self) THROWS(E_BADALLOC) {
+/* Try to remove a given driver `self' from the list of loaded drivers.
+ * This function is called as part of `driver_destroy()', but is allowed
+ * to fail, in which case anyone using the global driver list will simply
+ * notice that one of the drivers has been destroyed, which is then handled
+ * by simply skipping that driver. */
+PRIVATE NOBLOCK bool
+NOTHROW(KCALL try_remove_driver_from_global_set)(struct driver *__restrict self) {
 	size_t i;
 	REF struct driver_state *old_state;
 	REF struct driver_state *new_state;
@@ -477,28 +486,46 @@ again:
 	for (i = 0; i < old_state->ds_count; ++i) {
 		if (old_state->ds_drivers[i] == self) {
 			/* Found it! */
-			FINALLY_DECREF(old_state);
 			if (old_state->ds_count == 1) {
 				new_state = incref(&empty_driver_state);
 			} else {
-				size_t j;
-				new_state = (REF struct driver_state *)kmalloc(offsetof(struct driver_state, ds_drivers) +
-				                                               (old_state->ds_count - 1) *
-				                                               sizeof(REF struct driver *),
-				                                               GFP_LOCKED | GFP_PREFLT);
+				size_t j, dst;
+				struct driver *other_driver;
+				new_state = (REF struct driver_state *)kmalloc_nx(offsetof(struct driver_state, ds_drivers) +
+				                                                  (old_state->ds_count - 1) *
+				                                                  sizeof(REF struct driver *),
+				                                                  GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
+				if unlikely(!new_state) {
+					/* Cannot allocate the truncated driver state list...
+					 * That means that the driver will remain as a ghost entry that
+					 * users of the loaded-driver-list will simply have to skip over
+					 * upon being encountered... */
+					decref_unlikely(old_state);
+					return false;
+				}
 				new_state->ds_refcnt = 1; /* Inherited by `current_driver_state.cmpxch_inherit_new()' */
-				new_state->ds_count  = old_state->ds_count - 1;
 				/* Copy existing drivers (but skip the driver at `i'). */
-				for (j = 0; j < i; ++j)
-					new_state->ds_drivers[j] = incref(old_state->ds_drivers[j]);
-				for (++j; j < old_state->ds_count; ++j)
-					new_state->ds_drivers[j - 1] = incref(old_state->ds_drivers[j]);
+				dst = 0;
+				for (j = 0; j < i; ++j) {
+					other_driver = old_state->ds_drivers[j];
+					if likely(!wasdestroyed(other_driver))
+						new_state->ds_drivers[dst++] = weakincref(other_driver);
+				}
+				for (++j; j < old_state->ds_count; ++j) {
+					other_driver = old_state->ds_drivers[j];
+					if likely(!wasdestroyed(other_driver))
+						new_state->ds_drivers[dst++] = weakincref(other_driver);
+				}
+				assert(dst <= old_state->ds_count - 1);
+				new_state->ds_count = dst;
 			}
 			/* Try to set the new state via an atomic compare-exchange */
-			if unlikely(!current_driver_state.cmpxch_inherit_new(old_state, new_state)) {
+			if unlikely(!current_driver_state.cmpxch_inherit_new(old_state,
+			                                                     new_state)) {
 				decref_likely(new_state);
 				goto again;
 			}
+			decref(old_state);
 			return true;
 		}
 	}
@@ -519,8 +546,14 @@ NOTHROW(KCALL driver_clear_fde_caches)(void) {
 	REF struct driver_state *ds;
 	result = driver_clear_fde_cache(&kernel_driver);
 	ds = current_driver_state.get();
-	for (i = 0; i < ds->ds_count; ++i)
-		result += driver_clear_fde_cache(ds->ds_drivers[i]);
+	for (i = 0; i < ds->ds_count; ++i) {
+		REF struct driver *drv;
+		drv = ds->ds_drivers[i];
+		if (!tryincref(drv))
+			continue;
+		result += driver_clear_fde_cache(drv);
+		decref_unlikely(drv);
+	}
 	decref_unlikely(ds);
 	return result;
 }
@@ -654,11 +687,16 @@ NOTHROW(KCALL system_clearcaches)(void) {
 		state = current_driver_state.get();
 		for (i = 0; i < state->ds_count; ++i) {
 			kernel_system_clearcache_t func;
-			if (driver_symbol_ex(state->ds_drivers[i], "drv_clearcache", (void **)&func)) {
+			REF struct driver *drv;
+			drv = state->ds_drivers[i];
+			if (!tryincref(drv))
+				continue; /* Dead driver... */
+			if (driver_symbol_ex(drv, "drv_clearcache", (void **)&func)) {
 				temp = (*func)();
 				if (OVERFLOW_UADD(result, temp, &result))
 					result = (size_t)-1;
 			}
+			decref_unlikely(drv);
 		}
 		assert(!wasdestroyed(state));
 		if (ATOMIC_DECFETCH(state->ds_refcnt) == 0) {
@@ -1006,6 +1044,9 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 
 	/* Invoke dynamic driver unloading callbacks. */
 	driver_unloaded_callbacks(self);
+
+	/* Try to remove the driver from the loaded-driver-list */
+	try_remove_driver_from_global_set(self);
 
 	printk(KERN_NOTICE "[mod][-] Delmod: %q\n", self->d_name);
 
@@ -1872,9 +1913,6 @@ do_start_finalization:
 				driver_destroy_global_objects(self);
 				driver_finalized_callbacks(self);
 
-				/* Remove the driver from the current driver state */
-				remove_global_driver(self);
-
 				sync_write(&self->d_sections_lock);
 			} EXCEPT {
 				/* If this acquire failed, still indicate that callbacks were executed. */
@@ -1933,13 +1971,16 @@ again_search_dependers:
 			struct driver *d;
 			size_t i;
 			d = ds->ds_drivers[j];
+			if (d == self)
+				continue;
+			if (!tryincref(d))
+				continue;
 			/* Check if this driver has a dependency on us. */
 			for (i = 0; i < d->d_depcnt; ++i) {
 				bool success;
 				if (d->d_depvec[i] != self)
 					continue;
 				/* Try to unload this driver! */
-				incref(d);
 				decref_unlikely(ds);
 				TRY {
 					/* Recursively delete this driver. */
@@ -1949,7 +1990,7 @@ again_search_dependers:
 					decref(d);
 					RETHROW();
 				}
-				/* Even if 1 depender driver could not be unloaded, keep on finalizing
+				/* Even if 1 depending driver could not be unloaded, keep on finalizing
 				 * all other drivers to give the first one more time to come to terms
 				 * with the fact that it is being unloaded.
 				 * If everything works out, we'll still be able to destroy our driver
@@ -1958,6 +1999,7 @@ again_search_dependers:
 					decref(d);
 				goto again_search_dependers;
 			}
+			decref_unlikely(d);
 		}
 		decref_unlikely(ds);
 	}
@@ -1987,66 +2029,42 @@ driver_delmod(USER CHECKED char const *driver_name,
 	first_char = ATOMIC_READ(driver_name[0]);
 	COMPILER_BARRIER();
 	ds = current_driver_state.get();
-	if (first_char == '/') {
-		for (i = 0; i < ds->ds_count; ++i) {
-			int compare;
-			struct driver *d;
-			d = ds->ds_drivers[i];
-			if (!d->d_filename)
-				continue;
-			TRY {
+	for (i = 0; i < ds->ds_count; ++i) {
+		int compare;
+		struct driver *d;
+		d = ds->ds_drivers[i];
+		if unlikely(!tryincref(d))
+			continue; /* Dead driver */
+		TRY {
+			if (first_char == '/') {
+				if (!d->d_filename)
+					continue;
 				compare = strcmp(d->d_filename, driver_name);
-			} EXCEPT {
-				decref_unlikely(ds);
-				RETHROW();
-			}
-			if (compare == 0) {
-				bool success;
-				/* Found it! */
-				incref(d);
-				decref_unlikely(ds);
-				TRY {
-					success = driver_try_decref_and_delmod(d, flags);
-				} EXCEPT {
-					decref(d);
-					RETHROW();
-				}
-				if (success)
-					return DRIVER_DELMOD_SUCCESS;
-				/* `driver_try_decref_and_delmod()' only inherit a reference on success! */
-				decref(d);
-				return DRIVER_DELMOD_INUSE;
-			}
-		}
-	} else {
-		for (i = 0; i < ds->ds_count; ++i) {
-			int compare;
-			struct driver *d;
-			d = ds->ds_drivers[i];
-			TRY {
+			} else {
 				compare = strcmp(d->d_name, driver_name);
+			}
+		} EXCEPT {
+			decref_unlikely(d);
+			decref_unlikely(ds);
+			RETHROW();
+		}
+		if (compare == 0) {
+			bool success;
+			/* Found it! */
+			decref_unlikely(ds);
+			TRY {
+				success = driver_try_decref_and_delmod(d, flags);
 			} EXCEPT {
-				decref_unlikely(ds);
+				decref(d);
 				RETHROW();
 			}
-			if (compare == 0) {
-				bool success;
-				/* Found it! */
-				incref(d);
-				decref_unlikely(ds);
-				TRY {
-					success = driver_try_decref_and_delmod(d, flags);
-				} EXCEPT {
-					decref(d);
-					RETHROW();
-				}
-				if (success)
-					return DRIVER_DELMOD_SUCCESS;
-				/* `driver_try_decref_and_delmod()' only inherit a reference on success! */
-				decref(d);
-				return DRIVER_DELMOD_INUSE;
-			}
+			if (success)
+				return DRIVER_DELMOD_SUCCESS;
+			/* `driver_try_decref_and_delmod()' only inherit a reference on success! */
+			decref(d);
+			return DRIVER_DELMOD_INUSE;
 		}
+		decref_unlikely(d);
 	}
 	decref_unlikely(ds);
 	return DRIVER_DELMOD_UNKNOWN;
@@ -2063,10 +2081,13 @@ driver_delmod_inode(struct inode *__restrict driver_node,
 		bool success;
 		struct driver *d;
 		d = ds->ds_drivers[i];
-		if (d->d_file != driver_node)
+		if unlikely(!tryincref(d))
+			continue; /* Dead driver */
+		if (d->d_file != driver_node) {
+			decref_unlikely(d);
 			continue;
+		}
 		/* Found it! */
-		incref(d);
 		decref_unlikely(ds);
 		TRY {
 			success = driver_try_decref_and_delmod(d, flags);
@@ -2783,21 +2804,25 @@ NOTHROW(FCALL driver_at_address)(void const *static_pointer) {
 	for (i = 0; i < ds->ds_count; ++i) {
 		size_t j;
 		result = ds->ds_drivers[i];
-		if (static_pointer < (void *)result->d_loadstart)
+		if unlikely(!tryincref(result))
+			continue; /* Dead driver. */
+		if (static_pointer < (void *)result->d_loadstart) {
+decref_result_and_continue:
+			decref_unlikely(result);
 			continue;
+		}
 		if (static_pointer >= (void *)result->d_loadend)
-			continue;
+			goto decref_result_and_continue;
 		/* Make sure that `static_pointer' maps to some program segment. */
 		for (j = 0; j < result->d_phnum; ++j) {
 			uintptr_t segment_base;
 			if (result->d_phdr[j].p_type != PT_LOAD)
-				continue;
+				goto decref_result_and_continue;
 			segment_base = result->d_loadaddr + result->d_phdr[j].p_vaddr;
 			if ((uintptr_t)static_pointer < segment_base)
-				continue;
+				goto decref_result_and_continue;
 			if ((uintptr_t)static_pointer >= segment_base + result->d_phdr[j].p_memsz)
-				continue;
-			incref(result);
+				goto decref_result_and_continue;
 			goto done;
 		}
 	}
@@ -2820,11 +2845,19 @@ PUBLIC WUNUSED REF struct driver *
 	ds = current_driver_state.get();
 	FINALLY_DECREF_UNLIKELY(ds);
 	for (i = 0; i < ds->ds_count; ++i) {
+		bool is_a_match;
 		result = ds->ds_drivers[i];
-		if (strcmp(result->d_name, driver_name) == 0) {
-			incref(result);
-			goto done;
+		if unlikely(!tryincref(result))
+			continue; /* Dead driver. */
+		TRY {
+			is_a_match = strcmp(result->d_name, driver_name) == 0;
+		} EXCEPT {
+			decref_unlikely(result);
+			RETHROW();
 		}
+		if (is_a_match)
+			goto done;
+		decref_unlikely(result);
 	}
 	result = NULL;
 done:
@@ -2844,12 +2877,20 @@ PUBLIC WUNUSED REF struct driver *
 	ds = current_driver_state.get();
 	FINALLY_DECREF_UNLIKELY(ds);
 	for (i = 0; i < ds->ds_count; ++i) {
+		bool is_a_match;
 		result = ds->ds_drivers[i];
-		if (memcmp(result->d_name, driver_name, driver_name_len * sizeof(char)) == 0 &&
-		    result->d_name[driver_name_len] == '\0') {
-			incref(result);
-			goto done;
+		if unlikely(!tryincref(result))
+			continue; /* Dead driver. */
+		TRY {
+			is_a_match = strlen(result->d_name) == driver_name_len &&
+			             memcmp(result->d_name, driver_name, driver_name_len * sizeof(char)) == 0;
+		} EXCEPT {
+			decref_unlikely(result);
+			RETHROW();
 		}
+		if (is_a_match)
+			goto done;
+		decref_unlikely(result);
 	}
 	result = NULL;
 done:
@@ -2867,15 +2908,26 @@ PUBLIC WUNUSED REF struct driver *
 	ds = current_driver_state.get();
 	FINALLY_DECREF_UNLIKELY(ds);
 	for (i = 0; i < ds->ds_count; ++i) {
+		bool is_a_match;
 		char const *filename;
 		result   = ds->ds_drivers[i];
+		if unlikely(!tryincref(result))
+			continue; /* Dead driver */
 		filename = ATOMIC_READ(result->d_filename);
-		if (!filename)
+		if (!filename) {
+			/* Filename not loaded. */
+			decref_unlikely(result);
 			continue;
-		if (strcmp(filename, driver_filename) == 0) {
-			incref(result);
-			goto done;
 		}
+		TRY {
+			is_a_match = strcmp(filename, driver_filename) == 0;
+		} EXCEPT {
+			decref_unlikely(result);
+			RETHROW();
+		}
+		if (is_a_match)
+			goto done;
+		decref_unlikely(result);
 	}
 	result = NULL;
 done:
@@ -2893,10 +2945,11 @@ NOTHROW(FCALL driver_with_file)(struct regular_node *__restrict driver_file) {
 	ds = current_driver_state.get();
 	for (i = 0; i < ds->ds_count; ++i) {
 		result = ds->ds_drivers[i];
-		if (result->d_file == driver_file) {
-			incref(result);
+		if unlikely(!tryincref(result))
+			continue; /* Dead driver. */
+		if (result->d_file == driver_file)
 			goto done;
-		}
+		decref_unlikely(result);
 	}
 	result = NULL;
 done:
@@ -4534,7 +4587,7 @@ done:
 PRIVATE ATTR_FREETEXT size_t
 NOTHROW(KCALL initdrivers)(size_t buflen) {
 	REF struct driver **buf;
-	size_t i, driver_count, loaded_drivers = 0;
+	size_t i, dst, driver_count, loaded_drivers = 0;
 	buf = (REF struct driver **)malloca(buflen * sizeof(REF struct driver *));
 	/*TRY*/ {
 		REF struct driver_state *state;
@@ -4545,9 +4598,14 @@ NOTHROW(KCALL initdrivers)(size_t buflen) {
 			loaded_drivers = driver_count;
 			goto done;
 		}
-		for (i = 0; i < driver_count; ++i)
-			buf[i] = incref(state->ds_drivers[i]);
+		for (dst = i = 0; i < driver_count; ++i) {
+			struct driver *drv;
+			drv = state->ds_drivers[i];
+			if likely(tryincref(drv))
+				buf[dst++] = drv;
+		}
 		decref_unlikely(state);
+		driver_count = dst;
 		/*TRY*/ {
 			unsigned int sort_remaining;
 			bool sort_must_restart;
@@ -4718,6 +4776,8 @@ DBG_COMMAND(lsmod,
 		struct driver *d;
 		size_t temp;
 		d = ds->ds_drivers[i];
+		if (wasdestroyed(d))
+			continue; /* Dead driver... */
 		temp = strlen(d->d_name);
 		if (longest_name < temp)
 			longest_name = temp;
@@ -4742,6 +4802,8 @@ DBG_COMMAND(lsmod,
 		struct driver *d;
 		size_t temp;
 		d = ds->ds_drivers[i];
+		if (wasdestroyed(d))
+			continue; /* Dead driver... */
 		if (d->d_flags & DRIVER_FLAG_FINALIZED)
 			/* Already finalized */
 			dbg_print(DBGSTR(AC_FG(ANSITTY_CL_MAROON)));

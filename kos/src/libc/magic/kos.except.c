@@ -687,6 +687,12 @@ for (local name: classes.keys.sorted()) {
 		break;
 @@pp_endif@@
 
+@@pp_if defined(ENODATA)@@
+	case @E_NO_SUCH_OBJECT@:
+		result = ENODATA;
+		break;
+@@pp_endif@@
+
 @@pp_if defined(EOK)@@
 	case @E_OK@:
 		result = EOK;

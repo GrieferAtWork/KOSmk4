@@ -253,10 +253,13 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 	REF struct driver_state *state;
 	state = driver_get_state();
 	for (i = 0; i < state->ds_count; ++i) {
-		struct driver *d = state->ds_drivers[i];
+		struct driver *drv = state->ds_drivers[i];
 		ElfW(Half) j;
 		ElfW(Addr) lowest_segment_offset;
 		size_t alignment_offset;
+		if unlikely(!tryincref(drv))
+			continue; /* Dead driver... */
+		FINALLY_DECREF_UNLIKELY(drv);
 		/* One would expect that GDB wants `d_loadaddr', but that is incorrect.
 		 * One might also thing that GDB wants `d_loadstart', and that is ~mostly~ correct.
 		 * But what GDB actually wants is the absolute address of the first segment, meaning
@@ -264,17 +267,17 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 		 * with the lowest vaddr offset. */
 		alignment_offset      = 0;
 		lowest_segment_offset = (ElfW(Addr))-1;
-		assert(d->d_phnum != 0);
-		for (j = 0; j < d->d_phnum; ++j) {
-			if (d->d_phdr[j].p_type != PT_LOAD)
+		assert(drv->d_phnum != 0);
+		for (j = 0; j < drv->d_phnum; ++j) {
+			if (drv->d_phdr[j].p_type != PT_LOAD)
 				continue;
-			if (d->d_phdr[j].p_vaddr >= lowest_segment_offset)
+			if (drv->d_phdr[j].p_vaddr >= lowest_segment_offset)
 				continue;
-			lowest_segment_offset = d->d_phdr[j].p_vaddr;
-			alignment_offset      = d->d_phdr[j].p_offset & PAGEMASK;
+			lowest_segment_offset = drv->d_phdr[j].p_vaddr;
+			alignment_offset      = drv->d_phdr[j].p_offset & PAGEMASK;
 		}
-		if (d->d_filename) {
-			PRINTF("<library name=\"%#q\">", d->d_filename);
+		if (drv->d_filename) {
+			PRINTF("<library name=\"%#q\">", drv->d_filename);
 		} else {
 			REF struct driver_library_path_string *libpath;
 			libpath = driver_library_path.get();
@@ -288,16 +291,16 @@ NOTHROW(FCALL GDBInfo_PrintKernelDriverList)(pformatprinter printer, void *arg) 
 				len = strlen(path);
 				while (len && path[len - 1] == '/')
 					--len;
-				PRINTF("<library name=\"/%#$q/%#q\">", len, path, d->d_name);
+				PRINTF("<library name=\"/%#$q/%#q\">", len, path, drv->d_name);
 				decref_unlikely(libpath);
 			} else {
 				decref_unlikely(libpath);
-				PRINTF("<library name=\"%#q\">", d->d_name);
+				PRINTF("<library name=\"%#q\">", drv->d_name);
 			}
 		}
 		PRINTF("<segment address=\"%#" PRIxPTR "\"/>"
 		       "</library>",
-		       d->d_loadstart + alignment_offset);
+		       drv->d_loadstart + alignment_offset);
 	}
 	decref_unlikely(state);
 	return result;
@@ -545,8 +548,12 @@ NOTHROW(FCALL GDBInfo_PrintDriverList)(pformatprinter printer, void *arg) {
 	DO(GDBInfo_PrintDriverListEntry(printer, arg,
 	                                &kernel_driver, ds));
 	for (i = 0; i < ds->ds_count; ++i) {
+		struct driver *drv = ds->ds_drivers[i];
+		if unlikely(!tryincref(drv))
+			continue; /* Dead driver... */
 		DO(GDBInfo_PrintDriverListEntry(printer, arg,
-		                                ds->ds_drivers[i], ds));
+		                                drv, ds));
+		decref_unlikely(drv);
 	}
 	PRINT("</osdata>");
 	decref_unlikely(ds);

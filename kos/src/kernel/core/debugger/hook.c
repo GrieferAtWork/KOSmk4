@@ -58,6 +58,8 @@ dbg_hookiterator_current_driver_loadaddr(struct dbg_hookiterator const *__restri
 		drv = self->dhi_drivers->ds_drivers[self->dhi_nextdriver - 1];
 		if unlikely(!ADDR_ISKERN(drv))
 			return 0; /* Shouldn't happen! */
+		if unlikely(!wasdestroyed(drv))
+			return 0; /* Driver has been unloaded */
 		result = drv->d_loadaddr;
 	} EXCEPT { /* Shouldn't happen */
 		if (dbg_active)
@@ -238,6 +240,8 @@ end_of_everything:
 				++self->dhi_nextdriver;
 				if unlikely(!ADDR_ISKERN(next_driver))
 					goto end_of_driver; /* Shouldn't happen */
+				if unlikely(wasdestroyed(next_driver))
+					goto end_of_driver; /* Destroyed driver. */
 				sect = driver_section_lock(next_driver, str_dbg_hooks, DRIVER_SECTION_LOCK_FNODATA);
 				if (!sect)
 					goto end_of_driver; /* This driver doesn't export debugger hooks. */
@@ -322,6 +326,8 @@ dbg_hookiterator_driver(struct dbg_hookiterator const *__restrict self) {
 			goto done; /* Shouldn't happen! */
 		drv = self->dhi_drivers->ds_drivers[self->dhi_nextdriver - 1];
 		if unlikely(!ADDR_ISKERN(drv))
+			drv = &kernel_driver; /* Shouldn't happen! */
+		if unlikely(!wasdestroyed(drv))
 			drv = &kernel_driver; /* Shouldn't happen! */
 	} EXCEPT { /* Shouldn't happen */
 		if (dbg_active)

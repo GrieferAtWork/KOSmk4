@@ -1304,31 +1304,6 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 	mall_reachable_data((byte_t *)__debug_malloc_tracked_start,
 	                    (size_t)__debug_malloc_tracked_size);
 
-	/* Also search state data segments of loaded drivers.
-	 * For this purpose, we only scan writable segments */
-	{
-		REF struct driver_state *ds;
-		size_t i;
-		ds = driver_get_state();
-		for (i = 0; i < ds->ds_count; ++i) {
-			struct driver *d = ds->ds_drivers[i];
-			ElfW(Half) j;
-			for (j = 0; j < d->d_phnum; ++j) {
-				uintptr_t progaddr;
-				size_t progsize;
-				if (d->d_phdr[i].p_type != PT_LOAD)
-					continue; /* Skip segments that don't describe program memory. */
-				if (!(d->d_phdr[i].p_flags & PF_W))
-					continue; /* Skip non-writable segments. */
-				progaddr = (uintptr_t)(d->d_loadaddr + d->d_phdr[i].p_vaddr);
-				progsize = d->d_phdr[i].p_memsz;
-				/* Scan the contents of this segment. */
-				mall_reachable_data((byte_t *)progaddr, progsize);
-			}
-		}
-		decref_unlikely(ds);
-	}
-
 	/* Search all threads on all CPUs. */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2: Scan running threads\n");
 	for (i = 0; i < cpu_count; ++i) {
@@ -1400,17 +1375,21 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 		size_t i;
 		drivers = current_driver_state.m_pointer;
 		for (i = 0; i < drivers->ds_count; ++i) {
-			struct driver *d = drivers->ds_drivers[i];
 			uint16_t j;
-			for (j = 0; j < d->d_phnum; ++j) {
+			struct driver *drv = drivers->ds_drivers[i];
+			if unlikely(wasdestroyed(drv))
+				continue;
+			/* Since we're in single-core mode, we know that when `drv' isn't
+			 * destroyed at this point, it wont get destroyed before we're done! */
+			for (j = 0; j < drv->d_phnum; ++j) {
 				uintptr_t progaddr;
 				size_t progsize;
-				if (d->d_phdr[j].p_type != PT_LOAD)
+				if (drv->d_phdr[j].p_type != PT_LOAD)
 					continue;
-				if (!(d->d_phdr[j].p_flags & PF_W))
+				if (!(drv->d_phdr[j].p_flags & PF_W))
 					continue;
-				progaddr = (uintptr_t)(d->d_loadaddr + d->d_phdr[j].p_vaddr);
-				progsize = d->d_phdr[j].p_memsz;
+				progaddr = (uintptr_t)(drv->d_loadaddr + drv->d_phdr[j].p_vaddr);
+				progsize = drv->d_phdr[j].p_memsz;
 				progsize += progaddr & PAGEMASK;
 				progaddr &= ~PAGEMASK;
 				mall_reachable_data((byte_t *)progaddr,

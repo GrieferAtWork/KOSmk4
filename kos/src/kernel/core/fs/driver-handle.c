@@ -287,6 +287,8 @@ handle_driver_state_hop(struct driver_state *__restrict self,
 		size_t struct_size;
 		u64 depno;
 		struct handle d;
+		syscall_slong_t result;
+		REF struct driver *result_driver;
 		USER CHECKED struct hop_driver_open_dependency *data;
 		data = (USER CHECKED struct hop_driver_open_dependency *)arg;
 		validate_readable(data, sizeof(*data));
@@ -305,10 +307,17 @@ handle_driver_state_hop(struct driver_state *__restrict self,
 			      (intptr_t)(uintptr_t)0,
 			      (intptr_t)(uintptr_t)self->ds_count - 1);
 		}
+		result_driver = self->ds_drivers[(uintptr_t)depno];
 		d.h_type = HANDLE_TYPE_DRIVER;
 		d.h_mode = mode;
-		d.h_data = self->ds_drivers[(uintptr_t)depno];
-		return handle_installhop(&data->dod_result, d);
+		d.h_data = result_driver;
+		if unlikely(!tryincref(result_driver))
+			THROW(E_NO_SUCH_OBJECT); /* Dead driver */
+		{
+			FINALLY_DECREF_UNLIKELY(result_driver);
+			result = handle_installhop(&data->dod_result, d);
+		}
+		return result;
 	}	break;
 
 	default:

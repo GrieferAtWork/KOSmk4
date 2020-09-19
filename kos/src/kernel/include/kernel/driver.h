@@ -418,25 +418,13 @@ struct directory_entry;
 
 struct driver_state {
 	/* Descriptor for a lock-less snapshot of the current loaded-driver state. */
-	WEAK refcnt_t                                           ds_refcnt;   /* Reference counter. */
-	size_t                                     DRIVER_CONST ds_count;    /* [const] Number of loaded drivers. */
-	/* TODO: This structure should hold weak references to loaded drivers!
-	 *       Additionally, drivers should remove themself from this list
-	 *       once their normal reference count hits zero. (i.e. this list
-	 *       should always contain _all_ loaded drivers. - As it stands
-	 *       right now, trying to unload a driver essentially only causes
-	 *       its destructor callbacks to be invoked, before the driver
-	 *       itself is then removed from this list, though this doesn't
-	 *       necessarily guaranty that the driver has actually been unloaded
-	 *       from memory; it may linger longer, giving the false impression
-	 *       of the driver having been unloaded)
-	 *       Additionally, removing drivers from this list before they're
-	 *       about to be unloaded can result in a driver being loaded a
-	 *       second time, before being fully unloaded first. */
+	WEAK refcnt_t           ds_refcnt;   /* Reference counter. */
+	size_t     DRIVER_CONST ds_count;    /* [const] Number of loaded drivers. */
 	/* TODO: The kernel core driver should be included in `driver_get_state()'!
 	 *       There's no reason in having it always be a special case to needlessly
 	 *       complicate code that tries to enumerate loaded drivers! */
-	COMPILER_FLEXIBLE_ARRAY(REF struct driver *DRIVER_CONST,ds_drivers); /* [1..1][const][ds_count] Vector of loaded drivers. */
+	COMPILER_FLEXIBLE_ARRAY(WEAK REF struct driver *DRIVER_CONST,
+	                        ds_drivers); /* [1..1][const][ds_count] Vector of loaded drivers. */
 };
 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL driver_state_destroy)(struct driver_state *__restrict self);

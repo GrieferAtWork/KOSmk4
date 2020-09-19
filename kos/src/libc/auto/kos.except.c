@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6fde8ef */
+/* HASH CRC-32:0x562c50c7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -515,6 +515,12 @@ for (local name: classes.keys.sorted()) {
 		result = ENODEV;
 		break;
 #endif /* ENODEV */
+
+#ifdef ENODATA
+	case E_NO_SUCH_OBJECT:
+		result = ENODATA;
+		break;
+#endif /* ENODATA */
 
 #ifdef EOK
 	case E_OK:

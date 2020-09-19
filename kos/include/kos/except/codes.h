@@ -436,7 +436,7 @@
 /* E_NO_SUCH_OBJECT                                                     */
 /************************************************************************/
 #ifndef E_NO_SUCH_OBJECT
-#define E_NO_SUCH_OBJECT                          (0x0009)                   /* [msg("The specified object doesn't exist")] */
+#define E_NO_SUCH_OBJECT                          (0x0009)                   /* [errno(ENODATA), msg("The specified object doesn't exist")] */
 #endif /* !E_NO_SUCH_OBJECT */
 #ifndef E_NO_SUCH_BLOCKDEVICE
 #define E_NO_SUCH_BLOCKDEVICE                     (E_NO_SUCH_OBJECT, 0x0001) /* [msg("No block device has been bound")] */

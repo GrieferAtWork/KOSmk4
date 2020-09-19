@@ -65,7 +65,14 @@ branchstat(branchstat_callback_t cb, void *arg) {
 		FINALLY_DECREF_UNLIKELY(ds);
 		for (i = 0; i < ds->ds_count; ++i) {
 			ssize_t temp;
-			temp = branchstat_d(cb, arg, ds->ds_drivers[i]);
+			struct driver *drv;
+			drv = ds->ds_drivers[i];
+			if unlikely(!tryincref(drv))
+				continue; /* Dead driver... */
+			{
+				FINALLY_DECREF_UNLIKELY(drv);
+				temp = branchstat_d(cb, arg, drv);
+			}
 			if unlikely(temp < 0) {
 				result = temp;
 				break;

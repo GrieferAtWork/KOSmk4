@@ -147,6 +147,7 @@ struct hop_driver_open_dependency /*[PREFIX(dod_)]*/ {
 /* For `HANDLE_TYPE_DRIVER_STATE' */
 #define HOP_DRIVER_STATE_GET_COUNT  0x00100002 /* [uint64_t *result] Return the # of drivers contained with this driver state. */
 #define HOP_DRIVER_STATE_GET_DRIVER 0x00100003 /* [struct hop_driver_open_dependency *result] Open one of the individual drivers.
+                                                * @throw: E_NO_SUCH_OBJECT: The indexed driver has been destroyed.
                                                 * @return: == result->dod_result.of_hint */
 
 __DECL_END
