@@ -3853,6 +3853,55 @@ DEFINE_COMPAT_SYSCALL2(errno_t, statfs64,
 
 
 /************************************************************************/
+/* UTIME helper functions                                               */
+/************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_UTIME) ||                   \
+     defined(__ARCH_WANT_SYSCALL_UTIME64) ||                 \
+     defined(__ARCH_WANT_SYSCALL_UTIME_TIME64) ||            \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIME) ||            \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIME64) ||          \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIME_TIME64) ||     \
+     defined(__ARCH_WANT_SYSCALL_UTIMES) ||                  \
+     defined(__ARCH_WANT_SYSCALL_UTIMES64) ||                \
+     defined(__ARCH_WANT_SYSCALL_UTIMES_TIME64) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMES) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMES64) ||         \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMES_TIME64) ||    \
+     defined(__ARCH_WANT_SYSCALL_FUTIMESAT) ||               \
+     defined(__ARCH_WANT_SYSCALL_FUTIMESAT64) ||             \
+     defined(__ARCH_WANT_SYSCALL_FUTIMESAT_TIME64) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT_TIME64) || \
+     defined(__ARCH_WANT_SYSCALL_UTIMENSAT) ||               \
+     defined(__ARCH_WANT_SYSCALL_UTIMENSAT64) ||             \
+     defined(__ARCH_WANT_SYSCALL_UTIMENSAT_TIME64) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64) ||      \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT_TIME64))
+/* Verify that the calling thread is allowed to assign arbitrary
+ * timestamp to the given `node's last-accessed and last-modified
+ * fields. */
+PRIVATE NONNULL((1)) void KCALL
+inode_request_arbitrary_timestamps(struct inode *__restrict node) {
+	/* Caller must be owner, or have `CAP_FOWNER' */
+	inode_loadattr(node);
+	if (node->i_fileuid != cred_getfsuid())
+		require(CAP_FOWNER); /* FIXME: This fails with EACCES, but POSIX wants EPERM... */
+}
+
+PRIVATE NONNULL((1)) void KCALL
+inode_request_current_timestamps(struct inode *__restrict node) {
+	/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
+	if (!inode_tryaccess(node, W_OK) && !capable(CAP_DAC_OVERRIDE))
+		THROW(E_FSERROR_ACCESS_DENIED);
+}
+#endif /* ... */
+
+
+
+
+/************************************************************************/
 /* utime(), utime64()                                                   */
 /************************************************************************/
 #ifdef __ARCH_WANT_SYSCALL_UTIME
@@ -3879,15 +3928,10 @@ DEFINE_SYSCALL2(errno_t, utime,
 		mtm.tv_sec  = (time_t)times->modtime;
 		mtm.tv_nsec = 0;
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
@@ -3919,15 +3963,11 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utime,
 		mtm.tv_sec  = (time_t)times->modtime;
 		mtm.tv_nsec = 0;
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
+		if (!capable(CAP_DAC_OVERRIDE))
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
@@ -3935,10 +3975,18 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utime,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_UTIME */
 
+#if (defined(__ARCH_WANT_SYSCALL_UTIME64) || \
+     defined(__ARCH_WANT_SYSCALL_UTIME_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_UTIME64
 DEFINE_SYSCALL2(errno_t, utime64,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct utimbuf64 const *, times) {
+                USER UNCHECKED struct utimbuf64 const *, times)
+#else /* __ARCH_WANT_SYSCALL_UTIME64 */
+DEFINE_SYSCALL2(errno_t, utime_time64,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct utimbuf64 const *, times)
+#endif /* !__ARCH_WANT_SYSCALL_UTIME64 */
+{
 	struct fs *f = THIS_FS;
 	struct timespec atm, mtm;
 	REF struct inode *node;
@@ -3959,23 +4007,19 @@ DEFINE_SYSCALL2(errno_t, utime64,
 		mtm.tv_sec  = (time_t)times->modtime;
 		mtm.tv_nsec = 0;
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_UTIME64 */
+#endif /* __ARCH_WANT_SYSCALL_UTIME64 || __ARCH_WANT_SYSCALL_UTIME_TIME64 */
 
-#ifdef __ARCH_WANT_COMPAT_SYSCALL_UTIME64
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_UTIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIME_TIME64))
 DEFINE_COMPAT_SYSCALL2(errno_t, utime64,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_utimbuf64 const *, times) {
@@ -3999,21 +4043,16 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utime64,
 		mtm.tv_sec  = (time_t)times->modtime;
 		mtm.tv_nsec = 0;
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_UTIME64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_UTIME64 || __ARCH_WANT_COMPAT_SYSCALL_UTIME_TIME64 */
 
 
 
@@ -4043,15 +4082,10 @@ DEFINE_SYSCALL2(errno_t, utimes,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
@@ -4081,15 +4115,10 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utimes,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
@@ -4097,10 +4126,18 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utimes,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_UTIMES */
 
+#if (defined(__ARCH_WANT_SYSCALL_UTIMES64) || \
+     defined(__ARCH_WANT_SYSCALL_UTIMES_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_UTIMES64
 DEFINE_SYSCALL2(errno_t, utimes64,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timeval64 const *, times) {
+                USER UNCHECKED struct timeval64 const *, times)
+#else /* __ARCH_WANT_SYSCALL_UTIMES64 */
+DEFINE_SYSCALL2(errno_t, utimes_time64,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct timeval64 const *, times)
+#endif /* !__ARCH_WANT_SYSCALL_UTIMES64 */
+{
 	struct fs *f = THIS_FS;
 	struct timespec atm, mtm;
 	REF struct inode *node;
@@ -4119,26 +4156,29 @@ DEFINE_SYSCALL2(errno_t, utimes64,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_UTIMES64 */
+#endif /* __ARCH_WANT_SYSCALL_UTIMES64 || __ARCH_WANT_SYSCALL_UTIMES_TIME64 */
 
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMES64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMES_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_UTIMES64
 DEFINE_COMPAT_SYSCALL2(errno_t, utimes64,
                        USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timeval64 const *, times) {
+                       USER UNCHECKED struct compat_timeval64 const *, times)
+#else /* __ARCH_WANT_COMPAT_SYSCALL_UTIMES64 */
+DEFINE_COMPAT_SYSCALL2(errno_t, utimes_time64,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_timeval64 const *, times)
+#endif /* !__ARCH_WANT_COMPAT_SYSCALL_UTIMES64 */
+{
 	struct fs *f = THIS_FS;
 	struct timespec atm, mtm;
 	REF struct inode *node;
@@ -4157,21 +4197,16 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utimes64,
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_UTIMES64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_UTIMES64 || __ARCH_WANT_COMPAT_SYSCALL_UTIMES_TIME64 */
 
 
 
@@ -4179,38 +4214,52 @@ DEFINE_COMPAT_SYSCALL2(errno_t, utimes64,
 /************************************************************************/
 /* futimesat(), futimesat64()                                           */
 /************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_FUTIMESAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_FUTIMESAT64) ||        \
+     defined(__ARCH_WANT_SYSCALL_FUTIMESAT_TIME64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT_TIME64))
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct inode *KCALL
+lookup_inode_for_futimesat(fd_t dirfd, USER UNCHECKED char const *filename) {
+	REF struct inode *result;
+	if (filename) {
+		struct fs *f = THIS_FS;
+		validate_readable(filename, 1);
+		result = path_traversefull_at(f,
+		                              (unsigned int)dirfd,
+		                              filename,
+		                              true,
+		                              f->f_mode.f_atflag,
+		                              NULL,
+		                              NULL,
+		                              NULL,
+		                              NULL);
+	} else {
+		result = handle_get_inode((unsigned int)dirfd);
+	}
+	return result;
+}
+#endif /* ... */
+
 #ifdef __ARCH_WANT_SYSCALL_FUTIMESAT
 DEFINE_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct timeval32 const *, times) {
-	struct fs *f = THIS_FS;
 	struct timespec atm, mtm;
 	REF struct inode *node;
 	validate_readable(filename, 1);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            true,
-	                            f->f_mode.f_atflag,
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
+	node = lookup_inode_for_futimesat(dirfd, filename);
 	FINALLY_DECREF_UNLIKELY(node);
 	if (times) {
 		validate_readable(times, 2 * sizeof(*times));
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
@@ -4222,34 +4271,19 @@ DEFINE_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
 DEFINE_COMPAT_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_timeval32 const *, times) {
-	struct fs *f = THIS_FS;
 	struct timespec atm, mtm;
 	REF struct inode *node;
-	compat_validate_readable(filename, 1);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            true,
-	                            f->f_mode.f_atflag,
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
+	node = lookup_inode_for_futimesat(dirfd, filename);
 	FINALLY_DECREF_UNLIKELY(node);
 	if (times) {
 		compat_validate_readable(times, 2 * sizeof(*times));
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
@@ -4257,83 +4291,69 @@ DEFINE_COMPAT_SYSCALL3(errno_t, futimesat, fd_t, dirfd,
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT */
 
+#if (defined(__ARCH_WANT_SYSCALL_FUTIMESAT64) || \
+     defined(__ARCH_WANT_SYSCALL_FUTIMESAT_TIME64))
 #ifdef __ARCH_WANT_SYSCALL_FUTIMESAT64
 DEFINE_SYSCALL3(errno_t, futimesat64, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct timeval64 const *, times) {
-	struct fs *f = THIS_FS;
+                USER UNCHECKED struct timeval64 const *, times)
+#else /* __ARCH_WANT_SYSCALL_FUTIMESAT64 */
+DEFINE_SYSCALL3(errno_t, futimesat_time64, fd_t, dirfd,
+                USER UNCHECKED char const *, filename,
+                USER UNCHECKED struct timeval64 const *, times)
+#endif /* !__ARCH_WANT_SYSCALL_FUTIMESAT64 */
+{
 	struct timespec atm, mtm;
 	REF struct inode *node;
-	validate_readable(filename, 1);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            true,
-	                            f->f_mode.f_atflag,
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
+	node = lookup_inode_for_futimesat(dirfd, filename);
 	FINALLY_DECREF_UNLIKELY(node);
 	if (times) {
 		validate_readable(times, 2 * sizeof(*times));
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_SYSCALL_FUTIMESAT64 */
+#endif /* __ARCH_WANT_SYSCALL_FUTIMESAT64 || __ARCH_WANT_SYSCALL_FUTIMESAT_TIME64 */
 
+#if (defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT_TIME64))
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64
 DEFINE_COMPAT_SYSCALL3(errno_t, futimesat64, fd_t, dirfd,
                        USER UNCHECKED char const *, filename,
-                       USER UNCHECKED struct compat_timeval64 const *, times) {
-	struct fs *f = THIS_FS;
+                       USER UNCHECKED struct compat_timeval64 const *, times)
+#else /* __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64 */
+DEFINE_COMPAT_SYSCALL3(errno_t, futimesat_time64, fd_t, dirfd,
+                       USER UNCHECKED char const *, filename,
+                       USER UNCHECKED struct compat_timeval64 const *, times)
+#endif /* !__ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64 */
+{
 	struct timespec atm, mtm;
 	REF struct inode *node;
-	compat_validate_readable(filename, 1);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            true,
-	                            f->f_mode.f_atflag,
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
+	node = lookup_inode_for_futimesat(dirfd, filename);
 	FINALLY_DECREF_UNLIKELY(node);
 	if (times) {
 		compat_validate_readable(times, 2 * sizeof(*times));
 		TIMEVAL_TO_TIMESPEC(&times[0], &atm);
 		TIMEVAL_TO_TIMESPEC(&times[1], &mtm);
 		COMPILER_READ_BARRIER();
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 	}
 	inode_chtime(node, &atm, &mtm, NULL);
 	return -EOK;
 }
-#endif /* __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64 */
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT64 || __ARCH_WANT_COMPAT_SYSCALL_FUTIMESAT_TIME64 */
 
 
 
@@ -4341,29 +4361,51 @@ DEFINE_COMPAT_SYSCALL3(errno_t, futimesat64, fd_t, dirfd,
 /************************************************************************/
 /* utimensat(), utimensat64()                                           */
 /************************************************************************/
+#if (defined(__ARCH_WANT_SYSCALL_UTIMENSAT) ||          \
+     defined(__ARCH_WANT_SYSCALL_UTIMENSAT64) ||        \
+     defined(__ARCH_WANT_SYSCALL_UTIMENSAT_TIME64) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT) ||   \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT_TIME64))
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct inode *KCALL
+lookup_inode_for_utimensat(fd_t dirfd, USER UNCHECKED char const *filename,
+                           atflag_t flags) {
+	REF struct inode *result;
+	if (filename) {
+		struct fs *f = THIS_FS;
+		VALIDATE_FLAGSET(flags,
+		                 AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH,
+		                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS);
+		validate_readable(filename, 1);
+		result = path_traversefull_at(f,
+		                              (unsigned int)dirfd,
+		                              filename,
+		                              !(flags & AT_SYMLINK_NOFOLLOW),
+		                              fs_getmode_for(f, flags),
+		                              NULL,
+		                              NULL,
+		                              NULL,
+		                              NULL);
+	} else {
+		VALIDATE_FLAGSET(flags,
+		                 AT_CHANGE_CTIME,
+		                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME);
+		result = handle_get_inode((unsigned int)dirfd);
+	}
+	return result;
+}
+#endif /* ... */
+
 #ifdef __ARCH_WANT_SYSCALL_UTIMENSAT
 DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct timespec32 const *, times,
                 atflag_t, flags) {
-	struct fs *f = THIS_FS;
 	struct timespec atm, mtm, ctm;
 	struct timespec *patm, *pmtm;
 	struct timespec *pctm = NULL;
 	REF struct inode *node;
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS);
-	validate_readable(filename, 1);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
+	node = lookup_inode_for_utimensat(dirfd, filename, flags);
 	FINALLY_DECREF_UNLIKELY(node);
 	if (times) {
 		validate_readable(times, 2 * sizeof(*times));
@@ -4402,16 +4444,11 @@ DEFINE_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 			if (pctm && pctm->tv_nsec == UTIME_NOW)
 				*pctm = now;
 		}
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
 do_touch:
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 		patm = &atm;
 		pmtm = &mtm;
@@ -4426,24 +4463,11 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
                        USER UNCHECKED char const *, filename,
                        USER UNCHECKED struct compat_timespec32 const *, times,
                        atflag_t, flags) {
-	struct fs *f = THIS_FS;
 	struct timespec atm, mtm, ctm;
 	struct timespec *patm, *pmtm;
 	struct timespec *pctm = NULL;
 	REF struct inode *node;
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS);
-	compat_validate_readable(filename, 1);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
+	node = lookup_inode_for_utimensat(dirfd, filename, flags);
 	FINALLY_DECREF_UNLIKELY(node);
 	if (times) {
 		compat_validate_readable(times, 2 * sizeof(*times));
@@ -4482,16 +4506,11 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat, fd_t, dirfd,
 			if (pctm && pctm->tv_nsec == UTIME_NOW)
 				*pctm = now;
 		}
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
 do_touch:
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 		patm = &atm;
 		pmtm = &mtm;
@@ -4515,24 +4534,11 @@ DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
                 atflag_t, flags)
 #endif /* !__ARCH_WANT_SYSCALL_UTIMENSAT64 */
 {
-	struct fs *f = THIS_FS;
 	struct timespec atm, mtm, ctm;
 	struct timespec *patm, *pmtm;
 	struct timespec *pctm = NULL;
 	REF struct inode *node;
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS);
-	validate_readable(filename, 1);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
+	node = lookup_inode_for_utimensat(dirfd, filename, flags);
 	FINALLY_DECREF_UNLIKELY(node);
 	if (times) {
 		validate_readable(times, 2 * sizeof(*times));
@@ -4571,16 +4577,11 @@ DEFINE_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 			if (pctm && pctm->tv_nsec == UTIME_NOW)
 				*pctm = now;
 		}
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
 do_touch:
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 		patm = &atm;
 		pmtm = &mtm;
@@ -4604,24 +4605,11 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
                        atflag_t, flags)
 #endif /* !__ARCH_WANT_COMPAT_SYSCALL_UTIMENSAT64 */
 {
-	struct fs *f = THIS_FS;
 	struct timespec atm, mtm, ctm;
 	struct timespec *patm, *pmtm;
 	struct timespec *pctm = NULL;
 	REF struct inode *node;
-	VALIDATE_FLAGSET(flags,
-	                 AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH,
-	                 E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS);
-	compat_validate_readable(filename, 1);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            filename,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            NULL,
-	                            NULL,
-	                            NULL);
+	node = lookup_inode_for_utimensat(dirfd, filename, flags);
 	FINALLY_DECREF_UNLIKELY(node);
 	if (times) {
 		compat_validate_readable(times, 2 * sizeof(*times));
@@ -4660,16 +4648,11 @@ DEFINE_COMPAT_SYSCALL4(errno_t, utimensat_time64, fd_t, dirfd,
 			if (pctm && pctm->tv_nsec == UTIME_NOW)
 				*pctm = now;
 		}
-		/* Caller must be owner, or have `CAP_DAC_OVERRIDE' or `CAP_FOWNER' */
-		inode_loadattr(node);
-		if (node->i_fileuid != cred_getfsuid()) {
-			if (!capable(CAP_DAC_OVERRIDE))
-				require(CAP_FOWNER);
-		}
+		inode_request_arbitrary_timestamps(node);
 	} else {
 		/* Caller must be able to write to `node' */
 do_touch:
-		inode_access(node, W_OK);
+		inode_request_current_timestamps(node);
 		atm = mtm = realtime();
 		patm = &atm;
 		pmtm = &mtm;

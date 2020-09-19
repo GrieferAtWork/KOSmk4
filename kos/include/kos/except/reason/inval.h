@@ -186,6 +186,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO,                      /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: In a call to `rt_sigqueueinfo(2)', `rt_tgsigqueueinfo(2)' or `pidfd_send_signal(2)',
 	                                                                *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 	E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS,                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+	E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME,         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
 	E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `what' argument passed to `unshare(2)' isn't a subset of:
 	                                                                * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
 	                                                                *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
@@ -350,6 +351,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO                      E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO                      /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: In a call to `rt_sigqueueinfo(2)', `rt_tgsigqueueinfo(2)' or `pidfd_send_signal(2)',
                                                                                                                                      *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 #define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME         E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
 #define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `what' argument passed to `unshare(2)' isn't a subset of:
                                                                                                                                      * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                                                                                      *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
@@ -511,7 +513,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_SIGINFO_SIGNO                      140 /* E_INVALID_ARGUMENT_UNEXPECTED_COMMAND: In a call to `rt_sigqueueinfo(2)', `rt_tgsigqueueinfo(2)' or `pidfd_send_signal(2)',
                                                                            *                                        `uinfo' was given, but the pointed-to signal number didn't match the given `usigno' */
 #define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS                    141 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' isn't a set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
-#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       142 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `what' argument passed to `unshare(2)' isn't a subset of:
+#define E_INVALID_ARGUMENT_CONTEXT_UTIMENSAT_FLAGS_NOFILENAME         142 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `utimensat(2)' (with `filename' set to `NULL') isn't a set of `0 | AT_CHANGE_CTIME' */
+#define E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT                       143 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `what' argument passed to `unshare(2)' isn't a subset of:
                                                                            * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                            *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
