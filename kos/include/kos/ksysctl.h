@@ -139,7 +139,7 @@ struct ksysctl_driver_insmod /*[PREFIX(im_)]*/ {
 
 /* Delmod flags. */
 #define KSYSCTL_DRIVER_DELMOD_FNORMAL   0x0000 /* Normal delmod flags. */
-#define KSYSCTL_DRIVER_DELMOD_FDEPEND   0x0001 /* Also delete drivers that have dependencies on the given driver */
+#define KSYSCTL_DRIVER_DELMOD_FNODEPEND 0x0001 /* Don't try to delete drivers that have dependencies on `self' */
 #define KSYSCTL_DRIVER_DELMOD_FFORCE    0x0200 /* Force unload the driver, even if unaccounted references remain
                                                 * WARNING: Doing this may compromise system integrity! */
 #define KSYSCTL_DRIVER_DELMOD_FNONBLOCK 0x0800 /* Don't wait for the driver to fully go away.

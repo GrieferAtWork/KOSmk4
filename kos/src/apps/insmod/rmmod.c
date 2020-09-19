@@ -47,8 +47,8 @@ int main(int argc, char *argv[]) {
 		if (strcmp(arg, "-") == 0) {
 			/* Support for `--' to break the commandline */
 			break;
-		} else if (strcmp(arg, "d") == 0 || strcmp(arg, "-depend") == 0) {
-			flags |= KSYSCTL_DRIVER_DELMOD_FDEPEND;
+		} else if (strcmp(arg, "nd") == 0 || strcmp(arg, "-no-depend") == 0) {
+			flags |= KSYSCTL_DRIVER_DELMOD_FNODEPEND;
 		} else if (strcmp(arg, "f") == 0 || strcmp(arg, "-force") == 0) {
 			flags |= KSYSCTL_DRIVER_DELMOD_FFORCE;
 		} else if (strcmp(arg, "a") == 0 || strcmp(arg, "-async") == 0) {
@@ -70,9 +70,9 @@ int main(int argc, char *argv[]) {
 usage:
 	fprintf(stderr,
 	        "Usage: rmmod [FLAGS...] NAME\n"
-	        "    -d --depend    Also unload dependent drivers\n"
-	        "    -f --force     Force unload\n"
-	        "    -a --async     Don't wait for completion\n");
+	        "    -nd --no-depend   Don't unload dependent drivers\n"
+	        "    -f  --force       Force unload\n"
+	        "    -a  --async       Don't wait for completion\n");
 	return EXIT_FAILURE;
 }
 

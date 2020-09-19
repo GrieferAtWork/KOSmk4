@@ -600,7 +600,7 @@ driver_finalize(struct driver *__restrict self)
 
 /* Flags for driver unloading functions. */
 #define DRIVER_DELMOD_FLAG_NORMAL   0x0000 /* Normal delmod flags. */
-#define DRIVER_DELMOD_FLAG_DEPEND   0x0001 /* Also delete drivers that have dependencies on `self' */
+#define DRIVER_DELMOD_FLAG_NODEPEND 0x0001 /* Don't try to delete drivers that have dependencies on `self' */
 #define DRIVER_DELMOD_FLAG_FORCE    0x0200 /* Force unload the driver, even if unaccounted references remain
                                             * WARNING: Doing this may compromise system integrity! */
 #define DRIVER_DELMOD_FLAG_NONBLOCK 0x0800 /* Don't wait for the driver to fully go away.
@@ -613,7 +613,7 @@ driver_finalize(struct driver *__restrict self)
 /* Try to unload a driver module.
  * This function will:
  *   - invoke module finalizers (if they haven't been already)
- *   - DRIVER_DELMOD_FLAG_DEPEND:
+ *   - if (!DRIVER_DELMOD_FLAG_NODEPEND):
  *         Search for other modules make use of `self' through
  *         dependencies and finalize all of them such that their
  *         dependency vectors can be cleared, including the

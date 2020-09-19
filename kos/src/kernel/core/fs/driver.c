@@ -1944,7 +1944,7 @@ do_start_finalization:
 /* Try to unload a driver module.
  * This function will:
  *   - invoke module finalizers (if they haven't been already)
- *   - DRIVER_DELMOD_FLAG_DEPEND:
+ *   - if (!DRIVER_DELMOD_FLAG_NODEPEND):
  *         Search for other modules make use of `self' through
  *         dependencies and finalize all of them such that their
  *         dependency vectors can be cleared, including the
@@ -1967,7 +1967,7 @@ driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict s
 		driver_finalize(self);
 		if (ATOMIC_CMPXCH(self->d_refcnt, 1, 0))
 			goto success;
-		if (flags & DRIVER_DELMOD_FLAG_DEPEND) {
+		if (!(flags & DRIVER_DELMOD_FLAG_NODEPEND)) {
 			/* Search for, and delete modules that are using `self' */
 			size_t j;
 			REF struct driver_state *ds;
