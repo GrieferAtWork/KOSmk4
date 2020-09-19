@@ -267,6 +267,14 @@ DEFINE_REFCOUNT_FUNCTIONS(struct sighand_ptr, sp_refcnt, sighand_ptr_destroy)
 DATDEF ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr;
 #define THIS_SIGHAND_PTR        PERTASK_GET(this_sighand_ptr)
 
+/* Return the sighand pointer of the given thread. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) REF struct sighand_ptr *
+NOTHROW(FCALL task_getsighand_ptr)(struct task *__restrict thread);
+
+/* Exchange the sighand pointer of the calling thread. */
+FUNDEF WUNUSED REF struct sighand_ptr *
+NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr);
+
 
 
 /* Acquire a lock to the underlying signal handler table that is associated

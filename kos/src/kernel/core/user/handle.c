@@ -494,8 +494,9 @@ NOTHROW(FCALL task_sethandlemanager)(struct handle_manager *__restrict newman) {
 	while unlikely(!sync_trywrite(&handle_manager_change_lock))
 		task_pause();
 #endif /* !CONFIG_NO_SMP */
-	result = PERTASK(this_handle_manager);
-	PERTASK(this_handle_manager) = incref(newman);
+	result = PERTASK_GET(this_handle_manager);
+	incref(newman);
+	PERTASK_SET(this_handle_manager, newman);
 #ifndef CONFIG_NO_SMP
 	sync_endwrite(&handle_manager_change_lock);
 #endif /* !CONFIG_NO_SMP */

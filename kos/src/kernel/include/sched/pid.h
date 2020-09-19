@@ -252,6 +252,7 @@ LOCAL WUNUSED REF struct task *NOTHROW(KCALL task_getprocessparent_nx)(void);
 LOCAL WUNUSED REF struct taskpid *NOTHROW(KCALL task_getprocessparentpid_nx)(void);
 LOCAL WUNUSED NONNULL((1)) REF struct task *NOTHROW(KCALL task_getprocessparent_of_nx)(struct task *__restrict thread);
 LOCAL WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(KCALL task_getprocessparentpid_of_nx)(struct task *__restrict thread);
+LOCAL WUNUSED NONNULL((1)) struct task *NOTHROW(KCALL task_getprocessparentptr_of)(struct task *__restrict thread);
 
 /* Check if the given task was orphaned (no longer has a parent process) */
 LOCAL ATTR_PURE WUNUSED bool NOTHROW(KCALL task_isorphan)(void);
@@ -694,6 +695,12 @@ NOTHROW(KCALL task_getprocessparent_of_nx)(struct task *__restrict thread) {
 		result = NULL;
 	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
+}
+
+LOCAL WUNUSED NONNULL((1)) struct task *
+NOTHROW(KCALL task_getprocessparentptr_of)(struct task *__restrict thread) {
+	struct task *proc = task_getprocess_of(thread);
+	return __hybrid_atomic_load(FORTASK(proc, this_taskgroup).tg_proc_parent, __ATOMIC_ACQUIRE);
 }
 
 LOCAL WUNUSED REF struct taskpid *KCALL

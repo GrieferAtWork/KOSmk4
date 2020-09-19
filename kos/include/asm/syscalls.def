@@ -670,7 +670,7 @@ poll:([tostr(STRUCT_POLLFD:nfds)] struct pollfd *fds,
 @@@param: type: One of `KCMP_FILE', `KCMP_FILES', `KCMP_FS', `KCMP_IO',
 @@              `KCMP_SIGHAND', `KCMP_SYSVSEM', `KCMP_VM', `KCMP_EPOLL_TFD'
 kcmp:(pid_t pid1, pid_t pid2, [tostr(KCMP_TYPE)] syscall_ulong_t type,
-      syscall_ulong_t idx1, syscall_ulong_t idx2) -> syscall_slong_t; /* UNIMPLEMENTED! */
+      syscall_ulong_t idx1, syscall_ulong_t idx2) -> syscall_slong_t;
 
 
 

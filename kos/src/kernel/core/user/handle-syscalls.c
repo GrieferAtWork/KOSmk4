@@ -27,6 +27,7 @@
 
 #include <fs/file.h>
 #include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/aio.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
@@ -36,6 +37,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 
@@ -51,6 +53,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/hop/handle.h>
 #include <kos/io.h>
+#include <linux/kcmp.h>
 #include <sys/mount.h>
 #include <sys/poll.h>
 #include <sys/stat.h>
@@ -2595,6 +2598,192 @@ DEFINE_SYSCALL0(errno_t, pause) {
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_PAUSE */
+
+
+
+
+
+/************************************************************************/
+/* kcmp()                                                               */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_KCMP
+PRIVATE NONNULL((1)) void KCALL
+kcmp_require_inspect_process(struct task *__restrict thread) {
+	struct task *me = THIS_TASK;
+	struct task *thread_parent;
+	if (thread == me)
+		return; /* Always allowed to inspect yourself */
+	thread_parent = task_getprocessparentptr_of(thread);
+	if (thread_parent == task_getprocess_of(me))
+		return; /* Check if the caller's process is the parent of `thread' */
+	require(CAP_SYS_PTRACE);
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct task *KCALL
+kcmp_get_thread_from_pid(pid_t pid) {
+	REF struct task *result;
+	/* Lookup the thread in question */
+	result = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
+	TRY {
+		/* Make sure that the caller is allowed to inspect `thread' */
+		kcmp_require_inspect_process(result);
+	} EXCEPT {
+		decref_unlikely(result);
+		RETHROW();
+	}
+	return result;
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct handle_manager *KCALL
+kcmp_get_handle_manager_from_pid(pid_t pid) {
+	REF struct handle_manager *result;
+	REF struct task *thread;
+	/* Lookup the thread in question */
+	thread = kcmp_get_thread_from_pid(pid);
+	FINALLY_DECREF_UNLIKELY(thread);
+	/* Retrieve the thread's handle manager. */
+	result = task_gethandlemanager(thread);
+	return result;
+}
+
+PRIVATE WUNUSED REF struct handle KCALL
+kcmp_get_handle_from_pid(pid_t pid, unsigned int fd) {
+	REF struct handle result;
+	REF struct handle_manager *hman;
+	hman = kcmp_get_handle_manager_from_pid(pid);
+	FINALLY_DECREF_UNLIKELY(hman);
+	/* XXX: Support for symbolic handles? */
+	result = handle_lookupin(fd, hman);
+	return result;
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct vm *KCALL
+kcmp_get_vm_from_pid(pid_t pid) {
+	REF struct vm *result;
+	REF struct task *thread;
+	/* Lookup the thread in question */
+	thread = kcmp_get_thread_from_pid(pid);
+	FINALLY_DECREF_UNLIKELY(thread);
+	/* Retrieve the thread's vm. */
+	result = task_getvm(thread);
+	return result;
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct fs *KCALL
+kcmp_get_fs_from_pid(pid_t pid) {
+	REF struct fs *result;
+	REF struct task *thread;
+	/* Lookup the thread in question */
+	thread = kcmp_get_thread_from_pid(pid);
+	FINALLY_DECREF_UNLIKELY(thread);
+	/* Retrieve the thread's filesystem controller. */
+	result = task_getfs(thread);
+	return result;
+}
+
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct sighand_ptr *KCALL
+kcmp_get_sighand_ptr_from_pid(pid_t pid) {
+	REF struct sighand_ptr *result;
+	REF struct task *thread;
+	/* Lookup the thread in question */
+	thread = kcmp_get_thread_from_pid(pid);
+	FINALLY_DECREF_UNLIKELY(thread);
+	/* Retrieve the thread's filesystem controller. */
+	result = task_getsighand_ptr(thread);
+	return result;
+}
+
+#define KCMP_ORDER_EQUAL    0 /* type(pid1:idx1) == type(pid2:idx2) */
+#define KCMP_ORDER_LESS     1 /* type(pid1:idx1) <  type(pid2:idx2) */
+#define KCMP_ORDER_MORE     2 /* type(pid1:idx1) >  type(pid2:idx2) */
+#define KCMP_ORDER_NOTEQUAL 3 /* type(pid1:idx1) != type(pid2:idx2) */
+
+PRIVATE NOBLOCK syscall_slong_t
+NOTHROW(FCALL kcmp_pointer)(void *a, void *b) {
+	a = skew_kernel_pointer(a);
+	b = skew_kernel_pointer(b);
+	if (a < b)
+		return KCMP_ORDER_LESS;
+	if (a > b)
+		return KCMP_ORDER_MORE;
+	return KCMP_ORDER_EQUAL;
+}
+
+
+DEFINE_SYSCALL5(syscall_slong_t, kcmp,
+                pid_t, pid1, pid_t, pid2, syscall_ulong_t, type,
+                syscall_ulong_t, idx1, syscall_ulong_t, idx2) {
+	syscall_slong_t result;
+	switch (type) {
+
+	case KCMP_FILE: {
+		REF struct handle hand1;
+		REF struct handle hand2;
+		hand1 = kcmp_get_handle_from_pid(pid1, (unsigned int)idx1);
+		TRY {
+			hand2  = kcmp_get_handle_from_pid(pid2, (unsigned int)idx2);
+			result = kcmp_pointer(hand1.h_data, hand2.h_data);
+			decref_unlikely(hand2);
+		} EXCEPT {
+			decref_unlikely(hand1);
+			RETHROW();
+		}
+		decref_unlikely(hand1);
+	}	break;
+
+	case KCMP_VM: {
+		REF struct vm *vm1;
+		REF struct vm *vm2;
+		vm1 = kcmp_get_vm_from_pid(pid1);
+		FINALLY_DECREF_UNLIKELY(vm1);
+		vm2 = kcmp_get_vm_from_pid(pid2);
+		FINALLY_DECREF_UNLIKELY(vm2);
+		result = kcmp_pointer(vm1, vm2);
+	}	break;
+
+	case KCMP_FILES: {
+		REF struct handle_manager *hman1;
+		REF struct handle_manager *hman2;
+		hman1 = kcmp_get_handle_manager_from_pid(pid1);
+		FINALLY_DECREF_UNLIKELY(hman1);
+		hman2 = kcmp_get_handle_manager_from_pid(pid2);
+		FINALLY_DECREF_UNLIKELY(hman2);
+		result = kcmp_pointer(hman1, hman2);
+	}	break;
+
+	case KCMP_FS: {
+		REF struct fs *fs1;
+		REF struct fs *fs2;
+		fs1 = kcmp_get_fs_from_pid(pid1);
+		FINALLY_DECREF_UNLIKELY(fs1);
+		fs2 = kcmp_get_fs_from_pid(pid2);
+		FINALLY_DECREF_UNLIKELY(fs2);
+		result = kcmp_pointer(fs1, fs2);
+	}	break;
+
+	case KCMP_SIGHAND: {
+		REF struct sighand_ptr *hand1;
+		REF struct sighand_ptr *hand2;
+		hand1 = kcmp_get_sighand_ptr_from_pid(pid1);
+		FINALLY_DECREF_UNLIKELY(hand1);
+		hand2 = kcmp_get_sighand_ptr_from_pid(pid2);
+		FINALLY_DECREF_UNLIKELY(hand2);
+		result = kcmp_pointer(hand1 ? ATOMIC_READ(hand1->sp_hand) : NULL,
+		                      hand2 ? ATOMIC_READ(hand2->sp_hand) : NULL);
+	}	break;
+
+	/* XXX: Support for `KCMP_IO' */
+	/* XXX: Support for `KCMP_SYSVSEM' */
+	/* XXX: Support for `KCMP_EPOLL_TFD' */
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE,
+		      type);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_KCMP */
 
 
 DECL_END

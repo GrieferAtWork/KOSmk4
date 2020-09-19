@@ -563,8 +563,9 @@ again_lock_myptr:
 			kfree(newptr);
 			RETHROW();
 		}
-		PERTASK_SET(this_sighand_ptr, newptr); /* Inherit reference */
-		decref_unlikely(myptr);
+		FINALLY_DECREF_UNLIKELY(newptr);
+		myptr = task_setsighand_ptr(newptr);
+		xdecref_unlikely(myptr);
 	}
 }
 

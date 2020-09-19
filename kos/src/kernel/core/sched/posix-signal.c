@@ -25,6 +25,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/hook.h> /* DEFINE_DBG_BZERO_OBJECT */
 #include <kernel/coredump.h>
 #include <kernel/except.h>
 #include <kernel/paging.h> /* KERNELSPACE_HIGHMEM */
@@ -527,6 +528,52 @@ sigmask_ismasked_chk(signo_t signo) {
 /* [0..1][valid_if(!TASK_FKERNTHREAD)][lock(PRIVATE(THIS_TASK))]
  * User-space signal handlers for the calling thread. */
 PUBLIC ATTR_PERTASK REF struct sighand_ptr *this_sighand_ptr = NULL;
+
+/* Lock for accessing any remote thread's this_sighand_ptr field */
+#ifndef CONFIG_NO_SMP
+PRIVATE struct atomic_rwlock sighand_ptr_change_lock = ATOMIC_RWLOCK_INIT;
+DEFINE_DBG_BZERO_OBJECT(sighand_ptr_change_lock);
+#endif /* !CONFIG_NO_SMP */
+
+/* Return the sighand pointer of the given thread. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1)) REF struct sighand_ptr *
+NOTHROW(FCALL task_getsighand_ptr)(struct task *__restrict thread) {
+	pflag_t was;
+	REF struct sighand_ptr *result;
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
+	while unlikely(!sync_tryread(&sighand_ptr_change_lock))
+		task_pause();
+#endif /* !CONFIG_NO_SMP */
+	assert(FORTASK(thread, this_sighand_ptr));
+	result = xincref(FORTASK(thread, this_sighand_ptr));
+#ifndef CONFIG_NO_SMP
+	sync_endread(&sighand_ptr_change_lock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+	return result;
+}
+
+/* Exchange the sighand pointer of the calling thread. */
+PUBLIC WUNUSED REF struct sighand_ptr *
+NOTHROW(FCALL task_setsighand_ptr)(struct sighand_ptr *newsighand_ptr) {
+	pflag_t was;
+	REF struct sighand_ptr *result;
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
+	while unlikely(!sync_trywrite(&sighand_ptr_change_lock))
+		task_pause();
+#endif /* !CONFIG_NO_SMP */
+	result = PERTASK_GET(this_sighand_ptr);
+	xincref(newsighand_ptr);
+	PERTASK_SET(this_sighand_ptr, newsighand_ptr);
+#ifndef CONFIG_NO_SMP
+	sync_endwrite(&sighand_ptr_change_lock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+	return result;
+}
+
 
 
 DEFINE_PERTASK_CLONE(clone_posix_signals);

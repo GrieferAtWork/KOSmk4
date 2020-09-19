@@ -207,7 +207,7 @@ PRIVATE struct atomic_rwlock cred_change_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(cred_change_lock);
 #endif /* !CONFIG_NO_SMP */
 
-/* Return the handle manager of the given thread. */
+/* Return the credentials controller of the given thread. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
 NOTHROW(FCALL task_getcred)(struct task *__restrict thread) {
 	pflag_t was;
@@ -226,7 +226,7 @@ NOTHROW(FCALL task_getcred)(struct task *__restrict thread) {
 	return result;
 }
 
-/* Exchange the handle manager of the calling thread. */
+/* Exchange the credentials controller of the calling thread. */
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
 NOTHROW(FCALL task_setcred)(struct cred *__restrict newcred) {
 	pflag_t was;
@@ -236,8 +236,9 @@ NOTHROW(FCALL task_setcred)(struct cred *__restrict newcred) {
 	while unlikely(!sync_trywrite(&cred_change_lock))
 		task_pause();
 #endif /* !CONFIG_NO_SMP */
-	result = PERTASK(this_cred);
-	PERTASK(this_cred) = incref(newcred);
+	result = PERTASK_GET(this_cred);
+	incref(newcred);
+	PERTASK_SET(this_cred, newcred);
 #ifndef CONFIG_NO_SMP
 	sync_endwrite(&cred_change_lock);
 #endif /* !CONFIG_NO_SMP */
