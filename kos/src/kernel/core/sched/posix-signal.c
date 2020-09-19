@@ -192,6 +192,7 @@ usersigmask_ismasked_chk(signo_t signo) {
 	ulongptr_t mask, word;
 	USER CHECKED struct userprocmask *umask;
 	USER UNCHECKED sigset_t *usigset;
+	bool result;
 
 	/* Load the address of the userprocmask descriptor. */
 	umask = PERTASK_GET(this_userprocmask_address);
@@ -200,12 +201,6 @@ usersigmask_ismasked_chk(signo_t signo) {
 	/* Mark the signal as pending for this thread. */
 	word = __sigset_word(signo);
 	mask = __sigset_mask(signo);
-	if ((ATOMIC_READ(umask->pm_pending.__val[word]) & mask) == 0) {
-		if ((ATOMIC_FETCHOR(umask->pm_pending.__val[word], mask) & mask) == 0) {
-			printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending\n",
-			       umask, signo);
-		}
-	}
 
 	/* First user-space memory access: read our current signal mask. */
 	usigset = ATOMIC_READ(umask->pm_sigmask);
@@ -215,7 +210,18 @@ usersigmask_ismasked_chk(signo_t signo) {
 
 	/* Check if `signo' is a member.
 	 * NOTE: This call contains the second user-space memory access! */
-	return sigismember(usigset, signo);
+	result = (usigset->__val[word] & mask) != 0;
+
+	if (result) {
+		/* The is the signal is masked, we must tell user-space that we've
+		 * checked, and that the signal may be pending at this point. */
+		if ((ATOMIC_READ(umask->pm_pending.__val[word]) & mask) == 0) {
+			ATOMIC_FETCHOR(umask->pm_pending.__val[word], mask);
+			printk(KERN_DEBUG "[userprocmask:%p] Mark signal %d as pending\n",
+			       umask, signo);
+		}
+	}
+	return result;
 }
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
@@ -3876,14 +3882,6 @@ DEFINE_SYSCALL0(errno_t, sigmask_check) {
 	/* XXX:  An arch-specific version could be implemented to directly
 	 *       call `sigmask_check_s()', which would be way faster than
 	 *       this function is! */
-
-	/* TODO: Calling this function from user-space as the result of a
-	 *       prior `Mark signal [signo] as pending' event (see the printk
-	 *       for this event above), will once mark those same signals as
-	 *       pending.
-	 * Solution: When this system call is used to check for pending signals,
-	 *           that test should _not_ re-add those signals to our thread's
-	 *           userprocmask's pending set. */
 	sigmask_check();
 	return -EOK;
 }
