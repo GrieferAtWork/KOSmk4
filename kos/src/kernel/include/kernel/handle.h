@@ -379,8 +379,8 @@ FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handle_manager *
 NOTHROW(FCALL task_gethandlemanager)(struct task *__restrict thread);
 
 /* Exchange the handle manager of the calling thread (and return the old one). */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handle_manager *FCALL
-task_sethandlemanager(struct handle_manager *__restrict newman) THROWS(E_WOULDBLOCK);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handle_manager *
+NOTHROW(FCALL task_sethandlemanager)(struct handle_manager *__restrict newman);
 
 
 /* Close all handles with the `IO_FCLOEXEC' flag set.

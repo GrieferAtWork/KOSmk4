@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbcf50a9f */
+/* HASH CRC-32:0x543c68e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7250,8 +7250,8 @@ INTERN_FUNCTION(libc_sys_Xppoll)
 END(libc_sys_Xppoll)
 DEFINE_PUBLIC_ALIAS(sys_Xppoll, libc_sys_Xppoll)
 
-/* param flags: Set of `CLONE_*' */
-/* errno_t unshare(syscall_ulong_t flags) */
+/* param: what: Set of `CLONE_*' */
+/* errno_t unshare(syscall_ulong_t what) */
 .section .text.crt.syscall.unshare
 INTERN_FUNCTION(libc_sys_unshare)
 	.cfi_startproc
@@ -7263,8 +7263,8 @@ INTERN_FUNCTION(libc_sys_unshare)
 END(libc_sys_unshare)
 DEFINE_PUBLIC_ALIAS(sys_unshare, libc_sys_unshare)
 
-/* param flags: Set of `CLONE_*' */
-/* errno_t unshare(syscall_ulong_t flags) */
+/* param: what: Set of `CLONE_*' */
+/* errno_t unshare(syscall_ulong_t what) */
 .section .text.crt.syscall.Xunshare
 INTERN_FUNCTION(libc_sys_Xunshare)
 	.cfi_startproc

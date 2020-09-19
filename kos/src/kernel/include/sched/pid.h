@@ -111,8 +111,8 @@ NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self);
 /* [1..1][valid_if(!TASK_FKERNTHREAD)][const] The PID associated with the calling thread.
  * NOTE: `NULL' (though assume UNDEFINED if the choice comes up) for kernel threads. */
 DATDEF ATTR_PERTASK struct taskpid *this_taskpid;
-#define THIS_TASKPID    PERTASK_GET(this_taskpid)
-#define THIS_PIDNS     (PERTASK_GET(this_taskpid)->tp_pidns)
+#define THIS_TASKPID PERTASK_GET(this_taskpid)
+#define THIS_PIDNS   (PERTASK_GET(this_taskpid)->tp_pidns)
 
 
 /* For `posix-signal' */
@@ -502,7 +502,7 @@ __DEFINE_SYNC_RWLOCK(struct pidns,
 /* Destroy a previously allocated pidns. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pidns_destroy)(struct pidns *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct pidns,pn_refcnt,pidns_destroy)
+DEFINE_REFCOUNT_FUNCTIONS(struct pidns, pn_refcnt, pidns_destroy)
 
 /* Allocate a new child PID namespace for `parent' */
 FUNDEF ATTR_RETNONNULL NONNULL((1)) REF struct pidns *

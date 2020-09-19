@@ -39,20 +39,19 @@ ProcFS_PerProc_FsLink_Printer(struct symlink_node *__restrict self,
                               ptrdiff_t offsetof_path_from_fs) {
 	size_t result;
 	upid_t pid;
-	struct fs *threadfs;
+	REF struct fs *threadfs;
 	REF struct task *thread;
 	REF struct path *pth;
 	pid    = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
-	if unlikely(!thread) {
-err:
+	if unlikely(!thread)
 		return snprintf(buf, bufsize, "/");
-	}
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, this_fs);
-		if unlikely(!threadfs)
-			goto err;
+		threadfs = task_getfs(thread);
+	}
+	{
+		FINALLY_DECREF_UNLIKELY(threadfs);
 		sync_read(&threadfs->f_pathlock);
 		pth = incref(*(REF struct path **)((byte_t *)threadfs +
 		                                   offsetof_path_from_fs));

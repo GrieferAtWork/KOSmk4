@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c4d6f33 */
+/* HASH CRC-32:0xc80cdf8a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2314,8 +2314,8 @@ __CDECLARE_SC(,__errno_t,unlink,(char const *__filename),(__filename))
 __CDECLARE_SC(,__errno_t,unlinkat,(__fd_t __dirfd, char const *__name, __atflag_t __flags),(__dirfd,__name,__flags))
 #endif /* __CRT_HAVE_SC(unlinkat) */
 #if __CRT_HAVE_SC(unshare)
-/* param flags: Set of `CLONE_*' */
-__CDECLARE_SC(,__errno_t,unshare,(__syscall_ulong_t __flags),(__flags))
+/* param: what: Set of `CLONE_*' */
+__CDECLARE_SC(,__errno_t,unshare,(__syscall_ulong_t __what),(__what))
 #endif /* __CRT_HAVE_SC(unshare) */
 #if __CRT_HAVE_SC(uselib)
 __CDECLARE_SC(,__errno_t,uselib,(char const *__library),(__library))
@@ -4622,8 +4622,8 @@ __CDECLARE_XSC(,__errno_t,unlink,(char const *__filename),(__filename))
 __CDECLARE_XSC(,__errno_t,unlinkat,(__fd_t __dirfd, char const *__name, __atflag_t __flags),(__dirfd,__name,__flags))
 #endif /* __CRT_HAVE_XSC(unlinkat) */
 #if __CRT_HAVE_XSC(unshare)
-/* param flags: Set of `CLONE_*' */
-__CDECLARE_XSC(,__errno_t,unshare,(__syscall_ulong_t __flags),(__flags))
+/* param: what: Set of `CLONE_*' */
+__CDECLARE_XSC(,__errno_t,unshare,(__syscall_ulong_t __what),(__what))
 #endif /* __CRT_HAVE_XSC(unshare) */
 #if __CRT_HAVE_XSC(uselib)
 __CDECLARE_XSC(,__errno_t,uselib,(char const *__library),(__library))

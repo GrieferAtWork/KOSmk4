@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadd9e957 */
+/* HASH CRC-32:0xf466ec58 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -263,7 +263,7 @@
 #define __NRAN3_waitid                 options
 #define __NRAN4_waitid                 ru
 #define __NRAN0_set_tid_address        tidptr
-#define __NRAN0_unshare                flags
+#define __NRAN0_unshare                what
 #define __NRAN0_futex                  uaddr
 #define __NRAN1_futex                  futex_op
 #define __NRAN2_futex                  val
@@ -1132,7 +1132,7 @@
 #define __NRRTR_waitid                  SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_set_tid_address        SC_REPR_POINTER                                         /* tidptr */ 
 #define __NRRTR_set_tid_address         SC_REPR_PID_T                                           /* return */
-#define __NRATR0_unshare                SC_REPR_CLONE_FLAGS_UNSHARE                             /* flags */ 
+#define __NRATR0_unshare                SC_REPR_CLONE_FLAGS_UNSHARE                             /* what */ 
 #define __NRRTR_unshare                 SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_futex                  SC_REPR_POINTER                                         /* uaddr */ 
 #define __NRATR1_futex                  SC_REPR_FUTEX_OP                                        /* futex_op */ 

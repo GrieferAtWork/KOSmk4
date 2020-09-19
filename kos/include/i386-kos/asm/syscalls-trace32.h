@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2162476a */
+/* HASH CRC-32:0x530042f0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -654,7 +654,7 @@
 #define __NRAN2_ppoll                        timeout_ts
 #define __NRAN3_ppoll                        sigmask
 #define __NRAN4_ppoll                        sigsetsize
-#define __NRAN0_unshare                      flags
+#define __NRAN0_unshare                      what
 #define __NRAN0_set_robust_list              TODO_PROTOTYPE
 #define __NRAN0_get_robust_list              TODO_PROTOTYPE
 #define __NRAN0_splice                       fdin
@@ -2172,7 +2172,7 @@
 #define __NRATL3_ppoll                        4                                                                    /* sigmask -> sigsetsize */ 
 #define __NRATR4_ppoll                        SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NRRTR_ppoll                         SC_REPR_SSIZE_T                                                      /* return */
-#define __NRATR0_unshare                      SC_REPR_CLONE_FLAGS_UNSHARE                                          /* flags */ 
+#define __NRATR0_unshare                      SC_REPR_CLONE_FLAGS_UNSHARE                                          /* what */ 
 #define __NRRTR_unshare                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_set_robust_list              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NRRTR_set_robust_list               SC_REPR_ERRNO_T                                                      /* return */

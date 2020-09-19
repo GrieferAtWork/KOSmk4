@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87fd7829 */
+/* HASH CRC-32:0xbc4f7cc3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,8 +207,8 @@
  *                  optionally or'd with `WNOHANG | WNOWAIT' */
 #define SYS_waitid                 __NR_waitid                 /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
 #define SYS_set_tid_address        __NR_set_tid_address        /* pid_t set_tid_address(pid_t *tidptr) */
-/* param flags: Set of `CLONE_*' */
-#define SYS_unshare                __NR_unshare                /* errno_t unshare(syscall_ulong_t flags) */
+/* param: what: Set of `CLONE_*' */
+#define SYS_unshare                __NR_unshare                /* errno_t unshare(syscall_ulong_t what) */
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 #define SYS_futex                  __NR_futex                  /* syscall_slong_t futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespec const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
 #define SYS_set_robust_list        __NR_set_robust_list        /* errno_t set_robust_list(int TODO_PROTOTYPE) */

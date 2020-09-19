@@ -916,14 +916,25 @@ fs_open(USER CHECKED /*utf-8*/ char const *upath,
 
 
 
-/* [1..1] Per-thread filesystem information.
+/* [1..1][lock(read(THIS_TASK || INTERN(lock)), write(THIS_TASK && INTERN(lock)))]
+ * Per-thread filesystem information.
  * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
 DATDEF ATTR_PERTASK REF struct fs *this_fs;
-#define THIS_FS     PERTASK_GET(this_fs)
-#define THIS_VFS   (PERTASK_GET(this_fs)->f_vfs)
+#define THIS_FS  PERTASK_GET(this_fs)
+#define THIS_VFS (PERTASK_GET(this_fs)->f_vfs)
 
-#define fs_getuid(f) (f)->f_fsuid
-#define fs_getgid(f) (f)->f_fsgid
+/* Return the filesystem controller of the given thread. */
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
+NOTHROW(FCALL task_getfs)(struct task *__restrict thread);
+
+/* Exchange the filesystem controller of the calling thread. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
+NOTHROW(FCALL task_setfs)(struct fs *__restrict newfs);
+
+
+
+#define fs_getuid(f) (f)->f_fsuid /* TODO: Remove this */
+#define fs_getgid(f) (f)->f_fsgid /* TODO: Remove this */
 
 LOCAL NOBLOCK WUNUSED fsmode_t
 NOTHROW(KCALL fs_getmode_for)(struct fs *__restrict self, atflag_t flags) {

@@ -39,6 +39,7 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
 
@@ -458,38 +459,46 @@ clone_this_handle_manager(struct task *__restrict new_thread, uintptr_t flags) {
 }
 
 
+#ifndef CONFIG_NO_SMP
 /* Lock for accessing any remote thread's this_handle_manager field */
 PRIVATE struct atomic_rwlock handle_manager_change_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(handle_manager_change_lock);
+#endif /* !CONFIG_NO_SMP */
 
 /* Return the handle manager of the given thread. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handle_manager *
 NOTHROW(FCALL task_gethandlemanager)(struct task *__restrict thread) {
+	pflag_t was;
 	REF struct handle_manager *result;
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
 	while unlikely(!sync_tryread(&handle_manager_change_lock))
 		task_pause();
+#endif /* !CONFIG_NO_SMP */
 	assert(FORTASK(thread, this_handle_manager));
 	result = incref(FORTASK(thread, this_handle_manager));
+#ifndef CONFIG_NO_SMP
 	sync_endread(&handle_manager_change_lock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
 	return result;
 }
 
 /* Exchange the handle manager of the calling thread. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handle_manager *FCALL
-task_sethandlemanager(struct handle_manager *__restrict newman) THROWS(E_WOULDBLOCK) {
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct handle_manager *
+NOTHROW(FCALL task_sethandlemanager)(struct handle_manager *__restrict newman) {
 	pflag_t was;
 	REF struct handle_manager *result;
-again:
 	was = PREEMPTION_PUSHOFF();
-	if unlikely(!sync_trywrite(&handle_manager_change_lock)) {
-		PREEMPTION_POP(was);
-		/* Try to yield to that whoever is holding the lock will release it shortly. */
-		task_yield();
-		goto again;
-	}
+#ifndef CONFIG_NO_SMP
+	while unlikely(!sync_trywrite(&handle_manager_change_lock))
+		task_pause();
+#endif /* !CONFIG_NO_SMP */
 	result = PERTASK(this_handle_manager);
 	PERTASK(this_handle_manager) = incref(newman);
+#ifndef CONFIG_NO_SMP
 	sync_endwrite(&handle_manager_change_lock);
+#endif /* !CONFIG_NO_SMP */
 	PREEMPTION_POP(was);
 	assert(result);
 	return result;

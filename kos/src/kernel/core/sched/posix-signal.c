@@ -644,6 +644,8 @@ again_lock_myptr:
 				if (!myhand) {
 					/* No handlers -> Nothing to copy (the new thread will also use default handlers!) */
 					sync_endread(myptr);
+					kfree(newptr);
+					newptr = NULL;
 				} else {
 					if (!sync_trywrite(myhand)) {
 						sync_endread(myptr);

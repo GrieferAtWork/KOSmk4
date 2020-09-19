@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd215aca */
+/* HASH CRC-32:0xd9ff55c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -654,7 +654,7 @@
 #define __NR32AN2_ppoll                        timeout_ts
 #define __NR32AN3_ppoll                        sigmask
 #define __NR32AN4_ppoll                        sigsetsize
-#define __NR32AN0_unshare                      flags
+#define __NR32AN0_unshare                      what
 #define __NR32AN0_set_robust_list              TODO_PROTOTYPE
 #define __NR32AN0_get_robust_list              TODO_PROTOTYPE
 #define __NR32AN0_splice                       fdin
@@ -2172,7 +2172,7 @@
 #define __NR32ATL3_ppoll                        4                                                                    /* sigmask -> sigsetsize */ 
 #define __NR32ATR4_ppoll                        SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_ppoll                         SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_unshare                      SC_REPR_CLONE_FLAGS_UNSHARE                                          /* flags */ 
+#define __NR32ATR0_unshare                      SC_REPR_CLONE_FLAGS_UNSHARE                                          /* what */ 
 #define __NR32RTR_unshare                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_set_robust_list              SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
 #define __NR32RTR_set_robust_list               SC_REPR_ERRNO_T                                                      /* return */

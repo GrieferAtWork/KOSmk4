@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ed31714 */
+/* HASH CRC-32:0x2e519a86 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -614,8 +614,8 @@
 #define SYS_faccessat                __NR_faccessat                /* errno_t faccessat(fd_t dirfd, char const *filename, syscall_ulong_t type, atflag_t flags) */
 #define SYS_pselect6                 __NR_pselect6                 /* ssize_t pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timespecx64 const *timeout, void const *sigmask_sigset_and_len) */
 #define SYS_ppoll                    __NR_ppoll                    /* ssize_t ppoll(struct pollfd *fds, size_t nfds, struct timespecx64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize) */
-/* param flags: Set of `CLONE_*' */
-#define SYS_unshare                  __NR_unshare                  /* errno_t unshare(syscall_ulong_t flags) */
+/* param: what: Set of `CLONE_*' */
+#define SYS_unshare                  __NR_unshare                  /* errno_t unshare(syscall_ulong_t what) */
 #define SYS_set_robust_list          __NR_set_robust_list          /* errno_t set_robust_list(int TODO_PROTOTYPE) */
 #define SYS_get_robust_list          __NR_get_robust_list          /* errno_t get_robust_list(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */

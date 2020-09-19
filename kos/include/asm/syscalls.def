@@ -377,8 +377,8 @@ exit_group:([tostr(EXIT_STATUS)] syscall_ulong_t exit_code);
 clone:([tostr(CLONE_FLAGS)] syscall_ulong_t flags, void *child_stack, [tostr(out:PID_T)] pid_t *ptid,
        [tostr(POINTER)] uintptr_t newtls, [tostr(out:PID_T)] pid_t *ctid) -> pid_t;
 
-@@param flags: Set of `CLONE_*'
-unshare:([tostr(CLONE_FLAGS_UNSHARE)] syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
+@@param: what: Set of `CLONE_*'
+unshare:([tostr(CLONE_FLAGS_UNSHARE)] syscall_ulong_t what) -> errno_t;
 setns:(fd_t fd, [tostr(CLONE_FLAGS_SETNS)] syscall_ulong_t nstype) -> errno_t; /* UNIMPLEMENTED! */
 
 

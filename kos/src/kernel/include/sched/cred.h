@@ -308,10 +308,19 @@ DEFINE_REFCOUNT_FUNCTIONS(struct cred, c_refcnt, cred_destroy)
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *FCALL
 cred_clone(struct cred *__restrict self) THROWS(E_BADALLOC);
 
-/* [1..1] Per-thread filesystem information.
+/* [1..1][lock(read(THIS_TASK || INTERN(lock)), write(THIS_TASK && INTERN(lock)))]
+ * Per-thread credentials controller.
  * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
 DATDEF ATTR_PERTASK REF struct cred *this_cred;
 #define THIS_CRED PERTASK_GET(this_cred)
+
+/* Return the credentials controller of the given thread. */
+FUNDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
+NOTHROW(FCALL task_getcred)(struct task *__restrict thread);
+
+/* Exchange the credentials controller of the calling thread. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
+NOTHROW(FCALL task_setcred)(struct cred *__restrict newcred);
 
 /* Generic kernel credentials / credentials for /bin/init */
 DATDEF struct cred cred_kernel;

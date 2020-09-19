@@ -26,6 +26,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/hook.h> /* DEFINE_DBG_BZERO_OBJECT */
 #include <fs/node.h>
 #include <kernel/driver-param.h>
 #include <kernel/driver.h>
@@ -36,6 +37,7 @@
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <kernel/vm/nopf.h>
+#include <sched/cpu.h> /* CONFIG_NO_SMP */
 #include <sched/cred.h>
 
 #include <hybrid/atomic.h>
@@ -157,7 +159,8 @@ PUBLIC struct cred cred_kernel = {
 	/* .c_cap_ambient     = */ CREDCAP_INIT_FULL,
 };
 
-/* [1..1] Per-thread filesystem information.
+/* [1..1][lock(read(THIS_TASK || INTERN(lock)), write(THIS_TASK && INTERN(lock)))]
+ * Per-thread credentials controller.
  * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
 PUBLIC ATTR_PERTASK REF struct cred *this_cred = NULL;
 
@@ -197,6 +200,53 @@ PUBLIC void FCALL require(syscall_slong_t capno)
 	if (!capable(capno))
 		THROW(E_INSUFFICIENT_RIGHTS, capno);
 }
+
+/* Lock for accessing any remote thread's this_cred field */
+#ifndef CONFIG_NO_SMP
+PRIVATE struct atomic_rwlock cred_change_lock = ATOMIC_RWLOCK_INIT;
+DEFINE_DBG_BZERO_OBJECT(cred_change_lock);
+#endif /* !CONFIG_NO_SMP */
+
+/* Return the handle manager of the given thread. */
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
+NOTHROW(FCALL task_getcred)(struct task *__restrict thread) {
+	pflag_t was;
+	REF struct cred *result;
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
+	while unlikely(!sync_tryread(&cred_change_lock))
+		task_pause();
+#endif /* !CONFIG_NO_SMP */
+	assert(FORTASK(thread, this_cred));
+	result = incref(FORTASK(thread, this_cred));
+#ifndef CONFIG_NO_SMP
+	sync_endread(&cred_change_lock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+	return result;
+}
+
+/* Exchange the handle manager of the calling thread. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct cred *
+NOTHROW(FCALL task_setcred)(struct cred *__restrict newcred) {
+	pflag_t was;
+	REF struct cred *result;
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
+	while unlikely(!sync_trywrite(&cred_change_lock))
+		task_pause();
+#endif /* !CONFIG_NO_SMP */
+	result = PERTASK(this_cred);
+	PERTASK(this_cred) = incref(newcred);
+#ifndef CONFIG_NO_SMP
+	sync_endwrite(&cred_change_lock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+	assert(result);
+	return result;
+}
+
+
 
 
 

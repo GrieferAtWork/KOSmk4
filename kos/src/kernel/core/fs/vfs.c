@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/hook.h> /* DEFINE_DBG_BZERO_OBJECT */
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/cache.h>
@@ -35,6 +36,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/cpu.h>
 #include <sched/cred.h>
 #include <sched/sync.h>
 
@@ -45,10 +47,10 @@
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/hop/path.h>
-#include <limits.h> /* SYMLOOP_MAX */
 
 #include <assert.h>
 #include <format-printer.h>
+#include <limits.h> /* SYMLOOP_MAX */
 #include <sched.h>
 #include <string.h>
 
@@ -2240,7 +2242,8 @@ NOTHROW(KCALL fs_destroy)(struct fs *__restrict self) {
 }
 
 
-/* [1..1] Per-thread filesystem information.
+/* [1..1][lock(read(THIS_TASK || INTERN(lock)), write(THIS_TASK && INTERN(lock)))]
+ * Per-thread filesystem information.
  * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
 PUBLIC ATTR_PERTASK REF struct fs *this_fs = NULL;
 
@@ -2264,6 +2267,55 @@ clone_this_fs(struct task *__restrict new_thread, uintptr_t flags) {
 	assert(!FORTASK(new_thread, this_fs));
 	FORTASK(new_thread, this_fs) = f; /* Inherit reference */
 }
+
+
+/* Lock for accessing any remote thread's this_fs field */
+#ifndef CONFIG_NO_SMP
+PRIVATE struct atomic_rwlock fs_change_lock = ATOMIC_RWLOCK_INIT;
+DEFINE_DBG_BZERO_OBJECT(fs_change_lock);
+#endif /* !CONFIG_NO_SMP */
+
+/* Return the handle manager of the given thread. */
+PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
+NOTHROW(FCALL task_getfs)(struct task *__restrict thread) {
+	pflag_t was;
+	REF struct fs *result;
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
+	while unlikely(!sync_tryread(&fs_change_lock))
+		task_pause();
+#endif /* !CONFIG_NO_SMP */
+	assert(FORTASK(thread, this_fs));
+	result = incref(FORTASK(thread, this_fs));
+#ifndef CONFIG_NO_SMP
+	sync_endread(&fs_change_lock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+	return result;
+}
+
+/* Exchange the handle manager of the calling thread. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct fs *
+NOTHROW(FCALL task_setfs)(struct fs *__restrict newfs) {
+	pflag_t was;
+	REF struct fs *result;
+	was = PREEMPTION_PUSHOFF();
+#ifndef CONFIG_NO_SMP
+	while unlikely(!sync_trywrite(&fs_change_lock))
+		task_pause();
+#endif /* !CONFIG_NO_SMP */
+	result = PERTASK(this_fs);
+	PERTASK(this_fs) = incref(newfs);
+#ifndef CONFIG_NO_SMP
+	sync_endwrite(&fs_change_lock);
+#endif /* !CONFIG_NO_SMP */
+	PREEMPTION_POP(was);
+	assert(result);
+	return result;
+}
+
+
+
 
 DECL_END
 

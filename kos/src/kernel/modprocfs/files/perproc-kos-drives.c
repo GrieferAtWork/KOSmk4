@@ -43,8 +43,9 @@ ProcFS_PerProc_Kos_Drives_Lookup(struct directory_node *__restrict self,
 		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	upid_t pid;
-	REF struct task *thread;
 	unsigned char driveid;
+	REF struct fs *threadfs;
+	REF struct task *thread;
 	REF struct directory_entry *result;
 	if (namelen != 1)
 		goto err;
@@ -63,12 +64,12 @@ ProcFS_PerProc_Kos_Drives_Lookup(struct directory_node *__restrict self,
 	if unlikely(!thread)
 		goto err;
 	{
-		struct fs *threadfs;
-		struct vfs *threadvfs;
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, this_fs);
-		if unlikely(!threadfs)
-			goto err;
+		threadfs = task_getfs(thread);
+	}
+	{
+		struct vfs *threadvfs;
+		FINALLY_DECREF_UNLIKELY(threadfs);
 		threadvfs = threadfs->f_vfs;
 		if (!ATOMIC_READ(threadvfs->v_drives[driveid]))
 			goto err;
@@ -102,17 +103,18 @@ ProcFS_PerProc_Kos_Dcwd_Lookup(struct directory_node *__restrict self,
 PRIVATE u32 KCALL get_bound_drives(upid_t pid) {
 	u32 result = 0;
 	REF struct task *thread;
+	REF struct fs *threadfs;
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
 	if unlikely(!thread)
 		goto done;
 	{
-		size_t i;
-		struct fs *threadfs;
-		struct vfs *threadvfs;
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, this_fs);
-		if unlikely(!threadfs)
-			goto done;
+		threadfs = task_getfs(thread);
+	}
+	{
+		size_t i;
+		struct vfs *threadvfs;
+		FINALLY_DECREF_UNLIKELY(threadfs);
 		threadvfs = threadfs->f_vfs;
 		for (i = 0; i < VFS_DRIVECOUNT; ++i) {
 			if (ATOMIC_READ(threadvfs->v_drives[i]) != NULL)
@@ -222,6 +224,7 @@ ProcFS_PerProc_Kos_Drives_Entry_Readlink(struct symlink_node *__restrict self,
 	size_t result;
 	upid_t pid;
 	unsigned char drive_id;
+	REF struct fs *threadfs;
 	REF struct task *thread;
 	REF struct path *drive_root;
 	pid      = (upid_t)(self->i_fileino & PROCFS_INOTYPE_DCWD_PIDMASK);
@@ -231,12 +234,12 @@ ProcFS_PerProc_Kos_Drives_Entry_Readlink(struct symlink_node *__restrict self,
 	if unlikely(!thread)
 		goto err;
 	{
-		struct fs *threadfs;
-		struct vfs *threadvfs;
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, this_fs);
-		if unlikely(!threadfs)
-			goto err;
+		threadfs = task_getfs(thread);
+	}
+	{
+		struct vfs *threadvfs;
+		FINALLY_DECREF_UNLIKELY(threadfs);
 		threadvfs = threadfs->f_vfs;
 		sync_read(&threadvfs->v_drives_lock);
 		drive_root = xincref(threadvfs->v_drives[drive_id]);
@@ -261,6 +264,7 @@ ProcFS_PerProc_Kos_Dcwd_Entry_Readlink(struct symlink_node *__restrict self,
 	size_t result;
 	upid_t pid;
 	unsigned char drive_id;
+	REF struct fs *threadfs;
 	REF struct task *thread;
 	REF struct path *drive_pwd;
 	pid      = (upid_t)(self->i_fileino & PROCFS_INOTYPE_DRIVE_PIDMASK);
@@ -270,11 +274,11 @@ ProcFS_PerProc_Kos_Dcwd_Entry_Readlink(struct symlink_node *__restrict self,
 	if unlikely(!thread)
 		goto err;
 	{
-		struct fs *threadfs;
 		FINALLY_DECREF_UNLIKELY(thread);
-		threadfs = FORTASK(thread, this_fs);
-		if unlikely(!threadfs)
-			goto err;
+		threadfs = task_getfs(thread);
+	}
+	{
+		FINALLY_DECREF_UNLIKELY(threadfs);
 		sync_read(&threadfs->f_pathlock);
 		drive_pwd = xincref(threadfs->f_dcwd[drive_id]);
 		sync_endread(&threadfs->f_pathlock);

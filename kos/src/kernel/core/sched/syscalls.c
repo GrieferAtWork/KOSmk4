@@ -25,23 +25,31 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/vfs.h>
 #include <kernel/except.h>
+#include <kernel/handle.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
+#include <sched/pid.h>
+#include <sched/posix-signal.h>
 #include <sched/rpc.h>
+#include <sched/signal.h>
 #include <sched/task.h>
 
 #include <bits/timespec.h>
 #include <bits/timeval.h>
 #include <compat/config.h>
+#include <kos/except/reason/inval.h>
 #include <sys/time.h>
-#include <assert.h>
-#include <sched/signal.h>
 #include <sys/timeb.h>
 
+#include <assert.h>
 #include <errno.h>
+#include <sched.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/timeb.h>
@@ -477,6 +485,138 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_NANOSLEEP64 */
+
+
+
+
+
+/************************************************************************/
+/* unshare()                                                            */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_UNSHARE
+PRIVATE void KCALL unshare_vm(void) {
+	struct vm *myvm = THIS_VM;
+	if (isshared(myvm)) {
+		REF struct vm *newvm;
+		newvm = vm_clone(myvm);
+		FINALLY_DECREF_UNLIKELY(newvm);
+		task_setvm(newvm);
+	}
+}
+
+PRIVATE void KCALL unshare_fs(syscall_ulong_t what) {
+	struct fs *myfs = THIS_FS;
+	if (isshared(myfs)) {
+		REF struct fs *newfs;
+		newfs = fs_clone(myfs, (what & CLONE_NEWNS) != 0);
+		FINALLY_DECREF_UNLIKELY(newfs);
+		myfs = task_setfs(newfs);
+		decref_unlikely(myfs);
+	}
+}
+
+PRIVATE void KCALL unshare_files(void) {
+	struct handle_manager *myman = THIS_HANDLE_MANAGER;
+	if (isshared(myman)) {
+		REF struct handle_manager *newman;
+		newman = handle_manager_clone(myman);
+		FINALLY_DECREF_UNLIKELY(newman);
+		myman = task_sethandlemanager(newman);
+		decref_unlikely(myman);
+	}
+}
+
+PRIVATE void KCALL unshare_sighand(void) {
+	struct sighand_ptr *myptr;
+	myptr = PERTASK_GET(this_sighand_ptr);
+	if (myptr && isshared(myptr)) {
+		REF struct sighand_ptr *newptr;
+		struct sighand *myhand;
+		newptr = (REF struct sighand_ptr *)kmalloc(sizeof(struct sighand_ptr),
+		                                           GFP_NORMAL);
+again_lock_myptr:
+		TRY {
+			sync_read(myptr);
+			COMPILER_READ_BARRIER();
+			myhand = myptr->sp_hand;
+			COMPILER_READ_BARRIER();
+			if (!myhand) {
+				/* No handlers -> Nothing to point to! */
+				sync_endread(myptr);
+				kfree(newptr);
+				newptr = NULL;
+			} else {
+				if (!sync_trywrite(myhand)) {
+					sync_endread(myptr);
+					task_yield();
+					goto again_lock_myptr;
+				}
+				sync_endread(myptr);
+				sighand_incshare(myhand);
+				sync_endwrite(myhand);
+				/* Still share the handler table as copy-on-write. */
+				atomic_rwlock_init(&newptr->sp_lock);
+				newptr->sp_refcnt = 1;
+				newptr->sp_hand   = myhand; /* Inherit: sighand_incshare() */
+			}
+		} EXCEPT {
+			kfree(newptr);
+			RETHROW();
+		}
+		PERTASK_SET(this_sighand_ptr, newptr); /* Inherit reference */
+		decref_unlikely(myptr);
+	}
+}
+
+PRIVATE void KCALL unshare_cred(void) {
+	struct cred *mycred = THIS_CRED;
+	if (isshared(mycred)) {
+		REF struct cred *newcred;
+		newcred = cred_clone(mycred);
+		FINALLY_DECREF_UNLIKELY(newcred);
+		mycred = task_setcred(newcred);
+		decref_unlikely(mycred);
+	}
+}
+
+DEFINE_SYSCALL1(errno_t, unshare, syscall_ulong_t, what) {
+	VALIDATE_FLAGSET(what,
+	                 CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND |
+	                 CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM | CLONE_NEWUTS |
+	                 CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID |
+	                 CLONE_NEWNET | CLONE_IO,
+	                 E_INVALID_ARGUMENT_CONTEXT_UNSHARE_WHAT);
+	if (what & CLONE_VM)
+		unshare_vm();
+	if (what & CLONE_FS)
+		unshare_fs(what);
+	if (what & CLONE_FILES)
+		unshare_files();
+	if (what & CLONE_SIGHAND)
+		unshare_sighand();
+	if (what & CLONE_CRED)
+		unshare_cred();
+#if 0 /* XXX: Add support for these */
+	if (what & CLONE_SYSVSEM) {
+	}
+	if (what & CLONE_NEWUTS) {
+	}
+	if (what & CLONE_NEWIPC) {
+	}
+	if (what & CLONE_NEWUSER) {
+	}
+	if (what & CLONE_NEWPID) {
+		/* This one has some really weird semantics, since the
+		 * calling thread isn't moved into the new namespace. */
+	}
+	if (what & CLONE_NEWNET) {
+	}
+	if (what & CLONE_IO) {
+	}
+#endif
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_UNSHARE */
 
 
 DECL_END

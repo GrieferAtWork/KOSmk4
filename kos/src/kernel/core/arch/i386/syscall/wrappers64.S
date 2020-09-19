@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27dd8514 */
+/* HASH CRC-32:0x518fcc5a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8560,8 +8560,8 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ppoll)
 	.cfi_endproc
 END(__x86_asm64_syscall_ppoll)
 
-/* param flags: Set of `CLONE_*' */
-/* errno_t unshare(syscall_ulong_t flags) */
+/* param: what: Set of `CLONE_*' */
+/* errno_t unshare(syscall_ulong_t what) */
 .section .text.x86.asm64_syscall.unshare
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_unshare)
 	.cfi_startproc simple
@@ -23014,8 +23014,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ppoll)
 	.cfi_endproc
 END(__x86_asm32_int80_ppoll)
 
-/* param flags: Set of `CLONE_*' */
-/* errno_t unshare(syscall_ulong_t flags) */
+/* param: what: Set of `CLONE_*' */
+/* errno_t unshare(syscall_ulong_t what) */
 .section .text.x86.asm32_syscall_int80.unshare
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_unshare)
 	.cfi_startproc simple
@@ -31853,8 +31853,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ppoll)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ppoll)
 
-/* param flags: Set of `CLONE_*' */
-/* errno_t unshare(syscall_ulong_t flags) */
+/* param: what: Set of `CLONE_*' */
+/* errno_t unshare(syscall_ulong_t what) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_unshare, __x86_asm32_int80_unshare)
 
 /* errno_t set_robust_list(int TODO_PROTOTYPE) */
@@ -37845,8 +37845,8 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_ppoll)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_ppoll)
 
-/* param flags: Set of `CLONE_*' */
-/* errno_t unshare(syscall_ulong_t flags) */
+/* param: what: Set of `CLONE_*' */
+/* errno_t unshare(syscall_ulong_t what) */
 .section .text.x86.asm32_syscall_sysrun32.unshare
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_unshare)
 	.cfi_startproc
