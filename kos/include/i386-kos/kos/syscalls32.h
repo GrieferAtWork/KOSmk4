@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86b80037 */
+/* HASH CRC-32:0x7c4d6f33 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2343,9 +2343,11 @@ __CDECLARE_SC(,__fd_t,userviofd,(__size_t __initial_size, __syscall_ulong_t __fl
 __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_SC(ustat) */
 #if __CRT_HAVE_SC(utime)
+/* @param: times: When NULL, set the current time */
 __CDECLARE_SC(,__errno_t,utime,(char const *__filename, struct __utimbufx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime) */
 #if __CRT_HAVE_SC(utime64)
+/* @param: times: When NULL, set the current time */
 __CDECLARE_SC(,__errno_t,utime64,(char const *__filename, struct __utimbufx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utime64) */
 #if __CRT_HAVE_SC(utimensat)
@@ -2357,9 +2359,15 @@ __CDECLARE_SC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, stru
 __CDECLARE_SC(,__errno_t,utimensat_time64,(__fd_t __dirfd, char const *__filename, struct __timespecx32_64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_SC(utimensat_time64) */
 #if __CRT_HAVE_SC(utimes)
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 __CDECLARE_SC(,__errno_t,utimes,(char const *__filename, struct __timevalx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utimes) */
 #if __CRT_HAVE_SC(utimes64)
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 __CDECLARE_SC(,__errno_t,utimes64,(char const *__filename, struct __timevalx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_SC(utimes64) */
 #if __CRT_HAVE_SC(vfork)
@@ -4643,9 +4651,11 @@ __CDECLARE_XSC(,__fd_t,userviofd,(__size_t __initial_size, __syscall_ulong_t __f
 __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_XSC(ustat) */
 #if __CRT_HAVE_XSC(utime)
+/* @param: times: When NULL, set the current time */
 __CDECLARE_XSC(,__errno_t,utime,(char const *__filename, struct __utimbufx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime) */
 #if __CRT_HAVE_XSC(utime64)
+/* @param: times: When NULL, set the current time */
 __CDECLARE_XSC(,__errno_t,utime64,(char const *__filename, struct __utimbufx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utime64) */
 #if __CRT_HAVE_XSC(utimensat)
@@ -4657,9 +4667,15 @@ __CDECLARE_XSC(,__errno_t,utimensat,(__fd_t __dirfd, char const *__filename, str
 __CDECLARE_XSC(,__errno_t,utimensat_time64,(__fd_t __dirfd, char const *__filename, struct __timespecx32_64 const *__times, __atflag_t __flags),(__dirfd,__filename,__times,__flags))
 #endif /* __CRT_HAVE_XSC(utimensat_time64) */
 #if __CRT_HAVE_XSC(utimes)
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 __CDECLARE_XSC(,__errno_t,utimes,(char const *__filename, struct __timevalx32 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utimes) */
 #if __CRT_HAVE_XSC(utimes64)
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 __CDECLARE_XSC(,__errno_t,utimes64,(char const *__filename, struct __timevalx32_64 const *__times),(__filename,__times))
 #endif /* __CRT_HAVE_XSC(utimes64) */
 #if __CRT_HAVE_XSC(vfork)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18e67adc */
+/* HASH CRC-32:0x27dd8514 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4282,6 +4282,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sigaltstack)
 	.cfi_endproc
 END(__x86_asm64_syscall_sigaltstack)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime(char const *filename, struct utimbufx64 const *times) */
 .section .text.x86.asm64_syscall.utime
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utime)
@@ -7406,6 +7407,9 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tgkill)
 	.cfi_endproc
 END(__x86_asm64_syscall_tgkill)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes(char const *filename, struct timevalx64 const[2] times) */
 .section .text.x86.asm64_syscall.utimes
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utimes)
@@ -13952,6 +13956,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
 	.cfi_endproc
 END(__x86_asm32_int80_pause)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.x86.asm32_syscall_int80.utime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime)
@@ -21720,6 +21725,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
 	.cfi_endproc
 END(__x86_asm32_int80_tgkill)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_int80.utimes
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes)
@@ -27733,6 +27741,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	.cfi_endproc
 END(__x86_asm32_int80_waitid64)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_int80.utimes64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
@@ -28824,6 +28835,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_userprocmask_address)
 	.cfi_endproc
 END(__x86_asm32_int80_set_userprocmask_address)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_int80.utime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
@@ -30135,6 +30147,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_oldfstat, __x86_asm32_int80_oldfst
 /* errno_t pause(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pause, __x86_asm32_int80_pause)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime, __x86_asm32_int80_utime)
 
@@ -31464,6 +31477,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fstatfs64, __x86_asm32_int80_fstat
 /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_tgkill, __x86_asm32_int80_tgkill)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimes, __x86_asm32_int80_utimes)
 
@@ -33495,6 +33511,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_waitid64)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utimes64, __x86_asm32_int80_utimes64)
 
@@ -33854,6 +33873,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sigmask_check, __x86_asm32_int80_s
 /* errno_t set_userprocmask_address(struct userprocmask *ctl) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_set_userprocmask_address, __x86_asm32_int80_set_userprocmask_address)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_utime64, __x86_asm32_int80_utime64)
 
@@ -34751,6 +34771,7 @@ END(__x86_asm32_sysrun32_oldfstat)
 /* errno_t pause(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_pause, sys32_pause); */
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.x86.asm32_syscall_sysrun32.utime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime)
@@ -37347,6 +37368,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tgkill)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_tgkill)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_sysrun32.utimes
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes)
@@ -39685,6 +39709,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_waitid64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_waitid64)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_sysrun32.utimes64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utimes64)
@@ -40104,6 +40131,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_set_userprocmask_address)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_set_userprocmask_address)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_sysrun32.utime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_utime64)

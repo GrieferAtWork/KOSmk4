@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96a267fb */
+/* HASH CRC-32:0x4997dfa5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1177,6 +1177,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pause)
 	.cfi_endproc
 END(__x86_asm32_int80_pause)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.x86.asm32_syscall_int80.utime
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime)
@@ -10127,6 +10128,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
 	.cfi_endproc
 END(__x86_asm32_int80_tgkill)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_int80.utimes
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes)
@@ -17000,6 +17004,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_waitid64)
 	.cfi_endproc
 END(__x86_asm32_int80_waitid64)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_int80.utimes64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
@@ -18228,6 +18235,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_userprocmask_address)
 	.cfi_endproc
 END(__x86_asm32_int80_set_userprocmask_address)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_int80.utime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
@@ -20619,6 +20627,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_pause)
 	.cfi_endproc
 END(__x86_asm32_sysenter_pause)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.x86.asm32_syscall_sysenter.utime
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime)
@@ -29599,6 +29608,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_tgkill)
 	.cfi_endproc
 END(__x86_asm32_sysenter_tgkill)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.x86.asm32_syscall_sysenter.utimes
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimes)
@@ -36544,6 +36556,9 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_waitid64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_waitid64)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.x86.asm32_syscall_sysenter.utimes64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimes64)
@@ -37782,6 +37797,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_userprocmask_address)
 	.cfi_endproc
 END(__x86_asm32_sysenter_set_userprocmask_address)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_sysenter.utime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime64)

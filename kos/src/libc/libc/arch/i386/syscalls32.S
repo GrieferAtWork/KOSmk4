@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1baaf0b */
+/* HASH CRC-32:0xbe028644 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1078,6 +1078,7 @@ INTERN_FUNCTION(libc_sys_Xpause)
 END(libc_sys_Xpause)
 DEFINE_PUBLIC_ALIAS(sys_Xpause, libc_sys_Xpause)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.crt.syscall.utime
 INTERN_FUNCTION(libc_sys_utime)
@@ -1086,6 +1087,7 @@ INTERN_FUNCTION(libc_sys_utime)
 END(libc_sys_utime)
 DEFINE_PUBLIC_ALIAS(sys_utime, libc_sys_utime)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 .section .text.crt.syscall.Xutime
 INTERN_FUNCTION(libc_sys_Xutime)
@@ -5076,6 +5078,9 @@ INTERN_FUNCTION(libc_sys_Xtgkill)
 END(libc_sys_Xtgkill)
 DEFINE_PUBLIC_ALIAS(sys_Xtgkill, libc_sys_Xtgkill)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.crt.syscall.utimes
 INTERN_FUNCTION(libc_sys_utimes)
@@ -5084,6 +5089,9 @@ INTERN_FUNCTION(libc_sys_utimes)
 END(libc_sys_utimes)
 DEFINE_PUBLIC_ALIAS(sys_utimes, libc_sys_utimes)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 .section .text.crt.syscall.Xutimes
 INTERN_FUNCTION(libc_sys_Xutimes)
@@ -8426,6 +8434,9 @@ INTERN_FUNCTION(libc_sys_Xwaitid64)
 END(libc_sys_Xwaitid64)
 DEFINE_PUBLIC_ALIAS(sys_Xwaitid64, libc_sys_Xwaitid64)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.crt.syscall.utimes64
 INTERN_FUNCTION(libc_sys_utimes64)
@@ -8434,6 +8445,9 @@ INTERN_FUNCTION(libc_sys_utimes64)
 END(libc_sys_utimes64)
 DEFINE_PUBLIC_ALIAS(sys_utimes64, libc_sys_utimes64)
 
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 .section .text.crt.syscall.Xutimes64
 INTERN_FUNCTION(libc_sys_Xutimes64)
@@ -9102,6 +9116,7 @@ INTERN_FUNCTION(libc_sys_Xset_userprocmask_address)
 END(libc_sys_Xset_userprocmask_address)
 DEFINE_PUBLIC_ALIAS(sys_Xset_userprocmask_address, libc_sys_Xset_userprocmask_address)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.crt.syscall.utime64
 INTERN_FUNCTION(libc_sys_utime64)
@@ -9110,6 +9125,7 @@ INTERN_FUNCTION(libc_sys_utime64)
 END(libc_sys_utime64)
 DEFINE_PUBLIC_ALIAS(sys_utime64, libc_sys_utime64)
 
+/* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.crt.syscall.Xutime64
 INTERN_FUNCTION(libc_sys_Xutime64)

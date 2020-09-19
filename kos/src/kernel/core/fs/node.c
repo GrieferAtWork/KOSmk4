@@ -704,7 +704,7 @@ inode_tryaccess(struct inode *__restrict self, unsigned int type)
 				continue; /* The calling thread's user is part of the file owner's group */
 		}
 		if (mode & (how << 6)) {
-			if (self->i_fileuid == cred_getsuid())
+			if (self->i_fileuid == cred_getfsuid())
 				continue; /* The calling thread's user is the file's owner */
 			/* CAP_FOWNER: ... Ignore filesystem-uid checks ... */
 			if (capable(CAP_FOWNER))
@@ -886,8 +886,7 @@ PUBLIC NONNULL((1)) void KCALL
 inode_chtime(struct inode *__restrict self,
              struct timespec const *new_atime,
              struct timespec const *new_mtime,
-             struct timespec const *new_ctime,
-             bool check_permissions)
+             struct timespec const *new_ctime)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY, E_FSERROR_UNSUPPORTED_OPERATION, ...) {
 	struct inode_type *tp_self = self->i_type;
 	if (!tp_self->it_attr.a_saveattr)
@@ -895,19 +894,6 @@ inode_chtime(struct inode *__restrict self,
 	inode_loadattr_and_check_deleted(self);
 	{
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
-#ifndef CONFIG_EVERYONE_IS_ROOT
-		if (check_permissions) {
-			/* Permission restrictions:
-			 *  - `i_fileuid' must match the caller's fsuid, or the caller must have `CAP_FOWNER' */
-			if (self->i_fileuid != cred_getfsuid())
-				require(CAP_FOWNER);
-			/* KOS-specific: Changing a file's creation timestamp requires special capabilities. */
-			if (new_ctime != NULL)
-				require(CAP_AT_CHANGE_CTIME);
-		}
-#else /* !CONFIG_EVERYONE_IS_ROOT */
-		(void)check_permissions;
-#endif /* CONFIG_EVERYONE_IS_ROOT */
 		if (new_atime)
 			memcpy(&self->i_fileatime, new_atime, sizeof(struct timespec));
 		if (new_mtime)

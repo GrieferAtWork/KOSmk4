@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b9b70a1 */
+/* HASH CRC-32:0x49ae170f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -627,6 +627,9 @@
 #define __NR_rename                 0x40a /* errno_t rename(char const *oldname, char const *newname_or_path) */
 #define __NR_readlink               0x40b /* ssize_t readlink(char const *path, char *buf, size_t buflen) */
 #define __NR_symlink                0x40c /* errno_t symlink(char const *link_text, char const *target_path) */
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 #define __NR_utimes                 0x40d /* errno_t utimes(char const *filename, struct timeval const[2] times) */
 #define __NR_pipe                   0x410 /* errno_t pipe(fd_t[2] pipedes) */
 #define __NR_dup2                   0x411 /* fd_t dup2(fd_t oldfd, fd_t newfd) */
@@ -659,6 +662,7 @@
 /* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define __NR_pause                  0x425 /* errno_t pause(void) */
 #define __NR_time                   0x426 /* time32_t time(time32_t *timer) */
+/* @param: times: When NULL, set the current time */
 #define __NR_utime                  0x427 /* errno_t utime(char const *filename, struct utimbuf const *times) */
 #define __NR_creat                  0x428 /* fd_t creat(char const *filename, mode_t mode) */
 /* @return: * : The actual number of read entries

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaec1894f */
+/* HASH CRC-32:0xc58ea8f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -422,6 +422,7 @@
 #define __NR64_rt_sigqueueinfo          0x81                           /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
 #define __NR64_rt_sigsuspend            0x82                           /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define __NR64_sigaltstack              0x83                           /* errno_t sigaltstack(struct __sigaltstackx64 const *ss, struct __sigaltstackx64 *oss) */
+/* @param: times: When NULL, set the current time */
 #define __NR64_utime                    0x84                           /* errno_t utime(char const *filename, struct utimbufx64 const *times) */
 #define __NR64_mknod                    0x85                           /* errno_t mknod(char const *nodename, mode_t mode, dev_t dev) */
 #define __NR64_uselib                   0x86                           /* errno_t uselib(char const *library) */
@@ -544,6 +545,9 @@
 /* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 #define __NR64_epoll_ctl                0xe9                           /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
 #define __NR64_tgkill                   0xea                           /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 #define __NR64_utimes                   0xeb                           /* errno_t utimes(char const *filename, struct timevalx64 const[2] times) */
 #define __NR64_vserver                  0xec                           /* errno_t vserver(int TODO_PROTOTYPE) */
 #define __NR64_mbind                    0xed                           /* errno_t mbind(int TODO_PROTOTYPE) */

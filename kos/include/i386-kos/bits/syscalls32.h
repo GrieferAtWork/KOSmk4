@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b458ff3 */
+/* HASH CRC-32:0x9ace3a22 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,6 +102,7 @@
 #define SYS_oldfstat                     __NR_oldfstat                     /* errno_t oldfstat(fd_t fd, struct linux_oldstat *statbuf) */
 /* Same as `select(0, NULL, NULL, NULL, NULL)' */
 #define SYS_pause                        __NR_pause                        /* errno_t pause(void) */
+/* @param: times: When NULL, set the current time */
 #define SYS_utime                        __NR_utime                        /* errno_t utime(char const *filename, struct utimbufx32 const *times) */
 #define SYS_stty                         __NR_stty                         /* errno_t stty(void) */
 #define SYS_gtty                         __NR_gtty                         /* errno_t gtty(void) */
@@ -449,6 +450,9 @@
 #define SYS_statfs64                     __NR_statfs64                     /* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
 #define SYS_fstatfs64                    __NR_fstatfs64                    /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
 #define SYS_tgkill                       __NR_tgkill                       /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 #define SYS_utimes                       __NR_utimes                       /* errno_t utimes(char const *filename, struct timevalx32 const[2] times) */
 #define SYS_fadvise64_64                 __NR_fadvise64_64                 /* errno_t fadvise64_64(int TODO_PROTOTYPE) */
 #define SYS_vserver                      __NR_vserver                      /* errno_t vserver(int TODO_PROTOTYPE) */
@@ -920,6 +924,9 @@
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED',
  *                  optionally or'd with `WNOHANG | WNOWAIT' */
 #define SYS_waitid64                     __NR_waitid64                     /* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfox32_struct *infop, syscall_ulong_t options, struct rusagex32_64 *ru) */
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
 #define SYS_utimes64                     __NR_utimes64                     /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally or'd with any of `READDIR_SKIPREL | READDIR_WANTEOF' */
@@ -1048,6 +1055,7 @@
  * it negates a prior call to said function, while a future call to said
  * function will once again disable userprocmask, same as passing `NULL' would */
 #define SYS_set_userprocmask_address     __NR_set_userprocmask_address     /* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+/* @param: times: When NULL, set the current time */
 #define SYS_utime64                      __NR_utime64                      /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 /* Construct a user-vio-fd object supporting mmap(2), with actual
  * memory accesses being dispatched by adding them as pending requests

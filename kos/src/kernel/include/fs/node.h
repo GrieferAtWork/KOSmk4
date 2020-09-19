@@ -1287,8 +1287,7 @@ FUNDEF NONNULL((1)) void KCALL
 inode_chtime(struct inode *__restrict self,
              struct timespec const *new_atime,
              struct timespec const *new_mtime,
-             struct timespec const *new_ctime,
-             bool check_permissions DFL(true))
+             struct timespec const *new_ctime)
 		THROWS(E_FSERROR_DELETED, E_FSERROR_READONLY,
 		       E_FSERROR_UNSUPPORTED_OPERATION, ...);
 
