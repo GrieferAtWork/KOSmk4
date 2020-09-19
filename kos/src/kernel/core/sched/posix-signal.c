@@ -765,6 +765,7 @@ sigmask_kernel_getwr(void) THROWS(E_BADALLOC) {
 		}
 		mymask = copy;
 	}
+	assert(mymask != &kernel_sigmask_empty);
 	return mymask;
 }
 

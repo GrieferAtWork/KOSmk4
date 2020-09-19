@@ -3035,7 +3035,7 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 		 * signal mask that the new program will start execution
 		 * under. */
 		mymask = sigmask_kernel_getwr();
-		memcpy(mymask, um_sigset, sizeof(sigset_t));
+		memcpy(&mymask->sm_mask, um_sigset, sizeof(sigset_t));
 	}
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
