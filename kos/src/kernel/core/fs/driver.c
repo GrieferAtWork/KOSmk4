@@ -1050,6 +1050,9 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 
 	printk(KERN_NOTICE "[mod][-] Delmod: %q\n", self->d_name);
 
+	/* Wake up someone who might be waiting for the driver to get unloaded. */
+	sig_broadcast(&self->d_destroyed);
+
 	/* Service any remaining dead sections! */
 	driver_do_service_dead_sections(self);
 	assert(!self->d_dangsect);
@@ -1192,6 +1195,7 @@ PUBLIC struct driver kernel_driver = {
 #else /* __INTELLISENSE__ */
 	/* .d_shstrtab_end         = */ kernel_shstrtab_data + sizeof(struct kernel_shstrtab),
 #endif /* !__INTELLISENSE__ */
+	/* .d_destroyed              = */ SIG_INIT,
 	/* .d_phnum                = */ 2,
 	/* .d_pad3                 = */ { 0, },
 	{
@@ -1949,62 +1953,116 @@ do_start_finalization:
  * @param: flags:  Set of `DRIVER_DELMOD_FLAG_*'
  * @return: true:  Successfully unloaded the driver and inherited the reference to `self'
  * @return: false: Failed to unload the driver (there are still unaccounted
- *                 references to it other than the reference given through `self')
- *                 In this case, this function has _NOT_ inherited the reference to `self' */
-PUBLIC WUNUSED NONNULL((1)) bool KCALL
-driver_try_decref_and_delmod(/*inherit(on_success)*/ REF struct driver *__restrict self,
+ *                 references to it other than the reference given through `self') */
+PUBLIC NONNULL((1)) bool KCALL
+driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict self,
                              unsigned int flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
-	if unlikely(self == &kernel_driver)
-		return false; /* Not allowed! */
-	/* Always finalize the driver */
-	driver_finalize(self);
-	if (ATOMIC_CMPXCH(self->d_refcnt, 1, 0))
-		goto success;
-	if (flags & DRIVER_DELMOD_FLAG_DEPEND) {
-		/* Search for, and delete modules that are using `self' */
-		REF struct driver_state *ds;
-		size_t j;
-again_search_dependers:
-		ds = current_driver_state.get();
-		for (j = 0; j < ds->ds_count; ++j) {
-			struct driver *d;
-			size_t i;
-			d = ds->ds_drivers[j];
-			if (d == self)
-				continue;
-			if (!tryincref(d))
-				continue;
-			/* Check if this driver has a dependency on us. */
-			for (i = 0; i < d->d_depcnt; ++i) {
-				bool success;
-				if (d->d_depvec[i] != self)
-					continue;
-				/* Try to unload this driver! */
-				decref_unlikely(ds);
-				TRY {
-					/* Recursively delete this driver. */
-					success = driver_try_decref_and_delmod(d,
-					                                       flags);
-				} EXCEPT {
-					decref(d);
-					RETHROW();
-				}
-				/* Even if 1 depending driver could not be unloaded, keep on finalizing
-				 * all other drivers to give the first one more time to come to terms
-				 * with the fact that it is being unloaded.
-				 * If everything works out, we'll still be able to destroy our driver
-				 * in the final ATOMIC_CMPXCH() below. */
-				if unlikely(!success)
-					decref(d);
-				goto again_search_dependers;
-			}
-			decref_unlikely(d);
+	TRY {
+		if unlikely(self == &kernel_driver) {
+			decref_nokill(self);
+			return false; /* Not allowed! */
 		}
-		decref_unlikely(ds);
+		/* Always finalize the driver */
+		driver_finalize(self);
+		if (ATOMIC_CMPXCH(self->d_refcnt, 1, 0))
+			goto success;
+		if (flags & DRIVER_DELMOD_FLAG_DEPEND) {
+			/* Search for, and delete modules that are using `self' */
+			size_t j;
+			REF struct driver_state *ds;
+again_search_for_depending_drivers:
+			ds = current_driver_state.get();
+			for (j = 0; j < ds->ds_count; ++j) {
+				struct driver *d;
+				size_t i;
+				d = ds->ds_drivers[j];
+				if (d == self)
+					continue;
+				if (!tryincref(d))
+					continue;
+				/* Check if this driver has a dependency on us. */
+				for (i = 0; i < d->d_depcnt; ++i) {
+					if (d->d_depvec[i] != self)
+						continue;
+					TRY {
+						/* Recursively delete this driver. */
+						driver_try_decref_and_delmod(d, flags);
+						/* Even if 1 depending driver could not be unloaded, keep on finalizing
+						 * all other drivers to give the first one more time to come to terms
+						 * with the fact that it is being unloaded.
+						 * If everything works out, we'll still be able to destroy our driver
+						 * in the final ATOMIC_CMPXCH() below. */
+					} EXCEPT {
+						decref_unlikely(ds);
+						RETHROW();
+					}
+				}
+				decref_unlikely(d);
+			}
+			/* If the set of loaded drivers has changed, then
+			 * we have to check for more depending drivers. */
+			if (ATOMIC_READ(current_driver_state.m_pointer) != ds) {
+				decref_unlikely(ds);
+				goto again_search_for_depending_drivers;
+			}
+			decref_unlikely(ds);
+		}
+	} EXCEPT {
+		decref(self);
+		RETHROW();
 	}
+	/* Check if we can get rid of the last reference */
 	if (ATOMIC_CMPXCH(self->d_refcnt, 1, 0))
 		goto success;
+	if (flags & DRIVER_DELMOD_FLAG_FORCE) {
+		refcnt_t remaining_references;
+		remaining_references = ATOMIC_CMPXCH_VAL(self->d_refcnt, 1, 0);
+		if unlikely(remaining_references == 1)
+			goto success;
+		/* Forcing the kernel to do this is really bad, and the only situation
+		 * where us getting won't end up in the kernel crashing, is when the
+		 * driver really did leak one of its references.
+		 * Now granted, the driver may have intentionally leaked one of its
+		 * references, but even still: this is bad... */
+		printk(KERN_CRIT "[mod] Forcing unload driver %q with %" PRIuSIZ " unaccounted references\n",
+		       self->d_filename ? self->d_filename : self->d_name,
+		       remaining_references);
+		ATOMIC_WRITE(self->d_refcnt, 0);
+		goto success;
+	}
+	if (!(flags & DRIVER_DELMOD_FLAG_NONBLOCK)) {
+		/* Wait for the driver to be destroyed. */
+		task_connect(&self->d_destroyed); /* This is broadcast when the driver gets destroyed. */
+		weakincref(self);                 /* Keep the driver control structure alive */
+again_decref_and_waitfor_destroy:
+		decref(self);                     /* We'll re-acquire this reference of something goes wrong. */
+		TRY {
+			task_waitfor();
+		} EXCEPT {
+			/* Drop the weak reference we took above. */
+			weakdecref(self);
+			RETHROW();
+		}
+		/* Check if we can still acquire references.
+		 * This really shouldn't happen, since task_waitfor() shouldn't return
+		 * sporadically (meaning that we should only get here if someone did a
+		 * broadcast over `d_destroyed'), but just to be safe, do the check for
+		 * ourselves. */
+		if unlikely(tryincref(self)) {
+			TRY {
+				task_connect(&self->d_destroyed); /* This is broadcast when the driver gets destroyed. */
+			} EXCEPT {
+				decref_unlikely(self);
+				RETHROW();
+			}
+			goto again_decref_and_waitfor_destroy;
+		}
+		/* Yes: the driver is dead!
+		 * Now all that's left is the weak reference we still have from above. */
+		weakdecref(self);
+		return true;
+	}
 	return false;
 success:
 	/* Successfully caused the reference counter to drop to zero! */
@@ -2052,16 +2110,9 @@ driver_delmod(USER CHECKED char const *driver_name,
 			bool success;
 			/* Found it! */
 			decref_unlikely(ds);
-			TRY {
-				success = driver_try_decref_and_delmod(d, flags);
-			} EXCEPT {
-				decref(d);
-				RETHROW();
-			}
+			success = driver_try_decref_and_delmod(d, flags);
 			if (success)
 				return DRIVER_DELMOD_SUCCESS;
-			/* `driver_try_decref_and_delmod()' only inherit a reference on success! */
-			decref(d);
 			return DRIVER_DELMOD_INUSE;
 		}
 		decref_unlikely(d);
@@ -2089,16 +2140,9 @@ driver_delmod_inode(struct inode *__restrict driver_node,
 		}
 		/* Found it! */
 		decref_unlikely(ds);
-		TRY {
-			success = driver_try_decref_and_delmod(d, flags);
-		} EXCEPT {
-			decref(d);
-			RETHROW();
-		}
+		success = driver_try_decref_and_delmod(d, flags);
 		if (success)
 			return DRIVER_DELMOD_SUCCESS;
-		/* `driver_try_decref_and_delmod()' only inherit a reference on success! */
-		decref(d);
 		return DRIVER_DELMOD_INUSE;
 	}
 	decref_unlikely(ds);
@@ -3924,6 +3968,7 @@ done_tags_for_soname:
 		result->d_weakrefcnt = 1;
 		result->d_refcnt     = 2; /* 2: +1:<return-value>, +1:Not setting the `DRIVER_FLAG_FINALIZED' flag */
 		result->d_phnum      = phdrc;
+		sig_cinit(&result->d_destroyed);
 		atomic_rwlock_cinit(&result->d_eh_frame_cache_lock);
 		atomic_rwlock_cinit(&result->d_sections_lock);
 		/* Fill in driver information. */

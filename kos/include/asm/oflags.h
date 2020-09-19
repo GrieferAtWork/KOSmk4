@@ -32,14 +32,14 @@
 #define __O_WRONLY          0x0000001 /* Write-only file access */
 #define __O_RDWR            0x0000002 /* Read/Write file access */
 #define __O_ACCMODE_INVALID 0x0000003 /* Invalid ACCMODE value. */
-#define __O_TRUNC           0x0000200 /* Truncate (clear) the named file if it already exists,
-                                       * and `O_WRONLY' or `O_RDWR' access is specified. */
 #define __O_CREAT           0x0000040 /* If missing, create a new file */
 #define __O_EXCL            0x0000080 /* When used with `O_CREAT', throw an `E_FSERROR_FILE_ALREADY_EXISTS'
                                        * exception if the file already exists. */
 #define __O_NOCTTY          0x0000100 /* If the calling process does not have a controlling terminal assigned,
                                        * do not attempt to assign the newly opened file as terminal, even when
                                        * `isatty(open(...))' would be true. */
+#define __O_TRUNC           0x0000200 /* Truncate (clear) the named file if it already exists,
+                                       * and `O_WRONLY' or `O_RDWR' access is specified. */
 #define __O_APPEND          0x0000400 /* Always append data to the end of the file */
 #define __O_NONBLOCK        0x0000800 /* Do not block when trying to read data that hasn't been written, yet. */
 #define __O_SYNC            0x0001000 /* ??? */

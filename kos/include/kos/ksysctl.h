@@ -138,10 +138,15 @@ struct ksysctl_driver_insmod /*[PREFIX(im_)]*/ {
                                           *       a static pointer apart of the driver's binary image. */
 
 /* Delmod flags. */
-#define KSYSCTL_DRIVER_DELMOD_FNORMAL 0x0000 /* Normal delmod flags. */
-#define KSYSCTL_DRIVER_DELMOD_FDEPEND 0x0001 /* Also delete drivers that have dependencies on the given driver */
-#define KSYSCTL_DRIVER_DELMOD_FFORCE  0x0002 /* Force unload the driver, even if unaccounted references remain
-                                              * WARNING: Doing this may compromise system integrity! */
+#define KSYSCTL_DRIVER_DELMOD_FNORMAL   0x0000 /* Normal delmod flags. */
+#define KSYSCTL_DRIVER_DELMOD_FDEPEND   0x0001 /* Also delete drivers that have dependencies on the given driver */
+#define KSYSCTL_DRIVER_DELMOD_FFORCE    0x0200 /* Force unload the driver, even if unaccounted references remain
+                                                * WARNING: Doing this may compromise system integrity! */
+#define KSYSCTL_DRIVER_DELMOD_FNONBLOCK 0x0800 /* Don't wait for the driver to fully go away.
+                                                * Instead, the driver will have gone away once it can no longer be
+                                                * enumerated. In the event that the driver has a (possibly intentional)
+                                                * reference leak, you must use `KSYSCTL_DRIVER_DELMOD_FFORCE' to
+                                                * unload the driver (though doing this is _very_ dangerous) */
 #define __OFFSET_KSYSCTL_DRIVER_DELMOD_STRUCT_SIZE 0
 #define __OFFSET_KSYSCTL_DRIVER_DELMOD_FORMAT      4
 #define __OFFSET_KSYSCTL_DRIVER_DELMOD_FLAGS       6

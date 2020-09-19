@@ -64,8 +64,9 @@
 #define OFFSET_DRIVER32_DANGSECT             136
 #define OFFSET_DRIVER32_SHSTRTAB             140
 #define OFFSET_DRIVER32_SHSTRTAB_END         144
-#define OFFSET_DRIVER32_PHNUM                148 /* 2-byte! */
-#define OFFSET_DRIVER32_PHDR                 152
+#define OFFSET_DRIVER32_DESTROYED            148
+#define OFFSET_DRIVER32_PHNUM                152 /* 2-byte! */
+#define OFFSET_DRIVER32_PHDR                 156
 
 /* Offsets into `struct driver' (on 64-bit machines) */
 #define OFFSET_DRIVER64_REFCNT               0
@@ -106,8 +107,9 @@
 #define OFFSET_DRIVER64_DANGSECT             272
 #define OFFSET_DRIVER64_SHSTRTAB             280
 #define OFFSET_DRIVER64_SHSTRTAB_END         288
-#define OFFSET_DRIVER64_PHNUM                296 /* 2-byte! */
-#define OFFSET_DRIVER64_PHDR                 304
+#define OFFSET_DRIVER64_DESTROYED            296
+#define OFFSET_DRIVER64_PHNUM                304 /* 2-byte! */
+#define OFFSET_DRIVER64_PHDR                 312
 
 
 /* Offsets into `struct driver_state' (on 32-bit machines) */

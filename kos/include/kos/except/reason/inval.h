@@ -103,8 +103,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS,                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
 	E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND,                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
 	E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT,                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `sysctl_driver_insmod::im_format', `sysctl_driver_delmod::dm_format' or `sysctl_driver_getmod::gm_format' wasn't one of `SYSCTL_DRIVER_FORMAT_*', or wasn't recognized as valid in the specific context */
-	E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_insmod::im_flags' cannot be masked by `SYSCTL_DRIVER_INSMOD_F*' */
-	E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `SYSCTL_DRIVER_DELMOD_F*' */
+	E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_insmod::im_flags' cannot be masked by `KSYSCTL_DRIVER_INSMOD_F*' */
+	E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS,                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `KSYSCTL_DRIVER_DELMOD_F*' */
 	E_INVALID_ARGUMENT_CONTEXT_FRENAMEAT_FLAGS,                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `frenameat()' isn't a set of `0|AT_DOSPATH' */
 	E_INVALID_ARGUMENT_CONTEXT_FSYMLINKAT_FLAGS,                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fsymlinkat()' isn't a set of `0|AT_DOSPATH' */
 	E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS,                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmknodat()' isn't a set of `0|AT_DOSPATH' */
@@ -191,6 +191,7 @@ enum {
 	                                                                * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
 	                                                                *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
 	E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE,                          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
+	E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS,                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -269,8 +270,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                        E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
 #define E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                    E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
 #define E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT                      E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `sysctl_driver_insmod::im_format', `sysctl_driver_delmod::dm_format' or `sysctl_driver_getmod::gm_format' wasn't one of `SYSCTL_DRIVER_FORMAT_*', or wasn't recognized as valid in the specific context */
-#define E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS                       E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_insmod::im_flags' cannot be masked by `SYSCTL_DRIVER_INSMOD_F*' */
-#define E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                       E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `SYSCTL_DRIVER_DELMOD_F*' */
+#define E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS                       E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_insmod::im_flags' cannot be masked by `KSYSCTL_DRIVER_INSMOD_F*' */
+#define E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                       E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `KSYSCTL_DRIVER_DELMOD_F*' */
 #define E_INVALID_ARGUMENT_CONTEXT_FRENAMEAT_FLAGS                    E_INVALID_ARGUMENT_CONTEXT_FRENAMEAT_FLAGS                    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `frenameat()' isn't a set of `0|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_FSYMLINKAT_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_FSYMLINKAT_FLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fsymlinkat()' isn't a set of `0|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS                     E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmknodat()' isn't a set of `0|AT_DOSPATH' */
@@ -357,6 +358,7 @@ enum {
                                                                                                                                      * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                                                                                      *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
 #define E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                          E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
+#define E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS                E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -432,8 +434,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_PIPE2_FLAGS                        63  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `pipe2()' cannot be masked by `O_CLOEXEC|O_CLOFORK|O_NONBLOCK|O_DIRECT' */
 #define E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND                    64  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
 #define E_INVALID_ARGUMENT_CONTEXT_MODULE_FORMAT                      65  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given `sysctl_driver_insmod::im_format', `sysctl_driver_delmod::dm_format' or `sysctl_driver_getmod::gm_format' wasn't one of `SYSCTL_DRIVER_FORMAT_*', or wasn't recognized as valid in the specific context */
-#define E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS                       66  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_insmod::im_flags' cannot be masked by `SYSCTL_DRIVER_INSMOD_F*' */
-#define E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                       67  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `SYSCTL_DRIVER_DELMOD_F*' */
+#define E_INVALID_ARGUMENT_CONTEXT_INSMOD_FLAGS                       66  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_insmod::im_flags' cannot be masked by `KSYSCTL_DRIVER_INSMOD_F*' */
+#define E_INVALID_ARGUMENT_CONTEXT_DELMOD_FLAGS                       67  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `sysctl_driver_delmod::dm_flags' cannot be masked by `KSYSCTL_DRIVER_DELMOD_F*' */
 #define E_INVALID_ARGUMENT_CONTEXT_FRENAMEAT_FLAGS                    68  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `frenameat()' isn't a set of `0|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_FSYMLINKAT_FLAGS                   69  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fsymlinkat()' isn't a set of `0|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS                     70  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmknodat()' isn't a set of `0|AT_DOSPATH' */
@@ -520,6 +522,7 @@ enum {
                                                                            * `CLONE_VM | CLONE_FS | CLONE_FILES | CLONE_SIGHAND | CLONE_CRED | CLONE_NEWNS | CLONE_SYSVSEM |
                                                                            *  CLONE_NEWUTS | CLONE_NEWIPC | CLONE_NEWUSER | CLONE_NEWPID | CLONE_NEWNET | CLONE_IO' */
 #define E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE                          144 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
+#define E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS                145 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

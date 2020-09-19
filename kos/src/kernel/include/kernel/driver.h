@@ -29,6 +29,7 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
+#include <sched/signal.h>
 
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -366,6 +367,7 @@ struct driver {
 	REF struct driver_section*d_dangsect;   /* [0..1][lock(d_sections_lock)] Chain of dangling sections (sections no longer referenced, but kept in memory for caching) */
 	char const               *d_shstrtab;   /* [lock(WRITE_ONCE)][0..1][owned] Section headers name table (or `NULL' if not loaded). */
 	char const               *d_shstrtab_end;/* [lock(WRITE_ONCE)][0..1] End pointer for the `d_shstrtab' section (points to a NUL-character). */
+	struct sig                d_destroyed;    /* Signal broadcast during driver destruction, after the driver was (attempted to be) removed from `current_driver_state' */
 
 	/* Module program headers */
 	ElfW(Half)   DRIVER_CONST d_phnum;      /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][!0] (Max) number of program headers. */
@@ -600,8 +602,18 @@ driver_finalize(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
 
-#define DRIVER_DELMOD_FLAG_NORMAL  0x0000 /* Normal delmod flags. */
-#define DRIVER_DELMOD_FLAG_DEPEND  0x0001 /* Also delete drivers that have dependencies on `self' */
+/* Flags for driver unloading functions. */
+#define DRIVER_DELMOD_FLAG_NORMAL   0x0000 /* Normal delmod flags. */
+#define DRIVER_DELMOD_FLAG_DEPEND   0x0001 /* Also delete drivers that have dependencies on `self' */
+#define DRIVER_DELMOD_FLAG_FORCE    0x0200 /* Force unload the driver, even if unaccounted references remain
+                                            * WARNING: Doing this may compromise system integrity! */
+#define DRIVER_DELMOD_FLAG_NONBLOCK 0x0800 /* Don't wait for the driver to fully go away.
+                                            * Instead, the driver will have gone away once it can no longer be
+                                            * enumerated. In the event that the driver has a (possibly intentional)
+                                            * reference leak, you must use `KSYSCTL_DRIVER_DELMOD_FFORCE' to
+                                            * unload the driver (though doing this is _very_ dangerous) */
+
+
 /* Try to unload a driver module.
  * This function will:
  *   - invoke module finalizers (if they haven't been already)
@@ -614,10 +626,9 @@ driver_finalize(struct driver *__restrict self)
  * @param: flags:  Set of `DRIVER_DELMOD_FLAG_*'
  * @return: true:  Successfully unloaded the driver and inherited the reference to `self'
  * @return: false: Failed to unload the driver (there are still unaccounted
- *                 references to it other than the reference given through `self')
- *                 In this case, this function has _NOT_ inherited the reference to `self' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL KCALL
-driver_try_decref_and_delmod(/*inherit(on_success)*/ REF struct driver *__restrict self,
+ *                 references to it other than the reference given through `self') */
+FUNDEF NONNULL((1)) __BOOL KCALL
+driver_try_decref_and_delmod(/*inherit(always)*/ REF struct driver *__restrict self,
                              unsigned int flags DFL(DRIVER_DELMOD_FLAG_NORMAL))
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
