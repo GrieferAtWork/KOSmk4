@@ -204,9 +204,9 @@ END(rtm_begin_emulated_after_mprotect_fail)
 #define rtm_begin_emulated_spin libc_rtm_begin
 #else /* __OPTIMIZE_SIZE__ */
 PRIVATE_FUNCTION(rtm_begin_emulated_spin)
-	EXTERN(sys_sched_yield)
-	call  sys_sched_yield
-	jmp   libc_rtm_begin
+	EXTERN(libc_sys_sched_yield)
+	call   libc_sys_sched_yield
+	jmp    libc_rtm_begin
 END(rtm_begin_emulated_spin)
 #endif /* !__OPTIMIZE_SIZE__ */
 
