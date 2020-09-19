@@ -278,14 +278,10 @@ NOTHROW(KCALL driver_section_cdata_nx)(struct driver_section *__restrict self,
 #define DRIVER_FLAG_INITIALIZED  0x0020 /* Initializers (constructors) have been executed. */
 #define DRIVER_FLAG_FINALIZING   0x0040 /* Finalizers (destructors) have been executed / are currently being executed. */
 #define DRIVER_FLAG_FINALIZED    0x0080 /* Finalizers (destructors) have been executed.
-                                         * NOTE: This flag also means that the driver is no longer
-                                         *       registered as part of the current driver state,
-                                         *       meaning that the current driver state no longer
-                                         *       holds a reference to the driver in question.
-                                         *       Though an older, dangling driver state might still
-                                         *       hold such a reference.
+                                         * NOTE: By setting this flag, you implicitly inherit a reference
+                                         *       to the associated driver, which you must drop. 
                                          * NOTE: When this flag is set, additional driver sections can no
-                                         *       longer be mapped into memory! */
+                                         *       longer be mapped into memory!*/
 #define DRIVER_FLAG_FINALIZED_C  0x0100 /* INTERNAL: Finalizer callbacks were executed (and dependencies were decref()'ed),
                                          *           but other finalization components are still missing. */
 
