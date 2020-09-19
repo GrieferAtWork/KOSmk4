@@ -47,27 +47,40 @@
 
 #ifndef __HYBRID_PP_VA_NARGS
 #if defined(_MSC_VER) || defined(__INTELLISENSE__)
-/* MSVC-Specific (Capable of detecting empty va_args with ~,__VA_ARGS__) */
+/* MSVC-Specific (Capable of detecting empty __VA_ARGS__ with ~,__VA_ARGS__) */
 #   define __HYBRID_PP_PRIVATE_VA_NARGS_EXPAND_0(...) __VA_ARGS__
 #   define __HYBRID_PP_PRIVATE_VA_NARGS_EXPAND_1(...) __HYBRID_PP_PRIVATE_VA_NARGS_EXPAND_0(__VA_ARGS__)
 #   define __HYBRID_PP_PRIVATE_VA_NARGS_I(x,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,_33,_34,_35,_36,_37,_38,_39,_40,_41,_42,_43,_44,_45,_46,_47,_48,_49,_50,_51,_52,_53,_54,_55,_56,_57,_58,_59,N,...) N
 #   define __HYBRID_PP_PRIVATE_VA_NARGS_X(...) (~,__VA_ARGS__,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
 #   define __HYBRID_PP_VA_NARGS(...) __HYBRID_PP_PRIVATE_VA_NARGS_EXPAND_1(__HYBRID_PP_PRIVATE_VA_NARGS_I __HYBRID_PP_PRIVATE_VA_NARGS_X(__VA_ARGS__))
 #elif __has_extension(tpp_va_comma)
-/* TPP-Specific (Capable of detecting empty va_args with __VA_COMMA__) */
+/* TPP-Specific (Capable of detecting empty __VA_ARGS__ with __VA_COMMA__) */
 #   define __HYBRID_PP_PRIVATE_VA_NARGS(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,_33,_34,_35,_36,_37,_38,_39,_40,_41,_42,_43,_44,_45,_46,_47,_48,_49,_50,_51,_52,_53,_54,_55,_56,_57,_58,_59,N,...) N
 #   define __HYBRID_PP_VA_NARGS(...) __HYBRID_PP_PRIVATE_VA_NARGS(__VA_ARGS__ __VA_COMMA__ 59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
 #elif defined(__GNUC__) || (defined(__TPP_VERSION__) && __TPP_VERSION__ >= 103)
-/* GCC-Specific (Capable of detecting empty va_args with ,##__VA_ARGS__) */
+/* GCC-Specific (Capable of detecting empty __VA_ARGS__ with ,##__VA_ARGS__) */
 #   define __HYBRID_PP_PRIVATE_VA_NARGS(x,_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,_33,_34,_35,_36,_37,_38,_39,_40,_41,_42,_43,_44,_45,_46,_47,_48,_49,_50,_51,_52,_53,_54,_55,_56,_57,_58,_59,N,...) N
 #   define __HYBRID_PP_VA_NARGS(...) __HYBRID_PP_PRIVATE_VA_NARGS(~,##__VA_ARGS__,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
-#else
-/* STD-Implementation (Not Capable of detecting empty va_args) */
+#else /* ... */
+/* Check if __VA_OPT__ is supported, and if it is, use it for a standard, 0-arg-capable implementation.
+ * Note that we can check for `__VA_OPT__' without having to rely on any feature-test macros, since its
+ * behavior is well-defined even on preprocessors that don't support it! */
+#define __HYBRID_PP_PRIVATE_TEST_VA_OPT2(a, b, ...) b
+#define __HYBRID_PP_PRIVATE_TEST_VA_OPT(...) __HYBRID_PP_PRIVATE_TEST_VA_OPT2(__VA_OPT__(,) 1, 0)
+#if __HYBRID_PP_PRIVATE_TEST_VA_OPT(~)
+/* STD-Implementation (Capable of detecting empty __VA_ARGS__ with __VA_OPT__) */
+#   define __HYBRID_PP_PRIVATE_VA_NARGS(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,_33,_34,_35,_36,_37,_38,_39,_40,_41,_42,_43,_44,_45,_46,_47,_48,_49,_50,_51,_52,_53,_54,_55,_56,_57,_58,_59,N,...) N
+#   define __HYBRID_PP_VA_NARGS(...) __HYBRID_PP_PRIVATE_VA_NARGS(__VA_ARGS__ __VA_OPT__(,) 59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0)
+#else /* __HYBRID_PP_PRIVATE_TEST_VA_OPT(~) */
+/* STD-Implementation (Not Capable of detecting empty __VA_ARGS__) */
 #   define __HYBRID_PP_PRIVATE_VA_NARGS_EXPAND_0(...) __VA_ARGS__
 #   define __HYBRID_PP_PRIVATE_VA_NARGS2(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12,_13,_14,_15,_16,_17,_18,_19,_20,_21,_22,_23,_24,_25,_26,_27,_28,_29,_30,_31,_32,_33,_34,_35,_36,_37,_38,_39,_40,_41,_42,_43,_44,_45,_46,_47,_48,_49,_50,_51,_52,_53,_54,_55,_56,_57,_58,_59,N,...) N
 #   define __HYBRID_PP_PRIVATE_VA_NARGS(...) __HYBRID_PP_PRIVATE_VA_NARGS2(__VA_ARGS__,59,58,57,56,55,54,53,52,51,50,49,48,47,46,45,44,43,42,41,40,39,38,37,36,35,34,33,32,31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1)
 #   define __HYBRID_PP_VA_NARGS(...) __HYBRID_PP_PRIVATE_VA_NARGS_EXPAND_0(__HYBRID_PP_PRIVATE_VA_NARGS(__VA_ARGS__))
-#endif
+#endif /* !__HYBRID_PP_PRIVATE_TEST_VA_OPT(~) */
+#undef __HYBRID_PP_PRIVATE_TEST_VA_OPT2
+#undef __HYBRID_PP_PRIVATE_TEST_VA_OPT
+#endif /* !... */
 #endif /* !__HYBRID_PP_VA_NARGS */
 
 #ifndef __HYBRID_PP_VA_OVERLOAD
