@@ -28,8 +28,6 @@
 
 #include <kernel/syscall-properties.h>
 #include <kernel/types.h>
-#include <asm/unistd.h>
-
 
 #define ARG_PLACEHOLDER_   ,
 #define ARG_PLACEHOLDER_1  ,
@@ -56,6 +54,22 @@
 
 DECL_BEGIN
 
+/* Directly include the arch-specific header, so it we get recompiled
+ * if that header changes. (normally, changes in system headers won't
+ * trigger a re-compile of consumer source files) */
+#if defined(__i386__) || defined(__x86_64__)
+#define INC_LS_SYSCALLS "../../../../include/i386-kos/asm/ls-syscalls.h"
+#include "../../../../include/i386-kos/asm/syscalls.h"
+#else /* Arch... */
+/* Fallback for when we can't use relative includes... */
+#undef asm
+#undef ls
+#undef syscalls
+#undef h
+#define INC_LS_SYSCALLS <asm/ls-syscalls.h>
+#include <asm/unistd.h>
+#endif /* !Arch... */
+
 
 /************************************************************************/
 /* Define kernel_syscallN_iscp                                          */
@@ -68,7 +82,7 @@ DECL_BEGIN
 #define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	};
-#include <asm/ls-syscalls.h>
+#include INC_LS_SYSCALLS
 #define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
 	PUBLIC struct struct_kernel_syscall##table_id##_iscp \
 	kernel_syscall##table_id##_iscp_s ASMNAME("kernel_syscall" #table_id "_iscp") = {
@@ -78,7 +92,7 @@ DECL_BEGIN
 #define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	};
-#include <asm/ls-syscalls.h>
+#include INC_LS_SYSCALLS
 
 
 
@@ -95,7 +109,7 @@ DECL_BEGIN
 #define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	};
-#include <asm/ls-syscalls.h>
+#include INC_LS_SYSCALLS
 #define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
 	PUBLIC struct struct_kernel_syscall##table_id##_restartmode \
 	kernel_syscall##table_id##_restartmode_s ASMNAME("kernel_syscall" #table_id "_restartmode") = {
@@ -105,7 +119,7 @@ DECL_BEGIN
 #define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	};
-#include <asm/ls-syscalls.h>
+#include INC_LS_SYSCALLS
 
 
 
@@ -122,7 +136,7 @@ DECL_BEGIN
 #define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	};
-#include <asm/ls-syscalls.h>
+#include INC_LS_SYSCALLS
 #define __TSYSCALL_TABLE_BEGIN(table_id, ...) \
 	PUBLIC struct struct_kernel_syscall##table_id##_regcnt \
 	kernel_syscall##table_id##_regcnt_s ASMNAME("kernel_syscall" #table_id "_regcnt") = {
@@ -132,7 +146,7 @@ DECL_BEGIN
 #define __TSYSCALL_UNUSED_TRAILING(table_id, sysno, table_index, table_index_without_unused_leading, index_in_unused_trailing) __TSYSCALL_UNUSED_LEADING(table_id, sysno, table_index)
 #define __TSYSCALL_TABLE_END(table_id, ...) \
 	};
-#include <asm/ls-syscalls.h>
+#include INC_LS_SYSCALLS
 
 
 

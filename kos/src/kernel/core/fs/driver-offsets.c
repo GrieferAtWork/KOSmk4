@@ -21,8 +21,10 @@
 #define GUARD_KERNEL_CORE_FS_DRIVER_OFFSETS_C 1
 
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
+
 #include <kernel/driver-offsets.h>
+#include <kernel/driver.h>
+
 #include <stddef.h>
 
 DECL_BEGIN
