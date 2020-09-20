@@ -208,12 +208,28 @@ DATDEF struct driver drv_self ASMNAME("kernel_driver");
 
 
 
-typedef struct {
-	ElfW(Word) ht_nbuckts;      /* Total number of buckets. */
-	ElfW(Word) ht_nchains;      /* Total number of symbols. */
+#ifndef __elfw_hashtable_defined
+#define __elfw_hashtable_defined 1
+typedef struct elfW(hashtable) {
+	ElfW(Word) ht_nbuckts;      /* # of buckets. */
+	ElfW(Word) ht_nchains;      /* # of symbols. */
 	ElfW(Word) ht_table[1024];  /* [ht_nbuckts] Hash table. */
-//	ElfW(Word) ht_chains[1024]; /* [ht_nchains] Hash chains. */
+/*	ElfW(Word) ht_chains[1024];  * [ht_nchains] Hash chains. */
 } ElfW(HashTable);
+#endif /* !__elfw_hashtable_defined */
+
+#ifndef __elfw_gnu_hashtable_defined
+#define __elfw_gnu_hashtable_defined 1
+typedef struct elfW(gnu_hashtable) {
+	ElfW(Word) gh_nbuckets;      /* # of buckets. */
+	ElfW(Word) gh_symoffset;     /* Offset of symbol indices. */
+	ElfW(Word) gh_bloom_size;    /* # of elements in the bloom table. */
+	ElfW(Word) gh_bloom_shift;   /* Shift for bloom masks */
+	ElfW(Addr) gh_bloom[1024];   /* [gh_bloom_size] Bloom filter */
+/*	ElfW(Word) gh_buckets[1024];  * [gh_nbuckets] Hash buckest. */
+/*	ElfW(Word) gh_chains[];       * Hash chains */
+} ElfW(GnuHashTable);
+#endif /* !__elfw_gnu_hashtable_defined */
 
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
@@ -292,6 +308,7 @@ struct driver {
 	WEAK refcnt_t             d_refcnt;     /* Reference counter. */
 	WEAK refcnt_t             d_weakrefcnt; /* Weak reference counter. */
 	char const  *DRIVER_CONST d_name;       /* [1..1][const] Name of the driver (the module's `DT_SONAME' tag) */
+#define driver_filename_or_name(self) ((self)->d_filename ? (self)->d_filename : (self)->d_name)
 	char const  *DRIVER_CONST d_filename;   /* [0..1][lock(WRITE_ONCE)][owned]
 	                                         * Absolute (relative to `vfs_kernel') filename of the driver,
 	                                         * or `NULL' if the driver was loaded as a multiboot module.
@@ -344,6 +361,8 @@ struct driver {
 	                          d_dynsym_tab; /* [0..1][const] Vector of dynamic symbols defined by this module.
 	                                         * HINT: If also non-NULL, the number of symbols is `d_hashtab->ht_nchains' */
 	size_t       DRIVER_CONST d_dynsym_cnt; /* [const] Number of dynamic symbols defined by this driver. */
+	ElfW(GnuHashTable) const *DRIVER_CONST
+	                          d_gnuhashtab; /* [0..1][const] GNU Symbol hash table. */
 	ElfW(HashTable) const *DRIVER_CONST
 	                          d_hashtab;    /* [0..1][const] Symbol hash table. */
 	char const  *DRIVER_CONST d_dynstr;     /* [0..1][const] Dynamic string table. */

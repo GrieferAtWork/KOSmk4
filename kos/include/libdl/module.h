@@ -126,13 +126,18 @@ struct dlmodule_finalizers {
 	struct dlmodule_finalizer *df_list; /* [lock(df_lock)][1..df_size][owned] Vector of callbacks. */
 };
 
+#ifndef __elfw_hashtable_defined
+#define __elfw_hashtable_defined 1
 typedef struct elfW(hashtable) {
 	ElfW(Word) ht_nbuckts;      /* # of buckets. */
 	ElfW(Word) ht_nchains;      /* # of symbols. */
 	ElfW(Word) ht_table[1024];  /* [ht_nbuckts] Hash table. */
 /*	ElfW(Word) ht_chains[1024];  * [ht_nchains] Hash chains. */
 } ElfW(HashTable);
+#endif /* !__elfw_hashtable_defined */
 
+#ifndef __elfw_gnu_hashtable_defined
+#define __elfw_gnu_hashtable_defined 1
 typedef struct elfW(gnu_hashtable) {
 	ElfW(Word) gh_nbuckets;      /* # of buckets. */
 	ElfW(Word) gh_symoffset;     /* Offset of symbol indices. */
@@ -142,6 +147,7 @@ typedef struct elfW(gnu_hashtable) {
 /*	ElfW(Word) gh_buckets[1024];  * [gh_nbuckets] Hash buckest. */
 /*	ElfW(Word) gh_chains[];       * Hash chains */
 } ElfW(GnuHashTable);
+#endif /* !__elfw_gnu_hashtable_defined */
 
 struct dlmodule_elf {
 	/* Lazy relocations (JMPREL). */

@@ -163,9 +163,9 @@ search_dynsym:
 	/* Do a linear search over the symbol table.                            */
 	/************************************************************************/
 	{
-		size_t i, dyncnt;
 		ElfW(Sym) const *dynsym;
 		if ((dynsym = self->dm_elf.de_dynsym_tab) != NULL) {
+			size_t i, dyncnt;
 			dyncnt = DlModule_ElfGetDynSymCnt(self);
 			for (i = 0; i < dyncnt; ++i) {
 				char const *symname;

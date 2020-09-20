@@ -1185,6 +1185,7 @@ PUBLIC struct driver kernel_driver = {
 	/* .d_dynhdr               = */ NULL,
 	/* .d_dynsym_tab           = */ NULL,
 	/* .d_dynsym_cnt           = */ 0,
+	/* .d_gnuhashtab           = */ NULL,
 	/* .d_hashtab              = */ NULL,
 	/* .d_dynstr               = */ NULL,
 	/* .d_dynstr_end           = */ NULL,
@@ -2033,8 +2034,7 @@ find_next_dependent_driver:
 		 * Now granted, the driver may have intentionally leaked one of its
 		 * references, but even still: this is bad... */
 		printk(KERN_CRIT "[mod] Forcing unload driver %q with %" PRIuSIZ " unaccounted references\n",
-		       self->d_filename ? self->d_filename : self->d_name,
-		       remaining_references);
+		       driver_filename_or_name(self), remaining_references);
 		ATOMIC_WRITE(self->d_refcnt, 0);
 		goto success;
 	}
@@ -2157,6 +2157,15 @@ driver_delmod_inode(struct inode *__restrict driver_node,
 }
 
 
+
+LOCAL ATTR_PURE WUNUSED u32 KCALL
+gnu_symhash(USER CHECKED char const *name) {
+	u32 h = 5381;
+	for (; *name; ++name) {
+		h = h * 33 + (u8)*name;
+	}
+	return h;
+}
 
 LOCAL ATTR_PURE WUNUSED u32 KCALL
 elf_symhash(USER CHECKED char const *name) {
@@ -2589,6 +2598,16 @@ NOTHROW(KCALL driver_local_symbol_at)(struct driver *__restrict self,
 
 
 
+#if ELF_ARCH_CLASS == ELFCLASS32
+#define ELF_CLASSBITS 32
+#elif ELF_ARCH_CLASS == ELFCLASS64
+#define ELF_CLASSBITS 64
+#else /* ELF_ARCH_CLASS == ... */
+#define ELF_CLASSBITS (__SIZEOF_POINTER__ * 8)
+#endif /* ELF_ARCH_CLASS != ... */
+
+
+
 /* Lookup a locally defined ELF symbol within `self'
  * WARNING: This function cannot be used with `&kernel_driver', as
  *          the kernel core itself implements a custom protocol for
@@ -2600,40 +2619,116 @@ driver_local_symbol(struct driver *__restrict self,
                     /*in|out*/ uintptr_t *__restrict phash_gnu)
 		THROWS(E_SEGFAULT) {
 	ElfW(Sym) const *result;
-	ElfW(HashTable) const *elf_ht;
-	if ((elf_ht = self->d_hashtab) != NULL) {
-		ElfW(Word) const *ht_chains;
-		ElfW(Word) max_attempts, chain;
-		uintptr_t hash = *phash_elf;
-		if (hash == DRIVER_SYMBOL_HASH_UNSET)
-			hash = *phash_elf = elf_symhash(name);
-		if unlikely(!elf_ht->ht_nbuckts || !elf_ht->ht_nchains) {
-			goto nosym_no_elf_ht;
+	/************************************************************************/
+	/* GNU hash table support                                               */
+	/************************************************************************/
+	{
+		ElfW(GnuHashTable) const *gnu_ht;
+		if ((gnu_ht = self->d_gnuhashtab) != NULL) {
+			/* This implementation is derived from:
+			 * https://flapenguin.me/2017/05/10/elf-lookup-dt-gnu-hash/
+			 * https://sourceware.org/ml/binutils/2006-10/msg00377.html
+			 */
+			ElfW(Word) symid, gh_symoffset;
+			ElfW(Word) const *gh_buckets;
+			ElfW(Word) const *gh_chains;
+			ElfW(Addr) bloom_word, bloom_mask;
+			uintptr_t hash = *phash_gnu;
+			if (hash == DRIVER_SYMBOL_HASH_UNSET)
+				hash = *phash_gnu = gnu_symhash(name);
+			if unlikely(!gnu_ht->gh_bloom_size || !gnu_ht->gh_bloom_size)
+				goto nosym_no_gnu_ht;
+			gh_symoffset = gnu_ht->gh_symoffset;
+			gh_buckets   = (ElfW(Word) const *)(gnu_ht->gh_bloom + gnu_ht->gh_bloom_size);
+			gh_chains    = (ElfW(Word) const *)(gh_buckets + gnu_ht->gh_nbuckets);
+			bloom_word   = gnu_ht->gh_bloom[(hash / ELF_CLASSBITS) % gnu_ht->gh_bloom_size];
+			bloom_mask   = ((ElfW(Addr))1 << (hash % ELF_CLASSBITS)) |
+			               ((ElfW(Addr))1 << ((hash >> gnu_ht->gh_bloom_shift) % ELF_CLASSBITS));
+			if ((bloom_word & bloom_mask) != bloom_mask)
+				goto nosym;
+			symid = gh_buckets[hash % gnu_ht->gh_nbuckets];
+			if unlikely(symid < gh_symoffset)
+				goto nosym;
+			/* Search for the symbol. */
+			for (;; ++symid) {
+				ElfW(Word) enthash;
+				result  = self->d_dynsym_tab + symid;
+				enthash = gh_chains[symid - gh_symoffset];
+				if likely((hash | 1) == (enthash | 1)) {
+					if likely(strcmp(name, self->d_dynstr + result->st_name) == 0)
+						return result; /* Found it! */
+				}
+				if unlikely(enthash & 1)
+					break; /* End of chain */
+			}
+			goto nosym;
 		}
-		max_attempts = elf_ht->ht_nchains;
-		ht_chains    = elf_ht->ht_table + elf_ht->ht_nbuckts;
-		chain        = elf_ht->ht_table[hash % elf_ht->ht_nbuckts];
-		do {
-			if unlikely(chain == STN_UNDEF)
-				break; /* End of chain. */
-			if unlikely(chain >= elf_ht->ht_nchains)
-				goto nosym_no_elf_ht; /* Corrupted hash-table */
-			result = self->d_dynsym_tab + chain;
-			assert(result->st_name < (size_t)(self->d_dynstr_end - self->d_dynstr));
-			if (strcmp(name, self->d_dynstr + result->st_name) == 0)
-				return result; /* Found it! */
-			/* Load the next chain entry. */
-			chain = ht_chains[chain];
-		} while likely(--max_attempts);
-		goto nosym;
 	}
-	/* TODO: GNU hash table support */
-	(void)phash_gnu;
+
+search_elf_table:
+	/************************************************************************/
+	/* ELF hash table support                                               */
+	/************************************************************************/
+	{
+		ElfW(HashTable) const *elf_ht;
+		if ((elf_ht = self->d_hashtab) != NULL) {
+			ElfW(Word) const *ht_chains;
+			ElfW(Word) max_attempts, chain;
+			uintptr_t hash = *phash_elf;
+			if (hash == DRIVER_SYMBOL_HASH_UNSET)
+				hash = *phash_elf = elf_symhash(name);
+			if unlikely(!elf_ht->ht_nbuckts || !elf_ht->ht_nchains)
+				goto nosym_no_elf_ht;
+			max_attempts = elf_ht->ht_nchains;
+			ht_chains    = elf_ht->ht_table + elf_ht->ht_nbuckts;
+			chain        = elf_ht->ht_table[hash % elf_ht->ht_nbuckts];
+			do {
+				if unlikely(chain == STN_UNDEF)
+					break; /* End of chain. */
+				if unlikely(chain >= elf_ht->ht_nchains)
+					goto nosym_no_elf_ht; /* Corrupted hash-table */
+				result = self->d_dynsym_tab + chain;
+				if likely(strcmp(name, self->d_dynstr + result->st_name) == 0)
+					return result; /* Found it! */
+				/* Load the next chain entry. */
+				chain = ht_chains[chain];
+			} while likely(--max_attempts);
+			goto nosym;
+		}
+	}
+
+search_dynsym:
+	/************************************************************************/
+	/* Do a linear search over the symbol table.                            */
+	/************************************************************************/
+	{
+		ElfW(Sym) const *dynsym;
+		if ((dynsym = self->d_dynsym_tab) != NULL) {
+			size_t i, dyncnt;
+			dyncnt = self->d_dynsym_cnt;
+			for (i = 0; i < dyncnt; ++i) {
+				char const *symname;
+				symname = self->d_dynstr + dynsym[i].st_name;
+				if (strcmp(name, symname) != 0)
+					continue;
+				/* Found it! */
+				return &dynsym[i];
+			}
+		}
+	}
+
 nosym:
 	return NULL;
+nosym_no_gnu_ht:
+	printk(KERN_ERR "[mod] GNU symbol hash table of %q is corrupt\n",
+	       driver_filename_or_name(self));
+	self->d_gnuhashtab = NULL;
+	goto search_elf_table;
 nosym_no_elf_ht:
+	printk(KERN_ERR "[mod] Elf symbol hash table of %q is corrupt\n",
+	       driver_filename_or_name(self));
 	self->d_hashtab = NULL;
-	goto nosym;
+	goto search_dynsym;
 }
 
 
@@ -4122,7 +4217,7 @@ done_tags_for_soname:
 					case DT_STRTAB:
 						result->d_dynstr = (char *)(result->d_loadaddr + tag.d_un.d_ptr);
 						if unlikely((void *)result->d_dynstr < (void *)result->d_loadstart ||
-						            (void *)result->d_dynstr > (void *)result->d_loadend)
+						            (void *)result->d_dynstr >= (void *)result->d_loadend)
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR, tag.d_un.d_ptr);
 						break;
 
@@ -4133,14 +4228,21 @@ done_tags_for_soname:
 					case DT_HASH:
 						result->d_hashtab = (ElfW(HashTable) *)(result->d_loadaddr + tag.d_un.d_ptr);
 						if unlikely((void *)result->d_hashtab < (void *)result->d_loadstart ||
-						            (void *)result->d_hashtab > (void *)result->d_loadend)
+						            (void *)result->d_hashtab >= (void *)result->d_loadend)
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH, tag.d_un.d_ptr);
+						break;
+
+					case DT_GNU_HASH:
+						result->d_gnuhashtab = (ElfW(GnuHashTable) const *)(result->d_loadaddr + tag.d_un.d_ptr);
+						if unlikely((void *)result->d_hashtab < (void *)result->d_loadstart ||
+						            (void *)result->d_hashtab >= (void *)result->d_loadend)
+							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_GNUSYMHASH, tag.d_un.d_ptr);
 						break;
 
 					case DT_SYMTAB:
 						result->d_dynsym_tab = (ElfW(Sym) *)(result->d_loadaddr + tag.d_un.d_ptr);
 						if unlikely((void *)result->d_dynsym_tab < (void *)result->d_loadstart ||
-						            (void *)result->d_dynsym_tab > (void *)result->d_loadend)
+						            (void *)result->d_dynsym_tab >= (void *)result->d_loadend)
 							THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM, tag.d_un.d_ptr);
 						break;
 
@@ -4206,6 +4308,19 @@ do_dynstr_size:
 			if (result->d_dynsym_tab) {
 				if (result->d_hashtab) {
 					result->d_dynsym_cnt = (size_t)result->d_hashtab->ht_nchains;
+				} else if (result->d_gnuhashtab) {
+					size_t count;
+					ElfW(GnuHashTable) const *ht;
+					ElfW(Word) const *buckets, *chains;
+					/* GNU hash tables are a bit more complicated, since we need to
+					 * find the symbol with the greatest index, then add +1 to that. */
+					ht      = result->d_gnuhashtab;
+					buckets = (ElfW(Word) const *)(ht->gh_bloom + ht->gh_bloom_size);
+					chains  = (ElfW(Word) const *)(buckets + ht->gh_nbuckets);
+					count   = chains[-1];
+					while ((chains[count - ht->gh_symoffset] & 1) == 0)
+						++count;
+					result->d_dynsym_cnt = count;
 				} else {
 					/* Look at section headers to find the .dynsym section. */
 					for (i = 0; i < result->d_shnum; ++i) {

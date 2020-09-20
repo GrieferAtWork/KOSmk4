@@ -51,22 +51,23 @@
 #define OFFSET_DRIVER32_DYNHDR               88
 #define OFFSET_DRIVER32_DYNSYM_TAB           92
 #define OFFSET_DRIVER32_DYNSYM_CNT           96
-#define OFFSET_DRIVER32_HASHTAB              100
-#define OFFSET_DRIVER32_DYNSTR               104
-#define OFFSET_DRIVER32_DYNSTR_END           108
-#define OFFSET_DRIVER32_SHOFF                112
-#define OFFSET_DRIVER32_SHSTRNDX             116 /* 2-byte! */
-#define OFFSET_DRIVER32_SHNUM                118 /* 2-byte! */
-#define OFFSET_DRIVER32_SHDR                 120
-#define OFFSET_DRIVER32_SECTIONS_LOCK        124
-#define OFFSET_DRIVER32_SECTIONS             128
-#define OFFSET_DRIVER32_DEADSECT             132
-#define OFFSET_DRIVER32_DANGSECT             136
-#define OFFSET_DRIVER32_SHSTRTAB             140
-#define OFFSET_DRIVER32_SHSTRTAB_END         144
-#define OFFSET_DRIVER32_DESTROYED            148
-#define OFFSET_DRIVER32_PHNUM                152 /* 2-byte! */
-#define OFFSET_DRIVER32_PHDR                 156
+#define OFFSET_DRIVER32_GNUHASHTAB           100
+#define OFFSET_DRIVER32_HASHTAB              104
+#define OFFSET_DRIVER32_DYNSTR               108
+#define OFFSET_DRIVER32_DYNSTR_END           112
+#define OFFSET_DRIVER32_SHOFF                116
+#define OFFSET_DRIVER32_SHSTRNDX             120 /* 2-byte! */
+#define OFFSET_DRIVER32_SHNUM                122 /* 2-byte! */
+#define OFFSET_DRIVER32_SHDR                 124
+#define OFFSET_DRIVER32_SECTIONS_LOCK        128
+#define OFFSET_DRIVER32_SECTIONS             132
+#define OFFSET_DRIVER32_DEADSECT             136
+#define OFFSET_DRIVER32_DANGSECT             140
+#define OFFSET_DRIVER32_SHSTRTAB             144
+#define OFFSET_DRIVER32_SHSTRTAB_END         148
+#define OFFSET_DRIVER32_DESTROYED            152
+#define OFFSET_DRIVER32_PHNUM                156 /* 2-byte! */
+#define OFFSET_DRIVER32_PHDR                 160
 
 /* Offsets into `struct driver' (on 64-bit machines) */
 #define OFFSET_DRIVER64_REFCNT               0
@@ -94,22 +95,23 @@
 #define OFFSET_DRIVER64_DYNHDR               176
 #define OFFSET_DRIVER64_DYNSYM_TAB           184
 #define OFFSET_DRIVER64_DYNSYM_CNT           192
-#define OFFSET_DRIVER64_HASHTAB              200
-#define OFFSET_DRIVER64_DYNSTR               208
-#define OFFSET_DRIVER64_DYNSTR_END           216
-#define OFFSET_DRIVER64_SHOFF                224
-#define OFFSET_DRIVER64_SHSTRNDX             232 /* 2-byte! */
-#define OFFSET_DRIVER64_SHNUM                234 /* 2-byte! */
-#define OFFSET_DRIVER64_SHDR                 240
-#define OFFSET_DRIVER64_SECTIONS_LOCK        248
-#define OFFSET_DRIVER64_SECTIONS             256
-#define OFFSET_DRIVER64_DEADSECT             264
-#define OFFSET_DRIVER64_DANGSECT             272
-#define OFFSET_DRIVER64_SHSTRTAB             280
-#define OFFSET_DRIVER64_SHSTRTAB_END         288
-#define OFFSET_DRIVER64_DESTROYED            296
-#define OFFSET_DRIVER64_PHNUM                304 /* 2-byte! */
-#define OFFSET_DRIVER64_PHDR                 312
+#define OFFSET_DRIVER64_GNUHASHTAB           200
+#define OFFSET_DRIVER64_HASHTAB              208
+#define OFFSET_DRIVER64_DYNSTR               216
+#define OFFSET_DRIVER64_DYNSTR_END           224
+#define OFFSET_DRIVER64_SHOFF                232
+#define OFFSET_DRIVER64_SHSTRNDX             240 /* 2-byte! */
+#define OFFSET_DRIVER64_SHNUM                242 /* 2-byte! */
+#define OFFSET_DRIVER64_SHDR                 248
+#define OFFSET_DRIVER64_SECTIONS_LOCK        256
+#define OFFSET_DRIVER64_SECTIONS             264
+#define OFFSET_DRIVER64_DEADSECT             272
+#define OFFSET_DRIVER64_DANGSECT             280
+#define OFFSET_DRIVER64_SHSTRTAB             288
+#define OFFSET_DRIVER64_SHSTRTAB_END         296
+#define OFFSET_DRIVER64_DESTROYED            304
+#define OFFSET_DRIVER64_PHNUM                312 /* 2-byte! */
+#define OFFSET_DRIVER64_PHDR                 320
 
 
 /* Offsets into `struct driver_state' (on 32-bit machines) */

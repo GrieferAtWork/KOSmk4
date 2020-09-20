@@ -75,6 +75,7 @@ enum {
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME,     /* Only when loading drivers: [uintptr_t sh_addr, size_t sh_size] The `.eh_frame' section address points out-of-bounds */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR,       /* Only when loading drivers: [uintptr_t tagval] The `DT_STRTAB' tag is mapped out-of-bounds */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH,      /* Only when loading drivers: [uintptr_t tagval] The `DT_HASH' tag is mapped out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_GNUSYMHASH,   /* Only when loading drivers: [uintptr_t tagval] The `DT_GNU_HASH' tag is mapped out-of-bounds */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM,       /* Only when loading drivers: [uintptr_t tagval] The `DT_DYNSYM' tag is mapped out-of-bounds */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT,       /* Only when loading drivers: [uintptr_t tagval] The `DT_SYMENT' tag contains an invalid value */
 	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT,      /* Only when loading drivers: [uintptr_t tagval] The `DT_RELAENT' tag contains an invalid value */
@@ -118,6 +119,7 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME     E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME     /* Only when loading drivers: [uintptr_t sh_addr, size_t sh_size] The `.eh_frame' section address points out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR       E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR       /* Only when loading drivers: [uintptr_t tagval] The `DT_STRTAB' tag is mapped out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH      /* Only when loading drivers: [uintptr_t tagval] The `DT_HASH' tag is mapped out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_GNUSYMHASH   E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_GNUSYMHASH   /* Only when loading drivers: [uintptr_t tagval] The `DT_GNU_HASH' tag is mapped out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM       E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM       /* Only when loading drivers: [uintptr_t tagval] The `DT_DYNSYM' tag is mapped out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT       E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT       /* Only when loading drivers: [uintptr_t tagval] The `DT_SYMENT' tag contains an invalid value */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT      E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT      /* Only when loading drivers: [uintptr_t tagval] The `DT_RELAENT' tag contains an invalid value */
@@ -158,15 +160,16 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME     28 /* Only when loading drivers: [uintptr_t sh_addr, size_t sh_size] The `.eh_frame' section address points out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR       29 /* Only when loading drivers: [uintptr_t tagval] The `DT_STRTAB' tag is mapped out-of-bounds */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH      30 /* Only when loading drivers: [uintptr_t tagval] The `DT_HASH' tag is mapped out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM       31 /* Only when loading drivers: [uintptr_t tagval] The `DT_DYNSYM' tag is mapped out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT       32 /* Only when loading drivers: [uintptr_t tagval] The `DT_SYMENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT      33 /* Only when loading drivers: [uintptr_t tagval] The `DT_RELAENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT       34 /* Only when loading drivers: [uintptr_t tagval] The `DT_RELENT' tag contains an invalid value */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC    35 /* Only when loading drivers: [intptr_t reladdr] A constructor callback is located out-of-bounds */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED       36 /* Only when loading drivers: [size_t depid] Bad dependency (either an index miss-match, or a bad filename) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL       37 /* Only when loading drivers: [uintptr_t symid] Bad symbol index (symbol index is out-of-bounds) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME      38 /* Only when loading drivers: [uintptr_t st_name] Bad symbol name (symbol name is out-of-bounds) */
-#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL        39 /* Only when loading drivers: [uintptr_t st_name] Relocation against unknown symbol (s.a. system log) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_GNUSYMHASH   31 /* Only when loading drivers: [uintptr_t tagval] The `DT_GNU_HASH' tag is mapped out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM       32 /* Only when loading drivers: [uintptr_t tagval] The `DT_DYNSYM' tag is mapped out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT       33 /* Only when loading drivers: [uintptr_t tagval] The `DT_SYMENT' tag contains an invalid value */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT      34 /* Only when loading drivers: [uintptr_t tagval] The `DT_RELAENT' tag contains an invalid value */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT       35 /* Only when loading drivers: [uintptr_t tagval] The `DT_RELENT' tag contains an invalid value */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC    36 /* Only when loading drivers: [intptr_t reladdr] A constructor callback is located out-of-bounds */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED       37 /* Only when loading drivers: [size_t depid] Bad dependency (either an index miss-match, or a bad filename) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL       38 /* Only when loading drivers: [uintptr_t symid] Bad symbol index (symbol index is out-of-bounds) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME      39 /* Only when loading drivers: [uintptr_t st_name] Bad symbol name (symbol name is out-of-bounds) */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL        40 /* Only when loading drivers: [uintptr_t st_name] Relocation against unknown symbol (s.a. system log) */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

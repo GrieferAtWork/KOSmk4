@@ -33,7 +33,7 @@ DECL_BEGIN
 #define WS(base, name) OFFSET_##base##32_##name
 #endif /* __SIZEOF_POINTER__ < 8 */
 
-/* Assert offets for `struct driver' */
+/* Assert offsets for `struct driver' */
 STATIC_ASSERT(offsetof(struct driver, d_refcnt)               == WS(DRIVER, REFCNT));
 STATIC_ASSERT(offsetof(struct driver, d_weakrefcnt)           == WS(DRIVER, WEAKREFCNT));
 STATIC_ASSERT(offsetof(struct driver, d_name)                 == WS(DRIVER, NAME));
@@ -75,7 +75,7 @@ STATIC_ASSERT(offsetof(struct driver, d_shstrtab_end)         == WS(DRIVER, SHST
 STATIC_ASSERT(offsetof(struct driver, d_phnum)                == WS(DRIVER, PHNUM));
 STATIC_ASSERT(offsetof(struct driver, d_phdr)                 == WS(DRIVER, PHDR));
 
-/* Assert offets for `struct driver_state' */
+/* Assert offsets for `struct driver_state' */
 STATIC_ASSERT(offsetof(struct driver_state, ds_refcnt)  == WS(DRIVER_STATE, REFCNT));
 STATIC_ASSERT(offsetof(struct driver_state, ds_count)   == WS(DRIVER_STATE, COUNT));
 STATIC_ASSERT(offsetof(struct driver_state, ds_drivers) == WS(DRIVER_STATE, DRIVERS));
