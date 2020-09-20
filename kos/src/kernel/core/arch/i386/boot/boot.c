@@ -484,7 +484,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       /dev/disk/by-uuid/      -- Symlinks for block-devices
 	 * Alternatively (and arguably even better), make /dev a dynamic file system, similar to /proc */
 
-	/* XXX: Add a smart, arch-specific unwinder to libunwind that will inspect
+	/* XXX: Add a smart, arch-specific unwinder to libdebuginfo that will inspect
 	 *      the instruction stream to figure out how to unwind the stack.
 	 *      This unwinder should assume the default calling convention for every
 	 *      possible case, and should indicate unwind success once a ret-like

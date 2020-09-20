@@ -209,6 +209,11 @@ INTERN struct inode_type ProcFS_PerProc_Fd_Type = {
 				/* .o_lookup = */ &ProcFS_PerProc_Fd_Lookup,
 				/* .o_enum   = */ &ProcFS_PerProc_Fd_Enum,
 			}
+			/* TODO: The unlink operator should be usable to
+			 *       implement a remote close() operation:
+			 * >> unlink("/proc/self/fd/8");
+			 * >> close(8);  // Same thing!
+			 */
 		}
 	}
 };

@@ -616,6 +616,8 @@ DEFINE_SYSCALL2(errno_t, delete_module,
 	error = driver_delmod(name, delmod_flags);
 	if (error == DRIVER_DELMOD_UNKNOWN)
 		return -ENOENT;
+	if (error == DRIVER_DELMOD_INUSE)
+		return -EBUSY;
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_DELETE_MODULE */

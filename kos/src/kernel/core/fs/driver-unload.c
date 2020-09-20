@@ -35,7 +35,38 @@ DECL_BEGIN
 INTERN NONNULL((1)) void KCALL
 driver_destroy_global_objects(struct driver *__restrict self) {
 	(void)self;
-	/* TODO: Delete global hooks of `self' */
+	/* TODO: Delete global hooks of `self':
+	 *   - block_device_register()
+	 *   - character_device_register()
+	 *   - nic_device_setdefault()
+	 *   - register_filesystem_type()
+	 *   - fs_filesystems                       (All filesystem implemented by `self')
+	 *   - fs_filesystems                       (All filesystem using a block-device implemented by `self')
+	 *   - kernel_debugtraps_install()
+	 *   - driver_loaded_callbacks
+	 *   - driver_finalized_callbacks
+	 *   - driver_unloaded_callbacks
+	 *   - vm_onexec_callbacks
+	 *   - vm_oninit_callbacks
+	 *   - vm_onfini_callbacks
+	 *   - vm_onclone_callbacks
+	 *   - isr_register()
+	 *   - syslog_sink_register()
+	 *   - vm_rtm_hooks
+	 *   - register_async_worker()              (Delete all workers with callbacks apart of `self')
+	 *   - async_job_start()                    (Cancel all running jobs with callbacks apart of `self')
+	 *   - realtime_clock
+	 * XXX:
+	 *   - What about file handles that somehow reference the driver,
+	 *     including stuff like HANDLE_TYPE_FILE->f_node->i_super->s_device
+	 *     We should probably try to find these files, and close them in their
+	 *     accompanying handle manager.
+	 *     We can enumerate open handle managers by enumerating threads!
+	 *   - This function should also have a return value to indicate if it
+	 *     even did something, and if it did, the caller should be able to
+	 *     call us multiple times to do a kind-of keep-killing-until-it-dies
+	 *     functionality, alongside doing other things in-between.
+	 */
 }
 
 

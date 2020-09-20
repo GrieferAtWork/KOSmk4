@@ -267,7 +267,12 @@ driver_loaded_callbacks = CALLBACK_LIST_INIT;
 PUBLIC CALLBACK_LIST(void KCALL(struct driver *))
 driver_finalized_callbacks = CALLBACK_LIST_INIT;
 
-/* Callbacks invoked just before a driver is unloaded. */
+/* Callbacks invoked just before a driver is unloaded.
+ * WARNING: The given driver has a reference count of 0, which must not
+ *          be increased by callbacks. However, the actual driver itself
+ *          hasn't been destroyed, yet (meaning all of its members are
+ *          still as they were just before its reference count dropped
+ *          to ZERO)! */
 PUBLIC CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/ KCALL(struct driver *))
 driver_unloaded_callbacks = CALLBACK_LIST_INIT;
 
@@ -1034,6 +1039,13 @@ NOTHROW(KCALL driver_do_clear_dang_sections)(struct driver *__restrict self) {
 }
 
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL driver_decref_dependencies)(struct driver *__restrict self) {
+	size_t i;
+	for (i = 0; i < self->d_depcnt; ++i)
+		xdecref(self->d_depvec[i]);
+}
+
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	ElfW(Half) i;
@@ -1041,6 +1053,9 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	assertf(self->d_flags & DRIVER_FLAG_FINALIZED,
 	        "Without this flag, our reference count should not have been able to reach 0!");
 	assert(self != &kernel_driver);
+
+	/* Drop references from dependencies of `self' */
+	driver_decref_dependencies(self);
 
 	/* Invoke dynamic driver unloading callbacks. */
 	driver_unloaded_callbacks(self);
@@ -1159,8 +1174,8 @@ PUBLIC struct driver kernel_driver = {
 	/* .d_eh_frame_end         = */ (byte_t *)__kernel_eh_frame_end,
 	/* .d_eh_frame_cache       = */ NULL,
 	/* .d_eh_frame_cache_lock  = */ ATOMIC_RWLOCK_INIT,
-	/* .d_eh_frame_cache_semi0 = */ ATREE_SEMI0(uintptr_t),   /* TODO: Optimize specifically for the kernel core? */
-	/* .d_eh_frame_cache_leve0 = */ ATREE_LEVEL0(uintptr_t),  /* TODO: Optimize specifically for the kernel core? */
+	/* .d_eh_frame_cache_semi0 = */ ATREE_SEMI0(uintptr_t),  /* XXX: Optimize specifically for the kernel core? */
+	/* .d_eh_frame_cache_leve0 = */ ATREE_LEVEL0(uintptr_t), /* XXX: Optimize specifically for the kernel core? */
 #if __SIZEOF_POINTER__ > __SIZEOF_INT__
 	/* .d_pad                  = */ { 0, },
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
@@ -1775,14 +1790,6 @@ done_dyntag:
 }
 
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL driver_decref_dependencies)(struct driver *__restrict self) {
-	size_t i;
-	for (i = 0; i < self->d_depcnt; ++i)
-		xdecref(self->d_depvec[i]);
-}
-
-
 PRIVATE NONNULL((1)) void KCALL
 driver_enable_textrel(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK) {
@@ -1903,9 +1910,6 @@ do_start_finalization:
 				/* Invoke destructor callbacks. */
 				if (flags & DRIVER_FLAG_INITIALIZING)
 					driver_invoke_destructors(self);
-				/* Drop references from driver dependencies. */
-				if (flags & DRIVER_FLAG_DEPLOADED)
-					driver_decref_dependencies(self);
 			}
 			/* Acquire a sections lock so we can clear dangling sections. */
 			TRY {
@@ -3225,6 +3229,8 @@ driver_find_symbol_for_relocation(struct driver *__restrict self,
 	gnu_hash = DRIVER_SYMBOL_HASH_UNSET;
 	for (i = 0; i < self->d_depcnt; ++i) {
 		dep = self->d_depvec[i];
+		if unlikely(!dep)
+			continue;
 		sym = driver_local_symbol(dep,
 		                          symbol_name,
 		                          &elf_hash,
@@ -3806,8 +3812,8 @@ find_new_candidate_tryhard:
 			if (filesize > size)
 				filesize = size;
 			/* Create the program segment. */
-			/* TODO: Prefault this mapping! (although technically, this would only be a performance
-			 *       improvement, since we're faulting all of the memory below anyways...) */
+			/* XXX: Prefault this mapping! (although technically, this would only be a performance
+			 *      improvement, since we're faulting all of the memory below anyways...) */
 			if (!vm_mapat(&vm_kernel,
 			              (void *)(addr & ~PAGEMASK),
 			              CEIL_ALIGN(size + (addr & PAGEMASK), PAGESIZE),
@@ -4067,7 +4073,7 @@ done_tags_for_soname:
 						                       result->d_shdr[i].sh_addr,
 						                       result->d_shdr[i].sh_size);
 					}
-					/* TODO: Calculate best-fit semi/level values. */
+					/* XXX: Calculate best-fit semi/level values. */
 					result->d_eh_frame_cache_semi0 = ATREE_SEMI0(uintptr_t);
 					result->d_eh_frame_cache_leve0 = ATREE_LEVEL0(uintptr_t);
 					break;

@@ -242,6 +242,8 @@ handle_driver_hop(struct driver *__restrict self,
 		d.h_type = HANDLE_TYPE_DRIVER;
 		d.h_mode = mode;
 		d.h_data = self->d_depvec[(uintptr_t)depno];
+		if unlikely(!d.h_data)
+			THROW(E_NO_SUCH_OBJECT);
 		return handle_installhop(&data->dod_result, d);
 	}	break;
 

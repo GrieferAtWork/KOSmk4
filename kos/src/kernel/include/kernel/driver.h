@@ -330,7 +330,7 @@ struct driver {
 	/* Driver dependencies. */
 	size_t       DRIVER_CONST d_depcnt;     /* [const] Number of dependencies of this driver. */
 	REF struct driver *DRIVER_CONST *DRIVER_CONST
-	                          d_depvec;     /* [0..1][valid_if(!DRIVER_FLAG_FINALIZED)][0..d_depcnt][const]
+	                          d_depvec;     /* [0..1][lock(WRITE_ONCE)][0..d_depcnt][const]
 	                                         * [if(d_depcnt == 0,[== NULL])][const_if(d_depcnt == 0)]
 	                                         * Vector of driver dependencies.
 	                                         * NOTE: References to drivers in this vector are cleared
@@ -898,7 +898,12 @@ DATDEF CALLBACK_LIST(void KCALL(struct driver *)) driver_loaded_callbacks;
 /* Callbacks invoked when a driver is finalized. */
 DATDEF CALLBACK_LIST(void KCALL(struct driver *)) driver_finalized_callbacks;
 
-/* Callbacks invoked just before a driver is unloaded. */
+/* Callbacks invoked just before a driver is unloaded.
+ * WARNING: The given driver has a reference count of 0, which must not
+ *          be increased by callbacks. However, the actual driver itself
+ *          hasn't been destroyed, yet (meaning all of its members are
+ *          still as they were just before its reference count dropped
+ *          to ZERO)! */
 DATDEF CALLBACK_LIST(NOBLOCK void /*NOEXCEPT*/ KCALL(struct driver *)) driver_unloaded_callbacks;
 
 #endif /* __CC__ */
