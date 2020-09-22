@@ -51,10 +51,9 @@
 DECL_BEGIN
 
 /* Effective kernel version.
- * Usually the same as `KOS_VERSION_*', but can be used by
+ * Usually the same as `KOS_VERSION_CODE', but can be used by
  * modules to detect version differences between what they
- * were compiled for and what they are actually running under.
- * HINT: This value changes every time the kernel core is relinked! */
+ * were compiled for and what they are actually running under. */
 PUBLIC_CONST u32 const kernel_version = KOS_VERSION_CODE;
 
 

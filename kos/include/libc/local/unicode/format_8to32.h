@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9ee9f70 */
+/* HASH CRC-32:0x503fd73 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_unicode_c8toc32_defined 1
 #ifdef __CRT_HAVE_unicode_c8toc32
 __NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
@@ -44,9 +44,9 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_unicode_c8toc32 */
 #endif /* !__local___localdep_unicode_c8toc32_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
-#include <bits/format-printer.h>
-#include <bits/uformat-printer.h>
+#include <bits/crt/mbstate.h>
+#include <bits/crt/format-printer.h>
+#include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Format printer (compatible with `__pformatprinter') for
  * converting UTF-8 unicode input data into a UTF-32 output */

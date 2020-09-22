@@ -35,9 +35,9 @@
 #include <hybrid/__pointer.h> /* __HYBRID_PTR32 */
 #include <hybrid/host.h>      /* __x86_64__, __i386__ */
 
-#include <bits/mcontext32.h> /* struct __mcontextx32 */
-#include <bits/sigset.h>     /* struct __sigset_struct */
-#include <bits/sigstack32.h> /* struct __sigaltstackx32 */
+#include <bits/mcontext32.h>        /* struct __mcontextx32 */
+#include <bits/os/kos/sigstack32.h> /* struct __sigaltstackx32 */
+#include <bits/os/sigset.h>         /* struct __sigset_struct */
 
 #if !defined(__x86_64__) && defined(__i386__)
 #define __OFFSET_UCONTEXT_MCONTEXT __OFFSET_UCONTEXTX32_MCONTEXT

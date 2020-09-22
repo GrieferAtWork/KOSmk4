@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf768c09d */
+/* HASH CRC-32:0xdee36b6a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_remove_defined
 #define __local_remove_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_removeat)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: removeat from stdio */

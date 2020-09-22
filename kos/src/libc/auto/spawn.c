@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe74f330f */
+/* HASH CRC-32:0x5515bdc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,8 +39,8 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <bits/sigaction-struct.h>
 #include <libc/errno.h>
-#include <asm/vfork.h>
-#include <asm/oflags.h>
+#include <asm/os/vfork.h>
+#include <asm/os/oflags.h>
 #include <asm/os/signal.h>
 /* >> posix_fspawn_np(3)
  * Implementation for the fastest possible method of (safely) doing fork(2)+fexecve(2)
@@ -377,7 +377,7 @@ child_error:
 	return crt_posix_spawn(pid, buf, file_actions, attrp, ___argv, ___envp);
 #endif /* !__POSIX_SPAWN_USE_KOS || ((!__ARCH_HAVE_SHARED_VM_VFORK || (!__CRT_HAVE_vfork && !__CRT_HAVE___vfork)) && ((!__CRT_HAVE_fork && !__CRT_HAVE___fork) || (!__CRT_HAVE_pipe2 && !__CRT_HAVE_pipe && !__CRT_HAVE___pipe && !__CRT_HAVE__pipe) || !O_CLOEXEC || (!__CRT_HAVE_read && !__CRT_HAVE__read && !__CRT_HAVE___read) || (!__CRT_HAVE_write && !__CRT_HAVE__write && !__CRT_HAVE___write) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close))) || !__CRT_HAVE_fexecve || (!__CRT_HAVE_waitpid && !__CRT_HAVE___waitpid) */
 }
-#include <asm/oflags.h>
+#include <asm/os/oflags.h>
 /* >> posix_spawn(3)
  * Implementation for the fastest possible method of (safely) doing fork(2)+execve(2)
  * in order to spawn a new process from the given `path' program.

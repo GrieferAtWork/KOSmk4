@@ -471,6 +471,17 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Trigger `DEBUGTRAP_REASON_VFORK' and `DEBUGTRAP_REASON_VFORKDONE'
 	 *       at appropriate locations within the kernel. */
 
+	/* TODO: System calls that we're never going to implement (because linux doesn't
+	 *       implement them either) should all get routed to `sys_break', instead of
+	 *       having their own routing function each.
+	 *       Furthermore, these system calls should not be exported by-name from libc */
+
+	/* TODO: System calls that are called extremely rarely (e.g. sethostname(2))
+	 *       should not have a fast-pass function each. Instead, only a single
+	 *       wrapper should exist for them, and that wrapper should then dispatch
+	 *       the system call via`x86_sysrouteN_c[32|64]'
+	 *       This way, we may be able to reduce the kernel's binary size. */
+
 	/* TODO: Add special files to /proc, and add symlinks to /dev to implement:
 	 *       /dev/                   -- Just like right now, contains system devices by-name
 	 *       /dev/block/             -- Contains symlinks for the /dev device, such as 8:0 -> ../sda

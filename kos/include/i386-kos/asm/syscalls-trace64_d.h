@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfd6a188 */
+/* HASH CRC-32:0xc3f626f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -344,7 +344,7 @@
 #define __NR64AN0_sched_get_priority_max   algorithm
 #define __NR64AN0_sched_get_priority_min   algorithm
 #define __NR64AN0_sched_rr_get_interval    pid
-#define __NR64AN1_sched_rr_get_interval    tms
+#define __NR64AN1_sched_rr_get_interval    ts
 #define __NR64AN0_mlock                    addr
 #define __NR64AN1_mlock                    len
 #define __NR64AN0_munlock                  addr
@@ -1472,7 +1472,7 @@
 #define __NR64ATR0_sched_get_priority_min   SC_REPR_SCHED_POLICY                                                 /* algorithm */ 
 #define __NR64RTR_sched_get_priority_min    SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR64ATR0_sched_rr_get_interval    SC_REPR_PID_T                                                        /* pid */ 
-#define __NR64ATR1_sched_rr_get_interval    SC_REPR_POINTER                                                      /* tms */ 
+#define __NR64ATR1_sched_rr_get_interval    SC_REPR_POINTER                                                      /* ts */ 
 #define __NR64RTR_sched_rr_get_interval     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_mlock                    SC_REPR_POINTER                                                      /* addr */ 
 #define __NR64ATR1_mlock                    SC_REPR_SIZE_T                                                       /* len */ 

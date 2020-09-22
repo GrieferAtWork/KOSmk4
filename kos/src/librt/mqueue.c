@@ -31,6 +31,7 @@
 
 #include <errno.h>
 #include <stdarg.h>
+#include <syscall.h>
 #include <unistd.h>
 
 #include <librt/mqueue.h>
@@ -54,6 +55,14 @@
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>. */
+
+#ifdef SYS_mq_timedreceive_time64
+#define sys_mq_timedreceive64 sys_mq_timedreceive_time64
+#endif /* SYS_mq_timedreceive_time64 */
+
+#ifdef SYS_mq_timedsend_time64
+#define sys_mq_timedsend64 sys_mq_timedsend_time64
+#endif /* SYS_mq_timedsend_time64 */
 
 DECL_BEGIN
 

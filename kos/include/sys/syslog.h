@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e9a603 */
+/* HASH CRC-32:0x555062f7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,12 +30,17 @@
 
 #include <features.h>
 
-#include <asm/syslog.h>
-#include <bits/syslog-path.h>
+#include <asm/os/syslog.h>
+#include <asm/os/paths.h> /* __PATH_LOG */
 
 #ifdef __USE_KOS
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #endif /* __USE_KOS */
+
+
+#if !defined(_PATH_LOG) && defined(__PATH_LOG)
+#define _PATH_LOG __PATH_LOG /* Filesystem path to the kernel logger */
+#endif /* !_PATH_LOG && __PATH_LOG */
 
 
 /*
@@ -71,44 +76,58 @@
 
 __SYSDECL_BEGIN
 
-#ifdef __LOG_EMERG
+#if !defined(LOG_EMERG) && defined(__LOG_EMERG)
 #define LOG_EMERG   __LOG_EMERG   /* system is unusable */
-#endif /* __LOG_EMERG */
-#ifdef __LOG_ALERT
+#endif /* !LOG_EMERG && __LOG_EMERG */
+#if !defined(LOG_ALERT) && defined(__LOG_ALERT)
 #define LOG_ALERT   __LOG_ALERT   /* action must be taken immediately */
-#endif /* __LOG_ALERT */
-#ifdef __LOG_CRIT
+#endif /* !LOG_ALERT && __LOG_ALERT */
+#if !defined(LOG_CRIT) && defined(__LOG_CRIT)
 #define LOG_CRIT    __LOG_CRIT    /* critical conditions */
-#endif /* __LOG_CRIT */
-#ifdef __LOG_ERR
+#endif /* !LOG_CRIT && __LOG_CRIT */
+#if !defined(LOG_ERR) && defined(__LOG_ERR)
 #define LOG_ERR     __LOG_ERR     /* error conditions */
-#endif /* __LOG_ERR */
-#ifdef __LOG_WARNING
+#endif /* !LOG_ERR && __LOG_ERR */
+#if !defined(LOG_WARNING) && defined(__LOG_WARNING)
 #define LOG_WARNING __LOG_WARNING /* warning conditions */
-#endif /* __LOG_WARNING */
-#ifdef __LOG_NOTICE
+#endif /* !LOG_WARNING && __LOG_WARNING */
+#if !defined(LOG_NOTICE) && defined(__LOG_NOTICE)
 #define LOG_NOTICE  __LOG_NOTICE  /* normal but significant condition */
-#endif /* __LOG_NOTICE */
-#ifdef __LOG_INFO
+#endif /* !LOG_NOTICE && __LOG_NOTICE */
+#if !defined(LOG_INFO) && defined(__LOG_INFO)
 #define LOG_INFO    __LOG_INFO    /* informational */
-#endif /* __LOG_INFO */
-#ifdef __LOG_DEBUG
+#endif /* !LOG_INFO && __LOG_INFO */
+#if !defined(LOG_DEBUG) && defined(__LOG_DEBUG)
 #define LOG_DEBUG   __LOG_DEBUG   /* debug-level messages */
-#endif /* __LOG_DEBUG */
-#ifdef __LOG_PRIMASK
+#endif /* !LOG_DEBUG && __LOG_DEBUG */
+#if !defined(LOG_PRIMASK) && defined(__LOG_PRIMASK)
 #define LOG_PRIMASK __LOG_PRIMASK /* mask to extract priority part (internal) */
-#endif /* __LOG_PRIMASK */
+#endif /* !LOG_PRIMASK && __LOG_PRIMASK */
 
 /* extract priority */
-#define LOG_PRI(p)           ((p)&LOG_PRIMASK)
-#define LOG_MAKEPRI(fac,pri) ((fac)|(pri))
+#ifdef LOG_PRIMASK
+#define LOG_PRI(p)            ((p) & LOG_PRIMASK)
+#define LOG_MAKEPRI(fac, pri) ((fac) | (pri))
+#endif /* LOG_PRIMASK */
 
 #ifdef __USE_KOS
-#define LOG_ERROR   LOG_ERR
-#define LOG_WARN    LOG_WARNING
-#define LOG_CONFIRM LOG_NOTICE
-#define LOG_MESSAGE LOG_INFO
+#if !defined(LOG_ERROR) && defined(__LOG_ERR)
+#define LOG_ERROR   __LOG_ERR
+#endif /* !LOG_ERROR && __LOG_ERR */
+#if !defined(LOG_WARN) && defined(__LOG_WARNING)
+#define LOG_WARN    __LOG_WARNING
+#endif /* !LOG_WARN && __LOG_WARNING */
+#if !defined(LOG_CONFIRM) && defined(__LOG_NOTICE)
+#define LOG_CONFIRM __LOG_NOTICE
+#endif /* !LOG_CONFIRM && __LOG_NOTICE */
+#if !defined(LOG_MESSAGE) && defined(__LOG_INFO)
+#define LOG_MESSAGE __LOG_INFO
+#endif /* !LOG_MESSAGE && __LOG_INFO */
 #endif /* __USE_KOS */
+
+/* TODO: All of the below has been lifted from KOSmk2/3, but hasn't been
+ *       updated to fit what is done on KOSmk4, nor has it been re-checked
+ *       against the codes used by linux (there may be differences here...) */
 
 /* facility codes */
 #define LOG_KERN     (0<<3)  /* kernel messages. */

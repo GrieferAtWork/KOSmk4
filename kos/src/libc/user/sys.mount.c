@@ -33,7 +33,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_mount,hash:CRC-32=0xa4f3bc75]]]*/
+/*[[[head:libc_mount,hash:CRC-32=0x4b9f2946]]]*/
+/* @param: mountflags: Set of `MS_*' from <sys/mount.h> */
 INTERN ATTR_SECTION(".text.crt.fs.mount") int
 NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
                                  char const *dir,
@@ -67,7 +68,8 @@ NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file)
 }
 /*[[[end:libc_umount]]]*/
 
-/*[[[head:libc_umount2,hash:CRC-32=0xbe0b47d9]]]*/
+/*[[[head:libc_umount2,hash:CRC-32=0x396c6760]]]*/
+/* @param: flags: Set of `MNT_FORCE | MNT_DETACH | MNT_EXPIRE | UMOUNT_NOFOLLOW' */
 INTERN ATTR_SECTION(".text.crt.fs.mount") int
 NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file,
                                    __STDC_INT_AS_UINT_T flags)

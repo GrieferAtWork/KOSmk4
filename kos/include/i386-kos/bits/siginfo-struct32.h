@@ -40,7 +40,7 @@
 #include <hybrid/host.h>      /* __x86_64__ */
 #include <hybrid/typecore.h>  /* __INT32_TYPE__ */
 
-#include <bits/sigval32.h> /* union __sigvalx32 */
+#include <bits/os/kos/sigval32.h> /* union __sigvalx32 */
 
 __DECL_BEGIN
 

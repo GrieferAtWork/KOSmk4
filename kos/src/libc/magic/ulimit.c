@@ -23,59 +23,37 @@
 
 %{
 #include <features.h>
-#include <asm/ulimit.h>
+#include <asm/os/ulimit.h>
 
 __SYSDECL_BEGIN
 
-/* Some documentation comments are taken from /usr/include/ulimit.h on a linux machine.
- * The following copyright notice can be found at the top of that file: */
-/* Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
-
 #if (defined(__UL_GETFSIZE) || defined(__UL_SETFSIZE))
-/* Constants used as the first parameter for `ulimit'.
- * They denote limits which can be set or retrieved using this function. */
+/* Arguments for `ulimit(3)' */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
 #ifdef __UL_GETFSIZE
-	UL_GETFSIZE = __UL_GETFSIZE, /* Return limit on the size of a file, in units of 512 bytes. */
+	UL_GETFSIZE = __UL_GETFSIZE, /* TODO: Doc */
 #endif /* __UL_GETFSIZE */
 #ifdef __UL_SETFSIZE
-	UL_SETFSIZE = __UL_SETFSIZE, /* Set limit on the size of a file to second argument. */
+	UL_SETFSIZE = __UL_SETFSIZE, /* TODO: Doc */
 #endif /* __UL_SETFSIZE */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #ifdef __UL_GETFSIZE
-#define UL_GETFSIZE UL_GETFSIZE /* Return limit on the size of a file, in units of 512 bytes. */
+#define UL_GETFSIZE UL_GETFSIZE /* TODO: Doc */
 #endif /* __UL_GETFSIZE */
 #ifdef __UL_SETFSIZE
-#define UL_SETFSIZE UL_SETFSIZE /* Set limit on the size of a file to second argument. */
+#define UL_SETFSIZE UL_SETFSIZE /* TODO: Doc */
 #endif /* __UL_SETFSIZE */
 #else /* __COMPILER_PREFERR_ENUMS */
 #ifdef __UL_GETFSIZE
-#define UL_GETFSIZE __UL_GETFSIZE /* Return limit on the size of a file, in units of 512 bytes. */
+#define UL_GETFSIZE __UL_GETFSIZE /* TODO: Doc */
 #endif /* __UL_GETFSIZE */
 #ifdef __UL_SETFSIZE
-#define UL_SETFSIZE __UL_SETFSIZE /* Set limit on the size of a file to second argument. */
+#define UL_SETFSIZE __UL_SETFSIZE /* TODO: Doc */
 #endif /* __UL_SETFSIZE */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
@@ -84,7 +62,6 @@ enum {
 #ifdef __CC__
 }
 
-@@Control process limits according to CMD
 @@@param: cmd: One OF `UL_*'
 [[vartypes(long), decl_include("<features.h>")]]
 $longptr_t ulimit(__STDC_INT_AS_UINT_T cmd, ...);

@@ -25,7 +25,7 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 
 
 #define __OFFSET_USERPROCMASK_MYTID   0

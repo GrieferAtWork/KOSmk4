@@ -21,9 +21,12 @@
 #define _LIBDEBUGINFO_DEBUG_REPR_H 1
 
 #include "api.h"
-#include "dwarf.h"
+/**/
+
+#include <bits/crt/format-printer.h>
 #include <bits/types.h>
-#include <bits/format-printer.h>
+
+#include "dwarf.h"
 
 #ifdef __CC__
 __DECL_BEGIN

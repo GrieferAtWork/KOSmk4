@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/asm/uaio.h>

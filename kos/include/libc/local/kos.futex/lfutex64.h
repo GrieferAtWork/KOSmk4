@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5434666a */
+/* HASH CRC-32:0x51b7134c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CVREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex32,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val),lfutex,(__uaddr,__futex_op,__val),__val,2,(__UINTPTR_TYPE__,__UINTPTR_TYPE__))
 #endif /* !__local___localdep_lfutex32_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS

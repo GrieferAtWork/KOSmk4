@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1d1d4c6 */
+/* HASH CRC-32:0x931cfd5a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime)
 #include <bits/types.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: clock_gettime32 from time */
 #ifndef __local___localdep_clock_gettime32_defined

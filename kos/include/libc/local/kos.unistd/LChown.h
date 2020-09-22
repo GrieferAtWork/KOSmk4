@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x516a5d7f */
+/* HASH CRC-32:0x4da7a9cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_LChown_defined
 #define __local_LChown_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <kos/anno.h>
 #include <bits/types.h>

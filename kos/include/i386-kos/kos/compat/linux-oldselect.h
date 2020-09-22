@@ -27,7 +27,7 @@
 #include <hybrid/typecore.h>
 
 #include <kos/anno.h>
-#include <bits/timeval32.h> /* struct __timevalx32 */
+#include <bits/os/kos/timeval32.h> /* struct __timevalx32 */
 
 #if !defined(__x86_64__) && defined(__i386__)
 #define sel_arg_structx32 sel_arg_struct

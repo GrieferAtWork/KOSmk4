@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81dbea3a */
+/* HASH CRC-32:0xf1e1c403 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,11 +34,11 @@
 #include <hybrid/__byteswap.h>
 #include <hybrid/typecore.h>
 
-#include <bits/format-printer.h>
-#include <bits/mbstate.h>
+#include <bits/crt/format-printer.h>
+#include <bits/crt/mbstate.h>
+#include <bits/crt/uformat-printer.h>
+#include <bits/crt/wformat-printer.h>
 #include <bits/types.h>
-#include <bits/uformat-printer.h>
-#include <bits/wformat-printer.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN

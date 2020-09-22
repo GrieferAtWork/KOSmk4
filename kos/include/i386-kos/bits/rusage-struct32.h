@@ -25,7 +25,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/timeval32.h>
+#include <bits/os/kos/timeval32.h>
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #ifdef rusagex32

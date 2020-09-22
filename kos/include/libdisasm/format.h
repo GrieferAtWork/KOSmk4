@@ -20,14 +20,15 @@
 #ifndef _LIBDISASM_FORMAT_H
 #define _LIBDISASM_FORMAT_H 1
 
+#include "api.h"
+/**/
+
 #include <hybrid/host.h>
 
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <bits/types.h>
 
 #include <libc/string.h>
-
-#include "api.h"
 
 /* Format codes for `diasm_print_format_t' */
 #define DISASSEMBLER_FORMAT_REGISTER_PREFIX   0x0002 /* Prefix for register names. */

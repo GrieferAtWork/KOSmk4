@@ -24,7 +24,7 @@
 
 #include <hybrid/minmax.h> /* MIN(), MAX() */
 
-#include <asm/limits.h>
+#include <asm/os/limits.h>
 #include <asm/pagesize.h>
 
 #include <features.h>

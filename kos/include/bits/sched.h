@@ -26,7 +26,7 @@
 
 #include <hybrid/__bit.h>
 
-#include <asm/sched.h>
+#include <asm/os/sched.h> /* __CPU_SETSIZE */
 #include <bits/types.h>
 
 #include <libc/malloc.h>

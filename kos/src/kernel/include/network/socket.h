@@ -29,14 +29,14 @@
 
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/cmsghdr-struct.h>
+#include <bits/os/cmsghdr.h>
 #include <bits/sockaddr_storage-struct.h>
 #include <compat/config.h>
 #include <kos/io.h>
 #include <sys/socket.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/cmsghdr-struct.h>
+#include <compat/bits/os/cmsghdr.h>
 #include <compat/bits/types.h>
 #endif /* !__ARCH_HAVE_COMPAT */
 

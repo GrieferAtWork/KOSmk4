@@ -18,5 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __sigval_t_defined
-#include <bits/sigval.h>
+#include <bits/os/sigval.h>
+#ifndef __sigval_t_defined
+#define __sigval_t_defined 1
+#endif /* !__sigval_t_defined */
 #endif /* !__sigval_t_defined */

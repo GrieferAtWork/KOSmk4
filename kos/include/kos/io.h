@@ -23,11 +23,11 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <asm/dirent.h>
-#include <asm/fcntl.h>
-#include <asm/oflags.h>
-#include <asm/poll.h>
-#include <asm/stat.h>
+#include <asm/os/dirent.h>
+#include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#include <asm/os/poll.h>
+#include <asm/os/stat.h>
 #include <bits/types.h>
 
 #ifndef __KOS__

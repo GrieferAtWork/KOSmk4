@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2caf26e3 */
+/* HASH CRC-32:0xaff3e4d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))
 #else /* __CRT_HAVE_link */
 __NAMESPACE_LOCAL_END
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_linkat)
 __NAMESPACE_LOCAL_END

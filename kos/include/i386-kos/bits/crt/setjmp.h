@@ -25,7 +25,7 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 
 __SYSDECL_BEGIN
 

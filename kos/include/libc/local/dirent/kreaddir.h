@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1d8f877 */
+/* HASH CRC-32:0xbc99b777 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_kreaddir_defined 1
 #include <__crt.h>
 #if (defined(__CRT_HAVE_kreaddirf) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_kreaddirf64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64)))
-#include <bits/dirent.h>
+#include <bits/os/dirent.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: kreaddirf from dirent */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1db97815 */
+/* HASH CRC-32:0xc8c41944 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,34 +26,24 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: setitimer32 from sys.time */
 #if !defined(__local___localdep_setitimer32_defined) && defined(__CRT_HAVE_setitimer)
 #define __local___localdep_setitimer32_defined 1
-/* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
- * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(int __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
 #endif /* !__local___localdep_setitimer32_defined && __CRT_HAVE_setitimer */
 /* Dependency: setitimer64 from sys.time */
 #ifndef __local___localdep_setitimer64_defined
 #define __local___localdep_setitimer64_defined 1
 #ifdef __CRT_HAVE_setitimer64
-/* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
- * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer64,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
- * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(int __which, struct __itimerval64 const *__newval, struct __itimerval64 *__oldval),setitimer,(__which,__newval,__oldval))
 #elif defined(__CRT_HAVE_setitimer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/setitimer64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
- * Returns 0 on success, -1 on errors */
 #define __localdep_setitimer64 __LIBC_LOCAL_NAME(setitimer64)
 #else /* ... */
 #undef __local___localdep_setitimer64_defined
 #endif /* !... */
 #endif /* !__local___localdep_setitimer64_defined */
-/* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
- * Returns 0 on success, -1 on errors */
 __LOCAL_LIBC(setitimer) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setitimer))(int __which, struct itimerval const *__newval, struct itimerval *__oldval) {
 #ifdef __CRT_HAVE_setitimer

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4427118 */
+/* HASH CRC-32:0x45c0f99b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <asm/reboot.h>
+#include <asm/os/reboot.h>
 
 __SYSDECL_BEGIN
 

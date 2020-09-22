@@ -23,7 +23,7 @@
 
 %{
 #include <features.h>
-#include <asm/reboot.h>
+#include <asm/os/reboot.h>
 
 __SYSDECL_BEGIN
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38cd4bd5 */
+/* HASH CRC-32:0xe2921e61 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,8 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_select64) || defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select)
 #include <features.h>
-#include <bits/timeval.h>
-struct __fd_set_struct;
+#include <bits/os/timeval.h>
+#include <bits/os/fd_set.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: select32 from sys.select */
 #ifndef __local___localdep_select32_defined

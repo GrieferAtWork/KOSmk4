@@ -33,7 +33,7 @@
 %{
 #include <features.h>
 #include <hybrid/typecore.h>
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 
 __SYSDECL_BEGIN
 
@@ -91,7 +91,7 @@ typedef __CHAR32_TYPE__ char32_t;
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$mbrtowc")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(mbrtowc)]]
 [[exposed_name("mbrtoc16"), bind_local_function(uchar_mbrtoc16)]]
-[[decl_include("<bits/mbstate.h>")]]
+[[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
                      [[inp_opt(maxlen)]] char const *__restrict str,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
@@ -101,7 +101,7 @@ size_t stdc_mbrtoc16([[nullable]] char16_t *pc16,
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$mbrtowc")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(mbrtowc)]]
 [[exposed_name("mbrtoc32"), bind_local_function(uchar_mbrtoc32)]]
-[[decl_include("<bits/mbstate.h>")]]
+[[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
                      [[inp_opt(maxlen)]] char const *__restrict str,
                      size_t maxlen, [[nullable]] mbstate_t *mbs);
@@ -111,7 +111,7 @@ size_t stdc_mbrtoc32([[nullable]] char32_t *pc32,
 [[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wcrtomb")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), bind_local_function(wcrtomb)]]
 [[exposed_name("c16rtomb"), bind_local_function(uchar_c16rtomb)]]
-[[decl_include("<bits/mbstate.h>")]]
+[[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
                      [[nullable]] mbstate_t *mbs);
 
@@ -120,7 +120,7 @@ size_t stdc_c16rtomb(char *__restrict str, char16_t c16,
 [[if(defined(__PE__) && defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wcrtomb")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), bind_local_function(wcrtomb)]]
 [[exposed_name("c32rtomb"), bind_local_function(uchar_c32rtomb)]]
-[[decl_include("<bits/mbstate.h>")]]
+[[decl_include("<bits/crt/mbstate.h>")]]
 size_t stdc_c32rtomb(char *__restrict str, char32_t c32,
                      [[nullable]] mbstate_t *mbs);
 

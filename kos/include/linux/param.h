@@ -20,7 +20,7 @@
 #ifndef _LINUX_PARAM_H
 #define _LINUX_PARAM_H 1
 
-#include <asm/limits.h>
+#include <asm/os/limits.h>
 #include <asm/pagesize.h>
 
 /* System memory page size */

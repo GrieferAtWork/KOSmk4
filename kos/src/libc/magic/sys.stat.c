@@ -95,18 +95,26 @@
 %{
 #include <features.h>
 
-#include <asm/stat.h>
+#include <asm/os/stat.h>
 #include <bits/stat.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #include <time.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
-__SYSDECL_BEGIN
+#ifdef __USE_ATFILE
+#if !defined(UTIME_NOW) && defined(__UTIME_NOW)
+#define UTIME_NOW  __UTIME_NOW  /* TODO: Doc */
+#endif /* !UTIME_NOW && __UTIME_NOW */
+#if !defined(UTIME_OMIT) && defined(__UTIME_OMIT)
+#define UTIME_OMIT __UTIME_OMIT /* TODO: Doc */
+#endif /* !UTIME_OMIT && __UTIME_OMIT */
+#endif /* __USE_ATFILE */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __dev_t_defined
@@ -691,7 +699,7 @@ int utimensat32($fd_t dirfd, [[nonnull]] char const *filename,
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("utimensat64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("utimensat")]]
 [[userimpl, requires($has_function(utimensat32) || $has_function(utimensat64))]]
-[[impl_include("<asm/fcntl.h>")]]
+[[impl_include("<asm/os/fcntl.h>")]]
 int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
               [[nullable]] struct timespec const times[2 /*or:3*/],
               $atflag_t flags) {
@@ -749,7 +757,7 @@ int utimensat($fd_t dirfd, [[nonnull]] char const *filename,
 %#ifdef __USE_TIME64
 [[cp, time64_variant_of(utimensat)]]
 [[userimpl, requires_function(utimensat32)]]
-[[impl_include("<asm/fcntl.h>")]]
+[[impl_include("<asm/os/fcntl.h>")]]
 int utimensat64($fd_t dirfd, [[nonnull]] char const *filename,
                 [[nullable]] struct timespec64 const times[2 /*or:3*/], $atflag_t flags) {
 @@pp_ifdef __AT_CHANGE_CTIME@@
@@ -852,9 +860,8 @@ int futimens64($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/])
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_SYS_STAT_H)

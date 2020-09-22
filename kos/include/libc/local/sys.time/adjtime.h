@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f06a60d */
+/* HASH CRC-32:0x5eafb8bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,44 +26,24 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: adjtime32 from sys.time */
 #if !defined(__local___localdep_adjtime32_defined) && defined(__CRT_HAVE_adjtime)
 #define __local___localdep_adjtime32_defined 1
-/* Adjust the current time of day by the amount in DELTA.
- * If OLDDELTA is not NULL, it is filled in with the amount of time
- * adjustment remaining to be done from the last `adjtime' call.
- * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),adjtime,(__delta,__olddelta))
 #endif /* !__local___localdep_adjtime32_defined && __CRT_HAVE_adjtime */
 /* Dependency: adjtime64 from sys.time */
 #ifndef __local___localdep_adjtime64_defined
 #define __local___localdep_adjtime64_defined 1
 #ifdef __CRT_HAVE_adjtime64
-/* Adjust the current time of day by the amount in DELTA.
- * If OLDDELTA is not NULL, it is filled in with the amount of time
- * adjustment remaining to be done from the last `adjtime' call.
- * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime64,(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Adjust the current time of day by the amount in DELTA.
- * If OLDDELTA is not NULL, it is filled in with the amount of time
- * adjustment remaining to be done from the last `adjtime' call.
- * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime64,(struct __timeval64 const *__delta, struct __timeval64 *__olddelta),adjtime,(__delta,__olddelta))
 #elif defined(__CRT_HAVE_adjtime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/adjtime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Adjust the current time of day by the amount in DELTA.
- * If OLDDELTA is not NULL, it is filled in with the amount of time
- * adjustment remaining to be done from the last `adjtime' call.
- * This call is restricted to the super-user */
 #define __localdep_adjtime64 __LIBC_LOCAL_NAME(adjtime64)
 #else /* ... */
 #undef __local___localdep_adjtime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_adjtime64_defined */
-/* Adjust the current time of day by the amount in DELTA.
- * If OLDDELTA is not NULL, it is filled in with the amount of time
- * adjustment remaining to be done from the last `adjtime' call.
- * This call is restricted to the super-user */
 __LOCAL_LIBC(adjtime) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime))(struct timeval const *__delta, struct timeval *__olddelta) {
 #ifdef __CRT_HAVE_adjtime

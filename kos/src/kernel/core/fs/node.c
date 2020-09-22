@@ -53,7 +53,7 @@
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
-#include <bits/dirent.h>
+#include <dirent.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>

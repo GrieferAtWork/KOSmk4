@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeaac236 */
+/* HASH CRC-32:0x195e5653 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,29 +26,24 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lutimes32 from sys.time */
 #if !defined(__local___localdep_lutimes32_defined) && defined(__CRT_HAVE_lutimes)
 #define __local___localdep_lutimes32_defined 1
-/* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes32,(char const *__file, struct __timeval32 const __tvp[2]),lutimes,(__file,__tvp))
 #endif /* !__local___localdep_lutimes32_defined && __CRT_HAVE_lutimes */
 /* Dependency: lutimes64 from sys.time */
 #ifndef __local___localdep_lutimes64_defined
 #define __local___localdep_lutimes64_defined 1
 #ifdef __CRT_HAVE_lutimes64
-/* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes64,(char const *__file, struct __timeval64 const __tvp[2]),lutimes64,(__file,__tvp))
 #elif defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_lutimes64,(char const *__file, struct __timeval64 const __tvp[2]),lutimes,(__file,__tvp))
 #elif defined(__CRT_HAVE_lutimes)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/lutimes64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `utimes', but does not follow symbolic links */
 #define __localdep_lutimes64 __LIBC_LOCAL_NAME(lutimes64)
 #else /* ... */
 #undef __local___localdep_lutimes64_defined
 #endif /* !... */
 #endif /* !__local___localdep_lutimes64_defined */
-/* Same as `utimes', but does not follow symbolic links */
 __LOCAL_LIBC(lutimes) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lutimes))(char const *__file, struct timeval const __tvp[2]) {
 #ifdef __CRT_HAVE_utimes

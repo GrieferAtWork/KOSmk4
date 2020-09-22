@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc05a4f5 */
+/* HASH CRC-32:0x1c4a85b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_vscanf
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic scanf implementation
@@ -121,7 +121,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #ifndef ____vsscanf_getc_defined
 #define ____vsscanf_getc_defined 1
 __NAMESPACE_LOCAL_BEGIN

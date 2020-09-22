@@ -26,7 +26,7 @@
 #include <misc/atomic-ref.h>
 #include <sched/arch/time.h> /* ARCH_DEFAULT_REALTIME_CLOCK */
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 
 #include <stdbool.h>
 

@@ -30,7 +30,7 @@
 #include <features.h>
 
 #include <bits/sigevent.h> /* struct sigevent */
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 
 #include <librt/_api.h>

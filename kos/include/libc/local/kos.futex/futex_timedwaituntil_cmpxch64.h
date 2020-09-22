@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cfb57f1 */
+/* HASH CRC-32:0xe455fa16 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <bits/types.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lfutex64 from kos.futex */
 #ifndef __local___localdep_lfutex64_defined

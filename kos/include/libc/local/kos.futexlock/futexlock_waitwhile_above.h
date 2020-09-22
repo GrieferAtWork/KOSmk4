@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86792b22 */
+/* HASH CRC-32:0xf83b5fe0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,7 +120,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_lfutexlock64_defined */
 __NAMESPACE_LOCAL_END
 #include <kos/bits/futex.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait

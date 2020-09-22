@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-#include <asm/limits.h>
+#include <asm/os/limits.h>
 
 /* Max # of open files handles */
 #if !defined(NR_OPEN) && defined(__OPEN_MAX) && (__OPEN_MAX + 0) != -1

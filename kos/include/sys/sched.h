@@ -24,7 +24,7 @@
 
 #include <__stdinc.h>
 
-#include <asm/sched.h>
+#include <asm/os/sched.h>
 #include <bits/sched_param.h>
 #include <sys/_timespec.h>
 

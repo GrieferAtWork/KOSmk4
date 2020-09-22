@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95b71082 */
+/* HASH CRC-32:0x936d63fd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_ntp_gettime64_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_ntp_gettimex
+#include <bits/crt/ntptimeval.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ntp_gettime32 from sys.timex */
 #ifndef __local___localdep_ntp_gettime32_defined

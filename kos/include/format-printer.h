@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f162c5a */
+/* HASH CRC-32:0xb225d945 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 
 #include <hybrid/__assert.h>
 
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <bits/types.h>
 
 #include <libc/malloc.h>

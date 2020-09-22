@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9deec9d2 */
+/* HASH CRC-32:0xbd6154ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,10 @@
 
 #include <features.h>
 
+#include <asm/os/sched.h>
 #include <bits/sched.h>
 #include <bits/sched_param.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 
 #ifdef __USE_KOS

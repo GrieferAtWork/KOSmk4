@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdfa0143 */
+/* HASH CRC-32:0x8348480d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <asm/ioctls/tty.h>
-#include <asm/stdio.h>
+#include <asm/os/stdio.h>
 /* Make FD be the controlling terminal, stdin, stdout, and stderr;
  * then close FD. Returns 0 on success, nonzero on error */
 INTERN ATTR_SECTION(".text.crt.io.tty") int

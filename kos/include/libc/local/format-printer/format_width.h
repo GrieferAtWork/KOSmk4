@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d6f7192 */
+/* HASH CRC-32:0xb9f77a12 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_format_width_defined
 #define __local_format_width_defined 1
 #include <__crt.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 #include <libc/local/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN

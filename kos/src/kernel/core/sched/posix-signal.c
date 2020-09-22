@@ -62,10 +62,10 @@
 #include <librpc/rpc.h>
 
 #ifdef __ARCH_HAVE_COMPAT
+#include <compat/bits/os/timespec.h>
 #include <compat/bits/sigaction-struct.h>
 #include <compat/bits/siginfo-convert.h>
 #include <compat/bits/siginfo-struct.h>
-#include <compat/bits/timespec.h>
 #include <compat/kos/types.h>
 #include <compat/pointer.h>
 #include <compat/signal.h>

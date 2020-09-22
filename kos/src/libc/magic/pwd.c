@@ -240,7 +240,7 @@ $errno_t fgetpwnam_r([[nonnull]] $FILE *__restrict stream,
 @@                 Note that in this case, `errno' will have also been set to `ERANGE'
 @@@return: * :     Error (one of `E*' from `<errno.h>')
 [[static, cp, decl_include("<bits/types.h>", "<bits/crt/db/passwd.h>")]]
-[[impl_include("<libc/errno.h>", "<hybrid/typecore.h>", "<asm/syslog.h>")]]
+[[impl_include("<libc/errno.h>", "<hybrid/typecore.h>", "<asm/os/syslog.h>")]]
 [[requires_function(fgetpos64, fsetpos64, fparseln)]]
 $errno_t fgetpwfiltered_r([[nonnull]] $FILE *__restrict stream,
                           [[nonnull]] struct passwd *__restrict resultbuf,

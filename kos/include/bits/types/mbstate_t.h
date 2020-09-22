@@ -24,7 +24,7 @@ __NAMESPACE_STD_USING(mbstate_t)
 #endif /* __CC__ */
 #define __mbstate_t_defined 1
 #else /* __std_mbstate_t_defined */
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
 #ifdef __CC__

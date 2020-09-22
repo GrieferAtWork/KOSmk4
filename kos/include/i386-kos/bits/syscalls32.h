@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cfc37f */
+/* HASH CRC-32:0x4630f1c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,7 @@
 #define SYS_rmdir                        __NR_rmdir                        /* errno_t rmdir(char const *path) */
 #define SYS_dup                          __NR_dup                          /* fd_t dup(fd_t fd) */
 #define SYS_pipe                         __NR_pipe                         /* errno_t pipe(fd_t[2] pipedes) */
-#define SYS_times                        __NR_times                        /* clock_t times(struct tms *buf) */
+#define SYS_times                        __NR_times                        /* clock_t times(struct tmsx32 *buf) */
 #define SYS_prof                         __NR_prof                         /* errno_t prof(void) */
 #define SYS_brk                          __NR_brk                          /* errno_t brk(void *addr) */
 #define SYS_setgid                       __NR_setgid                       /* errno_t setgid(uint16_t gid) */
@@ -315,7 +315,7 @@
 #define SYS_sched_yield                  __NR_sched_yield                  /* errno_t sched_yield(void) */
 #define SYS_sched_get_priority_max       __NR_sched_get_priority_max       /* syscall_slong_t sched_get_priority_max(syscall_ulong_t algorithm) */
 #define SYS_sched_get_priority_min       __NR_sched_get_priority_min       /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
-#define SYS_sched_rr_get_interval        __NR_sched_rr_get_interval        /* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
+#define SYS_sched_rr_get_interval        __NR_sched_rr_get_interval        /* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *ts) */
 #define SYS_nanosleep                    __NR_nanosleep                    /* errno_t nanosleep(struct timespecx32 const *req, struct timespecx32 *rem) */
 /* @param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED' */
 #define SYS_mremap                       __NR_mremap                       /* void *mremap(void *addr, size_t old_len, size_t new_len, syscall_ulong_t flags, void *new_address) */
@@ -879,7 +879,7 @@
 #define SYS_rt_sigtimedwait_time64       __NR_rt_sigtimedwait_time64       /* syscall_slong_t rt_sigtimedwait_time64(struct __sigset_struct const *set, struct __siginfox32_struct *info, struct timespecx32_64 const *timeout, size_t sigsetsize) */
 /* @param: futex_op: One of `FUTEX_*' from <linux/futex.h> */
 #define SYS_futex_time64                 __NR_futex_time64                 /* syscall_slong_t futex_time64(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3) */
-#define SYS_sched_rr_get_interval_time64 __NR_sched_rr_get_interval_time64 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+#define SYS_sched_rr_get_interval_time64 __NR_sched_rr_get_interval_time64 /* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *ts) */
 /* Send a signal to the process of a given pidfd
  * @param: pidfd:  A `HANDLE_TYPE_TASK'-handle
  * @param: usigno: The signal that should be sent

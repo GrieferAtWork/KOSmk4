@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7bfb099 */
+/* HASH CRC-32:0xd806e9bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnvp)(__STDC_INT_AS_UINT_T mode,
                                    __TARGV) {
 	return libc_spawnvpe(mode, file, ___argv, __LOCAL_environ);
 }
-#include <asm/oflags.h>
+#include <asm/os/oflags.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((2, 3, 4)) pid_t
 NOTHROW_RPC(LIBCCALL libc_spawnve)(__STDC_INT_AS_UINT_T mode,
                                    char const *__restrict path,
@@ -271,7 +271,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(__STDC_INT_AS_UINT_T mode,
 }
 #include <asm/crt/process.h>
 #include <libc/errno.h>
-#include <asm/vfork.h>
+#include <asm/os/vfork.h>
 INTERN ATTR_SECTION(".text.crt.fs.exec.spawn") NONNULL((3, 4)) pid_t
 NOTHROW_RPC(LIBCCALL libc_fspawnve)(__STDC_INT_AS_UINT_T mode,
                                     fd_t execfd,

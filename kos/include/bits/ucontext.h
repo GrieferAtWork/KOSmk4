@@ -32,9 +32,9 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/mcontext.h> /* struct mcontext */
-#include <bits/sigset.h>   /* struct __sigset_struct */
-#include <bits/sigstack.h> /* struct sigaltstack */
+#include <bits/mcontext.h>    /* struct mcontext */
+#include <bits/os/sigset.h>   /* struct __sigset_struct */
+#include <bits/os/sigstack.h> /* struct sigaltstack */
 
 #ifndef __ALIGNOF_UCONTEXT
 #if defined(__ALIGNOF_MCONTEXT) && (__ALIGNOF_MCONTEXT > __SIZEOF_POINTER__)

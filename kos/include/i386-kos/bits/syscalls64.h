@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8eb3a3f */
+/* HASH CRC-32:0x50886143 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -384,7 +384,7 @@
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define SYS_getrusage                __NR_getrusage                /* errno_t getrusage(syscall_slong_t who, struct rusagex64 *tv) */
 #define SYS_sysinfo                  __NR_sysinfo                  /* errno_t sysinfo(struct sysinfo *info) */
-#define SYS_times                    __NR_times                    /* clock_t times(struct tms *buf) */
+#define SYS_times                    __NR_times                    /* clock_t times(struct tmsx64 *buf) */
 #define SYS_ptrace                   __NR_ptrace                   /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */
 #define SYS_getuid                   __NR_getuid                   /* uid_t getuid(void) */
 #define SYS_syslog                   __NR_syslog                   /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
@@ -446,7 +446,7 @@
 #define SYS_sched_getscheduler       __NR_sched_getscheduler       /* syscall_slong_t sched_getscheduler(pid_t pid) */
 #define SYS_sched_get_priority_max   __NR_sched_get_priority_max   /* syscall_slong_t sched_get_priority_max(syscall_ulong_t algorithm) */
 #define SYS_sched_get_priority_min   __NR_sched_get_priority_min   /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
-#define SYS_sched_rr_get_interval    __NR_sched_rr_get_interval    /* errno_t sched_rr_get_interval(pid_t pid, struct timespecx64 *tms) */
+#define SYS_sched_rr_get_interval    __NR_sched_rr_get_interval    /* errno_t sched_rr_get_interval(pid_t pid, struct timespecx64 *ts) */
 #define SYS_mlock                    __NR_mlock                    /* errno_t mlock(void const *addr, size_t len) */
 #define SYS_munlock                  __NR_munlock                  /* errno_t munlock(void const *addr, size_t len) */
 /* @param: flags: Set of `MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT' */

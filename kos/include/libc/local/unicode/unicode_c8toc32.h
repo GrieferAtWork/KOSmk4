@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1b3c7 */
+/* HASH CRC-32:0x54bf797c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_unicode_c8toc32_defined
 #define __local_unicode_c8toc32_defined 1
 #include <__crt.h>
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)

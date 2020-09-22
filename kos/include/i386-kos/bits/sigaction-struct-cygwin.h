@@ -36,7 +36,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 
 #ifdef __CRT_CYG_PRIMARY

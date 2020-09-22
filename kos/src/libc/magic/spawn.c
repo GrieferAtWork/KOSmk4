@@ -34,7 +34,7 @@
 #include <bits/crt/posix_spawn.h>
 )]%{
 #include <bits/sched_param.h>
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 #include <sys/types.h>
 
@@ -154,8 +154,8 @@ $errno_t crt_posix_spawn([[nonnull]] pid_t *__restrict pid,
 [[argument_names(pid, execfd, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[impl_include("<bits/sigaction-struct.h>", "<libc/errno.h>")]]
-[[impl_include("<asm/vfork.h>", "<asm/oflags.h>", "<asm/os/signal.h>")]]
-[[requires_include("<asm/crt/posix_spawn.h>", "<asm/vfork.h>")]]
+[[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
+[[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>")]]
 [[requires((defined(__POSIX_SPAWN_USE_KOS) && 
             ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
              ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&
@@ -498,7 +498,7 @@ child_error:
 @@@param: envp:         Same as the `envp' accepted by `execve(2)'
 @@@return: 0 :          Success. (The child process's PID has been stored in `*pid')
 @@@return: * :          Error errno-code describing the reason of failure
-[[requires_function(open, posix_fspawn_np), impl_include("<asm/oflags.h>")]]
+[[requires_function(open, posix_fspawn_np), impl_include("<asm/os/oflags.h>")]]
 [[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
 $errno_t posix_spawn([[nonnull]] pid_t *__restrict pid,
@@ -672,7 +672,7 @@ $errno_t posix_spawnattr_setflags([[nonnull]] posix_spawnattr_t *__restrict attr
 @@Get the set of signal handler that are reset of `SIG_DFL' by
 @@the child process when `POSIX_SPAWN_SETSIGDEF' is set.
 @@@return: 0 : Success
-[[decl_include("<bits/crt/posix_spawn.h>", "<bits/sigset.h>")]]
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
 $errno_t posix_spawnattr_getsigdefault([[nonnull]] posix_spawnattr_t const *__restrict attr,
@@ -685,7 +685,7 @@ $errno_t posix_spawnattr_getsigdefault([[nonnull]] posix_spawnattr_t const *__re
 @@Set the set of signal handler that are reset of `SIG_DFL' by
 @@the child process when `POSIX_SPAWN_SETSIGDEF' is set.
 @@@return: 0 : Success
-[[decl_include("<bits/crt/posix_spawn.h>", "<bits/sigset.h>")]]
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
 $errno_t posix_spawnattr_setsigdefault([[nonnull]] posix_spawnattr_t *__restrict attr,
@@ -698,7 +698,7 @@ $errno_t posix_spawnattr_setsigdefault([[nonnull]] posix_spawnattr_t *__restrict
 @@Get the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
 @@that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
 @@@return: 0 : Success
-[[decl_include("<bits/crt/posix_spawn.h>", "<bits/sigset.h>")]]
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
 $errno_t posix_spawnattr_getsigmask([[nonnull]] posix_spawnattr_t const *__restrict attr,
@@ -711,7 +711,7 @@ $errno_t posix_spawnattr_getsigmask([[nonnull]] posix_spawnattr_t const *__restr
 @@Set the `sigmask' argument of a call `sigprocmask(SIG_SETMASK, sigmask, NULL)'
 @@that the child process will perform when `POSIX_SPAWN_SETSIGMASK' is set.
 @@@return: 0 : Success
-[[decl_include("<bits/crt/posix_spawn.h>", "<bits/sigset.h>")]]
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sigset.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
 $errno_t posix_spawnattr_setsigmask([[nonnull]] posix_spawnattr_t *__restrict attr,

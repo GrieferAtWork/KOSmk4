@@ -27,7 +27,7 @@
 #include <sched/signal.h>
 #include <sched/task.h>
 
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <kos/kernel/gdb-cpu-state.h>
 
 DECL_BEGIN

@@ -25,7 +25,7 @@
 %{
 #include <features.h>
 
-#include <asm/eventfd.h> /* __EFD_* */
+#include <asm/os/eventfd.h> /* __EFD_* */
 #include <bits/types.h>
 
 #ifdef __USE_GLIBC
@@ -54,7 +54,7 @@ __SYSDECL_BEGIN
 
 /* Flags for `eventfd()'. */
 #if (defined(__EFD_SEMAPHORE) || defined(__EFD_NONBLOCK) || \
-     defined(__EFD_CLOEXEC))
+     defined(__EFD_CLOEXEC) || defined(__EFD_CLOFORK))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -67,6 +67,9 @@ enum {
 #ifdef __EFD_CLOEXEC
 	EFD_CLOEXEC   = __EFD_CLOEXEC,   /* Set the IO_CLOEXEC flag */
 #endif /* __EFD_CLOEXEC */
+#ifdef __EFD_CLOFORK
+	EFD_CLOFORK   = __EFD_CLOFORK,   /* Set the IO_CLOFORK flag */
+#endif /* __EFD_CLOFORK */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -80,6 +83,9 @@ enum {
 #ifdef __EFD_CLOEXEC
 #define EFD_CLOEXEC   EFD_CLOEXEC   /* Set the IO_CLOEXEC flag */
 #endif /* __EFD_CLOEXEC */
+#ifdef __EFD_CLOFORK
+#define EFD_CLOFORK   EFD_CLOFORK   /* Set the IO_CLOFORK flag */
+#endif /* __EFD_CLOFORK */
 #else /* __COMPILER_PREFERR_ENUMS */
 #ifdef __EFD_SEMAPHORE
 #define EFD_SEMAPHORE __EFD_SEMAPHORE /* Create a semaphore */
@@ -90,9 +96,12 @@ enum {
 #ifdef __EFD_CLOEXEC
 #define EFD_CLOEXEC   __EFD_CLOEXEC   /* Set the IO_CLOEXEC flag */
 #endif /* __EFD_CLOEXEC */
+#ifdef __EFD_CLOFORK
+#define EFD_CLOFORK   __EFD_CLOFORK   /* Set the IO_CLOFORK flag */
+#endif /* __EFD_CLOFORK */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
-#endif /* __EFD_SEMAPHORE || __EFD_NONBLOCK || __EFD_CLOEXEC */
+#endif /* __EFD_SEMAPHORE || __EFD_NONBLOCK || __EFD_CLOEXEC || __EFD_CLOFORK */
 
 
 #ifdef __CC__

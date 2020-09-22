@@ -27,7 +27,7 @@
 #include <hybrid/limitcore.h>
 
 #include <asm/crt/limits.h>
-#include <asm/limits.h>
+#include <asm/os/limits.h>
 
 /* You should really just always using 'MB_CUR_MAX'... */
 #ifdef __CRT_DOS_PRIMARY

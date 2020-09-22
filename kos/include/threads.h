@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4711640 */
+/* HASH CRC-32:0xbe535780 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@
 
 #include <asm/crt/threads.h>
 #include <bits/crt/threads.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <kos/anno.h>
 
 __SYSDECL_BEGIN

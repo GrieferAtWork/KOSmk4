@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe140ac45 */
+/* HASH CRC-32:0xef4c6a88 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,7 +110,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_open64_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __LOCAL_LIBC(creat64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2094dd29 */
+/* HASH CRC-32:0x5d401abf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 
 #include <features.h>
 
-#include <asm/xattr.h>
+#include <asm/os/xattr.h>
 #include <bits/types.h>
 
 #ifdef __USE_GLIBC

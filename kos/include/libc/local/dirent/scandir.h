@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29f75481 */
+/* HASH CRC-32:0x1943c67d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,10 @@
 #ifndef __local_scandir_defined
 #define __local_scandir_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 #include <features.h>
-#include <bits/dirent.h>
+#include <bits/os/dirent.h>
 #ifndef ____scandir_selector_t_defined
 #define ____scandir_selector_t_defined 1
 typedef int (*__scandir_selector_t)(struct dirent const *);

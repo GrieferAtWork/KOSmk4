@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5672240 */
+/* HASH CRC-32:0xb9e69adc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_ntp_adjtime64_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_ntp_adjtime
+#include <bits/os/timex.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ntp_adjtime32 from sys.timex */
 #ifndef __local___localdep_ntp_adjtime32_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1f22984 */
+/* HASH CRC-32:0x5918575e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <asm/limits.h>
+#include <asm/os/limits.h>
 #include <bits/types.h>
 
 #undef STDC_HEADERS
@@ -377,7 +377,7 @@
 #define HAVE_RANDOM 1
 
 #undef HAVE_RENAME
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_rename) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat)))
 #define HAVE_RENAME 1
 #endif /* __CRT_HAVE_rename || (__AT_FDCWD && (__CRT_HAVE_renameat || __CRT_HAVE_frenameat)) */

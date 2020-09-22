@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9b14eef */
+/* HASH CRC-32:0xd5cc8f3e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #if defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || defined(__CRT_HAVE__IO_putc) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE__IO_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)
 #include <hybrid/typecore.h>
 #include <kos/anno.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: fwrite from stdio */
 #ifndef __local___localdep_fwrite_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0b33352 */
+/* HASH CRC-32:0x69cae1e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_access_defined
 #define __local_access_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN

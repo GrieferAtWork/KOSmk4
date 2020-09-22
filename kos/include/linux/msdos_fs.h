@@ -23,10 +23,10 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/dirent.h>
 #include <hybrid/typecore.h>
 
 #include <asm/ioctl.h>
+#include <bits/os/dirent.h> /* __DIRENT_HAVE_U_D_INO */
 #include <linux/types.h>
 
 __DECL_BEGIN

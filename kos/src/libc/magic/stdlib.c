@@ -55,7 +55,7 @@
 #include <hybrid/typecore.h>
 
 #include <asm/crt/stdlib.h>
-#include <asm/stdlib.h>
+#include <asm/os/stdlib.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -603,13 +603,9 @@ int system([[nullable]] char const *command);
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
 [[export_alias("_ZSt9terminatev", "?terminate@@YAXXZ")]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_ABORT))]]
-[[requires_function(_Exit), impl_include("<asm/stdlib.h>")]]
+[[requires_function(_Exit), impl_include("<asm/os/stdlib.h>")]]
 void abort() {
-#ifdef __EXIT_FAILURE
-	_Exit(__EXIT_FAILURE);
-#else /* __EXIT_FAILURE */
-	_Exit(1);
-#endif /* !__EXIT_FAILURE */
+	_Exit(@__EXIT_FAILURE@);
 }
 
 [[std, guard, crtbuiltin, ATTR_NORETURN, throws]]
@@ -2070,9 +2066,9 @@ typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
 @@and `fdwalk()' returns with that same value. If `(*func)(...)' is never called, or all
 @@invocations return 0, `fdwalk()' will also return 0.
 [[decl_prefix(DEFINE_FDWALK_FUNC_T)]]
-[[requires_include("<asm/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(fcntl) && defined(__F_NEXT))]]
-[[impl_include("<asm/fcntl.h>", "<libc/errno.h>")]]
+[[impl_include("<asm/os/fcntl.h>", "<libc/errno.h>")]]
 int fdwalk([[nonnull]] __fdwalk_func_t func, void *cookie) {
 	int result = 0;
 @@pp_ifdef __libc_geterrno@@

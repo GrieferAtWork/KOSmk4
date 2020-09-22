@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8b5241c */
+/* HASH CRC-32:0x6937d1d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_pwritev64) || defined(__CRT_HAVE_pwritev)
 #include <features.h>
-#include <bits/iovec-struct.h>
+#include <bits/os/iovec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pwritev32 from sys.uio */

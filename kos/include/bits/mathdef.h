@@ -21,6 +21,7 @@
 #define _BITS_MATHDEF_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/limitcore.h>
 
 #ifdef __CC__
@@ -52,6 +53,5 @@ __DECL_END
 /* #define __FP_FAST_FMA 1 */
 /* #define __FP_FAST_FMAF 1 */
 /* #define __FP_FAST_FMAL 1 */
-
 
 #endif /* !_BITS_MATHDEF_H */

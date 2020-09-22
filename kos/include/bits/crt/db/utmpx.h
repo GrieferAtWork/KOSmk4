@@ -24,9 +24,8 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/timeval.h>
+#include <bits/os/timeval.h>
 #include <bits/types.h>
-#include <sys/time.h>
 
 /* Documentation taken from Glibc /usr/include/i386-linux-gnu/bits/utmpx.h */
 /* Structures and definitions for the user accounting database.  GNU version.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fde3cc0 */
+/* HASH CRC-32:0x48ab8768 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 
 #include <features.h>
 
-#include <asm/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
+#include <asm/os/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
 #include <bits/types.h>
 
 #ifdef __CC__

@@ -66,7 +66,7 @@ __SYSDECL_BEGIN
 @@then close FD. Returns 0 on success, nonzero on error
 [[guard, cp_kos, section(".text.crt{|.dos}.io.tty")]]
 [[impl_include("<asm/ioctls/tty.h>")]]
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/os/stdio.h>")]]
 [[requires_include("<asm/ioctls/tty.h>")]]
 [[requires(defined(@TIOCSCTTY@) && $has_function(ioctl) &&
            $has_function(setsid) && $has_function(dup2) &&

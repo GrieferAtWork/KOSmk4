@@ -42,20 +42,20 @@
 #include <features.h>
 
 #include <asm/os/signal.h>
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 #include <bits/types.h>
 
 #ifdef __USE_POSIX199309
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #endif /* __USE_POSIX199309 */
 
 #ifdef __USE_MISC
-#include <bits/sigcontext.h>
+#include <bits/os/sigcontext.h>
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-#include <asm/sigstack.h>
-#include <bits/sigstack.h> /* `struct sigstack', `struct sigaltstack' */
+#include <asm/os/sigstack.h>
+#include <bits/os/sigstack.h> /* `struct sigstack', `struct sigaltstack' */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <sys/ucontext.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
@@ -63,7 +63,7 @@
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 #include <bits/crt/pthreadtypes.h>
-#include <bits/sigval.h> /* union sigval */
+#include <bits/os/sigval.h> /* union sigval */
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #ifdef __USE_POSIX
@@ -71,11 +71,11 @@
 #endif /* __USE_POSIX */
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
-#include <asm/sigevent.h>
-#include <asm/siginfo.h>
+#include <asm/os/sigevent.h>
+#include <asm/os/siginfo.h>
+#include <bits/os/sigval.h>      /* union sigval */
 #include <bits/sigevent.h>       /* struct sigevent */
 #include <bits/siginfo-struct.h> /* struct __siginfo_struct */
-#include <bits/sigval.h>         /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 __SYSDECL_BEGIN
@@ -954,7 +954,7 @@ enum {
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 
-/* Possible values for `ss_flags.'. */
+/* Possible values for `struct sigaltstack::ss_flags.'. */
 #if defined(__SS_ONSTACK) || defined(__SS_DISABLE)
 /*[[[enum]]]*/
 #ifdef __CC__
@@ -1191,15 +1191,15 @@ int sigpause($signo_t signo);
 [[decl_include("<bits/types.h>")]]
 int kill($pid_t pid, $signo_t signo);
 
-[[kernel, decl_include("<bits/sigset.h>")]]
-[[impl_include("<bits/sigset.h>")]]
+[[kernel, decl_include("<bits/os/sigset.h>")]]
+[[impl_include("<bits/os/sigset.h>")]]
 int sigemptyset([[nonnull]] $sigset_t *set) {
 	bzeroc(set->__val, COMPILER_LENOF(set->__val), __SIZEOF_POINTER__);
 	return 0;
 }
 
-[[kernel, decl_include("<bits/sigset.h>")]]
-[[impl_include("<bits/sigset.h>")]]
+[[kernel, decl_include("<bits/os/sigset.h>")]]
+[[impl_include("<bits/os/sigset.h>")]]
 int sigfillset([[nonnull]] $sigset_t *set) {
 @@pp_if __SIZEOF_POINTER__ == 8@@
 	memsetq(set->__val, __UINT64_C(0xffffffffffffffff), COMPILER_LENOF(set->__val));
@@ -1215,7 +1215,7 @@ int sigfillset([[nonnull]] $sigset_t *set) {
 
 [[kernel, alias("__sigaddset")]]
 [[if(!defined(__KERNEL__)), export_as("__sigaddset")]]
-[[decl_include("<bits/types.h>", "<bits/sigset.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	ulongptr_t mask = __sigset_mask(signo);
 	ulongptr_t word = __sigset_word(signo);
@@ -1225,7 +1225,7 @@ int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 
 [[kernel, alias("__sigdelset")]]
 [[if(!defined(__KERNEL__)), export_as("__sigdelset")]]
-[[decl_include("<bits/types.h>", "<bits/sigset.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	ulongptr_t mask = __sigset_mask(signo);
 	ulongptr_t word = __sigset_word(signo);
@@ -1235,7 +1235,7 @@ int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 
 [[kernel, wunused, ATTR_PURE, alias("__sigismember")]]
 [[if(!defined(__KERNEL__)), export_as("__sigismember")]]
-[[decl_include("<bits/types.h>", "<bits/sigset.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 	ulongptr_t mask = __sigset_mask(signo);
 	ulongptr_t word = __sigset_word(signo);
@@ -1261,7 +1261,7 @@ int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 @@Return the current signal mask pointer.
 @@See the documentation of `setsigmaskptr(3)' for
 @@what this function is all about. 
-[[nonnull, wunused, decl_include("<bits/sigset.h>")]]
+[[nonnull, wunused, decl_include("<bits/os/sigset.h>")]]
 sigset_t *getsigmaskptr(void);
 
 @@>> setsigmaskptr(3)
@@ -1286,19 +1286,19 @@ sigset_t *getsigmaskptr(void);
 @@>> sigprocmask(SIG_SETMASK, &oldset, NULL);
 @@@param: sigmaskptr: Address of the signal mask to use from now on.
 @@@return: * : Address of the previously used signal mask.
-[[nonnull, decl_include("<bits/sigset.h>")]]
+[[nonnull, decl_include("<bits/os/sigset.h>")]]
 sigset_t *setsigmaskptr([[nonnull]] sigset_t *sigmaskptr);
 %#endif /* __USE_KOS */
 
 [[cp, export_alias("__sigsuspend")]]
-[[decl_include("<bits/sigset.h>")]]
+[[decl_include("<bits/os/sigset.h>")]]
 int sigsuspend([[nonnull]] sigset_t const *set);
 
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__sigaction"), decl_prefix(struct sigaction;)]]
 int sigaction($signo_t signo, struct sigaction const *act, struct sigaction *oact);
 
-[[decl_include("<bits/sigset.h>")]]
+[[decl_include("<bits/os/sigset.h>")]]
 int sigpending([[nonnull]] sigset_t *__restrict set);
 
 [[cp, decl_include("<bits/types.h>")]]
@@ -1306,7 +1306,7 @@ int sigwait([[nonnull]] sigset_t const *__restrict set,
             [[nonnull]] $signo_t *__restrict signo);
 
 %#ifdef __USE_GNU
-[[kernel, wunused, ATTR_PURE, decl_include("<bits/sigset.h>")]]
+[[kernel, wunused, ATTR_PURE, decl_include("<bits/os/sigset.h>")]]
 int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
@@ -1315,7 +1315,7 @@ int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	return 1;
 }
 
-[[kernel, decl_include("<bits/sigset.h>")]]
+[[kernel, decl_include("<bits/os/sigset.h>")]]
 int sigandset([[nonnull]] $sigset_t *set,
               [[nonnull]] $sigset_t const *left,
               [[nonnull]] $sigset_t const *right) {
@@ -1325,7 +1325,7 @@ int sigandset([[nonnull]] $sigset_t *set,
 	return 0;
 }
 
-[[kernel, decl_include("<bits/sigset.h>")]]
+[[kernel, decl_include("<bits/os/sigset.h>")]]
 int sigorset([[nonnull]] $sigset_t *set,
              [[nonnull]] $sigset_t const *left,
              [[nonnull]] $sigset_t const *right) {
@@ -1426,11 +1426,11 @@ void psiginfo([[nonnull]] siginfo_t const *pinfo,
 [[decl_include("<features.h>", "<bits/types.h>")]]
 int siginterrupt($signo_t signo, __STDC_INT_AS_UINT_T interrupt);
 
-[[decl_include("<bits/sigstack.h>")]]
+[[decl_include("<bits/os/sigstack.h>")]]
 int sigstack([[nullable]] struct sigstack *ss,
              [[nullable]] struct sigstack *oss);
 
-[[decl_include("<bits/sigstack.h>")]]
+[[decl_include("<bits/os/sigstack.h>")]]
 int sigaltstack([[nullable]] struct sigaltstack const *ss,
                 [[nullable]] struct sigaltstack *oss);
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
@@ -1472,7 +1472,7 @@ $signo_t __libc_current_sigrtmax() {
 %
 %#if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 
-[[guard, decl_include("<features.h>", "<bits/sigset.h>")]]
+[[guard, decl_include("<features.h>", "<bits/os/sigset.h>")]]
 [[nocrt, alias("pthread_sigmask", "sigprocmask")]]
 int pthread_sigmask(__STDC_INT_AS_UINT_T how,
                     [[nullable]] $sigset_t const *newmask,
@@ -1483,7 +1483,7 @@ int pthread_sigmask(__STDC_INT_AS_UINT_T how,
 int pthread_kill($pthread_t threadid, $signo_t signo);
 
 %#ifdef __USE_GNU
-[[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/sigval.h>")]]
+[[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/sigval.h>")]]
 int pthread_sigqueue($pthread_t threadid,
                      $signo_t signo,
                      union sigval const value);
@@ -1505,9 +1505,9 @@ int pthread_sigqueue($pthread_t threadid,
 
 
 %
-%/* GLibc function aliases originally found in <bits/sigset.h>
+%/* GLibc function aliases originally found in <bits/os/sigset.h>
 % * Because these don't violate namespacing rules, and because
-% * <bits/sigset.h> is included unconditionally, we also define
+% * <bits/os/sigset.h> is included unconditionally, we also define
 % * these unconditionally! */
 %
 %[insert:function(__sigemptyset = sigemptyset)]

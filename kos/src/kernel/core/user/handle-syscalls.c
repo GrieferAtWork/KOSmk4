@@ -47,7 +47,7 @@
 #include <asm/ioctls/block.h>
 #include <asm/ioctls/block_ex.h>
 #include <asm/ioctls/tty.h>
-#include <bits/iovec-struct.h> /* struct iovec */
+#include <bits/os/iovec.h> /* struct iovec */
 #include <compat/config.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
@@ -70,9 +70,9 @@
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/iovec-struct.h>
-#include <compat/bits/timespec.h>
-#include <compat/bits/timeval.h>
+#include <compat/bits/os/iovec.h>
+#include <compat/bits/os/timespec.h>
+#include <compat/bits/os/timeval.h>
 #include <compat/kos/types.h>
 #include <compat/pointer.h>
 #include <compat/signal.h>

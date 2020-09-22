@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14029b68 */
+/* HASH CRC-32:0xb00dc73b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,8 @@
 
 #include <features.h>
 
-#include <asm/dirent.h>
-#include <bits/dirent.h>
+#include <asm/os/dirent.h>
+#include <bits/os/dirent.h>
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -148,7 +148,7 @@ enum {
 #endif /* !IFTODT */
 
 #if defined(__USE_XOPEN2K8) && !defined(MAXNAMLEN)
-#include <asm/limits.h>
+#include <asm/os/limits.h>
 #if defined(__NAME_MAX) && (__NAME_MAX + 0) != -1
 #define MAXNAMLEN __NAME_MAX /* Max # chars in a file name */
 #else /* __NAME_MAX != -1 */
@@ -201,7 +201,7 @@ typedef struct __dirstream DIR;
 /* Open and return a new directory stream for reading, referring to `name' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),DIR *,__NOTHROW_RPC,opendir,(char const *__name),(__name))
 #else /* __CRT_HAVE_opendir */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_opendirat) || defined(__CRT_HAVE_fopendirat) || (defined(__CRT_HAVE_fdopendir) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))))
 #include <libc/local/dirent/opendir.h>
 /* Open and return a new directory stream for reading, referring to `name' */
@@ -315,7 +315,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(c
 /* Scan a directory `DIR' for all contained directory entries */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir,(char const *__restrict __dir, struct dirent ***__restrict __namelist, __scandir_selector_t __selector, __scandir_cmp_t __cmp),scandir64,(__dir,__namelist,__selector,__cmp))
 #else /* ... */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_scandirat) && (!defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))) || (defined(__CRT_HAVE_scandirat64) && (defined(__USE_FILE_OFFSET64) || defined(_DIRENT_MATCHES_DIRENT64))))
 #include <libc/local/dirent/scandir.h>
 /* Scan a directory `DIR' for all contained directory entries */
@@ -370,7 +370,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,
 /* 64-bit variant of `scandir()' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandir64,(char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandir,(__dir,__namelist,__selector,__cmp))
 #else /* ... */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_scandirat64) || (defined(__CRT_HAVE_scandirat) && defined(_DIRENT_MATCHES_DIRENT64)))
 #include <libc/local/dirent/scandir64.h>
 /* 64-bit variant of `scandir()' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83240f2c */
+/* HASH CRC-32:0x17842c64 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3311,7 +3311,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sysinfo)
 	.cfi_endproc
 END(__x86_asm64_syscall_sysinfo)
 
-/* clock_t times(struct tms *buf) */
+/* clock_t times(struct tmsx64 *buf) */
 .section .text.x86.asm64_syscall.times
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_times)
 	.cfi_startproc simple
@@ -4767,7 +4767,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_get_priority_min)
 	.cfi_endproc
 END(__x86_asm64_syscall_sched_get_priority_min)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx64 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx64 *ts) */
 .section .text.x86.asm64_syscall.sched_rr_get_interval
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_sched_rr_get_interval)
 	.cfi_startproc simple
@@ -14395,7 +14395,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_pipe)
 	.cfi_endproc
 END(__x86_asm32_int80_pipe)
 
-/* clock_t times(struct tms *buf) */
+/* clock_t times(struct tmsx32 *buf) */
 .section .text.x86.asm32_syscall_int80.times
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_times)
 	.cfi_startproc simple
@@ -18227,7 +18227,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_get_priority_min)
 	.cfi_endproc
 END(__x86_asm32_int80_sched_get_priority_min)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *ts) */
 .section .text.x86.asm32_syscall_int80.sched_rr_get_interval
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval)
 	.cfi_startproc simple
@@ -26829,7 +26829,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_futex_time64)
 	.cfi_endproc
 END(__x86_asm32_int80_futex_time64)
 
-/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *ts) */
 .section .text.x86.asm32_syscall_int80.sched_rr_get_interval_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_sched_rr_get_interval_time64)
 	.cfi_startproc simple
@@ -30260,7 +30260,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_dup, __x86_asm32_int80_dup)
 /* errno_t pipe(fd_t[2] pipedes) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_pipe, __x86_asm32_int80_pipe)
 
-/* clock_t times(struct tms *buf) */
+/* clock_t times(struct tmsx32 *buf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_times, __x86_asm32_int80_times)
 
 /* errno_t prof(void) */
@@ -30863,7 +30863,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_get_priority_max, __x86_asm3
 /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_get_priority_min, __x86_asm32_int80_sched_get_priority_min)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *ts) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_rr_get_interval, __x86_asm32_int80_sched_rr_get_interval)
 
 /* errno_t nanosleep(struct timespecx32 const *req, struct timespecx32 *rem) */
@@ -33240,7 +33240,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_futex_time64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_futex_time64)
 
-/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *ts) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_sched_rr_get_interval_time64, __x86_asm32_int80_sched_rr_get_interval_time64)
 
 /* Send a signal to the process of a given pidfd
@@ -34990,7 +34990,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_pipe)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_pipe)
 
-/* clock_t times(struct tms *buf) */
+/* clock_t times(struct tmsx32 *buf) */
 .section .text.x86.asm32_syscall_sysrun32.times
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_times)
 	.cfi_startproc
@@ -36235,7 +36235,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_get_priority_min)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_sched_get_priority_min)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *ts) */
 .section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval)
 	.cfi_startproc
@@ -39448,7 +39448,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_futex_time64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_futex_time64)
 
-/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *ts) */
 .section .text.x86.asm32_syscall_sysrun32.sched_rr_get_interval_time64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_sched_rr_get_interval_time64)
 	.cfi_startproc

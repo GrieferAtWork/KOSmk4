@@ -24,7 +24,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <asm/select.h> /* __FD_SETSIZE */
+#include <asm/os/fd_set.h> /* __FD_SETSIZE */
 #include <bits/types.h>
 #include <linux/bits/posix_types.h>
 

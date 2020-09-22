@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38113dc8 */
+/* HASH CRC-32:0xc7d9828f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_vprintf
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
@@ -261,7 +261,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 #include <hybrid/host.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vdprintf_printer) __ssize_t

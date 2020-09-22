@@ -23,9 +23,9 @@
 
 %{
 #include <features.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/sem.h>
-#include <bits/sembuf.h>
+#include <bits/os/sembuf.h>
 
 #ifdef __USE_GLIBC
 #include <stddef.h>
@@ -61,13 +61,13 @@ int semget(key_t key,
            __STDC_INT_AS_UINT_T semflg);
 
 @@Operate on semaphore
-[[decl_include("<bits/sembuf.h>")]]
+[[decl_include("<bits/os/sembuf.h>")]]
 int semop(int semid, struct sembuf *sops, size_t nsops);
 
 %#ifdef __USE_GNU
 @@Operate on semaphore with timeout
-[[decl_include("<bits/sembuf.h>")]]
-[[decl_include("<bits/timespec.h>")]]
+[[decl_include("<bits/os/sembuf.h>")]]
+[[decl_include("<bits/os/timespec.h>")]]
 int semtimedop(int semid,
                struct sembuf *sops, size_t nsops,
                struct timespec const *timeout);

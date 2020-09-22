@@ -74,7 +74,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
 #endif /* !_WCHAR_H */
 #include <hybrid/__assert.h>
 
-#include <bits/wformat-printer.h>
+#include <bits/crt/wformat-printer.h>
 #include <kos/anno.h>
 
 #include <libc/malloc.h>
@@ -108,7 +108,7 @@ typedef __pwformatprinter pwformatprinter;
 }
 
 [[wchar]]
-[[throws, decl_include("<bits/wformat-printer.h>")]]
+[[throws, decl_include("<bits/crt/wformat-printer.h>")]]
 $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
                         wchar_t ch, $size_t num_repetitions)
 	%{generate(str2wcs("format_repeat"))}
@@ -123,7 +123,7 @@ $ssize_t format_wrepeat([[nonnull]] pwformatprinter printer, void *arg,
 
 [[throws, ATTR_LIBC_WPRINTF(3, 0)]]
 [[wchar, doc_alias("format_vprintf")]]
-[[decl_include("<bits/wformat-printer.h>")]]
+[[decl_include("<bits/crt/wformat-printer.h>")]]
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/parts.uchar.string.h>")]]
 [[impl_include("<libc/string.h>")]]
@@ -257,7 +257,7 @@ $ssize_t format_wwidth(void *arg, [[nonnull]] wchar_t const *__restrict data, $s
 }
 
 
-[[ATTR_CONST, cc(__WFORMATPRINTER_CC), decl_include("<bits/wformat-printer.h>")]]
+[[ATTR_CONST, cc(__WFORMATPRINTER_CC), decl_include("<bits/crt/wformat-printer.h>")]]
 $ssize_t format_wlength(void *arg, wchar_t const *__restrict data,
                         $size_t datalen) = format_length;
 

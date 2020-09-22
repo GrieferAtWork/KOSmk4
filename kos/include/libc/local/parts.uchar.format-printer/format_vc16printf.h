@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72e57b7d */
+/* HASH CRC-32:0x53a2b754 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_format_vc16printf_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_16to32 from unicode */
 #ifndef __local___localdep_format_16to32_defined
@@ -416,7 +416,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_escape_defined 1
 #ifdef __CRT_HAVE_format_escape
 __NAMESPACE_LOCAL_END
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -435,7 +435,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_escape,(__pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_escape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_format_quote)
 __NAMESPACE_LOCAL_END
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -477,7 +477,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_width_defined 1
 #ifdef __CRT_HAVE_format_width
 __NAMESPACE_LOCAL_END
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Returns the width (number of characters; not bytes) of the given unicode string */

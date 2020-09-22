@@ -26,7 +26,7 @@
 #include <hybrid/__unaligned.h>
 #include <hybrid/typecore.h>
 
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/exec/module.h>

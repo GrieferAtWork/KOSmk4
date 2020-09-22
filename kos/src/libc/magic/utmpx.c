@@ -23,9 +23,10 @@
 
 %{
 #include <features.h>
-#include <sys/time.h>
+
 #include <bits/crt/db/utmpx.h>
 #include <bits/types.h>
+#include <sys/time.h>
 
 /* Documentation taken from Glibc /usr/include/utmp.h */
 /* Copyright (C) 1993-2016 Free Software Foundation, Inc.

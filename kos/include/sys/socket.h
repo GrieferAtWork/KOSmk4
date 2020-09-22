@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5449a25 */
+/* HASH CRC-32:0xb503d129 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,19 +34,19 @@
 #include <hybrid/typecore.h>
 
 #include <asm/ioctls/socket.h>
-#include <asm/socket.h>
-#include <bits/cmsghdr-struct.h>
-#include <bits/msghdr-struct.h>
+#include <asm/os/socket.h>
+#include <bits/os/cmsghdr.h>
+#include <bits/os/msghdr.h>
 #include <bits/sockaddr-struct.h>
 #include <bits/sockaddr.h>
 #include <bits/sockaddr_storage-struct.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 #include <sys/uio.h>
 
 #ifdef __USE_GNU
-#include <bits/mmsghdr-struct.h>
-#include <bits/sigset.h>
+#include <bits/os/mmsghdr.h>
+#include <bits/os/sigset.h>
 #endif /* __USE_GNU */
 
 #if defined(__KOS__) && defined(__USE_KOS_KERNEL)

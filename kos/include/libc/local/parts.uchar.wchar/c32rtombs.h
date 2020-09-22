@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8a01b1a */
+/* HASH CRC-32:0xfa1fc90e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32rtombs_defined
 #define __local_c32rtombs_defined 1
 #include <__crt.h>
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mempcpy from string */

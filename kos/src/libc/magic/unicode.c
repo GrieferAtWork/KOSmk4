@@ -40,11 +40,11 @@
 #include <hybrid/__byteswap.h>
 #include <hybrid/typecore.h>
 
-#include <bits/format-printer.h>
-#include <bits/mbstate.h>
+#include <bits/crt/format-printer.h>
+#include <bits/crt/mbstate.h>
+#include <bits/crt/uformat-printer.h>
+#include <bits/crt/wformat-printer.h>
 #include <bits/types.h>
-#include <bits/uformat-printer.h>
-#include <bits/wformat-printer.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -1104,7 +1104,7 @@ $char16_t *unicode_32to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst
 @@@return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 @@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
-[[decl_include("<bits/mbstate.h>")]]
+[[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c8toc16([[nonnull]] $char16_t *__restrict pc16,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
                         [[nonnull]] __mbstate_t *__restrict mbs) {
@@ -1238,7 +1238,7 @@ done:
 @@@return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 @@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
-[[decl_include("<bits/mbstate.h>")]]
+[[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c8toc32([[nonnull]] $char32_t *__restrict pc32,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
                         [[nonnull]] __mbstate_t *__restrict mbs) {
@@ -1368,7 +1368,7 @@ struct format_8to16_data {
 
 @@Format printer (compatible with `__pformatprinter') for
 @@converting UTF-8 unicode input data into a UTF-16 output
-[[impl_include("<bits/mbstate.h>", "<bits/format-printer.h>", "<bits/uformat-printer.h>")]]
+[[impl_include("<bits/crt/mbstate.h>", "<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
 $ssize_t format_8to16(/*struct format_8to16_data **/ void *arg,
                       /*utf-8*/ char const *data, $size_t datalen) {
 	struct __local_format_8to16_data {
@@ -1418,7 +1418,7 @@ struct format_8to32_data {
 
 @@Format printer (compatible with `__pformatprinter') for
 @@converting UTF-8 unicode input data into a UTF-32 output
-[[impl_include("<bits/mbstate.h>", "<bits/format-printer.h>", "<bits/uformat-printer.h>")]]
+[[impl_include("<bits/crt/mbstate.h>", "<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
 $ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
                       /*utf-8*/ char const *data, $size_t datalen) {
 	struct __local_format_8to32_data {
@@ -1467,7 +1467,7 @@ err:
 
 @@Format printer (compatible with `__pc16formatprinter') for
 @@converting wide-character unicode input data into a UTF-8 output
-[[hidden, impl_include("<bits/format-printer.h>"), wchar]]
+[[hidden, impl_include("<bits/crt/format-printer.h>"), wchar]]
 $ssize_t format_wto8(/*struct format_wto8_data **/ void *arg,
                      $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1589,7 +1589,7 @@ $ssize_t format_32to8(/*struct format_32to8_data **/ void *arg,
 
 @@Format printer (compatible with `__pc16formatprinter') for
 @@converting wide-character unicode input data into a UTF-32 output
-[[hidden, impl_include("<bits/uformat-printer.h>"), wchar]]
+[[hidden, impl_include("<bits/crt/uformat-printer.h>"), wchar]]
 $ssize_t format_wto32(/*struct format_wto32_data **/ void *arg,
                       $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
@@ -1677,7 +1677,7 @@ $ssize_t format_16to32(/*struct format_16to32_data **/ void *arg,
 
 @@Format printer (compatible with `pwformatprinter') for
 @@converting wide-character unicode input data into a UTF-16 output
-[[hidden, wchar, impl_include("<bits/format-printer.h>", "<bits/uformat-printer.h>")]]
+[[hidden, wchar, impl_include("<bits/crt/format-printer.h>", "<bits/crt/uformat-printer.h>")]]
 $ssize_t format_wto16(/*struct format_wto16_data **/ void *arg,
                       $wchar_t const *data, $size_t datalen) {
 @@pp_if __SIZEOF_WCHAR_T__ == 4@@

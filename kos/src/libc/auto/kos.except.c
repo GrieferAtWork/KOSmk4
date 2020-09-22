@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x562c50c7 */
+/* HASH CRC-32:0x6df5067f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -581,7 +581,7 @@ for (local name: classes.keys.sorted()) {
 	}
 	return result;
 }
-#include <asm/siginfo.h>
+#include <asm/os/siginfo.h>
 #include <asm/os/signal.h>
 #include <bits/siginfo-struct.h>
 /* Transform the given exception into a posix signal.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12ba8778 */
+/* HASH CRC-32:0x859b9a04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,108 +30,161 @@
 
 #include <features.h>
 
-#include <bits/timex.h>
+#include <asm/os/timex.h>
+#include <bits/os/timex.h>
+#include <bits/crt/ntptimeval.h>
 #include <bits/types.h>
 #include <sys/time.h>
 
-	/* Documentation taken from /usr/include/i386-linux-gnu/sys/timex.h */
-/* Copyright (C) 1995-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+/* Mode code flags (for `struct timex::mode') */
+#if !defined(ADJ_OFFSET) && defined(__ADJ_OFFSET)
+#define ADJ_OFFSET            __ADJ_OFFSET            /* ??? */
+#endif /* !ADJ_OFFSET && __ADJ_OFFSET */
+#if !defined(ADJ_FREQUENCY) && defined(__ADJ_FREQUENCY)
+#define ADJ_FREQUENCY         __ADJ_FREQUENCY         /* ??? */
+#endif /* !ADJ_FREQUENCY && __ADJ_FREQUENCY */
+#if !defined(ADJ_MAXERROR) && defined(__ADJ_MAXERROR)
+#define ADJ_MAXERROR          __ADJ_MAXERROR          /* ??? */
+#endif /* !ADJ_MAXERROR && __ADJ_MAXERROR */
+#if !defined(ADJ_ESTERROR) && defined(__ADJ_ESTERROR)
+#define ADJ_ESTERROR          __ADJ_ESTERROR          /* ??? */
+#endif /* !ADJ_ESTERROR && __ADJ_ESTERROR */
+#if !defined(ADJ_STATUS) && defined(__ADJ_STATUS)
+#define ADJ_STATUS            __ADJ_STATUS            /* ??? */
+#endif /* !ADJ_STATUS && __ADJ_STATUS */
+#if !defined(ADJ_TIMECONST) && defined(__ADJ_TIMECONST)
+#define ADJ_TIMECONST         __ADJ_TIMECONST         /* ??? */
+#endif /* !ADJ_TIMECONST && __ADJ_TIMECONST */
+#if !defined(ADJ_TAI) && defined(__ADJ_TAI)
+#define ADJ_TAI               __ADJ_TAI               /* ??? */
+#endif /* !ADJ_TAI && __ADJ_TAI */
+#if !defined(ADJ_SETOFFSET) && defined(__ADJ_SETOFFSET)
+#define ADJ_SETOFFSET         __ADJ_SETOFFSET         /* ??? */
+#endif /* !ADJ_SETOFFSET && __ADJ_SETOFFSET */
+#if !defined(ADJ_MICRO) && defined(__ADJ_MICRO)
+#define ADJ_MICRO             __ADJ_MICRO             /* ??? */
+#endif /* !ADJ_MICRO && __ADJ_MICRO */
+#if !defined(ADJ_NANO) && defined(__ADJ_NANO)
+#define ADJ_NANO              __ADJ_NANO              /* ??? */
+#endif /* !ADJ_NANO && __ADJ_NANO */
+#if !defined(ADJ_TICK) && defined(__ADJ_TICK)
+#define ADJ_TICK              __ADJ_TICK              /* ??? */
+#endif /* !ADJ_TICK && __ADJ_TICK */
+#if !defined(ADJ_OFFSET_SINGLESHOT) && defined(__ADJ_OFFSET_SINGLESHOT)
+#define ADJ_OFFSET_SINGLESHOT __ADJ_OFFSET_SINGLESHOT /* ??? */
+#endif /* !ADJ_OFFSET_SINGLESHOT && __ADJ_OFFSET_SINGLESHOT */
+#if !defined(ADJ_OFFSET_SS_READ) && defined(__ADJ_OFFSET_SS_READ)
+#define ADJ_OFFSET_SS_READ    __ADJ_OFFSET_SS_READ    /* ??? */
+#endif /* !ADJ_OFFSET_SS_READ && __ADJ_OFFSET_SS_READ */
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
+/* Status code flags (for `struct timex::status') */
+#if !defined(STA_PLL) && defined(__STA_PLL)
+#define STA_PLL       __STA_PLL       /* ??? */
+#endif /* !STA_PLL && __STA_PLL */
+#if !defined(STA_PPSFREQ) && defined(__STA_PPSFREQ)
+#define STA_PPSFREQ   __STA_PPSFREQ   /* ??? */
+#endif /* !STA_PPSFREQ && __STA_PPSFREQ */
+#if !defined(STA_PPSTIME) && defined(__STA_PPSTIME)
+#define STA_PPSTIME   __STA_PPSTIME   /* ??? */
+#endif /* !STA_PPSTIME && __STA_PPSTIME */
+#if !defined(STA_FLL) && defined(__STA_FLL)
+#define STA_FLL       __STA_FLL       /* ??? */
+#endif /* !STA_FLL && __STA_FLL */
+#if !defined(STA_INS) && defined(__STA_INS)
+#define STA_INS       __STA_INS       /* ??? */
+#endif /* !STA_INS && __STA_INS */
+#if !defined(STA_DEL) && defined(__STA_DEL)
+#define STA_DEL       __STA_DEL       /* ??? */
+#endif /* !STA_DEL && __STA_DEL */
+#if !defined(STA_UNSYNC) && defined(__STA_UNSYNC)
+#define STA_UNSYNC    __STA_UNSYNC    /* ??? */
+#endif /* !STA_UNSYNC && __STA_UNSYNC */
+#if !defined(STA_FREQHOLD) && defined(__STA_FREQHOLD)
+#define STA_FREQHOLD  __STA_FREQHOLD  /* ??? */
+#endif /* !STA_FREQHOLD && __STA_FREQHOLD */
+#if !defined(STA_PPSSIGNAL) && defined(__STA_PPSSIGNAL)
+#define STA_PPSSIGNAL __STA_PPSSIGNAL /* ??? */
+#endif /* !STA_PPSSIGNAL && __STA_PPSSIGNAL */
+#if !defined(STA_PPSJITTER) && defined(__STA_PPSJITTER)
+#define STA_PPSJITTER __STA_PPSJITTER /* ??? */
+#endif /* !STA_PPSJITTER && __STA_PPSJITTER */
+#if !defined(STA_PPSWANDER) && defined(__STA_PPSWANDER)
+#define STA_PPSWANDER __STA_PPSWANDER /* ??? */
+#endif /* !STA_PPSWANDER && __STA_PPSWANDER */
+#if !defined(STA_PPSERROR) && defined(__STA_PPSERROR)
+#define STA_PPSERROR  __STA_PPSERROR  /* ??? */
+#endif /* !STA_PPSERROR && __STA_PPSERROR */
+#if !defined(STA_CLOCKERR) && defined(__STA_CLOCKERR)
+#define STA_CLOCKERR  __STA_CLOCKERR  /* ??? */
+#endif /* !STA_CLOCKERR && __STA_CLOCKERR */
+#if !defined(STA_NANO) && defined(__STA_NANO)
+#define STA_NANO      __STA_NANO      /* ??? */
+#endif /* !STA_NANO && __STA_NANO */
+#if !defined(STA_MODE) && defined(__STA_MODE)
+#define STA_MODE      __STA_MODE      /* ??? */
+#endif /* !STA_MODE && __STA_MODE */
+#if !defined(STA_CLK) && defined(__STA_CLK)
+#define STA_CLK       __STA_CLK       /* ??? */
+#endif /* !STA_CLK && __STA_CLK */
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+/* Read-only bits */
+#if !defined(STA_RONLY) && defined(__STA_RONLY)
+#define STA_RONLY __STA_RONLY
+#endif /* !STA_RONLY && __STA_RONLY */
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+/* Old alias names */
+#if !defined(MOD_OFFSET) && defined(__ADJ_OFFSET)
+#define MOD_OFFSET    __ADJ_OFFSET
+#endif /* !MOD_OFFSET && __ADJ_OFFSET */
+#if !defined(MOD_FREQUENCY) && defined(__ADJ_FREQUENCY)
+#define MOD_FREQUENCY __ADJ_FREQUENCY
+#endif /* !MOD_FREQUENCY && __ADJ_FREQUENCY */
+#if !defined(MOD_MAXERROR) && defined(__ADJ_MAXERROR)
+#define MOD_MAXERROR  __ADJ_MAXERROR
+#endif /* !MOD_MAXERROR && __ADJ_MAXERROR */
+#if !defined(MOD_ESTERROR) && defined(__ADJ_ESTERROR)
+#define MOD_ESTERROR  __ADJ_ESTERROR
+#endif /* !MOD_ESTERROR && __ADJ_ESTERROR */
+#if !defined(MOD_STATUS) && defined(__ADJ_STATUS)
+#define MOD_STATUS    __ADJ_STATUS
+#endif /* !MOD_STATUS && __ADJ_STATUS */
+#if !defined(MOD_TIMECONST) && defined(__ADJ_TIMECONST)
+#define MOD_TIMECONST __ADJ_TIMECONST
+#endif /* !MOD_TIMECONST && __ADJ_TIMECONST */
+#if !defined(MOD_CLKB) && defined(__ADJ_TICK)
+#define MOD_CLKB      __ADJ_TICK
+#endif /* !MOD_CLKB && __ADJ_TICK */
+#if !defined(MOD_CLKA) && defined(__ADJ_OFFSET_SINGLESHOT)
+#define MOD_CLKA      __ADJ_OFFSET_SINGLESHOT
+#endif /* !MOD_CLKA && __ADJ_OFFSET_SINGLESHOT */
+#if !defined(MOD_TAI) && defined(__ADJ_TAI)
+#define MOD_TAI       __ADJ_TAI
+#endif /* !MOD_TAI && __ADJ_TAI */
+#if !defined(MOD_MICRO) && defined(__ADJ_MICRO)
+#define MOD_MICRO     __ADJ_MICRO
+#endif /* !MOD_MICRO && __ADJ_MICRO */
+#if !defined(MOD_NANO) && defined(__ADJ_NANO)
+#define MOD_NANO      __ADJ_NANO
+#endif /* !MOD_NANO && __ADJ_NANO */
 
-#define NTP_API  4 /* NTP API version */
 
-/* Clock states (time_state) */
-#define TIME_OK     0          /* clock synchronized, no leap second */
-#define TIME_INS    1          /* insert leap second */
-#define TIME_DEL    2          /* delete leap second */
-#define TIME_OOP    3          /* leap second in progress */
-#define TIME_WAIT   4          /* leap second has occurred */
-#define TIME_ERROR  5          /* clock not synchronized */
-#define TIME_BAD    TIME_ERROR /* bw compat */
+/* What about these? Are these asm/os or asm/crt? */
+#define NTP_API 4 /* ??? */
 
-/* Maximum time constant of the PLL.  */
-#define MAXTC       6
+#define TIME_OK    0          /* ??? */
+#define TIME_INS   1          /* ??? */
+#define TIME_DEL   2          /* ??? */
+#define TIME_OOP   3          /* ??? */
+#define TIME_WAIT  4          /* ??? */
+#define TIME_ERROR 5          /* ??? */
+#define TIME_BAD   TIME_ERROR /* ??? */
+
+#define MAXTC 6 /* ??? */
 
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
-
-#if __TM_SIZEOF(TIME) <= 4
-#define __ntptimeval64   __ntptimeval_alt
-#define __ntptimeval32   ntptimeval
-#else /* __TM_SIZEOF(TIME) <= 4 */
-#define __ntptimeval64   ntptimeval
-#define __ntptimeval32   __ntptimeval_alt
-#endif /* __TM_SIZEOF(TIME) > 4 */
-
-#ifdef __USE_TIME64
-#if __TM_SIZEOF(TIME) <= 4
-#define __ntptimeval_alt ntptimeval64
-#else /* __TM_SIZEOF(TIME) <= 4 */
-#define ntptimeval64     ntptimeval
-#endif /* __TM_SIZEOF(TIME) > 4 */
-#endif /* __USE_TIME64 */
-
-#ifdef __USE_KOS
-#if __TM_SIZEOF(TIME) <= 4
-#define ntptimeval32 ntptimeval
-#else /* __TM_SIZEOF(TIME) <= 4 */
-#define ntptimeval32 __ntptimeval_alt
-#endif /* __TM_SIZEOF(TIME) > 4 */
-#endif /* __USE_KOS */
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("time")
-#pragma push_macro("maxerror")
-#pragma push_macro("esterror")
-#pragma push_macro("tai")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef time
-#undef maxerror
-#undef esterror
-#undef tai
-/* TODO: Move these into a <bits/...> header! */
-struct ntptimeval {
-	struct timeval       time;            /* current time (ro) */
-	__LONGPTR_TYPE__     maxerror;        /* maximum error (us) (ro) */
-	__LONGPTR_TYPE__     esterror;        /* estimated error (us) (ro) */
-	__LONGPTR_TYPE__     tai;             /* TAI offset (ro) */
-	__LONGPTR_TYPE__   __glibc_reserved1; /* ... */
-	__LONGPTR_TYPE__   __glibc_reserved2; /* ... */
-	__LONGPTR_TYPE__   __glibc_reserved3; /* ... */
-	__LONGPTR_TYPE__   __glibc_reserved4; /* ... */
-};
-struct __ntptimeval_alt {
-	struct __timeval_alt time;            /* current time (ro) */
-	__LONGPTR_TYPE__     maxerror;        /* maximum error (us) (ro) */
-	__LONGPTR_TYPE__     esterror;        /* estimated error (us) (ro) */
-	__LONGPTR_TYPE__     tai;             /* TAI offset (ro) */
-	__LONGPTR_TYPE__   __glibc_reserved1; /* ... */
-	__LONGPTR_TYPE__   __glibc_reserved2; /* ... */
-	__LONGPTR_TYPE__   __glibc_reserved3; /* ... */
-	__LONGPTR_TYPE__   __glibc_reserved4; /* ... */
-};
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("tai")
-#pragma pop_macro("esterror")
-#pragma pop_macro("maxerror")
-#pragma pop_macro("time")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #if defined(__CRT_HAVE_adjtimex64) && defined(__USE_TIME_BITS64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__adjtimex,(struct timex *__restrict __ntx),adjtimex64,(__ntx))

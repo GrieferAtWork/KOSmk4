@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x654e5682 */
+/* HASH CRC-32:0x8cb9e434 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,7 +107,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_lfutex64_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <kos/bits/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')

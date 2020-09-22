@@ -34,7 +34,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/sigval.h> /* union sigval */
+#include <bits/os/sigval.h> /* union sigval */
 #include <bits/types.h>
 
 #define __SIGEV_MAX_SIZE    64

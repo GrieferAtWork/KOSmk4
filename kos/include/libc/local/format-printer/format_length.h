@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x611e803b */
+/* HASH CRC-32:0x12f8ec57 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_format_length_defined
 #define __local_format_length_defined 1
 #include <__crt.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Always re-return `datalen' and ignore all other arguments */

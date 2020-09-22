@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf601f8c */
+/* HASH CRC-32:0xa40524a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,24 +24,25 @@
 #include <__stdinc.h>
 #include <kos/asm/syscall.h>
 
-#include <bits/iovec-struct32.h>
-#include <bits/itimerspec32.h>
-#include <bits/itimerval32.h>
-#include <bits/mmsghdr-struct32.h>
-#include <bits/msghdr-struct32.h>
-#include <bits/pollfd.h>
+#include <bits/os/kos/iovec32.h>
+#include <bits/os/kos/itimerspec32.h>
+#include <bits/os/kos/itimerval32.h>
+#include <bits/os/kos/mmsghdr32.h>
+#include <bits/os/kos/msghdr32.h>
+#include <bits/os/kos/sigstack32.h>
+#include <bits/os/kos/timeb32.h>
+#include <bits/os/kos/timespec32.h>
+#include <bits/os/kos/timeval32.h>
+#include <bits/os/kos/tms32.h>
+#include <bits/os/kos/utimbuf32.h>
+#include <bits/os/pollfd.h>
 #include <bits/rusage-struct32.h>
 #include <bits/sigaction-struct.h>
 #include <bits/sigaction-struct32.h>
 #include <bits/siginfo-struct32.h>
-#include <bits/sigstack32.h>
 #include <bits/stat-kos32.h>
 #include <bits/statfs32.h>
-#include <bits/timeb32.h>
-#include <bits/timespec32.h>
-#include <bits/timeval32.h>
 #include <bits/types.h>
-#include <bits/utimbuf32.h>
 #include <elf.h>
 #include <hybrid/__pointer.h>
 #include <hybrid/typecore.h>
@@ -119,6 +120,7 @@ struct __timespecx32;
 struct __timespecx32_64;
 struct __timevalx32;
 struct __timevalx32_64;
+struct __tmsx32;
 struct __utimbufx32;
 struct __utimbufx32_64;
 struct debugtrap_reason32;
@@ -150,7 +152,6 @@ struct sockaddr;
 struct sysinfo;
 struct termios;
 struct timezone;
-struct tms;
 struct ucpustate32;
 struct userprocmask;
 struct ustat;
@@ -1837,10 +1838,10 @@ __CDECLARE_SC(,__errno_t,sched_getparam,(__pid_t __pid, struct sched_param *__pa
 __CDECLARE_SC(,__syscall_slong_t,sched_getscheduler,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_SC(sched_getscheduler) */
 #if __CRT_HAVE_SC(sched_rr_get_interval)
-__CDECLARE_SC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct __timespecx32 *__tms),(__pid,__tms))
+__CDECLARE_SC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct __timespecx32 *__ts),(__pid,__ts))
 #endif /* __CRT_HAVE_SC(sched_rr_get_interval) */
 #if __CRT_HAVE_SC(sched_rr_get_interval_time64)
-__CDECLARE_SC(,__errno_t,sched_rr_get_interval_time64,(__pid_t __pid, struct __timespecx32_64 *__tms),(__pid,__tms))
+__CDECLARE_SC(,__errno_t,sched_rr_get_interval_time64,(__pid_t __pid, struct __timespecx32_64 *__ts),(__pid,__ts))
 #endif /* __CRT_HAVE_SC(sched_rr_get_interval_time64) */
 #if __CRT_HAVE_SC(sched_setaffinity)
 __CDECLARE_SC(,__errno_t,sched_setaffinity,(__pid_t __pid, __size_t __cpusetsize, struct __cpu_set_struct const *__cpuset),(__pid,__cpusetsize,__cpuset))
@@ -2308,7 +2309,7 @@ __CDECLARE_SC(,__errno_t,timerfd_settime,(__fd_t __timerfd, __syscall_ulong_t __
 __CDECLARE_SC(,__errno_t,timerfd_settime64,(__fd_t __timerfd, __syscall_ulong_t __flags, struct __itimerspecx32_64 const *__utmr, struct __itimerspecx32_64 *__otmr),(__timerfd,__flags,__utmr,__otmr))
 #endif /* __CRT_HAVE_SC(timerfd_settime64) */
 #if __CRT_HAVE_SC(times)
-__CDECLARE_SC(,__clock_t,times,(struct tms *__buf),(__buf))
+__CDECLARE_SC(,__clock_t,times,(struct __tmsx32 *__buf),(__buf))
 #endif /* __CRT_HAVE_SC(times) */
 #if __CRT_HAVE_SC(tkill)
 __CDECLARE_SC(,__errno_t,tkill,(__pid_t __tid, __signo_t __signo),(__tid,__signo))
@@ -4185,10 +4186,10 @@ __CDECLARE_XSC(,__errno_t,sched_getparam,(__pid_t __pid, struct sched_param *__p
 __CDECLARE_XSC(,__syscall_slong_t,sched_getscheduler,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_XSC(sched_getscheduler) */
 #if __CRT_HAVE_XSC(sched_rr_get_interval)
-__CDECLARE_XSC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct __timespecx32 *__tms),(__pid,__tms))
+__CDECLARE_XSC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct __timespecx32 *__ts),(__pid,__ts))
 #endif /* __CRT_HAVE_XSC(sched_rr_get_interval) */
 #if __CRT_HAVE_XSC(sched_rr_get_interval_time64)
-__CDECLARE_XSC(,__errno_t,sched_rr_get_interval_time64,(__pid_t __pid, struct __timespecx32_64 *__tms),(__pid,__tms))
+__CDECLARE_XSC(,__errno_t,sched_rr_get_interval_time64,(__pid_t __pid, struct __timespecx32_64 *__ts),(__pid,__ts))
 #endif /* __CRT_HAVE_XSC(sched_rr_get_interval_time64) */
 #if __CRT_HAVE_XSC(sched_setaffinity)
 __CDECLARE_XSC(,__errno_t,sched_setaffinity,(__pid_t __pid, __size_t __cpusetsize, struct __cpu_set_struct const *__cpuset),(__pid,__cpusetsize,__cpuset))
@@ -4647,7 +4648,7 @@ __CDECLARE_XSC(,__errno_t,timerfd_settime,(__fd_t __timerfd, __syscall_ulong_t _
 __CDECLARE_XSC(,__errno_t,timerfd_settime64,(__fd_t __timerfd, __syscall_ulong_t __flags, struct __itimerspecx32_64 const *__utmr, struct __itimerspecx32_64 *__otmr),(__timerfd,__flags,__utmr,__otmr))
 #endif /* __CRT_HAVE_XSC(timerfd_settime64) */
 #if __CRT_HAVE_XSC(times)
-__CDECLARE_XSC(,__clock_t,times,(struct tms *__buf),(__buf))
+__CDECLARE_XSC(,__clock_t,times,(struct __tmsx32 *__buf),(__buf))
 #endif /* __CRT_HAVE_XSC(times) */
 #if __CRT_HAVE_XSC(tkill)
 __CDECLARE_XSC(,__errno_t,tkill,(__pid_t __tid, __signo_t __signo),(__tid,__signo))

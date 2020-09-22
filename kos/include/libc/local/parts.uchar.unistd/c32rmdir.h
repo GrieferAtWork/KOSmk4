@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea1e3a04 */
+/* HASH CRC-32:0xd2b3d9ad */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c32rmdir_defined
 #define __local_c32rmdir_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wunlinkat) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)) || defined(__CRT_HAVE_KOS$wunlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c32unlinkat from parts.uchar.unistd */

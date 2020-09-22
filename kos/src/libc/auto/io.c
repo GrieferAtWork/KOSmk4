@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d8444e9 */
+/* HASH CRC-32:0xf9704ae2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
 	(void)pipesize;
 	return libc_pipe2(pipedes, textmode);
 }
-#include <asm/stdio.h>
+#include <asm/os/stdio.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int64_t
 NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd) {
 	int64_t oldpos, result;
@@ -127,7 +127,7 @@ NOTHROW_NCX(LIBCCALL libc__filelength)(fd_t fd) {
 		libc_lseek(fd, oldpos, SEEK_SET);
 	return result;
 }
-#include <asm/stdio.h>
+#include <asm/os/stdio.h>
 INTERN ATTR_SECTION(".text.crt.dos.fs.utility") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__eof)(fd_t fd) {
 	int64_t oldpos, endpos;

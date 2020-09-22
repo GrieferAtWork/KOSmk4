@@ -26,7 +26,7 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <netinet/ip.h>
 #include <network/ethernet.h>
 

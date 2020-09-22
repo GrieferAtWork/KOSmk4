@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27f70123 */
+/* HASH CRC-32:0x635ee142 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,7 +120,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_lfutexlock64_defined */
 __NAMESPACE_LOCAL_END
 #include <kos/bits/futex.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait

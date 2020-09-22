@@ -40,9 +40,9 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <bits/mcontext-linux64.h> /* struct __mcontext_linux64 */
-#include <bits/sigset.h>           /* struct __sigset_struct */
-#include <bits/sigstack64.h>       /* struct __sigaltstackx64 */
+#include <bits/mcontext-linux64.h>  /* struct __mcontext_linux64 */
+#include <bits/os/kos/sigstack64.h> /* struct __sigaltstackx64 */
+#include <bits/os/sigset.h>         /* struct __sigset_struct */
 
 
 #if defined(__linux__) && defined(__x86_64__)

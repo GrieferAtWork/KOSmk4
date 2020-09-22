@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 #include <bits/types.h>
 
 #define __OFFSET_USERPROCMASK_MYTID   0

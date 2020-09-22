@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0052b01 */
+/* HASH CRC-32:0x58ad664 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/acct.h>
+#include <bits/os/acct.h>
 #include <bits/types.h>
 
 #ifdef __USE_GLIBC

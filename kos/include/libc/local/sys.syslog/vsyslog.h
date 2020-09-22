@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b28c193 */
+/* HASH CRC-32:0xef9423a4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_format_vprintf
 __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generic printf implementation
@@ -219,7 +219,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_syslog_printer_defined
 #define __local___localdep_syslog_printer_defined 1
 __NAMESPACE_LOCAL_END
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Helper functions for printing to the system log */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__FORMATPRINTER_CC,__localdep_syslog_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),syslog_printer,(__arg,__data,__datalen))

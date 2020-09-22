@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 
 #include <kos/anno.h>
-#include <bits/timeval.h> /* struct __timeval32 */
+#include <bits/os/timeval.h> /* struct __timeval32 */
 
 #ifdef __CC__
 __DECL_BEGIN

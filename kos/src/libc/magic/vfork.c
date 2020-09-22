@@ -21,7 +21,7 @@
 %{
 #include <features.h>
 
-#include <asm/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
+#include <asm/os/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
 #include <bits/types.h>
 
 #ifdef __CC__

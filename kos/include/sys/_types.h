@@ -130,7 +130,7 @@ typedef __ssize_t _ssize_t;
 
 #ifndef __machine_mbstate_t_defined
 #define __machine_mbstate_t_defined 1
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 typedef __mbstate_t _mbstate_t;
 #endif /* !__machine_mbstate_t_defined */
 

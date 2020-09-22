@@ -22,7 +22,7 @@
 
 %{
 #include <features.h>
-#include <bits/utsname.h>
+#include <bits/os/kos/utsname.h>
 
 __SYSDECL_BEGIN
 
@@ -36,7 +36,7 @@ __SYSDECL_BEGIN
 }
 
 @@Put information about the system in NAME
-[[decl_include("<bits/utsname.h>")]]
+[[decl_include("<bits/os/kos/utsname.h>")]]
 int uname([[nonnull]] struct utsname *name);
 
 %{

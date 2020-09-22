@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa927b60f */
+/* HASH CRC-32:0x196ac7d1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -267,7 +267,7 @@
 #define SYS_sched_yield            __NR_sched_yield            /* errno_t sched_yield(void) */
 #define SYS_sched_get_priority_max __NR_sched_get_priority_max /* syscall_slong_t sched_get_priority_max(syscall_ulong_t algorithm) */
 #define SYS_sched_get_priority_min __NR_sched_get_priority_min /* syscall_slong_t sched_get_priority_min(syscall_ulong_t algorithm) */
-#define SYS_sched_rr_get_interval  __NR_sched_rr_get_interval  /* errno_t sched_rr_get_interval(pid_t pid, struct timespec *tms) */
+#define SYS_sched_rr_get_interval  __NR_sched_rr_get_interval  /* errno_t sched_rr_get_interval(pid_t pid, struct timespec *ts) */
 #define SYS_restart_syscall        __NR_restart_syscall        /* errno_t restart_syscall(void) */
 #define SYS_kill                   __NR_kill                   /* errno_t kill(pid_t pid, signo_t signo) */
 #define SYS_tkill                  __NR_tkill                  /* errno_t tkill(pid_t tid, signo_t signo) */

@@ -21,8 +21,10 @@
 #define _LIBCMDLINE_ENCODE_H 1
 
 #include "api.h"
+/**/
+
+#include <bits/crt/format-printer.h>
 #include <bits/types.h>
-#include <bits/format-printer.h>
 
 #ifdef __CC__
 __DECL_BEGIN

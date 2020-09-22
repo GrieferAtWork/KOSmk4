@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dc03169 */
+/* HASH CRC-32:0xbe3ce274 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_mbrlen_defined 1
 #ifdef __CRT_HAVE_mbrlen
 __NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),mbrlen,(__str,__maxlen,__mbs))
 #elif defined(__CRT_HAVE___mbrlen)
 __NAMESPACE_LOCAL_END
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbrlen,(char const *__restrict __str, __SIZE_TYPE__ __maxlen, __mbstate_t *__mbs),__mbrlen,(__str,__maxlen,__mbs))
 #else /* ... */

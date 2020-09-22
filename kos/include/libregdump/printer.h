@@ -21,8 +21,10 @@
 #define _LIBREGDUMP_PRINTER_H 1
 
 #include "api.h"
+/**/
+
+#include <bits/crt/format-printer.h>
 #include <bits/types.h>
-#include <bits/format-printer.h>
 
 /* We re-use (some of) libdisasm's formatting constants to
  * describe how registers and/or values should be highlighted. */

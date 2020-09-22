@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7dd1bd2 */
+/* HASH CRC-32:0x7fc9e029 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +27,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gettimeofday32_defined
 #define __local___localdep_gettimeofday32_defined 1
 #ifdef __CRT_HAVE_gettimeofday
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday)
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__gettimeofday,(__tv,__tz))
 #else /* ... */
 #undef __local___localdep_gettimeofday32_defined
@@ -48,38 +38,18 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(str
 #ifndef __local___localdep_gettimeofday64_defined
 #define __local___localdep_gettimeofday64_defined 1
 #ifdef __CRT_HAVE_gettimeofday64
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),gettimeofday64,(__tv,__tz))
 #elif defined(__CRT_HAVE_gettimeofday) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday64,(struct __timeval64 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/gettimeofday64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 #define __localdep_gettimeofday64 __LIBC_LOCAL_NAME(gettimeofday64)
 #else /* ... */
 #undef __local___localdep_gettimeofday64_defined
 #endif /* !... */
 #endif /* !__local___localdep_gettimeofday64_defined */
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 __LOCAL_LIBC(gettimeofday) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday))(struct timeval *__restrict __tv, void * __tz) {
 #if defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)

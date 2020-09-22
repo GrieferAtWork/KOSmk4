@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1c9699b */
+/* HASH CRC-32:0x82c4a017 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@
 
 #ifdef __USE_OLD_DOS
 #include <bits/types.h>
-#include <asm/stdio.h> /* __SEEK_SET, __SEEK_... */
+#include <asm/os/stdio.h> /* __SEEK_SET, __SEEK_... */
 #endif /* __USE_OLD_DOS */
 
 #if defined(__i386__) || defined(__x86_64__)
@@ -111,7 +111,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
 #else /* ... */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)

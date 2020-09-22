@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9ee8edf */
+/* HASH CRC-32:0x19fa6f79 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,16 +26,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: adjtime32 from sys.time */
 #ifndef __local___localdep_adjtime32_defined
 #define __local___localdep_adjtime32_defined 1
-/* Adjust the current time of day by the amount in DELTA.
- * If OLDDELTA is not NULL, it is filled in with the amount of time
- * adjustment remaining to be done from the last `adjtime' call.
- * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_adjtime32,(struct __timeval32 const *__delta, struct __timeval32 *__olddelta),adjtime,(__delta,__olddelta))
 #endif /* !__local___localdep_adjtime32_defined */
-/* Adjust the current time of day by the amount in DELTA.
- * If OLDDELTA is not NULL, it is filled in with the amount of time
- * adjustment remaining to be done from the last `adjtime' call.
- * This call is restricted to the super-user */
 __LOCAL_LIBC(adjtime64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtime64))(struct __timeval64 const *__delta, struct __timeval64 *__olddelta) {
 	int __result;

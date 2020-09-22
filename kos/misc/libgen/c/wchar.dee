@@ -42,7 +42,7 @@ global wcharReplacementEscapes: {string: (string, string)} = Dict({
 
 @@Replacements for wchar-related headers
 global wcharReplacementHeaders: {string: (string, string)} = Dict({
-	"<bits/wformat-printer.h>"       : ("<bits/uformat-printer.h>",       "<bits/uformat-printer.h>"),
+	"<bits/crt/wformat-printer.h>"   : ("<bits/crt/uformat-printer.h>",   "<bits/crt/uformat-printer.h>"),
 	"<parts/wchar/format-printer.h>" : ("<parts/uchar/format-printer.h>", "<parts/uchar/format-printer.h>"),
 	"<parts/wchar/process.h>"        : ("<parts/uchar/process.h>",        "<parts/uchar/process.h>"),
 	"<parts/wchar/stdio.h>"          : ("<parts/uchar/stdio.h>",          "<parts/uchar/stdio.h>"),

@@ -46,8 +46,8 @@
 #include <hybrid/typecore.h>
 
 #include <asm/crt/confname.h>
-#include <asm/stdio.h>
-#include <asm/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
+#include <asm/os/stdio.h>
+#include <asm/os/vfork.h> /* os-specific vfork(2) caveats: __ARCH_HAVE_*_VFORK */
 #include <bits/posix_opt.h>
 #include <bits/crt/sys_errlist.h>
 #include <bits/types.h>
@@ -67,7 +67,7 @@
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_POSIX))
-#include <asm/fcntl.h> /* __F_ULOCK, __F_LOCK, __F_TLOCK, __F_TEST */
+#include <asm/os/fcntl.h> /* __F_ULOCK, __F_LOCK, __F_TLOCK, __F_TEST */
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
 
 #ifdef __USE_SOLARIS
@@ -684,7 +684,7 @@ char *getlogin();
 @@>> chown(2)
 @@Change the ownership of a given `FILE' to `GROUP:OWNER'
 [[cp, decl_include("<bits/types.h>")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(fchownat))]]
 int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__AT_FDCWD, file, owner, group, 0);
@@ -697,7 +697,7 @@ int chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 @@return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `PATH'
 @@return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option
 [[cp, section(".text.crt{|.dos}.fs.property"), decl_include("<features.h>")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires($has_function(fpathconf) && $has_function(open) && defined(__O_RDONLY))]]
 $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
 	fd_t fd;
@@ -714,7 +714,7 @@ $longptr_t pathconf([[nonnull]] char const *path, __STDC_INT_AS_UINT_T name) {
 
 @@>> link(2)
 @@Create a hard link from `FROM', leading to `TO'
-[[cp, userimpl, requires_include("<asm/fcntl.h>")]]
+[[cp, userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(linkat))]]
 int link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
@@ -869,7 +869,7 @@ int close($fd_t fd);
 @@Test for access to the specified file `FILE', testing for `TYPE'
 [[cp, guard, wunused, decl_include("<features.h>")]]
 [[export_alias("_access"), section(".text.crt{|.dos}.fs.property")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(faccessat))]]
 int access([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 	return faccessat(__AT_FDCWD, file, type, 0);
@@ -894,7 +894,7 @@ char *getcwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 @@>> unlink(2)
 @@Remove a file, symbolic link, device or FIFO referred to by `FILE'
 [[cp, guard, export_alias("_unlink")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
 int unlink([[nonnull]] char const *file) {
 	return unlinkat(__AT_FDCWD, file, 0);
@@ -904,7 +904,7 @@ int unlink([[nonnull]] char const *file) {
 @@>> rmdir(2)
 @@Remove a directory referred to by `PATH'
 [[cp, guard, export_alias("_rmdir")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(unlinkat))]]
 int rmdir([[nonnull]] char const *path) {
 	return unlinkat(__AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
@@ -920,7 +920,7 @@ int rmdir([[nonnull]] char const *path) {
 [[decl_include("<features.h>")]]
 [[cp, wunused, export_alias("eaccess")]]
 [[if(defined(__CRT_DOS)), alias("_access")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && defined(__AT_EACCESS) && $has_function(faccessat))]]
 int euidaccess([[nonnull]] char const *file, __STDC_INT_AS_UINT_T type) {
 	return faccessat(__AT_FDCWD, file, type, __AT_EACCESS);
@@ -1050,7 +1050,7 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 [[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pread64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pread")]]
-[[section(".text.crt{|.dos}.io.read"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
+[[section(".text.crt{|.dos}.io.read"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread64) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pread64)@@
@@ -1076,7 +1076,7 @@ ssize_t pread($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSE
 [[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("pwrite")]]
-[[section(".text.crt{|.dos}.io.write"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
+[[section(".text.crt{|.dos}.io.write"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite64) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_SET) && defined(__SEEK_CUR)))]]
 ssize_t pwrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET offset) {
 @@pp_if $has_function(pwrite64)@@
@@ -1143,7 +1143,7 @@ ssize_t pwrite32($fd_t fd, [[inp(bufsize)]] void const *buf,
 @@Read data from a file at a specific offset
 [[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[off64_variant_of(pread), section(".text.crt{|.dos}.io.large.read")]]
-[[export_alias("__pread64"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
+[[export_alias("__pread64"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pread32) || ($has_function(lseek) && $has_function(read) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(pread32)@@
@@ -1179,7 +1179,7 @@ ssize_t pread64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, __PIO_OFF
 @@Write data to a file at a specific offset
 [[cp, decl_include("<features.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[off64_variant_of(pwrite), section(".text.crt{|.dos}.io.large.write")]]
-[[export_alias("__pwrite64"), requires_include("<asm/stdio.h>"), decl_include("<bits/types.h>")]]
+[[export_alias("__pwrite64"), requires_include("<asm/os/stdio.h>"), decl_include("<bits/types.h>")]]
 [[userimpl, requires($has_function(pwrite32) || ($has_function(lseek) && $has_function(write) && defined(__SEEK_CUR) && defined(__SEEK_SET)))]]
 ssize_t pwrite64($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, __PIO_OFFSET64 offset) {
 @@pp_if $has_function(pwrite32)@@
@@ -1459,7 +1459,7 @@ $pid_t getsid($pid_t pid);
 @@Change the ownership of a given `FILE' to `GROUP:OWNER',
 @@but don't reference it if that file is a symbolic link
 [[cp, section(".text.crt{|.dos}.fs.modify"), decl_include("<bits/types.h>")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(fchownat))]]
 int lchown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	return fchownat(__AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
@@ -1724,7 +1724,7 @@ int ttyslot();
 @@text, at the filesystem location referred to by `TARGET_PATH'.
 @@Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)'
 [[cp, section(".text.crt{|.dos}.fs.modify")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(symlinkat))]]
 int symlink([[nonnull]] char const *link_text,
             [[nonnull]] char const *target_path) {
@@ -1743,7 +1743,7 @@ int symlink([[nonnull]] char const *link_text,
 @@         make use of the buffer in its entirety.
 @@When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'
 [[cp, section(".text.crt{|.dos}.fs.property")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(readlinkat))]]
 ssize_t readlink([[nonnull]] char const *path,
                  [[outp(buflen)]] char *buf,
@@ -2074,7 +2074,7 @@ $longptr_t sysconf(__STDC_INT_AS_UINT_T name);
 }
 
 @@Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)')
-[[guard, requires_include("<asm/fcntl.h>")]]
+[[guard, requires_include("<asm/os/fcntl.h>")]]
 [[section(".text.crt{|.dos}.bsd.io.access")]]
 [[requires($has_function(fcntl) && defined(__F_CLOSEM))]]
 void closefrom($fd_t lowfd) {
@@ -2109,7 +2109,7 @@ void closefrom($fd_t lowfd) {
 @@No special permissions are required to use this function, since a malicious application
 @@could achieve the same behavior by use of `*at' system calls, using `fd' as `dfd' argument.
 [[requires($has_function(dup2) && defined(__AT_FDROOT))]]
-[[requires_include("<asm/fcntl.h>"), impl_include("<asm/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>"), impl_include("<asm/os/fcntl.h>")]]
 int fchroot($fd_t fd) {
 	fd_t result;
 	result = dup2(fd, __AT_FDROOT);
@@ -2128,7 +2128,7 @@ int fchroot($fd_t fd) {
 @@the function will set errno=ERANGE and return -1
 @@@return: * : Used buffer size (possibly including a NUL-byte, but maybe not)
 @@@return: -1: Error. (s.a. `errno')
-[[requires_include("<asm/fcntl.h>")]]
+[[requires_include("<asm/os/fcntl.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[requires($has_function(frealpathat) && defined(__AT_FDCWD))]]
 __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
@@ -2151,9 +2151,9 @@ __STDC_INT_AS_SSIZE_T resolvepath([[nonnull]] char const *filename,
 [[wunused, guard, no_crt_self_import, decl_include("<features.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("tell64", "_telli64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("tell", "_tell")]]
-[[requires_include("<asm/stdio.h>")]]
+[[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(lseek) && defined(__SEEK_CUR))]]
-[[impl_include("<asm/stdio.h>"), export_as("_tell")]]
+[[impl_include("<asm/os/stdio.h>"), export_as("_tell")]]
 $off_t tell($fd_t fd) {
 	return lseek(fd, 0, SEEK_CUR);
 }
@@ -2161,9 +2161,9 @@ $off_t tell($fd_t fd) {
 %#ifdef __USE_LARGEFILE64
 @@Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)')
 [[wunused, guard, decl_include("<bits/types.h>")]]
-[[requires_include("<asm/stdio.h>")]]
+[[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(lseek64) && defined(__SEEK_CUR))]]
-[[impl_include("<asm/stdio.h>"), export_alias("_telli64")]]
+[[impl_include("<asm/os/stdio.h>"), export_alias("_telli64")]]
 $off64_t tell64($fd_t fd) {
 	return lseek64(fd, 0, __SEEK_CUR);
 }

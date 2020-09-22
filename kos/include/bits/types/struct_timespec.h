@@ -18,5 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __timespec_defined
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
+#ifndef __timespec_defined
+#define __timespec_defined 1
+#endif /* !__timespec_defined */
 #endif /* !__timespec_defined */

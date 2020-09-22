@@ -26,7 +26,7 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <bits/timespec32.h>
+#include <bits/os/kos/timespec32.h>
 #include <bits/types.h>
 
 #ifndef __WANT_FULL_STRUCT_STAT

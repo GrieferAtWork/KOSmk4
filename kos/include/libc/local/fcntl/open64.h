@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23ebae09 */
+/* HASH CRC-32:0x4b21a4d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 #endif /* !... */
 #endif /* !__local___localdep_open32_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Open a new file handle to the file specified by `FILENAME'
  * When `oflags & O_CREAT', then `mode' specifies the initial

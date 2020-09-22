@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1da8994e */
+/* HASH CRC-32:0x65676a41 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1290,7 +1290,7 @@ INTERN_FUNCTION(libc_sys_Xpipe)
 END(libc_sys_Xpipe)
 DEFINE_PUBLIC_ALIAS(sys_Xpipe, libc_sys_Xpipe)
 
-/* clock_t times(struct tms *buf) */
+/* clock_t times(struct tmsx32 *buf) */
 .section .text.crt.syscall.times
 INTERN_FUNCTION(libc_sys_times)
 	movl   $(0x2b), %eax
@@ -1298,7 +1298,7 @@ INTERN_FUNCTION(libc_sys_times)
 END(libc_sys_times)
 DEFINE_PUBLIC_ALIAS(sys_times, libc_sys_times)
 
-/* clock_t times(struct tms *buf) */
+/* clock_t times(struct tmsx32 *buf) */
 .section .text.crt.syscall.Xtimes
 INTERN_FUNCTION(libc_sys_Xtimes)
 	movl   $(0x2b), %eax
@@ -3324,7 +3324,7 @@ INTERN_FUNCTION(libc_sys_Xsched_get_priority_min)
 END(libc_sys_Xsched_get_priority_min)
 DEFINE_PUBLIC_ALIAS(sys_Xsched_get_priority_min, libc_sys_Xsched_get_priority_min)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *ts) */
 .section .text.crt.syscall.sched_rr_get_interval
 INTERN_FUNCTION(libc_sys_sched_rr_get_interval)
 	movl   $(0xa1), %eax
@@ -3332,7 +3332,7 @@ INTERN_FUNCTION(libc_sys_sched_rr_get_interval)
 END(libc_sys_sched_rr_get_interval)
 DEFINE_PUBLIC_ALIAS(sys_sched_rr_get_interval, libc_sys_sched_rr_get_interval)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx32 *ts) */
 .section .text.crt.syscall.Xsched_rr_get_interval
 INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval)
 	movl   $(0xa1), %eax
@@ -7952,7 +7952,7 @@ INTERN_FUNCTION(libc_sys_Xfutex_time64)
 END(libc_sys_Xfutex_time64)
 DEFINE_PUBLIC_ALIAS(sys_Xfutex_time64, libc_sys_Xfutex_time64)
 
-/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *ts) */
 .section .text.crt.syscall.sched_rr_get_interval_time64
 INTERN_FUNCTION(libc_sys_sched_rr_get_interval_time64)
 	movl   $(0x1a7), %eax
@@ -7960,7 +7960,7 @@ INTERN_FUNCTION(libc_sys_sched_rr_get_interval_time64)
 END(libc_sys_sched_rr_get_interval_time64)
 DEFINE_PUBLIC_ALIAS(sys_sched_rr_get_interval_time64, libc_sys_sched_rr_get_interval_time64)
 
-/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *tms) */
+/* errno_t sched_rr_get_interval_time64(pid_t pid, struct timespecx32_64 *ts) */
 .section .text.crt.syscall.Xsched_rr_get_interval_time64
 INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval_time64)
 	movl   $(0x1a7), %eax

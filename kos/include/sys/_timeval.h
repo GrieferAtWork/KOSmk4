@@ -25,7 +25,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/timeval.h>
+#include <bits/os/timeval.h>
 #include <bits/types.h>
 #include <sys/_types.h>
 

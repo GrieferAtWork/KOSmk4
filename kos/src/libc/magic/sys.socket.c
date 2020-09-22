@@ -35,21 +35,21 @@
 #include <hybrid/typecore.h>
 
 #include <asm/ioctls/socket.h>
-#include <asm/socket.h>
-#include <bits/cmsghdr-struct.h>
-#include <bits/msghdr-struct.h>
+#include <asm/os/socket.h>
+#include <bits/os/cmsghdr.h>
+#include <bits/os/msghdr.h>
 #include <bits/sockaddr-struct.h>
 #include <bits/sockaddr.h>
 #include <bits/sockaddr_storage-struct.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 }%[insert:prefix(
 #include <bits/types.h>
 )]%{
 #include <sys/uio.h>
 
 #ifdef __USE_GNU
-#include <bits/mmsghdr-struct.h>
-#include <bits/sigset.h>
+#include <bits/os/mmsghdr.h>
+#include <bits/os/sigset.h>
 #endif /* __USE_GNU */
 
 #if defined(__KOS__) && defined(__USE_KOS_KERNEL)
@@ -810,8 +810,8 @@ struct osockaddr {
 /* struct cmsghdr *CMSG_NXTHDR(struct msghdr *mhdr, struct cmsghdr *cmsg) */
 #define CMSG_NXTHDR(mhdr, cmsg) __cmsg_nxthdr(mhdr, cmsg)
 }
-[[decl_include("<bits/msghdr-struct.h>")]]
-[[decl_include("<bits/cmsghdr-struct.h>")]]
+[[decl_include("<bits/os/cmsghdr.h>")]]
+[[decl_include("<bits/os/msghdr.h>")]]
 [[impl_include("<bits/types.h>")]]
 [[no_inline_truncate, extern_inline, ATTR_PURE, wunused, nullable]]
 struct cmsghdr *__cmsg_nxthdr([[nonnull]] struct msghdr *mhdr,

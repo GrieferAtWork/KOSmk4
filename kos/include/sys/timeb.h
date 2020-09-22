@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x554aefcc */
+/* HASH CRC-32:0xd0494a7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/timeb.h>
+#include <bits/os/timeb.h>
 #include <bits/types.h>
 #include <hybrid/typecore.h>
 

@@ -32,7 +32,7 @@
 #include <sched/signal.h>
 #include <sched/task.h>
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <hw/usb/uhci.h>
 #include <sys/io.h>
 #include <sys/mmio.h>

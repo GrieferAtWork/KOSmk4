@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcec4c1a6 */
+/* HASH CRC-32:0x4eb37942 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_sigorset_defined
 #define __local_sigorset_defined 1
 #include <__crt.h>
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigorset) __ATTR_NONNULL((1, 2, 3)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigorset))(struct __sigset_struct *__set, struct __sigset_struct const *__left, struct __sigset_struct const *__right) {

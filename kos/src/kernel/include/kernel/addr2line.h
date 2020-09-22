@@ -26,7 +26,7 @@
 #include <kernel/types.h>
 #include <kernel/vm/usermod.h> /* CONFIG_HAVE_USERMOD */
 
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 
 #include <libdebuginfo/addr2line.h>
 

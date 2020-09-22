@@ -24,7 +24,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/timeval.h>
+#include <bits/os/timeval.h>
 #include <bits/types.h>
 
 /* Documentation taken from GLibc /usr/include/i386-linux-gnu/bits/resource.h */

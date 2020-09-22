@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4df98c3e */
+/* HASH CRC-32:0xe2a661f1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_shm_unlink_defined
 #define __local_shm_unlink_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_unlink) || defined(__CRT_HAVE__unlink) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpy from string */

@@ -20,7 +20,7 @@
 #ifndef ____sigset_t_defined
 #include <__stdinc.h>
 
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 #ifndef ____sigset_t_defined
 #define ____sigset_t_defined 1
 #ifdef __CC__

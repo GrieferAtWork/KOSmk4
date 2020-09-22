@@ -78,9 +78,9 @@
 #include <compat/bits/stat.h>
 #include <compat/bits/statfs-convert.h>
 #include <compat/bits/statfs.h>
-#include <compat/bits/timespec.h>
-#include <compat/bits/timeval.h>
-#include <compat/bits/utimbuf.h>
+#include <compat/bits/os/timespec.h>
+#include <compat/bits/os/timeval.h>
+#include <compat/bits/os/utimbuf.h>
 #include <compat/pointer.h>
 #endif /* __ARCH_HAVE_COMPAT */
 

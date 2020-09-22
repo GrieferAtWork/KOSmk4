@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcee5da67 */
+/* HASH CRC-32:0xc63e969f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_getentropy_defined
 #define __local_getentropy_defined 1
 #include <__crt.h>
-#include <asm/random.h>
+#include <asm/os/random.h>
 #if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getrandom from sys.random */

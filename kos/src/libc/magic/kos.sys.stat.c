@@ -169,7 +169,7 @@ void UTimensAt32($fd_t dirfd, [[nonnull]] char const *filename,
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("UTimensAt64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("UTimensAt")]]
 [[userimpl, requires($has_function(UTimensAt32) || $has_function(UTimensAt64))]]
-[[impl_include("<asm/fcntl.h>")]]
+[[impl_include("<asm/os/fcntl.h>")]]
 void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
                [[nullable]] struct timespec const times[2 /*or:3*/], $atflag_t flags) {
 @@pp_if $has_function(UTimensAt64)@@
@@ -234,7 +234,7 @@ void UTimensAt($fd_t dirfd, [[nonnull]] char const *filename,
 %#ifdef __USE_TIME64
 [[cp, throws, time64_variant_of(UTimensAt), doc_alias("utimensat")]]
 [[userimpl, requires_function(UTimensAt32)]]
-[[impl_include("<asm/fcntl.h>")]]
+[[impl_include("<asm/os/fcntl.h>")]]
 void UTimensAt64($fd_t dirfd, [[nonnull]] char const *filename,
                  [[nullable]] struct timespec64 const times[2 /*or:3*/], $atflag_t flags) {
 @@pp_ifdef __AT_CHANGE_CTIME@@

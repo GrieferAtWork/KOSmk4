@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2f5c36b */
+/* HASH CRC-32:0x47b347c6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_sem_timedwait
 #include <bits/crt/semaphore.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sem_timedwait32 from semaphore */
 #ifndef __local___localdep_sem_timedwait32_defined

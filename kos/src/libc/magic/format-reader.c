@@ -24,7 +24,7 @@
 
 %{
 #include <features.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 
 
 #ifdef __CC__

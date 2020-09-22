@@ -20,6 +20,8 @@
 #ifndef _BITS_POSIX_OPT_H
 #define _BITS_POSIX_OPT_H 1
 
+/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+
 #include <__stdinc.h>
 #include <__crt.h>
 

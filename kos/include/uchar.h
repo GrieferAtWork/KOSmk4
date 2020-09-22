@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x403a404b */
+/* HASH CRC-32:0x2f7aaf1d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_STD_USING(c32rtomb)
 
 #include <features.h>
 #include <hybrid/typecore.h>
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 
 __SYSDECL_BEGIN
 

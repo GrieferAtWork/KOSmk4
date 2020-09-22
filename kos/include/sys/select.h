@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe60c9c48 */
+/* HASH CRC-32:0xda8c130b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,32 +32,21 @@
 
 #include <hybrid/typecore.h>
 
-#include <asm/select.h> /* __FD_SETSIZE */
-#include <bits/sigset.h> /* struct __sigset_struct */
-#include <bits/time.h>
-#include <bits/timespec.h> /* struct timespec */
-#include <bits/timeval.h>  /* struct timeval */
+#include <bits/os/fd_set.h>   /* struct __fd_set_struct, __NFDBITS, __fd_mask, __FD_ELT, __FD_MASK, __SIZEOF_FD_SET */
+#include <bits/os/sigset.h>   /* struct __sigset_struct */
+#include <bits/os/timespec.h> /* struct timespec */
+#include <bits/os/timeval.h>  /* struct timeval */
 #include <bits/types.h>
 
 #ifndef __INTELLISENSE__
 #include <libc/string.h> /* __libc_bzero */
 #endif /* !__INTELLISENSE__ */
 
-#ifndef __FD_SETSIZE
-#define __FD_SETSIZE 1024
-#endif /* !__FD_SETSIZE */
-
-#ifdef __FD_SETSIZE
-#define FD_SETSIZE __FD_SETSIZE
-#endif /* __FD_SETSIZE */
+#ifndef FD_SETSIZE
+#define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
+#endif /* FD_SETSIZE */
 
 __SYSDECL_BEGIN
-
-#define __SIZEOF_FD_MASK __SIZEOF_POINTER__
-#define __SIZEOF_FD_SET  (__FD_SETSIZE / __CHAR_BIT__)
-#define __NFDBITS        (__SIZEOF_FD_MASK * __CHAR_BIT__)
-#define __FD_ELT(d)      ((d) / __NFDBITS)
-#define __FD_MASK(d)     (__CCAST(__fd_mask)1 << ((d) % __NFDBITS))
 
 #ifdef __CC__
 
@@ -76,18 +65,7 @@ typedef struct __sigset_struct sigset_t;
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 
-typedef __intptr_t __fd_mask;
-
-typedef struct __fd_set_struct {
-#ifdef __USE_XOPEN
-	__fd_mask fds_bits[__FD_SETSIZE / __NFDBITS];
-#define __FDS_BITS(set) ((set)->fds_bits)
-#else /* __USE_XOPEN */
-	__fd_mask __fds_bits[__FD_SETSIZE / __NFDBITS];
-#define __FDS_BITS(set) ((set)->__fds_bits)
-#endif /* !__USE_XOPEN */
-} fd_set;
-
+typedef struct __fd_set_struct fd_set;
 #ifdef __USE_MISC
 typedef __fd_mask fd_mask;
 #define NFDBITS __NFDBITS

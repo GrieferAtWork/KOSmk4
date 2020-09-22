@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ecda12 */
+/* HASH CRC-32:0x4d6a6c95 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,29 +26,24 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: timerfd_gettime32 from sys.timerfd */
 #if !defined(__local___localdep_timerfd_gettime32_defined) && defined(__CRT_HAVE_timerfd_gettime)
 #define __local___localdep_timerfd_gettime32_defined 1
-/* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #endif /* !__local___localdep_timerfd_gettime32_defined && __CRT_HAVE_timerfd_gettime */
 /* Dependency: timerfd_gettime64 from sys.timerfd */
 #ifndef __local___localdep_timerfd_gettime64_defined
 #define __local___localdep_timerfd_gettime64_defined 1
 #ifdef __CRT_HAVE_timerfd_gettime64
-/* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct __itimerspec64 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.timerfd/timerfd_gettime64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the next expiration time of UFD */
 #define __localdep_timerfd_gettime64 __LIBC_LOCAL_NAME(timerfd_gettime64)
 #else /* ... */
 #undef __local___localdep_timerfd_gettime64_defined
 #endif /* !... */
 #endif /* !__local___localdep_timerfd_gettime64_defined */
-/* Return the next expiration time of UFD */
 __LOCAL_LIBC(timerfd_gettime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime))(__fd_t __ufd, struct itimerspec *__restrict __otmr) {
 #ifdef __CRT_HAVE_timerfd_gettime

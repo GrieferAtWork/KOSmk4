@@ -32,8 +32,8 @@
 #define SIOCATMARK           _IO(0x89, 0x05) /* ... */
 
 #ifdef __KOS__
-#include <bits/timeval.h>
-#include <bits/timespec.h>
+#include <bits/os/timeval.h>
+#include <bits/os/timespec.h>
 #define __SIOCGSTAMP32       _IOR(0x89, 0x06, struct __timeval32) /* [struct timeval32 *arg] Get stamp */
 #define __SIOCGSTAMP64       _IOR(0x89, 0x06, struct __timeval64) /* [struct timeval64 *arg] Get stamp */
 #define __SIOCGSTAMPNS32     _IOR(0x89, 0x07, struct __timeval32) /* [struct timespec32 *arg] Get stamp */

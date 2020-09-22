@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x384b0e14 */
+/* HASH CRC-32:0x6492eb25 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -296,7 +296,7 @@
 #define __NRAN0_sched_get_priority_max       algorithm
 #define __NRAN0_sched_get_priority_min       algorithm
 #define __NRAN0_sched_rr_get_interval        pid
-#define __NRAN1_sched_rr_get_interval        tms
+#define __NRAN1_sched_rr_get_interval        ts
 #define __NRAN0_nanosleep                    req
 #define __NRAN1_nanosleep                    rem
 #define __NRAN0_mremap                       addr
@@ -952,7 +952,7 @@
 #define __NRAN4_futex_time64                 uaddr2
 #define __NRAN5_futex_time64                 val3
 #define __NRAN0_sched_rr_get_interval_time64 pid
-#define __NRAN1_sched_rr_get_interval_time64 tms
+#define __NRAN1_sched_rr_get_interval_time64 ts
 #define __NRAN0_pidfd_send_signal            pidfd
 #define __NRAN1_pidfd_send_signal            usigno
 #define __NRAN2_pidfd_send_signal            uinfo
@@ -1637,7 +1637,7 @@
 #define __NRATR0_sched_get_priority_min       SC_REPR_SCHED_POLICY                                                 /* algorithm */ 
 #define __NRRTR_sched_get_priority_min        SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_sched_rr_get_interval        SC_REPR_PID_T                                                        /* pid */ 
-#define __NRATR1_sched_rr_get_interval        SC_REPR_POINTER                                                      /* tms */ 
+#define __NRATR1_sched_rr_get_interval        SC_REPR_POINTER                                                      /* ts */ 
 #define __NRRTR_sched_rr_get_interval         SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_nanosleep                    SC_REPR_STRUCT_TIMESPECX32                                           /* req */ 
 #define __NRATR1_nanosleep                    SC_REPR_POINTER                                                      /* rem */ 
@@ -2620,7 +2620,7 @@
 #define __NRATR5_futex_time64                 SC_REPR_UINT32_T                                                     /* val3 */ 
 #define __NRRTR_futex_time64                  SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NRATR0_sched_rr_get_interval_time64 SC_REPR_PID_T                                                        /* pid */ 
-#define __NRATR1_sched_rr_get_interval_time64 SC_REPR_POINTER                                                      /* tms */ 
+#define __NRATR1_sched_rr_get_interval_time64 SC_REPR_POINTER                                                      /* ts */ 
 #define __NRRTR_sched_rr_get_interval_time64  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_pidfd_send_signal            SC_REPR_FD_T                                                         /* pidfd */ 
 #define __NRATR1_pidfd_send_signal            SC_REPR_SIGNO_T                                                      /* usigno */ 

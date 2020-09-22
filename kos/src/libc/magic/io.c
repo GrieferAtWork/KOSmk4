@@ -223,9 +223,9 @@ int _pipe([[nonnull]] $fd_t pipedes[2],
 %[insert:function(_tell = tell)]
 %[insert:function(_telli64 = tell64)]
 
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/os/stdio.h>")]]
 [[decl_include("<bits/types.h>"), wunused]]
-[[requires_include("<asm/stdio.h>")]]
+[[requires_include("<asm/os/stdio.h>")]]
 [[requires($has_function(lseek64) && defined(__SEEK_CUR) && defined(__SEEK_END) && defined(__SEEK_SET))]]
 $int64_t _filelengthi64($fd_t fd) {
 	int64_t oldpos, result;
@@ -297,7 +297,7 @@ $fd_t _open_osfhandle(intptr_t osfd, $oflag_t flags) {
 
 %[default:section(".text.crt.dos.fs.io")]
 
-[[export_alias("_setmode"), requires_include("<asm/fcntl.h>"), decl_include("<bits/types.h>")]]
+[[export_alias("_setmode"), requires_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
 [[requires($has_function(fcntl) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL))))]]
 $oflag_t setmode($fd_t fd, $oflag_t mode) {
 @@pp_ifdef __F_SETFL_XCH@@
@@ -349,7 +349,7 @@ __LONG32_TYPE__ filelength($fd_t fd) {
 [[decl_include("<bits/types.h>")]]
 [[wunused, crt_name("_eof")]]
 [[requires_function(lseek64)]]
-[[impl_include("<asm/stdio.h>")]]
+[[impl_include("<asm/os/stdio.h>")]]
 int eof($fd_t fd) {
 	$int64_t oldpos, endpos;
 	oldpos = lseek64(fd, 0, SEEK_CUR);

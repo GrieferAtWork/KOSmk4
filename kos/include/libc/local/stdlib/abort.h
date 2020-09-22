@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68060a71 */
+/* HASH CRC-32:0x2c09b007 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,15 +44,11 @@ __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep__Exit,(int __status),exit
 #endif /* !... */
 #endif /* !__local___localdep__Exit_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/stdlib.h>
+#include <asm/os/stdlib.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(abort) __ATTR_NORETURN void
 (__LIBCCALL __LIBC_LOCAL_NAME(abort))(void) __THROWS(...) {
-#ifdef __EXIT_FAILURE
 	__localdep__Exit(__EXIT_FAILURE);
-#else /* __EXIT_FAILURE */
-	__localdep__Exit(1);
-#endif /* !__EXIT_FAILURE */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_abort_defined

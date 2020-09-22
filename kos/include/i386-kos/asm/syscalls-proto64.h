@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb115df4 */
+/* HASH CRC-32:0xef2a71c9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1095,7 +1095,7 @@
 #define __NRAT0_getrusage                (syscall_slong_t, __syscall_slong_t)
 #define __NRAT1_getrusage                (struct rusagex64 *, struct __rusagex64 *)
 #define __NRAT0_sysinfo                  (struct sysinfo *, struct sysinfo *)
-#define __NRAT0_times                    (struct tms *, struct tms *)
+#define __NRAT0_times                    (struct tmsx64 *, struct __tmsx64 *)
 #define __NRAT0_ptrace                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_ptrace                   (pid_t, __pid_t)
 #define __NRAT2_ptrace                   (void *, void *)
@@ -1907,7 +1907,7 @@
 #define __NRAM_getrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit *)b
 #define __NRAM_getrusage(a, b, c, d, e, f)                (__syscall_slong_t)a, (struct __rusagex64 *)b
 #define __NRAM_sysinfo(a, b, c, d, e, f)                  (struct sysinfo *)a
-#define __NRAM_times(a, b, c, d, e, f)                    (struct tms *)a
+#define __NRAM_times(a, b, c, d, e, f)                    (struct __tmsx64 *)a
 #define __NRAM_ptrace(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__pid_t)b, (void *)c, (void *)d
 #define __NRAM_getuid(a, b, c, d, e, f)                   /* nothing */
 #define __NRAM_syslog(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (char const *)b, (__size_t)c

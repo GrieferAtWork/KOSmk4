@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4afbcab6 */
+/* HASH CRC-32:0x59eb722 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -255,7 +255,7 @@ INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
 NOTHROW_NCX(LIBCCALL libc_closefrom)(fd_t lowfd) {
 	libc_fcntl(lowfd, __F_CLOSEM);
 }
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 /* Change the root directory to `fd'. If `fd' was opened before a prior call to `chroot()',
  * and referrs to a directory, then this function can be used to escape a chroot() jail.
  * No special permissions are required to use this function, since a malicious application
@@ -295,13 +295,13 @@ NOTHROW_NCX(LIBCCALL libc_resolvepath)(char const *filename,
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree */
 	return retval;
 }
-#include <asm/stdio.h>
+#include <asm/os/stdio.h>
 /* Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
 INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED off_t
 NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd) {
 	return libc_lseek(fd, 0, SEEK_CUR);
 }
-#include <asm/stdio.h>
+#include <asm/os/stdio.h>
 /* Return the current file position (alias for `lseek64(fd, 0, SEEK_CUR)') */
 INTERN ATTR_SECTION(".text.crt.solaris") WUNUSED off64_t
 NOTHROW_NCX(LIBCCALL libc_tell64)(fd_t fd) {

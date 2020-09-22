@@ -103,24 +103,24 @@
 %[typeorg(<bits/types.h>: __time32_t, __time64_t)]
 %[typeorg(<bits/types.h>: __quantum_diff_t, __clock_t, __suseconds_t, __clockid_t)]
 %[typeorg(<bits/types.h>: __gid_t, __uid_t, __useconds_t, __jtime_t, __timer_t)]
-%[typeorg(<bits/itimerspec.h>: itimerspec, itimerspec32, itimerspec64, __itimerspec32, __itimerspec64)]
-%[typeorg(<bits/itimerspec32.h>: __itimerspecx32, __itimerspecx32_64, itimerspecx32, itimerspecx32_64)]
-%[typeorg(<bits/itimerspec64.h>: __itimerspecx64, itimerspecx64)]
-%[typeorg(<bits/itimerval.h>: itimerval, itimerval32, itimerval64, __itimerval32, __itimerval64)]
-%[typeorg(<bits/itimerval32.h>: __itimervalx32, __itimervalx32_64, itimervalx32, itimervalx32_64)]
-%[typeorg(<bits/itimerval64.h>: __itimervalx64, itimervalx64)]
-%[typeorg(<bits/timespec.h>: timespec, timespec32, timespec64, __timespec32, __timespec64)]
-%[typeorg(<bits/timespec32.h>: __timespecx32, __timespecx32_64, timespecx32, timespecx32_64)]
-%[typeorg(<bits/timespec64.h>: __timespecx64, timespecx64)]
-%[typeorg(<bits/timeval.h>: timeval, timeval32, timeval64, __timeval32, __timeval64)]
-%[typeorg(<bits/timeval32.h>: __timevalx32, __timevalx32_64, timevalx32, timevalx32_64)]
-%[typeorg(<bits/timeval64.h>: __timevalx64, timevalx64)]
-%[typeorg(<bits/timeb.h>: timeb, timeb32, timeb64, __timeb32, __timeb64)]
-%[typeorg(<bits/timeb32.h>: __timebx32, __timebx32_64, timebx32, timebx32_64)]
-%[typeorg(<bits/timeb64.h>: __timebx64, timebx64)]
-%[typeorg(<bits/utimbuf.h>: utimbuf, utimbuf32, utimbuf64, __utimbuf32, __utimbuf64)]
-%[typeorg(<bits/utimbuf32.h>: __utimbufx32, __utimbufx32_64, utimbufx32, utimbufx32_64)]
-%[typeorg(<bits/utimbuf64.h>: __utimbufx64, utimbufx64)]
+%[typeorg(<bits/os/itimerspec.h>: itimerspec, itimerspec32, itimerspec64, __itimerspec32, __itimerspec64)]
+%[typeorg(<bits/os/kos/itimerspec32.h>: __itimerspecx32, __itimerspecx32_64, itimerspecx32, itimerspecx32_64)]
+%[typeorg(<bits/os/kos/itimerspec64.h>: __itimerspecx64, itimerspecx64)]
+%[typeorg(<bits/os/itimerval.h>: itimerval, itimerval32, itimerval64, __itimerval32, __itimerval64)]
+%[typeorg(<bits/os/kos/itimerval32.h>: __itimervalx32, __itimervalx32_64, itimervalx32, itimervalx32_64)]
+%[typeorg(<bits/os/kos/itimerval64.h>: __itimervalx64, itimervalx64)]
+%[typeorg(<bits/os/timespec.h>: timespec, timespec32, timespec64, __timespec32, __timespec64)]
+%[typeorg(<bits/os/kos/timespec32.h>: __timespecx32, __timespecx32_64, timespecx32, timespecx32_64)]
+%[typeorg(<bits/os/kos/timespec64.h>: __timespecx64, timespecx64)]
+%[typeorg(<bits/os/timeval.h>: timeval, timeval32, timeval64, __timeval32, __timeval64)]
+%[typeorg(<bits/os/kos/timeval32.h>: __timevalx32, __timevalx32_64, timevalx32, timevalx32_64)]
+%[typeorg(<bits/os/kos/timeval64.h>: __timevalx64, timevalx64)]
+%[typeorg(<bits/os/timeb.h>: timeb, timeb32, timeb64, __timeb32, __timeb64)]
+%[typeorg(<bits/os/kos/timeb32.h>: __timebx32, __timebx32_64, timebx32, timebx32_64)]
+%[typeorg(<bits/os/kos/timeb64.h>: __timebx64, timebx64)]
+%[typeorg(<bits/os/utimbuf.h>: utimbuf, utimbuf32, utimbuf64, __utimbuf32, __utimbuf64)]
+%[typeorg(<bits/os/kos/utimbuf32.h>: __utimbufx32, __utimbufx32_64, utimbufx32, utimbufx32_64)]
+%[typeorg(<bits/os/kos/utimbuf64.h>: __utimbufx64, utimbufx64)]
 %[typeorg(<bits/rusage-struct.h>: rusage, __rusage32, __rusage64)]
 %[typeorg(<bits/rusage-struct32.h>: rusagex32, __rusagex32, rusagex32_64, __rusagex32_64)]
 %[typeorg(<bits/rusage-struct64.h>: rusagex64, __rusagex64)]
@@ -137,25 +137,28 @@
 %[typeorg(<bits/siginfo-struct32.h>: __siginfox32_struct, siginfox32_t)]
 %[typeorg(<bits/siginfo-struct64.h>: __siginfox64_struct, siginfox64_t)]
 %[typeorg(<hybrid/__pointer.h>: __HYBRID_PTR32, __HYBRID_PTR64)]
-%[typeorg(<bits/iovec-struct.h>: iovec)]
-%[typeorg(<bits/iovec-struct32.h>: iovecx32, __iovecx32)]
-%[typeorg(<bits/iovec-struct64.h>: iovecx64, __iovecx64)]
-%[typeorg(<bits/msghdr-struct.h>: msghdr)]
-%[typeorg(<bits/msghdr-struct32.h>: msghdrx32, __msghdrx32)]
-%[typeorg(<bits/msghdr-struct64.h>: msghdrx64, __msghdrx64)]
-%[typeorg(<bits/cmsghdr-struct.h>: cmsghdr)]
-%[typeorg(<bits/cmsghdr-struct32.h>: cmsghdrx32, __cmsghdrx32)]
-%[typeorg(<bits/cmsghdr-struct64.h>: cmsghdrx64, __cmsghdrx64)]
-%[typeorg(<bits/mmsghdr-struct.h>: mmsghdr)]
-%[typeorg(<bits/mmsghdr-struct32.h>: mmsghdrx32, __mmsghdrx32)]
-%[typeorg(<bits/mmsghdr-struct64.h>: mmsghdrx64, __mmsghdrx64)]
-%[typeorg(<bits/sigstack.h>: sigstack, sigaltstack)]
-%[typeorg(<bits/sigstack32.h>: __sigstackx32, __sigaltstackx32)]
-%[typeorg(<bits/sigstack64.h>: __sigstackx64, __sigaltstackx64)]
-%[typeorg(<bits/pollfd.h>: pollfd)]
-%[typeorg(<bits/sigval.h>: sigval)]
-%[typeorg(<bits/sigval32.h>: __sigvalx32)]
-%[typeorg(<bits/sigval64.h>: __sigvalx64)]
+%[typeorg(<bits/os/iovec.h>: iovec)]
+%[typeorg(<bits/os/kos/iovec32.h>: iovecx32, __iovecx32)]
+%[typeorg(<bits/os/kos/iovec64.h>: iovecx64, __iovecx64)]
+%[typeorg(<bits/os/msghdr.h>: msghdr)]
+%[typeorg(<bits/os/kos/msghdr32.h>: msghdrx32, __msghdrx32)]
+%[typeorg(<bits/os/kos/msghdr64.h>: msghdrx64, __msghdrx64)]
+%[typeorg(<bits/os/cmsghdr.h>: cmsghdr)]
+%[typeorg(<bits/os/kos/cmsghdr.h>: cmsghdrx32, __cmsghdrx32)]
+%[typeorg(<bits/os/kos/cmsghdr.h>: cmsghdrx64, __cmsghdrx64)]
+%[typeorg(<bits/os/mmsghdr.h>: mmsghdr)]
+%[typeorg(<bits/os/kos/mmsghdr32.h>: mmsghdrx32, __mmsghdrx32)]
+%[typeorg(<bits/os/kos/mmsghdr64.h>: mmsghdrx64, __mmsghdrx64)]
+%[typeorg(<bits/os/sigstack.h>: sigstack, sigaltstack)]
+%[typeorg(<bits/os/kos/sigstack32.h>: __sigstackx32, __sigaltstackx32)]
+%[typeorg(<bits/os/kos/sigstack64.h>: __sigstackx64, __sigaltstackx64)]
+%[typeorg(<bits/os/pollfd.h>: pollfd)]
+%[typeorg(<bits/os/sigval.h>: sigval)]
+%[typeorg(<bits/os/kos/sigval32.h>: __sigvalx32)]
+%[typeorg(<bits/os/kos/sigval64.h>: __sigvalx64)]
+%[typeorg(<bits/os/tms.h>: tms)]
+%[typeorg(<bits/os/kos/tms32.h>: __tmsx32)]
+%[typeorg(<bits/os/kos/tms64.h>: __tmsx64)]
 %[typeorg(<kos/bits/rtm.h>: __rtm_status_t)]
 %[typeorg(<kos/rtm.h>: rtm_status_t)]
 %[typeorg(<kos/compat/linux-stat.h>: linux_oldstat)]
@@ -180,6 +183,7 @@
 %[struct_escape(rusage64 = __rusage64, rusagex64 = __rusagex64)]
 %[struct_escape(timeb32 = __timeb32, timebx32 = __timebx32, timebx32_64 = __timebx32_64)]
 %[struct_escape(timeb64 = __timeb64, timebx64 = __timebx64)]
+%[struct_escape(tmsx32 = __tmsx32, tmsx64 = __tmsx64)]
 %[struct_escape(utimbuf32 = __utimbuf32, utimbufx32 = __utimbufx32, utimbufx32_64 = __utimbufx32_64)]
 %[struct_escape(utimbuf64 = __utimbuf64, utimbufx64 = __utimbufx64)]
 %[struct_escape(statfs32 = __statfs32, statfsx32 = __statfsx32, statfsx32_64 = __statfsx32_64)]
@@ -1787,12 +1791,12 @@ sched_get_priority_max:([tostr(SCHED_POLICY)] syscall_ulong_t algorithm) -> sysc
 sched_get_priority_min:([tostr(SCHED_POLICY)] syscall_ulong_t algorithm) -> syscall_slong_t; /* UNIMPLEMENTED! */
 
 %[startgroup]
-sched_rr_get_interval:(pid_t pid, [tostr(out:STRUCT_TIMESPEC)] struct timespec *tms) -> errno_t;                   /* UNIMPLEMENTED! */
-sched_rr_get_interval32:(pid_t pid, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *tms) -> errno_t;             /* UNIMPLEMENTED! */
-sched_rr_get_interval64:(pid_t pid, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *tms) -> errno_t;             /* UNIMPLEMENTED! */
-sched_rr_get_intervalx32:(pid_t pid, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *tms) -> errno_t;          /* UNIMPLEMENTED! */
-sched_rr_get_intervalx32_64:(pid_t pid, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *tms) -> errno_t; /* UNIMPLEMENTED! */
-sched_rr_get_intervalx64:(pid_t pid, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *tms) -> errno_t;          /* UNIMPLEMENTED! */
+sched_rr_get_interval:(pid_t pid, [tostr(out:STRUCT_TIMESPEC)] struct timespec *ts) -> errno_t;                   /* UNIMPLEMENTED! */
+sched_rr_get_interval32:(pid_t pid, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *ts) -> errno_t;             /* UNIMPLEMENTED! */
+sched_rr_get_interval64:(pid_t pid, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *ts) -> errno_t;             /* UNIMPLEMENTED! */
+sched_rr_get_intervalx32:(pid_t pid, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *ts) -> errno_t;          /* UNIMPLEMENTED! */
+sched_rr_get_intervalx32_64:(pid_t pid, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *ts) -> errno_t; /* UNIMPLEMENTED! */
+sched_rr_get_intervalx64:(pid_t pid, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *ts) -> errno_t;          /* UNIMPLEMENTED! */
 %[endgroup]
 
 
@@ -1841,7 +1845,11 @@ ftimex32_64:([tostr(out:STRUCT_TIMEBX32_64)] struct timebx32_64 *tp) -> errno_t;
 ftimex64:([tostr(out:STRUCT_TIMEBX64)] struct timebx64 *tp) -> errno_t;
 %[endgroup]
 
-times:([tostr(out:STRUCT_TMS)] struct tms *buf) -> clock_t; /* UNIMPLEMENTED! */
+%[startgroup]
+times:([tostr(out:STRUCT_TMS)] struct tms *buf) -> clock_t;          /* UNIMPLEMENTED! */
+timesx32:([tostr(out:STRUCT_TMSX32)] struct tmsx32 *buf) -> clock_t; /* UNIMPLEMENTED! */
+timesx64:([tostr(out:STRUCT_TMSX64)] struct tmsx64 *buf) -> clock_t; /* UNIMPLEMENTED! */
+%[endgroup]
 
 
 

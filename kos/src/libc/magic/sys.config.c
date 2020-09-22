@@ -33,7 +33,7 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#include <asm/limits.h>
+#include <asm/os/limits.h>
 #include <bits/types.h>
 
 #undef STDC_HEADERS

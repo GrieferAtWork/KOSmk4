@@ -53,7 +53,7 @@ typedef size_t rsize_t;
 
 #include <asm/crt/stdio.h> /* __WEOF */
 #include <bits/crt/tm.h>   /* struct tm */
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 #include <kos/anno.h>
 
 #ifdef __USE_KOS
@@ -251,7 +251,7 @@ NOTHROW_NCX(LIBKCALL libc_c16rtomb)(char *__restrict str,
 [[std, wchar, export_alias("__mbrtowc")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("mbrtoc16")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("mbrtoc32")]]
-[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[if(defined(__LIBCCALL_IS_LIBDCALL)),  dos_export_as("mbrtoc16")]]
 [[if(!defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$mbrtoc16")]]
@@ -284,7 +284,7 @@ size_t mbrtowc([[nullable]] wchar_t *pwc,
 
 
 [[std, wchar]]
-[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 [[impl_include("<libc/errno.h>")]]
 [[if(__SIZEOF_WCHAR_T__ == 2), alias("c16rtomb")]]
 [[if(__SIZEOF_WCHAR_T__ == 4), alias("c32rtomb")]]
@@ -339,7 +339,7 @@ size_t wcrtomb(char *__restrict str, wchar_t wc,
 };
 
 [[std, wchar, wunused, export_alias("__mbrlen")]]
-[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 $size_t mbrlen([[inp_opt(maxlen)]] char const *__restrict str, $size_t maxlen,
                [[nullable]] $mbstate_t *mbs) {
 	wchar_t wc;
@@ -347,7 +347,7 @@ $size_t mbrlen([[inp_opt(maxlen)]] char const *__restrict str, $size_t maxlen,
 };
 
 [[std, wchar]]
-[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 size_t mbsrtowcs([[outp(dstlen)]] wchar_t *__restrict dst,
                  [[nonnull]] char const **__restrict psrc, size_t dstlen,
                  [[nullable]] mbstate_t *mbs) {
@@ -371,7 +371,7 @@ size_t mbsrtowcs([[outp(dstlen)]] wchar_t *__restrict dst,
 };
 
 [[std, wchar]]
-[[decl_include("<bits/mbstate.h>", "<hybrid/typecore.h>")]]
+[[decl_include("<bits/crt/mbstate.h>", "<hybrid/typecore.h>")]]
 size_t wcsrtombs([[outp(dstlen)]] char *dst,
                  [[nonnull]] wchar_t const **__restrict psrc, size_t dstlen,
                  [[nullable]] mbstate_t *mbs) {
@@ -412,9 +412,9 @@ wcstol(*) %{generate(str2wcs("strtol"))}
 [[section(".text.crt{|.dos}.wchar.unicode.static.convert")]]
 wcstoul(*) %{generate(str2wcs("strtoul"))}
 
-[[std, wunused, ATTR_PURE, decl_include("<bits/mbstate.h>")]]
+[[std, wunused, ATTR_PURE, decl_include("<bits/crt/mbstate.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-[[decl_include("<bits/mbstate.h>")]]
+[[decl_include("<bits/crt/mbstate.h>")]]
 int mbsinit([[nullable]] mbstate_t const *mbs) {
 	return !mbs || __MBSTATE_ISINIT(mbs);
 }
@@ -950,13 +950,13 @@ wcsxfrm_l(*) %{generate(str2wcs("strxfrm_l"))}
 }
 
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-[[decl_include("<hybrid/typecore.h>", "<bits/mbstate.h>")]]
+[[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
 $size_t mbsnrtowcs([[nullable]] wchar_t *dst,
                    [[nonnull]] char const **__restrict psrc, $size_t nmc, $size_t len,
                    [[nullable]] $mbstate_t *mbs); /* TODO: Implement here */
 
 [[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-[[decl_include("<hybrid/typecore.h>", "<bits/mbstate.h>")]]
+[[decl_include("<hybrid/typecore.h>", "<bits/crt/mbstate.h>")]]
 $size_t wcsnrtombs([[nullable]] char *dst,
                    [[nonnull]] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
                    [[nullable]] $mbstate_t *mbs); /* TODO: Implement here */

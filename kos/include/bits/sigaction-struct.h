@@ -31,20 +31,20 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
-
-__SYSDECL_BEGIN
 
 #define __OFFSET_SIGACTION_HANDLER   0
 #define __OFFSET_SIGACTION_SIGACTION 0
 #define __OFFSET_SIGACTION_MASK      __SIZEOF_POINTER__
-#define __OFFSET_SIGACTION_FLAGS    (__SIZEOF_POINTER__ + __SIZEOF_SIGSET_T__)
-#define __OFFSET_SIGACTION_RESTORER ((__SIZEOF_POINTER__ * 2) + __SIZEOF_SIGSET_T__)
-#define __SIZEOF_SIGACTION          ((__SIZEOF_POINTER__ * 3) + __SIZEOF_SIGSET_T__)
-#define __ALIGNOF_SIGACTION         __SIZEOF_POINTER__
+#define __OFFSET_SIGACTION_FLAGS     (__SIZEOF_POINTER__ + __SIZEOF_SIGSET_T__)
+#define __OFFSET_SIGACTION_RESTORER  ((__SIZEOF_POINTER__ * 2) + __SIZEOF_SIGSET_T__)
+#define __SIZEOF_SIGACTION           ((__SIZEOF_POINTER__ * 3) + __SIZEOF_SIGSET_T__)
+#define __ALIGNOF_SIGACTION          __SIZEOF_POINTER__
 
 #ifdef __CC__
+__DECL_BEGIN
+
 #ifndef ____sighandler_t_defined
 #define ____sighandler_t_defined 1
 typedef void (__LIBKCALL *__sighandler_t)(int __signo);
@@ -79,8 +79,9 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */
 	void      (__LIBKCALL *sa_restorer)(void); /* Restore handler. */
 };
+
+__DECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #endif /* !_BITS_SIGACTION_STRUCT_H */

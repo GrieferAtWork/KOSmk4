@@ -31,8 +31,8 @@
 %{
 #include <features.h>
 
-#include <asm/limits.h> /* __IOV_MAX */
-#include <bits/iovec-struct.h>
+#include <asm/os/limits.h> /* __IOV_MAX */
+#include <bits/os/iovec.h>
 #include <bits/types.h>
 #include <sys/types.h>
 
@@ -61,7 +61,7 @@ typedef __SIZE_TYPE__ size_t;
 @@Read memory from another process's VM
 @@@param: flags: Must be `0'
 @@@return: * :   The actual number of read bytes
-[[cp, wunused, decl_include("<bits/iovec-struct.h>", "<bits/types.h>")]]
+[[cp, wunused, decl_include("<bits/os/iovec.h>", "<bits/types.h>")]]
 ssize_t process_vm_readv($pid_t pid,
                          [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
                          [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
@@ -71,7 +71,7 @@ ssize_t process_vm_readv($pid_t pid,
 @@Write memory to another process's VM
 @@@param: flags: Must be `0'
 @@@return: * :   The actual number of written bytes
-[[cp, decl_include("<bits/iovec-struct.h>", "<bits/types.h>")]]
+[[cp, decl_include("<bits/os/iovec.h>", "<bits/types.h>")]]
 process_vm_writev:($pid_t pid,
                    [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
                    [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
@@ -88,7 +88,7 @@ process_vm_writev:($pid_t pid,
 @@was available at the time.
 @@@return: <= SUM(iov[*].iov_len): The actual amount of read bytes
 @@@return: 0                     : EOF
-[[cp, wunused, decl_include("<bits/iovec-struct.h>", "<features.h>", "<bits/types.h>")]]
+[[cp, wunused, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
 ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 @@>> writev(2)
@@ -100,7 +100,7 @@ ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SI
 @@if no data could be written at the time.
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
 @@@return: 0                     : No more data can be written
-[[cp, decl_include("<bits/iovec-struct.h>", "<features.h>", "<bits/types.h>")]]
+[[cp, decl_include("<bits/os/iovec.h>", "<features.h>", "<bits/types.h>")]]
 ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 
 
@@ -108,12 +108,12 @@ ssize_t writev($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_S
 %#ifdef __USE_MISC
 
 [[cp, ignore, nocrt, alias("preadv"), doc_alias(preadv)]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 ssize_t preadv32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
 [[cp, ignore, nocrt, alias("pwritev"), doc_alias(pwritev)]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off32_t offset);
 
@@ -122,7 +122,7 @@ ssize_t pwritev32($fd_t fd, [[inp(count)]] struct iovec const *iov,
 @@specific `offset', rather than the current R/W position
 @@@return: <= SUM(iov[*].iov_len): The actual amount of read bytes
 [[cp, wunused, no_crt_self_import]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("preadv64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("preadv")]]
 [[userimpl, requires($has_function(preadv32) || $has_function(preadv64))]]
@@ -140,7 +140,7 @@ ssize_t preadv($fd_t fd, [[inp(count)]] struct iovec const *iov,
 @@specific `offset', rather than the current R/W position
 @@@return: <= SUM(iov[*].iov_len): The actual amount of written bytes
 [[cp, no_crt_self_import]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev64)]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pwritev)]]
 [[userimpl, requires($has_function(pwritev32) || $has_function(pwritev64))]]
@@ -156,7 +156,7 @@ ssize_t pwritev($fd_t fd, [[inp(count)]] struct iovec const *iov,
 %
 %#ifdef __USE_LARGEFILE64
 [[cp, wunused, off64_variant_of(preadv), doc_alias(preadv)]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 [[userimpl, requires_function(preadv32)]]
 ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
                  __STDC_INT_AS_SIZE_T count, $off64_t offset) {
@@ -164,7 +164,7 @@ ssize_t preadv64($fd_t fd, [[inp(count)]] struct iovec const *iov,
 }
 
 [[cp, off64_variant_of(pwritev), doc_alias(pwritev)]]
-[[decl_include("<features.h>", "<bits/iovec-struct.h>", "<bits/types.h>")]]
+[[decl_include("<features.h>", "<bits/os/iovec.h>", "<bits/types.h>")]]
 [[userimpl, requires_function(pwritev32)]]
 ssize_t pwritev64($fd_t fd, [[inp(count)]] struct iovec const *iov,
                   __STDC_INT_AS_SIZE_T count, $off64_t offset) {

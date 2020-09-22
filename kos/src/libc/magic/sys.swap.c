@@ -23,7 +23,7 @@
 
 %{
 #include <features.h>
-#include <asm/swap.h>
+#include <asm/os/swap.h>
 
 __SYSDECL_BEGIN
 

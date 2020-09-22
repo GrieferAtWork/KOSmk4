@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb472cf50 */
+/* HASH CRC-32:0x6df65d9c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,10 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <sys/time.h>
+
 #include <bits/crt/db/utmpx.h>
 #include <bits/types.h>
+#include <sys/time.h>
 
 /* Documentation taken from Glibc /usr/include/utmp.h */
 /* Copyright (C) 1993-2016 Free Software Foundation, Inc.

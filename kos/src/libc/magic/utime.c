@@ -35,7 +35,7 @@
 #include <features.h>
 
 #include <bits/types.h>
-#include <bits/utimbuf.h>
+#include <bits/os/utimbuf.h>
 
 __SYSDECL_BEGIN
 
@@ -65,23 +65,23 @@ typedef __TM_TYPE(time) time_t;
 
 };
 
-[[decl_include("<bits/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, ignore, nocrt, alias("utime", "_utime32")]]
 int crt_utime32([[nonnull]] char const *filename, [[nullable]] struct $utimbuf32 const *file_times);
 
-[[decl_include("<bits/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, ignore, nocrt, alias("utime64", "_utime64")]]
 int crt_utime64([[nonnull]] char const *filename, [[nullable]] struct $utimbuf64 const *file_times);
 
-[[decl_include("<bits/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, ignore, nocrt, alias("futime", "_futime32")]]
 int crt_futime32($fd_t fd, [[nullable]] struct $utimbuf32 const *file_times);
 
-[[decl_include("<bits/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, ignore, nocrt, alias("futime64", "_futime64")]]
 int crt_futime64($fd_t fd, [[nullable]] struct $utimbuf64 const *file_times);
 
-[[decl_include("<bits/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, export_as("_utime32"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("utime64", "_utime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("utime", "_utime32")]]
@@ -116,7 +116,7 @@ int utime([[nonnull]] char const *filename, [[nullable]] struct utimbuf const *f
 
 %
 %#ifdef __USE_TIME64
-[[decl_include("<bits/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, export_alias("_utime64"), time64_variant_of(utime)]]
 [[userimpl, requires_function(crt_utime32)]]
 int utime64:([[nonnull]] char const *filename, [[nullable]] struct utimbuf64 const *file_times) {
@@ -142,7 +142,7 @@ int utime64:([[nonnull]] char const *filename, [[nullable]] struct utimbuf64 con
 %
 %
 %#ifdef __USE_KOS
-[[decl_include("<bits/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, export_as("_futime32"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("futime64", "_futime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("futime", "_futime32")]]
@@ -177,7 +177,7 @@ int futime($fd_t fd, [[nullable]] struct utimbuf const *file_times) {
 
 %
 %#ifdef __USE_TIME64
-[[decl_include("<bits/utimbuf.h>")]]
+[[decl_include("<bits/os/utimbuf.h>")]]
 [[cp, export_alias("_futime64"), time64_variant_of(futime)]]
 [[userimpl, requires_function(crt_futime32)]]
 int futime64($fd_t fd, [[nullable]] struct utimbuf64 const *file_times) {
@@ -216,7 +216,7 @@ int futime64($fd_t fd, [[nullable]] struct utimbuf64 const *file_times) {
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
-[[decl_include("<features.h>", "<bits/utimbuf.h>")]]
+[[decl_include("<features.h>", "<bits/os/utimbuf.h>")]]
 [[cp, alias("utime"), no_crt_impl, requires_function(crt_utime64)]]
 int _utime32([[nonnull]] char const *filename,
              [[nullable]] struct $utimbuf32 __KOS_FIXED_CONST *file_times) {
@@ -240,7 +240,7 @@ int _utime32([[nonnull]] char const *filename,
 
 %[insert:function(_utime64 = utime64)]
 
-[[decl_include("<features.h>", "<bits/utimbuf.h>")]]
+[[decl_include("<features.h>", "<bits/os/utimbuf.h>")]]
 [[cp, alias("futime"), no_crt_impl, requires_function(crt_futime64)]]
 int _futime32($fd_t fd, [[nullable]] struct $utimbuf32 __KOS_FIXED_CONST *file_times) {
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -265,7 +265,7 @@ int _futime32($fd_t fd, [[nullable]] struct $utimbuf32 __KOS_FIXED_CONST *file_t
 
 %[insert:function(_wutime = wutime)]
 
-[[decl_include("<features.h>", "<bits/utimbuf.h>")]]
+[[decl_include("<features.h>", "<bits/os/utimbuf.h>")]]
 [[cp, alias("wutime"), nocrt, wchar, requires_function(crt_wutime64)]]
 int _wutime32([[nonnull]] wchar_t const *filename,
               [[nullable]] struct $utimbuf32 __KOS_FIXED_CONST *file_times) {

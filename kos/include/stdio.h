@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f2231c8 */
+/* HASH CRC-32:0x355ea940 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -185,16 +185,16 @@ __NAMESPACE_STD_USING(snprintf)
 #include <features.h>
 
 #include <asm/crt/stdio.h>
-#include <asm/limits.h> /* __IOV_MAX */
-#include <asm/oflags.h>
-#include <asm/stdio.h>
+#include <asm/os/limits.h> /* __IOV_MAX */
+#include <asm/os/oflags.h>
+#include <asm/os/stdio.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
 #include <libio.h>
 
 #ifdef __USE_KOS
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #endif /* __USE_KOS */
 
 #ifdef __USE_DOS
@@ -429,7 +429,7 @@ __NAMESPACE_GLB_USING_OR_IMPL(remove, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,remove,(char const *__filename),(__filename))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 __NAMESPACE_STD_BEGIN
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_removeat)
 __NAMESPACE_STD_END
@@ -454,7 +454,7 @@ __NAMESPACE_GLB_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,rename,(char const *__oldname, char const *__newname_or_path),(__oldname,__newname_or_path))
 #else /* ... */
 __NAMESPACE_STD_END
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 __NAMESPACE_STD_BEGIN
 #if defined(__AT_FDCWD) && (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat))
 __NAMESPACE_STD_END
@@ -3607,7 +3607,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),_unlink,(__file))
 #else /* ... */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)
@@ -3629,7 +3629,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),u
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_unlink,(char const *__file),(__file))
 #else /* ... */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
 #include <libc/local/unistd/unlink.h>
 /* >> unlink(2)

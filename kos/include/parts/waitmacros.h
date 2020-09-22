@@ -23,7 +23,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <asm/wait.h>
+#include <asm/os/wait.h>
 
 /* Bits in the third argument to `waitpid'. */
 #ifdef __WNOHANG

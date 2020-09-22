@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89fe1882 */
+/* HASH CRC-32:0xf0affc39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1095,7 +1095,7 @@
 #define __NR64AT0_getrusage                (syscall_slong_t, __syscall_slong_t)
 #define __NR64AT1_getrusage                (struct rusagex64 *, struct __rusagex64 *)
 #define __NR64AT0_sysinfo                  (struct sysinfo *, struct sysinfo *)
-#define __NR64AT0_times                    (struct tms *, struct tms *)
+#define __NR64AT0_times                    (struct tmsx64 *, struct __tmsx64 *)
 #define __NR64AT0_ptrace                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_ptrace                   (pid_t, __pid_t)
 #define __NR64AT2_ptrace                   (void *, void *)
@@ -1907,7 +1907,7 @@
 #define __NR64AM_getrlimit(a, b, c, d, e, f)                (__syscall_ulong_t)a, (struct rlimit *)b
 #define __NR64AM_getrusage(a, b, c, d, e, f)                (__syscall_slong_t)a, (struct __rusagex64 *)b
 #define __NR64AM_sysinfo(a, b, c, d, e, f)                  (struct sysinfo *)a
-#define __NR64AM_times(a, b, c, d, e, f)                    (struct tms *)a
+#define __NR64AM_times(a, b, c, d, e, f)                    (struct __tmsx64 *)a
 #define __NR64AM_ptrace(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__pid_t)b, (void *)c, (void *)d
 #define __NR64AM_getuid(a, b, c, d, e, f)                   /* nothing */
 #define __NR64AM_syslog(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (char const *)b, (__size_t)c

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb28cdb95 */
+/* HASH CRC-32:0xaddf2f51 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,9 +22,9 @@
 #define __local_ppoll64_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_ppoll
-#include <bits/pollfd.h>
-#include <bits/timespec.h>
-#include <bits/sigset.h>
+#include <bits/os/pollfd.h>
+#include <bits/os/timespec.h>
+#include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: ppoll32 from sys.poll */
 #ifndef __local___localdep_ppoll32_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7179dc1 */
+/* HASH CRC-32:0xcf6402b2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 
 #include <features.h>
 
-#include <asm/wait.h>
+#include <asm/os/wait.h>
 #include <bits/types.h>
 #include <parts/waitmacros.h>
 

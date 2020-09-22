@@ -24,10 +24,10 @@
 %{
 #include <features.h>
 
-#include <asm/resource.h>
+#include <asm/os/resource.h>
 #include <bits/resource.h>
 #include <bits/rusage-struct.h>
-#include <bits/timeval.h>
+#include <bits/os/timeval.h>
 #include <bits/types.h>
 
 __SYSDECL_BEGIN

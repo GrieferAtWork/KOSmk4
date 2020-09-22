@@ -30,7 +30,7 @@
 #ifndef _UCHAR_H
 #include <uchar.h>
 #endif /* !_UCHAR_H */
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 #include <kos/anno.h>
 
 #include <libc/malloc.h>
@@ -129,10 +129,10 @@ format_c32snprintf_printer(*) %{uchar32("format_wsnprintf_printer")}
 format_c16width(*) %{uchar16("format_wwidth")}
 format_c32width(*) %{uchar32("format_wwidth")}
 
-[[ATTR_CONST, cc(__C16FORMATPRINTER_CC), decl_include("<bits/uformat-printer.h>")]]
+[[ATTR_CONST, cc(__C16FORMATPRINTER_CC), decl_include("<bits/crt/uformat-printer.h>")]]
 $ssize_t format_c16length(void *arg, char16_t const *__restrict data, $size_t datalen) = format_length;
 
-[[ATTR_CONST, cc(__C32FORMATPRINTER_CC), decl_include("<bits/uformat-printer.h>")]]
+[[ATTR_CONST, cc(__C32FORMATPRINTER_CC), decl_include("<bits/crt/uformat-printer.h>")]]
 $ssize_t format_c32length(void *arg, char32_t const *__restrict data, $size_t datalen) = format_length;
 
 

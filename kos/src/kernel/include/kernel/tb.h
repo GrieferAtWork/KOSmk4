@@ -22,10 +22,10 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/types.h>
 #include <kernel/syslog.h>
+#include <kernel/types.h>
 
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 
 DECL_BEGIN
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdec9795c */
+/* HASH CRC-32:0xac697f69 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@
 
 #include <features.h>
 
-#include <asm/fcntl.h>  /* __LOCK_* */
-#include <asm/stdio.h>  /* __SEEK_* */
-#include <bits/types.h> /* fd_t */
+#include <asm/os/fcntl.h> /* __LOCK_* */
+#include <asm/os/stdio.h> /* __SEEK_* */
+#include <bits/types.h>   /* fd_t */
 
 #ifdef __USE_GLIBC
 #include <fcntl.h>

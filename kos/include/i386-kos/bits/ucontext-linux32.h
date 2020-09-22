@@ -36,9 +36,9 @@
 #include <hybrid/host.h>      /* __x86_64__, __i386__ */
 #include <hybrid/typecore.h>  /* __ULONG32_TYPE__ */
 
-#include <bits/mcontext-linux32.h> /* struct __mcontext_linux32 */
-#include <bits/sigset.h>           /* struct __sigset_struct */
-#include <bits/sigstack32.h>       /* struct __sigaltstackx32 */
+#include <bits/mcontext-linux32.h>  /* struct __mcontext_linux32 */
+#include <bits/os/kos/sigstack32.h> /* struct __sigaltstackx32 */
+#include <bits/os/sigset.h>         /* struct __sigset_struct */
 
 #if ((defined(__linux__) || (defined(__KOS__) && __KOS_VERSION__ < 300)) && \
      (!defined(__x86_64__) && defined(__i386__)))

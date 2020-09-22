@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x959f8064 */
+/* HASH CRC-32:0x7554a0c1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_setmode_defined
 #define __local_setmode_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__F_SETFL_XCH) || (defined(__F_GETFL) && defined(__F_SETFL)))
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN

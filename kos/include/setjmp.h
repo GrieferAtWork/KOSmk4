@@ -48,7 +48,7 @@ __NAMESPACE_STD_USING(longjmp)
 #include <features.h>
 
 #include <bits/crt/setjmp.h>
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 
 __SYSDECL_BEGIN
 

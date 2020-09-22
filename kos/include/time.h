@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3901930 */
+/* HASH CRC-32:0x1ff937e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,12 +79,12 @@ __NAMESPACE_STD_USING(timespec_get)
 #include <features.h>
 
 #include <bits/crt/tm.h>
-#include <bits/time.h>
+#include <asm/os/clock.h>
 #include <bits/types.h>
 
 #ifdef __USE_POSIX199309
-#include <bits/timespec.h>
-#include <bits/itimerval.h>
+#include <bits/os/timespec.h>
+#include <bits/os/itimerval.h>
 #endif /* __USE_POSIX199309 */
 
 #ifdef __USE_XOPEN2K8
@@ -92,7 +92,139 @@ __NAMESPACE_STD_USING(timespec_get)
 #endif /* __USE_XOPEN2K8 */
 
 #ifdef __USE_GNU
-#include <bits/timex.h>
+#include <asm/os/timex.h>
+#include <bits/os/timex.h>
+
+/* Mode code flags (for `struct timex::mode') */
+#if !defined(ADJ_OFFSET) && defined(__ADJ_OFFSET)
+#define ADJ_OFFSET            __ADJ_OFFSET            /* ??? */
+#endif /* !ADJ_OFFSET && __ADJ_OFFSET */
+#if !defined(ADJ_FREQUENCY) && defined(__ADJ_FREQUENCY)
+#define ADJ_FREQUENCY         __ADJ_FREQUENCY         /* ??? */
+#endif /* !ADJ_FREQUENCY && __ADJ_FREQUENCY */
+#if !defined(ADJ_MAXERROR) && defined(__ADJ_MAXERROR)
+#define ADJ_MAXERROR          __ADJ_MAXERROR          /* ??? */
+#endif /* !ADJ_MAXERROR && __ADJ_MAXERROR */
+#if !defined(ADJ_ESTERROR) && defined(__ADJ_ESTERROR)
+#define ADJ_ESTERROR          __ADJ_ESTERROR          /* ??? */
+#endif /* !ADJ_ESTERROR && __ADJ_ESTERROR */
+#if !defined(ADJ_STATUS) && defined(__ADJ_STATUS)
+#define ADJ_STATUS            __ADJ_STATUS            /* ??? */
+#endif /* !ADJ_STATUS && __ADJ_STATUS */
+#if !defined(ADJ_TIMECONST) && defined(__ADJ_TIMECONST)
+#define ADJ_TIMECONST         __ADJ_TIMECONST         /* ??? */
+#endif /* !ADJ_TIMECONST && __ADJ_TIMECONST */
+#if !defined(ADJ_TAI) && defined(__ADJ_TAI)
+#define ADJ_TAI               __ADJ_TAI               /* ??? */
+#endif /* !ADJ_TAI && __ADJ_TAI */
+#if !defined(ADJ_SETOFFSET) && defined(__ADJ_SETOFFSET)
+#define ADJ_SETOFFSET         __ADJ_SETOFFSET         /* ??? */
+#endif /* !ADJ_SETOFFSET && __ADJ_SETOFFSET */
+#if !defined(ADJ_MICRO) && defined(__ADJ_MICRO)
+#define ADJ_MICRO             __ADJ_MICRO             /* ??? */
+#endif /* !ADJ_MICRO && __ADJ_MICRO */
+#if !defined(ADJ_NANO) && defined(__ADJ_NANO)
+#define ADJ_NANO              __ADJ_NANO              /* ??? */
+#endif /* !ADJ_NANO && __ADJ_NANO */
+#if !defined(ADJ_TICK) && defined(__ADJ_TICK)
+#define ADJ_TICK              __ADJ_TICK              /* ??? */
+#endif /* !ADJ_TICK && __ADJ_TICK */
+#if !defined(ADJ_OFFSET_SINGLESHOT) && defined(__ADJ_OFFSET_SINGLESHOT)
+#define ADJ_OFFSET_SINGLESHOT __ADJ_OFFSET_SINGLESHOT /* ??? */
+#endif /* !ADJ_OFFSET_SINGLESHOT && __ADJ_OFFSET_SINGLESHOT */
+#if !defined(ADJ_OFFSET_SS_READ) && defined(__ADJ_OFFSET_SS_READ)
+#define ADJ_OFFSET_SS_READ    __ADJ_OFFSET_SS_READ    /* ??? */
+#endif /* !ADJ_OFFSET_SS_READ && __ADJ_OFFSET_SS_READ */
+
+/* Status code flags (for `struct timex::status') */
+#if !defined(STA_PLL) && defined(__STA_PLL)
+#define STA_PLL       __STA_PLL       /* ??? */
+#endif /* !STA_PLL && __STA_PLL */
+#if !defined(STA_PPSFREQ) && defined(__STA_PPSFREQ)
+#define STA_PPSFREQ   __STA_PPSFREQ   /* ??? */
+#endif /* !STA_PPSFREQ && __STA_PPSFREQ */
+#if !defined(STA_PPSTIME) && defined(__STA_PPSTIME)
+#define STA_PPSTIME   __STA_PPSTIME   /* ??? */
+#endif /* !STA_PPSTIME && __STA_PPSTIME */
+#if !defined(STA_FLL) && defined(__STA_FLL)
+#define STA_FLL       __STA_FLL       /* ??? */
+#endif /* !STA_FLL && __STA_FLL */
+#if !defined(STA_INS) && defined(__STA_INS)
+#define STA_INS       __STA_INS       /* ??? */
+#endif /* !STA_INS && __STA_INS */
+#if !defined(STA_DEL) && defined(__STA_DEL)
+#define STA_DEL       __STA_DEL       /* ??? */
+#endif /* !STA_DEL && __STA_DEL */
+#if !defined(STA_UNSYNC) && defined(__STA_UNSYNC)
+#define STA_UNSYNC    __STA_UNSYNC    /* ??? */
+#endif /* !STA_UNSYNC && __STA_UNSYNC */
+#if !defined(STA_FREQHOLD) && defined(__STA_FREQHOLD)
+#define STA_FREQHOLD  __STA_FREQHOLD  /* ??? */
+#endif /* !STA_FREQHOLD && __STA_FREQHOLD */
+#if !defined(STA_PPSSIGNAL) && defined(__STA_PPSSIGNAL)
+#define STA_PPSSIGNAL __STA_PPSSIGNAL /* ??? */
+#endif /* !STA_PPSSIGNAL && __STA_PPSSIGNAL */
+#if !defined(STA_PPSJITTER) && defined(__STA_PPSJITTER)
+#define STA_PPSJITTER __STA_PPSJITTER /* ??? */
+#endif /* !STA_PPSJITTER && __STA_PPSJITTER */
+#if !defined(STA_PPSWANDER) && defined(__STA_PPSWANDER)
+#define STA_PPSWANDER __STA_PPSWANDER /* ??? */
+#endif /* !STA_PPSWANDER && __STA_PPSWANDER */
+#if !defined(STA_PPSERROR) && defined(__STA_PPSERROR)
+#define STA_PPSERROR  __STA_PPSERROR  /* ??? */
+#endif /* !STA_PPSERROR && __STA_PPSERROR */
+#if !defined(STA_CLOCKERR) && defined(__STA_CLOCKERR)
+#define STA_CLOCKERR  __STA_CLOCKERR  /* ??? */
+#endif /* !STA_CLOCKERR && __STA_CLOCKERR */
+#if !defined(STA_NANO) && defined(__STA_NANO)
+#define STA_NANO      __STA_NANO      /* ??? */
+#endif /* !STA_NANO && __STA_NANO */
+#if !defined(STA_MODE) && defined(__STA_MODE)
+#define STA_MODE      __STA_MODE      /* ??? */
+#endif /* !STA_MODE && __STA_MODE */
+#if !defined(STA_CLK) && defined(__STA_CLK)
+#define STA_CLK       __STA_CLK       /* ??? */
+#endif /* !STA_CLK && __STA_CLK */
+
+/* Read-only bits */
+#if !defined(STA_RONLY) && defined(__STA_RONLY)
+#define STA_RONLY __STA_RONLY
+#endif /* !STA_RONLY && __STA_RONLY */
+
+/* Old alias names */
+#if !defined(MOD_OFFSET) && defined(__ADJ_OFFSET)
+#define MOD_OFFSET    __ADJ_OFFSET
+#endif /* !MOD_OFFSET && __ADJ_OFFSET */
+#if !defined(MOD_FREQUENCY) && defined(__ADJ_FREQUENCY)
+#define MOD_FREQUENCY __ADJ_FREQUENCY
+#endif /* !MOD_FREQUENCY && __ADJ_FREQUENCY */
+#if !defined(MOD_MAXERROR) && defined(__ADJ_MAXERROR)
+#define MOD_MAXERROR  __ADJ_MAXERROR
+#endif /* !MOD_MAXERROR && __ADJ_MAXERROR */
+#if !defined(MOD_ESTERROR) && defined(__ADJ_ESTERROR)
+#define MOD_ESTERROR  __ADJ_ESTERROR
+#endif /* !MOD_ESTERROR && __ADJ_ESTERROR */
+#if !defined(MOD_STATUS) && defined(__ADJ_STATUS)
+#define MOD_STATUS    __ADJ_STATUS
+#endif /* !MOD_STATUS && __ADJ_STATUS */
+#if !defined(MOD_TIMECONST) && defined(__ADJ_TIMECONST)
+#define MOD_TIMECONST __ADJ_TIMECONST
+#endif /* !MOD_TIMECONST && __ADJ_TIMECONST */
+#if !defined(MOD_CLKB) && defined(__ADJ_TICK)
+#define MOD_CLKB      __ADJ_TICK
+#endif /* !MOD_CLKB && __ADJ_TICK */
+#if !defined(MOD_CLKA) && defined(__ADJ_OFFSET_SINGLESHOT)
+#define MOD_CLKA      __ADJ_OFFSET_SINGLESHOT
+#endif /* !MOD_CLKA && __ADJ_OFFSET_SINGLESHOT */
+#if !defined(MOD_TAI) && defined(__ADJ_TAI)
+#define MOD_TAI       __ADJ_TAI
+#endif /* !MOD_TAI && __ADJ_TAI */
+#if !defined(MOD_MICRO) && defined(__ADJ_MICRO)
+#define MOD_MICRO     __ADJ_MICRO
+#endif /* !MOD_MICRO && __ADJ_MICRO */
+#if !defined(MOD_NANO) && defined(__ADJ_NANO)
+#define MOD_NANO      __ADJ_NANO
+#endif /* !MOD_NANO && __ADJ_NANO */
 #endif /* __USE_GNU */
 
 
@@ -150,12 +282,104 @@ __SYSDECL_BEGIN
 #define NULL __NULLPTR
 #endif /* NULL */
 
-#if (defined(__USE_DOS) || \
-     (!defined(__USE_XOPEN2K) && !defined(__USE_ISOC_PURE) && !defined(__STRICT_ANSI__)))
-#ifndef CLK_TCK
+#if !defined(CLOCKS_PER_SEC) && defined(__CLOCKS_PER_SEC)
+#define CLOCKS_PER_SEC  (__CCAST(clock_t)__CLOCKS_PER_SEC)
+#endif /* !CLOCKS_PER_SEC && __CLOCKS_PER_SEC */
+
+#if (!defined(__STRICT_ANSI__) || defined(__USE_POSIX)) && \
+     !defined(__USE_XOPEN2K) && defined(__CC__) && !defined(__USE_ISOC_PURE)
+__SYSDECL_END
+#include <asm/crt/confname.h>
+__SYSDECL_BEGIN
+#ifdef _SC_CLK_TCK
+#ifndef ____os_sysconf_defined
+#define ____os_sysconf_defined 1
+#ifdef __CRT_HAVE_sysconf
+/* >> sysconf(2)
+ * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
+ * Return a system configuration value `NAME'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+__CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__os_sysconf,(__STDC_INT_AS_UINT_T __name),sysconf,(__name))
+#elif defined(__CRT_HAVE__sysconf)
+/* >> sysconf(2)
+ * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
+ * Return a system configuration value `NAME'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+__CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__os_sysconf,(__STDC_INT_AS_UINT_T __name),_sysconf,(__name))
+#elif defined(__CRT_HAVE___sysconf)
+/* >> sysconf(2)
+ * @param: NAME: One of `_SC_*' from <asm/crt/confname.h>
+ * Return a system configuration value `NAME'
+ * return: * : The configuration limit associated with `NAME' for `PATH'
+ * return: -1: [errno=<unchanged>] `NAME' refers to a maximum or minimum
+ *                                 limit, and that limit is indeterminate
+ * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
+__CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__os_sysconf,(__STDC_INT_AS_UINT_T __name),__sysconf,(__name))
+#else /* ... */
+#undef ____os_sysconf_defined
+#endif /* !... */
+#endif /* !____os_sysconf_defined */
+#endif /* _SC_CLK_TCK */
+#if defined(____os_sysconf_defined) && defined(_SC_CLK_TCK)
+#define CLK_TCK ((__clock_t)__os_sysconf(_SC_CLK_TCK))
+#else /* ____os_sysconf_defined && _SC_CLK_TCK */
 #define CLK_TCK CLOCKS_PER_SEC
-#endif /* !CLK_TCK */
-#endif /* __USE_DOS || (!__USE_XOPEN2K && !__USE_ISOC_PURE && !__STRICT_ANSI__) */
+#endif /* !____os_sysconf_defined || !_SC_CLK_TCK */
+#endif /* ... */
+
+
+#ifdef __USE_POSIX199309
+#if !defined(CLOCK_REALTIME) && defined(__CLOCK_REALTIME)
+#define CLOCK_REALTIME           __CLOCK_REALTIME           /* TODO: Doc */
+#endif /* !CLOCK_REALTIME && __CLOCK_REALTIME */
+#if !defined(CLOCK_MONOTONIC) && defined(__CLOCK_MONOTONIC)
+#define CLOCK_MONOTONIC          __CLOCK_MONOTONIC          /* TODO: Doc */
+#endif /* !CLOCK_MONOTONIC && __CLOCK_MONOTONIC */
+#if !defined(CLOCK_PROCESS_CPUTIME_ID) && defined(__CLOCK_PROCESS_CPUTIME_ID)
+#define CLOCK_PROCESS_CPUTIME_ID __CLOCK_PROCESS_CPUTIME_ID /* TODO: Doc */
+#endif /* !CLOCK_PROCESS_CPUTIME_ID && __CLOCK_PROCESS_CPUTIME_ID */
+#if !defined(CLOCK_THREAD_CPUTIME_ID) && defined(__CLOCK_THREAD_CPUTIME_ID)
+#define CLOCK_THREAD_CPUTIME_ID  __CLOCK_THREAD_CPUTIME_ID  /* TODO: Doc */
+#endif /* !CLOCK_THREAD_CPUTIME_ID && __CLOCK_THREAD_CPUTIME_ID */
+#if !defined(CLOCK_MONOTONIC_RAW) && defined(__CLOCK_MONOTONIC_RAW)
+#define CLOCK_MONOTONIC_RAW      __CLOCK_MONOTONIC_RAW      /* TODO: Doc */
+#endif /* !CLOCK_MONOTONIC_RAW && __CLOCK_MONOTONIC_RAW */
+#if !defined(CLOCK_REALTIME_COARSE) && defined(__CLOCK_REALTIME_COARSE)
+#define CLOCK_REALTIME_COARSE    __CLOCK_REALTIME_COARSE    /* TODO: Doc */
+#endif /* !CLOCK_REALTIME_COARSE && __CLOCK_REALTIME_COARSE */
+#if !defined(CLOCK_MONOTONIC_COARSE) && defined(__CLOCK_MONOTONIC_COARSE)
+#define CLOCK_MONOTONIC_COARSE   __CLOCK_MONOTONIC_COARSE   /* TODO: Doc */
+#endif /* !CLOCK_MONOTONIC_COARSE && __CLOCK_MONOTONIC_COARSE */
+#if !defined(CLOCK_BOOTTIME) && defined(__CLOCK_BOOTTIME)
+#define CLOCK_BOOTTIME           __CLOCK_BOOTTIME           /* TODO: Doc */
+#endif /* !CLOCK_BOOTTIME && __CLOCK_BOOTTIME */
+#if !defined(CLOCK_REALTIME_ALARM) && defined(__CLOCK_REALTIME_ALARM)
+#define CLOCK_REALTIME_ALARM     __CLOCK_REALTIME_ALARM     /* TODO: Doc */
+#endif /* !CLOCK_REALTIME_ALARM && __CLOCK_REALTIME_ALARM */
+#if !defined(CLOCK_BOOTTIME_ALARM) && defined(__CLOCK_BOOTTIME_ALARM)
+#define CLOCK_BOOTTIME_ALARM     __CLOCK_BOOTTIME_ALARM     /* TODO: Doc */
+#endif /* !CLOCK_BOOTTIME_ALARM && __CLOCK_BOOTTIME_ALARM */
+#if !defined(CLOCK_TAI) && defined(__CLOCK_TAI)
+#define CLOCK_TAI                __CLOCK_TAI                /* TODO: Doc */
+#endif /* !CLOCK_TAI && __CLOCK_TAI */
+#if !defined(TIMER_ABSTIME) && defined(__TIMER_ABSTIME)
+#define TIMER_ABSTIME            __TIMER_ABSTIME            /* TODO: Doc */
+#endif /* !TIMER_ABSTIME && __TIMER_ABSTIME */
+#endif /* __USE_POSIX199309 */
+
+
+#if (!defined(CLK_TCK) &&                                 \
+     (defined(__USE_DOS) || (!defined(__USE_XOPEN2K) &&   \
+                             !defined(__STRICT_ANSI__) && \
+                             !defined(__USE_ISOC_PURE))))
+#define CLK_TCK CLOCKS_PER_SEC
+#endif /* !CLK_TCK && (__USE_DOS || (!__USE_XOPEN2K && !__STRICT_ANSI__ && !__USE_ISOC_PURE)) */
 
 
 #ifdef __CC__

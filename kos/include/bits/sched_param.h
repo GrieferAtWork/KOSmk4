@@ -26,7 +26,7 @@
 
 #define __OFFSET_SCHED_PARAM_SCHED_PRIORITY 0
 #define __SIZEOF_SCHED_PARAM                __SIZEOF_INT__
-#define __ALIGNOF_SCHED_PARAM               __SIZEOF_INT__
+#define __ALIGNOF_SCHED_PARAM               __ALIGNOF_INT__
 #ifdef __CC__
 __DECL_BEGIN
 

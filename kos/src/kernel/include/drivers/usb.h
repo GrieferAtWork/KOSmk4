@@ -31,7 +31,7 @@
 #include <hybrid/__atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <kos/kernel/memory.h>
 
 #include <stdbool.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7071d08f */
+/* HASH CRC-32:0x10cb87b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -327,7 +327,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("
 }
 #include <asm/crt/stdio.h>
 #include <hybrid/typecore.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #ifndef ____vsscanf_getc_defined
 #define ____vsscanf_getc_defined 1
 __NAMESPACE_LOCAL_BEGIN
@@ -501,7 +501,7 @@ NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
 #include <hybrid/host.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vdprintf_printer) __ssize_t

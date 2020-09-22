@@ -39,9 +39,8 @@ DECL_BEGIN
 /*[[[start:implementation]]]*/
 
 
-/*[[[head:libc_ulimit,hash:CRC-32=0xda230fa2]]]*/
-/* Control process limits according to CMD
- * @param: cmd: One OF `UL_*' */
+/*[[[head:libc_ulimit,hash:CRC-32=0x9b432880]]]*/
+/* @param: cmd: One OF `UL_*' */
 INTERN ATTR_SECTION(".text.crt.unsorted") longptr_t
 NOTHROW_NCX(VLIBCCALL libc_ulimit)(__STDC_INT_AS_UINT_T cmd,
                                    ...)

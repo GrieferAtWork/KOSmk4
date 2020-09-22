@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x894af2c4 */
+/* HASH CRC-32:0x9837b193 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@
 #include <asm/crt/posix_spawn.h>
 #include <bits/crt/posix_spawn.h>
 #include <bits/sched_param.h>
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 #include <sys/types.h>
 
@@ -127,7 +127,7 @@ typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
  * @return: * :          Error errno-code describing the reason of failure */
 __CDECLARE(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_RPC,posix_fspawn_np,(pid_t *__restrict __pid, __fd_t __execfd, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__execfd,__file_actions,__attrp,___argv,___envp))
 #else /* __CRT_HAVE_posix_fspawn_np */
-#include <asm/vfork.h>
+#include <asm/os/vfork.h>
 #if (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))) || defined(__CRT_HAVE_posix_spawn)
 #include <libc/local/spawn/posix_fspawn_np.h>
 /* >> posix_fspawn_np(3)
@@ -183,8 +183,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_fspawn_np, __FORCELOCAL __ATTR_ARTIFICIAL 
  * @return: * :          Error errno-code describing the reason of failure */
 __CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,posix_spawn,(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__path,__file_actions,__attrp,___argv,___envp))
 #else /* __CRT_HAVE_posix_spawn */
-#include <asm/fcntl.h>
-#include <asm/vfork.h>
+#include <asm/os/fcntl.h>
+#include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_posix_fspawn_np) || (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))))
 #include <libc/local/spawn/posix_spawn.h>
 /* >> posix_spawn(3)
@@ -223,8 +223,8 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,posix_spawnp,(pi
 #else /* __CRT_HAVE_posix_spawnp */
 #include <hybrid/__alloca.h>
 #include <libc/local/environ.h>
-#include <asm/fcntl.h>
-#include <asm/vfork.h>
+#include <asm/os/fcntl.h>
+#include <asm/os/vfork.h>
 #if (defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)) && (defined(__CRT_HAVE_posix_spawn) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_posix_fspawn_np) || (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid)))))) && defined(__hybrid_alloca)
 #include <libc/local/spawn/posix_spawnp.h>
 /* >> posix_spawnp(3)

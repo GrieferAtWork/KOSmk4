@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc62ae90c */
+/* HASH CRC-32:0xa6b135d3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_fdwalk_defined
 #define __local_fdwalk_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_NEXT)
 #ifndef ____fdwalk_func_t_defined
 #define ____fdwalk_func_t_defined 1

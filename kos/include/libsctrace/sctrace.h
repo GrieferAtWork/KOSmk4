@@ -23,8 +23,8 @@
 #include "api.h"
 /**/
 
+#include <bits/crt/format-printer.h>
 #include <bits/types.h>
-#include <bits/format-printer.h>
 
 #include "repr-types.h"
 

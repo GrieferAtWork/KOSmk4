@@ -40,8 +40,8 @@
 #include <sched/signal.h>
 #include <sched/task.h>
 
-#include <bits/timespec.h>
-#include <bits/timeval.h>
+#include <bits/os/timespec.h>
+#include <bits/os/timeval.h>
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
 #include <sys/time.h>
@@ -52,9 +52,9 @@
 #include <sched.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/timeb.h>
-#include <compat/bits/timespec.h>
-#include <compat/bits/timeval.h>
+#include <compat/bits/os/timeb.h>
+#include <compat/bits/os/timespec.h>
+#include <compat/bits/os/timeval.h>
 #include <compat/kos/types.h>
 #endif /* __ARCH_HAVE_COMPAT */
 

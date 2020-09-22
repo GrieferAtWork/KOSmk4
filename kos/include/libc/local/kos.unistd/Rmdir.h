@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5930a72 */
+/* HASH CRC-32:0xdb7c7737 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_Rmdir_defined
 #define __local_Rmdir_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN

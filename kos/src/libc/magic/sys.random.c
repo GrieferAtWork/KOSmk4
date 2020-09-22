@@ -25,7 +25,7 @@
 %{
 #include <features.h>
 
-#include <asm/random.h>
+#include <asm/os/random.h>
 #include <bits/types.h>
 #ifdef __USE_GLIBC
 #include <sys/types.h>
@@ -81,7 +81,7 @@ ssize_t getrandom([[outp(num_bytes)]] void *buf,
 @@@return:  0: Success
 @@@return: -1: Error (see `errno')
 [[guard, wunused, impl_include("<libc/errno.h>")]]
-[[requires_include("<asm/random.h>")]]
+[[requires_include("<asm/os/random.h>")]]
 [[userimpl, requires(defined(__GRND_RANDOM) && $has_function(getrandom))]]
 int getentropy([[outp(num_bytes)]] void *buf, size_t num_bytes) {
 	size_t result = 0;

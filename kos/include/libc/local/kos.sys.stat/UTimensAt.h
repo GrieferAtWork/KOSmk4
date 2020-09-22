@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1d15b15 */
+/* HASH CRC-32:0xb29ec5f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_UTimensAt64_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __LOCAL_LIBC(UTimensAt) __ATTR_NONNULL((2)) void

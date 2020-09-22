@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc883bbbf */
+/* HASH CRC-32:0xba91da31 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,8 +30,8 @@
 
 #include <features.h>
 
-#include <asm/limits.h> /* __IOV_MAX */
-#include <bits/iovec-struct.h>
+#include <asm/os/limits.h> /* __IOV_MAX */
+#include <bits/os/iovec.h>
 #include <bits/types.h>
 #include <sys/types.h>
 

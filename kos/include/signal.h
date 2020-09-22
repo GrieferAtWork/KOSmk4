@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf467b5f0 */
+/* HASH CRC-32:0x351bfacf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,20 +55,20 @@ __NAMESPACE_STD_USING(signal)
 #include <features.h>
 
 #include <asm/os/signal.h>
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 #include <bits/types.h>
 
 #ifdef __USE_POSIX199309
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #endif /* __USE_POSIX199309 */
 
 #ifdef __USE_MISC
-#include <bits/sigcontext.h>
+#include <bits/os/sigcontext.h>
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-#include <asm/sigstack.h>
-#include <bits/sigstack.h> /* `struct sigstack', `struct sigaltstack' */
+#include <asm/os/sigstack.h>
+#include <bits/os/sigstack.h> /* `struct sigstack', `struct sigaltstack' */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <sys/ucontext.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
@@ -76,7 +76,7 @@ __NAMESPACE_STD_USING(signal)
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 #include <bits/crt/pthreadtypes.h>
-#include <bits/sigval.h> /* union sigval */
+#include <bits/os/sigval.h> /* union sigval */
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #ifdef __USE_POSIX
@@ -84,11 +84,11 @@ __NAMESPACE_STD_USING(signal)
 #endif /* __USE_POSIX */
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
-#include <asm/sigevent.h>
-#include <asm/siginfo.h>
+#include <asm/os/sigevent.h>
+#include <asm/os/siginfo.h>
+#include <bits/os/sigval.h>      /* union sigval */
 #include <bits/sigevent.h>       /* struct sigevent */
 #include <bits/siginfo-struct.h> /* struct __siginfo_struct */
-#include <bits/sigval.h>         /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 __SYSDECL_BEGIN
@@ -967,7 +967,7 @@ enum {
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 
-/* Possible values for `ss_flags.'. */
+/* Possible values for `struct sigaltstack::ss_flags.'. */
 #if defined(__SS_ONSTACK) || defined(__SS_DISABLE)
 /*[[[enum]]]*/
 #ifdef __CC__
@@ -1424,9 +1424,9 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_sigqueue,(__pthread_t __threadid, __signo_
 #define SIGSET_INIT_FULL __SIGSET_INIT((__ULONGPTR_TYPE__)-1)
 #endif /* __USE_KOS */
 
-/* GLibc function aliases originally found in <bits/sigset.h>
+/* GLibc function aliases originally found in <bits/os/sigset.h>
  * Because these don't violate namespacing rules, and because
- * <bits/sigset.h> is included unconditionally, we also define
+ * <bits/os/sigset.h> is included unconditionally, we also define
  * these unconditionally! */
 
 #ifdef __CRT_HAVE_sigemptyset

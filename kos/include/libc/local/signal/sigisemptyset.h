@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1acd4651 */
+/* HASH CRC-32:0x90616eb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_sigisemptyset_defined
 #define __local_sigisemptyset_defined 1
 #include <__crt.h>
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigisemptyset) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigisemptyset))(struct __sigset_struct const *__restrict __set) {

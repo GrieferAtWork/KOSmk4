@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x645f735b */
+/* HASH CRC-32:0x80431adb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_format_wprintf_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-#include <bits/wformat-printer.h>
+#include <bits/crt/wformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_vwprintf from parts.wchar.format-printer */
 #ifndef __local___localdep_format_vwprintf_defined

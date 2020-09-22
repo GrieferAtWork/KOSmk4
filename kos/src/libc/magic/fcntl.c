@@ -61,16 +61,16 @@
 %{
 #include <features.h>
 
-#include <asm/fcntl.h>
-#include <asm/oflags.h>
-#include <bits/flock-struct.h>
+#include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#include <bits/os/flock.h>
 #include <bits/types.h>
 
 #ifdef __USE_GNU
-#include <asm/limits.h> /* __IOV_MAX */
-#include <bits/f_owner_ex-struct.h>
-#include <bits/file_handle-struct.h>
-#include <bits/iovec-struct.h>
+#include <asm/os/limits.h> /* __IOV_MAX */
+#include <bits/os/f_owner_ex.h>
+#include <bits/os/file_handle.h>
+#include <bits/os/iovec.h>
 
 #ifndef UIO_MAXIOV
 #if !defined(__IOV_MAX) || (__IOV_MAX == -1)
@@ -82,9 +82,19 @@
 #endif /* __USE_GNU */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#include <asm/stdio.h>
+#include <asm/os/stat.h>
+#include <asm/os/stdio.h>
 #include <bits/stat.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
+
+#ifdef __USE_ATFILE
+#if !defined(UTIME_NOW) && defined(__UTIME_NOW)
+#define UTIME_NOW  __UTIME_NOW  /* TODO: Doc */
+#endif /* !UTIME_NOW && __UTIME_NOW */
+#if !defined(UTIME_OMIT) && defined(__UTIME_OMIT)
+#define UTIME_OMIT __UTIME_OMIT /* TODO: Doc */
+#endif /* !UTIME_OMIT && __UTIME_OMIT */
+#endif /* __USE_ATFILE */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #if defined(__USE_NETBSD) && defined(__USE_XOPEN)
@@ -1567,7 +1577,7 @@ $fd_t open32([[nonnull]] char const *filename, $oflag_t oflags, ...);
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("open64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("open", "_open", "__open")]]
 [[decl_include("<bits/types.h>"), export_as("__open")]]
-[[crt_dos_variant, dos_export_as("DOS$_open"), requires_include("<asm/fcntl.h>")]]
+[[crt_dos_variant, dos_export_as("DOS$_open"), requires_include("<asm/os/fcntl.h>")]]
 [[userimpl, requires($has_function(open64) || (defined(__AT_FDCWD) && $has_function(openat)))]]
 $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 	$fd_t result;
@@ -1589,7 +1599,7 @@ $fd_t open([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 [[crt_dos_variant, dos_export_as("DOS$_creat")]]
 [[alias("creat", "_creat", "creat64")]]
 [[userimpl, requires_function(creat64, open)]]
-[[impl_include("<asm/fcntl.h>"), decl_include("<bits/types.h>")]]
+[[impl_include("<asm/os/fcntl.h>"), decl_include("<bits/types.h>")]]
 $fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
 	return open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode);
 }
@@ -1598,7 +1608,7 @@ $fd_t creat([[nonnull]] char const *filename, $mode_t mode) {
 %#ifdef __USE_LARGEFILE64
 [[vartypes($mode_t), doc_alias(open)]]
 [[export_alias("__open64"), largefile64_variant_of(open)]]
-[[decl_include("<bits/types.h>"), impl_include("<asm/fcntl.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("open", "_open")]]
 [[cp, wunused, crt_dos_variant, userimpl, requires_function(open32)]]
 $fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
@@ -1617,7 +1627,7 @@ $fd_t open64([[nonnull]] char const *filename, $oflag_t oflags, ...) {
 }
 
 [[guard, largefile64_variant_of(creat), doc_alias(creat)]]
-[[decl_include("<bits/types.h>"), impl_include("<asm/fcntl.h>")]]
+[[decl_include("<bits/types.h>"), impl_include("<asm/os/fcntl.h>")]]
 [[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("creat", "_creat")]]
 [[cp, wunused, userimpl, crt_dos_variant, requires_function(open64)]]
 $fd_t creat64([[nonnull]] char const *filename, $mode_t mode) {

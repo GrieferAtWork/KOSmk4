@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ea571e7 */
+/* HASH CRC-32:0x274a5d13 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,7 +155,7 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #include <hybrid/typecore.h>
 
 #include <asm/crt/stdlib.h>
-#include <asm/stdlib.h>
+#include <asm/os/stdlib.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -2263,7 +2263,7 @@ typedef __uid_t uid_t; /* User ID */
 /* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 __CDECLARE_VOID(,__NOTHROW_NCX,closefrom,(__fd_t __lowfd),(__lowfd))
 #else /* __CRT_HAVE_closefrom */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_CLOSEM)
 #include <libc/local/unistd/closefrom.h>
 /* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
@@ -2406,7 +2406,7 @@ typedef int (__LIBKCALL *__fdwalk_func_t)(void *__cookie, __fd_t __fd);
  * invocations return 0, `fdwalk()' will also return 0. */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,fdwalk,(__fdwalk_func_t __func, void *__cookie),(__func,__cookie))
 #else /* __CRT_HAVE_fdwalk */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && defined(__F_NEXT)
 #include <libc/local/stdlib/fdwalk.h>
 /* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them

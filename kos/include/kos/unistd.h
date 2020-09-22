@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x176b4d65 */
+/* HASH CRC-32:0x18c7de9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,11 +130,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Execlpe, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
 #define Execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Execlpe))
 #endif /* !__cplusplus */
 #endif /* ... */
-
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Pipe,(__fd_t __pipedes[2]),(__pipedes))
-
 #ifdef __CRT_HAVE_FSync
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
@@ -152,7 +150,6 @@ __CREDIRECT_VOID(,__THROWING,FSync,(__fd_t __fd),FDataSync,(__fd))
  * meaning that changes to its data and/or descriptor are written to disk */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FSync, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FSync)(__fd_t __fd) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FSync))(__fd); })
 #endif /* !... */
-
 /* >> setpgid(2)
  * Change the ID of the process group associated with `PID's process.
  * (That is the TID of the leader of the process group of `PID's leader)
@@ -160,7 +157,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(FSync, __FORCELOCAL __ATTR_ARTIFICIAL void (__LI
  * When `PID' is ZERO(0), use `gettid()' for it instead.
  * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
 __CDECLARE_VOID_OPT(,__THROWING,SetPGid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid))
-
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
  * process group, before also making it its own session leader.
@@ -169,21 +165,18 @@ __CDECLARE_VOID_OPT(,__THROWING,SetPGid,(__pid_t __pid, __pid_t __pgid),(__pid,_
  *  - THIS_THREAD->LEADER->GROUP_LEADER->SESSION_LEADER = THIS_THREAD->LEADER->GROUP_LEADER;
  *  - return THIS_THREAD->LEADER->PID; */
 __CDECLARE_OPT(,__pid_t,__THROWING,SetSid,(void),())
-
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `UID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_VOID_OPT(,__THROWING,SetUid,(__uid_t __uid),(__uid))
-
 /* >> setgid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
  * @return: -1: [errno=EINVAL] : The given `GID' is invalid
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
-
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
  * in the parent process where this function returns the (non-zero) PID
@@ -195,13 +188,12 @@ __CDECLARE_VOID_OPT(,__THROWING,SetGid,(__gid_t __gid),(__gid))
  * @return: 0 : You're the new process that was created
  * @return: * : The `return' value is the pid of your new child process */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,Fork,(void),())
-
 #ifdef __CRT_HAVE_Chown
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_Chown */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <libc/local/kos.unistd/Chown.h>
 /* >> chown(2)
@@ -209,13 +201,12 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Chown,(char const *__file, __uid_
 __NAMESPACE_LOCAL_USING_OR_IMPL(Chown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Chown)(char const *__file, __uid_t __owner, __gid_t __group) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Chown))(__file, __owner, __group); })
 #endif /* __AT_FDCWD && __CRT_HAVE_FChownAt */
 #endif /* !__CRT_HAVE_Chown */
-
 #ifdef __CRT_HAVE_Link
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Link,(char const *__from, char const *__to),(__from,__to))
 #else /* __CRT_HAVE_Link */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_LinkAt)
 #include <libc/local/kos.unistd/Link.h>
 /* >> link(2)
@@ -223,7 +214,6 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Link,(char const *__from, char
 __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Link)(char const *__from, char const *__to) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Link))(__from, __to); })
 #endif /* __AT_FDCWD && __CRT_HAVE_LinkAt */
 #endif /* !__CRT_HAVE_Link */
-
 /* >> read(2)
  * Read up to `bufsize' bytes from `fd' into `buf'
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
@@ -232,7 +222,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Link, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
  * @return: <= bufsize: The actual amount of read bytes
  * @return: 0         : EOF */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Read,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-
 /* >> write(2)
  * Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
@@ -241,7 +230,6 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Read,(__fd_t __fd, void *__
  * @return: <= bufsize: The actual amount of written bytes
  * @return: 0         : No more data can be written */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),size_t,__THROWING,Write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_ReadAll
 /* >> readall(3)
@@ -264,7 +252,6 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,ReadAll,(__fd_t __fd, void *__b
 __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL ReadAll)(__fd_t __fd, void *__buf, size_t __bufsize) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ReadAll))(__fd, __buf, __bufsize); })
 #endif /* ... */
 #endif /* __USE_KOS */
-
 #if defined(__CRT_HAVE_LSeek64) && defined(__USE_FILE_OFFSET64)
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -279,31 +266,26 @@ __CDECLARE(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offse
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(pos) (__LIBCCALL LSeek)(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek))(__fd, __offset, __whence); })
 #endif /* ... */
-
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
 __CDECLARE_OPT(,__fd_t,__THROWING,Dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
-
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
 __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__THROWING,Dup,(__fd_t __fd),(__fd))
-
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,Chdir,(char const *__path),(__path))
-
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CDECLARE_OPT(,char *,__THROWING,GetCwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
-
 #ifdef __CRT_HAVE_Unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Unlink,(char const *__file),(__file))
 #else /* __CRT_HAVE_Unlink */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <libc/local/kos.unistd/Unlink.h>
 /* >> unlink(2)
@@ -311,13 +293,12 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Unlink,(char const *__file),(__fi
 __NAMESPACE_LOCAL_USING_OR_IMPL(Unlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Unlink)(char const *__file) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Unlink))(__file); })
 #endif /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
 #endif /* !__CRT_HAVE_Unlink */
-
 #ifdef __CRT_HAVE_Rmdir
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Rmdir,(char const *__path),(__path))
 #else /* __CRT_HAVE_Rmdir */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_UnlinkAt)
 #include <libc/local/kos.unistd/Rmdir.h>
 /* >> rmdir(2)
@@ -325,22 +306,17 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Rmdir,(char const *__path),(__pat
 __NAMESPACE_LOCAL_USING_OR_IMPL(Rmdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Rmdir)(char const *__path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Rmdir))(__path); })
 #endif /* __AT_FDCWD && __CRT_HAVE_UnlinkAt */
 #endif /* !__CRT_HAVE_Rmdir */
-
 #ifdef __USE_ATFILE
-
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,FChownAt,(__fd_t __dfd, char const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),(__dfd,__file,__owner,__group,__flags))
-
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2, 4)),__THROWING,LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),(__fromfd,__from,__tofd,__to,__flags))
-
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 3)),__THROWING,SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path))
-
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -350,14 +326,12 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((1, 3)),__THROWING,SymlinkAt,(char const *__l
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE'. */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 3)),size_t,__THROWING,ReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__dfd,__path,__buf,__buflen))
-
 #ifdef __USE_KOS
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
 __CDECLARE_OPT(__ATTR_NONNULL((2, 3)),size_t,__THROWING,FReadlinkAt,(__fd_t __dfd, char const *__restrict __path, char *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* __USE_KOS */
-
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((2)),__THROWING,UnlinkAt,(__fd_t __dfd, char const *__name, __atflag_t __flags),(__dfd,__name,__flags))
@@ -383,7 +357,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LSeek64, __FORCELOCAL __ATTR_ARTIFICIAL __pos64_
 
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-
 #if defined(__CRT_HAVE_PRead64) && defined(__USE_FILE_OFFSET64)
 /* >> pread(2)
  * Read data from a file at a specific `offset', rather than the current R/W position
@@ -418,7 +391,6 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite,(__fd_t __fd, void const
  * @return: <= bufsize: The actual amount of written bytes */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PWrite, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PWrite)(__fd_t __fd, void const *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
-
 #ifdef __USE_KOS
 #if defined(__CRT_HAVE_PReadAll64) && defined(__USE_FILE_OFFSET64)
 /* >> preadall(3)
@@ -435,7 +407,6 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,__THROWING,PReadAll,(__fd_t __fd, void *__
 __NAMESPACE_LOCAL_USING_OR_IMPL(PReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PReadAll)(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PReadAll))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
 #endif /* __USE_KOS */
-
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_PRead64
 /* >> pread64(2)
@@ -465,7 +436,6 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,__THROWING,PWrite64,(__fd_t __fd, void *_
  * Write data to a file at a specific offset */
 __NAMESPACE_LOCAL_USING_OR_IMPL(PWrite64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) size_t (__LIBCCALL PWrite64)(__fd_t __fd, void *__buf, size_t __bufsize, pos64_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(PWrite64))(__fd, __buf, __bufsize, __offset); })
 #endif /* ... */
-
 #ifdef __USE_KOS
 #ifdef __CRT_HAVE_PReadAll64
 /* >> preadall64(3)
@@ -536,34 +506,29 @@ __CDECLARE_VOID_OPT(,__THROWING,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid
  * process performs any of the actions above. */
 __CDECLARE_OPT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING,VFork,(void),())
 #endif
-
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
 __CDECLARE_VOID_OPT(,__THROWING,FChown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
-
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 __CDECLARE_VOID_OPT(,__THROWING,FChdir,(__fd_t __fd),(__fd))
-
 /* >> getpgid(2)
  * Return the ID of the process group associated with `PID's process.
  * (That is the TID of the leader of the process group of `PID's leader)
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `PID' is ZERO(0), use `gettid()' for it instead */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetPGid,(__pid_t __pid),(__pid))
-
 /* >> getsid(2)
  * Return the ID of the session which a process `PID' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
 __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__THROWING,GetSid,(__pid_t __pid),(__pid))
-
 #ifdef __CRT_HAVE_LChown
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,LChown,(char const *__file, __uid_t __owner, __gid_t __group),(__file,__owner,__group))
 #else /* __CRT_HAVE_LChown */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_FChownAt)
 #include <libc/local/kos.unistd/LChown.h>
 /* >> lchown(2)
@@ -574,7 +539,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(LChown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #endif /* !__CRT_HAVE_LChown */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-
 #if defined(__CRT_HAVE_Truncate64) && defined(__USE_FILE_OFFSET64)
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
@@ -589,7 +553,6 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__THROWING,Truncate,(char const *__file, pos
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) void (__LIBCCALL Truncate)(char const *__file, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Truncate))(__file, __length); })
 #endif /* ... */
-
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_Truncate64
 /* >> truncate64(2)
@@ -609,7 +572,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #ifdef __USE_XOPEN2K8
-
 #ifndef __FExecve_defined
 #define __FExecve_defined 1
 #ifdef __CRT_HAVE_FExecve
@@ -670,7 +632,7 @@ __CDECLARE_VOID_OPT(,__THROWING,SetEGid,(__gid_t __egid),(__egid))
  * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path))
 #else /* __CRT_HAVE_Symlink */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt)
 #include <libc/local/kos.unistd/Symlink.h>
 /* >> symlink(3)
@@ -680,7 +642,6 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Symlink,(char const *__link_te
 __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Symlink)(char const *__link_text, char const *__target_path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Symlink))(__link_text, __target_path); })
 #endif /* __AT_FDCWD && __CRT_HAVE_SymlinkAt */
 #endif /* !__CRT_HAVE_Symlink */
-
 #ifdef __CRT_HAVE_Readlink
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
@@ -693,7 +654,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_N
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),size_t,__THROWING,Readlink,(char const *__restrict __path, char *__restrict __buf, size_t __buflen),(__path,__buf,__buflen))
 #else /* __CRT_HAVE_Readlink */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && defined(__CRT_HAVE_ReadlinkAt)
 #include <libc/local/kos.unistd/Readlink.h>
 /* >> readlink(3)
@@ -717,15 +678,12 @@ __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,GetHostName,(char *__name, si
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 #ifdef __USE_MISC
-
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,SetHostName,(char const *__name, size_t __len),(__name,__len))
-
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,GetDomainName,(char *__name, size_t __buflen),(__name,__buflen))
-
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__THROWING,SetDomainName,(char const *__name, size_t __len),(__name,__len))
@@ -764,7 +722,6 @@ __CDECLARE_VOID(,__THROWING,FTruncate,(__fd_t __fd, pos_t __length),(__fd,__leng
  * Truncate the given file `FD' to a length of `LENGTH' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(FTruncate, __FORCELOCAL __ATTR_ARTIFICIAL void (__LIBCCALL FTruncate)(__fd_t __fd, pos_t __length) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FTruncate))(__fd, __length); })
 #endif /* ... */
-
 #ifdef __USE_LARGEFILE64
 #ifdef __CRT_HAVE_FTruncate64
 /* >> ftruncate64(2)

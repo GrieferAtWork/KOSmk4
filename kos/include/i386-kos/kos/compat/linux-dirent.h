@@ -23,9 +23,10 @@
 #include <__stdinc.h>
 #include <features.h> /* __USE_KOS_ALTERATIONS */
 
-#include <bits/dirent.h> /* __DIRENT_HAVE_U_D_INO */
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
+
+#include <bits/os/dirent.h> /* __DIRENT_HAVE_U_D_INO */
 
 #ifdef __x86_64__
 #define linux_direntx64 linux_dirent

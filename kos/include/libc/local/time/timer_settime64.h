@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad66a9d1 */
+/* HASH CRC-32:0x847bb4ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #ifdef __CRT_HAVE_timer_settime
 #include <features.h>
-#include <bits/itimerspec.h>
+#include <bits/os/itimerspec.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: timer_settime32 from time */

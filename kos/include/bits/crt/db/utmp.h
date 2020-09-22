@@ -25,7 +25,7 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <bits/timeval.h>
+#include <bits/os/timeval.h>
 
 
 /* The `struct utmp' type, describing entries in the utmp file.  GNU version.

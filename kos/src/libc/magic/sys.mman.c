@@ -32,7 +32,7 @@
 %{
 
 #include <features.h>
-#include <asm/mman.h>
+#include <asm/os/mman.h>
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -587,7 +587,7 @@ int mlockall(__STDC_INT_AS_UINT_T flags);
 int munlockall();
 
 [[cp, requires_function(open)]]
-[[impl_include("<asm/os/paths.h>", "<asm/oflags.h>")]]
+[[impl_include("<asm/os/paths.h>", "<asm/os/oflags.h>")]]
 [[impl_include("<parts/malloca.h>", "<libc/errno.h>")]]
 $fd_t shm_open([[nonnull]] char const *name,
                $oflag_t oflags, mode_t mode) {

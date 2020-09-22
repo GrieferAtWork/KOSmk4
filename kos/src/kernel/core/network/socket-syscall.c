@@ -32,8 +32,8 @@
 
 #include <hybrid/overflow.h>
 
-#include <bits/iovec-struct.h>
-#include <bits/timespec.h>
+#include <bits/os/iovec.h>
+#include <bits/os/timespec.h>
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
 #include <network/socket.h>
@@ -45,11 +45,11 @@
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/cmsghdr-struct.h>
-#include <compat/bits/iovec-struct.h>
-#include <compat/bits/mmsghdr-struct.h>
-#include <compat/bits/msghdr-struct.h>
-#include <compat/bits/timespec.h>
+#include <compat/bits/os/cmsghdr.h>
+#include <compat/bits/os/iovec.h>
+#include <compat/bits/os/mmsghdr.h>
+#include <compat/bits/os/msghdr.h>
+#include <compat/bits/os/timespec.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN

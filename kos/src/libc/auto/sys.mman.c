@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c68fae0 */
+/* HASH CRC-32:0x9820a24c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <asm/os/paths.h>
-#include <asm/oflags.h>
+#include <asm/os/oflags.h>
 #include <parts/malloca.h>
 #include <libc/errno.h>
 INTERN ATTR_SECTION(".text.crt.system.mman") NONNULL((1)) fd_t

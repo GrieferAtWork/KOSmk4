@@ -27,7 +27,7 @@
 
 %{
 #include <features.h>
-#include <bits/timeb.h>
+#include <bits/os/timeb.h>
 #include <bits/types.h>
 #include <hybrid/typecore.h>
 

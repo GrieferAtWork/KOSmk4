@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a33e12b */
+/* HASH CRC-32:0x164f2f7a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,19 +30,13 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return file descriptor for new interval timer source */
+/* @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 INTDEF fd_t NOTHROW(LIBDCALL libd_timerfd_create)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags);
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
- * is absolute. Optionally return the old expiration time in OTMR */
+/* @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_timerfd_settime)(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec const *utmr, struct itimerspec *otmr);
-/* Return the next expiration time of UFD */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_timerfd_gettime)(fd_t ufd, struct itimerspec *__restrict otmr);
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
- * is absolute. Optionally return the old expiration time in OTMR */
+/* @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_timerfd_settime64)(fd_t ufd, __STDC_INT_AS_UINT_T flags, struct itimerspec64 const *utmr, struct itimerspec64 *otmr);
-/* Return the next expiration time of UFD */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_timerfd_gettime64)(fd_t ufd, struct itimerspec64 *__restrict otmr);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

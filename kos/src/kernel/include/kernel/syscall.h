@@ -26,7 +26,7 @@
 #include <kernel/types.h>
 
 #include <asm/unistd.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <kos/kernel/syscalls.h> /* __ARCH_WANT_SYSCALL_* */
 #include <kos/syscalls.h>        /* System call prototypes */
 

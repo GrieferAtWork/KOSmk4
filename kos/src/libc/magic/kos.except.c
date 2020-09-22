@@ -762,7 +762,7 @@ for (local name: classes.keys.sorted()) {
 [[decl_prefix(struct exception_data;)]]
 [[decl_prefix(struct __siginfo_struct;)]]
 [[impl_include("<hybrid/host.h>")]]
-[[impl_include("<asm/siginfo.h>")]]
+[[impl_include("<asm/os/siginfo.h>")]]
 [[impl_include("<asm/os/signal.h>")]]
 [[impl_include("<bits/siginfo-struct.h>")]]
 [[impl_include("<kos/bits/exception_data.h>")]]

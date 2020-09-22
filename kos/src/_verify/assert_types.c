@@ -397,26 +397,29 @@ static_assert(sizeof(Elf64_Versym) == __SIZEOF_ELF64_VERSYM__);
 /*[[[deemon
 import * from ...misc.libgen.assert_offsetof;
 local files = {
-	"../../include/bits/cmsghdr-struct.h",
-	"../../include/bits/flock-struct.h",
-	"../../include/bits/itimerspec.h",
-	"../../include/bits/itimerval.h",
+	"../../include/bits/os/kos/cmsghdr.h",
+	"../../include/bits/os/kos/flock.h",
+	"../../include/bits/os/kos/itimerspec.h",
+	"../../include/bits/os/kos/itimerval.h",
 	"../../include/bits/mcontext.h",
-	"../../include/bits/mmsghdr-struct.h",
-	"../../include/bits/msghdr-struct.h",
-	"../../include/bits/pollfd.h",
+	"../../include/bits/os/kos/mmsghdr.h",
+	"../../include/bits/os/kos/msghdr.h",
+	"../../include/bits/os/kos/pollfd.h",
 	"../../include/bits/rusage-struct.h",
 	"../../include/bits/sigaction-struct.h",
 	"../../include/bits/siginfo-struct.h",
 	"../../include/bits/stat-kos.h",
 	"../../include/bits/statfs.h",
-	"../../include/bits/timeb.h",
-	"../../include/bits/timespec.h",
-	"../../include/bits/timeval.h",
+	"../../include/bits/os/kos/timeb.h",
+	"../../include/bits/os/kos/timespec.h",
+	"../../include/bits/os/kos/timeval.h",
 	"../../include/bits/ucontext.h",
 	"../../include/bits/ustat.h",
-	"../../include/bits/utimbuf.h",
-	"../../include/bits/utsname.h",
+	"../../include/bits/os/kos/utimbuf.h",
+	"../../include/bits/os/kos/utsname.h",
+	"../../include/bits/crt/ntptimeval.h",
+	"../../include/bits/os/kos/timex.h",
+	"../../include/bits/os/kos/tms.h",
 	"../../include/elf.h",
 	"../../include/kos/bits/debugtrap.h",
 	"../../include/kos/bits/ukern-struct.h",
@@ -467,7 +470,7 @@ for (local f: files)
 	genAsserts(f);
 
 ]]]*/
-#include <bits/cmsghdr-struct.h>
+#include <bits/os/kos/cmsghdr.h>
 
 /* struct cmsghdr */
 static_assert(offsetof(struct cmsghdr, cmsg_data) == __OFFSET_CMSGHDR_DATA);
@@ -480,7 +483,7 @@ static_assert(alignof(struct cmsghdr) == __ALIGNOF_CMSGHDR);
 
 
 
-#include <bits/flock-struct.h>
+#include <bits/os/kos/flock.h>
 
 /* struct flock */
 static_assert(offsetof(struct flock, l_len) == __OFFSET_FLOCK_LEN);
@@ -510,7 +513,7 @@ static_assert(sizeof(struct __flock32) == __SIZEOF_FLOCK32);
 
 
 
-#include <bits/itimerspec.h>
+#include <bits/os/kos/itimerspec.h>
 
 /* struct itimerspec */
 static_assert(offsetof(struct itimerspec, it_interval) == __OFFSET_ITIMERSPEC_INTERVAL);
@@ -531,7 +534,7 @@ static_assert(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
 
 
 
-#include <bits/itimerval.h>
+#include <bits/os/kos/itimerval.h>
 
 /* struct itimerval */
 static_assert(offsetof(struct itimerval, it_interval) == __OFFSET_ITIMERVAL_INTERVAL);
@@ -562,7 +565,7 @@ static_assert(alignof(struct mcontext) == __ALIGNOF_MCONTEXT);
 
 
 
-#include <bits/mmsghdr-struct.h>
+#include <bits/os/kos/mmsghdr.h>
 
 /* struct mmsghdr */
 static_assert(offsetof(struct mmsghdr, msg_hdr) == __OFFSET_MMSGHDR_HDR);
@@ -574,7 +577,7 @@ static_assert(alignof(struct mmsghdr) == __ALIGNOF_MMSGHDR);
 
 
 
-#include <bits/msghdr-struct.h>
+#include <bits/os/kos/msghdr.h>
 
 /* struct msghdr */
 static_assert(offsetof(struct msghdr, msg_control) == __OFFSET_MSGHDR_CONTROL);
@@ -591,7 +594,7 @@ static_assert(alignof(struct msghdr) == __ALIGNOF_MSGHDR);
 
 
 
-#include <bits/pollfd.h>
+#include <bits/os/kos/pollfd.h>
 
 /* struct pollfd */
 static_assert(offsetof(struct pollfd, events) == __OFFSET_POLLFD_EVENTS);
@@ -885,7 +888,7 @@ static_assert(alignof(struct __statfs64) == __ALIGNOF_STATFS64);
 
 
 
-#include <bits/timeb.h>
+#include <bits/os/kos/timeb.h>
 
 /* struct timeb */
 static_assert(offsetof(struct timeb, dstflag) == __OFFSET_TIMEB_DSTFLAG);
@@ -912,7 +915,7 @@ static_assert(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
 
 
 
-#include <bits/timespec.h>
+#include <bits/os/kos/timespec.h>
 
 /* struct timespec */
 static_assert(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
@@ -933,7 +936,7 @@ static_assert(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
 
 
 
-#include <bits/timeval.h>
+#include <bits/os/kos/timeval.h>
 
 /* struct timeval */
 static_assert(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
@@ -982,28 +985,31 @@ static_assert(alignof(struct ustat) == __ALIGNOF_USTAT);
 
 
 
-#include <bits/utimbuf.h>
+#include <bits/os/kos/utimbuf.h>
 
 /* struct utimbuf */
 static_assert(offsetof(struct utimbuf, actime) == __OFFSET_UTIMBUF_ACTIME);
 static_assert(offsetof(struct utimbuf, modtime) == __OFFSET_UTIMBUF_MODTIME);
 static_assert(sizeof(struct utimbuf) == __SIZEOF_UTIMBUF);
+static_assert(alignof(struct utimbuf) == __ALIGNOF_UTIMBUF);
 
 /* struct __utimbuf64 */
 static_assert(offsetof(struct __utimbuf64, actime) == __OFFSET_UTIMBUF64_ACTIME);
 static_assert(offsetof(struct __utimbuf64, modtime) == __OFFSET_UTIMBUF64_MODTIME);
 static_assert(sizeof(struct __utimbuf64) == __SIZEOF_UTIMBUF64);
+static_assert(alignof(struct __utimbuf64) == __ALIGNOF_UTIMBUF64);
 
 /* struct __utimbuf32 */
 static_assert(offsetof(struct __utimbuf32, actime) == __OFFSET_UTIMBUF32_ACTIME);
 static_assert(offsetof(struct __utimbuf32, modtime) == __OFFSET_UTIMBUF32_MODTIME);
 static_assert(sizeof(struct __utimbuf32) == __SIZEOF_UTIMBUF32);
+static_assert(alignof(struct __utimbuf32) == __ALIGNOF_UTIMBUF32);
 
 
 
 
 
-#include <bits/utsname.h>
+#include <bits/os/kos/utsname.h>
 
 /* struct utsname */
 static_assert(offsetof(struct utsname, domainname) == __OFFSET_UTSNAME_DOMAINNAME);
@@ -1014,6 +1020,131 @@ static_assert(offsetof(struct utsname, sysname) == __OFFSET_UTSNAME_SYSNAME);
 static_assert(offsetof(struct utsname, version) == __OFFSET_UTSNAME_VERSION);
 static_assert(sizeof(struct utsname) == __SIZEOF_UTSNAME);
 static_assert(alignof(struct utsname) == __ALIGNOF_UTSNAME);
+
+
+
+
+
+#include <bits/crt/ntptimeval.h>
+
+/* struct ntptimeval */
+static_assert(offsetof(struct ntptimeval, esterror) == __OFFSET_NTPTIMEVAL_ESTERROR);
+static_assert(offsetof(struct ntptimeval, maxerror) == __OFFSET_NTPTIMEVAL_MAXERROR);
+static_assert(offsetof(struct ntptimeval, tai) == __OFFSET_NTPTIMEVAL_TAI);
+static_assert(offsetof(struct ntptimeval, time) == __OFFSET_NTPTIMEVAL_TIME);
+static_assert(sizeof(struct ntptimeval) == __SIZEOF_NTPTIMEVAL);
+static_assert(alignof(struct ntptimeval) == __ALIGNOF_NTPTIMEVAL);
+
+/* struct __ntptimeval64 */
+static_assert(offsetof(struct __ntptimeval64, esterror) == __OFFSET_NTPTIMEVAL64_ESTERROR);
+static_assert(offsetof(struct __ntptimeval64, maxerror) == __OFFSET_NTPTIMEVAL64_MAXERROR);
+static_assert(offsetof(struct __ntptimeval64, tai) == __OFFSET_NTPTIMEVAL64_TAI);
+static_assert(offsetof(struct __ntptimeval64, time) == __OFFSET_NTPTIMEVAL64_TIME);
+static_assert(sizeof(struct __ntptimeval64) == __SIZEOF_NTPTIMEVAL64);
+static_assert(alignof(struct __ntptimeval64) == __ALIGNOF_NTPTIMEVAL64);
+
+/* struct __ntptimeval32 */
+static_assert(offsetof(struct __ntptimeval32, esterror) == __OFFSET_NTPTIMEVAL32_ESTERROR);
+static_assert(offsetof(struct __ntptimeval32, maxerror) == __OFFSET_NTPTIMEVAL32_MAXERROR);
+static_assert(offsetof(struct __ntptimeval32, tai) == __OFFSET_NTPTIMEVAL32_TAI);
+static_assert(offsetof(struct __ntptimeval32, time) == __OFFSET_NTPTIMEVAL32_TIME);
+static_assert(sizeof(struct __ntptimeval32) == __SIZEOF_NTPTIMEVAL32);
+static_assert(alignof(struct __ntptimeval32) == __ALIGNOF_NTPTIMEVAL32);
+
+
+
+
+
+#include <bits/os/kos/timex.h>
+
+/* struct timex */
+static_assert(offsetof(struct timex, calcnt) == __OFFSET_TIMEX_CALCNT);
+static_assert(offsetof(struct timex, constant) == __OFFSET_TIMEX_CONSTANT);
+static_assert(offsetof(struct timex, errcnt) == __OFFSET_TIMEX_ERRCNT);
+static_assert(offsetof(struct timex, esterror) == __OFFSET_TIMEX_ESTERROR);
+static_assert(offsetof(struct timex, freq) == __OFFSET_TIMEX_FREQ);
+static_assert(offsetof(struct timex, jitcnt) == __OFFSET_TIMEX_JITCNT);
+static_assert(offsetof(struct timex, jitter) == __OFFSET_TIMEX_JITTER);
+static_assert(offsetof(struct timex, maxerror) == __OFFSET_TIMEX_MAXERROR);
+static_assert(offsetof(struct timex, modes) == __OFFSET_TIMEX_MODES);
+static_assert(offsetof(struct timex, offset) == __OFFSET_TIMEX_OFFSET);
+static_assert(offsetof(struct timex, ppsfreq) == __OFFSET_TIMEX_PPSFREQ);
+static_assert(offsetof(struct timex, precision) == __OFFSET_TIMEX_PRECISION);
+static_assert(offsetof(struct timex, shift) == __OFFSET_TIMEX_SHIFT);
+static_assert(offsetof(struct timex, stabil) == __OFFSET_TIMEX_STABIL);
+static_assert(offsetof(struct timex, status) == __OFFSET_TIMEX_STATUS);
+static_assert(offsetof(struct timex, stbcnt) == __OFFSET_TIMEX_STBCNT);
+static_assert(offsetof(struct timex, tai) == __OFFSET_TIMEX_TAI);
+static_assert(offsetof(struct timex, tick) == __OFFSET_TIMEX_TICK);
+static_assert(offsetof(struct timex, time) == __OFFSET_TIMEX_TIME);
+static_assert(offsetof(struct timex, tolerance) == __OFFSET_TIMEX_TOLERANCE);
+static_assert(offsetof(struct timex, __pad) == __OFFSET_TIMEX___PAD);
+static_assert(sizeof(struct timex) == __SIZEOF_TIMEX);
+static_assert(alignof(struct timex) == __ALIGNOF_TIMEX);
+
+/* struct __timex64 */
+static_assert(offsetof(struct __timex64, calcnt) == __OFFSET_TIMEX64_CALCNT);
+static_assert(offsetof(struct __timex64, constant) == __OFFSET_TIMEX64_CONSTANT);
+static_assert(offsetof(struct __timex64, errcnt) == __OFFSET_TIMEX64_ERRCNT);
+static_assert(offsetof(struct __timex64, esterror) == __OFFSET_TIMEX64_ESTERROR);
+static_assert(offsetof(struct __timex64, freq) == __OFFSET_TIMEX64_FREQ);
+static_assert(offsetof(struct __timex64, jitcnt) == __OFFSET_TIMEX64_JITCNT);
+static_assert(offsetof(struct __timex64, jitter) == __OFFSET_TIMEX64_JITTER);
+static_assert(offsetof(struct __timex64, maxerror) == __OFFSET_TIMEX64_MAXERROR);
+static_assert(offsetof(struct __timex64, modes) == __OFFSET_TIMEX64_MODES);
+static_assert(offsetof(struct __timex64, offset) == __OFFSET_TIMEX64_OFFSET);
+static_assert(offsetof(struct __timex64, ppsfreq) == __OFFSET_TIMEX64_PPSFREQ);
+static_assert(offsetof(struct __timex64, precision) == __OFFSET_TIMEX64_PRECISION);
+static_assert(offsetof(struct __timex64, shift) == __OFFSET_TIMEX64_SHIFT);
+static_assert(offsetof(struct __timex64, stabil) == __OFFSET_TIMEX64_STABIL);
+static_assert(offsetof(struct __timex64, status) == __OFFSET_TIMEX64_STATUS);
+static_assert(offsetof(struct __timex64, stbcnt) == __OFFSET_TIMEX64_STBCNT);
+static_assert(offsetof(struct __timex64, tai) == __OFFSET_TIMEX64_TAI);
+static_assert(offsetof(struct __timex64, tick) == __OFFSET_TIMEX64_TICK);
+static_assert(offsetof(struct __timex64, time) == __OFFSET_TIMEX64_TIME);
+static_assert(offsetof(struct __timex64, tolerance) == __OFFSET_TIMEX64_TOLERANCE);
+static_assert(offsetof(struct __timex64, __pad) == __OFFSET_TIMEX64___PAD);
+static_assert(sizeof(struct __timex64) == __SIZEOF_TIMEX64);
+static_assert(alignof(struct __timex64) == __ALIGNOF_TIMEX64);
+
+/* struct __timex32 */
+static_assert(offsetof(struct __timex32, calcnt) == __OFFSET_TIMEX32_CALCNT);
+static_assert(offsetof(struct __timex32, constant) == __OFFSET_TIMEX32_CONSTANT);
+static_assert(offsetof(struct __timex32, errcnt) == __OFFSET_TIMEX32_ERRCNT);
+static_assert(offsetof(struct __timex32, esterror) == __OFFSET_TIMEX32_ESTERROR);
+static_assert(offsetof(struct __timex32, freq) == __OFFSET_TIMEX32_FREQ);
+static_assert(offsetof(struct __timex32, jitcnt) == __OFFSET_TIMEX32_JITCNT);
+static_assert(offsetof(struct __timex32, jitter) == __OFFSET_TIMEX32_JITTER);
+static_assert(offsetof(struct __timex32, maxerror) == __OFFSET_TIMEX32_MAXERROR);
+static_assert(offsetof(struct __timex32, modes) == __OFFSET_TIMEX32_MODES);
+static_assert(offsetof(struct __timex32, offset) == __OFFSET_TIMEX32_OFFSET);
+static_assert(offsetof(struct __timex32, ppsfreq) == __OFFSET_TIMEX32_PPSFREQ);
+static_assert(offsetof(struct __timex32, precision) == __OFFSET_TIMEX32_PRECISION);
+static_assert(offsetof(struct __timex32, shift) == __OFFSET_TIMEX32_SHIFT);
+static_assert(offsetof(struct __timex32, stabil) == __OFFSET_TIMEX32_STABIL);
+static_assert(offsetof(struct __timex32, status) == __OFFSET_TIMEX32_STATUS);
+static_assert(offsetof(struct __timex32, stbcnt) == __OFFSET_TIMEX32_STBCNT);
+static_assert(offsetof(struct __timex32, tai) == __OFFSET_TIMEX32_TAI);
+static_assert(offsetof(struct __timex32, tick) == __OFFSET_TIMEX32_TICK);
+static_assert(offsetof(struct __timex32, time) == __OFFSET_TIMEX32_TIME);
+static_assert(offsetof(struct __timex32, tolerance) == __OFFSET_TIMEX32_TOLERANCE);
+static_assert(offsetof(struct __timex32, __pad) == __OFFSET_TIMEX32___PAD);
+static_assert(sizeof(struct __timex32) == __SIZEOF_TIMEX32);
+static_assert(alignof(struct __timex32) == __ALIGNOF_TIMEX32);
+
+
+
+
+
+#include <bits/os/kos/tms.h>
+
+/* struct tms */
+static_assert(offsetof(struct tms, tms_cstime) == __OFFSET_TMS_CSTIME);
+static_assert(offsetof(struct tms, tms_cutime) == __OFFSET_TMS_CUTIME);
+static_assert(offsetof(struct tms, tms_stime) == __OFFSET_TMS_STIME);
+static_assert(offsetof(struct tms, tms_utime) == __OFFSET_TMS_UTIME);
+static_assert(sizeof(struct tms) == __SIZEOF_TMS);
+static_assert(alignof(struct tms) == __ALIGNOF_TMS);
 
 
 

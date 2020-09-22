@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc37ee771 */
+/* HASH CRC-32:0x17f05b50 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@
 #endif /* !_WCHAR_H */
 #include <hybrid/__assert.h>
 
-#include <bits/wformat-printer.h>
+#include <bits/crt/wformat-printer.h>
 #include <kos/anno.h>
 
 #include <libc/malloc.h>

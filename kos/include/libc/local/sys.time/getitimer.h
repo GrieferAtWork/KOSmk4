@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x267c071c */
+/* HASH CRC-32:0xc458a593 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,34 +26,24 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getitimer32 from sys.time */
 #if !defined(__local___localdep_getitimer32_defined) && defined(__CRT_HAVE_getitimer)
 #define __local___localdep_getitimer32_defined 1
-/* Set *VALUE to the current setting of timer WHICH.
- * Return 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(int __which, struct __itimerval32 *__curr_value),getitimer,(__which,__curr_value))
 #endif /* !__local___localdep_getitimer32_defined && __CRT_HAVE_getitimer */
 /* Dependency: getitimer64 from sys.time */
 #ifndef __local___localdep_getitimer64_defined
 #define __local___localdep_getitimer64_defined 1
 #ifdef __CRT_HAVE_getitimer64
-/* Set *VALUE to the current setting of timer WHICH.
- * Return 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),getitimer64,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Set *VALUE to the current setting of timer WHICH.
- * Return 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer64,(int __which, struct __itimerval64 *__curr_value),getitimer,(__which,__curr_value))
 #elif defined(__CRT_HAVE_getitimer)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/getitimer64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Set *VALUE to the current setting of timer WHICH.
- * Return 0 on success, -1 on errors */
 #define __localdep_getitimer64 __LIBC_LOCAL_NAME(getitimer64)
 #else /* ... */
 #undef __local___localdep_getitimer64_defined
 #endif /* !... */
 #endif /* !__local___localdep_getitimer64_defined */
-/* Set *VALUE to the current setting of timer WHICH.
- * Return 0 on success, -1 on errors */
 __LOCAL_LIBC(getitimer) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(int __which, struct itimerval *__curr_value) {
 #ifdef __CRT_HAVE_getitimer

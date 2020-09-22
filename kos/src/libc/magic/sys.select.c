@@ -41,32 +41,21 @@
 
 #include <hybrid/typecore.h>
 
-#include <asm/select.h> /* __FD_SETSIZE */
-#include <bits/sigset.h> /* struct __sigset_struct */
-#include <bits/time.h>
-#include <bits/timespec.h> /* struct timespec */
-#include <bits/timeval.h>  /* struct timeval */
+#include <bits/os/fd_set.h>   /* struct __fd_set_struct, __NFDBITS, __fd_mask, __FD_ELT, __FD_MASK, __SIZEOF_FD_SET */
+#include <bits/os/sigset.h>   /* struct __sigset_struct */
+#include <bits/os/timespec.h> /* struct timespec */
+#include <bits/os/timeval.h>  /* struct timeval */
 #include <bits/types.h>
 
 #ifndef __INTELLISENSE__
 #include <libc/string.h> /* __libc_bzero */
 #endif /* !__INTELLISENSE__ */
 
-#ifndef __FD_SETSIZE
-#define __FD_SETSIZE 1024
-#endif /* !__FD_SETSIZE */
-
-#ifdef __FD_SETSIZE
-#define FD_SETSIZE __FD_SETSIZE
-#endif /* __FD_SETSIZE */
+#ifndef FD_SETSIZE
+#define FD_SETSIZE __FD_SETSIZE /* 1+ the max FD which may be stored in a `fd_set' */
+#endif /* FD_SETSIZE */
 
 __SYSDECL_BEGIN
-
-#define __SIZEOF_FD_MASK __SIZEOF_POINTER__
-#define __SIZEOF_FD_SET  (__FD_SETSIZE / __CHAR_BIT__)
-#define __NFDBITS        (__SIZEOF_FD_MASK * __CHAR_BIT__)
-#define __FD_ELT(d)      ((d) / __NFDBITS)
-#define __FD_MASK(d)     (__CCAST(__fd_mask)1 << ((d) % __NFDBITS))
 
 #ifdef __CC__
 
@@ -85,18 +74,7 @@ typedef struct __sigset_struct sigset_t;
 typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 
-typedef __intptr_t __fd_mask;
-
-typedef struct __fd_set_struct {
-#ifdef __USE_XOPEN
-	__fd_mask fds_bits[__FD_SETSIZE / __NFDBITS];
-#define __FDS_BITS(set) ((set)->fds_bits)
-#else /* __USE_XOPEN */
-	__fd_mask __fds_bits[__FD_SETSIZE / __NFDBITS];
-#define __FDS_BITS(set) ((set)->__fds_bits)
-#endif /* !__USE_XOPEN */
-} fd_set;
-
+typedef struct __fd_set_struct fd_set;
 #ifdef __USE_MISC
 typedef __fd_mask fd_mask;
 #define NFDBITS __NFDBITS
@@ -120,8 +98,8 @@ __ATTR_NONNULL((1)) void (FD_ZERO)(fd_set *__fdsetp);
 
 }
 
-[[decl_include("<features.h>", "<bits/timeval.h>")]]
-[[decl_prefix(struct __fd_set_struct;)]]
+[[decl_include("<features.h>", "<bits/os/timeval.h>")]]
+[[decl_include("<bits/os/fd_set.h>")]]
 [[cp, ignore, nocrt, alias("select", "__select")]]
 __STDC_INT_AS_SSIZE_T select32(__STDC_INT_AS_SIZE_T nfds,
                                [[nullable]] fd_set *__restrict readfds,
@@ -129,8 +107,8 @@ __STDC_INT_AS_SSIZE_T select32(__STDC_INT_AS_SIZE_T nfds,
                                [[nullable]] fd_set *__restrict exceptfds,
                                [[nullable]] struct $timeval32 *__restrict timeout);
 
-[[decl_include("<features.h>", "<bits/timespec.h>")]]
-[[decl_prefix(struct __fd_set_struct;)]]
+[[decl_include("<features.h>", "<bits/os/timespec.h>")]]
+[[decl_include("<bits/os/fd_set.h>")]]
 [[cp, ignore, nocrt, alias("pselect")]]
 __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
                                 [[nullable]] fd_set *__restrict readfds,
@@ -140,8 +118,8 @@ __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
                                 [[nullable]] $sigset_t const *__restrict sigmask);
 
 
-[[decl_include("<features.h>", "<bits/timeval.h>")]]
-[[decl_prefix(struct __fd_set_struct;)]]
+[[decl_include("<features.h>", "<bits/os/timeval.h>")]]
+[[decl_include("<bits/os/fd_set.h>")]]
 [[cp, no_crt_self_import, export_as("__select")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("select64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("select", "__select")]]
@@ -155,22 +133,22 @@ __STDC_INT_AS_SSIZE_T select(__STDC_INT_AS_SIZE_T nfds,
 	struct timeval64 tmv;
 	if (!timeout)
 		return select64(nfds, readfds, writefds, exceptfds, NULL);
-	tmv.tv_sec  = (time64_t)timeout->tv_sec;
-	tmv.tv_usec = timeout->tv_usec;
+	tmv.@tv_sec@  = (time64_t)timeout->@tv_sec@;
+	tmv.@tv_usec@ = timeout->@tv_usec@;
 	return select64(nfds, readfds, writefds, exceptfds, &tmv);
 @@pp_else@@
 	struct timeval32 tmv;
 	if (!timeout)
 		return select32(nfds, readfds, writefds, exceptfds, NULL);
-	tmv.tv_sec  = (time32_t)timeout->tv_sec;
-	tmv.tv_usec = timeout->tv_usec;
+	tmv.@tv_sec@  = (time32_t)timeout->@tv_sec@;
+	tmv.@tv_usec@ = timeout->@tv_usec@;
 	return select32(nfds, readfds, writefds, exceptfds, &tmv);
 @@pp_endif@@
 }
 
 %#ifdef __USE_XOPEN2K
-[[decl_include("<features.h>", "<bits/timespec.h>", "<bits/sigset.h>")]]
-[[decl_prefix(struct __fd_set_struct;)]]
+[[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>")]]
+[[decl_include("<bits/os/fd_set.h>")]]
 [[cp, no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("pselect64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("pselect")]]
@@ -185,15 +163,15 @@ __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
 	struct timespec64 tmv;
 	if (!timeout)
 		return pselect64(nfds, readfds, writefds, exceptfds, NULL, sigmask);
-	tms.tv_sec  = (time64_t)timeout->tv_sec;
-	tms.tv_nsec = timeout->tv_nsec;
+	tms.@tv_sec@  = (time64_t)timeout->@tv_sec@;
+	tms.@tv_nsec@ = timeout->@tv_nsec@;
 	return pselect64(nfds, readfds, writefds, exceptfds, &tms, sigmask);
 @@pp_else@@
 	struct timespec32 tms;
 	if (!timeout)
 		return pselect32(nfds, readfds, writefds, exceptfds, NULL, sigmask);
-	tms.tv_sec  = (time32_t)timeout->tv_sec;
-	tms.tv_nsec = timeout->tv_nsec;
+	tms.@tv_sec@  = (time32_t)timeout->@tv_sec@;
+	tms.@tv_nsec@ = timeout->@tv_nsec@;
 	return pselect32(nfds, readfds, writefds, exceptfds, &tms, sigmask);
 @@pp_endif@@
 }
@@ -201,8 +179,8 @@ __STDC_INT_AS_SSIZE_T pselect(__STDC_INT_AS_SIZE_T nfds,
 
 %
 %#ifdef __USE_TIME64
-[[decl_include("<features.h>", "<bits/timeval.h>")]]
-[[decl_prefix(struct __fd_set_struct;)]]
+[[decl_include("<features.h>", "<bits/os/timeval.h>")]]
+[[decl_include("<bits/os/fd_set.h>")]]
 [[cp, doc_alias("select"), time64_variant_of(select)]]
 [[userimpl, requires_function(select32)]]
 __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
@@ -213,14 +191,14 @@ __STDC_INT_AS_SSIZE_T select64(__STDC_INT_AS_SIZE_T nfds,
 	struct timeval32 tmv;
 	if (!timeout)
 		return select32(nfds, readfds, writefds, exceptfds, NULL);
-	tmv.tv_sec  = (time32_t)timeout->tv_sec;
-	tmv.tv_usec = timeout->tv_usec;
+	tmv.tv_sec  = (time32_t)timeout->@tv_sec@;
+	tmv.tv_usec = timeout->@tv_usec@;
 	return select32(nfds, readfds, writefds, exceptfds, &tmv);
 }
 
 %#ifdef __USE_XOPEN2K
-[[decl_include("<features.h>", "<bits/timespec.h>", "<bits/sigset.h>")]]
-[[decl_prefix(struct __fd_set_struct;)]]
+[[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/os/sigset.h>")]]
+[[decl_include("<bits/os/fd_set.h>")]]
 [[doc_alias("pselect"), time64_variant_of(pselect)]]
 [[cp, userimpl, requires_function(pselect32)]]
 __STDC_INT_AS_SSIZE_T pselect64(__STDC_INT_AS_SIZE_T nfds,
@@ -232,8 +210,8 @@ __STDC_INT_AS_SSIZE_T pselect64(__STDC_INT_AS_SIZE_T nfds,
 	struct timespec32 tms;
 	if (!timeout)
 		return pselect32(nfds, readfds, writefds, exceptfds, NULL, sigmask);
-	tms.tv_sec  = (time32_t)timeout->tv_sec;
-	tms.tv_nsec = timeout->tv_nsec;
+	tms.tv_sec  = (time32_t)timeout->@tv_sec@;
+	tms.tv_nsec = timeout->@tv_nsec@;
 	return pselect32(nfds, readfds, writefds, exceptfds, &tms, sigmask);
 }
 %#endif /* __USE_XOPEN2K */

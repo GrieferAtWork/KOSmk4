@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf97e8df2 */
+/* HASH CRC-32:0xe803949 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -216,7 +216,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc,(int __ch, _
 #endif /* !__local___localdep_ungetc_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/stdio.h>
-#include <asm/stdio.h>
+#include <asm/os/stdio.h>
 #include <asm/crt/util.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Parse one line of text from `stream', whilst accounting for

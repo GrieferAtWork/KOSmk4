@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc575e2e3 */
+/* HASH CRC-32:0x2057d04b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_format_scanf_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_vscanf from format-printer */

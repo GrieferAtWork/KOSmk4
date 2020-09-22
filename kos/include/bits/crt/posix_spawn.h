@@ -26,7 +26,7 @@
 
 #include <asm/crt/posix_spawn.h>
 #include <bits/sched_param.h>
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 
 

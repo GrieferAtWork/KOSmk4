@@ -441,7 +441,7 @@ $pid_t spawnvp(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict fil
 [[cp, guard, argument_names(mode, path, ___argv, ___envp)]]
 [[export_alias("_spawnve"), requires_function(open, fspawnve)]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
-[[impl_include("<asm/oflags.h>")]]
+[[impl_include("<asm/os/oflags.h>")]]
 $pid_t spawnve(__STDC_INT_AS_UINT_T mode,
                [[nonnull]] char const *__restrict path,
                [[nonnull]] __TARGV, [[nonnull]] __TENVP) {
@@ -576,8 +576,8 @@ $pid_t spawnlpe(__STDC_INT_AS_UINT_T mode, [[nonnull]] char const *__restrict fi
 [[cp, guard, argument_names(mode, path, ___argv, ___envp)]]
 [[export_alias("_spawnve")]]
 [[decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_TARGV)]]
-[[impl_include("<asm/crt/process.h>", "<libc/errno.h>", "<asm/vfork.h>")]]
-[[requires_include("<asm/oflags.h>", "<asm/vfork.h>")]]
+[[impl_include("<asm/crt/process.h>", "<libc/errno.h>", "<asm/os/vfork.h>")]]
+[[requires_include("<asm/os/oflags.h>", "<asm/os/vfork.h>")]]
 [[requires($has_function(fexecve) && $has_function(_Exit) &&
            ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && $has_function(vfork)) ||
             ($has_function(fork) && ($has_function(pipe2) && defined(O_CLOEXEC)) &&

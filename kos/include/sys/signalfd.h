@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4900408 */
+/* HASH CRC-32:0x843f9696 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,10 @@
 
 #include <features.h>
 
-#include <asm/signalfd.h>
-#include <bits/signalfd_siginfo.h>
-#include <bits/sigset.h> /* struct __sigset_struct */
-#include <bits/types.h>
+#include <asm/os/signalfd.h>          /* __SFD_*/
+#include <bits/os/signalfd_siginfo.h> /* struct signalfd_siginfo */
+#include <bits/os/sigset.h>           /* struct __sigset_struct */
+#include <bits/types.h>               /* __fd_t */
 
 #ifdef __USE_GLIBC
 #include <stdint.h>

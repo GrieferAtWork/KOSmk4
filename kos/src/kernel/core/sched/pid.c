@@ -43,9 +43,9 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <bits/os/timespec.h>
 #include <bits/rusage-convert.h>
 #include <bits/rusage-struct.h>
-#include <bits/timespec.h>
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
 #include <sys/poll.h>

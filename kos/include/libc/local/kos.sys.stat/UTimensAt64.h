@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2ce54dd */
+/* HASH CRC-32:0xb2f2c228 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__THROWING,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct timespec const __times[2 /*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags))
 #endif /* !__local___localdep_UTimensAt32_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 __NAMESPACE_LOCAL_BEGIN
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __LOCAL_LIBC(UTimensAt64) __ATTR_NONNULL((2)) void

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57f11872 */
+/* HASH CRC-32:0x70267187 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,106 +32,86 @@
 
 #include <hybrid/typecore.h>
 
-#include <asm/poll.h>
-#include <bits/pollfd.h>
+#include <asm/os/poll.h>
+#include <bits/os/pollfd.h>
 #include <bits/types.h>
 
 #ifdef __USE_GNU
-#include <bits/sigset.h> /* struct __sigset_struct */
-#include <bits/timespec.h>
+#include <bits/os/sigset.h> /* struct __sigset_struct */
+#include <bits/os/timespec.h>
 #endif /* __USE_GNU */
 
 __SYSDECL_BEGIN
 
-/* Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-/* Event types that can be polled for. These bits may be set in `events'
- * to indicate the interesting event types; they will appear in `revents'
- * to indicate the status of the file descriptor. */
-#ifdef __POLLIN
-#define POLLIN __POLLIN /* There is data to read. */
-#endif /* __POLLIN */
-#ifdef __POLLPRI
+/* Flags for `struct pollfd::events' */
+#if !defined(POLLIN) && defined(__POLLIN)
+#define POLLIN  __POLLIN  /* There is data to read. (`read' & friends won't block when invoked) */
+#endif /* !POLLIN && __POLLIN */
+#if !defined(POLLPRI) && defined(__POLLPRI)
 #define POLLPRI __POLLPRI /* There is urgent data to read. */
-#endif /* __POLLPRI */
-#ifdef __POLLOUT
-#define POLLOUT __POLLOUT /* Writing now will not block. */
-#endif /* __POLLOUT */
+#endif /* !POLLPRI && __POLLPRI */
+#if !defined(POLLOUT) && defined(__POLLOUT)
+#define POLLOUT __POLLOUT /* Writing now will not block. (`write' & friends won't block when invoked) */
+#endif /* !POLLOUT && __POLLOUT */
 
-#if ((defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)) && \
-     !defined(__USE_KOS_PURE))
+#if ((defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)) && !defined(__USE_KOS_PURE))
 /* These values are defined in XPG4.2. */
-#ifdef __POLLRDNORM
+#if !defined(POLLRDNORM) && defined(__POLLRDNORM)
 #define POLLRDNORM __POLLRDNORM /* 100% identical to `POLLIN' (Normal data may be read). */
-#endif /* __POLLRDNORM */
-#ifdef __POLLRDBAND
+#endif /* !POLLRDNORM && __POLLRDNORM */
+#if !defined(POLLRDBAND) && defined(__POLLRDBAND)
 #define POLLRDBAND __POLLRDBAND /* Priority data may be read. */
-#endif /* __POLLRDBAND */
-#ifdef __POLLWRNORM
+#endif /* !POLLRDBAND && __POLLRDBAND */
+#if !defined(POLLWRNORM) && defined(__POLLWRNORM)
 #define POLLWRNORM __POLLWRNORM /* 100% identical to `POLLOUT' (Writing now will not block). */
-#endif /* __POLLWRNORM */
-#ifdef __POLLWRBAND
+#endif /* !POLLWRNORM && __POLLWRNORM */
+#if !defined(POLLWRBAND) && defined(__POLLWRBAND)
 #define POLLWRBAND __POLLWRBAND /* Priority data may be written. */
-#endif /* __POLLWRBAND */
+#endif /* !POLLWRBAND && __POLLWRBAND */
 #endif /* (__USE_XOPEN || __USE_XOPEN2K8) && !__USE_KOS_PURE */
 
 #ifdef __USE_GNU
-/* These are extensions for Linux. */
-#ifdef __POLLMSG
-#define POLLMSG __POLLMSG /* Documented as unused */
-#endif /* __POLLMSG */
-#ifdef __POLLREMOVE
+/* Linux (and KOS)-specific extensions. */
+#if !defined(POLLMSG) && defined(__POLLMSG)
+#define POLLMSG    __POLLMSG    /* Documented as unused */
+#endif /* !POLLMSG && __POLLMSG */
+#if !defined(POLLREMOVE) && defined(__POLLREMOVE)
 #define POLLREMOVE __POLLREMOVE /* Undocumented & unused */
-#endif /* __POLLREMOVE */
-#ifdef __POLLRDHUP
-#define POLLRDHUP __POLLRDHUP /* Socket peer closed connection, or shut down writing half of its connection */
-#endif /* __POLLRDHUP */
+#endif /* !POLLREMOVE && __POLLREMOVE */
+#if !defined(POLLRDHUP) && defined(__POLLRDHUP)
+#define POLLRDHUP  __POLLRDHUP  /* Socket peer closed connection, or shut down writing half of its connection */
+#endif /* !POLLRDHUP && __POLLRDHUP */
 #endif /* __USE_GNU */
 
-/* Event types always implicitly polled for. These bits need
- * not be set in `events', but they will appear in `revents'
- * to indicate the status of the file descriptor. */
-#ifdef __POLLERR
-#define POLLERR __POLLERR /* Error condition. */
-#endif /* __POLLERR */
-#ifdef __POLLHUP
-#define POLLHUP __POLLHUP /* Hung up. (writes are no longer possible) */
-#endif /* __POLLHUP */
-#ifdef __POLLNVAL
+/* Event types always implicitly polled for.
+ * These don't need to be set in `events', but they will appear
+ * in `revents' to indicate their respective status condition. */
+#if !defined(POLLERR) && defined(__POLLERR)
+#define POLLERR  __POLLERR  /* Error condition. */
+#endif /* !POLLERR && __POLLERR */
+#if !defined(POLLHUP) && defined(__POLLHUP)
+#define POLLHUP  __POLLHUP  /* Hung up. (writes are no longer possible) */
+#endif /* !POLLHUP && __POLLHUP */
+#if !defined(POLLNVAL) && defined(__POLLNVAL)
 #define POLLNVAL __POLLNVAL /* Invalid polling request. */
-#endif /* __POLLNVAL */
+#endif /* !POLLNVAL && __POLLNVAL */
 
 /* Poll events are mapped by select(2) using these macros. */
 #ifdef __USE_KOS
-#ifdef __POLLSELECT_READFDS
-#define POLLSELECT_READFDS __POLLSELECT_READFDS /* readfds */
-#endif /* __POLLSELECT_READFDS */
-#ifdef __POLLSELECT_WRITEFDS
-#define POLLSELECT_WRITEFDS __POLLSELECT_WRITEFDS /* writefds */
-#endif /* __POLLSELECT_WRITEFDS */
-#ifdef __POLLSELECT_EXCEPTFDS
-#define POLLSELECT_EXCEPTFDS __POLLSELECT_EXCEPTFDS /* exceptfds */
-#endif /* __POLLSELECT_EXCEPTFDS */
+#if !defined(POLLSELECT_READFDS) && defined(__POLLSELECT_READFDS)
+#define POLLSELECT_READFDS   __POLLSELECT_READFDS   /* select(2).readfds */
+#endif /* !POLLSELECT_READFDS && __POLLSELECT_READFDS */
+#if !defined(POLLSELECT_WRITEFDS) && defined(__POLLSELECT_WRITEFDS)
+#define POLLSELECT_WRITEFDS  __POLLSELECT_WRITEFDS  /* select(2).writefds */
+#endif /* !POLLSELECT_WRITEFDS && __POLLSELECT_WRITEFDS */
+#if !defined(POLLSELECT_EXCEPTFDS) && defined(__POLLSELECT_EXCEPTFDS)
+#define POLLSELECT_EXCEPTFDS __POLLSELECT_EXCEPTFDS /* select(2).exceptfds */
+#endif /* !POLLSELECT_EXCEPTFDS && __POLLSELECT_EXCEPTFDS */
 #endif /* __USE_KOS */
 
 #ifdef __USE_BSD
 #ifndef INFTIM
-#define INFTIM (-1)
+#define INFTIM (-1) /* Infinite timeout (pass for the `timeout' argument of `poll(2)') */
 #endif /* !INFTIM */
 #endif /* __USE_BSD */
 

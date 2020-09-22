@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39061ef5 */
+/* HASH CRC-32:0x4696bcc4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_c16readlink_defined
 #define __local_c16readlink_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__AT_FDCWD) && ((defined(__CRT_HAVE_wreadlinkat) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)) || defined(__CRT_HAVE_DOS$wreadlinkat))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: c16readlinkat from parts.uchar.unistd */

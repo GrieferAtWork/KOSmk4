@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12073ddb */
+/* HASH CRC-32:0x5488f771 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <bits/dirent.h>
+#include <bits/os/dirent.h>
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strcmp(3)' would */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1,
@@ -40,7 +40,7 @@ NOTHROW_NCX(LIBCCALL libc_alphasort)(struct dirent const **e1,
 #ifdef _DIRENT_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_alphasort64, libc_alphasort);
 #else /* _DIRENT_MATCHES_DIRENT64 */
-#include <bits/dirent.h>
+#include <bits/os/dirent.h>
 /* 64-bit variant of `alphasort()' */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1,
@@ -48,7 +48,7 @@ NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct dirent64 const **e1,
 	return libc_strcoll((*e1)->d_name, (*e2)->d_name);
 }
 #endif /* !_DIRENT_MATCHES_DIRENT64 */
-#include <bits/dirent.h>
+#include <bits/os/dirent.h>
 /* Sort the 2 given directory entries `E1' and `E2' the same way `strvercmp(3)' would. */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1,
@@ -58,7 +58,7 @@ NOTHROW_NCX(LIBCCALL libc_versionsort)(struct dirent const **e1,
 #ifdef _DIRENT_MATCHES_DIRENT64
 DEFINE_INTERN_ALIAS(libc_versionsort64, libc_versionsort);
 #else /* _DIRENT_MATCHES_DIRENT64 */
-#include <bits/dirent.h>
+#include <bits/os/dirent.h>
 /* 64-bit variant of `versionsort()' */
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_versionsort64)(struct dirent64 const **e1,

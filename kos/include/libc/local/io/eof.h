@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bcba6cd */
+/* HASH CRC-32:0xda5ec1e0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
 __NAMESPACE_LOCAL_END
-#include <asm/stdio.h>
+#include <asm/os/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(eof) __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(eof))(__fd_t __fd) {

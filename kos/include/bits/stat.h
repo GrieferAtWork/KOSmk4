@@ -21,15 +21,6 @@
 #define _BITS_STAT_H 1
 
 #include <__stdinc.h>
-#include <features.h>
-
-#include <asm/stat.h>
-
-#ifdef __USE_ATFILE
-#define UTIME_NOW  __UTIME_NOW
-#define UTIME_OMIT __UTIME_OMIT
-#endif /* __USE_ATFILE */
-
 
 /* When running as `__CRT_DOS_PRIMARY':
  *   `struct stat' is:

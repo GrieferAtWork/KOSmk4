@@ -33,7 +33,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/sigval.h>
+#include <bits/os/sigval.h>
 #include <bits/types.h>
 
 #define __SI_MAX_SIZE 128

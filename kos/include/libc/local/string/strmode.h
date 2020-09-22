@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce1d3674 */
+/* HASH CRC-32:0xfa103b5b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_strmode_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <asm/stat.h>
+#include <asm/os/stat.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Generate a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
@@ -55,41 +55,41 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 	switch (__mode & __S_IFMT) {
 #ifdef __S_IFDIR
 	case __S_IFDIR:  __ch = 'd'; break;
-#endif /* S_IFDIR */
+#endif /* __S_IFDIR */
 #ifdef __S_IFCHR
 	case __S_IFCHR:  __ch = 'c'; break;
-#endif /* S_IFCHR */
+#endif /* __S_IFCHR */
 #ifdef __S_IFBLK
 	case __S_IFBLK:  __ch = 'b'; break;
-#endif /* S_IFBLK */
+#endif /* __S_IFBLK */
 #ifdef __S_IFREG
 	case __S_IFREG:  __ch = '-'; break;
-#endif /* S_IFREG */
+#endif /* __S_IFREG */
 #ifdef __S_IFLNK
 	case __S_IFLNK:  __ch = 'l'; break;
-#endif /* S_IFLNK */
+#endif /* __S_IFLNK */
 #ifdef __S_IFSOCK
 	case __S_IFSOCK: __ch = 's'; break;
-#endif /* S_IFSOCK */
+#endif /* __S_IFSOCK */
 #ifdef __S_IFIFO
 	case __S_IFIFO:  __ch = 'p'; break; /* p=pipe */
-#endif /* S_IFIFO */
+#endif /* __S_IFIFO */
 	default: break;
 	}
-#endif /* S_IFMT */
+#endif /* __S_IFMT */
 	*__p++ = __ch;
 
 #ifdef __S_IRUSR
 	*__p++ = __mode & __S_IRUSR ? 'r' : '-';
-#else /* S_IRUSR */
+#else /* __S_IRUSR */
 	*__p++ = '-';
-#endif /* !S_IRUSR */
+#endif /* !__S_IRUSR */
 
 #ifdef __S_IWUSR
 	*__p++ = __mode & __S_IWUSR ? 'w' : '-';
-#else /* S_IWUSR */
+#else /* __S_IWUSR */
 	*__p++ = '-';
-#endif /* !S_IWUSR */
+#endif /* !__S_IWUSR */
 
 #if defined(__S_IXUSR) && defined(__S_ISUID)
 	switch (__mode & (__S_IXUSR | __S_ISUID)) {
@@ -103,22 +103,22 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 	__ch = __mode & __S_IXUSR ? 'x' : '-';
 #elif defined(__S_ISUID)
 	__ch = __mode & __S_ISUID ? 'S' : '-';
-#else /* S_IWUSR */
+#else /* ... */
 	__ch = '-';
-#endif /* !S_IWUSR */
+#endif /* !... */
 	*__p++ = __ch;
 
 #ifdef __S_IRGRP
 	*__p++ = __mode & __S_IRGRP ? 'r' : '-';
-#else /* S_IRGRP */
+#else /* __S_IRGRP */
 	*__p++ = '-';
-#endif /* !S_IRGRP */
+#endif /* !__S_IRGRP */
 
 #ifdef __S_IWGRP
 	*__p++ = __mode & __S_IWGRP ? 'w' : '-';
-#else /* S_IWGRP */
+#else /* __S_IWGRP */
 	*__p++ = '-';
-#endif /* !S_IWGRP */
+#endif /* !__S_IWGRP */
 
 #if defined(__S_IXGRP) && defined(__S_ISGID)
 	switch (__mode & (__S_IXGRP | __S_ISGID)) {
@@ -132,22 +132,22 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 	__ch = __mode & __S_IXGRP ? 'x' : '-';
 #elif defined(__S_ISGID)
 	__ch = __mode & __S_ISGID ? 'S' : '-';
-#else /* S_IWUSR */
+#else /* ... */
 	__ch = '-';
-#endif /* !S_IWUSR */
+#endif /* !... */
 	*__p++ = __ch;
 
 #ifdef __S_IROTH
 	*__p++ = __mode & __S_IROTH ? 'r' : '-';
-#else /* S_IROTH */
+#else /* __S_IROTH */
 	*__p++ = '-';
-#endif /* !S_IROTH */
+#endif /* !__S_IROTH */
 
 #ifdef __S_IWOTH
 	*__p++ = __mode & __S_IWOTH ? 'w' : '-';
-#else /* S_IWOTH */
+#else /* __S_IWOTH */
 	*__p++ = '-';
-#endif /* !S_IWOTH */
+#endif /* !__S_IWOTH */
 
 #if defined(__S_IXOTH) && defined(__S_ISVTX)
 	switch (__mode & (__S_IXOTH | __S_ISVTX)) {
@@ -161,9 +161,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strmode))(__mode_t __mode, char __p[1
 	__ch = __mode & __S_IXOTH ? 'x' : '-';
 #elif defined(__S_ISVTX)
 	__ch = __mode & __S_ISVTX ? 'T' : '-';
-#else /* S_IWUSR */
+#else /* ... */
 	__ch = '-';
-#endif /* !S_IWUSR */
+#endif /* !... */
 	*__p++ = __ch;
 
 	/* Always space in this implementation */

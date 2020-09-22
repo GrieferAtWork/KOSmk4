@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc4b8012 */
+/* HASH CRC-32:0x3689dfd0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,18 +30,26 @@
 
 #include <features.h>
 
-#include <asm/stat.h>
+#include <asm/os/stat.h>
 #include <bits/stat.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #include <time.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
-__SYSDECL_BEGIN
+#ifdef __USE_ATFILE
+#if !defined(UTIME_NOW) && defined(__UTIME_NOW)
+#define UTIME_NOW  __UTIME_NOW  /* TODO: Doc */
+#endif /* !UTIME_NOW && __UTIME_NOW */
+#if !defined(UTIME_OMIT) && defined(__UTIME_OMIT)
+#define UTIME_OMIT __UTIME_OMIT /* TODO: Doc */
+#endif /* !UTIME_OMIT && __UTIME_OMIT */
+#endif /* __USE_ATFILE */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __dev_t_defined
@@ -613,9 +621,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat32i64,(__WCHAR_TYP
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wstat64i32,(__WCHAR_TYPE__ const *__filename, struct __dos_stat64i32 *__buf),(__filename,__buf))
 #endif /* __USE_DOS */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_SYS_STAT_H)

@@ -21,11 +21,12 @@
 #define _LIBRT_AIO_H 1
 
 #include "api.h"
+/**/
 
 #include <__crt.h>
 
+#include <bits/os/timespec.h>
 #include <bits/sigevent.h>
-#include <bits/timespec.h>
 #include <bits/types.h>
 
 #include <librt/asm/aio.h>

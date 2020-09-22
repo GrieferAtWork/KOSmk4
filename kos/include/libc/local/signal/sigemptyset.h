@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb72cdfbf */
+/* HASH CRC-32:0xcff78d93 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_sigemptyset_defined
 #define __local_sigemptyset_defined 1
 #include <__crt.h>
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: bzeroc from string */
 #ifndef __local___localdep_bzeroc_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1b3bdae */
+/* HASH CRC-32:0xafbbdcee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -330,7 +330,7 @@
 #define __NRAN0_sched_get_priority_max algorithm
 #define __NRAN0_sched_get_priority_min algorithm
 #define __NRAN0_sched_rr_get_interval  pid
-#define __NRAN1_sched_rr_get_interval  tms
+#define __NRAN1_sched_rr_get_interval  ts
 #define __NRAN0_kill                   pid
 #define __NRAN1_kill                   signo
 #define __NRAN0_tkill                  tid
@@ -1239,7 +1239,7 @@
 #define __NRATR0_sched_get_priority_min SC_REPR_SCHED_POLICY                                    /* algorithm */ 
 #define __NRRTR_sched_get_priority_min  SC_REPR_SYSCALL_SLONG_T                                 /* return */
 #define __NRATR0_sched_rr_get_interval  SC_REPR_PID_T                                           /* pid */ 
-#define __NRATR1_sched_rr_get_interval  SC_REPR_POINTER                                         /* tms */ 
+#define __NRATR1_sched_rr_get_interval  SC_REPR_POINTER                                         /* ts */ 
 #define __NRRTR_sched_rr_get_interval   SC_REPR_ERRNO_T                                         /* return */
 #define __NRRTR_restart_syscall         SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_kill                   SC_REPR_PID_T                                           /* pid */ 

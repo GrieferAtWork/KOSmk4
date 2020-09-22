@@ -32,8 +32,8 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_timerfd_create,hash:CRC-32=0x4a61a0af]]]*/
-/* Return file descriptor for new interval timer source */
+/*[[[head:libc_timerfd_create,hash:CRC-32=0x4536f53a]]]*/
+/* @param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK' */
 INTERN ATTR_SECTION(".text.crt.timer") fd_t
 NOTHROW(LIBCCALL libc_timerfd_create)(clockid_t clock_id,
                                       __STDC_INT_AS_UINT_T flags)
@@ -45,10 +45,8 @@ NOTHROW(LIBCCALL libc_timerfd_create)(clockid_t clock_id,
 }
 /*[[[end:libc_timerfd_create]]]*/
 
-/*[[[head:libc_timerfd_settime,hash:CRC-32=0xc572a963]]]*/
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
- * is absolute. Optionally return the old expiration time in OTMR */
+/*[[[head:libc_timerfd_settime,hash:CRC-32=0x489962e]]]*/
+/* @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd,
                                            __STDC_INT_AS_UINT_T flags,
@@ -62,8 +60,7 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd,
 }
 /*[[[end:libc_timerfd_settime]]]*/
 
-/*[[[head:libc_timerfd_gettime,hash:CRC-32=0xf14de7e5]]]*/
-/* Return the next expiration time of UFD */
+/*[[[head:libc_timerfd_gettime,hash:CRC-32=0x79f883e5]]]*/
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd,
                                            struct itimerspec *__restrict otmr)
@@ -75,13 +72,11 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd,
 }
 /*[[[end:libc_timerfd_gettime]]]*/
 
-/*[[[head:libc_timerfd_settime64,hash:CRC-32=0xe494f92d]]]*/
+/*[[[head:libc_timerfd_settime64,hash:CRC-32=0x7289996]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timerfd_settime64, libc_timerfd_settime);
 #else /* MAGIC:alias */
-/* Set next expiration time of interval timer source UFD to UTMR.
- * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
- * is absolute. Optionally return the old expiration time in OTMR */
+/* @param: flags: Set of `0 | TFD_TIMER_ABSTIME' */
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((3)) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_settime64)(fd_t ufd,
                                              __STDC_INT_AS_UINT_T flags,
@@ -96,11 +91,10 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_settime64)(fd_t ufd,
 #endif /* MAGIC:alias */
 /*[[[end:libc_timerfd_settime64]]]*/
 
-/*[[[head:libc_timerfd_gettime64,hash:CRC-32=0xb71fd16]]]*/
+/*[[[head:libc_timerfd_gettime64,hash:CRC-32=0x887627f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timerfd_gettime64, libc_timerfd_gettime);
 #else /* MAGIC:alias */
-/* Return the next expiration time of UFD */
 INTERN ATTR_SECTION(".text.crt.timer") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd,
                                              struct itimerspec64 *__restrict otmr)

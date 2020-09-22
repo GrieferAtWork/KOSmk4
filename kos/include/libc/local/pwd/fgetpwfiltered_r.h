@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a33233e */
+/* HASH CRC-32:0xaf90444b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -377,7 +377,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 #include <hybrid/typecore.h>
-#include <asm/syslog.h>
+#include <asm/os/syslog.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Filtered read from `stream'
  * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID

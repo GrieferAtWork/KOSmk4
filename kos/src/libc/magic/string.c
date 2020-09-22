@@ -6768,52 +6768,52 @@ miss:
 @@                //          methods associated with the inode"
 @@   p[11] = '\0';
 [[section(".text.crt{|.dos}.bsd.strstat")]]
-[[impl_include("<asm/stat.h>"), decl_include("<bits/types.h>")]]
+[[impl_include("<asm/os/stat.h>"), decl_include("<bits/types.h>")]]
 void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	char ch;
 	/* First character: File type */
 	ch = '?';
-#ifdef S_IFMT
+@@pp_ifdef S_IFMT@@
 	switch (mode & S_IFMT) {
-#ifdef S_IFDIR
+@@pp_ifdef S_IFDIR@@
 	case S_IFDIR:  ch = 'd'; break;
-#endif /* S_IFDIR */
-#ifdef S_IFCHR
+@@pp_endif@@
+@@pp_ifdef S_IFCHR@@
 	case S_IFCHR:  ch = 'c'; break;
-#endif /* S_IFCHR */
-#ifdef S_IFBLK
+@@pp_endif@@
+@@pp_ifdef S_IFBLK@@
 	case S_IFBLK:  ch = 'b'; break;
-#endif /* S_IFBLK */
-#ifdef S_IFREG
+@@pp_endif@@
+@@pp_ifdef S_IFREG@@
 	case S_IFREG:  ch = '-'; break;
-#endif /* S_IFREG */
-#ifdef S_IFLNK
+@@pp_endif@@
+@@pp_ifdef S_IFLNK@@
 	case S_IFLNK:  ch = 'l'; break;
-#endif /* S_IFLNK */
-#ifdef S_IFSOCK
+@@pp_endif@@
+@@pp_ifdef S_IFSOCK@@
 	case S_IFSOCK: ch = 's'; break;
-#endif /* S_IFSOCK */
-#ifdef S_IFIFO
+@@pp_endif@@
+@@pp_ifdef S_IFIFO@@
 	case S_IFIFO:  ch = 'p'; break; /* p=pipe */
-#endif /* S_IFIFO */
+@@pp_endif@@
 	default: break;
 	}
-#endif /* S_IFMT */
+@@pp_endif@@
 	*p++ = ch;
 
-#ifdef S_IRUSR
+@@pp_ifdef S_IRUSR@@
 	*p++ = mode & S_IRUSR ? 'r' : '-';
-#else /* S_IRUSR */
+@@pp_else@@
 	*p++ = '-';
-#endif /* !S_IRUSR */
+@@pp_endif@@
 
-#ifdef S_IWUSR
+@@pp_ifdef S_IWUSR@@
 	*p++ = mode & S_IWUSR ? 'w' : '-';
-#else /* S_IWUSR */
+@@pp_else@@
 	*p++ = '-';
-#endif /* !S_IWUSR */
+@@pp_endif@@
 
-#if defined(S_IXUSR) && defined(S_ISUID)
+@@pp_if defined(S_IXUSR) && defined(S_ISUID)@@
 	switch (mode & (S_IXUSR | S_ISUID)) {
 	case 0:                 ch = '-'; break;
 	case S_IXUSR:           ch = 'x'; break;
@@ -6821,28 +6821,28 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	case S_IXUSR | S_ISUID: ch = 's'; break;
 	default: __builtin_unreachable();
 	}
-#elif defined(S_IXUSR)
+@@pp_elif defined(S_IXUSR)@@
 	ch = mode & S_IXUSR ? 'x' : '-';
-#elif defined(S_ISUID)
+@@pp_elif defined(S_ISUID)@@
 	ch = mode & S_ISUID ? 'S' : '-';
-#else /* S_IWUSR */
+@@pp_else@@
 	ch = '-';
-#endif /* !S_IWUSR */
+@@pp_endif@@
 	*p++ = ch;
 
-#ifdef S_IRGRP
+@@pp_ifdef S_IRGRP@@
 	*p++ = mode & S_IRGRP ? 'r' : '-';
-#else /* S_IRGRP */
+@@pp_else@@
 	*p++ = '-';
-#endif /* !S_IRGRP */
+@@pp_endif@@
 
-#ifdef S_IWGRP
+@@pp_ifdef S_IWGRP@@
 	*p++ = mode & S_IWGRP ? 'w' : '-';
-#else /* S_IWGRP */
+@@pp_else@@
 	*p++ = '-';
-#endif /* !S_IWGRP */
+@@pp_endif@@
 
-#if defined(S_IXGRP) && defined(S_ISGID)
+@@pp_if defined(S_IXGRP) && defined(S_ISGID)@@
 	switch (mode & (S_IXGRP | S_ISGID)) {
 	case 0:                 ch = '-'; break;
 	case S_IXGRP:           ch = 'x'; break;
@@ -6850,28 +6850,28 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	case S_IXGRP | S_ISGID: ch = 's'; break;
 	default: __builtin_unreachable();
 	}
-#elif defined(S_IXGRP)
+@@pp_elif defined(S_IXGRP)@@
 	ch = mode & S_IXGRP ? 'x' : '-';
-#elif defined(S_ISGID)
+@@pp_elif defined(S_ISGID)@@
 	ch = mode & S_ISGID ? 'S' : '-';
-#else /* S_IWUSR */
+@@pp_else@@
 	ch = '-';
-#endif /* !S_IWUSR */
+@@pp_endif@@
 	*p++ = ch;
 
-#ifdef S_IROTH
+@@pp_ifdef S_IROTH@@
 	*p++ = mode & S_IROTH ? 'r' : '-';
-#else /* S_IROTH */
+@@pp_else@@
 	*p++ = '-';
-#endif /* !S_IROTH */
+@@pp_endif@@
 
-#ifdef S_IWOTH
+@@pp_ifdef S_IWOTH@@
 	*p++ = mode & S_IWOTH ? 'w' : '-';
-#else /* S_IWOTH */
+@@pp_else@@
 	*p++ = '-';
-#endif /* !S_IWOTH */
+@@pp_endif@@
 
-#if defined(S_IXOTH) && defined(S_ISVTX)
+@@pp_if defined(S_IXOTH) && defined(S_ISVTX)@@
 	switch (mode & (S_IXOTH | S_ISVTX)) {
 	case 0:                 ch = '-'; break;
 	case S_IXOTH:           ch = 'x'; break;
@@ -6879,13 +6879,13 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 	case S_IXOTH | S_ISVTX: ch = 't'; break;
 	default: __builtin_unreachable();
 	}
-#elif defined(S_IXOTH)
+@@pp_elif defined(S_IXOTH)@@
 	ch = mode & S_IXOTH ? 'x' : '-';
-#elif defined(S_ISVTX)
+@@pp_elif defined(S_ISVTX)@@
 	ch = mode & S_ISVTX ? 'T' : '-';
-#else /* S_IWUSR */
+@@pp_else@@
 	ch = '-';
-#endif /* !S_IWUSR */
+@@pp_endif@@
 	*p++ = ch;
 
 	/* Always space in this implementation */

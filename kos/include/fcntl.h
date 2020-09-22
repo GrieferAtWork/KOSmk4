@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6471eff5 */
+/* HASH CRC-32:0x3be51547 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,16 +30,16 @@
 
 #include <features.h>
 
-#include <asm/fcntl.h>
-#include <asm/oflags.h>
-#include <bits/flock-struct.h>
+#include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
+#include <bits/os/flock.h>
 #include <bits/types.h>
 
 #ifdef __USE_GNU
-#include <asm/limits.h> /* __IOV_MAX */
-#include <bits/f_owner_ex-struct.h>
-#include <bits/file_handle-struct.h>
-#include <bits/iovec-struct.h>
+#include <asm/os/limits.h> /* __IOV_MAX */
+#include <bits/os/f_owner_ex.h>
+#include <bits/os/file_handle.h>
+#include <bits/os/iovec.h>
 
 #ifndef UIO_MAXIOV
 #if !defined(__IOV_MAX) || (__IOV_MAX == -1)
@@ -51,9 +51,19 @@
 #endif /* __USE_GNU */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#include <asm/stdio.h>
+#include <asm/os/stat.h>
+#include <asm/os/stdio.h>
 #include <bits/stat.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
+
+#ifdef __USE_ATFILE
+#if !defined(UTIME_NOW) && defined(__UTIME_NOW)
+#define UTIME_NOW  __UTIME_NOW  /* TODO: Doc */
+#endif /* !UTIME_NOW && __UTIME_NOW */
+#if !defined(UTIME_OMIT) && defined(__UTIME_OMIT)
+#define UTIME_OMIT __UTIME_OMIT /* TODO: Doc */
+#endif /* !UTIME_OMIT && __UTIME_OMIT */
+#endif /* __USE_ATFILE */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #if defined(__USE_NETBSD) && defined(__USE_XOPEN)
@@ -1511,7 +1521,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char 
  *                                         as `/proc/self/fd/1234', which is more like `dup(1234)' */
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
 #else /* ... */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 #include <libc/local/fcntl/open.h>
 /* Open a new file handle to the file specified by `FILENAME'
@@ -1558,7 +1568,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char 
 /* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat,(char const *__filename, __mode_t __mode),creat64,(__filename,__mode))
 #else /* ... */
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open)
 #include <libc/local/fcntl/creat.h>
 /* Alias for `open(filename, O_CREAT | O_WRONLY | O_TRUNC, mode)' */

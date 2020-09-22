@@ -23,9 +23,10 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/dirent.h> /* __DIRENT_HAVE_U_D_INO */
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
+
+#include <bits/os/dirent.h> /* __DIRENT_HAVE_U_D_INO */
 
 #ifdef __x86_64__
 #define old_linux_direntx64 old_linux_dirent

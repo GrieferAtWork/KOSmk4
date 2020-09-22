@@ -18,5 +18,5 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __sigstack_defined
-#include <bits/sigstack.h>
+#include <bits/os/sigstack.h>
 #endif /* !__sigstack_defined */

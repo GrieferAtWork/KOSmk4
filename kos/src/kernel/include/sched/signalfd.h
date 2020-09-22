@@ -25,7 +25,7 @@
 #include <kernel/malloc.h>
 #include <kernel/types.h>
 
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 
 /* signalfd() objects are really very simple:
  * read(): >> CHECK_PENDING_SIGNALS(domain: PROCESS | THREAD, mask: sf_mask)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb6af430 */
+/* HASH CRC-32:0x913f372b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_sigaddset_defined 1
 #include <__crt.h>
 #include <bits/types.h>
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigaddset) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigaddset))(struct __sigset_struct *__set, __signo_t __signo) {

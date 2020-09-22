@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6e80034 */
+/* HASH CRC-32:0xac70608f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@
 #ifndef _UCHAR_H
 #include <uchar.h>
 #endif /* !_UCHAR_H */
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 #include <kos/anno.h>
 
 #include <libc/malloc.h>

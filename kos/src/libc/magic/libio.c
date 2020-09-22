@@ -23,7 +23,7 @@
 %{
 #include <features.h>
 #include <bits/types.h>
-#include <asm/stdio.h>
+#include <asm/os/stdio.h>
 #include <asm/crt/stdio.h>
 
 /* Partially derived from GNU C /usr/include/libio.h */

@@ -27,7 +27,7 @@
 
 #ifdef __USE_OLD_DOS
 #include <bits/types.h>
-#include <asm/stdio.h> /* __SEEK_SET, __SEEK_... */
+#include <asm/os/stdio.h> /* __SEEK_SET, __SEEK_... */
 #endif /* __USE_OLD_DOS */
 
 #if defined(__i386__) || defined(__x86_64__)

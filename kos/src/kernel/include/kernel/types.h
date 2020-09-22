@@ -25,7 +25,7 @@
 #include <hybrid/__altint.h>
 #include <hybrid/typecore.h>
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <kos/kernel/types.h>
 
 DECL_BEGIN

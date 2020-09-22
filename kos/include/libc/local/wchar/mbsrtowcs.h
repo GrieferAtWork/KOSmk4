@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce24079e */
+/* HASH CRC-32:0x134dd9e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_mbsrtowcs_defined
 #define __local_mbsrtowcs_defined 1
 #include <__crt.h>
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: mbrtowc from wchar */

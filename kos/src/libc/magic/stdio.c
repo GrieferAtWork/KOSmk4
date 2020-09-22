@@ -91,16 +91,16 @@
 #include <features.h>
 
 #include <asm/crt/stdio.h>
-#include <asm/limits.h> /* __IOV_MAX */
-#include <asm/oflags.h>
-#include <asm/stdio.h>
+#include <asm/os/limits.h> /* __IOV_MAX */
+#include <asm/os/oflags.h>
+#include <asm/os/stdio.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
 #include <libio.h>
 
 #ifdef __USE_KOS
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #endif /* __USE_KOS */
 
 #ifdef __USE_DOS
@@ -645,7 +645,7 @@ int crt_flushall();
 
 @@Remove a file or directory `FILENAME'
 [[cp, std, guard]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(removeat))]]
 int remove([[nonnull]] char const *filename) {
 	return removeat(__AT_FDCWD, filename);
@@ -654,7 +654,7 @@ int remove([[nonnull]] char const *filename) {
 @@Rename a given file `OLDNAME' to `NEWNAME_OR_PATH', or in the event
 @@that `NEWNAME_OR_PATH' refers to a directory, place the file within.
 [[cp, std, guard]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(renameat))]]
 int rename([[nonnull]] char const *oldname,
            [[nonnull]] char const *newname_or_path) {
@@ -1351,7 +1351,7 @@ __LOCAL_LIBC(@vsc32scanf_ungetc@) ssize_t
 [[guard, std, guard, crtbuiltin, impl_include("<asm/crt/stdio.h>")]]
 [[wunused, ATTR_LIBC_SCANF(2, 0), decl_include("<features.h>")]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]
-[[impl_include("<hybrid/typecore.h>", "<bits/format-printer.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<bits/crt/format-printer.h>")]]
 [[impl_prefix(DEFINE_VSSCANF_HELPERS_C8), alias("_vsscanf", "_vsscanf_s")]]
 [[section(".text.crt{|.dos}.unicode.static.format.scanf"), export_alias("__vsscanf")]]
 __STDC_INT_AS_SIZE_T vsscanf([[nonnull]] char const *__restrict input,
@@ -1459,7 +1459,7 @@ __STDC_INT_AS_SIZE_T snprintf([[outp_opt(min(return, buflen))]] char *__restrict
 %
 %#ifdef __USE_XOPEN2K8
 [[section(".text.crt{|.dos}.io.write"), decl_include("<features.h>")]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/host.h>", "<bits/format-printer.h>")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/host.h>", "<bits/crt/format-printer.h>")]]
 [[cp, requires_dependent_function(write), impl_prefix(
 @@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_INT__ != __SIZEOF_POINTER__@@
 @@push_namespace(local)@@
@@ -2175,7 +2175,7 @@ int fsetpos64([[nonnull]] $FILE *__restrict stream,
 %[default:section(".text.crt{|.dos}.FILE.locked.write.write")]
 @@For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument
 [[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), decl_include("<bits/format-printer.h>")]]
+[[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), decl_include("<bits/crt/format-printer.h>")]]
 [[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias("file_printer_unlocked")]]
 [[alias("file_printer_unlocked"), userimpl, requires_function(fwrite)]]
 $ssize_t file_printer([[nonnull]] /*FILE*/ void *arg,
@@ -2187,7 +2187,7 @@ $ssize_t file_printer([[nonnull]] /*FILE*/ void *arg,
 %[default:section(".text.crt{|.dos}.FILE.unlocked.write.write")]
 @@Same as `file_printer()', but performs I/O without acquiring a lock to `($FILE *)ARG'
 [[decl_include("<hybrid/typecore.h>")]]
-[[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), decl_include("<bits/format-printer.h>")]]
+[[cp_stdio, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC), decl_include("<bits/crt/format-printer.h>")]]
 [[alias("file_printer"), userimpl, requires_function(fwrite_unlocked)]]
 $ssize_t file_printer_unlocked([[nonnull]] /*FILE*/ void *arg,
                                [[inp(datalen)]] char const *__restrict data,

@@ -33,29 +33,10 @@
 %{
 #include <features.h>
 
-#include <asm/time.h>
+#include <asm/os/itimer.h> /* __ITIMER_* */
 #include <bits/types.h>
-#include <bits/itimerval.h>
+#include <bits/os/itimerval.h>
 #include <sys/select.h>
-
-/* Documentation taken from /usr/include/i386-linux-gnu/sys/time.h */
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 
 __SYSDECL_BEGIN
 
@@ -122,7 +103,7 @@ typedef __suseconds_t suseconds_t;
 #define __struct_timezone_defined 1
 struct timezone {
 	__INT32_TYPE__ tz_minuteswest; /* Minutes west of GMT. */
-	__INT32_TYPE__ tz_dsttime;     /* Nonzero if DST is ever in effect. */
+	__INT32_TYPE__ tz_dsttime;     /* Nonzero if daylight-savings-time can ever be effect. */
 };
 #endif /* !__struct_timezone_defined */
 #endif /* __USE_MISC */
@@ -174,11 +155,6 @@ int futimes32($fd_t fd, [[nullable]] struct $timeval32 const tvp[2]);
 
 
 
-@@Get the current time of day and timezone information,
-@@putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
-@@Returns 0 on success, -1 on errors.
-@@NOTE: This form of timezone information is obsolete.
-@@Use the functions and variables declared in <time.h> instead
 [[section(".text.crt{|.dos}.time"), export_as("__gettimeofday"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("gettimeofday64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("gettimeofday", "__gettimeofday")]]
@@ -211,8 +187,6 @@ int gettimeofday([[nonnull]] struct timeval *__restrict tv,
 }
 
 
-@@Set *VALUE to the current setting of timer WHICH.
-@@Return 0 on success, -1 on errors
 [[section(".text.crt{|.dos}.time"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("getitimer64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("getitimer")]]
@@ -244,8 +218,6 @@ int getitimer(__itimer_which_t which,
 @@pp_endif@@
 }
 
-@@Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
-@@Returns 0 on success, -1 on errors
 [[section(".text.crt{|.dos}.time"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("setitimer64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("setitimer")]]
@@ -287,9 +259,6 @@ int setitimer(__itimer_which_t which,
 }
 
 
-@@Change the access time of FILE to TVP[0] and the modification time of
-@@FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
-@@Returns 0 on success, -1 on errors
 [[section(".text.crt{|.dos}.fs.modify_time"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("utimes64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("utimes")]]
@@ -319,7 +288,6 @@ int utimes([[nonnull]] char const *file,
 
 %
 %#ifdef __USE_GNU
-@@Same as `utimes', but takes an open file descriptor instead of a name
 [[section(".text.crt{|.dos}.fs.modify_time"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("futimesat64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("futimesat")]]
@@ -350,8 +318,6 @@ int futimesat($fd_t fd, [[nonnull]] char const *file,
 
 %
 %#ifdef __USE_MISC
-@@Set the current time of day and timezone information.
-@@This call is restricted to the super-user
 [[section(".text.crt{|.dos}.system.adjtime"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("settimeofday64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("settimeofday")]]
@@ -375,10 +341,6 @@ int settimeofday([[nullable]] struct timeval const *tv,
 @@pp_endif@@
 }
 
-@@Adjust the current time of day by the amount in DELTA.
-@@If OLDDELTA is not NULL, it is filled in with the amount of time
-@@adjustment remaining to be done from the last `adjtime' call.
-@@This call is restricted to the super-user
 [[section(".text.crt{|.dos}.system.adjtime"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("adjtime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("adjtime")]]
@@ -414,7 +376,6 @@ int adjtime([[nullable]] struct timeval const *delta,
 @@pp_endif@@
 }
 
-@@Same as `utimes', but does not follow symbolic links
 [[section(".text.crt{|.dos}.fs.modify_time"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("lutimes64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("lutimes")]]
@@ -443,7 +404,6 @@ int lutimes([[nonnull]] char const *file,
 }
 
 
-@@Same as `utimes', but takes an open file descriptor instead of a name
 [[section(".text.crt{|.dos}.fs.modify_time"), no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("futimes64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("futimes")]]

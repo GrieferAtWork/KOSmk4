@@ -21,13 +21,14 @@
 #define _LIBVIDEO_GFX_FONT_H 1
 
 #include "api.h"
+/**/
 
 #include <hybrid/__atomic.h>
 #include <hybrid/typecore.h>
 
-#include <bits/format-printer.h> /* __FORMATPRINTER_CC */
+#include <bits/crt/format-printer.h>  /* __FORMATPRINTER_CC */
+#include <bits/crt/uformat-printer.h> /* __C32FORMATPRINTER_CC */
 #include <bits/types.h>
-#include <bits/uformat-printer.h> /* __C32FORMATPRINTER_CC */
 #include <kos/anno.h>
 #include <kos/refcnt.h>
 

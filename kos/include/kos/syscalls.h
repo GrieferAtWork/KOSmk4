@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x284ee610 */
+/* HASH CRC-32:0x6721e7e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,21 +24,22 @@
 #include <__stdinc.h>
 #include <kos/asm/syscall.h>
 
-#include <bits/iovec-struct.h>
-#include <bits/itimerspec.h>
-#include <bits/itimerval.h>
-#include <bits/mmsghdr-struct.h>
-#include <bits/msghdr-struct.h>
-#include <bits/pollfd.h>
+#include <bits/os/iovec.h>
+#include <bits/os/itimerspec.h>
+#include <bits/os/itimerval.h>
+#include <bits/os/mmsghdr.h>
+#include <bits/os/msghdr.h>
+#include <bits/os/pollfd.h>
+#include <bits/os/sigstack.h>
+#include <bits/os/timespec.h>
+#include <bits/os/timeval.h>
+#include <bits/os/tms.h>
+#include <bits/os/utimbuf.h>
 #include <bits/rusage-struct.h>
 #include <bits/sigaction-struct.h>
 #include <bits/siginfo-struct.h>
-#include <bits/sigstack.h>
 #include <bits/statfs.h>
-#include <bits/timespec.h>
-#include <bits/timeval.h>
 #include <bits/types.h>
-#include <bits/utimbuf.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
 #include <kos/compat/linux-stat.h>
@@ -1049,7 +1050,7 @@ __CDECLARE_SC(,__errno_t,sched_getparam,(__pid_t __pid, struct sched_param *__pa
 __CDECLARE_SC(,__syscall_slong_t,sched_getscheduler,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_SC(sched_getscheduler) */
 #if __CRT_HAVE_SC(sched_rr_get_interval)
-__CDECLARE_SC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),(__pid,__tms))
+__CDECLARE_SC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct timespec *__ts),(__pid,__ts))
 #endif /* __CRT_HAVE_SC(sched_rr_get_interval) */
 #if __CRT_HAVE_SC(sched_setaffinity)
 __CDECLARE_SC(,__errno_t,sched_setaffinity,(__pid_t __pid, __size_t __cpusetsize, struct __cpu_set_struct const *__cpuset),(__pid,__cpusetsize,__cpuset))
@@ -2407,7 +2408,7 @@ __CDECLARE_XSC(,__errno_t,sched_getparam,(__pid_t __pid, struct sched_param *__p
 __CDECLARE_XSC(,__syscall_slong_t,sched_getscheduler,(__pid_t __pid),(__pid))
 #endif /* __CRT_HAVE_XSC(sched_getscheduler) */
 #if __CRT_HAVE_XSC(sched_rr_get_interval)
-__CDECLARE_XSC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct timespec *__tms),(__pid,__tms))
+__CDECLARE_XSC(,__errno_t,sched_rr_get_interval,(__pid_t __pid, struct timespec *__ts),(__pid,__ts))
 #endif /* __CRT_HAVE_XSC(sched_rr_get_interval) */
 #if __CRT_HAVE_XSC(sched_setaffinity)
 __CDECLARE_XSC(,__errno_t,sched_setaffinity,(__pid_t __pid, __size_t __cpusetsize, struct __cpu_set_struct const *__cpuset),(__pid,__cpusetsize,__cpuset))

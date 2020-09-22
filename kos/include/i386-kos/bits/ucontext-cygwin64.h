@@ -37,8 +37,8 @@
 #include <hybrid/typecore.h>  /* __ULONG64_TYPE__ */
 
 #include <bits/mcontext-cygwin64.h> /* struct __cygwin64_mcontext */
-#include <bits/sigset.h>            /* struct __sigset_struct */
-#include <bits/sigstack64.h>        /* struct __sigaltstackx64 */
+#include <bits/os/kos/sigstack64.h> /* struct __sigaltstackx64 */
+#include <bits/os/sigset.h>         /* struct __sigset_struct */
 
 #if defined(__CRT_CYG) && defined(__x86_64__)
 #define __cygwin64_ucontext        ucontext

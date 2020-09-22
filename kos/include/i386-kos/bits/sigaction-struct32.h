@@ -39,7 +39,7 @@
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
 
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 #include <bits/types.h>
 
 #if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)

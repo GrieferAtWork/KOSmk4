@@ -24,9 +24,9 @@
 %{
 #include <features.h>
 
-#include <asm/epoll.h>
-#include <bits/epoll.h>
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <asm/os/epoll.h>
+#include <bits/os/epoll.h>
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 
 #ifdef __USE_GLIBC
@@ -262,6 +262,8 @@ typedef int __epoll_ctl_t;
 #endif /* ... */
 
 #ifdef __CC__
+
+typedef union epoll_data epoll_data_t;
 
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1

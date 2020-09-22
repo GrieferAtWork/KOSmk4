@@ -26,7 +26,7 @@
 #ifdef __USE_POSIX
 #include <hybrid/limitcore.h>
 
-#include <asm/limits.h> /* Actual system limits */
+#include <asm/os/limits.h> /* Actual system limits */
 #include <bits/types.h>
 
 #undef __USE_ALL_LIMITS

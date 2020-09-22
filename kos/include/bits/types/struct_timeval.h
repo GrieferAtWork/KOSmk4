@@ -18,5 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __timeval_defined
-#include <bits/timeval.h>
+#include <bits/os/timeval.h>
+#ifndef __timeval_defined
+#define __timeval_defined 1
+#endif /* !__timeval_defined */
 #endif /* !__timeval_defined */

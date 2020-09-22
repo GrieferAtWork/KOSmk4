@@ -24,7 +24,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/mbstate.h>
+#include <asm/crt/stdio.h>
 #include <bits/types.h>
 
 #include <libc/string.h>
@@ -213,11 +213,9 @@ struct char_traits {
 	static __CXX_CLASSMEMBER __CXX11_CONSTEXPR int_type eof() __CXX_NOEXCEPT {
 #ifdef __EOF
 		return (int_type)__EOF;
-#elif defined(EOF)
-		return (int_type)EOF;
-#else
+#else /* __EOF */
 		return (int_type)-1;
-#endif
+#endif /* !__EOF */
 	}
 
 	static __CXX_CLASSMEMBER __CXX11_CONSTEXPR int_type

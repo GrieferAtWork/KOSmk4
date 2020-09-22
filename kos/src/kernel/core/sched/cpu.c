@@ -38,7 +38,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <sys/wait.h>
 
 #include <assert.h>

@@ -24,10 +24,10 @@
 %{
 #include <features.h>
 
-#include <asm/signalfd.h>
-#include <bits/signalfd_siginfo.h>
-#include <bits/sigset.h> /* struct __sigset_struct */
-#include <bits/types.h>
+#include <asm/os/signalfd.h>          /* __SFD_*/
+#include <bits/os/signalfd_siginfo.h> /* struct signalfd_siginfo */
+#include <bits/os/sigset.h>           /* struct __sigset_struct */
+#include <bits/types.h>               /* __fd_t */
 
 #ifdef __USE_GLIBC
 #include <stdint.h>
@@ -90,7 +90,7 @@ typedef struct __sigset_struct sigset_t;
 @@Create a poll(2)-able file descriptor which can be used to wait for the
 @@delivery of signals masked by `SIGMASK' to the waiting thread/process.
 @@@param: flags: Set of `0 | SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK'
-[[wunused, decl_include("<features.h>", "<bits/sigset.h>")]]
+[[wunused, decl_include("<features.h>", "<bits/os/sigset.h>")]]
 $fd_t signalfd($fd_t fd, [[nonnull]] sigset_t const *sigmask,
                __STDC_INT_AS_UINT_T flags);
 

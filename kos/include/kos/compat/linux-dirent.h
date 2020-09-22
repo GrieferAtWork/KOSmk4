@@ -25,7 +25,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/dirent.h> /* __DIRENT_HAVE_U_D_INO */
+#include <bits/os/dirent.h> /* __DIRENT_HAVE_U_D_INO */
 
 #ifdef __CC__
 __DECL_BEGIN

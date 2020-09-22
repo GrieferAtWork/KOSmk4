@@ -35,7 +35,7 @@
 
 #include <hybrid/typecore.h> /* __INT32_TYPE__ */
 
-#include <bits/sigval.h> /* union sigval */
+#include <bits/os/sigval.h> /* union sigval */
 
 #ifdef __CRT_CYG_PRIMARY
 #define __sigevent_cygwin                   sigevent

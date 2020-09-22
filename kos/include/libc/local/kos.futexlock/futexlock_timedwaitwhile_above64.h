@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1163de58 */
+/* HASH CRC-32:0x6b9a8e85 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #if defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock)
 #include <bits/types.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: lfutexlock64 from kos.futexlock */
 #ifndef __local___localdep_lfutexlock64_defined

@@ -22,8 +22,8 @@
 
 #include <__stdinc.h>
 
-#include <bits/flock-struct.h>
-#include <bits/timespec.h>
+#include <bits/os/flock.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 #include <sys/sysmacros.h>
 

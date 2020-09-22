@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1db0d793 */
+/* HASH CRC-32:0x6a9d6d00 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_format_vprintf_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_16to8 from unicode */
@@ -84,7 +84,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_c16escape_defined 1
 #if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 __NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -102,7 +102,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_DOS$format_wescape)
 __NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -120,7 +120,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c16escape,(__pc16formatprinter __printer, void *__arg, __CHAR16_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 2
 __NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 #include <libc/local/parts.wchar.format-printer/format_wescape.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -185,7 +185,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_format_c32escape_defined 1
 #if defined(__CRT_HAVE_format_wescape) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
 __NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -203,7 +203,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_KOS$format_wescape)
 __NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -221,7 +221,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
-#include <bits/uformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 #include <libc/local/parts.wchar.format-printer/format_wescape.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Do C-style escape on the given text, printing it to the given printer.

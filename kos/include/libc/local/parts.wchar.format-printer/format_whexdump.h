@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b78d451 */
+/* HASH CRC-32:0x8d8137fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local_format_whexdump_defined 1
 #include <__crt.h>
 #include <kos/anno.h>
-#include <bits/wformat-printer.h>
+#include <bits/crt/wformat-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: format_wrepeat from parts.wchar.format-printer */

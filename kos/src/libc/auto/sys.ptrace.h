@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84d803cb */
+/* HASH CRC-32:0xa2083244 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,6 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Perform process tracing functions. REQUEST is one of
- * the values above, and determines the action to be taken.
- * For all requests except PTRACE_TRACEME, PID specifies the process to be traced.
- *
- * PID and the other arguments described above for the various requests should
- * appear (those that are used for the particular request) as:
- *     pid_t PID, void *ADDR, int DATA, void *ADDR2
- * after REQUEST */
 INTDEF longptr_t NOTHROW_NCX(VLIBDCALL libd_ptrace)(__ptrace_request_t request, ...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

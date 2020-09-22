@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e7d90e0 */
+/* HASH CRC-32:0xefb16053 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 #include <kos/bits/futex.h>
 #include <kos/bits/futex-expr.h>
 #include <bits/types.h>
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <hybrid/__atomic.h>
 #ifndef __cplusplus
 #include <hybrid/pp/__va_nargs.h>

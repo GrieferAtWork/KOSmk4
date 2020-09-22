@@ -19,7 +19,7 @@
  */
 #ifndef __stack_t_defined
 #ifndef __sigstack_defined
-#include <bits/sigstack.h>
+#include <bits/os/sigstack.h>
 #endif /* !__sigstack_defined */
 #ifndef __stack_t_defined
 #define __stack_t_defined 1

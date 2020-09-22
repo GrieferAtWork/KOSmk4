@@ -43,7 +43,7 @@
 
 #ifdef __USE_GNU
 #include <bits/sigevent.h> /* struct sigevent */
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #endif /* __USE_GNU */
 
 /* TODO: Constants and structs from this header should

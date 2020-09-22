@@ -38,7 +38,7 @@
 #include <hybrid/host.h>      /* __x86_64__ */
 #include <hybrid/typecore.h>  /* __INT32_TYPE__ */
 
-#include <bits/sigval32.h> /* union __sigvalx32 */
+#include <bits/os/kos/sigval32.h> /* union __sigvalx32 */
 
 #if !defined(__CRT_CYG_PRIMARY) && !defined(__x86_64__) && defined(__i386__)
 #define __sigeventx32                       sigevent

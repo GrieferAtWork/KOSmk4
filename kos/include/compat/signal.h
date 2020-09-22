@@ -25,22 +25,22 @@
 #ifdef __ARCH_HAVE_COMPAT
 #include <features.h>
 
-#include <compat/bits/sigset.h>
+#include <compat/bits/os/sigset.h>
 #include <compat/bits/types.h>
 
 #ifdef __USE_POSIX199309
-#include <compat/bits/timespec.h>
+#include <compat/bits/os/timespec.h>
 #endif /* __USE_POSIX199309 */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
-#include <compat/bits/sigstack.h>
+#include <compat/bits/os/sigstack.h>
 //#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 //#include <compat/sys/ucontext.h>
 //#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
-#include <compat/bits/sigval.h> /* union sigval */
+#include <compat/bits/os/sigval.h> /* union sigval */
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #ifdef __USE_POSIX
@@ -50,7 +50,7 @@
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #include <compat/bits/sigevent.h>       /* struct sigevent */
 #include <compat/bits/siginfo-struct.h> /* struct __siginfo_struct */
-#include <compat/bits/sigval.h>         /* union sigval */
+#include <compat/bits/os/sigval.h>         /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 

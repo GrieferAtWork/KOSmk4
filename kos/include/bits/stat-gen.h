@@ -25,7 +25,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 
 #ifdef __CRT_GENERIC

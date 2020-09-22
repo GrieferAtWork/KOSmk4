@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x925d4e09 */
+/* HASH CRC-32:0x62f6aa02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,28 +27,13 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_gettimeofday32_defined
 #define __local___localdep_gettimeofday32_defined 1
 #ifdef __CRT_HAVE_gettimeofday
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),gettimeofday,(__tv,__tz))
 #elif defined(__CRT_HAVE___gettimeofday)
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_gettimeofday32,(struct __timeval32 *__restrict __tv, void * __tz),__gettimeofday,(__tv,__tz))
 #else /* ... */
 #undef __local___localdep_gettimeofday32_defined
 #endif /* !... */
 #endif /* !__local___localdep_gettimeofday32_defined */
-/* Get the current time of day and timezone information,
- * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
- * Returns 0 on success, -1 on errors.
- * NOTE: This form of timezone information is obsolete.
- * Use the functions and variables declared in <time.h> instead */
 __LOCAL_LIBC(gettimeofday64) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday64))(struct __timeval64 *__restrict __tv, void * __tz) {
 	int __result;

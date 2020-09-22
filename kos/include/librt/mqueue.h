@@ -21,9 +21,10 @@
 #define _LIBRT_MQUEUE_H 1
 
 #include "api.h"
+/**/
 
+#include <bits/os/timespec.h>
 #include <bits/sigevent.h>
-#include <bits/timespec.h>
 #include <bits/types.h>
 
 #include <librt/bits/mqueue.h>

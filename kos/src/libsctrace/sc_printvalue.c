@@ -46,10 +46,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <asm/ioctls/socket.h>
 #include <asm/ioctls/socket_ex.h>
 #include <asm/ioctls/tty.h>
-#include <bits/itimerspec.h>
-#include <bits/itimerval.h>
-#include <bits/timespec.h>
-#include <bits/timeval.h>
+#include <bits/os/itimerspec.h>
+#include <bits/os/itimerval.h>
+#include <bits/os/timespec.h>
+#include <bits/os/timeval.h>
 #include <kos/anno.h>
 #include <kos/dev.h>
 #include <kos/except.h>
@@ -86,11 +86,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include "sctrace.h"
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/iovec-struct.h>
-#include <compat/bits/itimerspec.h>
-#include <compat/bits/itimerval.h>
-#include <compat/bits/timespec.h>
-#include <compat/bits/timeval.h>
+#include <compat/bits/os/iovec.h>
+#include <compat/bits/os/itimerspec.h>
+#include <compat/bits/os/itimerval.h>
+#include <compat/bits/os/timespec.h>
+#include <compat/bits/os/timeval.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 #ifdef __KERNEL__
@@ -1897,8 +1897,8 @@ print_signo_t(pformatprinter printer, void *arg, signo_t signo) {
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local sockaf = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__AF_");
-local sockpf = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__PF_");
+local sockaf = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__AF_");
+local sockpf = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__PF_");
 
 printStrendNDatabase("SOCKAF", sockaf);
 if (sockaf == sockpf) {
@@ -2029,7 +2029,7 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__SOCK_");
+local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__SOCK_");
 printStrendNDatabase("SOCKTYPE", typ[:255]);
 ]]]*/
 #define GETBASE_SOCKTYPE(result, index) \
@@ -2171,7 +2171,7 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/stdio.h", "__SEEK_");
+local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/stdio.h", "__SEEK_");
 printStrendNDatabase("SEEK", typ);
 ]]]*/
 #define GETBASE_SEEK(result, index) \
@@ -2212,19 +2212,17 @@ print_seek_whence(pformatprinter printer, void *arg,
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/fcntl.h", "__F_");
+local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/fcntl.h", "__F_");
 printStrendNDatabase("FCNTL", typ);
 ]]]*/
 #define GETBASE_FCNTL(result, index) \
-	(((index) <= 0x2e) ? ((result) = repr_FCNTL_0h, true) : \
+	(((index) <= 0x26) ? ((result) = repr_FCNTL_0h, true) : \
 	 ((index) >= 0x400 && (index) <= 0x408) ? ((index) -= 0x400, (result) = repr_FCNTL_400h, true) : \
 	 ((index) >= 0x142b && (index) <= 0x1430) ? ((index) -= 0x142b, (result) = repr_FCNTL_142bh, true) : false)
 PRIVATE char const repr_FCNTL_0h[] =
 "DUPFD\0GETFD\0SETFD\0GETFL\0SETFL\0GETLK\0SETLK\0SETLKW\0SETOWN\0GETOWN\0S"
-"ETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GETOWN_EX\0QUOTAC"
-"TL\0BLOCKS\0BLKSIZE\0\0\0\0GETOWN\0SETOWN\0REVOKE\0HASREMOTELOCKS\0\0\0\0\0\0MD"
-"ACC\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW\0\0SHARE\0UNSHARE\0SETLK_NBMAN"
-"D\0SHARE_NBMAND\0\0GETXFL\0BADFD";
+"ETSIG\0GETSIG\0GETLK64\0SETLK64\0SETLKW64\0SETOWN_EX\0GETOWN_EX\0\0\0\0\0\0\0"
+"\0\0\0\0\0\0\0\0\0\0\0\0\0OFD_GETLK\0OFD_SETLK\0OFD_SETLKW";
 PRIVATE char const repr_FCNTL_400h[] =
 "SETLEASE\0GETLEASE\0NOTIFY\0\0\0\0DUPFD_CLOEXEC\0SETPIPE_SZ\0GETPIPE_SZ";
 PRIVATE char const repr_FCNTL_142bh[] =
@@ -2336,7 +2334,7 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/fcntl.h", "__F_OWNER_");
+local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/fcntl.h", "__F_OWNER_");
 printStrendNDatabase("F_OWNER", typ);
 ]]]*/
 #define GETBASE_F_OWNER(result, index) \
@@ -2804,7 +2802,7 @@ err:
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__SOL_");
+local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__SOL_");
 printStrendNDatabase("SOL", typ);
 ]]]*/
 #define GETBASE_SOL(result, index) \
@@ -2850,7 +2848,7 @@ print_sockopt_level(pformatprinter printer, void *arg,
 /*[[[deemon
 import * from deemon;
 import * from ...misc.libgen.strendN;
-local typ = getPrefixedMacrosFromFile("../../include/asm/socket.h", "__SO_");
+local typ = getPrefixedMacrosFromFile("../../include/asm/os/kos/socket.h", "__SO_");
 printStrendNDatabase("SOCKET_SO", typ);
 ]]]*/
 #define GETBASE_SOCKET_SO(result, index) \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc96f89d0 */
+/* HASH CRC-32:0x9c1c6254 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 
 #include <features.h>
 
-#include <asm/random.h>
+#include <asm/os/random.h>
 #include <bits/types.h>
 #ifdef __USE_GLIBC
 #include <sys/types.h>
@@ -84,7 +84,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,getrando
  * @return: -1: Error (see `errno') */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,getentropy,(void *__buf, size_t __num_bytes),(__buf,__num_bytes))
 #else /* __CRT_HAVE_getentropy */
-#include <asm/random.h>
+#include <asm/os/random.h>
 #if defined(__GRND_RANDOM) && defined(__CRT_HAVE_getrandom)
 #include <libc/local/sys.random/getentropy.h>
 /* Similar to `getrandom(BUF, NUM_BYTES, GRND_RANDOM)', however

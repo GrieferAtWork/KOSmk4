@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x323a04d0 */
+/* HASH CRC-32:0x8000e920 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 
 DECL_BEGIN
 
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set) {
 	libc_bzeroc(set->__val, COMPILER_LENOF(set->__val), __SIZEOF_POINTER__);

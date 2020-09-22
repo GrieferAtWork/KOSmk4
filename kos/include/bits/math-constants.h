@@ -148,7 +148,6 @@
 #endif /* !__has_builtin(__builtin_nanl) */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
-
 #endif /* !__NO_FPU */
 #endif /* __CC__ */
 

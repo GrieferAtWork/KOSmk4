@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5394f3f5 */
+/* HASH CRC-32:0xcd76bd10 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,7 +112,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream,
 }
 #include <libc/errno.h>
 #include <hybrid/typecore.h>
-#include <asm/syslog.h>
+#include <asm/os/syslog.h>
 /* Filtered read from `stream'
  * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
  * @param: filtered_name: When not `NULL', require this username

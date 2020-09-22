@@ -27,7 +27,7 @@
 %{
 #include <features.h>
 
-#include <asm/wait.h>
+#include <asm/os/wait.h>
 #include <bits/types.h>
 #include <parts/waitmacros.h>
 

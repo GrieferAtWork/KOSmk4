@@ -25,7 +25,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <bits/types.h>
 #include <sys/_types.h>
 

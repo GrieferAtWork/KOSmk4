@@ -86,12 +86,10 @@ void Execlpe([[nonnull]] char const *__restrict file, char const *args, ... /*, 
 }
 
 
-%
 [[throws, doc_alias("pipe"), section(".text.crt{|.dos}.except.io.access")]]
 void Pipe([[nonnull]] $fd_t pipedes[2]);
 
 
-%
 [[cp, throws, decl_include("<bits/types.h>"), doc_alias("fsync"), userimpl]]
 [[alias("FDataSync"), section(".text.crt{|.dos}.except.io.sync")]]
 void FSync($fd_t fd) {
@@ -102,57 +100,47 @@ void FSync($fd_t fd) {
 
 %[default:section(".text.crt{|.dos}.except.sched.process")]
 
-%
 [[throws, doc_alias("setpgid"), decl_include("<bits/types.h>")]]
 void SetPGid($pid_t pid, $pid_t pgid);
 
 
-%
 [[throws, doc_alias("setsid"), decl_include("<bits/types.h>")]]
 $pid_t SetSid();
 
-%
 [[throws, doc_alias("setuid"), decl_include("<bits/types.h>")]]
 void SetUid($uid_t uid);
 
-%
 [[throws, doc_alias("setgid"), decl_include("<bits/types.h>")]]
 void SetGid($gid_t gid);
 
-%
 [[throws, wunused, decl_include("<bits/types.h>"), doc_alias("fork")]]
 [[section(".text.crt{|.dos}.except.sched.access")]]
 $pid_t Fork();
 
 %[default:section(".text.crt{|.dos}.except.fs.modify")]
 
-%
 [[cp, throws, decl_include("<bits/types.h>"), doc_alias("chown")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(FChownAt))]]
 void Chown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__AT_FDCWD, file, owner, group, 0);
 }
 
-%
 [[cp, throws, doc_alias("link")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(LinkAt))]]
 void Link([[nonnull]] char const *from, [[nonnull]] char const *to) {
 	LinkAt(__AT_FDCWD, from, __AT_FDCWD, to, 0);
 }
 
-%
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("read"), section(".text.crt{|.dos}.except.io.read")]]
 size_t Read($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize);
 
-%
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("write"), section(".text.crt{|.dos}.except.io.write")]]
 size_t Write($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize);
 
-%
 %#ifdef __USE_KOS
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("readall"), section(".text.crt{|.dos}.except.io.read")]]
@@ -197,7 +185,6 @@ size_t ReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize) {
 [[doc_alias("lseek32"), ignore, nocrt, alias("LSeek")]]
 $pos32_t LSeek32($fd_t fd, $off32_t offset, int whence);
 
-%
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias(lseek), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("LSeek64")]]
@@ -212,72 +199,60 @@ $pos_t LSeek($fd_t fd, $off_t offset, int whence) {
 @@pp_endif@@
 }
 
-%
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("dup2"), section(".text.crt{|.dos}.except.io.access")]]
 $fd_t Dup2($fd_t oldfd, $fd_t newfd);
 
-%
 [[throws, wunused, decl_include("<bits/types.h>")]]
 [[doc_alias("dup"), section(".text.crt{|.dos}.except.io.access")]]
 $fd_t Dup($fd_t fd);
 
-%
 [[cp, throws, doc_alias("chdir")]]
 [[section(".text.crt{|.dos}.except.fs.basic_property")]]
 void Chdir([[nonnull]] char const *path);
 
-%
 [[cp, throws, doc_alias("getcwd"), decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.except.fs.basic_property")]]
 char *GetCwd([[outp_opt(bufsize)]] char *buf, size_t bufsize);
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
-%
 [[cp, throws, doc_alias("unlink")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(UnlinkAt))]]
 void Unlink([[nonnull]] char const *file) {
 	UnlinkAt(__AT_FDCWD, file, 0);
 }
 
-%
 [[cp, throws, doc_alias("rmdir")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(UnlinkAt))]]
 void Rmdir([[nonnull]] char const *path) {
 	UnlinkAt(__AT_FDCWD, path, 0x0200); /* AT_REMOVEDIR */
 }
 
-%
 %#ifdef __USE_ATFILE
 %[default:section(".text.crt{|.dos}.except.fs.modify")]
 
-%
 [[cp, throws, doc_alias("fchownat"), decl_include("<bits/types.h>")]]
 void FChownAt($fd_t dfd, [[nonnull]] char const *file,
               $uid_t owner, $gid_t group, $atflag_t flags);
 
-%
 [[cp, throws, doc_alias("linkat"), decl_include("<bits/types.h>")]]
 void LinkAt($fd_t fromfd, [[nonnull]] char const *from,
             $fd_t tofd, [[nonnull]] char const *to,
             $atflag_t flags);
 
-%
 [[cp, throws, doc_alias("symlinkat"), decl_include("<bits/types.h>")]]
 void SymlinkAt([[nonnull]] char const *link_text, $fd_t tofd,
                [[nonnull]] char const *target_path);
 
 %[default:section(".text.crt{|.dos}.except.fs.property")]
 
-%
 [[cp, throws, doc_alias("readlinkat"), decl_include("<bits/types.h>")]]
 size_t ReadlinkAt($fd_t dfd, [[nonnull]] char const *__restrict path,
                   [[outp(buflen)]] char *__restrict buf, size_t buflen);
 
-%
 %#ifdef __USE_KOS
 [[cp, throws, doc_alias("freadlinkat"), decl_include("<bits/types.h>")]]
 size_t FReadlinkAt($fd_t dfd, [[nonnull]] char const *__restrict path,
@@ -286,7 +261,6 @@ size_t FReadlinkAt($fd_t dfd, [[nonnull]] char const *__restrict path,
 
 %[default:section(".text.crt{|.dos}.except.fs.modify")]
 
-%
 [[cp, throws, doc_alias("unlinkat"), decl_include("<bits/types.h>")]]
 void UnlinkAt($fd_t dfd, [[nonnull]] char const *name, $atflag_t flags);
 %#endif /* __USE_ATFILE */
@@ -309,7 +283,6 @@ $pos64_t LSeek64($fd_t fd, $off64_t offset, int whence) {
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 
-%
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("pread"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("PRead64")]]
@@ -339,7 +312,6 @@ size_t PWrite($fd_t fd, [[inp(bufsize)]] void const *buf, size_t bufsize, pos_t 
 }
 
 
-%
 %#ifdef __USE_KOS
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("preadall"), no_crt_self_import]]
@@ -356,7 +328,6 @@ size_t PReadAll($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos_t off
 }
 %#endif /* __USE_KOS */
 
-%
 %#ifdef __USE_LARGEFILE64
 
 [[cp, throws, ignore, nocrt, alias("PRead"), decl_include("<bits/types.h>")]]
@@ -379,7 +350,6 @@ size_t PWrite64($fd_t fd, [[outp(bufsize)]] void *buf, size_t bufsize, pos64_t o
 	return PWrite32(fd, buf, bufsize, (pos32_t)offset);
 }
 
-%
 %#ifdef __USE_KOS
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[ignore, nocrt, alias("PReadAll")]]
@@ -462,30 +432,25 @@ $pid_t VFork();
 %#endif
 
 
-%
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("fchown"), section(".text.crt{|.dos}.except.fs.modify")]]
 void FChown($fd_t fd, $uid_t owner, $gid_t group);
 
-%
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("fchdir"), section(".text.crt{|.dos}.except.fs.basic_property")]]
 void FChdir($fd_t fd);
 
-%
 [[throws, decl_include("<bits/types.h>")]]
 [[wunused, doc_alias("getpgid"), section(".text.crt{|.dos}.except.sched.user")]]
 $pid_t GetPGid($pid_t pid);
 
-%
 [[throws, decl_include("<bits/types.h>")]]
 [[wunused, doc_alias("getsid"), section(".text.crt{|.dos}.except.sched.process")]]
 $pid_t GetSid($pid_t pid);
 
-%
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[doc_alias("lchown"), section(".text.crt{|.dos}.except.fs.modify")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(FChownAt))]]
 void LChown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 	FChownAt(__AT_FDCWD, file, owner, group, 0x0100); /* AT_SYMLINK_NOFOLLOW */
@@ -495,7 +460,6 @@ void LChown([[nonnull]] char const *file, $uid_t owner, $gid_t group) {
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 
-%
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("truncate"), no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("Truncate64")]]
@@ -514,7 +478,6 @@ void Truncate([[nonnull]] char const *file, pos_t length) {
 [[throws, decl_include("<bits/types.h>")]]
 vodi Truncate32([[nonnull]] char const *file, $pos32_t length);
 
-%
 %#ifdef __USE_LARGEFILE64
 [[throws, decl_include("<bits/types.h>")]]
 [[doc_alias("truncate64"), off64_variant_of(Truncate)]]
@@ -528,7 +491,6 @@ void Truncate64([[nonnull]] char const *file, pos64_t length) {
 
 %#ifdef __USE_XOPEN2K8
 
-%
 [[guard, ATTR_NORETURN, doc_alias(fexecve)]]
 [[cp, throws, decl_include("<bits/types.h>")]]
 [[decl_include("<features.h>"), decl_prefix(DEFINE_TARGV)]]
@@ -583,16 +545,15 @@ void SetEGid($gid_t egid);
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 [[cp, throws, doc_alias("symlink"), section(".text.crt{|.dos}.except.fs.modify")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(SymlinkAt))]]
 void Symlink([[nonnull]] char const *link_text,
              [[nonnull]] char const *target_path) {
 	SymlinkAt(link_text, __AT_FDCWD, target_path);
 }
 
-%
 [[cp, doc_alias("readlink"), section(".text.crt{|.dos}.except.fs.property")]]
-[[userimpl, requires_include("<asm/fcntl.h>")]]
+[[userimpl, requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(ReadlinkAt))]]
 [[throws, decl_include("<hybrid/typecore.h>")]]
 size_t Readlink([[nonnull]] char const *__restrict path,
@@ -613,17 +574,14 @@ void GetHostName([[outp(buflen)]] char *name, size_t buflen);
 
 %
 %#ifdef __USE_MISC
-%
 [[doc_alias("sethostname"), section(".text.crt{|.dos}.except.system.configuration")]]
 [[throws, decl_include("<hybrid/typecore.h>")]]
 void SetHostName([[inp(len)]] char const *name, size_t len);
 
-%
 [[doc_alias("getdomainname"), section(".text.crt{|.dos}.except.system.configuration")]]
 [[throws, decl_include("<hybrid/typecore.h>")]]
 void GetDomainName([[outp(buflen)]] char *name, size_t buflen);
 
-%
 [[doc_alias("setdomainname"), section(".text.crt{|.dos}.except.system.configuration")]]
 [[throws, decl_include("<hybrid/typecore.h>")]]
 void SetDomainName([[inp(len)]] char const *name, size_t len);
@@ -671,7 +629,6 @@ void FTruncate($fd_t fd, pos_t length) {
 @@pp_endif@@
 }
 
-%
 %#ifdef __USE_LARGEFILE64
 [[throws, doc_alias("ftruncate64"), off64_variant_of(FTruncate)]]
 [[section(".text.crt{|.dos}.except.io.large.write")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf8baa72 */
+/* HASH CRC-32:0xa7657362 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1115,7 +1115,7 @@
 #define __NR32AT0_rmdir                        (char const *, char const *)
 #define __NR32AT0_dup                          (fd_t, __fd_t)
 #define __NR32AT0_pipe                         (fd_t *, __fd_t *)
-#define __NR32AT0_times                        (struct tms *, struct tms *)
+#define __NR32AT0_times                        (struct tmsx32 *, struct __tmsx32 *)
 #define __NR32AT0_brk                          (void *, void *)
 #define __NR32AT0_setgid                       (uint16_t, __uint16_t)
 #define __NR32AT0_signal                       (signo_t, __signo_t)
@@ -2253,7 +2253,7 @@
 #define __NR32AM_rmdir(a, b, c, d, e, f)                        (char const *)a
 #define __NR32AM_dup(a, b, c, d, e, f)                          (__fd_t)a
 #define __NR32AM_pipe(a, b, c, d, e, f)                         (__fd_t *)a
-#define __NR32AM_times(a, b, c, d, e, f)                        (struct tms *)a
+#define __NR32AM_times(a, b, c, d, e, f)                        (struct __tmsx32 *)a
 #define __NR32AM_prof(a, b, c, d, e, f)                         /* nothing */
 #define __NR32AM_brk(a, b, c, d, e, f)                          (void *)a
 #define __NR32AM_setgid(a, b, c, d, e, f)                       (__uint16_t)a

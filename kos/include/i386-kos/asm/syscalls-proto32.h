@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47a368b7 */
+/* HASH CRC-32:0x38a35431 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1115,7 +1115,7 @@
 #define __NRAT0_rmdir                        (char const *, char const *)
 #define __NRAT0_dup                          (fd_t, __fd_t)
 #define __NRAT0_pipe                         (fd_t *, __fd_t *)
-#define __NRAT0_times                        (struct tms *, struct tms *)
+#define __NRAT0_times                        (struct tmsx32 *, struct __tmsx32 *)
 #define __NRAT0_brk                          (void *, void *)
 #define __NRAT0_setgid                       (uint16_t, __uint16_t)
 #define __NRAT0_signal                       (signo_t, __signo_t)
@@ -2253,7 +2253,7 @@
 #define __NRAM_rmdir(a, b, c, d, e, f)                        (char const *)a
 #define __NRAM_dup(a, b, c, d, e, f)                          (__fd_t)a
 #define __NRAM_pipe(a, b, c, d, e, f)                         (__fd_t *)a
-#define __NRAM_times(a, b, c, d, e, f)                        (struct tms *)a
+#define __NRAM_times(a, b, c, d, e, f)                        (struct __tmsx32 *)a
 #define __NRAM_prof(a, b, c, d, e, f)                         /* nothing */
 #define __NRAM_brk(a, b, c, d, e, f)                          (void *)a
 #define __NRAM_setgid(a, b, c, d, e, f)                       (__uint16_t)a

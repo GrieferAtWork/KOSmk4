@@ -36,7 +36,7 @@
 
 #include <hybrid/atomic.h>
 
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
 #include <kos/futex.h>
@@ -50,7 +50,7 @@
 #include "vm-nodeapi.h"
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/timespec.h>
+#include <compat/bits/os/timespec.h>
 #include <compat/kos/futex.h>
 #include <compat/kos/types.h>
 #endif /* __ARCH_HAVE_COMPAT */

@@ -38,7 +38,7 @@
 #include <hybrid/__pointer.h>
 #include <hybrid/host.h>
 
-#include <bits/sigset.h> /* struct __sigset_struct */
+#include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 
 #if !defined(__CRT_CYG_PRIMARY) && defined(__x86_64__)

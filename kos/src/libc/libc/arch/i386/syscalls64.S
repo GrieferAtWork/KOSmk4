@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf1503e */
+/* HASH CRC-32:0x62467f3d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2944,7 +2944,7 @@ INTERN_FUNCTION(libc_sys_Xsysinfo)
 END(libc_sys_Xsysinfo)
 DEFINE_PUBLIC_ALIAS(sys_Xsysinfo, libc_sys_Xsysinfo)
 
-/* clock_t times(struct tms *buf) */
+/* clock_t times(struct tmsx64 *buf) */
 .section .text.crt.syscall.times
 INTERN_FUNCTION(libc_sys_times)
 	.cfi_startproc
@@ -2956,7 +2956,7 @@ INTERN_FUNCTION(libc_sys_times)
 END(libc_sys_times)
 DEFINE_PUBLIC_ALIAS(sys_times, libc_sys_times)
 
-/* clock_t times(struct tms *buf) */
+/* clock_t times(struct tmsx64 *buf) */
 .section .text.crt.syscall.Xtimes
 INTERN_FUNCTION(libc_sys_Xtimes)
 	.cfi_startproc
@@ -4128,7 +4128,7 @@ INTERN_FUNCTION(libc_sys_Xsched_get_priority_min)
 END(libc_sys_Xsched_get_priority_min)
 DEFINE_PUBLIC_ALIAS(sys_Xsched_get_priority_min, libc_sys_Xsched_get_priority_min)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx64 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx64 *ts) */
 .section .text.crt.syscall.sched_rr_get_interval
 INTERN_FUNCTION(libc_sys_sched_rr_get_interval)
 	.cfi_startproc
@@ -4140,7 +4140,7 @@ INTERN_FUNCTION(libc_sys_sched_rr_get_interval)
 END(libc_sys_sched_rr_get_interval)
 DEFINE_PUBLIC_ALIAS(sys_sched_rr_get_interval, libc_sys_sched_rr_get_interval)
 
-/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx64 *tms) */
+/* errno_t sched_rr_get_interval(pid_t pid, struct timespecx64 *ts) */
 .section .text.crt.syscall.Xsched_rr_get_interval
 INTERN_FUNCTION(libc_sys_Xsched_rr_get_interval)
 	.cfi_startproc

@@ -580,7 +580,7 @@
  *     being included.
  *   - That is where this feature test macro comes into play, essentially
  *     allowing headers to be configured as such:
- *     >> // In <bits/timespec.h>:
+ *     >> // In <bits/os/timespec.h>:
  *     >> ...    (#if SHOULD_DEFINE_TIMESPEC64_AS_ALIAS_FOR_TIMESPEC)
  *     >> #ifdef __USE_STRUCT64_MACRO
  *     >> #define timespec64 timespec

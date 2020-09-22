@@ -57,18 +57,18 @@ static_assert(sizeof(union ieee854_float80) == 10);
 /*[[[deemon
 import * from .....misc.libgen.assert_offsetof;
 local files = {
-	"../../../../include/i386-kos/bits/cmsghdr-struct32.h",
-	"../../../../include/i386-kos/bits/cmsghdr-struct64.h",
-	"../../../../include/i386-kos/bits/flock-struct32.h",
-	"../../../../include/i386-kos/bits/flock-struct64.h",
-	"../../../../include/i386-kos/bits/itimerspec32.h",
-	"../../../../include/i386-kos/bits/itimerspec64.h",
-	"../../../../include/i386-kos/bits/itimerval32.h",
-	"../../../../include/i386-kos/bits/itimerval64.h",
-	"../../../../include/i386-kos/bits/mmsghdr-struct32.h",
-	"../../../../include/i386-kos/bits/mmsghdr-struct64.h",
-	"../../../../include/i386-kos/bits/msghdr-struct32.h",
-	"../../../../include/i386-kos/bits/msghdr-struct64.h",
+	"../../../../include/i386-kos/bits/os/kos/cmsghdr32.h",
+	"../../../../include/i386-kos/bits/os/kos/cmsghdr64.h",
+	"../../../../include/i386-kos/bits/os/kos/flock32.h",
+	"../../../../include/i386-kos/bits/os/kos/flock64.h",
+	"../../../../include/i386-kos/bits/os/kos/itimerspec32.h",
+	"../../../../include/i386-kos/bits/os/kos/itimerspec64.h",
+	"../../../../include/i386-kos/bits/os/kos/itimerval32.h",
+	"../../../../include/i386-kos/bits/os/kos/itimerval64.h",
+	"../../../../include/i386-kos/bits/os/kos/mmsghdr32.h",
+	"../../../../include/i386-kos/bits/os/kos/mmsghdr64.h",
+	"../../../../include/i386-kos/bits/os/kos/msghdr32.h",
+	"../../../../include/i386-kos/bits/os/kos/msghdr64.h",
 	"../../../../include/i386-kos/bits/rusage-struct32.h",
 	"../../../../include/i386-kos/bits/rusage-struct64.h",
 	"../../../../include/i386-kos/bits/sigaction-struct-cygwin.h",
@@ -78,22 +78,24 @@ local files = {
 	"../../../../include/i386-kos/bits/sigevent64.h",
 	"../../../../include/i386-kos/bits/siginfo-struct32.h",
 	"../../../../include/i386-kos/bits/siginfo-struct64.h",
-	"../../../../include/i386-kos/bits/sigstack32.h",
-	"../../../../include/i386-kos/bits/sigstack64.h",
-	"../../../../include/i386-kos/bits/sigval32.h",
-	"../../../../include/i386-kos/bits/sigval64.h",
+	"../../../../include/i386-kos/bits/os/kos/sigstack32.h",
+	"../../../../include/i386-kos/bits/os/kos/sigstack64.h",
+	"../../../../include/i386-kos/bits/os/kos/sigval32.h",
+	"../../../../include/i386-kos/bits/os/kos/sigval64.h",
 	"../../../../include/i386-kos/bits/stat-kos32.h",
 	"../../../../include/i386-kos/bits/stat-kos64.h",
 	"../../../../include/i386-kos/bits/statfs32.h",
 	"../../../../include/i386-kos/bits/statfs64.h",
-	"../../../../include/i386-kos/bits/timeb32.h",
-	"../../../../include/i386-kos/bits/timeb64.h",
-	"../../../../include/i386-kos/bits/timespec32.h",
-	"../../../../include/i386-kos/bits/timespec64.h",
-	"../../../../include/i386-kos/bits/timeval32.h",
-	"../../../../include/i386-kos/bits/timeval64.h",
-	"../../../../include/i386-kos/bits/utimbuf32.h",
-	"../../../../include/i386-kos/bits/utimbuf64.h",
+	"../../../../include/i386-kos/bits/os/kos/timeb32.h",
+	"../../../../include/i386-kos/bits/os/kos/timeb64.h",
+	"../../../../include/i386-kos/bits/os/kos/timespec32.h",
+	"../../../../include/i386-kos/bits/os/kos/timespec64.h",
+	"../../../../include/i386-kos/bits/os/kos/timeval32.h",
+	"../../../../include/i386-kos/bits/os/kos/timeval64.h",
+	"../../../../include/i386-kos/bits/os/kos/tms32.h",
+	"../../../../include/i386-kos/bits/os/kos/tms64.h",
+	"../../../../include/i386-kos/bits/os/kos/utimbuf32.h",
+	"../../../../include/i386-kos/bits/os/kos/utimbuf64.h",
 	"../../../../include/i386-kos/bits/va_list-struct32.h",
 	"../../../../include/i386-kos/bits/va_list-struct64.h",
 	"../../../../include/i386-kos/bits/mcontext32.h",
@@ -207,7 +209,7 @@ for (local i: [:16]) {
 }
 
 ]]]*/
-#include <bits/cmsghdr-struct32.h>
+#include <bits/os/kos/cmsghdr32.h>
 
 /* struct __cmsghdrx32 */
 static_assert(offsetof(struct __cmsghdrx32, cmsg_data) == __OFFSET_CMSGHDRX32_DATA);
@@ -220,7 +222,7 @@ static_assert(alignof(struct __cmsghdrx32) == __ALIGNOF_CMSGHDRX32);
 
 
 
-#include <bits/cmsghdr-struct64.h>
+#include <bits/os/kos/cmsghdr64.h>
 
 /* struct __cmsghdrx64 */
 static_assert(offsetof(struct __cmsghdrx64, cmsg_data) == __OFFSET_CMSGHDRX64_DATA);
@@ -233,7 +235,7 @@ static_assert(alignof(struct __cmsghdrx64) == __ALIGNOF_CMSGHDRX64);
 
 
 
-#include <bits/flock-struct32.h>
+#include <bits/os/kos/flock32.h>
 
 /* struct flockx32 */
 static_assert(offsetof(struct flockx32, l_len) == __OFFSET_FLOCKX32_LEN);
@@ -258,7 +260,7 @@ static_assert(sizeof(struct flockx32_64) == __SIZEOF_FLOCKX32_64);
 
 
 
-#include <bits/flock-struct64.h>
+#include <bits/os/kos/flock64.h>
 
 /* struct flockx64 */
 static_assert(offsetof(struct flockx64, l_len) == __OFFSET_FLOCKX64_LEN);
@@ -275,7 +277,7 @@ static_assert(sizeof(struct flockx64) == __SIZEOF_FLOCKX64);
 
 
 
-#include <bits/itimerspec32.h>
+#include <bits/os/kos/itimerspec32.h>
 
 /* struct itimerspecx32 */
 static_assert(offsetof(struct itimerspecx32, it_interval) == __OFFSET_ITIMERSPECX32_INTERVAL);
@@ -296,7 +298,7 @@ static_assert(alignof(struct itimerspecx32_64) == __ALIGNOF_ITIMERSPECX32_64);
 
 
 
-#include <bits/itimerspec64.h>
+#include <bits/os/kos/itimerspec64.h>
 
 /* struct itimerspecx64 */
 static_assert(offsetof(struct itimerspecx64, it_interval) == __OFFSET_ITIMERSPECX64_INTERVAL);
@@ -311,7 +313,7 @@ static_assert(alignof(struct itimerspecx64) == __ALIGNOF_ITIMERSPECX64);
 
 
 
-#include <bits/itimerval32.h>
+#include <bits/os/kos/itimerval32.h>
 
 /* struct itimervalx32 */
 static_assert(offsetof(struct itimervalx32, it_interval) == __OFFSET_ITIMERVALX32_INTERVAL);
@@ -332,7 +334,7 @@ static_assert(alignof(struct itimervalx32_64) == __ALIGNOF_ITIMERVALX32_64);
 
 
 
-#include <bits/itimerval64.h>
+#include <bits/os/kos/itimerval64.h>
 
 /* struct itimervalx64 */
 static_assert(offsetof(struct itimervalx64, it_interval) == __OFFSET_ITIMERVALX64_INTERVAL);
@@ -347,7 +349,7 @@ static_assert(alignof(struct itimervalx64) == __ALIGNOF_ITIMERVALX64);
 
 
 
-#include <bits/mmsghdr-struct32.h>
+#include <bits/os/kos/mmsghdr32.h>
 
 /* struct __mmsghdrx32 */
 static_assert(offsetof(struct __mmsghdrx32, msg_hdr) == __OFFSET_MMSGHDRX32_HDR);
@@ -359,7 +361,7 @@ static_assert(alignof(struct __mmsghdrx32) == __ALIGNOF_MMSGHDRX32);
 
 
 
-#include <bits/mmsghdr-struct64.h>
+#include <bits/os/kos/mmsghdr64.h>
 
 /* struct __mmsghdrx64 */
 static_assert(offsetof(struct __mmsghdrx64, msg_hdr) == __OFFSET_MMSGHDRX64_HDR);
@@ -371,7 +373,7 @@ static_assert(alignof(struct __mmsghdrx64) == __ALIGNOF_MMSGHDRX64);
 
 
 
-#include <bits/msghdr-struct32.h>
+#include <bits/os/kos/msghdr32.h>
 
 /* struct __msghdrx32 */
 static_assert(offsetof(struct __msghdrx32, msg_control) == __OFFSET_MSGHDRX32_CONTROL);
@@ -388,7 +390,7 @@ static_assert(alignof(struct __msghdrx32) == __ALIGNOF_MSGHDRX32);
 
 
 
-#include <bits/msghdr-struct64.h>
+#include <bits/os/kos/msghdr64.h>
 
 /* struct __msghdrx64 */
 static_assert(offsetof(struct __msghdrx64, msg_control) == __OFFSET_MSGHDRX64_CONTROL);
@@ -694,7 +696,7 @@ static_assert(sizeof(struct __siginfox64_struct) == __SIZEOF_SIGINFOX64);
 
 
 
-#include <bits/sigstack32.h>
+#include <bits/os/kos/sigstack32.h>
 
 /* struct __sigstackx32 */
 static_assert(offsetof(struct __sigstackx32, ss_onstack) == __OFFSET_SIGSTACKX32_ONSTACK);
@@ -711,7 +713,7 @@ static_assert(sizeof(struct __sigaltstackx32) == __SIZEOF_SIGALTSTACKX32);
 
 
 
-#include <bits/sigstack64.h>
+#include <bits/os/kos/sigstack64.h>
 
 /* struct __sigstackx64 */
 static_assert(offsetof(struct __sigstackx64, ss_onstack) == __OFFSET_SIGSTACKX64_ONSTACK);
@@ -728,7 +730,7 @@ static_assert(sizeof(struct __sigaltstackx64) == __SIZEOF_SIGALTSTACKX64);
 
 
 
-#include <bits/sigval32.h>
+#include <bits/os/kos/sigval32.h>
 
 /* union __sigvalx32 */
 static_assert(sizeof(union __sigvalx32) == __SIZEOF_SIGVALX32);
@@ -738,7 +740,7 @@ static_assert(alignof(union __sigvalx32) == __ALIGNOF_SIGVALX32);
 
 
 
-#include <bits/sigval64.h>
+#include <bits/os/kos/sigval64.h>
 
 /* union __sigvalx64 */
 static_assert(sizeof(union __sigvalx64) == __SIZEOF_SIGVALX64);
@@ -950,7 +952,7 @@ static_assert(alignof(struct statfsx64) == __ALIGNOF_STATFSX64);
 
 
 
-#include <bits/timeb32.h>
+#include <bits/os/kos/timeb32.h>
 
 /* struct timebx32 */
 static_assert(offsetof(struct timebx32, dstflag) == __OFFSET_TIMEBX32_DSTFLAG);
@@ -975,7 +977,7 @@ static_assert(alignof(struct timebx32_64) == __ALIGNOF_TIMEBX32_64);
 
 
 
-#include <bits/timeb64.h>
+#include <bits/os/kos/timeb64.h>
 
 /* struct timebx64 */
 static_assert(offsetof(struct timebx64, dstflag) == __OFFSET_TIMEBX64_DSTFLAG);
@@ -992,7 +994,7 @@ static_assert(alignof(struct timebx64) == __ALIGNOF_TIMEBX64);
 
 
 
-#include <bits/timespec32.h>
+#include <bits/os/kos/timespec32.h>
 
 /* struct timespecx32 */
 static_assert(offsetof(struct timespecx32, tv_nsec) == __OFFSET_TIMESPECX32_NSEC);
@@ -1013,7 +1015,7 @@ static_assert(alignof(struct timespecx32_64) == __ALIGNOF_TIMESPECX32_64);
 
 
 
-#include <bits/timespec64.h>
+#include <bits/os/kos/timespec64.h>
 
 /* struct timespecx64 */
 static_assert(offsetof(struct timespecx64, tv_nsec) == __OFFSET_TIMESPECX64_NSEC);
@@ -1028,7 +1030,7 @@ static_assert(alignof(struct timespecx64) == __ALIGNOF_TIMESPECX64);
 
 
 
-#include <bits/timeval32.h>
+#include <bits/os/kos/timeval32.h>
 
 /* struct timevalx32 */
 static_assert(offsetof(struct timevalx32, tv_sec) == __OFFSET_TIMEVALX32_SEC);
@@ -1049,7 +1051,7 @@ static_assert(alignof(struct timevalx32_64) == __ALIGNOF_TIMEVALX32_64);
 
 
 
-#include <bits/timeval64.h>
+#include <bits/os/kos/timeval64.h>
 
 /* struct timevalx64 */
 static_assert(offsetof(struct timevalx64, tv_sec) == __OFFSET_TIMEVALX64_SEC);
@@ -1064,7 +1066,35 @@ static_assert(alignof(struct timevalx64) == __ALIGNOF_TIMEVALX64);
 
 
 
-#include <bits/utimbuf32.h>
+#include <bits/os/kos/tms32.h>
+
+/* struct __tmsx32 */
+static_assert(offsetof(struct __tmsx32, tms_cstime) == __OFFSET_TMSX32_CSTIME);
+static_assert(offsetof(struct __tmsx32, tms_cutime) == __OFFSET_TMSX32_CUTIME);
+static_assert(offsetof(struct __tmsx32, tms_stime) == __OFFSET_TMSX32_STIME);
+static_assert(offsetof(struct __tmsx32, tms_utime) == __OFFSET_TMSX32_UTIME);
+static_assert(sizeof(struct __tmsx32) == __SIZEOF_TMSX32);
+static_assert(alignof(struct __tmsx32) == __ALIGNOF_TMSX32);
+
+
+
+
+
+#include <bits/os/kos/tms64.h>
+
+/* struct __tmsx64 */
+static_assert(offsetof(struct __tmsx64, tms_cstime) == __OFFSET_TMSX64_CSTIME);
+static_assert(offsetof(struct __tmsx64, tms_cutime) == __OFFSET_TMSX64_CUTIME);
+static_assert(offsetof(struct __tmsx64, tms_stime) == __OFFSET_TMSX64_STIME);
+static_assert(offsetof(struct __tmsx64, tms_utime) == __OFFSET_TMSX64_UTIME);
+static_assert(sizeof(struct __tmsx64) == __SIZEOF_TMSX64);
+static_assert(alignof(struct __tmsx64) == __ALIGNOF_TMSX64);
+
+
+
+
+
+#include <bits/os/kos/utimbuf32.h>
 
 /* struct utimbufx32 */
 static_assert(offsetof(struct utimbufx32, actime) == __OFFSET_UTIMBUFX32_ACTIME);
@@ -1085,7 +1115,7 @@ static_assert(alignof(struct utimbufx32_64) == __ALIGNOF_UTIMBUFX32_64);
 
 
 
-#include <bits/utimbuf64.h>
+#include <bits/os/kos/utimbuf64.h>
 
 /* struct utimbufx64 */
 static_assert(offsetof(struct utimbufx64, actime) == __OFFSET_UTIMBUFX64_ACTIME);
@@ -1505,64 +1535,64 @@ static_assert(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 
 #include <kos/bits/exception_data32.h>
 
-/* struct __exception_insufficient_rights_data32 */
-/* ... */
-
-/* struct __exception_ioerror_data32 */
-/* ... */
-
-/* struct __exception_segfault_data32 */
-/* ... */
-
 /* struct __exception_badalloc_data32 */
-/* ... */
-
-/* struct __exception___e_retry_rwlock_data32 */
-/* ... */
-
-/* struct __exception_exit_thread_data32 */
-/* ... */
-
-/* struct __exception_exit_process_data32 */
-/* ... */
-
-/* struct __exception_unknown_systemcall_data32 */
-/* ... */
-
-/* struct __exception_unhandled_interrupt_data32 */
-/* ... */
-
-/* struct __exception_no_device_data32 */
 /* ... */
 
 /* struct __exception_buffer_too_small_data32 */
 /* ... */
 
-/* struct __exception_invalid_handle_data32 */
+/* struct __exception_exit_process_data32 */
 /* ... */
 
-/* struct __exception_illegal_operation_data32 */
-/* ... */
-
-/* struct __exception_process_exited_data32 */
-/* ... */
-
-/* struct __exception_illegal_instruction_data32 */
-/* ... */
-
-/* struct __exception_index_error_data32 */
+/* struct __exception_exit_thread_data32 */
 /* ... */
 
 /* struct __exception_fserror_data32 */
 /* ... */
 
-/* struct __exception_not_executable_data32 */
+/* struct __exception_illegal_instruction_data32 */
+/* ... */
+
+/* struct __exception_illegal_operation_data32 */
+/* ... */
+
+/* struct __exception_index_error_data32 */
+/* ... */
+
+/* struct __exception_insufficient_rights_data32 */
 /* ... */
 
 /* struct __exception_invalid_argument_data32 */
 /* ... */
 
+/* struct __exception_invalid_handle_data32 */
+/* ... */
+
+/* struct __exception_ioerror_data32 */
+/* ... */
+
 /* struct __exception_net_error_data32 */
+/* ... */
+
+/* struct __exception_not_executable_data32 */
+/* ... */
+
+/* struct __exception_no_device_data32 */
+/* ... */
+
+/* struct __exception_process_exited_data32 */
+/* ... */
+
+/* struct __exception_segfault_data32 */
+/* ... */
+
+/* struct __exception_unhandled_interrupt_data32 */
+/* ... */
+
+/* struct __exception_unknown_systemcall_data32 */
+/* ... */
+
+/* struct __exception___e_retry_rwlock_data32 */
 /* ... */
 
 /* union __exception_data_pointers32 */
@@ -1582,64 +1612,64 @@ static_assert(sizeof(struct __exception_data32) == __SIZEOF_EXCEPTION_DATA32);
 
 #include <kos/bits/exception_data64.h>
 
-/* struct __exception_insufficient_rights_data64 */
-/* ... */
-
-/* struct __exception_ioerror_data64 */
-/* ... */
-
-/* struct __exception_segfault_data64 */
-/* ... */
-
 /* struct __exception_badalloc_data64 */
-/* ... */
-
-/* struct __exception___e_retry_rwlock_data64 */
-/* ... */
-
-/* struct __exception_exit_thread_data64 */
-/* ... */
-
-/* struct __exception_exit_process_data64 */
-/* ... */
-
-/* struct __exception_unknown_systemcall_data64 */
-/* ... */
-
-/* struct __exception_unhandled_interrupt_data64 */
-/* ... */
-
-/* struct __exception_no_device_data64 */
 /* ... */
 
 /* struct __exception_buffer_too_small_data64 */
 /* ... */
 
-/* struct __exception_invalid_handle_data64 */
+/* struct __exception_exit_process_data64 */
 /* ... */
 
-/* struct __exception_illegal_operation_data64 */
-/* ... */
-
-/* struct __exception_process_exited_data64 */
-/* ... */
-
-/* struct __exception_illegal_instruction_data64 */
-/* ... */
-
-/* struct __exception_index_error_data64 */
+/* struct __exception_exit_thread_data64 */
 /* ... */
 
 /* struct __exception_fserror_data64 */
 /* ... */
 
-/* struct __exception_not_executable_data64 */
+/* struct __exception_illegal_instruction_data64 */
+/* ... */
+
+/* struct __exception_illegal_operation_data64 */
+/* ... */
+
+/* struct __exception_index_error_data64 */
+/* ... */
+
+/* struct __exception_insufficient_rights_data64 */
 /* ... */
 
 /* struct __exception_invalid_argument_data64 */
 /* ... */
 
+/* struct __exception_invalid_handle_data64 */
+/* ... */
+
+/* struct __exception_ioerror_data64 */
+/* ... */
+
 /* struct __exception_net_error_data64 */
+/* ... */
+
+/* struct __exception_not_executable_data64 */
+/* ... */
+
+/* struct __exception_no_device_data64 */
+/* ... */
+
+/* struct __exception_process_exited_data64 */
+/* ... */
+
+/* struct __exception_segfault_data64 */
+/* ... */
+
+/* struct __exception_unhandled_interrupt_data64 */
+/* ... */
+
+/* struct __exception_unknown_systemcall_data64 */
+/* ... */
+
+/* struct __exception___e_retry_rwlock_data64 */
 /* ... */
 
 /* union __exception_data_pointers64 */
@@ -2390,7 +2420,7 @@ static_assert(offsetof(struct x86_64_va_list_reg_save_area, rsa_xmm[15]) == OFFS
 //[[[end]]]
 
 
-#include <bits/sigset.h>
+#include <bits/os/sigset.h>
 static_assert(sizeof(struct __sigset_struct) == __SIZEOF_SIGSET_T__);
 static_assert(COMPILER_LENOF(((struct __sigset_struct *)0)->__val) == __SIGSET_NWORDS);
 

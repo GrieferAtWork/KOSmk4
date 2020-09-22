@@ -25,39 +25,75 @@
 
 %{
 #include <features.h>
-#include <time.h>
-#include <bits/timerfd.h>
+
+#include <asm/os/timerfd.h>
 #include <bits/types.h>
+
+#ifdef __USE_GLIBC
+#include <time.h>
+#endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
 
-/* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/timerfd.h */
-/* Copyright (C) 2008-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-/* Bits to be set in the FLAGS parameter of `timerfd_settime'.  */
-#ifdef __COMPILER_PREFERR_ENUMS
+/* Values for the `flags' argument of `timerfd_create(2)'. */
+#if (defined(__TFD_NONBLOCK) || defined(__TFD_CLOEXEC) || \
+     (defined(__USE_KOS) && defined(__TFD_CLOFORK)))
+/*[[[enum]]]*/
+#ifdef __CC__
 enum {
-	TFD_TIMER_ABSTIME = 1
-#define TFD_TIMER_ABSTIME TFD_TIMER_ABSTIME
+#ifdef __TFD_NONBLOCK
+	TFD_NONBLOCK      = __TFD_NONBLOCK, /* Set the `IO_NONBLOCK' flag for the returned */
+#endif /* __TFD_NONBLOCK */
+#ifdef __TFD_CLOEXEC
+	TFD_CLOEXEC       = __TFD_CLOEXEC,  /* Set the `IO_CLOEXEC' flag for the returned */
+#endif /* __TFD_CLOEXEC */
+#if defined(__USE_KOS) && defined(__TFD_CLOFORK)
+	TFD_CLOFORK       = __TFD_CLOFORK,  /* Set the `IO_CLOFORK' flag for the returned */
+#endif /* __USE_KOS && __TFD_CLOFORK */
 };
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __TFD_NONBLOCK
+#define TFD_NONBLOCK TFD_NONBLOCK /* Set the `IO_NONBLOCK' flag for the returned */
+#endif /* __TFD_NONBLOCK */
+#ifdef __TFD_CLOEXEC
+#define TFD_CLOEXEC  TFD_CLOEXEC  /* Set the `IO_CLOEXEC' flag for the returned */
+#endif /* __TFD_CLOEXEC */
+#if defined(__USE_KOS) && defined(__TFD_CLOFORK)
+#define TFD_CLOFORK  TFD_CLOFORK  /* Set the `IO_CLOFORK' flag for the returned */
+#endif /* __USE_KOS && __TFD_CLOFORK */
 #else /* __COMPILER_PREFERR_ENUMS */
-#define TFD_TIMER_ABSTIME 1
+#ifdef __TFD_NONBLOCK
+#define TFD_NONBLOCK __TFD_NONBLOCK /* Set the `IO_NONBLOCK' flag for the returned */
+#endif /* __TFD_NONBLOCK */
+#ifdef __TFD_CLOEXEC
+#define TFD_CLOEXEC  __TFD_CLOEXEC  /* Set the `IO_CLOEXEC' flag for the returned */
+#endif /* __TFD_CLOEXEC */
+#if defined(__USE_KOS) && defined(__TFD_CLOFORK)
+#define TFD_CLOFORK  __TFD_CLOFORK  /* Set the `IO_CLOFORK' flag for the returned */
+#endif /* __USE_KOS && __TFD_CLOFORK */
 #endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
+#endif /* ... */
+
+/* Values for the `flags' argument of `timerfd_settime(2)'. */
+#ifdef __TFD_TIMER_ABSTIME
+/*[[[enum]]]*/
+#ifdef __CC__
+enum {
+	TFD_TIMER_ABSTIME = __TFD_TIMER_ABSTIME /* Work with absolute timestamps. */
+};
+#endif /* __CC__ */
+/*[[[AUTO]]]*/
+#ifdef __COMPILER_PREFERR_ENUMS
+#define TFD_TIMER_ABSTIME TFD_TIMER_ABSTIME /* Work with absolute timestamps. */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define TFD_TIMER_ABSTIME __TFD_TIMER_ABSTIME /* Work with absolute timestamps. */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+/*[[[end]]]*/
+#endif /* __TFD_TIMER_ABSTIME */
+
 
 
 #ifdef __CC__
@@ -75,13 +111,11 @@ int timerfd_settime32($fd_t ufd, __STDC_INT_AS_UINT_T flags,
 int timerfd_gettime32($fd_t ufd, [[nonnull]] struct $itimerspec32 *__restrict otmr);
 
 
-@@Return file descriptor for new interval timer source
+@@@param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK'
 [[nothrow, decl_include("<features.h>")]]
 $fd_t timerfd_create(clockid_t clock_id, __STDC_INT_AS_UINT_T flags);
 
-@@Set next expiration time of interval timer source UFD to UTMR.
-@@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
-@@is absolute. Optionally return the old expiration time in OTMR
+@@@param: flags: Set of `0 | TFD_TIMER_ABSTIME'
 [[no_crt_self_import, decl_include("<features.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timerfd_settime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timerfd_settime")]]
@@ -122,7 +156,6 @@ int timerfd_settime($fd_t ufd, __STDC_INT_AS_UINT_T flags,
 @@pp_endif@@
 }
 
-@@Return the next expiration time of UFD
 [[no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timerfd_gettime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timerfd_gettime")]]

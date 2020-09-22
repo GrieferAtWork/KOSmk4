@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda271fe */
+/* HASH CRC-32:0x3020f2d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4094,7 +4094,7 @@ miss:
 #endif /* !__KERNEL__ */
 #include <sys/stat.h>
 #ifndef __KERNEL__
-#include <asm/stat.h>
+#include <asm/os/stat.h>
 /* Generate a file mode representation similar to what's printed by `ls -l'
  * The representation is written to `p', and `mode' is the value as returned
  * by `stat(2)' in `struct stat::st_mode'
@@ -4175,9 +4175,9 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	ch = mode & S_IXUSR ? 'x' : '-';
 #elif defined(S_ISUID)
 	ch = mode & S_ISUID ? 'S' : '-';
-#else /* S_IWUSR */
+#else /* ... */
 	ch = '-';
-#endif /* !S_IWUSR */
+#endif /* !... */
 	*p++ = ch;
 
 #ifdef S_IRGRP
@@ -4204,9 +4204,9 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	ch = mode & S_IXGRP ? 'x' : '-';
 #elif defined(S_ISGID)
 	ch = mode & S_ISGID ? 'S' : '-';
-#else /* S_IWUSR */
+#else /* ... */
 	ch = '-';
-#endif /* !S_IWUSR */
+#endif /* !... */
 	*p++ = ch;
 
 #ifdef S_IROTH
@@ -4233,9 +4233,9 @@ NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode,
 	ch = mode & S_IXOTH ? 'x' : '-';
 #elif defined(S_ISVTX)
 	ch = mode & S_ISVTX ? 'T' : '-';
-#else /* S_IWUSR */
+#else /* ... */
 	ch = '-';
-#endif /* !S_IWUSR */
+#endif /* !... */
 	*p++ = ch;
 
 	/* Always space in this implementation */

@@ -23,7 +23,7 @@
 %{
 #include <features.h>
 
-#include <asm/xattr.h>
+#include <asm/os/xattr.h>
 #include <bits/types.h>
 
 #ifdef __USE_GLIBC

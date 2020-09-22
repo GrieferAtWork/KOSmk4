@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30dd2f2a */
+/* HASH CRC-32:0x952d6232 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_uchar_mbrtoc32_defined
 #define __local_uchar_mbrtoc32_defined 1
 #include <__crt.h>
-#include <bits/mbstate.h>
+#include <bits/crt/mbstate.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: unicode_c8toc16 from unicode */

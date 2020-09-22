@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fc28e6d */
+/* HASH CRC-32:0x9a6d2416 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -287,14 +287,10 @@ NOTHROW_NCX(LIBKCALL libc_wcstombs)(char *__restrict dst,
 	return libc_wcsrtombs(dst, (char32_t const **)&src, dstlen, NULL);
 }
 #ifndef LIBC_ARCH_HAVE_ABORT
-#include <asm/stdlib.h>
+#include <asm/os/stdlib.h>
 INTERN ATTR_SECTION(".text.crt.application.exit") ATTR_NORETURN void
 (LIBCCALL libc_abort)(void) THROWS(...) {
-#ifdef __EXIT_FAILURE
 	libc__Exit(__EXIT_FAILURE);
-#else /* __EXIT_FAILURE */
-	libc__Exit(1);
-#endif /* !__EXIT_FAILURE */
 }
 #endif /* !LIBC_ARCH_HAVE_ABORT */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_PURE WUNUSED NONNULL((1)) int
@@ -1161,7 +1157,7 @@ INTERN ATTR_SECTION(".text.crt.solaris") ATTR_CONST WUNUSED char const *
 NOTHROW_NCX(LIBCCALL libc_getexecname)(void) {
 	return __LOCAL_program_invocation_name;
 }
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #include <libc/errno.h>
 /* Enumerate all open file descriptors by invoking `(*func)(cookie, FD)' for each of them
  * If during any of these invocations, `(*func)(...)' returns non-zero, enumeration stops,

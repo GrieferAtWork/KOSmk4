@@ -22,10 +22,13 @@
 
 #include <__stdinc.h>
 
-
-
 #ifndef __PATH_SHM
 #define __PATH_SHM "/dev/shm" /* Must _not_ include a trailing slash! */
 #endif /* !__PATH_SHM */
+
+/* Exposed as `_PATH_LOG' in <sys/syslog.h> */
+#ifndef __PATH_LOG
+#define __PATH_LOG "/dev/log" /* Filesystem path to the kernel logger */
+#endif /* !__PATH_LOG */
 
 #endif /* !_ASM_OS_PATHS_H */

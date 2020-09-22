@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc55adbec */
+/* HASH CRC-32:0xf5b1020f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,29 +26,24 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: futimes32 from sys.time */
 #if !defined(__local___localdep_futimes32_defined) && defined(__CRT_HAVE_futimes)
 #define __local___localdep_futimes32_defined 1
-/* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))
 #endif /* !__local___localdep_futimes32_defined && __CRT_HAVE_futimes */
 /* Dependency: futimes64 from sys.time */
 #ifndef __local___localdep_futimes64_defined
 #define __local___localdep_futimes64_defined 1
 #ifdef __CRT_HAVE_futimes64
-/* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),futimes64,(__fd,__tvp))
 #elif defined(__CRT_HAVE_lutimes) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),lutimes,(__fd,__tvp))
 #elif defined(__CRT_HAVE_futimes)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.time/futimes64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `utimes', but does not follow symbolic links */
 #define __localdep_futimes64 __LIBC_LOCAL_NAME(futimes64)
 #else /* ... */
 #undef __local___localdep_futimes64_defined
 #endif /* !... */
 #endif /* !__local___localdep_futimes64_defined */
-/* Same as `utimes', but takes an open file descriptor instead of a name */
 __LOCAL_LIBC(futimes) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futimes))(__fd_t __fd, struct timeval const __tvp[2]) {
 #ifdef __CRT_HAVE_futimes

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2f20713 */
+/* HASH CRC-32:0x9369c34e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_shm_open_defined
 #define __local_shm_open_defined 1
 #include <__crt.h>
-#include <asm/fcntl.h>
+#include <asm/os/fcntl.h>
 #if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpy from string */
@@ -194,7 +194,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/paths.h>
-#include <asm/oflags.h>
+#include <asm/os/oflags.h>
 #include <parts/malloca.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN

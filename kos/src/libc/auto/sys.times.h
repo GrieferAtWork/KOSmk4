@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7435aa6e */
+/* HASH CRC-32:0xfeac20 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,6 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Store the CPU time used by this process and all its
- * dead children (and their dead children) in BUFFER.
- * Return the elapsed real time, or (clock_t) -1 for errors.
- * All times are in CLK_TCKths of a second */
 INTDEF clock_t NOTHROW_NCX(LIBDCALL libd_times)(struct tms *buffer);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

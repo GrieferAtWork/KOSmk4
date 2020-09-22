@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7fdcd88 */
+/* HASH CRC-32:0x5022c18c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,7 +107,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_lfutex64_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #include <kos/bits/futex.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Wait if `(*uaddr & bitmask) != setmask'

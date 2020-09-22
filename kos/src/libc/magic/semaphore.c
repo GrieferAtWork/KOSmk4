@@ -31,7 +31,7 @@
 #include <bits/types.h>
 #include <bits/crt/semaphore.h>
 #ifdef __USE_XOPEN2K
-#include <bits/timespec.h>
+#include <bits/os/timespec.h>
 #endif /* __USE_XOPEN2K */
 
 __SYSDECL_BEGIN
@@ -85,7 +85,7 @@ int sem_unlink([[nonnull]] const char *name);
 int sem_wait([[nonnull]] sem_t *sem);
 
 [[cp, doc_alias(sem_timedwait), ignore, nocrt, alias("sem_timedwait")]]
-[[decl_include("<bits/crt/semaphore.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
 int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
                     [[nonnull]] struct $timespec32 const *__restrict abstime);
 
@@ -93,7 +93,7 @@ int sem_timedwait32([[nonnull]] sem_t *__restrict sem,
 %
 %#ifdef __USE_XOPEN2K
 @@Similar to `sem_wait' but wait only until ABSTIME
-[[cp, no_crt_self_import, decl_include("<bits/crt/semaphore.h>", "<bits/timespec.h>")]]
+[[cp, no_crt_self_import, decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("sem_timedwait")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("sem_timedwait64")]]
 [[userimpl, requires($has_function(sem_timedwait32) || $has_function(sem_timedwait64))]]
@@ -116,7 +116,7 @@ int sem_timedwait([[nonnull]] sem_t *__restrict sem,
 %#ifdef __USE_TIME64
 [[cp, time64_variant_of(sem_timedwait)]]
 [[userimpl, requires_function(sem_timedwait32)]]
-[[decl_include("<bits/crt/semaphore.h>", "<bits/timespec.h>")]]
+[[decl_include("<bits/crt/semaphore.h>", "<bits/os/timespec.h>")]]
 int sem_timedwait64([[nonnull]] sem_t *__restrict sem,
                     [[nonnull]] struct timespec64 const *__restrict abstime) {
 	struct timespec32 ts32;

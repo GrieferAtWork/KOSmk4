@@ -22,11 +22,13 @@
 
 #include <__stdinc.h>
 
-#include <bits/time.h>
-#include <bits/timespec.h>
-#include <bits/timeval.h>
+#include <asm/os/clock.h> /* __CLOCKS_PER_SEC */
+#include <bits/os/timespec.h>
+#include <bits/os/timeval.h>
 
-#define _CLOCKS_PER_SEC_ CLOCKS_PER_SEC
+#ifdef __CLOCKS_PER_SEC
+#define _CLOCKS_PER_SEC_ __CLOCKS_PER_SEC
+#endif /* __CLOCKS_PER_SEC */
 
 /*???#ifdef __SPU__
 #include <sys/_timespec.h>
