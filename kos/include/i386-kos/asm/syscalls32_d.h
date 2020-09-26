@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dda43a5 */
+/* HASH CRC-32:0x988bb7f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1413,7 +1413,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_RESTART_MODES
 #ifndef __NR32FEAT_DEFINED_SYSCALL_RESTART_MODES
-#define __NR32FEAT_DEFINED_SYSCALL_RESTART_MODES 1
+#define __NR32FEAT_DEFINED_SYSCALL_RESTART_MODES
 /* Restart modes:
  * 0 (auto):
  *   - Always restart after an `E_INTERRUPT_USER_RPC'
@@ -1949,182 +1949,182 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_CANCELLATION_POINTS
 #ifndef __NR32FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS
-#define __NR32FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS 1
-#define __NR32FEAT_HAVE_CANCELLATION_POINTS 1
-#define __NR32CP_read                         1
-#define __NR32CP_write                        1
-#define __NR32CP_open                         1
-#define __NR32CP_waitpid                      1
-#define __NR32CP_creat                        1
-#define __NR32CP_link                         1
-#define __NR32CP_unlink                       1
-#define __NR32CP_execve                       1
-#define __NR32CP_chdir                        1
-#define __NR32CP_mknod                        1
-#define __NR32CP_chmod                        1
-#define __NR32CP_lchown                       1
-#define __NR32CP_oldstat                      1
-#define __NR32CP_lseek                        1
-#define __NR32CP_mount                        1
-#define __NR32CP_umount                       1
-#define __NR32CP_oldfstat                     1
-#define __NR32CP_pause                        1
-#define __NR32CP_utime                        1
-#define __NR32CP_access                       1
-#define __NR32CP_sync                         1
-#define __NR32CP_rename                       1
-#define __NR32CP_mkdir                        1
-#define __NR32CP_umount2                      1
-#define __NR32CP_ioctl                        1
-#define __NR32CP_fcntl                        1
-#define __NR32CP_sigsuspend                   1
-#define __NR32CP_select                       1
-#define __NR32CP_symlink                      1
-#define __NR32CP_oldlstat                     1
-#define __NR32CP_readlink                     1
-#define __NR32CP_readdir                      1
-#define __NR32CP_fchmod                       1
-#define __NR32CP_fchown                       1
-#define __NR32CP_syslog                       1
-#define __NR32CP_stat                         1
-#define __NR32CP_lstat                        1
-#define __NR32CP_fstat                        1
-#define __NR32CP_wait4                        1
-#define __NR32CP_sysinfo                      1
-#define __NR32CP_fsync                        1
-#define __NR32CP_fchdir                       1
-#define __NR32CP__llseek                      1
-#define __NR32CP_getdents                     1
-#define __NR32CP__newselect                   1
-#define __NR32CP_flock                        1
-#define __NR32CP_msync                        1
-#define __NR32CP_readv                        1
-#define __NR32CP_writev                       1
-#define __NR32CP_fdatasync                    1
-#define __NR32CP_nanosleep                    1
-#define __NR32CP_poll                         1
-#define __NR32CP_rt_sigtimedwait              1
-#define __NR32CP_rt_sigsuspend                1
-#define __NR32CP_pread64                      1
-#define __NR32CP_pwrite64                     1
-#define __NR32CP_chown                        1
-#define __NR32CP_getcwd                       1
-#define __NR32CP_sendfile                     1
-#define __NR32CP_getpmsg                      1
-#define __NR32CP_putpmsg                      1
-#define __NR32CP_stat64                       1
-#define __NR32CP_lstat64                      1
-#define __NR32CP_fstat64                      1
-#define __NR32CP_lchown32                     1
-#define __NR32CP_fchown32                     1
-#define __NR32CP_chown32                      1
-#define __NR32CP_getdents64                   1
-#define __NR32CP_fcntl64                      1
-#define __NR32CP_setxattr                     1
-#define __NR32CP_lsetxattr                    1
-#define __NR32CP_fsetxattr                    1
-#define __NR32CP_getxattr                     1
-#define __NR32CP_lgetxattr                    1
-#define __NR32CP_fgetxattr                    1
-#define __NR32CP_listxattr                    1
-#define __NR32CP_llistxattr                   1
-#define __NR32CP_flistxattr                   1
-#define __NR32CP_removexattr                  1
-#define __NR32CP_lremovexattr                 1
-#define __NR32CP_fremovexattr                 1
-#define __NR32CP_sendfile64                   1
-#define __NR32CP_futex                        1
-#define __NR32CP_epoll_wait                   1
-#define __NR32CP_clock_nanosleep              1
-#define __NR32CP_utimes                       1
-#define __NR32CP_mq_timedsend                 1
-#define __NR32CP_mq_timedreceive              1
-#define __NR32CP_waitid                       1
-#define __NR32CP_openat                       1
-#define __NR32CP_mkdirat                      1
-#define __NR32CP_mknodat                      1
-#define __NR32CP_fchownat                     1
-#define __NR32CP_futimesat                    1
-#define __NR32CP_fstatat64                    1
-#define __NR32CP_unlinkat                     1
-#define __NR32CP_renameat                     1
-#define __NR32CP_linkat                       1
-#define __NR32CP_symlinkat                    1
-#define __NR32CP_readlinkat                   1
-#define __NR32CP_fchmodat                     1
-#define __NR32CP_faccessat                    1
-#define __NR32CP_pselect6                     1
-#define __NR32CP_ppoll                        1
-#define __NR32CP_splice                       1
-#define __NR32CP_sync_file_range              1
-#define __NR32CP_tee                          1
-#define __NR32CP_vmsplice                     1
-#define __NR32CP_epoll_pwait                  1
-#define __NR32CP_utimensat                    1
-#define __NR32CP_preadv                       1
-#define __NR32CP_pwritev                      1
-#define __NR32CP_recvmmsg                     1
-#define __NR32CP_name_to_handle_at            1
-#define __NR32CP_open_by_handle_at            1
-#define __NR32CP_syncfs                       1
-#define __NR32CP_sendmmsg                     1
-#define __NR32CP_renameat2                    1
-#define __NR32CP_execveat                     1
-#define __NR32CP_connect                      1
-#define __NR32CP_accept4                      1
-#define __NR32CP_sendto                       1
-#define __NR32CP_sendmsg                      1
-#define __NR32CP_recvfrom                     1
-#define __NR32CP_recvmsg                      1
-#define __NR32CP_msgsnd                       1
-#define __NR32CP_msgrcv                       1
-#define __NR32CP_clock_nanosleep_time64       1
-#define __NR32CP_utimensat_time64             1
-#define __NR32CP_pselect6_time64              1
-#define __NR32CP_ppoll_time64                 1
-#define __NR32CP_recvmmsg_time64              1
-#define __NR32CP_mq_timedsend_time64          1
-#define __NR32CP_mq_timedreceive_time64       1
-#define __NR32CP_rt_sigtimedwait_time64       1
-#define __NR32CP_futex_time64                 1
-#define __NR32CP_pwritevf                     1
-#define __NR32CP_preadvf                      1
-#define __NR32CP_freadlinkat                  1
-#define __NR32CP_fsymlinkat                   1
-#define __NR32CP_frenameat                    1
-#define __NR32CP_kfstatat                     1
-#define __NR32CP_futimesat64                  1
-#define __NR32CP_fmknodat                     1
-#define __NR32CP_fmkdirat                     1
-#define __NR32CP_waitid64                     1
-#define __NR32CP_utimes64                     1
-#define __NR32CP_kreaddirf                    1
-#define __NR32CP_kfstat                       1
-#define __NR32CP_klstat                       1
-#define __NR32CP_kstat                        1
-#define __NR32CP_pwrite64f                    1
-#define __NR32CP_pread64f                     1
-#define __NR32CP_nanosleep64                  1
-#define __NR32CP_rpc_service                  1
-#define __NR32CP_ksysctl                      1
-#define __NR32CP_writevf                      1
-#define __NR32CP_readvf                       1
-#define __NR32CP_kreaddir                     1
-#define __NR32CP_wait4_64                     1
-#define __NR32CP_select64                     1
-#define __NR32CP_ioctlf                       1
-#define __NR32CP_utime64                      1
-#define __NR32CP_lfutexlockexpr               1
-#define __NR32CP_lfutexexpr                   1
-#define __NR32CP_lseek64                      1
-#define __NR32CP_lfutex                       1
-#define __NR32CP_fchdirat                     1
-#define __NR32CP_frealpathat                  1
-#define __NR32CP_frealpath4                   1
-#define __NR32CP_writef                       1
-#define __NR32CP_readf                        1
-#define __NR32CP_hopf                         1
-#define __NR32CP_hop                          1
+#define __NR32FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS
+#define __NR32FEAT_HAVE_CANCELLATION_POINTS
+#define __NR32CP_read
+#define __NR32CP_write
+#define __NR32CP_open
+#define __NR32CP_waitpid
+#define __NR32CP_creat
+#define __NR32CP_link
+#define __NR32CP_unlink
+#define __NR32CP_execve
+#define __NR32CP_chdir
+#define __NR32CP_mknod
+#define __NR32CP_chmod
+#define __NR32CP_lchown
+#define __NR32CP_oldstat
+#define __NR32CP_lseek
+#define __NR32CP_mount
+#define __NR32CP_umount
+#define __NR32CP_oldfstat
+#define __NR32CP_pause
+#define __NR32CP_utime
+#define __NR32CP_access
+#define __NR32CP_sync
+#define __NR32CP_rename
+#define __NR32CP_mkdir
+#define __NR32CP_umount2
+#define __NR32CP_ioctl
+#define __NR32CP_fcntl
+#define __NR32CP_sigsuspend
+#define __NR32CP_select
+#define __NR32CP_symlink
+#define __NR32CP_oldlstat
+#define __NR32CP_readlink
+#define __NR32CP_readdir
+#define __NR32CP_fchmod
+#define __NR32CP_fchown
+#define __NR32CP_syslog
+#define __NR32CP_stat
+#define __NR32CP_lstat
+#define __NR32CP_fstat
+#define __NR32CP_wait4
+#define __NR32CP_sysinfo
+#define __NR32CP_fsync
+#define __NR32CP_fchdir
+#define __NR32CP__llseek
+#define __NR32CP_getdents
+#define __NR32CP__newselect
+#define __NR32CP_flock
+#define __NR32CP_msync
+#define __NR32CP_readv
+#define __NR32CP_writev
+#define __NR32CP_fdatasync
+#define __NR32CP_nanosleep
+#define __NR32CP_poll
+#define __NR32CP_rt_sigtimedwait
+#define __NR32CP_rt_sigsuspend
+#define __NR32CP_pread64
+#define __NR32CP_pwrite64
+#define __NR32CP_chown
+#define __NR32CP_getcwd
+#define __NR32CP_sendfile
+#define __NR32CP_getpmsg
+#define __NR32CP_putpmsg
+#define __NR32CP_stat64
+#define __NR32CP_lstat64
+#define __NR32CP_fstat64
+#define __NR32CP_lchown32
+#define __NR32CP_fchown32
+#define __NR32CP_chown32
+#define __NR32CP_getdents64
+#define __NR32CP_fcntl64
+#define __NR32CP_setxattr
+#define __NR32CP_lsetxattr
+#define __NR32CP_fsetxattr
+#define __NR32CP_getxattr
+#define __NR32CP_lgetxattr
+#define __NR32CP_fgetxattr
+#define __NR32CP_listxattr
+#define __NR32CP_llistxattr
+#define __NR32CP_flistxattr
+#define __NR32CP_removexattr
+#define __NR32CP_lremovexattr
+#define __NR32CP_fremovexattr
+#define __NR32CP_sendfile64
+#define __NR32CP_futex
+#define __NR32CP_epoll_wait
+#define __NR32CP_clock_nanosleep
+#define __NR32CP_utimes
+#define __NR32CP_mq_timedsend
+#define __NR32CP_mq_timedreceive
+#define __NR32CP_waitid
+#define __NR32CP_openat
+#define __NR32CP_mkdirat
+#define __NR32CP_mknodat
+#define __NR32CP_fchownat
+#define __NR32CP_futimesat
+#define __NR32CP_fstatat64
+#define __NR32CP_unlinkat
+#define __NR32CP_renameat
+#define __NR32CP_linkat
+#define __NR32CP_symlinkat
+#define __NR32CP_readlinkat
+#define __NR32CP_fchmodat
+#define __NR32CP_faccessat
+#define __NR32CP_pselect6
+#define __NR32CP_ppoll
+#define __NR32CP_splice
+#define __NR32CP_sync_file_range
+#define __NR32CP_tee
+#define __NR32CP_vmsplice
+#define __NR32CP_epoll_pwait
+#define __NR32CP_utimensat
+#define __NR32CP_preadv
+#define __NR32CP_pwritev
+#define __NR32CP_recvmmsg
+#define __NR32CP_name_to_handle_at
+#define __NR32CP_open_by_handle_at
+#define __NR32CP_syncfs
+#define __NR32CP_sendmmsg
+#define __NR32CP_renameat2
+#define __NR32CP_execveat
+#define __NR32CP_connect
+#define __NR32CP_accept4
+#define __NR32CP_sendto
+#define __NR32CP_sendmsg
+#define __NR32CP_recvfrom
+#define __NR32CP_recvmsg
+#define __NR32CP_msgsnd
+#define __NR32CP_msgrcv
+#define __NR32CP_clock_nanosleep_time64
+#define __NR32CP_utimensat_time64
+#define __NR32CP_pselect6_time64
+#define __NR32CP_ppoll_time64
+#define __NR32CP_recvmmsg_time64
+#define __NR32CP_mq_timedsend_time64
+#define __NR32CP_mq_timedreceive_time64
+#define __NR32CP_rt_sigtimedwait_time64
+#define __NR32CP_futex_time64
+#define __NR32CP_pwritevf
+#define __NR32CP_preadvf
+#define __NR32CP_freadlinkat
+#define __NR32CP_fsymlinkat
+#define __NR32CP_frenameat
+#define __NR32CP_kfstatat
+#define __NR32CP_futimesat64
+#define __NR32CP_fmknodat
+#define __NR32CP_fmkdirat
+#define __NR32CP_waitid64
+#define __NR32CP_utimes64
+#define __NR32CP_kreaddirf
+#define __NR32CP_kfstat
+#define __NR32CP_klstat
+#define __NR32CP_kstat
+#define __NR32CP_pwrite64f
+#define __NR32CP_pread64f
+#define __NR32CP_nanosleep64
+#define __NR32CP_rpc_service
+#define __NR32CP_ksysctl
+#define __NR32CP_writevf
+#define __NR32CP_readvf
+#define __NR32CP_kreaddir
+#define __NR32CP_wait4_64
+#define __NR32CP_select64
+#define __NR32CP_ioctlf
+#define __NR32CP_utime64
+#define __NR32CP_lfutexlockexpr
+#define __NR32CP_lfutexexpr
+#define __NR32CP_lseek64
+#define __NR32CP_lfutex
+#define __NR32CP_fchdirat
+#define __NR32CP_frealpathat
+#define __NR32CP_frealpath4
+#define __NR32CP_writef
+#define __NR32CP_readf
+#define __NR32CP_hopf
+#define __NR32CP_hop
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS */
 #endif /* __WANT_SYSCALL_CANCELLATION_POINTS */
 
@@ -2134,7 +2134,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_REGISTER_COUNT
 #ifndef __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT
-#define __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT 1
+#define __NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT
 #define __NR32FEAT_SYSCALL_REGISTER_MAX_COUNT 6
 #define __NR32FEAT_SYSCALL_REGISTER_BITS 32
 #define __NR32RC_restart_syscall              0
@@ -2641,11 +2641,11 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_DOUBLE_WIDE_RETURN
 #ifndef __NR32FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN
-#define __NR32FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN 1
-#define __NR32FEAT_HAVE_DOUBLE_WIDE 1
-#define __NR32DW_fsmode                       1
-#define __NR32DW_lseek64                      1
-#define __NR32DW_time64                       1
+#define __NR32FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN
+#define __NR32FEAT_HAVE_DOUBLE_WIDE
+#define __NR32DW_fsmode
+#define __NR32DW_lseek64
+#define __NR32DW_time64
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN */
 #endif /* __WANT_SYSCALL_DOUBLE_WIDE_RETURN */
 

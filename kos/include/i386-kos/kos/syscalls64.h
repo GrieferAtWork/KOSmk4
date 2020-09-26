@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba787fd8 */
+/* HASH CRC-32:0x458668aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@
 #endif
 #define __CDECLARE_XSC(attr, Treturn, name, param, args) __CDECLARE(attr,Treturn,,sys_X##name,param,args)
 #define __CDECLARE_VOID_XSC(attr, name, param, args)     __CDECLARE_VOID(attr,,sys_X##name,param,args)
-#define __PRIVATE_CRT_HAVE_PLACEHOLDER_1         ,
+#define __PRIVATE_CRT_HAVE_PLACEHOLDER_ ,
 #define __PRIVATE_CRT_HAVE_ARG_IMPL(x, val, ...) val
 #define __PRIVATE_CRT_HAVE_ARG(x)  __PRIVATE_CRT_HAVE_ARG_IMPL x
 #define __PRIVATE_CRT_HAVE3(...)   __PRIVATE_CRT_HAVE_ARG((__VA_ARGS__ 1,0))

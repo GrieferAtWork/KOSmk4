@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ff9730c */
+/* HASH CRC-32:0xadbf0552 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hsearch_r) __ATTR_NONNULL((3, 4)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int __action, struct entry **__retval, struct hsearch_data *__htab) {
 	typedef struct {
-		unsigned int __used;
+		unsigned int ___used;
 		struct entry        __entry;
 	} __entry_type;
 	unsigned int __hval, __count, __idx;
@@ -94,9 +94,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int 
 	if (__hval == 0)
 		++__hval;
 	__idx = __hval % __htab->size + 1;
-	if (((__entry_type *)__htab->table)[__idx].__used) {
+	if (((__entry_type *)__htab->table)[__idx].___used) {
 		unsigned int __hval2, __first_idx;
-		if (((__entry_type *)__htab->table)[__idx].__used == __hval &&
+		if (((__entry_type *)__htab->table)[__idx].___used == __hval &&
 		    __localdep_strcmp(__item.key, ((__entry_type *)__htab->table)[__idx].__entry.key) == 0) {
 			*__retval = &((__entry_type *)__htab->table)[__idx].__entry;
 			return 1;
@@ -110,12 +110,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int 
 				__idx -= __hval2;
 			if (__idx == __first_idx)
 				break;
-			if (((__entry_type *)__htab->table)[__idx].__used == __hval &&
+			if (((__entry_type *)__htab->table)[__idx].___used == __hval &&
 			    __localdep_strcmp(__item.key, ((__entry_type *)__htab->table)[__idx].__entry.key) == 0) {
 				*__retval = &((__entry_type *)__htab->table)[__idx].__entry;
 				return 1;
 			}
-		} while (((__entry_type *)__htab->table)[__idx].__used);
+		} while (((__entry_type *)__htab->table)[__idx].___used);
 	}
 	if (__action == 1) {
 		if (__htab->filled == __htab->size) {
@@ -125,7 +125,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, int 
 			*__retval = __NULLPTR;
 			return 0;
 		}
-		((__entry_type *)__htab->table)[__idx].__used  = __hval;
+		((__entry_type *)__htab->table)[__idx].___used  = __hval;
 		((__entry_type *)__htab->table)[__idx].__entry = __item;
 		++__htab->filled;
 		*__retval = &((__entry_type *)__htab->table)[__idx].__entry;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae1e1aee */
+/* HASH CRC-32:0xe6541f3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,626 +18,626 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define __CRT_HAVE_sys__sysctl 1
-#define __CRT_HAVE_sys_accept 1
-#define __CRT_HAVE_sys_accept4 1
-#define __CRT_HAVE_sys_access 1
-#define __CRT_HAVE_sys_acct 1
-#define __CRT_HAVE_sys_add_key 1
-#define __CRT_HAVE_sys_adjtimex 1
-#define __CRT_HAVE_sys_alarm 1
-#define __CRT_HAVE_sys_bdflush 1
-#define __CRT_HAVE_sys_bind 1
-#define __CRT_HAVE_sys_bpf 1
-#define __CRT_HAVE_sys_brk 1
-#define __CRT_HAVE_sys_capget 1
-#define __CRT_HAVE_sys_capset 1
-#define __CRT_HAVE_sys_chdir 1
-#define __CRT_HAVE_sys_chmod 1
-#define __CRT_HAVE_sys_chown 1
-#define __CRT_HAVE_sys_chroot 1
-#define __CRT_HAVE_sys_clock_adjtime 1
-#define __CRT_HAVE_sys_clock_getres 1
-#define __CRT_HAVE_sys_clock_gettime 1
-#define __CRT_HAVE_sys_clock_nanosleep 1
-#define __CRT_HAVE_sys_clock_settime 1
-#define __CRT_HAVE_sys_clone 1
-#define __CRT_HAVE_sys_close 1
-#define __CRT_HAVE_sys_connect 1
-#define __CRT_HAVE_sys_creat 1
-#define __CRT_HAVE_sys_delete_module 1
-#define __CRT_HAVE_sys_dup 1
-#define __CRT_HAVE_sys_dup2 1
-#define __CRT_HAVE_sys_dup3 1
-#define __CRT_HAVE_sys_epoll_create 1
-#define __CRT_HAVE_sys_epoll_create1 1
-#define __CRT_HAVE_sys_epoll_ctl 1
-#define __CRT_HAVE_sys_epoll_pwait 1
-#define __CRT_HAVE_sys_epoll_wait 1
-#define __CRT_HAVE_sys_eventfd 1
-#define __CRT_HAVE_sys_eventfd2 1
-#define __CRT_HAVE_sys_execve 1
-#define __CRT_HAVE_sys_execveat 1
-#define __CRT_HAVE_sys_exit 1
-#define __CRT_HAVE_sys_exit_group 1
-#define __CRT_HAVE_sys_faccessat 1
-#define __CRT_HAVE_sys_fadvise64 1
-#define __CRT_HAVE_sys_fallocate 1
-#define __CRT_HAVE_sys_fanotify_init 1
-#define __CRT_HAVE_sys_fanotify_mark 1
-#define __CRT_HAVE_sys_fchdir 1
-#define __CRT_HAVE_sys_fchmod 1
-#define __CRT_HAVE_sys_fchmodat 1
-#define __CRT_HAVE_sys_fchown 1
-#define __CRT_HAVE_sys_fchownat 1
-#define __CRT_HAVE_sys_fcntl 1
-#define __CRT_HAVE_sys_fdatasync 1
-#define __CRT_HAVE_sys_fgetxattr 1
-#define __CRT_HAVE_sys_finit_module 1
-#define __CRT_HAVE_sys_flistxattr 1
-#define __CRT_HAVE_sys_flock 1
-#define __CRT_HAVE_sys_fork 1
-#define __CRT_HAVE_sys_fremovexattr 1
-#define __CRT_HAVE_sys_fsetxattr 1
-#define __CRT_HAVE_sys_fstat 1
-#define __CRT_HAVE_sys_fstatfs 1
-#define __CRT_HAVE_sys_fsync 1
-#define __CRT_HAVE_sys_ftruncate 1
-#define __CRT_HAVE_sys_futex 1
-#define __CRT_HAVE_sys_futimesat 1
-#define __CRT_HAVE_sys_get_mempolicy 1
-#define __CRT_HAVE_sys_get_robust_list 1
-#define __CRT_HAVE_sys_getcpu 1
-#define __CRT_HAVE_sys_getcwd 1
-#define __CRT_HAVE_sys_getdents 1
-#define __CRT_HAVE_sys_getdents64 1
-#define __CRT_HAVE_sys_getegid 1
-#define __CRT_HAVE_sys_geteuid 1
-#define __CRT_HAVE_sys_getgid 1
-#define __CRT_HAVE_sys_getgroups 1
-#define __CRT_HAVE_sys_getitimer 1
-#define __CRT_HAVE_sys_getpeername 1
-#define __CRT_HAVE_sys_getpgid 1
-#define __CRT_HAVE_sys_getpgrp 1
-#define __CRT_HAVE_sys_getpid 1
-#define __CRT_HAVE_sys_getppid 1
-#define __CRT_HAVE_sys_getpriority 1
-#define __CRT_HAVE_sys_getrandom 1
-#define __CRT_HAVE_sys_getresgid 1
-#define __CRT_HAVE_sys_getresuid 1
-#define __CRT_HAVE_sys_getrlimit 1
-#define __CRT_HAVE_sys_getrusage 1
-#define __CRT_HAVE_sys_getsid 1
-#define __CRT_HAVE_sys_getsockname 1
-#define __CRT_HAVE_sys_getsockopt 1
-#define __CRT_HAVE_sys_gettid 1
-#define __CRT_HAVE_sys_gettimeofday 1
-#define __CRT_HAVE_sys_getuid 1
-#define __CRT_HAVE_sys_getxattr 1
-#define __CRT_HAVE_sys_init_module 1
-#define __CRT_HAVE_sys_inotify_add_watch 1
-#define __CRT_HAVE_sys_inotify_init 1
-#define __CRT_HAVE_sys_inotify_init1 1
-#define __CRT_HAVE_sys_inotify_rm_watch 1
-#define __CRT_HAVE_sys_io_cancel 1
-#define __CRT_HAVE_sys_io_destroy 1
-#define __CRT_HAVE_sys_io_getevents 1
-#define __CRT_HAVE_sys_io_setup 1
-#define __CRT_HAVE_sys_io_submit 1
-#define __CRT_HAVE_sys_ioctl 1
-#define __CRT_HAVE_sys_ioprio_get 1
-#define __CRT_HAVE_sys_ioprio_set 1
-#define __CRT_HAVE_sys_kcmp 1
-#define __CRT_HAVE_sys_kexec_load 1
-#define __CRT_HAVE_sys_keyctl 1
-#define __CRT_HAVE_sys_kill 1
-#define __CRT_HAVE_sys_lchown 1
-#define __CRT_HAVE_sys_lgetxattr 1
-#define __CRT_HAVE_sys_link 1
-#define __CRT_HAVE_sys_linkat 1
-#define __CRT_HAVE_sys_listen 1
-#define __CRT_HAVE_sys_listxattr 1
-#define __CRT_HAVE_sys_llistxattr 1
-#define __CRT_HAVE_sys_lookup_dcookie 1
-#define __CRT_HAVE_sys_lremovexattr 1
-#define __CRT_HAVE_sys_lseek 1
-#define __CRT_HAVE_sys_lsetxattr 1
-#define __CRT_HAVE_sys_lstat 1
-#define __CRT_HAVE_sys_madvise 1
-#define __CRT_HAVE_sys_mbind 1
-#define __CRT_HAVE_sys_membarrier 1
-#define __CRT_HAVE_sys_memfd_create 1
-#define __CRT_HAVE_sys_migrate_pages 1
-#define __CRT_HAVE_sys_mincore 1
-#define __CRT_HAVE_sys_mkdir 1
-#define __CRT_HAVE_sys_mkdirat 1
-#define __CRT_HAVE_sys_mknod 1
-#define __CRT_HAVE_sys_mknodat 1
-#define __CRT_HAVE_sys_mlock 1
-#define __CRT_HAVE_sys_mlock2 1
-#define __CRT_HAVE_sys_mlockall 1
-#define __CRT_HAVE_sys_mmap 1
-#define __CRT_HAVE_sys_mount 1
-#define __CRT_HAVE_sys_move_pages 1
-#define __CRT_HAVE_sys_mprotect 1
-#define __CRT_HAVE_sys_mq_getsetattr 1
-#define __CRT_HAVE_sys_mq_notify 1
-#define __CRT_HAVE_sys_mq_open 1
-#define __CRT_HAVE_sys_mq_timedreceive 1
-#define __CRT_HAVE_sys_mq_timedsend 1
-#define __CRT_HAVE_sys_mq_unlink 1
-#define __CRT_HAVE_sys_mremap 1
-#define __CRT_HAVE_sys_msgctl 1
-#define __CRT_HAVE_sys_msgget 1
-#define __CRT_HAVE_sys_msgrcv 1
-#define __CRT_HAVE_sys_msgsnd 1
-#define __CRT_HAVE_sys_msync 1
-#define __CRT_HAVE_sys_munlock 1
-#define __CRT_HAVE_sys_munlockall 1
-#define __CRT_HAVE_sys_munmap 1
-#define __CRT_HAVE_sys_name_to_handle_at 1
-#define __CRT_HAVE_sys_nanosleep 1
-#define __CRT_HAVE_sys_newfstatat 1
-#define __CRT_HAVE_sys_nfsservctl 1
-#define __CRT_HAVE_sys_oldwait4 1
-#define __CRT_HAVE_sys_open 1
-#define __CRT_HAVE_sys_open_by_handle_at 1
-#define __CRT_HAVE_sys_openat 1
-#define __CRT_HAVE_sys_pause 1
-#define __CRT_HAVE_sys_perf_event_open 1
-#define __CRT_HAVE_sys_personality 1
-#define __CRT_HAVE_sys_pipe 1
-#define __CRT_HAVE_sys_pipe2 1
-#define __CRT_HAVE_sys_pivot_root 1
-#define __CRT_HAVE_sys_poll 1
-#define __CRT_HAVE_sys_ppoll 1
-#define __CRT_HAVE_sys_prctl 1
-#define __CRT_HAVE_sys_pread64 1
-#define __CRT_HAVE_sys_preadv 1
-#define __CRT_HAVE_sys_prlimit64 1
-#define __CRT_HAVE_sys_process_vm_readv 1
-#define __CRT_HAVE_sys_process_vm_writev 1
-#define __CRT_HAVE_sys_pselect6 1
-#define __CRT_HAVE_sys_ptrace 1
-#define __CRT_HAVE_sys_pwrite64 1
-#define __CRT_HAVE_sys_pwritev 1
-#define __CRT_HAVE_sys_quotactl 1
-#define __CRT_HAVE_sys_read 1
-#define __CRT_HAVE_sys_readahead 1
-#define __CRT_HAVE_sys_readlink 1
-#define __CRT_HAVE_sys_readlinkat 1
-#define __CRT_HAVE_sys_readv 1
-#define __CRT_HAVE_sys_reboot 1
-#define __CRT_HAVE_sys_recv 1
-#define __CRT_HAVE_sys_recvfrom 1
-#define __CRT_HAVE_sys_recvmmsg 1
-#define __CRT_HAVE_sys_recvmsg 1
-#define __CRT_HAVE_sys_remap_file_pages 1
-#define __CRT_HAVE_sys_removexattr 1
-#define __CRT_HAVE_sys_rename 1
-#define __CRT_HAVE_sys_renameat 1
-#define __CRT_HAVE_sys_renameat2 1
-#define __CRT_HAVE_sys_request_key 1
-#define __CRT_HAVE_sys_restart_syscall 1
-#define __CRT_HAVE_sys_rmdir 1
-#define __CRT_HAVE_sys_rt_sigaction 1
-#define __CRT_HAVE_sys_rt_sigpending 1
-#define __CRT_HAVE_sys_rt_sigprocmask 1
-#define __CRT_HAVE_sys_rt_sigqueueinfo 1
-#define __CRT_HAVE_sys_rt_sigreturn 1
-#define __CRT_HAVE_sys_rt_sigsuspend 1
-#define __CRT_HAVE_sys_rt_sigtimedwait 1
-#define __CRT_HAVE_sys_rt_tgsigqueueinfo 1
-#define __CRT_HAVE_sys_sched_get_priority_max 1
-#define __CRT_HAVE_sys_sched_get_priority_min 1
-#define __CRT_HAVE_sys_sched_getaffinity 1
-#define __CRT_HAVE_sys_sched_getattr 1
-#define __CRT_HAVE_sys_sched_getparam 1
-#define __CRT_HAVE_sys_sched_getscheduler 1
-#define __CRT_HAVE_sys_sched_rr_get_interval 1
-#define __CRT_HAVE_sys_sched_setaffinity 1
-#define __CRT_HAVE_sys_sched_setattr 1
-#define __CRT_HAVE_sys_sched_setparam 1
-#define __CRT_HAVE_sys_sched_setscheduler 1
-#define __CRT_HAVE_sys_sched_yield 1
-#define __CRT_HAVE_sys_seccomp 1
-#define __CRT_HAVE_sys_select 1
-#define __CRT_HAVE_sys_semctl 1
-#define __CRT_HAVE_sys_semget 1
-#define __CRT_HAVE_sys_semop 1
-#define __CRT_HAVE_sys_semtimedop 1
-#define __CRT_HAVE_sys_send 1
-#define __CRT_HAVE_sys_sendfile 1
-#define __CRT_HAVE_sys_sendmmsg 1
-#define __CRT_HAVE_sys_sendmsg 1
-#define __CRT_HAVE_sys_sendto 1
-#define __CRT_HAVE_sys_set_mempolicy 1
-#define __CRT_HAVE_sys_set_robust_list 1
-#define __CRT_HAVE_sys_set_tid_address 1
-#define __CRT_HAVE_sys_setdomainname 1
-#define __CRT_HAVE_sys_setfsgid 1
-#define __CRT_HAVE_sys_setfsuid 1
-#define __CRT_HAVE_sys_setgid 1
-#define __CRT_HAVE_sys_setgroups 1
-#define __CRT_HAVE_sys_sethostname 1
-#define __CRT_HAVE_sys_setitimer 1
-#define __CRT_HAVE_sys_setns 1
-#define __CRT_HAVE_sys_setpgid 1
-#define __CRT_HAVE_sys_setpriority 1
-#define __CRT_HAVE_sys_setregid 1
-#define __CRT_HAVE_sys_setresgid 1
-#define __CRT_HAVE_sys_setresuid 1
-#define __CRT_HAVE_sys_setreuid 1
-#define __CRT_HAVE_sys_setrlimit 1
-#define __CRT_HAVE_sys_setsid 1
-#define __CRT_HAVE_sys_setsockopt 1
-#define __CRT_HAVE_sys_settimeofday 1
-#define __CRT_HAVE_sys_setuid 1
-#define __CRT_HAVE_sys_setxattr 1
-#define __CRT_HAVE_sys_shmat 1
-#define __CRT_HAVE_sys_shmctl 1
-#define __CRT_HAVE_sys_shmdt 1
-#define __CRT_HAVE_sys_shmget 1
-#define __CRT_HAVE_sys_shutdown 1
-#define __CRT_HAVE_sys_sigaltstack 1
-#define __CRT_HAVE_sys_signalfd 1
-#define __CRT_HAVE_sys_signalfd4 1
-#define __CRT_HAVE_sys_socket 1
-#define __CRT_HAVE_sys_socketpair 1
-#define __CRT_HAVE_sys_splice 1
-#define __CRT_HAVE_sys_stat 1
-#define __CRT_HAVE_sys_statfs 1
-#define __CRT_HAVE_sys_swapoff 1
-#define __CRT_HAVE_sys_swapon 1
-#define __CRT_HAVE_sys_symlink 1
-#define __CRT_HAVE_sys_symlinkat 1
-#define __CRT_HAVE_sys_sync 1
-#define __CRT_HAVE_sys_sync_file_range 1
-#define __CRT_HAVE_sys_syncfs 1
-#define __CRT_HAVE_sys_sysinfo 1
-#define __CRT_HAVE_sys_syslog 1
-#define __CRT_HAVE_sys_tee 1
-#define __CRT_HAVE_sys_tgkill 1
-#define __CRT_HAVE_sys_time 1
-#define __CRT_HAVE_sys_timer_create 1
-#define __CRT_HAVE_sys_timer_delete 1
-#define __CRT_HAVE_sys_timer_getoverrun 1
-#define __CRT_HAVE_sys_timer_gettime 1
-#define __CRT_HAVE_sys_timer_settime 1
-#define __CRT_HAVE_sys_timerfd_create 1
-#define __CRT_HAVE_sys_timerfd_gettime 1
-#define __CRT_HAVE_sys_timerfd_settime 1
-#define __CRT_HAVE_sys_times 1
-#define __CRT_HAVE_sys_tkill 1
-#define __CRT_HAVE_sys_truncate 1
-#define __CRT_HAVE_sys_umask 1
-#define __CRT_HAVE_sys_umount 1
-#define __CRT_HAVE_sys_umount2 1
-#define __CRT_HAVE_sys_uname 1
-#define __CRT_HAVE_sys_unlink 1
-#define __CRT_HAVE_sys_unlinkat 1
-#define __CRT_HAVE_sys_unshare 1
-#define __CRT_HAVE_sys_uselib 1
-#define __CRT_HAVE_sys_userfaultfd 1
-#define __CRT_HAVE_sys_ustat 1
-#define __CRT_HAVE_sys_utime 1
-#define __CRT_HAVE_sys_utimensat 1
-#define __CRT_HAVE_sys_utimes 1
-#define __CRT_HAVE_sys_vfork 1
-#define __CRT_HAVE_sys_vhangup 1
-#define __CRT_HAVE_sys_vmsplice 1
-#define __CRT_HAVE_sys_wait4 1
-#define __CRT_HAVE_sys_waitid 1
-#define __CRT_HAVE_sys_write 1
-#define __CRT_HAVE_sys_writev 1
-#define __CRT_HAVE_sys_X_sysctl 1
-#define __CRT_HAVE_sys_Xaccept 1
-#define __CRT_HAVE_sys_Xaccept4 1
-#define __CRT_HAVE_sys_Xaccess 1
-#define __CRT_HAVE_sys_Xacct 1
-#define __CRT_HAVE_sys_Xadd_key 1
-#define __CRT_HAVE_sys_Xadjtimex 1
-#define __CRT_HAVE_sys_Xalarm 1
-#define __CRT_HAVE_sys_Xbdflush 1
-#define __CRT_HAVE_sys_Xbind 1
-#define __CRT_HAVE_sys_Xbpf 1
-#define __CRT_HAVE_sys_Xbrk 1
-#define __CRT_HAVE_sys_Xcapget 1
-#define __CRT_HAVE_sys_Xcapset 1
-#define __CRT_HAVE_sys_Xchdir 1
-#define __CRT_HAVE_sys_Xchmod 1
-#define __CRT_HAVE_sys_Xchown 1
-#define __CRT_HAVE_sys_Xchroot 1
-#define __CRT_HAVE_sys_Xclock_adjtime 1
-#define __CRT_HAVE_sys_Xclock_getres 1
-#define __CRT_HAVE_sys_Xclock_gettime 1
-#define __CRT_HAVE_sys_Xclock_nanosleep 1
-#define __CRT_HAVE_sys_Xclock_settime 1
-#define __CRT_HAVE_sys_Xclone 1
-#define __CRT_HAVE_sys_Xclose 1
-#define __CRT_HAVE_sys_Xconnect 1
-#define __CRT_HAVE_sys_Xcreat 1
-#define __CRT_HAVE_sys_Xdelete_module 1
-#define __CRT_HAVE_sys_Xdup 1
-#define __CRT_HAVE_sys_Xdup2 1
-#define __CRT_HAVE_sys_Xdup3 1
-#define __CRT_HAVE_sys_Xepoll_create 1
-#define __CRT_HAVE_sys_Xepoll_create1 1
-#define __CRT_HAVE_sys_Xepoll_ctl 1
-#define __CRT_HAVE_sys_Xepoll_pwait 1
-#define __CRT_HAVE_sys_Xepoll_wait 1
-#define __CRT_HAVE_sys_Xeventfd 1
-#define __CRT_HAVE_sys_Xeventfd2 1
-#define __CRT_HAVE_sys_Xexecve 1
-#define __CRT_HAVE_sys_Xexecveat 1
-#define __CRT_HAVE_sys_Xexit 1
-#define __CRT_HAVE_sys_Xexit_group 1
-#define __CRT_HAVE_sys_Xfaccessat 1
-#define __CRT_HAVE_sys_Xfadvise64 1
-#define __CRT_HAVE_sys_Xfallocate 1
-#define __CRT_HAVE_sys_Xfanotify_init 1
-#define __CRT_HAVE_sys_Xfanotify_mark 1
-#define __CRT_HAVE_sys_Xfchdir 1
-#define __CRT_HAVE_sys_Xfchmod 1
-#define __CRT_HAVE_sys_Xfchmodat 1
-#define __CRT_HAVE_sys_Xfchown 1
-#define __CRT_HAVE_sys_Xfchownat 1
-#define __CRT_HAVE_sys_Xfcntl 1
-#define __CRT_HAVE_sys_Xfdatasync 1
-#define __CRT_HAVE_sys_Xfgetxattr 1
-#define __CRT_HAVE_sys_Xfinit_module 1
-#define __CRT_HAVE_sys_Xflistxattr 1
-#define __CRT_HAVE_sys_Xflock 1
-#define __CRT_HAVE_sys_Xfork 1
-#define __CRT_HAVE_sys_Xfremovexattr 1
-#define __CRT_HAVE_sys_Xfsetxattr 1
-#define __CRT_HAVE_sys_Xfstat 1
-#define __CRT_HAVE_sys_Xfstatfs 1
-#define __CRT_HAVE_sys_Xfsync 1
-#define __CRT_HAVE_sys_Xftruncate 1
-#define __CRT_HAVE_sys_Xfutex 1
-#define __CRT_HAVE_sys_Xfutimesat 1
-#define __CRT_HAVE_sys_Xget_mempolicy 1
-#define __CRT_HAVE_sys_Xget_robust_list 1
-#define __CRT_HAVE_sys_Xgetcpu 1
-#define __CRT_HAVE_sys_Xgetcwd 1
-#define __CRT_HAVE_sys_Xgetdents 1
-#define __CRT_HAVE_sys_Xgetdents64 1
-#define __CRT_HAVE_sys_Xgetegid 1
-#define __CRT_HAVE_sys_Xgeteuid 1
-#define __CRT_HAVE_sys_Xgetgid 1
-#define __CRT_HAVE_sys_Xgetgroups 1
-#define __CRT_HAVE_sys_Xgetitimer 1
-#define __CRT_HAVE_sys_Xgetpeername 1
-#define __CRT_HAVE_sys_Xgetpgid 1
-#define __CRT_HAVE_sys_Xgetpgrp 1
-#define __CRT_HAVE_sys_Xgetpid 1
-#define __CRT_HAVE_sys_Xgetppid 1
-#define __CRT_HAVE_sys_Xgetpriority 1
-#define __CRT_HAVE_sys_Xgetrandom 1
-#define __CRT_HAVE_sys_Xgetresgid 1
-#define __CRT_HAVE_sys_Xgetresuid 1
-#define __CRT_HAVE_sys_Xgetrlimit 1
-#define __CRT_HAVE_sys_Xgetrusage 1
-#define __CRT_HAVE_sys_Xgetsid 1
-#define __CRT_HAVE_sys_Xgetsockname 1
-#define __CRT_HAVE_sys_Xgetsockopt 1
-#define __CRT_HAVE_sys_Xgettid 1
-#define __CRT_HAVE_sys_Xgettimeofday 1
-#define __CRT_HAVE_sys_Xgetuid 1
-#define __CRT_HAVE_sys_Xgetxattr 1
-#define __CRT_HAVE_sys_Xinit_module 1
-#define __CRT_HAVE_sys_Xinotify_add_watch 1
-#define __CRT_HAVE_sys_Xinotify_init 1
-#define __CRT_HAVE_sys_Xinotify_init1 1
-#define __CRT_HAVE_sys_Xinotify_rm_watch 1
-#define __CRT_HAVE_sys_Xio_cancel 1
-#define __CRT_HAVE_sys_Xio_destroy 1
-#define __CRT_HAVE_sys_Xio_getevents 1
-#define __CRT_HAVE_sys_Xio_setup 1
-#define __CRT_HAVE_sys_Xio_submit 1
-#define __CRT_HAVE_sys_Xioctl 1
-#define __CRT_HAVE_sys_Xioprio_get 1
-#define __CRT_HAVE_sys_Xioprio_set 1
-#define __CRT_HAVE_sys_Xkcmp 1
-#define __CRT_HAVE_sys_Xkexec_load 1
-#define __CRT_HAVE_sys_Xkeyctl 1
-#define __CRT_HAVE_sys_Xkill 1
-#define __CRT_HAVE_sys_Xlchown 1
-#define __CRT_HAVE_sys_Xlgetxattr 1
-#define __CRT_HAVE_sys_Xlink 1
-#define __CRT_HAVE_sys_Xlinkat 1
-#define __CRT_HAVE_sys_Xlisten 1
-#define __CRT_HAVE_sys_Xlistxattr 1
-#define __CRT_HAVE_sys_Xllistxattr 1
-#define __CRT_HAVE_sys_Xlookup_dcookie 1
-#define __CRT_HAVE_sys_Xlremovexattr 1
-#define __CRT_HAVE_sys_Xlseek 1
-#define __CRT_HAVE_sys_Xlsetxattr 1
-#define __CRT_HAVE_sys_Xlstat 1
-#define __CRT_HAVE_sys_Xmadvise 1
-#define __CRT_HAVE_sys_Xmbind 1
-#define __CRT_HAVE_sys_Xmembarrier 1
-#define __CRT_HAVE_sys_Xmemfd_create 1
-#define __CRT_HAVE_sys_Xmigrate_pages 1
-#define __CRT_HAVE_sys_Xmincore 1
-#define __CRT_HAVE_sys_Xmkdir 1
-#define __CRT_HAVE_sys_Xmkdirat 1
-#define __CRT_HAVE_sys_Xmknod 1
-#define __CRT_HAVE_sys_Xmknodat 1
-#define __CRT_HAVE_sys_Xmlock 1
-#define __CRT_HAVE_sys_Xmlock2 1
-#define __CRT_HAVE_sys_Xmlockall 1
-#define __CRT_HAVE_sys_Xmmap 1
-#define __CRT_HAVE_sys_Xmount 1
-#define __CRT_HAVE_sys_Xmove_pages 1
-#define __CRT_HAVE_sys_Xmprotect 1
-#define __CRT_HAVE_sys_Xmq_getsetattr 1
-#define __CRT_HAVE_sys_Xmq_notify 1
-#define __CRT_HAVE_sys_Xmq_open 1
-#define __CRT_HAVE_sys_Xmq_timedreceive 1
-#define __CRT_HAVE_sys_Xmq_timedsend 1
-#define __CRT_HAVE_sys_Xmq_unlink 1
-#define __CRT_HAVE_sys_Xmremap 1
-#define __CRT_HAVE_sys_Xmsgctl 1
-#define __CRT_HAVE_sys_Xmsgget 1
-#define __CRT_HAVE_sys_Xmsgrcv 1
-#define __CRT_HAVE_sys_Xmsgsnd 1
-#define __CRT_HAVE_sys_Xmsync 1
-#define __CRT_HAVE_sys_Xmunlock 1
-#define __CRT_HAVE_sys_Xmunlockall 1
-#define __CRT_HAVE_sys_Xmunmap 1
-#define __CRT_HAVE_sys_Xname_to_handle_at 1
-#define __CRT_HAVE_sys_Xnanosleep 1
-#define __CRT_HAVE_sys_Xnewfstatat 1
-#define __CRT_HAVE_sys_Xnfsservctl 1
-#define __CRT_HAVE_sys_Xoldwait4 1
-#define __CRT_HAVE_sys_Xopen 1
-#define __CRT_HAVE_sys_Xopen_by_handle_at 1
-#define __CRT_HAVE_sys_Xopenat 1
-#define __CRT_HAVE_sys_Xpause 1
-#define __CRT_HAVE_sys_Xperf_event_open 1
-#define __CRT_HAVE_sys_Xpersonality 1
-#define __CRT_HAVE_sys_Xpipe 1
-#define __CRT_HAVE_sys_Xpipe2 1
-#define __CRT_HAVE_sys_Xpivot_root 1
-#define __CRT_HAVE_sys_Xpoll 1
-#define __CRT_HAVE_sys_Xppoll 1
-#define __CRT_HAVE_sys_Xprctl 1
-#define __CRT_HAVE_sys_Xpread64 1
-#define __CRT_HAVE_sys_Xpreadv 1
-#define __CRT_HAVE_sys_Xprlimit64 1
-#define __CRT_HAVE_sys_Xprocess_vm_readv 1
-#define __CRT_HAVE_sys_Xprocess_vm_writev 1
-#define __CRT_HAVE_sys_Xpselect6 1
-#define __CRT_HAVE_sys_Xptrace 1
-#define __CRT_HAVE_sys_Xpwrite64 1
-#define __CRT_HAVE_sys_Xpwritev 1
-#define __CRT_HAVE_sys_Xquotactl 1
-#define __CRT_HAVE_sys_Xread 1
-#define __CRT_HAVE_sys_Xreadahead 1
-#define __CRT_HAVE_sys_Xreadlink 1
-#define __CRT_HAVE_sys_Xreadlinkat 1
-#define __CRT_HAVE_sys_Xreadv 1
-#define __CRT_HAVE_sys_Xreboot 1
-#define __CRT_HAVE_sys_Xrecv 1
-#define __CRT_HAVE_sys_Xrecvfrom 1
-#define __CRT_HAVE_sys_Xrecvmmsg 1
-#define __CRT_HAVE_sys_Xrecvmsg 1
-#define __CRT_HAVE_sys_Xremap_file_pages 1
-#define __CRT_HAVE_sys_Xremovexattr 1
-#define __CRT_HAVE_sys_Xrename 1
-#define __CRT_HAVE_sys_Xrenameat 1
-#define __CRT_HAVE_sys_Xrenameat2 1
-#define __CRT_HAVE_sys_Xrequest_key 1
-#define __CRT_HAVE_sys_Xrestart_syscall 1
-#define __CRT_HAVE_sys_Xrmdir 1
-#define __CRT_HAVE_sys_Xrt_sigaction 1
-#define __CRT_HAVE_sys_Xrt_sigpending 1
-#define __CRT_HAVE_sys_Xrt_sigprocmask 1
-#define __CRT_HAVE_sys_Xrt_sigqueueinfo 1
-#define __CRT_HAVE_sys_Xrt_sigsuspend 1
-#define __CRT_HAVE_sys_Xrt_sigtimedwait 1
-#define __CRT_HAVE_sys_Xrt_tgsigqueueinfo 1
-#define __CRT_HAVE_sys_Xsched_get_priority_max 1
-#define __CRT_HAVE_sys_Xsched_get_priority_min 1
-#define __CRT_HAVE_sys_Xsched_getaffinity 1
-#define __CRT_HAVE_sys_Xsched_getattr 1
-#define __CRT_HAVE_sys_Xsched_getparam 1
-#define __CRT_HAVE_sys_Xsched_getscheduler 1
-#define __CRT_HAVE_sys_Xsched_rr_get_interval 1
-#define __CRT_HAVE_sys_Xsched_setaffinity 1
-#define __CRT_HAVE_sys_Xsched_setattr 1
-#define __CRT_HAVE_sys_Xsched_setparam 1
-#define __CRT_HAVE_sys_Xsched_setscheduler 1
-#define __CRT_HAVE_sys_Xsched_yield 1
-#define __CRT_HAVE_sys_Xseccomp 1
-#define __CRT_HAVE_sys_Xselect 1
-#define __CRT_HAVE_sys_Xsemctl 1
-#define __CRT_HAVE_sys_Xsemget 1
-#define __CRT_HAVE_sys_Xsemop 1
-#define __CRT_HAVE_sys_Xsemtimedop 1
-#define __CRT_HAVE_sys_Xsend 1
-#define __CRT_HAVE_sys_Xsendfile 1
-#define __CRT_HAVE_sys_Xsendmmsg 1
-#define __CRT_HAVE_sys_Xsendmsg 1
-#define __CRT_HAVE_sys_Xsendto 1
-#define __CRT_HAVE_sys_Xset_mempolicy 1
-#define __CRT_HAVE_sys_Xset_robust_list 1
-#define __CRT_HAVE_sys_Xset_tid_address 1
-#define __CRT_HAVE_sys_Xsetdomainname 1
-#define __CRT_HAVE_sys_Xsetfsgid 1
-#define __CRT_HAVE_sys_Xsetfsuid 1
-#define __CRT_HAVE_sys_Xsetgid 1
-#define __CRT_HAVE_sys_Xsetgroups 1
-#define __CRT_HAVE_sys_Xsethostname 1
-#define __CRT_HAVE_sys_Xsetitimer 1
-#define __CRT_HAVE_sys_Xsetns 1
-#define __CRT_HAVE_sys_Xsetpgid 1
-#define __CRT_HAVE_sys_Xsetpriority 1
-#define __CRT_HAVE_sys_Xsetregid 1
-#define __CRT_HAVE_sys_Xsetresgid 1
-#define __CRT_HAVE_sys_Xsetresuid 1
-#define __CRT_HAVE_sys_Xsetreuid 1
-#define __CRT_HAVE_sys_Xsetrlimit 1
-#define __CRT_HAVE_sys_Xsetsid 1
-#define __CRT_HAVE_sys_Xsetsockopt 1
-#define __CRT_HAVE_sys_Xsettimeofday 1
-#define __CRT_HAVE_sys_Xsetuid 1
-#define __CRT_HAVE_sys_Xsetxattr 1
-#define __CRT_HAVE_sys_Xshmat 1
-#define __CRT_HAVE_sys_Xshmctl 1
-#define __CRT_HAVE_sys_Xshmdt 1
-#define __CRT_HAVE_sys_Xshmget 1
-#define __CRT_HAVE_sys_Xshutdown 1
-#define __CRT_HAVE_sys_Xsigaltstack 1
-#define __CRT_HAVE_sys_Xsignalfd 1
-#define __CRT_HAVE_sys_Xsignalfd4 1
-#define __CRT_HAVE_sys_Xsocket 1
-#define __CRT_HAVE_sys_Xsocketpair 1
-#define __CRT_HAVE_sys_Xsplice 1
-#define __CRT_HAVE_sys_Xstat 1
-#define __CRT_HAVE_sys_Xstatfs 1
-#define __CRT_HAVE_sys_Xswapoff 1
-#define __CRT_HAVE_sys_Xswapon 1
-#define __CRT_HAVE_sys_Xsymlink 1
-#define __CRT_HAVE_sys_Xsymlinkat 1
-#define __CRT_HAVE_sys_Xsync 1
-#define __CRT_HAVE_sys_Xsync_file_range 1
-#define __CRT_HAVE_sys_Xsyncfs 1
-#define __CRT_HAVE_sys_Xsysinfo 1
-#define __CRT_HAVE_sys_Xsyslog 1
-#define __CRT_HAVE_sys_Xtee 1
-#define __CRT_HAVE_sys_Xtgkill 1
-#define __CRT_HAVE_sys_Xtime 1
-#define __CRT_HAVE_sys_Xtimer_create 1
-#define __CRT_HAVE_sys_Xtimer_delete 1
-#define __CRT_HAVE_sys_Xtimer_getoverrun 1
-#define __CRT_HAVE_sys_Xtimer_gettime 1
-#define __CRT_HAVE_sys_Xtimer_settime 1
-#define __CRT_HAVE_sys_Xtimerfd_create 1
-#define __CRT_HAVE_sys_Xtimerfd_gettime 1
-#define __CRT_HAVE_sys_Xtimerfd_settime 1
-#define __CRT_HAVE_sys_Xtimes 1
-#define __CRT_HAVE_sys_Xtkill 1
-#define __CRT_HAVE_sys_Xtruncate 1
-#define __CRT_HAVE_sys_Xumask 1
-#define __CRT_HAVE_sys_Xumount 1
-#define __CRT_HAVE_sys_Xumount2 1
-#define __CRT_HAVE_sys_Xuname 1
-#define __CRT_HAVE_sys_Xunlink 1
-#define __CRT_HAVE_sys_Xunlinkat 1
-#define __CRT_HAVE_sys_Xunshare 1
-#define __CRT_HAVE_sys_Xuselib 1
-#define __CRT_HAVE_sys_Xuserfaultfd 1
-#define __CRT_HAVE_sys_Xustat 1
-#define __CRT_HAVE_sys_Xutime 1
-#define __CRT_HAVE_sys_Xutimensat 1
-#define __CRT_HAVE_sys_Xutimes 1
-#define __CRT_HAVE_sys_Xvfork 1
-#define __CRT_HAVE_sys_Xvhangup 1
-#define __CRT_HAVE_sys_Xvmsplice 1
-#define __CRT_HAVE_sys_Xwait4 1
-#define __CRT_HAVE_sys_Xwaitid 1
-#define __CRT_HAVE_sys_Xwrite 1
-#define __CRT_HAVE_sys_Xwritev 1
+#define __CRT_HAVE_sys__sysctl
+#define __CRT_HAVE_sys_accept
+#define __CRT_HAVE_sys_accept4
+#define __CRT_HAVE_sys_access
+#define __CRT_HAVE_sys_acct
+#define __CRT_HAVE_sys_add_key
+#define __CRT_HAVE_sys_adjtimex
+#define __CRT_HAVE_sys_alarm
+#define __CRT_HAVE_sys_bdflush
+#define __CRT_HAVE_sys_bind
+#define __CRT_HAVE_sys_bpf
+#define __CRT_HAVE_sys_brk
+#define __CRT_HAVE_sys_capget
+#define __CRT_HAVE_sys_capset
+#define __CRT_HAVE_sys_chdir
+#define __CRT_HAVE_sys_chmod
+#define __CRT_HAVE_sys_chown
+#define __CRT_HAVE_sys_chroot
+#define __CRT_HAVE_sys_clock_adjtime
+#define __CRT_HAVE_sys_clock_getres
+#define __CRT_HAVE_sys_clock_gettime
+#define __CRT_HAVE_sys_clock_nanosleep
+#define __CRT_HAVE_sys_clock_settime
+#define __CRT_HAVE_sys_clone
+#define __CRT_HAVE_sys_close
+#define __CRT_HAVE_sys_connect
+#define __CRT_HAVE_sys_creat
+#define __CRT_HAVE_sys_delete_module
+#define __CRT_HAVE_sys_dup
+#define __CRT_HAVE_sys_dup2
+#define __CRT_HAVE_sys_dup3
+#define __CRT_HAVE_sys_epoll_create
+#define __CRT_HAVE_sys_epoll_create1
+#define __CRT_HAVE_sys_epoll_ctl
+#define __CRT_HAVE_sys_epoll_pwait
+#define __CRT_HAVE_sys_epoll_wait
+#define __CRT_HAVE_sys_eventfd
+#define __CRT_HAVE_sys_eventfd2
+#define __CRT_HAVE_sys_execve
+#define __CRT_HAVE_sys_execveat
+#define __CRT_HAVE_sys_exit
+#define __CRT_HAVE_sys_exit_group
+#define __CRT_HAVE_sys_faccessat
+#define __CRT_HAVE_sys_fadvise64
+#define __CRT_HAVE_sys_fallocate
+#define __CRT_HAVE_sys_fanotify_init
+#define __CRT_HAVE_sys_fanotify_mark
+#define __CRT_HAVE_sys_fchdir
+#define __CRT_HAVE_sys_fchmod
+#define __CRT_HAVE_sys_fchmodat
+#define __CRT_HAVE_sys_fchown
+#define __CRT_HAVE_sys_fchownat
+#define __CRT_HAVE_sys_fcntl
+#define __CRT_HAVE_sys_fdatasync
+#define __CRT_HAVE_sys_fgetxattr
+#define __CRT_HAVE_sys_finit_module
+#define __CRT_HAVE_sys_flistxattr
+#define __CRT_HAVE_sys_flock
+#define __CRT_HAVE_sys_fork
+#define __CRT_HAVE_sys_fremovexattr
+#define __CRT_HAVE_sys_fsetxattr
+#define __CRT_HAVE_sys_fstat
+#define __CRT_HAVE_sys_fstatfs
+#define __CRT_HAVE_sys_fsync
+#define __CRT_HAVE_sys_ftruncate
+#define __CRT_HAVE_sys_futex
+#define __CRT_HAVE_sys_futimesat
+#define __CRT_HAVE_sys_get_mempolicy
+#define __CRT_HAVE_sys_get_robust_list
+#define __CRT_HAVE_sys_getcpu
+#define __CRT_HAVE_sys_getcwd
+#define __CRT_HAVE_sys_getdents
+#define __CRT_HAVE_sys_getdents64
+#define __CRT_HAVE_sys_getegid
+#define __CRT_HAVE_sys_geteuid
+#define __CRT_HAVE_sys_getgid
+#define __CRT_HAVE_sys_getgroups
+#define __CRT_HAVE_sys_getitimer
+#define __CRT_HAVE_sys_getpeername
+#define __CRT_HAVE_sys_getpgid
+#define __CRT_HAVE_sys_getpgrp
+#define __CRT_HAVE_sys_getpid
+#define __CRT_HAVE_sys_getppid
+#define __CRT_HAVE_sys_getpriority
+#define __CRT_HAVE_sys_getrandom
+#define __CRT_HAVE_sys_getresgid
+#define __CRT_HAVE_sys_getresuid
+#define __CRT_HAVE_sys_getrlimit
+#define __CRT_HAVE_sys_getrusage
+#define __CRT_HAVE_sys_getsid
+#define __CRT_HAVE_sys_getsockname
+#define __CRT_HAVE_sys_getsockopt
+#define __CRT_HAVE_sys_gettid
+#define __CRT_HAVE_sys_gettimeofday
+#define __CRT_HAVE_sys_getuid
+#define __CRT_HAVE_sys_getxattr
+#define __CRT_HAVE_sys_init_module
+#define __CRT_HAVE_sys_inotify_add_watch
+#define __CRT_HAVE_sys_inotify_init
+#define __CRT_HAVE_sys_inotify_init1
+#define __CRT_HAVE_sys_inotify_rm_watch
+#define __CRT_HAVE_sys_io_cancel
+#define __CRT_HAVE_sys_io_destroy
+#define __CRT_HAVE_sys_io_getevents
+#define __CRT_HAVE_sys_io_setup
+#define __CRT_HAVE_sys_io_submit
+#define __CRT_HAVE_sys_ioctl
+#define __CRT_HAVE_sys_ioprio_get
+#define __CRT_HAVE_sys_ioprio_set
+#define __CRT_HAVE_sys_kcmp
+#define __CRT_HAVE_sys_kexec_load
+#define __CRT_HAVE_sys_keyctl
+#define __CRT_HAVE_sys_kill
+#define __CRT_HAVE_sys_lchown
+#define __CRT_HAVE_sys_lgetxattr
+#define __CRT_HAVE_sys_link
+#define __CRT_HAVE_sys_linkat
+#define __CRT_HAVE_sys_listen
+#define __CRT_HAVE_sys_listxattr
+#define __CRT_HAVE_sys_llistxattr
+#define __CRT_HAVE_sys_lookup_dcookie
+#define __CRT_HAVE_sys_lremovexattr
+#define __CRT_HAVE_sys_lseek
+#define __CRT_HAVE_sys_lsetxattr
+#define __CRT_HAVE_sys_lstat
+#define __CRT_HAVE_sys_madvise
+#define __CRT_HAVE_sys_mbind
+#define __CRT_HAVE_sys_membarrier
+#define __CRT_HAVE_sys_memfd_create
+#define __CRT_HAVE_sys_migrate_pages
+#define __CRT_HAVE_sys_mincore
+#define __CRT_HAVE_sys_mkdir
+#define __CRT_HAVE_sys_mkdirat
+#define __CRT_HAVE_sys_mknod
+#define __CRT_HAVE_sys_mknodat
+#define __CRT_HAVE_sys_mlock
+#define __CRT_HAVE_sys_mlock2
+#define __CRT_HAVE_sys_mlockall
+#define __CRT_HAVE_sys_mmap
+#define __CRT_HAVE_sys_mount
+#define __CRT_HAVE_sys_move_pages
+#define __CRT_HAVE_sys_mprotect
+#define __CRT_HAVE_sys_mq_getsetattr
+#define __CRT_HAVE_sys_mq_notify
+#define __CRT_HAVE_sys_mq_open
+#define __CRT_HAVE_sys_mq_timedreceive
+#define __CRT_HAVE_sys_mq_timedsend
+#define __CRT_HAVE_sys_mq_unlink
+#define __CRT_HAVE_sys_mremap
+#define __CRT_HAVE_sys_msgctl
+#define __CRT_HAVE_sys_msgget
+#define __CRT_HAVE_sys_msgrcv
+#define __CRT_HAVE_sys_msgsnd
+#define __CRT_HAVE_sys_msync
+#define __CRT_HAVE_sys_munlock
+#define __CRT_HAVE_sys_munlockall
+#define __CRT_HAVE_sys_munmap
+#define __CRT_HAVE_sys_name_to_handle_at
+#define __CRT_HAVE_sys_nanosleep
+#define __CRT_HAVE_sys_newfstatat
+#define __CRT_HAVE_sys_nfsservctl
+#define __CRT_HAVE_sys_oldwait4
+#define __CRT_HAVE_sys_open
+#define __CRT_HAVE_sys_open_by_handle_at
+#define __CRT_HAVE_sys_openat
+#define __CRT_HAVE_sys_pause
+#define __CRT_HAVE_sys_perf_event_open
+#define __CRT_HAVE_sys_personality
+#define __CRT_HAVE_sys_pipe
+#define __CRT_HAVE_sys_pipe2
+#define __CRT_HAVE_sys_pivot_root
+#define __CRT_HAVE_sys_poll
+#define __CRT_HAVE_sys_ppoll
+#define __CRT_HAVE_sys_prctl
+#define __CRT_HAVE_sys_pread64
+#define __CRT_HAVE_sys_preadv
+#define __CRT_HAVE_sys_prlimit64
+#define __CRT_HAVE_sys_process_vm_readv
+#define __CRT_HAVE_sys_process_vm_writev
+#define __CRT_HAVE_sys_pselect6
+#define __CRT_HAVE_sys_ptrace
+#define __CRT_HAVE_sys_pwrite64
+#define __CRT_HAVE_sys_pwritev
+#define __CRT_HAVE_sys_quotactl
+#define __CRT_HAVE_sys_read
+#define __CRT_HAVE_sys_readahead
+#define __CRT_HAVE_sys_readlink
+#define __CRT_HAVE_sys_readlinkat
+#define __CRT_HAVE_sys_readv
+#define __CRT_HAVE_sys_reboot
+#define __CRT_HAVE_sys_recv
+#define __CRT_HAVE_sys_recvfrom
+#define __CRT_HAVE_sys_recvmmsg
+#define __CRT_HAVE_sys_recvmsg
+#define __CRT_HAVE_sys_remap_file_pages
+#define __CRT_HAVE_sys_removexattr
+#define __CRT_HAVE_sys_rename
+#define __CRT_HAVE_sys_renameat
+#define __CRT_HAVE_sys_renameat2
+#define __CRT_HAVE_sys_request_key
+#define __CRT_HAVE_sys_restart_syscall
+#define __CRT_HAVE_sys_rmdir
+#define __CRT_HAVE_sys_rt_sigaction
+#define __CRT_HAVE_sys_rt_sigpending
+#define __CRT_HAVE_sys_rt_sigprocmask
+#define __CRT_HAVE_sys_rt_sigqueueinfo
+#define __CRT_HAVE_sys_rt_sigreturn
+#define __CRT_HAVE_sys_rt_sigsuspend
+#define __CRT_HAVE_sys_rt_sigtimedwait
+#define __CRT_HAVE_sys_rt_tgsigqueueinfo
+#define __CRT_HAVE_sys_sched_get_priority_max
+#define __CRT_HAVE_sys_sched_get_priority_min
+#define __CRT_HAVE_sys_sched_getaffinity
+#define __CRT_HAVE_sys_sched_getattr
+#define __CRT_HAVE_sys_sched_getparam
+#define __CRT_HAVE_sys_sched_getscheduler
+#define __CRT_HAVE_sys_sched_rr_get_interval
+#define __CRT_HAVE_sys_sched_setaffinity
+#define __CRT_HAVE_sys_sched_setattr
+#define __CRT_HAVE_sys_sched_setparam
+#define __CRT_HAVE_sys_sched_setscheduler
+#define __CRT_HAVE_sys_sched_yield
+#define __CRT_HAVE_sys_seccomp
+#define __CRT_HAVE_sys_select
+#define __CRT_HAVE_sys_semctl
+#define __CRT_HAVE_sys_semget
+#define __CRT_HAVE_sys_semop
+#define __CRT_HAVE_sys_semtimedop
+#define __CRT_HAVE_sys_send
+#define __CRT_HAVE_sys_sendfile
+#define __CRT_HAVE_sys_sendmmsg
+#define __CRT_HAVE_sys_sendmsg
+#define __CRT_HAVE_sys_sendto
+#define __CRT_HAVE_sys_set_mempolicy
+#define __CRT_HAVE_sys_set_robust_list
+#define __CRT_HAVE_sys_set_tid_address
+#define __CRT_HAVE_sys_setdomainname
+#define __CRT_HAVE_sys_setfsgid
+#define __CRT_HAVE_sys_setfsuid
+#define __CRT_HAVE_sys_setgid
+#define __CRT_HAVE_sys_setgroups
+#define __CRT_HAVE_sys_sethostname
+#define __CRT_HAVE_sys_setitimer
+#define __CRT_HAVE_sys_setns
+#define __CRT_HAVE_sys_setpgid
+#define __CRT_HAVE_sys_setpriority
+#define __CRT_HAVE_sys_setregid
+#define __CRT_HAVE_sys_setresgid
+#define __CRT_HAVE_sys_setresuid
+#define __CRT_HAVE_sys_setreuid
+#define __CRT_HAVE_sys_setrlimit
+#define __CRT_HAVE_sys_setsid
+#define __CRT_HAVE_sys_setsockopt
+#define __CRT_HAVE_sys_settimeofday
+#define __CRT_HAVE_sys_setuid
+#define __CRT_HAVE_sys_setxattr
+#define __CRT_HAVE_sys_shmat
+#define __CRT_HAVE_sys_shmctl
+#define __CRT_HAVE_sys_shmdt
+#define __CRT_HAVE_sys_shmget
+#define __CRT_HAVE_sys_shutdown
+#define __CRT_HAVE_sys_sigaltstack
+#define __CRT_HAVE_sys_signalfd
+#define __CRT_HAVE_sys_signalfd4
+#define __CRT_HAVE_sys_socket
+#define __CRT_HAVE_sys_socketpair
+#define __CRT_HAVE_sys_splice
+#define __CRT_HAVE_sys_stat
+#define __CRT_HAVE_sys_statfs
+#define __CRT_HAVE_sys_swapoff
+#define __CRT_HAVE_sys_swapon
+#define __CRT_HAVE_sys_symlink
+#define __CRT_HAVE_sys_symlinkat
+#define __CRT_HAVE_sys_sync
+#define __CRT_HAVE_sys_sync_file_range
+#define __CRT_HAVE_sys_syncfs
+#define __CRT_HAVE_sys_sysinfo
+#define __CRT_HAVE_sys_syslog
+#define __CRT_HAVE_sys_tee
+#define __CRT_HAVE_sys_tgkill
+#define __CRT_HAVE_sys_time
+#define __CRT_HAVE_sys_timer_create
+#define __CRT_HAVE_sys_timer_delete
+#define __CRT_HAVE_sys_timer_getoverrun
+#define __CRT_HAVE_sys_timer_gettime
+#define __CRT_HAVE_sys_timer_settime
+#define __CRT_HAVE_sys_timerfd_create
+#define __CRT_HAVE_sys_timerfd_gettime
+#define __CRT_HAVE_sys_timerfd_settime
+#define __CRT_HAVE_sys_times
+#define __CRT_HAVE_sys_tkill
+#define __CRT_HAVE_sys_truncate
+#define __CRT_HAVE_sys_umask
+#define __CRT_HAVE_sys_umount
+#define __CRT_HAVE_sys_umount2
+#define __CRT_HAVE_sys_uname
+#define __CRT_HAVE_sys_unlink
+#define __CRT_HAVE_sys_unlinkat
+#define __CRT_HAVE_sys_unshare
+#define __CRT_HAVE_sys_uselib
+#define __CRT_HAVE_sys_userfaultfd
+#define __CRT_HAVE_sys_ustat
+#define __CRT_HAVE_sys_utime
+#define __CRT_HAVE_sys_utimensat
+#define __CRT_HAVE_sys_utimes
+#define __CRT_HAVE_sys_vfork
+#define __CRT_HAVE_sys_vhangup
+#define __CRT_HAVE_sys_vmsplice
+#define __CRT_HAVE_sys_wait4
+#define __CRT_HAVE_sys_waitid
+#define __CRT_HAVE_sys_write
+#define __CRT_HAVE_sys_writev
+#define __CRT_HAVE_sys_X_sysctl
+#define __CRT_HAVE_sys_Xaccept
+#define __CRT_HAVE_sys_Xaccept4
+#define __CRT_HAVE_sys_Xaccess
+#define __CRT_HAVE_sys_Xacct
+#define __CRT_HAVE_sys_Xadd_key
+#define __CRT_HAVE_sys_Xadjtimex
+#define __CRT_HAVE_sys_Xalarm
+#define __CRT_HAVE_sys_Xbdflush
+#define __CRT_HAVE_sys_Xbind
+#define __CRT_HAVE_sys_Xbpf
+#define __CRT_HAVE_sys_Xbrk
+#define __CRT_HAVE_sys_Xcapget
+#define __CRT_HAVE_sys_Xcapset
+#define __CRT_HAVE_sys_Xchdir
+#define __CRT_HAVE_sys_Xchmod
+#define __CRT_HAVE_sys_Xchown
+#define __CRT_HAVE_sys_Xchroot
+#define __CRT_HAVE_sys_Xclock_adjtime
+#define __CRT_HAVE_sys_Xclock_getres
+#define __CRT_HAVE_sys_Xclock_gettime
+#define __CRT_HAVE_sys_Xclock_nanosleep
+#define __CRT_HAVE_sys_Xclock_settime
+#define __CRT_HAVE_sys_Xclone
+#define __CRT_HAVE_sys_Xclose
+#define __CRT_HAVE_sys_Xconnect
+#define __CRT_HAVE_sys_Xcreat
+#define __CRT_HAVE_sys_Xdelete_module
+#define __CRT_HAVE_sys_Xdup
+#define __CRT_HAVE_sys_Xdup2
+#define __CRT_HAVE_sys_Xdup3
+#define __CRT_HAVE_sys_Xepoll_create
+#define __CRT_HAVE_sys_Xepoll_create1
+#define __CRT_HAVE_sys_Xepoll_ctl
+#define __CRT_HAVE_sys_Xepoll_pwait
+#define __CRT_HAVE_sys_Xepoll_wait
+#define __CRT_HAVE_sys_Xeventfd
+#define __CRT_HAVE_sys_Xeventfd2
+#define __CRT_HAVE_sys_Xexecve
+#define __CRT_HAVE_sys_Xexecveat
+#define __CRT_HAVE_sys_Xexit
+#define __CRT_HAVE_sys_Xexit_group
+#define __CRT_HAVE_sys_Xfaccessat
+#define __CRT_HAVE_sys_Xfadvise64
+#define __CRT_HAVE_sys_Xfallocate
+#define __CRT_HAVE_sys_Xfanotify_init
+#define __CRT_HAVE_sys_Xfanotify_mark
+#define __CRT_HAVE_sys_Xfchdir
+#define __CRT_HAVE_sys_Xfchmod
+#define __CRT_HAVE_sys_Xfchmodat
+#define __CRT_HAVE_sys_Xfchown
+#define __CRT_HAVE_sys_Xfchownat
+#define __CRT_HAVE_sys_Xfcntl
+#define __CRT_HAVE_sys_Xfdatasync
+#define __CRT_HAVE_sys_Xfgetxattr
+#define __CRT_HAVE_sys_Xfinit_module
+#define __CRT_HAVE_sys_Xflistxattr
+#define __CRT_HAVE_sys_Xflock
+#define __CRT_HAVE_sys_Xfork
+#define __CRT_HAVE_sys_Xfremovexattr
+#define __CRT_HAVE_sys_Xfsetxattr
+#define __CRT_HAVE_sys_Xfstat
+#define __CRT_HAVE_sys_Xfstatfs
+#define __CRT_HAVE_sys_Xfsync
+#define __CRT_HAVE_sys_Xftruncate
+#define __CRT_HAVE_sys_Xfutex
+#define __CRT_HAVE_sys_Xfutimesat
+#define __CRT_HAVE_sys_Xget_mempolicy
+#define __CRT_HAVE_sys_Xget_robust_list
+#define __CRT_HAVE_sys_Xgetcpu
+#define __CRT_HAVE_sys_Xgetcwd
+#define __CRT_HAVE_sys_Xgetdents
+#define __CRT_HAVE_sys_Xgetdents64
+#define __CRT_HAVE_sys_Xgetegid
+#define __CRT_HAVE_sys_Xgeteuid
+#define __CRT_HAVE_sys_Xgetgid
+#define __CRT_HAVE_sys_Xgetgroups
+#define __CRT_HAVE_sys_Xgetitimer
+#define __CRT_HAVE_sys_Xgetpeername
+#define __CRT_HAVE_sys_Xgetpgid
+#define __CRT_HAVE_sys_Xgetpgrp
+#define __CRT_HAVE_sys_Xgetpid
+#define __CRT_HAVE_sys_Xgetppid
+#define __CRT_HAVE_sys_Xgetpriority
+#define __CRT_HAVE_sys_Xgetrandom
+#define __CRT_HAVE_sys_Xgetresgid
+#define __CRT_HAVE_sys_Xgetresuid
+#define __CRT_HAVE_sys_Xgetrlimit
+#define __CRT_HAVE_sys_Xgetrusage
+#define __CRT_HAVE_sys_Xgetsid
+#define __CRT_HAVE_sys_Xgetsockname
+#define __CRT_HAVE_sys_Xgetsockopt
+#define __CRT_HAVE_sys_Xgettid
+#define __CRT_HAVE_sys_Xgettimeofday
+#define __CRT_HAVE_sys_Xgetuid
+#define __CRT_HAVE_sys_Xgetxattr
+#define __CRT_HAVE_sys_Xinit_module
+#define __CRT_HAVE_sys_Xinotify_add_watch
+#define __CRT_HAVE_sys_Xinotify_init
+#define __CRT_HAVE_sys_Xinotify_init1
+#define __CRT_HAVE_sys_Xinotify_rm_watch
+#define __CRT_HAVE_sys_Xio_cancel
+#define __CRT_HAVE_sys_Xio_destroy
+#define __CRT_HAVE_sys_Xio_getevents
+#define __CRT_HAVE_sys_Xio_setup
+#define __CRT_HAVE_sys_Xio_submit
+#define __CRT_HAVE_sys_Xioctl
+#define __CRT_HAVE_sys_Xioprio_get
+#define __CRT_HAVE_sys_Xioprio_set
+#define __CRT_HAVE_sys_Xkcmp
+#define __CRT_HAVE_sys_Xkexec_load
+#define __CRT_HAVE_sys_Xkeyctl
+#define __CRT_HAVE_sys_Xkill
+#define __CRT_HAVE_sys_Xlchown
+#define __CRT_HAVE_sys_Xlgetxattr
+#define __CRT_HAVE_sys_Xlink
+#define __CRT_HAVE_sys_Xlinkat
+#define __CRT_HAVE_sys_Xlisten
+#define __CRT_HAVE_sys_Xlistxattr
+#define __CRT_HAVE_sys_Xllistxattr
+#define __CRT_HAVE_sys_Xlookup_dcookie
+#define __CRT_HAVE_sys_Xlremovexattr
+#define __CRT_HAVE_sys_Xlseek
+#define __CRT_HAVE_sys_Xlsetxattr
+#define __CRT_HAVE_sys_Xlstat
+#define __CRT_HAVE_sys_Xmadvise
+#define __CRT_HAVE_sys_Xmbind
+#define __CRT_HAVE_sys_Xmembarrier
+#define __CRT_HAVE_sys_Xmemfd_create
+#define __CRT_HAVE_sys_Xmigrate_pages
+#define __CRT_HAVE_sys_Xmincore
+#define __CRT_HAVE_sys_Xmkdir
+#define __CRT_HAVE_sys_Xmkdirat
+#define __CRT_HAVE_sys_Xmknod
+#define __CRT_HAVE_sys_Xmknodat
+#define __CRT_HAVE_sys_Xmlock
+#define __CRT_HAVE_sys_Xmlock2
+#define __CRT_HAVE_sys_Xmlockall
+#define __CRT_HAVE_sys_Xmmap
+#define __CRT_HAVE_sys_Xmount
+#define __CRT_HAVE_sys_Xmove_pages
+#define __CRT_HAVE_sys_Xmprotect
+#define __CRT_HAVE_sys_Xmq_getsetattr
+#define __CRT_HAVE_sys_Xmq_notify
+#define __CRT_HAVE_sys_Xmq_open
+#define __CRT_HAVE_sys_Xmq_timedreceive
+#define __CRT_HAVE_sys_Xmq_timedsend
+#define __CRT_HAVE_sys_Xmq_unlink
+#define __CRT_HAVE_sys_Xmremap
+#define __CRT_HAVE_sys_Xmsgctl
+#define __CRT_HAVE_sys_Xmsgget
+#define __CRT_HAVE_sys_Xmsgrcv
+#define __CRT_HAVE_sys_Xmsgsnd
+#define __CRT_HAVE_sys_Xmsync
+#define __CRT_HAVE_sys_Xmunlock
+#define __CRT_HAVE_sys_Xmunlockall
+#define __CRT_HAVE_sys_Xmunmap
+#define __CRT_HAVE_sys_Xname_to_handle_at
+#define __CRT_HAVE_sys_Xnanosleep
+#define __CRT_HAVE_sys_Xnewfstatat
+#define __CRT_HAVE_sys_Xnfsservctl
+#define __CRT_HAVE_sys_Xoldwait4
+#define __CRT_HAVE_sys_Xopen
+#define __CRT_HAVE_sys_Xopen_by_handle_at
+#define __CRT_HAVE_sys_Xopenat
+#define __CRT_HAVE_sys_Xpause
+#define __CRT_HAVE_sys_Xperf_event_open
+#define __CRT_HAVE_sys_Xpersonality
+#define __CRT_HAVE_sys_Xpipe
+#define __CRT_HAVE_sys_Xpipe2
+#define __CRT_HAVE_sys_Xpivot_root
+#define __CRT_HAVE_sys_Xpoll
+#define __CRT_HAVE_sys_Xppoll
+#define __CRT_HAVE_sys_Xprctl
+#define __CRT_HAVE_sys_Xpread64
+#define __CRT_HAVE_sys_Xpreadv
+#define __CRT_HAVE_sys_Xprlimit64
+#define __CRT_HAVE_sys_Xprocess_vm_readv
+#define __CRT_HAVE_sys_Xprocess_vm_writev
+#define __CRT_HAVE_sys_Xpselect6
+#define __CRT_HAVE_sys_Xptrace
+#define __CRT_HAVE_sys_Xpwrite64
+#define __CRT_HAVE_sys_Xpwritev
+#define __CRT_HAVE_sys_Xquotactl
+#define __CRT_HAVE_sys_Xread
+#define __CRT_HAVE_sys_Xreadahead
+#define __CRT_HAVE_sys_Xreadlink
+#define __CRT_HAVE_sys_Xreadlinkat
+#define __CRT_HAVE_sys_Xreadv
+#define __CRT_HAVE_sys_Xreboot
+#define __CRT_HAVE_sys_Xrecv
+#define __CRT_HAVE_sys_Xrecvfrom
+#define __CRT_HAVE_sys_Xrecvmmsg
+#define __CRT_HAVE_sys_Xrecvmsg
+#define __CRT_HAVE_sys_Xremap_file_pages
+#define __CRT_HAVE_sys_Xremovexattr
+#define __CRT_HAVE_sys_Xrename
+#define __CRT_HAVE_sys_Xrenameat
+#define __CRT_HAVE_sys_Xrenameat2
+#define __CRT_HAVE_sys_Xrequest_key
+#define __CRT_HAVE_sys_Xrestart_syscall
+#define __CRT_HAVE_sys_Xrmdir
+#define __CRT_HAVE_sys_Xrt_sigaction
+#define __CRT_HAVE_sys_Xrt_sigpending
+#define __CRT_HAVE_sys_Xrt_sigprocmask
+#define __CRT_HAVE_sys_Xrt_sigqueueinfo
+#define __CRT_HAVE_sys_Xrt_sigsuspend
+#define __CRT_HAVE_sys_Xrt_sigtimedwait
+#define __CRT_HAVE_sys_Xrt_tgsigqueueinfo
+#define __CRT_HAVE_sys_Xsched_get_priority_max
+#define __CRT_HAVE_sys_Xsched_get_priority_min
+#define __CRT_HAVE_sys_Xsched_getaffinity
+#define __CRT_HAVE_sys_Xsched_getattr
+#define __CRT_HAVE_sys_Xsched_getparam
+#define __CRT_HAVE_sys_Xsched_getscheduler
+#define __CRT_HAVE_sys_Xsched_rr_get_interval
+#define __CRT_HAVE_sys_Xsched_setaffinity
+#define __CRT_HAVE_sys_Xsched_setattr
+#define __CRT_HAVE_sys_Xsched_setparam
+#define __CRT_HAVE_sys_Xsched_setscheduler
+#define __CRT_HAVE_sys_Xsched_yield
+#define __CRT_HAVE_sys_Xseccomp
+#define __CRT_HAVE_sys_Xselect
+#define __CRT_HAVE_sys_Xsemctl
+#define __CRT_HAVE_sys_Xsemget
+#define __CRT_HAVE_sys_Xsemop
+#define __CRT_HAVE_sys_Xsemtimedop
+#define __CRT_HAVE_sys_Xsend
+#define __CRT_HAVE_sys_Xsendfile
+#define __CRT_HAVE_sys_Xsendmmsg
+#define __CRT_HAVE_sys_Xsendmsg
+#define __CRT_HAVE_sys_Xsendto
+#define __CRT_HAVE_sys_Xset_mempolicy
+#define __CRT_HAVE_sys_Xset_robust_list
+#define __CRT_HAVE_sys_Xset_tid_address
+#define __CRT_HAVE_sys_Xsetdomainname
+#define __CRT_HAVE_sys_Xsetfsgid
+#define __CRT_HAVE_sys_Xsetfsuid
+#define __CRT_HAVE_sys_Xsetgid
+#define __CRT_HAVE_sys_Xsetgroups
+#define __CRT_HAVE_sys_Xsethostname
+#define __CRT_HAVE_sys_Xsetitimer
+#define __CRT_HAVE_sys_Xsetns
+#define __CRT_HAVE_sys_Xsetpgid
+#define __CRT_HAVE_sys_Xsetpriority
+#define __CRT_HAVE_sys_Xsetregid
+#define __CRT_HAVE_sys_Xsetresgid
+#define __CRT_HAVE_sys_Xsetresuid
+#define __CRT_HAVE_sys_Xsetreuid
+#define __CRT_HAVE_sys_Xsetrlimit
+#define __CRT_HAVE_sys_Xsetsid
+#define __CRT_HAVE_sys_Xsetsockopt
+#define __CRT_HAVE_sys_Xsettimeofday
+#define __CRT_HAVE_sys_Xsetuid
+#define __CRT_HAVE_sys_Xsetxattr
+#define __CRT_HAVE_sys_Xshmat
+#define __CRT_HAVE_sys_Xshmctl
+#define __CRT_HAVE_sys_Xshmdt
+#define __CRT_HAVE_sys_Xshmget
+#define __CRT_HAVE_sys_Xshutdown
+#define __CRT_HAVE_sys_Xsigaltstack
+#define __CRT_HAVE_sys_Xsignalfd
+#define __CRT_HAVE_sys_Xsignalfd4
+#define __CRT_HAVE_sys_Xsocket
+#define __CRT_HAVE_sys_Xsocketpair
+#define __CRT_HAVE_sys_Xsplice
+#define __CRT_HAVE_sys_Xstat
+#define __CRT_HAVE_sys_Xstatfs
+#define __CRT_HAVE_sys_Xswapoff
+#define __CRT_HAVE_sys_Xswapon
+#define __CRT_HAVE_sys_Xsymlink
+#define __CRT_HAVE_sys_Xsymlinkat
+#define __CRT_HAVE_sys_Xsync
+#define __CRT_HAVE_sys_Xsync_file_range
+#define __CRT_HAVE_sys_Xsyncfs
+#define __CRT_HAVE_sys_Xsysinfo
+#define __CRT_HAVE_sys_Xsyslog
+#define __CRT_HAVE_sys_Xtee
+#define __CRT_HAVE_sys_Xtgkill
+#define __CRT_HAVE_sys_Xtime
+#define __CRT_HAVE_sys_Xtimer_create
+#define __CRT_HAVE_sys_Xtimer_delete
+#define __CRT_HAVE_sys_Xtimer_getoverrun
+#define __CRT_HAVE_sys_Xtimer_gettime
+#define __CRT_HAVE_sys_Xtimer_settime
+#define __CRT_HAVE_sys_Xtimerfd_create
+#define __CRT_HAVE_sys_Xtimerfd_gettime
+#define __CRT_HAVE_sys_Xtimerfd_settime
+#define __CRT_HAVE_sys_Xtimes
+#define __CRT_HAVE_sys_Xtkill
+#define __CRT_HAVE_sys_Xtruncate
+#define __CRT_HAVE_sys_Xumask
+#define __CRT_HAVE_sys_Xumount
+#define __CRT_HAVE_sys_Xumount2
+#define __CRT_HAVE_sys_Xuname
+#define __CRT_HAVE_sys_Xunlink
+#define __CRT_HAVE_sys_Xunlinkat
+#define __CRT_HAVE_sys_Xunshare
+#define __CRT_HAVE_sys_Xuselib
+#define __CRT_HAVE_sys_Xuserfaultfd
+#define __CRT_HAVE_sys_Xustat
+#define __CRT_HAVE_sys_Xutime
+#define __CRT_HAVE_sys_Xutimensat
+#define __CRT_HAVE_sys_Xutimes
+#define __CRT_HAVE_sys_Xvfork
+#define __CRT_HAVE_sys_Xvhangup
+#define __CRT_HAVE_sys_Xvmsplice
+#define __CRT_HAVE_sys_Xwait4
+#define __CRT_HAVE_sys_Xwaitid
+#define __CRT_HAVE_sys_Xwrite
+#define __CRT_HAVE_sys_Xwritev

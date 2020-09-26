@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6492eb25 */
+/* HASH CRC-32:0x84785fa7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_NAMES
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_NAMES
 #define __NRAN0_exit                         exit_code
 #define __NRAN0_read                         fd
 #define __NRAN1_read                         buf
@@ -1190,7 +1190,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_FORMAT
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT
 #define __NRRTR_restart_syscall               SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_exit                         SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
 #define __NRRTR_exit                          SC_REPR_SIGHANDLER_T                                                 /* return */
@@ -2967,25 +2967,25 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE 1
-#define __NRDW1__llseek         1
-#define __NRDW3_pread64         1
-#define __NRDW3_pwrite64        1
-#define __NRDW1_truncate64      1
-#define __NRDW1_ftruncate64     1
-#define __NRDW1_readahead       1
-#define __NRDW1_sync_file_range 1
-#define __NRDW2_sync_file_range 1
-#define __NRDW3_preadv          1
-#define __NRDW3_pwritev         1
-#define __NRDW3_pwritevf        1
-#define __NRDW3_preadvf         1
-#define __NRDW2_fallocate64     1
-#define __NRDW3_fallocate64     1
-#define __NRDW3_pwrite64f       1
-#define __NRDW3_pread64f        1
-#define __NRDW0_fsmode          1
-#define __NRDW1_lseek64         1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE
+#define __NRDW1__llseek
+#define __NRDW3_pread64
+#define __NRDW3_pwrite64
+#define __NRDW1_truncate64
+#define __NRDW1_ftruncate64
+#define __NRDW1_readahead
+#define __NRDW1_sync_file_range
+#define __NRDW2_sync_file_range
+#define __NRDW3_preadv
+#define __NRDW3_pwritev
+#define __NRDW3_pwritevf
+#define __NRDW3_preadvf
+#define __NRDW2_fallocate64
+#define __NRDW3_fallocate64
+#define __NRDW3_pwrite64f
+#define __NRDW3_pread64f
+#define __NRDW0_fsmode
+#define __NRDW1_lseek64
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE */
 #endif /* __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE */
 

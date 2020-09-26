@@ -21,17 +21,17 @@
 #include "generator.c"
 #define MODE_DECODE 1
 //#define MODE_ZERO 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #if (defined(MODE_DECODE) + defined(MODE_ZERO)) != 1
 #error "Must define exactly one of `MODE_DECODE, MODE_ZERO'"
-#endif
+#endif /* ... */
 
 
 #ifdef MODE_DECODE
 #define IF_DECODE(...) __VA_ARGS__
 #define IF_ZERO(...)   /* nothing */
-#else                  /* MODE_DECODE */
+#else /* MODE_DECODE */
 #define IF_DECODE(...) /* nothing */
 #define IF_ZERO(...) __VA_ARGS__
 #endif /* !MODE_DECODE */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2541bcc5 */
+/* HASH CRC-32:0x56607613 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,200 +19,200 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-#define __CRT_HAVE__Unwind_Resume 1
-#define __CRT_HAVE__ZSt9terminatev 1
-#define __CRT_HAVE___acheck 1
-#define __CRT_HAVE___acheckf 1
-#define __CRT_HAVE___afail 1
-#define __CRT_HAVE___afailf 1
-#define __CRT_HAVE___crt_unreachable 1
-#define __CRT_HAVE___cxa_begin_catch 1
-#define __CRT_HAVE___cxa_end_catch 1
-#define __CRT_HAVE___cxa_rethrow 1
-#define __CRT_HAVE___gcc_personality_v0 1
-#define __CRT_HAVE___gxx_personality_v0 1
-#define __CRT_HAVE___stack_chk_fail 1
-#define __CRT_HAVE___stack_chk_guard 1
-#define __CRT_HAVE_abort 1
-#define __CRT_HAVE_bzero 1
-#define __CRT_HAVE_bzeroc 1
-#define __CRT_HAVE_bzerol 1
-#define __CRT_HAVE_bzeroq 1
-#define __CRT_HAVE_bzerow 1
-#define __CRT_HAVE_cfmakesane 1
-#define __CRT_HAVE_error_active 1
-#define __CRT_HAVE_error_as_errno 1
-#define __CRT_HAVE_error_as_signal 1
-#define __CRT_HAVE_error_class 1
-#define __CRT_HAVE_error_code 1
-#define __CRT_HAVE_error_data 1
-#define __CRT_HAVE_error_info 1
-#define __CRT_HAVE_error_name 1
-#define __CRT_HAVE_error_register_state 1
-#define __CRT_HAVE_error_rethrow 1
-#define __CRT_HAVE_error_subclass 1
-#define __CRT_HAVE_error_throw 1
-#define __CRT_HAVE_error_throw_current 1
-#define __CRT_HAVE_error_thrown 1
-#define __CRT_HAVE_error_unwind 1
-#define __CRT_HAVE_format_escape 1
-#define __CRT_HAVE_format_hexdump 1
-#define __CRT_HAVE_format_length 1
-#define __CRT_HAVE_format_printf 1
-#define __CRT_HAVE_format_repeat 1
-#define __CRT_HAVE_format_scanf 1
-#define __CRT_HAVE_format_snprintf_printer 1
-#define __CRT_HAVE_format_sprintf_printer 1
-#define __CRT_HAVE_format_vprintf 1
-#define __CRT_HAVE_format_vscanf 1
-#define __CRT_HAVE_format_width 1
-#define __CRT_HAVE_isalnum 1
-#define __CRT_HAVE_isalpha 1
-#define __CRT_HAVE_isblank 1
-#define __CRT_HAVE_iscntrl 1
-#define __CRT_HAVE_isdigit 1
-#define __CRT_HAVE_isgraph 1
-#define __CRT_HAVE_islower 1
-#define __CRT_HAVE_isprint 1
-#define __CRT_HAVE_ispunct 1
-#define __CRT_HAVE_isspace 1
-#define __CRT_HAVE_isupper 1
-#define __CRT_HAVE_isxdigit 1
-#define __CRT_HAVE_memcasecmp 1
-#define __CRT_HAVE_memchr 1
-#define __CRT_HAVE_memchrl 1
-#define __CRT_HAVE_memchrq 1
-#define __CRT_HAVE_memchrw 1
-#define __CRT_HAVE_memcmp 1
-#define __CRT_HAVE_memcmpl 1
-#define __CRT_HAVE_memcmpq 1
-#define __CRT_HAVE_memcmpw 1
-#define __CRT_HAVE_memcpy 1
-#define __CRT_HAVE_memcpyl 1
-#define __CRT_HAVE_memcpyq 1
-#define __CRT_HAVE_memcpyw 1
-#define __CRT_HAVE_memend 1
-#define __CRT_HAVE_memendl 1
-#define __CRT_HAVE_memendq 1
-#define __CRT_HAVE_memendw 1
-#define __CRT_HAVE_memlen 1
-#define __CRT_HAVE_memlenl 1
-#define __CRT_HAVE_memlenq 1
-#define __CRT_HAVE_memlenw 1
-#define __CRT_HAVE_memmove 1
-#define __CRT_HAVE_memmovedown 1
-#define __CRT_HAVE_memmovedownl 1
-#define __CRT_HAVE_memmovedownq 1
-#define __CRT_HAVE_memmovedownw 1
-#define __CRT_HAVE_memmovel 1
-#define __CRT_HAVE_memmoveq 1
-#define __CRT_HAVE_memmoveup 1
-#define __CRT_HAVE_memmoveupl 1
-#define __CRT_HAVE_memmoveupq 1
-#define __CRT_HAVE_memmoveupw 1
-#define __CRT_HAVE_memmovew 1
-#define __CRT_HAVE_mempatl 1
-#define __CRT_HAVE_mempatq 1
-#define __CRT_HAVE_mempatw 1
-#define __CRT_HAVE_mempcpy 1
-#define __CRT_HAVE_mempcpyl 1
-#define __CRT_HAVE_mempcpyq 1
-#define __CRT_HAVE_mempcpyw 1
-#define __CRT_HAVE_mempmove 1
-#define __CRT_HAVE_mempmovedown 1
-#define __CRT_HAVE_mempmovedownl 1
-#define __CRT_HAVE_mempmovedownq 1
-#define __CRT_HAVE_mempmovedownw 1
-#define __CRT_HAVE_mempmovel 1
-#define __CRT_HAVE_mempmoveq 1
-#define __CRT_HAVE_mempmoveup 1
-#define __CRT_HAVE_mempmoveupl 1
-#define __CRT_HAVE_mempmoveupq 1
-#define __CRT_HAVE_mempmoveupw 1
-#define __CRT_HAVE_mempmovew 1
-#define __CRT_HAVE_mempset 1
-#define __CRT_HAVE_mempsetl 1
-#define __CRT_HAVE_mempsetq 1
-#define __CRT_HAVE_mempsetw 1
-#define __CRT_HAVE_memrchr 1
-#define __CRT_HAVE_memrchrl 1
-#define __CRT_HAVE_memrchrq 1
-#define __CRT_HAVE_memrchrw 1
-#define __CRT_HAVE_memrend 1
-#define __CRT_HAVE_memrendl 1
-#define __CRT_HAVE_memrendq 1
-#define __CRT_HAVE_memrendw 1
-#define __CRT_HAVE_memrlen 1
-#define __CRT_HAVE_memrlenl 1
-#define __CRT_HAVE_memrlenq 1
-#define __CRT_HAVE_memrlenw 1
-#define __CRT_HAVE_memset 1
-#define __CRT_HAVE_memsetl 1
-#define __CRT_HAVE_memsetq 1
-#define __CRT_HAVE_memsetw 1
-#define __CRT_HAVE_qsort 1
-#define __CRT_HAVE_qsort_r 1
-#define __CRT_HAVE_rawmemchr 1
-#define __CRT_HAVE_rawmemchrl 1
-#define __CRT_HAVE_rawmemchrq 1
-#define __CRT_HAVE_rawmemchrw 1
-#define __CRT_HAVE_rawmemlen 1
-#define __CRT_HAVE_rawmemlenl 1
-#define __CRT_HAVE_rawmemlenq 1
-#define __CRT_HAVE_rawmemlenw 1
-#define __CRT_HAVE_rawmemrchr 1
-#define __CRT_HAVE_rawmemrchrl 1
-#define __CRT_HAVE_rawmemrchrq 1
-#define __CRT_HAVE_rawmemrchrw 1
-#define __CRT_HAVE_rawmemrlen 1
-#define __CRT_HAVE_rawmemrlenl 1
-#define __CRT_HAVE_rawmemrlenq 1
-#define __CRT_HAVE_rawmemrlenw 1
-#define __CRT_HAVE_sigaddset 1
-#define __CRT_HAVE_sigandset 1
-#define __CRT_HAVE_sigdelset 1
-#define __CRT_HAVE_sigemptyset 1
-#define __CRT_HAVE_sigfillset 1
-#define __CRT_HAVE_sigisemptyset 1
-#define __CRT_HAVE_sigismember 1
-#define __CRT_HAVE_sigorset 1
-#define __CRT_HAVE_snprintf 1
-#define __CRT_HAVE_sprintf 1
-#define __CRT_HAVE_strchr 1
-#define __CRT_HAVE_strchrnul 1
-#define __CRT_HAVE_strcmp 1
-#define __CRT_HAVE_strend 1
-#define __CRT_HAVE_strlen 1
-#define __CRT_HAVE_strnend 1
-#define __CRT_HAVE_strnlen 1
-#define __CRT_HAVE_strrchr 1
-#define __CRT_HAVE_strto32 1
-#define __CRT_HAVE_strto64 1
-#define __CRT_HAVE_strtou32 1
-#define __CRT_HAVE_strtou64 1
-#define __CRT_HAVE_tolower 1
-#define __CRT_HAVE_toupper 1
-#define __CRT_HAVE_unicode_16to32 1
-#define __CRT_HAVE_unicode_16to8 1
-#define __CRT_HAVE_unicode_32to16 1
-#define __CRT_HAVE_unicode_32to8 1
-#define __CRT_HAVE_unicode_8to16 1
-#define __CRT_HAVE_unicode_8to32 1
-#define __CRT_HAVE_unicode_readutf16 1
-#define __CRT_HAVE_unicode_readutf16_n 1
-#define __CRT_HAVE_unicode_readutf16_rev 1
-#define __CRT_HAVE_unicode_readutf16_rev_n 1
-#define __CRT_HAVE_unicode_readutf16_swap 1
-#define __CRT_HAVE_unicode_readutf16_swap_n 1
-#define __CRT_HAVE_unicode_readutf16_swap_rev 1
-#define __CRT_HAVE_unicode_readutf16_swap_rev_n 1
-#define __CRT_HAVE_unicode_readutf8 1
-#define __CRT_HAVE_unicode_readutf8_n 1
-#define __CRT_HAVE_unicode_readutf8_rev 1
-#define __CRT_HAVE_unicode_readutf8_rev_n 1
-#define __CRT_HAVE_unicode_utf8seqlen 1
-#define __CRT_HAVE_unicode_writeutf16 1
-#define __CRT_HAVE_unicode_writeutf16_chk 1
-#define __CRT_HAVE_unicode_writeutf8 1
-#define __CRT_HAVE_vsnprintf 1
-#define __CRT_HAVE_vsprintf 1
+#define __CRT_HAVE__Unwind_Resume
+#define __CRT_HAVE__ZSt9terminatev
+#define __CRT_HAVE___acheck
+#define __CRT_HAVE___acheckf
+#define __CRT_HAVE___afail
+#define __CRT_HAVE___afailf
+#define __CRT_HAVE___crt_unreachable
+#define __CRT_HAVE___cxa_begin_catch
+#define __CRT_HAVE___cxa_end_catch
+#define __CRT_HAVE___cxa_rethrow
+#define __CRT_HAVE___gcc_personality_v0
+#define __CRT_HAVE___gxx_personality_v0
+#define __CRT_HAVE___stack_chk_fail
+#define __CRT_HAVE___stack_chk_guard
+#define __CRT_HAVE_abort
+#define __CRT_HAVE_bzero
+#define __CRT_HAVE_bzeroc
+#define __CRT_HAVE_bzerol
+#define __CRT_HAVE_bzeroq
+#define __CRT_HAVE_bzerow
+#define __CRT_HAVE_cfmakesane
+#define __CRT_HAVE_error_active
+#define __CRT_HAVE_error_as_errno
+#define __CRT_HAVE_error_as_signal
+#define __CRT_HAVE_error_class
+#define __CRT_HAVE_error_code
+#define __CRT_HAVE_error_data
+#define __CRT_HAVE_error_info
+#define __CRT_HAVE_error_name
+#define __CRT_HAVE_error_register_state
+#define __CRT_HAVE_error_rethrow
+#define __CRT_HAVE_error_subclass
+#define __CRT_HAVE_error_throw
+#define __CRT_HAVE_error_throw_current
+#define __CRT_HAVE_error_thrown
+#define __CRT_HAVE_error_unwind
+#define __CRT_HAVE_format_escape
+#define __CRT_HAVE_format_hexdump
+#define __CRT_HAVE_format_length
+#define __CRT_HAVE_format_printf
+#define __CRT_HAVE_format_repeat
+#define __CRT_HAVE_format_scanf
+#define __CRT_HAVE_format_snprintf_printer
+#define __CRT_HAVE_format_sprintf_printer
+#define __CRT_HAVE_format_vprintf
+#define __CRT_HAVE_format_vscanf
+#define __CRT_HAVE_format_width
+#define __CRT_HAVE_isalnum
+#define __CRT_HAVE_isalpha
+#define __CRT_HAVE_isblank
+#define __CRT_HAVE_iscntrl
+#define __CRT_HAVE_isdigit
+#define __CRT_HAVE_isgraph
+#define __CRT_HAVE_islower
+#define __CRT_HAVE_isprint
+#define __CRT_HAVE_ispunct
+#define __CRT_HAVE_isspace
+#define __CRT_HAVE_isupper
+#define __CRT_HAVE_isxdigit
+#define __CRT_HAVE_memcasecmp
+#define __CRT_HAVE_memchr
+#define __CRT_HAVE_memchrl
+#define __CRT_HAVE_memchrq
+#define __CRT_HAVE_memchrw
+#define __CRT_HAVE_memcmp
+#define __CRT_HAVE_memcmpl
+#define __CRT_HAVE_memcmpq
+#define __CRT_HAVE_memcmpw
+#define __CRT_HAVE_memcpy
+#define __CRT_HAVE_memcpyl
+#define __CRT_HAVE_memcpyq
+#define __CRT_HAVE_memcpyw
+#define __CRT_HAVE_memend
+#define __CRT_HAVE_memendl
+#define __CRT_HAVE_memendq
+#define __CRT_HAVE_memendw
+#define __CRT_HAVE_memlen
+#define __CRT_HAVE_memlenl
+#define __CRT_HAVE_memlenq
+#define __CRT_HAVE_memlenw
+#define __CRT_HAVE_memmove
+#define __CRT_HAVE_memmovedown
+#define __CRT_HAVE_memmovedownl
+#define __CRT_HAVE_memmovedownq
+#define __CRT_HAVE_memmovedownw
+#define __CRT_HAVE_memmovel
+#define __CRT_HAVE_memmoveq
+#define __CRT_HAVE_memmoveup
+#define __CRT_HAVE_memmoveupl
+#define __CRT_HAVE_memmoveupq
+#define __CRT_HAVE_memmoveupw
+#define __CRT_HAVE_memmovew
+#define __CRT_HAVE_mempatl
+#define __CRT_HAVE_mempatq
+#define __CRT_HAVE_mempatw
+#define __CRT_HAVE_mempcpy
+#define __CRT_HAVE_mempcpyl
+#define __CRT_HAVE_mempcpyq
+#define __CRT_HAVE_mempcpyw
+#define __CRT_HAVE_mempmove
+#define __CRT_HAVE_mempmovedown
+#define __CRT_HAVE_mempmovedownl
+#define __CRT_HAVE_mempmovedownq
+#define __CRT_HAVE_mempmovedownw
+#define __CRT_HAVE_mempmovel
+#define __CRT_HAVE_mempmoveq
+#define __CRT_HAVE_mempmoveup
+#define __CRT_HAVE_mempmoveupl
+#define __CRT_HAVE_mempmoveupq
+#define __CRT_HAVE_mempmoveupw
+#define __CRT_HAVE_mempmovew
+#define __CRT_HAVE_mempset
+#define __CRT_HAVE_mempsetl
+#define __CRT_HAVE_mempsetq
+#define __CRT_HAVE_mempsetw
+#define __CRT_HAVE_memrchr
+#define __CRT_HAVE_memrchrl
+#define __CRT_HAVE_memrchrq
+#define __CRT_HAVE_memrchrw
+#define __CRT_HAVE_memrend
+#define __CRT_HAVE_memrendl
+#define __CRT_HAVE_memrendq
+#define __CRT_HAVE_memrendw
+#define __CRT_HAVE_memrlen
+#define __CRT_HAVE_memrlenl
+#define __CRT_HAVE_memrlenq
+#define __CRT_HAVE_memrlenw
+#define __CRT_HAVE_memset
+#define __CRT_HAVE_memsetl
+#define __CRT_HAVE_memsetq
+#define __CRT_HAVE_memsetw
+#define __CRT_HAVE_qsort
+#define __CRT_HAVE_qsort_r
+#define __CRT_HAVE_rawmemchr
+#define __CRT_HAVE_rawmemchrl
+#define __CRT_HAVE_rawmemchrq
+#define __CRT_HAVE_rawmemchrw
+#define __CRT_HAVE_rawmemlen
+#define __CRT_HAVE_rawmemlenl
+#define __CRT_HAVE_rawmemlenq
+#define __CRT_HAVE_rawmemlenw
+#define __CRT_HAVE_rawmemrchr
+#define __CRT_HAVE_rawmemrchrl
+#define __CRT_HAVE_rawmemrchrq
+#define __CRT_HAVE_rawmemrchrw
+#define __CRT_HAVE_rawmemrlen
+#define __CRT_HAVE_rawmemrlenl
+#define __CRT_HAVE_rawmemrlenq
+#define __CRT_HAVE_rawmemrlenw
+#define __CRT_HAVE_sigaddset
+#define __CRT_HAVE_sigandset
+#define __CRT_HAVE_sigdelset
+#define __CRT_HAVE_sigemptyset
+#define __CRT_HAVE_sigfillset
+#define __CRT_HAVE_sigisemptyset
+#define __CRT_HAVE_sigismember
+#define __CRT_HAVE_sigorset
+#define __CRT_HAVE_snprintf
+#define __CRT_HAVE_sprintf
+#define __CRT_HAVE_strchr
+#define __CRT_HAVE_strchrnul
+#define __CRT_HAVE_strcmp
+#define __CRT_HAVE_strend
+#define __CRT_HAVE_strlen
+#define __CRT_HAVE_strnend
+#define __CRT_HAVE_strnlen
+#define __CRT_HAVE_strrchr
+#define __CRT_HAVE_strto32
+#define __CRT_HAVE_strto64
+#define __CRT_HAVE_strtou32
+#define __CRT_HAVE_strtou64
+#define __CRT_HAVE_tolower
+#define __CRT_HAVE_toupper
+#define __CRT_HAVE_unicode_16to32
+#define __CRT_HAVE_unicode_16to8
+#define __CRT_HAVE_unicode_32to16
+#define __CRT_HAVE_unicode_32to8
+#define __CRT_HAVE_unicode_8to16
+#define __CRT_HAVE_unicode_8to32
+#define __CRT_HAVE_unicode_readutf16
+#define __CRT_HAVE_unicode_readutf16_n
+#define __CRT_HAVE_unicode_readutf16_rev
+#define __CRT_HAVE_unicode_readutf16_rev_n
+#define __CRT_HAVE_unicode_readutf16_swap
+#define __CRT_HAVE_unicode_readutf16_swap_n
+#define __CRT_HAVE_unicode_readutf16_swap_rev
+#define __CRT_HAVE_unicode_readutf16_swap_rev_n
+#define __CRT_HAVE_unicode_readutf8
+#define __CRT_HAVE_unicode_readutf8_n
+#define __CRT_HAVE_unicode_readutf8_rev
+#define __CRT_HAVE_unicode_readutf8_rev_n
+#define __CRT_HAVE_unicode_utf8seqlen
+#define __CRT_HAVE_unicode_writeutf16
+#define __CRT_HAVE_unicode_writeutf16_chk
+#define __CRT_HAVE_unicode_writeutf8
+#define __CRT_HAVE_vsnprintf
+#define __CRT_HAVE_vsprintf

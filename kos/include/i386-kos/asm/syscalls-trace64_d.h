@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3f626f3 */
+/* HASH CRC-32:0xbf276bd3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_NAMES
 #ifndef __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES
-#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES 1
+#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES
 #define __NR64AN0_read                     fd
 #define __NR64AN1_read                     buf
 #define __NR64AN2_read                     bufsize
@@ -977,7 +977,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_FORMAT
 #ifndef __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT
-#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1
+#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT
 #define __NR64ATR0_read                     SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR1_read                     SC_REPR_POINTER                                                      /* buf */ 
 #define __NR64ATR2_read                     SC_REPR_SIZE_T                                                       /* bufsize */ 
@@ -2428,7 +2428,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE
 #ifndef __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE
-#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE 1
+#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE */
 #endif /* __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE */
 

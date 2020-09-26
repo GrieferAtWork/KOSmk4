@@ -2,6 +2,7 @@
 #define attribute(x)
 #define __attribute(x)
 #define __attribute__(x)
+#define __declspec(...)
 #define __volatile volatile
 #define __volatile__ volatile
 #define __const const
@@ -16,7 +17,9 @@
 #define inline
 #define __inline
 #define __inline__
+#define noreturn
 #define _Noreturn
+#define thread_local
 #define _Thread_local
 #define __flash
 #define __flash1
@@ -35,6 +38,17 @@
 #define __unsigned__ unsigned
 #define __restrict restrict
 #define __restrict__ restrict
+#define asm(...)
+#define __asm(...)
+#define __asm__(...)
+#define __w64
+#define __fastcall
+#define __stdcall
+#define __cdecl
+#define __thiscall
+#define __clrcall
+#define __ms_abi
+#define __sysv_abi
 
 #define PHYS
 #define __PHYS
@@ -51,10 +65,11 @@
 #define WEAK
 #define __WEAK
 #define REF
-#define REF_IF(x)
 #define __REF
+#define REF_IF(x)
 #define __REF_IF(x)
 #define FREE
+#define __FREE
 #define NOBLOCK
 #define __NOBLOCK
 #define NOPREEMPT
@@ -67,6 +82,7 @@
 #define THROWS(...)
 #define __THROWS(...)
 #define THROWS_INDIRECT(...)
+#define __THROWS_INDIRECT(...)
 #define KCALL
 #define __KCALL
 #define FCALL
@@ -86,7 +102,9 @@
 #define __VLIBDCALL
 #define __LIBC
 #define CC
+#define __CC
 #define VCC
+#define __VCC
 #define FORMATPRINTER_CC
 #define __FORMATPRINTER_CC
 #define WFORMATPRINTER_CC
@@ -159,6 +177,10 @@
 #define LIBVM86_DECL
 #define LIBZLIB_CC
 #define LIBZLIB_DECL
+#define DLFCN_CC
+#define __DLFCN_CC
+#define DLFCN_VCC
+#define __DLFCN_VCC
 
 #define INT8_C(c) c
 #define __INT8_C(c) c
@@ -217,10 +239,106 @@
 #define __DECL_END
 #define __SYSDECL_END
 
-#define __NULLPTR 0
 #define NULL 0
+#define __NULLPTR 0
 
+#define XBLOCK
+#define __XBLOCK
+#define XRETURN
+#define __XRETURN
+
+#define __BEGIN_DECLS
+#define __END_DECLS
 #define __P(x) x
+#define __PMT(x) x
+#define __LEAF_ATTR
+#define __THROW
+#define __THROWNL
+#define __NTH(fct) fct
+#define __ptr_t  void *
+#define __long_double_t long double
+#define __BEGIN_NAMESPACE_STD namespace std {
+#define __END_NAMESPACE_STD }
+#define __USING_NAMESPACE_STD(x) using std::x;
+#define __BEGIN_NAMESPACE_C99 namespace __c99 {
+#define __END_NAMESPACE_C99 }
+#define __USING_NAMESPACE_C99(x) using __c99::x;
+#define __warndecl(name,msg)  void(name)(void)
+#define __errordecl(name,msg) void(name)(void)
+#define __warnattr(msg)
+#define __flexarr []
+#define __REDIRECT(name,proto,alias) name proto
+#define __REDIRECT_NTH(name,proto,alias) name proto
+#define __REDIRECT_NTHNL(name,proto,alias) name proto
+#define __attribute_malloc__
+#define __attribute_alloc_size__
+#define __attribute_pure__
+#define __attribute_const__
+#define __attribute_used__
+#define __attribute_noinline__
+#define __attribute_deprecated__
+#define __nonnull
+#define __attribute_warn_unused_result__
+#define __attribute_format_strfmon__
+#define __always_inline
+#define __attribute_artificial__
+#define __glibc_unlikely(x) x
+#define __glibc_likely(x) x
+#define __wur
+#define __attribute_format_arg__(x)
+#define __extern_inline
+#define __extern_always_inline
+#define __fortify_function
+#define __LDBL_REDIR1(name, proto, alias)       name proto
+#define __LDBL_REDIR(name, proto)               name proto
+#define __LDBL_REDIR1_NTH(name, proto, alias)   name proto
+#define __LDBL_REDIR_NTH(name, proto)           name proto
+#define __LDBL_REDIR1_DECL(name, alias)         decltype(name) name;
+#define __LDBL_REDIR_DECL(name)                 decltype(name) name;
+#define __REDIRECT_LDBL(name, proto, alias)     name proto;
+#define __REDIRECT_NTH_LDBL(name, proto, alias) name proto;
+#define __weak_symbol
+#define __used
+#define __section(x)
+#define __alloc_size(x)
+#define __alloc_size2(n,x)
+#define __alloc_align(x)
+#define alignas(x)
+#define _Alignas(x)
+#define	__generic(expr, t, yes, no) no
+#define __malloc_like
+#define __result_use_check
+#define __returns_twice
+#define __dead2
+#define __pure
+#define __pure2
+#define __noinline
+#define __null_sentinel
+#define __exported
+#define __hidden
+#define __packed
+#define __aligned(x)
+#define __unused
+#define __printflike(x,y)
+#define __scanflike(x,y)
+#define __strfmonlike(x,y)
+#define __strftimelike(x,y)
+#define __printf0like(x,y)
+#define __format_arg(x)
+#define __bounded__(x,y,z)
+#define __RCSID(x)
+#define __FBSDID(x)
+#define __RCSID_SOURCE(x)
+#define __SCCSID(x)
+#define __COPYRIGHT(x)
+
+
+#define static_assert(...)
+#define _Static_assert(...)
+#define STATIC_ASSERT(...)
+#define __STATIC_ASSERT(...)
+#define STATIC_ASSERT_MSG(...)
+#define __STATIC_ASSERT_MSG(...)
 
 #define __ATTR_W64
 #define ATTR_NOINLINE
@@ -238,11 +356,17 @@
 #define ATTR_MSABI
 #define __ATTR_MSABI
 #define ATTR_PURE
+#define ATTR_PURE_P
 #define __ATTR_PURE
+#define __ATTR_PURE_P
 #define ATTR_CONST
+#define ATTR_CONST_P
 #define __ATTR_CONST
+#define __ATTR_CONST_P
 #define ATTR_LEAF
+#define ATTR_LEAF_P
 #define __ATTR_LEAF
+#define __ATTR_LEAF_P
 #define ATTR_FLATTEN
 #define __ATTR_FLATTEN
 #define ATTR_MALLOC
@@ -305,6 +429,27 @@
 #define __ATTR_EXTERNALLY_VISIBLE
 #define ATTR_ARTIFICIAL
 #define __ATTR_ARTIFICIAL
+#define ATTR_FALLTHROUGH ;
+#define __ATTR_FALLTHROUGH ;
+#define ATTR_OPTIMIZE(x)
+#define __ATTR_OPTIMIZE(x)
+#define ATTR_TRANSPARENT_UNION
+#define __ATTR_TRANSPARENT_UNION
+#define ATTR_FORMAT_PRINTF(...)
+#define __ATTR_FORMAT_PRINTF(...)
+#define ATTR_FORMAT_SCANF(...)
+#define __ATTR_FORMAT_SCANF(...)
+#define ATTR_FORMAT_STRFMON(...)
+#define __ATTR_FORMAT_STRFMON(...)
+#define ATTR_FORMAT_STRFTIME(...)
+#define __ATTR_FORMAT_STRFTIME(...)
+#define ATTR_NOPLT
+#define __ATTR_NOPLT
+#define ATTR_SELECTANY
+#define __ATTR_SELECTANY
+#define ATTR_VISIBILITY(x)
+#define __ATTR_VISIBILITY(x)
+
 
 #define PRIVATE_FUNCTION(sym)      ;int sym() {}
 #define INTERN_FUNCTION(sym)       ;int sym() {}
@@ -326,9 +471,9 @@
 #define __CXX_DEFAULT_CTOR(T) T()
 #define __CXX_DEFAULT_DTOR(T) ~T()
 #define __CXX_DEFAULT_COPY(T,...) T(T const&)=default
-#define __CXX_DEFAULT_CTOR_NOEXCEPT(T) T()noexcept
-#define __CXX_DEFAULT_DTOR_NOEXCEPT(T) ~T()noexcept
-#define __CXX_DEFAULT_COPY_NOEXCEPT(T,...) T(T const&)noexcept=default
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T) T()
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T) ~T()
+#define __CXX_DEFAULT_COPY_NOEXCEPT(T,...) T(T const&)=default
 #define __CXX_STATIC_CONST(T,decl) static T decl
 #define __CXX_DELETE_CTOR(T) T()
 #define __CXX_DELETE_DTOR(T) ~T()
@@ -339,12 +484,17 @@
 #define __CXXDECL_END
 #define __CXX_THROWS(...)
 
-#define NONNULL(x)
-#define __ATTR_NONNULL(x)
+#define NONNULL(...)
+#define ATTR_NONNULL(...)
+#define __ATTR_NONNULL(...)
+#define NONNULL_CXX(...)
+#define ATTR_NONNULL_CXX(...)
+#define __ATTR_NONNULL_CXX(...)
 #define WUNUSED
+#define ATTR_WUNUSED
 #define __ATTR_WUNUSED
-#define UNUSED(x) x
-#define __UNUSED(x) x
+#define UNUSED(...) __VA_ARGS__
+#define __UNUSED(...) __VA_ARGS__
 #define IMPDEF
 #define __IMPDEF
 #define EXPDEF
@@ -373,6 +523,8 @@
 #define __FORCELOCAL
 #define EXTERN_INLINE
 #define __EXTERN_INLINE
+#define EXTERN_FORCEINLINE
+#define __EXTERN_FORCEINLINE
 #define LOCAL
 #define __LOCAL
 #define __LOCAL_REDIRECT
@@ -384,27 +536,77 @@
 #define ATTR_FREERODATA
 #define ATTR_FREEDATA
 #define ATTR_FREEBSS
+#define ATTR_FREETEXT_S(x)
+#define ATTR_FREERODATA_S(x)
+#define ATTR_FREEDATA_S(x)
+#define ATTR_FREEBSS_S(x)
 #define ATTR_HOTTEXT
 #define ATTR_HOTRODATA
 #define ATTR_HOTDATA
 #define ATTR_HOTBSS
+#define ATTR_HOTTEXT_S(x)
+#define ATTR_HOTRODATA_S(x)
+#define ATTR_HOTDATA_S(x)
+#define ATTR_HOTBSS_S(x)
 #define ATTR_READMOSTLY
 #define ATTR_WRITEMOSTLY
+#define ATTR_READMOSTLY_S(x)
+#define ATTR_WRITEMOSTLY_S(x)
 #define ATTR_COLDTEXT
 #define ATTR_COLDRODATA
 #define ATTR_COLDDATA
 #define ATTR_COLDBSS
+#define ATTR_COLDTEXT_S(x)
+#define ATTR_COLDRODATA_S(x)
+#define ATTR_COLDDATA_S(x)
+#define ATTR_COLDBSS_S(x)
 #define ATTR_TEXT
 #define ATTR_RODATA
 #define ATTR_DATA
 #define ATTR_BSS
+#define ATTR_TEXT_S(x)
+#define ATTR_RODATA_S(x)
+#define ATTR_DATA_S(x)
+#define ATTR_BSS_S(x)
 #define ATTR_PERCPU
 #define ATTR_PERVM
 #define ATTR_PERTASK
+#define ATTR_DBGTEXT
+#define ATTR_DBGRODATA
+#define ATTR_DBGSTRINGS
+#define ATTR_DBGDATA
+#define ATTR_DBGBSS
+#define ATTR_DBGTEXT_S(x)
+#define ATTR_DBGRODATA_S(x)
+#define ATTR_DBGDATA_S(x)
+#define ATTR_DBGBSS_S(x)
+#define ATTR_DBG_HOOK
 #define FREESTR
+#define DBGSTR
+#define ATTR_MALL_UNTRACKED
+#define DRIVER_CONST const
 #define DRIVER_INIT
 #define DRIVER_FINI
 #define ATTR_KERNEL_PANIC_NORETURN
+#define TEXTSECTION
+#define STRINGSECTION
+#define REPR_TEXTSECTION
+#define REPR_RODATASECTION
+#define REPR_STRINGSECTION
+#define PRINT_TEXTSECTION
+#define PRINT_STRINGSECTION
+#define SECTION_DEBUG_TEXT(x)
+#define SECTION_DEBUG_BSS(x)
+#define SECTION_DEBUG_STRING(x)
+#define UCHAR16_TEXT(x)
+#define UCHAR32_TEXT(x)
+#define UCHAR_TEXT
+#define SECTION_EXCEPT_TEXT
+#define SECTION_EXCEPT_DATA
+#define SECTION_EXCEPT_BSS
+#define SECTION_EXCEPT_RODATA
+#define SECTION_EXCEPT_STRING
+#define __cleanup_fct_attribute
 
 #define __CXX_NOEXCEPT
 #define __CXX_NOEXCEPT_IF(expr)
@@ -472,13 +674,44 @@
 #define __LOCAL_LIBC_CONST_DATA(name)
 
 #define __ATTR_LIBC_PRINTF(a,b)
+#define ATTR_LIBC_PRINTF(a,b)
 #define __ATTR_LIBC_PRINTF_P(a,b)
+#define ATTR_LIBC_PRINTF_P(a,b)
 #define __ATTR_LIBC_SCANF(a,b)
+#define ATTR_LIBC_SCANF(a,b)
+#define __ATTR_LIBC_STRFMON(a,b)
+#define ATTR_LIBC_STRFMON(a,b)
 #define __ATTR_LIBC_WPRINTF(a,b)
+#define ATTR_LIBC_WPRINTF(a,b)
 #define __ATTR_LIBC_WPRINTF_P(a,b)
+#define ATTR_LIBC_WPRINTF_P(a,b)
 #define __ATTR_LIBC_WSCANF(a,b)
+#define ATTR_LIBC_WSCANF(a,b)
+#define __ATTR_LIBC_WSTRFMON(a,b)
+#define ATTR_LIBC_WSTRFMON(a,b)
 #define __ATTR_MALL_DEFAULT_ALIGNED
+#define ATTR_MALL_DEFAULT_ALIGNED
 #define __ATTR_MALL_PAGEALIGNED
+#define ATTR_MALL_PAGEALIGNED
+
+#define __DECL_SIMD_cos
+#define __DECL_SIMD_cosf
+#define __DECL_SIMD_cosl
+#define __DECL_SIMD_sin
+#define __DECL_SIMD_sinf
+#define __DECL_SIMD_sinl
+#define __DECL_SIMD_sincos
+#define __DECL_SIMD_sincosf
+#define __DECL_SIMD_sincosl
+#define __DECL_SIMD_log
+#define __DECL_SIMD_logf
+#define __DECL_SIMD_logl
+#define __DECL_SIMD_exp
+#define __DECL_SIMD_expf
+#define __DECL_SIMD_expl
+#define __DECL_SIMD_pow
+#define __DECL_SIMD_powf
+#define __DECL_SIMD_powl
 
 #define ASMNAME(x)
 #define __ASMNAME(x)
@@ -578,6 +811,22 @@
 #define __DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new() {}
 #define __DEFINE_INTERN_WEAK_ALIAS(new,old) int new() {}
 
+#define REFCNT_METHODS(T) int
+#define REFCNT_METHODS_P(i) int
+#define REFCNT_METHODS_BASE(T) int
+#define REFCNT_METHODS_BASE_P(i) int
+#define WEAKREFCNT_METHODS(T) int
+#define WEAKREFCNT_METHODS_P(i) int
+#define WEAKREFCNT_METHODS_BASE(T) int
+#define WEAKREFCNT_METHODS_BASE_P(i) int
+#define __REFCNT_METHODS(T) int
+#define __REFCNT_METHODS_P(i) int
+#define __REFCNT_METHODS_BASE(T) int
+#define __REFCNT_METHODS_BASE_P(i) int
+#define __WEAKREFCNT_METHODS(T) int
+#define __WEAKREFCNT_METHODS_P(i) int
+#define __WEAKREFCNT_METHODS_BASE(T) int
+#define __WEAKREFCNT_METHODS_BASE_P(i) int
 #define __DEFINE_REFCNT_FUNCTIONS(...)
 #define __DEFINE_WEAKREFCNT_FUNCTIONS(...)
 #define DEFINE_REFCOUNT_FUNCTIONS(...)
@@ -618,6 +867,8 @@
 #define DEFINE_SYSCALL64_4(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3)             return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3)
 #define DEFINE_SYSCALL64_5(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4)       return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4)
 #define DEFINE_SYSCALL64_6(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4,T5,N5) return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4,T5 N5)
+
+#define TASK_POLL_BEFORE_CONNECT(...)
 
 #define __CDECLARE_SC(attr,Treturn,name,param,args)  Treturn sys_##name param;
 #define __CDECLARE_VOID_SC(attr,name,param,args)     void sys_##name param;
@@ -662,9 +913,9 @@
 #define _GLIBCXX17_CONSTEXPR    constexpr
 #define _GLIBCXX20_CONSTEXPR    constexpr
 #define _GLIBCXX17_INLINE
-#define _GLIBCXX_NOEXCEPT       noexcept
-#define _GLIBCXX_NOEXCEPT_IF(c) noexcept(c)
-#define _GLIBCXX_USE_NOEXCEPT   noexcept
+#define _GLIBCXX_NOEXCEPT
+#define _GLIBCXX_NOEXCEPT_IF(c)
+#define _GLIBCXX_USE_NOEXCEPT
 #define _GLIBCXX_THROW(x)
 #define _GLIBCXX_NAMESPACE_CXX11       __cxx11::
 #define _GLIBCXX_BEGIN_NAMESPACE_CXX11 namespace __cxx11 {
@@ -684,8 +935,8 @@
 #define _GLIBCXX_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_NAMESPACE_CXX11
 #define _GLIBCXX_BEGIN_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_BEGIN_NAMESPACE_CXX11
 #define _GLIBCXX_END_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_END_NAMESPACE_CXX11
-#define _GLIBCXX_BEGIN_EXTERN_C extern "C" {
-#define _GLIBCXX_END_EXTERN_C }
+#define _GLIBCXX_BEGIN_EXTERN_C
+#define _GLIBCXX_END_EXTERN_C
 #define _GLIBCXX_TXN_SAFE
 #define _GLIBCXX_TXN_SAFE_DYN
 
@@ -700,19 +951,29 @@
 #define compat_funcptr(return,cc,name,args) return (cc *name)args
 #define compat_ptr(T) T *
 
-#define likely
-#define unlikely
-#define __likely
-#define __unlikely
-#define likely_untraced
-#define unlikely_untraced
-#define __likely_untraced
-#define __unlikely_untraced
-#define untraced
-#define __untraced
+#define __STATIC_IF(x) if(x)
+#define __STATIC_ELSE(x) else
+#define __IF0 if(0)
+#define __IF1 if(1)
+#define __WHILE0 while(0)
+#define __WHILE1 while(1)
+#define likely(x) x
+#define unlikely(x) x
+#define __likely(x) x
+#define __unlikely(x) x
+#define __predict_true(x) x
+#define __predict_false(x) x
+#define likely_untraced(x) x
+#define unlikely_untraced(x) x
+#define __likely_untraced(x) x
+#define __unlikely_untraced(x) x
+#define untraced(x) x
+#define __untraced(x) x
 
 #define TRY
 #define EXCEPT
+#define RETHROW() throw
+#define THROW(...) error_throw(0)
 
 #define __FS_TYPE(x)      x##_t
 #define __FS_ALTTYPE(x)   x##_t
@@ -741,7 +1002,28 @@
 
 #define CASE(x) case x:
 #define FUNC(x) x
+#define FUNC0(x,...) x
+#define FUNC2(x,...) x
 #define NAME(x) x
+#define SYM(x) x
+#define KERNEL_SELECT(a,b) b
+#define ERROR(err) goto err
+#define ERRORF(err,...) goto err
+#define DECL
+#define RETURN_TYPE(T) T
+#define IFELSERW(r,w) r
+#define IFRD(...) __VA_ARGS__
+#define IFWR(...)
+#define IFELSE(a,b) a
+#define IE(a,b) a
+#define VALUE_ARG(T)
+#define FUNC_RW(x) vm_datablock_read##x
+#define FUNC_VIO_RW(x) vm_datablock_vio_read##x
+#define VM_FUNCTION(x) vm_##x
+#define SYSCALL_RETURN_TYPE_OF(...) int
+#define SYSCALL_ARG_TYPE_OF(...) int
+#define COMPAT_SYSCALL_RETURN_TYPE_OF(...) int
+#define COMPAT_SYSCALL_ARG_TYPE_OF(...) int
 
 #define ATTR_DBGTEXT
 #define ATTR_DBGRODATA
@@ -754,6 +1036,16 @@
 #define DBG_INIT(func)  void dbg_init_##func(void)
 #define DBG_RESET(func) void dbg_reset_##func(void)
 #define DBG_FINI(func)  void dbg_fini_##func(void)
+#define DEFINE_DBG_BZERO(...)
+#define DEFINE_DBG_BZERO_IF(...)
+#define DEFINE_DBG_BZERO_VECTOR(...)
+#define DEFINE_DBG_BZERO_OBJECT(...)
+#define DBG_DEFHOOK_INIT(...)
+#define DBG_DEFHOOK_RESET(...)
+#define DBG_DEFHOOK_FINI(...)
+#define DBG_DEFHOOK_COMMAND(...)
+#define DBG_AUTOCOMPLETE(name,argc,argv,cb,arg,...) PRIVATE ATTR_USED void DBG_CALL autocomplete_##name(size_t argc, char *argv[], dbg_autocomplete_cb_t cb, void *arg)
+#define TYPEOF_DEREF(T) int
 
 #define __HYBRID_ALTINT(UID,allow_int_ops,...) __VA_ARGS__
 #define __HYBRID_ALTINT_UID(UID)
@@ -762,9 +1054,13 @@
 
 #define ELFW(x) ELF64_##x
 #define ElfW(x) Elf64_##x
+#define elfw(x) elf64_##x
 #define COMPAT_ElfW(x) Elf32_##x
 #define COMPAT_ELFW(x) ELF32_##x
+#define COMPAT_elfW(x) elf32_##x
 #define __ARCH_COMPAT(x) x##32
+#define MY_ElfW(x) ELF64_##x
+#define MY_ELFW(x) Elf64_##x
 
 #define SLIST_FOREACH(elem,l,key) for(;;)
 #define SLIST_FOREACH_P(elem,l,getpath) for(;;)
@@ -826,8 +1122,8 @@
 	pos_t bd_total_bytes; lba_t bd_sector_count; size_t bd_sector_size;             \
 	uintptr_half_t bd_flags; char bd_name[16];
 
-#define _os_heap_gfparg(v) , int v
-#define _os_heap_gfppar(v) , v
+#define _os_heap_gfparg(v) ,int v
+#define _os_heap_gfppar(v) ,v
 #define os_heap_gfparg_(v) int v,
 #define os_heap_gfppar_(v) v,
 #define os_heap_gfparg(v) int v
@@ -841,6 +1137,30 @@
 #define module_type_arg(name)    name
 #define module_type__arg(name)   , name
 #define module_type_arg_(name)   name,
+
+#define IF_DECODE(x) x
+#define IF_ZERO(x)
+#define IFELSE_NX(if_nx,if_x) if_nx
+#define NOTHROW_NX(x) x
+#define __NRFEAT_SYSCALL_TABLE_FOREACH(cb) cb(0) cb(1)
+#define DEFINE_LIBRARY_OPEN(open_libname, ...) void *open_libname(void);
+#define DlModule_GlobalList_FOREACH(...) for(;;)
+#define DlModule_AllList_FOREACH(...) for(;;)
+#define BUILTIN_GLOBALS_ENUMERATE(cb) cb(__gxx_personality_v0) cb(__cxa_begin_catch) cb(__cxa_end_catch) cb(__cxa_rethrow) cb(_Unwind_Resume)
+#define POINTER_SET_FOREACH(...) for(;;)
+#define PAGEDIR_P_BEGINUSE(...)
+#define PAGEDIR_P_ENDUSE(...)
+#define PCI_FOREACH(...) for(;;)
+#define PCI_FOREACH_CLASS(...) for(;;)
+#define SLAB_FOREACH_SIZE(func,_) func(8,_) func(16,_) func(24,_) func(32,_)
+
+#define DEFINE_ABS_CALLBACK(...)
+#define DEFINE_REL_CALLBACK(...)
+#define DEFINE_CALLBACK(...)
+#define DEFINE_PERTASK_INIT(func)
+#define DEFINE_PERTASK_FINI(func)
+#define DEFINE_PERTASK_CLONE(func)
+#define DEFINE_PERTASK_ONEXIT(func)
 
 
 #define BZ_API(f) f
@@ -924,6 +1244,46 @@
 #define Py_LOCAL_INLINE(type) type
 #define Py_PROTO(x) x
 #define Py_FPROTO(x) x
+#define _PyObject_HEAD_EXTRA
+#define _PyObject_EXTRA_INIT
+#define PyObject_HEAD Py_ssize_t ob_refcnt;struct _typeobject *ob_type;
+#define PyObject_VAR_HEAD Py_ssize_t ob_refcnt;struct _typeobject *ob_type;Py_ssize_t ob_size;
+#define _PyTZINFO_HEAD Py_ssize_t ob_refcnt;struct _typeobject *ob_type;long hashcode;char hastzinfo;
+#define _PyDateTime_TIMEHEAD Py_ssize_t ob_refcnt;struct _typeobject *ob_type;long hashcode;char hastzinfo;unsigned char data[6];
+#define _PyDateTime_DATETIMEHEAD Py_ssize_t ob_refcnt;struct _typeobject *ob_type;long hashcode;char hastzinfo;unsigned char data[10];
+#define Py_FORMAT_PARSETUPLE(func,p1,p2)
+#define Py_ALIGNED(x)
+#define Py_GCC_ATTRIBUTE(x)
+#define Py_LL(x) x##LL
+#define Py_ULL(x) x##ULL
+#define __owur
+#define OPENSSL_EXPORT
+#define OPENSSL_EXTERN
+#define OPENSSL_IMPLEMENT_GLOBAL(t,n,v) t _shadow_##n=v;
+#define OPENSSL_DECLARE_GLOBAL(t,n) t _shadow_##n
+#define OPENSSL_GLOBAL_REF(n) _shadow_##n
+#define ossl_inline
+#define ossl_noreturn
+#define ossl_unused
+#define STACK_OF(type) struct stack_st_##type
+#define LHASH_OF(type) struct lhash_st_##type
+#define SKM_DEFINE_STACK_OF(t1,t2, t3)
+#define DEFINE_SPECIAL_STACK_OF(t1,t2)
+#define DEFINE_STACK_OF(t)
+#define DEFINE_SPECIAL_STACK_OF_CONST(t1,t2)
+#define DEFINE_STACK_OF_CONST(t)
+#define PIXMAN_BEGIN_DECLS
+#define PIXMAN_END_DECLS
+#define __REPB_PREFIX(name) name
+#define __COMPILER_ATOMIC(T) T
+#define GCC_PRINTFLIKE(fmt,var)
+#define GCC_SCANFLIKE(fmt,var)
+#define	GCC_NORETURN
+#define	GCC_UNUSED
+#define externalref
+#define externaldef(psect)
+#define _XtShell_h_Const const
+#define DLMALLOC_EXPORT
 
 
 /* All of these are only here to make code navigation use non-escaped type names */

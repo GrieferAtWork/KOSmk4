@@ -38,42 +38,42 @@
      !defined(__CRT_GENERIC) && !defined(__CRT_KOS_KERNEL) && \
      !defined(__CRT_FREESTANDING))
 #if defined(__KOS__) && defined(__KERNEL__)
-#   define __CRT_KOS_KERNEL 1
-#   define __CRT_KOS_PRIMARY 1
-#   define __CRT_KOS 1
+#   define __CRT_KOS_KERNEL
+#   define __CRT_KOS_PRIMARY
+#   define __CRT_KOS
 /* This might seem like a good idea, but programs using `-ffreestanding',
  * but still ending up #including some CRT header will likely also pass
  * `-lc' on the commandline, so we shouldn't respond to that flag to
  * determine the linked CRT library to be non-present... */
 //#elif defined(__STDC_HOSTED__) && (__STDC_HOSTED__ + 0) == 0
 ///* Freestanding CRT environment. */
-//#   define __CRT_FREESTANDING 1
+//#   define __CRT_FREESTANDING
 #elif defined(__KOS__)
-#   define __CRT_KOS 1
-#   define __CRT_GLC 1 /* Emulated by KOS */
-#   define __CRT_DOS 1 /* Emulated by KOS */
-#   define __CRT_KOS_PRIMARY 1
+#   define __CRT_KOS
+#   define __CRT_GLC /* Emulated by KOS */
+#   define __CRT_DOS /* Emulated by KOS */
+#   define __CRT_KOS_PRIMARY
 #elif defined(__CYGWIN__) || defined(__CYGWIN32__)
-#   define __CRT_CYG_PRIMARY 1
-#   define __CRT_CYG 1
+#   define __CRT_CYG_PRIMARY
+#   define __CRT_CYG
 #elif defined(__linux__) || defined(__linux) || defined(linux) || \
       defined(__unix__) || defined(__unix) || defined(unix)
-#   define __CRT_GLC_PRIMARY 1
-#   define __CRT_GLC 1
+#   define __CRT_GLC_PRIMARY
+#   define __CRT_GLC
 #elif defined(__WINDOWS__) || defined(_MSC_VER) || \
       defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) || \
       defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
       defined(_WIN32_WCE) || defined(WIN32_WCE)
-#   define __CRT_DOS_PRIMARY 1
-/* TinyC links against an older version of MSVCRT by default,
- * so we use the old names by default as well. */
+#   define __CRT_DOS_PRIMARY
+/* XXX: TinyC links against an older version of MSVCRT by default,
+ *      so we use the old names by default as well. */
 #ifdef __TINYC__
-#   define __CRT_DOS 1
+#   define __CRT_DOS
 #else
-#   define __CRT_DOS 2
+#   define __CRT_DOS
 #endif
 #else /* ... */
-#   define __CRT_GENERIC 1
+#   define __CRT_GENERIC
 #endif /* !... */
 #endif /* !__CRT_... */
 
@@ -82,13 +82,13 @@
 
 #if defined(__KERNEL__) && defined(__KOS__)
 #undef __NO_FPU
-#define __NO_FPU 1 /* Disable functions using FPU registers in kernel-mode. */
+#define __NO_FPU /* Disable functions using FPU registers in kernel-mode. */
 #endif /* __KERNEL__ && __KOS__ */
 
 #ifdef __CRT_KOS_PRIMARY
 #ifndef __BUILDING_LIBC
 #ifdef __CRT_KOS_KERNEL
-#define __NO_STDSTREAMS 1
+#define __NO_STDSTREAMS
 #include <crt-features/crt-kos-kernel.h>
 #if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_DEBUGGER)
 #undef __CRT_HAVE___acheck
@@ -107,7 +107,7 @@
 #elif defined(__CRT_GENERIC)
 #include <crt-features/generic.h>
 #elif defined(__CRT_FREESTANDING)
-#define __NO_STDSTREAMS 1
+#define __NO_STDSTREAMS
 #endif /* ... */
 
 
@@ -149,7 +149,7 @@
 #undef __LIBC_BIND_OPTIMIZATIONS
 #if (!defined(__INTELLISENSE__) && \
      (defined(__OPTIMIZE__) || defined(__KERNEL__)))
-#define __LIBC_BIND_OPTIMIZATIONS 1
+#define __LIBC_BIND_OPTIMIZATIONS
 #endif /* ... */
 
 
@@ -167,7 +167,7 @@
         * Because GCC assumes the default calling convention for builtin functions, we'd end up \
         * with stack corruptions since the kernel uses STDCALL, but gcc invokes as CDECL. */    \
        !(defined(__CRT_KOS_KERNEL) && (defined(__i386__) && !defined(__x86_64__))))
-#define __LIBC_BIND_CRTBUILTINS 1
+#define __LIBC_BIND_CRTBUILTINS
 #endif
 
 
@@ -265,38 +265,38 @@
 #   define __VLIBDCALL __ATTR_SYSVABI
 #   define __LIBCCALL  __ATTR_SYSVABI
 #   define __VLIBCCALL __ATTR_SYSVABI
-#   define __LIBCCALL_IS_LIBKCALL 1
-#   define __LIBCCALL_IS_LIBDCALL 1
-#   define __LIBDCALL_IS_LIBKCALL 1
-#   define __VLIBCCALL_IS_VLIBKCALL 1
-#   define __VLIBCCALL_IS_VLIBDCALL 1
-#   define __VLIBDCALL_IS_VLIBKCALL 1
-#   define __VLIBCCALL_IS_LIBCCALL 1
-#   define __VLIBDCALL_IS_LIBDCALL 1
-#   define __VLIBKCALL_IS_LIBKCALL 1
-#   define __LIBCCALL_CALLER_CLEANUP 1
-#   define __LIBKCALL_CALLER_CLEANUP 1
-#   define __LIBDCALL_CALLER_CLEANUP 1
+#   define __LIBCCALL_IS_LIBKCALL
+#   define __LIBCCALL_IS_LIBDCALL
+#   define __LIBDCALL_IS_LIBKCALL
+#   define __VLIBCCALL_IS_VLIBKCALL
+#   define __VLIBCCALL_IS_VLIBDCALL
+#   define __VLIBDCALL_IS_VLIBKCALL
+#   define __VLIBCCALL_IS_LIBCCALL
+#   define __VLIBDCALL_IS_LIBDCALL
+#   define __VLIBKCALL_IS_LIBKCALL
+#   define __LIBCCALL_CALLER_CLEANUP
+#   define __LIBKCALL_CALLER_CLEANUP
+#   define __LIBDCALL_CALLER_CLEANUP
 #else /* __CRT_KOS_KERNEL */
 #   define __LIBKCALL  __ATTR_SYSVABI
 #   define __VLIBKCALL __ATTR_SYSVABI
 #   define __LIBDCALL  __ATTR_MSABI
 #   define __VLIBDCALL __ATTR_MSABI
-#   define __LIBCCALL_CALLER_CLEANUP 1
-#   define __LIBKCALL_CALLER_CLEANUP 1
-#   define __LIBDCALL_CALLER_CLEANUP 1
-#   define __VLIBCCALL_IS_LIBCCALL 1
-#   define __VLIBDCALL_IS_LIBDCALL 1
-#   define __VLIBKCALL_IS_LIBKCALL 1
+#   define __LIBCCALL_CALLER_CLEANUP
+#   define __LIBKCALL_CALLER_CLEANUP
+#   define __LIBDCALL_CALLER_CLEANUP
+#   define __VLIBCCALL_IS_LIBCCALL
+#   define __VLIBDCALL_IS_LIBDCALL
+#   define __VLIBKCALL_IS_LIBKCALL
 #ifdef __PE__
-#   define __LIBCCALL_IS_LIBDCALL 1
+#   define __LIBCCALL_IS_LIBDCALL
 #   define __LIBCCALL  __LIBDCALL
-#   define __VLIBCCALL_IS_VLIBDCALL 1
+#   define __VLIBCCALL_IS_VLIBDCALL
 #   define __VLIBCCALL  __VLIBDCALL
 #else /* __PE__ */
-#   define __LIBCCALL_IS_LIBKCALL 1
+#   define __LIBCCALL_IS_LIBKCALL
 #   define __LIBCCALL  __LIBKCALL
-#   define __VLIBCCALL_IS_VLIBKCALL 1
+#   define __VLIBCCALL_IS_VLIBKCALL
 #   define __VLIBCCALL  __VLIBKCALL
 #endif /* !__PE__ */
 #endif /* !__CRT_KOS_KERNEL */
@@ -309,27 +309,27 @@
 #   define __LIBCCALL  __ATTR_CDECL
 #   define __LIBKCALL  __ATTR_CDECL
 #   define __LIBDCALL  __ATTR_CDECL
-#   define __VLIBCCALL_IS_LIBCCALL  1
-#   define __VLIBKCALL_IS_LIBKCALL  1
-#   define __VLIBDCALL_IS_LIBDCALL  1
-#   define __LIBCCALL_CALLER_CLEANUP  1
-#   define __LIBKCALL_CALLER_CLEANUP  1
-#   define __LIBDCALL_CALLER_CLEANUP  1
+#   define __VLIBCCALL_IS_LIBCCALL
+#   define __VLIBKCALL_IS_LIBKCALL
+#   define __VLIBDCALL_IS_LIBDCALL
+#   define __LIBCCALL_CALLER_CLEANUP
+#   define __LIBKCALL_CALLER_CLEANUP
+#   define __LIBDCALL_CALLER_CLEANUP
 #endif /* !__CRT_KOS_KERNEL */
-#   define __LIBCCALL_IS_LIBKCALL 1
-#   define __LIBCCALL_IS_LIBDCALL 1
-#   define __LIBDCALL_IS_LIBKCALL 1
+#   define __LIBCCALL_IS_LIBKCALL
+#   define __LIBCCALL_IS_LIBDCALL
+#   define __LIBDCALL_IS_LIBKCALL
 #   define __VLIBCCALL __ATTR_CDECL
 #   define __VLIBKCALL __ATTR_CDECL
 #   define __VLIBDCALL __ATTR_CDECL
-#   define __VLIBCCALL_IS_VLIBKCALL 1
-#   define __VLIBCCALL_IS_VLIBDCALL 1
-#   define __VLIBDCALL_IS_VLIBKCALL 1
+#   define __VLIBCCALL_IS_VLIBKCALL
+#   define __VLIBCCALL_IS_VLIBDCALL
+#   define __VLIBDCALL_IS_VLIBKCALL
 #else /* Arch... */
 #if defined(__arm__)
-#   define __LIBCCALL_CALLER_CLEANUP 1
-#   define __LIBKCALL_CALLER_CLEANUP 1
-#   define __LIBDCALL_CALLER_CLEANUP 1
+#   define __LIBCCALL_CALLER_CLEANUP
+#   define __LIBKCALL_CALLER_CLEANUP
+#   define __LIBDCALL_CALLER_CLEANUP
 #endif /* __arm__ */
 #   define __LIBCCALL  /* Nothing */
 #   define __LIBDCALL  /* Nothing */
@@ -337,15 +337,15 @@
 #   define __VLIBCCALL /* Nothing */
 #   define __VLIBDCALL /* Nothing */
 #   define __VLIBKCALL /* Nothing */
-#   define __LIBCCALL_IS_LIBKCALL   1
-#   define __LIBCCALL_IS_LIBDCALL   1
-#   define __LIBDCALL_IS_LIBKCALL   1
-#   define __VLIBCCALL_IS_VLIBKCALL 1
-#   define __VLIBCCALL_IS_VLIBDCALL 1
-#   define __VLIBDCALL_IS_VLIBKCALL 1
-#   define __VLIBCCALL_IS_LIBCCALL  1
-#   define __VLIBDCALL_IS_LIBDCALL  1
-#   define __VLIBKCALL_IS_LIBKCALL  1
+#   define __LIBCCALL_IS_LIBKCALL
+#   define __LIBCCALL_IS_LIBDCALL
+#   define __LIBDCALL_IS_LIBKCALL
+#   define __VLIBCCALL_IS_VLIBKCALL
+#   define __VLIBCCALL_IS_VLIBDCALL
+#   define __VLIBDCALL_IS_VLIBKCALL
+#   define __VLIBCCALL_IS_LIBCCALL
+#   define __VLIBDCALL_IS_LIBDCALL
+#   define __VLIBKCALL_IS_LIBKCALL
 #endif /* !Arch... */
 
 

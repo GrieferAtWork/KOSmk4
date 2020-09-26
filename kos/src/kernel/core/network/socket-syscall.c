@@ -1367,7 +1367,8 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg, fd_t, sockfd,
 		/* Copy the timeout into a kernel-space buffer.
 		 * We can't have `task_waitfor()' fault upon trying to access it! */
 		COMPILER_READ_BARRIER();
-		memcpy(&_timeout_buf, timeout, sizeof(*timeout));
+		_timeout_buf.tv_sec  = (time_t)timeout->tv_sec;
+		_timeout_buf.tv_nsec = (syscall_ulong_t)timeout->tv_nsec;
 		COMPILER_READ_BARRIER();
 		timeout = (struct timespec32 *)&_timeout_buf;
 	}
@@ -1401,7 +1402,8 @@ DEFINE_SYSCALL5(ssize_t, recvmmsg_time64, fd_t, sockfd,
 		/* Copy the timeout into a kernel-space buffer.
 		 * We can't have `task_waitfor()' fault upon trying to access it! */
 		COMPILER_READ_BARRIER();
-		memcpy(&_timeout_buf, timeout, sizeof(*timeout));
+		_timeout_buf.tv_sec  = (time_t)timeout->tv_sec;
+		_timeout_buf.tv_nsec = (syscall_ulong_t)timeout->tv_nsec;
 		COMPILER_READ_BARRIER();
 		timeout = (struct timespec64 *)&_timeout_buf;
 	}

@@ -438,6 +438,13 @@ global final keywordMacros: {string: string | Callable with (CParser, File | CWr
 });
 
 
+@@Keywords that may look escaped, but must be escaped again
+global final special_escapes: {string...} = {
+	"__used",
+	"__unused",
+	"__packed",
+};
+
 
 @@Escape the given keyword if it isn't already escaped
 function escapeKeywordIfNotAlreadyEscaped(
@@ -448,7 +455,10 @@ function escapeKeywordIfNotAlreadyEscaped(
 		return word;
 	if (word.startswith("_") && #word >= 2 && word.isupper(1))
 		return word;
-	return "__" + word;
+	local result = "__" + word;
+	if (result in special_escapes)
+		result = "_" + result;
+	return result;
 }
 
 

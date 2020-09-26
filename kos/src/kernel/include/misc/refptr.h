@@ -67,7 +67,7 @@ template<class T> class refptr {
 private:
 	T *m_ptr; /* [0..1][const] The pointed-to object. */
 public:
-    typedef REFCNT_METHODS(T) rm;
+	typedef REFCNT_METHODS(T) rm;
 	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL ~refptr() __CXX_NOEXCEPT { if (m_ptr) rm::decref(m_ptr); }
 	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL refptr() __CXX_NOEXCEPT: m_ptr(__NULLPTR) {}
 	__CXX_FORCEINLINE NOBLOCK ATTR_ARTIFICIAL refptr(T *ptr) __CXX_NOEXCEPT: m_ptr(ptr) { if (ptr) rm::incref(ptr); }

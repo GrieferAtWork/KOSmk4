@@ -20,7 +20,7 @@
 #ifdef __INTELLISENSE__
 #include "vm.c"
 //#define SPLIT_NX 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #include <hybrid/align.h>
 

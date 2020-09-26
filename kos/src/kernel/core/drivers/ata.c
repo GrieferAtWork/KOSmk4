@@ -1164,7 +1164,7 @@ NOTHROW(KCALL Ata_DmaHandleProgress)(struct aio_handle *__restrict self,
 
 
 INTERN void KCALL
-AtaBus_LockPIO(struct ata_bus *__restrict self) THROWS(E_WOULDBLOCK,...) {
+AtaBus_LockPIO(struct ata_bus *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	union ata_bus_state_and_flags state, newstate;
 	assert(!task_isconnected());
 	for (;;) {

@@ -137,7 +137,7 @@ __NOTHROW_NCX(LIBDISASM_CC disasm_init)(struct disassembler *__restrict self,
 __LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_CC
 disasm_print(struct disassembler *__restrict self,
              char const *__restrict text, __size_t len) {
-	if (self->d_result >= 0) {
+	if __likely(self->d_result >= 0) {
 		__ssize_t temp;
 		temp = (*self->d_printer)(self->d_arg, text, len);
 		if __unlikely(temp < 0)
@@ -157,8 +157,8 @@ disasm_puts(struct disassembler *__restrict self,
 __LOCAL __ATTR_NONNULL((1)) void LIBDISASM_CC
 disasm_puts_s(struct disassembler *__restrict self,
               char const *text) {
-	if (text)
-		disasm_print(self,text,__libc_strlen(text));
+	if __likely(text)
+		disasm_print(self, text, __libc_strlen(text));
 }
 
 __LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_CC
@@ -177,7 +177,7 @@ disasm_printf(struct disassembler *__restrict self,
 __LOCAL __ATTR_NONNULL((1)) void LIBDISASM_CC
 disasm_print_format(struct disassembler *__restrict self,
                     unsigned int format_code) {
-	if (self->d_format && self->d_result >= 0) {
+	if (self->d_format && __likely(self->d_result >= 0)) {
 		__ssize_t temp;
 		temp = (*self->d_format)(self, format_code);
 		if __unlikely(temp < 0)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd77249d2 */
+/* HASH CRC-32:0xf7da7e9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ATTR_NORETURN
 #ifndef __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN
-#define __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN 1
-#define __NRFEAT_HAVE_ATTR_NORETURN 1
-#define __NRNT_exit                   1
-#define __NRNT_exit_group             1
+#define __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN
+#define __NRFEAT_HAVE_ATTR_NORETURN
+#define __NRNT_exit
+#define __NRNT_exit_group
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN */
 #endif /* __WANT_SYSCALL_ATTR_NORETURN */
 
@@ -37,7 +37,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_COUNT
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
 #define __NRAC_io_setup               1
 #define __NRAC_io_destroy             1
 #define __NRAC_io_submit              1
@@ -359,7 +359,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_RETURN_TYPES
 #ifndef __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES
-#define __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES 1
+#define __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES
 #define __NRRT_io_setup               (errno_t, __errno_t)
 #define __NRRT_io_destroy             (errno_t, __errno_t)
 #define __NRRT_io_submit              (errno_t, __errno_t)
@@ -681,7 +681,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_TYPES
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
 #define __NRAT0_io_setup               (int, int)
 #define __NRAT0_io_destroy             (int, int)
 #define __NRAT0_io_submit              (int, int)
@@ -1429,7 +1429,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_MAKER
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
 #define __NRAM_io_setup(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (int)a
 #define __NRAM_io_destroy(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (int)a
 #define __NRAM_io_submit(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (int)a
@@ -1751,7 +1751,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_PACKER
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
 #define __NRAP_io_setup(a)                                                                                          (__syscall_ulong_t)a
 #define __NRAP_io_destroy(a)                                                                                        (__syscall_ulong_t)a
 #define __NRAP_io_submit(a)                                                                                         (__syscall_ulong_t)a

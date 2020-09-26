@@ -21,19 +21,19 @@
 #ifdef __ASSEMBLY__
 #if __ASSEMBLY__+0 == 0
 #undef __ASSEMBLY__
-#define __ASSEMBLY__  1
+#define __ASSEMBLY__ 1
 #endif /* __ASSEMBLY__+0 == 0 */
 #elif defined(__ASSEMBLER__)
 #if __ASSEMBLER__+0 == 0
-#define __ASSEMBLY__   1
+#define __ASSEMBLY__ 1
 #else /* __ASSEMBLER__+0 == 0 */
 #define __ASSEMBLY__   __ASSEMBLER__
 #endif /* __ASSEMBLER__+0 != 0 */
 #elif defined(__assembler)
 #if __assembler+0 == 0
-#define __ASSEMBLY__   1
+#define __ASSEMBLY__ 1
 #else /* __assembler+0 == 0 */
-#define __ASSEMBLY__   __assembler
+#define __ASSEMBLY__ __assembler
 #endif /* __assembler+0 != 0 */
 #endif
 
@@ -41,7 +41,7 @@
  * are our general-purpose detection macros. */
 #ifdef __ASSEMBLY__
 #ifndef __ASSEMBLER__
-#define __ASSEMBLER__  __ASSEMBLY__
+#define __ASSEMBLER__ __ASSEMBLY__
 #endif /* !__ASSEMBLER__ */
 #endif /* __ASSEMBLY__ */
 
@@ -51,48 +51,48 @@
 
 
 #ifndef __has_feature
-#define __NO_has_feature 1
+#define __NO_has_feature
 #define __has_feature(x) 0
 #endif /* !__has_feature */
 
 #ifndef __has_extension
 #ifndef __NO_has_feature
-#define __NO_has_extension 1
+#define __NO_has_extension
 #endif /* !__NO_has_feature */
 #define __has_extension  __has_feature
 #endif /* !__has_extension */
 
 #ifndef __has_include
-#define __NO_has_include 1
+#define __NO_has_include
 #define __has_include(x) 0
 #endif /* !__has_include */
 
 #ifndef __has_include_next
-#define __NO_has_include_next 1
+#define __NO_has_include_next
 #define __has_include_next(x) 0
 #endif /* !__has_include */
 
 #ifndef __TPP_VERSION__
 #undef __has_attribute
+#define __NO_has_attribute
 #define __has_attribute(x) 0
-#define __NO_has_attribute 1
 
 #undef __has_declspec_attribute
+#define __NO_has_declspec_attribute
 #define __has_declspec_attribute(x) 0
-#define __NO_has_declspec_attribute 1
 
 #undef __has_cpp_attribute
+#define __NO_has_cpp_attribute
 #define __has_cpp_attribute(x) 0
-#define __NO_has_cpp_attribute 1
 
 #undef __has_builtin
+#define __NO_has_builtin
 #define __has_builtin(x) 0
-#define __NO_has_builtin 1
 #else /* !__TPP_VERSION__ */
-#define __NO_has_attribute 1
-#define __NO_has_declspec_attribute 1
-#define __NO_has_cpp_attribute 1
-#define __NO_has_builtin 1
+#define __NO_has_attribute
+#define __NO_has_declspec_attribute
+#define __NO_has_cpp_attribute
+#define __NO_has_builtin
 #endif /* __TPP_VERSION__ */
 
 
@@ -128,10 +128,10 @@
 
 
 #define __builtin_expect(x, y) (x)
-#define __NO_builtin_expect    1
-#define __likely               /* Nothing */
-#define __unlikely             /* Nothing */
-#define __P(x)                 /* Nothing */
+#define __NO_builtin_expect
+#define __likely   /* Nothing */
+#define __unlikely /* Nothing */
+#define __P(x)     /* Nothing */
 #ifdef __LINKER__
 #define __STATIC_ASSERT(expr)          ASSERT(expr, #expr)
 #define __STATIC_ASSERT_MSG(expr, msg) ASSERT(expr, msg)
@@ -140,152 +140,152 @@
 #define __STATIC_ASSERT_MSG(expr, msg) /* Nothing */
 #endif /* !__LINKER__ */
 
-#define __extension__            /* Nothing */
-#define __attribute__(x)         /* Nothing */
+#define __extension__    /* Nothing */
+#define __attribute__(x) /* Nothing */
 
-#define __NO_ASMNAME 1
+#define __NO_ASMNAME
 #define __ASMNAME(x) /* Nothing */
 
-#define __NO_ATTR_NOINLINE       1
-#define __ATTR_NOINLINE          /* Nothing */
-#define __NO_ATTR_NORETURN       1
-#define __ATTR_NORETURN          /* Nothing */
-#define __NO_ATTR_W64            1
-#define __ATTR_W64               /* Nothing */
-#define __NO_ATTR_FALLTHROUGH    1
-#define __ATTR_FALLTHROUGH       /* Nothing */
-#define __NO_ATTR_FASTCALL       1
-#define __ATTR_FASTCALL          /* Nothing */
-#define __NO_ATTR_STDCALL        1
-#define __ATTR_STDCALL           /* Nothing */
-#define __NO_ATTR_CDECL          1
-#define __ATTR_CDECL             /* Nothing */
-#define __NO_ATTR_MSABI          1
-#define __ATTR_MSABI             /* Nothing */
-#define __NO_ATTR_SYSVABI        1
-#define __ATTR_SYSVABI           /* Nothing */
-#define __NO_ATTR_PURE           1
-#define __ATTR_PURE              /* Nothing */
-#define __NO_ATTR_PURE_P         1
-#define __ATTR_PURE_P            /* Nothing */
-#define __NO_ATTR_CONST          1
-#define __ATTR_CONST             /* Nothing */
-#define __NO_ATTR_CONST_P        1
-#define __ATTR_CONST_P           /* Nothing */
-#define __NO_ATTR_LEAF           1
-#define __ATTR_LEAF              /* Nothing */
-#define __NO_ATTR_LEAF_P         1
-#define __ATTR_LEAF_P            /* Nothing */
-#define __NO_ATTR_FLATTEN        1
-#define __ATTR_FLATTEN           /* Nothing */
-#define __NO_ATTR_MALLOC         1
-#define __ATTR_MALLOC            /* Nothing */
-#define __NO_ATTR_HOT            1
-#define __ATTR_HOT               /* Nothing */
-#define __NO_ATTR_COLD           1
-#define __ATTR_COLD              /* Nothing */
-#define __NO_ATTR_ALLOC_SIZE     1
+#define __NO_ATTR_NOINLINE
+#define __ATTR_NOINLINE /* Nothing */
+#define __NO_ATTR_NORETURN
+#define __ATTR_NORETURN /* Nothing */
+#define __NO_ATTR_W64
+#define __ATTR_W64 /* Nothing */
+#define __NO_ATTR_FALLTHROUGH
+#define __ATTR_FALLTHROUGH /* Nothing */
+#define __NO_ATTR_FASTCALL
+#define __ATTR_FASTCALL /* Nothing */
+#define __NO_ATTR_STDCALL
+#define __ATTR_STDCALL /* Nothing */
+#define __NO_ATTR_CDECL
+#define __ATTR_CDECL /* Nothing */
+#define __NO_ATTR_MSABI
+#define __ATTR_MSABI /* Nothing */
+#define __NO_ATTR_SYSVABI
+#define __ATTR_SYSVABI /* Nothing */
+#define __NO_ATTR_PURE
+#define __ATTR_PURE /* Nothing */
+#define __NO_ATTR_PURE_P
+#define __ATTR_PURE_P /* Nothing */
+#define __NO_ATTR_CONST
+#define __ATTR_CONST /* Nothing */
+#define __NO_ATTR_CONST_P
+#define __ATTR_CONST_P /* Nothing */
+#define __NO_ATTR_LEAF
+#define __ATTR_LEAF /* Nothing */
+#define __NO_ATTR_LEAF_P
+#define __ATTR_LEAF_P /* Nothing */
+#define __NO_ATTR_FLATTEN
+#define __ATTR_FLATTEN /* Nothing */
+#define __NO_ATTR_MALLOC
+#define __ATTR_MALLOC /* Nothing */
+#define __NO_ATTR_HOT
+#define __ATTR_HOT /* Nothing */
+#define __NO_ATTR_COLD
+#define __ATTR_COLD /* Nothing */
+#define __NO_ATTR_ALLOC_SIZE
 #define __ATTR_ALLOC_SIZE(ppars) /* Nothing */
-#define __NO_ATTR_ALLOC_ALIGN    1
+#define __NO_ATTR_ALLOC_ALIGN
 #define __ATTR_ALLOC_ALIGN(pari) /* Nothing */
-#define __NO_ATTR_ASSUME_ALIGNED 1
+#define __NO_ATTR_ASSUME_ALIGNED
 #define __ATTR_ASSUME_ALIGNED(n) /* Nothing */
-#define __NO_ATTR_NOCLONE        1
-#define __ATTR_NOCLONE           /* Nothing */
-#define __NO_ATTR_USED           1
-#define __ATTR_USED              /* Nothing */
-#define __NO_ATTR_UNUSED         1
-#define __ATTR_UNUSED            /* Nothing */
-#define __NO_ATTR_SENTINEL       1
-#define __ATTR_SENTINEL          /* Nothing */
-#define __NO_ATTR_SENTINEL_O     1
-#define __ATTR_SENTINEL_O(x)     /* Nothing */
-#define __NO_ATTR_THREAD         1
-#define __ATTR_THREAD            /* Nothing */
-#define __NO_ATTR_DEPRECATED     1
-#define __ATTR_DEPRECATED(text)  /* Nothing */
-#define __NO_ATTR_WARNING        1
-#define __ATTR_ERROR(text)       /* Nothing */
-#define __NO_ATTR_WARNING        1
-#define __ATTR_ERROR(text)       /* Nothing */
-#define __NO_ATTR_SECTION        1
-#define __ATTR_SECTION(name)     /* Nothing */
-#define __NO_ATTR_NOTHROW        1
-#define __ATTR_NOTHROW           /* Nothing */
-#define __NO_ATTR_OPTIMIZE       1
-#define __ATTR_OPTIMIZE(opt)     /* Nothing */
-#define __NO_ATTR_RETNONNULL     1
-#define __ATTR_RETNONNULL        /* Nothing */
-#define __NO_ATTR_PACKED         1
-#define __ATTR_PACKED            /* Nothing */
-#define __NO_ATTR_ALIAS          1
-#define __ATTR_ALIAS(name)       /* Nothing */
-#define __NO_ATTR_ALIGNED        1
-#define __ATTR_ALIGNED(n)        /* Nothing */
-#define __NO_ATTR_WEAK           1
-#define __ATTR_WEAK              /* Nothing */
-#define __NO_ATTR_SELECTANY      1
-#define __ATTR_SELECTANY         /* Nothing */
-#define __NO_ATTR_RETURNS_TWICE  1
-#define __ATTR_RETURNS_TWICE     /* Nothing */
-#define __NO_ATTR_EXTERNALLY_VISIBLE 1
+#define __NO_ATTR_NOCLONE
+#define __ATTR_NOCLONE /* Nothing */
+#define __NO_ATTR_USED
+#define __ATTR_USED /* Nothing */
+#define __NO_ATTR_UNUSED
+#define __ATTR_UNUSED /* Nothing */
+#define __NO_ATTR_SENTINEL
+#define __ATTR_SENTINEL /* Nothing */
+#define __NO_ATTR_SENTINEL_O
+#define __ATTR_SENTINEL_O(x) /* Nothing */
+#define __NO_ATTR_THREAD
+#define __ATTR_THREAD /* Nothing */
+#define __NO_ATTR_DEPRECATED
+#define __ATTR_DEPRECATED(text) /* Nothing */
+#define __NO_ATTR_WARNING
+#define __ATTR_ERROR(text) /* Nothing */
+#define __NO_ATTR_WARNING
+#define __ATTR_ERROR(text) /* Nothing */
+#define __NO_ATTR_SECTION
+#define __ATTR_SECTION(name) /* Nothing */
+#define __NO_ATTR_NOTHROW
+#define __ATTR_NOTHROW /* Nothing */
+#define __NO_ATTR_OPTIMIZE
+#define __ATTR_OPTIMIZE(opt) /* Nothing */
+#define __NO_ATTR_RETNONNULL
+#define __ATTR_RETNONNULL /* Nothing */
+#define __NO_ATTR_PACKED
+#define __ATTR_PACKED /* Nothing */
+#define __NO_ATTR_ALIAS
+#define __ATTR_ALIAS(name) /* Nothing */
+#define __NO_ATTR_ALIGNED
+#define __ATTR_ALIGNED(n) /* Nothing */
+#define __NO_ATTR_WEAK
+#define __ATTR_WEAK /* Nothing */
+#define __NO_ATTR_SELECTANY
+#define __ATTR_SELECTANY /* Nothing */
+#define __NO_ATTR_RETURNS_TWICE
+#define __ATTR_RETURNS_TWICE /* Nothing */
+#define __NO_ATTR_EXTERNALLY_VISIBLE
 #define __ATTR_EXTERNALLY_VISIBLE /* Nothing */
-#define __NO_ATTR_VISIBILITY     1
-#define __ATTR_VISIBILITY(vis)   /* Nothing */
-#define __NO_ATTR_FORMAT_PRINTF  1
+#define __NO_ATTR_VISIBILITY
+#define __ATTR_VISIBILITY(vis) /* Nothing */
+#define __NO_ATTR_FORMAT_PRINTF
 #define __ATTR_FORMAT_PRINTF(fmt, args) /* Nothing */
-#define __NO_ATTR_FORMAT_SCANF   1
+#define __NO_ATTR_FORMAT_SCANF
 #define __ATTR_FORMAT_SCANF(fmt, args) /* Nothing */
-#define __NO_ATTR_FORMAT_STRFMON 1
+#define __NO_ATTR_FORMAT_STRFMON
 #define __ATTR_FORMAT_STRFMON(fmt, args) /* Nothing */
-#define __NO_ATTR_FORMAT_STRFTIME 1
+#define __NO_ATTR_FORMAT_STRFTIME
 #define __ATTR_FORMAT_STRFTIME(fmt, args) /* Nothing */
-#define __NO_ATTR_DLLIMPORT      1
-#define __ATTR_DLLIMPORT         /* nothing */
-#define __NO_ATTR_DLLEXPORT      1
-#define __ATTR_DLLEXPORT         /* nothing */
-#define __NO_ATTR_NOPLT          1
-#define __ATTR_NOPLT             /* nothing */
-#define __NO_ATTR_NONNULL        1
-#define __ATTR_NONNULL(ppars)    /* Nothing */
-#define __ATTR_NONNULL_CXX(ppars)/* Nothing */
-#define __NO_ATTR_WUNUSED        1
-#define __ATTR_WUNUSED           /* Nothing */
-#define __NO_ATTR_TRANSPARENT_UNION 1
+#define __NO_ATTR_DLLIMPORT
+#define __ATTR_DLLIMPORT /* nothing */
+#define __NO_ATTR_DLLEXPORT
+#define __ATTR_DLLEXPORT /* nothing */
+#define __NO_ATTR_NOPLT
+#define __ATTR_NOPLT /* nothing */
+#define __NO_ATTR_NONNULL
+#define __ATTR_NONNULL(ppars)     /* Nothing */
+#define __ATTR_NONNULL_CXX(ppars) /* Nothing */
+#define __NO_ATTR_WUNUSED
+#define __ATTR_WUNUSED /* Nothing */
+#define __NO_ATTR_TRANSPARENT_UNION
 #define __ATTR_TRANSPARENT_UNION /* nothing */
-#define __NO_ATTR_INLINE         1
-#define __ATTR_INLINE            /* nothing */
-#define __NO_ATTR_FORCEINLINE    1
-#define __ATTR_FORCEINLINE       /* nothing */
-#define __NO_ATTR_ARTIFICIAL     1
-#define __ATTR_ARTIFICIAL        /* nothing */
+#define __NO_ATTR_INLINE
+#define __ATTR_INLINE /* nothing */
+#define __NO_ATTR_FORCEINLINE
+#define __ATTR_FORCEINLINE /* nothing */
+#define __NO_ATTR_ARTIFICIAL
+#define __ATTR_ARTIFICIAL /* nothing */
 
-#define __NO_XBLOCK              1
+#define __NO_XBLOCK
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
-#define __NO_builtin_choose_expr 1
-#define __NO_builtin_types_compatible_p   1
-#define __builtin_types_compatible_p(...) 1
+#define __NO_builtin_choose_expr
+#define __NO_builtin_types_compatible_p
+#define __builtin_types_compatible_p(...)
 #undef __builtin_assume_has_sideeffects
-#define __builtin_assume(x)      /* nothing */
-#define __builtin_unreachable()  /* nothing */
-#define __LOCAL                  /* nothing */
-#define __FORCELOCAL             /* nothing */
-#define __NO_EXTERN_INLINE       1
-#define __EXTERN_INLINE          /* nothing */
-#define __EXTERN_FORCEINLINE     /* nothing */
-#define __NO_builtin_constant_p  1
+#define __builtin_assume(x)     /* nothing */
+#define __builtin_unreachable() /* nothing */
+#define __LOCAL                 /* nothing */
+#define __FORCELOCAL            /* nothing */
+#define __NO_EXTERN_INLINE
+#define __EXTERN_INLINE      /* nothing */
+#define __EXTERN_FORCEINLINE /* nothing */
+#define __NO_builtin_constant_p  
 
 #ifdef __LINKER__
-#define __builtin_constant_p(x)  1 /* Anything the linker can work with is constant. */
+#define __builtin_constant_p(x) 1 /* Anything the linker can work with is constant. */
 #else /* __LINKER__ */
-#define __builtin_constant_p(x)  0
+#define __builtin_constant_p(x) 0
 #endif /* !__LINKER__ */
 
 #define __restrict     /* nothing */
 #define __restrict_arr /* nothing */
 #define __COMPILER_FLEXIBLE_ARRAY(T, x) /* nothing */
 
-#define __NO_COMPILER_IGNORE_UNINITIALIZED 1
+#define __NO_COMPILER_IGNORE_UNINITIALIZED
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
 
 #define __COMPILER_BARRIER()       /* nothing */
@@ -293,7 +293,7 @@
 #define __COMPILER_WRITE_BARRIER() /* nothing */
 #define __COMPILER_IMPURE()        /* nothing */
 
-#define __NULLPTR                0
+#define __NULLPTR 0
 
 
 #ifdef __LINKER__

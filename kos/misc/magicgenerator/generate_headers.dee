@@ -500,10 +500,10 @@ function doPrint_src_libc_crtFeatures(fp: File) {
 		local cond = crtFeatureConditions[name];
 		if (cond == "1") {
 			/* Speed up file printing in this simple case */
-			wrt << "#define __CRT_HAVE_" << name << " 1\n";
+			wrt << "#define __CRT_HAVE_" << name << "\n";
 		} else {
 			CWriter_ppIfEscaped(wrt, cond, ESCAPE_MODE_NONE);
-			wrt << "#define __CRT_HAVE_" << name << " 1\n";
+			wrt << "#define __CRT_HAVE_" << name << "\n";
 			wrt.ppEndif();
 		}
 	}
@@ -562,10 +562,10 @@ function doPrint_include_crtFeatures_crtKosKernel(fp: File) {
 		local cond = crtFeatureConditions[name];
 		if (cond == "1") {
 			/* Speed up file printing in this simple case */
-			wrt << "#define __CRT_HAVE_" << name << " 1\n";
+			wrt << "#define __CRT_HAVE_" << name << "\n";
 		} else {
 			CWriter_ppIfEscaped(wrt, cond, ESCAPE_MODE_FULL);
-			wrt << "#define __CRT_HAVE_" << name << " 1\n";
+			wrt << "#define __CRT_HAVE_" << name << "\n";
 			wrt.ppEndif();
 		}
 	}
@@ -764,7 +764,7 @@ function doPrint_include_gnu_stubs(fp: File) {
 			CWriter_ppIfEscaped(cWriter, ppCond, ESCAPE_MODE_FULL);
 			if (symbolName.startswith("?"))
 				symbolName = symbolName.replace("?", "$Q").replace("@", "$A");
-			cWriter << "#define __stub_" << symbolName << " 1\n";
+			cWriter << "#define __stub_" << symbolName << "\n";
 			cWriter.ppEndif();
 		}
 		cWriter.ppEndif();

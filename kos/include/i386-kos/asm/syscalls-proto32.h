@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38a35431 */
+/* HASH CRC-32:0xdc8bf183 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ATTR_NORETURN
 #ifndef __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN
-#define __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN 1
-#define __NRFEAT_HAVE_ATTR_NORETURN 1
-#define __NRNT_exit                         1
-#define __NRNT_exit_group                   1
+#define __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN
+#define __NRFEAT_HAVE_ATTR_NORETURN
+#define __NRNT_exit
+#define __NRNT_exit_group
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN */
 #endif /* __WANT_SYSCALL_ATTR_NORETURN */
 
@@ -37,7 +37,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_COUNT
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
 #define __NRAC_restart_syscall              0
 #define __NRAC_exit                         1
 #define __NRAC_fork                         0
@@ -542,7 +542,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_RETURN_TYPES
 #ifndef __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES
-#define __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES 1
+#define __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES
 #define __NRRT_restart_syscall              (errno_t, __errno_t)
 #define __NRRT_exit                         (void, void)
 #define __NRRT_fork                         (pid_t, __pid_t)
@@ -1047,7 +1047,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_TYPES
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
 #define __NRAT0_exit                         (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_read                         (fd_t, __fd_t)
 #define __NRAT1_read                         (void *, void *)
@@ -2209,7 +2209,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_MAKER
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
 #define __NRAM_restart_syscall(a, b, c, d, e, f)              /* nothing */
 #define __NRAM_exit(a, b, c, d, e, f)                         (__syscall_ulong_t)a
 #define __NRAM_fork(a, b, c, d, e, f)                         /* nothing */
@@ -2714,7 +2714,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_PACKER
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
 #define __NRAP_restart_syscall()                              /* nothing */
 #define __NRAP_exit(a)                                        (__syscall_ulong_t)a
 #define __NRAP_fork()                                         /* nothing */

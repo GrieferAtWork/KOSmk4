@@ -27,7 +27,7 @@
  * >> #include <hybrid/compiler.h> // Pull in KOS-specific headers without relying on `__has_include'.
  * >> #endif
  */
-#define __KOS_SYSTEM_HEADERS__ 1
+#define __KOS_SYSTEM_HEADERS__
 #ifndef __KOS_VERSION__
 #define __KOS_VERSION__ 400
 #endif /* !__KOS_VERSION__ */
@@ -39,8 +39,8 @@
      (!defined(__LINKER__) && !defined(__ASSEMBLY__) &&   \
       !defined(__ASSEMBLER__) && !defined(__assembler) && \
       !defined(__DEEMON__)))
-#define __CC__  1  /* C Compiler. */
-#define __CCAST    /* Nothing */
+#define __CC__  1 /* C Compiler. */
+#define __CCAST   /* Nothing */
 #else /* ... */
 #undef __cplusplus
 #define __CCAST(T) /* Nothing */
@@ -136,7 +136,7 @@
      (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS + 0) != 0))
 #undef __NO_NON_CALL_EXCEPTIONS
 #undef __NON_CALL_EXCEPTIONS
-#define __NON_CALL_EXCEPTIONS 1
+#define __NON_CALL_EXCEPTIONS
 #define __NOTHROW_NCX /* Nothing */
 #ifdef __cplusplus
 #define __CXX_NOEXCEPT_NCX /* Nothing */
@@ -145,7 +145,7 @@
 #undef __NO_NON_CALL_EXCEPTIONS
 #undef __NON_CALL_EXCEPTIONS
 #undef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG /* No work-around needed w/o NCX */
-#define __NO_NON_CALL_EXCEPTIONS 1
+#define __NO_NON_CALL_EXCEPTIONS
 #define __NOTHROW_NCX __NOTHROW
 #ifdef __cplusplus
 #define __CXX_NOEXCEPT_NCX __CXX_NOEXCEPT
@@ -221,14 +221,14 @@
        * export a certain symbol. - So while in theory we can define non-public aliases,
        * defining public ones is something that we cannot do without assuming the caller's
        * current section. */
-#define __NO_DEFINE_ALIAS 1
+#define __NO_DEFINE_ALIAS
 #define __DEFINE_PRIVATE_ALIAS(new, old)      /* Nothing */
 #define __DEFINE_PUBLIC_ALIAS(new, old)       /* Nothing */
 #define __DEFINE_INTERN_ALIAS(new, old)       /* Nothing */
 #define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* Nothing */
 #define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* Nothing */
 #define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* Nothing */
-#else
+#else /* ... */
 #define __DEFINE_ALIAS_STR(x) #x
 #define __DEFINE_PE_DIRECTIVE_STR2(directive) ".pushsection .drectve\n.ascii " #directive "\n.popsection\n"
 #define __DEFINE_PE_DIRECTIVE_STR(directive)  __DEFINE_PE_DIRECTIVE_STR2(directive)
@@ -241,7 +241,7 @@
 #define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
 #define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __asm__(__DEFINE_PE_EXPORT_STR(new) ".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
 #define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
-#endif
+#endif /* !... */
 #else /* __PE__ */
 #define __DEFINE_ALIAS_STR(x) #x
 #define __DEFINE_PRIVATE_ALIAS(new, old)      __asm__(".local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
@@ -252,7 +252,7 @@
 #define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
 #endif /* !__PE__ */
 #else /* __COMPILER_HAVE_GCC_ASM */
-#define __NO_DEFINE_ALIAS 1
+#define __NO_DEFINE_ALIAS
 #define __DEFINE_PRIVATE_ALIAS(new, old)      /* Nothing */
 #define __DEFINE_PUBLIC_ALIAS(new, old)       /* Nothing */
 #define __DEFINE_INTERN_ALIAS(new, old)       /* Nothing */
@@ -316,15 +316,15 @@
  * user having to `#define __WANT_NO_PLT_RELOCATIONS' prior to including any
  * system header file. */
 #if __has_attribute(__noplt__) && __has_attribute(__visibility__)
-#define __HAVE_NO_PLT_RELOCATIONS 1 /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
+#define __HAVE_NO_PLT_RELOCATIONS /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
 #define __IMPDEF        extern __attribute__((__noplt__, __visibility__("default")))
 #elif !defined(__NO_ATTR_VISIBILITY) && !defined(__NO_ATTR_NOPLT)
-#define __HAVE_NO_PLT_RELOCATIONS 1 /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
+#define __HAVE_NO_PLT_RELOCATIONS /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
 #define __IMPDEF        extern __ATTR_NOPLT __ATTR_VISIBILITY("default")
 #elif !defined(__NO_ATTR_VISIBILITY)
 #define __IMPDEF        extern __ATTR_VISIBILITY("default")
 #elif !defined(__NO_ATTR_NOPLT)
-#define __HAVE_NO_PLT_RELOCATIONS 1 /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
+#define __HAVE_NO_PLT_RELOCATIONS /* ACK feedback that we've understood the `__WANT_NO_PLT_RELOCATIONS' request */
 #define __IMPDEF        extern __ATTR_NOPLT
 #else /* ... */
 #define __IMPDEF        extern
@@ -408,7 +408,7 @@
 #elif !defined(__NO_ATTR_WEAK)
 #define __PUBLIC_COMDAT __PUBLIC __ATTR_WEAK
 #else /* ... */
-#define __NO_PUBLIC_COMDAT 1
+#define __NO_PUBLIC_COMDAT
 #define __PUBLIC_COMDAT __INTERN_COMDAT
 #endif /* !... */
 #endif /* !__PUBLIC_COMDAT */
@@ -417,18 +417,18 @@
 
 #ifndef __UNUSED
 #ifdef __INTELLISENSE__
-#define __UNUSED         /* Nothing */
+#define __UNUSED       /* Nothing */
 #elif defined(__cplusplus) || defined(__DEEMON__)
-#define __UNUSED(name)   /* Nothing */
+#define __UNUSED(name) /* Nothing */
 #elif !defined(__NO_ATTR_UNUSED)
-#define __UNUSED(name)   name __ATTR_UNUSED
+#define __UNUSED(name) name __ATTR_UNUSED
 #elif defined(__LCLINT__)
-#define __UNUSED(name)   /*@unused@*/ name
+#define __UNUSED(name) /*@unused@*/ name
 #elif defined(_MSC_VER)
-#define __UNUSED(name)   name
+#define __UNUSED(name) name
 #pragma warning(disable: 4100)
 #else /* ... */
-#define __UNUSED(name)   name
+#define __UNUSED(name) name
 #endif /* !... */
 #endif /* !__UNUSED */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x631daa1a */
+/* HASH CRC-32:0x6b2c3ed1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -779,7 +779,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_RESTART_MODES
 #ifndef __NRFEAT_DEFINED_SYSCALL_RESTART_MODES
-#define __NRFEAT_DEFINED_SYSCALL_RESTART_MODES 1
+#define __NRFEAT_DEFINED_SYSCALL_RESTART_MODES
 /* Restart modes:
  * 0 (auto):
  *   - Always restart after an `E_INTERRUPT_USER_RPC'
@@ -1132,121 +1132,121 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_CANCELLATION_POINTS
 #ifndef __NRFEAT_DEFINED_SYSCALL_CANCELLATION_POINTS
-#define __NRFEAT_DEFINED_SYSCALL_CANCELLATION_POINTS 1
-#define __NRFEAT_HAVE_CANCELLATION_POINTS 1
-#define __NRCP_setxattr               1
-#define __NRCP_lsetxattr              1
-#define __NRCP_fsetxattr              1
-#define __NRCP_getxattr               1
-#define __NRCP_lgetxattr              1
-#define __NRCP_fgetxattr              1
-#define __NRCP_listxattr              1
-#define __NRCP_llistxattr             1
-#define __NRCP_flistxattr             1
-#define __NRCP_removexattr            1
-#define __NRCP_lremovexattr           1
-#define __NRCP_fremovexattr           1
-#define __NRCP_getcwd                 1
-#define __NRCP_epoll_pwait            1
-#define __NRCP_ioctl                  1
-#define __NRCP_flock                  1
-#define __NRCP_mknodat                1
-#define __NRCP_mkdirat                1
-#define __NRCP_unlinkat               1
-#define __NRCP_symlinkat              1
-#define __NRCP_linkat                 1
-#define __NRCP_renameat               1
-#define __NRCP_umount2                1
-#define __NRCP_mount                  1
-#define __NRCP_faccessat              1
-#define __NRCP_chdir                  1
-#define __NRCP_fchdir                 1
-#define __NRCP_fchmod                 1
-#define __NRCP_fchmodat               1
-#define __NRCP_fchownat               1
-#define __NRCP_fchown                 1
-#define __NRCP_openat                 1
-#define __NRCP_getdents64             1
-#define __NRCP_read                   1
-#define __NRCP_write                  1
-#define __NRCP_readv                  1
-#define __NRCP_writev                 1
-#define __NRCP_pread64                1
-#define __NRCP_pwrite64               1
-#define __NRCP_preadv                 1
-#define __NRCP_pwritev                1
-#define __NRCP_pselect6               1
-#define __NRCP_ppoll                  1
-#define __NRCP_vmsplice               1
-#define __NRCP_splice                 1
-#define __NRCP_tee                    1
-#define __NRCP_readlinkat             1
-#define __NRCP_sync                   1
-#define __NRCP_fsync                  1
-#define __NRCP_fdatasync              1
-#define __NRCP_sync_file_range        1
-#define __NRCP_utimensat              1
-#define __NRCP_waitid                 1
-#define __NRCP_futex                  1
-#define __NRCP_nanosleep              1
-#define __NRCP_clock_nanosleep        1
-#define __NRCP_syslog                 1
-#define __NRCP_rt_sigsuspend          1
-#define __NRCP_rt_sigtimedwait        1
-#define __NRCP_sysinfo                1
-#define __NRCP_mq_timedsend           1
-#define __NRCP_mq_timedreceive        1
-#define __NRCP_msgrcv                 1
-#define __NRCP_msgsnd                 1
-#define __NRCP_accept                 1
-#define __NRCP_connect                1
-#define __NRCP_sendto                 1
-#define __NRCP_recvfrom               1
-#define __NRCP_sendmsg                1
-#define __NRCP_recvmsg                1
-#define __NRCP_execve                 1
-#define __NRCP_msync                  1
-#define __NRCP_accept4                1
-#define __NRCP_recvmmsg               1
-#define __NRCP_wait4                  1
-#define __NRCP_name_to_handle_at      1
-#define __NRCP_open_by_handle_at      1
-#define __NRCP_syncfs                 1
-#define __NRCP_sendmmsg               1
-#define __NRCP_renameat2              1
-#define __NRCP_execveat               1
-#define __NRCP_open                   1
-#define __NRCP_link                   1
-#define __NRCP_unlink                 1
-#define __NRCP_mknod                  1
-#define __NRCP_chmod                  1
-#define __NRCP_chown                  1
-#define __NRCP_mkdir                  1
-#define __NRCP_lchown                 1
-#define __NRCP_access                 1
-#define __NRCP_rename                 1
-#define __NRCP_readlink               1
-#define __NRCP_symlink                1
-#define __NRCP_utimes                 1
-#define __NRCP_sendfile               1
-#define __NRCP_stat                   1
-#define __NRCP_lstat                  1
-#define __NRCP_fstat                  1
-#define __NRCP_fcntl                  1
-#define __NRCP_newfstatat             1
-#define __NRCP_lseek                  1
-#define __NRCP_pause                  1
-#define __NRCP_utime                  1
-#define __NRCP_creat                  1
-#define __NRCP_getdents               1
-#define __NRCP_futimesat              1
-#define __NRCP_select                 1
-#define __NRCP_poll                   1
-#define __NRCP_epoll_wait             1
-#define __NRCP_oldwait4               1
-#define __NRCP_recv                   1
-#define __NRCP_send                   1
-#define __NRCP_umount                 1
+#define __NRFEAT_DEFINED_SYSCALL_CANCELLATION_POINTS
+#define __NRFEAT_HAVE_CANCELLATION_POINTS
+#define __NRCP_setxattr
+#define __NRCP_lsetxattr
+#define __NRCP_fsetxattr
+#define __NRCP_getxattr
+#define __NRCP_lgetxattr
+#define __NRCP_fgetxattr
+#define __NRCP_listxattr
+#define __NRCP_llistxattr
+#define __NRCP_flistxattr
+#define __NRCP_removexattr
+#define __NRCP_lremovexattr
+#define __NRCP_fremovexattr
+#define __NRCP_getcwd
+#define __NRCP_epoll_pwait
+#define __NRCP_ioctl
+#define __NRCP_flock
+#define __NRCP_mknodat
+#define __NRCP_mkdirat
+#define __NRCP_unlinkat
+#define __NRCP_symlinkat
+#define __NRCP_linkat
+#define __NRCP_renameat
+#define __NRCP_umount2
+#define __NRCP_mount
+#define __NRCP_faccessat
+#define __NRCP_chdir
+#define __NRCP_fchdir
+#define __NRCP_fchmod
+#define __NRCP_fchmodat
+#define __NRCP_fchownat
+#define __NRCP_fchown
+#define __NRCP_openat
+#define __NRCP_getdents64
+#define __NRCP_read
+#define __NRCP_write
+#define __NRCP_readv
+#define __NRCP_writev
+#define __NRCP_pread64
+#define __NRCP_pwrite64
+#define __NRCP_preadv
+#define __NRCP_pwritev
+#define __NRCP_pselect6
+#define __NRCP_ppoll
+#define __NRCP_vmsplice
+#define __NRCP_splice
+#define __NRCP_tee
+#define __NRCP_readlinkat
+#define __NRCP_sync
+#define __NRCP_fsync
+#define __NRCP_fdatasync
+#define __NRCP_sync_file_range
+#define __NRCP_utimensat
+#define __NRCP_waitid
+#define __NRCP_futex
+#define __NRCP_nanosleep
+#define __NRCP_clock_nanosleep
+#define __NRCP_syslog
+#define __NRCP_rt_sigsuspend
+#define __NRCP_rt_sigtimedwait
+#define __NRCP_sysinfo
+#define __NRCP_mq_timedsend
+#define __NRCP_mq_timedreceive
+#define __NRCP_msgrcv
+#define __NRCP_msgsnd
+#define __NRCP_accept
+#define __NRCP_connect
+#define __NRCP_sendto
+#define __NRCP_recvfrom
+#define __NRCP_sendmsg
+#define __NRCP_recvmsg
+#define __NRCP_execve
+#define __NRCP_msync
+#define __NRCP_accept4
+#define __NRCP_recvmmsg
+#define __NRCP_wait4
+#define __NRCP_name_to_handle_at
+#define __NRCP_open_by_handle_at
+#define __NRCP_syncfs
+#define __NRCP_sendmmsg
+#define __NRCP_renameat2
+#define __NRCP_execveat
+#define __NRCP_open
+#define __NRCP_link
+#define __NRCP_unlink
+#define __NRCP_mknod
+#define __NRCP_chmod
+#define __NRCP_chown
+#define __NRCP_mkdir
+#define __NRCP_lchown
+#define __NRCP_access
+#define __NRCP_rename
+#define __NRCP_readlink
+#define __NRCP_symlink
+#define __NRCP_utimes
+#define __NRCP_sendfile
+#define __NRCP_stat
+#define __NRCP_lstat
+#define __NRCP_fstat
+#define __NRCP_fcntl
+#define __NRCP_newfstatat
+#define __NRCP_lseek
+#define __NRCP_pause
+#define __NRCP_utime
+#define __NRCP_creat
+#define __NRCP_getdents
+#define __NRCP_futimesat
+#define __NRCP_select
+#define __NRCP_poll
+#define __NRCP_epoll_wait
+#define __NRCP_oldwait4
+#define __NRCP_recv
+#define __NRCP_send
+#define __NRCP_umount
 #endif /* !__NRFEAT_DEFINED_SYSCALL_CANCELLATION_POINTS */
 #endif /* __WANT_SYSCALL_CANCELLATION_POINTS */
 
@@ -1256,7 +1256,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_REGISTER_COUNT
 #ifndef __NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT
-#define __NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT 1
+#define __NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT
 #define __NRFEAT_SYSCALL_REGISTER_MAX_COUNT none
 #define __NRFEAT_SYSCALL_REGISTER_BITS none
 #define __NRRC_io_setup               1
@@ -1580,7 +1580,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_DOUBLE_WIDE_RETURN
 #ifndef __NRFEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN
-#define __NRFEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN 1
+#define __NRFEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN
 #endif /* !__NRFEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN */
 #endif /* __WANT_SYSCALL_DOUBLE_WIDE_RETURN */
 

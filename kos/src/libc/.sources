@@ -105,18 +105,18 @@ BEGIN
 						fp << COPYRIGHT << "\n\n\n";
 						if (!TARGET.DL_HAVE_PE_COMPAT) {
 							for (local x: symbols_set.sorted())
-								fp << "#define __CRT_HAVE_" << x << " 1\n";
+								fp << "#define __CRT_HAVE_" << x << "\n";
 						} else {
 							local dosSymbols     = HashSet(); /* Symbols exposed with a DOS$ prefix */
 							for (local x: symbols_set.sorted()) {
 								if (x.startswith("?")) {
 									fp << "#define __CRT_HAVE_"
 										<< x.replace("?", "$Q").replace("@", "$A")
-										<< " 1\n";
+										<< "\n";
 								} else if (x.startswith("DOS$")) {
 									dosSymbols.insert(x[4:]);
 								} else {
-									fp << "#define __CRT_HAVE_" << x << " 1\n";
+									fp << "#define __CRT_HAVE_" << x << "\n";
 								}
 							}
 							if (dosSymbols) {
@@ -126,15 +126,15 @@ BEGIN
 									/* Functions that only exist in DOS */
 									if (x in symbols_set) {
 										/* Hybrid symbol */
-										fp << "#define __CRT_HAVE_KOS$" << x << " 1\n";
+										fp << "#define __CRT_HAVE_KOS$" << x << "\n";
 									} else {
 										/* DOS-only symbol symbol */
-										fp << "#define __CRT_HAVE_" << x << " 1\n";
+										fp << "#define __CRT_HAVE_" << x << "\n";
 									}
 								}
 								fp << "#else /* __PE__ */\n";
 								for (local x: dosSymbols)
-									fp << "#define __CRT_HAVE_DOS$" << x << " 1\n";
+									fp << "#define __CRT_HAVE_DOS$" << x << "\n";
 								fp << "#endif /* !__PE__ */\n";
 							}
 						}

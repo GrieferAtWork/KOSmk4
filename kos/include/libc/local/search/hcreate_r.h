@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe464fa95 */
+/* HASH CRC-32:0x78cb1a2d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hcreate_r) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate_r))(__SIZE_TYPE__ __nel, struct hsearch_data *__htab) {
 	typedef struct {
-		unsigned int __used;
+		unsigned int ___used;
 		struct entry        __entry;
 	} __entry_type;
 	if (__htab == __NULLPTR) {

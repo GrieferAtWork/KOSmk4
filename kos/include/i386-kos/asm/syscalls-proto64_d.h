@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0affc39 */
+/* HASH CRC-32:0x78a6c14f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ATTR_NORETURN
 #ifndef __NR64FEAT_DEFINED_SYSCALL_ATTR_NORETURN
-#define __NR64FEAT_DEFINED_SYSCALL_ATTR_NORETURN 1
-#define __NR64FEAT_HAVE_ATTR_NORETURN 1
-#define __NR64NT_exit                     1
-#define __NR64NT_exit_group               1
+#define __NR64FEAT_DEFINED_SYSCALL_ATTR_NORETURN
+#define __NR64FEAT_HAVE_ATTR_NORETURN
+#define __NR64NT_exit
+#define __NR64NT_exit_group
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_ATTR_NORETURN */
 #endif /* __WANT_SYSCALL_ATTR_NORETURN */
 
@@ -37,7 +37,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_COUNT
 #ifndef __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
-#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT 1
+#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
 #define __NR64AC_read                     3
 #define __NR64AC_write                    3
 #define __NR64AC_open                     3
@@ -447,7 +447,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_RETURN_TYPES
 #ifndef __NR64FEAT_DEFINED_SYSCALL_RETURN_TYPES
-#define __NR64FEAT_DEFINED_SYSCALL_RETURN_TYPES 1
+#define __NR64FEAT_DEFINED_SYSCALL_RETURN_TYPES
 #define __NR64RT_read                     (ssize_t, __ssize_t)
 #define __NR64RT_write                    (ssize_t, __ssize_t)
 #define __NR64RT_open                     (fd_t, __fd_t)
@@ -857,7 +857,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_TYPES
 #ifndef __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
-#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES 1
+#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
 #define __NR64AT0_read                     (fd_t, __fd_t)
 #define __NR64AT1_read                     (void *, void *)
 #define __NR64AT2_read                     (size_t, __size_t)
@@ -1806,7 +1806,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_MAKER
 #ifndef __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
-#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER 1
+#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
 #define __NR64AM_read(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c
 #define __NR64AM_write(a, b, c, d, e, f)                    (__fd_t)a, (void const *)b, (__size_t)c
 #define __NR64AM_open(a, b, c, d, e, f)                     (char const *)a, (__oflag_t)b, (__mode_t)c
@@ -2216,7 +2216,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_PACKER
 #ifndef __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
-#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER 1
+#define __NR64FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
 #define __NR64AP_read(a, b, c)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_write(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_open(a, b, c)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

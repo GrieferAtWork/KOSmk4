@@ -24,6 +24,8 @@
 
 #include <hybrid/typecore.h>
 
+#include <bits/typesizes.h>
+
 #ifndef _FEATURES_H
 #include <features.h>
 #endif /* !_FEATURES_H */
@@ -135,8 +137,8 @@
 #endif /* !__flexarr */
 
 #ifndef __USER_LABEL_PREFIX__
-#define __USER_LABEL_PREFIX_IS_EMPTY 1
-#define __USER_LABEL_PREFIX__        /* nothing */
+#define __USER_LABEL_PREFIX_IS_EMPTY
+#define __USER_LABEL_PREFIX__ /* nothing */
 #endif /* !__USER_LABEL_PREFIX__ */
 
 #ifdef __USER_LABEL_PREFIX_IS_EMPTY
@@ -204,12 +206,13 @@
 #if __GNUC_PREREQ(4, 3) || __has_builtin(__builtin_va_arg_pack_len)
 #define __va_arg_pack_len() __builtin_va_arg_pack_len()
 #endif /* __GNUC_PREREQ(4, 3) || __has_builtin(__builtin_va_arg_pack_len) */
-#if (!defined(_Noreturn) &&                                               \
+#if (!defined(_Noreturn) && !defined(__ATTR_NORETURN_IS__NORETURN) &&     \
      (defined(__STDC_VERSION__) ? (__STDC_VERSION__ + 0) : 0) < 201112 && \
      !__GNUC_PREREQ(4, 7))
 #define _Noreturn __ATTR_NORETURN
 #endif /* ... */
 #if (!defined(_Static_assert) && !defined(__cplusplus) &&               \
+     !defined(__STATIC_ASSERT_IS__STATIC_ASSERT) &&                     \
      (defined(__STDC_VERSION__) ? __STDC_VERSION__ + 0 : 0) < 201112 && \
      (!__GNUC_PREREQ(4, 6) || defined(__STRICT_ANSI__)))
 #define _Static_assert(expr, diagnostic) __STATIC_ASSERT(expr)
@@ -242,12 +245,91 @@
 #endif /* !__LDBL_COMPAT || !__REDIRECT */
 
 #ifdef __USE_BSD
+#ifndef __weak_symbol
+#define __weak_symbol __ATTR_WEAK
+#endif /* !__weak_symbol */
+#ifndef __used
+#define __used    __ATTR_USED
+#endif /* !__used */
+#ifndef __section
+#define __section __ATTR_SECTION
+#endif /* !__section */
+#ifndef __alloc_size
+#define __alloc_size(x) __ATTR_ALLOC_SIZE((x))
+#endif /* !__alloc_size */
+#ifndef __alloc_size2
+#define __alloc_size2(n, x) __ATTR_ALLOC_SIZE((n, x))
+#endif /* !__alloc_size2 */
+#ifndef __alloc_align
+#define __alloc_align(x) __ATTR_ALLOC_ALIGN(x)
+#endif /* !__alloc_align */
+#if !defined(__alignof) && !defined(__COMPILER_ALIGNOF_IS___ALIGNOF)
+#define __alignof(x) __COMPILER_ALIGNOF(x)
+#endif /* !__alignof && !__COMPILER_ALIGNOF_IS___ALIGNOF */
+#if !defined(_Alignof) && !defined(__COMPILER_ALIGNOF_IS__ALIGNOF)
+#define _Alignof(x) __COMPILER_ALIGNOF(x)
+#endif /* !_Alignof && !__COMPILER_ALIGNOF_IS__ALIGNOF */
+#if !defined(_Alignas) && !defined(__ATTR_ALIGNED_IS__ALIGNAS)
+#define _Alignas(x) __ATTR_ALIGNED(x)
+#endif /* !_Alignas && !__ATTR_ALIGNED_IS__ALIGNAS */
+#if !defined(_Thread_local) && !defined(__ATTR_THREAD_IS__THREAD_LOCAL)
+#define _Thread_local __ATTR_THREAD
+#endif /* !_Thread_local && !__ATTR_THREAD_IS__THREAD_LOCAL */
+#ifndef __generic
+#ifdef __COMPILER_HAVE_C11_GENERIC
+#define	__generic(expr, t, yes, no) _Generic(expr, t: yes, default: no)
+#elif (!defined(__NO_builtin_choose_expr) &&        \
+       !defined(__NO_builtin_types_compatible_p) && \
+       defined(__COMPILER_HAVE_TYPEOF))
+#define __generic(expr, t, yes, no) \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof(expr), t), yes, no)
+#endif
+#endif /* !__generic */
+#ifndef __malloc_like
+#define __malloc_like __ATTR_MALLOC
+#endif /* !__malloc_like */
 #ifndef __dead2
 #define __dead2 __ATTR_NORETURN
 #endif /* !__dead2 */
+#ifndef __pure
+#define __pure __ATTR_PURE
+#endif /* !__pure */
 #ifndef __pure2
 #define __pure2 __ATTR_CONST
 #endif /* !__pure2 */
+#ifndef __noinline
+#define __noinline __ATTR_NOINLINE
+#endif /* !__noinline */
+#ifndef __fastcall
+#define __fastcall __ATTR_FASTCALL
+#endif /* !__fastcall */
+#ifndef __result_use_check
+#define __result_use_check __ATTR_WUNUSED
+#endif /* !__result_use_check */
+#ifndef __returns_twice
+#define __returns_twice __ATTR_RETURNS_TWICE
+#endif /* !__returns_twice */
+#ifndef __unreachable
+#define __unreachable __builtin_unreachable
+#endif /* !__unreachable */
+#ifndef __COMPILER_HAVE_LONGLONG
+#define __LONG_LONG_SUPPORTED
+#endif /* __COMPILER_HAVE_LONGLONG */
+#ifndef __predict_true
+#define __predict_true __likely
+#endif /* !__predict_true */
+#ifndef __predict_false
+#define __predict_false __unlikely
+#endif /* !__predict_false */
+#ifndef __null_sentinel
+#define __null_sentinel __ATTR_SENTINEL
+#endif /* !__null_sentinel */
+#ifndef __exported
+#define __exported __ATTR_VISIBILITY("default")
+#endif /* !__exported */
+#ifndef __hidden
+#define __hidden __ATTR_VISIBILITYility__("hidden")
+#endif /* !__hidden */
 #ifndef __packed
 #define __packed __ATTR_PACKED
 #endif /* !__packed */
@@ -260,6 +342,21 @@
 #ifndef __printflike
 #define __printflike __ATTR_FORMAT_PRINTF
 #endif /* !__printflike */
+#ifndef __scanflike
+#define __scanflike __ATTR_FORMAT_SCANF
+#endif /* !__scanflike */
+#ifndef __format_arg
+#define __format_arg __attribute_format_arg__
+#endif /* !__format_arg */
+#ifndef __strfmonlike
+#define __strfmonlike __ATTR_FORMAT_STRFMON
+#endif /* !__strfmonlike */
+#ifndef __strftimelike
+#define __strftimelike __ATTR_FORMAT_STRFTIME
+#endif /* !__strftimelike */
+#ifndef __printf0like
+#define __printf0like(x, y)
+#endif /* !__printf0like */
 #ifndef __bounded__
 #define __bounded__(x, y, z)
 #endif /* !__bounded__ */
@@ -324,7 +421,6 @@
 #endif /* __SIZEOF_POINTER__ != ... */
 
 /* __SYSCALL_WORDSIZE = __SIZEOF_SYSCALL_LONG_T__ * __CHAR_BIT__ */
-#include <bits/typesizes.h>
 #if __SIZEOF_SYSCALL_LONG_T__ == 1
 #define __SYSCALL_WORDSIZE 8
 #elif __SIZEOF_SYSCALL_LONG_T__ == 2

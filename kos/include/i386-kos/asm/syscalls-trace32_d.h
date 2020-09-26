@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7fec1fe */
+/* HASH CRC-32:0xfae1b91e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_NAMES
 #ifndef __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES
-#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES 1
+#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES
 #define __NR32AN0_exit                         exit_code
 #define __NR32AN0_read                         fd
 #define __NR32AN1_read                         buf
@@ -1190,7 +1190,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_FORMAT
 #ifndef __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT
-#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1
+#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT
 #define __NR32RTR_restart_syscall               SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_exit                         SC_REPR_EXIT_STATUS                                                  /* exit_code */ 
 #define __NR32RTR_exit                          SC_REPR_SIGHANDLER_T                                                 /* return */
@@ -2967,25 +2967,25 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE
 #ifndef __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE
-#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE 1
-#define __NR32DW1__llseek         1
-#define __NR32DW3_pread64         1
-#define __NR32DW3_pwrite64        1
-#define __NR32DW1_truncate64      1
-#define __NR32DW1_ftruncate64     1
-#define __NR32DW1_readahead       1
-#define __NR32DW1_sync_file_range 1
-#define __NR32DW2_sync_file_range 1
-#define __NR32DW3_preadv          1
-#define __NR32DW3_pwritev         1
-#define __NR32DW3_pwritevf        1
-#define __NR32DW3_preadvf         1
-#define __NR32DW2_fallocate64     1
-#define __NR32DW3_fallocate64     1
-#define __NR32DW3_pwrite64f       1
-#define __NR32DW3_pread64f        1
-#define __NR32DW0_fsmode          1
-#define __NR32DW1_lseek64         1
+#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE
+#define __NR32DW1__llseek
+#define __NR32DW3_pread64
+#define __NR32DW3_pwrite64
+#define __NR32DW1_truncate64
+#define __NR32DW1_ftruncate64
+#define __NR32DW1_readahead
+#define __NR32DW1_sync_file_range
+#define __NR32DW2_sync_file_range
+#define __NR32DW3_preadv
+#define __NR32DW3_pwritev
+#define __NR32DW3_pwritevf
+#define __NR32DW3_preadvf
+#define __NR32DW2_fallocate64
+#define __NR32DW3_fallocate64
+#define __NR32DW3_pwrite64f
+#define __NR32DW3_pread64f
+#define __NR32DW0_fsmode
+#define __NR32DW1_lseek64
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE */
 #endif /* __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE */
 

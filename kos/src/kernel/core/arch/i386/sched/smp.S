@@ -117,7 +117,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	intr_enter INTR
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 #else /* __x86_64__ */
-	ASM_PUSH_ICPUSTATE_AFTER_HM_IRET_CFI_R
+	ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R
 	/* Load kernel-space segments. */
 	movw   $(SEGMENT_USER_DATA_RPL), %ax
 	movw   %ax, %ds
@@ -187,7 +187,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 
 .Lipi_resume:
 	.cfi_remember_state
-	ASM_POP_ICPUSTATE_BEFORE_HM_IRET_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_HW_IRET_CFI_R
 	RETURN_FROM_INTERRUPT
 	.cfi_restore_state
 .Lipi_switch_tasks:
@@ -1153,7 +1153,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	call   x86_serve_ipi
 	movP   %Pax, %Psp
 
-	ASM_POP_ICPUSTATE_BEFORE_HM_IRET_CFI_R
+	ASM_POP_ICPUSTATE_BEFORE_HW_IRET_CFI_R
 	RETURN_FROM_INTERRUPT
 	.cfi_endproc
 #ifdef __x86_64__
@@ -1190,7 +1190,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	ASM_PUSH_SGBASE_CFI_R
 	ASM_PUSH_SGREGS_CFI_R(%rax)
 #else /* __x86_64__ */
-	ASM_PUSH_SCPUSTATE_AFTER_HM_IRET_CFI_R
+	ASM_PUSH_SCPUSTATE_AFTER_HW_IRET_CFI_R
 #endif /* !__x86_64__ */
 
 #ifdef CONFIG_FPU

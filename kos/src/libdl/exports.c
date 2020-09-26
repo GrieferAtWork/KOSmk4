@@ -30,20 +30,18 @@
 
 DECL_BEGIN
 
-#define FAKEDATA ATTR_SECTION(".fakedata")
-
 #undef environ
 #undef _environ
 #undef __environ
-PUBLIC FAKEDATA char **environ = NULL;
+PUBLIC ATTR_SECTION(".fakedata") char **environ = NULL;
 DEFINE_PUBLIC_ALIAS(_environ, environ);
 DEFINE_PUBLIC_ALIAS(__environ, environ);
 
-PUBLIC FAKEDATA struct process_peb __peb = { 0 };
-PUBLIC FAKEDATA size_t __argc = 0;
-PUBLIC FAKEDATA char **__argv = NULL;
-PUBLIC FAKEDATA char *program_invocation_name = NULL;
-PUBLIC FAKEDATA char *program_invocation_short_name = NULL;
+PUBLIC ATTR_SECTION(".fakedata") struct process_peb __peb = { 0 };
+PUBLIC ATTR_SECTION(".fakedata") size_t __argc = 0;
+PUBLIC ATTR_SECTION(".fakedata") char **__argv = NULL;
+PUBLIC ATTR_SECTION(".fakedata") char *program_invocation_name = NULL;
+PUBLIC ATTR_SECTION(".fakedata") char *program_invocation_short_name = NULL;
 DEFINE_PUBLIC_ALIAS(_pgmptr, program_invocation_name);
 DEFINE_PUBLIC_ALIAS(__progname_full, program_invocation_name);
 DEFINE_PUBLIC_ALIAS(__progname, program_invocation_short_name);

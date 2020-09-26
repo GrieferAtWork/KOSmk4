@@ -1781,7 +1781,7 @@ function generateKosSyscallHeader(
 	fp << "#endif\n";
 	fp << "#define __CDECLARE_XSC(attr, Treturn, name, param, args) __CDECLARE(attr,Treturn,,sys_X##name,param,args)\n";
 	fp << "#define __CDECLARE_VOID_XSC(attr, name, param, args)     __CDECLARE_VOID(attr,,sys_X##name,param,args)\n";
-	fp << "#define __PRIVATE_CRT_HAVE_PLACEHOLDER_1         ,\n";
+	fp << "#define __PRIVATE_CRT_HAVE_PLACEHOLDER_ ,\n";
 	fp << "#define __PRIVATE_CRT_HAVE_ARG_IMPL(x, val, ...) val\n";
 	fp << "#define __PRIVATE_CRT_HAVE_ARG(x)  __PRIVATE_CRT_HAVE_ARG_IMPL x\n";
 	fp << "#define __PRIVATE_CRT_HAVE3(...)   __PRIVATE_CRT_HAVE_ARG((__VA_ARGS__ 1,0))\n";
@@ -1807,10 +1807,10 @@ function generateCrtFeaturesCrtKosSyscallsHeader(
 	fp << copyright << "\n";
 	availableSystemCalls = availableSystemCalls.sorted();
 	for (local sc: availableSystemCalls)
-		fp << "#define __CRT_HAVE_sys_" << sc.name << " 1\n";
+		fp << "#define __CRT_HAVE_sys_" << sc.name << "\n";
 	for (local sc: availableSystemCalls) {
 		if (!sc.isNoExcept)
-			fp << "#define __CRT_HAVE_sys_X" << sc.name << " 1\n";
+			fp << "#define __CRT_HAVE_sys_X" << sc.name << "\n";
 	}
 }
 
@@ -1950,7 +1950,7 @@ function generateAsmSyscallsHeaders(
 	printMessageBox(fp, "SYSCALL RESTART MODES");
 	fp << "#ifdef __WANT_SYSCALL_RESTART_MODES\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_RESTART_MODES\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_RESTART_MODES 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_RESTART_MODES\n";
 	fp << "/* Restart modes:\n";
 	fp << " * " << FUNCTION_RESTART_MODE_AUTO << " (auto):\n";
 	fp << " *   - Always restart after an `E_INTERRUPT_USER_RPC'\n";
@@ -1994,17 +1994,16 @@ function generateAsmSyscallsHeaders(
 	printMessageBox(fp, "SYSCALL CANCELLATION POINTS");
 	fp << "#ifdef __WANT_SYSCALL_CANCELLATION_POINTS\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS\n";
 	local isFirst = true;
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		if (f.isCp) {
 			if (isFirst) {
-				fp << "#define " << prefix << "FEAT_HAVE_CANCELLATION_POINTS 1\n";
+				fp << "#define " << prefix << "FEAT_HAVE_CANCELLATION_POINTS\n";
 				isFirst = false;
 			}
-			fp << "#define " << prefix << "CP_" << f.name << " " * (longestNameLen - #f.name);
-			fp << " 1\n";
+			fp << "#define " << prefix << "CP_" << f.name << "\n";
 		}
 	}
 	fp << "#endif /* !" << prefix << "FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS */\n";
@@ -2014,7 +2013,7 @@ function generateAsmSyscallsHeaders(
 	printMessageBox(fp, "SYSCALL REGISTER COUNT");
 	fp << "#ifdef __WANT_SYSCALL_REGISTER_COUNT\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_REGISTER_COUNT\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_REGISTER_COUNT 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_REGISTER_COUNT\n";
 	fp << "#define " << prefix << "FEAT_SYSCALL_REGISTER_MAX_COUNT " << arch.platformSyscallRegisterCount << "\n";
 	fp << "#define " << prefix << "FEAT_SYSCALL_REGISTER_BITS " << arch.platformGpRegisterSizeInBits << "\n";
 	for (local sysno: ids) {
@@ -2035,7 +2034,7 @@ function generateAsmSyscallsHeaders(
 	printMessageBox(fp, "SYSCALL DOUBLE WIDE RETURN VALUE");
 	fp << "#ifdef __WANT_SYSCALL_DOUBLE_WIDE_RETURN\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN\n";
 	local isFirst = true;
 	if (arch.platformGpRegisterSizeInBits != 0) {
 		for (local sysno: ids) {
@@ -2043,11 +2042,10 @@ function generateAsmSyscallsHeaders(
 			if ((f.returnType.isReg128 && arch.platformGpRegisterSizeInBits < 128) ||
 			    (f.returnType.isReg64 && arch.platformGpRegisterSizeInBits < 64)) {
 				if (isFirst) {
-					fp << "#define " << prefix << "FEAT_HAVE_DOUBLE_WIDE 1\n";
+					fp << "#define " << prefix << "FEAT_HAVE_DOUBLE_WIDE\n";
 					isFirst = false;
 				}
-				fp << "#define " << prefix << "DW_" << f.name << " " * (longestNameLen - #f.name);
-				fp << " 1\n";
+				fp << "#define " << prefix << "DW_" << f.name << "\n";
 			}
 		}
 	}
@@ -2073,17 +2071,16 @@ function generateAsmSyscallsProtoHeader(
 	printMessageBox(fp, "SYSCALL NORETURN ATTRIBUTE");
 	fp << "#ifdef __WANT_SYSCALL_ATTR_NORETURN\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ATTR_NORETURN\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ATTR_NORETURN 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ATTR_NORETURN\n";
 	local isFirst = true;
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		if (f.isNoReturn) {
 			if (isFirst) {
-				fp << "#define " << prefix << "FEAT_HAVE_ATTR_NORETURN 1\n";
+				fp << "#define " << prefix << "FEAT_HAVE_ATTR_NORETURN\n";
 				isFirst = false;
 			}
-			fp << "#define " << prefix << "NT_" << f.name << " " * (longestNameLen - #f.name);
-			fp << " 1\n";
+			fp << "#define " << prefix << "NT_" << f.name << "\n";
 		}
 	}
 	fp << "#endif /* !" << prefix << "FEAT_DEFINED_SYSCALL_ATTR_NORETURN */\n";
@@ -2093,7 +2090,7 @@ function generateAsmSyscallsProtoHeader(
 	printMessageBox(fp, "SYSCALL ARGUMENT COUNT");
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_COUNT\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT\n";
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		fp << "#define " << prefix << "AC_" << f.name << " " * (longestNameLen - #f.name);
@@ -2106,7 +2103,7 @@ function generateAsmSyscallsProtoHeader(
 	printMessageBox(fp, "SYSCALL RETURN TYPES");
 	fp << "#ifdef __WANT_SYSCALL_RETURN_TYPES\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_RETURN_TYPES\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_RETURN_TYPES 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_RETURN_TYPES\n";
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		fp << "#define " << prefix << "RT_" << f.name << " " * (longestNameLen - #f.name);
@@ -2119,7 +2116,7 @@ function generateAsmSyscallsProtoHeader(
 	printMessageBox(fp, "SYSCALL ARGUMENT TYPES");
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_TYPES\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES\n";
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		for (local i, a: util.enumerate(f.args)) {
@@ -2135,7 +2132,7 @@ function generateAsmSyscallsProtoHeader(
 	printMessageBox(fp, "SYSCALL ARGUMENT LIST MAKING");
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_LIST_MAKER\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER\n";
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		local args = [ABC[:arch.platformSyscallRegisterCount]...];
@@ -2202,7 +2199,7 @@ function generateAsmSyscallsProtoHeader(
 	printMessageBox(fp, "SYSCALL ARGUMENT LIST PACKING");
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_LIST_PACKER\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER\n";
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		local args = [ABC[:arch.platformSyscallRegisterCount]...];
@@ -2290,7 +2287,7 @@ function generateAsmSyscallsTraceHeader(
 		.format({ "prefix" : prefix }));
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_NAMES\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES\n";
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
 		for (local i, a: util.enumerate(f.args)) {
@@ -2310,7 +2307,7 @@ function generateAsmSyscallsTraceHeader(
 		.format({ "prefix" : prefix }));
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_FORMAT\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT\n";
 	local longestReprTypeLen = 0;
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
@@ -2384,7 +2381,7 @@ function generateAsmSyscallsTraceHeader(
 	printMessageBox(fp, "SYSCALL ARGUMENT DOUBLE WIDE");
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE\n";
-	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE 1\n";
+	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE\n";
 	local doubleWideMacros = List();
 	for (local sysno: ids) {
 		local f: Function = context.functions[context.sysidMappings[sysno][2]];
@@ -2399,7 +2396,7 @@ function generateAsmSyscallsTraceHeader(
 	}
 	local longestDoubleWideName = doubleWideMacros.each.length > ...;
 	for (local x: doubleWideMacros)
-		fp << "#define " << x << (" " * (longestDoubleWideName - #x)) << " 1\n";
+		fp << "#define " << x << "\n";
 	fp << "#endif /* !" << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_DOUBLE_WIDE */\n";
 	fp << "#endif /* __WANT_SYSCALL_ARGUMENT_DOUBLE_WIDE */\n";
 	fp << "\n";
@@ -2437,14 +2434,14 @@ function generateAsmSyscallsTypesHeader(
 	if (usedReprTypes) {
 		fp << "#ifdef __WANT_HAVE_SYSCALL_ARGUMENT_REPR_TYPES\n";
 		for (local typ: usedReprTypes.sorted())
-			fp << "#define HAVE_" << SC_REPR_PREFIX << typ << " 1\n";
+			fp << "#define HAVE_" << SC_REPR_PREFIX << typ << "\n";
 		fp << "#endif /* __WANT_HAVE_SYSCALL_ARGUMENT_REPR_TYPES */\n";
 		fp << "\n";
 	}
 	if (usedReturnReprTypes) {
 		fp << "#ifdef __WANT_HAVE_SYSCALL_RETURN_REPR_TYPES\n";
 		for (local typ: usedReturnReprTypes.sorted())
-			fp << "#define HAVE_" << SC_REPR_PREFIX << typ << " 1\n";
+			fp << "#define HAVE_" << SC_REPR_PREFIX << typ << "\n";
 		fp << "#endif /* __WANT_HAVE_SYSCALL_RETURN_REPR_TYPES */\n";
 		fp << "\n";
 	}
@@ -2845,23 +2842,11 @@ function generateKosKernelSyscallsRequestHeader(fp: File,
 			requestedCompatFunctionNames.insert(name);
 	}
 	requestedCompatFunctionNames = requestedCompatFunctionNames.sorted();
-	local longestNameLen = requestedBaseFunctionNames.each.length > ...;
-	if (requestedCompatFunctionNames) {
-		local temp = requestedCompatFunctionNames.each.length > ...;
-		if (longestNameLen < temp)
-			longestNameLen = temp;
-	}
 	fp << "#ifndef __ARCH_WANT_SYSCALL_" << requestedBaseFunctionNames.first.upper() << "\n";
-	for (local n: requestedBaseFunctionNames) {
-		fp << "#define __ARCH_WANT_SYSCALL_" << n.upper();
-		if (requestedCompatFunctionNames)
-			fp << "       ";
-		fp << " " * (longestNameLen - #n) << " 1\n";
-	}
-	for (local n: requestedCompatFunctionNames) {
-		fp << "#define __ARCH_WANT_COMPAT_SYSCALL_" << n.upper();
-		fp << " " * (longestNameLen - #n) << " 1\n";
-	}
+	for (local n: requestedBaseFunctionNames)
+		fp << "#define __ARCH_WANT_SYSCALL_" << n.upper() << "\n";
+	for (local n: requestedCompatFunctionNames)
+		fp << "#define __ARCH_WANT_COMPAT_SYSCALL_" << n.upper() << "\n";
 	fp << "#endif /* !__ARCH_WANT_SYSCALL_" << requestedBaseFunctionNames.first.upper() << " */\n";
 }
 

@@ -33,7 +33,7 @@ import Function from .cheaders;
 
 /* How auto vs. user implementation is selected:
  * >> if (HAS_MAGIC_IMPLEMENTION_BODY) {
- * >>     if (HAS_ANNOTATION("crt_userimpl")) {
+ * >>     if (HAS_ANNOTATION("userimpl")) {
  * >>         return USE_USER_IMPL;
  * >>     } else {
  * >>         return USE_AUTO_IMPL;

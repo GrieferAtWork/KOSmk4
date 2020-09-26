@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x747cb78d */
+/* HASH CRC-32:0x31024302 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1289,7 +1289,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_RESTART_MODES
 #ifndef __NR64FEAT_DEFINED_SYSCALL_RESTART_MODES
-#define __NR64FEAT_DEFINED_SYSCALL_RESTART_MODES 1
+#define __NR64FEAT_DEFINED_SYSCALL_RESTART_MODES
 /* Restart modes:
  * 0 (auto):
  *   - Always restart after an `E_INTERRUPT_USER_RPC'
@@ -1730,150 +1730,150 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_CANCELLATION_POINTS
 #ifndef __NR64FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS
-#define __NR64FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS 1
-#define __NR64FEAT_HAVE_CANCELLATION_POINTS 1
-#define __NR64CP_read                     1
-#define __NR64CP_write                    1
-#define __NR64CP_open                     1
-#define __NR64CP_stat                     1
-#define __NR64CP_fstat                    1
-#define __NR64CP_lstat                    1
-#define __NR64CP_poll                     1
-#define __NR64CP_lseek                    1
-#define __NR64CP_ioctl                    1
-#define __NR64CP_pread64                  1
-#define __NR64CP_pwrite64                 1
-#define __NR64CP_readv                    1
-#define __NR64CP_writev                   1
-#define __NR64CP_access                   1
-#define __NR64CP_select                   1
-#define __NR64CP_msync                    1
-#define __NR64CP_pause                    1
-#define __NR64CP_nanosleep                1
-#define __NR64CP_sendfile                 1
-#define __NR64CP_connect                  1
-#define __NR64CP_accept                   1
-#define __NR64CP_sendto                   1
-#define __NR64CP_recvfrom                 1
-#define __NR64CP_sendmsg                  1
-#define __NR64CP_recvmsg                  1
-#define __NR64CP_execve                   1
-#define __NR64CP_wait4                    1
-#define __NR64CP_msgsnd                   1
-#define __NR64CP_msgrcv                   1
-#define __NR64CP_fcntl                    1
-#define __NR64CP_flock                    1
-#define __NR64CP_fsync                    1
-#define __NR64CP_fdatasync                1
-#define __NR64CP_getdents                 1
-#define __NR64CP_getcwd                   1
-#define __NR64CP_chdir                    1
-#define __NR64CP_fchdir                   1
-#define __NR64CP_rename                   1
-#define __NR64CP_mkdir                    1
-#define __NR64CP_creat                    1
-#define __NR64CP_link                     1
-#define __NR64CP_unlink                   1
-#define __NR64CP_symlink                  1
-#define __NR64CP_readlink                 1
-#define __NR64CP_chmod                    1
-#define __NR64CP_fchmod                   1
-#define __NR64CP_chown                    1
-#define __NR64CP_fchown                   1
-#define __NR64CP_lchown                   1
-#define __NR64CP_sysinfo                  1
-#define __NR64CP_syslog                   1
-#define __NR64CP_rt_sigtimedwait          1
-#define __NR64CP_rt_sigsuspend            1
-#define __NR64CP_utime                    1
-#define __NR64CP_mknod                    1
-#define __NR64CP_sync                     1
-#define __NR64CP_mount                    1
-#define __NR64CP_umount2                  1
-#define __NR64CP_getpmsg                  1
-#define __NR64CP_putpmsg                  1
-#define __NR64CP_setxattr                 1
-#define __NR64CP_lsetxattr                1
-#define __NR64CP_fsetxattr                1
-#define __NR64CP_getxattr                 1
-#define __NR64CP_lgetxattr                1
-#define __NR64CP_fgetxattr                1
-#define __NR64CP_listxattr                1
-#define __NR64CP_llistxattr               1
-#define __NR64CP_flistxattr               1
-#define __NR64CP_removexattr              1
-#define __NR64CP_lremovexattr             1
-#define __NR64CP_fremovexattr             1
-#define __NR64CP_futex                    1
-#define __NR64CP_epoll_wait_old           1
-#define __NR64CP_getdents64               1
-#define __NR64CP_clock_nanosleep          1
-#define __NR64CP_epoll_wait               1
-#define __NR64CP_utimes                   1
-#define __NR64CP_mq_timedsend             1
-#define __NR64CP_mq_timedreceive          1
-#define __NR64CP_waitid                   1
-#define __NR64CP_openat                   1
-#define __NR64CP_mkdirat                  1
-#define __NR64CP_mknodat                  1
-#define __NR64CP_fchownat                 1
-#define __NR64CP_futimesat                1
-#define __NR64CP_newfstatat               1
-#define __NR64CP_unlinkat                 1
-#define __NR64CP_renameat                 1
-#define __NR64CP_linkat                   1
-#define __NR64CP_symlinkat                1
-#define __NR64CP_readlinkat               1
-#define __NR64CP_fchmodat                 1
-#define __NR64CP_faccessat                1
-#define __NR64CP_pselect6                 1
-#define __NR64CP_ppoll                    1
-#define __NR64CP_splice                   1
-#define __NR64CP_tee                      1
-#define __NR64CP_sync_file_range          1
-#define __NR64CP_vmsplice                 1
-#define __NR64CP_utimensat                1
-#define __NR64CP_epoll_pwait              1
-#define __NR64CP_accept4                  1
-#define __NR64CP_preadv                   1
-#define __NR64CP_pwritev                  1
-#define __NR64CP_recvmmsg                 1
-#define __NR64CP_name_to_handle_at        1
-#define __NR64CP_open_by_handle_at        1
-#define __NR64CP_syncfs                   1
-#define __NR64CP_sendmmsg                 1
-#define __NR64CP_renameat2                1
-#define __NR64CP_execveat                 1
-#define __NR64CP_pwritevf                 1
-#define __NR64CP_preadvf                  1
-#define __NR64CP_freadlinkat              1
-#define __NR64CP_fsymlinkat               1
-#define __NR64CP_frenameat                1
-#define __NR64CP_kfstatat                 1
-#define __NR64CP_fmknodat                 1
-#define __NR64CP_fmkdirat                 1
-#define __NR64CP_ksysctl                  1
-#define __NR64CP_fchdirat                 1
-#define __NR64CP_kreaddirf                1
-#define __NR64CP_kreaddir                 1
-#define __NR64CP_lfutexlockexpr           1
-#define __NR64CP_lfutexexpr               1
-#define __NR64CP_lfutex                   1
-#define __NR64CP_rpc_service              1
-#define __NR64CP_writevf                  1
-#define __NR64CP_readvf                   1
-#define __NR64CP_pwrite64f                1
-#define __NR64CP_pread64f                 1
-#define __NR64CP_ioctlf                   1
-#define __NR64CP_frealpathat              1
-#define __NR64CP_frealpath4               1
-#define __NR64CP_readf                    1
-#define __NR64CP_klstat                   1
-#define __NR64CP_kfstat                   1
-#define __NR64CP_kstat                    1
-#define __NR64CP_hopf                     1
-#define __NR64CP_hop                      1
-#define __NR64CP_writef                   1
+#define __NR64FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS
+#define __NR64FEAT_HAVE_CANCELLATION_POINTS
+#define __NR64CP_read
+#define __NR64CP_write
+#define __NR64CP_open
+#define __NR64CP_stat
+#define __NR64CP_fstat
+#define __NR64CP_lstat
+#define __NR64CP_poll
+#define __NR64CP_lseek
+#define __NR64CP_ioctl
+#define __NR64CP_pread64
+#define __NR64CP_pwrite64
+#define __NR64CP_readv
+#define __NR64CP_writev
+#define __NR64CP_access
+#define __NR64CP_select
+#define __NR64CP_msync
+#define __NR64CP_pause
+#define __NR64CP_nanosleep
+#define __NR64CP_sendfile
+#define __NR64CP_connect
+#define __NR64CP_accept
+#define __NR64CP_sendto
+#define __NR64CP_recvfrom
+#define __NR64CP_sendmsg
+#define __NR64CP_recvmsg
+#define __NR64CP_execve
+#define __NR64CP_wait4
+#define __NR64CP_msgsnd
+#define __NR64CP_msgrcv
+#define __NR64CP_fcntl
+#define __NR64CP_flock
+#define __NR64CP_fsync
+#define __NR64CP_fdatasync
+#define __NR64CP_getdents
+#define __NR64CP_getcwd
+#define __NR64CP_chdir
+#define __NR64CP_fchdir
+#define __NR64CP_rename
+#define __NR64CP_mkdir
+#define __NR64CP_creat
+#define __NR64CP_link
+#define __NR64CP_unlink
+#define __NR64CP_symlink
+#define __NR64CP_readlink
+#define __NR64CP_chmod
+#define __NR64CP_fchmod
+#define __NR64CP_chown
+#define __NR64CP_fchown
+#define __NR64CP_lchown
+#define __NR64CP_sysinfo
+#define __NR64CP_syslog
+#define __NR64CP_rt_sigtimedwait
+#define __NR64CP_rt_sigsuspend
+#define __NR64CP_utime
+#define __NR64CP_mknod
+#define __NR64CP_sync
+#define __NR64CP_mount
+#define __NR64CP_umount2
+#define __NR64CP_getpmsg
+#define __NR64CP_putpmsg
+#define __NR64CP_setxattr
+#define __NR64CP_lsetxattr
+#define __NR64CP_fsetxattr
+#define __NR64CP_getxattr
+#define __NR64CP_lgetxattr
+#define __NR64CP_fgetxattr
+#define __NR64CP_listxattr
+#define __NR64CP_llistxattr
+#define __NR64CP_flistxattr
+#define __NR64CP_removexattr
+#define __NR64CP_lremovexattr
+#define __NR64CP_fremovexattr
+#define __NR64CP_futex
+#define __NR64CP_epoll_wait_old
+#define __NR64CP_getdents64
+#define __NR64CP_clock_nanosleep
+#define __NR64CP_epoll_wait
+#define __NR64CP_utimes
+#define __NR64CP_mq_timedsend
+#define __NR64CP_mq_timedreceive
+#define __NR64CP_waitid
+#define __NR64CP_openat
+#define __NR64CP_mkdirat
+#define __NR64CP_mknodat
+#define __NR64CP_fchownat
+#define __NR64CP_futimesat
+#define __NR64CP_newfstatat
+#define __NR64CP_unlinkat
+#define __NR64CP_renameat
+#define __NR64CP_linkat
+#define __NR64CP_symlinkat
+#define __NR64CP_readlinkat
+#define __NR64CP_fchmodat
+#define __NR64CP_faccessat
+#define __NR64CP_pselect6
+#define __NR64CP_ppoll
+#define __NR64CP_splice
+#define __NR64CP_tee
+#define __NR64CP_sync_file_range
+#define __NR64CP_vmsplice
+#define __NR64CP_utimensat
+#define __NR64CP_epoll_pwait
+#define __NR64CP_accept4
+#define __NR64CP_preadv
+#define __NR64CP_pwritev
+#define __NR64CP_recvmmsg
+#define __NR64CP_name_to_handle_at
+#define __NR64CP_open_by_handle_at
+#define __NR64CP_syncfs
+#define __NR64CP_sendmmsg
+#define __NR64CP_renameat2
+#define __NR64CP_execveat
+#define __NR64CP_pwritevf
+#define __NR64CP_preadvf
+#define __NR64CP_freadlinkat
+#define __NR64CP_fsymlinkat
+#define __NR64CP_frenameat
+#define __NR64CP_kfstatat
+#define __NR64CP_fmknodat
+#define __NR64CP_fmkdirat
+#define __NR64CP_ksysctl
+#define __NR64CP_fchdirat
+#define __NR64CP_kreaddirf
+#define __NR64CP_kreaddir
+#define __NR64CP_lfutexlockexpr
+#define __NR64CP_lfutexexpr
+#define __NR64CP_lfutex
+#define __NR64CP_rpc_service
+#define __NR64CP_writevf
+#define __NR64CP_readvf
+#define __NR64CP_pwrite64f
+#define __NR64CP_pread64f
+#define __NR64CP_ioctlf
+#define __NR64CP_frealpathat
+#define __NR64CP_frealpath4
+#define __NR64CP_readf
+#define __NR64CP_klstat
+#define __NR64CP_kfstat
+#define __NR64CP_kstat
+#define __NR64CP_hopf
+#define __NR64CP_hop
+#define __NR64CP_writef
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_CANCELLATION_POINTS */
 #endif /* __WANT_SYSCALL_CANCELLATION_POINTS */
 
@@ -1883,7 +1883,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_REGISTER_COUNT
 #ifndef __NR64FEAT_DEFINED_SYSCALL_REGISTER_COUNT
-#define __NR64FEAT_DEFINED_SYSCALL_REGISTER_COUNT 1
+#define __NR64FEAT_DEFINED_SYSCALL_REGISTER_COUNT
 #define __NR64FEAT_SYSCALL_REGISTER_MAX_COUNT 6
 #define __NR64FEAT_SYSCALL_REGISTER_BITS 64
 #define __NR64RC_read                     3
@@ -2295,7 +2295,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_DOUBLE_WIDE_RETURN
 #ifndef __NR64FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN
-#define __NR64FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN 1
+#define __NR64FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN
 #endif /* !__NR64FEAT_DEFINED_SYSCALL_DOUBLE_WIDE_RETURN */
 #endif /* __WANT_SYSCALL_DOUBLE_WIDE_RETURN */
 

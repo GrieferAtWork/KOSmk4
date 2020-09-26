@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7657362 */
+/* HASH CRC-32:0xafdbdfe8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ATTR_NORETURN
 #ifndef __NR32FEAT_DEFINED_SYSCALL_ATTR_NORETURN
-#define __NR32FEAT_DEFINED_SYSCALL_ATTR_NORETURN 1
-#define __NR32FEAT_HAVE_ATTR_NORETURN 1
-#define __NR32NT_exit                         1
-#define __NR32NT_exit_group                   1
+#define __NR32FEAT_DEFINED_SYSCALL_ATTR_NORETURN
+#define __NR32FEAT_HAVE_ATTR_NORETURN
+#define __NR32NT_exit
+#define __NR32NT_exit_group
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_ATTR_NORETURN */
 #endif /* __WANT_SYSCALL_ATTR_NORETURN */
 
@@ -37,7 +37,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_COUNT
 #ifndef __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
-#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT 1
+#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
 #define __NR32AC_restart_syscall              0
 #define __NR32AC_exit                         1
 #define __NR32AC_fork                         0
@@ -542,7 +542,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_RETURN_TYPES
 #ifndef __NR32FEAT_DEFINED_SYSCALL_RETURN_TYPES
-#define __NR32FEAT_DEFINED_SYSCALL_RETURN_TYPES 1
+#define __NR32FEAT_DEFINED_SYSCALL_RETURN_TYPES
 #define __NR32RT_restart_syscall              (errno_t, __errno_t)
 #define __NR32RT_exit                         (void, void)
 #define __NR32RT_fork                         (pid_t, __pid_t)
@@ -1047,7 +1047,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_TYPES
 #ifndef __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
-#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES 1
+#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
 #define __NR32AT0_exit                         (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_read                         (fd_t, __fd_t)
 #define __NR32AT1_read                         (void *, void *)
@@ -2209,7 +2209,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_MAKER
 #ifndef __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
-#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER 1
+#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
 #define __NR32AM_restart_syscall(a, b, c, d, e, f)              /* nothing */
 #define __NR32AM_exit(a, b, c, d, e, f)                         (__syscall_ulong_t)a
 #define __NR32AM_fork(a, b, c, d, e, f)                         /* nothing */
@@ -2714,7 +2714,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_PACKER
 #ifndef __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
-#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER 1
+#define __NR32FEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
 #define __NR32AP_restart_syscall()                              /* nothing */
 #define __NR32AP_exit(a)                                        (__syscall_ulong_t)a
 #define __NR32AP_fork()                                         /* nothing */

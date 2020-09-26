@@ -1092,16 +1092,16 @@ DEFINE_LIBRARY_OPEN(open_libdebuginfo, pdyn_libdebuginfo, LIBDEBUGINFO_LIBRARY_N
 DEFINE_LIBRARY_OPEN(open_libdisasm, pdyn_libdisasm, LIBDISASM_LIBRARY_NAME)
 #undef DEFINE_LIBRARY_OPEN
 
-PRIVATE PDEBUG_ADDR2LINE_SECTIONS_LOCK     pdyn_debug_addr2line_sections_lock     = NULL;
-PRIVATE PDEBUG_ADDR2LINE_SECTIONS_UNLOCK   pdyn_debug_addr2line_sections_unlock   = NULL;
-PRIVATE PDEBUG_ADDR2LINE pdyn_debug_addr2line = NULL;
-PRIVATE PINSTRUCTION_PRED_NX      pdyn_instruction_pred_nx      = NULL;
-PRIVATE PDISASM_SINGLE            pdyn_disasm_single            = NULL;
-#define debug_addr2line_sections_lock     (*pdyn_debug_addr2line_sections_lock)
-#define debug_addr2line_sections_unlock   (*pdyn_debug_addr2line_sections_unlock)
-#define debug_addr2line (*pdyn_debug_addr2line)
-#define instruction_pred_nx      (*pdyn_instruction_pred_nx)
-#define disasm_single            (*pdyn_disasm_single)
+PRIVATE PDEBUG_ADDR2LINE_SECTIONS_LOCK /*  */ pdyn_debug_addr2line_sections_lock   = NULL;
+PRIVATE PDEBUG_ADDR2LINE_SECTIONS_UNLOCK /**/ pdyn_debug_addr2line_sections_unlock = NULL;
+PRIVATE PDEBUG_ADDR2LINE /*                */ pdyn_debug_addr2line                 = NULL;
+PRIVATE PINSTRUCTION_PRED_NX /*            */ pdyn_instruction_pred_nx             = NULL;
+PRIVATE PDISASM_SINGLE /*                  */ pdyn_disasm_single                   = NULL;
+#define debug_addr2line_sections_lock   (*pdyn_debug_addr2line_sections_lock)
+#define debug_addr2line_sections_unlock (*pdyn_debug_addr2line_sections_unlock)
+#define debug_addr2line                 (*pdyn_debug_addr2line)
+#define instruction_pred_nx             (*pdyn_instruction_pred_nx)
+#define disasm_single                   (*pdyn_disasm_single)
 
 #define ENSURE_LIBINSTRLEN() ensure_libinstrlen()
 PRIVATE bool CC ensure_libinstrlen(void) {

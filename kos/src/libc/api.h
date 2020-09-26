@@ -20,12 +20,14 @@
 #ifndef GUARD_LIBC_API_H
 #define GUARD_LIBC_API_H 1
 
-#define __BUILDING_LIBC   1
-#define __CRT_KOS_PRIMARY 1
-#define __CRT_KOS         1
+#ifndef __BUILDING_LIBC
+#define __BUILDING_LIBC
+#endif /* !__BUILDING_LIBC */
+#define __CRT_KOS_PRIMARY
+#define __CRT_KOS
 #ifdef __KERNEL__
-#define __CRT_KOS_KERNEL 1
-#define __NO_STDSTREAMS  1
+#define __CRT_KOS_KERNEL
+#define __NO_STDSTREAMS
 #endif /* __KERNEL__ */
 
 #ifndef __OPTIMIZE_SIZE__
@@ -35,7 +37,7 @@
  * NOTE: When optimizing for size, we don't do this, in which case system calls used
  *       by libc library functions get linked against the system call wrappers that
  *       are always exported from libc unconditionally. */
-#define __WANT_INLINE_SYSCALLS 1
+#define __WANT_INLINE_SYSCALLS
 #endif /* !__OPTIMIZE_SIZE__ */
 
 

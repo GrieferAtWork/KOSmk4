@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef2a71c9 */
+/* HASH CRC-32:0xe61234a9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ATTR_NORETURN
 #ifndef __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN
-#define __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN 1
-#define __NRFEAT_HAVE_ATTR_NORETURN 1
-#define __NRNT_exit                     1
-#define __NRNT_exit_group               1
+#define __NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN
+#define __NRFEAT_HAVE_ATTR_NORETURN
+#define __NRNT_exit
+#define __NRNT_exit_group
 #endif /* !__NRFEAT_DEFINED_SYSCALL_ATTR_NORETURN */
 #endif /* __WANT_SYSCALL_ATTR_NORETURN */
 
@@ -37,7 +37,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_COUNT
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
 #define __NRAC_read                     3
 #define __NRAC_write                    3
 #define __NRAC_open                     3
@@ -447,7 +447,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_RETURN_TYPES
 #ifndef __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES
-#define __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES 1
+#define __NRFEAT_DEFINED_SYSCALL_RETURN_TYPES
 #define __NRRT_read                     (ssize_t, __ssize_t)
 #define __NRRT_write                    (ssize_t, __ssize_t)
 #define __NRRT_open                     (fd_t, __fd_t)
@@ -857,7 +857,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_TYPES
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
 #define __NRAT0_read                     (fd_t, __fd_t)
 #define __NRAT1_read                     (void *, void *)
 #define __NRAT2_read                     (size_t, __size_t)
@@ -1806,7 +1806,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_MAKER
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_MAKER
 #define __NRAM_read(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c
 #define __NRAM_write(a, b, c, d, e, f)                    (__fd_t)a, (void const *)b, (__size_t)c
 #define __NRAM_open(a, b, c, d, e, f)                     (char const *)a, (__oflag_t)b, (__mode_t)c
@@ -2216,7 +2216,7 @@
 /************************************************************************/
 #ifdef __WANT_SYSCALL_ARGUMENT_LIST_PACKER
 #ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
-#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER 1
+#define __NRFEAT_DEFINED_SYSCALL_ARGUMENT_LIST_PACKER
 #define __NRAP_read(a, b, c)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_write(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_open(a, b, c)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

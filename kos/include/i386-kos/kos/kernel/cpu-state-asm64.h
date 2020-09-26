@@ -362,11 +362,11 @@
 
 /* Push everything necessary to create an `icpustate'
  * from an `irregs' structure onto the stack. */
-#define ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R  \
+#define ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R \
 	ASM_PUSH_GPREGSNSP_CFI_R
 
 /* Do the reverse of `ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R' */
-#define ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R  \
+#define ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R \
 	ASM_POP_GPREGSNSP_CFI_R
 
 /* Same as `ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R', but must
@@ -378,8 +378,8 @@
 #define ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R \
 	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
 
-/* Do the reverse of `ASM_PUSH_ICPUSTATE_AFTER_HM_IRET_CFI_R' */
-#define ASM_POP_ICPUSTATE_BEFORE_HM_IRET_CFI_R \
+/* Do the reverse of `ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R' */
+#define ASM_POP_ICPUSTATE_BEFORE_HW_IRET_CFI_R \
 	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
 
 /* Push everything necessary to create an `scpustate'
@@ -390,12 +390,28 @@
 	ASM_PUSH_SGBASE_CFI_R                   \
 	ASM_PUSH_SGREGS_CFI_R(%rax)
 
+/* Do the reverse of `ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R' */
+#define ASM_POP_SCPUSTATE_BEFORE_IRET_CFI_R \
+	ASM_POP_SGREGS_CFI_R(%rax)              \
+	ASM_POP_SGBASE_CFI_R                    \
+	ASM_POP_GPREGSNSP_CFI_R
+
 /* Push everything necessary to create an `scpustate'
  * from an `icpustate' structure onto the stack.
  * CLOBBER: %rax, %rcx, %rdx and %rflags */
 #define ASM_PUSH_SCPUSTATE_AFTER_ICPUSTATE_CFI_R \
 	ASM_PUSH_SGBASE_CFI_R                        \
 	ASM_PUSH_SGREGS_CFI_R(%rax)
+
+/* Push everything necessary to create an `scpustate'
+ * from an hardware-`irregs' structure onto the stack. */
+#define ASM_PUSH_SCPUSTATE_AFTER_HW_IRET_CFI_R \
+	ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R
+
+/* Do the reverse of `ASM_PUSH_SCPUSTATE_AFTER_HW_IRET_CFI_R' */
+#define ASM_POP_SCPUSTATE_BEFORE_HW_IRET_CFI_R \
+	ASM_POP_SCPUSTATE_BEFORE_IRET_CFI_R
+
 
 /* Push everything necessary to create an `kcpustate'.
  * This macro assumes that before being used, `%rip' already exists in `0(%rsp)'.

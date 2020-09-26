@@ -139,7 +139,7 @@
  * A special macro is needed for this case, due to the fact
  * that in case of a vm86 IRET tail, unwinding of segment
  * registers has to be altered. */
-#define ASM_PUSH_ICPUSTATE_AFTER_HM_IRET_CFI_R  \
+#define ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R  \
 	__ASM_L(pushl_cfi %ds)                      \
 	__ASM_L(.cfi_restore_iret_ds_or_offset -4)  \
 	__ASM_L(pushl_cfi %es)                      \
@@ -148,8 +148,8 @@
 	__ASM_L(.cfi_restore_iret_fs_or_offset -12) \
 	__ASM_L(pushal_cfi_r)
 
-/* Do the reverse of `ASM_PUSH_ICPUSTATE_AFTER_HM_IRET_CFI_R' */
-#define ASM_POP_ICPUSTATE_BEFORE_HM_IRET_CFI_R \
+/* Do the reverse of `ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R' */
+#define ASM_POP_ICPUSTATE_BEFORE_HW_IRET_CFI_R \
 	__ASM_L(popal_cfi_r)                       \
 	__ASM_L(popl_cfi %fs)                      \
 	__ASM_L(.cfi_restore_iret_fs)              \
@@ -161,7 +161,7 @@
 
 /* Push everything necessary to create an `scpustate'
  * from an hardware-`irregs' structure onto the stack. */
-#define ASM_PUSH_SCPUSTATE_AFTER_HM_IRET_CFI_R  \
+#define ASM_PUSH_SCPUSTATE_AFTER_HW_IRET_CFI_R  \
 	__ASM_L(pushl_cfi %ds)                      \
 	__ASM_L(.cfi_restore_iret_ds_or_offset -4)  \
 	__ASM_L(pushl_cfi %es)                      \
@@ -171,6 +171,18 @@
 	__ASM_L(pushl_cfi %gs)                      \
 	__ASM_L(.cfi_restore_iret_fs_or_offset -16) \
 	__ASM_L(pushal_cfi_r)
+
+/* Do the reverse of `ASM_PUSH_SCPUSTATE_AFTER_HW_IRET_CFI_R' */
+#define ASM_POP_SCPUSTATE_BEFORE_HW_IRET_CFI_R \
+	__ASM_L(popal_cfi_r)                       \
+	__ASM_L(popl_cfi %gs)                      \
+	__ASM_L(.cfi_restore_iret_gs)              \
+	__ASM_L(popl_cfi %fs)                      \
+	__ASM_L(.cfi_restore_iret_fs)              \
+	__ASM_L(popl_cfi %es)                      \
+	__ASM_L(.cfi_restore_iret_es)              \
+	__ASM_L(popl_cfi %ds)                      \
+	__ASM_L(.cfi_restore_iret_ds)
 
 
 #endif /* __i386__ && !__x86_64__ */

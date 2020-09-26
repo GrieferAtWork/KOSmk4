@@ -19,61 +19,65 @@
  */
 
 
-#if 1 || defined(_MSC_VER) || defined(__GNUC__) || \
-    defined(__TPP_VERSION__) || defined(__DCC_VERSION__) || \
-    defined(__DEEMON__)
-#define __PREPROCESSOR_HAVE_CAT     1 /* #define CAT(a, b) a##b */
-#define __PREPROCESSOR_HAVE_STR     1 /* #define STR(x) #x */
-#define __PREPROCESSOR_HAVE_VA_ARGS 1 /* __VA_ARGS__ */
-#endif
-#if !defined(__INTELLISENSE__) && \
-    (defined(__TPP_VERSION__) || defined(__GNUC__))
-#define __PREPROCESSOR_HAVE_INCLUDE_NEXT 1 /* #include_next */
-#define __PREPROCESSOR_HAVE_WARNING      1 /* #warning "foo" */
-#endif
+#if (1 || defined(_MSC_VER) || defined(__GNUC__) ||          \
+     defined(__TPP_VERSION__) || defined(__DCC_VERSION__) || \
+     defined(__DEEMON__))
+#define __PREPROCESSOR_HAVE_CAT     /* #define CAT(a, b) a##b */
+#define __PREPROCESSOR_HAVE_STR     /* #define STR(x) #x */
+#define __PREPROCESSOR_HAVE_VA_ARGS /* __VA_ARGS__ */
+#endif /* ... */
+#if (!defined(__INTELLISENSE__) && \
+     (defined(__TPP_VERSION__) || defined(__GNUC__)))
+#define __PREPROCESSOR_HAVE_INCLUDE_NEXT /* #include_next */
+#define __PREPROCESSOR_HAVE_WARNING      /* #warning "foo" */
+#endif /* ... */
 #if defined(_MSC_VER) || defined(__TPP_VERSION__)
-#define __PREPROCESSOR_HAVE_PRAGMA_WARNING 1 /* #pragma warning("foo") */
-#endif
+#define __PREPROCESSOR_HAVE_PRAGMA_WARNING /* #pragma warning("foo") */
+#endif /* ... */
 
 
 #ifdef __PREPROCESSOR_HAVE_STR
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
-#   define __PP_PRIVATE_STR(...) #__VA_ARGS__
-#   define __PP_STR(...) __PP_PRIVATE_STR(__VA_ARGS__)
-#else
-#   define __PP_PRIVATE_STR(x) #x
-#   define __PP_STR(x) __PP_PRIVATE_STR(x)
-#endif
+#define __PP_PRIVATE_STR(...) #__VA_ARGS__
+#define __PP_STR(...)         __PP_PRIVATE_STR(__VA_ARGS__)
+#else /* ... */
+#define __PP_PRIVATE_STR(x) #x
+#define __PP_STR(x)         __PP_PRIVATE_STR(x)
+#endif /* !... */
 #else /* __PREPROCESSOR_HAVE_STR */
-#   define __PP_PRIVATE_STR(x) "x"
-#   define __PP_STR(x)         "x"
+#define __PP_PRIVATE_STR(x) "x"
+#define __PP_STR(x)         "x"
 #endif /* !__PREPROCESSOR_HAVE_STR */
 
 #ifdef __PREPROCESSOR_HAVE_CAT
-#   define __PP_PRIVATE_CAT2(a, b)       a##b
-#   define __PP_PRIVATE_CAT3(a, b, c)    a##b##c
-#   define __PP_PRIVATE_CAT4(a, b, c, d) a##b##c##d
-#   define __PP_CAT2(a, b)       __PP_PRIVATE_CAT2(a, b)
-#   define __PP_CAT3(a, b, c)    __PP_PRIVATE_CAT3(a, b, c)
-#   define __PP_CAT4(a, b, c, d) __PP_PRIVATE_CAT4(a, b, c, d)
+#define __PP_PRIVATE_CAT2(a, b)       a##b
+#define __PP_PRIVATE_CAT3(a, b, c)    a##b##c
+#define __PP_PRIVATE_CAT4(a, b, c, d) a##b##c##d
+#define __PP_CAT2(a, b)               __PP_PRIVATE_CAT2(a, b)
+#define __PP_CAT3(a, b, c)            __PP_PRIVATE_CAT3(a, b, c)
+#define __PP_CAT4(a, b, c, d)         __PP_PRIVATE_CAT4(a, b, c, d)
 #else /* __PREPROCESSOR_HAVE_CAT */
-#   define __PP_PRIVATE_CAT2(a,b)     a/**/b
-#   define __PP_PRIVATE_CAT3(a,b,c)   a/**/b/**/c
-#   define __PP_PRIVATE_CAT4(a,b,c,d) a/**/b/**/c/**/d
-#   define __PP_CAT2(a,b)             a/**/b
-#   define __PP_CAT3(a,b,c)           a/**/b/**/c
-#   define __PP_CAT4(a,b,c,d)         a/**/b/**/c/**/d
+/* clang-format off */
+#define __PP_PRIVATE_CAT2(a, b)       a/**/b
+#define __PP_PRIVATE_CAT3(a, b, c)    a/**/b/**/c
+#define __PP_PRIVATE_CAT4(a, b, c, d) a/**/b/**/c/**/d
+#define __PP_CAT2(a, b)               a/**/b
+#define __PP_CAT3(a, b, c)            a/**/b/**/c
+#define __PP_CAT4(a, b, c, d)         a/**/b/**/c/**/d
+/* clang-format on */
 #endif /* !__PREPROCESSOR_HAVE_CAT */
 
-#define __PP_PRIVATE_MUL8_0  0
-#define __PP_PRIVATE_MUL8_1  8
-#define __PP_PRIVATE_MUL8_2  16
-#define __PP_PRIVATE_MUL8_4  32
-#define __PP_PRIVATE_MUL8_8  64
+#define __PP_PRIVATE_MUL8_0 0
+#define __PP_PRIVATE_MUL8_1 8
+#define __PP_PRIVATE_MUL8_2 16
+#define __PP_PRIVATE_MUL8_4 32
+#define __PP_PRIVATE_MUL8_8 64
 #ifdef __PREPROCESSOR_HAVE_CAT
 #define __PP_PRIVATE_MUL8(x) __PP_PRIVATE_MUL8_##x
 #define __PP_MUL8(x)         __PP_PRIVATE_MUL8(x)
 #else /* __PREPROCESSOR_HAVE_CAT */
+/* clang-format off */
 #define __PP_PRIVATE_MUL8(x) __PP_PRIVATE_MUL8_/**/x
 #define __PP_MUL8(x)         __PP_PRIVATE_MUL8_/**/x
+/* clang-format on */
 #endif /* !__PREPROCESSOR_HAVE_CAT */

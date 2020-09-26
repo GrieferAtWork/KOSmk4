@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc042a38f */
+/* HASH CRC-32:0x6eb2974e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,541 +18,541 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define __stub__CrtDbgReport 1
-#define __stub_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ 1
-#define __stub__CrtDbgReportW 1
-#define __stub__CrtGetAllocHook 1
-#define __stub__CrtGetDumpClient 1
-#define __stub__CrtGetReportHook 1
-#define __stub__CrtSetAllocHook 1
-#define __stub__CrtSetBreakAlloc 1
-#define __stub__CrtSetDebugFillThreshold 1
-#define __stub__CrtSetDumpClient 1
-#define __stub__CrtSetReportFile 1
-#define __stub__CrtSetReportHook 1
-#define __stub__CrtSetReportHook2 1
-#define __stub__CrtSetReportHookW2 1
-#define __stub__CrtSetReportMode 1
-#define __stub___control87_2 1
-#define __stub___fpecode 1
-#define __stub___h_errno_location 1
-#define __stub___locale_ctype_ptr 1
-#define __stub___locale_ctype_ptr_l 1
-#define __stub___p___wargv 1
-#define __stub___p___winitenv 1
-#define __stub___p__crtAssertBusy 1
-#define __stub___p__crtBreakAlloc 1
-#define __stub___p__crtDbgFlag 1
-#define __stub___p__fmode 1
-#define __stub___p__wenviron 1
-#define __stub___p__wpgmptr 1
-#define __stub___pthread_register_cancel 1
-#define __stub___pthread_register_cancel_defer 1
-#define __stub___pthread_unregister_cancel 1
-#define __stub___pthread_unregister_cancel_restore 1
-#define __stub___pthread_unwind_next 1
-#define __stub___wcserror 1
-#define __stub___wcserror_s 1
-#define __stub___xpg_sigpause 1
-#define __stub__beep 1
-#define __stub__clearfp 1
-#define __stub__control87 1
-#define __stub__controlfp 1
-#define __stub__controlfp_s 1
-#define __stub__dupenv_s 1
-#define __stub__fpclass 1
-#define __stub__get_fmode 1
-#define __stub__get_invalid_parameter_handler 1
-#define __stub__get_output_format 1
-#define __stub__get_printf_count_output 1
-#define __stub__get_purecall_handler 1
-#define __stub__getdiskfree 1
-#define __stub__getmaxstdio 1
-#define __stub__isctype 1
-#define __stub__isctype_l 1
-#define __stub__mktemp_s 1
-#define __stub__rmtmp 1
-#define __stub__searchenv_s 1
-#define __stub__set_abort_behavior 1
-#define __stub__set_controlfp 1
-#define __stub__set_error_mode 1
-#define __stub__set_fmode 1
-#define __stub__set_invalid_parameter_handler 1
-#define __stub__set_output_format 1
-#define __stub__set_printf_count_output 1
-#define __stub__set_purecall_handler 1
-#define __stub__seterrormode 1
-#define __stub__setmaxstdio 1
-#define __stub__statusfp 1
-#define __stub__statusfp2 1
-#define __stub__wcserror 1
-#define __stub__wcserror_s 1
-#define __stub__wdupenv_s 1
-#define __stub__wfdopen 1
-#define __stub__wfopen_s 1
-#define __stub__wfreopen_s 1
-#define __stub__wfsopen 1
-#define __stub__wfullpath 1
-#define __stub__wgetenv 1
-#define __stub__wgetenv_s 1
-#define __stub__wputenv 1
-#define __stub__wputenv_s 1
-#define __stub__wsearchenv_s 1
-#define __stub__wtempnam 1
-#define __stub__wtmpnam_s 1
-#define __stub_a64l 1
-#define __stub___acos 1
-#define __stub_acos 1
-#define __stub___acosh 1
-#define __stub_acosh 1
-#define __stub_addmntent 1
-#define __stub___adjtimex 1
-#define __stub_adjtimex 1
-#define __stub___adjtimex64 1
-#define __stub_adjtimex64 1
-#define __stub___asin 1
-#define __stub_asin 1
-#define __stub___asinh 1
-#define __stub_asinh 1
-#define __stub___atanh 1
-#define __stub_atanh 1
-#define __stub_bindresvport 1
-#define __stub_bindresvport6 1
-#define __stub_clock 1
-#define __stub_clock_adjtime 1
-#define __stub_clock_adjtime64 1
-#define __stub___clock_getcpuclockid 1
-#define __stub_clock_getcpuclockid 1
-#define __stub_closelog 1
-#define __stub___cos 1
-#define __stub_cos 1
-#define __stub___cosh 1
-#define __stub_cosh 1
-#define __stub_crypt 1
-#define __stub_crypt_r 1
-#define __stub_drand48 1
-#define __stub_drand48_r 1
-#define __stub___duplocale 1
-#define __stub_duplocale 1
-#define __stub_encrypt 1
-#define __stub_encrypt_r 1
-#define __stub_endaliasent 1
-#define __stub_endgrent 1
-#define __stub_endhostent 1
-#define __stub___endmntent 1
-#define __stub_endmntent 1
-#define __stub_endnetent 1
-#define __stub_endnetgrent 1
-#define __stub_endprotoent 1
-#define __stub_endrpcent 1
-#define __stub_endservent 1
-#define __stub_endspent 1
-#define __stub_endttyent 1
-#define __stub_endusershell 1
-#define __stub_endutent 1
-#define __stub_endutxent 1
-#define __stub_erand48 1
-#define __stub_erand48_r 1
-#define __stub___erf 1
-#define __stub_erf 1
-#define __stub___erfc 1
-#define __stub_erfc 1
-#define __stub_ether_hostton 1
-#define __stub_ether_ntohost 1
-#define __stub___exp10 1
-#define __stub_exp10 1
-#define __stub___exp2 1
-#define __stub_exp2 1
-#define __stub_fattach 1
-#define __stub_fdetach 1
-#define __stub_fgetgrent 1
-#define __stub_fgetgrent_r 1
-#define __stub_fgetspent 1
-#define __stub_fgetspent_r 1
-#define __stub__fpreset 1
-#define __stub_fpreset 1
-#define __stub_freeaddrinfo 1
-#define __stub_freeifaddrs 1
-#define __stub___freelocale 1
-#define __stub_freelocale 1
-#define __stub_ftok 1
-#define __stub_gai_cancel 1
-#define __stub_gai_error 1
-#define __stub_gai_strerror 1
-#define __stub_gai_suspend 1
-#define __stub_gai_suspend64 1
-#define __stub_get_nprocs_conf 1
-#define __stub_getaddrinfo 1
-#define __stub_getaddrinfo_a 1
-#define __stub_getaliasbyname 1
-#define __stub_getaliasbyname_r 1
-#define __stub_getaliasent 1
-#define __stub_getaliasent_r 1
-#define __stub_getdate 1
-#define __stub_getenv_s 1
-#define __stub_getgrent 1
-#define __stub_getgrent_r 1
-#define __stub_getgrgid 1
-#define __stub_getgrgid_r 1
-#define __stub_getgrnam 1
-#define __stub_getgrnam_r 1
-#define __stub_getgrouplist 1
-#define __stub_gethostbyaddr 1
-#define __stub_gethostbyaddr_r 1
-#define __stub_gethostbyname 1
-#define __stub_gethostbyname2 1
-#define __stub_gethostbyname2_r 1
-#define __stub_gethostbyname_r 1
-#define __stub_gethostent 1
-#define __stub_gethostent_r 1
-#define __stub_getifaddrs 1
-#define __stub_getipv4sourcefilter 1
-#define __stub_getloadavg 1
-#define __stub_getlogin 1
-#define __stub_getlogin_r 1
-#define __stub_getmntent 1
-#define __stub___getmntent_r 1
-#define __stub_getmntent_r 1
-#define __stub_getmsg 1
-#define __stub_getnameinfo 1
-#define __stub_getnetbyaddr 1
-#define __stub_getnetbyaddr_r 1
-#define __stub_getnetbyname 1
-#define __stub_getnetbyname_r 1
-#define __stub_getnetent 1
-#define __stub_getnetent_r 1
-#define __stub_getnetgrent 1
-#define __stub_getnetgrent_r 1
-#define __stub_getpass 1
-#define __stub_getpmsg 1
-#define __stub_getprotobyname 1
-#define __stub_getprotobyname_r 1
-#define __stub_getprotobynumber 1
-#define __stub_getprotobynumber_r 1
-#define __stub_getprotoent 1
-#define __stub_getprotoent_r 1
-#define __stub_getpt 1
-#define __stub_getrlimit64 1
-#define __stub_getrpcbyname 1
-#define __stub_getrpcbyname_r 1
-#define __stub_getrpcbynumber 1
-#define __stub_getrpcbynumber_r 1
-#define __stub_getrpcent 1
-#define __stub_getrpcent_r 1
-#define __stub_getrusage64 1
-#define __stub_getservbyname 1
-#define __stub_getservbyname_r 1
-#define __stub_getservbyport 1
-#define __stub_getservbyport_r 1
-#define __stub_getservent 1
-#define __stub_getservent_r 1
-#define __stub_getsourcefilter 1
-#define __stub_getspent 1
-#define __stub_getspent_r 1
-#define __stub_getspnam 1
-#define __stub_getspnam_r 1
-#define __stub_getttyent 1
-#define __stub_getttynam 1
-#define __stub_getusershell 1
-#define __stub_getutent 1
-#define __stub_getutent_r 1
-#define __stub_getutid 1
-#define __stub_getutid_r 1
-#define __stub_getutline 1
-#define __stub_getutline_r 1
-#define __stub_getutmp 1
-#define __stub_getutmpx 1
-#define __stub_getutxent 1
-#define __stub_getutxid 1
-#define __stub_getutxline 1
-#define __stub_globfree 1
-#define __stub_globfree64 1
-#define __stub_grantpt 1
-#define __stub_gtty 1
-#define __stub_herror 1
-#define __stub_hstrerror 1
-#define __stub___hypot 1
-#define __stub_hypot 1
-#define __stub_if_freenameindex 1
-#define __stub_if_indextoname 1
-#define __stub_if_nameindex 1
-#define __stub_if_nametoindex 1
-#define __stub_inet6_opt_append 1
-#define __stub_inet6_opt_find 1
-#define __stub_inet6_opt_finish 1
-#define __stub_inet6_opt_get_val 1
-#define __stub_inet6_opt_init 1
-#define __stub_inet6_opt_next 1
-#define __stub_inet6_opt_set_val 1
-#define __stub_inet6_option_alloc 1
-#define __stub_inet6_option_append 1
-#define __stub_inet6_option_find 1
-#define __stub_inet6_option_init 1
-#define __stub_inet6_option_next 1
-#define __stub_inet6_option_space 1
-#define __stub_inet6_rth_add 1
-#define __stub_inet6_rth_getaddr 1
-#define __stub_inet6_rth_init 1
-#define __stub_inet6_rth_reverse 1
-#define __stub_inet6_rth_segments 1
-#define __stub_inet6_rth_space 1
-#define __stub_inet_net_ntop 1
-#define __stub_inet_net_pton 1
-#define __stub_inet_nsap_addr 1
-#define __stub_inet_nsap_ntoa 1
-#define __stub_inet_ntop 1
-#define __stub_inet_pton 1
-#define __stub_initgroups 1
-#define __stub_initstate 1
-#define __stub_initstate_r 1
-#define __stub_innetgr 1
-#define __stub_iruserok 1
-#define __stub_iruserok_af 1
-#define __stub_isastream 1
-#define __stub___j0 1
-#define __stub_j0 1
-#define __stub___j1 1
-#define __stub_j1 1
-#define __stub___jn 1
-#define __stub_jn 1
-#define __stub_jrand48 1
-#define __stub_jrand48_r 1
-#define __stub_klogctl 1
-#define __stub_l64a 1
-#define __stub_lckpwdf 1
-#define __stub_lcong48 1
-#define __stub_lcong48_r 1
-#define __stub_gamma 1
-#define __stub___lgamma 1
-#define __stub___gamma 1
-#define __stub_lgamma 1
-#define __stub___lgamma_r 1
-#define __stub_lgamma_r 1
-#define __stub_lockf64 1
-#define __stub___log 1
-#define __stub_log 1
-#define __stub___log10 1
-#define __stub_log10 1
-#define __stub___log1p 1
-#define __stub_log1p 1
-#define __stub___log2 1
-#define __stub_log2 1
-#define __stub___logb 1
-#define __stub__logb 1
-#define __stub_logb 1
-#define __stub_login 1
-#define __stub_logout 1
-#define __stub_logwtmp 1
-#define __stub_lrand48 1
-#define __stub_lrand48_r 1
-#define __stub_mbsnrtowcs 1
-#define __stub_mkdtemp 1
-#define __stub_mkostemp 1
-#define __stub_mkostemp64 1
-#define __stub_mkostemps 1
-#define __stub_mkostemps64 1
-#define __stub_mkstemps 1
-#define __stub_mkstemps64 1
-#define __stub___mktemp 1
-#define __stub_mktemp 1
-#define __stub_mrand48 1
-#define __stub_mrand48_r 1
-#define __stub_msgctl 1
-#define __stub_msgget 1
-#define __stub_msgrcv 1
-#define __stub_msgsnd 1
-#define __stub___newlocale 1
-#define __stub_newlocale 1
-#define __stub_nrand48 1
-#define __stub_nrand48_r 1
-#define __stub_ntp_adjtime 1
-#define __stub_ntp_adjtime64 1
-#define __stub_ntp_gettimex 1
-#define __stub_ntp_gettimex64 1
-#define __stub_obstack_vprintf 1
-#define __stub_open_wmemstream 1
-#define __stub_opendev 1
-#define __stub_openlog 1
-#define __stub__IO_popen 1
-#define __stub_popen 1
-#define __stub_posix_fadvise64 1
-#define __stub_posix_fallocate64 1
-#define __stub_posix_openpt 1
-#define __stub_psiginfo 1
-#define __stub_psignal 1
-#define __stub_pthread_atfork 1
-#define __stub_pthread_barrier_destroy 1
-#define __stub_pthread_barrier_init 1
-#define __stub_pthread_barrier_wait 1
-#define __stub_pthread_getcpuclockid 1
-#define __stub_tss_get 1
-#define __stub_pthread_getspecific 1
-#define __stub_pthread_key_create 1
-#define __stub_tss_delete 1
-#define __stub_pthread_key_delete 1
-#define __stub_pthread_mutex_consistent_np 1
-#define __stub_pthread_mutex_consistent 1
-#define __stub_pthread_mutex_getprioceiling 1
-#define __stub_pthread_mutex_setprioceiling 1
-#define __stub_pthread_rwlock_destroy 1
-#define __stub_pthread_rwlock_init 1
-#define __stub_pthread_rwlock_rdlock 1
-#define __stub_pthread_rwlock_timedrdlock 1
-#define __stub_pthread_rwlock_timedrdlock64 1
-#define __stub_pthread_rwlock_timedwrlock 1
-#define __stub_pthread_rwlock_timedwrlock64 1
-#define __stub_pthread_rwlock_tryrdlock 1
-#define __stub_pthread_rwlock_trywrlock 1
-#define __stub_pthread_rwlock_unlock 1
-#define __stub_pthread_rwlock_wrlock 1
-#define __stub_pthread_setcancelstate 1
-#define __stub_pthread_setcanceltype 1
-#define __stub_pthread_setspecific 1
-#define __stub_ptsname_r 1
-#define __stub_putgrent 1
-#define __stub_putmsg 1
-#define __stub_putpmsg 1
-#define __stub_putspent 1
-#define __stub_pututline 1
-#define __stub_pututxline 1
-#define __stub_random_r 1
-#define __stub_rcmd 1
-#define __stub_rcmd_af 1
-#define __stub_re_match_2 1
-#define __stub_re_search_2 1
-#define __stub_re_set_registers 1
-#define __stub_regcomp 1
-#define __stub_regerror 1
-#define __stub_regexec 1
-#define __stub___remquo 1
-#define __stub_remquo 1
-#define __stub_revoke 1
-#define __stub_rexec 1
-#define __stub_rexec_af 1
-#define __stub_rresvport 1
-#define __stub_rresvport_af 1
-#define __stub_ruserok 1
-#define __stub_ruserok_af 1
-#define __stub_seed48 1
-#define __stub_seed48_r 1
-#define __stub_semctl 1
-#define __stub_semget 1
-#define __stub_semop 1
-#define __stub_semtimedop 1
-#define __stub_setaliasent 1
-#define __stub_setgrent 1
-#define __stub_sethostent 1
-#define __stub_setipv4sourcefilter 1
-#define __stub_setkey 1
-#define __stub_setkey_r 1
-#define __stub_setlogin 1
-#define __stub_setlogmask 1
-#define __stub___setmntent 1
-#define __stub_setmntent 1
-#define __stub_setnetent 1
-#define __stub_setnetgrent 1
-#define __stub_setprotoent 1
-#define __stub_setrlimit64 1
-#define __stub_setrpcent 1
-#define __stub_setservent 1
-#define __stub_setsourcefilter 1
-#define __stub_setspent 1
-#define __stub_setstate 1
-#define __stub_setstate_r 1
-#define __stub_setttyent 1
-#define __stub_setusershell 1
-#define __stub_setutent 1
-#define __stub_setutxent 1
-#define __stub_sgetspent 1
-#define __stub_sgetspent_r 1
-#define __stub_shmat 1
-#define __stub_shmctl 1
-#define __stub_shmdt 1
-#define __stub_shmget 1
-#define __stub_sigreturn 1
-#define __stub___sin 1
-#define __stub_sin 1
-#define __stub___sincos 1
-#define __stub_sincos 1
-#define __stub___sinh 1
-#define __stub_sinh 1
-#define __stub_srand48 1
-#define __stub_srand48_r 1
-#define __stub_srandom_r 1
-#define __stub_strfmon 1
-#define __stub___strfmon_l 1
-#define __stub_strfmon_l 1
-#define __stub_stty 1
-#define __stub___tan 1
-#define __stub_tan 1
-#define __stub___tanh 1
-#define __stub_tanh 1
-#define __stub_tempnam 1
-#define __stub___tgamma 1
-#define __stub_tgamma 1
-#define __stub_timespec_get 1
-#define __stub_tmpfile 1
-#define __stub_tmpnam 1
-#define __stub_ttyslot 1
-#define __stub_tzset 1
-#define __stub_ulckpwdf 1
-#define __stub_unlockpt 1
-#define __stub_updwtmp 1
-#define __stub_updwtmpx 1
-#define __stub___uselocale 1
-#define __stub_uselocale 1
-#define __stub_utmpname 1
-#define __stub_utmpxname 1
-#define __stub_vfwscanf 1
-#define __stub_vfwscanf_unlocked 1
-#define __stub_vhangup 1
-#define __stub_wcsnrtombs 1
-#define __stub_wfreadlinkat 1
-#define __stub_wgetlogin 1
-#define __stub_wgetlogin_r 1
-#define __stub_wttyname 1
-#define __stub_wttyname_r 1
-#define __stub___y0 1
-#define __stub_y0 1
-#define __stub___y1 1
-#define __stub_y1 1
-#define __stub___yn 1
-#define __stub_yn 1
-#define __stub_DOS$__p___wargv 1
-#define __stub_DOS$__p___winitenv 1
-#define __stub_DOS$__p__wenviron 1
-#define __stub_DOS$__p__wpgmptr 1
-#define __stub_DOS$__wcserror 1
-#define __stub_DOS$__wcserror_s 1
-#define __stub_DOS$_wcserror 1
-#define __stub_DOS$_wcserror_s 1
-#define __stub_DOS$_wdupenv_s 1
-#define __stub_DOS$_wfdopen 1
-#define __stub_DOS$_wfopen_s 1
-#define __stub_DOS$_wfreopen_s 1
-#define __stub_DOS$_wfsopen 1
-#define __stub_DOS$_wfullpath 1
-#define __stub_DOS$_wgetenv 1
-#define __stub_DOS$_wgetenv_s 1
-#define __stub_DOS$_wputenv 1
-#define __stub_DOS$_wputenv_s 1
-#define __stub_DOS$_wsearchenv_s 1
-#define __stub_DOS$_wtempnam 1
-#define __stub_DOS$_wtmpnam_s 1
-#define __stub_DOS$mbsnrtowcs 1
-#define __stub_DOS$open_wmemstream 1
-#define __stub_DOS$openat 1
+#define __stub__CrtDbgReport
+#define __stub_$Q_CrtDbgReportW$A$AYAHHPBGH00ZZ
+#define __stub__CrtDbgReportW
+#define __stub__CrtGetAllocHook
+#define __stub__CrtGetDumpClient
+#define __stub__CrtGetReportHook
+#define __stub__CrtSetAllocHook
+#define __stub__CrtSetBreakAlloc
+#define __stub__CrtSetDebugFillThreshold
+#define __stub__CrtSetDumpClient
+#define __stub__CrtSetReportFile
+#define __stub__CrtSetReportHook
+#define __stub__CrtSetReportHook2
+#define __stub__CrtSetReportHookW2
+#define __stub__CrtSetReportMode
+#define __stub___control87_2
+#define __stub___fpecode
+#define __stub___h_errno_location
+#define __stub___locale_ctype_ptr
+#define __stub___locale_ctype_ptr_l
+#define __stub___p___wargv
+#define __stub___p___winitenv
+#define __stub___p__crtAssertBusy
+#define __stub___p__crtBreakAlloc
+#define __stub___p__crtDbgFlag
+#define __stub___p__fmode
+#define __stub___p__wenviron
+#define __stub___p__wpgmptr
+#define __stub___pthread_register_cancel
+#define __stub___pthread_register_cancel_defer
+#define __stub___pthread_unregister_cancel
+#define __stub___pthread_unregister_cancel_restore
+#define __stub___pthread_unwind_next
+#define __stub___wcserror
+#define __stub___wcserror_s
+#define __stub___xpg_sigpause
+#define __stub__beep
+#define __stub__clearfp
+#define __stub__control87
+#define __stub__controlfp
+#define __stub__controlfp_s
+#define __stub__dupenv_s
+#define __stub__fpclass
+#define __stub__get_fmode
+#define __stub__get_invalid_parameter_handler
+#define __stub__get_output_format
+#define __stub__get_printf_count_output
+#define __stub__get_purecall_handler
+#define __stub__getdiskfree
+#define __stub__getmaxstdio
+#define __stub__isctype
+#define __stub__isctype_l
+#define __stub__mktemp_s
+#define __stub__rmtmp
+#define __stub__searchenv_s
+#define __stub__set_abort_behavior
+#define __stub__set_controlfp
+#define __stub__set_error_mode
+#define __stub__set_fmode
+#define __stub__set_invalid_parameter_handler
+#define __stub__set_output_format
+#define __stub__set_printf_count_output
+#define __stub__set_purecall_handler
+#define __stub__seterrormode
+#define __stub__setmaxstdio
+#define __stub__statusfp
+#define __stub__statusfp2
+#define __stub__wcserror
+#define __stub__wcserror_s
+#define __stub__wdupenv_s
+#define __stub__wfdopen
+#define __stub__wfopen_s
+#define __stub__wfreopen_s
+#define __stub__wfsopen
+#define __stub__wfullpath
+#define __stub__wgetenv
+#define __stub__wgetenv_s
+#define __stub__wputenv
+#define __stub__wputenv_s
+#define __stub__wsearchenv_s
+#define __stub__wtempnam
+#define __stub__wtmpnam_s
+#define __stub_a64l
+#define __stub___acos
+#define __stub_acos
+#define __stub___acosh
+#define __stub_acosh
+#define __stub_addmntent
+#define __stub___adjtimex
+#define __stub_adjtimex
+#define __stub___adjtimex64
+#define __stub_adjtimex64
+#define __stub___asin
+#define __stub_asin
+#define __stub___asinh
+#define __stub_asinh
+#define __stub___atanh
+#define __stub_atanh
+#define __stub_bindresvport
+#define __stub_bindresvport6
+#define __stub_clock
+#define __stub_clock_adjtime
+#define __stub_clock_adjtime64
+#define __stub___clock_getcpuclockid
+#define __stub_clock_getcpuclockid
+#define __stub_closelog
+#define __stub___cos
+#define __stub_cos
+#define __stub___cosh
+#define __stub_cosh
+#define __stub_crypt
+#define __stub_crypt_r
+#define __stub_drand48
+#define __stub_drand48_r
+#define __stub___duplocale
+#define __stub_duplocale
+#define __stub_encrypt
+#define __stub_encrypt_r
+#define __stub_endaliasent
+#define __stub_endgrent
+#define __stub_endhostent
+#define __stub___endmntent
+#define __stub_endmntent
+#define __stub_endnetent
+#define __stub_endnetgrent
+#define __stub_endprotoent
+#define __stub_endrpcent
+#define __stub_endservent
+#define __stub_endspent
+#define __stub_endttyent
+#define __stub_endusershell
+#define __stub_endutent
+#define __stub_endutxent
+#define __stub_erand48
+#define __stub_erand48_r
+#define __stub___erf
+#define __stub_erf
+#define __stub___erfc
+#define __stub_erfc
+#define __stub_ether_hostton
+#define __stub_ether_ntohost
+#define __stub___exp10
+#define __stub_exp10
+#define __stub___exp2
+#define __stub_exp2
+#define __stub_fattach
+#define __stub_fdetach
+#define __stub_fgetgrent
+#define __stub_fgetgrent_r
+#define __stub_fgetspent
+#define __stub_fgetspent_r
+#define __stub__fpreset
+#define __stub_fpreset
+#define __stub_freeaddrinfo
+#define __stub_freeifaddrs
+#define __stub___freelocale
+#define __stub_freelocale
+#define __stub_ftok
+#define __stub_gai_cancel
+#define __stub_gai_error
+#define __stub_gai_strerror
+#define __stub_gai_suspend
+#define __stub_gai_suspend64
+#define __stub_get_nprocs_conf
+#define __stub_getaddrinfo
+#define __stub_getaddrinfo_a
+#define __stub_getaliasbyname
+#define __stub_getaliasbyname_r
+#define __stub_getaliasent
+#define __stub_getaliasent_r
+#define __stub_getdate
+#define __stub_getenv_s
+#define __stub_getgrent
+#define __stub_getgrent_r
+#define __stub_getgrgid
+#define __stub_getgrgid_r
+#define __stub_getgrnam
+#define __stub_getgrnam_r
+#define __stub_getgrouplist
+#define __stub_gethostbyaddr
+#define __stub_gethostbyaddr_r
+#define __stub_gethostbyname
+#define __stub_gethostbyname2
+#define __stub_gethostbyname2_r
+#define __stub_gethostbyname_r
+#define __stub_gethostent
+#define __stub_gethostent_r
+#define __stub_getifaddrs
+#define __stub_getipv4sourcefilter
+#define __stub_getloadavg
+#define __stub_getlogin
+#define __stub_getlogin_r
+#define __stub_getmntent
+#define __stub___getmntent_r
+#define __stub_getmntent_r
+#define __stub_getmsg
+#define __stub_getnameinfo
+#define __stub_getnetbyaddr
+#define __stub_getnetbyaddr_r
+#define __stub_getnetbyname
+#define __stub_getnetbyname_r
+#define __stub_getnetent
+#define __stub_getnetent_r
+#define __stub_getnetgrent
+#define __stub_getnetgrent_r
+#define __stub_getpass
+#define __stub_getpmsg
+#define __stub_getprotobyname
+#define __stub_getprotobyname_r
+#define __stub_getprotobynumber
+#define __stub_getprotobynumber_r
+#define __stub_getprotoent
+#define __stub_getprotoent_r
+#define __stub_getpt
+#define __stub_getrlimit64
+#define __stub_getrpcbyname
+#define __stub_getrpcbyname_r
+#define __stub_getrpcbynumber
+#define __stub_getrpcbynumber_r
+#define __stub_getrpcent
+#define __stub_getrpcent_r
+#define __stub_getrusage64
+#define __stub_getservbyname
+#define __stub_getservbyname_r
+#define __stub_getservbyport
+#define __stub_getservbyport_r
+#define __stub_getservent
+#define __stub_getservent_r
+#define __stub_getsourcefilter
+#define __stub_getspent
+#define __stub_getspent_r
+#define __stub_getspnam
+#define __stub_getspnam_r
+#define __stub_getttyent
+#define __stub_getttynam
+#define __stub_getusershell
+#define __stub_getutent
+#define __stub_getutent_r
+#define __stub_getutid
+#define __stub_getutid_r
+#define __stub_getutline
+#define __stub_getutline_r
+#define __stub_getutmp
+#define __stub_getutmpx
+#define __stub_getutxent
+#define __stub_getutxid
+#define __stub_getutxline
+#define __stub_globfree
+#define __stub_globfree64
+#define __stub_grantpt
+#define __stub_gtty
+#define __stub_herror
+#define __stub_hstrerror
+#define __stub___hypot
+#define __stub_hypot
+#define __stub_if_freenameindex
+#define __stub_if_indextoname
+#define __stub_if_nameindex
+#define __stub_if_nametoindex
+#define __stub_inet6_opt_append
+#define __stub_inet6_opt_find
+#define __stub_inet6_opt_finish
+#define __stub_inet6_opt_get_val
+#define __stub_inet6_opt_init
+#define __stub_inet6_opt_next
+#define __stub_inet6_opt_set_val
+#define __stub_inet6_option_alloc
+#define __stub_inet6_option_append
+#define __stub_inet6_option_find
+#define __stub_inet6_option_init
+#define __stub_inet6_option_next
+#define __stub_inet6_option_space
+#define __stub_inet6_rth_add
+#define __stub_inet6_rth_getaddr
+#define __stub_inet6_rth_init
+#define __stub_inet6_rth_reverse
+#define __stub_inet6_rth_segments
+#define __stub_inet6_rth_space
+#define __stub_inet_net_ntop
+#define __stub_inet_net_pton
+#define __stub_inet_nsap_addr
+#define __stub_inet_nsap_ntoa
+#define __stub_inet_ntop
+#define __stub_inet_pton
+#define __stub_initgroups
+#define __stub_initstate
+#define __stub_initstate_r
+#define __stub_innetgr
+#define __stub_iruserok
+#define __stub_iruserok_af
+#define __stub_isastream
+#define __stub___j0
+#define __stub_j0
+#define __stub___j1
+#define __stub_j1
+#define __stub___jn
+#define __stub_jn
+#define __stub_jrand48
+#define __stub_jrand48_r
+#define __stub_klogctl
+#define __stub_l64a
+#define __stub_lckpwdf
+#define __stub_lcong48
+#define __stub_lcong48_r
+#define __stub_gamma
+#define __stub___lgamma
+#define __stub___gamma
+#define __stub_lgamma
+#define __stub___lgamma_r
+#define __stub_lgamma_r
+#define __stub_lockf64
+#define __stub___log
+#define __stub_log
+#define __stub___log10
+#define __stub_log10
+#define __stub___log1p
+#define __stub_log1p
+#define __stub___log2
+#define __stub_log2
+#define __stub___logb
+#define __stub__logb
+#define __stub_logb
+#define __stub_login
+#define __stub_logout
+#define __stub_logwtmp
+#define __stub_lrand48
+#define __stub_lrand48_r
+#define __stub_mbsnrtowcs
+#define __stub_mkdtemp
+#define __stub_mkostemp
+#define __stub_mkostemp64
+#define __stub_mkostemps
+#define __stub_mkostemps64
+#define __stub_mkstemps
+#define __stub_mkstemps64
+#define __stub___mktemp
+#define __stub_mktemp
+#define __stub_mrand48
+#define __stub_mrand48_r
+#define __stub_msgctl
+#define __stub_msgget
+#define __stub_msgrcv
+#define __stub_msgsnd
+#define __stub___newlocale
+#define __stub_newlocale
+#define __stub_nrand48
+#define __stub_nrand48_r
+#define __stub_ntp_adjtime
+#define __stub_ntp_adjtime64
+#define __stub_ntp_gettimex
+#define __stub_ntp_gettimex64
+#define __stub_obstack_vprintf
+#define __stub_open_wmemstream
+#define __stub_opendev
+#define __stub_openlog
+#define __stub__IO_popen
+#define __stub_popen
+#define __stub_posix_fadvise64
+#define __stub_posix_fallocate64
+#define __stub_posix_openpt
+#define __stub_psiginfo
+#define __stub_psignal
+#define __stub_pthread_atfork
+#define __stub_pthread_barrier_destroy
+#define __stub_pthread_barrier_init
+#define __stub_pthread_barrier_wait
+#define __stub_pthread_getcpuclockid
+#define __stub_tss_get
+#define __stub_pthread_getspecific
+#define __stub_pthread_key_create
+#define __stub_tss_delete
+#define __stub_pthread_key_delete
+#define __stub_pthread_mutex_consistent_np
+#define __stub_pthread_mutex_consistent
+#define __stub_pthread_mutex_getprioceiling
+#define __stub_pthread_mutex_setprioceiling
+#define __stub_pthread_rwlock_destroy
+#define __stub_pthread_rwlock_init
+#define __stub_pthread_rwlock_rdlock
+#define __stub_pthread_rwlock_timedrdlock
+#define __stub_pthread_rwlock_timedrdlock64
+#define __stub_pthread_rwlock_timedwrlock
+#define __stub_pthread_rwlock_timedwrlock64
+#define __stub_pthread_rwlock_tryrdlock
+#define __stub_pthread_rwlock_trywrlock
+#define __stub_pthread_rwlock_unlock
+#define __stub_pthread_rwlock_wrlock
+#define __stub_pthread_setcancelstate
+#define __stub_pthread_setcanceltype
+#define __stub_pthread_setspecific
+#define __stub_ptsname_r
+#define __stub_putgrent
+#define __stub_putmsg
+#define __stub_putpmsg
+#define __stub_putspent
+#define __stub_pututline
+#define __stub_pututxline
+#define __stub_random_r
+#define __stub_rcmd
+#define __stub_rcmd_af
+#define __stub_re_match_2
+#define __stub_re_search_2
+#define __stub_re_set_registers
+#define __stub_regcomp
+#define __stub_regerror
+#define __stub_regexec
+#define __stub___remquo
+#define __stub_remquo
+#define __stub_revoke
+#define __stub_rexec
+#define __stub_rexec_af
+#define __stub_rresvport
+#define __stub_rresvport_af
+#define __stub_ruserok
+#define __stub_ruserok_af
+#define __stub_seed48
+#define __stub_seed48_r
+#define __stub_semctl
+#define __stub_semget
+#define __stub_semop
+#define __stub_semtimedop
+#define __stub_setaliasent
+#define __stub_setgrent
+#define __stub_sethostent
+#define __stub_setipv4sourcefilter
+#define __stub_setkey
+#define __stub_setkey_r
+#define __stub_setlogin
+#define __stub_setlogmask
+#define __stub___setmntent
+#define __stub_setmntent
+#define __stub_setnetent
+#define __stub_setnetgrent
+#define __stub_setprotoent
+#define __stub_setrlimit64
+#define __stub_setrpcent
+#define __stub_setservent
+#define __stub_setsourcefilter
+#define __stub_setspent
+#define __stub_setstate
+#define __stub_setstate_r
+#define __stub_setttyent
+#define __stub_setusershell
+#define __stub_setutent
+#define __stub_setutxent
+#define __stub_sgetspent
+#define __stub_sgetspent_r
+#define __stub_shmat
+#define __stub_shmctl
+#define __stub_shmdt
+#define __stub_shmget
+#define __stub_sigreturn
+#define __stub___sin
+#define __stub_sin
+#define __stub___sincos
+#define __stub_sincos
+#define __stub___sinh
+#define __stub_sinh
+#define __stub_srand48
+#define __stub_srand48_r
+#define __stub_srandom_r
+#define __stub_strfmon
+#define __stub___strfmon_l
+#define __stub_strfmon_l
+#define __stub_stty
+#define __stub___tan
+#define __stub_tan
+#define __stub___tanh
+#define __stub_tanh
+#define __stub_tempnam
+#define __stub___tgamma
+#define __stub_tgamma
+#define __stub_timespec_get
+#define __stub_tmpfile
+#define __stub_tmpnam
+#define __stub_ttyslot
+#define __stub_tzset
+#define __stub_ulckpwdf
+#define __stub_unlockpt
+#define __stub_updwtmp
+#define __stub_updwtmpx
+#define __stub___uselocale
+#define __stub_uselocale
+#define __stub_utmpname
+#define __stub_utmpxname
+#define __stub_vfwscanf
+#define __stub_vfwscanf_unlocked
+#define __stub_vhangup
+#define __stub_wcsnrtombs
+#define __stub_wfreadlinkat
+#define __stub_wgetlogin
+#define __stub_wgetlogin_r
+#define __stub_wttyname
+#define __stub_wttyname_r
+#define __stub___y0
+#define __stub_y0
+#define __stub___y1
+#define __stub_y1
+#define __stub___yn
+#define __stub_yn
+#define __stub_DOS$__p___wargv
+#define __stub_DOS$__p___winitenv
+#define __stub_DOS$__p__wenviron
+#define __stub_DOS$__p__wpgmptr
+#define __stub_DOS$__wcserror
+#define __stub_DOS$__wcserror_s
+#define __stub_DOS$_wcserror
+#define __stub_DOS$_wcserror_s
+#define __stub_DOS$_wdupenv_s
+#define __stub_DOS$_wfdopen
+#define __stub_DOS$_wfopen_s
+#define __stub_DOS$_wfreopen_s
+#define __stub_DOS$_wfsopen
+#define __stub_DOS$_wfullpath
+#define __stub_DOS$_wgetenv
+#define __stub_DOS$_wgetenv_s
+#define __stub_DOS$_wputenv
+#define __stub_DOS$_wputenv_s
+#define __stub_DOS$_wsearchenv_s
+#define __stub_DOS$_wtempnam
+#define __stub_DOS$_wtmpnam_s
+#define __stub_DOS$mbsnrtowcs
+#define __stub_DOS$open_wmemstream
+#define __stub_DOS$openat
 #ifndef __LIBCCALL_IS_LIBDCALL
-#define __stub_DOS$semctl 1
-#define __stub_DOS$strfmon 1
-#define __stub_DOS$__strfmon_l 1
-#define __stub_DOS$strfmon_l 1
+#define __stub_DOS$semctl
+#define __stub_DOS$strfmon
+#define __stub_DOS$__strfmon_l
+#define __stub_DOS$strfmon_l
 #endif /* !__LIBCCALL_IS_LIBDCALL */
-#define __stub_DOS$vfwscanf 1
-#define __stub_DOS$vfwscanf_unlocked 1
-#define __stub_DOS$wcsnrtombs 1
-#define __stub_DOS$wfreadlinkat 1
-#define __stub_DOS$wgetlogin 1
-#define __stub_DOS$wgetlogin_r 1
-#define __stub_DOS$wttyname 1
-#define __stub_DOS$wttyname_r 1
+#define __stub_DOS$vfwscanf
+#define __stub_DOS$vfwscanf_unlocked
+#define __stub_DOS$wcsnrtombs
+#define __stub_DOS$wfreadlinkat
+#define __stub_DOS$wgetlogin
+#define __stub_DOS$wgetlogin_r
+#define __stub_DOS$wttyname
+#define __stub_DOS$wttyname_r
