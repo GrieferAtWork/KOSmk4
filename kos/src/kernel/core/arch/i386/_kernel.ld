@@ -510,6 +510,10 @@ SECTIONS {
 		STATIC_ASSERT((ABSOLUTE(.) - ABSOLUTE(__kernel_percpu_tss)) == SIZEOF_TSS);
 #endif /* !CONFIG_NO_SMP */
 
+		PROVIDE_HIDDEN(__x86_alternatives_start = ABSOLUTE(.));
+		KEEP(*(.alternatives))
+		PROVIDE_HIDDEN(__x86_alternatives_end = ABSOLUTE(.));
+
 		*(.rodata.free)
 		*(.rodata.str.free)
 		*(.data.free)

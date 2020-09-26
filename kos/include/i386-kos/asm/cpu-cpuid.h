@@ -40,7 +40,7 @@
 
 
 /* TODO: Add more info (s.a. `Vol. 2A   3-213') */
-
+/*[[[begin]]]*/
 #define CPUID_1D_FPU             __UINT32_C(0x00000001) /* [bit(EDX:0)] Onboard x87 FPU. */
 #define CPUID_1D_VME             __UINT32_C(0x00000002) /* [bit(EDX:1)] Virtual 8086 mode extensions (such as VIF, VIP, PIV). */
 #define CPUID_1D_DE              __UINT32_C(0x00000004) /* [bit(EDX:2)] Debugging extensions (CR4 bit 3). */
@@ -265,6 +265,8 @@
 #define CPUID_80000001D_LM            __UINT32_C(0x20000000) /* [bit(29)] Long mode. */
 #define CPUID_80000001D_3DNOWEXT      __UINT32_C(0x40000000) /* [bit(30)] Extended 3DNow. */
 #define CPUID_80000001D_3DNOW         __UINT32_C(0x80000000) /* [bit(31)] 3DNow!. */
+#define CPUID_80000007D_INVARIANT_TSC __UINT32_C(0x00000100) /* [bit(EDX:8)] The TSC's increment speed is invariant. */
+/*[[[end]]]*/
 
 
 

@@ -137,6 +137,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	x86_initialize_fsgsbase();
 #endif /* __x86_64__ */
 
+	/* Load generic text alternatives. */
+	x86_initialize_alternatives();
+
 #ifndef __x86_64__
 	/* Initialize the atomic64 configuration */
 	x86_initialize_atomic64();

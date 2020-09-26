@@ -3490,6 +3490,11 @@ done_dynamic:
 	}
 #endif /* ELF_ARCH_USESRELA */
 
+	/* Perform arch-specific driver initialization. */
+#ifdef ARCH_HAVE_ARCH_DRIVER_INITIALIZE
+	arch_driver_initialize(self);
+#endif /* ARCH_HAVE_ARCH_DRIVER_INITIALIZE */
+
 	/* Disable text relocations for read-only program sections of the driver. */
 	driver_disable_textrel(self);
 }

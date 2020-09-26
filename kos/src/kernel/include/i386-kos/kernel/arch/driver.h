@@ -41,4 +41,23 @@
 #define KERNEL_DRIVER_REQUIRED_DATA_S       "ELFDATA2LSB"
 #define KERNEL_DRIVER_MAXPROGRAMHEADERCOUNT 64
 
+#ifdef __CC__
+DECL_BEGIN
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+struct driver;
+
+/* Perform arch-specific driver initialization.
+ * On x86, this function handles code alternatives, as
+ * defined via the optional `.alternatives' section. */
+INTDEF NONNULL((1)) void KCALL
+arch_driver_initialize(struct driver *__restrict self);
+
+#define ARCH_HAVE_ARCH_DRIVER_INITIALIZE 1
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
+DECL_END
+#endif /* __CC__ */
+
+
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_DRIVER_H */
