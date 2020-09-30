@@ -26,6 +26,7 @@
 #include <fs/vfs.h>
 #include <sched/pid.h>
 
+#include <stddef.h>
 #include <stdio.h>
 
 #include "../procfs.h"

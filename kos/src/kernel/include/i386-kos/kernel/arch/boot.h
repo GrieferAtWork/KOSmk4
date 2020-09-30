@@ -71,6 +71,8 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_default_memory_banks)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_memory_via_bios)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_smp)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_acpi)(void);
+INTDEF FREE void NOTHROW(KCALL x86_initialize_tsc)(void);
+INTDEF FREE void NOTHROW(KCALL x86_initialize_tsc_resync)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_apic)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_alternatives)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_iobm)(void);

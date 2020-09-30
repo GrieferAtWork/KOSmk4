@@ -43,6 +43,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/cpu.h>
 #include <sched/enum.h>
 #include <sched/pid.h>
+#include <sched/sched.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

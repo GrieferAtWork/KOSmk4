@@ -37,6 +37,7 @@
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
+#include <sched/sched.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -58,15 +59,6 @@ DECL_BEGIN
 
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
-STATIC_ASSERT(offsetof(struct task, t_self) == OFFSET_TASK_SELF);
-STATIC_ASSERT(offsetof(struct task, t_refcnt) == OFFSET_TASK_REFCNT);
-STATIC_ASSERT(offsetof(struct task, t_flags) == OFFSET_TASK_FLAGS);
-STATIC_ASSERT(offsetof(struct task, t_cpu) == OFFSET_TASK_CPU);
-STATIC_ASSERT(offsetof(struct task, t_vm) == OFFSET_TASK_VM);
-STATIC_ASSERT(offsetof(struct task, t_vm_tasks) == OFFSET_TASK_VM_TASKS);
-STATIC_ASSERT(offsetof(struct task, t_heapsz) == OFFSET_TASK_HEAPSZ);
-STATIC_ASSERT(offsetof(struct task, t_sched.s_state) == OFFSET_TASK_SCHED_STATE);
-
 
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y
@@ -83,9 +75,7 @@ struct task task_header = {
 	/* .t_vm       = */ &vm_kernel,
 	/* .t_vm_tasks = */ LLIST_INITNODE,
 	/* .t_heapsz   = */ (size_t)__kernel_pertask_size,
-	/* .t_sched    = */ {
-		/* .s_state = */ NULL
-	}
+	/* .t_state    = */ NULL
 };
 
 INTDEF byte_t __kernel_boottask_stack_pageid[];
@@ -207,9 +197,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(this_task, offsetof(struct task, t_self), sizeof(struct task));
 	DEFINE_PUBLIC_SYMBOL(this_cpu, offsetof(struct task, t_cpu), sizeof(struct cpu *));
 	DEFINE_PUBLIC_SYMBOL(this_vm, offsetof(struct task, t_vm), sizeof(struct vm *));
-	DEFINE_PUBLIC_SYMBOL(this_sched_state, offsetof(struct task, t_sched.s_state), sizeof(struct scpustate *));
-	DEFINE_PUBLIC_SYMBOL(this_sched_runprv, offsetof(struct task, t_sched.s_running.sr_runprv), sizeof(struct task *));
-	DEFINE_PUBLIC_SYMBOL(this_sched_runnxt, offsetof(struct task, t_sched.s_running.sr_runnxt), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(this_sstate, offsetof(struct task, t_state), sizeof(struct scpustate *));
 	DEFINE_PUBLIC_SYMBOL(this_exception_code, &this_exception_info.ei_code, sizeof(this_exception_info.ei_code));
 	DEFINE_PUBLIC_SYMBOL(this_exception_data, &this_exception_info.ei_data, sizeof(this_exception_info.ei_data));
 	DEFINE_PUBLIC_SYMBOL(this_exception_state, &this_exception_info.ei_state, sizeof(this_exception_info.ei_state));
@@ -224,23 +212,13 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_PUBLIC_SYMBOL(this_exception_trace, 0, 0);
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
 	DEFINE_PUBLIC_SYMBOL(thiscpu_id, offsetof(struct cpu, c_id), sizeof(cpuid_t));
-	DEFINE_PUBLIC_SYMBOL(thiscpu_current, offsetof(struct cpu, c_current), sizeof(struct task *));
-	DEFINE_PUBLIC_SYMBOL(thiscpu_override, offsetof(struct cpu, c_override), sizeof(struct task *));
 #ifndef CONFIG_NO_SMP
-	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, offsetof(struct cpu, c_pdir), sizeof(struct vm *));
-	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, offsetof(struct cpu, c_pending), sizeof(struct task *));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, offsetof(struct cpu, c_pdir), sizeof(pagedir_phys_t));
 #else /* !CONFIG_NO_SMP */
 	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, 0, 0);
-	DEFINE_PUBLIC_SYMBOL(thiscpu_pending, 0, 0);
 #endif /* CONFIG_NO_SMP */
 	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
 	DEFINE_PUBLIC_SYMBOL(thisvm_pdir_phys, offsetof(struct vm, v_pdir_phys), sizeof(physaddr_t));
-
-	/* Set kernel boot timestamps.
-	 * These can be used to calculate things such as uptime, etc. */
-	_boottask.t_ctime  = realtime();
-	_bootidle.t_ctime  = _boottask.t_ctime;
-	_asyncwork.t_ctime = _boottask.t_ctime;
 
 	assert(_boottask.t_refcnt == 1);
 	assert(_bootidle.t_refcnt == 1);
@@ -352,16 +330,20 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	_asyncwork.t_flags = TASK_FCRITICAL | TASK_FSTARTED | TASK_FRUNNING | TASK_FKERNTHREAD;
 	_bootidle.t_flags  = TASK_FCRITICAL | TASK_FSTARTED | TASK_FKEEPCORE | TASK_FKERNTHREAD;
 
-	_boottask.t_sched.s_running.sr_runnxt  = &_asyncwork;
-	_boottask.t_sched.s_running.sr_runprv  = &_asyncwork;
-	_asyncwork.t_sched.s_running.sr_runnxt = &_boottask;
-	_asyncwork.t_sched.s_running.sr_runprv = &_boottask;
+	/* Initialize the boot CPU's scheduler. */
+	FORTASK(&_boottask, this_sched_link).ln_pself  = &FORCPU(&_bootcpu, thiscpu_scheduler).s_running;
+	FORTASK(&_boottask, this_sched_link).ln_next   = &_asyncwork;
+	FORTASK(&_asyncwork, this_sched_link).ln_pself = &FORTASK(&_boottask, this_sched_link).ln_next;
+	/*FORTASK(&_asyncwork, this_sched_link).ln_next = NULL;*/
+	FORCPU(&_bootcpu, thiscpu_scheduler).s_running      = &_boottask;
+	FORCPU(&_bootcpu, thiscpu_scheduler).s_running_last = &_asyncwork;
+	FORCPU(&_bootcpu, thiscpu_scheduler).s_runcount     = 2;
 
 	_boottask.t_self  = &_boottask;
 	_bootidle.t_self  = &_bootidle;
 	_asyncwork.t_self = &_asyncwork;
 
-	_bootcpu.c_current = &_boottask;
+	FORCPU(&_bootcpu, thiscpu_sched_current) = &_boottask;
 
 	kernel_initialize_scheduler_arch();
 }
@@ -464,18 +446,16 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 			                               self,
 			                               self->t_heapsz,
 			                               MAX(MAX(COMPILER_OFFSETAFTER(struct task, t_vm_tasks),
-			                                       COMPILER_OFFSETAFTER(struct task, t_sched)),
+			                                       KEY_task_vm_dead__next_offsetafter),
 			                                   COMPILER_OFFSETAFTER(struct task, t_heapsz)),
 			                               GFP_NORMAL);
 			/* Schedule our task for pending removal within its associated VM.
 			 * The next time someone acquires a lock to the VM's task-chain,
 			 * we will be removed automatically, and finally freed. */
-			cpu_assert_integrity();
 			do {
 				next = ATOMIC_READ(myvm->v_deltasks);
-				self->t_sched.s_running.sr_runnxt = next;
+				ATOMIC_WRITE(KEY_task_vm_dead__next(self), next);
 			} while (!ATOMIC_CMPXCH_WEAK(myvm->v_deltasks, next, self));
-			cpu_assert_integrity();
 			vm_tasklock_tryservice(myvm);
 		} else {
 do_free_self:
@@ -504,16 +484,13 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 		struct vm_kernel_pending_operation *mine, *next;
 		/* Schedule the task to-be destroyed later. */
 		mine = (struct vm_kernel_pending_operation *)self;
-		cpu_assert_integrity();
 		mine->vkpo_exec = (vm_kernel_pending_cb_t)&task_destroy_raw_impl;
-		cpu_assert_integrity();
 		do {
 			next = ATOMIC_READ(vm_kernel_pending_operations);
 			mine->vkpo_next = next;
 			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(vm_kernel_pending_operations,
 		                             next, mine));
-		cpu_assert_integrity();
 		vm_kernel_treelock_tryservice();
 	}
 }

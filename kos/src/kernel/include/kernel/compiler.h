@@ -30,6 +30,22 @@
 
 #include "compiler-branch-tracer.h"
 
+/* Configure SMP-behavior. */
+#ifdef CONFIG_NO_SMP
+#   undef CONFIG_MAX_CPU_COUNT
+#   define CONFIG_MAX_CPU_COUNT 1
+#else /* CONFIG_NO_SMP */
+/* Configuration option: The max number of CPUs supported by KOS. */
+#   ifndef CONFIG_MAX_CPU_COUNT
+#      define CONFIG_MAX_CPU_COUNT 16
+#   elif (CONFIG_MAX_CPU_COUNT+0) <= 1
+#      undef CONFIG_MAX_CPU_COUNT
+#      define CONFIG_MAX_CPU_COUNT 1
+#      define CONFIG_NO_SMP 1
+#   endif
+#endif /* !CONFIG_NO_SMP */
+
+
 #if defined(__CC__) && defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif

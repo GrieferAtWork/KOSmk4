@@ -36,6 +36,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <string.h>
 
 #ifndef CONFIG_NO_PAGING_P32

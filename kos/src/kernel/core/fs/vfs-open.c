@@ -44,6 +44,7 @@
 #include <assert.h>
 #include <fcntl.h>
 #include <malloca.h>
+#include <stddef.h>
 
 DECL_BEGIN
 

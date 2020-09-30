@@ -272,21 +272,33 @@ INTERN_FUNCTION(_start)
 	cpuid
 	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001C
 	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000001D
+
+	/* Check if we can extract the brand string from cpuid */
 	movl   V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000000A, %eax
-	cmpl   $(0x80000004), %eax
+	cmpl   $(0x80000007), %eax
+	jnae   4f
+	movl   $(0x80000007), %eax
+	cpuid
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000007D
+	jmp    5f
+4:	cmpl   $(0x80000004), %eax
 	jnae   3f
+5:
+
 	movl   $(0x80000004), %eax
 	cpuid
 	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000004A
 	movl   %ebx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000004B
 	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000004C
 	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000004D
+
 	movl   $(0x80000003), %eax
 	cpuid
 	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000003A
 	movl   %ebx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000003B
 	movl   %ecx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000003C
 	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000003D
+
 	movl   $(0x80000002), %eax
 	cpuid
 	movl   %eax, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000002A

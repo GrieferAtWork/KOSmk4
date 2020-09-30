@@ -71,7 +71,7 @@ NOTHROW(FCALL GDB_DoGetRegister)(struct task *__restrict thread,
 		assert(GDBThread_IsAllStopModeActive);
 		/* Unrelated thread in all-stop mode */
 		result = GDB_GetSCpuStateRegister(thread, regno, buf, bufsize,
-		                                  thread->t_sched.s_state);
+		                                  thread->t_state);
 	}
 	return result;
 }
@@ -106,7 +106,7 @@ NOTHROW(FCALL GDB_DoSetRegister)(struct task *__restrict thread,
 		assert(GDBThread_IsAllStopModeActive);
 		/* Unrelated thread in all-stop mode */
 		result = GDB_SetSCpuStateRegister(thread, regno, buf, bufsize,
-		                                  &thread->t_sched.s_state);
+		                                  &thread->t_state);
 	}
 	return result;
 }

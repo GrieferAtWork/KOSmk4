@@ -60,6 +60,7 @@ STATIC_ASSERT(OFFSET_CPUID_80000004A == offsetof(struct cpuinfo, ci_80000004a));
 STATIC_ASSERT(OFFSET_CPUID_80000004B == offsetof(struct cpuinfo, ci_80000004b));
 STATIC_ASSERT(OFFSET_CPUID_80000004C == offsetof(struct cpuinfo, ci_80000004c));
 STATIC_ASSERT(OFFSET_CPUID_80000004D == offsetof(struct cpuinfo, ci_80000004d));
+STATIC_ASSERT(OFFSET_CPUID_80000007D == offsetof(struct cpuinfo, ci_80000007d));
 STATIC_ASSERT(SIZEOF_CPUID_CPUINFO   == sizeof(struct cpuinfo));
 
 DECL_END

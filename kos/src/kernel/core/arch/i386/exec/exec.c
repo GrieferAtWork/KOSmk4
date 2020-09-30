@@ -40,6 +40,7 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
+#include <stddef.h>
 #include <string.h>
 
 #ifdef __x86_64__

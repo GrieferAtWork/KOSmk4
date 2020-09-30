@@ -103,7 +103,7 @@
 #define CPUID_1C_OSXSAVE         __UINT32_C(0x08000000) /* [bit(ECX:27)] XSAVE enabled by OS. */
 #define CPUID_1C_AVX             __UINT32_C(0x10000000) /* [bit(ECX:28)] Advanced Vector Extensions. */
 #define CPUID_1C_F16C            __UINT32_C(0x20000000) /* [bit(ECX:29)] F16C (half-precision) FP support. */
-#define CPUID_1C_RDRND           __UINT32_C(0x40000000) /* [bit(ECX:30)] RDRAND (on-chip random number generator) support. */
+#define CPUID_1C_RDRAND          __UINT32_C(0x40000000) /* [bit(ECX:30)] RDRAND (on-chip random number generator) support. */
 #define CPUID_1C_HYPERVISOR      __UINT32_C(0x80000000) /* [bit(ECX:31)] Running on a hypervisor (always 0 on a real CPU, but also with some hypervisors). */
 
 /*      CPUID_7D_                __UINT32_C(0x00000001) /* [bit(0)] RESERVED. */

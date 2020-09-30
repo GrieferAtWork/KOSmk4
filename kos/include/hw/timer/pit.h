@@ -60,6 +60,12 @@
 #    define PIT_COMMAND_FBINARY               0x00 /* Data is accessed as 8/16-bit binary. */
 #    define PIT_COMMAND_FBCD                  0x01 /* Data is accessed as four-digit BCD (no one needs this). */
 
+/* NOTE: On KOS, PIT channels are used as follows:
+ *   - PIT_COMMAND_SELECT_F0: TSC emulation timer (when APIC isn't available)
+ *   - PIT_COMMAND_SELECT_F1: General-purpose delay timer (when realtime()-based delays cannot be used)
+ *   - PIT_COMMAND_SELECT_F2: Unused/Reserved for beep()
+ */
+
 
 #define PIT_HZ_X3     3579545 /* 1.193182 */
 #define PIT_HZ        (PIT_HZ_X3 / 3)

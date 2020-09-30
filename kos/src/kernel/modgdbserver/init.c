@@ -34,6 +34,7 @@
 #include <hybrid/atomic.h>
 
 #include <signal.h> /* SIGTRAP */
+#include <stddef.h>
 
 #include "fsio.h"
 #include "gdb.h"

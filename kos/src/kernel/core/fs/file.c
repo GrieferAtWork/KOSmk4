@@ -47,6 +47,7 @@
 #include <assert.h>
 #include <dirent.h>
 #include <stdalign.h>
+#include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 

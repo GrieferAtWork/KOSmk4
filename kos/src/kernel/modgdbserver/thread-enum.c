@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <sched/cpu.h>
+#include <sched/enum.h>
 
 #include <hybrid/atomic.h>
 
@@ -82,6 +83,22 @@ NOTHROW(FCALL GDBThread_ShouldEnumerate)(struct task *__restrict thread) {
 	return true;
 }
 
+typedef struct {
+	PTHREAD_ENUM_CALLBACK ted_cb;  /* Callback */
+	void                 *ted_arg; /* Argument */
+} GDBThread_Enumerate_Data;
+
+PRIVATE ssize_t
+NOTHROW(KCALL GDBThread_Enumerate_Cb)(void *arg,
+                                      struct task *thread,
+                                      struct taskpid *UNUSED(pid)) {
+	GDBThread_Enumerate_Data *cookie;
+	if (!thread)
+		return 0;
+	cookie = (GDBThread_Enumerate_Data *)arg;
+	return (*cookie->ted_cb)(cookie->ted_arg, thread);
+}
+
 /* Enumerate thread that are:
  *  - In EVERY_CPU->c_running
  *  - In EVERY_CPU->c_sleeping
@@ -92,8 +109,8 @@ NOTHROW(FCALL GDBThread_ShouldEnumerate)(struct task *__restrict thread) {
 INTDEF ssize_t
 NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback,
                                    void *arg) {
-	cpuid_t cid;
-	ssize_t temp, result = 0;
+	ssize_t result;
+	GDBThread_Enumerate_Data data;
 #ifndef CONFIG_NO_SMP
 	bool mustStopAll;
 	/* If our CPU is the only one online, then
@@ -121,66 +138,17 @@ again_check_must_stop:
 	if (GDBThread_IsNonStopModeActive)
 		PREEMPTION_DISABLE();
 #endif /* !CONFIG_NO_SMP */
-	for (cid = 0; cid < cpu_count; ++cid) {
-		struct task *iter, *first;
-		struct cpu *c = cpu_vector[cid];
-		bool didThisIdle = false;
-		iter = first = c->c_current;
-		do {
-			if (GDBThread_ShouldEnumerate(iter)) {
-				temp = (*callback)(arg, iter);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
-			}
-			if (iter == &FORCPU(c, thiscpu_idle))
-				didThisIdle = true;
-			assert(iter->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == iter);
-			assert(iter->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == iter);
-			iter = iter->t_sched.s_running.sr_runnxt;
-		} while (iter != first);
-		for (iter = c->c_sleeping; iter;
-		     iter = iter->t_sched.s_asleep.ss_tmonxt) {
-			if (GDBThread_ShouldEnumerate(iter)) {
-				temp = (*callback)(arg, iter);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
-			}
-			if (iter == &FORCPU(c, thiscpu_idle))
-				didThisIdle = true;
-		}
-#ifndef CONFIG_NO_SMP
-		for (iter = c->c_pending;
-		     iter != CPU_PENDING_ENDOFCHAIN;
-		     iter = iter->t_sched.s_pending.ss_pennxt) {
-			if (GDBThread_ShouldEnumerate(iter)) {
-				assert(iter != &FORCPU(c, thiscpu_idle));
-				temp = (*callback)(arg, iter);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
-			}
-		}
-#endif /* !CONFIG_NO_SMP */
-		if (!didThisIdle &&
-		    (GDBServer_Features & GDB_SERVER_FEATURE_SHOWKERNEL)) {
-			temp = (*callback)(arg, &FORCPU(c, thiscpu_idle));
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
-		}
-	}
-done:
+	data.ted_cb  = callback;
+	data.ted_arg = arg;
+	/* Enumerate all running threads from all CPUs */
+	result = task_enum_all_noipi_nb(&GDBThread_Enumerate_Cb,
+	                                &data);
 	PREEMPTION_ENABLE();
 #ifndef CONFIG_NO_SMP
 	if (mustStopAll)
 		GDBThread_ResumeAllCpus();
 #endif /* !CONFIG_NO_SMP */
 	return result;
-err:
-	result = temp;
-	goto done;
 }
 
 

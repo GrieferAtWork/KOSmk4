@@ -23,58 +23,97 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <sched/arch/time.h>
 #include <sched/signal.h>
-#include <sched/time.h>
+#include <sched/task.h>
+
+#include <hybrid/__atomic.h>
 
 #include <hw/rtc/cmos.h>
 #include <sys/io.h>
 
 #ifndef CONFIG_NO_SMP
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 #endif /* !CONFIG_NO_SMP */
 
 #ifdef __CC__
 DECL_BEGIN
 
-struct cmos_realtime_clock_struct
-#if defined(__cplusplus) && !defined(CONFIG_WANT_CMOS_REALTIME_CLOCK_AS_STRUCT)
-    : realtime_clock_struct
-#endif /* __cplusplus && !CONFIG_WANT_CMOS_REALTIME_CLOCK_AS_STRUCT */
-{
-#if !defined(__cplusplus) || defined(CONFIG_WANT_CMOS_REALTIME_CLOCK_AS_STRUCT)
-	struct realtime_clock_struct cr_clock;   /* The underlying clock. */
-#endif /* !__cplusplus || CONFIG_WANT_CMOS_REALTIME_CLOCK_AS_STRUCT */
+struct x86_cmos_struct {
 #ifndef CONFIG_NO_SMP
-	struct atomic_rwlock cr_lock;    /* CMOS SMP lock. */
+	struct atomic_lock cr_lock;         /* CMOS SMP lock. */
 #endif /* !CONFIG_NO_SMP */
-	u8                   cr_century;      /* [const] CMOS century register. (or 0 if unknown) */
-	u8                   cr_stb;          /* [const] Configured BIOS value for `CMOS_STATE_B' */
-	WEAK u8              cr_nmi;          /* [lock(cr_lock)] 0 if NMIs are enabled; `CMOS_ADDR_NONMI' otherwise */
-	u8                  _cr_pad;          /* ... */
-	u8                   cr_alarm_second; /* [lock(cr_lock)] Last value written to `CMOS_ALARM_SECOND' */
-	u8                   cr_alarm_minute; /* [lock(cr_lock)] Last value written to `CMOS_ALARM_MINUTE' */
-	u8                   cr_alarm_hour;   /* [lock(cr_lock)] Last value written to `CMOS_ALARM_HOUR' */
-	WEAK u8              cr_stc;          /* [lock(ATOMIC)] Or'd together bits describing triggered interrupts (set of `CMOS_C_*')
-	                                       * Bits in this set are atomically turned on just before `cr_irq' is broadcast */
-	struct sig           cr_irq;          /* Signal broadcast when `X86_INTNO_PIC2_CMOS' is fired, and `cr_stc' changed. */
-	time_t               cr_alarm;        /* [lock(cr_lock)] The currently programmed alarm timeout (or `INT64_MAX' if not programmed) */
+	u8                 cr_century;      /* [const] CMOS century register. (or 0 if unknown) */
+	u8                 cr_stb;          /* [const] Configured BIOS value for `CMOS_STATE_B' */
+	WEAK u8            cr_nmi;          /* [lock(cr_lock)] 0 if NMIs are enabled; `CMOS_ADDR_NONMI' otherwise */
+	u8                _cr_pad1;         /* ... */
+	u8                 cr_alarm_second; /* [lock(cr_lock)] Last value written to `CMOS_ALARM_SECOND' */
+	u8                 cr_alarm_minute; /* [lock(cr_lock)] Last value written to `CMOS_ALARM_MINUTE' */
+	u8                 cr_alarm_hour;   /* [lock(cr_lock)] Last value written to `CMOS_ALARM_HOUR' */
+	u8                _cr_pad2;         /* ... */
 };
 
+DATDEF struct x86_cmos_struct x86_cmos;
+
+#ifndef CONFIG_NO_SMP
+#define x86_cmos_lock_acquire_nopr() atomic_lock_acquire_nopr(&x86_cmos.cr_lock)
+#define x86_cmos_lock_release_nopr() atomic_lock_release(&x86_cmos.cr_lock)
+#else /* !CONFIG_NO_SMP */
+#define x86_cmos_lock_acquire_nopr() (void)0
+#define x86_cmos_lock_release_nopr() (void)0
+#endif /* CONFIG_NO_SMP */
+#define x86_cmos_lock_acquire()                 \
+	do {                                        \
+		pflag_t _cl_was = PREEMPTION_PUSHOFF(); \
+		x86_cmos_lock_acquire_nopr()
+#define x86_cmos_lock_break()          \
+		(x86_cmos_lock_release_nopr(), \
+		 PREEMPTION_POP(_cl_was))
+#define x86_cmos_lock_release() \
+		x86_cmos_lock_break();  \
+	} __WHILE0
 
 /* Read CMOS control register `reg' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL u8
-NOTHROW(KCALL cmos_rd)(u8 reg) {
-	outb(CMOS_ADDR, reg | cmos_realtime_clock.cr_nmi);
-	return inb(CMOS_DATA);
-}
+#define cmos_rd(reg)                           \
+	(outb(CMOS_ADDR, (reg) | x86_cmos.cr_nmi), \
+	 inb(CMOS_DATA))
 
 /* Write CMOS control register `reg' */
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL cmos_wr)(u8 reg, u8 val) {
-	outb(CMOS_ADDR, reg | cmos_realtime_clock.cr_nmi);
-	outb(CMOS_DATA, val);
+#define cmos_wr(reg, val)                      \
+	(outb(CMOS_ADDR, (reg) | x86_cmos.cr_nmi), \
+	 outb(CMOS_DATA, (val)))
+
+
+/* Get/Set NMI (non-maskable interrupt) being enabled
+ * These interrupts should normally be enabled in all situations,
+ * and should only be disabled momentarily, and when absolutely
+ * necessary.
+ * Also note that NMI enable/disable is controlled globally, and
+ * not, say, per-CPU!
+ * @param: enabled: The new nmi-enabled state (if different from `return',
+ *                  the state was changed)
+ * @return: * :     The NMI-enabled state prior to the call being made. */
+#define x86_get_nmi_enabled() \
+	((__hybrid_atomic_load(x86_cmos.cr_nmi, __ATOMIC_ACQUIRE) & CMOS_ADDR_NONMI) == 0)
+LOCAL NOBLOCK NOPREEMPT __BOOL
+NOTHROW(KCALL x86_set_nmi_enabled_nopr)(__BOOL enabled) {
+	u8 old_nmi, new_nmi;
+	new_nmi = enabled ? 0 : CMOS_ADDR_NONMI;
+	x86_cmos_lock_acquire_nopr();
+	old_nmi = __hybrid_atomic_xch(x86_cmos.cr_nmi, new_nmi, __ATOMIC_SEQ_CST);
+	if (old_nmi != new_nmi)
+		outb(CMOS_ADDR, new_nmi); /* Update hardware */
+	x86_cmos_lock_release_nopr();
+	return (old_nmi & CMOS_ADDR_NONMI) == 0;
 }
+LOCAL NOBLOCK NOPREEMPT __BOOL
+NOTHROW(KCALL x86_set_nmi_enabled)(__BOOL enabled) {
+	__BOOL result;
+	pflag_t was = PREEMPTION_PUSHOFF();
+	result = x86_set_nmi_enabled_nopr(enabled);
+	PREEMPTION_POP(was);
+	return result;
+}
+
 
 
 DECL_END

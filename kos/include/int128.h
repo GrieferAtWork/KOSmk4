@@ -622,6 +622,264 @@ void uint128_sub(int128_t &__var, unsigned __int64 __value);
 void uint128_sub(uint128_t &__var, unsigned __int64 __value);
 #endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
 
+/* VAR *= VALUE */
+#ifdef __CHAR_UNSIGNED__
+void uint128_mul(int128_t &__var, char __value);
+void uint128_mul(uint128_t &__var, char __value);
+#endif /* __CHAR_UNSIGNED__ */
+void uint128_mul(int128_t &__var, unsigned char __value);
+void uint128_mul(uint128_t &__var, unsigned char __value);
+void uint128_mul(int128_t &__var, unsigned short __value);
+void uint128_mul(uint128_t &__var, unsigned short __value);
+void uint128_mul(int128_t &__var, unsigned int __value);
+void uint128_mul(uint128_t &__var, unsigned int __value);
+void uint128_mul(int128_t &__var, unsigned long __value);
+void uint128_mul(uint128_t &__var, unsigned long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+void uint128_mul(int128_t &__var, __ULONGLONG __value);
+void uint128_mul(uint128_t &__var, __ULONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+void uint128_mul8(int128_t &__var, __UINT8_TYPE__ __value);
+void uint128_mul8(uint128_t &__var, __UINT8_TYPE__ __value);
+void uint128_mul16(int128_t &__var, __UINT16_TYPE__ __value);
+void uint128_mul16(uint128_t &__var, __UINT16_TYPE__ __value);
+void uint128_mul32(int128_t &__var, __UINT32_TYPE__ __value);
+void uint128_mul32(uint128_t &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+void uint128_mul64(int128_t &__var, __UINT64_TYPE__ __value);
+void uint128_mul64(uint128_t &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+void uint128_mul128(int128_t &__var, int128_t __value);
+void uint128_mul128(uint128_t &__var, int128_t __value);
+void uint128_mul128(int128_t &__var, uint128_t __value);
+void uint128_mul128(uint128_t &__var, uint128_t __value);
+#ifndef __CHAR_UNSIGNED__
+void int128_mul(int128_t &__var, char __value);
+void int128_mul(uint128_t &__var, char __value);
+#endif /* !__CHAR_UNSIGNED__ */
+void int128_mul(int128_t &__var, signed char __value);
+void int128_mul(uint128_t &__var, signed char __value);
+void int128_mul(int128_t &__var, short __value);
+void int128_mul(uint128_t &__var, short __value);
+void int128_mul(int128_t &__var, int __value);
+void int128_mul(uint128_t &__var, int __value);
+void int128_mul(int128_t &__var, long __value);
+void int128_mul(uint128_t &__var, long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+void int128_mul(int128_t &__var, __LONGLONG __value);
+void int128_mul(uint128_t &__var, __LONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+void int128_mul8(int128_t &__var, __UINT8_TYPE__ __value);
+void int128_mul8(uint128_t &__var, __UINT8_TYPE__ __value);
+void int128_mul16(int128_t &__var, __UINT16_TYPE__ __value);
+void int128_mul16(uint128_t &__var, __UINT16_TYPE__ __value);
+void int128_mul32(int128_t &__var, __UINT32_TYPE__ __value);
+void int128_mul32(uint128_t &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+void int128_mul64(int128_t &__var, __UINT64_TYPE__ __value);
+void int128_mul64(uint128_t &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+void int128_mul128(int128_t &__var, int128_t __value);
+void int128_mul128(uint128_t &__var, int128_t __value);
+void int128_mul128(int128_t &__var, uint128_t __value);
+void int128_mul128(uint128_t &__var, uint128_t __value);
+#ifdef __COMPILER_INT8_IS_UNIQUE_TYPE
+void int128_mul(int128_t &__var, __int8 __value);
+void int128_mul(uint128_t &__var, __int8 __value);
+void uint128_mul(int128_t &__var, unsigned __int8 __value);
+void uint128_mul(uint128_t &__var, unsigned __int8 __value);
+#endif /* __COMPILER_INT8_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT16_IS_UNIQUE_TYPE
+void int128_mul(int128_t &__var, __int16 __value);
+void int128_mul(uint128_t &__var, __int16 __value);
+void uint128_mul(int128_t &__var, unsigned __int16 __value);
+void uint128_mul(uint128_t &__var, unsigned __int16 __value);
+#endif /* __COMPILER_INT16_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT32_IS_UNIQUE_TYPE
+void int128_mul(int128_t &__var, __int32 __value);
+void int128_mul(uint128_t &__var, __int32 __value);
+void uint128_mul(int128_t &__var, unsigned __int32 __value);
+void uint128_mul(uint128_t &__var, unsigned __int32 __value);
+#endif /* __COMPILER_INT32_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT64_IS_UNIQUE_TYPE
+void int128_mul(int128_t &__var, __int64 __value);
+void int128_mul(uint128_t &__var, __int64 __value);
+void uint128_mul(int128_t &__var, unsigned __int64 __value);
+void uint128_mul(uint128_t &__var, unsigned __int64 __value);
+#endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
+
+/* VAR /= VALUE */
+#ifdef __CHAR_UNSIGNED__
+void uint128_div(int128_t &__var, char __value);
+void uint128_div(uint128_t &__var, char __value);
+#endif /* __CHAR_UNSIGNED__ */
+void uint128_div(int128_t &__var, unsigned char __value);
+void uint128_div(uint128_t &__var, unsigned char __value);
+void uint128_div(int128_t &__var, unsigned short __value);
+void uint128_div(uint128_t &__var, unsigned short __value);
+void uint128_div(int128_t &__var, unsigned int __value);
+void uint128_div(uint128_t &__var, unsigned int __value);
+void uint128_div(int128_t &__var, unsigned long __value);
+void uint128_div(uint128_t &__var, unsigned long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+void uint128_div(int128_t &__var, __ULONGLONG __value);
+void uint128_div(uint128_t &__var, __ULONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+void uint128_div8(int128_t &__var, __UINT8_TYPE__ __value);
+void uint128_div8(uint128_t &__var, __UINT8_TYPE__ __value);
+void uint128_div16(int128_t &__var, __UINT16_TYPE__ __value);
+void uint128_div16(uint128_t &__var, __UINT16_TYPE__ __value);
+void uint128_div32(int128_t &__var, __UINT32_TYPE__ __value);
+void uint128_div32(uint128_t &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+void uint128_div64(int128_t &__var, __UINT64_TYPE__ __value);
+void uint128_div64(uint128_t &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+void uint128_div128(int128_t &__var, int128_t __value);
+void uint128_div128(uint128_t &__var, int128_t __value);
+void uint128_div128(int128_t &__var, uint128_t __value);
+void uint128_div128(uint128_t &__var, uint128_t __value);
+#ifndef __CHAR_UNSIGNED__
+void int128_div(int128_t &__var, char __value);
+void int128_div(uint128_t &__var, char __value);
+#endif /* !__CHAR_UNSIGNED__ */
+void int128_div(int128_t &__var, signed char __value);
+void int128_div(uint128_t &__var, signed char __value);
+void int128_div(int128_t &__var, short __value);
+void int128_div(uint128_t &__var, short __value);
+void int128_div(int128_t &__var, int __value);
+void int128_div(uint128_t &__var, int __value);
+void int128_div(int128_t &__var, long __value);
+void int128_div(uint128_t &__var, long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+void int128_div(int128_t &__var, __LONGLONG __value);
+void int128_div(uint128_t &__var, __LONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+void int128_div8(int128_t &__var, __UINT8_TYPE__ __value);
+void int128_div8(uint128_t &__var, __UINT8_TYPE__ __value);
+void int128_div16(int128_t &__var, __UINT16_TYPE__ __value);
+void int128_div16(uint128_t &__var, __UINT16_TYPE__ __value);
+void int128_div32(int128_t &__var, __UINT32_TYPE__ __value);
+void int128_div32(uint128_t &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+void int128_div64(int128_t &__var, __UINT64_TYPE__ __value);
+void int128_div64(uint128_t &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+void int128_div128(int128_t &__var, int128_t __value);
+void int128_div128(uint128_t &__var, int128_t __value);
+void int128_div128(int128_t &__var, uint128_t __value);
+void int128_div128(uint128_t &__var, uint128_t __value);
+#ifdef __COMPILER_INT8_IS_UNIQUE_TYPE
+void int128_div(int128_t &__var, __int8 __value);
+void int128_div(uint128_t &__var, __int8 __value);
+void uint128_div(int128_t &__var, unsigned __int8 __value);
+void uint128_div(uint128_t &__var, unsigned __int8 __value);
+#endif /* __COMPILER_INT8_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT16_IS_UNIQUE_TYPE
+void int128_div(int128_t &__var, __int16 __value);
+void int128_div(uint128_t &__var, __int16 __value);
+void uint128_div(int128_t &__var, unsigned __int16 __value);
+void uint128_div(uint128_t &__var, unsigned __int16 __value);
+#endif /* __COMPILER_INT16_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT32_IS_UNIQUE_TYPE
+void int128_div(int128_t &__var, __int32 __value);
+void int128_div(uint128_t &__var, __int32 __value);
+void uint128_div(int128_t &__var, unsigned __int32 __value);
+void uint128_div(uint128_t &__var, unsigned __int32 __value);
+#endif /* __COMPILER_INT32_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT64_IS_UNIQUE_TYPE
+void int128_div(int128_t &__var, __int64 __value);
+void int128_div(uint128_t &__var, __int64 __value);
+void uint128_div(int128_t &__var, unsigned __int64 __value);
+void uint128_div(uint128_t &__var, unsigned __int64 __value);
+#endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
+
+/* VAR %= VALUE */
+#ifdef __CHAR_UNSIGNED__
+void uint128_mod(int128_t &__var, char __value);
+void uint128_mod(uint128_t &__var, char __value);
+#endif /* __CHAR_UNSIGNED__ */
+void uint128_mod(int128_t &__var, unsigned char __value);
+void uint128_mod(uint128_t &__var, unsigned char __value);
+void uint128_mod(int128_t &__var, unsigned short __value);
+void uint128_mod(uint128_t &__var, unsigned short __value);
+void uint128_mod(int128_t &__var, unsigned int __value);
+void uint128_mod(uint128_t &__var, unsigned int __value);
+void uint128_mod(int128_t &__var, unsigned long __value);
+void uint128_mod(uint128_t &__var, unsigned long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+void uint128_mod(int128_t &__var, __ULONGLONG __value);
+void uint128_mod(uint128_t &__var, __ULONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+void uint128_mod8(int128_t &__var, __UINT8_TYPE__ __value);
+void uint128_mod8(uint128_t &__var, __UINT8_TYPE__ __value);
+void uint128_mod16(int128_t &__var, __UINT16_TYPE__ __value);
+void uint128_mod16(uint128_t &__var, __UINT16_TYPE__ __value);
+void uint128_mod32(int128_t &__var, __UINT32_TYPE__ __value);
+void uint128_mod32(uint128_t &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+void uint128_mod64(int128_t &__var, __UINT64_TYPE__ __value);
+void uint128_mod64(uint128_t &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+void uint128_mod128(int128_t &__var, int128_t __value);
+void uint128_mod128(uint128_t &__var, int128_t __value);
+void uint128_mod128(int128_t &__var, uint128_t __value);
+void uint128_mod128(uint128_t &__var, uint128_t __value);
+#ifndef __CHAR_UNSIGNED__
+void int128_mod(int128_t &__var, char __value);
+void int128_mod(uint128_t &__var, char __value);
+#endif /* !__CHAR_UNSIGNED__ */
+void int128_mod(int128_t &__var, signed char __value);
+void int128_mod(uint128_t &__var, signed char __value);
+void int128_mod(int128_t &__var, short __value);
+void int128_mod(uint128_t &__var, short __value);
+void int128_mod(int128_t &__var, int __value);
+void int128_mod(uint128_t &__var, int __value);
+void int128_mod(int128_t &__var, long __value);
+void int128_mod(uint128_t &__var, long __value);
+#ifdef __COMPILER_HAVE_LONGLONG
+void int128_mod(int128_t &__var, __LONGLONG __value);
+void int128_mod(uint128_t &__var, __LONGLONG __value);
+#endif /* __COMPILER_HAVE_LONGLONG */
+void int128_mod8(int128_t &__var, __UINT8_TYPE__ __value);
+void int128_mod8(uint128_t &__var, __UINT8_TYPE__ __value);
+void int128_mod16(int128_t &__var, __UINT16_TYPE__ __value);
+void int128_mod16(uint128_t &__var, __UINT16_TYPE__ __value);
+void int128_mod32(int128_t &__var, __UINT32_TYPE__ __value);
+void int128_mod32(uint128_t &__var, __UINT32_TYPE__ __value);
+#ifdef __UINT64_TYPE__
+void int128_mod64(int128_t &__var, __UINT64_TYPE__ __value);
+void int128_mod64(uint128_t &__var, __UINT64_TYPE__ __value);
+#endif /* __UINT64_TYPE__ */
+void int128_mod128(int128_t &__var, int128_t __value);
+void int128_mod128(uint128_t &__var, int128_t __value);
+void int128_mod128(int128_t &__var, uint128_t __value);
+void int128_mod128(uint128_t &__var, uint128_t __value);
+#ifdef __COMPILER_INT8_IS_UNIQUE_TYPE
+void int128_mod(int128_t &__var, __int8 __value);
+void int128_mod(uint128_t &__var, __int8 __value);
+void uint128_mod(int128_t &__var, unsigned __int8 __value);
+void uint128_mod(uint128_t &__var, unsigned __int8 __value);
+#endif /* __COMPILER_INT8_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT16_IS_UNIQUE_TYPE
+void int128_mod(int128_t &__var, __int16 __value);
+void int128_mod(uint128_t &__var, __int16 __value);
+void uint128_mod(int128_t &__var, unsigned __int16 __value);
+void uint128_mod(uint128_t &__var, unsigned __int16 __value);
+#endif /* __COMPILER_INT16_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT32_IS_UNIQUE_TYPE
+void int128_mod(int128_t &__var, __int32 __value);
+void int128_mod(uint128_t &__var, __int32 __value);
+void uint128_mod(int128_t &__var, unsigned __int32 __value);
+void uint128_mod(uint128_t &__var, unsigned __int32 __value);
+#endif /* __COMPILER_INT32_IS_UNIQUE_TYPE */
+#ifdef __COMPILER_INT64_IS_UNIQUE_TYPE
+void int128_mod(int128_t &__var, __int64 __value);
+void int128_mod(uint128_t &__var, __int64 __value);
+void uint128_mod(int128_t &__var, unsigned __int64 __value);
+void uint128_mod(uint128_t &__var, unsigned __int64 __value);
+#endif /* __COMPILER_INT64_IS_UNIQUE_TYPE */
+
 /* VAR == VALUE */
 #ifdef __CHAR_UNSIGNED__
 __ATTR_WUNUSED __ATTR_PURE bool uint128_eq(int128_t const &__var, char __value);
@@ -1290,6 +1548,36 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_is64bit(int128_t const &__var);   /* VAR 
 #define int128_sub16(var, v)                __hybrid_int128_sub16(var, v)
 #define int128_sub32(var, v)                __hybrid_int128_sub32(var, v)
 #define int128_sub128(var, v)               __hybrid_int128_sub128(var, v)
+#define uint128_mul(var, v)                 __hybrid_uint128_mul(var, v)
+#define uint128_mul8(var, v)                __hybrid_uint128_mul8(var, v)
+#define uint128_mul16(var, v)               __hybrid_uint128_mul16(var, v)
+#define uint128_mul32(var, v)               __hybrid_uint128_mul32(var, v)
+#define uint128_mul128(var, v)              __hybrid_uint128_mul128(var, v)
+#define int128_mul(var, v)                  __hybrid_int128_mul(var, v)
+#define int128_mul8(var, v)                 __hybrid_int128_mul8(var, v)
+#define int128_mul16(var, v)                __hybrid_int128_mul16(var, v)
+#define int128_mul32(var, v)                __hybrid_int128_mul32(var, v)
+#define int128_mul128(var, v)               __hybrid_int128_mul128(var, v)
+#define uint128_div(var, v)                 __hybrid_uint128_div(var, v)
+#define uint128_div8(var, v)                __hybrid_uint128_div8(var, v)
+#define uint128_div16(var, v)               __hybrid_uint128_div16(var, v)
+#define uint128_div32(var, v)               __hybrid_uint128_div32(var, v)
+#define uint128_div128(var, v)              __hybrid_uint128_div128(var, v)
+#define int128_div(var, v)                  __hybrid_int128_div(var, v)
+#define int128_div8(var, v)                 __hybrid_int128_div8(var, v)
+#define int128_div16(var, v)                __hybrid_int128_div16(var, v)
+#define int128_div32(var, v)                __hybrid_int128_div32(var, v)
+#define int128_div128(var, v)               __hybrid_int128_div128(var, v)
+#define uint128_mod(var, v)                 __hybrid_uint128_mod(var, v)
+#define uint128_mod8(var, v)                __hybrid_uint128_mod8(var, v)
+#define uint128_mod16(var, v)               __hybrid_uint128_mod16(var, v)
+#define uint128_mod32(var, v)               __hybrid_uint128_mod32(var, v)
+#define uint128_mod128(var, v)              __hybrid_uint128_mod128(var, v)
+#define int128_mod(var, v)                  __hybrid_int128_mod(var, v)
+#define int128_mod8(var, v)                 __hybrid_int128_mod8(var, v)
+#define int128_mod16(var, v)                __hybrid_int128_mod16(var, v)
+#define int128_mod32(var, v)                __hybrid_int128_mod32(var, v)
+#define int128_mod128(var, v)               __hybrid_int128_mod128(var, v)
 #define uint128_shl32(var, shift)           __hybrid_uint128_shl32(var, shift)
 #define uint128_shr32(var, shift)           __hybrid_uint128_shr32(var, shift)
 #define int128_shl32(var, shift)            __hybrid_int128_shl32(var, shift)

@@ -35,6 +35,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/rt.h>
 #include <kernel/vm.h>
 #include <kernel/x86/breakpoint.h>
+#include <sched/sched.h>
 
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
@@ -204,7 +205,7 @@ NOTHROW(KCALL get_dbg_current_kernel_gs_base)(u64 *__restrict presult) {
 	}
 #ifndef CONFIG_NO_SMP
 	else if (dbg_current->t_cpu &&
-	         dbg_current->t_cpu->c_current == dbg_current) {
+	         FORCPU(dbg_current->t_cpu, thiscpu_sched_current) == dbg_current) {
 		cpuid_t cpuid;
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
@@ -234,7 +235,7 @@ NOTHROW(KCALL set_dbg_current_kernel_gs_base)(u64 value) {
 	}
 #ifndef CONFIG_NO_SMP
 	else if (dbg_current->t_cpu &&
-	         dbg_current->t_cpu->c_current == dbg_current) {
+	         FORCPU(dbg_current->t_cpu, thiscpu_sched_current) == dbg_current) {
 		cpuid_t cpuid;
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
@@ -273,7 +274,7 @@ NOTHROW(KCALL saveorig)(void) {
 		set_trapstate_from_fcpustate(&x86_dbg_origstate);
 #ifndef CONFIG_NO_SMP
 	} else if (dbg_current->t_cpu &&
-	           dbg_current->t_cpu->c_current == dbg_current) {
+	           FORCPU(dbg_current->t_cpu, thiscpu_sched_current) == dbg_current) {
 		cpuid_t cpuid;
 		struct icpustate *ist;
 		struct x86_dbg_cpuammend *ammend;
@@ -318,11 +319,11 @@ NOTHROW(KCALL saveorig)(void) {
 do_normal_unscheduled_thread:
 #endif /* !CONFIG_NO_SMP */
 		/* Re-construct the thread's scheduler CPU state. */
-		sst = dbg_current->t_sched.s_state;
+		sst = dbg_current->t_state;
 		if (sst) {
 			sst = (struct scpustate *)((byte_t *) + scpustate_sizeof(sst));
 			sst = fcpustate_to_scpustate_p(&x86_dbg_origstate, sst);
-			dbg_current->t_sched.s_state = sst;
+			dbg_current->t_state = sst;
 		}
 		/* Fill in missing registers. */
 #ifndef CONFIG_NO_SMP
@@ -387,7 +388,7 @@ NOTHROW(KCALL loadview)(void) {
 			get_fcpustate_from_trapstate(&x86_dbg_origstate);
 #ifndef CONFIG_NO_SMP
 		} else if (dbg_current->t_cpu &&
-		           dbg_current->t_cpu->c_current == dbg_current) {
+		           FORCPU(dbg_current->t_cpu, thiscpu_sched_current) == dbg_current) {
 			cpuid_t cpuid;
 			struct icpustate *ist;
 			struct x86_dbg_cpuammend *ammend;
@@ -470,9 +471,9 @@ NOTHROW(KCALL loadview)(void) {
 do_normal_unscheduled_thread:
 #endif /* !CONFIG_NO_SMP */
 			/* Some different thread that is not being scheduled at the moment. */
-			if (dbg_current->t_sched.s_state) {
+			if (dbg_current->t_state) {
 				fcpustate_assign_scpustate(&x86_dbg_origstate,
-				                           dbg_current->t_sched.s_state);
+				                           dbg_current->t_state);
 			} else {
 				memset(&x86_dbg_origstate, 0, sizeof(x86_dbg_origstate));
 			}

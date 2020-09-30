@@ -39,7 +39,6 @@ DECL_BEGIN
  *                          TASK_RPC_FWAITFOR            RPC_SCHEDULE_FLAG_WAITSMPACK
  *                          TASK_RPC_FDONTWAKE           RPC_SCHEDULE_FLAG_DONTWAKE
  *                          TASK_RPC_FHIGHPRIO           RPC_SCHEDULE_FLAG_HIGHPRIO
- *                          TASK_RPC_FLOWPRIO            RPC_SCHEDULE_FLAG_LOWPRIO
  */
 #define RPC_KIND_SYNC            0x0000 /* Synchronous RPC */
 #define RPC_KIND_USER            0x0001 /* User RPC (service before returning to user-space) */
@@ -111,7 +110,7 @@ NOTHROW(KCALL task_free_rpc)(struct rpc_entry *__restrict rpc);
 /* Deliver a given `rpc' to the specified `target' thread.
  * @param: target:   The target thread to which to deliver the RPC.
  * @param: rpc:      The rpc to-be delivered (inherited upon success; s.a. possible return values)
- * @param: priority: Set of `TASK_RPC_FNORMAL | TASK_RPC_FDONTWAKE | TASK_RPC_FHIGHPRIO | TASK_RPC_FLOWPRIO | TASK_RPC_FWAITFOR'
+ * @param: priority: Set of `TASK_RPC_FNORMAL | TASK_RPC_FDONTWAKE | TASK_RPC_FHIGHPRIO | TASK_RPC_FWAITFOR'
  * @return: TASK_DELIVER_RPC_KERNTHREAD:  Failed to deliver the RPC: `rpc' is a USER-level RPC, and `target' is a kernel thread.
  * @return: TASK_DELIVER_RPC_TERMINATED:  Failed to deliver the RPC: The given `target' has already terminated.
  * @return: TASK_DELIVER_RPC_SUCCESS:     Successfully delivered RPC

@@ -43,6 +43,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stddef.h>
 
 #define KiB(n) ((n) * 1024)
 #define MiB(n) ((n) * 1024 * 1024)
@@ -281,7 +282,7 @@ again_read_e3_word:
 		goto again_read_e3_word;
 	}
 #endif /* !CONFIG_NO_SMP */
-	printk(FREESTR(KERN_DEBUG "[p2v] Setup identity mapping at %p-%p\n"),
+	printk(KERN_DEBUG "[p2v] Setup identity mapping at %p-%p\n",
 	       (byte_t *)P64_PDIR_VECADDR(vec4, vec3, 0, 0),
 	       (byte_t *)P64_PDIR_VECADDR(vec4, vec3, 511, 511) + PAGESIZE - 1);
 done:

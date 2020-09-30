@@ -41,7 +41,9 @@
 #include <kernel/x86/pic.h>
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
+#include <sched/sched.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 #include <sched/x86/cpureg.h>
 #include <sched/x86/smp.h>
 #include <sched/x86/tss.h>
@@ -53,7 +55,6 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/tss-compat.h>
 #include <kos/kernel/tss.h>
-#include <sys/param.h> /* HZ */
 
 #include <assert.h>
 #include <inttypes.h>
@@ -62,22 +63,6 @@
 
 DECL_BEGIN
 
-#ifndef CONFIG_NO_SMP
-/* Lock used to synchronize access to the PIT. */
-PUBLIC struct atomic_rwlock x86_pit_lock = ATOMIC_RWLOCK_INIT;
-#endif /* !CONFIG_NO_SMP */
-
-INTDEF byte_t x86_pic_acknowledge[];
-#ifdef CONFIG_HAVE_DEBUGGER
-INTDEF byte_t x86_debug_pic_acknowledge[];
-#endif /* CONFIG_HAVE_DEBUGGER */
-
-INTDEF byte_t x86_ack_pic[];
-INTDEF byte_t x86_ack_apic[];
-INTDEF byte_t x86_ack_apic_size[];
-
-
-DATDEF ATTR_PERCPU quantum_diff_t _thiscpu_quantum_length ASMNAME("thiscpu_quantum_length");
 DATDEF ATTR_PERCPU u8 _thiscpu_x86_lapicid ASMNAME("thiscpu_x86_lapicid");
 DATDEF ATTR_PERCPU u8 _thiscpu_x86_lapicversion ASMNAME("thiscpu_x86_lapicversion");
 DATDEF cpuid_t _cpu_count ASMNAME("cpu_count");
@@ -135,100 +120,8 @@ LOCAL bool KCALL all_all_cpus_online(void) {
 #define CPU_ALL_ONLINE   all_all_cpus_online()
 #endif
 
-PRIVATE NOBLOCK void NOTHROW(KCALL x86_calibrate_apic_with_pic)(void) {
-	u8 temp;
-	/* Make sure that the speaker is off and disconnected. */
-	temp = inb(PIT_PCSPEAKER);
-	outb(PIT_PCSPEAKER, temp & ~(PIT_PCSPEAKER_FSYNCPIT |
-	                             PIT_PCSPEAKER_FINOUT));
-	/* Wait until the speaker moves to the in-position */
-	for (;;) {
-		temp = inb(PIT_PCSPEAKER);
-		if (!(temp & PIT_PCSPEAKER_OUT))
-			break;
-		__pause();
-	}
-	outb(PIT_COMMAND,
-	     PIT_COMMAND_SELECT_F2 |
-	     PIT_COMMAND_ACCESS_FLOHI |
-	     PIT_COMMAND_MODE_FONESHOT |
-	     PIT_COMMAND_FBINARY);
-	/* Configure the PIT to trigger after 1/100th of a second (10ms). */
-	outb_p(PIT_DATA2, (PIT_HZ_DIV(100) & 0xff));
-	outb(PIT_DATA2, (PIT_HZ_DIV(100) >> 8) & 0xff);
-	/*  Move the speaker to trigger the one-shot timer.
-	 * (This is what I call a hack from the last century!) */
-	outb(PIT_PCSPEAKER, temp | (PIT_PCSPEAKER_OUT |
-	                            PIT_PCSPEAKER_FSYNCPIT));
-	/* The PIC timer is now running. */
-	/* Set LAPIC counter to its maximum possible value. */
-	lapic_write(APIC_TIMER_INITIAL, (u32)-1);
-	COMPILER_BARRIER();
-
-	/* Wait for our one-shot time to expire. */
-	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT)
-		__pause();
-	/* Turn off the APIC timer. */
-	lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED);
-	/* Make sure to disable the speaker once again. */
-	outb(PIT_PCSPEAKER, temp & ~(PIT_PCSPEAKER_FSYNCPIT |
-	                             PIT_PCSPEAKER_FINOUT));
-}
-
-
-/* TODO: This function being apart of the .free section is unsafe!
- *       The boot core may move on to unmap the .free section while
- *       a secondary core still performing initialization in here! */
-PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
-	u32 num_ticks;
-	struct cpu *me = THIS_CPU;
-	cpuid_t id     = me->c_id;
-
-	/* Disable the APIC timer again, which had already
-	 * been enabled during SMP bootstrapping */
-	lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED);
-
-	/* C-level entry point for secondary SMP cores. */
-	printk(/*FREESTR*/ (KERN_INFO "[smp] Begin CPU #%u initialization\n"), id);
-
-	/* Tell the boot-cpu that we're now online. */
-	ATOMIC_AND(cpu_offline_mask[id / 8], ~(1 << (id % 8)));
-
-	/* Same as what the BOOT processor does to configure its LAPIC. */
-	while (!sync_trywrite(&x86_pit_lock))
-		__pause();
-	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
-	lapic_write(APIC_TIMER, 0xff | APIC_TIMER_MODE_FONESHOT);
-	x86_calibrate_apic_with_pic();
-	sync_endwrite(&x86_pit_lock);
-	num_ticks = lapic_read(APIC_TIMER_CURRENT);
-	num_ticks = (((u32)-1) - num_ticks) * 100;
-	num_ticks /= HZ;
-	if unlikely(!num_ticks)
-		num_ticks = 1;
-	printk(/*FREESTR*/ (KERN_INFO "[apic] CPU #%u has a quantum length of %" PRIu32 " units\n"),
-	       me->c_id, num_ticks);
-	/* TODO: If `num_ticks' differs from `FORCPU(&_bootcpu,_thiscpu_quantum_length)'
-	 *       by more than 1%, re-try the calibration up to 2 more times.
-	 *    -> Mainly affects emulators when the bus-clock is based on real
-	 *       time, but the emulator itself may have been preempted while
-	 *       it was hosting our calibration code.
-	 *    -> This is something I've seen happening a couple of times, leaving
-	 *       secondary cores to arbitrarily have tick counters off by _a_ _lot_. */
-
-	cpu_set_quantum_length(num_ticks);
-
-	/* Enable the LAPIC for real this time. */
-	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
-	lapic_write(APIC_TIMER,
-	            X86_INTNO_PIC1_PIT |
-	            APIC_TIMER_MODE_FPERIODIC);
-	lapic_write(APIC_TIMER_INITIAL, num_ticks);
-	FORCPU(me, arch_cpu_preemptive_interrupts_disabled) = false;
-}
-
-
-
+INTDEF FREE void NOTHROW(KCALL x86_calibrate_boottsc)(void);
+INTDEF FREE void NOTHROW(KCALL x86_altcore_entry)(void);
 
 /* The physical page to which the realmode SMP entry code is mapped. */
 INTERN u8 x86_smp_entry_page = 0;
@@ -602,14 +495,17 @@ i386_allocate_secondary_cores(void) {
 		FORCPU(altcore, _thiscpu_x86_lapicversion) = ((uintptr_t)_cpu_vector[i] & 0xff00) >> 8;
 		_cpu_vector[i] = altcore;
 
-		altcore->c_id                        = i;
-		altcore->c_current                   = altidle;
-		altcore->c_override                  = NULL;
-		altidle->t_cpu                       = altcore;
-		altidle->t_self                      = altidle;
-		altidle->t_flags                     = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE | TASK_FCRITICAL;
-		altidle->t_sched.s_running.sr_runnxt = altidle;
-		altidle->t_sched.s_running.sr_runprv = altidle;
+		altcore->c_id                          = i;
+		FORCPU(altcore, thiscpu_sched_current) = altidle;
+		altidle->t_cpu                         = altcore;
+		altidle->t_self                        = altidle;
+		altidle->t_flags                       = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE | TASK_FCRITICAL;
+		FORCPU(altcore, thiscpu_scheduler).s_runcount     = 1;
+		FORCPU(altcore, thiscpu_scheduler).s_running      = altidle;
+		FORCPU(altcore, thiscpu_scheduler).s_running_last = altidle;
+		/*FORCPU(altcore, thiscpu_scheduler).s_waiting_last = NULL;*/
+		FORTASK(altidle, this_sched_link).ln_pself = &FORCPU(altcore, thiscpu_scheduler).s_running;
+		/*FORTASK(altidle, this_sched_link).ln_next = NULL;*/
 
 		/* Insert the new task into the kernel VM's task user list. */
 		LLIST_INSERT(vm_kernel.v_tasks, altidle, t_vm_tasks);
@@ -733,7 +629,7 @@ i386_allocate_secondary_cores(void) {
 
 		/* Set up the boot-strap CPU state for the new CPU.
 		 * -> When a CPU is started by using an INIT IPI, it will perform internal
-		 *    setup functions before executing `THIS_CPU->c_current->t_sched.s_state'
+		 *    setup functions before executing `THIS_CPU->c_current->t_state'
 		 *    Since this is the first time that we're starting this CPU, we direct
 		 *    that state to perform some high-level CPU initialization functions,
 		 *    such as determining CPU features (and comparing those against those
@@ -765,7 +661,7 @@ i386_allocate_secondary_cores(void) {
 			init_state->scs_sgregs.sg_fs    = SEGMENT_KERNEL_FSBASE;
 			init_state->scs_sgregs.sg_gs    = SEGMENT_USER_GSBASE_RPL;
 #endif /* !__x86_64__ */
-			altidle->t_sched.s_state        = init_state;
+			altidle->t_state        = init_state;
 		}
 
 		/* Run per-task initializers on the new cpu's IDLE thread. */
@@ -797,25 +693,6 @@ i386_allocate_secondary_cores(void) {
 
 #endif /* !CONFIG_NO_SMP */
 
-
-/* Alternate implementation for `arch_cpu_quantum_elapsed_nopr()' for when APIC is available. */
-INTDEF FREE byte_t apic86_arch_cpu_quantum_elapsed_nopr[];
-INTDEF byte_t apic86_arch_cpu_quantum_elapsed_nopr_size[];
-
-INTDEF FREE byte_t apic86_arch_cpu_enable_preemptive_interrupts_nopr[];
-INTDEF byte_t apic86_arch_cpu_enable_preemptive_interrupts_nopr_size[];
-
-INTDEF FREE byte_t apic86_arch_cpu_disable_preemptive_interrupts_nopr[];
-INTDEF byte_t apic86_arch_cpu_disable_preemptive_interrupts_nopr_size[];
-
-INTDEF FREE byte_t apic86_arch_cpu_quantum_elapsed_and_reset_nopr[];
-INTDEF byte_t apic86_arch_cpu_quantum_elapsed_and_reset_nopr_size[];
-
-INTDEF FREE byte_t apic86_arch_cpu_update_quantum_length_nopr[];
-INTDEF byte_t apic86_arch_cpu_update_quantum_length_nopr_size[];
-
-INTDEF FREE byte_t apic86_arch_cpu_hwipi_pending_nopr[];
-INTDEF byte_t apic86_arch_cpu_hwipi_pending_nopr_size[];
 
 #ifdef __HAVE_CPUSET_FULL_MASK
 DATDEF cpuset_t ___cpuset_full_mask ASMNAME("__cpuset_full_mask");
@@ -855,24 +732,39 @@ INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
 #endif /* CONFIG_HAVE_DEBUGGER */
 }
 
-INTERN ATTR_FREEBSS bool x86_config_noapic = false;
-DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_config_noapic,
-                                            KERNEL_COMMANDLINE_OPTION_TYPE_BOOL,
-                                            "noapic");
+extern byte_t x86_arch_cpu_hwipi_pending_nopr[] ASMNAME("arch_cpu_hwipi_pending_nopr");
 
-DATDEF VIRT byte_t volatile *_x86_lapicbase ASMNAME("x86_lapicbase");
+#ifndef CONFIG_NO_SMP
+INTERN ATTR_FREETEXT void KCALL pit_delay_hz(u16 hz) {
+	x86_pit_lock_acquire_nopr();
+	outb(PIT_COMMAND,
+	     PIT_COMMAND_SELECT_F1 |
+	     PIT_COMMAND_ACCESS_FLOHI |
+	     PIT_COMMAND_MODE_FONESHOT |
+	     PIT_COMMAND_FBINARY);
+	/* Configure the PIT to trigger after 1/100th of a second (10ms). */
+	outb_p(PIT_DATA1, hz & 0xff);
+	outb(PIT_DATA1, (hz >> 8) & 0xff);
+	outb(PIT_COMMAND, PIT_COMMAND_SELECT_F1 | PIT_COMMAND_ACCESS_FHI |
+	                  PIT_COMMAND_MODE_FONESHOT | PIT_COMMAND_FBINARY);
+	while (inb(PIT_DATA1))
+		task_pause();
+	outb(PIT_COMMAND, PIT_COMMAND_SELECT_F1 | PIT_COMMAND_ACCESS_FLO |
+	                  PIT_COMMAND_MODE_FONESHOT | PIT_COMMAND_FBINARY);
+	while (inb(PIT_DATA1))
+		task_pause();
+	x86_pit_lock_release_nopr();
+}
+#endif /* !CONFIG_NO_SMP */
+
 
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 
 	/* Initialize the regular PIC */
 	x86_initialize_pic();
-#define MAKE_DWORD(a, b, c, d) ((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
-	if (bootcpu_x86_cpuid.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
-		x86_config_noapic = true; /* FIXME: Work-around for weird timing... */
 
 	/* Check if we should make use of the LAPIC */
-	if (X86_HAVE_LAPIC && !x86_config_noapic) {
-		u32 num_ticks;
+	if (X86_HAVE_LAPIC) {
 #ifndef CONFIG_NO_SMP
 		cpuid_t i;
 		if (_cpu_count > 1) {
@@ -882,14 +774,14 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 			                                 (physpage_t)((physaddr_t)0x000fffff / PAGESIZE),
 			                                 CEILDIV(x86_smp_entry_size, PAGESIZE));
 			if unlikely(entry_page == PHYSPAGE_INVALID) {
-				printk(FREESTR(KERN_WARNING "[apic] Failed to allocate SMP trampoline (re-configure for single-core mode)\n"));
+				printk(FREESTR(KERN_WARNING "[smp] Failed to allocate SMP trampoline (re-configure for single-core mode)\n"));
 				_cpu_count = 1;
 #ifdef __HAVE_CPUSET_FULL_MASK
 				CPUSET_SETONE(___cpuset_full_mask, 0); /* 0 == BOOTCPU_ID */
 #endif /* __HAVE_CPUSET_FULL_MASK */
 				goto done_early_altcore_init;
 			}
-			printk(FREESTR(KERN_INFO "[apic] Allocating SMP trampoline at %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"),
+			printk(FREESTR(KERN_INFO "[smp] Allocating SMP trampoline at %" PRIpN(__SIZEOF_PHYSADDR_T__) "\n"),
 			       physpage2addr(entry_page));
 			x86_smp_entry_page = (u8)entry_page;
 			/* Apply some custom AP entry relocations. */
@@ -913,38 +805,6 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 done_early_altcore_init:
 #endif /* !CONFIG_NO_SMP */
 
-		printk(FREESTR(KERN_INFO "[apic] Using LAPIC for timings\n"));
-
-		/* Re-write text for the quantum accessor functions to use the APIC reload counter. */
-		memcpy((void *)&arch_cpu_quantum_elapsed_nopr,
-		       (void *)apic86_arch_cpu_quantum_elapsed_nopr,
-		       (size_t)apic86_arch_cpu_quantum_elapsed_nopr_size);
-		memcpy((void *)&arch_cpu_enable_preemptive_interrupts_nopr,
-		       (void *)apic86_arch_cpu_enable_preemptive_interrupts_nopr,
-		       (size_t)apic86_arch_cpu_enable_preemptive_interrupts_nopr_size);
-		memcpy((void *)&arch_cpu_disable_preemptive_interrupts_nopr,
-		       (void *)apic86_arch_cpu_disable_preemptive_interrupts_nopr,
-		       (size_t)apic86_arch_cpu_disable_preemptive_interrupts_nopr_size);
-		memcpy((void *)&arch_cpu_quantum_elapsed_and_reset_nopr,
-		       (void *)apic86_arch_cpu_quantum_elapsed_and_reset_nopr,
-		       (size_t)apic86_arch_cpu_quantum_elapsed_and_reset_nopr_size);
-		memcpy((void *)&arch_cpu_update_quantum_length_nopr,
-		       (void *)apic86_arch_cpu_update_quantum_length_nopr,
-		       (size_t)apic86_arch_cpu_update_quantum_length_nopr_size);
-		memcpy((void *)&arch_cpu_hwipi_pending_nopr,
-		       (void *)apic86_arch_cpu_hwipi_pending_nopr,
-		       (size_t)apic86_arch_cpu_hwipi_pending_nopr_size);
-
-		/* Re-write scheduler interrupt handlers to ACK APIC interrupts, rather than the PIC ones. */
-		memcpy((void *)x86_pic_acknowledge,
-		       (void *)x86_ack_apic,
-		       (size_t)x86_ack_apic_size);
-#ifndef CONFIG_NO_DEBUGGER
-		memcpy((void *)x86_debug_pic_acknowledge,
-		       (void *)x86_ack_apic,
-		       (size_t)x86_ack_apic_size);
-#endif /* !CONFIG_NO_DEBUGGER */
-
 		/* Read out the boot cpu's LAPIC id if it couldn't be determined before now. */
 		if (FORCPU(&_bootcpu, _thiscpu_x86_lapicid) == 0xff) {
 			u32 id = lapic_read(APIC_ID);
@@ -958,9 +818,7 @@ done_early_altcore_init:
 		lapic_write(APIC_SPURIOUS,
 		            APIC_SPURIOUS_FENABLED |
 		            X86_INTERRUPT_APIC_SPURIOUS);
-
 #ifndef CONFIG_NO_SMP
-		sync_write(&x86_pit_lock);
 		assert(CPU_ALL_ONLINE);
 		/* Send INIT commands to all CPUs. */
 		for (i = 1; i < _cpu_count; ++i) {
@@ -976,19 +834,8 @@ done_early_altcore_init:
 		 *       up boot time by just that tiny bit more. */
 #endif /* !CONFIG_NO_SMP */
 
-		/* Setup the first portion of an APIC timer. */
-		lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
-		lapic_write(APIC_TIMER,
-		            X86_INTERRUPT_APIC_SPURIOUS |
-		            APIC_TIMER_MODE_FONESHOT);
 		/* Calibrate the APIC */
-		x86_calibrate_apic_with_pic();
-#ifndef CONFIG_NO_SMP
-		sync_endwrite(&x86_pit_lock);
-#endif /* !CONFIG_NO_SMP */
-		COMPILER_BARRIER();
-		num_ticks = lapic_read(APIC_TIMER_CURRENT);
-
+		x86_calibrate_boottsc();
 #ifndef CONFIG_NO_SMP
 		/* Send start IPIs to all APs. */
 		for (i = 1; i < _cpu_count; ++i) {
@@ -996,58 +843,29 @@ done_early_altcore_init:
 			                  x86_smp_entry_page);
 		}
 #endif /* !CONFIG_NO_SMP */
-		num_ticks = (((u32)-1) - num_ticks) * 100;
-		num_ticks /= HZ;
-		if unlikely(!num_ticks)
-			num_ticks = 1;
-		printk(FREESTR(KERN_INFO "[apic] Boot CPU has a quantum length of %" PRIu32 " units\n"), num_ticks);
-
-		lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
-		lapic_write(APIC_TIMER,
-		            /* Set the PIT interrupt to the APIC timer. */
-		            X86_INTNO_PIC1_PIT |
-		            APIC_TIMER_MODE_FPERIODIC);
-		lapic_write(APIC_TIMER_INITIAL, num_ticks);
-		cpu_set_quantum_length(num_ticks);
-		FORCPU(&_bootcpu, arch_cpu_preemptive_interrupts_disabled) = false;
-		PREEMPTION_ENABLE();
 
 #ifndef CONFIG_NO_SMP
 		/* Wait for secondary CPUs to come online. */
 		if (!CPU_ALL_ONLINE) {
 			unsigned int timeout;
-			PREEMPTION_DISABLE();
-			arch_cpu_quantum_elapsed_and_reset_nopr(&_bootcpu);
-			PREEMPTION_ENABLE();
-#if HZ >= 100
-			/* Wait for more than a single jiffi. */
-			timeout = ((HZ + 1) / 100);
-			while (timeout--) {
-				__hlt();
-				if likely(CPU_ALL_ONLINE)
-					goto all_online;
-			}
-#else /* HZ >= 100 */
-			__hlt(); /* XXX: Waiting for 1ms would be enough here... */
-#endif /* HZ < 100 */
-
+			/* Wait for 1 ms (or 1/1000'th of a second) */
+			pit_delay_hz(PIT_HZ_DIV(1000));
 			if likely(CPU_ALL_ONLINE)
 				goto all_online;
 			/* Re-send start IPIs to all APs still not online. */
 			for (i = 1; i < _cpu_count; ++i) {
 				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8))))
 					continue;
-				printk(FREESTR(KERN_WARNING "[apic] Re-attempting startup of processor #%u (LAPIC id %#.2" PRIx8 ")\n"),
+				printk(FREESTR(KERN_WARNING "[smp] Re-attempting startup of processor #%u (LAPIC id %#.2" PRIx8 ")\n"),
 				       i, FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
 				apic_send_startup(FORCPU(cpu_vector[i], thiscpu_x86_lapicid),
 				                  x86_smp_entry_page);
 			}
 			/* Wait up to a full second for the (possibly slow?) CPUs to come online. */
-			timeout = HZ;
-			while (timeout--) {
+			for (timeout = 0; timeout < 20; ++timeout) {
 				if (CPU_ALL_ONLINE)
 					goto all_online;
-				__hlt();
+				pit_delay_hz(PIT_HZ_DIV(20));
 			}
 			/* Check one last time? */
 			if (CPU_ALL_ONLINE)
@@ -1061,7 +879,7 @@ done_early_altcore_init:
 					++i;
 					continue;
 				}
-				printk(FREESTR(KERN_ERR "[apic] CPU with LAPIC id %#.2" PRIx8 " doesn't want to "
+				printk(FREESTR(KERN_ERR "[smp] CPU with LAPIC id %#.2" PRIx8 " doesn't want to "
 				                        "come online (removing it from the configuration)\n"),
 				       i, FORCPU(_cpu_vector[i], thiscpu_x86_lapicid));
 				cpu_destroy(_cpu_vector[i]);
@@ -1078,10 +896,7 @@ all_online:
 #endif /* __HAVE_CPUSET_FULL_MASK */
 #endif /* !CONFIG_NO_SMP */
 	} else {
-		printk(FREESTR(KERN_INFO "[apic] LAPIC unavailable or disabled. Using PIC for timings\n"));
-
-		/* Clear out the lapic pointer when disabled. */
-		_x86_lapicbase = NULL;
+		printk(FREESTR(KERN_INFO "[smp] LAPIC unavailable or disabled\n"));
 
 		/* Ensure that we're configured for only a single CPU */
 		_cpu_count = 1;
@@ -1093,26 +908,12 @@ all_online:
 		outb_p(X86_PIC1_DATA, 0);
 		outb_p(X86_PIC2_DATA, 0);
 
-		/* Re-write the preemption code to acknowledge PIC interrupts. */
-		memcpy(x86_pic_acknowledge, x86_ack_pic, (size_t)x86_ack_apic_size);
-#ifndef CONFIG_NO_DEBUGGER
-		memcpy(x86_debug_pic_acknowledge, x86_ack_pic, (size_t)x86_ack_apic_size);
-#endif /* !CONFIG_NO_DEBUGGER */
-
-		cpu_set_quantum_length(PIT_HZ_DIV(HZ));
-
-		/* Set the PIC speed. */
-		outb(PIT_COMMAND,
-		     PIT_COMMAND_SELECT_F0 |
-		     PIT_COMMAND_ACCESS_FLOHI |
-		     PIT_COMMAND_MODE_FRATEGEN |
-		     PIT_COMMAND_FBINARY);
-		outb_p(PIT_DATA0, PIT_HZ_DIV(HZ) & 0xff);
-		outb(PIT_DATA0, PIT_HZ_DIV(HZ) >> 8);
-
-		FORCPU(&_bootcpu, arch_cpu_preemptive_interrupts_disabled) = false;
-		PREEMPTION_ENABLE();
+		/* Have `arch_cpu_hwipi_pending_nopr()' immediatly return `false' */
+		x86_arch_cpu_hwipi_pending_nopr[0] = 0x31; /* xorl */
+		x86_arch_cpu_hwipi_pending_nopr[1] = 0xc0; /* %eax, %eax */
+		x86_arch_cpu_hwipi_pending_nopr[2] = 0xc3; /* ret */
 	}
+	PREEMPTION_ENABLE();
 }
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ff937e */
+/* HASH CRC-32:0x772dec35 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,6 +81,7 @@ __NAMESPACE_STD_USING(timespec_get)
 #include <bits/crt/tm.h>
 #include <asm/os/clock.h>
 #include <bits/types.h>
+#include <hybrid/typecore.h>
 
 #ifdef __USE_POSIX199309
 #include <bits/os/timespec.h>
@@ -252,13 +253,13 @@ __SYSDECL_BEGIN
 
 
 #ifdef __USE_KOS
-#define MSEC_PER_SEC  1000l
-#define USEC_PER_MSEC 1000l
-#define NSEC_PER_USEC 1000l
-#define NSEC_PER_MSEC 1000000l
-#define USEC_PER_SEC  1000000l
-#define NSEC_PER_SEC  1000000000l
-#define FSEC_PER_SEC  1000000000000000ll
+#define MSEC_PER_SEC  __UINT16_C(1000)
+#define USEC_PER_MSEC __UINT16_C(1000)
+#define NSEC_PER_USEC __UINT16_C(1000)
+#define NSEC_PER_MSEC __UINT32_C(1000000)
+#define USEC_PER_SEC  __UINT32_C(1000000)
+#define NSEC_PER_SEC  __UINT32_C(1000000000)
+#define FSEC_PER_SEC  __UINT64_C(1000000000000000)
 #endif /* __USE_KOS */
 
 #ifdef __USE_ISOC11

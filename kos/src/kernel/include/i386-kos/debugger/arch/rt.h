@@ -124,7 +124,6 @@ struct x86_dbg_cpuammend {
 	struct desctab dca_gdt;       /* Saved GDT descriptor table */
 	struct task   *dca_override;  /* [0..1] Saved `c_override' of this CPU */
 	uintptr_t      dca_taskflags; /* Saved `dca_thread->t_flags' */
-	bool           dca_pint;      /* Set to true if preemptive interrupts were enabled */
 	u8             dca_intr[256 / 8]; /* Bitset of pending interrupts */
 };
 struct x86_dbg_cpustate {

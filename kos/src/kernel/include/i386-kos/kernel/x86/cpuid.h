@@ -64,7 +64,8 @@ DECL_BEGIN
 #define OFFSET_CPUID_80000004B   96
 #define OFFSET_CPUID_80000004C   100
 #define OFFSET_CPUID_80000004D   104
-#define SIZEOF_CPUID_CPUINFO     112
+#define OFFSET_CPUID_80000007D   112
+#define SIZEOF_CPUID_CPUINFO     116
 
 
 #ifdef __CC__
@@ -76,7 +77,7 @@ struct cpuinfo {
 	};
 	union ATTR_PACKED {
 		u32           ci_80000000a;    /* [const][== cpuid(0x80000000).EAX] */
-		u32           ci_eleaf_max;    /* [const][== cpuid(0x80000000).EAX] Max supported basic cpuid leaf number */
+		u32           ci_eleaf_max;    /* [const][== cpuid(0x80000000).EAX] Max supported extended cpuid leaf number */
 	};
 	union ATTR_PACKED {
 		u32           ci_1a;           /* [const][== cpuid(1).EAX] Processor info... */
@@ -128,6 +129,9 @@ struct cpuinfo {
 		char          ci_brand[48];    /* [const][== cpuid(0x80000002...0x80000004).EAX~EBX~ECX~EDX] Brand string. */
 	};
 	char            __ci_zero2[4];     /* [const][== 0] */
+	/* TODO: Move `thiscpu_x86_cpufeatures' to overlap with `__ci_zero2'
+	 *       -> Save some space and make the inter-connected relation more obvious. */
+	u32               ci_80000007d;    /* [const][== cpuid(0x80000007).EDX] Set of `CPUID_80000007D_*' */
 };
 
 /* Basic CPU feature flags (Set of `CPU_FEATURE_F*') */
@@ -171,7 +175,7 @@ DATDEF struct cpuinfo const bootcpu_x86_cpuid;
 #define X86_HAVE_SYSCALL               (bootcpu_x86_cpuid.ci_80000001d & CPUID_80000001D_SYSCALL)
 #define X86_HAVE_2MIB_PAGES            1 /* Always available! (and also assumed to be by kernel code!) */
 #define X86_HAVE_4MIB_PAGES            0 /* 32-bit only feature */
-#define X86_HAVE_1GIB_PAGES            (bootcpu_x86_cpuid.ci_80000001d & CPUID_80000001D_PSE)
+#define X86_HAVE_1GIB_PAGES            (bootcpu_x86_cpuid.ci_80000001d & CPUID_80000001D_PDPE1GB)
 #define X86_HAVE_PAE                   0 /* 32-bit only feature */
 #else /* __x86_64__ */
 #define X86_HAVE_FSGSBASE              0 /* 64-bit only feature */
@@ -182,6 +186,11 @@ DATDEF struct cpuinfo const bootcpu_x86_cpuid;
 #define X86_HAVE_1GIB_PAGES            0 /* 64-bit only feature */
 #define X86_HAVE_PAE                   (bootcpu_x86_cpuid.ci_1d & CPUID_1D_PAE)
 #endif /* !__x86_64__ */
+
+/* TSC features. */
+#define X86_HAVE_TSC           (bootcpu_x86_cpuid.ci_1d & CPUID_1D_TSC)                         /* Implies: `X86_HAVE_LAPIC' */
+#define X86_HAVE_INVARIANT_TSC (bootcpu_x86_cpuid.ci_80000007d & CPUID_80000007D_INVARIANT_TSC) /* Implies: `X86_HAVE_LAPIC && X86_HAVE_TSC' */
+#define X86_HAVE_TSC_DEADLINE  (bootcpu_x86_cpuid.ci_1c & CPUID_1C_TSC_DEADLINE)                /* Implies: `X86_HAVE_LAPIC && X86_HAVE_TSC && X86_HAVE_INVARIANT_TSC' */
 
 
 /* Same as above, but for the current CPU (whereas

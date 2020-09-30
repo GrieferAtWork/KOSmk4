@@ -41,6 +41,8 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/ukern.h>
 
+#include <stddef.h>
+
 #include <libvio/vio.h>
 
 #ifdef __ARCH_HAVE_COMPAT

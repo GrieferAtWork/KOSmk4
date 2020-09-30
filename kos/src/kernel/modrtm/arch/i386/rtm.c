@@ -53,6 +53,7 @@
 
 #include <errno.h>
 #include <int128.h>
+#include <stddef.h> /* UINT32_C */
 #include <stdint.h> /* UINT32_C */
 #include <string.h>
 

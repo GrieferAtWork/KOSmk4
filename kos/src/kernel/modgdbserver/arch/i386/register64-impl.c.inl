@@ -26,6 +26,8 @@
 #include <kos/kernel/fpu-state64.h>
 #include <kos/kernel/gdb-cpu-state64.h>
 
+#include <stddef.h>
+
 DECL_BEGIN
 
 PRIVATE NONNULL((1, 3)) size_t

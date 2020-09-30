@@ -833,10 +833,6 @@ handle_remove_write_error:
 			COMPILER_READ_BARRIER();
 			error = task_deliver_rpc(thread,
 			                         task_terminate_rpcs,
-			                         /* Low priority: We don't care when the thread actually gets terminated,
-			                          *               so we instruct the scheduler that our termination RPC
-			                          *               is allowed to be serviced at a later point in time. */
-			                         TASK_RPC_FLOWPRIO |
 			                         /* Wait for IPI: If the thread is hosted by a different CPU, we need to wait
 			                          *               for that CPU to acknowledge the IPI before we can commence.
 			                          *               Otherwise, we end up with a race condition where some other

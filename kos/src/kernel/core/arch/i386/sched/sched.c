@@ -90,7 +90,7 @@ kernel_initialize_threadstack(struct task *__restrict thread,
 #endif /* !__x86_64__ */
 	init_state->scs_irregs.ir_pip    = (uintptr_t)(void *)entry;
 	init_state->scs_irregs.ir_pflags = EFLAGS_IF;
-	thread->t_sched.s_state = init_state;
+	thread->t_state = init_state;
 }
 
 INTDEF byte_t __kernel_bootidle_stack[KERNEL_IDLE_STACKSIZE];
@@ -170,7 +170,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 #endif /* !__x86_64__ */
 	/* TODO: Must also execute thread startup callbacks! */
 	thread->t_flags |= TASK_FKERNTHREAD;
-	thread->t_sched.s_state = state;
+	thread->t_state = state;
 	if (!FORTASK(thread, this_fs))
 		FORTASK(thread, this_fs) = incref(&fs_kernel);
 #ifndef CONFIG_EVERYONE_IS_ROOT
@@ -456,7 +456,7 @@ NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	if (self == THIS_TASK) {
 		ucpustate_current(&st);
 	} else {
-		scpustate_to_ucpustate(self->t_sched.s_state, &st);
+		scpustate_to_ucpustate(self->t_state, &st);
 	}
 	unwind_pc = (void *)ucpustate_getpc(&st);
 	for (;;) {
@@ -574,10 +574,10 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 	 *       meaning that interrupts could only ever happen for the very first
 	 *       instruction. */
 	if unlikely(self != THIS_TASK &&
-	            self->t_sched.s_state->scs_irregs.ir_eip == (uintptr_t)(void *)&x86_syscall32_lcall7) {
+	            self->t_state->scs_irregs.ir_eip == (uintptr_t)(void *)&x86_syscall32_lcall7) {
 		byte_t *fixup;
 		u32 eflags;
-		fixup = (byte_t *)self->t_sched.s_state;
+		fixup = (byte_t *)self->t_state;
 		assertf((fixup + OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL) ==
 		        (byte_t *)(FORTASK(self, this_x86_kernel_psp0) - 16),
 		        "Fixup(%p) itn't placed 16 bytes below stack_end(%p) (16 == { IP,CS,SP,SS })",
@@ -587,7 +587,7 @@ NOTHROW(FCALL task_enable_redirect_usercode_rpc)(struct task *__restrict self) {
 		fixup = (byte_t *)memmovedown(fixup - 4, fixup,
 		                              OFFSET_SCPUSTATE_IRREGS +
 		                              SIZEOF_IRREGS_KERNEL);
-		self->t_sched.s_state = (struct scpustate *)fixup;
+		self->t_state = (struct scpustate *)fixup;
 		/* Read the original user-space EFLAGS value. */
 		eflags = ((struct scpustate *)fixup)->scs_irregs.ir_eflags;
 		/* Skip the lcall IRET adjustment we're doing ourself below by

@@ -147,6 +147,6 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard: Cpp03
 TabWidth: 4
-TypenameMacros: ['ATREE_HEAD', 'ATREE_NODE', 'ATREE_NODE_SINGLE', 'ATREE_XNODE', 'ATREE_SEMI_T', 'SLIST', 'SLIST_NODE', 'LLIST', 'LLIST_NODE', 'DLIST', 'DLIST_NODE']
+TypenameMacros: ['ATREE_HEAD', 'ATREE_NODE', 'ATREE_NODE_SINGLE', 'ATREE_XNODE', 'ATREE_SEMI_T', 'SLIST', 'SLIST_NODE', 'LLIST', 'LLIST_NODE']
 UseCRLF: false
 UseTab: ForIndentation

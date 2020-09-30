@@ -45,6 +45,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/kernel/cpu-state.h>
 
 #include <inttypes.h>
+#include <stddef.h>
 
 /**/
 #include <dev/block.h>    /* TODO: Remove me; Only used for boot_partition-init */
@@ -53,6 +54,34 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/panic.h> /* TODO: Remove me; Only used for boot_partition-init */
 
 DECL_BEGIN
+
+#if 0
+#include <assert.h>
+#include <sched/tsc.h>
+#include <sched/cpu.h>
+
+PRIVATE void test_tsc() {
+	struct cpu *me = THIS_CPU;
+	PREEMPTION_DISABLE();
+	for (;;) {
+		tsc_t now, deadline, distance;
+		ktime_t nano_distance;
+		now      = tsc_get(me);
+		deadline = now + (FORCPU(me, thiscpu_tsc_hz) / 1000);
+		if ((now = tsc_deadline(me, deadline)) < deadline) {
+			do {
+				PREEMPTION_ENABLE_WAIT_DISABLE();
+			} while ((now = tsc_get(me)) < deadline);
+		}
+		distance      = now - deadline;
+		nano_distance = (distance * FORCPU(me, thiscpu_tsc_hz)) / 1000000000;
+		printk(KERN_TRACE "HERE: %I64u (deadline: %I64u, distance: [nano:0.%09I64u] %I64u)\n",
+		       now, deadline, nano_distance, distance);
+	}
+	PREEMPTION_ENABLE();
+}
+#endif
+
 
 PUBLIC ATTR_USED ATTR_SECTION(".bss")
 struct fcpustate32 boot_cpustate;
@@ -136,9 +165,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * patch the kernel to use (rd|wr)msr if unavailable. */
 	x86_initialize_fsgsbase();
 #endif /* __x86_64__ */
-
-	/* Load generic text alternatives. */
-	x86_initialize_alternatives();
 
 #ifndef __x86_64__
 	/* Initialize the atomic64 configuration */
@@ -272,6 +298,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       left in physical memory below the 1GiB mark). */
 	x86_initialize_kernel_vm();
 
+	/* Load generic text alternatives.
+	 * Must happen after `x86_initialize_kernel_vm', since this one checks for
+	 * the presence of a LAPIC, which gets mapped in `x86_initialize_kernel_vm()' */
+	x86_initialize_alternatives();
+
 	/* Relocate memory information into higher memory, moving it away from
 	 * being somewhere where it could cause problems, or be accidentally
 	 * corrupted. */
@@ -285,8 +316,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       caches that had become clobbered by our incessant modifications above. */
 	pagedir_syncall();
 
+	/* Figure out how we want to implement the TSC (APIC+TSC, APIC or PIC) */
+	x86_initialize_tsc();
+
 	/* Initialize the APIC / PIC, as well as secondary CPUs when SMP is enabled. */
 	x86_initialize_apic();
+
+	/* Set-up the realtime clock resync interrupt */
+	x86_initialize_tsc_resync();
 
 	/* XXX: ioapic support (ioapic is the modern equivalent of the pic) */
 
@@ -392,6 +429,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	printk(FREESTR(KERN_INFO "Initial jump to user-space [pc=%p] [sp=%p]\n"),
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
+
+//	test_tsc();
 
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:

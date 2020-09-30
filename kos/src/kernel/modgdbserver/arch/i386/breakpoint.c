@@ -31,6 +31,7 @@
 #include <asm/cpu-flags.h> /* DR_* */
 
 #include <errno.h>
+#include <stddef.h>
 
 #include "../../gdb.h"
 

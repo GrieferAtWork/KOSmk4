@@ -53,6 +53,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <string.h>
 #include <unicode.h>
 

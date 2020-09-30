@@ -805,7 +805,7 @@ emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 #define EMU86_EMULATE_RDTSC() emulate_rdtsc()
 PRIVATE u64 KCALL emulate_rdtsc(void) {
 	struct timespec now = realtime();
-	return ((u64)now.tv_sec * __NSECS_PER_SEC) + now.tv_nsec;
+	return ((u64)now.tv_sec * __NSEC_PER_SEC) + now.tv_nsec;
 }
 #else /* EMU86_EMULATE_CONFIG_WANT_RDTSC */
 #define EMU86_EMULATE_RDTSC() DONT_USE

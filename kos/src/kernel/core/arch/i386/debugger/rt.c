@@ -44,6 +44,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/x86/pic.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
+#include <sched/sched.h>
 #include <sched/task.h>
 #include <sched/x86/tss.h>
 
@@ -116,13 +117,6 @@ DATDEF ATTR_PERTASK struct vm_datapart this_kernel_stackpart_ ASMNAME("this_kern
 
 INTDEF NOBLOCK void NOTHROW(KCALL init_this_x86_kernel_psp0)(struct task *__restrict self);
 
-/* Check if preemptive interrupts are enabled on the calling CPU */
-PRIVATE NOBLOCK ATTR_DBGTEXT ATTR_PURE WUNUSED bool
-NOTHROW(KCALL are_preemptive_interrupts_enabled)(struct cpu *__restrict me) {
-	return !FORCPU(me, arch_cpu_preemptive_interrupts_disabled);
-}
-
-
 #ifdef CONFIG_NO_SMP
 #define x86_failsafe_getcpu() &_bootcpu
 #else /* CONFIG_NO_SMP */
@@ -159,11 +153,11 @@ ac_ints[CONFIG_DBG_ALTCORE_MAX_INTERRUPTS] = { };
  * is to filter out `vector == 0xf1' */
 INTERN ATTR_DBGTEXT NOBLOCK void
 NOTHROW(FCALL x86_dbg_altcore_interrupt)(u8 vector) {
-	struct cpu *mycpu = x86_failsafe_getcpu();
+	struct cpu *me = x86_failsafe_getcpu();
 	union ac_int aint;
-	if ((uintptr_t)mycpu < KERNELSPACE_BASE)
+	if ((uintptr_t)me < KERNELSPACE_BASE)
 		return;
-	aint.ai_sender = (mycpu->c_id % CONFIG_MAX_CPU_COUNT) + 1;
+	aint.ai_sender = (me->c_id % CONFIG_MAX_CPU_COUNT) + 1;
 	aint.ai_vector = vector;
 	for (;;) {
 		unsigned int i;
@@ -286,8 +280,8 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	ammend.dca_cpu = x86_failsafe_getcpu();
 
 	/* Load the calling thread pointer. */
-	ammend.dca_thread = ammend.dca_cpu->c_current;
-	if (!ammend.dca_thread)
+	ammend.dca_thread = FORCPU(ammend.dca_cpu, thiscpu_sched_current);
+	if (!ADDR_ISKERN(ammend.dca_thread))
 		ammend.dca_thread = &FORCPU(ammend.dca_cpu, thiscpu_idle);
 
 	mycpuid = ammend.dca_cpu->c_id % CONFIG_MAX_CPU_COUNT;
@@ -296,8 +290,8 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	ammend.dca_taskflags = ATOMIC_FETCHOR(ammend.dca_thread->t_flags, TASK_FKEEPCORE);
 
 	/* Set our own thread as the scheduling override. */
-	ammend.dca_override        = ammend.dca_cpu->c_override;
-	ammend.dca_cpu->c_override = ammend.dca_thread;
+	ammend.dca_override                      = FORCPU(ammend.dca_cpu, thiscpu_sched_override);
+	FORCPU(ammend.dca_cpu, thiscpu_sched_override) = ammend.dca_thread;
 
 	/* Save additional registers. */
 	ammend.dca_tr  = __str();
@@ -330,18 +324,14 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	/* Clear the set of pending interrupts. */
 	memset(ammend.dca_intr, 0, sizeof(ammend.dca_intr));
 
-	/* Disable preemptive interrupts. */
-	ammend.dca_pint = are_preemptive_interrupts_enabled(ammend.dca_cpu);
-	if (ammend.dca_pint)
-		cpu_disable_preemptive_interrupts_nopr();
-
 	/* Fill in the host-backup area of our CPU, thus
 	 * ACK-ing the fact that we're now supposed to sleep. */
 	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_iammend, &ammend);
 	ATOMIC_WRITE(x86_dbg_hostbackup.dhs_cpus[mycpuid].dcs_istate, state);
 
 	/* Load the IDT for use by secondary CPUs while one specific CPU is hosting the debugger.
-	 * WARNING: INTERRUPT HANDLERS OF THIS IDT _DONT_ PRESERVE THE (R|E)AX REGISTER! */
+	 * WARNING: INTERRUPT HANDLERS OF THIS IDT _DONT_ PRESERVE THE (R|E)AX REGISTER!
+	 * TODO: Preemptive interrupts should continue to fire and account for passed time! */
 	__lidt_p(&x86_dbgaltcoreidt_ptr);
 
 	/* While for the debugger to become inactive. */
@@ -406,11 +396,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 		ATOMIC_AND(ammend.dca_thread->t_flags, ~TASK_FKEEPCORE);
 
 	/* Restore the previous override. */
-	ammend.dca_cpu->c_override = ammend.dca_override;
-
-	/* Re-enable preemptive interrupts. */
-	if (ammend.dca_pint)
-		cpu_enable_preemptive_interrupts_nopr();
+	FORCPU(ammend.dca_cpu, thiscpu_sched_override) = ammend.dca_override;
 
 	/* TODO: Service interrupts for all 1-bits in `ammend.dca_intr' */
 done:
@@ -443,6 +429,7 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 	pflag_t was = PREEMPTION_PUSHOFF();
 	for (i = 0; i < cpu_count; ++i) {
 		struct cpu *target;
+		struct task *thread;
 		target = cpu_vector[i];
 		if (target == calling_cpu)
 			continue;
@@ -458,11 +445,12 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 
 		/* One of the last things done during init is setting TTS.PSP0
 		 * Check if that field has already been initialized */
-		if ((uintptr_t)target->c_current < KERNELSPACE_BASE)
+		thread = FORCPU(target, thiscpu_sched_current);
+		if ((uintptr_t)thread < KERNELSPACE_BASE)
 			continue;
 		{
 			uintptr_t const *ppsp0;
-			ppsp0 = &FORTASK(target->c_current, this_x86_kernel_psp0);
+			ppsp0 = &FORTASK(thread, this_x86_kernel_psp0);
 			if ((uintptr_t)ppsp0 < KERNELSPACE_BASE)
 				continue;
 			if (FORCPU(target, thiscpu_x86_tss).t_psp0 != *ppsp0)
@@ -478,12 +466,12 @@ NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
 
 
 PRIVATE ATTR_DBGTEXT void KCALL
-x86_dbg_initialize_segments(struct cpu *mycpu, struct task *mythread) {
+x86_dbg_initialize_segments(struct cpu *me, struct task *mythread) {
 	/* Set segment base values */
-	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_CPU_TSS)], (uintptr_t)&FORCPU(mycpu, thiscpu_x86_tss));
-	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_CPU_LDT)], (uintptr_t)&FORCPU(mycpu, thiscpu_x86_ldt));
+	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_CPU_TSS)], (uintptr_t)&FORCPU(me, thiscpu_x86_tss));
+	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_CPU_LDT)], (uintptr_t)&FORCPU(me, thiscpu_x86_ldt));
 #ifndef __x86_64__
-	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_CPU_TSS_DF)], (uintptr_t)&FORCPU(mycpu, thiscpu_x86_tssdf));
+	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_CPU_TSS_DF)], (uintptr_t)&FORCPU(me, thiscpu_x86_tssdf));
 	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_KERNEL_FSBASE)], (uintptr_t)mythread);
 	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)], (uintptr_t)FORTASK(mythread, this_x86_user_fsbase));
 	segment_wrbaseX(&x86_dbggdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)], (uintptr_t)FORTASK(mythread, this_x86_user_gsbase));
@@ -552,7 +540,6 @@ PRIVATE ATTR_DBGBSS volatile u8 initok = 0;
 #define INITOK_SCHED_OVERRIDE        0x10
 #define INITOK_READLOCKS             0x20
 #define INITOK_CONNECTIONS           0x40
-#define INITOK_PREEMPTIVE_INTERRUPTS 0x80
 
 PRIVATE ATTR_DBGTEXT void FCALL
 x86_save_psp0_thread(struct x86_dbg_psp0threadstate *__restrict state,
@@ -616,39 +603,39 @@ x86_init_psp0_thread(struct task *__restrict thread, size_t stack_size) {
 }
 
 PRIVATE ATTR_DBGTEXT void FCALL
-x86_save_psp0(struct cpu *mycpu, struct task *mythread) {
-	struct task *myidle = &FORCPU(mycpu, thiscpu_idle);
+x86_save_psp0(struct cpu *me, struct task *mythread) {
+	struct task *myidle = &FORCPU(me, thiscpu_idle);
 	x86_save_psp0_thread(&x86_dbg_hostbackup.dhs_psp0.dps_thistask, mythread);
 	x86_save_psp0_thread(&x86_dbg_hostbackup.dhs_psp0.dps_thisidle, myidle);
 }
 
 PRIVATE ATTR_DBGTEXT void FCALL
-x86_init_psp0(struct cpu *mycpu, struct task *mythread) {
-	struct task *myidle = &FORCPU(mycpu, thiscpu_idle);
+x86_init_psp0(struct cpu *me, struct task *mythread) {
+	struct task *myidle = &FORCPU(me, thiscpu_idle);
 	x86_init_psp0_thread(mythread, KERNEL_STACKSIZE);
 	x86_init_psp0_thread(myidle, KERNEL_IDLE_STACKSIZE);
 }
 
 PRIVATE ATTR_DBGTEXT void FCALL
-x86_load_psp0(struct cpu *mycpu, struct task *mythread) {
-	struct task *myidle = &FORCPU(mycpu, thiscpu_idle);
+x86_load_psp0(struct cpu *me, struct task *mythread) {
+	struct task *myidle = &FORCPU(me, thiscpu_idle);
 	x86_load_psp0_thread(&x86_dbg_hostbackup.dhs_psp0.dps_thistask, mythread);
 	x86_load_psp0_thread(&x86_dbg_hostbackup.dhs_psp0.dps_thisidle, myidle);
 }
 
 
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
-	struct cpu *mycpu;
+	struct cpu *me;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu    = x86_failsafe_getcpu();
+	me    = x86_failsafe_getcpu();
 
-	mythread = mycpu->c_current;
+	mythread = FORCPU(me, thiscpu_sched_current);
 	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */
-		mythread = &FORCPU(mycpu, thiscpu_idle);
+		mythread = &FORCPU(me, thiscpu_idle);
 
 	/* Set segment base values */
-	x86_dbg_initialize_segments(mycpu, mythread);
+	x86_dbg_initialize_segments(me, mythread);
 
 	/* Re-configure the hosting cpu/thread */
 	if (!(initok & INITOK_THIS_EXCEPTION_INFO)) {
@@ -669,15 +656,15 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		ATOMIC_OR(mythread->t_flags, TASK_FKEEPCORE);
 	}
 	if (!(initok & INITOK_PSP0)) {
-		x86_save_psp0(mycpu, mythread);
+		x86_save_psp0(me, mythread);
 		initok |= INITOK_PSP0;
 	}
-	x86_init_psp0(mycpu, mythread);
+	x86_init_psp0(me, mythread);
 	if (!(initok & INITOK_SCHED_OVERRIDE)) {
-		x86_dbg_hostbackup.dhs_override = mycpu->c_override;
+		x86_dbg_hostbackup.dhs_override = FORCPU(me, thiscpu_sched_override);
 		initok |= INITOK_SCHED_OVERRIDE;
 	}
-	mycpu->c_override = mythread;
+	FORCPU(me, thiscpu_sched_override) = mythread;
 
 	/* Save held read-locks, and re-initialize the per-thread descriptor. */
 	if (!(initok & INITOK_READLOCKS)) {
@@ -735,18 +722,12 @@ fully_reset_task_connections:
 		}
 #endif /* !CONFIG_USE_NEW_SIGNAL_API */
 	}
-	if (!(initok & INITOK_PREEMPTIVE_INTERRUPTS)) {
-		x86_dbg_hostbackup.dhs_pint = are_preemptive_interrupts_enabled(mycpu);
-		if (x86_dbg_hostbackup.dhs_pint)
-			cpu_disable_preemptive_interrupts_nopr();
-		initok |= INITOK_PREEMPTIVE_INTERRUPTS;
-	}
 
 	/* NOTE: Clear `dbg_cpu_' _BEFORE_ sending the IPI to stop execution
 	 *       on other CPUs. - This field being non-NULL is the trigger
 	 *       that causes other CPUs to stay suspended! */
 	COMPILER_BARRIER();
-	dbg_cpu_ = mycpu;
+	dbg_cpu_ = me;
 	COMPILER_BARRIER();
 
 	/* Suspend execution on all other CPUs. */
@@ -757,7 +738,7 @@ fully_reset_task_connections:
 		memset(x86_dbg_hostbackup.dhs_cpus, 0, sizeof(x86_dbg_hostbackup.dhs_cpus));
 		COMPILER_BARRIER();
 		count = cpu_broadcastipi_notthis_early_boot_aware(&debugger_wait_for_done, args,
-		                                                  CPU_IPI_FWAITFOR, mycpu);
+		                                                  CPU_IPI_FWAITFOR, me);
 		if (count) {
 			/* Wait for other CPUs to ACK becoming suspended. */
 			unsigned int volatile timeout = 1000000;
@@ -889,18 +870,18 @@ reset_pdir(struct task *mythread) {
  * This function should perform any reset that interacts with data
  * structures which may be located on the debugger stack. */
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset_dbg_stack(void) {
-	struct cpu *mycpu;
+	struct cpu *me;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu    = x86_failsafe_getcpu();
-	dbg_cpu_ = mycpu;
+	me    = x86_failsafe_getcpu();
+	dbg_cpu_ = me;
 
-	mythread = mycpu->c_current;
+	mythread = FORCPU(me, thiscpu_sched_current);
 	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */
-		mythread = &FORCPU(mycpu, thiscpu_idle);
+		mythread = &FORCPU(me, thiscpu_idle);
 
 	/* Set segment base values */
-	x86_dbg_initialize_segments(mycpu, mythread);
+	x86_dbg_initialize_segments(me, mythread);
 
 	/* Make sure that the signal connections sub-system is (still) initialized. */
 	if (!FORTASK(mythread, this_connections) ||
@@ -950,24 +931,24 @@ reset_all_connections:
 }
 
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
-	struct cpu *mycpu;
+	struct cpu *me;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu    = x86_failsafe_getcpu();
-	dbg_cpu_ = mycpu;
+	me    = x86_failsafe_getcpu();
+	dbg_cpu_ = me;
 
-	mythread = mycpu->c_current;
+	mythread = FORCPU(me, thiscpu_sched_current);
 	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */
-		mythread = &FORCPU(mycpu, thiscpu_idle);
+		mythread = &FORCPU(me, thiscpu_idle);
 
 	/* Set segment base values */
-	x86_dbg_initialize_segments(mycpu, mythread);
+	x86_dbg_initialize_segments(me, mythread);
 
 	/* Re-configure the hosting cpu/thread */
 	mythread->t_self = mythread;
 	ATOMIC_OR(mythread->t_flags, TASK_FKEEPCORE);
-	mycpu->c_override = mythread;
-	x86_init_psp0(mycpu, mythread);
+	FORCPU(me, thiscpu_sched_override) = mythread;
+	x86_init_psp0(me, mythread);
 	pertask_readlocks_init(mythread);
 
 	/* Make sure that the signal connections sub-system is (still) initialized. */
@@ -1012,17 +993,17 @@ NOTHROW(FCALL debugger_wake_after_done)(struct icpustate *__restrict state,
 
 
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
-	struct cpu *mycpu;
+	struct cpu *me;
 	struct task *mythread;
 	/* Figure out which one's our own CPU. */
-	mycpu = x86_failsafe_getcpu();
+	me = x86_failsafe_getcpu();
 
-	mythread = mycpu->c_current;
+	mythread = FORCPU(me, thiscpu_sched_current);
 	if unlikely(!mythread) /* Shouldn't happen, but better be safe! */
-		mythread = &FORCPU(mycpu, thiscpu_idle);
+		mythread = &FORCPU(me, thiscpu_idle);
 
 	/* Set segment base values */
-	x86_dbg_initialize_segments(mycpu, mythread);
+	x86_dbg_initialize_segments(me, mythread);
 
 	/* Invoke global callbacks. */
 	dbg_runhooks(DBG_HOOK_FINI);
@@ -1044,7 +1025,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 		COMPILER_BARRIER();
 		/* Send a sporadic IPI to all CPUs other than the caller. */
 		cpu_broadcastipi_notthis_early_boot_aware(&debugger_wake_after_done, args,
-		                                          CPU_IPI_FWAITFOR, mycpu);
+		                                          CPU_IPI_FWAITFOR, me);
 		/* Wait for other CPUs to resume execution. */
 		while (x86_dbg_hostbackup_cpu_suspended_count() != 0)
 			__pause();
@@ -1065,9 +1046,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 			ATOMIC_AND(mythread->t_flags, ~TASK_FKEEPCORE);
 	}
 	if (initok & INITOK_PSP0)
-		x86_load_psp0(mycpu, mythread);
+		x86_load_psp0(me, mythread);
 	if (initok & INITOK_SCHED_OVERRIDE)
-		mycpu->c_override = x86_dbg_hostbackup.dhs_override;
+		FORCPU(me, thiscpu_sched_override) = x86_dbg_hostbackup.dhs_override;
 	if (initok & INITOK_READLOCKS) {
 		memcpy(&FORTASK(mythread, this_read_locks),
 		       &x86_dbg_hostbackup.dhs_readlocks,
@@ -1080,10 +1061,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 #else /* CONFIG_USE_NEW_SIGNAL_API */
 		task_popconnections(&x86_dbg_hostbackup.dhs_signals);
 #endif /* !CONFIG_USE_NEW_SIGNAL_API */
-	}
-	if (initok & INITOK_PREEMPTIVE_INTERRUPTS) {
-		if (x86_dbg_hostbackup.dhs_pint)
-			cpu_enable_preemptive_interrupts_nopr();
 	}
 
 	/* Update the debugger exit state to have `dbg_enter_r()' return

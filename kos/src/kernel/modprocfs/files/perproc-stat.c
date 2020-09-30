@@ -39,6 +39,7 @@
 #include <format-printer.h>
 #include <inttypes.h>
 #include <signal.h>
+#include <stddef.h>
 
 #include "../procfs.h"
 
@@ -145,17 +146,12 @@ no_exec:
 			flags = ATOMIC_READ(thread->t_flags);
 			if (flags & TASK_FRUNNING)
 				state = 'R'; /* Running */
-#ifndef CONFIG_NO_SMP
-			else if (flags & (TASK_FWAKING | TASK_FPENDING))
-#else /* !CONFIG_NO_SMP */
-			else if (flags & TASK_FWAKING)
-#endif /* CONFIG_NO_SMP */
-				state = 'W'; /* Waking */
 			else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED))
 				state = 'T'; /* Stopped */
 			else if (flags & TASK_FSTARTED)
 				state = 'S'; /* Sleeping */
 			else {
+				/* XXX: 'W' For waking??? */
 				state = 'P'; /* Parked? */
 			}
 		} else if (tpid) {

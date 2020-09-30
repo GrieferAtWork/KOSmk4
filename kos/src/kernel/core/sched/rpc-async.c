@@ -27,8 +27,10 @@
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>
+#include <sched/sched.h>
 #include <sched/signal.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -42,14 +44,8 @@
 
 DECL_BEGIN
 
-#ifndef CONFIG_NO_SMP
-#define WAS_START_AND_IS_NOT_PENDING(f) (((f) & (TASK_FPENDING | TASK_FSTARTED)) == TASK_FSTARTED)
-#define WAS_START_AND_IS_SLEEPING(f)    (((f) & (TASK_FRUNNING | TASK_FPENDING | TASK_FSTARTED)) == TASK_FSTARTED)
-#else /* !CONFIG_NO_SMP */
 #define WAS_START_AND_IS_NOT_PENDING(f) (((f) & TASK_FSTARTED) != 0)
 #define WAS_START_AND_IS_SLEEPING(f)    (((f) & (TASK_FRUNNING | TASK_FSTARTED)) == TASK_FSTARTED)
-#endif /* CONFIG_NO_SMP */
-
 
 #ifdef CONFIG_NO_SMP
 #define IFELSE_SMP(if_smp, if_no_smp) if_no_smp
@@ -59,41 +55,111 @@ DECL_BEGIN
 
 
 #ifndef CONFIG_NO_SMP
-#ifndef __INTELLISENSE__
-DECL_END
+PRIVATE NOBLOCK struct icpustate *
+NOTHROW(FCALL ipi_schedule_asynchronous_rpc)(struct icpustate *__restrict state,
+                                             void *args[CPU_IPI_ARGCOUNT]) {
+	REF struct task *target;
+	struct cpu *me, *target_cpu;
+	struct task *caller;
+	task_rpc_t func;
+	void *arg;
+	uintptr_t mode;
+	uintptr_t target_flags;
+	func   = (task_rpc_t)args[1];
+	arg    = args[2];
+	caller = THIS_TASK;
+	target = (REF struct task *)args[0];
+	mode   = (uintptr_t)args[3];
+	if (target == caller) {
+		struct icpustate *result;
+		result = (*func)(arg, state,
+		                 icpustate_isuser(state)
+		                 ? TASK_RPC_REASON_ASYNCUSER
+		                 : TASK_RPC_REASON_ASYNC,
+		                 NULL);
+		decref_nokill(target);
+		return result;
+	}
+	target_flags = ATOMIC_READ(target->t_flags);
+	if unlikely(target_flags & TASK_FTERMINATED) {
+		state = (*func)(arg, state, TASK_RPC_REASON_SHUTDOWN, NULL);
+		decref(target);
+		return state;
+	}
+	target_cpu = ATOMIC_READ(target->t_cpu);
+	me      = caller->t_cpu;
+	if unlikely(target_cpu != me) {
+		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
+		while (!cpu_sendipi(target_cpu,
+		                    &ipi_schedule_asynchronous_rpc, args,
+		                    CPU_IPI_FWAKEUP))
+			task_pause();
+		return state;
+	}
+	target->t_state = task_push_asynchronous_rpc(target->t_state,
+	                                                     func, arg);
+	if (!(mode & TASK_RPC_FDONTWAKE)) {
+		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		                                caller, target,
+		                                (mode & TASK_RPC_FHIGHPRIO) != 0);
+		if (target != caller) {
+			FORCPU(me, thiscpu_sched_current) = target;
+			decref_unlikely(target);
+			return CPU_IPI_MODE_SWITCH_TASKS;
+		}
+	}
+	decref_unlikely(target);
+	return state;
+}
 
-#define DEFINE_SCHEDIPI_RPC_DW 1
-#include "rpc-async-schedipi.c.inl"
-#define DEFINE_SCHEDIPI_RPC_LP 1
-#include "rpc-async-schedipi.c.inl"
-#define DEFINE_SCHEDIPI_RPC_HP 1
-#include "rpc-async-schedipi.c.inl"
-#define DEFINE_SCHEDIPI_RPC    1
-#include "rpc-async-schedipi.c.inl"
 
-DECL_BEGIN
-#else /* !__INTELLISENSE__ */
 
-PRIVATE NOBLOCK struct icpustate *NOTHROW(FCALL ipi_schedule_asynchronous_rpc_dw)(struct icpustate *__restrict state, void *args[CPU_IPI_ARGCOUNT]);
-PRIVATE NOBLOCK struct icpustate *NOTHROW(FCALL ipi_schedule_asynchronous_rpc_lp)(struct icpustate *__restrict state, void *args[CPU_IPI_ARGCOUNT]);
-PRIVATE NOBLOCK struct icpustate *NOTHROW(FCALL ipi_schedule_asynchronous_rpc_hp)(struct icpustate *__restrict state, void *args[CPU_IPI_ARGCOUNT]);
-PRIVATE NOBLOCK struct icpustate *NOTHROW(FCALL ipi_schedule_asynchronous_rpc)(struct icpustate *__restrict state, void *args[CPU_IPI_ARGCOUNT]);
-
-PRIVATE NOBLOCK struct icpustate *NOTHROW(FCALL ipi_redirect_usercode_rpc_dw)(struct icpustate *__restrict state, void *args[CPU_IPI_ARGCOUNT]);
-PRIVATE NOBLOCK struct icpustate *NOTHROW(FCALL ipi_redirect_usercode_rpc_lp)(struct icpustate *__restrict state, void *args[CPU_IPI_ARGCOUNT]);
-PRIVATE NOBLOCK struct icpustate *NOTHROW(FCALL ipi_redirect_usercode_rpc_hp)(struct icpustate *__restrict state, void *args[CPU_IPI_ARGCOUNT]);
-PRIVATE NOBLOCK struct icpustate *NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state, void *args[CPU_IPI_ARGCOUNT]);
-
-#endif /* __INTELLISENSE__ */
-
-#define IPI_FUNCTION_OF_MODE(mode, name) \
-	(((mode)&TASK_RPC_FDONTWAKE)         \
-	 ? &name##_dw                        \
-	 : ((mode)&TASK_RPC_FLOWPRIO)        \
-	   ? &name##_lp                      \
-	   : ((mode)&TASK_RPC_FHIGHPRIO)     \
-	     ? &name##_hp                    \
-	     : &name)
+PRIVATE NOBLOCK struct icpustate *
+NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state,
+                                         void *args[CPU_IPI_ARGCOUNT]) {
+	REF struct task *target;
+	struct cpu *me, *target_cpu;
+	struct task *caller;
+	uintptr_t target_flags;
+	uintptr_t mode;
+	target       = (REF struct task *)args[0];
+	mode         = (uintptr_t)args[1];
+	target_flags = ATOMIC_READ(target->t_flags);
+	if unlikely(target_flags & TASK_FTERMINATED) {
+		/* TODO: What now?
+		 *       Our caller is `task_redirect_usercode_rpc()', which may return `false'
+		 *       to indicate this error condition. However since this IPI is serviced
+		 *       asynchronously, we only get here when that function has already returned
+		 *       to its caller, indicating success... */
+		decref(target);
+		return state;
+	}
+	caller     = THIS_TASK;
+	me      = caller->t_cpu;
+	target_cpu = ATOMIC_READ(target->t_cpu);
+	if unlikely(target_cpu != me) {
+		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
+		while (!cpu_sendipi(target_cpu,
+		                    &ipi_redirect_usercode_rpc,
+		                    args, /* inherit:reference:target */
+		                    CPU_IPI_FWAKEUP))
+			task_pause();
+		return state;
+	}
+	task_enable_redirect_usercode_rpc(target);
+	if (!(mode & TASK_RPC_FDONTWAKE)) {
+		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		                                caller, target,
+		                                (mode & TASK_RPC_FHIGHPRIO) != 0);
+		if (target != caller) {
+			FORCPU(me, thiscpu_sched_current) = target;
+			decref_unlikely(target);
+			return CPU_IPI_MODE_SWITCH_TASKS;
+		}
+	}
+	decref_unlikely(target);
+	return state;
+}
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -116,20 +182,17 @@ PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintptr_t mode) {
 	pflag_t was;
 #ifndef CONFIG_NO_SMP
-	struct cpu *mycpu;
+	struct cpu *me;
 	struct cpu *target_cpu;
 	was        = PREEMPTION_PUSHOFF();
-	mycpu      = THIS_CPU;
+	me         = THIS_CPU;
 	target_cpu = ATOMIC_READ(target->t_cpu);
-	if (mycpu != target_cpu) {
+	if (me != target_cpu) {
 		void *args[CPU_IPI_ARGCOUNT];
-		cpu_ipi_t ipifunc;
 		args[0] = (void *)incref(target);
 		args[1] = (void *)mode;
-		ipifunc = IPI_FUNCTION_OF_MODE(mode, ipi_redirect_usercode_rpc);
 		while (!cpu_sendipi(target_cpu,
-		                    ipifunc,
-		                    args,
+		                    &ipi_redirect_usercode_rpc, args,
 		                    CPU_IPI_FWAKEUP))
 			task_pause();
 		PREEMPTION_POP(was);
@@ -148,56 +211,17 @@ NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintpt
 			return false;
 		}
 		task_enable_redirect_usercode_rpc(target);
-		if (mode & TASK_RPC_FDONTWAKE)
-			goto done_success;
-		if (target_flags & TASK_FRUNNING) {
-			/* Running thread */
-			cpu_assert_running(target);
-			if (!(mode & TASK_RPC_FLOWPRIO) && target != caller) {
-				struct task *next;
-				/* Re-schedule the thread to execute as soon as possible. */
-				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
-insert_target_after_caller:
-				next = caller->t_sched.s_running.sr_runnxt;
-				target->t_sched.s_running.sr_runprv = caller;
-				target->t_sched.s_running.sr_runnxt = next;
-				caller->t_sched.s_running.sr_runnxt = target;
-				next->t_sched.s_running.sr_runprv   = target;
-				ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_running(target);
-				if (PREEMPTION_WASENABLED(was)) {
-					if ((mode & TASK_RPC_FHIGHPRIO) &&
-					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
-						/* End the current quantum prematurely. */
-						cpu_quantum_end_nopr(caller, target);
-						/* Immediately switch to the next target thread. */
-						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
-						cpu_run_current_and_remember_nopr(caller);
-					}
-					PREEMPTION_ENABLE();
-				}
-				return true;
+		if (!(mode & TASK_RPC_FDONTWAKE)) {
+			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+			                                caller, target,
+			                                (mode & TASK_RPC_FHIGHPRIO) != 0 &&
+			                                PREEMPTION_WASENABLED(was));
+			if (target != caller) {
+				/* Immediately switch to the next target thread. */
+				FORCPU(IFELSE_SMP(me, &_bootcpu), thiscpu_sched_current) = target;
+				cpu_run_current_and_remember_nopr(caller);
 			}
-		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
-			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			assert(target != caller);
-			cpu_assert_sleeping(target);
-			ATOMIC_OR(target->t_flags, TASK_FRUNNING);
-			if unlikely(!target->t_sched.s_asleep.ss_pself) {
-				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-#ifndef CONFIG_NO_SMP
-				assert(target == &FORCPU(mycpu, thiscpu_idle));
-#else /* !CONFIG_NO_SMP */
-				assert(target == &PERCPU(thiscpu_idle));
-#endif /* CONFIG_NO_SMP */
-			} else {
-				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
-			}
-			goto insert_target_after_caller;
 		}
-done_success:
 		PREEMPTION_POP(was);
 	}
 	return true;
@@ -214,21 +238,19 @@ NOTHROW(KCALL task_schedule_asynchronous_rpc)(struct task *__restrict target,
                                               uintptr_t mode) {
 	pflag_t was;
 #ifndef CONFIG_NO_SMP
-	struct cpu *mycpu;
+	struct cpu *me;
 	struct cpu *target_cpu;
 	was        = PREEMPTION_PUSHOFF();
-	mycpu      = THIS_CPU;
+	me         = THIS_CPU;
 	target_cpu = ATOMIC_READ(target->t_cpu);
-	if (mycpu != target_cpu) {
+	if (me != target_cpu) {
 		void *args[CPU_IPI_ARGCOUNT];
-		cpu_ipi_t ipifunc;
 		args[0] = incref(target);
 		args[1] = (void *)func;
 		args[2] = arg;
-		ipifunc = IPI_FUNCTION_OF_MODE(mode, ipi_schedule_asynchronous_rpc);
+		args[3] = (void *)(uintptr_t)mode;
 		while (!cpu_sendipi(target_cpu,
-		                    ipifunc,
-		                    args,
+		                    &ipi_schedule_asynchronous_rpc, args,
 		                    CPU_IPI_FWAKEUP |
 		                    (mode & TASK_RPC_FWAITFOR)))
 			task_pause();
@@ -254,57 +276,19 @@ NOTHROW(KCALL task_schedule_asynchronous_rpc)(struct task *__restrict target,
 			PREEMPTION_POP(was);
 			return false;
 		}
-		target->t_sched.s_state = task_push_asynchronous_rpc(target->t_sched.s_state,
-		                                                     func, arg);
-		if (mode & TASK_RPC_FDONTWAKE)
-			goto done_success;
-		if (target_flags & TASK_FRUNNING) {
-			/* Running thread */
-			cpu_assert_running(target);
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
-				struct task *next;
-				/* Re-schedule the thread to execute as soon as possible. */
-				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
-insert_target_after_caller:
-				next = caller->t_sched.s_running.sr_runnxt;
-				target->t_sched.s_running.sr_runprv = caller;
-				target->t_sched.s_running.sr_runnxt = next;
-				caller->t_sched.s_running.sr_runnxt = target;
-				next->t_sched.s_running.sr_runprv   = target;
-				ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_running(target);
-				if (PREEMPTION_WASENABLED(was)) {
-					if ((mode & TASK_RPC_FHIGHPRIO) &&
-					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
-						/* End the current quantum prematurely. */
-						cpu_quantum_end_nopr(caller, target);
-						/* Immediately switch to the next target thread. */
-						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
-						cpu_run_current_and_remember_nopr(caller);
-					}
-					PREEMPTION_ENABLE();
-				}
-				return true;
+		target->t_state = task_push_asynchronous_rpc(target->t_state,
+		                                             func, arg);
+		if (!(mode & TASK_RPC_FDONTWAKE)) {
+			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+			                                caller, target,
+			                                (mode & TASK_RPC_FHIGHPRIO) != 0 &&
+			                                PREEMPTION_WASENABLED(was));
+			if (target != caller) {
+				/* Immediately switch to the next target thread. */
+				FORCPU(IFELSE_SMP(me, &_bootcpu), thiscpu_sched_current) = target;
+				cpu_run_current_and_remember_nopr(caller);
 			}
-		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
-			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_sleeping(target);
-			ATOMIC_OR(target->t_flags, TASK_FRUNNING);
-			if unlikely(!target->t_sched.s_asleep.ss_pself) {
-				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-#ifndef CONFIG_NO_SMP
-				assert(target == &FORCPU(mycpu, thiscpu_idle));
-#else /* !CONFIG_NO_SMP */
-				assert(target == &PERCPU(thiscpu_idle));
-#endif /* CONFIG_NO_SMP */
-			} else {
-				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
-			}
-			goto insert_target_after_caller;
 		}
-done_success:
 		PREEMPTION_POP(was);
 	}
 	return true;
@@ -333,11 +317,11 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc)(struct icpustate *__restrict state,
 	struct dat_exec_asynchronous_rpc *data;
 	struct cpu *target_cpu;
 	struct task *caller = THIS_TASK;
-	struct cpu *mycpu   = caller->t_cpu;
+	struct cpu *me   = caller->t_cpu;
 	target     = (struct task *)args[0];
 	data       = (struct dat_exec_asynchronous_rpc *)args[1];
 	target_cpu = ATOMIC_READ(target->t_cpu);
-	if unlikely(mycpu != target_cpu) {
+	if unlikely(me != target_cpu) {
 		COMPILER_BARRIER();
 		ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CORECHANGE);
 		COMPILER_BARRIER();
@@ -363,49 +347,21 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc)(struct icpustate *__restrict state,
 		COMPILER_BARRIER();
 		return state;
 	}
-	target->t_sched.s_state = task_push_asynchronous_rpc(target->t_sched.s_state,
-	                                                     data->ar_func,
-	                                                     data->ar_arg);
-	if (data->ar_mode & TASK_RPC_FDONTWAKE)
-		goto done_success;
-	if (target_flags & TASK_FRUNNING) {
-		/* Running thread */
-		cpu_assert_running(target);
-		if (!(data->ar_mode & TASK_RPC_FLOWPRIO)) {
-			struct task *next;
-			/* Re-schedule the thread to execute as soon as possible. */
-			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
-insert_target_after_caller:
-			next = caller->t_sched.s_running.sr_runnxt;
-			target->t_sched.s_running.sr_runprv = caller;
-			target->t_sched.s_running.sr_runnxt = next;
-			caller->t_sched.s_running.sr_runnxt = target;
-			next->t_sched.s_running.sr_runprv   = target;
-			ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
-			cpu_assert_running(target);
-			if (data->ar_mode & TASK_RPC_FHIGHPRIO) {
-				COMPILER_BARRIER();
-				ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
-				COMPILER_BARRIER();
-				mycpu->c_current = target;
-				return CPU_IPI_MODE_SWITCH_TASKS;
-			}
+	target->t_state = task_push_asynchronous_rpc(target->t_state,
+	                                             data->ar_func,
+	                                             data->ar_arg);
+	if (!(data->ar_mode & TASK_RPC_FDONTWAKE)) {
+		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		                                caller, target,
+		                                data->ar_mode & TASK_RPC_FHIGHPRIO);
+		if (target != caller) {
+			COMPILER_BARRIER();
+			ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
+			COMPILER_BARRIER();
+			FORCPU(me, thiscpu_sched_current) = target;
+			return CPU_IPI_MODE_SWITCH_TASKS;
 		}
-	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
-		/* Wake up a sleeping thread by using a sporadic wake-up. */
-		cpu_assert_sleeping(target);
-		ATOMIC_OR(target->t_flags, TASK_FRUNNING);
-		if unlikely(!target->t_sched.s_asleep.ss_pself) {
-			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, thiscpu_idle));
-		} else {
-			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
-		}
-		goto insert_target_after_caller;
 	}
-done_success:
 	COMPILER_BARRIER();
 	ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
 	COMPILER_BARRIER();
@@ -419,12 +375,12 @@ NOTHROW(KCALL task_exec_asynchronous_rpc)(struct task *__restrict target,
                                           uintptr_t mode) {
 	pflag_t was;
 	struct task *caller = THIS_TASK;
-	struct cpu *mycpu, *target_cpu;
+	struct cpu *me, *target_cpu;
 	was   = PREEMPTION_PUSHOFF();
-	mycpu = caller->t_cpu;
+	me = caller->t_cpu;
 again:
 	target_cpu = ATOMIC_READ(target->t_cpu);
-	if (mycpu != target_cpu) {
+	if (me != target_cpu) {
 		void *args[CPU_IPI_ARGCOUNT];
 		struct dat_exec_asynchronous_rpc data;
 		int final_state;
@@ -466,54 +422,19 @@ again:
 			PREEMPTION_POP(was);
 			return false;
 		}
-		target->t_sched.s_state = task_push_asynchronous_rpc(target->t_sched.s_state,
-		                                                     func, arg);
-		if (mode & TASK_RPC_FDONTWAKE)
-			goto done_success;
-		if (target_flags & TASK_FRUNNING) {
-			/* Running thread */
-			cpu_assert_running(target);
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
-				struct task *next;
-				/* Re-schedule the thread to execute as soon as possible. */
-				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
-insert_target_after_caller:
-				next = caller->t_sched.s_running.sr_runnxt;
-				target->t_sched.s_running.sr_runprv = caller;
-				target->t_sched.s_running.sr_runnxt = next;
-				caller->t_sched.s_running.sr_runnxt = target;
-				next->t_sched.s_running.sr_runprv   = target;
-				ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_running(target);
-				if (PREEMPTION_WASENABLED(was)) {
-					if ((mode & TASK_RPC_FHIGHPRIO) &&
-					    mycpu->c_override != caller) {
-						/* End the current quantum prematurely. */
-						cpu_quantum_end_nopr(caller, target);
-						/* Immediately switch to the next target thread. */
-						mycpu->c_current = target;
-						cpu_run_current_and_remember_nopr(caller);
-					}
-					PREEMPTION_ENABLE();
-				}
-				return true;
+		target->t_state = task_push_asynchronous_rpc(target->t_state,
+		                                             func, arg);
+		if (!(mode & TASK_RPC_FDONTWAKE)) {
+			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+			                                caller, target,
+			                                (mode & TASK_RPC_FHIGHPRIO) != 0 &&
+			                                PREEMPTION_WASENABLED(was));
+			if (target != caller) {
+				/* Immediately switch to the next target thread. */
+				FORCPU(IFELSE_SMP(me, &_bootcpu), thiscpu_sched_current) = target;
+				cpu_run_current_and_remember_nopr(caller);
 			}
-		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
-			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_sleeping(target);
-			ATOMIC_OR(target->t_flags, TASK_FRUNNING);
-			assert(target->t_sched.s_asleep.ss_pself);
-			if unlikely(!target->t_sched.s_asleep.ss_pself) {
-				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-				assert(target == &FORCPU(mycpu, thiscpu_idle));
-			} else {
-				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
-			}
-			goto insert_target_after_caller;
 		}
-done_success:
 		PREEMPTION_POP(was);
 	}
 	return true;
@@ -543,11 +464,11 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc_v)(struct icpustate *__restrict state,
 	struct dat_exec_asynchronous_rpc_v *data;
 	struct cpu *target_cpu;
 	struct task *caller = THIS_TASK;
-	struct cpu *mycpu   = caller->t_cpu;
+	struct cpu *me   = caller->t_cpu;
 	target     = (struct task *)args[0];
 	data       = (struct dat_exec_asynchronous_rpc_v *)args[1];
 	target_cpu = ATOMIC_READ(target->t_cpu);
-	if unlikely(mycpu != target_cpu) {
+	if unlikely(me != target_cpu) {
 		COMPILER_BARRIER();
 		ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CORECHANGE);
 		COMPILER_BARRIER();
@@ -575,50 +496,22 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc_v)(struct icpustate *__restrict state,
 		COMPILER_BARRIER();
 		return state;
 	}
-	target->t_sched.s_state = task_push_asynchronous_rpc_v(target->t_sched.s_state,
+	target->t_state = task_push_asynchronous_rpc_v(target->t_state,
 	                                                       data->ar_func,
 	                                                       data->ar_buf,
 	                                                       data->ar_bufsize);
-	if (data->ar_mode & TASK_RPC_FDONTWAKE)
-		goto done_success;
-	if (target_flags & TASK_FRUNNING) {
-		/* Running thread */
-		cpu_assert_running(target);
-		if (!(data->ar_mode & TASK_RPC_FLOWPRIO)) {
-			struct task *next;
-			/* Re-schedule the thread to execute as soon as possible. */
-			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
-insert_target_after_caller:
-			next = caller->t_sched.s_running.sr_runnxt;
-			target->t_sched.s_running.sr_runprv = caller;
-			target->t_sched.s_running.sr_runnxt = next;
-			caller->t_sched.s_running.sr_runnxt = target;
-			next->t_sched.s_running.sr_runprv   = target;
-			ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
-			cpu_assert_running(target);
-			if (data->ar_mode & TASK_RPC_FHIGHPRIO) {
-				COMPILER_BARRIER();
-				ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
-				COMPILER_BARRIER();
-				mycpu->c_current = target;
-				return CPU_IPI_MODE_SWITCH_TASKS;
-			}
+	if (!(data->ar_mode & TASK_RPC_FDONTWAKE)) {
+		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		                                caller, target,
+		                                data->ar_mode & TASK_RPC_FHIGHPRIO);
+		if (target != caller) {
+			COMPILER_BARRIER();
+			ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
+			COMPILER_BARRIER();
+			FORCPU(me, thiscpu_sched_current) = target;
+			return CPU_IPI_MODE_SWITCH_TASKS;
 		}
-	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
-		/* Wake up a sleeping thread by using a sporadic wake-up. */
-		cpu_assert_sleeping(target);
-		ATOMIC_OR(target->t_flags, TASK_FRUNNING);
-		if unlikely(!target->t_sched.s_asleep.ss_pself) {
-			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-			assert(target == &FORCPU(mycpu, thiscpu_idle));
-		} else {
-			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
-		}
-		goto insert_target_after_caller;
 	}
-done_success:
 	COMPILER_BARRIER();
 	ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
 	COMPILER_BARRIER();
@@ -634,13 +527,13 @@ NOTHROW(KCALL task_exec_asynchronous_rpc_v)(struct task *__restrict target,
                                             uintptr_t mode) {
 	pflag_t was;
 #ifndef CONFIG_NO_SMP
-	struct cpu *mycpu;
+	struct cpu *me;
 	struct cpu *target_cpu;
 	was   = PREEMPTION_PUSHOFF();
-	mycpu = THIS_CPU;
+	me = THIS_CPU;
 again:
 	target_cpu = ATOMIC_READ(target->t_cpu);
-	if (mycpu != target_cpu) {
+	if (me != target_cpu) {
 		void *args[CPU_IPI_ARGCOUNT];
 		struct dat_exec_asynchronous_rpc_v data;
 		int final_state;
@@ -690,57 +583,19 @@ again:
 			PREEMPTION_POP(was);
 			return false;
 		}
-		if (mode & TASK_RPC_FDONTWAKE)
-			goto done_success;
-		target->t_sched.s_state = task_push_asynchronous_rpc_v(target->t_sched.s_state,
-		                                                       func, buf, bufsize);
-		if (target_flags & TASK_FRUNNING) {
-			/* Running thread */
-			cpu_assert_running(target);
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
-				struct task *next;
-				/* Re-schedule the thread to execute as soon as possible. */
-				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
-insert_target_after_caller:
-				next = caller->t_sched.s_running.sr_runnxt;
-				target->t_sched.s_running.sr_runprv = caller;
-				target->t_sched.s_running.sr_runnxt = next;
-				caller->t_sched.s_running.sr_runnxt = target;
-				next->t_sched.s_running.sr_runprv   = target;
-				ATOMIC_AND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_running(target);
-				if (PREEMPTION_WASENABLED(was)) {
-					if ((mode & TASK_RPC_FHIGHPRIO) &&
-					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
-						/* End the current quantum prematurely. */
-						cpu_quantum_end_nopr(caller, target);
-						/* Immediately switch to the next target thread. */
-						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
-						cpu_run_current_and_remember_nopr(caller);
-					}
-					PREEMPTION_ENABLE();
-				}
-				return true;
+		target->t_state = task_push_asynchronous_rpc_v(target->t_state,
+		                                               func, buf, bufsize);
+		if (!(mode & TASK_RPC_FDONTWAKE)) {
+			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+			                                caller, target,
+			                                (mode & TASK_RPC_FHIGHPRIO) != 0 &&
+			                                PREEMPTION_WASENABLED(was));
+			if (target != caller) {
+				/* Immediately switch to the next target thread. */
+				FORCPU(IFELSE_SMP(me, &_bootcpu), thiscpu_sched_current) = target;
+				cpu_run_current_and_remember_nopr(caller);
 			}
-		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
-			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_sleeping(target);
-			ATOMIC_OR(target->t_flags, TASK_FRUNNING);
-			if unlikely(!target->t_sched.s_asleep.ss_pself) {
-				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
-#ifndef CONFIG_NO_SMP
-				assert(target == &FORCPU(mycpu, thiscpu_idle));
-#else /* !CONFIG_NO_SMP */
-				assert(target == &PERCPU(thiscpu_idle));
-#endif /* CONFIG_NO_SMP */
-			} else {
-				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
-			}
-			goto insert_target_after_caller;
 		}
-done_success:
 		PREEMPTION_POP(was);
 	}
 	return true;

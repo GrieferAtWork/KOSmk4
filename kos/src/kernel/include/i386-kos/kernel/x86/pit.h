@@ -22,29 +22,34 @@
 
 #include <kernel/compiler.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <hw/timer/pit.h>
+#include <asm/intrin.h> /* __pause */
 
-DECL_BEGIN
+
+/* Used PIT frequency before APIC/TSC has been initialized. */
+#define X86_PIT_EARLY_HZ 20
 
 #ifdef __CC__
+DECL_BEGIN
+
 #ifndef CONFIG_NO_SMP
 /* Lock used to synchronize access to the PIT.
- * WARNING: When acquiring this lock, you must first disable preemption:
- * >> for (;;) {
- * >>     PREEMPTION_DISABLE();
- * >>     if (sync_trywrite(&x86_pit_lock))
- * >>         break;
- * >>     PREEMPTION_ENABLE();
- * >>     task_yield();
- * >> }
+ * WARNING: When acquiring this lock, you must first disable preemption!
  * In single-core mode, it is sufficient to only disable preemption. */
-DATDEF struct atomic_rwlock x86_pit_lock;
-#endif /* !CONFIG_NO_SMP */
+DATDEF struct atomic_lock x86_pit_lock;
+#define x86_pit_lock_acquire_nopr() atomic_lock_acquire_nopr(&x86_pit_lock);
+#define x86_pit_lock_release_nopr() atomic_lock_release(&x86_pit_lock)
+
+#else /* !CONFIG_NO_SMP */
+#define x86_pit_lock_acquire_nopr() (void)0
+#define x86_pit_lock_release_nopr() (void)0
+#endif /* CONFIG_NO_SMP */
+
+DECL_END
 #endif /* __CC__ */
 
 
-DECL_END
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PIT_H */

@@ -34,6 +34,7 @@
 #include <kos/kernel/handle.h>
 
 #include <assert.h>
+#include <stddef.h>
 
 /* This #include must be relative so that `deemon -F' can find it! */
 #include "../../include/kernel/handle-proto.h"

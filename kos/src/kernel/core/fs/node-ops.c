@@ -33,6 +33,7 @@
 #include <kos/except/reason/io.h>
 
 #include <assert.h>
+#include <stddef.h>
 
 DECL_BEGIN
 

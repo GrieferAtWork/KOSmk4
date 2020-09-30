@@ -61,8 +61,8 @@
 
 DECL_BEGIN
 
+STATIC_ASSERT(TASK_WAKE_FWAITFOR == TASK_RPC_FWAITFOR);
 STATIC_ASSERT(TASK_WAKE_FHIGHPRIO == TASK_RPC_FHIGHPRIO);
-STATIC_ASSERT(TASK_WAKE_FLOWPRIO == TASK_RPC_FLOWPRIO);
 
 DEFINE_PREALLOCATION_CACHE(INTERN, rpcentry, struct rpc_entry, 128)
 DEFINE_PREALLOCATION_CACHE_ALLOC_NX(INTERN, rpcentry, struct rpc_entry)
@@ -278,7 +278,7 @@ NOTHROW(KCALL task_free_rpc)(struct rpc_entry *__restrict rpc) {
 /* Deliver a given `rpc' to the specified `target' thread.
  * @param: target:   The target thread to which to deliver the RPC.
  * @param: rpc:      The rpc to-be delivered (inherited upon success; s.a. possible return values)
- * @param: priority: Set of `TASK_RPC_FNORMAL | TASK_RPC_FDONTWAKE | TASK_RPC_FHIGHPRIO | TASK_RPC_FLOWPRIO | TASK_RPC_FWAITFOR'
+ * @param: priority: Set of `TASK_RPC_FNORMAL | TASK_RPC_FDONTWAKE | TASK_RPC_FHIGHPRIO | TASK_RPC_FWAITFOR'
  * @return: TASK_DELIVER_RPC_KERNTHREAD:  Failed to deliver the RPC: `rpc' is a USER-level RPC, and `target' is a kernel thread.
  * @return: TASK_DELIVER_RPC_TERMINATED:  Failed to deliver the RPC: The given `target' has already terminated.
  * @return: TASK_DELIVER_RPC_SUCCESS:     Successfully delivered RPC
@@ -293,7 +293,7 @@ NOTHROW(KCALL task_deliver_rpc)(struct task *__restrict target,
 	uintptr_t target_flags;
 	uintptr_t rpc_mode;
 	struct rpc_entry *next;
-	assertf(!(priority & ~TASK_WAKE_FMASK),
+	assertf(!(priority & ~(TASK_RPC_FWAITFOR | TASK_RPC_FDONTWAKE | TASK_RPC_FHIGHPRIO)),
 	        "priority = %#" PRIxPTR, priority);
 	target_flags = ATOMIC_READ(target->t_flags);
 
@@ -918,14 +918,14 @@ restore_old_except:
 	 RPC_SCHEDULE_FLAG_WAITFORSTART | RPC_SCHEDULE_FLAG_STATUSFUTEX | \
 	 RPC_SCHEDULE_FLAG_SYSRESTART | RPC_SCHEDULE_FLAG_NOSYSRESTART |  \
 	 RPC_SCHEDULE_FLAG_WAITSMPACK | RPC_SCHEDULE_FLAG_DONTWAKE |      \
-	 RPC_SCHEDULE_FLAG_HIGHPRIO | RPC_SCHEDULE_FLAG_LOWPRIO)
+	 RPC_SCHEDULE_FLAG_HIGHPRIO)
 
 #define RPC_SCHEDULE_VALID_ASYNCFLAGS                                 \
 	(RPC_SCHEDULE_ASYNC | RPC_SCHEDULE_FLAG_NOINTERRUPT |             \
 	 RPC_SCHEDULE_FLAG_WAITFORSTART | RPC_SCHEDULE_FLAG_STATUSFUTEX | \
 	 RPC_SCHEDULE_FLAG_SYSRESTART | RPC_SCHEDULE_FLAG_NOSYSRESTART |  \
 	 RPC_SCHEDULE_FLAG_WAITSMPACK | RPC_SCHEDULE_FLAG_DONTWAKE |      \
-	 RPC_SCHEDULE_FLAG_HIGHPRIO | RPC_SCHEDULE_FLAG_LOWPRIO)
+	 RPC_SCHEDULE_FLAG_HIGHPRIO)
 
 #ifdef __ARCH_WANT_SYSCALL_RPC_SCHEDULE
 DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
@@ -964,12 +964,10 @@ DEFINE_SYSCALL4(syscall_slong_t, rpc_schedule,
 		STATIC_ASSERT(TASK_RPC_FWAITFOR == RPC_SCHEDULE_FLAG_WAITSMPACK);
 		STATIC_ASSERT(TASK_RPC_FDONTWAKE == RPC_SCHEDULE_FLAG_DONTWAKE);
 		STATIC_ASSERT(TASK_RPC_FHIGHPRIO == RPC_SCHEDULE_FLAG_HIGHPRIO);
-		STATIC_ASSERT(TASK_RPC_FLOWPRIO == RPC_SCHEDULE_FLAG_LOWPRIO);
 		/* Inherit 1-on-1 flags directly. */
 		rpc_mode = flags & (RPC_SCHEDULE_FLAG_WAITSMPACK |
 		                    RPC_SCHEDULE_FLAG_DONTWAKE |
-		                    RPC_SCHEDULE_FLAG_HIGHPRIO |
-		                    RPC_SCHEDULE_FLAG_LOWPRIO);
+		                    RPC_SCHEDULE_FLAG_HIGHPRIO);
 	}
 	if (!(flags & RPC_SCHEDULE_ASYNC)) {
 		/* Sync */

@@ -39,6 +39,12 @@
 #include <stddef.h>
 #include <string.h>
 
+#if defined(__i386__) || defined(__x86_64__)
+#include <kernel/vm/nopf.h>
+
+#include <asm/intrin.h>
+#endif /* __i386__ || __x86_64__ */
+
 DECL_BEGIN
 
 #ifdef CONFIG_NO_SMP
@@ -117,13 +123,45 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self) {
 	FORTASK(self, this_connections) = rootcons;
 }
 
+#if defined(__x86_64__) || defined(__i386__)
+INTERN NOBLOCK ATTR_RETNONNULL struct task *
+NOTHROW(KCALL x86_repair_broken_tls_state)(void);
+#endif /* __x86_64__ || __i386__ */
 
 /* Push/pop the active set of connections. */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_pushconnections)(struct task_connections *__restrict cons) {
 	struct task_connections *oldcons;
 	unsigned int i;
+#ifdef NDEBUG
 	oldcons = THIS_CONNECTIONS;
+#elif defined(__i386__) || defined(__x86_64__)
+	struct task *mythread;
+#ifdef __x86_64__
+	mythread = (struct task *)__rdgsbaseq();
+#else /* __x86_64__ */
+	mythread = NULL;
+	if likely(__rdfs() == SEGMENT_KERNEL_FSBASE) {
+		struct desctab gdt;
+		__sgdt(&gdt);
+		if likely(gdt.dt_limit > SEGMENT_KERNEL_FSBASE) {
+			struct segment *fsseg;
+			fsseg    = (struct segment *)(gdt.dt_base + SEGMENT_KERNEL_FSBASE);
+			mythread = (struct task *)segment_rdbaseX(fsseg);
+		}
+	}
+#endif /* !__x86_64__ */
+	if unlikely(memcpy_nopf(&oldcons, &FORTASK(mythread, this_connections), sizeof(oldcons)) != 0) {
+		assertf(memcpy_nopf(&oldcons, &FORTASK(mythread, this_connections), sizeof(oldcons)) == 0,
+		        "Corrupt TLS base pointer: mythread = %p", mythread);
+		/* Allow the user to IGNORE the assertion check, in which case we'll
+		 * try to repair the damage... */
+		mythread = x86_repair_broken_tls_state();
+		oldcons  = FORTASK(mythread, this_connections);
+	}
+#else /* ... */
+	oldcons = THIS_CONNECTIONS;
+#endif /* !... */
 	assertf(cons != oldcons,
 	        "Connections set %p has already been pushed",
 	        cons);

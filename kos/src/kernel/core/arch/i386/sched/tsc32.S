@@ -17,25 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_TIME_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_TIME_H 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSC32_S
+#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSC32_S 1
+#define __ASSEMBLER__ 1
 
-#include <kernel/compiler.h>
+#ifndef __INTELLISENSE__
+#include "tsc.S"
+#endif /* !__INTELLISENSE__ */
 
-#ifdef __CC__
-DECL_BEGIN
-
-struct cmos_realtime_clock_struct;
-/* The CMOS realtime clock driver descriptor structure */
-DATDEF struct cmos_realtime_clock_struct cmos_realtime_clock;
-
-struct realtime_clock_struct;
-
-/* Define CMOS as the architecture default realtime clock. */
-#define ARCH_DEFAULT_REALTIME_CLOCK \
-	((struct realtime_clock_struct *)&cmos_realtime_clock)
-
-DECL_END
-#endif /* __CC__ */
-
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_SCHED_ARCH_TIME_H */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSC32_S */

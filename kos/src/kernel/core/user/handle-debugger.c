@@ -37,6 +37,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/rt.h>
 #include <kernel/handle.h>
 
+#include <stddef.h>
+
 DECL_BEGIN
 
 

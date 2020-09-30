@@ -115,7 +115,7 @@ PUBLIC ATTR_PERCPU u8 _thiscpu_x86_lapicversion ASMNAME("thiscpu_x86_lapicversio
 DATDEF cpuid_t _cpu_count ASMNAME("cpu_count");
 DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 
-PUBLIC VIRT byte_t volatile *_x86_lapicbase ASMNAME("x86_lapicbase") = NULL;
+PUBLIC VIRT byte_t volatile *x86_lapicbase_ ASMNAME("x86_lapicbase") = NULL;
 
 #ifndef CONFIG_NO_SMP
 /* Commandline option to set the max number of CPUs which may be configured.
@@ -161,7 +161,7 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		return;
 	/* Remember the LAPIC base address. */
 	if (table->tab_lapicaddr & PAGEMASK) {
-		_x86_lapicbase = (byte_t *)(uintptr_t)(table->tab_lapicaddr & PAGEMASK);
+		x86_lapicbase_ = (byte_t *)(uintptr_t)(table->tab_lapicaddr & PAGEMASK);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_start = (physpage_t)(table->tab_lapicaddr / PAGESIZE);
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 2;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_ASM_CPU_FEATURE_H
-#define _I386_KOS_ASM_CPU_FEATURE_H 1
+#ifndef _I386_KOS_ASM_CPU_FEATURES_H
+#define _I386_KOS_ASM_CPU_FEATURES_H 1
 
 #include <hybrid/typecore.h>
 
@@ -167,7 +167,7 @@ for (local name, index, register, mask, comment: features) {
 #define X86_FEAT_OSXSAVE         X86_FEATURE(0x00000001, C, 27) /* XSAVE enabled by OS */
 #define X86_FEAT_AVX             X86_FEATURE(0x00000001, C, 28) /* Advanced Vector Extensions */
 #define X86_FEAT_F16C            X86_FEATURE(0x00000001, C, 29) /* F16C (half-precision) FP support */
-#define X86_FEAT_RDRND           X86_FEATURE(0x00000001, C, 30) /* RDRAND (on-chip random number generator) support */
+#define X86_FEAT_RDRAND          X86_FEATURE(0x00000001, C, 30) /* RDRAND (on-chip random number generator) support */
 #define X86_FEAT_HYPERVISOR      X86_FEATURE(0x00000001, C, 31) /* Running on a hypervisor (always 0 on a real CPU, but also with some hypervisors) */
 #define X86_FEAT_AVX512_4VNNIW   X86_FEATURE(0x00000007, D,  2) /* AVX-512 4-register Neural Network Instructions */
 #define X86_FEAT_AVX512_4FMAPS   X86_FEATURE(0x00000007, D,  3) /* AVX-512 4-register Multiply Accumulation Single precision */
@@ -254,4 +254,4 @@ for (local name, index, register, mask, comment: features) {
 /*[[[end]]]*/
 
 
-#endif /* !_I386_KOS_ASM_CPU_FEATURE_H */
+#endif /* !_I386_KOS_ASM_CPU_FEATURES_H */

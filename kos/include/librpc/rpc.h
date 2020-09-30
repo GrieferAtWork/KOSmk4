@@ -254,9 +254,6 @@ __SYSDECL_BEGIN
 #define RPC_SCHEDULE_FLAG_HIGHPRIO      0x4000 /* [A|S] Schedule the RPC with high priority (if the target is hosted by the same
                                                 * CPU as the caller, preempt the caller's current quantum and immediately switch
                                                 * to the targeted thread to service the RPC) */
-#define RPC_SCHEDULE_FLAG_LOWPRIO       0x8000 /* [A|S] Schedule the RPC with low priority (if the target is hosted by the same
-                                                * CPU as the caller, don't schedule the target thread to begin its quantum after
-                                                * the caller's current quantum ends) */
 
 
 /* RPC futex status values. */

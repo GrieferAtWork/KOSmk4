@@ -36,6 +36,7 @@
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <sched/cpu.h>
+#include <sched/sched.h>
 
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -147,17 +148,17 @@ panic_df_dbg_main(void *cr3)
 
 
 PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
-NOTHROW(KCALL x86_repair_broken_tls_state_impl)(struct cpu *__restrict mycpu) {
+NOTHROW(KCALL x86_repair_broken_tls_state_impl)(struct cpu *__restrict me) {
 	struct task *mythread;
-	mythread = mycpu->c_current;
+	mythread = FORCPU(me, thiscpu_sched_current);
 	if unlikely(!VERIFY_ADDR(mythread))
-		mythread = &FORCPU(mycpu, thiscpu_idle);
+		mythread = &FORCPU(me, thiscpu_idle);
 #ifdef __x86_64__
 	__wrgsbase(mythread);
 #else /* __x86_64__ */
-	segment_wrbaseX(&FORCPU(mycpu, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
+	segment_wrbaseX(&FORCPU(me, thiscpu_x86_gdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
 	                (uintptr_t)mythread);
-	__lgdt(sizeof(thiscpu_x86_gdt) - 1, FORCPU(mycpu, thiscpu_x86_gdt));
+	__lgdt(sizeof(thiscpu_x86_gdt) - 1, FORCPU(me, thiscpu_x86_gdt));
 	__wrfs(SEGMENT_KERNEL_FSBASE);
 #endif /* !__x86_64__ */
 	return mythread;
@@ -165,9 +166,9 @@ NOTHROW(KCALL x86_repair_broken_tls_state_impl)(struct cpu *__restrict mycpu) {
 
 INTERN NOBLOCK ATTR_RETNONNULL struct task *
 NOTHROW(KCALL x86_repair_broken_tls_state)(void) {
-	struct cpu *mycpu;
-	mycpu = x86_failsafe_getcpu();
-	return x86_repair_broken_tls_state_impl(mycpu);
+	struct cpu *me;
+	me = x86_failsafe_getcpu();
+	return x86_repair_broken_tls_state_impl(me);
 }
 
 
@@ -175,7 +176,7 @@ NOTHROW(KCALL x86_repair_broken_tls_state)(void) {
 INTERN struct df_cpustate *FCALL
 x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	void *pc;
-	struct cpu *mycpu;
+	struct cpu *me;
 #ifdef __x86_64__
 	pc = (void *)state->dcs_regs.ics_irregs.ir_rip;
 #else /* __x86_64__ */
@@ -187,13 +188,13 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	 * it to become the c_current pointer of our current CPU, or, if that pointer
 	 * is broken, use the current CPU's IDLE thread instead. */
 #ifdef __x86_64__
-	mycpu = x86_failsafe_getcpu();
+	me = x86_failsafe_getcpu();
 #else /* __x86_64__ */
-	mycpu = state->dcs_cpu;
-	if unlikely(!VERIFY_ADDR(mycpu))
-		mycpu = x86_failsafe_getcpu();
+	me = state->dcs_cpu;
+	if unlikely(!VERIFY_ADDR(me))
+		me = x86_failsafe_getcpu();
 #endif /* !__x86_64__ */
-	x86_repair_broken_tls_state_impl(mycpu);
+	x86_repair_broken_tls_state_impl(me);
 	COMPILER_BARRIER();
 	/* Ok. If we're still alive, then the above ~should~ have just
 	 * giving us ~some~ semblance of a consistent TLS state. */

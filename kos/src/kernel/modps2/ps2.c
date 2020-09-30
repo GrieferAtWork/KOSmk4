@@ -116,6 +116,7 @@ handle_resend_or_other:
 PRIVATE NOBLOCK ATTR_FREETEXT bool
 NOTHROW(FCALL ps2_probe_handle_interrupt)(void *arg) {
 	u8 data, status = inb(PS2_STATUS);
+	printk(KERN_TRACE "[ps2] ps2_probe_handle_interrupt: %#.2I8x\n", status);
 	struct ps2_probe_data *probe = (struct ps2_probe_data *)arg;
 	if (status & PS2_STATUS_OUTFULL2) {
 		data = inb(PS2_DATA);

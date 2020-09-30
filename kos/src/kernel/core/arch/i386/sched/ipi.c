@@ -29,6 +29,7 @@
 #include <kernel/x86/idt.h>
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
+#include <sched/rpc.h>
 #include <sched/task.h>
 #include <sched/x86/smp.h>
 
@@ -249,16 +250,19 @@ NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me) {
 	return false;
 }
 
-
-INTERN NONNULL((1)) struct icpustate *
-NOTHROW(FCALL x86_serve_ipi)(struct icpustate *__restrict state) {
+INTERN NONNULL((1, 2)) struct icpustate *
+NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
+                             struct icpustate *__restrict state) {
 	unsigned int i, j;
 	struct icpustate *new_state;
 	struct icpustate *result = state;
-	struct cpu *me           = THIS_CPU;
 	IPI_DEBUG("x86_serve_ipi\n");
-	for (i = 0; i < CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER); ++i) {
+	i = CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER);
+	/* Must iterate in reverse, since assembly only checks the first word
+	 * of the in-use bitset to determine if unhandled IPIs are present. */
+	while (i) {
 		uintptr_t bits, mask;
+		--i;
 		bits = ATOMIC_XCH(FORCPU(me, thiscpu_x86_ipi_inuse[i]), 0);
 		if (!bits)
 			continue;
@@ -291,6 +295,27 @@ NOTHROW(FCALL x86_serve_ipi)(struct icpustate *__restrict state) {
 	}
 	return result;
 }
+
+
+PRIVATE WUNUSED NONNULL((2)) struct icpustate *FCALL
+task_rpc_serve_ipi(void *UNUSED(arg),
+                   struct icpustate *__restrict state,
+                   unsigned int UNUSED(reason),
+                   struct rpc_syscall_info const *UNUSED(sc_info)) {
+	return x86_serve_ipi(THIS_CPU, state);
+}
+
+
+/* Modify the scheduler state of `thread' to have it
+ * service IPIs before resuming what it was doing before. */
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL x86_task_push_serve_ipi)(struct task *__restrict thread) {
+	thread->t_state = task_push_asynchronous_rpc(thread->t_state,
+	                                             &task_rpc_serve_ipi,
+	                                             NULL);
+}
+
+
 
 
 
@@ -424,7 +449,7 @@ done_failure:
 
 /* Wake up a CPU, regardless of which ever state it may be in, potentially
  * not even waking it at all, but simply sending an IPI, such that sooner
- * or later it will check its chain of pending task (`target->c_pending'),
+ * or later it will check its chain of pending task (`FORCPU(target, thiscpu_sched_pending)'),
  * causing it to load all threads found within that chain, so-as to allow
  * those tasks to continue running on it.
  * On X86, this function is implemented as:

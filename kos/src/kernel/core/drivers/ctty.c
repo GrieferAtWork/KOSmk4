@@ -31,6 +31,8 @@
 
 #include <kos/dev.h>
 
+#include <stddef.h>
+
 DECL_BEGIN
 
 LOCAL ATTR_RETNONNULL WUNUSED REF struct ttybase_device *

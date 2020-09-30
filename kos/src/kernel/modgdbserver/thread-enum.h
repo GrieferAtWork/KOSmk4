@@ -28,7 +28,7 @@
 
 DECL_BEGIN
 
-typedef ssize_t /*NOTHROW*/ (FCALL PTHREAD_ENUM_CALLBACK)(void *arg, struct task *__restrict thread);
+typedef ssize_t /*NOTHROW*/ (FCALL *PTHREAD_ENUM_CALLBACK)(void *arg, struct task *__restrict thread);
 
 /* Enumerate thread that are:
  *  - In EVERY_CPU->c_running

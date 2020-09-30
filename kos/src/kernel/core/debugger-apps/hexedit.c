@@ -53,6 +53,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <alloca.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>

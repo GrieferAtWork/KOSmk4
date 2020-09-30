@@ -43,6 +43,7 @@
 #include <kos/kernel/segment.h>
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -168,6 +169,12 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 	 * NOTE: Possibly, we could even go so far as-to save CRn registers.
 	 * Also: Check if we're actually restoring DRn registers, as already
 	 *       defined on a per-vm basis! */
+	printk(KERN_DEBUG "[idt] Set new IDT {%p, %#" PRIx16 "}\n",
+	       ptr->dt_base, ptr->dt_limit);
+	printk(KERN_DEBUG "[idt:80] = %p\n", segment_rdbaseX(&((struct idt_segment *)ptr->dt_base)[0x80].i_seg));
+	printk(KERN_DEBUG "[idt:ee] = %p\n", segment_rdbaseX(&((struct idt_segment *)ptr->dt_base)[0xee].i_seg));
+	printk(KERN_DEBUG "[idt:ff] = %p\n", segment_rdbaseX(&((struct idt_segment *)ptr->dt_base)[0xff].i_seg));
+
 	COMPILER_BARRIER();
 #ifndef CONFIG_NO_SMP
 	{
@@ -257,7 +264,7 @@ PUBLIC ATTR_COLDTEXT bool FCALL x86_idt_modify_begin(bool nx)
 	}
 	assert(!x86_idt_modify_copy);
 	/* Fill in the IDT copy. */
-	memcpy(copy, x86_dbgidt, 256, sizeof(struct idt_segment));
+	memcpy(copy, x86_idt, 256, sizeof(struct idt_segment));
 	x86_idt_modify_copy = copy;
 	/* Set the IDT copy as the IDT exclusively used everywhere */
 	dt.dt_base  = (uintptr_t)copy;
@@ -283,7 +290,7 @@ NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 	x86_idt_modify_copy = NULL;
 	/* Check if we're supposed to discard any changes made. */
 	if (discard_changes)
-		memcpy(x86_dbgidt, copy, 256, sizeof(struct idt_segment));
+		memcpy(x86_idt, copy, 256, sizeof(struct idt_segment));
 	/* Restore the used IDT within all CPUs */
 	x86_idt_setcurrent(&x86_idt_ptr);
 	/* Release the IDT modifications lock. */

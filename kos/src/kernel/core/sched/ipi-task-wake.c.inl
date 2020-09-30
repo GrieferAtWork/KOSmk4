@@ -67,35 +67,14 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
                             unsigned int flags)
 #endif /* ... */
 {
-	uintptr_t old_flags;
 	pflag_t was;
-	struct cpu *mycpu;
+	struct cpu *me;
 #ifdef DEFINE_task_wake_as
 	assertf(!PREEMPTION_ENABLED() || (PERTASK_GET(this_task.t_flags) & TASK_FKEEPCORE),
 	        "You must ensure that you're core won't change before calling `task_wake_as()'");
 	assertf(caller && caller->t_cpu == THIS_CPU,
 	        "You may only impersonate other threads from your own CPU");
-	assert(caller->t_sched.s_running.sr_runnxt &&
-	       caller->t_sched.s_running.sr_runprv &&
-	       caller->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == caller &&
-	       caller->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == caller);
-#else /* DEFINE_task_wake_as */
-	assert(PERTASK_GET(this_task.t_sched.s_running.sr_runnxt) &&
-	       PERTASK_GET(this_task.t_sched.s_running.sr_runprv) &&
-	       PERTASK_GET(this_task.t_sched.s_running.sr_runnxt)->t_sched.s_running.sr_runprv == THIS_TASK &&
-	       PERTASK_GET(this_task.t_sched.s_running.sr_runprv)->t_sched.s_running.sr_runnxt == THIS_TASK);
-#endif /* !DEFINE_task_wake_as */
-	do {
-		old_flags = ATOMIC_READ(thread->t_flags);
-		if (old_flags & TASK_FTERMINATED) {
-			IPI_DEBUG("task_wake(%p):terminated\n", thread);
-			return false; /* The thread has already terminated. */
-		}
-		if (old_flags & TASK_FWAKING) {
-			IPI_DEBUG("task_wake(%p):already\n", thread);
-			return true; /* A wake-up is already pending. */
-		}
-	} while (!ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags, old_flags | TASK_FWAKING));
+#endif /* DEFINE_task_wake_as */
 	/* Now we're responsible to see to it that the thread either gets
 	 * woken, or that the `TASK_FTERMINATED' gets set before then.
 	 * NOTE: We can't actually track the later happening on other cores,
@@ -105,14 +84,18 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 	 *       guarantied to be responsive to wakeup commands. */
 	was = PREEMPTION_PUSHOFF();
 #ifdef DEFINE_task_wake_as
-	mycpu = caller->t_cpu;
+	me = caller->t_cpu;
 #else /* DEFINE_task_wake_as */
-	mycpu = THIS_CPU;
+	me = THIS_CPU;
 #endif /* !DEFINE_task_wake_as */
 #ifndef CONFIG_NO_SMP
-	if (thread->t_cpu != mycpu) {
+	if (thread->t_cpu != me) {
 		/* Use an IPI to wake up the thread! */
 		void *args[CPU_IPI_ARGCOUNT];
+		if (ATOMIC_READ(thread->t_flags) & TASK_FTERMINATED) {
+			IPI_DEBUG("task_wake(%p):terminated\n", thread);
+			return false; /* The thread has already terminated. */
+		}
 		args[0] = thread;
 		args[1] = (void *)(uintptr_t)flags;
 		IPI_DEBUG("task_wake(%p):ipi\n", thread);
@@ -127,18 +110,9 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 #ifndef DEFINE_task_wake_as
 		struct task *caller;
 #endif /* !DEFINE_task_wake_as */
-		struct task *next;
-		uintptr_t thread_flags;
 		IPI_DEBUG("task_wake(%p):me\n", thread);
 		COMPILER_READ_BARRIER();
-		thread_flags = thread->t_flags;
-		COMPILER_READ_BARRIER();
-#ifndef CONFIG_NO_SMP
-		if (thread_flags & (TASK_FTERMINATED | TASK_FPENDING))
-#else /* !CONFIG_NO_SMP */
-		if (thread_flags & (TASK_FTERMINATED))
-#endif /* CONFIG_NO_SMP */
-		{
+		if (thread->t_flags & TASK_FTERMINATED) {
 			/* The thread has already terminated, but the wake-up was requested at
 			 * a time when the thread wasn't. So between then and now, the thread
 			 * must have executed at least for a while, meaning it did get a wake-up
@@ -149,79 +123,24 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 			 * once that request goes through (which may actually happen as soon as
 			 * we re-enable preemption, which may be done by the next line) */
 			IPI_DEBUG("task_wake(%p):terminated\n", thread);
-			PREEMPTION_POP(was);
-			return true;
-		}
-#ifndef DEFINE_task_wake_as
-		caller = THIS_TASK;
-#endif /* !DEFINE_task_wake_as */
-		if (thread_flags & TASK_FRUNNING) {
-#ifndef DEFINE_task_wake_as
-			cpu_assert_running(thread);
-#endif /* !DEFINE_task_wake_as */
-			if (flags & TASK_WAKE_FLOWPRIO)
-				goto unset_waking; /* Don't re-prioritize the target thread. */
-			if unlikely(caller == thread) {
-				/* Special (and _very_ unlikely) case: The calling thread is trying to wake itself.
-				 * This could? happen under very rare circumstances, and is actually allowed behavior,
-				 * so handle it by operating as a no-op, other than unsetting our own `TASK_FWAKING'
-				 * flag. */
-#ifdef NDEBUG
-				PREEMPTION_POP(was);
-				ATOMIC_AND(thread->t_flags, ~TASK_FWAKING);
-#else /* NDEBUG */
-				ATOMIC_AND(thread->t_flags, ~TASK_FWAKING);
-#ifndef DEFINE_task_wake_as
-				cpu_assert_running(thread);
-#endif /* !DEFINE_task_wake_as */
-				PREEMPTION_POP(was);
-#endif /* !NDEBUG */
-				return true;
-			}
-			/* The thread is already running.
-			 * In this case, re-schedule the thread to-be executed next. */
-			thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = thread->t_sched.s_running.sr_runnxt;
-			thread->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = thread->t_sched.s_running.sr_runprv;
 		} else {
-			assert(caller != thread);
 #ifndef DEFINE_task_wake_as
-			cpu_assert_sleeping(thread);
+			caller = THIS_TASK;
 #endif /* !DEFINE_task_wake_as */
-			ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
-			/* The thread was sleeping. - Wake it up */
-			if ((*thread->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_tmonxt) != NULL)
-				thread->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_pself;
-		}
-		next = caller->t_sched.s_running.sr_runnxt;
-		assert(next);
-		thread->t_sched.s_running.sr_runprv = caller;
-		thread->t_sched.s_running.sr_runnxt = next;
-		caller->t_sched.s_running.sr_runnxt = thread;
-		next->t_sched.s_running.sr_runprv   = thread;
-		assert(caller->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == caller &&
-		       caller->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == caller);
-		assert(thread->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == thread &&
-		       thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == thread);
-unset_waking:
-		ATOMIC_AND(thread->t_flags, ~TASK_FWAKING);
-#ifndef DEFINE_task_wake_as
-		cpu_assert_running(thread);
-#endif /* !DEFINE_task_wake_as */
-		if (PREEMPTION_WASENABLED(was)) {
-			if ((flags & TASK_WAKE_FHIGHPRIO) &&
-			    mycpu->c_override != caller) {
-				/* End the current quantum prematurely. */
-				cpu_quantum_end_nopr(caller, thread);
+			thread = sched_intern_localwake(me, caller, thread,
+			                                (flags & TASK_WAKE_FHIGHPRIO) != 0 &&
+			                                PREEMPTION_WASENABLED(was));
+			if (thread != caller) {
 				/* Directly switch execution to the thread in question,
 				 * immediately allowing it to resume executing. */
-				mycpu->c_current = thread;
+				FORCPU(me, thiscpu_sched_current) = thread;
 				cpu_run_current_and_remember_nopr(caller);
 				/* At this point, `thread' got to execute for a while, and we're
 				 * back in business, with preemption enabled once again. */
+				return true;
 			}
-			PREEMPTION_ENABLE();
 		}
-		/*PREEMPTION_POP(was);*/
+		PREEMPTION_POP(was);
 	}
 	return true;
 }

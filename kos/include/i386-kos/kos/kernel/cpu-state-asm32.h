@@ -184,6 +184,15 @@
 	__ASM_L(popl_cfi %ds)                      \
 	__ASM_L(.cfi_restore_iret_ds)
 
+/* Push everything necessary to create an `scpustate'
+ * from an `irregs' structure onto the stack. */
+#define ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R \
+	__ASM_L(pushl_cfi_r %ds)                \
+	__ASM_L(pushl_cfi_r %es)                \
+	__ASM_L(pushl_cfi_r %fs)                \
+	__ASM_L(pushl_cfi_r %gs)                \
+	__ASM_L(pushal_cfi_r)
+
 
 #endif /* __i386__ && !__x86_64__ */
 

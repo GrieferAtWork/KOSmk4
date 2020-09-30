@@ -159,8 +159,8 @@ NOTHROW(KCALL nic_packet_desc_for_packet)(struct nic_packet_desc *__restrict sel
 		self->npd_payload.ab_last = packet->np_payloadv[packet->np_payloadc - 1].ab_size;
 	} else {
 		self->npd_payload.ab_entc         = 1;
-		self->npd_payload.ab_entv         = NULL;
-		self->npd_payload.ab_head.ab_base = NULL;
+		self->npd_payload.ab_entv         = __NULLPTR;
+		self->npd_payload.ab_head.ab_base = __NULLPTR;
 		self->npd_payload.ab_head.ab_size = 0;
 		self->npd_payload.ab_last         = 0;
 	}

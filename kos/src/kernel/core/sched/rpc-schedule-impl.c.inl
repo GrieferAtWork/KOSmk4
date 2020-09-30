@@ -27,20 +27,20 @@ DECL_BEGIN
 
 
 #ifndef RPC_NOEXCEPT
-#define SUCCESS_RETURN_VALUE  true
+#define SUCCESS_RETURN_VALUE true
 #elif defined(RPC_USER)
-#define SUCCESS_RETURN_VALUE  TASK_SCHEDULE_USER_RPC_SUCCESS
-#else
-#define SUCCESS_RETURN_VALUE  TASK_SCHEDULE_SYNCHRONOUS_RPC_SUCCESS
-#endif
+#define SUCCESS_RETURN_VALUE TASK_SCHEDULE_USER_RPC_SUCCESS
+#else /* ... */
+#define SUCCESS_RETURN_VALUE TASK_SCHEDULE_SYNCHRONOUS_RPC_SUCCESS
+#endif /* !... */
 
 #ifndef RPC_NOEXCEPT
-#define TARGET_HAS_TERMINATED_RETURN_VALUE  false
+#define TARGET_HAS_TERMINATED_RETURN_VALUE false
 #elif defined(RPC_USER)
-#define TARGET_HAS_TERMINATED_RETURN_VALUE  TASK_SCHEDULE_USER_RPC_TERMINATED
-#else
-#define TARGET_HAS_TERMINATED_RETURN_VALUE  TASK_SCHEDULE_SYNCHRONOUS_RPC_TERMINATED
-#endif
+#define TARGET_HAS_TERMINATED_RETURN_VALUE TASK_SCHEDULE_USER_RPC_TERMINATED
+#else /* ... */
+#define TARGET_HAS_TERMINATED_RETURN_VALUE TASK_SCHEDULE_SYNCHRONOUS_RPC_TERMINATED
+#endif /* !... */
 
 
 #ifdef RPC_USER
@@ -202,7 +202,7 @@ PUBLIC NONNULL((1, 2)) bool
 	/* Always re-direct user-space, since any kind of synchronous
 	 * interrupt must be handled immediately if `target' is currently
 	 * running from user-space! */
-	task_redirect_usercode_rpc(target, mode & TASK_WAKE_FMASK);
+	task_redirect_usercode_rpc(target, mode & (TASK_RPC_FWAITFOR | TASK_RPC_FDONTWAKE | TASK_RPC_FHIGHPRIO));
 
 	/* Throw an error to return to user-space if we're interrupting, and are sending this to ourself. */
 	if ((mode & TASK_USER_RPC_FINTR) && target == THIS_TASK) {

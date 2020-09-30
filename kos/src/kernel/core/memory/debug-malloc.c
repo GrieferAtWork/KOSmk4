@@ -49,7 +49,9 @@
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
+#include <sched/enum.h>
 #include <sched/pid.h>
+#include <sched/sched.h>
 #include <sched/task.h>
 #ifndef CONFIG_NO_SMP
 #include <sched/signal.h>
@@ -1281,10 +1283,32 @@ NOTHROW(KCALL mall_search_corepage_chain)(struct vm_corepage *chain) {
 		mall_reachable_data((byte_t *)chain->cp_parts, sizeof(chain->cp_parts));
 }
 
+PRIVATE ssize_t
+NOTHROW(KCALL mall_search_thread)(void *UNUSED(arg),
+                                  struct task *thread,
+                                  struct taskpid *UNUSED(pid)) {
+	if (thread && thread != THIS_TASK) {
+#ifndef CONFIG_NO_SMP
+		/* NOTE: Must check if mall_other_cpu_states[i] != NULL, in
+		 *       case the CPU didn't get suspended because it is (and
+		 *       still should be) in deep sleep. */
+		if (thread == FORCPU(thread->t_cpu, thiscpu_sched_current) &&
+		    mall_other_cpu_states[thread->t_cpu->c_id] != NULL) {
+			/* Special case for the thread that got stopped on the foreign CPU */
+			mall_search_task_icpustate(thread, mall_other_cpu_states[thread->t_cpu->c_id]);
+		} else
+#endif /* !CONFIG_NO_SMP */
+		{
+			mall_search_task_scpustate(thread, thread->t_state);
+		}
+	}
+	return 0;
+}
+
+
 
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_search_leaks_impl)(void) {
-	cpuid_t i;
 	/* Search for memory leaks.
 	 * The idea here is not to be able to find all memory blocks that were
 	 * leaked, but rather to find anything that ~might~ be referenced.
@@ -1306,46 +1330,8 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 
 	/* Search all threads on all CPUs. */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2: Scan running threads\n");
-	for (i = 0; i < cpu_count; ++i) {
-		struct cpu *c = cpu_vector[i];
-		struct task *iter, *chain;
-		bool did_check_idle = false;
-		iter = chain = c->c_current;
-		do {
-			if (iter != THIS_TASK) {
-				if (iter == &FORCPU(c, thiscpu_idle))
-					did_check_idle = true;
-#ifndef CONFIG_NO_SMP
-				/* NOTE: Must check if mall_other_cpu_states[i] != NULL, in
-				 *       case the CPU didn't get suspended because it is (and
-				 *       still should be) in deep sleep. */
-				if (iter == chain && mall_other_cpu_states[i] != NULL) {
-					/* Special case for the thread that got stopped on the foreign CPU */
-					assert(c != THIS_CPU);
-					mall_search_task_icpustate(iter, mall_other_cpu_states[i]);
-				} else
-#endif /* !CONFIG_NO_SMP */
-				{
-					mall_search_task_scpustate(iter, iter->t_sched.s_state);
-				}
-			}
-		} while ((iter = iter->t_sched.s_running.sr_runnxt) != chain);
-		for (chain = c->c_sleeping; chain;
-		     chain = chain->t_sched.s_asleep.ss_tmonxt) {
-			if (chain == &FORCPU(c, thiscpu_idle))
-				did_check_idle = true;
-			mall_search_task_scpustate(chain, chain->t_sched.s_state);
-		}
-#ifndef CONFIG_NO_SMP
-		for (chain = c->c_pending; chain != CPU_PENDING_ENDOFCHAIN;
-		     chain = chain->t_sched.s_pending.ss_pennxt)
-			mall_search_task_scpustate(chain, chain->t_sched.s_state);
-#endif /* !CONFIG_NO_SMP */
-		if (!did_check_idle) {
-			mall_search_task_scpustate(&FORCPU(c, thiscpu_idle),
-			                           FORCPU(c, thiscpu_idle).t_sched.s_state);
-		}
-	}
+	task_enum_all_noipi_nb(&mall_search_thread, NULL);
+
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2.1: Scan the calling thread\n");
 	mall_search_this_task();
 
@@ -1501,8 +1487,8 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 	/* Setup a preemption override for our own CPU */
 	COMPILER_BARRIER();
 	old_flags    = ATOMIC_FETCHOR(me->t_flags, TASK_FKEEPCORE);
-	old_override = me->t_cpu->c_override;
-	me->t_cpu->c_override = me;
+	old_override = FORCPU(me->t_cpu, thiscpu_sched_override);
+	FORCPU(me->t_cpu, thiscpu_sched_override) = me;
 	COMPILER_BARRIER();
 
 	/* Store the interrupted state for our CPU, allowing the mall
@@ -1537,7 +1523,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 
 	/* Restore the old preemption behavior. */
 	COMPILER_BARRIER();
-	me->t_cpu->c_override = old_override;
+	FORCPU(me->t_cpu, thiscpu_sched_override) = old_override;
 	if (!(old_flags & TASK_FKEEPCORE))
 		ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
 	COMPILER_BARRIER();
@@ -1617,8 +1603,8 @@ again:
 		/* Setup a preemption override for our own CPU */
 		was = PREEMPTION_PUSHOFF();
 		old_flags    = ATOMIC_FETCHOR(me->t_flags, TASK_FKEEPCORE);
-		old_override = me->t_cpu->c_override;
-		me->t_cpu->c_override = me;
+		old_override = FORCPU(me->t_cpu, thiscpu_sched_override);
+		FORCPU(me->t_cpu, thiscpu_sched_override) = me;
 		PREEMPTION_POP(was);
 
 #ifndef CONFIG_NO_SMP
@@ -1626,7 +1612,7 @@ again:
 		 * execution until we're done performing our scan. */
 		if (!mall_enter_singlecore_mode()) {
 			was = PREEMPTION_PUSHOFF();
-			me->t_cpu->c_override = old_override;
+			FORCPU(me->t_cpu, thiscpu_sched_override) = old_override;
 			if (!(old_flags & TASK_FKEEPCORE))
 				ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
 			PREEMPTION_POP(was);
@@ -1662,7 +1648,7 @@ again:
 
 		/* Restore the old preemption behavior. */
 		was = PREEMPTION_PUSHOFF();
-		me->t_cpu->c_override = old_override;
+		FORCPU(me->t_cpu, thiscpu_sched_override) = old_override;
 		if (!(old_flags & TASK_FKEEPCORE))
 			ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
 		PREEMPTION_POP(was);

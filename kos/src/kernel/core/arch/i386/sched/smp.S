@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fpu.h> /* CONFIG_FPU */
+#include <kernel/x86/alternatives.h>
 #include <kernel/x86/apic.h>
 #include <kernel/x86/breakpoint.h> /* reload_x86_debug_registers */
 #include <kernel/x86/cpuid.h>
@@ -49,17 +50,16 @@
 #include <kos/kernel/tss.h>
 
 #include <stddef.h>
+#include <stdint.h>
 #ifdef __x86_64__
 #include <asm/instr/fsgsbase.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
 #endif /* __x86_64__ */
 
-#ifndef CONFIG_NO_SMP
+#define PS __SIZEOF_POINTER__
 
-#ifndef SIZEOF_POINTER
-#define SIZEOF_POINTER __SIZEOF_POINTER__
-#endif /* !SIZEOF_POINTER */
+#ifndef CONFIG_NO_SMP
 
 .macro pushP_cfi_r_ss
 #ifdef __x86_64__
@@ -139,9 +139,12 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 
 	/* Reset the used action mode. */
 	xorP   %Pbp, %Pbp
+	EXTERN(this_cpu)
+	movP   %segtls:this_cpu, %Pbx
 
 1:	/* Serve pending IPIs */
-	movP   %Psp, %R_fcall0P
+	movP   %Pbx, %R_fcall0P
+	movP   %Psp, %R_fcall1P
 	call   x86_serve_ipi
 	cmpP   %Pax, %Psp
 	je     2f
@@ -160,14 +163,44 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 3:	movP   %Pax, %Psp
 	jmp    1b
 
-	/* Load all tasks that are pending execution by this CPU.
+2:	/* Load all tasks that are pending execution by this CPU.
 	 * This must be done _after_ IPIs are served, as the presence
 	 * of pending IPIs also prevents more IPIs from being delivered.
 	 * XXX: Add some way to have high-priority tasks be switched
 	 *      to immediately, rather than having the previous task
 	 *      complete its quantum. */
-2:	EXTERN(cpu_loadpending_nopr)
-	call   cpu_loadpending_nopr
+	xorP   %Pdx, %Pdx
+	EXTERN(thiscpu_sched_pending)
+	/*lock*/ xchgP %Pdx, thiscpu_sched_pending(%Pbx)
+	testP  %Pdx, %Pdx
+	jz     .Lapic_ipi_no_pending
+	movP   %Pbx, %R_fcall0P
+	EXTERN(this_task)
+	movP   %segtls:this_task, %R_fcall1P
+#ifndef __x86_64__
+	pushl_cfi %edx /* chain */
+#endif /* __x86_64__ */
+	EXTERN(sched_intern_loadpending)
+	call   sched_intern_loadpending
+#ifndef __x86_64__
+	.cfi_adjust_cfa_offset -4
+#endif /* __x86_64__ */
+	cmpP   %Pax, %segtls:this_task
+	je     .Lapic_ipi_no_pending
+	/* Remember the thread that the scheduler wants us to switch to. */
+	EXTERN(thiscpu_sched_current)
+	movP   %Pax, thiscpu_sched_current(%Pbx)
+	/* Check if there are  */
+	EXTERN(thiscpu_x86_ipi_inuse)
+	cmpP   $(NULL), thiscpu_x86_ipi_inuse(%Pbx)
+	je     .Lipi_switch_tasks
+	/* Modify the target thread's CPU state to have it service the remaining IPIs. */
+	movP   %Pax, %R_fcall0P
+	EXTERN(x86_task_push_serve_ipi)
+	call   x86_task_push_serve_ipi
+	jmp    .Lipi_switch_tasks
+.Lapic_ipi_no_pending:
+
 
 	/* Check for more pending IPIs by looking at the first word
 	 * of the IPI in-use bitset. - The same check is also done by
@@ -175,15 +208,13 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	 * the expectation that the presence of any IPIs allows for the
 	 * assumption that no interrupt has to be fired on the target
 	 * core, in which case it is expected that we handle that IPI. */
-	EXTERN(this_cpu)
-	movP   %segtls:this_cpu, %Pax
 	EXTERN(thiscpu_x86_ipi_inuse)
-	cmpP   $(NULL), thiscpu_x86_ipi_inuse(%Pax)
+	cmpP   $(NULL), thiscpu_x86_ipi_inuse(%Pbx)
 	jne    1b
 
 	/* Resume execution, as requested */
 	PRIVATE(ipi_action_table)
-	jmpP   *ipi_action_table(,%Pbp,SIZEOF_POINTER)
+	jmpP   *ipi_action_table(,%Pbp,PS)
 
 .Lipi_resume:
 	.cfi_remember_state
@@ -202,22 +233,10 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	pushal_cfi_r
 #endif /* !__x86_64__ */
 
-	EXTERN(this_task)
-	movP   %segtls:this_task, %R_fcall0P
-	EXTERN(this_cpu)
-	movP   this_cpu(%R_fcall0P), %Pbx
-	EXTERN(this_sched_state)
-	movP   %Psp, this_sched_state(%R_fcall0P)
-
-	/* Prematurely end the current quantum */
-	EXTERN(this_sched_runnxt)
-	movP   this_sched_runnxt(%R_fcall0P), %R_fcall1P
-	EXTERN(cpu_quantum_end_nopr)
-	call   cpu_quantum_end_nopr
+	EXTERN(thiscpu_sched_current)
+	movP   thiscpu_sched_current(%Pbx), %Pax
 
 	/* Load the new CPU state */
-	EXTERN(thiscpu_current)
-	movP   thiscpu_current(%Pbx), %Pax
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
 	jmp    x86_load_thread_Pax_cpu_Pbx
 	.cfi_endproc
@@ -306,7 +325,7 @@ INTERN_FUNCTION(x86_execute_direct_ipi)
 	cmpP   $(CPU_IPI_MODE_SPECIAL_MIN), %Pax
 	jnae   .Lipi_resume
 	negP   %Pax
-	jmpP   *ipi_action_table(,%Pax,SIZEOF_POINTER)
+	jmpP   *ipi_action_table(,%Pax,PS)
 	/* Load the new stack and continue serving IPIs */
 1:	movP   %Pax, %Psp
 	jmp    .Lipi_resume
@@ -483,20 +502,31 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000001C)(R_CPU)
 	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000001D)(R_CPU)
 	movl   (thiscpu_x86_cpuid + OFFSET_CPUID_80000000A)(R_CPU), %eax
-	cmpl   $(0x80000004), %eax
+
+	cmpl   $(0x80000007), %eax
+	jnae   4f
+	movl   $(0x80000007), %eax
+	cpuid
+	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000007D)(R_CPU)
+	jmp    5f
+4:	cmpl   $(0x80000004), %eax
 	jnae   3f
+5:
+
 	movl   $(0x80000004), %eax
 	cpuid
 	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_80000004A)(R_CPU)
 	movl   %ebx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000004B)(R_CPU)
 	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000004C)(R_CPU)
 	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000004D)(R_CPU)
+
 	movl   $(0x80000003), %eax
 	cpuid
 	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_80000003A)(R_CPU)
 	movl   %ebx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000003B)(R_CPU)
 	movl   %ecx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000003C)(R_CPU)
 	movl   %edx, (thiscpu_x86_cpuid + OFFSET_CPUID_80000003D)(R_CPU)
+
 	movl   $(0x80000002), %eax
 	cpuid
 	movl   %eax, (thiscpu_x86_cpuid + OFFSET_CPUID_80000002A)(R_CPU)
@@ -819,7 +849,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movP   cpu_count, %Pcx
 	decP   %Pcx
 	EXTERN(cpu_vector)
-1:	movP   cpu_vector(,%Pcx,SIZEOF_POINTER), R_CPU
+1:	movP   cpu_vector(,%Pcx,PS), R_CPU
 	EXTERN(thiscpu_x86_lapicid)
 	movzbw thiscpu_x86_lapicid(R_CPU), %dx
 	cmpw   %dx, %sp
@@ -834,10 +864,10 @@ INTERN_FUNCTION(x86_smp_entry64)
 	lock   incP cpu_online_count
 
 	/* Found our CPU (now stored in R_CPU) */
-	EXTERN(thiscpu_current)
-	movP   thiscpu_current(R_CPU),  R_TASK /* TARGET task. */
-	EXTERN(this_sched_state)
-	movP   this_sched_state(R_TASK), %Psp   /* stack */
+	EXTERN(thiscpu_sched_current)
+	movP   thiscpu_sched_current(R_CPU), R_TASK /* TARGET task. */
+	EXTERN(this_sstate)
+	movP   this_sstate(R_TASK), %Psp            /* stack */
 
 	/* Load the GDT of our new CPU */
 	EXTERN(thiscpu_x86_saved_gdtr)
@@ -998,21 +1028,17 @@ INTERN_FUNCTION(x86_smp_entry64)
 .Ldone_syscall:
 #endif /* __x86_64__ */
 
-	EXTERN(thiscpu_pdir)
-	EXTERN(pagedir_kernel_phys)
-	movP   $(pagedir_kernel_phys), thiscpu_pdir(R_CPU) /* Update the per-cpu current-pdir field. */
+.Ldo_init_with_task_and_stack:
 
 	/* Load the VM of the target task. */
+	EXTERN(this_vm)
 	movP   this_vm(R_TASK), %Pcx
-	EXTERN(vm_kernel)
-	cmpP   $(vm_kernel), %Pcx
-	je     1f
 	EXTERN(thisvm_pdir_phys)
-	movP   thisvm_pdir_phys(%Pcx), %Pcx
+	movP   thisvm_pdir_phys(%Pcx), %Pax
 	EXTERN(thiscpu_pdir)
-	movP   %Pcx, thiscpu_pdir(R_CPU) /* Update the per-cpu current-pdir field. */
-	movP   %Pcx, %cr3
-1:
+	movP   %Pax, thiscpu_pdir(R_CPU) /* Update the per-cpu current-pdir field. */
+	movP   %Pax, %cr3
+
 	/* Set up tracing to appear as though we're nothing but an interrupt originating
 	 * from whereever we're supposed to start executing the provided thread. */
 	.cfi_startproc simple
@@ -1050,30 +1076,28 @@ INTERN_FUNCTION(x86_smp_entry64)
 	 * R_TASK:  THIS_TASK  (%rbx) */
 
 	/* Check for, and load all threads that are pending execution by our CPU. */
-	movP   $(CPU_PENDING_ENDOFCHAIN), %R_fcall1P
-	EXTERN(thiscpu_pending)
-	lock   xchgP %R_fcall1P, thiscpu_pending(R_CPU)
-	cmpP   $(CPU_PENDING_ENDOFCHAIN), %R_fcall1P
+	xorP   %Pdx, %Pdx
+	EXTERN(thiscpu_sched_pending)
+	/*lock*/ xchgP %Pdx, thiscpu_sched_pending(R_CPU)
+	testP  %Pdx, %Pdx
 	jz     1f
-	movP   R_CPU, %R_fcall0P
-	EXTERN(cpu_loadpending_chain_nopr)
-	call   cpu_loadpending_chain_nopr
+	movP   R_CPU,  %R_fcall0P
+	movP   R_TASK, %R_fcall1P
+#ifndef __x86_64__
+	pushl_cfi %edx /* chain */
+#endif /* __x86_64__ */
+	EXTERN(sched_intern_loadpending)
+	call   sched_intern_loadpending
+#ifndef __x86_64__
+	.cfi_adjust_cfa_offset -4
+#endif /* __x86_64__ */
+	cmpP   %Pax, R_TASK
+	je     1f
+	/* Start execution with a different thread. */
+	movP   %Pax, R_TASK
+	movP   this_sstate(R_TASK), %Psp /* stack */
+	jmp    .Ldo_init_with_task_and_stack
 1:
-
-	/* Enable the APIC of this CPU, thus also enabling preemptive interrupts. */
-	EXTERN(x86_lapicbase)
-	movP   x86_lapicbase, %Pax
-#define lapic_write(offset, value) movl   $(value), (offset)(%Pax)
-	lapic_write(APIC_SPURIOUS,      APIC_SPURIOUS_FENABLED | X86_INTERRUPT_APIC_SPURIOUS)
-	lapic_write(APIC_TIMER_DIVIDE,  APIC_TIMER_DIVIDE_F16)
-	lapic_write(APIC_TIMER,         X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC) /* Set the PIT interrupt to the APIC timer. */
-/*	lapic_write(APIC_TIMER_INITIAL, FORCPU(me, _thiscpu_quantum_length)); */
-	EXTERN(thiscpu_quantum_length)
-	movl   thiscpu_quantum_length(R_CPU), %edx
-	movl   %edx, APIC_TIMER_INITIAL(%Pax)
-#undef lapic_write
-
-	/* TODO: re-sync the realtime() clock! */
 
 	/* Load other scheduler-related register values. */
 	EXTERN(this_x86_kernel_psp0)
@@ -1124,6 +1148,66 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movP   $(0), thiscpu_fputhread(R_CPU)
 #endif /* CONFIG_FPU */
 
+	/* Enable the APIC/TSC of this CPU, thus also enabling preemptive interrupts. */
+.alt_if X86_FEAT_TSC_DEADLINE
+	/* Set the TSC deadline to its max value. */
+	movP   $-1, %Pax
+	movl   %eax, %edx
+	movl   $(IA32_TSC_DEADLINE), %ecx
+	wrmsr
+#ifdef __x86_64__
+	movq   %rax, thiscpu_x86_apic_emutsc_deadline(R_CPU)
+#else /* __x86_64__ */
+	movl   %eax, thiscpu_x86_apic_emutsc_deadline(R_CPU)
+	movl   %eax, thiscpu_x86_apic_emutsc_deadline+4(R_CPU)
+#endif /* !__x86_64__ */
+	EXTERN(x86_lapicbase)
+	movP   x86_lapicbase, %Pax
+	/* Enable the APIC timer in TSC-deadline mode. */
+#define lapic_write(offset, value) movl   $(value), (offset)(%Pax)
+	lapic_write(APIC_SPURIOUS, APIC_SPURIOUS_FENABLED | X86_INTERRUPT_APIC_SPURIOUS)
+	lapic_write(APIC_TIMER,    X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FTSCDEADLINE)
+#undef lapic_write
+
+.alt_else
+	/* PURE APIC */
+	EXTERN(x86_lapicbase)
+	movP   x86_lapicbase, %Pax
+#define lapic_write(offset, value) movl   $(value), (offset)(%Pax)
+	lapic_write(APIC_SPURIOUS,      APIC_SPURIOUS_FENABLED | X86_INTERRUPT_APIC_SPURIOUS)
+	lapic_write(APIC_TIMER,         X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC)
+	lapic_write(APIC_TIMER_DIVIDE,  APIC_TIMER_DIVIDE_F128)
+	lapic_write(APIC_TIMER_INITIAL, UINT32_MAX)
+#undef lapic_write
+	/* Initialize per-cpu variables related to emutsc */
+	xorP   %Pax, %Pax
+#ifdef __x86_64__
+	movq   %rax, thiscpu_x86_apic_emutsc_tscbase(R_CPU)
+#else /* __x86_64__ */
+	movl   %eax, thiscpu_x86_apic_emutsc_tscbase(R_CPU)
+	movl   %eax, thiscpu_x86_apic_emutsc_tscbase+4(R_CPU)
+#endif /* !__x86_64__ */
+	movl   %eax, thiscpu_x86_apic_emutsc_prev_current(R_CPU)
+	movb   %al, thiscpu_x86_apic_emutsc_early_interrupt(R_CPU)
+	movb   $(7), thiscpu_x86_apic_emutsc_divide(R_CPU)
+	decP   %Pax /* %Pax = UINT[32|64]_MAX */
+#ifdef __x86_64__
+	movq   %rax, thiscpu_x86_apic_emutsc_deadline(R_CPU)
+#else /* __x86_64__ */
+	movl   %eax, thiscpu_x86_apic_emutsc_deadline(R_CPU)
+	movl   %eax, thiscpu_x86_apic_emutsc_deadline+4(R_CPU)
+#endif /* !__x86_64__ */
+	movl   %eax, thiscpu_x86_apic_emutsc_initial(R_CPU)
+	shll   $(7), %eax /* %eax = (u32)(UINT32_MAX << 7) */
+	movl   %eax, thiscpu_x86_apic_emutsc_initial_shifted(R_CPU)
+	movl   $(0x7f), thiscpu_x86_apic_emutsc_initial_shifted+4(R_CPU)
+.alt_endif
+
+	/* re-sync the realtime() clock and set-up the initial TSC deadline. */
+	movP   R_CPU, %R_fcall0P
+	EXTERN(tsc_resync_init)
+	call   tsc_resync_init
+
 	/* (Partially) load the underlying CPU state */
 #ifdef __x86_64__
 	ASM_POP_SGREGS_CFI_R(%rax)
@@ -1148,7 +1232,9 @@ INTERN_FUNCTION(x86_smp_entry64)
 	 * NOTE: Since `x86_serve_ipi()' expects an `icpustate' structure,
 	 *       we were forced to partially unwind the CPU state so-as to
 	 *       already pre-load the `%segtls' register. */
-	movP   %Psp, %R_fcall0P
+	EXTERN(this_cpu)
+	movP   %segtls:this_cpu, %R_fcall0P
+	movP   %Psp, %R_fcall1P
 	EXTERN(x86_serve_ipi)
 	call   x86_serve_ipi
 	movP   %Pax, %Psp
@@ -1241,8 +1327,8 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	EXTERN(cpu_online_count)
 	lock   decP cpu_online_count
 
-	EXTERN(thiscpu_idle_sched_state)
-	movP   %Psp, thiscpu_idle_sched_state(%R_fcall0P)
+	EXTERN(thiscpu_idle_sstate)
+	movP   %Psp, thiscpu_idle_sstate(%R_fcall0P)
 
 	/* Flush all caches before actually commiting to beginning to dream */
 	wbinvd /* TODO: Only available since 486. - Must be replaced with `nop' no 386 */

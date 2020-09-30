@@ -39,6 +39,7 @@
 
 #include <inttypes.h>
 #include <malloca.h>
+#include <stddef.h>
 #include <string.h>
 
 #include <libcmdline/decode.h>

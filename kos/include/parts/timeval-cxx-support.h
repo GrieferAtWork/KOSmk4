@@ -30,12 +30,12 @@
 
 #include <kos/anno.h>
 
-#ifndef __USECS_PER_SEC
-#define __USECS_PER_SEC __UINTPTR_C(1000000)
-#endif /* !__USECS_PER_SEC */
+#ifndef __USEC_PER_SEC
+#define __USEC_PER_SEC __UINT32_C(1000000)
+#endif /* !__USEC_PER_SEC */
 
 #ifndef __USECS_OVERFLOW
-#define __USECS_OVERFLOW(TV_USEC_TYPE) (((TV_USEC_TYPE)-1) / __USECS_PER_SEC)
+#define __USECS_OVERFLOW(TV_USEC_TYPE) (((TV_USEC_TYPE)-1) / __USEC_PER_SEC)
 #endif /* !__USECS_OVERFLOW */
 
 #define __TIMEVAL_CXX_DECL_BEGIN extern "C++" {
@@ -47,11 +47,11 @@
 		if (__hybrid_overflow_uadd((TV_USEC_TYPE)tv_usec, __n,             \
 		                           (TV_USEC_TYPE *)&tv_usec)) {            \
 			tv_sec += __USECS_OVERFLOW(TV_USEC_TYPE);                      \
-			tv_usec -= __USECS_OVERFLOW(TV_USEC_TYPE) * __USECS_PER_SEC;   \
+			tv_usec -= __USECS_OVERFLOW(TV_USEC_TYPE) * __USEC_PER_SEC;    \
 		}                                                                  \
-		if ((TV_USEC_TYPE)tv_usec >= __USECS_PER_SEC) {                    \
-			tv_sec  += (TV_USEC_TYPE)tv_usec / __USECS_PER_SEC;            \
-			tv_usec = (TV_USEC_TYPE)tv_usec % __USECS_PER_SEC;             \
+		if ((TV_USEC_TYPE)tv_usec >= __USEC_PER_SEC) {                     \
+			tv_sec  += (TV_USEC_TYPE)tv_usec / __USEC_PER_SEC;             \
+			tv_usec = (TV_USEC_TYPE)tv_usec % __USEC_PER_SEC;              \
 		}                                                                  \
 	}                                                                      \
 	/* Subtract microseconds (1/1_000_000 seconds) */                      \
@@ -60,11 +60,11 @@
 		if (__hybrid_overflow_usub((TV_USEC_TYPE)tv_usec, __n,             \
 		                           (TV_USEC_TYPE *)&tv_usec)) {            \
 			tv_sec  -= __USECS_OVERFLOW(TV_USEC_TYPE);                     \
-			tv_usec += __USECS_OVERFLOW(TV_USEC_TYPE) * __USECS_PER_SEC;   \
+			tv_usec += __USECS_OVERFLOW(TV_USEC_TYPE) * __USEC_PER_SEC;    \
 		}                                                                  \
-		if ((TV_USEC_TYPE)tv_usec >= __USECS_PER_SEC) {                    \
-			tv_sec  += (TV_USEC_TYPE)tv_usec / __USECS_PER_SEC;            \
-			tv_usec = (TV_USEC_TYPE)tv_usec % __USECS_PER_SEC;             \
+		if ((TV_USEC_TYPE)tv_usec >= __USEC_PER_SEC) {                     \
+			tv_sec  += (TV_USEC_TYPE)tv_usec / __USEC_PER_SEC;             \
+			tv_usec = (TV_USEC_TYPE)tv_usec % __USEC_PER_SEC;              \
 		}                                                                  \
 	}                                                                      \
 	/* Add milliseconds (1/1_000 seconds) */                               \
@@ -93,9 +93,9 @@
 	operator*=(unsigned int __n) __CXX_NOEXCEPT {                          \
 		tv_sec *= __n;                                                     \
 		tv_usec = (TV_USEC_TYPE)tv_usec * __n;                             \
-		if ((TV_USEC_TYPE)tv_usec >= __USECS_PER_SEC) {                    \
-			tv_sec += (TV_USEC_TYPE)tv_usec / __USECS_PER_SEC;             \
-			tv_usec = (TV_USEC_TYPE)tv_usec % __USECS_PER_SEC;             \
+		if ((TV_USEC_TYPE)tv_usec >= __USEC_PER_SEC) {                     \
+			tv_sec += (TV_USEC_TYPE)tv_usec / __USEC_PER_SEC;              \
+			tv_usec = (TV_USEC_TYPE)tv_usec % __USEC_PER_SEC;              \
 		}                                                                  \
 		return *this;                                                      \
 	}                                                                      \

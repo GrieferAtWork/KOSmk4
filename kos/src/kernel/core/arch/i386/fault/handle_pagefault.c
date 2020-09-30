@@ -149,7 +149,7 @@ STATIC_ASSERT(PAGEDIR_MAP_FREAD == VM_PROT_READ);
 /* @return: true:  Success
  * @return: false: Must try again (preemption had to be enabled) */
 LOCAL bool FCALL
-handle_iob_access(struct cpu *__restrict mycpu,
+handle_iob_access(struct cpu *__restrict me,
                   bool is_writing,
                   bool allow_preemption) {
 #define GET_GFP_FLAGS()                           \
@@ -159,9 +159,9 @@ handle_iob_access(struct cpu *__restrict mycpu,
 	assert(!PREEMPTION_ENABLED());
 	iob = THIS_X86_IOPERM_BITMAP;
 	if (!iob) {
-		assertf(ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)) == NULL,
-		        "FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = %p",
-		        ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)));
+		assertf(ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
+		        "FORCPU(me, thiscpu_x86_ioperm_bitmap) = %p",
+		        ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)));
 		if (is_writing) {
 			iob = ioperm_bitmap_allocf_nx(GET_GFP_FLAGS());
 			if unlikely(!iob) {
@@ -170,9 +170,9 @@ handle_iob_access(struct cpu *__restrict mycpu,
 				/* Re-attempt the allocation with preemption enabled. */
 				PREEMPTION_ENABLE();
 				iob = ioperm_bitmap_allocf(GFP_LOCKED | GFP_PREFLT);
-				assertf(ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)) == NULL,
-				        "FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = %p",
-				        ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)));
+				assertf(ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
+				        "FORCPU(me, thiscpu_x86_ioperm_bitmap) = %p",
+				        ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)));
 				PERTASK_SET(this_x86_ioperm_bitmap, iob);
 				return false;
 			}
@@ -181,7 +181,7 @@ handle_iob_access(struct cpu *__restrict mycpu,
 			ATOMIC_INC(iob->ib_share);
 		}
 		/* NOTE: The following line causes an inconsistency that is fixed by
-		 *       assigning `FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob'
+		 *       assigning `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob'
 		 *       below. Because preemption is currently off, this inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, iob);
@@ -199,27 +199,27 @@ handle_iob_access(struct cpu *__restrict mycpu,
 
 			/* Unmap the current IOB map if it still points to our old IOB.
 			 * This must be done to ensure that the assumption:
-			 *     FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == NULL ||
-			 *     FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP
+			 *     FORCPU(me, thiscpu_x86_ioperm_bitmap) == NULL ||
+			 *     FORCPU(me, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP
 			 * continues to be consistent.
 			 */
 			assertf(THIS_X86_IOPERM_BITMAP == iob,
 			        "THIS_X86_IOPERM_BITMAP = %p\n"
 			        "iob                    = %p",
 			        THIS_X86_IOPERM_BITMAP, iob);
-			if (ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)) == iob) {
+			if (ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)) == iob) {
 				PREEMPTION_DISABLE();
 				COMPILER_READ_BARRIER();
-				if (FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == iob) {
-					pagedir_unmap(FORCPU(mycpu, thiscpu_x86_iob), 2 * PAGESIZE);
-					pagedir_sync(FORCPU(mycpu, thiscpu_x86_iob), 2 * PAGESIZE);
-					FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = NULL;
+				if (FORCPU(me, thiscpu_x86_ioperm_bitmap) == iob) {
+					pagedir_unmap(FORCPU(me, thiscpu_x86_iob), 2 * PAGESIZE);
+					pagedir_sync(FORCPU(me, thiscpu_x86_iob), 2 * PAGESIZE);
+					FORCPU(me, thiscpu_x86_ioperm_bitmap) = NULL;
 				}
 				PREEMPTION_ENABLE();
 			} else {
-				assertf(ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)) == NULL,
-				        "FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = %p",
-				        ATOMIC_READ(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap)));
+				assertf(ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)) == NULL,
+				        "FORCPU(me, thiscpu_x86_ioperm_bitmap) = %p",
+				        ATOMIC_READ(FORCPU(me, thiscpu_x86_ioperm_bitmap)));
 			}
 			PERTASK_SET(this_x86_ioperm_bitmap, cow);
 			ATOMIC_DEC(iob->ib_share);
@@ -227,7 +227,7 @@ handle_iob_access(struct cpu *__restrict mycpu,
 			return false;
 		}
 		/* NOTE: The following line causes an inconsistency that is fixed by
-		 *       assigning `FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob'
+		 *       assigning `FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob'
 		 *       below. Because preemption is currently off, this inconsistency
 		 *       never becomes visible outside of this function. */
 		PERTASK_SET(this_x86_ioperm_bitmap, cow);
@@ -235,12 +235,12 @@ handle_iob_access(struct cpu *__restrict mycpu,
 		decref(iob);
 		iob = cow;
 	}
-	pagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
+	pagedir_map(FORCPU(me, thiscpu_x86_iob),
 	            2 * PAGESIZE,
 	            iob->ib_pages,
 	            is_writing ? (PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE)
 	                       : (PAGEDIR_MAP_FREAD));
-	FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = iob;
+	FORCPU(me, thiscpu_x86_ioperm_bitmap) = iob;
 #undef GET_GFP_FLAGS
 	return true;
 }
@@ -617,7 +617,7 @@ again_lookup_node:
 got_node_and_effective_vm_lock:
 #endif /* !CONFIG_NO_USERKERN_SEGMENT && __x86_64__ */
 			if unlikely(!node->vn_part) {
-				struct cpu *mycpu;
+				struct cpu *me;
 				sync_endread(effective_vm);
 #ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
 				/* Check for special case: `node' belongs to the physical identity area. */
@@ -629,24 +629,24 @@ got_node_and_effective_vm_lock:
 
 				/* Check for special case: `node' may be the `thiscpu_x86_iobnode' of some CPU */
 do_handle_iob_node_access:
-				mycpu = THIS_CPU;
-				if (node == &FORCPU(mycpu, thiscpu_x86_iobnode)) {
+				me = THIS_CPU;
+				if (node == &FORCPU(me, thiscpu_x86_iobnode)) {
 					PREEMPTION_DISABLE();
 					IF_SMP(COMPILER_READ_BARRIER();)
-					IF_SMP(mycpu = THIS_CPU;)
-					IF_SMP(if (node == &FORCPU(mycpu, thiscpu_x86_iobnode))) {
+					IF_SMP(me = THIS_CPU;)
+					IF_SMP(if (node == &FORCPU(me, thiscpu_x86_iobnode))) {
 						/* Most likely case: Accessing the IOB of the current CPU. */
 						bool allow_preemption;
-						assertf(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == NULL ||
-						        FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP,
-						        "mycpu                                    = %p\n"
-						        "FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) = %p\n"
+						assertf(FORCPU(me, thiscpu_x86_ioperm_bitmap) == NULL ||
+						        FORCPU(me, thiscpu_x86_ioperm_bitmap) == THIS_X86_IOPERM_BITMAP,
+						        "me                                    = %p\n"
+						        "FORCPU(me, thiscpu_x86_ioperm_bitmap) = %p\n"
 						        "THIS_X86_IOPERM_BITMAP                   = %p\n",
-						        mycpu, FORCPU(mycpu, thiscpu_x86_ioperm_bitmap),
+						        me, FORCPU(me, thiscpu_x86_ioperm_bitmap),
 						        THIS_X86_IOPERM_BITMAP);
 						/* Make sure to handle any access errors after the ioperm() bitmap
 						 * was already mapped during the current quantum as full segfault. */
-						if unlikely(FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) != NULL) {
+						if unlikely(FORCPU(me, thiscpu_x86_ioperm_bitmap) != NULL) {
 							/* Check for special case: even if the IOPERM bitmap is already
 							 * mapped, allow a mapping upgrade if it was mapped read-only
 							 * before, but is now needed as read-write. */
@@ -671,7 +671,7 @@ do_handle_iob_node_access:
 							if (!is_io_instruction_and_not_memory_access((byte_t *)pc, state, (uintptr_t)addr))
 								goto pop_connections_and_throw_segfault;
 						}
-						if (!handle_iob_access(mycpu,
+						if (!handle_iob_access(me,
 						                       (ecode & X86_PAGEFAULT_ECODE_WRITING) != 0,
 						                       allow_preemption)) {
 							assert(PREEMPTION_ENABLED());

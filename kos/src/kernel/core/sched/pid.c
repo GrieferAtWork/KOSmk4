@@ -59,6 +59,7 @@
 #include <limits.h>
 #include <sched.h>
 #include <signal.h>
+#include <stddef.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT

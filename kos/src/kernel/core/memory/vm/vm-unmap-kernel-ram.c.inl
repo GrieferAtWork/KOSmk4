@@ -1002,10 +1002,8 @@ NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags) {
 #ifndef NDEBUG
 			memset(pend, 0xcc, sizeof(*pend));
 #endif /* !NDEBUG */
-			cpu_assert_integrity();
 			/* Invoke the callback. */
 			(*cb)(pend);
-			cpu_assert_integrity();
 			COMPILER_BARRIER();
 			pend = next;
 		}

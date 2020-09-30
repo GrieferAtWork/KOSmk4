@@ -36,22 +36,6 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_NO_SMP
-#   undef CONFIG_MAX_CPU_COUNT
-#   define CONFIG_MAX_CPU_COUNT 1
-#else /* CONFIG_NO_SMP */
-/* Configuration option: The max number of CPUs supported by KOS. */
-#   ifndef CONFIG_MAX_CPU_COUNT
-#      define CONFIG_MAX_CPU_COUNT 16
-#   elif (CONFIG_MAX_CPU_COUNT+0) <= 1
-#      undef CONFIG_MAX_CPU_COUNT
-#      define CONFIG_MAX_CPU_COUNT 1
-#      define CONFIG_NO_SMP 1
-#   endif
-#endif /* !CONFIG_NO_SMP */
-
-
-
 /* NOTE: When talking about a CPU having `work left to be done', what is meant one of these:
  *  - The CPU is hosting at least 1 thread (that isn't its IDLE thread)
  *    as part of the active chain of running tasks.
@@ -82,11 +66,6 @@ DECL_BEGIN
                                          * the internal CPU initialization phase (the i386 variant of which
                                          * is implemented in `arch/i386/sched/smp32.S') */
 
-
-#ifndef CONFIG_NO_SMP
-#define CPU_PENDING_ENDOFCHAIN (__CCAST(struct task *)(-1))
-#endif /* !CONFIG_NO_SMP */
-
 #ifdef __CC__
 
 #ifndef __jtime_t_defined
@@ -108,184 +87,24 @@ struct task;
 struct vm;
 
 struct cpu {
-	cpuid_t          c_id;       /* The ID of this CPU. */
+	cpuid_t             c_id;       /* The ID of this CPU. */
+	WEAK u16            c_state;    /* CPU State (one of `CPU_STATE_*') */
+	u16                 c_pad[(sizeof(void *)-2)/2]; /* ... */
 #ifndef CONFIG_NO_SMP
-	WEAK pagedir_phys_t
-	                 c_pdir;     /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
-	                              * The currently used page directory. When `vm_sync()' is called,
-	                              * this field is checked for all configured CPUs, and if equal to
-	                              * the VM that is being synced, our CPU will receive an IPI, telling
-	                              * us that we need to (possibly partially) invalidate our VM caches.
-	                              * s.a. `vm_sync()', `pagedir_sync_smp_p()', `pagedir_sync()' */
+	WEAK pagedir_phys_t c_pdir; /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
+	                             * The currently used page directory. When `vm_sync()' is called,
+	                             * this field is checked for all configured CPUs, and if equal to
+	                             * the VM that is being synced, our CPU will receive an IPI, telling
+	                             * us that we need to (possibly partially) invalidate our VM caches.
+	                             * s.a. `vm_sync()', `pagedir_sync_smp_p()', `pagedir_sync()' */
 #endif /* !CONFIG_NO_SMP */
-	REF struct task *c_current;  /* [1..1][lock(PRIVATE(THIS_CPU && PREEMPTION))]
-	                              * [CHAIN(->t_sched.s_running.sr_runnxt)]
-	                              * The task currently being executed, as well as a linked
-	                              * list of task scheduled for execution there-after. */
-	REF struct task *c_sleeping; /* [0..1][lock(PRIVATE(THIS_CPU && PREEMPTION))]
-	                              * [CHAIN(->t_sched.s_asleep.ss_tmonxt)]
-	                              * Pointer to the next task scheduled to wake up due to a timeout.
-	                              * NOTE: This chain never contains the IDLE thread, which
-	                              *       must implement special handling when it comes to
-	                              *       blocking waits, as implemented by `task_sleep()' */
-#ifndef CONFIG_NO_SMP
-	WEAK REF struct task
-	                *c_pending;  /* [0..1|NULL(== CPU_PENDING_ENDOFCHAIN)]
-	                              * [lock(WRITE(ATOMIC),READ(XCH(CPU_PENDING_ENDOFCHAIN)))]
-	                              * [CHAIN(->t_sched.s_pending.ss_pennxt)]
-	                              * Chain of tasks that are pending for being executed.
-	                              * This chain is loaded by the CPU itself, which can be
-	                              * provoked by another CPU calling `cpu_wake()' */
-#endif /* !CONFIG_NO_SMP */
-	REF struct task *c_override; /* [0..1][lock(PRIVATE(THIS_CPU))] Scheduling override.
-	                              * When non-NULL, this is the only thread that may run on this CPU.
-	                              * Note that any given thread can only ever set itself as override,
-	                              * the general requirement being that setting an override requires
-	                              * `c_override == NULL || c_current == c_override' */
-	WEAK u16         c_state;    /* CPU State (one of `CPU_STATE_*') */
-	u16              c_pad[(sizeof(void *)-2)/2]; /* ... */
 	/* Per-CPU data goes here. */
 };
 
 
-#ifndef NDEBUG
-FUNDEF NOBLOCK void NOTHROW(FCALL cpu_assert_integrity)(struct task *ignored_thread DFL(__NULLPTR));
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_assert_running)(struct task *__restrict thread);
-FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_assert_sleeping)(struct task *__restrict thread);
-#else /* !NDEBUG */
-#define cpu_assert_integrity(ignored_thread) (void)0
-#define cpu_assert_running(thread)           (void)0
-#define cpu_assert_sleeping(thread)          (void)0
-#endif /* NDEBUG */
-
-/* The per-cpu / global jiffies counters. */
-DATDEF ATTR_PERCPU jtime_t volatile thiscpu_jiffies;
-
-/* [< thiscpu_quantum_length]
- * A sub-quantum offset that must be added to `thiscpu_jiffies' in
- * order to determine the true start of the current quantum (in ticks). */
-DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_offset;
-
-/* The length of a single quantum (the number of ticks
- * that need to pass before `thiscpu_jiffies' is incremented)
- * HINT: On x86, this the LAPIC reload value! */
-DATDEF ATTR_PERCPU quantum_diff_t volatile thiscpu_quantum_length;
-
-
-/* Return the result of `((a * b) + c - 1) / c' */
-FUNDEF NOBLOCK ATTR_CONST u64
-NOTHROW(KCALL __umuldiv64)(u64 a, u32 b, u32 c);
-LOCAL NOBLOCK ATTR_CONST u64
-NOTHROW(KCALL umuldiv64)(u64 a, u32 b, u32 c) {
-	u64 result;
-	if (!__hybrid_overflow_umul(a, b, &result) &&
-	    !__hybrid_overflow_uadd(result, c - 1, &result))
-		return result / c;
-	return __umuldiv64(a, b, c);
-}
-
-
-struct qtick {
-	u64 qt_tick; /* # of quantum units of active execution time since system boot. */
-	u32 qt_freq; /* [!0] # of quantum units per 1/HZ second. */
-#ifdef __cplusplus
-	inline NOBLOCK struct qtick &KCALL
-	operator-=(struct qtick const &other) noexcept {
-		if likely(qt_freq == other.qt_freq) {
-			qt_tick -= other.qt_tick;
-		} else if (other.qt_tick != 0) {
-			u32 common_freq;
-			common_freq = (u32)(((u64)qt_freq + other.qt_freq) / 2);
-			qt_tick  = umuldiv64(qt_tick, common_freq, qt_freq);
-			qt_tick -= umuldiv64(other.qt_tick, common_freq, other.qt_freq);
-			qt_freq  = common_freq;
-		}
-		return *this;
-	}
-	inline NOBLOCK struct qtick &KCALL
-	operator+=(struct qtick const &other) noexcept {
-		if likely(qt_freq == other.qt_freq) {
-			qt_tick += other.qt_tick;
-		} else if (other.qt_tick != 0) {
-			u32 common_freq;
-			common_freq = (u32)(((u64)qt_freq + other.qt_freq) / 2);
-			qt_tick  = umuldiv64(qt_tick, common_freq, qt_freq);
-			qt_tick += umuldiv64(other.qt_tick, common_freq, other.qt_freq);
-			qt_freq  = common_freq;
-		}
-		return *this;
-	}
-	inline NOBLOCK WUNUSED struct qtick KCALL
-	operator-(struct qtick const &other) const noexcept {
-		struct qtick result = *this;
-		result -= other;
-		return result;
-	}
-	inline NOBLOCK WUNUSED struct qtick KCALL
-	operator+(struct qtick const &other) const noexcept {
-		struct qtick result = *this;
-		result += other;
-		return result;
-	}
-#endif /* __cplusplus */
-};
-
-/* Return the current quantum tick for the calling CPU
- * This quantum tick is the most precise unit of measurement available
- * within the KOS kernel, being at least as precise than `realtime()'.
- * Quantum ticks increase all the time so-long as preemptive interrupts
- * as enabled (i.e. the quantum tick doesn't change after a call to
- * `cpu_disable_preemptive_interrupts_nopr()')
- * Note that the actual point in time to which a quantum tick is the
- * result of the division of `return.qt_tick / return.qt_freq', as done
- * with infinite-precision floating point arithmetic.
- * Note that this function returns a value that is per-cpu, and as such
- * prone to inconsistencies when the calling thread is moved between
- * different CPUs. A similar, thread-consistent counter can be accessed
- * through `task_quantum_tick()', which returns a thread-local quantum
- * tick representing the # of time spent executing code in the context
- * of that thread. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct qtick
-NOTHROW(KCALL cpu_quantum_tick)(void);
-FUNDEF NOBLOCK NOPREEMPT ATTR_PURE WUNUSED struct qtick
-NOTHROW(KCALL cpu_quantum_tick_nopr)(void);
-
-/* Return the amount of time that has been spent executing code in the
- * context of the calling thread. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct qtick
-NOTHROW(KCALL task_quantum_tick)(void);
-
-/* Return the amount of time that has been spent executing code in the
- * context of the given thread. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED struct qtick
-NOTHROW(KCALL task_quantum_tick_of)(struct task const *__restrict thread);
-
-
-/* TODO: realtime() may change arbitrarily due to use of settimeofday()
- *       As such, KOS really needs some sort of `CLOCK_MONOTONIC' timer, which
- *       could easily be implemented in terms of the underlying implementation
- *       of `realtime()', with timeouts passed to the low-level `task_sleep()'
- *       function then relative to that clock!
- * Instead, there should be two functions:
- *   - realtime(): Same as realtime() is right now, though doesn't
- *                 necessarily have to match the actual current time,
- *                 though will still increase at the same speed at
- *                 all times, such that walltime() - realtime() remains
- *                 consistent (so-long as both timestamps are read at
- *                 exactly the same offset from each other)
- *           Also: This kind of timer would not be (too) prone to timing
- *                 differences between multiple CPUs (unlike `cpu_quantum_tick()'),
- *                 in that the common base-line for realtime() is likely going
- *                 to be time-since-boot
- *   - walltime(): Return the actual, current wall-clock time.
- *                 Pretty much exact what realtime() is right now:
- *                 The actual, current time, as shown by a clock you
- *                 may have hanging on some >>wall<<.
- */
-
+#ifndef __realtime_defined
+#define __realtime_defined 1
 /* Returns the current real time derived from the current CPU time.
- * If no realtime hardware is available, this clock may stop when
- * the CPU is idle and will not indicate the actual current time.
  * WARNING: KOS only gives a best-effort guaranty for this function
  *          in terms of consistency when it comes to the calling
  *          thread being moved to a different CPU.
@@ -297,6 +116,7 @@ NOTHROW(KCALL task_quantum_tick_of)(struct task const *__restrict thread);
  * by the same CPU will _always_ return values such that later values
  * are >= earlier values. */
 FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
+#endif /* !__realtime_defined */
 
 /* [!0][<= CONFIG_MAX_CPU_COUNT][const] The total number of known CPUs. */
 DATDEF cpuid_t const cpu_count;
@@ -310,16 +130,6 @@ DATDEF cpuid_t const cpu_count;
 DATDEF cpuid_t cpu_online_count;
 #else /* !CONFIG_NO_SMP */
 #define cpu_online_count 1
-#endif /* CONFIG_NO_SMP */
-
-
-#ifndef CONFIG_NO_SMP
-#define task_isonlythread()                                           \
-	(__hybrid_atomic_load(cpu_online_count, __ATOMIC_ACQUIRE) <= 1 && \
-	 __hybrid_atomic_load(THIS_TASK->t_sched.s_running.sr_runnxt, __ATOMIC_ACQUIRE) == THIS_TASK)
-#else /* !CONFIG_NO_SMP */
-#define task_isonlythread() \
-	(__hybrid_atomic_load(THIS_TASK->t_sched.s_running.sr_runnxt, __ATOMIC_ACQUIRE) == THIS_TASK)
 #endif /* CONFIG_NO_SMP */
 
 
@@ -405,36 +215,18 @@ DATDEF cpuset_t const __cpuset_full_mask; /* [== (1 << cpu_count) - 1] */
 
 
 
-
-
+/* The boot CPU. */
 DATDEF struct cpu _bootcpu;
-DATDEF struct task _bootidle;
+
+/* The CPU of the calling thread */
 DATDEF ATTR_PERTASK struct cpu *this_cpu;
 
-/* NOTE: When it comes to scheduling, the IDLE thread is special in that:
- *   - It doesn't necessarily have to be apart of any chain (`c_current' or `c_sleeping'),
- *     but can just be sitting around without being recognized by the scheduler at all.
- *     >> (t_flags & TASK_FRUNNING) == 0;
- *     >> t_sched.s_asleep.ss_pself == NULL;
- *   - It can be apart of the `c_current' chain if it wants to
- *     >> (t_flags & TASK_FRUNNING) != 0;
- *   - It can be apart of the `c_sleeping' chain if it wants to
- *     >> (t_flags & TASK_FRUNNING) == 0;
- *     >> t_sched.s_asleep.ss_pself != NULL;
- *   - It can never be apart of the `c_pending' chain, and neither
- *     can it ever switch its hosting CPU to be moved to another CPU
- *   - When no other thread is running on the associated CPU, the IDLE
- *     thread will be the thread in `c_current'
- *   - Calling `task_pause()' is called from the IDLE thread will always
- *     return after the next sporadic interrupt (always returning `false') */
-DATDEF ATTR_PERCPU struct task thiscpu_idle;
+/* [const] The ID (index in `cpu_vector') of the calling thread. */
+DATDEF ATTR_PERCPU cpuid_t thiscpu_id; /* ALIAS:THIS_CPU->c_id */
 
-DATDEF ATTR_PERCPU cpuid_t thiscpu_id;            /* ALIAS:THIS_CPU->c_id */
-DATDEF ATTR_PERCPU struct task *thiscpu_current;  /* ALIAS:THIS_CPU->c_current */
-DATDEF ATTR_PERCPU struct task *thiscpu_override; /* ALIAS:THIS_CPU->c_override */
 #ifndef CONFIG_NO_SMP
-DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir; /* ALIAS:THIS_CPU->c_pdir */
-DATDEF ATTR_PERCPU struct task *thiscpu_pending;    /* ALIAS:THIS_CPU->c_pending */
+/* ALIAS:THIS_CPU->c_pdir */
+DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir;
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -457,8 +249,8 @@ DATDEF ATTR_PERCPU struct task *thiscpu_pending;    /* ALIAS:THIS_CPU->c_pending
 
 #ifndef CONFIG_NO_SMP
 /* Set the current VM, and update the VM pointer of `self' */
-#define cpu_setvm_ex(mycpu, current_vm)               \
-	(__hybrid_atomic_store((mycpu)->c_pdir,           \
+#define cpu_setvm_ex(me, current_vm)                  \
+	(__hybrid_atomic_store((me)->c_pdir,              \
 	                       (current_vm)->v_pdir_phys, \
 	                       __ATOMIC_RELEASE),         \
 	 pagedir_set((current_vm)->v_pdir_phys))
@@ -496,8 +288,8 @@ NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
 #else /* !CONFIG_NO_SMP */
 
 /* Set the current VM, and update the VM pointer of `self' */
-#define cpu_setvm_ex(mycpu, current_vm) pagedir_set((current_vm)->v_pdir_phys)
-#define cpu_setvm(current_vm)           pagedir_set((current_vm)->v_pdir_phys)
+#define cpu_setvm_ex(me, current_vm) pagedir_set((current_vm)->v_pdir_phys)
+#define cpu_setvm(current_vm)        pagedir_set((current_vm)->v_pdir_phys)
 
 #endif /* CONFIG_NO_SMP */
 
@@ -565,7 +357,7 @@ FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
 #ifndef CONFIG_NO_SMP
 /* MUST ONLY BE CALLED FROM AN IDLE TASK!
  * This function does the following:
- * >> FORCPU(me, thiscpu_idle).t_sched.s_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
+ * >> FORCPU(me, thiscpu_idle).t_state = PUSH_CPU_STATE_FOR_RETURNING_TO_CALLER();
  * >> ATOMIC_WRITE(caller->c_state, CPU_STATE_DREAMING);
  * >> PREEMPTION_DEEPHALT();
  * NOTE: Do not call this function directly. - Use `cpu_deepsleep()' instead,
@@ -576,109 +368,21 @@ FUNDEF void NOTHROW(KCALL cpu_deepsleep)(void);
  * With this, it is the arch-dependent portion of `cpu_deepsleep()'
  * that performs the actual deep-sleep on a multi-core system. */
 FUNDEF NOPREEMPT void NOTHROW(FCALL cpu_enter_deepsleep)(struct cpu *__restrict caller);
-#endif /* !CONFIG_NO_SMP */
 
-
-/* Returns the number of ticks that have passed since the start of the current quantum.
- * The true current CPU-local time (in ticks) can then be calculated as:
- * >> (thiscpu_jiffies * PERCPU(thiscpu_quantum_length)) + PERCPU(thiscpu_quantum_offset) + cpu_quantum_elapsed_nopr();
- * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1, 2)) quantum_diff_t
-NOTHROW(FCALL cpu_quantum_elapsed_nopr)(struct cpu *__restrict mycpu,
-                                        jtime_t *__restrict preal_jtime);
-
-/* Disable / re-enable preemptive interrupts on the calling CPU.
- * When `cpu_enable_preemptive_interrupts_nopr()' is called, any time that has
- * passed between then and a prior call to `cpu_disable_preemptive_interrupts_nopr()'
- * will be added to the cpu's local jiffies counter, while also configuring
- * the current quantum to be aligned with the amount of time that has passed.
- * NOTE: In case preemptive interrupts cannot be disabled,
- *       all of these these functions are no-ops.
- * NOTE: The `*_nopr' variants may only be called when preemption is disabled! */
-FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_disable_preemptive_interrupts_nopr)(void);
-FUNDEF NOBLOCK NOPREEMPT void NOTHROW(KCALL cpu_enable_preemptive_interrupts_nopr)(void);
-
-/* Prematurely end the current quantum, accounting its elapsed
- * time to `prev', and starting a new quantum such that the
- * next scheduler interrupt will happen after a full quantum. */
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) void
-NOTHROW(FCALL cpu_quantum_end_nopr)(struct task *__restrict prev,
-                                    struct task *__restrict next);
-
-/* Explicitly set the quantum length value for the calling CPU, and do an RTC
- * re-sync such that the given `cpu_qsize' appears to fit perfectly (at least
- * for the time being)
- * NOTE: This function does _NOT_ call `arch_cpu_update_quantum_length_nopr()'! */
-FUNDEF NOBLOCK NOPREEMPT void
-NOTHROW(KCALL cpu_set_quantum_length)(quantum_diff_t cpu_qsize);
-
-
-/* Same as the function above, however don't
- * account for lazy/delayed interrupt handling. */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) quantum_diff_t
-NOTHROW(FCALL arch_cpu_quantum_elapsed_nopr)(struct cpu *__restrict me);
-
-/* Same as the functions above, but don't adjust the CPU time afterwards.
- * WARNING: Keeping preemptive interrupts disabled without time loss accounting
- *          for longer periods of time will cause `thiscpu_quantum_length' to
- *          go nuts once they actually get turned back on.
- * NOTE:    As long as preemptive interrupts are disabled, `arch_cpu_quantum_elapsed_nopr()'
- *          and `arch_cpu_quantum_elapsed_and_reset_nopr()' always return 0.
- * NOTE:    When `arch_cpu_enable_preemptive_interrupts_nopr()' always also
- *          does the same as `arch_cpu_update_quantum_length_nopr()'. */
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
-NOTHROW(FCALL arch_cpu_disable_preemptive_interrupts_nopr)(struct cpu *__restrict me);
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
-NOTHROW(FCALL arch_cpu_enable_preemptive_interrupts_nopr)(struct cpu *__restrict me);
-
-/* Set to true/false by `arch_cpu_(enable|disable)_preemptive_interrupts_nopr()' */
-DATDEF ATTR_PERCPU bool arch_cpu_preemptive_interrupts_disabled;
-
-/* Update hardware following a change made to `thiscpu_quantum_length'
- * NOTE: If `thiscpu_quantum_length' is greater than the implementation limit,
- *       it will be clamped to the max possible value. Note however that the
- *       implementation limit is always defined such that properly functioning
- *       hardware is always able to provide a quantum length suitable to
- *       perfectly match `HZ' ticks per second (even when the perfect quantum
- *       length needed to reach this goal changes over time)
- * @return: * : The number of quantum units already elapsed (updating the hardware
- *              tick counter has the same effect of resetting its current tick value
- *              to 0 as a call to `arch_cpu_quantum_elapsed_and_reset_nopr()' has). */
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) quantum_diff_t
-NOTHROW(FCALL arch_cpu_update_quantum_length_nopr)(struct cpu *__restrict me);
-
-/* Return the # of elapsed quantum units from the current CPU tick,
- * before resetting the # of elapsed units (as well as the # of units
- * left before a scheduler interrupt is fired) to their max values. */
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) quantum_diff_t
-NOTHROW(FCALL arch_cpu_quantum_elapsed_and_reset_nopr)(struct cpu *__restrict me);
-
-#ifndef CONFIG_NO_SMP
 /* Check if IPIs are pending to be executed by the calling CPU,
  * returning `true' if this is the case, or `false' it not.
  * In order to serve any pending IPIs, preemption must be enabled. */
-FUNDEF NOBLOCK WUNUSED NOPREEMPT NONNULL((1)) bool
-NOTHROW(FCALL arch_cpu_hwipi_pending_nopr)(struct cpu *__restrict me);
+FUNDEF NOBLOCK WUNUSED NOPREEMPT bool
+NOTHROW(FCALL arch_cpu_hwipi_pending_nopr)(void);
 
 /* Check if there are any non-interrupting software-based IPIs pending.
  * If some are present, these must be serviced by calling `cpu_ipi_service_nopr()' */
 FUNDEF NOBLOCK WUNUSED NOPREEMPT NONNULL((1)) bool
 NOTHROW(FCALL arch_cpu_swipi_pending_nopr)(struct cpu *__restrict me);
-#endif /* !CONFIG_NO_SMP */
-
-
-
-
-#ifndef CONFIG_NO_SMP
-/* Load all pending threads within the calling CPU.
- * NOTE: Preemption must be disabled before this function may be called!
- * @return: true:  At least 1 new task was added to the execution ring.
- * @return: false: No tasks were pending. */
-FUNDEF NOBLOCK NOPREEMPT bool NOTHROW(KCALL cpu_loadpending_nopr)(void);
 
 /* Wake up a CPU, regardless of which ever state it may be in, potentially
  * not even waking it at all, but simply sending an IPI, such that sooner
- * or later it will check its chain of pending task (`target->c_pending'),
+ * or later it will check its chain of pending task (`FORCPU(target, thiscpu_sched_pending)'),
  * causing it to load all threads found within that chain, so-as to allow
  * those tasks to continue running on it.
  * On X86, this function is implemented as:
@@ -789,8 +493,8 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
 #define CPU_IPI_MODE_SPECIAL_MIN      (__CCAST(uintptr_t)(-1))
 #define CPU_IPI_MODE_ISSPECIAL(x)     (__CCAST(uintptr_t)(x) >= CPU_IPI_MODE_SPECIAL_MIN)
 
-/* Prematurely end the current quantum and switch execution over
- * to `THIS_CPU->c_current'.
+/* Directly yield execution to `THIS_CPU->c_current'. The caller is responsible
+ * to deal with time accounting, preferrably via use of the `sched_intern_*' API.
  * This is mainly used to quickly cause a thread woken by `task_wake()'
  * to resume execution when it was hosted by a different CPU before then. */
 #define CPU_IPI_MODE_SWITCH_TASKS     (__CCAST(struct icpustate *)(-1))
@@ -892,33 +596,6 @@ NOTHROW(FCALL cpu_run_current_and_remember_nopr)(struct task *__restrict caller)
  * NOTE: Preemption must be disabled before this function may be called! */
 FUNDEF NOPREEMPT ATTR_NORETURN void
 NOTHROW(FCALL cpu_run_current_nopr)(void);
-
-#ifndef CONFIG_NO_SMP
-/* Schedule `thread' as a task that is pending execution on `target'
- * NOTE: This function inherits a reference to `thread' from the caller!
- * NOTE: The caller must ensure that:
- *        - `TASK_FRUNNING' isn't set
- *        - `TASK_FPENDING' is set
- * @return: true:  Successfully schedule the task pending on `target'.
- * @return: false: The task has already been designated a role as either
- *                 pending, sleeping, or running. */
-FUNDEF NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(FCALL cpu_addpendingtask)(struct cpu *__restrict target,
-                                  /*in*/ REF struct task *__restrict thread);
-#endif /* !CONFIG_NO_SMP */
-
-/* Add the given task as running / sleeping within the current CPU.
- * NOTE: These functions inherit a reference to `thread' from the caller!
- * NOTE: Preemption must be disabled before this function may be called! */
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL cpu_addrunningtask_nopr)(/*in*/ REF struct task *__restrict thread);
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL cpu_addsleepingtask_nopr)(/*in*/ REF struct task *__restrict thread);
-
-/* Remove a running or sleeping task `thread' from the current CPU.
- * NOTE: These functions return with a reference to `thread' handed to the caller.
- * NOTE: Preemption must be disabled before this function may be called! */
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL cpu_delrunningtask_nopr)(/*out*/ REF struct task *__restrict thread);
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void NOTHROW(FCALL cpu_delsleepingtask_nopr)(/*out*/ REF struct task *__restrict thread);
-
 
 /* IDLE job prototype.
  * @param: arg:  The argument with which the job was scheduled.

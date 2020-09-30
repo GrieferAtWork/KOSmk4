@@ -50,6 +50,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <sched.h>
+#include <stddef.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/timeb.h>

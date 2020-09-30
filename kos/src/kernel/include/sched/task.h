@@ -58,25 +58,22 @@ DECL_BEGIN
  * and scheduler association always hold true. - As a matter of fact: These relations
  * are asserted by `cpu_assert_integrity()' */
 #define TASK_FNORMAL       __UINT32_C(0x00000000) /* Normal task flags. */
-#define TASK_FKEEPCORE     __UINT32_C(0x00000001) /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
-#define TASK_FKERNTHREAD   __UINT32_C(0x00000002) /* [const] The thread is running exclusively in kernel-space, and can never return to user-space. */
+#define TASK_FRUNNING      __UINT32_C(0x00000001) /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
+#define TASK_FTIMEOUT      __UINT32_C(0x00000002) /* [lock(CLEAR(THIS_TASK))] Set by the scheduler when waking a task due to a timeout. */
 /*      TASK_F             __UINT32_C(0x00000004)  * ... */
 /*      TASK_F             __UINT32_C(0x00000008)  * ... */
-#define TASK_FTERMINATING  __UINT32_C(0x00000010) /* [lock(WRITE_ONCE)] The task has started the process of being terminated.
+#define TASK_FSTARTING     __UINT32_C(0x00000010) /* [lock(WRITE_ONCE)] The thread is currently starting. */
+#define TASK_FSTARTED      __UINT32_C(0x00000020) /* [lock(WRITE_ONCE)] The thread has been started. */
+#define TASK_FTERMINATING  __UINT32_C(0x00000040) /* [lock(WRITE_ONCE)] The task has started the process of being terminated.
                                                    *                  - No further synchronous RPCs may be scheduled for execution
                                                    *                  - Implies `TASK_FKEEPCORE' (the task may no longer change its hosting CPU) */
-#define TASK_FTERMINATED   __UINT32_C(0x00000020) /* [lock(WRITE_ONCE)] The task has been fully terminated.
+#define TASK_FTERMINATED   __UINT32_C(0x00000080) /* [lock(WRITE_ONCE)] The task has been fully terminated.
                                                    *                  - No further RPCs of any kind may be scheduled for execution
                                                    *                  - The thread must no longer appear in the CURRENT/SLEEPING or PENDING chain of any CPU. */
-#define TASK_FWAKING       __UINT32_C(0x00000040) /* [lock(WAKE_OWNER)] The task is currently being re-awoken (may not be set once `TASK_FTERMINATING' has been set). */
-#define TASK_FRUNNING      __UINT32_C(0x00000080) /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
-#ifndef CONFIG_NO_SMP
-#define TASK_FPENDING      __UINT32_C(0x00000100) /* [lock(WRITE_ONCE(OLD_CPU_OR_CREATOR),CLEAR(THIS_CPU))]
-                                                   * The task is currently pending execution on its associated CPU. */
-#endif /* !CONFIG_NO_SMP */
-/*      TASK_F             __UINT32_C(0x00000200)  * ... */
-#define TASK_FSTARTING     __UINT32_C(0x00000400) /* [lock(WRITE_ONCE)] The thread is currently starting. */
-#define TASK_FSTARTED      __UINT32_C(0x00000800) /* [lock(WRITE_ONCE)] The thread has been started. */
+#define TASK_FKEEPCORE     __UINT32_C(0x00000100) /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
+#define TASK_FSUSPENDED    __UINT32_C(0x00000200) /* [lock(PRIVATE(THIS_TASK))] Used internally to implement of SIGSTOP/SIGCONT */
+/*      TASK_F             __UINT32_C(0x00000400)  * ... */
+/*      TASK_F             __UINT32_C(0x00000800)  * ... */
 /*      TASK_F             __UINT32_C(0x00001000)  * ... */
 /*      TASK_F             __UINT32_C(0x00002000)  * ... */
 /*      TASK_F             __UINT32_C(0x00004000)  * ... */
@@ -94,24 +91,15 @@ DECL_BEGIN
 /*      TASK_F             __UINT32_C(0x00200000)  * ... */
 /*      TASK_F             __UINT32_C(0x00400000)  * ... */
 /*      TASK_F             __UINT32_C(0x00800000)  * ... */
-/*      TASK_F             __UINT32_C(0x01000000)  * ... */
+#define TASK_FGDB_STOPPED  __UINT32_C(0x01000000) /* Used internally by the gdbserver driver */
 /*      TASK_F             __UINT32_C(0x02000000)  * ... */
 /*      TASK_F             __UINT32_C(0x04000000)  * ... */
-/*      TASK_F             __UINT32_C(0x08000000)  * ... */
-#define TASK_FCRITICAL     __UINT32_C(0x10000000) /* The thread is critical, and any attempting to task_exit() it causes kernel panic. */
-#define TASK_FGDB_STOPPED  __UINT32_C(0x20000000) /* Used internally by the gdbserver driver */
-#define TASK_FSUSPENDED    __UINT32_C(0x40000000) /* Used internally to implement of SIGSTOP/SIGCONT */
-#define TASK_FTIMEOUT      __UINT32_C(0x80000000) /* [lock(CLEAR(THIS_TASK))] Set by the scheduler when waking a task due to a timeout. */
+#define TASK_FCRITICAL     __UINT32_C(0x08000000) /* [lock(PRIVATE(THIS_TASK))] The thread is critical, and any attempting to task_exit() it causes kernel panic. */
+/*      TASK_F             __UINT32_C(0x10000000)  * ... */
+/*      TASK_F             __UINT32_C(0x20000000)  * ... */
+/*      TASK_F             __UINT32_C(0x40000000)  * ... */
+#define TASK_FKERNTHREAD   __UINT32_C(0x80000000) /* [const] The thread is running exclusively in kernel-space, and can never return to user-space. */
 
-
-#define OFFSET_TASK_SELF         0
-#define OFFSET_TASK_REFCNT       __SIZEOF_POINTER__
-#define OFFSET_TASK_FLAGS        (2 * __SIZEOF_POINTER__)
-#define OFFSET_TASK_CPU          (3 * __SIZEOF_POINTER__)
-#define OFFSET_TASK_VM           (4 * __SIZEOF_POINTER__)
-#define OFFSET_TASK_VM_TASKS     (5 * __SIZEOF_POINTER__)
-#define OFFSET_TASK_HEAPSZ       (7 * __SIZEOF_POINTER__)
-#define OFFSET_TASK_SCHED_STATE  (8 * __SIZEOF_POINTER__)
 
 #ifdef __CC__
 
@@ -119,53 +107,26 @@ struct cpu;
 struct vm;
 struct scpustate;
 struct task {
-	struct task    *t_self;       /* [1..1][const][== this] Self-pointer (always at offset == 0) */
-	WEAK refcnt_t   t_refcnt;     /* Task reference counter. */
-	WEAK uintptr_t  t_flags;      /* Thread state & flags (Set of `TASK_F*'). */
-	struct cpu     *t_cpu;        /* [1..1][lock(PRIVATE)] The CPU that this task is being hosted by.
-	                               * NOTE: Also accessible via the `this_cpu' field. */
-	REF struct vm  *t_vm;         /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
-	                               *             write(THIS_TASK && INTERN(lock)))]
-	                               * The VM used to host this task.
-	                               * NOTE: Also accessible via the `this_vm' field. */
-	LLIST_NODE(struct task) t_vm_tasks; /* [lock(t_vm->v_tasklock)] Chain of tasks using `t_vm' */
-	size_t          t_heapsz;     /* [const] Allocated heap size of this task. */
-	struct {
-		struct scpustate        *s_state;    /* [lock(PRIVATE(t_cpu == THIS_CPU))][valid_if(t_self != t_cpu->c_current)]
-		                                      * The CPU state to-be restored when execution of this task continues. */
-		union {
-			struct {
-				struct task     *sr_runprv;  /* [lock(PRIVATE(t_cpu == THIS_CPU))][1..1] Previous task. */
-				REF struct task *sr_runnxt;  /* [lock(PRIVATE(t_cpu == THIS_CPU))][1..1] The task that will be executed after this one.
-				                              * NOTE: This pointer forms a ring of tasks being executed */
-			} s_running;                     /* [valid_if(THIS_TASK in t_cpu->c_current)] Running-task chain */
-			struct {
-				struct task    **ss_pself;   /* [lock(PRIVATE(t_cpu == THIS_CPU))][1..1][1..1] Timeout self-pointer. */
-				REF struct task *ss_tmonxt;  /* [lock(PRIVATE(t_cpu == THIS_CPU))][0..1] Sleeping task with the next greater timeout. */
-				struct timespec  ss_timeout; /* Absolute `realtime()' when this task should resume execution. */
-			} s_asleep;                      /* [valid_if(THIS_TASK in t_cpu->c_sleeping)] Sleeping-task chain */
-#ifndef CONFIG_NO_SMP
-			struct {
-				REF struct task *ss_pennxt;  /* [lock(PRIVATE(t_cpu == THIS_CPU))][0..1] Another pending task.
-				                              * NOTE: This field must be initialized to `NULL', but will
-				                              *       contain `CPU_PENDING_ENDOFCHAIN' when used to indicate
-				                              *       the end of a CPU's pending task chain!
-				                              *       This, alongside the overlap with the `sr_runprv' and `ss_pself'
-				                              *       fields above is a requirement for scheduling to function properly,
-				                              *       as it allowed an ATOMIC_CMPXCH(ss_pennxt, NULL, ...) to be used to
-				                              *       designate a single thread that is then responsible for properly
-				                              *       scheduling some task as pending in another CPU. */
-			} s_pending;                     /* [valid_if(THIS_TASK in t_cpu->c_pending)] Pending-task chain */
-#endif /* !CONFIG_NO_SMP */
-		};
-	}               t_sched;
-	struct timespec t_ctime; /* [valid_if(TASK_FSTARTED)] Absolute `realtime()' of when the task was first started. */
-	/* per-task data goes here. */
+	struct task            *t_self;      /* [1..1][const][== this] Self-pointer (always at offset == 0) */
+	WEAK refcnt_t           t_refcnt;    /* Task reference counter. */
+	WEAK uintptr_t          t_flags;     /* Thread state & flags (Set of `TASK_F*'). */
+	struct cpu             *t_cpu;       /* [1..1][lock(PRIVATE)] The CPU that this task is being hosted by.
+	                                      * NOTE: Also accessible via the `this_cpu' field. */
+	REF struct vm          *t_vm;        /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
+	                                      *             write(THIS_TASK && INTERN(lock)))]
+	                                      * The VM used to host this task.
+	                                      * NOTE: Also accessible via the `this_vm' field. */
+	LLIST_NODE(struct task) t_vm_tasks;  /* [lock(t_vm->v_tasklock)] Chain of tasks using `t_vm' */
+	size_t                  t_heapsz;    /* [const] Allocated heap size of this task. */
+	struct scpustate       *t_state;     /* [lock(PRIVATE(t_cpu == THIS_CPU))]
+	                                      * [valid_if(t_self != FORCPU(t_cpu, thiscpu_sched_current))]
+	                                      * The CPU state to-be restored when execution of this task continues. */
+#define KEY_task_vm_dead__next_offsetafter __COMPILER_OFFSETAFTER(struct task, t_state)
+#define KEY_task_vm_dead__next(thread)     (*(struct task **)&(thread)->t_state)
+	/* ATTR_PERTASK-data goes here. */
 };
 
-DATDEF ATTR_PERTASK struct scpustate *this_sched_state; /* ALIAS:THIS_TASK->t_sched.s_state */
-DATDEF ATTR_PERTASK struct task *this_sched_runprv;     /* ALIAS:THIS_TASK->t_sched.s_running.sr_runprv */
-DATDEF ATTR_PERTASK struct task *this_sched_runnxt;     /* ALIAS:THIS_TASK->t_sched.s_running.sr_runnxt */
+DATDEF ATTR_PERTASK struct scpustate *this_sstate; /* ALIAS:THIS_TASK->t_state */
 
 
 /* Allocate + initialize a new task.
@@ -334,14 +295,12 @@ FUNDEF ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
 
 #ifdef __cplusplus
-#ifdef __USE_MISC
 extern "C++" {
 FORCELOCAL ATTR_ARTIFICIAL ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(union wait status) {
 	task_exit(status.w_status);
 }
-}
-#endif /* __USE_MISC */
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 
@@ -352,9 +311,6 @@ NOTHROW(FCALL task_exit)(union wait status) {
 #define TASK_WAKE_FHIGHPRIO 0x4000 /* The wake-up has high priority. - Yield to the target thread
                                     * when preemption was enabled, before returning at the start
                                     * of a new quantum. */
-#define TASK_WAKE_FLOWPRIO  0x8000 /* The wake-up has low priority and doesn't require the target
-                                    * to be re-schedule for being executed as soon as possible. */
-#define TASK_WAKE_FMASK     0xd000 /* Mask for wake-up priority flags. */
 
 
 /* Re-schedule the given `thread' if it was unscheduled (entered a sleeping state).
@@ -435,6 +391,9 @@ FUNDEF WUNUSED __BOOL NOTHROW(KCALL task_yield_nx)(void);
 
 
 
+
+
+#if 0
 #define TASK_CLONE_CSIGNAL        0x000000ff /* Signal mask to be sent at exit. */
 #define TASK_CLONE_VM             0x00000100 /* Set if VM shared between processes. */
 #define TASK_CLONE_FS             0x00000200 /* Set if fs info shared between processes. */
@@ -461,8 +420,6 @@ FUNDEF WUNUSED __BOOL NOTHROW(KCALL task_yield_nx)(void);
 #define TASK_CLONE_NEWNET         0x40000000 /* New network namespace. */
 #define TASK_CLONE_IO             0x80000000 /* Clone I/O context. */
 
-
-#if 0
 /* High-level kernel interface for the clone(2) system call.
  * @param: clone_flags: Set of `TASK_CLONE_*' */
 FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL REF struct task *

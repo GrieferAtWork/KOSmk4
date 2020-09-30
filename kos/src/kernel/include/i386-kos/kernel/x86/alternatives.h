@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_ALTERNATIVE_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_ALTERNATIVE_H 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_ALTERNATIVES_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_ALTERNATIVES_H 1
 
 #include <kernel/compiler.h>
 
@@ -27,7 +27,7 @@
 #include <hybrid/__asm.h>
 
 #include <asm/asmword.h>
-#include <asm/cpu-feature.h>
+#include <asm/cpu-features.h>
 
 #ifdef __CC__
 DECL_BEGIN
@@ -63,77 +63,72 @@ DECL_END
  */
 __ASM_BEGIN
 
+/* Local labels:
+ *    771: Start of base-code in primary section
+ *    772: Start of current alt-code
+ *    773: End of current alt-code
+ *    774: End of base-code in primary section
+ */
+
 __ASM_L(.macro .alt_if feature:req)
+__ASM_L(771:)
 __ASM_L(.Lalt_maxlength = 0)
 __ASM_L(	.pushsection .alternatives, "a")
 __ASM_L(		.word32 __ASM_ARG(\feature))
-__ASM_L(		.word32 (774f - 773f))
+__ASM_L(		.word32 (773f - 772f))
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-__ASM_L(		.wordptr 771f)
+__ASM_L(		.wordptr 771b)
+__ASM_L(		.wordptr 774f)
 __ASM_L(		.wordptr 772f)
-__ASM_L(		.wordptr 773f)
 #else /* CONFIG_BUILDING_KERNEL_CORE */
-__ASM_L(		.wordrel 771f)
+__ASM_L(		.wordrel 771b)
+__ASM_L(		.wordrel 774f)
 __ASM_L(		.wordrel 772f)
-__ASM_L(		.wordrel 773f)
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 __ASM_L(	.popsection)
-__ASM_L(	.pushsection %S.alternative)
-__ASM_L(773:)
+__ASM_L(	.pushsection .text.free.alternatives)
+__ASM_L(772:)
 __ASM_L(.endm)
 
-__ASM_L(.macro .alt_elif feature:req)
-__ASM_L(774:)
-__ASM_L(.if (. - 773b) > .Lalt_maxlength)
-__ASM_L(.Lalt_maxlength = (. - 773b))
+__ASM_L(.macro .alt_elseif feature:req)
+__ASM_L(773:)
+__ASM_L(.if (. - 772b) > .Lalt_maxlength)
+__ASM_L(.Lalt_maxlength = (. - 772b))
 __ASM_L(.endif)
+__ASM_L(	.popsection)
 __ASM_L(	.pushsection .alternatives, "a")
 __ASM_L(		.word32 __ASM_ARG(\feature))
-__ASM_L(		.word32 (774f - 773f))
+__ASM_L(		.word32 (773f - 772f))
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-__ASM_L(		.wordptr 771f)
+__ASM_L(		.wordptr 771b)
+__ASM_L(		.wordptr 774f)
 __ASM_L(		.wordptr 772f)
-__ASM_L(		.wordptr 773f)
 #else /* CONFIG_BUILDING_KERNEL_CORE */
-__ASM_L(		.wordrel 771f)
+__ASM_L(		.wordrel 771b)
+__ASM_L(		.wordrel 774f)
 __ASM_L(		.wordrel 772f)
-__ASM_L(		.wordrel 773f)
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 __ASM_L(	.popsection)
-__ASM_L(773:)
+__ASM_L(	.pushsection .text.free.alternatives)
+__ASM_L(772:)
 __ASM_L(.endm)
 
 __ASM_L(.macro .alt_else)
-__ASM_L(774:)
-__ASM_L(.if (. - 773b) > .Lalt_maxlength)
-__ASM_L(.Lalt_maxlength = (. - 773b))
+__ASM_L(773:)
+__ASM_L(.if (. - 772b) > .Lalt_maxlength)
+__ASM_L(.Lalt_maxlength = (. - 772b))
 __ASM_L(.endif)
 __ASM_L(	.popsection)
-__ASM_L(	.pushsection .alternatives, "a")
-__ASM_L(		.word32 X86_FEAT_TRUE)
-__ASM_L(		.word32 (774f - 773f))
-#ifdef CONFIG_BUILDING_KERNEL_CORE
-__ASM_L(		.wordptr 771f)
-__ASM_L(		.wordptr 772f)
-__ASM_L(		.wordptr 773f)
-#else /* CONFIG_BUILDING_KERNEL_CORE */
-__ASM_L(		.wordrel 771f)
-__ASM_L(		.wordrel 772f)
-__ASM_L(		.wordrel 773f)
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
-__ASM_L(	.popsection)
-__ASM_L(771:)
 __ASM_L(.endm)
 
 __ASM_L(.macro .alt_endif)
-__ASM_L(774:)
 __ASM_L(.if .Lalt_maxlength > (. - 771b))
 __ASM_L(.skip .Lalt_maxlength - (. - 771b), 0x90)
 __ASM_L(.endif)
-__ASM_L(773:)
+__ASM_L(774:)
 __ASM_L(.endm)
 __ASM_END
 
 
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_ALTERNATIVE_H */
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_ALTERNATIVES_H */

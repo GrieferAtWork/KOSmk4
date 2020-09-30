@@ -45,6 +45,8 @@
 #include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <stddef.h>
+
 #ifndef USERKERN_STRUCT
 #if USERKERN_WIDTH == 4
 #include <kos/kernel/cpu-state32.h>

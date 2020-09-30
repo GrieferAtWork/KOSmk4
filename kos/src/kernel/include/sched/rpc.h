@@ -176,10 +176,6 @@ typedef WUNUSED NONNULL((2)) struct icpustate *
 #define TASK_RPC_FHIGHPRIO 0x4000 /* The RPC has high priority. - When the target is hosted by the same
                                    * core as the caller, yield to the target thread when preemption was
                                    * enabled, before returning at the start of a new quantum. */
-#define TASK_RPC_FLOWPRIO  0x8000 /* The RPC has low priority and doesn't require the target
-                                   * to be re-schedule for being executed as soon as possible.
-                                   * When not set, the target thread is scheduled to resume execution
-                                   * at the start of the next quantum on the target CPU. */
 
 
 /* Synchronous RPC flags. */

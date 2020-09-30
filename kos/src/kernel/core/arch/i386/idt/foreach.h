@@ -580,20 +580,10 @@
 
 
 
-/* 0xf0 */
-/*[[[deemon PRINT_VECTOR_INCLUDES("IDT_PREEMPT_IMPL", [0xf0]); ]]]*/
-#ifdef IDT_PREEMPT_IMPL
-#define IDT_VECTOR f0
-#include IDT_PREEMPT_IMPL
-#undef IDT_PREEMPT_IMPL
-#endif /* IDT_PREEMPT_IMPL */
-/*[[[end]]]*/
-
-
-
-
 /* 0xf1 ... 0xff */
-/*[[[deemon PRINT_VECTOR_INCLUDES("IDT_SPECIFIC_IMPL", [0xf1 : 0xff + 1]); ]]]*/
+/*[[[deemon PRINT_VECTOR_INCLUDES("IDT_SPECIFIC_IMPL",
+	[      0xf1, 0xf2, 0xf3, 0xf4, 0xf5, 0xf6, 0xf7,
+	       0xf9, 0xfa, 0xfb, 0xfc, 0xfd, 0xfe, 0xff]); ]]]*/
 #ifdef IDT_SPECIFIC_IMPL
 #define IDT_VECTOR f1
 #include IDT_SPECIFIC_IMPL
@@ -608,8 +598,6 @@
 #define IDT_VECTOR f6
 #include IDT_SPECIFIC_IMPL
 #define IDT_VECTOR f7
-#include IDT_SPECIFIC_IMPL
-#define IDT_VECTOR f8
 #include IDT_SPECIFIC_IMPL
 #define IDT_VECTOR f9
 #include IDT_SPECIFIC_IMPL

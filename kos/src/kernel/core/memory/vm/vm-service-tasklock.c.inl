@@ -38,7 +38,7 @@ NOTHROW(KCALL vm_clear_pending_deltasks)(struct vm *__restrict self) {
 	REF struct task *iter, *next;
 	iter = ATOMIC_XCH(self->v_deltasks, NULL);
 	while (iter) {
-		next = iter->t_sched.s_running.sr_runnxt;
+		next = KEY_task_vm_dead__next(iter);
 		assert(iter->t_vm == self);
 		assert(iter->t_vm_tasks.ln_pself != NULL);
 		LLIST_REMOVE(iter, t_vm_tasks);

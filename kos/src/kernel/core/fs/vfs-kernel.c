@@ -27,6 +27,7 @@
 #include <debugger/hook.h>
 #include <fs/vfs.h>
 
+#include <stddef.h>
 #include <limits.h> /* SYMLOOP_MAX */
 
 DECL_BEGIN

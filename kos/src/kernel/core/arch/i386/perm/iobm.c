@@ -68,12 +68,12 @@ PUBLIC ATTR_PERCPU struct ioperm_bitmap *thiscpu_x86_ioperm_bitmap = NULL;
  * got scheduled on a different CPU, or hasn't yet received its first quantum) */
 LOCAL NOBLOCK void
 NOTHROW(KCALL ioperm_bitmap_unset_write_access)(struct ioperm_bitmap *__restrict self) {
-	struct cpu *mycpu;
+	struct cpu *me;
 	pflag_t was = PREEMPTION_PUSHOFF();
-	mycpu = THIS_CPU;
-	if (FORCPU(mycpu, thiscpu_x86_ioperm_bitmap) == self) {
+	me = THIS_CPU;
+	if (FORCPU(me, thiscpu_x86_ioperm_bitmap) == self) {
 		/* Re-map, and only include read permissions. */
-		pagedir_map(FORCPU(mycpu, thiscpu_x86_iob),
+		pagedir_map(FORCPU(me, thiscpu_x86_iob),
 		            2 * PAGESIZE,
 		            self->ib_pages,
 		            PAGEDIR_MAP_FREAD);

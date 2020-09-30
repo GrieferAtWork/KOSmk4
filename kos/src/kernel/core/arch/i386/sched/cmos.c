@@ -22,17 +22,18 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_TIME_C
-#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_TIME_C 1
-#define CONFIG_WANT_CMOS_REALTIME_CLOCK_AS_STRUCT 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_CMOS_C
+#define GUARD_KERNEL_CORE_ARCH_I386_SCHED_CMOS_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/driver.h>
-#include <kernel/x86/nmi.h>
+#include <kernel/x86/pit.h> /* X86_PIT_EARLY_HZ */
+#include <kernel/printk.h>
+#include <sched/cpu.h>
 #include <sched/signal.h>
-#include <sched/time.h>
+#include <sched/tsc.h>
 #include <sched/x86/cmos.h>
 
 #include <hybrid/atomic.h>
@@ -41,8 +42,9 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 #include <hw/rtc/cmos.h>
 #include <sys/io.h>
 
-#include <stdint.h>
 #include <assert.h>
+#include <stdint.h>
+#include <time.h>
 
 #ifndef __DATE_YEAR__
 #ifdef __INTELLISENSE__
@@ -54,90 +56,29 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 
 DECL_BEGIN
 
-/* Get/Set NMI (non-maskable interrupt) being enabled
- * These interrupts should normally be enabled in all situations,
- * and should only be disabled momentarily, and when absolutely
- * necessary.
- * Also note that NMI enable/disable is controlled globally, and
- * not, say, per-CPU!
- * @param: enabled: The new nmi-enabled state (if different from `return',
- *                  the state was changed)
- * @return: * :     The NMI-enabled state prior to the call being made. */
-FUNDEF NOBLOCK ATTR_PURE WUNUSED bool
-NOTHROW(KCALL x86_get_nmi_enabled)(void) {
-	u8 nmi;
-	nmi = ATOMIC_READ(cmos_realtime_clock.cr_nmi);
-	return nmi & CMOS_ADDR_NONMI ? false : true;
-}
-
-FUNDEF NOPREEMPT NOBLOCK bool
-NOTHROW(KCALL x86_set_nmi_enabled_nopr)(bool enabled) {
-	u8 old_nmi, new_nmi;
-	new_nmi = enabled ? 0 : CMOS_ADDR_NONMI;
-	assert(!PREEMPTION_ENABLED());
-#ifndef CONFIG_NO_SMP
-	while (!sync_trywrite(&cmos_realtime_clock.cr_lock)) {
-		u8 nmi = ATOMIC_READ(cmos_realtime_clock.cr_nmi);
-		if (nmi == new_nmi)
-			return enabled; /* Unchanged */
-		task_pause();
-	}
-#endif /* !CONFIG_NO_SMP */
-	old_nmi = ATOMIC_XCH(cmos_realtime_clock.cr_nmi, new_nmi);
-	if (old_nmi != new_nmi)
-		outb(CMOS_ADDR, new_nmi); /* Update hardware */
-#ifndef CONFIG_NO_SMP
-	sync_endwrite(&cmos_realtime_clock.cr_lock);
-#endif /* !CONFIG_NO_SMP */
-	return old_nmi & CMOS_ADDR_NONMI ? false : true;
-}
-
-
-
-
-PRIVATE NOBLOCK WUNUSED struct timespec
-NOTHROW(KCALL cmos_gettime)(struct realtime_clock_struct *__restrict self);
-/*
-PRIVATE bool
-NOTHROW(KCALL cmos_waitfor)(struct realtime_clock_struct *__restrict self,
-                            struct timespec const *__restrict abs_time);*/
-
-
 /* The CMOS realtime clock driver descriptor structure */
-PUBLIC struct cmos_realtime_clock_struct cmos_realtime_clock = {
-	/* .cr_clock = */ {
-		/* .rc_refcnt    = */ 2, /* cmos_realtime_clock, realtime_clock.m_ptr */
-		/* .rc_driver    = */ &kernel_driver,
-		/* .rc_precision = */ { 1, 0 }, /* 1 second */
-		/* .rc_gettime   = */ &cmos_gettime,
-		/* .rc_settime   = */ NULL, /* TODO: &cmos_settime */
-		/* .rc_waitfor   = */ NULL, /* TODO: &cmos_waitfor */
-		/* .rc_fini      = */ NULL
-	},
+PUBLIC struct x86_cmos_struct x86_cmos = {
 #ifndef CONFIG_NO_SMP
-	/* .cr_lock         = */ ATOMIC_RWLOCK_INIT,
+	/* .cr_lock         = */ ATOMIC_LOCK_INIT,
 #endif /* !CONFIG_NO_SMP */
 	/* .cr_century      = */ 0,
 	/* .cr_stb          = */ 0,
 	/* .cr_nmi          = */ 0,
-	/* ._cr_pad         = */ 0,
+	/* ._cr_pad1        = */ 0,
 	/* .cr_alarm_second = */ 0xff,
 	/* .cr_alarm_minute = */ 0xff,
 	/* .cr_alarm_hour   = */ 0xff,
-	/* .cr_stc          = */ 0,
-	/* .cr_irq          = */ SIG_INIT,
-	/* .cr_alarm        = */ INT64_MAX
+	/* ._cr_pad2        = */ 0
 };
 
 
 
+#define UNIX_TIME_START_YEAR 1970
+#define SECONDS_PER_DAY      86400
+#define DAYS2YEARS(n_days)   __daystoyears(n_days)
+#define YEARS2DAYS(n_years)  __yearstodays(n_years)
+#define ISLEAPYEAR(year)     __isleap(year)
 
-#define LINUX_TIME_START_YEAR 1970
-#define SECONDS_PER_DAY       86400
-
-#define DAYS2YEARS(n_days)  ((((n_days) + 1) * 400) / 146097)
-#define YEARS2DAYS(n_years) ((((n_years) * 146097) / 400) /* - 1*/) /* rounding error? */
-#define ISLEAPYEAR(year)    ((year) % 400 == 0 || ((year) % 100 != 0 && (year) % 4 == 0))
 
 /* Zero-based day-of-year values for the first of any given month. */
 PRIVATE time_t const time_monthstart_yday[2][13] = {
@@ -149,20 +90,15 @@ PRIVATE time_t const time_monthstart_yday[2][13] = {
 	time_monthstart_yday[!!(leap_year)][month]
 
 LOCAL NOBLOCK NOPREEMPT WUNUSED time_t
-NOTHROW(KCALL cmos_unix_time)(bool lock) {
+NOTHROW(KCALL cmos_gettime)(bool lock) {
 	u8 cmos_second, cmos_minute, cmos_hour, temp;
 	u8 cmos_day, cmos_month, cmos_year, cmos_cent;
 	unsigned int timeout;
 	u16 year;
 	time_t result;
 	assert(!PREEMPTION_ENABLED());
-	(void)lock;
-#ifndef CONFIG_NO_SMP
-	if (lock) {
-		while (!sync_trywrite(&cmos_realtime_clock.cr_lock))
-			task_pause();
-	}
-#endif /* !CONFIG_NO_SMP */
+	if (lock)
+		x86_cmos_lock_acquire_nopr();
 	timeout = 1000000;
 	while (cmos_rd(CMOS_STATE_A) & CMOS_A_UPDATING) {
 		if unlikely(!timeout)
@@ -177,8 +113,8 @@ NOTHROW(KCALL cmos_unix_time)(bool lock) {
 	cmos_month  = cmos_rd(CMOS_MONTH);
 	cmos_year   = cmos_rd(CMOS_YEAR);
 	cmos_cent   = 0;
-	if (cmos_realtime_clock.cr_century)
-		cmos_cent = cmos_rd(cmos_realtime_clock.cr_century);
+	if (x86_cmos.cr_century)
+		cmos_cent = cmos_rd(x86_cmos.cr_century);
 	/* re-read the second register to ensure that it didn't change in the mean time. */
 	temp = cmos_rd(CMOS_SECOND);
 	if likely(temp == cmos_second)
@@ -209,15 +145,13 @@ NOTHROW(KCALL cmos_unix_time)(bool lock) {
 	if likely(cmos_year == temp)
 		goto got_time;
 	cmos_year = temp;
-	if (cmos_realtime_clock.cr_century)
-		cmos_cent = cmos_rd(cmos_realtime_clock.cr_century);
+	if (x86_cmos.cr_century)
+		cmos_cent = cmos_rd(x86_cmos.cr_century);
 got_time:
-#ifndef CONFIG_NO_SMP
 	if (lock)
-		sync_endwrite(&cmos_realtime_clock.cr_lock);
-#endif /* !CONFIG_NO_SMP */
+		x86_cmos_lock_release_nopr();
 	/* Fix BCD time information. */
-	if ((cmos_realtime_clock.cr_stb & CMOS_B_DM) == CMOS_B_DM_BCD) {
+	if ((x86_cmos.cr_stb & CMOS_B_DM) == CMOS_B_DM_BCD) {
 		cmos_second = CMOS_BCD_DECODE(cmos_second);
 		cmos_minute = CMOS_BCD_DECODE(cmos_minute);
 		cmos_hour   = CMOS_BCD_DECODE(cmos_hour & 0x7f) | (cmos_hour & 0x80);
@@ -227,25 +161,25 @@ got_time:
 		cmos_cent   = CMOS_BCD_DECODE(cmos_cent);
 	}
 	/* Fix 12-hour time information. */
-	if ((cmos_realtime_clock.cr_stb & CMOS_B_2412) == CMOS_B_2412_12H && (cmos_hour & 0x80) != 0)
+	if ((x86_cmos.cr_stb & CMOS_B_2412) == CMOS_B_2412_12H && (cmos_hour & 0x80) != 0)
 		cmos_hour = ((cmos_hour & 0x7f) + 12) % 24; 
 	/* Figure out the proper year. */
 	year = cmos_year;
-	if (cmos_realtime_clock.cr_century)
+	if (x86_cmos.cr_century)
 		year += (u16)cmos_cent * 100;
 	else {
 		if (year < (__DATE_YEAR__ % 100))
 			year += 100; /* 100 years into the future. */
 		year += (__DATE_YEAR__ - (__DATE_YEAR__ % 100));
 	}
-	result = YEARS2DAYS((time_t)((s32)year - 1970));
+	result = YEARS2DAYS((time_t)((s32)year - UNIX_TIME_START_YEAR));
 	result += MONTH_STARTING_DAY_OF_YEAR(ISLEAPYEAR(year), (u8)(cmos_month - 1) % 12);
 	result += cmos_day - 1;
 	result *= SECONDS_PER_DAY;
 	result += cmos_hour * 60 * 60;
 	result += cmos_minute * 60;
 	result += cmos_second;
-	if unlikely(cmos_realtime_clock.cr_stb & CMOS_B_DSE) {
+	if unlikely(x86_cmos.cr_stb & CMOS_B_DSE) {
 		/* TODO:
 		 *   - If current time is not
 		 *     (now >= 03:00:00 on the last Sunday of April) &&
@@ -274,15 +208,17 @@ got_time:
 }
 
 
+/* The max error by which `tsc_resync_realtime()' may be off. */
+PUBLIC_CONST ktime_t const tsc_realtime_err = NSEC_PER_SEC; /* 1 second */
 
-
-PRIVATE NOBLOCK NOPREEMPT WUNUSED struct timespec
-NOTHROW(KCALL cmos_gettime)(struct realtime_clock_struct *__restrict UNUSED(self)) {
-	struct timespec result;
-	result.tv_sec  = cmos_unix_time(true);
-	result.tv_nsec = 0;
-	return result;
+/* Retrieve the current realtime, as read from an external clock source.
+ * This function's implementation is arch-specific, and should only be
+ * called from within `tsc_resync_interrupt()' in order to determine the
+ * actual current realtime timestamp. */
+PUBLIC NOPREEMPT NOBLOCK ktime_t NOTHROW(FCALL tsc_resync_realtime)(void) {
+	return (ktime_t)(cmos_gettime(true) - boottime.tv_sec) * NSEC_PER_SEC;
 }
+
 
 
 /* Set CMOS registers:
@@ -300,9 +236,9 @@ NOTHROW(KCALL cmos_setalarm)(time_t time) {
 	cmos_minute = time % 60;
 	time /= 60;
 	cmos_hour = time % 24;
-	if ((cmos_realtime_clock.cr_stb & CMOS_B_2412) == CMOS_B_2412_12H && cmos_hour >= 12)
+	if ((x86_cmos.cr_stb & CMOS_B_2412) == CMOS_B_2412_12H && cmos_hour >= 12)
 		cmos_hour = (cmos_hour - 12) | 0x80; 
-	if ((cmos_realtime_clock.cr_stb & CMOS_B_DM) == CMOS_B_DM_BCD) {
+	if ((x86_cmos.cr_stb & CMOS_B_DM) == CMOS_B_DM_BCD) {
 		cmos_second = CMOS_BCD_ENCODE(cmos_second);
 		cmos_minute = CMOS_BCD_ENCODE(cmos_minute);
 		cmos_hour   = CMOS_BCD_ENCODE(cmos_hour & 0x7f) | (cmos_hour & 0x80);
@@ -313,71 +249,135 @@ NOTHROW(KCALL cmos_setalarm)(time_t time) {
 	 * changing it when we have to.
 	 * The same goes for the other registers, too. (though admittedly,
 	 * the second register will probably change every time...) */
-	if (cmos_realtime_clock.cr_alarm_hour != cmos_hour) {
+	if (x86_cmos.cr_alarm_hour != cmos_hour) {
 		cmos_wr(CMOS_ALARM_HOUR, cmos_hour);
-		cmos_realtime_clock.cr_alarm_hour = cmos_hour;
+		x86_cmos.cr_alarm_hour = cmos_hour;
 	}
-	if (cmos_realtime_clock.cr_alarm_minute != cmos_minute) {
+	if (x86_cmos.cr_alarm_minute != cmos_minute) {
 		cmos_wr(CMOS_ALARM_MINUTE, cmos_minute);
-		cmos_realtime_clock.cr_alarm_minute = cmos_minute;
+		x86_cmos.cr_alarm_minute = cmos_minute;
 	}
-	if (cmos_realtime_clock.cr_alarm_second != cmos_second) {
+	if (x86_cmos.cr_alarm_second != cmos_second) {
 		cmos_wr(CMOS_ALARM_SECOND, cmos_second);
-		cmos_realtime_clock.cr_alarm_second = cmos_second;
+		x86_cmos.cr_alarm_second = cmos_second;
+	}
+}
+
+
+#ifndef CONFIG_NO_SMP
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) struct icpustate *
+NOTHROW(FCALL cmos_resync_ipi)(struct icpustate *__restrict state,
+                               void *args[CPU_IPI_ARGCOUNT]) {
+	ktime_t now;
+#if __SIZEOF_POINTER__ >= 8
+	now = (ktime_t)(uintptr_t)args[0];
+#else /* __SIZEOF_POINTER__ >= 8 */
+	now = (ktime_t)(uintptr_t)args[0] |
+	      (ktime_t)(uintptr_t)args[1] << 32;
+#endif /* __SIZEOF_POINTER__ < 8 */
+	tsc_resync_interrupt(now);
+	return state;
+}
+#endif /* !CONFIG_NO_SMP */
+
+INTERN NOPREEMPT NOBLOCK void
+NOTHROW(KCALL x86_cmos_interrupt)(void) {
+	time_t cmos_now, then;
+	ktime_t now;
+	/* Clear pending interrupt flags. */
+	cmos_rd(CMOS_STATE_C);
+	cmos_now = cmos_gettime(false);
+again:
+	now = (ktime_t)(cmos_now - boottime.tv_sec) * NSEC_PER_SEC;
+	tsc_resync_interrupt(now);
+#ifndef CONFIG_NO_SMP
+	{
+		void *args[CPU_IPI_ARGCOUNT];
+#if __SIZEOF_POINTER__ >= 8
+		args[0] = (void *)(uintptr_t)now;
+#else /* __SIZEOF_POINTER__ >= 8 */
+		args[0] = (void *)(uintptr_t)(now & 0xffffffff);
+		args[1] = (void *)(uintptr_t)((now >> 32) & 0xffffffff);
+#endif /* __SIZEOF_POINTER__ < 8 */
+		cpu_broadcastipi_notthis(&cmos_resync_ipi, args,
+		                         CPU_IPI_FNORMAL);
+	}
+#endif /* !CONFIG_NO_SMP */
+	/* Set the new alarm for 2 seconds from the original read.
+	 * TODO: This interval should be configurable via a commandline option! */
+	cmos_now += 2;
+	cmos_setalarm(cmos_now);
+	cmos_wr(CMOS_STATE_B, x86_cmos.cr_stb);
+	/* Check for the unlikely case that the alarm has already expired. */
+	then = cmos_gettime(false);
+	if unlikely(then >= cmos_now) {
+		cmos_now = then;
+		goto again;
 	}
 }
 
 
 
-#if 0 /* TODO */
-PRIVATE bool
-NOTHROW(KCALL cmos_waitfor)(struct realtime_clock_struct *__restrict UNUSED(self),
-                            struct timespec const *__restrict abs_time) {
-	time_t alarm;
-	time_t cmos_now;
-	assert(PREEMPTION_ENABLED());
-	assert(!task_isconnected());
-	alarm = abs_time->tv_sec;
-
-	/* Connect to the interrupt pin of the RTC. */
-	task_connect(&cmos_realtime_clock.cr_irq);
-	/* Configure the chip for the given timeout. */
-	PREEMPTION_DISABLE();
-#ifndef CONFIG_NO_SMP
-	while (!sync_trywrite(&cmos_realtime_clock.cr_lock))
-		task_pause();
-#endif /* !CONFIG_NO_SMP */
-	/* Check: Does the currently set alarm expire before the new one? */
-	if (alarm >= cmos_realtime_clock.cr_alarm &&
-	    cmos_realtime_clock.cr_alarm != INT64_MAX)
-		goto wait_for_interrupt;
-	/* Figure out how much time must still pass
-	 * before `abs_time' has been reached. */
-	cmos_now = cmos_unix_time(false);
-	if (alarm <= cmos_now) {
-		/* Timeout has already expired! */
-#ifndef CONFIG_NO_SMP
-		sync_endwrite(&cmos_realtime_clock.cr_lock);
-#endif /* !CONFIG_NO_SMP */
-		return true;
-	}
 
 
-#ifndef CONFIG_NO_SMP
-	sync_endwrite(&cmos_realtime_clock.cr_lock);
-#endif /* !CONFIG_NO_SMP */
-wait_for_interrupt:
 
-	return true;
-}
-#endif
+DATDEF struct timespec boottime_ ASMNAME("boottime");
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_cmos)(void) {
-	cmos_realtime_clock.cr_stb = cmos_rd(CMOS_STATE_B);
-	//cmos_realtime_clock.cr_century = ...; /* TODO: This can be read from the ACPI descriptor table. */
+	x86_cmos.cr_stb = cmos_rd(CMOS_STATE_B);
+	if unlikely(x86_cmos.cr_stb & (CMOS_B_UIE | CMOS_B_AIE |
+	                               CMOS_B_PIE | CMOS_B_SET)) {
+		x86_cmos.cr_stb &= ~(CMOS_B_UIE | CMOS_B_AIE | CMOS_B_PIE | CMOS_B_SET);
+		cmos_wr(CMOS_STATE_B, x86_cmos.cr_stb);
+		cmos_rd(CMOS_STATE_C);
+	}
+	/* Set-up the initial PIT counter. */
+	outb(PIT_COMMAND,
+	     PIT_COMMAND_SELECT_F0 |
+	     PIT_COMMAND_ACCESS_FLOHI |
+	     PIT_COMMAND_MODE_FRATEGEN |
+	     PIT_COMMAND_FBINARY);
+	outb_p(PIT_DATA0, PIT_HZ_DIV(X86_PIT_EARLY_HZ) & 0xff);
+	outb(PIT_DATA0, (PIT_HZ_DIV(X86_PIT_EARLY_HZ) >> 8) & 0xff);
+
+	//x86_cmos.cr_century = ...; /* TODO: This can be read from the ACPI descriptor table. */
+	/* Initialize the initial system boot timestamp. */
+	boottime_.tv_sec  = cmos_gettime(true);
+	boottime_.tv_nsec = 0;
+}
+
+
+INTERN ATTR_FREETEXT void
+NOTHROW(KCALL x86_initialize_tsc_resync)(void) {
+	/* Initialize the RTC interrupt to perform periodic re-sync.
+	 * Also enable use of realtime() for retrieving the actual,
+	 * current system time. */
+	time_t then, then2;
+	PREEMPTION_DISABLE();
+	x86_cmos_lock_acquire_nopr();
+	x86_cmos.cr_alarm_hour   = cmos_rd(CMOS_ALARM_HOUR);
+	x86_cmos.cr_alarm_minute = cmos_rd(CMOS_ALARM_MINUTE);
+	x86_cmos.cr_alarm_second = cmos_rd(CMOS_ALARM_SECOND);
+	x86_cmos.cr_stb = cmos_rd(CMOS_STATE_B);
+	x86_cmos.cr_stb &= ~(CMOS_B_UIE | CMOS_B_AIE | CMOS_B_PIE | CMOS_B_SET);
+	x86_cmos.cr_stb |= CMOS_B_AIE;
+	then = cmos_gettime(false);
+	cmos_setalarm(then + 1);
+	cmos_wr(CMOS_STATE_B, x86_cmos.cr_stb);
+	for (;;) {
+		then2 = cmos_gettime(false);
+		if likely(then2 <= then)
+			break;
+		/* Alarm may not have triggered! */
+		then = then2;
+		cmos_setalarm(then + 1);
+		cmos_wr(CMOS_STATE_B, x86_cmos.cr_stb);
+	}
+	x86_cmos_lock_release_nopr();
+	PREEMPTION_ENABLE();
 }
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_TIME_C */
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_CMOS_C */

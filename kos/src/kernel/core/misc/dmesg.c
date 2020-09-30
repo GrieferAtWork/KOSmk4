@@ -40,6 +40,7 @@
 #include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
+#include <time.h> /* NSEC_PER_SEC */
 
 DECL_BEGIN
 
@@ -419,7 +420,7 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 		                 ((u32)(nano[2] & 0x7f) << 14) |
 		                 ((u32)(nano[3] & 0x7f) << 21) |
 		                 ((u32)(nano[4] & 0x3) << 28);
-		if unlikely(packet.sp_nsec >= 1000000000)
+		if unlikely(packet.sp_nsec >= NSEC_PER_SEC)
 			goto done; /* Invalid nano seconds timestamp. */
 		/* Decode the sender TID of the packet. */
 		{

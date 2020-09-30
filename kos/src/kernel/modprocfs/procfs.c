@@ -31,6 +31,8 @@
 
 #include <linux/magic.h>
 
+#include <stddef.h>
+
 #include <libvio/api.h>
 
 DECL_BEGIN

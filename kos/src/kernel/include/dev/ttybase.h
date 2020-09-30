@@ -129,9 +129,9 @@ NOTHROW(KCALL ttybase_device_setctty)(struct ttybase_device *__restrict self,
  * @param: pold_ctty:         When non-NULL, store the old CTTY here upon success.
  * @return: * : One of `TTYBASE_DEVICE_HUPCTTY_*' */
 FUNDEF NOBLOCK int
-NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty DFL(NULL),
+NOTHROW(KCALL ttybase_device_hupctty)(struct ttybase_device *required_old_ctty DFL(__NULLPTR),
                                       bool caller_must_be_leader DFL(true),
-                                      REF struct ttybase_device **pold_ctty DFL(NULL));
+                                      REF struct ttybase_device **pold_ctty DFL(__NULLPTR));
 #define TTYBASE_DEVICE_HUPCTTY_ALREADY      1  /* The calling session didn't have a CTTY to begin with */
 #define TTYBASE_DEVICE_HUPCTTY_SUCCESS      0  /* Successfully gave up control of the CTTY (when `pold_ctty' was non-NULL, that old CTTY is stored there) */
 #define TTYBASE_DEVICE_HUPCTTY_NOTLEADER  (-1) /* The calling process isn't the session leader, and `caller_must_be_leader' was true. */

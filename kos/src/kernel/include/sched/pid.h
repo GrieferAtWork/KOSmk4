@@ -633,18 +633,18 @@ NOTHROW(KCALL taskpid_getrootpid)(struct taskpid const *__restrict self) {
 LOCAL ATTR_PURE WUNUSED bool
 NOTHROW(KCALL task_isorphan)(void) {
 	struct taskpid *proc = task_getprocesspid();
-	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
+	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL task_isorphan_p)(struct task *__restrict thread) {
 	struct taskpid *proc = task_getprocesspid_of(thread);
-	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
+	return __hybrid_atomic_load(proc->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL taskpid_isorphan_p)(struct taskpid *__restrict self) {
-	return __hybrid_atomic_load(self->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == NULL;
+	return __hybrid_atomic_load(self->tp_siblings.ln_pself, __ATOMIC_ACQUIRE) == __NULLPTR;
 }
 
 LOCAL WUNUSED REF struct task *KCALL
@@ -654,7 +654,7 @@ task_getprocessparent(void) THROWS(E_WOULDBLOCK) {
 	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
 	if (result && !tryincref(result))
-		result = NULL;
+		result = __NULLPTR;
 	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
 }
@@ -666,7 +666,7 @@ task_getprocessparent_of(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	sync_read(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
 	if (result && !tryincref(result))
-		result = NULL;
+		result = __NULLPTR;
 	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
 }
@@ -679,7 +679,7 @@ NOTHROW(KCALL task_getprocessparent_nx)(void) {
 		return __NULLPTR;
 	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
 	if (result && !tryincref(result))
-		result = NULL;
+		result = __NULLPTR;
 	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
 }
@@ -692,7 +692,7 @@ NOTHROW(KCALL task_getprocessparent_of_nx)(struct task *__restrict thread) {
 		return __NULLPTR;
 	result = FORTASK(proc, this_taskgroup).tg_proc_parent;
 	if (result && !tryincref(result))
-		result = NULL;
+		result = __NULLPTR;
 	sync_endread(&FORTASK(proc, this_taskgroup).tg_proc_parent_lock);
 	return result;
 }

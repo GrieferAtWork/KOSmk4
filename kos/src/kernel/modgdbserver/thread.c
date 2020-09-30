@@ -31,8 +31,10 @@
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
+#include <sched/sched.h>
 #include <sched/signal.h>
 #include <sched/task.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
@@ -173,13 +175,13 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 	COMPILER_READ_BARRIER();
 	if (flags & GDBTHREAD_STOPRPCIMPL_F_STOPCPU) {
 		struct task *old_override;
-		struct cpu *mycpu;
+		struct cpu *me;
 do_cpu_stop:
 		COMPILER_BARRIER();
-		mycpu = stop_event.e.tse_thread->t_cpu;
-		cpu_disable_preemptive_interrupts_nopr();
-		old_override = mycpu->c_override;
-		mycpu->c_override = stop_event.e.tse_thread;
+		me = stop_event.e.tse_thread->t_cpu;
+		/* TODO: Don't directly access `thiscpu_sched_override'! */
+		old_override = FORCPU(me, thiscpu_sched_override);
+		FORCPU(me, thiscpu_sched_override) = stop_event.e.tse_thread;
 		COMPILER_BARRIER();
 
 		PREEMPTION_ENABLE();
@@ -188,8 +190,7 @@ do_cpu_stop:
 			if (!ATOMIC_READ(stop_event.e.tse_isacpu)) {
 switch_to_normal_stop:
 				COMPILER_BARRIER();
-				cpu_enable_preemptive_interrupts_nopr();
-				mycpu->c_override = old_override;
+				FORCPU(me, thiscpu_sched_override) = old_override;
 				COMPILER_BARRIER();
 				goto do_normal_stop;
 			}
@@ -208,19 +209,19 @@ switch_to_normal_stop:
 		PREEMPTION_DISABLE();
 
 		COMPILER_BARRIER();
-		mycpu->c_override = old_override;
-		cpu_enable_preemptive_interrupts_nopr();
+		FORCPU(me, thiscpu_sched_override) = old_override;
 		COMPILER_BARRIER();
 	} else {
 		/* Check if we have to switch over to the original scheduling override.
 		 * s.a. `GDBThread_StopWithAsyncNotificationRPC()' */
 		{
-			struct cpu *mycpu = stop_event.e.tse_thread->t_cpu;
-			if (mycpu->c_override &&
-			    mycpu->c_override != stop_event.e.tse_thread) {
-				cpu_quantum_end_nopr(stop_event.e.tse_thread, mycpu->c_override);
+			struct cpu *me = stop_event.e.tse_thread->t_cpu;
+			/* TODO: Don't directly access `thiscpu_sched_override'! */
+			if (FORCPU(me, thiscpu_sched_override) &&
+			    FORCPU(me, thiscpu_sched_override) != stop_event.e.tse_thread) {
+				//TODO:sched_switchthread_force(me, stop_event.e.tse_thread, FORCPU(me, thiscpu_sched_override));
 				/* Switch back to `c_override' */
-				mycpu->c_current = mycpu->c_override;
+				FORCPU(me, thiscpu_sched_current) = FORCPU(me, thiscpu_sched_override);
 				cpu_run_current_and_remember_nopr(stop_event.e.tse_thread);
 			}
 		}
@@ -306,27 +307,25 @@ PRIVATE uintptr_t GDBThread_StopAll_Host_Old_flags = 0;
 
 PRIVATE void NOTHROW(FCALL GDBThread_DisablePreemptionForHostCPU)(void) {
 	pflag_t was;
+	/* TODO: Don't directly access `thiscpu_sched_override'! */
 	was = PREEMPTION_PUSHOFF();
 	/* Ensure that the GDB host thread doesn't move to a different core. */
 	GDBThread_StopAll_Host_Old_flags = ATOMIC_FETCHOR(THIS_TASK->t_flags, TASK_FKEEPCORE);
 	/* Set the GDB Host thread as the scheduling override */
-	GDBThread_StopAll_Host_Old_override = GDBServer_Host->t_cpu->c_override;
-	GDBServer_Host->t_cpu->c_override = GDBServer_Host;
-	/* Disable preemptive interrupts */
-	cpu_disable_preemptive_interrupts_nopr();
+	GDBThread_StopAll_Host_Old_override = FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override);
+	FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override) = GDBServer_Host;
 	PREEMPTION_POP(was);
 }
 
 PRIVATE void NOTHROW(FCALL GDBThread_ReenablePreemptionForHostCPU)(void) {
 	pflag_t was;
+	/* TODO: Don't directly access `thiscpu_sched_override'! */
 	was = PREEMPTION_PUSHOFF();
 	/* Restore the old scheduling override */
-	GDBServer_Host->t_cpu->c_override = GDBThread_StopAll_Host_Old_override;
+	FORCPU(GDBServer_Host->t_cpu, thiscpu_sched_override) = GDBThread_StopAll_Host_Old_override;
 	/* Restore the old KEEPCORE flag. */
 	if (!(GDBThread_StopAll_Host_Old_flags & TASK_FKEEPCORE))
 		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
-	/* Re-enable preemptive interrupts */
-	cpu_enable_preemptive_interrupts_nopr();
 	PREEMPTION_POP(was);
 }
 
@@ -500,11 +499,12 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationRPC)(void *arg,
                                                       unsigned int UNUSED(reason),
                                                       struct rpc_syscall_info const *UNUSED(sc_info)) {
 	/* Restore the old CPU override. */
-	struct cpu *mycpu;
+	struct cpu *me;
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
-	mycpu = THIS_CPU;
-	mycpu->c_override = (REF struct task *)arg;
+	me = THIS_CPU;
+	/* TODO: Don't directly access `thiscpu_sched_override'! */
+	FORCPU(me, thiscpu_sched_override) = (REF struct task *)arg;
 	state = GDBThread_StopRPCImpl(GDBTHREAD_STOPRPCIMPL_F_SETREASON,
 	                              state);
 	PREEMPTION_POP(was);
@@ -519,13 +519,14 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationIPI)(struct icpustate *__restri
                                                       void *args[CPU_IPI_ARGCOUNT]) {
 	struct task *thread;
 	struct task *caller = THIS_TASK;
-	struct cpu *mycpu   = caller->t_cpu;
+	struct cpu *me   = caller->t_cpu;
 	thread = (struct task *)args[0];
-	assert(mycpu->c_override == caller); /* TODO: This can fail if the CPU wasn't stop-suspended */
+	assert(FORCPU(me, thiscpu_sched_override) == caller); /* TODO: This can fail if the CPU wasn't stop-suspended */
 	assert(!PREEMPTION_ENABLED());
 	/* Pass scheduling override control to `thread' */
 	COMPILER_BARRIER();
-	mycpu->c_override = thread;
+	/* TODO: Don't directly access `thiscpu_sched_override'! */
+	FORCPU(me, thiscpu_sched_override) = thread;
 	COMPILER_BARRIER();
 	GDB_DEBUG("[gdb] Send Stop RPC to with %p (%u.%u) [async-altcpu]\n",
 	          thread,
@@ -539,7 +540,7 @@ NOTHROW(FCALL GDBThread_StopWithAsyncNotificationIPI)(struct icpustate *__restri
 	                                     *                 allowing it to run as the new override. */
 	                                    TASK_RPC_FHIGHPRIO)) {
 		COMPILER_BARRIER();
-		mycpu->c_override = GDBServer_Host;
+		FORCPU(me, thiscpu_sched_override) = GDBServer_Host;
 		COMPILER_BARRIER();
 	}
 	sig_broadcast(&GDBThread_StopWithAsyncNotificationIPI_Done);
@@ -631,7 +632,8 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 		 *               we shouldn't send an IPI to ourself. */
 		if (target_cpu == GDBServer_Host->t_cpu) {
 			COMPILER_BARRIER();
-			target_cpu->c_override = thread;
+			/* TODO: Don't directly access `thiscpu_sched_override'! */
+			FORCPU(target_cpu, thiscpu_sched_override) = thread;
 			COMPILER_BARRIER();
 			GDB_DEBUG("[gdb] Send Stop RPC to with %p (%u.%u) [async]\n",
 			          thread,
@@ -645,12 +647,12 @@ NOTHROW(FCALL GDBThread_CreateMissingAsyncStopNotification)(struct task *__restr
 			                                     *                 allowing it to run as the new override. */
 			                                    TASK_RPC_FHIGHPRIO)) {
 				COMPILER_BARRIER();
-				target_cpu->c_override = GDBServer_Host;
+				FORCPU(target_cpu, thiscpu_sched_override) = GDBServer_Host;
 				COMPILER_BARRIER();
 				return false; /* The thread has already exited... */
 			}
 			COMPILER_BARRIER();
-			assert(target_cpu->c_override == GDBServer_Host);
+			assert(FORCPU(target_cpu, thiscpu_sched_override) == GDBServer_Host);
 			goto done;
 		}
 

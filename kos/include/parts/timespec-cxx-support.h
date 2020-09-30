@@ -30,12 +30,12 @@
 
 #include <kos/anno.h>
 
-#ifndef __NSECS_PER_SEC
-#define __NSECS_PER_SEC __UINTPTR_C(1000000000)
-#endif /* !__NSECS_PER_SEC */
+#ifndef __NSEC_PER_SEC
+#define __NSEC_PER_SEC __UINT32_C(1000000000)
+#endif /* !__NSEC_PER_SEC */
 
 #ifndef __NSECS_OVERFLOW
-#define __NSECS_OVERFLOW(TV_NSEC_TYPE) (((TV_NSEC_TYPE)-1) / __NSECS_PER_SEC)
+#define __NSECS_OVERFLOW(TV_NSEC_TYPE) (((TV_NSEC_TYPE)-1) / __NSEC_PER_SEC)
 #endif /* !__NSECS_OVERFLOW */
 
 #define __TIMESPEC_CXX_DECL_BEGIN extern "C++" {
@@ -47,11 +47,11 @@
 		if (__hybrid_overflow_uadd((TV_NSEC_TYPE)tv_nsec, __n,             \
 		                           (TV_NSEC_TYPE *)&tv_nsec)) {            \
 			tv_sec += __NSECS_OVERFLOW(TV_NSEC_TYPE);                      \
-			tv_nsec -= __NSECS_OVERFLOW(TV_NSEC_TYPE) * __NSECS_PER_SEC;   \
+			tv_nsec -= __NSECS_OVERFLOW(TV_NSEC_TYPE) * __NSEC_PER_SEC;    \
 		}                                                                  \
-		if ((TV_NSEC_TYPE)tv_nsec >= __NSECS_PER_SEC) {                    \
-			tv_sec  += (TV_NSEC_TYPE)tv_nsec / __NSECS_PER_SEC;            \
-			tv_nsec = (TV_NSEC_TYPE)tv_nsec % __NSECS_PER_SEC;             \
+		if ((TV_NSEC_TYPE)tv_nsec >= __NSEC_PER_SEC) {                     \
+			tv_sec  += (TV_NSEC_TYPE)tv_nsec / __NSEC_PER_SEC;             \
+			tv_nsec = (TV_NSEC_TYPE)tv_nsec % __NSEC_PER_SEC;              \
 		}                                                                  \
 	}                                                                      \
 	/* Subtract nanoseconds (1/1_000_000_000 seconds) */                   \
@@ -60,11 +60,11 @@
 		if (__hybrid_overflow_usub((TV_NSEC_TYPE)tv_nsec, __n,             \
 		                           (TV_NSEC_TYPE *)&tv_nsec)) {            \
 			tv_sec -= __NSECS_OVERFLOW(TV_NSEC_TYPE);                      \
-			tv_nsec += __NSECS_OVERFLOW(TV_NSEC_TYPE) * __NSECS_PER_SEC;   \
+			tv_nsec += __NSECS_OVERFLOW(TV_NSEC_TYPE) * __NSEC_PER_SEC;    \
 		}                                                                  \
-		if ((TV_NSEC_TYPE)tv_nsec >= __NSECS_PER_SEC) {                    \
-			tv_sec  += (TV_NSEC_TYPE)tv_nsec / __NSECS_PER_SEC;            \
-			tv_nsec = (TV_NSEC_TYPE)tv_nsec % __NSECS_PER_SEC;             \
+		if ((TV_NSEC_TYPE)tv_nsec >= __NSEC_PER_SEC) {                     \
+			tv_sec  += (TV_NSEC_TYPE)tv_nsec / __NSEC_PER_SEC;             \
+			tv_nsec = (TV_NSEC_TYPE)tv_nsec % __NSEC_PER_SEC;              \
 		}                                                                  \
 	}                                                                      \
 	/* Add microseconds (1/1_000_000 seconds) */                           \
@@ -103,9 +103,9 @@
 	operator*=(unsigned int __n) __CXX_NOEXCEPT {                          \
 		tv_sec *= __n;                                                     \
 		tv_nsec = (TV_NSEC_TYPE)tv_nsec * __n;                             \
-		if ((TV_NSEC_TYPE)tv_nsec >= __NSECS_PER_SEC) {                    \
-			tv_sec += (TV_NSEC_TYPE)tv_nsec / __NSECS_PER_SEC;             \
-			tv_nsec = (TV_NSEC_TYPE)tv_nsec % __NSECS_PER_SEC;             \
+		if ((TV_NSEC_TYPE)tv_nsec >= __NSEC_PER_SEC) {                     \
+			tv_sec += (TV_NSEC_TYPE)tv_nsec / __NSEC_PER_SEC;              \
+			tv_nsec = (TV_NSEC_TYPE)tv_nsec % __NSEC_PER_SEC;              \
 		}                                                                  \
 		return *this;                                                      \
 	}                                                                      \

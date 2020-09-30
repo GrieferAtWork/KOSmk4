@@ -28,6 +28,7 @@
 #include <kernel/vm/phys.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

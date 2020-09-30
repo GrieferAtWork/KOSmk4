@@ -26,6 +26,7 @@
 #include <fs/node.h>
 #include <kernel/driver.h>
 #include <sched/pid.h>
+#include <sched/tsc.h>
 
 #include <kos/except/reason/io.h>
 #include <sys/stat.h>
@@ -517,6 +518,7 @@ ProcFS_PerProc_StatInode(struct inode *__restrict self,
                          USER CHECKED struct stat *result)
 		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	REF struct task *thread;
+	struct timespec start;
 	upid_t pid;
 	pid = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 	/* Lookup the associated thread. */
@@ -525,12 +527,13 @@ ProcFS_PerProc_StatInode(struct inode *__restrict self,
 		return;
 	FINALLY_DECREF_UNLIKELY(thread);
 	/* Use the thread's creation timestamp for a/m/c-timestamps. */
-	result->st_atimespec.tv_sec  = thread->t_ctime.tv_sec;
-	result->st_atimespec.tv_nsec = thread->t_ctime.tv_nsec;
-	result->st_mtimespec.tv_sec  = thread->t_ctime.tv_sec;
-	result->st_mtimespec.tv_nsec = thread->t_ctime.tv_nsec;
-	result->st_ctimespec.tv_sec  = thread->t_ctime.tv_sec;
-	result->st_ctimespec.tv_nsec = thread->t_ctime.tv_nsec;
+	start = task_getstarttime(thread);
+	result->st_atimespec.tv_sec  = start.tv_sec;
+	result->st_atimespec.tv_nsec = start.tv_nsec;
+	result->st_mtimespec.tv_sec  = start.tv_sec;
+	result->st_mtimespec.tv_nsec = start.tv_nsec;
+	result->st_ctimespec.tv_sec  = start.tv_sec;
+	result->st_ctimespec.tv_nsec = start.tv_nsec;
 }
 
 

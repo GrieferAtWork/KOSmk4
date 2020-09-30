@@ -206,14 +206,14 @@ NOTHROW(FCALL this_vm_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		struct vm *myvm   = THIS_VM;
-		struct cpu *mycpu = THIS_CPU;
+		struct vm *myvm = THIS_VM;
+		struct cpu *me  = THIS_CPU;
 		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
 		if unlikely(myvm == &vm_kernel)
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
-		CPUSET_REMOVE(targets, mycpu->c_id);
+		CPUSET_REMOVE(targets, me->c_id);
 		args[0] = (void *)(uintptr_t)addr;
 		args[1] = (void *)(uintptr_t)num_bytes;
 		cpu_sendipi_cpuset(targets,
@@ -232,13 +232,13 @@ NOTHROW(FCALL this_vm_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
 		struct vm *myvm   = THIS_VM;
-		struct cpu *mycpu = THIS_CPU;
+		struct cpu *me = THIS_CPU;
 		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
 		if unlikely(myvm == &vm_kernel)
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
-		CPUSET_REMOVE(targets, mycpu->c_id);
+		CPUSET_REMOVE(targets, me->c_id);
 		args[0] = (void *)(uintptr_t)addr;
 		cpu_sendipi_cpuset(targets,
 		                   &ipi_invtlb_one,
@@ -258,13 +258,13 @@ NOTHROW(FCALL this_vm_syncall)(void) {
 	if (cpu_online_count > 1) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
-		struct cpu *mycpu = THIS_CPU;
+		struct cpu *me = THIS_CPU;
 		vm_getcpus(myvm, CPUSET_PTR(targets));
 		/* Check for special case: The kernel VM is being synced. */
 		if unlikely(myvm == &vm_kernel)
 			CPUSET_SETFULL(targets);
 		/* Don't use IPIs for the calling CPU */
-		CPUSET_REMOVE(targets, mycpu->c_id);
+		CPUSET_REMOVE(targets, me->c_id);
 		cpu_sendipi_cpuset(targets,
 		                   myvm == &vm_kernel ? &ipi_invtlb_all
 		                                      : &ipi_invtlb_user,

@@ -147,6 +147,42 @@
 #define __hybrid_int128_sub32(var, v)                (void)((var) -= (__INT128_TYPE__)(__INT32_TYPE__)(v))
 #define __hybrid_int128_sub64(var, v)                (void)((var) -= (__INT128_TYPE__)(__INT64_TYPE__)(v))
 #define __hybrid_int128_sub128(var, v)               (void)((var) -= (__INT128_TYPE__)(v))
+#define __hybrid_uint128_mul(var, v)                 (void)((var) *= (__UINT128_TYPE__)(v))
+#define __hybrid_uint128_mul8(var, v)                (void)((var) *= (__UINT128_TYPE__)(__UINT8_TYPE__)(v))
+#define __hybrid_uint128_mul16(var, v)               (void)((var) *= (__UINT128_TYPE__)(__UINT16_TYPE__)(v))
+#define __hybrid_uint128_mul32(var, v)               (void)((var) *= (__UINT128_TYPE__)(__UINT32_TYPE__)(v))
+#define __hybrid_uint128_mul64(var, v)               (void)((var) *= (__UINT128_TYPE__)(__UINT64_TYPE__)(v))
+#define __hybrid_uint128_mul128(var, v)              (void)((var) *= (__UINT128_TYPE__)(v))
+#define __hybrid_int128_mul(var, v)                  (void)((var) *= (__INT128_TYPE__)(v))
+#define __hybrid_int128_mul8(var, v)                 (void)((var) *= (__INT128_TYPE__)(__INT8_TYPE__)(v))
+#define __hybrid_int128_mul16(var, v)                (void)((var) *= (__INT128_TYPE__)(__INT16_TYPE__)(v))
+#define __hybrid_int128_mul32(var, v)                (void)((var) *= (__INT128_TYPE__)(__INT32_TYPE__)(v))
+#define __hybrid_int128_mul64(var, v)                (void)((var) *= (__INT128_TYPE__)(__INT64_TYPE__)(v))
+#define __hybrid_int128_mul128(var, v)               (void)((var) *= (__INT128_TYPE__)(v))
+#define __hybrid_uint128_div(var, v)                 (void)((var) /= (__UINT128_TYPE__)(v))
+#define __hybrid_uint128_div8(var, v)                (void)((var) /= (__UINT128_TYPE__)(__UINT8_TYPE__)(v))
+#define __hybrid_uint128_div16(var, v)               (void)((var) /= (__UINT128_TYPE__)(__UINT16_TYPE__)(v))
+#define __hybrid_uint128_div32(var, v)               (void)((var) /= (__UINT128_TYPE__)(__UINT32_TYPE__)(v))
+#define __hybrid_uint128_div64(var, v)               (void)((var) /= (__UINT128_TYPE__)(__UINT64_TYPE__)(v))
+#define __hybrid_uint128_div128(var, v)              (void)((var) /= (__UINT128_TYPE__)(v))
+#define __hybrid_int128_div(var, v)                  (void)((var) /= (__INT128_TYPE__)(v))
+#define __hybrid_int128_div8(var, v)                 (void)((var) /= (__INT128_TYPE__)(__INT8_TYPE__)(v))
+#define __hybrid_int128_div16(var, v)                (void)((var) /= (__INT128_TYPE__)(__INT16_TYPE__)(v))
+#define __hybrid_int128_div32(var, v)                (void)((var) /= (__INT128_TYPE__)(__INT32_TYPE__)(v))
+#define __hybrid_int128_div64(var, v)                (void)((var) /= (__INT128_TYPE__)(__INT64_TYPE__)(v))
+#define __hybrid_int128_div128(var, v)               (void)((var) /= (__INT128_TYPE__)(v))
+#define __hybrid_uint128_mod(var, v)                 (void)((var) %= (__UINT128_TYPE__)(v))
+#define __hybrid_uint128_mod8(var, v)                (void)((var) %= (__UINT128_TYPE__)(__UINT8_TYPE__)(v))
+#define __hybrid_uint128_mod16(var, v)               (void)((var) %= (__UINT128_TYPE__)(__UINT16_TYPE__)(v))
+#define __hybrid_uint128_mod32(var, v)               (void)((var) %= (__UINT128_TYPE__)(__UINT32_TYPE__)(v))
+#define __hybrid_uint128_mod64(var, v)               (void)((var) %= (__UINT128_TYPE__)(__UINT64_TYPE__)(v))
+#define __hybrid_uint128_mod128(var, v)              (void)((var) %= (__UINT128_TYPE__)(v))
+#define __hybrid_int128_mod(var, v)                  (void)((var) %= (__INT128_TYPE__)(v))
+#define __hybrid_int128_mod8(var, v)                 (void)((var) %= (__INT128_TYPE__)(__INT8_TYPE__)(v))
+#define __hybrid_int128_mod16(var, v)                (void)((var) %= (__INT128_TYPE__)(__INT16_TYPE__)(v))
+#define __hybrid_int128_mod32(var, v)                (void)((var) %= (__INT128_TYPE__)(__INT32_TYPE__)(v))
+#define __hybrid_int128_mod64(var, v)                (void)((var) %= (__INT128_TYPE__)(__INT64_TYPE__)(v))
+#define __hybrid_int128_mod128(var, v)               (void)((var) %= (__INT128_TYPE__)(v))
 #define __hybrid_uint128_shl32(var, shift)           (void)((var) <<= (shift))
 #define __hybrid_uint128_shr32(var, shift)           (void)((var) >>= (shift))
 #define __hybrid_int128_shl32(var, shift)            (void)((var) <<= (shift))
@@ -660,6 +696,88 @@
 #define __hybrid_int128_sub128(var, v) (__hybrid_int128_isneg(v) ? __hybrid_uint128_add128_neg((__hybrid_uint128_t *)&(var), (__hybrid_int128_t const *)&(v)) : __hybrid_uint128_sub128(var, v))
 
 
+#define __HYBRID_PRIVATE_UINT128_MULN_BITINT(v, i) (((v) >> (i)) & 1)
+#define __HYBRID_PRIVATE_UINT128_MULN_BIT128(v, i) (((v).__i128_u32[(i) / 32] >> ((i) % 32)) & 1)
+#define __HYBRID_PRIVATE_UINT128_MULN(T, var, n, v, v_bit, shl)      \
+	do {                                                             \
+		unsigned int _i128_muli;                                     \
+		T _i128_mulres, _i128_multmp;                                \
+		__hybrid_int128_setzero(_i128_mulres);                       \
+		for (_i128_muli = 0; _i128_muli < n; ++_i128_muli) {         \
+			if (v_bit(v, _i128_muli)) {                              \
+				_i128_multmp = (var);                                \
+				shl(_i128_multmp, _i128_muli);                       \
+				__hybrid_uint128_add128(_i128_mulres, _i128_multmp); \
+			}                                                        \
+		}                                                            \
+		(var) = _i128_mulres;                                        \
+	}	__WHILE0
+#define __HYBRID_PRIVATE_INT128_MULN(var, n, v, v_bit, shl)          \
+	do {                                                             \
+		__UINT##n##_TYPE__ _abs_v = (__UINT##n##_TYPE__)(v);         \
+		__BOOL _i128_isneg        = __hybrid_int128_isneg(var);      \
+		if ((__INT##n##_TYPE__)_abs_v < (__INT##n##_TYPE__)0) {      \
+			_abs_v = (__UINT##n##_TYPE__)-(__INT##n##_TYPE__)_abs_v; \
+			_i128_isneg = !_i128_isneg;                              \
+		}                                                            \
+		if (_i128_isneg)                                             \
+			__hybrid_int128_neg(var);                                \
+		__HYBRID_PRIVATE_UINT128_MULN(__hybrid_int128_t, var,        \
+		                              n, _abs_v, v_bit, shl);        \
+		if (_i128_isneg)                                             \
+			__hybrid_int128_neg(var);                                \
+	}	__WHILE0
+
+#define __hybrid_uint128_mul8(var, v)                __HYBRID_PRIVATE_UINT128_MULN(__hybrid_uint128_t, var, 8, (__UINT8_TYPE__)(v), __HYBRID_PRIVATE_UINT128_MULN_BITINT, __hybrid_uint128_shl32)
+#define __hybrid_uint128_mul16(var, v)               __HYBRID_PRIVATE_UINT128_MULN(__hybrid_uint128_t, var, 16, (__UINT16_TYPE__)(v), __HYBRID_PRIVATE_UINT128_MULN_BITINT, __hybrid_uint128_shl32)
+#define __hybrid_uint128_mul32(var, v)               __HYBRID_PRIVATE_UINT128_MULN(__hybrid_uint128_t, var, 32, (__UINT32_TYPE__)(v), __HYBRID_PRIVATE_UINT128_MULN_BITINT, __hybrid_uint128_shl32)
+#ifdef __UINT64_TYPE__
+#define __hybrid_uint128_mul64(var, v)               __HYBRID_PRIVATE_UINT128_MULN(__hybrid_uint128_t, var, 64, (__UINT64_TYPE__)(v), __HYBRID_PRIVATE_UINT128_MULN_BITINT, __hybrid_uint128_shl64)
+#endif /* __UINT64_TYPE__ */
+#define __hybrid_uint128_mul128(var, v)              __HYBRID_PRIVATE_UINT128_MULN(__hybrid_uint128_t, var, 128, v, __HYBRID_PRIVATE_UINT128_MULN_BIT128, __hybrid_uint128_shl)
+#define __hybrid_int128_mul8(var, v)                 __HYBRID_PRIVATE_INT128_MULN(var, 8, (__UINT8_TYPE__)(v), __HYBRID_PRIVATE_UINT128_MULN_BITINT, __hybrid_uint128_shl32)
+#define __hybrid_int128_mul16(var, v)                __HYBRID_PRIVATE_INT128_MULN(var, 16, (__UINT16_TYPE__)(v), __HYBRID_PRIVATE_UINT128_MULN_BITINT, __hybrid_uint128_shl32)
+#define __hybrid_int128_mul32(var, v)                __HYBRID_PRIVATE_INT128_MULN(var, 32, (__UINT32_TYPE__)(v), __HYBRID_PRIVATE_UINT128_MULN_BITINT, __hybrid_uint128_shl32)
+#ifdef __UINT64_TYPE__
+#define __hybrid_int128_mul64(var, v)                __HYBRID_PRIVATE_INT128_MULN(var, 64, (__UINT64_TYPE__)(v), __HYBRID_PRIVATE_UINT128_MULN_BITINT, __hybrid_uint128_shl64)
+#endif /* __UINT64_TYPE__ */
+#define __hybrid_int128_mul128(var, v)                                      \
+	do {                                                                    \
+		__hybrid_int128_t _abs_v = (v);                                     \
+		__BOOL _i128_isneg = __hybrid_int128_isneg(var);                    \
+		if (__hybrid_int128_isneg(_abs_v)) {                                \
+			__hybrid_int128_neg(_abs_v);                                    \
+			_i128_isneg = !_i128_isneg;                                     \
+		}                                                                   \
+		if (_i128_isneg)                                                    \
+			__hybrid_int128_neg(var);                                       \
+		__HYBRID_PRIVATE_UINT128_MULN(__hybrid_int128_t, var, 128, _abs_v,  \
+		                              __HYBRID_PRIVATE_UINT128_MULN_BIT128, \
+		                              __hybrid_uint128_shl);                \
+		if (_i128_isneg)                                                    \
+			__hybrid_int128_neg(var);                                       \
+	}	__WHILE0
+
+#define __hybrid_uint128_div8(var, v)   TODO
+#define __hybrid_uint128_div16(var, v)  TODO
+#define __hybrid_uint128_div32(var, v)  TODO
+#define __hybrid_uint128_div64(var, v)  TODO
+#define __hybrid_uint128_div128(var, v) TODO
+#define __hybrid_int128_div8(var, v)    TODO
+#define __hybrid_int128_div16(var, v)   TODO
+#define __hybrid_int128_div32(var, v)   TODO
+#define __hybrid_int128_div64(var, v)   TODO
+#define __hybrid_int128_div128(var, v)  TODO
+#define __hybrid_uint128_mod8(var, v)   TODO
+#define __hybrid_uint128_mod16(var, v)  TODO
+#define __hybrid_uint128_mod32(var, v)  TODO
+#define __hybrid_uint128_mod64(var, v)  TODO
+#define __hybrid_uint128_mod128(var, v) TODO
+#define __hybrid_int128_mod8(var, v)    TODO
+#define __hybrid_int128_mod16(var, v)   TODO
+#define __hybrid_int128_mod32(var, v)   TODO
+#define __hybrid_int128_mod64(var, v)   TODO
+#define __hybrid_int128_mod128(var, v)  TODO
 
 #define __hybrid_uint128_shl32_overflows(var, shift) \
 	((__hybrid_uint128_vec32_significand(var, 3) >> (32 - (shift))) != 0)
@@ -1169,7 +1287,6 @@
 	 : (__hybrid_int128_isneg(var) ? 0 /* +x <= -y --> false */                                                       \
 	                               : __hybrid_uint128_le128(var, v) /* +x <= +y  <==> (unsigned)+x <= (unsigned)+y */))
 
-
 #ifdef __UINT64_TYPE__
 #ifdef __NO_builtin_choose_expr
 #define __hybrid_uint128_and(var, v)                   \
@@ -1222,6 +1339,36 @@
 	 sizeof(v) == 2 ? __hybrid_int128_sub16(var, v) : \
 	 sizeof(v) == 4 ? __hybrid_int128_sub32(var, v) : \
 	                  __hybrid_int128_sub64(var, v))
+#define __hybrid_uint128_mul(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_uint128_mul8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_uint128_mul16(var, v) : \
+	 sizeof(v) == 4 ? __hybrid_uint128_mul32(var, v) : \
+	                  __hybrid_uint128_mul64(var, v))
+#define __hybrid_int128_mul(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_int128_mul8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_int128_mul16(var, v) : \
+	 sizeof(v) == 4 ? __hybrid_int128_mul32(var, v) : \
+	                  __hybrid_int128_mul64(var, v))
+#define __hybrid_uint128_div(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_uint128_div8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_uint128_div16(var, v) : \
+	 sizeof(v) == 4 ? __hybrid_uint128_div32(var, v) : \
+	                  __hybrid_uint128_div64(var, v))
+#define __hybrid_int128_div(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_int128_div8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_int128_div16(var, v) : \
+	 sizeof(v) == 4 ? __hybrid_int128_div32(var, v) : \
+	                  __hybrid_int128_div64(var, v))
+#define __hybrid_uint128_mod(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_uint128_mod8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_uint128_mod16(var, v) : \
+	 sizeof(v) == 4 ? __hybrid_uint128_mod32(var, v) : \
+	                  __hybrid_uint128_mod64(var, v))
+#define __hybrid_int128_mod(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_int128_mod8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_int128_mod16(var, v) : \
+	 sizeof(v) == 4 ? __hybrid_int128_mod32(var, v) : \
+	                  __hybrid_int128_mod64(var, v))
 #define __hybrid_uint128_eq(var, v)                   \
 	(sizeof(v) == 1 ? __hybrid_uint128_eq8(var, v) :  \
 	 sizeof(v) == 2 ? __hybrid_uint128_eq16(var, v) : \
@@ -1303,6 +1450,36 @@
 	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_sub16(var, v), \
 	__builtin_choose_expr(sizeof(v) == 4, __hybrid_uint128_sub32(var, v), \
 	                                      __hybrid_uint128_sub64(var, v))))
+#define __hybrid_uint128_mul(var, v)                                      \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_mul8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_mul16(var, v), \
+	__builtin_choose_expr(sizeof(v) == 4, __hybrid_uint128_mul32(var, v), \
+	                                      __hybrid_uint128_mul64(var, v))))
+#define __hybrid_int128_mul(var, v)                                       \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_mul8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_mul16(var, v), \
+	__builtin_choose_expr(sizeof(v) == 4, __hybrid_uint128_mul32(var, v), \
+	                                      __hybrid_uint128_mul64(var, v))))
+#define __hybrid_uint128_div(var, v)                                      \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_div8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_div16(var, v), \
+	__builtin_choose_expr(sizeof(v) == 4, __hybrid_uint128_div32(var, v), \
+	                                      __hybrid_uint128_div64(var, v))))
+#define __hybrid_int128_div(var, v)                                       \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_div8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_div16(var, v), \
+	__builtin_choose_expr(sizeof(v) == 4, __hybrid_uint128_div32(var, v), \
+	                                      __hybrid_uint128_div64(var, v))))
+#define __hybrid_uint128_mod(var, v)                                      \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_mod8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_mod16(var, v), \
+	__builtin_choose_expr(sizeof(v) == 4, __hybrid_uint128_mod32(var, v), \
+	                                      __hybrid_uint128_mod64(var, v))))
+#define __hybrid_int128_mod(var, v)                                       \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_mod8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_mod16(var, v), \
+	__builtin_choose_expr(sizeof(v) == 4, __hybrid_uint128_mod32(var, v), \
+	                                      __hybrid_uint128_mod64(var, v))))
 #define __hybrid_uint128_eq(var, v)                                      \
 	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_eq8(var, v),  \
 	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_eq16(var, v), \
@@ -1376,6 +1553,30 @@
 	(sizeof(v) == 1 ? __hybrid_int128_sub8(var, v) :  \
 	 sizeof(v) == 2 ? __hybrid_int128_sub16(var, v) : \
 	                  __hybrid_int128_sub32(var, v))
+#define __hybrid_uint128_mul(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_uint128_mul8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_uint128_mul16(var, v) : \
+	                  __hybrid_uint128_mul32(var, v))
+#define __hybrid_int128_mul(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_int128_mul8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_int128_mul16(var, v) : \
+	                  __hybrid_int128_mul32(var, v))
+#define __hybrid_uint128_div(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_uint128_div8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_uint128_div16(var, v) : \
+	                  __hybrid_uint128_div32(var, v))
+#define __hybrid_int128_div(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_int128_div8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_int128_div16(var, v) : \
+	                  __hybrid_int128_div32(var, v))
+#define __hybrid_uint128_mod(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_uint128_mod8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_uint128_mod16(var, v) : \
+	                  __hybrid_uint128_mod32(var, v))
+#define __hybrid_int128_mod(var, v)                   \
+	(sizeof(v) == 1 ? __hybrid_int128_mod8(var, v) :  \
+	 sizeof(v) == 2 ? __hybrid_int128_mod16(var, v) : \
+	                  __hybrid_int128_mod32(var, v))
 #define __hybrid_uint128_eq(var, v)                   \
 	(sizeof(v) == 1 ? __hybrid_uint128_eq8(var, v) :  \
 	 sizeof(v) == 2 ? __hybrid_uint128_eq16(var, v) : \
@@ -1441,6 +1642,30 @@
 	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_sub8(var, v),  \
 	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_sub16(var, v), \
 	                                      __hybrid_uint128_sub32(var, v)))
+#define __hybrid_uint128_mul(var, v)                                      \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_mul8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_mul16(var, v), \
+	                                      __hybrid_uint128_mul32(var, v)))
+#define __hybrid_int128_mul(var, v)                                       \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_mul8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_mul16(var, v), \
+	                                      __hybrid_uint128_mul32(var, v)))
+#define __hybrid_uint128_div(var, v)                                      \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_div8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_div16(var, v), \
+	                                      __hybrid_uint128_div32(var, v)))
+#define __hybrid_int128_div(var, v)                                       \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_div8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_div16(var, v), \
+	                                      __hybrid_uint128_div32(var, v)))
+#define __hybrid_uint128_mod(var, v)                                      \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_mod8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_mod16(var, v), \
+	                                      __hybrid_uint128_mod32(var, v)))
+#define __hybrid_int128_mod(var, v)                                       \
+	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_mod8(var, v),  \
+	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_mod16(var, v), \
+	                                      __hybrid_uint128_mod32(var, v)))
 #define __hybrid_uint128_eq(var, v)                                      \
 	__builtin_choose_expr(sizeof(v) == 1, __hybrid_uint128_eq8(var, v),  \
 	__builtin_choose_expr(sizeof(v) == 2, __hybrid_uint128_eq16(var, v), \
@@ -1721,6 +1946,9 @@ __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(|, or)
 __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(^, xor)
 __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(+, add)
 __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(-, sub)
+__HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(*, mul)
+__HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(/, div)
+__HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR(%, mod)
 #undef __HYBRID_INT128_DEFINE_BINARY_CXX_OPERATOR
 #define __HYBRID_INT128_DEFINE_COMPARE_CXX_OPERATOR(op, np, name)                                                                                                                                                                                  \
 	template<class __ValType> __LOCAL __ATTR_WUNUSED __ATTR_PURE __HYBRID_INT128_ENABLE_IF_UNSIGNED(__ValType, bool) operator op (__hybrid_uint128_t const &__self, __ValType __v) __CXX_NOEXCEPT { return __hybrid_uint128_##name(__self, __v); } \

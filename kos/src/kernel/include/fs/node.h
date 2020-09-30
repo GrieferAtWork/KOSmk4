@@ -2324,7 +2324,7 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED REF struct superblock *
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
 	return superblock_open(filesystem_type_name,
-	                       (struct basic_block_device *)NULL,
+	                       (struct basic_block_device *)__NULLPTR,
 	                       flags,
 	                       args,
 	                       pnew_superblock_created);
@@ -2340,7 +2340,7 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct super
 		       E_FSERROR_CORRUPTED_FILE_SYSTEM, E_IOERROR, E_BADALLOC,
 		       E_SEGFAULT, E_WOULDBLOCK, ...) {
 	return superblock_open(type,
-	                       (struct basic_block_device *)NULL,
+	                       (struct basic_block_device *)__NULLPTR,
 	                       flags,
 	                       args,
 	                       pnew_superblock_created);

@@ -847,7 +847,7 @@ LOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
 NOTHROW(KCALL vm_datapart_isstatewritable)(struct vm_datapart const *__restrict self) {
 	if (!(self->dp_flags & VM_DATAPART_FLAG_HEAPPPP))
 		return 1;
-	return self->dp_pprop_p != NULL;
+	return self->dp_pprop_p != __NULLPTR;
 }
 
 /* Set the state of a page. */
@@ -1080,7 +1080,7 @@ struct vm_datablock {
 		VM_DATABLOCK_INIT_PAGEINFO(pageshift)                 \
 	}
 #define VM_DATABLOCK_INIT_VIO(vio) \
-	VM_DATABLOCK_INIT_VIO_EX(&vm_datablock_anonymous_type, vio, NULL, 0)
+	VM_DATABLOCK_INIT_VIO_EX(&vm_datablock_anonymous_type, vio, __NULLPTR, 0)
 #else /* LIBVIO_CONFIG_ENABLED */
 #define VM_DATABLOCK_INIT(type, parts, pageshift) \
 	{                                             \
@@ -1276,7 +1276,7 @@ NOTHROW(KCALL vm_datablock_deanonymize)(struct vm_datablock *__restrict self);
 #define vm_datablock_deanonymize(self)                                \
 	(__hybrid_assert(vm_datablock_allow_deanonymize(self)),           \
 	 __hybrid_atomic_cmpxch((self)->db_parts, VM_DATABLOCK_ANONPARTS, \
-	                        NULL, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
+	                        __NULLPTR, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST))
 #endif /* !__INTELLISENSE__ */
 
 /* Check if `self' is an anonymous datablock */
@@ -1632,7 +1632,7 @@ bool (vm_node_iskernelspace)(struct vm_node const *__restrict self);
 #endif /* !KERNELSPACE_HIGHMEM */
 #endif /* !__INTELLISENSE__ */
 
-#define VM_NODE_HASNEXT(self, vm) ((self)->vn_byaddr.ln_next != NULL)
+#define VM_NODE_HASNEXT(self, vm) ((self)->vn_byaddr.ln_next != __NULLPTR)
 #define VM_NODE_HASPREV(self, vm) ((self)->vn_byaddr.ln_pself != &LLIST_HEAD((vm)->v_byaddr))
 #define VM_NODE_NEXT(self)        ((self)->vn_byaddr.ln_next)
 #define VM_NODE_PREV(self)        __COMPILER_CONTAINER_OF((self)->vn_byaddr.ln_pself,struct vm_node,vn_byaddr.ln_next)
@@ -1654,7 +1654,7 @@ struct vm {
 	                                             *          tasks that haven't yet started, or even tasks
 	                                             *          with a reference counter of ZERO(0)! */
 	struct atomic_rwlock       v_tasklock;      /* Lock for `v_tasks' */
-	WEAK REF struct task      *v_deltasks;      /* [0..1][CHAIN(->t_sched.s_running.sr_runnxt)]
+	WEAK REF struct task      *v_deltasks;      /* [0..1][CHAIN(key:KEY_task_vm_dead__next)]
 	                                             * Chain of tasks that are pending deletion from `v_tasks',
 	                                             * as well as follow-up `heap_free()' of the task in question.
 	                                             * NOTE: All other components of the task will have already been destroyed. */

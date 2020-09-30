@@ -32,6 +32,7 @@
 #include <sched/cpu.h>
 #include <sched/enum.h>
 #include <sched/pid.h>
+#include <sched/sched.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -40,6 +41,7 @@
 #include <alloca.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 
 DECL_BEGIN
@@ -296,7 +298,7 @@ NOTHROW(FCALL task_enum_mycpu_nb)(task_enum_cb_t cb, void *arg,
                                   struct cpu *__restrict c)
 		THROWS(E_WOULDBLOCK) {
 	ssize_t temp, result;
-	struct task *first, *thread, *idle;
+	struct task *thread, *idle;
 	/* Start out by enumerating our IDLE thread. */
 	idle   = &FORCPU(c, thiscpu_idle);
 	result = (*cb)(arg, idle, NULL);
@@ -304,28 +306,18 @@ NOTHROW(FCALL task_enum_mycpu_nb)(task_enum_cb_t cb, void *arg,
 		goto done;
 
 	/* Now walk the running-thread-loop */
-	thread = first = c->c_current;
-	do {
+	FOREACH_thiscpu_threads(thread, c) {
 		if (thread != idle)
 			CB_THREAD(thread);
-	} while ((thread = thread->t_sched.s_running.sr_runnxt) != first);
+	}
 
 #ifndef CONFIG_NO_SMP
 	/* Now go through all of the pending threads. */
-	for (thread = c->c_pending;
-	     thread && thread != CPU_PENDING_ENDOFCHAIN;
-	     thread = thread->t_sched.s_pending.ss_pennxt) {
+	FOREACH_thiscpu_sched_pending(thread, c) {
 		ASSERT_POISON(thread != idle);
 		CB_THREAD(thread);
 	}
 #endif /* !CONFIG_NO_SMP */
-
-	/* Finally, enumerate sleeping threads. */
-	for (thread = c->c_sleeping; thread;
-	     thread = thread->t_sched.s_asleep.ss_tmonxt) {
-		if (thread != idle)
-			CB_THREAD(thread);
-	}
 done:
 	return result;
 err:
@@ -361,7 +353,7 @@ NOTHROW(KCALL task_enum_cpu_nb)(task_enum_cb_t cb, void *arg,
                                 struct cpu *__restrict c) {
 	ssize_t result;
 #ifdef CONFIG_NO_SMP
-	result = task_enum_mycpu(cb, arg, c);
+	result = task_enum_mycpu_nb(cb, arg, c);
 #else /* CONFIG_NO_SMP */
 	uintptr_t old_flags;
 	/* Don't need any of this IPI stuff when already in debugger-mode! */
@@ -419,6 +411,25 @@ task_enum_all_nb(task_enum_cb_t cb, void *arg)
 #endif /* !CONFIG_NO_SMP */
 	return result;
 }
+
+/* Same as `task_enum_all_nb()', but directly access the structures of other CPUs,
+ * rather than sending IPIs and letting those CPUs access their own structures.
+ * Doing it this way must be done when the caller knows that no other CPU is
+ * actively running. */
+#ifndef CONFIG_NO_SMP
+FUNDEF NONNULL((1)) ssize_t
+NOTHROW(KCALL task_enum_all_noipi_nb)(task_enum_cb_t cb, void *arg) {
+	cpuid_t i;
+	ssize_t temp, result = 0;
+	for (i = 0; i < cpu_count; ++i) {
+		temp = task_enum_mycpu_nb(cb, arg, cpu_vector[i]);
+		if unlikely(temp < 0)
+			return temp;
+		result += temp;
+	}
+	return result;
+}
+#endif /* !CONFIG_NO_SMP */
 
 
 

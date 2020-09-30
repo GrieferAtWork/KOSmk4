@@ -877,8 +877,6 @@
 
 #define LLIST(T)                  T *
 #define LLIST_NODE(T)             struct { T *ln_next, **ln_pself;  }
-#define DLIST(T)                  struct { T *dl_head, *dl_tail; }
-#define DLIST_NODE(T)             struct { T **dn_pnext, **dn_pprev, *dn_next, *dn_prev; }
 #define SLIST(T)                  T *
 #define SLIST_NODE(T)             struct { T *sn_next; }
 #define ATREE_HEAD(T)             T *
@@ -1069,10 +1067,6 @@
 #define LLIST_FOREACH(elem,l,key) for(;;)
 #define LLIST_FOREACH_P(elem,l,getpath) for(;;)
 #define LLIST_RFOREACH(T,elem,l,start,key) for(;;)
-#define DLIST_FOREACH(elem,l,key) for(;;)
-#define DLIST_FOREACH_P(elem,l,getpath) for(;;)
-#define DLIST_RFOREACH(elem,l,key) for(;;)
-#define DLIST_RFOREACH_P(elem,l,getpath) for(;;)
 #define AIO_BUFFER_FOREACH(ent,self) for(;;)
 #define AIO_BUFFER_FOREACH_N(ent,self) for(;;)
 #define AIO_PBUFFER_FOREACH(ent,self) for(;;)

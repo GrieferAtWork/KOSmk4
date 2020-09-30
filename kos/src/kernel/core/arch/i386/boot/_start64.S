@@ -514,8 +514,16 @@ INTERN_FUNCTION(_start)
 
 	/* Check if we can extract the brand string from cpuid */
 	movl   V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000000A, %eax
-	cmpl   $(0x80000004), %eax
+
+	cmpl   $(0x80000007), %eax
+	jnae   4f
+	movl   $(0x80000007), %eax
+	cpuid
+	movl   %edx, V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_80000007D
+	jmp    5f
+4:	cmpl   $(0x80000004), %eax
 	jnae   3f
+5:
 
 	movl   $(0x80000004), %eax
 	cpuid
