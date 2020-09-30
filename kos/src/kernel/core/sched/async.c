@@ -42,6 +42,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdalign.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

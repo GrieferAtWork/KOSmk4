@@ -35,6 +35,7 @@
 #include <link.h>
 #include <malloc.h>
 #include <signal.h>
+#include <stddef.h>
 #include <string.h>
 #include <unistd.h>
 

@@ -273,7 +273,14 @@
 #define __NO_EXTERN_INLINE
 #define __EXTERN_INLINE      /* nothing */
 #define __EXTERN_FORCEINLINE /* nothing */
-#define __NO_builtin_constant_p  
+#define __NO_builtin_constant_p
+#define __builtin_LINE() __LINE__
+#define __builtin_FILE() __FILE__
+#define __NO_builtin_FUNCTION
+#define __builtin_FUNCTION() ""
+#define __FUNCTION__ ""
+
+
 
 #ifdef __LINKER__
 #define __builtin_constant_p(x) 1 /* Anything the linker can work with is constant. */

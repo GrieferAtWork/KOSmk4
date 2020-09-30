@@ -28,6 +28,8 @@
 #include <kernel/except.h>
 #include <kernel/vm/rtm.h>
 
+#include <stddef.h>
+
 DECL_BEGIN
 
 /* Define driver init/fini callbacks to register RTM hooks */

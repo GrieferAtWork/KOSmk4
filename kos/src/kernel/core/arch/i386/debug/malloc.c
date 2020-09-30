@@ -23,9 +23,11 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver-param.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
-#include <kernel/driver-param.h>
+
+#include <stddef.h>
 
 #if defined(CONFIG_DEBUG_MALLOC) || defined(CONFIG_DEBUG_HEAP)
 DECL_BEGIN

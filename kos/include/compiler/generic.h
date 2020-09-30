@@ -194,16 +194,26 @@
 #define __builtin_va_list __builtin_va_list
 #endif /* __has_builtin(__builtin_va_list) */
 
-#if !defined(__DCC_VERSION__) && !defined(__FUNCTION__)
-#if defined(__TINYC__) || 1
+#if !__has_builtin(__builtin_LINE)
+#define __builtin_LINE() __LINE__
+#endif /* !__has_builtin(__builtin_LINE) */
+
+#if !__has_builtin(__builtin_FILE)
+#define __builtin_FILE() __FILE__
+#endif /* !__has_builtin(__builtin_FILE) */
+
+#if !__has_builtin(__builtin_FUNCTION)
+#if defined(__DCC_VERSION__) || defined(__FUNCTION__)
+#define __builtin_FUNCTION() __FUNCTION__
+#elif defined(__TINYC__) || 1
 #define __FUNCTION__ __func__
-#elif __has_builtin(__builtin_FUNCTION)
-#define __FUNCTION__ __builtin_FUNCTION()
+#define __builtin_FUNCTION() __func__
 #else /* ... */
-#define __NO_FUNCTION__
-#define __FUNCTION__ (char *)0
+#define __NO_builtin_FUNCTION
+#define __builtin_FUNCTION() (char *)0
+#define __FUNCTION__ ""
 #endif /* !... */
-#endif /* !__DCC_VERSION__ && !__FUNCTION__ */
+#endif /* !__has_builtin(__builtin_FUNCTION) */
 
 #if __has_attribute(__noinline__)
 #define __ATTR_NOINLINE __attribute__((__noinline__))

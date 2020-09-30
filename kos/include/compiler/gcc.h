@@ -782,10 +782,16 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #endif /* !__INTELLISENSE__ */
 
 #if !__has_builtin(__builtin_LINE)
-#define __builtin_LINE()     __LINE__
-#define __builtin_FUNCTION() __FUNCTION__
-#define __builtin_FILE()     __FILE__
+#define __builtin_LINE() __LINE__
 #endif /* !__has_builtin(__builtin_LINE) */
+
+#if !__has_builtin(__builtin_FILE)
+#define __builtin_FILE() __FILE__
+#endif /* !__has_builtin(__builtin_FILE) */
+
+#if !__has_builtin(__builtin_FUNCTION)
+#define __builtin_FUNCTION() __FUNCTION__
+#endif /* !__has_builtin(__builtin_FUNCTION) */
 
 #if !__has_builtin(__builtin_unreachable)
 #define __builtin_unreachable() __XBLOCK({ for (;;); (void)0; })

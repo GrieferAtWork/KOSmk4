@@ -37,6 +37,7 @@
 #include <hw/usb/hub.h>
 #include <hw/usb/usb.h>
 
+#include <stddef.h>
 #include <stdio.h>
 
 DECL_BEGIN

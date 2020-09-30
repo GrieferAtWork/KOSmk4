@@ -293,6 +293,9 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #undef __builtin_assume_has_sideeffects
 #define __builtin_assume(x) __assume(x)
 
+#define __builtin_LINE() __LINE__
+#define __builtin_FILE() __FILE__
+#define __builtin_FUNCTION() __FUNCTION__
 #define __builtin_unreachable() __assume(0)
 #define __COMPILER_ALIGNOF_IS___ALIGNOF
 #define __COMPILER_ALIGNOF __alignof

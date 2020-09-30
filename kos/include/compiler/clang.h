@@ -620,6 +620,23 @@
 #define __XRETURN /* Nothing */
 #define __pragma(...) _Pragma(#__VA_ARGS__)
 
+#if !__has_builtin(__builtin_LINE)
+#define __builtin_LINE() __LINE__
+#endif /* !__has_builtin(__builtin_LINE) */
+
+#if !__has_builtin(__builtin_FILE)
+#define __builtin_FILE() __FILE__
+#endif /* !__has_builtin(__builtin_FILE) */
+
+#if !__has_builtin(__builtin_FUNCTION)
+#ifdef __FUNCTION__
+#define __builtin_FUNCTION() __FUNCTION__
+#else /* __FUNCTION__ */
+#define __FUNCTION__ __func__
+#define __builtin_FUNCTION() __func__
+#endif /* !__FUNCTION__ */
+#endif /* !__has_builtin(__builtin_FUNCTION) */
+
 #if !__has_builtin(__builtin_assume)
 #if 0
 #define __builtin_assume_has_sideeffects

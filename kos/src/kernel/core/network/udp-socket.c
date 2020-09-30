@@ -38,6 +38,7 @@
 #include <network/udp.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN

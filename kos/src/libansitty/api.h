@@ -37,14 +37,14 @@
 #ifdef __KERNEL__
 #include <kernel/printk.h>
 #undef TRACE
-#define DOTRACE(...)      (printk(KERN_RAW "%s(%d) : %s : ",__FILE__,__LINE__,__FUNCTION__),printk(KERN_RAW __VA_ARGS__))
-#define ERROR(err)      do{printk(KERN_RAW "%s(%d) : %s : Error : %s\n",__FILE__,__LINE__,__FUNCTION__,#err); goto err;}__WHILE0
-#define ERRORF(err,...) do{printk(KERN_RAW "%s(%d) : %s : Error : %s : ",__FILE__,__LINE__,__FUNCTION__,#err); printk(KERN_RAW __VA_ARGS__); goto err;}__WHILE0
+#define DOTRACE(...)      (printk(KERN_RAW "%s(%d) : %s : ",__FILE__,__LINE__,__builtin_FUNCTION()),printk(KERN_RAW __VA_ARGS__))
+#define ERROR(err)      do{printk(KERN_RAW "%s(%d) : %s : Error : %s\n",__FILE__,__LINE__,__builtin_FUNCTION(),#err); goto err;}__WHILE0
+#define ERRORF(err,...) do{printk(KERN_RAW "%s(%d) : %s : Error : %s : ",__FILE__,__LINE__,__builtin_FUNCTION(),#err); printk(KERN_RAW __VA_ARGS__); goto err;}__WHILE0
 #else /* __KERNEL__ */
 #include <syslog.h>
-#define DOTRACE(...)      (syslog(LOG_DEBUG,"%s(%d) : %s : ",__FILE__,__LINE__,__FUNCTION__),syslog(LOG_DEBUG,__VA_ARGS__))
-#define ERROR(err)      do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s\n",__FILE__,__LINE__,__FUNCTION__,#err); goto err;}__WHILE0
-#define ERRORF(err,...) do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s : ",__FILE__,__LINE__,__FUNCTION__,#err); syslog(LOG_ERR,__VA_ARGS__); goto err;}__WHILE0
+#define DOTRACE(...)      (syslog(LOG_DEBUG,"%s(%d) : %s : ",__FILE__,__LINE__,__builtin_FUNCTION()),syslog(LOG_DEBUG,__VA_ARGS__))
+#define ERROR(err)      do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s\n",__FILE__,__LINE__,__builtin_FUNCTION(),#err); goto err;}__WHILE0
+#define ERRORF(err,...) do{syslog(LOG_ERR,"%s(%d) : %s : Error : %s : ",__FILE__,__LINE__,__builtin_FUNCTION(),#err); syslog(LOG_ERR,__VA_ARGS__); goto err;}__WHILE0
 #endif /* !__KERNEL__ */
 #define CASE(x)         __IF0{case x: TRACE("%s\n",#x);}
 #endif /* !NDEBUG */

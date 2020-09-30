@@ -30,6 +30,7 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <stddef.h>
 
 #include "gdb.h"
 #include "server.h" /* GDBServer_Features */

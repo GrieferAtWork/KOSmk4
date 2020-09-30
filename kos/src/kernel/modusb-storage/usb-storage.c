@@ -30,6 +30,8 @@
 #include <hw/usb/class.h>
 #include <hw/usb/usb.h>
 
+#include <stddef.h>
+
 #include "scsi.h"
 
 DECL_BEGIN

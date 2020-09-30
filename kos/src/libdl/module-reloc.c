@@ -32,6 +32,7 @@
 #include <kos/syscalls.h>
 
 #include <elf.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>

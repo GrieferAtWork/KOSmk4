@@ -54,6 +54,7 @@
 #include <sys/ucontext.h>
 
 #include <signal.h>
+#include <stddef.h>
 #include <string.h>
 #include <syscall.h>
 
