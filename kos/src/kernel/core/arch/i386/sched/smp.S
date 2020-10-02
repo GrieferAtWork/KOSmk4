@@ -1187,10 +1187,10 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movl   %eax, thiscpu_x86_apic_emutsc_tscbase(R_CPU)
 	movl   %eax, thiscpu_x86_apic_emutsc_tscbase+4(R_CPU)
 #endif /* !__x86_64__ */
-	movl   %eax, thiscpu_x86_apic_emutsc_prev_current(R_CPU)
 	movb   %al, thiscpu_x86_apic_emutsc_early_interrupt(R_CPU)
 	movb   $(7), thiscpu_x86_apic_emutsc_divide(R_CPU)
 	decP   %Pax /* %Pax = UINT[32|64]_MAX */
+	movl   %eax, thiscpu_x86_apic_emutsc_prev_current(R_CPU)
 #ifdef __x86_64__
 	movq   %rax, thiscpu_x86_apic_emutsc_deadline(R_CPU)
 #else /* __x86_64__ */

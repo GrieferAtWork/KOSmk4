@@ -364,6 +364,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 	outb   %al, $(X86_PIC1_CMD)
 .alt_endif
 
+	EXTERN(this_task)
 	movP   %segtls:this_task, %Pbp
 	EXTERN(this_cpu)
 	movP   this_cpu(%Pbp), %Pbx /* THIS_CPU */
@@ -403,7 +404,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 	EXTERN(thiscpu_x86_apic_emutsc_early_interrupt)
 	xchgb  thiscpu_x86_apic_emutsc_early_interrupt(%Pbx), %al
 	testb  %al, %al
-	jz8    1f
+	jnz8   1f
 	/* Advance the timer. */
 	EXTERN(thiscpu_x86_apic_emutsc_tscbase)
 	EXTERN(thiscpu_x86_apic_emutsc_initial_shifted)
@@ -418,9 +419,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 #endif /* !__x86_64__ */
 1:	/* Store the current counter. */
 /*	movP   x86_lapicbase, %Pdi */ /* Had already been loaded */
-	EXTERN(thiscpu_x86_apic_emutsc_initial)
-	movl   thiscpu_x86_apic_emutsc_initial(%Pbx), %eax
-	subl   APIC_TIMER_CURRENT(%Pdi), %eax
+	movl   APIC_TIMER_CURRENT(%Pdi), %eax
 	EXTERN(thiscpu_x86_apic_emutsc_prev_current)
 	movl   %eax, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
 
@@ -454,7 +453,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 	EXTERN(thiscpu_x86_apic_emutsc_early_interrupt)
 	xchgb  thiscpu_x86_apic_emutsc_early_interrupt(%Pbx), %al
 	testb  %al, %al
-	jz8    1f
+	jnz8   1f
 	/* Advance the timer. */
 	EXTERN(thiscpu_x86_apic_emutsc_tscbase)
 	EXTERN(thiscpu_x86_apic_emutsc_initial_shifted)
@@ -477,11 +476,8 @@ INTERN_FUNCTION(x86_idt_preemption)
 	movzwl %cx, %ecx
 
 	/* Store the current counter. */
-	EXTERN(thiscpu_x86_apic_emutsc_initial)
-	movl   thiscpu_x86_apic_emutsc_initial(%Pbx), %eax
-	subl   %ecx, %eax
 	EXTERN(thiscpu_x86_apic_emutsc_prev_current)
-	movl   %eax, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
+	movl   %ecx, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
 
 	/* Check if a deadline has even been set. */
 #ifdef __x86_64__
@@ -642,6 +638,8 @@ INTERN_FUNCTION(x86_load_scpustate_esp)
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
+	.cfi_register %gs.base, %rax
+
 	/* Load segment registers. */
 	ASM_POP_SGREGS_CFI_R(%rcx)
 
@@ -649,6 +647,7 @@ INTERN_FUNCTION(x86_load_scpustate_esp)
 	 * NOTE: This must be done _after_ segment registers were loaded,
 	 *       as the use of `ASM_POP_SGREGS_CFI_R()' clobbered %gs.base! */
 	wrgsbaseq %rax
+	.cfi_same_value %gs.base
 
 	/* Load fsbase and kgsbase */
 	ASM_POP_SGBASE_CFI_R
@@ -773,7 +772,7 @@ INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 	xorb   %cl, %cl
 	xchgb  %cl, thiscpu_x86_apic_emutsc_early_interrupt(%Pbx)
 	testb  %cl, %cl
-	jz8    1f
+	jnz8   1f
 	/*     FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) +=
 	 *         FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted); */
 	EXTERN(thiscpu_x86_apic_emutsc_tscbase)
@@ -791,9 +790,7 @@ INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 	 * } */
 1:	/* FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = (FORCPU(me, thiscpu_x86_apic_emutsc_initial) -
 	 *                                                     lapic_read(APIC_TIMER_CURRENT)); */
-	EXTERN(thiscpu_x86_apic_emutsc_initial)
-	movl   thiscpu_x86_apic_emutsc_initial(%Pbx), %ecx
-	subl   APIC_TIMER_CURRENT(%Pax), %ecx /* NOTE: %Pax was loaded above! */
+	movl   APIC_TIMER_CURRENT(%Pax), %ecx /* NOTE: %Pax was loaded above! */
 	EXTERN(thiscpu_x86_apic_emutsc_prev_current)
 	movl   %ecx, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
 .alt_else
@@ -807,7 +804,7 @@ INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 	xorb   %cl, %cl
 	xchgb  %cl, thiscpu_x86_apic_emutsc_early_interrupt(%Pbx)
 	testb  %cl, %cl
-	jz8    1f
+	jnz8   1f
 	/*     FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) +=
 	 *         FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted); */
 	EXTERN(thiscpu_x86_apic_emutsc_tscbase)
@@ -823,20 +820,15 @@ INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 #endif /* !__x86_64__ */
 	/*     ...
 	 * } */
-1:	/* FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = (FORCPU(me, thiscpu_x86_apic_emutsc_initial) -
-	 *                                                     lapic_read(APIC_TIMER_CURRENT)); */
-	EXTERN(thiscpu_x86_apic_emutsc_initial)
-	movw   thiscpu_x86_apic_emutsc_initial(%Pbx), %cx
+1:	/* FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = lapic_read(APIC_TIMER_CURRENT); */
 
 	/* Read the current PIT counter position. */
 	movb   $(PIT_COMMAND_SELECT_F0 | PIT_COMMAND_ACCESS_FLATCH | PIT_COMMAND_FBINARY), %al
 	outb   %al,  $(PIT_COMMAND)
 	inb    $(PIT_DATA0), %al
-	movb   %al, %ah
+	movb   %al, %cl
 	inb    $(PIT_DATA0), %al
-	xchgb  %al, %ah
-	subw   %ax, %cx
-	EXTERN(thiscpu_x86_apic_emutsc_prev_current)
+	movb   %al, %ch
 	movzwl %cx, %ecx
 	movl   %ecx, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
 .alt_endif

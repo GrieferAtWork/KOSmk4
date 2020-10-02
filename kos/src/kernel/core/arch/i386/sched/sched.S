@@ -303,16 +303,16 @@ PUBLIC_FUNCTION(task_tryyield)
 	ASM_PUSH_SCPUSTATE_AFTER_IRET_CFI_R
 #endif /* !__x86_64__ */
 
-	/* Remember the current scheduler state. */
-	EXTERN(this_sstate)
-	movP   %Psp, %segtls:this_sstate
-
 	EXTERN(this_task)
 	movP   %segtls:this_task, %Pbp
+
+	/* Remember the current scheduler state. */
+	EXTERN(this_sstate)
+	movP   %Psp, this_sstate(%Pbp)
 	movP   %Pbp, %R_fcall1P
 	cli
 	EXTERN(this_cpu)
-	movP   %segtls:this_cpu, %Pbx
+	movP   this_cpu(%Pbp), %Pbx
 	movP   %Pbx, %R_fcall0P
 	EXTERN(sched_intern_yield)
 	call   sched_intern_yield

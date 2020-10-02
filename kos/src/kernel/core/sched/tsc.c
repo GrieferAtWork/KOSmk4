@@ -131,7 +131,6 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t new_ktime) {
 	tsc_hz_t new_hz;
 	new_tsc = tsc_get(me);
 	COMPILER_BARRIER();
-	/*printk(KERN_INFO "tsc_resync_interrupt()\n");*/
 again:
 	old_ktime = FORCPU(me, thiscpu_resync_ktime);
 	if unlikely(old_ktime > new_ktime) {

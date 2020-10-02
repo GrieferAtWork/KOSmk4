@@ -58,7 +58,7 @@ DECL_BEGIN
  * Also note that `sched_quantum_max' only applies for non-infinite quanta,
  * and that `sched_quantum_min' doesn't apply to short delays as the result
  * of accounting to the timeouts of sleeping threads. */
-PUBLIC ktime_t sched_quantum_min = NSEC_PER_SEC / 10000;
+PUBLIC ktime_t sched_quantum_min = NSEC_PER_SEC / 1000;
 PUBLIC ktime_t sched_quantum_max = NSEC_PER_SEC / 20;
 
 /* Delay before a CPU (other than the boot CPU)
@@ -493,16 +493,20 @@ PRIVATE NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_reload_deadline)(struct cpu *__restrict me,
                                             struct task *__restrict caller,
                                             ktime_t quantum_start,
-                                            ktime_t now) {
+                                            ktime_t now,
+                                            tsc_t tsc_now) {
 	struct task *thread;
 	ktime_t deadline;
 	tsc_t tsc_deadline_value;
+	if unlikely(quantum_start > now)
+		quantum_start = now;
 	deadline = (now - quantum_start) / sched.s_runcount;
 	if (deadline < sched_quantum_min)
 		deadline = sched_quantum_min;
 	if (deadline > sched_quantum_max)
 		deadline = sched_quantum_max;
 	deadline += now;
+	assert(deadline >= now);
 	/* Check if we should cut the quantum short due to a sleeping thread. */
 	FOREACH_thiscpu_sleeping(thread, me) {
 		ktime_t distance;
@@ -518,14 +522,16 @@ NOTHROW(FCALL sched_intern_reload_deadline)(struct cpu *__restrict me,
 		if (thrd_priorty_then > next_priorty_then) {
 do_use_sleeping_thread_timeout:
 			deadline = sched_timeout(thread);
+			if unlikely(deadline <= now)
+				return tsc_deadline_passed(me, caller, tsc_now);
 			break;
 		}
 	}
-	if unlikely(deadline <= now)
-		goto deadline_passed;
 
 	/* Convert the effective deadline into a TSC value. */
 	tsc_deadline_value = ktime_future_to_tsc(me, deadline);
+	printk(KERN_DEBUG "sched_intern_reload_deadline(): deadline=%#I64x [%#I64x]\n",
+	       deadline, tsc_deadline_value);
 	/* Set the final TSC deadline to indicate when
 	 * to trigger the next preemptive interrupt. */
 	if (tsc_deadline_value == TSC_MAX) {
@@ -535,7 +541,6 @@ do_use_sleeping_thread_timeout:
 		tsc_now = tsc_deadline(me, tsc_deadline_value);
 		if (tsc_now >= tsc_deadline_value) {
 			/* Deadline has already expired... */
-deadline_passed:
 			caller = tsc_deadline_passed(me, caller, tsc_now);
 		}
 	}
@@ -563,7 +568,7 @@ NOTHROW(FCALL sched_intern_high_priority_switch)(struct cpu *__restrict me,
 	move_thread_pair_to_back_of_runqueue(me, caller, thread, now);
 	/* If requested to, reload the current deadline. */
 	if (reload_deadline)
-		thread = sched_intern_reload_deadline(me, thread, quantum_start, now);
+		thread = sched_intern_reload_deadline(me, thread, quantum_start, now, tsc_now);
 	return thread;
 }
 
@@ -582,6 +587,8 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 	assert(thread->t_cpu == me);
 	sched_assert();
 	flags = thread->t_flags;
+	printk(KERN_TRACE "sched_intern_localwake(%p, %#Ix, %u)\n",
+	       thread, flags, (unsigned int)high_priority);
 	switch (__builtin_expect(flags & (TASK_FRUNNING |
 	                                  TASK_FSTARTED |
 	                                  TASK_FTERMINATED),
@@ -592,10 +599,12 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 		/* Check for special case: wakeup the IDLE thread, when
 		 *                         the IDLE thread isn't loaded.
 		 * -> handle this as a no-op. */
-		if unlikely(thread == &sched_idle && sched_pself(thread) == NULL)
-			break;
-		/* Unlink the thread from the waiting list. */
-		sched_intern_unlink_from_waiting(me, thread);
+		if unlikely(thread == &sched_idle && sched_pself(thread) == NULL) {
+			/* IDLE wasn't apart of the run-queue, so don't try to unlink it! */
+		} else {
+			/* Unlink the thread from the waiting list. */
+			sched_intern_unlink_from_waiting(me, thread);
+		}
 		/* Resume execution of the thread. */
 		ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
 		/* Insert the thread into the run-queue */
@@ -614,7 +623,10 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 			if (high_priority)
 				result = sched_intern_high_priority_switch(me, caller, thread, tsc_now, true);
 			else {
-				result = sched_intern_reload_deadline(me, result, tsc_now, ktime_with_cpu(me));
+				result = sched_intern_reload_deadline(me, result,
+				                                      sched_stoptime(caller),
+				                                      tsc_now_to_ktime(me, tsc_now),
+				                                      tsc_now);
 			}
 		}
 		break;
@@ -661,7 +673,10 @@ NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
 		if (high_priority)
 			result = sched_intern_high_priority_switch(me, caller, thread, tsc_now, true);
 		else {
-			result = sched_intern_reload_deadline(me, caller, tsc_now, ktime_with_cpu(me));
+			result = sched_intern_reload_deadline(me, caller,
+			                                      sched_stoptime(caller),
+			                                      tsc_now_to_ktime(me, tsc_now),
+			                                      tsc_now);
 		}
 	}
 	sched_assert();
@@ -704,6 +719,7 @@ do_switch_to_result:
 PUBLIC NOPREEMPT NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
                                          struct task *__restrict caller) {
+	tsc_t tsc_now;
 	ktime_t now, quantum_start;
 	struct task *result;
 	sched_assert();
@@ -741,7 +757,8 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 	}
 	/* Perform something similar to a high-priority switch */
 	assert(caller != result);
-	now = ktime_with_cpu(me);
+	tsc_now = tsc_get(me);
+	now     = tsc_now_to_ktime(me, tsc_now);
 	/* Gift the remainder of `caller's quantum to `thread' */
 	quantum_start = sched_stoptime(caller);
 	if unlikely(quantum_start > now)
@@ -752,7 +769,7 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 	/* Update the stop timestamp of `next' */
 	move_thread_to_back_of_runqueue(me, result, now);
 	/* Reload the current deadline. */
-	result = sched_intern_reload_deadline(me, result, quantum_start, now);
+	result = sched_intern_reload_deadline(me, result, quantum_start, now, tsc_now);
 	sched_assert();
 	return result;
 }
@@ -836,6 +853,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	struct task *caller = THIS_TASK;
 	struct cpu *me;
 	ktime_t now, timeout, quantum_start;
+	tsc_t tsc_now;
 	PREEMPTION_DISABLE();
 	me = ATOMIC_READ(caller->t_cpu);
 	sched_assert();
@@ -882,7 +900,6 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 		sched_assert();
 	} else {
 		/* Unlink from the run queue. */
-		assert(caller != &sched_idle);
 		assert(sched.s_runcount >= 2);
 		if (sched.s_running_last == caller)
 			sched.s_running_last = sched_prev(caller);
@@ -896,7 +913,10 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	assert(next);
 	assert(next != caller);
 	assert(next->t_flags & TASK_FRUNNING);
-	now = ktime_with_cpu(me);
+	tsc_now = tsc_get(me);
+	now     = tsc_now_to_ktime(me, tsc_now);
+	printk(KERN_TRACE "task_sleep(%p, %#I64x) [now:%#I64x,dist:%#I64x]\n",
+	       caller, timeout, now, timeout >= now ? (u64)(timeout - now) : (u64)0);
 
 	/* Gift the remainder of `caller's quantum to `thread' */
 	quantum_start = sched_stoptime(caller);
@@ -915,7 +935,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	sched_intern_add_to_waitqueue(me, caller, timeout);
 
 	/* Reload the current deadline. */
-	next = sched_intern_reload_deadline(me, next, quantum_start, now);
+	next = sched_intern_reload_deadline(me, next, quantum_start, now, tsc_now);
 
 	/* Continue execution in the next thread. */
 	assert(next->t_flags & TASK_FRUNNING);
@@ -970,13 +990,17 @@ NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
 	tsc_t tsc_deadline_value;
 	/* Check for special case: a scheduler override is present.
 	 * Note that this should really happen, since setting a scheduler
-	 * override should call `tsc_nodeadline()' */
+	 * override should have already called `tsc_nodeadline()'...
+	 * We check this anyways to prevent race conditions, as well as
+	 * to allow a scheduler override to use TSC deadlines. */
 	if unlikely(FORCPU(me, thiscpu_sched_override))
 		return FORCPU(me, thiscpu_sched_override);
 	sched_assert();
 	/* Calculate the current scheduler time. */
 again_with_tsc_now:
 	now = tsc_now_to_ktime(me, tsc_now);
+	printk(KERN_DEBUG "tsc_deadline_passed(%p,%p,%#I64x) [now:%#I64x]\n",
+	       me, caller, tsc_now, now);
 again:
 	/* Select the thread with the lowest stop-time as successor. */
 	next          = sched.s_running;
@@ -989,11 +1013,14 @@ again:
 		if unlikely(sched_stoptime(thread) > next_priority)
 			break; /* Thread priority too low for a wake-up */
 		/* Wake-up the thread. */
+do_timeout_thread:
 		sched_intern_unlink_from_waiting(me, thread);
 		ATOMIC_OR(thread->t_flags, TASK_FRUNNING | TASK_FTIMEOUT);
 		sched_intern_add_to_runqueue(me, thread);
 		goto again;
 	}
+	if unlikely(next_priority > now)
+		next_priority = now; /* Shouldn't happen (TM) */
 	/* This is the primary deadline formula that
 	 * enables us to do preemptive multitasking. */
 	deadline = /*now + */ (now - next_priority) / sched.s_runcount;
@@ -1020,8 +1047,14 @@ again:
 		deadline += now;
 		if (sched.s_runcount == 1) {
 			deadline = (ktime_t)-1;
+		} else {
+			/* Account for time spent being active. */
+			sched_activetime(caller) += now - sched_stoptime(caller);
+			/* Update the stop timestamp of `caller' */
+			move_thread_to_back_of_runqueue(me, caller, now);
 		}
 	}
+	assert(deadline >= now);
 	/* Check if we should cut the quantum short due to a sleeping thread. */
 	FOREACH_thiscpu_sleeping(thread, me) {
 		ktime_t distance;
@@ -1037,6 +1070,10 @@ again:
 		if (thrd_priorty_then > next_priorty_then) {
 do_use_sleeping_thread_timeout:
 			deadline = sched_timeout(thread);
+			if unlikely(deadline <= now) {
+				caller = next;
+				goto do_timeout_thread;
+			}
 			break;
 		}
 	}
@@ -1044,6 +1081,8 @@ do_use_sleeping_thread_timeout:
 
 	/* Convert the effective deadline into a TSC value. */
 	tsc_deadline_value = ktime_future_to_tsc(me, deadline);
+	printk(KERN_DEBUG "tsc_deadline_passed(): deadline=%#I64x [%#I64x]\n",
+	       deadline, tsc_deadline_value);
 
 	/* Set the final TSC deadline to indicate when
 	 * to trigger the next preemptive interrupt. */
