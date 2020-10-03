@@ -178,9 +178,78 @@ NOTHROW(FCALL _sched_assert)(struct cpu *__restrict me) {
 		pself     = &sched_next(iter);
 	}
 }
+
+#define sched_assert_in_runqueue(thread) _sched_assert_in_runqueue(me, thread)
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL _sched_assert_in_runqueue)(struct cpu *__restrict me,
+                                         struct task *__restrict thread) {
+	do {
+		struct task *iter;
+		FOREACH_thiscpu_running(iter, me) {
+			if (iter == thread)
+				return;
+		}
+	} while (__assertion_checkf("thread IN sched.s_running",
+	                            "Thread %p isn't apart of the run-queue of cpu #%u",
+	                            thread, me->c_id));
+}
+
+#define sched_assert_not_in_runqueue(thread) _sched_assert_not_in_runqueue(me, thread)
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL _sched_assert_not_in_runqueue)(struct cpu *__restrict me,
+                                             struct task *__restrict thread) {
+	struct task *iter;
+again:
+	FOREACH_thiscpu_running(iter, me) {
+		if (iter == thread) {
+			if (!__assertion_checkf("thread !IN sched.s_running",
+			                        "Thread %p is apart of the run-queue of cpu #%u",
+			                        thread, me->c_id))
+				return;
+			goto again;
+		}
+	}
+}
+
+#define sched_assert_in_waitqueue(thread) _sched_assert_in_waitqueue(me, thread)
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL _sched_assert_in_waitqueue)(struct cpu *__restrict me,
+                                          struct task *__restrict thread) {
+	do {
+		struct task *iter;
+		FOREACH_thiscpu_waiting(iter, me) {
+			if (iter == thread)
+				return;
+		}
+	} while (__assertion_checkf("thread IN sched.s_waiting",
+	                            "Thread %p isn't apart of the wait-queue of cpu #%u",
+	                            thread, me->c_id));
+}
+
+#define sched_assert_not_in_waitqueue(thread) _sched_assert_not_in_waitqueue(me, thread)
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
+NOTHROW(FCALL _sched_assert_not_in_waitqueue)(struct cpu *__restrict me,
+                                             struct task *__restrict thread) {
+	struct task *iter;
+again:
+	FOREACH_thiscpu_waiting(iter, me) {
+		if (iter == thread) {
+			if (!__assertion_checkf("thread !IN sched.s_waiting",
+			                        "Thread %p is apart of the wait-queue of cpu #%u",
+			                        thread, me->c_id))
+				return;
+			goto again;
+		}
+	}
+}
+
 #else /* !NDEBUG */
 #define SCHED_ASSERT_IS_NOOP
-#define sched_assert() (void)0
+#define sched_assert()                        (void)0
+#define sched_assert_in_runqueue(thread)      (void)0
+#define sched_assert_in_waitqueue(thread)     (void)0
+#define sched_assert_not_in_runqueue(thread)  (void)0
+#define sched_assert_not_in_waitqueue(thread) (void)0
 #endif /* NDEBUG */
 
 
@@ -269,7 +338,7 @@ NOTHROW(FCALL sched_intern_add_to_runqueue)(struct cpu *__restrict me,
 	ktime_t thread_stoptime;
 	struct task *neighbor;
 	sched_assert();
-	/* TODO: Assert that `thread' isn't apart of the run-queue */
+	sched_assert_not_in_runqueue(thread);
 	assert(thread->t_flags & TASK_FRUNNING);
 	neighbor = sched.s_running_last;
 	thread_stoptime = sched_stoptime(thread);
@@ -289,6 +358,7 @@ NOTHROW(FCALL sched_intern_add_to_runqueue)(struct cpu *__restrict me,
 		LLIST_INSERT_BEFORE_P(thread, neighbor, sched_link);
 	}
 	++sched.s_runcount;
+	sched_assert_in_runqueue(thread);
 	sched_assert();
 }
 
@@ -300,7 +370,7 @@ NOTHROW(FCALL sched_intern_add_to_waitqueue)(struct cpu *__restrict me,
 	struct task *last_waiting;
 	sched_assert();
 	assert(!(thread->t_flags & TASK_FRUNNING));
-	/* TODO: Assert that `thread' isn't apart of the wait-queue */
+	sched_assert_not_in_waitqueue(thread);
 	last_waiting = sched.s_waiting_last;
 	assert((last_waiting != NULL) ==
 	       (sched_s_waiting != NULL));
@@ -333,6 +403,7 @@ NOTHROW(FCALL sched_intern_add_to_waitqueue)(struct cpu *__restrict me,
 		sched.s_waiting_last     = thread;
 	}
 	sched_timeout(thread) = timeout;
+	sched_assert_in_waitqueue(thread);
 	sched_assert();
 }
 
@@ -342,7 +413,7 @@ NOTHROW(FCALL sched_intern_unlink_from_waiting)(struct cpu *__restrict me,
                                                 /*out*/REF struct task *__restrict thread) {
 	struct task *next;
 	sched_assert();
-	/* TODO: Assert that `thread' is apart of the wait-queue */
+	sched_assert_in_waitqueue(thread);
 	assert(sched_s_waiting != NULL);
 	assert(!(thread->t_flags & TASK_FRUNNING));
 	next = sched_next(thread);
@@ -358,6 +429,7 @@ NOTHROW(FCALL sched_intern_unlink_from_waiting)(struct cpu *__restrict me,
 		if (sched.s_waiting_last == sched.s_running_last)
 			sched.s_waiting_last = NULL;
 	}
+	sched_assert_not_in_waitqueue(thread);
 	sched_assert();
 }
 
@@ -372,8 +444,8 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
                                                     ktime_t new_stop_time) {
 	/* Update stop timestamps of `caller' and `thread' */
 	sched_assert();
-	/* TODO: Assert that `caller' is apart of the run-queue */
-	/* TODO: Assert that `thread' is apart of the run-queue */
+	sched_assert_in_runqueue(thread);
+	sched_assert_in_runqueue(caller);
 	assert(sched.s_runcount >= 2);
 	if (sched.s_runcount == 2) {
 		struct task *waiting;
@@ -445,7 +517,7 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
                                                struct task *__restrict thread,
                                                ktime_t new_stop_time) {
 	sched_assert();
-	/* TODO: Assert that `thread' is apart of the run-queue */
+	sched_assert_in_runqueue(thread);
 	/* Update stop timestamp of `thread' */
 	if unlikely(sched.s_runcount == 1) {
 		assert(sched.s_running == thread);
@@ -519,7 +591,7 @@ NOTHROW(FCALL sched_intern_reload_deadline)(struct cpu *__restrict me,
 	deadline += now;
 	assert(deadline >= now);
 	/* Check if we should cut the quantum short due to a sleeping thread. */
-	FOREACH_thiscpu_sleeping(thread, me) {
+	FOREACH_thiscpu_waiting(thread, me) {
 		ktime_t distance;
 		ktime_t next_priorty_then;
 		ktime_t thrd_priorty_then;
@@ -1025,7 +1097,7 @@ again:
 	next          = sched.s_running;
 	next_priority = sched_stoptime(next);
 	/* Check the timeouts of sleeping threads. */
-	FOREACH_thiscpu_sleeping(thread, me) {
+	FOREACH_thiscpu_waiting(thread, me) {
 		assert(!(thread->t_flags & TASK_FRUNNING));
 		if (sched_timeout(thread) > now)
 			break; /* No more threads that have timed out. */
@@ -1075,7 +1147,7 @@ do_timeout_thread:
 	}
 	assert(deadline >= now);
 	/* Check if we should cut the quantum short due to a sleeping thread. */
-	FOREACH_thiscpu_sleeping(thread, me) {
+	FOREACH_thiscpu_waiting(thread, me) {
 		ktime_t distance;
 		ktime_t next_priorty_then;
 		ktime_t thrd_priorty_then;
