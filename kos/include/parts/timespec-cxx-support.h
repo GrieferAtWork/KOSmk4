@@ -180,10 +180,10 @@
 		        (tv_sec == __other.tv_sec && tv_nsec >= __other.tv_nsec)); \
 	}
 
-#define __TIMESPEC_CXX_SUPPORT2(T, TV_SEC_TYPE, TV_NSEC_TYPE)   \
-	__CXX_CLASSMEMBER __NOBLOCK T                               \
-	operator*(unsigned int __n, T const &__tmv)__CXX_NOEXCEPT { \
-		return __tmv * __n;                                     \
+#define __TIMESPEC_CXX_SUPPORT2(T, TV_SEC_TYPE, TV_NSEC_TYPE)    \
+	__CXX_CLASSMEMBER __NOBLOCK T                                \
+	operator*(unsigned int __n, T const &__tmv) __CXX_NOEXCEPT { \
+		return __tmv * __n;                                      \
 	}
 
 #else /* __cplusplus && __USE_KOS */

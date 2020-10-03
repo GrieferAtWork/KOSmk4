@@ -1447,10 +1447,10 @@ NOTHROW(KCALL keyboard_device_init)(struct keyboard_device *__restrict self,
 	self->cd_type.ct_stat  = &keyboard_device_stat;
 	self->cd_type.ct_poll  = &keyboard_device_poll;
 	self->kd_flags = K_UNICODE; /* Use unicode by default. */
-	/* Enable DBGF12 by default when building with debug enabled. */
-#if !defined(NDEBUG) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
+	/* Enable DBGF12 by default when building with the builtin debugger enabled. */
+#if !defined(CONFIG_NO_DEBUGGER) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
 	self->kd_flags |= KEYBOARD_DEVICE_FLAG_DBGF12;
-#endif /* !NDEBUG && KEYBOARD_DEVICE_FLAG_DBGF12 */
+#endif /* !CONFIG_NO_DEBUGGER && KEYBOARD_DEVICE_FLAG_DBGF12 */
 	keymap_init_en_US(&self->kd_map);
 	mutex_cinit(&self->kd_leds_lock);
 	atomic_rwlock_cinit(&self->kd_map_lock);

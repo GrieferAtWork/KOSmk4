@@ -81,7 +81,11 @@
 	((1 << _IOC_KOSSHIFT) | _IOC(dir, type, nr, size))
 #endif /* _IOC_KOSSHIFT */
 
+#ifdef __USE_KOS_ALTERATIONS
+#define _IOC_TYPECHECK(t) sizeof(*(t *)0)
+#else /* __USE_KOS_ALTERATIONS */
 #define _IOC_TYPECHECK(t) sizeof(t)
+#endif /* !__USE_KOS_ALTERATIONS */
 
 /* used to create numbers */
 #define _IO(type, nr)          _IOC(_IOC_NONE, (type), (nr), 0)

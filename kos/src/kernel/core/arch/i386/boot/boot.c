@@ -55,34 +55,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
-#if 0
-#include <assert.h>
-#include <sched/tsc.h>
-#include <sched/cpu.h>
-
-PRIVATE void test_tsc() {
-	struct cpu *me = THIS_CPU;
-	PREEMPTION_DISABLE();
-	for (;;) {
-		tsc_t now, deadline, distance;
-		ktime_t nano_distance;
-		now      = tsc_get(me);
-		deadline = now + (FORCPU(me, thiscpu_tsc_hz) / 1000);
-		if ((now = tsc_deadline(me, deadline)) < deadline) {
-			do {
-				PREEMPTION_ENABLE_WAIT_DISABLE();
-			} while ((now = tsc_get(me)) < deadline);
-		}
-		distance      = now - deadline;
-		nano_distance = (distance * FORCPU(me, thiscpu_tsc_hz)) / 1000000000;
-		printk(KERN_TRACE "HERE: %I64u (deadline: %I64u, distance: [nano:0.%09I64u] %I64u)\n",
-		       now, deadline, nano_distance, distance);
-	}
-	PREEMPTION_ENABLE();
-}
-#endif
-
-
 PUBLIC ATTR_USED ATTR_SECTION(".bss")
 struct fcpustate32 boot_cpustate;
 PUBLIC ATTR_USED ATTR_SECTION(".data.cold")
@@ -430,7 +402,14 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
-//	test_tsc();
+	/* TODO: Running `playground fault' (on a secondary CPU), followed by `l' within the debugger
+	 *       will cause the kernel to lock up, where the secondary CPU will keep on waiting for
+	 *       a part of playground's .debug_str section to be loaded.
+	 *       Why that particular portion of memory doesn't end up being loaded, I don't know,
+	 *       but it only happens if it's a secondary CPU that's waiting.
+	 * NOTE: This may be related to a situation where a secondary CPU will sporadically not receive
+	 *       a wake-up request sent by another CPU. And I'm guessing the problem causing all of this
+	 *       is located somewhere within the new scheduler. */
 
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:

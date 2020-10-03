@@ -59,7 +59,7 @@ locals_format_printer(void *UNUSED(format_arg),
                       pformatprinter printer, void *arg,
                       unsigned int format_option) {
 	char const *format;
-	if (format_option & 1)
+	if (DEBUGINFO_PRINT_FORMAT_ISSUFFIX(format_option))
 		format = AC_DEFATTR;
 	else {
 		switch (format_option) {

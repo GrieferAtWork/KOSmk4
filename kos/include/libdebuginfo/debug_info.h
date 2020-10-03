@@ -112,6 +112,8 @@
 #define DEBUGINFO_PRINT_FORMAT_ASSIGN_SUFFIX    0x0023 /* ... */
 #define DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX   0x0024 /* Prefix for unknown (raw) data */
 #define DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX   0x0025 /* ... */
+#define DEBUGINFO_PRINT_FORMAT_ISPREFIX(x) (!((x) & 1))
+#define DEBUGINFO_PRINT_FORMAT_ISSUFFIX(x) ((x) & 1)
 
 
 #ifdef __CC__

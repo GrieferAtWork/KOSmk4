@@ -5,12 +5,17 @@
 #define __declspec(...)
 #define __volatile volatile
 #define __volatile__ volatile
+#define explicit
+#define constexpr
 #define __const const
 #define __const__ const
 #define __label__
 #define typeof decltype
 #define __typeof decltype
 #define __typeof__ decltype
+#define _Complex
+#define __complex
+#define __complex__
 #define _Atomic
 #define __thread
 #define __auto_type auto
@@ -232,12 +237,12 @@
 #define THROWING(x) x
 #define __THROWING(x) x
 
-#define DECL_BEGIN
-#define __DECL_BEGIN
-#define __SYSDECL_BEGIN
-#define DECL_END
-#define __DECL_END
-#define __SYSDECL_END
+#define DECL_BEGIN extern "C" {
+#define __DECL_BEGIN extern "C" {
+#define __SYSDECL_BEGIN extern "C" {
+#define DECL_END }
+#define __DECL_END }
+#define __SYSDECL_END }
 
 #define NULL 0
 #define __NULLPTR 0
@@ -480,8 +485,8 @@
 #define __CXX_DELETE_COPY(T) T(T const&)
 #define __CXX_DELETE_COPY_ASSIGN(T) T&operator=(T const&)
 #define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T&operator=(T const&)volatile
-#define __CXXDECL_BEGIN
-#define __CXXDECL_END
+#define __CXXDECL_BEGIN extern "C++" {
+#define __CXXDECL_END }
 #define __CXX_THROWS(...)
 
 #define NONNULL(...)
@@ -672,6 +677,13 @@
 #define __LOCAL_LIBC(name)
 #define __LOCAL_LIBC_DATA(name)
 #define __LOCAL_LIBC_CONST_DATA(name)
+
+#define __LIBM_LOCAL_DECLARE_BEGIN                  namespace __local_imp {
+#define __LIBM_LOCAL_DECLARE_END                    }
+#define __LIBM_LOCAL_DECLARE(T, name, value)        T const __libm_##name;
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n, ...) T const __libm_##name[n];
+#define __LIBM_LOCAL_VALUE(name)                    ::__local_imp::__libm_##name
+
 
 #define __ATTR_LIBC_PRINTF(a,b)
 #define ATTR_LIBC_PRINTF(a,b)
@@ -900,19 +912,19 @@
 #define _GLIBCXX_CONST
 #define _GLIBCXX_NORETURN
 #define _GLIBCXX_NOTHROW
-#define _GLIBCXX_VISIBILITY(V)
+#define _GLIBCXX_VISIBILITY(x)
 #define _GLIBCXX_DEPRECATED
 #define _GLIBCXX17_DEPRECATED
 #define _GLIBCXX_ABI_TAG_CXX11
 #define _GLIBCXX_NODISCARD
-#define _GLIBCXX_CONSTEXPR      constexpr
-#define _GLIBCXX_USE_CONSTEXPR  constexpr
-#define _GLIBCXX14_CONSTEXPR    constexpr
-#define _GLIBCXX17_CONSTEXPR    constexpr
-#define _GLIBCXX20_CONSTEXPR    constexpr
+#define _GLIBCXX_CONSTEXPR
+#define _GLIBCXX_USE_CONSTEXPR
+#define _GLIBCXX14_CONSTEXPR
+#define _GLIBCXX17_CONSTEXPR
+#define _GLIBCXX20_CONSTEXPR
 #define _GLIBCXX17_INLINE
 #define _GLIBCXX_NOEXCEPT
-#define _GLIBCXX_NOEXCEPT_IF(c)
+#define _GLIBCXX_NOEXCEPT_IF(x)
 #define _GLIBCXX_USE_NOEXCEPT
 #define _GLIBCXX_THROW(x)
 #define _GLIBCXX_NAMESPACE_CXX11       __cxx11::
@@ -937,6 +949,20 @@
 #define _GLIBCXX_END_EXTERN_C
 #define _GLIBCXX_TXN_SAFE
 #define _GLIBCXX_TXN_SAFE_DYN
+#define _GLIBCXX_ALWAYS_INLINE
+#define _GLIBCXX_NOEXCEPT_PARM
+#define _GLIBCXX_NOEXCEPT_QUAL
+#define __try if(1)
+#define __catch(...) if(0)
+#define __glibcxx_function_requires(...)
+#define __glibcxx_class_requires(...)
+#define __glibcxx_class_requires2(...)
+#define __glibcxx_class_requires3(...)
+#define __glibcxx_class_requires4(...)
+#define __gthrw2(...)
+#define __gthrw_(x) x
+#define __gthrw(...)
+#define _GLIBCXX_GTHRW(x) int __glibcxx_##x(pthread_rwlock_t *rwlock);
 
 #define __HYBRID_FUNCPTR32(return,cc,name,args) return (cc *name)args
 #define __HYBRID_FUNCPTR64(return,cc,name,args) return (cc *name)args
@@ -1084,6 +1110,10 @@
 #define NCURSES_WRAPPED_VAR(t,x) t _nc_##x(void)
 #define NCURSES_CONST const
 #define NCURSES_SBOOL char
+#define NCURSES_CPP_TRY
+#define NCURSES_CPP_CATCH(e) if(0)
+#define NCURSES_FIELD_INTERNALS
+#define THROW2(...)
 #define UNDEF(x) CUR_##x
 
 #define ANSITTY_INTERNAL(x) x
@@ -1095,14 +1125,12 @@
 #define __ASM_ARG(x)
 #define __ASM_L(...)
 
-#define __CRT_PRIVATE_SINT2(sizeof) int
-#define __CRT_PRIVATE_UINT2(sizeof) unsigned
-#define __CRT_PRIVATE_SLNG2(sizeof) long
-#define __CRT_PRIVATE_ULNG2(sizeof) unsigned long
 #define __CRT_PRIVATE_SINT(sizeof)  int
 #define __CRT_PRIVATE_UINT(sizeof)  unsigned
 #define __CRT_PRIVATE_SLNG(sizeof)  long
 #define __CRT_PRIVATE_ULNG(sizeof)  unsigned long
+#define __TYPEFOR_INTIB(n)          int
+#define __TYPEFOR_UINTIB(n)         unsigned
 
 #define DECLARE_PREALLOCATION_CACHE(decl,name,T)          T *name##_alloc(gfp_t alloc_flags); void name##_free(T *p); size_t name##_clear(void);
 #define DECLARE_PREALLOCATION_CACHE_ALLOC_NX(decl,name,T) T *name##_alloc_nx(gfp_t alloc_flags);
@@ -1160,7 +1188,57 @@
 #define DEFINE_PERTASK_CLONE(func)
 #define DEFINE_PERTASK_ONEXIT(func)
 
+#define __PRIVATE_CXX_DEFINE_COMPARE_EXCHANGE(T) \
+	bool compare_exchange_weak(T &exp, T val, memory_order succ, memory_order fail); bool compare_exchange_weak(T &exp, T val, memory_order succ, memory_order fail) volatile; \
+	bool compare_exchange_weak(T &exp, T val, memory_order order = memory_order_seq_cst); bool compare_exchange_weak(T &exp, T val, memory_order order = memory_order_seq_cst) volatile; \
+	bool compare_exchange_strong(T &exp, T val, memory_order succ, memory_order fail); bool compare_exchange_strong(T &exp, T val, memory_order succ, memory_order fail) volatile; \
+	bool compare_exchange_strong(T &exp, T val, memory_order order = memory_order_seq_cst); bool compare_exchange_strong(T &exp, T val, memory_order order = memory_order_seq_cst) volatile; \
+	bool cmpxch(T oldv, T newv, memory_order succ, memory_order fail); bool cmpxch(T oldv, T newv, memory_order succ, memory_order fail) volatile; \
+	bool cmpxch(T oldv, T newv, memory_order order = memory_order_seq_cst); bool cmpxch(T oldv, T newv, memory_order order = memory_order_seq_cst) volatile; \
+	T cmpxch_val(T oldv, T newv, memory_order succ, memory_order fail); T cmpxch_val(T oldv, T newv, memory_order succ, memory_order fail) volatile; \
+	T cmpxch_val(T oldv, T newv, memory_order order = memory_order_seq_cst); T cmpxch_val(T oldv, T newv, memory_order order = memory_order_seq_cst) volatile; \
+	bool cmpxch_weak(T oldv, T newv, memory_order succ, memory_order fail); bool cmpxch_weak(T oldv, T newv, memory_order succ, memory_order fail) volatile; \
+	bool cmpxch_weak(T oldv, T newv, memory_order order = memory_order_seq_cst); bool cmpxch_weak(T oldv, T newv, memory_order order = memory_order_seq_cst) volatile; \
+	T cmpxch_val_weak(T oldv, T newv, memory_order succ, memory_order fail); T cmpxch_val_weak(T oldv, T newv, memory_order succ, memory_order fail) volatile; \
+	T cmpxch_val_weak(T oldv, T newv, memory_order order = memory_order_seq_cst); T cmpxch_val_weak(T oldv, T newv, memory_order order = memory_order_seq_cst) volatile;
+#define __PRIVATE_CXX_ATOMIC_SPECIALIZE_INTEGRAL(T)
+#define __TIMEVAL_CXX_DECL_BEGIN extern "C++" {
+#define __TIMEVAL_CXX_DECL_END }
+#define __TIMEVAL_CXX_SUPPORT(T, TV_SEC_TYPE, TV_USEC_TYPE) \
+	void add_microseconds(TV_USEC_TYPE n); void sub_microseconds(TV_USEC_TYPE n); \
+	void add_milliseconds(TV_USEC_TYPE n); void sub_milliseconds(TV_USEC_TYPE n); \
+	T &operator+=(T const &other); T &operator-=(T const &other); \
+	T &operator*=(unsigned int n); T &operator/=(unsigned int n); \
+	T &operator%=(unsigned int n); T operator+(T const &other) const; \
+	T operator-(T const &other) const; T operator*(unsigned int n) const; \
+	T operator/(unsigned int n) const; T operator%(unsigned int n); \
+	bool operator==(T const &other) const; bool operator!=(T const &other) const; \
+	bool operator<(T const &other) const; bool operator<=(T const &other) const; \
+	bool operator>(T const &other) const; bool operator>=(T const &other) const;
+#define __TIMEVAL_CXX_SUPPORT2(T, TV_SEC_TYPE, TV_USEC_TYPE) \
+	T operator*(unsigned int n, T const &tmv);
+#define __TIMESPEC_CXX_DECL_BEGIN extern "C++" {
+#define __TIMESPEC_CXX_DECL_END }
+#define __TIMESPEC_CXX_SUPPORT(T, TV_SEC_TYPE, TV_NSEC_TYPE) \
+	void add_nanoseconds(TV_NSEC_TYPE n); void sub_nanoseconds(TV_NSEC_TYPE n); \
+	void add_microseconds(TV_USEC_TYPE n); void sub_microseconds(TV_USEC_TYPE n); \
+	void add_milliseconds(TV_USEC_TYPE n); void sub_milliseconds(TV_USEC_TYPE n); \
+	T &operator+=(T const &other); T &operator-=(T const &other); \
+	T &operator*=(unsigned int n); T &operator/=(unsigned int n); \
+	T &operator%=(unsigned int n); T operator+(T const &other) const; \
+	T operator-(T const &other) const; T operator*(unsigned int n) const; \
+	T operator/(unsigned int n) const; T operator%(unsigned int n); \
+	bool operator==(T const &other) const; bool operator!=(T const &other) const; \
+	bool operator<(T const &other) const; bool operator<=(T const &other) const; \
+	bool operator>(T const &other) const; bool operator>=(T const &other) const;
+#define __TIMESPEC_CXX_SUPPORT2(T, TV_SEC_TYPE, TV_NSEC_TYPE) \
+	T operator*(unsigned int n, T const &tmv);
+#define __USERKERN_PAD_PID(x)
+#define __USERKERN_PAD_UID(x)
+#define __USERKERN_PAD_GID(x)
 
+
+#define BZ_EXTERN
 #define BZ_API(f) f
 #define PIXMAN_API
 #define _Xconst const
@@ -1180,8 +1258,8 @@
 #define B32
 #define B16
 #define DRM_PRINTFLIKE(f,a)
-#define FT_BEGIN_HEADER
-#define FT_END_HEADER
+#define FT_BEGIN_HEADER extern "C" {
+#define FT_END_HEADER }
 #define FT_LOCAL(x) x
 #define FT_LOCAL_DEF(x) x
 #define FT_LOCAL_ARRAY(x) const x
@@ -1196,6 +1274,9 @@
 #define FT_BASE_CALLBACK_DEF(x) x
 #define FT_CALLBACK_TABLE
 #define FT_CALLBACK_TABLE_DEF
+#define FT_ENC_TAG(x, ...) x
+#define FT_IMAGE_TAG(x, ...) x
+#define FT_DEPRECATED_ATTRIBUTE
 #define PNG_CONST const
 #define PNGARG(x) x
 #define PNGAPI
@@ -1216,8 +1297,9 @@
 #define PNG_DEPRECATED
 #define PNG_PRIVATE
 #define PNG_RESTRICT restrict
-#define PNG_FP_EXPORT(v,x,y,z) x y z
-#define PNG_FIXED_EXPORT(v,x,y,z) x y z
+#define PNG_FP_EXPORT(v,x,y,z) x y z;
+#define PNG_FIXED_EXPORT(v,x,y,z) x y z;
+#define PNG_REMOVED(v,x,y,z,a)
 #define DECLARE_DEPRECATED(f) f;
 #define OF(x) x
 #define Z_ARG(x) x
@@ -1282,6 +1364,8 @@
 #define externaldef(psect)
 #define _XtShell_h_Const const
 #define DLMALLOC_EXPORT
+#define FFI_API
+#define FFI_EXTERN
 
 
 /* All of these are only here to make code navigation use non-escaped type names */

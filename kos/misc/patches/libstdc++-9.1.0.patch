@@ -2370,18 +2370,6 @@ diff -Naur 9.1.0-orig/thread 9.1.0/thread
      }
  
    /** @namespace std::this_thread
-diff -Naur 9.1.0-orig/tr1/cctype 9.1.0/tr1/cctype
---- 9.1.0-orig/tr1/cctype	2019-07-16 14:21:09.889938500 +0200
-+++ 9.1.0/tr1/cctype	2019-07-16 16:19:59.931348000 +0200
-@@ -40,7 +40,7 @@
- {
- namespace tr1
- {
--  using ::isblank;
-+  using ::(isblank);
- }
- }
- 
 diff -Naur 9.1.0-orig/tr1/regex 9.1.0/tr1/regex
 --- 9.1.0-orig/tr1/regex	2019-07-16 14:21:11.295167300 +0200
 +++ 9.1.0/tr1/regex	2019-07-16 16:29:38.996650800 +0200
