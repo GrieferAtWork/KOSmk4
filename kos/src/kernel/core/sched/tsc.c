@@ -82,7 +82,7 @@ PRIVATE ATTR_PERCPU struct timestamp thiscpu_startup = { 0, 0 }; /* Startup time
 PRIVATE ATTR_PERCPU struct timestamp thiscpu_basetime = { 0, 0 }; /* Baseline timestamp. */
 
 
-PRIVATE NOBLOCK WUNUSED tsc_hz_t
+PRIVATE NOBLOCK WUNUSED ATTR_CONST tsc_hz_t
 NOTHROW(FCALL calculate_hz)(tsc_t tsc, ktime_t time, bool ceildiv) {
 	tsc_hz_t result;
 	if (OVERFLOW_UMUL(tsc, NSEC_PER_SEC, &result)) {
@@ -341,8 +341,8 @@ NOTHROW(FCALL tsc_resync_init)(struct cpu *__restrict me) {
 }
 
 /* Convert a given `tsc' value into the corresponding ktime offset. */
-PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) ktime_t
-NOTHROW(FCALL tsc_to_ktime)(struct cpu *__restrict me,
+PUBLIC NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) ktime_t
+NOTHROW(FCALL tsc_to_ktime)(struct cpu const *__restrict me,
                             tsc_t tsc) {
 	ktime_t result;
 	/* Determine the TSC offset since the last re-sync */
@@ -461,8 +461,8 @@ hz_overflow:
 /* Convert a given `kt' timestamp into its TSC equivalent.
  * When `kt' lies so far into the future that TSC would overflow, return `TSC_MAX' instead.
  * NOTE: It is assumed that return >= <any `now' ever passed to `tsc_now_to_ktime'> */
-PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
-NOTHROW(FCALL ktime_future_to_tsc)(struct cpu *__restrict me,
+PUBLIC NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) tsc_t
+NOTHROW(FCALL ktime_future_to_tsc)(struct cpu const *__restrict me,
                                    ktime_t kt) {
 	ktime_t distance;
 	tsc_t result;
@@ -489,8 +489,8 @@ infinite:
 }
 
 /* Same as `ktime_future_to_tsc()', but make no assumptions on `kt' being in the future. */
-PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
-NOTHROW(FCALL ktime_to_tsc)(struct cpu *__restrict me,
+PUBLIC NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) tsc_t
+NOTHROW(FCALL ktime_to_tsc)(struct cpu const *__restrict me,
                             ktime_t kt) {
 	ktime_t distance;
 	tsc_t result;
@@ -526,8 +526,8 @@ infinite:
 
 
 /* Convert a ktime offset (read: not an absolute timestamp) to the equivalent # of TSC units. */
-PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
-NOTHROW(FCALL ktime_offset_to_tsc)(struct cpu *__restrict me,
+PUBLIC NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) tsc_t
+NOTHROW(FCALL ktime_offset_to_tsc)(struct cpu const *__restrict me,
                                    ktime_t num_nanoseconds) {
 	tsc_t result;
 	if (OVERFLOW_UMUL(num_nanoseconds, FORCPU(me, thiscpu_tsc_hz), &result)) {
@@ -543,8 +543,8 @@ NOTHROW(FCALL ktime_offset_to_tsc)(struct cpu *__restrict me,
 }
 
 /* Convert a tsc offset (read: not an absolute tick value) to the equivalent # of nanoseconds. */
-PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) ktime_t
-NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu *__restrict me,
+PUBLIC NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) ktime_t
+NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
                                    tsc_t num_ticks) {
 	ktime_t result;
 	if (OVERFLOW_UMUL(num_ticks, NSEC_PER_SEC, &result)) {

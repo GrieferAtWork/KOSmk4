@@ -144,8 +144,8 @@ DATDEF ktime_t const tsc_realtime_err;
 
 
 /* Convert a given `tsc' value into the corresponding ktime offset. */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) ktime_t
-NOTHROW(FCALL tsc_to_ktime)(struct cpu *__restrict me,
+FUNDEF NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) ktime_t
+NOTHROW(FCALL tsc_to_ktime)(struct cpu const *__restrict me,
                             tsc_t tsc);
 
 /* Same as `tsc_to_ktime()', but the caller guaranties that `now' is an actual
@@ -160,24 +160,24 @@ NOTHROW(FCALL tsc_now_to_ktime)(struct cpu *__restrict me,
 /* Convert a given `kt' timestamp into its TSC equivalent.
  * When `kt' lies so far into the future that TSC would overflow, return `TSC_MAX' instead.
  * NOTE: It is assumed that return >= <any `now' ever passed to `tsc_now_to_ktime'> */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
-NOTHROW(FCALL ktime_future_to_tsc)(struct cpu *__restrict me,
+FUNDEF NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) tsc_t
+NOTHROW(FCALL ktime_future_to_tsc)(struct cpu const *__restrict me,
                                    ktime_t kt);
 
 /* Same as `ktime_future_to_tsc()', but make no assumptions on `kt' being in the future.
  * NOTE: When `kt' lies in the past of `tsc_to_ktime(me, 0)', `0' is returned instead. */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
-NOTHROW(FCALL ktime_to_tsc)(struct cpu *__restrict me,
+FUNDEF NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) tsc_t
+NOTHROW(FCALL ktime_to_tsc)(struct cpu const *__restrict me,
                             ktime_t kt);
 
 /* Convert a ktime offset (read: not an absolute timestamp) to the equivalent # of TSC units. */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
-NOTHROW(FCALL ktime_offset_to_tsc)(struct cpu *__restrict me,
+FUNDEF NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) tsc_t
+NOTHROW(FCALL ktime_offset_to_tsc)(struct cpu const *__restrict me,
                                    ktime_t num_nanoseconds);
 
 /* Convert a tsc offset (read: not an absolute tick value) to the equivalent # of nanoseconds. */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) ktime_t
-NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu *__restrict me,
+FUNDEF NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) ktime_t
+NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
                                    tsc_t num_ticks);
 
 /* Return the current kernel time (in nano seconds since `boottime')

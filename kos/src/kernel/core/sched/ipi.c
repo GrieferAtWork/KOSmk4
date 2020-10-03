@@ -269,7 +269,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		if (old_flags & (TASK_FSTARTED | TASK_FRUNNING)) {
 			assertf(!(old_flags & TASK_FRUNNING) || (old_flags & TASK_FSTARTED),
 			        "old_flags = %#" PRIxPTR, old_flags);
-			goto done_pop_preemption;
+			goto done;
 		}
 		FORTASK(thread, this_starttime) = ktime();
 		FORTASK(thread, this_stoptime)  = FORTASK(thread, this_starttime);
@@ -284,7 +284,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	       (unsigned int)thread->t_cpu->c_id, thread,
 	       (unsigned int)task_getroottid_of_s(thread));
 #ifndef CONFIG_NO_SMP
-	target_cpu = ATOMIC_READ(thread->t_cpu);
+	target_cpu = thread->t_cpu;
 	if (me != target_cpu) {
 		sched_intern_addpending(target_cpu, thread);
 		/* Wake up the targeted CPU, forcing it to load pending tasks. */
@@ -303,10 +303,9 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 			FORCPU(me, thiscpu_sched_current) = thread;
 			cpu_run_current_and_remember_nopr(caller);
 		}
-		PREEMPTION_POP(was);
 	}
-done_pop_preemption:
 	PREEMPTION_POP(was);
+done:
 	return thread;
 }
 

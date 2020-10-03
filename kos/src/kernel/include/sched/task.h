@@ -118,11 +118,14 @@ struct task {
 	                                      * NOTE: Also accessible via the `this_vm' field. */
 	LLIST_NODE(struct task) t_vm_tasks;  /* [lock(t_vm->v_tasklock)] Chain of tasks using `t_vm' */
 	size_t                  t_heapsz;    /* [const] Allocated heap size of this task. */
-	struct scpustate       *t_state;     /* [lock(PRIVATE(t_cpu == THIS_CPU))]
-	                                      * [valid_if(t_self != FORCPU(t_cpu, thiscpu_sched_current))]
-	                                      * The CPU state to-be restored when execution of this task continues. */
-#define KEY_task_vm_dead__next_offsetafter __COMPILER_OFFSETAFTER(struct task, t_state)
-#define KEY_task_vm_dead__next(thread)     (*(struct task **)&(thread)->t_state)
+	union {
+		struct task        *_t_next;     /* [0..1][lock(INTERNAL)] Next dead VM within the same VM. */
+		struct scpustate   *t_state;     /* [lock(PRIVATE(t_cpu == THIS_CPU))]
+		                                  * [valid_if(t_self != FORCPU(t_cpu, thiscpu_sched_current))]
+		                                  * The CPU state to-be restored when execution of this task continues. */
+	};
+#define KEY_task_vm_dead__next_offsetafter __COMPILER_OFFSETAFTER(struct task, _t_next)
+#define KEY_task_vm_dead__next(thread)     (thread)->_t_next
 	/* ATTR_PERTASK-data goes here. */
 };
 
