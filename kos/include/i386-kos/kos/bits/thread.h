@@ -25,13 +25,25 @@
 #include <asm/intrin.h>
 
 #ifdef __x86_64__
-#define RD_TLS_BASE_REGISTER()   __rdfsptr(0)
-#define RD_TLS_BASE_REGISTER_S() __rdfsbase()
-#define WR_TLS_BASE_REGISTER(v)  __wrfsbase(v)
-#else /* __x86_64__ */
+#ifdef __KERNEL__
 #define RD_TLS_BASE_REGISTER()   __rdgsptr(0)
 #define RD_TLS_BASE_REGISTER_S() __rdgsbase()
 #define WR_TLS_BASE_REGISTER(v)  __wrgsbase(v)
+#else /* __KERNEL__ */
+#define RD_TLS_BASE_REGISTER()   __rdfsptr(0)
+#define RD_TLS_BASE_REGISTER_S() __rdfsbase()
+#define WR_TLS_BASE_REGISTER(v)  __wrfsbase(v)
+#endif /* !__KERNEL__ */
+#else /* __x86_64__ */
+#ifdef __KERNEL__
+#define RD_TLS_BASE_REGISTER()   __rdfsptr(0)
+#define RD_TLS_BASE_REGISTER_S() __rdfsbase()
+#define WR_TLS_BASE_REGISTER(v)  __wrfsbase(v)
+#else /* __KERNEL__ */
+#define RD_TLS_BASE_REGISTER()   __rdgsptr(0)
+#define RD_TLS_BASE_REGISTER_S() __rdgsbase()
+#define WR_TLS_BASE_REGISTER(v)  __wrgsbase(v)
+#endif /* !__KERNEL__ */
 #endif /* !__x86_64__ */
 
 #endif /* !_I386_KOS_KOS_BITS_THREAD_H */

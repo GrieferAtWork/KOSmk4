@@ -288,7 +288,7 @@ NOTHROW(FCALL this_vm_syncall)(void) {
  * sync changes made to the kernel VM. */
 PUBLIC NOBLOCK void
 NOTHROW(FCALL vm_supersync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
-                              PAGEDIR_PAGEALIGNED size_t num_bytes) {
+                            PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	assertf(((uintptr_t)addr & PAGEMASK) == 0, "addr = %p", addr);
 	assertf((num_bytes & PAGEMASK) == 0, "num_bytes = %#" PRIxSIZ, num_bytes);
 	if (cpu_online_count > 1) {

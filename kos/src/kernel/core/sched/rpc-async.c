@@ -99,11 +99,12 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc)(struct icpustate *__restrict state,
 	target->t_state = task_push_asynchronous_rpc(target->t_state,
 	                                                     func, arg);
 	if (!(mode & TASK_RPC_FDONTWAKE)) {
-		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
-		                                caller, target,
-		                                (mode & TASK_RPC_FHIGHPRIO) != 0);
-		if (target != caller) {
-			FORCPU(me, thiscpu_sched_current) = target;
+		struct task *next_thread;
+		next_thread = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		                                     caller, target,
+		                                     (mode & TASK_RPC_FHIGHPRIO) != 0);
+		if (next_thread != caller) {
+			FORCPU(me, thiscpu_sched_current) = next_thread;
 			decref_unlikely(target);
 			return CPU_IPI_MODE_SWITCH_TASKS;
 		}
@@ -148,11 +149,12 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state,
 	}
 	task_enable_redirect_usercode_rpc(target);
 	if (!(mode & TASK_RPC_FDONTWAKE)) {
-		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
-		                                caller, target,
-		                                (mode & TASK_RPC_FHIGHPRIO) != 0);
-		if (target != caller) {
-			FORCPU(me, thiscpu_sched_current) = target;
+		struct task *next_thread;
+		next_thread = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
+		                                     caller, target,
+		                                     (mode & TASK_RPC_FHIGHPRIO) != 0);
+		if (next_thread != caller) {
+			FORCPU(me, thiscpu_sched_current) = next_thread;
 			decref_unlikely(target);
 			return CPU_IPI_MODE_SWITCH_TASKS;
 		}
