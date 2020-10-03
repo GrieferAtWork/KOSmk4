@@ -28,7 +28,6 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/syslog.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/x86/alternatives.h>
@@ -55,6 +54,14 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 
 #define assert_poison(expr)       assert((expr) || kernel_poisoned())
 #define assertf_poison(expr, ...) assertf((expr) || kernel_poisoned(), __VA_ARGS__)
+
+
+/* CONFIG: Enable some sanity checks to assert that `tsc_get()' never runs backwards. */
+#undef CONFIG_TSC_ASSERT_FORWARD
+#ifndef NDEBUG
+#define CONFIG_TSC_ASSERT_FORWARD 1
+#endif /* !NDEBUG */
+
 
 DECL_BEGIN
 
@@ -164,6 +171,49 @@ FORCELOCAL WUNUSED u32 NOTHROW(tsc_ll_getcurrent)(void) {
 	                     , "X" ((u16)PIT_COMMAND));
 	COMPILER_BARRIER();
 	return result;
+}
+
+/* Check if a timer interrupt is current pending. */
+FORCELOCAL WUNUSED bool NOTHROW(tsc_interrupt_ispending)(void) {
+#if 1
+	bool result;
+	uintptr_t temp;
+	COMPILER_BARRIER();
+	__asm__ __volatile__(".alt_if %P[x86_feat_apic]\n"
+#ifdef __x86_64__
+	                     "	movq   x86_lapicbase, %1\n"
+#else /* __x86_64__ */
+	                     "	movl   x86_lapicbase, %1\n"
+#endif /* !__x86_64__ */
+	                     "	testl  $%P[lapic_irr_mask], %P[lapic_irr_addr](%1)\n"
+	                     ".alt_else\n"
+	                     "	movb   $%P[x86_pic_read_irr], %%al\n"
+	                     "	outb   %%al, $%P[x86_pic1_cmd]\n"
+	                     "	inb    $%P[x86_pic1_cmd], %%al\n"
+	                     "	testb  $%P[pic_mask], %%al\n"
+	                     ".alt_endif\n"
+	                     : "=@ccnz" (result)
+	                     , "=&a" (temp)
+	                     : [x86_feat_apic] "X" (X86_FEAT_APIC)
+	                     , [lapic_irr_addr] "X" (APIC_IRR(APIC_IRR_INDEX(X86_INTNO_PIC1_PIT)))
+	                     , [lapic_irr_mask] "X" (APIC_IRR_MASK(X86_INTNO_PIC1_PIT))
+	                     , [x86_pic1_cmd] "X" ((u16)X86_PIC1_CMD)
+	                     , [pic_mask] "X" (X86_INTNO_PIC1_PIT - X86_INTERRUPT_PIC1_BASE)
+	                     , [x86_pic_read_irr] "X" (X86_PIC_READ_IRR));
+	COMPILER_BARRIER();
+	return result;
+#else
+	COMPILER_BARRIER();
+	return (lapic_read(APIC_IRR(APIC_IRR_INDEX(X86_INTNO_PIC1_PIT))) &
+	        /*                */ APIC_IRR_MASK(X86_INTNO_PIC1_PIT)) != 0;
+#endif
+}
+
+/* Mark an already-pending TSC interrupt as ignored. */
+LOCAL NONNULL((1)) void
+NOTHROW(FCALL tsc_ignore_pending_interrupt)(struct cpu *__restrict me) {
+	if (!FORCPU(me, thiscpu_x86_apic_emutsc_early_interrupt))
+		FORCPU(me, thiscpu_x86_apic_emutsc_early_interrupt) = tsc_interrupt_ispending();
 }
 
 
@@ -290,6 +340,11 @@ NOTHROW(KCALL x86_calibrate_tsc_cmpxch_delay_stable)(void) {
 }
 
 
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+PRIVATE ATTR_PERCPU tsc_t thiscpu_last_tsc = 0;
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
+
+
 /* Read and return the current timestamp counter of the calling CPU.
  * The base-line of the returned counter is the calling CPU being
  * booted, or more precisely: some point in time during before the
@@ -297,6 +352,7 @@ NOTHROW(KCALL x86_calibrate_tsc_cmpxch_delay_stable)(void) {
  * This function may only be called with preemption disabled. */
 PUBLIC NOPREEMPT NOBLOCK WUNUSED NONNULL((1)) tsc_t
 NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
+	tsc_t result;
 	u64 tscbase;
 	u32 current;
 	current = tsc_ll_getcurrent();
@@ -316,7 +372,15 @@ NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
 	}
 	FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = current;
 	current = FORCPU(me, thiscpu_x86_apic_emutsc_initial) - current;
-	return tscbase + ((u64)current << FORCPU(me, thiscpu_x86_apic_emutsc_divide));
+	result = tscbase + ((u64)current << FORCPU(me, thiscpu_x86_apic_emutsc_divide));
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	assertf_poison(result >= FORCPU(me, thiscpu_last_tsc),
+	               "result = %#" PRIxN(__SIZEOF_TSC_HZ_T__) "\n"
+	               "last   = %#" PRIxN(__SIZEOF_TSC_HZ_T__) "\n",
+	               result, FORCPU(me, thiscpu_last_tsc));
+	FORCPU(me, thiscpu_last_tsc) = result;
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
+	return result;
 }
 
 /* Disable the TSC deadline, such that it will never trigger (or at the
@@ -326,6 +390,9 @@ PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
 	u32 current_reg, delay;
 	u32 new_current_reg;
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	COMPILER_UNUSED(tsc_get(me));
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 	/* TODO: Support for PIC-mode */
 	FORCPU(me, thiscpu_x86_apic_emutsc_deadline) = (u64)-1;
 	/* Check for simple case: If initial+divide didn't change,
@@ -361,6 +428,12 @@ NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
 			delay = current_reg - new_current_reg;
 		current_reg = new_current_reg;
 	}
+	/* Ignore the next TSC interrupt, if it's already pending.
+	 * NOTE: Technically, we'd have to do this atomically alongside
+	 *       `tsc_ll_cmpxch_divide_and_initial()', however we should
+	 *       be safe to assume that the newly set APIC counter won't
+	 *       have already expired at this point. */
+	tsc_ignore_pending_interrupt(me);
 	if unlikely(new_current_reg > FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)) {
 		/* Interrupt hasn't fired yet. (correct timings ourself) */
 		FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) += FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted);
@@ -373,6 +446,9 @@ NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
 	FORCPU(me, thiscpu_x86_apic_emutsc_divide)          = 7; /* CLZ(128) */
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial)         = UINT32_MAX;
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)UINT32_MAX << 7;
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	COMPILER_UNUSED(tsc_get(me));
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 }
 
 /* Set the TSC deadline, that is: the point in time when `tsc_interrupt()'
@@ -397,6 +473,9 @@ NOTHROW(FCALL tsc_deadline)(struct cpu *__restrict me,
 	u8 i, divide;
 	tsc_t tsc_current;
 	tsc_t tsc_distance;
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	COMPILER_UNUSED(tsc_get(me));
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 	/* TODO: Support for PIC-mode */
 	delay = 1; /* Initial guess */
 again:
@@ -441,6 +520,9 @@ again_with_timer:
 #if 0 /* Not required */
 		tsc_nodeadline(me);
 #endif
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+		COMPILER_UNUSED(tsc_get(me));
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 		return tsc_current;
 	}
 	/* Calculate the TSC once after the clock got reconfigured. */
@@ -514,6 +596,12 @@ again_with_timer:
 		current_reg = new_current_reg;
 		goto again_with_timer;
 	}
+	/* Ignore the next TSC interrupt, if it's already pending.
+	 * NOTE: Technically, we'd have to do this atomically alongside
+	 *       `tsc_ll_cmpxch_divide_and_initial()', however we should
+	 *       be safe to assume that the newly set APIC counter won't
+	 *       have already expired at this point. */
+	tsc_ignore_pending_interrupt(me);
 	/* Remember the updated LAPIC configuration. */
 	FORCPU(me, thiscpu_x86_apic_emutsc_tscbase)         = tsc_current; /* Absolute TSC time during re-configure. */
 	FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)    = initial;     /* Timer was reset, so this becomes `initial' */
@@ -522,6 +610,9 @@ again_with_timer:
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)initial << divide;
 done:
 	FORCPU(me, thiscpu_x86_apic_emutsc_deadline)        = deadline;
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	COMPILER_UNUSED(tsc_get(me));
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 	return tsc_current;
 }
 
@@ -721,6 +812,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_altcore_entry)(void) {
 	/* Store the initial TSC-hz result. */
 	FORCPU(me, thiscpu_tsc_hz)                      = hz;
 	FORCPU(me, thiscpu_x86_apic_emutsc_mindistance) = hz / TSC_MIN_DISTANCE_HZ;
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	FORCPU(me, thiscpu_last_tsc) = 0;
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 
 	if (!X86_HAVE_TSC_DEADLINE) {
 		/* Calibrate the TSC-cmpxch delay. */
@@ -730,6 +824,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_altcore_entry)(void) {
 	lapic_write(APIC_TIMER, X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC);
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F128);
 	lapic_write(APIC_TIMER_INITIAL, UINT32_MAX);
+	tsc_ignore_pending_interrupt(me);
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	COMPILER_UNUSED(tsc_get(me));
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 
 	/* Since we've screwed with our APIC, we must
 	 * once again re-initialize our RTC-sync. */
@@ -760,6 +858,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_calibrate_boottsc)(void) {
 	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)UINT32_MAX << 7;
 	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_early_interrupt) = false;
 	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_mindistance)     = hz / TSC_MIN_DISTANCE_HZ;
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	FORCPU(&_bootcpu, thiscpu_last_tsc) = 0;
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 	if (!X86_HAVE_TSC_DEADLINE) {
 		/* Calibrate the TSC-cmpxch delay.
 		 * On QEMU, this ends up being either 200 or 300 (the actual result appears
@@ -776,6 +877,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_calibrate_boottsc)(void) {
 	lapic_write(APIC_TIMER, X86_INTNO_PIC1_PIT | APIC_TIMER_MODE_FPERIODIC);
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F128);
 	lapic_write(APIC_TIMER_INITIAL, UINT32_MAX);
+	tsc_ignore_pending_interrupt(&_bootcpu);
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	COMPILER_UNUSED(tsc_get(&_bootcpu));
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 
 	/* Initialize the RTC proper. */
 	tsc_resync_init(&_bootcpu);
@@ -823,6 +928,12 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_tsc)(void) {
 	} else if (X86_HAVE_LAPIC) {
 		/* Use APIC */
 		printk(FREESTR(KERN_INFO "[tsc] Use APIC for timings\n"));
+		/* TODO: ```
+		 *    If CPUID.06H:EAX.ARAT[bit 2] = 1, the processor's APIC timer runs at a constant rate [...].
+		 *    If CPUID.06H:EAX.ARAT[bit 2] = 0 or if CPUID 06H is not supported, the APIC timer may temporarily stop [...].
+		 * ```
+		 */
+
 	} else {
 		/* Use PIT */
 		printk(FREESTR(KERN_INFO "[tsc] Use PIT for timings\n"));

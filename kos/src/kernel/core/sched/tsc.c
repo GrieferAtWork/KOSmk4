@@ -57,63 +57,54 @@ PUBLIC ATTR_PERTASK ktime_t this_activetime = 0;
 
 
 
+/* The min/max bounds for what can be considered valid HZ values. */
+PUBLIC ATTR_PERCPU tsc_hz_t thiscpu_tsc_hzmin = 0;
+PUBLIC ATTR_PERCPU tsc_hz_t thiscpu_tsc_hzmax = (tsc_hz_t)-1;
+
+struct timestamp {
+	ktime_t ts_kt;  /* RTC realtime */
+	tsc_t   ts_tsc; /* TSC counter mapping to some point in [ts_kt, ts_kt+tsc_realtime_err-1] */
+};
+
+
+/************************************************************************/
+/* CPU uptime calculations.                                             */
+/************************************************************************/
+PRIVATE ATTR_PERCPU struct timestamp thiscpu_startup = { 0, 0 }; /* Startup timestamp (for the last time the CPU came online). */
+//PRIVATE ATTR_PERCPU tsc_t thiscpu_uptime_tsc         = 0;        /* Uptime addend (updated when the CPU goes offline). */
+/* TODO: `thiscpu_uptime_tsc' must be updated from within `cpu_enter_deepsleep()' as:
+ *     >> thiscpu_uptime_tsc += tsc_get() - thiscpu_startup_tsc; */
+
+
 /************************************************************************/
 /* REALTIME calculations.                                               */
 /************************************************************************/
-PRIVATE ATTR_PERCPU ktime_t thiscpu_resync_ktime = 0; /* Baseline timestamp. */
-PRIVATE ATTR_PERCPU tsc_t thiscpu_resync_tsc     = 0; /* Baseline TSC value. */
+PRIVATE ATTR_PERCPU struct timestamp thiscpu_basetime = { 0, 0 }; /* Baseline timestamp. */
 
-/* Fix a TSC HZ calculation overflow by advancing both
- * `thiscpu_resync_ktime' and `thiscpu_resync_tsc' in
- * order to shrink offsets.
- *
- * When running under QEMU, this function needs to be
- * about every 16 seconds, as the result of the value of
- * `tsc_elapsed * 1000000000' (1000000000 == NSEC_PER_SEC)
- * overflowing a 64-bit value.
- *
- * Also note that on QEMU, it appears as though the 100%
- * perfect HZ counter is also `1000000000' (at least for
- * me), so by doing `1000000000**2', you get the result of
- * `0x0de0b6b3a7640000', which you can multiply by 16 to
- * get `0xde0b6b3a76400000'. But trying to add yet another
- * instance of `1000000000**2' will result in an overflow,
- * thus resulting in the 16-second interval mentioned above.
- *
- * WARNING: Don't add any printk() to this function. Doing so
- *          will result in an infinite loop caused by printk
- *          calling realtime()->ktime()->tsc_fix_overflow()
- */
-PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL tsc_fix_overflow)(struct cpu *__restrict me,
-                                tsc_t tsc_elapsed) {
-	time_t seconds;
-	tsc_t tsc_seconds;
-	tsc_t tsc_remainder;
-	seconds       = (time_t)(tsc_elapsed / FORCPU(me, thiscpu_tsc_hz));
-	tsc_remainder = tsc_elapsed % FORCPU(me, thiscpu_tsc_hz);
-	tsc_seconds   = tsc_elapsed - tsc_remainder;
-	/* Account for whole seconds which have elapsed */
-	FORCPU(me, thiscpu_resync_ktime) += (ktime_t)seconds * NSEC_PER_SEC;
-	FORCPU(me, thiscpu_resync_tsc) += tsc_seconds;
-	if unlikely(!seconds) {
-		/* The value of `thiscpu_tsc_hz' is so great that we can't adjust
-		 * whole seconds. - Instead, we must sacrifice precision and adjust
-		 * by nanoseconds. */
-		ktime_t nanoseconds;
-		tsc_hz_t nano_hz;
-		tsc_t tsc_nano_remainder;
-		tsc_t tsc_nano_seconds;
-		/* WARNING: This division right here results in a loss of precision! */
-		nano_hz     = FORCPU(me, thiscpu_tsc_hz) / NSEC_PER_SEC;
-		nanoseconds = (ktime_t)(tsc_elapsed / nano_hz);
-		assert(nanoseconds);
-		tsc_nano_remainder = tsc_elapsed % nano_hz;
-		tsc_nano_seconds   = tsc_elapsed - tsc_nano_remainder;
-		FORCPU(me, thiscpu_resync_ktime) += nanoseconds;
-		FORCPU(me, thiscpu_resync_tsc) += tsc_nano_seconds;
+
+PRIVATE NOBLOCK WUNUSED tsc_hz_t
+NOTHROW(FCALL calculate_hz)(tsc_t tsc, ktime_t time, bool ceildiv) {
+	tsc_hz_t result;
+	if (OVERFLOW_UMUL(tsc, NSEC_PER_SEC, &result)) {
+		uint128_t tsc_nsec;
+do128:
+		uint128_set(tsc_nsec, tsc);
+		uint128_mul(tsc_nsec, NSEC_PER_SEC);
+		if (ceildiv)
+			uint128_add(tsc_nsec, time - 1);
+		uint128_div(tsc_nsec, time);
+		result = uint128_get64(tsc_nsec);
+	} else {
+		if (ceildiv) {
+			if (OVERFLOW_UADD(result, time - 1, &result))
+				goto do128;
+		}
+		result /= time;
 	}
+	return result;
 }
+
+
 
 /* Interrupt handler for implementing realtime() re-syncing.
  * This function should call `tsc_resync_realtime()' to retrieve the
@@ -123,60 +114,163 @@ NOTHROW(FCALL tsc_fix_overflow)(struct cpu *__restrict me,
  * should be.
  * @param: new_ktime: The new RTC time (as returned by `tsc_resync_realtime()') */
 PUBLIC NOPREEMPT NOBLOCK void
-NOTHROW(FCALL tsc_resync_interrupt)(ktime_t new_ktime) {
+NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	struct cpu *me = THIS_CPU;
-	ktime_t old_ktime;
-	ktime_t tsc_ktime;
-	tsc_t new_tsc, tsc_since;
-	tsc_hz_t new_hz;
-	new_tsc = tsc_get(me);
+	struct timestamp now;
+	tsc_t tsc_passed;
+	ktime_t cpu_now;
+	ktime_t ktime_passed_min;
+	ktime_t ktime_passed_max;
+	ktime_t ktime_passed_cpu;
+	tsc_hz_t hz_min, hz_max;
+	tsc_hz_t hz;
+	now.ts_kt = curr_ktime;
+	for (;;) {
+		ktime_t temp;
+		/* Get a TSC value, and ensure it corresponds to a consistent `curr_ktime'
+		 * Ensure this by getting one that points to the same RTC time slice. */
+		now.ts_tsc = tsc_get(me);
+		temp       = tsc_resync_realtime();
+		if (temp == now.ts_kt)
+			break;
+		now.ts_kt = temp;
+	}
 	COMPILER_BARRIER();
-again:
-	old_ktime = FORCPU(me, thiscpu_resync_ktime);
-	if unlikely(old_ktime > new_ktime) {
-		/* Backwards realtime clock? */
-		FORCPU(me, thiscpu_resync_ktime) = new_ktime;
-		FORCPU(me, thiscpu_resync_tsc)   = new_tsc;
+	/*
+	 * Create a projection:
+	 *
+	 * TSC
+	 *  ^
+	 *  |                      [------]  (now)
+	 *  |                      |     /
+	 *  |                      |    /
+	 *  |                     |    /
+	 *  |                     |   /
+	 *  |         hz_min --> |   / <-- hz_max
+	 *  |                    |  /
+	 *  |                   |  /
+	 *  |                   | /
+	 *  |                  | /
+	 *  |                  |/
+	 *  |                 |/
+	 *  |                 /
+	 *  |                /
+	 *  |               /|
+	 *  |              /|
+	 *  |             / |
+	 *  |            / |
+	 *  |           /  |
+	 *  |          /  |
+	 *  |         /   |
+	 *  |        /   |
+	 *  |       /    |
+	 *  |      /    |
+	 *  |     /     |
+	 *  |    [------]  (thiscpu_startup)
+	 *  |
+	 *  +--------------------------------------> KT
+	 */
+	tsc_passed       = now.ts_tsc - FORCPU(me, thiscpu_startup.ts_tsc);
+	ktime_passed_min = FORCPU(me, thiscpu_startup.ts_kt) + tsc_realtime_err;
+	if (OVERFLOW_USUB(now.ts_kt, ktime_passed_min, &ktime_passed_min))
+		ktime_passed_min = 0;
+	ktime_passed_max = (now.ts_kt + tsc_realtime_err) - FORCPU(me, thiscpu_startup.ts_kt);
+	assert(ktime_passed_min <= ktime_passed_max);
+	assert(ktime_passed_max != 0);
+	hz_min = calculate_hz(tsc_passed, ktime_passed_max, false);
+	hz_max = likely(ktime_passed_min != 0)
+	         ? calculate_hz(tsc_passed, ktime_passed_min, true)
+	         : (tsc_hz_t)-1;
+	assert(hz_min <= hz_max);
+	if (hz_min < FORCPU(me, thiscpu_tsc_hzmin)) {
+		printk(KERN_WARNING "[cpu#%u] hz_min widened ("
+		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
+		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) ")\n",
+		       me->c_id, FORCPU(me, thiscpu_tsc_hzmin), hz_min);
+	}
+	if (hz_max > FORCPU(me, thiscpu_tsc_hzmax)) {
+		printk(KERN_WARNING "[cpu#%u] hz_max widened ("
+		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
+		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) ")\n",
+		       me->c_id, FORCPU(me, thiscpu_tsc_hzmax), hz_max);
+	}
+	FORCPU(me, thiscpu_tsc_hzmin) = hz_min;
+	FORCPU(me, thiscpu_tsc_hzmax) = hz_max;
+	/* If the currently used HZ value falls into the hz_min/hz_max range, then everything is well. */
+	hz = FORCPU(me, thiscpu_tsc_hz);
+	if (hz >= hz_min && hz <= hz_max)
 		return;
+	/* Calculate what we though the current time would be. */
+	ktime_passed_cpu = tsc_offset_to_ktime(me, tsc_passed);
+	/* Check if our predicted CPU time falls within our margin of error.
+	 * This may still be the case, even if the newly calculated HZ would
+	 * fall outside the margin of error due to rounding errors. */
+	if (ktime_passed_cpu >= ktime_passed_min &&
+	    ktime_passed_cpu <= ktime_passed_max)
+		return;
+	/* Figure out the closest HZ value that would still be valid. */
+	if (hz < hz_min)
+		hz = hz_min;
+	else {
+		assert(hz > hz_max);
+		hz = hz_max;
 	}
-	/* Figure out by how much we're off by calculating the TSC-based ktime. */
-	/* Determine the TSC offset since the last re-sync */
-	/* Calculate the current boot-time offset. */
-	tsc_since = new_tsc - FORCPU(me, thiscpu_resync_tsc);
-	tsc_ktime = old_ktime + ((tsc_since * NSEC_PER_SEC) /
-	                         FORCPU(me, thiscpu_tsc_hz));
-	if (tsc_ktime > new_ktime) {
-		/* TSC is running ahead */
-		/* Give the benefit of the doubt and use the
-		 * closest realtime that would still be correct. */
-		new_ktime += tsc_realtime_err;
-		if likely(new_ktime >= tsc_ktime)
-			return; /* Acceptable error! */
-		new_ktime -= tsc_realtime_err;
-	} else /*if (tsc_ktime < new_ktime)*/ {
-		/* TSC is running behind */
-		ktime_t error;
-		error = new_ktime - tsc_ktime;
-		if likely(error <= tsc_realtime_err)
-			return; /* Acceptable error! */
+	/* Our currently used HZ value wasn't correct.
+	 * We must clamp it to the nearest valid HZ value, and re-calculate `thiscpu_basetime'
+	 * to point to the nearest valid location on a line with an angle of the new HZ value,
+	 * and drawn through some point within the `thiscpu_startup' range.
+	 * This can easily be done by clamping `thiscpu_basetime' to some value within the
+	 * range described by now...+=tsc_realtime_err
+	 *
+	 * TSC
+	 *  ^
+	 *  |          (cpu_now) [-]  [------] (now)
+	 *  |                     |      /
+	 *  |                     |     /
+	 *  |                    |     /
+	 *  |                    |    /
+	 *  |                   |    /
+	 *  |                   |   /
+	 *  |                  |   /
+	 *  |                  |  /
+	 *  |                 |  /
+	 *  |                 | /
+	 *  |                | /
+	 *  |                |/
+	 *  |                /
+	 *  |               [------]  (thiscpu_startup)
+	 *  |
+	 *  +--------------------------------------> KT
+	 */
+	cpu_now = tsc_now_to_ktime(me, now.ts_tsc);
+	/* Clamp `cpu_now' to the closest valid TSC timestamp. */
+	if (cpu_now < now.ts_kt) {
+		/* Simple case: Have the clock jump ahead */
+		cpu_now = now.ts_kt;
+	} else {
+		now.ts_kt += tsc_realtime_err;
+		if (cpu_now > now.ts_kt) {
+			/* Difficult case: we have to turn the clock backwards... */
+			printk(KERN_WARNING "[cpu#%u] Turn back clock ("
+			                    "%#" PRIxN(__SIZEOF_KTIME_T__) " -> "
+			                    "%#" PRIxN(__SIZEOF_KTIME_T__) ")\n",
+			       me->c_id, cpu_now, now.ts_kt);
+			cpu_now = now.ts_kt;
+		}
 	}
-	if unlikely(OVERFLOW_UMUL(tsc_since, NSEC_PER_SEC, &new_hz))
-		goto hz_overflow;
-	new_hz /= (new_ktime - old_ktime);
-	assert(new_hz);
-	/* Average the new HZ value with the one in a 1/3 - 2/3 ratio.
-	 * 
-	 * TODO: A better ratio might be:
-	 *       new_hz_part = KTIME_ERROR / KTIME_SINCE_FIRST_RESYNC;
-	 *       new_hz = (new_hz_part * new_hz) + ((1 - new_hz_part) * old_hz);
-	 * Where `KTIME_SINCE_FIRST_RESYNC' is the time set in `tsc_resync_init' */
-	new_hz = (new_hz + FORCPU(me, thiscpu_tsc_hz) * 2) / 3;
-	if (new_hz != FORCPU(me, thiscpu_tsc_hz)) {
+
+	/* Set the baseline CPU timestamp to follow the linear vector from the
+	 * CPU startup timestamp, all the way to the current point in time that
+	 * still falls into the margin of error, and is closest to what we've
+	 * assumed to be the case until this point. */
+	FORCPU(me, thiscpu_basetime.ts_kt)  = cpu_now;
+	FORCPU(me, thiscpu_basetime.ts_tsc) = now.ts_tsc;
+	{
 		bool increase;
 		tsc_hz_t old_hz;
 		old_hz = FORCPU(me, thiscpu_tsc_hz);
-		FORCPU(me, thiscpu_tsc_hz) = new_hz;
-		increase = new_hz > old_hz;
+		FORCPU(me, thiscpu_tsc_hz) = hz;
+		increase = hz > old_hz;
 		printk(KERN_INFO "[cpu#%u][%c] Adjust tsc hz "
 		                 "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
 		                 "%" PRIuN(__SIZEOF_TSC_HZ_T__) " "
@@ -184,7 +278,7 @@ again:
 		       me->c_id,
 		       increase ? '+' : '-',
 		       old_hz,
-		       new_hz,
+		       hz,
 		       increase ? "fast" : "slow");
 		/* TODO: When TSC_HZ changes, we should probably re-calculate the
 		 *       current TSC deadline by re-doing the deadline calculation
@@ -197,26 +291,30 @@ again:
 		 *       the result of a hardware interrupt! */
 	}
 	return;
-hz_overflow:
-	/* Overflow during HZ calculation.
-	 * -> Resolve this by advancing the CPU clock base. */
-	tsc_fix_overflow(me, tsc_since);
-	goto again;
 }
 
-#ifndef CONFIG_NO_SMP
 /* Perform the initial TSC resync for the calling CPU.
  * This function will also calculate and set the initial TSC deadline. */
 PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL tsc_resync_init)(struct cpu *__restrict me) {
-	ktime_t new_ktime;
-	tsc_t new_tsc;
+	struct timestamp ts;
 	COMPILER_BARRIER();
-	new_ktime = tsc_resync_realtime();
-	new_tsc   = tsc_get(me);
+	ts.ts_kt = tsc_resync_realtime();
+	for (;;) {
+		ktime_t temp;
+		ts.ts_tsc = tsc_get(me);
+		temp      = tsc_resync_realtime();
+		if (temp == ts.ts_kt)
+			break;
+		ts.ts_kt = temp;
+	}
 	COMPILER_BARRIER();
-	FORCPU(me, thiscpu_resync_ktime) = new_ktime;
-	FORCPU(me, thiscpu_resync_tsc)   = new_tsc;
+	FORCPU(me, thiscpu_startup) = ts;
+	ts.ts_kt += tsc_realtime_err / 2; /* Assume an average error. */
+	FORCPU(me, thiscpu_basetime)  = ts;
+	FORCPU(me, thiscpu_tsc_hzmin) = 0;
+	FORCPU(me, thiscpu_tsc_hzmax) = (tsc_hz_t)-1;
+
 	/* TODO: Set the initial TSC deadline to the next scheduling EVENT:
 	 * >> if (NUM_RUNNING_THREADS == 1 && !HAS_WAITING_THREADS)
 	 * >>     tsc_nodeadline();
@@ -241,7 +339,6 @@ NOTHROW(FCALL tsc_resync_init)(struct cpu *__restrict me) {
 	 * >> } */
 	tsc_nodeadline(me);
 }
-#endif /* !CONFIG_NO_SMP */
 
 /* Convert a given `tsc' value into the corresponding ktime offset. */
 PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) ktime_t
@@ -249,11 +346,11 @@ NOTHROW(FCALL tsc_to_ktime)(struct cpu *__restrict me,
                             tsc_t tsc) {
 	ktime_t result;
 	/* Determine the TSC offset since the last re-sync */
-	if unlikely(tsc < FORCPU(me, thiscpu_resync_tsc)) {
+	if unlikely(tsc < FORCPU(me, thiscpu_basetime.ts_tsc)) {
 		tsc_t until, until_nano;
-		until = FORCPU(me, thiscpu_resync_tsc) - tsc;
+		until = FORCPU(me, thiscpu_basetime.ts_tsc) - tsc;
 		/* Calculate the current boot-time offset. */
-		result = FORCPU(me, thiscpu_resync_ktime);
+		result = FORCPU(me, thiscpu_basetime.ts_kt);
 		if unlikely(OVERFLOW_UMUL(until, NSEC_PER_SEC, &until_nano)) {
 			uint128_t since128;
 			uint128_set(since128, until);
@@ -265,9 +362,9 @@ NOTHROW(FCALL tsc_to_ktime)(struct cpu *__restrict me,
 		}
 	} else {
 		tsc_t since, since_nano;
-		since = tsc - FORCPU(me, thiscpu_resync_tsc);
+		since = tsc - FORCPU(me, thiscpu_basetime.ts_tsc);
 		/* Calculate the current boot-time offset. */
-		result = FORCPU(me, thiscpu_resync_ktime);
+		result = FORCPU(me, thiscpu_basetime.ts_kt);
 		if unlikely(OVERFLOW_UMUL(since, NSEC_PER_SEC, &since_nano)) {
 			uint128_t since128;
 			uint128_set(since128, since);
@@ -279,6 +376,60 @@ NOTHROW(FCALL tsc_to_ktime)(struct cpu *__restrict me,
 		}
 	}
 	return result;
+}
+
+/* Fix a TSC HZ calculation overflow by advancing both
+ * `thiscpu_basetime.ts_kt' and `thiscpu_basetime.ts_tsc' in
+ * order to shrink offsets.
+ *
+ * When running under QEMU, this function needs to be
+ * about every 16 seconds, as the result of the value of
+ * `tsc_elapsed * 1000000000' (1000000000 == NSEC_PER_SEC)
+ * overflowing a 64-bit value.
+ *
+ * Also note that on QEMU, it appears as though the 100%
+ * perfect HZ counter is also `1000000000' (at least for
+ * me), so by doing `1000000000**2', you get the result of
+ * `0x0de0b6b3a7640000', which you can multiply by 16 to
+ * get `0xde0b6b3a76400000'. But trying to add yet another
+ * instance of `1000000000**2' will result in an overflow,
+ * thus resulting in the 16-second interval mentioned above.
+ *
+ * WARNING: Don't add any printk() to this function. Doing so
+ *          will result in an infinite loop caused by printk
+ *          calling realtime()->ktime()->tsc_now_to_ktime()->tsc_fix_overflow()
+ */
+PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL tsc_fix_overflow)(struct cpu *__restrict me,
+                                tsc_t tsc_elapsed) {
+	ktime_t seconds;
+	tsc_t tsc_seconds;
+	tsc_t tsc_remainder;
+	seconds       = (ktime_t)(tsc_elapsed / FORCPU(me, thiscpu_tsc_hz));
+	tsc_remainder = tsc_elapsed % FORCPU(me, thiscpu_tsc_hz);
+	tsc_seconds   = tsc_elapsed - tsc_remainder;
+	/* Account for whole seconds which have elapsed */
+	FORCPU(me, thiscpu_basetime.ts_kt) += seconds * NSEC_PER_SEC;
+	FORCPU(me, thiscpu_basetime.ts_tsc) += tsc_seconds;
+	if unlikely(!seconds) {
+		/* The value of `thiscpu_tsc_hz' is so great that we can't adjust
+		 * whole seconds. - Instead, we must sacrifice precision and adjust
+		 * by nanoseconds. */
+		ktime_t nanoseconds;
+		tsc_hz_t nano_hz;
+		tsc_t tsc_nano_remainder;
+		tsc_t tsc_nano_seconds;
+		assert(tsc_remainder == tsc_elapsed);
+		assert(tsc_seconds == 0);
+		/* WARNING: This division right here results in a loss of precision! */
+		nano_hz     = FORCPU(me, thiscpu_tsc_hz) / NSEC_PER_SEC;
+		nanoseconds = (ktime_t)(tsc_elapsed / nano_hz);
+		assert(nanoseconds);
+		tsc_nano_remainder = tsc_elapsed % nano_hz;
+		tsc_nano_seconds   = tsc_elapsed - tsc_nano_remainder;
+		FORCPU(me, thiscpu_basetime.ts_kt) += nanoseconds;
+		FORCPU(me, thiscpu_basetime.ts_tsc) += tsc_nano_seconds;
+	}
 }
 
 /* Same as `tsc_to_ktime()', but the caller guaranties that `now' is an actual
@@ -293,11 +444,13 @@ NOTHROW(FCALL tsc_now_to_ktime)(struct cpu *__restrict me,
 	tsc_t since, since_nano;
 again:
 	/* Determine the TSC offset since the last re-sync */
-	since = now - FORCPU(me, thiscpu_resync_tsc);
+	assert(now <= tsc_get(me));
+	assert(now >= FORCPU(me, thiscpu_basetime.ts_tsc));
+	since = now - FORCPU(me, thiscpu_basetime.ts_tsc);
 	/* Calculate the current boot-time offset. */
 	if unlikely(OVERFLOW_UMUL(since, NSEC_PER_SEC, &since_nano))
 		goto hz_overflow;
-	result = FORCPU(me, thiscpu_resync_ktime);
+	result = FORCPU(me, thiscpu_basetime.ts_kt);
 	result += since_nano / FORCPU(me, thiscpu_tsc_hz);
 	return result;
 hz_overflow:
@@ -314,8 +467,8 @@ NOTHROW(FCALL ktime_future_to_tsc)(struct cpu *__restrict me,
 	ktime_t distance;
 	tsc_t result;
 	/* Calculate the distance from the baseline in nanoseconds. */
-	assert(kt >= FORCPU(me, thiscpu_resync_ktime));
-	distance = kt - FORCPU(me, thiscpu_resync_ktime);
+	assert(kt >= FORCPU(me, thiscpu_basetime.ts_kt));
+	distance = kt - FORCPU(me, thiscpu_basetime.ts_kt);
 	if (OVERFLOW_UMUL(distance, FORCPU(me, thiscpu_tsc_hz), &result)) {
 		uint128_t distance128;
 		/* Special handling to speed up handling of max timeouts. */
@@ -328,7 +481,7 @@ NOTHROW(FCALL ktime_future_to_tsc)(struct cpu *__restrict me,
 	} else {
 		result /= NSEC_PER_SEC;
 	}
-	if (OVERFLOW_UADD(result, FORCPU(me, thiscpu_resync_tsc), &result)) {
+	if (OVERFLOW_UADD(result, FORCPU(me, thiscpu_basetime.ts_tsc), &result)) {
 infinite:
 		result = TSC_MAX; /* (effectively) an infinite timeout. */
 	}
@@ -344,8 +497,8 @@ NOTHROW(FCALL ktime_to_tsc)(struct cpu *__restrict me,
 	bool is_future;
 	is_future = true;
 	/* Calculate the distance from the baseline in nanoseconds. */
-	if unlikely(OVERFLOW_USUB(kt, FORCPU(me, thiscpu_resync_ktime), &distance)) {
-		distance  = FORCPU(me, thiscpu_resync_ktime) - kt;
+	if unlikely(OVERFLOW_USUB(kt, FORCPU(me, thiscpu_basetime.ts_kt), &distance)) {
+		distance  = FORCPU(me, thiscpu_basetime.ts_kt) - kt;
 		is_future = false;
 	}
 	if (OVERFLOW_UMUL(distance, FORCPU(me, thiscpu_tsc_hz), &result)) {
@@ -360,12 +513,12 @@ NOTHROW(FCALL ktime_to_tsc)(struct cpu *__restrict me,
 		result /= NSEC_PER_SEC;
 	}
 	if likely(is_future) {
-		if (OVERFLOW_UADD(result, FORCPU(me, thiscpu_resync_tsc), &result)) {
+		if (OVERFLOW_UADD(result, FORCPU(me, thiscpu_basetime.ts_tsc), &result)) {
 infinite:
 			result = TSC_MAX; /* (effectively) an infinite timeout. */
 		}
 	} else {
-		if (OVERFLOW_USUB(result, FORCPU(me, thiscpu_resync_tsc), &result))
+		if (OVERFLOW_USUB(result, FORCPU(me, thiscpu_basetime.ts_tsc), &result))
 			result = 0; /* Can't go lower than this. */
 	}
 	return result;

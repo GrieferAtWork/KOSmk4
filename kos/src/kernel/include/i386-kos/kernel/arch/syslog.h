@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
 
 DECL_BEGIN
 
@@ -41,6 +42,19 @@ DATDEF struct syslog_sink x86_default_syslog_sink;
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL x86_syslog_write)(char const *__restrict data,
                                 __SIZE_TYPE__ datalen);
+
+/* Same as `x86_syslog_write()', but is format-printer compatible. */
+FUNDEF NOBLOCK NONNULL((1)) __SSIZE_TYPE__
+NOTHROW(__FORMATPRINTER_CC x86_syslog_printer)(void *ignored_arg,
+                                               /*utf-8*/ char const *__restrict data,
+                                               __SIZE_TYPE__ datalen);
+
+/* Helpers for printf-style writing to the raw X86 system log port. */
+FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__
+NOTHROW(VCALL x86_syslog_printf)(/*utf-8*/ char const *__restrict format, ...);
+FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__
+NOTHROW(FCALL x86_syslog_vprintf)(/*utf-8*/ char const *__restrict format,
+                                  __builtin_va_list args);
 
 
 #endif /* __CC__ */

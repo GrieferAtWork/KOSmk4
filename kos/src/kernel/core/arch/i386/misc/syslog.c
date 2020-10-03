@@ -33,7 +33,10 @@
 
 #include <sys/io.h>
 
+#include <alloca.h>
+#include <format-printer.h>
 #include <inttypes.h>
+#include <stdarg.h>
 #include <stdio.h> /* sprintf() */
 #include <time.h>  /* localtime_r() */
 
@@ -87,6 +90,58 @@ NOTHROW(FCALL x86_syslog_write)(char const *__restrict data,
 	outsb(x86_syslog_port, data, datalen);
 	x86_syslog_smplock_release(was);
 }
+
+/* Same as `x86_syslog_write()', but is format-printer compatible. */
+PUBLIC NOBLOCK NONNULL((1)) ssize_t
+NOTHROW(FORMATPRINTER_CC x86_syslog_printer)(void *UNUSED(ignored_arg),
+                                             /*utf-8*/ char const *__restrict data,
+                                             size_t datalen) {
+	if (datalen)
+		x86_syslog_write(data, datalen);
+	return (ssize_t)datalen;
+}
+
+PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL syslog_alloca_buffer)(/*utf-8*/ char const *__restrict format,
+                                    va_list args) {
+	size_t avail = get_stack_avail();
+	if (avail >= __SIZEOF_POINTER__ * 512) {
+		char *buf;
+		size_t reqlen;
+		avail -= __SIZEOF_POINTER__ * 512;
+		buf    = (char *)alloca(avail);
+		reqlen = vsnprintf(buf, avail, format, args);
+		if (reqlen <= avail) {
+			x86_syslog_write(buf, reqlen);
+			return reqlen + 1;
+		}
+	}
+	return 0;
+}
+
+/* Helpers for printf-style writing to the raw X86 system log port. */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL x86_syslog_vprintf)(/*utf-8*/ char const *__restrict format,
+                                  va_list args) {
+	size_t result;
+	/* Try to write everything at once, using a stack buffer. */
+	result = syslog_alloca_buffer(format, args);
+	if (result != 0)
+		return result - 1;
+	/* If that fails, write in chunks using the normal format-printer API. */
+	return (size_t)format_vprintf(&x86_syslog_printer, NULL, format, args);
+}
+
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(VCALL x86_syslog_printf)(/*utf-8*/ char const *__restrict format, ...) {
+	size_t result;
+	va_list args;
+	va_start(args, format);
+	result = x86_syslog_vprintf(format, args);
+	va_end(args);
+	return result;
+}
+
 
 
 

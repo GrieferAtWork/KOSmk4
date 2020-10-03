@@ -68,16 +68,6 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef __jtime_t_defined
-#define __jtime_t_defined 1
-typedef __jtime_t jtime_t;
-#endif /* !__jtime_t_defined */
-
-#ifndef __quantum_diff_t_defined
-#define __quantum_diff_t_defined 1
-typedef __quantum_diff_t quantum_diff_t; /* Sub-quantum quantum_diff difference */
-#endif /* !__quantum_diff_t_defined */
-
 #ifndef __cpuid_t_defined
 #define __cpuid_t_defined 1
 typedef uintptr_t cpuid_t;

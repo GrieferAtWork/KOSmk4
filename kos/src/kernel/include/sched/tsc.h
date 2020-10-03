@@ -69,6 +69,9 @@ typedef u64 ktime_t;
  *
  * HINT: HZ = ticks_per_second. */
 DATDEF ATTR_PERCPU tsc_hz_t thiscpu_tsc_hz;
+/* The min/max bounds for what can be considered valid HZ values. */
+DATDEF ATTR_PERCPU tsc_hz_t thiscpu_tsc_hzmin;
+DATDEF ATTR_PERCPU tsc_hz_t thiscpu_tsc_hzmax;
 
 /* Read and return the current timestamp counter of the calling CPU.
  * The base-line of the returned counter is the calling CPU being
@@ -125,12 +128,10 @@ NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
 FUNDEF NOPREEMPT NOBLOCK void
 NOTHROW(FCALL tsc_resync_interrupt)(ktime_t new_ktime);
 
-#ifndef CONFIG_NO_SMP
 /* Perform the initial TSC resync for the calling CPU.
  * This function will also calculate and set the initial TSC deadline.*/
 FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL tsc_resync_init)(struct cpu *__restrict me);
-#endif /* !CONFIG_NO_SMP */
 
 /* Retrieve the current realtime, as read from an external clock source.
  * This function's implementation is arch-specific, and should only be

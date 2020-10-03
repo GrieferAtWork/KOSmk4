@@ -1372,14 +1372,12 @@
 #define __fsid_t           fsid_t
 #define __time32_t         time32_t
 #define __time64_t         time64_t
-#define __quantum_diff_t   quantum_diff_t
 #define __clock_t          clock_t
 #define __suseconds_t      suseconds_t
 #define __clockid_t        clockid_t
 #define __gid_t            gid_t
 #define __uid_t            uid_t
 #define __useconds_t       useconds_t
-#define __jtime_t          jtime_t
 #define __timer_t          timer_t
 #define __fsword_t         fsword_t
 #define __STDC_INT_AS_SSIZE_T   ssize_t

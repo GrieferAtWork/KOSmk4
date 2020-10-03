@@ -122,7 +122,7 @@ vm_copytophys(PHYS physaddr_t dst,
 	byte_t *tramp;
 	bool is_first;
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY(src, num_bytes)) {
+	if (PHYS_IS_IDENTITY(dst, num_bytes)) {
 		memcpy(PHYS_TO_IDENTITY(dst), src, num_bytes);
 		return;
 	}
@@ -234,7 +234,7 @@ NOTHROW(KCALL vm_copytophys_nopf)(PHYS physaddr_t dst,
 	byte_t *tramp;
 	bool is_first;
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY(src, num_bytes))
+	if (PHYS_IS_IDENTITY(dst, num_bytes))
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, num_bytes);
 #endif /* !NO_PHYS_IDENTITY */
 	if unlikely(!num_bytes)
@@ -585,7 +585,7 @@ NOTHROW(KCALL vm_copytophys_onepage_nopf)(PHYS physaddr_t dst,
 	size_t result;
 	ASSERT_ONEPAGE_RANGE(dst, num_bytes, PAGESIZE);
 #ifndef NO_PHYS_IDENTITY
-	if (PHYS_IS_IDENTITY(src, num_bytes))
+	if (PHYS_IS_IDENTITY(dst, num_bytes))
 		return memcpy_nopf(PHYS_TO_IDENTITY(dst), src, num_bytes);
 #endif /* !NO_PHYS_IDENTITY */
 	tramp  = THIS_TRAMPOLINE_BASE;

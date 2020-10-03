@@ -417,11 +417,23 @@ INTERN_FUNCTION(x86_idt_preemption)
 	movl   thiscpu_x86_apic_emutsc_initial_shifted+4(%Pbx), %eax
 	adcl   %eax, thiscpu_x86_apic_emutsc_tscbase+4(%Pbx)
 #endif /* !__x86_64__ */
-1:	/* Store the current counter. */
+	/* Store the current counter.
+	 * NOTE: Must only do this if the interrupt wasn't already handled,
+	 *       else this might result in an APIC interval being lost:
+	 * >> READ(CURRENT) = 0x123;
+	 * >> HW:SCHEDULE_INTERRUPT;
+	 * >> CURRENT = 0x100000;
+	 * >> READ(CURRENT) = 0xf0000;  -> thiscpu_x86_apic_emutsc_early_interrupt=true;
+	 * >> READ(CURRENT) = 0x8000;
+	 * >> SW:HANDLE_INTERRUPT;
+	 * >> thiscpu_x86_apic_emutsc_prev_current = READ(CURRENT) = 0xf0000;
+	 * If the last line was executed, it would cause the secondary interrupt
+	 * to become lost! */
 /*	movP   x86_lapicbase, %Pdi */ /* Had already been loaded */
 	movl   APIC_TIMER_CURRENT(%Pdi), %eax
 	EXTERN(thiscpu_x86_apic_emutsc_prev_current)
 	movl   %eax, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
+1:
 
 	/* Check if a deadline has even been set. */
 #ifdef __x86_64__
@@ -466,7 +478,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 	movl   thiscpu_x86_apic_emutsc_initial_shifted+4(%Pbx), %eax
 	adcl   %eax, thiscpu_x86_apic_emutsc_tscbase+4(%Pbx)
 #endif /* !__x86_64__ */
-1:	/* Read the current counter. */
+	/* Read the current counter. */
 	movb   $(PIT_COMMAND_SELECT_F0 | PIT_COMMAND_ACCESS_FLATCH | PIT_COMMAND_FBINARY), %al
 	outb   %al, $(PIT_COMMAND)
 	inb    $(PIT_DATA0), %al
@@ -475,11 +487,22 @@ INTERN_FUNCTION(x86_idt_preemption)
 	movb   %al, %ch
 	movzwl %cx, %ecx
 
-	/* Store the current counter. */
+	/* Store the current counter.
+	 * NOTE: Must only do this if the interrupt wasn't already handled,
+	 *       else this might result in an APIC interval being lost:
+	 * >> READ(CURRENT) = 0x123;
+	 * >> HW:SCHEDULE_INTERRUPT;
+	 * >> CURRENT = 0x100000;
+	 * >> READ(CURRENT) = 0xf0000;  -> thiscpu_x86_apic_emutsc_early_interrupt=true;
+	 * >> READ(CURRENT) = 0x8000;
+	 * >> SW:HANDLE_INTERRUPT;
+	 * >> thiscpu_x86_apic_emutsc_prev_current = READ(CURRENT) = 0xf0000;
+	 * If the last line was executed, it would cause the secondary interrupt
+	 * to become lost! */
 	EXTERN(thiscpu_x86_apic_emutsc_prev_current)
 	movl   %ecx, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
 
-	/* Check if a deadline has even been set. */
+1:	/* Check if a deadline has even been set. */
 #ifdef __x86_64__
 	movq   thiscpu_x86_apic_emutsc_deadline(%Pbx), %rsi /* tsc_deadline:deadline */
 	cmpq   $(-1), %rsi
@@ -788,11 +811,11 @@ INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 #endif /* !__x86_64__ */
 	/*     ...
 	 * } */
-1:	/* FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = (FORCPU(me, thiscpu_x86_apic_emutsc_initial) -
-	 *                                                     lapic_read(APIC_TIMER_CURRENT)); */
+	/* FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = lapic_read(APIC_TIMER_CURRENT); */
 	movl   APIC_TIMER_CURRENT(%Pax), %ecx /* NOTE: %Pax was loaded above! */
 	EXTERN(thiscpu_x86_apic_emutsc_prev_current)
 	movl   %ecx, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
+1:
 .alt_else
 	/* Account for timings, but don't re-calculate the TSC deadline. */
 	movP   %segtls:this_cpu, %Pbx
@@ -820,7 +843,7 @@ INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 #endif /* !__x86_64__ */
 	/*     ...
 	 * } */
-1:	/* FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = lapic_read(APIC_TIMER_CURRENT); */
+	/* FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = lapic_read(APIC_TIMER_CURRENT); */
 
 	/* Read the current PIT counter position. */
 	movb   $(PIT_COMMAND_SELECT_F0 | PIT_COMMAND_ACCESS_FLATCH | PIT_COMMAND_FBINARY), %al
@@ -831,6 +854,7 @@ INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 	movb   %al, %ch
 	movzwl %cx, %ecx
 	movl   %ecx, thiscpu_x86_apic_emutsc_prev_current(%Pbx)
+1:
 .alt_endif
 
 	popP_cfi_r %Pbx
