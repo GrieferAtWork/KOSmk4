@@ -53,16 +53,15 @@
 
 DECL_BEGIN
 
-
 #ifdef __HAVE_CPUSET_FULL_MASK
 PUBLIC cpuset_t ___cpuset_full_mask ASMNAME("__cpuset_full_mask") = 1;
-#endif
+#endif /* __HAVE_CPUSET_FULL_MASK */
 
 
 /* [!0][<= CONFIG_MAX_CPU_COUNT][const] The total number of known CPUs. */
-PUBLIC cpuid_t _cpu_count ASMNAME("cpu_count") = 1;
+PUBLIC unsigned int cpu_count_ ASMNAME("cpu_count") = 1;
 #ifndef CONFIG_NO_SMP
-PUBLIC cpuid_t cpu_online_count = 1;
+PUBLIC unsigned int cpu_online_count = 1;
 #endif /* !CONFIG_NO_SMP */
 
 /* [1..1][cpu_count] Vector of CPU descriptors.
@@ -75,7 +74,9 @@ PRIVATE ATTR_USED ATTR_SECTION(".data.percpu.head")
 struct cpu cpu_header = {
 	/* .c_id       = */ 0,
 	/* .c_state    = */ CPU_STATE_RUNNING,
-	/* .c_pad      = */ { 0, },
+#if ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0
+	/* ._c_pad     = */ { 0, },
+#endif /* ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0 */
 #ifndef CONFIG_NO_SMP
 	/* .c_pdir     = */ pagedir_kernel_phys
 #endif /* !CONFIG_NO_SMP */

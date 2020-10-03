@@ -144,7 +144,7 @@ PRIVATE ATTR_COLDBSS struct idt_segment *x86_idt_modify_copy = NULL;
 
 
 #ifndef CONFIG_NO_SMP
-PRIVATE ATTR_COLDBSS cpuid_t x86_idt_setcurrent_ack = 0;
+PRIVATE ATTR_COLDBSS unsigned int x86_idt_setcurrent_ack = 0;
 PRIVATE ATTR_COLDTEXT NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL x86_idt_setcurrent_ipi)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
@@ -178,7 +178,7 @@ NOTHROW(FCALL x86_idt_setcurrent)(struct desctab const *__restrict ptr) {
 	COMPILER_BARRIER();
 #ifndef CONFIG_NO_SMP
 	{
-		cpuid_t count;
+		unsigned int count;
 		void *args[CPU_IPI_ARGCOUNT];
 		ATOMIC_WRITE(x86_idt_setcurrent_ack, 0);
 		args[0] = (void *)ptr;

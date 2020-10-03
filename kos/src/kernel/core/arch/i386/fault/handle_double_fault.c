@@ -87,7 +87,7 @@ NOTHROW(KCALL x86_failsafe_getcpu)(void) {
 		result = &_bootcpu;
 	} else if (X86_HAVE_LAPIC) {
 		/* Use the LAPIC id to determine the current CPU. */
-		cpuid_t i;
+		unsigned int i;
 		u8 id = (u8)(lapic_read(APIC_ID) >> APIC_ID_FSHIFT);
 		result = &_bootcpu;
 		for (i = 0; i < cpu_count; ++i) {

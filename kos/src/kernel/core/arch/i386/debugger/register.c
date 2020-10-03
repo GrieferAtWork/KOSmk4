@@ -206,7 +206,7 @@ NOTHROW(KCALL get_dbg_current_kernel_gs_base)(u64 *__restrict presult) {
 #ifndef CONFIG_NO_SMP
 	else if (dbg_current->t_cpu &&
 	         FORCPU(dbg_current->t_cpu, thiscpu_sched_current) == dbg_current) {
-		cpuid_t cpuid;
+		unsigned int cpuid;
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
@@ -236,7 +236,7 @@ NOTHROW(KCALL set_dbg_current_kernel_gs_base)(u64 value) {
 #ifndef CONFIG_NO_SMP
 	else if (dbg_current->t_cpu &&
 	         FORCPU(dbg_current->t_cpu, thiscpu_sched_current) == dbg_current) {
-		cpuid_t cpuid;
+		unsigned int cpuid;
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
@@ -275,7 +275,7 @@ NOTHROW(KCALL saveorig)(void) {
 #ifndef CONFIG_NO_SMP
 	} else if (dbg_current->t_cpu &&
 	           FORCPU(dbg_current->t_cpu, thiscpu_sched_current) == dbg_current) {
-		cpuid_t cpuid;
+		unsigned int cpuid;
 		struct icpustate *ist;
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
@@ -328,7 +328,7 @@ do_normal_unscheduled_thread:
 		/* Fill in missing registers. */
 #ifndef CONFIG_NO_SMP
 		if (dbg_current->t_cpu != THIS_CPU) {
-			cpuid_t cpuid;
+			unsigned int cpuid;
 			if unlikely(!dbg_current->t_cpu)
 				goto nocpu;
 			cpuid = dbg_current->t_cpu->c_id;
@@ -389,7 +389,7 @@ NOTHROW(KCALL loadview)(void) {
 #ifndef CONFIG_NO_SMP
 		} else if (dbg_current->t_cpu &&
 		           FORCPU(dbg_current->t_cpu, thiscpu_sched_current) == dbg_current) {
-			cpuid_t cpuid;
+			unsigned int cpuid;
 			struct icpustate *ist;
 			struct x86_dbg_cpuammend *ammend;
 			uintptr_t psp;
@@ -490,7 +490,7 @@ do_normal_unscheduled_thread:
 			/* Fill in missing registers. */
 #ifndef CONFIG_NO_SMP
 			if (dbg_current->t_cpu != THIS_CPU) {
-				cpuid_t cpuid;
+				unsigned int cpuid;
 				if unlikely(!dbg_current->t_cpu)
 					goto nocpu;
 				cpuid = dbg_current->t_cpu->c_id;

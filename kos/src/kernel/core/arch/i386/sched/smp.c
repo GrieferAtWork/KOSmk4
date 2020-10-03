@@ -110,10 +110,10 @@ done:
 }
 
 
-PUBLIC ATTR_PERCPU u8 _thiscpu_x86_lapicid ASMNAME("thiscpu_x86_lapicid") = 0;
-PUBLIC ATTR_PERCPU u8 _thiscpu_x86_lapicversion ASMNAME("thiscpu_x86_lapicversion") = 0;
-DATDEF cpuid_t _cpu_count ASMNAME("cpu_count");
-DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
+PUBLIC ATTR_PERCPU u8 thiscpu_x86_lapicid_ ASMNAME("thiscpu_x86_lapicid") = 0;
+PUBLIC ATTR_PERCPU u8 thiscpu_x86_lapicversion_ ASMNAME("thiscpu_x86_lapicversion") = 0;
+DATDEF unsigned int cpu_count_ ASMNAME("cpu_count");
+DATDEF struct cpu *cpu_vector_[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 
 PUBLIC VIRT byte_t volatile *x86_lapicbase_ ASMNAME("x86_lapicbase") = NULL;
 
@@ -145,8 +145,8 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 		x86_vm_part_lapic.dp_ramdata.rd_block0.rb_size  = 1;
 		x86_vm_part_lapic.dp_tree.a_vmin                = (datapage_t)0;
 		x86_vm_part_lapic.dp_tree.a_vmax                = (datapage_t)0;
-		FORCPU(&_bootcpu, _thiscpu_x86_lapicid)         = 0xff; /* Read later using the LAPIC */
-		FORCPU(&_bootcpu, _thiscpu_x86_lapicversion)    = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
+		FORCPU(&_bootcpu, thiscpu_x86_lapicid_)         = 0xff; /* Read later using the LAPIC */
+		FORCPU(&_bootcpu, thiscpu_x86_lapicversion_)    = fps->mp_defcfg > 4 ? APICVER_INTEGRATED : APICVER_82489DX;
 		return;
 	}
 	/* Check pointer location. */
@@ -189,10 +189,10 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 					if (entry->mp_processor.p_cpuflag & MP_PROCESSOR_FBOOTPROCESSOR) {
 						printk(FREESTR(KERN_INFO "[smp] Found boot processor with lapic id %#.2" PRIx8 "\n"),
 						       entry->mp_processor.p_lapicid);
-						FORCPU(&_bootcpu, _thiscpu_x86_lapicid) = entry->mp_processor.p_lapicid;
+						FORCPU(&_bootcpu, thiscpu_x86_lapicid_) = entry->mp_processor.p_lapicid;
 					}
 #ifndef CONFIG_NO_SMP
-					else if unlikely(_cpu_count >= x86_config_max_cpu_count) {
+					else if unlikely(cpu_count_ >= x86_config_max_cpu_count) {
 						printk(FREESTR(KERN_WARNING "[smp] Cannot configure additional "
 						                            "processor with lapic id %#.2" PRIx8 "\n"),
 						       entry->mp_processor.p_lapicid);
@@ -202,11 +202,11 @@ NOTHROW(KCALL x86_initialize_smp)(void) {
 						 *       later on. - For right now, we only save its LAPIC id where its
 						 *       controller point will go later (s.a. `x86_initialize_apic()'). */
 						printk(FREESTR(KERN_INFO "[smp] Found secondary processor #%u with lapic id %#.2" PRIx8 "\n"),
-						       _cpu_count, entry->mp_processor.p_lapicid);
+						       cpu_count_, entry->mp_processor.p_lapicid);
 						/* This entry will later be replaced by a proper `struct cpu' structure! */
-						_cpu_vector[_cpu_count] = (struct cpu *)(uintptr_t)(((u16)entry->mp_processor.p_lapicid) |
+						cpu_vector_[cpu_count_] = (struct cpu *)(uintptr_t)(((u16)entry->mp_processor.p_lapicid) |
 						                                                    ((u16)entry->mp_processor.p_lapicver << 8));
-						++_cpu_count;
+						++cpu_count_;
 					}
 #endif /* !CONFIG_NO_SMP */
 				}

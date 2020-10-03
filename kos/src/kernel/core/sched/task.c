@@ -211,7 +211,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 #else /* EXCEPT_BACKTRACE_SIZE != 0 */
 	DEFINE_PUBLIC_SYMBOL(this_exception_trace, 0, 0);
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
-	DEFINE_PUBLIC_SYMBOL(thiscpu_id, offsetof(struct cpu, c_id), sizeof(cpuid_t));
+	DEFINE_PUBLIC_SYMBOL(thiscpu_id, offsetof(struct cpu, c_id), sizeof(unsigned int));
 #ifndef CONFIG_NO_SMP
 	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, offsetof(struct cpu, c_pdir), sizeof(pagedir_phys_t));
 #else /* !CONFIG_NO_SMP */

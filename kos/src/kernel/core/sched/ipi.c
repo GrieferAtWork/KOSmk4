@@ -60,10 +60,10 @@ DECL_BEGIN
  * @return: true:  IPI delivery successful.
  * @return: false: The IPI could not be scheduled because the target
   *                CPU is offline, and `CPU_IPI_FWAKEUP' was not set. */
-PUBLIC ATTR_WEAK NOBLOCK NONNULL((2, 3)) ATTR_SECTION(".text.kernel.cpu_sendipi_cpuset") cpuid_t
+PUBLIC ATTR_WEAK NOBLOCK NONNULL((2, 3)) ATTR_SECTION(".text.kernel.cpu_sendipi_cpuset") unsigned int
 NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
                                   void *args[CPU_IPI_ARGCOUNT], unsigned int flags) {
-	cpuid_t i, result = 0;
+	unsigned int i, result = 0;
 	if (flags & CPU_IPI_FWAKEUP) {
 		for (i = 0; i < cpu_count; ++i) {
 			if (!CPUSET_CONTAINS(targets, i))
@@ -130,9 +130,9 @@ again_check_cpu_state:
 
 /* Same as the regular IPI functions, however the IPI is broadcast to all CPUs.
  * @return: * : The number of successfully delivered IPIs. */
-PUBLIC ATTR_WEAK NOBLOCK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcastipi") cpuid_t
+PUBLIC ATTR_WEAK NOBLOCK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcastipi") unsigned int
 NOTHROW(KCALL cpu_broadcastipi)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], unsigned int flags) {
-	cpuid_t result;
+	unsigned int result;
 	cpuset_t set;
 	CPUSET_SETFULL(set);
 	result = cpu_sendipi_cpuset(set, func, args, flags);
@@ -140,9 +140,9 @@ NOTHROW(KCALL cpu_broadcastipi)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], un
 }
 
 /* Same as `cpu_broadcastipi()', but don't send the IPI to the calling CPU. */
-PUBLIC ATTR_WEAK NOBLOCK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcastipi_notthis") cpuid_t
+PUBLIC ATTR_WEAK NOBLOCK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcastipi_notthis") unsigned int
 NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], unsigned int flags) {
-	cpuid_t result;
+	unsigned int result;
 	cpuset_t set;
 	uintptr_t old_flags;
 	struct task *me = THIS_TASK;

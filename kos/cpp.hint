@@ -1147,6 +1147,10 @@
 #define PCI_FOREACH(...) for(;;)
 #define PCI_FOREACH_CLASS(...) for(;;)
 #define SLAB_FOREACH_SIZE(func,_) func(8,_) func(16,_) func(24,_) func(32,_)
+#define FOREACH_thiscpu_threads(...) for(;;)
+#define FOREACH_thiscpu_running(...) for(;;)
+#define FOREACH_thiscpu_waiting(...) for(;;)
+#define FOREACH_thiscpu_sched_pending(...) for(;;)
 
 #define DEFINE_ABS_CALLBACK(...)
 #define DEFINE_REL_CALLBACK(...)

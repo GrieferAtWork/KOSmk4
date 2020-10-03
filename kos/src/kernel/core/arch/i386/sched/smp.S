@@ -846,7 +846,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 	/* Find the CPU how's APIC_ID matches `%sp' (and that'll be us then) */
 	EXTERN(cpu_count)
-	movP   cpu_count, %Pcx
+	movzlP cpu_count, %Pcx
 	decP   %Pcx
 	EXTERN(cpu_vector)
 1:	movP   cpu_vector(,%Pcx,PS), R_CPU
@@ -861,7 +861,7 @@ INTERN_FUNCTION(x86_smp_entry64)
 	EXTERN(thiscpu_state)
 	movP   $(CPU_STATE_RUNNING), thiscpu_state(R_CPU)
 	EXTERN(cpu_online_count)
-	lock   incP cpu_online_count
+	lock   incl cpu_online_count
 
 	/* Found our CPU (now stored in R_CPU) */
 	EXTERN(thiscpu_sched_current)
@@ -1325,7 +1325,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 
 	/* Decrement the cpu-online counter. */
 	EXTERN(cpu_online_count)
-	lock   decP cpu_online_count
+	lock   decl cpu_online_count
 
 	EXTERN(thiscpu_idle_sstate)
 	movP   %Psp, thiscpu_idle_sstate(%R_fcall0P)

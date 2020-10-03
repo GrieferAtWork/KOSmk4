@@ -400,7 +400,7 @@ task_enum_all_nb(task_enum_cb_t cb, void *arg)
 	result = task_enum_cpu_nb(cb, arg, &_bootcpu);
 #else /* CONFIG_NO_SMP */
 	ssize_t temp;
-	cpuid_t i;
+	unsigned int i;
 	result = 0;
 	for (i = 0; i < cpu_count; ++i) {
 		temp = task_enum_cpu_nb(cb, arg, cpu_vector[i]);
@@ -419,7 +419,7 @@ task_enum_all_nb(task_enum_cb_t cb, void *arg)
 #ifndef CONFIG_NO_SMP
 FUNDEF NONNULL((1)) ssize_t
 NOTHROW(KCALL task_enum_all_noipi_nb)(task_enum_cb_t cb, void *arg) {
-	cpuid_t i;
+	unsigned int i;
 	ssize_t temp, result = 0;
 	for (i = 0; i < cpu_count; ++i) {
 		temp = task_enum_mycpu_nb(cb, arg, cpu_vector[i]);

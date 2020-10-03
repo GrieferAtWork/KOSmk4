@@ -63,7 +63,7 @@ PUBLIC NOBLOCK WUNUSED cpuset_t
 NOTHROW(FCALL __pagedir_getcpus)(pagedir_phys_t self)
 #endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
 {
-	cpuid_t i;
+	unsigned int i;
 #if CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER
 	cpuset_t result;
 #endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */

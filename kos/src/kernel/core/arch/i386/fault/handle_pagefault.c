@@ -250,7 +250,7 @@ handle_iob_access(struct cpu *__restrict me,
 /* Check if the given `node' is the IOB vector of some CPU */
 LOCAL NOBLOCK WUNUSED ATTR_CONST bool
 NOTHROW(FCALL is_iob_node)(struct vm_node *node) {
-	cpuid_t i;
+	unsigned int i;
 	for (i = 0; i < cpu_count; ++i) {
 		if (node == &FORCPU(cpu_vector[i], thiscpu_x86_iobnode))
 			return true;

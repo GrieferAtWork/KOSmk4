@@ -43,7 +43,7 @@
  *    >>again:
  *    >> NEXT = THIS_CPU.thiscpu_scheduler.s_running;
  *    >> NEXT_PRIORITY = NEXT.this_stoptime;
- *    >> FOREACH_thiscpu_sleeping(thread, me) {
+ *    >> FOREACH_thiscpu_waiting(thread, me) {
  *    >>     if (thread.this_sched_timeout > NOW)
  *    >>         break; // No more threads that have timed out.
  *    >>     if unlikely(thread.this_stoptime > NEXT_PRIORITY)
@@ -64,7 +64,7 @@
  *    >>         DEADLINE = INFINITE;
  *    >> }
  *    >> // Check if we should cut the quantum short due to a sleeping thread.
- *    >> FOREACH_thiscpu_sleeping(thread, me) {
+ *    >> FOREACH_thiscpu_waiting(thread, me) {
  *    >>     if unlikely(thread.this_sched_timeout >= DEADLINE)
  *    >>         break; // No sleeping thread will time out before our quantum ends
  *    >>     // Check if the thread will have a greater priority than `NEXT' when it times out.
@@ -207,7 +207,7 @@ DATDEF struct task _bootidle;
 	     (iter) = FORTASK(iter, this_sched_link.ln_next))
 
 /* Enumerate all sleeping threads of the given CPU */
-#define FOREACH_thiscpu_sleeping(iter, me)                                     \
+#define FOREACH_thiscpu_waiting(iter, me)                                      \
 	for ((iter) = scheduler_s_waiting(&FORCPU(me, thiscpu_scheduler)); (iter); \
 	     (iter) = FORTASK(iter, this_sched_link.ln_next))
 

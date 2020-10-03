@@ -802,8 +802,8 @@ INTDEF FREE volatile u8 cpu_offline_mask[CEILDIV(CONFIG_MAX_CPU_COUNT, 8)];
  * NOTE: This function is only called when `X86_HAVE_LAPIC == true' */
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_altcore_entry)(void) {
 	/* C-level entry point for secondary SMP cores. */
-	struct cpu *me = THIS_CPU;
-	cpuid_t id     = me->c_id;
+	struct cpu *me  = THIS_CPU;
+	unsigned int id = me->c_id;
 	tsc_hz_t hz;
 	/* Tell the boot-cpu that we're now online. */
 	ATOMIC_AND(cpu_offline_mask[id / 8], ~(1 << (id % 8)));

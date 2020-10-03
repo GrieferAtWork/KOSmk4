@@ -270,7 +270,7 @@ PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
                                       void *args[CPU_IPI_ARGCOUNT]) {
 	struct x86_dbg_cpuammend ammend;
-	cpuid_t mycpuid;
+	unsigned int mycpuid;
 	/* Quick check: Are we even supposed to become suspended? */
 	if unlikely(ATOMIC_READ(dbg_cpu_) == NULL)
 		goto done;
@@ -408,9 +408,9 @@ done:
 #ifndef CONFIG_NO_SMP
 
 /* Return the number of CPUs that have ACKed having been suspended. */
-PRIVATE NOBLOCK ATTR_DBGTEXT cpuid_t
+PRIVATE NOBLOCK ATTR_DBGTEXT unsigned int
 NOTHROW(KCALL x86_dbg_hostbackup_cpu_suspended_count)(void) {
-	cpuid_t i, result = 0;
+	unsigned int i, result = 0;
 	for (i = 0; i < cpu_count; ++i) {
 		if (ATOMIC_READ(x86_dbg_hostbackup.dhs_cpus[i].dcs_istate) != NULL)
 			++result;
@@ -420,12 +420,12 @@ NOTHROW(KCALL x86_dbg_hostbackup_cpu_suspended_count)(void) {
 
 INTDEF ATTR_PERCPU uintptr_t thiscpu_idle_x86_kernel_psp0;
 
-PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 2)) cpuid_t
+PRIVATE NOBLOCK ATTR_DBGTEXT NONNULL((1, 2)) unsigned int
 NOTHROW(KCALL cpu_broadcastipi_notthis_early_boot_aware)(cpu_ipi_t func,
                                                          void *args[CPU_IPI_ARGCOUNT],
                                                          unsigned int flags,
                                                          struct cpu *calling_cpu) {
-	cpuid_t i, result = 0;
+	unsigned int i, result = 0;
 	pflag_t was = PREEMPTION_PUSHOFF();
 	for (i = 0; i < cpu_count; ++i) {
 		struct cpu *target;
@@ -734,7 +734,7 @@ fully_reset_task_connections:
 #ifndef CONFIG_NO_SMP
 	{
 		void *args[CPU_IPI_ARGCOUNT];
-		cpuid_t count;
+		unsigned int count;
 		memset(x86_dbg_hostbackup.dhs_cpus, 0, sizeof(x86_dbg_hostbackup.dhs_cpus));
 		COMPILER_BARRIER();
 		count = cpu_broadcastipi_notthis_early_boot_aware(&debugger_wait_for_done, args,

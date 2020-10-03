@@ -63,10 +63,10 @@
 
 DECL_BEGIN
 
-DATDEF ATTR_PERCPU u8 _thiscpu_x86_lapicid ASMNAME("thiscpu_x86_lapicid");
-DATDEF ATTR_PERCPU u8 _thiscpu_x86_lapicversion ASMNAME("thiscpu_x86_lapicversion");
-DATDEF cpuid_t _cpu_count ASMNAME("cpu_count");
-DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
+DATDEF ATTR_PERCPU u8 thiscpu_x86_lapicid_ ASMNAME("thiscpu_x86_lapicid");
+DATDEF ATTR_PERCPU u8 thiscpu_x86_lapicversion_ ASMNAME("thiscpu_x86_lapicversion");
+DATDEF unsigned int cpu_count_ ASMNAME("cpu_count");
+DATDEF struct cpu *cpu_vector_[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 
 
 #ifndef CONFIG_NO_SMP
@@ -483,17 +483,17 @@ NOTHROW(KCALL cpu_destroy)(struct cpu *__restrict self) {
 
 PRIVATE ATTR_FREETEXT void KCALL
 i386_allocate_secondary_cores(void) {
-	cpuid_t i;
-	for (i = 1; i < _cpu_count; ++i) {
+	unsigned int i;
+	for (i = 1; i < cpu_count_; ++i) {
 		struct cpu *altcore;
 		struct task *altidle;
 		/* Allocate an initialize the alternative core. */
 		altcore = cpu_alloc();
 		altidle = &FORCPU(altcore, thiscpu_idle);
 		/* Decode information previously encoded in `smp.c' */
-		FORCPU(altcore, _thiscpu_x86_lapicid)      = (uintptr_t)_cpu_vector[i] & 0xff;
-		FORCPU(altcore, _thiscpu_x86_lapicversion) = ((uintptr_t)_cpu_vector[i] & 0xff00) >> 8;
-		_cpu_vector[i] = altcore;
+		FORCPU(altcore, thiscpu_x86_lapicid_)      = (uintptr_t)cpu_vector_[i] & 0xff;
+		FORCPU(altcore, thiscpu_x86_lapicversion_) = ((uintptr_t)cpu_vector_[i] & 0xff00) >> 8;
+		cpu_vector_[i] = altcore;
 
 		altcore->c_id                          = i;
 		FORCPU(altcore, thiscpu_sched_current) = altidle;
@@ -766,8 +766,8 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 	/* Check if we should make use of the LAPIC */
 	if (X86_HAVE_LAPIC) {
 #ifndef CONFIG_NO_SMP
-		cpuid_t i;
-		if (_cpu_count > 1) {
+		unsigned int i;
+		if (cpu_count_ > 1) {
 			physpage_t entry_page;
 			/* Allocate low physical memory for the SMP initialization entry page. */
 			entry_page = page_malloc_between((physpage_t)((physaddr_t)0x00000000 / PAGESIZE),
@@ -775,7 +775,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 			                                 CEILDIV(x86_smp_entry_size, PAGESIZE));
 			if unlikely(entry_page == PHYSPAGE_INVALID) {
 				printk(FREESTR(KERN_WARNING "[smp] Failed to allocate SMP trampoline (re-configure for single-core mode)\n"));
-				_cpu_count = 1;
+				cpu_count_ = 1;
 #ifdef __HAVE_CPUSET_FULL_MASK
 				CPUSET_SETONE(___cpuset_full_mask, 0); /* 0 == BOOTCPU_ID */
 #endif /* __HAVE_CPUSET_FULL_MASK */
@@ -806,9 +806,9 @@ done_early_altcore_init:
 #endif /* !CONFIG_NO_SMP */
 
 		/* Read out the boot cpu's LAPIC id if it couldn't be determined before now. */
-		if (FORCPU(&_bootcpu, _thiscpu_x86_lapicid) == 0xff) {
+		if (FORCPU(&_bootcpu, thiscpu_x86_lapicid_) == 0xff) {
 			u32 id = lapic_read(APIC_ID);
-			FORCPU(&_bootcpu, _thiscpu_x86_lapicid) = (u8)(id >> APIC_ID_FSHIFT);
+			FORCPU(&_bootcpu, thiscpu_x86_lapicid_) = (u8)(id >> APIC_ID_FSHIFT);
 		}
 
 		/* Disable the PIT interrupt if we're going to use the LAPIC timer. */
@@ -821,7 +821,7 @@ done_early_altcore_init:
 #ifndef CONFIG_NO_SMP
 		assert(CPU_ALL_ONLINE);
 		/* Send INIT commands to all CPUs. */
-		for (i = 1; i < _cpu_count; ++i) {
+		for (i = 1; i < cpu_count_; ++i) {
 			cpu_offline_mask[i / 8] |= 1 << (i % 8); /* Mark the CPU as offline */
 			apic_send_init(FORCPU(cpu_vector[i], thiscpu_x86_lapicid));
 		}
@@ -838,7 +838,7 @@ done_early_altcore_init:
 		x86_calibrate_boottsc();
 #ifndef CONFIG_NO_SMP
 		/* Send start IPIs to all APs. */
-		for (i = 1; i < _cpu_count; ++i) {
+		for (i = 1; i < cpu_count_; ++i) {
 			apic_send_startup(FORCPU(cpu_vector[i], thiscpu_x86_lapicid),
 			                  x86_smp_entry_page);
 		}
@@ -853,7 +853,7 @@ done_early_altcore_init:
 			if likely(CPU_ALL_ONLINE)
 				goto all_online;
 			/* Re-send start IPIs to all APs still not online. */
-			for (i = 1; i < _cpu_count; ++i) {
+			for (i = 1; i < cpu_count_; ++i) {
 				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8))))
 					continue;
 				printk(FREESTR(KERN_WARNING "[smp] Re-attempting startup of processor #%u (LAPIC id %#.2" PRIx8 ")\n"),
@@ -871,9 +871,9 @@ done_early_altcore_init:
 			if (CPU_ALL_ONLINE)
 				goto all_online;
 			/* Guess these CPUs are just broken... */
-			for (i = 1; i < _cpu_count;) {
+			for (i = 1; i < cpu_count_;) {
 				struct cpu *discard_cpu;
-				discard_cpu       = _cpu_vector[i];
+				discard_cpu       = cpu_vector_[i];
 				discard_cpu->c_id = i; /* Re-assign CPU IDs to reflect removed entries. */
 				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8)))) {
 					++i;
@@ -881,25 +881,25 @@ done_early_altcore_init:
 				}
 				printk(FREESTR(KERN_ERR "[smp] CPU with LAPIC id %#.2" PRIx8 " doesn't want to "
 				                        "come online (removing it from the configuration)\n"),
-				       i, FORCPU(_cpu_vector[i], thiscpu_x86_lapicid));
-				cpu_destroy(_cpu_vector[i]);
+				       i, FORCPU(cpu_vector_[i], thiscpu_x86_lapicid));
+				cpu_destroy(cpu_vector_[i]);
 				/* Remove the CPU from the vector. */
-				--_cpu_count;
-				memmovedown(&_cpu_vector[i], &_cpu_vector[i + 1],
-				            _cpu_count - i, sizeof(struct cpu *));
+				--cpu_count_;
+				memmovedown(&cpu_vector_[i], &cpu_vector_[i + 1],
+				            cpu_count_ - i, sizeof(struct cpu *));
 			}
 		}
 all_online:
 		;
 #ifdef __HAVE_CPUSET_FULL_MASK
-		___cpuset_full_mask = ((cpuset_t)1 << _cpu_count) - 1;
+		___cpuset_full_mask = ((cpuset_t)1 << cpu_count_) - 1;
 #endif /* __HAVE_CPUSET_FULL_MASK */
 #endif /* !CONFIG_NO_SMP */
 	} else {
 		printk(FREESTR(KERN_INFO "[smp] LAPIC unavailable or disabled\n"));
 
 		/* Ensure that we're configured for only a single CPU */
-		_cpu_count = 1;
+		cpu_count_ = 1;
 #ifdef __HAVE_CPUSET_FULL_MASK
 		CPUSET_SETONE(___cpuset_full_mask, 0); /* 0 == BOOTCPU_ID */
 #endif /* __HAVE_CPUSET_FULL_MASK */

@@ -331,7 +331,7 @@ PRIVATE void NOTHROW(FCALL GDBThread_ReenablePreemptionForHostCPU)(void) {
 
 
 INTERN void NOTHROW(FCALL GDBThread_StopAllCpus)(void) {
-	cpuid_t count;
+	unsigned int count;
 	GDBThreadStopEvent *oldStopEvents;
 	if (GDBThread_IsAllStopModeActive)
 		return; /* Already in all-stop mode */
@@ -348,7 +348,7 @@ INTERN void NOTHROW(FCALL GDBThread_StopAllCpus)(void) {
 	if (count != 0) {
 		/* Wait until a total of `count' new stop events have appeared. */
 		GDBThreadStopEvent *lastNewEvent;
-		cpuid_t newCount;
+		unsigned int newCount;
 		for (;;) {
 			newCount     = 0;
 			lastNewEvent = ATOMIC_READ(GDBThread_Stopped);

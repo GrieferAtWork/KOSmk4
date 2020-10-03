@@ -1470,7 +1470,7 @@ NOTHROW(KCALL mall_print_leaks_impl)(void) {
 
 
 #ifndef CONFIG_NO_SMP
-PRIVATE ATTR_COLDBSS WEAK cpuid_t mall_suspended_cpu_count = 0;
+PRIVATE ATTR_COLDBSS WEAK unsigned int mall_suspended_cpu_count = 0;
 PRIVATE ATTR_COLDBSS WEAK struct task *mall_suspended_locked = NULL;
 PRIVATE ATTR_COLDBSS struct sig mall_suspended_unlock = SIG_INIT;
 
@@ -1534,7 +1534,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 
 PRIVATE NOBLOCK ATTR_COLDTEXT bool
 NOTHROW(KCALL mall_enter_singlecore_mode)(void) {
-	cpuid_t num_suspended;
+	unsigned int num_suspended;
 	struct task *old_thread;
 	old_thread = ATOMIC_CMPXCH_VAL(mall_suspended_locked,
 	                               NULL, THIS_TASK);

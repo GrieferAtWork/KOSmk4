@@ -68,18 +68,14 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef __cpuid_t_defined
-#define __cpuid_t_defined 1
-typedef uintptr_t cpuid_t;
-#endif /* !__cpuid_t_defined */
-
 struct task;
-struct vm;
 
 struct cpu {
-	cpuid_t             c_id;       /* The ID of this CPU. */
+	unsigned int        c_id;       /* The ID of this CPU. */
 	WEAK u16            c_state;    /* CPU State (one of `CPU_STATE_*') */
-	u16                 c_pad[(sizeof(void *)-2)/2]; /* ... */
+#if ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0
+	u16                _c_pad[__SIZEOF_POINTER__ - ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__)]; /* ... */
+#endif /* ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0 */
 #ifndef CONFIG_NO_SMP
 	WEAK pagedir_phys_t c_pdir; /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
 	                             * The currently used page directory. When `vm_sync()' is called,
@@ -109,7 +105,7 @@ FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(KCALL realtime)(void);
 #endif /* !__realtime_defined */
 
 /* [!0][<= CONFIG_MAX_CPU_COUNT][const] The total number of known CPUs. */
-DATDEF cpuid_t const cpu_count;
+DATDEF unsigned int const cpu_count;
 
 #ifndef CONFIG_NO_SMP
 /* Number of CPUs with a state set to `CPU_STATE_RUNNING'
@@ -117,7 +113,7 @@ DATDEF cpuid_t const cpu_count;
  * as the result of a call to `cpu_wake()' when an INIT IPI is used, and is
  * decremented when a cpu changes state to `CPU_STATE_DREAMING'.
  * Because the BOOT CPU can never dream, this value is always `>= 1'! */
-DATDEF cpuid_t cpu_online_count;
+DATDEF unsigned int cpu_online_count;
 #else /* !CONFIG_NO_SMP */
 #define cpu_online_count 1
 #endif /* CONFIG_NO_SMP */
@@ -154,7 +150,7 @@ typedef uintptr_t cpuset_t[(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_
 #define CPUSET_COUNT(x) cpuset_count_impl(x)
 LOCAL size_t NOTHROW(KCALL cpuset_count_impl)(cpuset_t self) {
 	size_t result = 0;
-	cpuid_t i;
+	unsigned int i;
 	for (i = 0; i < cpu_count; ++i) {
 		if (CPUSET_CONTAINS(self, i))
 			++result;
@@ -163,7 +159,7 @@ LOCAL size_t NOTHROW(KCALL cpuset_count_impl)(cpuset_t self) {
 }
 #define CPUSET_ISEMPTY(x) cpuset_isempty_impl(x)
 LOCAL bool NOTHROW(KCALL cpuset_isempty_impl)(cpuset_t self) {
-	cpuid_t i;
+	unsigned int i;
 	for (i = 0; i < cpu_count; ++i) {
 		if (CPUSET_CONTAINS(self, i))
 			return false;
@@ -212,7 +208,7 @@ DATDEF struct cpu _bootcpu;
 DATDEF ATTR_PERTASK struct cpu *this_cpu;
 
 /* [const] The ID (index in `cpu_vector') of the calling thread. */
-DATDEF ATTR_PERCPU cpuid_t thiscpu_id; /* ALIAS:THIS_CPU->c_id */
+DATDEF ATTR_PERCPU unsigned int thiscpu_id; /* ALIAS:THIS_CPU->c_id */
 
 #ifndef CONFIG_NO_SMP
 /* ALIAS:THIS_CPU->c_pdir */
@@ -223,14 +219,14 @@ DATDEF ATTR_PERCPU pagedir_phys_t thiscpu_pdir;
 #ifdef CONFIG_NO_SMP
 #undef THIS_CPU
 #undef THIS_IDLE
-#define THIS_CPU   (&_bootcpu)
-#define THIS_IDLE  (&_bootidle)
+#define THIS_CPU  (&_bootcpu)
+#define THIS_IDLE (&_bootidle)
 #else /* CONFIG_NO_SMP */
 #ifndef THIS_CPU
-#define THIS_CPU   PERTASK_GET(this_cpu)
+#define THIS_CPU PERTASK_GET(this_cpu)
 #endif /* !THIS_CPU */
 #ifndef THIS_IDLE
-#define THIS_IDLE  (&PERCPU(thiscpu_idle))
+#define THIS_IDLE (&PERCPU(thiscpu_idle))
 #endif /* !THIS_IDLE */
 #endif /* !CONFIG_NO_SMP */
 
@@ -547,17 +543,17 @@ NOTHROW(KCALL cpu_sendipi)(struct cpu *__restrict target, cpu_ipi_t func,
 
 /* Send an IPI to all CPUs apart of the given set of `targets'.
  * @return: * : The number of successfully delivered IPIs. */
-FUNDEF NOBLOCK NONNULL((2, 3)) cpuid_t
+FUNDEF NOBLOCK NONNULL((2, 3)) unsigned int
 NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
                                   void *args[CPU_IPI_ARGCOUNT], unsigned int flags);
 
 /* Same as the regular IPI functions, however the IPI is broadcast to all CPUs.
  * @return: * : The number of successfully delivered IPIs. */
-FUNDEF NOBLOCK NONNULL((1, 2)) cpuid_t
+FUNDEF NOBLOCK NONNULL((1, 2)) unsigned int
 NOTHROW(KCALL cpu_broadcastipi)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], unsigned int flags);
 
 /* Same as `cpu_broadcastipi()', but don't send the IPI to the calling CPU. */
-FUNDEF NOBLOCK NONNULL((1, 2)) cpuid_t
+FUNDEF NOBLOCK NONNULL((1, 2)) unsigned int
 NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], unsigned int flags);
 
 #endif /* !CONFIG_NO_SMP */

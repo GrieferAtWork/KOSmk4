@@ -377,7 +377,7 @@ again_lock_vm:
 #if 1 /* XXX: Remove me (only here to force & verify use of IPI mechanisms in multi-core situations)
        *      Basically: Only here to test a whole bunch of stuff... */
 		if (cpu_count > 1) {
-			static cpuid_t nextcpu = 0;
+			static unsigned int nextcpu = 0;
 			result->t_cpu = cpu_vector[(nextcpu++) % cpu_count];
 		}
 #endif

@@ -459,7 +459,7 @@ struct syslog_buffer {
 #ifdef WANT_SYSLOG_LOCK
 LOCAL NOBLOCK ATTR_CONST WUNUSED bool
 NOTHROW(FCALL is_a_valid_cpu)(struct cpu *c) {
-	cpuid_t i;
+	unsigned int i;
 	for (i = 0; i < cpu_count; ++i) {
 		if (cpu_vector[i] == c)
 			return true;

@@ -109,7 +109,7 @@ PRIVATE ATTR_PERCPU bool thiscpu_busline7 = false;
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL bus_tryacquirelock)(void) {
 	struct cpu *me = THIS_CPU;
-	cpuid_t i, myid = me->c_id;
+	unsigned int i, myid = me->c_id;
 	if (!FORCPU(me, thiscpu_busline7)) {
 		COMPILER_BARRIER();
 		bus_flags[myid] = false; /* down */
@@ -145,7 +145,7 @@ PRIVATE void NOTHROW(KCALL bus_acquirelock)(void) {
 PRIVATE NOBLOCK void
 NOTHROW(KCALL bus_releaselock)(void) {
 	struct cpu *me = THIS_CPU;
-	cpuid_t myid   = me->c_id;
+	unsigned int myid   = me->c_id;
 	COMPILER_BARRIER();
 	FORCPU(me, thiscpu_busline7) = false;
 	COMPILER_BARRIER();
