@@ -39,6 +39,12 @@
 #include <assert.h>
 #include <string.h>
 
+#ifndef NDEBUG
+#include <int128.h>
+#include <inttypes.h>
+#include <stdint.h>
+#endif /* !NDEBUG */
+
 DECL_BEGIN
 
 typedef NONNULL((1)) void (KCALL *pervm_init_t)(struct vm *__restrict self) /*THROWS(...)*/;
@@ -301,6 +307,79 @@ again:
 
 
 
+#ifndef NDEBUG
+/* Assert that 128-bit integer arithmetic works.
+ *
+ * This kind of functionality is required by the scheduler, but the
+ * only portable on-time initializer related to the scheduler, which
+ * is `kernel_initialize_scheduler()' can't safely be used to perform
+ * assertions, since that would be too early for assertion handling
+ * to function correctly.
+ *
+ * Note though that even the debugger assumes that 128-bit integers
+ * work correctly (though only indirectly, since the debugger keeps
+ * the scheduler running, to the point where the scheduler will use
+ * the 128-bit integer API to keep track of HZ calculations, etc.)
+ */
+PRIVATE ATTR_FREETEXT void KCALL assert_int128(void) {
+	uint128_t value, temp;
+	uint128_setone(value);
+	assert(!uint128_shl_overflows(value, 1));
+	assert(!uint128_shl_overflows(value, 126));
+	assert(!uint128_shl_overflows(value, 127));
+
+	uint128_setmax(value);
+	assert(uint128_shl_overflows(value, 1));
+	assert(uint128_shl_overflows(value, 126));
+	assert(uint128_shl_overflows(value, 127));
+
+	uint128_pack64(value, UINT64_C(0xffffffffffffffff), UINT64_C(0xffffffffffff0000));
+	uint128_shl32(value, 16);
+	uint128_pack64(temp, UINT64_C(0xffffffffffff0000), UINT64_C(0xffffffff0000ffff));
+	assert(uint128_eq128(value, temp));
+
+	uint128_pack64(value, UINT64_C(0xffffffffffffffff), UINT64_C(0xffffffffffff0000));
+	uint128_shl64(value, 16);
+	uint128_pack64(temp, UINT64_C(0xffffffffffff0000), UINT64_C(0xffffffff0000ffff));
+	assert(uint128_eq128(value, temp));
+
+	uint128_pack64(value, UINT64_C(0xffffffffffffffff), UINT64_C(0xffffffffffff0000));
+	uint128_shl(value, 16);
+	uint128_pack64(temp, UINT64_C(0xffffffffffff0000), UINT64_C(0xffffffff0000ffff));
+	assert(uint128_eq128(value, temp));
+
+	uint128_set64(value, UINT64_C(9844823857937149542));
+	uint128_set64(temp, UINT64_C(9844823857937149542));
+	uint128_add128(value, temp);
+	uint128_pack64(temp, UINT64_C(0x113fae470144dccc), UINT64_C(0x0000000000000001));
+	assert(uint128_eq128(value, temp));
+
+	uint128_set64(temp, UINT64_C(9844823857937149542));
+	uint128_sub128(value, temp);
+	assert(uint128_is64bit(value));
+	assert(uint128_get64(value) == UINT64_C(9844823857937149542));
+
+	uint128_set(value, UINT64_C(18448238579));
+
+	uint128_mul(value, UINT64_C(1000000000));
+	uint128_pack64(temp, UINT64_C(0x00054f3ea0f3be00), UINT64_C(0x0000000000000001));
+	assert(uint128_eq128(value, temp));
+	assert(!uint128_is64bit(value));
+
+	uint128_add(value, UINT64_C(22000000000) - 1);
+	uint128_pack64(temp, UINT64_C(0x00054f43c04119ff), UINT64_C(0x0000000000000001));
+	assert(uint128_eq128(value, temp));
+	assert(!uint128_is64bit(value));
+
+	uint128_div(value, UINT64_C(22000000000));
+	assert(uint128_is64bit(value));
+	assertf(uint128_get64(value) == UINT64_C(838556300),
+	        "%" PRIu64 " != %" PRIu64,
+	        uint128_get64(value), UINT64_C(838556300));
+}
+#endif /* !NDEBUG */
+
+
 /* Allocate an set a new VM for /bin/init during booting.
  * This function is used to assign a new VM for the initial user-space process,
  * so-as not to launch that process in the context of the special `kernel_vm',
@@ -311,6 +390,9 @@ NOTHROW(KCALL kernel_initialize_user_vm)(void) {
 	uvm = vm_alloc();
 	task_setvm(uvm);
 	decref(uvm);
+#ifndef NDEBUG
+	assert_int128();
+#endif /* !NDEBUG */
 }
 
 

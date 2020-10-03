@@ -181,7 +181,10 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	hz_max = likely(ktime_passed_min != 0)
 	         ? calculate_hz(tsc_passed, ktime_passed_min, true)
 	         : (tsc_hz_t)-1;
-	assert(hz_min <= hz_max);
+	assertf(hz_min <= hz_max,
+	        "hz_min = %" PRIuN(__SIZEOF_TSC_HZ_T__) "\n"
+	        "hz_max = %" PRIuN(__SIZEOF_TSC_HZ_T__) "\n",
+	        hz_min, hz_max);
 	if (hz_min < FORCPU(me, thiscpu_tsc_hzmin)) {
 		printk(KERN_WARNING "[cpu#%u] hz_min widened ("
 		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
@@ -627,7 +630,7 @@ NOTHROW(FCALL ktime_to_timespec)(ktime_t t) {
 	struct timespec result;
 	result.tv_sec  = (time_t)(t / NSEC_PER_SEC);
 	result.tv_nsec = (syscall_ulong_t)(t % NSEC_PER_SEC);
-	result += boottime;
+	result += boottime_;
 	return result;
 }
 

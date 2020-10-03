@@ -121,8 +121,7 @@ NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
 PUBLIC ATTR_COLDTEXT NONNULL((1)) void
 NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
 	debug_addr2line_sections_unlock(&buf->ds_sect module_type__arg(buf->ds_modtype));
-	if (buf->ds_mod)
-		module_decref(buf->ds_mod, buf->ds_modtype);
+	module_xdecref(buf->ds_mod, buf->ds_modtype);
 }
 
 
@@ -363,7 +362,7 @@ addr2line_vprintf(pformatprinter printer, void *arg, void const *start_pc,
 	                              end_pc,
 	                              message_format,
 	                              args);
-	module_decref(mod, modtype);
+	module_xdecref(mod, modtype);
 	addr2line_end(&ainfo);
 	return result;
 }

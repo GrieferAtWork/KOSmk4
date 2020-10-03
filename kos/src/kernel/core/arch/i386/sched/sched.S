@@ -195,7 +195,7 @@ PUBLIC_FUNCTION(task_yield_nx)
 	jz     .Lillegal_task_yield_nx
 	pushP_cfi_r_kernel_cs             /* ir_cs */
 	pushP_cfi %Pax                    /* ir_rip */
-	.cfi_rel_offset %rip, 0
+	.cfi_rel_offset %Pip, 0
 
 	/* Construct a full `struct scpustate' structure */
 #ifdef __x86_64__

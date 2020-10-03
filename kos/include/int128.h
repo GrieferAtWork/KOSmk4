@@ -58,10 +58,10 @@ __ATTR_WUNUSED __ATTR_CONST __uint16_t const (&uint128_vec16(uint128_t const &__
 __ATTR_WUNUSED __ATTR_CONST __uint32_t (&uint128_vec32(uint128_t &__var))[4];
 __ATTR_WUNUSED __ATTR_CONST __uint32_t const (&uint128_vec32(uint128_t const &__var))[4];
 #ifdef __UINT64_TYPE__
-__ATTR_WUNUSED __ATTR_CONST __int64_t (&int128_vec64(int128_t &__var))[4];
-__ATTR_WUNUSED __ATTR_CONST __int64_t const (&int128_vec64(int128_t const &__var))[4];
-__ATTR_WUNUSED __ATTR_CONST __uint64_t (&uint128_vec64(uint128_t &__var))[4];
-__ATTR_WUNUSED __ATTR_CONST __uint64_t const (&uint128_vec64(uint128_t const &__var))[4];
+__ATTR_WUNUSED __ATTR_CONST __int64_t (&int128_vec64(int128_t &__var))[2];
+__ATTR_WUNUSED __ATTR_CONST __int64_t const (&int128_vec64(int128_t const &__var))[2];
+__ATTR_WUNUSED __ATTR_CONST __uint64_t (&uint128_vec64(uint128_t &__var))[2];
+__ATTR_WUNUSED __ATTR_CONST __uint64_t const (&uint128_vec64(uint128_t const &__var))[2];
 #endif /* __UINT64_TYPE__ */
 
 /* Return a reference to the I'th least significant word, where 0 is the least
@@ -95,6 +95,30 @@ __ATTR_WUNUSED __ATTR_PURE __uint32_t uint128_get32(uint128_t const &__var);
 #ifdef __UINT64_TYPE__
 __ATTR_WUNUSED __ATTR_PURE __int64_t int128_get64(int128_t const &__var);
 __ATTR_WUNUSED __ATTR_PURE __uint64_t uint128_get64(uint128_t const &__var);
+#endif /* __UINT64_TYPE__ */
+
+/* Construct a 128-bit integer, given its individual words in least->most significand order. */
+void int128_pack8(int128_t &__var,
+                  __uint8_t a, __uint8_t b, __uint8_t c, __uint8_t d,
+                  __uint8_t e, __uint8_t f, __uint8_t g, __uint8_t h,
+                  __uint8_t i, __uint8_t j, __uint8_t k, __uint8_t l,
+                  __uint8_t m, __uint8_t n, __uint8_t o, __uint8_t p);
+void int128_pack16(int128_t &__var,
+                   __uint16_t a, __uint16_t b, __uint16_t c, __uint16_t d,
+                   __uint16_t e, __uint16_t f, __uint16_t g, __uint16_t h);
+void int128_pack32(int128_t &__var, __uint32_t a, __uint32_t b, __uint32_t c, __uint32_t d);
+void uint128_pack8(uint128_t &__var,
+                   __uint8_t a, __uint8_t b, __uint8_t c, __uint8_t d,
+                   __uint8_t e, __uint8_t f, __uint8_t g, __uint8_t h,
+                   __uint8_t i, __uint8_t j, __uint8_t k, __uint8_t l,
+                   __uint8_t m, __uint8_t n, __uint8_t o, __uint8_t p);
+void uint128_pack16(uint128_t &__var,
+                    __uint16_t a, __uint16_t b, __uint16_t c, __uint16_t d,
+                    __uint16_t e, __uint16_t f, __uint16_t g, __uint16_t h);
+void uint128_pack32(uint128_t &__var, __uint32_t a, __uint32_t b, __uint32_t c, __uint32_t d);
+#ifdef __UINT64_TYPE__
+void int128_pack64(int128_t &__var, __uint64_t lo, __uint64_t hi);
+void uint128_pack64(uint128_t &__var, __uint64_t lo, __uint64_t hi);
 #endif /* __UINT64_TYPE__ */
 
 /* Set a 128-bit integer from a given data-word */
@@ -1476,6 +1500,12 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_is64bit(int128_t const &__var);   /* VAR 
 #define uint128_vec8_significand(var, i)    __hybrid_uint128_vec8_significand(var, i)
 #define uint128_vec16_significand(var, i)   __hybrid_uint128_vec16_significand(var, i)
 #define uint128_vec32_significand(var, i)   __hybrid_uint128_vec32_significand(var, i)
+#define int128_pack8(var, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)  __hybrid_int128_pack8(var, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
+#define int128_pack16(var, a, b, c, d, e, f, g, h) __hybrid_int128_pack16(var, a, b, c, d, e, f, g, h)
+#define int128_pack32(var, a, b, c, d)      __hybrid_int128_pack32(var, a, b, c, d)
+#define uint128_pack8(var, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p) __hybrid_uint128_pack8(var, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
+#define uint128_pack16(var, a, b, c, d, e, f, g, h) __hybrid_uint128_pack16(var, a, b, c, d, e, f, g, h)
+#define uint128_pack32(var, a, b, c, d)     __hybrid_uint128_pack32(var, a, b, c, d)
 #define int128_get8(var)                    __hybrid_int128_get8(var)
 #define int128_set8(var, v)                 __hybrid_int128_set8(var, v)
 #define uint128_get8(var)                   __hybrid_uint128_get8(var)
@@ -1695,6 +1725,8 @@ __ATTR_WUNUSED __ATTR_PURE bool int128_is64bit(int128_t const &__var);   /* VAR 
 #define uint128_vec64(var)                  __hybrid_uint128_vec64(var)
 #define int128_vec64_significand(var, i)    __hybrid_int128_vec64_significand(var, i)
 #define uint128_vec64_significand(var, i)   __hybrid_uint128_vec64_significand(var, i)
+#define int128_pack64(var, lo, hi)          __hybrid_int128_pack64(var, lo, hi)
+#define uint128_pack64(var, lo, hi)         __hybrid_uint128_pack64(var, lo, hi)
 #define int128_get64(var)                   __hybrid_int128_get64(var)
 #define int128_set64(var, v)                __hybrid_int128_set64(var, v)
 #define uint128_get64(var)                  __hybrid_uint128_get64(var)

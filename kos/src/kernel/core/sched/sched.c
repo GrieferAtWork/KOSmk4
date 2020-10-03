@@ -269,6 +269,7 @@ NOTHROW(FCALL sched_intern_add_to_runqueue)(struct cpu *__restrict me,
 	ktime_t thread_stoptime;
 	struct task *neighbor;
 	sched_assert();
+	/* TODO: Assert that `thread' isn't apart of the run-queue */
 	assert(thread->t_flags & TASK_FRUNNING);
 	neighbor = sched.s_running_last;
 	thread_stoptime = sched_stoptime(thread);
@@ -299,6 +300,7 @@ NOTHROW(FCALL sched_intern_add_to_waitqueue)(struct cpu *__restrict me,
 	struct task *last_waiting;
 	sched_assert();
 	assert(!(thread->t_flags & TASK_FRUNNING));
+	/* TODO: Assert that `thread' isn't apart of the wait-queue */
 	last_waiting = sched.s_waiting_last;
 	assert((last_waiting != NULL) ==
 	       (sched_s_waiting != NULL));
@@ -340,6 +342,7 @@ NOTHROW(FCALL sched_intern_unlink_from_waiting)(struct cpu *__restrict me,
                                                 /*out*/REF struct task *__restrict thread) {
 	struct task *next;
 	sched_assert();
+	/* TODO: Assert that `thread' is apart of the wait-queue */
 	assert(sched_s_waiting != NULL);
 	assert(!(thread->t_flags & TASK_FRUNNING));
 	next = sched_next(thread);
@@ -368,6 +371,9 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
                                                     struct task *__restrict thread,
                                                     ktime_t new_stop_time) {
 	/* Update stop timestamps of `caller' and `thread' */
+	sched_assert();
+	/* TODO: Assert that `caller' is apart of the run-queue */
+	/* TODO: Assert that `thread' is apart of the run-queue */
 	assert(sched.s_runcount >= 2);
 	if (sched.s_runcount == 2) {
 		struct task *waiting;
@@ -430,6 +436,7 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 	}
 	sched_stoptime(caller) = new_stop_time;
 	sched_stoptime(thread) = new_stop_time;
+	sched_assert();
 }
 
 /* Move a single thread to the back of the run queue */
@@ -437,6 +444,8 @@ PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2)) void
 NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
                                                struct task *__restrict thread,
                                                ktime_t new_stop_time) {
+	sched_assert();
+	/* TODO: Assert that `thread' is apart of the run-queue */
 	/* Update stop timestamp of `thread' */
 	if unlikely(sched.s_runcount == 1) {
 		assert(sched.s_running == thread);
@@ -485,6 +494,7 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 		}
 	}
 	sched_stoptime(thread) = new_stop_time;
+	sched_assert();
 }
 
 
@@ -1100,6 +1110,16 @@ do_use_sleeping_thread_timeout:
 		if (tsc_now >= tsc_deadline_value) {
 			/* Deadline has already expired... */
 			caller = next;
+			deadline -= now;
+			if unlikely(deadline == sched_quantum_min) {
+				ktime_t new_quantum_min;
+				new_quantum_min = sched_quantum_min * 2;
+				printk(KERN_WARNING "[sched] Raise minimum quantum "
+				                    "%" PRIuN(__SIZEOF_KTIME_T__) " -> "
+				                    "%" PRIuN(__SIZEOF_KTIME_T__) "\n",
+				       sched_quantum_min, new_quantum_min);
+				sched_quantum_min = new_quantum_min;
+			}
 			goto again_with_tsc_now;
 		}
 	}

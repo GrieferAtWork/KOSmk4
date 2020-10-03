@@ -43,6 +43,7 @@
 #include <kernel/vm/nopf.h>
 
 #include <asm/intrin.h>
+#include <kos/kernel/segment.h>
 #endif /* __i386__ || __x86_64__ */
 
 DECL_BEGIN

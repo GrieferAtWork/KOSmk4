@@ -50,10 +50,10 @@
 
 #ifdef __x86_64__
 #define x86_load_thread_Pax_cpu_Pbx x86_load_thread_rax_cpu_rbx
-#define Lunwind_scpustate_Psp       Lunwind_scpustate_rsp
+#define x86_unwind_scpustate_Psp    x86_unwind_scpustate_rsp
 #else /* __x86_64__ */
 #define x86_load_thread_Pax_cpu_Pbx x86_load_thread_eax_cpu_ebx
-#define Lunwind_scpustate_Psp       Lunwind_scpustate_esp
+#define x86_unwind_scpustate_Psp    x86_unwind_scpustate_esp
 #endif /* !__x86_64__ */
 
 
@@ -327,9 +327,14 @@ PRIVATE_FUNCTION(call_tsc_deadline)
 #ifndef __x86_64__
 	pushl_cfi %edi /* tsc_deadline:deadline (high 32 bits) */
 	pushl_cfi %esi /* tsc_deadline:deadline (low 32 bits) */
-#endif /* !__x86_64__ */
+	EXTERN(tsc_deadline)
+	call   tsc_deadline
+	.cfi_adjust_cfa_offset -8
+	ret
+#else /* !__x86_64__ */
 	EXTERN(tsc_deadline)
 	jmp    tsc_deadline
+#endif /* __x86_64__ */
 	.cfi_endproc
 END(call_tsc_deadline)
 
@@ -369,10 +374,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 	EXTERN(this_cpu)
 	movP   this_cpu(%Pbp), %Pbx /* THIS_CPU */
 
-.Lcheck_start:
 .alt_if X86_FEAT_TSC_DEADLINE
-.Lfeat_deadline_start:
-#define RELSYM(s) (.Lfeat_deadline_start + (s - .Lcheck_start))
 	/* Check if there really was an interrupt. */
 	movl   $(IA32_TSC_DEADLINE), %ecx
 	rdmsr
@@ -396,10 +398,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 #else /* __x86_64__ */
 	/* %edx:%eax == NOW */
 #endif /* !__x86_64__ */
-#undef RELSYM
 .alt_elseif X86_FEAT_APIC
-.Lfeat_apic_start:
-#define RELSYM(s) (.Lfeat_apic_start + (s - .Lcheck_start))
 	xorb   %al, %al
 	EXTERN(thiscpu_x86_apic_emutsc_early_interrupt)
 	xchgb  thiscpu_x86_apic_emutsc_early_interrupt(%Pbx), %al
@@ -439,28 +438,24 @@ INTERN_FUNCTION(x86_idt_preemption)
 #ifdef __x86_64__
 	movq   thiscpu_x86_apic_emutsc_deadline(%Pbx), %rsi /* tsc_deadline:deadline */
 	cmpq   $(-1), %rsi
-	je32   RELSYM(.Lunwind_scpustate_Psp)
+	alt_je32 x86_unwind_scpustate_Psp
 #else /* __x86_64__ */
 	movl   thiscpu_x86_apic_emutsc_deadline+0(%Pbx), %esi
 	movl   thiscpu_x86_apic_emutsc_deadline+4(%Pbx), %edi
 	cmpl   $(-1), %edi
 	jne8   1f
 	cmpl   $(-1), %esi
-	je32   RELSYM(.Lunwind_scpustate_Psp)
+	alt_je32 x86_unwind_scpustate_Psp
 1:
 #endif /* !__x86_64__ */
 
 	/* Re-calculate the deadline and check if it has already expired. */
 	movP   %Pbx, %R_fcall0P
-	EXTERN(call_tsc_deadline)
-	call   RELSYM(call_tsc_deadline)
+	alt_call call_tsc_deadline
 #ifdef __x86_64__
 	movq   thiscpu_x86_apic_emutsc_deadline(%Pbx), %rsi
 #endif /* __x86_64__ */
-#undef RELSYM
 .alt_else
-.Lfeat_pit_start:
-#define RELSYM(s) (.Lfeat_pit_start + (s - .Lcheck_start))
 	xorb   %al, %al
 	EXTERN(thiscpu_x86_apic_emutsc_early_interrupt)
 	xchgb  thiscpu_x86_apic_emutsc_early_interrupt(%Pbx), %al
@@ -506,40 +501,38 @@ INTERN_FUNCTION(x86_idt_preemption)
 #ifdef __x86_64__
 	movq   thiscpu_x86_apic_emutsc_deadline(%Pbx), %rsi /* tsc_deadline:deadline */
 	cmpq   $(-1), %rsi
-	je32   RELSYM(.Lunwind_scpustate_Psp)
+	alt_je32 x86_unwind_scpustate_Psp
 #else /* __x86_64__ */
 	movl   thiscpu_x86_apic_emutsc_deadline+0(%Pbx), %esi
 	movl   thiscpu_x86_apic_emutsc_deadline+4(%Pbx), %edi
 	cmpl   $(-1), %edi
 	jne8   1f
 	cmpl   $(-1), %esi
-	je32   RELSYM(.Lunwind_scpustate_Psp)
+	alt_je32 x86_unwind_scpustate_Psp
 1:
 #endif /* !__x86_64__ */
 
 	/* Re-calculate the deadline and check if it has already expired. */
 	movP   %Pbx, %R_fcall0P
-	EXTERN(call_tsc_deadline)
-	call   RELSYM(call_tsc_deadline)
+	alt_call call_tsc_deadline
 #ifdef __x86_64__
 	movq   thiscpu_x86_apic_emutsc_deadline(%Pbx), %rsi
 #endif /* __x86_64__ */
-#undef RELSYM
 .alt_endif
 
 #ifdef __x86_64__
 	/* %rax -- Current time */
 	/* %rsi -- Current deadline */
 	cmpq   %rax, %rsi
-	ja32   .Lunwind_scpustate_Psp /* if (deadline > now) goto .Lunwind_scpustate_Psp; */
+	ja32   x86_unwind_scpustate_Psp /* if (deadline > now) goto x86_unwind_scpustate_Psp; */
 #else /* __x86_64__ */
 	/* %edx:%eax -- Current time */
 	/* %edi:%esi -- Current deadline */
 	cmpl   %edx, %edi
-	ja32   .Lunwind_scpustate_Psp /* if (deadline[1] > now[1]) goto .Lunwind_scpustate_Psp; */
+	ja32   x86_unwind_scpustate_Psp /* if (deadline[1] > now[1]) goto x86_unwind_scpustate_Psp; */
 	jne8   1f                     /* if (deadline[1] != now[1]) goto 1f; */
 	cmpl   %eax, %esi
-	ja32   .Lunwind_scpustate_Psp /* if (deadline[0] > now[0]) goto .Lunwind_scpustate_Psp; */
+	ja32   x86_unwind_scpustate_Psp /* if (deadline[0] > now[0]) goto x86_unwind_scpustate_Psp; */
 1:
 #endif /* !__x86_64__ */
 	/* Deadline has expirted (and the current time is now stored in %rax / %edx:%eax) */
@@ -548,14 +541,14 @@ INTERN_FUNCTION(x86_idt_preemption)
 	movP   %Psp, this_sstate(%Pbp)
 
 	/* Trigger the deadline-passed interrupt handler. */
-	movP   %Pbx, %R_fcall0P /* tsc_deadline_passed:me */
-	movP   %Pbp, %R_fcall1P /* tsc_deadline_passed:caller */
 #ifdef __x86_64__
 	movq   %rax, %rdx       /* tsc_deadline_passed:now */
 #else /* __x86_64__ */
 	pushl_cfi %edx          /* tsc_deadline_passed:now (high 32 bits) */
 	pushl_cfi %eax          /* tsc_deadline_passed:now (low 32 bits) */
 #endif /* !__x86_64__ */
+	movP   %Pbx, %R_fcall0P /* tsc_deadline_passed:me */
+	movP   %Pbp, %R_fcall1P /* tsc_deadline_passed:caller */
 	EXTERN(tsc_deadline_passed)
 	call   tsc_deadline_passed
 #ifndef __x86_64__
@@ -564,7 +557,7 @@ INTERN_FUNCTION(x86_idt_preemption)
 
 	/* Check if we should actually switch threads */
 	cmpP   %Pbp, %Pax
-	je32   .Lunwind_scpustate_Psp
+	je32   x86_unwind_scpustate_Psp
 
 	/* Switch the task returned by `tsc_deadline_passed()' */
 	EXTERN(thiscpu_sched_current)
@@ -682,7 +675,7 @@ INTERN_FUNCTION(x86_load_scpustate_esp)
 	intr_exit intr_enabled=0
 #else /* __x86_64__ */
 	/* Load the underlying CPU state */
-.Lunwind_scpustate_Psp:
+PRIVATE_FUNCTION(x86_unwind_scpustate_Psp)
 	popal_cfi_r
 
 	popl_cfi %gs
@@ -695,6 +688,7 @@ INTERN_FUNCTION(x86_load_scpustate_esp)
 	.cfi_restore_iret_ds
 
 	iret
+END(x86_unwind_scpustate_Psp)
 #endif /* !__x86_64__ */
 #ifdef __x86_64__
 END(x86_load_scpustate_rsp_gsbase_rax)
@@ -705,11 +699,12 @@ END(x86_load_scpustate_esp)
 	.cfi_restore_state
 #ifdef __x86_64__
 	.cfi_remember_state
-.Lunwind_scpustate_Psp:
+PRIVATE_FUNCTION(x86_unwind_scpustate_Psp)
 	/* Only restore GP registers! */
 	addq   $(OFFSET_SCPUSTATE64_GPREGSNSP), %rsp
 	ASM_POP_GPREGSNSP_CFI_R
 	intr_exit intr_enabled=0
+END(x86_unwind_scpustate_Psp)
 	.cfi_restore_state
 #endif /* __x86_64__ */
 
