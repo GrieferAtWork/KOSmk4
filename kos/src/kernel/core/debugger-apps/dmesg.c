@@ -356,7 +356,8 @@ PRIVATE ATTR_DBGTEXT void KCALL dbg_dmesg_main(void) {
 
 		case KEY_DOWN:
 			if (dbg_isholding_ctrl()) {
-				if (data.rd_selected == data.rd_minpacket)
+				if (data.rd_selected == data.rd_minpacket &&
+				    data.rd_maxpacket != data.rd_lastpacket)
 					++data.rd_selected;
 				++data.rd_minpacket;
 			} else {
