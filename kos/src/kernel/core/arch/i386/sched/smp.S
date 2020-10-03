@@ -174,12 +174,12 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	/*lock*/ xchgP %Pdx, thiscpu_sched_pending(%Pbx)
 	testP  %Pdx, %Pdx
 	jz     .Lapic_ipi_no_pending
-	movP   %Pbx, %R_fcall0P
-	EXTERN(this_task)
-	movP   %segtls:this_task, %R_fcall1P
 #ifndef __x86_64__
 	pushl_cfi %edx /* chain */
 #endif /* __x86_64__ */
+	movP   %Pbx, %R_fcall0P
+	EXTERN(this_task)
+	movP   %segtls:this_task, %R_fcall1P
 	EXTERN(sched_intern_loadpending)
 	call   sched_intern_loadpending
 #ifndef __x86_64__
