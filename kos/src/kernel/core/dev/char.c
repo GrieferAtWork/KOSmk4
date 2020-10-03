@@ -56,6 +56,7 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <format-printer.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
@@ -836,7 +837,9 @@ DEFINE_PUBLIC_ALIAS(character_device_poll, handle_characterdevice_poll);
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
-do_dump_character_device(struct character_device *__restrict self) {
+do_dump_character_device(struct character_device *__restrict self,
+                         size_t max_device_namelen,
+                         size_t max_driver_namelen) {
 	char const *kind;
 	if (character_device_isattybase(self))
 		kind = ttybase_isapty((struct ttybase_device *)self)
@@ -849,10 +852,14 @@ do_dump_character_device(struct character_device *__restrict self) {
 	else {
 		kind = DBGSTR("other");
 	}
-	dbg_printf(DBGSTR("/dev/" AC_WHITE("%s") "\t%u:%-2u\t%s\t%s\t"),
-	           self->cd_name,
+	dbg_printf(DBGSTR("/dev/" AC_WHITE("%-*s") "  "
+	                  "%3.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
+	                  "%*-s  %-8s  "),
+	           (unsigned int)max_device_namelen, self->cd_name,
 	           (unsigned int)MAJOR(character_device_devno(self)),
 	           (unsigned int)MINOR(character_device_devno(self)),
+	           (unsigned int)max_driver_namelen,
 	           self->cd_type.ct_driver ? self->cd_type.ct_driver->d_name
 	                                   : DBGSTR("?"),
 	           kind);
@@ -869,12 +876,48 @@ do_dump_character_device(struct character_device *__restrict self) {
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-dump_character_device(struct character_device *__restrict self) {
+dump_character_device(struct character_device *__restrict self,
+                      size_t max_device_namelen,
+                      size_t max_driver_namelen) {
 again:
-	do_dump_character_device(self);
+	do_dump_character_device(self,
+	                         max_device_namelen,
+	                         max_driver_namelen);
 	if (self->cd_devlink.a_min) {
-		if (self->cd_devlink.a_max)
-			dump_character_device(self->cd_devlink.a_max);
+		if (self->cd_devlink.a_max) {
+			dump_character_device(self->cd_devlink.a_max,
+			                      max_device_namelen,
+			                      max_driver_namelen);
+		}
+		self = self->cd_devlink.a_min;
+		goto again;
+	}
+	if (self->cd_devlink.a_max) {
+		self = self->cd_devlink.a_max;
+		goto again;
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+gather_longest_name_lengths(struct character_device *__restrict self,
+                            size_t *__restrict pmax_device_namelen,
+                            size_t *__restrict pmax_driver_namelen) {
+	size_t namelen;
+again:
+	namelen = strlen(self->cd_name);
+	if (*pmax_device_namelen < namelen)
+		*pmax_device_namelen = namelen;
+	if (ADDR_ISKERN(self->cd_type.ct_driver)) {
+		namelen = strlen(self->cd_type.ct_driver->d_name);
+		if (*pmax_driver_namelen < namelen)
+			*pmax_driver_namelen = namelen;
+	}
+	if (self->cd_devlink.a_min) {
+		if (self->cd_devlink.a_max) {
+			gather_longest_name_lengths(self->cd_devlink.a_max,
+			                            pmax_device_namelen,
+			                            pmax_driver_namelen);
+		}
 		self = self->cd_devlink.a_min;
 		goto again;
 	}
@@ -886,10 +929,36 @@ again:
 
 DBG_COMMAND(lschr,
             "lschr\n"
-            "\tList all defined character devices\n") {
-	dbg_print(DBGSTR("     name\tdevno\tdriver\tkind\tfeatures\n"));
-	if (character_device_tree)
-		dump_character_device(character_device_tree);
+            "\tList all defined character devices\n"
+            "\tfeatures:\n"
+            "\t\t" AC_WHITE("r") ": Supports " AC_WHITE("read") "\n"
+            "\t\t" AC_WHITE("w") ": Supports " AC_WHITE("write") "\n"
+            "\t\t" AC_WHITE("R") ": Supports " AC_WHITE("pread") "\n"
+            "\t\t" AC_WHITE("W") ": Supports " AC_WHITE("pwrite") "\n"
+            "\t\t" AC_WHITE("i") ": Supports " AC_WHITE("ioctl") "\n"
+            "\t\t" AC_WHITE("m") ": Supports " AC_WHITE("mmap") "\n"
+            "\t\t" AC_WHITE("s") ": Supports " AC_WHITE("sync") "\n"
+            "\t\t" AC_WHITE("t") ": Supports " AC_WHITE("stat") "\n"
+            "\t\t" AC_WHITE("p") ": Supports " AC_WHITE("poll") "\n") {
+	size_t longest_device_name = COMPILER_STRLEN("name");
+	size_t longest_driver_name = COMPILER_STRLEN("driver");
+	if (character_device_tree) {
+		gather_longest_name_lengths(character_device_tree,
+		                            &longest_device_name,
+		                            &longest_driver_name);
+	}
+	dbg_print(DBGSTR("     name"));
+	if (longest_device_name > COMPILER_STRLEN("name"))
+		format_repeat(&dbg_printer, NULL, ' ', longest_device_name - COMPILER_STRLEN("name"));
+	dbg_print(DBGSTR("  devno    driver"));
+	if (longest_driver_name > COMPILER_STRLEN("driver"))
+		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
+	dbg_print(DBGSTR("  kind      features\n"));
+	if (character_device_tree) {
+		dump_character_device(character_device_tree,
+		                      longest_device_name,
+		                      longest_driver_name);
+	}
 	return 0;
 }
 

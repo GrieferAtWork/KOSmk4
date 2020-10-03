@@ -1186,8 +1186,8 @@ DBG_COMMAND(lsram,
 		total_pages = (size_t)zone->mz_rmax + 1;
 		used_pages  = total_pages - (size_t)zone->mz_cfree;
 		usage_percent = (unsigned int)(((u64)used_pages * 100 * 100000) / total_pages);
-		dbg_printf(DBGSTR("%" PRIuSIZ " " AC_WHITE(PRIpN(__SIZEOF_PHYSADDR_T__)) "-"
-		                  /*           */ AC_WHITE(PRIpN(__SIZEOF_PHYSADDR_T__)) " "
+		dbg_printf(DBGSTR("%" PRIuSIZ " " AC_WHITE("%" PRIpN(__SIZEOF_PHYSADDR_T__)) "-"
+		                  /*           */ AC_WHITE("%" PRIpN(__SIZEOF_PHYSADDR_T__)) " "
 		                  "%3u.%.5u%% (%" PRIuSIZ "/%" PRIuSIZ ")\n"),
 		           i,
 		           physpage2addr(zone->mz_start),

@@ -56,6 +56,7 @@
 #include <kos/guid.h>
 
 #include <assert.h>
+#include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -548,7 +549,8 @@ block_device_add_to_devfs(struct basic_block_device *__restrict self) {
 			self->bd_name[COMPILER_LENOF(self->bd_name) - 1] = 0;
 		} else {
 			sprintf(self->bd_name,
-			        "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":%.2" PRIxN(__SIZEOF_MINOR_T__),
+			        "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+			        "%.2" PRIxN(__SIZEOF_MINOR_T__),
 			        MAJOR(self->bd_devlink.a_vaddr),
 			        MINOR(self->bd_devlink.a_vaddr));
 		}
@@ -1547,7 +1549,9 @@ _block_device_write(struct block_device *__restrict self,
 
 #ifdef CONFIG_HAVE_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
-do_dump_block_device(struct basic_block_device *__restrict self) {
+do_dump_block_device(struct basic_block_device *__restrict self,
+                     size_t longest_device_name,
+                     size_t longest_driver_name) {
 	u64 total_bytes_adj = (u64)self->bd_total_bytes;
 	char const *total_bytes_name = DBGSTR("b");
 	REF struct driver *drv;
@@ -1564,16 +1568,17 @@ do_dump_block_device(struct basic_block_device *__restrict self) {
 	drv = driver_at_address(block_device_ispartition(self)
 	                        ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
 	                        : (void *)self->bd_type.dt_read);
-	dbg_printf(DBGSTR("/dev/" AC_WHITE("%s") "\t"
-	                  "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
-	                  "%-2" PRIxN(__SIZEOF_MINOR_T__) "\t"
-	                  "%s\t"
-	                  "%" PRIu64 "%s\t"
-	                  "%" PRIu64 "\t"
+	dbg_printf(DBGSTR("/dev/" AC_WHITE("%-*s") "  "
+	                  "%3.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
+	                  "%-3.2" PRIxN(__SIZEOF_MINOR_T__) "  "
+	                  "%*-s  "
+	                  "%5" PRIu64 "%s  "
+	                  "%-11" PRIu64 "  "
 	                  "%" PRIuSIZ "\n"),
-	           self->bd_name,
+	           (unsigned int)longest_device_name, self->bd_name,
 	           (unsigned int)MAJOR(block_device_devno(self)),
 	           (unsigned int)MINOR(block_device_devno(self)),
+	           (unsigned int)longest_driver_name,
 	           drv ? drv->d_name : "?",
 	           total_bytes_adj, total_bytes_name,
 	           (u64)self->bd_sector_count,
@@ -1582,19 +1587,63 @@ do_dump_block_device(struct basic_block_device *__restrict self) {
 }
 
 PRIVATE ATTR_DBGTEXT void KCALL
-dump_block_device(struct basic_block_device *__restrict self) {
+dump_block_device(struct basic_block_device *__restrict self,
+                  size_t longest_device_name,
+                  size_t longest_driver_name) {
 again:
 	if (!block_device_ispartition(self)) {
 		struct block_device *me;
 		struct block_device_partition *parts;
 		me = (struct block_device *)self;
-		do_dump_block_device(self);
-		for (parts = me->bd_parts; parts; parts = parts->bp_parts.ln_next)
-			do_dump_block_device(parts);
+		do_dump_block_device(self,
+		                     longest_device_name,
+		                     longest_driver_name);
+		for (parts = me->bd_parts; parts; parts = parts->bp_parts.ln_next) {
+			do_dump_block_device(parts,
+			                     longest_device_name,
+			                     longest_driver_name);
+		}
 	}
 	if (self->bd_devlink.a_min) {
-		if (self->bd_devlink.a_max)
-			dump_block_device(self->bd_devlink.a_max);
+		if (self->bd_devlink.a_max) {
+			dump_block_device(self->bd_devlink.a_max,
+			                  longest_device_name,
+			                  longest_driver_name);
+		}
+		self = self->bd_devlink.a_min;
+		goto again;
+	}
+	if (self->bd_devlink.a_max) {
+		self = self->bd_devlink.a_max;
+		goto again;
+	}
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL
+gather_longest_name_lengths(struct basic_block_device *__restrict self,
+                            size_t *__restrict pmax_device_namelen,
+                            size_t *__restrict pmax_driver_namelen) {
+	REF struct driver *drv;
+	size_t namelen;
+again:
+	namelen = strlen(self->bd_name);
+	if (*pmax_device_namelen < namelen)
+		*pmax_device_namelen = namelen;
+	drv = driver_at_address(block_device_ispartition(self)
+	                        ? (void *)((struct block_device_partition *)self)->bp_master->bd_type.dt_read
+	                        : (void *)self->bd_type.dt_read);
+	if (drv) {
+		namelen = strlen(drv->d_name);
+		if (*pmax_driver_namelen < namelen)
+			*pmax_driver_namelen = namelen;
+		decref_nokill(drv);
+	}
+	if (self->bd_devlink.a_min) {
+		if (self->bd_devlink.a_max) {
+			gather_longest_name_lengths(self->bd_devlink.a_max,
+			                            pmax_device_namelen,
+			                            pmax_driver_namelen);
+		}
 		self = self->bd_devlink.a_min;
 		goto again;
 	}
@@ -1607,9 +1656,25 @@ again:
 DBG_COMMAND(lsblk,
             "lsblk\n"
             "\tList all defined block devices\n") {
-	dbg_print(DBGSTR("     name\tdevno\tdriver\tsize\tsectors\tsector-size\n"));
-	if (block_device_tree)
-		dump_block_device(block_device_tree);
+	size_t longest_device_name = COMPILER_STRLEN("name");
+	size_t longest_driver_name = COMPILER_STRLEN("driver");
+	if (block_device_tree) {
+		gather_longest_name_lengths(block_device_tree,
+		                            &longest_device_name,
+		                            &longest_driver_name);
+	}
+	dbg_print(DBGSTR("     name"));
+	if (longest_device_name > COMPILER_STRLEN("name"))
+		format_repeat(&dbg_printer, NULL, ' ', longest_device_name - COMPILER_STRLEN("name"));
+	dbg_print(DBGSTR("  devno    driver"));
+	if (longest_driver_name > COMPILER_STRLEN("driver"))
+		format_repeat(&dbg_printer, NULL, ' ', longest_driver_name - COMPILER_STRLEN("driver"));
+	dbg_print(DBGSTR("  size      sectors      sector-size\n"));
+	if (block_device_tree) {
+		dump_block_device(block_device_tree,
+		                  longest_device_name,
+		                  longest_driver_name);
+	}
 	return 0;
 }
 

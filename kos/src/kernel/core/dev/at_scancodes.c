@@ -49,7 +49,7 @@ DECL_BEGIN
  * `at_scancodes[KEY_*] & 0xff'.
  * The value of `at_scancodes[KEY_*] & 0x80' is reserved and is
  * currently always 0. */
-INTERN uint16_t const at_scancodes[256] = {
+INTERN_CONST uint16_t const at_scancodes[256] = {
 	[0 ... 255] = 0x0000,
 
 	[KEY_ESC]          = 0x0001,
