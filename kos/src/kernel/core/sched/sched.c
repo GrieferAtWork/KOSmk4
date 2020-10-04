@@ -1325,7 +1325,7 @@ NOTHROW(FCALL task_transfer_thread_to_other_cpu)(struct cpu *__restrict me,
 	if unlikely(target == me)
 		return false; /* Must be a different thread. */
 	/* Schedule `thread' as pending on `target' */
-	ATOMIC_OR(thread->t_flags, TASK_FRUNNING | TASK_FTIMEOUT);
+	ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
 	ATOMIC_WRITE(thread->t_cpu, target);
 	sched_intern_addpending(target, thread);
 	/* Schedule the target CPU to receive a wake-up once our caller is finished. */
