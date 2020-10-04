@@ -1516,7 +1516,7 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 			task_disconnectall();
 	}
 	PREEMPTION_DISABLE();
-	task_popconnections(&new_cons);
+	task_popconnections();
 
 	/* Report that we've resumed execution. */
 	ATOMIC_DEC(mall_suspended_cpu_count);

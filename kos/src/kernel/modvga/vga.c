@@ -1100,11 +1100,11 @@ PRIVATE void KCALL flash_current_line_pause(void) THROWS(E_WOULDBLOCK, ...) {
 			do_flash_screen_pause();
 		} EXCEPT {
 			assert(!task_isconnected());
-			task_popconnections(&con);
+			task_popconnections();
 			RETHROW();
 		}
 		assert(!task_isconnected());
-		task_popconnections(&con);
+		task_popconnections();
 	} else {
 		do_flash_screen_pause();
 	}

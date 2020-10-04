@@ -84,11 +84,7 @@ handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,
 	}	break;
 
 	case HOP_FUTEX_ISWAITING:
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 		return sig_iswaiting(&self->f_signal) ? 1 : 0;
-#else /* CONFIG_USE_NEW_SIGNAL_API */
-		return ATOMIC_READ(self->f_signal.s_ptr) != NULL ? 1 : 0;
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 	case HOP_FUTEX_BROADCAST:
 		return sig_broadcast(&self->f_signal);

@@ -247,7 +247,7 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  *          it will be re-enabled once this function returns.
  * NOTE: This function is the bottom-most (and still task-level) API
  *       for conserving CPU cycles using preemption, in that this
- *       function is even used to implement `task_wait()'.
+ *       function is even used to implement `task_waitfor()'.
  *       The functions used to implement this one no longer work on tasks, but on CPUs!
  * NOTE: If the thread is transferred to a different CPU while sleeping, a
  *       sporadic wakeup will be triggered, causing `task_sleep()' to return

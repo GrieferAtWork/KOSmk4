@@ -266,6 +266,15 @@ FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_yield)(struct cpu *__restrict me,
                                   struct task *__restrict caller);
 
+/* Same as `sched_intern_yield()', but ensure that `caller' doesn't get re-returned.
+ * Additionally, this function will unlink `caller' from the run-queue, and if doing
+ * so were to cause the run queue to become empty, then the IDLE thread will be added
+ * to the run queue, as well as be returned.
+ * Note that it is illegal to call this function as the IDLE thread! */
+FUNDEF NOPREEMPT NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
+NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
+                                         /*out*/ REF struct task *__restrict caller);
+
 
 
 /* [0..1][lock(PRIVATE(THIS_CPU))]
@@ -332,16 +341,6 @@ FUNDEF NOBLOCK void NOTHROW(FCALL sched_override_end)(void);
  *       CPU's run-queue). */
 FUNDEF NONNULL((1)) void
 NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread);
-
-
-/* Same as `sched_intern_yield()', but ensure that `caller' doesn't get re-returned.
- * Additionally, this function will unlink `caller' from the run-queue, and if doing
- * so were to cause the run queue to become empty, then the IDLE thread will be added
- * to the run queue, as well as be switched to.
- * Note that it is illegal to call this function as the IDLE thread! */
-FUNDEF NOPREEMPT NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
-NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
-                                         /*out*/ REF struct task *__restrict caller);
 
 #endif /* __CC__ */
 

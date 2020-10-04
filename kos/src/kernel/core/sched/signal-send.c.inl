@@ -19,150 +19,290 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-#define DEFINE_SINGLE    1
-#define DEFINE_ALTERNATE 1
+//#define DEFINE_sig_send 1
+//#define DEFINE_sig_altsend 1
+//#define DEFINE_sig_broadcast 1
+//#define DEFINE_sig_altbroadcast 1
+#define DEFINE_sig_broadcast_as 1
 #endif /* __INTELLISENSE__ */
+
+#if (defined(DEFINE_sig_send) /**/ + defined(DEFINE_sig_altsend) +      \
+     defined(DEFINE_sig_broadcast) + defined(DEFINE_sig_altbroadcast) + \
+     defined(DEFINE_sig_broadcast_as)) != 1
+#error "Must #define exactly one of these macros!"
+#endif /* ... */
 
 DECL_BEGIN
 
-#if defined(DEFINE_SINGLE) && defined(DEFINE_ALTERNATE)
-PUBLIC NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(FCALL sig_altsend)(struct sig *__restrict self, struct sig *sender)
-#elif defined(DEFINE_SINGLE)
-PUBLIC NOBLOCK NONNULL((1)) bool
+#ifdef DEFINE_sig_send
+/* Send signal `self' to exactly 1 connected thread
+ *  - The receiver is the thread who's connection has been pending the longest.
+ *  - Note the special interaction of this function with poll-based connections.
+ *    For more information on this subject, see `task_connect_for_poll()'.
+ * @return: true:  A waiting thread was signaled.
+ * @return: false: The given signal didn't have any active connections. */
+PUBLIC NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL sig_send)(struct sig *__restrict self)
-#elif defined(DEFINE_ALTERNATE)
-PUBLIC NOBLOCK NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_altbroadcast)(struct sig *__restrict self, struct sig *sender)
-#else
+#elif defined(DEFINE_sig_altsend)
+#define HAVE_SENDER 1
+PUBLIC NOBLOCK NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL sig_altsend)(struct sig *self,
+                           struct sig *sender)
+#elif defined(DEFINE_sig_broadcast)
+#define HAVE_BROADCAST 1
+/* Send signal to all connected threads.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
-#endif
+#elif defined(DEFINE_sig_altbroadcast)
+#define HAVE_BROADCAST 1
+#define HAVE_SENDER 1
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
+                                struct sig *sender)
+#elif defined(DEFINE_sig_broadcast_as)
+#define HAVE_BROADCAST 1
+#define HAVE_SENDER_THREAD 1
+/* Send signal to all connected threads.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_as)(struct sig *__restrict self,
+                                struct task *__restrict sender_thread)
+#endif /* ... */
 {
-#ifndef DEFINE_SINGLE
+#ifdef HAVE_BROADCAST
 	size_t result = 0;
-#endif /* !DEFINE_SINGLE */
-	struct task_connection *c;
-#ifdef DEFINE_ALTERNATE
-	assert(sender != NULL);
-#endif /* !DEFINE_ALTERNATE */
-#ifdef DEFINE_SINGLE
-	{
-		pflag_t was;
+#endif /* HAVE_BROADCAST */
+	struct task_connection *con;
+	pflag_t was;
+#ifdef HAVE_SENDER
+#define SIG_SENDER sender
+	assert(sender);
+#else /* HAVE_SENDER */
+#define SIG_SENDER self
+#endif /* !HAVE_SENDER */
 again:
-#ifndef CONFIG_NO_SMP
+#if SIG_SMPLOCK_BIT != 0
+	/* Lock the signal. */
+	con = ATOMIC_READ(self->s_con);
+	if (SIG_SMPLOCK_TST(con)) {
+		if (SIG_SMPLOCK_CLR(con) == NULL)
+			goto done_nocon_nounlock;
+#define NEED_done_nocon_nounlock
 		for (;;) {
-			c = ATOMIC_READ(self->s_ptr);
-			if (c == NULL)
-				return false;
-			if unlikely(c == SIG_TEMPLOCK) {
-				task_pause();
-				continue;
-			}
-			/* Disable preemption to we don't get interrupted by other code that may try
-			 * to do the same thing we're trying to do: Send/broadcast this signal. */
-			was = PREEMPTION_PUSHOFF();
-			if likely(ATOMIC_CMPXCH_WEAK(self->s_ptr, c, SIG_TEMPLOCK))
-				break;
-			PREEMPTION_POP(was);
-		}
-		assert(c->tc_signext != SIG_TEMPLOCK);
-		ATOMIC_WRITE(self->s_ptr, c->tc_signext);
-		PREEMPTION_POP(was);
-#else /* !CONFIG_NO_SMP */
-		was = PREEMPTION_PUSHOFF();
-		c   = ATOMIC_READ(self->s_ptr);
-		if (c == NULL) {
-			PREEMPTION_POP(was);
-			return false;
-		}
-		ATOMIC_WRITE(self->s_ptr, c->tc_signext);
-		PREEMPTION_POP(was);
-#endif /* CONFIG_NO_SMP */
-	}
-#else /* DEFINE_SINGLE */
-#ifdef SIG_TEMPLOCK
-	do {
-		c = ATOMIC_READ(self->s_ptr);
-		if unlikely(c == SIG_TEMPLOCK) {
 			task_pause();
-			continue;
+			was = PREEMPTION_PUSHOFF();
+			con = (struct task_connection *)ATOMIC_FETCHOR(self->s_ctl, SIG_SMPLOCK_BIT);
+			if (((uintptr_t)con & SIG_SMPLOCK_BIT) == 0)
+				break;
+preemption_pop_and_lock:
+			PREEMPTION_POP(was);
 		}
-	} while (!ATOMIC_CMPXCH_WEAK(self->s_ptr, c, NULL));
-#else /* SIG_TEMPLOCK */
-	c = ATOMIC_XCH(self->s_ptr, NULL);
-#endif /* !SIG_TEMPLOCK */
-#endif /* !DEFINE_SINGLE */
-
-#ifndef DEFINE_SINGLE
-	while (c)
-#endif /* !DEFINE_SINGLE */
-	{
-#ifndef DEFINE_SINGLE
-		struct task_connection *n;
-		n = c->tc_signext;
-#endif /* !DEFINE_SINGLE */
-		for (;;) {
-			struct sig *constate;
-			constate = ATOMIC_READ(c->tc_signal);
-			if (constate == TASK_CONNECTION_DISCONNECTING) {
-				if unlikely(!ATOMIC_CMPXCH_WEAK(c->tc_signal,
-				                                TASK_CONNECTION_DISCONNECTING,
-				                                TASK_CONNECTION_DELIVERED))
-					continue;
-#ifdef DEFINE_SINGLE
-				goto again;
-#else /* DEFINE_SINGLE */
-				break; /* wake_next_thread */
-#endif /* !DEFINE_SINGLE */
-			}
-			if (((uintptr_t)constate & ~1) == (uintptr_t)self) {
-				struct task_sigset *set;
-				if (!ATOMIC_CMPXCH_WEAK(c->tc_signal, constate, TASK_CONNECTION_DELIVERING))
-					continue;
-				COMPILER_READ_BARRIER();
-				set = ATOMIC_XCH(c->tc_cons, NULL);
-				if (set) {
-#ifdef DEFINE_ALTERNATE
-					if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, sender))
-#else /* DEFINE_ALTERNATE */
-					if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, self))
-#endif /* !DEFINE_ALTERNATE */
-					{
-						struct task *thread;
-						thread = set->ts_thread;
-						if (!thread || task_wake(thread)) {
-							if (!((uintptr_t)constate & 1)) {
-								/* Don't track ghosts */
-#ifdef DEFINE_SINGLE
-								ATOMIC_WRITE(c->tc_signal, TASK_CONNECTION_DELIVERED);
-								return true;
-#else /* DEFINE_SINGLE */
-								++result;
-#endif /* !DEFINE_SINGLE */
-							}
-						}
-					}
-				}
-				ATOMIC_WRITE(c->tc_signal, TASK_CONNECTION_DELIVERED);
-#ifdef DEFINE_SINGLE
-				goto again;
-#else /* DEFINE_SINGLE */
-				break; /* wake_next_thread */
-#endif /* !DEFINE_SINGLE */
-			}
-		}
-#ifndef DEFINE_SINGLE
-		c = n;
-#endif /* !DEFINE_SINGLE */
+	} else {
+		was = PREEMPTION_PUSHOFF();
+		con = (struct task_connection *)ATOMIC_FETCHOR(self->s_ctl, SIG_SMPLOCK_BIT);
+		if unlikely(((uintptr_t)con & SIG_SMPLOCK_BIT) != 0)
+			goto preemption_pop_and_lock;
 	}
-#ifndef DEFINE_SINGLE
+#else /* SIG_SMPLOCK_BIT != 0 */
+	was = PREEMPTION_PUSHOFF();
+	con = ATOMIC_READ(self->s_con);
+#endif /* SIG_SMPLOCK_BIT == 0 */
+
+	if (con) {
+#ifdef HAVE_BROADCAST
+		struct task_connection *next;
+		struct task_connections *target_cons;
+		assert(con->tc_sig == self);
+		target_cons = (struct task_connections *)ATOMIC_XCH(con->tc_stat,
+		                                                    TASK_CONNECTION_STAT_SENT);
+		assert((uintptr_t)target_cons != TASK_CONNECTION_STAT_BROADCAST);
+		if (TASK_CONNECTION_STAT_CHECK(target_cons)) {
+			/* Signal was already sent in the past.
+			 * -> Change it's disposition to BROADCAST, and unlink it. */
+			assert((uintptr_t)target_cons == TASK_CONNECTION_STAT_SENT);
+			next = con->tc_signext;
+			COMPILER_BARRIER();
+			ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			assert(!next || ADDR_ISKERN(next));
+			assert(!SIG_SMPLOCK_TST(next));
+			ATOMIC_WRITE(self->s_con, next);
+			PREEMPTION_POP(was);
+		} else {
+			REF struct task *target_thread = NULL;
+			struct task_connections *real_target_cons;
+			real_target_cons = TASK_CONNECTION_STAT_GETCONS(target_cons);
+			/* Set the delivered signal, and capture
+			 * the target_thread thread, if there is one */
+			if (ATOMIC_CMPXCH(real_target_cons->tcs_dlvr, NULL, SIG_SENDER))
+				target_thread = xincref(ATOMIC_READ(real_target_cons->tcs_thread));
+			next = con->tc_signext;
+			COMPILER_BARRIER();
+			ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			assert(!next || ADDR_ISKERN(next));
+			assert(!SIG_SMPLOCK_TST(next));
+			ATOMIC_WRITE(self->s_con, next);
+			PREEMPTION_POP(was);
+			if (target_thread) {
+#ifdef HAVE_SENDER_THREAD
+				task_wake_as(target_thread, sender_thread);
+#else /* HAVE_SENDER_THREAD */
+				task_wake(target_thread);
+#endif /* !HAVE_SENDER_THREAD */
+				decref_unlikely(target_thread);
+			}
+			/* Only normal connections count towards the returned # of threads. */
+			if (TASK_CONNECTION_STAT_ISNORM(target_cons))
+				++result;
+		}
+		/* Try to wake up the remaining threads. */
+#ifdef __OPTIMIZE_SIZE__
+		goto again;
+#else /* __OPTIMIZE_SIZE__ */
+		if (next)
+			goto again;
+#endif /* !__OPTIMIZE_SIZE__ */
+#else /* HAVE_BROADCAST */
+		struct task_connections *target_cons;
+		struct task_connection *receiver;
+		REF struct task *target_thread;
+start_find_receiver:
+		receiver = NULL;
+		for (;;) {
+			uintptr_t status;
+			assert(con->tc_sig == self);
+			status = ATOMIC_READ(con->tc_stat);
+			assert(status != TASK_CONNECTION_STAT_BROADCAST);
+			if (!TASK_CONNECTION_STAT_CHECK(status)) {
+				if (TASK_CONNECTION_STAT_ISNORM(status))
+					receiver = con; /* This connection is still in alive. */
+			} else {
+				assert(status == TASK_CONNECTION_STAT_SENT);
+			}
+			con = con->tc_signext;
+			if (!con)
+				break;
+		}
+		if likely(receiver) {
+			target_cons = ATOMIC_READ(receiver->tc_cons);
+			if unlikely(TASK_CONNECTION_STAT_CHECK(target_cons)) {
+again_find_receiver:
+				con = SIG_SMPLOCK_CLR(ATOMIC_READ(self->s_con));
+				assertf(con, "We've holding the SMP-lock, and we already know that there "
+				             "connections from above. So more could have only been added "
+				             "in the mean time, but none could have been removed!");
+				goto start_find_receiver;
+			}
+			assertf(TASK_CONNECTION_STAT_ISNORM(target_cons),
+			        "We've checked this above, and established "
+			        "connections can't suddenly become poll-based!");
+			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+			                        (struct task_connections *)TASK_CONNECTION_STAT_SENT))
+				goto again_find_receiver;
+			if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, SIG_SENDER)) {
+				/* Unlink the signal, and mark it as broadcast. */
+				task_connection_unlink_from_sig(self, receiver);
+				ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+				goto again_find_receiver;
+			}
+			/* Unlock the signal, and wake-up the thread attached to the connection */
+			target_thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+			_sig_smp_lock_release(self);
+			PREEMPTION_POP(was);
+			if (target_thread) {
+#ifdef HAVE_SENDER_THREAD
+				task_wake_as(target_thread, sender_thread);
+#else /* HAVE_SENDER_THREAD */
+				task_wake(target_thread);
+#endif /* !HAVE_SENDER_THREAD */
+				decref_unlikely(target_thread);
+			}
+			return true;
+		} else {
+			struct task_connection *next;
+			/* No regular connections, but there might be poll-based ones.
+			 * If there are any, we must broadcast to all of them! */
+			con = SIG_SMPLOCK_CLR(ATOMIC_READ(self->s_con));
+			assertf(con, "We've holding the SMP-lock, and we already know that there "
+			             "connections from above. So more could have only been added "
+			             "in the mean time, but none could have been removed!");
+			assert(con->tc_sig == self);
+			/* Simply do a broadcast to _all_ connections. */
+			target_cons = (struct task_connections *)ATOMIC_XCH(con->tc_stat,
+			                                                    TASK_CONNECTION_STAT_SENT);
+			assert((uintptr_t)target_cons != TASK_CONNECTION_STAT_BROADCAST);
+			if (TASK_CONNECTION_STAT_CHECK(target_cons)) {
+				/* Signal was already sent in the past.
+				 * -> Change it's disposition to BROADCAST, and unlink it. */
+				assert((uintptr_t)target_cons == TASK_CONNECTION_STAT_SENT);
+				next = con->tc_signext;
+				COMPILER_BARRIER();
+				ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+				assert(!next || ADDR_ISKERN(next));
+				assert(!SIG_SMPLOCK_TST(next));
+				ATOMIC_WRITE(self->s_con, next);
+				PREEMPTION_POP(was);
+			} else {
+				REF struct task *target_thread = NULL;
+				target_cons = TASK_CONNECTION_STAT_GETCONS(target_cons);
+				/* Set the delivered signal, and capture
+				 * the target_thread thread, if there is one */
+				if (ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, SIG_SENDER))
+					target_thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+				next = con->tc_signext;
+				COMPILER_BARRIER();
+				ATOMIC_WRITE(con->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+				assert(!next || ADDR_ISKERN(next));
+				assert(!SIG_SMPLOCK_TST(next));
+				ATOMIC_WRITE(self->s_con, next);
+				PREEMPTION_POP(was);
+				if (target_thread) {
+#ifdef HAVE_SENDER_THREAD
+					task_wake_as(target_thread, sender_thread);
+#else /* HAVE_SENDER_THREAD */
+					task_wake(target_thread);
+#endif /* !HAVE_SENDER_THREAD */
+					decref_unlikely(target_thread);
+				}
+			}
+			/* Try to wake up the remaining threads. */
+#ifdef __OPTIMIZE_SIZE__
+			goto again;
+#else /* __OPTIMIZE_SIZE__ */
+			if (next)
+				goto again;
+#endif /* !__OPTIMIZE_SIZE__ */
+		}
+#endif /* !HAVE_BROADCAST */
+	}
+
+/*done_nocon:*/
+	_sig_smp_lock_release(self);
+	PREEMPTION_POP(was);
+#ifdef NEED_done_nocon_nounlock
+#undef NEED_done_nocon_nounlock
+done_nocon_nounlock:
+#endif /* NEED_done_nocon_nounlock */
+#ifdef HAVE_BROADCAST
 	return result;
-#endif /* !DEFINE_SINGLE */
+#else /* HAVE_BROADCAST */
+	return false;
+#endif /* !HAVE_BROADCAST */
+#undef SIG_SENDER
 }
+
+#undef HAVE_SENDER_THREAD
+#undef HAVE_BROADCAST
+#undef HAVE_SENDER
+
 
 DECL_END
 
-#undef DEFINE_SINGLE
-#undef DEFINE_ALTERNATE
+#undef DEFINE_sig_broadcast_as
+#undef DEFINE_sig_altbroadcast
+#undef DEFINE_sig_broadcast
+#undef DEFINE_sig_altsend
+#undef DEFINE_sig_send
 

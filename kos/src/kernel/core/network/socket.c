@@ -114,14 +114,14 @@ socket_isconnected(struct socket *__restrict self) {
 	TRY {
 		(*self->sk_ops->so_getpeername)(self, NULL, 0);
 	} EXCEPT {
-		task_popconnections(&cons);
+		task_popconnections();
 		if (was_thrown(E_INVALID_ARGUMENT_BAD_STATE) &&
 		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) ==
 		    E_INVALID_ARGUMENT_CONTEXT_GETPEERNAME_NOT_CONNECTED)
 			return false; /* Not connected. */
 		RETHROW();
 	}
-	task_popconnections(&cons);
+	task_popconnections();
 	return true;
 }
 

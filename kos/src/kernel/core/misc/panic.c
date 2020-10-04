@@ -44,7 +44,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/vm.h>
 #include <sched/async.h>
 #include <sched/rwlock-intern.h>
-#include <sched/signal-intern.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -83,15 +82,9 @@ NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
 		thread->t_self = thread; /* Shouldn't happen... */
 	if (!FORTASK(thread, this_read_locks).rls_vec)
 		pertask_readlocks_init(thread);
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 	if (!FORTASK(thread, this_connections) ||
 	    (FORTASK(thread, this_connections)->tcs_thread != thread))
 		pertask_init_task_connections(thread);
-#else /* CONFIG_USE_NEW_SIGNAL_API */
-	if (!FORTASK(thread, this_connections).tc_static_v ||
-	    FORTASK(thread, this_connections).tc_signals.ts_thread != thread)
-		pertask_init_task_connections(thread);
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 }
 
 #if defined(__x86_64__) || defined(__i386__)

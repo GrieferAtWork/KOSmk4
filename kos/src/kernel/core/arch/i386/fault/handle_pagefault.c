@@ -852,7 +852,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							 * If we did a normal RETHROW() here, then the (currently correct) return PC
 							 * would get overwritten with the VIO function address. */
 							decref_unlikely(args.vea_args.va_part);
-							task_popconnections(&con);
+							task_popconnections();
 							if (isuser())
 								PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
 							x86_userexcept_unwind_interrupt(state);
@@ -860,7 +860,7 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 						assert(args.vea_args.va_part == part);
 						decref_unlikely(args.vea_args.va_block);
 						decref_unlikely(args.vea_args.va_part);
-						task_popconnections(&con);
+						task_popconnections();
 						return state;
 					}
 do_normal_vio:
@@ -890,13 +890,13 @@ do_normal_vio:
 						decref_unlikely(args.vea_args.va_block);
 						assert(args.vea_args.va_part == part);
 						/*decref_unlikely(args.vea_args.va_part);*/ /* Handled by outer EXCEPT */
-						/*task_popconnections(&con);*/ /* Handled by outer EXCEPT */
+						/*task_popconnections();*/ /* Handled by outer EXCEPT */
 						RETHROW();
 					}
 					decref_unlikely(args.vea_args.va_block);
 					assert(args.vea_args.va_part == part);
 					decref_unlikely(args.vea_args.va_part);
-					task_popconnections(&con);
+					task_popconnections();
 #ifndef __x86_64__
 					/* Check if the kernel %esp or %ss was modified */
 					if unlikely(args.vea_kernel_override & (VIO_EMULATE_ARGS_386_KERNEL_ESP_VALID |
@@ -1087,21 +1087,21 @@ done_before_pop_connections:
 			;
 		} EXCEPT {
 			task_disconnectall();
-			task_popconnections(&con);
+			task_popconnections();
 			if (isuser())
 				PERTASK_SET(this_exception_faultaddr, (void *)pc);
 			rethrow_exception_from_pf_handler(state, pc);
 		}
-		task_popconnections(&con);
+		task_popconnections();
 		__IF0 {
 pop_connections_and_throw_segfault:
-			task_popconnections(&con);
+			task_popconnections();
 			goto throw_segfault;
 pop_connections_and_set_exception_pointers:
-			task_popconnections(&con);
+			task_popconnections();
 			goto set_exception_pointers;
 pop_connections_and_set_exception_pointers2:
-			task_popconnections(&con);
+			task_popconnections();
 			goto set_exception_pointers2;
 		}
 	}

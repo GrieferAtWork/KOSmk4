@@ -30,7 +30,6 @@
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/rwlock-intern.h>
-#include <sched/signal-intern.h>
 
 #include <hybrid/sequence/list.h>
 

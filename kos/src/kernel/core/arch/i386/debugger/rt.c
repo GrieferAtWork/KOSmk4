@@ -494,7 +494,6 @@ x86_dbg_initialize_segments(struct cpu *me, struct task *mythread) {
 
 
 /* Verify the integrity of a given set of task connections. */
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 PRIVATE ATTR_DBGTEXT bool
 NOTHROW(KCALL verify_task_connections)(struct task_connections *self) {
 	TRY {
@@ -518,7 +517,6 @@ nope:
 	return false;
 }
 
-#endif /* CONFIG_USE_NEW_SIGNAL_API */
 
 
 
@@ -678,15 +676,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 	pertask_readlocks_init(mythread);
 
 	/* Make sure that the signal connections sub-system is initialized. */
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 	if (!FORTASK(mythread, this_connections) ||
 	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
 		pertask_init_task_connections(mythread);
-#else /* CONFIG_USE_NEW_SIGNAL_API */
-	if (!FORTASK(mythread, this_connections).tc_static_v ||
-	    FORTASK(mythread, this_connections).tc_signals.ts_thread != mythread)
-		pertask_init_task_connections(mythread);
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 	/* Push active connections. */
 	if (!(initok & INITOK_CONNECTIONS)) {
@@ -698,7 +690,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		 * Technically, this should already be prevented by `initok & INITOK_CONNECTIONS',
 		 * however given that this is all about making this code be robust against broken
 		 * code elsewhere within the kernel, double-checking isn't a problem here! */
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 		if unlikely(!verify_task_connections(FORTASK(mythread, this_connections))) {
 			/* Connections are all f'ed up. - Fully reset them, so
 			 * we can at least get ~some~ kind of working state... */
@@ -717,12 +708,6 @@ fully_reset_task_connections:
 			}
 		}
 		initok |= INITOK_CONNECTIONS;
-#else /* CONFIG_USE_NEW_SIGNAL_API */
-		if (FORTASK(mythread, this_connections).tc_static_v != x86_dbg_hostbackup.dhs_signals.tc_static) {
-			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
-			initok |= INITOK_CONNECTIONS;
-		}
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 	}
 
 	/* NOTE: Clear `dbg_cpu_' _BEFORE_ sending the IPI to stop execution
@@ -890,7 +875,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset_dbg_stack(void) {
 	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
 		pertask_init_task_connections(mythread);
 
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 	/* When the debugger is reset after a prior call to `task_pushconnections()',
 	 * then we must take special care to pop the pushed set of connections.
 	 * This case can be detected by looking at connection set pointers, and
@@ -929,7 +913,6 @@ reset_all_connections:
 		if (initok & INITOK_CONNECTIONS)
 			task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 	}
-#endif /* CONFIG_USE_NEW_SIGNAL_API */
 }
 
 INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
@@ -954,7 +937,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	pertask_readlocks_init(mythread);
 
 	/* Make sure that the signal connections sub-system is (still) initialized. */
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 	if (!FORTASK(mythread, this_connections) ||
 	    (FORTASK(mythread, this_connections)->tcs_thread != mythread))
 		pertask_init_task_connections(mythread);
@@ -964,11 +946,6 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 		task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 		initok |= INITOK_CONNECTIONS;
 	}
-#else /* CONFIG_USE_NEW_SIGNAL_API */
-	if (!FORTASK(mythread, this_connections).tc_static_v ||
-	    FORTASK(mythread, this_connections).tc_signals.ts_thread != mythread)
-		pertask_init_task_connections(mythread);
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 	/* Set our own thread as the current thread. */
 	dbg_current        = mythread;
@@ -1057,12 +1034,8 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 		       sizeof(struct read_locks));
 	}
 	if (initok & INITOK_CONNECTIONS) {
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 		if (FORTASK(mythread, this_connections) == &x86_dbg_hostbackup.dhs_signals)
 			task_popconnections();
-#else /* CONFIG_USE_NEW_SIGNAL_API */
-		task_popconnections(&x86_dbg_hostbackup.dhs_signals);
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 	}
 
 	/* Update the debugger exit state to have `dbg_enter_r()' return

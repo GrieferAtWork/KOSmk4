@@ -23,21 +23,7 @@
 #include <kernel/compiler.h>
 #include <kernel/types.h>
 
-#undef CONFIG_USE_NEW_SIGNAL_API
-#if 1
-#define CONFIG_USE_NEW_SIGNAL_API 1
-#endif
-
-#ifdef CONFIG_USE_NEW_SIGNAL_API
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_NEWSIGNAL_H
-#include <sched/newsignal.h>
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_NEWSIGNAL_H */
-#else /* CONFIG_USE_NEW_SIGNAL_API */
 #include <sched/pertask.h>
-
-#include <hybrid/__assert.h>
-
-#include <stdbool.h>
 
 DECL_BEGIN
 
@@ -62,224 +48,310 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+struct sig;
+struct task;
 struct task_connection;
 struct task_connections;
 
-#ifndef CONFIG_NO_SMP
-/* A special (and very rarely seen) value for `struct sig::s_ptr' that
- * is used to indicate that another CPU is currently invoking `sig_send()',
- * and has removed the pending chain of connections, though has not yet
- * re-scheduled the remaining connections that will won't be signaled.
- * WARNING: You may only ever assign this value to `s_ptr' when you have
- *          previously disabled preemption, as the only reason why this
- *          could ever appear while inside of `sig_broadcast()' must remain
- *          another CPU having TEMPorarily LOCKed the connections chain.
- *          In this case you must deal with the lock by calling `task_pause()'
- *         (DON'T EVEN THINK about calling `task_yield()') though, in order
- *          to given that other CPU its best chances of releasing the temporary
- *          lock.
- *       -> Similarly, you are only allowed to re-enable preemption _AFTER_
- *          you have released this kind of lock.
- * Note that when SMP is disabled, or when only 1 core is online after preemption has
- * been disabled (`defined(CONFIG_NO_SMP) || (!PREEMPTION_ENABLED() && cpu_online_count <= 1)'),
- * this special locking value is unnecessary and not required, as it is sufficient to
- * simply disable preemption when wishing to pop a limited number of connections from `s_ptr'. */
-#define SIG_TEMPLOCK ((struct task_connection *)-1)
-#endif /* !CONFIG_NO_SMP */
-
-
-
-
-/* Synchronous, automatic (and since KOS400 non-blocking when sending),
- * low-level scheduling mechanism.
- * A signal on its own should be seen as entirely state-less. It only
- * gains a state once a user starts to operate with it, allowing one
- * thread to wait for a signal to be delivered, while another thread
- * gains the ability to asynchronously wake another thread, who will
- * receive that wake-up synchronously.
- * Using signals, a simple locking mechanism can be implemented as
- * follows, with any other kind of possible locking mechanism possible
- * to be built on-top:
- * >> struct lock {
- * >>     struct sig   l_signal;
- * >>     unsigned int l_locked;
- * >> };
- * >>
- * >> bool try_acquire(struct lock *me) {
- * >>     return ATOMIC_CMPXCH(me->l_locked,0,1);
- * >> }
- * >>
- * >> void acquire(struct lock *me) {
- * >>     while (!try_acquire(me)) {
- * >>         task_connect(&me->l_signal);
- * >>         if (try_acquire(me)) {
- * >>             task_disconnectall();
- * >>             break;
- * >>         }
- * >>         task_waitfor();
- * >>     }
- * >> }
- * >>
- * >> void release(struct lock *me) {
- * >>     ATOMIC_WRITE(me->l_locked,0);
- * >>     sig_broadcast(&me->l_signal);
- * >> }
- * The above example could easily be extended to provide
- * functionality for polling, recursion, or better
- * performance by using `TASK_POLL_BEFORE_CONNECT()'
- * in `acquire()', or `sig_send()' in `release()'.
- */
 struct sig {
-	WEAK struct task_connection *s_ptr; /* [0..1] Atomic linked list of active connections. */
+#ifdef __SIG_INTERNAL_EXPOSE_CONTROL_WORD
+	union {
+		struct task_connection *s_con; /* [0..1][chain(->tc_signext)]
+		                                * [lock(INSERT(ATOMIC))]
+		                                * [lock(REMOVE(!PREEMPTION_ENABLED() && IF_SMP(SMP_LOCK(tc_sig))))]
+		                                * Chain of established connections.
+		                                * In SMP, the least significant bit is a lock that needs to be
+		                                * held when connections are removed. Note however that this lock
+		                                * may only be acquired when preemption is disabled, as it must
+		                                * be guarantied that the lock always becomes available while doing
+		                                * a `while (!trylock()) task_pause()'-loop. */
+		uintptr_t               s_ctl; /* Signal control word */
+	};
+#else /* __SIG_INTERNAL_EXPOSE_CONTROL_WORD */
+	struct task_connection *s_con; /* [0..1][chain(->tc_signext)]
+	                                * [lock(INSERT(ATOMIC))]
+	                                * [lock(REMOVE(!PREEMPTION_ENABLED() && IF_SMP(SMP_LOCK(tc_sig))))]
+	                                * Chain of established connections.
+	                                * In SMP, the least significant bit is a lock that needs to be
+	                                * held when connections are removed. Note however that this lock
+	                                * may only be acquired when preemption is disabled, as it must
+	                                * be guarantied that the lock always becomes available while doing
+	                                * a `while (!trylock()) task_pause()'-loop. */
+#endif /* !__SIG_INTERNAL_EXPOSE_CONTROL_WORD */
 };
-#define SIG_INIT     { 0 }
-#define sig_init(x)  (void)((x)->s_ptr = 0)
-#define sig_cinit(x) (void)(__hybrid_assert((x)->s_ptr == 0))
+
+#ifdef __SIG_INTERNAL_EXPOSE_CONTROL_WORD
+#define SIG_INIT { { __NULLPTR } }
+#else /* __SIG_INTERNAL_EXPOSE_CONTROL_WORD */
+#define SIG_INIT { __NULLPTR }
+#endif /* !__SIG_INTERNAL_EXPOSE_CONTROL_WORD */
+
+#define sig_init(x)  (void)((x)->s_con = __NULLPTR)
+#define sig_cinit(x) (void)(__hybrid_assert((x)->s_con == __NULLPTR))
 
 
-/* Send signal `self' to up to 1 connected threads
- * @return: true:  The signal was delivered to at least 1 non-ghost connection.
- * @return: false: No non-ghost connections could be reached. */
-FUNDEF NOBLOCK NONNULL((1)) bool
+
+/* Send signal `self' to exactly 1 connected thread
+ *  - The receiver is the thread who's connection has been pending the longest.
+ *  - Note the special interaction of this function with poll-based connections.
+ *    For more information on this subject, see `task_connect_for_poll()'.
+ * @return: true:  A waiting thread was signaled.
+ * @return: false: The given signal didn't have any active connections. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL sig_send)(struct sig *__restrict self);
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL sig_altsend)(struct sig *self,
+                           struct sig *sender);
 
-/* Send signal to all connected threads
- * @return: true: The actual number of threads notified, not counting ghosts. */
+/* Same as `sig_send()', but repeat the operation up to `maxcount' times,
+ * and return the # of times that `sig_send()' would have returned `true'
+ * Equivalent to:
+ * >> size_t result = 0;
+ * >> while (maxcount) {
+ * >>     if (!sig_send(self))
+ * >>         break;
+ * >>     --maxcount;
+ * >>     ++result;
+ * >> }
+ * >> return result; */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_sendmany)(struct sig *__restrict self,
+                            size_t maxcount);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altsendmany)(struct sig *self,
+                               struct sig *sender,
+                               size_t maxcount);
+
+/* Send signal to all connected threads.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self);
-
-/* Alternative signal sender functions:
- *  - Operate the same way as their regular counterparts
- *  - Able to use a custom `sender' signal that is returned
- *    to the caller of `task_wait()' as the origin of the
- *    signal, rather than the signal that was actually used.
- *  - Be careful when using this, as improper use may result
- *    in unexpected behavior where `task_wait()' returns a
- *    signal to which the waiting task wasn't even connected,
- *    while in fact it really wasn't connected to it.
- *  - `sender' must not necessarily be a `struct sig *', but
- *    can also be an arbitrary data pointer or 32/64-bit data
- *    word. However the one thing that it is not allowed to be
- *    is a NULL-pointer, as that value is internally used to
- *    indicate a signal that hasn't been sent, yet.
- *  - This functionality hasn't gotten much use yet, however
- *    it is getting used by kernel-space RPC acknowledgement
- *    to indicate to user-RPCs that the thread did receive the
- *    RPC, however was unable to execute it as the RPC was
- *    scheduled past the point of no return, after which the
- *    thread will never again return to user-space (after an `exit()')
- *    In that case, the thread waiting for the RPC will read a
- *    sender signal not matching the expected value of the
- *    ack-signal, but the thread's join-signal, which is then
- *    interpreted as the thread's inability to serve further
- *    user-space RPCs. */
-FUNDEF NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(FCALL sig_altsend)(struct sig *__restrict self, struct sig *sender);
 FUNDEF NOBLOCK NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_altbroadcast)(struct sig *__restrict self, struct sig *sender);
+NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
+                                struct sig *sender);
+
+/* Check if the given signal has viable recipients.
+ * This includes poll-based connections. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self);
+
+/* Count the # of viable recipients of the given signal.
+ * This includes poll-based connections. */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
+
+/* Same as `sig_broadcast()', but impersonate `sender_thread', and
+ * wake up thread through use of `task_wake_as()'. The same rules
+ * apply, meaning that the (true) caller must ensure that their
+ * CPU won't change, and that `sender_thread' is also running as
+ * part of their CPU. */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_as)(struct sig *__restrict self,
+                                struct task *__restrict sender_thread);
 
 
 
+
+/* Connection status values (is-connected is every `x' with `!TASK_CONNECTION_STAT_CHECK(x)')
+ * This initial `!TASK_CONNECTION_STAT_CHECK(x)'-state can transition to:
+ *   - TASK_CONNECTION_STAT_SENT:      Some thread called `sig_send(tc_sig)', and the
+ *                                     associated `struct task_connection' was selected.
+ *   - TASK_CONNECTION_STAT_BROADCAST: Some thread called `sig_broadcast(tc_sig)'.
+ * Also note that any recipient can only ever have at most 1 connection with
+ * a state of `TASK_CONNECTION_STAT_SENT' or `TASK_CONNECTION_STAT_BROADCAST',
+ * though this invariant is only true when interlocked with the SMP-locks of
+ * all attached signals. (s.a. `tcs_dlvr')
+ */
+#define TASK_CONNECTION_STAT_SENT         ((uintptr_t)-1) /* Signal was sent, and must be forwarded if not received via `task_waitfor()'
+                                                           * In this state, the attached signal must not be free'd, though this case can
+                                                           * easily be handled by broadcasting signals one last time before disconnecting.
+                                                           * Transitions to (with [lock(SMP_LOCK(tc_sig))]):
+                                                           *   - TASK_CONNECTION_STAT_BROADCAST: Any thread called `sig_broadcast()'
+                                                           *                                     on the attached signal. */
+#define TASK_CONNECTION_STAT_BROADCAST    ((uintptr_t)-2) /* Signal was broadcast (forwarding is unnecessary if ignored)
+                                                           * In this state, `tc_sig' must be considered to be `[valid_if(false)]', and the
+                                                           * thread that originally connected to the signal mustn't directly re-connect.
+                                                           * When all (past) connections have entered this state, the associated signal is
+                                                           * allowed to have it's backing memory be free'd!
+                                                           * NOTE: THIS STATUS WILL NEVER APPEAR IN SIGNAL CONNECTION CHAINS! */
+#define TASK_CONNECTION_STAT_CHECK(x)     ((uintptr_t)(x) >= (uintptr_t)-2)
+
+/* For use when `!TASK_CONNECTION_STAT_CHECK(x)': check for poll-connections. */
+#define TASK_CONNECTION_STAT_GETCONS(x)   ((struct task_connections *)((uintptr_t)(x) & ~1))
+#define TASK_CONNECTION_STAT_ISNORM(x)    (((uintptr_t)(x) & 1) == 0)
+#define TASK_CONNECTION_STAT_ISPOLL(x)    (((uintptr_t)(x) & 1) != 0)
 
 struct task_connection {
-	struct task_sigset                *tc_cons;    /* [0..1][lock(SET(PRIVATE),CLEAR(tc_signal))] Associated connections set. */
-	struct sig                        *tc_signal;  /* [0..1][lock(SET(PRIVATE),CLEAR(.))] The connected signal
-	                                                * NOTE: The lowest-order bit is used to indicate ghost connections. */
-#define TASK_CONNECTION_DELIVERED      ((struct sig *)0)  /* Set once signal delivery has been completed. */
-#define TASK_CONNECTION_DELIVERING     ((struct sig *)-1) /* Set while a signal is being delivered. */
-#define TASK_CONNECTION_DISCONNECTING  ((struct sig *)-2) /* The signal is being disconnected. */
-#define TASK_CONNECTION_DISCONNECTED   ((struct sig *)-3) /* The signal has been disconnected. */
-	struct task_connection            *tc_signext; /* [0..1][const] Next connection made by `tc_signal'. */
-	struct task_connection            *tc_connext; /* [0..1][const] Next connection made by the thread.
-	                                                * NOTE: The lowest-order bit is used to indicate heap-allocated connections. */
-};
-
-struct task_sigset {
-	struct task            *ts_thread; /* [0..1][const] The thread to wake upon signal delivery, or
-	                                    *              `NULL' if the task is only receiving the signal
-	                                    *               passively. */
-	struct task_connection *ts_cons;   /* [0..1][lock(PRIVATE)] Chain of active connections. */
-	struct sig             *ts_dlvr;   /* [0..1][lock(WRITE_ONCE,CLEAR(PRIVATE))] The signal that got delivered. */
+	struct sig                  *tc_sig;     /* [1..1][const] The connected signal. */
+	struct task_connection      *tc_connext; /* [0..1][lock(THIS_TASK)] Next connection established by the caller. */
+	struct task_connection      *tc_signext; /* [0..1][lock(!PREEMPTION_ENABLED() && IF_SMP(SMP_LOCK(tc_sig)))]
+	                                          * Next connection for the same signal. */
+	union {
+		struct task_connections *tc_cons; /* [1..1] Attached connection set/connection status.
+		                                   * The least significant bit is set in case of a poll-connection. */
+		WEAK uintptr_t           tc_stat; /* Connection status (one of `TASK_CONNECTION_STAT_*'). */
+	};
 };
 
 
 /* Max number of signal connections guarantied to not invoke `kmalloc()'
- * and potentially throw exceptions, or serve RPC functions.
- * A value of ONE(1) would suffice, but a static buffer is mandatory
- * due to the fact that allocating a dynamic buffer (using `kmalloc()')
- * may need to acquire its own locks in case that new memory must be
- * vm_paged_map()-ed. In this case, when locking needs to be done, a logic
- * recursion can only be prevented if it is possible to use at least
- * one signal slot that is allocated statically (`task_connect()' uses
- * `task_push_connections()' to free up that static slot before calling
- * `kmalloc()'). */
+ * and potentially throw exceptions, or serve RPC functions. */
 #ifndef CONFIG_TASK_STATIC_CONNECTIONS
 #define CONFIG_TASK_STATIC_CONNECTIONS 3
 #endif /* !CONFIG_TASK_STATIC_CONNECTIONS */
 
 struct task_connections {
-	struct task_sigset      tc_signals;                                /* Task signal set. */
-	struct task_connection  tc_static[CONFIG_TASK_STATIC_CONNECTIONS]; /* Statically allocated connections. */
-	struct task_connection *tc_static_v; /* [1..1] Pointer to the previous/current vector
-	                                      *        of statically allocated connections. */
+	struct task_connections *tsc_prev;   /* [0..1][lock(PRIVATE(THIS_TASK))]
+	                                      * [(!= NULL) == (this == &this_root_connections)]
+	                                      * Previous set of active connections. */
+	WEAK struct task        *tcs_thread; /* [0..1][lock(PRIVATE(THIS_TASK))]
+	                                      * The thread to wake upon signal delivery. (may also be `NULL')
+	                                      * This field is usually `NULL' for all connection sets 
+	                                      * `!= FORTASK(tcs_thread, this_connections)', and is set
+	                                      * as equal to `THIS_TASK' for `PERTASK(this_connections)'
+	                                      * Note that it is guarantied that this task-pointer remains
+	                                      * valid from the point of view of potentially attached signal,
+	                                      * even after this field may be set to NULL/non-NULL, for as
+	                                      * long as the actual, underlying thread no longer has any
+	                                      * active connections. (i.e. has called `task_disconnectall()') */
+	struct task_connection  *tcs_con;    /* [0..1][chain(->tc_connext)][lock(PRIVATE(THIS_TASK))]
+	                                      * Chain of active connections. */
+	struct sig              *tcs_dlvr;   /* [0..1][lock(WRITE_ONCE, CLEAR(PRIVATE))]
+	                                      * The first signal that got delivered. */
+	struct task_connection   tcs_static[CONFIG_TASK_STATIC_CONNECTIONS];
+	                                     /* [*.in_use_if(.tc_sig != NULL)][lock(PRIVATE(THIS_TASK))]
+	                                      * Statically allocated connections. Any connection that belongs to
+	                                      * this connections set, but points outside of this array is allocated
+	                                      * dynamically using `kmalloc()', and as such, must be freed by `kfree()' */
 };
 
+/* Root connections set. */
+DATDEF ATTR_PERTASK struct task_connections this_root_connections;
+#define THIS_ROOT_CONNECTIONS (&PERTASK(this_root_connections))
 
-/* Push/pop the active set of connections.
- * NOTE: After having been pushed, the calling thread will appear to not be connected
- *       to anything. - Similarly, `task_popconnections()' may only be called after
- *       all connections made were disconnected again.
- *    -> Signals delivered in the mean time will then immediately be available. */
+/* [1..1][lock(PRIVATE(THIS_TASK))] Current set of in-use connections.
+ * Most of the time, this will simply point to `PERTASK(this_root_connections)' */
+DATDEF ATTR_PERTASK struct task_connections *this_connections;
+#define THIS_CONNECTIONS PERTASK_GET(this_connections)
+
+
+/* Push/pop the active set of connections. */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL task_pushconnections)(struct task_connections *__restrict cons);
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL task_popconnections)(struct task_connections *__restrict cons);
+FUNDEF NOBLOCK ATTR_RETNONNULL struct task_connections *
+NOTHROW(FCALL task_popconnections)(void);
 
 
-/* NOTE: It is valid to destroy a signal after it was broadcast, even before it
- *       has been received! - The following sequence of calls is valid:
- * >> struct sig *send;
- * >> struct sig t = SIG_INIT;
- * >> assert(!task_isconnected());
- * >> task_connect(&t);
- * >> assert(task_isconnected());
- * >> sig_broadcast(&t);
- * >> memset(&t, 0xcc, sizeof(t)); // Invalidate the signal
- * >> send = task_waitfor();       // Wait for the signal (will not access the signal's memory!)
- * >> assert(send == &t);          // The correct signal was send
- * This is quite important, since it allows one to poll any given object without
- * have to make sure that that object is still alive when task_waitfor() is called! */
 
 
 /* Connect the calling thread to a given signal.
- * @throw: E_BADALLOC:   [task_connect[_ghost]] Insufficient memory (only when there are
- *                        at least `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
-FUNDEF NONNULL((1)) void FCALL task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
-FUNDEF NONNULL((1)) void FCALL task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
+ * NOTE: It the caller was already connected to `target', a second connection
+ *       will be established, and `task_disconnect()' must be called more than
+ *       once. However, aside from this, having multiple connections to the
+ *       same signal has no other adverse side-effects.
+ * NOTE: When the signal test expression is able to throw an exception, the
+ *       caller of this function is responsible to disconnect from the signal
+ *       afterwards. However, exceptions that may be thrown by `task_waitfor()'
+ *       always guaranty that _all_ established connections have been removed.
+ * >> if (test())
+ * >>     return true;
+ * >> task_connect(s);
+ * >> TRY {
+ * >>     if (test()) {
+ * >>         task_disconnectall();
+ * >>         return true;
+ * >>     }
+ * >> } EXCEPT {
+ * >>     task_disconnectall();
+ * >>     RETHROW();
+ * >> }
+ * >> task_waitfor();
+ *
+ * @throw: E_BADALLOC: Insufficient memory (only when there are at least
+ *                     `CONFIG_TASK_STATIC_CONNECTIONS' connections already). */
+FUNDEF NONNULL((1)) void FCALL
+task_connect(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
+
+/* Exactly the same as `task_connect()', however must be used when the connection
+ * is made for a poll-based operation that only wishes to wait for some event to
+ * be triggered, but does not wish to act upon this event by acquiring some kind
+ * of lock with the intend to release it eventually, where the act of releasing
+ * said lock includes a call to `sig_send()'.
+ *
+ * This connect() function is only required for signals that may be delivered via
+ * `sig_send()', meaning that only a single thread would be informed of the signal
+ * event having taken place. If in this scenario, the recipient thread (i.e the
+ * thread that called `task_connect()') then decides not to act upon the signal
+ * in question, but rather to do something else, the original intend of `sig_send()'
+ * will become lost, that intend being for some (single) thread to try to acquire
+ * an accompanying lock (for an example of this, see kernel header <sched/mutex.h>)
+ *
+ * As far as semantics go, a signal connection established with this function will
+ * never satisfy a call to `sig_send()', and will instead be skipped if encountered
+ * during its search for a recipient (such that by default, poll-connections will
+ * only be acted upon when `sig_broadcast()' is used). However, if a call to
+ * `sig_send()' is unable to find any non-poll-based connections, it will proceed
+ * to act like a call to `sig_broadcast()' and wake all polling thread, though will
+ * still end up returning `false', indicative of not having woken any (properly)
+ * waiting thread.
+ *
+ * With all of this in mind, this function can also be though of as a sort-of
+ * low-priority task connection, that will only be triggered after other connections
+ * have already been served, and will only be woken by `sig_send()', when no other
+ * connections exist.
+ *
+ * In practice, this function must be used whenever it is unknown what will eventually
+ * happen after `task_waitfor()', or if what happens afterwards doesn't include the
+ * acquisition of some kind of lock, whose release includes the sending of `target'.
+ *
+ * s.a. The difference between `task_disconnectall()' and `task_receiveall()' */
+FUNDEF NONNULL((1)) void FCALL
+task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/;
+
 
 /* Disconnect from a specific signal `target'
- * No-op if the caller isn't actually connected to `target'
- * WARNING: If the connected signal was already sent, causing the calling
- *          thread to enter a signaled state, that state will not be
- *          reverted by this call! */
-FUNDEF NOBLOCK NONNULL((1)) void
+ * @return: true:  Disconnected from `target'
+ * @return: false: You weren't actually connected to `target' */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL task_disconnect)(struct sig *__restrict target);
 
-/* Remove all active signals.
- * In case one of them got delivered, return the signal that got. Otherwise, return `NULL' */
-FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_disconnectall)(void);
-#define task_receiveall task_disconnectall
+/* Disconnect from all connected signal.
+ * Signals with a state of `TASK_CONNECTION_STAT_SENT' will be forwarded. */
+FUNDEF NOBLOCK void
+NOTHROW(FCALL task_disconnectall)(void);
+
+/* Same as `task_disconnectall()', but don't forward signals with a
+ * `TASK_CONNECTION_STAT_SENT'-state, but rather return the sender
+ * of of the signal that was received.
+ * As such, the caller must properly pass on information about the
+ * fact that a signal may have been received, as well as act upon
+ * this fact. */
+FUNDEF NOBLOCK WUNUSED struct sig *
+NOTHROW(FCALL task_receiveall)(void);
 
 /* Check if the calling thread is connected to any signal. */
-FUNDEF NOBLOCK WUNUSED bool NOTHROW(FCALL task_isconnected)(void);
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
+NOTHROW(FCALL task_isconnected)(void);
+
+/* Check if the calling thread is connected to the given signal. */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
+NOTHROW(FCALL task_isconnected_to)(struct sig const *__restrict target);
+
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
+NOTHROW(FCALL task_isconnected)(struct sig const *__restrict target)
+		ASMNAME("task_isconnected_to");
+} /* extern "C++" */
+#endif /* __cplusplus */
+
 
 /* Check if there is a signal to was delivered, disconnecting
  * all other connected signals if this was the case.
  * @return: NULL: No signal is available
  * @return: * :   The signal that was delivered. */
 FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
-
-struct timespec;
 
 /* Wait for the first signal to be delivered, unconditionally
  * disconnecting all connected signals thereafter.
@@ -306,18 +378,27 @@ task_waitfor_norpc(struct timespec const *abs_timeout DFL(__NULLPTR))
 /* Same as `task_waitfor', but only service NX RPCs, and return `NULL' if
  * there are pending RPCs that are allowed to throw exception, or if preemption
  * was disabled, and the operation would have blocked. */
-FUNDEF struct sig *NOTHROW(FCALL task_waitfor_nx)(struct timespec const *abs_timeout DFL(__NULLPTR));
+FUNDEF struct sig *
+NOTHROW(FCALL task_waitfor_nx)(struct timespec const *abs_timeout DFL(__NULLPTR));
 
 /* Same as `task_waitfor', but don't serve RPC functions, and return
  * `NULL' if preemption was disabled, and the operation would have blocked. */
-FUNDEF struct sig *NOTHROW(FCALL task_waitfor_norpc_nx)(struct timespec const *abs_timeout DFL(__NULLPTR));
+FUNDEF struct sig *
+NOTHROW(FCALL task_waitfor_norpc_nx)(struct timespec const *abs_timeout DFL(__NULLPTR));
+
+
+#ifdef CONFIG_BUILDING_KERNEL_CORE
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
+
 #endif /* __CC__ */
 
 
 /* Configuration option for standard synchronization primitives.
  * Before connecting to a signal, try to yield a couple of times
  * to try and get other threads to release some kind of lock, as
- * `task_yield()' is a much faster operation than task_connect()+task_wait().
+ * `task_yield()' is a much faster operation than task_connect()+task_waitfor().
  * Doing this may improve performance, especially on single-core machines.
  * Note however that this option does not affect the behavior of
  * low-level `struct sig' objects, but instead primitives found in
@@ -329,11 +410,11 @@ FUNDEF struct sig *NOTHROW(FCALL task_waitfor_norpc_nx)(struct timespec const *a
  *       before a signal is actually connected. */
 #ifndef CONFIG_YIELD_BEFORE_CONNECT
 #ifndef CONFIG_NO_YIELD_BEFORE_CONNECT
-#define CONFIG_YIELD_BEFORE_CONNECT  4
+#define CONFIG_YIELD_BEFORE_CONNECT 4
 #endif /* !CONFIG_NO_YIELD_BEFORE_CONNECT */
 #elif defined(CONFIG_NO_YIELD_BEFORE_CONNECT)
 #undef CONFIG_YIELD_BEFORE_CONNECT
-#endif
+#endif /* ... */
 
 #if defined(CONFIG_YIELD_BEFORE_CONNECT) && (CONFIG_YIELD_BEFORE_CONNECT+0) == 0
 #undef CONFIG_YIELD_BEFORE_CONNECT
@@ -374,93 +455,93 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 #endif /* !__task_tryyield_defined */
 #if CONFIG_YIELD_BEFORE_CONNECT == 1
 #define TASK_POLL_BEFORE_CONNECT(...) \
-	do {                          \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-	} __WHILE0
+	do {                              \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+	}	__WHILE0
 #elif CONFIG_YIELD_BEFORE_CONNECT == 2
 #define TASK_POLL_BEFORE_CONNECT(...) \
-	do {                          \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-	} __WHILE0
+	do {                              \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+	}	__WHILE0
 #elif CONFIG_YIELD_BEFORE_CONNECT == 3
 #define TASK_POLL_BEFORE_CONNECT(...) \
-	do {                          \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-	} __WHILE0
+	do {                              \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+	}	__WHILE0
 #elif CONFIG_YIELD_BEFORE_CONNECT == 4
 #define TASK_POLL_BEFORE_CONNECT(...) \
-	do {                          \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-	} __WHILE0
+	do {                              \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+	}	__WHILE0
 #elif CONFIG_YIELD_BEFORE_CONNECT == 5
 #define TASK_POLL_BEFORE_CONNECT(...) \
-	do {                          \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-	} __WHILE0
+	do {                              \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+	}	__WHILE0
 #elif CONFIG_YIELD_BEFORE_CONNECT == 6
 #define TASK_POLL_BEFORE_CONNECT(...) \
-	do {                          \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-		if (task_tryyield() != 0) \
-			break;                \
-		__VA_ARGS__;              \
-	} __WHILE0
-#else
-#define TASK_POLL_BEFORE_CONNECT(...) \
+	do {                              \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+	}	__WHILE0
+#else /* CONFIG_YIELD_BEFORE_CONNECT == ... */
+#define TASK_POLL_BEFORE_CONNECT(...)                            \
 	do {                                                         \
 		unsigned int __poll_count = CONFIG_YIELD_BEFORE_CONNECT; \
 		do {                                                     \
@@ -468,15 +549,13 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 				break;                                           \
 			__VA_ARGS__;                                         \
 		} while (--__poll_count);                                \
-	} __WHILE0
-#endif
-#else
+	}	__WHILE0
+#endif /* CONFIG_YIELD_BEFORE_CONNECT != ... */
+#else /* CONFIG_YIELD_BEFORE_CONNECT */
 #define TASK_POLL_BEFORE_CONNECT(...) (void)0
-#endif
+#endif /* !CONFIG_YIELD_BEFORE_CONNECT */
 #endif /* __CC__ */
 
-
 DECL_END
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_H */

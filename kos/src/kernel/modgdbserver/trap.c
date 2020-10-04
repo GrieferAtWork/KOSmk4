@@ -346,7 +346,7 @@ done_unlock:
 	sig_broadcast(&GDBServer_HostUnlocked);
 
 done:
-	task_popconnections(&stop_event.tse_oldcon);
+	task_popconnections();
 	return stop_event.tse_state;
 }
 

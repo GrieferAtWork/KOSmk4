@@ -823,7 +823,7 @@ do_switch_to_result:
 /* Same as `sched_intern_yield()', but ensure that `caller' doesn't get re-returned.
  * Additionally, this function will unlink `caller' from the run-queue, and if doing
  * so were to cause the run queue to become empty, then the IDLE thread will be added
- * to the run queue, as well as be switched to.
+ * to the run queue, as well as be returned.
  * Note that it is illegal to call this function as the IDLE thread! */
 PUBLIC NOPREEMPT NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
@@ -938,7 +938,7 @@ NOTHROW(FCALL waitfor_ktime_or_interrupt)(struct cpu *__restrict me,
  *          it will be re-enabled once this function returns.
  * NOTE: This function is the bottom-most (and still task-level) API
  *       for conserving CPU cycles using preemption, in that this
- *       function is even used to implement `task_wait()'.
+ *       function is even used to implement `task_waitfor()'.
  *       The functions used to implement this one no longer work on tasks, but on CPUs!
  * NOTE: If the thread is transferred to a different CPU while sleeping, a
  *       sporadic wakeup will be triggered, causing `task_sleep()' to return

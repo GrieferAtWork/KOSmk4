@@ -279,7 +279,7 @@ do_normal_stop:
 	/* Clear our thread's KEEPCORE flags */
 	if likely(!(old_flags & TASK_FKEEPCORE))
 		ATOMIC_AND(stop_event.e.tse_thread->t_flags, ~TASK_FKEEPCORE);
-	task_popconnections(&stop_event.e.tse_oldcon);
+	task_popconnections();
 	return (struct icpustate *)stop_event.e.tse_state;
 }
 
