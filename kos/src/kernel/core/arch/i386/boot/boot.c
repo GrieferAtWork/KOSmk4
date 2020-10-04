@@ -402,15 +402,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
-	/* TODO: Running `playground fault' (on a secondary CPU), followed by `l' within the debugger
-	 *       will cause the kernel to lock up, where the secondary CPU will keep on waiting for
-	 *       a part of playground's .debug_str section to be loaded.
-	 *       Why that particular portion of memory doesn't end up being loaded, I don't know,
-	 *       but it only happens if it's a secondary CPU that's waiting.
-	 * NOTE: This may be related to a situation where a secondary CPU will sporadically not receive
-	 *       a wake-up request sent by another CPU. And I'm guessing the problem causing all of this
-	 *       is located somewhere within the new scheduler. */
-
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:
 	 *       $ deemon --help /deemon/string

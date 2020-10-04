@@ -215,6 +215,8 @@ NOTHROW(FCALL x86_dbg_handle_aci)(struct cpu *__restrict sender,
 		return true;
 	}
 	/* XXX: Handle other interrupts? */
+	if (vector >= X86_INTERRUPT_PIC1_BASE)
+		X86_PIC_EOI(vector);
 	return false;
 }
 

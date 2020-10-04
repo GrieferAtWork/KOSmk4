@@ -97,8 +97,6 @@ DECL_BEGIN
 /* TODO: libstdc++ doesn't detect `_GLIBCXX_USE_CLOCK_REALTIME' properly */
 /* TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT' */
 /* TODO: Add support for `_GLIBCXX_HAVE___CXA_THREAD_ATEXIT_IMPL' */
-/* TODO: Add support for `closefrom(2)' http://man.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man2/closefrom.2 */
-/* TODO: Add support for `fdwalk(2)' https://docs.oracle.com/cd/E86824_01/html/E54766/fdwalk-3c.html */
 /* TODO: Implement `timespec_get()' so that `_GLIBCXX_HAVE_TIMESPEC_GET'
  *       can be detected (__stub_timespec_get currently breaks that) */
 /* TODO: Add system header <sys/machine.h> */
@@ -801,13 +799,13 @@ int main_vfork(int argc, char *argv[], char *envp[]) {
 
 /************************************************************************/
 PRIVATE sigset_t const full_sigset = SIGSET_INIT_FULL;
-PRIVATE void *sigbound_theradmain(void *) {
+PRIVATE void *sigbound_threadmain(void *) {
 	/* Block _all_ signals.
 	 * This function's implementation will also ensure
 	 * that we're using the userprocmask mechanism. */
 	setsigmaskptr((sigset_t *)&full_sigset);
 	for (;;) {
-		printf("sigbound_theradmain(): %d\n", gettid());
+		printf("sigbound_threadmain(): %d\n", gettid());
 		pause();
 	}
 	return NULL;
@@ -825,7 +823,7 @@ int main_sigbounce(int argc, char *argv[], char *envp[]) {
 	/* Create an additional thread, thus bumping our process's total
 	 * thread count up to 2, which is needed to get the two threads
 	 * the signal used to end up bouncing between. */
-	pthread_create(&pt, NULL, &sigbound_theradmain, NULL);
+	pthread_create(&pt, NULL, &sigbound_threadmain, NULL);
 
 	/* A test program to test the corner-case detailed in `sigmask_ismasked_in()'
 	 * To trigger the corner-case, press CTRL+C after running `playground sigbounce'

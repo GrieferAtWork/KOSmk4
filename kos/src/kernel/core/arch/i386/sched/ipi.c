@@ -338,6 +338,7 @@ NOTHROW(KCALL cpu_sendipi)(struct cpu *__restrict target,
 	unsigned int i, attempt = 0;
 	unsigned int slot;
 	pflag_t was;
+	IPI_DEBUG("cpu_sendipi:%p,%p\n", target, func);
 	was = PREEMPTION_PUSHOFF();
 	if (target == THIS_CPU) {
 		/* Special case: The current CPU is being targeted. */

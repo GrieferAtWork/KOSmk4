@@ -1703,9 +1703,9 @@ calculate_lba28:
 						drive->bd_type.dt_writev      = (void(KCALL *)(struct block_device *__restrict, struct aio_buffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveWriteVector;
 						drive->bd_type.dt_writev_phys = (void(KCALL *)(struct block_device *__restrict, struct aio_pbuffer *__restrict, size_t, lba_t, struct aio_handle *__restrict) THROWS(...))&Ata_ChsDriveWriteVectorPhys;
 calculate_chs:
-						drive->bd_sector_count         = (lba_t)(u8)specs.heads *
-						                                 (lba_t)(u16)specs.cyls *
-						                                 (lba_t)(u8)specs.sectors;
+						drive->bd_sector_count = (lba_t)(u8)specs.heads *
+						                         (lba_t)(u16)specs.cyls *
+						                         (lba_t)(u8)specs.sectors;
 					}
 				}
 				drive->bd_total_bytes = ((pos_t)drive->bd_sector_count *
