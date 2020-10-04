@@ -463,14 +463,15 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 		struct task *last_running;
 		assert(sched.s_runcount >= 3);
 		/* Unlink `thread' and `caller' from somewhere within the running queue. */
-		LLIST_REMOVE_P(thread, sched_link);
 		if unlikely(sched.s_running_last == thread)
 			sched.s_running_last = sched_prev(thread);
-		LLIST_REMOVE_P(caller, sched_link);
+		LLIST_REMOVE_P(thread, sched_link);
 		if unlikely(sched.s_running_last == caller)
 			sched.s_running_last = sched_prev(caller);
+		LLIST_REMOVE_P(caller, sched_link);
 		LINK2(caller, thread);
 		last_running = sched.s_running_last;
+		assert(last_running != thread && last_running != caller);
 		if likely(new_stop_time >= sched_stoptime(last_running)) {
 			struct task *first_waiting;
 			/* Insert `caller'+`thread' at the back of the running queue. */
@@ -495,14 +496,15 @@ NOTHROW(FCALL move_thread_pair_to_back_of_runqueue)(struct cpu *__restrict me,
 				sched_pself(caller) = &sched.s_running;
 				sched.s_running     = caller;
 			} else {
-				/* Find the thread before which we should insert caller+thread */
-				struct task *before_last_running;
+				/* Find the thread after which we should insert caller+thread */
+				struct task *after_last_running;
 				do {
 					last_running = sched_prev(last_running);
 				} while (new_stop_time < sched_stoptime(last_running));
-				before_last_running = sched_prev(last_running);
-				LINK2(before_last_running, caller);
-				LINK2(thread, last_running);
+				/* NOTE: new_stop_time >= sched_stoptime(last_running) */
+				after_last_running = sched_next(last_running);
+				LINK2(last_running, caller);
+				LINK2(thread, after_last_running);
 			}
 		}
 	}
@@ -526,16 +528,17 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 	} else {
 		struct task *last_running;
 		assert(sched.s_runcount >= 2);
-		/* Re-insert `thread' */
-		LLIST_REMOVE_P(thread, sched_link);
 		last_running = sched.s_running_last;
 		if unlikely(last_running == thread) {
-			last_running         = sched_prev(thread);
+			last_running = sched_prev(thread);
+			assert(last_running != thread);
 			sched.s_running_last = last_running;
 		}
+		LLIST_REMOVE_P(thread, sched_link);
+		/* Re-insert `thread' */
 		if likely(new_stop_time >= sched_stoptime(last_running)) {
 			struct task *first_waiting;
-			/* Insert `caller'+`thread' at the back of the running queue. */
+			/* Insert `thread' at the back of the running queue. */
 			first_waiting = sched_next(last_running);
 			assert((first_waiting != NULL) == (sched.s_waiting_last != NULL));
 			if ((sched_next(thread) = first_waiting) != NULL)
@@ -549,19 +552,20 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 			 * that is located in the future from our point of view. - This is
 			 * something that is allowed, but not something that would normally
 			 * happen.
-			 * In this case, we must manually insert caller+thread into the queue. */
+			 * In this case, we must manually insert thread into the queue. */
 			if unlikely(new_stop_time < sched_stoptime(first_running)) {
-				/* All threads except for `caller'+`thread' have stopped in the future...
-				 * In this case, re-insert caller+thread at the front. */
+				/* All threads except for `thread' have stopped in the future...
+				 * In this case, re-insert thread at the front. */
 				LINK2(thread, first_running);
 				sched_pself(thread) = &sched.s_running;
 				sched.s_running     = thread;
 			} else {
-				/* Find the thread before which we should insert caller+thread */
+				/* Find the thread after which we should insert our's */
 				do {
 					last_running = sched_prev(last_running);
 				} while (new_stop_time < sched_stoptime(last_running));
-				LLIST_INSERT_BEFORE_P(thread, last_running, sched_link);
+				/* NOTE: new_stop_time >= sched_stoptime(last_running) */
+				LLIST_INSERT_AFTER_P(last_running, thread, sched_link);
 			}
 		}
 	}
