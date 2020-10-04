@@ -1503,6 +1503,13 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 	/* Wait for the unlock to be signaled. */
 	task_pushconnections(&new_cons);
 	PREEMPTION_ENABLE();
+
+	/* Make sure that other IPIs also get handled!
+	 * This is important because HW-IPIs may only be send when there aren't
+	 * any pending SW-IPIs, meaning that we wouldn't get the memo if we were
+	 * to wait for other CPUs while there are still more pending SW-IPIs! */
+	cpu_ipi_service_nopr();
+
 	while (ATOMIC_READ(mall_suspended_locked) != NULL) {
 		/* Wait for `mall_suspended_unlock' */
 		task_connect_for_poll(&mall_suspended_unlock);

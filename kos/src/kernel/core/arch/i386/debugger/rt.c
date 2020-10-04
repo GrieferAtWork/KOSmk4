@@ -292,7 +292,7 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	ammend.dca_taskflags = ATOMIC_FETCHOR(ammend.dca_thread->t_flags, TASK_FKEEPCORE);
 
 	/* Set our own thread as the scheduling override. */
-	ammend.dca_override                      = FORCPU(ammend.dca_cpu, thiscpu_sched_override);
+	ammend.dca_override = FORCPU(ammend.dca_cpu, thiscpu_sched_override);
 	FORCPU(ammend.dca_cpu, thiscpu_sched_override) = ammend.dca_thread;
 
 	/* Save additional registers. */
@@ -335,6 +335,12 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 	 * WARNING: INTERRUPT HANDLERS OF THIS IDT _DONT_ PRESERVE THE (R|E)AX REGISTER!
 	 * TODO: Preemptive interrupts should continue to fire and account for passed time! */
 	__lidt_p(&x86_dbgaltcoreidt_ptr);
+
+	/* Make sure that other IPIs also get handled!
+	 * This is important because HW-IPIs may only be send when there aren't
+	 * any pending SW-IPIs, meaning that we wouldn't get the memo if we were
+	 * to wait for other CPUs while there are still more pending SW-IPIs! */
+	cpu_ipi_service_nopr();
 
 	/* While for the debugger to become inactive. */
 	while (ATOMIC_READ(dbg_cpu_) != NULL) {
