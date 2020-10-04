@@ -580,6 +580,7 @@ PRIVATE NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_reload_deadline)(struct cpu *__restrict me,
                                             struct task *__restrict caller,
                                             ktime_t quantum_start,
+                                            ktime_t priority_boost,
                                             ktime_t now,
                                             tsc_t tsc_now,
                                             bool delay_deadline_passed) {
@@ -588,7 +589,7 @@ NOTHROW(FCALL sched_intern_reload_deadline)(struct cpu *__restrict me,
 	tsc_t tsc_deadline_value;
 	if unlikely(quantum_start > now)
 		quantum_start = now;
-	deadline = (now - quantum_start) / sched.s_runcount;
+	deadline = ((now - quantum_start) + priority_boost) / sched.s_runcount;
 	if (deadline < sched_quantum_min)
 		deadline = sched_quantum_min;
 	if (deadline > sched_quantum_max)
@@ -658,12 +659,20 @@ NOTHROW(FCALL sched_intern_high_priority_switch)(struct cpu *__restrict me,
                                                  tsc_t tsc_now,
                                                  bool reload_deadline) {
 	ktime_t now, quantum_start;
+	ktime_t priority_boost;
 	assert(caller != thread);
 	now = tsc_now_to_ktime(me, tsc_now);
 	/* Gift the remainder of `caller's quantum to `thread' */
 	quantum_start = sched_stoptime(caller);
 	if unlikely(quantum_start >= now)
 		return caller; /* Shouldn't happen... */
+	/* If the caller only had a really short amount of time left for
+	 * their current quantum, and `thread' has already been waiting
+	 * for a really long time, then `thread' must still get its
+	 * priority boost! */
+	if (OVERFLOW_USUB(now, sched_stoptime(thread), &priority_boost))
+		priority_boost = 0;
+
 	/* Account for time spent being active. */
 	sched_activetime(caller) += now - quantum_start;
 	/* Update the stop timestamps of both `caller' and `next' */
@@ -671,8 +680,10 @@ NOTHROW(FCALL sched_intern_high_priority_switch)(struct cpu *__restrict me,
 	/* If requested to, reload the current deadline. */
 	if (reload_deadline) {
 		thread = sched_intern_reload_deadline(me, thread,
-		                                      quantum_start, now,
-		                                      tsc_now, false);
+		                                      quantum_start,
+		                                      priority_boost,
+		                                      now, tsc_now,
+		                                      false);
 	}
 	return thread;
 }
@@ -721,7 +732,7 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 				result = sched_intern_high_priority_switch(me, caller, thread, tsc_now, true);
 			else {
 				result = sched_intern_reload_deadline(me, result,
-				                                      sched_stoptime(caller),
+				                                      sched_stoptime(caller), 0,
 				                                      tsc_now_to_ktime(me, tsc_now),
 				                                      tsc_now, true);
 				assert(result == caller);
@@ -772,7 +783,7 @@ NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
 			result = sched_intern_high_priority_switch(me, caller, thread, tsc_now, true);
 		else {
 			result = sched_intern_reload_deadline(me, caller,
-			                                      sched_stoptime(caller),
+			                                      sched_stoptime(caller), 0,
 			                                      tsc_now_to_ktime(me, tsc_now),
 			                                      tsc_now, false);
 		}
@@ -818,7 +829,7 @@ PUBLIC NOPREEMPT NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
                                          struct task *__restrict caller) {
 	tsc_t tsc_now;
-	ktime_t now, quantum_start;
+	ktime_t now, quantum_start, priority_boost;
 	struct task *result;
 	sched_assert();
 	assert(caller != &sched_idle);
@@ -864,11 +875,18 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 	/* Account for time spent being active. */
 	sched_activetime(caller) += now - quantum_start;
 	sched_stoptime(caller) = now;
+	/* If the caller only had a really short amount of time left for
+	 * their current quantum, and `thread' has already been waiting
+	 * for a really long time, then `thread' must still get its
+	 * priority boost! */
+	if (OVERFLOW_USUB(now, sched_stoptime(result), &priority_boost))
+		priority_boost = 0;
 	/* Update the stop timestamp of `next' */
 	move_thread_to_back_of_runqueue(me, result, now);
 	/* Reload the current deadline. */
 	result = sched_intern_reload_deadline(me, result, quantum_start,
-	                                      now, tsc_now, false);
+	                                      priority_boost, now,
+	                                      tsc_now, false);
 	sched_assert();
 	return result;
 }
@@ -951,7 +969,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	struct task *next;
 	struct task *caller = THIS_TASK;
 	struct cpu *me;
-	ktime_t now, timeout, quantum_start;
+	ktime_t now, timeout, quantum_start, priority_boost;
 	tsc_t tsc_now;
 	PREEMPTION_DISABLE();
 	me = ATOMIC_READ(caller->t_cpu);
@@ -1024,6 +1042,13 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	sched_activetime(caller) += now - quantum_start;
 	sched_stoptime(caller) = now;
 
+	/* If the caller only had a really short amount of time left for
+	 * their current quantum, and `thread' has already been waiting
+	 * for a really long time, then `thread' must still get its
+	 * priority boost! */
+	if (OVERFLOW_USUB(now, sched_stoptime(next), &priority_boost))
+		priority_boost = 0;
+
 	/* Update the stop timestamp of `next' */
 	move_thread_to_back_of_runqueue(me, next, now);
 
@@ -1033,7 +1058,8 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 
 	/* Reload the current deadline. */
 	next = sched_intern_reload_deadline(me, next, quantum_start,
-	                                    now, tsc_now, false);
+	                                    priority_boost, now,
+	                                    tsc_now, false);
 
 	/* Continue execution in the next thread. */
 	assert(next->t_flags & TASK_FRUNNING);
@@ -1216,7 +1242,7 @@ PRIVATE NOPREEMPT NONNULL((1, 2, 3)) void
 NOTHROW(FCALL idle_unload_and_switch_to)(struct cpu *__restrict me,
                                          struct task *__restrict caller,
                                          struct task *__restrict next) {
-	ktime_t now, quantum_start;
+	ktime_t now, quantum_start, priority_boost;
 	tsc_t tsc_now;
 	assert(caller == &sched_idle);
 	assert(next);
@@ -1245,12 +1271,20 @@ NOTHROW(FCALL idle_unload_and_switch_to)(struct cpu *__restrict me,
 	sched_activetime(caller) += now - quantum_start;
 	sched_stoptime(caller) = now;
 
+	/* If the caller only had a really short amount of time left for
+	 * their current quantum, and `thread' has already been waiting
+	 * for a really long time, then `thread' must still get its
+	 * priority boost! */
+	if (OVERFLOW_USUB(now, sched_stoptime(next), &priority_boost))
+		priority_boost = 0;
+
 	/* Update the stop timestamp of `next' */
 	move_thread_to_back_of_runqueue(me, next, now);
 
 	/* Reload the current deadline. */
 	next = sched_intern_reload_deadline(me, next, quantum_start,
-	                                    now, tsc_now, false);
+	                                    priority_boost, now,
+	                                    tsc_now, false);
 
 	/* Continue execution in the next thread. */
 	assert(next->t_flags & TASK_FRUNNING);
