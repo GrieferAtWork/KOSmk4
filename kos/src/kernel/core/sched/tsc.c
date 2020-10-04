@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <sched/atomic64.h>
 #include <sched/cpu.h>
@@ -33,10 +34,13 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
-#include <int128.h>
 #include <assert.h>
+#include <int128.h>
 #include <inttypes.h>
 #include <time.h> /* NSEC_PER_SEC */
+
+#define assert_poison(expr)       assert((expr) || kernel_poisoned())
+#define assertf_poison(expr, ...) assertf((expr) || kernel_poisoned(), __VA_ARGS__)
 
 DECL_BEGIN
 
@@ -447,8 +451,8 @@ NOTHROW(FCALL tsc_now_to_ktime)(struct cpu *__restrict me,
 	tsc_t since, since_nano;
 again:
 	/* Determine the TSC offset since the last re-sync */
-	assert(now <= tsc_get(me));
-	assert(now >= FORCPU(me, thiscpu_basetime.ts_tsc));
+	assert_poison(now <= tsc_get(me));
+	assert_poison(now >= FORCPU(me, thiscpu_basetime.ts_tsc));
 	since = now - FORCPU(me, thiscpu_basetime.ts_tsc);
 	/* Calculate the current boot-time offset. */
 	if unlikely(OVERFLOW_UMUL(since, NSEC_PER_SEC, &since_nano))
@@ -470,7 +474,7 @@ NOTHROW(FCALL ktime_future_to_tsc)(struct cpu const *__restrict me,
 	ktime_t distance;
 	tsc_t result;
 	/* Calculate the distance from the baseline in nanoseconds. */
-	assert(kt >= FORCPU(me, thiscpu_basetime.ts_kt));
+	assert_poison(kt >= FORCPU(me, thiscpu_basetime.ts_kt));
 	distance = kt - FORCPU(me, thiscpu_basetime.ts_kt);
 	if (OVERFLOW_UMUL(distance, FORCPU(me, thiscpu_tsc_hz), &result)) {
 		uint128_t distance128;

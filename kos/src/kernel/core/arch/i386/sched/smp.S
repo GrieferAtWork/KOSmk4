@@ -57,6 +57,9 @@
 #include <asm/instr/movzxq.h>
 #endif /* __x86_64__ */
 
+/**/
+#include "tsc.h" /* CONFIG_TSC_ASSERT_FORWARD */
+
 #define PS __SIZEOF_POINTER__
 
 #ifndef CONFIG_NO_SMP
@@ -1075,30 +1078,6 @@ INTERN_FUNCTION(x86_smp_entry64)
 	/* R_CPU:   THIS_CPU   (%rbp)
 	 * R_TASK:  THIS_TASK  (%rbx) */
 
-	/* Check for, and load all threads that are pending execution by our CPU. */
-	xorP   %Pdx, %Pdx
-	EXTERN(thiscpu_sched_pending)
-	/*lock*/ xchgP %Pdx, thiscpu_sched_pending(R_CPU)
-	testP  %Pdx, %Pdx
-	jz     1f
-	movP   R_CPU,  %R_fcall0P
-	movP   R_TASK, %R_fcall1P
-#ifndef __x86_64__
-	pushl_cfi %edx /* chain */
-#endif /* __x86_64__ */
-	EXTERN(sched_intern_loadpending)
-	call   sched_intern_loadpending
-#ifndef __x86_64__
-	.cfi_adjust_cfa_offset -4
-#endif /* __x86_64__ */
-	cmpP   %Pax, R_TASK
-	je     1f
-	/* Start execution with a different thread. */
-	movP   %Pax, R_TASK
-	movP   this_sstate(R_TASK), %Psp /* stack */
-	jmp    .Ldo_init_with_task_and_stack
-1:
-
 	/* Load other scheduler-related register values. */
 	EXTERN(this_x86_kernel_psp0)
 	movP   this_x86_kernel_psp0(R_TASK), %Pcx
@@ -1183,9 +1162,16 @@ INTERN_FUNCTION(x86_smp_entry64)
 	xorP   %Pax, %Pax
 #ifdef __x86_64__
 	movq   %rax, thiscpu_x86_apic_emutsc_tscbase(R_CPU)
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	movq   %rax, thiscpu_x86_last_tsc(R_CPU)
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 #else /* __x86_64__ */
 	movl   %eax, thiscpu_x86_apic_emutsc_tscbase(R_CPU)
 	movl   %eax, thiscpu_x86_apic_emutsc_tscbase+4(R_CPU)
+#ifdef CONFIG_TSC_ASSERT_FORWARD
+	movl   %eax, thiscpu_x86_last_tsc(R_CPU)
+	movl   %eax, thiscpu_x86_last_tsc+4(R_CPU)
+#endif /* CONFIG_TSC_ASSERT_FORWARD */
 #endif /* !__x86_64__ */
 	movb   %al, thiscpu_x86_apic_emutsc_early_interrupt(R_CPU)
 	movb   $(7), thiscpu_x86_apic_emutsc_divide(R_CPU)
@@ -1207,6 +1193,44 @@ INTERN_FUNCTION(x86_smp_entry64)
 	movP   R_CPU, %R_fcall0P
 	EXTERN(tsc_resync_init)
 	call   tsc_resync_init
+
+	/* Check for, and load all threads that are pending execution by our CPU. */
+	xorP   %Pdx, %Pdx
+	EXTERN(thiscpu_sched_pending)
+	/*lock*/ xchgP %Pdx, thiscpu_sched_pending(R_CPU)
+	testP  %Pdx, %Pdx
+	jz     1f
+#ifndef __x86_64__
+	pushl_cfi %edx /* chain */
+#endif /* __x86_64__ */
+	movP   R_CPU,  %R_fcall0P
+	movP   R_TASK, %R_fcall1P
+	/* Ensure that we're calling `sched_intern_loadpending' with a valid TLS context. */
+#ifdef __x86_64__
+	wrgsbaseq R_TASK
+#else /* __x86_64__ */
+	/* Load kernel-space segments. */
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+#endif /* !__x86_64__ */
+	EXTERN(sched_intern_loadpending)
+	call   sched_intern_loadpending
+#ifndef __x86_64__
+	.cfi_adjust_cfa_offset -4
+#endif /* __x86_64__ */
+	cmpP   %Pax, R_TASK
+	je     1f
+	/* Start execution with a different thread. */
+	EXTERN(thiscpu_sched_current)
+	movP   %Pax, thiscpu_sched_current(R_CPU)
+	movP   %Pax, R_TASK
+	movP   this_sstate(%Pax), %Psp /* stack */
+	jmp    .Ldo_init_with_task_and_stack
+1:
+
 
 	/* (Partially) load the underlying CPU state */
 #ifdef __x86_64__

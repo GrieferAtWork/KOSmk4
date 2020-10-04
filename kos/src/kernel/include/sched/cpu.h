@@ -130,6 +130,7 @@ DECL_END
 DECL_BEGIN
 typedef uintptr_t *cpuset_ptr_t;
 #define CPUSET_PTR(x) x
+#define CPUSET_IND(x) x
 typedef uintptr_t cpuset_t[(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_PER_POINTER];
 #if __SIZEOF_POINTER__ == 8
 #define CPUSET_COPY(dst, src) (void)__libc_memcpyq(dst, src, (CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER - 1)) / BITS_PER_POINTER)
@@ -169,6 +170,7 @@ LOCAL bool NOTHROW(KCALL cpuset_isempty_impl)(cpuset_t self) {
 #else /* CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER */
 typedef uintptr_t *cpuset_ptr_t;
 #define CPUSET_PTR(x) (&(x))
+#define CPUSET_IND(x) (*(x))
 typedef uintptr_t cpuset_t;
 #define CPUSET_INIT 0
 #if CONFIG_MAX_CPU_COUNT <= 1

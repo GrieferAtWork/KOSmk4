@@ -1,8 +1,3 @@
-/*[[[magic
-local deemon = import("deemon");
-local macros = options.setdefault("COMPILE.macros", deemon.Dict(()));
-macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
-]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,15 +47,12 @@ macros["__DATE_YEAR__"] = str(import("time").Time.now().year)[#"Years ":];
 #include <stdio.h>
 #include <string.h>
 
+/**/
+#include "tsc.h" /* CONFIG_TSC_ASSERT_FORWARD */
+
 #define assert_poison(expr)       assert((expr) || kernel_poisoned())
 #define assertf_poison(expr, ...) assertf((expr) || kernel_poisoned(), __VA_ARGS__)
 
-
-/* CONFIG: Enable some sanity checks to assert that `tsc_get()' never runs backwards. */
-#undef CONFIG_TSC_ASSERT_FORWARD
-#ifndef NDEBUG
-#define CONFIG_TSC_ASSERT_FORWARD 1
-#endif /* !NDEBUG */
 
 
 DECL_BEGIN
@@ -341,7 +333,7 @@ NOTHROW(KCALL x86_calibrate_tsc_cmpxch_delay_stable)(void) {
 
 
 #ifdef CONFIG_TSC_ASSERT_FORWARD
-PRIVATE ATTR_PERCPU tsc_t thiscpu_last_tsc = 0;
+INTERN ATTR_PERCPU tsc_t thiscpu_x86_last_tsc = 0;
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
 
 
@@ -374,11 +366,11 @@ NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
 	current = FORCPU(me, thiscpu_x86_apic_emutsc_initial) - current;
 	result = tscbase + ((u64)current << FORCPU(me, thiscpu_x86_apic_emutsc_divide));
 #ifdef CONFIG_TSC_ASSERT_FORWARD
-	assertf_poison(result >= FORCPU(me, thiscpu_last_tsc),
+	assertf_poison(result >= FORCPU(me, thiscpu_x86_last_tsc),
 	               "result = %#" PRIxN(__SIZEOF_TSC_HZ_T__) "\n"
 	               "last   = %#" PRIxN(__SIZEOF_TSC_HZ_T__) "\n",
-	               result, FORCPU(me, thiscpu_last_tsc));
-	FORCPU(me, thiscpu_last_tsc) = result;
+	               result, FORCPU(me, thiscpu_x86_last_tsc));
+	FORCPU(me, thiscpu_x86_last_tsc) = result;
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
 	return result;
 }
@@ -813,7 +805,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_altcore_entry)(void) {
 	FORCPU(me, thiscpu_tsc_hz)                      = hz;
 	FORCPU(me, thiscpu_x86_apic_emutsc_mindistance) = hz / TSC_MIN_DISTANCE_HZ;
 #ifdef CONFIG_TSC_ASSERT_FORWARD
-	FORCPU(me, thiscpu_last_tsc) = 0;
+	FORCPU(me, thiscpu_x86_last_tsc) = 0;
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
 
 	if (!X86_HAVE_TSC_DEADLINE) {
@@ -825,9 +817,6 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_altcore_entry)(void) {
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F128);
 	lapic_write(APIC_TIMER_INITIAL, UINT32_MAX);
 	tsc_ignore_pending_interrupt(me);
-#ifdef CONFIG_TSC_ASSERT_FORWARD
-	COMPILER_UNUSED(tsc_get(me));
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
 
 	/* Since we've screwed with our APIC, we must
 	 * once again re-initialize our RTC-sync. */
@@ -859,7 +848,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_calibrate_boottsc)(void) {
 	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_early_interrupt) = false;
 	FORCPU(&_bootcpu, thiscpu_x86_apic_emutsc_mindistance)     = hz / TSC_MIN_DISTANCE_HZ;
 #ifdef CONFIG_TSC_ASSERT_FORWARD
-	FORCPU(&_bootcpu, thiscpu_last_tsc) = 0;
+	FORCPU(&_bootcpu, thiscpu_x86_last_tsc) = 0;
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
 	if (!X86_HAVE_TSC_DEADLINE) {
 		/* Calibrate the TSC-cmpxch delay.
@@ -878,9 +867,6 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_calibrate_boottsc)(void) {
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F128);
 	lapic_write(APIC_TIMER_INITIAL, UINT32_MAX);
 	tsc_ignore_pending_interrupt(&_bootcpu);
-#ifdef CONFIG_TSC_ASSERT_FORWARD
-	COMPILER_UNUSED(tsc_get(&_bootcpu));
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
 
 	/* Initialize the RTC proper. */
 	tsc_resync_init(&_bootcpu);

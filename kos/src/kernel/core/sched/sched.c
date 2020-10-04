@@ -72,13 +72,14 @@ PUBLIC ktime_t sched_shutdown_delay = (ktime_t)10 * NSEC_PER_SEC;
 	                  offsetof(_sched_link_t, ln_next))))
 
 /* Helper macros. */
-#define sched               FORCPU(me, thiscpu_scheduler)
-#define sched_idle          FORCPU(me, thiscpu_idle)
-#define sched_s_waiting     scheduler_s_waiting(&sched)
-#define sched_link(thread)  FORTASK(thread, this_sched_link)
-#define sched_pself(thread) FORTASK(thread, this_sched_link.ln_pself)
-#define sched_next(thread)  FORTASK(thread, this_sched_link.ln_next)
-#define sched_prev(thread)  prev_task_from_pself(sched_pself(thread))
+#define sched                    FORCPU(me, thiscpu_scheduler)
+#define sched_idle               FORCPU(me, thiscpu_idle)
+#define sched_s_waiting          scheduler_s_waiting(&sched)
+#define sched_override           FORCPU(me, thiscpu_sched_override)
+#define sched_link(thread)       FORTASK(thread, this_sched_link)
+#define sched_pself(thread)      FORTASK(thread, this_sched_link.ln_pself)
+#define sched_next(thread)       FORTASK(thread, this_sched_link.ln_next)
+#define sched_prev(thread)       prev_task_from_pself(sched_pself(thread))
 #define sched_stoptime(thread)   FORTASK(thread, this_stoptime)
 #define sched_activetime(thread) FORTASK(thread, this_activetime)
 #define sched_timeout(thread)    FORTASK(thread, this_sched_timeout)
@@ -711,7 +712,7 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 		ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
 		/* Insert the thread into the run-queue */
 		sched_intern_add_to_runqueue(me, thread);
-		if likely(!FORCPU(me, thiscpu_sched_override)) {
+		if likely(!sched_override) {
 			tsc_t tsc_now;
 			/* Reload the scheduler deadline, or (optionally)
 			 * perform a high-priority switch to the named `thread'. */
@@ -733,7 +734,7 @@ NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
 			break;
 		if (!high_priority)
 			break; /* Simple case... (nothing actually changed) */
-		if likely(!FORCPU(me, thiscpu_sched_override)) {
+		if likely(!sched_override) {
 			tsc_t tsc_now;
 			/* Perform a high-priority thread switch. */
 			tsc_now = tsc_get(me);
@@ -762,7 +763,7 @@ NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
 	assert(thread->t_flags & TASK_FRUNNING);
 	/* Insert the given `thread' into the run-queue */
 	sched_intern_add_to_runqueue(me, thread);
-	if likely(!FORCPU(me, thiscpu_sched_override)) {
+	if likely(!sched_override) {
 		tsc_t tsc_now;
 		/* Reload the scheduler deadline, or perform a
 		 * high-priority switch to the named `thread'. */
@@ -788,7 +789,7 @@ NOTHROW(FCALL sched_intern_yield)(struct cpu *__restrict me,
                                   struct task *__restrict caller) {
 	struct task *result;
 	sched_assert();
-	result = FORCPU(me, thiscpu_sched_override);
+	result = sched_override;
 	if likely(!result) {
 		result = sched.s_running;
 		if (result != caller) {
@@ -822,7 +823,7 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 	sched_assert();
 	assert(caller != &sched_idle);
 	assert(caller->t_flags & TASK_FRUNNING);
-	assert(!FORCPU(me, thiscpu_sched_override));
+	assert(!sched_override);
 
 	/* Unlink the thread from the run queue. */
 	if unlikely(sched.s_runcount == 1) {
@@ -959,9 +960,9 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	/* TODO: Change the task_sleep() API to use `ktime_t' instead of timespec! */
 	timeout = abs_timeout ? timespec_to_ktime(abs_timeout)
 	                      : (ktime_t)-1;
-	if unlikely(FORCPU(me, thiscpu_sched_override)) {
+	if unlikely(sched_override) {
 		/* Scheduler override has been set.
-		 * -> Wait for the given timeout to expire, or a sporadic interrupt */
+		 * -> Wait for the given timeout to expire, or a sporadic interrupt to take place */
 		return waitfor_ktime_or_interrupt(me, timeout);
 	}
 	/* Unlink the thread from the run queue. */
@@ -975,7 +976,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 			/* Special case: wait within the IDLE thread, when no other
 			 *               threads exist to which we can switch.
 			 * In this case, we must wait until either `timeout', or the
-			 * timeout of our CPU's first waiting thread has expired. */
+			 * timeout of our CPU's first waiting thread (if any) expires. */
 			ktime_t used_timeout = timeout;
 			if (first_waiting_thread) {
 				ktime_t other_timeout;
@@ -1023,7 +1024,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	sched_activetime(caller) += now - quantum_start;
 	sched_stoptime(caller) = now;
 
-	/* Update the stop timestamps of both `caller' and `next' */
+	/* Update the stop timestamp of `next' */
 	move_thread_to_back_of_runqueue(me, next, now);
 
 	/* Insert `caller' into the queue of waiting threads. */
@@ -1050,12 +1051,14 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 		/* HINT: If your debugger break here, it means that your
 		 *       thread is probably waiting on some kind of signal. */
 		assert(caller->t_flags & TASK_FRUNNING);
+#if 0 /* Can't be asserted: We may have switched CPUs in the mean time! */
 		assert(FORCPU(me, thiscpu_sched_current) == caller);
 #ifndef SCHED_ASSERT_IS_NOOP
 		PREEMPTION_DISABLE();
 		sched_assert();
 		PREEMPTION_ENABLE();
 #endif /* !SCHED_ASSERT_IS_NOOP */
+#endif
 	} else {
 		sched_assert();
 		PREEMPTION_ENABLE();
@@ -1090,8 +1093,8 @@ NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
 	 * override should have already called `tsc_nodeadline()'...
 	 * We check this anyways to prevent race conditions, as well as
 	 * to allow a scheduler override to use TSC deadlines. */
-	if unlikely(FORCPU(me, thiscpu_sched_override))
-		return FORCPU(me, thiscpu_sched_override);
+	if unlikely(sched_override)
+		return sched_override;
 	sched_assert();
 	/* Calculate the current scheduler time. */
 again_with_tsc_now:
@@ -1206,31 +1209,138 @@ do_use_sleeping_thread_timeout:
 
 
 
+/* Unload the IDLE thread (who must be the caller), and switch to `next'
+ * This function returns the next time the IDLE thread is loaded, at which
+ * point preemption will have been re-enabled. */
+PRIVATE NOPREEMPT NONNULL((1, 2, 3)) void
+NOTHROW(FCALL idle_unload_and_switch_to)(struct cpu *__restrict me,
+                                         struct task *__restrict caller,
+                                         struct task *__restrict next) {
+	ktime_t now, quantum_start;
+	tsc_t tsc_now;
+	assert(caller == &sched_idle);
+	assert(next);
+	assert(next->t_flags & TASK_FRUNNING);
+	assert(sched.s_runcount >= 2);
+	/* Remove caller (the IDLE thread) from the run queue */
+	if (sched.s_running_last == caller)
+		sched.s_running_last = sched_prev(caller);
+	LLIST_REMOVE_P(caller, sched_link);
+	--sched.s_runcount;
+	ATOMIC_AND(caller->t_flags, ~TASK_FRUNNING);
+	/* Mark the IDLE thread as unloaded, as documented in,
+	 * and required by `struct scheduler::s_running' */
+	sched_pself(caller) = NULL;
+	sched_next(caller)  = NULL;
+
+	tsc_now = tsc_get(me);
+	now     = tsc_now_to_ktime(me, tsc_now);
+
+	/* Gift the remainder of `caller's quantum to `thread' */
+	quantum_start = sched_stoptime(caller);
+	if unlikely(quantum_start > now)
+		quantum_start = now; /* Shouldn't happen... */
+
+	/* Account for time spent being active. */
+	sched_activetime(caller) += now - quantum_start;
+	sched_stoptime(caller) = now;
+
+	/* Update the stop timestamp of `next' */
+	move_thread_to_back_of_runqueue(me, next, now);
+
+	/* Reload the current deadline. */
+	next = sched_intern_reload_deadline(me, next, quantum_start,
+	                                    now, tsc_now, false);
+
+	/* Continue execution in the next thread. */
+	assert(next->t_flags & TASK_FRUNNING);
+
+	/* Check for special case: The switch wasn't actually done. */
+	if likely(next != caller) {
+		FORCPU(me, thiscpu_sched_current) = next;
+		sched_assert();
+		cpu_run_current_and_remember_nopr(caller);
+		/* HINT: If your debugger break here, it means that your
+		 *       thread is probably waiting on some kind of signal. */
+		assert(caller->t_flags & TASK_FRUNNING);
+	} else {
+		sched_assert();
+		PREEMPTION_ENABLE();
+	}
+}
+
+#ifndef CONFIG_NO_SMP
+/* Transfer `thread' to some CPU other than `me'
+ * Returns `false' if doing so is impossible due to the affinity of `thread',
+ * or if the scheduler decides that the caller should keep on holding on to
+ * `thread' for the time being.
+ *
+ * NOTE: When `true' is returned, then this function will have inherited a
+ *       reference to `thread'! */
+PRIVATE NOBLOCK bool
+NOTHROW(FCALL task_transfer_thread_to_other_cpu)(struct cpu *__restrict me,
+                                                 struct task *__restrict thread,
+                                                 cpuset_ptr_t pnotify_cpus) {
+	struct cpu *target;
+	assert(!(thread->t_flags & TASK_FRUNNING));
+	assert(thread != &sched_idle);
+	if (thread->t_flags & TASK_FKEEPCORE)
+		return false; /* Thread cannot be transfered. */
+	target = &_bootcpu; /* TODO: Dynamically determine based on recent load. */
+	assert(thread->t_cpu == me);
+	if unlikely(target == me)
+		return false; /* Must be a different thread. */
+	/* Schedule `thread' as pending on `target' */
+	ATOMIC_WRITE(thread->t_cpu, target);
+	ATOMIC_OR(thread->t_flags, TASK_FRUNNING | TASK_FTIMEOUT);
+	sched_intern_addpending(target, thread);
+	/* Schedule the target CPU to receive a wake-up once our caller is finished. */
+	CPUSET_INSERT(CPUSET_IND(pnotify_cpus), target->c_id);
+	return true;
+}
+
+/* Send wake-up requests to each of the given `cpus' */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL cpuset_wake)(cpuset_t cpus) {
+	unsigned int i;
+	for (i = 0; i < cpu_count; ++i) {
+		if (CPUSET_CONTAINS(cpus, i))
+			cpu_wake(cpu_vector[i]);
+	}
+}
+
+#endif /* !CONFIG_NO_SMP */
+
+
 
 PUBLIC void NOTHROW(KCALL cpu_deepsleep)(void) {
-#if 1
-	/* TODO: Unload the IDLE thread or setup a timeout using
-	 *       `sched_shutdown_delay' for when we should shut-
-	 *       down the CPU. */
-	PREEMPTION_ENABLE();
-	while (task_tryyield() == TASK_TRYYIELD_SUCCESS);
-	PREEMPTION_WAIT();
-#else
-	struct task *next;
-	struct cpu *me = THIS_CPU;
-	assertf(THIS_TASK == &sched_idle,
+	struct task *caller = THIS_TASK;
+	struct cpu *me = FORTASK(caller, this_cpu);
+again:
+	assertf(caller == &sched_idle,
 	        "cpu_deepsleep() may only be called form a cpu's IDLE thread!");
-	assertf(FORCPU(me, thiscpu_sched_current) == &sched_idle,
+	assertf(FORCPU(me, thiscpu_sched_current) == caller,
 	        "cpu_deepsleep() may only be called form a cpu's IDLE thread!");
 	assertf(FORCPU(me, thiscpu_sched_override) == NULL,
 	        "cpu_deepsleep() cannot be called while a scheduling override is active");
-	assert(sched_idle.t_flags & TASK_FRUNNING);
+	assert(caller->t_flags & TASK_FRUNNING);
 	assert(me->c_state == CPU_STATE_RUNNING);
-again:
 	PREEMPTION_DISABLE();
-again_already_disabled:
-	ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
-	assert(!PREEMPTION_ENABLED());
+	sched_assert();
+	sched_assert_in_runqueue(caller);
+	/* First check: Are there any running threads we can switch to? */
+	if (sched.s_runcount >= 2) {
+		struct task *next;
+		next = sched.s_running;
+		if (next == caller)
+			next = sched_next(next);
+		assert(next != caller);
+		/* Switch to the next available thread. */
+		idle_unload_and_switch_to(me, caller, next);
+		return;
+	}
+
+
 #ifndef CONFIG_NO_SMP
 	/* Check for pending threads, and if there are some,
 	 * load them and directly yield to the first of them. */
@@ -1238,70 +1348,192 @@ again_already_disabled:
 		REF struct task *chain;
 		chain = ATOMIC_XCH(FORCPU(me, thiscpu_sched_pending), NULL);
 		if (chain != NULL) {
-			next = sched_intern_loadpending(me, &sched_idle, chain);
-			if (next != &sched_idle)
-				goto yield_to_next;
+			struct task *next;
+			next = sched_intern_loadpending(me, caller, chain);
+			if (next != caller) {
+				FORCPU(me, thiscpu_sched_current) = next;
+				cpu_run_current_and_remember_nopr(caller);
+				return;
+			}
+			/* Additional threads were loaded.
+			 * -> Try to yield to one of them. */
+			goto again;
 		}
 	}
-	/* Check if there are IPIs that are pending execution, as send from other cores.
-	 * For this, check for both hardware (interrupting), as well as software (pending) IPIs.
-	 * NOTE: Software IPIs must be checked to prevent the following race condition:
-	 *
-	 *  #1  CPU#0: cpu_sendipi:     SCHEDULE_SW_IPI();
-	 *  #2  CPU#0: cpu_sendipi:     ATOMIC_READ(CPU[1].c_state) == CPU_STATE_RUNNING;
-	 *  #3  CPU#1: cpu_deepsleep:   PREEMPTION_DISABLE();
-	 *  #4  CPU#1: cpu_deepsleep:   ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
-	 *  #5  CPU#1: cpu_deepsleep:   arch_cpu_hwipi_pending_nopr(me) == false;
-	 *  #6  CPU#1: cpu_deepsleep:   cpu_enter_deepsleep(me);
-	 *  #7  CPU#1: cpu_deepsleep:   ATOMIC_WRITE(me->c_state, CPU_STATE_DREAMING);
-	 *  #8  CPU#0: cpu_sendipi:     SCHEDULE_HW_IPI();
-	 *  #9  CPU#1: cpu_sendipi:     ---                    The hardware IPI never arrives, because we've gone into deep sleep
-	 *  #10 CPU#0: cpu_sendipi:     return true;           As far as CPU#0 can tell, everything worked.
-	 *
-	 * -> The IPI never arrives because CPU#1 doesn't get woken up.
-	 *
-	 * The solution is to simply check for `arch_cpu_swipi_pending_nopr()' in
-	 * step #5, since those types of interrupts will have already become visible
-	 * following step #1!
-	 *
-	 * As such, the SWIPI check forms an interlocked check for pending IPIs in
-	 * situations where a software-IPI was already scheduled, but a hardware
-	 * IPI hasn't been generated yet, would get generated at a later point in
-	 * time (i.e. after this call to `arch_cpu_hwipi_pending_nopr()' already
-	 * returned `false'), or would not get generated at all.
-	 */
+	/* Check if there are any pending soft- or hard-ware IPIs */
 	if (arch_cpu_hwipi_pending_nopr() || arch_cpu_swipi_pending_nopr(me)) {
-		ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
 		cpu_ipi_service_nopr();
 #ifdef PREEMPTION_ENABLE_P
-		/* Use `PREEMPTION_ENABLE_P()' in order to ensure that interrupts had at least
-		 * a single instruction during which they could be served, in case GCC decides
-		 * to move the `PREEMPTION_DISABLE()' above in such a manner that it would follow
-		 * our `PREEMPTION_ENABLE()' immediately. */
 		PREEMPTION_ENABLE_P();
 #else /* PREEMPTION_ENABLE_P */
 		PREEMPTION_ENABLE();
 #endif /* !PREEMPTION_ENABLE_P */
 		goto again;
 	}
+	if (me != &_bootcpu) {
+		/* We're not the boot CPU, so we can be shut off.
+		 * For this purpose, `sched_shutdown_delay' exists. */
+		struct task *thread;
+		ktime_t timeout, now, shutdown_timeout;
+		tsc_t deadline, tsc_now;
+		assert(sched.s_runcount == 1); /* The IDLE thread */
+
+		/* We're only allowed to shut down if there aren't
+		 * any sleeping threads with the TASK_FKEEPCORE flag
+		 * set, since we'll need to transfer sleeping threads
+		 * to another CPU before shutting down! */
+		FOREACH_thiscpu_waiting(thread, me) {
+			if (thread->t_flags & TASK_FKEEPCORE)
+				goto cannot_shut_down;
+		}
+
+		/* Set-up a timeout before actually shutting down the CPU.
+		 * Also: If any of the waiting threads would time out before
+		 *       `sched_shutdown_delay' has passed, don't actually
+		 *       shut down the CPU. */
+		timeout = (ktime_t)-1;
+		if (sched.s_waiting_last)
+			timeout = sched_timeout(sched_s_waiting);
+		tsc_now = tsc_get(me);
+		now     = tsc_now_to_ktime(me, tsc_now);
+		shutdown_timeout = now + sched_shutdown_delay;
+		if (shutdown_timeout >= timeout)
+			goto cannot_shut_down; /* Don't shut down the CPU! */
+		/* Figure out the deadline for when we're allowed to shut down the CPU. */
+		deadline = ktime_future_to_tsc(me, shutdown_timeout);
+		tsc_now  = tsc_deadline(me, deadline);
+		if likely(tsc_now < deadline) {
+			/* Must set ourselves as the scheduler override to prevent the
+			 * deadline-expired interrupt from changing our custom deadline. */
+			FORCPU(me, thiscpu_sched_override) = caller;
+
+			/* Wait for the deadline to expire, but still handle sporadic
+			 * interrupts in the mean time. If new work arrives before we
+			 * get there, roll back everything and resume normal execution. */
+			for (;;) {
+				PREEMPTION_ENABLE_WAIT_DISABLE();
+
+				/* Check if more work has arrived.
+				 * NOTE: Scheduled threads may have changed in the mean time due
+				 *       to another CPU sending an IPI that directly modified our
+				 *       CPU's scheduler controller.
+				 *       One example for this would be `task_wake()' */
+				if (sched.s_runcount > 1) {
+disable_custom_deadline_and_start_over:
+					FORCPU(me, thiscpu_sched_override) = NULL;
+					tsc_nodeadline(me);
+					goto again;
+				}
+				if (FORCPU(me, thiscpu_sched_pending) != NULL)
+					goto disable_custom_deadline_and_start_over;
+#if 0 /* No need to check for IPIs: If there were any, they would have already been
+       * handled while preemption was enabled above, and if there are new ones now,
+       * they'll be handled the next time we get to the above code, or they'll be
+       * noticed by the IPI-check that follows `CPU_STATE_FALLING_ASLEEP' below. */
+				if (arch_cpu_hwipi_pending_nopr() || arch_cpu_swipi_pending_nopr(me))
+					goto disable_custom_deadline_and_start_over;
+#endif
+				/* Check if a waiting thread has popped up that has
+				 * a timeout which expires before `shutdown_timeout' */
+				if (sched.s_waiting_last != NULL &&
+				    sched_timeout(sched_s_waiting) < shutdown_timeout)
+					goto disable_custom_deadline_and_start_over;
+
+				/* Re-instate our custom deadline.
+				 * Note however that the deadline should still be active... */
+				tsc_now = tsc_deadline(me, deadline);
+				if (tsc_now >= deadline)
+					break; /* The shutdown-timeout has expired. */
+			}
+			FORCPU(me, thiscpu_sched_override) = NULL;
+		}
+
+		/* Yes: Shut down this CPU! */
+		ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
+
+		/* Transfer all remaining sleeping threads to other CPUs. */
+		{
+			cpuset_t pending_cpu_wake;
+			struct task **pself, *self, *next;
+			pself = &sched_s_waiting;
+			CPUSET_CLEAR(pending_cpu_wake);
+			while ((self = *pself) != NULL) {
+				assert(sched_pself(self) == pself);
+				next = sched_next(self);
+				assert((sched.s_waiting_last == self) == (next == NULL));
+				if (task_transfer_thread_to_other_cpu(me, self, CPUSET_PTR(pending_cpu_wake))) {
+					/* Thread was transfered (fix-up our CPU's wait-queue chain) */
+					if ((*pself = next) != NULL)
+						sched_pself(next) = pself;
+					continue;
+				}
+				
+				/* Thread wasn't transfered.
+				 * This means that we won't be able to shut down, so
+				 * we might as well stop trying and just get back to
+				 * normal execution. */
+				ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
+				/* Must still send wake-up requests to all CPUs that
+				 * received threads before we've failed to transfer
+				 * the most recent thread. */
+				cpuset_wake(pending_cpu_wake);
+				goto again;
+			}
+			/* With all sleeping threads transfered, fix-up the waiting-last pointer. */
+			assert(sched_s_waiting == NULL);
+			sched.s_waiting_last = NULL;
+			/* Wake-up all CPUs that received our old threads. */
+			cpuset_wake(pending_cpu_wake);
+		}
+
+		/* Do one more check if new work arrived since we've changed state,
+		 * thus ensuring that the state-transition is interlocked with pending
+		 * threads, as well as pending hard- and software IPIs. */
+		if (FORCPU(me, thiscpu_sched_pending) != NULL ||
+		    arch_cpu_hwipi_pending_nopr() ||
+		    arch_cpu_swipi_pending_nopr(me)) {
+			ATOMIC_WRITE(me->c_state, CPU_STATE_RUNNING);
+			goto again;
+		}
+		printk(KERN_INFO "[sched:cpu#%u][+] Enter deep-sleep\n", me->c_id);
+		cpu_enter_deepsleep(me);
+		printk(KERN_INFO "[sched:cpu#%u][-] Leave deep-sleep\n", me->c_id);
+		return;
+	}
+cannot_shut_down:
 #endif /* !CONFIG_NO_SMP */
 
-	/* Check if there are other running threads. */
-	assert(sched.s_runcount >= 1);
-	if (sched.s_runcount > 1 || sched.s_running != &sched_idle)
-		goto yield_and_return;
+	/* It has been decided that our CPU can't be turned
+	 * off for one reason or another.
+	 *
+	 * Setup the TSC deadline to trigger an interrupt
+	 * once the first waiting thread has timed out. */
+	if (sched.s_waiting_last) {
+		struct task *first_waiting;
+		ktime_t timeout;
+		tsc_t deadline, now;
+		first_waiting = sched_s_waiting;
+		assert(first_waiting);
+		timeout  = sched_timeout(first_waiting);
+		deadline = ktime_to_tsc(me, timeout);
+		now      = tsc_deadline(me, deadline);
+		if (now >= deadline) {
+			/* Deadline has already expired! */
+			struct task *next;
+			next = tsc_deadline_passed(me, caller, now);
+			if (next != caller) {
+				FORCPU(me, thiscpu_sched_current) = next;
+				cpu_run_current_and_remember_nopr(caller);
+				return;
+			}
+		}
+	} else {
+		/* Nothing to wait for -> Disable the TSC deadline so it doesn't wake us up. */
+		tsc_nodeadline(me);
+	}
 
-	TODO;
-
-	goto again_already_disabled;
-yield_and_return:
-	assert(sched.s_runcount > 1 || sched.s_running != &sched_idle);
-	TODO;
-
-yield_to_next:
-	FORCPU(me, thiscpu_sched_current) = next;
-	cpu_run_current_and_remember_nopr(&sched_idle);
-#endif
+	/* Re-enable preemption and wait until something happens. */
+	PREEMPTION_ENABLE_WAIT();
 }
 
 DECL_END
