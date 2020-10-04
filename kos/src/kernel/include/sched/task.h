@@ -45,18 +45,7 @@
 
 DECL_BEGIN
 
-/* Task flags <--> scheduler state mapping:
- *
- *   thread in thread->t_cpu->c_current:
- *      (thread->t_flags & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED|TASK_FPENDING)) == (TASK_FSTARTED|TASK_FRUNNING)
- *   thread in thread->t_cpu->c_sleeping:
- *      (thread->t_flags & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED|TASK_FPENDING)) == (TASK_FSTARTED)
- *   thread in thread->t_cpu->c_pending:
- *      (thread->t_flags & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED|TASK_FPENDING)) == (TASK_FSTARTED|TASK_FPENDING)
- *
- * Note that any code is allowed to assume that these mappings between thread flags,
- * and scheduler association always hold true. - As a matter of fact: These relations
- * are asserted by `cpu_assert_integrity()' */
+/* Task state flags. */
 #define TASK_FNORMAL       __UINT32_C(0x00000000) /* Normal task flags. */
 #define TASK_FRUNNING      __UINT32_C(0x00000001) /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
 #define TASK_FTIMEOUT      __UINT32_C(0x00000002) /* [lock(CLEAR(THIS_TASK))] Set by the scheduler when waking a task due to a timeout. */
@@ -69,7 +58,7 @@ DECL_BEGIN
                                                    *                  - Implies `TASK_FKEEPCORE' (the task may no longer change its hosting CPU) */
 #define TASK_FTERMINATED   __UINT32_C(0x00000080) /* [lock(WRITE_ONCE)] The task has been fully terminated.
                                                    *                  - No further RPCs of any kind may be scheduled for execution
-                                                   *                  - The thread must no longer appear in the CURRENT/SLEEPING or PENDING chain of any CPU. */
+                                                   *                  - The thread must no longer appear in the scheduler of any CPU. */
 #define TASK_FKEEPCORE     __UINT32_C(0x00000100) /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
 #define TASK_FSUSPENDED    __UINT32_C(0x00000200) /* [lock(PRIVATE(THIS_TASK))] Used internally to implement of SIGSTOP/SIGCONT */
 /*      TASK_F             __UINT32_C(0x00000400)  * ... */
@@ -190,7 +179,7 @@ FORCELOCAL NOBLOCK ATTR_ARTIFICIAL ATTR_RETNONNULL NONNULL((1)) struct task *
 NOTHROW(FCALL task_start)(struct task *__restrict thread) {
 	return task_start(thread, task_start_default_flags);
 }
-}
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 
@@ -219,8 +208,8 @@ DATDEF ATTR_PERTASK struct vm_node const this_kernel_stackguard;
 #define THIS_KERNEL_STACK_PART (&PERTASK(this_kernel_stackpart))
 
 /* Return some rough estimates for the available/used stack memory.
- * These `get_stack_avail()' is usually called prior to `alloca()' in order
- * to ensure that sufficient memory remains available after the allocation
+ * `get_stack_avail()' is usually called prior to `alloca()' in order to
+ * ensure that sufficient memory remains available after the allocation
  * was made. (for example: the max CFI remember-stack size is directly
  * determined by the amount of available stack memory) */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED size_t NOTHROW(KCALL get_stack_avail)(void);
@@ -276,37 +265,6 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp);
  * >> task_wake(waiting_thread); */
 FUNDEF __BOOL NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout DFL(__NULLPTR));
 
-/* Terminate the calling thread immediately.
- * WARNING: Do not call this function to terminate a thread.
- *          It would work, but exception handlers would not
- *          get unwound and resources would be leaked.
- *          If you wish to exit your current thread, just
- *          throw an `E_EXIT_THREAD' error instead.
- * This function is called by the unhandled exception handler
- * when it encounters an `E_EXIT_THREAD' error, or when exception
- * data cannot be propagated to userspace in the event of an
- * interrupt throwing some error, whilst originating from user-space.
- * NOTE: The caller should fill in `error_info()->e_error.e_exit.e_reason'
- *       to pass information on why the exit is happening.
- *       TODO: The volatility of error_info() makes this a bad choice!
- *             Instead, reason information should be passed as an argument!
- * @param: w_status: The task's exit status (mustn't be `WIFSTOPPED()' or `WIFCONTINUED()').
- *                   This argument is ignored for kernel-threads.
- * WARNING: Calling this function from an IDLE task will cause
- *          the kernel to PANIC! */
-FUNDEF ATTR_NORETURN void
-NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
-
-#ifdef __cplusplus
-extern "C++" {
-FORCELOCAL ATTR_ARTIFICIAL ATTR_NORETURN void
-NOTHROW(FCALL task_exit)(union wait status) {
-	task_exit(status.w_status);
-}
-} /* extern "C++" */
-#endif /* __cplusplus */
-
-
 #define TASK_WAKE_FNORMAL   0x0000 /* Normal wake-up flags. */
 #define TASK_WAKE_FWAITFOR  0x1000 /* When sending an IPI to a different CPU, wait for that CPU to acknowledge
                                     * having received the IPI, rather than allowing the IPI to be delivered
@@ -352,9 +310,36 @@ FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
                             unsigned int flags DFL(TASK_WAKE_FNORMAL));
 
+/* Terminate the calling thread immediately.
+ * WARNING: Do not call this function to terminate a thread.
+ *          It would work, but exception handlers would not
+ *          get unwound and resources would be leaked.
+ *          If you wish to exit your current thread, just
+ *          throw an `E_EXIT_THREAD' error instead.
+ * This function is called by the unhandled exception handler
+ * when it encounters an `E_EXIT_THREAD' error, or when exception
+ * data cannot be propagated to userspace in the event of an
+ * interrupt throwing some error, whilst originating from user-space.
+ * @param: w_status: The task's exit status (mustn't be `WIFSTOPPED()' or `WIFCONTINUED()').
+ *                   This argument is ignored for kernel-threads.
+ * WARNING: Calling this function from an IDLE task, or any other
+ *          task that is critical will cause the kernel to PANIC! */
+FUNDEF ATTR_NORETURN void
+NOTHROW(FCALL task_exit)(int w_status DFL(__W_EXITCODE(0, 0)));
+
+#ifdef __cplusplus
+extern "C++" {
+FORCELOCAL ATTR_ARTIFICIAL ATTR_NORETURN void
+NOTHROW(FCALL task_exit)(union wait status) {
+	task_exit(status.w_status);
+}
+} /* extern "C++" */
+#endif /* __cplusplus */
+
+
 /* Pause execution for short moment, allowing other CPU cores to catch up.
  * This function is similar to `task_yield()', but intended to be used for
- * helping to synchronize between multiple cores. - If no such functionality
+ * helping synchronization between multiple cores. - If no such functionality
  * exists on the host system, this is a no-op. */
 #ifndef CONFIG_NO_SMP
 FUNDEF NOBLOCK void NOTHROW(KCALL task_pause)(void);

@@ -40,25 +40,18 @@
 /* KOS mk4                                                              */
 /************************************************************************/
 
-#include <__crt.h>
-#ifdef __task_yield_defined
-#define __hybrid_yield()    task_yield()
-#define __hybrid_yield_nx() task_yield_nx()
-#else /* __task_yield_defined */
-#define __task_yield_defined 1
+#ifdef __INTELLISENSE__
 __DECL_BEGIN
-#ifdef THROWS
-__PUBDEF void (__KCALL task_yield)(void) THROWS(E_WOULDBLOCK_PREEMPTED);
-#elif defined(__THROWS)
-__PUBDEF void (__KCALL task_yield)(void) __THROWS(E_WOULDBLOCK_PREEMPTED);
-#else /* THROWS */
-__PUBDEF void (__KCALL task_yield)(void);
-#endif /* !THROWS */
-__PUBDEF __BOOL __NOTHROW(__KCALL task_yield_nx)(void);
+void (__hybrid_yield)(void);
+__BOOL (__hybrid_yield_nx)(void);
+__DECL_END
+#define __hybrid_yield()    __hybrid_yield()
+#define __hybrid_yield_nx() __hybrid_yield_nx()
+#else /* __INTELLISENSE__ */
+#include <sched/task.h>
 #define __hybrid_yield()    task_yield()
 #define __hybrid_yield_nx() task_yield_nx()
-__DECL_END
-#endif /* !__task_yield_defined */
+#endif /* !__INTELLISENSE__ */
 
 #elif __KOS_VERSION__ >= 300
 /************************************************************************/
@@ -93,9 +86,9 @@ typedef int errno_t;
  * @return: -EAGAIN:    There was no other task to switch to. */
 __PUBDEF errno_t (__KCALL task_yield)(void);
 
-#if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_GCC_ASM) && \
-   (!defined(__x86_64__) || defined(CONFIG_BUILDING_KERNEL_CORE)) && \
-     defined(__i386__)
+#if (!defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_GCC_ASM) &&      \
+     (!defined(__x86_64__) || defined(CONFIG_BUILDING_KERNEL_CORE)) && \
+     defined(__i386__))
 /* Take advantage of the fact that `task_yield()' doesn't clobber anything. */
 #define task_yield()                             \
 	__XBLOCK({                                   \
@@ -104,7 +97,7 @@ __PUBDEF errno_t (__KCALL task_yield)(void);
 		                     : "=a"(__y_err));   \
 		__XRETURN __y_err;                       \
 	})
-#endif
+#endif /* ... */
 #endif /* !__task_yield_defined */
 #define __hybrid_yield() task_yield()
 __DECL_END

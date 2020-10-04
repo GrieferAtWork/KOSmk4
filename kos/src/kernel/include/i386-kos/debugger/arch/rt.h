@@ -106,7 +106,7 @@ struct task;
 #ifndef CONFIG_NO_SMP
 struct x86_dbg_cpuammend {
 	struct cpu    *dca_cpu;       /* [1..1][const] The associated CPU (same as `cpu_vector[INDEXOF(this in dhs_cpus)]') */
-	struct task   *dca_thread;    /* [1..1][const] The associated thread (same as `cpu_vector[INDEXOF(this in dhs_cpus)]->c_current') */
+	struct task   *dca_thread;    /* [1..1][const] The associated thread (same as `FORCPU(cpu_vector[INDEXOF(this in dhs_cpus)], thiscpu_sched_current)') */
 	struct coregs  dca_coregs;    /* Control registers */
 	struct drregs  dca_drregs;    /* Debug registers */
 #ifdef __x86_64__

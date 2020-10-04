@@ -185,8 +185,8 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 
 	/* In order to even be able to write to the system log, we must be able to
 	 * identify ourselves. As such, try to fix the `THIS_TASK' pointer by changing
-	 * it to become the c_current pointer of our current CPU, or, if that pointer
-	 * is broken, use the current CPU's IDLE thread instead. */
+	 * it to become the thiscpu_sched_current pointer of our current CPU, or, if
+	 * that pointer is broken, use the current CPU's IDLE thread instead. */
 #ifdef __x86_64__
 	me = x86_failsafe_getcpu();
 #else /* __x86_64__ */

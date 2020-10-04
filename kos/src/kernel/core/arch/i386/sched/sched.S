@@ -71,8 +71,8 @@ PUBLIC_FUNCTION(task_yield)
 	.cfi_signal_frame
 	popP_cfi %Pax
 	.cfi_register %Pip, %Pax
-	movP   %Psp, %Pcx
 #ifdef __x86_64__
+	movq   %rsp, %rcx
 	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
 	pushq_cfi %rcx                    /* ir_rsp */
@@ -219,7 +219,7 @@ PUBLIC_FUNCTION(task_yield_nx)
 #endif /* !__x86_64__ */
 	movP   %Pax, %Pcx
 	.cfi_register %Pip, %Pcx
-	movP   $(0), %Pax
+	xorP   %Pax, %Pax
 	jmpP   *%Pcx
 	.cfi_endproc
 END(task_yield_nx)
@@ -230,13 +230,13 @@ END(task_yield_nx)
 .section .text
 PUBLIC_FUNCTION(task_tryyield_or_pause)
 	.cfi_startproc
-	popP_cfi %Pcx
-	.cfi_register %Pip, %Pcx
+	popP_cfi %Pax
+	.cfi_register %Pip, %Pax
 #ifdef __x86_64__
-	movq   %rsp, %rdx
+	movq   %rsp, %rcx
 	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rdx                    /* ir_rsp */
+	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
 #endif /* __x86_64__ */
 	pushfP_cfi_r
@@ -252,6 +252,7 @@ PUBLIC_FUNCTION(task_tryyield_or_pause)
 	.cfi_adjust_cfa_offset -4
 #endif /* !__x86_64__ */
 	.cfi_same_value %Pflags
+	movP   %Pax, %Pcx
 	movP   $(TASK_TRYYIELD_PREEMPTION_DISABLED), %Pax
 #ifndef CONFIG_NO_SMP
 	pause
@@ -261,13 +262,13 @@ END(task_tryyield_or_pause)
 	.cfi_adjust_cfa_offset __SIZEOF_POINTER__
 	.cfi_restore %Pip
 PUBLIC_FUNCTION(task_tryyield)
-	popP_cfi %Pcx
-	.cfi_register %Pip, %Pcx
+	popP_cfi %Pax
+	.cfi_register %Pip, %Pax
 #ifdef __x86_64__
-	movq   %rsp, %rdx
+	movq   %rsp, %rcx
 	pushq_cfi $(SEGMENT_KERNEL_DATA0) /* ir_ss */
 	.cfi_rel_offset %ss, 0
-	pushq_cfi %rdx                    /* ir_rsp */
+	pushq_cfi %rcx                    /* ir_rsp */
 	.cfi_rel_offset %rsp, 0
 #endif /* __x86_64__ */
 	pushfP_cfi_r
@@ -284,11 +285,12 @@ PUBLIC_FUNCTION(task_tryyield)
 	.cfi_adjust_cfa_offset -4
 #endif /* !__x86_64__ */
 	.cfi_same_value %Pflags
+	movP   %Pax, %Pcx
 	movP   $(TASK_TRYYIELD_PREEMPTION_DISABLED), %Pax
 	jmpP   *%Pcx
 1:	.cfi_restore_state
 	pushP_cfi_r_kernel_cs            /* ir_cs */
-	pushP_cfi %Pcx                   /* ir_rip */
+	pushP_cfi %Pax                   /* ir_rip */
 	.cfi_rel_offset %Pip, 0
 
 	/* Construct a full `struct scpustate' structure */

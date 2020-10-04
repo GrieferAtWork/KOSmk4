@@ -481,7 +481,7 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) /*ATTR_NOTHROW*/ struct icpustate *
 #define CPU_IPI_MODE_SPECIAL_MIN      (__CCAST(uintptr_t)(-1))
 #define CPU_IPI_MODE_ISSPECIAL(x)     (__CCAST(uintptr_t)(x) >= CPU_IPI_MODE_SPECIAL_MIN)
 
-/* Directly yield execution to `THIS_CPU->c_current'. The caller is responsible
+/* Directly yield execution to `PERCPU(thiscpu_sched_current)'. The caller is responsible
  * to deal with time accounting, preferrably via use of the `sched_intern_*' API.
  * This is mainly used to quickly cause a thread woken by `task_wake()'
  * to resume execution when it was hosted by a different CPU before then. */
@@ -572,7 +572,7 @@ FUNDEF ATTR_NORETURN void NOTHROW(FCALL cpu_idlemain)(void);
 
 
 /* Save the current CPU context and store it in `caller->s_state'.
- * Then, switch context to `THIS_CPU->c_current' and continue by executing it.
+ * Then, switch context to `PERCPU(thiscpu_sched_current)' and continue by executing it.
  * NOTE: Preemption must be disabled before this function may be called!
  * NOTE: Upon return, preemption will have been re-enabled! */
 FUNDEF NOPREEMPT NONNULL((1)) void

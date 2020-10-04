@@ -332,7 +332,7 @@ DBG_COMMAND(r,
 			 *       should ever be interruptible with an incorrect %gs.base. If this can
 			 *       still happen somewhere, then that is a bug that would be indicate by this)
 			 *       Note that the debugger determines the calling thread using a different method.
-			 *       Namely: CURRENT_LAPIC_ID -> CURRENT_CPU -> c_current */
+			 *       Namely: CURRENT_LAPIC_ID -> CURRENT_CPU -> thiscpu_sched_current */
 			dbg_putc(' ');
 			debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_ERROR_PREFIX);
 			dbg_printf(DBGSTR("BAD: should be %p"), dbg_current);

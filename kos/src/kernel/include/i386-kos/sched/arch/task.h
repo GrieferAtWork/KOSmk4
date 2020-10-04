@@ -40,235 +40,270 @@ DECL_BEGIN
 
 
 #ifdef __CC__
-#define task_pause() x86_pause()
-FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL x86_pause)(void) {
-	__asm__ __volatile__("pause");
+
+/* Inline optimizations for scheduler functions implemented via assembly.
+ * Using this, we can help GCC generate better code by telling it which
+ * registers get clobbered by which function, allowing it to keep more
+ * variables in registers across calls to these functions (which is quite
+ * useful, considering that these functions often appear in the middle of
+ * long functions needing to use the same objects both before and after
+ * the call) */
+#ifndef __INTELLISENSE__
+#ifdef __NO_XBLOCK
+#define task_yield() __x86_task_yield()
+FORCELOCAL ATTR_ARTIFICIAL void (__x86_task_yield)(void) {
+#ifdef __x86_64__
+	__asm__("call task_yield" : : : "%rax", "%rcx", "memory");
+#else /* __x86_64__ */
+	__asm__("call task_yield" : : : "%eax", "memory");
+#endif /* !__x86_64__ */
 }
+#define task_pause() __x86_task_pause()
+FORCELOCAL ATTR_ARTIFICIAL void NOTHROW(__x86_task_pause)(void) {
+	__asm__("pause");
+}
+#define task_yield_nx() __x86_task_yield_nx()
+FORCELOCAL ATTR_ARTIFICIAL __BOOL NOTHROW(__x86_task_yield_nx)(void) {
+	__register __BOOL __res;
+#ifdef __x86_64__
+	__asm__("call task_yield" : "=a" (__res) : : "%rcx", "memory");
+#else /* __x86_64__ */
+	__asm__("call task_yield" : "=a" (__res) : : "memory");
+#endif /* !__x86_64__ */
+	return __res;
+}
+#define task_tryyield() __x86_task_tryyield()
+FORCELOCAL ATTR_ARTIFICIAL unsigned int NOTHROW(__x86_task_tryyield)(void) {
+	__register unsigned int __res;
+#ifdef __x86_64__
+	__asm__("call task_tryyield" : "=a" (__res) : : "%rcx", "memory");
+#else /* __x86_64__ */
+	__asm__("call task_tryyield" : "=a" (__res) : : "memory");
+#endif /* !__x86_64__ */
+	return __res;
+}
+#define task_tryyield_or_pause() __x86_task_tryyield_or_pause()
+FORCELOCAL ATTR_ARTIFICIAL unsigned int NOTHROW(__x86_task_tryyield_or_pause)(void) {
+	__register unsigned int __res;
+#ifdef __x86_64__
+	__asm__("call task_tryyield_or_pause" : "=a" (__res) : : "%rcx", "memory");
+#else /* __x86_64__ */
+	__asm__("call task_tryyield_or_pause" : "=a" (__res) : : "memory");
+#endif /* !__x86_64__ */
+	return __res;
+}
+#else /* __NO_XBLOCK */
+#define task_pause() __XBLOCK({ __asm__("pause"); (void)0; })
+#ifdef __x86_64__
+#define task_yield()             __XBLOCK({ __asm__("call task_yield" : : : "%rax", "%rcx", "memory"); (void)0; })
+#define task_yield_nx()          __XBLOCK({ __register __BOOL __ty_res; __asm__("call task_yield" : "=a" (__ty_res) : : "%rcx", "memory"); __XRETURN __ty_res; })
+#define task_tryyield()          __XBLOCK({ __register unsigned int __ty_res; __asm__("call task_tryyield" : "=a" (__ty_res) : : "%rcx", "memory"); __XRETURN __ty_res; })
+#define task_tryyield_or_pause() __XBLOCK({ __register unsigned int __ty_res; __asm__("call task_tryyield_or_pause" : "=a" (__ty_res) : : "%rcx", "memory"); __XRETURN __ty_res; })
+#else /* __x86_64__ */
+#define task_yield()             __XBLOCK({ __asm__("call task_yield" : : : "%eax", "memory"); (void)0; })
+#define task_yield_nx()          __XBLOCK({ __register __BOOL __ty_res; __asm__("call task_yield" : "=a" (__ty_res) : : "memory"); __XRETURN __ty_res; })
+#define task_tryyield()          __XBLOCK({ __register unsigned int __ty_res; __asm__("call task_tryyield" : "=a" (__ty_res) : : "memory"); __XRETURN __ty_res; })
+#define task_tryyield_or_pause() __XBLOCK({ __register unsigned int __ty_res; __asm__("call task_tryyield_or_pause" : "=a" (__ty_res) : : "memory"); __XRETURN __ty_res; })
+#endif /* !__x86_64__ */
+#endif /* !__NO_XBLOCK */
+#endif /* !__INTELLISENSE__ */
+
+
 
 /* Preemption control. */
+typedef uintptr_t pflag_t;
+#define PREEMPTION_WASENABLED(flag) ((flag) & 0x00000200 /* EFLAGS_IF */)
+
+#ifdef __NO_XBLOCK
+#define PREEMPTION_ENABLE()              __x86_preemption_enable()
+#define PREEMPTION_ENABLE_WAIT()         __x86_preemption_enable_wait()
+#define PREEMPTION_ENABLE_WAIT_DISABLE() __x86_preemption_enable_wait_disable()
+#define PREEMPTION_ENABLE_P()            __x86_preemption_enable_p()
+#define PREEMPTION_DISABLE()             __x86_preemption_disable()
+#define PREEMPTION_WAIT()                __x86_preemption_wait()
+#define PREEMPTION_HALT()                __x86_preemption_halt()
+
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL x86_interrupt_enable)(void) {
-	COMPILER_BARRIER();
-	__asm__ __volatile__("sti"
-	                     :
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
+NOTHROW(__x86_preemption_enable)(void) {
+	__COMPILER_BARRIER();
+	__asm__ __volatile__("sti" : : : "memory");
+	__COMPILER_BARRIER();
 }
 
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL x86_interrupt_enable_wait)(void) {
-	COMPILER_BARRIER();
+NOTHROW(__x86_preemption_enable_wait)(void) {
+	__COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
 	                     "hlt"
-	                     :
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
+	                     : : : "memory");
+	__COMPILER_BARRIER();
 }
 
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL x86_interrupt_enable_wait_disable)(void) {
-	COMPILER_BARRIER();
+NOTHROW(__x86_preemption_enable_wait_disable)(void) {
+	__COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
 	                     "hlt\n\t"
 	                     "cli"
-	                     :
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
+	                     : : : "memory");
+	__COMPILER_BARRIER();
 }
 
 FORCELOCAL ATTR_ARTIFICIAL void
-NOTHROW(KCALL x86_interrupt_wait)(void) {
-	COMPILER_BARRIER();
+NOTHROW(__x86_preemption_wait)(void) {
+	__COMPILER_BARRIER();
 	__asm__ __volatile__("hlt"
-	                     :
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
+	                     : : : "memory");
+	__COMPILER_BARRIER();
 }
 
 FORCELOCAL ATTR_ARTIFICIAL ATTR_NORETURN void
-NOTHROW(KCALL x86_interrupt_halt)(void) {
-	COMPILER_BARRIER();
+NOTHROW(__x86_preemption_halt)(void) {
+	__COMPILER_BARRIER();
 	__asm__ __volatile__("cli\n\t"
 	                     "hlt"
-	                     :
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
+	                     : : : "memory");
+	__COMPILER_BARRIER();
 	__builtin_unreachable();
-	COMPILER_BARRIER();
+	__COMPILER_BARRIER();
 }
 
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL x86_interrupt_enable_p)(void) {
-	COMPILER_BARRIER();
+NOTHROW(__x86_preemption_enable_p)(void) {
+	__COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
 	                     "nop"
-	                     :
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
+	                     : : : "memory");
+	__COMPILER_BARRIER();
 }
 
 FORCELOCAL NOBLOCK ATTR_ARTIFICIAL void
-NOTHROW(KCALL x86_interrupt_disable)(void) {
-	COMPILER_BARRIER();
-	__asm__ __volatile__("cli"
-	                     :
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
+NOTHROW(__x86_preemption_disable)(void) {
+	__COMPILER_BARRIER();
+	__asm__ __volatile__("cli" : : : "memory");
+	__COMPILER_BARRIER();
 }
 
-typedef uintptr_t pflag_t;
-
+#define PREEMPTION_ENABLED() (__x86_preemption_enabled() & 0x00000200 /* EFLAGS_IF */)
+#define PREEMPTION_PUSH()    __x86_preemption_push()
+#define PREEMPTION_PUSHON()  __x86_preemption_pushon()
+#define PREEMPTION_PUSHOFF() __x86_preemption_pushoff()
+#define PREEMPTION_POP(flag) __x86_preemption_pop(flag)
+FORCELOCAL NOBLOCK WUNUSED pflag_t
+NOTHROW(__x86_preemption_enabled)(void) {
+	pflag_t result;
+	__asm__ __volatile__(""
 #ifdef __x86_64__
-LOCAL NOBLOCK WUNUSED pflag_t
-NOTHROW(KCALL x86_interrupt_enabled)(void) {
-	pflag_t result;
-	__asm__ __volatile__("pushfq\n\t"
-	                     "popq %0"
-	                     : "=g" (result)
-	                     :
-	                     : "memory");
-	return result;
-}
-
-LOCAL NOBLOCK WUNUSED pflag_t
-NOTHROW(KCALL x86_interrupt_push)(void) {
-	pflag_t result;
-	COMPILER_BARRIER();
-	__asm__ __volatile__("pushfq\n\t"
-	                     "popq %0"
-	                     : "=g" (result)
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
-	return result;
-}
-
-LOCAL NOBLOCK WUNUSED pflag_t
-NOTHROW(KCALL x86_interrupt_pushon)(void) {
-	pflag_t result;
-	COMPILER_BARRIER();
-	__asm__ __volatile__("pushfq\n\t"
-	                     "popq %0\n\t"
-	                     "sti"
-	                     : "=g" (result)
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
-	return result;
-}
-
-LOCAL NOBLOCK WUNUSED pflag_t
-NOTHROW(KCALL x86_interrupt_pushoff)(void) {
-	pflag_t result;
-	COMPILER_BARRIER();
-	__asm__ __volatile__("pushfq\n\t"
-	                     "popq %0\n\t"
-	                     "cli"
-	                     : "=g" (result)
-	                     :
-	                     : "memory");
-	COMPILER_BARRIER();
-	return result;
-}
-
-LOCAL NOBLOCK void
-NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
-	COMPILER_BARRIER();
-	__asm__ __volatile__("pushq %0\n\t"
-	                     "popfq"
-	                     :
-	                     : "g" (flag)
-	                     : "memory", "cc");
-	COMPILER_BARRIER();
-}
-
+	                     "pushfq\n\t"
+	                     "popq %q0"
 #else /* __x86_64__ */
-
-LOCAL NOBLOCK pflag_t
-NOTHROW(KCALL x86_interrupt_enabled)(void) {
-	pflag_t result;
-	__asm__ __volatile__("pushfl\n\t"
-	                     "popl %0"
+	                     "pushfl\n\t"
+	                     "popl %k0"
+#endif /* !__x86_64__ */
 	                     : "=g" (result)
 	                     :
 	                     : "memory");
 	return result;
 }
 
-LOCAL NOBLOCK pflag_t
-NOTHROW(KCALL x86_interrupt_push)(void) {
+FORCELOCAL NOBLOCK WUNUSED pflag_t
+NOTHROW(__x86_preemption_push)(void) {
 	pflag_t result;
-	COMPILER_BARRIER();
-	__asm__ __volatile__("pushfl\n\t"
-	                     "popl %0"
+	__COMPILER_BARRIER();
+	__asm__ __volatile__(""
+#ifdef __x86_64__
+	                     "pushfq\n\t"
+	                     "popq %q0"
+#else /* __x86_64__ */
+	                     "pushfl\n\t"
+	                     "popl %k0"
+#endif /* !__x86_64__ */
 	                     : "=g" (result)
 	                     :
 	                     : "memory");
-	COMPILER_BARRIER();
+	__COMPILER_BARRIER();
 	return result;
 }
 
-LOCAL NOBLOCK pflag_t
-NOTHROW(KCALL x86_interrupt_pushon)(void) {
+FORCELOCAL NOBLOCK WUNUSED pflag_t
+NOTHROW(__x86_preemption_pushon)(void) {
 	pflag_t result;
-	COMPILER_BARRIER();
-	__asm__ __volatile__("pushfl\n\t"
-	                     "popl %0\n\t"
+	__COMPILER_BARRIER();
+	__asm__ __volatile__(""
+#ifdef __x86_64__
+	                     "pushfq\n\t"
+	                     "popq %q0\n\t"
+#else /* __x86_64__ */
+	                     "pushfl\n\t"
+	                     "popl %k0\n\t"
+#endif /* !__x86_64__ */
 	                     "sti"
 	                     : "=g" (result)
 	                     :
 	                     : "memory");
-	COMPILER_BARRIER();
+	__COMPILER_BARRIER();
 	return result;
 }
 
-LOCAL NOBLOCK pflag_t
-NOTHROW(KCALL x86_interrupt_pushoff)(void) {
+FORCELOCAL NOBLOCK WUNUSED pflag_t
+NOTHROW(__x86_preemption_pushoff)(void) {
 	pflag_t result;
-	COMPILER_BARRIER();
-	__asm__ __volatile__("pushfl\n\t"
-	                     "popl %0\n\t"
+	__COMPILER_BARRIER();
+	__asm__ __volatile__(""
+#ifdef __x86_64__
+	                     "pushfq\n\t"
+	                     "popq %q0\n\t"
+#else /* __x86_64__ */
+	                     "pushfl\n\t"
+	                     "popl %k0\n\t"
+#endif /* !__x86_64__ */
 	                     "cli"
 	                     : "=g" (result)
 	                     :
 	                     : "memory");
-	COMPILER_BARRIER();
+	__COMPILER_BARRIER();
 	return result;
 }
 
-LOCAL NOBLOCK void
-NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
-	COMPILER_BARRIER();
-	__asm__ __volatile__("pushl %0\n\t"
+FORCELOCAL NOBLOCK void
+NOTHROW(__x86_preemption_pop)(pflag_t flag) {
+	__COMPILER_BARRIER();
+	__asm__ __volatile__(""
+#ifdef __x86_64__
+	                     "pushq %q0\n\t"
+	                     "popfq"
+#else /* __x86_64__ */
+	                     "pushl %k0\n\t"
 	                     "popfl"
+#endif /* !__x86_64__ */
 	                     :
 	                     : "g" (flag)
-	                     : "memory", "cc");
-	COMPILER_BARRIER();
+	                     : "memory"
+	                     , "cc");
+	__COMPILER_BARRIER();
 }
+#else /* __NO_XBLOCK */
+#define PREEMPTION_ENABLE()              __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("sti" : : : "memory"); __COMPILER_BARRIER(); (void)0; })
+#define PREEMPTION_ENABLE_WAIT()         __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("sti\n\thlt" : : : "memory"); __COMPILER_BARRIER(); (void)0; })
+#define PREEMPTION_ENABLE_WAIT_DISABLE() __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("sti\n\thlt\n\tcli" : : : "memory"); __COMPILER_BARRIER(); (void)0; })
+#define PREEMPTION_WAIT()                __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("hlt" : : : "memory"); __COMPILER_BARRIER(); (void)0; })
+#define PREEMPTION_HALT()                __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("cli\n\thlt" : : : "memory"); __COMPILER_BARRIER(); __builtin_unreachable(); __COMPILER_BARRIER(); (void)0; })
+#define PREEMPTION_ENABLE_P()            __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("sti\n\t" "nop" : : : "memory"); __COMPILER_BARRIER(); (void)0; })
+#define PREEMPTION_DISABLE()             __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("cli" : : : "memory"); __COMPILER_BARRIER(); (void)0; })
+#ifdef __x86_64__
+#define PREEMPTION_ENABLED()             __XBLOCK({ pflag_t __Pflags; __asm__ __volatile__("pushfq\n\tpopq %q0" : "=g" (__Pflags) : : "memory"); __XRETURN __Pflags & 0x00000200 /* EFLAGS_IF */; })
+#define PREEMPTION_PUSH()                __XBLOCK({ pflag_t __Pflags; __COMPILER_BARRIER(); __asm__ __volatile__("pushfq\n\tpopq %q0" : "=g" (__Pflags) : : "memory"); __COMPILER_BARRIER(); __XRETURN __Pflags; })
+#define PREEMPTION_PUSHON()              __XBLOCK({ pflag_t __Pflags; __COMPILER_BARRIER(); __asm__ __volatile__("pushfq\n\tpopq %q0\n\tsti" : "=g" (__Pflags) : : "memory"); __COMPILER_BARRIER(); __XRETURN __Pflags; })
+#define PREEMPTION_PUSHOFF()             __XBLOCK({ pflag_t __Pflags; __COMPILER_BARRIER(); __asm__ __volatile__("pushfq\n\tpopq %q0\n\tcli" : "=g" (__Pflags) : : "memory"); __COMPILER_BARRIER(); __XRETURN __Pflags; })
+#define PREEMPTION_POP(flag)             __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("pushq %q0\n\tpopfq" : : "g" (flag) : "memory", "cc"); __COMPILER_BARRIER(); (void)0; })
+#else /* __x86_64__ */
+#define PREEMPTION_ENABLED()             __XBLOCK({ pflag_t __Pflags; __asm__ __volatile__("pushfl\n\tpopl %k0" : "=g" (__Pflags) : : "memory"); __XRETURN __Pflags & 0x00000200 /* EFLAGS_IF */; })
+#define PREEMPTION_PUSH()                __XBLOCK({ pflag_t __Pflags; __COMPILER_BARRIER(); __asm__ __volatile__("pushfl\n\tpopl %k0" : "=g" (__Pflags) : : "memory"); __COMPILER_BARRIER(); __XRETURN __Pflags; })
+#define PREEMPTION_PUSHON()              __XBLOCK({ pflag_t __Pflags; __COMPILER_BARRIER(); __asm__ __volatile__("pushfl\n\tpopl %k0\n\tsti" : "=g" (__Pflags) : : "memory"); __COMPILER_BARRIER(); __XRETURN __Pflags; })
+#define PREEMPTION_PUSHOFF()             __XBLOCK({ pflag_t __Pflags; __COMPILER_BARRIER(); __asm__ __volatile__("pushfl\n\tpopl %k0\n\tcli" : "=g" (__Pflags) : : "memory"); __COMPILER_BARRIER(); __XRETURN __Pflags; })
+#define PREEMPTION_POP(flag)             __XBLOCK({ __COMPILER_BARRIER(); __asm__ __volatile__("pushl %k0\n\tpopfl" : : "g" (flag) : "memory", "cc"); __COMPILER_BARRIER(); (void)0; })
 #endif /* !__x86_64__ */
-
-#define PREEMPTION_ENABLE()              x86_interrupt_enable()
-#define PREEMPTION_ENABLE_WAIT()         x86_interrupt_enable_wait()
-#define PREEMPTION_ENABLE_WAIT_DISABLE() x86_interrupt_enable_wait_disable()
-#define PREEMPTION_ENABLE_P()            x86_interrupt_enable_p()
-#define PREEMPTION_DISABLE()             x86_interrupt_disable()
-#define PREEMPTION_ENABLED()             (x86_interrupt_enabled() & 0x00000200 /* EFLAGS_IF */)
-#define PREEMPTION_PUSH()                x86_interrupt_push()
-#define PREEMPTION_PUSHON()              x86_interrupt_pushon()
-#define PREEMPTION_PUSHOFF()             x86_interrupt_pushoff()
-#define PREEMPTION_WASENABLED(flag)      ((flag) & 0x00000200 /* EFLAGS_IF */)
-#define PREEMPTION_WAIT()                x86_interrupt_wait()
-#define PREEMPTION_HALT()                x86_interrupt_halt()
-#define PREEMPTION_POP(flag)             x86_interrupt_pop(flag)
+#endif /* !__NO_XBLOCK */
 
 
 /* Entry point for IRET tails that have been re-directed for RPC.

@@ -629,7 +629,7 @@ i386_allocate_secondary_cores(void) {
 
 		/* Set up the boot-strap CPU state for the new CPU.
 		 * -> When a CPU is started by using an INIT IPI, it will perform internal
-		 *    setup functions before executing `THIS_CPU->c_current->t_state'
+		 *    setup functions before executing `PERCPU(thiscpu_sched_current)->t_state'
 		 *    Since this is the first time that we're starting this CPU, we direct
 		 *    that state to perform some high-level CPU initialization functions,
 		 *    such as determining CPU features (and comparing those against those

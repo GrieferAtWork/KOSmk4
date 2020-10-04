@@ -109,13 +109,15 @@ NOTHROW(FCALL panic_critical_thread_exited)(void) {
  *          It would work, but exception handlers would not
  *          get unwound and resources would be leaked.
  *          If you wish to exit your current thread, just
- *          throw an `E_EXIT_THREAD' error.
+ *          throw an `E_EXIT_THREAD' error instead.
  * This function is called by the unhandled exception handler
  * when it encounters an `E_EXIT_THREAD' error, or when exception
  * data cannot be propagated to userspace in the event of an
  * interrupt throwing some error, whilst originating from user-space.
- * NOTE: The caller should fill in `error_info()->e_error.e_exit.e_reason'
- *       to pass information on why the exit is happening. */
+ * @param: w_status: The task's exit status (mustn't be `WIFSTOPPED()' or `WIFCONTINUED()').
+ *                   This argument is ignored for kernel-threads.
+ * WARNING: Calling this function from an IDLE task, or any other
+ *          task that is critical will cause the kernel to PANIC! */
 PUBLIC ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status) {
 	struct task *caller, *next;

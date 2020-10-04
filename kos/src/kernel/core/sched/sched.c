@@ -1318,7 +1318,7 @@ NOTHROW(FCALL task_transfer_thread_to_other_cpu)(struct cpu *__restrict me,
 	struct cpu *target;
 	assert(!(thread->t_flags & TASK_FRUNNING));
 	assert(thread != &sched_idle);
-	if (thread->t_flags & TASK_FKEEPCORE)
+	if (thread->t_flags & (TASK_FKEEPCORE | TASK_FTERMINATING))
 		return false; /* Thread cannot be transfered. */
 	target = &_bootcpu; /* TODO: Dynamically determine based on recent load. */
 	assert(thread->t_cpu == me);
@@ -1417,7 +1417,7 @@ again:
 		 * set, since we'll need to transfer sleeping threads
 		 * to another CPU before shutting down! */
 		FOREACH_thiscpu_waiting(thread, me) {
-			if (thread->t_flags & TASK_FKEEPCORE)
+			if (thread->t_flags & (TASK_FKEEPCORE | TASK_FTERMINATING))
 				goto cannot_shut_down;
 		}
 
