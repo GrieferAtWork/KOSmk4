@@ -325,9 +325,11 @@ int main_fork(int argc, char *argv[], char *envp[]) {
 int main_forkbomb(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	/* Just your traditional fork-bomb
-	 * Use CTRL+C to kill all of the created processes at once,
-	 * but don't take too long or else the system may have already
-	 * become unresponsive :) */
+	 * Use CTRL+C to kill all of the created processes at once.
+	 *
+	 * And with the KOS kernel now implementing a CFS-based scheduler,
+	 * it should be fairly unlikely for the system to become completely
+	 * unresponsive during. */
 	for (;;) {
 		pid_t cpid;
 		cpid = fork();

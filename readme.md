@@ -148,6 +148,18 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- Simple-to-use synchronization primitives, all of which are derived from `struct sig`
 	- User-space support for `futex()`-based synchronization primitives
 		- Unlike linux, allows for arbitrarily complex check-expressions (in the context of an interlocked futex operation)
+- Scheduler
+	- Low-level: Tick-less (i.e. NOT based on `void pit_interrupt() { ++time; yield(); }`), and instead based on a hardware TSC (TimeStampCounter)
+		- Hardware is used to calculate a fixed-length interval counter that represents the time since the associated CPU was started (the frequency of this counter is calibrated during boot, and periodically adjusted)
+			- Can be implemented via APIC+`rdtsc`, the APIC timer alone, or the PIT
+		- Using the TSC, implement a function `tsc_deadline()` that can be used to specify a tsc value after which an interrupt should be fired which can then be used for scheduling
+			- For APIC+`rdtsc`, simply write to the `IA32_TSC_DEADLINE` msr
+			- For pure APIC or PIT, update the timer reload counters to trigger as close to the given deadline as possible. In this case, the interrupt handler then checks: `if (NOW >= CURRENT_DEADLINE) DO_INTR(); else tsc_deadline(CURRENT_DEADLINE);`, thus continously updating APIC/PIT reload values until the actual deadline has expired
+		- The TSC \<\-\> realtime relation is updated/synced through use of periodic RTC/CMOS interrupts
+	- High-level: [CFS](https://en.wikipedia.org/wiki/Completely_Fair_Scheduler) based scheduler
+		- Whenever a thread becomes ready to run, it gets assigned a quantum length equal to `(NOW - TIME_WHEN_THREAD_STARTED_WAITING) / NUM_RUNNING_THREADS`, meaning that threads that spend most of their time waiting (i.e. interactive threads) automatically get a big performance boost
+		- During preemption, the next `tsc_deadline()` is set to `NOW + (NOW - TIME_WHEN_THREAD_STARTED_WAITING) / NUM_RUNNING_THREADS`
+	- Power-saving: When a CPU didn't have anything to do for a while, it will shut itself down, such that it can only be re-activated by being sent another Startup-IPI
 - Physical memory management
 	- Physical memory information and region tracking
 		- Processing of memory map
