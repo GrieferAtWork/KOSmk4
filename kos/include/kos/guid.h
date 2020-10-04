@@ -26,21 +26,22 @@
 #include <hybrid/__byteswap.h>
 
 #include <bits/types.h>
+#include <bits/crt/inttypes.h>
 
-#define __OFFSET_GUID_A    0
-#define __OFFSET_GUID_B    4
-#define __OFFSET_GUID_C    6
-#define __OFFSET_GUID_D    8
-#define __OFFSET_GUID_E    10
-#define __SIZEOF_GUID_T__  16
+#define __OFFSET_GUID_A 0
+#define __OFFSET_GUID_B 4
+#define __OFFSET_GUID_C 6
+#define __OFFSET_GUID_D 8
+#define __OFFSET_GUID_E 10
+#define __SIZEOF_GUID   16
 #ifdef __USE_KOS_KERNEL
-#define OFFSET_GUID_A    __OFFSET_GUID_A
-#define OFFSET_GUID_B    __OFFSET_GUID_B
-#define OFFSET_GUID_C    __OFFSET_GUID_C
-#define OFFSET_GUID_D    __OFFSET_GUID_D
-#define OFFSET_GUID_E    __OFFSET_GUID_E
-#define SIZEOF_GUID      __SIZEOF_GUID_T__
-#endif
+#define OFFSET_GUID_A __OFFSET_GUID_A
+#define OFFSET_GUID_B __OFFSET_GUID_B
+#define OFFSET_GUID_C __OFFSET_GUID_C
+#define OFFSET_GUID_D __OFFSET_GUID_D
+#define OFFSET_GUID_E __OFFSET_GUID_E
+#define SIZEOF_GUID   __SIZEOF_GUID
+#endif /* __USE_KOS_KERNEL */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -100,7 +101,7 @@ typedef union __ATTR_PACKED {
 #endif
 
 /* Printf helpers for GUID printing */
-#define FORMAT_GUID_T         "%.8I32X-%.4I16X-%.4I16X-%.4I16X-%.12I64X"
+#define FORMAT_GUID_T         "%" __PRINP_4 "-%" __PRINP_2 "-%" __PRINP_2 "-%" __PRINP_2 "-%.12" __PRI8_PREFIX "X"
 #define FORMAT_GUID_T_ARGS(x) GUID_A(x), GUID_B(x), GUID_C(x), GUID_D(x), GUID_E(x)
 
 /* Compare `self' against the given, constant GUID */

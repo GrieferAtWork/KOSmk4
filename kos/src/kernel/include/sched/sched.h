@@ -278,8 +278,60 @@ NOTHROW(FCALL sched_intern_yield)(struct cpu *__restrict me,
  * which will automatically account for the TSC deadline and the like. */
 DATDEF ATTR_PERCPU struct task *thiscpu_sched_override;
 
+/* Acquire/release the scheduler override lock for the calling CPU,
+ * thereby effectively seizing control over the calling CPU to the
+ * point where regular scheduling mechanism will not let the calling
+ * thread hand over control to anyone else:
+ *   - task_yield()
+ *   - task_wake()
+ *   - tsc_deadline_passed()
+ *
+ * Note that this is quite similar to disabling preemption, however
+ * many cases exist where disabling preemption is overkill, or maybe
+ * even counter-productive (i.e. certain functionality requires that
+ * preemption remain enabled, such as disk-, user-, or network-I/O)
+ *
+ * Another similar mechanism is to set the TASK_FKEEPCORE flag for
+ * one's own thread, which, while not getting set explicitly by these
+ * functions, is implicitly set whenever a thread is a scheduling
+ * override.
+ *
+ * Note that other CPUs will continue to run normally, meaning that
+ * these functions would only seize complete control of the system
+ * when `cpu_count == 1'
+ *
+ * NOTE: These functions can be called both with and without preemption
+ *       enabled, however `sched_override_yieldto()' may only be called
+ *       when preemption is enabled, additionally leaving this check up
+ *       to the caller by only repeating it as an internal assertion.
+ *
+ * HINT: When a scheduler override is active, the scheduler's preemptive
+ *       interrupt handler will no modify the currently set TSC deadline,
+ *       leaving that facility up for use by the caller!
+ *
+ * WARNING: These function do not operate recursively. Calling...
+ *     ... `sched_override_start()' with `thiscpu_sched_override != NULL' isn't allowed
+ *     ... `sched_override_end()' with `thiscpu_sched_override == NULL' also isn't allowed
+ */
 FUNDEF NOBLOCK void NOTHROW(FCALL sched_override_start)(void);
 FUNDEF NOBLOCK void NOTHROW(FCALL sched_override_end)(void);
+
+/* While the caller is holding a scheduler override, pass over that
+ * privilege to `thread', and continue execution in the context of
+ * that thread.
+ * This function will only return when `thread' switches back to the
+ * caller's thread, or when `thread', or whoever it passes the override
+ * to ends up calling `sched_override_end()'
+ * NOTE: This function must be called with preemption enabled.
+ *       Otherwise, an internal assertion check will fail.
+ * NOTE: When `thread == THIS_TASK', this function behaves as a no-op
+ *       In this case, the function will no assert that preemption is
+ *       enabled when called.
+ * NOTE: The caller must ensure that `thread' has the `TASK_FRUNNING'
+ *       flag set (meaning that `thread' must be apart of the current
+ *       CPU's run-queue). */
+FUNDEF NONNULL((1)) void
+NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread);
 
 
 /* Same as `sched_intern_yield()', but ensure that `caller' doesn't get re-returned.

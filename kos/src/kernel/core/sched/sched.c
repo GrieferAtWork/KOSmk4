@@ -1570,6 +1570,126 @@ cannot_shut_down:
 	PREEMPTION_ENABLE_WAIT();
 }
 
+
+
+
+/* Acquire/release the scheduler override lock for the calling CPU,
+ * thereby effectively seizing control over the calling CPU to the
+ * point where regular scheduling mechanism will not let the calling
+ * thread hand over control to anyone else:
+ *   - task_yield()
+ *   - task_wake()
+ *   - tsc_deadline_passed()
+ *
+ * Note that this is quite similar to disabling preemption, however
+ * many cases exist where disabling preemption is overkill, or maybe
+ * even counter-productive (i.e. certain functionality requires that
+ * preemption remain enabled, such as disk-, user-, or network-I/O)
+ *
+ * Another similar mechanism is to set the TASK_FKEEPCORE flag for
+ * one's own thread, which, while not getting set explicitly by these
+ * functions, is implicitly set whenever a thread is a scheduling
+ * override.
+ *
+ * Note that other CPUs will continue to run normally, meaning that
+ * these functions would only seize complete control of the system
+ * when `cpu_count == 1'
+ *
+ * NOTE: These functions can be called both with and without preemption
+ *       enabled, however `sched_override_yieldto()' may only be called
+ *       when preemption is enabled, additionally leaving this check up
+ *       to the caller by only repeating it as an internal assertion.
+ *
+ * HINT: When a scheduler override is active, the scheduler's preemptive
+ *       interrupt handler will no modify the currently set TSC deadline,
+ *       leaving that facility up for use by the caller!
+ *
+ * WARNING: These function do not operate recursively. Calling...
+ *     ... `sched_override_start()' with `thiscpu_sched_override != NULL' isn't allowed
+ *     ... `sched_override_end()' with `thiscpu_sched_override == NULL' also isn't allowed
+ */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL sched_override_start)(void) {
+	struct task *caller;
+	struct cpu *me;
+	pflag_t was;
+	caller = THIS_TASK;
+	was    = PREEMPTION_PUSHOFF();
+	COMPILER_READ_BARRIER();
+	me = caller->t_cpu;
+	assert(!sched_override);
+	/* Set the calling thread as scheduling override. */
+	sched_override = caller;
+	/* Disable any previously set deadline. */
+	tsc_nodeadline(me);
+	PREEMPTION_POP(was);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL sched_override_end)(void) {
+	struct task *caller, *next;
+	struct cpu *me;
+	tsc_t tsc_now;
+	pflag_t was;
+	caller = THIS_TASK;
+	me     = caller->t_cpu;
+	assert(sched_override == caller);
+	was = PREEMPTION_PUSHOFF();
+	sched_override = NULL;
+	tsc_now        = tsc_get(me);
+	/* Reload the TSC deadline for the calling thread, thus accounting for
+	 * the additional time it spent being an active scheduler override. */
+	next = sched_intern_reload_deadline(me, caller, sched_stoptime(caller),
+	                                    0, tsc_now_to_ktime(me, tsc_now),
+	                                    tsc_now, !PREEMPTION_WASENABLED(was));
+	if (next != caller) {
+		assert(PREEMPTION_WASENABLED(was));
+		/* Directly resume execution in `next' */
+		FORCPU(me, thiscpu_sched_current) = next;
+		sched_assert();
+		/* Switch over to the next thread. */
+		cpu_run_current_and_remember_nopr(caller);
+	}
+	PREEMPTION_POP(was);
+}
+
+/* While the caller is holding a scheduler override, pass over that
+ * privilege to `thread', and continue execution in the context of
+ * that thread.
+ * This function will only return when `thread' switches back to the
+ * caller's thread, or when `thread', or whoever it passes the override
+ * to ends up calling `sched_override_end()'
+ * NOTE: This function must be called with preemption enabled.
+ *       Otherwise, an internal assertion check will fail.
+ * NOTE: When `thread == THIS_TASK', this function behaves as a no-op
+ *       In this case, the function will no assert that preemption is
+ *       enabled when called.
+ * NOTE: The caller must ensure that `thread' has the `TASK_FRUNNING'
+ *       flag set (meaning that `thread' must be apart of the current
+ *       CPU's run-queue). */
+PUBLIC NONNULL((1)) void
+NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread) {
+	struct cpu *me;
+	struct task *caller;
+	caller = THIS_TASK;
+	me     = caller->t_cpu;
+	assert(sched_override == caller);
+	if (thread == caller)
+		return; /* No-op */
+	assert(PREEMPTION_ENABLED());
+	assert(thread->t_cpu == me);
+	assert(thread->t_flags & TASK_FRUNNING);
+	PREEMPTION_DISABLE();
+
+	/* Directly switch over to continue execution on `thread', while
+	 * simultaneously passing over control of the scheduling override. */
+	FORCPU(me, thiscpu_sched_override) = thread;
+	FORCPU(me, thiscpu_sched_current)  = thread;
+	cpu_run_current_and_remember_nopr(caller);
+}
+
+
+
 DECL_END
 
 
