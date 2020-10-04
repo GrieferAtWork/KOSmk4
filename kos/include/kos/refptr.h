@@ -33,7 +33,6 @@
 #include <type_traits>
 
 extern "C++" {
-
 namespace kos {
 
 template<class __T>
@@ -199,10 +198,8 @@ public: /* Constructor / Destructor */
 #endif /* __COMPILER_HAVE_CXX_RVALUE_REFERENCE */
 };
 
-}
-
+} /* namespace kos */
 } /* extern "C++" */
-
 #endif /* !__cplusplus || !__CC__ */
 
 

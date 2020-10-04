@@ -431,15 +431,6 @@ int main_sleep(int argc, char *argv[], char *envp[]) {
 		delay.tv_sec  = 0;
 		delay.tv_nsec = 0;
 		delay.add_microseconds(1000000 - now.tv_usec);
-		/* TODO: Improve nanosleep() to be as precise as possible.
-		 *       The precision error can easily be determined by
-		 *       running this program (`playground sleep'), and
-		 *       looking at the printed `usec:...' value.
-		 *       Currently, it hovers between 0 and 0.05 seconds,
-		 *       which makes a lot of sense since 0.05 = 1/20 = 1/HZ,
-		 *       with the error being produced by the kernel only
-		 *       checking for wake-ups every time a preemptive
-		 *       interrupt is fired. */
 		nanosleep(&delay, NULL);
 	}
 	return 0;

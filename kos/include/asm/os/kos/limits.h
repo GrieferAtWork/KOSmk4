@@ -29,12 +29,8 @@
 /* KOS                                                                  */
 /************************************************************************/
 
-#if 1
-#define __HZ 20 /* Scheduler frequency */
-#else
-#define __HZ 100 /* Scheduler frequency */
-#endif
-
+/*efine __HZ                 N/A         * Scheduler frequency (N/A because KOS's scheduler is TSC-based,
+                                         * so HZ (and a resulting quantum length) can be anything) */
 #define __HOST_NAME_MAX      64         /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
 #define __NGROUPS_MAX        (-1)       /* Max # of supplemental group IDs that may be set (s.a. `setgroups(2)') */
 #define __OPEN_MAX           (-1)       /* Max # of open files handles */
