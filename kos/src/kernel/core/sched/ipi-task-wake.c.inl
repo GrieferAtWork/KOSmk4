@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "ipi.c"
-//#define DEFINE_task_wake
-#define DEFINE_task_wake_as
+#define DEFINE_task_wake
+//#define DEFINE_task_wake_as
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_task_wake) + defined(DEFINE_task_wake_as)) != 1
@@ -69,6 +69,9 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 {
 	pflag_t was;
 	struct cpu *me;
+#ifndef CONFIG_NO_SMP
+	struct cpu *target;
+#endif /* !CONFIG_NO_SMP */
 #ifdef DEFINE_task_wake_as
 	assertf(!PREEMPTION_ENABLED() || (PERTASK_GET(this_task.t_flags) & TASK_FKEEPCORE),
 	        "You must ensure that you're core won't change before calling `task_wake_as()'");
@@ -89,7 +92,9 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 	me = THIS_CPU;
 #endif /* !DEFINE_task_wake_as */
 #ifndef CONFIG_NO_SMP
-	if (thread->t_cpu != me) {
+	/* Read the CPU field _once_ since it might change before the next read. */
+	target = ATOMIC_READ(thread->t_cpu);
+	if (target != me) {
 		/* Use an IPI to wake up the thread! */
 		void *args[CPU_IPI_ARGCOUNT];
 		if (ATOMIC_READ(thread->t_flags) & TASK_FTERMINATED) {
@@ -99,7 +104,7 @@ NOTHROW(FCALL task_wake_as)(struct task *thread, struct task *caller,
 		args[0] = thread;
 		args[1] = (void *)(uintptr_t)flags;
 		IPI_DEBUG("task_wake(%p):ipi\n", thread);
-		while (!cpu_sendipi(thread->t_cpu, &task_wake_ipi, args,
+		while (!cpu_sendipi(target, &task_wake_ipi, args,
 		                    CPU_IPI_FWAKEUP | (flags & TASK_WAKE_FWAITFOR)))
 			task_pause();
 		PREEMPTION_POP(was);

@@ -235,7 +235,7 @@ task_setvm(struct vm *__restrict newvm)
 	 *       user-space. */
 	pflag_t was;
 	REF struct vm *oldvm;
-	struct task *me = THIS_TASK;
+	struct task *caller = THIS_TASK;
 again:
 	was = PREEMPTION_PUSHOFF();
 	if (!sync_trywrite(&change_vm_lock)) {
@@ -243,7 +243,7 @@ again:
 		task_yield();
 		goto again;
 	}
-	oldvm = FORTASK(me, this_vm);
+	oldvm = FORTASK(caller, this_vm);
 	if likely(oldvm != newvm) {
 		if unlikely(!vm_tasklock_trywrite(newvm)) {
 			PREEMPTION_POP(was);
@@ -252,7 +252,7 @@ again:
 			vm_tasklock_endwrite(newvm);
 			goto again;
 		}
-		if (ATOMIC_READ(me->t_vm_tasks.ln_pself) != NULL) {
+		if (ATOMIC_READ(caller->t_vm_tasks.ln_pself) != NULL) {
 			if unlikely(!vm_tasklock_trywrite(oldvm)) {
 				incref(oldvm);
 				PREEMPTION_POP(was);
@@ -264,14 +264,14 @@ again:
 				goto again;
 			}
 			COMPILER_READ_BARRIER();
-			if likely(ATOMIC_READ(me->t_vm_tasks.ln_pself) != NULL)
-				LLIST_REMOVE(me, t_vm_tasks);
+			if likely(ATOMIC_READ(caller->t_vm_tasks.ln_pself) != NULL)
+				LLIST_REMOVE(caller, t_vm_tasks);
 			vm_tasklock_endwrite(oldvm);
 		}
-		LLIST_INSERT(newvm->v_tasks, me, t_vm_tasks);
+		LLIST_INSERT(newvm->v_tasks, caller, t_vm_tasks);
 		vm_tasklock_endwrite(newvm);
-		FORTASK(me, this_vm) = incref(newvm);
-		cpu_setvm_ex(me->t_cpu, newvm);
+		FORTASK(caller, this_vm) = incref(newvm);
+		cpu_setvm_ex(caller->t_cpu, newvm);
 		sync_endwrite(&change_vm_lock);
 		PREEMPTION_POP(was);
 		decref(oldvm);
@@ -289,7 +289,7 @@ task_getvm(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
 	pflag_t was;
 again:
 	was = PREEMPTION_PUSHOFF();
-	if (thread == me || thread->t_cpu == me->t_cpu)
+	if (thread == me || ATOMIC_READ(thread->t_cpu) == me->t_cpu)
 		result = incref(thread->t_vm);
 	else {
 		if (!sync_tryread(&change_vm_lock)) {

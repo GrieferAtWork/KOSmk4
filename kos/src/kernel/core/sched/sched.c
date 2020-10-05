@@ -967,12 +967,13 @@ NOTHROW(FCALL waitfor_ktime_or_interrupt)(struct cpu *__restrict me,
  * >> task_wake(waiting_thread); */
 PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
 	struct task *next;
-	struct task *caller = THIS_TASK;
+	struct task *caller;
 	struct cpu *me;
 	ktime_t now, timeout, quantum_start, priority_boost;
 	tsc_t tsc_now;
+	caller = THIS_TASK;
 	PREEMPTION_DISABLE();
-	me = ATOMIC_READ(caller->t_cpu);
+	me = caller->t_cpu;
 	sched_assert();
 	assert(caller->t_flags & TASK_FRUNNING);
 	/* TODO: Change the task_sleep() API to use `ktime_t' instead of timespec! */
@@ -1326,7 +1327,10 @@ NOTHROW(FCALL task_transfer_thread_to_other_cpu)(struct cpu *__restrict me,
 	assert(thread->t_cpu == me);
 	if unlikely(target == me)
 		return false; /* Must be a different thread. */
-	/* Schedule `thread' as pending on `target' */
+	/* Schedule `thread' as pending on `target'
+	 * NOTE: The order in which we set the RUNNING flag, and change
+	 *       the thread's CPU doesn't matter, but both modifications
+	 *       individually must be atomic! */
 	ATOMIC_OR(thread->t_flags, TASK_FRUNNING);
 	ATOMIC_WRITE(thread->t_cpu, target);
 	sched_intern_addpending(target, thread);

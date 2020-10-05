@@ -87,7 +87,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc)(struct icpustate *__restrict state,
 		return state;
 	}
 	target_cpu = ATOMIC_READ(target->t_cpu);
-	me      = caller->t_cpu;
+	me         = caller->t_cpu;
 	if unlikely(target_cpu != me) {
 		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
 		while (!cpu_sendipi(target_cpu,
@@ -97,7 +97,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc)(struct icpustate *__restrict state,
 		return state;
 	}
 	target->t_state = task_push_asynchronous_rpc(target->t_state,
-	                                                     func, arg);
+	                                             func, arg);
 	if (!(mode & TASK_RPC_FDONTWAKE)) {
 		struct task *next_thread;
 		next_thread = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
@@ -136,7 +136,7 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state,
 		return state;
 	}
 	caller     = THIS_TASK;
-	me      = caller->t_cpu;
+	me         = caller->t_cpu;
 	target_cpu = ATOMIC_READ(target->t_cpu);
 	if unlikely(target_cpu != me) {
 		/* Re-deliver the IPI to yet another CPU (letting it bounce until we get it right) */
@@ -318,8 +318,10 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc)(struct icpustate *__restrict state,
 	uintptr_t target_flags;
 	struct dat_exec_asynchronous_rpc *data;
 	struct cpu *target_cpu;
-	struct task *caller = THIS_TASK;
-	struct cpu *me   = caller->t_cpu;
+	struct task *caller;
+	struct cpu *me;
+	caller     = THIS_TASK;
+	me         = caller->t_cpu;
 	target     = (struct task *)args[0];
 	data       = (struct dat_exec_asynchronous_rpc *)args[1];
 	target_cpu = ATOMIC_READ(target->t_cpu);
@@ -378,8 +380,8 @@ NOTHROW(KCALL task_exec_asynchronous_rpc)(struct task *__restrict target,
 	pflag_t was;
 	struct task *caller = THIS_TASK;
 	struct cpu *me, *target_cpu;
-	was   = PREEMPTION_PUSHOFF();
-	me = caller->t_cpu;
+	was = PREEMPTION_PUSHOFF();
+	me  = caller->t_cpu;
 again:
 	target_cpu = ATOMIC_READ(target->t_cpu);
 	if (me != target_cpu) {
@@ -465,8 +467,10 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc_v)(struct icpustate *__restrict state,
 	uintptr_t target_flags;
 	struct dat_exec_asynchronous_rpc_v *data;
 	struct cpu *target_cpu;
-	struct task *caller = THIS_TASK;
-	struct cpu *me   = caller->t_cpu;
+	struct task *caller;
+	struct cpu *me;
+	caller     = THIS_TASK;
+	me         = caller->t_cpu;
 	target     = (struct task *)args[0];
 	data       = (struct dat_exec_asynchronous_rpc_v *)args[1];
 	target_cpu = ATOMIC_READ(target->t_cpu);
@@ -529,10 +533,9 @@ NOTHROW(KCALL task_exec_asynchronous_rpc_v)(struct task *__restrict target,
                                             uintptr_t mode) {
 	pflag_t was;
 #ifndef CONFIG_NO_SMP
-	struct cpu *me;
-	struct cpu *target_cpu;
-	was   = PREEMPTION_PUSHOFF();
-	me = THIS_CPU;
+	struct cpu *me, *target_cpu;
+	was = PREEMPTION_PUSHOFF();
+	me  = THIS_CPU;
 again:
 	target_cpu = ATOMIC_READ(target->t_cpu);
 	if (me != target_cpu) {

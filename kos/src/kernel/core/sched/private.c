@@ -60,12 +60,15 @@ NOTHROW(FCALL cpf_ipi)(struct icpustate *__restrict state,
 	struct cpf_rtdata *rt;
 	cpu_private_function_t func;
 	struct task *thread;
+	struct cpu *target_cpu;
 	rt     = (struct cpf_rtdata *)args[CPF_IPI_RTDATA];
 	func   = (cpu_private_function_t)args[CPF_IPI_FUNC];
 	thread = (struct task *)args[CPF_IPI_THREAD];
 	assert(rt->cpf_refcnt == 2);
-	if unlikely(thread->t_cpu != THIS_CPU) {
-		while (!cpu_sendipi(thread->t_cpu, &cpf_ipi, args, CPU_IPI_FWAKEUP))
+	/* Read the CPU field _once_ since it might change before the next read. */
+	target_cpu = ATOMIC_READ(thread->t_cpu);
+	if unlikely(target_cpu != THIS_CPU) {
+		while (!cpu_sendipi(target_cpu, &cpf_ipi, args, CPU_IPI_FWAKEUP))
 			task_pause();
 	} else {
 		/* Invoke the accessor function */

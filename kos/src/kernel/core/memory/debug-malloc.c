@@ -1292,10 +1292,11 @@ NOTHROW(KCALL mall_search_thread)(void *UNUSED(arg),
 		/* NOTE: Must check if mall_other_cpu_states[i] != NULL, in
 		 *       case the CPU didn't get suspended because it is (and
 		 *       still should be) in deep sleep. */
-		if (thread == FORCPU(thread->t_cpu, thiscpu_sched_current) &&
-		    mall_other_cpu_states[thread->t_cpu->c_id] != NULL) {
+		struct cpu *c = thread->t_cpu;
+		if (thread == FORCPU(c, thiscpu_sched_current) &&
+		    mall_other_cpu_states[c->c_id] != NULL) {
 			/* Special case for the thread that got stopped on the foreign CPU */
-			mall_search_task_icpustate(thread, mall_other_cpu_states[thread->t_cpu->c_id]);
+			mall_search_task_icpustate(thread, mall_other_cpu_states[c->c_id]);
 		} else
 #endif /* !CONFIG_NO_SMP */
 		{
@@ -1478,23 +1479,25 @@ PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
                                         void *args[CPU_IPI_ARGCOUNT]) {
 	uintptr_t old_flags;
-	struct task *me = THIS_TASK;
+	struct cpu *me;
+	struct task *caller = THIS_TASK;
 	struct task *old_override;
 	struct task_connections new_cons;
 	assert(!PREEMPTION_ENABLED());
 	(void)args;
+	me = caller->t_cpu;
 
 	/* Setup a preemption override for our own CPU */
 	COMPILER_BARRIER();
-	old_flags    = ATOMIC_FETCHOR(me->t_flags, TASK_FKEEPCORE);
-	old_override = FORCPU(me->t_cpu, thiscpu_sched_override);
-	FORCPU(me->t_cpu, thiscpu_sched_override) = me;
+	old_flags    = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
+	old_override = FORCPU(me, thiscpu_sched_override);
+	FORCPU(me, thiscpu_sched_override) = caller;
 	COMPILER_BARRIER();
 
 	/* Store the interrupted state for our CPU, allowing the mall
 	 * scanner to know our latest register state for the purpose
 	 * of scanning it. */
-	mall_other_cpu_states[me->t_cpu->c_id] = state;
+	mall_other_cpu_states[me->c_id] = state;
 	COMPILER_BARRIER();
 
 	/* Report that we can now be considered to be suspended. */
@@ -1530,9 +1533,9 @@ NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
 
 	/* Restore the old preemption behavior. */
 	COMPILER_BARRIER();
-	FORCPU(me->t_cpu, thiscpu_sched_override) = old_override;
+	FORCPU(me, thiscpu_sched_override) = old_override;
 	if (!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
+		ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
 	COMPILER_BARRIER();
 
 	return state;
@@ -1605,13 +1608,13 @@ again:
 	{
 		uintptr_t old_flags;
 		pflag_t was;
-		struct task *me = THIS_TASK;
+		struct task *caller = THIS_TASK;
 		struct task *old_override;
 		/* Setup a preemption override for our own CPU */
 		was = PREEMPTION_PUSHOFF();
-		old_flags    = ATOMIC_FETCHOR(me->t_flags, TASK_FKEEPCORE);
-		old_override = FORCPU(me->t_cpu, thiscpu_sched_override);
-		FORCPU(me->t_cpu, thiscpu_sched_override) = me;
+		old_flags    = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
+		old_override = FORCPU(caller->t_cpu, thiscpu_sched_override);
+		FORCPU(caller->t_cpu, thiscpu_sched_override) = caller;
 		PREEMPTION_POP(was);
 
 #ifndef CONFIG_NO_SMP
@@ -1619,9 +1622,9 @@ again:
 		 * execution until we're done performing our scan. */
 		if (!mall_enter_singlecore_mode()) {
 			was = PREEMPTION_PUSHOFF();
-			FORCPU(me->t_cpu, thiscpu_sched_override) = old_override;
+			FORCPU(caller->t_cpu, thiscpu_sched_override) = old_override;
 			if (!(old_flags & TASK_FKEEPCORE))
-				ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
+				ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
 			PREEMPTION_POP(was);
 			vm_kernel_treelock_endwrite();
 			mall_release();
@@ -1655,9 +1658,9 @@ again:
 
 		/* Restore the old preemption behavior. */
 		was = PREEMPTION_PUSHOFF();
-		FORCPU(me->t_cpu, thiscpu_sched_override) = old_override;
+		FORCPU(caller->t_cpu, thiscpu_sched_override) = old_override;
 		if (!(old_flags & TASK_FKEEPCORE))
-			ATOMIC_AND(me->t_flags, ~TASK_FKEEPCORE);
+			ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
 		PREEMPTION_POP(was);
 	}
 	return result;
