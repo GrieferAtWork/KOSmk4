@@ -19,7 +19,6 @@
  */
 #ifndef GUARD_KERNEL_SRC_SCHED_SUPER_OVERRIDE_C
 #define GUARD_KERNEL_SRC_SCHED_SUPER_OVERRIDE_C 1
-#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 

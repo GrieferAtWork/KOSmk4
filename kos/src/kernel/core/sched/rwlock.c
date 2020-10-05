@@ -27,6 +27,7 @@
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
+#include <kernel/selftest.h>
 #include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/pertask.h>
@@ -1651,9 +1652,8 @@ NOTHROW(FCALL rwlock_canwrite)(struct rwlock const *__restrict self) {
 
 
 
-#ifdef CONFIG_TESTS
-TEST(rwlock_recursion)
-{
+#ifdef DEFINE_TEST
+DEFINE_TEST(rwlock_recursion) {
 	struct rwlock test = RWLOCK_INIT;
 #define ASSERT_LOCKS(rlocks, wlocks)             \
 	assertf(rwlock_reading_r(&test) == rlocks && \
@@ -1703,7 +1703,7 @@ TEST(rwlock_recursion)
 
 #undef ASSERT_LOCKS
 }
-#endif /* CONFIG_TESTS */
+#endif /* DEFINE_TEST */
 
 
 DECL_END

@@ -45,7 +45,6 @@
 
 DECL_BEGIN
 
-
 #if 0
 #define IPI_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
 #else

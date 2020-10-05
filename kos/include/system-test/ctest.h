@@ -19,6 +19,13 @@
  */
 #ifndef _SYSTEM_TEST_CTEST_H
 #define _SYSTEM_TEST_CTEST_H 1
+
+#include <__stdinc.h>
+
+#if defined(__KOS__) && defined(__KERNEL__)
+#include <kernel/selftest.h>
+#else /* __KOS__ && __KERNEL__ */
+
 #undef NDEBUG /* We can't have assertions be disabled! */
 
 #include "api.h"
@@ -62,4 +69,5 @@ __DECL_END
 #endif /* __CC__ */
 
 
+#endif /* !__KOS__ || !__KERNEL__ */
 #endif /* !_SYSTEM_TEST_CTEST_H */

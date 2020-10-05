@@ -23,12 +23,13 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <sched/signal.h>
 
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
+#include <kernel/selftest.h>
 #include <sched/rpc.h>
+#include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -803,6 +804,39 @@ NOTHROW(FCALL sig_altsendmany)(struct sig *self,
 	}
 	return result;
 }
+
+#ifdef DEFINE_TEST
+DEFINE_TEST(recursive_signals) {
+	struct task_connections cons;
+	struct sig s = SIG_INIT;
+	task_disconnectall();
+	task_connect(&s);
+	task_pushconnections(&cons);
+	task_connect(&s);
+
+	assert(task_isconnected());
+	assert(task_isconnected(&s));
+	assert(task_trywait() == NULL);
+
+	sig_broadcast(&s);
+
+	/* Simulate what kfree() for the signal would do, thus
+	 * ensuring that the the signal can still be received,
+	 * even after it was destroyed. */
+	memset(&s, 0xcc, sizeof(s));
+
+	assert(task_isconnected());
+	assert(task_isconnected(&s));
+
+	assert(task_trywait() == &s);
+	assert(task_trywait() == NULL);
+
+	assert(task_popconnections() == &cons);
+
+	assert(task_trywait() == &s);
+	assert(task_trywait() == NULL);
+}
+#endif /* DEFINE_TEST */
 
 
 DECL_END

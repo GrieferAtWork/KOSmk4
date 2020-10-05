@@ -370,6 +370,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Move this mount() call into a different file. */
 	path_mount(THIS_VFS, "fat", boot_partition, SUPERBLOCK_FNORMAL, NULL, NULL, true);
 
+	/* Run self-tests. (if enabled) */
+#ifdef CONFIG_SELFTEST
+	kernel_initialize_selftest();
+#endif /* CONFIG_SELFTEST */
+
 	mall_dump_leaks(GFP_NORMAL);
 
 #if 0

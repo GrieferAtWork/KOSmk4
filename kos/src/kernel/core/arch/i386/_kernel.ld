@@ -26,12 +26,13 @@
 #include <kernel/compiler.h>
 
 #include <kernel/paging.h>
+#include <kernel/selftest.h>
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h>
 #include <kernel/x86/multiboot.h>
 #include <kernel/x86/syscall-tables.h>
-#include <sched/x86/tss.h>
 #include <sched/task.h> /* CONFIG_HAVE_KERNEL_STACK_GUARD */
+#include <sched/x86/tss.h>
 
 #include <hybrid/align.h>
 
@@ -514,6 +515,12 @@ SECTIONS {
 		PROVIDE_HIDDEN(__x86_alternatives_start = ABSOLUTE(.));
 		KEEP(*(.alternatives))
 		PROVIDE_HIDDEN(__x86_alternatives_end = ABSOLUTE(.));
+
+#ifdef CONFIG_SELFTEST
+		PROVIDE_HIDDEN(__kernel_selftest_start = ABSOLUTE(.));
+		KEEP(*(.rodata.free.callback.selftest))
+		PROVIDE_HIDDEN(__kernel_selftest_end = ABSOLUTE(.));
+#endif /* CONFIG_SELFTEST */
 
 		*(.rodata.free)
 		*(.rodata.str.free)

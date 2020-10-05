@@ -100,8 +100,15 @@ function start(
 	}
 	local qemu_arguments = [];
 	qemu_arguments.extend({ "-serial", "stdio" });
-	if (opt.getBool(options, opt.HOSTED, true))
+	if (opt.getBool(options, opt.HOSTED, true)) {
+		/* NOTE: Qemu will refuse to guest requests for a reboot when
+		 *       -no-reboot is given. However, reboot-on-tripple-fault
+		 *       will also work when -no-reboot isn't given, which
+		 *       probably isn't something you'd want...
+		 * NOTE: When GDB is enabled, you'll get a SIGQUIT trap when
+		 *       the guest tries to reboot, and -no-reboot is set. */
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
+	}
 	local gdb_mode = options.get(opt.GDB);
 	local boot_drivers = List(DRIVERS);
 	if (gdb_mode !is none) {

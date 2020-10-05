@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/boot.h>
+#include <kernel/selftest.h> /* CONFIG_SELFTEST */
 #include <kernel/types.h>
 
 DECL_BEGIN
@@ -66,6 +67,10 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_null_devices)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_ctty_device)(void);
 
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_bootpid)(void);
+
+#ifdef CONFIG_SELFTEST
+INTDEF FREE void NOTHROW(KCALL kernel_initialize_selftest)(void);
+#endif /* CONFIG_SELFTEST */
 
 /* Update the given cpu state to start executing /bin/init, or whatever
  * was passed as argument in a `init=...' kernel commandline option. */
