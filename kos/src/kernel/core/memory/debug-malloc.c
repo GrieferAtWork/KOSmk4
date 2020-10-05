@@ -1159,40 +1159,6 @@ NOTHROW(KCALL mall_search_task_scpustate)(struct task *__restrict thread,
 	}
 }
 
-#ifndef CONFIG_NO_SMP
-PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL mall_search_task_icpustate)(struct task *__restrict thread,
-                                          struct icpustate *__restrict context) {
-	/* Search the registers of this thread. */
-	if (irregs_isuser(&context->ics_irregs)) {
-		/* Thread is currently in user-space (meaning its kernel stack is unused) */
-	} else {
-		unsigned int i;
-		void *sp, *stack_min, *stack_end;
-		/* Search general-purpose registers. */
-		for (i = 0; i < (sizeof(struct gpregs) / sizeof(void *)); ++i)
-			mall_reachable_pointer(((void **)&context->ics_gpregs)[i]);
-		stack_min = vm_node_getmin(&FORTASK(thread, this_kernel_stacknode));
-		stack_end = vm_node_getend(&FORTASK(thread, this_kernel_stacknode));
-#ifdef icpustate_getkernelpsp
-		sp = (void *)icpustate_getkernelpsp(context);
-#else /* icpustate_getkernelpsp */
-		sp = (void *)icpustate_getsp(context);
-#endif /* !icpustate_getkernelpsp */
-		if (sp > stack_min && sp <= stack_end) {
-			/* Search the used portion of the kernel stack. */
-			mall_reachable_data((byte_t *)sp,
-			                    (size_t)((byte_t *)stack_end - (byte_t *)sp));
-		} else {
-			/* Stack pointer is out-of-bounds (no idea what this is
-			 * about, but let's just assume the entire stack is allocated) */
-			mall_reachable_data((byte_t *)stack_min,
-			                    (size_t)((byte_t *)stack_end - (byte_t *)stack_min));
-		}
-	}
-}
-#endif /* !CONFIG_NO_SMP */
-
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL mall_search_this_task)(void) {
 	unsigned int i;
@@ -1266,10 +1232,6 @@ INTDEF byte_t __debug_malloc_tracked_start[];
 INTDEF byte_t __debug_malloc_tracked_end[];
 INTDEF byte_t __debug_malloc_tracked_size[];
 
-#ifndef CONFIG_NO_SMP
-PRIVATE ATTR_COLDBSS struct icpustate *mall_other_cpu_states[CONFIG_MAX_CPU_COUNT];
-#endif /* !CONFIG_NO_SMP */
-
 INTDEF atomic_ref<struct driver_state> current_driver_state ASMNAME("current_driver_state");
 
 
@@ -1287,22 +1249,8 @@ PRIVATE ssize_t
 NOTHROW(KCALL mall_search_thread)(void *UNUSED(arg),
                                   struct task *thread,
                                   struct taskpid *UNUSED(pid)) {
-	if (thread && thread != THIS_TASK) {
-#ifndef CONFIG_NO_SMP
-		/* NOTE: Must check if mall_other_cpu_states[i] != NULL, in
-		 *       case the CPU didn't get suspended because it is (and
-		 *       still should be) in deep sleep. */
-		struct cpu *c = thread->t_cpu;
-		if (thread == FORCPU(c, thiscpu_sched_current) &&
-		    mall_other_cpu_states[c->c_id] != NULL) {
-			/* Special case for the thread that got stopped on the foreign CPU */
-			mall_search_task_icpustate(thread, mall_other_cpu_states[c->c_id]);
-		} else
-#endif /* !CONFIG_NO_SMP */
-		{
-			mall_search_task_scpustate(thread, thread->t_state);
-		}
-	}
+	if (thread && thread != THIS_TASK)
+		mall_search_task_scpustate(thread, thread->t_state);
 	return 0;
 }
 
@@ -1470,119 +1418,6 @@ NOTHROW(KCALL mall_print_leaks_impl)(void) {
 }
 
 
-#ifndef CONFIG_NO_SMP
-PRIVATE ATTR_COLDBSS WEAK unsigned int mall_suspended_cpu_count = 0;
-PRIVATE ATTR_COLDBSS WEAK struct task *mall_suspended_locked = NULL;
-PRIVATE ATTR_COLDBSS struct sig mall_suspended_unlock = SIG_INIT;
-
-PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL mall_singlecore_mode_ipi)(struct icpustate *__restrict state,
-                                        void *args[CPU_IPI_ARGCOUNT]) {
-	uintptr_t old_flags;
-	struct cpu *me;
-	struct task *caller = THIS_TASK;
-	struct task *old_override;
-	struct task_connections new_cons;
-	assert(!PREEMPTION_ENABLED());
-	(void)args;
-	me = caller->t_cpu;
-
-	/* Setup a preemption override for our own CPU */
-	COMPILER_BARRIER();
-	old_flags    = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
-	old_override = FORCPU(me, thiscpu_sched_override);
-	FORCPU(me, thiscpu_sched_override) = caller;
-	COMPILER_BARRIER();
-
-	/* Store the interrupted state for our CPU, allowing the mall
-	 * scanner to know our latest register state for the purpose
-	 * of scanning it. */
-	mall_other_cpu_states[me->c_id] = state;
-	COMPILER_BARRIER();
-
-	/* Report that we can now be considered to be suspended. */
-	ATOMIC_INC(mall_suspended_cpu_count);
-
-	/* Wait for the unlock to be signaled. */
-	task_pushconnections(&new_cons);
-	PREEMPTION_ENABLE();
-
-	/* Make sure that other IPIs also get handled!
-	 * This is important because HW-IPIs may only be send when there aren't
-	 * any pending SW-IPIs, meaning that we wouldn't get the memo if we were
-	 * to wait for other CPUs while there are still more pending SW-IPIs! */
-	cpu_ipi_service_nopr();
-
-	while (ATOMIC_READ(mall_suspended_locked) != NULL) {
-		/* Wait for `mall_suspended_unlock' */
-		task_connect_for_poll(&mall_suspended_unlock);
-		if unlikely(ATOMIC_READ(mall_suspended_locked) == NULL) {
-			task_disconnectall();
-			break;
-		}
-		/* Wait for the other thread, but don't service RPCs,
-		 * or allow exceptions to be thrown. */
-		if (!task_waitfor_norpc_nx())
-			task_disconnectall();
-	}
-	PREEMPTION_DISABLE();
-	task_popconnections();
-
-	/* Report that we've resumed execution. */
-	ATOMIC_DEC(mall_suspended_cpu_count);
-
-	/* Restore the old preemption behavior. */
-	COMPILER_BARRIER();
-	FORCPU(me, thiscpu_sched_override) = old_override;
-	if (!(old_flags & TASK_FKEEPCORE))
-		ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
-	COMPILER_BARRIER();
-
-	return state;
-}
-
-
-PRIVATE NOBLOCK ATTR_COLDTEXT bool
-NOTHROW(KCALL mall_enter_singlecore_mode)(void) {
-	unsigned int num_suspended;
-	struct task *old_thread;
-	old_thread = ATOMIC_CMPXCH_VAL(mall_suspended_locked,
-	                               NULL, THIS_TASK);
-	if unlikely(old_thread != NULL) {
-		assertf(old_thread != THIS_TASK,
-		        "Recursive call to `mall_enter_singlecore_mode()' on %p",
-		        old_thread);
-		return false; /* Some other thread already initiated the suspend. */
-	}
-	memset(mall_other_cpu_states, 0, sizeof(mall_other_cpu_states));
-	assert(mall_suspended_cpu_count == 0);
-	{
-		void *args[CPU_IPI_ARGCOUNT];
-		/* Atomically send IPIs to all CPUs that aren't in deep sleep (excluding our own) */
-		num_suspended = cpu_broadcastipi_notthis(&mall_singlecore_mode_ipi,
-		                                         args, CPU_IPI_FWAITFOR);
-	}
-	/* Wait until all other CPUs have checked in and reported having become suspended. */
-	while (ATOMIC_READ(mall_suspended_cpu_count) < num_suspended)
-		task_pause();
-	return true;
-}
-
-PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL mall_leave_singlecore_mode)(void) {
-	/* Unlock singlecore mode */
-	ATOMIC_WRITE(mall_suspended_locked, NULL);
-	/* Wake up all suspended CPUs */
-	sig_broadcast(&mall_suspended_unlock);
-	/* Wait for CPUs to resume */
-	while (ATOMIC_READ(mall_suspended_cpu_count) != 0)
-		task_pause();
-}
-
-#endif /* !CONFIG_NO_SMP */
-
-
-
 /* Locks that must be held when searching for leaks:
  *  - `mall_lock'         (for reading)
  *  - `vm_kernel.v_treelock'
@@ -1605,64 +1440,37 @@ again:
 		}
 	}
 
-	{
-		uintptr_t old_flags;
-		pflag_t was;
-		struct task *caller = THIS_TASK;
-		struct task *old_override;
-		/* Setup a preemption override for our own CPU */
-		was = PREEMPTION_PUSHOFF();
-		old_flags    = ATOMIC_FETCHOR(caller->t_flags, TASK_FKEEPCORE);
-		old_override = FORCPU(caller->t_cpu, thiscpu_sched_override);
-		FORCPU(caller->t_cpu, thiscpu_sched_override) = caller;
-		PREEMPTION_POP(was);
-
-#ifndef CONFIG_NO_SMP
-		/* Send an IPI to all other CPUs, asking them to suspend
-		 * execution until we're done performing our scan. */
-		if (!mall_enter_singlecore_mode()) {
-			was = PREEMPTION_PUSHOFF();
-			FORCPU(caller->t_cpu, thiscpu_sched_override) = old_override;
-			if (!(old_flags & TASK_FKEEPCORE))
-				ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
-			PREEMPTION_POP(was);
-			vm_kernel_treelock_endwrite();
-			mall_release();
-			task_pause();
-			goto again;
-		}
-#endif /* !CONFIG_NO_SMP */
+	/* Acquire a scheduler super-override, thus ensuring that we're
+	 * the only thread running anywhere on the entire system. */
+	if (!sched_super_override_trystart()) {
 		vm_kernel_treelock_endwrite();
 		mall_release();
-		/* At this point we've got all the locks we need! */
+		task_pause();
+		goto again;
+	}
 
-		++mall_leak_version;
-		if unlikely(mall_leak_version == 0)
-			mall_leak_version = 1;
-		/* Search for leaks. */
-		mall_search_leaks_impl();
-		/* Print all found leaks. */
-		result = mall_print_leaks_impl();
+	vm_kernel_treelock_endwrite();
+	mall_release();
+	/* At this point we've got all the locks we need! */
+
+	++mall_leak_version;
+	if unlikely(mall_leak_version == 0)
+		mall_leak_version = 1;
+	/* Search for leaks. */
+	mall_search_leaks_impl();
+	/* Print all found leaks. */
+	result = mall_print_leaks_impl();
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-		/* Clear the is-reachable bits from all of
-		 * the different slabs that could be reached. */
-		slab_reset_reach();
+	/* Clear the is-reachable bits from all of
+	 * the different slabs that could be reached. */
+	slab_reset_reach();
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
+	/* Release the scheduler super-override, allowing normal
+	 * system execution to resume. */
+	sched_super_override_end();
 
-#ifndef CONFIG_NO_SMP
-		/* Allow other CPUs to resume execution. */
-		mall_leave_singlecore_mode();
-#endif /* !CONFIG_NO_SMP */
-
-		/* Restore the old preemption behavior. */
-		was = PREEMPTION_PUSHOFF();
-		FORCPU(caller->t_cpu, thiscpu_sched_override) = old_override;
-		if (!(old_flags & TASK_FKEEPCORE))
-			ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
-		PREEMPTION_POP(was);
-	}
 	return result;
 }
 

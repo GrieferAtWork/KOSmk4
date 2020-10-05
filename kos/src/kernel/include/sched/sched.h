@@ -250,7 +250,7 @@ FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct task 
 NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
                                       struct task *__restrict caller,
                                       struct task *__restrict thread,
-                                      bool high_priority);
+                                      __BOOL high_priority);
 
 /* Add a new (running) thread to current CPU.
  * @return: * :  The new thread with which to continue execution. */
@@ -258,7 +258,7 @@ FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct task 
 NOTHROW(FCALL sched_intern_localadd)(struct cpu *__restrict me,
                                      struct task *__restrict caller,
                                      /*inherit*/ REF struct task *__restrict thread,
-                                     bool high_priority);
+                                     __BOOL high_priority);
 
 /* Yield execution to some other thread, returning the switch to which to switch.
  * If it is impossible to yield to anyone, simply re-return `caller'. */
@@ -321,8 +321,8 @@ DATDEF ATTR_PERCPU struct task *thiscpu_sched_override;
  * WARNING: These function do not operate recursively. Calling...
  *     ... `sched_override_start()' with `thiscpu_sched_override != NULL' isn't allowed
  *     ... `sched_override_end()' with `thiscpu_sched_override == NULL' also isn't allowed
- */
-FUNDEF NOBLOCK void NOTHROW(FCALL sched_override_start)(void);
+ * @return: * : The CPU that the calling thread managed to seize (same as `THIS_CPU') */
+FUNDEF NOBLOCK ATTR_RETNONNULL struct cpu *NOTHROW(FCALL sched_override_start)(void);
 FUNDEF NOBLOCK void NOTHROW(FCALL sched_override_end)(void);
 
 /* While the caller is holding a scheduler override, pass over that
@@ -341,6 +341,82 @@ FUNDEF NOBLOCK void NOTHROW(FCALL sched_override_end)(void);
  *       CPU's run-queue). */
 FUNDEF NONNULL((1)) void
 NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread);
+
+/* Start/End a scheduler override super-lock, which behaves similar to regular
+ * scheduler overrides, but will simultaneously cause all other CPUs to also
+ * suspend execution, such that the caller will end up as the only running
+ * thread on the entire system.
+ *
+ * Note that in order to do something like this, preemption must be enabled,
+ * since other CPUs can only receive super-override-suspend request when they
+ * have preemption enabled, meaning that if 2 CPUs were to call this function
+ * at the same time, one of them would have to wait for the other's suspend
+ * IPI, which in turn requires preemption to be enabled.
+ *
+ * So as a result, a function like this one can only be implemented safely
+ * by forcing the caller to have preemption enabled before calling it.
+ *
+ * Also note that other exceptions may also be thrown by this function, since
+ * it also services synchronous RPCs for the calling thread, meaning that it
+ * behaves as a cancellation point.
+ *
+ * NOTES:
+ *   - This function also sets the calling thread as a scheduler override for
+ *     their current CPU through use of `sched_override_start()', meaning that
+ *     the caller can pass control over the a super override to another thread
+ *     by using `sched_override_yieldto()', in which case that other thread
+ *     must either switch to yet another thread via `sched_override_yieldto()',
+ *     or has to call `sched_super_override_end()' in order to end the super
+ *     override.
+ *   - IPIs and device interrupts continue to function normally when a super
+ *     override is held, and will be executed in the context of whatever thread
+ *     was suspended when the super-override request was made.
+ *   - For simplicity sake, you don't have to worry about CPUs that weren't online
+ *     at the time a call to `sched_super_override_start()' was made, since all
+ *     CPUs are forced to come online by this function (with the suspended threads
+ *     also setting their TASK_FKEEPCORE flags, thus preventing their respective
+ *     CPUs from being shut down until the super-override lock is release), meaning
+ *     that no race exists where a CPU may be brought online while a super-override
+ *     lock is in place.
+ *   - The super-override lock is mainly meant for debugging purposes, and may be
+ *     used to implement facilities such as `mall_dump_leaks()', or the GDB driver.
+ *     Note that the builtin debugger uses its own, separate mechanism in order to
+ *     deal with more corner-cases.
+ *   - The scheduling of other CPUs can be directly altered while a super-override
+ *     is active, such that the caller may view and alter the `t_state' of any thread
+ *     of any other CPU (including `thiscpu_sched_current', which normally wouldn't
+ *     be allowed), as well as change `thiscpu_sched_current' itself, which will
+ *     cause the other CPU to resume execution in the context of that other thread
+ *     once the super-override CPU calls `sched_super_override_end()'
+ *   - Only the CPU that originally called `sched_super_override_start()' may eventually
+ *     call `sched_super_override_end()' to release the super override lock. In other
+ *     words: You can't send an IPI to have another CPU release the lock for you!
+ *   - When acquiring a super-lock, if the caller wasn't already the scheduling
+ *     override for this current CPU, they will automatically become that override.
+ *
+ * WARNING: These functions aren't recursive. Calling `sched_super_override_start'
+ *          when a super override is already active results in kernel panic, and
+ *          calling `sched_super_override_end' when no override is active also
+ *          results in panic.
+ *
+ * @param: release_sched_override: When non-zero, also call `sched_override_end()'
+ *                                 Note that `sched_override_start()' is called
+ *                                 unconditionally by `sched_super_override_start()',
+ *                                 unless `thiscpu_sched_override' was already non-NULL
+ *                                 before `sched_super_override_start()' was called. */
+FUNDEF NOCONNECT void FCALL sched_super_override_start(void) THROWS(E_WOULDBLOCK, ...);
+FUNDEF NOBLOCK void NOTHROW(FCALL sched_super_override_end)(__BOOL release_sched_override DFL(1));
+
+/* Same as `sched_super_override_start()', but fail and return
+ * `false' if the lock can't be acquired at the moment. */
+FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(FCALL sched_super_override_trystart)(void);
+
+/* Check if a super override is active. As far as data races go, this function will
+ * only ever return `true' after `sched_super_override_start()' has returned, but is
+ * not restricted to only returning `true' for the thread holding the super-override
+ * system lock, meaning that it can also be used from within IPIs send to other CPUs
+ * where a completely different thread is the one who engaged the super-override. */
+FUNDEF NOBLOCK ATTR_PURE __BOOL NOTHROW(FCALL sched_super_override_active)(void);
 
 #endif /* __CC__ */
 

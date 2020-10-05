@@ -42,9 +42,11 @@
 #ifdef __x86_64__
 #define Ldo_yield_to_thread_Pax_cpu_Pbx Ldo_yield_to_thread_rax_cpu_rbx
 #define x86_load_thread_Pax_cpu_Pbx     x86_load_thread_rax_cpu_rbx
+#define libcpu_apply_scpustate_Psp      libcpu_apply_scpustate_rsp
 #else /* __x86_64__ */
 #define Ldo_yield_to_thread_Pax_cpu_Pbx Ldo_yield_to_thread_eax_cpu_ebx
 #define x86_load_thread_Pax_cpu_Pbx     x86_load_thread_eax_cpu_ebx
+#define libcpu_apply_scpustate_Psp      libcpu_apply_scpustate_esp
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
@@ -400,5 +402,98 @@ PUBLIC_FUNCTION(cpu_run_current_nopr)
 END(cpu_run_current_nopr)
 
 
+
+
+#ifndef CONFIG_NO_SMP
+.section .text.cold
+/* >> INTDEF NOPREEMPT NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
+ * >> NOTHROW(FCALL arch_sched_super_override_ipi)(struct icpustate *__restrict state,
+ * >>                                              void *args[CPU_IPI_ARGCOUNT]);  */
+INTERN_FUNCTION(arch_sched_super_override_ipi)
+	.cfi_startproc
+	.cfi_signal_frame
+	.cfi_def_cfa %R_fcall0P, OFFSET_ICPUSTATE_IRREGS
+#ifdef __x86_64__
+	ASM_CFI_REL_OFFSET_RESTORE_ICPUSTATE(0)
+#else /* __x86_64__ */
+	.cfi_restore_iret_eip
+	.cfi_restore_iret_cs
+	.cfi_restore_iret_eflags
+	.cfi_restore_iret_esp
+	.cfi_restore_iret_ss
+	.cfi_restore_iret_es_or_offset (OFFSET_ICPUSTATE_ES - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_ds_or_offset (OFFSET_ICPUSTATE_DS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_fs_or_offset (OFFSET_ICPUSTATE_FS - OFFSET_ICPUSTATE_IRREGS)
+	.cfi_restore_iret_gs
+	.cfi_rel_offset %edi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI)
+	.cfi_rel_offset %esi, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI)
+	.cfi_rel_offset %ebp, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBP)
+	.cfi_rel_offset %ebx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EBX)
+	.cfi_rel_offset %edx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDX)
+	.cfi_rel_offset %ecx, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ECX)
+	.cfi_rel_offset %eax, (OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EAX)
+#endif /* !__x86_64__ */
+	movP   %R_fcall0P, %Psp /* Return register state. (as an `icpustate') */
+	.cfi_def_cfa_register %Psp
+	/* Convert the caller's `icpustate' register state into a `scpustate' */
+#ifdef __x86_64__
+	ASM_PUSH_SGBASE_CFI_R
+	ASM_PUSH_SGREGS_CFI_R(%rax)
+#else /* __x86_64__ */
+	popal_cfi_r
+	pushl_cfi_r %gs
+	pushal_cfi_r
+#endif /* !__x86_64__ */
+
+	/* Check if we're already the scheduler override for our CPU. */
+	xorb   %bl, %bl
+	EXTERN(this_cpu)
+	movP   %segtls:this_cpu, %Pax
+	EXTERN(thiscpu_sched_override)
+	cmpP   $(0), thiscpu_sched_override(%Pax)
+	jne    1f
+	EXTERN(sched_override_start)
+	call   sched_override_start
+	incb   %bl /* %bl = 1 */
+1:	movP   %Pax, %Pbx
+	/* %Pbx = struct cpu *THIS_CPU;
+	 * %Psp = struct icpustate *state;
+	 * %Pbp = bool did_become_sched_override; */
+	
+	/* Save the current register state. */
+	EXTERN(this_sstate)
+	movP   %Psp, %segtls:this_sstate
+
+	/* Invoke the high-level super-override IPI function. */
+	EXTERN(sched_super_override_ipi)
+	call   sched_super_override_ipi
+
+	/* Release our scheduler override, if we acquired it earlier. */
+	testb  %bl, %bl
+	jz     1f
+	EXTERN(sched_override_end)
+	call   sched_override_end
+1:
+
+	/* Resume execution by loading the next thread. But still
+	 * check if that thread differs from our current thread. */
+	EXTERN(thiscpu_sched_current)
+	movP   thiscpu_sched_current(%Pbx), %Pax
+	EXTERN(this_task)
+	cmpP   %Pax, %segtls:this_task
+	EXTERN(x86_load_thread_Pax_cpu_Pbx)
+	jne    x86_load_thread_Pax_cpu_Pbx /* Switch to a different thread. */
+
+	/* Resume execution by re-loading `this_task.t_state' */
+	EXTERN(this_sstate)
+	movP   %segtls:this_sstate, %Psp
+
+	EXTERN(libcpu_apply_scpustate_Psp)
+	jmp    libcpu_apply_scpustate_Psp
+	.cfi_endproc
+END(arch_sched_super_override_ipi)
+
+
+#endif /* !CONFIG_NO_SMP */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_SCHED_S */

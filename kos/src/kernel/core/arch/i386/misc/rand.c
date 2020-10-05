@@ -25,17 +25,15 @@
 #include <kernel/compiler.h>
 #include <kernel/rand.h>
 #include <kernel/printk.h>
+#include <sched/x86/cmos.h>
 #include <sys/io.h>
 
 DECL_BEGIN
 
+/* Registers used for entropy */
 PRIVATE ATTR_FREERODATA u8 const cmos_registers[] = {
-	0x00, /* CMOS_SECOND  */
-	0x02, /* CMOS_MINUTE  */
-	0x04, /* CMOS_HOUR    */
-	0x07, /* CMOS_DAY     */
-	0x08, /* CMOS_MONTH   */
-	0x09  /* CMOS_YEAR    */
+	CMOS_SECOND, CMOS_MINUTE, CMOS_HOUR,
+	CMOS_DAY, CMOS_MONTH, CMOS_YEAR
 };
 
 INTERN ATTR_FREETEXT void
@@ -46,8 +44,7 @@ NOTHROW(KCALL x86_initialize_rand_entropy)(void) {
 
 	/* Gather entropy from CMOS registers. */
 	for (i = 0; i < COMPILER_LENOF(cmos_registers); ++i) {
-		outb((port_t)0x70, cmos_registers[i]);
-		entropy[i] = inb((port_t)0x71);
+		entropy[i] = cmos_rd(cmos_registers[i]);
 	}
 
 	/* Combine entropy to generate our boot seed. */

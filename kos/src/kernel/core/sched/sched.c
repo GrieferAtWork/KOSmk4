@@ -1613,8 +1613,8 @@ cannot_shut_down:
  * WARNING: These function do not operate recursively. Calling...
  *     ... `sched_override_start()' with `thiscpu_sched_override != NULL' isn't allowed
  *     ... `sched_override_end()' with `thiscpu_sched_override == NULL' also isn't allowed
- */
-PUBLIC NOBLOCK void
+ * @return: * : The CPU that the calling thread managed to seize (same as `THIS_CPU') */
+PUBLIC NOBLOCK ATTR_RETNONNULL struct cpu *
 NOTHROW(FCALL sched_override_start)(void) {
 	struct task *caller;
 	struct cpu *me;
@@ -1629,6 +1629,7 @@ NOTHROW(FCALL sched_override_start)(void) {
 	/* Disable any previously set deadline. */
 	tsc_nodeadline(me);
 	PREEMPTION_POP(was);
+	return me;
 }
 
 PUBLIC NOBLOCK void
@@ -1695,6 +1696,19 @@ NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread) {
 }
 
 
+#ifdef CONFIG_NO_SMP
+DEFINE_PUBLIC_ALIAS(sched_super_override_start, sched_override_start);
+DEFINE_PUBLIC_ALIAS(sched_super_override_end, sched_override_end);
+
+PUBLIC NOBLOCK WUNUSED bool NOTHROW(FCALL sched_super_override_trystart)(void) {
+	sched_override_start();
+	return true;
+}
+
+PUBLIC NOBLOCK ATTR_PURE bool NOTHROW(FCALL sched_super_override_active)(void) {
+	return FORCPU(&_bootcpu, thiscpu_sched_override) != NULL;
+}
+#endif /* !CONFIG_NO_SMP */
 
 DECL_END
 

@@ -191,10 +191,9 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 			return CPU_IPI_MODE_SWITCH_TASKS;
 		}
 	}
-#if 0 /* No need to send another IPI to the target CPU!                            \
-       * Whenever a thread changes CPUs, a sporadic wakeup will be triggered,      \
-       * which is the same thing we were trying to do. Additionally, that sporadic \
-       * wake-up will have already unset the `TASK_FWAKING' bit for us! */
+#if 0 /* No need to send another IPI to the target CPU!                       \
+       * Whenever a thread changes CPUs, a sporadic wakeup will be triggered, \
+       * which is the same thing we were trying to do. */
 	else {
 		while (!cpu_sendipi(thread_cpu, &task_wake_ipi, args, CPU_IPI_FWAKEUP))
 			task_pause();
@@ -284,6 +283,9 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	       (unsigned int)thread->t_cpu->c_id, thread,
 	       (unsigned int)task_getroottid_of_s(thread));
 #ifndef CONFIG_NO_SMP
+	/* NOTE: Before being started, the thread's CPU shouldn't be subject to change yet,
+	 *       so we're safe in assuming that the thread's CPU won't change before we're
+	 *       done here. */
 	target_cpu = thread->t_cpu;
 	if (me != target_cpu) {
 		sched_intern_addpending(target_cpu, thread);
