@@ -1625,7 +1625,7 @@ NOTHROW(FCALL sched_override_start)(void) {
 	me = caller->t_cpu;
 	assert(!sched_override);
 	/* Set the calling thread as scheduling override. */
-	sched_override = caller;
+	ATOMIC_WRITE(sched_override, caller);
 	/* Disable any previously set deadline. */
 	tsc_nodeadline(me);
 	PREEMPTION_POP(was);
@@ -1642,7 +1642,7 @@ NOTHROW(FCALL sched_override_end)(void) {
 	me     = caller->t_cpu;
 	assert(sched_override == caller);
 	was = PREEMPTION_PUSHOFF();
-	sched_override = NULL;
+	ATOMIC_WRITE(sched_override, NULL);
 	tsc_now        = tsc_get(me);
 	/* Reload the TSC deadline for the calling thread, thus accounting for
 	 * the additional time it spent being an active scheduler override. */

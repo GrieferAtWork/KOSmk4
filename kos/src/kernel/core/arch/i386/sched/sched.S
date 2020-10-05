@@ -445,20 +445,22 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 	pushal_cfi_r
 #endif /* !__x86_64__ */
 
-	/* Check if we're already the scheduler override for our CPU. */
-	xorb   %bl, %bl
+	cli    /* Should already be the case, but better be careful! */
+
 	EXTERN(this_cpu)
-	movP   %segtls:this_cpu, %Pax
+	movP   %segtls:this_cpu, %Pbx
+
+	/* Check if we're already the scheduler override for our CPU. */
 	EXTERN(thiscpu_sched_override)
-	cmpP   $(0), thiscpu_sched_override(%Pax)
-	jne    1f
+	movP   thiscpu_sched_override(%Pbx), %Pbp
+	testP  %Pbp, %Pbp
+	jnz    1f
 	EXTERN(sched_override_start)
 	call   sched_override_start
-	incb   %bl /* %bl = 1 */
-1:	movP   %Pax, %Pbx
-	/* %Pbx = struct cpu *THIS_CPU;
+	movP   %Pax, %Pbx
+1:	/* %Pbx = struct cpu *THIS_CPU;
 	 * %Psp = struct icpustate *state;
-	 * %Pbp = bool did_become_sched_override; */
+	 * %Pbp = struct task *old_sched_override; */
 	
 	/* Save the current register state. */
 	EXTERN(this_sstate)
@@ -469,8 +471,8 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 	call   sched_super_override_ipi
 
 	/* Release our scheduler override, if we acquired it earlier. */
-	testb  %bl, %bl
-	jz     1f
+	testP  %Pbp, %Pbp
+	jnz    1f    /* if (old_sched_override != NULL) goto 1f; */
 	EXTERN(sched_override_end)
 	call   sched_override_end
 1:
