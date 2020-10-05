@@ -45,6 +45,10 @@
 #include <inttypes.h>
 #include <string.h>
 
+#ifndef NDEBUG
+#include <kernel/rand.h>
+#endif /* !NDEBUG */
+
 DECL_BEGIN
 
 #if 0
@@ -339,6 +343,15 @@ NOTHROW(KCALL cpu_sendipi)(struct cpu *__restrict target,
 	unsigned int slot;
 	pflag_t was;
 	IPI_DEBUG("cpu_sendipi:%p,%p\n", target, func);
+#ifndef NDEBUG
+	/* Make it easier for race conditions related to IPI races to surface
+	 * by randomly introducing a couple of pause instructions, thus causing
+	 * the calling CPU to randomly slow down before actually sending an IPI */
+	if (krand32() >= UINT32_C(0x80000000)) {
+		task_pause();
+		task_pause();
+	}
+#endif /* !NDEBUG */
 	was = PREEMPTION_PUSHOFF();
 	if (target == THIS_CPU) {
 		/* Special case: The current CPU is being targeted. */
