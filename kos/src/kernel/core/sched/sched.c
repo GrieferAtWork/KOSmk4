@@ -1218,6 +1218,8 @@ do_use_sleeping_thread_timeout:
 			deadline -= now;
 			if unlikely(deadline == sched_quantum_min) {
 				ktime_t new_quantum_min;
+				/* TODO: We might get here due to an SMM interrupt, in which case
+				 *       it wasn't actually the fault of `sched_quantum_min'! */
 				new_quantum_min = sched_quantum_min * 2;
 				printk(KERN_WARNING "[sched] Raise minimum quantum "
 				                    "%" PRIuN(__SIZEOF_KTIME_T__) " -> "

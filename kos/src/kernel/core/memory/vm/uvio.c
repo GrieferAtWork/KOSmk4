@@ -29,6 +29,7 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/printk.h>
 #include <kernel/rand.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
@@ -619,8 +620,8 @@ try_readone:
 
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 uvio_server_write(struct vm_datablock *__restrict self,
-	              USER CHECKED void const *src,
-	              size_t num_bytes,
+                  USER CHECKED void const *src,
+                  size_t num_bytes,
                   iomode_t UNUSED(mode)) THROWS(...) {
 	size_t result;
 	struct uvio *me;
@@ -730,6 +731,7 @@ err_bad_respid_lowbyte:
 		/* Ignore responses to requests that may have been aborted. */
 		if unlikely(!VERIFY_SLOT(slot, response_header)) {
 unlock_slot_and_ignore:
+			printk(KERN_WARNING "[uvio] Ignore bad/aborted response\n");
 			sync_endread(&slot->kur_lock);
 			goto done;
 		}

@@ -220,6 +220,7 @@ did_update_x86_64_kernel:
 		qemu_arguments.append("-append");
 		qemu_arguments.append(cmdline);
 	}
+	print "qemu:", repr qemu_arguments;
 	local proc = ipc.Process(qemu, qemu_arguments);
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;

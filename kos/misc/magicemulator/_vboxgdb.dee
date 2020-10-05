@@ -2162,7 +2162,7 @@ function startVboxGDBGlue(
 	 * it only started doing so after I added the connectedSemaphore.wait();
 	 * call in our caller to wait for VirtualBox to connect to the log pipe.
 	 * And in theory, VirtualBox might open the debug server _much_ later than
-	 * then opening of the log file (so better be safe here...) */
+	 * the opening of the log file (so better be safe here...) */
 	if (CONFIG_VERBOSE)
 		print "[vboxgdb] Connecting to telnet under", vboxTelnetAddr, "...";
 	for (local i: [:20]) {

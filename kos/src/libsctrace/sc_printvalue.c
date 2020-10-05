@@ -220,7 +220,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #endif /* HAVE_SC_REPR_FILENAME */
 
 #ifdef HAVE_SC_REPR_BUFFER
-#define NEED_print_string
+#define NEED_print_string_or_buffer
 #endif /* HAVE_SC_REPR_BUFFER */
 
 #ifdef HAVE_SC_REPR_STRING
@@ -481,6 +481,11 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef NEED_print_string_vector
 #define NEED_print_string
 #endif /* NEED_print_string_vector */
+
+#ifdef NEED_print_string_or_buffer
+#define NEED_print_string
+#define NEED_print_bytes
+#endif /* NEED_print_string_or_buffer */
 
 #ifdef NEED_print_timespec_vector
 #define NEED_print_timespec
@@ -1179,6 +1184,102 @@ print_string(pformatprinter printer, void *arg,
 	return result;
 }
 #endif /* NEED_print_string */
+
+
+
+#ifdef NEED_print_bytes
+PRIVATE ssize_t CC
+print_bytes(pformatprinter printer, void *arg,
+            USER CHECKED void const *buf, size_t len) {
+	ssize_t temp, result = 0;
+	size_t i;
+	for (i = 0; i < len; ++i) {
+		byte_t b;
+		b = ((USER CHECKED byte_t const *)buf)[i];
+		if (i != 0)
+			PRINT("," SYNSPACE);
+		PRINTF("%#.2" PRIx8, b);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_bytes */
+
+
+
+#ifdef NEED_print_string_or_buffer
+PRIVATE ATTR_CONST bool CC
+is_printable_character(char ch) {
+	if (isprint(ch))
+		return true;
+	switch (ch) {
+
+	case 7:  /* \a */
+	case 8:  /* \b */
+	case 9:  /* \t */
+	case 10: /* \n */
+	case 11: /* \v */
+	case 12: /* \f */
+	case 13: /* \r */
+	case 27: /* \e */
+	case '\\':
+	case '\'':
+	case '\"':
+		return true;
+	default:
+		break;
+	}
+	return false;
+}
+
+PRIVATE ATTR_PURE bool CC
+is_printable_string(USER CHECKED char const *str,
+                    size_t length) {
+	size_t i;
+	for (i = 0; i < length; ++i) {
+		if (!is_printable_character(str[i]))
+			return false;
+	}
+	return true;
+}
+
+PRIVATE ssize_t CC
+print_string_or_buffer(pformatprinter printer, void *arg,
+                       USER UNCHECKED void const *buf,
+                       size_t length) {
+	ssize_t result, temp;
+	if (!buf) {
+		result = (*printer)(arg, NULLSTR, COMPILER_STRLEN(NULLSTR));
+	} else if (!length) {
+		result = format_printf(printer, arg, "%#p", buf);
+	} else {
+		size_t used_length = length;
+		if (used_length > LIMIT_STRLEN)
+			used_length = LIMIT_STRLEN;
+		validate_readable(buf, used_length);
+		/* Check if all characters are printable.
+		 * If all of them are, output as a  */
+		if (is_printable_string((char const *)buf, used_length)) {
+			result = format_printf(printer, arg, "%$q", used_length, buf);
+			if unlikely(result < 0)
+				goto done;
+		} else {
+			result = DOPRINT("[");
+			if unlikely(result < 0)
+				goto done;
+			DO(print_bytes(printer, arg, buf, used_length));
+			PRINT("]");
+		}
+		if (used_length > LIMIT_STRLEN)
+			PRINT("...");
+	}
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_string_or_buffer */
 
 
 
@@ -2074,27 +2175,6 @@ err:
 	return temp;
 }
 #endif /* NEED_print_socket_type */
-
-
-
-#ifdef NEED_print_bytes
-PRIVATE ssize_t CC
-print_bytes(pformatprinter printer, void *arg,
-            USER CHECKED void const *buf, size_t len) {
-	ssize_t temp, result = 0;
-	size_t i;
-	for (i = 0; i < len; ++i) {
-		byte_t b;
-		b = ((USER CHECKED byte_t const *)buf)[i];
-		if (i != 0)
-			PRINT("," SYNSPACE);
-		PRINTF("%#.2" PRIx8, b);
-	}
-	return result;
-err:
-	return temp;
-}
-#endif /* NEED_print_bytes */
 
 
 
@@ -4191,7 +4271,9 @@ do_struct_timespecx64:
 	case SC_REPR_BUFFER:
 		if unlikely(!link)
 			goto do_pointer;
-		result = print_string(printer, arg, (char const *)(uintptr_t)value.sv_u64, link);
+		result = print_string_or_buffer(printer, arg,
+		                                (void const *)(uintptr_t)value.sv_u64,
+		                                (size_t)link->sa_value.sv_u64);
 		break;
 #endif /* HAVE_SC_REPR_BUFFER */
 

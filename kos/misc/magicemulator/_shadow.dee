@@ -17,11 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifdef __WINDOWS__
-#define HOST_EXE(x)  x ".exe"
-#else
-#define HOST_EXE(x)  x
-#endif
 
 import * from deemon;
 import * from ..libmagic.libmagic;
