@@ -27,7 +27,7 @@
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
-#include <kernel/selftest.h>
+#include <kernel/selftest.h> /* DEFINE_TEST */
 #include <kernel/types.h>
 #include <sched/cpu.h>
 #include <sched/pertask.h>

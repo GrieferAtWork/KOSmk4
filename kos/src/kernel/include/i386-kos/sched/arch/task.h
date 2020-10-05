@@ -50,14 +50,6 @@ DECL_BEGIN
  * the call) */
 #ifndef __INTELLISENSE__
 #ifdef __NO_XBLOCK
-#define task_yield() __x86_task_yield()
-FORCELOCAL ATTR_ARTIFICIAL void (__x86_task_yield)(void) {
-#ifdef __x86_64__
-	__asm__("call task_yield" : : : "%rax", "%rcx", "memory");
-#else /* __x86_64__ */
-	__asm__("call task_yield" : : : "%eax", "memory");
-#endif /* !__x86_64__ */
-}
 #define task_pause() __x86_task_pause()
 FORCELOCAL ATTR_ARTIFICIAL void NOTHROW(__x86_task_pause)(void) {
 	__asm__("pause");
@@ -66,9 +58,9 @@ FORCELOCAL ATTR_ARTIFICIAL void NOTHROW(__x86_task_pause)(void) {
 FORCELOCAL ATTR_ARTIFICIAL __BOOL NOTHROW(__x86_task_yield_nx)(void) {
 	__register __BOOL __res;
 #ifdef __x86_64__
-	__asm__("call task_yield" : "=a" (__res) : : "%rcx", "memory");
+	__asm__("call task_yield_nx" : "=a" (__res) : : "%rcx", "memory");
 #else /* __x86_64__ */
-	__asm__("call task_yield" : "=a" (__res) : : "memory");
+	__asm__("call task_yield_nx" : "=a" (__res) : : "memory");
 #endif /* !__x86_64__ */
 	return __res;
 }
@@ -95,17 +87,29 @@ FORCELOCAL ATTR_ARTIFICIAL unsigned int NOTHROW(__x86_task_tryyield_or_pause)(vo
 #else /* __NO_XBLOCK */
 #define task_pause() __XBLOCK({ __asm__("pause"); (void)0; })
 #ifdef __x86_64__
-#define task_yield()             __XBLOCK({ __asm__("call task_yield" : : : "%rax", "%rcx", "memory"); (void)0; })
-#define task_yield_nx()          __XBLOCK({ __register __BOOL __ty_res; __asm__("call task_yield" : "=a" (__ty_res) : : "%rcx", "memory"); __XRETURN __ty_res; })
+#define task_yield_nx()          __XBLOCK({ __register __BOOL __ty_res; __asm__("call task_yield_nx" : "=a" (__ty_res) : : "%rcx", "memory"); __XRETURN __ty_res; })
 #define task_tryyield()          __XBLOCK({ __register unsigned int __ty_res; __asm__("call task_tryyield" : "=a" (__ty_res) : : "%rcx", "memory"); __XRETURN __ty_res; })
 #define task_tryyield_or_pause() __XBLOCK({ __register unsigned int __ty_res; __asm__("call task_tryyield_or_pause" : "=a" (__ty_res) : : "%rcx", "memory"); __XRETURN __ty_res; })
 #else /* __x86_64__ */
-#define task_yield()             __XBLOCK({ __asm__("call task_yield" : : : "%eax", "memory"); (void)0; })
-#define task_yield_nx()          __XBLOCK({ __register __BOOL __ty_res; __asm__("call task_yield" : "=a" (__ty_res) : : "memory"); __XRETURN __ty_res; })
+#define task_yield_nx()          __XBLOCK({ __register __BOOL __ty_res; __asm__("call task_yield_nx" : "=a" (__ty_res) : : "memory"); __XRETURN __ty_res; })
 #define task_tryyield()          __XBLOCK({ __register unsigned int __ty_res; __asm__("call task_tryyield" : "=a" (__ty_res) : : "memory"); __XRETURN __ty_res; })
 #define task_tryyield_or_pause() __XBLOCK({ __register unsigned int __ty_res; __asm__("call task_tryyield_or_pause" : "=a" (__ty_res) : : "memory"); __XRETURN __ty_res; })
 #endif /* !__x86_64__ */
 #endif /* !__NO_XBLOCK */
+
+#define task_yield() __x86_task_yield()
+/* This wrapper cannot be implemented using __XBLOCK due to a GCC bug
+ * that causes `__asm__ __volatile__' by itself to be considered as
+ * NOTHROW, forcing one to wrap by an inline function:
+ *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357
+ */
+FORCELOCAL ATTR_ARTIFICIAL void (__x86_task_yield)(void) {
+#ifdef __x86_64__
+	__asm__ __volatile__("call task_yield" : : : "%rax", "%rcx", "memory");
+#else /* __x86_64__ */
+	__asm__ __volatile__("call task_yield" : : : "%eax", "memory");
+#endif /* !__x86_64__ */
+}
 #endif /* !__INTELLISENSE__ */
 
 

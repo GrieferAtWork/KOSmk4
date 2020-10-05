@@ -27,7 +27,7 @@
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
-#include <kernel/selftest.h>
+#include <kernel/selftest.h> /* DEFINE_TEST */
 #include <sched/rpc.h>
 #include <sched/signal.h>
 #include <sched/task.h>
