@@ -267,7 +267,7 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 	while (i) {
 		uintptr_t bits, mask;
 		--i;
-		bits = ATOMIC_XCH(FORCPU(me, thiscpu_x86_ipi_inuse[i]), 0);
+		bits = ATOMIC_READ(FORCPU(me, thiscpu_x86_ipi_inuse[i]));
 		if (!bits)
 			continue;
 		for (j = 0, mask = 1; bits; ++j, mask <<= 1) {
@@ -282,6 +282,20 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 #ifndef NDEBUG
 			memset(&FORCPU(me, thiscpu_x86_ipi_pending[slot]), 0xcc, sizeof(ipi));
 #endif /* !NDEBUG */
+			/* Free up the IPI slot.
+			 * This must happen for every in-use slot individually, since the
+			 * IPI callback itself may recursively call `cpu_ipi_service_nopr()',
+			 * which must be able to handle any additional IPIs, and if we were
+			 * to clear the in-use bits for multiple IPIs at once, then we'd
+			 * essentially commit to executing all of those IPIs without blocking!
+			 *
+			 * NOTE: The write order here is also important:
+			 *       We must unset the IPI's bit in the IN-USE bitset first,
+			 *       and only then clear it in the ALLOC bitset. If we did it
+			 *       the other way around, then there might be a chance that
+			 *       the IPI get allocated immediately, and we'd end up clearing
+			 *       a in-use bit of a whole different IPI! */
+			ATOMIC_AND(FORCPU(me, thiscpu_x86_ipi_inuse[i]), ~mask);
 			ATOMIC_AND(FORCPU(me, thiscpu_x86_ipi_alloc[i]), ~mask);
 			/* Execute the IPI callback. */
 			IPI_DEBUG("x86_serve_ipi:%p [slot=%u,i=%u,mask=%#" PRIxPTR "]\n",
