@@ -27,7 +27,7 @@
 #include <kernel/printk.h>
 #include <sched/atomic64.h>
 #include <sched/cpu.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -289,7 +289,7 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 		       increase ? "fast" : "slow");
 		/* TODO: When TSC_HZ changes, we should probably re-calculate the
 		 *       current TSC deadline by re-doing the deadline calculation
-		 *       code as documented at the top of <sched/sched.h>, starting
+		 *       code as documented at the top of <sched/scheduler.h>, starting
 		 *       at `TSC_DEAD = KTIME_TO_TSC(DEADLINE);'
 		 * NOTE: For this case, we also need the ability to immediately
 		 *       perform a thread switch, which is something that we can't

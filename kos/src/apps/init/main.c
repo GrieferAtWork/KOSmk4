@@ -197,6 +197,33 @@ done_tmpfs:
 		}
 	}
 
+#if 0
+	{
+		pid_t cpid;
+		int stat;
+		cpid = VFork();
+		if (cpid == 0) {
+			console_set_fgproc();
+			signal(SIGHUP, SIG_DFL);
+			signal(SIGINT, SIG_DFL);
+			signal(SIGTTIN, SIG_DFL);
+			signal(SIGTTOU, SIG_DFL);
+			execle("/bin/system-test", "system-test", (char *)NULL, init_envp);
+		}
+		/* Wait for the system-test to finish. */
+		while (waitpid(cpid, &stat, 0) < 0)
+			sched_yield();
+		if (!WIFEXITED(stat) || WEXITSTATUS(stat) != 0) {
+			syslog(LOG_ERR, "system-test exited with %u\n",
+			       WEXITSTATUS(stat));
+		} else {
+			ksysctl(0xcccc0001); /* reboot (requires `CONFIG_HAVE_HACKY_REBOOT') */
+		}
+		for (;;)
+			pause();
+	}
+#endif
+
 	for (;;) {
 		pid_t cpid;
 		/* Do some cleanup on the console. */

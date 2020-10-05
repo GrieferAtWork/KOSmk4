@@ -41,7 +41,7 @@
 #include <kernel/x86/pic.h>
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 #include <sched/x86/cpureg.h>

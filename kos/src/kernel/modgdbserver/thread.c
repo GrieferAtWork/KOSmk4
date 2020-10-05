@@ -31,7 +31,7 @@
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 #include <sched/tsc.h>

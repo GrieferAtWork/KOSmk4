@@ -17,15 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_SCHED_SCHED_C
-#define GUARD_KERNEL_SRC_SCHED_SCHED_C 1
+#ifndef GUARD_KERNEL_SRC_SCHED_SCHEDULER_C
+#define GUARD_KERNEL_SRC_SCHED_SCHEDULER_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include <kernel/printk.h>
 #include <sched/cpu.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -1713,4 +1713,4 @@ PUBLIC NOBLOCK ATTR_PURE bool NOTHROW(FCALL sched_super_override_active)(void) {
 DECL_END
 
 
-#endif /* !GUARD_KERNEL_SRC_SCHED_SCHED_C */
+#endif /* !GUARD_KERNEL_SRC_SCHED_SCHEDULER_C */

@@ -407,6 +407,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: Make the x86 LDT object ATTR_PERVM, and reload LDT registers during a VM switch.
+	 *       On linux, they're PERVM, too, so we really should do the same. */
+
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:
 	 *       $ deemon --help /deemon/string

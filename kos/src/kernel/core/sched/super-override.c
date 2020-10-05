@@ -26,7 +26,7 @@
 #include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <sched/cpu.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 

@@ -34,7 +34,7 @@
 #include <kernel/vm/exec.h>
 #include <kernel/vm/usermod.h>
 #include <sched/pid.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>

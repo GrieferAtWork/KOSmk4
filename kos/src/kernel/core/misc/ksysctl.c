@@ -45,6 +45,16 @@
 #include <stddef.h>
 #include <string.h>
 
+#undef CONFIG_HAVE_HACKY_REBOOT
+#if 0
+#define CONFIG_HAVE_HACKY_REBOOT
+#endif
+
+#ifdef CONFIG_HAVE_HACKY_REBOOT
+#include <kernel/printk.h>
+#include <sys/io.h>
+#endif /* CONFIG_HAVE_HACKY_REBOOT */
+
 DECL_BEGIN
 
 /* The default library path.
@@ -550,6 +560,17 @@ again_get_oldpath:
 		temp.h_data = FORTASK(&_boottask, this_taskpid);
 		return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, temp);
 	}	break;
+
+#ifdef CONFIG_HAVE_HACKY_REBOOT
+	case 0xcccc0001: {
+		PREEMPTION_DISABLE();
+		printk(KERN_RAW "Reboot\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		                "%{monitor:system_reset\n}\n");
+		while (inb((port_t)0x64) & 0x02);
+		outb((port_t)0x64, 0xfe);
+		PREEMPTION_HALT();
+	}	break;
+#endif /* CONFIG_HAVE_HACKY_REBOOT */
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_SCHED_SCHED_H
-#define GUARD_KERNEL_INCLUDE_SCHED_SCHED_H 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_SCHEDULER_H
+#define GUARD_KERNEL_INCLUDE_SCHED_SCHEDULER_H 1
 
 #include <kernel/compiler.h>
 
@@ -422,4 +422,4 @@ FUNDEF NOBLOCK ATTR_PURE __BOOL NOTHROW(FCALL sched_super_override_active)(void)
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SCHED_H */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_SCHEDULER_H */

@@ -37,7 +37,7 @@
 #include <sched/async.h>
 #include <sched/cpu.h>
 #include <sched/cred.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>

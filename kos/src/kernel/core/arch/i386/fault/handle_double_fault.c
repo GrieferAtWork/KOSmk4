@@ -36,7 +36,7 @@
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h> /* IDT_CONFIG_ISTRAP() */
 #include <sched/cpu.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state-helpers.h>

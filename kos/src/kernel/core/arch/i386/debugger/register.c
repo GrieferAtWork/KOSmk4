@@ -35,7 +35,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/rt.h>
 #include <kernel/vm.h>
 #include <kernel/x86/breakpoint.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>

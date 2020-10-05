@@ -51,7 +51,7 @@
 #include <sched/cpu.h>
 #include <sched/enum.h>
 #include <sched/pid.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 #ifndef CONFIG_NO_SMP
 #include <sched/signal.h>

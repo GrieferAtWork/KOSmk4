@@ -44,7 +44,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/x86/pic.h>
 #include <sched/async.h>
 #include <sched/cpu.h>
-#include <sched/sched.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/x86/tss.h>
 
