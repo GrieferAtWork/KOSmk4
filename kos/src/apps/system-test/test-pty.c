@@ -77,6 +77,8 @@ DEFINE_TEST(pty_works_correctly) {
 	 * be destroyed. */
 	errno = 0;
 	while (waitpid(cpid, NULL, 0) != cpid) {
+		if (errno == EINTR)
+			continue;
 		if (errno)
 			err(1, "waitpid(%d) failed", cpid);
 	}
@@ -95,7 +97,7 @@ DEFINE_TEST(pty_works_correctly) {
 	 * file (who's existence we've asserted earlier) goes away without any further
 	 * action being required (note that there are a couple of things that not only
 	 * we, but also some other process could do to prevent the file from going away,
-	 * however, starting out of a clean system state, the file(s) should always go
+	 * however, starting out with a clean system state, the file(s) should always go
 	 * away without any additional hassle) */
 	if (stat(name, &st) == 0)
 		err(1, "stat(%q) still succeeds after master and slave were deleted", name);

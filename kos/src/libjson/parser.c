@@ -42,59 +42,74 @@ DECL_BEGIN
 #define isradixch(ch) ((ch) == 'x' || (ch) == 'X' || (ch) == 'b' || (ch) == 'B')
 
 
+/* RETURN *PTR++; */
 PRIVATE NONNULL((1)) char32_t
 NOTHROW_NCX(CC json_getc)(struct json_parser *__restrict self) {
 	char32_t result;
 	switch (__builtin_expect(self->jp_encoding, JSON_ENCODING_UTF8)) {
+
 	case JSON_ENCODING_UTF8:
 		result = unicode_readutf8_n((char const **)&self->jp_pos,
 		                            (char const *)self->jp_end);
 		break;
+
 	case JSON_ENCODING_UTF16LE:
 		result = unicode_readutf16le_n((char16_t const **)&self->jp_pos,
 		                               (char16_t const *)self->jp_end);
 		break;
+
 	case JSON_ENCODING_UTF32LE:
 		result = unicode_readutf32le_n((char32_t const **)&self->jp_pos,
 		                               (char32_t const *)self->jp_end);
 		break;
+
 	case JSON_ENCODING_UTF16BE:
 		result = unicode_readutf16be_n((char16_t const **)&self->jp_pos,
 		                               (char16_t const *)self->jp_end);
 		break;
+
 	case JSON_ENCODING_UTF32BE:
 		result = unicode_readutf32be_n((char32_t const **)&self->jp_pos,
 		                               (char32_t const *)self->jp_end);
 		break;
+
 	default: __builtin_unreachable();
 	}
 	return result;
 }
 
+
+/* RETURN *--PTR; */
 PRIVATE NONNULL((1)) char32_t
 NOTHROW_NCX(CC json_ungetc)(struct json_parser *__restrict self) {
 	char32_t result;
 	switch (__builtin_expect(self->jp_encoding, JSON_ENCODING_UTF8)) {
+
 	case JSON_ENCODING_UTF8:
 		result = unicode_readutf8_rev_n((char const **)&self->jp_pos,
 		                                (char const *)self->jp_start);
 		break;
+
 	case JSON_ENCODING_UTF16LE:
 		result = unicode_readutf16le_rev_n((char16_t const **)&self->jp_pos,
 		                                   (char16_t const *)self->jp_start);
 		break;
+
 	case JSON_ENCODING_UTF32LE:
 		result = unicode_readutf32le_rev_n((char32_t const **)&self->jp_pos,
 		                                   (char32_t const *)self->jp_start);
 		break;
+
 	case JSON_ENCODING_UTF16BE:
 		result = unicode_readutf16be_rev_n((char16_t const **)&self->jp_pos,
 		                                   (char16_t const *)self->jp_start);
 		break;
+
 	case JSON_ENCODING_UTF32BE:
 		result = unicode_readutf32be_rev_n((char32_t const **)&self->jp_pos,
 		                                   (char32_t const *)self->jp_start);
 		break;
+
 	default: __builtin_unreachable();
 	}
 	return result;
@@ -375,9 +390,11 @@ INTERN NONNULL((1, 2)) void
 NOTHROW_NCX(CC json_skip_utf8string_trailing_nuls)(struct json_parser *__restrict self,
                                                    char const *__restrict new_pointer) {
 	switch (self->jp_encoding) {
+
 	case JSON_ENCODING_UTF8:
 		new_pointer = (char const *)memxendb(new_pointer, 0, (size_t)(self->jp_end - new_pointer));
 		break;
+
 	case JSON_ENCODING_UTF16LE:
 	case JSON_ENCODING_UTF16BE:
 		if (((uintptr_t)new_pointer & 1) != ((uintptr_t)self->jp_start & 1))
@@ -385,6 +402,7 @@ NOTHROW_NCX(CC json_skip_utf8string_trailing_nuls)(struct json_parser *__restric
 		while (new_pointer < self->jp_end && UNALIGNED_GET16((uint16_t *)new_pointer) == 0)
 			new_pointer += 2;
 		break;
+
 	case JSON_ENCODING_UTF32LE:
 	case JSON_ENCODING_UTF32BE:
 		while (((uintptr_t)new_pointer & 3) != ((uintptr_t)self->jp_start & 3))
@@ -392,6 +410,7 @@ NOTHROW_NCX(CC json_skip_utf8string_trailing_nuls)(struct json_parser *__restric
 		while (new_pointer < self->jp_end && UNALIGNED_GET32((uint32_t *)new_pointer) == 0)
 			new_pointer += 4;
 		break;
+
 	default: __builtin_unreachable();
 	}
 	self->jp_pos = new_pointer;
@@ -401,24 +420,28 @@ INTERN NONNULL((1, 2)) void
 NOTHROW_NCX(CC json_truncate_pos_for_alignment)(struct json_parser *__restrict self,
                                                 char const *__restrict new_pointer) {
 	switch (self->jp_encoding) {
+
 	case JSON_ENCODING_UTF8:
 		break;
+
 	case JSON_ENCODING_UTF16LE:
 	case JSON_ENCODING_UTF16BE:
 		if (((uintptr_t)new_pointer & 1) != ((uintptr_t)self->jp_start & 1))
 			--new_pointer; /* Fix alignment */
 		break;
+
 	case JSON_ENCODING_UTF32LE:
 	case JSON_ENCODING_UTF32BE:
 		while (((uintptr_t)new_pointer & 3) != ((uintptr_t)self->jp_start & 3))
 			--new_pointer; /* Fix alignment */
 		break;
+
 	default: __builtin_unreachable();
 	}
 	self->jp_pos = new_pointer;
 }
 
-/* Yield to the next token
+/* Yield to the current token and advance to the next one (*PTR++)
  * @return: JSON_PARSER_*:     The previously selected token (the parser now points at its end)
  * @return: JSON_ERROR_EOF:    The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
@@ -481,9 +504,12 @@ again:
 		break;
 
 	case '-':
-		if likely(unicode_isdecimal(ch))
-			goto do_digit;
-		return JSON_ERROR_SYNTAX;
+		ch = json_getc(self);
+		if unlikely(!unicode_isdecimal(ch))
+			goto syn2;
+		if (ch == '0')
+			goto do_decimal_0;
+		goto do_decimal;
 
 	case 't':
 		if ((ch = json_getc(self)) != 'r')
@@ -520,21 +546,24 @@ again:
 	default:
 		if (unicode_isdecimal(ch)) {
 		case '0':
+do_decimal_0:
 			prev = self->jp_pos;
-			ch = json_getc(self);
+			ch   = json_getc(self);
 			if (!isradixch(ch))
 				goto do_digit_inner;
-do_digit:
 			ATTR_FALLTHROUGH
 		case '1': case '2': case '3':
 		case '4': case '5': case '6':
 		case '7': case '8': case '9':
+do_decimal:
 			do {
 				prev = self->jp_pos;
 				ch = json_getc(self);
 do_digit_inner:
 				;
-			} while (unicode_isdecimal(ch));
+			} while (unicode_isdecimal(ch) ||
+			         (ch >= 'a' && ch <= 'f') ||
+			         (ch >= 'A' && ch <= 'F'));
 			if (ch == '.') {
 				/* Fractional part. */
 				do {
@@ -584,7 +613,7 @@ syn2:
 	return JSON_ERROR_SYNTAX;
 }
 
-/* Yield to the previous token
+/* Yield to the previous token and return it (*--PTR)
  * @return: JSON_PARSER_*:     The now selected token (The parser is now located at the previous token)
  * @return: JSON_ERROR_EOF:    The start of the input file had already been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
@@ -677,6 +706,7 @@ again:
 		break;
 
 	case 'e':
+		next = self->jp_pos;
 		ch = json_ungetc(self);
 		if (ch == 'u') {
 			if (json_ungetc(self) != 'r')
@@ -693,19 +723,23 @@ again:
 				goto syn5;
 			result = JSON_PARSER_FALSE;
 		} else {
-			goto syn2;
+			/* 'e' can be trailing character in `0xe' */
+			goto do_decimal;
 		}
 		break;
 
 	default:
 		if (unicode_isdecimal(ch)) {
-/*do_digit:*/
 		case '0': case '1': case '2': case '3':
 		case '4': case '5': case '6': case '7':
 		case '8': case '9':
+		case 'a': case 'b': case 'c': case 'd': /*case 'e':*/ case 'f':
+		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
 			do {
 				next = self->jp_pos;
 				ch = json_ungetc(self);
+do_decimal:
+				;
 			} while (unicode_isdecimal(ch));
 			if (ch == '+' || ch == '-') {
 				do {
@@ -1433,11 +1467,15 @@ NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
 	if (!unicode_isdecimal(ch)) {
 		if (negative)
 			return JSON_ERROR_SYNTAX;
+bad_integer:
 		self->jp_pos = start;
 		return JSON_ERROR_NOOBJ; /* Not an integer. */
 	}
+	result = 0;
 	if (ch == '0') {
-		ch = json_getc(self);
+		char const *pos;
+		pos = self->jp_pos;
+		ch  = json_getc(self);
 		if (ch == 'x' || ch == 'X') {
 			radix = 16;
 			ch    = json_getc(self);
@@ -1447,12 +1485,29 @@ NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
 		} else {
 			radix = 8;
 		}
+		if (!unicode_isdecimal(ch) &&
+		    !(ch >= 'a' && ch <= 'f') &&
+		    !(ch >= 'A' && ch <= 'F')) {
+			if (radix == 8) {
+				/* Special case: '0' */
+				start = pos;
+				goto done;
+			}
+			goto bad_integer;
+		}
 	}
-	result = 0;
-	do {
+	for (;;) {
 		uint8_t digit;
 again_parse_ch:
-		digit = unicode_asdigit(ch);
+		if (ch >= '0' && ch <= '9') {
+			digit = (uint8_t)(ch - '0');
+		} else if (ch >= 'a' && ch <= 'f') {
+			digit = 10 + (uint8_t)(ch - 'a');
+		} else if (ch >= 'A' && ch <= 'F') {
+			digit = 10 + (uint8_t)(ch - 'A');
+		} else {
+			digit = unicode_asdigit(ch);
+		}
 		if unlikely(digit > radix)
 			return JSON_ERROR_SYNTAX;
 		new_result = (result * radix) + digit;
@@ -1465,8 +1520,13 @@ again_parse_ch:
 				ch = json_getc(self);
 				/* If this was the last digit, then the
 				 * number doesn't actually overflow! */
-				if (!unicode_isdecimal(ch))
-					break;
+				if (!unicode_isdecimal(ch)) {
+					if (radix < 16)
+						break;
+					if (!(ch >= 'a' && ch <= 'f') &&
+					    !(ch >= 'A' && ch <= 'F'))
+						break;
+				}
 				error = JSON_ERROR_RANGE;
 				goto again_parse_ch;
 			}
@@ -1474,9 +1534,19 @@ again_parse_ch:
 		}
 		result = new_result;
 		start  = self->jp_pos;
-		ch = json_getc(self);
-	} while (unicode_isdecimal(ch));
+		ch     = json_getc(self);
+		if (unicode_isdecimal(ch))
+			continue;
+		if (radix >= 16) {
+			if (ch >= 'a' && ch <= 'f')
+				continue;
+			if (ch >= 'A' && ch <= 'F')
+				continue;
+		}
+		break;
+	}
 	/* Skip trailing whitespace. */
+done:
 	json_skip_whitespace_at(self, ch, start);
 	/* Store the generated integer.
 	 * NOTE: The special case where `INTPTR_MIN == -INTPTR_MIN'
@@ -1506,11 +1576,15 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 	if (!unicode_isdecimal(ch)) {
 		if (negative)
 			return JSON_ERROR_SYNTAX;
+bad_integer:
 		self->jp_pos = start;
 		return JSON_ERROR_NOOBJ; /* Not an integer. */
 	}
+	result = 0;
 	if (ch == '0') {
-		ch = json_getc(self);
+		char const *pos;
+		pos = self->jp_pos;
+		ch  = json_getc(self);
 		if (ch == 'x' || ch == 'X') {
 			radix = 16;
 			ch    = json_getc(self);
@@ -1520,12 +1594,29 @@ NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
 		} else {
 			radix = 8;
 		}
+		if (!unicode_isdecimal(ch) &&
+		    !(ch >= 'a' && ch <= 'f') &&
+		    !(ch >= 'A' && ch <= 'F')) {
+			if (radix == 8) {
+				/* Special case: '0' */
+				start = pos;
+				goto done;
+			}
+			goto bad_integer;
+		}
 	}
-	result = 0;
-	do {
+	for (;;) {
 		uint8_t digit;
 again_parse_ch:
-		digit = unicode_asdigit(ch);
+		if (ch >= '0' && ch <= '9') {
+			digit = (uint8_t)(ch - '0');
+		} else if (ch >= 'a' && ch <= 'f') {
+			digit = 10 + (uint8_t)(ch - 'a');
+		} else if (ch >= 'A' && ch <= 'F') {
+			digit = 10 + (uint8_t)(ch - 'A');
+		} else {
+			digit = unicode_asdigit(ch);
+		}
 		if unlikely(digit > radix)
 			return JSON_ERROR_SYNTAX;
 		new_result = (result * radix) + digit;
@@ -1538,8 +1629,13 @@ again_parse_ch:
 				ch = json_getc(self);
 				/* If this was the last digit, then the
 				 * number doesn't actually overflow! */
-				if (!unicode_isdecimal(ch))
-					break;
+				if (!unicode_isdecimal(ch)) {
+					if (radix < 16)
+						break;
+					if (!(ch >= 'a' && ch <= 'f') &&
+					    !(ch >= 'A' && ch <= 'F'))
+						break;
+				}
 				error = JSON_ERROR_RANGE;
 				goto again_parse_ch;
 			}
@@ -1547,12 +1643,22 @@ again_parse_ch:
 		}
 		result = new_result;
 		start  = self->jp_pos;
-		ch = json_getc(self);
-	} while (unicode_isdecimal(ch));
+		ch     = json_getc(self);
+		if (unicode_isdecimal(ch))
+			continue;
+		if (radix >= 16) {
+			if (ch >= 'a' && ch <= 'f')
+				continue;
+			if (ch >= 'A' && ch <= 'F')
+				continue;
+		}
+		break;
+	}
 	/* Skip trailing whitespace. */
+done:
 	json_skip_whitespace_at(self, ch, start);
 	/* Store the generated integer.
-	 * NOTE: The special case where `INT64_MIN == -INT64_MIN'
+	 * NOTE: The special case where `INTPTR_MIN == -INTPTR_MIN'
 	 *       is already handled above by the overflow check! */
 	if (negative)
 		result = -result;
@@ -1620,6 +1726,10 @@ NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
 			start = self->jp_pos;
 			ch = json_getc(self);
 		} while (unicode_isdecimal(ch));
+		/* TODO: Use the same trick for converting string->float
+		 *       as is also being used by `format_scanf()'!
+		 *       It's much more precise, and doesn't require any
+		 *       functions from <math.h>! */
 #ifdef __USE_GNU
 		exp = pow10(exp);
 #else /* __USE_GNU */

@@ -564,7 +564,7 @@ NOTHROW_NCX(CC libkeymap_translate_buf)(struct keymap *__restrict self,
  *       least 5 additional trailing 0-bytes (i.e. `blob_base[blob_size+{0,1,2,3,4}] == 0')
  * NOTE: Upon success, the caller must also ensure that `self->km_ext...+=(blob_base+blob_size)-self->km_ext'
  *       will not be freed. Alternatively, the caller may replace `self->km_ext' with a duplicate of that
- *       memory region and free it themself during finalization
+ *       memory region and free it themself after finalization
  * @return: true:  Successfully loaded the given blob and initialized `self'
  * @return: false: Failed to open the blob (not a valid KMP file) */
 INTERN NONNULL((1, 2)) bool

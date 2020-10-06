@@ -1008,9 +1008,9 @@ __fp_no_exp_addend:
 			if (__flags & __SCANF_FLAG_L)
 #elif defined(__SIZEOF_LONG_LONG__)
 			if (__type_size == __SIZEOF_LONG_LONG__)
-#else /* __SIZEOF_LONG_LONG__ */
+#else /* ... */
 			if (__type_size == __SIZEOF_LONG_DOUBLE__)
-#endif /* !__SIZEOF_LONG_LONG__ */
+#endif /* !... */
 			{
 				/* Result pointer is a long-double */
 				__LONGDOUBLE *__dst;

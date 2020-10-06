@@ -90,7 +90,7 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 	char json_input[] =
 	" /* leading comment */ {"
 	"\"beta\":20, /* The value of *beta* */"
-	"\"alpha\":10/* The value of *alpha**/,"
+	"\"alpha\":0xa/* The value of *alpha**/,"
 	"\"name\":\"This is\\n my /*name*/\","
 	"\"values\"/*a*/:/*b*/[/*c*/1/*d*/,/*e*/2,4,8,16,32,64,128/*e*/]/*f*/"
 	"}/*g*/";

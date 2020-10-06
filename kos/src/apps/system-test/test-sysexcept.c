@@ -95,7 +95,7 @@ PRIVATE ATTR_NOINLINE void sysenter_Pipe(fd_t fd[2]) {
 	                     : "a" (SYS_pipe)
 	                     , "b" (&fd[0])
 	                     : "cc", "memory"
-	                     , "edi");
+	                     , "%edi");
 }
 #endif /* __i386__ && !__x86_64 */
 

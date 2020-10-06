@@ -80,11 +80,12 @@ DEFINE_TEST(open_anon_inode) {
 		return;
 
 	/* Pipes exist as anonymous objects in kernel-space.
-	 * -> Reading their symlink will yielding something
+	 * -> Reading their symlink will yield something
 	 *    along the lines of `anon_inode:[...]' */
 	error = pipe(rw);
 	ASSERT_ERROR_OK(error == 0);
-	close(rw[1]);
+	error = close(rw[1]);
+	ASSERT_ERROR_OK(error == 0);
 
 	/* First test: When using one of the fd/xxx files as part of a
 	 * path expression, the symlink must still be followed normally,
@@ -94,8 +95,8 @@ DEFINE_TEST(open_anon_inode) {
 	 * Same as:
 	 * >> openat(dfd, path, oflags);
 	 * As such, by having the fd's number be followed by a slash,
-	 * we're explicitly dereferencing the symlink (which in this
-	 * case will expand to something `anon_inode:[reader:pipe:...]`)
+	 * we're explicitly dereferencing the symlink (which in this case
+	 * will expand to something like `anon_inode:[reader:pipe:...]`)
 	 * as a path, which must obviously result in a file-not-found
 	 * exception. */
 	sprintf(pathbuf, "/proc/self/fd/%d/", rw[0]);
