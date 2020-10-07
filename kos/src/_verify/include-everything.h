@@ -305,6 +305,7 @@ incdir("", "../../include");
 #include <bits/crt/lconv.h>
 #include <bits/crt/locale.h>
 #include <bits/crt/math-vector.h>
+#include <bits/crt/mathdef.h>
 #include <bits/crt/mbstate.h>
 #include <bits/crt/ntptimeval.h>
 #include <bits/crt/posix_spawn.h>
@@ -323,7 +324,6 @@ incdir("", "../../include");
 #include <bits/in.h>
 #include <bits/ipc.h>
 #include <bits/math-constants.h>
-#include <bits/mathdef.h>
 #include <bits/mcontext.h>
 #include <bits/msgbuf.h>
 #include <bits/msq.h>
@@ -356,6 +356,7 @@ incdir("", "../../include");
 #include <bits/os/timeval.h>
 #include <bits/os/timex.h>
 #include <bits/os/tms.h>
+#include <bits/os/ustat.h>
 #include <bits/os/utimbuf.h>
 #include <bits/os/utsname.h>
 #include <bits/os_defines.h>
@@ -419,7 +420,6 @@ incdir("", "../../include");
 #include <bits/types.h>
 #include <bits/typesizes.h>
 #include <bits/ucontext.h>
-#include <bits/ustat.h>
 #include <bits/wait.h>
 #include <bitstring.h>
 #include <bsd/bitstring.h>

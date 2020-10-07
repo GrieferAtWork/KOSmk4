@@ -21,23 +21,27 @@
 %[define_replacement(dev_t = __dev_t)]
 
 %{
-#include <features.h>
-#include <sys/types.h>
-#include <bits/ustat.h>
 
-__SYSDECL_BEGIN
+#include <features.h>
+
+#include <bits/os/ustat.h> /* struct ustat */
+#include <bits/types.h>    /* __dev_t */
+
+#ifdef __USE_GLIBC
+#include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
-[[decl_include("<bits/ustat.h>")]]
+[[decl_include("<bits/os/ustat.h>", "<bits/types.h>")]]
 int ustat($dev_t dev, [[nonnull]] struct ustat *ubuf);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

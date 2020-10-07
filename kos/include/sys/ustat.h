@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x921be44a */
+/* HASH CRC-32:0xf1e0dbcf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,18 +28,22 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <features.h>
-#include <sys/types.h>
-#include <bits/ustat.h>
 
-__SYSDECL_BEGIN
+#include <features.h>
+
+#include <bits/os/ustat.h> /* struct ustat */
+#include <bits/types.h>    /* __dev_t */
+
+#ifdef __USE_GLIBC
+#include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_USTAT_H */

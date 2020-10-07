@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcadff801 */
+/* HASH CRC-32:0xe83c051b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
-#include <bits/mathdef.h>
+#include <bits/crt/mathdef.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return the binary exponent of X, which must be nonzero */
 __LOCAL_LIBC(ilogbf) __ATTR_WUNUSED int

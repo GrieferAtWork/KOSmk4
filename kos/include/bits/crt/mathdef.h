@@ -17,27 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_MATHDEF_H
-#define _I386_KOS_BITS_MATHDEF_H 1
+#ifndef _BITS_CRT_MATHDEF_H
+#define _BITS_CRT_MATHDEF_H 1
 
 #include <__stdinc.h>
-#include <hybrid/limitcore.h> /* __INT_MIN__ */
 
-#ifdef __CC__
-__DECL_BEGIN
-#if (defined(__x86_64__) || \
-     (defined(__FLT_EVAL_METHOD__) && __FLT_EVAL_METHOD__ == 0))
-typedef float  __float_t;  /* `float' expressions are evaluated as `float'.  */
-typedef double __double_t; /* `double' expressions are evaluated as `double'.  */
-#else /* __x86_64__ || __FLT_EVAL_METHOD__ == 0 */
-typedef __LONGDOUBLE __float_t;  /* `float' expressions are evaluated as `long double'.  */
-typedef __LONGDOUBLE __double_t; /* `double' expressions are evaluated as `long double'.  */
-#endif /* !__x86_64__ && __FLT_EVAL_METHOD__ != 0 */
-__DECL_END
-#endif /* __CC__ */
+#include <hybrid/limitcore.h>
 
 /* The values returned by `ilogb' for 0 and NaN respectively. */
 #define __FP_ILOGB0   __INT_MIN__
-#define __FP_ILOGBNAN __INT_MIN__
+#define __FP_ILOGBNAN __INT_MAX__
 
-#endif /* !_I386_KOS_BITS_MATHDEF_H */
+/* #define __FP_FAST_FMA 1 */
+/* #define __FP_FAST_FMAF 1 */
+/* #define __FP_FAST_FMAL 1 */
+
+#endif /* !_BITS_CRT_MATHDEF_H */

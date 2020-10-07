@@ -25,7 +25,7 @@
 #ifndef __NO_FPU
 #include <hybrid/typecore.h>
 
-#include <bits/mathdef.h> /* __FP_ILOGB0, __FP_ILOGBNAN */
+#include <bits/crt/mathdef.h> /* __FP_ILOGB0, __FP_ILOGBNAN */
 #include <bits/types.h>
 
 #include <libm/fdlibm.h>

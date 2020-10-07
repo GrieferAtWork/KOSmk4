@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x42037867 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,30 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_ilogb_defined
-#define __local_ilogb_defined 1
-#include <__crt.h>
-#include <ieee754.h>
-#if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
-#include <libm/ilogb.h>
-#include <libm/matherr.h>
-#include <bits/crt/mathdef.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Return the binary exponent of X, which must be nonzero */
-__LOCAL_LIBC(ilogb) __ATTR_WUNUSED int
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogb))(double __x) {
-	int __result;
-	__result = __LIBM_MATHFUNI(ilogb, __x);
-	if (__result == __FP_ILOGB0 || __result == __FP_ILOGBNAN || __result == __INT_MAX__)
-		__kernel_standard(__x, __x, __x, __LIBM_KMATHERRF_ILOGB);
-	return __result;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_ilogb_defined
-#define __local___localdep_ilogb_defined 1
-#define __localdep_ilogb __LIBC_LOCAL_NAME(ilogb)
-#endif /* !__local___localdep_ilogb_defined */
-#else /* __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
-#undef __local_ilogb_defined
-#endif /* !__IEEE754_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ && !__IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
-#endif /* !__local_ilogb_defined */
+#ifndef _I386_KOS_BITS_CRT_MATHDEF_H
+#define _I386_KOS_BITS_CRT_MATHDEF_H 1
+
+#include <__stdinc.h>
+
+#include <hybrid/limitcore.h> /* __INT_MIN__ */
+
+/* The values returned by `ilogb' for 0 and NaN respectively. */
+#define __FP_ILOGB0   __INT_MIN__
+#define __FP_ILOGBNAN __INT_MIN__ /* NOTE: This overrides the default of `__INT_MAX__'! */
+
+#endif /* !_I386_KOS_BITS_CRT_MATHDEF_H */

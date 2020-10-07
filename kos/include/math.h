@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb78ae6f9 */
+/* HASH CRC-32:0x46de658c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -561,6 +561,7 @@ __NAMESPACE_STD_USING(islessgreater)
 #include <features.h>
 
 #include <hybrid/typecore.h>
+#include <hybrid/floatcore.h>
 
 #include <bits/math-constants.h>
 #include <bits/crt/math-vector.h>
@@ -568,8 +569,8 @@ __NAMESPACE_STD_USING(islessgreater)
 #include <ieee754.h>
 
 #ifdef __USE_ISOC99
-#include <asm/fp_type.h>  /* __FP_NAN, __FP_INFINITE, ... */
-#include <bits/mathdef.h> /* __float_t, __double_t */
+#include <asm/fp_type.h>      /* __FP_NAN, __FP_INFINITE, ... */
+#include <bits/crt/mathdef.h> /* __FLT_EVAL_METHOD__, __FP_ILOGB0, __FP_ILOGBNAN */
 #endif /* __USE_ISOC99 */
 
 #ifdef __USE_MISC
@@ -10732,8 +10733,28 @@ enum {
 /*[[[end]]]*/
 #endif /* ... */
 
+/* Figure out defaults for `float_t' and `double_t' if those
+ * havn't already been defined by `<bits/crt/mathdef.h>' */
+#if !defined(__float_t) || !defined(__double_t)
+#if (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 2)
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#define __float_t  __LONGDOUBLE
+#define __double_t __LONGDOUBLE
+#else /* __COMPILER_HAVE_LONGDOUBLE */
+#define __float_t  double
+#define __double_t double
+#endif /* !__COMPILER_HAVE_LONGDOUBLE */
+#elif (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 1)
+#define __float_t  double
+#define __double_t double
+#else /* __FLT_EVAL_METHOD__ == ... */
+#define __float_t  float
+#define __double_t double
+#endif /* __FLT_EVAL_METHOD__ != ... */
+#endif /* !__float_t || !__double_t */
+
 /* `float' expressions are evaluated as this. */
-typedef __float_t  float_t;
+typedef __float_t float_t;
 
 /* `double' expressions are evaluated as this. */
 typedef __double_t double_t;

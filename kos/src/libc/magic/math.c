@@ -51,6 +51,8 @@
 
 }%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%[insert:prefix(
+#include <hybrid/floatcore.h>
 )]%{
 
 }%[insert:prefix(
@@ -64,8 +66,8 @@
 )]%{
 
 #ifdef __USE_ISOC99
-#include <asm/fp_type.h>  /* __FP_NAN, __FP_INFINITE, ... */
-#include <bits/mathdef.h> /* __float_t, __double_t */
+#include <asm/fp_type.h>      /* __FP_NAN, __FP_INFINITE, ... */
+#include <bits/crt/mathdef.h> /* __FLT_EVAL_METHOD__, __FP_ILOGB0, __FP_ILOGBNAN */
 #endif /* __USE_ISOC99 */
 
 #ifdef __USE_MISC
@@ -794,7 +796,7 @@ double remainder(double x, double p) {
 
 @@Return the binary exponent of X, which must be nonzero
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__ilogb")]]
-[[impl_include("<libm/ilogb.h>", "<libm/matherr.h>", "<bits/mathdef.h>")]]
+[[impl_include("<libm/ilogb.h>", "<libm/matherr.h>", "<bits/crt/mathdef.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) ||
@@ -2197,8 +2199,28 @@ enum {
 /*[[[end]]]*/
 #endif /* ... */
 
+/* Figure out defaults for `float_t' and `double_t' if those
+ * havn't already been defined by `<bits/crt/mathdef.h>' */
+#if !defined(__float_t) || !defined(__double_t)
+#if (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 2)
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#define __float_t  __LONGDOUBLE
+#define __double_t __LONGDOUBLE
+#else /* __COMPILER_HAVE_LONGDOUBLE */
+#define __float_t  double
+#define __double_t double
+#endif /* !__COMPILER_HAVE_LONGDOUBLE */
+#elif (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 1)
+#define __float_t  double
+#define __double_t double
+#else /* __FLT_EVAL_METHOD__ == ... */
+#define __float_t  float
+#define __double_t double
+#endif /* __FLT_EVAL_METHOD__ != ... */
+#endif /* !__float_t || !__double_t */
+
 /* `float' expressions are evaluated as this. */
-typedef __float_t  float_t;
+typedef __float_t float_t;
 
 /* `double' expressions are evaluated as this. */
 typedef __double_t double_t;

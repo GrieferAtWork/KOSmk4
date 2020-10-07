@@ -17,41 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_MATHDEF_H
-#define _BITS_MATHDEF_H 1
+#ifndef _BITS_OS_USTAT_H
+#define _BITS_OS_USTAT_H 1
+
+/* File:
+ *    <bits/os/ustat.h>
+ * 
+ * Definitions:
+ *    struct ustat {
+ *        ...
+ *    };
+ */
 
 #include <__stdinc.h>
 
-#include <hybrid/limitcore.h>
+/**/
+#include <bits/os/kos/ustat.h>
 
-#ifdef __CC__
-__DECL_BEGIN
-
-#if (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 2)
-#ifdef __COMPILER_HAVE_LONGDOUBLE
-typedef __LONGDOUBLE __float_t;
-typedef __LONGDOUBLE __double_t;
-#else /* __COMPILER_HAVE_LONGDOUBLE */
-typedef double __float_t;
-typedef double __double_t;
-#endif /* !__COMPILER_HAVE_LONGDOUBLE */
-#elif (defined(__FLT_EVAL_METHOD__) && (__FLT_EVAL_METHOD__ + 0) == 1)
-typedef double __float_t;
-typedef double __double_t;
-#else /* __FLT_EVAL_METHOD__ == ... */
-typedef float  __float_t;
-typedef double __double_t;
-#endif /* __FLT_EVAL_METHOD__ != ... */
-
-__DECL_END
-#endif /* __CC__ */
-
-/* The values returned by `ilogb' for 0 and NaN respectively. */
-#define __FP_ILOGB0   __INT_MIN__
-#define __FP_ILOGBNAN __INT_MAX__
-
-/* #define __FP_FAST_FMA 1 */
-/* #define __FP_FAST_FMAF 1 */
-/* #define __FP_FAST_FMAL 1 */
-
-#endif /* !_BITS_MATHDEF_H */
+#endif /* !_BITS_OS_USTAT_H */

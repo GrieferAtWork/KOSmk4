@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5770ab65 */
+/* HASH CRC-32:0xc132bec7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1199,7 +1199,7 @@ NOTHROW(LIBCCALL libc_remainder)(double x,
 }
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
-#include <bits/mathdef.h>
+#include <bits/crt/mathdef.h>
 /* Return the binary exponent of X, which must be nonzero */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED int
 NOTHROW(LIBCCALL libc_ilogb)(double x) {
@@ -1256,7 +1256,7 @@ NOTHROW(LIBCCALL libc_remainderf)(float x,
 }
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
-#include <bits/mathdef.h>
+#include <bits/crt/mathdef.h>
 /* Return the binary exponent of X, which must be nonzero */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED int
 NOTHROW(LIBCCALL libc_ilogbf)(float x) {
@@ -1319,7 +1319,7 @@ NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
 }
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
-#include <bits/mathdef.h>
+#include <bits/crt/mathdef.h>
 /* Return the binary exponent of X, which must be nonzero */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED int
 NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x) {

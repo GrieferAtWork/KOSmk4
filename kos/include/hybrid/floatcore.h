@@ -37,6 +37,17 @@
 #endif /* !... */
 #endif /* !__FLT_EVAL_METHOD__ */
 
+#if __FLT_EVAL_METHOD__ < 0
+#include "host.h"
+#ifdef __x86_64__
+#undef __FLT_EVAL_METHOD__
+#define __FLT_EVAL_METHOD__ 0
+#elif defined(__i386__)
+#undef __FLT_EVAL_METHOD__
+#define __FLT_EVAL_METHOD__ 2
+#endif /* ... */
+#endif /* __FLT_EVAL_METHOD__ < 0 */
+
 #ifndef __FLT_DECIMAL_DIG__
 #define __FLT_DECIMAL_DIG__        9
 #endif /* !__FLT_DECIMAL_DIG__ */

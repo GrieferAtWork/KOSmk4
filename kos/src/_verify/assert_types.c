@@ -414,7 +414,7 @@ local files = {
 	"../../include/bits/os/kos/timespec.h",
 	"../../include/bits/os/kos/timeval.h",
 	"../../include/bits/ucontext.h",
-	"../../include/bits/ustat.h",
+	"../../include/bits/os/kos/ustat.h",
 	"../../include/bits/os/kos/utimbuf.h",
 	"../../include/bits/os/kos/utsname.h",
 	"../../include/bits/crt/ntptimeval.h",
@@ -971,7 +971,7 @@ static_assert(alignof(struct ucontext) == __ALIGNOF_UCONTEXT);
 
 
 
-#include <bits/ustat.h>
+#include <bits/os/kos/ustat.h>
 
 /* struct ustat */
 static_assert(offsetof(struct ustat, f_fname) == __OFFSET_USTAT_FNAME);

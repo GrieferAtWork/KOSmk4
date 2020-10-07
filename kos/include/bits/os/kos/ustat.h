@@ -17,8 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_USTAT_H
-#define _BITS_USTAT_H 1
+#ifndef _BITS_OS_KOS_USTAT_H
+#define _BITS_OS_KOS_USTAT_H 1
+
+/* File:
+ *    <bits/os/kos/ustat.h>
+ * 
+ * Definitions:
+ *    struct ustat {
+ *        ...
+ *    };
+ */
 
 #include <__stdinc.h>
 
@@ -63,4 +72,4 @@ struct ustat /*[PREFIX(f_)]*/ {
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_BITS_USTAT_H */
+#endif /* !_BITS_OS_KOS_USTAT_H */
