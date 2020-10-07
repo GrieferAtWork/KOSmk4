@@ -406,7 +406,7 @@ typedef struct {
 #endif /* __KERNEL__ */
 } vga_vm86_state_t;
 
-/* Return the virtual base address of the bios communition data buffer. */
+/* Return the virtual base address of the bios communication data buffer. */
 #define vga_vm86_buffer(self, num_bytes) \
 	((self)->vv_biosbase + VGA_VM86_BUF)
 
@@ -492,24 +492,31 @@ vm86_io(vm86_state_t *__restrict UNUSED(self),
         void *data) {
 	int result = VM86_SUCCESS;
 	switch (action) {
+
 	case VM86_HANDLE_IO_INB:
 		*(uint8_t *)data = inb((port_t)port);
 		break;
+
 	case VM86_HANDLE_IO_INW:
 		*(uint16_t *)data = inw((port_t)port);
 		break;
+
 	case VM86_HANDLE_IO_INL:
 		*(uint32_t *)data = inl((port_t)port);
 		break;
+
 	case VM86_HANDLE_IO_OUTB:
 		outb((port_t)port, *(uint8_t *)data);
 		break;
+
 	case VM86_HANDLE_IO_OUTW:
 		outw((port_t)port, *(uint16_t *)data);
 		break;
+
 	case VM86_HANDLE_IO_OUTL:
 		outl((port_t)port, *(uint32_t *)data);
 		break;
+
 	default:
 		result = VM86_BADPORT;
 		break;
@@ -781,14 +788,14 @@ NOTHROW_KERNEL(CC libvga_state_fini)(struct vga_state const *__restrict self) {
 
 
 
-/* DISCLAIMER: This font data has been generated from univga:
- * https://star.inp.nsk.su/~bolkhov/files/fonts/univga/ */
 PRIVATE struct vga_mode const textmode =
 VGA_BIOTEXT80x25_MODE_INIT(VGA_PALINDX_CGA_ANSI_INIT);
 
 PRIVATE struct vga_palette16 const textpal =
 VGA_PALETTE_CGA_INIT;
 
+/* DISCLAIMER: This font data has been generated from univga:
+ * https://star.inp.nsk.su/~bolkhov/files/fonts/univga/ */
 PRIVATE struct vga_font const textfont = {{
 /*[[[deemon
 local CP437 = {

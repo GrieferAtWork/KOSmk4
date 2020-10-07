@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4aeb001 */
+/* HASH CRC-32:0xfd74fedf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -665,9 +665,13 @@ INTDEF ATTR_LEAF NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strsep)(char **
 INTDEF ATTR_LEAF NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strsep)(char **__restrict stringp, char const *__restrict delim);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_bcopy)(void const *src, void *dst, size_t num_bytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src, void *dst, size_t num_bytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

@@ -17,15 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_IOCTLS_TERMIO_H
-#define _BITS_IOCTLS_TERMIO_H 1
+#ifndef _BITS_OS_KOS_TERMIO_H
+#define _BITS_OS_KOS_TERMIO_H 1
 
 #include <__stdinc.h>
-
-#if defined(__KOS__) || defined(__linux__)
 #include <hybrid/typecore.h>
-
-#include <asm/ioctls/tty.h>
 
 __DECL_BEGIN
 
@@ -112,6 +108,5 @@ enum {
 /*[[[end]]]*/
 
 __DECL_END
-#endif /* __KOS__ || __linux__ */
 
-#endif /* !_BITS_IOCTLS_TERMIO_H */
+#endif /* !_BITS_OS_KOS_TERMIO_H */

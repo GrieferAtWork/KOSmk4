@@ -44,16 +44,15 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
-#include <asm/ioctls/block.h>
-#include <asm/ioctls/block_ex.h>
-#include <asm/ioctls/tty.h>
 #include <bits/os/iovec.h> /* struct iovec */
 #include <compat/config.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/hop/handle.h>
 #include <kos/io.h>
+#include <linux/fs.h>
 #include <linux/kcmp.h>
+#include <sys/ioctl.h>
 #include <sys/mount.h>
 #include <sys/poll.h>
 #include <sys/stat.h>

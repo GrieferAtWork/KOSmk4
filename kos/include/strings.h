@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65762de5 */
+/* HASH CRC-32:0xae1860b9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,11 +54,17 @@ typedef __SIZE_TYPE__ size_t;
 #ifndef __bcopy_defined
 #define __bcopy_defined 1
 #if __has_builtin(__builtin_bcopy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_bcopy)
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),void,__NOTHROW_NCX,bcopy,(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes),{ return __builtin_bcopy(__src, __dst, __num_bytes); })
 #elif defined(__CRT_HAVE_bcopy)
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 __CDECLARE_VOID_GCCNCX(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,bcopy,(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes),(__src,__dst,__num_bytes))
 #else /* ... */
 #include <libc/local/string/bcopy.h>
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 __NAMESPACE_LOCAL_USING_OR_IMPL(bcopy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL bcopy)(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bcopy))(__src, __dst, __num_bytes); })
 #endif /* !... */
 #endif /* !__bcopy_defined */

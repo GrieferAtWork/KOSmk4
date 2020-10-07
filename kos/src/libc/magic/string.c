@@ -413,7 +413,7 @@ __NAMESPACE_STD_USING(__forward_size)
  *   [kos] mempmoveup[b|w|l|q]  - Same as `mempmove[b|w|l|q]', but assume that `DST >= SRC'
  *   [kos] mempmovedown[b|w|l|q]- Same as `mempmove[b|w|l|q]', but assume that `DST <= SRC'
  *   [std] memchr[b|w|l|q]      - Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
- *   [glc] memrchr[b|w|l|q]     - Descendingly search for `NEEDLE', starting at `HAYSTACK+N_(BYTES|WORDS|DWORDS)'. - Return `NULL' if `NEEDLE' wasn't found.
+ *   [glc] memrchr[b|w|l|q]     - Descendingly search for `NEEDLE', starting at `HAYSTACK+N_(BYTES|WORDS|DWORDS)-1'. - Return `NULL' if `NEEDLE' wasn't found.
  *   [glc] rawmemchr[b|w|l|q]   - Same as `memchr[b|w|l|q]' with a search limit of `(size_t)-1/sizeof(T)'
  *   [kos] rawmemrchr[b|w|l|q]  - Same as `memrchr[b|w|l|q]' without a search limit, starting at `HAYSTACK-sizeof(T)'
  *   [kos] memend[b|w|l|q]      - Same as `memchr[b|w|l|q]', but return `HAYSTACK+N_(BYTES|WORDS|DWORDS)', rather than `NULL' if `NEEDLE' wasn't found.
@@ -1304,7 +1304,7 @@ $errno_t __xpg_strerror_r($errno_t errnum, [[nonnull]] char *buf, $size_t buflen
 char *strsep([[nonnull]] char **__restrict stringp,
              [[nonnull]] char const *__restrict delim) {
 	char *result, *iter;
-	if (!stringp || (result = *stringp) == NULL || !*result)
+	if ((result = *stringp) == NULL || !*result)
 		return NULL;
 	for (iter = result; *iter && !strchr(delim, *iter); ++iter)
 		;
@@ -1314,6 +1314,8 @@ char *strsep([[nonnull]] char **__restrict stringp,
 	return result;
 }
 
+@@Same as `memmove(dst, src, num_bytes)'
+@@Note that bcopy is called with `dst' and `src' reversed
 [[guard, crtbuiltin]]
 [[decl_include("<hybrid/typecore.h>")]]
 void bcopy([[nonnull]] void const *src,
@@ -1393,11 +1395,11 @@ void bzerol([[nonnull]] void *__restrict dst, $size_t num_dwords) {
 [[preferred_fastbind, guard, libc, kernel, ATTR_LEAF]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZEROQ))]]
 void bzeroq([[nonnull]] void *__restrict dst, $size_t num_qwords) {
-#ifdef __UINT64_TYPE__
+@@pp_if defined(__UINT64_TYPE__) && __SIZEOF_BUSINT__ >= 8@@
 	memsetq(dst, 0, num_qwords);
-#else /* __UINT64_TYPE__ */
+@@pp_else@@
 	bzerol(dst, num_qwords * 2);
-#endif /* !__UINT64_TYPE__ */
+@@pp_endif@@
 }
 
 %#endif /* __USE_STRING_BWLQ */
@@ -1427,7 +1429,7 @@ void bzeroq([[nonnull]] void *__restrict dst, $size_t num_qwords) {
 [[impl_include("<hybrid/host.h>"), decl_include("<hybrid/typecore.h>")]]
 void bzeroc([[nonnull]] void *__restrict dst,
             $size_t elem_count, $size_t elem_size) {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -1442,19 +1444,19 @@ void bzeroc([[nonnull]] void *__restrict dst,
 		bzerol(dst, elem_count);
 		break;
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		bzeroq(dst, elem_count);
 		break;
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		bzero(dst, elem_count * elem_size);
 		break;
 	}
-#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_else@@
 	bzero(dst, elem_count * elem_size);
-#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 }
 
 %#endif /* __USE_KOS */
@@ -3449,7 +3451,7 @@ memcpyc:([[nonnull]] void *__restrict dst,
          [[nonnull]] void const *__restrict src,
          $size_t elem_count, $size_t elem_size)
 	-> [[== dst]] void * {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -3461,15 +3463,15 @@ memcpyc:([[nonnull]] void *__restrict dst,
 	case 4:
 		return memcpyl(dst, src, elem_count);
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return memcpyq(dst, src, elem_count);
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		break;
 	}
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 	return memcpy(dst, src, elem_count * elem_size);
 }
 
@@ -3480,7 +3482,7 @@ mempcpyc:([[nonnull]] void *__restrict dst,
           [[nonnull]] void const *__restrict src,
           $size_t elem_count, $size_t elem_size)
 	-> [[== dst + (elem_count * elem_size)]] void * {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -3492,15 +3494,15 @@ mempcpyc:([[nonnull]] void *__restrict dst,
 	case 4:
 		return mempcpyl(dst, src, elem_count);
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return mempcpyq(dst, src, elem_count);
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		break;
 	}
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 	return mempcpy(dst, src, elem_count * elem_size);
 }
 
@@ -3512,7 +3514,7 @@ memmovec:([[nonnull]] void *dst,
           [[nonnull]] void const *src,
           $size_t elem_count, $size_t elem_size)
 	-> [[== dst]] void * {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -3524,15 +3526,15 @@ memmovec:([[nonnull]] void *dst,
 	case 4:
 		return memmovel(dst, src, elem_count);
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return memmoveq(dst, src, elem_count);
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		break;
 	}
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 	return memmove(dst, src, elem_count * elem_size);
 }
 
@@ -3543,7 +3545,7 @@ mempmovec:([[nonnull]] void *dst,
            [[nonnull]] void const *src,
            $size_t elem_count, $size_t elem_size)
 	-> [[== dst + (elem_count * elem_size)]] void * {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -3555,15 +3557,15 @@ mempmovec:([[nonnull]] void *dst,
 	case 4:
 		return mempmovel(dst, src, elem_count);
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return mempmoveq(dst, src, elem_count);
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		break;
 	}
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 	return mempmove(dst, src, elem_count * elem_size);
 }
 
@@ -3575,7 +3577,7 @@ memmoveupc:([[nonnull]] void *dst,
             [[nonnull]] void const *src,
             $size_t elem_count, $size_t elem_size)
 	-> [[== dst]] void * {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -3587,15 +3589,15 @@ memmoveupc:([[nonnull]] void *dst,
 	case 4:
 		return memmoveupl(dst, src, elem_count);
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return memmoveupq(dst, src, elem_count);
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		break;
 	}
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 	return memmoveup(dst, src, elem_count * elem_size);
 }
 
@@ -3607,7 +3609,7 @@ mempmoveupc:([[nonnull]] void *dst,
              [[nonnull]] void const *src,
              $size_t elem_count, $size_t elem_size)
 	-> [[== dst + (elem_count * elem_size)]] void * {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -3619,15 +3621,15 @@ mempmoveupc:([[nonnull]] void *dst,
 	case 4:
 		return mempmoveupl(dst, src, elem_count);
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return mempmoveupq(dst, src, elem_count);
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		break;
 	}
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 	return mempmoveup(dst, src, elem_count * elem_size);
 }
 
@@ -3639,7 +3641,7 @@ memmovedownc:([[nonnull]] void *dst,
               [[nonnull]] void const *src,
               $size_t elem_count, $size_t elem_size)
 	-> [[== dst]] void * {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -3651,15 +3653,15 @@ memmovedownc:([[nonnull]] void *dst,
 	case 4:
 		return memmovedownl(dst, src, elem_count);
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return memmovedownq(dst, src, elem_count);
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		break;
 	}
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 	return memmovedown(dst, src, elem_count * elem_size);
 }
 
@@ -3670,7 +3672,7 @@ mempmovedownc:([[nonnull]] void *dst,
                [[nonnull]] void const *src,
                $size_t elem_count, $size_t elem_size)
 	-> [[== dst + (elem_count * elem_size)]] void * {
-#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -3682,15 +3684,15 @@ mempmovedownc:([[nonnull]] void *dst,
 	case 4:
 		return mempmovedownl(dst, src, elem_count);
 
-#ifdef __UINT64_TYPE__
+@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return mempmovedownq(dst, src, elem_count);
-#endif /* __UINT64_TYPE__ */
+@@pp_endif@@
 
 	default:
 		break;
 	}
-#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+@@pp_endif@@
 	return mempmovedown(dst, src, elem_count * elem_size);
 }
 
@@ -6587,6 +6589,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(__forward_size)
 #endif /* !__CXX_SYSTEM_HEADER */
+/* Special handling, so this macro also works as `std::strlen(...)' */
 #define strlen(x) __forward_size(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
 #else /* __cplusplus */
 #define strlen(x) (__builtin_constant_p(x) ? __builtin_strlen(x) : (strlen)(x))
@@ -6639,7 +6642,25 @@ __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __
 
 
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
-/* In C, we can use argument-count overload macros to implement these overloads! */
+/* In C, we can use argument-count overload macros to implement these overloads:
+ * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
+ * >> void *memcpy(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *memmove(void *dst, void const *src, size_t num_bytes);
+ * >> void *memmove(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *memmoveup(void *dst, void const *src, size_t num_bytes);
+ * >> void *memmoveup(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *memmovedown(void *dst, void const *src, size_t num_bytes);
+ * >> void *memmovedown(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *mempcpy(void *dst, void const *src, size_t num_bytes);
+ * >> void *mempcpy(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *mempmove(void *dst, void const *src, size_t num_bytes);
+ * >> void *mempmove(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *mempmoveup(void *dst, void const *src, size_t num_bytes);
+ * >> void *mempmoveup(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *mempmovedown(void *dst, void const *src, size_t num_bytes);
+ * >> void *mempmovedown(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void bzero(void *dst, size_t num_bytes);
+ * >> void bzero(void *dst, size_t elem_count, size_t elem_size); */
 #ifdef __USE_MISC
 #undef __PRIVATE_bzero_3
 #undef __PRIVATE_bzero_4

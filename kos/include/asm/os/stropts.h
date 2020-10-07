@@ -17,21 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_XTITYPES_H
-#define _BITS_XTITYPES_H 1
+#ifndef _ASM_OS_STROPTS_H
+#define _ASM_OS_STROPTS_H 1
 
 #include <__stdinc.h>
 
-#include <hybrid/typecore.h>
+#if defined(__KOS__) || defined(__linux__)
+#include <asm/os/kos/stropts.h>
+#endif /* ... */
 
-#define __SIZEOF_T_SCALAR_T__ 4
-#ifdef __CC__
-__DECL_BEGIN
-
-typedef __LONG32_TYPE__  __t_scalar_t;
-typedef __ULONG32_TYPE__ __t_uscalar_t;
-
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_BITS_XTITYPES_H */
+#endif /* !_ASM_OS_STROPTS_H */

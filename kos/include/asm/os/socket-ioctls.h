@@ -17,23 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_TERMIOX_H
-#define _SYS_TERMIOX_H 1
+#ifndef _ASM_OS_SOCKET_IOCTLS_H
+#define _ASM_OS_SOCKET_IOCTLS_H 1
 
-#include <asm/os/tty.h> /* TCGETX, TCSETX, TCSETXW, TCSETXF */
-#include <bits/os/termiox.h> /* struct termiox */
+#include <__stdinc.h>
 
-#if !defined(TCGETX) && defined(__TCGETX)
-#define TCGETX  __TCGETX  /* SYS5 TCGETX compatibility */
-#endif /* !TCGETX && __TCGETX */
-#if !defined(TCSETX) && defined(__TCSETX)
-#define TCSETX  __TCSETX  /* ... */
-#endif /* !TCSETX && __TCSETX */
-#if !defined(TCSETXF) && defined(__TCSETXF)
-#define TCSETXF __TCSETXF /* ... */
-#endif /* !TCSETXF && __TCSETXF */
-#if !defined(TCSETXW) && defined(__TCSETXW)
-#define TCSETXW __TCSETXW /* ... */
-#endif /* !TCSETXW && __TCSETXW */
+#if defined(__KOS__) || defined(__linux__)
+#include <asm/os/kos/socket-ioctls.h>
+#endif /* ... */
 
-#endif /* !_SYS_TERMIOX_H */
+#endif /* !_ASM_OS_SOCKET_IOCTLS_H */

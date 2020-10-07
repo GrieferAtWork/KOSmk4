@@ -31,116 +31,117 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_isastream,hash:CRC-32=0x2908900d]]]*/
-/* Test whether FILDES is associated with a STREAM-based file */
+/*[[[head:libc_isastream,hash:CRC-32=0x195903e8]]]*/
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
-NOTHROW(LIBCCALL libc_isastream)(fd_t fildes)
+NOTHROW(LIBCCALL libc_isastream)(fd_t fd)
 /*[[[body:libc_isastream]]]*/
 /*AUTO*/{
-	(void)fildes;
-	CRT_UNIMPLEMENTEDF("isastream(%" PRIxN(__SIZEOF_FD_T__) ")", fildes); /* TODO */
+	(void)fd;
+	CRT_UNIMPLEMENTEDF("isastream(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
 /*[[[end:libc_isastream]]]*/
 
-/*[[[head:libc_getmsg,hash:CRC-32=0xe7ca45fa]]]*/
-/* Receive next message from a STREAMS file */
+/*[[[head:libc_getmsg,hash:CRC-32=0xc7e3994]]]*/
+/* @param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
+ * @return: MORECTL:  ???
+ * @return: MOREDATA: ??? */
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
-NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fildes,
+NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fd,
                                   struct strbuf *__restrict ctlptr,
                                   struct strbuf *__restrict dataptr,
-                                  __STDC_INT_AS_UINT_T *__restrict flagsp)
+                                  __STDC_INT_AS_UINT_T *__restrict pflags)
 /*[[[body:libc_getmsg]]]*/
 /*AUTO*/{
-	(void)fildes;
+	(void)fd;
 	(void)ctlptr;
 	(void)dataptr;
-	(void)flagsp;
-	CRT_UNIMPLEMENTEDF("getmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p)", fildes, ctlptr, dataptr, flagsp); /* TODO */
+	(void)pflags;
+	CRT_UNIMPLEMENTEDF("getmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p)", fd, ctlptr, dataptr, pflags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
 /*[[[end:libc_getmsg]]]*/
 
-/*[[[head:libc_getpmsg,hash:CRC-32=0x5fc8bd76]]]*/
-/* Receive next message from a STREAMS file, with *FLAGSP allowing to control which message. */
+/*[[[head:libc_getpmsg,hash:CRC-32=0xa553be7e]]]*/
+/* @param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
+ * @return: MORECTL:  ???
+ * @return: MOREDATA: ??? */
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
-NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fildes,
+NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fd,
                                    struct strbuf *__restrict ctlptr,
                                    struct strbuf *__restrict dataptr,
                                    int *__restrict bandp,
-                                   __STDC_INT_AS_UINT_T *__restrict flagsp)
+                                   __STDC_INT_AS_UINT_T *__restrict pflags)
 /*[[[body:libc_getpmsg]]]*/
 /*AUTO*/{
-	(void)fildes;
+	(void)fd;
 	(void)ctlptr;
 	(void)dataptr;
 	(void)bandp;
-	(void)flagsp;
-	CRT_UNIMPLEMENTEDF("getpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p, %p)", fildes, ctlptr, dataptr, bandp, flagsp); /* TODO */
+	(void)pflags;
+	CRT_UNIMPLEMENTEDF("getpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p, %p)", fd, ctlptr, dataptr, bandp, pflags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
 /*[[[end:libc_getpmsg]]]*/
 
-/*[[[head:libc_putmsg,hash:CRC-32=0xae8e6f50]]]*/
-/* Send a message on a STREAM */
+/*[[[head:libc_putmsg,hash:CRC-32=0x3e031ec0]]]*/
+/* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
-NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fildes,
+NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fd,
                                   struct strbuf const *ctlptr,
                                   struct strbuf const *dataptr,
                                   __STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_putmsg]]]*/
 /*AUTO*/{
-	(void)fildes;
+	(void)fd;
 	(void)ctlptr;
 	(void)dataptr;
 	(void)flags;
-	CRT_UNIMPLEMENTEDF("putmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x)", fildes, ctlptr, dataptr, flags); /* TODO */
+	CRT_UNIMPLEMENTEDF("putmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x)", fd, ctlptr, dataptr, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
 /*[[[end:libc_putmsg]]]*/
 
-/*[[[head:libc_putpmsg,hash:CRC-32=0x5a834cff]]]*/
-/* Send a message on a STREAM to the BAND */
+/*[[[head:libc_putpmsg,hash:CRC-32=0x5bfcc902]]]*/
+/* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
 INTERN ATTR_SECTION(".text.crt.io.stropts") int
-NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fildes,
+NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd,
                                    struct strbuf const *ctlptr,
                                    struct strbuf const *dataptr,
                                    __STDC_INT_AS_UINT_T band,
                                    __STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_putpmsg]]]*/
 /*AUTO*/{
-	(void)fildes;
+	(void)fd;
 	(void)ctlptr;
 	(void)dataptr;
 	(void)band;
 	(void)flags;
-	CRT_UNIMPLEMENTEDF("putpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x, %x)", fildes, ctlptr, dataptr, band, flags); /* TODO */
+	CRT_UNIMPLEMENTEDF("putpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x, %x)", fd, ctlptr, dataptr, band, flags); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
 /*[[[end:libc_putpmsg]]]*/
 
-/*[[[head:libc_fattach,hash:CRC-32=0x4412fa6b]]]*/
-/* Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space */
+/*[[[head:libc_fattach,hash:CRC-32=0x1af7818f]]]*/
 INTERN ATTR_SECTION(".text.crt.io.stropts") NONNULL((2)) int
-NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fildes,
+NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd,
                                        char const *__restrict path)
 /*[[[body:libc_fattach]]]*/
 /*AUTO*/{
-	(void)fildes;
+	(void)fd;
 	(void)path;
-	CRT_UNIMPLEMENTEDF("fattach(%" PRIxN(__SIZEOF_FD_T__) ", %q)", fildes, path); /* TODO */
+	CRT_UNIMPLEMENTEDF("fattach(%" PRIxN(__SIZEOF_FD_T__) ", %q)", fd, path); /* TODO */
 	libc_seterrno(ENOSYS);
 	return 0;
 }
 /*[[[end:libc_fattach]]]*/
 
-/*[[[head:libc_fdetach,hash:CRC-32=0xa9c32b13]]]*/
-/* Detach a name PATH from a STREAMS-based file descriptor */
+/*[[[head:libc_fdetach,hash:CRC-32=0x44e4641f]]]*/
 INTERN ATTR_SECTION(".text.crt.io.stropts") NONNULL((1)) int
 NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 /*[[[body:libc_fdetach]]]*/

@@ -26,7 +26,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/crt/format-printer.h>
-#include <bits/ioctls/termios.h> /* struct termios */
+#include <bits/os/termios.h> /* struct termios */
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/io.h>

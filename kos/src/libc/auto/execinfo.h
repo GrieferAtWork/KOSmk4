@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd28ea47d */
+/* HASH CRC-32:0x2af86cf1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,9 +33,9 @@ DECL_BEGIN
 /* Create a traceback of up to `SIZE' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
  * information is constructed with the help of CFI instrumentation,
- * and the function from `<libunwind/...>'. However, on other systems,
- * this function is fairly dump and relies on all traversed code
- * having been compiled with function frames enabled.
+ * and the functions from `<libunwind/...>'. However, on other
+ * systems, this function is fairly dump and relies on all traversed
+ * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
 INTDEF NONNULL((1)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd_backtrace)(void **array, __STDC_INT_AS_SIZE_T size);
 /* Return an array of exactly `size' elements that contains the

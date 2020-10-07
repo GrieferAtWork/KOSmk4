@@ -17,13 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_IOCTLS_TERMIOS_H
-#define _BITS_IOCTLS_TERMIOS_H 1
+#ifndef _BITS_OS_KOS_TERMIOS_H
+#define _BITS_OS_KOS_TERMIOS_H 1
 
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
-#if defined(__KOS__) || defined(__linux__)
 __DECL_BEGIN
 
 #ifdef __CC__
@@ -265,6 +264,5 @@ struct termios2 {
 	_IOT(_IOTS(cflag_t), 4, _IOTS(cc_t), NCCS, _IOTS(speed_t), 2)
 
 __DECL_END
-#endif /* __KOS__ || __linux__ */
 
-#endif /* !_BITS_IOCTLS_TERMIOS_H */
+#endif /* !_BITS_OS_KOS_TERMIOS_H */

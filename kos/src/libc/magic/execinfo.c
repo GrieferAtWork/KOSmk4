@@ -33,9 +33,9 @@ __SYSDECL_BEGIN
 @@Create a traceback of up to `SIZE' instruction pointers from
 @@the calling function, their caller, and so forth. On KOS, this
 @@information is constructed with the help of CFI instrumentation,
-@@and the function from `<libunwind/...>'. However, on other systems,
-@@this function is fairly dump and relies on all traversed code
-@@having been compiled with function frames enabled.
+@@and the functions from `<libunwind/...>'. However, on other
+@@systems, this function is fairly dump and relies on all traversed
+@@code having been compiled with function frames enabled.
 @@@return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE')
 [[export_alias("__backtrace"), decl_include("<features.h>")]]
 __STDC_INT_AS_SIZE_T backtrace([[nonnull]] void **array,

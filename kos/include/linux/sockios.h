@@ -22,6 +22,6 @@
 
 #include <__stdinc.h>
 
-#include <asm/ioctls/socket.h>
+#include <sys/ioctl.h> /* Only need to define SOCKET ioctls */
 
 #endif /* !_LINUX_SOCKIOS_H */

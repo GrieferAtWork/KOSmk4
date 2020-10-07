@@ -135,13 +135,13 @@ bool LIBCCALL init_libdebuginfo(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_backtrace,hash:CRC-32=0xb681b400]]]*/
+/*[[[head:libc_backtrace,hash:CRC-32=0x8b224395]]]*/
 /* Create a traceback of up to `SIZE' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
  * information is constructed with the help of CFI instrumentation,
- * and the function from `<libunwind/...>'. However, on other systems,
- * this function is fairly dump and relies on all traversed code
- * having been compiled with function frames enabled.
+ * and the functions from `<libunwind/...>'. However, on other
+ * systems, this function is fairly dump and relies on all traversed
+ * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
 INTERN ATTR_SECTION(".text.crt.debug") NONNULL((1)) __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,

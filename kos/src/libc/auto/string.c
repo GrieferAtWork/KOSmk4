@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3020f2d9 */
+/* HASH CRC-32:0x2f6ac997 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -763,7 +763,7 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_strsep)(char **__restrict stringp,
                                   char const *__restrict delim) {
 	char *result, *iter;
-	if (!stringp || (result = *stringp) == NULL || !*result)
+	if ((result = *stringp) == NULL || !*result)
 		return NULL;
 	for (iter = result; *iter && !libc_strchr(delim, *iter); ++iter)
 		;
@@ -772,6 +772,8 @@ NOTHROW_NCX(LIBCCALL libc_strsep)(char **__restrict stringp,
 	*stringp = iter;
 	return result;
 }
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 INTERN ATTR_SECTION(".text.crt.string.memory") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src,
                                  void *dst,
@@ -817,11 +819,11 @@ NOTHROW_NCX(LIBCCALL libc_bzerol)(void *__restrict dst,
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_bzeroq)(void *__restrict dst,
                                   size_t num_qwords) {
-#ifdef __UINT64_TYPE__
+#if defined(__UINT64_TYPE__) && __SIZEOF_BUSINT__ >= 8
 	libc_memsetq(dst, 0, num_qwords);
-#else /* __UINT64_TYPE__ */
+#else /* __UINT64_TYPE__ && __SIZEOF_BUSINT__ >= 8 */
 	libc_bzerol(dst, num_qwords * 2);
-#endif /* !__UINT64_TYPE__ */
+#endif /* !__UINT64_TYPE__ || __SIZEOF_BUSINT__ < 8 */
 }
 #endif /* !LIBC_ARCH_HAVE_BZEROQ */
 /* Restore optimized libc string functions */

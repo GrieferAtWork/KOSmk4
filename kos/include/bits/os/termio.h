@@ -17,23 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_TERMIOX_H
-#define _SYS_TERMIOX_H 1
+#ifndef _BITS_OS_TERMIO_H
+#define _BITS_OS_TERMIO_H 1
 
-#include <asm/os/tty.h> /* TCGETX, TCSETX, TCSETXW, TCSETXF */
-#include <bits/os/termiox.h> /* struct termiox */
+/* File:
+ *    <bits/os/termio.h>
+ * 
+ * Definitions:
+ *    - struct winsize { ... };
+ *    - struct termio { ... };
+ */
 
-#if !defined(TCGETX) && defined(__TCGETX)
-#define TCGETX  __TCGETX  /* SYS5 TCGETX compatibility */
-#endif /* !TCGETX && __TCGETX */
-#if !defined(TCSETX) && defined(__TCSETX)
-#define TCSETX  __TCSETX  /* ... */
-#endif /* !TCSETX && __TCSETX */
-#if !defined(TCSETXF) && defined(__TCSETXF)
-#define TCSETXF __TCSETXF /* ... */
-#endif /* !TCSETXF && __TCSETXF */
-#if !defined(TCSETXW) && defined(__TCSETXW)
-#define TCSETXW __TCSETXW /* ... */
-#endif /* !TCSETXW && __TCSETXW */
+#include <__stdinc.h>
 
-#endif /* !_SYS_TERMIOX_H */
+#if defined(__KOS__) || defined(__linux__)
+#include <bits/os/kos/termio.h>
+#endif /* ... */
+
+#endif /* !_BITS_OS_TERMIO_H */

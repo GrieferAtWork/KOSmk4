@@ -22,6 +22,9 @@
 
 #include <__stdinc.h>
 
+#include <asm/os/socket-ioctls.h>
+#include <asm/os/tty.h>
+
 /* This file only needs to define the following macros:
  * >> #define FIOCLEX   ...
  * >> #define FIONCLEX  ...
@@ -31,7 +34,27 @@
  * >> #define FIOSETOWN ...
  * >> #define FIOGETOWN ... */
 
-#include <asm/ioctls/socket.h> /* FIOSETOWN, FIOGETOWN */
-#include <asm/ioctls/tty.h>    /* FIOCLEX, FIONCLEX, FIONREAD, FIONBIO, FIOASYNC */
+#if !defined(FIONCLEX) && defined(__FIONCLEX)
+#define FIONCLEX __FIONCLEX /* Clear O_CLOEXEC / IO_CLOEXEC */
+#endif /* !FIONCLEX && __FIONCLEX */
+#if !defined(FIOCLEX) && defined(__FIOCLEX)
+#define FIOCLEX  __FIOCLEX  /* Set O_CLOEXEC / IO_CLOEXEC */
+#endif /* !FIOCLEX && __FIOCLEX */
+#if !defined(FIONREAD) && defined(__TIOCINQ)
+#define FIONREAD __TIOCINQ  /* [int *count] Save the number of pending input bytes */
+#endif /* !FIONREAD && __TIOCINQ */
+#if !defined(FIONBIO) && defined(__FIONBIO)
+#define FIONBIO  __FIONBIO  /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_NONBLOCK / IO_NONBLOCK */
+#endif /* !FIONBIO && __FIONBIO */
+#if !defined(FIOASYNC) && defined(__FIOASYNC)
+#define FIOASYNC __FIOASYNC /* [int *arg] Set (*arg != 0) or clear (*arg == 0) O_ASYNC / IO_ASYNC */
+#endif /* !FIOASYNC && __FIOASYNC */
+
+#if !defined(FIOSETOWN) && defined(__FIOSETOWN)
+#define FIOSETOWN  __FIOSETOWN  /* ... */
+#endif /* !FIOSETOWN && __FIOSETOWN */
+#if !defined(FIOGETOWN) && defined(__FIOGETOWN)
+#define FIOGETOWN  __FIOGETOWN  /* ... */
+#endif /* !FIOGETOWN && __FIOGETOWN */
 
 #endif /* !_SYS_FILIO_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8348480d */
+/* HASH CRC-32:0xb72d44f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <asm/ioctls/tty.h>
+#include <asm/os/tty.h>
 #include <asm/os/stdio.h>
 /* Make FD be the controlling terminal, stdin, stdout, and stderr;
  * then close FD. Returns 0 on success, nonzero on error */
@@ -39,7 +39,7 @@ INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 	if unlikely(libc_setsid() < 0)
 		goto err;
-	if unlikely(libc_ioctl(fd, TIOCSCTTY) < 0)
+	if unlikely(libc_ioctl(fd, __TIOCSCTTY) < 0)
 		goto err;
 #if !STDIN_FILENO && STDOUT_FILENO == 1 && STDERR_FILENO == 2
 	{
@@ -60,9 +60,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_login_tty)(fd_t fd) {
 		goto err;
 	if (likely(fd != STDERR_FILENO) && unlikely(libc_dup2(fd, STDERR_FILENO)))
 		goto err;
-	if likely(fd != STDIN_FILENO &&
-	          fd != STDOUT_FILENO &&
-	          fd != STDERR_FILENO)
+	if likely(fd != STDIN_FILENO && fd != STDOUT_FILENO && fd != STDERR_FILENO)
 		libc_close(fd);
 #endif /* STDIN_FILENO || STDOUT_FILENO != 1 || STDERR_FILENO != 2 */
 	return 0;

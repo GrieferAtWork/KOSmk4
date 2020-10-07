@@ -29,32 +29,32 @@
 #define __BLOCK_SIZE      1024 /* ... */
 #define __BLOCK_SIZE_BITS 10   /* ... */
 
-#define __MS_RDONLY      0x00000001 /* TODO: Document me */
-#define __MS_NOSUID      0x00000002 /* TODO: Document me */
-#define __MS_NODEV       0x00000004 /* TODO: Document me */
-#define __MS_NOEXEC      0x00000008 /* TODO: Document me */
-#define __MS_SYNCHRONOUS 0x00000010 /* TODO: Document me */
-#define __MS_REMOUNT     0x00000020 /* TODO: Document me */
-#define __MS_MANDLOCK    0x00000040 /* TODO: Document me */
-#define __MS_DIRSYNC     0x00000080 /* TODO: Document me */
-#define __MS_NOATIME     0x00000400 /* TODO: Document me */
-#define __MS_NODIRATIME  0x00000800 /* TODO: Document me */
-#define __MS_BIND        0x00001000 /* TODO: Document me */
-#define __MS_MOVE        0x00002000 /* TODO: Document me */
-#define __MS_REC         0x00004000 /* TODO: Document me */
-#define __MS_SILENT      0x00008000 /* TODO: Document me */
-#define __MS_POSIXACL    0x00010000 /* TODO: Document me */
-#define __MS_UNBINDABLE  0x00020000 /* TODO: Document me */
-#define __MS_PRIVATE     0x00040000 /* TODO: Document me */
-#define __MS_SLAVE       0x00080000 /* TODO: Document me */
-#define __MS_SHARED      0x00100000 /* TODO: Document me */
-#define __MS_RELATIME    0x00200000 /* TODO: Document me */
-#define __MS_KERNMOUNT   0x00400000 /* TODO: Document me */
-#define __MS_I_VERSION   0x00800000 /* TODO: Document me */
-#define __MS_STRICTATIME 0x01000000 /* TODO: Document me */
-#define __MS_LAZYTIME    0x02000000 /* TODO: Document me */
-#define __MS_ACTIVE      0x40000000 /* TODO: Document me */
-#define __MS_NOUSER      0x80000000 /* TODO: Document me */
+#define __MS_RDONLY      0x00000001 /* ??? */
+#define __MS_NOSUID      0x00000002 /* ??? */
+#define __MS_NODEV       0x00000004 /* ??? */
+#define __MS_NOEXEC      0x00000008 /* ??? */
+#define __MS_SYNCHRONOUS 0x00000010 /* ??? */
+#define __MS_REMOUNT     0x00000020 /* ??? */
+#define __MS_MANDLOCK    0x00000040 /* ??? */
+#define __MS_DIRSYNC     0x00000080 /* ??? */
+#define __MS_NOATIME     0x00000400 /* ??? */
+#define __MS_NODIRATIME  0x00000800 /* ??? */
+#define __MS_BIND        0x00001000 /* ??? */
+#define __MS_MOVE        0x00002000 /* ??? */
+#define __MS_REC         0x00004000 /* ??? */
+#define __MS_SILENT      0x00008000 /* ??? */
+#define __MS_POSIXACL    0x00010000 /* ??? */
+#define __MS_UNBINDABLE  0x00020000 /* ??? */
+#define __MS_PRIVATE     0x00040000 /* ??? */
+#define __MS_SLAVE       0x00080000 /* ??? */
+#define __MS_SHARED      0x00100000 /* ??? */
+#define __MS_RELATIME    0x00200000 /* ??? */
+#define __MS_KERNMOUNT   0x00400000 /* ??? */
+#define __MS_I_VERSION   0x00800000 /* ??? */
+#define __MS_STRICTATIME 0x01000000 /* ??? */
+#define __MS_LAZYTIME    0x02000000 /* ??? */
+#define __MS_ACTIVE      0x40000000 /* ??? */
+#define __MS_NOUSER      0x80000000 /* ??? */
 
 /* Flags that can be changed when combined with `MS_REMOUNT' */
 #define __MS_RMT_MASK (__MS_RDONLY | __MS_SYNCHRONOUS | __MS_MANDLOCK | __MS_I_VERSION | __MS_LAZYTIME)

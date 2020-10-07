@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8269b44e */
+/* HASH CRC-32:0xc805ea38 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2836,7 +2836,7 @@ INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_LEAF NONNULL((1, 2
 NOTHROW_NCX(LIBDCALL libd_wcssep)(char16_t **__restrict stringp,
                                   char16_t const *__restrict delim) {
 	char16_t *result, *iter;
-	if (!stringp || (result = *stringp) == NULL || !*result)
+	if ((result = *stringp) == NULL || !*result)
 		return NULL;
 	for (iter = result; *iter && !libd_wcschr(delim, *iter); ++iter)
 		;
@@ -2849,7 +2849,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_LEAF NONNULL((1, 2)) c
 NOTHROW_NCX(LIBKCALL libc_wcssep)(char32_t **__restrict stringp,
                                   char32_t const *__restrict delim) {
 	char32_t *result, *iter;
-	if (!stringp || (result = *stringp) == NULL || !*result)
+	if ((result = *stringp) == NULL || !*result)
 		return NULL;
 	for (iter = result; *iter && !libc_wcschr(delim, *iter); ++iter)
 		;

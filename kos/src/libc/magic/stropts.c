@@ -25,31 +25,230 @@
 #include <features.h>
 
 #include <bits/types.h>
-#include <bits/xtitypes.h>
-#include <bits/stropts.h>
+#include <asm/os/stropts.h>
+#include <bits/os/stropts.h>
 
-/* Documentation taken from Glibc /usr/include/stropts.h */
-/* Copyright (C) 1998-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+/* ioctl(2) request codes */
+#if !defined(I_NREAD) && defined(__I_NREAD)
+#define I_NREAD     __I_NREAD     /* ??? */
+#endif /* !I_NREAD && __I_NREAD */
+#if !defined(I_PUSH) && defined(__I_PUSH)
+#define I_PUSH      __I_PUSH      /* ??? */
+#endif /* !I_PUSH && __I_PUSH */
+#if !defined(I_POP) && defined(__I_POP)
+#define I_POP       __I_POP       /* ??? */
+#endif /* !I_POP && __I_POP */
+#if !defined(I_LOOK) && defined(__I_LOOK)
+#define I_LOOK      __I_LOOK      /* ??? */
+#endif /* !I_LOOK && __I_LOOK */
+#if !defined(I_FLUSH) && defined(__I_FLUSH)
+#define I_FLUSH     __I_FLUSH     /* ??? */
+#endif /* !I_FLUSH && __I_FLUSH */
+#if !defined(I_SRDOPT) && defined(__I_SRDOPT)
+#define I_SRDOPT    __I_SRDOPT    /* ??? */
+#endif /* !I_SRDOPT && __I_SRDOPT */
+#if !defined(I_GRDOPT) && defined(__I_GRDOPT)
+#define I_GRDOPT    __I_GRDOPT    /* ??? */
+#endif /* !I_GRDOPT && __I_GRDOPT */
+#if !defined(I_STR) && defined(__I_STR)
+#define I_STR       __I_STR       /* ??? */
+#endif /* !I_STR && __I_STR */
+#if !defined(I_SETSIG) && defined(__I_SETSIG)
+#define I_SETSIG    __I_SETSIG    /* ??? */
+#endif /* !I_SETSIG && __I_SETSIG */
+#if !defined(I_GETSIG) && defined(__I_GETSIG)
+#define I_GETSIG    __I_GETSIG    /* ??? */
+#endif /* !I_GETSIG && __I_GETSIG */
+#if !defined(I_FIND) && defined(__I_FIND)
+#define I_FIND      __I_FIND      /* ??? */
+#endif /* !I_FIND && __I_FIND */
+#if !defined(I_LINK) && defined(__I_LINK)
+#define I_LINK      __I_LINK      /* ??? */
+#endif /* !I_LINK && __I_LINK */
+#if !defined(I_UNLINK) && defined(__I_UNLINK)
+#define I_UNLINK    __I_UNLINK    /* ??? */
+#endif /* !I_UNLINK && __I_UNLINK */
+#if !defined(I_PEEK) && defined(__I_PEEK)
+#define I_PEEK      __I_PEEK      /* ??? */
+#endif /* !I_PEEK && __I_PEEK */
+#if !defined(I_FDINSERT) && defined(__I_FDINSERT)
+#define I_FDINSERT  __I_FDINSERT  /* ??? */
+#endif /* !I_FDINSERT && __I_FDINSERT */
+#if !defined(I_SENDFD) && defined(__I_SENDFD)
+#define I_SENDFD    __I_SENDFD    /* ??? */
+#endif /* !I_SENDFD && __I_SENDFD */
+#if !defined(I_RECVFD) && defined(__I_RECVFD)
+#define I_RECVFD    __I_RECVFD    /* ??? */
+#endif /* !I_RECVFD && __I_RECVFD */
+#if !defined(I_SWROPT) && defined(__I_SWROPT)
+#define I_SWROPT    __I_SWROPT    /* ??? */
+#endif /* !I_SWROPT && __I_SWROPT */
+#if !defined(I_GWROPT) && defined(__I_GWROPT)
+#define I_GWROPT    __I_GWROPT    /* ??? */
+#endif /* !I_GWROPT && __I_GWROPT */
+#if !defined(I_LIST) && defined(__I_LIST)
+#define I_LIST      __I_LIST      /* ??? */
+#endif /* !I_LIST && __I_LIST */
+#if !defined(I_PLINK) && defined(__I_PLINK)
+#define I_PLINK     __I_PLINK     /* ??? */
+#endif /* !I_PLINK && __I_PLINK */
+#if !defined(I_PUNLINK) && defined(__I_PUNLINK)
+#define I_PUNLINK   __I_PUNLINK   /* ??? */
+#endif /* !I_PUNLINK && __I_PUNLINK */
+#if !defined(I_FLUSHBAND) && defined(__I_FLUSHBAND)
+#define I_FLUSHBAND __I_FLUSHBAND /* ??? */
+#endif /* !I_FLUSHBAND && __I_FLUSHBAND */
+#if !defined(I_CKBAND) && defined(__I_CKBAND)
+#define I_CKBAND    __I_CKBAND    /* ??? */
+#endif /* !I_CKBAND && __I_CKBAND */
+#if !defined(I_GETBAND) && defined(__I_GETBAND)
+#define I_GETBAND   __I_GETBAND   /* ??? */
+#endif /* !I_GETBAND && __I_GETBAND */
+#if !defined(I_ATMARK) && defined(__I_ATMARK)
+#define I_ATMARK    __I_ATMARK    /* ??? */
+#endif /* !I_ATMARK && __I_ATMARK */
+#if !defined(I_SETCLTIME) && defined(__I_SETCLTIME)
+#define I_SETCLTIME __I_SETCLTIME /* ??? */
+#endif /* !I_SETCLTIME && __I_SETCLTIME */
+#if !defined(I_GETCLTIME) && defined(__I_GETCLTIME)
+#define I_GETCLTIME __I_GETCLTIME /* ??? */
+#endif /* !I_GETCLTIME && __I_GETCLTIME */
+#if !defined(I_CANPUT) && defined(__I_CANPUT)
+#define I_CANPUT    __I_CANPUT    /* ??? */
+#endif /* !I_CANPUT && __I_CANPUT */
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
+#if !defined(FMNAMESZ) && defined(__FMNAMESZ)
+#define FMNAMESZ __FMNAMESZ /* Used by `I_LOOK' */
+#endif /* !FMNAMESZ && __FMNAMESZ */
 
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+/* Flags for the argument used by `I_FLUSH' */
+#if !defined(FLUSHR) && defined(__FLUSHR)
+#define FLUSHR    __FLUSHR    /* ??? */
+#endif /* !FLUSHR && __FLUSHR */
+#if !defined(FLUSHW) && defined(__FLUSHW)
+#define FLUSHW    __FLUSHW    /* ??? */
+#endif /* !FLUSHW && __FLUSHW */
+#if !defined(FLUSHRW) && defined(__FLUSHRW)
+#define FLUSHRW   __FLUSHRW   /* ??? */
+#endif /* !FLUSHRW && __FLUSHRW */
+#ifdef __USE_GNU
+#if !defined(FLUSHBAND) && defined(__FLUSHBAND)
+#define FLUSHBAND __FLUSHBAND /* ??? */
+#endif /* !FLUSHBAND && __FLUSHBAND */
+#endif /* __USE_GNU */
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+/* Flags for the argument used by `I_SETSIG' */
+#if !defined(S_INPUT) && defined(__S_INPUT)
+#define S_INPUT   __S_INPUT   /* ??? */
+#endif /* !S_INPUT && __S_INPUT */
+#if !defined(S_HIPRI) && defined(__S_HIPRI)
+#define S_HIPRI   __S_HIPRI   /* ??? */
+#endif /* !S_HIPRI && __S_HIPRI */
+#if !defined(S_OUTPUT) && defined(__S_OUTPUT)
+#define S_OUTPUT  __S_OUTPUT  /* ??? */
+#endif /* !S_OUTPUT && __S_OUTPUT */
+#if !defined(S_MSG) && defined(__S_MSG)
+#define S_MSG     __S_MSG     /* ??? */
+#endif /* !S_MSG && __S_MSG */
+#if !defined(S_ERROR) && defined(__S_ERROR)
+#define S_ERROR   __S_ERROR   /* ??? */
+#endif /* !S_ERROR && __S_ERROR */
+#if !defined(S_HANGUP) && defined(__S_HANGUP)
+#define S_HANGUP  __S_HANGUP  /* ??? */
+#endif /* !S_HANGUP && __S_HANGUP */
+#if !defined(S_RDNORM) && defined(__S_RDNORM)
+#define S_RDNORM  __S_RDNORM  /* ??? */
+#endif /* !S_RDNORM && __S_RDNORM */
+#if !defined(S_RDBAND) && defined(__S_RDBAND)
+#define S_RDBAND  __S_RDBAND  /* ??? */
+#endif /* !S_RDBAND && __S_RDBAND */
+#if !defined(S_WRBAND) && defined(__S_WRBAND)
+#define S_WRBAND  __S_WRBAND  /* ??? */
+#endif /* !S_WRBAND && __S_WRBAND */
+#if !defined(S_BANDURG) && defined(__S_BANDURG)
+#define S_BANDURG __S_BANDURG /* ??? */
+#endif /* !S_BANDURG && __S_BANDURG */
+#if !defined(S_WRNORM) && defined(__S_OUTPUT)
+#define S_WRNORM  __S_OUTPUT  /* Alias */
+#endif /* !S_WRNORM && __S_OUTPUT */
 
+/* Flags for the argument used by `I_PEEK' */
+#if !defined(RS_HIPRI) && defined(__RS_HIPRI)
+#define RS_HIPRI __RS_HIPRI /* ??? */
+#endif /* !RS_HIPRI && __RS_HIPRI */
 
-__SYSDECL_BEGIN
+/* Flags for the argument used by `I_SRDOPT' */
+#if !defined(RNORM) && defined(__RNORM)
+#define RNORM     __RNORM     /* ??? */
+#endif /* !RNORM && __RNORM */
+#if !defined(RMSGD) && defined(__RMSGD)
+#define RMSGD     __RMSGD     /* ??? */
+#endif /* !RMSGD && __RMSGD */
+#if !defined(RMSGN) && defined(__RMSGN)
+#define RMSGN     __RMSGN     /* ??? */
+#endif /* !RMSGN && __RMSGN */
+#if !defined(RPROTDAT) && defined(__RPROTDAT)
+#define RPROTDAT  __RPROTDAT  /* ??? */
+#endif /* !RPROTDAT && __RPROTDAT */
+#if !defined(RPROTDIS) && defined(__RPROTDIS)
+#define RPROTDIS  __RPROTDIS  /* ??? */
+#endif /* !RPROTDIS && __RPROTDIS */
+#if !defined(RPROTNORM) && defined(__RPROTNORM)
+#define RPROTNORM __RPROTNORM /* ??? */
+#endif /* !RPROTNORM && __RPROTNORM */
+#ifdef __USE_GNU
+#if !defined(RPROTMASK) && defined(__RPROTMASK)
+#define RPROTMASK __RPROTMASK /* ??? */
+#endif /* !RPROTMASK && __RPROTMASK */
+#endif /* __USE_GNU */
+
+/* Flags for the argument used by `I_SWROPT' */
+#if !defined(SNDZERO) && defined(__SNDZERO)
+#define SNDZERO __SNDZERO /* ??? */
+#endif /* !SNDZERO && __SNDZERO */
+#ifdef __USE_GNU
+#if !defined(SNDPIPE) && defined(__SNDPIPE)
+#define SNDPIPE __SNDPIPE /* ??? */
+#endif /* !SNDPIPE && __SNDPIPE */
+#endif /* __USE_GNU */
+
+/* Flags for the argument used by `I_ATMARK' */
+#if !defined(ANYMARK) && defined(__ANYMARK)
+#define ANYMARK  __ANYMARK  /* ??? */
+#endif /* !ANYMARK && __ANYMARK */
+#if !defined(LASTMARK) && defined(__LASTMARK)
+#define LASTMARK __LASTMARK /* ??? */
+#endif /* !LASTMARK && __LASTMARK */
+
+/* Flags for the argument used by `I_UNLINK' */
+#ifdef __USE_GNU
+#if !defined(MUXID_ALL) && defined(__MUXID_ALL)
+#define MUXID_ALL __MUXID_ALL /* ??? */
+#endif /* !MUXID_ALL && __MUXID_ALL */
+#endif /* __USE_GNU */
+
+/* Flags used by `getmsg()', `getpmsg()', `putmsg()' and `putpmsg()'. */
+#if !defined(MSG_HIPRI) && defined(__MSG_HIPRI)
+#define MSG_HIPRI __MSG_HIPRI /* ??? */
+#endif /* !MSG_HIPRI && __MSG_HIPRI */
+#if !defined(MSG_ANY) && defined(__MSG_ANY)
+#define MSG_ANY   __MSG_ANY   /* ??? */
+#endif /* !MSG_ANY && __MSG_ANY */
+#if !defined(MSG_BAND) && defined(__MSG_BAND)
+#define MSG_BAND  __MSG_BAND  /* ??? */
+#endif /* !MSG_BAND && __MSG_BAND */
+
+/* Return values for `getmsg()' and `getpmsg()' */
+#if !defined(MORECTL) && defined(__MORECTL)
+#define MORECTL  __MORECTL  /* ??? */
+#endif /* !MORECTL && __MORECTL */
+#if !defined(MOREDATA) && defined(__MOREDATA)
+#define MOREDATA __MOREDATA /* ??? */
+#endif /* !MOREDATA && __MOREDATA */
+
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __gid_t_defined
 #define __gid_t_defined 1
@@ -66,54 +265,54 @@ typedef __t_uscalar_t t_uscalar_t;
 
 }
 
-@@Test whether FILDES is associated with a STREAM-based file
 [[nothrow, decl_include("<bits/types.h>")]]
-int isastream($fd_t fildes);
+int isastream($fd_t fd);
 
-@@Receive next message from a STREAMS file
+@@@param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
+@@@return: MORECTL:  ???
+@@@return: MOREDATA: ???
 [[cp, decl_include("<bits/types.h>", "<bits/stropts.h>")]]
-int getmsg($fd_t fildes,
+int getmsg($fd_t fd,
            struct strbuf *__restrict ctlptr,
            struct strbuf *__restrict dataptr,
-           __STDC_INT_AS_UINT_T *__restrict flagsp);
+           __STDC_INT_AS_UINT_T *__restrict pflags);
 
-@@Receive next message from a STREAMS file, with *FLAGSP allowing to control which message.
+@@@param: pflags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
+@@@return: MORECTL:  ???
+@@@return: MOREDATA: ???
 [[cp, decl_include("<bits/types.h>", "<bits/stropts.h>")]]
-int getpmsg($fd_t fildes,
+int getpmsg($fd_t fd,
             struct strbuf *__restrict ctlptr,
             struct strbuf *__restrict dataptr,
             int *__restrict bandp,
-            __STDC_INT_AS_UINT_T *__restrict flagsp);
+            __STDC_INT_AS_UINT_T *__restrict pflags);
 
-%[insert:extern(ioctl)]
-
-@@Send a message on a STREAM
+@@@param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/stropts.h>")]]
-int putmsg($fd_t fildes,
+int putmsg($fd_t fd,
            struct strbuf const *ctlptr,
            struct strbuf const *dataptr,
            __STDC_INT_AS_UINT_T flags);
 
-@@Send a message on a STREAM to the BAND
+@@@param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND'
 [[cp, decl_include("<features.h>", "<bits/types.h>", "<bits/stropts.h>")]]
-int putpmsg($fd_t fildes,
+int putpmsg($fd_t fd,
             struct strbuf const *ctlptr,
             struct strbuf const *dataptr,
             __STDC_INT_AS_UINT_T band,
             __STDC_INT_AS_UINT_T flags);
 
-@@Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space
 [[guard, cp_kos, decl_include("<bits/types.h>")]]
-int fattach($fd_t fildes, [[nonnull]] char const *__restrict path);
+int fattach($fd_t fd, [[nonnull]] char const *__restrict path);
 
-@@Detach a name PATH from a STREAMS-based file descriptor
 [[guard, cp_kos]]
 int fdetach([[nonnull]] char const *__restrict path);
 
+%[insert:extern(ioctl)]
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

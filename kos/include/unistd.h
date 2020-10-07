@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79eccdb4 */
+/* HASH CRC-32:0x88b9ff72 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2416,8 +2416,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #ifndef __fattach_defined
 #define __fattach_defined 1
 #ifdef __CRT_HAVE_fattach
-/* Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space */
-__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fildes, char const *__restrict __path),(__fildes,__path))
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
 #else /* __CRT_HAVE_fattach */
 #undef __fattach_defined
 #endif /* !__CRT_HAVE_fattach */
@@ -2425,7 +2424,6 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fildes, c
 #ifndef __fdetach_defined
 #define __fdetach_defined 1
 #ifdef __CRT_HAVE_fdetach
-/* Detach a name PATH from a STREAMS-based file descriptor */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
 #else /* __CRT_HAVE_fdetach */
 #undef __fdetach_defined

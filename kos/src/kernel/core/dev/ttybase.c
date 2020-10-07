@@ -36,15 +36,15 @@
 
 #include <hybrid/atomic.h>
 
-#include <asm/ioctls/tty.h>
-#include <bits/ioctls/termiox.h> /* struct termiox */
 #include <compat/config.h>
 #include <compat/kos/types.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
 #include <kos/ioctl/tty.h>
+#include <sys/ioctl.h>
 #include <sys/stat.h>
-#include <sys/types.h> /* loff_t */
+#include <sys/termiox.h> /* struct termiox */
+#include <sys/types.h>   /* loff_t */
 
 #include <assert.h>
 #include <errno.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33820e8f */
+/* HASH CRC-32:0x9011702d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 
 #include <features.h>
 #include <sys/ioctl.h>
-#include <bits/ioctls/termios.h>
+#include <bits/os/termios.h>
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #include <bits/types.h>

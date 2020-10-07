@@ -17,23 +17,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_TERMIOX_H
-#define _SYS_TERMIOX_H 1
+#ifndef _BITS_OS_KOS_TERMIOX_H
+#define _BITS_OS_KOS_TERMIOX_H 1
 
-#include <asm/os/tty.h> /* TCGETX, TCSETX, TCSETXW, TCSETXF */
-#include <bits/os/termiox.h> /* struct termiox */
+#include <__stdinc.h>
 
-#if !defined(TCGETX) && defined(__TCGETX)
-#define TCGETX  __TCGETX  /* SYS5 TCGETX compatibility */
-#endif /* !TCGETX && __TCGETX */
-#if !defined(TCSETX) && defined(__TCSETX)
-#define TCSETX  __TCSETX  /* ... */
-#endif /* !TCSETX && __TCSETX */
-#if !defined(TCSETXF) && defined(__TCSETXF)
-#define TCSETXF __TCSETXF /* ... */
-#endif /* !TCSETXF && __TCSETXF */
-#if !defined(TCSETXW) && defined(__TCSETXW)
-#define TCSETXW __TCSETXW /* ... */
-#endif /* !TCSETXW && __TCSETXW */
+#define NFF 5
 
-#endif /* !_SYS_TERMIOX_H */
+#ifdef __CC__
+#include <hybrid/typecore.h>
+__DECL_BEGIN
+
+struct termiox {
+	/* Argument used by `TCGETX', `TCSETX', `TCSETXF' and `TCSETXW' */
+	__UINT16_TYPE__ x_hflag;
+	__UINT16_TYPE__ x_cflag;
+	__UINT16_TYPE__ x_rflag[NFF];
+	__UINT16_TYPE__ x_sflag;
+};
+
+__DECL_END
+#endif /* __CC__ */
+
+/* XXX: Where are these flags used?
+ *      Are they used in by one of the fields of the struct above?
+ * Here are some docs for it?
+ *  - https://docs.oracle.com/cd/E86824_01/html/E54777/termiox-7i.html
+ *  - https://docstore.mik.ua/manuals/hp-ux/en/B2355-60130/termiox.7.html
+ */
+#define RTSXOFF 0x0001 /* RTS flow control on input */
+#define CTSXON  0x0002 /* CTS flow control on output */
+#define DTRXOFF 0x0004 /* DTR flow control on input */
+#define DSRXON  0x0008 /* DCD flow control on output */
+
+#endif /* !_BITS_OS_KOS_TERMIOX_H */

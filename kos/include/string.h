@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf20ad354 */
+/* HASH CRC-32:0x269cd5f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,7 +127,7 @@ __NAMESPACE_STD_USING(__forward_size)
  *   [kos] mempmoveup[b|w|l|q]  - Same as `mempmove[b|w|l|q]', but assume that `DST >= SRC'
  *   [kos] mempmovedown[b|w|l|q]- Same as `mempmove[b|w|l|q]', but assume that `DST <= SRC'
  *   [std] memchr[b|w|l|q]      - Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found.
- *   [glc] memrchr[b|w|l|q]     - Descendingly search for `NEEDLE', starting at `HAYSTACK+N_(BYTES|WORDS|DWORDS)'. - Return `NULL' if `NEEDLE' wasn't found.
+ *   [glc] memrchr[b|w|l|q]     - Descendingly search for `NEEDLE', starting at `HAYSTACK+N_(BYTES|WORDS|DWORDS)-1'. - Return `NULL' if `NEEDLE' wasn't found.
  *   [glc] rawmemchr[b|w|l|q]   - Same as `memchr[b|w|l|q]' with a search limit of `(size_t)-1/sizeof(T)'
  *   [kos] rawmemrchr[b|w|l|q]  - Same as `memrchr[b|w|l|q]' without a search limit, starting at `HAYSTACK-sizeof(T)'
  *   [kos] memend[b|w|l|q]      - Same as `memchr[b|w|l|q]', but return `HAYSTACK+N_(BYTES|WORDS|DWORDS)', rather than `NULL' if `NEEDLE' wasn't found.
@@ -1236,11 +1236,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strsep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LE
 #ifndef __bcopy_defined
 #define __bcopy_defined 1
 #if __has_builtin(__builtin_bcopy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_bcopy)
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 __CEIDECLARE_GCCNCX(__ATTR_NONNULL((1, 2)),void,__NOTHROW_NCX,bcopy,(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes),{ return __builtin_bcopy(__src, __dst, __num_bytes); })
 #elif defined(__CRT_HAVE_bcopy)
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 __CDECLARE_VOID_GCCNCX(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,bcopy,(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes),(__src,__dst,__num_bytes))
 #else /* ... */
 #include <libc/local/string/bcopy.h>
+/* Same as `memmove(dst, src, num_bytes)'
+ * Note that bcopy is called with `dst' and `src' reversed */
 __NAMESPACE_LOCAL_USING_OR_IMPL(bcopy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) void __NOTHROW_NCX(__LIBCCALL bcopy)(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bcopy))(__src, __dst, __num_bytes); })
 #endif /* !... */
 #endif /* !__bcopy_defined */
@@ -7766,6 +7772,7 @@ __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(__forward_size)
 #endif /* !__CXX_SYSTEM_HEADER */
+/* Special handling, so this macro also works as `std::strlen(...)' */
 #define strlen(x) __forward_size(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
 #else /* __cplusplus */
 #define strlen(x) (__builtin_constant_p(x) ? __builtin_strlen(x) : (strlen)(x))
@@ -7818,7 +7825,25 @@ __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __
 
 
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
-/* In C, we can use argument-count overload macros to implement these overloads! */
+/* In C, we can use argument-count overload macros to implement these overloads:
+ * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
+ * >> void *memcpy(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *memmove(void *dst, void const *src, size_t num_bytes);
+ * >> void *memmove(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *memmoveup(void *dst, void const *src, size_t num_bytes);
+ * >> void *memmoveup(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *memmovedown(void *dst, void const *src, size_t num_bytes);
+ * >> void *memmovedown(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *mempcpy(void *dst, void const *src, size_t num_bytes);
+ * >> void *mempcpy(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *mempmove(void *dst, void const *src, size_t num_bytes);
+ * >> void *mempmove(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *mempmoveup(void *dst, void const *src, size_t num_bytes);
+ * >> void *mempmoveup(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void *mempmovedown(void *dst, void const *src, size_t num_bytes);
+ * >> void *mempmovedown(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> void bzero(void *dst, size_t num_bytes);
+ * >> void bzero(void *dst, size_t elem_count, size_t elem_size); */
 #ifdef __USE_MISC
 #undef __PRIVATE_bzero_3
 #undef __PRIVATE_bzero_4

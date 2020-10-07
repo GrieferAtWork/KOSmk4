@@ -38,6 +38,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/hop/blockdevice.h>
 #include <kos/io.h>
+#include <linux/fs.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
 
@@ -372,19 +373,19 @@ do_BLKFRAGET_compat:
 		*(u64 *)arg = (u64)self->bd_total_bytes;
 		break;
 
-#define BLKTRACESETUP    _IOWR(0x12, 115, struct blk_user_trace_setup)
-#define BLKTRACESTART    _IO(0x12, 116)
-#define BLKTRACESTOP     _IO(0x12, 117)
-#define BLKTRACETEARDOWN _IO(0x12, 118)
-#define BLKDISCARD       _IO(0x12, 119)
-#define BLKIOMIN         _IO(0x12, 120)
-#define BLKIOOPT         _IO(0x12, 121)
-#define BLKALIGNOFF      _IO(0x12, 122)
-#define BLKPBSZGET       _IO(0x12, 123)
-#define BLKDISCARDZEROES _IO(0x12, 124)
-#define BLKSECDISCARD    _IO(0x12, 125)
-#define BLKROTATIONAL    _IO(0x12, 126)
-#define BLKZEROOUT       _IO(0x12, 127)
+//TODO:#define BLKTRACESETUP    _IOWR(0x12, 115, struct blk_user_trace_setup)
+//TODO:#define BLKTRACESTART    _IO(0x12, 116)
+//TODO:#define BLKTRACESTOP     _IO(0x12, 117)
+//TODO:#define BLKTRACETEARDOWN _IO(0x12, 118)
+//TODO:#define BLKDISCARD       _IO(0x12, 119)
+//TODO:#define BLKIOMIN         _IO(0x12, 120)
+//TODO:#define BLKIOOPT         _IO(0x12, 121)
+//TODO:#define BLKALIGNOFF      _IO(0x12, 122)
+//TODO:#define BLKPBSZGET       _IO(0x12, 123)
+//TODO:#define BLKDISCARDZEROES _IO(0x12, 124)
+//TODO:#define BLKSECDISCARD    _IO(0x12, 125)
+//TODO:#define BLKROTATIONAL    _IO(0x12, 126)
+//TODO:#define BLKZEROOUT       _IO(0x12, 127)
 
 	default:
 		if (self->bd_type.dt_ioctl)

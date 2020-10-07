@@ -22,11 +22,11 @@
 
 #include <__stdinc.h>
 
-#include <asm/ioctls/tty.h>
-#include <bits/ioctls/termio.h>
-#include <bits/ioctls/termios.h>
-#include <bits/ioctls/termiox.h>
+#include <bits/os/termio.h>
+#include <bits/os/termios.h>
+#include <bits/os/termiox.h>
 #include <linux/posix_types.h>
 #include <linux/types.h>
+#include <sys/ioctl.h> /* (unescaped) TTY ioctls. (only those from `<asm/os/tty.h>' are needed) */
 
 #endif /* !_LINUX_TERMIOS_H */

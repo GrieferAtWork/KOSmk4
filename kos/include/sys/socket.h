@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb503d129 */
+/* HASH CRC-32:0xaac5186e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,14 +33,14 @@
 
 #include <hybrid/typecore.h>
 
-#include <asm/ioctls/socket.h>
+#include <asm/os/socket-ioctls.h>
 #include <asm/os/socket.h>
 #include <bits/os/cmsghdr.h>
 #include <bits/os/msghdr.h>
+#include <bits/os/timespec.h>
 #include <bits/sockaddr-struct.h>
 #include <bits/sockaddr.h>
 #include <bits/sockaddr_storage-struct.h>
-#include <bits/os/timespec.h>
 #include <bits/types.h>
 #include <sys/uio.h>
 
@@ -58,6 +58,56 @@
 #endif /* __USE_GLIBC */
 
 __SYSDECL_BEGIN
+
+#if !defined(FIOSETOWN) && defined(__FIOSETOWN)
+#define FIOSETOWN  __FIOSETOWN  /* ... */
+#endif /* !FIOSETOWN && __FIOSETOWN */
+#if !defined(SIOCSPGRP) && defined(__SIOCSPGRP)
+#define SIOCSPGRP  __SIOCSPGRP  /* ... */
+#endif /* !SIOCSPGRP && __SIOCSPGRP */
+#if !defined(FIOGETOWN) && defined(__FIOGETOWN)
+#define FIOGETOWN  __FIOGETOWN  /* ... */
+#endif /* !FIOGETOWN && __FIOGETOWN */
+#if !defined(SIOCGPGRP) && defined(__SIOCGPGRP)
+#define SIOCGPGRP  __SIOCGPGRP  /* ... */
+#endif /* !SIOCGPGRP && __SIOCGPGRP */
+#if !defined(SIOCATMARK) && defined(__SIOCATMARK)
+#define SIOCATMARK __SIOCATMARK /* ... */
+#endif /* !SIOCATMARK && __SIOCATMARK */
+
+#ifdef __USE_TIME_BITS64
+#if !defined(SIOCGSTAMP) && defined(__SIOCGSTAMP64)
+#define SIOCGSTAMP   __SIOCGSTAMP64   /* [struct timeval *arg] Get stamp */
+#endif /* !SIOCGSTAMP && __SIOCGSTAMP64 */
+#if !defined(SIOCGSTAMPNS) && defined(__SIOCGSTAMPNS64)
+#define SIOCGSTAMPNS __SIOCGSTAMPNS64 /* [struct timespec *arg] Get stamp */
+#endif /* !SIOCGSTAMPNS && __SIOCGSTAMPNS64 */
+#else /* __USE_TIME_BITS64 */
+#if !defined(SIOCGSTAMP) && defined(__SIOCGSTAMP32)
+#define SIOCGSTAMP   __SIOCGSTAMP32   /* [struct timeval *arg] Get stamp */
+#endif /* !SIOCGSTAMP && __SIOCGSTAMP32 */
+#if !defined(SIOCGSTAMPNS) && defined(__SIOCGSTAMPNS32)
+#define SIOCGSTAMPNS __SIOCGSTAMPNS32 /* [struct timespec *arg] Get stamp */
+#endif /* !SIOCGSTAMPNS && __SIOCGSTAMPNS32 */
+#endif /* !__USE_TIME_BITS64 */
+
+#ifdef __USE_KOS
+#if !defined(SIOCGSTAMP32) && defined(__SIOCGSTAMP32)
+#define SIOCGSTAMP32   __SIOCGSTAMP32   /* [struct timeval32 *arg] Get stamp */
+#endif /* !SIOCGSTAMP32 && __SIOCGSTAMP32 */
+#if !defined(SIOCGSTAMPNS32) && defined(__SIOCGSTAMPNS32)
+#define SIOCGSTAMPNS32 __SIOCGSTAMPNS32 /* [struct timespec32 *arg] Get stamp */
+#endif /* !SIOCGSTAMPNS32 && __SIOCGSTAMPNS32 */
+#endif /* __USE_KOS */
+
+#ifdef __USE_TIME64
+#if !defined(SIOCGSTAMP64) && defined(__SIOCGSTAMP64)
+#define SIOCGSTAMP64   __SIOCGSTAMP64   /* [struct timeval64 *arg] Get stamp */
+#endif /* !SIOCGSTAMP64 && __SIOCGSTAMP64 */
+#if !defined(SIOCGSTAMPNS64) && defined(__SIOCGSTAMPNS64)
+#define SIOCGSTAMPNS64 __SIOCGSTAMPNS64 /* [struct timespec64 *arg] Get stamp */
+#endif /* !SIOCGSTAMPNS64 && __SIOCGSTAMPNS64 */
+#endif /* __USE_TIME64 */
 
 
 /* Socket address/domain families.

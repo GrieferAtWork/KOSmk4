@@ -230,12 +230,8 @@ incdir("", "../../include");
 #include <asm/intrin-arith.h>
 #include <asm/intrin.h>
 #include <asm/ioctl.h>
-#include <asm/ioctls/block.h>
-#include <asm/ioctls/block_ex.h>
-#include <asm/ioctls/socket.h>
-#include <asm/ioctls/socket_ex.h>
-#include <asm/ioctls/tty.h>
 #include <asm/ls-syscalls.h>
+#include <asm/os/block.h>
 #include <asm/os/clock.h>
 #include <asm/os/dirent.h>
 #include <asm/os/epoll.h>
@@ -261,14 +257,17 @@ incdir("", "../../include");
 #include <asm/os/signalfd.h>
 #include <asm/os/sigset.h>
 #include <asm/os/sigstack.h>
+#include <asm/os/socket-ioctls.h>
 #include <asm/os/socket.h>
 #include <asm/os/stat.h>
 #include <asm/os/stdio.h>
 #include <asm/os/stdlib.h>
+#include <asm/os/stropts.h>
 #include <asm/os/swap.h>
 #include <asm/os/syslog.h>
 #include <asm/os/timerfd.h>
 #include <asm/os/timex.h>
+#include <asm/os/tty.h>
 #include <asm/os/ulimit.h>
 #include <asm/os/utsname.h>
 #include <asm/os/vfork.h>
@@ -322,9 +321,6 @@ incdir("", "../../include");
 #include <bits/elf.h>
 #include <bits/hwcap.h>
 #include <bits/in.h>
-#include <bits/ioctls/termio.h>
-#include <bits/ioctls/termios.h>
-#include <bits/ioctls/termiox.h>
 #include <bits/ipc.h>
 #include <bits/math-constants.h>
 #include <bits/mathdef.h>
@@ -351,6 +347,10 @@ incdir("", "../../include");
 #include <bits/os/sigset.h>
 #include <bits/os/sigstack.h>
 #include <bits/os/sigval.h>
+#include <bits/os/stropts.h>
+#include <bits/os/termio.h>
+#include <bits/os/termios.h>
+#include <bits/os/termiox.h>
 #include <bits/os/timeb.h>
 #include <bits/os/timespec.h>
 #include <bits/os/timeval.h>
@@ -385,7 +385,6 @@ incdir("", "../../include");
 #include <bits/statfs-convert.h>
 #include <bits/statfs.h>
 #include <bits/statvfs.h>
-#include <bits/stropts.h>
 #include <bits/syscalls.h>
 #include <bits/types/FILE.h>
 #include <bits/types/__FILE.h>
@@ -422,7 +421,6 @@ incdir("", "../../include");
 #include <bits/ucontext.h>
 #include <bits/ustat.h>
 #include <bits/wait.h>
-#include <bits/xtitypes.h>
 #include <bitstring.h>
 #include <bsd/bitstring.h>
 #include <bsd/err.h>
@@ -678,6 +676,7 @@ incdir("", "../../include");
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/vector.h>
 #include <hybrid/struct.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-once.h>
 #include <hybrid/sync/atomic-owner-rwlock.h>
 #include <hybrid/sync/atomic-rwlock.h>

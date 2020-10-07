@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3504ae4 */
+/* HASH CRC-32:0xbec3c96 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,18 +39,18 @@ __SYSDECL_BEGIN
 /* Create a traceback of up to `SIZE' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
  * information is constructed with the help of CFI instrumentation,
- * and the function from `<libunwind/...>'. However, on other systems,
- * this function is fairly dump and relies on all traversed code
- * having been compiled with function frames enabled.
+ * and the functions from `<libunwind/...>'. However, on other
+ * systems, this function is fairly dump and relies on all traversed
+ * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
 __CDECLARE(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
 #elif defined(__CRT_HAVE___backtrace)
 /* Create a traceback of up to `SIZE' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
  * information is constructed with the help of CFI instrumentation,
- * and the function from `<libunwind/...>'. However, on other systems,
- * this function is fairly dump and relies on all traversed code
- * having been compiled with function frames enabled.
+ * and the functions from `<libunwind/...>'. However, on other
+ * systems, this function is fairly dump and relies on all traversed
+ * code having been compiled with function frames enabled.
  * @return: * : The actual number of pointers written to `ARRAY' (always `<= SIZE') */
 __CREDIRECT(__ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void **__array, __STDC_INT_AS_SIZE_T __size),__backtrace,(__array,__size))
 #endif /* ... */
