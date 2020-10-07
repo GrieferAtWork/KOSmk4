@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xe637cabd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +17,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_SYS_IPC_H
-#define GUARD_LIBC_USER_SYS_IPC_H 1
+#ifndef _ASM_OS_KOS_IPC_H
+#define _ASM_OS_KOS_IPC_H 1
 
-#include "../api.h"
-#include "../auto/sys.ipc.h"
+#include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <sys/ipc.h>
+/* Mode flags for `msgget()', `semget()', and `shmget()'. */
+#define __IPC_CREAT  01000 /* ??? */
+#define __IPC_EXCL   02000 /* ??? */
+#define __IPC_NOWAIT 04000 /* ??? */
 
-DECL_BEGIN
+/* Control commands for `msgctl', `semctl', and `shmctl'. */
+#define __IPC_RMID 0 /* ??? */
+#define __IPC_SET  1 /* ??? */
+#define __IPC_STAT 2 /* ??? */
+#define __IPC_INFO 3 /* ??? */
 
-#ifndef __KERNEL__
-INTDEF NONNULL((1)) key_t NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname, __STDC_INT_AS_UINT_T proj_id);
-#endif /* !__KERNEL__ */
+/* Special key values. */
+#define __IPC_PRIVATE 0 /* ???. */
 
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_SYS_IPC_H */
+#endif /* !_ASM_OS_KOS_IPC_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cf56d7f */
+/* HASH CRC-32:0x752146cd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,8 +25,20 @@
 
 #ifdef __CC__
 #include <__crt.h>
+#ifdef __LIBC_BIND_OPTIMIZATIONS
+#include <optimized/unistd.h>
+#endif /* __LIBC_BIND_OPTIMIZATIONS */
 #include "core/unistd.h"
 
+#ifndef ____libc_getpagesize_defined
+#ifdef __fast_getpagesize_defined
+#define ____libc_getpagesize_defined 1
+#define __libc_getpagesize (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(getpagesize))
+#elif defined(____libc_core_getpagesize_defined)
+#define ____libc_getpagesize_defined 1
+#define __libc_getpagesize __libc_core_getpagesize
+#endif /* ... */
+#endif /* !____libc_getpagesize_defined */
 #if !defined(____libc_syscall_defined) && defined(____libc_core_syscall_defined)
 #define ____libc_syscall_defined 1
 #define __libc_syscall __libc_core_syscall

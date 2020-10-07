@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ab787da */
+/* HASH CRC-32:0x2ec1ac7a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,11 +32,45 @@
 
 #include <bits/types.h>
 #include <bits/ipctypes.h>
-#include <bits/ipc.h>
+#include <asm/os/ipc.h>
+#include <bits/os/ipc.h>
 
-__SYSDECL_BEGIN
+
+/* Mode flags for `msgget()', `semget()', and `shmget()'. */
+#if !defined(IPC_CREAT) && defined(__IPC_CREAT)
+#define IPC_CREAT  __IPC_CREAT  /* ??? */
+#endif /* !IPC_CREAT && __IPC_CREAT */
+#if !defined(IPC_EXCL) && defined(__IPC_EXCL)
+#define IPC_EXCL   __IPC_EXCL   /* ??? */
+#endif /* !IPC_EXCL && __IPC_EXCL */
+#if !defined(IPC_NOWAIT) && defined(__IPC_NOWAIT)
+#define IPC_NOWAIT __IPC_NOWAIT /* ??? */
+#endif /* !IPC_NOWAIT && __IPC_NOWAIT */
+
+/* Control commands for `msgctl', `semctl', and `shmctl'. */
+#if !defined(IPC_RMID) && defined(__IPC_RMID)
+#define IPC_RMID __IPC_RMID /* ??? */
+#endif /* !IPC_RMID && __IPC_RMID */
+#if !defined(IPC_SET) && defined(__IPC_SET)
+#define IPC_SET  __IPC_SET  /* ??? */
+#endif /* !IPC_SET && __IPC_SET */
+#if !defined(IPC_STAT) && defined(__IPC_STAT)
+#define IPC_STAT __IPC_STAT /* ??? */
+#endif /* !IPC_STAT && __IPC_STAT */
+#ifdef __USE_GNU
+#if !defined(IPC_INFO) && defined(__IPC_INFO)
+#define IPC_INFO __IPC_INFO /* ??? */
+#endif /* !IPC_INFO && __IPC_INFO */
+#endif /* __USE_GNU */
+
+/* Special key values. */
+#if !defined(IPC_PRIVATE) && defined(__IPC_PRIVATE)
+#define IPC_PRIVATE (__CCAST(__key_t)__IPC_PRIVATE) /* ???. */
+#endif /* !IPC_PRIVATE && __IPC_PRIVATE */
+
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __uid_t_defined
 #define __uid_t_defined 1
@@ -58,11 +92,9 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 typedef __key_t key_t;
 #endif /* !__key_t_defined */
 
-/* Generates key for System V style IPC */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),key_t,__NOTHROW_RPC,ftok,(char const *__pathname, __STDC_INT_AS_UINT_T __proj_id),(__pathname,__proj_id))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_IPC_H */

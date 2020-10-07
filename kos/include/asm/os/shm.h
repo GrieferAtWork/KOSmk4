@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xe637cabd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_SYS_IPC_H
-#define GUARD_LIBC_USER_SYS_IPC_H 1
+#ifndef _ASM_OS_SHM_H
+#define _ASM_OS_SHM_H 1
 
-#include "../api.h"
-#include "../auto/sys.ipc.h"
+#include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <sys/ipc.h>
+#if defined(__KOS__) || defined(__linux__)
+#include <asm/os/kos/shm.h>
+#endif /* ... */
 
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF NONNULL((1)) key_t NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname, __STDC_INT_AS_UINT_T proj_id);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_SYS_IPC_H */
+#endif /* !_ASM_OS_SHM_H */

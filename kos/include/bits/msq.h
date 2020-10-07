@@ -25,7 +25,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/ipc.h>
+#include <bits/os/ipc.h>
 #include <bits/types.h>
 
 /* Documentation taken from /usr/include/i386-linux/gnu/bits/msq.h */

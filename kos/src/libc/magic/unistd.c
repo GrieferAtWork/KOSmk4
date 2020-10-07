@@ -1645,7 +1645,7 @@ int setregid($gid_t rgid, $gid_t egid);
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K)
 @@>> getpagesize(3)
 @@Return the size of a PAGE (in bytes)
-[[ATTR_CONST, wunused, export_alias("__getpagesize")]]
+[[libc, ATTR_CONST, wunused, export_alias("__getpagesize")]]
 [[requires_include("<asm/pagesize.h>"), requires(defined(__ARCH_PAGESIZE))]]
 [[section(".text.crt{|.dos}.system.configuration"), decl_include("<features.h>")]]
 [[if($extended_prefix(

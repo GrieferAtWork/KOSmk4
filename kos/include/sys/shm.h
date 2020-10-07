@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe77dd24 */
+/* HASH CRC-32:0x84822635 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,15 +29,95 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/shm.h>
+
+#include <asm/os/shm.h>
+#include <asm/pagesize.h> /* __ARCH_PAGESIZE */
+#include <bits/os/shm.h>
 
 #ifdef __USE_GLIBC
 #include <sys/ipc.h>
 #endif /* __USE_GLIBC */
 
-__SYSDECL_BEGIN
+
+/* Permission flag for use with `shmget()'. */
+#ifndef SHM_W
+#ifdef __SHM_W
+#define SHM_W __SHM_W /* or S_IWUGO */
+#else /* __SHM_W */
+#define SHM_W 0222    /* or S_IWUGO */
+#endif /* !__SHM_W */
+#endif /* !SHM_W */
+#ifndef SHM_R
+#ifdef __SHM_R
+#define SHM_R __SHM_R /* or S_IRUGO */
+#else /* __SHM_R */
+#define SHM_R 0444    /* or S_IRUGO */
+#endif /* !__SHM_R */
+#endif /* !SHM_R */
+
+/* Flags for use with `shmat()'. */
+#if !defined(SHM_RDONLY) && defined(__SHM_RDONLY)
+#define SHM_RDONLY __SHM_RDONLY /* ??? */
+#endif /* !SHM_RDONLY && __SHM_RDONLY */
+#if !defined(SHM_RND) && defined(__SHM_RND)
+#define SHM_RND    __SHM_RND    /* ??? */
+#endif /* !SHM_RND && __SHM_RND */
+#if !defined(SHM_REMAP) && defined(__SHM_REMAP)
+#define SHM_REMAP  __SHM_REMAP  /* ??? */
+#endif /* !SHM_REMAP && __SHM_REMAP */
+#if !defined(SHM_EXEC) && defined(__SHM_EXEC)
+#define SHM_EXEC   __SHM_EXEC   /* ??? */
+#endif /* !SHM_EXEC && __SHM_EXEC */
+
+/* Command codes for use with `shmctl()'. */
+#if !defined(SHM_LOCK) && defined(__SHM_LOCK)
+#define SHM_LOCK   __SHM_LOCK   /* ??? */
+#endif /* !SHM_LOCK && __SHM_LOCK */
+#if !defined(SHM_UNLOCK) && defined(__SHM_UNLOCK)
+#define SHM_UNLOCK __SHM_UNLOCK /* ??? */
+#endif /* !SHM_UNLOCK && __SHM_UNLOCK */
+
+/* Segment low boundary address multiple.  */
+#ifndef SHMLBA
+#ifdef __SHMLBA
+#define SHMLBA __SHMLBA
+#elif defined(__ARCH_PAGESIZE)
+#define SHMLBA __ARCH_PAGESIZE
+#else /* __ARCH_PAGESIZE */
+#include <libc/unistd.h>
+#ifdef ____libc_getpagesize_defined
+#define SHMLBA __libc_getpagesize()
+#endif /* ____libc_getpagesize_defined */
+#endif /* ... */
+#endif /* !SHMLBA */
+
+#ifdef __USE_MISC
+/* ipcs ctl commands */
+#if !defined(SHM_STAT) && defined(__SHM_STAT)
+#define SHM_STAT __SHM_STAT /* ??? */
+#endif /* !SHM_STAT && __SHM_STAT */
+#if !defined(SHM_INFO) && defined(__SHM_INFO)
+#define SHM_INFO __SHM_INFO /* ??? */
+#endif /* !SHM_INFO && __SHM_INFO */
+
+/* shm_mode upper byte flags. */
+#if !defined(SHM_DEST) && defined(__SHM_DEST)
+#define SHM_DEST      __SHM_DEST      /* ??? */
+#endif /* !SHM_DEST && __SHM_DEST */
+#if !defined(SHM_LOCKED) && defined(__SHM_LOCKED)
+#define SHM_LOCKED    __SHM_LOCKED    /* ??? */
+#endif /* !SHM_LOCKED && __SHM_LOCKED */
+#if !defined(SHM_HUGETLB) && defined(__SHM_HUGETLB)
+#define SHM_HUGETLB   __SHM_HUGETLB   /* ??? */
+#endif /* !SHM_HUGETLB && __SHM_HUGETLB */
+#if !defined(SHM_NORESERVE) && defined(__SHM_NORESERVE)
+#define SHM_NORESERVE __SHM_NORESERVE /* ??? */
+#endif /* !SHM_NORESERVE && __SHM_NORESERVE */
+#endif /* __USE_MISC */
+
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifdef __USE_XOPEN
 #ifndef __pid_t_defined
@@ -66,8 +146,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,shmget,(key_t __key, size_t __size, __STDC_INT
 __CDECLARE_OPT(,void *,__NOTHROW_NCX,shmat,(int __shmid, void const *__shmaddr, __STDC_INT_AS_UINT_T __shmflg),(__shmid,__shmaddr,__shmflg))
 __CDECLARE_OPT(,int,__NOTHROW_NCX,shmdt,(void const *__shmaddr),(__shmaddr))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_SHM_H */

@@ -21,7 +21,8 @@
 #define _BITS_SEM_H 1
 
 #include <__stdinc.h>
-#include <bits/ipc.h>
+
+#include <bits/os/ipc.h>
 
 /* Documentation taken from GLibc /usr/include/i386-linux-gnu/bits/sem.h */
 /* Copyright (C) 2002-2016 Free Software Foundation, Inc.

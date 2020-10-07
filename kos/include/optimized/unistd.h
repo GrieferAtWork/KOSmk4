@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xe637cabd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +17,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_SYS_IPC_H
-#define GUARD_LIBC_USER_SYS_IPC_H 1
+#ifndef _OPTIMIZED_UNISTD_H
+#define _OPTIMIZED_UNISTD_H 1
 
-#include "../api.h"
-#include "../auto/sys.ipc.h"
+#include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <sys/ipc.h>
+#include <asm/pagesize.h>
 
-DECL_BEGIN
+#if defined(__CC__) && defined(__ARCH_PAGESIZE) && !defined(__fast_getpagesize_defined)
+#include <features.h>
+#define __fast_getpagesize_defined 1
+__DECL_BEGIN __NAMESPACE_FAST_BEGIN
 
-#ifndef __KERNEL__
-INTDEF NONNULL((1)) key_t NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname, __STDC_INT_AS_UINT_T proj_id);
-#endif /* !__KERNEL__ */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED
+__STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBC_FAST_NAME(getpagesize))(void) {
+	return __ARCH_PAGESIZE;
+}
 
-DECL_END
+__NAMESPACE_FAST_END __DECL_END
+#endif /* __CC__ */
 
-#endif /* !GUARD_LIBC_USER_SYS_IPC_H */
+#endif /* !_OPTIMIZED_UNISTD_H */

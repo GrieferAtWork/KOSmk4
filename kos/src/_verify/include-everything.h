@@ -239,6 +239,7 @@ incdir("", "../../include");
 #include <asm/os/eventfd.h>
 #include <asm/os/fcntl.h>
 #include <asm/os/fd_set.h>
+#include <asm/os/ipc.h>
 #include <asm/os/itimer.h>
 #include <asm/os/limits.h>
 #include <asm/os/mman.h>
@@ -251,6 +252,7 @@ incdir("", "../../include");
 #include <asm/os/reboot.h>
 #include <asm/os/resource.h>
 #include <asm/os/sched.h>
+#include <asm/os/shm.h>
 #include <asm/os/sigevent.h>
 #include <asm/os/siginfo.h>
 #include <asm/os/signal.h>
@@ -322,7 +324,6 @@ incdir("", "../../include");
 #include <bits/elf.h>
 #include <bits/hwcap.h>
 #include <bits/in.h>
-#include <bits/ipc.h>
 #include <bits/math-constants.h>
 #include <bits/mcontext.h>
 #include <bits/msgbuf.h>
@@ -336,12 +337,14 @@ incdir("", "../../include");
 #include <bits/os/file_handle.h>
 #include <bits/os/flock.h>
 #include <bits/os/iovec.h>
+#include <bits/os/ipc.h>
 #include <bits/os/itimerspec.h>
 #include <bits/os/itimerval.h>
 #include <bits/os/mmsghdr.h>
 #include <bits/os/msghdr.h>
 #include <bits/os/pollfd.h>
 #include <bits/os/sembuf.h>
+#include <bits/os/shm.h>
 #include <bits/os/sigcontext.h>
 #include <bits/os/signalfd_siginfo.h>
 #include <bits/os/sigset.h>
@@ -370,7 +373,6 @@ incdir("", "../../include");
 #include <bits/sched.h>
 #include <bits/sched_param.h>
 #include <bits/sem.h>
-#include <bits/shm.h>
 #include <bits/sigaction-struct.h>
 #include <bits/sigevent.h>
 #include <bits/siginfo-struct.h>
