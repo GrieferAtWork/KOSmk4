@@ -31,8 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_msgctl,hash:CRC-32=0xf717f6e0]]]*/
-/* Message queue control operation */
+/*[[[head:libc_msgctl,hash:CRC-32=0x4dac60df]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.msg") int
 NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid,
                                   __STDC_INT_AS_UINT_T cmd,
@@ -48,8 +47,7 @@ NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid,
 }
 /*[[[end:libc_msgctl]]]*/
 
-/*[[[head:libc_msgget,hash:CRC-32=0x3b93d677]]]*/
-/* Get messages queue */
+/*[[[head:libc_msgget,hash:CRC-32=0x5a133850]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.msg") int
 NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key,
                                   __STDC_INT_AS_UINT_T msgflg)
@@ -63,8 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key,
 }
 /*[[[end:libc_msgget]]]*/
 
-/*[[[head:libc_msgrcv,hash:CRC-32=0x7f9751e6]]]*/
-/* Receive message from message queue */
+/*[[[head:libc_msgrcv,hash:CRC-32=0xe47a8da2]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.msg") ssize_t
 NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
                                   void *msgp,
@@ -84,8 +81,7 @@ NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
 }
 /*[[[end:libc_msgrcv]]]*/
 
-/*[[[head:libc_msgsnd,hash:CRC-32=0x2749a6da]]]*/
-/* Send message to message queue */
+/*[[[head:libc_msgsnd,hash:CRC-32=0xc10861c1]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.msg") int
 NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
                                   const void *msgp,

@@ -23,13 +23,15 @@
 
 %{
 #include <features.h>
-#include <bits/os/timespec.h>
-#include <bits/sem.h>
+
+#include <bits/os/sem.h>
 #include <bits/os/sembuf.h>
+#include <bits/os/timespec.h>
 
 #ifdef __USE_GLIBC
-#include <stddef.h>
 #include <sys/ipc.h>
+
+#include <stddef.h>
 #endif /* __USE_GLIBC */
 
 #ifdef __CC__

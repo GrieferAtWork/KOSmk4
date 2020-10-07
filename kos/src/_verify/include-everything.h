@@ -244,6 +244,7 @@ incdir("", "../../include");
 #include <asm/os/limits.h>
 #include <asm/os/mman.h>
 #include <asm/os/mount.h>
+#include <asm/os/msq.h>
 #include <asm/os/oflags.h>
 #include <asm/os/paths.h>
 #include <asm/os/poll.h>
@@ -252,6 +253,7 @@ incdir("", "../../include");
 #include <asm/os/reboot.h>
 #include <asm/os/resource.h>
 #include <asm/os/sched.h>
+#include <asm/os/sem.h>
 #include <asm/os/shm.h>
 #include <asm/os/sigevent.h>
 #include <asm/os/siginfo.h>
@@ -326,8 +328,6 @@ incdir("", "../../include");
 #include <bits/in.h>
 #include <bits/math-constants.h>
 #include <bits/mcontext.h>
-#include <bits/msgbuf.h>
-#include <bits/msq.h>
 #include <bits/os/acct.h>
 #include <bits/os/cmsghdr.h>
 #include <bits/os/dirent.h>
@@ -341,8 +341,11 @@ incdir("", "../../include");
 #include <bits/os/itimerspec.h>
 #include <bits/os/itimerval.h>
 #include <bits/os/mmsghdr.h>
+#include <bits/os/msgbuf.h>
 #include <bits/os/msghdr.h>
+#include <bits/os/msq.h>
 #include <bits/os/pollfd.h>
+#include <bits/os/sem.h>
 #include <bits/os/sembuf.h>
 #include <bits/os/shm.h>
 #include <bits/os/sigcontext.h>
@@ -372,7 +375,6 @@ incdir("", "../../include");
 #include <bits/rusage-struct.h>
 #include <bits/sched.h>
 #include <bits/sched_param.h>
-#include <bits/sem.h>
 #include <bits/sigaction-struct.h>
 #include <bits/sigevent.h>
 #include <bits/siginfo-struct.h>
@@ -1456,6 +1458,7 @@ incdir("", "../../include");
 #include <optimized/fenv.h>
 #include <optimized/ssp.string.h>
 #include <optimized/string.h>
+#include <optimized/unistd.h>
 #include <osfcn.h>
 #if __has_include(<panel.h>)
 #include <panel.h>

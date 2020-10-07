@@ -27,7 +27,6 @@
 #include <features.h>
 
 #include <bits/types.h>
-#include <bits/ipctypes.h>
 #include <asm/os/ipc.h>
 #include <bits/os/ipc.h>
 

@@ -17,18 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_MSGBUF_H
-#define _BITS_MSGBUF_H 1
+#ifndef _BITS_OS_KOS_MSGBUF_H
+#define _BITS_OS_KOS_MSGBUF_H 1
 
 #include <__stdinc.h>
-#include <features.h>
+#include <features.h> /* __USE_KOS_ALTERATIONS */
 
 #include <bits/types.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
-/* Template for struct to be used as argument for `msgsnd' and `msgrcv'.  */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("mtype")
 #pragma push_macro("mtext")
@@ -36,13 +35,14 @@ __DECL_BEGIN
 #undef mtype
 #undef mtext
 
+/* Template for struct to be used as argument for `msgsnd' and `msgrcv'. */
 struct msgbuf {
-	__syscall_slong_t               mtype;    /* type of received/sent message */
-#ifdef __USE_KOS
-	__COMPILER_FLEXIBLE_ARRAY(char, mtext);   /* text of the message */
-#else /* __USE_KOS */
-	char                            mtext[1]; /* text of the message */
-#endif /* !__USE_KOS */
+	__syscall_slong_t               mtype;    /* ??? */
+#ifdef __USE_KOS_ALTERATIONS
+	__COMPILER_FLEXIBLE_ARRAY(char, mtext);   /* Payload */
+#else /* __USE_KOS_ALTERATIONS */
+	char                            mtext[1]; /* Payload */
+#endif /* !__USE_KOS_ALTERATIONS */
 };
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -53,4 +53,4 @@ struct msgbuf {
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* _BITS_MSGBUF_H */
+#endif /* _BITS_OS_KOS_MSGBUF_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa708a998 */
+/* HASH CRC-32:0x9fb078af */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,13 +31,9 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Message queue control operation */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid, __STDC_INT_AS_UINT_T cmd, struct msqid_ds *buf);
-/* Get messages queue */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key, __STDC_INT_AS_UINT_T msgflg);
-/* Receive message from message queue */
 INTDEF ssize_t NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid, void *msgp, size_t msgsz, longptr_t msgtyp, __STDC_INT_AS_UINT_T msgflg);
-/* Send message to message queue */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid, const void *msgp, size_t msgsz, __STDC_INT_AS_UINT_T msgflg);
 #endif /* !__KERNEL__ */
 

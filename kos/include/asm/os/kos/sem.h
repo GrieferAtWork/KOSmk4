@@ -17,20 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_IPCTYPES_H
-#define _I386_KOS_BITS_IPCTYPES_H 1
+#ifndef _BITS_SEM_H
+#define _BITS_SEM_H 1
 
 #include <__stdinc.h>
-#include <hybrid/host.h>
-#include <hybrid/typecore.h>
 
-#ifdef __CC__
-/* Used by `struct shmid_ds'. */
-#ifdef __x86_64__
-typedef __INT32_TYPE__ __ipc_pid_t;
-#else /* __x86_64__ */
-typedef __INT16_TYPE__ __ipc_pid_t;
-#endif /* !__x86_64__ */
-#endif /* __CC__ */
+/* Flags for `semop'. */
+#define __SEM_UNDO 0x1000 /* ??? */
 
-#endif /* !_I386_KOS_BITS_IPCTYPES_H */
+/* Commands for `semctl'.  */
+#define __GETPID  11 /* ??? */
+#define __GETVAL  12 /* ??? */
+#define __GETALL  13 /* ??? */
+#define __GETNCNT 14 /* ??? */
+#define __GETZCNT 15 /* ??? */
+#define __SETVAL  16 /* ??? */
+#define __SETALL  17 /* ??? */
+
+/* ipcs ctl cmds */
+#define __SEM_STAT 18 /* ??? */
+#define __SEM_INFO 19 /* ??? */
+
+#endif /* _BITS_SEM_H */

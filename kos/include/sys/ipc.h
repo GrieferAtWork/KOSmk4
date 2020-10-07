@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ec1ac7a */
+/* HASH CRC-32:0x21de7c90 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,6 @@
 #include <features.h>
 
 #include <bits/types.h>
-#include <bits/ipctypes.h>
 #include <asm/os/ipc.h>
 #include <bits/os/ipc.h>
 

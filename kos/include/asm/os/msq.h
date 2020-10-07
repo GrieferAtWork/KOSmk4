@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xe0262e27 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,24 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_SYS_MSG_H
-#define GUARD_LIBC_AUTO_SYS_MSG_H 1
+#ifndef _ASM_OS_MSQ_H
+#define _ASM_OS_MSQ_H 1
 
-#include "../api.h"
+#include <__stdinc.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <sys/msg.h>
+#if defined(__KOS__) || defined(__linux__)
+#include <asm/os/kos/msq.h>
+#endif /* ... */
 
-DECL_BEGIN
-
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_msgctl)(int msqid, __STDC_INT_AS_UINT_T cmd, struct msqid_ds *buf);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_msgget)(key_t key, __STDC_INT_AS_UINT_T msgflg);
-INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_msgrcv)(int msqid, void *msgp, size_t msgsz, longptr_t msgtyp, __STDC_INT_AS_UINT_T msgflg);
-INTDEF int NOTHROW_RPC(LIBDCALL libd_msgsnd)(int msqid, const void *msgp, size_t msgsz, __STDC_INT_AS_UINT_T msgflg);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_AUTO_SYS_MSG_H */
+#endif /* !_ASM_OS_MSQ_H */

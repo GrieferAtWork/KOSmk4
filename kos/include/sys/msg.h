@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44035c1b */
+/* HASH CRC-32:0x6a67989c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,39 +28,19 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-
 #include <features.h>
-#include <bits/msq.h>
+#include <bits/os/msq.h>
 
 #ifdef __USE_GNU
-#include <bits/msgbuf.h> /* struct msgbuf */
+#include <bits/os/msgbuf.h> /* `struct msgbuf' */
 #endif /* __USE_GNU */
 
 #ifdef __USE_GLIBC
 #include <sys/ipc.h>
 #endif /* __USE_GLIBC */
 
-/* Documentation taken from /usr/include/i386-linux-gnu/sys/msg.h */
-/* Copyright (C) 1995-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __time_t_defined
 #define __time_t_defined 1
@@ -87,20 +67,12 @@ typedef __ssize_t ssize_t;
 typedef __key_t key_t;
 #endif /* !__key_t_defined */
 
-/* The following System V style IPC functions implement a message queue system.
- * The definition is found in XPG2. */
-
-/* Message queue control operation */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,msgctl,(int __msqid, __STDC_INT_AS_UINT_T __cmd, struct msqid_ds *__buf),(__msqid,__cmd,__buf))
-/* Get messages queue */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,msgget,(key_t __key, __STDC_INT_AS_UINT_T __msgflg),(__key,__msgflg))
-/* Receive message from message queue */
 __CDECLARE_OPT(,ssize_t,__NOTHROW_RPC,msgrcv,(int __msqid, void *__msgp, size_t __msgsz, __LONGPTR_TYPE__ __msgtyp, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgtyp,__msgflg))
-/* Send message to message queue */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,msgsnd,(int __msqid, const void *__msgp, size_t __msgsz, __STDC_INT_AS_UINT_T __msgflg),(__msqid,__msgp,__msgsz,__msgflg))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_MSG_H */
