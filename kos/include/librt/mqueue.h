@@ -24,7 +24,7 @@
 /**/
 
 #include <bits/os/timespec.h>
-#include <bits/sigevent.h>
+#include <bits/os/sigevent.h>
 #include <bits/types.h>
 
 #include <librt/bits/mqueue.h>

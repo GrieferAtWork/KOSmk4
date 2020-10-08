@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd6154ce */
+/* HASH CRC-32:0x4ee0898d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,9 +31,9 @@
 #include <features.h>
 
 #include <asm/os/sched.h>
-#include <bits/sched.h>
-#include <bits/sched_param.h>
-#include <bits/os/timespec.h>
+#include <bits/os/cpu_set.h>  /* struct __cpu_set_struct */
+#include <bits/os/sched.h>    /* struct sched_param */
+#include <bits/os/timespec.h> /* struct timespec */
 #include <bits/types.h>
 
 #ifdef __USE_KOS
@@ -43,25 +43,25 @@
 
 __SYSDECL_BEGIN
 
-#ifdef __SCHED_OTHER
-#define SCHED_OTHER __SCHED_OTHER /* ... */
-#endif /* __SCHED_OTHER */
-#ifdef __SCHED_FIFO
-#define SCHED_FIFO __SCHED_FIFO /* ... */
-#endif /* __SCHED_FIFO */
-#ifdef __SCHED_RR
-#define SCHED_RR __SCHED_RR /* ... */
-#endif /* __SCHED_RR */
+#if !defined(SCHED_OTHER) && defined(__SCHED_OTHER)
+#define SCHED_OTHER         __SCHED_OTHER         /* ... */
+#endif /* !SCHED_OTHER && __SCHED_OTHER */
+#if !defined(SCHED_FIFO) && defined(__SCHED_FIFO)
+#define SCHED_FIFO          __SCHED_FIFO          /* ... */
+#endif /* !SCHED_FIFO && __SCHED_FIFO */
+#if !defined(SCHED_RR) && defined(__SCHED_RR)
+#define SCHED_RR            __SCHED_RR            /* ... */
+#endif /* !SCHED_RR && __SCHED_RR */
 #ifdef __USE_GNU
-#ifdef __SCHED_BATCH
-#define SCHED_BATCH __SCHED_BATCH /* ... */
-#endif /* __SCHED_BATCH */
-#ifdef __SCHED_IDLE
-#define SCHED_IDLE __SCHED_IDLE /* ... */
-#endif /* __SCHED_IDLE */
-#ifdef __SCHED_RESET_ON_FORK
+#if !defined(SCHED_BATCH) && defined(__SCHED_BATCH)
+#define SCHED_BATCH         __SCHED_BATCH         /* ... */
+#endif /* !SCHED_BATCH && __SCHED_BATCH */
+#if !defined(SCHED_IDLE) && defined(__SCHED_IDLE)
+#define SCHED_IDLE          __SCHED_IDLE          /* ... */
+#endif /* !SCHED_IDLE && __SCHED_IDLE */
+#if !defined(SCHED_RESET_ON_FORK) && defined(__SCHED_RESET_ON_FORK)
 #define SCHED_RESET_ON_FORK __SCHED_RESET_ON_FORK /* ... */
-#endif /* __SCHED_RESET_ON_FORK */
+#endif /* !SCHED_RESET_ON_FORK && __SCHED_RESET_ON_FORK */
 #endif /* __USE_GNU */
 
 
@@ -143,127 +143,79 @@ __SYSDECL_BEGIN
 #if defined(__USE_GNU) || defined(__USE_KOS)
 /* Cloning flags. */
 
-/* Signal mask to be sent at exit. */
-#ifdef __CSIGNAL
-#define CSIGNAL __CSIGNAL
-#endif /* __CSIGNAL */
-
-/* Set if VM shared between processes. */
-#ifdef __CLONE_VM
-#define CLONE_VM __CLONE_VM
-#endif /* __CLONE_VM */
-
-/* Set if fs info shared between processes. */
-#ifdef __CLONE_FS
-#define CLONE_FS __CLONE_FS
-#endif /* __CLONE_FS */
-
-/* Set if open files shared between processes. */
-#ifdef __CLONE_FILES
-#define CLONE_FILES __CLONE_FILES
-#endif /* __CLONE_FILES */
-
-/* Set if signal handlers shared. */
-#ifdef __CLONE_SIGHAND
-#define CLONE_SIGHAND __CLONE_SIGHAND
-#endif /* __CLONE_SIGHAND */
-
-/* Set if credentials (user/group ids and special permissions) are shared.
- * Note that during an exec() credentials are unshared unconditionalls. */
-#ifdef __CLONE_CRED
-#define CLONE_CRED __CLONE_CRED
-#endif /* __CLONE_CRED */
-
-/* Set if tracing continues on the child. */
-#ifdef __CLONE_PTRACE
-#define CLONE_PTRACE __CLONE_PTRACE
-#endif /* __CLONE_PTRACE */
-
-/* Set if the parent wants the child to wake it up on mm_release. */
-#ifdef __CLONE_VFORK
-#define CLONE_VFORK __CLONE_VFORK
-#endif /* __CLONE_VFORK */
-
-/* Set if we want to have the same parent as the cloner. */
-#ifdef __CLONE_PARENT
-#define CLONE_PARENT __CLONE_PARENT
-#endif /* __CLONE_PARENT */
-
-/* Set to add to same thread group. */
-#ifdef __CLONE_THREAD
-#define CLONE_THREAD __CLONE_THREAD
-#endif /* __CLONE_THREAD */
-
-/* Set to create new namespace. */
-#ifdef __CLONE_NEWNS
-#define CLONE_NEWNS __CLONE_NEWNS
-#endif /* __CLONE_NEWNS */
-
-/* Set to shared SVID SEM_UNDO semantics. */
-#ifdef __CLONE_SYSVSEM
-#define CLONE_SYSVSEM __CLONE_SYSVSEM
-#endif /* __CLONE_SYSVSEM */
-
-/* Set TLS info. */
-#ifdef __CLONE_SETTLS
-#define CLONE_SETTLS __CLONE_SETTLS
-#endif /* __CLONE_SETTLS */
-
-/* Store TID in userlevel buffer before MM copy. */
-#ifdef __CLONE_PARENT_SETTID
-#define CLONE_PARENT_SETTID __CLONE_PARENT_SETTID
-#endif /* __CLONE_PARENT_SETTID */
-
-/* Register exit futex and memory location to clear. */
-#ifdef __CLONE_CHILD_CLEARTID
-#define CLONE_CHILD_CLEARTID __CLONE_CHILD_CLEARTID
-#endif /* __CLONE_CHILD_CLEARTID */
-
-/* Create clone detached. */
-#ifdef __CLONE_DETACHED
-#define CLONE_DETACHED __CLONE_DETACHED
-#endif /* __CLONE_DETACHED */
-
-/* Set if the tracing process can't force CLONE_PTRACE on this clone. */
-#ifdef __CLONE_UNTRACED
-#define CLONE_UNTRACED __CLONE_UNTRACED
-#endif /* __CLONE_UNTRACED */
-
-/* Store TID in userlevel buffer in the child. */
-#ifdef __CLONE_CHILD_SETTID
-#define CLONE_CHILD_SETTID __CLONE_CHILD_SETTID
-#endif /* __CLONE_CHILD_SETTID */
-
-/* New utsname group. */
-#ifdef __CLONE_NEWUTS
-#define CLONE_NEWUTS __CLONE_NEWUTS
-#endif /* __CLONE_NEWUTS */
-
-/* New ipcs. */
-#ifdef __CLONE_NEWIPC
-#define CLONE_NEWIPC __CLONE_NEWIPC
-#endif /* __CLONE_NEWIPC */
-
-/* New user namespace. */
-#ifdef __CLONE_NEWUSER
-#define CLONE_NEWUSER __CLONE_NEWUSER
-#endif /* __CLONE_NEWUSER */
-
-/* New pid namespace. */
-#ifdef __CLONE_NEWPID
-#define CLONE_NEWPID __CLONE_NEWPID
-#endif /* __CLONE_NEWPID */
-
-/* New network namespace. */
-#ifdef __CLONE_NEWNET
-#define CLONE_NEWNET __CLONE_NEWNET
-#endif /* __CLONE_NEWNET */
-
-/* Clone I/O context. */
-#ifdef __CLONE_IO
-#define CLONE_IO __CLONE_IO
-#endif /* __CLONE_IO */
-
+#if !defined(CSIGNAL) && defined(__CSIGNAL)
+#define CSIGNAL              __CSIGNAL              /* Signal mask to be sent at exit. */
+#endif /* !CSIGNAL && __CSIGNAL */
+#if !defined(CLONE_VM) && defined(__CLONE_VM)
+#define CLONE_VM             __CLONE_VM             /* Set if VM shared between processes. */
+#endif /* !CLONE_VM && __CLONE_VM */
+#if !defined(CLONE_FS) && defined(__CLONE_FS)
+#define CLONE_FS             __CLONE_FS             /* Set if fs info shared between processes. */
+#endif /* !CLONE_FS && __CLONE_FS */
+#if !defined(CLONE_FILES) && defined(__CLONE_FILES)
+#define CLONE_FILES          __CLONE_FILES          /* Set if open files shared between processes. */
+#endif /* !CLONE_FILES && __CLONE_FILES */
+#if !defined(CLONE_SIGHAND) && defined(__CLONE_SIGHAND)
+#define CLONE_SIGHAND        __CLONE_SIGHAND        /* Set if signal handlers shared. */
+#endif /* !CLONE_SIGHAND && __CLONE_SIGHAND */
+#if !defined(CLONE_CRED) && defined(__CLONE_CRED)
+#define CLONE_CRED           __CLONE_CRED           /* Set if credentials (user/group ids and special permissions) are shared. \
+                                                     * Note that during an exec() credentials are unshared unconditionally. */
+#endif /* !CLONE_CRED && __CLONE_CRED */
+#if !defined(CLONE_PTRACE) && defined(__CLONE_PTRACE)
+#define CLONE_PTRACE         __CLONE_PTRACE         /* Set if tracing continues on the child. */
+#endif /* !CLONE_PTRACE && __CLONE_PTRACE */
+#if !defined(CLONE_VFORK) && defined(__CLONE_VFORK)
+#define CLONE_VFORK          __CLONE_VFORK          /* Set if the parent wants the child to wake it up on mm_release. */
+#endif /* !CLONE_VFORK && __CLONE_VFORK */
+#if !defined(CLONE_PARENT) && defined(__CLONE_PARENT)
+#define CLONE_PARENT         __CLONE_PARENT         /* Set if we want to have the same parent as the cloner. */
+#endif /* !CLONE_PARENT && __CLONE_PARENT */
+#if !defined(CLONE_THREAD) && defined(__CLONE_THREAD)
+#define CLONE_THREAD         __CLONE_THREAD         /* Set to add to same thread group. */
+#endif /* !CLONE_THREAD && __CLONE_THREAD */
+#if !defined(CLONE_NEWNS) && defined(__CLONE_NEWNS)
+#define CLONE_NEWNS          __CLONE_NEWNS          /* Set to create new namespace. */
+#endif /* !CLONE_NEWNS && __CLONE_NEWNS */
+#if !defined(CLONE_SYSVSEM) && defined(__CLONE_SYSVSEM)
+#define CLONE_SYSVSEM        __CLONE_SYSVSEM        /* Set to shared SVID SEM_UNDO semantics. */
+#endif /* !CLONE_SYSVSEM && __CLONE_SYSVSEM */
+#if !defined(CLONE_SETTLS) && defined(__CLONE_SETTLS)
+#define CLONE_SETTLS         __CLONE_SETTLS         /* Set TLS info. */
+#endif /* !CLONE_SETTLS && __CLONE_SETTLS */
+#if !defined(CLONE_PARENT_SETTID) && defined(__CLONE_PARENT_SETTID)
+#define CLONE_PARENT_SETTID  __CLONE_PARENT_SETTID  /* Store TID in userlevel buffer before MM copy. */
+#endif /* !CLONE_PARENT_SETTID && __CLONE_PARENT_SETTID */
+#if !defined(CLONE_CHILD_CLEARTID) && defined(__CLONE_CHILD_CLEARTID)
+#define CLONE_CHILD_CLEARTID __CLONE_CHILD_CLEARTID /* Register exit futex and memory location to clear. */
+#endif /* !CLONE_CHILD_CLEARTID && __CLONE_CHILD_CLEARTID */
+#if !defined(CLONE_DETACHED) && defined(__CLONE_DETACHED)
+#define CLONE_DETACHED       __CLONE_DETACHED       /* Create clone detached. */
+#endif /* !CLONE_DETACHED && __CLONE_DETACHED */
+#if !defined(CLONE_UNTRACED) && defined(__CLONE_UNTRACED)
+#define CLONE_UNTRACED       __CLONE_UNTRACED       /* Set if the tracing process can't force CLONE_PTRACE on this clone. */
+#endif /* !CLONE_UNTRACED && __CLONE_UNTRACED */
+#if !defined(CLONE_CHILD_SETTID) && defined(__CLONE_CHILD_SETTID)
+#define CLONE_CHILD_SETTID   __CLONE_CHILD_SETTID   /* Store TID in userlevel buffer in the child. */
+#endif /* !CLONE_CHILD_SETTID && __CLONE_CHILD_SETTID */
+#if !defined(CLONE_NEWUTS) && defined(__CLONE_NEWUTS)
+#define CLONE_NEWUTS         __CLONE_NEWUTS         /* New utsname group. */
+#endif /* !CLONE_NEWUTS && __CLONE_NEWUTS */
+#if !defined(CLONE_NEWIPC) && defined(__CLONE_NEWIPC)
+#define CLONE_NEWIPC         __CLONE_NEWIPC         /* New ipcs. */
+#endif /* !CLONE_NEWIPC && __CLONE_NEWIPC */
+#if !defined(CLONE_NEWUSER) && defined(__CLONE_NEWUSER)
+#define CLONE_NEWUSER        __CLONE_NEWUSER        /* New user namespace. */
+#endif /* !CLONE_NEWUSER && __CLONE_NEWUSER */
+#if !defined(CLONE_NEWPID) && defined(__CLONE_NEWPID)
+#define CLONE_NEWPID         __CLONE_NEWPID         /* New pid namespace. */
+#endif /* !CLONE_NEWPID && __CLONE_NEWPID */
+#if !defined(CLONE_NEWNET) && defined(__CLONE_NEWNET)
+#define CLONE_NEWNET         __CLONE_NEWNET         /* New network namespace. */
+#endif /* !CLONE_NEWNET && __CLONE_NEWNET */
+#if !defined(CLONE_IO) && defined(__CLONE_IO)
+#define CLONE_IO             __CLONE_IO             /* Clone I/O context. */
+#endif /* !CLONE_IO && __CLONE_IO */
 
 #ifdef __USE_KOS
 /* Value passed for 'CHILD_STACK' to 'clone()':
@@ -292,6 +244,7 @@ __SYSDECL_BEGIN
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 #endif /* !CLONE_CHILDSTACK_AUTO */
 
+#ifndef CLONE_NEW_THREAD
 #ifdef __CLONE_THREAD
 #define __PRIVATE_CLONE_THREAD __CLONE_THREAD
 #else /* __CLONE_THREAD */
@@ -338,24 +291,21 @@ __SYSDECL_BEGIN
 	 __PRIVATE_CLONE_SIGHAND | \
 	 __PRIVATE_CLONE_CRED |    \
 	 __PRIVATE_CLONE_IO)
+#endif /* !CLONE_NEW_THREAD */
 
 /* Same flags as used by fork() */
+#ifndef CLONE_NEW_PROCESS
 #ifdef __SIGCHLD
 #define CLONE_NEW_PROCESS (__SIGCHLD)
 #else /* __SIGCHLD */
 #define CLONE_NEW_PROCESS 0
 #endif /* !__SIGCHLD */
+#endif /* !CLONE_NEW_PROCESS */
 
 #endif /* __USE_KOS */
 #endif /* __USE_GNU || __USE_KOS */
 
 #ifdef __CC__
-
-#ifndef sched_priority
-#define sched_priority __sched_priority
-#endif /* !sched_priority */
-
-
 #if defined(__USE_GNU) || defined(__USE_KOS)
 typedef int (__LIBKCALL *__clone_func_t)(void *__arg);
 #ifdef __CRT_HAVE_clone
@@ -420,7 +370,7 @@ __CDECLARE_VOID_OPT(__ATTR_NORETURN,__NOTHROW_NCX,exit_thread,(int __exit_code),
 #ifdef __USE_GNU
 
 #ifdef __CC__
-typedef __cpu_set_t cpu_set_t;
+typedef struct __cpu_set_struct cpu_set_t;
 #endif /* __CC__ */
 
 #ifdef __USE_KOS
@@ -431,7 +381,7 @@ typedef __cpu_set_t cpu_set_t;
 #define CPU_FILL(cpusetp)            __CPU_FILL_S(sizeof(cpu_set_t), cpusetp)
 #define CPU_FILL_S(setsize, cpusetp) __CPU_FILL_S(setsize, cpusetp)
 #endif /* __USE_KOS */
-#define CPU_SETSIZE   __CPU_SETSIZE
+#define CPU_SETSIZE __CPU_SETSIZE
 
 #define CPU_SET(cpu, cpusetp)                         __CPU_SET_S(cpu, sizeof(cpu_set_t), cpusetp)
 #define CPU_CLR(cpu, cpusetp)                         __CPU_CLR_S(cpu, sizeof(cpu_set_t), cpusetp)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f493595 */
+/* HASH CRC-32:0xcfa2214d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #include <features.h>
 
 #include <asm/os/resource.h>
-#include <bits/resource.h>
+#include <bits/os/rlimit.h> /* struct rlimit, struct rlimit64 */
 #include <bits/rusage-struct.h>
 #include <bits/os/timeval.h>
 #include <bits/types.h>

@@ -26,7 +26,7 @@
 #include <__crt.h>
 
 #include <bits/os/timespec.h>
-#include <bits/sigevent.h>
+#include <bits/os/sigevent.h>
 #include <bits/types.h>
 
 #include <librt/asm/aio.h>

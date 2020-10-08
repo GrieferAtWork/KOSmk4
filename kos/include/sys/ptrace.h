@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3525b38c */
+/* HASH CRC-32:0x8c12644 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 
 #include <asm/os/ptrace.h>
 #include <bits/types.h>
-#include <bits/ptrace.h> /* `struct __ptrace_peeksiginfo_args' */
+#include <bits/os/ptrace.h> /* `struct __ptrace_peeksiginfo_args' */
 
 __SYSDECL_BEGIN
 

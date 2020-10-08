@@ -25,7 +25,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/sigevent.h>
+#include <bits/os/sigevent.h>
 #include <bits/types.h>
 
 /* Documentation derived from Glibc /usr/include/aio.h */

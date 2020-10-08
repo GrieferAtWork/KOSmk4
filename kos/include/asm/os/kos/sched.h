@@ -33,7 +33,7 @@
 #define __CLONE_SIGHAND        0x00000800 /* Set if signal handlers shared. */
 #ifdef __KOS__
 #define __CLONE_CRED           0x00001000 /* Set if credentials (user/group ids and special permissions) are shared.
-                                           * Note that during an exec() credentials are unshared unconditionalls. */
+                                           * Note that during an exec() credentials are unshared unconditionally. */
 #endif /* __KOS__ */
 #define __CLONE_PTRACE         0x00002000 /* Set if tracing continues on the child. */
 #define __CLONE_VFORK          0x00004000 /* Set if the parent wants the child to wake it up on mm_release. */

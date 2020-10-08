@@ -74,7 +74,7 @@
 #include <asm/os/sigevent.h>
 #include <asm/os/siginfo.h>
 #include <bits/os/sigval.h>      /* union sigval */
-#include <bits/sigevent.h>       /* struct sigevent */
+#include <bits/os/sigevent.h>    /* struct sigevent */
 #include <bits/siginfo-struct.h> /* struct __siginfo_struct */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 

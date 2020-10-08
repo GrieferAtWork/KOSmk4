@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9837b193 */
+/* HASH CRC-32:0x7030140e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@
 
 #include <asm/crt/posix_spawn.h>
 #include <bits/crt/posix_spawn.h>
-#include <bits/sched_param.h>
+#include <bits/os/sched.h>  /* struct sched_param */
 #include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 #include <sys/types.h>

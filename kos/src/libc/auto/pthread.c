@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20d33c2f */
+/* HASH CRC-32:0x3eed95ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,7 +134,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
 	return 0;
 }
-#include <bits/sched.h>
+#include <bits/os/cpu_set.h>
 /* @return: * : The number of cpus that the calling thread is able to run on */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
@@ -143,7 +143,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
 		return 1;
 	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(cset), &cset);
 }
-#include <bits/sched.h>
+#include <bits/os/cpu_set.h>
 #include <libc/errno.h>
 /* Restrict the calling thread to only run on the first `n' cpus
  * @return: EOK:    Success

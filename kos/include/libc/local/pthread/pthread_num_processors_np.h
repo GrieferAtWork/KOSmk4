@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x531c22f6 */
+/* HASH CRC-32:0x6ec4100 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,17 +29,17 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_sched_getaffinity_defined 1
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
-#include <bits/sched.h>
+#include <bits/os/cpu_set.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, __cpu_set_t *__cpuset),sched_getaffinity,(__pid,__cpusetsize,__cpuset))
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, struct __cpu_set_struct *__cpuset),sched_getaffinity,(__pid,__cpusetsize,__cpuset))
 #endif /* !__local___localdep_sched_getaffinity_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/sched.h>
+#include <bits/os/cpu_set.h>
 __NAMESPACE_LOCAL_BEGIN
 /* @return: * : The number of cpus that the calling thread is able to run on */
 __LOCAL_LIBC(pthread_num_processors_np) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_num_processors_np))(void) {
-	__cpu_set_t __cset;
+	struct __cpu_set_struct __cset;
 	if __unlikely(__localdep_sched_getaffinity(0, sizeof(__cset), &__cset) != 0)
 		return 1;
 	return (__STDC_INT_AS_SIZE_T)__CPU_COUNT_S(sizeof(__cset), &__cset);

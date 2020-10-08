@@ -401,11 +401,12 @@ local files = {
 	"../../include/bits/os/kos/flock.h",
 	"../../include/bits/os/kos/itimerspec.h",
 	"../../include/bits/os/kos/itimerval.h",
-	"../../include/bits/mcontext.h",
+	"../../include/bits/os/mcontext.h",
 	"../../include/bits/os/kos/mmsghdr.h",
 	"../../include/bits/os/kos/msghdr.h",
 	"../../include/bits/os/kos/pollfd.h",
 	"../../include/bits/rusage-struct.h",
+	"../../include/bits/os/kos/sched.h",
 	"../../include/bits/sigaction-struct.h",
 	"../../include/bits/siginfo-struct.h",
 	"../../include/bits/stat-kos.h",
@@ -413,7 +414,7 @@ local files = {
 	"../../include/bits/os/kos/timeb.h",
 	"../../include/bits/os/kos/timespec.h",
 	"../../include/bits/os/kos/timeval.h",
-	"../../include/bits/ucontext.h",
+	"../../include/bits/os/ucontext.h",
 	"../../include/bits/os/kos/ustat.h",
 	"../../include/bits/os/kos/utimbuf.h",
 	"../../include/bits/os/kos/utsname.h",
@@ -555,7 +556,7 @@ static_assert(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
 
 
 
-#include <bits/mcontext.h>
+#include <bits/os/mcontext.h>
 
 /* struct mcontext */
 static_assert(sizeof(struct mcontext) == __SIZEOF_MCONTEXT);
@@ -665,6 +666,17 @@ static_assert(offsetof(struct __rusage32, ru_oublock) == __OFFSET_RUSAGE32_OUBLO
 static_assert(offsetof(struct __rusage32, ru_stime) == __OFFSET_RUSAGE32_STIME);
 static_assert(offsetof(struct __rusage32, ru_utime) == __OFFSET_RUSAGE32_UTIME);
 static_assert(sizeof(struct __rusage32) == __SIZEOF_RUSAGE32);
+
+
+
+
+
+#include <bits/os/kos/sched.h>
+
+/* struct sched_param */
+static_assert(offsetof(struct sched_param, sched_priority) == __OFFSET_SCHED_PARAM_SCHED_PRIORITY);
+static_assert(sizeof(struct sched_param) == __SIZEOF_SCHED_PARAM);
+static_assert(alignof(struct sched_param) == __ALIGNOF_SCHED_PARAM);
 
 
 
@@ -957,7 +969,7 @@ static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
 
 
 
-#include <bits/ucontext.h>
+#include <bits/os/ucontext.h>
 
 /* struct ucontext */
 static_assert(offsetof(struct ucontext, uc_link) == __OFFSET_UCONTEXT_LINK);

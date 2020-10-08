@@ -72,7 +72,7 @@ union wait {
 #endif /* Endian... */
 	};
 #endif /* __COMPILER_HAVE_TRANSPARENT_STRUCT */
-#if (!defined(__USE_KOS) || \
+#if (!defined(__USE_KOS_ALTERATIONS) || \
      !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT))
 	struct __ATTR_PACKED {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -105,7 +105,7 @@ union wait {
 #define w_stopsig  __wait_stopped.__w_stopsig
 #define w_stopval  __wait_stopped.__w_stopval
 #endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
-#endif /* !__USE_KOS || !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+#endif /* !__USE_KOS_ALTERATIONS || !__COMPILER_HAVE_TRANSPARENT_STRUCT */
 };
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("w_retcode")

@@ -1251,7 +1251,7 @@ int clock_settime(clockid_t clock_id, [[nonnull]] struct timespec const *tp) {
 
 
 @@Create new per-process timer using CLOCK_ID
-[[decl_include("<bits/sigevent.h>", "<bits/types.h>")]]
+[[decl_include("<bits/os/sigevent.h>", "<bits/types.h>")]]
 [[section(".text.crt{|.dos}.timer")]]
 int timer_create(clockid_t clock_id,
                  [[nullable]] struct sigevent *__restrict evp,

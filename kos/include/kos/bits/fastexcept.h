@@ -31,7 +31,7 @@
 #include <kos/bits/exception_data.h> /* struct exception_data, __error_code_t, ... */
 
 #ifndef __ERROR_REGISTER_STATE_TYPE
-#include <bits/mcontext.h>
+#include <bits/os/mcontext.h>
 #define __ERROR_REGISTER_STATE_TYPE   struct mcontext
 #define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__ERROR_REGISTER_STATE_TYPE */

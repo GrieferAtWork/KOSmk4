@@ -29,7 +29,7 @@
 
 #include <asm/os/ptrace.h>
 #include <bits/types.h>
-#include <bits/ptrace.h> /* `struct __ptrace_peeksiginfo_args' */
+#include <bits/os/ptrace.h> /* `struct __ptrace_peeksiginfo_args' */
 
 __SYSDECL_BEGIN
 

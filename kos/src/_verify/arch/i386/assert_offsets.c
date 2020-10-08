@@ -74,8 +74,8 @@ local files = {
 	"../../../../include/i386-kos/bits/sigaction-struct-cygwin.h",
 	"../../../../include/i386-kos/bits/sigaction-struct32.h",
 	"../../../../include/i386-kos/bits/sigaction-struct64.h",
-	"../../../../include/i386-kos/bits/sigevent32.h",
-	"../../../../include/i386-kos/bits/sigevent64.h",
+	"../../../../include/i386-kos/bits/os/kos/sigevent32.h",
+	"../../../../include/i386-kos/bits/os/kos/sigevent64.h",
 	"../../../../include/i386-kos/bits/siginfo-struct32.h",
 	"../../../../include/i386-kos/bits/siginfo-struct64.h",
 	"../../../../include/i386-kos/bits/os/kos/sigstack32.h",
@@ -98,18 +98,18 @@ local files = {
 	"../../../../include/i386-kos/bits/os/kos/utimbuf64.h",
 	"../../../../include/i386-kos/bits/va_list-struct32.h",
 	"../../../../include/i386-kos/bits/va_list-struct64.h",
-	"../../../../include/i386-kos/bits/mcontext32.h",
-	"../../../../include/i386-kos/bits/mcontext64.h",
-	"../../../../include/i386-kos/bits/mcontext-linux32.h",
-	"../../../../include/i386-kos/bits/mcontext-linux64.h",
-	"../../../../include/i386-kos/bits/mcontext-cygwin32.h",
-	"../../../../include/i386-kos/bits/mcontext-cygwin64.h",
-	"../../../../include/i386-kos/bits/ucontext32.h",
-	"../../../../include/i386-kos/bits/ucontext64.h",
-	"../../../../include/i386-kos/bits/ucontext-linux32.h",
-	"../../../../include/i386-kos/bits/ucontext-linux64.h",
-	"../../../../include/i386-kos/bits/ucontext-cygwin32.h",
-	"../../../../include/i386-kos/bits/ucontext-cygwin64.h",
+	"../../../../include/i386-kos/bits/os/kos/mcontext32.h",
+	"../../../../include/i386-kos/bits/os/kos/mcontext64.h",
+	"../../../../include/i386-kos/bits/os/linux/mcontext32.h",
+	"../../../../include/i386-kos/bits/os/linux/mcontext64.h",
+	"../../../../include/i386-kos/bits/os/cygwin/mcontext32.h",
+	"../../../../include/i386-kos/bits/os/cygwin/mcontext64.h",
+	"../../../../include/i386-kos/bits/os/kos/ucontext32.h",
+	"../../../../include/i386-kos/bits/os/kos/ucontext64.h",
+	"../../../../include/i386-kos/bits/os/linux/ucontext32.h",
+	"../../../../include/i386-kos/bits/os/linux/ucontext64.h",
+	"../../../../include/i386-kos/bits/os/cygwin/ucontext32.h",
+	"../../../../include/i386-kos/bits/os/cygwin/ucontext64.h",
 	"../../../../include/i386-kos/kos/bits/debugtrap32.h",
 	"../../../../include/i386-kos/kos/bits/debugtrap64.h",
 	"../../../../include/i386-kos/kos/bits/exception_data32.h",
@@ -165,7 +165,7 @@ print "#undef sigev_signo";
 print "#undef sigev_notify";
 print "#undef sigev_notify_function";
 print "#undef sigev_notify_attributes";
-genAsserts("../../../../include/i386-kos/bits/sigevent-cygwin.h");
+genAsserts("../../../../include/bits/os/cygwin/sigevent.h");
 
 print "#undef si_signo";
 print "#undef si_code";
@@ -532,7 +532,7 @@ static_assert(alignof(struct __sigactionx64) == __ALIGNOF_SIGACTIONX64);
 
 
 
-#include <bits/sigevent32.h>
+#include <bits/os/kos/sigevent32.h>
 
 /* struct __sigeventx32 */
 static_assert(offsetof(struct __sigeventx32, _sigev_data) == __OFFSET_SIGEVENTX32_DATA);
@@ -552,7 +552,7 @@ static_assert(sizeof(struct __sigeventx32) == __SIZEOF_SIGEVENTX32);
 
 
 
-#include <bits/sigevent64.h>
+#include <bits/os/kos/sigevent64.h>
 
 /* struct __sigeventx64 */
 static_assert(offsetof(struct __sigeventx64, _sigev_data) == __OFFSET_SIGEVENTX64_DATA);
@@ -1161,7 +1161,7 @@ static_assert(sizeof(struct x86_64_va_list_struct) == SIZEOF_X86_64_VA_LIST_STRU
 
 
 
-#include <bits/mcontext32.h>
+#include <bits/os/kos/mcontext32.h>
 
 /* struct _libc_fpreg */
 /* ... */
@@ -1185,7 +1185,7 @@ static_assert(alignof(struct __mcontextx32) == __ALIGNOF_MCONTEXTX32);
 
 
 
-#include <bits/mcontext64.h>
+#include <bits/os/kos/mcontext64.h>
 
 /* struct __mcontextx64 */
 static_assert(offsetof(struct __mcontextx64, gregs) == __OFFSET_MCONTEXTX64_CPU);
@@ -1203,7 +1203,7 @@ static_assert(alignof(struct __mcontextx64) == __ALIGNOF_MCONTEXTX64);
 
 
 
-#include <bits/mcontext-linux32.h>
+#include <bits/os/linux/mcontext32.h>
 
 /* struct __libc_linux32_fpreg */
 static_assert(offsetof(struct __libc_linux32_fpreg, exponent) == __OFFSET_LIBC_LINUX32_FPREG_EXPONENT);
@@ -1234,7 +1234,7 @@ static_assert(alignof(struct __mcontext_linux32) == __ALIGNOF_MCONTEXT_LINUX32);
 
 
 
-#include <bits/mcontext-linux64.h>
+#include <bits/os/linux/mcontext64.h>
 
 /* struct __libc_linux64_fpxreg */
 static_assert(offsetof(struct __libc_linux64_fpxreg, exponent) == __OFFSET_LIBC_LINUX64_FPXREG_EXPONENT);
@@ -1272,7 +1272,7 @@ static_assert(alignof(struct __mcontext_linux64) == __ALIGNOF_MCONTEXT_LINUX64);
 
 
 
-#include <bits/mcontext-cygwin32.h>
+#include <bits/os/cygwin/mcontext32.h>
 
 /* struct __cygwin32_uc_fpreg */
 static_assert(offsetof(struct __cygwin32_uc_fpreg, exponent) == __OFFSET_CYGWIN32_UC_FPREG_EXPONENT);
@@ -1328,7 +1328,7 @@ static_assert(alignof(struct __cygwin32_mcontext) == __ALIGNOF_CYGWIN32_MCONTEXT
 
 
 
-#include <bits/mcontext-cygwin64.h>
+#include <bits/os/cygwin/mcontext64.h>
 
 /* struct __cygwin64_uc_fpxreg */
 static_assert(offsetof(struct __cygwin64_uc_fpxreg, exponent) == __OFFSET_CYGWIN64_UC_FPXREG_EXPONENT);
@@ -1413,7 +1413,7 @@ static_assert(alignof(struct __cygwin64_mcontext) == __ALIGNOF_CYGWIN64_MCONTEXT
 
 
 
-#include <bits/ucontext32.h>
+#include <bits/os/kos/ucontext32.h>
 
 /* struct __sigset_structx32 */
 /* ... */
@@ -1430,7 +1430,7 @@ static_assert(alignof(struct __ucontextx32) == __ALIGNOF_UCONTEXTX32);
 
 
 
-#include <bits/ucontext64.h>
+#include <bits/os/kos/ucontext64.h>
 
 /* struct __ucontextx64 */
 static_assert(offsetof(struct __ucontextx64, uc_link) == __OFFSET_UCONTEXTX64_LINK);
@@ -1444,7 +1444,7 @@ static_assert(alignof(struct __ucontextx64) == __ALIGNOF_UCONTEXTX64);
 
 
 
-#include <bits/ucontext-linux32.h>
+#include <bits/os/linux/ucontext32.h>
 
 /* struct __sigset_structx32 */
 /* ... */
@@ -1463,7 +1463,7 @@ static_assert(alignof(struct __ucontext_linux32) == __ALIGNOF_UCONTEXT_LINUX32);
 
 
 
-#include <bits/ucontext-linux64.h>
+#include <bits/os/linux/ucontext64.h>
 
 /* struct __ucontext_linux64 */
 /* ... */
@@ -1472,7 +1472,7 @@ static_assert(alignof(struct __ucontext_linux32) == __ALIGNOF_UCONTEXT_LINUX32);
 
 
 
-#include <bits/ucontext-cygwin32.h>
+#include <bits/os/cygwin/ucontext32.h>
 
 /* struct __sigset_structx32 */
 /* ... */
@@ -1490,7 +1490,7 @@ static_assert(alignof(struct __cygwin32_ucontext) == __ALIGNOF_CYGWIN32_UCONTEXT
 
 
 
-#include <bits/ucontext-cygwin64.h>
+#include <bits/os/cygwin/ucontext64.h>
 
 /* struct __cygwin64_ucontext */
 static_assert(offsetof(struct __cygwin64_ucontext, uc_flags) == __OFFSET_CYGWIN64_UCONTEXT_FLAGS);
@@ -2249,7 +2249,7 @@ static_assert(sizeof(struct rpc_syscall_info64) == SIZEOF_RPC_SYSCALL_INFO64);
 #undef sigev_notify
 #undef sigev_notify_function
 #undef sigev_notify_attributes
-#include <bits/sigevent-cygwin.h>
+#include <bits/os/cygwin/sigevent.h>
 
 /* struct __sigevent_cygwin */
 static_assert(offsetof(struct __sigevent_cygwin, sigev_notify) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca2df3c */
+/* HASH CRC-32:0x1b53ce91 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,8 +41,8 @@
 #endif /* __USE_MISC */
 
 #ifdef __USE_GNU
-#include <bits/sigevent.h> /* struct sigevent */
-#include <bits/os/timespec.h>
+#include <bits/os/sigevent.h> /* struct sigevent */
+#include <bits/os/timespec.h> /* struct timespec */
 #endif /* __USE_GNU */
 
 /* TODO: Constants and structs from this header should

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7162413 */
+/* HASH CRC-32:0xaa00f666 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <asm/crt/posix_spawn.h>
 #ifdef __POSIX_SPAWN_USE_KOS
 #include <bits/crt/posix_spawn.h>
-#include <bits/sched_param.h>
+#include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: memcpy from string */
 #ifndef __local___localdep_memcpy_defined

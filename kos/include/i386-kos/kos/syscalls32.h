@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x157df37a */
+/* HASH CRC-32:0x362b9914 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,7 @@
 #include <bits/os/kos/tms32.h>
 #include <bits/os/kos/utimbuf32.h>
 #include <bits/os/pollfd.h>
+#include <bits/os/sigevent.h>
 #include <bits/rusage-struct32.h>
 #include <bits/sigaction-struct.h>
 #include <bits/sigaction-struct32.h>

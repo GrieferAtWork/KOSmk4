@@ -33,7 +33,7 @@
 %[define_replacement(pthread_spinlock_t = __pthread_spinlock_t)]
 %[define_replacement(pthread_barrier_t = __pthread_barrier_t)]
 %[define_replacement(pthread_barrierattr_t = __pthread_barrierattr_t)]
-%[define_replacement(cpu_set_t = __cpu_set_t)]
+%[define_replacement(cpu_set_t = "struct __cpu_set_struct")]
 
 %[define_type_class(__pthread_t = "TIn(__SIZEOF_PTHREAD_T)")]
 %[define_type_class(__pthread_key_t = "TIn(__SIZEOF_PTHREAD_KEY_T)")]
@@ -881,14 +881,14 @@ $errno_t pthread_attr_setstack([[nonnull]] pthread_attr_t *attr, void *stackaddr
 @@@return: EOK:    Success
 @@@return: EINVAL: The given set contains a non-existant CPU
 @@@return: ENOMEM: Insufficient memory
-[[decl_include("<bits/types.h>", "<bits/sched.h>", "<bits/crt/pthreadtypes.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_setaffinity_np([[nonnull]] pthread_attr_t *attr, size_t cpusetsize,
                                      [[nonnull]] cpu_set_t const *cpuset);
 
 @@Get bit set in CPUSET representing the processors threads created with ATTR can run on
 @@@return: EOK:    Success
 @@@return: EINVAL: `cpusetsize' is too small
-[[decl_include("<bits/types.h>", "<bits/sched.h>", "<bits/crt/pthreadtypes.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_attr_getaffinity_np([[nonnull]] pthread_attr_t const *attr, size_t cpusetsize,
                                      [[nonnull]] cpu_set_t *cpuset);
 
@@ -996,14 +996,14 @@ $errno_t pthread_yield(void) = sched_yield;
 @@Limit specified thread THREAD to run only on the processors represented in CPUSET
 @@@return: EOK:   Success
 @@@return: ESRCH: `pthread' has already exited
-[[decl_include("<bits/types.h>", "<bits/sched.h>", "<bits/crt/pthreadtypes.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_setaffinity_np(pthread_t pthread, size_t cpusetsize,
                                 [[nonnull]] cpu_set_t const *cpuset);
 
 @@Get bit set in CPUSET representing the processors THREAD can run on
 @@@return: EOK:   Success
 @@@return: ESRCH: `pthread' has already exited
-[[decl_include("<bits/types.h>", "<bits/sched.h>", "<bits/crt/pthreadtypes.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_getaffinity_np(pthread_t pthread, size_t cpusetsize,
                                 [[nonnull]] cpu_set_t *cpuset);
 %#endif /* __USE_GNU */
@@ -2074,7 +2074,7 @@ $errno_t pthread_atfork([[nullable]] __pthread_atfork_func_t prepare,
 %/* Some more functions from winpthread. */
 
 @@@return: * : The number of cpus that the calling thread is able to run on
-[[impl_include("<bits/sched.h>")]]
+[[impl_include("<bits/os/cpu_set.h>")]]
 [[decl_include("<features.h>")]]
 [[requires_function(sched_getaffinity)]]
 __STDC_INT_AS_SIZE_T pthread_num_processors_np() {
@@ -2089,7 +2089,7 @@ __STDC_INT_AS_SIZE_T pthread_num_processors_np() {
 @@@return: EINVAL: `n' was specified as less than `1'
 @@@return: * :     Same as `errno' after a call to `sched_setaffinity(2)'
 [[decl_include("<bits/types.h>")]]
-[[impl_include("<bits/sched.h>", "<libc/errno.h>")]]
+[[impl_include("<bits/os/cpu_set.h>", "<libc/errno.h>")]]
 [[requires_function(sched_setaffinity)]]
 $errno_t pthread_set_num_processors_np(int n) {
 	int i, result;

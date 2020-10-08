@@ -63,7 +63,7 @@
 #define OFFSET_EXCEPTION_INFO_POINTERS (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE + 2)))
 
 #ifndef __ERROR_REGISTER_STATE_TYPE
-#include <bits/mcontext.h>
+#include <bits/os/mcontext.h>
 #define __ERROR_REGISTER_STATE_TYPE   struct mcontext
 #define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__ERROR_REGISTER_STATE_TYPE */

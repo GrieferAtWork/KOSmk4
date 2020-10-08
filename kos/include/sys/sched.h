@@ -25,20 +25,20 @@
 #include <__stdinc.h>
 
 #include <asm/os/sched.h>
-#include <bits/sched_param.h>
+#include <bits/os/sched.h> /* `struct sched_param' */
 #include <sys/_timespec.h>
 
-#ifdef __SCHED_OTHER
-#define SCHED_OTHER __SCHED_OTHER /* ... */
-#endif /* __SCHED_OTHER */
-#ifdef __SCHED_FIFO
-#define SCHED_FIFO __SCHED_FIFO /* ... */
-#endif /* __SCHED_FIFO */
-#ifdef __SCHED_RR
-#define SCHED_RR __SCHED_RR /* ... */
-#endif /* __SCHED_RR */
-#ifdef __SCHED_SPORADIC
+#if !defined(SCHED_OTHER) && defined(__SCHED_OTHER)
+#define SCHED_OTHER    __SCHED_OTHER    /* ... */
+#endif /* !SCHED_OTHER && __SCHED_OTHER */
+#if !defined(SCHED_FIFO) && defined(__SCHED_FIFO)
+#define SCHED_FIFO     __SCHED_FIFO     /* ... */
+#endif /* !SCHED_FIFO && __SCHED_FIFO */
+#if !defined(SCHED_RR) && defined(__SCHED_RR)
+#define SCHED_RR       __SCHED_RR       /* ... */
+#endif /* !SCHED_RR && __SCHED_RR */
+#if !defined(SCHED_SPORADIC) && defined(__SCHED_SPORADIC)
 #define SCHED_SPORADIC __SCHED_SPORADIC /* ... */
-#endif /* __SCHED_SPORADIC */
+#endif /* !SCHED_SPORADIC && __SCHED_SPORADIC */
 
 #endif /* !_SYS_SCHED_H */

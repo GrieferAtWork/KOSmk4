@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7286285f */
+/* HASH CRC-32:0x2c451cb9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,12 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sched_setaffinity_defined
 #define __local___localdep_sched_setaffinity_defined 1
 __NAMESPACE_LOCAL_END
-#include <bits/sched.h>
+#include <bits/os/cpu_set.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, __cpu_set_t const *__cpuset),sched_setaffinity,(__pid,__cpusetsize,__cpuset))
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, struct __cpu_set_struct const *__cpuset),sched_setaffinity,(__pid,__cpusetsize,__cpuset))
 #endif /* !__local___localdep_sched_setaffinity_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/sched.h>
+#include <bits/os/cpu_set.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Restrict the calling thread to only run on the first `n' cpus
@@ -43,7 +43,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_set_num_processors_np) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_set_num_processors_np))(int __n) {
 	int __i, __result;
-	__cpu_set_t __cset;
+	struct __cpu_set_struct __cset;
 	if (__n < 1) {
 #ifdef __EINVAL
 		return __EINVAL;

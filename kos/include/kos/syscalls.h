@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf51e427 */
+/* HASH CRC-32:0x7f2810c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@
 #include <bits/os/mmsghdr.h>
 #include <bits/os/msghdr.h>
 #include <bits/os/pollfd.h>
+#include <bits/os/sigevent.h>
 #include <bits/os/sigstack.h>
 #include <bits/os/timespec.h>
 #include <bits/os/timeval.h>

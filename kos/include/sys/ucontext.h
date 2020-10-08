@@ -23,8 +23,8 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#include <bits/mcontext.h> /* struct mcontext */
-#include <bits/ucontext.h> /* struct ucontext */
+#include <bits/os/mcontext.h> /* struct mcontext */
+#include <bits/os/ucontext.h> /* struct ucontext */
 
 #ifdef __MCONTEXT_NGREG
 #define NGREG __MCONTEXT_NGREG

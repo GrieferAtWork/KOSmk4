@@ -26,8 +26,8 @@
 #include <compat/config.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/mcontext.h> /* struct compat_mcontext */
-#include <compat/bits/ucontext.h> /* struct compat_ucontext */
+#include <compat/bits/os/mcontext.h> /* struct compat_mcontext */
+#include <compat/bits/os/ucontext.h> /* struct compat_ucontext */
 
 #ifdef __COMPAT_MCONTEXT_NGREG
 #define COMPAT_NGREG __COMPAT_MCONTEXT_NGREG

@@ -48,7 +48,7 @@
 #endif /* !EXCEPTION_DATA_POINTERS */
 
 #ifndef __ERROR_REGISTER_STATE_TYPE
-#include <bits/mcontext.h>
+#include <bits/os/mcontext.h>
 #define __ERROR_REGISTER_STATE_TYPE   struct mcontext
 #define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__ERROR_REGISTER_STATE_TYPE */
@@ -177,7 +177,7 @@ error_subclass_t error_subclass(void) {
 [[wunused, const, nothrow, nonnull, decl_include("<kos/bits/except.h>")]]
 [[decl_prefix(
 #ifndef __ERROR_REGISTER_STATE_TYPE
-#include <bits/mcontext.h>
+#include <bits/os/mcontext.h>
 #define __ERROR_REGISTER_STATE_TYPE   struct mcontext
 #define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__ERROR_REGISTER_STATE_TYPE */
@@ -1262,7 +1262,7 @@ struct exception_info *error_info(void) {
 )]]
 [[decl_prefix(
 #ifndef __ERROR_REGISTER_STATE_TYPE
-#include <bits/mcontext.h>
+#include <bits/os/mcontext.h>
 #define __ERROR_REGISTER_STATE_TYPE   struct mcontext
 #define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__ERROR_REGISTER_STATE_TYPE */

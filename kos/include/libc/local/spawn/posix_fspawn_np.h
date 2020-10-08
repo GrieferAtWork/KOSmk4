@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4cfd0612 */
+/* HASH CRC-32:0x194240e5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -353,12 +353,12 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 #define __local___localdep_sched_getparam_defined 1
 #ifdef __CRT_HAVE_sched_getparam
 __NAMESPACE_LOCAL_END
-#include <bits/sched_param.h>
+#include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getparam,(__pid_t __pid, struct sched_param *__param),sched_getparam,(__pid,__param))
 #elif defined(__CRT_HAVE___sched_getparam)
 __NAMESPACE_LOCAL_END
-#include <bits/sched_param.h>
+#include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getparam,(__pid_t __pid, struct sched_param *__param),__sched_getparam,(__pid,__param))
 #else /* ... */
@@ -369,7 +369,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_getparam,(__pid_t __pid, struct 
 #if !defined(__local___localdep_sched_setparam_defined) && defined(__CRT_HAVE_sched_setparam)
 #define __local___localdep_sched_setparam_defined 1
 __NAMESPACE_LOCAL_END
-#include <bits/sched_param.h>
+#include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setparam,(__pid_t __pid, struct sched_param const *__param),sched_setparam,(__pid,__param))
 #endif /* !__local___localdep_sched_setparam_defined && __CRT_HAVE_sched_setparam */
@@ -378,12 +378,12 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setparam,(__pid_t __pid, struct 
 #define __local___localdep_sched_setscheduler_defined 1
 #ifdef __CRT_HAVE_sched_setscheduler
 __NAMESPACE_LOCAL_END
-#include <bits/sched_param.h>
+#include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),sched_setscheduler,(__pid,__policy,__param))
 #elif defined(__CRT_HAVE___sched_setscheduler)
 __NAMESPACE_LOCAL_END
-#include <bits/sched_param.h>
+#include <bits/os/sched.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),__sched_setscheduler,(__pid,__policy,__param))
 #else /* ... */

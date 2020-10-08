@@ -42,8 +42,8 @@
 #endif /* __USE_MISC */
 
 #ifdef __USE_GNU
-#include <bits/sigevent.h> /* struct sigevent */
-#include <bits/os/timespec.h>
+#include <bits/os/sigevent.h> /* struct sigevent */
+#include <bits/os/timespec.h> /* struct timespec */
 #endif /* __USE_GNU */
 
 /* TODO: Constants and structs from this header should
@@ -676,7 +676,7 @@ int getnameinfo(struct sockaddr const *__restrict sa, socklen_t salen,
 @@queueing the requests and signal completion according to SIG.
 @@This function is not part of POSIX and therefore no official
 @@cancellation point
-[[cp]]
+[[cp, decl_include("<bits/os/sigevent.h>")]]
 int getaddrinfo_a(int mode,
                   struct gaicb *list[__restrict_arr], int ent,
                   struct sigevent *__restrict sig);

@@ -31,8 +31,8 @@
 #include <asm/cpu-cpuid.h>
 #include <asm/instr/ttest.h>
 #include <asm/pagesize.h>
-#include <bits/mcontext64.h>
-#include <bits/ucontext64.h>
+#include <bits/os/kos/mcontext64.h>
+#include <bits/os/kos/ucontext64.h>
 
 #include <pthread.h>
 #include <signal.h>

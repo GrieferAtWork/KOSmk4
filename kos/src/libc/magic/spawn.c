@@ -33,7 +33,7 @@
 )]%[insert:prefix(
 #include <bits/crt/posix_spawn.h>
 )]%{
-#include <bits/sched_param.h>
+#include <bits/os/sched.h>  /* struct sched_param */
 #include <bits/os/sigset.h> /* struct __sigset_struct */
 #include <bits/types.h>
 #include <sys/types.h>
@@ -776,7 +776,7 @@ $errno_t posix_spawnattr_setschedpolicy([[nonnull]] posix_spawnattr_t *__restric
 @@Get the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
 @@that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
 @@@return: 0 : Success
-[[decl_include("<bits/crt/posix_spawn.h>", "<bits/sched_param.h>")]]
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sched.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
 $errno_t posix_spawnattr_getschedparam([[nonnull]] posix_spawnattr_t const *__restrict attr,
@@ -789,7 +789,7 @@ $errno_t posix_spawnattr_getschedparam([[nonnull]] posix_spawnattr_t const *__re
 @@Set the `param' argument of a call `sched_setscheduler(getpid(), policy, param)'
 @@that the child process will perform when `POSIX_SPAWN_SETSCHEDPARAM' is set.
 @@@return: 0 : Success
-[[decl_include("<bits/crt/posix_spawn.h>", "<bits/sched_param.h>")]]
+[[decl_include("<bits/crt/posix_spawn.h>", "<bits/os/sched.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>")]]
 [[requires(defined(__POSIX_SPAWN_USE_KOS))]]
 $errno_t posix_spawnattr_setschedparam([[nonnull]] posix_spawnattr_t *__restrict attr,

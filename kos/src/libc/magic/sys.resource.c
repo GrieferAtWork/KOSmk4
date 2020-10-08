@@ -25,7 +25,7 @@
 #include <features.h>
 
 #include <asm/os/resource.h>
-#include <bits/resource.h>
+#include <bits/os/rlimit.h> /* struct rlimit, struct rlimit64 */
 #include <bits/rusage-struct.h>
 #include <bits/os/timeval.h>
 #include <bits/types.h>
@@ -439,7 +439,7 @@ int prlimit64($pid_t pid, __rlimit_resource_t resource,
 [[no_crt_self_import, export_as("__getrlimit")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("getrlimit", "__getrlimit")]]
-[[decl_include("<bits/resource.h>")]]
+[[decl_include("<bits/os/rlimit.h>")]]
 int getrlimit(__rlimit_resource_t resource,
               [[nonnull]] struct rlimit *rlimits);
 
@@ -449,7 +449,7 @@ int getrlimit(__rlimit_resource_t resource,
 [[no_crt_self_import]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("setrlimit64")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("setrlimit")]]
-[[decl_include("<bits/resource.h>")]]
+[[decl_include("<bits/os/rlimit.h>")]]
 int setrlimit(__rlimit_resource_t resource,
               [[nonnull]] struct rlimit const *rlimits);
 
@@ -483,12 +483,12 @@ int setpriority(__priority_which_t which, id_t who, int prio);
 %
 %#ifdef __USE_LARGEFILE64
 [[doc_alias("getrlimit"), off64_variant_of(getrlimit)]]
-[[decl_include("<bits/resource.h>")]]
+[[decl_include("<bits/os/rlimit.h>")]]
 int getrlimit64(__rlimit_resource_t resource,
                 [[nonnull]] struct rlimit64 *rlimits);
 
 [[doc_alias("setrlimit"), off64_variant_of(setrlimit)]]
-[[decl_include("<bits/resource.h>")]]
+[[decl_include("<bits/os/rlimit.h>")]]
 int setrlimit64(__rlimit_resource_t resource,
                 [[nonnull]] struct rlimit64 const *rlimits);
 %#endif /* __USE_LARGEFILE64 */

@@ -29,7 +29,7 @@
 
 #include <features.h>
 
-#include <bits/sigevent.h> /* struct sigevent */
+#include <bits/os/sigevent.h> /* struct sigevent */
 #include <bits/os/timespec.h>
 #include <bits/types.h>
 

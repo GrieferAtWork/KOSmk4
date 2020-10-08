@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc2e0fb1 */
+/* HASH CRC-32:0x5e81b8d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@
 #endif /* !EXCEPTION_DATA_POINTERS */
 
 #ifndef __ERROR_REGISTER_STATE_TYPE
-#include <bits/mcontext.h>
+#include <bits/os/mcontext.h>
 #define __ERROR_REGISTER_STATE_TYPE   struct mcontext
 #define __SIZEOF_ERROR_REGISTER_STATE __SIZEOF_MCONTEXT
 #endif /* !__ERROR_REGISTER_STATE_TYPE */

@@ -35,7 +35,7 @@
 
 #ifdef __USE_PTHREAD_INTERNALS
 #include <asm/unistd.h>              /* __NR_set_userprocmask_address */
-#include <bits/sched_param.h>        /* `struct sched_param' */
+#include <bits/os/sched.h>           /* `struct sched_param' */
 #include <bits/types.h>              /* __pid_t, etc... */
 #include <kos/anno.h>                /* __WEAK */
 #include <kos/bits/exception_info.h> /* `struct exception_info' */
