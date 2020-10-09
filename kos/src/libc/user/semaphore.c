@@ -34,6 +34,7 @@
 #include <inttypes.h>
 #include <limits.h>
 #include <malloca.h>
+#include <semaphore.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,15 +58,17 @@ DECL_BEGIN
 #elif SEM_VALUE_MAX == INT64_MAX
 #define SEM_COUNT_MASK   UINT64_C(0x7fffffffffffffff)
 #define SEM_WAITERS_FLAG UINT64_C(0x8000000000000000)
-#else
+#else /* SEM_VALUE_MAX == ... */
 #error "Unsupported `SEM_VALUE_MAX'"
-#endif
+#endif /* SEM_VALUE_MAX != ... */
 
-struct sem {
-	lfutex_t s_count; /* Number of available tickets (optionally or'd with `SEM_WAITERS_FLAG') */
-};
+/* <=, because `__SIZEOF_SEM_T' is the public ABI buffer size, while,
+ * us being libc, sizeof(sem_t) is the actually used/needed buffer
+ * size, meaning that libc users are allowed to provide more buffer
+ * space than we actually need. */
+STATIC_ASSERT(sizeof(sem_t) <= __SIZEOF_SEM_T);
 
-/*[[[start:implementation]]]*/
+
 
 /*[[[head:libc_sem_init,hash:CRC-32=0x634e9c4a]]]*/
 /* >> sem_init(3)
@@ -87,14 +90,15 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
                                     unsigned int value)
 /*[[[body:libc_sem_init]]]*/
 {
-	struct sem *self;
 	(void)pshared;
-	self = (struct sem *)sem;
 #if UINT_MAX > SEM_COUNT_MASK
 	if unlikely(value > SEM_COUNT_MASK)
 		return libc_seterrno(EINVAL);
 #endif /* UINT_MAX > SEM_COUNT_MASK */
-	self->s_count = value;
+#ifndef NDEBUG
+	memset(sem, 0xaa, __SIZEOF_SEM_T);
+#endif /* !NDEBUG */
+	sem->s_count = value;
 	return 0;
 }
 /*[[[end:libc_sem_init]]]*/
@@ -110,6 +114,9 @@ NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
 	COMPILER_IMPURE();
 	(void)sem;
 	/* Nothing to do here... */
+#ifndef NDEBUG
+	memset(sem, 0xcc, __SIZEOF_SEM_T);
+#endif /* !NDEBUG */
 	return 0;
 }
 /*[[[end:libc_sem_destroy]]]*/
@@ -121,7 +128,7 @@ char const named_prefix[] = "/dev/shm/sem.";
 #define NAMED_PREFIX_OFFSETOF_SEM COMPILER_STRLEN("/dev/shm/")
 
 
-/*[[[head:libc_sem_open,hash:CRC-32=0x2fff3599]]]*/
+/*[[[head:libc_sem_open,hash:CRC-32=0x1419e6ab]]]*/
 /* >> sem_open(3)
  * Open a named semaphore `name', which must be string that starts with `/'
  * NOTE: When called multiple times with identical strings for `name',
@@ -136,23 +143,27 @@ char const named_prefix[] = "/dev/shm/sem.";
  *          only have to be called once to close all open handles for the
  *          semaphore
  *       #endif // !__ARCH_HAVE_NON_UNIQUE_SEM_OPEN
- * @param: oflags: Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
- *                 takes 2 additional arguments `..., mode_t mode, unsigned int value')
- * @return: * :    A pointer to the opened semaphore, which must be closed by `sem_close(3)'
- * @return: NULL:  [errno=EINVAL] The given `name' contains no characters after the initial `/'
- * @return: NULL:  Error (s.a. `errno') */
+ * @param: oflags:      Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
+ *                      takes 2 additional arguments `..., mode_t mode, unsigned int value')
+ * @return: * :         A pointer to the opened semaphore, which must be closed by `sem_close(3)'
+ * @return: SEM_FAILED: [errno=EINVAL] The given `name' contains no characters after the initial `/'
+ * @return: SEM_FAILED: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) sem_t *
 NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
                                          oflag_t oflags,
                                          ...)
 /*[[[body:libc_sem_open]]]*/
 {
+#define MMAP_SEMAPHORE(fd)                                        \
+	((sem_t *)mmap(NULL, sizeof(sem_t),                           \
+	               PROT_READ | PROT_WRITE, MAP_FILE | MAP_SHARED, \
+	               (fd), 0))
 	char *filename;
 	size_t name_length;
 	fd_t fd;
 	va_list args;
 	mode_t mode;
-	struct sem *result;
+	sem_t *result;
 	unsigned int value;
 	while (*name == '/')
 		++name;
@@ -231,12 +242,9 @@ err_tempname_filename:
 					goto again_create_temp_file;
 				}
 			}
-			result = (struct sem *)mmap(NULL, sizeof(struct sem),
-			                            PROT_READ | PROT_WRITE,
-			                            MAP_FILE | MAP_SHARED,
-			                            fd, 0);
+			result = MMAP_SEMAPHORE(fd);
 			sys_close(fd);
-			if unlikely(result == (struct sem *)MAP_FAILED) {
+			if unlikely(result == (sem_t *)MAP_FAILED) {
 				sys_unlink(tempname);
 				goto err_tempname_filename;
 			}
@@ -272,25 +280,22 @@ err_tempname_filename:
 			}
 			freea(tempname);
 			/* Success: new semaphore was created and initialized. */
-			return (sem_t *)result;
+			return result;
 		}
 	}
 	fd = open(filename, O_RDWR | oflags | O_CLOEXEC | O_CLOFORK, mode);
 	if unlikely(fd < 0)
 		goto err_filename;
 	freea(filename);
-	result = (struct sem *)mmap(NULL, sizeof(struct sem),
-	                            PROT_READ | PROT_WRITE,
-	                            MAP_FILE | MAP_SHARED,
-	                            fd, 0);
+	result = MMAP_SEMAPHORE(fd);
 	sys_close(fd);
-	if unlikely(result == (struct sem *)MAP_FAILED)
+	if unlikely(result == (sem_t *)MAP_FAILED)
 		goto err;
-	return (sem_t *)result;
+	return result;
 err_filename:
 	freea(filename);
 err:
-	return NULL;
+	return SEM_FAILED;
 }
 /*[[[end:libc_sem_open]]]*/
 
@@ -304,7 +309,7 @@ INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem)
 /*[[[body:libc_sem_close]]]*/
 {
-	return munmap(sem, sizeof(struct sem));
+	return munmap(sem, sizeof(sem_t));
 }
 /*[[[end:libc_sem_close]]]*/
 
@@ -356,26 +361,24 @@ INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
 /*[[[body:libc_sem_wait]]]*/
 {
-	struct sem *self;
-	self = (struct sem *)sem;
 	for (;;) {
 		int error;
 		lfutex_t oldval;
-		oldval = ATOMIC_READ(self->s_count);
+		oldval = ATOMIC_READ(sem->s_count);
 		if (oldval & SEM_COUNT_MASK) {
-			if (!ATOMIC_CMPXCH_WEAK(self->s_count, oldval, oldval - 1))
+			if (!ATOMIC_CMPXCH_WEAK(sem->s_count, oldval, oldval - 1))
 				continue;
 			return 0; /* Success! */
 		}
 		/* Set the is-waiting bit the first time around. */
 		if (!(oldval & SEM_WAITERS_FLAG)) {
-			if (!ATOMIC_CMPXCH_WEAK(self->s_count,
+			if (!ATOMIC_CMPXCH_WEAK(sem->s_count,
 			                        oldval,
 			                        oldval | SEM_WAITERS_FLAG))
 				continue;
 		}
 		/* Wait until `SEM_COUNT_MASK' becomes non-zero. */
-		error = futex_waitwhile_exactbits(&self->s_count,
+		error = futex_waitwhile_exactbits(&sem->s_count,
 		                                  SEM_WAITERS_FLAG,
 		                                  0);
 		if (error < 0)
@@ -398,26 +401,24 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
                                          struct timespec const *__restrict abstime)
 /*[[[body:libc_sem_timedwait]]]*/
 {
-	struct sem *self;
-	self = (struct sem *)sem;
 	for (;;) {
 		int error;
 		lfutex_t oldval;
-		oldval = ATOMIC_READ(self->s_count);
+		oldval = ATOMIC_READ(sem->s_count);
 		if (oldval & SEM_COUNT_MASK) {
-			if (!ATOMIC_CMPXCH_WEAK(self->s_count, oldval, oldval - 1))
+			if (!ATOMIC_CMPXCH_WEAK(sem->s_count, oldval, oldval - 1))
 				continue;
 			return 0; /* Success! */
 		}
 		/* Set the is-waiting bit the first time around. */
 		if (!(oldval & SEM_WAITERS_FLAG)) {
-			if (!ATOMIC_CMPXCH_WEAK(self->s_count,
+			if (!ATOMIC_CMPXCH_WEAK(sem->s_count,
 			                        oldval,
 			                        oldval | SEM_WAITERS_FLAG))
 				continue;
 		}
 		/* Wait until `SEM_COUNT_MASK' becomes non-zero. */
-		error = lfutex(&self->s_count,
+		error = lfutex(&sem->s_count,
 		               LFUTEX_WAIT_WHILE_BITMASK |
 		               LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME,
 		               (lfutex_t)SEM_WAITERS_FLAG,
@@ -445,26 +446,24 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem,
                                            struct timespec64 const *__restrict abstime)
 /*[[[body:libc_sem_timedwait64]]]*/
 {
-	struct sem *self;
-	self = (struct sem *)sem;
 	for (;;) {
 		int error;
 		lfutex_t oldval;
-		oldval = ATOMIC_READ(self->s_count);
+		oldval = ATOMIC_READ(sem->s_count);
 		if (oldval & SEM_COUNT_MASK) {
-			if (!ATOMIC_CMPXCH_WEAK(self->s_count, oldval, oldval - 1))
+			if (!ATOMIC_CMPXCH_WEAK(sem->s_count, oldval, oldval - 1))
 				continue;
 			return 0; /* Success! */
 		}
 		/* Set the is-waiting bit the first time around. */
 		if (!(oldval & SEM_WAITERS_FLAG)) {
-			if (!ATOMIC_CMPXCH_WEAK(self->s_count,
+			if (!ATOMIC_CMPXCH_WEAK(sem->s_count,
 			                        oldval,
 			                        oldval | SEM_WAITERS_FLAG))
 				continue;
 		}
 		/* Wait until `SEM_COUNT_MASK' becomes non-zero. */
-		error = lfutex64(&self->s_count,
+		error = lfutex64(&sem->s_count,
 		                 LFUTEX_WAIT_WHILE_BITMASK |
 		                 LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME,
 		                 (lfutex_t)SEM_WAITERS_FLAG,
@@ -488,13 +487,11 @@ INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem)
 /*[[[body:libc_sem_trywait]]]*/
 {
-	struct sem *self;
 	lfutex_t oldval;
-	self = (struct sem *)sem;
 again:
-	oldval = ATOMIC_READ(self->s_count);
+	oldval = ATOMIC_READ(sem->s_count);
 	if (oldval & SEM_COUNT_MASK) {
-		if (!ATOMIC_CMPXCH_WEAK(self->s_count, oldval, oldval - 1))
+		if (!ATOMIC_CMPXCH_WEAK(sem->s_count, oldval, oldval - 1))
 			goto again;
 		return 0; /* Success! */
 	}
@@ -514,14 +511,12 @@ INTERN ATTR_SECTION(".text.crt.sched.semaphore") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem)
 /*[[[body:libc_sem_post]]]*/
 {
-	struct sem *self;
 	lfutex_t oldval;
-	self = (struct sem *)sem;
 	do {
-		oldval = ATOMIC_READ(self->s_count);
+		oldval = ATOMIC_READ(sem->s_count);
 		if unlikely((oldval & SEM_COUNT_MASK) == SEM_VALUE_MAX)
 			return libc_seterrno(EOVERFLOW);
-	} while (!ATOMIC_CMPXCH_WEAK(self->s_count,
+	} while (!ATOMIC_CMPXCH_WEAK(sem->s_count,
 	                             oldval,
 	                             oldval + 1));
 	/* If there are waiting threads, wake one of them. */
@@ -531,7 +526,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem)
 		 * >>     ATOMIC_AND(&self->s_count, ~SEM_WAITERS_FLAG);
 		 * >>     sys_lfutex(&self->s_count, LFUTEX_WAKE, (size_t)-1, NULL, 0);
 		 * >> } */
-		sys_lfutex(&self->s_count, LFUTEX_WAKEMASK, 1,
+		sys_lfutex(&sem->s_count, LFUTEX_WAKEMASK, 1,
 		           (struct timespec64 const *)(uintptr_t)~SEM_WAITERS_FLAG, 0);
 	}
 	return 0;
@@ -547,15 +542,10 @@ NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem,
                                         __STDC_INT_AS_UINT_T *__restrict sval)
 /*[[[body:libc_sem_getvalue]]]*/
 {
-	struct sem *self;
-	self = (struct sem *)sem;
-	*sval = (int)(unsigned int)(ATOMIC_READ(self->s_count) & SEM_COUNT_MASK);
+	*sval = (int)(unsigned int)(ATOMIC_READ(sem->s_count) & SEM_COUNT_MASK);
 	return 0;
 }
 /*[[[end:libc_sem_getvalue]]]*/
-
-/*[[[end:implementation]]]*/
-
 
 
 /*[[[start:exports,hash:CRC-32=0x83453b4]]]*/

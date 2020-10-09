@@ -25,29 +25,33 @@
 #ifndef __SIZEOF_SEM_T
 #include <hybrid/typecore.h>
 #if __SIZEOF_POINTER__ == 4
-#define __SIZEOF_SEM_T   16
+#define __SIZEOF_SEM_T 16
 #elif __SIZEOF_POINTER__ == 8
-#define __SIZEOF_SEM_T   32
+#define __SIZEOF_SEM_T 32
 #else /* ... */
-#define __SIZEOF_SEM_T   (__SIZEOF_POINTER__ * 4)
+#define __SIZEOF_SEM_T (__SIZEOF_POINTER__ * 4)
 #endif /* !... */
 #endif /* !__SIZEOF_SEM_T */
 
-/* Value returned by `sem_open' upon failure. */
-#ifndef SEM_FAILED
-#define SEM_FAILED (__CCAST(sem_t *) 0)
-#endif /* !SEM_FAILED */
+#define __SEM_FAILED 0 /* Returned by `sem_open(3)' upon failure. */
 
 #ifdef __CC__
 __DECL_BEGIN
 
-#ifndef __sem_t_defined
-#define __sem_t_defined 1
+#undef __USE_PTHREAD_INTERNALS
+#if defined(__KOS__) && (defined(__BUILDING_LIBC) || defined(_LIBC_SOURCE))
+#define __USE_PTHREAD_INTERNALS 1
+#endif /* __KOS__ && (__BUILDING_LIBC || _LIBC_SOURCE) */
+
 typedef union {
+#ifdef __USE_PTHREAD_INTERNALS
+#undef s_count
+	lfutex_t s_count;
+#else /* __USE_PTHREAD_INTERNALS */
 	__BYTE_TYPE__ __data[__SIZEOF_SEM_T];
 	void         *__align;
-} sem_t;
-#endif /* !__sem_t_defined */
+#endif /* !__USE_PTHREAD_INTERNALS */
+} __sem_t;
 
 __DECL_END
 #endif /* __CC__ */

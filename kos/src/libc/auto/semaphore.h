@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e0792c7 */
+/* HASH CRC-32:0x738261b6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,11 +62,11 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sem_destroy)(sem_t *sem);
  *          only have to be called once to close all open handles for the
  *          semaphore
  *       #endif // !__ARCH_HAVE_NON_UNIQUE_SEM_OPEN
- * @param: oflags: Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
- *                 takes 2 additional arguments `..., mode_t mode, unsigned int value')
- * @return: * :    A pointer to the opened semaphore, which must be closed by `sem_close(3)'
- * @return: NULL:  [errno=EINVAL] The given `name' contains no characters after the initial `/'
- * @return: NULL:  Error (s.a. `errno') */
+ * @param: oflags:      Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
+ *                      takes 2 additional arguments `..., mode_t mode, unsigned int value')
+ * @return: * :         A pointer to the opened semaphore, which must be closed by `sem_close(3)'
+ * @return: SEM_FAILED: [errno=EINVAL] The given `name' contains no characters after the initial `/'
+ * @return: SEM_FAILED: Error (s.a. `errno') */
 INTDEF NONNULL((1)) sem_t *NOTHROW_RPC_KOS(VLIBDCALL libd_sem_open)(char const *name, oflag_t oflags, ...);
 /* >> sem_close(3)
  * Close a semaphore previously returned by `sem_open(3)'. But note the case

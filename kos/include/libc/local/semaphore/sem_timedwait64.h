@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9eb4110f */
+/* HASH CRC-32:0x30e6f217 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0:  Success
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(__sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #endif /* !__local___localdep_sem_timedwait32_defined */
 /* >> sem_timedwait(3)
  * Wait for a ticket to become available to the given semaphore `sem'
@@ -45,7 +45,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,
  * @return: -1: [errno=EINTR]     Interrupted.
  * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __LOCAL_LIBC(sem_timedwait64) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait64))(__sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime) {
 	struct __timespec32 __ts32;
 	__ts32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__ts32.tv_nsec = __abstime->tv_nsec;

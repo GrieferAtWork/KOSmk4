@@ -22,14 +22,14 @@
 %[define_replacement(oflag_t = __oflag_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[define_replacement(sem_t = sem_t)]
+%[define_replacement(sem_t = __sem_t)]
 %[default:section(".text.crt{|.dos}.sched.semaphore")]
 
 %{
 #include <features.h>
 
 #include <asm/crt/semaphore.h> /* __ARCH_HAVE_INTERPROCESS_SEMAPHORES, __ARCH_HAVE_NON_UNIQUE_SEM_OPEN */
-#include <bits/crt/semaphore.h>
+#include <bits/crt/semaphore.h> /* __sem_t */
 #include <bits/types.h>
 #ifdef __USE_XOPEN2K
 #include <bits/os/timespec.h>
@@ -39,8 +39,14 @@
 #include <sys/types.h>
 #endif /* __USE_GLIBC */
 
+#if !defined(SEM_FAILED) && defined(__SEM_FAILED)
+#define SEM_FAILED (__CCAST(sem_t *)__SEM_FAILED) /* Returned by `sem_open(3)' upon failure. */
+#endif /* !SEM_FAILED && __SEM_FAILED */
+
 #ifdef __CC__
 __SYSDECL_BEGIN
+
+typedef __sem_t sem_t;
 
 }
 
@@ -80,11 +86,11 @@ int sem_destroy([[nonnull]] sem_t *sem);
 @@         only have to be called once to close all open handles for the
 @@         semaphore
 @@      #endif // !__ARCH_HAVE_NON_UNIQUE_SEM_OPEN
-@@@param: oflags: Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
-@@                takes 2 additional arguments `..., mode_t mode, unsigned int value')
-@@@return: * :    A pointer to the opened semaphore, which must be closed by `sem_close(3)'
-@@@return: NULL:  [errno=EINVAL] The given `name' contains no characters after the initial `/'
-@@@return: NULL:  Error (s.a. `errno')
+@@@param: oflags:      Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
+@@                     takes 2 additional arguments `..., mode_t mode, unsigned int value')
+@@@return: * :         A pointer to the opened semaphore, which must be closed by `sem_close(3)'
+@@@return: SEM_FAILED: [errno=EINVAL] The given `name' contains no characters after the initial `/'
+@@@return: SEM_FAILED: Error (s.a. `errno')
 [[cp_kos, vartypes($mode_t, unsigned int)]]
 [[decl_include("<bits/crt/semaphore.h>")]]
 sem_t *sem_open([[nonnull]] char const *name, $oflag_t oflags,
