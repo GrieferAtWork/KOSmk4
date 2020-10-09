@@ -23,63 +23,48 @@
 
 %{
 #include <features.h>
+
+#include <bits/os/statfs.h>
+#include <bits/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/types.h>
-#include <bits/statfs.h>
-
-__SYSDECL_BEGIN
-
-/* Documentation (partially) derived from Glibc /usr/include/i386-linux-gnu/sys/statfs.h */
-/* Definitions for getting information about a filesystem.
-   Copyright (C) 1996-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
+#endif /* __USE_GLIBC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
-@@Return information about the filesystem on which FILE resides
 [[no_crt_self_import, export_as("__statfs")]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("statfs", "__statfs")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("statfs64")]]
+[[decl_include("<bits/os/statfs.h>")]]
 int statfs([[nonnull]] char const *file, [[nonnull]] struct statfs *buf);
 
-@@Return information about the filesystem containing the file FILDES refers to
 [[no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fstatfs64")]]
+[[decl_include("<bits/os/statfs.h>")]]
 int fstatfs($fd_t filedes, [[nonnull]] struct statfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
-
 %#ifndef statfs64
 [[doc_alias("statfs"), statfs64_variant_of(statfs)]]
+[[decl_include("<bits/os/statfs.h>")]]
 int statfs64([[nonnull]] const char *file, [[nonnull]] struct statfs64 *buf);
 %#endif /* !statfs64 */
 
 [[doc_alias("fstatfs"), statfs64_variant_of(fstatfs)]]
+[[decl_include("<bits/os/statfs.h>")]]
 int fstatfs64($fd_t filedes, [[nonnull]] struct statfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

@@ -85,7 +85,7 @@
 #define TCP_SAVED_SYN            28 /* Get SYN headers recorded for connection. */
 
 #ifdef __USE_MISC
-#include <bits/sockaddr_storage-struct.h>
+#include <bits/os/sockaddr_storage.h>
 #include <bits/types.h>
 #include <net/bits/types.h>
 

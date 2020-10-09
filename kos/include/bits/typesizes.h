@@ -76,6 +76,7 @@
 #define __SIZEOF_FSWORD_T__         __SIZEOF_SYSCALL_LONG_T__
 #define __SIZEOF_PHYSADDR_T__       __SIZEOF_POINTER__
 #define __SIZEOF_PHYSPAGE_T__       __SIZEOF_POINTER__
+#define __SIZEOF_SA_FAMILY_T__      2
 #endif
 
 #endif /* !_BITS_TYPESIZES_H */

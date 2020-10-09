@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5918575e */
+/* HASH CRC-32:0x6eff5d95 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -468,7 +468,7 @@
 
 
 
-#include <bits/stat.h> /* _STATBUF_ST_xxx */
+#include <bits/os/stat.h> /* _STATBUF_ST_xxx */
 #undef HAVE_ST_BLKSIZE
 #ifdef _STATBUF_ST_BLKSIZE
 #define HAVE_ST_BLKSIZE 1 /* `struct stat::st_blksize' */

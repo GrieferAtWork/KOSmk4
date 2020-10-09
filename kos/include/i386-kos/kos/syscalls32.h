@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x362b9914 */
+/* HASH CRC-32:0x4623c212 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,25 +24,25 @@
 #include <__stdinc.h>
 #include <kos/asm/syscall.h>
 
-#include <bits/os/kos/iovec32.h>
-#include <bits/os/kos/itimerspec32.h>
-#include <bits/os/kos/itimerval32.h>
+#include <bits/os/generic/iovec32.h>
+#include <bits/os/generic/itimerspec32.h>
+#include <bits/os/generic/itimerval32.h>
+#include <bits/os/generic/timespec32.h>
+#include <bits/os/generic/timeval32.h>
 #include <bits/os/kos/mmsghdr32.h>
 #include <bits/os/kos/msghdr32.h>
+#include <bits/os/kos/rusage32.h>
+#include <bits/os/kos/sigaction32.h>
+#include <bits/os/kos/siginfo32.h>
 #include <bits/os/kos/sigstack32.h>
+#include <bits/os/kos/stat32.h>
+#include <bits/os/kos/statfs32.h>
 #include <bits/os/kos/timeb32.h>
-#include <bits/os/kos/timespec32.h>
-#include <bits/os/kos/timeval32.h>
 #include <bits/os/kos/tms32.h>
 #include <bits/os/kos/utimbuf32.h>
 #include <bits/os/pollfd.h>
+#include <bits/os/sigaction.h>
 #include <bits/os/sigevent.h>
-#include <bits/rusage-struct32.h>
-#include <bits/sigaction-struct.h>
-#include <bits/sigaction-struct32.h>
-#include <bits/siginfo-struct32.h>
-#include <bits/stat-kos32.h>
-#include <bits/statfs32.h>
 #include <bits/types.h>
 #include <elf.h>
 #include <hybrid/__pointer.h>

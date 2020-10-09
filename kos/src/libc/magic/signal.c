@@ -67,15 +67,15 @@
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #ifdef __USE_POSIX
-#include <bits/sigaction-struct.h>
+#include <bits/os/sigaction.h>
 #endif /* __USE_POSIX */
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #include <asm/os/sigevent.h>
 #include <asm/os/siginfo.h>
-#include <bits/os/sigval.h>      /* union sigval */
-#include <bits/os/sigevent.h>    /* struct sigevent */
-#include <bits/siginfo-struct.h> /* struct __siginfo_struct */
+#include <bits/os/sigevent.h> /* struct sigevent */
+#include <bits/os/siginfo.h>  /* struct __siginfo_struct */
+#include <bits/os/sigval.h>   /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 __SYSDECL_BEGIN
@@ -1110,7 +1110,7 @@ int raise($signo_t signo);
 %[insert:function(__sysv_signal = sysv_signal)]
 
 %#ifdef __USE_GNU
-[[decl_include("<bits/types.h>", "<bits/sigaction-struct.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/sigaction.h>")]]
 [[export_alias("__sysv_signal"), crt_dos_variant]]
 $sighandler_t sysv_signal($signo_t signo, $sighandler_t handler);
 %#endif /* __USE_GNU */
@@ -1119,13 +1119,13 @@ $sighandler_t sysv_signal($signo_t signo, $sighandler_t handler);
 [[std, no_crt_self_import, alias("sysv_signal")]]
 [[if(defined(__USE_MISC)), preferred_alias("signal", "_signal")]]
 [[crt_dos_variant, dos_export_as("DOS$_signal")]]
-[[decl_include("<bits/types.h>", "<bits/sigaction-struct.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/sigaction.h>")]]
 $sighandler_t signal($signo_t signo, $sighandler_t handler);
 
 %#ifdef __USE_MISC
 %#define sigmask(signo) __sigset_mask(signo)
 
-[[decl_include("<bits/types.h>", "<bits/sigaction-struct.h>"), crt_dos_variant]]
+[[decl_include("<bits/types.h>", "<bits/os/sigaction.h>"), crt_dos_variant]]
 $sighandler_t ssignal($signo_t signo, $sighandler_t handler);
 
 [[decl_include("<bits/types.h>"), crt_dos_variant]]
@@ -1177,7 +1177,7 @@ void sigreturn(struct sigcontext const *scp);
 %
 %#ifdef __USE_XOPEN
 
-[[decl_include("<bits/types.h>", "<bits/sigaction-struct.h>"), crt_dos_variant]]
+[[decl_include("<bits/types.h>", "<bits/os/sigaction.h>"), crt_dos_variant]]
 $sighandler_t bsd_signal($signo_t signo, $sighandler_t handler);
 
 [[crt_name("__xpg_sigpause")]]
@@ -1337,17 +1337,17 @@ int sigorset([[nonnull]] $sigset_t *set,
 %#endif /* __USE_GNU */
 
 %#ifdef __USE_POSIX199309
-[[cp, decl_include("<bits/siginfo-struct.h>")]]
+[[cp, decl_include("<bits/os/siginfo.h>")]]
 int sigwaitinfo([[nonnull]] $sigset_t const *__restrict set,
                 [[nullable]] siginfo_t *__restrict info);
 
 [[cp, ignore, nocrt, alias("sigtimedwait"), doc_alias("sigtimedwait")]]
-[[decl_include("<bits/siginfo-struct.h>")]]
+[[decl_include("<bits/os/siginfo.h>")]]
 int sigtimedwait32([[nonnull]] $sigset_t const *__restrict set,
                    [[nullable]] siginfo_t *__restrict info,
                    [[nullable]] struct $timespec32 const *timeout);
 
-[[cp, no_crt_self_import, decl_include("<bits/siginfo-struct.h>")]]
+[[cp, no_crt_self_import, decl_include("<bits/os/siginfo.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
@@ -1378,7 +1378,7 @@ int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 
 [[time64_variant_of(sigtimedwait), doc_alias("sigtimedwait")]]
 [[cp, userimpl, requires_function(sigtimedwait32)]]
-[[decl_include("<bits/siginfo-struct.h>")]]
+[[decl_include("<bits/os/siginfo.h>")]]
 int sigtimedwait64([[nonnull]] $sigset_t const *__restrict set,
                    [[nullable]] siginfo_t *__restrict info,
                    [[nullable]] struct $timespec64 const *timeout) {
@@ -1396,11 +1396,11 @@ int sigtimedwait64([[nonnull]] $sigset_t const *__restrict set,
 
 %
 %#ifdef __USE_KOS
-[[decl_include("<bits/types.h>", "<bits/siginfo-struct.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/siginfo.h>")]]
 int sigqueueinfo($pid_t tgid, $signo_t signo,
                  [[nonnull]] siginfo_t const *uinfo);
 
-[[decl_include("<bits/types.h>", "<bits/siginfo-struct.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/siginfo.h>")]]
 int tgsigqueueinfo($pid_t tgid, $pid_t tid, $signo_t signo,
                    [[nonnull]] siginfo_t const *uinfo);
 %#endif /* __USE_KOS */
@@ -1416,7 +1416,7 @@ int killpg($pid_t pgrp, $signo_t signo);
 [[decl_include("<bits/types.h>")]]
 void psignal($signo_t signo, [[nullable]] char const *s);
 
-[[decl_include("<bits/siginfo-struct.h>")]]
+[[decl_include("<bits/os/siginfo.h>")]]
 void psiginfo([[nonnull]] siginfo_t const *pinfo,
               [[nullable]] char const *s);
 %#endif /* __USE_XOPEN2K8 */

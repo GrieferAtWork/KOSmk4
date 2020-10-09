@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __siginfo_t_defined
-#include <bits/siginfo-struct.h>
+#include <bits/os/siginfo.h>
 #ifndef __siginfo_t_defined
 #define __siginfo_t_defined 1
 #ifdef __CC__

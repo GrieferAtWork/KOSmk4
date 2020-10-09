@@ -24,7 +24,11 @@
 #ifdef __ARCH_HAVE_COMPAT
 #include <__stdinc.h>
 
+#if defined(__KOS__) || defined(__linux__)
 #include <compat/bits/os/kos/sigevent.h>
+#else /* ... */
+#include <compat/bits/os/generic/sigevent.h>
+#endif /* !... */
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_OS_SIGEVENT_H */

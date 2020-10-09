@@ -44,13 +44,13 @@
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #ifdef __USE_POSIX
-#include <compat/bits/sigaction-struct.h>
+#include <compat/bits/os/sigaction.h>
 #endif /* __USE_POSIX */
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
-#include <compat/bits/os/sigevent.h>    /* struct sigevent */
-#include <compat/bits/siginfo-struct.h> /* struct __siginfo_struct */
-#include <compat/bits/os/sigval.h>      /* union sigval */
+#include <compat/bits/os/sigevent.h> /* struct sigevent */
+#include <compat/bits/os/siginfo.h>  /* struct __siginfo_struct */
+#include <compat/bits/os/sigval.h>   /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 

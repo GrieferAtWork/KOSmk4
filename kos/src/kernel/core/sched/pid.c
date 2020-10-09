@@ -43,9 +43,9 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <bits/os/rusage-convert.h>
+#include <bits/os/rusage.h>
 #include <bits/os/timespec.h>
-#include <bits/rusage-convert.h>
-#include <bits/rusage-struct.h>
 #include <compat/config.h>
 #include <kos/except/reason/inval.h>
 #include <sys/poll.h>
@@ -63,9 +63,10 @@
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/rusage-convert.h>
-#include <compat/bits/rusage-struct.h>
-#include <compat/bits/siginfo-convert.h>
+#include <compat/bits/os/rusage-convert.h>
+#include <compat/bits/os/rusage.h>
+#include <compat/bits/os/siginfo-convert.h>
+#include <compat/bits/os/siginfo.h>
 #include <compat/bits/types.h>
 #include <compat/kos/types.h>
 #include <compat/signal.h>

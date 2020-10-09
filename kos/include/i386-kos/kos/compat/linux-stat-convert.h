@@ -24,7 +24,7 @@
 
 #include <hybrid/host.h>
 
-#include <bits/stat-kos.h>
+#include <bits/os/kos/stat.h>
 #include <kos/compat/linux-stat.h>
 
 #ifdef __CC__

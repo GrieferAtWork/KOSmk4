@@ -20,10 +20,6 @@
 #ifndef _COMPAT_BITS_OS_KOS_FLOCK_H
 #define _COMPAT_BITS_OS_KOS_FLOCK_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/kos/flock.h>
-#define compat_flock flock
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/flock.h>
 
 #endif /* !_COMPAT_BITS_OS_KOS_FLOCK_H */

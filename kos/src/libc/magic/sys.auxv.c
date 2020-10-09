@@ -23,11 +23,9 @@
 
 %{
 #include <elf.h>
-#include <bits/hwcap.h>
-
-__SYSDECL_BEGIN
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -39,8 +37,7 @@ $ulongptr_t getauxval($ulongptr_t type);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

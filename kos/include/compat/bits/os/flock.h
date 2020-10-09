@@ -23,9 +23,12 @@
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
 #include <__stdinc.h>
+
 #if defined(__KOS__) || defined(__linux__)
 #include <compat/bits/os/kos/flock.h>
-#endif /* ... */
+#else /* ... */
+#include <compat/bits/os/generic/flock.h>
+#endif /* !... */
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_OS_FLOCK_H */

@@ -485,7 +485,7 @@
 
 
 
-#include <bits/stat.h> /* _STATBUF_ST_xxx */
+#include <bits/os/stat.h> /* _STATBUF_ST_xxx */
 #undef HAVE_ST_BLKSIZE
 #ifdef _STATBUF_ST_BLKSIZE
 #define HAVE_ST_BLKSIZE 1 /* `struct stat::st_blksize' */

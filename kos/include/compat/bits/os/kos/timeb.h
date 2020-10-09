@@ -20,11 +20,6 @@
 #ifndef _COMPAT_BITS_OS_KOS_TIMEB_H
 #define _COMPAT_BITS_OS_KOS_TIMEB_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/kos/timeb.h>
-#define compat_timeb32 __timeb32
-#define compat_timeb64 __timeb64
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/timeb.h>
 
 #endif /* !_COMPAT_BITS_OS_KOS_TIMEB_H */

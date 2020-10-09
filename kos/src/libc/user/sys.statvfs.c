@@ -80,8 +80,7 @@ statfs64_to_statvfs64(struct statvfs64 *__restrict dst,
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_statvfs,hash:CRC-32=0xa48ca9cc]]]*/
-/* Return information about the filesystem on which FILE resides */
+/*[[[head:libc_statvfs,hash:CRC-32=0x98be8f6d]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_statvfs)(char const *file,
                                    struct statvfs *buf)
@@ -96,8 +95,7 @@ NOTHROW_NCX(LIBCCALL libc_statvfs)(char const *file,
 }
 /*[[[end:libc_statvfs]]]*/
 
-/*[[[head:libc_fstatvfs,hash:CRC-32=0x27b1480e]]]*/
-/* Return information about the filesystem containing the file FILDES refers to */
+/*[[[head:libc_fstatvfs,hash:CRC-32=0x73b8fe16]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_fstatvfs)(fd_t filedes,
                                     struct statvfs *buf)
@@ -112,11 +110,10 @@ NOTHROW_NCX(LIBCCALL libc_fstatvfs)(fd_t filedes,
 }
 /*[[[end:libc_fstatvfs]]]*/
 
-/*[[[head:libc_statvfs64,hash:CRC-32=0x532fc1ae]]]*/
+/*[[[head:libc_statvfs64,hash:CRC-32=0x6b42a481]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_statvfs64, libc_statvfs);
 #else /* MAGIC:alias */
-/* Return information about the filesystem on which FILE resides */
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_statvfs64)(const char *file,
                                      struct statvfs64 *buf)
@@ -132,11 +129,10 @@ NOTHROW_NCX(LIBCCALL libc_statvfs64)(const char *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_statvfs64]]]*/
 
-/*[[[head:libc_fstatvfs64,hash:CRC-32=0x299bb34]]]*/
+/*[[[head:libc_fstatvfs64,hash:CRC-32=0xbc942219]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fstatvfs64, libc_fstatvfs);
 #else /* MAGIC:alias */
-/* Return information about the filesystem containing the file FILDES refers to */
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statvfs") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_fstatvfs64)(fd_t filedes,
                                       struct statvfs64 *buf)

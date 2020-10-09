@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6be6091 */
+/* HASH CRC-32:0xe40c4afe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,11 +29,9 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <elf.h>
-#include <bits/hwcap.h>
-
-__SYSDECL_BEGIN
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_getauxval
 /* Return the value associated with an Elf*_auxv_t type from the auxv list
@@ -47,8 +45,7 @@ __CDECLARE(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type)
 __CREDIRECT(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
 #endif /* ... */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_AUXV_H */

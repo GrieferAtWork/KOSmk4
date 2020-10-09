@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99041910 */
+/* HASH CRC-32:0x63abc78b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifdef __CRT_HAVE_wait3
 #include <bits/types.h>
 #include <features.h>
-#include <bits/rusage-struct.h>
+#include <bits/os/rusage.h>
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wait3_32 from sys.wait */
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,__localdep_wait3_32,(__WAIT_STATUS __stat_loc, __STDC_INT_AS_UINT_T __options, struct __rusage32 *__usage),wait3,(__stat_loc,__options,__usage))
 #endif /* !__local___localdep_wait3_32_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/rusage-convert.h>
+#include <bits/os/rusage-convert.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `waitpid(-1, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */

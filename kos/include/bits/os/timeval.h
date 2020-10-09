@@ -39,6 +39,6 @@
 #include <__stdinc.h>
 
 /**/
-#include <bits/os/kos/timeval.h>
+#include <bits/os/generic/timeval.h>
 
 #endif /* !_BITS_OS_TIMEVAL_H */

@@ -23,31 +23,53 @@
 
 %{
 #include <features.h>
-#include <bits/statvfs.h>
 
-__SYSDECL_BEGIN
+#include <asm/os/statvfs.h>  /* __ST_* */
+#include <bits/os/statvfs.h> /* struct statvfs, struct statvfs64 */
+#include <bits/types.h>
 
-/* Documentation (partially) derived from Glibc /usr/include/i386-linux-gnu/sys/statvfs.h */
-/* Definitions for getting information about a filesystem.
-   Copyright (C) 1998-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+#if !defined(ST_RDONLY) && defined(__ST_RDONLY)
+#define ST_RDONLY      __ST_RDONLY /* ??? */
+#endif /* !ST_RDONLY && __ST_RDONLY */
+#if !defined(ST_NOSUID) && defined(__ST_NOSUID)
+#define ST_NOSUID      __ST_NOSUID /* ??? */
+#endif /* !ST_NOSUID && __ST_NOSUID */
+#ifdef __USE_GNU
+#if !defined(ST_NODEV) && defined(__ST_NODEV)
+#define ST_NODEV       __ST_NODEV       /* ??? */
+#endif /* !ST_NODEV && __ST_NODEV */
+#if !defined(ST_NOEXEC) && defined(__ST_NOEXEC)
+#define ST_NOEXEC      __ST_NOEXEC      /* ??? */
+#endif /* !ST_NOEXEC && __ST_NOEXEC */
+#if !defined(ST_SYNCHRONOUS) && defined(__ST_SYNCHRONOUS)
+#define ST_SYNCHRONOUS __ST_SYNCHRONOUS /* ??? */
+#endif /* !ST_SYNCHRONOUS && __ST_SYNCHRONOUS */
+#if !defined(ST_MANDLOCK) && defined(__ST_MANDLOCK)
+#define ST_MANDLOCK    __ST_MANDLOCK    /* ??? */
+#endif /* !ST_MANDLOCK && __ST_MANDLOCK */
+#if !defined(ST_WRITE) && defined(__ST_WRITE)
+#define ST_WRITE       __ST_WRITE       /* ??? */
+#endif /* !ST_WRITE && __ST_WRITE */
+#if !defined(ST_APPEND) && defined(__ST_APPEND)
+#define ST_APPEND      __ST_APPEND      /* ??? */
+#endif /* !ST_APPEND && __ST_APPEND */
+#if !defined(ST_IMMUTABLE) && defined(__ST_IMMUTABLE)
+#define ST_IMMUTABLE   __ST_IMMUTABLE   /* ??? */
+#endif /* !ST_IMMUTABLE && __ST_IMMUTABLE */
+#if !defined(ST_NOATIME) && defined(__ST_NOATIME)
+#define ST_NOATIME     __ST_NOATIME     /* ??? */
+#endif /* !ST_NOATIME && __ST_NOATIME */
+#if !defined(ST_NODIRATIME) && defined(__ST_NODIRATIME)
+#define ST_NODIRATIME  __ST_NODIRATIME  /* ??? */
+#endif /* !ST_NODIRATIME && __ST_NODIRATIME */
+#if !defined(ST_RELATIME) && defined(__ST_RELATIME)
+#define ST_RELATIME    __ST_RELATIME    /* ??? */
+#endif /* !ST_RELATIME && __ST_RELATIME */
+#endif /* __USE_GNU */
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __fsblkcnt_t_defined
 #define __fsblkcnt_t_defined 1
@@ -61,31 +83,35 @@ typedef __FS_TYPE(fsfilcnt) fsfilcnt_t; /* Type to count file system inodes.  */
 }
 
 
-@@Return information about the filesystem on which FILE resides
 [[no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("statvfs")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("statvfs64")]]
+[[decl_include("<bits/os/statvfs.h>")]]
 int statvfs([[nonnull]] char const *file, [[nonnull]] struct statvfs *buf);
 
-@@Return information about the filesystem containing the file FILDES refers to
 [[no_crt_self_import]]
 [[if(!defined(__USE_FILE_OFFSET64)), preferred_alias("fstatvfs")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("fstatvfs64")]]
+[[decl_include("<bits/os/statvfs.h>")]]
 int fstatvfs($fd_t filedes, [[nonnull]] struct statvfs *buf);
 
 %
 %#ifdef __USE_LARGEFILE64
+%#ifndef statvfs64
 [[doc_alias("statvfs"), off64_variant_of(statvfs)]]
+[[decl_include("<bits/os/statvfs.h>")]]
 int statvfs64([[nonnull]] const char *file, [[nonnull]] struct statvfs64 *buf);
+%#endif /* !statvfs64 */
 
 [[doc_alias("fstatvfs"), off64_variant_of(fstatvfs)]]
+[[decl_include("<bits/os/statvfs.h>")]]
 int fstatvfs64($fd_t filedes, [[nonnull]] struct statvfs64 *buf);
 %#endif /* __USE_LARGEFILE64 */
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

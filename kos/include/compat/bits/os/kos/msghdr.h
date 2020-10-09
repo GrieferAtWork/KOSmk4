@@ -17,13 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _COMPAT_BITS_OS_KOS_MSGHDR_STRUCT_H
-#define _COMPAT_BITS_OS_KOS_MSGHDR_STRUCT_H 1
+#ifndef _COMPAT_BITS_OS_KOS_MSGHDR_H
+#define _COMPAT_BITS_OS_KOS_MSGHDR_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/kos/msghdr.h>
-#define compat_msghdr msghdr
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/msghdr.h>
 
-#endif /* !_COMPAT_BITS_OS_KOS_MSGHDR_STRUCT_H */
+#endif /* !_COMPAT_BITS_OS_KOS_MSGHDR_H */

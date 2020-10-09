@@ -33,8 +33,8 @@
 #include <hybrid/host.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <bits/siginfo-struct.h> /* struct __siginfo_struct */
-#include <bits/os/sigset.h>      /* struct __sigset_struct */
+#include <bits/os/siginfo.h> /* struct __siginfo_struct */
+#include <bits/os/sigset.h>  /* struct __sigset_struct */
 #include <sys/wait.h>
 
 #include <signal.h>  /* SIG* */

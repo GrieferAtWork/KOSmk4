@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefe9a83f */
+/* HASH CRC-32:0x814d04f3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,15 +80,15 @@ __NAMESPACE_STD_USING(signal)
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 #ifdef __USE_POSIX
-#include <bits/sigaction-struct.h>
+#include <bits/os/sigaction.h>
 #endif /* __USE_POSIX */
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 #include <asm/os/sigevent.h>
 #include <asm/os/siginfo.h>
-#include <bits/os/sigval.h>      /* union sigval */
-#include <bits/os/sigevent.h>    /* struct sigevent */
-#include <bits/siginfo-struct.h> /* struct __siginfo_struct */
+#include <bits/os/sigevent.h> /* struct sigevent */
+#include <bits/os/siginfo.h>  /* struct __siginfo_struct */
+#include <bits/os/sigval.h>   /* union sigval */
 #endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 __SYSDECL_BEGIN

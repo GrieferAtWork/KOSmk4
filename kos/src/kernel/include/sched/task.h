@@ -30,8 +30,8 @@
 #include <hybrid/typecore.h>
 
 #ifdef __cplusplus
-#include <asm/os/wait.h> /* `__W_EXITCODE()' */
-#include <bits/wait.h>   /* `union wait' */
+#include <asm/os/wait.h>  /* `__W_EXITCODE()' */
+#include <bits/os/wait.h> /* `union wait' */
 #endif /* __cplusplus */
 
 #ifdef CONFIG_NO_KERNEL_STACK_GUARD

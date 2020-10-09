@@ -23,8 +23,8 @@
 #include "../api.h"
 /**/
 
-#include <bits/rusage-convert.h>
-#include <bits/rusage-struct.h>
+#include <bits/os/rusage-convert.h>
+#include <bits/os/rusage.h>
 #include <kos/syscalls.h>
 
 #include <syscall.h>

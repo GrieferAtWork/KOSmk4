@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d4b5d6c */
+/* HASH CRC-32:0xcac4f345 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,23 +24,23 @@
 #include <__stdinc.h>
 #include <kos/asm/syscall.h>
 
-#include <bits/os/kos/iovec64.h>
-#include <bits/os/kos/itimerspec64.h>
-#include <bits/os/kos/itimerval64.h>
+#include <bits/os/generic/iovec64.h>
+#include <bits/os/generic/itimerspec64.h>
+#include <bits/os/generic/itimerval64.h>
+#include <bits/os/generic/timespec64.h>
+#include <bits/os/generic/timeval64.h>
 #include <bits/os/kos/mmsghdr64.h>
 #include <bits/os/kos/msghdr64.h>
+#include <bits/os/kos/rusage64.h>
+#include <bits/os/kos/sigaction64.h>
+#include <bits/os/kos/siginfo64.h>
 #include <bits/os/kos/sigstack64.h>
-#include <bits/os/kos/timespec64.h>
-#include <bits/os/kos/timeval64.h>
+#include <bits/os/kos/stat64.h>
+#include <bits/os/kos/statfs64.h>
 #include <bits/os/kos/tms64.h>
 #include <bits/os/kos/utimbuf64.h>
 #include <bits/os/pollfd.h>
 #include <bits/os/sigevent.h>
-#include <bits/rusage-struct64.h>
-#include <bits/sigaction-struct64.h>
-#include <bits/siginfo-struct64.h>
-#include <bits/stat-kos64.h>
-#include <bits/statfs64.h>
 #include <bits/types.h>
 #include <elf.h>
 #include <hybrid/__pointer.h>

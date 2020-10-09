@@ -24,10 +24,10 @@
 #include "../api.h"
 /**/
 
-#include <bits/stat-cyg.h>
-#include <bits/stat-dos.h>
-#include <bits/stat-glc.h>
-#include <bits/stat-kos.h>
+#include <bits/os/cygwin/stat.h>
+#include <bits/os/dos/stat.h>
+#include <bits/os/kos/stat.h>
+#include <bits/os/linux/stat.h>
 #include <kos/syscalls.h>
 
 #include <fcntl.h>

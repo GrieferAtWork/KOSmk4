@@ -43,9 +43,9 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
-#include <bits/os/kos/ucontext32.h> /* __ucontextx32 */
-#include <bits/siginfo-convert.h>   /* siginfo64_to_siginfo32 */
-#include <bits/siginfo-struct32.h>  /* siginfo32_t */
+#include <bits/os/kos/siginfo-convert.h> /* siginfo64_to_siginfo32 */
+#include <bits/os/kos/siginfo32.h>       /* siginfo32_t */
+#include <bits/os/kos/ucontext32.h>      /* __ucontextx32 */
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-verify.h> /* cpustate_verify_user...() */
 #include <kos/kernel/cpu-state.h>        /* icpustate */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f0783fc */
+/* HASH CRC-32:0xe9f73ce0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,9 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Return information about the filesystem on which FILE resides */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_statvfs)(char const *file, struct statvfs *buf);
-/* Return information about the filesystem containing the file FILDES refers to */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_fstatvfs)(fd_t filedes, struct statvfs *buf);
-/* Return information about the filesystem on which FILE resides */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_statvfs64)(const char *file, struct statvfs64 *buf);
-/* Return information about the filesystem containing the file FILDES refers to */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_fstatvfs64)(fd_t filedes, struct statvfs64 *buf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

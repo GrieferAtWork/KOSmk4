@@ -39,6 +39,6 @@
 #include <__stdinc.h>
 
 /**/
-#include <bits/os/kos/timespec.h>
+#include <bits/os/generic/timespec.h>
 
 #endif /* !_BITS_OS_TIMESPEC_H */

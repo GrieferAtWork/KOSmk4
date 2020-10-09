@@ -52,8 +52,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
-#include <bits/statfs-convert.h>
-#include <bits/statfs.h>
+#include <bits/os/statfs-convert.h>
+#include <bits/os/statfs.h>
 #include <compat/config.h>
 #include <kos/debugtrap.h>
 #include <kos/except/reason/inval.h>
@@ -74,10 +74,10 @@
 #include <librpc/rpc.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/stat-convert.h>
-#include <compat/bits/stat.h>
-#include <compat/bits/statfs-convert.h>
-#include <compat/bits/statfs.h>
+#include <compat/bits/os/stat-convert.h>
+#include <compat/bits/os/stat.h>
+#include <compat/bits/os/statfs-convert.h>
+#include <compat/bits/os/statfs.h>
 #include <compat/bits/os/timespec.h>
 #include <compat/bits/os/timeval.h>
 #include <compat/bits/os/utimbuf.h>

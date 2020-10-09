@@ -21,15 +21,26 @@
 #define _SYS_UN_H 1
 
 #include <__stdinc.h>
+
+#include <asm/os/socket.h> /* __AF_LOCAL */
+
+#ifdef __AF_LOCAL
 #include <features.h>
-#include <bits/sockaddr.h>
+
+#include <bits/os/sockaddr-common.h> /* __SOCKADDR_COMMON */
+#include <bits/types.h>
 #ifdef __USE_MISC
 #include <libc/string.h>
 #endif /* __USE_MISC */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
+
+#ifndef __sa_family_t_defined
+#define __sa_family_t_defined 1
+typedef __sa_family_t sa_family_t; /* One of `AF_*' */
+#endif /* !__sa_family_t_defined */
+
 #ifndef __sockaddr_un_defined
 #define __sockaddr_un_defined 1
 struct sockaddr_un {
@@ -39,16 +50,20 @@ struct sockaddr_un {
 #endif /* !__sockaddr_un_defined */
 
 #ifdef __USE_KOS
-#define DEFINE_SOCKADDR_UN(name,path) \
-    struct { __SOCKADDR_COMMON(sun_); char sun_path[sizeof(path)]; } \
-    name = { AF_UNIX, path }
-#endif
+#define DEFINE_SOCKADDR_UN(name, path) \
+	struct {                           \
+		__SOCKADDR_COMMON(sun_);       \
+		char sun_path[sizeof(path)];   \
+	} name = { __AF_LOCAL, path }
+#endif /* __USE_KOS */
 
 #ifdef __USE_MISC
-#define SUN_LEN(ptr)   ((size_t)(((struct sockaddr_un *)0)->sun_path)+__libc_strlen((ptr)->sun_path))
+#define SUN_LEN(ptr) \
+	((size_t)(((struct sockaddr_un *)0)->sun_path) + __libc_strlen((ptr)->sun_path))
 #endif /* __USE_MISC */
-#endif /* __CC__ */
 
-__SYSDECL_END
+__DECL_END
+#endif /* __CC__ */
+#endif /* __AF_LOCAL */
 
 #endif /* !_SYS_UN_H */

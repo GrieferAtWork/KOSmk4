@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f38d57d */
+/* HASH CRC-32:0x5d7c28fc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 #include <asm/os/siginfo.h>
 #include <asm/os/signal.h>
-#include <bits/siginfo-struct.h>
+#include <bits/os/siginfo.h>
 #include <kos/bits/exception_data.h>
 #include <kos/except/codes.h>
 #include <kos/kernel/handle.h>

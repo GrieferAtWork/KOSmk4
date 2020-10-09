@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x194240e5 */
+/* HASH CRC-32:0x2a7520e6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -682,7 +682,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 #endif /* !... */
 #endif /* !__local___localdep_write_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/sigaction-struct.h>
+#include <bits/os/sigaction.h>
 #include <libc/errno.h>
 #include <asm/os/oflags.h>
 #include <asm/os/signal.h>

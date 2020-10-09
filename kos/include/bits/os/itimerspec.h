@@ -33,6 +33,6 @@
 #include <__stdinc.h>
 
 /**/
-#include <bits/os/kos/itimerspec.h>
+#include <bits/os/generic/itimerspec.h>
 
 #endif /* !_BITS_OS_ITIMERSPEC_H */

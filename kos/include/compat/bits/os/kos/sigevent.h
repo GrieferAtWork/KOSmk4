@@ -20,10 +20,6 @@
 #ifndef _COMPAT_BITS_OS_KOS_SIGEVENT_H
 #define _COMPAT_BITS_OS_KOS_SIGEVENT_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/sigevent.h>
-#define compat_sigevent sigevent
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/sigevent.h>
 
 #endif /* !_COMPAT_BITS_OS_KOS_SIGEVENT_H */

@@ -153,7 +153,7 @@ $errno_t crt_posix_spawn([[nonnull]] pid_t *__restrict pid,
 @@@return: * :          Error errno-code describing the reason of failure
 [[argument_names(pid, execfd, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
-[[impl_include("<bits/sigaction-struct.h>", "<libc/errno.h>")]]
+[[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>")]]
 [[impl_include("<asm/os/vfork.h>", "<asm/os/oflags.h>", "<asm/os/signal.h>")]]
 [[requires_include("<asm/crt/posix_spawn.h>", "<asm/os/vfork.h>")]]
 [[requires((defined(__POSIX_SPAWN_USE_KOS) && 

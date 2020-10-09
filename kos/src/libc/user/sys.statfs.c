@@ -31,8 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_statfs,hash:CRC-32=0x29698398]]]*/
-/* Return information about the filesystem on which FILE resides */
+/*[[[head:libc_statfs,hash:CRC-32=0xa91fc4b1]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_statfs)(char const *file,
                                   struct statfs *buf)
@@ -44,8 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_statfs)(char const *file,
 }
 /*[[[end:libc_statfs]]]*/
 
-/*[[[head:libc_fstatfs,hash:CRC-32=0xba458ff9]]]*/
-/* Return information about the filesystem containing the file FILDES refers to */
+/*[[[head:libc_fstatfs,hash:CRC-32=0x35e5856c]]]*/
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes,
                                    struct statfs *buf)
@@ -58,11 +56,10 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs)(fd_t filedes,
 /*[[[end:libc_fstatfs]]]*/
 
 
-/*[[[head:libc_statfs64,hash:CRC-32=0x27a34f8d]]]*/
+/*[[[head:libc_statfs64,hash:CRC-32=0x4a80f504]]]*/
 #if defined(_STATFS_MATCHES_STATFS64)
 DEFINE_INTERN_ALIAS(libc_statfs64, libc_statfs);
 #else /* MAGIC:alias */
-/* Return information about the filesystem on which FILE resides */
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file,
                                     struct statfs64 *buf)
@@ -75,11 +72,10 @@ NOTHROW_NCX(LIBCCALL libc_statfs64)(const char *file,
 #endif /* MAGIC:alias */
 /*[[[end:libc_statfs64]]]*/
 
-/*[[[head:libc_fstatfs64,hash:CRC-32=0x87384ecd]]]*/
+/*[[[head:libc_fstatfs64,hash:CRC-32=0x492aa2bc]]]*/
 #if defined(_STATFS_MATCHES_STATFS64)
 DEFINE_INTERN_ALIAS(libc_fstatfs64, libc_fstatfs);
 #else /* MAGIC:alias */
-/* Return information about the filesystem containing the file FILDES refers to */
 INTERN ATTR_SECTION(".text.crt.fs.statfs.statfs") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes,
                                      struct statfs64 *buf)

@@ -20,10 +20,6 @@
 #ifndef _COMPAT_BITS_OS_KOS_MMSGHDR_H
 #define _COMPAT_BITS_OS_KOS_MMSGHDR_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/kos/mmsghdr.h>
-#define compat_mmsghdr mmsghdr
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/mmsghdr.h>
 
 #endif /* !_COMPAT_BITS_OS_KOS_MMSGHDR_H */

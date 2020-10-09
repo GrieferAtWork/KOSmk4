@@ -22,7 +22,7 @@
 
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/os/kos/iovec.h>
+#include <compat/bits/os/generic/iovec.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_OS_IOVEC_H */

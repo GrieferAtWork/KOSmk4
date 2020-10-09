@@ -30,7 +30,6 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/os/cmsghdr.h>
-#include <bits/sockaddr_storage-struct.h>
 #include <compat/config.h>
 #include <kos/io.h>
 #include <sys/socket.h>

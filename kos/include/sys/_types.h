@@ -155,7 +155,6 @@ typedef __TM_TYPE(time) __time_t;
 #define _TIMER_T_ __timer_t
 #ifndef __machine_sa_family_t_defined
 #define __machine_sa_family_t_defined 1
-typedef __uint16_t __sa_family_t;
 #endif /* !__machine_sa_family_t_defined */
 
 #ifndef __machine_socklen_t_defined

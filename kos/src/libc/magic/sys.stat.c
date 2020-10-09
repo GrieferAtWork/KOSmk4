@@ -96,8 +96,8 @@
 #include <features.h>
 
 #include <asm/os/stat.h>
-#include <bits/stat.h>
-#include <bits/os/timespec.h>
+#include <bits/os/stat.h>     /* `struct stat', `struct stat64' */
+#include <bits/os/timespec.h> /* `struct timespec' */
 #include <bits/types.h>
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)

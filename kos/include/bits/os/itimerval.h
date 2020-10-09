@@ -33,6 +33,6 @@
 #include <__stdinc.h>
 
 /**/
-#include <bits/os/kos/itimerval.h>
+#include <bits/os/generic/itimerval.h>
 
 #endif /* !_BITS_OS_ITIMERVAL_H */

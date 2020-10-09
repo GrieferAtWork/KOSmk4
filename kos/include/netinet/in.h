@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8250d41 */
+/* HASH CRC-32:0x5de737d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,9 +34,8 @@
 #include <hybrid/__byteswap.h>
 #include <hybrid/typecore.h>
 
-#include <bits/sockaddr-struct.h>
-#include <bits/sockaddr.h>
-#include <bits/sockaddr_storage-struct.h>
+#include <bits/os/sockaddr.h>
+#include <bits/os/sockaddr_storage.h>
 #include <bits/types.h>
 #include <net/bits/types.h>
 #include <netinet/bits/in.h>
@@ -53,30 +52,9 @@
 /* TODO: Constants and structs from this header should
  *       be moved into <asm/> and <bits/> headers! */
 
-
-/* Documentation taken from Glibc /usr/include/netinet/in.h */
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 __SYSDECL_BEGIN
 
-/* Definitions of the bits in an Internet address integer.
- * On subnets, host and network parts are found according
- * to the subnet mask, not these masks. */
+/* Integer net address classification macros */
 #define IN_CLASSA(/*u32*/ a)       (((__CCAST(__uint32_t)(a)) & __UINT32_C(0x80000000)) == 0)
 #define IN_CLASSA_NET              __UINT32_C(0xff000000)
 #define IN_CLASSA_NSHIFT           24
@@ -97,16 +75,14 @@ __SYSDECL_BEGIN
 #define IN_EXPERIMENTAL(/*u32*/ a) (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xe0000000)) == __UINT32_C(0xe0000000))
 #define IN_BADCLASS(/*u32*/ a)     (((__CCAST(__uint32_t)(a)) & __UINT32_C(0xf0000000)) == __UINT32_C(0xf0000000))
 
-#define INADDR_ANY       __UINT32_C(0x00000000) /* Address to accept any incoming messages. */
-#define INADDR_BROADCAST __UINT32_C(0xffffffff) /* Address to send to all hosts. */
-#define INADDR_NONE      __UINT32_C(0xffffffff) /* Address indicating an error return. */
+#define INADDR_ANY       __UINT32_C(0x00000000) /* Address: accept any incoming messages. */
+#define INADDR_BROADCAST __UINT32_C(0xffffffff) /* Address: send to all hosts. */
+#define INADDR_NONE      __UINT32_C(0xffffffff) /* Address: error/none. */
 
-#define IN_LOOPBACKNET   127 /* Network number for local host loopback. */
-#ifndef INADDR_LOOPBACK /* Address to loopback in software to local host. */
-#define INADDR_LOOPBACK  __UINT32_C(0x7f000001) /* Inet 127.0.0.1. */
-#endif /* !INADDR_LOOPBACK */
+#define IN_LOOPBACKNET  127                    /* == INADDR_LOOPBACK & IN_CLASSA_NET */
+#define INADDR_LOOPBACK __UINT32_C(0x7f000001) /* Your typical `127.0.0.1' */
 
-/* Defines for Multicast INADDR. */
+/* Special, multicast internet addresses. */
 #define INADDR_UNSPEC_GROUP    0xe0000000 /* 224.0.0.0 */
 #define INADDR_ALLHOSTS_GROUP  0xe0000001 /* 224.0.0.1 */
 #define INADDR_ALLRTRS_GROUP   0xe0000002 /* 224.0.0.2 */
@@ -115,12 +91,17 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-typedef __u_net16_t in_port_t; /* Type to represent a port. */
+#ifndef __sa_family_t_defined
+#define __sa_family_t_defined 1
+typedef __sa_family_t sa_family_t; /* One of `AF_*' */
+#endif /* !__sa_family_t_defined */
 
 #ifndef __socklen_t_defined
 #define __socklen_t_defined 1
 typedef __socklen_t socklen_t;
 #endif /* !__socklen_t_defined */
+
+typedef __u_net16_t in_port_t; /* Type to represent a port. */
 
 
 /* IPv6 address */
@@ -167,21 +148,22 @@ __LIBC struct in6_addr const (in6addr_loopback); /* ::1 */
 #define INET_ADDRSTRLEN  16
 #define INET6_ADDRSTRLEN 46
 
-/* Structure describing an Internet socket address. */
+/* AF_INET: Socket address */
 struct sockaddr_in {
 	__SOCKADDR_COMMON(sin_);
 	in_port_t      sin_port; /* Port number. */
 	struct in_addr sin_addr; /* Internet address. */
-	/* Pad to size of `struct sockaddr'. */
-	unsigned char sin_zero[sizeof(struct sockaddr) -
-	                       (__SOCKADDR_COMMON_SIZE +
-	                        sizeof(in_port_t) +
-	                        sizeof(struct in_addr))];
+	/* Pad to match `sizeof(struct sockaddr)'. */
+	unsigned char  sin_zero[sizeof(struct sockaddr) -
+	                        (__SOCKADDR_COMMON_SIZE +
+	                         sizeof(in_port_t) +
+	                         sizeof(struct in_addr))];
 };
 
+/* AF_INET6: Socket address */
 struct sockaddr_in6 {
 	__SOCKADDR_COMMON(sin6_);
-	in_port_t       sin6_port;     /* Transport layer port # */
+	in_port_t       sin6_port;     /* Port number. */
 	__u_net32_t     sin6_flowinfo; /* IPv6 flow information */
 	struct in6_addr sin6_addr;     /* IPv6 address */
 	__u_net32_t     sin6_scope_id; /* IPv6 scope-id */
@@ -202,8 +184,8 @@ struct ip_mreq_source {
 
 /* IPv6 multicast request. */
 struct ipv6_mreq {
-	struct in6_addr         ipv6mr_multiaddr; /* IPv6 multicast address of group */
-	__STDC_UINT32_AS_SIZE_T ipv6mr_interface; /* local interface */
+	struct in6_addr         ipv6mr_multiaddr; /* IPv6 multicast address of group. */
+	__STDC_UINT32_AS_SIZE_T ipv6mr_interface; /* local interface. */
 };
 
 #ifdef __USE_MISC
@@ -311,45 +293,88 @@ __LOCAL __ATTR_CONST __UINT64_TYPE__ __NOTHROW_NCX(__LIBCCALL ntohq)(__UINT64_TY
 #endif /* __USE_KOS && __UINT64_TYPE__ */
 #endif /* !__USE_KOS_ALTERATIONS */
 
+#define IN6_IS_ADDR_LINKLOCAL(a) \
+	((((struct in6_addr const *)(a))->s6_addr32[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfe800000)))
+#define IN6_IS_ADDR_SITELOCAL(a) \
+	((((struct in6_addr const *)(a))->s6_addr32[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfec00000)))
+#define IN6_IS_ADDR_MULTICAST(a) \
+	(((__uint8_t const *)(a))[0] == __UINT8_C(0xff))
 #ifndef __NO_XBLOCK
-#define IN6_IS_ADDR_UNSPECIFIED(a) __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == 0; })
-#define IN6_IS_ADDR_LOOPBACK(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == htonl(1); })
-#define IN6_IS_ADDR_LINKLOCAL(a)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN (__a->s6_addr32[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfe800000)); })
-#define IN6_IS_ADDR_SITELOCAL(a)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN (__a->s6_addr32[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfec00000)); })
-#define IN6_IS_ADDR_V4MAPPED(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == htonl(__UINT32_C(0x0000ffff)); })
-#define IN6_IS_ADDR_V4COMPAT(a)    __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); __XRETURN __a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && __a->s6_addr32[2] == 0 && ntohl (__a->s6_addr32[3]) > 1; })
-#define IN6_ARE_ADDR_EQUAL(a, b)   __XBLOCK({ struct in6_addr const *__a = (struct in6_addr const *)(a); \
-                                              struct in6_addr const *__b = (struct in6_addr const *)(b); \
-                                              __XRETURN __a->s6_addr32[0] == __b->s6_addr32[0] && \
-                                                        __a->s6_addr32[1] == __b->s6_addr32[1] && \
-                                                        __a->s6_addr32[2] == __b->s6_addr32[2] && \
-                                                        __a->s6_addr32[3] == __b->s6_addr32[3]; })
+#define IN6_IS_ADDR_UNSPECIFIED(a)                                    \
+	__XBLOCK({                                                        \
+		struct in6_addr const *__a = (struct in6_addr const *)(a);    \
+		__XRETURN(__a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 && \
+		          __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == 0);  \
+	})
+#define IN6_IS_ADDR_LOOPBACK(a)                                             \
+	__XBLOCK({                                                              \
+		struct in6_addr const *__a = (struct in6_addr const *)(a);          \
+		__XRETURN(__a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 &&       \
+		          __a->s6_addr32[2] == 0 && __a->s6_addr32[3] == htonl(1)); \
+	})
+#define IN6_IS_ADDR_V4MAPPED(a)                                        \
+	__XBLOCK({                                                         \
+		struct in6_addr const *__a = (struct in6_addr const *)(a);     \
+		__XRETURN(__a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 &&  \
+		          __a->s6_addr32[2] == htonl(__UINT32_C(0x0000ffff))); \
+	})
+#define IN6_IS_ADDR_V4COMPAT(a)                                            \
+	__XBLOCK({                                                             \
+		struct in6_addr const *__a = (struct in6_addr const *)(a);         \
+		__XRETURN(__a->s6_addr32[0] == 0 && __a->s6_addr32[1] == 0 &&      \
+		          __a->s6_addr32[2] == 0 && ntohl(__a->s6_addr32[3]) > 1); \
+	})
+#define IN6_ARE_ADDR_EQUAL(a, b)                                   \
+	__XBLOCK({                                                     \
+		struct in6_addr const *__a = (struct in6_addr const *)(a); \
+		struct in6_addr const *__b = (struct in6_addr const *)(b); \
+		__XRETURN(__a->s6_addr32[0] == __b->s6_addr32[0] &&        \
+		          __a->s6_addr32[1] == __b->s6_addr32[1] &&        \
+		          __a->s6_addr32[2] == __b->s6_addr32[2] &&        \
+		          __a->s6_addr32[3] == __b->s6_addr32[3]);         \
+	})
 #else /* !__NO_XBLOCK */
-#define IN6_IS_ADDR_UNSPECIFIED(a) (((__uint32_t const *)(a))[0] == 0 && ((__uint32_t const *)(a))[1] == 0 && ((__uint32_t const *)(a))[2] == 0 && ((__uint32_t const *)(a))[3] == 0)
-#define IN6_IS_ADDR_LOOPBACK(a)    (((__uint32_t const *)(a))[0] == 0 && ((__uint32_t const *)(a))[1] == 0 && ((__uint32_t const *)(a))[2] == 0 && ((__uint32_t const *)(a))[3] == htonl(1))
-#define IN6_IS_ADDR_LINKLOCAL(a)  ((((__uint32_t const *)(a))[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfe800000)))
-#define IN6_IS_ADDR_SITELOCAL(a)  ((((__uint32_t const *)(a))[0] & htonl(__UINT32_C(0xffc00000))) == htonl(__UINT32_C(0xfec00000)))
-#define IN6_IS_ADDR_V4MAPPED(a)   ((((__uint32_t const *)(a))[0] == 0) && (((__uint32_t const *)(a))[1] == 0) && (((__uint32_t const *)(a))[2] == htonl(__UINT32_C(0x0000ffff))))
-#define IN6_IS_ADDR_V4COMPAT(a)   ((((__uint32_t const *)(a))[0] == 0) && (((__uint32_t const *)(a))[1] == 0) && (((__uint32_t const *)(a))[2] == 0) && (ntohl (((__uint32_t const *)(a))[3]) > 1))
-#define IN6_ARE_ADDR_EQUAL(a, b)  ((((__uint32_t const *)(a))[0] == ((__uint32_t const *)(b))[0]) && \
-                                   (((__uint32_t const *)(a))[1] == ((__uint32_t const *)(b))[1]) && \
-                                   (((__uint32_t const *)(a))[2] == ((__uint32_t const *)(b))[2]) && \
-                                   (((__uint32_t const *)(a))[3] == ((__uint32_t const *)(b))[3]))
+#define IN6_IS_ADDR_UNSPECIFIED(a)        \
+	(((__uint32_t const *)(a))[0] == 0 && \
+	 ((__uint32_t const *)(a))[1] == 0 && \
+	 ((__uint32_t const *)(a))[2] == 0 && \
+	 ((__uint32_t const *)(a))[3] == 0)
+#define IN6_IS_ADDR_LOOPBACK(a)           \
+	(((__uint32_t const *)(a))[0] == 0 && \
+	 ((__uint32_t const *)(a))[1] == 0 && \
+	 ((__uint32_t const *)(a))[2] == 0 && \
+	 ((__uint32_t const *)(a))[3] == htonl(1))
+#define IN6_IS_ADDR_V4MAPPED(a)             \
+	((((__uint32_t const *)(a))[0] == 0) && \
+	 (((__uint32_t const *)(a))[1] == 0) && \
+	 (((__uint32_t const *)(a))[2] == htonl(__UINT32_C(0x0000ffff))))
+#define IN6_IS_ADDR_V4COMPAT(a)             \
+	((((__uint32_t const *)(a))[0] == 0) && \
+	 (((__uint32_t const *)(a))[1] == 0) && \
+	 (((__uint32_t const *)(a))[2] == 0) && \
+	 (ntohl(((__uint32_t const *)(a))[3]) > 1))
+#define IN6_ARE_ADDR_EQUAL(a, b)                                       \
+	((((__uint32_t const *)(a))[0] == ((__uint32_t const *)(b))[0]) && \
+	 (((__uint32_t const *)(a))[1] == ((__uint32_t const *)(b))[1]) && \
+	 (((__uint32_t const *)(a))[2] == ((__uint32_t const *)(b))[2]) && \
+	 (((__uint32_t const *)(a))[3] == ((__uint32_t const *)(b))[3]))
 #endif /* __NO_XBLOCK */
-#define IN6_IS_ADDR_MULTICAST(a) (((__uint8_t const *)(a))[0] == __UINT8_C(0xff))
 
 #ifdef __USE_MISC
-/* Bind socket to a privileged IP port */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,bindresvport,(__fd_t __sockfd, struct sockaddr_in *__sock_in),(__sockfd,__sock_in))
-/* The IPv6 version of this function */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,bindresvport6,(__fd_t __sockfd, struct sockaddr_in6 *__sock_in),(__sockfd,__sock_in))
 #endif /* __USE_MISC */
 
-#define IN6_IS_ADDR_MC_NODELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x1)))
-#define IN6_IS_ADDR_MC_LINKLOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x2)))
-#define IN6_IS_ADDR_MC_SITELOCAL(a) (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x5)))
-#define IN6_IS_ADDR_MC_ORGLOCAL(a)  (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x8)))
-#define IN6_IS_ADDR_MC_GLOBAL(a)    (IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0xe)))
+#define IN6_IS_ADDR_MC_NODELOCAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x1)))
+#define IN6_IS_ADDR_MC_LINKLOCAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x2)))
+#define IN6_IS_ADDR_MC_SITELOCAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x5)))
+#define IN6_IS_ADDR_MC_ORGLOCAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0x8)))
+#define IN6_IS_ADDR_MC_GLOBAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && ((((__uint8_t const *)(a))[1] & __UINT8_C(0xf)) == __UINT8_C(0xe)))
 
 #ifdef __USE_GNU
 struct cmsghdr;
@@ -362,55 +387,32 @@ struct in6_pktinfo {
 
 /* IPv6 MTU information. */
 struct ip6_mtuinfo {
-	struct sockaddr_in6 ip6m_addr; /* dst address including zone ID */
-	__uint32_t          ip6m_mtu;  /* path MTU in host byte order */
+	struct sockaddr_in6 ip6m_addr; /* Destination address w/ zone ID */
+	__uint32_t          ip6m_mtu;  /* Path MTU in host byte order */
 };
 
-/* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_space,(int __nbytes),(__nbytes))
-/* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_init,(void *__bp, struct cmsghdr **__cmsgp, int __type),(__bp,__cmsgp,__type))
-/* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_append,(struct cmsghdr *__cmsg, __UINT8_TYPE__ const *__typep, int __multx, int __plusy),(__cmsg,__typep,__multx,__plusy))
-/* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE_OPT(__ATTR_DEPRECATED_,__UINT8_TYPE__ *,__NOTHROW_RPC_KOS,inet6_option_alloc,(struct cmsghdr *__cmsg, int __datalen, int __multx, int __plusy),(__cmsg,__datalen,__multx,__plusy))
-/* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_next,(struct cmsghdr const *__cmsg, __UINT8_TYPE__ **__tptrp),(__cmsg,__tptrp))
-/* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 __CDECLARE_OPT(__ATTR_DEPRECATED_,int,__NOTHROW_RPC_KOS,inet6_option_find,(struct cmsghdr const *__cmsg, __UINT8_TYPE__ **__tptrp, int __type),(__cmsg,__tptrp,__type))
-/* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_init,(void *__extbuf, socklen_t __extlen),(__extbuf,__extlen))
-/* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_append,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ __type, socklen_t __len, __UINT8_TYPE__ __align, void **__databufp),(__extbuf,__extlen,__offset,__type,__len,__align,__databufp))
-/* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_finish,(void *__extbuf, socklen_t __extlen, int __offset),(__extbuf,__extlen,__offset))
-/* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_set_val,(void *__databuf, int __offset, void *__val, socklen_t __vallen),(__databuf,__offset,__val,__vallen))
-/* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_next,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ *__typep, socklen_t *__lenp, void **__databufp),(__extbuf,__extlen,__offset,__typep,__lenp,__databufp))
-/* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_find,(void *__extbuf, socklen_t __extlen, int __offset, __UINT8_TYPE__ __type, socklen_t *__lenp, void **__databufp),(__extbuf,__extlen,__offset,__type,__lenp,__databufp))
-/* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_opt_get_val,(void *__databuf, int __offset, void *__val, socklen_t __vallen),(__databuf,__offset,__val,__vallen))
-/* Routing Header Option (RFC 3542) */
 __CDECLARE_OPT(,socklen_t,__NOTHROW_RPC_KOS,inet6_rth_space,(int __type, int __segments),(__type,__segments))
-/* Routing Header Option (RFC 3542) */
 __CDECLARE_OPT(,void *,__NOTHROW_RPC_KOS,inet6_rth_init,(void *__bp, socklen_t __bp_len, int __type, int __segments),(__bp,__bp_len,__type,__segments))
-/* Routing Header Option (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_add,(void *__bp, struct in6_addr const *__addr),(__bp,__addr))
-/* Routing Header Option (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_reverse,(void const *__in, void *__out),(__in,__out))
-/* Routing Header Option (RFC 3542) */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,inet6_rth_segments,(void const *__bp),(__bp))
-/* Routing Header Option (RFC 3542) */
 __CDECLARE_OPT(,struct in6_addr *,__NOTHROW_RPC_KOS,inet6_rth_getaddr,(void const *__bp, int __index),(__bp,__index))
-/* Get IPv4 source filter */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct in_addr *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))
-/* Set IPv4 source filter */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setipv4sourcefilter,(__fd_t __sockfd, struct in_addr __interface_addr, struct in_addr __group, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct in_addr const *__slist),(__sockfd,__interface_addr,__group,__fmode,__numsrc,__slist))
-/* Get source filter */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,getsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ *__fmode, __UINT32_TYPE__ *__numsrc, struct sockaddr_storage *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
-/* Set source filter */
 __CDECLARE_OPT(,int,__NOTHROW_RPC_KOS,setsourcefilter,(__fd_t __sockfd, __UINT32_TYPE__ __interface_addr, struct sockaddr const *__group, socklen_t __grouplen, __UINT32_TYPE__ __fmode, __UINT32_TYPE__ __numsrc, struct sockaddr_storage const *__slist),(__sockfd,__interface_addr,__group,__grouplen,__fmode,__numsrc,__slist))
 #endif /* __USE_GNU */
 

@@ -397,23 +397,30 @@ static_assert(sizeof(Elf64_Versym) == __SIZEOF_ELF64_VERSYM__);
 /*[[[deemon
 import * from ...misc.libgen.assert_offsetof;
 local files = {
+	"../../include/bits/os/cygwin/sigaction.h",
+	"../../include/bits/os/cygwin/stat.h",
+	"../../include/bits/os/dos/stat.h",
+	"../../include/bits/os/generic/iovec.h",
+	"../../include/bits/os/generic/itimerspec.h",
+	"../../include/bits/os/generic/itimerval.h",
+	"../../include/bits/os/generic/timespec.h",
+	"../../include/bits/os/generic/timeval.h",
+	"../../include/bits/os/generic/stat.h",
+	"../../include/bits/os/generic/sockaddr_storage.h",
+	"../../include/bits/os/generic/sockaddr.h",
 	"../../include/bits/os/kos/cmsghdr.h",
 	"../../include/bits/os/kos/flock.h",
-	"../../include/bits/os/kos/itimerspec.h",
-	"../../include/bits/os/kos/itimerval.h",
 	"../../include/bits/os/mcontext.h",
 	"../../include/bits/os/kos/mmsghdr.h",
 	"../../include/bits/os/kos/msghdr.h",
 	"../../include/bits/os/kos/pollfd.h",
-	"../../include/bits/rusage-struct.h",
+	"../../include/bits/os/kos/rusage.h",
 	"../../include/bits/os/kos/sched.h",
-	"../../include/bits/sigaction-struct.h",
-	"../../include/bits/siginfo-struct.h",
-	"../../include/bits/stat-kos.h",
-	"../../include/bits/statfs.h",
+	"../../include/bits/os/kos/sigaction.h",
+	"../../include/bits/os/kos/siginfo.h",
+	"../../include/bits/os/kos/stat.h",
+	"../../include/bits/os/kos/statfs.h",
 	"../../include/bits/os/kos/timeb.h",
-	"../../include/bits/os/kos/timespec.h",
-	"../../include/bits/os/kos/timeval.h",
 	"../../include/bits/os/ucontext.h",
 	"../../include/bits/os/kos/ustat.h",
 	"../../include/bits/os/kos/utimbuf.h",
@@ -421,6 +428,7 @@ local files = {
 	"../../include/bits/crt/ntptimeval.h",
 	"../../include/bits/os/kos/timex.h",
 	"../../include/bits/os/kos/tms.h",
+	"../../include/bits/os/linux/stat.h",
 	"../../include/elf.h",
 	"../../include/kos/bits/debugtrap.h",
 	"../../include/kos/bits/ukern-struct.h",
@@ -470,7 +478,208 @@ do_gen_asserts:
 for (local f: files)
 	genAsserts(f);
 
+print "#undef sigev_value";
+print "#undef sigev_signo";
+print "#undef sigev_notify";
+print "#undef sigev_notify_function";
+print "#undef sigev_notify_attributes";
+genAsserts("../../include/bits/os/cygwin/sigevent.h");
+
+print "#undef si_signo";
+print "#undef si_code";
+print "#undef si_pid";
+print "#undef si_uid";
+print "#undef si_errno";
+print "#undef _si_data";
+print "#undef _si_commune";
+print "#undef si_sigval";
+print "#undef si_value";
+print "#undef si_tid";
+print "#undef si_overrun";
+print "#undef si_status";
+print "#undef si_utime";
+print "#undef si_stime";
+print "#undef si_addr";
+genAsserts("../../include/bits/os/cygwin/siginfo.h");
+
 ]]]*/
+#include <bits/os/cygwin/sigaction.h>
+
+/* struct __sigaction_cygwin */
+static_assert(offsetof(struct __sigaction_cygwin, sa_flags) == __OFFSET_SIGACTION_CYGWIN_FLAGS);
+static_assert(offsetof(struct __sigaction_cygwin, sa_handler) == __OFFSET_SIGACTION_CYGWIN_HANDLER);
+static_assert(offsetof(struct __sigaction_cygwin, sa_mask) == __OFFSET_SIGACTION_CYGWIN_MASK);
+static_assert(offsetof(struct __sigaction_cygwin, sa_sigaction) == __OFFSET_SIGACTION_CYGWIN_SIGACTION);
+static_assert(sizeof(struct __sigaction_cygwin) == __SIZEOF_SIGACTION_CYGWIN);
+static_assert(alignof(struct __sigaction_cygwin) == __ALIGNOF_SIGACTION_CYGWIN);
+
+
+
+
+
+#include <bits/os/cygwin/stat.h>
+
+/* struct __cyg_stat */
+/* ... */
+
+/* struct __cyg_stat_alias64 */
+/* ... */
+
+
+
+
+
+#include <bits/os/dos/stat.h>
+
+/* struct __dos_bstat */
+/* ... */
+
+/* struct __dos_bstat64 */
+/* ... */
+
+/* struct __dos_stat32 */
+/* ... */
+
+/* struct __dos_stat32i64 */
+/* ... */
+
+/* struct __dos_stat64i32 */
+/* ... */
+
+/* struct __dos_stat64 */
+/* ... */
+
+
+
+
+
+#include <bits/os/generic/iovec.h>
+
+/* struct iovec */
+static_assert(offsetof(struct iovec, iov_base) == __OFFSET_IOVEC_BASE);
+static_assert(offsetof(struct iovec, iov_len) == __OFFSET_IOVEC_LEN);
+static_assert(sizeof(struct iovec) == __SIZEOF_IOVEC);
+
+
+
+
+
+#include <bits/os/generic/itimerspec.h>
+
+/* struct itimerspec */
+static_assert(offsetof(struct itimerspec, it_interval) == __OFFSET_ITIMERSPEC_INTERVAL);
+static_assert(offsetof(struct itimerspec, it_value) == __OFFSET_ITIMERSPEC_VALUE);
+static_assert(sizeof(struct itimerspec) == __SIZEOF_ITIMERSPEC);
+
+/* struct __itimerspec64 */
+static_assert(offsetof(struct __itimerspec64, it_interval) == __OFFSET_ITIMERSPEC64_INTERVAL);
+static_assert(offsetof(struct __itimerspec64, it_value) == __OFFSET_ITIMERSPEC64_VALUE);
+static_assert(sizeof(struct __itimerspec64) == __SIZEOF_ITIMERSPEC64);
+
+/* struct __itimerspec32 */
+static_assert(offsetof(struct __itimerspec32, it_interval) == __OFFSET_ITIMERSPEC32_INTERVAL);
+static_assert(offsetof(struct __itimerspec32, it_value) == __OFFSET_ITIMERSPEC32_VALUE);
+static_assert(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
+
+
+
+
+
+#include <bits/os/generic/itimerval.h>
+
+/* struct itimerval */
+static_assert(offsetof(struct itimerval, it_interval) == __OFFSET_ITIMERVAL_INTERVAL);
+static_assert(offsetof(struct itimerval, it_value) == __OFFSET_ITIMERVAL_VALUE);
+static_assert(sizeof(struct itimerval) == __SIZEOF_ITIMERVAL);
+
+/* struct __itimerval64 */
+static_assert(offsetof(struct __itimerval64, it_interval) == __OFFSET_ITIMERVAL64_INTERVAL);
+static_assert(offsetof(struct __itimerval64, it_value) == __OFFSET_ITIMERVAL64_VALUE);
+static_assert(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
+
+/* struct __itimerval32 */
+static_assert(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
+static_assert(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
+static_assert(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
+
+
+
+
+
+#include <bits/os/generic/timespec.h>
+
+/* struct timespec */
+static_assert(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
+static_assert(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
+static_assert(sizeof(struct timespec) == __SIZEOF_TIMESPEC);
+
+/* struct __timespec64 */
+static_assert(offsetof(struct __timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
+static_assert(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
+static_assert(sizeof(struct __timespec64) == __SIZEOF_TIMESPEC64);
+
+/* struct __timespec32 */
+static_assert(offsetof(struct __timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
+static_assert(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
+static_assert(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
+
+
+
+
+
+#include <bits/os/generic/timeval.h>
+
+/* struct timeval */
+static_assert(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
+static_assert(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
+static_assert(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
+
+/* struct __timeval64 */
+static_assert(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
+static_assert(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
+static_assert(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
+
+/* struct __timeval32 */
+static_assert(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
+static_assert(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
+static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
+
+
+
+
+
+#include <bits/os/generic/stat.h>
+
+/* struct __gen_stat */
+/* ... */
+
+/* struct __gen_stat64 */
+/* ... */
+
+
+
+
+
+#include <bits/os/generic/sockaddr_storage.h>
+
+/* struct sockaddr_storage */
+static_assert(sizeof(struct sockaddr_storage) == __SIZEOF_SOCKADDR_STORAGE);
+static_assert(alignof(struct sockaddr_storage) == __ALIGNOF_SOCKADDR_STORAGE);
+
+
+
+
+
+#include <bits/os/generic/sockaddr.h>
+
+/* struct sockaddr */
+static_assert(sizeof(struct sockaddr) == __SIZEOF_SOCKADDR);
+static_assert(alignof(struct sockaddr) == __ALIGNOF_SOCKADDR);
+
+
+
+
+
 #include <bits/os/kos/cmsghdr.h>
 
 /* struct cmsghdr */
@@ -509,48 +718,6 @@ static_assert(offsetof(struct __flock32, l_start) == __OFFSET_FLOCK32_START);
 static_assert(offsetof(struct __flock32, l_type) == __OFFSET_FLOCK32_TYPE);
 static_assert(offsetof(struct __flock32, l_whence) == __OFFSET_FLOCK32_WHENCE);
 static_assert(sizeof(struct __flock32) == __SIZEOF_FLOCK32);
-
-
-
-
-
-#include <bits/os/kos/itimerspec.h>
-
-/* struct itimerspec */
-static_assert(offsetof(struct itimerspec, it_interval) == __OFFSET_ITIMERSPEC_INTERVAL);
-static_assert(offsetof(struct itimerspec, it_value) == __OFFSET_ITIMERSPEC_VALUE);
-static_assert(sizeof(struct itimerspec) == __SIZEOF_ITIMERSPEC);
-
-/* struct __itimerspec64 */
-static_assert(offsetof(struct __itimerspec64, it_interval) == __OFFSET_ITIMERSPEC64_INTERVAL);
-static_assert(offsetof(struct __itimerspec64, it_value) == __OFFSET_ITIMERSPEC64_VALUE);
-static_assert(sizeof(struct __itimerspec64) == __SIZEOF_ITIMERSPEC64);
-
-/* struct __itimerspec32 */
-static_assert(offsetof(struct __itimerspec32, it_interval) == __OFFSET_ITIMERSPEC32_INTERVAL);
-static_assert(offsetof(struct __itimerspec32, it_value) == __OFFSET_ITIMERSPEC32_VALUE);
-static_assert(sizeof(struct __itimerspec32) == __SIZEOF_ITIMERSPEC32);
-
-
-
-
-
-#include <bits/os/kos/itimerval.h>
-
-/* struct itimerval */
-static_assert(offsetof(struct itimerval, it_interval) == __OFFSET_ITIMERVAL_INTERVAL);
-static_assert(offsetof(struct itimerval, it_value) == __OFFSET_ITIMERVAL_VALUE);
-static_assert(sizeof(struct itimerval) == __SIZEOF_ITIMERVAL);
-
-/* struct __itimerval64 */
-static_assert(offsetof(struct __itimerval64, it_interval) == __OFFSET_ITIMERVAL64_INTERVAL);
-static_assert(offsetof(struct __itimerval64, it_value) == __OFFSET_ITIMERVAL64_VALUE);
-static_assert(sizeof(struct __itimerval64) == __SIZEOF_ITIMERVAL64);
-
-/* struct __itimerval32 */
-static_assert(offsetof(struct __itimerval32, it_interval) == __OFFSET_ITIMERVAL32_INTERVAL);
-static_assert(offsetof(struct __itimerval32, it_value) == __OFFSET_ITIMERVAL32_VALUE);
-static_assert(sizeof(struct __itimerval32) == __SIZEOF_ITIMERVAL32);
 
 
 
@@ -608,7 +775,7 @@ static_assert(alignof(struct pollfd) == __ALIGNOF_POLLFD);
 
 
 
-#include <bits/rusage-struct.h>
+#include <bits/os/kos/rusage.h>
 
 /* struct rusage */
 static_assert(offsetof(struct rusage, ru_idrss) == __OFFSET_RUSAGE_IDRSS);
@@ -682,7 +849,7 @@ static_assert(alignof(struct sched_param) == __ALIGNOF_SCHED_PARAM);
 
 
 
-#include <bits/sigaction-struct.h>
+#include <bits/os/kos/sigaction.h>
 
 /* struct sigaction */
 static_assert(offsetof(struct sigaction, sa_flags) == __OFFSET_SIGACTION_FLAGS);
@@ -697,7 +864,7 @@ static_assert(alignof(struct sigaction) == __ALIGNOF_SIGACTION);
 
 
 
-#include <bits/siginfo-struct.h>
+#include <bits/os/kos/siginfo.h>
 
 /* struct __siginfo_struct */
 static_assert(offsetof(struct __siginfo_struct, si_addr) == __OFFSET_SIGINFO_ADDR);
@@ -728,7 +895,7 @@ static_assert(sizeof(struct __siginfo_struct) == __SIZEOF_SIGINFO);
 
 
 
-#include <bits/stat-kos.h>
+#include <bits/os/kos/stat.h>
 
 /* struct __kos_stat */
 static_assert(offsetof(struct __kos_stat, st_atime) == __OFFSET_KOS_STAT_ATIME);
@@ -814,7 +981,7 @@ static_assert(sizeof(struct __kos_stat_alias64) == __SIZEOF_KOS_STAT);
 
 
 
-#include <bits/statfs.h>
+#include <bits/os/kos/statfs.h>
 
 /* struct statfs */
 static_assert(offsetof(struct statfs, f_bavail) == __OFFSET_STATFS_BAVAIL);
@@ -922,48 +1089,6 @@ static_assert(offsetof(struct __timeb32, millitm) == __OFFSET_TIMEB32_MILLITM);
 static_assert(offsetof(struct __timeb32, time) == __OFFSET_TIMEB32_TIME);
 static_assert(offsetof(struct __timeb32, timezone) == __OFFSET_TIMEB32_TIMEZONE);
 static_assert(sizeof(struct __timeb32) == __SIZEOF_TIMEB32);
-
-
-
-
-
-#include <bits/os/kos/timespec.h>
-
-/* struct timespec */
-static_assert(offsetof(struct timespec, tv_nsec) == __OFFSET_TIMESPEC_NSEC);
-static_assert(offsetof(struct timespec, tv_sec) == __OFFSET_TIMESPEC_SEC);
-static_assert(sizeof(struct timespec) == __SIZEOF_TIMESPEC);
-
-/* struct __timespec64 */
-static_assert(offsetof(struct __timespec64, tv_nsec) == __OFFSET_TIMESPEC64_NSEC);
-static_assert(offsetof(struct __timespec64, tv_sec) == __OFFSET_TIMESPEC64_SEC);
-static_assert(sizeof(struct __timespec64) == __SIZEOF_TIMESPEC64);
-
-/* struct __timespec32 */
-static_assert(offsetof(struct __timespec32, tv_nsec) == __OFFSET_TIMESPEC32_NSEC);
-static_assert(offsetof(struct __timespec32, tv_sec) == __OFFSET_TIMESPEC32_SEC);
-static_assert(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
-
-
-
-
-
-#include <bits/os/kos/timeval.h>
-
-/* struct timeval */
-static_assert(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
-static_assert(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
-static_assert(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
-
-/* struct __timeval64 */
-static_assert(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
-static_assert(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
-static_assert(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
-
-/* struct __timeval32 */
-static_assert(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
-static_assert(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
-static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
 
 
 
@@ -1157,6 +1282,18 @@ static_assert(offsetof(struct tms, tms_stime) == __OFFSET_TMS_STIME);
 static_assert(offsetof(struct tms, tms_utime) == __OFFSET_TMS_UTIME);
 static_assert(sizeof(struct tms) == __SIZEOF_TMS);
 static_assert(alignof(struct tms) == __ALIGNOF_TMS);
+
+
+
+
+
+#include <bits/os/linux/stat.h>
+
+/* struct __glc_stat */
+/* ... */
+
+/* struct __glc_stat64 */
+/* ... */
 
 
 
@@ -2074,6 +2211,52 @@ static_assert(offsetof(struct udphdr, uh_sport) == __OFFSET_UDPHDR_SPORT);
 static_assert(offsetof(struct udphdr, uh_sum) == __OFFSET_UDPHDR_SUM);
 static_assert(offsetof(struct udphdr, uh_ulen) == __OFFSET_UDPHDR_ULEN);
 static_assert(sizeof(struct udphdr) == __SIZEOF_UDPHDR);
+
+
+
+
+
+#undef sigev_value
+#undef sigev_signo
+#undef sigev_notify
+#undef sigev_notify_function
+#undef sigev_notify_attributes
+#include <bits/os/cygwin/sigevent.h>
+
+/* struct __sigevent_cygwin */
+static_assert(offsetof(struct __sigevent_cygwin, sigev_notify) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY);
+static_assert(offsetof(struct __sigevent_cygwin, sigev_notify_attributes) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY_ATTRIBUTES);
+static_assert(offsetof(struct __sigevent_cygwin, sigev_notify_function) == __OFFSET_SIGEVENT_CYGWIN_NOTIFY_FUNCTION);
+static_assert(offsetof(struct __sigevent_cygwin, sigev_signo) == __OFFSET_SIGEVENT_CYGWIN_SIGNO);
+static_assert(offsetof(struct __sigevent_cygwin, sigev_value) == __OFFSET_SIGEVENT_CYGWIN_VALUE);
+static_assert(sizeof(struct __sigevent_cygwin) == __SIZEOF_SIGEVENT_CYGWIN);
+
+
+
+
+
+#undef si_signo
+#undef si_code
+#undef si_pid
+#undef si_uid
+#undef si_errno
+#undef _si_data
+#undef _si_commune
+#undef si_sigval
+#undef si_value
+#undef si_tid
+#undef si_overrun
+#undef si_status
+#undef si_utime
+#undef si_stime
+#undef si_addr
+#include <bits/os/cygwin/siginfo.h>
+
+/* struct _sigcommune */
+/* ... */
+
+/* struct __siginfo_cygwin_struct */
+/* ... */
 //[[[end]]]
 
 

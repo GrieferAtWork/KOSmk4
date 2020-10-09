@@ -20,10 +20,6 @@
 #ifndef _COMPAT_BITS_OS_KOS_CMSGHDR_H
 #define _COMPAT_BITS_OS_KOS_CMSGHDR_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/kos/cmsghdr.h>
-#define compat_cmsghdr cmsghdr
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/cmsghdr.h>
 
 #endif /* !_COMPAT_BITS_OS_KOS_CMSGHDR_H */

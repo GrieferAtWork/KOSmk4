@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f2810c4 */
+/* HASH CRC-32:0x810856e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,16 +30,16 @@
 #include <bits/os/mmsghdr.h>
 #include <bits/os/msghdr.h>
 #include <bits/os/pollfd.h>
+#include <bits/os/rusage.h>
+#include <bits/os/sigaction.h>
 #include <bits/os/sigevent.h>
+#include <bits/os/siginfo.h>
 #include <bits/os/sigstack.h>
+#include <bits/os/statfs.h>
 #include <bits/os/timespec.h>
 #include <bits/os/timeval.h>
 #include <bits/os/tms.h>
 #include <bits/os/utimbuf.h>
-#include <bits/rusage-struct.h>
-#include <bits/sigaction-struct.h>
-#include <bits/siginfo-struct.h>
-#include <bits/statfs.h>
 #include <bits/types.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>

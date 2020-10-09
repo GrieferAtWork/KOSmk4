@@ -23,6 +23,6 @@
 #include <__stdinc.h>
 
 /**/
-#include <bits/os/kos/iovec.h>
+#include <bits/os/generic/iovec.h>
 
 #endif /* !_BITS_OS_IOVEC_H */

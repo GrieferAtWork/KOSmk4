@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3be51547 */
+/* HASH CRC-32:0xb1614c0a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <asm/os/stat.h>
 #include <asm/os/stdio.h>
-#include <bits/stat.h>
+#include <bits/os/stat.h>
 #include <bits/os/timespec.h>
 
 #ifdef __USE_ATFILE

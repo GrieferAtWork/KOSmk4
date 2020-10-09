@@ -22,7 +22,7 @@
 
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/os/kos/itimerspec.h>
+#include <compat/bits/os/generic/itimerspec.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_OS_ITIMERSPEC_H */

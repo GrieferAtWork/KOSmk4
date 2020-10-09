@@ -50,7 +50,6 @@ typedef __FS_TYPE(fsfilcnt) __fsfilcnt_t;
 typedef __FS_TYPE(ino) __ino_t;
 #define __machine_key_t_defined 1
 #define __machine_sa_family_t_defined 1
-typedef __uint16_t __sa_family_t;
 #define __machine_socklen_t_defined 1
 
 #endif /* __CC__ */

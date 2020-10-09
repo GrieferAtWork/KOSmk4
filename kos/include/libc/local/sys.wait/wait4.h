@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fa2b1e5 */
+/* HASH CRC-32:0xae1f717b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 struct rusage;
 #include <bits/types.h>
 #include <features.h>
-#include <bits/rusage-struct.h>
+#include <bits/os/rusage.h>
 #include <parts/waitmacros.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: wait4_32 from sys.wait */
@@ -68,7 +68,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_wait4_64_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/rusage-convert.h>
+#include <bits/os/rusage-convert.h>
 __NAMESPACE_LOCAL_BEGIN
 /* >> wait4(2)
  * Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL

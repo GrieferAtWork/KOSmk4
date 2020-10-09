@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3689dfd0 */
+/* HASH CRC-32:0xd86691e8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,8 +31,8 @@
 #include <features.h>
 
 #include <asm/os/stat.h>
-#include <bits/stat.h>
-#include <bits/os/timespec.h>
+#include <bits/os/stat.h>     /* `struct stat', `struct stat64' */
+#include <bits/os/timespec.h> /* `struct timespec' */
 #include <bits/types.h>
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)

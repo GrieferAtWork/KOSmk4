@@ -84,7 +84,7 @@
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #include <asm/os/stat.h>
 #include <asm/os/stdio.h>
-#include <bits/stat.h>
+#include <bits/os/stat.h>
 #include <bits/os/timespec.h>
 
 #ifdef __USE_ATFILE

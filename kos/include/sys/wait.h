@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf6402b2 */
+/* HASH CRC-32:0xcc2afcb7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,31 +35,31 @@
 #include <parts/waitmacros.h>
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
-#include <bits/siginfo-struct.h> /* `struct __siginfo_struct' */
+#include <bits/os/siginfo.h> /* `struct __siginfo_struct' */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
-#ifdef __WCOREFLAG
+#if !defined(WCOREFLAG) && defined(__WCOREFLAG)
 #define WCOREFLAG __WCOREFLAG
-#endif /* __WCOREFLAG */
-#ifdef __WCOREDUMP
+#endif /* !WCOREFLAG && __WCOREFLAG */
+#if !defined(WCOREDUMP) && defined(__WCOREDUMP)
 #define WCOREDUMP(status) __WCOREDUMP(__WAIT_INT(status))
-#endif /* __WCOREDUMP */
-#ifdef __W_EXITCODE
+#endif /* !WCOREDUMP && __WCOREDUMP */
+#if !defined(W_EXITCODE) && defined(__W_EXITCODE)
 #define W_EXITCODE(ret, sig) __W_EXITCODE(ret, sig)
-#endif /* __W_EXITCODE */
-#ifdef __W_STOPCODE
+#endif /* !W_EXITCODE && __W_EXITCODE */
+#if !defined(W_STOPCODE) && defined(__W_STOPCODE)
 #define W_STOPCODE(sig) __W_STOPCODE(sig)
-#endif /* __W_STOPCODE */
+#endif /* !W_STOPCODE && __W_STOPCODE */
 
-#ifdef __WAIT_ANY
+#if !defined(WAIT_ANY) && defined(__WAIT_ANY)
 #define WAIT_ANY __WAIT_ANY /* Any process. */
-#endif /* __WAIT_ANY */
-#ifdef __WAIT_MYPGRP
+#endif /* !WAIT_ANY && __WAIT_ANY */
+#if !defined(WAIT_MYPGRP) && defined(__WAIT_MYPGRP)
 #define WAIT_MYPGRP __WAIT_MYPGRP /* Any process in my process group. */
-#endif /* __WAIT_MYPGRP */
+#endif /* !WAIT_MYPGRP && __WAIT_MYPGRP */
 #endif /* __USE_MISC */
 
 

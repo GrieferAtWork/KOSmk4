@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6723b14d */
+/* HASH CRC-32:0x51ff3fbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,33 +32,13 @@ DECL_BEGIN
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_prlimit)(pid_t pid, __rlimit_resource_t resource, struct rlimit const *new_limit, struct rlimit *old_limit);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_prlimit64)(pid_t pid, __rlimit_resource_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit);
-/* Put the soft and hard limits for RESOURCE in *RLIMITS.
- * Returns 0 if successful, -1 if not (and sets errno) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getrlimit)(__rlimit_resource_t resource, struct rlimit *rlimits);
-/* Set the soft and hard limits for RESOURCE to *RLIMITS.
- * Only the super-user can increase hard limits.
- * Return 0 if successful, -1 if not (and sets errno) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_setrlimit)(__rlimit_resource_t resource, struct rlimit const *rlimits);
-/* Return resource usage information on process indicated by WHO
- * and put it in *USAGE. Returns 0 for success, -1 for failure */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getrusage)(__rusage_who_t who, struct rusage *usage);
-/* Return resource usage information on process indicated by WHO
- * and put it in *USAGE. Returns 0 for success, -1 for failure */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getrusage64)(__rusage_who_t who, struct rusage64 *usage);
-/* Return the highest priority of any process specified by WHICH and
- * WHO (see above); if WHO is zero, the current process, process group,
- * or user (as specified by WHO) is used.  A lower priority number means
- * higher priority. Priorities range from PRIO_MIN to PRIO_MAX (above) */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_getpriority)(__priority_which_t which, id_t who);
-/* Set the priority of all processes specified by WHICH and WHO (see above) to PRIO.
- * Returns 0 on success, -1 on errors */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_setpriority)(__priority_which_t which, id_t who, int prio);
-/* Put the soft and hard limits for RESOURCE in *RLIMITS.
- * Returns 0 if successful, -1 if not (and sets errno) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_getrlimit64)(__rlimit_resource_t resource, struct rlimit64 *rlimits);
-/* Set the soft and hard limits for RESOURCE to *RLIMITS.
- * Only the super-user can increase hard limits.
- * Return 0 if successful, -1 if not (and sets errno) */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_setrlimit64)(__rlimit_resource_t resource, struct rlimit64 const *rlimits);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

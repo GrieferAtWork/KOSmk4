@@ -20,16 +20,6 @@
 #ifndef _COMPAT_BITS_OS_KOS_SIGSTACK_H
 #define _COMPAT_BITS_OS_KOS_SIGSTACK_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/kos/sigstack.h>
-#define compat_sigstack    sigstack
-#define compat_sigaltstack sigaltstack
-#ifdef __CC__
-__DECL_BEGIN
-typedef struct sigaltstack compat_stack_t;
-__DECL_END
-#endif /* __CC__ */
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/sigstack.h>
 
 #endif /* !_COMPAT_BITS_OS_KOS_SIGSTACK_H */

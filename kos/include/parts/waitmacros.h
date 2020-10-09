@@ -126,7 +126,7 @@ typedef int idtype_t;
 
 
 #ifdef __USE_MISC
-#include <bits/wait.h> /* `union wait' */
+#include <bits/os/wait.h> /* `union wait' */
 
 #if defined(__GNUC__) && !defined(__cplusplus)
 #define __WAIT_INT(status) \

@@ -22,7 +22,13 @@
 
 #include <compat/config.h>
 #ifdef __ARCH_HAVE_COMPAT
+#include <__stdinc.h>
+
+#if defined(__KOS__) || defined(__linux__)
 #include <compat/bits/os/kos/cmsghdr.h>
+#else /* ... */
+#include <compat/bits/os/generic/cmsghdr.h>
+#endif /* !... */
 #endif /* __ARCH_HAVE_COMPAT */
 
 #endif /* !_COMPAT_BITS_OS_CMSGHDR_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaac5186e */
+/* HASH CRC-32:0xb2a5f2ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,9 +38,8 @@
 #include <bits/os/cmsghdr.h>
 #include <bits/os/msghdr.h>
 #include <bits/os/timespec.h>
-#include <bits/sockaddr-struct.h>
-#include <bits/sockaddr.h>
-#include <bits/sockaddr_storage-struct.h>
+#include <bits/os/sockaddr.h>
+#include <bits/os/sockaddr_storage.h>
 #include <bits/types.h>
 #include <sys/uio.h>
 
@@ -811,6 +810,11 @@ struct linger {
 #define __size_t_defined 1
 typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
+
+#ifndef __sa_family_t_defined
+#define __sa_family_t_defined 1
+typedef __sa_family_t sa_family_t; /* One of `AF_*' */
+#endif /* !__sa_family_t_defined */
 
 #ifndef __socklen_t_defined
 #define __socklen_t_defined 1

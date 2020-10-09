@@ -20,11 +20,6 @@
 #ifndef _COMPAT_BITS_OS_KOS_UTIMBUF_H
 #define _COMPAT_BITS_OS_KOS_UTIMBUF_H 1
 
-#include <compat/config.h>
-#ifdef __ARCH_HAVE_COMPAT
-#include <bits/os/kos/utimbuf.h>
-#define compat_utimbuf32 __utimbuf32
-#define compat_utimbuf64 __utimbuf64
-#endif /* __ARCH_HAVE_COMPAT */
+#include <compat/bits/os/generic/utimbuf.h>
 
 #endif /* !_COMPAT_BITS_OS_KOS_UTIMBUF_H */

@@ -764,7 +764,7 @@ for (local name: classes.keys.sorted()) {
 [[impl_include("<hybrid/host.h>")]]
 [[impl_include("<asm/os/siginfo.h>")]]
 [[impl_include("<asm/os/signal.h>")]]
-[[impl_include("<bits/siginfo-struct.h>")]]
+[[impl_include("<bits/os/siginfo.h>")]]
 [[impl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<kos/except/codes.h>")]]
 [[impl_include("<kos/kernel/handle.h>")]]

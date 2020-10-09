@@ -171,6 +171,12 @@ __DECL_BEGIN
 #ifndef __SIZEOF_PHYSADDR_T__
 #define __SIZEOF_PHYSADDR_T__       __SIZEOF_POINTER__
 #endif /* !__SIZEOF_PHYSADDR_T__ */
+#ifndef __SIZEOF_PHYSPAGE_T__
+#define __SIZEOF_PHYSPAGE_T__       __SIZEOF_POINTER__
+#endif /* !__SIZEOF_PHYSPAGE_T__ */
+#ifndef __SIZEOF_SA_FAMILY_T__
+#define __SIZEOF_SA_FAMILY_T__      2
+#endif /* !__SIZEOF_SA_FAMILY_T__ */
 
 
 #ifdef __CC__
@@ -391,6 +397,7 @@ typedef __bitwise__ __UINT64_TYPE__ __be64;
 #define __fsword_t        __CRT_PRIVATE_SLNG(__SIZEOF_FSWORD_T__)
 #define __physaddr_t      __CRT_PRIVATE_ULNG(__SIZEOF_PHYSADDR_T__)
 #define __physpage_t      __CRT_PRIVATE_ULNG(__SIZEOF_PHYSPAGE_T__)
+#define __sa_family_t     __CRT_PRIVATE_UINT(__SIZEOF_SA_FAMILY_T__)
 #define _TIME32_T_DEFINED 1
 #define __time32_t        __CRT_PRIVATE_SINT(__SIZEOF_TIME32_T__)
 #define _TIME64_T_DEFINED 1

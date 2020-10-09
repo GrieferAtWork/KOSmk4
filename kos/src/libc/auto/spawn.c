@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5515bdc */
+/* HASH CRC-32:0xf3b7ad31 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-#include <bits/sigaction-struct.h>
+#include <bits/os/sigaction.h>
 #include <libc/errno.h>
 #include <asm/os/vfork.h>
 #include <asm/os/oflags.h>

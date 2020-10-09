@@ -43,7 +43,8 @@
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <compat/bits/siginfo-convert.h>
+#include <compat/bits/os/siginfo-convert.h>
+#include <compat/bits/os/siginfo.h>
 #include <compat/signal.h>
 #endif /* __ARCH_HAVE_COMPAT */
 

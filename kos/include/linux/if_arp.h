@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-#include <bits/sockaddr-struct.h>
+#include <bits/os/sockaddr.h>
 #include <bits/types.h>
 #include <net/bits/types.h>
 
