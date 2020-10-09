@@ -17,22 +17,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_POSIX_LIM1_H
-#define _BITS_POSIX_LIM1_H 1
+#ifndef _BITS_SIGSET_H
+#define _BITS_SIGSET_H 1
 
 /* NOTE: This file must _always_ be kept for GLibc compatibility! */
 
-#include "../features.h"
+#include <__stdinc.h>
 
-#ifndef _POSIX_ARG_MAX
-#undef _LIMITS_H
-#ifdef __USE_POSIX
-#include "../limits.h"
-#else /* __USE_POSIX */
-#define __USE_POSIX 1
-#include "../limits.h"
-#undef __USE_POSIX
-#endif /* !... */
-#endif /* !_POSIX_ARG_MAX */
+#ifndef _SIGSET_H_types
+#define _SIGSET_H_types 1
+#ifdef __CC__
+#include <hybrid/typecore.h>
 
-#endif /* !_BITS_POSIX_LIM1_H */
+#include <bits/os/sigset.h>
+
+__DECL_BEGIN
+
+typedef __SIG_ATOMIC_TYPE__ __sig_atomic_t;
+
+#ifndef __SIGSET_NWORDS
+#define __SIGSET_NWORDS (__SIZEOF_SIGSET_T__ / __SIZEOF_POINTER__)
+#endif /* !__SIGSET_NWORDS */
+#define _SIGSET_NWORDS __SIGSET_NWORDS
+typedef struct __sigset_struct __sigset_t;
+
+__DECL_END
+#endif /* __CC__ */
+#endif /* !_SIGSET_H_types */
+
+/* NOTE: The Glibc counterpart of this file also declares some function,
+ *       but only does so when <signal.h> was already included. However
+ *       the function that it declares already get defined by <signal.h>
+ *       on KOS, so no need to define anything else here :) */
+
+#endif /* !_BITS_SIGSET_H */

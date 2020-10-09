@@ -20,6 +20,8 @@
 #ifndef _BITS_TYPES_H
 #define _BITS_TYPES_H 1
 
+/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+
 #include <__crt.h>
 #include <__stdinc.h>
 

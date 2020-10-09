@@ -20,7 +20,19 @@
 #ifndef _BITS_POSIX_LIM2_H
 #define _BITS_POSIX_LIM2_H 1
 
- /* NOTE: This file must _always_ be kept for GLibc compatibility! */
-#include "posix_lim1.h"
+/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+
+#include "../features.h"
+
+#ifndef _POSIX2_LINE_MAX
+#undef _LIMITS_H
+#ifdef __USE_POSIX2
+#include "../limits.h"
+#else /* __USE_POSIX2 */
+#define __USE_POSIX2 1
+#include "../limits.h"
+#undef __USE_POSIX2
+#endif /* !... */
+#endif /* !_POSIX2_LINE_MAX */
 
 #endif /* !_BITS_POSIX_LIM2_H */

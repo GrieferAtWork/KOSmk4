@@ -20,7 +20,6 @@
 #ifndef _LIMITS_H
 #define _LIMITS_H 1
 
-#include <__crt.h>
 #include <__stdinc.h>
 #include <features.h>
 
@@ -30,6 +29,8 @@
 #include <asm/os/limits.h>
 
 /* You should really just always using 'MB_CUR_MAX'... */
+#ifndef MB_LEN_MAX
+#include <__crt.h>
 #ifdef __CRT_DOS_PRIMARY
 #define MB_LEN_MAX 5
 #elif defined(__CRT_CYG_PRIMARY)
@@ -38,6 +39,7 @@
 #else /* ... */
 #define MB_LEN_MAX 16
 #endif /* !... */
+#endif /* !MB_LEN_MAX */
 
 #define CHAR_BIT    __CHAR_BIT__
 #define SCHAR_MIN   __SCHAR_MIN__
@@ -88,12 +90,12 @@
 
 /* """Extension""" Define something that belongs in <stdint.h> */
 #ifndef SIZE_MAX
-#define SIZE_MAX    __SIZE_MAX__
+#define SIZE_MAX __SIZE_MAX__
 #endif  /* SIZE_MAX */
 
 #ifdef __USE_DOS_SLIB
 #ifndef RSIZE_MAX
-#define RSIZE_MAX  (__SIZE_MAX__ >> 1)
+#define RSIZE_MAX __SSIZE_MAX__
 #endif /* RSIZE_MAX */
 #endif /* __USE_DOS_SLIB */
 

@@ -408,6 +408,7 @@
  * here, since KOS doesn't have <bits/wordsize.h> (any more) */
 
 /* __WORDSIZE = __SIZEOF_POINTER__ * __CHAR_BIT__ */
+#ifndef __WORDSIZE
 #if __SIZEOF_POINTER__ == 1
 #define __WORDSIZE 8
 #elif __SIZEOF_POINTER__ == 2
@@ -419,6 +420,18 @@
 #else /* __SIZEOF_POINTER__ == ... */
 #define __WORDSIZE (__SIZEOF_POINTER__ * 8)
 #endif /* __SIZEOF_POINTER__ != ... */
+#endif /* !__WORDSIZE */
+
+#ifndef __SIZEOF_SYSCALL_LONG_T__
+#define __SIZEOF_SYSCALL_LONG_T__   __SIZEOF_REGISTER__
+#endif /* !__SIZEOF_SYSCALL_LONG_T__ */
+
+#ifndef __SIZEOF_TIME32_T__
+#define __SIZEOF_TIME32_T__         4
+#endif /* !__SIZEOF_TIME32_T__ */
+#ifndef __SIZEOF_TIME64_T__
+#define __SIZEOF_TIME64_T__         8
+#endif /* !__SIZEOF_TIME64_T__ */
 
 /* __SYSCALL_WORDSIZE = __SIZEOF_SYSCALL_LONG_T__ * __CHAR_BIT__ */
 #if __SIZEOF_SYSCALL_LONG_T__ == 1

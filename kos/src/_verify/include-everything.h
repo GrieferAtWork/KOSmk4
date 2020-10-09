@@ -386,8 +386,11 @@ incdir("", "../../include");
 #include <bits/posix_lim1.h>
 #include <bits/posix_lim2.h>
 #include <bits/posix_opt.h>
+#include <bits/pthreadtypes.h>
+#include <bits/sigset.h>
 #include <bits/sockaddr.h>
 #include <bits/syscalls.h>
+#include <bits/timex.h>
 #include <bits/types/FILE.h>
 #include <bits/types/__FILE.h>
 #include <bits/types/__fpos64_t.h>
@@ -420,6 +423,9 @@ incdir("", "../../include");
 #include <bits/types/wint_t.h>
 #include <bits/types.h>
 #include <bits/typesizes.h>
+#include <bits/wchar.h>
+#include <bits/wordsize.h>
+#include <bits/xopen_lim.h>
 #include <bitstring.h>
 #include <bsd/bitstring.h>
 #include <bsd/err.h>

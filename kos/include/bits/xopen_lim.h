@@ -17,22 +17,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_POSIX_LIM1_H
-#define _BITS_POSIX_LIM1_H 1
+#ifndef _BITS_XOPEN_LIM_H
+#define _BITS_XOPEN_LIM_H 1
 
 /* NOTE: This file must _always_ be kept for GLibc compatibility! */
 
 #include "../features.h"
 
-#ifndef _POSIX_ARG_MAX
+#ifndef _XOPEN_IOV_MAX
 #undef _LIMITS_H
-#ifdef __USE_POSIX
+#ifdef __USE_XOPEN
 #include "../limits.h"
-#else /* __USE_POSIX */
-#define __USE_POSIX 1
+#else /* __USE_XOPEN */
+#define __USE_XOPEN 1
 #include "../limits.h"
-#undef __USE_POSIX
+#undef __USE_XOPEN
 #endif /* !... */
-#endif /* !_POSIX_ARG_MAX */
+#endif /* !_XOPEN_IOV_MAX */
 
-#endif /* !_BITS_POSIX_LIM1_H */
+#endif /* !_BITS_XOPEN_LIM_H */

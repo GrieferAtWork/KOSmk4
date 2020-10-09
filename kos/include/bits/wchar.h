@@ -17,22 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_POSIX_LIM1_H
-#define _BITS_POSIX_LIM1_H 1
+#ifndef _BITS_WCHAR_H
+#define _BITS_WCHAR_H 1
 
 /* NOTE: This file must _always_ be kept for GLibc compatibility! */
 
-#include "../features.h"
+#include <__stdinc.h>
 
-#ifndef _POSIX_ARG_MAX
-#undef _LIMITS_H
-#ifdef __USE_POSIX
-#include "../limits.h"
-#else /* __USE_POSIX */
-#define __USE_POSIX 1
-#include "../limits.h"
-#undef __USE_POSIX
-#endif /* !... */
-#endif /* !_POSIX_ARG_MAX */
+#include <hybrid/limitcore.h> /* __WCHAR_MIN__, __WCHAR_MAX__ */
 
-#endif /* !_BITS_POSIX_LIM1_H */
+#define __WCHAR_MAX __WCHAR_MAX__
+#define __WCHAR_MIN __WCHAR_MIN__
+
+#endif /* !_BITS_WCHAR_H */
