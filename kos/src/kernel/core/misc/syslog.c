@@ -593,7 +593,11 @@ set_timestamp_and_write_data:
 	dst = self->sp_msg + offset;
 	for (;;) {
 		char ch = *data++;
-		if (ch == '\n') {
+		switch (ch) {
+
+		case 0x0a: /* LF ('\n') */
+		case 0x0b: /* VT (Vertical tab) */
+		case 0x0c: /* FF (Form-feed) */
 do_handle_linefeed:
 			/* Commit the current line. */
 			*dst++ = '\n';
@@ -605,9 +609,11 @@ do_handle_linefeed:
 			if (--count != 0)
 				goto set_timestamp_and_write_data;
 			goto done;
-		} else if (ch == '\r') {
+
+		case 0x0d: /* CR ('\r') */
 			/* Truncate already written data. */
 			if (--count != 0) {
+				/* Special case: '\r\n' is treated the same as '\n' */
 				if (*data == '\n') {
 					++data;
 					goto do_handle_linefeed;
@@ -621,13 +627,54 @@ do_handle_linefeed:
 			self->sp_len = 0;
 			COMPILER_WRITE_BARRIER();
 			offset = 0;
+			goto done_setlen;
+
+		case 0x08: /* BS */
+			/* Delete the last-written character. */
+			if (dst > self->sp_msg)
+				--dst;
+			break;
+
+			/* Ignore these control-characters. */
+		case 0x00: /* NUL */
+		case 0x05: /* ENQ */
+		case 0x06: /* ACK */
+		case 0x07: /* BEL */
+		case 0x0e: /* SO */
+		case 0x0f: /* SI */
+		case 0x11: /* DC1 */
+		case 0x12: /* DC2 */
+		case 0x13: /* DC3 */
+		case 0x14: /* DC4 */
+		case 0x15: /* NAK */
+		case 0x16: /* SYN */
+		case 0x17: /* ETB */
+		case 0x18: /* CAN */
+		case 0x19: /* EM */
+		case 0x1a: /* SUB */
+		case 0x1b: /* ESC */
+			break;
+
+#if 0 /* These control characters are allowed, and may be
+       * used for custom syslog packet encapsulations */
+		case 0x01: /* SOH */
+		case 0x02: /* STX */
+		case 0x03: /* ETX */
+		case 0x04: /* EOT */
+		case 0x1c: /* FS */
+		case 0x1d: /* GS */
+		case 0x1e: /* RS */
+		case 0x1f: /* US */
+#endif
+		default:
+			/* Simply append any other character. */
+			*dst++ = ch;
 			break;
 		}
-		/* Append character. */
-		*dst++ = ch;
 		if (!--count)
 			break;
 	}
+done_setlen:
 	self->sp_len = (unsigned int)(dst - self->sp_msg);
 done:
 	return result;
@@ -697,6 +744,12 @@ syslog_printer(void *level,
 		                     (unsigned int)(uintptr_t)level);
 	} EXCEPT {
 		/* Unlock the buffer. */
+		/* TODO: Currently, we can get here when `data' contains lazily initialized
+		 *       memory mappings that originate from disk (which can easily happen
+		 *       when `data' is a static (.rodata-style) string that user-space wants
+		 *       to print to the system log)
+		 * Fix this by changing the syslog buffer lock such that we don't have to
+		 * disable preemption in order to acquire it! */
 		SYSLOG_BUFFER_BREAK(buffer);
 		RETHROW();
 	}
