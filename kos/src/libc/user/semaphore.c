@@ -161,7 +161,7 @@ NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
 	value = va_arg(args, unsigned int);
 	va_end(args);
 	name_length = strlen(name);
-	if unlikely(!name_length) {
+	if unlikely(!name_length || (oflags & (O_CREAT | O_EXCL)) != 0) {
 		libc_seterrno(EINVAL);
 		goto err;
 	}
@@ -180,10 +180,10 @@ again_open_or_create:
 		 * To prevent the semaphore from becoming visible to other processes before
 		 * then, we create it under a different name, which we then refactor to the
 		 * proper name once it's been initialized. */
-		fd = open(filename, (oflags & ~(O_CREAT | O_EXCL)) | O_CLOEXEC | O_CLOFORK, mode);
+		fd = open(filename, O_RDWR | O_CREAT | O_CLOEXEC | O_CLOFORK, mode);
 		if (fd != -1) {
 			/* Semaphore already exists. */
-			if (oflags & O_EXCL) {
+			if unlikely(oflags & O_EXCL) {
 				sys_close(fd);
 				libc_seterrno(EEXIST);
 				goto err_filename;
@@ -202,7 +202,7 @@ again_open_or_create:
 			memcpy(tempname, filename, namesize);
 			tempname[NAMED_PREFIX_OFFSETOF_SEM] = 't';
 again_create_temp_file:
-			fd = open(tempname, oflags | O_EXCL | O_CLOEXEC | O_CLOFORK, mode);
+			fd = open(tempname, O_RDWR | O_CREAT | O_EXCL | O_CLOEXEC | O_CLOFORK, mode);
 			if unlikely(fd == -1) {
 				struct timespec ts;
 				if unlikely(libc_geterrno() != EEXIST) {
@@ -221,7 +221,7 @@ err_tempname_filename:
 				ts.tv_sec  = 0;
 				ts.tv_nsec = 25000000; /* 1/40th of a second. */
 				nanosleep(&ts, NULL);
-				fd = open(tempname, oflags | O_EXCL | O_CLOEXEC | O_CLOFORK, mode);
+				fd = open(tempname, O_RDWR | O_CREAT | O_EXCL | O_CLOEXEC | O_CLOFORK, mode);
 				if (fd == -1) {
 					if unlikely(libc_geterrno() != EEXIST)
 						goto err_tempname_filename;
@@ -275,7 +275,7 @@ err_tempname_filename:
 			return (sem_t *)result;
 		}
 	}
-	fd = open(filename, oflags | O_CLOEXEC | O_CLOFORK, mode);
+	fd = open(filename, O_RDWR | oflags | O_CLOEXEC | O_CLOFORK, mode);
 	if unlikely(fd < 0)
 		goto err_filename;
 	freea(filename);
