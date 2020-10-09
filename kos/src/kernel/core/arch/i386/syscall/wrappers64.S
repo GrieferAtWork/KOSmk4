@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17842c64 */
+/* HASH CRC-32:0x6716b095 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4192,7 +4192,7 @@ END(__x86_asm64_syscall_rt_sigtimedwait)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
 .section .text.x86.asm64_syscall.rt_sigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_sigqueueinfo)
 	.cfi_startproc simple
@@ -5629,9 +5629,9 @@ END(__x86_asm64_syscall_init_module)
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -7399,7 +7399,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl)
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_ctl)
 
-/* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+/* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 .section .text.x86.asm64_syscall.tgkill
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_tgkill)
 	.cfi_startproc simple
@@ -9391,7 +9391,7 @@ END(__x86_asm64_syscall_pwritev)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
 .section .text.x86.asm64_syscall.rt_tgsigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_rt_tgsigqueueinfo)
 	.cfi_startproc simple
@@ -17182,9 +17182,9 @@ END(__x86_asm32_int80_init_module)
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -18803,7 +18803,7 @@ END(__x86_asm32_int80_rt_sigtimedwait)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_int80.rt_sigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_sigqueueinfo)
 	.cfi_startproc simple
@@ -21746,7 +21746,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs64)
 	.cfi_endproc
 END(__x86_asm32_int80_fstatfs64)
 
-/* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+/* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 .section .text.x86.asm32_syscall_int80.tgkill
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_tgkill)
 	.cfi_startproc simple
@@ -23945,7 +23945,7 @@ END(__x86_asm32_int80_pwritev)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_int80.rt_tgsigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_rt_tgsigqueueinfo)
 	.cfi_startproc simple
@@ -30671,9 +30671,9 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_init_module, __x86_asm32_int80_ini
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -30995,7 +30995,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigtimedwait, __x86_asm32_int80
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_sigqueueinfo, __x86_asm32_int80_rt_sigqueueinfo)
 
 /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
@@ -31568,7 +31568,7 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_statfs64, __x86_asm32_int80_statfs
 /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fstatfs64, __x86_asm32_int80_fstatfs64)
 
-/* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+/* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_tgkill, __x86_asm32_int80_tgkill)
 
 /* @param: times:    When NULL, set the current time
@@ -32230,7 +32230,7 @@ END(__x86_asm32_sysenter_pwritev)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_rt_tgsigqueueinfo, __x86_asm32_int80_rt_tgsigqueueinfo)
 
 /* errno_t perf_event_open(int TODO_PROTOTYPE) */
@@ -35882,9 +35882,9 @@ END(__x86_asm32_sysrun32_init_module)
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -36443,7 +36443,7 @@ END(__x86_asm32_sysrun32_rt_sigtimedwait)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_sysrun32.rt_sigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_sigqueueinfo)
 	.cfi_startproc
@@ -37463,7 +37463,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fstatfs64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_fstatfs64)
 
-/* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+/* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 .section .text.x86.asm32_syscall_sysrun32.tgkill
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_tgkill)
 	.cfi_startproc
@@ -38293,7 +38293,7 @@ END(__x86_asm32_sysrun32_pwritev)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.x86.asm32_syscall_sysrun32.rt_tgsigqueueinfo
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_rt_tgsigqueueinfo)
 	.cfi_startproc

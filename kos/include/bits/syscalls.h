@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x196ac7d1 */
+/* HASH CRC-32:0xebd4231 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -237,9 +237,9 @@
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 #define SYS_delete_module          __NR_delete_module          /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -271,7 +271,7 @@
 #define SYS_restart_syscall        __NR_restart_syscall        /* errno_t restart_syscall(void) */
 #define SYS_kill                   __NR_kill                   /* errno_t kill(pid_t pid, signo_t signo) */
 #define SYS_tkill                  __NR_tkill                  /* errno_t tkill(pid_t tid, signo_t signo) */
-#define SYS_tgkill                 __NR_tgkill                 /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+#define SYS_tgkill                 __NR_tgkill                 /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 #define SYS_sigaltstack            __NR_sigaltstack            /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
 #define SYS_rt_sigsuspend          __NR_rt_sigsuspend          /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define SYS_rt_sigaction           __NR_rt_sigaction           /* errno_t rt_sigaction(signo_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
@@ -285,7 +285,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-#define SYS_rt_sigqueueinfo        __NR_rt_sigqueueinfo        /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfo_struct const *uinfo) */
+#define SYS_rt_sigqueueinfo        __NR_rt_sigqueueinfo        /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfo_struct const *uinfo) */
 #define SYS_rt_sigreturn           __NR_rt_sigreturn           /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define SYS_setpriority            __NR_setpriority            /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
@@ -550,7 +550,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-#define SYS_rt_tgsigqueueinfo      __NR_rt_tgsigqueueinfo      /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfo_struct const *uinfo) */
+#define SYS_rt_tgsigqueueinfo      __NR_rt_tgsigqueueinfo      /* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfo_struct const *uinfo) */
 #define SYS_perf_event_open        __NR_perf_event_open        /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* Accept incoming client (aka. peer) connection requests.
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')

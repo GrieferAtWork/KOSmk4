@@ -3066,7 +3066,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, signo_t, signo) {
 		target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
 		FINALLY_DECREF_UNLIKELY(target);
 		info.si_pid = taskpid_getpid_ind(mypid, get_pid_indirection(target));
-		if (!task_raisesignalthread(target, &info))
+		if (!task_raisesignalprocess(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
 	} else if (pid == 0) {
 		/* Kill all processes in the calling thread's process group. */
@@ -3090,7 +3090,7 @@ do_inherit_target_and_raise_processgroup:
 
 #ifdef __ARCH_WANT_SYSCALL_TGKILL
 DEFINE_SYSCALL3(errno_t, tgkill,
-                pid_t, tgid, pid_t, pid,
+                pid_t, pid, pid_t, tid,
                 signo_t, signo) {
 	REF struct task *target;
 	if unlikely(signo < 0 || signo >= NSIG)
@@ -3101,16 +3101,16 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID,
 		      pid);
-	if unlikely(tgid <= 0)
+	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TGID,
-		      tgid);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID,
+		      tid);
+	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Check if the given TGID matches the group of this thread. */
-	if (taskpid_getpid_s(task_getprocesspid_of(target)) != (upid_t)tgid) {
+	if (taskpid_getpid_s(task_getprocesspid_of(target)) != (upid_t)pid) {
 		/* Maybe not necessarily exited, but no need to create a new exception type for this... */
-		THROW(E_PROCESS_EXITED, tgid);
+		THROW(E_PROCESS_EXITED, pid);
 	}
 	/* Don't deliver signal `0'. - It's used to test access. */
 	if (signo != 0) {
@@ -3129,15 +3129,15 @@ DEFINE_SYSCALL3(errno_t, tgkill,
 #endif /* __ARCH_WANT_SYSCALL_TGKILL */
 
 #ifdef __ARCH_WANT_SYSCALL_TKILL
-DEFINE_SYSCALL2(errno_t, tkill, pid_t, pid, signo_t, signo) {
+DEFINE_SYSCALL2(errno_t, tkill, pid_t, tid, signo_t, signo) {
 	REF struct task *target;
 	if unlikely(signo < 0 || signo >= NSIG)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO, signo);
-	if unlikely(pid <= 0)
+	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
+	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't deliver signal `0'. - It's used to test access. */
 	if (signo != 0) {
@@ -3223,16 +3223,16 @@ siginfo_from_compat_user(siginfo_t *__restrict info, signo_t usigno,
 
 #ifdef __ARCH_WANT_SYSCALL_RT_SIGQUEUEINFO
 DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
-                pid_t, tgid, signo_t, signo,
+                pid_t, pid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
 	REF struct task *target;
 	siginfo_t info;
-	if unlikely(tgid <= 0) {
+	if unlikely(pid <= 0) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	}
 	siginfo_from_user(&info, signo, uinfo);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tgid);
+	target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
@@ -3250,17 +3250,17 @@ DEFINE_SYSCALL3(errno_t, rt_sigqueueinfo,
 
 #ifdef __ARCH_WANT_SYSCALL_RT_TGSIGQUEUEINFO
 DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
-                pid_t, tgid, pid_t, tid, signo_t, signo,
+                pid_t, pid, pid_t, tid, signo_t, signo,
                 USER UNCHECKED siginfo_t const *, uinfo) {
 	siginfo_t info;
 	REF struct task *target;
 	struct task *leader;
-	if unlikely(tgid <= 0)
+	if unlikely(pid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	siginfo_from_user(&info, signo, uinfo);
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
@@ -3271,8 +3271,8 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
 		      info.si_code);
 	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
-	if (task_gettid_of_s(leader) != (upid_t)tgid)
-		THROW(E_PROCESS_EXITED, tgid);
+	if (task_gettid_of_s(leader) != (upid_t)pid)
+		THROW(E_PROCESS_EXITED, pid);
 	if (signo != 0) {
 		if (!task_raisesignalthread(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));
@@ -3283,15 +3283,15 @@ DEFINE_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_SIGQUEUEINFO
 DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
-                       pid_t, tgid, signo_t, signo,
+                       pid_t, pid, signo_t, signo,
                        USER UNCHECKED compat_siginfo_t const *, uinfo) {
 	REF struct task *target;
 	siginfo_t info;
-	if unlikely(tgid <= 0)
+	if unlikely(pid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	siginfo_from_compat_user(&info, signo, uinfo);
-	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tgid);
+	target = pidns_lookup_task(THIS_PIDNS, (upid_t)pid);
 	FINALLY_DECREF_UNLIKELY(target);
 	/* Don't allow sending arbitrary signals to other processes. */
 	if ((info.si_code >= 0 || info.si_code == SI_TKILL) &&
@@ -3309,17 +3309,17 @@ DEFINE_COMPAT_SYSCALL3(errno_t, rt_sigqueueinfo,
 
 #ifdef __ARCH_WANT_COMPAT_SYSCALL_RT_TGSIGQUEUEINFO
 DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
-                       pid_t, tgid, pid_t, tid, signo_t, signo,
+                       pid_t, pid, pid_t, tid, signo_t, signo,
                        USER UNCHECKED compat_siginfo_t const *, uinfo) {
 	siginfo_t info;
 	REF struct task *target;
 	struct task *leader;
-	if unlikely(tgid <= 0)
+	if unlikely(pid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tgid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, pid);
 	if unlikely(tid <= 0)
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_RAISE_PID, tid);
+		      E_INVALID_ARGUMENT_CONTEXT_RAISE_TID, tid);
 	siginfo_from_compat_user(&info, signo, uinfo);
 	target = pidns_lookup_task(THIS_PIDNS, (upid_t)tid);
 	FINALLY_DECREF_UNLIKELY(target);
@@ -3330,8 +3330,8 @@ DEFINE_COMPAT_SYSCALL4(errno_t, rt_tgsigqueueinfo,
 		      E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,
 		      info.si_code);
 	/* Check if the thread-group ID matches that of the leader of the requested thread-group. */
-	if (task_gettid_of_s(leader) != (upid_t)tgid)
-		THROW(E_PROCESS_EXITED, tgid);
+	if (task_gettid_of_s(leader) != (upid_t)pid)
+		THROW(E_PROCESS_EXITED, pid);
 	if (signo != 0) {
 		if (!task_raisesignalthread(target, &info))
 			THROW(E_PROCESS_EXITED, task_gettid_of_s(target));

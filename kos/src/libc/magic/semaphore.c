@@ -28,7 +28,7 @@
 %{
 #include <features.h>
 
-#include <asm/crt/semaphore.h> /* __ARCH_HAVE_INTERPROCESS_SEMAPHORES, __ARCH_HAVE_NON_UNIQUE_SEM_OPEN */
+#include <asm/crt/semaphore.h>  /* __ARCH_HAVE_INTERPROCESS_SEMAPHORES, __ARCH_HAVE_NON_UNIQUE_SEM_OPEN */
 #include <bits/crt/semaphore.h> /* __sem_t */
 #include <bits/types.h>
 #ifdef __USE_XOPEN2K

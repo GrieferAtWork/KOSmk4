@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b69b6b0 */
+/* HASH CRC-32:0xcc6aadc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,15 +27,29 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sigtimedwait32 from signal */
 #ifndef __local___localdep_sigtimedwait32_defined
 #define __local___localdep_sigtimedwait32_defined 1
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__timeout),sigtimedwait,(__set,__info,__timeout))
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__rel_timeout),sigtimedwait,(__set,__info,__rel_timeout))
 #endif /* !__local___localdep_sigtimedwait32_defined */
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
 __LOCAL_LIBC(sigtimedwait64) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__timeout) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait64))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__rel_timeout) {
 	struct __timespec32 __tmv;
-	if (!__timeout)
+	if (!__rel_timeout)
 		return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
-	__tmv.tv_sec  = (__time32_t)__timeout->tv_sec;
-	__tmv.tv_nsec = __timeout->tv_nsec;
+	__tmv.tv_sec  = (__time32_t)__rel_timeout->tv_sec;
+	__tmv.tv_nsec = __rel_timeout->tv_nsec;
 	return __localdep_sigtimedwait32(__set, __info, __NULLPTR);
 }
 __NAMESPACE_LOCAL_END

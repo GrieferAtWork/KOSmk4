@@ -32,69 +32,7 @@
 
 #include <__stdinc.h>
 
-#include <asm/os/sigset.h> /* __SIZEOF_SIGSET_T__ */
-#include <hybrid/typecore.h>
-
-#ifndef __ALIGNOF_SIGSET_T__
-#define __ALIGNOF_SIGSET_T__ __SIZEOF_POINTER__
-#endif /* !__ALIGNOF_SIGSET_T__ */
-
-#define __SIGSET_NWORDS (__SIZEOF_SIGSET_T__ / __SIZEOF_POINTER__)
-
-#ifdef __CC__
-#if __ALIGNOF_SIGSET_T__ != __SIZEOF_POINTER__
-__ATTR_ALIGNED(__ALIGNOF_SIGSET_T__)
-#endif /* __ALIGNOF_SIGSET_T__ != __SIZEOF_POINTER__ */
-struct __sigset_struct {
-	__ULONGPTR_TYPE__ __val[__SIGSET_NWORDS];
-};
-
-#if __SIGSET_NWORDS == 1
-#define __SIGSET_INIT(f) \
-	{                    \
-		{ f }            \
-	}
-#elif __SIGSET_NWORDS == 2
-#define __SIGSET_INIT(f) \
-	{                    \
-		{ f, f }         \
-	}
-#elif __SIGSET_NWORDS == 4
-#define __SIGSET_INIT(f) \
-	{                    \
-		{ f, f, f, f }   \
-	}
-#elif __SIGSET_NWORDS == 8
-#define __SIGSET_INIT(f)           \
-	{                              \
-		{ f, f, f, f, f, f, f, f } \
-	}
-#elif __SIGSET_NWORDS == 16
-#define __SIGSET_INIT(f)                                   \
-	{                                                      \
-		{ f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f } \
-	}
-#elif __SIGSET_NWORDS == 32
-#define __SIGSET_INIT(f)                                   \
-	{                                                      \
-		{ f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f,  \
-		  f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f } \
-	}
-#elif __SIGSET_NWORDS == 64
-#define __SIGSET_INIT(f)                                   \
-	{                                                      \
-		{ f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f,  \
-		  f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f,  \
-		  f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f,  \
-		  f, f, f, f, f, f, f, f, f, f, f, f, f, f, f, f } \
-	}
-#else /* __SIGSET_NWORDS == ... */
-#define __SIGSET_INIT(f)   { { [0 ... __SIGSET_NWORDS - 1] = f } }
-#endif /* __SIGSET_NWORDS != ... */
-#endif /* __CC__ */
-
-/* Return the mask or index for a specific signal `sig' within some sigset. */
-#define __sigset_mask(sig) ((__CCAST(__ULONGPTR_TYPE__) 1) << (((sig)-1) % (8 * __SIZEOF_POINTER__)))
-#define __sigset_word(sig) (__CCAST(__ULONGPTR_TYPE__)(((sig)-1) / (8 * __SIZEOF_POINTER__)))
+/**/
+#include <bits/os/generic/sigset.h>
 
 #endif /* !_BITS_OS_SIGSET_H */

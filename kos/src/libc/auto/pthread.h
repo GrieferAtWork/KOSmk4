@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0e7fcaa */
+/* HASH CRC-32:0x10933222 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -573,7 +573,7 @@ INTDEF WUNUSED void *NOTHROW_NCX(LIBDCALL libd_pthread_getspecific)(pthread_key_
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd_pthread_setspecific)(pthread_key_t key, void const *pointer);
 /* Get ID of CPU-time clock for thread THREAD_ID
  * @return: EOK: Success */
-INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getcpuclockid)(pthread_t pthread_id, clockid_t *clock_id);
+INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_getcpuclockid)(pthread_t pthread, clockid_t *clock_id);
 /* Install handlers to be called when a new process is created with FORK.
  * The PREPARE handler is called in the parent process just before performing
  * FORK. The PARENT handler is called in the parent process just after FORK.

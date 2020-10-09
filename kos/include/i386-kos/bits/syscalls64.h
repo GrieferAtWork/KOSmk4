@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50886143 */
+/* HASH CRC-32:0x828daf67 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -422,7 +422,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-#define SYS_rt_sigqueueinfo          __NR_rt_sigqueueinfo          /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
+#define SYS_rt_sigqueueinfo          __NR_rt_sigqueueinfo          /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
 #define SYS_rt_sigsuspend            __NR_rt_sigsuspend            /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define SYS_sigaltstack              __NR_sigaltstack              /* errno_t sigaltstack(struct __sigaltstackx64 const *ss, struct __sigaltstackx64 *oss) */
 /* @param: times: When NULL, set the current time */
@@ -495,9 +495,9 @@
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 #define SYS_delete_module            __NR_delete_module            /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -569,7 +569,7 @@
 #define SYS_epoll_wait               __NR_epoll_wait               /* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
 /* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
 #define SYS_epoll_ctl                __NR_epoll_ctl                /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
-#define SYS_tgkill                   __NR_tgkill                   /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+#define SYS_tgkill                   __NR_tgkill                   /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 /* @param: times:    When NULL, set the current time
  * @param: times[0]: New access time
  * @param: times[1]: New last-modified time */
@@ -708,7 +708,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-#define SYS_rt_tgsigqueueinfo        __NR_rt_tgsigqueueinfo        /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
+#define SYS_rt_tgsigqueueinfo        __NR_rt_tgsigqueueinfo        /* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox64_struct const *uinfo) */
 #define SYS_perf_event_open          __NR_perf_event_open          /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.

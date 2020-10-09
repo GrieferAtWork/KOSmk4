@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x988bb7f3 */
+/* HASH CRC-32:0xdd73e6a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -252,9 +252,9 @@
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 #define __NR32_delete_module                0x81                   /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -343,7 +343,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-#define __NR32_rt_sigqueueinfo              0xb2                   /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+#define __NR32_rt_sigqueueinfo              0xb2                   /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 #define __NR32_rt_sigsuspend                0xb3                   /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define __NR32_pread64                      0xb4                   /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define __NR32_pwrite64                     0xb5                   /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
@@ -468,7 +468,7 @@
 #define __NR32_clock_nanosleep              0x10b                  /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32 const *requested_time, struct timespecx32 *remaining) */
 #define __NR32_statfs64                     0x10c                  /* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
 #define __NR32_fstatfs64                    0x10d                  /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
-#define __NR32_tgkill                       0x10e                  /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+#define __NR32_tgkill                       0x10e                  /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 /* @param: times:    When NULL, set the current time
  * @param: times[0]: New access time
  * @param: times[1]: New last-modified time */
@@ -595,7 +595,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-#define __NR32_rt_tgsigqueueinfo            0x14f                  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+#define __NR32_rt_tgsigqueueinfo            0x14f                  /* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 #define __NR32_perf_event_open              0x150                  /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* Same as `recvmsg(2)', but may be used to receive many
  * messages (datagrams) with a single system call.

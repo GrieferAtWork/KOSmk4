@@ -2031,7 +2031,7 @@ $errno_t pthread_setspecific(pthread_key_t key, void const *pointer);
 @@Get ID of CPU-time clock for thread THREAD_ID
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_getcpuclockid(pthread_t pthread_id, [[nonnull]] $clockid_t *clock_id);
+$errno_t pthread_getcpuclockid(pthread_t pthread, [[nonnull]] $clockid_t *clock_id);
 %#endif /* __USE_XOPEN2K */
 
 %

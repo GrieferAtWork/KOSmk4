@@ -127,7 +127,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_SIGACTION_ACT_FLAGS,                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to sigaction() or rt_sigaction() isn't a set of `SA_*' */
 	E_INVALID_ARGUMENT_CONTEXT_SIGPROCMASK_HOW,                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `how' passed to `sigprocmask()' (must be one of { SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK }) */
 	E_INVALID_ARGUMENT_CONTEXT_RAISE_PID,                          /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_pid] Bad pid value to one of the signal functions */
-	E_INVALID_ARGUMENT_CONTEXT_RAISE_TGID,                         /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_tgid] Bad tgid value to one of the signal functions */
+	E_INVALID_ARGUMENT_CONTEXT_RAISE_TID,                          /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_tid] Bad tid value to one of the signal functions */
 	E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE,              /* E_INVALID_ARGUMENT_BAD_VALUE: [int given_code] Attempted to raise a signal using `rt_sigqueueinfo()' or `rt_tgsigqueueinfo()' with a bad `si_code' */
 	E_INVALID_ARGUMENT_CONTEXT_MKTTY_FLAGS,                        /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [syscall_ulong_t reserved] The `reserved' argument passed to `mktty()' is non-zero */
 	E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME,                         /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t namelen, max_namelen] The `name' argument passed to `mktty()' is too long */
@@ -294,7 +294,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_SIGACTION_ACT_FLAGS                E_INVALID_ARGUMENT_CONTEXT_SIGACTION_ACT_FLAGS                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to sigaction() or rt_sigaction() isn't a set of `SA_*' */
 #define E_INVALID_ARGUMENT_CONTEXT_SIGPROCMASK_HOW                    E_INVALID_ARGUMENT_CONTEXT_SIGPROCMASK_HOW                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `how' passed to `sigprocmask()' (must be one of { SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK }) */
 #define E_INVALID_ARGUMENT_CONTEXT_RAISE_PID                          E_INVALID_ARGUMENT_CONTEXT_RAISE_PID                          /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_pid] Bad pid value to one of the signal functions */
-#define E_INVALID_ARGUMENT_CONTEXT_RAISE_TGID                         E_INVALID_ARGUMENT_CONTEXT_RAISE_TGID                         /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_tgid] Bad tgid value to one of the signal functions */
+#define E_INVALID_ARGUMENT_CONTEXT_RAISE_TID                          E_INVALID_ARGUMENT_CONTEXT_RAISE_TID                          /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_tid] Bad tid value to one of the signal functions */
 #define E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE              E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE              /* E_INVALID_ARGUMENT_BAD_VALUE: [int given_code] Attempted to raise a signal using `rt_sigqueueinfo()' or `rt_tgsigqueueinfo()' with a bad `si_code' */
 #define E_INVALID_ARGUMENT_CONTEXT_MKTTY_FLAGS                        E_INVALID_ARGUMENT_CONTEXT_MKTTY_FLAGS                        /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [syscall_ulong_t reserved] The `reserved' argument passed to `mktty()' is non-zero */
 #define E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME                         E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME                         /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t namelen, max_namelen] The `name' argument passed to `mktty()' is too long */
@@ -458,7 +458,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_SIGACTION_ACT_FLAGS                86  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to sigaction() or rt_sigaction() isn't a set of `SA_*' */
 #define E_INVALID_ARGUMENT_CONTEXT_SIGPROCMASK_HOW                    87  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `how' passed to `sigprocmask()' (must be one of { SIG_BLOCK, SIG_UNBLOCK, SIG_SETMASK }) */
 #define E_INVALID_ARGUMENT_CONTEXT_RAISE_PID                          88  /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_pid] Bad pid value to one of the signal functions */
-#define E_INVALID_ARGUMENT_CONTEXT_RAISE_TGID                         89  /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_tgid] Bad tgid value to one of the signal functions */
+#define E_INVALID_ARGUMENT_CONTEXT_RAISE_TID                          89  /* E_INVALID_ARGUMENT_BAD_VALUE: [pid_t given_tid] Bad tid value to one of the signal functions */
 #define E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE              90  /* E_INVALID_ARGUMENT_BAD_VALUE: [int given_code] Attempted to raise a signal using `rt_sigqueueinfo()' or `rt_tgsigqueueinfo()' with a bad `si_code' */
 #define E_INVALID_ARGUMENT_CONTEXT_MKTTY_FLAGS                        91  /* E_INVALID_ARGUMENT_RESERVED_ARGUMENT: [syscall_ulong_t reserved] The `reserved' argument passed to `mktty()' is non-zero */
 #define E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME                         92  /* E_INVALID_ARGUMENT_BAD_VALUE: [size_t namelen, max_namelen] The `name' argument passed to `mktty()' is too long */

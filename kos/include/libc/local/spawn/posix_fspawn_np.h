@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a7520e6 */
+/* HASH CRC-32:0xe3e0a54f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -440,11 +440,25 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_setpgid,(__pid_t __pid, __pid_t __pgid
 __NAMESPACE_LOCAL_END
 struct sigaction;
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigaction(2)
+ * Get/Set the action that shall be performed when a
+ * signal `signo' must be handled by the calling process.
+ * This function will modifiy the caller's kernel-space signal handler descriptor,
+ * who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaction,(__signo_t __signo, struct sigaction const *__act, struct sigaction *__oact),sigaction,(__signo,__act,__oact))
 #elif defined(__CRT_HAVE___sigaction)
 __NAMESPACE_LOCAL_END
 struct sigaction;
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigaction(2)
+ * Get/Set the action that shall be performed when a
+ * signal `signo' must be handled by the calling process.
+ * This function will modifiy the caller's kernel-space signal handler descriptor,
+ * who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaction,(__signo_t __signo, struct sigaction const *__act, struct sigaction *__oact),__sigaction,(__signo,__act,__oact))
 #else /* ... */
 #undef __local___localdep_sigaction_defined
@@ -457,11 +471,17 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaction,(__signo_t __signo, struct s
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigemptyset(3)
+ * Clear the given signal set of all contained signals
+ * @return: 0: Always returns `0' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigemptyset,(struct __sigset_struct *__set),sigemptyset,(__set))
 #else /* __CRT_HAVE_sigemptyset */
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/sigemptyset.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigemptyset(3)
+ * Clear the given signal set of all contained signals
+ * @return: 0: Always returns `0' */
 #define __localdep_sigemptyset __LIBC_LOCAL_NAME(sigemptyset)
 #endif /* !__CRT_HAVE_sigemptyset */
 #endif /* !__local___localdep_sigemptyset_defined */
@@ -472,16 +492,28 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigismember(3)
+ * Check if a given `signo' is apart of the a given signal set
+ * @return: != 0: The given `signo' is apart of `set'
+ * @return: == 0: The given `signo' isn't apart of `set' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigismember,(struct __sigset_struct const *__set, __signo_t __signo),sigismember,(__set,__signo))
 #elif defined(__CRT_HAVE___sigismember)
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigismember(3)
+ * Check if a given `signo' is apart of the a given signal set
+ * @return: != 0: The given `signo' is apart of `set'
+ * @return: == 0: The given `signo' isn't apart of `set' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigismember,(struct __sigset_struct const *__set, __signo_t __signo),__sigismember,(__set,__signo))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/sigismember.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigismember(3)
+ * Check if a given `signo' is apart of the a given signal set
+ * @return: != 0: The given `signo' is apart of `set'
+ * @return: == 0: The given `signo' isn't apart of `set' */
 #define __localdep_sigismember __LIBC_LOCAL_NAME(sigismember)
 #endif /* !... */
 #endif /* !__local___localdep_sigismember_defined */
@@ -501,7 +533,9 @@ __NAMESPACE_LOCAL_BEGIN
  * Note also that on KOS 2 additional functions `getsigmaskptr()'
  * and `setsigmaskptr()' exist, which can be used to get/set the
  * address of the signal mask used by the kernel.
- * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] Invalid `how' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),sigprocmask,(__how,__set,__oset))
 #elif defined(__CRT_HAVE_pthread_sigmask)
 __NAMESPACE_LOCAL_END
@@ -516,7 +550,9 @@ __NAMESPACE_LOCAL_BEGIN
  * Note also that on KOS 2 additional functions `getsigmaskptr()'
  * and `setsigmaskptr()' exist, which can be used to get/set the
  * address of the signal mask used by the kernel.
- * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] Invalid `how' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigprocmask,(__STDC_INT_AS_UINT_T __how, struct __sigset_struct const *__set, struct __sigset_struct *__oset),pthread_sigmask,(__how,__set,__oset))
 #else /* ... */
 #undef __local___localdep_sigprocmask_defined

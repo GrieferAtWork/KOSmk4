@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97c93c2e */
+/* HASH CRC-32:0x20a1927f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,32 +27,67 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: sigtimedwait32 from signal */
 #if !defined(__local___localdep_sigtimedwait32_defined) && defined(__CRT_HAVE_sigtimedwait)
 #define __local___localdep_sigtimedwait32_defined 1
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__timeout),sigtimedwait,(__set,__info,__timeout))
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec32 const *__rel_timeout),sigtimedwait,(__set,__info,__rel_timeout))
 #endif /* !__local___localdep_sigtimedwait32_defined && __CRT_HAVE_sigtimedwait */
 /* Dependency: sigtimedwait64 from signal */
 #ifndef __local___localdep_sigtimedwait64_defined
 #define __local___localdep_sigtimedwait64_defined 1
 #ifdef __CRT_HAVE_sigtimedwait64
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__timeout),sigtimedwait64,(__set,__info,__timeout))
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__rel_timeout),sigtimedwait64,(__set,__info,__rel_timeout))
 #elif defined(__CRT_HAVE_sigtimedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__timeout),sigtimedwait,(__set,__info,__timeout))
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct __timespec64 const *__rel_timeout),sigtimedwait,(__set,__info,__rel_timeout))
 #elif defined(__CRT_HAVE_sigtimedwait)
 __NAMESPACE_LOCAL_END
 #include <libc/local/signal/sigtimedwait64.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
 #define __localdep_sigtimedwait64 __LIBC_LOCAL_NAME(sigtimedwait64)
 #else /* ... */
 #undef __local___localdep_sigtimedwait64_defined
 #endif /* !... */
 #endif /* !__local___localdep_sigtimedwait64_defined */
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
 __LOCAL_LIBC(sigtimedwait) __ATTR_NONNULL((1)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct timespec const *__timeout) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait))(struct __sigset_struct const *__restrict __set, struct __siginfo_struct *__restrict __info, struct timespec const *__rel_timeout) {
 
 	struct __timespec64 __tmv;
-	if (!__timeout)
+	if (!__rel_timeout)
 		return __localdep_sigtimedwait64(__set, __info, __NULLPTR);
-	__tmv.tv_sec  = (__time64_t)__timeout->tv_sec;
-	__tmv.tv_nsec = __timeout->tv_nsec;
+	__tmv.tv_sec  = (__time64_t)__rel_timeout->tv_sec;
+	__tmv.tv_nsec = __rel_timeout->tv_nsec;
 	return __localdep_sigtimedwait64(__set, __info, __NULLPTR);
 
 

@@ -1455,7 +1455,7 @@ open_by_handle_at:(fd_t mountdirfd, [tostr(STRUCT_FILE_HANDLE)] struct file_hand
 
 kill:(pid_t pid, signo_t signo) -> errno_t;
 tkill:(pid_t tid, signo_t signo) -> errno_t;
-tgkill:(pid_t tgid, pid_t tid, signo_t signo) -> errno_t;
+tgkill:(pid_t pid, pid_t tid, signo_t signo) -> errno_t;
 
 signal:(signo_t signo, sighandler_t handler) -> sighandler_t;
 
@@ -1546,9 +1546,9 @@ set_userprocmask_address:(struct userprocmask *ctl) -> errno_t;
 @@@throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
 @@@throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
 @@@throw: E_ILLEGAL_OPERATION:                                                            [...]
-rt_sigqueueinfo:(pid_t tgid, signo_t usigno, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox32:(pid_t tgid, signo_t usigno, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox64:(pid_t tgid, signo_t usigno, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
+rt_sigqueueinfo:(pid_t pid, signo_t usigno, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox32:(pid_t pid, signo_t usigno, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_sigqueueinfo)] rt_sigqueueinfox64:(pid_t pid, signo_t usigno, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -1558,9 +1558,9 @@ rt_sigqueueinfo:(pid_t tgid, signo_t usigno, [tostr(STRUCT_SIGINFO)] struct __si
 @@@throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
 @@@throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
 @@@throw: E_ILLEGAL_OPERATION:                                                            [...]
-rt_tgsigqueueinfo:(pid_t tgid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
-[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox32:(pid_t tgid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
-[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox64:(pid_t tgid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
+rt_tgsigqueueinfo:(pid_t pid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFO)] struct __siginfo_struct const *uinfo) -> errno_t;
+[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox32:(pid_t pid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFOX32)] struct __siginfox32_struct const *uinfo) -> errno_t;
+[doc_alias(rt_tgsigqueueinfo)] rt_tgsigqueueinfox64:(pid_t pid, pid_t tid, signo_t usigno, [tostr(STRUCT_SIGINFOX64)] struct __siginfox64_struct const *uinfo) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -2622,9 +2622,9 @@ finit_module:(fd_t fd, char const *uargs, syscall_ulong_t flags) -> errno_t;
 @@                - O_NONBLOCK: Don't wait for the driver to be unloaded.
 @@                              Currently, KOS simply ignores this flag,
 @@                              since drivers on KOS should always be unloaded
-@@                              immediatly. - However, driver finalizers may
+@@                              immediately. - However, driver finalizers may
 @@                              do blocking operations before then...
-@@                - O_TRUNC:    Force the driver to be unloaded immediatly
+@@                - O_TRUNC:    Force the driver to be unloaded immediately
 @@                              (may compromise system integrity)
 @@                              s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE'
 delete_module:(char const *name, oflag_t flags) -> errno_t;

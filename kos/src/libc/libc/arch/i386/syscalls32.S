@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65676a41 */
+/* HASH CRC-32:0xa0e00c86 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2748,9 +2748,9 @@ DEFINE_PUBLIC_ALIAS(sys_Xinit_module, libc_sys_Xinit_module)
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -2769,9 +2769,9 @@ DEFINE_PUBLIC_ALIAS(sys_delete_module, libc_sys_delete_module)
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -3604,7 +3604,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xrt_sigtimedwait, libc_sys_Xrt_sigtimedwait)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.rt_sigqueueinfo
 INTERN_FUNCTION(libc_sys_rt_sigqueueinfo)
 	movl   $(0xb2), %eax
@@ -3618,7 +3618,7 @@ DEFINE_PUBLIC_ALIAS(sys_rt_sigqueueinfo, libc_sys_rt_sigqueueinfo)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.Xrt_sigqueueinfo
 INTERN_FUNCTION(libc_sys_Xrt_sigqueueinfo)
 	movl   $(0xb2), %eax
@@ -5106,7 +5106,7 @@ INTERN_FUNCTION(libc_sys_Xfstatfs64)
 END(libc_sys_Xfstatfs64)
 DEFINE_PUBLIC_ALIAS(sys_Xfstatfs64, libc_sys_Xfstatfs64)
 
-/* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+/* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 .section .text.crt.syscall.tgkill
 INTERN_FUNCTION(libc_sys_tgkill)
 	movl   $(0x10e), %eax
@@ -5114,7 +5114,7 @@ INTERN_FUNCTION(libc_sys_tgkill)
 END(libc_sys_tgkill)
 DEFINE_PUBLIC_ALIAS(sys_tgkill, libc_sys_tgkill)
 
-/* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+/* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 .section .text.crt.syscall.Xtgkill
 INTERN_FUNCTION(libc_sys_Xtgkill)
 	movl   $(0x10e), %eax
@@ -6250,7 +6250,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xpwritev, libc_sys_Xpwritev)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.rt_tgsigqueueinfo
 INTERN_FUNCTION(libc_sys_rt_tgsigqueueinfo)
 	movl   $(0x14f), %eax
@@ -6264,7 +6264,7 @@ DEFINE_PUBLIC_ALIAS(sys_rt_tgsigqueueinfo, libc_sys_rt_tgsigqueueinfo)
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-/* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
+/* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfox32_struct const *uinfo) */
 .section .text.crt.syscall.Xrt_tgsigqueueinfo
 INTERN_FUNCTION(libc_sys_Xrt_tgsigqueueinfo)
 	movl   $(0x14f), %eax

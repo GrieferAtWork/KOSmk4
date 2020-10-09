@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1320bd8b */
+/* HASH CRC-32:0x37733554 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -335,7 +335,7 @@
 #define __NRAN1_kill                   signo
 #define __NRAN0_tkill                  tid
 #define __NRAN1_tkill                  signo
-#define __NRAN0_tgkill                 tgid
+#define __NRAN0_tgkill                 pid
 #define __NRAN1_tgkill                 tid
 #define __NRAN2_tgkill                 signo
 #define __NRAN0_sigaltstack            ss
@@ -356,7 +356,7 @@
 #define __NRAN1_rt_sigtimedwait        info
 #define __NRAN2_rt_sigtimedwait        timeout
 #define __NRAN3_rt_sigtimedwait        sigsetsize
-#define __NRAN0_rt_sigqueueinfo        tgid
+#define __NRAN0_rt_sigqueueinfo        pid
 #define __NRAN1_rt_sigqueueinfo        usigno
 #define __NRAN2_rt_sigqueueinfo        uinfo
 #define __NRAN0_rt_sigreturn           restore_fpu
@@ -563,7 +563,7 @@
 #define __NRAN0_set_mempolicy          TODO_PROTOTYPE
 #define __NRAN0_migrate_pages          TODO_PROTOTYPE
 #define __NRAN0_move_pages             TODO_PROTOTYPE
-#define __NRAN0_rt_tgsigqueueinfo      tgid
+#define __NRAN0_rt_tgsigqueueinfo      pid
 #define __NRAN1_rt_tgsigqueueinfo      tid
 #define __NRAN2_rt_tgsigqueueinfo      usigno
 #define __NRAN3_rt_tgsigqueueinfo      uinfo
@@ -1248,7 +1248,7 @@
 #define __NRATR0_tkill                  SC_REPR_PID_T                                           /* tid */ 
 #define __NRATR1_tkill                  SC_REPR_SIGNO_T                                         /* signo */ 
 #define __NRRTR_tkill                   SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_tgkill                 SC_REPR_PID_T                                           /* tgid */ 
+#define __NRATR0_tgkill                 SC_REPR_PID_T                                           /* pid */ 
 #define __NRATR1_tgkill                 SC_REPR_PID_T                                           /* tid */ 
 #define __NRATR2_tgkill                 SC_REPR_SIGNO_T                                         /* signo */ 
 #define __NRRTR_tgkill                  SC_REPR_ERRNO_T                                         /* return */
@@ -1280,7 +1280,7 @@
 #define __NRATR2_rt_sigtimedwait        SC_REPR_STRUCT_TIMESPEC                                 /* timeout */ 
 #define __NRATR3_rt_sigtimedwait        SC_REPR_SIZE_T                                          /* sigsetsize */ 
 #define __NRRTR_rt_sigtimedwait         SC_REPR_SYSCALL_SLONG_T                                 /* return */
-#define __NRATR0_rt_sigqueueinfo        SC_REPR_PID_T                                           /* tgid */ 
+#define __NRATR0_rt_sigqueueinfo        SC_REPR_PID_T                                           /* pid */ 
 #define __NRATR1_rt_sigqueueinfo        SC_REPR_SIGNO_T                                         /* usigno */ 
 #define __NRATR2_rt_sigqueueinfo        SC_REPR_STRUCT_SIGINFO                                  /* uinfo */ 
 #define __NRRTR_rt_sigqueueinfo         SC_REPR_ERRNO_T                                         /* return */
@@ -1602,7 +1602,7 @@
 #define __NRRTR_migrate_pages           SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_move_pages             SC_REPR_INT                                             /* TODO_PROTOTYPE */ 
 #define __NRRTR_move_pages              SC_REPR_ERRNO_T                                         /* return */
-#define __NRATR0_rt_tgsigqueueinfo      SC_REPR_PID_T                                           /* tgid */ 
+#define __NRATR0_rt_tgsigqueueinfo      SC_REPR_PID_T                                           /* pid */ 
 #define __NRATR1_rt_tgsigqueueinfo      SC_REPR_PID_T                                           /* tid */ 
 #define __NRATR2_rt_tgsigqueueinfo      SC_REPR_SIGNO_T                                         /* usigno */ 
 #define __NRATR3_rt_tgsigqueueinfo      SC_REPR_STRUCT_SIGINFO                                  /* uinfo */ 

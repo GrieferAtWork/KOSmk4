@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf276bd3 */
+/* HASH CRC-32:0x90ad1d01 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -307,7 +307,7 @@
 #define __NR64AN1_rt_sigtimedwait          info
 #define __NR64AN2_rt_sigtimedwait          timeout
 #define __NR64AN3_rt_sigtimedwait          sigsetsize
-#define __NR64AN0_rt_sigqueueinfo          tgid
+#define __NR64AN0_rt_sigqueueinfo          pid
 #define __NR64AN1_rt_sigqueueinfo          usigno
 #define __NR64AN2_rt_sigqueueinfo          uinfo
 #define __NR64AN0_rt_sigsuspend            set
@@ -512,7 +512,7 @@
 #define __NR64AN1_epoll_ctl                op
 #define __NR64AN2_epoll_ctl                fd
 #define __NR64AN3_epoll_ctl                event
-#define __NR64AN0_tgkill                   tgid
+#define __NR64AN0_tgkill                   pid
 #define __NR64AN1_tgkill                   tid
 #define __NR64AN2_tgkill                   signo
 #define __NR64AN0_utimes                   filename
@@ -691,7 +691,7 @@
 #define __NR64AN1_pwritev                  iovec
 #define __NR64AN2_pwritev                  count
 #define __NR64AN3_pwritev                  offset
-#define __NR64AN0_rt_tgsigqueueinfo        tgid
+#define __NR64AN0_rt_tgsigqueueinfo        pid
 #define __NR64AN1_rt_tgsigqueueinfo        tid
 #define __NR64AN2_rt_tgsigqueueinfo        usigno
 #define __NR64AN3_rt_tgsigqueueinfo        uinfo
@@ -1414,7 +1414,7 @@
 #define __NR64ATR2_rt_sigtimedwait          SC_REPR_STRUCT_TIMESPECX64                                           /* timeout */ 
 #define __NR64ATR3_rt_sigtimedwait          SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR64RTR_rt_sigtimedwait           SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR64ATR0_rt_sigqueueinfo          SC_REPR_PID_T                                                        /* tgid */ 
+#define __NR64ATR0_rt_sigqueueinfo          SC_REPR_PID_T                                                        /* pid */ 
 #define __NR64ATR1_rt_sigqueueinfo          SC_REPR_SIGNO_T                                                      /* usigno */ 
 #define __NR64ATR2_rt_sigqueueinfo          SC_REPR_STRUCT_SIGINFOX64                                            /* uinfo */ 
 #define __NR64RTR_rt_sigqueueinfo           SC_REPR_ERRNO_T                                                      /* return */
@@ -1733,7 +1733,7 @@
 #define __NR64ATR2_epoll_ctl                SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR3_epoll_ctl                SC_REPR_POINTER                                                      /* event */ 
 #define __NR64RTR_epoll_ctl                 SC_REPR_ERRNO_T                                                      /* return */
-#define __NR64ATR0_tgkill                   SC_REPR_PID_T                                                        /* tgid */ 
+#define __NR64ATR0_tgkill                   SC_REPR_PID_T                                                        /* pid */ 
 #define __NR64ATR1_tgkill                   SC_REPR_PID_T                                                        /* tid */ 
 #define __NR64ATR2_tgkill                   SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR64RTR_tgkill                    SC_REPR_ERRNO_T                                                      /* return */
@@ -2009,7 +2009,7 @@
 #define __NR64ATR2_pwritev                  SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR64ATR3_pwritev                  SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR64RTR_pwritev                   SC_REPR_SSIZE_T                                                      /* return */
-#define __NR64ATR0_rt_tgsigqueueinfo        SC_REPR_PID_T                                                        /* tgid */ 
+#define __NR64ATR0_rt_tgsigqueueinfo        SC_REPR_PID_T                                                        /* pid */ 
 #define __NR64ATR1_rt_tgsigqueueinfo        SC_REPR_PID_T                                                        /* tid */ 
 #define __NR64ATR2_rt_tgsigqueueinfo        SC_REPR_SIGNO_T                                                      /* usigno */ 
 #define __NR64ATR3_rt_tgsigqueueinfo        SC_REPR_STRUCT_SIGINFOX64                                            /* uinfo */ 

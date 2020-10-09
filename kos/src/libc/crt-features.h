@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xace3cabc */
+/* HASH CRC-32:0x934cbee6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2199,6 +2199,7 @@
 #define __CRT_HAVE_DOS$sendmsg
 #define __CRT_HAVE_DOS$sendto
 #define __CRT_HAVE_DOS$set_exception_handler
+#define __CRT_HAVE_DOS$set_single_signal_action
 #define __CRT_HAVE_DOS$setbuf
 #define __CRT_HAVE_DOS$setbuffer
 #define __CRT_HAVE_DOS$setdomainname
@@ -2276,6 +2277,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$signalfd
+#define __CRT_HAVE_DOS$signandset
 #define __CRT_HAVE_DOS$significand
 #define __CRT_HAVE_DOS$significandf
 #define __CRT_HAVE_DOS$significandl
@@ -5240,6 +5242,7 @@
 #define __CRT_HAVE_sendmsg
 #define __CRT_HAVE_sendto
 #define __CRT_HAVE_set_exception_handler
+#define __CRT_HAVE_set_single_signal_action
 #define __CRT_HAVE_setaliasent
 #define __CRT_HAVE_setbuf
 #define __CRT_HAVE_setbuffer
@@ -5333,6 +5336,9 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_signal
 #define __CRT_HAVE_signalfd
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE_signandset
+#ifndef __KERNEL__
 #define __CRT_HAVE_significand
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl

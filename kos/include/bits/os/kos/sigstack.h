@@ -53,7 +53,7 @@ struct sigstack /*[PREFIX(ss_)]*/ {
 /* Alternate, preferred interface. */
 struct sigaltstack /*[PREFIX(ss_)]*/ {
 	void            *ss_sp;
-	int              ss_flags;
+	int              ss_flags; /* Set of `0 | SS_AUTODISARM' */
 #if __SIZEOF_POINTER__ > __SIZEOF_INT__
 	__BYTE_TYPE__  __ss_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__];
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */

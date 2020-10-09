@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d684aef */
+/* HASH CRC-32:0xcbc59bdf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,9 @@
 #include <bits/types.h>
 #include <bits/os/sigset.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> sigdelset(3)
+ * Remove only the given `signo' from the given signal set
+ * @return: 0: Always returns `0' */
 __LOCAL_LIBC(sigdelset) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigdelset))(struct __sigset_struct *__set, __signo_t __signo) {
 	__ULONGPTR_TYPE__ __mask = __sigset_mask(__signo);

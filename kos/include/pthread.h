@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23ae45fd */
+/* HASH CRC-32:0x64515365 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1766,7 +1766,7 @@ __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key
 #ifdef __USE_XOPEN2K
 /* Get ID of CPU-time clock for thread THREAD_ID
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_t __pthread_id, __clockid_t *__clock_id),(__pthread_id,__clock_id))
+__CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_t __pthread, __clockid_t *__clock_id),(__pthread,__clock_id))
 #endif /* __USE_XOPEN2K */
 
 #ifndef ____pthread_atfork_func_t_defined

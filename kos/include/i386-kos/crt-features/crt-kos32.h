@@ -3101,6 +3101,7 @@
 #define __CRT_HAVE_siglongjmp
 #define __CRT_HAVE_signal
 #define __CRT_HAVE_signalfd
+#define __CRT_HAVE_signandset
 #define __CRT_HAVE_significand
 #define __CRT_HAVE_significandf
 #define __CRT_HAVE_significandl

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x810856e7 */
+/* HASH CRC-32:0xb4a7061c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -256,9 +256,9 @@ __CDECLARE_SC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filenam
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 __CDECLARE_SC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(__name,__flags))
@@ -1012,7 +1012,7 @@ __CDECLARE_SC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigse
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__tgid,__usigno,__uinfo))
+__CDECLARE_SC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_sigqueueinfo) */
 #if __CRT_HAVE_SC(rt_sigreturn)
 __CDECLARE_VOID_SC(,rt_sigreturn,(struct fpustate const *__restore_fpu, struct __sigset_struct const *__restore_sigmask, struct rpc_syscall_info const *__sc_info, struct ucpustate const *__restore_cpu),(__restore_fpu,__restore_sigmask,__sc_info,__restore_cpu))
@@ -1030,7 +1030,7 @@ __CDECLARE_SC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const *
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__tgid,__tid,__usigno,__uinfo))
+__CDECLARE_SC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __pid, __pid_t __tid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__tid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_SC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_SC(sched_get_priority_max)
 __CDECLARE_SC(,__syscall_slong_t,sched_get_priority_max,(__syscall_ulong_t __algorithm),(__algorithm))
@@ -1324,7 +1324,7 @@ __CDECLARE_SC(,__ssize_t,syslog,(__syscall_ulong_t __level, char const *__str, _
 __CDECLARE_SC(,__ssize_t,tee,(__fd_t __fdin, __fd_t __fdout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__fdout,__length,__flags))
 #endif /* __CRT_HAVE_SC(tee) */
 #if __CRT_HAVE_SC(tgkill)
-__CDECLARE_SC(,__errno_t,tgkill,(__pid_t __tgid, __pid_t __tid, __signo_t __signo),(__tgid,__tid,__signo))
+__CDECLARE_SC(,__errno_t,tgkill,(__pid_t __pid, __pid_t __tid, __signo_t __signo),(__pid,__tid,__signo))
 #endif /* __CRT_HAVE_SC(tgkill) */
 #if __CRT_HAVE_SC(time)
 __CDECLARE_SC(,__time32_t,time,(__time32_t *__timer),(__timer))
@@ -1617,9 +1617,9 @@ __CDECLARE_XSC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filena
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 __CDECLARE_XSC(,__errno_t,delete_module,(char const *__name, __oflag_t __flags),(__name,__flags))
@@ -2373,7 +2373,7 @@ __CDECLARE_XSC(,__errno_t,rt_sigprocmask,(__syscall_ulong_t __how, struct __sigs
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __tgid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__tgid,__usigno,__uinfo))
+__CDECLARE_XSC(,__errno_t,rt_sigqueueinfo,(__pid_t __pid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_sigqueueinfo) */
 #if __CRT_HAVE_XSC(rt_sigsuspend)
 __CDECLARE_XSC(,__errno_t,rt_sigsuspend,(struct __sigset_struct const *__set, __size_t __sigsetsize),(__set,__sigsetsize))
@@ -2388,7 +2388,7 @@ __CDECLARE_XSC(,__syscall_slong_t,rt_sigtimedwait,(struct __sigset_struct const 
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __tgid, __pid_t __tid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__tgid,__tid,__usigno,__uinfo))
+__CDECLARE_XSC(,__errno_t,rt_tgsigqueueinfo,(__pid_t __pid, __pid_t __tid, __signo_t __usigno, struct __siginfo_struct const *__uinfo),(__pid,__tid,__usigno,__uinfo))
 #endif /* __CRT_HAVE_XSC(rt_tgsigqueueinfo) */
 #if __CRT_HAVE_XSC(sched_get_priority_max)
 __CDECLARE_XSC(,__syscall_slong_t,sched_get_priority_max,(__syscall_ulong_t __algorithm),(__algorithm))
@@ -2682,7 +2682,7 @@ __CDECLARE_XSC(,__ssize_t,syslog,(__syscall_ulong_t __level, char const *__str, 
 __CDECLARE_XSC(,__ssize_t,tee,(__fd_t __fdin, __fd_t __fdout, __size_t __length, __syscall_ulong_t __flags),(__fdin,__fdout,__length,__flags))
 #endif /* __CRT_HAVE_XSC(tee) */
 #if __CRT_HAVE_XSC(tgkill)
-__CDECLARE_XSC(,__errno_t,tgkill,(__pid_t __tgid, __pid_t __tid, __signo_t __signo),(__tgid,__tid,__signo))
+__CDECLARE_XSC(,__errno_t,tgkill,(__pid_t __pid, __pid_t __tid, __signo_t __signo),(__pid,__tid,__signo))
 #endif /* __CRT_HAVE_XSC(tgkill) */
 #if __CRT_HAVE_XSC(time)
 __CDECLARE_XSC(,__time32_t,time,(__time32_t *__timer),(__timer))

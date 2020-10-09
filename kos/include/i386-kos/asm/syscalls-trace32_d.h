@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfae1b91e */
+/* HASH CRC-32:0x8180ab1d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -342,7 +342,7 @@
 #define __NR32AN1_rt_sigtimedwait              info
 #define __NR32AN2_rt_sigtimedwait              timeout
 #define __NR32AN3_rt_sigtimedwait              sigsetsize
-#define __NR32AN0_rt_sigqueueinfo              tgid
+#define __NR32AN0_rt_sigqueueinfo              pid
 #define __NR32AN1_rt_sigqueueinfo              usigno
 #define __NR32AN2_rt_sigqueueinfo              uinfo
 #define __NR32AN0_rt_sigsuspend                set
@@ -546,7 +546,7 @@
 #define __NR32AN1_statfs64                     buf
 #define __NR32AN0_fstatfs64                    file
 #define __NR32AN1_fstatfs64                    buf
-#define __NR32AN0_tgkill                       tgid
+#define __NR32AN0_tgkill                       pid
 #define __NR32AN1_tgkill                       tid
 #define __NR32AN2_tgkill                       signo
 #define __NR32AN0_utimes                       filename
@@ -725,7 +725,7 @@
 #define __NR32AN1_pwritev                      iovec
 #define __NR32AN2_pwritev                      count
 #define __NR32AN3_pwritev                      offset
-#define __NR32AN0_rt_tgsigqueueinfo            tgid
+#define __NR32AN0_rt_tgsigqueueinfo            pid
 #define __NR32AN1_rt_tgsigqueueinfo            tid
 #define __NR32AN2_rt_tgsigqueueinfo            usigno
 #define __NR32AN3_rt_tgsigqueueinfo            uinfo
@@ -1704,7 +1704,7 @@
 #define __NR32ATR2_rt_sigtimedwait              SC_REPR_STRUCT_TIMESPECX32                                           /* timeout */ 
 #define __NR32ATR3_rt_sigtimedwait              SC_REPR_SIZE_T                                                       /* sigsetsize */ 
 #define __NR32RTR_rt_sigtimedwait               SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_rt_sigqueueinfo              SC_REPR_PID_T                                                        /* tgid */ 
+#define __NR32ATR0_rt_sigqueueinfo              SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_rt_sigqueueinfo              SC_REPR_SIGNO_T                                                      /* usigno */ 
 #define __NR32ATR2_rt_sigqueueinfo              SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 
 #define __NR32RTR_rt_sigqueueinfo               SC_REPR_ERRNO_T                                                      /* return */
@@ -2006,7 +2006,7 @@
 #define __NR32ATR0_fstatfs64                    SC_REPR_FD_T                                                         /* file */ 
 #define __NR32ATR1_fstatfs64                    SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32RTR_fstatfs64                     SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_tgkill                       SC_REPR_PID_T                                                        /* tgid */ 
+#define __NR32ATR0_tgkill                       SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_tgkill                       SC_REPR_PID_T                                                        /* tid */ 
 #define __NR32ATR2_tgkill                       SC_REPR_SIGNO_T                                                      /* signo */ 
 #define __NR32RTR_tgkill                        SC_REPR_ERRNO_T                                                      /* return */
@@ -2283,7 +2283,7 @@
 #define __NR32ATR2_pwritev                      SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR3_pwritev                      SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NR32RTR_pwritev                       SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_rt_tgsigqueueinfo            SC_REPR_PID_T                                                        /* tgid */ 
+#define __NR32ATR0_rt_tgsigqueueinfo            SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_rt_tgsigqueueinfo            SC_REPR_PID_T                                                        /* tid */ 
 #define __NR32ATR2_rt_tgsigqueueinfo            SC_REPR_SIGNO_T                                                      /* usigno */ 
 #define __NR32ATR3_rt_tgsigqueueinfo            SC_REPR_STRUCT_SIGINFOX32                                            /* uinfo */ 

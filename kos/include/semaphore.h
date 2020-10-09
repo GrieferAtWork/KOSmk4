@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a4d0441 */
+/* HASH CRC-32:0x3be411a8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 
 #include <features.h>
 
-#include <asm/crt/semaphore.h> /* __ARCH_HAVE_INTERPROCESS_SEMAPHORES, __ARCH_HAVE_NON_UNIQUE_SEM_OPEN */
+#include <asm/crt/semaphore.h>  /* __ARCH_HAVE_INTERPROCESS_SEMAPHORES, __ARCH_HAVE_NON_UNIQUE_SEM_OPEN */
 #include <bits/crt/semaphore.h> /* __sem_t */
 #include <bits/types.h>
 #ifdef __USE_XOPEN2K

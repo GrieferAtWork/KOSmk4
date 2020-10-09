@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41ed683d */
+/* HASH CRC-32:0x69551e9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,41 +31,18 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Open database for reading.
- * This function is not part of POSIX and therefore no official cancellation point */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setspent)(void);
-/* Close database. */
 INTDEF void NOTHROW_RPC_NOKOS(LIBCCALL libc_endspent)(void);
-/* Get next entry from database, perhaps after opening the file.
- * This function is not part of POSIX and therefore no official cancellation point */
 INTDEF struct spwd *NOTHROW_RPC(LIBCCALL libc_getspent)(void);
-/* Get shadow entry matching NAME.
- * This function is not part of POSIX and therefore no official cancellation point */
 INTDEF NONNULL((1)) struct spwd *NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name);
-/* Read shadow entry from STRING.
- * This function is not part of POSIX and therefore no official cancellation point */
 INTDEF NONNULL((1)) struct spwd *NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string);
-/* Read next shadow entry from STREAM.
- * This function is not part of POSIX and therefore no official cancellation point */
 INTDEF NONNULL((1)) struct spwd *NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream);
-/* Write line containing shadow password entry to stream.
- * This function is not part of POSIX and therefore no official cancellation point */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p, FILE *__restrict stream);
-/* Reentrant versions of some of the functions above.
- * These functions are not part of POSIX and therefore no official cancellation point */
 INTDEF NONNULL((1, 2, 4)) int NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
-/* Reentrant versions of some of the functions above.
- * These functions are not part of POSIX and therefore no official cancellation point */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
-/* Reentrant versions of some of the functions above.
- * These functions are not part of POSIX and therefore no official cancellation point */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
-/* Reentrant versions of some of the functions above.
- * These functions are not part of POSIX and therefore no official cancellation point */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream, struct spwd *__restrict result_buf, char *__restrict buffer, size_t buflen, struct spwd **__restrict result);
-/* Protect password file against multi writers */
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_lckpwdf)(void);
-/* Unlock password file */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void);
 #endif /* !__KERNEL__ */
 

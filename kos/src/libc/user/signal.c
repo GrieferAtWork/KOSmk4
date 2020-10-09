@@ -73,7 +73,14 @@ INTDEF void /*ASMCALL*/ libc_sig_restore(void);
 
 
 
-/*[[[head:libd_raise,hash:CRC-32=0x8c6e30c8]]]*/
+/*[[[head:libd_raise,hash:CRC-32=0xc08b88d9]]]*/
+/* >> raise(3)
+ * Raise a signal within the current thread.
+ * In a *-theaded process this is same as:
+ *   *=multi:  `pthread_kill(pthread_self(), signo)'
+ *   *=single: `kill(getpid(), signo)'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 INTERN ATTR_SECTION(".text.crt.dos.sched.signal") int
 NOTHROW_NCX(LIBDCALL libd_raise)(signo_t signo)
 /*[[[body:libd_raise]]]*/
@@ -82,7 +89,14 @@ NOTHROW_NCX(LIBDCALL libd_raise)(signo_t signo)
 }
 /*[[[end:libd_raise]]]*/
 
-/*[[[head:libc_raise,hash:CRC-32=0xbfc984b3]]]*/
+/*[[[head:libc_raise,hash:CRC-32=0x4ecd8fe5]]]*/
+/* >> raise(3)
+ * Raise a signal within the current thread.
+ * In a *-theaded process this is same as:
+ *   *=multi:  `pthread_kill(pthread_self(), signo)'
+ *   *=single: `kill(getpid(), signo)'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_raise)(signo_t signo)
 /*[[[body:libc_raise]]]*/
@@ -92,7 +106,18 @@ NOTHROW_NCX(LIBCCALL libc_raise)(signo_t signo)
 }
 /*[[[end:libc_raise]]]*/
 
-/*[[[head:libd_sysv_signal,hash:CRC-32=0xe68d1b83]]]*/
+/*[[[head:libd_sysv_signal,hash:CRC-32=0xa472bfcf]]]*/
+/* >> sysv_signal(3)
+ * Wrapper for `sigaction(2)' to establish a signal handler as:
+ *     >> struct sigaction act, oact
+ *     >> act.sa_handler = handler;
+ *     >> act.sa_flags   = (SA_RESETHAND | SA_NODEFER) & ~SA_RESTART;
+ *     >> sigemptyset(&act.sa_mask);
+ *     >> if (sigaction(signo, &act, &oact) != 0)
+ *     >>     oact.sa_handler = SIG_ERR;
+ *     >> return oact.sa_handler;
+ * @return: * :      The previous signal handler function.
+ * @return: SIG_ERR: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.dos.sched.signal") sighandler_t
 NOTHROW_NCX(LIBDCALL libd_sysv_signal)(signo_t signo,
                                        sighandler_t handler)
@@ -102,12 +127,24 @@ NOTHROW_NCX(LIBDCALL libd_sysv_signal)(signo_t signo,
 }
 /*[[[end:libd_sysv_signal]]]*/
 
-/*[[[head:libc_sysv_signal,hash:CRC-32=0x39dc26c6]]]*/
+/*[[[head:libc_sysv_signal,hash:CRC-32=0xa82fcb1f]]]*/
+/* >> sysv_signal(3)
+ * Wrapper for `sigaction(2)' to establish a signal handler as:
+ *     >> struct sigaction act, oact
+ *     >> act.sa_handler = handler;
+ *     >> act.sa_flags   = (SA_RESETHAND | SA_NODEFER) & ~SA_RESTART;
+ *     >> sigemptyset(&act.sa_mask);
+ *     >> if (sigaction(signo, &act, &oact) != 0)
+ *     >>     oact.sa_handler = SIG_ERR;
+ *     >> return oact.sa_handler;
+ * @return: * :      The previous signal handler function.
+ * @return: SIG_ERR: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.signal") sighandler_t
 NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
                                        sighandler_t handler)
 /*[[[body:libc_sysv_signal]]]*/
 {
+	errno_t result;
 	struct sigaction act, oact;
 	if unlikely(handler == SIG_ERR) {
 		libc_seterrno(EINVAL);
@@ -115,61 +152,20 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
 	}
 	act.sa_handler = handler;
 	libc_sigemptyset(&act.sa_mask);
-	act.sa_flags = SA_RESETHAND | SA_NOMASK | SA_INTERRUPT;
-	/*act.sa_flags &= ~SA_RESTART;*/
+	act.sa_flags = (SA_RESETHAND | SA_NODEFER) & ~SA_RESTART;
 	SET_SIGRESTORE(act);
-	if unlikely(sigaction(signo, &act, &oact))
+#ifdef __NR_sigaction
+	result = sys_sigaction(signo, &act, &oact);
+#else /* __NR_sigaction */
+	result = sys_rt_sigaction(signo, &act, &oact, sizeof(sigset_t));
+#endif /* !__NR_sigaction */
+	if unlikely(E_ISERR(result)) {
+		libc_seterrno(-result);
 		oact.sa_handler = SIG_ERR;
+	}
 	return oact.sa_handler;
 }
 /*[[[end:libc_sysv_signal]]]*/
-
-/*[[[head:libc_sigblock,hash:CRC-32=0x32d96dc3]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask)
-/*[[[body:libc_sigblock]]]*/
-{
-	errno_t result;
-	result = sys_rt_sigprocmask(SIG_BLOCK,
-	                            (sigset_t *)&mask,
-	                            NULL,
-	                            sizeof(mask));
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_sigblock]]]*/
-
-/*[[[head:libc_sigsetmask,hash:CRC-32=0xcfcf517a]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask)
-/*[[[body:libc_sigsetmask]]]*/
-{
-	errno_t result;
-	result = sys_rt_sigprocmask(SIG_SETMASK,
-	                            (sigset_t *)&mask,
-	                            NULL,
-	                            sizeof(mask));
-	return libc_seterrno_syserr(result);
-}
-/*[[[end:libc_sigsetmask]]]*/
-
-/*[[[head:libc_siggetmask,hash:CRC-32=0x597fe5fd]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_siggetmask)(void)
-/*[[[body:libc_siggetmask]]]*/
-{
-	int value, result;
-	result = sys_rt_sigprocmask(SIG_SETMASK,
-	                            NULL,
-	                            (sigset_t *)&value,
-	                            sizeof(value));
-	if unlikely(E_ISERR(result)) {
-		result = (int)libc_seterrno(-result);
-	} else {
-		result = value;
-	}
-	return result;
-}
-/*[[[end:libc_siggetmask]]]*/
 
 
 #undef sys_siglist
@@ -201,7 +197,9 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 }
 /*[[[end:libc___p_sys_siglist]]]*/
 
-/*[[[head:libc_sigreturn,hash:CRC-32=0x5c20a42e]]]*/
+/*[[[head:libc_sigreturn,hash:CRC-32=0xfebcf9f0]]]*/
+/* Don't call directly. Used internally to resume
+ * execution when returning from a signal handler. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_NORETURN void
 NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 /*[[[body:libc_sigreturn]]]*/
@@ -217,7 +215,23 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 
 PRIVATE ATTR_SECTION(".bss.crt.sched.signal") sigset_t __sigintr;
 
-/*[[[head:libc_bsd_signal,hash:CRC-32=0x8260093]]]*/
+/*[[[head:libc_bsd_signal,hash:CRC-32=0xde37059e]]]*/
+/* >> bsd_signal(3)
+ * Wrapper for `sigaction(2)' to establish a signal handler as:
+ *     >> struct sigaction act, oact
+ *     >> act.sa_handler = handler;
+ *     >> sigemptyset(&act.sa_mask);
+ *     >> sigaddset(&act.sa_mask, signo);
+ *     >> act.sa_flags = sigismember(&[SIGNALS_WITH_SIGINTERRUPT], signo) ? 0 : SA_RESTART;
+ *     >> SET_SIGRESTORE(act);
+ *     >> if (sigaction(signo, &act, &oact) != 0)
+ *     >>     oact.sa_handler = SIG_ERR;
+ *     >> return oact.sa_handler;
+ *     Where `SIGNALS_WITH_SIGINTERRUPT' is the set of signals for which
+ *     `siginterrupt(3)' had last been called with a non-zero `interrupt'
+ *     argument
+ * @return: * :      The previous signal handler function.
+ * @return: SIG_ERR: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.signal") sighandler_t
 NOTHROW_NCX(LIBCCALL libc_bsd_signal)(signo_t signo,
                                       sighandler_t handler)
@@ -244,7 +258,23 @@ NOTHROW_NCX(LIBCCALL libc_bsd_signal)(signo_t signo,
 }
 /*[[[end:libc_bsd_signal]]]*/
 
-/*[[[head:libd_bsd_signal,hash:CRC-32=0xb42e433d]]]*/
+/*[[[head:libd_bsd_signal,hash:CRC-32=0x7ce60dfa]]]*/
+/* >> bsd_signal(3)
+ * Wrapper for `sigaction(2)' to establish a signal handler as:
+ *     >> struct sigaction act, oact
+ *     >> act.sa_handler = handler;
+ *     >> sigemptyset(&act.sa_mask);
+ *     >> sigaddset(&act.sa_mask, signo);
+ *     >> act.sa_flags = sigismember(&[SIGNALS_WITH_SIGINTERRUPT], signo) ? 0 : SA_RESTART;
+ *     >> SET_SIGRESTORE(act);
+ *     >> if (sigaction(signo, &act, &oact) != 0)
+ *     >>     oact.sa_handler = SIG_ERR;
+ *     >> return oact.sa_handler;
+ *     Where `SIGNALS_WITH_SIGINTERRUPT' is the set of signals for which
+ *     `siginterrupt(3)' had last been called with a non-zero `interrupt'
+ *     argument
+ * @return: * :      The previous signal handler function.
+ * @return: SIG_ERR: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.dos.sched.signal") sighandler_t
 NOTHROW_NCX(LIBDCALL libd_bsd_signal)(signo_t signo,
                                       sighandler_t handler)
@@ -255,19 +285,22 @@ NOTHROW_NCX(LIBDCALL libd_bsd_signal)(signo_t signo,
 /*[[[end:libd_bsd_signal]]]*/
 
 
-/*[[[head:libc___xpg_sigpause,hash:CRC-32=0xf7eccb73]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc___xpg_sigpause)(signo_t signo)
-/*[[[body:libc___xpg_sigpause]]]*/
-/*AUTO*/{
-	(void)signo;
-	CRT_UNIMPLEMENTEDF("__xpg_sigpause(%" PRIxN(__SIZEOF_SIGNO_T__) ")", signo); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc___xpg_sigpause]]]*/
 
-/*[[[head:libc_kill,hash:CRC-32=0x4135227d]]]*/
+/*[[[head:libc_kill,hash:CRC-32=0xdf836e2b]]]*/
+/* >> kill(2)
+ * Raise a signal `signo' within the process(es) specified by `pid':
+ *   - pid > 0:   Deliver `signo' to a process who's PID matches `pid'.
+ *   - pid == 0:  Deliver `signo' to every process within the caller's process group.
+ *   - pid == -1: Deliver `signo' to every process the caller has permission to send
+ *                signals to, with the exception of a process with pid=1 (i.e. `/bin/init')
+ *   - pid < -1:  Deliver `signo' to every process within the process group `-pid'
+ * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ *                and this function can be used to test if the caller would be allowed to
+ *                send signals to the process(es) specified by `pid'
+ * @return: 0:    Success
+ * @return: -1:   [errno=EINVAL] The given `signo' is invalid
+ * @return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
+ * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
                                 signo_t signo)
@@ -286,7 +319,7 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
 #endif /* !__NR_sigprocmask */
 
 
-/*[[[head:libc_sigprocmask,hash:CRC-32=0x3c90cbea]]]*/
+/*[[[head:libc_sigprocmask,hash:CRC-32=0x5ef0eb3e]]]*/
 /* Change the signal mask for the calling thread. Note that portable
  * programs that also make use of multithreading must instead use the
  * pthread-specific `pthread_sigmask()' function instead, as POSIX
@@ -296,7 +329,9 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
  * Note also that on KOS 2 additional functions `getsigmaskptr()'
  * and `setsigmaskptr()' exist, which can be used to get/set the
  * address of the signal mask used by the kernel.
- * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
+ * @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] Invalid `how' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
                                        sigset_t const *set,
@@ -410,11 +445,12 @@ STATIC_ASSERT(sizeof(sigset_t) >= sizeof(void *));
 #define INITIAL_SIGMASKBUF(me)  (me)->pt_emumask
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 
-/*[[[head:libc_getsigmaskptr,hash:CRC-32=0x3573e7f9]]]*/
+/*[[[head:libc_getsigmaskptr,hash:CRC-32=0xf709aa6c]]]*/
 /* >> getsigmaskptr(3)
  * Return the current signal mask pointer.
  * See the documentation of `setsigmaskptr(3)' for
- * what this function is all about. */
+ * what this function is all about.
+ * @return: * : A pointer to the calling thread's current signal mask */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_RETNONNULL WUNUSED sigset_t *
 NOTHROW_NCX(LIBCCALL libc_getsigmaskptr)(void)
 /*[[[body:libc_getsigmaskptr]]]*/
@@ -523,7 +559,12 @@ do_legacy_sigprocmask:
 }
 /*[[[end:libc_setsigmaskptr]]]*/
 
-/*[[[head:libc_sigsuspend,hash:CRC-32=0xf8598483]]]*/
+/*[[[head:libc_sigsuspend,hash:CRC-32=0xc9c070c8]]]*/
+/* >> sigsuspend(2)
+ * Atomically save and set the caller's signal mask to `set', then wait for
+ * one of the contained signals to arrive before restoring the old signal mask.
+ * @param: set: The set of signals on which to wait
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_sigsuspend)(sigset_t const *set)
 /*[[[body:libc_sigsuspend]]]*/
@@ -538,7 +579,14 @@ NOTHROW_RPC(LIBCCALL libc_sigsuspend)(sigset_t const *set)
 }
 /*[[[end:libc_sigsuspend]]]*/
 
-/*[[[head:libc_sigaction,hash:CRC-32=0xe485d789]]]*/
+/*[[[head:libc_sigaction,hash:CRC-32=0x134e7c78]]]*/
+/* >> sigaction(2)
+ * Get/Set the action that shall be performed when a
+ * signal `signo' must be handled by the calling process.
+ * This function will modifiy the caller's kernel-space signal handler descriptor,
+ * who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
                                      struct sigaction const *act,
@@ -563,7 +611,11 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(signo_t signo,
 }
 /*[[[end:libc_sigaction]]]*/
 
-/*[[[head:libc_sigpending,hash:CRC-32=0xcbeddd74]]]*/
+/*[[[head:libc_sigpending,hash:CRC-32=0x1c91f480]]]*/
+/* >> sigpending(2)
+ * Retrieve the set of signals that are pending
+ * in either the calling thread and process
+ * @return: 0: Success */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigpending)(sigset_t *__restrict set)
 /*[[[body:libc_sigpending]]]*/
@@ -578,7 +630,10 @@ NOTHROW_NCX(LIBCCALL libc_sigpending)(sigset_t *__restrict set)
 }
 /*[[[end:libc_sigpending]]]*/
 
-/*[[[head:libc_sigwait,hash:CRC-32=0xf3b20004]]]*/
+/*[[[head:libc_sigwait,hash:CRC-32=0xf676c990]]]*/
+/* >> sigwait(3)
+ * Same as `sigsuspend(2)', but write-back the actual signal that was raised to `*signo'
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_sigwait)(sigset_t const *__restrict set,
                                    signo_t *__restrict signo)
@@ -605,7 +660,13 @@ NOTHROW_RPC(LIBCCALL libc_sigwait)(sigset_t const *__restrict set,
 }
 /*[[[end:libc_sigwait]]]*/
 
-/*[[[head:libc_sigwaitinfo,hash:CRC-32=0x742d4cef]]]*/
+/*[[[head:libc_sigwaitinfo,hash:CRC-32=0xc8432a78]]]*/
+/* >> sigwaitinfo(2)
+ * Same as `sigsuspend(2)', but write-back extended information in the signal,
+ * as it would/has also been passed to a signal handler's second (info) argument.
+ * @param: set:  The set of signals on which to wait
+ * @param: info: Information about the signal on which to wait.
+ * @return: -1: [errno=EINTR] The signal handler for `signo' was executed. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_sigwaitinfo)(sigset_t const *__restrict set,
                                        siginfo_t *__restrict info)
@@ -627,42 +688,56 @@ NOTHROW_RPC(LIBCCALL libc_sigwaitinfo)(sigset_t const *__restrict set,
 }
 /*[[[end:libc_sigwaitinfo]]]*/
 
-/*[[[head:libc_sigtimedwait,hash:CRC-32=0x6e3bc73e]]]*/
+/*[[[head:libc_sigtimedwait,hash:CRC-32=0x164aa466]]]*/
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_sigtimedwait)(sigset_t const *__restrict set,
                                         siginfo_t *__restrict info,
-                                        struct timespec const *timeout)
+                                        struct timespec const *rel_timeout)
 /*[[[body:libc_sigtimedwait]]]*/
 {
 	errno_t result;
 	result = sys_rt_sigtimedwait(set,
 	                             info,
-	                             timeout,
+	                             rel_timeout,
 	                             sizeof(sigset_t));
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sigtimedwait]]]*/
 
-/*[[[head:libc_sigtimedwait64,hash:CRC-32=0x5521c50f]]]*/
+/*[[[head:libc_sigtimedwait64,hash:CRC-32=0x9c8be360]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sigtimedwait64, libc_sigtimedwait);
 #else /* MAGIC:alias */
+/* >> sigtimedwait(2)
+ * Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+ * @param: set:         The set of signals on which to wait
+ * @param: info:        Information about the signal on which to wait.
+ * @param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+ * @return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+ * @return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed. */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_sigtimedwait64)(sigset_t const *__restrict set,
                                           siginfo_t *__restrict info,
-                                          struct timespec64 const *timeout)
+                                          struct timespec64 const *rel_timeout)
 /*[[[body:libc_sigtimedwait64]]]*/
 {
 	errno_t result;
 #ifdef SYS_rt_sigtimedwait64
 	result = sys_rt_sigtimedwait64(set,
 	                               info,
-	                               timeout,
+	                               rel_timeout,
 	                               sizeof(sigset_t));
 #elif defined(SYS_rt_sigtimedwait_time64)
 	result = sys_rt_sigtimedwait_time64(set,
 	                                    info,
-	                                    timeout,
+	                                    rel_timeout,
 	                                    sizeof(sigset_t));
 #else /* ... */
 #error "No way to implement `sigtimedwait64()'"
@@ -672,7 +747,22 @@ NOTHROW_RPC(LIBCCALL libc_sigtimedwait64)(sigset_t const *__restrict set,
 #endif /* MAGIC:alias */
 /*[[[end:libc_sigtimedwait64]]]*/
 
-/*[[[head:libc_sigqueue,hash:CRC-32=0x24374bab]]]*/
+/*[[[head:libc_sigqueue,hash:CRC-32=0x26e533e8]]]*/
+/* >> sigqueue(2)
+ * Similar to `kill(2)', but `pid' must be positive and reference a process's PID,
+ * meaning that this function can only be uesd to send a signal to single, specific process.
+ * @param: pid:   The PID of the process that shall receive the signal.
+ * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ *                and this function can be used to test if the caller would be allowed to
+ *                send signals to the process(es) specified by `pid'
+ * @param: val:   An additional value to pass alongside the signal itself. This value can
+ *                read as `info->si_value' from within a 3-arg signal handler established
+ *                by `pid', or may also be returned by a call to `sigwaitinfo(2)' and
+ *                friends made by `pid'.
+ * @return: 0:    Success
+ * @return: -1:   [errno=EINVAL] The given `signo' is invalid
+ * @return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
+ * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigqueue)(pid_t pid,
                                     signo_t signo,
@@ -687,47 +777,68 @@ NOTHROW_NCX(LIBCCALL libc_sigqueue)(pid_t pid,
 }
 /*[[[end:libc_sigqueue]]]*/
 
-/*[[[head:libc_sigqueueinfo,hash:CRC-32=0xc4bc11c]]]*/
+/*[[[head:libc_sigqueueinfo,hash:CRC-32=0x7b4d788f]]]*/
+/* >> sigqueueinfo(2)
+ * Similar to `sigqueue(2)', but instead of only being able to specify a custom
+ * signal value, everything about signal meta-data can be specified by this function.
+ * Note however that various privileges are required to provide custom values for
+ * different values of `uinfo' that don't match what the equivalent call to `sigqueue(2)'
+ * would have used.
+ * @param: pid:   The PID of the process that shall receive the signal.
+ * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ *                and this function can be used to test if the caller would be allowed to
+ *                send signals to the process(es) specified by `pid'
+ * @param: uinfo: Signal information to pass alongside the signal itself.
+ * @return: 0:    Success
+ * @return: -1:   [errno=EINVAL] The given `signo' is invalid
+ * @return: -1:   [errno=EINVAL] The given `signo' doesn't match `uinfo->si_signo'
+ * @return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
+ * @return: -1:   [errno=EPERM]  `info->si_code' is invalid, and `pid' is a different process
+ * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((3)) int
-NOTHROW_NCX(LIBCCALL libc_sigqueueinfo)(pid_t tgid,
+NOTHROW_NCX(LIBCCALL libc_sigqueueinfo)(pid_t pid,
                                         signo_t signo,
                                         siginfo_t const *uinfo)
 /*[[[body:libc_sigqueueinfo]]]*/
 {
 	errno_t result;
-	result = sys_rt_sigqueueinfo(tgid,
+	result = sys_rt_sigqueueinfo(pid,
 	                             (syscall_ulong_t)(unsigned int)signo,
 	                             uinfo);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sigqueueinfo]]]*/
 
-/*[[[head:libc_tgsigqueueinfo,hash:CRC-32=0xa3e87001]]]*/
+/*[[[head:libc_tgsigqueueinfo,hash:CRC-32=0x464eb3cd]]]*/
+/* >> tgsigqueueinfo(2)
+ * Similar to `sigqueueinfo(2)', rather than sending a signal to a process
+ * as a whole, only send the signal to a single thread within that process.
+ * @param: pid:   The PID of the process that shall receive the signal.
+ * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ *                and this function can be used to test if the caller would be allowed to
+ *                send signals to the process(es) specified by `pid'
+ * @param: uinfo: Signal information to pass alongside the signal itself.
+ * @return: 0:    Success
+ * @return: -1:   [errno=EINVAL] The given `signo' is invalid
+ * @return: -1:   [errno=EINVAL] The given `signo' doesn't match `uinfo->si_signo'
+ * @return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
+ * @return: -1:   [errno=EPERM]  `info->si_code' is invalid, and `pid' is a different process
+ * @return: -1:   [errno=ESRCH]  No process is identified by `pid' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((4)) int
-NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t tgid,
+NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t pid,
                                           pid_t tid,
                                           signo_t signo,
                                           siginfo_t const *uinfo)
 /*[[[body:libc_tgsigqueueinfo]]]*/
 {
 	errno_t result;
-	result = sys_rt_tgsigqueueinfo(tgid,
+	result = sys_rt_tgsigqueueinfo(pid,
 	                               tid,
 	                               (syscall_ulong_t)(unsigned int)signo,
 	                               uinfo);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_tgsigqueueinfo]]]*/
-
-/*[[[head:libc_killpg,hash:CRC-32=0x632634b6]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp,
-                                  signo_t signo)
-/*[[[body:libc_killpg]]]*/
-{
-	return kill(-pgrp, signo);
-}
-/*[[[end:libc_killpg]]]*/
 
 /*[[[head:libc_psignal,hash:CRC-32=0x40b58e8a]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.signal") void
@@ -755,7 +866,15 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 }
 /*[[[end:libc_psiginfo]]]*/
 
-/*[[[head:libc_siginterrupt,hash:CRC-32=0x7be25065]]]*/
+/*[[[head:libc_siginterrupt,hash:CRC-32=0x235b7f05]]]*/
+/* >> siginterrupt(3)
+ * Set the `SA_RESTART' of the already-established signal handler for `signo',
+ * as well as cause any future handler established by `bsd_signal()' or one of
+ * its aliases to immediately be established with `SA_RESTART' set/cleared
+ * @param: interrupt: When == 0: clear `SA_RESTART' for the signal handler of `signo'
+ *                    When != 0: set `SA_RESTART' for the signal handler of `signo'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] The given `signo' is invalid */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_siginterrupt)(signo_t signo,
                                         __STDC_INT_AS_UINT_T interrupt)
@@ -779,32 +898,13 @@ err:
 }
 /*[[[end:libc_siginterrupt]]]*/
 
-/*[[[head:libc_sigstack,hash:CRC-32=0x7f3bfb8c]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss,
-                                    struct sigstack *oss)
-/*[[[body:libc_sigstack]]]*/
-{
-	struct sigaltstack ass, aoss;
-	int result;
-	if (ss) {
-		ass.ss_flags = ss->ss_onstack
-		               ? SS_ONSTACK
-		               : SS_DISABLE;
-		ass.ss_sp   = ss->ss_sp;
-		ass.ss_size = (size_t)-1;
-	}
-	result = sigaltstack(ss ? &ass : NULL,
-	                     oss ? &aoss : NULL);
-	if (likely(!result) && oss) {
-		oss->ss_onstack = !!(aoss.ss_flags & SS_ONSTACK);
-		oss->ss_sp      = aoss.ss_sp;
-	}
-	return result;
-}
-/*[[[end:libc_sigstack]]]*/
-
-/*[[[head:libc_sigaltstack,hash:CRC-32=0xea1267]]]*/
+/*[[[head:libc_sigaltstack,hash:CRC-32=0x46a3cdb5]]]*/
+/* >> sigaltstack(2)
+ * Get/Set the alternate signal stack for the calling thread. When set,
+ * the alternate signal stack can be used to host signal handlers that
+ * have been established with the `SA_ONSTACK' flag in `sa_flags'.
+ * @return: 0:  Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigaltstack)(struct sigaltstack const *ss,
                                        struct sigaltstack *oss)
@@ -816,120 +916,61 @@ NOTHROW_NCX(LIBCCALL libc_sigaltstack)(struct sigaltstack const *ss,
 }
 /*[[[end:libc_sigaltstack]]]*/
 
-
-PRIVATE int LIBCCALL
-set_single_signal_action(int sig, int how) {
-	sigset_t set;
-	libc_sigemptyset(&set);
-	libc_sigaddset(&set, sig);
-	return libc_sigprocmask(how, &set, NULL);
-}
-
-/*[[[head:libc_sighold,hash:CRC-32=0xb5de5490]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sighold)(signo_t signo)
-/*[[[body:libc_sighold]]]*/
-{
-	return set_single_signal_action(signo, SIG_BLOCK);
-}
-/*[[[end:libc_sighold]]]*/
-
-/*[[[head:libc_sigrelse,hash:CRC-32=0xce23f035]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigrelse)(signo_t signo)
-/*[[[body:libc_sigrelse]]]*/
-{
-	return set_single_signal_action(signo, SIG_UNBLOCK);
-}
-/*[[[end:libc_sigrelse]]]*/
-
-/*[[[head:libc_sigignore,hash:CRC-32=0x197c5558]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_sigignore)(signo_t signo)
-/*[[[body:libc_sigignore]]]*/
-{
-	return libc_bsd_signal(signo, SIG_IGN) == SIG_ERR ? -1 : 0;
-}
-/*[[[end:libc_sigignore]]]*/
-
-/*[[[head:libc_sigset,hash:CRC-32=0x1270dec0]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") sighandler_t
-NOTHROW_NCX(LIBCCALL libc_sigset)(signo_t signo,
-                                  sighandler_t disp)
-/*[[[body:libc_sigset]]]*/
-{
-	struct sigaction act, oact;
-	sigset_t set, oset;
-	if unlikely(disp == SIG_ERR)
-		goto err_inval;
-	libc_sigemptyset(&set);
-	libc_sigaddset(&set, signo);
-	if (disp == SIG_HOLD) {
-		if unlikely(libc_sigprocmask(SIG_BLOCK, &set, &oset) < 0)
-			goto err;
-		if unlikely(libc_sigismember(&oset, signo))
-			goto err;
-		if unlikely(libc_sigaction(signo, NULL, &oact) < 0)
-			goto err;
-		return oact.sa_handler;
-	}
-	act.sa_handler = disp;
-	libc_sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
-	SET_SIGRESTORE(act);
-	if unlikely(sigaction(signo, &act, &oact) < 0)
-		goto err;
-	if unlikely(sigprocmask(SIG_UNBLOCK, &set, &oset) < 0)
-		goto err;
-	return libc_sigismember(&oset, signo)
-	       ? SIG_HOLD
-	       : oact.sa_handler;
-err_inval:
-	libc_seterrno(EINVAL);
-err:
-	return SIG_ERR;
-}
-/*[[[end:libc_sigset]]]*/
-
-/*[[[head:libc_pthread_kill,hash:CRC-32=0x7438a00e]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
+/*[[[head:libc_pthread_kill,hash:CRC-32=0xccc0e8e7]]]*/
+/* >> pthread_kill(3)
+ * Portable function for sending a signal to a specific `pthread' within one's own process.
+ * @return: EOK:    Success
+ * @return: EINVAL: The given `signo' is invalid */
+INTERN ATTR_SECTION(".text.crt.sched.signal") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t pthread,
                                         signo_t signo)
 /*[[[body:libc_pthread_kill]]]*/
 {
-	struct pthread *pt = (struct pthread *)threadid;
 	pid_t tid;
 	errno_t result;
-	tid = ATOMIC_READ(_pthread_tid(pt));
+	tid = ATOMIC_READ(_pthread_tid(pthread));
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* No way to handle the case where `pt_tid' got set
 	 * to zero, and `tid' got re-used. - Sorry... */
-	result = sys_kill(tid, signo);
+	result = sys_tkill(tid, signo);
 	return -result;
 }
 /*[[[end:libc_pthread_kill]]]*/
 
-/*[[[head:libc_pthread_sigqueue,hash:CRC-32=0xef2ef369]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
+/*[[[head:libc_pthread_sigqueue,hash:CRC-32=0x7bae824f]]]*/
+/* >> pthread_sigqueue(3)
+ * This function is for `pthread_kill(3)', what `sigqueue(2)' is for `kill(2)',
+ * in that it sends a signal to `pthread', alongside a custom signal value `val'
+ * @param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+ *                and this function can be used to test if the caller would be allowed to
+ *                send signals to the process(es) specified by `pid'
+ * @param: val:   An additional value to pass alongside the signal itself. This value can
+ *                read as `info->si_value' from within a 3-arg signal handler established
+ *                by `pid', or may also be returned by a call to `sigwaitinfo(2)' and
+ *                friends made by `pid'.
+ * @return: EOK:    Success
+ * @return: EINVAL: The given `signo' is invalid
+ * @return: ESRCH:  The given `pthread' has already terminated, and could no longer handle the signal */
+INTERN ATTR_SECTION(".text.crt.sched.signal") errno_t
+NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t pthread,
                                             signo_t signo,
-                                            union sigval const value)
+                                            union sigval const val)
 /*[[[body:libc_pthread_sigqueue]]]*/
 {
-	struct pthread *pt = (struct pthread *)threadid;
 	siginfo_t info;
 	errno_t result;
 	pid_t tid;
 	memset(&info, 0, sizeof(siginfo_t));
-	info.si_value = value;
+	info.si_value = val;
 	info.si_code  = SI_QUEUE;
-	tid = ATOMIC_READ(_pthread_tid(pt));
+	tid = ATOMIC_READ(_pthread_tid(pthread));
 	if unlikely(tid == 0)
 		return ESRCH;
 	/* No way to handle the case where `pt_tid' got set
 	 * to zero, and `tid' got re-used. - Sorry... */
-	result = sys_rt_sigqueueinfo(tid, signo, &info);
+	/* XXX: Do this without having to call `getpid()' ??? */
+	result = sys_rt_tgsigqueueinfo(getpid(), tid, signo, &info);
 	return -result;
 }
 /*[[[end:libc_pthread_sigqueue]]]*/
@@ -950,7 +991,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x36f105f1]]]*/
+/*[[[start:exports,hash:CRC-32=0x158f17ec]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -964,14 +1005,10 @@ DEFINE_PUBLIC_ALIAS(DOS$ssignal, libd_ssignal);
 DEFINE_PUBLIC_ALIAS(ssignal, libc_ssignal);
 DEFINE_PUBLIC_ALIAS(DOS$gsignal, libd_gsignal);
 DEFINE_PUBLIC_ALIAS(gsignal, libc_gsignal);
-DEFINE_PUBLIC_ALIAS(sigblock, libc_sigblock);
-DEFINE_PUBLIC_ALIAS(sigsetmask, libc_sigsetmask);
-DEFINE_PUBLIC_ALIAS(siggetmask, libc_siggetmask);
 DEFINE_PUBLIC_ALIAS(__p_sys_siglist, libc___p_sys_siglist);
 DEFINE_PUBLIC_ALIAS(sigreturn, libc_sigreturn);
 DEFINE_PUBLIC_ALIAS(DOS$bsd_signal, libd_bsd_signal);
 DEFINE_PUBLIC_ALIAS(bsd_signal, libc_bsd_signal);
-DEFINE_PUBLIC_ALIAS(__xpg_sigpause, libc___xpg_sigpause);
 DEFINE_PUBLIC_ALIAS(kill, libc_kill);
 DEFINE_PUBLIC_ALIAS(pthread_sigmask, libc_sigprocmask);
 DEFINE_PUBLIC_ALIAS(sigprocmask, libc_sigprocmask);
@@ -989,16 +1026,10 @@ DEFINE_PUBLIC_ALIAS(sigqueue, libc_sigqueue);
 DEFINE_PUBLIC_ALIAS(sigtimedwait64, libc_sigtimedwait64);
 DEFINE_PUBLIC_ALIAS(sigqueueinfo, libc_sigqueueinfo);
 DEFINE_PUBLIC_ALIAS(tgsigqueueinfo, libc_tgsigqueueinfo);
-DEFINE_PUBLIC_ALIAS(killpg, libc_killpg);
 DEFINE_PUBLIC_ALIAS(psignal, libc_psignal);
 DEFINE_PUBLIC_ALIAS(psiginfo, libc_psiginfo);
 DEFINE_PUBLIC_ALIAS(siginterrupt, libc_siginterrupt);
-DEFINE_PUBLIC_ALIAS(sigstack, libc_sigstack);
 DEFINE_PUBLIC_ALIAS(sigaltstack, libc_sigaltstack);
-DEFINE_PUBLIC_ALIAS(sighold, libc_sighold);
-DEFINE_PUBLIC_ALIAS(sigrelse, libc_sigrelse);
-DEFINE_PUBLIC_ALIAS(sigignore, libc_sigignore);
-DEFINE_PUBLIC_ALIAS(sigset, libc_sigset);
 DEFINE_PUBLIC_ALIAS(pthread_kill, libc_pthread_kill);
 DEFINE_PUBLIC_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);
 /*[[[end:exports]]]*/

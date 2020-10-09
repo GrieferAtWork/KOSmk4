@@ -1586,17 +1586,17 @@ NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void)
 }
 /*[[[end:libc_pthread_testcancel]]]*/
 
-/*[[[head:libc_pthread_getcpuclockid,hash:CRC-32=0x6c87e8b7]]]*/
+/*[[[head:libc_pthread_getcpuclockid,hash:CRC-32=0x2ea1f83a]]]*/
 /* Get ID of CPU-time clock for thread THREAD_ID
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((2)) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread_id,
+NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread,
                                                  clockid_t *clock_id)
 /*[[[body:libc_pthread_getcpuclockid]]]*/
 /*AUTO*/{
-	(void)pthread_id;
+	(void)pthread;
 	(void)clock_id;
-	CRT_UNIMPLEMENTEDF("pthread_getcpuclockid(%" PRIxN(__SIZEOF_PTHREAD_T) ", %p)", pthread_id, clock_id); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_getcpuclockid(%" PRIxN(__SIZEOF_PTHREAD_T) ", %p)", pthread, clock_id); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_getcpuclockid]]]*/

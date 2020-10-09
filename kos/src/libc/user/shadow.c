@@ -31,9 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_setspent,hash:CRC-32=0x381becd4]]]*/
-/* Open database for reading.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_setspent,hash:CRC-32=0x8a151368]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") void
 NOTHROW_RPC(LIBCCALL libc_setspent)(void)
 /*[[[body:libc_setspent]]]*/
@@ -43,8 +41,7 @@ NOTHROW_RPC(LIBCCALL libc_setspent)(void)
 }
 /*[[[end:libc_setspent]]]*/
 
-/*[[[head:libc_endspent,hash:CRC-32=0x35b44d37]]]*/
-/* Close database. */
+/*[[[head:libc_endspent,hash:CRC-32=0x49326e3a]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endspent)(void)
 /*[[[body:libc_endspent]]]*/
@@ -54,9 +51,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endspent)(void)
 }
 /*[[[end:libc_endspent]]]*/
 
-/*[[[head:libc_getspent,hash:CRC-32=0x895461bd]]]*/
-/* Get next entry from database, perhaps after opening the file.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_getspent,hash:CRC-32=0x32f1ea92]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") struct spwd *
 NOTHROW_RPC(LIBCCALL libc_getspent)(void)
 /*[[[body:libc_getspent]]]*/
@@ -67,9 +62,7 @@ NOTHROW_RPC(LIBCCALL libc_getspent)(void)
 }
 /*[[[end:libc_getspent]]]*/
 
-/*[[[head:libc_getspnam,hash:CRC-32=0xe006374e]]]*/
-/* Get shadow entry matching NAME.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_getspnam,hash:CRC-32=0x4200f335]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1)) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name)
 /*[[[body:libc_getspnam]]]*/
@@ -81,9 +74,7 @@ NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name)
 }
 /*[[[end:libc_getspnam]]]*/
 
-/*[[[head:libc_sgetspent,hash:CRC-32=0x4165ee3c]]]*/
-/* Read shadow entry from STRING.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_sgetspent,hash:CRC-32=0xc94f481f]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1)) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string)
 /*[[[body:libc_sgetspent]]]*/
@@ -95,9 +86,7 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string)
 }
 /*[[[end:libc_sgetspent]]]*/
 
-/*[[[head:libc_fgetspent,hash:CRC-32=0xb3eb2a3e]]]*/
-/* Read next shadow entry from STREAM.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_fgetspent,hash:CRC-32=0x65f8ebf5]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1)) struct spwd *
 NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream)
 /*[[[body:libc_fgetspent]]]*/
@@ -109,9 +98,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream)
 }
 /*[[[end:libc_fgetspent]]]*/
 
-/*[[[head:libc_putspent,hash:CRC-32=0x6a8112a4]]]*/
-/* Write line containing shadow password entry to stream.
- * This function is not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_putspent,hash:CRC-32=0xf3c9214d]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
                                     FILE *__restrict stream)
@@ -125,9 +112,7 @@ NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
 }
 /*[[[end:libc_putspent]]]*/
 
-/*[[[head:libc_getspent_r,hash:CRC-32=0xfab378af]]]*/
-/* Reentrant versions of some of the functions above.
- * These functions are not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_getspent_r,hash:CRC-32=0x9b7152bf]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2, 4)) int
 NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
                                       char *__restrict buffer,
@@ -145,9 +130,7 @@ NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
 }
 /*[[[end:libc_getspent_r]]]*/
 
-/*[[[head:libc_getspnam_r,hash:CRC-32=0x5629111e]]]*/
-/* Reentrant versions of some of the functions above.
- * These functions are not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_getspnam_r,hash:CRC-32=0xd76055eb]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
                                       struct spwd *__restrict result_buf,
@@ -167,9 +150,7 @@ NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
 }
 /*[[[end:libc_getspnam_r]]]*/
 
-/*[[[head:libc_sgetspent_r,hash:CRC-32=0x1a7bc87]]]*/
-/* Reentrant versions of some of the functions above.
- * These functions are not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_sgetspent_r,hash:CRC-32=0xa32e0ae5]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
                                        struct spwd *__restrict result_buf,
@@ -189,9 +170,7 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
 }
 /*[[[end:libc_sgetspent_r]]]*/
 
-/*[[[head:libc_fgetspent_r,hash:CRC-32=0x799adf59]]]*/
-/* Reentrant versions of some of the functions above.
- * These functions are not part of POSIX and therefore no official cancellation point */
+/*[[[head:libc_fgetspent_r,hash:CRC-32=0xb4cc908e]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
                                        struct spwd *__restrict result_buf,
@@ -211,8 +190,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
 }
 /*[[[end:libc_fgetspent_r]]]*/
 
-/*[[[head:libc_lckpwdf,hash:CRC-32=0x52f047fc]]]*/
-/* Protect password file against multi writers */
+/*[[[head:libc_lckpwdf,hash:CRC-32=0xa0976341]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") int
 NOTHROW_RPC_KOS(LIBCCALL libc_lckpwdf)(void)
 /*[[[body:libc_lckpwdf]]]*/
@@ -223,8 +201,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_lckpwdf)(void)
 }
 /*[[[end:libc_lckpwdf]]]*/
 
-/*[[[head:libc_ulckpwdf,hash:CRC-32=0x9ca5bf33]]]*/
-/* Unlock password file */
+/*[[[head:libc_ulckpwdf,hash:CRC-32=0x80daa9be]]]*/
 INTERN ATTR_SECTION(".text.crt.database.shadow") int
 NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void)
 /*[[[body:libc_ulckpwdf]]]*/

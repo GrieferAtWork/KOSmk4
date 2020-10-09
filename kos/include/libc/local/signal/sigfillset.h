@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x393c4517 */
+/* HASH CRC-32:0x7437a7ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,6 +117,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memsetw __LIBC_LOCAL_NAME(memsetw)
 #endif /* !... */
 #endif /* !__local___localdep_memsetw_defined */
+/* >> sigfillset(3)
+ * Add all possible signals (possibly even including undefined signals,
+ * though these would be ignored by the kernel) to the given signal set
+ * @return: 0: Always returns `0' */
 __LOCAL_LIBC(sigfillset) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigfillset))(struct __sigset_struct *__set) {
 #if __SIZEOF_POINTER__ == 8

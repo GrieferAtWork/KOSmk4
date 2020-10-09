@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b2c3ed1 */
+/* HASH CRC-32:0xa174c02b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -234,9 +234,9 @@
  *                 - O_NONBLOCK: Don't wait for the driver to be unloaded.
  *                               Currently, KOS simply ignores this flag,
  *                               since drivers on KOS should always be unloaded
- *                               immediatly. - However, driver finalizers may
+ *                               immediately. - However, driver finalizers may
  *                               do blocking operations before then...
- *                 - O_TRUNC:    Force the driver to be unloaded immediatly
+ *                 - O_TRUNC:    Force the driver to be unloaded immediately
  *                               (may compromise system integrity)
  *                               s.a. `KSYSCTL_DRIVER_DELMOD_FFORCE' */
 #define __NR_delete_module          0x6a  /* errno_t delete_module(char const *name, oflag_t flags) */
@@ -268,7 +268,7 @@
 #define __NR_restart_syscall        0x80  /* errno_t restart_syscall(void) */
 #define __NR_kill                   0x81  /* errno_t kill(pid_t pid, signo_t signo) */
 #define __NR_tkill                  0x82  /* errno_t tkill(pid_t tid, signo_t signo) */
-#define __NR_tgkill                 0x83  /* errno_t tgkill(pid_t tgid, pid_t tid, signo_t signo) */
+#define __NR_tgkill                 0x83  /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 #define __NR_sigaltstack            0x84  /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
 #define __NR_rt_sigsuspend          0x85  /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define __NR_rt_sigaction           0x86  /* errno_t rt_sigaction(signo_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize) */
@@ -282,7 +282,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-#define __NR_rt_sigqueueinfo        0x8a  /* errno_t rt_sigqueueinfo(pid_t tgid, signo_t usigno, struct __siginfo_struct const *uinfo) */
+#define __NR_rt_sigqueueinfo        0x8a  /* errno_t rt_sigqueueinfo(pid_t pid, signo_t usigno, struct __siginfo_struct const *uinfo) */
 #define __NR_rt_sigreturn           0x8b  /* void rt_sigreturn(struct fpustate const *restore_fpu, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define __NR_setpriority            0x8c  /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
@@ -547,7 +547,7 @@
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGNO:            [...]
  * @throw: E_INVALID_ARGUMENT_BAD_VALUE:E_INVALID_ARGUMENT_CONTEXT_RAISE_SIGINFO_BADCODE:  [...]
  * @throw: E_ILLEGAL_OPERATION:                                                            [...] */
-#define __NR_rt_tgsigqueueinfo      0xf0  /* errno_t rt_tgsigqueueinfo(pid_t tgid, pid_t tid, signo_t usigno, struct __siginfo_struct const *uinfo) */
+#define __NR_rt_tgsigqueueinfo      0xf0  /* errno_t rt_tgsigqueueinfo(pid_t pid, pid_t tid, signo_t usigno, struct __siginfo_struct const *uinfo) */
 #define __NR_perf_event_open        0xf1  /* errno_t perf_event_open(int TODO_PROTOTYPE) */
 /* Accept incoming client (aka. peer) connection requests.
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')

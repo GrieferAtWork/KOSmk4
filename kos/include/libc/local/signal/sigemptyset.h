@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcff78d93 */
+/* HASH CRC-32:0xb87edbb3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,9 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzeroc __LIBC_LOCAL_NAME(bzeroc)
 #endif /* !__CRT_HAVE_bzeroc */
 #endif /* !__local___localdep_bzeroc_defined */
+/* >> sigemptyset(3)
+ * Clear the given signal set of all contained signals
+ * @return: 0: Always returns `0' */
 __LOCAL_LIBC(sigemptyset) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigemptyset))(struct __sigset_struct *__set) {
 	__localdep_bzeroc(__set->__val, __COMPILER_LENOF(__set->__val), __SIZEOF_POINTER__);

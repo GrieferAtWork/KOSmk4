@@ -1128,18 +1128,68 @@ __NAMESPACE_STD_USING(size_t)
 
 %[insert:std]
 
-[[std, crt_dos_variant, decl_include("<bits/types.h>")]]
-int raise($signo_t signo);
+@@>> raise(3)
+@@Raise a signal within the current thread.
+@@In a *-theaded process this is same as:
+@@  *=multi:  `pthread_kill(pthread_self(), signo)'
+@@  *=single: `kill(getpid(), signo)'
+@@@return: 0:  Success
+@@@return: -1: [errno=EINVAL] The given `signo' is invalid
+[[std, userimpl, crt_dos_variant, decl_include("<bits/types.h>")]]
+[[requires(($has_function(pthread_kill) && $has_function(pthread_self)) ||
+           ($has_function(kill) && $has_function(getpid)))]]
+[[impl_include("<libc/errno.h>")]]
+int raise($signo_t signo) {
+@@pp_if $has_function(pthread_kill) && $has_function(pthread_self)@@
+	errno_t error;
+	error = pthread_kill(pthread_self(), signo);
+	if unlikely(error != EOK)
+		error = (errno_t)__libc_seterrno(error);
+	return (int)error;
+@@pp_else@@
+	return kill(getpid(), signo);
+@@pp_endif@@
+}
 
 %[insert:function(__sysv_signal = sysv_signal)]
 
 %#ifdef __USE_GNU
+@@>> sysv_signal(3)
+@@Wrapper for `sigaction(2)' to establish a signal handler as:
+@@    >> struct sigaction act, oact
+@@    >> act.sa_handler = handler;
+@@    >> act.sa_flags   = (SA_RESETHAND | SA_NODEFER) & ~SA_RESTART;
+@@    >> sigemptyset(&act.sa_mask);
+@@    >> if (sigaction(signo, &act, &oact) != 0)
+@@    >>     oact.sa_handler = SIG_ERR;
+@@    >> return oact.sa_handler;
+@@@return: * :      The previous signal handler function.
+@@@return: SIG_ERR: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sigaction.h>")]]
 [[export_alias("__sysv_signal"), crt_dos_variant]]
-$sighandler_t sysv_signal($signo_t signo, $sighandler_t handler);
+[[requires_include("<asm/os/signal.h>")]]
+[[userimpl, requires(defined(@__SA_RESETHAND@) && defined(@__SA_NODEFER@) &&
+                     defined(@__SIG_ERR@) && $has_function(sigaction))]]
+[[impl_include("<asm/os/signal.h>")]]
+[[impl_include("<bits/os/sigaction.h>")]]
+$sighandler_t sysv_signal($signo_t signo, $sighandler_t handler) {
+	struct @sigaction@ act, oact
+	act.@sa_handler@ = handler;
+	act.@sa_flags@   = @__SA_RESETHAND@ | @__SA_NODEFER@;
+	sigemptyset(&act.@sa_mask@);
+	if (sigaction(signo, &act, &oact) != 0)
+	    oact.@sa_handler@ = @__SIG_ERR@;
+	return oact.@sa_handler@;
+}
 %#endif /* __USE_GNU */
 
 
+@@>> signal(2/3)
+@@Non-portable signal handler establishment function that behaves
+@@either like `sysv_signal()', `bsd_signal()', or has its own behavior.
+@@On KOS, this function behaves identical to `bsd_signal()'
+@@@return: * :      The previous signal handler function.
+@@@return: SIG_ERR: Error (s.a. `errno')
 [[std, no_crt_self_import, alias("sysv_signal")]]
 [[if(defined(__USE_MISC)), preferred_alias("signal", "_signal")]]
 [[crt_dos_variant, dos_export_as("DOS$_signal")]]
@@ -1149,15 +1199,83 @@ $sighandler_t signal($signo_t signo, $sighandler_t handler);
 %#ifdef __USE_MISC
 %#define sigmask(signo) __sigset_mask(signo)
 
+@@>> ssignal(3)
+@@Establish a software-signal-handler. This handler may or may not
+@@be distinct from normal signal handlers, and should be triggered
+@@by `gsignal(3)', rather than `raise(3)'.
+@@On KOS, this function behaves identical to `bsd_signal()'
+@@@return: * :      The previous signal handler function.
+@@@return: SIG_ERR: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sigaction.h>"), crt_dos_variant]]
-$sighandler_t ssignal($signo_t signo, $sighandler_t handler);
+[[userimpl, requires_function(bsd_signal)]]
+$sighandler_t ssignal($signo_t signo, $sighandler_t handler) {
+	return bsd_signal(signo, handler);
+}
 
+@@>> gsignal(3)
+@@Raise a software-signal by invocing a previously established
+@@software-signal-handler, as set by `ssignal(signo, ...)'.
+@@This method by which a software signal is raised may or may not
+@@be distinct from normal signal handlers.
+@@On KOS, this function behaves identical to `raise()'
+@@@return: 0:  Success
+@@@return: -1: [errno=EINVAL] The given `signo' is invalid
 [[decl_include("<bits/types.h>"), crt_dos_variant]]
-int gsignal($signo_t signo);
+[[userimpl, requires_function(raise)]]
+int gsignal($signo_t signo) {
+	return raise(signo);
+}
 
-/*[[deprecated("Using `sigprocmask()' instead")]]*/ int sigblock(int mask);
-/*[[deprecated("Using `sigprocmask()' instead")]]*/ int sigsetmask(int mask);
-/*[[deprecated("Using `sigprocmask()' instead")]]*/ int siggetmask(void);
+@@>> sigblock(3)
+@@Deprecated method of SIG_BLOCK-ing a given set of signals.
+@@Modern code should use `sigprocmask()' instead.
+@@@return: 0: Success
+[[deprecated("Using `sigprocmask(SIG_BLOCK)' instead")]]
+[[requires_include("<asm/os/signal.h>")]]
+[[requires(defined(@__SIG_BLOCK@) && $has_function(sigprocmask))]]
+[[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>")]]
+int sigblock(int mask) {
+	sigset_t sigset;
+	sigemptyset(&sigset);
+	sigset.@__val@[0] = (uintptr_t)(unsigned int)mask;
+	return sigprocmask(@__SIG_BLOCK@, &sigset, NULL);
+}
+
+@@>> sigsetmask(3)
+@@Deprecated method of SIG_SETMASK-ing a given set of signals.
+@@Modern code should use `sigprocmask(SIG_SETMASK)' instead.
+@@@return: 0: Success
+[[deprecated("Using `sigprocmask()' instead")]]
+[[requires_include("<asm/os/signal.h>")]]
+[[requires(defined(@__SIG_SETMASK@) && $has_function(sigprocmask))]]
+[[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>")]]
+int sigsetmask(int mask) {
+	sigset_t sigset;
+	sigemptyset(&sigset);
+	sigset.@__val@[0] = (uintptr_t)(unsigned int)mask;
+	return sigprocmask(@__SIG_SETMASK@, &sigset, NULL);
+}
+
+@@>> sigsetmask(3)
+@@Deprecated method of retrieving the masking-state of
+@@the lowest-numberred `sizeof(int) * NBBY - 1' signals.
+@@@return: <= INT_MAX: An incomplete signal mask bitset for a couple
+@@                     of the lowest-numbered couple of signal.
+@@@return: -1:         Error
+[[deprecated("Using `sigprocmask()' instead")]]
+[[requires($has_function(sigprocmask))]]
+[[impl_include("<asm/os/signal.h>", "<bits/os/sigset.h>", "<hybrid/typecore.h>")]]
+int siggetmask(void) {
+	sigset_t sigset;
+@@pp_if defined(@__SIG_SETMASK@)@@
+	if (sigprocmask(@__SIG_SETMASK@, NULL, &sigset))
+		return -1;
+@@pp_else@@
+	if (sigprocmask(0, NULL, &sigset))
+		return -1;
+@@pp_endif@@
+	return sigset.@__val@[0] & @__INT_MAX__@;
+}
 
 
 %
@@ -1167,7 +1285,7 @@ int gsignal($signo_t signo);
 #define sys_siglist _sys_siglist
 #else /* _sys_siglist */
 }
-[[guard, nothrow, wunused, ATTR_CONST, nonnull]]
+[[guard, nothrow, wunused, const, nonnull]]
 char const *const *__p_sys_siglist();
 %{
 #ifdef ____p_sys_siglist_defined
@@ -1194,27 +1312,73 @@ __LIBC char const *const _sys_siglist[_NSIG];
 }
 
 %struct sigcontext;
-[[ATTR_NORETURN, decl_prefix(struct sigcontext;)]]
+
+@@Don't call directly. Used internally to resume
+@@execution when returning from a signal handler.
+[[noreturn, decl_prefix(struct sigcontext;)]]
 void sigreturn(struct sigcontext const *scp);
 
 %#endif /* __USE_MISC */
 %
 %#ifdef __USE_XOPEN
 
+@@>> bsd_signal(3)
+@@Wrapper for `sigaction(2)' to establish a signal handler as:
+@@    >> struct sigaction act, oact
+@@    >> act.sa_handler = handler;
+@@    >> sigemptyset(&act.sa_mask);
+@@    >> sigaddset(&act.sa_mask, signo);
+@@    >> act.sa_flags = sigismember(&[SIGNALS_WITH_SIGINTERRUPT], signo) ? 0 : SA_RESTART;
+@@    >> SET_SIGRESTORE(act);
+@@    >> if (sigaction(signo, &act, &oact) != 0)
+@@    >>     oact.sa_handler = SIG_ERR;
+@@    >> return oact.sa_handler;
+@@    Where `SIGNALS_WITH_SIGINTERRUPT' is the set of signals for which
+@@    `siginterrupt(3)' had last been called with a non-zero `interrupt'
+@@    argument
+@@@return: * :      The previous signal handler function.
+@@@return: SIG_ERR: Error (s.a. `errno')
 [[decl_include("<bits/types.h>", "<bits/os/sigaction.h>"), crt_dos_variant]]
 $sighandler_t bsd_signal($signo_t signo, $sighandler_t handler);
 
-[[crt_name("__xpg_sigpause")]]
-[[decl_include("<bits/types.h>")]]
-int sigpause($signo_t signo);
+@@>> sigpause(3)
+@@Atomically save and set the caller's signal mask to consist solely
+@@of the signal signal `signo', then wait for that signal to arrive
+@@before restoring the old signal mask.
+@@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
+[[requires_function(sigsuspend)]]
+[[crt_name("__xpg_sigpause"), decl_include("<bits/types.h>")]]
+int sigpause($signo_t signo) {
+	sigset_t mask;
+	sigemptyset(&mask);
+	sigaddset(&mask, signo);
+	return sigsuspend(&mask);
+}
 
 %#endif /* __USE_XOPEN */
 %
 %#ifdef __USE_POSIX
 
+@@>> kill(2)
+@@Raise a signal `signo' within the process(es) specified by `pid':
+@@  - pid > 0:   Deliver `signo' to a process who's PID matches `pid'.
+@@  - pid == 0:  Deliver `signo' to every process within the caller's process group.
+@@  - pid == -1: Deliver `signo' to every process the caller has permission to send
+@@               signals to, with the exception of a process with pid=1 (i.e. `/bin/init')
+@@  - pid < -1:  Deliver `signo' to every process within the process group `-pid'
+@@@param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+@@               and this function can be used to test if the caller would be allowed to
+@@               send signals to the process(es) specified by `pid'
+@@@return: 0:    Success
+@@@return: -1:   [errno=EINVAL] The given `signo' is invalid
+@@@return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
+@@@return: -1:   [errno=ESRCH]  No process is identified by `pid'
 [[decl_include("<bits/types.h>")]]
 int kill($pid_t pid, $signo_t signo);
 
+@@>> sigemptyset(3)
+@@Clear the given signal set of all contained signals
+@@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
 [[impl_include("<bits/os/sigset.h>")]]
 int sigemptyset([[nonnull]] $sigset_t *set) {
@@ -1222,6 +1386,10 @@ int sigemptyset([[nonnull]] $sigset_t *set) {
 	return 0;
 }
 
+@@>> sigfillset(3)
+@@Add all possible signals (possibly even including undefined signals,
+@@though these would be ignored by the kernel) to the given signal set
+@@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
 [[impl_include("<bits/os/sigset.h>")]]
 int sigfillset([[nonnull]] $sigset_t *set) {
@@ -1237,6 +1405,9 @@ int sigfillset([[nonnull]] $sigset_t *set) {
 	return 0;
 }
 
+@@>> sigaddset(3)
+@@Add only the given `signo' to the given signal set
+@@@return: 0: Always returns `0'
 [[kernel, alias("__sigaddset")]]
 [[if(!defined(__KERNEL__)), export_as("__sigaddset")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
@@ -1247,6 +1418,9 @@ int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	return 0;
 }
 
+@@>> sigdelset(3)
+@@Remove only the given `signo' from the given signal set
+@@@return: 0: Always returns `0'
 [[kernel, alias("__sigdelset")]]
 [[if(!defined(__KERNEL__)), export_as("__sigdelset")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
@@ -1257,13 +1431,17 @@ int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 	return 0;
 }
 
+@@>> sigismember(3)
+@@Check if a given `signo' is apart of the a given signal set
+@@@return: != 0: The given `signo' is apart of `set'
+@@@return: == 0: The given `signo' isn't apart of `set'
 [[kernel, wunused, ATTR_PURE, alias("__sigismember")]]
 [[if(!defined(__KERNEL__)), export_as("__sigismember")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 	ulongptr_t mask = __sigset_mask(signo);
 	ulongptr_t word = __sigset_word(signo);
-	return (set->__val[word] & mask) != 0;
+	return (int)(set->__val[word] & mask);
 }
 
 @@Change the signal mask for the calling thread. Note that portable
@@ -1276,6 +1454,8 @@ int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
 @@and `setsigmaskptr()' exist, which can be used to get/set the
 @@address of the signal mask used by the kernel.
 @@@param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
+@@@return: 0:  Success
+@@@return: -1: [errno=EINVAL] Invalid `how'
 [[decl_include("<features.h>"), export_alias("pthread_sigmask")]]
 [[decl_prefix(struct __sigset_struct;)]]
 int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
@@ -1285,6 +1465,7 @@ int sigprocmask(__STDC_INT_AS_UINT_T how, sigset_t const *set, sigset_t *oset);
 @@Return the current signal mask pointer.
 @@See the documentation of `setsigmaskptr(3)' for
 @@what this function is all about. 
+@@@return: * : A pointer to the calling thread's current signal mask
 [[nonnull, wunused, decl_include("<bits/os/sigset.h>")]]
 sigset_t *getsigmaskptr(void);
 
@@ -1314,31 +1495,58 @@ sigset_t *getsigmaskptr(void);
 sigset_t *setsigmaskptr([[nonnull]] sigset_t *sigmaskptr);
 %#endif /* __USE_KOS */
 
+@@>> sigsuspend(2)
+@@Atomically save and set the caller's signal mask to `set', then wait for
+@@one of the contained signals to arrive before restoring the old signal mask.
+@@@param: set: The set of signals on which to wait
+@@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, export_alias("__sigsuspend")]]
 [[decl_include("<bits/os/sigset.h>")]]
 int sigsuspend([[nonnull]] sigset_t const *set);
 
+@@>> sigaction(2)
+@@Get/Set the action that shall be performed when a
+@@signal `signo' must be handled by the calling process.
+@@This function will modifiy the caller's kernel-space signal handler descriptor,
+@@who's shared/unshared behavior between threads is controlled by `CLONE_SIGHAND'
+@@@return: 0:  Success
+@@@return: -1: [errno=EINVAL] The given `signo' is invalid
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__sigaction"), decl_prefix(struct sigaction;)]]
 int sigaction($signo_t signo, struct sigaction const *act, struct sigaction *oact);
 
+@@>> sigpending(2)
+@@Retrieve the set of signals that are pending
+@@in either the calling thread and process
+@@@return: 0: Success
 [[decl_include("<bits/os/sigset.h>")]]
 int sigpending([[nonnull]] sigset_t *__restrict set);
 
+@@>> sigwait(3)
+@@Same as `sigsuspend(2)', but write-back the actual signal that was raised to `*signo'
+@@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, decl_include("<bits/types.h>")]]
 int sigwait([[nonnull]] sigset_t const *__restrict set,
             [[nonnull]] $signo_t *__restrict signo);
 
 %#ifdef __USE_GNU
+@@>> sigisemptyset(3)
+@@Check if the given signal set is empty
+@@@return: != 0: The given `set' is non-empty
+@@@return: == 0: The given `set' is empty
 [[kernel, wunused, ATTR_PURE, decl_include("<bits/os/sigset.h>")]]
 int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i) {
 		if (set->__val[i])
 			return 0;
+	}
 	return 1;
 }
 
+@@>> sigandset(3)
+@@Set-up every signal `S' from `set' as the result of `set[S] = left[S] & right[S]'
+@@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
 int sigandset([[nonnull]] $sigset_t *set,
               [[nonnull]] $sigset_t const *left,
@@ -1349,6 +1557,9 @@ int sigandset([[nonnull]] $sigset_t *set,
 	return 0;
 }
 
+@@>> sigorset(3)
+@@Set-up every signal `S' from `set' as the result of `set[S] = left[S] | right[S]'
+@@@return: 0: Always returns `0'
 [[kernel, decl_include("<bits/os/sigset.h>")]]
 int sigorset([[nonnull]] $sigset_t *set,
              [[nonnull]] $sigset_t const *left,
@@ -1360,7 +1571,31 @@ int sigorset([[nonnull]] $sigset_t *set,
 }
 %#endif /* __USE_GNU */
 
+
+%#ifdef __USE_KOS
+@@>> signandset(3)
+@@Set-up every signal `S' from `set' as the result of `set[S] = left[S] & ~right[S]'
+@@@return: 0: Always returns `0'
+[[kernel, decl_include("<bits/os/sigset.h>")]]
+int signandset([[nonnull]] $sigset_t *set,
+               [[nonnull]] $sigset_t const *left,
+               [[nonnull]] $sigset_t const *right) {
+	size_t i;
+	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
+		set->__val[i] = left->__val[i] & ~right->__val[i];
+	return 0;
+}
+%#endif /* __USE_KOS */
+
+
 %#ifdef __USE_POSIX199309
+
+@@>> sigwaitinfo(2)
+@@Same as `sigsuspend(2)', but write-back extended information in the signal,
+@@as it would/has also been passed to a signal handler's second (info) argument.
+@@@param: set:  The set of signals on which to wait
+@@@param: info: Information about the signal on which to wait.
+@@@return: -1: [errno=EINTR] The signal handler for `signo' was executed.
 [[cp, decl_include("<bits/os/siginfo.h>")]]
 int sigwaitinfo([[nonnull]] $sigset_t const *__restrict set,
                 [[nullable]] siginfo_t *__restrict info);
@@ -1369,32 +1604,54 @@ int sigwaitinfo([[nonnull]] $sigset_t const *__restrict set,
 [[decl_include("<bits/os/siginfo.h>")]]
 int sigtimedwait32([[nonnull]] $sigset_t const *__restrict set,
                    [[nullable]] siginfo_t *__restrict info,
-                   [[nullable]] struct $timespec32 const *timeout);
+                   [[nullable]] struct $timespec32 const *rel_timeout);
 
+@@>> sigtimedwait(2)
+@@Same as `sigwaitinfo(2)', but stop waiting after a total of `rel_timeout' has passed
+@@@param: set:         The set of signals on which to wait
+@@@param: info:        Information about the signal on which to wait.
+@@@param: rel_timeout: The timeout specifying for how long to wait (or `NULL' to wait indefinitely)
+@@@return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
+@@@return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed.
 [[cp, no_crt_self_import, decl_include("<bits/os/siginfo.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("sigtimedwait")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
 int sigtimedwait([[nonnull]] $sigset_t const *__restrict set,
                  [[nullable]] siginfo_t *__restrict info,
-                 [[nullable]] struct timespec const *timeout) {
+                 [[nullable]] struct timespec const *rel_timeout) {
 @@pp_if $has_function(sigtimedwait64)@@
 	struct timespec64 tmv;
-	if (!timeout)
+	if (!rel_timeout)
 		return sigtimedwait64(set, info, NULL);
-	tmv.tv_sec  = (__time64_t)timeout->tv_sec;
-	tmv.tv_nsec = timeout->tv_nsec;
+	tmv.tv_sec  = (__time64_t)rel_timeout->tv_sec;
+	tmv.tv_nsec = rel_timeout->tv_nsec;
 	return sigtimedwait64(set, info, NULL);
 @@pp_else@@
 	struct timespec32 tmv;
-	if (!timeout)
+	if (!rel_timeout)
 		return sigtimedwait32(set, info, NULL);
-	tmv.tv_sec  = (__time32_t)timeout->tv_sec;
-	tmv.tv_nsec = timeout->tv_nsec;
+	tmv.tv_sec  = (__time32_t)rel_timeout->tv_sec;
+	tmv.tv_nsec = rel_timeout->tv_nsec;
 	return sigtimedwait32(set, info, NULL);
 @@pp_endif@@
 }
 
+@@>> sigqueue(2)
+@@Similar to `kill(2)', but `pid' must be positive and reference a process's PID,
+@@meaning that this function can only be uesd to send a signal to single, specific process.
+@@@param: pid:   The PID of the process that shall receive the signal.
+@@@param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+@@               and this function can be used to test if the caller would be allowed to
+@@               send signals to the process(es) specified by `pid'
+@@@param: val:   An additional value to pass alongside the signal itself. This value can
+@@               read as `info->si_value' from within a 3-arg signal handler established
+@@               by `pid', or may also be returned by a call to `sigwaitinfo(2)' and
+@@               friends made by `pid'.
+@@@return: 0:    Success
+@@@return: -1:   [errno=EINVAL] The given `signo' is invalid
+@@@return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
+@@@return: -1:   [errno=ESRCH]  No process is identified by `pid'
 [[decl_include("<bits/types.h>")]]
 int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 
@@ -1405,12 +1662,12 @@ int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 [[decl_include("<bits/os/siginfo.h>")]]
 int sigtimedwait64([[nonnull]] $sigset_t const *__restrict set,
                    [[nullable]] siginfo_t *__restrict info,
-                   [[nullable]] struct $timespec64 const *timeout) {
+                   [[nullable]] struct $timespec64 const *rel_timeout) {
 	struct timespec32 tmv;
-	if (!timeout)
+	if (!rel_timeout)
 		return sigtimedwait32(set, info, NULL);
-	tmv.tv_sec  = (__time32_t)timeout->tv_sec;
-	tmv.tv_nsec = timeout->tv_nsec;
+	tmv.tv_sec  = (__time32_t)rel_timeout->tv_sec;
+	tmv.tv_nsec = rel_timeout->tv_nsec;
 	return sigtimedwait32(set, info, NULL);
 }
 
@@ -1420,19 +1677,61 @@ int sigtimedwait64([[nonnull]] $sigset_t const *__restrict set,
 
 %
 %#ifdef __USE_KOS
+@@>> sigqueueinfo(2)
+@@Similar to `sigqueue(2)', but instead of only being able to specify a custom
+@@signal value, everything about signal meta-data can be specified by this function.
+@@Note however that various privileges are required to provide custom values for
+@@different values of `uinfo' that don't match what the equivalent call to `sigqueue(2)'
+@@would have used.
+@@@param: pid:   The PID of the process that shall receive the signal.
+@@@param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+@@               and this function can be used to test if the caller would be allowed to
+@@               send signals to the process(es) specified by `pid'
+@@@param: uinfo: Signal information to pass alongside the signal itself.
+@@@return: 0:    Success
+@@@return: -1:   [errno=EINVAL] The given `signo' is invalid
+@@@return: -1:   [errno=EINVAL] The given `signo' doesn't match `uinfo->si_signo'
+@@@return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
+@@@return: -1:   [errno=EPERM]  `info->si_code' is invalid, and `pid' is a different process
+@@@return: -1:   [errno=ESRCH]  No process is identified by `pid'
 [[decl_include("<bits/types.h>", "<bits/os/siginfo.h>")]]
-int sigqueueinfo($pid_t tgid, $signo_t signo,
+int sigqueueinfo($pid_t pid, $signo_t signo,
                  [[nonnull]] siginfo_t const *uinfo);
 
+@@>> tgsigqueueinfo(2)
+@@Similar to `sigqueueinfo(2)', rather than sending a signal to a process
+@@as a whole, only send the signal to a single thread within that process.
+@@@param: pid:   The PID of the process that shall receive the signal.
+@@@param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+@@               and this function can be used to test if the caller would be allowed to
+@@               send signals to the process(es) specified by `pid'
+@@@param: uinfo: Signal information to pass alongside the signal itself.
+@@@return: 0:    Success
+@@@return: -1:   [errno=EINVAL] The given `signo' is invalid
+@@@return: -1:   [errno=EINVAL] The given `signo' doesn't match `uinfo->si_signo'
+@@@return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pid'
+@@@return: -1:   [errno=EPERM]  `info->si_code' is invalid, and `pid' is a different process
+@@@return: -1:   [errno=ESRCH]  No process is identified by `pid'
 [[decl_include("<bits/types.h>", "<bits/os/siginfo.h>")]]
-int tgsigqueueinfo($pid_t tgid, $pid_t tid, $signo_t signo,
+int tgsigqueueinfo($pid_t pid, $pid_t tid, $signo_t signo,
                    [[nonnull]] siginfo_t const *uinfo);
 %#endif /* __USE_KOS */
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-[[decl_include("<bits/types.h>")]]
-int killpg($pid_t pgrp, $signo_t signo);
+@@>> killpg(3)
+@@Alias for `kill(-pgrp, signo)'
+@@@param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+@@               and this function can be used to test if the caller would be allowed to
+@@               send signals to the process(es) specified by `pid'
+@@@return: 0:    Success
+@@@return: -1:   [errno=EINVAL] The given `signo' is invalid
+@@@return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pgrp'
+@@@return: -1:   [errno=ESRCH]  No process group is identified by `pgrp'
+[[decl_include("<bits/types.h>"), requires_function(kill)]]
+int killpg($pid_t pgrp, $signo_t signo) {
+	return kill(-pgrp, signo);
+}
 %#endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 %
@@ -1447,13 +1746,53 @@ void psiginfo([[nonnull]] siginfo_t const *pinfo,
 
 %
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
+@@>> siginterrupt(3)
+@@Set the `SA_RESTART' of the already-established signal handler for `signo',
+@@as well as cause any future handler established by `bsd_signal()' or one of
+@@its aliases to immediately be established with `SA_RESTART' set/cleared
+@@@param: interrupt: When == 0: clear `SA_RESTART' for the signal handler of `signo'
+@@                   When != 0: set `SA_RESTART' for the signal handler of `signo'
+@@@return: 0:  Success
+@@@return: -1: [errno=EINVAL] The given `signo' is invalid
 [[decl_include("<features.h>", "<bits/types.h>")]]
 int siginterrupt($signo_t signo, __STDC_INT_AS_UINT_T interrupt);
 
+@@>> sigstack(2)
+@@Deprecated, and slightly different version of `sigaltstack(2)'
+@@@return: 0:  Success
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/os/sigstack.h>")]]
+[[impl_include("<asm/os/signal.h>", "<bits/os/sigstack.h>")]]
+[[requires_include("<asm/os/signal.h>")]]
+[[requires(defined(@__SS_ONSTACK@) && defined(@__SS_DISABLE@) &&
+           $has_function(sigaltstack))]]
 int sigstack([[nullable]] struct sigstack *ss,
-             [[nullable]] struct sigstack *oss);
+             [[nullable]] struct sigstack *oss) {
+	struct @sigaltstack@ ass, aoss;
+	int result;
+	if (ss) {
+		ass.@ss_flags@ = ss->@ss_onstack@
+		                 ? @__SS_ONSTACK@
+		                 : @__SS_DISABLE@;
+		ass.@ss_sp@   = ss->@ss_sp@;
+		ass.@ss_size@ = (size_t)-1;
+	}
+	result = sigaltstack(ss ? &ass : NULL,
+	                     oss ? &aoss : NULL);
+	if (likely(!result) && oss) {
+		oss->@ss_onstack@ = !!(aoss.@ss_flags@ & @__SS_ONSTACK@);
+		oss->@ss_sp@      = aoss.@ss_sp@;
+	}
+	return result;
+}
 
+
+@@>> sigaltstack(2)
+@@Get/Set the alternate signal stack for the calling thread. When set,
+@@the alternate signal stack can be used to host signal handlers that
+@@have been established with the `SA_ONSTACK' flag in `sa_flags'.
+@@@return: 0:  Success
+@@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/os/sigstack.h>")]]
 int sigaltstack([[nullable]] struct sigaltstack const *ss,
                 [[nullable]] struct sigaltstack *oss);
@@ -1461,34 +1800,112 @@ int sigaltstack([[nullable]] struct sigaltstack const *ss,
 
 %
 %#ifdef __USE_XOPEN_EXTENDED
-[[decl_include("<bits/types.h>")]]
-int sighold($signo_t signo);
 
-[[decl_include("<bits/types.h>")]]
-int sigrelse($signo_t signo);
+[[static, requires_function(sigprocmask)]]
+int set_single_signal_action(int sig, int how) {
+	sigset_t set;
+	sigemptyset(&set);
+	sigaddset(&set, sig);
+	return sigprocmask(how, &set, NULL);
+}
 
-[[decl_include("<bits/types.h>")]]
-int sigignore($signo_t signo);
 
-[[decl_include("<bits/types.h>")]]
-$sighandler_t sigset($signo_t signo, $sighandler_t disp);
+@@>> sighold(3)
+@@Mask a single signal `signo', which is the same
+@@as `sigprocmask(SIG_BLOCK, MASKFOR(signo), NULL)'
+@@@return: 0:  Success
+@@@return: -1: Error (s.a. `errno')
+[[decl_include("<bits/types.h>"), impl_include("<asm/os/signal.h>")]]
+[[requires_include("<asm/os/signal.h>")]]
+[[requires(defined(@__SIG_BLOCK@) && $has_function(set_single_signal_action))]]
+int sighold($signo_t signo) {
+	return set_single_signal_action(signo, @__SIG_BLOCK@);
+}
+
+@@>> sighold(3)
+@@Unmask a single signal `signo', which is the same
+@@as `sigprocmask(SIG_UNBLOCK, MASKFOR(signo), NULL)'
+@@@return: 0:  Success
+@@@return: -1: Error (s.a. `errno')
+[[decl_include("<bits/types.h>"), impl_include("<asm/os/signal.h>")]]
+[[requires_include("<asm/os/signal.h>")]]
+[[requires(defined(@__SIG_UNBLOCK@) && $has_function(set_single_signal_action))]]
+int sigrelse($signo_t signo) {
+	return set_single_signal_action(signo, @__SIG_UNBLOCK@);
+}
+
+@@>> sigignore(3)
+@@Change the disposition of `signo' to `SIG_IGN' using `bsd_signal(3)'
+@@@return: 0:  Success
+@@@return: -1: Error (s.a. `errno')
+[[decl_include("<bits/types.h>"), impl_include("<asm/os/signal.h>")]]
+[[requires_include("<asm/os/signal.h>")]]
+[[requires(defined(@__SIG_IGN@) && defined(@__SIG_ERR@) &&
+           $has_function(bsd_signal))]]
+int sigignore($signo_t signo) {
+	return bsd_signal(signo, (sighandler_t)@__SIG_IGN@) == (sighandler_t)@__SIG_ERR@ ? -1 : 0;
+}
+
+@@>> sigset(3)
+@@Set the handler of `signo' to `disp', or add `signo' to
+@@the calling threads's signal mask when `disp == SIG_HOLD'
+@@@return: 0:  Success
+@@@return: -1: Error (s.a. `errno')
+[[impl_include("<libc/errno.h>", "<asm/os/signal.h>", "<bits/os/sigaction.h>")]]
+[[requires_include("<asm/os/signal.h>"), decl_include("<bits/types.h>")]]
+[[requires(defined(@__SIG_ERR@) && defined(@__SIG_HOLD@) &&
+           defined(@__SIG_BLOCK@) && $has_function(sigprocmask) &&
+           $has_function(sigaction))]]
+$sighandler_t sigset($signo_t signo, $sighandler_t disp) {
+	struct @sigaction@ act, oact;
+	sigset_t set, oset;
+	if unlikely(disp == (sighandler_t)@__SIG_ERR@)
+		goto err_inval;
+	sigemptyset(&set);
+	sigaddset(&set, signo);
+	if (disp == (sighandler_t)@__SIG_HOLD@) {
+		if unlikely(sigprocmask(@__SIG_BLOCK@, &set, &oset) != 0)
+			goto err;
+		if unlikely(sigismember(&oset, signo))
+			goto err;
+		if unlikely(sigaction(signo, NULL, &oact) != 0)
+			goto err;
+		return oact.@sa_handler@;
+	}
+	act.@sa_handler@ = disp;
+	sigemptyset(&act.@sa_mask@);
+	act.@sa_flags@ = 0;
+	if unlikely(sigaction(signo, &act, &oact) != 0)
+		goto err;
+	if unlikely(sigprocmask(SIG_UNBLOCK, &set, &oset) != 0)
+		goto err;
+	return sigismember(&oset, signo)
+	       ? (sighandler_t)@__SIG_HOLD@
+	       : oact.@sa_handler@;
+err_inval:
+@@pp_ifdef EINVAL@@
+	__libc_seterrno(EINVAL);
+@@pp_else@@
+	__libc_seterrno(1);
+@@pp_endif@@
+err:
+	return (sighandler_t)@__SIG_ERR@;
+}
 
 %#endif /* __USE_XOPEN_EXTENDED */
 %
 
 
-[[ATTR_CONST, wunused]]
+[[const, wunused, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(__SIGRTMIN))]]
-[[decl_include("<bits/types.h>")]]
 $signo_t __libc_current_sigrtmin() {
 	return __SIGRTMIN;
 }
 
-[[ATTR_CONST, wunused]]
+[[const, wunused, decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(__SIGRTMAX))]]
-[[decl_include("<bits/types.h>")]]
 $signo_t __libc_current_sigrtmax() {
 	return __SIGRTMAX;
 }
@@ -1496,21 +1913,50 @@ $signo_t __libc_current_sigrtmax() {
 %
 %#if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 
+@@>> pthread_sigmask(3)
+@@Thread-safe version of `sigprocmask(2)'. Note though, that on
+@@many systems (including KOS), this function behaves identical
+@@to `sigprocmask()', though portable programs should still use
+@@this function if they intend to use multiple threads.
+@@@return: EOK:    Success
+@@@return: EINVAL: Invalid `how'
 [[guard, decl_include("<features.h>", "<bits/os/sigset.h>")]]
+/* NOTE: Aliasing to `sigprocmask' breaks the meaning of return values, but
+ *       while not 100% conforming, I don't personally see any problem in
+ *       doing it this ways, especially since the only possible error can
+ *       only happen as the result of improper API use of an argument that
+ *       will almost always simply have a fixed, constant value. */
 [[nocrt, alias("pthread_sigmask", "sigprocmask")]]
-int pthread_sigmask(__STDC_INT_AS_UINT_T how,
-                    [[nullable]] $sigset_t const *newmask,
-                    [[nullable]] $sigset_t *oldmask);
+$errno_t pthread_sigmask(__STDC_INT_AS_UINT_T how,
+                         [[nullable]] $sigset_t const *newmask,
+                         [[nullable]] $sigset_t *oldmask);
 
 
+@@>> pthread_kill(3)
+@@Portable function for sending a signal to a specific `pthread' within one's own process.
+@@@return: EOK:    Success
+@@@return: EINVAL: The given `signo' is invalid
 [[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-int pthread_kill($pthread_t threadid, $signo_t signo);
+$errno_t pthread_kill($pthread_t pthread, $signo_t signo);
 
 %#ifdef __USE_GNU
+@@>> pthread_sigqueue(3)
+@@This function is for `pthread_kill(3)', what `sigqueue(2)' is for `kill(2)',
+@@in that it sends a signal to `pthread', alongside a custom signal value `val'
+@@@param: signo: The signal number to deliver. When set to `0', no signal is delivered,
+@@               and this function can be used to test if the caller would be allowed to
+@@               send signals to the process(es) specified by `pid'
+@@@param: val:   An additional value to pass alongside the signal itself. This value can
+@@               read as `info->si_value' from within a 3-arg signal handler established
+@@               by `pid', or may also be returned by a call to `sigwaitinfo(2)' and
+@@               friends made by `pid'.
+@@@return: EOK:    Success
+@@@return: EINVAL: The given `signo' is invalid
+@@@return: ESRCH:  The given `pthread' has already terminated, and could no longer handle the signal
 [[guard, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/sigval.h>")]]
-int pthread_sigqueue($pthread_t threadid,
-                     $signo_t signo,
-                     union sigval const value);
+$errno_t pthread_sigqueue($pthread_t pthread,
+                          $signo_t signo,
+                          union sigval const val);
 %#endif /* __USE_GNU */
 
 %#endif /* __USE_POSIX199506 || __USE_UNIX98 */
@@ -1529,9 +1975,9 @@ int pthread_sigqueue($pthread_t threadid,
 
 
 %
-%/* GLibc function aliases originally found in <bits/os/sigset.h>
+%/* GLibc function aliases originally found in <bits/sigset.h>
 % * Because these don't violate namespacing rules, and because
-% * <bits/os/sigset.h> is included unconditionally, we also define
+% * <bits/sigset.h> is included unconditionally, we also define
 % * these unconditionally! */
 %
 %[insert:function(__sigemptyset = sigemptyset)]
