@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7204b17 */
+/* HASH CRC-32:0xc20b1875 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,7 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Fill in *PARAMS with terminal parameters associated with FD */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_gtty)(fd_t fd, struct sgttyb *params);
-/* Set the terminal parameters associated with FD to *PARAMS */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_stty)(fd_t fd, struct sgttyb const *params);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x84fd2428 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,23 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_SGTTY_H
-#define GUARD_LIBC_USER_SGTTY_H 1
+#ifndef _ASM_CRT_SEMAPHORE_H
+#define _ASM_CRT_SEMAPHORE_H 1
 
-#include "../api.h"
-#include "../auto/sgtty.h"
+#include <__crt.h>
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <sgtty.h>
+/* #define __ARCH_HAVE_INTERPROCESS_SEMAPHORES
+ * >> Defined if `sem_init(3)' with a non-zero value for `pshared'
+ *    succeeds, rather than returning with `errno=ENOSYS'. */
+#if defined(__CRT_KOS) || defined(__CRT_GLC)
+#define __ARCH_HAVE_INTERPROCESS_SEMAPHORES 1
+#endif /* ... */
 
-DECL_BEGIN
+/* #define __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
+ * >> Defined if `sem_open(3)' returns non-unique semaphore objects
+ *    when passed separate names. (current) POSIX requires that calls
+ *    to `sem_open(3)' that use identical values for `name' shall also
+ *    return identical pointers, rather than allowing it to return
+ *    different pointer, and simply require those points to be backed
+ *    by identical physical memory. */
+#if defined(__CRT_KOS)
+#define __ARCH_HAVE_NON_UNIQUE_SEM_OPEN 1
+#endif /* ... */
 
-#ifndef __KERNEL__
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd, struct sgttyb *params);
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd, struct sgttyb const *params);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_USER_SGTTY_H */
+#endif /* !_ASM_CRT_SEMAPHORE_H */

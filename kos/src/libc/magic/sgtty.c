@@ -23,45 +23,28 @@
 
 %{
 #include <features.h>
+#include <bits/types.h>
+
+#ifdef __USE_GLIBC
 #include <sys/ioctl.h>
-
-__SYSDECL_BEGIN
-
-/* Documentation taken from Glibc /usr/include/sgtty.h */
-/* Copyright (C) 1991-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
+#endif /* __USE_GLIBC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 struct sgttyb;
 
 }
 
-@@Fill in *PARAMS with terminal parameters associated with FD
 [[decl_prefix(struct sgttyb;), decl_include("<bits/types.h>")]]
 int gtty($fd_t fd, [[nonnull]] struct sgttyb *params);
 
-@@Set the terminal parameters associated with FD to *PARAMS
 [[decl_prefix(struct sgttyb;), decl_include("<bits/types.h>")]]
 int stty($fd_t fd, [[nonnull]] struct sgttyb const *params);
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

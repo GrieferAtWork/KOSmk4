@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd02116d */
+/* HASH CRC-32:0x1b17941a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,28 +31,97 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Initialize semaphore object SEM to VALUE.
- * If PSHARED then share it with other processes */
+/* >> sem_init(3)
+ * Initialize the given semaphore `sem' to start out with `value' tickets
+ * @param: sem:     The semaphore to initialize
+ * @param: pshared: When non-zero, `sem' may point to a memory region shared
+ *                  with another process, such that both caller, and any process
+ *                  the pointed-to memory is shared with can safely operate on
+ *                  the same semaphore.
+ * @param: value:   The initial # of tickets available.
+ * @return: 0:      Success
+ * @return: -1:     [errno=EINVAL] `value > SEM_VALUE_MAX'
+ *                  HINT: Never returned `#if SEM_VALUE_MAX >= UINT_MAX'
+ * @return: -1:     [errno=ENOSYS] `pshared != 0', but inter-process semaphores aren't supported
+ *                  HINT: Never returned `#ifdef __ARCH_HAVE_INTERPROCESS_SEMAPHORES' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem, int pshared, unsigned int value);
-/* Free resources associated with semaphore object SEM */
+/* >> sem_destroy(3)
+ * Destroy a semaphore previously initialized by `sem_init(3)'
+ * @return: 0: Success */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem);
-/* Open a named semaphore NAME with open flags OFLAGS */
+/* >> sem_open(3)
+ * Open a named semaphore `name', which must be string that starts with `/'
+ * NOTE: When called multiple times with identical strings for `name',
+ *       the behavior of this function differes between implementations:
+ *       #ifdef __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
+ *          The returned pointer is allowed to be unique and different from
+ *          any previously returned semaphore, but the backing physical memory
+ *          will be shared with other semaphores with the same name.
+ *       #else // __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
+ *          The returned pointer may be identical to a pointer previously
+ *          returned for the same semaphore. In this case, `sem_close()' may
+ *          only have to be called once to close all open handles for the
+ *          semaphore
+ *       #endif // !__ARCH_HAVE_NON_UNIQUE_SEM_OPEN
+ * @param: oflags: Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
+ *                 takes 2 additional arguments `..., mode_t mode, unsigned int value')
+ * @return: * :    A pointer to the opened semaphore, which must be closed by `sem_close(3)'
+ * @return: NULL:  [errno=EINVAL] The given `name' contains no characters after the initial `/'
+ * @return: NULL:  Error (s.a. `errno') */
 INTDEF NONNULL((1)) sem_t *NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name, oflag_t oflags, ...);
-/* Close descriptor for named semaphore SEM */
+/* >> sem_close(3)
+ * Close a semaphore previously returned by `sem_open(3)'. But note the case
+ * of opening the same semaphore more than once within the same process, as
+ * described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
+ * @return: 0: Success */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem);
-/* Remove named semaphore NAME */
+/* >> sem_unlink(3)
+ * Unlink (delete) a named semaphore `name' that was
+ * previously created by `sem_open(name, O_CREAT)'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
+ * @return: -1: Error (s.a. `errno') */
 INTDEF NONNULL((1)) int NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *name);
-/* Wait for SEM being posted */
+/* >> sem_wait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. Until that
+ * point in time, keep on blocking.
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR] Interrupted. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem);
-/* Similar to `sem_wait' but wait only until ABSTIME */
+/* >> sem_timedwait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem, struct timespec const *__restrict abstime);
+/* >> sem_timedwait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem, struct timespec64 const *__restrict abstime);
-/* Test whether SEM is posted */
+/* >> sem_trywait(3)
+ * Atomically check if at least 1 ticket is available for `sem', and consume
+ * one if this is the case, or return with `errno=EAGAIN' if no tickets were
+ * available at the time of the call.
+ * @return: 0:  Success
+ * @return: -1: [errno=EAGAIN] A ticket could not be acquired without blocking. */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem);
-/* Post SEM */
+/* >> sem_post(3)
+ * Post a ticket to the given semaphore `sem', waking up to 1 other thread
+ * that may be waiting for tickets to become available before returning.
+ * @return: 0:  Success
+ * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem);
-/* Get current value of SEM and store it in *SVAL */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem, int *__restrict sval);
+/* >> sem_getvalue(3)
+ * Capture a snapshot of how may tickets are available storing that number in `*sval'
+ * @return: 0: Success */
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem, __STDC_INT_AS_UINT_T *__restrict sval);
 #endif /* !__KERNEL__ */
 
 DECL_END

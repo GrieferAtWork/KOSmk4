@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44f0d705 */
+/* HASH CRC-32:0xa60882da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,81 +29,162 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <sys/types.h>
-#include <bits/types.h>
+
+#include <asm/crt/semaphore.h> /* __ARCH_HAVE_INTERPROCESS_SEMAPHORES, __ARCH_HAVE_NON_UNIQUE_SEM_OPEN */
 #include <bits/crt/semaphore.h>
+#include <bits/types.h>
 #ifdef __USE_XOPEN2K
 #include <bits/os/timespec.h>
 #endif /* __USE_XOPEN2K */
 
-__SYSDECL_BEGIN
-
-/* Documentation taken from /usr/include/semaphore.h */
-/* Copyright (C) 2002-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
+#ifdef __USE_GLIBC
+#include <sys/types.h>
+#endif /* __USE_GLIBC */
 
 #ifdef __CC__
-/* Initialize semaphore object SEM to VALUE.
- * If PSHARED then share it with other processes */
+__SYSDECL_BEGIN
+
+/* >> sem_init(3)
+ * Initialize the given semaphore `sem' to start out with `value' tickets
+ * @param: sem:     The semaphore to initialize
+ * @param: pshared: When non-zero, `sem' may point to a memory region shared
+ *                  with another process, such that both caller, and any process
+ *                  the pointed-to memory is shared with can safely operate on
+ *                  the same semaphore.
+ * @param: value:   The initial # of tickets available.
+ * @return: 0:      Success
+ * @return: -1:     [errno=EINVAL] `value > SEM_VALUE_MAX'
+ *                  HINT: Never returned `#if SEM_VALUE_MAX >= UINT_MAX'
+ * @return: -1:     [errno=ENOSYS] `pshared != 0', but inter-process semaphores aren't supported
+ *                  HINT: Never returned `#ifdef __ARCH_HAVE_INTERPROCESS_SEMAPHORES' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_init,(sem_t *__sem, int __pshared, unsigned int __value),(__sem,__pshared,__value))
-/* Free resources associated with semaphore object SEM */
+/* >> sem_destroy(3)
+ * Destroy a semaphore previously initialized by `sem_init(3)'
+ * @return: 0: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_destroy,(sem_t *__sem),(__sem))
 #ifdef __CRT_HAVE_sem_open
-/* Open a named semaphore NAME with open flags OFLAGS */
+/* >> sem_open(3)
+ * Open a named semaphore `name', which must be string that starts with `/'
+ * NOTE: When called multiple times with identical strings for `name',
+ *       the behavior of this function differes between implementations:
+ *       #ifdef __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
+ *          The returned pointer is allowed to be unique and different from
+ *          any previously returned semaphore, but the backing physical memory
+ *          will be shared with other semaphores with the same name.
+ *       #else // __ARCH_HAVE_NON_UNIQUE_SEM_OPEN
+ *          The returned pointer may be identical to a pointer previously
+ *          returned for the same semaphore. In this case, `sem_close()' may
+ *          only have to be called once to close all open handles for the
+ *          semaphore
+ *       #endif // !__ARCH_HAVE_NON_UNIQUE_SEM_OPEN
+ * @param: oflags: Set of `0 | O_CREAT | O_EXCL' (When `O_CREAT' is given, this functions
+ *                 takes 2 additional arguments `..., mode_t mode, unsigned int value')
+ * @return: * :    A pointer to the opened semaphore, which must be closed by `sem_close(3)'
+ * @return: NULL:  [errno=EINVAL] The given `name' contains no characters after the initial `/'
+ * @return: NULL:  Error (s.a. `errno') */
 __LIBC __ATTR_NONNULL((1)) sem_t *__NOTHROW_RPC_KOS(__VLIBCCALL sem_open)(char const *__name, __oflag_t __oflags, ...) __CASMNAME_SAME("sem_open");
 #endif /* __CRT_HAVE_sem_open */
-/* Close descriptor for named semaphore SEM */
+/* >> sem_close(3)
+ * Close a semaphore previously returned by `sem_open(3)'. But note the case
+ * of opening the same semaphore more than once within the same process, as
+ * described by in `sem_open(3)' and by `__ARCH_HAVE_NON_UNIQUE_SEM_OPEN'->
+ * @return: 0: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_close,(sem_t *__sem),(__sem))
-/* Remove named semaphore NAME */
+/* >> sem_unlink(3)
+ * Unlink (delete) a named semaphore `name' that was
+ * previously created by `sem_open(name, O_CREAT)'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINVAL] The given `name' contains no characters after the initial `/'
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,sem_unlink,(const char *__name),(__name))
-/* Wait for SEM being posted */
+/* >> sem_wait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. Until that
+ * point in time, keep on blocking.
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR] Interrupted. */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sem_wait,(sem_t *__sem),(__sem))
 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_sem_timedwait) && !defined(__USE_TIME_BITS64)
-/* Similar to `sem_wait' but wait only until ABSTIME */
+/* >> sem_timedwait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__restrict __sem, struct timespec const *__restrict __abstime),(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait64) && defined(__USE_TIME_BITS64)
-/* Similar to `sem_wait' but wait only until ABSTIME */
+/* >> sem_timedwait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__restrict __sem, struct timespec const *__restrict __abstime),sem_timedwait64,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait64) || defined(__CRT_HAVE_sem_timedwait)
 #include <libc/local/semaphore/sem_timedwait.h>
-/* Similar to `sem_wait' but wait only until ABSTIME */
+/* >> sem_timedwait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait)(sem_t *__restrict __sem, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait))(__sem, __abstime); })
 #endif /* ... */
 
 #ifdef __USE_TIME64
 #ifdef __CRT_HAVE_sem_timedwait64
+/* >> sem_timedwait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait64,(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime),(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> sem_timedwait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait64,(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait)
 #include <libc/local/semaphore/sem_timedwait64.h>
+/* >> sem_timedwait(3)
+ * Wait for a ticket to become available to the given semaphore `sem'
+ * Once a ticket has become available, consume it and return. If no ticket
+ * becomes available until `abstime' has passed, return `errno=ETIMEDOUT'
+ * @return: 0:  Success
+ * @return: -1: [errno=EINTR]     Interrupted.
+ * @return: -1: [errno=ETIMEDOUT] The given `abstime' expired before a ticket became available. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait64)(sem_t *__restrict __sem, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait64))(__sem, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
-/* Test whether SEM is posted */
+/* >> sem_trywait(3)
+ * Atomically check if at least 1 ticket is available for `sem', and consume
+ * one if this is the case, or return with `errno=EAGAIN' if no tickets were
+ * available at the time of the call.
+ * @return: 0:  Success
+ * @return: -1: [errno=EAGAIN] A ticket could not be acquired without blocking. */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_trywait,(sem_t *__sem),(__sem))
-/* Post SEM */
+/* >> sem_post(3)
+ * Post a ticket to the given semaphore `sem', waking up to 1 other thread
+ * that may be waiting for tickets to become available before returning.
+ * @return: 0:  Success
+ * @return: -1: [errno=EOVERFLOW] The maximum number of tickets have already been posted. */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_post,(sem_t *__sem),(__sem))
-/* Get current value of SEM and store it in *SVAL */
-__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sem_getvalue,(sem_t *__restrict __sem, int *__restrict __sval),(__sem,__sval))
+/* >> sem_getvalue(3)
+ * Capture a snapshot of how may tickets are available storing that number in `*sval'
+ * @return: 0: Success */
+__CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sem_getvalue,(sem_t *__restrict __sem, __STDC_INT_AS_UINT_T *__restrict __sval),(__sem,__sval))
 #endif /* __CC__ */
 
 __SYSDECL_END

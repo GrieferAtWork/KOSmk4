@@ -31,8 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_gtty,hash:CRC-32=0xc264f852]]]*/
-/* Fill in *PARAMS with terminal parameters associated with FD */
+/*[[[head:libc_gtty,hash:CRC-32=0x4249e775]]]*/
 INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,
                                 struct sgttyb *params)
@@ -46,8 +45,7 @@ NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,
 }
 /*[[[end:libc_gtty]]]*/
 
-/*[[[head:libc_stty,hash:CRC-32=0x60762401]]]*/
-/* Set the terminal parameters associated with FD to *PARAMS */
+/*[[[head:libc_stty,hash:CRC-32=0x78327b10]]]*/
 INTERN ATTR_SECTION(".text.crt.database.utmpx") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd,
                                 struct sgttyb const *params)

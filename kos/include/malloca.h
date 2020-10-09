@@ -21,7 +21,9 @@
 #define _MALLOCA_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
+
 #include <parts/malloca.h>
 
 /* A hybrid between alloca and malloc, using alloca for
@@ -47,43 +49,71 @@ __DECL_BEGIN
 /* Free a pointer previously allocated by `malloca' and friends */
 __ATTR_NONNULL((1)) void (freea)(void *__restrict __ptr);
 
+extern "C++" {
+
 /* Allocate a malloca-like data block with `NUM_BYTES' bytes */
 __ATTR_WUNUSED __ATTR_MALLOC void *(malloca)(__SIZE_TYPE__ __num_bytes);
+__ATTR_WUNUSED __ATTR_MALLOC void *(malloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
 __ATTR_WUNUSED __ATTR_MALLOC void *(calloca)(__SIZE_TYPE__ __num_bytes);
+__ATTR_WUNUSED __ATTR_MALLOC void *(calloca)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
 __ATTR_WUNUSED __ATTR_MALLOC void *(malloca_heap)(__SIZE_TYPE__ __num_bytes);
+__ATTR_WUNUSED __ATTR_MALLOC void *(malloca_heap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
 __ATTR_WUNUSED __ATTR_MALLOC void *(calloca_heap)(__SIZE_TYPE__ __num_bytes);
+__ATTR_WUNUSED __ATTR_MALLOC void *(calloca_heap)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
 __ATTR_WUNUSED __ATTR_MALLOC void *(malloca_stack)(__SIZE_TYPE__ __num_bytes);
+__ATTR_WUNUSED __ATTR_MALLOC void *(malloca_stack)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
 __ATTR_WUNUSED __ATTR_MALLOC void *(calloca_stack)(__SIZE_TYPE__ __num_bytes);
+__ATTR_WUNUSED __ATTR_MALLOC void *(calloca_stack)(__SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size);
 
 /* Try hard to allocate memory, always using stack memory when heap allocation fails. */
-extern "C++" {
 template<class __T> void (malloca_tryhard)(__T *&__result, __SIZE_TYPE__ __num_bytes);
 template<class __T> void (calloca_tryhard)(__T *&__result, __SIZE_TYPE__ __num_bytes);
-}
+} /* extern "C++" */
 
 __DECL_END
 
 #else /* __INTELLISENSE__ */
-#define freea(ptr)                        __freea(ptr)
-#define malloca(num_bytes)                __malloca(num_bytes)
-#define calloca(num_bytes)                __calloca(num_bytes)
-#define malloca_tryhard(result,num_bytes) __malloca_tryhard(result,num_bytes)
-#define calloca_tryhard(result,num_bytes) __calloca_tryhard(result,num_bytes)
+#include <hybrid/pp/__va_nargs.h>
+
+#define __PRIVATE_malloca_1(num_bytes)                             __malloca(num_bytes)
+#define __PRIVATE_malloca_2(elem_count, elem_size)                 __malloca((elem_count) * (elem_size))
+#define __PRIVATE_calloca_1(num_bytes)                             __calloca(num_bytes)
+#define __PRIVATE_calloca_2(elem_count, elem_size)                 __calloca((elem_count) * (elem_size))
+#define __PRIVATE_malloca_tryhard_2(result, num_bytes)             __malloca_tryhard(result, num_bytes)
+#define __PRIVATE_malloca_tryhard_3(result, elem_count, elem_size) __malloca_tryhard(result, (elem_count) * (elem_size))
+#define __PRIVATE_calloca_tryhard_2(result, num_bytes)             __calloca_tryhard(result, num_bytes)
+#define __PRIVATE_calloca_tryhard_3(result, elem_count, elem_size) __calloca_tryhard(result, (elem_count) * (elem_size))
+
+#define freea(ptr)           __freea(ptr)
+#define malloca(...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_, (__VA_ARGS__))(__VA_ARGS__)
+#define calloca(...)         __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_, (__VA_ARGS__))(__VA_ARGS__)
+#define malloca_tryhard(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_tryhard_, (__VA_ARGS__))(__VA_ARGS__)
+#define calloca_tryhard(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_tryhard_, (__VA_ARGS__))(__VA_ARGS__)
+
 #ifdef __malloca_heap
-#define malloca_heap(num_bytes)           __malloca_heap(num_bytes)
-#define calloca_heap(num_bytes)           __calloca_heap(num_bytes)
+#define __PRIVATE_malloca_heap_1(num_bytes)             __malloca_heap(num_bytes)
+#define __PRIVATE_malloca_heap_2(elem_count, elem_size) __malloca_heap((elem_count) * (elem_size))
+#define __PRIVATE_calloca_heap_1(num_bytes)             __calloca_heap(num_bytes)
+#define __PRIVATE_calloca_heap_2(elem_count, elem_size) __calloca_heap((elem_count) * (elem_size))
+#define malloca_heap(num_bytes) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_heap_, (__VA_ARGS__))(__VA_ARGS__)
+#define calloca_heap(num_bytes) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_heap_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __malloca_heap */
 #define __NO_MALLOCA_HEAP 1
-#define malloca_heap(num_bytes)           __malloca(num_bytes)
-#define calloca_heap(num_bytes)           __calloca(num_bytes)
+#define malloca_heap      malloca
+#define calloca_heap      calloca
 #endif /* !__malloca_heap */
+
 #ifdef __malloca_stack
-#define malloca_stack(num_bytes)          __malloca_stack(num_bytes)
-#define calloca_stack(num_bytes)          __calloca_stack(num_bytes)
+#define __PRIVATE_malloca_stack_1(num_bytes)             __malloca_stack(num_bytes)
+#define __PRIVATE_malloca_stack_2(elem_count, elem_size) __malloca_stack((elem_count) * (elem_size))
+#define __PRIVATE_calloca_stack_1(num_bytes)             __calloca_stack(num_bytes)
+#define __PRIVATE_calloca_stack_2(elem_count, elem_size) __calloca_stack((elem_count) * (elem_size))
+#define malloca_stack(num_bytes) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloca_stack_, (__VA_ARGS__))(__VA_ARGS__)
+#define calloca_stack(num_bytes) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloca_stack_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __malloca_stack */
 #define __NO_MALLOCA_STACK 1
-#define malloca_stack(num_bytes)          __malloca(num_bytes)
-#define calloca_stack(num_bytes)          __calloca(num_bytes)
+#define malloca_stack      malloca
+#define calloca_stack      calloca
 #endif /* !__malloca_stack */
 #endif /* !__INTELLISENSE__ */
 
