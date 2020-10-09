@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1614c0a */
+/* HASH CRC-32:0x7a20caff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,10 +58,10 @@
 
 #ifdef __USE_ATFILE
 #if !defined(UTIME_NOW) && defined(__UTIME_NOW)
-#define UTIME_NOW  __UTIME_NOW  /* TODO: Doc */
+#define UTIME_NOW  __UTIME_NOW  /* for utimensat(): Set `times[0|1].tv_nsec' to this to use the current time instead. */
 #endif /* !UTIME_NOW && __UTIME_NOW */
 #if !defined(UTIME_OMIT) && defined(__UTIME_OMIT)
-#define UTIME_OMIT __UTIME_OMIT /* TODO: Doc */
+#define UTIME_OMIT __UTIME_OMIT /* for utimensat(): Set `times[0|1].tv_nsec' to this to not modify that timestamp. */
 #endif /* !UTIME_OMIT && __UTIME_OMIT */
 #endif /* __USE_ATFILE */
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */

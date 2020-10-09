@@ -22,13 +22,21 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/typecore.h>
+
 /************************************************************************/
 /* KOS/LINUX                                                            */
 /************************************************************************/
 
 /* Possible values for `struct sigaltstack::ss_flags.'. */
-#define __SS_ONSTACK 1
-#define __SS_DISABLE 2
+#define __SS_ONSTACK    __UINT32_C(0x00000001) /* out.flag: Currently executing from the alternate signal stack. */
+#define __SS_DISABLE    __UINT32_C(0x00000002) /* in.flag:  Disable the alternate signal stack. (all other flags are ignored when set)
+                                                * out.flag: The alternate signal stack is currently disabled. */
+#define __SS_AUTODISARM __UINT32_C(0x80000000) /* flag:     Disable the alternate signal stack upon signal handler
+                                                *           entry by saving its old configuration and disabling it
+                                                *           by means of `SS_DISABLE', before restoring its prior
+                                                *           setting once the signal handler returns, thus preventing
+                                                *           other signal handlers from recursing onto an in-use stack. */
 
 #define __MINSIGSTKSZ 2048 /* Minimum stack size for a signal handler. */
 #define __SIGSTKSZ    8192 /* System default stack size. */

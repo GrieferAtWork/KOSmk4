@@ -26,7 +26,7 @@
 /* KOS/LINUX                                                            */
 /************************************************************************/
 
-#define __UTIME_NOW  ((1l << 30) - 1l) /* TODO: Doc */
-#define __UTIME_OMIT ((1l << 30) - 2l) /* TODO: Doc */
+#define __UTIME_NOW  ((1l << 30) - 1l) /* for utimensat(): Set `times[0|1].tv_nsec' to this to use the current time instead. */
+#define __UTIME_OMIT ((1l << 30) - 2l) /* for utimensat(): Set `times[0|1].tv_nsec' to this to not modify that timestamp. */
 
 #endif /* !_ASM_OS_KOS_STAT_H */

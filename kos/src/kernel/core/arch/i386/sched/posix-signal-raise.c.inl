@@ -123,8 +123,10 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	orig_usp = (USER CHECKED byte_t *)icpustate_getuserpsp(state);
 	usp      = orig_usp;
 	/* Check if sigaltstack should be used. */
-	if (action->sa_flags & SIGACTION_SA_ONSTACK)
+	if (action->sa_flags & SIGACTION_SA_ONSTACK) {
+		/* TODO: SS_AUTODISARM */
 		usp = (USER CHECKED byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
+	}
 #ifdef DEFINE_RAISE64
 	else {
 		usp -= 128; /* Red zone (TODO: Make this configurable!) */
