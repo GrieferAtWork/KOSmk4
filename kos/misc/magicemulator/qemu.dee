@@ -202,6 +202,8 @@ did_update_x86_64_kernel:
 		"-netdev", "user,id=n1", "-device", "ne2k_pci,netdev=n1",
 		"-object", "filter-dump,id=f1,netdev=n1,file=qemu-netdump.dat",
 		"-vga", "std",
+		/* Enable the VM-based RTC clock, which pauses when the kernel is paused. */
+		"-rtc", "base=utc,clock=vm"
 	});
 	if (fs.stat.exists("bin/ext2.img")) {
 		qemu_arguments.extend({
