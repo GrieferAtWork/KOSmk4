@@ -770,10 +770,10 @@ do_TCSETX:
 	case TTYIO_OPEND_GETLIMIT:
 	case TTYIO_IPEND_GETLIMIT:
 #if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
-	case _IO_WITHSIZE(TTYIO_IBUF_GETLIMIT, compat_size_t):
-	case _IO_WITHSIZE(TTYIO_CANON_GETLIMIT, compat_size_t):
-	case _IO_WITHSIZE(TTYIO_OPEND_GETLIMIT, compat_size_t):
-	case _IO_WITHSIZE(TTYIO_IPEND_GETLIMIT, compat_size_t):
+	case _IO_WITHTYPE(TTYIO_IBUF_GETLIMIT, compat_size_t):
+	case _IO_WITHTYPE(TTYIO_CANON_GETLIMIT, compat_size_t):
+	case _IO_WITHTYPE(TTYIO_OPEND_GETLIMIT, compat_size_t):
+	case _IO_WITHTYPE(TTYIO_IPEND_GETLIMIT, compat_size_t):
 #endif /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
 	{
 		size_t value;
@@ -818,10 +818,10 @@ do_TCSETX:
 	case TTYIO_OPEND_SETLIMIT:
 	case TTYIO_IPEND_SETLIMIT:
 #if defined(__ARCH_HAVE_COMPAT) && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T
-	case _IO_WITHSIZE(TTYIO_IBUF_SETLIMIT, compat_size_t):
-	case _IO_WITHSIZE(TTYIO_CANON_SETLIMIT, compat_size_t):
-	case _IO_WITHSIZE(TTYIO_OPEND_SETLIMIT, compat_size_t):
-	case _IO_WITHSIZE(TTYIO_IPEND_SETLIMIT, compat_size_t):
+	case _IO_WITHTYPE(TTYIO_IBUF_SETLIMIT, compat_size_t):
+	case _IO_WITHTYPE(TTYIO_CANON_SETLIMIT, compat_size_t):
+	case _IO_WITHTYPE(TTYIO_OPEND_SETLIMIT, compat_size_t):
+	case _IO_WITHTYPE(TTYIO_IPEND_SETLIMIT, compat_size_t):
 #endif /* __ARCH_HAVE_COMPAT && __SIZEOF_SIZE_T__ != __ARCH_COMPAT_SIZEOF_SIZE_T */
 	{
 		size_t value;

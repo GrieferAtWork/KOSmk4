@@ -332,7 +332,7 @@ NOTHROW(KCALL mall_pending_untrace_overflow)(void *__restrict ptr, size_t num_by
 		                "after failing to untrace %p...%p\n",
 		       ptr, (uintptr_t)ptr + num_bytes - 1);
 	} else {
-		printk(KERN_ERR "Invalidating all MALL user-nodes "
+		printk(KERN_ERR "Invalidating all MALL nodes "
 		                "after failing to untrace %p\n",
 		       ptr);
 	}
@@ -1714,7 +1714,7 @@ NOTHROW(KCALL mall_insert_tree)(struct mallnode *__restrict node) {
 			printk(KERN_CRIT "Traceback of existing node:\n");
 			mallnode_print_traceback(existing_node,
 			                         &syslog_printer,
-			                         SYSLOG_LEVEL_CRIT);
+			                         SYSLOG_LEVEL_RAW);
 			kernel_panic("Attempted to trace memory at %p...%p, which "
 			             "overlaps with an existing tracing of %p...%p",
 			             node->m_tree.a_vmin,

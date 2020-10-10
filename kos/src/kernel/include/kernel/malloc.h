@@ -405,7 +405,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL mall_validate_padding)(void);
  *     other data blocks, some of which are allowed to be other mall
  *     blocks.
  *     However despite the fact that it might seem obvious to the programmer
- *     that a data block allocated using `heap_alloc_u()' should be able to
+ *     that a data block allocated using `heap_alloc()' should be able to
  *     hold pointers to data blocks allocated using `kmalloc()', this is
  *     not the case (out of the box), because again: the MALL GC checker
  *     would not be able to know what (if any) memory pointed to by that

@@ -34,6 +34,9 @@
 
 DECL_BEGIN
 
+STATIC_ASSERT(sizeof(AtaAIOHandleData) <=
+             (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
+
 /* Release held DMA locks of `self' */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL AtaDrive_DmaAioHandle_ReleaseDmaLocks)(struct aio_handle *__restrict self) {

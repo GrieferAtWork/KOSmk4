@@ -35,6 +35,8 @@
 #include <sched/signal.h>
 #include <sched/tsc.h>
 
+#include <hybrid/byteorder.h>
+
 #include <hw/disk/ata.h>
 #include <kos/except/reason/io.h>
 
@@ -63,7 +65,7 @@ typedef struct ata_dma_drive_struct AtaDmaDrive;
 
 union ata_aio_prd {
 	/* NOTE: These fields are set to `NULL'/0 when the operation is started.
-	 *       This is done to satisfy the atomic was-started condition
+	 *       This is done to satisfy the atomic was-started condition (aka. `[COMMAND_DESCRIPTOR]')
 	 *       described by <kernel/aio.h>:[async_work(device)]:[line#8]:
 	 *       >> cmd = ATOMIC_XCH(ent->ah_data[1], NULL); */
 	PHYS u32      hd_prd0_bufaddr; /* [valid_if(ATA_AIO_HANDLE_FONEPRD)] Physical buffer base address. */
@@ -93,6 +95,24 @@ typedef struct {
 		u16           hd_prd_count;    /* [valid_if(!ATA_AIO_HANDLE_FONEPRD)][!0] Number of required PRD entires. */
 	};
 } AtaAIOHandleData;
+
+/* Fill in `hd_io_lbaaddr' and `hd_io_sectors' with `addr' and `num_sectors' */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define AtaAIOHandleData_SetAddrAndSectors(self, addr, num_sectors) \
+	(*(u32 *)&(self)->hd_io_lbaaddr[0] = (u32)(addr),               \
+	 *(u16 *)&(self)->hd_io_lbaaddr[4] = (u16)((addr) >> 32),       \
+	 *(u16 *)&(self)->hd_io_sectors[0] = (u16)(num_sectors))
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#define AtaAIOHandleData_SetAddrAndSectors(self, addr, num_sectors) \
+	((self)->hd_io_lbaaddr[0] = (u8)(addr),                         \
+	 (self)->hd_io_lbaaddr[1] = (u8)((addr) >> 8),                  \
+	 (self)->hd_io_lbaaddr[2] = (u8)((addr) >> 16),                 \
+	 (self)->hd_io_lbaaddr[3] = (u8)((addr) >> 24),                 \
+	 (self)->hd_io_lbaaddr[4] = (u8)((addr) >> 32),                 \
+	 (self)->hd_io_lbaaddr[5] = (u8)((addr) >> 40),                 \
+	 (self)->hd_io_sectors[0] = (u8)(num_sectors),                  \
+	 (self)->hd_io_sectors[1] = (u8)((num_sectors) >> 8))
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 
 
@@ -144,7 +164,7 @@ struct ata_drive_struct: block_device {
 	u8                  ad_chs_number_of_heads;   /* [const] # of heads for CHS addressing */
 	u8                  ad_drive;                 /* [const] Used drive (either `ATA_DRIVE_MASTER' or `ATA_DRIVE_SLAVE') */
 #define ATA_DRIVE_FEATURE_FNORMAL 0x00            /* Normal features */
-#define ATA_DRIVE_FEATURE_FFLUSH  0x01            /* The drive supports `ATA_COMMAND_CACHE_FLUSH' function */
+#define ATA_DRIVE_FEATURE_FFLUSH  0x01            /* The drive supports `ATA_COMMAND_CACHE_FLUSH' function (TODO: Currently unused) */
 	u8                  ad_features;              /* [const] Set of `ATA_DRIVE_FEATURE_F*' */
 };
 

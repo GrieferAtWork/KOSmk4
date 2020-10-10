@@ -486,6 +486,8 @@ check_result_inode_for_symlink:
 					cdev = character_device_lookup(devno);
 					if unlikely(!cdev)
 						THROW(E_NO_DEVICE, E_NO_DEVICE_KIND_CHARACTER_DEVICE, devno);
+					result.h_data = cdev; /* Inherit reference. */
+					result.h_type = HANDLE_TYPE_CHARACTERDEVICE;
 					/* Allow custom callbacks during open(2) */
 					if unlikely(cdev->cd_type.ct_open) {
 						/* Keep an additional reference around during the callbacks
@@ -502,8 +504,6 @@ check_result_inode_for_symlink:
 						/* NOTE: `ttybase_device_setctty()' is NOTHROW(), so no need to guard this call! */
 						ttybase_device_setctty((struct ttybase_device *)cdev);
 					}
-					result.h_data = cdev; /* Inherit reference. */
-					result.h_type = HANDLE_TYPE_CHARACTERDEVICE;
 					decref(result_inode);
 					decref(result_containing_path);
 					decref(result_containing_directory);

@@ -39,9 +39,6 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT(sizeof(AtaAIOHandleData) <=
-             (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
-
 /* Initialize a given PRD from various sources.
  * NOTE: Upon successful completion of `AtaPRD_InitFromVirt' or `AtaPRD_InitFromVirtVector',
  *       either `ATA_AIO_HANDLE_FUNLOCK_USER_DMA' or `ATA_AIO_HANDLE_FUNLOCK_KERNEL_DMA' is
@@ -68,6 +65,7 @@ struct ata_dma_acquire_data {
 	size_t  ad_siz;  /* Number of remaining buffer entries. */
 	size_t  ad_max;  /* Number of available buffer entries. */
 };
+
 PRIVATE NOBLOCK void
 NOTHROW(KCALL ata_dma_reset_func)(void *arg) {
 	struct ata_dma_acquire_data *data;
@@ -75,6 +73,7 @@ NOTHROW(KCALL ata_dma_reset_func)(void *arg) {
 	data->ad_buf = data->ad_base;
 	data->ad_siz = data->ad_max;
 }
+
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL ata_dma_acquire_func)(void *arg, physaddr_t paddr, size_t num_bytes,
                                     struct vm_dmalock *__restrict UNUSED(lock) DFL(NULL)) {
@@ -318,7 +317,7 @@ again_start_dma_lockvec:
 				/* Need _even_ more DMA locks! */
 				lockvec = (struct vm_dmalock *)krealloc(lockvec,
 				                                        (new_req_locks + 1) *
-                                                        sizeof(struct vm_dmalock),
+				                                        sizeof(struct vm_dmalock),
 				                                        GFP_LOCKED | GFP_PREFLT);
 				req_locks = new_req_locks;
 				goto again_start_dma_lockvec;

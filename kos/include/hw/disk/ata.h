@@ -53,12 +53,12 @@ __DECL_BEGIN
                                         *       operations, as only `a_ctrl' can safely be used when working
                                         *       with interrupts enabled. */
 #define ATA_COMMAND        __IOPORT(7) /* [WRITE] ATA Command port */
-#   define ATA_COMMAND_READ_SECTORS    0x20
+#   define ATA_COMMAND_READ_SECTORS    0x20 /* CHS */
 #   define ATA_COMMAND_READ_PIO        0x20 /* 28-bit LBA */
 #   define ATA_COMMAND_READ_PIO_EXT    0x24 /* 48-bit LBA */
 #   define ATA_COMMAND_READ_DMA        0xc8 /* 28-bit LBA */
 #   define ATA_COMMAND_READ_DMA_EXT    0x25 /* 48-bit LBA */
-#   define ATA_COMMAND_WRITE_SECTORS   0x30
+#   define ATA_COMMAND_WRITE_SECTORS   0x30 /* CHS */
 #   define ATA_COMMAND_WRITE_PIO       0x30 /* 28-bit LBA */
 #   define ATA_COMMAND_WRITE_PIO_EXT   0x34 /* 48-bit LBA */
 #   define ATA_COMMAND_WRITE_DMA       0xca /* 28-bit LBA */

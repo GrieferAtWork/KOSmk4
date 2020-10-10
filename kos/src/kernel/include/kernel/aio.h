@@ -44,8 +44,9 @@ DECL_BEGIN
 #ifdef __CC__
 
 /* NOTE: Alright: I admit it: getting AIO right inside of drivers is hard.
- * However, you can take a look at the Ne2k driver (/kos/src/kernel/modne2k),
- * which was the first one to actually get it correct.
+ * However, you can take a look at these drivers, which use this design:
+ *   - the Ne2k driver      /kos/src/kernel/modne2k  (async-job: yes)
+ *   - the IDE/ATA driver   /kos/src/kernel/modide   (async-job: no)
  * To try and bring all of the information together, you may use the following flow-chart:
  *
  *   ┌─── <ENTRY>
@@ -160,37 +161,37 @@ DECL_BEGIN
  * >>     .ht_cancel   = &aio_cancel,   ───┐                                                 │     │
  * >>     .ht_progress = &aio_progress  ─┐ │                                                 │     │
  * >> };                                 │ └─> [aio_cancel(aio)]                             │     │
- *                                       │     >> device = aio->ah_data[0];   <──────────────┘     │
- * ┌─────────────────────────────────────┘     >> [COMMAND_DESCRIPTOR] *cmd;   <───────────────────┤
- * │                                           >> was = PREEMPTION_PUSHOFF();                      │
- * │                                           >> cmd = ATOMIC_XCH(aio->ah_data[1], NULL);   <─────┘
- * v                                           >> if (cmd) {
- * [aio_progress(aio)]                         >>     // Cancelled before started
- * Optional, but in case of multi-step         >>     decref_likely(cmd);
- * commands, this can easily be implemented    >>     // Remove the entry from pending AIO. Having successfully
- * by keeping track of how many steps have     >>     // cleared the command-pointer, we know that `async_work()'
- * already been completed, and how many        >>     // hasn't gotten around to this AIO handle, yet.
- * are still left within the device itself,    >>     d_aio_pending.REMOVE(ent);
- * alongside checking if `aio' matches the     >>     PREEMPTION_POP(was);
- * device's `d_aio_current' field.             >>     goto do_cancel;
- *                                             >> }
- *                                             >> // If the cmd-pointer was already cleared, then the AIO operation
- *                                             >> // is either current in progress (i.e. the async-worker is executing
- *                                             >> // `COMMAND_DESCRIPTOR_DO_NEXT_STEP()'), or the AIO operation was
- *                                             >> // already completed.
- *                                             >> if (ATOMIC_CMPXCH(device->d_aio_current, aio, NULL)) {
- *                                             >>     // Cancel the current operation on a hardware-level
- *                                             >>     // Note that this function can assume that the async-worker thread
- *                                             >>     // is currently inside of `[COMMAND_DESCRIPTOR_DO_NEXT_STEP]', and
- *                                             >>     // will fall into `[HWIO_WAIT_FOR_CANCEL_COMPLETION]' shortly.
- *                                             >>     [HWIO_CANCEL_CURRENT_OPERATION](device);
- *                                             >>     PREEMPTION_POP(was);
- *                                             >>     goto do_cancel;
- *                                             >> }
- *                                             >> PREEMPTION_POP(was);
- *                                             >> return;
- *                                             >>do_cancel:
- *                                             >> aio_handle_complete(aio, AIO_COMPLETION_CANCEL);
+ *                                       │     [ 0] >> device = aio->ah_data[0];   <─────────┘     │
+ * ┌─────────────────────────────────────┘     [ 1] >> [COMMAND_DESCRIPTOR] *cmd;   <──────────────┤
+ * │                                           [ 2] >> was = PREEMPTION_PUSHOFF();                 │
+ * │                                           [ 3] >> cmd = ATOMIC_XCH(aio->ah_data[1], NULL);  <─┘
+ * v                                           [ 4] >> if (cmd) {
+ * [aio_progress(aio)]                         [ 5] >>     // Cancelled before started
+ * Optional, but in case of multi-step         [ 6] >>     decref_likely(cmd);
+ * commands, this can easily be implemented    [ 7] >>     // Remove the entry from pending AIO. Having successfully
+ * by keeping track of how many steps have     [ 8] >>     // cleared the command-pointer, we know that `async_work()'
+ * already been completed, and how many        [ 9] >>     // hasn't gotten around to this AIO handle, yet.
+ * are still left within the device itself,    [10] >>     d_aio_pending.REMOVE(ent);
+ * alongside checking if `aio' matches the     [11] >>     PREEMPTION_POP(was);
+ * device's `d_aio_current' field.             [12] >>     goto do_cancel;
+ *                                             [13] >> }
+ *                                             [14] >> // If the cmd-pointer was already cleared, then the AIO operation
+ *                                             [15] >> // is either current in progress (i.e. the async-worker is executing
+ *                                             [16] >> // `COMMAND_DESCRIPTOR_DO_NEXT_STEP()'), or the AIO operation was
+ *                                             [17] >> // already completed.
+ *                                             [18] >> if (ATOMIC_CMPXCH(device->d_aio_current, aio, NULL)) {
+ *                                             [19] >>     // Cancel the current operation on a hardware-level
+ *                                             [20] >>     // Note that this function can assume that the async-worker thread
+ *                                             [21] >>     // is currently inside of `[COMMAND_DESCRIPTOR_DO_NEXT_STEP]', and
+ *                                             [22] >>     // will fall into `[HWIO_WAIT_FOR_CANCEL_COMPLETION]' shortly.
+ *                                             [23] >>     [HWIO_CANCEL_CURRENT_OPERATION](device);
+ *                                             [24] >>     PREEMPTION_POP(was);
+ *                                             [25] >>     goto do_cancel;
+ *                                             [26] >> }
+ *                                             [27] >> PREEMPTION_POP(was);
+ *                                             [28] >> return;
+ *                                             [29] >>do_cancel:
+ *                                             [30] >> aio_handle_complete(aio, AIO_COMPLETION_CANCEL);
  * HINT: SMP locks aren't required because `aio_handle_fini()' will
  *       wait until the handle's completion function has returned!
  */

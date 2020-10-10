@@ -19,12 +19,12 @@
  */
 #ifdef __INTELLISENSE__
 #include "io.c"
-#define DEFINE_RW_Read
-//#define DEFINE_RW_Write
+//#define DEFINE_RW_Read
+#define DEFINE_RW_Write
 
-#define DEFINE_DATA_Virt
+//#define DEFINE_DATA_Virt
 //#define DEFINE_DATA_Phys
-//#define DEFINE_DATA_VirtVector
+#define DEFINE_DATA_VirtVector
 //#define DEFINE_DATA_PhysVector
 #endif /* __INTELLISENSE__ */
 
@@ -115,6 +115,14 @@ DECL_BEGIN
 	}	__WHILE0
 #endif
 
+#ifdef _ATA_DATA_IS_PHYSICAL
+#define _ATA_DATA_READB(addr)          vm_readphysb((physaddr_t)(addr))
+#define _ATA_DATA_WRITEB(addr, value) vm_writephysb((physaddr_t)(addr), value)
+#elif defined(_ATA_DATA_IS_VIRTUAL)
+#define _ATA_DATA_READB(addr)          (*(u8 const *)(addr))
+#define _ATA_DATA_WRITEB(addr, value) (void)(*(u8 *)(addr) = (value))
+#endif /* ... */
+
 
 LOCAL NONNULL((1, 2)) AtaError_t KCALL
 PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict bus,
@@ -176,36 +184,20 @@ PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict b
 						} data;
 #ifdef DEFINE_RW_Read
 						data.word = inw(bus->ab_busio + ATA_DATA);
-#ifdef _ATA_DATA_IS_PHYSICAL
-						vm_writephysb((physaddr_t)(ent.ab_base + ent.ab_size - 1), data.bytes[0]);
-#elif defined(_ATA_DATA_IS_VIRTUAL)
-						((u8 *)ent.ab_base)[ent.ab_size - 1] = data.bytes[0];
-#endif /* ... */
+						_ATA_DATA_WRITEB(ent.ab_base + ent.ab_size - 1, data.bytes[0]);
 #elif defined(DEFINE_RW_Write)
-#ifdef _ATA_DATA_IS_PHYSICAL
-						data.bytes[0] = vm_readphysb((physaddr_t)(ent.ab_base + ent.ab_size - 1));
-#elif defined(_ATA_DATA_IS_VIRTUAL)
-						data.bytes[0] = ((u8 *)ent.ab_base)[ent.ab_size - 1];
-#endif /* ... */
+						data.bytes[0] = _ATA_DATA_READB(ent.ab_base + ent.ab_size - 1);
 #endif /* ... */
 						assert(next_ent_index < buf->ab_entc);
 						AIO_BUFFER_GETENT(ent, buf, next_ent_index);
 						assert(ent.ab_size);
 						++next_ent_index;
 #ifdef DEFINE_RW_Read
-#ifdef _ATA_DATA_IS_PHYSICAL
-						vm_writephysb(ent.ab_base, data.bytes[1]);
-#else /* _ATA_DATA_IS_PHYSICAL */
-						((u8 *)ent.ab_base)[0] = data.bytes[1];
-#endif /* !_ATA_DATA_IS_PHYSICAL */
-#else /* DEFINE_RW_Read */
-#ifdef _ATA_DATA_IS_PHYSICAL
-						data.bytes[1] = vm_readphysb(ent.ab_base);
-#else /* _ATA_DATA_IS_PHYSICAL */
-						data.bytes[1] = ((u8 *)ent.ab_base)[0];
-#endif /* !_ATA_DATA_IS_PHYSICAL */
+						_ATA_DATA_WRITEB(ent.ab_base, data.bytes[1]);
+#elif defined(DEFINE_RW_Write)
+						data.bytes[1] = _ATA_DATA_READB(ent.ab_base);
 						outw(bus->ab_busio + ATA_DATA, data.word);
-#endif /* !DEFINE_RW_Read */
+#endif /* ... */
 						++ent.ab_base;
 						--ent.ab_size;
 					}
@@ -250,6 +242,8 @@ PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict b
 #undef _ATA_DATA_SIZE
 #undef _ATA_DATA_IS_VIRTUAL
 #undef _ATA_DATA_IS_PHYSICAL
+#undef _ATA_DATA_READB
+#undef _ATA_DATA_WRITEB
 
 DECL_END
 

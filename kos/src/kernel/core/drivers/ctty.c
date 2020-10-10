@@ -26,11 +26,13 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle-proto.h>
+#include <kernel/handle.h>
 #include <sched/pid-ctty.h>
 #include <sched/pid.h>
 
 #include <kos/dev.h>
 
+#include <assert.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -144,6 +146,15 @@ ctty_poll(struct character_device *__restrict UNUSED(self),
 	return result;
 }
 
+PRIVATE NONNULL((1, 2)) void KCALL
+ctty_open(struct character_device *__restrict self,
+          struct handle *__restrict hand) {
+	assert(self == &dev_tty);
+	assert(self == hand->h_data);
+	decref_nokill(self);
+	hand->h_data = getctty();
+}
+
 
 /* The character device made available under /dev/tty
  * This device implements all operators as direct aliasing callbacks
@@ -163,6 +174,7 @@ PUBLIC struct character_device dev_tty = {
 		/* .ct_sync   = */ &ctty_sync,
 		/* .ct_stat   = */ &ctty_stat,
 		/* .ct_poll   = */ &ctty_poll,
+		/* .ct_open   = */ &ctty_open
 	},
 	/* .cd_devlink     = */ { NULL, NULL, 0 },
 	/* .cd_flags       = */ CHARACTER_DEVICE_FLAG_NORMAL,

@@ -1302,7 +1302,7 @@ continue_copy_keymap:
 	}	break;
 
 	case KDGETLED:
-	case _IO_WITHSIZE(KDGETLED, char): {
+	case _IO_WITHTYPE(KDGETLED, char): {
 		uintptr_t leds;
 		STATIC_ASSERT(KEYBOARD_LED_SCROLLLOCK >> 8 == LED_SCR);
 		STATIC_ASSERT(KEYBOARD_LED_NUMLOCK    >> 8 == LED_NUM);
@@ -1315,7 +1315,7 @@ continue_copy_keymap:
 	}	break;
 
 	case KDSETLED:
-	case _IO_WITHSIZE(KDSETLED, char): {
+	case _IO_WITHTYPE(KDSETLED, char): {
 		uintptr_t new_leds;
 		validate_readable(arg, sizeof(char));
 		COMPILER_READ_BARRIER();
@@ -1341,19 +1341,19 @@ continue_copy_keymap:
 	}	break;
 
 	case KDGKBTYPE:
-	case _IO_WITHSIZE(KDGKBTYPE, unsigned int):
+	case _IO_WITHTYPE(KDGKBTYPE, unsigned int):
 		validate_writable(arg, sizeof(unsigned int));
 		*(unsigned int *)arg = KB_101;
 		break;
 
 	case KDGKBMODE:
-	case _IO_WITHSIZE(KDGKBMODE, unsigned int):
+	case _IO_WITHTYPE(KDGKBMODE, unsigned int):
 		validate_writable(arg, sizeof(unsigned int));
 		*(unsigned int *)arg = linux_keyboard_getmode(me);
 		break;
 
 	case KDSKBMODE:
-	case _IO_WITHSIZE(KDSKBMODE, unsigned int):
+	case _IO_WITHTYPE(KDSKBMODE, unsigned int):
 		if ((uintptr_t)arg < PAGESIZE) {
 			/* Compatibility with linux. */
 			linux_keyboard_setmode(me, (unsigned int)(uintptr_t)arg);
@@ -1364,20 +1364,20 @@ continue_copy_keymap:
 		break;
 
 	case KDGKBMETA:
-	case _IO_WITHSIZE(KDGKBMETA, unsigned int):
+	case _IO_WITHTYPE(KDGKBMETA, unsigned int):
 		validate_writable(arg, sizeof(unsigned int));
 		*(unsigned int *)arg = linux_keyboard_getmeta(me);
 		break;
 
 	case KDSKBMETA:
-	case _IO_WITHSIZE(KDSKBMETA, unsigned int):
+	case _IO_WITHTYPE(KDSKBMETA, unsigned int):
 		validate_readable(arg, sizeof(unsigned int));
 		linux_keyboard_setmeta(me, *(unsigned int *)arg);
 		break;
 
 
 	case KDGKBLED:
-	case _IO_WITHSIZE(KDGKBLED, char): {
+	case _IO_WITHTYPE(KDGKBLED, char): {
 		uintptr_t mods;
 		STATIC_ASSERT(KEYMOD_SCROLLLOCK >> 8 == K_SCROLLLOCK);
 		STATIC_ASSERT(KEYMOD_NUMLOCK >> 8 == K_NUMLOCK);
@@ -1390,7 +1390,7 @@ continue_copy_keymap:
 	}	break;
 
 	case KDSKBLED:
-	case _IO_WITHSIZE(KDSKBLED, char): {
+	case _IO_WITHTYPE(KDSKBLED, char): {
 		uintptr_t old_mods, new_mask, new_mods;
 		validate_readable(arg, sizeof(char));
 		COMPILER_READ_BARRIER();

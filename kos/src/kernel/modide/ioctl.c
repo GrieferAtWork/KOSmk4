@@ -65,8 +65,9 @@ AtaDrive_Ioctl(AtaDrive *__restrict self,
 			goto do_compat_hdio_getgeo;
 		ATTR_FALLTHROUGH
 #endif /* __ARCH_HAVE_COMPAT */
-	case _IOR(_IOC_TYPE(HDIO_GETGEO), _IOC_NR(HDIO_GETGEO), struct hd_geometry): {
+	case _IO_WITHTYPE(HDIO_GETGEO, struct hd_geometry): {
 		struct hd_geometry *data;
+		/* TODO: Permission checks? */
 		validate_writable(arg, sizeof(struct hd_geometry));
 		data = (struct hd_geometry *)arg;
 		COMPILER_WRITE_BARRIER();
@@ -78,8 +79,9 @@ AtaDrive_Ioctl(AtaDrive *__restrict self,
 	}	break;
 
 #ifdef __ARCH_HAVE_COMPAT
-	case _IOR(_IOC_TYPE(HDIO_GETGEO), _IOC_NR(HDIO_GETGEO), struct hd_geometry_compat): {
+	case _IO_WITHTYPE(HDIO_GETGEO, struct hd_geometry_compat): {
 		struct hd_geometry_compat *data;
+		/* TODO: Permission checks? */
 do_compat_hdio_getgeo:
 		validate_writable(arg, sizeof(struct hd_geometry_compat));
 		data = (struct hd_geometry_compat *)arg;
@@ -93,9 +95,10 @@ do_compat_hdio_getgeo:
 #endif /* __ARCH_HAVE_COMPAT */
 
 	case HDIO_GET_IDENTITY:
-	case _IOR(_IOC_TYPE(HDIO_GET_IDENTITY), _IOC_NR(HDIO_GET_IDENTITY), struct hd_driveid): {
+	case _IO_WITHTYPE(HDIO_GET_IDENTITY, struct hd_driveid): {
 		struct hd_driveid specs;
 		AtaBus *bus;
+		/* TODO: Permission checks? */
 		validate_writable(arg, sizeof(specs));
 		bus = self->ad_bus;
 		AtaBus_LockPIO(bus);
@@ -157,7 +160,8 @@ got_identify_signal:
 	}	break;
 
 	case HDIO_GET_DMA:
-	case _IOR(_IOC_TYPE(HDIO_GET_DMA), _IOC_NR(HDIO_GET_DMA), int): {
+	case _IO_WITHTYPE(HDIO_GET_DMA, int): {
+		/* TODO: Permission checks? */
 		validate_writable(arg, sizeof(int));
 		COMPILER_WRITE_BARRIER();
 		*(int *)arg = ((void *)self->bd_type.dt_read == (void *)&AtaDrive_DmaDriveRead) ? 1 : 0;
@@ -165,7 +169,8 @@ got_identify_signal:
 	}	break;
 
 	case HDIO_GET_WCACHE:
-	case _IOR(_IOC_TYPE(HDIO_GET_WCACHE), _IOC_NR(HDIO_GET_WCACHE), int): {
+	case _IO_WITHTYPE(HDIO_GET_WCACHE, int): {
+		/* TODO: Permission checks? */
 		validate_writable(arg, sizeof(int));
 		COMPILER_WRITE_BARRIER();
 		*(int *)arg = (self->ad_features & ATA_DRIVE_FEATURE_FFLUSH) ? 1 : 0;
@@ -173,8 +178,9 @@ got_identify_signal:
 	}	break;
 
 	case HDIO_SET_WCACHE:
-	case _IOW(_IOC_TYPE(HDIO_SET_WCACHE), _IOC_NR(HDIO_SET_WCACHE), int): {
+	case _IO_WITHTYPE(HDIO_SET_WCACHE, int): {
 		int cache_mode;
+		/* TODO: Permission checks? */
 		validate_readable(arg, sizeof(int));
 		COMPILER_READ_BARRIER();
 		cache_mode = *(int *)arg;
@@ -189,6 +195,7 @@ got_identify_signal:
 
 	case HDIO_DRIVE_RESET: {
 		AtaBus *bus;
+		/* TODO: Permission checks? */
 		bus = self->ad_bus;
 		AtaBus_LockPIO(bus);
 		TRY {
@@ -201,8 +208,9 @@ got_identify_signal:
 	}	break;
 
 	case HDIO_GET_BUSSTATE:
-	case _IOR(_IOC_TYPE(HDIO_GET_BUSSTATE), _IOC_NR(HDIO_GET_BUSSTATE), int): {
+	case _IO_WITHTYPE(HDIO_GET_BUSSTATE, int): {
 		uintptr_half_t state;
+		/* TODO: Permission checks? */
 		validate_writable(arg, sizeof(int));
 		state = ATOMIC_READ(self->ad_bus->ab_state);
 		COMPILER_WRITE_BARRIER();

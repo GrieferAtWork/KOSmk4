@@ -27,8 +27,8 @@
 //#define DEFINE_DATA_VirtVector
 //#define DEFINE_DATA_PhysVector
 
-#define DEFINE_IOMETHOD_Dma
-//#define DEFINE_IOMETHOD_Chs
+//#define DEFINE_IOMETHOD_Dma
+#define DEFINE_IOMETHOD_Chs
 //#define DEFINE_IOMETHOD_Lba28
 //#define DEFINE_IOMETHOD_Lba48
 #endif /* __INTELLISENSE__ */
@@ -36,7 +36,6 @@
 #include <kernel/iovec.h>
 
 #include <hybrid/atomic.h>
-#include <hybrid/byteorder.h>
 
 #include <sys/io.h>
 
@@ -159,14 +158,27 @@ DECL_BEGIN
 #endif /* ... */
 
 #ifdef DEFINE_RW_Read
-#define _ATA_LOWLEVEL_RW_SECTORS ATA_COMMAND_READ_SECTORS
+#define _ATA_LOWLEVEL_RW_CHS     ATA_COMMAND_READ_SECTORS
 #define _ATA_LOWLEVEL_RW_PIO     ATA_COMMAND_READ_PIO
 #define _ATA_LOWLEVEL_RW_PIO_EXT ATA_COMMAND_READ_PIO_EXT
 #elif defined(DEFINE_RW_Write)
-#define _ATA_LOWLEVEL_RW_SECTORS ATA_COMMAND_WRITE_SECTORS
+#define _ATA_LOWLEVEL_RW_CHS     ATA_COMMAND_WRITE_SECTORS
 #define _ATA_LOWLEVEL_RW_PIO     ATA_COMMAND_WRITE_PIO
 #define _ATA_LOWLEVEL_RW_PIO_EXT ATA_COMMAND_WRITE_PIO_EXT
 #endif /* ... */
+
+#ifdef DEFINE_IOMETHOD_Dma
+/* ... */
+#elif defined(DEFINE_IOMETHOD_Lba48)
+#define _ATA_MAX_SECTORS_PER_TRANSFER   0xffff
+#define _ATA_MAX_SECTORS_PER_TRANSFER_T u16
+#elif defined(DEFINE_IOMETHOD_Lba28)
+#define _ATA_MAX_SECTORS_PER_TRANSFER   0xff
+#define _ATA_MAX_SECTORS_PER_TRANSFER_T u8
+#elif defined(DEFINE_IOMETHOD_Chs)
+#define _ATA_MAX_SECTORS_PER_TRANSFER   0xff /* ??? */
+#define _ATA_MAX_SECTORS_PER_TRANSFER_T u8
+#endif
 
 
 
@@ -217,38 +229,30 @@ PP_CAT5(AtaDrive_, _ATA_IOMETHOD_Name, Drive, _ATA_RW_Name, _ATA_DATA_Name)(_ATA
 		                        state, newstate))
 			continue;
 		assert(bus->ab_aio_current == NULL);
+
 		/* NOTE: The `ATA_AIO_HANDLE_FONEPRD' flag doesn't matter in this
 		 *       case, since we completely by-pass the in-handle PRD buffer,
 		 *       and directly fill in the bus's PRD buffer! */
 		data->hd_flags = _ATA_RW_HANDLE_FLAGS;
-		/* Immediately start a new DMA operation. */
+
+		/* Directly fill in the bus's PRD buffer, rather than creating
+		 * our own buffer that would later get copied ontop of the bus's. */
 		prd_count = _ATA_INITIALIZE_PRD_FROM_BUF(bus->ab_prdt,
 		                                         ATA_PRD_MAXCOUNT,
 		                                         buf,
 		                                         num_sectors * ATA_SECTOR_SIZE(self),
 		                                         data);
+
 		if unlikely(!prd_count || prd_count > ATA_PRD_MAXCOUNT) {
 			/* Request contains non-canonical memory. */
 			AtaBus_StartNextDmaOperation(bus);
 			goto service_without_dma;
 		}
+
 		ATA_VERBOSE("[ata] Setup initial dma\n");
 		aio_handle_init(aio, &AtaDrive_DmaAioHandleType);
 		data->hd_drive = (REF AtaDrive *)incref(self);
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		*(u32 *)&data->hd_io_lbaaddr[0] = (u32)addr;
-		*(u16 *)&data->hd_io_lbaaddr[4] = (u16)(addr >> 32);
-		*(u16 *)&data->hd_io_sectors[0] = (u16)num_sectors;
-#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-		data->hd_io_lbaaddr[0] = (u8)(addr);
-		data->hd_io_lbaaddr[1] = (u8)(addr >> 8);
-		data->hd_io_lbaaddr[2] = (u8)(addr >> 16);
-		data->hd_io_lbaaddr[3] = (u8)(addr >> 24);
-		data->hd_io_lbaaddr[4] = (u8)(addr >> 32);
-		data->hd_io_lbaaddr[5] = (u8)(addr >> 40);
-		data->hd_io_sectors[0] = (u8)(num_sectors);
-		data->hd_io_sectors[1] = (u8)(num_sectors >> 8);
-#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+		AtaAIOHandleData_SetAddrAndSectors(data, addr, num_sectors);
 #ifdef _ATA_DATA_IS_PHYSICAL
 		data->hd_dmalockvec = NULL;
 		assert(!(data->hd_flags & ATA_AIO_HANDLE_FONEDMA));
@@ -324,20 +328,7 @@ again_init_prdv:
 	/* Initialize additional stuff... */
 	aio_handle_init(aio, &AtaDrive_DmaAioHandleType);
 	data->hd_drive = (REF AtaDrive *)incref(self);
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-	*(u32 *)&data->hd_io_lbaaddr[0] = (u32)addr;
-	*(u16 *)&data->hd_io_lbaaddr[4] = (u16)(addr >> 32);
-	*(u16 *)&data->hd_io_sectors[0] = (u16)num_sectors;
-#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-	data->hd_io_lbaaddr[0] = (u8)(addr);
-	data->hd_io_lbaaddr[1] = (u8)(addr >> 8);
-	data->hd_io_lbaaddr[2] = (u8)(addr >> 16);
-	data->hd_io_lbaaddr[3] = (u8)(addr >> 24);
-	data->hd_io_lbaaddr[4] = (u8)(addr >> 32);
-	data->hd_io_lbaaddr[5] = (u8)(addr >> 40);
-	data->hd_io_sectors[0] = (u8)(num_sectors);
-	data->hd_io_sectors[1] = (u8)(num_sectors >> 8);
-#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+	AtaAIOHandleData_SetAddrAndSectors(data, addr, num_sectors);
 #ifdef _ATA_DATA_IS_PHYSICAL
 	data->hd_dmalockvec = NULL;
 	assert(!(data->hd_flags & ATA_AIO_HANDLE_FONEDMA));
@@ -367,16 +358,6 @@ service_without_dma:
 #error "Unsupported configuration"
 #endif
 #else /* DEFINE_IOMETHOD_Dma */
-#ifdef DEFINE_IOMETHOD_Lba48
-#define _ATA_MAX_SECTORS_PER_TRANSFER   0xffff
-#define _ATA_MAX_SECTORS_PER_TRANSFER_T u16
-#elif defined(DEFINE_IOMETHOD_Lba28)
-#define _ATA_MAX_SECTORS_PER_TRANSFER   0xff
-#define _ATA_MAX_SECTORS_PER_TRANSFER_T u8
-#elif defined(DEFINE_IOMETHOD_Chs)
-#define _ATA_MAX_SECTORS_PER_TRANSFER   0xff /* ??? */
-#define _ATA_MAX_SECTORS_PER_TRANSFER_T u8
-#endif
 #ifdef _ATA_DATA_ENTRY
 	_ATA_DATA_VECTOR view, view2;
 #endif /* _ATA_DATA_ENTRY */
@@ -396,12 +377,16 @@ again_service_io:
 				goto err_io_error;
 			task_connect(&bus->ab_piointr);
 #ifdef DEFINE_IOMETHOD_Chs
+			/* CHS addressing */
 			{
-				u32 temp = (u32)((u32)addr / (u8)self->ad_chs_sectors_per_track);
-				u8 sector = (u8)(((u32)addr % (u8)self->ad_chs_sectors_per_track) + 1);
-				u8 head = (u8)((u32)temp % (u8)self->ad_chs_number_of_heads);
-				u16 cylinder = (u16)((u32)temp / (u8)self->ad_chs_number_of_heads);
-				u8 max_count = self->ad_chs_sectors_per_track - sector;
+				u32 temp;
+				u8 sector, head, max_count;
+				u16 cylinder;
+				temp      = (u32)((u32)addr / (u8)self->ad_chs_sectors_per_track);
+				sector    = (u8)(((u32)addr % (u8)self->ad_chs_sectors_per_track) + 1);
+				head      = (u8)((u32)temp % (u8)self->ad_chs_number_of_heads);
+				cylinder  = (u16)((u32)temp / (u8)self->ad_chs_number_of_heads);
+				max_count = self->ad_chs_sectors_per_track - sector;
 				if (part_sectors > max_count)
 					part_sectors = (_ATA_MAX_SECTORS_PER_TRANSFER_T)max_count;
 				outb(bus->ab_busio + ATA_DRIVE_SELECT,
@@ -411,9 +396,10 @@ again_service_io:
 				outb(bus->ab_busio + ATA_ADDRESS1, (u8)sector);
 				outb(bus->ab_busio + ATA_ADDRESS2, (u8)cylinder);
 				outb(bus->ab_busio + ATA_ADDRESS3, (u8)(cylinder >> 8));
-				outb(bus->ab_busio + ATA_COMMAND, _ATA_LOWLEVEL_RW_SECTORS);
+				outb(bus->ab_busio + ATA_COMMAND, _ATA_LOWLEVEL_RW_CHS);
 			}
 #else /* DEFINE_IOMETHOD_Chs */
+			/* LBA28 or LBA48 */
 #ifdef DEFINE_IOMETHOD_Lba48
 			outb(bus->ab_busio + ATA_DRIVE_SELECT, self->ad_drive);
 			AtaBus_HW_SelectDelay(bus);
@@ -509,12 +495,10 @@ err_io_error:
 
 	/* Handle the ATA error via AIO */
 	AioHandle_CompleteWithAtaError(aio, error);
-#undef _ATA_MAX_SECTORS_PER_TRANSFER_T
-#undef _ATA_MAX_SECTORS_PER_TRANSFER
 #endif /* !DEFINE_IOMETHOD_Dma */
 }
 
-#undef _ATA_LOWLEVEL_RW_SECTORS
+#undef _ATA_LOWLEVEL_RW_CHS
 #undef _ATA_LOWLEVEL_RW_PIO
 #undef _ATA_LOWLEVEL_RW_PIO_EXT
 #undef _ATA_INITIALIZE_PRD_FROM_BUF
@@ -530,6 +514,8 @@ err_io_error:
 #undef _ATA_DATA_IS_PHYSICAL
 #undef _ATA_RW_HANDLE_FLAGS_ONEPRD
 #undef _ATA_RW_HANDLE_FLAGS
+#undef _ATA_MAX_SECTORS_PER_TRANSFER_T
+#undef _ATA_MAX_SECTORS_PER_TRANSFER
 
 DECL_END
 

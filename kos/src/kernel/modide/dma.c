@@ -39,9 +39,10 @@ DECL_BEGIN
 
 
 #if ATA_AIO_HANDLE_FWRITING == 1
-#define DMA_RW_COMMAND(aio_flags)     dma_rw_command[(aio_flags)&1]
-#define DMA_RW_COMMAND_EXT(aio_flags) dma_rw_command_ext[(aio_flags)&1]
-#define DMA_DMA_COMMAND(aio_flags)    dma_dma_command[(aio_flags)&1]
+#define DMA_RW_COMMAND(aio_flags)          dma_rw_command[(aio_flags)&1]
+#define DMA_RW_COMMAND_EXT(aio_flags)      dma_rw_command_ext[(aio_flags)&1]
+#define DMA_DMA_COMMAND(aio_flags)         dma_dma_command[(aio_flags)&1]
+#define DMA_DMA_COMMAND_ENABLED(aio_flags) dma_dma_command_enabled[(aio_flags)&1]
 PRIVATE u8 const dma_rw_command[2] = {
 	[0]                       = ATA_COMMAND_READ_DMA,
 	[ATA_AIO_HANDLE_FWRITING] = ATA_COMMAND_WRITE_DMA
@@ -51,6 +52,10 @@ PRIVATE u8 const dma_rw_command_ext[2] = {
 	[ATA_AIO_HANDLE_FWRITING] = ATA_COMMAND_WRITE_DMA_EXT
 };
 PRIVATE u8 const dma_dma_command[2] = {
+	[0]                       = DMA_COMMAND_FREADMODE,
+	[ATA_AIO_HANDLE_FWRITING] = 0
+};
+PRIVATE u8 const dma_dma_command_enabled[2] = {
 	[0]                       = DMA_COMMAND_FENABLED | DMA_COMMAND_FREADMODE,
 	[ATA_AIO_HANDLE_FWRITING] = DMA_COMMAND_FENABLED
 };
@@ -64,6 +69,10 @@ PRIVATE u8 const dma_dma_command[2] = {
 	 ? ATA_COMMAND_WRITE_DMA_EXT         \
 	 : ATA_COMMAND_READ_DMA_EXT)
 #define DMA_DMA_COMMAND(aio_flags)       \
+	((aio_flags)&ATA_AIO_HANDLE_FWRITING \
+	 ? 0                                 \
+	 : DMA_COMMAND_FREADMODE)
+#define DMA_DMA_COMMAND_ENABLED(aio_flags)       \
 	((aio_flags)&ATA_AIO_HANDLE_FWRITING \
 	 ? DMA_COMMAND_FENABLED              \
 	 : DMA_COMMAND_FENABLED | DMA_COMMAND_FREADMODE)
@@ -139,7 +148,7 @@ again:
 
 	/* Configure DMA */
 	outb(self->ab_dmaio + DMA_PRIMARY_COMMAND,
-	     data->hd_flags & ATA_AIO_HANDLE_FWRITING ? 0 : DMA_COMMAND_FREADMODE);
+	     DMA_DMA_COMMAND(data->hd_flags));
 	outb(self->ab_dmaio + DMA_PRIMARY_STATUS,
 	     DMA_STATUS_FDMARUNNING |
 	     DMA_STATUS_FTRANSPORT_FAILURE |
@@ -188,7 +197,8 @@ again:
 		goto handle_io_error;
 
 	/* This following outb() is what actually activates hardware-DMA */
-	outb(self->ab_dmaio + DMA_PRIMARY_COMMAND, DMA_DMA_COMMAND(data->hd_flags));
+	outb(self->ab_dmaio + DMA_PRIMARY_COMMAND,
+	     DMA_DMA_COMMAND_ENABLED(data->hd_flags));
 
 	/* At this point the DMA operation has started! */
 	return true;
