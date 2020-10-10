@@ -107,6 +107,7 @@ function start(
 		 *       probably isn't something you'd want...
 		 * NOTE: When GDB is enabled, you'll get a SIGQUIT trap when
 		 *       the guest tries to reboot, and -no-reboot is set. */
+//		qemu_arguments.extend({ "-no-shutdown" });
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
 	}
 	local gdb_mode = options.get(opt.GDB);

@@ -3083,8 +3083,8 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 				TRY {
 					ATOMIC_WRITE(um->pm_sigmask, NULL);
 				} EXCEPT {
-					error_code_t code = error_code();
-					if (ERRORCODE_ISRTLPRIORITY(code))
+					error_class_t cls = error_class();
+					if (ERRORCLASS_ISRTLPRIORITY(cls))
 						RETHROW();
 					error_printf("Handling TASK_FUSERPROCMASK_AFTER_VFORK");
 				}

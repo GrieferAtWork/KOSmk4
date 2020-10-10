@@ -135,7 +135,7 @@
  *                If it is, move on to step #CORE
  *         #2:    Check if the base application is exception aware (see below)
  *                If it is, raise the exception like it would be in mode #3
- *         #3:    Check if the exception is ERRORCODE_ISRTLPRIORITY().
+ *         #3:    Check if the exception is ERRORCLASS_ISRTLPRIORITY().
  *                If it is, raise the exception like it would be in mode #3
  *         #4:    Save the currently active thread-local KOS exception, and
  *                set the `EXCEPT_FINEXCEPT' flag. (may be restored later)

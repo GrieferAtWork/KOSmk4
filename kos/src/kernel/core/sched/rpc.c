@@ -95,8 +95,8 @@ NOTHROW(KCALL cleanup_pending_rpcs)(void) {
 		} EXCEPT {
 			/* Dump the exception if it is non-signaling */
 			error_class_t cls = error_class();
-			if (!ERRORCODE_ISLOWPRIORITY(cls) &&
-			    !ERRORCODE_ISRTLPRIORITY(cls))
+			if (!ERRORCLASS_ISLOWPRIORITY(cls) &&
+			    !ERRORCLASS_ISRTLPRIORITY(cls))
 				error_printf("Unhandled exception in RPC function during thread termination");
 		}
 		rpcentry_free(chain);
@@ -125,7 +125,7 @@ NOTHROW(KCALL fini_pending_rpcs)(struct task *__restrict thread) {
 		} EXCEPT {
 			/* Dump the exception if it is non-signaling */
 			error_class_t cls = error_class();
-			if (!ERRORCODE_ISLOWPRIORITY(cls) && !ERRORCODE_ISRTLPRIORITY(cls))
+			if (!ERRORCLASS_ISLOWPRIORITY(cls) && !ERRORCLASS_ISRTLPRIORITY(cls))
 				error_printf("Unhandled exception in RPC function during thread destroy");
 		}
 		rpcentry_free(chain);
@@ -897,10 +897,12 @@ done_program_noapply:
 		}
 #undef SET_STATUS
 	} EXCEPT {
+		error_class_t cls;
 		/* Always indicate completion. */
 		sig_broadcast(&data->rpc_completed);
 		/* Propagate RTL-priority exceptions (such as E_EXIT_THREAD) */
-		if (ERRORCODE_ISRTLPRIORITY(error_code()))
+		cls = error_class();
+		if (ERRORCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
 		goto restore_old_except;
 	}

@@ -4442,8 +4442,8 @@ done_dynsym:
 			TRY {
 				driver_finalize(result);
 			} EXCEPT {
-				error_code_t code = error_code();
-				if (ERRORCODE_ISRTLPRIORITY(code)) {
+				error_class_t cls = error_class();
+				if (ERRORCLASS_ISRTLPRIORITY(cls)) {
 					decref(result);
 					RETHROW();
 				}

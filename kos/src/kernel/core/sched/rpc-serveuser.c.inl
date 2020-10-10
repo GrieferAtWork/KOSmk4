@@ -145,11 +145,11 @@ restore_rpc:
 			        "Exception thrown by NOTHROW RPC at %p",
 			        chain->re_func);
 			assert(tls_error->ei_code != E_OK);
-			STATIC_ASSERT(ERRORCODE_ISLOWPRIORITY(ERROR_CLASS(ERROR_CODEOF(E_INTERRUPT_USER_RPC))));
+			STATIC_ASSERT(ERRORCLASS_ISLOWPRIORITY(ERROR_CLASS(ERROR_CODEOF(E_INTERRUPT_USER_RPC))));
 			/* Propagate only the more important exception. */
 			if (last_error.ei_code == E_OK ||
-			    ERRORCODE_ISLOWPRIORITY(last_error.ei_class) ||
-			    ERRORCODE_ISHIGHPRIORITY(tls_error->ei_class))
+			    ERRORCLASS_ISLOWPRIORITY(last_error.ei_class) ||
+			    ERRORCLASS_ISHIGHPRIORITY(tls_error->ei_class))
 				memcpy(&last_error, tls_error, sizeof(last_error));
 		}
 		if (chain->re_kind & RPC_KIND_INTERRUPT)

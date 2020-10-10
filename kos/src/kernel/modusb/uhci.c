@@ -2687,8 +2687,8 @@ uhci_controller_device_attached(struct uhci_controller *__restrict self,
 	TRY {
 		usb_device_discovered(self, flags);
 	} EXCEPT {
-		error_code_t code = error_code();
-		if (ERRORCODE_ISRTLPRIORITY(code))
+		error_class_t cls = error_class();
+		if (ERRORCLASS_ISRTLPRIORITY(cls))
 			RETHROW();
 		error_printf("discovering usb device on uhci[pci:%I32p,io:%#Ix] port #%I16u",
 		             self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);

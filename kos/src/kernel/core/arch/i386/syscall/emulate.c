@@ -281,13 +281,13 @@ do_syscall:
 	} EXCEPT {
 		/* Service user-redirection RPCs to try and resolve the problem. */
 		bool must_restart_syscall;
-		error_code_t code = PERTASK_GET(this_exception_code);
+		error_class_t cls = PERTASK_GET(this_exception_class);
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
 		                                       TASK_RPC_REASON_SYSCALL,
 		                                       sc_info,
 		                                       &must_restart_syscall);
-		if (code == ERROR_CODEOF(E_OK)) {
+		if (cls == ERROR_CLASS(ERROR_CODEOF(E_OK))) {
 			if unlikely(must_restart_syscall)
 				goto again; /* Do the restart */
 			/* RPCs were able to handle the error!  -> return normally */
@@ -295,7 +295,7 @@ do_syscall:
 		}
 		assert(!must_restart_syscall);
 		if ((sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) || /* propagate exceptions */
-		    ERRORCODE_ISRTLPRIORITY(code))                     /* Always propagate RTL exceptions */
+		    ERRORCLASS_ISRTLPRIORITY(cls))                     /* Always propagate RTL exceptions */
 			RETHROW();
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
@@ -362,13 +362,13 @@ do_syscall32:
 	} EXCEPT {
 		/* Service user-redirection RPCs to try and resolve the problem. */
 		bool must_restart_syscall;
-		error_code_t code = PERTASK_GET(this_exception_code);
+		error_class_t cls = PERTASK_GET(this_exception_class);
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
 		                                       TASK_RPC_REASON_SYSCALL,
 		                                       sc_info,
 		                                       &must_restart_syscall);
-		if (code == ERROR_CODEOF(E_OK)) {
+		if (cls == ERROR_CLASS(ERROR_CODEOF(E_OK))) {
 			if unlikely(must_restart_syscall)
 				goto again; /* Do the restart */
 			/* RPCs were able to handle the error!  -> return normally */
@@ -376,7 +376,7 @@ do_syscall32:
 		}
 		assert(!must_restart_syscall);
 		if ((sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) || /* propagate exceptions */
-		    ERRORCODE_ISRTLPRIORITY(code))                     /* Always propagate RTL exceptions */
+		    ERRORCLASS_ISRTLPRIORITY(cls))                     /* Always propagate RTL exceptions */
 			RETHROW();
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
@@ -451,13 +451,13 @@ do_syscall32:
 	} EXCEPT {
 		/* Service user-redirection RPCs to try and resolve the problem. */
 		bool must_restart_syscall;
-		error_code_t code = PERTASK_GET(this_exception_code);
+		error_class_t cls = PERTASK_GET(this_exception_class);
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
 		                                       TASK_RPC_REASON_SYSCALL,
 		                                       sc_info,
 		                                       &must_restart_syscall);
-		if (code == ERROR_CODEOF(E_OK)) {
+		if (cls == ERROR_CLASS(ERROR_CODEOF(E_OK))) {
 			if unlikely(must_restart_syscall)
 				goto again; /* Do the restart */
 			/* RPCs were able to handle the error!  -> return normally */
@@ -465,7 +465,7 @@ do_syscall32:
 		}
 		assert(!must_restart_syscall);
 		if ((sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) || /* propagate exceptions */
-		    ERRORCODE_ISRTLPRIORITY(code))                     /* Always propagate RTL exceptions */
+		    ERRORCLASS_ISRTLPRIORITY(cls))                     /* Always propagate RTL exceptions */
 			RETHROW();
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */

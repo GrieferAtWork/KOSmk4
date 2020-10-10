@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21340f0c */
+/* HASH CRC-32:0x61bc197e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -140,7 +140,7 @@
  *                If it is, move on to step #CORE
  *         #2:    Check if the base application is exception aware (see below)
  *                If it is, raise the exception like it would be in mode #3
- *         #3:    Check if the exception is ERRORCODE_ISRTLPRIORITY().
+ *         #3:    Check if the exception is ERRORCLASS_ISRTLPRIORITY().
  *                If it is, raise the exception like it would be in mode #3
  *         #4:    Save the currently active thread-local KOS exception, and
  *                set the `EXCEPT_FINEXCEPT' flag. (may be restored later)
