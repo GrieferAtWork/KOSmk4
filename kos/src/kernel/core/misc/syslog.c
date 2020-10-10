@@ -457,6 +457,11 @@ struct syslog_buffer {
 };
 
 #ifdef WANT_SYSLOG_LOCK
+struct syslog_buffer_lock {
+	uintptr_t   sb_flags;  /* Old task flags. */
+	struct cpu *sb_caller; /* [0..1] Non-NULL if the SMP lock is being used. */
+};
+
 LOCAL NOBLOCK ATTR_CONST WUNUSED bool
 NOTHROW(FCALL is_a_valid_cpu)(struct cpu *c) {
 	unsigned int i;
@@ -467,18 +472,34 @@ NOTHROW(FCALL is_a_valid_cpu)(struct cpu *c) {
 	return false;
 }
 
-LOCAL NOBLOCK struct cpu *
-NOTHROW(FCALL syslog_buffer_lock)(struct syslog_buffer *__restrict self,
-                                  pflag_t preemption_was_enabled) {
+LOCAL NOBLOCK void
+NOTHROW(FCALL syslog_buffer_acquire)(struct syslog_buffer *__restrict self,
+                                     struct syslog_buffer_lock *__restrict lock) {
+	struct task *caller;
 	struct cpu *me;
 	struct cpu *oldcpu;
+	lock->sb_caller = NULL;
+	caller = THIS_TASK;
+	if unlikely(!ADDR_ISKERN(caller)) {
+		lock->sb_flags = (uintptr_t)-1;
+		return;
+	}
+	lock->sb_flags = caller->t_flags;
+	ATOMIC_OR(caller->t_flags, TASK_FKEEPCORE);
+	COMPILER_BARRIER();
 again:
-	me     = THIS_CPU;
+	me     = caller->t_cpu;
 	oldcpu = ATOMIC_CMPXCH_VAL(self->sb_writer, NULL, me);
-	if (oldcpu == NULL)
-		return me; /* Non-recursive, normal lock */
-	if (oldcpu == me)
-		return NULL; /* Recursive lock */
+	if (oldcpu == NULL) {
+		/* Non-recursive, normal lock */
+success:
+		lock->sb_caller = me;
+		return;
+	}
+	if (oldcpu == me) {
+		/* Recursive lock */
+		return;
+	}
 	/* Syslog printing must remain functional, even if some other CPU
 	 * crashed fatally during CPU initialization while holding this lock. */
 	if unlikely(!is_a_valid_cpu(oldcpu)) {
@@ -486,52 +507,46 @@ again:
 		real_oldcpu = ATOMIC_CMPXCH_VAL(self->sb_writer, oldcpu, me);
 		if (oldcpu != real_oldcpu)
 			goto again;
-		return me; /* Non-recursive, normal lock */
+		goto success;
 	}
 
 	/* Another CPU is holding the lock. ~try~ to yield. */
-	if (PREEMPTION_WASENABLED(preemption_was_enabled)) {
-		PREEMPTION_ENABLE();
-		task_pause();
-		task_tryyield();
-		PREEMPTION_DISABLE();
+	if (PREEMPTION_ENABLED()) {
+		task_yield();
 		goto again;
 	}
+
 	/* Try to pause ~once~ */
 	task_pause();
-	oldcpu = ATOMIC_CMPXCH_VAL(self->sb_writer, NULL, me);
-	if (oldcpu == NULL)
-		return me; /* Non-recursive, normal lock */
-	return NULL; /* Cannot acquire lock (just write the message without syncing) */
+	if (ATOMIC_CMPXCH(self->sb_writer, NULL, me))
+		goto success;
+	/* Cannot acquire lock (just write the message without syncing) */
 }
 
 LOCAL NOBLOCK void
-NOTHROW(FCALL syslog_buffer_unlock)(struct syslog_buffer *__restrict self,
-                                    struct cpu *caller_or_null) {
-	if (caller_or_null != NULL)
+NOTHROW(FCALL syslog_buffer_release)(struct syslog_buffer *__restrict self,
+                                     struct syslog_buffer_lock *__restrict lock) {
+	if (lock->sb_caller != NULL)
 		ATOMIC_WRITE(self->sb_writer, NULL);
+	if (!(lock->sb_flags & TASK_FKEEPCORE)) {
+		struct task *caller = THIS_TASK;
+		ATOMIC_AND(caller->t_flags, ~TASK_FKEEPCORE);
+	}
 }
 
-#define SYSLOG_BUFFER_LOCK(self)                \
-	do {                                        \
-		pflag_t _sb_was = PREEMPTION_PUSHOFF(); \
-		struct cpu *_sb_cpu = syslog_buffer_lock(self, _sb_was)
+#define SYSLOG_BUFFER_LOCK(self)            \
+	do {                                    \
+		struct syslog_buffer_lock _sb_lock; \
+		syslog_buffer_acquire(self, &_sb_lock)
 #define SYSLOG_BUFFER_BREAK(self) \
-	(syslog_buffer_unlock(self, _sb_cpu), PREEMPTION_POP(_sb_was))
-#define SYSLOG_BUFFER_UNLOCK(self) \
-		SYSLOG_BUFFER_BREAK(self); \
-	} __WHILE0
+		syslog_buffer_release(self, &_sb_lock)
+#define SYSLOG_BUFFER_UNLOCK(self)              \
+		syslog_buffer_release(self, &_sb_lock); \
+	}	__WHILE0
 #else /* WANT_SYSLOG_LOCK */
-#define syslog_buffer_lock(self, preemption_was_enabled) NULL
-#define syslog_buffer_unlock(self, caller_or_null)       (void)0
-#define SYSLOG_BUFFER_LOCK(self) \
-	do {                         \
-		pflag_t _sb_was = PREEMPTION_PUSHOFF()
-#define SYSLOG_BUFFER_BREAK(self) \
-	(PREEMPTION_POP(_sb_was))
-#define SYSLOG_BUFFER_UNLOCK(self) \
-		SYSLOG_BUFFER_BREAK(self); \
-	} __WHILE0
+#define SYSLOG_BUFFER_LOCK(self)   (void)0
+#define SYSLOG_BUFFER_BREAK(self)  (void)0
+#define SYSLOG_BUFFER_UNLOCK(self) (void)0
 #endif /* !WANT_SYSLOG_LOCK */
 
 
@@ -653,6 +668,7 @@ do_handle_linefeed:
 		case 0x19: /* EM */
 		case 0x1a: /* SUB */
 		case 0x1b: /* ESC */
+		case 0x7f: /* DEL */
 			break;
 
 #if 0 /* These control characters are allowed, and may be
@@ -744,12 +760,6 @@ syslog_printer(void *level,
 		                     (unsigned int)(uintptr_t)level);
 	} EXCEPT {
 		/* Unlock the buffer. */
-		/* TODO: Currently, we can get here when `data' contains lazily initialized
-		 *       memory mappings that originate from disk (which can easily happen
-		 *       when `data' is a static (.rodata-style) string that user-space wants
-		 *       to print to the system log)
-		 * Fix this by changing the syslog buffer lock such that we don't have to
-		 * disable preemption in order to acquire it! */
 		SYSLOG_BUFFER_BREAK(buffer);
 		RETHROW();
 	}
