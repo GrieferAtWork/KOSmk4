@@ -88,6 +88,13 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq)(/*aligned(8)*/ PHYS physaddr_t 
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_writephysq_unaligned)(PHYS physaddr_t addr, u64 value);
 #endif /* __UINT64_TYPE__ */
 
+/* I/O functions with physical buffers. */
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_insb_phys)(port_t port, PHYS physaddr_t buf, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_insw_phys)(port_t port, PHYS physaddr_t buf, size_t num_words);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_insl_phys)(port_t port, PHYS physaddr_t buf, size_t num_dwords);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_outsb_phys)(port_t port, PHYS physaddr_t buf, size_t num_bytes);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_outsw_phys)(port_t port, PHYS physaddr_t buf, size_t num_words);
+FUNDEF NOBLOCK void NOTHROW(KCALL vm_outsl_phys)(port_t port, PHYS physaddr_t buf, size_t num_dwords);
 
 
 /* Copy memory to/from the physical address space. */

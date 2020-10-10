@@ -510,6 +510,13 @@ DBG_COMMAND(rawmagic,
 	return 0;
 }
 
+DBG_COMMAND(except,
+            "except\n"
+            "\tPrint the currently active exception\n") {
+	error_printf(NULL);
+	return 0;
+}
+
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

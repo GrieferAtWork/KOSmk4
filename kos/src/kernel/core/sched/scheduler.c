@@ -888,6 +888,7 @@ NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
 	                                      priority_boost, now,
 	                                      tsc_now, false);
 	sched_assert();
+	assert(result != caller);
 	return result;
 }
 

@@ -67,7 +67,7 @@ aio_buffer_copyfromphys(struct aio_buffer const *__restrict self,
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		vm_copyfromphys((byte_t *)ent.ab_base + dst_offset, src, ent.ab_size);
+		vm_copyfromphys(ent.ab_base + dst_offset, src, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		src += ent.ab_size;
@@ -88,7 +88,7 @@ aio_buffer_copytophys(struct aio_buffer const *__restrict self,
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		vm_copytophys(dst, (byte_t *)ent.ab_base + src_offset, ent.ab_size);
+		vm_copytophys(dst, ent.ab_base + src_offset, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		dst += ent.ab_size;
@@ -110,7 +110,7 @@ aio_buffer_memset(struct aio_buffer const *__restrict self,
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		memset((byte_t *)ent.ab_base + dst_offset,
+		memset(ent.ab_base + dst_offset,
 		       byte, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
@@ -150,7 +150,7 @@ aio_buffer_copyfrommem(struct aio_buffer const *__restrict self, uintptr_t dst_o
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		memcpy((byte_t *)ent.ab_base + dst_offset, src, ent.ab_size);
+		memcpy(ent.ab_base + dst_offset, src, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		src = (byte_t *)src + ent.ab_size;
@@ -194,7 +194,7 @@ aio_buffer_copytomem(struct aio_buffer const *__restrict self,
 		}
 		if (ent.ab_size > num_bytes)
 			ent.ab_size = num_bytes;
-		memcpy(dst, (byte_t *)ent.ab_base + src_offset, ent.ab_size);
+		memcpy(dst, ent.ab_base + src_offset, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
 		dst = (byte_t *)dst + ent.ab_size;
@@ -319,7 +319,7 @@ aio_pbuffer_copytovmem(struct aio_pbuffer const *__restrict src,
 				dst_offset -= dstent.ab_size;
 				continue;
 			}
-			dstent.ab_base = (byte_t *)dstent.ab_base + dst_offset;
+			dstent.ab_base += dst_offset;
 			dstent.ab_size -= dst_offset;
 			dst_offset = 0;
 		}

@@ -291,9 +291,9 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #endif /* !DEFINE_IO_READ */
 #else /* DEFINE_IO_PHYS */
 #ifdef DEFINE_IO_READ
-					vio_copyfromvio(&args, file_position, (byte_t *)ent.ab_base, ent.ab_size);
+					vio_copyfromvio(&args, file_position, ent.ab_base, ent.ab_size);
 #else /* DEFINE_IO_READ */
-					vio_copytovio(&args, file_position, (byte_t *)ent.ab_base, ent.ab_size);
+					vio_copytovio(&args, file_position, ent.ab_base, ent.ab_size);
 #endif /* !DEFINE_IO_READ */
 #endif /* !DEFINE_IO_PHYS */
 					if (ent.ab_size >= num_bytes)

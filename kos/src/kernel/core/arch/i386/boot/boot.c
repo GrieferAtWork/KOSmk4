@@ -412,6 +412,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Make use of `signandset()' where it's use is appropriate (e.g. in `sys_sigprocmask()') */
 
+	/* TODO: A lot of places use atomic_rwlock, when atomic_lock would suffice. The later can
+	 *       generate more efficient code than the former, and so should be used whenever possible.
+	 * -> This also applies to deemon! */
+
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:
 	 *       $ deemon --help /deemon/string

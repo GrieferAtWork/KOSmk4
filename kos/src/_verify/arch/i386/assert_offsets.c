@@ -2366,8 +2366,8 @@ static_assert(sizeof(struct __sigset_struct) == __SIZEOF_SIGSET_T__);
 static_assert(COMPILER_LENOF(((struct __sigset_struct *)0)->__val) == __SIGSET_NWORDS);
 
 #include <bits/crt/semaphore.h>
-static_assert(sizeof(sem_t) == __SIZEOF_SEM_T);
-static_assert(alignof(sem_t) >= alignof(void *));
+static_assert(sizeof(__sem_t) == __SIZEOF_SEM_T);
+static_assert(alignof(__sem_t) >= alignof(void *));
 
 
 #include <kos/kernel/segment.h>

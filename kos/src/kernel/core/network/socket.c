@@ -53,7 +53,7 @@ NOTHROW(KCALL aio_buffer_init)(struct aio_buffer *__restrict self,
                                USER CHECKED void const *buf, size_t buflen) {
 	self->ab_entc         = 1;
 	self->ab_entv         = &self->ab_head;
-	self->ab_head.ab_base = (USER CHECKED void *)buf;
+	self->ab_head.ab_base = (USER CHECKED byte_t *)buf;
 	self->ab_head.ab_size = buflen;
 	self->ab_last         = buflen;
 }

@@ -89,6 +89,9 @@ BEGIN
 		/* Required for: Video mode switching within the builtin debugger */
 		"../../libvgastate/*.c",
 
+		/* Pull in some hard-coded drivers */
+		"../modide/*.c", /* Needed for disk I/O */
+
 		/* Pull in the actual kernel sources */
 		"debugger/*.c",
 		"debugger-apps/*.c",

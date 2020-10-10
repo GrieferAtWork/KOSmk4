@@ -810,7 +810,7 @@ DEFINE_SYSCALL3(ssize_t, readv, fd_t, fd,
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
 					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
@@ -857,7 +857,7 @@ DEFINE_SYSCALL3(ssize_t, writev, fd_t, fd,
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
 					validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
@@ -904,7 +904,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
 					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
@@ -951,7 +951,7 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, writev, fd_t, fd,
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
 					compat_validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
@@ -1005,7 +1005,7 @@ DEFINE_SYSCALL4(ssize_t, preadv, fd_t, fd,
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
 					validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
@@ -1053,7 +1053,7 @@ DEFINE_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = ATOMIC_READ(iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)ATOMIC_READ(iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
 					validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                  ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
@@ -1101,7 +1101,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, preadv, fd_t, fd,
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
 					compat_validate_writable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);
@@ -1149,7 +1149,7 @@ DEFINE_COMPAT_SYSCALL4(ssize_t, pwritev, fd_t, fd,
 			TRY {
 				size_t i;
 				for (i = 0, num_bytes = 0; i < count; ++i) {
-					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
+					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base = (USER CHECKED byte_t *)(void *)ATOMIC_READ(*(compat_uintptr_t *)&iov[i].iov_base);
 					((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size = ATOMIC_READ(iov[i].iov_len);
 					compat_validate_readable(((struct aio_buffer_entry *)dst.ab_entv)[i].ab_base,
 					                         ((struct aio_buffer_entry *)dst.ab_entv)[i].ab_size);

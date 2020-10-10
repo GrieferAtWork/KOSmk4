@@ -21,14 +21,16 @@
 #include "phys.c"
 #define DEFINE_PHYS_READ 1
 //#define DEFINE_PHYS_WRITE 1
-#define DEFINE_PHYS_UNALIGNED 1
+//#define DEFINE_PHYS_UNALIGNED 1
 #endif /* __INTELLISENSE__ */
 
 #include <hybrid/unaligned.h>
 
+#include <sys/io.h>
+
 #if (defined(DEFINE_PHYS_READ) + defined(DEFINE_PHYS_WRITE)) != 1
 #error "Must #define exactly one of `DEFINE_PHYS_READ', `DEFINE_PHYS_WRITE'"
-#endif
+#endif /* (DEFINE_PHYS_READ + DEFINE_PHYS_WRITE) != 1 */
 
 #ifdef DEFINE_PHYS_UNALIGNED
 #define FUNC3(x, y) x##y##_unaligned
@@ -265,6 +267,198 @@ NOTHROW(KCALL FUNC(physq))(PHYS physaddr_t addr VALUE_ARG(u64)) {
 	IFRD(return result);
 }
 
+
+#ifndef DEFINE_PHYS_UNALIGNED
+/* I/O functions with physical buffers. */
+
+#ifdef DEFINE_PHYS_READ
+#define _VM_IONAME outs
+#else /* DEFINE_PHYS_READ */
+#define _VM_IONAME ins
+#endif /* !DEFINE_PHYS_READ */
+
+PUBLIC NOBLOCK void
+NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, b_phys))(port_t port,
+                                                PHYS physaddr_t buf,
+                                                size_t num_bytes) {
+	pagedir_pushval_t backup;
+	byte_t *tramp;
+	bool is_first;
+#ifndef NO_PHYS_IDENTITY
+	if (PHYS_IS_IDENTITY(buf, num_bytes)) {
+		(PP_CAT2(_VM_IONAME, b)(port,
+		                        PHYS_TO_IDENTITY(buf),
+		                        num_bytes));
+		return;
+	}
+#endif /* !NO_PHYS_IDENTITY */
+	is_first = true;
+	tramp    = THIS_TRAMPOLINE_BASE;
+	for (;;) {
+		size_t page_bytes;
+		page_bytes = PAGESIZE - (buf & PAGEMASK);
+		if (page_bytes > num_bytes)
+			page_bytes = num_bytes;
+		if (is_first) {
+			backup = pagedir_push_mapone(tramp,
+			                             buf & ~PAGEMASK,
+			                             PAGEDIR_MAP_FREAD);
+			is_first = true;
+		} else {
+			pagedir_mapone(tramp,
+			               buf & PAGEMASK,
+			               PAGEDIR_MAP_FREAD);
+		}
+		pagedir_syncone(tramp);
+		TRY {
+			/* Copy memory. */
+			(PP_CAT2(_VM_IONAME, b)(port,
+			                        tramp + ((ptrdiff_t)buf & PAGEMASK),
+			                        page_bytes));
+		} EXCEPT {
+			/* Try-catch is required, because `dst' may be a user-buffer,
+			 * in which case access may cause an exception to be thrown. */
+			pagedir_pop_mapone(tramp, backup);
+			RETHROW();
+		}
+		if (page_bytes >= num_bytes)
+			break;
+		num_bytes -= page_bytes;
+		buf += page_bytes;
+	}
+	pagedir_pop_mapone(tramp, backup);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, w_phys))(port_t port,
+                                                PHYS physaddr_t buf,
+                                                size_t num_words) {
+	pagedir_pushval_t backup;
+	byte_t *tramp;
+	bool is_first;
+#ifndef NO_PHYS_IDENTITY
+	if (PHYS_IS_IDENTITY(buf, num_words * 2)) {
+		(PP_CAT2(_VM_IONAME, w)(port,
+		                        PHYS_TO_IDENTITY(buf),
+		                        num_words));
+		return;
+	}
+#endif /* !NO_PHYS_IDENTITY */
+	is_first = true;
+	tramp    = THIS_TRAMPOLINE_BASE;
+	for (;;) {
+		size_t page_words;
+		page_words = (PAGESIZE - (buf & PAGEMASK)) / 2;
+		if (page_words > num_words)
+			page_words = num_words;
+		if (is_first) {
+			backup = pagedir_push_mapone(tramp,
+			                             buf & ~PAGEMASK,
+			                             PAGEDIR_MAP_FREAD);
+			is_first = true;
+		} else {
+			pagedir_mapone(tramp,
+			               buf & PAGEMASK,
+			               PAGEDIR_MAP_FREAD);
+		}
+		pagedir_syncone(tramp);
+		TRY {
+			/* Copy memory. */
+			(PP_CAT2(_VM_IONAME, w)(port,
+			                        tramp + ((ptrdiff_t)buf & PAGEMASK),
+			                        page_words));
+		} EXCEPT {
+			/* Try-catch is required, because `dst' may be a user-buffer,
+			 * in which case access may cause an exception to be thrown. */
+			pagedir_pop_mapone(tramp, backup);
+			RETHROW();
+		}
+		if (page_words >= num_words)
+			break;
+		num_words -= page_words;
+		buf += page_words * 2;
+		if unlikely(buf & 1) {
+			u16 word;
+#ifdef DEFINE_PHYS_READ
+			word = vm_readphysw_unaligned(buf);
+			outw(port, word);
+#else /* DEFINE_PHYS_READ */
+			word = inw(port);
+			vm_writephysw_unaligned(buf, word);
+#endif /* !DEFINE_PHYS_READ */
+			--num_words;
+			buf += 2;
+		}
+	}
+	pagedir_pop_mapone(tramp, backup);
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(KCALL PP_CAT3(vm_, _VM_IONAME, l_phys))(port_t port,
+                                                PHYS physaddr_t buf,
+                                                size_t num_dwords) {
+	pagedir_pushval_t backup;
+	byte_t *tramp;
+	bool is_first;
+#ifndef NO_PHYS_IDENTITY
+	if (PHYS_IS_IDENTITY(buf, num_dwords * 4)) {
+		(PP_CAT2(_VM_IONAME, l)(port,
+		                        PHYS_TO_IDENTITY(buf),
+		                        num_dwords));
+		return;
+	}
+#endif /* !NO_PHYS_IDENTITY */
+	is_first = true;
+	tramp    = THIS_TRAMPOLINE_BASE;
+	for (;;) {
+		size_t page_dwords;
+		page_dwords = (PAGESIZE - (buf & PAGEMASK)) / 4;
+		if (page_dwords > num_dwords)
+			page_dwords = num_dwords;
+		if (is_first) {
+			backup = pagedir_push_mapone(tramp,
+			                             buf & ~PAGEMASK,
+			                             PAGEDIR_MAP_FREAD);
+			is_first = true;
+		} else {
+			pagedir_mapone(tramp,
+			               buf & PAGEMASK,
+			               PAGEDIR_MAP_FREAD);
+		}
+		pagedir_syncone(tramp);
+		TRY {
+			/* Copy memory. */
+			(PP_CAT2(_VM_IONAME, l)(port,
+			                        tramp + ((ptrdiff_t)buf & PAGEMASK),
+			                        page_dwords));
+		} EXCEPT {
+			/* Try-catch is required, because `dst' may be a user-buffer,
+			 * in which case access may cause an exception to be thrown. */
+			pagedir_pop_mapone(tramp, backup);
+			RETHROW();
+		}
+		if (page_dwords >= num_dwords)
+			break;
+		num_dwords -= page_dwords;
+		buf += page_dwords * 4;
+		if unlikely(buf & 3) {
+			u32 dword;
+#ifdef DEFINE_PHYS_READ
+			dword = vm_readphysl_unaligned(buf);
+			outl(port, dword);
+#else /* DEFINE_PHYS_READ */
+			dword = inl(port);
+			vm_writephysl_unaligned(buf, dword);
+#endif /* !DEFINE_PHYS_READ */
+			--num_dwords;
+			buf += 4;
+		}
+	}
+	pagedir_pop_mapone(tramp, backup);
+}
+
+#undef _VM_IONAME
+#endif /* !DEFINE_PHYS_UNALIGNED */
 
 
 DECL_END
