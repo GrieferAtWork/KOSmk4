@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd74fedf */
+/* HASH CRC-32:0xe21d19cb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -581,10 +581,52 @@ INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack, int needle);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_PURE WUNUSED char *NOTHROW_NCX(LIBDCALL libd_basename)(char const *filename);
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_basename)(char const *filename);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF ATTR_PURE WUNUSED char *NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename);
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Same as `strstr', but ignore casing */

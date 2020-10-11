@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb3093c0 */
+/* HASH CRC-32:0xd5e592e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,9 +30,9 @@
 
 #include <sys/ioctl.h>
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 #ifndef __Ioctl_defined
 #define __Ioctl_defined 1
 #ifdef __CRT_HAVE_Ioctl
@@ -44,8 +44,8 @@ __LIBC __SSIZE_TYPE__ (__VLIBCCALL Ioctl)(__fd_t __fd, unsigned long int __reque
 #undef __Ioctl_defined
 #endif /* !__CRT_HAVE_Ioctl */
 #endif /* !__Ioctl_defined */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_SYS_IOCTL_H */

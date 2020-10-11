@@ -30,11 +30,11 @@
 #include <kos/anno.h>
 #include <bits/types.h>
 
+#ifdef __CC__
+__SYSDECL_BEGIN
+
 }
-%#ifdef __CC__
-%
-%__SYSDECL_BEGIN
-%
+
 
 @@Print to stderr: `<program_invocation_short_name>: <format...>: strerror(errno)\n'
 [[cp_stdio, ATTR_LIBC_PRINTF(1, 2)]]
@@ -150,11 +150,10 @@ void verrx(int status, char const *format, $va_list args) {
 	exit(status);
 }
 
-%
-%__SYSDECL_END
-%
-%#endif /* __CC__ */
 %{
+
+__SYSDECL_END
+#endif /* __CC__ */
 
 }
 

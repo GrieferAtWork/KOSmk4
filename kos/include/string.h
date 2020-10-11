@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x269cd5f */
+/* HASH CRC-32:0xcf6ea482 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -945,21 +945,147 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strchrnul, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __CRT_HAVE_basename
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,basename,(char *__filename),basename,(__filename))
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,char const *,__NOTHROW_NCX,basename,(char const *__filename),basename,(__filename))
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char *__filename),basename,(__filename))
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,basename,(char const *__filename),basename,(__filename))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,basename,(char const *__filename),(__filename))
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,basename,(char const *__filename),(__filename))
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #else /* __CRT_HAVE_basename */
 #include <libc/local/string/basename.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-__NAMESPACE_LOCAL_USING_OR_IMPL(basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); })
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__NAMESPACE_LOCAL_USING_OR_IMPL(basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL basename)(char const *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(basename))(__filename); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !__CRT_HAVE_basename */
 #endif /* !__basename_defined */

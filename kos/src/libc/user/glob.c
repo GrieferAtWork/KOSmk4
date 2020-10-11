@@ -31,18 +31,19 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_glob,hash:CRC-32=0xaa9e134f]]]*/
-/* Do glob searching for PATTERN, placing results in PGLOB.
- * The bits defined above may be set in FLAGS.
- * If a directory cannot be opened or read and ERRFUNC is not nil,
- * it is called with the pathname that caused the error, and the
- * `errno' value from the failing call; if it returns non-zero
- * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
- * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
- * Otherwise, `glob' returns zero */
+/*[[[head:libc_glob,hash:CRC-32=0xe1f0c0eb]]]*/
+/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
+ *                        GLOB_NOCHECK | GLOB_APPEND | GLOB_NOESCAPE |
+ *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
+ *                        GLOB_BRACE | GLOB_NOMAGIC | GLOB_TILDE |
+ *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+ * @return: GLOB_NOSPACE : ...
+ * @return: GLOB_ABORTED : ...
+ * @return: GLOB_NOMATCH : ...
+ * @return: GLOB_NOSYS   : ... */
 INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1, 4)) int
 NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
-                                int flags,
+                                __STDC_INT_AS_UINT_T flags,
                                 __glob_errfunc_t errfunc,
                                 glob_t *__restrict pglob)
 /*[[[body:libc_glob]]]*/
@@ -57,8 +58,7 @@ NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
 }
 /*[[[end:libc_glob]]]*/
 
-/*[[[head:libc_globfree,hash:CRC-32=0xe8b659c9]]]*/
-/* Free storage allocated in PGLOB by a previous `glob' call */
+/*[[[head:libc_globfree,hash:CRC-32=0x28adcec1]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 /*[[[body:libc_globfree]]]*/
@@ -69,18 +69,19 @@ NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 }
 /*[[[end:libc_globfree]]]*/
 
-/*[[[head:libc_glob64,hash:CRC-32=0x3dac10fb]]]*/
-/* Do glob searching for PATTERN, placing results in PGLOB.
- * The bits defined above may be set in FLAGS.
- * If a directory cannot be opened or read and ERRFUNC is not nil,
- * it is called with the pathname that caused the error, and the
- * `errno' value from the failing call; if it returns non-zero
- * `glob' returns GLOB_ABEND; if it returns zero, the error is ignored.
- * If memory cannot be allocated for PGLOB, GLOB_NOSPACE is returned.
- * Otherwise, `glob' returns zero */
+/*[[[head:libc_glob64,hash:CRC-32=0xe4413fa7]]]*/
+/* @param: flags: Set of `GLOB_ERR | GLOB_MARK | GLOB_NOSORT | GLOB_DOOFFS |
+ *                        GLOB_NOCHECK | GLOB_APPEND | GLOB_NOESCAPE |
+ *                        GLOB_PERIOD | GLOB_MAGCHAR | GLOB_ALTDIRFUNC |
+ *                        GLOB_BRACE | GLOB_NOMAGIC | GLOB_TILDE |
+ *                        GLOB_ONLYDIR | GLOB_TILDE_CHECK'
+ * @return: GLOB_NOSPACE : ...
+ * @return: GLOB_ABORTED : ...
+ * @return: GLOB_NOMATCH : ...
+ * @return: GLOB_NOSYS   : ... */
 INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1, 4)) int
 NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
-                                  int flags,
+                                  __STDC_INT_AS_UINT_T flags,
                                   __glob_errfunc_t errfunc,
                                   struct __glob64_struct *__restrict pglob)
 /*[[[body:libc_glob64]]]*/
@@ -95,8 +96,7 @@ NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
 }
 /*[[[end:libc_glob64]]]*/
 
-/*[[[head:libc_globfree64,hash:CRC-32=0x25fe68c5]]]*/
-/* Free storage allocated in PGLOB by a previous `glob' call */
+/*[[[head:libc_globfree64,hash:CRC-32=0x876076f2]]]*/
 INTERN ATTR_SECTION(".text.crt.utility.glob") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
 /*[[[body:libc_globfree64]]]*/

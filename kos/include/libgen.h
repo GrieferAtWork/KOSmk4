@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb51b8efd */
+/* HASH CRC-32:0x2cc3ce9c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,38 +30,114 @@
 
 #include <features.h>
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
-
 #ifdef __CRT_HAVE_dirname
-/* Return directory part of PATH or "." if none is available */
+/* Return the directory, that is everything leading up to, but not
+ * including the last slash of `path'. If no such path exists, "."
+ * is returned instead. Trailing slashes are ignored
+ * >> dirname("/usr/include///"); // Returns "/usr"
+ * >> dirname("/usr/include/");   // Returns "/usr"
+ * >> dirname("/usr/include");    // Returns "/usr"
+ * >> dirname("/usr/");           // Returns "/"
+ * >> dirname("/usr");            // Returns "/"
+ * >> dirname("/");               // Returns "/"
+ * >> dirname("///");             // Returns "/"
+ * >> dirname("foo/bar/");        // Returns "foo"
+ * >> dirname("foo/bar");         // Returns "foo"
+ * >> dirname("foo/");            // Returns "."
+ * >> dirname("foo");             // Returns "."
+ * >> dirname(".");               // Returns "."
+ * >> dirname("..");              // Returns "."
+ * >> dirname("");                // Returns "."
+ * >> dirname(NULL);              // Returns "."
+ * Note that for this purpose, `path' may be modified in-place, meaning
+ * that you should really always pass an strdup()'d, or writable string. */
 __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path))
 #else /* __CRT_HAVE_dirname */
 #include <libc/local/libgen/dirname.h>
-/* Return directory part of PATH or "." if none is available */
+/* Return the directory, that is everything leading up to, but not
+ * including the last slash of `path'. If no such path exists, "."
+ * is returned instead. Trailing slashes are ignored
+ * >> dirname("/usr/include///"); // Returns "/usr"
+ * >> dirname("/usr/include/");   // Returns "/usr"
+ * >> dirname("/usr/include");    // Returns "/usr"
+ * >> dirname("/usr/");           // Returns "/"
+ * >> dirname("/usr");            // Returns "/"
+ * >> dirname("/");               // Returns "/"
+ * >> dirname("///");             // Returns "/"
+ * >> dirname("foo/bar/");        // Returns "foo"
+ * >> dirname("foo/bar");         // Returns "foo"
+ * >> dirname("foo/");            // Returns "."
+ * >> dirname("foo");             // Returns "."
+ * >> dirname(".");               // Returns "."
+ * >> dirname("..");              // Returns "."
+ * >> dirname("");                // Returns "."
+ * >> dirname(NULL);              // Returns "."
+ * Note that for this purpose, `path' may be modified in-place, meaning
+ * that you should really always pass an strdup()'d, or writable string. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
 #endif /* !__CRT_HAVE_dirname */
 #ifdef __CRT_HAVE___xpg_basename
-/* Return final component of PATH.
- * This is the weird XPG version of this function. It sometimes will
- * modify its argument. Therefore we normally use the GNU version (in
- * <string.h>) and only if this header is included make the XPG
- * version available under the real name */
+/* Return the filename-part, that is everything following
+ * the last slash of `filename'. If no such part exists, "."
+ * is returned instead. Trailing slashes are ignored
+ * >> basename("/usr/include///"); // Returns "include"
+ * >> basename("/usr/include/");   // Returns "include"
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns "usr"
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns "/"
+ * >> basename("///");             // Returns "/"
+ * >> basename("foo/bar/");        // Returns "bar"
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns "foo"
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns "."
+ * >> basename(NULL);              // Returns "."
+ * Note that for this purpose, `filename' may be modified in-place, meaning
+ * that you should really always pass an strdup()'d, or writable string.
+ *
+ * Also note that a different version of this function exists in <string.h>,
+ * where if you include both <libgen.h> and <string.h>, you can use the
+ * alternate function from <string.h> by `#undef basename', or calling the
+ * function as `(basename)(...)' (as opposed to `basename(...)') */
 __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,__xpg_basename,(char *__filename),(__filename))
 #else /* __CRT_HAVE___xpg_basename */
 #include <libc/local/libgen/__xpg_basename.h>
-/* Return final component of PATH.
- * This is the weird XPG version of this function. It sometimes will
- * modify its argument. Therefore we normally use the GNU version (in
- * <string.h>) and only if this header is included make the XPG
- * version available under the real name */
+/* Return the filename-part, that is everything following
+ * the last slash of `filename'. If no such part exists, "."
+ * is returned instead. Trailing slashes are ignored
+ * >> basename("/usr/include///"); // Returns "include"
+ * >> basename("/usr/include/");   // Returns "include"
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns "usr"
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns "/"
+ * >> basename("///");             // Returns "/"
+ * >> basename("foo/bar/");        // Returns "bar"
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns "foo"
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns "."
+ * >> basename(NULL);              // Returns "."
+ * Note that for this purpose, `filename' may be modified in-place, meaning
+ * that you should really always pass an strdup()'d, or writable string.
+ *
+ * Also note that a different version of this function exists in <string.h>,
+ * where if you include both <libgen.h> and <string.h>, you can use the
+ * alternate function from <string.h> by `#undef basename', or calling the
+ * function as `(basename)(...)' (as opposed to `basename(...)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(__xpg_basename, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL __xpg_basename)(char *__filename) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__xpg_basename))(__filename); })
 #endif /* !__CRT_HAVE___xpg_basename */
 #define basename(path) __xpg_basename(path)
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_LIBGEN_H */

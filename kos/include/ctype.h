@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8279e402 */
+/* HASH CRC-32:0x2ab6eeb6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,9 +60,9 @@ __NAMESPACE_STD_USING(isblank)
 #include <endian.h>
 #endif /* __USE_GLIBC */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 __NAMESPACE_STD_BEGIN
 #if __has_builtin(__builtin_iscntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iscntrl)
 __CEIDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,iscntrl,(int __ch),{ return __builtin_iscntrl(__ch); })
@@ -726,10 +726,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(toascii, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_C
 
 #endif /* __USE_MISC || __USE_XOPEN */
 
-
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #ifdef __CXX_SYSTEM_HEADER
 #define _CXX_STDONLY_CCTYPE 1

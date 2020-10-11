@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29994974 */
+/* HASH CRC-32:0x82a972ca */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,13 +31,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Create a linked list of `struct ifaddrs' structures, one for each
- * network interface on the host machine. If successful, store the
- * list in *IFAP and return 0. On errors, return -1 and set `errno'.
- * The storage returned in *IFAP is allocated dynamically and can
- * only be properly freed by passing it to `freeifaddrs' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap);
-/* Reclaim the storage allocated by a previous `getifaddrs' call */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa);
 #endif /* !__KERNEL__ */
 

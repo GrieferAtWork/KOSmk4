@@ -37,8 +37,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_getgrgid,hash:CRC-32=0xa1dcf07]]]*/
-/* Search for an entry with a matching group ID */
+/*[[[head:libc_getgrgid,hash:CRC-32=0x7ce1bd23]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid)
 /*[[[body:libc_getgrgid]]]*/
@@ -50,8 +49,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid)
 }
 /*[[[end:libc_getgrgid]]]*/
 
-/*[[[head:libc_getgrnam,hash:CRC-32=0x1039e5d3]]]*/
-/* Search for an entry with a matching group name */
+/*[[[head:libc_getgrnam,hash:CRC-32=0xee197878]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name)
 /*[[[body:libc_getgrnam]]]*/
@@ -63,8 +61,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name)
 }
 /*[[[end:libc_getgrnam]]]*/
 
-/*[[[head:libc_setgrent,hash:CRC-32=0x719f2952]]]*/
-/* Rewind the group-file stream */
+/*[[[head:libc_setgrent,hash:CRC-32=0xe6e65628]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") void
 NOTHROW_RPC(LIBCCALL libc_setgrent)(void)
 /*[[[body:libc_setgrent]]]*/
@@ -74,8 +71,7 @@ NOTHROW_RPC(LIBCCALL libc_setgrent)(void)
 }
 /*[[[end:libc_setgrent]]]*/
 
-/*[[[head:libc_endgrent,hash:CRC-32=0x94c6ff8d]]]*/
-/* Close the group-file stream */
+/*[[[head:libc_endgrent,hash:CRC-32=0x641c37da]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void)
 /*[[[body:libc_endgrent]]]*/
@@ -85,8 +81,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void)
 }
 /*[[[end:libc_endgrent]]]*/
 
-/*[[[head:libc_getgrent,hash:CRC-32=0xc9029de5]]]*/
-/* Read an entry from the group-file stream, opening it if necessary */
+/*[[[head:libc_getgrent,hash:CRC-32=0x5792ae5b]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") struct group *
 NOTHROW_RPC(LIBCCALL libc_getgrent)(void)
 /*[[[body:libc_getgrent]]]*/
@@ -97,8 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrent)(void)
 }
 /*[[[end:libc_getgrent]]]*/
 
-/*[[[head:libc_putgrent,hash:CRC-32=0xaca86e5d]]]*/
-/* Write the given entry onto the given stream */
+/*[[[head:libc_putgrent,hash:CRC-32=0xcaaaa285]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2)) int
 NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
                                     FILE *__restrict stream)
@@ -112,8 +106,7 @@ NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry,
 }
 /*[[[end:libc_putgrent]]]*/
 
-/*[[[head:libc_getgrgid_r,hash:CRC-32=0x1c903276]]]*/
-/* Search for an entry with a matching group ID */
+/*[[[head:libc_getgrgid_r,hash:CRC-32=0x3a931761]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
                                       struct group *__restrict resultbuf,
@@ -133,8 +126,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid,
 }
 /*[[[end:libc_getgrgid_r]]]*/
 
-/*[[[head:libc_getgrnam_r,hash:CRC-32=0x53d0d3cc]]]*/
-/* Search for an entry with a matching group name */
+/*[[[head:libc_getgrnam_r,hash:CRC-32=0x705123f9]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
                                       struct group *__restrict resultbuf,
@@ -154,8 +146,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name,
 }
 /*[[[end:libc_getgrnam_r]]]*/
 
-/*[[[head:libc_getgrent_r,hash:CRC-32=0x359e238f]]]*/
-/* Read an entry from the group-file stream, opening it if necessary */
+/*[[[head:libc_getgrent_r,hash:CRC-32=0x61ab34a7]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 4)) int
 NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
                                       char *__restrict buffer,
@@ -173,8 +164,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf,
 }
 /*[[[end:libc_getgrent_r]]]*/
 
-/*[[[head:libc_fgetgrent_r,hash:CRC-32=0xd5c49c02]]]*/
-/* Read a group entry from STREAM */
+/*[[[head:libc_fgetgrent_r,hash:CRC-32=0x33f949d3]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 2, 3, 5)) int
 NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
                                        struct group *__restrict resultbuf,
@@ -194,8 +184,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream,
 }
 /*[[[end:libc_fgetgrent_r]]]*/
 
-/*[[[head:libc_fgetgrent,hash:CRC-32=0xc1a3adce]]]*/
-/* Read a group entry from STREAM */
+/*[[[head:libc_fgetgrent,hash:CRC-32=0x91a986b7]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) struct group *
 NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
 /*[[[body:libc_fgetgrent]]]*/
@@ -207,8 +196,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream)
 }
 /*[[[end:libc_fgetgrent]]]*/
 
-/*[[[head:libc_setgroups,hash:CRC-32=0xa46ba23e]]]*/
-/* Set the group set for the current user to GROUPS (N of them) */
+/*[[[head:libc_setgroups,hash:CRC-32=0x74eb5525]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") int
 NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
                                      gid_t const *groups)
@@ -224,10 +212,7 @@ NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count,
 }
 /*[[[end:libc_setgroups]]]*/
 
-/*[[[head:libc_getgrouplist,hash:CRC-32=0xa73f1812]]]*/
-/* Store at most *NGROUPS members of the group set for USER into
- * *GROUPS. Also include GROUP. The actual number of groups found is
- * returned in *NGROUPS.  Return -1 if the if *NGROUPS is too small */
+/*[[[head:libc_getgrouplist,hash:CRC-32=0x32d8befc]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1, 3, 4)) int
 NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
                                         gid_t group,
@@ -245,10 +230,7 @@ NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user,
 }
 /*[[[end:libc_getgrouplist]]]*/
 
-/*[[[head:libc_initgroups,hash:CRC-32=0xc4ff9a82]]]*/
-/* Initialize the group set for the current user
- * by reading the group database and using all groups
- * of which USER is a member. Also include GROUP. */
+/*[[[head:libc_initgroups,hash:CRC-32=0xaf80da3c]]]*/
 INTERN ATTR_SECTION(".text.crt.database.group") NONNULL((1)) int
 NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user,
                                       gid_t group)

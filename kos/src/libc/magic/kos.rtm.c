@@ -28,43 +28,43 @@
 )]%{
 
 /* RTM abort reason flags. */
-#ifdef __RTM_ABORT_FAILED
+#if !defined(RTM_ABORT_FAILED) && defined(__RTM_ABORT_FAILED)
 #define RTM_ABORT_FAILED   __RTM_ABORT_FAILED   /* Transaction cannot be performed atomically. */
-#endif /* __RTM_ABORT_FAILED */
-#ifdef __RTM_ABORT_EXPLICIT
+#endif /* !RTM_ABORT_FAILED && __RTM_ABORT_FAILED */
+#if !defined(RTM_ABORT_EXPLICIT) && defined(__RTM_ABORT_EXPLICIT)
 #define RTM_ABORT_EXPLICIT __RTM_ABORT_EXPLICIT /* Abort was caused by `sys_rtm_abort()' (s.a. `RTM_ABORT_CODE()'). */
-#endif /* __RTM_ABORT_EXPLICIT */
-#ifdef __RTM_ABORT_RETRY
+#endif /* !RTM_ABORT_EXPLICIT && __RTM_ABORT_EXPLICIT */
+#if !defined(RTM_ABORT_RETRY) && defined(__RTM_ABORT_RETRY)
 #define RTM_ABORT_RETRY    __RTM_ABORT_RETRY    /* The transaction may succeed if re-attempted. */
-#endif /* __RTM_ABORT_RETRY */
-#ifdef __RTM_ABORT_CAPACITY
+#endif /* !RTM_ABORT_RETRY && __RTM_ABORT_RETRY */
+#if !defined(RTM_ABORT_CAPACITY) && defined(__RTM_ABORT_CAPACITY)
 #define RTM_ABORT_CAPACITY __RTM_ABORT_CAPACITY /* The internal buffer to track transactions overflowed. */
-#endif /* __RTM_ABORT_CAPACITY */
-#ifdef __RTM_ABORT_CODE_M
+#endif /* !RTM_ABORT_CAPACITY && __RTM_ABORT_CAPACITY */
+#if !defined(RTM_ABORT_CODE_M) && defined(__RTM_ABORT_CODE_M)
 #define RTM_ABORT_CODE_M   __RTM_ABORT_CODE_M   /* [valid_if(RTM_ABORT_EXPLICIT)] XABORT argument. */
-#endif /* __RTM_ABORT_CODE_M */
-#ifdef __RTM_ABORT_CODE_S
+#endif /* !RTM_ABORT_CODE_M && __RTM_ABORT_CODE_M */
+#if !defined(RTM_ABORT_CODE_S) && defined(__RTM_ABORT_CODE_S)
 #define RTM_ABORT_CODE_S   __RTM_ABORT_CODE_S   /* Shift for `RTM_ABORT_CODE_M'. */
-#endif /* __RTM_ABORT_CODE_S */
+#endif /* !RTM_ABORT_CODE_S && __RTM_ABORT_CODE_S */
 
 /* Helper macro for extracting the abort code (as passed to `rtm_abort()')
  * from a given `rtm_status_t x' when `x & RTM_ABORT_EXPLICIT' is true. */
-#if defined(RTM_ABORT_CODE_M) && defined(RTM_ABORT_CODE_S)
+#if !defined(RTM_ABORT_CODE) && defined(__RTM_ABORT_CODE_M) && defined(__RTM_ABORT_CODE_S)
 #define RTM_ABORT_CODE(/*rtm_status_t*/ x) \
-	(__CCAST(unsigned int)(((x)&RTM_ABORT_CODE_M) >> RTM_ABORT_CODE_S))
-#endif /* RTM_ABORT_CODE_M && RTM_ABORT_CODE_S */
+	(__CCAST(unsigned int)(((x)&__RTM_ABORT_CODE_M) >> __RTM_ABORT_CODE_S))
+#endif /* !RTM_ABORT_CODE && __RTM_ABORT_CODE_M && __RTM_ABORT_CODE_S */
 
 /* Returned by `rtm_begin()' when RTM isn't supported.
  * NOTE: When this macro isn't defined, then RTM is always supported */
-#ifdef __RTM_NOSYS
+#if !defined(RTM_NOSYS) && defined(__RTM_NOSYS)
 #define RTM_NOSYS __RTM_NOSYS /* RTM isn't supposed */
-#endif /* __RTM_NOSYS */
+#endif /* !RTM_NOSYS && __RTM_NOSYS */
 
 /* Returned by `rtm_begin()' when RTM was entered successfully.
  * NOTE: When this macro isn't defined, then RTM is never supported */
-#ifdef __RTM_STARTED
+#if !defined(RTM_STARTED) && defined(__RTM_STARTED)
 #define RTM_STARTED __RTM_STARTED /* RTM was entered */
-#endif /* __RTM_STARTED */
+#endif /* !RTM_STARTED && __RTM_STARTED */
 
 
 #ifdef __CC__

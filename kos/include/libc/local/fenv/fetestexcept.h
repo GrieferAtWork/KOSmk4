@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda80c0f6 */
+/* HASH CRC-32:0xc59fd622 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,6 @@
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Determine which of subset of the exceptions
- * specified by EXCEPTS are currently set */
 __LOCAL_LIBC(fetestexcept) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fetestexcept))(int __excepts) {
 	return __inline_fetestexcept(__excepts);

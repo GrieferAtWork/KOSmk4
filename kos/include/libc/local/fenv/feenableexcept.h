@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f58ddc */
+/* HASH CRC-32:0x63c20acb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,6 @@
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Enable individual exceptions.  Will not enable more exceptions than
- * EXCEPTS specifies.  Returns the previous enabled exceptions if all
- * exceptions are successfully set, otherwise returns -1 */
 __LOCAL_LIBC(feenableexcept) int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(feenableexcept))(int __excepts) {
 	return __inline_feenableexcept(__excepts);

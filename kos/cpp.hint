@@ -1533,3 +1533,7 @@
 #define __T16ENVP             char16_t *const envp[]
 #define __T32ARGV             char32_t *const argv[]
 #define __T32ENVP             char32_t *const envp[]
+#define __FILE                FILE
+#define __locale_t            locale_t
+#define __sighandler_t        sighandler_t
+#define __sa_family_t         sa_family_t

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18c7de9 */
+/* HASH CRC-32:0xe097c175 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,9 +34,8 @@
 
 #include <unistd.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __pos_t_defined
 #define __pos_t_defined 1
@@ -760,8 +759,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(FDataSync, __FORCELOCAL __ATTR_ARTIFICIAL void (
 #endif /* !... */
 #endif /* __USE_POSIX199309 || __USE_UNIX98 */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_UNISTD_H */

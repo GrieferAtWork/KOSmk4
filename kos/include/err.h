@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f82c562 */
+/* HASH CRC-32:0x190c05a7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,6 @@
 #include <bits/types.h>
 
 #ifdef __CC__
-
 __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_warn
@@ -234,7 +233,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(verrx, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NOR
 #endif /* !__CRT_HAVE_verrx */
 
 __SYSDECL_END
-
 #endif /* __CC__ */
 
 #endif /* !_ERR_H */

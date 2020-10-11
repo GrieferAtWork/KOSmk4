@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11edbfea */
+/* HASH CRC-32:0xca5c3b72 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,11 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Setup DES tables according KEY */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_setkey)(char const *key);
-/* Encrypt at most 8 characters from KEY using salt to perturb DES */
 INTDEF NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_crypt)(char const *key, char const *salt);
-/* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_encrypt)(char *glibc_block, __STDC_INT_AS_UINT_T edflag);
-/* Encrypt at most 8 characters from KEY using salt to perturb DES */
 INTDEF NONNULL((1, 2, 3)) char *NOTHROW_NCX(LIBDCALL libd_crypt_r)(char const *key, char const *salt, struct crypt_data *__restrict data);
-/* Setup DES tables according KEY */
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBDCALL libd_setkey_r)(char const *key, struct crypt_data *__restrict data);
-/* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
 INTDEF NONNULL((1, 3)) void NOTHROW_NCX(LIBDCALL libd_encrypt_r)(char *glibc_block, int edflag, struct crypt_data *__restrict data);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x286c946c */
+/* HASH CRC-32:0x6c3c811f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,44 +22,47 @@
 #define __local_basename_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(basename) __ATTR_PURE __ATTR_WUNUSED char *
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+__LOCAL_LIBC(basename) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
-	char __ch, *__iter = (char *)__filename, *__result = __NULLPTR;
-	if (!__filename || !*__filename)
-		return (char *)__filename;
-	do {
-		__ch = *__iter++;
+	/* char *slash = strrchr(filename, '/');
+	 * return slash ? slash + 1 : (char *)filename; */
+	char *__result = (char *)__filename;
+	char *__iter   = (char *)__filename;
+	for (;;) {
+		char __ch = *__iter++;
 #ifdef _WIN32
 		if (__ch == '/' || __ch == '\\')
-			__result = __iter;
 #else /* _WIN32 */
 		if (__ch == '/')
+#endif /* !_WIN32 */
+		{
 			__result = __iter;
-#endif /* !_WIN32 */
-	} while (__ch);
-	if __unlikely(!__result)
-		return (char *)__filename; /* Path doesn't contain '/'. */
-	if (*__result)
-		return __result; /* Last character isn't a '/'. */
-	__iter = __result;
-#ifdef _WIN32
-	while (__iter != __filename && (__iter[-1] == '/' || __iter[-1] == '\\'))
-		--__iter;
-#else /* _WIN32 */
-	while (__iter != __filename && __iter[-1] == '/')
-		--__iter;
-#endif /* !_WIN32 */
-	if (__iter == __filename)
-		return __result-1; /* Only `'/'"-characters. */
-	//*iter = '\0'; /* Trim all ending `'/'"-characters. */
-#ifdef _WIN32
-	while (__iter != __filename && (__iter[-1] != '/' || __iter[-1] != '\\'))
-		--__iter; /* Scan until the previous '/'. */
-#else /* _WIN32 */
-	while (__iter != __filename && __iter[-1] != '/')
-		--__iter; /* Scan until the previous '/'. */
-#endif /* !_WIN32 */
-	return __iter; /* Returns string after previous '/'. */
+		}
+		if (!__ch)
+			break;
+	}
+	return __result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_basename_defined

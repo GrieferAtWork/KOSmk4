@@ -32,9 +32,8 @@
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__cplusplus */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __lfutex_t_defined
 #define __lfutex_t_defined 1
@@ -1094,9 +1093,7 @@ unsigned int futex_setspin(unsigned int new_spin);
 
 %{
 
-
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

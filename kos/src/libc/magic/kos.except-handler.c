@@ -197,8 +197,6 @@
  *     they once where.
  */
 
-__SYSDECL_BEGIN
-
 #define EXCEPT_HANDLER_MODE_UNCHANGED  0x0000 /* Don't change the current mode */
 #define EXCEPT_HANDLER_MODE_DISABLED   0x0001 /* MODE: Disable exception handlers (s.a. mode #1) */
 #define EXCEPT_HANDLER_MODE_ENABLED    0x0002 /* MODE: Enable exception handlers for sys_X* system calls (s.a. mode #2) */
@@ -219,6 +217,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __except_handler_t_defined
 #define __except_handler_t_defined 1
@@ -290,8 +289,7 @@ void except_handler4(error_register_state_t *__restrict state,
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

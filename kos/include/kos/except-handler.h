@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61bc197e */
+/* HASH CRC-32:0x7e31153d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,8 +202,6 @@
  *     they once where.
  */
 
-__SYSDECL_BEGIN
-
 #define EXCEPT_HANDLER_MODE_UNCHANGED  0x0000 /* Don't change the current mode */
 #define EXCEPT_HANDLER_MODE_DISABLED   0x0001 /* MODE: Disable exception handlers (s.a. mode #1) */
 #define EXCEPT_HANDLER_MODE_ENABLED    0x0002 /* MODE: Enable exception handlers for sys_X* system calls (s.a. mode #2) */
@@ -224,6 +222,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __except_handler_t_defined
 #define __except_handler_t_defined 1
@@ -279,8 +278,7 @@ __LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler3)(error_register
 __LIBC __ATTR_NORETURN void (__EXCEPT_HANDLER_CC except_handler4)(error_register_state_t *__restrict __state, struct exception_data *__restrict __error) __THROWS(...) __CASMNAME_SAME("except_handler4");
 #endif /* __CRT_HAVE_except_handler4 */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_EXCEPT_HANDLER_H */

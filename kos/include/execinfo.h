@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbec3c96 */
+/* HASH CRC-32:0xebc235ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,9 @@
 
 #include <bits/types.h> /* $fd_t */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 #ifdef __CRT_HAVE_backtrace
 /* Create a traceback of up to `SIZE' instruction pointers from
  * the calling function, their caller, and so forth. On KOS, this
@@ -102,8 +102,8 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *co
  * written in total. */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
 #endif /* ... */
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_EXECINFO_H */

@@ -20,12 +20,13 @@
 
 %{
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
 #include <bits/crt/_diskfree_t.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
@@ -70,8 +71,8 @@ int _mkdir([[nonnull]] char const *path) {
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

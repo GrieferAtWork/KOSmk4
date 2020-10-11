@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9be73c7d */
+/* HASH CRC-32:0xff4fc10d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,6 @@
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 #ifdef __CC__
-
 __SYSDECL_BEGIN
 
 #ifdef __fast_error_defined
@@ -127,7 +126,6 @@ __LIBC int error_one_per_line;
 
 
 __SYSDECL_END
-
 #endif /* __CC__ */
 
 #endif /* !_ERROR_H */

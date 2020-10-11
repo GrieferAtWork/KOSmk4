@@ -25,9 +25,9 @@
 
 #include <bits/types.h> /* $fd_t */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 }
 
 @@Create a traceback of up to `SIZE' instruction pointers from
@@ -72,8 +72,8 @@ void backtrace_symbols_fd([[nonnull]] void *const *array,
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

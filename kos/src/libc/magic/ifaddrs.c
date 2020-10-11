@@ -23,88 +23,27 @@
 
 %{
 #include <features.h>
+
+#include <bits/crt/ifaddrs.h>
+
+#ifdef __USE_GLIBC
 #include <sys/socket.h>
-
-/* Derived from GLibc /usr/include/ifaddrs.h */
-/* ifaddrs.h -- declarations for getting network interface addresses
-   Copyright (C) 2002-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
-__SYSDECL_BEGIN
+#endif /* __USE_GLIBC */
 
 #ifdef __CC__
-
-/* The `getifaddrs' function generates a linked list of these structures.
- * Each element of the list describes one network interface. */
-/* TODO: These structures should go into <bits/crt/ifaddrs.h> */
-struct ifaddrs {
-	struct ifaddrs  *ifa_next;    /* Pointer to the next structure. */
-	char            *ifa_name;    /* Name of this network interface. */
-	__UINT32_TYPE__  ifa_flags;   /* Flags as from SIOCGIFFLAGS ioctl. */
-	struct sockaddr *ifa_addr;    /* Network address of this interface. */
-	struct sockaddr *ifa_netmask; /* Netmask of this interface. */
-#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
-	union {
-		union {
-			/* At most one of the following two is valid. If the IFF_BROADCAST
-			 * bit is set in `ifa_flags', then `ifa_broadaddr' is valid. If the
-			 * IFF_POINTOPOINT bit is set, then `ifa_dstaddr' is valid.
-			 * It is never the case that both these bits are set at once. */
-			struct sockaddr *ifu_broadaddr; /* Broadcast address of this interface. */
-			struct sockaddr *ifu_dstaddr;   /* Point-to-point destination address. */
-		} ifa_ifu;
-		struct sockaddr *ifa_broadaddr; /* Broadcast address of this interface. */
-		struct sockaddr *ifa_dstaddr;   /* Point-to-point destination address. */
-	};
-#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
-	union {
-		/* At most one of the following two is valid. If the IFF_BROADCAST
-		 * bit is set in `ifa_flags', then `ifa_broadaddr' is valid. If the
-		 * IFF_POINTOPOINT bit is set, then `ifa_dstaddr' is valid.
-		 * It is never the case that both these bits are set at once. */
-		struct sockaddr *ifu_broadaddr; /* Broadcast address of this interface. */
-		struct sockaddr *ifu_dstaddr;   /* Point-to-point destination address. */
-	} ifa_ifu;
-#ifndef ifa_broadaddr
-#define ifa_broadaddr ifa_ifu.ifu_broadaddr
-#define ifa_dstaddr ifa_ifu.ifu_dstaddr
-#endif /* !ifa_broadaddr */
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
-	void *ifa_data; /* Address-specific data (may be unused). */
-};
+__SYSDECL_BEGIN
 
 }
 
-
-@@Create a linked list of `struct ifaddrs' structures, one for each
-@@network interface on the host machine. If successful, store the
-@@list in *IFAP and return 0. On errors, return -1 and set `errno'.
-@@The storage returned in *IFAP is allocated dynamically and can
-@@only be properly freed by passing it to `freeifaddrs'
+[[decl_include("<bits/crt/ifaddrs.h>")]]
 int getifaddrs(struct ifaddrs **ifap);
 
-@@Reclaim the storage allocated by a previous `getifaddrs' call
+[[decl_include("<bits/crt/ifaddrs.h>")]]
 void freeifaddrs(struct ifaddrs *ifa);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

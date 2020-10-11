@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc916d83d */
+/* HASH CRC-32:0x9b4b2eb4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Clear the supported exceptions represented by EXCEPTS */
+/* @param: EXCEPTS: Set of `FE_*' */
 __LOCAL_LIBC(feclearexcept) int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(feclearexcept))(int __excepts) {
 	__inline_feclearexcept(__excepts);

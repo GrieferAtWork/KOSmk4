@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f6ac997 */
+/* HASH CRC-32:0x692188f5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -495,44 +495,47 @@ NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
 #ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED char *
+/* Alternate `basename(3)' function that doesn't modify its `filename' argument
+ * For a version that is allowed to modify its argument, but is also allowed to
+ * strip trailing slashes, include <libgen.h> instead, which will override this
+ * GNU-specific basename() function (you can explicitly make use of this GNU
+ * version by doing `#undef basename', or writing `(basename)(filename)', as
+ * opposed to `basename(filename)', when both version have been defined)
+ * >> basename("/usr/include///"); // Returns ""
+ * >> basename("/usr/include/");   // Returns ""
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns ""
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns ""
+ * >> basename("///");             // Returns ""
+ * >> basename("foo/bar/");        // Returns ""
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns ""
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns ""
+ * >> basename(NULL);              // <Undefined behavior> */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
-	char ch, *iter = (char *)filename, *result = NULL;
-	if (!filename || !*filename)
-		return (char *)filename;
-	do {
-		ch = *iter++;
+	/* char *slash = strrchr(filename, '/');
+	 * return slash ? slash + 1 : (char *)filename; */
+	char *result = (char *)filename;
+	char *iter   = (char *)filename;
+	for (;;) {
+		char ch = *iter++;
 #ifdef _WIN32
 		if (ch == '/' || ch == '\\')
-			result = iter;
 #else /* _WIN32 */
 		if (ch == '/')
+#endif /* !_WIN32 */
+		{
 			result = iter;
-#endif /* !_WIN32 */
-	} while (ch);
-	if unlikely(!result)
-		return (char *)filename; /* Path doesn't contain '/'. */
-	if (*result)
-		return result; /* Last character isn't a '/'. */
-	iter = result;
-#ifdef _WIN32
-	while (iter != filename && (iter[-1] == '/' || iter[-1] == '\\'))
-		--iter;
-#else /* _WIN32 */
-	while (iter != filename && iter[-1] == '/')
-		--iter;
-#endif /* !_WIN32 */
-	if (iter == filename)
-		return result-1; /* Only `'/'"-characters. */
-	//*iter = '\0'; /* Trim all ending `'/'"-characters. */
-#ifdef _WIN32
-	while (iter != filename && (iter[-1] != '/' || iter[-1] != '\\'))
-		--iter; /* Scan until the previous '/'. */
-#else /* _WIN32 */
-	while (iter != filename && iter[-1] != '/')
-		--iter; /* Scan until the previous '/'. */
-#endif /* !_WIN32 */
-	return iter; /* Returns string after previous '/'. */
+		}
+		if (!ch)
+			break;
+	}
+	return result;
 }
 /* Same as `strstr', but ignore casing */
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char *

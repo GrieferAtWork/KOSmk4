@@ -38,7 +38,6 @@
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
 
 #ifdef __CC__
-
 __SYSDECL_BEGIN
 
 }
@@ -234,7 +233,6 @@ __LIBC int error_one_per_line;
 %{
 
 __SYSDECL_END
-
 #endif /* __CC__ */
 
 }

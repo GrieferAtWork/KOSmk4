@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f19f12f */
+/* HASH CRC-32:0x73b3b82a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,9 +37,8 @@
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__cplusplus */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __lfutex_t_defined
 #define __lfutex_t_defined 1
@@ -2363,9 +2362,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL 
 #define futex_waitwhile_allbits(...)              __HYBRID_PP_VA_OVERLOAD(__PRIVATE_futex_waitwhile_allbits_, (__VA_ARGS__))(__VA_ARGS__)
 #endif /* !__cplusplus */
 
-
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_FUTEX_H */

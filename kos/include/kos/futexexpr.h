@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefb16053 */
+/* HASH CRC-32:0xb12794df */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,9 +38,8 @@
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__cplusplus */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __lfutex_t_defined
 #define __lfutex_t_defined 1
@@ -529,9 +528,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutexlockexpr64, __FORCELOCAL __ATTR_ARTIFICIAL
 #endif /* ... */
 #endif /* __USE_TIME64 */
 
-
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_FUTEXEXPR_H */

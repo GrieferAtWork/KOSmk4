@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1367ac74 */
+/* HASH CRC-32:0xfc4a9669 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@
 #include <features.h>
 
 #include <bits/crt/db/aliases.h>
+#include <bits/types.h>
 
 #ifdef __USE_GLIBC
 #include <sys/types.h>

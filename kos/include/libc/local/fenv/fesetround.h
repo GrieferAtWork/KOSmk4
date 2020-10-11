@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x771441a8 */
+/* HASH CRC-32:0x23ca143f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Establish the rounding direction represented by `rounding_direction'
+/* Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()

@@ -24,9 +24,8 @@
 #include <fcntl.h>
 #include <kos/anno.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -149,8 +148,7 @@ $fd_t OpenAt64($fd_t dirfd, [[nonnull]] char const *filename, $oflag_t oflags, .
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

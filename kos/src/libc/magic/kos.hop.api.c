@@ -26,8 +26,6 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 
-__SYSDECL_BEGIN
-
 #if defined(__KERNEL__) && __SIZEOF_SIZE_T__ < 8
 #define __HOP_SIZE64_FIELD(name) union { __size_t name; __uint64_t __##name##64; }
 #else /* __KERNEL__ */
@@ -49,6 +47,7 @@ __SYSDECL_BEGIN
 #endif /* !__HOP_PAD_POINTER */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -78,8 +77,7 @@ $syscall_slong_t Hopf($fd_t fd, $syscall_ulong_t cmd, $iomode_t mode, ... /*, vo
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

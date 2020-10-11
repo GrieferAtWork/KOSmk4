@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xc0ae4fee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,19 +17,53 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_fesetenv_defined
-#define __local_fesetenv_defined 1
-#include <__crt.h>
-#include <bits/crt/fenv-inline.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fesetenv) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fesetenv))(struct __fenv_struct const *___envp) {
-	__inline_fesetenv(___envp);
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_fesetenv_defined
-#define __local___localdep_fesetenv_defined 1
-#define __localdep_fesetenv __LIBC_LOCAL_NAME(fesetenv)
-#endif /* !__local___localdep_fesetenv_defined */
-#endif /* !__local_fesetenv_defined */
+#ifndef _BITS_CRT_IFADDRS_H
+#define _BITS_CRT_IFADDRS_H 1
+
+#include <__stdinc.h>
+
+#include <hybrid/typecore.h>
+
+#include <bits/types.h>
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct ifaddrs;
+struct sockaddr;
+
+struct ifaddrs {
+	struct ifaddrs  *ifa_next;    /* ??? */
+	char            *ifa_name;    /* ??? */
+	__UINT32_TYPE__  ifa_flags;   /* ??? */
+#if __SIZEOF_POINTER__ > 4
+	__BYTE_TYPE__ __ifa_pad[__SIZEOF_POINTER__ - 4];
+#endif /* __SIZEOF_POINTER__ > 4 */
+	struct sockaddr *ifa_addr;    /* ??? */
+	struct sockaddr *ifa_netmask; /* ??? */
+#undef ifa_broadaddr
+#undef ifa_dstaddr
+#ifdef __COMPILER_HAVE_TRANSPARENT_UNION
+	union {
+		union {
+			struct sockaddr *ifu_broadaddr; /* ??? */
+			struct sockaddr *ifu_dstaddr;   /* ??? */
+		} ifa_ifu;
+		struct sockaddr *ifa_broadaddr; /* ??? */
+		struct sockaddr *ifa_dstaddr;   /* ??? */
+	};
+#else /* __COMPILER_HAVE_TRANSPARENT_UNION */
+	union {
+		struct sockaddr *ifu_broadaddr; /* ??? */
+		struct sockaddr *ifu_dstaddr;   /* ??? */
+	} ifa_ifu;
+#define ifa_broadaddr ifa_ifu.ifu_broadaddr
+#define ifa_dstaddr   ifa_ifu.ifu_dstaddr
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	void *ifa_data; /* ??? */
+};
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_CRT_IFADDRS_H */

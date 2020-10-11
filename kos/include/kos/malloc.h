@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe08a021e */
+/* HASH CRC-32:0xea377644 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,9 +34,8 @@
 
 #include <malloc.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__THROWING,Malloc,(size_t __num_bytes),(__num_bytes))
 __CDECLARE_OPT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,__THROWING,Calloc,(size_t __count, size_t __num_bytes),(__count,__num_bytes))
@@ -67,8 +66,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Memcdup, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_M
 #endif /* ... */
 #endif /* __USE_KOS */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_MALLOC_H */

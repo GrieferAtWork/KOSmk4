@@ -1022,47 +1022,50 @@ void *memrchr([[nonnull]] void const *__restrict haystack, int needle, $size_t n
 	return (char *)haystack;
 }
 
+@@Alternate `basename(3)' function that doesn't modify its `filename' argument
+@@For a version that is allowed to modify its argument, but is also allowed to
+@@strip trailing slashes, include <libgen.h> instead, which will override this
+@@GNU-specific basename() function (you can explicitly make use of this GNU
+@@version by doing `#undef basename', or writing `(basename)(filename)', as
+@@opposed to `basename(filename)', when both version have been defined)
+@@>> basename("/usr/include///"); // Returns ""
+@@>> basename("/usr/include/");   // Returns ""
+@@>> basename("/usr/include");    // Returns "include"
+@@>> basename("/usr/");           // Returns ""
+@@>> basename("/usr");            // Returns "usr"
+@@>> basename("/");               // Returns ""
+@@>> basename("///");             // Returns ""
+@@>> basename("foo/bar/");        // Returns ""
+@@>> basename("foo/bar");         // Returns "bar"
+@@>> basename("foo/");            // Returns ""
+@@>> basename("foo");             // Returns "foo"
+@@>> basename(".");               // Returns "."
+@@>> basename("..");              // Returns ".."
+@@>> basename("");                // Returns ""
+@@>> basename(NULL);              // <Undefined behavior>
 [[guard, wunused, ATTR_PURE]]
-char *basename([[nullable]] char const *filename)
-	[([[nullable]] char *filename): char *]
-	[([[nullable]] char const *filename): char const *]
+char *basename([[nonnull]] char const *filename)
+	[([[nonnull]] char *filename): char *]
+	[([[nonnull]] char const *filename): char const *]
 {
-	char ch, *iter = (char *)filename, *result = NULL;
-	if (!filename || !*filename)
-		return (char *)filename;
-	do {
-		ch = *iter++;
+	/* char *slash = strrchr(filename, '/');
+	 * return slash ? slash + 1 : (char *)filename; */
+	char *result = (char *)filename;
+	char *iter   = (char *)filename;
+	for (;;) {
+		char ch = *iter++;
 @@pp_ifdef _WIN32@@
 		if (ch == '/' || ch == '\\')
-			result = iter;
 @@pp_else@@
 		if (ch == '/')
+@@pp_endif@@
+		{
 			result = iter;
-@@pp_endif@@
-	} while (ch);
-	if unlikely(!result)
-		return (char *)filename; /* Path doesn't contain '/'. */
-	if (*result)
-		return result; /* Last character isn't a '/'. */
-	iter = result;
-@@pp_ifdef _WIN32@@
-	while (iter != filename && (iter[-1] == '/' || iter[-1] == '\\'))
-		--iter;
-@@pp_else@@
-	while (iter != filename && iter[-1] == '/')
-		--iter;
-@@pp_endif@@
-	if (iter == filename)
-		return result-1; /* Only `'/'"-characters. */
-	//*iter = '\0'; /* Trim all ending `'/'"-characters. */
-@@pp_ifdef _WIN32@@
-	while (iter != filename && (iter[-1] != '/' || iter[-1] != '\\'))
-		--iter; /* Scan until the previous '/'. */
-@@pp_else@@
-	while (iter != filename && iter[-1] != '/')
-		--iter; /* Scan until the previous '/'. */
-@@pp_endif@@
-	return iter; /* Returns string after previous '/'. */
+		}
+		if (!ch)
+			break;
+	}
+	return result;
 }
 
 

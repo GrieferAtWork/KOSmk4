@@ -23,114 +23,124 @@
 %{
 #include <features.h>
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
-
 }
 
-@@Return directory part of PATH or "." if none is available
-[[nonnull]] char *dirname(char *path) {
-	/* NOTE: This implementation is taken from GLibc */
-	/* dirname - return directory part of PATH.
-	   Copyright (C) 1996-2017 Free Software Foundation, Inc.
-	   This file is part of the GNU C Library.
-	   Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
-	
-	   The GNU C Library is free software; you can redistribute it and/or
-	   modify it under the terms of the GNU Lesser General Public
-	   License as published by the Free Software Foundation; either
-	   version 2.1 of the License, or (at your option) any later version.
-	
-	   The GNU C Library is distributed in the hope that it will be useful,
-	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	   Lesser General Public License for more details.
-	
-	   You should have received a copy of the GNU Lesser General Public
-	   License along with the GNU C Library; if not, see
-	   <http://www.gnu.org/licenses/>.  */
-	char *last_slash;
-	last_slash = path ? strrchr(path, '/') : NULL;
-	if (last_slash && last_slash != path && last_slash[1] == '\0') {
-		char *runp;
-		for (runp = last_slash; runp != path; --runp) {
-			if (runp[-1] != '/')
-				break;
+@@Return the directory, that is everything leading up to, but not
+@@including the last slash of `path'. If no such path exists, "."
+@@is returned instead. Trailing slashes are ignored
+@@>> dirname("/usr/include///"); // Returns "/usr"
+@@>> dirname("/usr/include/");   // Returns "/usr"
+@@>> dirname("/usr/include");    // Returns "/usr"
+@@>> dirname("/usr/");           // Returns "/"
+@@>> dirname("/usr");            // Returns "/"
+@@>> dirname("/");               // Returns "/"
+@@>> dirname("///");             // Returns "/"
+@@>> dirname("foo/bar/");        // Returns "foo"
+@@>> dirname("foo/bar");         // Returns "foo"
+@@>> dirname("foo/");            // Returns "."
+@@>> dirname("foo");             // Returns "."
+@@>> dirname(".");               // Returns "."
+@@>> dirname("..");              // Returns "."
+@@>> dirname("");                // Returns "."
+@@>> dirname(NULL);              // Returns "."
+@@Note that for this purpose, `path' may be modified in-place, meaning
+@@that you should really always pass an strdup()'d, or writable string.
+[[nonnull]] char *dirname([[nullable]] char *path) {
+	char *iter;
+	/* Handle the empty-path case. */
+	if (!path || !*path)
+		goto fallback;
+	iter = strend(path);
+	for (;;) {
+		--iter;
+		if (*iter != '/')
+			break;
+		if (iter <= path) {
+			/* String consists only of '/'-characters */
+			return path;
 		}
-		if (runp != path)
-			last_slash = (char *)memrchr(path, '/', (size_t)(runp - path));
+		/* Trim trailing slashes */
+		*iter = '\0';
 	}
-	if (last_slash) {
-		char *runp;
-		for (runp = last_slash; runp != path; --runp) {
-			if (runp[-1] != '/')
-				break;
-		}
-		if (runp == path) {
-			if (last_slash == path + 1)
-				++last_slash;
-			else {
-				last_slash = path + 1;
-			}
-		} else {
-			last_slash = runp;
-		}
-		last_slash[0] = '\0';
-	} else {
-		path = (char *)".";
+	/* HINT: iter == strend(path) - 1; */
+	for (;;) {
+		if (iter < path)
+			goto fallback;
+		if (*iter == '/')
+			break;
+		--iter;
 	}
+	if (iter == path) {
+		/* First character is the slash (e.g. "/foo/")
+		 * Return "/" in this case! */
+		++iter;
+	}
+	/* Delete the slash character (or the one after the
+	 * slash, if the only character left is a leading slash) */
+	iter[0] = '\0';
 	return path;
+fallback:
+	return (char *)".";
 }
 
-@@Return final component of PATH.
-@@This is the weird XPG version of this function. It sometimes will
-@@modify its argument. Therefore we normally use the GNU version (in
-@@<string.h>) and only if this header is included make the XPG
-@@version available under the real name
+
+
+@@Return the filename-part, that is everything following
+@@the last slash of `filename'. If no such part exists, "."
+@@is returned instead. Trailing slashes are ignored
+@@>> basename("/usr/include///"); // Returns "include"
+@@>> basename("/usr/include/");   // Returns "include"
+@@>> basename("/usr/include");    // Returns "include"
+@@>> basename("/usr/");           // Returns "usr"
+@@>> basename("/usr");            // Returns "usr"
+@@>> basename("/");               // Returns "/"
+@@>> basename("///");             // Returns "/"
+@@>> basename("foo/bar/");        // Returns "bar"
+@@>> basename("foo/bar");         // Returns "bar"
+@@>> basename("foo/");            // Returns "foo"
+@@>> basename("foo");             // Returns "foo"
+@@>> basename(".");               // Returns "."
+@@>> basename("..");              // Returns ".."
+@@>> basename("");                // Returns "."
+@@>> basename(NULL);              // Returns "."
+@@Note that for this purpose, `filename' may be modified in-place, meaning
+@@that you should really always pass an strdup()'d, or writable string.
+@@
+@@Also note that a different version of this function exists in <string.h>,
+@@where if you include both <libgen.h> and <string.h>, you can use the
+@@alternate function from <string.h> by `#undef basename', or calling the
+@@function as `(basename)(...)' (as opposed to `basename(...)')
 [[nonnull]] char *__xpg_basename(char *filename) {
-	/* NOTE: This implementation is taken from GLibc */
-	/* Return basename of given pathname according to the weird XPG specification.
-	   Copyright (C) 1997-2017 Free Software Foundation, Inc.
-	   This file is part of the GNU C Library.
-	   Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
-	
-	   The GNU C Library is free software; you can redistribute it and/or
-	   modify it under the terms of the GNU Lesser General Public
-	   License as published by the Free Software Foundation; either
-	   version 2.1 of the License, or (at your option) any later version.
-	
-	   The GNU C Library is distributed in the hope that it will be useful,
-	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	   Lesser General Public License for more details.
-	
-	   You should have received a copy of the GNU Lesser General Public
-	   License along with the GNU C Library; if not, see
-	   <http://www.gnu.org/licenses/>.  */
-	char *result;
-	if (!filename || !filename[0])
-		result = (char *)".";
-	else {
-		result = strrchr(filename, '/');
-		if (!result)
-			result = filename;
-		else if (!result[1]) {
-			while (result > filename && result[-1] == '/')
-				--result;
-			if (result > filename) {
-				*result-- = '\0';
-				while (result > filename && result[-1] != '/')
-					--result;
-			} else {
-				while (result[1] != '\0')
-					++result;
-			}
-		} else {
-			++result;
+	char *iter;
+	/* Handle the empty-path case. */
+	if (!filename || !*filename)
+		goto fallback;
+	iter = strend(filename);
+	for (;;) {
+		--iter;
+		if (*iter != '/')
+			break;
+		if (iter <= filename) {
+			/* String consists only of '/'-characters */
+			return filename;
 		}
+		/* Trim trailing slashes */
+		*iter = '\0';
 	}
-	return result;
+	/* HINT: iter == strend(path) - 1; */
+	for (;;) {
+		if (iter < filename)
+			break;
+		if (*iter == '/')
+			break;
+		--iter;
+	}
+	return iter + 1;
+fallback:
+	return (char *)".";
 }
 
 %#define basename(path) __xpg_basename(path)
@@ -138,8 +148,7 @@ __SYSDECL_BEGIN
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

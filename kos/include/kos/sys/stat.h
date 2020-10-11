@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f70b33a */
+/* HASH CRC-32:0x1298c89c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,8 @@
 #include <sys/stat.h>
 #include <kos/anno.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_KStat) && defined(__USE_FILE_OFFSET64)
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__THROWING,Stat,(char const *__restrict __filename, struct stat *__restrict __buf),KStat,(__filename,__buf))
@@ -172,8 +171,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens64, __FORCELOCAL __ATTR_ARTIFICIAL void 
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K8 */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_SYS_STAT_H */

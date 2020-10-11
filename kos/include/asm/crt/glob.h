@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xc0ae4fee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,19 +17,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_fesetenv_defined
-#define __local_fesetenv_defined 1
-#include <__crt.h>
-#include <bits/crt/fenv-inline.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(fesetenv) __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fesetenv))(struct __fenv_struct const *___envp) {
-	__inline_fesetenv(___envp);
-	return 0;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_fesetenv_defined
-#define __local___localdep_fesetenv_defined 1
-#define __localdep_fesetenv __LIBC_LOCAL_NAME(fesetenv)
-#endif /* !__local___localdep_fesetenv_defined */
-#endif /* !__local_fesetenv_defined */
+#ifndef _ASM_CRT_GLOB_H
+#define _ASM_CRT_GLOB_H 1
+
+#include <__stdinc.h>
+
+/* Flags accepted by the `flags' argument of `glob(3)' */
+#define __GLOB_ERR         0x0001 /* ??? */
+#define __GLOB_MARK        0x0002 /* ??? */
+#define __GLOB_NOSORT      0x0004 /* ??? */
+#define __GLOB_DOOFFS      0x0008 /* ??? */
+#define __GLOB_NOCHECK     0x0010 /* ??? */
+#define __GLOB_APPEND      0x0020 /* ??? */
+#define __GLOB_NOESCAPE    0x0040 /* ??? */
+#define __GLOB_PERIOD      0x0080 /* ??? */
+#define __GLOB_MAGCHAR     0x0100 /* ??? */
+#define __GLOB_ALTDIRFUNC  0x0200 /* ??? */
+#define __GLOB_BRACE       0x0400 /* ??? */
+#define __GLOB_NOMAGIC     0x0800 /* ??? */
+#define __GLOB_TILDE       0x1000 /* ??? */
+#define __GLOB_ONLYDIR     0x2000 /* ??? */
+#define __GLOB_TILDE_CHECK 0x4000 /* ??? */
+
+/* Returns values for `glob(3)' */
+#define __GLOB_NOSPACE 1 /* ??? */
+#define __GLOB_ABORTED 2 /* ??? */
+#define __GLOB_NOMATCH 3 /* ??? */
+#define __GLOB_NOSYS   4 /* ??? */
+
+#endif /* !_ASM_CRT_GLOB_H */

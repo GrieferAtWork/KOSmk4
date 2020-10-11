@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ff5ecb8 */
+/* HASH CRC-32:0xa26a9a51 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,72 +22,74 @@
 #define __local___xpg_basename_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: strrchr from string */
-#ifndef __local___localdep_strrchr_defined
-#define __local___localdep_strrchr_defined 1
-#if __has_builtin(__builtin_strrchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strrchr)
-/* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strrchr,(char const *__restrict __haystack, int __needle),strrchr,{ return __builtin_strrchr(__haystack, __needle); })
-#elif defined(__CRT_HAVE_strrchr)
-/* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strrchr,(char const *__restrict __haystack, int __needle),strrchr,(__haystack,__needle))
-#else /* ... */
+/* Dependency: strend from string */
+#ifndef __local___localdep_strend_defined
+#define __local___localdep_strend_defined 1
+#ifdef __CRT_HAVE_strend
+/* Same as `STR + strlen(STR)' */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
+#else /* __CRT_HAVE_strend */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strrchr.h>
+#include <libc/local/string/strend.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
-#define __localdep_strrchr __LIBC_LOCAL_NAME(strrchr)
-#endif /* !... */
-#endif /* !__local___localdep_strrchr_defined */
-/* Return final component of PATH.
- * This is the weird XPG version of this function. It sometimes will
- * modify its argument. Therefore we normally use the GNU version (in
- * <string.h>) and only if this header is included make the XPG
- * version available under the real name */
+/* Same as `STR + strlen(STR)' */
+#define __localdep_strend __LIBC_LOCAL_NAME(strend)
+#endif /* !__CRT_HAVE_strend */
+#endif /* !__local___localdep_strend_defined */
+/* Return the filename-part, that is everything following
+ * the last slash of `filename'. If no such part exists, "."
+ * is returned instead. Trailing slashes are ignored
+ * >> basename("/usr/include///"); // Returns "include"
+ * >> basename("/usr/include/");   // Returns "include"
+ * >> basename("/usr/include");    // Returns "include"
+ * >> basename("/usr/");           // Returns "usr"
+ * >> basename("/usr");            // Returns "usr"
+ * >> basename("/");               // Returns "/"
+ * >> basename("///");             // Returns "/"
+ * >> basename("foo/bar/");        // Returns "bar"
+ * >> basename("foo/bar");         // Returns "bar"
+ * >> basename("foo/");            // Returns "foo"
+ * >> basename("foo");             // Returns "foo"
+ * >> basename(".");               // Returns "."
+ * >> basename("..");              // Returns ".."
+ * >> basename("");                // Returns "."
+ * >> basename(NULL);              // Returns "."
+ * Note that for this purpose, `filename' may be modified in-place, meaning
+ * that you should really always pass an strdup()'d, or writable string.
+ *
+ * Also note that a different version of this function exists in <string.h>,
+ * where if you include both <libgen.h> and <string.h>, you can use the
+ * alternate function from <string.h> by `#undef basename', or calling the
+ * function as `(basename)(...)' (as opposed to `basename(...)') */
 __LOCAL_LIBC(__xpg_basename) __ATTR_RETNONNULL char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__xpg_basename))(char *__filename) {
-	/* NOTE: This implementation is taken from GLibc */
-	/* Return basename of given pathname according to the weird XPG specification.
-	   Copyright (C) 1997-2017 Free Software Foundation, Inc.
-	   This file is part of the GNU C Library.
-	   Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
-	
-	   The GNU C Library is free software; you can redistribute it and/or
-	   modify it under the terms of the GNU Lesser General Public
-	   License as published by the Free Software Foundation; either
-	   version 2.1 of the License, or (at your option) any later version.
-	
-	   The GNU C Library is distributed in the hope that it will be useful,
-	   but WITHOUT ANY WARRANTY; without even the implied warranty of
-	   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	   Lesser General Public License for more details.
-	
-	   You should have received a copy of the GNU Lesser General Public
-	   License along with the GNU C Library; if not, see
-	   <http://www.gnu.org/licenses/>.  */
-	char *__result;
-	if (!__filename || !__filename[0])
-		__result = (char *)".";
-	else {
-		__result = __localdep_strrchr(__filename, '/');
-		if (!__result)
-			__result = __filename;
-		else if (!__result[1]) {
-			while (__result > __filename && __result[-1] == '/')
-				--__result;
-			if (__result > __filename) {
-				*__result-- = '\0';
-				while (__result > __filename && __result[-1] != '/')
-					--__result;
-			} else {
-				while (__result[1] != '\0')
-					++__result;
-			}
-		} else {
-			++__result;
+	char *__iter;
+	/* Handle the empty-path case. */
+	if (!__filename || !*__filename)
+		goto __fallback;
+	__iter = __localdep_strend(__filename);
+	for (;;) {
+		--__iter;
+		if (*__iter != '/')
+			break;
+		if (__iter <= __filename) {
+			/* String consists only of '/'-characters */
+			return __filename;
 		}
+		/* Trim trailing slashes */
+		*__iter = '\0';
 	}
-	return __result;
+	/* HINT: iter == strend(path) - 1; */
+	for (;;) {
+		if (__iter < __filename)
+			break;
+		if (*__iter == '/')
+			break;
+		--__iter;
+	}
+	return __iter + 1;
+__fallback:
+	return (char *)".";
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep___xpg_basename_defined

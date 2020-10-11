@@ -31,9 +31,8 @@
 
 #include <unistd.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __pos_t_defined
 #define __pos_t_defined 1
@@ -652,8 +651,7 @@ void FDataSync($fd_t fd) {
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

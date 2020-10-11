@@ -33,9 +33,8 @@
 #include <sys/stat.h>
 #include <kos/anno.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -324,8 +323,7 @@ void FUtimens64($fd_t fd, [[nullable]] struct timespec64 const times[2 /*or:3*/]
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ad5792e */
+/* HASH CRC-32:0xc54b64d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,8 +34,6 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 
-__SYSDECL_BEGIN
-
 #if defined(__KERNEL__) && __SIZEOF_SIZE_T__ < 8
 #define __HOP_SIZE64_FIELD(name) union { __size_t name; __uint64_t __##name##64; }
 #else /* __KERNEL__ */
@@ -57,6 +55,7 @@ __SYSDECL_BEGIN
 #endif /* !__HOP_PAD_POINTER */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef __hop_defined
 #define __hop_defined 1
@@ -104,8 +103,7 @@ __LIBC __syscall_slong_t (__VLIBCCALL Hopf)(__fd_t __fd, __syscall_ulong_t __cmd
 #endif /* !__CRT_HAVE_Hopf */
 #endif /* !__Hopf_defined */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_KOS_HOP_API_H */

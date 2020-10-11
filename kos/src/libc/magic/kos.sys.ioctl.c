@@ -24,17 +24,17 @@
 %{
 #include <sys/ioctl.h>
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 }
 
 [[cp, throws, guard, doc_alias("ioctl"), vartypes(void *)]]
-Ioctl:($fd_t fd, unsigned long int request, ...) -> $ssize_t;
+$ssize_t Ioctl($fd_t fd, unsigned long int request, ...);
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

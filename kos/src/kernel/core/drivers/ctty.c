@@ -151,6 +151,7 @@ ctty_open(struct character_device *__restrict self,
           struct handle *__restrict hand) {
 	assert(self == &dev_tty);
 	assert(self == hand->h_data);
+	assert(hand->h_type == HANDLE_TYPE_CHARACTERDEVICE);
 	decref_nokill(self);
 	hand->h_data = getctty();
 }

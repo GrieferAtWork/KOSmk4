@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x274a5d13 */
+/* HASH CRC-32:0x2a9215e3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1855,7 +1855,6 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mkdtemp,(cha
 #ifdef __USE_XOPEN
 #if !defined(__setkey_defined) && defined(__CRT_HAVE_setkey)
 #define __setkey_defined 1
-/* Setup DES tables according KEY */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #endif /* !__setkey_defined && __CRT_HAVE_setkey */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,grantpt,(__fd_t __fd),(__fd))

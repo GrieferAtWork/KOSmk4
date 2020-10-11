@@ -1,0 +1,81 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_LIBGEN_CTEST
+#define GUARD_LIBC_LIBC_LIBGEN_CTEST 1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
+#undef NDEBUG
+
+#include <hybrid/compiler.h>
+
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <libgen.h>
+
+#undef basename
+
+DECL_BEGIN
+
+DEFINE_TEST(libgen) {
+#define ASSERT_DIRNAME_BASENAME(in, out_dirname, out_xpg_basename, out_basename)                          \
+	do {                                                                                                  \
+		char *_s_ou;                                                                                      \
+		char _s_in[]  = in;                                                                               \
+		char _s_in2[] = in;                                                                               \
+		_s_ou         = dirname(_s_in);                                                                   \
+		assertf(strcmp(_s_ou, out_dirname) == 0, "dirname: %q != %q", _s_ou, out_dirname);                \
+		_s_ou = __xpg_basename(_s_in2);                                                                   \
+		assertf(strcmp(_s_ou, out_xpg_basename) == 0, "xpg_basename: %q != %q", _s_ou, out_xpg_basename); \
+		_s_ou = (char *)basename(in);                                                                     \
+		assertf(strcmp(_s_ou, out_basename) == 0, "basename: %q != %q", _s_ou, out_basename);             \
+	}	__WHILE0
+
+	ASSERT_DIRNAME_BASENAME("/usr/include///", /* */ "/usr", /* */ "include", /* */ "");
+	ASSERT_DIRNAME_BASENAME("/usr/include/", /*   */ "/usr", /* */ "include", /* */ "");
+	ASSERT_DIRNAME_BASENAME("/usr/include", /*    */ "/usr", /* */ "include", /* */ "include");
+	ASSERT_DIRNAME_BASENAME("/usr/", /*           */ "/", /*    */ "usr", /*     */ "");
+	ASSERT_DIRNAME_BASENAME("/usr", /*            */ "/", /*    */ "usr", /*     */ "usr");
+	ASSERT_DIRNAME_BASENAME("/", /*               */ "/", /*    */ "/", /*       */ "");
+	ASSERT_DIRNAME_BASENAME("///", /*             */ "/", /*    */ "/", /*       */ "");
+	ASSERT_DIRNAME_BASENAME("foo/bar/", /*        */ "foo", /*  */ "bar", /*     */ "");
+	ASSERT_DIRNAME_BASENAME("foo/bar", /*         */ "foo", /*  */ "bar", /*     */ "bar");
+	ASSERT_DIRNAME_BASENAME("foo/", /*            */ ".", /*    */ "foo", /*     */ "");
+	ASSERT_DIRNAME_BASENAME("foo", /*             */ ".", /*    */ "foo", /*     */ "foo");
+	ASSERT_DIRNAME_BASENAME(".", /*               */ ".", /*    */ ".", /*       */ ".");
+	ASSERT_DIRNAME_BASENAME("..", /*              */ ".", /*    */ "..", /*      */ "..");
+	ASSERT_DIRNAME_BASENAME("", /*                */ ".", /*    */ ".", /*       */ "");
+//	ASSERT_DIRNAME_BASENAME(NULL, /*              */ ".", /*    */ ".", /*       */ <Undefined behavior>);
+	{
+		char *s;
+		s = dirname(NULL);
+		assertf(strcmp(s, ".") == 0, "dirname: %q", s);
+		s = __xpg_basename(NULL);
+		assertf(strcmp(s, ".") == 0, "xpg_basename: %q", s);
+	}
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_LIBGEN_CTEST */

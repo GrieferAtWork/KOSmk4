@@ -26,9 +26,8 @@
 #include <hybrid/__assert.h>
 #include <hybrid/typecore.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__DECL_BEGIN
 
 /* @param: EXCEPTS: Set of `FE_*' */
 __LOCAL void (__inline_feraiseexcept)(int __excepts) {
@@ -134,9 +133,8 @@ __NOTHROW(__inline_fesetexceptflag)(__fexcept_t const *__flagp, int __excepts) {
 }
 #endif
 
-
+__DECL_END
 #endif /* __CC__ */
 
-__SYSDECL_END
 
 #endif /* !_BITS_CRT_FENV_INLINE_H */

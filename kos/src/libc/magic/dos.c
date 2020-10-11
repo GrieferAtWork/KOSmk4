@@ -34,8 +34,6 @@
 #include <asm/intrin.h>
 #endif /* __i386__ || __x86_64__ */
 
-__SYSDECL_BEGIN
-
 #ifndef _A_NORMAL
 #define _A_NORMAL 0x00
 #define _A_RDONLY 0x01
@@ -47,6 +45,7 @@ __SYSDECL_BEGIN
 #endif /* !_A_NORMAL */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #define diskfree_t _diskfree_t
 
@@ -104,6 +103,7 @@ __LOCAL void (outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(_
 
 %{
 
+__SYSDECL_END
 #endif /* __CC__ */
 
 #ifdef __USE_OLD_DOS
@@ -127,8 +127,5 @@ __LOCAL void (outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(_
 #define SEEK_END __SEEK_END /* Seek from end of file. */
 #endif /* !SEEK_END && __SEEK_END */
 #endif /* __USE_OLD_DOS */
-
-
-__SYSDECL_END
 
 }

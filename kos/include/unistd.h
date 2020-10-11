@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88b9ff72 */
+/* HASH CRC-32:0x2aa8275a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2173,7 +2173,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fdatasync, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #ifndef __crypt_defined
 #define __crypt_defined 1
 #ifdef __CRT_HAVE_crypt
-/* Encrypt at most 8 characters from KEY using salt to perturb DES */
 __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
 #else /* __CRT_HAVE_crypt */
 #undef __crypt_defined
@@ -2182,7 +2181,6 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key,
 #ifndef __encrypt_defined
 #define __encrypt_defined 1
 #ifdef __CRT_HAVE_encrypt
-/* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, __STDC_INT_AS_UINT_T __edflag),(__glibc_block,__edflag))
 #else /* __CRT_HAVE_encrypt */
 #undef __encrypt_defined

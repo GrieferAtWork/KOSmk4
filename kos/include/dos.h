@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82c4a017 */
+/* HASH CRC-32:0xe3544fd8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,8 +43,6 @@
 #include <asm/intrin.h>
 #endif /* __i386__ || __x86_64__ */
 
-__SYSDECL_BEGIN
-
 #ifndef _A_NORMAL
 #define _A_NORMAL 0x00
 #define _A_RDONLY 0x01
@@ -56,6 +54,7 @@ __SYSDECL_BEGIN
 #endif /* !_A_NORMAL */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #define diskfree_t _diskfree_t
 
@@ -138,6 +137,7 @@ __LOCAL void (outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(_
 
 #endif /* __USE_OLD_DOS */
 
+__SYSDECL_END
 #endif /* __CC__ */
 
 #ifdef __USE_OLD_DOS
@@ -161,8 +161,5 @@ __LOCAL void (outport)(__UINT16_TYPE__ __port, __UINT16_TYPE__ __val) { __outw(_
 #define SEEK_END __SEEK_END /* Seek from end of file. */
 #endif /* !SEEK_END && __SEEK_END */
 #endif /* __USE_OLD_DOS */
-
-
-__SYSDECL_END
 
 #endif /* !_DOS_H */

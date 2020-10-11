@@ -33,8 +33,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_crypt,hash:CRC-32=0xa7e5b2d9]]]*/
-/* Encrypt at most 8 characters from KEY using salt to perturb DES */
+/*[[[head:libc_crypt,hash:CRC-32=0xb8be50d2]]]*/
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
                                  char const *salt)
@@ -48,8 +47,7 @@ NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
 }
 /*[[[end:libc_crypt]]]*/
 
-/*[[[head:libc_setkey,hash:CRC-32=0xb214b713]]]*/
-/* Setup DES tables according KEY */
+/*[[[head:libc_setkey,hash:CRC-32=0x735e598b]]]*/
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 /*[[[body:libc_setkey]]]*/
@@ -60,8 +58,7 @@ NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 }
 /*[[[end:libc_setkey]]]*/
 
-/*[[[head:libc_encrypt,hash:CRC-32=0x6927dc3f]]]*/
-/* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
+/*[[[head:libc_encrypt,hash:CRC-32=0x69530dad]]]*/
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block,
                                    __STDC_INT_AS_UINT_T edflag)
@@ -74,8 +71,7 @@ NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block,
 }
 /*[[[end:libc_encrypt]]]*/
 
-/*[[[head:libc_crypt_r,hash:CRC-32=0x90e292b5]]]*/
-/* Encrypt at most 8 characters from KEY using salt to perturb DES */
+/*[[[head:libc_crypt_r,hash:CRC-32=0x64d4ee6f]]]*/
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 2, 3)) char *
 NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
                                    char const *salt,
@@ -91,8 +87,7 @@ NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
 }
 /*[[[end:libc_crypt_r]]]*/
 
-/*[[[head:libc_setkey_r,hash:CRC-32=0xc0a1ef28]]]*/
-/* Setup DES tables according KEY */
+/*[[[head:libc_setkey_r,hash:CRC-32=0xfd5509b5]]]*/
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key,
                                     struct crypt_data *__restrict data)
@@ -105,8 +100,7 @@ NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key,
 }
 /*[[[end:libc_setkey_r]]]*/
 
-/*[[[head:libc_encrypt_r,hash:CRC-32=0xa9ad8cbd]]]*/
-/* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
+/*[[[head:libc_encrypt_r,hash:CRC-32=0x8e402f36]]]*/
 INTERN ATTR_SECTION(".text.crt.string.encrypt") NONNULL((1, 3)) void
 NOTHROW_NCX(LIBCCALL libc_encrypt_r)(char *glibc_block,
                                      int edflag,

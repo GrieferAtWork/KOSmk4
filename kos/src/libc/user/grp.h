@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ab20c41 */
+/* HASH CRC-32:0xf94ad318 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,37 +31,19 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Search for an entry with a matching group ID */
 INTDEF struct group *NOTHROW_RPC(LIBCCALL libc_getgrgid)(gid_t gid);
-/* Search for an entry with a matching group name */
 INTDEF NONNULL((1)) struct group *NOTHROW_RPC(LIBCCALL libc_getgrnam)(char const *__restrict name);
-/* Rewind the group-file stream */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_setgrent)(void);
-/* Close the group-file stream */
 INTDEF void NOTHROW_RPC_NOKOS(LIBCCALL libc_endgrent)(void);
-/* Read an entry from the group-file stream, opening it if necessary */
 INTDEF struct group *NOTHROW_RPC(LIBCCALL libc_getgrent)(void);
-/* Write the given entry onto the given stream */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_putgrent)(struct group const *__restrict entry, FILE *__restrict stream);
-/* Search for an entry with a matching group ID */
 INTDEF NONNULL((2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_getgrgid_r)(gid_t gid, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
-/* Search for an entry with a matching group name */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_getgrnam_r)(char const *__restrict name, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
-/* Read an entry from the group-file stream, opening it if necessary */
 INTDEF NONNULL((1, 2, 4)) int NOTHROW_RPC(LIBCCALL libc_getgrent_r)(struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
-/* Read a group entry from STREAM */
 INTDEF NONNULL((1, 2, 3, 5)) int NOTHROW_RPC(LIBCCALL libc_fgetgrent_r)(FILE *__restrict stream, struct group *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct group **__restrict result);
-/* Read a group entry from STREAM */
 INTDEF NONNULL((1)) struct group *NOTHROW_RPC(LIBCCALL libc_fgetgrent)(FILE *__restrict stream);
-/* Set the group set for the current user to GROUPS (N of them) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_setgroups)(size_t count, gid_t const *groups);
-/* Store at most *NGROUPS members of the group set for USER into
- * *GROUPS. Also include GROUP. The actual number of groups found is
- * returned in *NGROUPS.  Return -1 if the if *NGROUPS is too small */
 INTDEF NONNULL((1, 3, 4)) int NOTHROW_RPC(LIBCCALL libc_getgrouplist)(char const *user, gid_t group, gid_t *groups, int *ngroups);
-/* Initialize the group set for the current user
- * by reading the group database and using all groups
- * of which USER is a member. Also include GROUP. */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_initgroups)(char const *user, gid_t group);
 #endif /* !__KERNEL__ */
 

@@ -25,9 +25,8 @@
 
 #include <malloc.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
@@ -87,8 +86,7 @@ Memcdup:([[nonnull]] void const *__restrict ptr, int needle, size_t num_bytes) -
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

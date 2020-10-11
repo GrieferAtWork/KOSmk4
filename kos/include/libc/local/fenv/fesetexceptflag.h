@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4cfb1b4 */
+/* HASH CRC-32:0x285e385a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,6 @@
 #include <__crt.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Set complete status for exceptions indicated by EXCEPTS according
- * to the representation in the object pointed to by FLAGP */
 __LOCAL_LIBC(fesetexceptflag) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fesetexceptflag))(__fexcept_t const *__flagp, int __excepts) {
 #ifdef __inline_fesetexceptflag

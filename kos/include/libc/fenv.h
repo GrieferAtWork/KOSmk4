@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbcef7b9 */
+/* HASH CRC-32:0x72199ffb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,14 +31,14 @@
 #include "core/fenv.h"
 
 #ifdef __fast_feraiseexcept_defined
-/* Raise the supported exceptions represented by EXCEPTS */
+/* @param: EXCEPTS: Set of `FE_*' */
 #define __libc_feraiseexcept (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(feraiseexcept))
 #else /* __fast_feraiseexcept_defined */
-/* Raise the supported exceptions represented by EXCEPTS */
+/* @param: EXCEPTS: Set of `FE_*' */
 #define __libc_feraiseexcept __libc_core_feraiseexcept
 #endif /* !__fast_feraiseexcept_defined */
 #ifdef __fast_fegetround_defined
-/* Get current rounding direction
+/* Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -46,7 +46,7 @@
  *             ... `FE_TOWARDZERO': trunc() */
 #define __libc_fegetround (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fegetround))
 #else /* __fast_fegetround_defined */
-/* Get current rounding direction
+/* Get the current rounding direction
  * @return: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -55,7 +55,7 @@
 #define __libc_fegetround __libc_core_fegetround
 #endif /* !__fast_fegetround_defined */
 #ifdef __fast_fesetround_defined
-/* Establish the rounding direction represented by `rounding_direction'
+/* Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()
@@ -63,7 +63,7 @@
  *             ... `FE_TOWARDZERO': trunc() */
 #define __libc_fesetround (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(fesetround))
 #else /* __fast_fesetround_defined */
-/* Establish the rounding direction represented by `rounding_direction'
+/* Set the current rounding direction
  * @param: rounding_direction: One of...
  *             ... `FE_TONEAREST':  round()
  *             ... `FE_DOWNWARD':   floor()

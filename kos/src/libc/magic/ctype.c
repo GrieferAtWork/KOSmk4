@@ -48,9 +48,9 @@
 #include <endian.h>
 #endif /* __USE_GLIBC */
 
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 }
 
 %[default:section(".text.crt{|.dos}.unicode.static.ctype")];
@@ -1119,10 +1119,8 @@ int toascii(int c) {
 
 #endif /* __USE_MISC || __USE_XOPEN */
 
-
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
 

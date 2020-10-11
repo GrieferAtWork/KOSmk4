@@ -37,27 +37,8 @@
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
 )]%{
 
-/* Documentation comments are derived from glibc /usr/include/fenv.h */
-/* Copyright (C) 1997-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 __NAMESPACE_STD_BEGIN
 #ifndef __std_fenv_t_defined
@@ -89,22 +70,20 @@ __NAMESPACE_STD_USING(fexcept_t)
 %
 
 
-@@Clear the supported exceptions represented by EXCEPTS
+@@@param: EXCEPTS: Set of `FE_*'
 [[std, nothrow, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int feclearexcept(int excepts) {
 	@__inline_feclearexcept@(excepts);
 	return 0;
 }
 
-@@Raise the supported exceptions represented by EXCEPTS
+@@@param: EXCEPTS: Set of `FE_*'
 [[std, throws, preferred_fastbind, libc, impl_include("<bits/crt/fenv-inline.h>")]]
 int feraiseexcept:(int excepts) {
 	@__inline_feraiseexcept@(excepts);
 	return 0;
 }
 
-@@Store implementation-defined representation of the exception
-@@flags indicated by EXCEPTS in the object pointed to by FLAGP
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fegetexceptflag([[nonnull]] fexcept_t *flagp, int excepts) {
 @@pp_ifdef __inline_fegetexceptflag@@
@@ -116,8 +95,6 @@ int fegetexceptflag([[nonnull]] fexcept_t *flagp, int excepts) {
 	return 0;
 }
 
-@@Set complete status for exceptions indicated by EXCEPTS according
-@@to the representation in the object pointed to by FLAGP
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
 @@pp_ifdef __inline_fesetexceptflag@@
@@ -130,15 +107,13 @@ int fesetexceptflag([[nonnull]] fexcept_t const *flagp, int excepts) {
 	return 0;
 }
 
-@@Determine which of subset of the exceptions
-@@specified by EXCEPTS are currently set
 [[std, nothrow, wunused, ATTR_PURE]]
 [[preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fetestexcept(int excepts) {
 	return __inline_fetestexcept(excepts);
 }
 
-@@Get current rounding direction
+@@Get the current rounding direction
 @@@return: One of...
 @@            ... `FE_TONEAREST':  round()
 @@            ... `FE_DOWNWARD':   floor()
@@ -150,7 +125,7 @@ int fegetround() {
 	return __inline_fegetround();
 }
 
-@@Establish the rounding direction represented by `rounding_direction'
+@@Set the current rounding direction
 @@@param: rounding_direction: One of...
 @@            ... `FE_TONEAREST':  round()
 @@            ... `FE_DOWNWARD':   floor()
@@ -162,31 +137,24 @@ int fesetround(int rounding_direction) {
 	return __inline_fesetround(rounding_direction);
 }
 
-@@Store the current floating-point environment in the object pointed to by ENVP
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fegetenv([[nonnull]] fenv_t *envp) {
 	__inline_fegetenv(envp);
 	return 0;
 }
 
-@@Save the current environment in the object pointed to by ENVP, clear
-@@exception flags and install a non-stop mode (if available) for all exceptions
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int feholdexcept([[nonnull]] fenv_t *envp) {
 	__inline_feholdexcept(envp);
 	return 0;
 }
 
-@@Establish the floating-point environment represented by the object pointed to by ENVP
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fesetenv([[nonnull]] fenv_t const *envp) {
 	__inline_fesetenv(envp);
 	return 0;
 }
 
-@@Save current exceptions in temporary storage, install environment
-@@represented by object pointed to by ENVP and raise exceptions
-@@according to saved exceptions
 [[std, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int feupdateenv([[nonnull]] fenv_t const *envp) {
 	__inline_feupdateenv(envp);
@@ -195,24 +163,16 @@ int feupdateenv([[nonnull]] fenv_t const *envp) {
 
 
 %#ifdef __USE_GNU
-
-@@Enable individual exceptions.  Will not enable more exceptions than
-@@EXCEPTS specifies.  Returns the previous enabled exceptions if all
-@@exceptions are successfully set, otherwise returns -1
 [[nothrow, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int feenableexcept(int excepts) {
 	return __inline_feenableexcept(excepts);
 }
 
-@@Disable individual exceptions.  Will not disable more exceptions than
-@@EXCEPTS specifies.  Returns the previous enabled exceptions if all
-@@exceptions are successfully disabled, otherwise returns -1
 [[nothrow, preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fedisableexcept(int excepts) {
 	return __inline_fedisableexcept(excepts);
 }
 
-@@Return enabled exceptions
 [[wunused, nothrow, ATTR_PURE]]
 [[preferred_fastbind, impl_include("<bits/crt/fenv-inline.h>")]]
 int fegetexcept() {
@@ -223,9 +183,8 @@ int fegetexcept() {
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
 %(c, ccompat)#endif /* !__NO_FPU */

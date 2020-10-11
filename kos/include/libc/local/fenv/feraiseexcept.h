@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb30a8eb8 */
+/* HASH CRC-32:0x3a3fc17a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <kos/anno.h>
 #include <bits/crt/fenv-inline.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Raise the supported exceptions represented by EXCEPTS */
+/* @param: EXCEPTS: Set of `FE_*' */
 __LOCAL_LIBC(feraiseexcept) int
 (__LIBCCALL __LIBC_LOCAL_NAME(feraiseexcept))(int __excepts) __THROWS(...) {
 	__inline_feraiseexcept(__excepts);

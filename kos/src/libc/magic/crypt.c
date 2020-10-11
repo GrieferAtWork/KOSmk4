@@ -27,52 +27,21 @@
 #include <bits/crt/crypt_data.h>
 #endif /* __USE_GNU */
 
-/* Derived from GLibc: /usr/include/crypt.h */
-/*
- * UFC-crypt: ultra fast crypt(3) implementation
- *
- * Copyright (C) 1991-2016 Free Software Foundation, Inc.
- *
- * The GNU C Library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * The GNU C Library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with the GNU C Library; if not, see
- * <http://www.gnu.org/licenses/>.
- *
- * @(#)crypt.h	1.5 12/20/96
- *
- */
-
+#ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CC__
 }
 
-@@Setup DES tables according KEY
 void setkey([[nonnull]] char const *key);
 
-@@Encrypt at most 8 characters from KEY using salt to perturb DES
 [[guard]]
 char *crypt([[nonnull]] char const *key, [[nonnull]] char const *salt);
 
-@@Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place
 [[guard, decl_include("<features.h>")]]
 void encrypt([[nonnull]] char *glibc_block, __STDC_INT_AS_UINT_T edflag);
 
 %
 %#ifdef __USE_GNU
-%/* Reentrant versions of the functions above.
-% * The additional argument points to a structure where the results are placed in.  */
-%
-
 [[doc_alias("crypt"), decl_include("<bits/crt/crypt_data.h>")]]
 char *crypt_r([[nonnull]] char const *key,
               [[nonnull]] char const *salt,
@@ -85,13 +54,11 @@ void setkey_r([[nonnull]] char const *key,
 [[doc_alias("encrypt"), decl_include("<bits/crt/crypt_data.h>")]]
 void encrypt_r([[nonnull]] char *glibc_block, int edflag,
                [[nonnull]] struct crypt_data *__restrict data);
-
 %#endif /* __USE_GNU */
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
