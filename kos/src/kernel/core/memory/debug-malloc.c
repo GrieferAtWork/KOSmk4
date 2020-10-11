@@ -234,26 +234,26 @@ DEFINE_DBG_BZERO_OBJECT(mall_heap.h_lock);
 typedef uintptr_half_t mall_ver_t;
 
 struct mallnode {
-	ATREE_NODE(struct mallnode,uintptr_t) m_tree;     /* Tree of mall nodes. */
-	size_t                                m_size;     /* [const] Allocated heap-size of this node. */
+	ATREE_NODE(struct mallnode, uintptr_t) m_tree;     /* Tree of mall nodes. */
+	size_t                                 m_size;     /* [const] Allocated heap-size of this node. */
 
-	mall_ver_t                            m_reach;    /* Last leak-check iteration when this node was reached. */
-	mall_ver_t                            m_visit;    /* Last leak-check iteration when this node was visited. */
-#define MALLNODE_FNORMAL                  0x0000      /* Normal MALLNODE flags. */
-#define MALLNODE_FNOLEAK                  GFP_NOLEAK  /* This node not being reachable isn't a leak. */
-#define MALLNODE_FNOWALK                  GFP_NOWALK  /* This node should not be scanned for GC-pointers. */
-#define MALLNODE_FUSERNODE                0x8000      /* This node describes a custom tracing point. */
-	u16                                   m_flags;    /* Set of `MALLNODE_F*' */
-	u16                                   m_userver;  /* Is-valid-user-node version number.
-	                                                   * When this value is lower than `mall_valid_user_node_version_number',
-	                                                   * the node should not be considered as being valid for the purposes
-	                                                   * of being re-traced, or untraced. However, it should still be considered
-	                                                   * valid for the purposes of GC searches, as well as other passive
-	                                                   * interactions such as reading its size.
-	                                                   * Note that this only applies to nodes with the `MALLNODE_FUSERNODE' flag set! */
-	upid_t                                m_tracetid; /* Traceback thread id (in the root namespace). */
-	COMPILER_FLEXIBLE_ARRAY(void *,       m_trace);   /* [1..1][0..MALLNODE_TRACESZ(self)]
-	                                                   * Traceback of where the pointer was originally allocated. */
+	mall_ver_t                             m_reach;    /* Last leak-check iteration when this node was reached. */
+	mall_ver_t                             m_visit;    /* Last leak-check iteration when this node was visited. */
+#define MALLNODE_FNORMAL                   0x0000      /* Normal MALLNODE flags. */
+#define MALLNODE_FNOLEAK                   GFP_NOLEAK  /* This node not being reachable isn't a leak. */
+#define MALLNODE_FNOWALK                   GFP_NOWALK  /* This node should not be scanned for GC-pointers. */
+#define MALLNODE_FUSERNODE                 0x8000      /* This node describes a custom tracing point. */
+	u16                                    m_flags;    /* Set of `MALLNODE_F*' */
+	u16                                    m_userver;  /* Is-valid-user-node version number.
+	                                                    * When this value is lower than `mall_valid_user_node_version_number',
+	                                                    * the node should not be considered as being valid for the purposes
+	                                                    * of being re-traced, or untraced. However, it should still be considered
+	                                                    * valid for the purposes of GC searches, as well as other passive
+	                                                    * interactions such as reading its size.
+	                                                    * Note that this only applies to nodes with the `MALLNODE_FUSERNODE' flag set! */
+	upid_t                                 m_tracetid; /* Traceback thread id (in the root namespace). */
+	COMPILER_FLEXIBLE_ARRAY(void *,        m_trace);   /* [1..1][0..MALLNODE_TRACESZ(self)]
+	                                                    * Traceback of where the pointer was originally allocated. */
 };
 #define MALLNODE_MIN(x)     ((x)->m_tree.a_vmin)
 #define MALLNODE_MAX(x)     ((x)->m_tree.a_vmax)
@@ -263,7 +263,7 @@ struct mallnode {
 #define MALLNODE_TRACESZ(x) (((x)->m_size - offsetof(struct mallnode, m_trace)) / sizeof(void *))
 #define MALLNODE_ISVALID(x)                  \
 	(!((x)->m_flags & MALLNODE_FUSERNODE) || \
-	 (x)->m_userver <= mall_valid_user_node_version_number)
+	 (x)->m_userver >= mall_valid_user_node_version_number)
 
 
 /* The global descriptor table of known MALL nodes. */
@@ -564,11 +564,15 @@ generic_handle_node:
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL mall_restore_invalid_version_number)(struct mallnode *__restrict node,
-                                                    u16 old_max_version) {
+                                                   u16 old_max_version) {
 again:
 	if ((node->m_flags & MALLNODE_FUSERNODE) &&
-	    (node->m_userver < old_max_version))
+	    (node->m_userver < old_max_version)) {
+		printk(KERN_DEBUG "Reset invalid mall version of %p...%p (%I16u >= %I16u)\n",
+		       MALLNODE_MIN(node), MALLNODE_MAX(node),
+		       node->m_userver, old_max_version);
 		node->m_userver = 0;
+	}
 	if (node->m_tree.a_min) {
 		if (node->m_tree.a_max) {
 			mall_restore_invalid_version_number(node->m_tree.a_max,
@@ -1763,9 +1767,9 @@ NOTHROW(KCALL mall_insert_tree)(struct mallnode *__restrict node) {
 				       node->m_tree.a_vmin,
 				       node->m_tree.a_vmax);
 			} else {
-				hinode->m_tree.a_vmin        = existing_node->m_tree.a_vmax + 1;
+				hinode->m_tree.a_vmin        = node->m_tree.a_vmax + 1;
 				hinode->m_tree.a_vmax        = existing_node->m_tree.a_vmax;
-				existing_node->m_tree.a_vmax = existing_node->m_tree.a_vmin - 1;
+				existing_node->m_tree.a_vmax = node->m_tree.a_vmin - 1;
 				hinode->m_flags              = existing_node->m_flags;
 				memcpy(hinode->m_trace, existing_node->m_trace,
 				       MIN(MALLNODE_TRACESZ(hinode),
@@ -1864,8 +1868,7 @@ NOTHROW(KCALL mall_print_traceback)(void *ptr, gfp_t flags) {
 			return; /* Cannot print like this. */
 		sync_read(&mall_lock);
 	}
-	node = mall_tree ? mallnode_tree_locate(mall_tree, (uintptr_t)ptr)
-	                 : NULL;
+	node = mallnode_tree_locate(mall_tree, (uintptr_t)ptr);
 	if unlikely(!node) {
 		sync_endread(&mall_lock);
 		PANIC_INVALID_MALL_POINTER_WITH_CALLER_TRACEBACK(ptr);
@@ -1975,8 +1978,7 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 		return *(size_t *)((byte_t *)ptr - (CONFIG_MALL_PREFIX_SIZE +
 		                                    CONFIG_MALL_HEAD_SIZE));
 	}
-	node = mall_tree ? mallnode_tree_locate(mall_tree, (uintptr_t)ptr)
-	                 : NULL;
+	node = mallnode_tree_locate(mall_tree, (uintptr_t)ptr);
 	if unlikely(!node) {
 		sync_endread(&mall_lock);
 		PANIC_INVALID_MALL_POINTER_WITH_CALLER_TRACEBACK(ptr);

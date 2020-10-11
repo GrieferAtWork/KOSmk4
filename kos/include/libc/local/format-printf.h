@@ -1005,7 +1005,6 @@ __check_string_error_and_print_tail:
 #define __PFORMATPRINTER_GENCC __C32FORMATPRINTER_CC
 #endif /* __CHAR_SIZE != ... */
 			if (!__xformat_argsize) {
-
 				/* Generator without closure */
 				typedef __SSIZE_TYPE__ (__PFORMATPRINTER_GENCC *__gen_t)(__PFORMATPRINTER_TYPE, void *);
 				__gen_t __gen = __builtin_va_arg(__FORMAT_ARGS, __gen_t);

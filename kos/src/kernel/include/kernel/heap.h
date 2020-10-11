@@ -101,7 +101,7 @@ struct mfree {
 #define HEAP_BUCKET_COUNT       ((__SIZEOF_SIZE_T__*8)-(HEAP_BUCKET_OFFSET-1))
 
 #define HEAP_INIT(overalloc, freethresh, hintaddr, hintmode) \
-	{ ATOMIC_RWLOCK_INIT, NULL, { }, overalloc, freethresh, hintaddr, hintmode }
+	{ ATOMIC_RWLOCK_INIT, __NULLPTR, { }, overalloc, freethresh, hintaddr, hintmode }
 
 struct heap_pending_free {
 	struct heap_pending_free *hpf_next;  /* [0..1] Next pending free block. */
