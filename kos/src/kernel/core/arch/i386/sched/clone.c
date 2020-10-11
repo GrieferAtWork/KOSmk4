@@ -335,7 +335,7 @@ again_lock_vm:
 			                                   &task_srpc_set_child_tid,
 			                                   child_tidptr);
 		}
-		result->t_state = state;
+		FORTASK(result, this_sstate) = state;
 	}
 
 	result->t_vm = result_vm; /* Inherit reference. */

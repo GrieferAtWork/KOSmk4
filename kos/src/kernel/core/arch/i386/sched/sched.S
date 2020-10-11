@@ -380,6 +380,7 @@ PUBLIC_FUNCTION(cpu_run_current_and_remember_nopr)
 	movP   this_cpu(%R_fcall0P), %Pbx
 	EXTERN(thiscpu_sched_current)
 	movP   thiscpu_sched_current(%Pbx), %Pax
+
 	/* Load the new CPU state */
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
 	jmp    x86_load_thread_Pax_cpu_Pbx
@@ -486,7 +487,7 @@ INTERN_FUNCTION(arch_sched_super_override_ipi)
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
 	jne    x86_load_thread_Pax_cpu_Pbx /* Switch to a different thread. */
 
-	/* Resume execution by re-loading `this_task.t_state' */
+	/* Resume execution by re-loading `this_sstate' */
 	EXTERN(this_sstate)
 	movP   %segtls:this_sstate, %Psp
 

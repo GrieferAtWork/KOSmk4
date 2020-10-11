@@ -1254,7 +1254,7 @@ NOTHROW(KCALL mall_search_thread)(void *UNUSED(arg),
                                   struct task *thread,
                                   struct taskpid *UNUSED(pid)) {
 	if (thread && thread != THIS_TASK)
-		mall_search_task_scpustate(thread, thread->t_state);
+		mall_search_task_scpustate(thread, FORTASK(thread, this_sstate));
 	return 0;
 }
 

@@ -319,11 +319,11 @@ NOTHROW(KCALL saveorig)(void) {
 do_normal_unscheduled_thread:
 #endif /* !CONFIG_NO_SMP */
 		/* Re-construct the thread's scheduler CPU state. */
-		sst = dbg_current->t_state;
+		sst = FORTASK(dbg_current, this_sstate);
 		if (sst) {
 			sst = (struct scpustate *)((byte_t *) + scpustate_sizeof(sst));
 			sst = fcpustate_to_scpustate_p(&x86_dbg_origstate, sst);
-			dbg_current->t_state = sst;
+			FORTASK(dbg_current, this_sstate) = sst;
 		}
 		/* Fill in missing registers. */
 #ifndef CONFIG_NO_SMP
@@ -471,9 +471,9 @@ NOTHROW(KCALL loadview)(void) {
 do_normal_unscheduled_thread:
 #endif /* !CONFIG_NO_SMP */
 			/* Some different thread that is not being scheduled at the moment. */
-			if (dbg_current->t_state) {
+			if (FORTASK(dbg_current, this_sstate)) {
 				fcpustate_assign_scpustate(&x86_dbg_origstate,
-				                           dbg_current->t_state);
+				                           FORTASK(dbg_current, this_sstate));
 			} else {
 				memset(&x86_dbg_origstate, 0, sizeof(x86_dbg_origstate));
 			}

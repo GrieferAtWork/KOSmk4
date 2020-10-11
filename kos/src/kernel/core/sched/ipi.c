@@ -234,17 +234,20 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 #ifndef CONFIG_NO_SMP
 	struct cpu *target_cpu;
 #endif /* !CONFIG_NO_SMP */
-	assertf(thread->t_state != NULL,
+	assertf(FORTASK(thread, this_sstate) != NULL,
 	        "Task hasn't been given a restore-state at which execution can start");
 	if (!(ATOMIC_FETCHOR(thread->t_flags, TASK_FSTARTING) & TASK_FSTARTING)) {
 		if (kernel_debugtrap_enabled()) {
 			if (thread->t_vm == THIS_VM || thread->t_vm == &vm_kernel ||
 			    thread->t_flags & TASK_FKERNTHREAD || !task_isprocessleader_p(thread)) {
+				struct scpustate *state;
 				/* New thread.
 				 * -> In this case, we must trigger a clone()
 				 *    trap once the thread begins execution. */
-				thread->t_state = task_push_asynchronous_rpc(thread->t_state,
-				                                                     &trigger_clone_trap);
+				state = FORTASK(thread, this_sstate);
+				state = task_push_asynchronous_rpc(state,
+				                                   &trigger_clone_trap);
+				FORTASK(thread, this_sstate) = state;
 			} else {
 				struct debugtrap_reason r;
 				/* New process. */

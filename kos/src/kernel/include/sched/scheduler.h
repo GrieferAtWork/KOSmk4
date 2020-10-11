@@ -383,11 +383,11 @@ NOTHROW(FCALL sched_override_yieldto)(struct task *__restrict thread);
  *     Note that the builtin debugger uses its own, separate mechanism in order to
  *     deal with more corner-cases.
  *   - The scheduling of other CPUs can be directly altered while a super-override
- *     is active, such that the caller may view and alter the `t_state' of any thread
- *     of any other CPU (including `thiscpu_sched_current', which normally wouldn't
- *     be allowed), as well as change `thiscpu_sched_current' itself, which will
- *     cause the other CPU to resume execution in the context of that other thread
- *     once the super-override CPU calls `sched_super_override_end()'
+ *     is active, such that the caller may view and alter the `this_sstate' of any
+ *     thread of any other CPU (including `thiscpu_sched_current', which normally
+ *     wouldn't be allowed), as well as change `thiscpu_sched_current' itself, which
+ *     will cause the other CPU to resume execution in the context of that other
+ *     thread once the super-override CPU calls `sched_super_override_end()'
  *   - Only the CPU that originally called `sched_super_override_start()' may eventually
  *     call `sched_super_override_end()' to release the super override lock. In other
  *     words: You can't send an IPI to have another CPU release the lock for you!

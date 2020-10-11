@@ -330,9 +330,12 @@ task_rpc_serve_ipi(void *UNUSED(arg),
  * service IPIs before resuming what it was doing before. */
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL x86_task_push_serve_ipi)(struct task *__restrict thread) {
-	thread->t_state = task_push_asynchronous_rpc(thread->t_state,
-	                                             &task_rpc_serve_ipi,
-	                                             NULL);
+	struct scpustate *state;
+	state = FORTASK(thread, this_sstate);
+	state = task_push_asynchronous_rpc(state,
+	                                   &task_rpc_serve_ipi,
+	                                   NULL);
+	FORTASK(thread, this_sstate) = state;
 }
 
 

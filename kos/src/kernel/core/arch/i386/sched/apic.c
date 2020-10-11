@@ -628,8 +628,8 @@ i386_allocate_secondary_cores(void) {
 		FORTASK(altidle, this_handle_manager) = incref(&handle_manager_kernel);
 
 		/* Set up the boot-strap CPU state for the new CPU.
-		 * -> When a CPU is started by using an INIT IPI, it will perform internal
-		 *    setup functions before executing `PERCPU(thiscpu_sched_current)->t_state'
+		 * -> When a CPU is started by using an INIT IPI, it will perform internal setup
+		 *    functions before executing `FORTASK(PERCPU(thiscpu_sched_current), this_sstate)'
 		 *    Since this is the first time that we're starting this CPU, we direct
 		 *    that state to perform some high-level CPU initialization functions,
 		 *    such as determining CPU features (and comparing those against those
@@ -661,7 +661,7 @@ i386_allocate_secondary_cores(void) {
 			init_state->scs_sgregs.sg_fs    = SEGMENT_KERNEL_FSBASE;
 			init_state->scs_sgregs.sg_gs    = SEGMENT_USER_GSBASE_RPL;
 #endif /* !__x86_64__ */
-			altidle->t_state        = init_state;
+			FORTASK(altidle, this_sstate) = init_state;
 		}
 
 		/* Run per-task initializers on the new cpu's IDLE thread. */

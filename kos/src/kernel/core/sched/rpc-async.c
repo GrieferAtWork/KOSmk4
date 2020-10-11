@@ -96,8 +96,12 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc)(struct icpustate *__restrict state,
 			task_pause();
 		return state;
 	}
-	target->t_state = task_push_asynchronous_rpc(target->t_state,
-	                                             func, arg);
+	{
+		struct scpustate *target_state;
+		target_state = FORTASK(target, this_sstate);
+		target_state = task_push_asynchronous_rpc(target_state, func, arg);
+		FORTASK(target, this_sstate) = target_state;
+	}
 	if (!(mode & TASK_RPC_FDONTWAKE)) {
 		struct task *next_thread;
 		next_thread = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
@@ -278,8 +282,12 @@ NOTHROW(KCALL task_schedule_asynchronous_rpc)(struct task *__restrict target,
 			PREEMPTION_POP(was);
 			return false;
 		}
-		target->t_state = task_push_asynchronous_rpc(target->t_state,
-		                                             func, arg);
+		{
+			struct scpustate *target_state;
+			target_state = FORTASK(target, this_sstate);
+			target_state = task_push_asynchronous_rpc(target_state, func, arg);
+			FORTASK(target, this_sstate) = target_state;
+		}
 		if (!(mode & TASK_RPC_FDONTWAKE)) {
 			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
 			                                caller, target,
@@ -351,9 +359,14 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc)(struct icpustate *__restrict state,
 		COMPILER_BARRIER();
 		return state;
 	}
-	target->t_state = task_push_asynchronous_rpc(target->t_state,
-	                                             data->ar_func,
-	                                             data->ar_arg);
+	{
+		struct scpustate *target_state;
+		target_state = FORTASK(target, this_sstate);
+		target_state = task_push_asynchronous_rpc(target_state,
+		                                          data->ar_func,
+		                                          data->ar_arg);
+		FORTASK(target, this_sstate) = target_state;
+	}
 	if (!(data->ar_mode & TASK_RPC_FDONTWAKE)) {
 		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
 		                                caller, target,
@@ -426,8 +439,12 @@ again:
 			PREEMPTION_POP(was);
 			return false;
 		}
-		target->t_state = task_push_asynchronous_rpc(target->t_state,
-		                                             func, arg);
+		{
+			struct scpustate *target_state;
+			target_state = FORTASK(target, this_sstate);
+			target_state = task_push_asynchronous_rpc(target_state, func, arg);
+			FORTASK(target, this_sstate) = target_state;
+		}
 		if (!(mode & TASK_RPC_FDONTWAKE)) {
 			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
 			                                caller, target,
@@ -502,10 +519,15 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc_v)(struct icpustate *__restrict state,
 		COMPILER_BARRIER();
 		return state;
 	}
-	target->t_state = task_push_asynchronous_rpc_v(target->t_state,
-	                                                       data->ar_func,
-	                                                       data->ar_buf,
-	                                                       data->ar_bufsize);
+	{
+		struct scpustate *target_state;
+		target_state = FORTASK(target, this_sstate);
+		target_state = task_push_asynchronous_rpc_v(target_state,
+		                                            data->ar_func,
+		                                            data->ar_buf,
+		                                            data->ar_bufsize);
+		FORTASK(target, this_sstate) = target_state;
+	}
 	if (!(data->ar_mode & TASK_RPC_FDONTWAKE)) {
 		target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
 		                                caller, target,
@@ -588,8 +610,13 @@ again:
 			PREEMPTION_POP(was);
 			return false;
 		}
-		target->t_state = task_push_asynchronous_rpc_v(target->t_state,
-		                                               func, buf, bufsize);
+		{
+			struct scpustate *target_state;
+			target_state = FORTASK(target, this_sstate);
+			target_state = task_push_asynchronous_rpc_v(target_state,
+			                                            func, buf, bufsize);
+			FORTASK(target, this_sstate) = target_state;
+		}
 		if (!(mode & TASK_RPC_FDONTWAKE)) {
 			target = sched_intern_localwake(IFELSE_SMP(me, &_bootcpu),
 			                                caller, target,

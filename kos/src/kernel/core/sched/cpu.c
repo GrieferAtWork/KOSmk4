@@ -177,9 +177,14 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	 * caused if we tried to decref (and possibly destroy) ourself.
 	 *
 	 * NOTE: The reference destroyed here was gifted to us by `sched_intern_yield_onexit()' */
-	next->t_state = task_push_asynchronous_rpc(next->t_state,
-	                                           &task_decref_for_exit,
-	                                           caller);
+	{
+		struct scpustate *state;
+		state = FORTASK(next, this_sstate);
+		state = task_push_asynchronous_rpc(state,
+		                                   &task_decref_for_exit,
+		                                   caller);
+		FORTASK(next, this_sstate) = state;
+	}
 
 	/* Update our thread's status flags. */
 	{
