@@ -965,6 +965,23 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 
 	/* Invoke global callbacks. */
 	dbg_runhooks(DBG_HOOK_RESET);
+
+	/* Finally, handle any pending SW-ipis for our CPU.
+	 * There may still be some unhandled ones if the debugger was reset
+	 * from within an IPI callback, in which case we may not have gotten
+	 * around to handling any potentially remaining IPIs.
+	 *
+	 * One example where this might happen would be the F12-reset trick,
+	 * in which case the debugger gets reset from within an interrupt
+	 * handler, which may actually be the IPI-handler if the debug-cpu
+	 * isn't the boot cpu! */
+	{
+		pflag_t was;
+		was = PREEMPTION_PUSHOFF();
+		cpu_ipi_service_nopr();
+		PREEMPTION_POP(was);
+	}
+
 }
 
 #ifndef CONFIG_NO_SMP

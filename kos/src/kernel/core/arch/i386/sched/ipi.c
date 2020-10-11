@@ -30,6 +30,7 @@
 #include <kernel/x86/pit.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>
+#include <sched/scheduler.h>
 #include <sched/task.h>
 #include <sched/x86/smp.h>
 
@@ -260,7 +261,8 @@ NOTHROW(FCALL x86_serve_ipi)(struct cpu *__restrict me,
 	unsigned int i, j;
 	struct icpustate *new_state;
 	struct icpustate *result = state;
-	IPI_DEBUG("x86_serve_ipi\n");
+	IPI_DEBUG("x86_serve_ipi(%p,%p)\n",
+	          state, FORCPU(me, thiscpu_sched_current));
 	i = CEILDIV(CPU_IPI_BUFFER_SIZE, BITS_PER_POINTER);
 	/* Must iterate in reverse, since assembly only checks the first word
 	 * of the in-use bitset to determine if unhandled IPIs are present. */
@@ -451,7 +453,11 @@ do_wake_target:
 			/* Indicate that the IPI is now ready for handling by the core. */
 			IPI_DEBUG("cpu_sendipi:ipi_secondary [slot=%u,i=%u,mask=%#" PRIxPTR "]\n", slot, i, mask);
 			ATOMIC_OR(FORCPU(target, thiscpu_x86_ipi_inuse[i]), mask);
-			if (flags & CPU_IPI_FWAITFOR) {
+			if ((flags & CPU_IPI_FWAITFOR) ||
+			    /* Check for race condition: If the first IPI slot became available in the
+			     * mean time, then we still have to send out a HW-IPI, just so the target
+			     * CPU will actually handle it! */
+			    !(ATOMIC_READ(FORCPU(target, thiscpu_x86_ipi_inuse[0])) & 1)) {
 				/* Must still synchronize with the target CPU's reception of the IPI... */
 				if (ATOMIC_READ(target->c_state) == CPU_STATE_RUNNING)
 					goto do_send_ipi;

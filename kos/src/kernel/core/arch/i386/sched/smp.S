@@ -83,9 +83,11 @@
 .endm /* pushP_cfi_r_cs */
 
 #ifdef __x86_64__
-#define x86_load_thread_Pax_cpu_Pbx x86_load_thread_rax_cpu_rbx
+#define x86_load_thread_Pax_cpu_Pbx    x86_load_thread_rax_cpu_rbx
+#define x86_idt_apic_ipi_icpustate_Psp x86_idt_apic_ipi_icpustate_rsp
 #else /* __x86_64__ */
-#define x86_load_thread_Pax_cpu_Pbx x86_load_thread_eax_cpu_ebx
+#define x86_load_thread_Pax_cpu_Pbx    x86_load_thread_eax_cpu_ebx
+#define x86_idt_apic_ipi_icpustate_Psp x86_idt_apic_ipi_icpustate_esp
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
@@ -128,6 +130,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
 #endif /* !__x86_64__ */
+INTERN_FUNCTION(x86_idt_apic_ipi_icpustate_Psp)
 
 	/* Achnowledge the IPI beforehand, thus allowing another
 	 * to be delivered while we're still handling the old one.
@@ -193,9 +196,9 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	/* Remember the thread that the scheduler wants us to switch to. */
 	EXTERN(thiscpu_sched_current)
 	movP   %Pax, thiscpu_sched_current(%Pbx)
-	/* Check if there are  */
+	/* Check if there are more IPIs */
 	EXTERN(thiscpu_x86_ipi_inuse)
-	cmpP   $(NULL), thiscpu_x86_ipi_inuse(%Pbx)
+	cmpP   $(0), thiscpu_x86_ipi_inuse(%Pbx)
 	je     .Lipi_switch_tasks
 	/* Modify the target thread's CPU state to have it service the remaining IPIs. */
 	movP   %Pax, %R_fcall0P
@@ -212,7 +215,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	 * assumption that no interrupt has to be fired on the target
 	 * core, in which case it is expected that we handle that IPI. */
 	EXTERN(thiscpu_x86_ipi_inuse)
-	cmpP   $(NULL), thiscpu_x86_ipi_inuse(%Pbx)
+	cmpP   $(0), thiscpu_x86_ipi_inuse(%Pbx)
 	jne    1b
 
 	/* Resume execution, as requested */
@@ -243,6 +246,7 @@ INTERN_FUNCTION(x86_idt_apic_ipi)
 	EXTERN(x86_load_thread_Pax_cpu_Pbx)
 	jmp    x86_load_thread_Pax_cpu_Pbx
 	.cfi_endproc
+END(x86_idt_apic_ipi_icpustate_Psp)
 END(x86_idt_apic_ipi)
 END(cpu_ipi_service_nopr)
 

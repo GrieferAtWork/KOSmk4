@@ -26,27 +26,27 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <kernel/compiler.h>
 
+#include <kernel/x86/apic.h>
 #include <kernel/x86/idt-names.h>
+#include <kernel/x86/pic.h>
 
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 #include <asm/cfi.h>
-
-#ifdef __x86_64__
+#include <asm/cpu-flags.h>
+#include <asm/instr/compat.h>
+#include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
-#endif /* __x86_64__ */
+#include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/gdt.h>
 
 .section .text.x86.asmirq.x86_dbgaltcoreidt
 
 .cfi_startproc simple
 .cfi_iret_signal_frame
-#ifdef __x86_64__
-.cfi_def_cfa %rsp, 0
-#else /* __x86_64__ */
-.cfi_def_cfa %esp, 0
-#endif /* !__x86_64__ */
-
+.cfi_def_cfa %Psp, 0
 
 #define DEFINE_DBGALTCORE_IDT_OVERRIDE(id)                      \
 	INTERN_FUNCTION(PP_CAT2(x86_dbgaltcoreidt_, IDT_X86_##id)); \
@@ -313,7 +313,6 @@ INTERN_FUNCTION(x86_dbgaltcore_interrupt)
 	popq_cfi_r %rdi
 	popq_cfi_r %rdx
 	popq_cfi_r %rcx
-	iretq
 #else /* __x86_64__ */
 	pushl_cfi_r %ecx
 	pushl_cfi_r %edx
@@ -325,10 +324,145 @@ INTERN_FUNCTION(x86_dbgaltcore_interrupt)
 
 	popl_cfi_r %edx
 	popl_cfi_r %ecx
-	iret
 #endif /* !__x86_64__ */
+	iretP
 END(x86_dbgaltcore_interrupt)
 .cfi_endproc
+
+
+
+#ifdef __x86_64__
+#define FOREACH_CLOBBER_pushP_cfi_r                            \
+	pushq_cfi_r %rax;   /* [C] Accumulator register */         \
+	pushq_cfi_r %rcx;   /* [C] Count register */               \
+	pushq_cfi_r %rdx;   /* [C] Data register */                \
+	pushq_cfi_r %rsi;   /* [C] Source pointer */               \
+	pushq_cfi_r %rdi;   /* [C] Destination pointer */          \
+	pushq_cfi_r %r8;    /* [C] General purpose register #8 */  \
+	pushq_cfi_r %r9;    /* [C] General purpose register #9 */  \
+	pushq_cfi_r %r10;   /* [C] General purpose register #10 */ \
+	pushq_cfi_r %r11;   /* [C] General purpose register #11 */
+#define FOREACH_CLOBBER_popP_cfi_r                             \
+	popq_cfi_r %r11;    /* [C] General purpose register #11 */ \
+	popq_cfi_r %r10;    /* [C] General purpose register #10 */ \
+	popq_cfi_r %r9;     /* [C] General purpose register #9 */  \
+	popq_cfi_r %r8;     /* [C] General purpose register #8 */  \
+	popq_cfi_r %rdi;    /* [C] Destination pointer */          \
+	popq_cfi_r %rsi;    /* [C] Source pointer */               \
+	popq_cfi_r %rdx;    /* [C] Data register */                \
+	popq_cfi_r %rcx;    /* [C] Count register */               \
+	popq_cfi_r %rax     /* [C] Accumulator register */
+#else /* __x86_64__ */
+#define FOREACH_CLOBBER_pushP_cfi_r \
+	pushl_cfi_r %eax;               \
+	pushl_cfi_r %ecx;               \
+	pushl_cfi_r %edx
+#define FOREACH_CLOBBER_popP_cfi_r \
+	popl_cfi_r %edx;               \
+	popl_cfi_r %ecx;               \
+	popl_cfi_r %eax
+#endif /* !__x86_64__ */
+
+
+#ifdef __x86_64__
+#define x86_idt_apic_ipi_icpustate_Psp x86_idt_apic_ipi_icpustate_rsp
+#else /* __x86_64__ */
+#define x86_idt_apic_ipi_icpustate_Psp x86_idt_apic_ipi_icpustate_esp
+#endif /* !__x86_64__ */
+
+
+
+
+.section .text.x86.asmirq.x86_dbgidt_apic_ipi
+INTERN_FUNCTION(x86_dbgidt_apic_ipi)
+	.cfi_startproc
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %Psp, 0
+#ifdef __x86_64__
+	cli
+	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
+#else /* __x86_64__ */
+	ASM_PUSH_ICPUSTATE_AFTER_HW_IRET_CFI_R
+	/* Load kernel-space segments. */
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+#endif /* !__x86_64__ */
+
+	/* Achnowledge the IPI. */
+	EXTERN(x86_lapicbase)
+	movP   x86_lapicbase, %Pax
+	movl   $(APIC_EOI_FSIGNAL), APIC_EOI(%Pax)
+
+	/* Deal with the interrupt */
+	EXTERN(x86_dbg_handle_altcore_interrupt)
+	call   x86_dbg_handle_altcore_interrupt
+
+	/* Do normal APIC-IPI handling (ala. cpu_sendipi())
+	 * This is still required, because other CPUs will only send HW-ipis
+	 * to us if we keep on handling SW-based IPIs, meaning that we'll only
+	 * get IPI-related interrupts if we're nice and handling SW-based ones!
+	 *
+	 * Also: Since we're in debug-mode, and the specific CPU that's
+	 *       responsible for controlling the system at the moment, any
+	 *       IPI that gets back to us should really be as the result of
+	 *       us requesting some sort of data (such as disk I/O, or the
+	 *       like...) */
+	EXTERN(x86_idt_apic_ipi_icpustate_Psp)
+	jmp    x86_idt_apic_ipi_icpustate_Psp
+	.cfi_endproc
+END(x86_dbgidt_apic_ipi)
+
+
+
+.section .text.x86.asmirq.x86_dbgidt_specific_00h
+INTERN_FUNCTION(x86_dbgidt_specific_00h) /* ISR_X86_f1 */
+	.cfi_startproc simple
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %Psp, 0
+#ifdef __x86_64__
+	cli
+#else /* __x86_64__ */
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+#endif /* !__x86_64__ */
+
+	FOREACH_CLOBBER_pushP_cfi_r
+
+#ifndef __x86_64__
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+#endif /* !__x86_64__ */
+
+	EXTERN(x86_handle_dbg_ps2_interrupt)
+	call   x86_handle_dbg_ps2_interrupt
+
+	/* outb(X86_PIC1_CMD, X86_PIC_CMD_EOI); */
+	movb   $(X86_PIC_CMD_EOI), %al
+	outb   %al, $(X86_PIC1_CMD)
+
+	FOREACH_CLOBBER_popP_cfi_r
+#ifndef __x86_64__
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+#endif /* !__x86_64__ */
+	iretP
+	.cfi_endproc
+END(x86_dbgidt_specific_00h)
+
 
 
 #endif /* CONFIG_HAVE_DEBUGGER */

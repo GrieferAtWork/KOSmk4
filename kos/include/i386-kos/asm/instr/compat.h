@@ -146,6 +146,7 @@
 #define rdgsbaseP    rdgsbaseq
 #define wrfsbaseP    wrfsbaseq
 #define wrgsbaseP    wrgsbaseq
+#define iretP        iretq
 
 #ifdef __KERNEL__
 #define segtls       gs /* THIS_TASK */
@@ -278,11 +279,11 @@
 #define rclP         rcll
 #define rcrP         rcrl
 #define jPcxz        jecxz
-
 #define rdfsbaseP    rdfsbasel
 #define rdgsbaseP    rdgsbasel
 #define wrfsbaseP    wrfsbasel
 #define wrgsbaseP    wrgsbasel
+#define iretP        iret
 
 #ifdef __KERNEL__
 #define segtls       fs /* THIS_TASK: SEGMENT_KERNEL_FSBASE */
