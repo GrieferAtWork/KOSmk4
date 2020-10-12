@@ -543,6 +543,47 @@ search_fde:
 			}
 			/* Pass the placeholder exception object for KOS exceptions. */
 			__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)libc_get_kos_unwind_exception());
+
+			/* TODO: Work-around to deal with a problem caused
+			 *       by inline, exception-enabled system calls:
+			 * >> TRY {
+			 * >>     inline_sys_Xpipe(NULL);
+			 * >> } EXCEPT {
+			 * >>     ...
+			 * >> }
+			 *
+			 * Assembly (mock-up):
+			 * >> .Ltry_begin:
+			 * >>     movq   $0, %rdi
+			 * >>     movq   $SYS_pipe, %rax
+			 * >>     std
+			 * >> .cfi_remember_state
+			 * >> .cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a
+			 * >>     syscall
+			 * >>     cld
+			 * >> .cfi_restore_state
+			 * >> .Ltry_end:
+			 * >>     ...
+			 * >> .Lexcept:
+			 * >>     ...
+			 *
+			 * Because the exception handler is apart of the same function-frame as the CFI
+			 * instrumentation that would normally be required to clear EFLAGS.DF, that flag
+			 * doesn't actually end up getting cleared, since the surrounding frame never
+			 * ends up being unwound.
+			 *
+			 * I _really_ dislike the work-around of unconditionally clearing EFLAGS.DF before
+			 * jumping to an exception handler, and in the long run I envision a KOS-specific
+			 * extension to CFI that allows one to specify custom unwind expression that are
+			 * performed during regular unwinding and/or before jumping to a local exception
+			 * handler, similar to what's already done by `unwind_fde_exec_landing_pad_adjustment()'
+			 * and its `DW_CFA_GNU_args_size' opcode, only much more powerful by being able to
+			 * be used to specify custom behavior for _any_ register. */
+#ifdef __x86_64__
+			state->kcs_rflags &= ~0x400; /* EFLAGS_DF */
+#elif defined(__i386__)
+			state->kcs_eflags &= ~0x400; /* EFLAGS_DF */
+#endif /* ... */
 			return state;
 		}
 		if unlikely(reason != _URC_CONTINUE_UNWIND) {
