@@ -57,6 +57,17 @@ struct pointer_set {
 		if (((uintptr_t)((ptr) = (__typeof__(ptr))(set)->ps_list[_fe_i])) == POINTER_SET_SENTINAL) \
 			;                                                                                      \
 		else
+#define _POINTER_SET_USABLE_MEMORY(self)       \
+	((self)->ps_list == (self)->ps_buf         \
+	 ? POINTER_SET_BUFSIZE * sizeof(uintptr_t) \
+	 : kmalloc_usable_size((self)->ps_list))
+#define _POINTER_SET_ASSERT_USABLE_MEMORY(self)                 \
+	__hybrid_assertf(_POINTER_SET_USABLE_MEMORY(self) >=        \
+	                 ((self)->ps_mask + 1) * sizeof(uintptr_t), \
+	                 "usable: %Iu, used: %Iu",                  \
+	                 _POINTER_SET_USABLE_MEMORY(self),          \
+	                 ((self)->ps_mask + 1) * sizeof(uintptr_t))
+
 
 
 
@@ -93,6 +104,7 @@ NOTHROW(KCALL pointer_set_rehash_with)(struct pointer_set *__restrict self,
                                        uintptr_t new_mask) {
 	size_t i;
 	uintptr_t j, perturb;
+	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 #if POINTER_SET_SENTINAL != 0
 	for (i = 0; i <= new_mask; ++i)
 		new_set[i] = POINTER_SET_SENTINAL;
@@ -114,6 +126,7 @@ NOTHROW(KCALL pointer_set_rehash_with)(struct pointer_set *__restrict self,
 		kfree(self->ps_list);
 	self->ps_list = new_set;
 	self->ps_mask = new_mask;
+	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 }
 
 LOCAL NOBLOCK bool
@@ -121,6 +134,7 @@ NOTHROW(KCALL pointer_set_do_insert)(struct pointer_set *__restrict self,
                                      uintptr_t ptr) {
 	size_t i, perturb;
 	uintptr_t *slot;
+	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 	i = perturb = POINTER_SET_HASHPTR(ptr) & self->ps_mask;
 	for (;; POINTER_SET_HASHNXT(i, perturb)) {
 		slot = &self->ps_list[i & self->ps_mask];
@@ -199,6 +213,7 @@ LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL pointer_set_contains)(struct pointer_set const *__restrict self,
                                     void *ptr) {
 	size_t i, perturb;
+	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 	i = perturb = POINTER_SET_HASHPTR((uintptr_t)ptr) & self->ps_mask;
 	for (;; POINTER_SET_HASHNXT(i, perturb)) {
 		uintptr_t ent = self->ps_list[i & self->ps_mask];
@@ -222,6 +237,7 @@ pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
 	size_t new_mask;
 	uintptr_t *old_map;
 	uintptr_t *new_map;
+	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 	new_mask = 1;
 	while (new_mask <= (min_allocation * 3) / 2)
 		new_mask = (new_mask << 1) | 1;
@@ -263,6 +279,7 @@ pointer_set_clear_and_rehash(struct pointer_set *__restrict self,
 	self->ps_list = new_map;
 	self->ps_mask = new_mask;
 	self->ps_size = 0;
+	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 }
 
 LOCAL bool
@@ -272,6 +289,7 @@ NOTHROW(KCALL pointer_set_clear_and_rehash_nx)(struct pointer_set *__restrict se
 	size_t new_mask;
 	uintptr_t *new_map;
 	uintptr_t *old_map;
+	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 	new_mask = 1;
 	while (new_mask <= (min_allocation * 3) / 2)
 		new_mask = (new_mask << 1) | 1;
@@ -316,6 +334,7 @@ NOTHROW(KCALL pointer_set_clear_and_rehash_nx)(struct pointer_set *__restrict se
 	self->ps_list = new_map;
 	self->ps_mask = new_mask;
 	self->ps_size = 0;
+	_POINTER_SET_ASSERT_USABLE_MEMORY(self);
 	return true;
 }
 

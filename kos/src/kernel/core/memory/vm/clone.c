@@ -164,6 +164,14 @@ again_lock_vm:
 				error = pointer_set_insert_nx(&locked_parts,
 				                              node_part,
 				                              GFP_ATOMIC);
+#ifndef NDEBUG
+				{
+					struct vm_datapart *part;
+					POINTER_SET_FOREACH(part, &locked_parts) {
+						assert(ADDR_ISKERN(part));
+					}
+				}
+#endif /* !NDEBUG */
 				if unlikely(error == POINTER_SET_INSERT_NX_FAILED) {
 					size_t min_parts;
 					/* Failed to re-hash the pointer set.

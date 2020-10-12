@@ -37,6 +37,7 @@
 #endif
 
 #ifdef CONFIG_DEBUG_MALLOC
+#ifndef CONFIG_USE_NEW_DEBUG_MALLOC
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <kernel/addr2line.h>
@@ -87,7 +88,7 @@ DECL_BEGIN
 
 INTERN void /* Must be INTERN, because this function gets overwritten
              * when `nomall' is passed on the commandline */
-NOTHROW(KCALL debug_malloc_generate_traceback)(void **__restrict buffer, size_t buflen,
+NOTHROW(KCALL trace_malloc_generate_traceback)(void **__restrict buffer, size_t buflen,
                                                struct lcpustate *__restrict state) {
 #if 1
 	TRY {
@@ -120,7 +121,7 @@ DECL_END
 	struct lcpustate context[1]; \
 	lcpustate_current(context);
 #define FILL_NODE_TRACE_WITH_CALLER_TRACEBACK(node) \
-	debug_malloc_generate_traceback((node)->m_trace, MALLNODE_TRACESZ(node), (struct lcpustate *)context)
+	trace_malloc_generate_traceback((node)->m_trace, MALLNODE_TRACESZ(node), (struct lcpustate *)context)
 #define PANIC_HERE(...) kernel_panic(__VA_ARGS__)
 #define PANIC_CALL(...) kernel_panic(__VA_ARGS__) /* XXX: Panic at __builtin_return_address() */
 
@@ -221,13 +222,13 @@ DECL_BEGIN
 #define MALL_HEAP_FLAGS  (GFP_NORMAL | GFP_LOCKED | GFP_PREFLT)
 
 /* Debug-heap used for allocating `struct mallnode' objects. */
-INTERN struct heap mall_heap =
+INTERN struct heap trace_heap =
 HEAP_INIT(PAGESIZE * 4,
           PAGESIZE * 16,
           HINT_GETADDR(KERNEL_VMHINT_DHEAP),
           HINT_GETMODE(KERNEL_VMHINT_DHEAP));
-DEFINE_VALIDATABLE_HEAP(mall_heap);
-DEFINE_DBG_BZERO_OBJECT(mall_heap.h_lock);
+DEFINE_VALIDATABLE_HEAP(trace_heap);
+DEFINE_DBG_BZERO_OBJECT(trace_heap.h_lock);
 
 
 
@@ -1460,8 +1461,10 @@ again:
 	++mall_leak_version;
 	if unlikely(mall_leak_version == 0)
 		mall_leak_version = 1;
+
 	/* Search for leaks. */
 	mall_search_leaks_impl();
+
 	/* Print all found leaks. */
 	result = mall_print_leaks_impl();
 
@@ -1655,7 +1658,7 @@ PRIVATE ATTR_MALLOC ATTR_RETNONNULL NOBLOCK_IF(flags & GFP_ATOMIC)
 struct mallnode *KCALL mallnode_alloc(gfp_t gfp) {
 	struct mallnode *result;
 	struct heapptr ptr;
-	ptr = heap_alloc_untraced(&mall_heap,
+	ptr = heap_alloc_untraced(&trace_heap,
 	                          offsetof(struct mallnode, m_trace) +
 	                          (CONFIG_MALL_TRACEMIN * sizeof(void *)),
 	                          MALL_HEAP_FLAGS | (gfp & GFP_INHERIT));
@@ -1671,7 +1674,7 @@ PRIVATE ATTR_MALLOC NOBLOCK_IF(flags & GFP_ATOMIC) struct mallnode *
 NOTHROW(KCALL mallnode_alloc_nx)(gfp_t gfp) {
 	struct mallnode *result;
 	struct heapptr ptr;
-	ptr = heap_alloc_untraced_nx(&mall_heap,
+	ptr = heap_alloc_untraced_nx(&trace_heap,
 	                             offsetof(struct mallnode, m_trace) +
 	                             (CONFIG_MALL_TRACEMIN * sizeof(void *)),
 	                             MALL_HEAP_FLAGS | (gfp & GFP_INHERIT));
@@ -1687,7 +1690,7 @@ NOTHROW(KCALL mallnode_alloc_nx)(gfp_t gfp) {
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL mallnode_free)(struct mallnode *__restrict self) {
-	heap_free_untraced(&mall_heap,
+	heap_free_untraced(&trace_heap,
 	                   self,
 	                   self->m_size,
 	                   MALL_HEAP_FLAGS);
@@ -2021,6 +2024,7 @@ DECL_END
 #include "debug-malloc-impl.c.inl"
 #endif /* !__INTELLISENSE__ */
 
+#endif /* !CONFIG_USE_NEW_DEBUG_MALLOC */
 #endif /* CONFIG_DEBUG_MALLOC */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_DEBUG_MALLOC_C */

@@ -145,11 +145,19 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 
 	case KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS:
 		cred_require_sysadmin();
+#ifdef CONFIG_USE_NEW_DEBUG_MALLOC
+		return (syscall_slong_t)kmalloc_leaks();
+#else /* CONFIG_USE_NEW_DEBUG_MALLOC */
 		return (syscall_slong_t)mall_dump_leaks(GFP_NORMAL);
+#endif /* !CONFIG_USE_NEW_DEBUG_MALLOC */
 
 	case KSYSCTL_SYSTEM_MEMORY_VALIDATE_PADDING:
 		cred_require_sysadmin();
+#ifdef CONFIG_USE_NEW_DEBUG_MALLOC
+		kmalloc_validate();
+#else /* CONFIG_USE_NEW_DEBUG_MALLOC */
 		mall_validate_padding();
+#endif /* !CONFIG_USE_NEW_DEBUG_MALLOC */
 		return 0;
 
 	case KSYSCTL_SYSTEM_BRANCH_DUMP_STATS:

@@ -570,7 +570,7 @@ INTDEF kernel_system_clearcache_t __kernel_system_clearcaches_end[];
 
 
 #ifdef CONFIG_DEBUG_MALLOC
-INTDEF ATTR_WEAK struct heap mall_heap;
+INTDEF ATTR_WEAK struct heap trace_heap;
 #endif /* CONFIG_DEBUG_MALLOC */
 
 
@@ -584,8 +584,8 @@ PUBLIC NOBLOCK size_t NOTHROW(KCALL system_trimheaps)(void) {
 			result = (size_t)-1;
 	}
 #ifdef CONFIG_DEBUG_MALLOC
-	if (&mall_heap) {
-		temp = heap_trim(&mall_heap, 0);
+	if (&trace_heap) {
+		temp = heap_trim(&trace_heap, 0);
 		if (OVERFLOW_UADD(result, temp, &result))
 			result = (size_t)-1;
 	}

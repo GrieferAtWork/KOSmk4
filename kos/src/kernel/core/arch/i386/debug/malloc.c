@@ -53,9 +53,7 @@ PRIVATE ATTR_FREETEXT void KCALL inject_ret(void *at, u16 n_bytes) {
 }
 
 struct lcpustate;
-INTDEF ATTR_WEAK void
-NOTHROW(KCALL debug_malloc_generate_traceback)(void **__restrict buffer, size_t buflen,
-                                               struct lcpustate *__restrict state);
+INTDEF ATTR_WEAK void trace_malloc_generate_traceback();
 
 PRIVATE void
 NOTHROW(KCALL noop_generate_traceback)(void **__restrict buffer, size_t buflen,
@@ -81,8 +79,8 @@ kernel_disable_debug_malloc(void) {
 	 * associated with mall debugging enabled.
 	 * If that function as defined (we check for this by weakly linking it),
 	 * then redirect it against a no-op traceback generator function. */
-	if (debug_malloc_generate_traceback) {
-		inject_jmp((void *)&debug_malloc_generate_traceback,
+	if (trace_malloc_generate_traceback) {
+		inject_jmp((void *)&trace_malloc_generate_traceback,
 		           (void *)&noop_generate_traceback);
 	}
 }

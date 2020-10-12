@@ -389,6 +389,7 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 	        "&_asyncwork = %p\n",
 	        self, &_boottask, &_bootidle, &_asyncwork);
 	assert(sync_writing(&vm_kernel.v_treelock));
+	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
 
 	/* Unlink + unmap the trampoline node. */
 	node = vm_paged_node_remove(&vm_kernel, FORTASK(self, this_trampoline_node).vn_node.a_vmin);
@@ -473,6 +474,9 @@ INTDEF pertask_fini_t __kernel_pertask_fini_end[];
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	pertask_fini_t *iter;
+	assert(self->t_refcnt == 0);
+	assert((self->t_flags & TASK_FTERMINATED) || !(self->t_flags & TASK_FSTARTED));
+
 	/* Run task finalizers. */
 	iter = __kernel_pertask_fini_start;
 	for (; iter < __kernel_pertask_fini_end; ++iter)

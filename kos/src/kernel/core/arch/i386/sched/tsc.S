@@ -569,6 +569,13 @@ INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
 	EXTERN(this_sstate)
 	movP   this_sstate(%Pax), %Psp
 
+#ifndef NDEBUG
+	cmpP   $(0x00200000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
+	jna    1f /* if (!(STATE.EFLAGS > 0x00200000)) goto 1f; */
+	int3
+1:
+#endif /* !NDEBUG */
+
 	/* Load other scheduler-related register values. */
 	EXTERN(this_x86_kernel_psp0)
 	movP   this_x86_kernel_psp0(%Pax), %Pcx

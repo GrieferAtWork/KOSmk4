@@ -375,7 +375,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	kernel_initialize_selftest();
 #endif /* CONFIG_SELFTEST */
 
+#ifdef CONFIG_USE_NEW_DEBUG_MALLOC
+	kmalloc_leaks();
+#else /* CONFIG_USE_NEW_DEBUG_MALLOC */
 	mall_dump_leaks(GFP_NORMAL);
+#endif /* !CONFIG_USE_NEW_DEBUG_MALLOC */
 
 #if 0
 	decref(driver_insmod("iso9660", "a b foobar bazbaz"));

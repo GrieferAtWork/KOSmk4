@@ -603,8 +603,10 @@ panic_kernel_dbg_main(void *arg) {
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
-                        char const *format, va_list args) {
+kernel_vpanic_ucpustate_n(unsigned int n_skip,
+                          struct ucpustate *__restrict state,
+                          char const *format, va_list args) {
+	(void)n_skip; /* TODO: Support for `n_skip'! */
 	PREEMPTION_DISABLE();
 	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
@@ -636,44 +638,85 @@ kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
-kernel_vpanic_lcpustate(struct lcpustate *__restrict state,
+kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
                         char const *format, va_list args) {
+	kernel_vpanic_ucpustate_n(0, state, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
+kernel_vpanic_lcpustate_n(unsigned int n_skip,
+                          struct lcpustate *__restrict state,
+                          char const *format, va_list args) {
 	struct ucpustate ustate;
 	lcpustate_to_ucpustate(state, &ustate);
-	kernel_vpanic_ucpustate(&ustate, format, args);
+	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
+kernel_vpanic_kcpustate_n(unsigned int n_skip,
+                          struct kcpustate *__restrict state,
+                          char const *format, va_list args) {
+	struct ucpustate ustate;
+	kcpustate_to_ucpustate(state, &ustate);
+	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
+kernel_vpanic_icpustate_n(unsigned int n_skip,
+                          struct icpustate *__restrict state,
+                          char const *format, va_list args) {
+	struct ucpustate ustate;
+	icpustate_to_ucpustate(state, &ustate);
+	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
+kernel_vpanic_scpustate_n(unsigned int n_skip,
+                          struct scpustate *__restrict state,
+                          char const *format, va_list args) {
+	struct ucpustate ustate;
+	scpustate_to_ucpustate(state, &ustate);
+	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
+kernel_vpanic_fcpustate_n(unsigned int n_skip,
+                          struct fcpustate *__restrict state,
+                          char const *format, va_list args) {
+	struct ucpustate ustate;
+	/* XXX: Don't convert to ucpustate. - This causes information to be lost... */
+	fcpustate_to_ucpustate(state, &ustate);
+	kernel_vpanic_ucpustate_n(n_skip, &ustate, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
+kernel_vpanic_lcpustate(struct lcpustate *__restrict state,
+                        char const *format, va_list args) {
+	kernel_vpanic_lcpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_kcpustate(struct kcpustate *__restrict state,
                         char const *format, va_list args) {
-	struct ucpustate ustate;
-	kcpustate_to_ucpustate(state, &ustate);
-	kernel_vpanic_ucpustate(&ustate, format, args);
+	kernel_vpanic_kcpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_icpustate(struct icpustate *__restrict state,
                         char const *format, va_list args) {
-	struct ucpustate ustate;
-	icpustate_to_ucpustate(state, &ustate);
-	kernel_vpanic_ucpustate(&ustate, format, args);
+	kernel_vpanic_icpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_scpustate(struct scpustate *__restrict state,
                         char const *format, va_list args) {
-	struct ucpustate ustate;
-	scpustate_to_ucpustate(state, &ustate);
-	kernel_vpanic_ucpustate(&ustate, format, args);
+	kernel_vpanic_scpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void FCALL
 kernel_vpanic_fcpustate(struct fcpustate *__restrict state,
                         char const *format, va_list args) {
-	struct ucpustate ustate;
-	/* XXX: Don't convert to ucpustate. - This causes information to be lost... */
-	fcpustate_to_ucpustate(state, &ustate);
-	kernel_vpanic_ucpustate(&ustate, format, args);
+	kernel_vpanic_fcpustate_n(0, state, format, args);
 }
 
 
@@ -683,7 +726,7 @@ kernel_panic_ucpustate(struct ucpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
-	kernel_vpanic_ucpustate(state, format, args);
+	kernel_vpanic_ucpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
@@ -691,7 +734,7 @@ kernel_panic_lcpustate(struct lcpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
-	kernel_vpanic_lcpustate(state, format, args);
+	kernel_vpanic_lcpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
@@ -699,7 +742,7 @@ kernel_panic_kcpustate(struct kcpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
-	kernel_vpanic_kcpustate(state, format, args);
+	kernel_vpanic_kcpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
@@ -707,7 +750,7 @@ kernel_panic_icpustate(struct icpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
-	kernel_vpanic_icpustate(state, format, args);
+	kernel_vpanic_icpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
@@ -715,7 +758,7 @@ kernel_panic_scpustate(struct scpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
-	kernel_vpanic_scpustate(state, format, args);
+	kernel_vpanic_scpustate_n(0, state, format, args);
 }
 
 PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
@@ -723,8 +766,64 @@ kernel_panic_fcpustate(struct fcpustate *__restrict state,
                        char const *format, ...) {
 	va_list args;
 	va_start(args, format);
-	kernel_vpanic_fcpustate(state, format, args);
+	kernel_vpanic_fcpustate_n(0, state, format, args);
 }
+
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
+kernel_panic_ucpustate_n(unsigned int n_skip,
+                         struct ucpustate *__restrict state,
+                         char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	kernel_vpanic_ucpustate_n(n_skip, state, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
+kernel_panic_lcpustate_n(unsigned int n_skip,
+                         struct lcpustate *__restrict state,
+                         char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	kernel_vpanic_lcpustate_n(n_skip, state, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
+kernel_panic_kcpustate_n(unsigned int n_skip,
+                         struct kcpustate *__restrict state,
+                         char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	kernel_vpanic_kcpustate_n(n_skip, state, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
+kernel_panic_icpustate_n(unsigned int n_skip,
+                         struct icpustate *__restrict state,
+                         char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	kernel_vpanic_icpustate_n(n_skip, state, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
+kernel_panic_scpustate_n(unsigned int n_skip,
+                         struct scpustate *__restrict state,
+                         char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	kernel_vpanic_scpustate_n(n_skip, state, format, args);
+}
+
+PUBLIC ATTR_NORETURN ATTR_COLD ATTR_COLDTEXT void VCALL
+kernel_panic_fcpustate_n(unsigned int n_skip,
+                         struct fcpustate *__restrict state,
+                         char const *format, ...) {
+	va_list args;
+	va_start(args, format);
+	kernel_vpanic_fcpustate_n(n_skip, state, format, args);
+}
+
 
 DECL_END
 
