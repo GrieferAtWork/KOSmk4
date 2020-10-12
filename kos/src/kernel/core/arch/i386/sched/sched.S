@@ -124,11 +124,11 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	cli
 #endif /* !CONFIG_NO_SMP */
 #ifdef __x86_64__
-	EXTERN(x86_load_scpustate_rsp_gsbase_rax)
-	jmp    x86_load_scpustate_rsp_gsbase_rax
+	EXTERN(x86_load_scpustate_rsp_gsbase_rax_nopr)
+	jmp    x86_load_scpustate_rsp_gsbase_rax_nopr
 #else /* __x86_64__ */
-	EXTERN(x86_load_scpustate_esp)
-	jmp    x86_load_scpustate_esp
+	EXTERN(x86_load_scpustate_esp_nopr)
+	jmp    x86_load_scpustate_esp_nopr
 #endif /* !__x86_64__ */
 	.cfi_restore_state
 .Lillegal_task_yield:
@@ -332,15 +332,18 @@ PUBLIC_FUNCTION(task_tryyield)
 #else /* __x86_64__ */
 	movl   $(TASK_TRYYIELD_NO_SUCCESSOR), (OFFSET_SCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)(%esp)
 #endif /* !__x86_64__ */
+
 #ifndef CONFIG_NO_SMP
-	pause
+	pause /* Set other CPUs run for a bit */
+	cli   /* Don't forget to re-disable interrupts before loading the new CPU state */
 #endif /* !CONFIG_NO_SMP */
+
 #ifdef __x86_64__
-	EXTERN(x86_load_scpustate_rsp_gsbase_rax)
-	jmp    x86_load_scpustate_rsp_gsbase_rax
+	EXTERN(x86_load_scpustate_rsp_gsbase_rax_nopr)
+	jmp    x86_load_scpustate_rsp_gsbase_rax_nopr
 #else /* __x86_64__ */
-	EXTERN(x86_load_scpustate_esp)
-	jmp    x86_load_scpustate_esp
+	EXTERN(x86_load_scpustate_esp_nopr)
+	jmp    x86_load_scpustate_esp_nopr
 #endif /* !__x86_64__ */
 	.cfi_endproc
 END(task_tryyield)

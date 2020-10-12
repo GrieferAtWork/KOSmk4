@@ -655,10 +655,18 @@ INTERN_LABEL(__x86_lazy_disable_ioperm_bitmap_return):
 1:
 
 #ifdef __x86_64__
-INTERN_FUNCTION(x86_load_scpustate_rsp_gsbase_rax)
+INTERN_FUNCTION(x86_load_scpustate_rsp_gsbase_rax_nopr)
 #else /* __x86_64__ */
-INTERN_FUNCTION(x86_load_scpustate_esp)
+INTERN_FUNCTION(x86_load_scpustate_esp_nopr)
 #endif /* !__x86_64__ */
+
+#ifndef NDEBUG
+	pushfP_cfi
+	testP  $(EFLAGS_IF), 0(%Psp)
+	jz     1f
+	int3   /* ASSERTION FAILED: Interrupt should be off when you get here! */
+1:	popfP_cfi
+#endif /* !NDEBUG */
 
 #ifdef __x86_64__
 	.cfi_register %gs.base, %rax
@@ -698,9 +706,9 @@ PRIVATE_FUNCTION(x86_unwind_scpustate_Psp)
 END(x86_unwind_scpustate_Psp)
 #endif /* !__x86_64__ */
 #ifdef __x86_64__
-END(x86_load_scpustate_rsp_gsbase_rax)
+END(x86_load_scpustate_rsp_gsbase_rax_nopr)
 #else /* __x86_64__ */
-END(x86_load_scpustate_esp)
+END(x86_load_scpustate_esp_nopr)
 #endif /* !__x86_64__ */
 	nop /* This fixes tracebacks when the IRET breaks */
 	.cfi_restore_state
