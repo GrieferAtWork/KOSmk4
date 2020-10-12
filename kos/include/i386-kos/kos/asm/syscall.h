@@ -190,7 +190,7 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
 #endif /* ... */
 
 #ifndef __X86_SYSCALL_ASSEMBLY
-#define __X86_SYSCALL_ASSEMBLY "tint {$0x80|80h}"
+#define __X86_SYSCALL_ASSEMBLY "int {$0x80|80h}"
 /* Encode a CFI sequence to clear EFLAGS.DF when the system call returns
  * by throwing an exception. This is required since the kernel will preserve
  * the state of EFLAGS.DF, and libc's unwind engine has to be told to clear
