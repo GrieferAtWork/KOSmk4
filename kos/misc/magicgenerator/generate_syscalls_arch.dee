@@ -24,10 +24,10 @@ import * from .generate_syscalls;
 class SyscallArch {
 	this = default;
 
-	@@name of the platform (e.g. `i386-kos')
+	@@name of the platform (e.g. `i386-kos`)
 	member platformName: string;
 
-	@@Architecture of the platform (e.g. `i386')
+	@@Architecture of the platform (e.g. `i386`)
 	member platformArch: string;
 
 	@@Optional suffix for platform files (for use with multi-arch platforms)
@@ -47,10 +47,10 @@ class SyscallArch {
 	@@Set of (name, arch) for hybridized syscalls-types.h headers
 	member platformSyscallCompatTypes: {(string, string)...} = none;
 
-	@@Name of the architecture that is targeted by `__ARCH_HAVE_COMPAT', and
+	@@Name of the architecture that is targeted by `__ARCH_HAVE_COMPAT`, and
 	@@for which compatibility-mode implementation requests are issued to the
-	@@kernel. (when defined, emit `#define __ARCH_WANT_COMPAT_SYSCALL_XXX 1'
-	@@alongside `#define __ARCH_WANT_SYSCALL_YYY 1' in `<kos/kernel/syscalls.h>')
+	@@kernel. (when defined, emit `#define __ARCH_WANT_COMPAT_SYSCALL_XXX 1`
+	@@alongside `#define __ARCH_WANT_SYSCALL_YYY 1` in `<kos/kernel/syscalls.h>`)
 	@@NOTE: Compatibility-mode system calls that are already share binary
 	@@      compatibility with other, regular system calls will not cause
 	@@      an implementation request to be issued.
@@ -59,7 +59,7 @@ class SyscallArch {
 	@@Size of general-purpose registers used for passing system call arguments (in bits)
 	member platformGpRegisterSizeInBits: int;
 
-	@@Size of `sizeof(void *)'
+	@@Size of `sizeof(void *)`
 	member platformPointerSizeInBytes: int;
 
 	@@The number of registers used to pass system call arguments
@@ -71,12 +71,19 @@ class SyscallArch {
 	@@Number of system call tables used by this platform
 	member platformSyscallTableCount: int;
 
-	@@The max possibly system call number (usually `(1 << platformGpRegisterSizeInBits) - 1')
+	@@The max possibly system call number (usually `(1 << platformGpRegisterSizeInBits) - 1`)
 	member platformMaxPossibleSysno: int;
 
 	@@Print common code which may be used by @platformLibcSyscallWrapper
 	@@This is a @function(fp: File)
-	member platformLibcSyscallCommon: Callable = none;
+	member platformLibcSyscallPrefix: Callable = none;
+	member platformLibcSyscallSuffix: Callable = none;
+
+	/* Prefix/Suffix for noexcept/except system call wrappers. */
+	member platformLibcSyscallNoexceptPrefix: Callable = none;
+	member platformLibcSyscallNoexceptSuffix: Callable = none;
+	member platformLibcSyscallExceptPrefix: Callable = none;
+	member platformLibcSyscallExceptSuffix: Callable = none;
 
 	@@Print assembly for invoking
 	@@This is a @function(fp: File, f: Function, sysno: int, enableExcept: bool)
@@ -87,18 +94,18 @@ class SyscallArch {
 	member platformKernelSyscallWrappersCommon: Callable = none;
 
 	@@Mapping of known system call wrappers.
-	@@@key:   The prefix to be pre-pended before the wrappers's name
-	@@        e.g. when `__fooasm_', one symbol might be `__fooasm_exit'
+	@@@key:   The prefix to be pre-pended before the wrappers´s name
+	@@        e.g. when `__fooasm_`, one symbol might be `__fooasm_exit`
 	@@@value: A tuple @(function(fp: File, f: Function, sysno: int),
 	@@                  arch_origin_name)
 	@@        This function should print the assembly body for servicing
 	@@        the system call in the context in which this wrapper might
-	@@        be called. The given `f' is the function that is being defined.
-	@@        @arch_origin_name is the name of the ARCH who's system calls
+	@@        be called. The given `f` is the function that is being defined.
+	@@        @arch_origin_name is the name of the ARCH who´s system calls
 	@@        should be wrapped. Normally this is the same name as the
 	@@        current arch, however in order to allow for multi-arch
-	@@        compatibility mode (such as x86_64's IA32-mode), one is
-	@@        allowed to specify a different arch who's system calls
+	@@        compatibility mode (such as x86_64´s IA32-mode), one is
+	@@        allowed to specify a different arch who´s system calls
 	@@        are then going to be wrapped.
 	member platformKernelSyscallWrappers: {string: (Callable, string)};
 
@@ -114,6 +121,27 @@ class SyscallArch {
 /************************************************************************/
 /* I386                                                                 */
 /************************************************************************/
+/* Print instructions to set/restore EFLAGS.DF before/after a system call.
+ * NOTE: The sysv i386 specs require that EFLAGS.DF=0 during normal user-space
+ *       operations, so we the user wants to invoke a system call without
+ *       exceptions, additional set-up is required. */
+
+/* CFI code to inject in order to clear EFLAGS.DF upon return */
+/*[[[deemon
+import * from ..libgen.cfi.compiler;
+local bytes = compileExpressionEx('i386', '%eflags', r'
+	push %eflags     # %eflags
+	push $EFLAGS_DF  # %eflags, EFLAGS_DF
+	not              # %eflags, ~EFLAGS_DF
+	and              # (%eflags & ~EFLAGS_DF)
+', deref_after: false);
+print("final global i386CfiClearDF = ", repr(", ".join(
+	for (local b: bytes) "0x" + b.hex()[2:].zfill(2))), ";");
+]]]*/
+final global i386CfiClearDF = "0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a";
+/*[[[end]]]*/
+#define I386_SETDF_BEGIN(fp, enableExcept) if (enableExcept) fp << "\tstd /* Enable exceptions */\n";
+#define I386_SETDF_END(fp, enableExcept)   if (enableExcept) fp << "\tcld /* Disable exceptions */\n";
 final global i386SyscallArgumentRegisters = { "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" };
 function i386_printLibcSyscallSysenterCdeclInvocation(
 		fp: File, registerCount: int, enableExcept: bool) {
@@ -135,9 +163,9 @@ function i386_printLibcSyscallSysenterCdeclInvocation(
 	} else if (registerCount > 4) {
 		fp << "	" << "pushl_cfi " << (spOffset + 16) << "(%esp)\n";
 	}
-	fp << "	call   libc_x86_sysenter_";
-	if (enableExcept) fp << "X";
-	fp << "common\n";
+	I386_SETDF_BEGIN(fp, enableExcept)
+	fp << "	call   libc_x86_sysenter_common\n";
+	I386_SETDF_END(fp, enableExcept)
 	if (registerCount > 4) {
 		local off = 4 * (registerCount - 4);
 		fp << "	" << "addl   $(" << off << "), %esp\n";
@@ -163,17 +191,17 @@ function i386_printLibcSyscallInt80CdeclInvocation(
 		fp << "	" << "pushl_cfi_r " << x << "\n";
 	for (local i: [:registerCount])
 		fp << "	" << "movl   " << (sp_offset + i * 4) << "(%esp), " << i386SyscallArgumentRegisters[i] << "\n";
-	fp << (enableExcept ? "	stc\n" : "	clc\n");
+	I386_SETDF_BEGIN(fp, enableExcept)
 	fp << "	int    $(0x80)\n";
+	I386_SETDF_END(fp, enableExcept)
 	for (local x: preservedRegisters.reversed())
 		fp << "	" << "popl_cfi_r " << x << "\n";
 }
 
-function i386_printLibcSyscallWrapperCommon(fp: File) {
+function i386_printLibcSyscallWrapperPrefix(fp: File) {
 	fp << "#include <asm/cfi.h>\n";
 	fp << "\n";
 	fp << "EXTERN(libc_x86_sysenter_common)\n";
-	fp << "EXTERN(libc_x86_sysenter_Xcommon)\n";
 	fp << "EXTERN(libc_x86_syscall_check_sysenter)\n";
 	fp << "\n";
 	for (local enableExcept: { false, true }) {
@@ -181,12 +209,14 @@ function i386_printLibcSyscallWrapperCommon(fp: File) {
 		for (local registerCount: [1:6+1]) {
 			local name = "x86_exec_{}syscall{}".format({ conditionalX, registerCount });
 			fp << "#ifdef __OPTIMIZE_SIZE__\n";
-			fp << ".section .text.crt.syscall." << name << ", \"ax\"\n";
+			fp << ".section .text.crt.syscalls\n";
 			fp << "#else /* __OPTIMIZE_SIZE__ */\n";
-			fp << ".section .xdata.crt.syscall." << name << ", \"awx\"\n";
+			fp << ".section .xdata.crt.syscalls, \"awx\"\n";
 			fp << "#endif /* !__OPTIMIZE_SIZE__ */\n";
 			fp << "INTERN_FUNCTION(libc_" << name << ")\n";
 			fp << "	.cfi_startproc\n";
+			if (enableExcept)
+				fp << "	.cfi_escape " << i386CfiClearDF << "\n";
 			fp << "#ifndef __OPTIMIZE_SIZE__\n";
 			fp << "	call   libc_x86_syscall_check_sysenter\n";
 			fp << "	.byte  0x74\n";
@@ -202,6 +232,13 @@ function i386_printLibcSyscallWrapperCommon(fp: File) {
 			fp << "END(libc_" << name << ")\n";
 		}
 	}
+	fp << "\n";
+	fp << ".section .text.crt.syscalls\n";
+	fp << ".cfi_startproc /* Unwinding for syscall wrappers */\n";
+}
+
+function i386_printLibcSyscallWrapperSuffix(fp: File) {
+	fp << ".cfi_endproc /* Unwinding for syscall wrappers */\n";
 }
 
 function i386_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enableExcept: bool) {
@@ -457,6 +494,20 @@ function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: i
 /************************************************************************/
 /* X86_64                                                               */
 /************************************************************************/
+/* CFI code to inject in order to clear EFLAGS.DF upon return */
+/*[[[deemon
+import * from ..libgen.cfi.compiler;
+local bytes = compileExpressionEx('x86_64', '%rflags', r'
+	push %rflags     # %rflags
+	push $EFLAGS_DF  # %rflags, EFLAGS_DF
+	not              # %rflags, ~EFLAGS_DF
+	and              # (%rflags & ~EFLAGS_DF)
+', deref_after: false);
+print("final global x86_64CfiClearDF = ", repr(", ".join(
+	for (local b: bytes) "0x" + b.hex()[2:].zfill(2))), ";");
+]]]*/
+final global x86_64CfiClearDF = "0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a";
+/*[[[end]]]*/
 final global x86_64SyscallArgumentRegisters = { "%rdi", "%rsi", "%rdx", "%r10", "%r8", "%r9" };
 final global x86_64SysvABIRegisters = { "%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9" };
 final global x86_64Reg8NamesOfReg32 = {
@@ -471,11 +522,15 @@ final global x86_64Reg16NamesOfReg32 = {
 	"%esp" : "%sp", "%ebp" : "%bp",
 	"%esi" : "%si", "%edi" : "%di",
 };
-function x86_64_printLibcSyscallWrapperCommon(fp: File) {
+function x86_64_printLibcSyscallWrapperPrefix(fp: File) {
+	fp << ".cfi_startproc\n";
+	fp << ".cfi_escape " << x86_64CfiClearDF << " /* Clear EFLAGS.DF on exit */\n";
+}
+function x86_64_printLibcSyscallWrapperSuffix(fp: File) {
+	fp << ".cfi_endproc\n";
 }
 
 function x86_64_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enableExcept: bool) {
-	fp << "	.cfi_startproc\n";
 	if (sysno == 0) {
 		fp << "	xorq   %rax, %rax\n";
 	} else {
@@ -483,10 +538,10 @@ function x86_64_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enabl
 	}
 	if (f.getArgumentRegisterCount(64) >= 4)
 		fp << "	movq   %rcx, %r10\n";
-	fp << (enableExcept ? "	stc\n" : "	clc\n");
+	I386_SETDF_BEGIN(fp, enableExcept)
 	fp << "	syscall\n";
+	I386_SETDF_END(fp, enableExcept)
 	fp << "	ret\n";
-	fp << "	.cfi_endproc\n";
 }
 
 function x86_64_printKernelSyscallWrapperCommon(fp: File) {
@@ -1368,7 +1423,8 @@ global ARCH: {string: SyscallArch} = {
 		platformEndian: "le",
 		platformSyscallTableCount: 2,
 		platformMaxPossibleSysno: 0xffffffff,
-		platformLibcSyscallCommon: i386_printLibcSyscallWrapperCommon,
+		platformLibcSyscallPrefix: i386_printLibcSyscallWrapperPrefix,
+		platformLibcSyscallSuffix: i386_printLibcSyscallWrapperSuffix,
 		platformLibcSyscallWrapper: i386_printLibcSyscallWrapper,
 		platformKernelSyscallWrappersCommon: i386_printKernelSyscallWrapperCommon,
 		platformKernelSyscallWrappers: {
@@ -1409,7 +1465,8 @@ global ARCH: {string: SyscallArch} = {
 		platformEndian: "le",
 		platformSyscallTableCount: 2,
 		platformMaxPossibleSysno: 0xffffffffffffffff,
-		platformLibcSyscallCommon: x86_64_printLibcSyscallWrapperCommon,
+		platformLibcSyscallPrefix: x86_64_printLibcSyscallWrapperPrefix,
+		platformLibcSyscallSuffix: x86_64_printLibcSyscallWrapperSuffix,
 		platformLibcSyscallWrapper: x86_64_printLibcSyscallWrapper,
 		platformKernelSyscallWrappersCommon: x86_64_printKernelSyscallWrapperCommon,
 		platformKernelSyscallWrappers: {
@@ -1431,7 +1488,7 @@ global ARCH: {string: SyscallArch} = {
 //		platformEndian: "le",
 //		platformSyscallTableCount: 2,
 //		platformMaxPossibleSysno: 0xffffffff,
-//		platformLibcSyscallCommon: arm_printLibcSyscallWrapperCommon,
+//		platformLibcSyscallPrefix: arm_printLibcSyscallWrapperCommon,
 //		platformLibcSyscallWrapper: arm_printLibcSyscallWrapper,
 //		platformKernelSyscallWrappersCommon: arm_printKernelSyscallWrapperCommon,
 //		platformKernelSyscallWrappers: {

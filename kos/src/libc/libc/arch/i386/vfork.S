@@ -40,13 +40,10 @@ INTERN_FUNCTION(libc_vfork)
 	.cfi_register %Pip, %Pdx
 
 	/* Invoke the vfork() system call. */
+	movP   $(SYS_vfork), %Pax
 #ifdef __x86_64__
-	movq   $(SYS_vfork), %rax
-	clc
 	syscall
 #else /* __x86_64__ */
-	movl   $(SYS_vfork), %eax
-	clc
 	int    $(0x80)
 #endif /* !__x86_64__ */
 
@@ -89,15 +86,14 @@ INTERN_FUNCTION(libc_VFork)
 	.cfi_register %Pip, %Pdx
 
 	/* Invoke the vfork() system call. */
+	movP   $(SYS_vfork), %Pax
+	std /* Enable exceptions */
 #ifdef __x86_64__
-	movq   $(SYS_vfork), %rax
-	stc
 	syscall
 #else /* __x86_64__ */
-	movl   $(SYS_vfork), %eax
-	stc
 	int    $(0x80)
 #endif /* !__x86_64__ */
+	cld /* Disable exceptions */
 
 	/* Return to the caller. */
 	jmpP   *%Pdx

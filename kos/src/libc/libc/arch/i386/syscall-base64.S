@@ -36,7 +36,6 @@ INTERN_FUNCTION(libc_syscall)
 	movq   %r8,     %r10 /* arg #3 */
 	movq   %r9,     %r8  /* arg #4 */
 	movq   8(%rsp), %r9  /* arg #5 */
-	clc
 	syscall
 	cmpq   $(-4096), %rax /* Check for error. */
 	ja     1f
@@ -62,8 +61,9 @@ INTERN_FUNCTION(libc_Syscall)
 	movq   %r8,     %r10 /* arg #3 */
 	movq   %r9,     %r8  /* arg #4 */
 	movq   8(%rsp), %r9  /* arg #5 */
-	stc
+	std /* Enable exceptions */
 	syscall
+	cld /* Disable exceptions */
 	ret
 	.cfi_endproc
 END(libc_Syscall)

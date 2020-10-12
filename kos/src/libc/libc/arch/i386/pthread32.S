@@ -88,7 +88,6 @@ INTERN_FUNCTION(libc_pthread_clone)
 	            CLONE_PARENT | CLONE_THREAD | CLONE_SYSVSEM | CLONE_SETTLS |       \
 	            CLONE_CHILD_CLEARTID | CLONE_DETACHED | CLONE_CHILD_SETTID |       \
 	            CLONE_IO | CLONE_PARENT_SETTID | CLONE_CRED)
-	clc
 	lcall  $(7), $(SYS_clone)
 
 	/* Check if we're inside of the child thread
@@ -120,7 +119,6 @@ INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
 	movl   %ecx,          %ebx /* munmap:addr = void *stackaddr */
 	movl   %edx,          %ecx /* munmap:len  = size_t stacksize */
 	movl   $(SYS_munmap), %eax
-	clc
 	int    $(0x80)             /* unmap our own stack. */
 	/* WARNING: No more accessing stack memory from here on! */
 

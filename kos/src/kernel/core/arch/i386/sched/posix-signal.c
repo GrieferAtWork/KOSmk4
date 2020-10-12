@@ -196,7 +196,7 @@ sigreturn32_impl(struct icpustate *__restrict state,
                  USER UNCHECKED sigset_t const *restore_sigmask,
                  USER UNCHECKED struct rpc_syscall_info32 const *sc_info) {
 	bool enable_except;
-	enable_except = (irregs_rdflags(&state->ics_irregs) & EFLAGS_CF) != 0;
+	enable_except = (irregs_rdflags(&state->ics_irregs) & EFLAGS_DF) != 0;
 	TRY {
 again:
 		validate_readable(restore_cpu, sizeof(*restore_cpu));
@@ -283,15 +283,15 @@ again:
 		}
 	} EXCEPT {
 		/* Implement our own custom exception handler to work around the fact
-		 * that EFLAGS.CF is undefined when sigreturn() is called, meaning it
+		 * that EFLAGS.DF is undefined when sigreturn() is called, meaning it
 		 * would also be undefined how exceptions caused by restarted system
 		 * calls are handled.
 		 * The intended behavior here is that sigreturn() only accounts for
-		 * its own EFLAGS.CF when validating and processing is restore arguments,
+		 * its own EFLAGS.DF when validating and processing is restore arguments,
 		 * but will mirror the exceptions model of a restarted system call. */
 
 		/* NOTE: Technically, this behavior right here is incorrect, as it doesn't
-		 *       preserve the correct user-space EFLAGS.CF value. However, we have
+		 *       preserve the correct user-space EFLAGS.DF value. However, we have
 		 *       no other way of passing the knowledge about how the exception should
 		 *       be propagated to `x86_userexcept_propagate()' and friends.
 		 *       So with this in mind, this is the best we can do when it comes to this problem.
@@ -299,8 +299,8 @@ again:
 		 * handlers, this shouldn't actually be a problem...
 		 * XXX: Why not call `x86_userexcept_propagate()' directly here? */
 		icpustate_setpflags(state,
-		                    (icpustate_getpflags(state) & ~EFLAGS_CF) |
-		                    (enable_except ? EFLAGS_CF : 0));
+		                    (icpustate_getpflags(state) & ~EFLAGS_DF) |
+		                    (enable_except ? EFLAGS_DF : 0));
 		RETHROW();
 	}
 	return state;
@@ -402,7 +402,7 @@ sigreturn64_impl(struct icpustate *__restrict state,
                  USER UNCHECKED sigset_t const *restore_sigmask,
                  USER UNCHECKED struct rpc_syscall_info64 const *sc_info) {
 	bool enable_except;
-	enable_except = (irregs_rdflags(&state->ics_irregs) & EFLAGS_CF) != 0;
+	enable_except = (irregs_rdflags(&state->ics_irregs) & EFLAGS_DF) != 0;
 	TRY {
 again:
 		validate_readable(restore_cpu, sizeof(*restore_cpu));
@@ -490,15 +490,15 @@ again:
 		}
 	} EXCEPT {
 		/* Implement our own custom exception handler to work around the fact
-		 * that EFLAGS.CF is undefined when sigreturn() is called, meaning it
+		 * that EFLAGS.DF is undefined when sigreturn() is called, meaning it
 		 * would also be undefined how exceptions caused by restarted system
 		 * calls are handled.
 		 * The intended behavior here is that sigreturn() only accounts for
-		 * its own EFLAGS.CF when validating and processing is restore arguments,
+		 * its own EFLAGS.DF when validating and processing is restore arguments,
 		 * but will mirror the exceptions model of a restarted system call. */
 
 		/* NOTE: Technically, this behavior right here is incorrect, as it doesn't
-		 *       preserve the correct user-space EFLAGS.CF value. However, we have
+		 *       preserve the correct user-space EFLAGS.DF value. However, we have
 		 *       no other way of passing the knowledge about how the exception should
 		 *       be propagated to `x86_userexcept_propagate()' and friends.
 		 *       So with this in mind, this is the best we can do when it comes to this problem.
@@ -506,8 +506,8 @@ again:
 		 * handlers, this shouldn't actually be a problem...
 		 * XXX: Why not call `x86_userexcept_propagate()' directly here? */
 		icpustate_setpflags(state,
-		                    (icpustate_getpflags(state) & ~EFLAGS_CF) |
-		                    (enable_except ? EFLAGS_CF : 0));
+		                    (icpustate_getpflags(state) & ~EFLAGS_DF) |
+		                    (enable_except ? EFLAGS_DF : 0));
 		RETHROW();
 	}
 	return state;

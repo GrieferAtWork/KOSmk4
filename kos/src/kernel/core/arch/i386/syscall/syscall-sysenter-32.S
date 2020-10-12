@@ -165,7 +165,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
 	            RPC_SYSCALL_INFO_METHOD_SYSENTER_32)
 	/* Check if exceptions are enabled. */
-	ttest  mask=EFLAGS_CF, loc=(44 + OFFSET_IRREGS_EFLAGS)(%esp)
+	ttest  mask=EFLAGS_DF, loc=(44 + OFFSET_IRREGS_EFLAGS)(%esp)
 	jz     1f
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%esp)
 1:
@@ -390,8 +390,8 @@ INTERN_FUNCTION(__asm32_bad_sysenter_extension)
 	.cfi_restore_iret_es_or_offset -8
 	.cfi_restore_iret_ds_or_offset -12
 
-	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	ttest  mask=EFLAGS_CF, loc=12 + OFFSET_IRREGS_EFLAGS(%esp), seg=%ss
+	/* Check IRET.EFLAGS.DF if an exception should be thrown */
+	ttest  mask=EFLAGS_DF, loc=12 + OFFSET_IRREGS_EFLAGS(%esp), seg=%ss
 	jnz    1f
 
 	/* Check if we must sign-extend the error return value. */
@@ -479,8 +479,8 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter_break
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
-	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	ttest  mask=EFLAGS_CF, loc=OFFSET_IRREGS_EFLAGS(%esp), seg=%ss
+	/* Check IRET.EFLAGS.DF if an exception should be thrown */
+	ttest  mask=EFLAGS_DF, loc=OFFSET_IRREGS_EFLAGS(%esp), seg=%ss
 	jnz    1f
 	movl   $(-ENOSYS), %eax
 	iret

@@ -485,34 +485,12 @@ x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
 
 
 /* Set the appropriate error flag for the system call method described by `sc_info' (if any)
- * In all current cases where such a flag is defined, this is EFLAGS.CF, allowing user-space
- * to easily determine if an exception occurred by using `jc' instead of having to do a
- * `cmpl $-4096, %eax'. Note however that this feature isn't actually being used in libc, since
- * doing so would break POSIX compliance, as CF would not be set when a system call directly
- * returns a value that would fall into the errno range, such as is the case for some system
- * calls that do timeout-based wait operations and don't want to use a slow exception to indicate
- * the (quite common) case of the timeout having expired. */
+ * We (no longer) have a dedicated system error-flag. */
 LOCAL NOBLOCK NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL x86_userexcept_set_error_flag)(struct icpustate *__restrict state,
                                              struct rpc_syscall_info const *__restrict sc_info) {
-	switch (sc_info->rsi_flags & RPC_SYSCALL_INFO_FMETHOD) {
-
-	case RPC_SYSCALL_INFO_METHOD_INT80H_32:
-	case RPC_SYSCALL_INFO_METHOD_SYSENTER_32:
-	case RPC_SYSCALL_INFO_METHOD_LCALL7_32:
-#ifdef __x86_64__
-	case RPC_SYSCALL_INFO_METHOD_INT80H_64:
-	case RPC_SYSCALL_INFO_METHOD_LCALL7_64:
-#endif /* __x86_64__ */
-		/* Turn on EFLAGS.CF (it was off since otherwise the exception would not have
-		 * been translated to errno, as CF being set on entry would have indicated that
-		 * exceptions should have been used) */
-		icpustate_mskpflags(state, (uintptr_t)-1, EFLAGS_CF);
-		break;
-
-	default:
-		break;
-	}
+	(void)sc_info;
+	/* We (no longer) have a dedicated system error-flag. */
 	return state;
 }
 

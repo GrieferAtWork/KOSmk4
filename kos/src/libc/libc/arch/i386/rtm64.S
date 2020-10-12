@@ -87,7 +87,6 @@ INTERN_FUNCTION(libc_rtm_begin)
 	ret
 #else /* CONFIG_SUPPORT_HARDWARE_RTM */
 	movq   $(SYS_rtm_begin), %rax
-	clc
 	syscall
 	ret
 #endif /* !CONFIG_SUPPORT_HARDWARE_RTM */
@@ -103,11 +102,8 @@ DEFINE_PUBLIC_ALIAS(rtm_begin, libc_rtm_begin)
  * function does not return normally, but returns from the original `rtm_begin()' */
 INTERN_FUNCTION(libc_rtm_abort)
 	.cfi_startproc
-	.byte  0x48
-.Lrtm_abort_redirection:
-	.byte  0xc7, 0xc0       /* movq $(SYS_rtm_abort), %rax */
+	.byte  0x48, 0xc7, 0xc0       /* movq $(SYS_rtm_abort), %rax */
 	.long  (SYS_rtm_abort & 0xffffffff)
-	.byte  0xf8             /* clc */
 	syscall
 	ret
 	.cfi_endproc
@@ -121,7 +117,6 @@ DEFINE_PUBLIC_ALIAS(rtm_abort, libc_rtm_abort)
  * @return: 1 : An RTM operation is currently in progress */
 INTERN_FUNCTION(libc_rtm_test)
 	.cfi_startproc
-	.byte  0xf8             /* clc */
 	.byte  0x48             /* movq $(SYS_rtm_test), %rax */
 .Lrtm_test_redirection:
 	.byte  0xc7, 0xc0       /* ... */
@@ -140,7 +135,6 @@ DEFINE_PUBLIC_ALIAS(rtm_test, libc_rtm_test)
 INTERN_FUNCTION(libc___x86_rtm_xtest)
 	.cfi_startproc
 	movq   $(SYS_rtm_test), %rax
-	clc
 	syscall
 	/* NOTE: The `SYS_rtm_test' system call has some special handling in how
 	 *       it returns its result, in that in addition to setting %eax, it
@@ -195,7 +189,6 @@ END(rtm_selfmod_state)
 PRIVATE_FUNCTION(rtm_begin_emulated_after_mprotect_fail)
 	movl   $(0), rtm_selfmod_state(%rip)
 	movq   $(SYS_rtm_begin), %rax
-	clc
 	syscall
 	ret
 END(rtm_begin_emulated_after_mprotect_fail)
@@ -228,7 +221,6 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	movq   $(rtm_selfmod_end - rtm_selfmod_start), %rsi /* sys_mprotect:length */
 	movq   $(PROT_READ | PROT_WRITE | PROT_EXEC),  %rdx /* sys_mprotect:prot */
 	movq   $(SYS_mprotect), %rax
-	clc
 	syscall
 	testq  %rax, %rax
 	jnz    rtm_begin_emulated_after_mprotect_fail /* Fallback: Use RTM emulation (so the initial function state matches) */
@@ -274,7 +266,7 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 
 	/* Re-write helper function: `rtm_abort()' */
 	leaq   (libc_hw_rtm_abort)(%rip), %rcx
-	leaq   (.Lrtm_abort_redirection + 4)(%rip), %rax
+	leaq   (libc_rtm_abort + 5)(%rip), %rax
 	subq   %rax, %rcx
 	shlq   $(8), %rcx
 	movabs $(ENCODE_INT64(0xe9, /* jmp libc_hw_rtm_abort */          \
@@ -284,11 +276,11 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	                      0x00, /* ... */                            \
 	                      INT64_BYTE(SYS_rtm_abort & 0xffffffff, 2), \
 	                      INT64_BYTE(SYS_rtm_abort & 0xffffffff, 3), \
-	                      0xf8  /* clc */                            \
+	                      0x0f  /* INSTR("syscall").bytes[0] */      \
 	       )), %rdx
 	orq    %rcx, %rdx /* Fill in the jump-offset to `libc_hw_rtm_abort' */
 	/* Re-write the first 8 bytes of `rtm_abort()' to become `jmp libc_hw_rtm_abort' */
-	movq   %rdx, -1(%rax)
+	movq   %rdx, -5(%rax)
 
 	/* Re-write helper function: `__x86_rtm_xtest' to become `xtest; ret' */
 	movl   $(ENCODE_INT32(0x0f, 0x01, 0xd6, /* xtest */ \
@@ -296,7 +288,6 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	       )), libc___x86_rtm_xtest(%rip)
 
 	/* Re-write helper function: `rtm_test()'
-	 *   0xf8    clc
 	 *   0x48    movq $(SYS_rtm_test), %rax  -> .      xorq %rax, %rax
 	 *   0xc7    ...                         -> 0x31   ...
 	 *   0xc0    ...                         -> 0xc0   ...
@@ -343,7 +334,6 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	movq   $(rtm_selfmod_end - rtm_selfmod_start), %rsi /* sys_mprotect:length */
 	movq   $(PROT_READ | PROT_EXEC),               %rdx /* sys_mprotect:prot */
 	movq   $(SYS_mprotect), %rax
-	clc
 	syscall
 
 	popq_cfi_r %rbx
@@ -359,10 +349,10 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	 * [1] = (SYS_rtm_begin & 0x0000ff00) >> 8
 	 * [2] = (SYS_rtm_begin & 0x00ff0000) >> 16
 	 * [3] = (SYS_rtm_begin & 0xff000000) >> 24
-	 * [4] = 0xf8   // clc
-	 * [5] = 0x0f
-	 * [6] = 0x05   // syscall
-	 * [7] = 0xc3   // retq
+	 * [4] = 0x0f
+	 * [5] = 0x05   // syscall
+	 * [6] = 0xc3   // retq
+	 * [7] = 0x90   // nop
 	 *
 	 * By doing this, the function `rtm_begin()' gets re-written
 	 * such that it will invoke the system call used for emulation
@@ -371,10 +361,10 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	                      /* [1] = */ (SYS_rtm_begin & 0x0000ff00) >> 8,  \
 	                      /* [2] = */ (SYS_rtm_begin & 0x00ff0000) >> 16, \
 	                      /* [3] = */ (SYS_rtm_begin & 0xff000000) >> 24, \
-	                      /* [4] = */ 0xf8, /* clc */                     \
-	                      /* [5] = */ 0x0f,                               \
-	                      /* [6] = */ 0x05, /* syscall */                 \
-	                      /* [7] = */ 0xc3  /* retq */                    \
+	                      /* [4] = */ 0x0f,                               \
+	                      /* [5] = */ 0x05, /* syscall */                 \
+	                      /* [6] = */ 0xc3, /* retq */                    \
+	                      /* [7] = */ 0x90  /* nop */                     \
 	       )), %rax
 	movq   %rax, .Lrtm_begin_maybe_syscall(%rip)
 

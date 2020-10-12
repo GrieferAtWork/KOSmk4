@@ -57,7 +57,6 @@ INTERN_FUNCTION(libc_clone)
 	movq   %r9,     %r8  /* newtls */
 
 	/* pid_t clone(syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls) */
-	clc
 	movq   $(SYS_clone), %rax
 	syscall
 

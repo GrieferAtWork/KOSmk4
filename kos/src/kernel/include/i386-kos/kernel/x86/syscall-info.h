@@ -72,7 +72,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_int80h_ucpustate)(struct rpc_syscall_info *
 	                  RPC_SYSCALL_INFO_FREGVALID(3) |
 	                  RPC_SYSCALL_INFO_FREGVALID(4) |
 	                  RPC_SYSCALL_INFO_FREGVALID(5);
-	if (ucpustate_getpflags(state) & EFLAGS_CF)
+	if (ucpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ucs_gpregs);
 	self->rsi_regs[0] = gpregs_getpbx(&state->ucs_gpregs);
@@ -94,7 +94,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_int80h_icpustate)(struct rpc_syscall_info *
 	                  RPC_SYSCALL_INFO_FREGVALID(3) |
 	                  RPC_SYSCALL_INFO_FREGVALID(4) |
 	                  RPC_SYSCALL_INFO_FREGVALID(5);
-	if (icpustate_getpflags(state) & EFLAGS_CF)
+	if (icpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
 	self->rsi_regs[0] = gpregs_getpbx(&state->ics_gpregs);
@@ -116,7 +116,7 @@ rpc_syscall_info_get32_sysenter_icpustate(struct rpc_syscall_info *__restrict se
 	                  RPC_SYSCALL_INFO_FREGVALID(1) |
 	                  RPC_SYSCALL_INFO_FREGVALID(2) |
 	                  RPC_SYSCALL_INFO_FREGVALID(3);
-	if (icpustate_getpflags(state) & EFLAGS_CF)
+	if (icpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
 	self->rsi_regs[0] = gpregs_getpbx(&state->ics_gpregs);
@@ -147,7 +147,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
 	                  RPC_SYSCALL_INFO_FREGVALID(1) |
 	                  RPC_SYSCALL_INFO_FREGVALID(2) |
 	                  RPC_SYSCALL_INFO_FREGVALID(3);
-	if (ucpustate_getpflags(state) & EFLAGS_CF)
+	if (ucpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ucs_gpregs);
 	self->rsi_regs[0] = gpregs_getpbx(&state->ucs_gpregs);
@@ -213,7 +213,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 	 *       will have invoked the instruction from user-space. */
 	USER CHECKED byte_t *pc;
 	self->rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
-	if (ucpustate_getpflags(state) & EFLAGS_CF)
+	if (ucpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno = gpregs_getpax(&state->ucs_gpregs);
 	/* lcall $7, $? -- { 0x9a, ?, ?, ?, ?, 0x07, 0x00 } */
@@ -267,7 +267,7 @@ NOTHROW(FCALL rpc_syscall_info_get64_int80h_ucpustate)(struct rpc_syscall_info *
 	                  RPC_SYSCALL_INFO_FREGVALID(3) |
 	                  RPC_SYSCALL_INFO_FREGVALID(4) |
 	                  RPC_SYSCALL_INFO_FREGVALID(5);
-	if (ucpustate_getpflags(state) & EFLAGS_CF)
+	if (ucpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ucs_gpregs);
 	self->rsi_regs[0] = gpregs_getpdi(&state->ucs_gpregs);
@@ -289,7 +289,7 @@ NOTHROW(FCALL rpc_syscall_info_get64_int80h_icpustate)(struct rpc_syscall_info *
 	                  RPC_SYSCALL_INFO_FREGVALID(3) |
 	                  RPC_SYSCALL_INFO_FREGVALID(4) |
 	                  RPC_SYSCALL_INFO_FREGVALID(5);
-	if (icpustate_getpflags(state) & EFLAGS_CF)
+	if (icpustate_getpflags(state) & EFLAGS_DF)
 		self->rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	self->rsi_sysno   = gpregs_getpax(&state->ics_gpregs);
 	self->rsi_regs[0] = gpregs_getpdi(&state->ics_gpregs);

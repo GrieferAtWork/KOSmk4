@@ -102,20 +102,39 @@
 __SYSDECL_BEGIN
 #ifdef __x86_64__
 
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall0)(__syscall_ulong_t __sysno) { __register __syscall_ulong_t __res; __asm__ __volatile__("clc\n\tsyscall" : "=a" (__res) : "0" (__sysno) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall0)(__syscall_ulong_t __sysno) { __register __syscall_ulong_t __res; __asm__ __volatile__("stc\n\tsyscall" : "=a" (__res) : "0" (__sysno) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall1)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0) { __register __syscall_ulong_t __res; __asm__ __volatile__("clc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall1)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0) { __register __syscall_ulong_t __res; __asm__ __volatile__("stc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall2)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1) { __register __syscall_ulong_t __res; __asm__ __volatile__("clc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall2)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1) { __register __syscall_ulong_t __res; __asm__ __volatile__("stc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall3)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2) { __register __syscall_ulong_t __res; __asm__ __volatile__("clc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall3)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2) { __register __syscall_ulong_t __res; __asm__ __volatile__("stc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall4)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __asm__ __volatile__("clc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall4)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __asm__ __volatile__("stc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall5)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __asm__ __volatile__("clc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall5)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __asm__ __volatile__("stc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __register __syscall_ulong_t __r9 __asm__("%r9") = __arg5; __asm__ __volatile__("clc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8), "r" (__r9) : "memory", "cc", "rcx", "r11"); return __res; }
-__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __register __syscall_ulong_t __r9 __asm__("%r9") = __arg5; __asm__ __volatile__("stc\n\tsyscall" : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8), "r" (__r9) : "memory", "cc", "rcx", "r11"); return __res; }
+#define __X86_SYSCALL_ASSEMBLY \
+	"syscall"
+
+/* Encode a CFI sequence to clear EFLAGS.DF when the system call returns
+ * by throwing an exception. This is required since the kernel will preserve
+ * the state of EFLAGS.DF, and libc's unwind engine has to be told to clear
+ * the direction bit when unwinding. (if this isn't done, stuff like strlen()
+ * might break, since everything from libc is allowed to assume that EFLAGS.DF=0
+ * upon function entry) */
+#define __X86_XSYSCALL_ASSEMBLY                               \
+	"std\n\t"                                                 \
+	".cfi_remember_state\n\t"                                 \
+	".cfi_escape 0x16,0x31,7,0x90,0x31,0xa,0,4,0x20,0x1a\n\t" \
+	"syscall\n\t"                                             \
+	"cld\n\t"                                                 \
+	".cfi_restore_state"
+
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall0)(__syscall_ulong_t __sysno) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall0)(__syscall_ulong_t __sysno) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall1)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall1)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall2)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall2)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall3)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall3)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2) { __register __syscall_ulong_t __res; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall4)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall4)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall5)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall5)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __register __syscall_ulong_t __r9 __asm__("%r9") = __arg5; __asm__ __volatile__(__X86_SYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8), "r" (__r9) : "memory", "cc", "rcx", "r11"); return __res; }
+__FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __register __syscall_ulong_t __r10 __asm__("%r10") = __arg3; __register __syscall_ulong_t __r8 __asm__("%r8") = __arg4; __register __syscall_ulong_t __r9 __asm__("%r9") = __arg5; __asm__ __volatile__(__X86_XSYSCALL_ASSEMBLY : "=a" (__res) : "0" (__sysno), "D" (__arg0), "S" (__arg1), "d" (__arg2), "r" (__r10), "r" (__r8), "r" (__r9) : "memory", "cc", "rcx", "r11"); return __res; }
+#undef __X86_XSYSCALL_ASSEMBLY
+#undef __X86_SYSCALL_ASSEMBLY
 
 #define __X86_64_SYSCALL_SELECT2(argc)  __x86_syscall##argc
 #define __X86_64_SYSCALL_SELECT(argc)   __X86_64_SYSCALL_SELECT2(argc)
@@ -150,19 +169,15 @@ __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__
 
 #else /* __x86_64__ */
 
-#if defined(__X86_SYSCALL_METHOD_INT80)
-#define __X86_SYSCALL_ASSEMBLY    "clc\n\tint {$0x80|80h}"
-#define __X86_XSYSCALL_ASSEMBLY   "stc\n\tint {$0x80|80h}"
-#undef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
-#elif defined(__X86_SYSCALL_METHOD_SYSENTER) && 0  /* TODO */
-#define __X86_SYSCALL_ASSEMBLY    "clc\n\tsysenter" /* TODO */
-#define __X86_XSYSCALL_ASSEMBLY   "stc\n\tsysenter" /* TODO */
+#if defined(__X86_SYSCALL_METHOD_SYSENTER) && 0 /* TODO */
+#define __X86_SYSCALL_ASSEMBLY  TODO
+#define __X86_XSYSCALL_ASSEMBLY TODO
 #define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX 1
 #elif defined(__BUILDING_LIBC)
 __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
         ".hidden libc___i386_Xsyscall\n\t.global libc___i386_Xsyscall\n\t");
-#define __X86_SYSCALL_ASSEMBLY   "call libc___i386_syscall"
-#define __X86_XSYSCALL_ASSEMBLY  "call libc___i386_Xsyscall"
+#define __X86_SYSCALL_ASSEMBLY  "call libc___i386_syscall"
+#define __X86_XSYSCALL_ASSEMBLY "call libc___i386_Xsyscall"
 #define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX 1
 #elif (defined(__CRT_HAVE___i386_syscall) && defined(__CRT_HAVE___i386_Xsyscall) &&    \
        0 /* This method doesn't work since PLT requires %ebx to point to the GOT,      \
@@ -172,11 +187,25 @@ __asm__(".hidden libc___i386_syscall\n\t.global libc___i386_syscall\n\t"
 #define __X86_SYSCALL_ASSEMBLY   "call __i386_syscall@PLT"
 #define __X86_XSYSCALL_ASSEMBLY  "call __i386_Xsyscall@PLT"
 #define __X86_SYSCALL_MAY_CLOBBER_ECX_EDX 1
-#else /* ... */
-#define __X86_SYSCALL_ASSEMBLY   "clc\n\tint {$0x80|80h}"
-#define __X86_XSYSCALL_ASSEMBLY  "stc\n\tint {$0x80|80h}"
+#endif /* ... */
+
+#ifndef __X86_SYSCALL_ASSEMBLY
+#define __X86_SYSCALL_ASSEMBLY "tint {$0x80|80h}"
+/* Encode a CFI sequence to clear EFLAGS.DF when the system call returns
+ * by throwing an exception. This is required since the kernel will preserve
+ * the state of EFLAGS.DF, and libc's unwind engine has to be told to clear
+ * the direction bit when unwinding. (if this isn't done, stuff like strlen()
+ * might break, since everything from libc is allowed to assume that EFLAGS.DF=0
+ * upon function entry) */
+#define __X86_XSYSCALL_ASSEMBLY                         \
+	"std\n\t"                                           \
+	".cfi_remember_state\n\t"                           \
+	".cfi_escape 0x16,9,6,0x59,0xa,0,0x4,0x20,0x1a\n\t" \
+	"int {$0x80|80h}\n\t"                               \
+	"cld\n\t"                                           \
+	".cfi_restore_state"
 #undef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
-#endif /* !... */
+#endif /* !__X86_SYSCALL_ASSEMBLY */
 
 #ifdef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
 #define __X86_SYSCALL_CLOBBER_ECX_EDX , "%ecx", "%edx"

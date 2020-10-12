@@ -164,7 +164,7 @@ x86_syscall32_lcall7_main(struct x86_syscall32_lcall7_args *__restrict args,
 		double_wide = __kernel_syscall_doublewide(kernel_syscall1_regcnt32, sysno - __NR32_syscall1_min);
 	} else {
 		syscall_ulong_t rpc_flags;
-		if (!(irregs_getpflags(&args->l7_iret) & EFLAGS_CF))
+		if (!(irregs_getpflags(&args->l7_iret) & EFLAGS_DF))
 			return (syscall_ulong_t)-ENOSYS;
 		rpc_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32 |
 		            RPC_SYSCALL_INFO_FEXCEPT;

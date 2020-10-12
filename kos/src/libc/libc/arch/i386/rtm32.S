@@ -84,7 +84,6 @@ INTERN_FUNCTION(libc_rtm_begin)
 	ret
 #else /* CONFIG_SUPPORT_HARDWARE_RTM */
 	movl   $(SYS_rtm_begin), %eax
-	clc
 	EXTERN(libc___i386_syscall)
 	jmp    libc___i386_syscall
 #endif /* !CONFIG_SUPPORT_HARDWARE_RTM */
@@ -108,7 +107,6 @@ INTERN_FUNCTION(libc_rtm_abort)
 	pushl_cfi_r %ebx
 	movl   %ecx, %ebx /* code */
 	movl   $(SYS_rtm_abort), %eax
-	.byte  0xf8             /* clc */
 	int    $(0x80)
 	popl_cfi_r %ebx
 	ret
@@ -132,7 +130,6 @@ INTERN_FUNCTION(libc_rtm_test)
 .Lrtm_test_redirection:
 	.byte 0x00
 	movl   $(SYS_rtm_test), %eax
-	clc
 	int    $(0x80)
 	ret
 	.cfi_endproc
@@ -147,7 +144,6 @@ DEFINE_PUBLIC_ALIAS(rtm_test, libc_rtm_test)
 INTERN_FUNCTION(libc___x86_rtm_xtest)
 	.cfi_startproc
 	movl   $(SYS_rtm_test), %eax
-	clc
 	/* Directly make use of `int80h' here, thus reducing the overhead in
 	 * in case we actually are executing in the context of an RTM operation.
 	 * In that case, by directly invoking int80, the emulator can directly
@@ -301,11 +297,9 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 .Lrtm_begin_modify_not_supported:
 	/* Re-write the above code by doing the following (in order):
 	 * >> *(u32 *)(.Lrtm_begin_maybe_syscall)    = SYS_rtm_begin;
-	 * >> *(u32 *)(.Lrtm_begin_maybe_xbegin + 0) = 0xf8;
 	 * >> *(u32 *)(.Lrtm_begin_maybe_xbegin + 2) = RELPTR(libc___i386_syscall);
 	 * Doing this will re-write the code of `rtm_begin' to become:
 	 * >> movl  $SYS_rtm_begin, %eax
-	 * >> clc
 	 * >> jmp   libc___i386_syscall
 	 */
 	call   1f
@@ -318,8 +312,7 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	subl   %eax, %ecx /* %ecx = OFFSET_FROM(".Lrtm_begin_do_return" TO "libc___i386_syscall") */
 	/* Modfy code. */
 	movl   $(SYS_rtm_begin), 0(%eax)
-	movb   $(0xf8), ((.Lrtm_begin_maybe_xbegin - .Lrtm_begin_maybe_syscall) + 0)(%eax) /* clc */
-	movl   %ecx,    ((.Lrtm_begin_maybe_xbegin - .Lrtm_begin_maybe_syscall) + 2)(%eax) /* jmp    libc___i386_syscall */
+	movl   %ecx, ((.Lrtm_begin_maybe_xbegin - .Lrtm_begin_maybe_syscall) + 2)(%eax) /* jmp    libc___i386_syscall */
 
 	cpuid  /* Serializing instruction is needed to flush the instruction cache. */
 	popl_cfi_r %ebx

@@ -39,6 +39,27 @@
 
 DECL_BEGIN
 
+/*[[[deemon
+import * from ....misc.libgen.cfi.compiler;
+local bytes = compileExpressionEx('i386', '%eflags', r'
+	push %eflags     # %eflags
+	push $EFLAGS_DF  # %eflags, EFLAGS_DF
+	not              # %eflags, ~EFLAGS_DF
+	and              # (%eflags & ~EFLAGS_DF)
+', deref_after: false);
+print("#define I386_CFI_CLEARDF   ", repr(", ".join(for (local b: bytes) "0x" + b.hex()[2:].zfill(2))));
+local bytes = compileExpressionEx('x86_64', '%rflags', r'
+	push %rflags     # %rflags
+	push $EFLAGS_DF  # %rflags, EFLAGS_DF
+	not              # %rflags, ~EFLAGS_DF
+	and              # (%rflags & ~EFLAGS_DF)
+', deref_after: false);
+print("#define X86_64_CFI_CLEARDF ", repr(", ".join(for (local b: bytes) "0x" + b.hex()[2:].zfill(2))));
+]]]*/
+#define I386_CFI_CLEARDF   "0x16, 0x09, 0x06, 0x59, 0x0a, 0x00, 0x04, 0x20, 0x1a"
+#define X86_64_CFI_CLEARDF "0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a"
+/*[[[end]]]*/
+
 #define assert_error_code(code) \
 	assertf(was_thrown(code), "error_code(): %I#x", error_code())
 
@@ -48,11 +69,13 @@ __asm__(
 ".pushsection .text\n"
 "lcall7_Pipe:\n"
 "	.cfi_startproc\n"
+"	.cfi_escape " I386_CFI_CLEARDF "\n"
 "	movl   4(%esp), %eax\n"
 "	pushl  %eax\n"
 "	.cfi_adjust_cfa_offset 4\n"
-"	stc\n"
+"	std\n" /* Enable exceptions */
 "	lcall  $7, $" PP_STR(SYS_pipe) "\n"
+"	cld\n" /* Disable exceptions */
 "	addl   $4, %esp\n"
 "	.cfi_adjust_cfa_offset -4\n"
 "	ret\n"
@@ -89,8 +112,12 @@ PRIVATE ATTR_NOINLINE void sysenter_Pipe(fd_t fd[2]) {
 	 *       so this should always work. However, when unavailable, that
 	 *       emulation is quite slow and expensive, so it's if unavailable,
 	 *       libc would fall back to using int 80h at runtime. */
-	__asm__ __volatile__("stc\n\t"
-	                     "call sysenter_common2\n\t"
+	__asm__ __volatile__("std\n\t" /* Enable exceptions */
+	                     ".cfi_remember_state\n\t"
+	                     ".cfi_escape " I386_CFI_CLEARDF "\n\t"
+	                     "call sysenter_common2\n\t" /* Do the syscall */
+	                     "cld\n\t"                   /* Disable exceptions */
+	                     ".cfi_restore_state"
 	                     :
 	                     : "a" (SYS_pipe)
 	                     , "b" (&fd[0])
@@ -101,8 +128,16 @@ PRIVATE ATTR_NOINLINE void sysenter_Pipe(fd_t fd[2]) {
 
 #if defined(__i386__) || defined(__x86_64__)
 LOCAL void int80_Pipe(fd_t fd[2]) {
-	__asm__ __volatile__("stc\n\t"
-	                     "int $0x80"
+	__asm__ __volatile__("std\n\t" /* Enable exceptions */
+	                     ".cfi_remember_state\n\t"
+#ifdef __x86_64__
+	                     ".cfi_escape " X86_64_CFI_CLEARDF "\n\t"
+#else /* __x86_64__ */
+	                     ".cfi_escape " I386_CFI_CLEARDF "\n\t"
+#endif /* !__x86_64__ */
+	                     "int $0x80\n\t" /* Do the syscall */
+	                     "cld\n\t"       /* Disable exceptions */
+	                     ".cfi_restore_state"
 	                     :
 	                     : "a" (SYS_pipe)
 #ifdef __x86_64__

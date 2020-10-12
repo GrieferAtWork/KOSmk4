@@ -142,7 +142,7 @@ __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_ROUTES)
  *    4(%ebp):    Arg #5  (If `kernel_syscall32_regcnt(%eax) >= 6')
  *    %edi:       Return-%eip
  *    %ebp:       Return-%esp
- *    %eflags.CF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
+ *    %eflags.DF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
  * Out:
  *    %eax:       low  32-bit of return value
  *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
@@ -150,7 +150,6 @@ __NRFEAT_SYSCALL_TABLE_FOREACH(DEFINE_KERNEL_SYSCALL_ROUTES)
  *    %esp:       Always set to `IN(%ebp)'
  *    %ecx:       May be clobbered
  *    %edx:       May be clobbered
- *    %eflags.CF: When cleared on entry, set on return if an exception was propagated
  *    *:          All other registers are preserved by default, though individual
  *                system calls may cause specific registers to become clobbered. */
 FUNDEF void ASMCALL x86_syscall32_sysenter(void);
@@ -167,11 +166,10 @@ FUNDEF void ASMCALL x86_syscall32_sysenter_traced(void);
  *    %esi:       Arg #3  (If `kernel_syscall32_regcnt(%eax) >= 4')
  *    %edi:       Arg #4  (If `kernel_syscall32_regcnt(%eax) >= 5')
  *    %ebp:       Arg #5  (If `kernel_syscall32_regcnt(%eax) >= 6')
- *    %eflags.CF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
+ *    %eflags.DF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
  * Out:
  *    %eax:       low  32-bit of return value
  *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
- *    %eflags.CF: When cleared on entry, set on return if an exception was propagated
  *    *:          All other registers are preserved by default, though individual
  *                system calls may cause specific registers to become clobbered. */
 FUNDEF void ASMCALL x86_syscall32_int80(void) ASMNAME("x86_idt_syscall");
@@ -208,11 +206,10 @@ FUNDEF void ASMCALL x86_syscall64x32_int80_traced(void);
  *    12(%esp):   Arg #3  (If `kernel_syscall32_regcnt(%eax) >= 4')
  *    16(%esp):   Arg #4  (If `kernel_syscall32_regcnt(%eax) >= 5')
  *    20(%esp):   Arg #5  (If `kernel_syscall32_regcnt(%eax) >= 6')
- *    %eflags.CF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
+ *    %eflags.DF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
  * Out:
  *    %eax:       low  32-bit of return value
  *    %edx:       high 32-bit of return value (If `kernel_syscall32_doublewide(IN(%eax))')
- *    %eflags.CF: When cleared on entry, set on return if an exception was propagated
  *    *:          All other registers are preserved by default, though individual
  *                system calls may cause specific registers to become clobbered. */
 #ifndef CONFIG_X86_EMULATE_LCALL7
@@ -238,15 +235,14 @@ FUNDEF void ASMCALL x86_syscall32_lcall7_iret(void);
  *    %r9:     Arg #5  (If `kernel_syscall64_regcnt(%rax) >= 6')
  *    %rcx:    Return-%rip
  *    %r11:    Return-%rflags
- *    %r11.CF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
+ *    %r11.DF: Set to enable exception propagation. (s.a. `sys_set_exception_handler()')
  * Out:
- *    %rax:       low  64-bit of return value
- *    %rdx:       high 64-bit of return value (If `kernel_syscall64_doublewide(IN(%rax))')
- *    %eip:       Always set to `IN(%edi)'
- *    %rflags.CF: Always set to `IN(%r11)'
- *                When cleared on entry, set on return if an exception was propagated
- *    *:          All other registers are preserved by default, though individual
- *                system calls may cause specific registers to become clobbered. */
+ *    %rax:    low  64-bit of return value
+ *    %rdx:    high 64-bit of return value (If `kernel_syscall64_doublewide(IN(%rax))')
+ *    %eip:    Always set to `IN(%edi)'
+ *             When cleared on entry, set on return if an exception was propagated
+ *    *:       All other registers are preserved by default, though individual
+ *             system calls may cause specific registers to become clobbered. */
 FUNDEF void ASMCALL x86_syscall64_syscall(void);
 FUNDEF void ASMCALL x86_syscall64_syscall_traced(void);
 #endif /* __x86_64__ */

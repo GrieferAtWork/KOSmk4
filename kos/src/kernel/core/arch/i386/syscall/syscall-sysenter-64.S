@@ -175,7 +175,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	            RPC_SYSCALL_INFO_FREGVALID(2) | RPC_SYSCALL_INFO_FREGVALID(3) | \
 	            RPC_SYSCALL_INFO_METHOD_SYSENTER_32)
 	/* Check if exceptions are enabled. */
-	ttest  mask=EFLAGS_CF, loc=(104 + OFFSET_IRREGS_RFLAGS)(%rsp)
+	ttest  mask=EFLAGS_DF, loc=(104 + OFFSET_IRREGS_RFLAGS)(%rsp)
 	jz     1f
 	orw    $(RPC_SYSCALL_INFO_FEXCEPT), 0(%rsp)
 1:
@@ -346,8 +346,8 @@ INTERN_FUNCTION(__x86_asm32_sysenter_break)
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter_break
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %rsp, 0
-	/* Check IRET.EFLAGS.CF if an exception should be thrown */
-	ttest  mask=EFLAGS_CF, loc=OFFSET_IRREGS_RFLAGS(%rsp)
+	/* Check IRET.EFLAGS.DF if an exception should be thrown */
+	ttest  mask=EFLAGS_DF, loc=OFFSET_IRREGS_RFLAGS(%rsp)
 	jnz    1f
 	movq   $-ENOSYS, %rax
 	/* We can just use `sysret' as a drop-in replacement for `sysexit', since

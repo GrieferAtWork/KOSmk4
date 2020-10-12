@@ -52,7 +52,6 @@ INTERN_FUNCTION(libc_clone)
 	pushl_cfi  32(%esp) /* pid_t *ptid */
 	pushl_cfi  24(%esp) /* void *child_stack */
 	pushl_cfi  32(%esp) /* int flags */
-	clc
 	lcall  $(7), $SYS_clone
 
 	/* Check if we're inside of the child thread */

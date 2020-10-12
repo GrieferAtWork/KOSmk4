@@ -135,21 +135,9 @@ INTERN_FUNCTION(libc_x86_sysenter_common)
 	popl_cfi %edi     /* EDI = RETURN_PC */
 	.cfi_register %eip, %edi
 	movl   %esp, %ebp /* EBP = RETURN_SP */
-	clc
 	sysenter
 	.cfi_endproc
 END(libc_x86_sysenter_common)
-
-.section .text.crt.syscall.x86_sysenter_Xcommon
-INTERN_FUNCTION(libc_x86_sysenter_Xcommon)
-	.cfi_startproc
-	popl_cfi %edi     /* EDI = RETURN_PC */
-	.cfi_register %eip, %edi
-	movl   %esp, %ebp /* EBP = RETURN_SP */
-	stc
-	sysenter
-	.cfi_endproc
-END(libc_x86_sysenter_Xcommon)
 
 
 INTERN(libc_x86_syscall_check_sysenter)
@@ -174,8 +162,7 @@ INTERN_FUNCTION(libc___i386_syscall)
 
 	ret
 
-1:	clc
-	int    $(0x80)
+1:	int    $(0x80)
 	ret
 	.cfi_endproc
 END(libc___i386_syscall)
@@ -193,15 +180,18 @@ INTERN_FUNCTION(libc___i386_Xsyscall)
 	pushl_cfi_r %edi
 	pushl_cfi_r %ebp
 
-	call   libc_x86_sysenter_Xcommon
+	std /* Enable exceptions */
+	call   libc_x86_sysenter_common
+	cld /* Disable exceptions */
 
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 
 	ret
 
-1:	stc
+1:	std /* Enable exceptions */
 	int    $(0x80)
+	cld /* Disable exceptions */
 	ret
 	.cfi_endproc
 END(libc___i386_Xsyscall)
@@ -220,7 +210,6 @@ INTERN_FUNCTION(libc_syscall)
 	movl   36(%esp), %esi /* arg #3 */
 	movl   40(%esp), %edi /* arg #4 */
 	movl   44(%esp), %ebp /* arg #5 */
-	clc
 	int    $(0x80)
 	cmpl   $-4096, %eax /* Check for error. */
 	ja     1f
@@ -262,8 +251,9 @@ INTERN_FUNCTION(libc_Syscall)
 	movl   36(%esp), %esi /* arg #3 */
 	movl   40(%esp), %edi /* arg #4 */
 	movl   44(%esp), %ebp /* arg #5 */
-	stc
+	std /* Enable exceptions */
 	int    $(0x80)
+	cld /* Disable exceptions */
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi

@@ -107,7 +107,7 @@ lcall7_clone32(struct icpustate *__restrict state) {
 		                      get_user_fsbase());
 	} EXCEPT {
 		sc_info.rsi_sysno = __NR32_clone;
-		if (icpustate_getpflags(state) & EFLAGS_CF)
+		if (icpustate_getpflags(state) & EFLAGS_DF)
 			sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 		x86_userexcept_unwind_i(state, &sc_info);
 	}
@@ -132,7 +132,7 @@ x86_emulate_syscall32_lcall7(struct icpustate *__restrict state, u32 segment_off
 		kernel_restart_interrupt(state, &lcall7_clone32);
 #endif /* !__OPTIMIZE_SIZE__ */
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
-	if (icpustate_getpflags(state) & EFLAGS_CF)
+	if (icpustate_getpflags(state) & EFLAGS_DF)
 		sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	argc = kernel_syscall32_regcnt(sc_info.rsi_sysno);
 	if (argc) {
@@ -164,7 +164,7 @@ x86_emulate_syscall64_lcall7(struct icpustate *__restrict state, u64 segment_off
 	sc_info.rsi_sysno = segment_offset ? segment_offset
 	                                   : gpregs_getpax(&state->ics_gpregs);
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_64;
-	if (icpustate_getpflags(state) & EFLAGS_CF)
+	if (icpustate_getpflags(state) & EFLAGS_DF)
 		sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 	argc = kernel_syscall64_regcnt(sc_info.rsi_sysno);
 	if (argc) {
