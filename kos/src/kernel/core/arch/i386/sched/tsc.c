@@ -380,8 +380,10 @@ NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
  * like that...) */
 PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
-	u32 current_reg, delay;
+	u32 current_reg;
+	u32 old_current_reg;
 	u32 new_current_reg;
+	u32 delay;
 #ifdef CONFIG_TSC_ASSERT_FORWARD
 	COMPILER_UNUSED(tsc_get(me));
 #endif /* CONFIG_TSC_ASSERT_FORWARD */
@@ -393,32 +395,47 @@ NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
 	    FORCPU(me, thiscpu_x86_apic_emutsc_divide) == APIC_TIMER_DIVIDE_F128)
 		return;
 	/* Re-program the LAPIC timer to use the largest, possible delays. */
-	current_reg = lapic_read(APIC_TIMER_CURRENT);
 	delay = 1; /* Initial guess */
-	for (;;) {
-		u32 old_current_reg;
-		assertf_poison(current_reg <= FORCPU(me, thiscpu_x86_apic_emutsc_initial),
-		               "current_reg                                 = %#I32x\n"
-		               "FORCPU(me, thiscpu_x86_apic_emutsc_initial) = %#I32x\n"
-		               "APIC_TIMER_INITIAL                          = %#I32x\n",
-		               current_reg,
-		               FORCPU(me, thiscpu_x86_apic_emutsc_initial),
-		               lapic_read(APIC_TIMER_INITIAL));
-		if (OVERFLOW_USUB(current_reg, delay, &old_current_reg)) {
-			/* In case there was a (really long) SMM interrupt,
-			 * we need to be able to deal with that, too */
-			delay >>= 1;
-		}
-		new_current_reg = tsc_ll_cmpxch_divide_and_initial(me,
-		                                                   old_current_reg,
-		                                                   APIC_TIMER_DIVIDE_F128,
-		                                                   UINT32_MAX);
-		if (new_current_reg == old_current_reg)
-			break;
+again:
+	COMPILER_BARRIER();
+	current_reg = lapic_read(APIC_TIMER_CURRENT);
+	COMPILER_BARRIER();
+again_with_timer:
+	COMPILER_BARRIER();
+	assertf_poison(current_reg <= FORCPU(me, thiscpu_x86_apic_emutsc_initial),
+	               "current_reg                                 = %#I32x\n"
+	               "FORCPU(me, thiscpu_x86_apic_emutsc_initial) = %#I32x\n"
+	               "APIC_TIMER_INITIAL                          = %#I32x\n",
+	               current_reg,
+	               FORCPU(me, thiscpu_x86_apic_emutsc_initial),
+	               lapic_read(APIC_TIMER_INITIAL));
+	if unlikely(current_reg > FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)) {
+		/* Interrupt hasn't fired yet. (correct timings ourself) */
+		FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) += FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted);
+		FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)    = current_reg;
+		FORCPU(me, thiscpu_x86_apic_emutsc_early_interrupt) = true;
+		goto again;
+	}
+	FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = current_reg;
+	/* Update the current register to what it's value will be down below. */
+	if (OVERFLOW_USUB(current_reg, delay, &old_current_reg)) {
+		/* Special case: Roll-over will (probably) happen during our calculations. */
+		task_pause();
+		/* In case there was a (really long) SMM interrupt,
+		 * we need to be able to deal with that, too */
+		delay >>= 1;
+		goto again;
+	}
+	new_current_reg = tsc_ll_cmpxch_divide_and_initial(me,
+	                                                   old_current_reg,
+	                                                   APIC_TIMER_DIVIDE_F128,
+	                                                   UINT32_MAX);
+	if (new_current_reg != old_current_reg) {
 		new_current_reg %= FORCPU(me, thiscpu_x86_apic_emutsc_initial);
-		if (current_reg > new_current_reg)
+		if (current_reg >= new_current_reg)
 			delay = current_reg - new_current_reg;
 		current_reg = new_current_reg;
+		goto again_with_timer;
 	}
 	/* Ignore the next TSC interrupt, if it's already pending.
 	 * NOTE: Technically, we'd have to do this atomically alongside
@@ -426,14 +443,10 @@ NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
 	 *       be safe to assume that the newly set APIC counter won't
 	 *       have already expired at this point. */
 	tsc_ignore_pending_interrupt(me);
-	if unlikely(new_current_reg > FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)) {
-		/* Interrupt hasn't fired yet. (correct timings ourself) */
-		FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) += FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted);
-		FORCPU(me, thiscpu_x86_apic_emutsc_early_interrupt) = true;
-	}
+
 	/* Remember the updated LAPIC configuration. */
-	current_reg = FORCPU(me, thiscpu_x86_apic_emutsc_initial) - current_reg;
-	FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) += (u64)current_reg << FORCPU(me, thiscpu_x86_apic_emutsc_divide);
+	new_current_reg = FORCPU(me, thiscpu_x86_apic_emutsc_initial) - new_current_reg;
+	FORCPU(me, thiscpu_x86_apic_emutsc_tscbase) += (tsc_t)new_current_reg << FORCPU(me, thiscpu_x86_apic_emutsc_divide);
 	FORCPU(me, thiscpu_x86_apic_emutsc_prev_current)    = UINT32_MAX;
 	FORCPU(me, thiscpu_x86_apic_emutsc_divide)          = 7; /* CLZ(128) */
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial)         = UINT32_MAX;
