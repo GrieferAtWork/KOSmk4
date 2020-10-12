@@ -2479,13 +2479,50 @@ load_more_threads:
 				continue;
 			if (!tryincref(iter))
 				continue;
+			/* Always re-start as long as we're able to find any other process that is able to
+			 * receive the signal. Otherwise, there would be a race condition between us releasing
+			 * the `tg_pgrp_processes_lock' lock, and some process calling `task_setprocess()' to
+			 * add itself to the process group. When this happens, that process wouldn't receive the
+			 * signal that we're sending to every process within the group.
+			 *
+			 * This might sound like intended behavior on the surface, but this could also lead
+			 * to a scenario where you're unable to kill everyone from some process group:
+			 *
+			 *  #1: Thread[5]: setpgid(0, 0)                          - Become a process group leader
+			 *  #2: Thread[5]: sys_fork()                             - Create new Process Thread[6]
+			 *  #3: Thread[2]: kill(-5, SIGKILL);                     - Send SIGKILL to every process in PGROUP[5]
+			 *  #4: Thread[2]: task_raisesignalprocessgroup()
+			 *  #5: Thread[2]: sync_read(tg_pgrp_processes_lock)      - Acquire the lock to view every process apart of PGROUP[5]
+			 *  #6: Thread[6]: sys_fork()                             - Try to create Thread[7]
+			 *  #7: Thread[6]: task_setprocess(Thread[7])
+			 *  #8: Thread[6]: sync_write(tg_pgrp_processes_lock)     - Acquire the lock to add Thread[7] to PGROUP[5].
+			 *                                                          This blocks because we're already holding the lock
+			 *                                                          from step #5, so the call blocks until the lock will
+			 *                                                          become available.
+			 *  #9: Thread[2]: -- Gather all processes from PGROUP[5] (but keep `there_are_more_procs = false')
+			 * #10: Thread[2]: sync_endread(tg_pgrp_processes_lock)             - The scheduler chooses not to wake-up `Thread[6]'
+			 * #11: Thread[2]: -- Send SIGKILL to every process in PGROUP[5]
+			 * #12: Thread[2]: sync_read(tg_pgrp_processes_lock)
+			 * #13: Thread[2]: -- Scan for more processes that haven't gotten the signal, yet
+			 * #14: Thread[2]: sync_endread(tg_pgrp_processes_lock)
+			 * #15: Thread[2]: -- No further processes found
+			 * #16: Thread[6]: sync_write(tg_pgrp_processes_lock)     - Finally stops blocking
+			 * #17: Thread[6]: -- Add Thread[7] to process to PGROUP[5]
+			 * #18: Thread[6]: sync_endwrite(tg_pgrp_processes_lock)
+			 *
+			 * #19: -- Every thread handles its signals in a random order and terminates.
+			 *         However, Thread[7] was never given sent a signal and will continue
+			 *         to run indefinitely.
+			 *
+			 * This is fixed by always keeping on searching for more processes to receive
+			 * the signal, which then interlocks with the call to `task_serve()' in `clone()',
+			 * that is done by the parent process and can be used to prevent the child process
+			 * from being started. */
+			there_are_more_procs = true;
 			pending_delivery_procv[pending_delivery_procc] = iter;
 			++pending_delivery_procc;
-			if (pending_delivery_procc >= COMPILER_LENOF(pending_delivery_procv)) {
-				if (FORTASK(iter, this_taskgroup).tg_proc_group_siblings.ln_next != NULL)
-					there_are_more_procs = true;
+			if (pending_delivery_procc >= COMPILER_LENOF(pending_delivery_procv))
 				break;
-			}
 		}
 		sync_endread(&pgroup_group->tg_pgrp_processes_lock);
 		TRY {
