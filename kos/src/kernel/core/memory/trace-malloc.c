@@ -1417,12 +1417,22 @@ kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 again:
 	vm_kernel_treelock_writef(GFP_NORMAL);
 
+	/* Acquire a lock to the corepage system, thus
+	 * ensuring that it's in a consistent state, too. */
+	if (!sync_trywrite(&vm_corepage_lock)) {
+		vm_kernel_treelock_endwrite();
+		while (!sync_canwrite(&vm_corepage_lock))
+			task_yield();
+		goto again;
+	}
+
 	/* Acquire a scheduler super-override, thus ensuring that we're
 	 * the only thread running anywhere on the entire system.
 	 * NOTE: We do this while already holding a lock to the kernel vm's
 	 *       tree of nodes, so-as to ensure that no other CPU is modifying
 	 *       the kernel VM when we become the super-override. */
 	if (!sched_super_override_trystart()) {
+		sync_endwrite(&vm_corepage_lock);
 		vm_kernel_treelock_endwrite();
 		task_pause();
 		goto again;
@@ -1432,6 +1442,7 @@ again:
 	 * point in still holding on to our lock to the kernel VM. - At this
 	 * point we can do pretty much anything while disregarding any sort
 	 * of locking! */
+	sync_endwrite(&vm_corepage_lock);
 	vm_kernel_treelock_endwrite();
 
 	/* Actually search for memory leaks. */
