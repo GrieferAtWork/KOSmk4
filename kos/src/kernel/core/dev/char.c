@@ -86,7 +86,7 @@ DECL_BEGIN
 PRIVATE /*REF_IF(!(->cd_flags & CHARACTER_DEVICE_FLAG_WEAKREG))*/
 ATREE_HEAD(struct character_device) character_device_tree = NULL;
 PRIVATE dev_t character_device_next_auto = MKDEV(DEV_MAJOR_AUTO,0);
-PRIVATE DEFINE_ATOMIC_RWLOCK(character_device_lock);
+PRIVATE struct atomic_rwlock character_device_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(character_device_lock);
 
 /* [0..1] Chain of weakly referenced, dead character devices.

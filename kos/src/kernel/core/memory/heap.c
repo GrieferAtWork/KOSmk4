@@ -338,10 +338,6 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 		return;
 	if (!sync_tryread(&self->h_lock))
 		return;
-#if 0
-	printk(KERN_TRACE "[heap] Begin validate %p (%" PRIuSIZ ", from %p)\n",
-	       self, self->h_lock.arw_lock, THIS_TASK);
-#endif
 	for (i = 0; i < COMPILER_LENOF(self->h_size); ++i) {
 		struct mfree **piter, *iter;
 		piter = &self->h_size[i];
@@ -430,10 +426,6 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			}
 		}
 	}
-#if 0
-	printk(KERN_TRACE "[heap] End validate %p (%" PRIuSIZ ", from %p)\n",
-	       self, self->h_lock.arw_lock, THIS_TASK);
-#endif
 	sync_endread(&self->h_lock);
 }
 #else /* CONFIG_DEBUG_HEAP */

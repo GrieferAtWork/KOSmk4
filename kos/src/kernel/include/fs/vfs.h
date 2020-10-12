@@ -34,6 +34,7 @@
 
 #include <hybrid/__atomic.h>
 #include <hybrid/sequence/list.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/crt/format-printer.h>
@@ -777,7 +778,7 @@ struct vfs
 	                                       * WARNING: This chain may contain paths with a reference counter of ZERO(0).
 	                                       * NOTE: Set to `VFS_MOUNT_ILLEGAL' when mounting becomes illegal. */
 #define VFS_MOUNT_ILLEGAL ((struct path *)-1)
-	struct atomic_rwlock   v_recent_lock; /* Lock for recently used paths. */
+	struct atomic_lock     v_recent_lock; /* Lock for recently used paths. */
 	LLIST(REF struct path) v_recent_list; /* [0..1][lock(v_recent_lock)] Cache of recently used paths. */
 	REF struct path       *v_recent_back; /* [0..1][lock(v_recent_lock)] Cache of recently used paths. */
 	size_t                 v_recent_size; /* [lock(v_recent_lock)] Number of cached, recently used paths. */

@@ -130,7 +130,7 @@ signalfd_try_read(struct signalfd *__restrict self, siginfo_t *si) {
 no_perthread_pending:
 	/* With per-task signals checked, also check for per-process signals */
 	prqueue = &THIS_PROCESS_SIGQUEUE;
-	sync_read(prqueue);
+	sync_read(&prqueue->psq_lock);
 	if (si) {
 		for (piter = &prqueue->psq_queue.sq_queue;
 			 (iter = *piter) != NULL; piter = &iter->sqe_next) {
@@ -138,7 +138,7 @@ no_perthread_pending:
 				continue;
 			/* Found one that's being looked for. */
 			*piter = iter->sqe_next;
-			sync_endread(prqueue);
+			sync_endread(&prqueue->psq_lock);
 			memcpy(si, &iter->sqe_info, sizeof(siginfo_t));
 			kfree(iter);
 			return true;
@@ -149,11 +149,11 @@ no_perthread_pending:
 			if (!sigismember(&self->sf_mask, iter->sqe_info.si_signo))
 				continue;
 			/* Found one that's being looked for. */
-			sync_endread(prqueue);
+			sync_endread(&prqueue->psq_lock);
 			return true;
 		}
 	}
-	sync_endread(prqueue);
+	sync_endread(&prqueue->psq_lock);
 	return false;
 }
 

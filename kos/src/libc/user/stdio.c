@@ -28,6 +28,7 @@
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/list.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-owner-rwlock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
@@ -115,27 +116,27 @@ NONNULL((1)) void LIBCCALL allfiles_remove(FILE *__restrict self) {
 PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.changed_linebuffered_files")
 FILE *changed_linebuffered_files = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.changed_linebuffered_files_lock")
-struct atomic_rwlock changed_linebuffered_files_lock = ATOMIC_RWLOCK_INIT;
+struct atomic_lock changed_linebuffered_files_lock = ATOMIC_LOCK_INIT;
 
 /* Add the given file to the set of changed line-buffered files */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.changed_linebuffered_insert")
 NONNULL((1)) void LIBCCALL changed_linebuffered_insert(FILE *__restrict self) {
-	atomic_rwlock_write(&changed_linebuffered_files_lock);
+	atomic_lock_acquire(&changed_linebuffered_files_lock);
 	if (!LLIST_ISBOUND(self, if_exdata->io_lnch))
 		LLIST_INSERT(changed_linebuffered_files, self, if_exdata->io_lnch);
 	assert(LLIST_ISBOUND(self, if_exdata->io_lnch));
-	atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
+	atomic_lock_release(&changed_linebuffered_files_lock);
 }
 
 /* Remove the given file from the set of changed line-buffered files */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.changed_linebuffered_remove")
 NONNULL((1)) void LIBCCALL changed_linebuffered_remove(FILE *__restrict self) {
-	atomic_rwlock_write(&changed_linebuffered_files_lock);
+	atomic_lock_acquire(&changed_linebuffered_files_lock);
 	if (LLIST_ISBOUND(self, if_exdata->io_lnch)) {
 		LLIST_REMOVE(self, if_exdata->io_lnch);
 		LLIST_UNBIND(self, if_exdata->io_lnch);
 	}
-	atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
+	atomic_lock_release(&changed_linebuffered_files_lock);
 }
 
 /* Low-level file read operation. */
@@ -563,11 +564,11 @@ INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_sync_lnfiles")
 void LIBCCALL file_sync_lnfiles(void) {
 	while (ATOMIC_READ(changed_linebuffered_files) != NULL) {
 		FILE *fp;
-		atomic_rwlock_write(&changed_linebuffered_files_lock);
+		atomic_lock_acquire(&changed_linebuffered_files_lock);
 		fp = changed_linebuffered_files;
 		for (;;) {
 			if unlikely(!fp) {
-				atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
+				atomic_lock_release(&changed_linebuffered_files_lock);
 				goto done;
 			}
 			assert(LLIST_ISBOUND(fp, if_exdata->io_lnch));
@@ -579,7 +580,7 @@ void LIBCCALL file_sync_lnfiles(void) {
 		assert(LLIST_ISBOUND(fp, if_exdata->io_lnch));
 		LLIST_REMOVE(fp, if_exdata->io_lnch);
 		LLIST_UNBIND(fp, if_exdata->io_lnch);
-		atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
+		atomic_lock_release(&changed_linebuffered_files_lock);
 		/* Synchronize this buffer. */
 		if (FMUSTLOCK(fp)) {
 			file_write(fp);

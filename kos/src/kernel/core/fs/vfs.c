@@ -2050,7 +2050,7 @@ REF struct vfs *(KCALL vfs_alloc)(void) THROWS(E_BADALLOC) {
 	atomic_rwlock_cinit(&result->p_lock);
 	result->v_fscount = 1;
 	atomic_rwlock_cinit(&result->v_mount_lock);
-	atomic_rwlock_cinit(&result->v_recent_lock);
+	atomic_lock_cinit(&result->v_recent_lock);
 	atomic_rwlock_cinit(&result->v_drives_lock);
 	result->v_recent_limit = VFS_DEFAULT_RECENT_LIMIT;
 	return result;

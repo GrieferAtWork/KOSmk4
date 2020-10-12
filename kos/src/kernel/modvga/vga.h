@@ -25,6 +25,7 @@
 #include <dev/video.h>
 #include <kernel/types.h>
 
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <hw/video/vga.h>
@@ -122,7 +123,7 @@ typedef struct
 #ifndef __cplusplus
 	struct video_device     v_dev;       /* The underlying ansi video device. */
 #endif
-	struct atomic_rwlock    v_lock;      /* Lock for accessing the VGA Hardware. */
+	struct atomic_lock      v_lock;      /* Lock for accessing the VGA Hardware. */
 	PHYS physaddr_t         v_vram_addr; /* [const] VRAM base address (physical). */
 	VIRT byte_t            *v_vram;      /* [const] VRAM base address (virtual). */
 	size_t                  v_vram_size; /* [const] VRAM size (in bytes). */

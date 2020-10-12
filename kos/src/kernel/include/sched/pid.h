@@ -133,7 +133,6 @@ struct process_sigqueue {
 	struct atomic_rwlock psq_lock;  /* Lock for `psq_queue'. */
 	struct sigqueue      psq_queue; /* The underlying queue. */
 };
-__DEFINE_SYNC_PROXY(struct process_sigqueue, psq_lock)
 
 FUNDEF NOBLOCK void NOTHROW(KCALL sigqueue_fini)(struct sigqueue *__restrict self);
 

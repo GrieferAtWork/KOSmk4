@@ -47,6 +47,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <hw/usb/uhci.h>
@@ -90,8 +91,8 @@ PRIVATE struct async_worker_callbacks const uhci_powerctl_cb {
 #define HINT_GETMODE(x) HINT_MODE x
 
 
-PRIVATE DEFINE_ATOMIC_RWLOCK(ostd_free_lock);
-PRIVATE DEFINE_ATOMIC_RWLOCK(osqh_free_lock);
+PRIVATE struct atomic_lock ostd_free_lock = ATOMIC_LOCK_INIT;
+PRIVATE struct atomic_lock osqh_free_lock = ATOMIC_LOCK_INIT;
 PRIVATE struct uhci_ostd *ostd_free = NULL;
 PRIVATE struct uhci_osqh *osqh_free = NULL;
 

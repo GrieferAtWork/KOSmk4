@@ -207,7 +207,7 @@ NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
 ATTR_SECTION(".bss.crt.sched.pthread.pthread_default_attr.attr")
 PRIVATE pthread_attr_t pthread_default_attr = {};
 ATTR_SECTION(".bss.crt.sched.pthread.pthread_default_attr.lock")
-PRIVATE DEFINE_ATOMIC_RWLOCK(pthread_default_attr_lock);
+PRIVATE struct atomic_rwlock pthread_default_attr_lock = ATOMIC_RWLOCK_INIT;
 
 
 

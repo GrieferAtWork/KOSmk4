@@ -896,7 +896,6 @@
 #define ATREE_NODE_SINGLE(T,Tkey) struct { T *a_min, *a_max; Tkey a_vaddr; }
 #define ATREE_XNODE(T)            struct { T *a_min, *a_max; }
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) refcnt_t handle_##name##_refcnt(T *self); void handle_##name##_incref(T *self); void handle_##name##_decref(T *self);
-#define DEFINE_ATOMIC_RWLOCK(name) struct atomic_rwlock name = ATOMIC_RWLOCK_INIT
 
 #define ATOMIC_REF(...)               atomic_ref< __VA_ARGS__ >
 #define XATOMIC_REF_STRUCT(...)       xatomic_ref_struct< __VA_ARGS__ >

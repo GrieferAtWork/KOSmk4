@@ -157,17 +157,6 @@ INTERN ATTR_SECTION(".text.crt.dos.utility.stdlib") WUNUSED NONNULL((1, 2, 5)) v
 /* TODO: Add support for: __cxa_thread_atexit_impl  */
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
 
-struct cxa_atexit_callback {
-	void (LIBCCALL *ac_func)(void *arg); /* [1..1] Function */
-	void           *ac_arg;              /* [?..?] Argument */
-};
-
-struct cxa_atexit_list {
-	struct atomic_rwlock        al_lock; /*  */
-	size_t                      al_size; /*  */
-	struct cxa_atexit_callback *al_list; /* [] */
-};
-
 INTERN ATTR_SECTION(".text.crt.sched.process.__cxa_atexit") int
 NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
                                         void *arg, void *dso_handle) {

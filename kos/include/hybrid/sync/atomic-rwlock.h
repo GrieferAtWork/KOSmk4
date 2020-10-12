@@ -55,7 +55,6 @@ struct atomic_rwlock {
 #define atomic_rwlock_init(self)        (void)((self)->arw_lock = 0)
 #define atomic_rwlock_init_read(self)   (void)((self)->arw_lock = 1)
 #define atomic_rwlock_init_write(self)  (void)((self)->arw_lock = __ATOMIC_RWLOCK_WFLAG)
-#define DEFINE_ATOMIC_RWLOCK(name)      struct atomic_rwlock name = ATOMIC_RWLOCK_INIT
 
 #define atomic_rwlock_reading(self)  (__hybrid_atomic_load((self)->arw_lock, __ATOMIC_ACQUIRE) != 0)
 #define atomic_rwlock_writing(self)  (__hybrid_atomic_load((self)->arw_lock, __ATOMIC_ACQUIRE) & __ATOMIC_RWLOCK_WFLAG)

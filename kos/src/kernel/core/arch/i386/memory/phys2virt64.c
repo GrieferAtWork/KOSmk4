@@ -39,7 +39,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -84,7 +84,7 @@ PRIVATE PAGEDIR_PAGEALIGNED size_t metadata_avail = 0;
 
 #ifndef CONFIG_NO_SMP
 /* Lock that must be held while modifying phys2virt mappings on an SMP machine. */
-PRIVATE struct atomic_rwlock metadata_lock = ATOMIC_RWLOCK_INIT;
+PRIVATE struct atomic_lock metadata_lock = ATOMIC_LOCK_INIT;
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -211,7 +211,7 @@ PUBLIC NOBLOCK NOPREEMPT void KCALL x86_phys2virt64_require(void *addr) {
 	assert(vec4 >= 256);
 	assert(P64_PDIR_E4_IDENTITY[vec4].p_vec3.v_present);
 #ifndef CONFIG_NO_SMP
-	while (!sync_tryread(&metadata_lock))
+	while (!sync_trywrite(&metadata_lock))
 		task_pause();
 again_read_e3_word:
 #endif /* !CONFIG_NO_SMP */
@@ -226,7 +226,7 @@ again_read_e3_word:
 		/* Check for special case: No metadata has ever been allocated... */
 		if unlikely(!metadata_size) {
 #ifndef CONFIG_NO_SMP
-			sync_endread(&metadata_lock);
+			sync_endwrite(&metadata_lock);
 #endif /* !CONFIG_NO_SMP */
 			THROW(E_SEGFAULT_UNMAPPED, addr);
 		}
@@ -287,7 +287,7 @@ again_read_e3_word:
 	       (byte_t *)P64_PDIR_VECADDR(vec4, vec3, 511, 511) + PAGESIZE - 1);
 done:
 #ifndef CONFIG_NO_SMP
-	sync_endread(&metadata_lock);
+	sync_endwrite(&metadata_lock);
 #endif /* !CONFIG_NO_SMP */
 	;
 }

@@ -28,7 +28,7 @@
 #include <sched/signal.h>
 
 #include <hybrid/__assert.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <linux/if_ether.h>
 
@@ -84,21 +84,21 @@ DATDEF struct net_peeraddrs net_peeraddrs_empty;
 
 struct ip_datagram;
 struct network_ip_datagrams {
-	struct atomic_rwlock  nid_lock;  /* Lock for accessing the datagram vector. */
-	size_t                nid_size;  /* Used vector length. */
-	size_t                nid_alloc; /* Allocated vector length. */
+	struct atomic_lock  nid_lock;  /* Lock for accessing the datagram vector. */
+	size_t              nid_size;  /* Used vector length. */
+	size_t              nid_alloc; /* Allocated vector length. */
 	/* TODO: Free up datagrams that have timed out as part of system_clearcache()! */
-	struct ip_datagram   *nid_list;  /* [1..1][lock(nid_lock)][0..nid_size|alloc(nid_alloc)]
-	                                  * [SORTED][lock(nid_lock)][owned] Vector of incomplete datagrams */
+	struct ip_datagram *nid_list;  /* [1..1][lock(nid_lock)][0..nid_size|alloc(nid_alloc)]
+	                                * [SORTED][lock(nid_lock)][owned] Vector of incomplete datagrams */
 };
 
-#define network_ip_datagrams_init(self)     \
-	(atomic_rwlock_init(&(self)->nid_lock), \
-	 (self)->nid_size  = 0,                 \
-	 (self)->nid_alloc = 0,                 \
+#define network_ip_datagrams_init(self)   \
+	(atomic_lock_init(&(self)->nid_lock), \
+	 (self)->nid_size  = 0,               \
+	 (self)->nid_alloc = 0,               \
 	 (self)->nid_list  = __NULLPTR)
 #define network_ip_datagrams_cinit(self)      \
-	(atomic_rwlock_init(&(self)->nid_lock),   \
+	(atomic_lock_cinit(&(self)->nid_lock),    \
 	 __hybrid_assert((self)->nid_size == 0),  \
 	 __hybrid_assert((self)->nid_alloc == 0), \
 	 __hybrid_assert((self)->nid_list == __NULLPTR))

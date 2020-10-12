@@ -22,7 +22,7 @@
 
 #include "api.h"
 
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <bits/types.h>
 #include <kos/anno.h>
@@ -88,25 +88,25 @@ struct linebuffer {
 	 * larger batches. - It also offers itself as a way of implementing
 	 * canonical line-buffers in TTYs, where user-input needs to be buffered
 	 * until an end-of-line character is received. */
-	struct atomic_rwlock lb_lock; /* Lock for this line buffer */
-	struct linecapture   lb_line; /* [lock(lb_lock)] The current line */
-	__WEAK __size_t      lb_limt; /* Max # of bytes that may appear in a single line
-	                               * When set to 0, the buffer is considered closed */
-	sched_signal_t       lb_nful; /* Signal broadcast when the buffer becomes non-full, or gets closed */
+	struct atomic_lock lb_lock; /* Lock for this line buffer */
+	struct linecapture lb_line; /* [lock(lb_lock)] The current line */
+	__WEAK __size_t    lb_limt; /* Max # of bytes that may appear in a single line
+	                             * When set to 0, the buffer is considered closed */
+	sched_signal_t     lb_nful; /* Signal broadcast when the buffer becomes non-full, or gets closed */
 };
 
 /* Static initialization */
 #define LINEBUFFER_DEFAULT_LIMIT  _POSIX_MAX_INPUT
-#define LINEBUFFER_INIT_EX(limit) { ATOMIC_RWLOCK_INIT, { __NULLPTR, 0, 0 }, limit, SCHED_SIGNAL_INIT }
+#define LINEBUFFER_INIT_EX(limit) { ATOMIC_LOCK_INIT, { __NULLPTR, 0, 0 }, limit, SCHED_SIGNAL_INIT }
 #define LINEBUFFER_INIT           LINEBUFFER_INIT_EX(LINEBUFFER_DEFAULT_LIMIT)
 
 /* Initialization / finalization */
 #define linebuffer_init_ex(self, limit)                      \
-	(atomic_rwlock_init(&(self)->lb_lock),                   \
+	(atomic_lock_init(&(self)->lb_lock),                     \
 	 (self)->lb_line.lc_size = (self)->lb_line.lc_alloc = 0, \
 	 (self)->lb_limt = (limit), sched_signal_init(&(self)->lb_nful))
 #define linebuffer_cinit_ex(self, limit)                    \
-	(atomic_rwlock_cinit(&(self)->lb_lock),                 \
+	(atomic_lock_cinit(&(self)->lb_lock),                   \
 	 __hybrid_assert((self)->lb_line.lc_base == __NULLPTR), \
 	 __hybrid_assert((self)->lb_line.lc_size == 0),         \
 	 __hybrid_assert((self)->lb_line.lc_alloc == 0),        \
@@ -247,14 +247,14 @@ __LOCAL __ATTR_NONNULL((1, 2)) void
                                   struct linecapture *__restrict __capture)
 		__THROWS(E_WOULDBLOCK) {
 	__BOOL __was_full;
-	atomic_rwlock_write(&__self->lb_lock);
+	atomic_lock_acquire(&__self->lb_lock);
 	*__capture = __self->lb_line;
 	__hybrid_assert(__self->lb_line.lc_size <= __self->lb_line.lc_alloc);
 	__was_full = __self->lb_line.lc_size >= __self->lb_line.lc_alloc;
 	__self->lb_line.lc_base  = __NULLPTR;
 	__self->lb_line.lc_alloc = 0;
 	__self->lb_line.lc_size  = 0;
-	atomic_rwlock_endwrite(&__self->lb_lock);
+	atomic_lock_release(&__self->lb_lock);
 	if (__was_full)
 		sched_signal_broadcast(&__self->lb_nful);
 }
@@ -264,7 +264,7 @@ __LOCAL __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW(LIBBUFFER_CC linebuffer_capture_nx)(struct linebuffer *__restrict __self,
                                               struct linecapture *__restrict __capture) {
 	__BOOL __was_full;
-	if (!atomic_rwlock_write_nx(&__self->lb_lock))
+	if (!atomic_lock_acquire_nx(&__self->lb_lock))
 		return 0;
 	*__capture = __self->lb_line;
 	__hybrid_assert(__self->lb_line.lc_size <= __self->lb_line.lc_alloc);
@@ -272,7 +272,7 @@ __NOTHROW(LIBBUFFER_CC linebuffer_capture_nx)(struct linebuffer *__restrict __se
 	__self->lb_line.lc_base  = __NULLPTR;
 	__self->lb_line.lc_alloc = 0;
 	__self->lb_line.lc_size  = 0;
-	atomic_rwlock_endwrite(&__self->lb_lock);
+	atomic_lock_release(&__self->lb_lock);
 	if (__was_full)
 		sched_signal_broadcast(&__self->lb_nful);
 	return 1;
@@ -283,7 +283,7 @@ __LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) __BOOL
 __NOTHROW(LIBBUFFER_CC linebuffer_trycapture)(struct linebuffer *__restrict __self,
                                               struct linecapture *__restrict __capture) {
 	__BOOL __was_full;
-	if (!atomic_rwlock_trywrite(&__self->lb_lock))
+	if (!atomic_lock_tryacquire(&__self->lb_lock))
 		return 0;
 	*__capture = __self->lb_line;
 	__hybrid_assert(__self->lb_line.lc_size <= __self->lb_line.lc_alloc);
@@ -291,7 +291,7 @@ __NOTHROW(LIBBUFFER_CC linebuffer_trycapture)(struct linebuffer *__restrict __se
 	__self->lb_line.lc_base  = __NULLPTR;
 	__self->lb_line.lc_alloc = 0;
 	__self->lb_line.lc_size  = 0;
-	atomic_rwlock_endwrite(&__self->lb_lock);
+	atomic_lock_release(&__self->lb_lock);
 	if (__was_full)
 		sched_signal_broadcast(&__self->lb_nful);
 	return 1;
@@ -300,16 +300,16 @@ __NOTHROW(LIBBUFFER_CC linebuffer_trycapture)(struct linebuffer *__restrict __se
 __LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
 __NOTHROW(LIBBUFFER_CC linebuffer_release)(struct linebuffer *__restrict __self,
                                            struct linecapture const *__restrict __capture) {
-	if (atomic_rwlock_trywrite(&__self->lb_lock)) {
+	if (atomic_lock_tryacquire(&__self->lb_lock)) {
 		__COMPILER_READ_BARRIER();
 		if __unlikely(__self->lb_line.lc_alloc != 0) {
-			atomic_rwlock_endwrite(&__self->lb_lock);
+			atomic_lock_release(&__self->lb_lock);
 			goto __free_capture;
 		}
 		__hybrid_assert(__self->lb_line.lc_size == 0);
 		__self->lb_line.lc_base  = __capture->lc_base;
 		__self->lb_line.lc_alloc = __capture->lc_alloc;
-		atomic_rwlock_endwrite(&__self->lb_lock);
+		atomic_lock_release(&__self->lb_lock);
 	} else {
 __free_capture:
 		linecapture_fini(__capture);

@@ -296,7 +296,7 @@ NOTHROW(KCALL block_device_acquire_partlock_trywrite)(struct block_device *__res
 /* The tree used to quickly look up a block device from its ID */
 PRIVATE REF ATREE_HEAD(struct basic_block_device) block_device_tree = NULL;
 PRIVATE dev_t block_device_next_auto = MKDEV(DEV_MAJOR_AUTO,0);
-PRIVATE DEFINE_ATOMIC_RWLOCK(block_device_lock);
+PRIVATE struct atomic_rwlock block_device_lock = ATOMIC_RWLOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(block_device_lock);
 
 

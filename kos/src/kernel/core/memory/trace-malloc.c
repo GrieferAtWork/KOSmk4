@@ -665,7 +665,7 @@ NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
 			word = CONFIG_MALL_HEAD_PATTERN;
 			base += i;
 			while (*(u8 *)base == ((u8 *)&word)[(uintptr_t)base & 3])
-				++*(uintptr_t *)&base;
+				base = (u32 *)((byte_t *)base + 1);
 			kernel_panic_n(n_skip + 1,
 			               "Corrupted MALL header in at %p (offset %" PRIdSIZ " from %p...%p)\n"
 			               "%$[hex]\n"

@@ -1887,7 +1887,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 	vga_device = CHARACTER_DEVICE_ALLOC(VGA);
 	TRY {
 		void *vram_base;
-		atomic_rwlock_cinit(&vga_device->v_lock);
+		atomic_lock_cinit(&vga_device->v_lock);
 		atomic_rwlock_cinit(&vga_device->v_textlock);
 		vga_device->v_vram_addr = (physaddr_t)0xa0000;
 		vga_device->v_vram_size = 8192 * 4 * 4; /* 128K */

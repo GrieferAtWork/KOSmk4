@@ -502,10 +502,10 @@ gather_pending_signals(sigset_t *__restrict these) {
 no_perthread_pending:
 	/* With per-task signals checked, also check for per-process signals */
 	prqueue = &THIS_PROCESS_SIGQUEUE;
-	sync_read(prqueue);
+	sync_read(&prqueue->psq_lock);
 	for (iter = prqueue->psq_queue.sq_queue; iter; iter = iter->sqe_next)
 		sigaddset(these, iter->sqe_info.si_signo);
-	sync_endread(prqueue);
+	sync_endread(&prqueue->psq_lock);
 }
 
 

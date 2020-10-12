@@ -34,7 +34,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/cpu-flags.h>
@@ -92,7 +92,7 @@ PUBLIC uintptr_t volatile kernel_debugtrap_on = KERNEL_DEBUGTRAP_ON_DEFAULT;
 	callback(fcpustate)
 
 
-PRIVATE DEFINE_ATOMIC_RWLOCK(kernel_debugtrap_lock);
+PRIVATE struct atomic_lock kernel_debugtrap_lock = ATOMIC_LOCK_INIT;
 DATDEF byte_t kernel_debugtrap_data[] ASMNAME("kernel_debugtrap");
 #define DEFINE_CPUSTATE_VARS(cpustate)                                                           \
 	INTDEF byte_t trigger_debugtrap_##cpustate##_data[] ASMNAME("trigger_debugtrap_" #cpustate); \

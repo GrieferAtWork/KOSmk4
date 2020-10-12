@@ -21,9 +21,11 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_CACHE_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
 #include <kernel/malloc.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <kernel/types.h>
+
+#include <hybrid/sync/atomic-lock.h>
 
 DECL_BEGIN
 
@@ -47,7 +49,7 @@ DECL_BEGIN
 	decl ATTR_MALLOC WUNUSED T *NOTHROW(KCALL name##_alloc_nx)(gfp_t alloc_flags);
 
 #define DEFINE_PREALLOCATION_CACHE(decl, name, T, max_size) \
-	decl DEFINE_ATOMIC_RWLOCK(name##_lock);                 \
+	decl struct atomic_lock name##_lock = ATOMIC_LOCK_INIT; \
 	decl size_t name##_freesize = 0;                        \
 	decl T *name##_freelist     = __NULLPTR;                \
 	decl ATTR_MALLOC ATTR_RETNONNULL WUNUSED T *KCALL       \

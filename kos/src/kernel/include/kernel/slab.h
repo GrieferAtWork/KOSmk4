@@ -28,7 +28,7 @@
 
 #include <hybrid/typecore.h>
 #ifdef CONFIG_BUILDING_KERNEL_CORE
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #include "malloc-defs.h"
@@ -226,7 +226,7 @@ struct slab_pending_free {
 };
 struct slab_descriptor {
 	/* Data descriptor for some fixed-length-segment slab. */
-	struct atomic_rwlock           sd_lock; /* Lock for this slab descriptor. */
+	struct atomic_lock             sd_lock; /* Lock for this slab descriptor. */
 	struct slab                   *sd_free; /* [0..1][lock(sd_lock)] Chain of partially free slab pages. */
 #ifdef CONFIG_DEBUG_MALLOC
 	struct slab                   *sd_used; /* [0..1][lock(sd_lock)] Chain of fully allocated slab pages. */

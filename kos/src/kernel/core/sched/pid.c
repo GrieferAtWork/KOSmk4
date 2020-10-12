@@ -105,11 +105,11 @@ LOCAL NOBLOCK void
 NOTHROW(KCALL process_sigqueue_set_term)(struct process_sigqueue *__restrict self) {
 	struct sigqueue_entry *queue;
 	assert(PREEMPTION_ENABLED());
-	sync_write(self);
+	sync_write(&self->psq_lock);
 	queue = ATOMIC_XCH(self->psq_queue.sq_queue, SIGQUEUE_SQ_QUEUE_TERMINATED);
 	assertf(queue != SIGQUEUE_SQ_QUEUE_TERMINATED,
 	        "sigqueue_set_term() can only be called once");
-	sync_endwrite(self);
+	sync_endwrite(&self->psq_lock);
 	sigqueue_entry_freechain(queue);
 }
 

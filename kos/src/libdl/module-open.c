@@ -51,11 +51,11 @@ DECL_BEGIN
 /* [1..1] Global chain of loaded modules.
  * WARNING: Contained modules may have a reference counter of ZERO(0)! */
 INTERN LLIST(DlModule) DlModule_GlobalList = LLIST_INIT;
-INTERN DEFINE_ATOMIC_RWLOCK(DlModule_GlobalLock);
+INTERN struct atomic_rwlock DlModule_GlobalLock = ATOMIC_RWLOCK_INIT;
 
 /* [1..1] List of all loaded modules. */
 INTERN DlModule *DlModule_AllList = NULL;
-INTERN DEFINE_ATOMIC_RWLOCK(DlModule_AllLock);
+INTERN struct atomic_rwlock DlModule_AllLock = ATOMIC_RWLOCK_INIT;
 
 
 INTERN WUNUSED fd_t CC reopen_bigfd(fd_t fd) {

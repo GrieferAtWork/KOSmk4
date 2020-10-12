@@ -28,6 +28,8 @@
 #include <kernel/vm.h>
 
 #include <hybrid/sequence/atree.h>
+#include <hybrid/sync/atomic-lock.h>
+#include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/io.h>
 
@@ -2031,7 +2033,7 @@ struct superblock
 	REF struct basic_block_device*s_device;       /* [0..1][const] The device supposedly carrying the data of this superblock. */
 	REF struct driver            *s_driver;       /* [1..1][const] The driver implementing this superblock. */
 	uintptr_t                     s_flags;        /* Superblock flags (Set of `SUPERBLOCK_F*') */
-	struct atomic_rwlock          s_changed_lock; /* Lock that must be held when removing nodes from, or clearing `s_changed' */
+	struct atomic_lock            s_changed_lock; /* Lock that must be held when removing nodes from, or clearing `s_changed' */
 	WEAK REF struct inode        *s_changed;      /* [0..1][CHAIN(->i_changed_next)]
 	                                               * Chain of modified INodes. (atomically exchanged with `NULL' to perform a SYNC() operation)
 	                                               * NOTE: Every node apart of this chain must have either the

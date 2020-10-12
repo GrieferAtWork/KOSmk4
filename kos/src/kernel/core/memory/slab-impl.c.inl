@@ -38,7 +38,7 @@ DECL_BEGIN
 #define SEGMENTS(s) ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
 
 INTERN struct slab_descriptor DESC = {
-	/* .sd_lock = */ ATOMIC_RWLOCK_INIT,
+	/* .sd_lock = */ ATOMIC_LOCK_INIT,
 	/* .sd_free = */ NULL,
 #ifdef CONFIG_DEBUG_MALLOC
 	/* .sd_used = */ NULL,
@@ -139,8 +139,7 @@ NOTHROW(KCALL FUNC(slab_freeptr))(struct slab *__restrict self,
 		} while unlikely(!ATOMIC_CMPXCH_WEAK(DESC.sd_pend, next, pend));
 again_try_service:
 		if (sync_trywrite(&DESC.sd_lock)) {
-			FUNC(slab_service_pending)
-			();
+			FUNC(slab_service_pending)();
 			sync_endwrite(&DESC.sd_lock);
 			if unlikely(ATOMIC_READ(DESC.sd_pend) != NULL)
 				goto again_try_service;

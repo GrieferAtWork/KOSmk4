@@ -30,7 +30,7 @@
  * acquired.
  *
  * >> struct foo;
- * >> PRIVATE DEFINE_ATOMIC_RWLOCK(foolock);
+ * >> PRIVATE struct atomic_rwlock foolock = ATOMIC_RWLOCK_INIT;
  * >> PRIVATE WEAK struct foo *dead_foo = NULL;
  * >>
  * >> // Perform finalization that can be done without `foolock'

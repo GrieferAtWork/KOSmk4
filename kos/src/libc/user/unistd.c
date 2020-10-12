@@ -25,6 +25,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/host.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <asm/pagesize.h>
@@ -1884,7 +1885,7 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate64)(fd_t fd,
 
 
 PRIVATE byte_t *brk_curr = NULL;
-PRIVATE DEFINE_ATOMIC_RWLOCK(brk_lock);
+PRIVATE struct atomic_lock brk_lock = ATOMIC_LOCK_INIT;
 
 PRIVATE int LIBCCALL do_brk(void *addr) {
 	byte_t *real_oldbrk, *real_newbrk;
@@ -1937,9 +1938,9 @@ NOTHROW_NCX(LIBCCALL libc_brk)(void *addr)
 /*[[[body:libc_brk]]]*/
 {
 	int result;
-	atomic_rwlock_write(&brk_lock);
+	atomic_lock_acquire(&brk_lock);
 	result = do_brk(addr);
-	atomic_rwlock_endwrite(&brk_lock);
+	atomic_lock_release(&brk_lock);
 	return result;
 }
 /*[[[end:libc_brk]]]*/
@@ -1950,7 +1951,7 @@ NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta)
 /*[[[body:libc_sbrk]]]*/
 {
 	byte_t *result;
-	atomic_rwlock_write(&brk_lock);
+	atomic_lock_acquire(&brk_lock);
 	if ((result = brk_curr) == NULL) {
 		/* Lookup the end address of the main executable
 		 * NOTE: We do this lazily to prevent the necessity of a relocation */
@@ -1961,10 +1962,10 @@ NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta)
 	}
 	if (do_brk(result + delta) != 0)
 		result = (byte_t *)-1;
-	atomic_rwlock_endwrite(&brk_lock);
+	atomic_lock_release(&brk_lock);
 	return result;
 err_perm:
-	atomic_rwlock_endwrite(&brk_lock);
+	atomic_lock_release(&brk_lock);
 	libc_seterrno(EPERM);
 	return NULL;
 }

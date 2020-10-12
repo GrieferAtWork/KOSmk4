@@ -52,8 +52,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sync/atomic-lock.h>
 
-#include <dirent.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
@@ -63,6 +63,7 @@
 #include <sys/statvfs.h>
 
 #include <assert.h>
+#include <dirent.h>
 #include <inttypes.h>
 #include <limits.h>
 #include <stddef.h>
@@ -274,7 +275,7 @@ directory_entry_alloc_s(USER CHECKED /*utf-8*/ char const *name, u16 namelen)
 
 
 /* RECENTLY USED INODE CACHE */
-PRIVATE DEFINE_ATOMIC_RWLOCK(inodes_recent_lock);
+PRIVATE struct atomic_lock inodes_recent_lock = ATOMIC_LOCK_INIT;
 DEFINE_DBG_BZERO_OBJECT(inodes_recent_lock);
 
 /* [lock(inodes_recent_lock)][0..1] Chain of recently used nodes. */
@@ -4415,7 +4416,7 @@ superblock_open(struct superblock_type *__restrict type,
 			incref(result->s_driver);
 			result->s_nodes = result;
 			result->s_flags = flags;
-			atomic_rwlock_cinit(&result->s_changed_lock);
+			atomic_lock_cinit(&result->s_changed_lock);
 			rwlock_cinit(&result->s_nodes_lock);
 			atomic_rwlock_cinit(&result->s_mount_lock);
 			/* Fill in filesystem features with documented default values. */

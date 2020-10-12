@@ -33,6 +33,7 @@
 #include <kernel/vm.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -53,7 +54,7 @@ struct vm_corepage vm_corepage_start;
 /* Core page controller globals.                                        */
 /************************************************************************/
 /* Lock for the corepage subsystem. */
-INTERN struct atomic_rwlock vm_corepage_lock = ATOMIC_RWLOCK_INIT;
+INTERN struct atomic_lock vm_corepage_lock = ATOMIC_LOCK_INIT;
 
 /* [1..1] Pointer to the first page containing free elements. */
 INTERN struct vm_corepage *vm_corepage_head = &vm_corepage_start;

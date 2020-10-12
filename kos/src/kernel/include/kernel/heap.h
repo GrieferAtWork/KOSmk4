@@ -27,7 +27,7 @@
 #include <hybrid/__bit.h>
 #include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/list.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 #include <hybrid/typecore.h>
 
 #include "malloc-defs.h"
@@ -63,7 +63,7 @@ struct mfree {
 #ifdef CONFIG_DEBUG_HEAP
 	u8                        mf_szchk;   /* Checksum for `mf_size' */
 #endif /* CONFIG_DEBUG_HEAP */
-	COMPILER_FLEXIBLE_ARRAY(byte_t,mf_data); /* Block data. */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, mf_data); /* Block data. */
 };
 #define MFREE_MIN(self)   ((uintptr_t)(self))
 #define MFREE_MAX(self)   ((uintptr_t)(self) + (self)->mf_size - 1)
@@ -92,16 +92,16 @@ struct mfree {
 #   define HEAP_BUCKET_OFFSET     8 /* FFS(HEAP_ALIGNMENT) */
 #elif HEAP_ALIGNMENT == 256
 #   define HEAP_BUCKET_OFFSET     9 /* FFS(HEAP_ALIGNMENT) */
-#else
+#else /* HEAP_ALIGNMENT == ... */
 #   define HEAP_BUCKET_OFFSET     __hybrid_ffs(HEAP_ALIGNMENT)
-#endif
+#endif /* HEAP_ALIGNMENT != ... */
 
 #define HEAP_BUCKET_OF(size)   (((__SIZEOF_SIZE_T__*8)-__hybrid_clz(size))-HEAP_BUCKET_OFFSET)
 #define HEAP_BUCKET_MINSIZE(i)   (1 << ((i)+HEAP_BUCKET_OFFSET-1))
 #define HEAP_BUCKET_COUNT       ((__SIZEOF_SIZE_T__*8)-(HEAP_BUCKET_OFFSET-1))
 
 #define HEAP_INIT(overalloc, freethresh, hintaddr, hintmode) \
-	{ ATOMIC_RWLOCK_INIT, __NULLPTR, { }, overalloc, freethresh, hintaddr, hintmode }
+	{ ATOMIC_LOCK_INIT, __NULLPTR, { }, overalloc, freethresh, hintaddr, hintmode }
 
 struct heap_pending_free {
 	struct heap_pending_free *hpf_next;  /* [0..1] Next pending free block. */
@@ -110,7 +110,7 @@ struct heap_pending_free {
 };
 
 struct heap {
-	struct atomic_rwlock      h_lock;       /* Lock for this heap. */
+	struct atomic_lock        h_lock;       /* Lock for this heap. */
 	ATREE_HEAD(struct mfree)  h_addr;       /* [lock(h_lock)][0..1] Heap sorted by address. */
 	LLIST(struct mfree)       h_size[HEAP_BUCKET_COUNT];
 	                                        /* [lock(h_lock)][0..1][*] Heap sorted by free range size. */

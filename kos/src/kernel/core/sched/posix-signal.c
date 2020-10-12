@@ -1573,7 +1573,7 @@ sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK) {
 no_perthread_pending:
 	/* With per-task signals checked, also check for per-process signals */
 	prqueue = &THIS_PROCESS_SIGQUEUE;
-	sync_read(prqueue);
+	sync_read(&prqueue->psq_lock);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
 		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
@@ -1582,7 +1582,7 @@ no_perthread_pending:
 		if (sigmask_ismasked_chk(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
-		sync_endread(prqueue);
+		sync_endread(&prqueue->psq_lock);
 		/* Send an RPC to ourself to service the signals.
 		 * Note that we use an RPC including another call to sigmask_check()
 		 * here, since there is a chance that the calling thread will mask
@@ -1599,7 +1599,7 @@ no_perthread_pending:
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	}
-	sync_endread(prqueue);
+	sync_endread(&prqueue->psq_lock);
 }
 
 
@@ -1687,7 +1687,7 @@ sigmask_check_after_syscall(syscall_ulong_t syscall_result)
 no_perthread_pending:
 	/* With per-task signals checked, also check for per-process signals */
 	prqueue = &THIS_PROCESS_SIGQUEUE;
-	sync_read(prqueue);
+	sync_read(&prqueue->psq_lock);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
 		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
@@ -1696,7 +1696,7 @@ no_perthread_pending:
 		if (sigmask_ismasked_chk(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
-		sync_endread(prqueue);
+		sync_endread(&prqueue->psq_lock);
 		/* Send an RPC to ourself to service the signals.
 		 * Note that we use an RPC including another call to sigmask_check()
 		 * here, since there is a chance that the calling thread will mask
@@ -1713,7 +1713,7 @@ no_perthread_pending:
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	}
-	sync_endread(prqueue);
+	sync_endread(&prqueue->psq_lock);
 }
 
 /* Same as `sigmask_check()', but should be called in order to have
@@ -1792,7 +1792,7 @@ no_perthread_pending:
 again_lock_prqueue:
 	if (ATOMIC_READ(prqueue->psq_queue.sq_queue) != NULL) {
 		bool has_write_lock;
-		sync_read(prqueue);
+		sync_read(&prqueue->psq_lock);
 		has_write_lock = false;
 again_scan_prqueue:
 		for (piter = &prqueue->psq_queue.sq_queue;
@@ -1806,12 +1806,12 @@ again_scan_prqueue:
 			 * -> Upgrade our lock to write-mode so we can steal it! */
 			if (!has_write_lock) {
 				has_write_lock = true;
-				if unlikely(!sync_upgrade(prqueue))
+				if unlikely(!sync_upgrade(&prqueue->psq_lock))
 					goto again_scan_prqueue;
 			}
 			/* Steal the current entry. */
 			*piter = iter->sqe_next;
-			sync_endwrite(prqueue);
+			sync_endwrite(&prqueue->psq_lock);
 			has_write_lock = false;
 			/* Handle this signal. */
 			TRY {
@@ -1828,9 +1828,9 @@ again_scan_prqueue:
 			goto again_lock_prqueue;
 		}
 		if unlikely(has_write_lock) {
-			sync_endwrite(prqueue);
+			sync_endwrite(&prqueue->psq_lock);
 		} else {
-			sync_endread(prqueue);
+			sync_endread(&prqueue->psq_lock);
 		}
 	}
 	if (!did_handle_something)
@@ -2325,7 +2325,7 @@ deliver_signal_to_some_thread_in_process(struct task *__restrict process_leader,
 	 * Schedule the signal as pending within the process signal queue. */
 	procqueue = &FORTASK(process_leader, this_taskgroup.tg_proc_signals);
 	TRY {
-		sync_write(procqueue);
+		sync_write(&procqueue->psq_lock);
 	} EXCEPT {
 		kfree(info);
 		RETHROW();
@@ -2336,7 +2336,7 @@ deliver_signal_to_some_thread_in_process(struct task *__restrict process_leader,
 			next = ATOMIC_READ(procqueue->psq_queue.sq_queue);
 			if unlikely(next == SIGQUEUE_SQ_QUEUE_TERMINATED) {
 				/* The target process has terminated. */
-				sync_endwrite(procqueue);
+				sync_endwrite(&procqueue->psq_lock);
 				kfree(info);
 				return false;
 			}
@@ -2345,7 +2345,7 @@ deliver_signal_to_some_thread_in_process(struct task *__restrict process_leader,
 		} while (!ATOMIC_CMPXCH_WEAK(procqueue->psq_queue.sq_queue,
 		                             next, info));
 	}
-	sync_endwrite(procqueue);
+	sync_endwrite(&procqueue->psq_lock);
 	/* Signal the arrival of a new pending signal.
 	 * Only one thread can ever handle the signal, so use `sig_send()' */
 	sig_send(&procqueue->psq_queue.sq_newsig);
@@ -3447,25 +3447,25 @@ signal_try_steal_pending(sigset_t const *__restrict these) {
 no_perthread_pending:
 	/* With per-task signals checked, also check for per-process signals */
 	prqueue = &THIS_PROCESS_SIGQUEUE;
-	sync_read(prqueue);
+	sync_read(&prqueue->psq_lock);
 again_scan_prqueue:
 	piter = &prqueue->psq_queue.sq_queue;
 	while ((iter = *piter) != NULL) {
 		if (sigismember(these, iter->sqe_info.si_signo)) {
 			if (!has_write_lock) {
 				has_write_lock = true;
-				if (!sync_upgrade(prqueue))
+				if (!sync_upgrade(&prqueue->psq_lock))
 					goto again_scan_prqueue;
 			}
 			/* Steal this signal packet. */
 			*piter = iter->sqe_next;
-			sync_endwrite(prqueue);
+			sync_endwrite(&prqueue->psq_lock);
 			return iter;
 		}
 		piter = &iter->sqe_next;
 	}
 	if (has_write_lock)
-		sync_downgrade(prqueue);
+		sync_downgrade(&prqueue->psq_lock);
 	/* Must also check if there is a pending signal
 	 * that isn't masked by our active signal mask. */
 	for (iter = prqueue->psq_queue.sq_queue;
@@ -3476,7 +3476,7 @@ again_scan_prqueue:
 		if (sigmask_ismasked_chk(iter->sqe_info.si_signo))
 			continue;
 		/* Found an unmasked signal. */
-		sync_endread(prqueue);
+		sync_endread(&prqueue->psq_lock);
 		task_schedule_user_rpc(THIS_TASK,
 		                       &task_sigmask_check_rpc_handler,
 		                       NULL,
@@ -3484,7 +3484,7 @@ again_scan_prqueue:
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	}
-	sync_endread(prqueue);
+	sync_endread(&prqueue->psq_lock);
 	return NULL;
 }
 
@@ -3910,7 +3910,7 @@ signal_gather_pending(sigset_t *__restrict these) {
 no_perthread_pending:
 	/* With per-task signals checked, also check for per-process signals */
 	prqueue = &THIS_PROCESS_SIGQUEUE;
-	sync_read(prqueue);
+	sync_read(&prqueue->psq_lock);
 	for (iter = prqueue->psq_queue.sq_queue;
 	     iter; iter = iter->sqe_next) {
 		/* XXX: Handle VFORK and USERPROCMASK here, so we can cache user-space memory
@@ -3921,7 +3921,7 @@ no_perthread_pending:
 			continue;
 		}
 		/* Found an unmasked signal. */
-		sync_endread(prqueue);
+		sync_endread(&prqueue->psq_lock);
 		task_schedule_user_rpc(THIS_TASK,
 		                       &task_sigmask_check_rpc_handler,
 		                       NULL,
@@ -3929,7 +3929,7 @@ no_perthread_pending:
 		                       GFP_NORMAL);
 		__builtin_unreachable();
 	}
-	sync_endread(prqueue);
+	sync_endread(&prqueue->psq_lock);
 }
 
 DEFINE_SYSCALL2(errno_t, rt_sigpending,

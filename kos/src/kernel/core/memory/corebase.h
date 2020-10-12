@@ -89,11 +89,11 @@ struct vm_corepage {
 
 
 /* Core page controller globals. */
-INTDEF struct atomic_rwlock vm_corepage_lock; /* Lock for the corepage subsystem. */
-INTDEF struct vm_corepage  *vm_corepage_head; /* [1..1] Pointer to the first page containing free elements. */
-INTDEF size_t               vm_corepage_free; /* [>= 2] Amount of free parts.
-                                               * NOTE: At all times, there must at least be 2 available
-                                               *       parts, so-as to allow for self-replication. */
+INTDEF struct atomic_lock  vm_corepage_lock; /* Lock for the corepage subsystem. */
+INTDEF struct vm_corepage *vm_corepage_head; /* [1..1] Pointer to the first page containing free elements. */
+INTDEF size_t              vm_corepage_free; /* [>= 2] Amount of free parts.
+                                              * NOTE: At all times, there must at least be 2 available
+                                              *       parts, so-as to allow for self-replication. */
 #ifdef CONFIG_COREBASE_HAVE_FULLPAGES
 INTDEF struct vm_corepage *vm_corepage_full; /* [0..1] Chain of fully allocated core pages. */
 #endif /* CONFIG_COREBASE_HAVE_FULLPAGES */

@@ -39,7 +39,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/sync/atomic-lock.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -52,11 +52,11 @@ DECL_BEGIN
 
 struct slab_pool {
 	/* Descriptor for the pool of free slab pages. */
-	struct atomic_rwlock sp_lock;  /* Lock for free pages. */
-	struct slab         *sp_free;  /* [0..1][lock(sp_lock)] Chain of fully free slab pages. */
-	size_t               sp_count; /* [lock(sp_lock)] Current amount of free pool pages */
-	size_t               sp_limit; /* [lock(sp_lock)] Max amount of free pool pages, before further pages must be freed. */
-	WEAK struct slab    *sp_pend;  /* Chain of pages pending to-be freed. */
+	struct atomic_lock sp_lock;  /* Lock for free pages. */
+	struct slab       *sp_free;  /* [0..1][lock(sp_lock)] Chain of fully free slab pages. */
+	size_t             sp_count; /* [lock(sp_lock)] Current amount of free pool pages */
+	size_t             sp_limit; /* [lock(sp_lock)] Max amount of free pool pages, before further pages must be freed. */
+	WEAK struct slab  *sp_pend;  /* Chain of pages pending to-be freed. */
 };
 
 
@@ -67,13 +67,13 @@ struct slab_pool {
 
 PRIVATE struct slab_pool slab_freepool[2] = {
 	{   /* SLAB_FNORMAL / GFP_NORMAL */
-		.sp_lock  = ATOMIC_RWLOCK_INIT,
+		.sp_lock  = ATOMIC_LOCK_INIT,
 		.sp_free  = NULL,
 		.sp_count = 0,
 		.sp_limit = SLAB_POOL_DEFAULT_LIMIT,
 		.sp_pend  = NULL
 	}, { /* SLAB_FLOCKED / GFP_LOCKED */
-		.sp_lock  = ATOMIC_RWLOCK_INIT,
+		.sp_lock  = ATOMIC_LOCK_INIT,
 		.sp_free  = NULL,
 		.sp_count = 0,
 		.sp_limit = SLAB_POOL_DEFAULT_LIMIT,
