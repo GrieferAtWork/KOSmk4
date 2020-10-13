@@ -2928,17 +2928,14 @@ DEFINE_SYSCALL4(errno_t, rt_sigprocmask, syscall_ulong_t, how,
 			sigmask_ensure_unmasked_mandatory_after_syscall(mymask, -EOK);
 			break;
 
-		case SIG_UNBLOCK: {
-			size_t i;
+		case SIG_UNBLOCK:
 			/* No need to check for mandatory masks being clear, since
 			 * this command is only able to clear masks from the get-go. */
-			/* sigandnset(&mymask->sm_mask, &mymask->sm_mask, set); */
-			for (i = 0; i < COMPILER_LENOF(mymask->__val); ++i)
-				mymask->__val[i] &= ~set->__val[i];
+			signandset(mymask, mymask, set); 
 			/* Since signals (may) have just gotten unmasked, check if we're
 			 * now able to handle any of the pending signals. */
 			sigmask_check_after_syscall(-EOK);
-		}	break;
+			break;
 
 		case SIG_SETMASK:
 			TRY {

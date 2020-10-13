@@ -374,11 +374,9 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 		sigorset(new_set, old_set, set);
 		break;
 
-	case SIG_UNBLOCK: {
-		unsigned int i;
-		for (i = 0; i < __SIGSET_NWORDS; ++i)
-			new_set->__val[i] = old_set->__val[i] & ~set->__val[i];
-	}	break;
+	case SIG_UNBLOCK:
+		signandset(new_set, old_set, set);
+		break;
 
 	default:
 		return libc_seterrno(EINVAL);
