@@ -1395,6 +1395,59 @@ PRIVATE size_t KCALL kmalloc_leaks_impl(void) {
 	/* Search for reachable data. */
 	gc_find_reachable();
 
+	/* TODO: Do some post-processing to form a dependency-tree between everything that got leaked:
+	 *       Often times when a memory leak happens due to some reference-counted kernel object
+	 *       not being decref'd when it should, and when this happens, any object pointed-to by
+	 *       that original object, as well as any heap memory owned by it will also appear as a
+	 *       memory leak.
+	 *
+	 * By doing some post-processing, we could order memory leaks by severity, based on how often
+	 * a leak is referenced by some other memory leak, as well as also include information about
+	 * how individual heap-blocks are referencing each other. Leaks would then be printed in
+	 * ascending order based on how often they are referenced by other leaks, as well as list the
+	 * individual pointers and offsets by which different heap-blocks point into each other:
+	 *
+	 * ============= 3 Memory leaks
+	 * Leaked 88 bytes of kmalloc-memory at E1A610F4...E1A61143 [tid=6] (Referenced 0 times)
+	 * Traceback here....
+	 *
+	 * Leaked 68 bytes of heap-memory at E1A493D0...E1A49413 [tid=3] (Referenced 0 times)
+	 * Traceback here....
+	 *
+	 * Leaked 60 bytes of kmalloc-memory at E1A4A044...E1A4A077 [tid=6] (Referenced 2 time)
+	 *     Referenced at *E1A610F8=E1A4A044 by leak at E1A610F4...E1A61143
+	 *     Referenced at *E1A493D4=E1A4A048[.+4] by leak at E1A493D0...E1A49413
+	 * Traceback here....
+	 *
+	 * Where the `Referenced at'-line is formated as
+	 *     Referenced at *ORIGIN_ADDR=TARGET_ADDR by leak at OTHER_LEAK_LO...OTHER_LEAK_HI
+	 * ORIGIN_ADDR:   The address within some other leak that references our leak
+	 * TARGET_ADDR:   The address within our leak referenced by the other leak, optionally
+	 *                suffixed by `[.+N]' where N is the offset from our own base address.
+	 * OTHER_LEAK_LO: Low address of the other leak (where that other leak can then also
+	 *                be identified by simply copy+pasting this range and searching the
+	 *                list of leaks for this same range)
+	 * OTHER_LEAK_HI: High address of the other leak
+	 *
+	 * HINT: We can temporarily gain 1 additional pointer-sized word of writable memory for
+	 *       every memory leak by removing all of them from the nodes-tree, chaining them
+	 *       back together via one of the node-tree pointers and forming a singly linked
+	 *       list, leaving the second pointer available for later use.
+	 *       Cross-references between leaks can then be enumerated in O(N*(N-1)), by
+	 *       enumerating all of the leaks, then scanning the bodies of all but the current
+	 *       leak for additional references to the same leak.
+	 * Also: by doing this we could off-load the process of printing the actual leaks onto
+	 *       our caller, to-be done after they've released `sched_super_override_end()',
+	 *       thus fixing the problem we're currently having where printing a traceback
+	 *       could potentially access disk I/O, which in turn might require an async job,
+	 *       which in turn requires that no schedule override be active in order to be
+	 *       able to run.
+	 * Only problem with that is: how would we dump leaks relating to the slab allocator.
+	 * One solution would be to also ensure that `kernel_locked_heap' is available before
+	 * acquiring a scheduler super-override, in which case we'd be allowed to allocate
+	 * additional heap memory, which we could then use to store the addresses of all of
+	 * the leaked slab pointers. */
+
 	/* Print everything that could not be reached as leaks. */
 	result = gc_print_unreachables();
 
