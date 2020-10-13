@@ -29,6 +29,8 @@
 
 #include <hybrid/pp/__va_nargs.h>
 
+#include <bits/crt/format-printer.h>
+
 #include <stdbool.h>
 
 #include <libansitty/ansitty.h>
@@ -39,6 +41,37 @@ DECL_BEGIN
 
 #ifdef __CC__
 
+/* The logecho-enabled state for debugger output.
+ * When enabled (default), debugger output is echoed via some
+ * architecture-specific mechanism onto an external logging
+ * sink which then allows external programs to inspect/record
+ * debugger output. */
+DATDEF bool dbg_logecho_enabled;
+#define dbg_logecho_push() \
+	do {                   \
+		bool _dle_old = dbg_logecho_enabled
+#define dbg_logecho_pushoff() \
+		dbg_logecho_push();   \
+		dbg_logecho_enabled = false
+#define dbg_logecho_pushon() \
+		dbg_logecho_push();  \
+		dbg_logecho_enabled = true
+#define dbg_logecho_break() \
+		(dbg_logecho_enabled = _dle_old)
+#define dbg_logecho_pop() \
+		dbg_logecho_enabled = _dle_old; \
+	} __WHILE0
+
+/* format-printer compatible function to manually write text
+ * to the external debugger logecho sink.
+ * NOTE: This function isn't affected by `dbg_logecho_enabled' */
+FUNDEF NONNULL((2)) ssize_t __FORMATPRINTER_CC dbg_logecho_printer(void *ignored, /*utf-8*/ char const *__restrict data, size_t datalen);
+/* Helper wrappers for `dbg_logecho_printer()' */
+FUNDEF NOBLOCK NONNULL((1)) size_t FCALL dbg_logecho(/*utf-8*/ char const *__restrict text);
+FUNDEF NOBLOCK NONNULL((1)) size_t VCALL dbg_logechof(/*utf-8*/ char const *__restrict format, ...);
+FUNDEF NOBLOCK NONNULL((1)) size_t FCALL dbg_vlogechof(/*utf-8*/ char const *__restrict format, __builtin_va_list args);
+
+
 /* Basic output functions within the debugger. */
 FUNDEF void NOTHROW(FCALL dbg_bell)(void);
 FUNDEF void NOTHROW(FCALL dbg_putc)(/*utf-8*/ char ch);
@@ -47,7 +80,7 @@ FUNDEF void NOTHROW(FCALL dbg_fillscreen)(/*utf-32*/ char32_t ch); /* Fill the e
 FUNDEF NONNULL((1)) size_t FCALL dbg_print(/*utf-8*/ char const *__restrict str);
 FUNDEF NONNULL((1)) size_t VCALL dbg_printf(/*utf-8*/ char const *__restrict format, ...);
 FUNDEF NONNULL((1)) size_t FCALL dbg_vprintf(/*utf-8*/ char const *__restrict format, __builtin_va_list args);
-FUNDEF NONNULL((2)) ssize_t KCALL dbg_printer(void *ignored, /*utf-8*/ char const *__restrict data, size_t datalen);
+FUNDEF NONNULL((2)) ssize_t __FORMATPRINTER_CC dbg_printer(void *ignored, /*utf-8*/ char const *__restrict data, size_t datalen);
 
 /* Display a rectangle (frame) or box (filled) on-screen. */
 FUNDEF void NOTHROW(FCALL dbg_fillbox)(int x, int y, unsigned int size_x,

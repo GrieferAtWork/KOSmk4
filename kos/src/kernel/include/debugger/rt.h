@@ -96,9 +96,9 @@ FUNDEF bool NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uint
 
 /* Return the fault program counter position
  * That is: the address of the last-executed instruction */
-#define dbg_getfaultpcreg(level)                     \
-	instruction_trypred((void *)dbg_getpcreg(level), \
-	                    dbg_instrlen_isa(level))
+#define dbg_getfaultpcreg(level)                         \
+	dbg_instruction_trypred((void *)dbg_getpcreg(level), \
+	                        dbg_instrlen_isa(level))
 
 
 LOCAL uintptr_t

@@ -201,13 +201,13 @@ NOTHROW(FCALL av_instr_pred_n)(void *addr, unsigned int n) {
 
 #else /* CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER */
 
-#define av_instr_succ(addr) ((void *)instruction_trysucc(addr, INSTRLEN_ISA_DEFAULT))
-#define av_instr_pred(addr) ((void *)instruction_trypred(addr, INSTRLEN_ISA_DEFAULT))
+#define av_instr_succ(addr) ((void *)dbg_instruction_trysucc(addr, INSTRLEN_ISA_DEFAULT))
+#define av_instr_pred(addr) ((void *)dbg_instruction_trypred(addr, INSTRLEN_ISA_DEFAULT))
 
 PRIVATE ATTR_DBGTEXT void *
 NOTHROW(FCALL av_instr_pred_n)(void *addr, unsigned int n) {
 	while (n--)
-		addr = (void *)instruction_trypred(addr, INSTRLEN_ISA_DEFAULT);
+		addr = (void *)dbg_instruction_trypred(addr, INSTRLEN_ISA_DEFAULT);
 	return addr;
 }
 
@@ -735,6 +735,7 @@ PUBLIC void *NOTHROW(FCALL dbg_asmview)(void *addr) {
 	was_cursor_visible = dbg_getcur_visible();
 	buf = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
 	oldcur = dbg_getcur();
+	dbg_logecho_pushoff();
 	dbg_savecolor();
 	dbg_getscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 
@@ -743,6 +744,7 @@ PUBLIC void *NOTHROW(FCALL dbg_asmview)(void *addr) {
 	/* Restore display contents and terminal settings. */
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 	dbg_loadcolor();
+	dbg_logecho_pop();
 	dbg_setcur(DBG_GETCUR_X(oldcur), DBG_GETCUR_Y(oldcur));
 	dbg_setcur_visible(was_cursor_visible);
 	return result;

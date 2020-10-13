@@ -895,6 +895,7 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 	was_cursor_visible = dbg_setcur_visible(false);
 	buf      = alloca(dbg_screen_width * dbg_screen_height * dbg_screen_cellsize);
 	oldcur   = dbg_getcur();
+	dbg_logecho_pushoff();
 	dbg_savecolor();
 	dbg_getscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 
@@ -922,6 +923,7 @@ NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly) {
 	/* Restore display contents and terminal settings. */
 	dbg_setscreendata(0, 0, dbg_screen_width, dbg_screen_height, buf);
 	dbg_loadcolor();
+	dbg_logecho_pop();
 	dbg_setcur(DBG_GETCUR_X(oldcur), DBG_GETCUR_Y(oldcur));
 	dbg_setcur_visible(was_cursor_visible);
 	return result;

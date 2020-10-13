@@ -168,10 +168,17 @@ PUBLIC_CONST ATTR_DBGRODATA unsigned int const dbg_screen_height   = VGA_HEIGHT;
 PUBLIC_CONST ATTR_DBGRODATA unsigned int const dbg_screen_cellsize = 2;
 
 /* Alignment of TAB characters (default: `DBG_TABSIZE_DEFAULT') */
-PUBLIC ATTR_DBGDATA unsigned int dbg_tabsize = 0;
+PUBLIC ATTR_DBGBSS unsigned int dbg_tabsize = 0;
 
 /* Cursor X-position assign after a line-feed */
-PUBLIC ATTR_DBGDATA unsigned int dbg_indent = 0;
+PUBLIC ATTR_DBGBSS unsigned int dbg_indent = 0;
+
+/* The logecho-enabled state for debugger output.
+ * When enabled (default), debugger output is echoed via some
+ * architecture-specific mechanism onto an external logging
+ * sink which then allows external programs to inspect/record
+ * debugger output. */
+PUBLIC ATTR_DBGBSS bool dbg_logecho_enabled = false;
 
 /* The ANSI TTY used for printing screen-output within the builtin debugger */
 PUBLIC ATTR_DBGBSS struct ansitty dbg_tty = {};
@@ -848,13 +855,12 @@ PRIVATE ATTR_DBGTEXT void
 NOTHROW(LIBANSITTY_CC vga_tty_putc)(struct ansitty *__restrict UNUSED(self),
                                     char32_t ch) {
 	u8 cp_ch;
-#if 1
-	{
+	if (dbg_logecho_enabled) {
 		char buf[UNICODE_UTF8_CURLEN];
 		size_t buflen = (size_t)(unicode_writeutf8(buf, ch) - buf);
 		x86_syslog_write(buf, buflen);
 	}
-#endif
+
 	/* Scroll to bottom before printing a character. */
 	if (vga_backlog_scrollpos && !vga_suppress_update)
 		vga_backlog_setscrollpos(0);
@@ -1486,6 +1492,7 @@ NOTHROW(KCALL dbg_reset_tty)(void) {
 	vga_suppress_update          = 0;
 	dbg_last_character           = 0;
 	vga_cursor_is_shown          = false;
+	dbg_logecho_enabled          = true;
 	memsetw(vga_real_terminal_start, VGA_EMPTY, VGA_WIDTH * VGA_HEIGHT);
 	{
 		u8 cursor_start;
@@ -1542,7 +1549,7 @@ dbg_printf(/*utf-8*/ char const *__restrict format, ...) {
 	return result;
 }
 
-PUBLIC ATTR_DBGTEXT ssize_t KCALL
+PUBLIC ATTR_DBGTEXT ssize_t FORMATPRINTER_CC
 dbg_printer(void *UNUSED(ignored),
             /*utf-8*/ char const *__restrict data,
             size_t datalen) {

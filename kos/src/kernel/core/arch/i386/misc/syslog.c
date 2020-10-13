@@ -38,7 +38,8 @@
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h> /* sprintf() */
-#include <time.h>  /* localtime_r() */
+#include <string.h>
+#include <time.h> /* localtime_r() */
 
 
 
@@ -82,9 +83,9 @@ PRIVATE unsigned int x86_syslog_smplock = 0;
 /* Raw, low-level write the given data to the default x86 system log.
  * The write is performed atomically in respect to other calls to
  * this function. */
-PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL x86_syslog_write)(char const *__restrict data,
-                                size_t datalen) {
+PUBLIC NOBLOCK NONNULL((1)) void FCALL
+x86_syslog_write(char const *__restrict data,
+                 size_t datalen) {
 	pflag_t was;
 	x86_syslog_smplock_acquire(was);
 	outsb(x86_syslog_port, data, datalen);
@@ -92,18 +93,18 @@ NOTHROW(FCALL x86_syslog_write)(char const *__restrict data,
 }
 
 /* Same as `x86_syslog_write()', but is format-printer compatible. */
-PUBLIC NOBLOCK NONNULL((1)) ssize_t
-NOTHROW(FORMATPRINTER_CC x86_syslog_printer)(void *UNUSED(ignored_arg),
-                                             /*utf-8*/ char const *__restrict data,
-                                             size_t datalen) {
+PUBLIC NOBLOCK NONNULL((1)) ssize_t FORMATPRINTER_CC
+x86_syslog_printer(void *UNUSED(ignored_arg),
+                   /*utf-8*/ char const *__restrict data,
+                   size_t datalen) {
 	if (datalen)
 		x86_syslog_write(data, datalen);
 	return (ssize_t)datalen;
 }
 
-PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL syslog_alloca_buffer)(/*utf-8*/ char const *__restrict format,
-                                    va_list args) {
+PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) size_t FCALL
+syslog_alloca_buffer(/*utf-8*/ char const *__restrict format,
+                     va_list args) {
 	size_t avail = get_stack_avail();
 	if (avail >= __SIZEOF_POINTER__ * 512) {
 		char *buf;
@@ -120,9 +121,17 @@ NOTHROW(FCALL syslog_alloca_buffer)(/*utf-8*/ char const *__restrict format,
 }
 
 /* Helpers for printf-style writing to the raw X86 system log port. */
-PUBLIC NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL x86_syslog_vprintf)(/*utf-8*/ char const *__restrict format,
-                                  va_list args) {
+PUBLIC NOBLOCK NONNULL((1)) size_t FCALL
+x86_syslog_print(/*utf-8*/ char const *__restrict text) {
+	size_t len;
+	len = strlen(text);
+	x86_syslog_write(text, len);
+	return len;
+}
+
+PUBLIC NOBLOCK NONNULL((1)) size_t FCALL
+x86_syslog_vprintf(/*utf-8*/ char const *__restrict format,
+                   va_list args) {
 	size_t result;
 	/* Try to write everything at once, using a stack buffer. */
 	result = syslog_alloca_buffer(format, args);
@@ -132,8 +141,8 @@ NOTHROW(FCALL x86_syslog_vprintf)(/*utf-8*/ char const *__restrict format,
 	return (size_t)format_vprintf(&x86_syslog_printer, NULL, format, args);
 }
 
-PUBLIC NOBLOCK NONNULL((1)) size_t
-NOTHROW(VCALL x86_syslog_printf)(/*utf-8*/ char const *__restrict format, ...) {
+PUBLIC NOBLOCK NONNULL((1)) size_t VCALL
+x86_syslog_printf(/*utf-8*/ char const *__restrict format, ...) {
 	size_t result;
 	va_list args;
 	va_start(args, format);
@@ -141,7 +150,6 @@ NOTHROW(VCALL x86_syslog_printf)(/*utf-8*/ char const *__restrict format, ...) {
 	va_end(args);
 	return result;
 }
-
 
 
 

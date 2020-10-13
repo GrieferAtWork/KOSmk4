@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/config.h>
 #include <hybrid/typecore.h>
 #include <bits/crt/format-printer.h>
 
@@ -39,22 +40,30 @@ DATDEF struct syslog_sink x86_default_syslog_sink;
 /* Raw, low-level write the given data to the default x86 system log.
  * The write is performed atomically in respect to other calls to
  * this function. */
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL x86_syslog_write)(char const *__restrict data,
-                                __SIZE_TYPE__ datalen);
+FUNDEF NOBLOCK NONNULL((1)) void FCALL
+x86_syslog_write(char const *__restrict data,
+                 __SIZE_TYPE__ datalen);
 
 /* Same as `x86_syslog_write()', but is format-printer compatible. */
-FUNDEF NOBLOCK NONNULL((1)) __SSIZE_TYPE__
-NOTHROW(__FORMATPRINTER_CC x86_syslog_printer)(void *ignored_arg,
-                                               /*utf-8*/ char const *__restrict data,
-                                               __SIZE_TYPE__ datalen);
+FUNDEF NOBLOCK NONNULL((1)) __SSIZE_TYPE__ __FORMATPRINTER_CC
+x86_syslog_printer(void *ignored_arg,
+                   /*utf-8*/ char const *__restrict data,
+                   __SIZE_TYPE__ datalen)
+#ifdef CONFIG_HAVE_DEBUGGER
+		ASMNAME("dbg_logecho_printer")
+#endif /* CONFIG_HAVE_DEBUGGER */
+		;
 
 /* Helpers for printf-style writing to the raw X86 system log port. */
-FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__
-NOTHROW(VCALL x86_syslog_printf)(/*utf-8*/ char const *__restrict format, ...);
-FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__
-NOTHROW(FCALL x86_syslog_vprintf)(/*utf-8*/ char const *__restrict format,
-                                  __builtin_va_list args);
+#ifdef CONFIG_HAVE_DEBUGGER
+FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ FCALL x86_syslog_print(/*utf-8*/ char const *__restrict text) ASMNAME("dbg_logecho");
+FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ VCALL x86_syslog_printf(/*utf-8*/ char const *__restrict format, ...) ASMNAME("dbg_logechof");
+FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ FCALL x86_syslog_vprintf(/*utf-8*/ char const *__restrict format, __builtin_va_list args) ASMNAME("dbg_vlogechof");
+#else /* CONFIG_HAVE_DEBUGGER */
+FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ FCALL x86_syslog_print(/*utf-8*/ char const *__restrict text);
+FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ VCALL x86_syslog_printf(/*utf-8*/ char const *__restrict format, ...);
+FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ FCALL x86_syslog_vprintf(/*utf-8*/ char const *__restrict format, __builtin_va_list args);
+#endif /* !CONFIG_HAVE_DEBUGGER */
 
 
 #endif /* __CC__ */

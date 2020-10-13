@@ -435,8 +435,11 @@ function processKosDebugOutput(
 		local i = 0;
 		for (;;) {
 			local pos = data.find(") :", i);
-			if (pos < 0)
-				break;
+			if (pos < 0) {
+				pos = data.find("):", i);
+				if (pos < 0)
+					break;
+			}
 			local lineStart = data.rfind("\n", flushStart, pos);
 			if (lineStart >= 0) {
 				++lineStart;

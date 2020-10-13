@@ -34,6 +34,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifdef CONFIG_HAVE_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/io.h>
+#include <debugger/rt.h>
 #include <debugger/util.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
@@ -48,6 +49,104 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <string.h>
 
 DECL_BEGIN
+
+#ifndef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
+DECL_END
+
+#undef CC
+#include "../../../libinstrlen/api.h" /* ARCH_INSTRUCTION_MAXLENGTH */
+#undef CC
+
+DECL_BEGIN
+/* Helper wrappers to determine the predecessor/successor of a given `pc',
+ * which is allowed to point into user-space, in which case user-space memory
+ * is accessed through use of `dbg_readmemory()', rather than direct access. */
+PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
+NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t isa) {
+	/* This `12' must be >= the max number of remaining zero-bytes
+	 * following after any other sequence of instruction bytes.
+	 * This is used to ensure that libdisasm sees that our instruction
+	 * sequence terminates after a certain offset. */
+	byte_t textbuf[ARCH_INSTRUCTION_MAXLENGTH], *result;
+	size_t textlen;
+	textlen = ARCH_INSTRUCTION_MAXLENGTH -
+	          dbg_readmemory(pc, textbuf, ARCH_INSTRUCTION_MAXLENGTH);
+	if (!textlen)
+		return NULL;
+	/* zero-fill a small tail area after the text. */
+	memset(textbuf + textlen, 0, ARCH_INSTRUCTION_MAXLENGTH - textlen);
+	result = instruction_succ_nx(textbuf, isa);
+	if (result)
+		result = (byte_t *)pc + (result - textbuf);
+	return result;
+}
+
+/* Return the start of the longest valid instruction that ends at `pc'
+ * If no such instruction exists, return `NULL' instead. */
+PRIVATE ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
+NOTHROW_NCX(FCALL dbg_predmaxone)(void const *pc, instrlen_isa_t isa) {
+	byte_t *result;
+	result = (byte_t *)pc - ARCH_INSTRUCTION_MAXLENGTH;
+	for (; (uintptr_t)result < (uintptr_t)pc; ++result) {
+		byte_t *nextptr;
+		nextptr = dbg_instruction_succ_nx(result, isa);
+		if (nextptr == (byte_t *)pc)
+			return result;
+	}
+	return NULL;
+}
+
+/* # of instructions to back-track in order to verify that
+ * some given instruction point fits into the instruction
+ * stream described by surrounding instructions. */
+#ifndef LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE
+#define LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE 16
+#endif /* !LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE */
+
+PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
+NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
+	byte_t *rev_iter_curr;
+	byte_t *rev_iter_next;
+	unsigned int i;
+	rev_iter_curr = (byte_t *)pc;
+	for (i = 0; i < LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE; ++i) {
+		rev_iter_next = dbg_predmaxone(rev_iter_curr, isa);
+		if (!rev_iter_next)
+			break;
+		rev_iter_curr = rev_iter_next;
+	}
+	/* Find the start of the first instruction that
+	 * ends at `>= pc', but starts at `>= rev_iter_curr' */
+	for (;;) {
+		rev_iter_next = dbg_instruction_succ_nx(rev_iter_curr, isa);
+		if (!rev_iter_next)
+			break; /* No such instruction... */
+		if (rev_iter_next >= pc)
+			return rev_iter_curr; /* Found it! */
+		rev_iter_curr = rev_iter_next;
+	}
+	return NULL;
+}
+
+PUBLIC ATTR_DBGTEXT ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
+NOTHROW(LIBINSTRLEN_CC dbg_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
+	byte_t *result;
+	result = dbg_instruction_succ_nx(pc, isa);
+	if unlikely(!result)
+		result = (byte_t *)pc + 1;
+	return result;
+}
+
+PUBLIC ATTR_DBGTEXT ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
+NOTHROW(LIBINSTRLEN_CC dbg_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
+	byte_t *result;
+	result = dbg_instruction_pred_nx(pc, isa);
+	if unlikely(!result)
+		result = (byte_t *)pc - 1;
+	return result;
+}
+#endif /* !LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH */
+
 
 /* Print addr2line optimized for the debugger.
  * Example (of an inlined function):
@@ -121,10 +220,66 @@ again_printlevel:
 			info.al_rawname = info.al_name;
 		if (!info.al_rawname)
 			info.al_rawname = (char *)DBGSTR("??" "?");
+		dbg_logecho_push();
 		fgcolor = level < info.al_levelcnt - 1
 		        ? inline_fgcolor
 		        : normal_fgcolor;
 		dbg_savecolor();
+		if (info.al_srcfile) {
+			dbg_logecho_enabled = false;
+			debug_addr2line_print_filename(&dbg_logecho_printer, NULL,
+			                               info.al_cubase,
+			                               info.al_srcpath,
+			                               info.al_srcfile);
+			if (info.al_srcline) {
+				if (info.al_srccol) {
+					dbg_logechof(DBGSTR("(%" PRIuPTR ",%" PRIuPTR ")"),
+					             info.al_srcline, info.al_srccol);
+				} else {
+					dbg_logechof(DBGSTR("(%" PRIuPTR ")"),
+					             info.al_srcline);
+				}
+			}
+			dbg_logechof(DBGSTR(" : %p+%" PRIuSIZ),
+			             level == 0 ? start_pc
+			                      : (((byte_t *)start_pc - module_relative_start_pc) +
+			                         info.al_symstart),
+			             level == 0 ? (size_t)((byte_t *)end_pc - (byte_t *)start_pc)
+			                      : (size_t)(info.al_lineend - info.al_linestart));
+			if (modinfo->ami_filename) {
+				dbg_logechof(DBGSTR("[%s]"), modinfo->ami_filename);
+			} else if (modinfo->ami_name && modinfo->ami_fspath) {
+				dbg_logecho(DBGSTR("["));
+				path_printentex(modinfo->ami_fspath,
+				                modinfo->ami_name,
+				                strlen(modinfo->ami_name),
+				                &dbg_logecho_printer, NULL,
+				                PATH_PRINT_MODE_NORMAL,
+				                &vfs_kernel);
+				dbg_logecho(DBGSTR("]"));
+			} else if (modinfo->ami_name) {
+				dbg_logechof(DBGSTR("[%s]"), modinfo->ami_name);
+			}
+			dbg_logechof(DBGSTR("[%s+%" PRIuSIZ "]"),
+			             info.al_rawname,
+			             level == 0 ? (size_t)(module_relative_start_pc - info.al_symstart)
+			                        : (size_t)(info.al_linestart - info.al_symstart));
+			if (message_format) {
+				dbg_logecho(DBGSTR(" ["));
+#ifdef __i386__
+				dbg_vlogechof(message_format, args);
+#else /* __i386__ */
+				{
+					va_list copy;
+					va_copy(copy, args);
+					dbg_vlogechof(message_format, args);
+					va_end(copy);
+				}
+#endif /* !__i386__ */
+				dbg_logecho(DBGSTR("]"));
+			}
+			dbg_logecho(DBGSTR("\n"));
+		}
 		dbg_setfgcolor(fgcolor);
 		dbg_printf(DBGSTR("%p"),
 		           level == 0 ? start_pc
@@ -211,6 +366,7 @@ again_printlevel:
 			dbg_putc(']');
 		}
 		dbg_putc('\n');
+		dbg_logecho_pop();
 		if (++level < info.al_levelcnt) {
 			/* Print additional levels */
 			error = addr2line(ainfo, module_relative_start_pc, &info, level);

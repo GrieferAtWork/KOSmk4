@@ -119,7 +119,7 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
  * some given instruction point fits into the instruction
  * stream described by surrounding instructions. */
 #ifndef LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE
-#define LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE 8
+#define LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE 16
 #endif /* !LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE */
 
 /* Return the start of the longest valid instruction that ends at `pc'
@@ -154,7 +154,7 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 	byte_t *rev_iter_next;
 	unsigned int i;
 	rev_iter_curr = (byte_t *)pc;
-	for (i = 0; i < ARCH_INSTRUCTION_MAXLENGTH; ++i) {
+	for (i = 0; i < LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE; ++i) {
 		rev_iter_next = predmaxone(rev_iter_curr, isa);
 		if (!rev_iter_next)
 			break;
