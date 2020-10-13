@@ -1397,9 +1397,9 @@ PRIVATE size_t KCALL kmalloc_leaks_impl(void) {
 
 	/* TODO: Do some post-processing to form a dependency-tree between everything that got leaked:
 	 *       Often times when a memory leak happens due to some reference-counted kernel object
-	 *       not being decref'd when it should, and when this happens, any object pointed-to by
-	 *       that original object, as well as any heap memory owned by it will also appear as a
-	 *       memory leak.
+	 *       not being decref'd when it should, the system log will be flooded by a wall of tracebacks.
+	 *       This happens because any object pointed-to by that original object, as well as any heap
+	 *       memory owned by it will also appear as a memory leak.
 	 *
 	 * By doing some post-processing, we could order memory leaks by severity, based on how often
 	 * a leak is referenced by some other memory leak, as well as also include information about
@@ -1468,26 +1468,48 @@ PUBLIC ATTR_NOINLINE size_t KCALL
 kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 	size_t result;
 again:
-	vm_kernel_treelock_writef(GFP_NORMAL);
+	/* Acquire a scheduler super-override, thus ensuring that we're
+	 * the only thread running anywhere on the entire system.
+	 *
+	 * NOTE: We must do this first, since a super-override should
+	 *       only be acquired when not already holding any atomic
+	 *       locks, since when holding such locks, there is a small
+	 *       chance that other CPUs are currently trying to acquire
+	 *       them, preventing us from reaching them.
+	 * Technically, this shouldn't happen, since you shouldn't do a
+	 * `while (!trylock()) task_pause();' loop (meaning that a cpu
+	 * that is blocking-waiting for an atomic lock should also have
+	 * preemption enabled), and where you are allowed to do this kind
+	 * of loop, you're actually dealing with an SMP-lock, which also
+	 * requires that preemption be disabled, where becoming a super
+	 * override will implicitly cause one to acquire all SMP-locks,
+	 * since a CPU that hold an SMP-lock must release it before re-
+	 * enabling preemption, meaning that being able to send an IPI
+	 * to every CPU, and having every cpu ACK that IPI also implies
+	 * that all CPUs had preemption enabled, which then implies that
+	 * no CPU was holding onto an SMP-lock.
+	 *
+	 * But despite all of that, it's better to be safe than sorry.
+	 *
+	 * HINT: `smplock' (see above) is (like the name says) an SMP-lock,
+	 *       so we implicitly acquire it by being the super-override, so
+	 *       we don't actually have to deal with that one at all! */
+	sched_super_override_start();
+
+	if (!vm_kernel_treelock_trywrite()) {
+		sched_super_override_end();
+		while (!sync_canwrite(&vm_kernel.v_treelock))
+			task_yield();
+		goto again;
+	}
 
 	/* Acquire a lock to the corepage system, thus
 	 * ensuring that it's in a consistent state, too. */
 	if (!sync_trywrite(&vm_corepage_lock)) {
 		vm_kernel_treelock_endwrite();
+		sched_super_override_end();
 		while (!sync_canwrite(&vm_corepage_lock))
 			task_yield();
-		goto again;
-	}
-
-	/* Acquire a scheduler super-override, thus ensuring that we're
-	 * the only thread running anywhere on the entire system.
-	 * NOTE: We do this while already holding a lock to the kernel vm's
-	 *       tree of nodes, so-as to ensure that no other CPU is modifying
-	 *       the kernel VM when we become the super-override. */
-	if (!sched_super_override_trystart()) {
-		sync_endwrite(&vm_corepage_lock);
-		vm_kernel_treelock_endwrite();
-		task_pause();
 		goto again;
 	}
 
