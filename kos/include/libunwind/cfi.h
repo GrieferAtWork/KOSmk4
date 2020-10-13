@@ -70,16 +70,35 @@
      defined(CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_SP)) != 1
 #error "Need exactly one of `CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP' or `CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_SP'"
 #endif
+#ifndef CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_NO_LANDING_COMMON_UNCOMMON_REGISTERS 1
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT   CFI_UNWIND_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT CFI_UNWIND_UNCOMMON_REGISTER_COUNT
+#ifdef CFI_UNWIND_COMMON_REGISTER_SP
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_SP      CFI_UNWIND_COMMON_REGISTER_SP
+#else /* CFI_UNWIND_COMMON_REGISTER_SP */
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP    CFI_UNWIND_UNCOMMON_REGISTER_SP
+#endif /* !CFI_UNWIND_COMMON_REGISTER_SP */
+#define cfi_unwind_landing_register_dw2common      cfi_unwind_register_dw2common
+#define cfi_unwind_landing_register_dw2uncommon    cfi_unwind_register_dw2uncommon
+#define cfi_unwind_landing_register_common2dw      cfi_unwind_register_common2dw
+#define cfi_unwind_landing_register_uncommon2dw    cfi_unwind_register_uncommon2dw
+#endif /* !CFI_UNWIND_COMMON_REGISTER_COUNT */
+
+#if (defined(CFI_UNWIND_LANDING_COMMON_REGISTER_SP) + \
+     defined(CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP)) != 1
+#error "Need exactly one of `CFI_UNWIND_LANDING_COMMON_REGISTER_SP' or `CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP'"
+#endif
 
 
 
 
 
-/* NOTE: Embedding CFI code that is only meant for the eyes of KOS:
+/* HINT: Embedding CFI code that is only meant for the eyes of KOS:
  *    .cfi_escape DW_OP_skip, 3, 0
  *    .cfi_escape 'K', 'O', 'S'
  *    .cfi_escape DW_OP_skip, n, m
- *    .cfi_escape ...  // This code (with a size of n + (m << 8)) is only executed in KOS
+ *    .cfi_escape ...  // This code (with a size of n + (m << 8)) is only executed under KOS
  */
 
 /*      DW_OP_                     0x00  * ... */
@@ -329,10 +348,170 @@
 #define DW_CFA_val_offset           0x14 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_val_offsetn, dwarf_decode_uleb128(&pc) }; */
 #define DW_CFA_val_offset_sf        0x15 /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_val_offsetn, dwarf_decode_sleb128(&pc) * self->f_dataalign }; */
 #define DW_CFA_val_expression       0x16 /* reg = dwarf_decode_uleb128(&pc); expr_size = dwarf_decode_uleb128(&pc); register[reg] = { type: DW_CFA_register_rule_val_expression, expr: { pc, pc + expr_size } }; pc += expr_size; */
+/*      DW_CFA_                     0x17  * ... */
+/*      DW_CFA_                     0x18  * ... */
+/*      DW_CFA_                     0x19  * ... */
+/*      DW_CFA_                     0x1a  * ... */
+/*      DW_CFA_                     0x1b  * ... */
 
 /* DWARF Call Frame Instruction (CFI) Extensions (section 10.5.2) */
+#define DW_CFA_lo_user                      0x1c /* First extension/custom opcode */
+/*      DW_CFA_                             0x1c  * ... */
+#define DW_CFA_MIPS_advance_loc8            0x1d /* ??? */
+/*      DW_CFA_                             0x1e  * ... */
+/*      DW_CFA_                             0x1f  * ... */
+/*      DW_CFA_                             0x20  * ... */
+/*      DW_CFA_                             0x21  * ... */
+/*      DW_CFA_                             0x22  * ... */
+/*      DW_CFA_                             0x23  * ... */
+/*      DW_CFA_                             0x24  * ... */
+/*      DW_CFA_                             0x25  * ... */
+/*      DW_CFA_                             0x26  * ... */
+/*      DW_CFA_                             0x27  * ... */
+/*      DW_CFA_                             0x28  * ... */
+/*      DW_CFA_                             0x29  * ... */
+/*      DW_CFA_                             0x2a  * ... */
+/*      DW_CFA_                             0x2b  * ... */
+/*      DW_CFA_                             0x2c  * ... */
+#define DW_CFA_GNU_window_save              0x2d /* ??? */
+#define DW_CFA_AARCH64_negate_ra_state      0x2d /* ??? */
 #define DW_CFA_GNU_args_size                0x2e /* landing_pad_adjustment = dwarf_decode_uleb128(&pc); */
 #define DW_CFA_GNU_negative_offset_extended 0x2f /* register[dwarf_decode_uleb128(&pc)] = { DW_CFA_register_rule_offsetn, -((signed)dwarf_decode_uleb128(&pc) * self->f_dataalign) }; */
+/*      DW_CFA_                             0x30  * ... */
+/*      DW_CFA_                             0x31  * ... */
+/*      DW_CFA_                             0x32  * ... */
+/*      DW_CFA_                             0x33  * ... */
+/*      DW_CFA_                             0x34  * ... */
+/*      DW_CFA_                             0x35  * ... */
+/*      DW_CFA_                             0x36  * ... */
+/*      DW_CFA_                             0x37  * ... */
+#define DW_CFA_KOS_startcapsule             0x38 /* Alias for `DW_CFA_remember_state' (except when used in functions with a landing pad) */
+#define DW_CFA_KOS_endcapsule               0x39 /* Alias for `DW_CFA_restore_state' (except when used in functions with a landing pad) */
+/*      DW_CFA_                             0x3a  * ... */
+/*      DW_CFA_                             0x3b  * ... */
+/*      DW_CFA_                             0x3c  * ... */
+/*      DW_CFA_                             0x3d  * ... */
+/*      DW_CFA_                             0x3e  * ... */
+/*      DW_CFA_                             0x3f  * ... */
+#define DW_CFA_hi_user                      0x3f /* Last extension/custom opcode */
+
+/* Behavior/use for `DW_CFA_KOS_startcapsule' / `DW_CFA_KOS_endcapsule'
+ *
+ * As already stated, these instructions only have special meaning when used in
+ * functions that also contain a landing pad (similar to how `DW_CFA_GNU_args_size'
+ * also only finds special use in such functions)
+ *
+ * When used, these instructions form "capsules" of that can be used to define
+ * ranges of CFI instructions that should be executed for the purpose of unwinding,
+ * both during normal unwinding of a function, as well as when unwinding in the
+ * context of jumping to a different location within the same function for the
+ * purpose of executing an exception handler. As such, the following is done
+ * prior to jumping to any landing pad:
+ *
+ * >> src_capsule = FIND_INNERMOST_CAPSULE(EXCEPTION_PC);
+ * >> if (!src_capsule) {
+ * >>     // Capsules aren't used
+ * >> } else {
+ * >>     // Find the last capsule that should still be unwound
+ * >>     dst_capsule  = FIND_INNERMOST_CAPSULE(LANDING_PAD_PC);
+ * >>     last_capsule = src_capsule;
+ * >>     if (!dst_capsule) {
+ * >>         // Unwind until the outer-most capsule.
+ * >>         while (last_capsule->parent)
+ * >>             last_capsule = last_capsule->parent;
+ * >>     } else if (dst_capsule == src_capsule) {
+ * >>         // Same capsule (don't unwind anything)
+ * >>         goto apply_gnu_args;
+ * >>     } else {
+ * >>         // Unwind everything until the first capsule shared with the landing pad
+ * >>         while (last_capsule->parent !in PARENTS_OF(dst_capsule))
+ * >>             last_capsule = last_capsule->parent;
+ * >>     }
+ * >>     
+ * >>     // Construct unwinding rules for CFA instrumentation between
+ * >>     // last_capsule->dw_cfa_start  (Which points at the byte in .eh_frame after the capsule's `DW_CFA_KOS_startcapsule')
+ * >>     // and whatever location marks the end of `EXCEPTION_PC'.
+ * >>     // During this construction of rules, the `DW_CFA_KOS_startcapsule'/`DW_CFA_KOS_endcapsule'
+ * >>     // opcodes once again behave identical to `DW_CFA_remember_state'/`DW_CFA_restore_state'
+ * >>     CONSTRUCT_RULES_FROM_DW_CFA_SUBRANGE(&RULES,
+ * >>                                          last_capsule->dw_cfa_start,
+ * >>                                          EXCEPTION_PC);
+ * >>     UNWIND_WITH_RULES(RULES);
+ * >> }
+ * >>apply_gnu_args:
+ * >> APPLY_GNU_ARGS_SIZE_INSTRUMENTATION(); // DW_CFA_GNU_args_size
+ * >> JUMP_TO_LANDING_PAD();
+ *
+ * Example:
+ * >> .Ltry_begin:
+ * >>     movq   $0, %rdi
+ * >>     movq   $SYS_pipe, %rax
+ * >>     std
+ * >> .cfi_startcapsule
+ * >> .cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a  // %rflags.DF = 0
+ * >>     syscall
+ * >>     cld
+ * >> .cfi_endcapsule
+ * >> .Ltry_end:
+ * >>     ...
+ * >> .Lexcept:
+ * >>     ...
+ *
+ * When jumping to `.Lexcept' as the landing pad of an exception thrown by `syscall',
+ * the custom piece of CFI instrumentation used to set `%rflags.DF = 0' will still be
+ * executed, even though normally such instrumentation would only be serviced when the
+ * surrounding CFI-proc would get unwound (which is the case when `.Lexcept' is jumped
+ * to as the target of a landing pad transition). But if `.Lexcept' was located within
+ * the same capsule as `syscall' (internally: .Lexcept would have to be followed by at
+ * least 1 additional byte of program code before followed by a .cfi_endcapsule directive),
+ * then the unwind rule specified by `.cfi_escape' would not be executed (since the landing
+ * pad would not leave the capsule)
+ *
+ * Using capsules, one is thus able to force certain registers to be restored before
+ * executing code from a local landing pad, which is quite useful when one needs custom
+ * unwinding behavior for dealing with exceptions produced by inline assembly (which is
+ * also the reason why this extension was originally created). Additionally, this also
+ * makes it possible to populate registers with custom values based on where in a function
+ * an exception originates:
+ *
+ * >> .cfi_startproc
+ * >>
+ * >> .Lexcept_begin:
+ * >> .cfi_startcapsule
+ * >> .cfi_escape ... // Code to unwind %rdi=0
+ * >>     call foo
+ * >> .cfi_endcapsule
+ * >>
+ * >> .cfi_startcapsule
+ * >> .cfi_escape ... // Code to unwind %rdi=1
+ * >>     call bar
+ * >> .cfi_endcapsule
+ * >>
+ * >> .cfi_startcapsule
+ * >> .cfi_escape ... // Code to unwind %rdi=2
+ * >>     call baz
+ * >> .cfi_endcapsule
+ * >>
+ * >> .Lexcept_end:
+ * >>
+ * >>     ret
+ * >> .Llanding_pad:
+ * >>     // The origin of the exception can be deduced from the value of %rdi:
+ * >>     //   %rdi == 0: Exception thrown by foo
+ * >>     //   %rdi == 1: Exception thrown by bar
+ * >>     //   %rdi == 2: Exception thrown by baz
+ * >>     ret
+ * >> .cfi_endproc
+ *
+ *
+ * Implementation:
+ *  - CFI capsules are implemented using 2 new CFI instruction `.cfi_startcapsule' and `.cfi_endcapsule'.
+ *  - As far as other tools should be concerned, `.cfi_startcapsule' and `.cfi_endcapsule'
+ *    are just aliases for `.cfi_remember_state' and `.cfi_restore_state'
+ *  - For compatibility, `DW_CFA_GNU_args_size' instrumentation is not affected by capsules.
+ *
+ */
+
 
 
 /* Type codes for `unwind_ste_t::s_type'

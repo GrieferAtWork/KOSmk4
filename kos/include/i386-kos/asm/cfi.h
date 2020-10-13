@@ -45,6 +45,18 @@
  */
 
 __ASM_BEGIN
+
+/* NOTE: CFI capsules are currently restricted to KOS+!KERNEL.
+ *       s.a. `LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES' */
+#if defined(__KOS__) && !defined(__KERNEL__)
+__ASM_L(.macro .cfi_startcapsule)
+__ASM_L(	.cfi_escape 0x38)
+__ASM_L(.endm)
+__ASM_L(.macro .cfi_endcapsule)
+__ASM_L(	.cfi_escape 0x39)
+__ASM_L(.endm)
+#endif /* __KOS__ && !__KERNEL__ */
+
 #ifdef __x86_64__
 __ASM_L(.macro subq_imm_cfi offset:req, reg:req)
 __ASM_L(	subq $(__ASM_ARG(\offset)), __ASM_ARG(\reg))

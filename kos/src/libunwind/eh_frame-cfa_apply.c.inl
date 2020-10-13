@@ -21,28 +21,18 @@
 #include "eh_frame.c"
 
 //#define EH_FRAME_CFA_APPLY 1
-#define EH_FRAME_CFA_SIGFRAME_APPLY 1
+//#define EH_FRAME_CFA_SIGFRAME_APPLY 1
+#define EH_FRAME_CFA_LANDING_APPLY 1
 #endif /* __INTELLISENSE__ */
 
-#if (defined(EH_FRAME_CFA_APPLY) + defined(EH_FRAME_CFA_SIGFRAME_APPLY)) != 1
+#if (defined(EH_FRAME_CFA_APPLY) + defined(EH_FRAME_CFA_SIGFRAME_APPLY) + defined(EH_FRAME_CFA_LANDING_APPLY)) != 1
 #error "Must #define EH_FRAME_CFA_APPLY or EH_FRAME_CFA_SIGFRAME_APPLY"
 #endif /* (EH_FRAME_CFA_APPLY + EH_FRAME_CFA_SIGFRAME_APPLY) != 1 */
 
 
 DECL_BEGIN
 
-#ifdef EH_FRAME_CFA_SIGFRAME_APPLY
-#ifdef CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP
-#define CFI_UNWIND_LOCAL_COMMON_REGISTER_SP      CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP
-#else /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP */
-#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP    CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_SP
-#endif /* !CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP */
-#define CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT   CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
-#define cfi_unwind_local_register_common2dw      cfi_unwind_sigframe_register_common2dw
-#define cfi_unwind_local_register_uncommon2dw    cfi_unwind_sigframe_register_uncommon2dw
-#define libuw_unwind_local_fde_exec_until        libuw_unwind_sigframe_fde_exec_until
-#else /* EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE */
+#ifdef EH_FRAME_CFA_APPLY
 #ifdef CFI_UNWIND_COMMON_REGISTER_SP
 #define CFI_UNWIND_LOCAL_COMMON_REGISTER_SP      CFI_UNWIND_COMMON_REGISTER_SP
 #else /* CFI_UNWIND_COMMON_REGISTER_SP */
@@ -53,29 +43,32 @@ DECL_BEGIN
 #define cfi_unwind_local_register_common2dw      cfi_unwind_register_common2dw
 #define cfi_unwind_local_register_uncommon2dw    cfi_unwind_register_uncommon2dw
 #define libuw_unwind_local_fde_exec_until        libuw_unwind_fde_exec_until
-#endif /* !EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE */
+#elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
+#ifdef CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP
+#define CFI_UNWIND_LOCAL_COMMON_REGISTER_SP      CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP
+#else /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP */
+#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP    CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_SP
+#endif /* !CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP */
+#define CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT   CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
+#define cfi_unwind_local_register_common2dw      cfi_unwind_sigframe_register_common2dw
+#define cfi_unwind_local_register_uncommon2dw    cfi_unwind_sigframe_register_uncommon2dw
+#define libuw_unwind_local_fde_exec_until        libuw_unwind_sigframe_fde_exec_until
+#elif defined(EH_FRAME_CFA_LANDING_APPLY)
+#ifdef CFI_UNWIND_LANDING_COMMON_REGISTER_SP
+#define CFI_UNWIND_LOCAL_COMMON_REGISTER_SP      CFI_UNWIND_LANDING_COMMON_REGISTER_SP
+#else /* CFI_UNWIND_LANDING_COMMON_REGISTER_SP */
+#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP    CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP
+#endif /* !CFI_UNWIND_LANDING_COMMON_REGISTER_SP */
+#define CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT   CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT
+#define cfi_unwind_local_register_common2dw      cfi_unwind_landing_register_common2dw
+#define cfi_unwind_local_register_uncommon2dw    cfi_unwind_landing_register_uncommon2dw
+#endif /* ... */
 
 
 
-#ifdef EH_FRAME_CFA_SIGFRAME_APPLY
-/* Behaves identical to `unwind_fde_exec()', and doesn't actually ever have to be
- * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
- * FDE descriptors (though again: use of this is entirely optional; the regular
- * `unwind_fde_exec()' is just as capable of unwinding signal frame descriptors.
- * This function is merely optimized to better restore registers commonly used
- * within signal frames)
- * @param: self:   The FDE to execute in search of `absolute_pc'
- * @param: result: CFA state descriptor, to-be filled with restore information upon success.
- * @return: UNWIND_SUCCESS:                 ...
- * @return: UNWIND_INVALID_REGISTER:        ...
- * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
- * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
- * @return: UNWIND_BADALLOC:                ... */
-INTERN NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
-                                               unwind_cfa_sigframe_state_t *__restrict result,
-                                               void *absolute_pc)
-#else /* EH_FRAME_CFA_SIGFRAME_APPLY */
+#ifdef EH_FRAME_CFA_APPLY
 /* Execute CFA result instruction until `absolute_pc' has been reached,
  * or the entirety of the FDE instruction code has been executed.
  * This function is used to fill in CFA result information at a given address,
@@ -95,8 +88,63 @@ INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_state_t *__restrict result,
                                       void *absolute_pc)
-#endif /* !EH_FRAME_CFA_SIGFRAME_APPLY */
+#elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
+/* Behaves identical to `unwind_fde_exec()', and doesn't actually ever have to be
+ * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
+ * FDE descriptors (though again: use of this is entirely optional; the regular
+ * `unwind_fde_exec()' is just as capable of unwinding signal frame descriptors.
+ * This function is merely optimized to better restore registers commonly used
+ * within signal frames)
+ * @param: self:   The FDE to execute in search of `absolute_pc'
+ * @param: result: CFA state descriptor, to-be filled with restore information upon success.
+ * @return: UNWIND_SUCCESS:                 ...
+ * @return: UNWIND_INVALID_REGISTER:        ...
+ * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
+ * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
+ * @return: UNWIND_BADALLOC:                ... */
+INTERN NONNULL((1, 2)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
+                                               unwind_cfa_sigframe_state_t *__restrict result,
+                                               void *absolute_pc)
+#elif defined(EH_FRAME_CFA_LANDING_APPLY)
+/* Behaves similar to `unwind_fde_exec()', but must be used to calculate the CFA
+ * for the purpose of jumping to a custom `LANDINGPAD_PC' as part of handling an
+ * exceptions which originates from `ABSOLUTE_PC' within the current cfi-proc.
+ * This function is calculates the relative CFI-capsule offset between `ABSOLUTE_PC',
+ * and `LANDINGPAD_PC', as well as the GNU-argsize adjustment. Once this is done,
+ * the caller must use `unwind_cfa_landing_apply()' to apply the these transformations
+ * onto some given register state, which may then be used to resume execution.
+ * @param: SELF:   The FDE to execute in search of `__absolute_pc'
+ * @param: RESULT: CFA state descriptor, to-be filled with restore information upon success.
+ * @return: UNWIND_SUCCESS:                 ...
+ * @return: UNWIND_INVALID_REGISTER:        ...
+ * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
+ * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
+ * @return: UNWIND_BADALLOC:                ... */
+INTERN NONNULL((1, 2)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict self,
+                                              unwind_cfa_landing_state_t *__restrict result,
+                                              void *absolute_pc, void *landingpad_pc)
+#endif /* ... */
 {
+#ifdef EH_FRAME_CFA_LANDING_APPLY
+#ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
+	memset(result, 0, sizeof(*result));
+	/* TODO: Find which range of capsules must be unwound
+	 *       between `absolute_pc' and `landingpad_pc',
+	 *       calculate the FDE unwind instructions between
+	 *       them, and respect all `DW_CFA_GNU_args_size'
+	 *       instructions we find along the value, returning the
+	 *       value of `unwind_fde_exec_landing_pad_adjustment()'
+	 *       in `result->cs_lp_adjustment'. */
+	(void)landingpad_pc;
+#else /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
+	(void)landingpad_pc;
+#endif /* !LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
+	return libuw_unwind_fde_exec_landing_pad_adjustment(self,
+	                                                    &result->cs_lp_adjustment,
+	                                                    absolute_pc);
+#else /* EH_FRAME_CFA_LANDING_APPLY */
 	unsigned int error;
 	unwind_order_index_t order = 0;
 	memset(result, 0, sizeof(*result));
@@ -142,6 +190,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
 	}
 	TRACE("unwind_fde_exec() -> %u\n", error);
 	return error;
+#endif /* !EH_FRAME_CFA_LANDING_APPLY */
 }
 
 
@@ -155,21 +204,7 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes);
 
 
 
-#ifdef EH_FRAME_CFA_SIGFRAME_APPLY
-/* For use with `unwind_fde_sigframe_exec()': Apply register rules previously calculated.
- * @param: self:        The CFA state to-be used when applying registers
- * @param: absolute_pc: Same value as was previously used to calculate `fde' from `self'
- * @return: UNWIND_SUCCESS:               ...
- * @return: UNWIND_INVALID_REGISTER:      ...
- * @return: UNWIND_SEGFAULT:              ...
- * @return: UNWIND_EMULATOR_*:            ...
- * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
-libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
-                                unwind_fde_t const *__restrict fde, void *absolute_pc,
-                                unwind_getreg_t reg_getter, void const *reg_getter_arg,
-                                unwind_setreg_t reg_setter, void *reg_setter_arg)
-#else /* EH_FRAME_CFA_SIGFRAME_APPLY */
+#ifdef EH_FRAME_CFA_APPLY
 /* Apply a given CFA unwind state in order to apply register information from from reg_getter to reg_setter.
  * Note however that only registers with a rule other than `DW_CFA_register_rule_undefined'
  * will be applied, meaning that `*reg_setter' will not get invoked for these registers.
@@ -188,17 +223,77 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
                        unwind_fde_t const *__restrict fde, void *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg)
-#endif /* !EH_FRAME_CFA_SIGFRAME_APPLY */
+#elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
+/* For use with `unwind_fde_sigframe_exec()': Apply register rules previously calculated.
+ * @param: self:        The CFA state to-be used when applying registers
+ * @param: absolute_pc: Same value as was previously used to calculate `fde' from `self'
+ * @return: UNWIND_SUCCESS:               ...
+ * @return: UNWIND_INVALID_REGISTER:      ...
+ * @return: UNWIND_SEGFAULT:              ...
+ * @return: UNWIND_EMULATOR_*:            ...
+ * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
+INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
+libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
+                                unwind_fde_t const *__restrict fde, void *absolute_pc,
+                                unwind_getreg_t reg_getter, void const *reg_getter_arg,
+                                unwind_setreg_t reg_setter, void *reg_setter_arg)
+#elif defined(EH_FRAME_CFA_LANDING_APPLY)
+/* For use with `unwind_fde_landing_exec()': Apply register rules previously calculated.
+ * @param: SELF:        The CFA state to-be used when applying registers
+ * @param: ABSOLUTE_PC: Same value as was previously used to calculate `FDE' from `SELF'
+ * @return: UNWIND_SUCCESS:               ...
+ * @return: UNWIND_INVALID_REGISTER:      ...
+ * @return: UNWIND_SEGFAULT:              ...
+ * @return: UNWIND_EMULATOR_*:            ...
+ * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
+INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
+libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
+                               unwind_fde_t const *__restrict fde, void *absolute_pc,
+                               unwind_getreg_t reg_getter, void const *reg_getter_arg,
+                               unwind_setreg_t reg_setter, void *reg_setter_arg)
+#endif /* ... */
 {
+#if defined(EH_FRAME_CFA_LANDING_APPLY) && !defined(LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES)
+	/* Only apply LP-adjustments but don't account for CFI capsules. */
+	(void)fde;         /* Unused... */
+	(void)absolute_pc; /* Unused... */
+	if (self->cs_lp_adjustment != 0) {
+		uintptr_t sp;
+		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_UNWIND_REGISTER_SP, &sp))
+			ERROR(err_invalid_register);
+		/* Adjust the stack-pointer. */
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+		sp += self->cs_lp_adjustment;
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+		sp -= self->cs_lp_adjustment;
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_UNWIND_REGISTER_SP, &sp))
+			ERROR(err_invalid_register);
+	}
+	return UNWIND_SUCCESS;
+#else /* EH_FRAME_CFA_LANDING_APPLY && !LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 	unsigned int result;
 	uintptr_t cfa;
+#ifdef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
+#ifndef EH_FRAME_CFA_LANDING_APPLY
+	bool has_sp_rule;
+#endif /* !EH_FRAME_CFA_LANDING_APPLY */
+#endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP */
 	union {
 		byte_t bytes[CFI_UNWIND_REGISTER_MAXSIZE];
 		uintptr_t addr;
 	} reg_buf;
+#ifdef EH_FRAME_CFA_LANDING_APPLY
+	/* Quick check: If no capsules were used, then only
+	 *              apply the LPA (LandingPadAdjustment) */
+	if (!self->cs_has_capsules)
+		goto done_apply_lpa;
+#endif /* EH_FRAME_CFA_LANDING_APPLY */
+
 #ifdef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
-	bool has_sp_rule;
+#ifndef EH_FRAME_CFA_LANDING_APPLY
 	has_sp_rule = self->cs_uncorder[CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP] != 0;
+#endif /* !EH_FRAME_CFA_LANDING_APPLY */
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP */
 
 	/* Step #1: Calculate the CFA (CanonicalFrameAddress) */
@@ -375,6 +470,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 	        "No CFA for %p...%p (GDB doesn't like this)",
 	        fde->f_pcstart, (byte_t *)fde->f_pcend - 1);
 
+#ifndef EH_FRAME_CFA_LANDING_APPLY
 	/* Set the new CFA value as content of the SP register. */
 	if (self->cs_cfa.cv_type != UNWIND_CFA_VALUE_UNSET &&
 	    /* Only apply if no other register rule was already defined for SP
@@ -447,14 +543,57 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 		                           &cfa))
 			ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)CFI_UNWIND_REGISTER_SP);
 	}
+#endif /* !EH_FRAME_CFA_LANDING_APPLY */
+
+#ifdef EH_FRAME_CFA_LANDING_APPLY
+done_apply_lpa:
+	if (self->cs_lp_adjustment != 0) {
+		uintptr_t sp;
+		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_UNWIND_REGISTER_SP, &sp))
+			ERROR(err_invalid_register);
+		/* Adjust the stack-pointer. */
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+		sp += self->cs_lp_adjustment;
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+		sp -= self->cs_lp_adjustment;
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_UNWIND_REGISTER_SP, &sp))
+			ERROR(err_invalid_register);
+	}
+	/* TODO: Work-around until CFI capsules are implemented. */
+#ifdef __x86_64__
+	if unlikely(result != UNWIND_SUCCESS)
+		goto done;
+	{
+		uintptr_t temp;
+		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_X86_64_UNWIND_REGISTER_RFLAGS, &temp))
+			ERROR(err_invalid_register);
+		temp &= ~0x400; /* EFLAGS_DF */
+		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_X86_64_UNWIND_REGISTER_RFLAGS, &temp))
+			ERROR(err_invalid_register);
+	}
+#elif defined(__i386__)
+	if unlikely(result != UNWIND_SUCCESS)
+		goto done;
+	{
+		uintptr_t temp;
+		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_386_UNWIND_REGISTER_EFLAGS, &temp))
+			ERROR(err_invalid_register);
+		temp &= ~0x400; /* EFLAGS_DF */
+		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_386_UNWIND_REGISTER_EFLAGS, &temp))
+			ERROR(err_invalid_register);
+	}
+#endif /* ... */
+#endif /* EH_FRAME_CFA_LANDING_APPLY */
 done:
 	return result;
 err_segfault:
 	return UNWIND_SEGFAULT;
-err_invalid_register:
-	return UNWIND_INVALID_REGISTER;
 err_noaddr_register:
 	return UNWIND_APPLY_NOADDR_REGISTER;
+#endif /* !EH_FRAME_CFA_LANDING_APPLY || LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
+err_invalid_register:
+	return UNWIND_INVALID_REGISTER;
 }
 
 #undef cfi_unwind_local_register_uncommon2dw
@@ -465,6 +604,7 @@ err_noaddr_register:
 #undef CFI_UNWIND_LOCAL_COMMON_REGISTER_SP
 #undef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
 
+#undef EH_FRAME_CFA_LANDING_APPLY
 #undef EH_FRAME_CFA_SIGFRAME_APPLY
 #undef EH_FRAME_CFA_APPLY
 

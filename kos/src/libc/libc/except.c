@@ -116,11 +116,12 @@ INTERN SECTION_EXCEPT_BSS void                                    *pdyn_libunwin
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_FIND                        pdyn_unwind_fde_find = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_GETREG_ERROR_REGISTER_STATE     pdyn_unwind_getreg_error_register_state = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_SETREG_ERROR_REGISTER_STATE     pdyn_unwind_setreg_error_register_state = NULL;
-PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_LANDING_PAD_ADJUSTMENT pdyn_unwind_fde_exec_landing_pad_adjustment = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC                        pdyn_unwind_fde_exec = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_APPLY                       pdyn_unwind_cfa_apply = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_EXEC_CFA                    pdyn_unwind_fde_exec_cfa = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_CALCULATE_CFA               pdyn_unwind_cfa_calculate_cfa = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_LANDING_EXEC                pdyn_unwind_fde_landing_exec = NULL;
+PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_LANDING_APPLY               pdyn_unwind_cfa_landing_apply = NULL;
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_FDE_SIGFRAME_EXEC               pdyn_unwind_fde_sigframe_exec = NULL;
 PRIVATE SECTION_EXCEPT_BSS PUNWIND_CFA_SIGFRAME_APPLY              pdyn_unwind_cfa_sigframe_apply = NULL;
@@ -132,11 +133,12 @@ PRIVATE SECTION_EXCEPT_STRING char const name_libunwind_so[] = LIBUNWIND_LIBRARY
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_find[]                        = "unwind_fde_find";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_getreg_error_register_state[]     = UNWIND_GETREG_ERROR_REGISTER_STATE_NAME;
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_setreg_error_register_state[]     = UNWIND_SETREG_ERROR_REGISTER_STATE_NAME;
-PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec_landing_pad_adjustment[] = "unwind_fde_exec_landing_pad_adjustment";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec[]                        = "unwind_fde_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_apply[]                       = "unwind_cfa_apply";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_exec_cfa[]                    = "unwind_fde_exec_cfa";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_calculate_cfa[]               = "unwind_cfa_calculate_cfa";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_landing_exec[]                = "unwind_fde_landing_exec";
+PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_landing_apply[]               = "unwind_cfa_landing_apply";
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_fde_sigframe_exec[]  = "unwind_fde_sigframe_exec";
 PRIVATE SECTION_EXCEPT_STRING char const name_unwind_cfa_sigframe_apply[] = "unwind_cfa_sigframe_apply";
@@ -156,11 +158,12 @@ void LIBCCALL initialize_libunwind(void) {
 	BIND(pdyn_unwind_fde_find, name_unwind_fde_find);
 	BIND(pdyn_unwind_getreg_error_register_state, name_unwind_getreg_error_register_state);
 	BIND(pdyn_unwind_setreg_error_register_state, name_unwind_setreg_error_register_state);
-	BIND(pdyn_unwind_fde_exec_landing_pad_adjustment, name_unwind_fde_exec_landing_pad_adjustment);
 	BIND(pdyn_unwind_fde_exec, name_unwind_fde_exec);
 	BIND(pdyn_unwind_cfa_apply, name_unwind_cfa_apply);
 	BIND(pdyn_unwind_fde_exec_cfa, name_unwind_fde_exec_cfa);
 	BIND(pdyn_unwind_cfa_calculate_cfa, name_unwind_cfa_calculate_cfa);
+	BIND(pdyn_unwind_fde_landing_exec, name_unwind_fde_landing_exec);
+	BIND(pdyn_unwind_cfa_landing_apply, name_unwind_cfa_landing_apply);
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 	/* We can substitute the sigframe variants with the regular ones. */
 	*(void **)&pdyn_unwind_fde_sigframe_exec  = dlsym(handle, name_unwind_fde_sigframe_exec);
@@ -185,16 +188,17 @@ err_init_failed:
 }
 
 
-#define unwind_fde_find                        (*pdyn_unwind_fde_find)
-#define unwind_getreg_error_register_state     (*pdyn_unwind_getreg_error_register_state)
-#define unwind_setreg_error_register_state     (*pdyn_unwind_setreg_error_register_state)
-#define unwind_fde_exec_landing_pad_adjustment (*pdyn_unwind_fde_exec_landing_pad_adjustment)
-#define unwind_fde_exec                        (*pdyn_unwind_fde_exec)
-#define unwind_cfa_apply                       (*pdyn_unwind_cfa_apply)
-#define unwind_fde_exec_cfa                    (*pdyn_unwind_fde_exec_cfa)
-#define unwind_cfa_calculate_cfa               (*pdyn_unwind_cfa_calculate_cfa)
-#define unwind_fde_sigframe_exec               (*pdyn_unwind_fde_sigframe_exec)
-#define unwind_cfa_sigframe_apply              (*pdyn_unwind_cfa_sigframe_apply)
+#define unwind_fde_find                    (*pdyn_unwind_fde_find)
+#define unwind_getreg_error_register_state (*pdyn_unwind_getreg_error_register_state)
+#define unwind_setreg_error_register_state (*pdyn_unwind_setreg_error_register_state)
+#define unwind_fde_exec                    (*pdyn_unwind_fde_exec)
+#define unwind_cfa_apply                   (*pdyn_unwind_cfa_apply)
+#define unwind_fde_exec_cfa                (*pdyn_unwind_fde_exec_cfa)
+#define unwind_cfa_calculate_cfa           (*pdyn_unwind_cfa_calculate_cfa)
+#define unwind_fde_landing_exec            (*pdyn_unwind_fde_landing_exec)
+#define unwind_cfa_landing_apply           (*pdyn_unwind_cfa_landing_apply)
+#define unwind_fde_sigframe_exec           (*pdyn_unwind_fde_sigframe_exec)
+#define unwind_cfa_sigframe_apply          (*pdyn_unwind_cfa_sigframe_apply)
 
 PRIVATE SECTION_EXCEPT_TEXT void LIBCCALL
 kos_unwind_exception_cleanup(_Unwind_Reason_Code UNUSED(reason),
@@ -397,6 +401,38 @@ done:
 }
 
 
+PRIVATE SECTION_EXCEPT_TEXT unsigned int __FCALL
+unwind_landingpad(unwind_fde_t const *__restrict fde,
+                  error_register_state_t *__restrict state,
+                  void *except_pc) {
+	void *landing_pad_pc;
+	unwind_cfa_landing_state_t cfa;
+	error_register_state_t new_state;
+	unsigned int unwind_error;
+	landing_pad_pc = (void *)__ERROR_REGISTER_STATE_TYPE_RDPC(*state);
+	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
+	if unlikely(unwind_error != UNWIND_SUCCESS)
+		goto done;
+	/* Apply landing-pad transformations. */
+	memcpy(&new_state, state, sizeof(new_state));
+	unwind_error = unwind_cfa_landing_apply(&cfa, fde, except_pc,
+	                                        &unwind_getreg_error_register_state, state,
+	                                        &unwind_setreg_error_register_state, &new_state);
+	if unlikely(unwind_error != UNWIND_SUCCESS)
+		goto done;
+	/* Write-back the new register state. */
+	memcpy(state, &new_state, sizeof(new_state));
+	return UNWIND_SUCCESS;
+done:
+	if (unwind_error == UNWIND_NO_FRAME) {
+		/* Directly jump to the landing pad. */
+		__ERROR_REGISTER_STATE_TYPE_WRPC(*state, (uintptr_t)landing_pad_pc);
+		unwind_error = UNWIND_SUCCESS;
+	}
+	return unwind_error;
+}
+
+
 
 
 
@@ -527,63 +563,10 @@ search_fde:
 			                                                              &context);
 		}
 		if (reason == _URC_INSTALL_CONTEXT) {
-			uintptr_t adjustment;
-			/* Calculate the landing pad adjustment */
-			unwind_error = unwind_fde_exec_landing_pad_adjustment(&context.uc_fde,
-			                                                      &adjustment,
-			                                                      pc);
-			if likely(unwind_error == UNWIND_SUCCESS) {
-#ifdef __ARCH_STACK_GROWS_DOWNWARDS
-				__ERROR_REGISTER_STATE_TYPE_WRSP(*state, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(*state) + adjustment);
-#else /* __ARCH_STACK_GROWS_DOWNWARDS */
-				__ERROR_REGISTER_STATE_TYPE_WRSP(*state, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(*state) - adjustment);
-#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-			} else if unlikely(unwind_error != UNWIND_NO_FRAME) {
+			/* Unwind to the landing pad. */
+			unwind_error = unwind_landingpad(&context.uc_fde, state, pc);
+			if unlikely(unwind_error != UNWIND_SUCCESS)
 				goto err;
-			}
-			/* Pass the placeholder exception object for KOS exceptions. */
-			__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)libc_get_kos_unwind_exception());
-
-			/* TODO: Work-around to deal with a problem caused
-			 *       by inline, exception-enabled system calls:
-			 * >> TRY {
-			 * >>     inline_sys_Xpipe(NULL);
-			 * >> } EXCEPT {
-			 * >>     ...
-			 * >> }
-			 *
-			 * Assembly (mock-up):
-			 * >> .Ltry_begin:
-			 * >>     movq   $0, %rdi
-			 * >>     movq   $SYS_pipe, %rax
-			 * >>     std
-			 * >> .cfi_remember_state
-			 * >> .cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a
-			 * >>     syscall
-			 * >>     cld
-			 * >> .cfi_restore_state
-			 * >> .Ltry_end:
-			 * >>     ...
-			 * >> .Lexcept:
-			 * >>     ...
-			 *
-			 * Because the exception handler is apart of the same function-frame as the CFI
-			 * instrumentation that would normally be required to clear EFLAGS.DF, that flag
-			 * doesn't actually end up getting cleared, since the surrounding frame never
-			 * ends up being unwound.
-			 *
-			 * I _really_ dislike the work-around of unconditionally clearing EFLAGS.DF before
-			 * jumping to an exception handler, and in the long run I envision a KOS-specific
-			 * extension to CFI that allows one to specify custom unwind expression that are
-			 * performed during regular unwinding and/or before jumping to a local exception
-			 * handler, similar to what's already done by `unwind_fde_exec_landing_pad_adjustment()'
-			 * and its `DW_CFA_GNU_args_size' opcode, only much more powerful by being able to
-			 * be used to specify custom behavior for _any_ register. */
-#ifdef __x86_64__
-			state->kcs_rflags &= ~0x400; /* EFLAGS_DF */
-#elif defined(__i386__)
-			state->kcs_eflags &= ~0x400; /* EFLAGS_DF */
-#endif /* ... */
 			return state;
 		}
 		if unlikely(reason != _URC_CONTINUE_UNWIND) {
@@ -671,32 +654,6 @@ _Unwind_Context_Identify(struct _Unwind_Context const *__restrict self) {
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 }
 
-LOCAL SECTION_EXCEPT_TEXT error_register_state_t *__ERROR_UNWIND_CC
-apply_state_with_landing_pad_adjustment(error_register_state_t *__restrict state,
-                                        error_register_state_t const *__restrict new_state,
-                                        unwind_fde_t const *__restrict fde, void *pc) {
-	unsigned int unwind_error;
-	uintptr_t adjustment;
-	/* Calculate the landing pad adjustment */
-	unwind_error = unwind_fde_exec_landing_pad_adjustment(fde, &adjustment, pc);
-	if likely(unwind_error == UNWIND_SUCCESS) {
-		memcpy(state, (void *)&new_state, sizeof(new_state));
-#ifdef __ARCH_STACK_GROWS_DOWNWARDS
-		__ERROR_REGISTER_STATE_TYPE_WRSP(*state, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(*state) + adjustment);
-#else /* __ARCH_STACK_GROWS_DOWNWARDS */
-		__ERROR_REGISTER_STATE_TYPE_WRSP(*state, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(*state) - adjustment);
-#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-	} else if unlikely(unwind_error != UNWIND_NO_FRAME) {
-		goto err;
-	} else {
-		memcpy(state, (void *)&new_state, sizeof(new_state));
-	}
-	return state;
-err:
-	__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
-	return state;
-}
-
 
 LOCAL ATTR_NOINLINE SECTION_EXCEPT_TEXT NONNULL((1)) error_register_state_t *
 NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_raise_phase_2)(error_register_state_t *__restrict state,
@@ -735,8 +692,13 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_raise_phase_2)(error_register_state
 		if unlikely(unwind_error != UNWIND_SUCCESS)
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
 	}
-	/* Apply the fully unwind newstate */
-	return apply_state_with_landing_pad_adjustment(state, &newstate, &context.uc_fde, pc);
+	/* Apply landing pad transformations. */
+	unwind_error = unwind_landingpad(&context.uc_fde, &newstate, pc);
+	if unlikely(unwind_error != UNWIND_SUCCESS)
+		goto err_unwind__URC_FATAL_PHASE2_ERROR;
+	/* Write-back the register state. */
+	memcpy(state, &newstate, sizeof(newstate));
+	return state;
 err_unwind__URC_FATAL_PHASE2_ERROR:
 	__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
 	return state;
@@ -793,8 +755,13 @@ NOTHROW_NCX(__ERROR_UNWIND_CC libc_exception_forceunwind_phase_2)(error_register
 			goto err_unwind__URC_FATAL_PHASE2_ERROR;
 		}
 	}
-	/* Apply the fully unwind newstate */
-	return apply_state_with_landing_pad_adjustment(state, &newstate, &context.uc_fde, pc);
+	/* Apply landing pad transformations. */
+	unwind_error = unwind_landingpad(&context.uc_fde, &newstate, pc);
+	if unlikely(unwind_error != UNWIND_SUCCESS)
+		goto err_unwind__URC_FATAL_PHASE2_ERROR;
+	/* Write-back the register state. */
+	memcpy(state, &newstate, sizeof(newstate));
+	return state;
 err_unwind__URC_FATAL_PHASE2_ERROR:
 	__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
 	return state;
@@ -1127,20 +1094,11 @@ libc_except_handler4_impl(error_register_state_t *__restrict state,
 				void *handle;
 				int is_aware;
 				if (!got_first_handler) {
-					uintptr_t adjustment;
 					/* Calculate the landing pad adjustment */
 					memcpy(&first_handler, &oldstate, sizeof(oldstate));
-					unwind_error = unwind_fde_exec_landing_pad_adjustment(&context.uc_fde,
-					                                                      &adjustment, pc);
-					if likely(unwind_error == UNWIND_SUCCESS) {
-#ifdef __ARCH_STACK_GROWS_DOWNWARDS
-						__ERROR_REGISTER_STATE_TYPE_WRSP(first_handler, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(first_handler) + adjustment);
-#else /* __ARCH_STACK_GROWS_DOWNWARDS */
-						__ERROR_REGISTER_STATE_TYPE_WRSP(first_handler, (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDSP(first_handler) - adjustment);
-#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-					} else if unlikely(unwind_error != UNWIND_NO_FRAME) {
+					unwind_error = unwind_landingpad(&context.uc_fde, &first_handler, pc);
+					if unlikely(unwind_error != UNWIND_SUCCESS)
 						goto do_coredump_with_unwind_error;
-					}
 					got_first_handler = true;
 				}
 				/* Check if the associated module is exception aware. */

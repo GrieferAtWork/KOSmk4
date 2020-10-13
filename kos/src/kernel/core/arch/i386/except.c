@@ -630,6 +630,36 @@ halt_unhandled_exception(unsigned int unwind_error,
 #endif /* !CONFIG_HAVE_DEBUGGER */
 }
 
+PRIVATE NONNULL((1)) unsigned int
+NOTHROW(FCALL unwind_landingpad)(unwind_fde_t const *__restrict fde,
+                                 struct kcpustate *__restrict state,
+                                 void *except_pc) {
+	void *landing_pad_pc;
+	unwind_cfa_landing_state_t cfa;
+	struct kcpustate new_state;
+	unsigned int unwind_error;
+	landing_pad_pc = (void *)kcpustate_getpc(state);
+	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
+	if unlikely(unwind_error != UNWIND_SUCCESS)
+		goto done;
+	/* Apply landing-pad transformations. */
+	memcpy(&new_state, state, sizeof(new_state));
+	unwind_error = unwind_cfa_landing_apply(&cfa, fde, except_pc,
+	                                        &unwind_getreg_kcpustate, state,
+	                                        &unwind_setreg_kcpustate, &new_state);
+	if unlikely(unwind_error != UNWIND_SUCCESS)
+		goto done;
+	/* Write-back the new register state. */
+	memcpy(state, &new_state, sizeof(new_state));
+	return UNWIND_SUCCESS;
+done:
+	if (unwind_error == UNWIND_NO_FRAME) {
+		/* Directly jump to the landing pad. */
+		kcpustate_setpc(state, (uintptr_t)landing_pad_pc);
+		unwind_error = UNWIND_SUCCESS;
+	}
+	return unwind_error;
+}
 
 DEFINE_PUBLIC_ALIAS(error_unwind, libc_error_unwind);
 INTERN NONNULL((1)) struct kcpustate *
@@ -661,15 +691,9 @@ search_fde:
 			 * `DW_CFA_GNU_args_size' instruction.
 			 * If there is, we must add its value to ESP before resuming execution!
 			 * s.a.: https://reviews.llvm.org/D38680 */
-			{
-				uintptr_t adjustment;
-				error = unwind_fde_exec_landing_pad_adjustment(&fde, &adjustment, pc);
-				if likely(error == UNWIND_SUCCESS) {
-					kcpustate_setsp(state, kcpustate_getsp(state) + adjustment);
-				} else if unlikely(error != UNWIND_NO_FRAME) {
-					goto err;
-				}
-			}
+			error = unwind_landingpad(&fde, state, pc);
+			if unlikely(error != UNWIND_SUCCESS)
+				goto err;
 			ATTR_FALLTHROUGH
 		case DWARF_PERSO_EXECUTE_HANDLER_NOW:
 			return state; /* Execute a new handler. */

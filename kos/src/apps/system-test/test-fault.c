@@ -47,7 +47,7 @@
 DECL_BEGIN
 
 #define assert_error_code(code) \
-	assertf(was_thrown(code), "error_code(): %I#x", error_code())
+	assertf(was_thrown(code), "error_code(): %#Ix", error_code())
 #define assert_eq_ptr(a, b) \
 	assertf((uintptr_t)(a) == (uintptr_t)(b), "%p != %p", (uintptr_t)(a), (uintptr_t)(b))
 #define assert_range(a, b, shift)                                      \
@@ -488,7 +488,7 @@ DEFINE_TEST(segfault_special_addresses) {
        *     the MODRM.REG field of the 0x8f opcode (and does so unconditionally)
        *     Furthermore a real machine (mine) raises a #UD exception when trying
        *     to execute something like 0x8f/1 (which is what the correct behavior
-       *     would be).
+       *     would be, so on my machine KOS would emulate XOP).
        *     Sadly, I don't have an account for the QEMU bug tracker, and I don't
        *     feel like making one right now, so I'm going to leave it at that for
        *     the time being... */

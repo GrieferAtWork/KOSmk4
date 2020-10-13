@@ -205,222 +205,32 @@
 #define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_MXCSR  53
 #define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_FCW    54
 #define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_FSW    55
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT  56
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM16  57
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM17  58
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM18  59
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM19  60
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM20  61
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM21  62
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM22  63
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM23  64
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM24  65
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM25  66
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM26  67
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM27  68
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM28  69
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM29  70
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM30  71
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM31  72
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K0     73
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K1     74
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K2     75
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K3     76
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K4     77
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K5     78
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K6     79
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K7     80
-#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT  81
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM16  56
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM17  57
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM18  58
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM19  59
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM20  60
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM21  61
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM22  62
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM23  63
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM24  64
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM25  65
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM26  66
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM27  67
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM28  68
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM29  69
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM30  70
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM31  71
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K0     72
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K1     73
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K2     74
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K3     75
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K4     76
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K5     77
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K6     78
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K7     79
+#define CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT  80
 
-#ifdef __CC__
-
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_register_dw2common)(__UINTPTR_HALF_TYPE__ __dw_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	switch (__dw_regno) {
-
-	case CFI_X86_64_UNWIND_REGISTER_RBX:
-		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_RBX;
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_RBP:
-		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_RBP;
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_R12:
-		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_R12;
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_R13:
-		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_R13;
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_R14:
-		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_R14;
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_R15:
-		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_R15;
-		break;
-
-	case CFI_X86_64_UNWIND_REGISTER_RIP:
-		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_RIP;
-		break;
-
-	default:
-		__result = CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT;
-		break;
-	}
-	return __result;
-}
-
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_register_common2dw)(__UINTPTR_HALF_TYPE__ __com_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	switch (__com_regno) {
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_RBX:
-		__result = CFI_X86_64_UNWIND_REGISTER_RBX;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_RBP:
-		__result = CFI_X86_64_UNWIND_REGISTER_RBP;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_R12:
-		__result = CFI_X86_64_UNWIND_REGISTER_R12;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_R13:
-		__result = CFI_X86_64_UNWIND_REGISTER_R13;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_R14:
-		__result = CFI_X86_64_UNWIND_REGISTER_R14;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_R15:
-		__result = CFI_X86_64_UNWIND_REGISTER_R15;
-		break;
-
-	case CFI_X86_64_UNWIND_COMMON_REGISTER_RIP:
-		__result = CFI_X86_64_UNWIND_REGISTER_RIP;
-		break;
-
-	default:
-		__result = CFI_X86_64_UNWIND_REGISTER_COUNT;
-		break;
-	}
-	return __result;
-}
-
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_register_dw2uncommon)(__UINTPTR_HALF_TYPE__ __dw_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-#if CFI_X86_64_UNWIND_REGISTER_RAX != 0
-	if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_RAX &&
-	    __dw_regno <= CFI_X86_64_UNWIND_REGISTER_RCX)
-#else /* CFI_X86_64_UNWIND_REGISTER_RAX != 0 */
-	if (__dw_regno <= CFI_X86_64_UNWIND_REGISTER_RCX)
-#endif /* CFI_X86_64_UNWIND_REGISTER_RAX == 0 */
-	{
-		__result = CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RAX + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_RAX);
-	} else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_RSI &&
-	           __dw_regno <= CFI_X86_64_UNWIND_REGISTER_RDI) {
-		__result = CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSI + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_RSI);
-	} else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_RSP &&
-	           __dw_regno <= CFI_X86_64_UNWIND_REGISTER_R11) {
-		__result = CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSP + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_RSP);
-	} else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_XMM0 &&
-	           __dw_regno <= CFI_X86_64_UNWIND_REGISTER_GS) {
-		__result = CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM0 + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_XMM0);
-	} else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_FSBASE &&
-	           __dw_regno <= CFI_X86_64_UNWIND_REGISTER_GSBASE) {
-		__result = CFI_X86_64_UNWIND_UNCOMMON_REGISTER_FSBASE + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_FSBASE);
-	} else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_TR &&
-	           __dw_regno <= CFI_X86_64_UNWIND_REGISTER_XMM31) {
-		__result = CFI_X86_64_UNWIND_UNCOMMON_REGISTER_TR + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_TR);
-	} else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_K0 &&
-	           __dw_regno <= CFI_X86_64_UNWIND_REGISTER_K7) {
-		__result = CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K0 + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_K0);
-	} else {
-		__result = CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT;
-	}
-	return __result;
-}
-
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_register_uncommon2dw)(__UINTPTR_HALF_TYPE__ __uncom_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-#if CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RAX != 0
-	if (__uncom_regno >= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RAX &&
-	    __uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RCX)
-#else /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RAX != 0 */
-	if (__uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RCX)
-#endif /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RAX == 0 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_RAX + (__uncom_regno - CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RAX);
-	}
-#if CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSI != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RCX + 1
-	else if (__uncom_regno >= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSI &&
-	         __uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RDI)
-#else /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSI != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RCX + 1 */
-	else if (__uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RDI)
-#endif /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSI == CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RCX + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_RSI + (__uncom_regno - CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSI);
-	}
-#if CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSP != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RDI + 1
-	else if (__uncom_regno >= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSP &&
-	         __uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_R11)
-#else /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSP != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RDI + 1 */
-	else if (__uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_R11)
-#endif /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSP == CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RDI + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_RSP + (__uncom_regno - CFI_X86_64_UNWIND_UNCOMMON_REGISTER_RSP);
-	}
-#if CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM0 != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_R11 + 1
-	else if (__uncom_regno >= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM0 &&
-	         __uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GS)
-#else /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM0 != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_R11 + 1 */
-	else if (__uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GS)
-#endif /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM0 == CFI_X86_64_UNWIND_UNCOMMON_REGISTER_R11 + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_XMM0 + (__uncom_regno - CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM0);
-	}
-#if CFI_X86_64_UNWIND_UNCOMMON_REGISTER_FSBASE != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GS + 1
-	else if (__uncom_regno >= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_FSBASE &&
-	         __uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GSBASE)
-#else /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_FSBASE != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GS + 1 */
-	else if (__uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GSBASE)
-#endif /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_FSBASE == CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GS + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_FSBASE + (__uncom_regno - CFI_X86_64_UNWIND_UNCOMMON_REGISTER_FSBASE);
-	}
-#if CFI_X86_64_UNWIND_UNCOMMON_REGISTER_TR != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GSBASE + 1
-	else if (__uncom_regno >= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_TR &&
-	         __uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM31)
-#else /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_TR != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GSBASE + 1 */
-	else if (__uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM31)
-#endif /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_TR == CFI_X86_64_UNWIND_UNCOMMON_REGISTER_GSBASE + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_TR + (__uncom_regno - CFI_X86_64_UNWIND_UNCOMMON_REGISTER_TR);
-	}
-#if CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K0 != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM31 + 1
-	else if (__uncom_regno >= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K0 &&
-	         __uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K7)
-#else /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K0 != CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM31 + 1 */
-	else if (__uncom_regno <= CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K7)
-#endif /* CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K0 == CFI_X86_64_UNWIND_UNCOMMON_REGISTER_XMM31 + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_K0 + (__uncom_regno - CFI_X86_64_UNWIND_UNCOMMON_REGISTER_K0);
-	} else {
-		__result = CFI_X86_64_UNWIND_REGISTER_COUNT;
-	}
-	return __result;
-}
-
-#endif /* __CC__ */
 
 
 
@@ -519,120 +329,191 @@ __NOTHROW(cfi_x86_64_unwind_register_uncommon2dw)(__UINTPTR_HALF_TYPE__ __uncom_
 #define CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K7     60
 #define CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT  61
 
-#ifdef __CC__
 
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_sigframe_register_dw2common)(__UINTPTR_HALF_TYPE__ __dw_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-#if CFI_X86_64_UNWIND_REGISTER_RAX != 0
-	if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_RAX &&
-	    __dw_regno <= CFI_X86_64_UNWIND_REGISTER_RIP)
-#else /* CFI_X86_64_UNWIND_REGISTER_RAX != 0 */
-	if (__dw_regno <= CFI_X86_64_UNWIND_REGISTER_RIP)
-#endif /* CFI_X86_64_UNWIND_REGISTER_RAX == 0 */
-	{
-		__result = CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RAX + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_RAX);
-	} else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_RFLAGS &&
-	           __dw_regno <= CFI_X86_64_UNWIND_REGISTER_GS)
-		__result = CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RFLAGS + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_RFLAGS);
-	else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_FSBASE &&
-	         __dw_regno <= CFI_X86_64_UNWIND_REGISTER_GSBASE)
-		__result = CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_FSBASE + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_FSBASE);
-	else {
-		__result = CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT;
-	}
-	return __result;
-}
 
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_sigframe_register_common2dw)(__UINTPTR_HALF_TYPE__ __com_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-#if CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RAX != 0
-	if (__com_regno >= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RAX &&
-	    __com_regno <= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RIP)
-#else /* CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RAX != 0 */
-	if (__com_regno <= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RIP)
-#endif /* CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RAX == 0 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_RAX + (__com_regno - CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RAX);
-	}
-#if CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RFLAGS != CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RIP + 1
-	else if (__com_regno >= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RFLAGS &&
-	         __com_regno <= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_GS)
-#else /* CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RFLAGS != CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RIP + 1 */
-	else if (__com_regno <= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_GS)
-#endif /* CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RFLAGS == CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RIP + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_RFLAGS + (__com_regno - CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_RFLAGS);
-	}
-#if CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_FSBASE != CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_GS + 1
-	else if (__com_regno >= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_FSBASE &&
-	         __com_regno <= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_GSBASE)
-#else /* CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_FSBASE != CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_GS + 1 */
-	else if (__com_regno <= CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_GSBASE)
-#endif /* CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_FSBASE == CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_GS + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_FSBASE + (__com_regno - CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_FSBASE);
-	} else {
-		__result = CFI_X86_64_UNWIND_REGISTER_COUNT;
-	}
-	return __result;
-}
 
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_sigframe_register_dw2uncommon)(__UINTPTR_HALF_TYPE__ __dw_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_XMM0 &&
-	    __dw_regno <= CFI_X86_64_UNWIND_REGISTER_MM7)
-		__result = CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_XMM0);
-	else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_TR &&
-	         __dw_regno <= CFI_X86_64_UNWIND_REGISTER_XMM31)
-		__result = CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_TR);
-	else if (__dw_regno >= CFI_X86_64_UNWIND_REGISTER_K0 &&
-	         __dw_regno <= CFI_X86_64_UNWIND_REGISTER_K7)
-		__result = CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 + (__dw_regno - CFI_X86_64_UNWIND_REGISTER_K0);
-	else {
-		__result = CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT;
-	}
-	return __result;
-}
+/* Register <--> Landing-pad Common/Uncommon-register mapping
+ * Currently, landing-pad unwinding is only needed for inline, exception-enabled
+ * system calls, and as such only the %eflags register is considered common, since
+ * that one needs to be modified in order to set EFLAGS.DF=0 during landing pad
+ * adjustments. */
+#define CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_RFLAGS 0
+#define CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_COUNT  1
 
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__
-__NOTHROW(cfi_x86_64_unwind_sigframe_register_uncommon2dw)(__UINTPTR_HALF_TYPE__ __uncom_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-#if CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 != 0
-	if (__uncom_regno >= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 &&
-	    __uncom_regno <= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM7)
-#else /* CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 != 0 */
-	if (__uncom_regno <= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM7)
-#endif /* CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 == 0 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_XMM0 + (__uncom_regno - CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0);
-	}
-#if CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR != CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM7 + 1
-	else if (__uncom_regno >= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR &&
-	         __uncom_regno <= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM31)
-#else /* CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR != CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM7 + 1 */
-	else if (__uncom_regno <= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM31)
-#endif /* CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR == CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM7 + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_TR + (__uncom_regno - CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR);
-	}
-#if CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 != CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM31 + 1
-	else if (__uncom_regno >= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 &&
-	         __uncom_regno <= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K7)
-#else /* CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 != CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM31 + 1 */
-	else if (__uncom_regno <= CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K7)
-#endif /* CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 == CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM31 + 1 */
-	{
-		__result = CFI_X86_64_UNWIND_REGISTER_K0 + (__uncom_regno - CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0);
-	} else {
-		__result = CFI_X86_64_UNWIND_REGISTER_COUNT;
-	}
-	return __result;
-}
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_SP     CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RSP
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RAX    0
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RDX    1
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RCX    2
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RBX    3
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RSI    4
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RDI    5
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RBP    6
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RSP    7
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_R8     8
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_R9     9
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_R10    10
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_R11    11
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_R12    12
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_R13    13
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_R14    14
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_R15    15
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_RIP    16
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM0   17
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM1   18
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM2   19
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM3   20
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM4   21
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM5   22
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM6   23
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM7   24
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM8   25
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM9   26
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM10  27
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM11  28
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM12  29
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM13  30
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM14  31
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM15  32
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ST0    33
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ST1    34
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ST2    35
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ST3    36
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ST4    37
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ST5    38
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ST6    39
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ST7    40
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MM0    41
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MM1    42
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MM2    43
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MM3    44
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MM4    45
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MM5    46
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MM6    47
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MM7    48
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_ES     49
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_CS     50
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_SS     51
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_DS     52
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_FS     53
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_GS     54
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_FSBASE 55
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_GSBASE 56
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_TR     57
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_LDTR   58
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_MXCSR  59
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_FCW    60
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_FSW    61
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM16  62
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM17  63
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM18  64
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM19  65
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM20  66
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM21  67
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM22  68
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM23  69
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM24  70
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM25  71
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM26  72
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM27  73
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM28  74
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM29  75
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM30  76
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_XMM31  77
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_K0     78
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_K1     79
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_K2     80
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_K3     81
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_K4     82
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_K5     83
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_K6     84
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_K7     85
+#define CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT  86
 
-#endif /* __CC__ */
+
+/*[[[deemon
+import * from deemon;
+import * from ....misc.libgen.strendN;
+import * from ....misc.libgen.converter;
+local macros: {string: int} = Dict(enumerateIntegerMacrosFromFile(__FILE__));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_register_dw2common", generateArrayMapping(macros, "CFI_X86_64_UNWIND_REGISTER_", "CFI_X86_64_UNWIND_COMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_register_dw2uncommon", generateArrayMapping(macros, "CFI_X86_64_UNWIND_REGISTER_", "CFI_X86_64_UNWIND_UNCOMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_register_common2dw", generateArrayMapping(macros, "CFI_X86_64_UNWIND_COMMON_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_register_uncommon2dw", generateArrayMapping(macros, "CFI_X86_64_UNWIND_UNCOMMON_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_sigframe_register_dw2common", generateArrayMapping(macros, "CFI_X86_64_UNWIND_REGISTER_", "CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_sigframe_register_dw2uncommon", generateArrayMapping(macros, "CFI_X86_64_UNWIND_REGISTER_", "CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_sigframe_register_common2dw", generateArrayMapping(macros, "CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_sigframe_register_uncommon2dw", generateArrayMapping(macros, "CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_dw2common", generateArrayMapping(macros, "CFI_X86_64_UNWIND_REGISTER_", "CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon", generateArrayMapping(macros, "CFI_X86_64_UNWIND_REGISTER_", "CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_common2dw", generateArrayMapping(macros, "CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", generateArrayMapping(macros, "CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
+]]]*/
+#define DEFINE_cfi_x86_64_unwind_register_dw2common(name)                             \
+	__UINT8_TYPE__ const name[17] = { 7, 7, 7, 0, 7, 7, 1, 7, 7, 7, 7, 7, 2, 3, 4, 5, \
+	                                  6 }
+#define DEFINE_cfi_x86_64_unwind_register_dw2uncommon(name)                                            \
+	__UINT8_TYPE__ const name[126] = { 0,  1,  2,  80, 3,  4,  80, 5,  6,  7,  8,  9,  80, 80, 80, 80, \
+	                                   80, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, \
+	                                   25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, \
+	                                   41, 42, 43, 44, 45, 46, 47, 48, 80, 80, 49, 50, 80, 80, 51, 52, \
+	                                   53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, \
+	                                   69, 70, 71, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, \
+	                                   80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, 80, \
+	                                   80, 80, 80, 80, 80, 80, 72, 73, 74, 75, 76, 77, 78, 79 }
+#define DEFINE_cfi_x86_64_unwind_register_common2dw(name) \
+	__UINT8_TYPE__ const name[7] = { 3, 6, 12, 13, 14, 15, 16 }
+#define DEFINE_cfi_x86_64_unwind_register_uncommon2dw(name)                                                           \
+	__UINT8_TYPE__ const name[80] = { 0,   1,   2,   4,   5,   7,   8,   9,   10,  11,  17,  18,  19,  20,  21,  22,  \
+	                                  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  \
+	                                  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  49,  50,  51,  52,  53,  54,  \
+	                                  55,  58,  59,  62,  63,  64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  \
+	                                  75,  76,  77,  78,  79,  80,  81,  82,  118, 119, 120, 121, 122, 123, 124, 125 }
+#define DEFINE_cfi_x86_64_unwind_sigframe_register_dw2common(name)                                    \
+	__UINT8_TYPE__ const name[60] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, \
+	                                  16, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, \
+	                                  26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, 26, \
+	                                  26, 17, 18, 19, 20, 21, 22, 23, 26, 26, 24, 25 }
+#define DEFINE_cfi_x86_64_unwind_sigframe_register_dw2uncommon(name)                                   \
+	__UINT8_TYPE__ const name[126] = { 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, \
+	                                   61, 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, \
+	                                   15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, \
+	                                   31, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 32, 33, \
+	                                   34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, \
+	                                   50, 51, 52, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, \
+	                                   61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, 61, \
+	                                   61, 61, 61, 61, 61, 61, 53, 54, 55, 56, 57, 58, 59, 60 }
+#define DEFINE_cfi_x86_64_unwind_sigframe_register_common2dw(name)                                    \
+	__UINT8_TYPE__ const name[26] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, \
+	                                  16, 49, 50, 51, 52, 53, 54, 55, 58, 59 }
+#define DEFINE_cfi_x86_64_unwind_sigframe_register_uncommon2dw(name)                                                  \
+	__UINT8_TYPE__ const name[61] = { 17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  \
+	                                  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  48,  \
+	                                  62,  63,  64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  \
+	                                  78,  79,  80,  81,  82,  118, 119, 120, 121, 122, 123, 124, 125 }
+#define DEFINE_cfi_x86_64_unwind_landing_register_dw2common(name)                     \
+	__UINT8_TYPE__ const name[50] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, \
+	                                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, \
+	                                  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, \
+	                                  1, 0 }
+#define DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon(name)                                    \
+	__UINT8_TYPE__ const name[126] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, \
+	                                   16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, \
+	                                   32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, \
+	                                   48, 86, 49, 50, 51, 52, 53, 54, 86, 86, 55, 56, 86, 86, 57, 58, \
+	                                   59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, \
+	                                   75, 76, 77, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, \
+	                                   86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, 86, \
+	                                   86, 86, 86, 86, 86, 86, 78, 79, 80, 81, 82, 83, 84, 85 }
+#define DEFINE_cfi_x86_64_unwind_landing_register_common2dw(name) \
+	__UINT8_TYPE__ const name[1] = { 49 }
+#define DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw(name)                                                   \
+	__UINT8_TYPE__ const name[86] = { 0,   1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,  15,  \
+	                                  16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  \
+	                                  32,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,  \
+	                                  48,  50,  51,  52,  53,  54,  55,  58,  59,  62,  63,  64,  65,  66,  67,  68,  \
+	                                  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,  80,  81,  82,  118, 119, \
+	                                  120, 121, 122, 123, 124, 125 }
+/*[[[end]]]*/
 
 
 
@@ -648,22 +529,31 @@ __NOTHROW(cfi_x86_64_unwind_sigframe_register_uncommon2dw)(__UINTPTR_HALF_TYPE__
 #define CFI_UNWIND_REGISTER_COUNT     CFI_X86_64_UNWIND_REGISTER_COUNT
 
 /* Normal common/uncommon */
-#define CFI_UNWIND_COMMON_REGISTER_COUNT   CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_UNCOMMON_REGISTER_SP    CFI_X86_64_UNWIND_UNCOMMON_REGISTER_SP
-#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT
-#define cfi_unwind_register_dw2common      cfi_x86_64_unwind_register_dw2common
-#define cfi_unwind_register_dw2uncommon    cfi_x86_64_unwind_register_dw2uncommon
-#define cfi_unwind_register_common2dw      cfi_x86_64_unwind_register_common2dw
-#define cfi_unwind_register_uncommon2dw    cfi_x86_64_unwind_register_uncommon2dw
+#define CFI_UNWIND_COMMON_REGISTER_COUNT       CFI_X86_64_UNWIND_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_UNCOMMON_REGISTER_SP        CFI_X86_64_UNWIND_UNCOMMON_REGISTER_SP
+#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT     CFI_X86_64_UNWIND_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_register_dw2common   DEFINE_cfi_x86_64_unwind_register_dw2common
+#define DEFINE_cfi_unwind_register_dw2uncommon DEFINE_cfi_x86_64_unwind_register_dw2uncommon
+#define DEFINE_cfi_unwind_register_common2dw   DEFINE_cfi_x86_64_unwind_register_common2dw
+#define DEFINE_cfi_unwind_register_uncommon2dw DEFINE_cfi_x86_64_unwind_register_uncommon2dw
 
 /* Sigframe common/uncommon */
-#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP      CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_SP
-#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT   CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
-#define cfi_unwind_sigframe_register_dw2common      cfi_x86_64_unwind_sigframe_register_dw2common
-#define cfi_unwind_sigframe_register_dw2uncommon    cfi_x86_64_unwind_sigframe_register_dw2uncommon
-#define cfi_unwind_sigframe_register_common2dw      cfi_x86_64_unwind_sigframe_register_common2dw
-#define cfi_unwind_sigframe_register_uncommon2dw    cfi_x86_64_unwind_sigframe_register_uncommon2dw
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP          CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_SP
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT       CFI_X86_64_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT     CFI_X86_64_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_sigframe_register_dw2common   DEFINE_cfi_x86_64_unwind_sigframe_register_dw2common
+#define DEFINE_cfi_unwind_sigframe_register_dw2uncommon DEFINE_cfi_x86_64_unwind_sigframe_register_dw2uncommon
+#define DEFINE_cfi_unwind_sigframe_register_common2dw   DEFINE_cfi_x86_64_unwind_sigframe_register_common2dw
+#define DEFINE_cfi_unwind_sigframe_register_uncommon2dw DEFINE_cfi_x86_64_unwind_sigframe_register_uncommon2dw
+
+/* Landing-pad common/uncommon */
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP        CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_SP
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT       CFI_X86_64_UNWIND_LANDING_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT     CFI_X86_64_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_landing_register_dw2common   DEFINE_cfi_x86_64_unwind_landing_register_dw2common
+#define DEFINE_cfi_unwind_landing_register_dw2uncommon DEFINE_cfi_x86_64_unwind_landing_register_dw2uncommon
+#define DEFINE_cfi_unwind_landing_register_common2dw   DEFINE_cfi_x86_64_unwind_landing_register_common2dw
+#define DEFINE_cfi_unwind_landing_register_uncommon2dw DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw
 #endif /* __x86_64__ */
 
 

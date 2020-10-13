@@ -37,6 +37,10 @@
 
 #include <assert.h>
 
+#if defined(__i386__) || defined(__x86_64__)
+#include <asm/cfi.h>
+#endif /* __i386__ || __x86_64__ */
+
 DECL_BEGIN
 
 /*[[[deemon
@@ -61,7 +65,7 @@ print("#define X86_64_CFI_CLEARDF ", repr(", ".join(for (local b: bytes) "0x" + 
 /*[[[end]]]*/
 
 #define assert_error_code(code) \
-	assertf(was_thrown(code), "error_code(): %I#x", error_code())
+	assertf(was_thrown(code), "error_code(): %#Ix", error_code())
 
 #if defined(__i386__) && !defined(__x86_64__)
 INTDEF void lcall7_Pipe(fd_t fd[2]);
@@ -129,7 +133,7 @@ PRIVATE ATTR_NOINLINE void sysenter_Pipe(fd_t fd[2]) {
 #if defined(__i386__) || defined(__x86_64__)
 LOCAL void int80_Pipe(fd_t fd[2]) {
 	__asm__ __volatile__("std\n\t" /* Enable exceptions */
-	                     ".cfi_remember_state\n\t"
+	                     ".cfi_startcapsule\n\t"
 #ifdef __x86_64__
 	                     ".cfi_escape " X86_64_CFI_CLEARDF "\n\t"
 #else /* __x86_64__ */
@@ -137,7 +141,7 @@ LOCAL void int80_Pipe(fd_t fd[2]) {
 #endif /* !__x86_64__ */
 	                     "int $0x80\n\t" /* Do the syscall */
 	                     "cld\n\t"       /* Disable exceptions */
-	                     ".cfi_restore_state"
+	                     ".cfi_endcapsule"
 	                     :
 	                     : "a" (SYS_pipe)
 #ifdef __x86_64__

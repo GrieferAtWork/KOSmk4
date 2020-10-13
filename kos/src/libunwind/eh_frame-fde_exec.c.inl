@@ -633,7 +633,8 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 
 #endif /* !EH_FRAME_FDE_EXEC_CFA_STATE && !EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE */
 
-			CASE(DW_CFA_remember_state) {
+			CASE(DW_CFA_remember_state)
+			CASE(DW_CFA_KOS_startcapsule) {
 				SYM(unwind_cfa_backup_state_t) *backup;
 				backup = state_backup_free;
 				if (backup) {
@@ -661,7 +662,8 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				state_backup_list = backup;
 			}	break;
 
-			CASE(DW_CFA_restore_state) {
+			CASE(DW_CFA_restore_state)
+			CASE(DW_CFA_KOS_endcapsule) {
 				SYM(unwind_cfa_backup_state_t) *backup;
 				backup = state_backup_list;
 				if unlikely(!backup)

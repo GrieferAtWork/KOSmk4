@@ -113,16 +113,30 @@ linuw_unwind(void *absolute_pc,
              unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int result;
 	unwind_fde_t fde;
-	unwind_cfa_state_t cfa;
 	result = libuw_unwind_fde_find(absolute_pc, &fde);
 	if unlikely(result != UNWIND_SUCCESS)
 		goto done;
-	result = libuw_unwind_fde_exec(&fde, &cfa, absolute_pc);
-	if unlikely(result != UNWIND_SUCCESS)
-		goto done;
-	result = libuw_unwind_cfa_apply(&cfa, &fde, absolute_pc,
-	                                reg_getter, reg_getter_arg,
-	                                reg_setter, reg_setter_arg);
+#ifndef __OPTIMIZE_SIZE__
+	/* Optimization for unwinding through signal frames! */
+	if (fde.f_sigframe) {
+		unwind_cfa_sigframe_state_t cfa;
+		result = libuw_unwind_fde_sigframe_exec(&fde, &cfa, absolute_pc);
+		if unlikely(result != UNWIND_SUCCESS)
+			goto done;
+		result = libuw_unwind_cfa_sigframe_apply(&cfa, &fde, absolute_pc,
+		                                         reg_getter, reg_getter_arg,
+		                                         reg_setter, reg_setter_arg);
+	} else
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		unwind_cfa_state_t cfa;
+		result = libuw_unwind_fde_exec(&fde, &cfa, absolute_pc);
+		if unlikely(result != UNWIND_SUCCESS)
+			goto done;
+		result = libuw_unwind_cfa_apply(&cfa, &fde, absolute_pc,
+		                                reg_getter, reg_getter_arg,
+		                                reg_setter, reg_setter_arg);
+	}
 done:
 	return result;
 }

@@ -79,8 +79,8 @@ function replaceKeywordsWithMacros(
 @@> #define FOO 42
 @@> #define BAR FOO
 @@This will be enumerated as:
-@@> yield ("FOO", 42);
-@@> yield ("BAR", 42);
+@@> yield ("FOO", "42");
+@@> yield ("BAR", "42");
 function enumerateMacrosFromFile(filename: string): {(string, string)...} {
 	local knownMacros: {string: string} = Dict();
 	with (local fp = File.open(filename)) {
@@ -154,6 +154,13 @@ function getMacroIntValue(macroValue: string): int | none {
 	return none;
 }
 
+function enumerateIntegerMacrosFromFile(filename: string): {(string, int)...} {
+	for (local name, value: enumerateMacrosFromFile(filename)) {
+		value = getMacroIntValue(value);
+		if (value !is none)
+			yield (name, value);
+	}
+}
 
 global final REPR_SPLIT_THRESHOLD = 24;
 

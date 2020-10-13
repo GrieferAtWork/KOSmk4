@@ -45,6 +45,25 @@
 #define SIZEOF_UNWIND_ORDER_INDEX_T 1
 #endif /* !... */
 
+
+/* Figure out if libunwind (should) support CFI capsules.
+ * Since CFI capsules are a KOS extension, only support them on
+ * KOS (for now, though since they don't need kernel support,
+ * nothing is stopping other operating system from supporting
+ * them as well).
+ * Additionally, don't enable them within the KOS kernel, since
+ * capsules add a small amount of overhead to exception handling
+ * that isn't actually needed/used within the KOS kernel (though
+ * this too can be changed at any point) */
+#ifndef __KOS__
+#undef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
+#elif defined(__KOS__) && defined(__KERNEL__)
+#undef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
+#else /* ... */
+#define LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES 1
+#endif /* !... */
+
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -189,6 +208,20 @@ typedef struct unwind_cfa_sigframe_state_struct {
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
 } unwind_cfa_sigframe_state_t;
 
+typedef struct unwind_cfa_landing_state_struct {
+	__uintptr_t           cs_lp_adjustment; /* Landing-pad adjustment (~ala `DW_CFA_GNU_args_size') */
+#ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
+	__uintptr_t           cs_has_capsules;  /* Non-zero if `cs_regs[*].cr_order != 0 || cs_uncorder[*] != 0' */
+#if CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT != 0
+	unwind_cfa_register_t cs_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT];       /* Common register restore rules. */
+#endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT != 0 */
+#if CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT != 0
+	unwind_order_index_t  cs_uncorder[CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT]; /* Restore order for uncommon registers (0 means unused). */
+#endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT != 0 */
+	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
+#endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
+} unwind_cfa_landing_state_t;
+
 
 /* Execute CFA state instruction until `ABSOLUTE_PC' has been reached,
  * or the entirety of the FDE instruction code has been executed.
@@ -243,6 +276,32 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t const *__restr
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
+/* Behaves similar to `unwind_fde_exec()', but must be used to calculate the CFA
+ * for the purpose of jumping to a custom `LANDINGPAD_PC' as part of handling an
+ * exceptions which originates from `ABSOLUTE_PC' within the current cfi-proc.
+ * This function is calculates the relative CFI-capsule offset between `ABSOLUTE_PC',
+ * and `LANDINGPAD_PC', as well as the GNU-argsize adjustment. Once this is done,
+ * the caller must use `unwind_cfa_landing_apply()' to apply the these transformations
+ * onto some given register state, which may then be used to resume execution.
+ * @param: SELF:   The FDE to execute in search of `__absolute_pc'
+ * @param: RESULT: CFA state descriptor, to-be filled with restore information upon success.
+ * @return: UNWIND_SUCCESS:                 ...
+ * @return: UNWIND_INVALID_REGISTER:        ...
+ * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
+ * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
+ * @return: UNWIND_BADALLOC:                ... */
+typedef __ATTR_NONNULL((1, 2)) unsigned int
+(LIBUNWIND_CC *PUNWIND_FDE_LANDING_EXEC)(unwind_fde_t const *__restrict __self,
+                                         unwind_cfa_landing_state_t *__restrict __result,
+                                         void *__absolute_pc, void *__landingpad_pc);
+#ifdef LIBUNWIND_WANT_PROTOTYPES
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
+__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_landing_exec)(unwind_fde_t const *__restrict __self,
+                                                    unwind_cfa_landing_state_t *__restrict __result,
+                                                    void *__absolute_pc, void *__landingpad_pc);
+#endif /* LIBUNWIND_WANT_PROTOTYPES */
+
+
 
 /* Similar to `unwind_fde_exec()', but used to calculate the
  * unwind rule for `dw_regno' at the given text location.
@@ -286,26 +345,6 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_cfa)(unwind_fde_t const *__restrict __self,
                                                 unwind_cfa_value_t *__restrict __result,
                                                 void *__absolute_pc);
-#endif /* LIBUNWIND_WANT_PROTOTYPES */
-
-
-/* Similar to `unwind_fde_exec()', but only decode `DW_CFA_GNU_args_size' instructions
- * in order to calculate the proper exception_handler landing-pad-stack-adjustment that
- * is required to re-align the stack before jumping to a local exception handler.
- * @return: UNWIND_SUCCESS:                 ...
- * @return: UNWIND_INVALID_REGISTER:        ...
- * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
- * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
- * @return: UNWIND_BADALLOC:                ... */
-typedef __ATTR_NONNULL((1, 2)) unsigned int
-(LIBUNWIND_CC *PUNWIND_FDE_EXEC_LANDING_PAD_ADJUSTMENT)(unwind_fde_t const *__restrict __self,
-                                                        __uintptr_t *__restrict __psp_adjustment,
-                                                        void *__absolute_pc);
-#ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
-__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_landing_pad_adjustment)(unwind_fde_t const *__restrict __self,
-                                                                   __uintptr_t *__restrict __psp_adjustment,
-                                                                   void *__absolute_pc);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
@@ -356,6 +395,29 @@ unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict __self,
                           unwind_fde_t const *__restrict __fde, void *__absolute_pc,
                           unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                           unwind_setreg_t __reg_setter, void *__reg_setter_arg);
+#endif /* LIBUNWIND_WANT_PROTOTYPES */
+
+
+
+/* For use with `unwind_fde_landing_exec()': Apply register rules previously calculated.
+ * @param: SELF:        The CFA state to-be used when applying registers
+ * @param: ABSOLUTE_PC: Same value as was previously used to calculate `FDE' from `SELF'
+ * @return: UNWIND_SUCCESS:               ...
+ * @return: UNWIND_INVALID_REGISTER:      ...
+ * @return: UNWIND_SEGFAULT:              ...
+ * @return: UNWIND_EMULATOR_*:            ...
+ * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
+typedef __ATTR_NONNULL((1, 2, 4, 6)) unsigned int
+(LIBUNWIND_CC *PUNWIND_CFA_LANDING_APPLY)(unwind_cfa_landing_state_t *__restrict __self,
+                                          unwind_fde_t const *__restrict __fde, void *__absolute_pc,
+                                          unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
+                                          unwind_setreg_t __reg_setter, void *__reg_setter_arg);
+#ifdef LIBUNWIND_WANT_PROTOTYPES
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unsigned int LIBUNWIND_CC
+unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict __self,
+                         unwind_fde_t const *__restrict __fde, void *__absolute_pc,
+                         unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
+                         unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 

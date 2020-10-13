@@ -52,7 +52,7 @@ LOCAL void doio() {
 }
 
 #define assert_error_code(code) \
-	assertf(was_thrown(code), "error_code(): %I#x", error_code())
+	assertf(was_thrown(code), "error_code(): %#Ix", error_code())
 
 DEFINE_TEST(ioperm_works_correctly) {
 	TRY {
@@ -68,7 +68,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 			err(EXIT_FAILURE, "iopl(3) failed");
 		doio();
 	} EXCEPT {
-		assert_failed("outsb:iopl(3): error_code(): %I#x\n", error_code());
+		assert_failed("outsb:iopl(3): error_code(): %#Ix\n", error_code());
 	}
 	TRY {
 		/* Make sure outsb() doesn't work with IOPL=0 */
@@ -85,7 +85,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 			err(EXIT_FAILURE, "ioperm(%#I16x, 1, 1) failed", portno);
 		doio();
 	} EXCEPT {
-		assert_failed("outsb:ioperm(1): error_code(): %I#x\n", error_code());
+		assert_failed("outsb:ioperm(1): error_code(): %#Ix\n", error_code());
 	}
 	{
 		pid_t cpid = fork();
@@ -94,7 +94,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 			TRY {
 				doio();
 			} EXCEPT {
-				assert_failed("child:outsb:ioperm(1): error_code(): %I#x\n", error_code());
+				assert_failed("child:outsb:ioperm(1): error_code(): %#Ix\n", error_code());
 			}
 			TRY {
 				/* Turn off permissions within the child process. */
@@ -125,7 +125,7 @@ DEFINE_TEST(ioperm_works_correctly) {
 	TRY {
 		doio();
 	} EXCEPT {
-		assert_failed("outsb:ioperm(1): error_code(): %I#x\n", error_code());
+		assert_failed("outsb:ioperm(1): error_code(): %#Ix\n", error_code());
 	}
 	TRY {
 		/* Make sure ioperm() only enables access to the specified ports */

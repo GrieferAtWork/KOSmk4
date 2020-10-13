@@ -53,6 +53,8 @@
  * CFA was supposed to work at one point...) */
 #undef CONFIG_DW_RELAXED_CFA_INITIALIZATION_RULES
 
+#undef DEBUG_FRAME /* Build the .eh_frame parser! */
+
 DECL_BEGIN
 
 #undef CONFIG_NO_CFA_SIGFRAME_STATE
@@ -61,9 +63,93 @@ DECL_BEGIN
 #define CONFIG_NO_CFA_SIGFRAME_STATE 1
 #endif /* ... */
 
+#define _convert_with_array(arr, index, error) \
+	((index) >= COMPILER_LENOF(arr) ? (error) : arr[index])
+
+/* Load register index convert arrays. */
+
+/* Normal common/uncommon */
+#ifndef cfi_unwind_register_dw2common
+PRIVATE DEFINE_cfi_unwind_register_dw2common(_cur_dw2common);
+#define cfi_unwind_register_dw2common(dw_regno) \
+	_convert_with_array(_cur_dw2common, dw_regno, CFI_UNWIND_COMMON_REGISTER_COUNT)
+#endif /* !cfi_unwind_register_dw2common */
+
+#ifndef cfi_unwind_register_dw2uncommon
+PRIVATE DEFINE_cfi_unwind_register_dw2uncommon(_cur_dw2uncommon);
+#define cfi_unwind_register_dw2uncommon(dw_regno) \
+	_convert_with_array(_cur_dw2uncommon, dw_regno, CFI_UNWIND_UNCOMMON_REGISTER_COUNT)
+#endif /* !cfi_unwind_register_dw2uncommon */
+
+#ifndef cfi_unwind_register_common2dw
+PRIVATE DEFINE_cfi_unwind_register_common2dw(_cur_common2dw);
+#define cfi_unwind_register_common2dw(common_regno) \
+	_convert_with_array(_cur_common2dw, common_regno, CFI_UNWIND_REGISTER_COUNT)
+#endif /* !cfi_unwind_register_common2dw */
+
+#ifndef cfi_unwind_register_uncommon2dw
+PRIVATE DEFINE_cfi_unwind_register_uncommon2dw(_cur_uncommon2dw);
+#define cfi_unwind_register_uncommon2dw(uncommon_regno) \
+	_convert_with_array(_cur_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_COUNT)
+#endif /* !cfi_unwind_register_uncommon2dw */
+
+
+/* Sigframe common/uncommon */
+#ifndef cfi_unwind_sigframe_register_dw2common
+PRIVATE DEFINE_cfi_unwind_sigframe_register_dw2common(_cur_sigframe_dw2common);
+#define cfi_unwind_sigframe_register_dw2common(dw_regno) \
+	_convert_with_array(_cur_sigframe_dw2common, dw_regno, CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT)
+#endif /* !cfi_unwind_sigframe_register_dw2common */
+
+#ifndef cfi_unwind_sigframe_register_dw2uncommon
+PRIVATE DEFINE_cfi_unwind_sigframe_register_dw2uncommon(_cur_sigframe_dw2uncommon);
+#define cfi_unwind_sigframe_register_dw2uncommon(dw_regno) \
+	_convert_with_array(_cur_sigframe_dw2uncommon, dw_regno, CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT)
+#endif /* !cfi_unwind_sigframe_register_dw2uncommon */
+
+#ifndef cfi_unwind_sigframe_register_common2dw
+PRIVATE DEFINE_cfi_unwind_sigframe_register_common2dw(_cur_sigframe_common2dw);
+#define cfi_unwind_sigframe_register_common2dw(common_regno) \
+	_convert_with_array(_cur_sigframe_common2dw, common_regno, CFI_UNWIND_REGISTER_COUNT)
+#endif /* !cfi_unwind_sigframe_register_common2dw */
+
+#ifndef cfi_unwind_sigframe_register_uncommon2dw
+PRIVATE DEFINE_cfi_unwind_sigframe_register_uncommon2dw(_cur_sigframe_uncommon2dw);
+#define cfi_unwind_sigframe_register_uncommon2dw(uncommon_regno) \
+	_convert_with_array(_cur_sigframe_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_COUNT)
+#endif /* !cfi_unwind_sigframe_register_uncommon2dw */
+
+
+/* Landing-pad common/uncommon */
+#ifndef cfi_unwind_landing_register_dw2common
+PRIVATE DEFINE_cfi_unwind_landing_register_dw2common(_cur_landing_dw2common);
+#define cfi_unwind_landing_register_dw2common(dw_regno) \
+	_convert_with_array(_cur_landing_dw2common, dw_regno, CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT)
+#endif /* !cfi_unwind_landing_register_dw2common */
+
+#ifndef cfi_unwind_landing_register_dw2uncommon
+PRIVATE DEFINE_cfi_unwind_landing_register_dw2uncommon(_cur_landing_dw2uncommon);
+#define cfi_unwind_landing_register_dw2uncommon(dw_regno) \
+	_convert_with_array(_cur_landing_dw2uncommon, dw_regno, CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT)
+#endif /* !cfi_unwind_landing_register_dw2uncommon */
+
+#ifndef cfi_unwind_landing_register_common2dw
+PRIVATE DEFINE_cfi_unwind_landing_register_common2dw(_cur_landing_common2dw);
+#define cfi_unwind_landing_register_common2dw(common_regno) \
+	_convert_with_array(_cur_landing_common2dw, common_regno, CFI_UNWIND_REGISTER_COUNT)
+#endif /* !cfi_unwind_landing_register_common2dw */
+
+#ifndef cfi_unwind_landing_register_uncommon2dw
+PRIVATE DEFINE_cfi_unwind_landing_register_uncommon2dw(_cur_landing_uncommon2dw);
+#define cfi_unwind_landing_register_uncommon2dw(uncommon_regno) \
+	_convert_with_array(_cur_landing_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_COUNT)
+#endif /* !cfi_unwind_landing_register_uncommon2dw */
+
+
+
+
 
 #ifndef __INTELLISENSE__
-#undef DEBUG_FRAME /* Build the .eh_frame parser! */
 DECL_END
 #define FIND_SPECIFIC_ADDRESS
 #include "eh_frame-find_fde.c.inl"
@@ -85,13 +171,13 @@ DECL_END
 #define EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT 1
 #include "eh_frame-fde_exec.c.inl"
 
-
 DECL_BEGIN
 #else /* !__INTELLISENSE__ */
+
 PRIVATE
-#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+#if CFI_UNWIND_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_UNCOMMON_REGISTER_COUNT != 0
 	NONNULL((1, 4, 5, 6, 7))
-#elif CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 || CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+#elif CFI_UNWIND_COMMON_REGISTER_COUNT != 0 || CFI_UNWIND_UNCOMMON_REGISTER_COUNT != 0
 	NONNULL((1, 3, 4, 5, 6))
 #else /* ... */
 	NONNULL((1, 2, 3, 4, 5))
@@ -109,6 +195,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
                                             byte_t *__restrict end,
                                             unwind_cfa_state_t *__restrict result,
                                             void *absolute_pc);
+
 PRIVATE
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
 	NONNULL((1, 4, 5, 6, 7))
@@ -137,6 +224,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t const *__restrict s
                                                 byte_t *__restrict end,
                                                 unwind_cfa_value_t *__restrict result,
                                                 void *absolute_pc);
+
 PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict self,
                                                  byte_t *__restrict reader,
@@ -303,9 +391,13 @@ DECL_END
 #include "eh_frame-cfa_apply.c.inl"
 #endif /* !CONFIG_NO_CFA_SIGFRAME_STATE */
 
+#define EH_FRAME_CFA_LANDING_APPLY 1
+#include "eh_frame-cfa_apply.c.inl"
 
 DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
+
+
 
 
 /* Alias the sigframe variants on-top of the regular ones. */
@@ -314,15 +406,15 @@ DEFINE_INTERN_ALIAS(libuw_unwind_fde_sigframe_exec, libuw_unwind_fde_exec);
 DEFINE_INTERN_ALIAS(libuw_unwind_cfa_sigframe_apply, libuw_unwind_cfa_apply);
 #endif /* CONFIG_NO_CFA_SIGFRAME_STATE */
 
-
 DEFINE_PUBLIC_ALIAS(unwind_fde_load, libuw_unwind_fde_load);
 DEFINE_PUBLIC_ALIAS(unwind_fde_scan, libuw_unwind_fde_scan);
 DEFINE_PUBLIC_ALIAS(unwind_fde_exec, libuw_unwind_fde_exec);
+DEFINE_PUBLIC_ALIAS(unwind_fde_landing_exec, libuw_unwind_fde_landing_exec);
 DEFINE_PUBLIC_ALIAS(unwind_fde_sigframe_exec, libuw_unwind_fde_sigframe_exec);
 DEFINE_PUBLIC_ALIAS(unwind_fde_rule, libuw_unwind_fde_rule);
 DEFINE_PUBLIC_ALIAS(unwind_fde_exec_cfa, libuw_unwind_fde_exec_cfa);
-DEFINE_PUBLIC_ALIAS(unwind_fde_exec_landing_pad_adjustment, libuw_unwind_fde_exec_landing_pad_adjustment);
 DEFINE_PUBLIC_ALIAS(unwind_cfa_apply, libuw_unwind_cfa_apply);
+DEFINE_PUBLIC_ALIAS(unwind_cfa_landing_apply, libuw_unwind_cfa_landing_apply);
 DEFINE_PUBLIC_ALIAS(unwind_cfa_sigframe_apply, libuw_unwind_cfa_sigframe_apply);
 DEFINE_PUBLIC_ALIAS(unwind_cfa_calculate_cfa, libuw_unwind_cfa_calculate_cfa);
 

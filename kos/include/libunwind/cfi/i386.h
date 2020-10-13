@@ -166,166 +166,7 @@
 #define CFI_386_UNWIND_UNCOMMON_REGISTER_K7     47
 #define CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT  48
 
-#ifdef __CC__
-/* @return: CFI_386_UNWIND_COMMON_REGISTER_COUNT: Not a common register */
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBUNWIND_CC
-cfi_386_unwind_register_dw2common(__UINTPTR_HALF_TYPE__ __dw_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	switch (__dw_regno) {
 
-	case CFI_386_UNWIND_REGISTER_EBX:
-		__result = CFI_386_UNWIND_COMMON_REGISTER_EBX;
-		break;
-
-	case CFI_386_UNWIND_REGISTER_EBP:
-		__result = CFI_386_UNWIND_COMMON_REGISTER_EBP;
-		break;
-
-	case CFI_386_UNWIND_REGISTER_ESI:
-		__result = CFI_386_UNWIND_COMMON_REGISTER_ESI;
-		break;
-
-	case CFI_386_UNWIND_REGISTER_EDI:
-		__result = CFI_386_UNWIND_COMMON_REGISTER_EDI;
-		break;
-
-	case CFI_386_UNWIND_REGISTER_EIP:
-		__result = CFI_386_UNWIND_COMMON_REGISTER_EIP;
-		break;
-
-	default:
-		__result = CFI_386_UNWIND_COMMON_REGISTER_COUNT;
-		break;
-	}
-	return __result;
-}
-
-/* @return: CFI_386_UNWIND_REGISTER_COUNT: Invalid register id */
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBUNWIND_CC
-cfi_386_unwind_register_common2dw(__UINTPTR_HALF_TYPE__ __com_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	switch (__com_regno) {
-
-	case CFI_386_UNWIND_COMMON_REGISTER_EBX:
-		__result = CFI_386_UNWIND_REGISTER_EBX;
-		break;
-
-	case CFI_386_UNWIND_COMMON_REGISTER_EBP:
-		__result = CFI_386_UNWIND_REGISTER_EBP;
-		break;
-
-	case CFI_386_UNWIND_COMMON_REGISTER_ESI:
-		__result = CFI_386_UNWIND_REGISTER_ESI;
-		break;
-
-	case CFI_386_UNWIND_COMMON_REGISTER_EDI:
-		__result = CFI_386_UNWIND_REGISTER_EDI;
-		break;
-
-	case CFI_386_UNWIND_COMMON_REGISTER_EIP:
-		__result = CFI_386_UNWIND_REGISTER_EIP;
-		break;
-
-	default:
-		__result = CFI_386_UNWIND_REGISTER_COUNT;
-		break;
-	}
-	return __result;
-}
-
-/* @return: CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT: Not an uncommon register */
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBUNWIND_CC
-cfi_386_unwind_register_dw2uncommon(__UINTPTR_HALF_TYPE__ __dw_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	switch (__dw_regno) {
-
-	case CFI_386_UNWIND_REGISTER_EAX:
-		__result = CFI_386_UNWIND_UNCOMMON_REGISTER_EAX;
-		break;
-
-	case CFI_386_UNWIND_REGISTER_ECX:
-		__result = CFI_386_UNWIND_UNCOMMON_REGISTER_ECX;
-		break;
-
-	case CFI_386_UNWIND_REGISTER_EDX:
-		__result = CFI_386_UNWIND_UNCOMMON_REGISTER_EDX;
-		break;
-
-	case CFI_386_UNWIND_REGISTER_ESP:
-		__result = CFI_386_UNWIND_UNCOMMON_REGISTER_ESP;
-		break;
-
-	case CFI_386_UNWIND_REGISTER_EFLAGS:
-		__result = CFI_386_UNWIND_UNCOMMON_REGISTER_EFLAGS;
-		break;
-
-	default:
-		if (__dw_regno >= CFI_386_UNWIND_REGISTER_ST0 &&
-		    __dw_regno <= CFI_386_UNWIND_REGISTER_ST7)
-			__result = CFI_386_UNWIND_UNCOMMON_REGISTER_ST0 + (__dw_regno - CFI_386_UNWIND_REGISTER_ST0);
-		else if (__dw_regno >= CFI_386_UNWIND_REGISTER_XMM0 &&
-		         __dw_regno <= CFI_386_UNWIND_REGISTER_GS)
-			__result = CFI_386_UNWIND_UNCOMMON_REGISTER_XMM0 + (__dw_regno - CFI_386_UNWIND_REGISTER_XMM0);
-		else if (__dw_regno >= CFI_386_UNWIND_REGISTER_TR &&
-		         __dw_regno <= CFI_386_UNWIND_REGISTER_LDTR)
-			__result = CFI_386_UNWIND_UNCOMMON_REGISTER_TR + (__dw_regno - CFI_386_UNWIND_REGISTER_TR);
-		else if (__dw_regno >= CFI_386_UNWIND_REGISTER_K0 &&
-		         __dw_regno <= CFI_386_UNWIND_REGISTER_K7)
-			__result = CFI_386_UNWIND_UNCOMMON_REGISTER_K0 + (__dw_regno - CFI_386_UNWIND_REGISTER_K0);
-		else {
-			__result = CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT;
-		}
-		break;
-	}
-	return __result;
-}
-
-/* @return: CFI_386_UNWIND_REGISTER_COUNT: Not an uncommon register */
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBUNWIND_CC
-cfi_386_unwind_register_uncommon2dw(__UINTPTR_HALF_TYPE__ __uncom_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	switch (__uncom_regno) {
-
-	case CFI_386_UNWIND_UNCOMMON_REGISTER_EAX:
-		__result = CFI_386_UNWIND_REGISTER_EAX;
-		break;
-
-	case CFI_386_UNWIND_UNCOMMON_REGISTER_ECX:
-		__result = CFI_386_UNWIND_REGISTER_ECX;
-		break;
-
-	case CFI_386_UNWIND_UNCOMMON_REGISTER_EDX:
-		__result = CFI_386_UNWIND_REGISTER_EDX;
-		break;
-
-	case CFI_386_UNWIND_UNCOMMON_REGISTER_ESP:
-		__result = CFI_386_UNWIND_REGISTER_ESP;
-		break;
-
-	case CFI_386_UNWIND_UNCOMMON_REGISTER_EFLAGS:
-		__result = CFI_386_UNWIND_REGISTER_EFLAGS;
-		break;
-
-	default:
-		if __unlikely(__uncom_regno > CFI_386_UNWIND_REGISTER_K7)
-			__result = CFI_386_UNWIND_REGISTER_COUNT;
-		else if (__uncom_regno >= CFI_386_UNWIND_UNCOMMON_REGISTER_K0)
-			__result = CFI_386_UNWIND_REGISTER_K0 + (__uncom_regno - CFI_386_UNWIND_UNCOMMON_REGISTER_K0);
-		else if (__uncom_regno >= CFI_386_UNWIND_UNCOMMON_REGISTER_K0)
-			__result = CFI_386_UNWIND_REGISTER_K0 + (__uncom_regno - CFI_386_UNWIND_UNCOMMON_REGISTER_K0);
-		else if (__uncom_regno >= CFI_386_UNWIND_UNCOMMON_REGISTER_TR)
-			__result = CFI_386_UNWIND_REGISTER_TR + (__uncom_regno - CFI_386_UNWIND_UNCOMMON_REGISTER_TR);
-		else if (__uncom_regno >= CFI_386_UNWIND_UNCOMMON_REGISTER_XMM0)
-			__result = CFI_386_UNWIND_REGISTER_XMM0 + (__uncom_regno - CFI_386_UNWIND_UNCOMMON_REGISTER_XMM0);
-		else {
-			__result = CFI_386_UNWIND_REGISTER_ST0 + (__uncom_regno - CFI_386_UNWIND_UNCOMMON_REGISTER_ST0);
-		}
-		break;
-	}
-	return __result;
-}
-
-#endif /* __CC__ */
 
 
 
@@ -423,125 +264,142 @@ cfi_386_unwind_register_uncommon2dw(__UINTPTR_HALF_TYPE__ __uncom_regno) {
 #define CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K7    36
 #define CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT 37
 
-#ifdef __CC__
-/* @return: CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT: Not a common register */
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBUNWIND_CC
-cfi_386_unwind_sigframe_register_dw2common(__UINTPTR_HALF_TYPE__ __dw_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-#if CFI_386_UNWIND_REGISTER_EAX != 0
-	if (__dw_regno >= CFI_386_UNWIND_REGISTER_EAX &&
-	    __dw_regno <= CFI_386_UNWIND_REGISTER_EFLAGS)
-#else /* CFI_386_UNWIND_REGISTER_EAX != 0 */
-	if (__dw_regno <= CFI_386_UNWIND_REGISTER_EFLAGS)
-#endif /* CFI_386_UNWIND_REGISTER_EAX == 0 */
-	{
-		__result = CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EAX + (__dw_regno - CFI_386_UNWIND_REGISTER_EAX);
-	} else if (__dw_regno >= CFI_386_UNWIND_REGISTER_ES &&
-	           __dw_regno <= CFI_386_UNWIND_REGISTER_GS) {
-		__result = CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ES + (__dw_regno - CFI_386_UNWIND_REGISTER_ES);
-	} else {
-		__result = CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT;
-	}
-	return __result;
-}
-
-/* @return: CFI_386_UNWIND_REGISTER_COUNT: Invalid register id */
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBUNWIND_CC
-cfi_386_unwind_sigframe_register_common2dw(__UINTPTR_HALF_TYPE__ __com_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-#if CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EAX != 0
-	if (__com_regno >= CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EAX &&
-	    __com_regno <= CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EFLAGS)
-#else /* CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EAX != 0 */
-	if (__com_regno <= CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EFLAGS)
-#endif /* CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EAX == 0 */
-	{
-		__result = CFI_386_UNWIND_REGISTER_EAX + (__com_regno - CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EAX);
-	}
-#if CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ES != CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EFLAGS + 1
-	else if (__com_regno >= CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ES &&
-	         __com_regno <= CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_GS)
-#else /* CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ES != CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EFLAGS + 1 */
-	else if (__com_regno <= CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_GS)
-#endif /* CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ES == CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_EFLAGS + 1 */
-	{
-		__result = CFI_386_UNWIND_REGISTER_ES + (__com_regno - CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_ES);
-	} else {
-		__result = CFI_386_UNWIND_REGISTER_COUNT;
-	}
-	return __result;
-}
-
-/* @return: CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT: Not an uncommon register */
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBUNWIND_CC
-cfi_386_unwind_sigframe_register_dw2uncommon(__UINTPTR_HALF_TYPE__ __dw_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-	if (__dw_regno >= CFI_386_UNWIND_REGISTER_ST0 &&
-	    __dw_regno <= CFI_386_UNWIND_REGISTER_ST7) {
-		__result = CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST0 + (__dw_regno - CFI_386_UNWIND_REGISTER_ST0);
-	} else if (__dw_regno >= CFI_386_UNWIND_REGISTER_XMM0 &&
-	           __dw_regno <= CFI_386_UNWIND_REGISTER_MXCSR) {
-		__result = CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 + (__dw_regno - CFI_386_UNWIND_REGISTER_XMM0);
-	} else if (__dw_regno >= CFI_386_UNWIND_REGISTER_TR &&
-	           __dw_regno <= CFI_386_UNWIND_REGISTER_LDTR) {
-		__result = CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR + (__dw_regno - CFI_386_UNWIND_REGISTER_TR);
-	} else if (__dw_regno >= CFI_386_UNWIND_REGISTER_K0 &&
-	           __dw_regno <= CFI_386_UNWIND_REGISTER_K7) {
-		__result = CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 + (__dw_regno - CFI_386_UNWIND_REGISTER_K0);
-	} else {
-		__result = CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT;
-	}
-	return __result;
-}
-
-/* @return: CFI_386_UNWIND_REGISTER_COUNT: Not an uncommon register */
-__LOCAL __ATTR_CONST __UINTPTR_HALF_TYPE__ LIBUNWIND_CC
-cfi_386_unwind_sigframe_register_uncommon2dw(__UINTPTR_HALF_TYPE__ __uncom_regno) {
-	__UINTPTR_HALF_TYPE__ __result;
-#if CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST0 != 0
-	if (__uncom_regno >= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST0 &&
-	    __uncom_regno <= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST7)
-#else /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST0 != 0 */
-	if (__uncom_regno <= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST7)
-#endif /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST0 == 0 */
-	{
-		__result = CFI_386_UNWIND_REGISTER_ST0 + (__uncom_regno - CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST0);
-	}
-#if CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 != CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST7 + 1
-	else if (__uncom_regno >= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 &&
-	         __uncom_regno <= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MXCSR)
-#else /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 != CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST7 + 1 */
-	else if (__uncom_regno <= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MXCSR)
-#endif /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0 == CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST7 + 1 */
-	{
-		__result = CFI_386_UNWIND_REGISTER_XMM0 + (__uncom_regno - CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0);
-	}
-#if CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR != CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MXCSR + 1
-	else if (__uncom_regno >= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR &&
-	         __uncom_regno <= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_LDTR)
-#else /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR != CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MXCSR + 1 */
-	else if (__uncom_regno <= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_LDTR)
-#endif /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR == CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MXCSR + 1 */
-	{
-		__result = CFI_386_UNWIND_REGISTER_TR + (__uncom_regno - CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR);
-	}
-#if CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 != CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_LDTR + 1
-	else if (__uncom_regno >= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 &&
-	         __uncom_regno <= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K7)
-#else /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 != CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_LDTR + 1 */
-	else if (__uncom_regno <= CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K7)
-#endif /* CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0 == CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_LDTR + 1 */
-	{
-		__result = CFI_386_UNWIND_REGISTER_K0 + (__uncom_regno - CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0);
-	} else {
-		__result = CFI_386_UNWIND_REGISTER_COUNT;
-	}
-	return __result;
-}
-
-#endif /* __CC__ */
 
 
+/* Register <--> Landing-pad Common/Uncommon-register mapping
+ * Currently, landing-pad unwinding is only needed for inline, exception-enabled
+ * system calls, and as such only the %eflags register is considered common, since
+ * that one needs to be modified in order to set EFLAGS.DF=0 during landing pad
+ * adjustments. */
+#define CFI_386_UNWIND_LANDING_COMMON_REGISTER_EFLAGS 0
+#define CFI_386_UNWIND_LANDING_COMMON_REGISTER_COUNT  1
+
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_SP    CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ESP
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_EAX   0
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ECX   1
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_EDX   2
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_EBX   3
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ESP   4
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_EBP   5
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ESI   6
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_EDI   7
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_EIP   8
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ST0   9
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ST1   10
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ST2   11
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ST3   12
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ST4   13
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ST5   14
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ST6   15
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ST7   16
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_XMM0  17
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_XMM1  18
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_XMM2  19
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_XMM3  20
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_XMM4  21
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_XMM5  22
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_XMM6  23
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_XMM7  24
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MM0   25
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MM1   26
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MM2   27
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MM3   28
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MM4   29
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MM5   30
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MM6   31
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MM7   32
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_FCW   33
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_FSW   34
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_MXCSR 35
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_ES    36
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_CS    37
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_SS    38
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_DS    39
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_FS    40
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_GS    41
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_TR    42
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_LDTR  43
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_K0    44
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_K1    45
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_K2    46
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_K3    47
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_K4    48
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_K5    49
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_K6    50
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_K7    51
+#define CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT 52
+
+
+/*[[[deemon
+import * from deemon;
+import * from ....misc.libgen.strendN;
+import * from ....misc.libgen.converter;
+local macros: {string: int} = Dict(enumerateIntegerMacrosFromFile(__FILE__));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_register_dw2common", generateArrayMapping(macros, "CFI_386_UNWIND_REGISTER_", "CFI_386_UNWIND_COMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_register_dw2uncommon", generateArrayMapping(macros, "CFI_386_UNWIND_REGISTER_", "CFI_386_UNWIND_UNCOMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_register_common2dw", generateArrayMapping(macros, "CFI_386_UNWIND_COMMON_REGISTER_", "CFI_386_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_register_uncommon2dw", generateArrayMapping(macros, "CFI_386_UNWIND_UNCOMMON_REGISTER_", "CFI_386_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_sigframe_register_dw2common", generateArrayMapping(macros, "CFI_386_UNWIND_REGISTER_", "CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_sigframe_register_dw2uncommon", generateArrayMapping(macros, "CFI_386_UNWIND_REGISTER_", "CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_sigframe_register_common2dw", generateArrayMapping(macros, "CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_", "CFI_386_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_sigframe_register_uncommon2dw", generateArrayMapping(macros, "CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_", "CFI_386_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_landing_register_dw2common", generateArrayMapping(macros, "CFI_386_UNWIND_REGISTER_", "CFI_386_UNWIND_LANDING_COMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_landing_register_dw2uncommon", generateArrayMapping(macros, "CFI_386_UNWIND_REGISTER_", "CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_landing_register_common2dw", generateArrayMapping(macros, "CFI_386_UNWIND_LANDING_COMMON_REGISTER_", "CFI_386_UNWIND_REGISTER_"));
+printArrayDefineMacro("DEFINE_cfi_386_unwind_landing_register_uncommon2dw", generateArrayMapping(macros, "CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_", "CFI_386_UNWIND_REGISTER_"));
+]]]*/
+#define DEFINE_cfi_386_unwind_register_dw2common(name) \
+	__UINT8_TYPE__ const name[9] = { 5, 5, 5, 0, 5, 1, 2, 3, 4 }
+#define DEFINE_cfi_386_unwind_register_dw2uncommon(name)                                               \
+	__UINT8_TYPE__ const name[101] = { 0,  1,  2,  48, 3,  48, 48, 48, 48, 4,  48, 5,  6,  7,  8,  9,  \
+	                                   10, 11, 12, 48, 48, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, \
+	                                   24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 48, 48, \
+	                                   38, 39, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, \
+	                                   48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, \
+	                                   48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 40, 41, 42, \
+	                                   43, 44, 45, 46, 47 }
+#define DEFINE_cfi_386_unwind_register_common2dw(name) \
+	__UINT8_TYPE__ const name[5] = { 3, 5, 6, 7, 8 }
+#define DEFINE_cfi_386_unwind_register_uncommon2dw(name)                                                              \
+	__UINT8_TYPE__ const name[48] = { 0,   1,   2,   4,   9,   11,  12,  13,  14,  15,  16,  17,  18,  21,  22,  23,  \
+	                                  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  \
+	                                  40,  41,  42,  43,  44,  45,  48,  49,  93,  94,  95,  96,  97,  98,  99,  100 }
+#define DEFINE_cfi_386_unwind_sigframe_register_dw2common(name)                                       \
+	__UINT8_TYPE__ const name[46] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  16, 16, 16, 16, 16, 16, \
+	                                  16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, \
+	                                  16, 16, 16, 16, 16, 16, 16, 16, 10, 11, 12, 13, 14, 15 }
+#define DEFINE_cfi_386_unwind_sigframe_register_dw2uncommon(name)                                      \
+	__UINT8_TYPE__ const name[101] = { 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 0,  1,  2,  3,  4,  \
+	                                   5,  6,  7,  37, 37, 8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, \
+	                                   19, 20, 21, 22, 23, 24, 25, 26, 37, 37, 37, 37, 37, 37, 37, 37, \
+	                                   27, 28, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, \
+	                                   37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, \
+	                                   37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 37, 29, 30, 31, \
+	                                   32, 33, 34, 35, 36 }
+#define DEFINE_cfi_386_unwind_sigframe_register_common2dw(name) \
+	__UINT8_TYPE__ const name[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 40, 41, 42, 43, 44, 45 }
+#define DEFINE_cfi_386_unwind_sigframe_register_uncommon2dw(name)                                                     \
+	__UINT8_TYPE__ const name[37] = { 11,  12,  13,  14,  15,  16,  17,  18,  21,  22,  23,  24,  25,  26,  27,  28,  \
+	                                  29,  30,  31,  32,  33,  34,  35,  36,  37,  38,  39,  48,  49,  93,  94,  95,  \
+	                                  96,  97,  98,  99,  100 }
+#define DEFINE_cfi_386_unwind_landing_register_dw2common(name) \
+	__UINT8_TYPE__ const name[10] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 }
+#define DEFINE_cfi_386_unwind_landing_register_dw2uncommon(name)                                       \
+	__UINT8_TYPE__ const name[101] = { 0,  1,  2,  3,  4,  5,  6,  7,  8,  52, 52, 9,  10, 11, 12, 13, \
+	                                   14, 15, 16, 52, 52, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, \
+	                                   28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 52, 52, \
+	                                   42, 43, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, \
+	                                   52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, \
+	                                   52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 52, 44, 45, 46, \
+	                                   47, 48, 49, 50, 51 }
+#define DEFINE_cfi_386_unwind_landing_register_common2dw(name) \
+	__UINT8_TYPE__ const name[1] = { 9 }
+#define DEFINE_cfi_386_unwind_landing_register_uncommon2dw(name)                                                      \
+	__UINT8_TYPE__ const name[52] = { 0,   1,   2,   3,   4,   5,   6,   7,   8,   11,  12,  13,  14,  15,  16,  17,  \
+	                                  18,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,  32,  33,  34,  35,  \
+	                                  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  48,  49,  93,  94,  95,  96,  \
+	                                  97,  98,  99,  100 }
+/*[[[end]]]*/
 
 
 
@@ -555,22 +413,31 @@ cfi_386_unwind_sigframe_register_uncommon2dw(__UINTPTR_HALF_TYPE__ __uncom_regno
 #define CFI_UNWIND_REGISTER_COUNT          CFI_386_UNWIND_REGISTER_COUNT
 
 /* Normal common/uncommon */
-#define CFI_UNWIND_UNCOMMON_REGISTER_SP    CFI_386_UNWIND_UNCOMMON_REGISTER_SP
-#define CFI_UNWIND_COMMON_REGISTER_COUNT   CFI_386_UNWIND_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT
-#define cfi_unwind_register_dw2common      cfi_386_unwind_register_dw2common
-#define cfi_unwind_register_dw2uncommon    cfi_386_unwind_register_dw2uncommon
-#define cfi_unwind_register_common2dw      cfi_386_unwind_register_common2dw
-#define cfi_unwind_register_uncommon2dw    cfi_386_unwind_register_uncommon2dw
+#define CFI_UNWIND_UNCOMMON_REGISTER_SP        CFI_386_UNWIND_UNCOMMON_REGISTER_SP
+#define CFI_UNWIND_COMMON_REGISTER_COUNT       CFI_386_UNWIND_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_UNCOMMON_REGISTER_COUNT     CFI_386_UNWIND_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_register_dw2common   DEFINE_cfi_386_unwind_register_dw2common
+#define DEFINE_cfi_unwind_register_dw2uncommon DEFINE_cfi_386_unwind_register_dw2uncommon
+#define DEFINE_cfi_unwind_register_common2dw   DEFINE_cfi_386_unwind_register_common2dw
+#define DEFINE_cfi_unwind_register_uncommon2dw DEFINE_cfi_386_unwind_register_uncommon2dw
 
 /* Sigframe common/uncommon */
-#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP      CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_SP
-#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT   CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
-#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
-#define cfi_unwind_sigframe_register_dw2common      cfi_386_unwind_sigframe_register_dw2common
-#define cfi_unwind_sigframe_register_dw2uncommon    cfi_386_unwind_sigframe_register_dw2uncommon
-#define cfi_unwind_sigframe_register_common2dw      cfi_386_unwind_sigframe_register_common2dw
-#define cfi_unwind_sigframe_register_uncommon2dw    cfi_386_unwind_sigframe_register_uncommon2dw
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP          CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_SP
+#define CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT       CFI_386_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT     CFI_386_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_sigframe_register_dw2common   DEFINE_cfi_386_unwind_sigframe_register_dw2common
+#define DEFINE_cfi_unwind_sigframe_register_dw2uncommon DEFINE_cfi_386_unwind_sigframe_register_dw2uncommon
+#define DEFINE_cfi_unwind_sigframe_register_common2dw   DEFINE_cfi_386_unwind_sigframe_register_common2dw
+#define DEFINE_cfi_unwind_sigframe_register_uncommon2dw DEFINE_cfi_386_unwind_sigframe_register_uncommon2dw
+
+/* Landing-pad common/uncommon */
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP        CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_SP
+#define CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT       CFI_386_UNWIND_LANDING_COMMON_REGISTER_COUNT
+#define CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT     CFI_386_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT
+#define DEFINE_cfi_unwind_landing_register_dw2common   DEFINE_cfi_386_unwind_landing_register_dw2common
+#define DEFINE_cfi_unwind_landing_register_dw2uncommon DEFINE_cfi_386_unwind_landing_register_dw2uncommon
+#define DEFINE_cfi_unwind_landing_register_common2dw   DEFINE_cfi_386_unwind_landing_register_common2dw
+#define DEFINE_cfi_unwind_landing_register_uncommon2dw DEFINE_cfi_386_unwind_landing_register_uncommon2dw
 #endif /* __i386__ && !__x86_64__ */
 
 

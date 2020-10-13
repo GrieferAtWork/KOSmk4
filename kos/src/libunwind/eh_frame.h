@@ -90,6 +90,25 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict se
                                                unwind_cfa_sigframe_state_t *__restrict result,
                                                void *absolute_pc);
 
+/* Behaves similar to `unwind_fde_exec()', but must be used to calculate the CFA
+ * for the purpose of jumping to a custom `LANDINGPAD_PC' as part of handling an
+ * exceptions which originates from `ABSOLUTE_PC' within the current cfi-proc.
+ * This function is calculates the relative CFI-capsule offset between `ABSOLUTE_PC',
+ * and `LANDINGPAD_PC', as well as the GNU-argsize adjustment. Once this is done,
+ * the caller must use `unwind_cfa_landing_apply()' to apply the these transformations
+ * onto some given register state, which may then be used to resume execution.
+ * @param: SELF:   The FDE to execute in search of `__absolute_pc'
+ * @param: RESULT: CFA state descriptor, to-be filled with restore information upon success.
+ * @return: UNWIND_SUCCESS:                 ...
+ * @return: UNWIND_INVALID_REGISTER:        ...
+ * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
+ * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
+ * @return: UNWIND_BADALLOC:                ... */
+INTDEF NONNULL((1, 2)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict self,
+                                              unwind_cfa_landing_state_t *__restrict result,
+                                              void *absolute_pc, void *landingpad_pc);
+
 /* Similar to `unwind_fde_exec()', but used to calculate the
  * unwind rule for `dw_regno' at the given text location.
  * This is used to implement unwinding for uncommon registers,
@@ -167,6 +186,20 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
                                 unwind_fde_t const *__restrict fde, void *absolute_pc,
                                 unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                 unwind_setreg_t reg_setter, void *reg_setter_arg);
+
+/* For use with `unwind_fde_landing_exec()': Apply register rules previously calculated.
+ * @param: SELF:        The CFA state to-be used when applying registers
+ * @param: ABSOLUTE_PC: Same value as was previously used to calculate `FDE' from `SELF'
+ * @return: UNWIND_SUCCESS:               ...
+ * @return: UNWIND_INVALID_REGISTER:      ...
+ * @return: UNWIND_SEGFAULT:              ...
+ * @return: UNWIND_EMULATOR_*:            ...
+ * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
+INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
+libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
+                               unwind_fde_t const *__restrict fde, void *absolute_pc,
+                               unwind_getreg_t reg_getter, void const *reg_getter_arg,
+                               unwind_setreg_t reg_setter, void *reg_setter_arg);
 
 /* Calculate the CFA (CanonicalFrameAddress) of the given CFA restore descriptor.
  * @param: self: The CFA state to-be used to calculate the CFA
