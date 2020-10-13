@@ -68,6 +68,7 @@ DECL_BEGIN
 
 
 
+#ifndef EH_FRAME_CFA_LANDING_APPLY
 #ifdef EH_FRAME_CFA_APPLY
 /* Execute CFA result instruction until `absolute_pc' has been reached,
  * or the entirety of the FDE instruction code has been executed.
@@ -106,45 +107,8 @@ INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
                                                unwind_cfa_sigframe_state_t *__restrict result,
                                                void *absolute_pc)
-#elif defined(EH_FRAME_CFA_LANDING_APPLY)
-/* Behaves similar to `unwind_fde_exec()', but must be used to calculate the CFA
- * for the purpose of jumping to a custom `LANDINGPAD_PC' as part of handling an
- * exceptions which originates from `ABSOLUTE_PC' within the current cfi-proc.
- * This function is calculates the relative CFI-capsule offset between `ABSOLUTE_PC',
- * and `LANDINGPAD_PC', as well as the GNU-argsize adjustment. Once this is done,
- * the caller must use `unwind_cfa_landing_apply()' to apply the these transformations
- * onto some given register state, which may then be used to resume execution.
- * @param: SELF:   The FDE to execute in search of `__absolute_pc'
- * @param: RESULT: CFA state descriptor, to-be filled with restore information upon success.
- * @return: UNWIND_SUCCESS:                 ...
- * @return: UNWIND_INVALID_REGISTER:        ...
- * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
- * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
- * @return: UNWIND_BADALLOC:                ... */
-INTERN NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict self,
-                                              unwind_cfa_landing_state_t *__restrict result,
-                                              void *absolute_pc, void *landingpad_pc)
 #endif /* ... */
 {
-#ifdef EH_FRAME_CFA_LANDING_APPLY
-#ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
-	memset(result, 0, sizeof(*result));
-	/* TODO: Find which range of capsules must be unwound
-	 *       between `absolute_pc' and `landingpad_pc',
-	 *       calculate the FDE unwind instructions between
-	 *       them, and respect all `DW_CFA_GNU_args_size'
-	 *       instructions we find along the value, returning the
-	 *       value of `unwind_fde_exec_landing_pad_adjustment()'
-	 *       in `result->cs_lp_adjustment'. */
-	(void)landingpad_pc;
-#else /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
-	(void)landingpad_pc;
-#endif /* !LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
-	return libuw_unwind_fde_exec_landing_pad_adjustment(self,
-	                                                    &result->cs_lp_adjustment,
-	                                                    absolute_pc);
-#else /* EH_FRAME_CFA_LANDING_APPLY */
 	unsigned int error;
 	unwind_order_index_t order = 0;
 	memset(result, 0, sizeof(*result));
@@ -190,8 +154,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict sel
 	}
 	TRACE("unwind_fde_exec() -> %u\n", error);
 	return error;
-#endif /* !EH_FRAME_CFA_LANDING_APPLY */
 }
+#endif /* !EH_FRAME_CFA_LANDING_APPLY */
 
 
 
@@ -246,32 +210,13 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
-libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
-                               unwind_fde_t const *__restrict fde, void *absolute_pc,
-                               unwind_getreg_t reg_getter, void const *reg_getter_arg,
-                               unwind_setreg_t reg_setter, void *reg_setter_arg)
+PRIVATE NONNULL((1, 2, 4, 6)) unsigned int CC
+_unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
+                          unwind_fde_t const *__restrict fde, void *absolute_pc,
+                          unwind_getreg_t reg_getter, void const *reg_getter_arg,
+                          unwind_setreg_t reg_setter, void *reg_setter_arg)
 #endif /* ... */
 {
-#if defined(EH_FRAME_CFA_LANDING_APPLY) && !defined(LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES)
-	/* Only apply LP-adjustments but don't account for CFI capsules. */
-	(void)fde;         /* Unused... */
-	(void)absolute_pc; /* Unused... */
-	if (self->cs_lp_adjustment != 0) {
-		uintptr_t sp;
-		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_UNWIND_REGISTER_SP, &sp))
-			ERROR(err_invalid_register);
-		/* Adjust the stack-pointer. */
-#ifdef __ARCH_STACK_GROWS_DOWNWARDS
-		sp += self->cs_lp_adjustment;
-#else /* __ARCH_STACK_GROWS_DOWNWARDS */
-		sp -= self->cs_lp_adjustment;
-#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_UNWIND_REGISTER_SP, &sp))
-			ERROR(err_invalid_register);
-	}
-	return UNWIND_SUCCESS;
-#else /* EH_FRAME_CFA_LANDING_APPLY && !LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 	unsigned int result;
 	uintptr_t cfa;
 #ifdef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
@@ -283,12 +228,6 @@ libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
 		byte_t bytes[CFI_UNWIND_REGISTER_MAXSIZE];
 		uintptr_t addr;
 	} reg_buf;
-#ifdef EH_FRAME_CFA_LANDING_APPLY
-	/* Quick check: If no capsules were used, then only
-	 *              apply the LPA (LandingPadAdjustment) */
-	if (!self->cs_has_capsules)
-		goto done_apply_lpa;
-#endif /* EH_FRAME_CFA_LANDING_APPLY */
 
 #ifdef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
 #ifndef EH_FRAME_CFA_LANDING_APPLY
@@ -544,54 +483,12 @@ libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
 			ERRORF(err_invalid_register, "regno=%u\n", (unsigned int)CFI_UNWIND_REGISTER_SP);
 	}
 #endif /* !EH_FRAME_CFA_LANDING_APPLY */
-
-#ifdef EH_FRAME_CFA_LANDING_APPLY
-done_apply_lpa:
-	if (self->cs_lp_adjustment != 0) {
-		uintptr_t sp;
-		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_UNWIND_REGISTER_SP, &sp))
-			ERROR(err_invalid_register);
-		/* Adjust the stack-pointer. */
-#ifdef __ARCH_STACK_GROWS_DOWNWARDS
-		sp += self->cs_lp_adjustment;
-#else /* __ARCH_STACK_GROWS_DOWNWARDS */
-		sp -= self->cs_lp_adjustment;
-#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
-		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_UNWIND_REGISTER_SP, &sp))
-			ERROR(err_invalid_register);
-	}
-	/* TODO: Work-around until CFI capsules are implemented. */
-#ifdef __x86_64__
-	if unlikely(result != UNWIND_SUCCESS)
-		goto done;
-	{
-		uintptr_t temp;
-		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_X86_64_UNWIND_REGISTER_RFLAGS, &temp))
-			ERROR(err_invalid_register);
-		temp &= ~0x400; /* EFLAGS_DF */
-		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_X86_64_UNWIND_REGISTER_RFLAGS, &temp))
-			ERROR(err_invalid_register);
-	}
-#elif defined(__i386__)
-	if unlikely(result != UNWIND_SUCCESS)
-		goto done;
-	{
-		uintptr_t temp;
-		if unlikely(!(*reg_getter)(reg_getter_arg, CFI_386_UNWIND_REGISTER_EFLAGS, &temp))
-			ERROR(err_invalid_register);
-		temp &= ~0x400; /* EFLAGS_DF */
-		if unlikely(!(*reg_setter)(reg_setter_arg, CFI_386_UNWIND_REGISTER_EFLAGS, &temp))
-			ERROR(err_invalid_register);
-	}
-#endif /* ... */
-#endif /* EH_FRAME_CFA_LANDING_APPLY */
 done:
 	return result;
 err_segfault:
 	return UNWIND_SEGFAULT;
 err_noaddr_register:
 	return UNWIND_APPLY_NOADDR_REGISTER;
-#endif /* !EH_FRAME_CFA_LANDING_APPLY || LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 err_invalid_register:
 	return UNWIND_INVALID_REGISTER;
 }

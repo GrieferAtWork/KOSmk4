@@ -139,21 +139,6 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
                                           unwind_cfa_value_t *__restrict result,
                                           void *absolute_pc);
 
-
-/* Similar to `unwind_fde_exec()', but only decode `DW_CFA_GNU_args_size' instructions
- * in order to calculate the proper exception_handler landing-pad-stack-adjustment that
- * is required to re-align the stack before jumping to a local exception handler.
- * @return: UNWIND_SUCCESS:                 ...
- * @return: UNWIND_INVALID_REGISTER:        ...
- * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
- * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
- * @return: UNWIND_BADALLOC:                ... */
-INTDEF NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fde_t const *__restrict self,
-                                                             uintptr_t *__restrict psp_adjustment,
-                                                             void *absolute_pc);
-
-
 /* Apply a given CFA unwind state in order to apply register information from from reg_getter to reg_setter.
  * Note however that only registers with a rule other than `DW_CFA_register_rule_undefined'
  * will be applied, meaning that `*reg_setter' will not get invoked for these registers.

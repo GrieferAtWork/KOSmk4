@@ -509,6 +509,8 @@
  *  - As far as other tools should be concerned, `.cfi_startcapsule' and `.cfi_endcapsule'
  *    are just aliases for `.cfi_remember_state' and `.cfi_restore_state'
  *  - For compatibility, `DW_CFA_GNU_args_size' instrumentation is not affected by capsules.
+ *  - CFI capsules are not allowed to be used inside of initialization text (f_inittext),
+ *    but only inside of eval-text (f_evaltext)
  *
  */
 

@@ -208,10 +208,8 @@ typedef struct unwind_cfa_sigframe_state_struct {
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
 } unwind_cfa_sigframe_state_t;
 
-typedef struct unwind_cfa_landing_state_struct {
-	__uintptr_t           cs_lp_adjustment; /* Landing-pad adjustment (~ala `DW_CFA_GNU_args_size') */
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
-	__uintptr_t           cs_has_capsules;  /* Non-zero if `cs_regs[*].cr_order != 0 || cs_uncorder[*] != 0' */
+typedef struct _unwind_cfa_landing_state_struct {
 #if CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT != 0
 	unwind_cfa_register_t cs_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT];       /* Common register restore rules. */
 #endif /* CFI_UNWIND_LANDING_COMMON_REGISTER_COUNT != 0 */
@@ -219,6 +217,14 @@ typedef struct unwind_cfa_landing_state_struct {
 	unwind_order_index_t  cs_uncorder[CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT]; /* Restore order for uncommon registers (0 means unused). */
 #endif /* CFI_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT != 0 */
 	unwind_cfa_value_t    cs_cfa; /* Canonical Frame Address evaluation rule. */
+} _unwind_cfa_landing_state_t;
+#endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
+
+typedef struct unwind_cfa_landing_state_struct {
+	__uintptr_t                 cs_lp_adjustment; /* Landing-pad adjustment (~ala `DW_CFA_GNU_args_size') */
+#ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
+	__uintptr_t                 cs_has_capsules;  /* Non-zero if `cs_regs[*].cr_order != 0 || cs_uncorder[*] != 0' */
+	_unwind_cfa_landing_state_t cs_state;         /* Canonical Frame Address evaluation rule. */
 #endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 } unwind_cfa_landing_state_t;
 
