@@ -570,8 +570,8 @@ INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
 	movP   this_sstate(%Pax), %Psp
 
 #ifndef NDEBUG
-	cmpP   $(0x00200000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
-	jna    1f /* if (!(STATE.EFLAGS > 0x00200000)) goto 1f; */
+	cmpP   $(0x10000000), (OFFSET_SCPUSTATE_IRREGS + OFFSET_IRREGS_PFLAGS)(%Psp)
+	jna    1f /* if (!(STATE.EFLAGS > 0x10000000)) goto 1f; */
 	int3
 1:
 #endif /* !NDEBUG */

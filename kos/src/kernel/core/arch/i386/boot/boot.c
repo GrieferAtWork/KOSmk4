@@ -521,8 +521,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *      current CPU state, and recursively unwinding on both ends of the
 	 *      jump. Only if both ends end up with a successful unwind, and only
 	 *      if both ends result in all-identical callee-preserve registers is
-	 *      the unwind to-be considered successful.
-	 */
+	 *      the unwind to-be considered successful. If a jump ends up going back
+	 *      on itself, its branch should simply be ignored (but if all branches
+	 *      end up being ignored, unwinding also fails) */
 
 	/* Xorg X-Window server support roadmap.
 	 *

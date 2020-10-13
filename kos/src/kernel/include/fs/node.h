@@ -1534,7 +1534,7 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	return directory_getcaseentry_p(self, name, __libc_strlen(name), poneshot_entry);
 }
-}
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 
@@ -1611,7 +1611,7 @@ directory_getcasenode(struct directory_node *__restrict self,
 		       E_IOERROR, E_SEGFAULT, ...) {
 	return directory_getcasenode(self, name, __libc_strlen(name), pentry);
 }
-}
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 
@@ -2347,16 +2347,16 @@ FORCELOCAL ATTR_ARTIFICIAL ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct super
 	                       args,
 	                       pnew_superblock_created);
 }
-}
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 
 #if 1
-#define FS_HEAP  (&kernel_default_heap)
-#define FS_GFP   (GFP_NORMAL)
+#define FS_HEAP (&kernel_default_heap)
+#define FS_GFP  (GFP_NORMAL)
 #else
-#define FS_HEAP  (&kernel_locked_heap)
-#define FS_GFP   (GFP_LOCKED)
+#define FS_HEAP (&kernel_locked_heap)
+#define FS_GFP  (GFP_LOCKED)
 #endif
 
 
