@@ -777,8 +777,14 @@ no_capsules:
 			                                            &result->cs_state,
 			                                            absolute_pc);
 		}
+		/* When `order' is non-zero, then we know that custom rules were defined,
+		 * and as a consequence, later code must apply register transformations.
+		 *
+		 * We could technically also just blindly assign `1' (or some other non-
+		 * zero value) here, but since we already have this `order' variable
+		 * around, we might as well do better and re-use that one here! */
+		result->cs_has_capsules = order;
 	}
-	result->cs_has_capsules = 1;
 	return error;
 err:
 	/* If we get here due to a specific instruction, then
