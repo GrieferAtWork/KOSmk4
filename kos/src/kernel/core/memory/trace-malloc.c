@@ -1471,11 +1471,11 @@ again:
 	/* Acquire a scheduler super-override, thus ensuring that we're
 	 * the only thread running anywhere on the entire system.
 	 *
-	 * NOTE: We must do this first, since a super-override should
-	 *       only be acquired when not already holding any atomic
-	 *       locks, since when holding such locks, there is a small
-	 *       chance that other CPUs are currently trying to acquire
-	 *       them, preventing us from reaching them.
+	 * NOTE: We do this first, since a super-override should only
+	 *       be acquired when not already holding any atomic locks,
+	 *       since when holding such locks, there is a small chance
+	 *       that other CPUs are currently trying to acquire them,
+	 *       preventing us from reaching them.
 	 * Technically, this shouldn't happen, since you shouldn't do a
 	 * `while (!trylock()) task_pause();' loop (meaning that a cpu
 	 * that is blocking-waiting for an atomic lock should also have
