@@ -90,8 +90,8 @@ DECL_BEGIN
 #ifdef LOCAL_HAVE_offset
 #define MY_heap_alloc_untraced(n_bytes, flags)                         \
 	LOCAL_heap_align_untraced(&kernel_heaps[(flags) & __GFP_HEAPMASK], \
-	                          offset +                                 \
 	                          min_alignment,                           \
+	                          offset +                                 \
 	                          CONFIG_MALL_HEAD_SIZE,                   \
 	                          CONFIG_MALL_HEAD_SIZE + (n_bytes) +      \
 	                          CONFIG_MALL_TAIL_SIZE,                   \
