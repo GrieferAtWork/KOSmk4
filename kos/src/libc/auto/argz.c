@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb014be9f */
+/* HASH CRC-32:0xd5730b3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -245,7 +245,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_add)(char **__restrict pargz,
 /* A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
- * markers between seperate strings. Note however that duplicate,
+ * markers between separate strings. Note however that duplicate,
  * successive instance of `sep' are merged, such that no empty sub-
  * strings will be present in the resulting ARGZ string.
  * @return: 0 :     Success

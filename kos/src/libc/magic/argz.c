@@ -294,7 +294,7 @@ error_t argz_add([[nonnull]] char **__restrict pargz,
 @@A combination of `argz_create_sep()' and `argz_append()' that will
 @@append a duplication of `string' onto `*PARGZ', whilst replacing all
 @@instances of `sep' with NUL-characters, thus turning them into the
-@@markers between seperate strings. Note however that duplicate,
+@@markers between separate strings. Note however that duplicate,
 @@successive instance of `sep' are merged, such that no empty sub-
 @@strings will be present in the resulting ARGZ string.
 @@@return: 0 :     Success

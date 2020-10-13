@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe05c602f */
+/* HASH CRC-32:0xbe33307 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -524,7 +524,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(_
 /* A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
- * markers between seperate strings. Note however that duplicate,
+ * markers between separate strings. Note however that duplicate,
  * successive instance of `sep' are merged, such that no empty sub-
  * strings will be present in the resulting ARGZ string.
  * @return: 0 :     Success
@@ -534,7 +534,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add_sep,(char **
 /* A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
- * markers between seperate strings. Note however that duplicate,
+ * markers between separate strings. Note however that duplicate,
  * successive instance of `sep' are merged, such that no empty sub-
  * strings will be present in the resulting ARGZ string.
  * @return: 0 :     Success
@@ -545,7 +545,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,argz_add_sep,(char *
 /* A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
- * markers between seperate strings. Note however that duplicate,
+ * markers between separate strings. Note however that duplicate,
  * successive instance of `sep' are merged, such that no empty sub-
  * strings will be present in the resulting ARGZ string.
  * @return: 0 :     Success
@@ -556,7 +556,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(argz_add_sep, __FORCELOCAL __ATTR_ARTIFICIAL __A
 /* A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
- * markers between seperate strings. Note however that duplicate,
+ * markers between separate strings. Note however that duplicate,
  * successive instance of `sep' are merged, such that no empty sub-
  * strings will be present in the resulting ARGZ string.
  * @return: 0 :     Success
@@ -566,7 +566,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add_sep,(char
 /* A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
- * markers between seperate strings. Note however that duplicate,
+ * markers between separate strings. Note however that duplicate,
  * successive instance of `sep' are merged, such that no empty sub-
  * strings will be present in the resulting ARGZ string.
  * @return: 0 :     Success
@@ -577,7 +577,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,__argz_add_sep,(char 
 /* A combination of `argz_create_sep()' and `argz_append()' that will
  * append a duplication of `string' onto `*PARGZ', whilst replacing all
  * instances of `sep' with NUL-characters, thus turning them into the
- * markers between seperate strings. Note however that duplicate,
+ * markers between separate strings. Note however that duplicate,
  * successive instance of `sep' are merged, such that no empty sub-
  * strings will be present in the resulting ARGZ string.
  * @return: 0 :     Success

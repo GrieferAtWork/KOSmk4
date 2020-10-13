@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa174c02b */
+/* HASH CRC-32:0xb46045b1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,7 +128,7 @@
  * @return: 0         : No more data can be written */
 #define __NR_write                  0x40  /* ssize_t write(fd_t fd, void const *buf, size_t bufsize) */
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -137,7 +137,7 @@
  * @return: 0                     : EOF */
 #define __NR_readv                  0x41  /* ssize_t readv(fd_t fd, struct iovec const *iovec, size_t count) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK

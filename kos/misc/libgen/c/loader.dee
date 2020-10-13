@@ -1427,7 +1427,7 @@ function truncateInlineFunctionImplementation(text: string): string {
 @@replace the existing object with @DuplicateFunctionMarker.
 @@NOTE: This function operates atomically between multiple threads,
 @@      which is required when multiple system header definition
-@@      source files are loaded by seperate threads.
+@@      source files are loaded by separate threads.
 function defineFunctionInMapping(
 		mapping: {string: Function} | {string: LocalFunction},
 		func: Function | LocalFunction) {

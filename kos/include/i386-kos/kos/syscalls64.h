@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb5881c5 */
+/* HASH CRC-32:0x11533657 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1439,7 +1439,7 @@ __CDECLARE_SC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *_
 #endif /* __CRT_HAVE_SC(readlinkat) */
 #if __CRT_HAVE_SC(readv)
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -1450,7 +1450,7 @@ __CDECLARE_SC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx64 const *__iovec, _
 #endif /* __CRT_HAVE_SC(readv) */
 #if __CRT_HAVE_SC(readvf)
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -2160,7 +2160,7 @@ __CDECLARE_SC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __bufs
 #endif /* __CRT_HAVE_SC(writef) */
 #if __CRT_HAVE_SC(writev)
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -2171,7 +2171,7 @@ __CDECLARE_SC(,__ssize_t,writev,(__fd_t __fd, struct __iovecx64 const *__iovec, 
 #endif /* __CRT_HAVE_SC(writev) */
 #if __CRT_HAVE_SC(writevf)
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -3482,7 +3482,7 @@ __CDECLARE_XSC(,__ssize_t,readlinkat,(__fd_t __dirfd, char const *__path, char *
 #endif /* __CRT_HAVE_XSC(readlinkat) */
 #if __CRT_HAVE_XSC(readv)
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -3493,7 +3493,7 @@ __CDECLARE_XSC(,__ssize_t,readv,(__fd_t __fd, struct __iovecx64 const *__iovec, 
 #endif /* __CRT_HAVE_XSC(readv) */
 #if __CRT_HAVE_XSC(readvf)
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -4186,7 +4186,7 @@ __CDECLARE_XSC(,__ssize_t,writef,(__fd_t __fd, void const *__buf, __size_t __buf
 #endif /* __CRT_HAVE_XSC(writef) */
 #if __CRT_HAVE_XSC(writev)
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -4197,7 +4197,7 @@ __CDECLARE_XSC(,__ssize_t,writev,(__fd_t __fd, struct __iovecx64 const *__iovec,
 #endif /* __CRT_HAVE_XSC(writev) */
 #if __CRT_HAVE_XSC(writevf)
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK

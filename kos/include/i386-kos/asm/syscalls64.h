@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3719f779 */
+/* HASH CRC-32:0x83a55e9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@
 #define __NR_pread64                  0x11                           /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define __NR_pwrite64                 0x12                           /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -99,7 +99,7 @@
  * @return: 0                     : EOF */
 #define __NR_readv                    0x13                           /* ssize_t readv(fd_t fd, struct iovecx64 const *iovec, size_t count) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -1084,7 +1084,7 @@
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 #define __NR_debugtrap                __UINT64_C(0xffffffffffffffea) /* errno_t debugtrap(struct ucpustate64 const *state, struct debugtrap_reason64 const *reason) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -1093,7 +1093,7 @@
  * @return: 0                     : No more data can be written */
 #define __NR_writevf                  __UINT64_C(0xffffffffffffffec) /* ssize_t writevf(fd_t fd, struct iovecx64 const *iovec, size_t count, iomode_t mode) */
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data

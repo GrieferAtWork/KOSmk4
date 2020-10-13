@@ -81,10 +81,10 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
 }
 /*[[[end:libc_process_vm_writev]]]*/
 
-/*[[[head:libc_readv,hash:CRC-32=0x26772af1]]]*/
+/*[[[head:libc_readv,hash:CRC-32=0x25ad2e58]]]*/
 /* >> readv(2)
  * Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -103,10 +103,10 @@ NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
 }
 /*[[[end:libc_readv]]]*/
 
-/*[[[head:libc_writev,hash:CRC-32=0xcb168fe7]]]*/
+/*[[[head:libc_writev,hash:CRC-32=0xeb5439d7]]]*/
 /* >> writev(2)
  * Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK

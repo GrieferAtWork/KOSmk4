@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b33f15a */
+/* HASH CRC-32:0x30b270a0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5484,7 +5484,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_msync)
 END(__x86_asm32_int80_msync)
 
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -5529,7 +5529,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readv)
 END(__x86_asm32_int80_readv)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -17419,7 +17419,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ksysctl)
 END(__x86_asm32_int80_ksysctl)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -17466,7 +17466,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_writevf)
 END(__x86_asm32_int80_writevf)
 
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -24971,7 +24971,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_msync)
 END(__x86_asm32_sysenter_msync)
 
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -25016,7 +25016,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readv)
 END(__x86_asm32_sysenter_readv)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -37004,7 +37004,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ksysctl)
 END(__x86_asm32_sysenter_ksysctl)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -37051,7 +37051,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_writevf)
 END(__x86_asm32_sysenter_writevf)
 
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data

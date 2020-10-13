@@ -466,7 +466,7 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 
 %[startgroup]
 @@Same as `read(2)', but rather than specifying a single, continuous buffer,
-@@read data into `count' seperate buffers, though still return the actual
+@@read data into `count' separate buffers, though still return the actual
 @@number of read bytes.
 @@When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
 @@available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -515,7 +515,7 @@ execveatx64:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *pathname,
 
 %[startgroup]
 @@Same as `write(2)', but rather than specifying a single, continuous buffer,
-@@write data from `count' seperate buffers, though still return the actual
+@@write data from `count' separate buffers, though still return the actual
 @@number of written bytes.
 @@When `fd' has the `O_NONBLOCK' flag set, only write as much data
 @@as possible at the time the call was made, and throw E_WOULDBLOCK

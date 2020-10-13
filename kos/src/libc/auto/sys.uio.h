@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cc09047 */
+/* HASH CRC-32:0x5cc06af2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBDCALL libd_process_vm_readv)(pid_t pid, st
 INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_process_vm_writev)(pid_t pid, struct iovec const *local_iov, ulongptr_t liovcnt, struct iovec const *remote_iov, ulongptr_t riovcnt, ulongptr_t flags);
 /* >> readv(2)
  * Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -52,7 +52,7 @@ INTDEF ssize_t NOTHROW_RPC(LIBDCALL libd_process_vm_writev)(pid_t pid, struct io
 INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readv)(fd_t fd, struct iovec const *iov, __STDC_INT_AS_SIZE_T count);
 /* >> writev(2)
  * Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK

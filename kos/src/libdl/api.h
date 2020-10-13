@@ -168,7 +168,7 @@
 
 /* TODO: Add a way of extending the RTLD driver with custom executable format
  *       back-ends, such as (once again) allowing PE binaries to be loaded.
- * -> There should be a seperate shared librariy `libdl-pe.so' similar to
+ * -> There should be a separate shared librariy `libdl-pe.so' similar to
  *    `libdl.so' that can simply be loaded using `dlopen()' and contains
  *    everything that's necessary to implement dynamic linking of PE binaries.
  *    As such, `DlModule' also needs to be given an optional v-table that can

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b5952af */
+/* HASH CRC-32:0x418c42fe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1650,7 +1650,7 @@ END(libc_sys_msync)
 DEFINE_PUBLIC_ALIAS(sys_msync, libc_sys_msync)
 
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -1665,7 +1665,7 @@ END(libc_sys_readv)
 DEFINE_PUBLIC_ALIAS(sys_readv, libc_sys_readv)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -4172,7 +4172,7 @@ END(libc_sys_ksysctl)
 DEFINE_PUBLIC_ALIAS(sys_ksysctl, libc_sys_ksysctl)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -4187,7 +4187,7 @@ END(libc_sys_writevf)
 DEFINE_PUBLIC_ALIAS(sys_writevf, libc_sys_writevf)
 
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -5974,7 +5974,7 @@ END(libc_sys_Xmsync)
 DEFINE_PUBLIC_ALIAS(sys_Xmsync, libc_sys_Xmsync)
 
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -5989,7 +5989,7 @@ END(libc_sys_Xreadv)
 DEFINE_PUBLIC_ALIAS(sys_Xreadv, libc_sys_Xreadv)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -8483,7 +8483,7 @@ END(libc_sys_Xksysctl)
 DEFINE_PUBLIC_ALIAS(sys_Xksysctl, libc_sys_Xksysctl)
 
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -8498,7 +8498,7 @@ END(libc_sys_Xwritevf)
 DEFINE_PUBLIC_ALIAS(sys_Xwritevf, libc_sys_Xwritevf)
 
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data

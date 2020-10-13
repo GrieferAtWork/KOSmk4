@@ -81,7 +81,7 @@ process_vm_writev:($pid_t pid,
 %
 @@>> readv(2)
 @@Same as `read(2)', but rather than specifying a single, continuous buffer,
-@@read data into `count' seperate buffers, though still return the actual
+@@read data into `count' separate buffers, though still return the actual
 @@number of read bytes.
 @@When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
 @@available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -93,7 +93,7 @@ ssize_t readv($fd_t fd, [[inp(count)]] struct iovec const *iov, __STDC_INT_AS_SI
 
 @@>> writev(2)
 @@Same as `write(2)', but rather than specifying a single, continuous buffer,
-@@write data from `count' seperate buffers, though still return the actual
+@@write data from `count' separate buffers, though still return the actual
 @@number of written bytes.
 @@When `fd' has the `O_NONBLOCK' flag set, only write as much data
 @@as possible at the time the call was made, and throw E_WOULDBLOCK

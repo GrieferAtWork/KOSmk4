@@ -1384,7 +1384,7 @@ class FunctionImplementation {
 				 *
 				 * (Better) solution:
 				 *     Have one <optimized/string/xxx.h> file for every function that provides
-				 *     inline optimizations (possibly auto-generate these files via a seperate
+				 *     inline optimizations (possibly auto-generate these files via a separate
 				 *     generator script).
 				 *     That way, `mempcpy()' wouldn't have an implicit dependency on `mempcpyc()',
 				 *     as it is this loop that makes it impossible to form a proper tree of

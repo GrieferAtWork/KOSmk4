@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd73e6a8 */
+/* HASH CRC-32:0x4e5e1a12 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -276,7 +276,7 @@
 #define __NR32_flock                        0x8f                   /* errno_t flock(fd_t fd, syscall_ulong_t operation) */
 #define __NR32_msync                        0x90                   /* errno_t msync(void *addr, size_t len, syscall_ulong_t flags) */
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data
@@ -285,7 +285,7 @@
  * @return: 0                     : EOF */
 #define __NR32_readv                        0x91                   /* ssize_t readv(fd_t fd, struct iovecx32 const *iovec, size_t count) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -968,7 +968,7 @@
 #define __NR32_rpc_service                  __UINT32_C(0xffffff62) /* syscall_slong_t rpc_service(void) */
 #define __NR32_ksysctl                      __UINT32_C(0xffffff6b) /* syscall_slong_t ksysctl(syscall_ulong_t command, void *arg) */
 /* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write data from `count' seperate buffers, though still return the actual
+ * write data from `count' separate buffers, though still return the actual
  * number of written bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data
  * as possible at the time the call was made, and throw E_WOULDBLOCK
@@ -977,7 +977,7 @@
  * @return: 0                     : No more data can be written */
 #define __NR32_writevf                      __UINT32_C(0xffffff6e) /* ssize_t writevf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
 /* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read data into `count' seperate buffers, though still return the actual
+ * read data into `count' separate buffers, though still return the actual
  * number of read bytes.
  * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
  * available at the time the call was made, and throw E_WOULDBLOCK if no data

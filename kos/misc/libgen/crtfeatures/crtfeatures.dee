@@ -864,7 +864,7 @@ final class CParser {
 						fDefs[cond] = mac;
 					}
 					/* Check for cases where the same macro definition
-					 * results from multiple, seperate pp-conditions.
+					 * results from multiple, separate pp-conditions.
 					 * If such is the case, then we can merge the definitions
 					 * and potentially optimize their conditions by doing:
 					 * >> cond = optimize(a || b); */
