@@ -26,6 +26,8 @@
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
+#include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
@@ -36,9 +38,11 @@
 #include <hybrid/atomic.h>
 #include <hybrid/unaligned.h>
 
+#include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/net.h>
 #include <network/socket.h>
+#include <sys/stat.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -1460,6 +1464,108 @@ DEFINE_INTERN_ALIAS(handle_socket_ioctl, socket_ioctl);
 
 
 
+
+
+/* Handle operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
+DEFINE_HANDLE_REFCNT_FUNCTIONS(socket, struct socket)
+
+/* read() and write() operators for socket handles. */
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_socket_read(struct socket *__restrict self, USER CHECKED void *dst,
+                   size_t num_bytes, iomode_t mode) THROWS(...) {
+	syscall_ulong_t msg_flags = 0;
+	if (mode & IO_NONBLOCK)
+		msg_flags |= MSG_DONTWAIT;
+	return socket_recv(self, dst, num_bytes, NULL, NULL, msg_flags, NULL);
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_socket_write(struct socket *__restrict self, USER CHECKED void const *src,
+                    size_t num_bytes, iomode_t mode) THROWS(...)  {
+	return socket_send(self, src, num_bytes, NULL, 0, mode);
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_socket_pread(struct socket *__restrict self,
+                    USER CHECKED void *dst, size_t num_bytes,
+                    pos_t addr, iomode_t mode) THROWS(...) {
+	if (addr != 0)
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+	return handle_socket_read(self, dst, num_bytes, mode);
+}
+
+INTERN WUNUSED NONNULL((1)) size_t KCALL
+handle_socket_pwrite(struct socket *__restrict self,
+                     USER CHECKED void const *src, size_t num_bytes,
+                     pos_t addr, iomode_t mode) THROWS(...) {
+	if (addr != 0)
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+	return handle_socket_write(self, src, num_bytes, mode);
+}
+
+/* readv() and writev() operators for socket handles. */
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_socket_readv(struct socket *__restrict self,
+                    struct aio_buffer *__restrict dst,
+                    size_t num_bytes, iomode_t mode) THROWS(...) {
+	syscall_ulong_t msg_flags = 0;
+	if (mode & IO_NONBLOCK)
+		msg_flags |= MSG_DONTWAIT;
+	return socket_recvv(self, dst, num_bytes, NULL, NULL, msg_flags, NULL);
+}
+
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_socket_writev(struct socket *__restrict self,
+                     struct aio_buffer *__restrict src,
+                     size_t num_bytes, iomode_t mode) THROWS(...) {
+	return socket_sendv(self, src, num_bytes, NULL, 0, mode);
+}
+
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_socket_preadv(struct socket *__restrict self,
+                     struct aio_buffer *__restrict dst,
+                     size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
+	if (addr != 0)
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+	return handle_socket_readv(self, dst, num_bytes, mode);
+}
+
+INTERN WUNUSED NONNULL((1, 2)) size_t KCALL
+handle_socket_pwritev(struct socket *__restrict self,
+                      struct aio_buffer *__restrict src,
+                      size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...) {
+	if (addr != 0)
+		THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
+	return handle_socket_writev(self, src, num_bytes, mode);
+}
+
+
+INTERN NONNULL((1)) void KCALL
+handle_socket_stat(struct socket *__restrict self,
+                   USER CHECKED struct stat *result) THROWS(...) {
+	(void)self;
+	result->st_mode = S_IFSOCK;
+}
+
+INTERN NONNULL((1)) syscall_slong_t KCALL
+handle_socket_hop(struct socket *__restrict self, syscall_ulong_t cmd,
+                  USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
+	switch (cmd) {
+
+		/* TODO: HOP functions for things such as re-throwing the connect() exception, etc... */
+		(void)self;
+		(void)cmd;
+		(void)arg;
+		(void)mode;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND,
+		      cmd);
+		break;
+	}
+	return 0;
+}
 
 DECL_END
 
