@@ -436,9 +436,9 @@
 	 __hybrid_int128_vec32_significand(var, 3) = __hybrid_int128_vec32_significand(var, 1))
 #define __hybrid_uint128_set32(var, v)                                  \
 	(__hybrid_uint128_vec32_significand(var, 0) = (__UINT32_TYPE__)(v), \
-	 __hybrid_uint128_vec32_significand(var, 0) = 0,                    \
-	 __hybrid_uint128_vec32_significand(var, 0) = 0,                    \
-	 __hybrid_uint128_vec32_significand(var, 0) = 0)
+	 __hybrid_uint128_vec32_significand(var, 1) = 0,                    \
+	 __hybrid_uint128_vec32_significand(var, 2) = 0,                    \
+	 __hybrid_uint128_vec32_significand(var, 3) = 0)
 #endif /* !__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC */
 
 #define __hybrid_int128_get16(var)  __hybrid_int128_vec16_significand(var, 0)
