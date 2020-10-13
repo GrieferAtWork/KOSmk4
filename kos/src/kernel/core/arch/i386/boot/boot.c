@@ -456,14 +456,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       simple C-level interrupt handlers and/or system calls, by not needing
 	 *       to save registers that wouldn't be used in any case! */
 
-	/* TODO: Create another separate driver (that makes use of the transactional
-	 *       instruction emulator) to emulate instruction execution for the child-
-	 *       process branch after a call to fork().
-	 *       By doing this (and doing it in a transactional environment), we could
-	 *       be on the lookout for calls to exec(), allowing us to detect the usual
-	 *       fork()+exec() pattern without having to actually clone anything (but
-	 *       instead we'd be able to spawn() a new process!) */
-
 	/* TODO: renameat2() is missing from <stdio.h> */
 
 	/* TODO: Decompressed driver section data should be reference counted, such that (then)
