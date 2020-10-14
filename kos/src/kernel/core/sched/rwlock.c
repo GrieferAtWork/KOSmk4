@@ -135,6 +135,27 @@ NOTHROW(FCALL rwlock_find_readlock)(struct rwlock const *__restrict lock) {
 	return NULL;
 }
 
+PRIVATE NONNULL((1, 3)) void
+NOTHROW(FCALL read_lock_rehash)(struct read_lock *__restrict new_vector, size_t new_mask,
+                                struct read_lock *__restrict old_vector, size_t old_mask) {
+	size_t i;
+	for (i = 0; i <= old_mask; ++i) {
+		size_t perturb, j;
+		struct rwlock *heldlock = old_vector[i].rl_rwlock;
+		if (!heldlock || heldlock == READLOCK_DUMMYLOCK)
+			continue;
+		perturb = j = RWLOCK_HASH(heldlock) & new_mask;
+		for (;; j = ((j << 2) + j + perturb + 1), perturb >>= 5) {
+			struct read_lock *lockdesc;
+			lockdesc = &new_vector[j & new_mask];
+			if (lockdesc->rl_rwlock)
+				continue;
+			memcpy(lockdesc, &old_vector[i], sizeof(struct read_lock));
+			break;
+		}
+	}
+}
+
 /* Return a read-lock descriptor for `lock', or allocate a new one. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct read_lock *FCALL
 rwlock_get_readlock(struct rwlock *__restrict lock) THROWS(E_BADALLOC) {
@@ -159,7 +180,7 @@ again:
 				if (locks->rls_cnt == locks->rls_msk) {
 					struct read_lock *old_vector;
 					struct read_lock *new_vector;
-					size_t new_mask, i;
+					size_t new_mask;
 					/* Must re-hash the readlock hash-vector. */
 					new_mask = (locks->rls_msk << 1) | 1;
 					/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
@@ -171,21 +192,11 @@ again:
 					 */
 					new_vector = (struct read_lock *)kmalloc((new_mask + 1) *
 					                                         sizeof(struct read_lock),
-					                                         GFP_CALLOC | GFP_LOCKED);
+					                                         GFP_CALLOC | GFP_LOCKED |
+					                                         GFP_PREFLT);
 					old_vector = locks->rls_vec;
-					for (i = 0; i <= locks->rls_msk; ++i) {
-						struct rwlock *heldlock = old_vector[i].rl_rwlock;
-						if (!heldlock || heldlock == READLOCK_DUMMYLOCK)
-							continue;
-						perturb = j = RWLOCK_HASH(heldlock) & new_mask;
-						for (;; j = ((j << 2) + j + perturb + 1), perturb >>= 5) {
-							lockdesc = &new_vector[j & new_mask];
-							if (lockdesc->rl_rwlock)
-								continue;
-							memcpy(lockdesc, &old_vector[i], sizeof(struct read_lock));
-							break;
-						}
-					}
+					read_lock_rehash(new_vector, new_mask,
+					                 old_vector, locks->rls_msk);
 					locks->rls_cnt = locks->rls_use; /* Dismiss dummy entries. */
 					locks->rls_vec = new_vector;
 					locks->rls_msk = new_mask;
@@ -238,7 +249,7 @@ again:
 				if (locks->rls_cnt == locks->rls_msk) {
 					struct read_lock *old_vector;
 					struct read_lock *new_vector;
-					size_t new_mask, i;
+					size_t new_mask;
 					/* Must re-hash the readlock hash-vector. */
 					new_mask = (locks->rls_msk << 1) | 1;
 					/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
@@ -250,23 +261,13 @@ again:
 					 */
 					new_vector = (struct read_lock *)kmalloc_nx((new_mask + 1) *
 					                                            sizeof(struct read_lock),
-					                                            GFP_CALLOC | GFP_LOCKED);
+					                                            GFP_CALLOC | GFP_LOCKED |
+					                                            GFP_PREFLT);
 					if unlikely(!new_vector)
 						return NULL;
 					old_vector = locks->rls_vec;
-					for (i = 0; i <= locks->rls_msk; ++i) {
-						struct rwlock *heldlock = old_vector[i].rl_rwlock;
-						if (!heldlock || heldlock == READLOCK_DUMMYLOCK)
-							continue;
-						perturb = j = RWLOCK_HASH(heldlock) & new_mask;
-						for (;; j = ((j << 2) + j + perturb + 1), perturb >>= 5) {
-							lockdesc = &new_vector[j & new_mask];
-							if (lockdesc->rl_rwlock)
-								continue;
-							memcpy(lockdesc, &old_vector[i], sizeof(struct read_lock));
-							break;
-						}
-					}
+					read_lock_rehash(new_vector, new_mask,
+					                 old_vector, locks->rls_msk);
 					locks->rls_cnt = locks->rls_use; /* Dismiss dummy entries. */
 					locks->rls_vec = new_vector;
 					locks->rls_msk = new_mask;
