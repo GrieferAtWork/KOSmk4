@@ -1700,8 +1700,10 @@ kmalloc_leaks_print(kmalloc_leak_t leaks,
 				continue;
 			trace_node_leak_getscan_uminmax(xref_leak, xref_umin, xref_umax);
 			FOREACH_XREF_BEGIN(ptr, pptr, xref_umin, xref_umax, umin, umax) {
-				PRINTF("\tReferenced at *%p=%p by leak at %p...%p\n",
-				       pptr, ptr, xref_umin, xref_umax);
+				PRINTF("\tReferenced at *%p=%p", pptr, ptr);
+				if ((uintptr_t)ptr > umin)
+					PRINTF("[.+%" PRIuSIZ "]", (uintptr_t)ptr - umin);
+				PRINTF(" by leak at %p...%p\n", xref_umin, xref_umax);
 			}
 			FOREACH_XREF_END();
 		}
