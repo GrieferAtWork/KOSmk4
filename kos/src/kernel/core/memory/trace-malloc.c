@@ -1741,6 +1741,11 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
 	node = (struct trace_node *)leaks;
 	while (node) {
 		next = node->tn_link.a_min;
+#if 0 /* Don't free pointed-to data! The user way wish to break into the
+       * debugger and inspect leaked memory, but if we free it now, then
+       * it'll be gone. After all: we're not trying to implement an actual
+       * gc here (one that would free unreachable heap block); we're only
+       * trying to discover and log memory leaks! */
 		/* Try to release the memory pointed to by the memory leaks.
 		 * However, we can only do this for kmalloc() and slab-leaks.
 		 * Custom traced regions cannot be blindly free'd! */
@@ -1764,6 +1769,7 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
 		default:
 			break;
 		}
+#endif
 		trace_node_free(node);
 		node = next;
 	}
