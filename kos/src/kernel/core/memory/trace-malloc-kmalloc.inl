@@ -56,10 +56,10 @@ DECL_BEGIN
 #ifndef INITIALIZE_USER_POINTER
 #if CONFIG_MALL_HEAD_SIZE != 0
 #if (CONFIG_MALL_HEAD_SIZE & 3) == 0
-#define INITIALIZE_USER_POINTER_HEAD(base, size)        \
+#define INITIALIZE_USER_POINTER_HEAD(base, size) \
 	memsetl((byte_t *)(base), CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE / 4)
 #else /* (CONFIG_MALL_HEAD_SIZE & 3) == 0 */
-#define INITIALIZE_USER_POINTER_HEAD(base, size)        \
+#define INITIALIZE_USER_POINTER_HEAD(base, size) \
 	mempatl((byte_t *)(base), CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE)
 #endif /* (CONFIG_MALL_HEAD_SIZE & 3) != 0 */
 #else /* CONFIG_MALL_HEAD_SIZE != 0 */
@@ -78,8 +78,8 @@ DECL_BEGIN
 #else /* CONFIG_MALL_TAIL_SIZE != 0 */
 #define INITIALIZE_USER_POINTER_TAIL(base, size) (void)0
 #endif /* CONFIG_MALL_TAIL_SIZE == 0 */
-#define INITIALIZE_USER_POINTER(base, size)      \
-	(INITIALIZE_USER_POINTER_HEAD(base, size),   \
+#define INITIALIZE_USER_POINTER(base, size)    \
+	(INITIALIZE_USER_POINTER_HEAD(base, size), \
 	 INITIALIZE_USER_POINTER_TAIL(base, size))
 #endif /* !INITIALIZE_USER_POINTER */
 
@@ -491,6 +491,8 @@ realloc_unchanged:
 #ifdef DEFINE_METHOD_kmalloc_in_place
 			goto err;
 #else /* DEFINE_METHOD_kmalloc_in_place */
+			void *oldblock_base;
+			size_t oldblock_size;
 			/* Must allocate a new block */
 			result = MY_heap_alloc_untraced(n_bytes, flags);
 #ifdef DEFINE_X_noexcept
@@ -517,8 +519,10 @@ again_remove_node_for_newchunk:
 			/* Extract information from the old node. */
 			extension_flags = (extension_flags & __GFP_HEAPMASK) |
 			                  (flags & ~(__GFP_HEAPMASK | GFP_CALLOC));
-			extension_base = trace_node_uaddr(node);
-			num_allocated  = trace_node_usize(node);
+			oldblock_base = trace_node_uaddr(node);
+			oldblock_size = trace_node_usize(node);
+			assert(oldblock_base == (byte_t *)ptr - CONFIG_MALL_HEAD_SIZE);
+
 			/* Re-write the contents of the node to fit the new block. */
 			node->tn_flags = flags & __GFP_HEAPMASK; /* Remember the heap bits now used by the allocation. */
 			node->tn_link.a_vmin = (uintptr_t)result.hp_ptr;
@@ -529,8 +533,8 @@ again_remove_node_for_newchunk:
 				/* Roll-back: We must restore the old node, then resolve the existing
 				 *            (possibly-bitset) node with which our new node overlaps. */
 				node->tn_flags = extension_flags & __GFP_HEAPMASK;
-				node->tn_link.a_vmin = (uintptr_t)ptr - CONFIG_MALL_HEAD_SIZE;
-				node->tn_link.a_vmax = (uintptr_t)extension_base - 1;
+				node->tn_link.a_vmin = (uintptr_t)oldblock_base;
+				node->tn_link.a_vmax = (uintptr_t)oldblock_base + oldblock_size - 1;
 				trace_node_tree_insert(&nodes, node);
 #ifdef DEFINE_X_except
 				TRY {
@@ -561,7 +565,7 @@ again_remove_node_for_newchunk:
 			                       ptr, old_user_size);
 			/* Free the old block. */
 			heap_free_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
-			                   extension_base, num_allocated, extension_flags);
+			                   oldblock_base, oldblock_size, extension_flags);
 			return result.hp_ptr;
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 		}
