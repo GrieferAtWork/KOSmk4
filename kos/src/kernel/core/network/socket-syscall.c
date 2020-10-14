@@ -81,6 +81,7 @@ DEFINE_SYSCALL3(fd_t, socket,
 			hand.h_mode |= IO_CLOFORK;
 		if (type & SOCK_NONBLOCK)
 			hand.h_mode |= IO_NONBLOCK;
+		FINALLY_DECREF_UNLIKELY(sock);
 		result = handle_install(THIS_HANDLE_MANAGER, hand);
 	}
 	return (fd_t)result;
