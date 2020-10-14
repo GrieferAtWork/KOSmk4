@@ -1016,7 +1016,7 @@ __check_string_error_and_print_tail:
 			}
 			if (__xformat_argsize == 1 && __xformat_arg[0] == 'c') {
 				/* Generator with closure */
-				switch (__length & 0xf0) {
+				switch (__length & 0x1f0) {
 #define __DEFINE_GENERATOR_IMPLEMENTATION(__T, __va_type)                                                        \
 				{                                                                                                \
 					typedef __SSIZE_TYPE__(__PFORMATPRINTER_GENCC *__gen_t)(__T, __PFORMATPRINTER_TYPE, void *); \
@@ -1030,12 +1030,12 @@ __check_string_error_and_print_tail:
 #if __SIZEOF_POINTER__ < 2
 				default:
 #endif /* __SIZEOF_POINTER__ < 2 */
-				case 0x00:
+				case __PRINTF_LENGTH_I8 & 0x1f0:
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT8_TYPE__, unsigned int)
 #if __SIZEOF_POINTER__ >= 2 && __SIZEOF_POINTER__ < 4
 				default:
 #endif /* __SIZEOF_POINTER__ >= 2 && __SIZEOF_POINTER__ < 4 */
-				case 0x10:
+				case __PRINTF_LENGTH_I16 & 0x1f0:
 #if __SIZEOF_INT__ > 2
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT16_TYPE__, unsigned int)
 #else /* __SIZEOF_INT__ > 2 */
@@ -1044,7 +1044,7 @@ __check_string_error_and_print_tail:
 #if __SIZEOF_POINTER__ >= 4 && __SIZEOF_POINTER__ < 8
 				default:
 #endif /* __SIZEOF_POINTER__ >= 4 && __SIZEOF_POINTER__ < 8 */
-				case 0x20:
+				case __PRINTF_LENGTH_I32 & 0x1f0:
 #if __SIZEOF_INT__ > 4
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT32_TYPE__, unsigned int)
 #else /* __SIZEOF_INT__ > 4 */
@@ -1053,7 +1053,7 @@ __check_string_error_and_print_tail:
 #if __SIZEOF_POINTER__ >= 8
 				default:
 #endif /* __SIZEOF_POINTER__ >= 8 */
-				case 0x30:
+				case __PRINTF_LENGTH_I64 & 0x1f0:
 #ifdef __UINT64_TYPE__
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT64_TYPE__, __UINT64_TYPE__)
 #else /* __UINT64_TYPE__ */
