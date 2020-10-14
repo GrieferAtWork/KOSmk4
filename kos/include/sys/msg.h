@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a67989c */
+/* HASH CRC-32:0x39bd95ba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,14 +30,11 @@
 
 #include <features.h>
 #include <bits/os/msq.h>
+#include <sys/ipc.h> /* [n4217.pdf:12344] #include mandated by POSIX */
 
 #ifdef __USE_GNU
 #include <bits/os/msgbuf.h> /* `struct msgbuf' */
 #endif /* __USE_GNU */
-
-#ifdef __USE_GLIBC
-#include <sys/ipc.h>
-#endif /* __USE_GLIBC */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

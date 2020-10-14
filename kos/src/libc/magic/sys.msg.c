@@ -25,14 +25,11 @@
 %{
 #include <features.h>
 #include <bits/os/msq.h>
+#include <sys/ipc.h> /* [n4217.pdf:12344] #include mandated by POSIX */
 
 #ifdef __USE_GNU
 #include <bits/os/msgbuf.h> /* `struct msgbuf' */
 #endif /* __USE_GNU */
-
-#ifdef __USE_GLIBC
-#include <sys/ipc.h>
-#endif /* __USE_GLIBC */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

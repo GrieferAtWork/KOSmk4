@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_SEM_H
-#define _BITS_SEM_H 1
+#ifndef _ASM_OF_KOS_SEM_H
+#define _ASM_OF_KOS_SEM_H 1
 
 #include <__stdinc.h>
 
@@ -38,4 +38,4 @@
 #define __SEM_STAT 18 /* ??? */
 #define __SEM_INFO 19 /* ??? */
 
-#endif /* _BITS_SEM_H */
+#endif /* _ASM_OF_KOS_SEM_H */

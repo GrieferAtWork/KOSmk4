@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84822635 */
+/* HASH CRC-32:0x3f701072 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,11 +33,7 @@
 #include <asm/os/shm.h>
 #include <asm/pagesize.h> /* __ARCH_PAGESIZE */
 #include <bits/os/shm.h>
-
-#ifdef __USE_GLIBC
-#include <sys/ipc.h>
-#endif /* __USE_GLIBC */
-
+#include <sys/ipc.h> /* [n4217.pdf:12556] #include mandated by POSIX */
 
 /* Permission flag for use with `shmget()'. */
 #ifndef SHM_W

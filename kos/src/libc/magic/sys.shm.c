@@ -29,11 +29,7 @@
 #include <asm/os/shm.h>
 #include <asm/pagesize.h> /* __ARCH_PAGESIZE */
 #include <bits/os/shm.h>
-
-#ifdef __USE_GLIBC
-#include <sys/ipc.h>
-#endif /* __USE_GLIBC */
-
+#include <sys/ipc.h> /* [n4217.pdf:12556] #include mandated by POSIX */
 
 /* Permission flag for use with `shmget()'. */
 #ifndef SHM_W

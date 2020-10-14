@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa114bb8b */
+/* HASH CRC-32:0x3cddd522 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,29 +30,77 @@
 
 #include <features.h>
 
+#include <asm/os/sem.h>
 #include <bits/os/sem.h>
 #include <bits/os/sembuf.h>
+#include <sys/ipc.h> /* [n4217.pdf:12514] #include mandated by POSIX */
+
+#ifdef __USE_GNU
 #include <bits/os/timespec.h>
+#endif /* __USE_GNU */
 
 #ifdef __USE_GLIBC
-#include <sys/ipc.h>
-
 #include <stddef.h>
 #endif /* __USE_GLIBC */
 
-#ifdef __CC__
+/* Flags for `semop'. */
+#if !defined(SEM_UNDO) && defined(__SEM_UNDO)
+#define SEM_UNDO __SEM_UNDO /* ??? */
+#endif /* !SEM_UNDO && __SEM_UNDO */
 
+/* Commands for `semctl'.  */
+#if !defined(GETPID) && defined(__GETPID)
+#define GETPID  __GETPID /* ??? */
+#endif /* !GETPID && __GETPID */
+#if !defined(GETVAL) && defined(__GETVAL)
+#define GETVAL  __GETVAL /* ??? */
+#endif /* !GETVAL && __GETVAL */
+#if !defined(GETALL) && defined(__GETALL)
+#define GETALL  __GETALL /* ??? */
+#endif /* !GETALL && __GETALL */
+#if !defined(GETNCNT) && defined(__GETNCNT)
+#define GETNCNT __GETNCNT /* ??? */
+#endif /* !GETNCNT && __GETNCNT */
+#if !defined(GETZCNT) && defined(__GETZCNT)
+#define GETZCNT __GETZCNT /* ??? */
+#endif /* !GETZCNT && __GETZCNT */
+#if !defined(SETVAL) && defined(__SETVAL)
+#define SETVAL  __SETVAL /* ??? */
+#endif /* !SETVAL && __SETVAL */
+#if !defined(SETALL) && defined(__SETALL)
+#define SETALL  __SETALL /* ??? */
+#endif /* !SETALL && __SETALL */
+
+/* ipcs ctl cmds */
+#if !defined(SEM_STAT) && defined(__SEM_STAT)
+#define SEM_STAT __SEM_STAT /* ??? */
+#endif /* !SEM_STAT && __SEM_STAT */
+#if !defined(SEM_INFO) && defined(__SEM_INFO)
+#define SEM_INFO __SEM_INFO /* ??? */
+#endif /* !SEM_INFO && __SEM_INFO */
+
+#ifdef __CC__
 __SYSDECL_BEGIN
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
-typedef __size_t size_t;
+typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #ifndef __key_t_defined
 #define __key_t_defined 1
 typedef __key_t key_t;
 #endif /* !__key_t_defined */
+
+#ifndef __pid_t_defined
+#define __pid_t_defined 1
+typedef __pid_t pid_t;
+#endif /* !__pid_t_defined */
+
+#ifndef __time_t_defined
+#define __time_t_defined 1
+typedef __TM_TYPE(time) time_t;
+#endif /* !__time_t_defined */
 
 #ifdef __CRT_HAVE_semctl
 /* Semaphore control operation. */
