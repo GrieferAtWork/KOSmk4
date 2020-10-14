@@ -70,8 +70,7 @@
 #elif (defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) ||          \
        defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
        defined(_WIN32_WCE) || defined(WIN32_WCE))
-#elif defined(__alpha__) || (defined(__sparc__) && defined(__arch64__)) || defined(__sparcv9)
-#define __SIZEOF_LONG__ 8
+#define __SIZEOF_LONG__ 4
 #else /* ... */
 #define __SIZEOF_LONG__ __SIZEOF_POINTER__
 #endif /* !... */
@@ -223,10 +222,10 @@
 #define __SIZEOF_POINTER__ 8
 #else /* ... */
 #include "host.h"
-#if (defined(__x86_64__) || defined(__aarch64__) || \
-     defined(__alpha__) || defined(__ia64__) ||     \
-     defined(__sparc64__) || defined(__s390x__) ||  \
-     defined(__powerpc64__))
+#if (defined(__x86_64__) || defined(__aarch64__) ||  \
+     defined(__alpha__) || defined(__ia64__) ||      \
+     defined(__sparc64__) || defined(__sparcv9__) || \
+     defined(__s390x__) ||  defined(__powerpc64__))
 #define __SIZEOF_POINTER__ 8
 #elif defined(__i386__) || defined(__arm__)
 #define __SIZEOF_POINTER__ 4

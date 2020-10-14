@@ -158,17 +158,18 @@ meanings (and values). - Please change your code to only include one of either"
 #endif /* !_ALIGNMENT_REQUIRED */
 
 
-#if !defined(_ILP32) && defined(__ILP32__)
+#if !defined(_ILP32) && (defined(__ILP32__) || (__SIZEOF_INT__ == 4 && __SIZEOF_LONG__ == 4 && __SIZEOF_POINTER__ == 4))
 #define _ILP32 1
-#endif /* !_ILP32 && __ILP32__ */
+#endif /* _ILP32... */
 
-#if !defined(_LP64) && defined(__LP64__)
+#if !defined(_LP64) && (defined(__LP64__) || (__SIZEOF_LONG__ == 8 && __SIZEOF_POINTER__ == 8))
 #define _LP64 1
-#endif /* !_LP64 && __LP64__ */
+#endif /* _LP64... */
 
-#if !defined(_I32LPx) && defined(___I32LPx__)
+#if !defined(_I32LPx) && (defined(___I32LPx__) || (__SIZEOF_INT__ == 4 && __SIZEOF_LONG__ == __SIZEOF_POINTER__))
 #define _I32LPx 1
-#endif /* !_I32LPx && ___I32LPx__ */
+#endif /* _I32LPx... */
+
 
 
 /* I get all of the other options, but from this point on, it gets _extremely_ specific.
