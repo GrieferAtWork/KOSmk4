@@ -150,6 +150,10 @@ NOTHROW(KCALL _kernel_poison)(void) {
 }
 
 
+PRIVATE void
+NOTHROW(KCALL handle_error_during_panic_info)(void) {
+	error_printf("printing panic info");
+}
 
 
 PRIVATE ATTR_COLDTEXT NOBLOCK bool
@@ -272,21 +276,25 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_assert_dbg_main(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
-	dbg_printf(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Assertion failure") "\n"
-	           "expr: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
-	           "file: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s")
-	           " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n",
-	           args->aa_expr,
-	           args->aa_file,
-	           args->aa_line);
-	if (args->aa_func)
-		dbg_printf(DBGSTR("func: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_func);
-	if (args->aa_format) {
-		dbg_print(DBGSTR("mesg: " AC_COLOR(ANSITTY_CL_TEAL, ANSITTY_CL_BLACK)));
-		dbg_indent += 6;
-		format_vprintf(&dbg_printer, NULL, args->aa_format, args->aa_args);
-		dbg_indent -= 6;
-		dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
+	TRY {
+		dbg_printf(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Assertion failure") "\n"
+		           "expr: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
+		           "file: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s")
+		           " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n",
+		           args->aa_expr,
+		           args->aa_file,
+		           args->aa_line);
+		if (args->aa_func)
+			dbg_printf(DBGSTR("func: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_func);
+		if (args->aa_format) {
+			dbg_print(DBGSTR("mesg: " AC_COLOR(ANSITTY_CL_TEAL, ANSITTY_CL_BLACK)));
+			dbg_indent += 6;
+			format_vprintf(&dbg_printer, NULL, args->aa_format, args->aa_args);
+			dbg_indent -= 6;
+			dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
+		}
+	} EXCEPT {
+		handle_error_during_panic_info();
 	}
 	dbg_printf(DBGSTR("addr: " AC_WITHFG(ANSITTY_CL_WHITE, "%p") "\n"),
 	           kcpustate_getpc(&args->aa_state));
@@ -302,17 +310,21 @@ libc_assertion_failure_core(struct assert_args *__restrict args) {
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Assertion Failure [pc=%p]\n",
 	       kcpustate_getpc(&args->aa_state));
-	printk(KERN_RAW "%s(%d) : %s%s%s\n",
-	       args->aa_file, args->aa_line,
-	       args->aa_func ? args->aa_func : "",
-	       args->aa_func ? " : " : "",
-	       args->aa_expr);
-	if (args->aa_format) {
-		va_list vargs;
-		va_copy(vargs, args->aa_args);
-		format_vprintf(&syslog_printer, SYSLOG_LEVEL_RAW, args->aa_format, vargs);
-		va_end(vargs);
-		printk(KERN_RAW "\n");
+	TRY {
+		printk(KERN_RAW "%s(%d) : %s%s%s\n",
+		       args->aa_file, args->aa_line,
+		       args->aa_func ? args->aa_func : "",
+		       args->aa_func ? " : " : "",
+		       args->aa_expr);
+		if (args->aa_format) {
+			va_list vargs_copy;
+			va_copy(vargs_copy, args->aa_args);
+			format_vprintf(&syslog_printer, SYSLOG_LEVEL_RAW, args->aa_format, vargs_copy);
+			va_end(vargs_copy);
+			printk(KERN_RAW "\n");
+		}
+	} EXCEPT {
+		handle_error_during_panic_info();
 	}
 	{
 		struct ucpustate temp;
@@ -339,23 +351,27 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_assert_chk_print_message(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
-	dbg_printf(DBGSTR("expr: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
-	                  "file: " AC_WITHFG(ANSITTY_CL_WHITE, "%s")
-	                  " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n"),
-	           args->aa_expr,
-	           args->aa_file,
-	           args->aa_line);
-	if (args->aa_func)
-		dbg_printf(DBGSTR("func: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_func);
-	if (args->aa_format) {
-		va_list vargs;
-		dbg_print(DBGSTR("mesg: " AC_COLOR(ANSITTY_CL_TEAL, ANSITTY_CL_BLACK)));
-		dbg_indent += 6;
-		va_copy(vargs, args->aa_args);
-		format_vprintf(&dbg_printer, NULL, args->aa_format, vargs);
-		va_end(vargs);
-		dbg_indent -= 6;
-		dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
+	TRY {
+		dbg_printf(DBGSTR("expr: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
+		                  "file: " AC_WITHFG(ANSITTY_CL_WHITE, "%s")
+		                  " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n"),
+		           args->aa_expr,
+		           args->aa_file,
+		           args->aa_line);
+		if (args->aa_func)
+			dbg_printf(DBGSTR("func: " AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"), args->aa_func);
+		if (args->aa_format) {
+			va_list vargs_copy;
+			dbg_print(DBGSTR("mesg: " AC_COLOR(ANSITTY_CL_TEAL, ANSITTY_CL_BLACK)));
+			dbg_indent += 6;
+			va_copy(vargs_copy, args->aa_args);
+			format_vprintf(&dbg_printer, NULL, args->aa_format, vargs_copy);
+			va_end(vargs_copy);
+			dbg_indent -= 6;
+			dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
+		}
+	} EXCEPT {
+		handle_error_during_panic_info();
 	}
 	dbg_printf(DBGSTR("addr: " AC_WITHFG(ANSITTY_CL_WHITE, "%p") "\n"),
 	           kcpustate_getpc(&args->aa_state));
@@ -461,17 +477,21 @@ libc_assertion_check_core(struct assert_args *__restrict args) {
 	printk(KERN_RAW "\n\n\n");
 	printk(KERN_EMERG "Assertion Check [pc=%p]\n",
 	       kcpustate_getpc(&args->aa_state));
-	printk(KERN_RAW "%s(%d) : %s%s%s\n",
-	       args->aa_file, args->aa_line,
-	       args->aa_func ? args->aa_func : "",
-	       args->aa_func ? " : " : "",
-	       args->aa_expr);
-	if (args->aa_format) {
-		va_list vargs;
-		va_copy(vargs, args->aa_args);
-		format_vprintf(&syslog_printer, SYSLOG_LEVEL_RAW, args->aa_format, vargs);
-		va_end(vargs);
-		printk(KERN_RAW "\n");
+	TRY {
+		printk(KERN_RAW "%s(%d) : %s%s%s\n",
+		       args->aa_file, args->aa_line,
+		       args->aa_func ? args->aa_func : "",
+		       args->aa_func ? " : " : "",
+		       args->aa_expr);
+		if (args->aa_format) {
+			va_list vargs_copy;
+			va_copy(vargs_copy, args->aa_args);
+			format_vprintf(&syslog_printer, SYSLOG_LEVEL_RAW, args->aa_format, vargs_copy);
+			va_end(vargs_copy);
+			printk(KERN_RAW "\n");
+		}
+	} EXCEPT {
+		handle_error_during_panic_info();
 	}
 	TRY {
 		struct ucpustate temp;
@@ -592,7 +612,11 @@ panic_kernel_dbg_main(void *arg) {
 	if (args->format) {
 		dbg_print(DBGSTR("mesg: " AC_COLOR(ANSITTY_CL_TEAL, ANSITTY_CL_BLACK)));
 		dbg_indent += 6;
-		format_vprintf(&dbg_printer, NULL, args->format, args->args);
+		TRY {
+			format_vprintf(&dbg_printer, NULL, args->format, args->args);
+		} EXCEPT {
+			handle_error_during_panic_info();
+		}
 		dbg_indent -= 6;
 		dbg_print(AC_DEFCOLOR "\n");
 	}
@@ -613,10 +637,14 @@ kernel_vpanic_ucpustate_n(unsigned int n_skip,
 	printk(KERN_EMERG "Kernel Panic [pc=%p]\n",
 	       ucpustate_getpc(state));
 	if (format) {
-		va_list cargs;
-		va_copy(cargs, args);
-		format_vprintf(&syslog_printer, SYSLOG_LEVEL_EMERG, format, cargs);
-		va_end(cargs);
+		va_list vargs_copy;
+		va_copy(vargs_copy, args);
+		TRY {
+			format_vprintf(&syslog_printer, SYSLOG_LEVEL_EMERG, format, vargs_copy);
+		} EXCEPT {
+			handle_error_during_panic_info();
+		}
+		va_end(vargs_copy);
 		printk(KERN_EMERG "\n");
 	}
 	kernel_halt_dump_traceback(&syslog_printer, SYSLOG_LEVEL_RAW, state);
