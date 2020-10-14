@@ -156,6 +156,25 @@ NOTHROW(FCALL read_lock_rehash)(struct read_lock *__restrict new_vector, size_t 
 	}
 }
 
+/* Rehash an empty read-locks hashmap. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL rehash_empty)(struct read_locks *__restrict locks) {
+	assert(locks->rls_use == 0);
+	assert(locks->rls_cnt != 0);
+	/* Clear the static buffer. */
+	bzero(locks->rls_sbuf,
+	      CONFIG_TASK_STATIC_READLOCKS,
+	      sizeof(struct read_lock));
+	/* Try to switch back to the static hashmap. */
+	locks->rls_cnt = 0;
+	if unlikely(locks->rls_vec != locks->rls_sbuf) {
+		struct read_lock *heapmap;
+		heapmap        = locks->rls_vec;
+		locks->rls_vec = locks->rls_sbuf;
+		kfree(heapmap);
+	}
+}
+
 /* Return a read-lock descriptor for `lock', or allocate a new one. */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct read_lock *FCALL
 rwlock_get_readlock(struct rwlock *__restrict lock) THROWS(E_BADALLOC) {
@@ -181,8 +200,21 @@ again:
 					struct read_lock *old_vector;
 					struct read_lock *new_vector;
 					size_t new_mask;
+					if (!locks->rls_use) {
+						/* Special case: When no locks are actually in use, then
+						 *               we can simply re-hash in-place by clearing
+						 *               the memory of the hash-vector.
+						 * Also: Try to revert to the original  */
+						rehash_empty(locks);
+						goto again;
+					}
 					/* Must re-hash the readlock hash-vector. */
-					new_mask = (locks->rls_msk << 1) | 1;
+					new_mask = locks->rls_msk;
+					/* Only increase the mask if all slots are actually in use.
+					 * Otherwise, it's sufficient to rehash to a mask equal to
+					 * our current size, */
+					if (locks->rls_use == locks->rls_cnt)
+						new_mask = (new_mask << 1) | 1;
 					/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
 					 *   #1: #PF
 					 *   #2: EXCEPTION
@@ -190,11 +222,22 @@ again:
 					 *   #4: FIND_READLOCK(VM)
 					 *   #5: #PF
 					 */
-					new_vector = (struct read_lock *)kmalloc((new_mask + 1) *
-					                                         sizeof(struct read_lock),
-					                                         GFP_CALLOC | GFP_LOCKED |
-					                                         GFP_PREFLT);
+
+					/* Check for special case: Try to re-use the static vector. */
 					old_vector = locks->rls_vec;
+					if (new_mask <= (CONFIG_TASK_STATIC_READLOCKS - 1) &&
+					    old_vector != locks->rls_sbuf) {
+						new_vector = locks->rls_sbuf;
+						new_mask = CONFIG_TASK_STATIC_READLOCKS - 1;
+						bzero(new_vector,
+						      CONFIG_TASK_STATIC_READLOCKS,
+						      sizeof(struct read_lock));
+					} else {
+						new_vector = (struct read_lock *)kmalloc((new_mask + 1) *
+						                                         sizeof(struct read_lock),
+						                                         GFP_CALLOC | GFP_LOCKED |
+						                                         GFP_PREFLT);
+					}
 					read_lock_rehash(new_vector, new_mask,
 					                 old_vector, locks->rls_msk);
 					locks->rls_cnt = locks->rls_use; /* Dismiss dummy entries. */
@@ -250,8 +293,21 @@ again:
 					struct read_lock *old_vector;
 					struct read_lock *new_vector;
 					size_t new_mask;
+					if (!locks->rls_use) {
+						/* Special case: When no locks are actually in use, then
+						 *               we can simply re-hash in-place by clearing
+						 *               the memory of the hash-vector.
+						 * Also: Try to revert to the original  */
+						rehash_empty(locks);
+						goto again;
+					}
 					/* Must re-hash the readlock hash-vector. */
-					new_mask = (locks->rls_msk << 1) | 1;
+					new_mask = locks->rls_msk;
+					/* Only increase the mask if all slots are actually in use.
+					 * Otherwise, it's sufficient to rehash to a mask equal to
+					 * our current size, */
+					if (locks->rls_use == locks->rls_cnt)
+						new_mask = (new_mask << 1) | 1;
 					/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
 					 *   #1: #PF
 					 *   #2: EXCEPTION
@@ -259,10 +315,20 @@ again:
 					 *   #4: FIND_READLOCK(VM)
 					 *   #5: #PF
 					 */
-					new_vector = (struct read_lock *)kmalloc_nx((new_mask + 1) *
-					                                            sizeof(struct read_lock),
-					                                            GFP_CALLOC | GFP_LOCKED |
-					                                            GFP_PREFLT);
+					old_vector = locks->rls_vec;
+					if (new_mask <= (CONFIG_TASK_STATIC_READLOCKS - 1) &&
+					    old_vector != locks->rls_sbuf) {
+						new_vector = locks->rls_sbuf;
+						new_mask = CONFIG_TASK_STATIC_READLOCKS - 1;
+						bzero(new_vector,
+						      CONFIG_TASK_STATIC_READLOCKS,
+						      sizeof(struct read_lock));
+					} else {
+						new_vector = (struct read_lock *)kmalloc_nx((new_mask + 1) *
+						                                            sizeof(struct read_lock),
+						                                            GFP_CALLOC | GFP_LOCKED |
+						                                            GFP_PREFLT);
+					}
 					if unlikely(!new_vector)
 						return NULL;
 					old_vector = locks->rls_vec;

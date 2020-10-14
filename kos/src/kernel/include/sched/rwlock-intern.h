@@ -38,7 +38,7 @@ struct task;
 
 struct read_lock {
 	uintptr_t      rl_recursion; /* [valid_if(rl_rwlock != NULL && rl_rwlock != READLOCK_DUMMYLOCK)]
-	                              *  Amount of recursive read-locks held. */
+	                              * Amount of recursive read-locks held. */
 	struct rwlock *rl_rwlock;    /* [valid_if(!= NULL && != READLOCK_DUMMYLOCK)] Associated R/W-lock. */
 };
 
