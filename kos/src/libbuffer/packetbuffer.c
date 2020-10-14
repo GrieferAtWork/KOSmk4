@@ -276,6 +276,7 @@ allocate_buffer_extension:
 				self->pb_bbas = (byte_t *)HEAPPTR_BASE(buf);
 				self->pb_bend = (byte_t *)HEAPPTR_BASE(buf) + HEAPPTR_SIZE(buf);
 				unlock();
+				pb_buffer_blob_free(oldbuf, oldsiz);
 				goto again;
 			}
 #endif /* !HEAP_REALLOC_UNX */
