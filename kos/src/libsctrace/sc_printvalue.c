@@ -479,11 +479,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_string
 #endif /* NEED_print_string_vector */
 
-#ifdef NEED_print_string_or_buffer
-#define NEED_print_string
-#define NEED_print_bytes
-#endif /* NEED_print_string_or_buffer */
-
 #ifdef NEED_print_timespec_vector
 #define NEED_print_timespec
 #endif /* NEED_print_timespec_vector */
@@ -534,12 +529,13 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #endif /* NEED_print_iovecx64 */
 
 #ifdef NEED_print_iovec_entry
-#define NEED_print_string_with_len
+#define NEED_print_string_or_buffer
 #endif /* NEED_print_iovec_entry */
 
-#ifdef NEED_print_string_with_len
+#ifdef NEED_print_string_or_buffer
 #define NEED_print_string
-#endif /* NEED_print_string_with_len */
+#define NEED_print_bytes
+#endif /* NEED_print_string_or_buffer */
 
 #ifdef NEED_print_fdset
 #define NEED_print_fd_t
@@ -1277,19 +1273,6 @@ err:
 	return temp;
 }
 #endif /* NEED_print_string_or_buffer */
-
-
-
-#ifdef NEED_print_string_with_len
-PRIVATE ssize_t CC
-print_string_with_len(pformatprinter printer, void *arg,
-                      USER UNCHECKED char const *str,
-                      size_t length) {
-	struct sc_argument length_link;
-	length_link.sa_value.sv_u64 = (u64)length;
-	return print_string(printer, arg, str, &length_link);
-}
-#endif /* NEED_print_string_with_len */
 
 
 
@@ -2685,9 +2668,9 @@ print_iovec_entry(pformatprinter printer, void *arg,
 		goto done;
 	if (print_content) {
 		validate_readable(iov_base, iov_len);
-		DO(print_string_with_len(printer, arg,
-		                         (USER CHECKED char const *)iov_base,
-		                         iov_len));
+		DO(print_string_or_buffer(printer, arg,
+		                          (USER CHECKED char const *)iov_base,
+		                          iov_len));
 	} else {
 		PRINTF("%#" PRIxPTR, iov_base);
 	}
