@@ -25,6 +25,7 @@
 #include <kernel/types.h>
 
 #include <asm/pagesize.h>
+#include <bits/crt/format-printer.h>
 
 #include "malloc-defs.h"
 
@@ -450,6 +451,18 @@ FUNDEF NOBLOCK void NOTHROW(KCALL kmalloc_validate)(void);
  * Note that to do what it does, this function has to temporarily elevate the
  * calling thread to super-override status (s.a. <sched/scheduler.h>) */
 FUNDEF size_t KCALL kmalloc_leaks(void) THROWS(E_WOULDBLOCK);
+
+typedef void *kmalloc_leak_t;
+
+/* Collect, print and discard memory leaks. */
+FUNDEF kmalloc_leak_t KCALL
+kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK);
+FUNDEF ssize_t KCALL
+kmalloc_leaks_print(kmalloc_leak_t leaks,
+                    __pformatprinter printer, void *arg,
+                    size_t *pnum_leaks DFL(__NULLPTR));
+FUNDEF NOBLOCK void
+NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks);
 
 #else /* CONFIG_USE_NEW_DEBUG_MALLOC */
 

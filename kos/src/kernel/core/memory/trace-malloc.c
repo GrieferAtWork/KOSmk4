@@ -111,6 +111,11 @@ DECL_BEGIN
                                      * a secondary node, the original node it transformed into this kind,
                                      * and given a bitset of POINTER-aligned memory locations that are
                                      * still considered as traced. */
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#define TRACE_NODE_KIND_SLAB   0x03 /* Does not actually appear in the nodes tree.
+                                     * Only used when dumping/discarding leaks. */
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
 #define TRACE_NODE_KIND_HAS_PADDING(kind)   ((kind) == TRACE_NODE_KIND_MALL)
 #define TRACE_NODE_KIND_HAS_TRACEBACK(kind) ((kind) != TRACE_NODE_KIND_BITSET)
 
@@ -132,8 +137,8 @@ struct trace_node {
 	size_t      tn_size;  /* [const] Allocated heap size of this TRACE-node. */
 	u8          tn_reach; /* Last leak-check iteration when this node was reached. */
 	u8          tn_visit; /* Last leak-check iteration when this node was visited. */
-	u8          tn_kind;  /* Node kind (one of `TRACE_NODE_KIND_*') */
 	u8          tn_flags; /* Node flags (or'd with `__GFP_HEAPMASK') */
+	u8          tn_kind;  /* Node kind (one of `TRACE_NODE_KIND_*') */
 	u32         tn_tid;   /* [const] ROOT-namespace TID of the allocating thread. */
 	COMPILER_FLEXIBLE_ARRAY(void *, tn_trace);
 	                      /* [1..1][0..MALLNODE_TRACESZ(self)]
@@ -141,13 +146,33 @@ struct trace_node {
 };
 
 /************************************************************************/
+/* LEAK HELPERS                                                         */
+/************************************************************************/
+#define trace_node_leak_next(self)            ((self)->tn_link.a_min)
+#define trace_node_leak_getxrefs(self)        ((size_t)(self)->tn_link.a_max)
+#define trace_node_leak_setxrefs(self, value) ((self)->tn_link.a_max = (struct trace_node *)(size_t)(value))
+#if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
+#define trace_node_leak_getscan_uminmax(self, scan_umin, scan_umax)        \
+	((self)->tn_kind == TRACE_NODE_KIND_MALL                               \
+	 ? (void)((scan_umin) = trace_node_umin(self) + CONFIG_MALL_HEAD_SIZE, \
+	          (scan_umax) = trace_node_umax(self) - CONFIG_MALL_TAIL_SIZE) \
+	 : (void)((scan_umin) = trace_node_umin(self),                         \
+	          (scan_umax) = trace_node_umax(self)))
+#else /* CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0 */
+#define trace_node_leak_getscan_uminmax(self, scan_umin, scan_umax) \
+	(void)((scan_umin) = trace_node_umin(self),                     \
+	       (scan_umax) = trace_node_umax(self))
+#endif /* CONFIG_MALL_HEAD_SIZE == 0 && CONFIG_MALL_TAIL_SIZE == 0 */
+
+
+/************************************************************************/
 /* GENERIC HELPERS                                                      */
 /************************************************************************/
-#define trace_node_umin(self)   ((self)->tn_link.a_vmin)
-#define trace_node_umax(self)   ((self)->tn_link.a_vmax)
-#define trace_node_uaddr(self)  ((byte_t *)(self)->tn_link.a_vmin)       /* NOTE: This one's always pointer-aligned! */
-#define trace_node_uend(self)   ((byte_t *)((self)->tn_link.a_vmax + 1)) /* NOTE: This one's always pointer-aligned! */
-#define trace_node_usize(self)  (((self)->tn_link.a_vmax - (self)->tn_link.a_vmin) + 1)
+#define trace_node_umin(self)  ((self)->tn_link.a_vmin)
+#define trace_node_umax(self)  ((self)->tn_link.a_vmax)
+#define trace_node_uaddr(self) ((byte_t *)(self)->tn_link.a_vmin)       /* NOTE: This one's always pointer-aligned! */
+#define trace_node_uend(self)  ((byte_t *)((self)->tn_link.a_vmax + 1)) /* NOTE: This one's always pointer-aligned! */
+#define trace_node_usize(self) (((self)->tn_link.a_vmax - (self)->tn_link.a_vmin) + 1)
 
 
 /************************************************************************/
@@ -810,93 +835,6 @@ NOTHROW(KCALL gc_slab_reset_reach)(void) {
 		gc_slab_reset_reach_desc(gc_slab_descs[i]);
 }
 
-PRIVATE ATTR_COLDBSS bool gc_slab_leak_did_notify_noslab_boot_option = false;
-
-PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) size_t
-NOTHROW(KCALL gc_slab_unreachable_segment)(void *base, size_t num_bytes) {
-	/* Slab allocations are way too light-weight to be able to support tracebacks.
-	 * As such, we _are_ able to detect slab memory leaks, but we aren't able to
-	 * tell the user where/how the leaking memory was allocated.
-	 * However, since slab allocators are always allowed to either:
-	 *
-	 *   - Allocate regular kmalloc()-style memory (as a matter of fact, most calls
-	 *     to slab allocators actually use compile-time dispatching from inside of
-	 *     a FORCELOCAL kmalloc() wrapper)
-	 *     Booting with `noslab' will modify the text of these functions to directly
-	 *     call forward to the regular heap functions, which are then able to generate
-	 *     proper tracebacks.
-	 *
-	 *   - Simply return `NULL'. This might come as a surprise, but because all kernel
-	 *     slab memory _must_ be continuous, there is a chance that some conflicting
-	 *     memory mapping will simply prevent us from expanding slab space any further.
-	 *     Due to this case, pure slab allocators (i.e. slab allocator function that
-	 *     will never return conventional heap memory) are always allowed to simply
-	 *     return true, which is indicating of their inability to allocate additional
-	 *     slab memory.
-	 */
-	if (!gc_slab_leak_did_notify_noslab_boot_option) {
-		gc_slab_leak_did_notify_noslab_boot_option = true;
-		printk(KERN_RAW "slab: Slab memory leaks don't include tracebacks.\n"
-		                "slab: Consider rebooting with `noslab'\n");
-	}
-	/* Slabs are always small, to to help at least a little bit, also dump the
-	 * contents of leaked blocks. - Those might still be (somewhat) useful... */
-	printk(KERN_RAW "slab: Leaked %" PRIuSIZ " bytes of heap-memory at %p...%p\n"
-	                "%$[hex]\n",
-	       num_bytes, base, (byte_t *)base + num_bytes - 1,
-	       num_bytes, base);
-	return 1;
-}
-
-PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) size_t
-NOTHROW(KCALL gc_slab_unreachable_slab)(struct slab *__restrict self) {
-	/* Search for slabs with a status of `SLAB_SEGMENT_STATUS_ALLOC' */
-	uintptr_t *bits;
-	size_t i, count;
-	size_t result = 0;
-	bits  = (uintptr_t *)(self + 1);
-	count = SLAB_SEGMENT_COUNT(self->s_size);
-	for (i = 0; i < count; ++i) {
-		unsigned int status;
-		status = (bits[_SLAB_SEGMENT_STATUS_WORD(i)] >>
-		          _SLAB_SEGMENT_STATUS_SHFT(i)) &
-		         SLAB_SEGMENT_STATUS_MASK;
-		if likely(status != SLAB_SEGMENT_STATUS_ALLOC)
-			continue;
-		/* Well... It's a leak :( */
-		result += gc_slab_unreachable_segment((byte_t *)self +
-		                                   SLAB_SEGMENT_OFFSET(self->s_size) +
-		                                   i * self->s_size,
-		                                   self->s_size);
-	}
-	return result;
-}
-
-PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_slab_unreachable_slab_chain)(struct slab *self) {
-	size_t result = 0;
-	for (; self; self = self->s_next)
-		result += gc_slab_unreachable_slab(self);
-	return result;
-}
-
-PRIVATE NOBLOCK ATTR_COLDTEXT NONNULL((1)) size_t
-NOTHROW(KCALL gc_slab_unreachable_desc)(struct slab_descriptor *__restrict self) {
-	size_t result;
-	result = gc_slab_unreachable_slab_chain(self->sd_free);
-	result += gc_slab_unreachable_slab_chain(self->sd_used);
-	return result;
-}
-
-PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_slab_unreachable)(void) {
-	size_t result = 0;
-	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(gc_slab_descs); ++i)
-		result += gc_slab_unreachable_desc(gc_slab_descs[i]);
-	return result;
-}
-
 PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 	struct slab *s;
@@ -1014,6 +952,15 @@ NOTHROW(KCALL gc_reachable_data)(void const *base, size_t num_bytes) {
 		size_t page_bytes = PAGESIZE - ((uintptr_t)base & PAGEMASK);
 		/* Only scan writable pages. */
 		if (!pagedir_iswritable((void *)base)) {
+			/* FIXME: What if `base' isn't writable because it was written to SWAP?
+			 *        In this case we'd have to abort GC detection, release our
+			 *        scheduler super-lock, force load `base' into the core, and
+			 *        finally: try again (though we should probably all pages to
+			 *        which this applies, and load them all at once)
+			 * NOTE:  We can only load them when not holding a super-lock, since
+			 *        the act of loading memory from SWAP might require the use
+			 *        of an async worker, which don't work while holding a super-
+			 *        lock. */
 			if (page_bytes >= num_bytes)
 				break;
 			base = (byte_t *)base + page_bytes;
@@ -1298,94 +1245,124 @@ NOTHROW(KCALL gc_find_reachable)(void) {
 	}
 }
 
-PRIVATE NOBLOCK ATTR_COLDTEXT void
-NOTHROW(KCALL gc_print_unreachable_node)(struct trace_node *__restrict node) {
-	size_t tracesize, i;
-	void **traceback, *pc;
-	traceback = trace_node_traceback_vector(node);
-	tracesize = trace_node_traceback_count(node);
-	pc        = tracesize ? traceback[0] : NULL;
-	switch (node->tn_kind) {
 
-	case TRACE_NODE_KIND_MALL:
-		addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-		                 instruction_trypred(pc, INSTRLEN_ISA_DEFAULT), pc,
-		                 "Leaked %" PRIuSIZ " bytes of kmalloc-memory at %p...%p [tid=%" PRIu32 "]",
-		                 trace_node_usize(node) - CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE,
-		                 trace_node_umin(node) + CONFIG_MALL_HEAD_SIZE,
-		                 trace_node_umax(node) - CONFIG_MALL_TAIL_SIZE,
-		                 node->tn_tid);
-		goto common_print_traceback_1plus;
 
-	case TRACE_NODE_KIND_BITSET: {
-		printk(KERN_RAW "Leaked %" PRIuSIZ " bytes of partially untraced memory between %p...%p [tid=%" PRIu32 "]\n",
-		       trace_node_usize(node), trace_node_umin(node), trace_node_umax(node), node->tn_tid);
-		/* TODO: Print one entry for every consecutive address range of still-traced words. */
-	}	break;
-
-	default:
-		addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-		                 instruction_trypred(pc, INSTRLEN_ISA_DEFAULT), pc,
-		                 "Leaked %" PRIuSIZ " bytes of heap-memory at %p...%p [tid=%" PRIu32 "]",
-		                 trace_node_usize(node),
-		                 trace_node_umin(node), trace_node_umax(node),
-		                 node->tn_tid);
-common_print_traceback_1plus:
-		for (i = 1; i < tracesize; ++i) {
-			void *pc_ent;
-			pc_ent = traceback[i];
-			if (!pc_ent)
-				break;
-			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                 instruction_trypred(pc_ent, INSTRLEN_ISA_DEFAULT),
-			                 pc_ent, "Called here");
-		}
-		break;
-	}
-	printk(KERN_RAW "\n");
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
+gc_gather_unreachable_slab_segment(struct trace_node **__restrict pleaks,
+                                   void *base, size_t num_bytes) {
+	struct trace_node *node;
+	struct heapptr node_ptr;
+	node_ptr = heap_alloc_untraced(&trace_heap,
+	                               offsetof(struct trace_node, tn_trace),
+	                               TRACE_HEAP_FLAGS);
+	node = (struct trace_node *)node_ptr.hp_ptr;
+	node->tn_link.a_vmin = (uintptr_t)base;
+	node->tn_link.a_vmax = (uintptr_t)base + num_bytes - 1;
+	node->tn_size        = node_ptr.hp_siz;
+	node->tn_reach       = gc_version - 1;
+	node->tn_visit       = 0;
+	node->tn_kind        = TRACE_NODE_KIND_SLAB;
+	node->tn_flags       = 0;
+	node->tn_tid         = 0;
+	if (trace_node_traceback_count(node))
+		trace_node_traceback_vector(node)[0] = NULL;
+	trace_node_leak_next(node) = *pleaks;
+	*pleaks = node;
 }
 
-PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_print_unreachable_nodes)(struct trace_node *__restrict node) {
-	size_t result = 0;
+PRIVATE ATTR_COLDTEXT NONNULL((1, 2)) void KCALL
+gc_gather_unreachable_slab(struct trace_node **__restrict pleaks,
+                           struct slab *__restrict self) {
+	/* Search for slabs with a status of `SLAB_SEGMENT_STATUS_ALLOC' */
+	uintptr_t *bits;
+	size_t i, count;
+	bits  = (uintptr_t *)(self + 1);
+	count = SLAB_SEGMENT_COUNT(self->s_size);
+	for (i = 0; i < count; ++i) {
+		unsigned int status;
+		status = (bits[_SLAB_SEGMENT_STATUS_WORD(i)] >>
+		          _SLAB_SEGMENT_STATUS_SHFT(i)) &
+		         SLAB_SEGMENT_STATUS_MASK;
+		if likely(status != SLAB_SEGMENT_STATUS_ALLOC)
+			continue;
+		/* Well... It's a leak :( */
+		gc_gather_unreachable_slab_segment(pleaks,
+		                                   (byte_t *)self +
+		                                   SLAB_SEGMENT_OFFSET(self->s_size) +
+		                                   i * self->s_size,
+		                                   self->s_size);
+	}
+}
+
+PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
+gc_gather_unreachable_slab_chain(struct trace_node **__restrict pleaks,
+                                 struct slab *self) {
+	for (; self; self = self->s_next)
+		gc_gather_unreachable_slab(pleaks, self);
+}
+
+PRIVATE ATTR_COLDTEXT NONNULL((1, 2)) void KCALL
+gc_gather_unreachable_slab_descriptor(struct trace_node **__restrict pleaks,
+                                      struct slab_descriptor *__restrict self) {
+	gc_gather_unreachable_slab_chain(pleaks, self->sd_free);
+	gc_gather_unreachable_slab_chain(pleaks, self->sd_used);
+}
+
+PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
+gc_gather_unreachable_slabs(struct trace_node **__restrict pleaks) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(gc_slab_descs); ++i)
+		gc_gather_unreachable_slab_descriptor(pleaks, gc_slab_descs[i]);
+}
+#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_gather_unreachable_nodes)(struct trace_node **__restrict pnode,
+                                           struct trace_node **__restrict pleaks,
+                                           ATREE_SEMI_T(uintptr_t) addr_semi,
+                                           ATREE_LEVEL_T addr_level) {
+	struct trace_node *node;
 again:
+	node = *pnode;
+again_node:
 	if (node->tn_reach != gc_version) {
 		/* This node wasn't reached. (but ignore if the node has the NOLEAK flag set) */
 		if (!(node->tn_flags & TRACE_NODE_FLAG_NOLEAK)) {
-			gc_print_unreachable_node(node);
-			++result;
+			struct trace_node *leak;
+			leak = trace_node_tree_pop_at(pnode, addr_semi, addr_level);
+			assert(leak);
+			trace_node_leak_next(leak) = *pleaks;
+			*pleaks = leak;
+			node = *pnode;
+			if (!node)
+				return;
+			goto again_node;
 		}
 	}
 	if (node->tn_link.a_min) {
-		if (node->tn_link.a_max)
-			result += gc_print_unreachable_nodes(node->tn_link.a_max);
-		node = node->tn_link.a_min;
+		if (node->tn_link.a_max) {
+			gc_gather_unreachable_nodes(&node->tn_link.a_max,
+			                            pleaks,
+			                            ATREE_NEXTMAX(uintptr_t, addr_semi, addr_level),
+			                            ATREE_NEXTLEVEL(addr_level));
+		}
+		ATREE_WALKMIN(uintptr_t, addr_semi, addr_level);
+		pnode = &node->tn_link.a_min;
 		goto again;
 	}
 	if (node->tn_link.a_max) {
-		node = node->tn_link.a_max;
+		ATREE_WALKMAX(uintptr_t, addr_semi, addr_level);
+		pnode = &node->tn_link.a_max;
 		goto again;
 	}
-	return result;
-}
-
-PRIVATE NOBLOCK ATTR_COLDTEXT size_t
-NOTHROW(KCALL gc_print_unreachables)(void) {
-	size_t result;
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	result = gc_slab_unreachable();
-#else /* CONFIG_USE_SLAB_ALLOCATORS */
-	result = 0;
-#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
-	if (nodes)
-		result += gc_print_unreachable_nodes(nodes);
-	return result;
 }
 
 
 /* Called after having become a super-override */
-PRIVATE size_t KCALL kmalloc_leaks_impl(void) {
-	size_t result;
+PRIVATE ATTR_COLDTEXT struct trace_node *KCALL
+kmalloc_leaks_gather(void) {
+	struct trace_node *result;
 
 	/* Get a new GC version. */
 	++gc_version;
@@ -1395,65 +1372,34 @@ PRIVATE size_t KCALL kmalloc_leaks_impl(void) {
 	/* Search for reachable data. */
 	gc_find_reachable();
 
-	/* TODO: Do some post-processing to form a dependency-tree between everything that got leaked:
-	 *       Often times when a memory leak happens due to some reference-counted kernel object
-	 *       not being decref'd when it should, the system log will be flooded by a wall of tracebacks.
-	 *       This happens because any object pointed-to by that original object, as well as any heap
-	 *       memory owned by it will also appear as a memory leak.
-	 *
-	 * By doing some post-processing, we could order memory leaks by severity, based on how often
-	 * a leak is referenced by some other memory leak, as well as also include information about
-	 * how individual heap-blocks are referencing each other. Leaks would then be printed in
-	 * ascending order based on how often they are referenced by other leaks, as well as list the
-	 * individual pointers and offsets by which different heap-blocks point into each other:
-	 *
-	 * ============= 3 Memory leaks
-	 * Leaked 88 bytes of kmalloc-memory at E1A610F4...E1A61143 [tid=6] (Referenced 0 times)
-	 * Traceback here....
-	 *
-	 * Leaked 68 bytes of heap-memory at E1A493D0...E1A49413 [tid=3] (Referenced 0 times)
-	 * Traceback here....
-	 *
-	 * Leaked 60 bytes of kmalloc-memory at E1A4A044...E1A4A077 [tid=6] (Referenced 2 time)
-	 *     Referenced at *E1A610F8=E1A4A044 by leak at E1A610F4...E1A61143
-	 *     Referenced at *E1A493D4=E1A4A048[.+4] by leak at E1A493D0...E1A49413
-	 * Traceback here....
-	 *
-	 * Where the `Referenced at'-line is formated as
-	 *     Referenced at *ORIGIN_ADDR=TARGET_ADDR by leak at OTHER_LEAK_LO...OTHER_LEAK_HI
-	 * ORIGIN_ADDR:   The address within some other leak that references our leak
-	 * TARGET_ADDR:   The address within our leak referenced by the other leak, optionally
-	 *                suffixed by `[.+N]' where N is the offset from our own base address.
-	 * OTHER_LEAK_LO: Low address of the other leak (where that other leak can then also
-	 *                be identified by simply copy+pasting this range and searching the
-	 *                list of leaks for this same range)
-	 * OTHER_LEAK_HI: High address of the other leak
-	 *
-	 * HINT: We can temporarily gain 1 additional pointer-sized word of writable memory for
-	 *       every memory leak by removing all of them from the nodes-tree, chaining them
-	 *       back together via one of the node-tree pointers and forming a singly linked
-	 *       list, leaving the second pointer available for later use.
-	 *       Cross-references between leaks can then be enumerated in O(N*(N-1)), by
-	 *       enumerating all of the leaks, then scanning the bodies of all but the current
-	 *       leak for additional references to the same leak.
-	 * Also: by doing this we could off-load the process of printing the actual leaks onto
-	 *       our caller, to-be done after they've released `sched_super_override_end()',
-	 *       thus fixing the problem we're currently having where printing a traceback
-	 *       could potentially access disk I/O, which in turn might require an async job,
-	 *       which in turn requires that no schedule override be active in order to be
-	 *       able to run.
-	 * Only problem with that is: how would we dump leaks relating to the slab allocator.
-	 * One solution would be to also ensure that `kernel_locked_heap' is available before
-	 * acquiring a scheduler super-override, in which case we'd be allowed to allocate
-	 * additional heap memory, which we could then use to store the addresses of all of
-	 * the leaked slab pointers. */
-
-	/* Print everything that could not be reached as leaks. */
-	result = gc_print_unreachables();
-
+	result = NULL;
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
+	TRY
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+	{
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+		/* Gather memory leaks from slabs.
+		 * NOTE: This right here may cause new memory to be allocated. */
+		gc_gather_unreachable_slabs(&result);
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+	
+		/* Gather leaks from trace nodes. */
+		if (nodes) {
+			gc_gather_unreachable_nodes(&nodes, &result,
+			                            ATREE_SEMI0(uintptr_t),
+			                            ATREE_LEVEL0(uintptr_t));
+		}
+	}
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+	EXCEPT {
+		gc_slab_reset_reach();
+		RETHROW();
+	}
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
 	/* Clear the is-reachable bits from all of
 	 * the different slabs that could be reached. */
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
 	gc_slab_reset_reach();
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 
@@ -1461,12 +1407,111 @@ PRIVATE size_t KCALL kmalloc_leaks_impl(void) {
 }
 
 
-/* Search for leaked heap memory, and return the total number of leaked blocks.
- * Note that to do what it does, this function has to temporarily elevate the
- * calling thread to super-override status (s.a. <sched/scheduler.h>) */
-PUBLIC ATTR_NOINLINE size_t KCALL
-kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
-	size_t result;
+#define FOREACH_XREF_BEGIN(ptr, pptr, scan_umin, scan_umax, target_min, target_max) \
+	do {                                                                            \
+		void *ptr, **pptr, **_scan_end;                                             \
+		pptr      = (void **)(scan_umin);                                           \
+		_scan_end = (void **)(scan_umax);                                           \
+		for (; pptr <= _scan_end; ++pptr) {                                         \
+			COMPILER_READ_BARRIER();                                                \
+			ptr = *pptr;                                                            \
+			COMPILER_READ_BARRIER();                                                \
+			if ((uintptr_t)ptr >= (uintptr_t)(target_min) &&                        \
+			    (uintptr_t)ptr <= (uintptr_t)(target_max)) {                        \
+				do
+#define FOREACH_XREF_END() \
+				__WHILE0;  \
+			}              \
+		}                  \
+	}	__WHILE0
+
+/* Check if `lhs < rhs' as far as priority goes. */
+PRIVATE ATTR_COLDTEXT WUNUSED NONNULL((1, 2)) bool KCALL
+trace_node_isbelow(struct trace_node *__restrict lhs,
+                   struct trace_node *__restrict rhs) {
+	/* Leaks with more XREFS should code before ones with less. */
+	if (trace_node_leak_getxrefs(lhs) < trace_node_leak_getxrefs(rhs))
+		return true;
+	if (trace_node_leak_getxrefs(lhs) > trace_node_leak_getxrefs(rhs))
+		return false;
+	/* Larger leaks should come before smaller leaks. */
+	if (trace_node_usize(lhs) > trace_node_usize(rhs))
+		return true;
+	if (trace_node_usize(lhs) < trace_node_usize(rhs))
+		return false;
+	/* If everything else matches, just sort by address. */
+	return trace_node_uaddr(lhs) < trace_node_uaddr(rhs);
+}
+
+PRIVATE ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct trace_node *KCALL
+kmalloc_pop_smallest_node(struct trace_node **__restrict pleaks) {
+	struct trace_node **pwinner, *winner;
+	struct trace_node **piter, *iter;
+	pwinner = pleaks;
+	winner  = *pwinner;
+	piter   = &trace_node_leak_next(winner);
+	while ((iter = *piter) != NULL) {
+		/* Check if `iter' should come before `winner' */
+		if (trace_node_isbelow(iter, winner)) {
+			winner  = iter;
+			pwinner = piter;
+		}
+		piter = &trace_node_leak_next(iter);
+	}
+	/* Unlink+return the winner node. */
+	*pwinner = trace_node_leak_next(winner);
+	return winner;
+}
+
+
+PRIVATE ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct trace_node *KCALL
+kmalloc_leaks_sort(struct trace_node *leaks) {
+	struct trace_node *leak;
+	struct trace_node *newchain, *newchain_last;
+	/* Step #1: Calculate the xref total for every node. */
+	for (leak = leaks; leak; leak = trace_node_leak_next(leak)) {
+		/* XXX: Only use this slow O(N^2) approach when there are only a couple of leaks,
+		 *      (say: less than 64), and try to re-construct an ATREE for O(1) lookup of
+		 *      addr->node which can then be used to only have to enumerate memory of
+		 *      nodes once. */
+		struct trace_node *leak2;
+		uintptr_t leak_min, leak_max;
+		size_t xref_count = 0;
+		trace_node_leak_getscan_uminmax(leak, leak_min, leak_max);
+		for (leak2 = leaks; leak2; leak2 = trace_node_leak_next(leak2)) {
+			uintptr_t leak2_min, leak2_max;
+			if (leak == leak2)
+				continue;
+			trace_node_leak_getscan_uminmax(leak2, leak2_min, leak2_max);
+			FOREACH_XREF_BEGIN(ptr, pptr,
+			                   leak2_min, leak2_max,
+			                   leak_min, leak_max) {
+				++xref_count;
+			}
+			FOREACH_XREF_END();
+		}
+		trace_node_leak_setxrefs(leak, xref_count);
+	}
+	/* Sort the chain of leaks. */
+	newchain = kmalloc_pop_smallest_node(&leaks);
+	newchain_last = newchain;
+	while (leaks) {
+		leak = kmalloc_pop_smallest_node(&leaks);
+		trace_node_leak_next(newchain_last) = leak;
+		newchain_last = leak;
+	}
+	/* Terminate the (now sorted) chain. */
+	trace_node_leak_next(newchain_last) = NULL;
+	return newchain;
+
+}
+
+
+
+/* Collect, print and discard memory leaks. */
+PUBLIC ATTR_COLDTEXT kmalloc_leak_t KCALL
+kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
+	struct trace_node *result;
 again:
 	/* Acquire a scheduler super-override, thus ensuring that we're
 	 * the only thread running anywhere on the entire system.
@@ -1505,10 +1550,26 @@ again:
 
 	/* Acquire a lock to the corepage system, thus
 	 * ensuring that it's in a consistent state, too. */
-	if (!sync_trywrite(&vm_corepage_lock)) {
+	if (!sync_canwrite(&vm_corepage_lock)) {
 		vm_kernel_treelock_endwrite();
 		sched_super_override_end();
 		while (!sync_canwrite(&vm_corepage_lock))
+			task_yield();
+		goto again;
+	}
+
+	/* Also ensure that `kernel_locked_heap' and `trace_heap' can be locked. */
+	if (!sync_canwrite(&kernel_locked_heap.h_lock)) {
+		vm_kernel_treelock_endwrite();
+		sched_super_override_end();
+		while (!sync_canwrite(&kernel_locked_heap.h_lock))
+			task_yield();
+		goto again;
+	}
+	if (!sync_canwrite(&trace_heap.h_lock)) {
+		vm_kernel_treelock_endwrite();
+		sched_super_override_end();
+		while (!sync_canwrite(&trace_heap.h_lock))
 			task_yield();
 		goto again;
 	}
@@ -1517,16 +1578,217 @@ again:
 	 * point in still holding on to our lock to the kernel VM. - At this
 	 * point we can do pretty much anything while disregarding any sort
 	 * of locking! */
-	sync_endwrite(&vm_corepage_lock);
 	vm_kernel_treelock_endwrite();
 
 	/* Actually search for memory leaks. */
-	result = kmalloc_leaks_impl();
+	result = kmalloc_leaks_gather();
 
 	/* Release the scheduler super-override, allowing normal
 	 * system execution to resume. */
 	sched_super_override_end();
 
+	/* Sort memory leaks by number of x-refs */
+	if (result)
+		result = kmalloc_leaks_sort(result);
+
+	return result;
+}
+
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+PRIVATE ATTR_COLDBSS bool gc_slab_leak_did_notify_noslab_boot_option = false;
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+PUBLIC ATTR_COLDTEXT ssize_t KCALL
+kmalloc_leaks_print(kmalloc_leak_t leaks,
+                    pformatprinter printer, void *arg,
+                    size_t *pnum_leaks) {
+#define DO(expr)                           \
+	do {                                   \
+		if unlikely(((temp) = (expr)) < 0) \
+			goto err;                      \
+		result += temp;                    \
+	}	__WHILE0
+#define PRINT(str)  DO((*printer)(arg, str, COMPILER_STRLEN(str)))
+#define PRINTF(...) DO(format_printf(printer, arg, __VA_ARGS__))
+	size_t num_leaks = 0;
+	ssize_t temp, result = 0;
+	struct trace_node *iter;
+	for (iter = (struct trace_node *)leaks;
+	     iter; iter = trace_node_leak_next(iter))
+		++num_leaks;
+	if (pnum_leaks)
+		*pnum_leaks = num_leaks;
+	if (!num_leaks)
+		goto done;
+	result = format_printf(printer, arg,
+	                       "============= %" PRIuSIZ " Memory leak%s\n",
+	                       num_leaks, num_leaks == 1 ? "" : "s");
+	if unlikely(result < 0)
+		goto done;
+	for (iter = (struct trace_node *)leaks;
+	     iter; iter = trace_node_leak_next(iter)) {
+		struct trace_node *xref_leak;
+		size_t tracesize, i;
+		void **traceback, *pc;
+		char const *method;
+		uintptr_t umin, umax;
+		size_t xrefs;
+		umin      = trace_node_umin(iter);
+		umax      = trace_node_umax(iter);
+		traceback = trace_node_traceback_vector(iter);
+		tracesize = trace_node_traceback_count(iter);
+		pc        = tracesize ? traceback[0] : NULL;
+		xrefs     = trace_node_leak_getxrefs(iter);
+		switch (iter->tn_kind) {
+
+		case TRACE_NODE_KIND_MALL:
+			umin += CONFIG_MALL_HEAD_SIZE;
+			umax -= CONFIG_MALL_TAIL_SIZE;
+			method = "kmalloc-memory";
+			break;
+
+		case TRACE_NODE_KIND_BITSET:
+			/* TODO: Print one entry for every consecutive address range of still-traced words. */
+			method    = "partially untraced heap memory";
+			tracesize = 0; /* No traceback */
+			break;
+
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+		case TRACE_NODE_KIND_SLAB:
+			/* Slab allocations are way too light-weight to be able to support tracebacks.
+			 * As such, we _are_ able to detect slab memory leaks, but we aren't able to
+			 * tell the user where/how the leaking memory was allocated.
+			 * However, since slab allocators are always allowed to either:
+			 *
+			 *   - Allocate regular kmalloc()-style memory (as a matter of fact, most calls
+			 *     to slab allocators actually use compile-time dispatching from inside of
+			 *     a FORCELOCAL kmalloc() wrapper)
+			 *     Booting with `noslab' will modify the text of these functions to directly
+			 *     call forward to the regular heap functions, which are then able to generate
+			 *     proper tracebacks.
+			 *
+			 *   - Simply return `NULL'. This might come as a surprise, but because all kernel
+			 *     slab memory _must_ be continuous, there is a chance that some conflicting
+			 *     memory mapping will simply prevent us from expanding slab space any further.
+			 *     Due to this case, pure slab allocators (i.e. slab allocator function that
+			 *     will never return conventional heap memory) are always allowed to simply
+			 *     return `NULL', which is indicative of their inability to allocate additional
+			 *     slab memory.
+			 */
+			if (!gc_slab_leak_did_notify_noslab_boot_option) {
+				gc_slab_leak_did_notify_noslab_boot_option = true;
+				PRINT("slab: Slab memory leaks don't include tracebacks.\n"
+				      "slab: Consider rebooting with `noslab'\n");
+			}
+			method = "slab-memory";
+			break;
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+		default:
+			method = "heap-memory";
+			break;
+		}
+		PRINTF("Leaked %" PRIuSIZ " bytes of %s at %p...%p "
+		       "[tid=%" PRIu32 "] (Referenced %" PRIuSIZ " times)\n",
+		       (umax - umin) + 1, method,
+		       umin, umax, iter->tn_tid, xrefs);
+		/* Print xrefs */
+		for (xref_leak = (struct trace_node *)leaks;
+		     xref_leak; xref_leak = trace_node_leak_next(xref_leak)) {
+			uintptr_t xref_umin, xref_umax;
+			if (xref_leak == iter)
+				continue;
+			trace_node_leak_getscan_uminmax(xref_leak, xref_umin, xref_umax);
+			FOREACH_XREF_BEGIN(ptr, pptr, xref_umin, xref_umax, umin, umax) {
+				PRINTF("\tReferenced at *%p=%p by leak at %p...%p\n",
+				       pptr, ptr, xref_umin, xref_umax);
+			}
+			FOREACH_XREF_END();
+		}
+		if (tracesize) {
+			DO(addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
+			                    instruction_trypred(pc, INSTRLEN_ISA_DEFAULT),
+			                    pc, "Allocated here"));
+			for (i = 1; i < tracesize; ++i) {
+				void *pc_ent;
+				pc_ent = traceback[i];
+				if (!pc_ent)
+					break;
+				DO(addr2line_printf(printer, arg,
+				                    instruction_trypred(pc_ent, INSTRLEN_ISA_DEFAULT),
+				                    pc_ent, "Called here"));
+			}
+		}
+		if (umin + 1024 > umax) {
+			PRINTF("%$[hex]\n",
+			       (size_t)(umax - umin) + 1,
+			       (void *)umin);
+		}
+		PRINT("\n");
+	}
+done:
+	return result;
+err:
+	return temp;
+#undef PRINTF
+#undef PRINT
+#undef DO
+}
+
+PUBLIC NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
+	struct trace_node *node, *next;
+	node = (struct trace_node *)leaks;
+	while (node) {
+		next = node->tn_link.a_min;
+		/* Try to release the memory pointed to by the memory leaks.
+		 * However, we can only do this for kmalloc() and slab-leaks.
+		 * Custom traced regions cannot be blindly free'd! */
+		switch (node->tn_kind) {
+
+		case TRACE_NODE_KIND_MALL: {
+			gfp_t flags;
+			flags = node->tn_flags & __GFP_HEAPMASK;
+			heap_free_untraced(&kernel_heaps[flags],
+			                   trace_node_uaddr(node),
+			                   trace_node_usize(node),
+			                   flags);
+		}	break;
+
+#ifdef CONFIG_USE_SLAB_ALLOCATORS
+		case TRACE_NODE_KIND_SLAB:
+			slab_free(trace_node_uaddr(node));
+			break;
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+
+		default:
+			break;
+		}
+		trace_node_free(node);
+		node = next;
+	}
+}
+
+
+
+/* Search for leaked heap memory, and return the total number of leaked blocks.
+ * Note that to do what it does, this function has to temporarily elevate the
+ * calling thread to super-override status (s.a. <sched/scheduler.h>) */
+PUBLIC ATTR_COLDTEXT ATTR_NOINLINE size_t KCALL
+kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
+	size_t result;
+	kmalloc_leak_t leaks;
+	leaks = kmalloc_leaks_collect();
+	TRY {
+		kmalloc_leaks_print(leaks,
+		                    &syslog_printer,
+		                    SYSLOG_LEVEL_RAW,
+		                    &result);
+	} EXCEPT {
+		kmalloc_leaks_discard(leaks);
+		RETHROW();
+	}
+	kmalloc_leaks_discard(leaks);
 	return result;
 }
 

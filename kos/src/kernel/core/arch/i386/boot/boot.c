@@ -376,7 +376,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 #endif /* CONFIG_SELFTEST */
 
 #ifdef CONFIG_USE_NEW_DEBUG_MALLOC
-	kmalloc_leaks();
+	__hybrid_assert(!kmalloc_leaks());
 #else /* CONFIG_USE_NEW_DEBUG_MALLOC */
 	mall_dump_leaks(GFP_NORMAL);
 #endif /* !CONFIG_USE_NEW_DEBUG_MALLOC */
