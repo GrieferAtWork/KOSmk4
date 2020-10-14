@@ -1419,8 +1419,8 @@ again_connect:
 		goto done;
 #ifdef __KERNEL__
 	task_connect(&self->t_ibuf.rb_nempty);
-	/* Try to read more data. */
 	TRY {
+		/* Try to read more data. */
 		temp = ringbuffer_read_nonblock(&self->t_ibuf,
 		                                (byte_t *)dst + result,
 		                                num_bytes - result);

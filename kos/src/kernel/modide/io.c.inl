@@ -376,9 +376,9 @@ again_service_io:
 			if unlikely(error != ATA_ERROR_OK)
 				goto err_io_error;
 			task_connect(&bus->ab_piointr);
+			TRY {
 #ifdef DEFINE_IOMETHOD_Chs
-			/* CHS addressing */
-			{
+				/* CHS addressing */
 				u32 temp;
 				u8 sector, head, max_count;
 				u16 cylinder;
@@ -397,36 +397,39 @@ again_service_io:
 				outb(bus->ab_busio + ATA_ADDRESS2, (u8)cylinder);
 				outb(bus->ab_busio + ATA_ADDRESS3, (u8)(cylinder >> 8));
 				outb(bus->ab_busio + ATA_COMMAND, _ATA_LOWLEVEL_RW_CHS);
-			}
 #else /* DEFINE_IOMETHOD_Chs */
-			/* LBA28 or LBA48 */
+				/* LBA28 or LBA48 */
 #ifdef DEFINE_IOMETHOD_Lba48
-			outb(bus->ab_busio + ATA_DRIVE_SELECT, self->ad_drive);
-			AtaBus_HW_SelectDelay(bus);
-			outb(bus->ab_busio + ATA_SECTOR_COUNT, (u8)(part_sectors >> 8));
-			outb(bus->ab_busio + ATA_ADDRESS1, (u8)(addr >> 24));
-			outb(bus->ab_busio + ATA_ADDRESS2, (u8)(addr >> 32));
-			outb(bus->ab_busio + ATA_ADDRESS3, (u8)(addr >> 40));
+				outb(bus->ab_busio + ATA_DRIVE_SELECT, self->ad_drive);
+				AtaBus_HW_SelectDelay(bus);
+				outb(bus->ab_busio + ATA_SECTOR_COUNT, (u8)(part_sectors >> 8));
+				outb(bus->ab_busio + ATA_ADDRESS1, (u8)(addr >> 24));
+				outb(bus->ab_busio + ATA_ADDRESS2, (u8)(addr >> 32));
+				outb(bus->ab_busio + ATA_ADDRESS3, (u8)(addr >> 40));
 #elif defined(DEFINE_IOMETHOD_Lba28)
-			outb(bus->ab_busio + ATA_DRIVE_SELECT,
-			     (0xe0 | (self->ad_drive - ATA_DRIVE_MASTER)) |
-			     ((u8)(addr >> 24) & 0xf));
-			AtaBus_HW_SelectDelay(bus);
+				outb(bus->ab_busio + ATA_DRIVE_SELECT,
+				     (0xe0 | (self->ad_drive - ATA_DRIVE_MASTER)) |
+				     ((u8)(addr >> 24) & 0xf));
+				AtaBus_HW_SelectDelay(bus);
 #else /* ... */
 #error "Unsupported method"
 #endif /* !... */
-			outb(bus->ab_busio + ATA_SECTOR_COUNT, (u8)part_sectors);
-			outb(bus->ab_busio + ATA_ADDRESS1, (u8)(addr));
-			outb(bus->ab_busio + ATA_ADDRESS2, (u8)(addr >> 8));
-			outb(bus->ab_busio + ATA_ADDRESS3, (u8)(addr >> 16));
+				outb(bus->ab_busio + ATA_SECTOR_COUNT, (u8)part_sectors);
+				outb(bus->ab_busio + ATA_ADDRESS1, (u8)(addr));
+				outb(bus->ab_busio + ATA_ADDRESS2, (u8)(addr >> 8));
+				outb(bus->ab_busio + ATA_ADDRESS3, (u8)(addr >> 16));
 #ifdef DEFINE_IOMETHOD_Lba48
-			outb(bus->ab_busio + ATA_COMMAND, _ATA_LOWLEVEL_RW_PIO_EXT);
+				outb(bus->ab_busio + ATA_COMMAND, _ATA_LOWLEVEL_RW_PIO_EXT);
 #elif defined(DEFINE_IOMETHOD_Lba28)
-			outb(bus->ab_busio + ATA_COMMAND, _ATA_LOWLEVEL_RW_PIO);
+				outb(bus->ab_busio + ATA_COMMAND, _ATA_LOWLEVEL_RW_PIO);
 #else /* ... */
 #error "Unsupported method"
 #endif /* !... */
 #endif /* !DEFINE_IOMETHOD_Chs */
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
 
 			/* Transfer sectors! */
 			error = PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(bus, self, buf,

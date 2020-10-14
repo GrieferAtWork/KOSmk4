@@ -29,6 +29,7 @@
 #include <kernel/user.h>
 #include <sched/cred.h>
 #include <sched/rpc.h>
+#include <sched/signal.h>
 
 #include <hybrid/host.h>
 #include <hybrid/pointer.h>
@@ -46,6 +47,7 @@
 #include <kos/kernel/cpu-state32.h>
 #include <sys/wait.h>
 
+#include <assert.h>
 #include <malloca.h>
 #include <signal.h>
 #include <stddef.h>

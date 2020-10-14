@@ -1449,7 +1449,12 @@ again_read_packet:
 		if (ATOMIC_READ(pbuf->pb_limt) == 0)
 			goto done; /* EOF */
 		task_connect(&pbuf->pb_psta);
-		packet = pb_buffer_startread(pbuf);
+		TRY {
+			packet = pb_buffer_startread(pbuf);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
 		if unlikely(packet) {
 			task_disconnectall();
 			break;

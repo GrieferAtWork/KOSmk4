@@ -150,6 +150,7 @@ got_identify_signal:
 			}
 			outb(bus->ab_busio + ATA_FEATURES, 0); /* ??? */
 		} EXCEPT {
+			task_disconnectall();
 			AtaBus_UnlockPIO(bus);
 			RETHROW();
 		}

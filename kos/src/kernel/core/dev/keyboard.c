@@ -844,7 +844,12 @@ again:
 	result = keyboard_device_trygetc(self);
 	if (result == -1) {
 		task_connect(&self->kd_buf.kb_avail);
-		result = keyboard_device_trygetc(self);
+		TRY {
+			result = keyboard_device_trygetc(self);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
 		if (result != -1) {
 			task_disconnectall();
 			goto done;
@@ -878,7 +883,12 @@ again_read_ch:
 				break;
 			}
 			task_connect(&me->kd_buf.kb_avail);
-			ch = keyboard_device_trygetc(me);
+			TRY {
+				ch = keyboard_device_trygetc(me);
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
 			if (ch != -1) {
 				task_disconnectall();
 				goto do_append_ch;

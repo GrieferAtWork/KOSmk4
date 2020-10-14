@@ -154,8 +154,13 @@ again:
 		}
 		task_connect(&fifo->f_fifo.ff_buffer.rb_nempty);
 		/* Retry reading data, now that we're being interlocked. */
-		result = ringbuffer_read_nonblock(&fifo->f_fifo.ff_buffer,
-		                                  dst, num_bytes);
+		TRY {
+			result = ringbuffer_read_nonblock(&fifo->f_fifo.ff_buffer,
+			                                  dst, num_bytes);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
 		if unlikely(result) {
 			task_disconnectall();
 			goto done;
@@ -205,8 +210,13 @@ no_readers:
 			goto no_readers;
 		task_connect(&fifo->f_fifo.ff_buffer.rb_nfull);
 		/* Retry writing data, now that we're being interlocked. */
-		result = ringbuffer_write_nonblock(&fifo->f_fifo.ff_buffer,
-		                                   src, num_bytes);
+		TRY {
+			result = ringbuffer_write_nonblock(&fifo->f_fifo.ff_buffer,
+			                                   src, num_bytes);
+		} EXCEPT {
+			task_disconnectall();
+			RETHROW();
+		}
 		if unlikely(result) {
 			task_disconnectall();
 			goto done;
@@ -252,9 +262,13 @@ again_read_ent:
 				break; /* End-of-file */
 			task_connect(&fifo->f_fifo.ff_buffer.rb_nempty);
 			/* Retry reading data, now that we're being interlocked. */
-			temp = ringbuffer_read_nonblock(&fifo->f_fifo.ff_buffer,
-			                                ent.ab_base,
-			                                ent.ab_size);
+			TRY {
+				temp = ringbuffer_read_nonblock(&fifo->f_fifo.ff_buffer,
+				                                ent.ab_base, ent.ab_size);
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
 			if unlikely(temp) {
 				task_disconnectall();
 				result += temp;
@@ -313,9 +327,13 @@ again_write_ent:
 				goto no_readers;
 			task_connect(&fifo->f_fifo.ff_buffer.rb_nfull);
 			/* Retry writing data, now that we're being interlocked. */
-			temp = ringbuffer_write_nonblock(&fifo->f_fifo.ff_buffer,
-			                                 ent.ab_base,
-			                                 ent.ab_size);
+			TRY {
+				temp = ringbuffer_write_nonblock(&fifo->f_fifo.ff_buffer,
+				                                 ent.ab_base, ent.ab_size);
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
 			if unlikely(temp) {
 				task_disconnectall();
 				result += temp;

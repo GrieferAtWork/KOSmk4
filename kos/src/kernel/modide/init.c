@@ -155,13 +155,18 @@ Ata_InitializeDrive(struct ata_ports *__restrict ports,
 			if (AtaBus_HW_WaitForBusy(bus) != ATA_ERROR_OK)
 				return false;
 			task_connect(&bus->ab_piointr);
-			outb(bus->ab_busio + ATA_DRIVE_SELECT,
-			     0xa0 + (drive_id - ATA_DRIVE_MASTER));
-			AtaBus_HW_SelectDelay_P(ports->a_ctrl);
-			outb(bus->ab_busio + ATA_ADDRESS1, 0);
-			outb(bus->ab_busio + ATA_ADDRESS2, 0);
-			outb(bus->ab_busio + ATA_ADDRESS3, 0);
-			outb(bus->ab_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
+			TRY {
+				outb(bus->ab_busio + ATA_DRIVE_SELECT,
+				     0xa0 + (drive_id - ATA_DRIVE_MASTER));
+				AtaBus_HW_SelectDelay_P(ports->a_ctrl);
+				outb(bus->ab_busio + ATA_ADDRESS1, 0);
+				outb(bus->ab_busio + ATA_ADDRESS2, 0);
+				outb(bus->ab_busio + ATA_ADDRESS3, 0);
+				outb(bus->ab_busio + ATA_COMMAND, ATA_COMMAND_IDENTIFY);
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
+			}
 			if (!task_trywait()) {
 				struct sig *signal;
 				u8 status;

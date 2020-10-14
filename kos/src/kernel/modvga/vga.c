@@ -1570,15 +1570,16 @@ VGA_DisableGraphicsMode(VGA *__restrict self) {
 		REL(self->v_scrlllin);
 		REL(self->v_scrlend);
 #undef REL
-		if (oldfont)
+		if (oldfont) {
 			VGA_DoSetFont(self, oldfont);
+			kfree(oldfont);
+		}
 		VGA_DoSetMode(self, &vga_ansitty_mode);
 		VGA_DoSetPalette(self, &vga_ansitty_pal, COMPILER_LENOF(vga_ansitty_pal.vp_pal));
 		memcpy(self->v_textbase, textbuf, textsize);
+		kfree(textbuf);
 		self->v_state &= ~VGA_STATE_FGRAPHICS;
 		sync_endwrite_both(self);
-		kfree(textbuf);
-		kfree(oldfont);
 	} else {
 		sync_endwrite_both(self);
 	}

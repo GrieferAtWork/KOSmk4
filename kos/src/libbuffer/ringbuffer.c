@@ -205,8 +205,8 @@ done:
 again_connect:
 #ifdef __KERNEL__
 	task_connect(&self->rb_nempty);
-	/* Try to read more data. */
 	TRY {
+		/* Try to read more data. */
 		temp = libringbuffer_read_nonblock(self,
 		                                   (byte_t *)dst + result,
 		                                   num_bytes - result);
@@ -446,8 +446,8 @@ done:
 again_connect:
 #ifdef __KERNEL__
 	task_connect(&self->rb_nfull);
-	/* Try to read more data. */
 	TRY {
+		/* Try to write more data. */
 		temp = libringbuffer_write_nonblock(self,
 		                                    (byte_t *)src + result,
 		                                    num_bytes - result);
@@ -523,8 +523,8 @@ done:
 again_connect:
 #ifdef __KERNEL__
 	task_connect(&self->rb_nfull);
-	/* Try to read more data. */
 	TRY {
+		/* Try to read write data. */
 		temp = libringbuffer_write_nonblock(self,
 		                                    (byte_t *)src + result,
 		                                    num_bytes - result);

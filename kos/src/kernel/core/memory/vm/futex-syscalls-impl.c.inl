@@ -262,25 +262,22 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			/* Lock isn't available (connect to it, then set the
 			 * is-waiting bit and sleep until it becomes available) */
 			newval = oldval | FUNC2(LFUTEX_WAIT_LOCK_WAITERS);
-			{
-
-				f = vm_getfutex(THIS_VM, uaddr);
-				FINALLY_DECREF(f);
-				task_connect(&f->f_signal);
-				TRY {
-					if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
-						/* Failed to set the locked bit (try again) */
-						task_disconnectall();
-						continue;
-					}
-					/* Wait for the futex and return the resulting status code. */
-					result = FUNC(task_waitfor_futex)(futex_op, timeout);
-				} EXCEPT {
+			f = vm_getfutex(THIS_VM, uaddr);
+			FINALLY_DECREF(f);
+			task_connect(&f->f_signal);
+			TRY {
+				if (!ATOMIC_CMPXCH_WEAK(*uaddr, oldval, newval)) {
+					/* Failed to set the locked bit (try again) */
 					task_disconnectall();
-					RETHROW();
+					continue;
 				}
-				break;
+				/* Wait for the futex and return the resulting status code. */
+				result = FUNC(task_waitfor_futex)(futex_op, timeout);
+			} EXCEPT {
+				task_disconnectall();
+				RETHROW();
 			}
+			break;
 		}
 	}	break;
 

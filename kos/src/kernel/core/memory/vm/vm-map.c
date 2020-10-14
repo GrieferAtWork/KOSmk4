@@ -234,8 +234,8 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 		size_t total_pages;
 		/* Step #1: Collect all of the required parts. */
 		part = vm_paged_datablock_locatepart_exact(data,
-		                                     data_start_vpage,
-		                                     num_pages);
+		                                           data_start_vpage,
+		                                           num_pages);
 		TRY {
 			partnode_pair_vector_addpart(info, part);
 		} EXCEPT {

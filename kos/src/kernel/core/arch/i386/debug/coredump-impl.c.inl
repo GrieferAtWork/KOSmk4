@@ -176,6 +176,7 @@ NAME(coredump_impl)(struct icpustate *__restrict return_state,
 	}
 	if (utb_vector)
 		freea(utb_vector);
+	assert(!task_isconnected());
 	THROW(E_EXIT_PROCESS,
 	      W_EXITCODE(1, signo & 0x7f) | WCOREFLAG);
 	return return_state;
