@@ -550,6 +550,7 @@ UnixSocket_Bind(struct socket *__restrict self,
 	/* Start the binding process, and ensure that the socket isn't
 	 * already bound, or is currently being bound by some other thread. */
 	if unlikely(!ATOMIC_CMPXCH(me->us_node, NULL, (REF struct socket_node *)-1)) {
+		decref_unlikely(bind_path);
 		THROW(E_INVALID_ARGUMENT_BAD_STATE,
 		      E_INVALID_ARGUMENT_CONTEXT_BIND_ALREADY_BOUND);
 	}
@@ -658,6 +659,7 @@ UnixSocket_WaitForAccept_Work(async_job_t self) {
 		/* The socket died? Ok... In that case, just force a disconnect */
 		if (!unix_client_refuse_connection(client))
 			unix_client_close_connection(client);
+		ATOMIC_WRITE(socket->us_node, NULL);
 		return ASYNC_JOB_WORK_COMPLETE;
 	}
 	/* Fill in fields of the socket. */
@@ -703,6 +705,7 @@ UnixSocket_WaitForAccept_Cancel(async_job_t self) {
 		 * after it was already established. */
 		unix_client_close_connection(client);
 	}
+	ATOMIC_WRITE(me->aw_socket->us_node, NULL);
 }
 
 
@@ -770,85 +773,85 @@ UnixSocket_Connect(struct socket *__restrict self,
 		                                                         &bind_path,
 		                                                         NULL,
 		                                                         &bind_name);
-	} EXCEPT {
-		ATOMIC_WRITE(me->us_node, NULL);
-		RETHROW();
-	}
-	TRY {
-		async_job_t job;
-		struct async_accept_wait *con;
-		REF struct unix_client *client;
-		/* Make sure that what we've found is actually a socket INode */
-		if unlikely(!INODE_ISSOCK(bind_node))
-			THROW(E_NET_CONNECTION_REFUSED);
-
-#ifndef __OPTIMIZE_SIZE__
-		/* Check that someone is listening to `bind_node'
-		 * NOTE: This check is also performed implicitly by `unix_server_append_acceptme()' */
-		if unlikely(!ATOMIC_READ(bind_node->s_server.us_max_backlog))
-			THROW(E_NET_CONNECTION_REFUSED);
-#endif /* !__OPTIMIZE_SIZE__ */
-
-		/* Allocate our reference-counted unix-socket-client-descriptor
-		 * that we can link into the server socket INode to inform it of
-		 * the fact that we wish to connect. */
-		client = (REF struct unix_client *)kmalloc(sizeof(struct unix_client),
-		                                           GFP_NORMAL);
-		client->uc_refcnt = 2; /* +1: unix_server_append_acceptme(), +1: con->aw_client */
-		client->uc_status = UNIX_CLIENT_STATUS_PENDING;
-		sig_init(&client->uc_status_sig);
-		/* Initialize the client/server packet buffers. */
-		pb_buffer_init(&client->uc_fromclient);
-		pb_buffer_init(&client->uc_fromserver);
-
 		TRY {
-			/* Construct an async worker for informing the server of our
-			 * presence, as well as to wait for it to accept(2) us. */
-			job = async_job_alloc(&UnixSocket_WaitForAccept);
+			async_job_t job;
+			struct async_accept_wait *con;
+			REF struct unix_client *client;
+			/* Make sure that what we've found is actually a socket INode */
+			if unlikely(!INODE_ISSOCK(bind_node))
+				THROW(E_NET_CONNECTION_REFUSED);
+	
+#ifndef __OPTIMIZE_SIZE__
+			/* Check that someone is listening to `bind_node'
+			 * NOTE: This check is also performed implicitly by `unix_server_append_acceptme()' */
+			if unlikely(!ATOMIC_READ(bind_node->s_server.us_max_backlog))
+				THROW(E_NET_CONNECTION_REFUSED);
+#endif /* !__OPTIMIZE_SIZE__ */
+	
+			/* Allocate our reference-counted unix-socket-client-descriptor
+			 * that we can link into the server socket INode to inform it of
+			 * the fact that we wish to connect. */
+			client = (REF struct unix_client *)kmalloc(sizeof(struct unix_client),
+			                                           GFP_NORMAL);
+			client->uc_refcnt = 2; /* +1: unix_server_append_acceptme(), +1: con->aw_client */
+			client->uc_status = UNIX_CLIENT_STATUS_PENDING;
+			sig_init(&client->uc_status_sig);
+			/* Initialize the client/server packet buffers. */
+			pb_buffer_init(&client->uc_fromclient);
+			pb_buffer_init(&client->uc_fromserver);
+	
 			TRY {
-				/* Inform the server that we're trying to connect to it */
-				REF struct unix_client *next, *last;
-				do {
-					next = ATOMIC_READ(bind_node->s_server.us_acceptme);
-					if unlikely(next == UNIX_SERVER_ACCEPTME_SHUTDOWN)
-						THROW(E_NET_CONNECTION_REFUSED); /* The server got shut down. */
-				} while (!ATOMIC_CMPXCH_WEAK(bind_node->s_server.us_acceptme,
-				                             next, NULL));
-				last = next;
-				if (last) {
-					while (last->uc_next)
-						last = last->uc_next;
-				} else {
-					last = client;
+				/* Construct an async worker for informing the server of our
+				 * presence, as well as to wait for it to accept(2) us. */
+				job = async_job_alloc(&UnixSocket_WaitForAccept);
+				TRY {
+					/* Inform the server that we're trying to connect to it */
+					REF struct unix_client *next, *last;
+					do {
+						next = ATOMIC_READ(bind_node->s_server.us_acceptme);
+						if unlikely(next == UNIX_SERVER_ACCEPTME_SHUTDOWN)
+							THROW(E_NET_CONNECTION_REFUSED); /* The server got shut down. */
+					} while (!ATOMIC_CMPXCH_WEAK(bind_node->s_server.us_acceptme,
+					                             next, NULL));
+					last = next;
+					if (last) {
+						while (last->uc_next)
+							last = last->uc_next;
+					} else {
+						last = client;
+					}
+					/* Insert our new client. */
+					client->uc_next = next;
+					/* Re-install the chain of _all_ new clients, as well as
+					 * check that the total # of pending clients isn't too large. */
+					if (!unix_server_append_acceptme(&bind_node->s_server,
+					                                 client, last, client))
+						THROW(E_NET_CONNECTION_REFUSED);
+	
+				} EXCEPT {
+					async_job_free(job);
 				}
-				/* Insert our new client. */
-				client->uc_next = next;
-				/* Re-install the chain of _all_ new clients, as well as
-				 * check that the total # of pending clients isn't too large. */
-				if (!unix_server_append_acceptme(&bind_node->s_server,
-				                                 client, last, client))
-					THROW(E_NET_CONNECTION_REFUSED);
-
 			} EXCEPT {
-				async_job_free(job);
+				destroy(client);
+				RETHROW();
 			}
+			con = (struct async_accept_wait *)job;
+			con->aw_socket    = (REF UnixSocket *)weakincref(self);
+			con->aw_client    = client;    /* Inherit reference */
+			con->aw_bind_path = bind_path; /* Inherit reference */
+			con->aw_bind_name = bind_name; /* Inherit reference */
+			con->aw_bind_node = bind_node; /* Inherit reference */
+	
+			/* Start the job. */
+			decref(async_job_start(job, aio));
 		} EXCEPT {
-			destroy(client);
+			decref_unlikely(bind_path);
+			decref_unlikely(bind_name);
+			decref_unlikely(bind_node);
 			RETHROW();
 		}
-		con = (struct async_accept_wait *)job;
-		con->aw_socket    = (REF UnixSocket *)weakincref(self);
-		con->aw_client    = client;    /* Inherit reference */
-		con->aw_bind_path = bind_path; /* Inherit reference */
-		con->aw_bind_name = bind_name; /* Inherit reference */
-		con->aw_bind_node = bind_node; /* Inherit reference */
-
-		/* Start the job. */
-		decref(async_job_start(job, aio));
 	} EXCEPT {
-		decref_unlikely(bind_path);
-		decref_unlikely(bind_name);
-		decref_unlikely(bind_node);
+		ATOMIC_WRITE(me->us_node, NULL);
 		RETHROW();
 	}
 }
