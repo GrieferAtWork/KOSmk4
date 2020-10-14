@@ -171,8 +171,10 @@ NOTHROW(FCALL rehash_empty)(struct read_locks *__restrict locks) {
 		struct read_lock *heapmap;
 		heapmap        = locks->rls_vec;
 		locks->rls_vec = locks->rls_sbuf;
+		locks->rls_msk = CONFIG_TASK_STATIC_READLOCKS - 1;
 		kfree(heapmap);
 	}
+	assert(locks->rls_msk == CONFIG_TASK_STATIC_READLOCKS - 1);
 }
 
 /* Return a read-lock descriptor for `lock', or allocate a new one. */
