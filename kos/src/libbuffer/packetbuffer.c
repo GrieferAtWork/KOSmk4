@@ -401,7 +401,7 @@ allocate_buffer_extension:
 #if (defined(HEAP_NONBLOCK_TRUNCATE_IN_PLACE_NX) || \
      (!defined(PB_BUFFER_BLOB_FREE_NEEDS_SIZE) &&   \
       defined(HEAP_NONBLOCK_TRUNCATE_IN_PLACE_NX_V)))
-		{
+		if (self->pb_bbas < self->pb_bend) {
 			size_t final_size;
 			final_size = ((byte_t *)self->pb_wptr -
 			              self->pb_bbas) +
