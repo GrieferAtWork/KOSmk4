@@ -35,6 +35,7 @@
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -565,7 +566,18 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
                          struct rpc_syscall_info const *sc_info) {
 	struct icpustate *result;
 	error_code_t code;
+	/* Assert that there are no active connections. */
+#ifndef NDEBUG
+	{
+		struct task_connections *self;
+		struct task_connection *con;
+		self = THIS_CONNECTIONS;
+		con = self->tcs_con;
+		assertf(con == NULL, "con = %p", con);
+	}
+#else /* NDEBUG */
 	assert(!task_isconnected());
+#endif /* !NDEBUG */
 
 	/* Handle special exception codes */
 	code = PERTASK_GET(this_exception_code);
