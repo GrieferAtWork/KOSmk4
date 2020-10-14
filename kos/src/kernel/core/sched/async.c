@@ -389,6 +389,7 @@ again:
 				task_connect_for_poll(&awork_changed);
 				received_signal = task_waitfor(asyncmain_timeout_p);
 			} EXCEPT {
+				task_disconnectall();
 				error_printf("_asyncmain:task_waitfor()");
 				goto again;
 			}
