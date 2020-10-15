@@ -365,6 +365,21 @@ int main_environ(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+int main_args(int argc, char *argv[], char *envp[]) {
+	int i;
+	(void)argv, (void)envp;
+	printf("argc = %d\n", argc);
+	for (i = 0; i < argc; ++i)
+		printf("argv[%d] = %q\n", i, argv[i]);
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
 int main_prognam(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("program_invocation_name       = %q\n", program_invocation_name);
@@ -949,6 +964,7 @@ typedef struct {
 } DEF;
 PRIVATE DEF defs[] = {
 	{ "environ", &main_environ },
+	{ "args", &main_args },
 	{ "dprint", &main_dprint },
 	{ "prognam", &main_prognam },
 	{ "rawterm", &main_rawterm },
@@ -1008,8 +1024,15 @@ int main(int argc, char *argv[], char *envp[]) {
 		return 1;
 	}
 	for (i = 0; defs[i].n; ++i) {
-		if (strcmp(defs[i].n, argv[1]) == 0)
-			return (*defs[i].f)(argc - 1, argv + 1, envp);
+		if (strcmp(defs[i].n, argv[1]) == 0) {
+			/* The `args' program is special, in that we mustn't
+			 * strip the initial `playground' argument from it. */
+			if (strcmp(defs[i].n, "args") != 0) {
+				--argc;
+				++argv;
+			}
+			return (*defs[i].f)(argc, argv, envp);
+		}
 	}
 	fprintf(stderr, "Unknown name %q\n", argv[1]);
 	return 1;
