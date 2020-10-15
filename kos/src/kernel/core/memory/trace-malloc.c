@@ -1814,7 +1814,6 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void **__restrict buffer, size_t 
 #if 1
 	TRY {
 		struct lcpustate oldstate;
-		oldstate = *state;
 		/* NOTE: Despite this being for debugging purposes, _DONT_ use `unwind_for_debug()' here!
 		 *       That one has to make use of the kernel heap (and consequently us) in order
 		 *       to be able to construct user-space program/section descriptors, etc, where-as

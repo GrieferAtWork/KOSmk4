@@ -146,9 +146,9 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
  * apply, meaning that the (true) caller must ensure that their
  * CPU won't change, and that `sender_thread' is also running as
  * part of their CPU. */
-FUNDEF NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast_as)(struct sig *__restrict self,
-                                struct task *__restrict sender_thread);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
+                                     struct task *__restrict sender_thread);
 
 /* Same as `sig_broadcast()', don't immediatly destroy threads when their
  * reference counter reaches 0. Instead, chain those threads together and

@@ -23,13 +23,13 @@
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_broadcast 1
 //#define DEFINE_sig_altbroadcast 1
-//#define DEFINE_sig_broadcast_as 1
+//#define DEFINE_sig_broadcast_as_nopr 1
 #define DEFINE_sig_broadcast_destroylater_nopr 1
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_sig_send) /**/ + defined(DEFINE_sig_altsend) +      \
      defined(DEFINE_sig_broadcast) + defined(DEFINE_sig_altbroadcast) + \
-     defined(DEFINE_sig_broadcast_as) + defined(DEFINE_sig_broadcast_destroylater_nopr)) != 1
+     defined(DEFINE_sig_broadcast_as_nopr) + defined(DEFINE_sig_broadcast_destroylater_nopr)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
@@ -64,23 +64,42 @@ NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
 PUBLIC NOBLOCK NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
                                 struct sig *sender)
-#elif defined(DEFINE_sig_broadcast_as)
+#elif defined(DEFINE_sig_broadcast_as_nopr)
 #define HAVE_BROADCAST
 #define HAVE_BROADCAST_RESULT
 #define HAVE_SENDER_THREAD
-/* Send signal to all connected threads.
- * @return: * : The actual number of threads notified,
- *              not counting poll-based connections. */
-PUBLIC NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast_as)(struct sig *__restrict self,
-                                struct task *__restrict sender_thread)
+#define HAVE_NOPREEMPT
+/* Same as `sig_broadcast()', but impersonate `sender_thread', and
+ * wake up thread through use of `task_wake_as()'. The same rules
+ * apply, meaning that the (true) caller must ensure that their
+ * CPU won't change, and that `sender_thread' is also running as
+ * part of their CPU. */
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
+                                     struct task *__restrict sender_thread)
 #elif defined(DEFINE_sig_broadcast_destroylater_nopr)
 #define HAVE_BROADCAST
 #define HAVE_DESTROYLATER
 #define HAVE_NOPREEMPT
-/* Send signal to all connected threads.
- * @return: * : The actual number of threads notified,
- *              not counting poll-based connections. */
+/* Same as `sig_broadcast()', don't immediatly destroy threads when their
+ * reference counter reaches 0. Instead, chain those threads together and
+ * return them to the caller, to-be destroyed at their leisure.
+ *
+ * This function is needed to comply with the no-decref requirement of AIO
+ * completion functions that have yet to invoke `aio_handle_release()':
+ * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
+ * >> NOTHROW(FCALL my_aio_completion)(struct aio_handle *__restrict self,
+ * >>                                  unsigned int status) {
+ * >>     struct task *delme_threads;
+ * >>     delme_threads = sig_broadcast_destroylater_nopr((struct sig *)self->ah_data[0]);
+ * >>     aio_handle_release(self);
+ * >>     while (unlikely(delme_threads)) {
+ * >>         struct task *next;
+ * >>         next = sig_destroylater_next(delme_threads);
+ * >>         destroy(delme_threads);
+ * >>         delme_threads = next;
+ * >>     }
+ * >> } */
 PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct task *
 NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self)
 #endif /* ... */
@@ -101,6 +120,9 @@ NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self)
 #else /* HAVE_SENDER */
 #define SIG_SENDER self
 #endif /* !HAVE_SENDER */
+#ifdef HAVE_NOPREEMPT
+	assert(!PREEMPTION_ENABLED());
+#endif /* HAVE_NOPREEMPT */
 again:
 #if SIG_SMPLOCK_BIT != 0
 	/* Lock the signal. */
@@ -373,7 +395,8 @@ done_nocon_nounlock:
 
 DECL_END
 
-#undef DEFINE_sig_broadcast_as
+#undef DEFINE_sig_broadcast_destroylater_nopr
+#undef DEFINE_sig_broadcast_as_nopr
 #undef DEFINE_sig_altbroadcast
 #undef DEFINE_sig_broadcast
 #undef DEFINE_sig_altsend

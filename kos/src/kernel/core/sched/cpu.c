@@ -248,7 +248,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		 *
 		 * Our current thread context is already too broken to allow us to
 		 * re-schedule others threads that may be waiting for us to exit. */
-		sig_broadcast_as(&pid->tp_changed, next);
+		sig_broadcast_as_nopr(&pid->tp_changed, next);
 	}
 
 	/* Good bye... */

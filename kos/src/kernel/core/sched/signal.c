@@ -854,7 +854,7 @@ DECL_END
 #define DEFINE_sig_altbroadcast 1
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_as 1
+#define DEFINE_sig_broadcast_as_nopr 1
 #include "signal-send.c.inl"
 
 #define DEFINE_sig_broadcast_destroylater_nopr 1
