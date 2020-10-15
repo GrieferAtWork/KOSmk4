@@ -230,7 +230,7 @@ __SYSDECL_BEGIN
  *       The stack memory itself will be lazily allocated on access and be pre-initialized
  *       to either all ZEROs or a debug constant such as `0xCC'.
  * NOTE: Of course this auto-generated stack will also be automatically
- *       munmap()'ed once the thread exists, meaning it's the perfect solution
+ *       munmap()'ed once the thread exits, meaning it's the perfect solution
  *       for simple user-space multithreading that doesn't want to use <pthread.h>. */
 /* TODO: KOSmk4 no longer supports automatic user-space stacks, but this
  *       functionality is currently assumed and made use of by `_beginthreadex(3)'.

@@ -19,5 +19,17 @@
  */
 #ifndef _MEM_H
 #define _MEM_H 1
+
 #include <memory.h>
+
+#ifndef __ptrdiff_t_defined
+#include <hybrid/typecore.h>
+#ifndef __ptrdiff_t_defined
+#define __ptrdiff_t_defined 1
+__DECL_BEGIN
+typedef __PTRDIFF_TYPE__ ptrdiff_t;
+__DECL_END
+#endif /* !__ptrdiff_t_defined */
+#endif /* !__ptrdiff_t_defined */
+
 #endif /* !_MEM_H */

@@ -401,7 +401,7 @@ INTDEF WUNUSED NONNULL((1)) int DLFCN_CC libdl_dltlsfree(DlModule *self);
  * NOTE: TLS Segments are allocated and initialized lazily, meaning that the initializer
  *       passed to `dltlsalloc()' will be called by this function upon the first use of
  *       that segment within each individual thread, also causing the finalizer to be
- *       enqueued for invocation when the calling thread exists.
+ *       enqueued for invocation when the calling thread exits.
  * WARNING: The order in which TLS finalizers are invoked is entirely UNDEFINED!
  * NOTE: the given `TLS_HANDLE' may also be a module handle, as returned by `dlopen()',
  *       in which case this function returns a pointer to the TLS segment of that module for

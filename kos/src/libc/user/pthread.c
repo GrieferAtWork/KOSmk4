@@ -211,7 +211,7 @@ PRIVATE struct atomic_rwlock pthread_default_attr_lock = ATOMIC_RWLOCK_INIT;
 
 
 
-/* Called just before a thread exists (used to destroy() the thread's
+/* Called just before a thread exits (used to destroy() the thread's
  * `pthread_self' structure in case the thread was detached) */
 INTERN ATTR_SECTION(".text.crt.sched.pthread.pthread_onexit") void
 NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
@@ -336,7 +336,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	pt = current_from_tls(tls);
 	/* This should only be able to fail when libc isn't part of the static TLS
 	 * segment, which can only happen when libc was loaded by dlopen(), rather
-	 * can coming pre-loaded by the initial application. */
+	 * having been pre-loaded by one of the initial application's DT_NEEDED-s. */
 	if unlikely(!pt)
 		goto err_nomem_tls;
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK

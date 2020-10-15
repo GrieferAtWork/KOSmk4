@@ -41,6 +41,9 @@ DECL_BEGIN
  *       the number of relocations within the resulting libc.so! */
 INTDEF ATTR_THREAD struct pthread current;
 
+/* Return a handle for libc.so, as would also be returned by `dlopen("libc.so")'
+ * Note however that this function doesn't return a new reference to libc's
+ * shared library handle, but rather simply returns the raw handle pointer. */
 #ifdef LIBC_ARCH_HAVE_LIBC_HANDLE
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(LIBCCALL libc_handle)(void);
 #else /* LIBC_ARCH_HAVE_LIBC_HANDLE */

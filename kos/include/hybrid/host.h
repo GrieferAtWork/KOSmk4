@@ -63,16 +63,19 @@
 #define __ia64__ 1
 #endif /* __ia64__... */
 
-#if (!defined(__sparc64__) && \
-     (defined(__sparc64) ||   \
-      (defined(__sparc__) && defined(__arch64__))))
-#define __sparc64__ 1
-#endif /* __sparc64__... */
+#if !defined(__sparc__) && defined(__sparc)
+#define __sparc__ 1
+#endif /* __sparc__... */
 
 #if (!defined(__sparcv9__) && defined(__sparcv9))
 #define __sparcv9__ 1
 #endif /* __sparcv9__... */
 
+#if (!defined(__sparc64__) &&                       \
+     (defined(__sparc64) || defined(__sparcv9__) || \
+      (defined(__sparc__) && defined(__arch64__))))
+#define __sparc64__ 1
+#endif /* __sparc64__... */
 
 #undef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #ifdef _ALIGNMENT_REQUIRED
