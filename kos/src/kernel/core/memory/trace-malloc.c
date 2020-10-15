@@ -523,7 +523,7 @@ NOTHROW(KCALL kmalloc_untrace_n_impl)(void *base, size_t num_bytes,
 			}
 			/* Truncate the node near its upper end. */
 			uend                 = trace_node_uend(node);
-			node->tn_link.a_vmax = (uintptr_t)base;
+			node->tn_link.a_vmax = (uintptr_t)base - 1;
 			base                 = uend;
 			trace_node_tree_insert(&nodes, node);
 			lock_break();
@@ -1426,7 +1426,7 @@ kmalloc_leaks_gather(void) {
 	}	__WHILE0
 
 /* Check if `lhs < rhs' as far as priority goes. */
-PRIVATE ATTR_COLDTEXT WUNUSED NONNULL((1, 2)) bool KCALL
+PRIVATE ATTR_COLDTEXT ATTR_PURE WUNUSED NONNULL((1, 2)) bool KCALL
 trace_node_isbelow(struct trace_node *__restrict lhs,
                    struct trace_node *__restrict rhs) {
 	/* Leaks with more XREFS should code before ones with less. */
@@ -1483,6 +1483,8 @@ kmalloc_leaks_sort(struct trace_node *leaks) {
 			if (leak == leak2)
 				continue;
 			trace_node_leak_getscan_uminmax(leak2, leak2_min, leak2_max);
+			/* TODO: If `leak' or `leak2' is `TRACE_NODE_KIND_BITSET', then
+			 *       we must ensure to only check traced areas for xrefs! */
 			FOREACH_XREF_BEGIN(ptr, pptr,
 			                   leak2_min, leak2_max,
 			                   leak_min, leak_max) {
@@ -1699,6 +1701,8 @@ kmalloc_leaks_print(kmalloc_leak_t leaks,
 			if (xref_leak == iter)
 				continue;
 			trace_node_leak_getscan_uminmax(xref_leak, xref_umin, xref_umax);
+			/* TODO: If `iter' or `xref_leak' is `TRACE_NODE_KIND_BITSET', then
+			 *       we must ensure to only check traced areas for xrefs! */
 			FOREACH_XREF_BEGIN(ptr, pptr, xref_umin, xref_umax, umin, umax) {
 				PRINTF("\tReferenced at *%p=%p", pptr, ptr);
 				if ((uintptr_t)ptr > umin)
