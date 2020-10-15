@@ -33,7 +33,6 @@
 
 #ifdef CONFIG_DEBUG_MALLOC
 #include <kernel/malloc.h>
-#ifdef CONFIG_USE_NEW_DEBUG_MALLOC
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <kernel/addr2line.h>
@@ -2151,7 +2150,6 @@ DECL_END
 #include "trace-malloc-heap.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* CONFIG_USE_NEW_DEBUG_MALLOC */
 #endif /* CONFIG_DEBUG_MALLOC */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_TRACE_MALLOC_C */

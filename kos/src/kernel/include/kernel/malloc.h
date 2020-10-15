@@ -357,15 +357,8 @@ NOTHROW(KCALL krealloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 
 
-#undef CONFIG_USE_NEW_DEBUG_MALLOC
-#if 1
-#define CONFIG_USE_NEW_DEBUG_MALLOC 1
-#endif
-
 #ifdef CONFIG_DEBUG_MALLOC
 #ifdef __CC__
-
-#ifdef CONFIG_USE_NEW_DEBUG_MALLOC
 
 /* Trace a given address range `base...+=num_bytes' for the purposes
  * of having that range checked during GC memory leak detection.
@@ -464,90 +457,10 @@ kmalloc_leaks_print(kmalloc_leak_t leaks,
 FUNDEF NOBLOCK void
 NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks);
 
-#else /* CONFIG_USE_NEW_DEBUG_MALLOC */
-
-/* Search for and dump kernel memory leaks,
- * returning the number of encountered leaks.
- * @throws: E_WOULDBLOCK: `GFP_ATOMIC' was not given, preemption was
- *                        disabled, and the operation would have blocked.
- */
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) size_t KCALL
-mall_dump_leaks(gfp_t flags) THROWS(E_WOULDBLOCK);
-
-/* Validate padding surrounding heap pointers to check if
- * memory has been written past allocated end addresses.  */
-FUNDEF NOBLOCK void NOTHROW(KCALL mall_validate_padding)(void);
-
-/* Add/Remove a given address range as a valid tracing junction:
- *   - Tracing junctions are blocks of memory which may contain
- *     points to other tracing junction, or regular mall-pointers.
- *   - When searching for leaked data blocks, KOS will dereference
- *     mall-pointers that are referenced in some way by any active
- *     component of the operating system:
- *       - Pointers found in general purpose registers of any
- *         running thread (if preempted while in the kernel)
- *       - Pointers found in the used part of the kernel stack
- *         of any running thread
- *       - Pointers found in writable global variables (.data & .bss)
- *     The definition of a pointer is as follows:
- *       - Points into the kernel-share segment (only required for `GFP_SHARED' heap pointers)
- *       - Dereferencable (memory is mapped where it points to)
- *       - Is aligned by at least `sizeof(void *)'
- *     The definition of a mall-pointer is as follows:
- *       - Points into the usable memory portion of any kmalloc()-allocated
- *         data block (including leading and trailing padding data used to
- *         verify write-past-the-end errors using `mall_validate_padding()')
- *   - This is all well and good, and the kernel can easily detect
- *     leaked memory by recursively traversing all allocated memory
- *     in search of pointers to other allocated memory blocks.
- *     The fact that memory is pre-initialized to a consistent
- *     debug state when `CONFIG_DEBUG_HEAP' is enabled makes this
- *     even easier.
- *     However the problem comes when code uses custom allocators
- *     that make use of the `heap_alloc()' API.
- *     Since the mall API is built ontop of that API, there is no
- *     connection that points back to the heap API and would allow
- *     the MALL GC checker to differentiate between some random data
- *     word, and a pointer that is directed into a data block of some
- *     specific length, which in itself is allowed to hold pointers to
- *     other data blocks, some of which are allowed to be other mall
- *     blocks.
- *     However despite the fact that it might seem obvious to the programmer
- *     that a data block allocated using `heap_alloc()' should be able to
- *     hold pointers to data blocks allocated using `kmalloc()', this is
- *     not the case (out of the box), because again: the MALL GC checker
- *     would not be able to know what (if any) memory pointed to by that
- *     data block can carry GC-able pointers.
- *   - The solution is to use this function pair to inform mall about
- *     some custom data block that can be used during traversable of
- *     reachable memory.
- *     If itself reachable (through the means described above), that data
- *     block will be analyzed just like any other data block allocated
- *     using `kmalloc()' would have been.
- *     Additionally, if not reachable during MALL GC search, the data
- *     block will be dumped as a leak alongside a traceback to the
- *     call to `mall_trace()' that registered that data block.
- *   - Be sure to use `mall_untrace()' to delete the data block once
- *     it should no longer act as a proxy (usually just before a call
- *     to `heap_free_untraced()'), by passing the address of any pointer that
- *     is considered to be part of that block `>= base && < base+num_bytes'.
- *     Usually, you'll just be passing `base', as `heap_free_untraced()' will
- *     be needing that same pointer from you.
- *    (Or just use `heap_free()' to have that be done automatically for you)
- * @return: base: Successfully started tracing the given pointer.
- * @return: NULL: Pointer tracing failed (not enough available memory) */
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL mall_trace(void *base, size_t num_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK);
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void *NOTHROW(KCALL mall_trace_nx)(void *base, size_t num_bytes, gfp_t flags);
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_print_traceback)(void *ptr, gfp_t flags);
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace)(void *ptr, gfp_t flags);
-FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace_n)(void *ptr, size_t num_bytes, gfp_t flags);
-#endif /* !CONFIG_USE_NEW_DEBUG_MALLOC */
-
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss.mall.untracked")
 #else /* CONFIG_DEBUG_MALLOC */
 #ifdef __CC__
-#ifdef CONFIG_USE_NEW_DEBUG_MALLOC
 #define kmalloc_trace(base, num_bytes, flags, tb_skip)    (base)
 #define kmalloc_trace_nx(base, num_bytes, flags, tb_skip) (base)
 #define kmalloc_untrace(...)                              (void)0
@@ -555,14 +468,10 @@ FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace_n)(void *p
 #define kmalloc_traceback(ptr, tb, buflen)                0
 #define kmalloc_validate()                                (void)0
 #define kmalloc_leaks()                                   0
-#else /* CONFIG_USE_NEW_DEBUG_MALLOC */
-#define mall_dump_leaks(flags)              0
-#define mall_validate_padding()             (void)0
-#define mall_trace(base, num_bytes, flags)  (base)
-#define mall_print_traceback(ptr, flags)    (void)0
-#define mall_untrace(ptr, flags)            (void)0
-#define mall_untrace_n(ptr, n_bytes, flags) (void)0
-#endif /* !CONFIG_USE_NEW_DEBUG_MALLOC */
+#define kmalloc_leaks_collect()                           __NULLPTR
+#define kmalloc_leaks_print(leaks, printer, arg, pnum_leaks) \
+	(((pnum_leaks) ? (void)*(pnum_leaks) = 0 : (void)), (ssize_t)0)
+#define kmalloc_leaks_discard(leaks) (void)0
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss")
 #endif /* !CONFIG_DEBUG_MALLOC */
