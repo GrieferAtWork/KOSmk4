@@ -332,8 +332,8 @@ DEFINE_SYSCALL4(errno_t, fmkdirat, fd_t, dirfd,
 	                 E_INVALID_ARGUMENT_CONTEXT_FMKDIRAT_FLAGS);
 	fsmode = fs_getmode_for(f, flags);
 	validate_readable(pathname, 1);
-	VALIDATE_FLAGSET(mode, 07777,
-	                 E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
+	if (has_personality(KP_MKDIR_CHECK_MODE))
+		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
 	p = path_traverse_at_recent(f,
 	                            (unsigned int)dirfd,
 	                            pathname,
@@ -352,7 +352,7 @@ DEFINE_SYSCALL4(errno_t, fmkdirat, fd_t, dirfd,
 		result_dir = directory_mkdir(dir,
 		                             last_seg,
 		                             last_seglen,
-		                             mode & ~ATOMIC_READ(f->f_umask),
+		                             mode & 07777 & ~ATOMIC_READ(f->f_umask),
 		                             fs_getuid(f),
 		                             fs_getgid(f),
 		                             fsmode & FS_MODE_FDOSPATH ? DIRECTORY_MKDIR_FNOCASE
@@ -374,8 +374,8 @@ DEFINE_SYSCALL3(errno_t, mkdirat, fd_t, dirfd,
 	REF struct directory_node *dir, *result_dir;
 	fsmode_t fsmode = ATOMIC_READ(f->f_mode.f_atflag);
 	validate_readable(pathname, 1);
-	VALIDATE_FLAGSET(mode, 07777,
-	                 E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
+	if (has_personality(KP_MKDIR_CHECK_MODE))
+		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
 	p = path_traverse_at_recent(f,
 	                            (unsigned int)dirfd,
 	                            pathname,
@@ -394,7 +394,7 @@ DEFINE_SYSCALL3(errno_t, mkdirat, fd_t, dirfd,
 		result_dir = directory_mkdir(dir,
 		                             last_seg,
 		                             last_seglen,
-		                             mode & ~ATOMIC_READ(f->f_umask),
+		                             mode & 07777 & ~ATOMIC_READ(f->f_umask),
 		                             fs_getuid(f),
 		                             fs_getgid(f),
 		                             fsmode & FS_MODE_FDOSPATH ? DIRECTORY_MKDIR_FNOCASE
@@ -416,8 +416,10 @@ DEFINE_SYSCALL2(errno_t, mkdir,
 	REF struct directory_node *dir, *result_dir;
 	fsmode_t fsmode = ATOMIC_READ(f->f_mode.f_atflag);
 	validate_readable(pathname, 1);
-	VALIDATE_FLAGSET(mode, 07777,
-	                 E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
+	if (has_personality(KP_MKDIR_CHECK_MODE)) {
+		VALIDATE_FLAGSET(mode, 07777,
+		                 E_INVALID_ARGUMENT_CONTEXT_MKDIR_MODE);
+	}
 	p = path_traverse_recent(f,
 	                         pathname,
 	                         &last_seg,
@@ -435,7 +437,7 @@ DEFINE_SYSCALL2(errno_t, mkdir,
 		result_dir = directory_mkdir(dir,
 		                             last_seg,
 		                             last_seglen,
-		                             mode & ~ATOMIC_READ(f->f_umask),
+		                             mode & 07777 & ~ATOMIC_READ(f->f_umask),
 		                             fs_getuid(f),
 		                             fs_getgid(f),
 		                             fsmode & FS_MODE_FDOSPATH ? DIRECTORY_MKDIR_FNOCASE
@@ -1606,7 +1608,8 @@ DEFINE_SYSCALL4(errno_t, fchmodat, fd_t, dirfd,
 	struct fs *f = THIS_FS;
 	REF struct inode *node;
 	validate_readable(filename, 1);
-	VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
+	if (has_personality(KP_CHMOD_CHECK_MODE))
+		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
 	VALIDATE_FLAGSET(flags,
 	                 AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_FCHMODAT_FLAGS);
@@ -1621,7 +1624,7 @@ DEFINE_SYSCALL4(errno_t, fchmodat, fd_t, dirfd,
 	                            NULL);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
-		inode_chmod(node, 0, mode);
+		inode_chmod(node, 0, mode & 07777);
 	}
 	return -EOK;
 }
@@ -1630,11 +1633,12 @@ DEFINE_SYSCALL4(errno_t, fchmodat, fd_t, dirfd,
 #ifdef __ARCH_WANT_SYSCALL_FCHMOD
 DEFINE_SYSCALL2(errno_t, fchmod, fd_t, fd, mode_t, mode) {
 	REF struct inode *node;
-	VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
+	if (has_personality(KP_CHMOD_CHECK_MODE))
+		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
 	node = handle_get_inode((unsigned int)fd);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
-		inode_chmod(node, 0, mode);
+		inode_chmod(node, 0, mode & 07777);
 	}
 	return -EOK;
 }
@@ -1645,7 +1649,8 @@ DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mod
 	struct fs *f = THIS_FS;
 	REF struct inode *node;
 	validate_readable(filename, 1);
-	VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
+	if (has_personality(KP_CHMOD_CHECK_MODE))
+		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE);
 	node = path_traversefull(f,
 	                         filename,
 	                         true,
@@ -1656,7 +1661,7 @@ DEFINE_SYSCALL2(errno_t, chmod, USER CHECKED char const *, filename, mode_t, mod
 	                         NULL);
 	{
 		FINALLY_DECREF_UNLIKELY(node);
-		inode_chmod(node, 0, mode);
+		inode_chmod(node, 0, mode & 07777);
 	}
 	return -EOK;
 }

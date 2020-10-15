@@ -44,6 +44,10 @@ enum {
 	                           *   - python: Whether intentional or not, python has problems updating its *.pyc
 	                           *             files when this personality is enabled. */
 	KP_PIDFD_OPEN_THREAD,     /* [default=0] Allow `pidfd_open()' to be used to open thread handles. */
+	KP_CHMOD_CHECK_MODE,      /* [default=0] The `chmod()' family of system calls will assert that
+	                           *             the `mode' argument can be masked by `07777' */
+	KP_MKDIR_CHECK_MODE,      /* [default=0] The `mkdir()' family of system calls will assert that
+	                           *             the `mode' argument can be masked by `07777' */
 	KP_COUNT,                 /* # of different personality codes. */
 };
 #endif /* __CC__ */
@@ -66,6 +70,10 @@ enum {
                                                            *   - python: Whether intentional or not, python has problems updating its *.pyc
                                                            *             files when this personality is enabled. */
 #define KP_PIDFD_OPEN_THREAD     KP_PIDFD_OPEN_THREAD     /* [default=0] Allow `pidfd_open()' to be used to open thread handles. */
+#define KP_CHMOD_CHECK_MODE      KP_CHMOD_CHECK_MODE      /* [default=0] The `chmod()' family of system calls will assert that
+                                                           *             the `mode' argument can be masked by `07777' */
+#define KP_MKDIR_CHECK_MODE      KP_MKDIR_CHECK_MODE      /* [default=0] The `mkdir()' family of system calls will assert that
+                                                           *             the `mode' argument can be masked by `07777' */
 #define KP_COUNT                 KP_COUNT                 /* # of different personality codes. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define KP_INVALID               0 /* Invalid/unused personality code. */
@@ -85,7 +93,11 @@ enum {
                                     *   - python: Whether intentional or not, python has problems updating its *.pyc
                                     *             files when this personality is enabled. */
 #define KP_PIDFD_OPEN_THREAD     2 /* [default=0] Allow `pidfd_open()' to be used to open thread handles. */
-#define KP_COUNT                 3 /* # of different personality codes. */
+#define KP_CHMOD_CHECK_MODE      3 /* [default=0] The `chmod()' family of system calls will assert that
+                                    *             the `mode' argument can be masked by `07777' */
+#define KP_MKDIR_CHECK_MODE      4 /* [default=0] The `mkdir()' family of system calls will assert that
+                                    *             the `mode' argument can be masked by `07777' */
+#define KP_COUNT                 5 /* # of different personality codes. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
