@@ -91,16 +91,19 @@ vm_exec(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
 	REF struct execabis_struct *abis;
 	size_t i;
-	{
+again_getabis:
+	abis = execabis.get();
+again_loadheader:
+	TRY {
 		size_t read_bytes;
 		/* Load the file header. */
 		read_bytes = inode_read(args->ea_xnode, args->ea_header, sizeof(args->ea_header), 0);
 		if unlikely(read_bytes < CONFIG_EXECABI_MAXHEADER)
 			memset(args->ea_header + read_bytes, 0, CONFIG_EXECABI_MAXHEADER - read_bytes);
+	} EXCEPT {
+		decref_unlikely(abis);
+		RETHROW();
 	}
-again_getabis:
-	abis = execabis.get();
-again_searchabis:
 	for (i = 0; i < abis->eas_count; ++i) {
 		unsigned int status;
 		struct execabi *abi = &abis->eas_abis[i];
@@ -137,7 +140,7 @@ again_searchabis:
 			 * to kill(2) or CTRL+C our process (in order words: we must
 			 * guaranty to be able to service RPCs when looping back) */
 			task_serve();
-			goto again_searchabis;
+			goto again_loadheader;
 		}
 	}
 	decref_unlikely(abis);
