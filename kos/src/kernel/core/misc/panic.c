@@ -390,8 +390,9 @@ PRIVATE ATTR_DBGRODATA char const *const assert_chk_options[] = {
 	[ASSERTION_OPTION_IGNORE_ALWAYS] = "ignore (always)",
 	NULL
 };
+
 PRIVATE ATTR_DBGBSS uintptr_t always_ignored_assertions[64] = { 0 };
-PRIVATE ATTR_PURE ATTR_COLDTEXT NOBLOCK bool
+PRIVATE ATTR_COLDTEXT ATTR_PURE NOBLOCK bool
 NOTHROW(KCALL is_pc_always_ignored)(uintptr_t pc) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {

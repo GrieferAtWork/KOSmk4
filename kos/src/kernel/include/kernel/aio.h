@@ -258,6 +258,7 @@ struct aio_handle_type {
 /* AIO completion callback. Guarantied to always be invoked _exactly_
  * once for each AIO operation started at any point before then.
  * NOTE: This callback is _always_ invoked with preemption disabled!
+ * NOTE: This callback _must_ _always_ invoke `aio_handle_release()'
  * @param: self:   The associated AIO operations handle.
  *                 When this function is invoked, this handle has already been
  *                 unbound from the AIO-capable device's chain of pending AIO
@@ -301,6 +302,50 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
 	AIO_HANDLE_HEAD
 	/* ... Handle-specific data goes here. */
 };
+
+/* Callback that _must_ be invoked from every possible `ah_func'-callback.
+ * After this callback has been invoked, the async handle itself may no
+ * longer be accessed, and some other thread/cpu polling the AIO handle
+ * to become completed can resume execution after this callback was invoked.
+ *
+ * Note that any other resources that may be released alongside the async
+ * handle itself must be released _after_ this callback has been invoked.
+ *
+ * This also means that an implementation of `ah_func' cannot use the normal
+ * sig_broadcast() function, but rather the special `sig_broadcast_nodecref()'
+ * function that passes references to threads that would be destroyed back to
+ * the caller, which must then be released _after_ this callback was invoked.
+ *
+ * This is required to prevent deadlock scenarios such as the following:
+ *      Setup: #1: Create a socket with an in-progress, async connect() operation
+ *             #2: Terminate the process that created the socket
+ *             #3: The socket's connect() operation completes
+ *
+ *      _asyncjob_main()
+ *      aio_handle_complete_nopr()          // The connect() operation has completed
+ *      aio_handle_generic_func()           // == ah_func  (note: this one must also invoke `aio_handle_release()')
+ *      sig_broadcast()                     // Wrong usage here
+ *          decref_unlikely(target_thread)  // This actually ends up destroying `target_thread'
+ *      task_destroy()
+ *      fini_this_handle_manager()
+ *      handle_manager_destroy()
+ *      handle_socket_decref()
+ *      socket_destroy()
+ *          decref_likely(self->sk_ncon.m_pointer)
+ *      socket_connect_aio_destroy()
+ *          aio_handle_generic_fini()
+ *              aio_handle_fini()
+ *              >> Deadlock here, since aio_handle_fini() can only return once
+ *                 aio_handle_release() has been called for the attached AIO.
+ *
+ * Solution: AIO completion functions, while allowed to decref() arbitrary objects, are
+ *           only allowed to do so after already having called `aio_handle_release()',
+ *           or when the object being decref's doesn't actually end up being destroyed. */
+#define aio_handle_release(self)                      \
+	(__hybrid_atomic_store((self)->ah_next,           \
+	                       AIO_HANDLE_NEXT_COMPLETED, \
+	                       __ATOMIC_RELEASE))
+
 
 /* No-op AIO handle type (intended for synchronous operations) */
 DATDEF struct aio_handle_type aio_noop_type;
@@ -369,12 +414,9 @@ LOCAL NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(KCALL aio_handle_complete_nopr)(/*inherit(always)*/ struct aio_handle *__restrict self,
                                         unsigned int status) {
 	__hybrid_assert(!PREEMPTION_ENABLED());
+	__hybrid_assert(!aio_handle_completed(self));
 	/* Invoke the completion callback */
 	(*self->ah_func)(self, status);
-	/* Mark the handle as finished. */
-	__hybrid_atomic_store(self->ah_next,
-	                      AIO_HANDLE_NEXT_COMPLETED,
-	                      __ATOMIC_RELEASE);
 }
 
 LOCAL NOBLOCK NONNULL((1)) void
@@ -389,10 +431,6 @@ NOTHROW(KCALL aio_handle_complete)(/*inherit(always)*/ struct aio_handle *__rest
 	__hybrid_assert(!aio_handle_completed(self));
 	/* Invoke the completion callback */
 	(*self->ah_func)(self, status);
-	/* Mark the handle as finished. */
-	__hybrid_atomic_store(self->ah_next,
-	                      AIO_HANDLE_NEXT_COMPLETED,
-	                      __ATOMIC_RELEASE);
 	PREEMPTION_POP(was);
 }
 

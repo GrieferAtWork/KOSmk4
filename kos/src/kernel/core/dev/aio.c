@@ -61,13 +61,21 @@ NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict se
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
                                         unsigned int status) {
+	struct task *delme_threads;
 	self->hg_status = status;
 	if (status == AIO_COMPLETION_FAILURE) {
 		memcpy(&self->hg_error, &THIS_EXCEPTION_DATA,
 		       sizeof(struct exception_data));
 	}
 	COMPILER_WRITE_BARRIER();
-	sig_broadcast(&self->hg_signal);
+	delme_threads = sig_broadcast_destroylater_nopr(&self->hg_signal);
+	aio_handle_release(self);
+	while (unlikely(delme_threads)) {
+		struct task *next;
+		next = sig_destroylater_next(delme_threads);
+		destroy(delme_threads);
+		delme_threads = next;
+	}
 }
 
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -97,6 +105,8 @@ NOTHROW(FCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict 
 	uintptr_t new_status;
 	hand = self->hg_controller;
 	self->hg_controller = AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE;
+	COMPILER_BARRIER();
+	aio_handle_release(self);
 	COMPILER_BARRIER();
 	assert(hand != AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED &&
 	       hand != AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
@@ -504,14 +514,15 @@ NOTHROW(FCALL aio_handle_async_func)(struct aio_handle *__restrict self,
                                      unsigned int status) {
 	struct async_aio_handle *me;
 	me = (struct async_aio_handle *)self;
-	aio_handle_async_restore_chain(me, me);
 	/* Invoke the user-defined completion function (if defined) */
 	if (me->aah_func) {
 		(*me->aah_func)(me, status);
 	} else {
+		aio_handle_release(me);
 		if (status == AIO_COMPLETION_FAILURE)
 			error_printf("Performing background AIO operation");
 	}
+	aio_handle_async_restore_chain(me, me);
 }
 
 

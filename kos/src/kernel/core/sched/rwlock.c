@@ -162,9 +162,7 @@ NOTHROW(FCALL rehash_empty)(struct read_locks *__restrict locks) {
 	assert(locks->rls_use == 0);
 	assert(locks->rls_cnt != 0);
 	/* Clear the static buffer. */
-	bzero(locks->rls_sbuf,
-	      CONFIG_TASK_STATIC_READLOCKS,
-	      sizeof(struct read_lock));
+	memset(locks->rls_sbuf, 0, sizeof(locks->rls_sbuf));
 	/* Try to switch back to the static hashmap. */
 	locks->rls_cnt = 0;
 	if unlikely(locks->rls_vec != locks->rls_sbuf) {
@@ -206,7 +204,7 @@ again:
 						/* Special case: When no locks are actually in use, then
 						 *               we can simply re-hash in-place by clearing
 						 *               the memory of the hash-vector.
-						 * Also: Try to revert to the original  */
+						 * Also: Try to revert to the original, static hash-vector. */
 						rehash_empty(locks);
 						goto again;
 					}
@@ -217,24 +215,21 @@ again:
 					 * our current size, */
 					if (locks->rls_use == locks->rls_cnt)
 						new_mask = (new_mask << 1) | 1;
-					/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
-					 *   #1: #PF
-					 *   #2: EXCEPTION
-					 *   #3: EXCEPTION: tryread(VM)  (To find the associated FDE)
-					 *   #4: FIND_READLOCK(VM)
-					 *   #5: #PF
-					 */
 
 					/* Check for special case: Try to re-use the static vector. */
 					old_vector = locks->rls_vec;
 					if (new_mask <= (CONFIG_TASK_STATIC_READLOCKS - 1) &&
 					    old_vector != locks->rls_sbuf) {
-						new_vector = locks->rls_sbuf;
-						new_mask = CONFIG_TASK_STATIC_READLOCKS - 1;
-						bzero(new_vector,
-						      CONFIG_TASK_STATIC_READLOCKS,
-						      sizeof(struct read_lock));
+						new_mask   = CONFIG_TASK_STATIC_READLOCKS - 1;
+						new_vector = (struct read_lock *)memset(locks->rls_sbuf, 0, sizeof(locks->rls_sbuf));
 					} else {
+						/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
+						 *   #1: #PF
+						 *   #2: EXCEPTION
+						 *   #3: EXCEPTION: tryread(VM)  (To find the associated FDE)
+						 *   #4: FIND_READLOCK(VM)
+						 *   #5: #PF
+						 */
 						new_vector = (struct read_lock *)kmalloc((new_mask + 1) *
 						                                         sizeof(struct read_lock),
 						                                         GFP_CALLOC | GFP_LOCKED |
@@ -299,7 +294,7 @@ again:
 						/* Special case: When no locks are actually in use, then
 						 *               we can simply re-hash in-place by clearing
 						 *               the memory of the hash-vector.
-						 * Also: Try to revert to the original  */
+						 * Also: Try to revert to the original, static hash-vector. */
 						rehash_empty(locks);
 						goto again;
 					}
@@ -310,22 +305,19 @@ again:
 					 * our current size, */
 					if (locks->rls_use == locks->rls_cnt)
 						new_mask = (new_mask << 1) | 1;
-					/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
-					 *   #1: #PF
-					 *   #2: EXCEPTION
-					 *   #3: EXCEPTION: tryread(VM)  (To find the associated FDE)
-					 *   #4: FIND_READLOCK(VM)
-					 *   #5: #PF
-					 */
 					old_vector = locks->rls_vec;
 					if (new_mask <= (CONFIG_TASK_STATIC_READLOCKS - 1) &&
 					    old_vector != locks->rls_sbuf) {
-						new_vector = locks->rls_sbuf;
-						new_mask = CONFIG_TASK_STATIC_READLOCKS - 1;
-						bzero(new_vector,
-						      CONFIG_TASK_STATIC_READLOCKS,
-						      sizeof(struct read_lock));
+						new_mask   = CONFIG_TASK_STATIC_READLOCKS - 1;
+						new_vector = (struct read_lock *)memset(locks->rls_sbuf, 0, sizeof(locks->rls_sbuf));
 					} else {
+						/* NOTE: Memory must be locked in-core, because otherwise the following loop can happen:
+						 *   #1: #PF
+						 *   #2: EXCEPTION
+						 *   #3: EXCEPTION: tryread(VM)  (To find the associated FDE)
+						 *   #4: FIND_READLOCK(VM)
+						 *   #5: #PF
+						 */
 						new_vector = (struct read_lock *)kmalloc_nx((new_mask + 1) *
 						                                            sizeof(struct read_lock),
 						                                            GFP_CALLOC | GFP_LOCKED |

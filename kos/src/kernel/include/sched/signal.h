@@ -150,6 +150,29 @@ FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as)(struct sig *__restrict self,
                                 struct task *__restrict sender_thread);
 
+/* Same as `sig_broadcast()', don't immediatly destroy threads when their
+ * reference counter reaches 0. Instead, chain those threads together and
+ * return them to the caller, to-be destroyed at their leisure.
+ *
+ * This function is needed to comply with the no-decref requirement of AIO
+ * completion functions that have yet to invoke `aio_handle_release()':
+ * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
+ * >> NOTHROW(FCALL my_aio_completion)(struct aio_handle *__restrict self,
+ * >>                                  unsigned int status) {
+ * >>     struct task *delme_threads;
+ * >>     delme_threads = sig_broadcast_destroylater_nopr((struct sig *)self->ah_data[0]);
+ * >>     aio_handle_release(self);
+ * >>     while (unlikely(delme_threads)) {
+ * >>         struct task *next;
+ * >>         next = sig_destroylater_next(delme_threads);
+ * >>         destroy(delme_threads);
+ * >>         delme_threads = next;
+ * >>     }
+ * >> } */
+FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct task *
+NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self);
+#define sig_destroylater_next(thread) KEY_task_vm_dead__next(thread)
+
 
 
 

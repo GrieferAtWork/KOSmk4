@@ -900,24 +900,37 @@ int main_udsocket(int argc, char *argv[], char *envp[]) {
 	/* At this point, we've got a full-duplex connection.
 	 * Time to send some data. */
 	{
-		char buf[64];
+		char buf[128];
 		ssize_t len;
-		len = write(accept_sock, "A->C", 4);
-		if (len != 4)
+		static char const msg1[] = "A->C";
+		static char const msg2[] = "C->A";
+		static char const msg3[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+		len = write(accept_sock, msg1, sizeof(msg1) - sizeof(char));
+		if (len != sizeof(msg1) - sizeof(char))
 			err(1, "write(accept_sock) returned: %" PRIdSIZ, len);
 		len = read(client_sock, buf, sizeof(buf));
-		if (len != 4)
+		if (len != sizeof(msg1) - sizeof(char))
 			err(1, "read(client_sock) returned: %" PRIdSIZ, len);
-		if (memcmp(buf, "A->C", 4) != 0)
+		if (memcmp(buf, msg1, sizeof(msg1) - sizeof(char)) != 0)
 			errc(1, EINVAL, "read(client_sock) returned data %$q", len, buf);
-		len = write(client_sock, "C->A", 4);
-		if (len != 4)
+		len = write(client_sock, msg2, sizeof(msg2) - sizeof(char));
+		if (len != sizeof(msg2) - sizeof(char))
 			err(1, "write(client_sock) returned: %" PRIdSIZ, len);
 		len = read(accept_sock, buf, sizeof(buf));
-		if (len != 4)
+		if (len != sizeof(msg2) - sizeof(char))
 			err(1, "read(accept_sock) returned: %" PRIdSIZ, len);
-		if (memcmp(buf, "C->A", 4) != 0)
+		if (memcmp(buf, msg2, sizeof(msg2) - sizeof(char)) != 0)
 			errc(1, EINVAL, "read(accept_sock) returned data %$q", len, buf);
+
+		len = write(accept_sock, msg3, sizeof(msg3) - sizeof(char));
+		if (len != sizeof(msg3) - sizeof(char))
+			err(1, "write(accept_sock) returned: %" PRIdSIZ, len);
+		len = read(client_sock, buf, sizeof(buf));
+		if (len != sizeof(msg3) - sizeof(char))
+			err(1, "read(client_sock) returned: %" PRIdSIZ, len);
+		if (memcmp(buf, msg3, sizeof(msg3) - sizeof(char)) != 0)
+			errc(1, EINVAL, "read(client_sock) returned data %$q", len, buf);
 	}
 
 	close(accept_sock);

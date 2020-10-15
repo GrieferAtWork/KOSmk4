@@ -23,12 +23,13 @@
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_broadcast 1
 //#define DEFINE_sig_altbroadcast 1
-#define DEFINE_sig_broadcast_as 1
+//#define DEFINE_sig_broadcast_as 1
+#define DEFINE_sig_broadcast_destroylater_nopr 1
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_sig_send) /**/ + defined(DEFINE_sig_altsend) +      \
      defined(DEFINE_sig_broadcast) + defined(DEFINE_sig_altbroadcast) + \
-     defined(DEFINE_sig_broadcast_as)) != 1
+     defined(DEFINE_sig_broadcast_as) + defined(DEFINE_sig_broadcast_destroylater_nopr)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
@@ -44,39 +45,56 @@ DECL_BEGIN
 PUBLIC NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL sig_send)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altsend)
-#define HAVE_SENDER 1
+#define HAVE_SENDER
 PUBLIC NOBLOCK NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL sig_altsend)(struct sig *self,
                            struct sig *sender)
 #elif defined(DEFINE_sig_broadcast)
-#define HAVE_BROADCAST 1
+#define HAVE_BROADCAST
+#define HAVE_BROADCAST_RESULT
 /* Send signal to all connected threads.
  * @return: * : The actual number of threads notified,
  *              not counting poll-based connections. */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast)
-#define HAVE_BROADCAST 1
-#define HAVE_SENDER 1
+#define HAVE_BROADCAST
+#define HAVE_BROADCAST_RESULT
+#define HAVE_SENDER
 PUBLIC NOBLOCK NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
                                 struct sig *sender)
 #elif defined(DEFINE_sig_broadcast_as)
-#define HAVE_BROADCAST 1
-#define HAVE_SENDER_THREAD 1
+#define HAVE_BROADCAST
+#define HAVE_BROADCAST_RESULT
+#define HAVE_SENDER_THREAD
 /* Send signal to all connected threads.
  * @return: * : The actual number of threads notified,
  *              not counting poll-based connections. */
 PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as)(struct sig *__restrict self,
                                 struct task *__restrict sender_thread)
+#elif defined(DEFINE_sig_broadcast_destroylater_nopr)
+#define HAVE_BROADCAST
+#define HAVE_DESTROYLATER
+#define HAVE_NOPREEMPT
+/* Send signal to all connected threads.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
+PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct task *
+NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self)
 #endif /* ... */
 {
-#ifdef HAVE_BROADCAST
+#ifdef HAVE_BROADCAST_RESULT
 	size_t result = 0;
-#endif /* HAVE_BROADCAST */
+#endif /* HAVE_BROADCAST_RESULT */
+#ifdef HAVE_DESTROYLATER
+	struct task *destroylater_threads = NULL;
+#endif /* HAVE_DESTROYLATER */
 	struct task_connection *con;
+#ifndef HAVE_NOPREEMPT
 	pflag_t was;
+#endif /* !HAVE_NOPREEMPT */
 #ifdef HAVE_SENDER
 #define SIG_SENDER sender
 	assert(sender);
@@ -93,21 +111,30 @@ again:
 #define NEED_done_nocon_nounlock
 		for (;;) {
 			task_pause();
+#ifndef HAVE_NOPREEMPT
 			was = PREEMPTION_PUSHOFF();
+#endif /* !HAVE_NOPREEMPT */
 			con = (struct task_connection *)ATOMIC_FETCHOR(self->s_ctl, SIG_SMPLOCK_BIT);
 			if (((uintptr_t)con & SIG_SMPLOCK_BIT) == 0)
 				break;
 preemption_pop_and_lock:
-			PREEMPTION_POP(was);
+#ifndef HAVE_NOPREEMPT
+			PREEMPTION_POP(was)
+#endif /* !HAVE_NOPREEMPT */
+			;
 		}
 	} else {
+#ifndef HAVE_NOPREEMPT
 		was = PREEMPTION_PUSHOFF();
+#endif /* !HAVE_NOPREEMPT */
 		con = (struct task_connection *)ATOMIC_FETCHOR(self->s_ctl, SIG_SMPLOCK_BIT);
 		if unlikely(((uintptr_t)con & SIG_SMPLOCK_BIT) != 0)
 			goto preemption_pop_and_lock;
 	}
 #else /* SIG_SMPLOCK_BIT != 0 */
+#ifndef HAVE_NOPREEMPT
 	was = PREEMPTION_PUSHOFF();
+#endif /* !HAVE_NOPREEMPT */
 	con = ATOMIC_READ(self->s_con);
 #endif /* SIG_SMPLOCK_BIT == 0 */
 
@@ -129,7 +156,9 @@ preemption_pop_and_lock:
 			assert(!next || ADDR_ISKERN(next));
 			assert(!SIG_SMPLOCK_TST(next));
 			ATOMIC_WRITE(self->s_con, next);
+#ifndef HAVE_NOPREEMPT
 			PREEMPTION_POP(was);
+#endif /* !HAVE_NOPREEMPT */
 		} else {
 			REF struct task *target_thread = NULL;
 			struct task_connections *real_target_cons;
@@ -144,18 +173,31 @@ preemption_pop_and_lock:
 			assert(!next || ADDR_ISKERN(next));
 			assert(!SIG_SMPLOCK_TST(next));
 			ATOMIC_WRITE(self->s_con, next);
+#ifndef HAVE_NOPREEMPT
 			PREEMPTION_POP(was);
+#endif /* !HAVE_NOPREEMPT */
 			if (target_thread) {
 #ifdef HAVE_SENDER_THREAD
 				task_wake_as(target_thread, sender_thread);
 #else /* HAVE_SENDER_THREAD */
 				task_wake(target_thread);
 #endif /* !HAVE_SENDER_THREAD */
+#ifdef HAVE_DESTROYLATER
+				assert(target_thread->t_refcnt > 0);
+				if unlikely(ATOMIC_FETCHDEC(target_thread->t_refcnt) == 1) {
+					/* Destroy this thread later... */
+					sig_destroylater_next(target_thread) = destroylater_threads;
+					destroylater_threads                 = target_thread;
+				}
+#else /* HAVE_DESTROYLATER */
 				decref_unlikely(target_thread);
+#endif /* !HAVE_DESTROYLATER */
 			}
 			/* Only normal connections count towards the returned # of threads. */
+#ifdef HAVE_BROADCAST_RESULT
 			if (TASK_CONNECTION_STAT_ISNORM(target_cons))
 				++result;
+#endif /* HAVE_BROADCAST_RESULT */
 		}
 		/* Try to wake up the remaining threads. */
 #ifdef __OPTIMIZE_SIZE__
@@ -210,14 +252,25 @@ again_find_receiver:
 			/* Unlock the signal, and wake-up the thread attached to the connection */
 			target_thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
 			_sig_smp_lock_release(self);
+#ifndef HAVE_NOPREEMPT
 			PREEMPTION_POP(was);
+#endif /* !HAVE_NOPREEMPT */
 			if (target_thread) {
 #ifdef HAVE_SENDER_THREAD
 				task_wake_as(target_thread, sender_thread);
 #else /* HAVE_SENDER_THREAD */
 				task_wake(target_thread);
 #endif /* !HAVE_SENDER_THREAD */
+#ifdef HAVE_DESTROYLATER
+				assert(target_thread->t_refcnt > 0);
+				if unlikely(ATOMIC_FETCHDEC(target_thread->t_refcnt) == 1) {
+					/* Destroy this thread later... */
+					sig_destroylater_next(target_thread) = destroylater_threads;
+					destroylater_threads                 = target_thread;
+				}
+#else /* HAVE_DESTROYLATER */
 				decref_unlikely(target_thread);
+#endif /* !HAVE_DESTROYLATER */
 			}
 			return true;
 		} else {
@@ -243,7 +296,9 @@ again_find_receiver:
 				assert(!next || ADDR_ISKERN(next));
 				assert(!SIG_SMPLOCK_TST(next));
 				ATOMIC_WRITE(self->s_con, next);
+#ifndef HAVE_NOPREEMPT
 				PREEMPTION_POP(was);
+#endif /* !HAVE_NOPREEMPT */
 			} else {
 				REF struct task *target_thread = NULL;
 				target_cons = TASK_CONNECTION_STAT_GETCONS(target_cons);
@@ -257,14 +312,25 @@ again_find_receiver:
 				assert(!next || ADDR_ISKERN(next));
 				assert(!SIG_SMPLOCK_TST(next));
 				ATOMIC_WRITE(self->s_con, next);
+#ifndef HAVE_NOPREEMPT
 				PREEMPTION_POP(was);
+#endif /* !HAVE_NOPREEMPT */
 				if (target_thread) {
 #ifdef HAVE_SENDER_THREAD
 					task_wake_as(target_thread, sender_thread);
 #else /* HAVE_SENDER_THREAD */
 					task_wake(target_thread);
 #endif /* !HAVE_SENDER_THREAD */
+#ifdef HAVE_DESTROYLATER
+					assert(target_thread->t_refcnt > 0);
+					if unlikely(ATOMIC_FETCHDEC(target_thread->t_refcnt) == 1) {
+						/* Destroy this thread later... */
+						sig_destroylater_next(target_thread) = destroylater_threads;
+						destroylater_threads                 = target_thread;
+					}
+#else /* HAVE_DESTROYLATER */
 					decref_unlikely(target_thread);
+#endif /* !HAVE_DESTROYLATER */
 				}
 			}
 			/* Try to wake up the remaining threads. */
@@ -280,22 +346,29 @@ again_find_receiver:
 
 /*done_nocon:*/
 	_sig_smp_lock_release(self);
+#ifndef HAVE_NOPREEMPT
 	PREEMPTION_POP(was);
+#endif /* !HAVE_NOPREEMPT */
 #ifdef NEED_done_nocon_nounlock
 #undef NEED_done_nocon_nounlock
 done_nocon_nounlock:
 #endif /* NEED_done_nocon_nounlock */
-#ifdef HAVE_BROADCAST
+#ifdef HAVE_BROADCAST_RESULT
 	return result;
-#else /* HAVE_BROADCAST */
+#elif defined(HAVE_DESTROYLATER)
+	return destroylater_threads;
+#else /* ... */
 	return false;
-#endif /* !HAVE_BROADCAST */
+#endif /* !... */
 #undef SIG_SENDER
 }
 
 #undef HAVE_SENDER_THREAD
+#undef HAVE_DESTROYLATER
+#undef HAVE_BROADCAST_RESULT
 #undef HAVE_BROADCAST
 #undef HAVE_SENDER
+#undef HAVE_NOPREEMPT
 
 
 DECL_END
