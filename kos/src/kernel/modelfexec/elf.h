@@ -17,24 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_EXEC_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_EXEC_H 1
+#ifndef GUARD_MODELFEXEC_ELF_H
+#define GUARD_MODELFEXEC_ELF_H 1
 
 #include <kernel/compiler.h>
 
-#include <kernel/arch/exec.h>
+#include <kernel/execabi.h>
 #include <kernel/types.h>
+
+#include <hybrid/host.h>
 
 #include <compat/config.h>
 #include <kos/exec/elf.h>
 
 #include <elf.h>
 
-#ifdef __ARCH_HAVE_COMPAT
-#include <compat/kos/exec/elf.h>
-#endif /* __ARCH_HAVE_COMPAT */
+#if defined(__i386__) || defined(__x86_64__)
+#include "arch/i386/elf.h"
+#endif /* Arch... */
 
 DECL_BEGIN
+
 
 struct icpustate;
 struct path;
@@ -45,7 +48,7 @@ struct vm_ramfile;
 
 /* Initialize user-space for program execution. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_ENTRY
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
                    KERNEL ElfW(Ehdr) const *__restrict ehdr,
                    USER void *peb_address, USER void *ustack_base,
@@ -54,7 +57,7 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 
 /* Initialize the RTLD user-space library for runtime linking. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_RTLD
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 elfexec_init_rtld(struct icpustate *__restrict user_state,
                   struct path *__restrict exec_path,
                   struct directory_entry *__restrict exec_dentry,
@@ -67,35 +70,12 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
                   size_t ustack_size, USER void *entry_pc);
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_RTLD */
 
-/* Base address and size symbols for the system RTLD */
-#ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_SYSTEM_RTLD
-DATDEF byte_t elfexec_system_rtld[];
-
-#undef elfexec_system_rtld_size
-#ifdef __INTELLISENSE__
-DATDEF size_t const elfexec_system_rtld_size;
-#else /* __INTELLISENSE__ */
-DATDEF byte_t elfexec_system_rtld_size[];
-#define elfexec_system_rtld_size ((size_t)elfexec_system_rtld_size)
-#endif /* !__INTELLISENSE__ */
-#endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_SYSTEM_RTLD */
-
-/* A static VM file blob for the building RTLD user-space program.
- * This is a raw ELF binary blob that is hard-linked into the kernel
- * core, and is mapped via copy-on-write into any user-space process
- * that requests the use of a dynamic linker
- * NOTE: The associated source code can be found in `/kos/src/libdl/...' */
-#ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_SYSTEM_RTLD_FILE
-DATDEF struct vm_ramfile elfexec_system_rtld_file;
-#endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_SYSTEM_RTLD_FILE */
-
-
 /* Low-level arch-specific exec functions for compatibility mode */
 
 #ifdef __ARCH_HAVE_COMPAT
 /* Initialize user-space for program execution. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 compat_elfexec_init_entry(struct icpustate *__restrict user_state,
                           KERNEL COMPAT_ElfW(Ehdr) const *__restrict ehdr,
                           USER void *peb_address, USER void *ustack_base,
@@ -104,7 +84,7 @@ compat_elfexec_init_entry(struct icpustate *__restrict user_state,
 
 /* Initialize the RTLD user-space library for runtime linking. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
                          struct path *__restrict exec_path,
                          struct directory_entry *__restrict exec_dentry,
@@ -116,32 +96,35 @@ compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
                          USER void *peb_address, USER void *ustack_base,
                          size_t ustack_size, USER void *entry_pc);
 #endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD */
-
-/* Base address and size symbols for the system RTLD */
-#ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD
-DATDEF byte_t compat_elfexec_system_rtld[];
-
-#undef compat_elfexec_system_rtld_size
-#ifdef __INTELLISENSE__
-DATDEF size_t const compat_elfexec_system_rtld_size;
-#else /* __INTELLISENSE__ */
-DATDEF byte_t compat_elfexec_system_rtld_size[];
-#define compat_elfexec_system_rtld_size  ((size_t)compat_elfexec_system_rtld_size)
-#endif /* !__INTELLISENSE__ */
-#endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD */
-
-/* A static VM file blob for the building RTLD user-space program.
- * This is a raw ELF binary blob that is hard-linked into the kernel
- * core, and is mapped via copy-on-write into any user-space process
- * that requests the use of a dynamic linker
- * NOTE: The associated source code can be found in `/kos/src/libdl/...' */
-#ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD_FILE
-DATDEF struct vm_ramfile compat_elfexec_system_rtld_file;
-#endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD_FILE */
-
 #endif /* __ARCH_HAVE_COMPAT */
+
+
+
+
+/* Populate a given `effective_vm' by loading an ELF executable file. */
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+elfabi_exec(struct vm *__restrict effective_vm,
+            struct icpustate *__restrict user_state,
+            struct path *__restrict exec_path,
+            struct directory_entry *__restrict exec_dentry,
+            struct regular_node *__restrict exec_node,
+            void const *exec_header,
+            bool change_vm_to_effective_vm,
+            size_t argc_inject, KERNEL char const *const *argv_inject,
+            execabi_strings_t argv, execabi_strings_t envp EXECABI_PARAM__argv_is_compat)
+THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
+
+/* ExecABI initializer for ELF. */
+#define EXECABI_INIT_ELF                                           \
+	{                                                              \
+		/* .ea_driver = */ &drv_self,                              \
+		/* .ea_magsiz = */ SELFMAG,                                \
+		/* .ea_magic  = */ { ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3 }, \
+		/* .ea_exec   = */ &elfabi_exec,                           \
+	}
+
 
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_EXEC_H */
+#endif /* !GUARD_MODELFEXEC_ELF_H */

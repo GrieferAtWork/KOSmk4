@@ -1862,13 +1862,6 @@ driver_disable_textrel(struct driver *__restrict self)
 }
 
 
-/* Destroy all places where the given driver may still be loaded
- * globally, including registered devices or object types, as well
- * as task callbacks and interrupt hooks, etc... */
-INTDEF NONNULL((1)) void KCALL
-driver_destroy_global_objects(struct driver *__restrict self);
-
-
 /* Finalize the given driver.
  *  #1: Execute destructor callbacks.
  *  #2: Decref (and ATOMIC_XCH(NULL)) each module from the dependency vector.
@@ -1919,7 +1912,7 @@ do_start_finalization:
 				driver_enable_textrel(self);
 
 				/* Invoke dynamic driver-level callbacks for a driver being unloaded. */
-				driver_destroy_global_objects(self);
+				driver_clear_globals(self);
 				driver_finalized_callbacks(self);
 
 				sync_write(&self->d_sections_lock);
@@ -2020,9 +2013,26 @@ find_next_dependent_driver:
 		decref(self);
 		RETHROW();
 	}
+
 	/* Check if we can get rid of the last reference */
 	if (ATOMIC_CMPXCH(self->d_refcnt, 1, 0))
 		goto success;
+
+	/* Try to delete remaining global hooks of the driver. */
+	for (;;) {
+		bool did_find_global_hooks;
+		TRY {
+			did_find_global_hooks = driver_clear_globals(self);
+		} EXCEPT {
+			decref(self);
+			RETHROW();
+		}
+		if (ATOMIC_CMPXCH(self->d_refcnt, 1, 0))
+			goto success;
+		if (!did_find_global_hooks)
+			break;
+	}
+
 	if (flags & DRIVER_DELMOD_FLAG_FORCE) {
 		refcnt_t remaining_references;
 		remaining_references = ATOMIC_CMPXCH_VAL(self->d_refcnt, 1, 0);

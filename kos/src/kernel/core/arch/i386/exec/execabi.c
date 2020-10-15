@@ -17,19 +17,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S
-#define GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S 1
+#ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_EXECABI_C
+#define GUARD_KERNEL_CORE_ARCH_I386_EXEC_EXECABI_C 1
+#define DISABLE_BRANCH_PROFILING 1 /* Don't profile this file */
 
-.section .rodata.execabi_system_rtld32
-	.global execabi_system_rtld32
-	.type   execabi_system_rtld32, @object
-	.align  4096 /* PAGESIZE */
-execabi_system_rtld32:
-	.incbin "bin/x86_64-kos/lib/libdl.rtld-flat.bin"
-	.align  4096 /* PAGESIZE */
-.global execabi_system_rtld32_size
-.type   execabi_system_rtld32_size, @object
-	execabi_system_rtld32_size = . - execabi_system_rtld32
-.size execabi_system_rtld32, . - execabi_system_rtld32
+#include <kernel/compiler.h>
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S */
+#include <kernel/execabi.h>
+#include <kernel/vm.h>
+
+DECL_BEGIN
+
+/* Define the RTLD file(s). */
+INTDEF byte_t execabi_system_rtld_startpageptr[];
+INTDEF byte_t execabi_system_rtld_numpages[];
+PUBLIC struct vm_ramfile execabi_system_rtld_file =
+	VM_RAMFILE_INIT((physpage_t)execabi_system_rtld_startpageptr,
+	                (size_t)execabi_system_rtld_numpages);
+
+#ifdef __x86_64__
+INTDEF byte_t execabi_system_rtld32_startpageptr[];
+INTDEF byte_t execabi_system_rtld32_numpages[];
+PUBLIC struct vm_ramfile execabi_system_rtld32_file =
+	VM_RAMFILE_INIT((physpage_t)execabi_system_rtld32_startpageptr,
+	                (size_t)execabi_system_rtld32_numpages);
+#endif /* __x86_64__ */
+
+DECL_END
+
+#endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_EXECABI_C */

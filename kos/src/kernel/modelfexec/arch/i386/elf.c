@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_EXEC_C
-#define GUARD_KERNEL_CORE_ARCH_I386_EXEC_EXEC_C 1
+#ifndef GUARD_MODELFEXEC_ARCH_I386_ELF_C
+#define GUARD_MODELFEXEC_ARCH_I386_ELF_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -26,7 +26,6 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/except.h>
-#include <kernel/exec.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/x86/gdt.h>
@@ -36,39 +35,26 @@
 
 #include <kos/except/reason/noexec.h>
 #include <kos/exec/asm/elf32.h>
+#include <kos/exec/bits/elf32.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
+#include <elf.h>
 #include <stddef.h>
 #include <string.h>
 
 #ifdef __x86_64__
 #include <kos/exec/asm/elf64.h>
+#include <kos/exec/bits/elf64.h>
 #endif /* __x86_64__ */
 
 DECL_BEGIN
 
-/* Define the RTLD file(s). */
-INTDEF byte_t elfexec_system_rtld_startpageptr[];
-INTDEF byte_t elfexec_system_rtld_numpages[];
-PUBLIC struct vm_ramfile elfexec_system_rtld_file =
-	VM_RAMFILE_INIT((physpage_t)elfexec_system_rtld_startpageptr,
-	                (size_t)elfexec_system_rtld_numpages);
-
-#ifdef __x86_64__
-INTDEF byte_t elfexec_system_rtld32_startpageptr[];
-INTDEF byte_t elfexec_system_rtld32_numpages[];
-PUBLIC struct vm_ramfile elfexec_system_rtld32_file =
-	VM_RAMFILE_INIT((physpage_t)elfexec_system_rtld32_startpageptr,
-	                (size_t)elfexec_system_rtld32_numpages);
-#endif /* __x86_64__ */
-
-
 #ifdef __x86_64__
 
 /* Initialize user-space for program execution. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry(struct icpustate *__restrict user_state,
                    Elf64_Ehdr const *__restrict ehdr,
                    USER void *peb_address, USER void *ustack_base,
@@ -113,7 +99,7 @@ elfexec_init_entry(struct icpustate *__restrict user_state,
 }
 
 /* Initialize the RTLD user-space library for runtime linking. */
-PUBLIC struct icpustate *KCALL
+INTERN struct icpustate *KCALL
 elfexec_init_rtld(struct icpustate *__restrict user_state,
                   struct path *__restrict exec_path,
                   struct directory_entry *__restrict exec_dentry,
@@ -214,7 +200,7 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 
 
 /* Initialize user-space for program execution. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 elfexec_init_entry32(struct icpustate *__restrict user_state,
                      Elf32_Ehdr const *__restrict ehdr,
                      USER void *peb_address, USER void *ustack_base,
@@ -275,7 +261,7 @@ elfexec_init_entry32(struct icpustate *__restrict user_state,
 
 
 /* Initialize the RTLD user-space library for runtime linking. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
 elfexec_init_rtld32(struct icpustate *__restrict user_state,
                     struct path *__restrict exec_path,
                     struct directory_entry *__restrict exec_dentry,
@@ -388,4 +374,4 @@ elfexec_init_rtld32(struct icpustate *__restrict user_state,
 
 DECL_END
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_EXEC_C */
+#endif /* !GUARD_MODELFEXEC_ARCH_I386_ELF_C */

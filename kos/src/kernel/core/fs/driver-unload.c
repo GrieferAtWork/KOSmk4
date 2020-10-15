@@ -26,15 +26,22 @@
 #include <dev/block.h>
 #include <dev/char.h>
 #include <kernel/driver.h>
+#include <kernel/execabi.h>
 
 DECL_BEGIN
 
 /* Destroy all places where the given driver may still be loaded
  * globally, including registered devices or object types, as well
- * as task callbacks and interrupt hooks, etc... */
-INTERN NONNULL((1)) void KCALL
-driver_destroy_global_objects(struct driver *__restrict self) {
+ * as task callbacks and interrupt hooks, etc...
+ * @return: true:  At least one global hook was cleared.
+ * @return: false: No global hooks were defined. */
+PUBLIC NONNULL((1)) bool KCALL
+driver_clear_globals(struct driver *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
+	bool result;
 	(void)self;
+	result = driver_clear_execabis(self);
+
 	/* TODO: Delete global hooks of `self':
 	 *   - block_device_register()
 	 *   - character_device_register()
@@ -67,9 +74,8 @@ driver_destroy_global_objects(struct driver *__restrict self) {
 	 *     call us multiple times to do a kind-of keep-killing-until-it-dies
 	 *     functionality, alongside doing other things in-between.
 	 */
+	return result;
 }
-
-
 
 
 DECL_END

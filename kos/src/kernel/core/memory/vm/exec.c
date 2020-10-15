@@ -27,31 +27,16 @@
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/driver-param.h>
-#include <kernel/except.h>
-#include <kernel/exec.h>
+#include <kernel/driver.h>
+#include <kernel/execabi.h>
 #include <kernel/vm.h>
-#include <kernel/vm/builder.h>
 #include <kernel/vm/exec.h>
-#include <kernel/vm/phys.h>
 
-#include <hybrid/align.h>
-#include <hybrid/pointer.h>
-
-#include <compat/config.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/noexec.h>
-#include <kos/exec/elf.h>
-#include <kos/exec/peb.h>
 
-#include <assert.h>
-#include <elf.h>
-#include <malloca.h>
+#include <signal.h>
 #include <string.h>
-#include <signal.h> /* SIGTRAP */
-
-#ifdef __ARCH_HAVE_COMPAT
-#include <compat/kos/exec/elf.h>
-#endif /* __ARCH_HAVE_COMPAT */
 
 #include "vm-nodeapi.h"
 
@@ -83,218 +68,6 @@ PUBLIC ATTR_PERVM struct vm_execinfo_struct thisvm_execinfo = {
  * These are called alongside stuff like `handle_manager_cloexec()'
  * NOTE: The passed vm is always `THIS_VM', and is never `&vm_kernel' */
 PUBLIC CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks = CALLBACK_LIST_INIT;
-
-
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(KCALL elf_validate_ehdr)(ElfW(Ehdr) const *__restrict ehdr) {
-	uintptr_t result;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;
-	if unlikely(ehdr->e_ident[EI_CLASS] != ELF_ARCH_CLASS)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER;
-	if unlikely(ehdr->e_ident[EI_DATA] != ELF_ARCH_DATA)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION;
-	if unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2;
-	if unlikely(ehdr->e_version != EV_CURRENT)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE;
-	if unlikely(ehdr->e_type != ET_EXEC)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH;
-	if unlikely(ehdr->e_machine != ELF_ARCH_MACHINE)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER;
-	if unlikely(ehdr->e_ehsize < offsetafter(ElfW(Ehdr), e_phnum))
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS;
-	if unlikely(!ehdr->e_phnum)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS;
-	if unlikely(ehdr->e_phentsize != sizeof(ElfW(Phdr)))
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS;
-	if unlikely(ehdr->e_phnum > ELF_ARCH_MAXPHCOUNT)
-		goto done; /* Too many program headers. */
-	result = 0;
-done:
-	return result;
-}
-
-#ifdef __ARCH_HAVE_COMPAT
-LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) uintptr_t
-NOTHROW(KCALL compat_elf_validate_ehdr)(COMPAT_ElfW(Ehdr) const *__restrict ehdr) {
-	uintptr_t result;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS;
-	if unlikely(ehdr->e_ident[EI_CLASS] != COMPAT_ELF_ARCH_CLASS)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER;
-	if unlikely(ehdr->e_ident[EI_DATA] != COMPAT_ELF_ARCH_DATA)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION;
-	if unlikely(ehdr->e_ident[EI_VERSION] != EV_CURRENT)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2;
-	if unlikely(ehdr->e_version != EV_CURRENT)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE;
-	if unlikely(ehdr->e_type != ET_EXEC)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH;
-	if unlikely(ehdr->e_machine != COMPAT_ELF_ARCH_MACHINE)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER;
-	if unlikely(ehdr->e_ehsize < offsetafter(COMPAT_ElfW(Ehdr), e_phnum))
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS;
-	if unlikely(!ehdr->e_phnum)
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS;
-	if unlikely(ehdr->e_phentsize != sizeof(COMPAT_ElfW(Phdr)))
-		goto done;
-	result = E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS;
-	if unlikely(ehdr->e_phnum > COMPAT_ELF_ARCH_MAXPHCOUNT)
-		goto done; /* Too many program headers. */
-	result = 0;
-done:
-	return result;
-}
-#endif /* __ARCH_HAVE_COMPAT */
-
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1)) struct vm_node *KCALL
-create_bss_overlap_node(struct regular_node *__restrict exec_node,
-                        pos_t file_data_offset,
-                        size_t bss_start_page_offset,
-                        size_t bss_num_bytes) {
-	struct vm_node *result_node;
-	struct vm_datapart *result_part;
-	physpage_t overlap_page;
-	result_node = (struct vm_node *)kmalloc(sizeof(struct vm_node),
-	                                        GFP_LOCKED | GFP_PREFLT);
-	TRY {
-		result_part = (struct vm_datapart *)kmalloc(sizeof(struct vm_datapart),
-		                                            GFP_LOCKED | GFP_PREFLT);
-		TRY {
-			overlap_page = page_mallocone();
-			if unlikely(overlap_page == PHYSPAGE_INVALID)
-				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
-			TRY {
-				/* Load the overlapping file data into memory. */
-				inode_readall_phys(exec_node, physpage2addr(overlap_page),
-				                   bss_start_page_offset,
-				                   file_data_offset);
-				/* Check if we must zero-initialize the BSS portion. */
-				if (!page_iszero(overlap_page)) {
-					/* Zero-initialize the BSS portion */
-					vm_memsetphys(physpage2addr(overlap_page) + bss_start_page_offset,
-					              0, bss_num_bytes);
-				}
-			} EXCEPT {
-				page_free(overlap_page, 1);
-				RETHROW();
-			}
-		} EXCEPT {
-			kfree(result_part);
-			RETHROW();
-		}
-	} EXCEPT {
-		kfree(result_node);
-		RETHROW();
-	}
-	result_part->dp_refcnt = 1;
-	shared_rwlock_init(&result_part->dp_lock);
-	result_part->dp_tree.a_vmin                = 0;
-	result_part->dp_tree.a_vmax                = 0;
-	result_part->dp_crefs                      = NULL;
-	result_part->dp_srefs                      = NULL;
-	result_part->dp_stale                      = NULL;
-	result_part->dp_block                      = incref(&vm_datablock_anonymous_zero);
-	result_part->dp_flags                      = VM_DATAPART_FLAG_NORMAL;
-	result_part->dp_state                      = VM_DATAPART_STATE_INCORE;
-	result_part->dp_ramdata.rd_blockv          = &result_part->dp_ramdata.rd_block0;
-	result_part->dp_ramdata.rd_block0.rb_start = overlap_page;
-	result_part->dp_ramdata.rd_block0.rb_size  = 1;
-	result_part->dp_pprop                      = VM_DATAPART_PPP_INITIALIZED << (0 * VM_DATAPART_PPP_BITS);
-	result_part->dp_futex                      = NULL;
-	/* result_node->vn_node.a_vmin = ...; // Initialized by the caller */
-	/* result_node->vn_node.a_vmax = ...; // Initialized by the caller */
-	/* result_node->vn_prot        = ...; // Initialized by the caller */
-	result_node->vn_flags = VM_NODE_FLAG_NORMAL;
-	/* result_node->vn_vm          = ...; // Unused by vmb */
-	result_node->vn_part   = result_part; /* Inherit reference */
-	result_node->vn_block  = incref(&vm_datablock_anonymous_zero);
-	result_node->vn_fspath = NULL;
-	result_node->vn_fsname = NULL;
-	/* result_node->vn_link        = ...; // Unused by vmb */
-	result_node->vn_guard = 0;
-	return result_node;
-}
-
-
-#ifndef __INTELLISENSE__
-DECL_END
-#define MY_PTR(x) x *
-#define MY_FUNC(x) x
-#define MY_ELFW ELFW
-#define MY_ElfW ElfW
-#define MY_POINTERSIZE __SIZEOF_POINTER__
-#ifdef __ARCH_HAVE_COMPAT
-#define MY_EXEC_ARGV_SIZE 1
-#endif /* __ARCH_HAVE_COMPAT */
-#include "exec-impl.c.inl"
-
-#ifdef __ARCH_HAVE_COMPAT
-#define MY_PTR              __ARCH_COMPAT_PTR
-#define MY_FUNC(x)          compat_##x
-#define MY_ELFW             COMPAT_ELFW
-#define MY_ElfW             COMPAT_ElfW
-#define MY_POINTERSIZE      __ARCH_COMPAT_SIZEOF_POINTER
-#define MY_EXEC_ARGV_SIZE 1
-#include "exec-impl.c.inl"
-#endif /* __ARCH_HAVE_COMPAT */
-
-DECL_BEGIN
-#else /* !__INTELLISENSE__ */
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
-vm_exec_impl(struct vm *__restrict effective_vm,
-             struct icpustate *__restrict user_state,
-             struct path *__restrict exec_path,
-             struct directory_entry *__restrict exec_dentry,
-             struct regular_node *__restrict exec_node,
-             bool change_vm_to_effective_vm,
-             size_t argc_inject, KERNEL char const *const *argv_inject,
-#ifdef __ARCH_HAVE_COMPAT
-             USER CHECKED void const *argv,
-             USER CHECKED void const *envp,
-#else /* __ARCH_HAVE_COMPAT */
-             USER UNCHECKED char const *USER CHECKED const *argv,
-             USER UNCHECKED char const *USER CHECKED const *envp,
-#endif /* !__ARCH_HAVE_COMPAT */
-             ElfW(Ehdr) const *__restrict ehdr
-#ifdef __ARCH_HAVE_COMPAT
-             ,
-             bool argv_is_compat
-#endif /* __ARCH_HAVE_COMPAT */
-             )
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
-#ifdef __ARCH_HAVE_COMPAT
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
-compat_vm_exec_impl(struct vm *__restrict effective_vm,
-                    struct icpustate *__restrict user_state,
-                    struct path *__restrict exec_path,
-                    struct directory_entry *__restrict exec_dentry,
-                    struct regular_node *__restrict exec_node,
-                    bool change_vm_to_effective_vm,
-                    size_t argc_inject, KERNEL char const *const *argv_inject,
-                    USER CHECKED void const *argv,
-                    USER CHECKED void const *envp,
-                    COMPAT_ElfW(Ehdr) const *__restrict ehdr,
-                    bool argv_is_compat)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
-#endif /* __ARCH_HAVE_COMPAT */
-#endif /* __INTELLISENSE__ */
 
 /* Load an executable binary `exec_node' into a temporary, emulated VM.
  * If this succeeds, clear all of the mappings from `effective_vm', and
@@ -337,75 +110,67 @@ vm_exec(struct vm *__restrict effective_vm,
         struct regular_node *__restrict exec_node,
         bool change_vm_to_effective_vm,
         size_t argc_inject, KERNEL char const *const *argv_inject,
-#ifdef __ARCH_HAVE_COMPAT
-        USER CHECKED void const *argv,
-        USER CHECKED void const *envp,
-        bool argv_is_compat
-#else /* __ARCH_HAVE_COMPAT */
-        USER UNCHECKED char const *USER CHECKED const *argv,
-        USER UNCHECKED char const *USER CHECKED const *envp
-#endif /* !__ARCH_HAVE_COMPAT */
-        )
+        execabi_strings_t argv, execabi_strings_t envp
+        EXECABI_PARAM__argv_is_compat)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
-	uintptr_t reason;
-	union {
-		ElfW(Ehdr)        e;
-#ifdef __ARCH_HAVE_COMPAT
-		COMPAT_ElfW(Ehdr) c;
-#endif /* __ARCH_HAVE_COMPAT */
-	} ehdr;
-	/* Read in the ELF header. */
-	inode_readall(exec_node, &ehdr, sizeof(ehdr), 0);
-
-	/* TODO: Support for Shebang */
-	/* TODO: Support for PE */
-
-	/* Validate the ELF header. */
-	if unlikely(ehdr.e.e_ident[EI_MAG0] != ELFMAG0 ||
-	            ehdr.e.e_ident[EI_MAG1] != ELFMAG1 ||
-	            ehdr.e.e_ident[EI_MAG2] != ELFMAG2 ||
-	            ehdr.e.e_ident[EI_MAG3] != ELFMAG3)
-		THROW(E_NOT_EXECUTABLE_NOT_A_BINARY);
-	reason = elf_validate_ehdr(&ehdr.e);
-	if (reason == 0) {
-		user_state = vm_exec_impl(effective_vm,
-		                          user_state,
-		                          exec_path,
-		                          exec_dentry,
-		                          exec_node,
-		                          change_vm_to_effective_vm,
-		                          argc_inject,
-		                          argv_inject,
-		                          argv,
-		                          envp,
-		                          &ehdr.e
-#ifdef __ARCH_HAVE_COMPAT
-		                          ,
-		                          argv_is_compat
-#endif /* __ARCH_HAVE_COMPAT */
-		                          );
-		return user_state;
+	REF struct execabis_struct *abis;
+	size_t i;
+	byte_t header[CONFIG_EXECABI_MAXHEADER];
+	{
+		size_t count;
+		/* Load the file header. */
+		count = inode_read(exec_node, header, sizeof(header), 0);
+		if unlikely(count < CONFIG_EXECABI_MAXHEADER)
+			memset(header + count, 0, CONFIG_EXECABI_MAXHEADER - count);
 	}
-#ifdef __ARCH_HAVE_COMPAT
-	reason = compat_elf_validate_ehdr(&ehdr.c);
-	if (reason == 0) {
-		user_state = compat_vm_exec_impl(effective_vm,
-		                                         user_state,
-		                                         exec_path,
-		                                         exec_dentry,
-		                                         exec_node,
-		                                         change_vm_to_effective_vm,
-		                                         argc_inject, argv_inject,
-		                                         argv,
-		                                         envp,
-		                                         &ehdr.c,
-		                                         argv_is_compat);
-		return user_state;
+again_getabis:
+	abis = execabis.get();
+	for (i = 0; i < abis->eas_count; ++i) {
+		struct icpustate *result;
+		struct execabi *abi = &abis->eas_abis[i];
+		/* Check if the magic for this ABI matches. */
+		if (memcmp(header, abi->ea_magic, abi->ea_magsiz) != 0)
+			continue;
+		if (!tryincref(abi->ea_driver))
+			continue;
+		FINALLY_DECREF_UNLIKELY(abi->ea_driver);
+		/* Try to invoke the exec loader of this ABI */
+		TRY {
+			result = (*abi->ea_exec)(effective_vm,
+			                         user_state,
+			                         exec_path,
+			                         exec_dentry,
+			                         exec_node,
+			                         header,
+			                         change_vm_to_effective_vm,
+			                         argc_inject, argv_inject,
+			                         argv,
+			                         envp
+			                         EXECABI_ARG__argv_is_compat);
+		} EXCEPT {
+			decref_unlikely(abi->ea_driver);
+			/* Handle `E_NOT_EXECUTABLE_NOT_A_BINARY' the same as a NULL-return-value
+			 * from the `ea_exec' callback, except when appearing in the last ABI, in
+			 * which case there aren't any more abis which we could try. */
+			if (i >= abis->eas_count - 1 || !was_thrown(E_NOT_EXECUTABLE_NOT_A_BINARY)) {
+				decref_unlikely(abis);
+				RETHROW();
+			}
+			continue;
+		}
+		decref_unlikely(abi->ea_driver);
+		if likely(result) {
+			decref_unlikely(abis);
+			return result; /* Got it! */
+		}
 	}
-#endif /* __ARCH_HAVE_COMPAT */
-	THROW(E_NOT_EXECUTABLE_FAULTY,
-	      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,
-	      reason);
+	decref_unlikely(abis);
+	if unlikely(abis != execabis.m_pointer) {
+		/* The available set of ABIs has changed. - Try again. */
+		goto again_getabis;
+	}
+	/* Fallback: File isn't a recognized binary. */
+	THROW(E_NOT_EXECUTABLE_NOT_A_BINARY);
 }
 
 

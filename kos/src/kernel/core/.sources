@@ -90,7 +90,13 @@ BEGIN
 		"../../libvgastate/*.c",
 
 		/* Pull in some hard-coded drivers */
-		"../modide/*.c", /* Needed for disk I/O */
+
+		/* Required for: executing ELF files. */
+		"../modelfexec/arch/" + XARCH + "/*.c",
+		"../modelfexec/*.c",
+
+		/* Required for: disk I/O */
+		"../modide/*.c",
 
 		/* Pull in the actual kernel sources */
 		"debugger/*.c",

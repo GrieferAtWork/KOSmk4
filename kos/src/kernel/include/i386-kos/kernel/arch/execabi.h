@@ -17,25 +17,47 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_S
-#define GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_S 1
+#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_EXECABI_H
+#define GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_EXECABI_H 1
+
+#include <kernel/compiler.h>
+
+#include <kernel/types.h>
 
 #include <hybrid/host.h>
 
-.section .rodata.execabi_system_rtld
-	.global execabi_system_rtld
-	.type   execabi_system_rtld, @object
-	.align  4096 /* PAGESIZE */
-execabi_system_rtld:
 #ifdef __x86_64__
-	.incbin "bin/x86_64-kos/lib64/libdl.rtld-flat.bin"
-#else /* __x86_64__ */
-	.incbin "bin/i386-kos/lib/libdl.rtld-flat.bin"
-#endif /* !__x86_64__ */
-	.align  4096 /* PAGESIZE */
-.global execabi_system_rtld_size
-.type   execabi_system_rtld_size, @object
-	execabi_system_rtld_size = . - execabi_system_rtld
-.size execabi_system_rtld, . - execabi_system_rtld
+#define CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD 1
+#define CONFIG_EXECABI_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_SYSTEM_RTLD_FILE 1
+#define compat_execabi_system_rtld      execabi_system_rtld32
+#define compat_execabi_system_rtld_size execabi_system_rtld32_size
+#define compat_execabi_system_rtld_file execabi_system_rtld32_file
+#endif /* __x86_64__ */
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_S */
+#ifdef __CC__
+DECL_BEGIN
+
+#ifdef __x86_64__
+
+/* Base address and size symbols for the system RTLD */
+DATDEF byte_t execabi_system_rtld32[];
+#undef execabi_system_rtld32_size
+#ifdef __INTELLISENSE__
+DATDEF size_t const execabi_system_rtld32_size;
+#else /* __INTELLISENSE__ */
+DATDEF byte_t execabi_system_rtld32_size[];
+#define execabi_system_rtld32_size ((size_t)execabi_system_rtld32_size)
+#endif /* !__INTELLISENSE__ */
+
+/* A static VM file blob for the building RTLD user-space program.
+ * This is a raw ELF binary blob that is hard-linked into the kernel
+ * core, and is mapped via copy-on-write into any user-space process
+ * that requests the use of a dynamic linker
+ * NOTE: The associated source code can be found in `/kos/src/libdl/...' */
+DATDEF struct vm_ramfile execabi_system_rtld32_file;
+#endif /* __x86_64__ */
+
+DECL_END
+#endif /* __CC__ */
+
+#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_EXECABI_H */

@@ -1066,7 +1066,7 @@ struct vm_datablock {
 		/* .db_refcnt = */ 1,                     \
 		/* .db_lock   = */ RWLOCK_INIT,           \
 		/* .db_type   = */ type,                  \
-		/* .db_vio    = */ NULL,                  \
+		/* .db_vio    = */ __NULLPTR,             \
 		/* .db_parts  = */ parts,                 \
 		VM_DATABLOCK_INIT_PAGEINFO(pageshift)     \
 	}
@@ -1445,7 +1445,7 @@ struct vm_ramfile {
 DATDEF struct vm_datablock_type vm_ramfile_type;
 
 #define VM_RAMFILE_INIT(/*physpage_t*/ start, /*size_t*/ num_pages) \
-	{ VM_DATABLOCK_INIT(&vm_ramfile_type, NULL, 0), /* .rf_data = */ { start, num_pages } }
+	{ VM_DATABLOCK_INIT(&vm_ramfile_type, __NULLPTR, 0), /* .rf_data = */ { start, num_pages } }
 
 
 

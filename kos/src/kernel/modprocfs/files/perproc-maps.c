@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <fs/vfs.h>
-#include <kernel/exec.h> /* elfexec_system_rtld_file */
+#include <kernel/execabi.h> /* execabi_system_rtld_file */
 #include <kernel/vm.h>
 #include <sched/pid.h>
 
@@ -42,7 +42,7 @@ DECL_BEGIN
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) char const *
 NOTHROW(FCALL nameof_special_datablock)(struct vm_datablock *__restrict self) {
 	/* The libdl program hard-coded into the kernel. */
-	if (self == &elfexec_system_rtld_file.rf_block) {
+	if (self == &execabi_system_rtld_file.rf_block) {
 #ifdef __ARCH_HAVE_COMPAT
 #if __SIZEOF_POINTER__ == 8
 		return "[kernel.libdl64]";
@@ -54,7 +54,7 @@ NOTHROW(FCALL nameof_special_datablock)(struct vm_datablock *__restrict self) {
 #endif /* !__ARCH_HAVE_COMPAT */
 	}
 #ifdef __ARCH_HAVE_COMPAT
-	if (self == &compat_elfexec_system_rtld_file.rf_block)
+	if (self == &compat_execabi_system_rtld_file.rf_block)
 		return "[kernel.libdl]";
 #endif /* __ARCH_HAVE_COMPAT */
 	if (self == &vm_datablock_physical)

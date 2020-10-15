@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
-#include "exec.c"
+#include "elf.c"
 #if defined(__x86_64__) && 1
 #define MY_PTR(x) __HYBRID_PTR32(x)
 #define MY_FUNC(x) compat_##x
@@ -38,26 +38,26 @@
 DECL_BEGIN
 
 LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
-MY_FUNC(vm_exec_impl)(struct vm *__restrict effective_vm,
-                      struct icpustate *__restrict user_state,
-                      struct path *__restrict exec_path,
-                      struct directory_entry *__restrict exec_dentry,
-                      struct regular_node *__restrict exec_node,
-                      bool change_vm_to_effective_vm,
-                      size_t argc_inject, KERNEL char const *const *argv_inject,
+MY_FUNC(elf_exec_impl)(struct vm *__restrict effective_vm,
+                       struct icpustate *__restrict user_state,
+                       struct path *__restrict exec_path,
+                       struct directory_entry *__restrict exec_dentry,
+                       struct regular_node *__restrict exec_node,
+                       MY_ElfW(Ehdr) const *__restrict ehdr,
+                       bool change_vm_to_effective_vm,
+                       size_t argc_inject, KERNEL char const *const *argv_inject,
 #ifdef MY_EXEC_ARGV_SIZE
-                      USER CHECKED void const *argv,
-                      USER CHECKED void const *envp,
+                       USER CHECKED void const *argv,
+                       USER CHECKED void const *envp
 #else /* MY_EXEC_ARGV_SIZE */
-                      USER UNCHECKED MY_PTR(char const) USER CHECKED const *argv,
-                      USER UNCHECKED MY_PTR(char const) USER CHECKED const *envp,
+                       USER UNCHECKED MY_PTR(char const) USER CHECKED const *argv,
+                       USER UNCHECKED MY_PTR(char const) USER CHECKED const *envp
 #endif /* !MY_EXEC_ARGV_SIZE */
-                      MY_ElfW(Ehdr) const *__restrict ehdr
 #ifdef MY_EXEC_ARGV_SIZE
-                      ,
-                      bool argv_is_compat
+                       ,
+                       bool argv_is_compat
 #endif /* MY_EXEC_ARGV_SIZE */
-                      )
+                       )
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
 	MY_ElfW(Phdr) *phdr_vector;
 	phdr_vector = (MY_ElfW(Phdr) *)malloca(ehdr->e_phnum * sizeof(MY_ElfW(Phdr)));
@@ -217,14 +217,14 @@ err_overlap:
 			if (need_dyn_linker) {
 				linker_base = vmb_map(&builder,
 				                      HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
-				                      MY_FUNC(elfexec_system_rtld_size),
+				                      MY_FUNC(execabi_system_rtld_size),
 				                      PAGESIZE,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
 				                      VM_GETFREE_ABOVE,
 #else
 				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
-				                      &MY_FUNC(elfexec_system_rtld_file).rf_block,
+				                      &MY_FUNC(execabi_system_rtld_file).rf_block,
 				                      NULL,
 				                      NULL,
 				                      0,
@@ -254,9 +254,9 @@ err_overlap:
 			if (argv_is_compat)
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8
 			if (!argv_is_compat)
-#else
+#else /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
 #error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
-#endif
+#endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
 			{
 				typedef USER UNCHECKED PTR32(char const) USER CHECKED const *vec_t;
 #if MY_POINTERSIZE == 4

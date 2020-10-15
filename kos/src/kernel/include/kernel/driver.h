@@ -616,6 +616,15 @@ FUNDEF NONNULL((1)) __BOOL KCALL
 driver_finalize(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 
+/* Destroy all places where the given driver may still be loaded
+ * globally, including registered devices or object types, as well
+ * as task callbacks and interrupt hooks, etc...
+ * @return: true:  At least one global hook was cleared.
+ * @return: false: No global hooks were defined. */
+FUNDEF NONNULL((1)) bool KCALL
+driver_clear_globals(struct driver *__restrict self)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+
 
 /* Flags for driver unloading functions. */
 #define DRIVER_DELMOD_FLAG_NORMAL   0x0000 /* Normal delmod flags. */
