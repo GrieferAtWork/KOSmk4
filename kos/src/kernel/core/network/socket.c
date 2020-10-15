@@ -1246,7 +1246,7 @@ socket_getsockopt(struct socket *__restrict self,
 		switch (optname) {
 
 		case SO_ERROR: {
-			errno_t value = EOK;
+			errno_t value = EPERM;
 			REF struct socket_connect_aio *ah;
 again_read_ncon:
 			ah = self->sk_ncon.get();
@@ -1255,12 +1255,15 @@ again_read_ncon:
 				if (!aio_handle_generic_hascompleted(&ah->sca_aio)) {
 					/* Don't consume before the operation has completed! */
 					decref_unlikely(ah);
+					value = EINPROGRESS;
 				} else {
 					/* If the operation failed, return the exit error errno. */
 					if (ah->sca_aio.hg_status == AIO_COMPLETION_FAILURE) {
 						value = error_as_errno(&ah->sca_aio.hg_error);
 					} else if (ah->sca_aio.hg_status == AIO_COMPLETION_CANCEL) {
 						value = ECANCELED;
+					} else {
+						value = EOK;
 					}
 					/* Consume the completion status. */
 					xch_ok = self->sk_ncon.cmpxch_inherit_new(ah, NULL);

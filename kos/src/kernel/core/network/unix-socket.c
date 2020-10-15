@@ -1444,11 +1444,10 @@ UnixSocket_Recvv(struct socket *__restrict self,
 	assert(pbuf);
 again_read_packet:
 	while ((packet = pb_buffer_startread(pbuf)) == NULL) {
-		if (msg_flags & MSG_DONTWAIT) {
-			if (result)
-				goto done;
+		if (result)
+			goto done;
+		if (msg_flags & MSG_DONTWAIT)
 			THROW(E_WOULDBLOCK);
-		}
 		if (ATOMIC_READ(pbuf->pb_limt) == 0)
 			goto done; /* EOF */
 		task_connect(&pbuf->pb_psta);
