@@ -455,6 +455,7 @@ NOTHROW(KCALL kmalloc_untrace_n_impl)(void *base, size_t num_bytes,
 	assert(((uintptr_t)base & (sizeof(void *) - 1)) == 0);
 	num_bytes = FLOOR_ALIGN(num_bytes, sizeof(void *));
 	endaddr   = (uintptr_t)base + num_bytes;
+again_while_num_bytes:
 	while (num_bytes) {
 		struct trace_node *node;
 		lock_acquire();
@@ -519,7 +520,7 @@ NOTHROW(KCALL kmalloc_untrace_n_impl)(void *base, size_t num_bytes,
 				base      = trace_node_uend(node);
 				num_bytes = endaddr - (uintptr_t)base;
 				trace_node_free(node);
-				continue;
+				goto again_while_num_bytes; /* Don't use `continue'! That one interferes with `lock_acquire()' */
 			}
 			/* Truncate the node near its upper end. */
 			uend                 = trace_node_uend(node);
@@ -528,7 +529,7 @@ NOTHROW(KCALL kmalloc_untrace_n_impl)(void *base, size_t num_bytes,
 			trace_node_tree_insert(&nodes, node);
 			lock_break();
 			num_bytes = endaddr - (uintptr_t)base;
-			continue;
+			goto again_while_num_bytes; /* Don't use `continue'! That one interferes with `lock_acquire()' */
 		}
 		/* Check if we can truncate the node at its base */
 		if ((uintptr_t)base <= trace_node_umin(node)) {
