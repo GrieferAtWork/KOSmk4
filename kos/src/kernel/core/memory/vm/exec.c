@@ -109,7 +109,6 @@ again_searchabis:
 			continue;
 		if (!tryincref(abi->ea_driver))
 			continue;
-		FINALLY_DECREF_UNLIKELY(abi->ea_driver);
 		/* Try to invoke the exec loader of this ABI */
 		TRY {
 			status = (*abi->ea_exec)(args);
