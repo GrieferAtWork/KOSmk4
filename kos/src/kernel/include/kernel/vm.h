@@ -2600,9 +2600,7 @@ NOTHROW(KCALL vm_enumdmav_nx)(struct vm *__restrict effective_vm,
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL vm_stopdma)(struct vm_dmalock *__restrict lockvec, size_t lockcnt);
 
-struct path;
-struct directory_entry;
-struct regular_node;
+struct execargs;
 
 /* Load an executable binary `exec_node' into a temporary, emulated VM.
  * If this succeeds, clear all of the mappings from `effective_vm', and
@@ -2616,110 +2614,13 @@ struct regular_node;
  *    by the executable's initialization, such as missing libraries)
  * NOTE: Upon successful return, all threads using the given `effective_vm' (excluding
  *       the caller themself if they are using the VM, too) will have been terminated.
- * @param: effective_vm: The VM into which to map the executable.
- *                       This must not be the kernel VM, which causes an assertion failure.
- *                       NOTE: When `change_vm_to_effective_vm' is `true', prior to a successful
- *                             return of this function, it will also do a `task_setvm(effective_vm)',
- *                             meaning that the caller will become apart of the given VM.
- * @param: user_state:   The user-space CPU state to update upon success in a manner that
- *                       proper execution of the loaded binary is possible.
- *                       Note however that in the case of a dynamic binary, a dynamic linker
- *                       may be injected to perform dynamic linking whilst already in user-space.
- * @param: exec_path:    Filesystem path for the directory inside of which `exec_node' is located.
- * @param: exec_dentry:  Directory entry containing the filename of `exec_node'
- * @param: exec_node:    The filesystem node which should be loaded as an executable binary.
- * @param: argc_inject:  The number of arguments from `argv_inject' to inject at the beginning of the user-space argc/argv vector.
- * @param: argv_inject:  Vector of arguments to inject at the beginning of the user-space argc/argv vector.
- * @param: argv:         NULL-terminated vector of arguments to-be passed to program being loaded.
- * @param: envp:         NULL-terminated vector of environment variables to-be passed to program being loaded.
- * @return: * :          A pointer to the user-space register state to-be loaded in order to start
- *                       execution of the newly loaded binary (usually equal to `user_state')
- * @throw: E_BADALLOC:   Insufficient memory
- * @throw: E_SEGFAULT:   The given `argv', `envp', or one of their pointed-to strings is faulty
+ * @param: args:             Exec arguments
+ * @throw: E_BADALLOC:       Insufficient memory
+ * @throw: E_SEGFAULT:       The given `argv', `envp', or one of their pointed-to strings is faulty
  * @throw: E_NOT_EXECUTABLE: The given `exec_node' was not recognized as an acceptable binary. */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
-vm_exec(struct vm *__restrict effective_vm,
-        struct icpustate *__restrict user_state,
-        struct path *__restrict exec_path,
-        struct directory_entry *__restrict exec_dentry,
-        struct regular_node *__restrict exec_node,
-        bool change_vm_to_effective_vm,
-        size_t argc_inject, KERNEL char const *const *argv_inject,
-#ifdef __ARCH_HAVE_COMPAT
-        USER CHECKED void const *argv,
-        USER CHECKED void const *envp,
-        bool argv_is_compat
-#else /* __ARCH_HAVE_COMPAT */
-        USER UNCHECKED char const *USER CHECKED const *argv,
-        USER UNCHECKED char const *USER CHECKED const *envp
-#endif /* !__ARCH_HAVE_COMPAT */
-        )
+FUNDEF NONNULL((1)) void KCALL
+vm_exec(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
-
-#if defined(__ARCH_HAVE_COMPAT) && defined(__cplusplus)
-extern "C++" {
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
-vm_exec(struct vm *__restrict effective_vm,
-        struct icpustate *__restrict user_state,
-        struct path *__restrict exec_path,
-        struct directory_entry *__restrict exec_dentry,
-        struct regular_node *__restrict exec_node,
-        bool change_vm_to_effective_vm,
-        size_t argc_inject, KERNEL char const *const *argv_inject,
-        USER UNCHECKED char const *USER CHECKED const *argv,
-        USER UNCHECKED char const *USER CHECKED const *envp)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
-	return vm_exec(effective_vm, user_state, exec_path,
-	               exec_dentry, exec_node,
-	               change_vm_to_effective_vm,
-	               argc_inject, argv_inject,
-	               argv, envp, false);
-}
-}
-#if __ARCH_COMPAT_SIZEOF_POINTER == 4
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
-vm_exec32(struct vm *__restrict effective_vm,
-          struct icpustate *__restrict user_state,
-          struct path *__restrict exec_path,
-          struct directory_entry *__restrict exec_dentry,
-          struct regular_node *__restrict exec_node,
-          bool change_vm_to_effective_vm,
-          size_t argc_inject, KERNEL char const *const *argv_inject,
-          USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *argv,
-          USER UNCHECKED __HYBRID_PTR32(char const) USER CHECKED const *envp)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
-	return vm_exec(effective_vm, user_state, exec_path,
-	               exec_dentry, exec_node,
-	               change_vm_to_effective_vm,
-	               argc_inject, argv_inject,
-	               argv, envp, true);
-}
-#else /* __ARCH_COMPAT_SIZEOF_POINTER == 4 */
-#define vm_exec32 vm_exec
-#endif /* __ARCH_COMPAT_SIZEOF_POINTER != 4 */
-
-#if __ARCH_COMPAT_SIZEOF_POINTER == 8
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
-vm_exec64(struct vm *__restrict effective_vm,
-          struct icpustate *__restrict user_state,
-          struct path *__restrict exec_path,
-          struct directory_entry *__restrict exec_dentry,
-          struct regular_node *__restrict exec_node,
-          bool change_vm_to_effective_vm,
-          size_t argc_inject, KERNEL char const *const *argv_inject,
-          USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *argv,
-          USER UNCHECKED __HYBRID_PTR64(char const) USER CHECKED const *envp)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
-	return vm_exec(effective_vm, user_state, exec_path,
-	               exec_dentry, exec_node,
-	               change_vm_to_effective_vm,
-	               argc_inject, argv_inject,
-	               argv, envp, true);
-}
-#else /* __ARCH_COMPAT_SIZEOF_POINTER == 8 */
-#define vm_exec64 vm_exec
-#endif /* __ARCH_COMPAT_SIZEOF_POINTER != 8 */
-#endif /* __ARCH_HAVE_COMPAT && __cplusplus */
 
 
 /* Assert that `self' is a regular node for the purpose of being used as the

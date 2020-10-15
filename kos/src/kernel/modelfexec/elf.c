@@ -215,108 +215,53 @@ create_bss_overlap_node(struct regular_node *__restrict exec_node,
 
 #ifndef __INTELLISENSE__
 DECL_END
-#define MY_PTR(x)      x *
-#define MY_FUNC(x)     x
-#define MY_ELFW        ELFW
-#define MY_ElfW        ElfW
-#define MY_POINTERSIZE __SIZEOF_POINTER__
+#define LOCAL_PTR(x)      x *
+#define LOCAL_FUNC(x)     x
+#define LOCAL_ELFW        ELFW
+#define LOCAL_ElfW        ElfW
+#define LOCAL_POINTERSIZE __SIZEOF_POINTER__
 #ifdef __ARCH_HAVE_COMPAT
-#define MY_EXEC_ARGV_SIZE 1
+#define LOCAL_EXEC_ARGV_SIZE 1
 #endif /* __ARCH_HAVE_COMPAT */
 #include "elf-exec.c.inl"
 
 #ifdef __ARCH_HAVE_COMPAT
-#define MY_PTR            __ARCH_COMPAT_PTR
-#define MY_FUNC(x)        compat_##x
-#define MY_ELFW           COMPAT_ELFW
-#define MY_ElfW           COMPAT_ElfW
-#define MY_POINTERSIZE    __ARCH_COMPAT_SIZEOF_POINTER
-#define MY_EXEC_ARGV_SIZE 1
+#define LOCAL_PTR            __ARCH_COMPAT_PTR
+#define LOCAL_FUNC(x)        compat_##x
+#define LOCAL_ELFW           COMPAT_ELFW
+#define LOCAL_ElfW           COMPAT_ElfW
+#define LOCAL_POINTERSIZE    __ARCH_COMPAT_SIZEOF_POINTER
+#define LOCAL_EXEC_ARGV_SIZE 1
 #include "elf-exec.c.inl"
 #endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN
 #else /* !__INTELLISENSE__ */
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
-elf_exec_impl(struct vm *__restrict effective_vm,
-              struct icpustate *__restrict user_state,
-              struct path *__restrict exec_path,
-              struct directory_entry *__restrict exec_dentry,
-              struct regular_node *__restrict exec_node,
-              ElfW(Ehdr) const *__restrict ehdr,
-              bool change_vm_to_effective_vm,
-              size_t argc_inject, KERNEL char const *const *argv_inject,
-              execabi_strings_t argv, execabi_strings_t envp
-              EXECABI_PARAM__argv_is_compat)
+LOCAL WUNUSED NONNULL((1)) unsigned int FCALL
+elf_exec_impl(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 #ifdef __ARCH_HAVE_COMPAT
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
-compat_elf_exec_impl(struct vm *__restrict effective_vm,
-                     struct icpustate *__restrict user_state,
-                     struct path *__restrict exec_path,
-                     struct directory_entry *__restrict exec_dentry,
-                     struct regular_node *__restrict exec_node,
-                     COMPAT_ElfW(Ehdr) const *__restrict ehdr,
-                     bool change_vm_to_effective_vm,
-                     size_t argc_inject, KERNEL char const *const *argv_inject,
-                     USER CHECKED void const *argv,
-                     USER CHECKED void const *envp,
-                     bool argv_is_compat)
+LOCAL WUNUSED NONNULL((1)) unsigned int FCALL
+compat_elf_exec_impl(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 #endif /* __ARCH_HAVE_COMPAT */
 #endif /* __INTELLISENSE__ */
 
 /* Exec-abi callback for ELF files */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
-elfabi_exec(struct vm *__restrict effective_vm,
-            struct icpustate *__restrict user_state,
-            struct path *__restrict exec_path,
-            struct directory_entry *__restrict exec_dentry,
-            struct regular_node *__restrict exec_node,
-            void const *exec_header,
-            bool change_vm_to_effective_vm,
-            size_t argc_inject, KERNEL char const *const *argv_inject,
-            execabi_strings_t argv, execabi_strings_t envp
-            EXECABI_PARAM__argv_is_compat)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
+INTERN WUNUSED NONNULL((1)) unsigned int FCALL
+elfabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	STATIC_ASSERT(CONFIG_EXECABI_MAXHEADER >= sizeof(ElfW(Ehdr)));
 #ifdef __ARCH_HAVE_COMPAT
 	STATIC_ASSERT(CONFIG_EXECABI_MAXHEADER >= sizeof(COMPAT_ElfW(Ehdr)));
 #endif /* __ARCH_HAVE_COMPAT */
 	uintptr_t reason;
-	reason = elf_validate_ehdr((ElfW(Ehdr) *)exec_header);
-	if (reason == 0) {
-		user_state = elf_exec_impl(effective_vm,
-		                           user_state,
-		                           exec_path,
-		                           exec_dentry,
-		                           exec_node,
-		                           (ElfW(Ehdr) *)exec_header,
-		                           change_vm_to_effective_vm,
-		                           argc_inject,
-		                           argv_inject,
-		                           argv,
-		                           envp
-		                           EXECABI_ARG__argv_is_compat);
-		return user_state;
-	}
+	reason = elf_validate_ehdr((ElfW(Ehdr) *)args->ea_header);
+	if (reason == 0)
+		return elf_exec_impl(args);
 #ifdef __ARCH_HAVE_COMPAT
 	reason = compat_elf_validate_ehdr((COMPAT_ElfW(Ehdr) *)exec_header);
-	if (reason == 0) {
-		user_state = compat_elf_exec_impl(effective_vm,
-		                                  user_state,
-		                                  exec_path,
-		                                  exec_dentry,
-		                                  exec_node,
-		                                  (COMPAT_ElfW(Ehdr) *)exec_header,
-		                                  change_vm_to_effective_vm,
-		                                  argc_inject,
-		                                  argv_inject,
-		                                  argv,
-		                                  envp,
-		                                  argv_is_compat);
-		return user_state;
-	}
+	if (reason == 0)
+		return compat_elf_exec_impl(args);
 #endif /* __ARCH_HAVE_COMPAT */
 	THROW(E_NOT_EXECUTABLE_FAULTY,
 	      E_NOT_EXECUTABLE_FAULTY_FORMAT_ELF,

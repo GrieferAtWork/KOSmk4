@@ -38,13 +38,10 @@
 
 DECL_BEGIN
 
-
 struct icpustate;
 struct path;
 struct directory_entry;
 struct regular_node;
-struct vm_ramfile;
-
 
 /* Initialize user-space for program execution. */
 #ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_ELFEXEC_INIT_ENTRY
@@ -102,17 +99,8 @@ compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
 
 
 /* Populate a given `effective_vm' by loading an ELF executable file. */
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 6)) struct icpustate *KCALL
-elfabi_exec(struct vm *__restrict effective_vm,
-            struct icpustate *__restrict user_state,
-            struct path *__restrict exec_path,
-            struct directory_entry *__restrict exec_dentry,
-            struct regular_node *__restrict exec_node,
-            void const *exec_header,
-            bool change_vm_to_effective_vm,
-            size_t argc_inject, KERNEL char const *const *argv_inject,
-            execabi_strings_t argv, execabi_strings_t envp EXECABI_PARAM__argv_is_compat)
-THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
+INTDEF WUNUSED NONNULL((1)) unsigned int FCALL
+elfabi_exec(/*in|out*/ struct execargs *__restrict args);
 
 /* ExecABI initializer for ELF. */
 #define EXECABI_INIT_ELF                                           \

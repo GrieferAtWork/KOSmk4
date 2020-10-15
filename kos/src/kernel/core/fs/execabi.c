@@ -23,6 +23,8 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/execabi.h>
@@ -36,6 +38,10 @@
 #include "../../modelfexec/elf.h"
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_ELF */
 
+#ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
+#include "../../modshebang/shebang.h"
+#endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
+
 DECL_BEGIN
 
 enum {
@@ -43,9 +49,11 @@ enum {
 #ifdef CONFIG_EXECABI_HAVE_BUILTIN_ELF
 	                          + 1
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_ELF */
+#ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
+	                          + 1
+#endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
 	                          )
 };
-
 
 /* Define execution ABIs built into the kernel core. */
 PRIVATE struct execabis_struct default_execabis = {
@@ -55,6 +63,9 @@ PRIVATE struct execabis_struct default_execabis = {
 #ifdef CONFIG_EXECABI_HAVE_BUILTIN_ELF
 		EXECABI_INIT_ELF,
 #endif /* CONFIG_EXECABI_HAVE_BUILTIN_ELF */
+#ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
+		EXECABI_INIT_SHEBANG,
+#endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
 	}
 };
 
@@ -70,6 +81,23 @@ NOTHROW(FCALL execabis_destroy)(struct execabis_struct *__restrict self) {
 		weakdecref(self->eas_abis[i].ea_driver);
 	kfree(self);
 }
+
+
+/* Finalize the given set of exec() arguments. */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL execargs_fini)(struct execargs *__restrict self) {
+	if unlikely(self->ea_argc_inject) {
+		size_t i;
+		for (i = 0; i < self->ea_argc_inject; ++i)
+			kfree(self->ea_argv_inject[i]);
+		kfree(self->ea_argv_inject);
+	}
+	decref_unlikely(self->ea_xpath);
+	decref_unlikely(self->ea_xdentry);
+	decref_unlikely(self->ea_xnode);
+}
+
+
 
 /* Register a given exec-ABI. Note that the only way to unregister
  * an ABI is to unload the associated driver (in which case the ABI

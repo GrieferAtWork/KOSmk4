@@ -95,6 +95,9 @@ BEGIN
 		"../modelfexec/arch/" + XARCH + "/*.c",
 		"../modelfexec/*.c",
 
+		/* Required for: executing #!-files. */
+		"../modshebang/*.c",
+
 		/* Required for: disk I/O */
 		"../modide/*.c",
 

@@ -31,6 +31,7 @@
 #include <kernel/execabi.h>
 #include <kernel/vm.h>
 #include <kernel/vm/exec.h>
+#include <sched/rpc.h> /* task_serve() */
 
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/noexec.h>
@@ -81,72 +82,37 @@ PUBLIC CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks = CALLBACK_LIST_INIT;
  *    by the executable's initialization, such as missing libraries)
  * NOTE: Upon successful return, all threads using the given `effective_vm' (excluding
  *       the caller themself if they are using the VM, too) will have been terminated.
- * @param: effective_vm: The VM into which to map the executable.
- *                       This must not be the kernel VM, which causes an assertion failure.
- *                       NOTE: When `change_vm_to_effective_vm' is `true', prior to a successful
- *                             return of this function, it will also do a `task_setvm(effective_vm)',
- *                             meaning that the caller will become apart of the given VM.
- * @param: user_state:   The user-space CPU state to update upon success in a manner that
- *                       proper execution of the loaded binary is possible.
- *                       Note however that in the case of a dynamic binary, a dynamic linker
- *                       may be injected to perform dynamic linking whilst already in user-space.
- * @param: exec_path:    Filesystem path for the directory inside of which `exec_node' is located.
- * @param: exec_dentry:  Directory entry containing the filename of `exec_node'
- * @param: exec_node:    The filesystem node which should be loaded as an executable binary.
- * @param: argc_inject:  The number of arguments from `argv_inject' to inject at the beginning of the user-space argc/argv vector.
- * @param: argv_inject:  Vector of arguments to inject at the beginning of the user-space argc/argv vector.
- * @param: argv:         NULL-terminated vector of arguments to-be passed to program being loaded.
- * @param: envp:         NULL-terminated vector of environment variables to-be passed to program being loaded.
- * @return: * :          A pointer to the user-space register state to-be loaded in order to start
- *                       execution of the newly loaded binary (usually equal to `user_state')
- * @throw: E_BADALLOC:   Insufficient memory
- * @throw: E_SEGFAULT:   The given `argv', `envp', or one of their pointed-to strings is faulty
+ * @param: args:             Exec arguments
+ * @throw: E_BADALLOC:       Insufficient memory
+ * @throw: E_SEGFAULT:       The given `argv', `envp', or one of their pointed-to strings is faulty
  * @throw: E_NOT_EXECUTABLE: The given `exec_node' was not recognized as an acceptable binary. */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) struct icpustate *KCALL
-vm_exec(struct vm *__restrict effective_vm,
-        struct icpustate *__restrict user_state,
-        struct path *__restrict exec_path,
-        struct directory_entry *__restrict exec_dentry,
-        struct regular_node *__restrict exec_node,
-        bool change_vm_to_effective_vm,
-        size_t argc_inject, KERNEL char const *const *argv_inject,
-        execabi_strings_t argv, execabi_strings_t envp
-        EXECABI_PARAM__argv_is_compat)
+PUBLIC NONNULL((1)) void KCALL
+vm_exec(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
 	REF struct execabis_struct *abis;
 	size_t i;
-	byte_t header[CONFIG_EXECABI_MAXHEADER];
 	{
-		size_t count;
+		size_t read_bytes;
 		/* Load the file header. */
-		count = inode_read(exec_node, header, sizeof(header), 0);
-		if unlikely(count < CONFIG_EXECABI_MAXHEADER)
-			memset(header + count, 0, CONFIG_EXECABI_MAXHEADER - count);
+		read_bytes = inode_read(args->ea_xnode, args->ea_header, sizeof(args->ea_header), 0);
+		if unlikely(read_bytes < CONFIG_EXECABI_MAXHEADER)
+			memset(args->ea_header + read_bytes, 0, CONFIG_EXECABI_MAXHEADER - read_bytes);
 	}
 again_getabis:
 	abis = execabis.get();
+again_searchabis:
 	for (i = 0; i < abis->eas_count; ++i) {
-		struct icpustate *result;
+		unsigned int status;
 		struct execabi *abi = &abis->eas_abis[i];
 		/* Check if the magic for this ABI matches. */
-		if (memcmp(header, abi->ea_magic, abi->ea_magsiz) != 0)
+		if (memcmp(args->ea_header, abi->ea_magic, abi->ea_magsiz) != 0)
 			continue;
 		if (!tryincref(abi->ea_driver))
 			continue;
 		FINALLY_DECREF_UNLIKELY(abi->ea_driver);
 		/* Try to invoke the exec loader of this ABI */
 		TRY {
-			result = (*abi->ea_exec)(effective_vm,
-			                         user_state,
-			                         exec_path,
-			                         exec_dentry,
-			                         exec_node,
-			                         header,
-			                         change_vm_to_effective_vm,
-			                         argc_inject, argv_inject,
-			                         argv,
-			                         envp
-			                         EXECABI_ARG__argv_is_compat);
+			status = (*abi->ea_exec)(args);
 		} EXCEPT {
 			decref_unlikely(abi->ea_driver);
 			/* Handle `E_NOT_EXECUTABLE_NOT_A_BINARY' the same as a NULL-return-value
@@ -159,9 +125,20 @@ again_getabis:
 			continue;
 		}
 		decref_unlikely(abi->ea_driver);
-		if likely(result) {
+		if (status == EXECABI_EXEC_SUCCESS) {
 			decref_unlikely(abis);
-			return result; /* Got it! */
+			return; /* Got it! */
+		}
+		/* If requested to, restart the exec process.
+		 * This is used to implement interpreter redirection, as used by #!-scripts. */
+		if (status == EXECABI_EXEC_RESTART) {
+			/* Make sure to service RPC functions before restarting.
+			 * A malicious user may have set-up #!-files in a loop, and
+			 * we must ensure that some other user remains the ability
+			 * to kill(2) or CTRL+C our process (in order words: we must
+			 * guaranty to be able to service RPCs when looping back) */
+			task_serve();
+			goto again_searchabis;
 		}
 	}
 	decref_unlikely(abis);
@@ -208,31 +185,37 @@ DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_init_binary,
  * was passed as argument in a `init=...' kernel commandline option. */
 INTERN ATTR_FREETEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
-	REF struct path *init_path;
-	REF struct inode *init_node;
-	REF struct directory_entry *init_dentry;
-	char const *init_argv[] = { kernel_init_binary };
-	init_node = path_traversefull(THIS_FS,
-	                              kernel_init_binary,
-	                              true,
-	                              FS_MODE_FNORMAL,
-	                              NULL,
-	                              &init_path,
-	                              NULL,
-	                              &init_dentry);
+	struct execargs args;
+	memset(&args, 0, sizeof(args)); /* For fields which we don't use */
+	args.ea_xnode = (REF struct regular_node *)path_traversefull(THIS_FS,
+	                                                             kernel_init_binary,
+	                                                             true,
+	                                                             FS_MODE_FNORMAL,
+	                                                             NULL,
+	                                                             &args.ea_xpath,
+	                                                             NULL,
+	                                                             &args.ea_xdentry);
 	/* Can only execute regular files. */
-	vm_exec_assert_regular(init_node);
-	/* Load the given INode as an executable. */
-	state = vm_exec(THIS_VM,
-	                state,
-	                init_path,
-	                init_dentry,
-	                (struct regular_node *)init_node,
-	                true, /* change_vm_to_effective_vm: Don't matter */
-	                COMPILER_LENOF(init_argv),
-	                init_argv,
-	                NULL,
-	                NULL);
+	vm_exec_assert_regular(args.ea_xnode);
+
+	/* Fill in the remaining fields of `args' (which we make use of) */
+	args.ea_vm          = THIS_VM;
+	args.ea_argc_inject = 1;
+	args.ea_argv_inject = (char **)kmalloc(1 * sizeof(char *), GFP_NORMAL);
+	{
+		size_t binlen = (strlen(kernel_init_binary) + 1) * sizeof(char);
+		args.ea_argv_inject[0] = (char *)memcpy(kmalloc(binlen, GFP_NORMAL),
+		                                        kernel_init_binary, binlen);
+	}
+
+	/* Do the actual exec */
+	args.ea_state = state;
+	vm_exec(&args);
+	state = args.ea_state;
+
+	/* Finalize exec arguments. */
+	execargs_fini(&args);
+
 	if (kernel_debugtrap_enabled()) {
 		struct debugtrap_reason r;
 		r.dtr_signo  = SIGTRAP;
@@ -242,9 +225,6 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 		r.dtr_strarg = kernel_init_binary;
 		state = kernel_debugtrap_r(state, &r);
 	}
-	decref(init_dentry);
-	decref(init_path);
-	decref(init_node);
 	return state;
 }
 

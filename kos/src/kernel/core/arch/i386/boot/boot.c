@@ -407,11 +407,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
-	/* TODO: Add an abstract exec-provider API for extending/providing exec loaders.
-	 * Using this API, add support for (in order from simplest to most complicated):
-	 *   - #!-shebang  (integrated into the kernel)
-	 *   - a.out       (separate driver)
-	 *   - PE          (separate driver) */
+	/* TODO: Add drivers for loading binaries:
+	 *   - a.out
+	 *   - PE */
 
 	/* TODO: Make the x86 LDT object ATTR_PERVM, and reload LDT registers during a VM switch.
 	 *       On linux, they're PERVM, too, so we really should do the same. */

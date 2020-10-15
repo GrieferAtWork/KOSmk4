@@ -20,47 +20,36 @@
 #ifdef __INTELLISENSE__
 #include "elf.c"
 #if defined(__x86_64__) && 1
-#define MY_PTR(x) __HYBRID_PTR32(x)
-#define MY_FUNC(x) compat_##x
-#define MY_ELFW COMPAT_ELFW
-#define MY_ElfW COMPAT_ElfW
-#define MY_EXEC_ARGV_SIZE 1
-#define MY_POINTERSIZE 4
-#else
-#define MY_PTR(x) x *
-#define MY_FUNC(x) x
-#define MY_ELFW ELFW
-#define MY_ElfW ElfW
-#define MY_POINTERSIZE __SIZEOF_POINTER__
-#endif
+#define LOCAL_PTR(x) __HYBRID_PTR32(x)
+#define LOCAL_FUNC(x) compat_##x
+#define LOCAL_ELFW COMPAT_ELFW
+#define LOCAL_ElfW COMPAT_ElfW
+#define LOCAL_EXEC_ARGV_SIZE 1
+#define LOCAL_POINTERSIZE 4
+#else /* __x86_64__ */
+#define LOCAL_PTR(x) x *
+#define LOCAL_FUNC(x) x
+#define LOCAL_ELFW ELFW
+#define LOCAL_ElfW ElfW
+#define LOCAL_POINTERSIZE __SIZEOF_POINTER__
+#endif /* !__x86_64__ */
 #endif /* __INTELLISENSE__ */
+
+#ifdef LOCAL_EXEC_ARGV_SIZE
+#define LOCAL_STRINGARRAY_TYPE USER CHECKED void const *
+#else /* LOCAL_EXEC_ARGV_SIZE */
+#define LOCAL_STRINGARRAY_TYPE USER UNCHECKED LOCAL_PTR(char const) USER CHECKED const *
+#endif /* !LOCAL_EXEC_ARGV_SIZE */
 
 DECL_BEGIN
 
-LOCAL ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5, 11)) struct icpustate *KCALL
-MY_FUNC(elf_exec_impl)(struct vm *__restrict effective_vm,
-                       struct icpustate *__restrict user_state,
-                       struct path *__restrict exec_path,
-                       struct directory_entry *__restrict exec_dentry,
-                       struct regular_node *__restrict exec_node,
-                       MY_ElfW(Ehdr) const *__restrict ehdr,
-                       bool change_vm_to_effective_vm,
-                       size_t argc_inject, KERNEL char const *const *argv_inject,
-#ifdef MY_EXEC_ARGV_SIZE
-                       USER CHECKED void const *argv,
-                       USER CHECKED void const *envp
-#else /* MY_EXEC_ARGV_SIZE */
-                       USER UNCHECKED MY_PTR(char const) USER CHECKED const *argv,
-                       USER UNCHECKED MY_PTR(char const) USER CHECKED const *envp
-#endif /* !MY_EXEC_ARGV_SIZE */
-#ifdef MY_EXEC_ARGV_SIZE
-                       ,
-                       bool argv_is_compat
-#endif /* MY_EXEC_ARGV_SIZE */
-                       )
+LOCAL WUNUSED NONNULL((1)) unsigned int FCALL
+LOCAL_FUNC(elf_exec_impl)(/*in|out*/ struct execargs *__restrict args)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR) {
-	MY_ElfW(Phdr) *phdr_vector;
-	phdr_vector = (MY_ElfW(Phdr) *)malloca(ehdr->e_phnum * sizeof(MY_ElfW(Phdr)));
+	LOCAL_ElfW(Ehdr) *ehdr;
+	LOCAL_ElfW(Phdr) *phdr_vector;
+	ehdr        = (LOCAL_ElfW(Ehdr) *)args->ea_header;
+	phdr_vector = (LOCAL_ElfW(Phdr) *)malloca(ehdr->e_phnum * sizeof(LOCAL_ElfW(Phdr)));
 	TRY {
 		struct vmb builder = VMB_INIT;
 		PAGEDIR_PAGEALIGNED UNCHECKED void *peb_base;
@@ -70,11 +59,11 @@ MY_FUNC(elf_exec_impl)(struct vm *__restrict effective_vm,
 		TRY {
 			bool need_dyn_linker = false;
 			linker_base = (UNCHECKED void *)-1;
-			MY_ElfW(Half) i;
+			LOCAL_ElfW(Half) i;
 			/* Read the program segment header table into memory. */
-			inode_readall(exec_node,
+			inode_readall(args->ea_xnode,
 			              phdr_vector,
-			              ehdr->e_phnum * sizeof(MY_ElfW(Phdr)),
+			              ehdr->e_phnum * sizeof(LOCAL_ElfW(Phdr)),
 			              (pos_t)ehdr->e_phoff);
 
 			/* Load program headers. */
@@ -118,7 +107,7 @@ MY_FUNC(elf_exec_impl)(struct vm *__restrict effective_vm,
 					}
 #if PF_X == VM_PROT_EXEC && PF_W == VM_PROT_WRITE && PF_R == VM_PROT_READ
 					prot = phdr_vector[i].p_flags & (PF_X | PF_W | PF_R);
-#else
+#else /* PF_X == VM_PROT_EXEC && PF_W == VM_PROT_WRITE && PF_R == VM_PROT_READ */
 					prot = VM_PROT_NONE;
 					if (phdr_vector[i].p_flags & PF_X)
 						prot |= VM_PROT_EXEC;
@@ -126,13 +115,13 @@ MY_FUNC(elf_exec_impl)(struct vm *__restrict effective_vm,
 						prot |= VM_PROT_WRITE;
 					if (phdr_vector[i].p_flags & PF_R)
 						prot |= VM_PROT_READ;
-#endif
+#endif /* PF_X != VM_PROT_EXEC || PF_W != VM_PROT_WRITE || PF_R != VM_PROT_READ */
 					map_ok = vmb_paged_mapat(&builder,
 					                         page_index,
 					                         num_pages,
-					                         exec_node,
-					                         exec_path,
-					                         exec_dentry,
+					                         args->ea_xnode,
+					                         args->ea_xpath,
+					                         args->ea_xdentry,
 					                         (pageid64_t)(phdr_vector[i].p_offset / PAGESIZE),
 					                         prot | VM_PROT_PRIVATE);
 					if unlikely(!map_ok) {
@@ -179,7 +168,7 @@ err_overlap:
 							assert(bss_overlap_page == PAGEID_ENCODE(bss_start));
 							if unlikely(vmb_getnodeofpageid(&builder, bss_overlap_page) != NULL)
 								goto err_overlap; /* Already in use... */
-							overlap_node = create_bss_overlap_node(exec_node,
+							overlap_node = create_bss_overlap_node(args->ea_xnode,
 							                                       (pos_t)(phdr_vector[i].p_offset +
 							                                               phdr_vector[i].p_filesz -
 							                                               bss_start_offset),
@@ -217,14 +206,14 @@ err_overlap:
 			if (need_dyn_linker) {
 				linker_base = vmb_map(&builder,
 				                      HINT_GETADDR(KERNEL_VMHINT_USER_DYNLINK),
-				                      MY_FUNC(execabi_system_rtld_size),
+				                      LOCAL_FUNC(execabi_system_rtld_size),
 				                      PAGESIZE,
 #if !defined(NDEBUG) && 1 /* XXX: Remove me */
 				                      VM_GETFREE_ABOVE,
 #else
 				                      HINT_GETMODE(KERNEL_VMHINT_USER_DYNLINK),
 #endif
-				                      &MY_FUNC(execabi_system_rtld_file).rf_block,
+				                      &LOCAL_FUNC(execabi_system_rtld_file).rf_block,
 				                      NULL,
 				                      NULL,
 				                      0,
@@ -248,8 +237,8 @@ err_overlap:
 			                     VM_NODE_FLAG_NORMAL,
 			                     0);
 
-			/* Create a memory mapping for the PEB containing `argv' and `envp' */
-#ifdef MY_EXEC_ARGV_SIZE
+			/* Create a memory mapping for the PEB containing `args->ea_argv' and `args->ea_envp' */
+#ifdef LOCAL_EXEC_ARGV_SIZE
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
 			if (argv_is_compat)
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8
@@ -259,52 +248,52 @@ err_overlap:
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
 			{
 				typedef USER UNCHECKED PTR32(char const) USER CHECKED const *vec_t;
-#if MY_POINTERSIZE == 4
+#if LOCAL_POINTERSIZE == 4
 				peb_base = vmb_alloc_peb32_p32(&builder,
-				                               argc_inject,
-				                               argv_inject,
-				                               (vec_t)argv,
-				                               (vec_t)envp);
-#else /* MY_POINTERSIZE == 4 */
+				                               args->ea_argc_inject,
+				                               args->ea_argv_inject,
+				                               (vec_t)args->ea_argv,
+				                               (vec_t)args->ea_envp);
+#else /* LOCAL_POINTERSIZE == 4 */
 				peb_base = vmb_alloc_peb64_p32(&builder,
-				                               argc_inject,
-				                               argv_inject,
-				                               (vec_t)argv,
-				                               (vec_t)envp);
-#endif /* MY_POINTERSIZE != 4 */
+				                               args->ea_argc_inject,
+				                               args->ea_argv_inject,
+				                               (vec_t)args->ea_argv,
+				                               (vec_t)args->ea_envp);
+#endif /* LOCAL_POINTERSIZE != 4 */
 			} else {
 				typedef USER UNCHECKED PTR64(char const) USER CHECKED const *vec_t;
-#if MY_POINTERSIZE == 4
+#if LOCAL_POINTERSIZE == 4
 				peb_base = vmb_alloc_peb32_p64(&builder,
-				                               argc_inject,
-				                               argv_inject,
-				                               (vec_t)argv,
-				                               (vec_t)envp);
-#else /* MY_POINTERSIZE == 4 */
+				                               args->ea_argc_inject,
+				                               args->ea_argv_inject,
+				                               (vec_t)args->ea_argv,
+				                               (vec_t)args->ea_envp);
+#else /* LOCAL_POINTERSIZE == 4 */
 				peb_base = vmb_alloc_peb64_p64(&builder,
-				                               argc_inject,
-				                               argv_inject,
-				                               (vec_t)argv,
-				                               (vec_t)envp);
-#endif /* MY_POINTERSIZE != 4 */
+				                               args->ea_argc_inject,
+				                               args->ea_argv_inject,
+				                               (vec_t)args->ea_argv,
+				                               (vec_t)args->ea_envp);
+#endif /* LOCAL_POINTERSIZE != 4 */
 			}
-#else /* MY_EXEC_ARGV_SIZE */
-			peb_base = MY_FUNC(vmb_alloc_peb)(&builder,
-			                                  argc_inject,
-			                                  argv_inject,
-			                                  argv,
-			                                  envp);
-#endif /* !MY_EXEC_ARGV_SIZE */
+#else /* LOCAL_EXEC_ARGV_SIZE */
+			peb_base = LOCAL_FUNC(vmb_alloc_peb)(&builder,
+			                                     args->ea_argc_inject,
+			                                     args->ea_argv_inject,
+			                                     (LOCAL_STRINGARRAY_TYPE)args->ea_argv,
+			                                     (LOCAL_STRINGARRAY_TYPE)args->ea_envp);
+#endif /* !LOCAL_EXEC_ARGV_SIZE */
 
 			/* Apply the newly loaded binary to the given VM and
 			 * terminate all threads using it except for the caller. */
 			{
 				struct vm_execinfo_struct ei;
-				ei.ei_node = exec_node;
-				ei.ei_dent = exec_dentry;
-				ei.ei_path = exec_path;
+				ei.ei_node = args->ea_xnode;
+				ei.ei_dent = args->ea_xdentry;
+				ei.ei_path = args->ea_xpath;
 				vmb_apply(&builder,
-				          effective_vm,
+				          args->ea_vm,
 				          VMB_APPLY_AA_TERMTHREADS |
 				          VMB_APPLY_AA_SETEXECINFO,
 				          &ei);
@@ -316,11 +305,11 @@ err_overlap:
 
 		{
 			REF struct vm *oldvm = THIS_VM;
-			/* Change the calling thread's vm to `effective_vm' */
-			if (oldvm != effective_vm) {
+			/* Change the calling thread's vm to `args->ea_vm' */
+			if (oldvm != args->ea_vm) {
 				incref(oldvm);
 				TRY {
-					task_setvm(effective_vm);
+					task_setvm(args->ea_vm);
 				} EXCEPT {
 					decref_nokill(oldvm);
 					RETHROW();
@@ -333,37 +322,37 @@ err_overlap:
 				entry_pc    = (USER void *)(uintptr_t)ehdr->e_entry;
 				if (linker_base != (void *)-1) {
 					/* Initialize such that we make use of the dynamic linker. */
-					user_state = MY_FUNC(elfexec_init_rtld)(/* user_state:           */ user_state,
-					                                        /* exec_path:            */ exec_path,
-					                                        /* exec_dentry:          */ exec_dentry,
-					                                        /* exec_node:            */ exec_node,
-					                                        /* ehdr:                 */ ehdr,
-					                                        /* phdr_vec:             */ phdr_vector,
-					                                        /* phdr_cnt:             */ ehdr->e_phnum,
-					                                        /* application_loadaddr: */ (void *)0,
-					                                        /* linker_loadaddr:      */ linker_base,
-					                                        /* peb_address:          */ peb_base,
-					                                        /* ustack_base:          */ stack_base,
-					                                        /* ustack_size:          */ ustack_size,
-					                                        /* entry_pc:             */ entry_pc);
+					args->ea_state = LOCAL_FUNC(elfexec_init_rtld)(/* user_state:           */ args->ea_state,
+					                                               /* args->ea_xpath:            */ args->ea_xpath,
+					                                               /* args->ea_xdentry:          */ args->ea_xdentry,
+					                                               /* args->ea_xnode:            */ args->ea_xnode,
+					                                               /* ehdr:                 */ ehdr,
+					                                               /* phdr_vec:             */ phdr_vector,
+					                                               /* phdr_cnt:             */ ehdr->e_phnum,
+					                                               /* application_loadaddr: */ (void *)0,
+					                                               /* linker_loadaddr:      */ linker_base,
+					                                               /* peb_address:          */ peb_base,
+					                                               /* ustack_base:          */ stack_base,
+					                                               /* ustack_size:          */ ustack_size,
+					                                               /* entry_pc:             */ entry_pc);
 				} else {
 					/* Set the entry point for the loaded binary. */
-					user_state = MY_FUNC(elfexec_init_entry)(user_state,
-					                                         ehdr,
-					                                         peb_base,
-					                                         stack_base,
-					                                         ustack_size,
-					                                         entry_pc);
+					args->ea_state = LOCAL_FUNC(elfexec_init_entry)(args->ea_state,
+					                                                ehdr,
+					                                                peb_base,
+					                                                stack_base,
+					                                                ustack_size,
+					                                                entry_pc);
 				}
 			} EXCEPT {
-				if (oldvm != effective_vm) {
+				if (oldvm != args->ea_vm) {
 					FINALLY_DECREF(oldvm);
 					task_setvm(oldvm);
 				}
 				RETHROW();
 			}
-			if (oldvm != effective_vm) {
-				if likely(change_vm_to_effective_vm) {
+			if (oldvm != args->ea_vm) {
+				if likely(args->ea_change_vm_to_effective_vm) {
 					decref(oldvm);
 				} else {
 					FINALLY_DECREF(oldvm);
@@ -376,16 +365,17 @@ err_overlap:
 		RETHROW();
 	}
 	freea(phdr_vector);
-	return user_state;
+	return EXECABI_EXEC_SUCCESS;
 }
 
 DECL_END
 
-#undef MY_PTR
-#undef MY_FUNC
-#undef MY_ELFW
-#undef MY_ElfW
-#undef MY_SYSTEM_RTLD_SIZE
-#undef MY_SYSTEM_RTLD_FILE
-#undef MY_EXEC_ARGV_SIZE
-#undef MY_POINTERSIZE
+#undef LOCAL_STRINGARRAY_TYPE
+#undef LOCAL_PTR
+#undef LOCAL_FUNC
+#undef LOCAL_ELFW
+#undef LOCAL_ElfW
+#undef LOCAL_SYSTEM_RTLD_SIZE
+#undef LOCAL_SYSTEM_RTLD_FILE
+#undef LOCAL_EXEC_ARGV_SIZE
+#undef LOCAL_POINTERSIZE

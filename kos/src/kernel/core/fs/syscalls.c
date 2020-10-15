@@ -37,6 +37,7 @@
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
+#include <kernel/execabi.h>
 #include <kernel/handle.h>
 #include <kernel/personality.h>
 #include <kernel/printk.h>
@@ -3001,20 +3002,8 @@ LOCAL void KCALL run_pervm_onexec(void) {
 
 
 
-PRIVATE struct icpustate *KCALL
-kernel_do_execveat_impl(struct icpustate *__restrict state,
-                        REF struct regular_node *__restrict exec_node,
-                        REF struct path *__restrict containing_path,
-                        REF struct directory_entry *__restrict containing_dentry,
-#ifdef __ARCH_HAVE_COMPAT
-                        USER CHECKED void const *argv,
-                        USER CHECKED void const *envp,
-                        bool argv_is_compat
-#else /* __ARCH_HAVE_COMPAT */
-                        USER UNCHECKED char const *USER CHECKED const *argv,
-                        USER UNCHECKED char const *USER CHECKED const *envp
-#endif /* !__ARCH_HAVE_COMPAT */
-                        ) {
+PRIVATE void KCALL
+kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	uintptr_t thread_flags;
 	thread_flags = PERTASK_GET(this_task.t_flags);
 #ifdef CONFIG_HAVE_USERPROCMASK
@@ -3040,27 +3029,15 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 #endif /* CONFIG_HAVE_USERPROCMASK */
 
 	/* Deal with the special VFORK mode. */
+	args->ea_change_vm_to_effective_vm = true;
 	if (thread_flags & TASK_FVFORK) {
 		REF struct vm *newvm;
 		/* Construct the new VM for the process after the exec. */
 		newvm = vm_alloc();
 		{
 			FINALLY_DECREF_UNLIKELY(newvm);
-			state = vm_exec(/* effective_vm:              */ newvm,
-			                /* user_state:                */ state,
-			                /* exec_path:                 */ containing_path,
-			                /* exec_dentry:               */ containing_dentry,
-			                /* exec_node:                 */ exec_node,
-			                /* change_vm_to_effective_vm: */ true,
-			                /* argc_inject:               */ 0,
-			                /* argv_inject:               */ NULL,
-			                /* argv:                      */ argv,
-			                /* envp:                      */ envp
-#ifdef __ARCH_HAVE_COMPAT
-			                ,
-			                /* argv_is_compat:            */ argv_is_compat
-#endif /* __ARCH_HAVE_COMPAT */
-			                );
+			args->ea_vm = newvm;
+			vm_exec(args);
 			/* Load the newly initialized VM as our current VM */
 			task_setvm(newvm);
 		}
@@ -3104,21 +3081,8 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 		 * XXX: Use `sigmask_check_s()' (after all: we _do_ have `state') */
 		sigmask_check();
 	} else {
-		state = vm_exec(/* effective_vm:              */ THIS_VM,
-		                /* user_state:                */ state,
-		                /* exec_path:                 */ containing_path,
-		                /* exec_dentry:               */ containing_dentry,
-		                /* exec_node:                 */ exec_node,
-		                /* change_vm_to_effective_vm: */ true, /* Doesn't matter! */
-		                /* argc_inject:               */ 0,
-		                /* argv_inject:               */ NULL,
-		                /* argv:                      */ argv,
-		                /* envp:                      */ envp
-#ifdef __ARCH_HAVE_COMPAT
-		                ,
-		                /* argv_is_compat:            */ argv_is_compat
-#endif /* __ARCH_HAVE_COMPAT */
-		                );
+		args->ea_vm = THIS_VM;
+		vm_exec(args);
 #ifdef CONFIG_HAVE_USERPROCMASK
 		/* If the previous process used to have a userprocmask, and didn't make proper
 		 * use of calling `sys_sigmask_check()', we check for pending signals in the
@@ -3135,32 +3099,19 @@ kernel_do_execveat_impl(struct icpustate *__restrict state,
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 	run_pervm_onexec();
 #ifndef CONFIG_EVERYONE_IS_ROOT
-	cred_onexec(exec_node);
+	cred_onexec(args->ea_xnode);
 #endif /* !CONFIG_EVERYONE_IS_ROOT */
-	return state;
 }
 
-PRIVATE struct icpustate *KCALL
-kernel_do_execveat(struct icpustate *__restrict state,
-                   REF struct regular_node *__restrict exec_node,
-                   REF struct path *__restrict containing_path,
-                   REF struct directory_entry *__restrict containing_dentry,
-#ifdef __ARCH_HAVE_COMPAT
-                   USER CHECKED void const *argv,
-                   USER CHECKED void const *envp,
-                   bool argv_is_compat
-#else /* __ARCH_HAVE_COMPAT */
-                   USER UNCHECKED char const *USER CHECKED const *argv,
-                   USER UNCHECKED char const *USER CHECKED const *envp
-#endif /* !__ARCH_HAVE_COMPAT */
-                   ) {
+PRIVATE void KCALL
+kernel_do_execveat(/*in|out*/ struct execargs *__restrict args) {
 	if (kernel_debugtrap_enabled()) {
 		/* Trigger an EXEC debug trap. */
 		char *buf, *dst;
 		size_t reglen;
-		reglen = (size_t)path_printent(containing_path,
-		                               containing_dentry->de_name,
-		                               containing_dentry->de_namelen,
+		reglen = (size_t)path_printent(args->ea_xpath,
+		                               args->ea_xdentry->de_name,
+		                               args->ea_xdentry->de_namelen,
 		                               &format_length,
 		                               NULL);
 		/* Allocate the register buffer beforehand, so this
@@ -3176,32 +3127,22 @@ kernel_do_execveat(struct icpustate *__restrict state,
 			 *        printent() call, then we may write past the end of the buffer!
 			 * Solution: Use `path_printentex()' and pass the same pre-loaded root-path
 			 *           during every invocation! */
-			path_printent(containing_path,
-			              containing_dentry->de_name,
-			              containing_dentry->de_namelen,
+			path_printent(args->ea_xpath,
+			              args->ea_xdentry->de_name,
+			              args->ea_xdentry->de_namelen,
 			              &format_sprintf_printer,
 			              &dst);
 			*dst = '\0';
 			assert(dst == buf + reglen);
 			*dst = 0;
 			/* Execute the specified program. */
-			state = kernel_do_execveat_impl(state,
-			                                exec_node,
-			                                containing_path,
-			                                containing_dentry,
-			                                argv,
-			                                envp
-#ifdef __ARCH_HAVE_COMPAT
-			                                ,
-			                                argv_is_compat
-#endif /* __ARCH_HAVE_COMPAT */
-			                                );
+			kernel_do_execveat_impl(args);
 			{
 				struct debugtrap_reason r;
 				r.dtr_signo  = SIGTRAP;
 				r.dtr_reason = DEBUGTRAP_REASON_EXEC;
 				r.dtr_strarg = buf;
-				state = kernel_debugtrap_r(state, &r);
+				args->ea_state = kernel_debugtrap_r(args->ea_state, &r);
 			}
 		} EXCEPT {
 			kfree(buf);
@@ -3210,36 +3151,15 @@ kernel_do_execveat(struct icpustate *__restrict state,
 		kfree(buf);
 	} else {
 		/* Execute the specified program. */
-		state = kernel_do_execveat_impl(state,
-		                                exec_node,
-		                                containing_path,
-		                                containing_dentry,
-		                                argv,
-		                                envp
-#ifdef __ARCH_HAVE_COMPAT
-		                                ,
-		                                argv_is_compat
-#endif /* __ARCH_HAVE_COMPAT */
-		                                );
+		kernel_do_execveat_impl(args);
 	}
-	return state;
 }
 
 
 struct kernel_exec_rpc_data {
-	REF struct regular_node                       *er_node;   /* [1..1] The INode that should be executed. */
-	REF struct path                               *er_path;   /* [1..1] The containing path for `er_node' */
-	REF struct directory_entry                    *er_dentry; /* [1..1] The directory entry for `er_node' */
-#ifdef __ARCH_HAVE_COMPAT
-	USER CHECKED void const                       *er_argv;   /* [?..?][1..1] Vector user-supplied arguments to-be passed to the targeted executable. */
-	USER CHECKED void const                       *er_envp;   /* [?..?][1..1] Vector user-supplied environment variables to-be passed to the targeted executable. */
-	bool                                           er_argv_is_compat; /* True if `er_argv' and `er_envp' original from compat-mode */
-#else /* __ARCH_HAVE_COMPAT */
-	USER UNCHECKED char const *USER CHECKED const *er_argv;   /* [?..?][1..1] Vector user-supplied arguments to-be passed to the targeted executable. */
-	USER UNCHECKED char const *USER CHECKED const *er_envp;   /* [?..?][1..1] Vector user-supplied environment variables to-be passed to the targeted executable. */
-#endif /* !__ARCH_HAVE_COMPAT */
-	struct exception_data                          er_except; /* Information about the exception that caused exec() to fail. */
-	struct sig                                     er_error;  /* Signal broadcast upon error. */
+	struct execargs       er_args;   /* Exec args. */
+	struct exception_data er_except; /* Information about the exception that caused exec() to fail. */
+	struct sig            er_error;  /* Signal broadcast upon error. */
 };
 
 
@@ -3255,9 +3175,6 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 	data = (struct kernel_exec_rpc_data *)arg;
 	memcpy(&old_exception_info, &THIS_EXCEPTION_INFO, sizeof(old_exception_info));
 	TRY {
-		FINALLY_DECREF_UNLIKELY(data->er_node);
-		FINALLY_DECREF_UNLIKELY(data->er_path);
-		FINALLY_DECREF_UNLIKELY(data->er_dentry);
 		/* Check for race condition: Our RPC only got executed because the
 		 * main thread is currently being terminated. - In this case it wouldn't
 		 * make any sense to try and load a new binary into the VM, so just indicate
@@ -3273,18 +3190,11 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 		/* Actually map the specified file into memory!
 		 * NOTE: For this purpose, we simply re-direct the given user-space
 		 *       CPU state to which the RPC would have normally returned! */
-		state = kernel_do_execveat(state,
-		                           data->er_node,
-		                           data->er_path,
-		                           data->er_dentry,
-		                           data->er_argv,
-		                           data->er_envp
-#ifdef __ARCH_HAVE_COMPAT
-		                           ,
-		                           data->er_argv_is_compat
-#endif /* __ARCH_HAVE_COMPAT */
-		                           );
+		data->er_args.ea_state = state;
+		kernel_do_execveat(&data->er_args);
+		state = data->er_args.ea_state;
 	} EXCEPT {
+		execargs_fini(&data->er_args);
 		memcpy(&data->er_except,
 		       &THIS_EXCEPTION_INFO,
 		       sizeof(data->er_except));
@@ -3296,6 +3206,7 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 	 *             by throwing an E_EXIT_THREAD exception that got caused by
 	 *            `vmb_apply()' terminating all threads except for the calling
 	 *             one (us) within the current process. */
+	execargs_fini(&data->er_args);
 	kfree(data);
 	return state;
 restore_exception:
@@ -3330,10 +3241,8 @@ kernel_execveat(fd_t dirfd,
 #endif /* __ARCH_HAVE_COMPAT */
                 struct icpustate *__restrict state) {
 	struct fs *f = THIS_FS;
-	REF struct inode *node;
-	REF struct path *containing_path;
-	REF struct directory_entry *containing_dentry;
 	struct task *caller = THIS_TASK;
+	struct execargs args;
 #ifdef __ARCH_HAVE_COMPAT
 	validate_readable_opt(argv, 1);
 	validate_readable_opt(envp, 1);
@@ -3344,37 +3253,33 @@ kernel_execveat(fd_t dirfd,
 	VALIDATE_FLAGSET(flags,
 	                 AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_EXECVEAT_FLAGS);
-	node = path_traversefull_at(f,
-	                            (unsigned int)dirfd,
-	                            pathname,
-	                            !(flags & AT_SYMLINK_NOFOLLOW),
-	                            fs_getmode_for(f, flags),
-	                            NULL,
-	                            &containing_path,
-	                            NULL,
-	                            &containing_dentry);
-	{
-		FINALLY_DECREF_UNLIKELY(containing_path);
-		FINALLY_DECREF_UNLIKELY(containing_dentry);
-		FINALLY_DECREF_UNLIKELY(node);
+	memset(&args, 0, sizeof(args));
+	args.ea_xnode = (REF struct regular_node *)path_traversefull_at(f,
+	                                                                (unsigned int)dirfd,
+	                                                                pathname,
+	                                                                !(flags & AT_SYMLINK_NOFOLLOW),
+	                                                                fs_getmode_for(f, flags),
+	                                                                NULL,
+	                                                                &args.ea_xpath,
+	                                                                NULL,
+	                                                                &args.ea_xdentry);
+	TRY {
 		/* Assert that the specified node is a regular file. */
-		vm_exec_assert_regular(node);
-		{
-			inode_loadattr(node);
-			/* TODO: Check for execute permissions? */
-		}
-		if (caller == task_getprocess_of(caller)) {
-			state = kernel_do_execveat(state,
-			                           (struct regular_node *)node,
-			                           containing_path,
-			                           containing_dentry,
-			                           argv,
-			                           envp
+		vm_exec_assert_regular(args.ea_xnode);
+		/* Check for execute permissions? */
+		inode_access(args.ea_xnode, R_OK | X_OK);
+
+		/* Fill in exec arguments. */
+		args.ea_argv = argv;
+		args.ea_envp = envp;
 #ifdef __ARCH_HAVE_COMPAT
-			                           ,
-			                           argv_is_compat
+		args.ea_argv_is_compat = argv_is_compat;
 #endif /* __ARCH_HAVE_COMPAT */
-			                           );
+
+		if (caller == task_getprocess_of(caller)) {
+			args.ea_state = state;
+			kernel_do_execveat(&args);
+			state = args.ea_state;
 		} else {
 			struct kernel_exec_rpc_data *data;
 			struct task *proc = task_getprocess_of(caller);
@@ -3384,15 +3289,12 @@ kernel_execveat(fd_t dirfd,
 			data = (struct kernel_exec_rpc_data *)kmalloc(sizeof(struct kernel_exec_rpc_data),
 			                                              GFP_LOCKED);
 			/* Initialize RPC information. */
-			data->er_node   = (REF struct regular_node *)incref(node);
-			data->er_path   = incref(containing_path);
-			data->er_dentry = incref(containing_dentry);
-			data->er_argv   = argv;
-			data->er_envp   = envp;
-#ifdef __ARCH_HAVE_COMPAT
-			data->er_argv_is_compat = argv_is_compat;
-#endif /* __ARCH_HAVE_COMPAT */
+			memcpy(&data->er_args, &args, sizeof(struct execargs));
 			sig_init(&data->er_error);
+			/* Create references for `data->er_args' */
+			incref(args.ea_xdentry);
+			incref(args.ea_xpath);
+			incref(args.ea_xnode);
 			TRY {
 				assert(!task_isconnected());
 				task_connect(&data->er_error);
@@ -3410,14 +3312,14 @@ kernel_execveat(fd_t dirfd,
 				}
 			} EXCEPT {
 				task_disconnectall();
-				assert(data->er_dentry == containing_dentry);
-				assert(data->er_path == containing_path);
-				assert(data->er_node == node);
+				assert(data->er_args.ea_xdentry == args.ea_xdentry);
+				assert(data->er_args.ea_xpath == args.ea_xpath);
+				assert(data->er_args.ea_xnode == args.ea_xnode);
 				/* NoKill, because we still got 1 more reference to each, which will be
 				 * dropped after `RETHROW()' by the `FINALLY_DECREF_UNLIKELY()' above. */
-				decref_nokill(containing_dentry);
-				decref_nokill(containing_path);
-				decref_nokill(node);
+				decref_nokill(args.ea_xdentry);
+				decref_nokill(args.ea_xpath);
+				decref_nokill(args.ea_xnode);
 				kfree(data);
 				RETHROW();
 			}
@@ -3459,7 +3361,11 @@ kernel_execveat(fd_t dirfd,
 			/* (Re-)throw the exception that caused the exec() to fail. */
 			error_throw_current();
 		}
+	} EXCEPT {
+		execargs_fini(&args);
+		RETHROW();
 	}
+	execargs_fini(&args);
 	return state;
 }
 

@@ -49,6 +49,8 @@
 /* Define feature test macros for ABIs built into the kernel core */
 #undef CONFIG_EXECABI_HAVE_BUILTIN_ELF
 #define CONFIG_EXECABI_HAVE_BUILTIN_ELF 1
+#undef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
+#define CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG 1
 
 
 #ifdef __CC__
@@ -122,6 +124,47 @@ typedef USER UNCHECKED char const *USER CHECKED const *execabi_strings_t;
 #endif /* !__ARCH_HAVE_COMPAT */
 
 struct driver;
+struct icpustate;
+struct vm;
+struct path;
+struct directory_entry;
+struct regular_node;
+
+struct execargs {
+	struct vm                  *ea_vm;          /* [1..1] The VM into which to map the executable.
+	                                             * This must not be the kernel VM, which causes an assertion failure.
+	                                             * NOTE: When `ea_change_vm_to_effective_vm' is `true', prior to a successful
+	                                             *       return of `ea_exec', it will also do a `task_setvm(ea_vm)',
+	                                             *       meaning that the caller will become apart of the given VM. */
+	struct icpustate           *ea_state;       /* [1..1] The user-space CPU state to update upon success in a manner
+	                                             *        that proper execution of the loaded binary is possible.
+	                                             * Note however that in the case of a dynamic binary, a dynamic linker
+	                                             * may be injected to perform dynamic linking whilst already in user-space. */
+	REF struct path            *ea_xpath;       /* [1..1] Filesystem path for the directory inside of which `ea_xnode' is located. */
+	REF struct directory_entry *ea_xdentry;     /* [1..1] Directory entry containing the filename of `ea_xnode'. */
+	REF struct regular_node    *ea_xnode;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
+	byte_t                      ea_header[CONFIG_EXECABI_MAXHEADER];
+	                                            /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xnode'. Of this buffer,
+	                                             * the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If the
+	                                             * executable file is smaller than `CONFIG_EXECABI_MAXHEADER', trailing bytes
+	                                             * are simply zero-initialized. */
+	bool                        ea_change_vm_to_effective_vm;
+	                                            /* When set to `true', `ea_vm' should be set as the effective VM upon a
+	                                             * successful return of `ea_exec'. */
+	size_t                      ea_argc_inject; /* The number of arguments from `ea_argv_inject' to inject at the beginning of the user-space argc/argv vector. */
+	char                      **ea_argv_inject; /* [1..1][owned][ea_argc_inject][owned] Vector of arguments to inject at the beginning of the user-space argc/argv vector. */
+	execabi_strings_t           ea_argv;        /* [0..1] NULL-terminated vector of arguments to-be passed to program being loaded. */
+	execabi_strings_t           ea_envp;        /* [0..1] NULL-terminated vector of environment variables to-be passed to program being loaded. */
+#ifdef __ARCH_HAVE_COMPAT
+	bool                        ea_argv_is_compat; /* When `true', `ea_argv' and `ea_envp' are compatibility-mode vectors. */
+#endif /* !__ARCH_HAVE_COMPAT */
+};
+
+/* Finalize the given set of exec() arguments. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL execargs_fini)(struct execargs *__restrict self);
+
+
 struct execabi {
 	/* NOTE: All fields of this structure are [const] */
 	WEAK REF struct driver *ea_driver; /* [1..1] Weak reference to the implementing driver.
@@ -135,47 +178,23 @@ struct execabi {
 	                                    * start with a byte sequence identical to `ea_magic[:ea_magsiz]'
 	                                    * When set to 0, all files are considered suitable candidates
 	                                    * for this ABI. */
-	u8                      ea_magic[CONFIG_EXECABI_MAXHEADER]; /* ABI ~magic~ */
+	byte_t                  ea_magic[CONFIG_EXECABI_MAXHEADER]; /* ABI ~magic~ */
 
 	/* [1..1] ABI execution callback.
-	 * @param: effective_vm: The VM into which to map the executable.
-	 *                       This must not be the kernel VM, which causes an assertion failure.
-	 *                       NOTE: When `change_vm_to_effective_vm' is `true', prior to a successful
-	 *                             return of this function, it will also do a `task_setvm(effective_vm)',
-	 *                             meaning that the caller will become apart of the given VM.
-	 * @param: user_state:   The user-space CPU state to update upon success in a manner that
-	 *                       proper execution of the loaded binary is possible.
-	 *                       Note however that in the case of a dynamic binary, a dynamic linker
-	 *                       may be injected to perform dynamic linking whilst already in user-space.
-	 * @param: exec_path:    Filesystem path for the directory inside of which `exec_node' is located.
-	 * @param: exec_dentry:  Directory entry containing the filename of `exec_node'
-	 * @param: exec_node:    The filesystem node which should be loaded as an executable binary.
-	 * @param: exec_header:  The first `CONFIG_EXECABI_MAXHEADER' bytes of `exec_node'. Of this buffer,
-	 *                       the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If the
-	 *                       executable file is smaller than `CONFIG_EXECABI_MAXHEADER', trailing bytes
-	 *                       are simply zero-initialized.
-	 * @param: argc_inject:  The number of arguments from `argv_inject' to inject at the beginning of the user-space argc/argv vector.
-	 * @param: argv_inject:  Vector of arguments to inject at the beginning of the user-space argc/argv vector.
-	 * @param: argv:         NULL-terminated vector of arguments to-be passed to program being loaded.
-	 * @param: envp:         NULL-terminated vector of environment variables to-be passed to program being loaded.
-	 * @return: * :          A pointer to the user-space register state to-be loaded in order to start
-	 *                       execution of the newly loaded binary (usually equal to `user_state')
-	 * @return: NULL:        File doesn't belong this ABI. (But its magic bytes were correct none-the-less)
-	 * @throw: E_NOT_EXECUTABLE_NOT_A_BINARY: File cannot be executed using this ABI. (maybe try another ABI?)
-	 *                                        But note that the caller must ensure that `ea_magic' is matched. */
-	ATTR_RETNONNULL WUNUSED struct icpustate *
-	(NONNULL((1, 2, 3, 4, 5, 6)) KCALL *ea_exec)(struct vm *__restrict effective_vm,
-	                                             struct icpustate *__restrict user_state,
-	                                             struct path *__restrict exec_path,
-	                                             struct directory_entry *__restrict exec_dentry,
-	                                             struct regular_node *__restrict exec_node,
-	                                             void const *exec_header,
-	                                             bool change_vm_to_effective_vm,
-	                                             size_t argc_inject, KERNEL char const *const *argv_inject,
-	                                             execabi_strings_t argv, execabi_strings_t envp
-	                                             EXECABI_PARAM__argv_is_compat)
+	 * @param: args:  Exec arguments
+	 * @return: * :   One of `EXECABI_EXEC_*'
+	 * @return: NULL: 
+	 * @throw: E_NOT_EXECUTABLE_NOT_A_BINARY: Same as returning `NULL'. */
+	WUNUSED unsigned int
+	(NONNULL((1)) FCALL *ea_exec)(/*in|out*/ struct execargs *__restrict args)
 			THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
 };
+
+/* Return codes for `ea_exec' */
+#define EXECABI_EXEC_SUCCESS 0 /* Success. */
+#define EXECABI_EXEC_NOTBIN  1 /* File doesn't belong this ABI. (Even though its magic bytes were correct) */
+#define EXECABI_EXEC_RESTART 2 /* Restart execution for an updated `ea_xnode' (used to implement #!-scripts) */
+
 
 struct execabis_struct {
 	WEAK refcnt_t                           eas_refcnt; /* Reference counter. */
