@@ -174,6 +174,8 @@ NOTHROW(FCALL unix_server_shutdown_listen)(struct unix_server *__restrict self) 
 		next = pending->uc_next;
 		unix_client_refuse_connection(pending);
 		decref_unlikely(pending);
+		if (!next)
+			break;
 		pending = next;
 	}
 }
