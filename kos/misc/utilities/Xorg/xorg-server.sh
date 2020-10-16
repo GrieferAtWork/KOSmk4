@@ -49,16 +49,11 @@ require_utility libpixman             "$PKG_CONFIG_PATH/pixman-1.pc"
 require_utility Xorg/proto.libXfont2  "$PKG_CONFIG_PATH/xfont2.pc"
 require_utility Xorg/proto.libxkbfile "$PKG_CONFIG_PATH/xkbfile.pc"
 require_utility Xorg/libXau           "$PKG_CONFIG_PATH/xau.pc"
-require_utility Xorg/xkbcomp          "$PKG_CONFIG_PATH/xkbcomp.pc"
 require_utility Xorg/libxshmfence     "$PKG_CONFIG_PATH/xshmfence.pc"
 
 # Run-time dependencies
 require_utility Xorg/xkbcomp          "$PKG_CONFIG_PATH/xkbcomp.pc"
 require_utility Xorg/xkeyboard-config "$PKG_CONFIG_PATH/xkeyboard-config.pc"
-
-# TODO: configure: error: Package requirements (libdrm >= 2.4.89) were not met:
-#       Package dependency requirement 'libdrm >= 2.4.89' could not be satisfied.
-#       Package 'libdrm' has version '2.4.82', required version is '>= 2.4.89'
 
 # xorg-macros
 . "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"

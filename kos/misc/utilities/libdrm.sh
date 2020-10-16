@@ -20,37 +20,35 @@
 
 require_utility libpciaccess "$PKG_CONFIG_PATH/pciaccess.pc"
 
-VERSION="2.4.82"
+# XXX: Versions startings at 2.4.101 don't use ./configure for building,
+#      but some weird build system no-one else uses, and that no-one's
+#      ever heard of. (So upgrading any further might be a problem...)
+VERSION="2.4.100"
 SO_VERSION_MAJOR="2"
 SO_VERSION="$SO_VERSION_MAJOR.4.0"
 
 SRCPATH="$KOS_ROOT/binutils/src/libdrm-$VERSION"
 OPTPATH="$BINUTILS_SYSROOT/opt/libdrm-$VERSION"
 
+# xorg-macros
+. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
+
 # libdrm
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
-			if ! [ -f "$SRCPATH/configure.ac" ]; then
-				cmd cd "$KOS_ROOT/binutils/src"
-				cmd rm -rf "libdrm-$VERSION"
-				cmd rm -rf "libdrm-libdrm-$VERSION"
-				download_file \
-					"libdrm-$VERSION.tar.gz" \
-					"https://github.com/freedreno/libdrm/archive/libdrm-$VERSION.tar.gz"
-				cmd tar xvf "libdrm-$VERSION.tar.gz"
-				if [ -d "libdrm-libdrm-$VERSION" ]; then
-					mv "libdrm-libdrm-$VERSION" "libdrm-$VERSION"
-				fi
-			fi
-			cmd cd "$SRCPATH"
-			apply_patch \
-				"$SRCPATH" \
-				"$KOS_PATCHES/libdrm-$VERSION.patch"
-			cmd aclocal
-			cmd autoreconf -i
-			cmd autoconf
+			cmd cd "$KOS_ROOT/binutils/src"
+			cmd rm -rf "libdrm-$VERSION"
+			cmd rm -rf "libdrm-libdrm-$VERSION"
+			download_file \
+				"libdrm-$VERSION.tar.gz" \
+				"https://dri.freedesktop.org/libdrm/libdrm-$VERSION.tar.gz"
+			cmd tar xvf "libdrm-$VERSION.tar.gz"
 		fi
+		cmd cd "$SRCPATH"
+		apply_patch \
+			"$SRCPATH" \
+			"$KOS_PATCHES/libdrm-$VERSION.patch"
 		cmd rm -rf "$OPTPATH"
 		cmd mkdir -p "$OPTPATH"
 		cmd cd "$OPTPATH"
@@ -94,6 +92,24 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
+# Install libraries
+install_file /$TARGET_LIBPATH/libdrm.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libdrm.so.$SO_VERSION"
+install_symlink /$TARGET_LIBPATH/libdrm.so.$SO_VERSION libdrm.so.$SO_VERSION_MAJOR
+install_symlink /$TARGET_LIBPATH/libdrm.so libdrm.so.$SO_VERSION_MAJOR
+
+# Install headers
+for f in "$SRCPATH"/include/drm/*.h; do
+	install_rawfile "$KOS_ROOT/kos/include/drm/$(basename "$f")" "$f"
+done
+
+install_rawfile "$KOS_ROOT/kos/include/libsync.h" "$SRCPATH/libsync.h"
+install_rawfile "$KOS_ROOT/kos/include/xf86drm.h" "$SRCPATH/xf86drm.h"
+install_rawfile "$KOS_ROOT/kos/include/xf86drmMode.h" "$SRCPATH/xf86drmMode.h"
+
+install_rawfile_stdin "$KOS_ROOT/kos/include/drm.h" <<EOF
+#include "drm/drm.h"
+EOF
+
 # Install the PKG_CONFIG file
 #     The make process above will have already created that file
 #     under "$OPTPATH/libdrm.pc", however we don't actually want
@@ -113,20 +129,4 @@ Description: Userspace interface to kernel DRM services
 Version: $VERSION
 Cflags:
 Libs: -ldrm
-EOF
-
-# Install libraries
-install_file /$TARGET_LIBPATH/libdrm.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libdrm.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libdrm.so.$SO_VERSION libdrm.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libdrm.so libdrm.so.$SO_VERSION_MAJOR
-
-# Install headers
-for f in "$SRCPATH"/include/drm/*.h; do
-	install_rawfile "$KOS_ROOT/kos/include/drm/$(basename "$f")" "$f"
-done
-install_rawfile "$KOS_ROOT/kos/include/xf86drm.h" "$SRCPATH/xf86drm.h"
-install_rawfile "$KOS_ROOT/kos/include/xf86drmMode.h" "$SRCPATH/xf86drmMode.h"
-
-install_rawfile_stdin "$KOS_ROOT/kos/include/drm.h" <<EOF
-#include "drm/drm.h"
 EOF
