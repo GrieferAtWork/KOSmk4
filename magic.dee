@@ -180,8 +180,12 @@ function setBinTargetLink(target_arch: string, target_name: string) {
 	local selConfigFile = "bin/{}-kos".format({ target_arch });
 	local selConfig = readlink(selConfigFile);
 	if (selConfig !is string || selConfig != target_name) {
-		if (selConfig !is none)
-			fs.unlink(selConfigFile);
+		if (selConfig !is none) {
+			try {
+				fs.unlink(selConfigFile);
+			} catch (...) {
+			}
+		}
 		print("Changing libpath: `ln -s ", repr(target_name), " ", repr(selConfigFile), "`");
 		local p = ipc.Process("bash", [ "-c",
 			"ln -s {!r} {!r}".format({ target_name, selConfigFile })
