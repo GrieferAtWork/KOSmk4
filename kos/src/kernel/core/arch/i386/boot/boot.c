@@ -408,8 +408,59 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getsp(state));
 
 	/* TODO: Add drivers for loading binaries:
+	 *   - binfmt_misc   Allows user-space to register custom interpreters
+	 *                   for arbitrary magic byte sequences.
+	 *                   s.a. linux:/proc/sys/fs/binfmt_misc
 	 *   - a.out
-	 *   - PE */
+	 *   - PE            maybe even implement this one as a user-space interpreter using
+	 *                   `binfmt_misc'. - That way it would be much safer to implement,
+	 *                   as well as greatly reduce future maintenance when kernel APIs
+	 *                   change (since it would use the syscall apis, which are _much_
+	 *                   more stable in comparison)
+	 *                   Also: portability, and would make it easier to pre-configure
+	 *                   other aspects of the process state to enable windows emulation,
+	 *                   such as changing the fsmode, binding DOS drives, and the direct
+	 *                   integration of both the regular libdl.so, as well as a secondary
+	 *                   program loader for dlls.
+	 *                #1: /bin/peloader MyPeProgram
+	 *                #2: Load /bin/peloader as an ELF binary like normal,
+	 *                    including mapping of libdl.so into the address space.
+	 *                    Note that /bin/peloader depends on libdl.so, but _NOT_ libc.so!
+	 *                #3: In /bin/peloader, figure out what address ranges need to be
+	 *                    preserved in order to be able to load the given PE binary.
+	 *                #4: If the load-address of libdl overlaps with this range, make use
+	 *                    of `DLAUXCTRL_RELOC_LIBDL' to move libdl to a different location
+	 *                #5: Load both libc.so and a helper library libpe.so using a custom
+	 *                    dlauxctrl() command code that allows one to load libraries at
+	 *                    custom addresses. (the load addresses used get calculated such
+	 *                    that they don't overlap with where the ranges used by the given
+	 *                    PE binary)
+	 *                #6: Jump to the primary entry point in libpe.so, and load the PE
+	 *                    binary from there.
+	 *             ... Thinking this over, I think it's better to just write a driver to
+	 *                 load the PE binary in-place, and have a user-space shared library
+	 *                 libpe.so that does all of the user-space initialization/dynamic
+	 *                 linking (libpe.so would then depend on libdl.so and libc.so)
+	 *
+	 */
+
+	/* TODO: Add a way for user-space to manually mmap() the kernel's libdl.so into their
+	 *       address space. Using this functionality, add `DLAUXCTRL_RELOC_LIBDL' to libdl
+	 *       which can be used to relocate libdl itself within one's own address space.
+	 *       This control function would then do the following:
+	 *        - Map a new copy of libdl.so at the specified location (if that location
+	 *          overlaps with the current location, recursively call `DLAUXCTRL_RELOC_LIBDL'
+	 *          with yet another location that doesn't overlap, thus essentially relocating
+	 *          the library twice in order to prevent overlaps every time)
+	 *        - Go through the relocations of all loaded libraries and recalculate them if
+	 *          those relocations reference symbols from / point into the old libdl's address
+	 *          space.
+	 *        - Directly jump into the secondary copy of libdl (aside from changing the
+	 *          absolute program counter position, this jump should be entirely seamless)
+	 *        - munmap() the old instance of libdl
+	 * XXX: This seems like a rather large function (at least the part about having to re-do
+	 *      all of the relocations does). - Maybe not implement this as part of the libdl
+	 *      core, but rather within some auxiliary helper library? */
 
 	/* TODO: Make the x86 LDT object ATTR_PERVM, and reload LDT registers during a VM switch.
 	 *       On linux, they're PERVM, too, so we really should do the same. */

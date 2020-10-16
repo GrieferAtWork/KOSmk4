@@ -69,7 +69,7 @@ PRIVATE struct execabis_struct default_execabis = {
 	}
 };
 
-/* [1..1] Currently defined exec-ABIs */
+/* [1..1] Currently registered exec-ABIs */
 PUBLIC ATOMIC_REF(struct execabis_struct)
 execabis = ATOMIC_REF_INIT(&default_execabis);
 

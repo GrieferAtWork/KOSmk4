@@ -107,20 +107,8 @@ DATDEF struct vm_ramfile compat_execabi_system_rtld_file;
 
 #ifdef __ARCH_HAVE_COMPAT
 typedef USER CHECKED void const *execabi_strings_t;
-#define EXECABI_PARAM_argv_is_compat  bool argv_is_compat
-#define EXECABI_PARAM__argv_is_compat , bool argv_is_compat
-#define EXECABI_PARAM_argv_is_compat_ bool argv_is_compat,
-#define EXECABI_ARG_argv_is_compat    argv_is_compat
-#define EXECABI_ARG__argv_is_compat   , argv_is_compat
-#define EXECABI_ARG_argv_is_compat_   argv_is_compat,
 #else /* __ARCH_HAVE_COMPAT */
 typedef USER UNCHECKED char const *USER CHECKED const *execabi_strings_t;
-#define EXECABI_PARAM_argv_is_compat  /* nothing */
-#define EXECABI_PARAM__argv_is_compat /* nothing */
-#define EXECABI_PARAM_argv_is_compat_ /* nothing */
-#define EXECABI_ARG_argv_is_compat    /* nothing */
-#define EXECABI_ARG__argv_is_compat   /* nothing */
-#define EXECABI_ARG_argv_is_compat_   /* nothing */
 #endif /* !__ARCH_HAVE_COMPAT */
 
 struct driver;
@@ -188,6 +176,9 @@ struct execabi {
 	WUNUSED unsigned int
 	(NONNULL((1)) FCALL *ea_exec)(/*in|out*/ struct execargs *__restrict args)
 			THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_NOT_EXECUTABLE, E_IOERROR);
+
+	/* TODO: Add callbacks to implement to implement
+	 *       format-specific support for `struct usermod' here. */
 };
 
 /* Return codes for `ea_exec' */
@@ -206,7 +197,7 @@ struct execabis_struct {
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL execabis_destroy)(struct execabis_struct *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct execabis_struct, eas_refcnt, execabis_destroy)
 
-/* [1..1] Currently defined exec-ABIs */
+/* [1..1] Currently registered exec-ABIs */
 DATDEF ATOMIC_REF(struct execabis_struct) execabis;
 
 /* Register a given exec-ABI. Note that the only way to unregister

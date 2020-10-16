@@ -602,6 +602,13 @@ again:
 	                                 (pageid64_t)(data_start_offset / PAGESIZE),
 	                                 num_bytes / PAGESIZE,
 	                                 prot);
+#ifndef NDEBUG
+	for (i = 0; i < parts.pv_cnt; ++i) {
+		struct vm_datapart *part;
+		part = parts.pv_vec[i].pn_part;
+		assert(!part->dp_futex || ADDR_ISKERN(part->dp_futex));
+	}
+#endif /* !NDEBUG */
 	/* The rest of this function is already NOEXCEPT at this point.
 	 * However, we still need to check that the indicated range isn't
 	 * already being used by some other mapping! */
@@ -644,6 +651,7 @@ again:
 		node = parts.pv_vec[i].pn_node;
 		assert(sync_writing(part));
 		assert(node);
+		assert(!part->dp_futex || ADDR_ISKERN(part->dp_futex));
 
 		/* Initialize the given node. */
 		part_pages = vm_datapart_numvpages(part);
@@ -660,6 +668,7 @@ again:
 		        (byte_t *)PAGEID_DECODE(offset_pageid),
 		        (byte_t *)PAGEID_DECODE(offset_pageid + part_pages) - 1, part_pages,
 		        result, (byte_t *)result + num_bytes - 1, num_bytes / PAGESIZE);
+		assert(!part->dp_futex || ADDR_ISKERN(part->dp_futex));
 		node->vn_node.a_vmin = offset_pageid;
 		node->vn_node.a_vmax = offset_pageid + part_pages - 1;
 		node->vn_prot        = prot;
@@ -670,13 +679,16 @@ again:
 		node->vn_fspath      = xincref(fspath);
 		node->vn_fsname      = xincref(fsname);
 		node->vn_guard       = 0;
+		assert(!part->dp_futex || ADDR_ISKERN(part->dp_futex));
 		if (prot & VM_PROT_SHARED) {
 			LLIST_INSERT(part->dp_srefs, node, vn_link);
 		} else {
 			LLIST_INSERT(part->dp_crefs, node, vn_link);
 		}
+		assert(!part->dp_futex || ADDR_ISKERN(part->dp_futex));
 		/* Map the given node into its associated VM */
 		vm_node_insert(node);
+		assert(!part->dp_futex || ADDR_ISKERN(part->dp_futex));
 		/* Release the write-lock from parts, as they are mapped. */
 		sync_endwrite(part);
 		offset_pageid += part_pages;
