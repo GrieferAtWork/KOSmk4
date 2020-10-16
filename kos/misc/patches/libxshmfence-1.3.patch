@@ -1,0 +1,25 @@
+diff -Naur libxshmfence-1.3-orig/src/xshmfence_futex.h libxshmfence-1.3/src/xshmfence_futex.h
+--- libxshmfence-1.3-orig/src/xshmfence_futex.h	2020-10-16 18:21:03.578373600 +0200
++++ libxshmfence-1.3/src/xshmfence_futex.h	2020-10-16 18:21:12.438025800 +0200
+@@ -53,10 +53,21 @@
+ #include <sys/time.h>
+ #include <sys/syscall.h>
+ 
++#ifdef __KOS__
++#include <kos/syscalls.h> /* sys_futex() */
++#define sys_futex(addr1, op, val1, timeout, addr2, val3) \
++	sys_futex((__uint32_t *)(addr1),   \
++	          (__syscall_ulong_t)(op), \
++	          (__uint32_t)(val1),      \
++	          timeout,                 \
++	          (__uint32_t *)(addr2),   \
++	          (__uint32_t)(val3))
++#else /* __KOS__ */
+ static inline long sys_futex(void *addr1, int op, int val1, struct timespec *timeout, void *addr2, int val3)
+ {
+ 	return syscall(SYS_futex, addr1, op, val1, timeout, addr2, val3);
+ }
++#endif /* !__KOS__ */
+ 
+ static inline int futex_wake(int32_t *addr) {
+ 	return sys_futex(addr, FUTEX_WAKE, MAXINT, NULL, NULL, 0);

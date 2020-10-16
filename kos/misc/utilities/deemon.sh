@@ -1,3 +1,4 @@
+#TEST: require_utility deemon "$TARGET_SYSROOT/bin/deemon"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

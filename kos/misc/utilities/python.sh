@@ -1,3 +1,4 @@
+#TEST: require_utility python "$PKG_CONFIG_PATH/python-2.7.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,9 +18,9 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends libffi
-# depends libexpat
-# depends libzlib   (optional)
+require_utility libffi "$TARGET_SYSROOT/$TARGET_LIBPATH/libffi.so"
+require_utility libexpat "$PKG_CONFIG_PATH/expat.pc"
+require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 
 PYTHON_VERSION_MAJOR="2"
 PYTHON_VERSION_MINOR="7"
@@ -165,9 +166,7 @@ if [ -f "$OPTPATH/python.exe" ]; then
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/python-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/python-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/python-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -181,7 +180,6 @@ Libs.private: -ldl
 Libs: -lpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
 Cflags: -I$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
 EOF
-fi
 
 # Install the python core
 install_file /bin/python "$PYTHON_EXE"
@@ -211,9 +209,7 @@ if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
 			"$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig64.h" \
 			"$OPTPATH/pyconfig.h"
 	fi
-	if ! [ -f "$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" ]; then
-		echo "Installing file $KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h"
-		cat > "$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" <<EOF
+	install_rawfile_stdin "$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" <<EOF
 #ifndef _I386_KOS_PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H
 #define _I386_KOS_PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H 1
 
@@ -227,25 +223,18 @@ if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
 
 #endif /* !_I386_KOS_PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H */
 EOF
-	else
-		echo "Installing file $KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h (up to date)"
-	fi
 else
 	install_rawfile \
 		"$KOS_ROOT/kos/include/$TARGET_INCPATH/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" \
 		"$OPTPATH/pyconfig.h"
 fi
-if ! [ -f "$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" ]; then
-	echo "Installing file $KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h"
-	cat > "$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" <<EOF
+
+install_rawfile_stdin "$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h" <<EOF
 #ifndef _PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H
 #define _PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H 1
 #include <python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h>
 #endif /* !_KOS_PYTHON${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}_PYCONFIG_H */
 EOF
-else
-	echo "Installing file $KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/pyconfig.h (up to date)"
-fi
 
 install_header "Python-ast.h"
 install_header "Python.h"

@@ -1,3 +1,4 @@
+#TEST: require_utility 2048 "$TARGET_SYSROOT/bin/2048"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

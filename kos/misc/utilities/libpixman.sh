@@ -1,3 +1,4 @@
+#TEST: require_utility libpixman "$PKG_CONFIG_PATH/pixman-1.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: libzlib
+require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 
 VERSION="0.40.0"
 SO_VERSION_MAJOR="0"
@@ -85,9 +86,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/pixman/.libs/libpixman-1.so
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/pixman-1.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/pixman-1.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/pixman-1.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -99,7 +98,6 @@ Version: $VERSION
 Cflags:
 Libs: -lpixman-1
 EOF
-fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libpixman-1.so.$SO_VERSION_MAJOR "$OPTPATH/pixman/.libs/libpixman-1.so.$SO_VERSION"
@@ -112,12 +110,9 @@ install_rawfile "$KOS_ROOT/kos/include/pixman-1/pixman.h"         "$SRCPATH/pixm
 install_rawfile "$KOS_ROOT/kos/include/pixman-1/pixman-version.h" "$OPTPATH/pixman/pixman-version.h"
 
 install_proxy_c_header() {
-	if ! [ -f "$1" ]; then
-		echo "Installing file $1"
-		echo "#include \"$2\"" > "$1"
-	else
-		echo "Installing file $1 (up to date)"
-	fi
+	install_rawfile_stdin "$1" <<EOF
+#include "$2"
+EOF
 }
 
 install_proxy_c_header "$KOS_ROOT/kos/include/pixman.h"         "pixman-1/pixman.h"

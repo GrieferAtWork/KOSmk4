@@ -581,34 +581,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * Run x as (from inside KOS):
 	 *     $ xinit /bin/twm -- -dumbSched
 	 *
-	 * Current Blocker:
-	 *     twm crashes because of a bug with how `_XkbReadKeySyms()' calls `_XkbReadBufferCopyKeySyms'.
-	 *     The line `if (offset+newMap->nSyms>=map->size_syms) {' should instead be
-	 *     `while (offset+newMap->nSyms>=map->size_syms) {', (or possibly be re-written
-	 *     entirely, as I'm not quite sure if that change would actually preserve logic),
-	 *     but as it stands, the following causes a crash:
-	 *     ```
-	 *     _XkbReadBufferCopyKeySyms(buf,(KeySym *)&map->syms[offset],
-	 *                               newMap->nSyms);
-	 *     ```
-	 *     Because at this point, `offset...+=newMap->nSyms' may lie outside of the
-	 *     allocated map range, which only gets incremented statically according to
-	 *     ```
-	 *     sz= map->size_syms+128;
-	 *     map->syms= _XkbTypedRealloc(map->syms,sz,KeySym);
-	 *     ```
-	 *     Here's a snapshot of the values of local variant
-	 *     ```
-	 *     buf   : (XkbReadBufferPtr)0x3BFADD80
-	 *     xkb   : (XkbDescPtr)0x10022380
-	 *     rep   : (xkbGetMapReply *)0x3BFADDC8
-	 *     i     : (int)224
-	 *     map   : (XkbClientMapPtr)0x100223B0
-	 *     offset: (int)4379
-	 *     oldMap: (XkbSymMapPtr)0x10037750
-	 *     newMap: (xkbSymMapWireDesc *)0x10027008
-	 *     ```
-	 *
 	 * TODO:
 	 *     - Finish implementing ancillary data support for unix domain sockets
 	 *     - Properly implement libc's regex functions

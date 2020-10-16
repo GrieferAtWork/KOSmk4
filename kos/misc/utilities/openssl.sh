@@ -1,3 +1,4 @@
+#TEST: require_utility openssl "$PKG_CONFIG_PATH/openssl.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: libzlib
+require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 
 VERSION="1.1.1g"
 SO_VERSION="1.1"
@@ -69,9 +70,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libssl.so.$SO_VERSION" ]; t
 fi
 
 # Install the PKG_CONFIG files
-if ! [ -f "$PKG_CONFIG_PATH/openssl.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/openssl.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/openssl.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -82,11 +81,8 @@ Description: Secure Sockets Layer and cryptography libraries and tools
 Version: $VERSION
 Requires: libssl libcrypto
 EOF
-fi
 
-if ! [ -f "$PKG_CONFIG_PATH/libssl.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/libssl.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/libssl.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -99,11 +95,8 @@ Requires.private: libcrypto
 Libs: -lssl
 Cflags:
 EOF
-fi
 
-if ! [ -f "$PKG_CONFIG_PATH/libcrypto.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/libcrypto.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/libcrypto.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -116,7 +109,6 @@ Libs: -lcrypto
 Libs.private: -ldl -pthread
 Cflags:
 EOF
-fi
 
 # Install libraries:
 install_file /bin/c_rehash "$OPTPATH/tools/c_rehash"

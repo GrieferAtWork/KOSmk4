@@ -1,3 +1,4 @@
+#TEST: require_utility nudoku "$TARGET_SYSROOT/bin/nudoku"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: libncurses
+require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
 
 if [ -z "$VERSION" ]; then VERSION="2.0.0"; fi
 

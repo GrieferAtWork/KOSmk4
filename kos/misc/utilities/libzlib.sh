@@ -1,3 +1,4 @@
+#TEST: require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -53,9 +54,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libz.so.$ZLIB_VERSION" ]; t
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/zlib.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/zlib.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/zlib.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -70,7 +69,6 @@ Requires:
 Libs: -lz
 Cflags:
 EOF
-fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libz.so "$OPTPATH/libz.so.$ZLIB_VERSION"

@@ -1,3 +1,4 @@
+#TEST: require_utility libfreetype2 "$PKG_CONFIG_PATH/freetype2.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,12 +18,9 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: libzlib
-# depends: libbz2
-# depends: libpng
-
-# xorg-macros
-. "$KOS_MISC/utilities/misc/xorg-macros.sh"
+require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
+require_utility libbzip2 "$PKG_CONFIG_PATH/bzip2.pc"
+require_utility libpng "$PKG_CONFIG_PATH/libpng.pc"
 
 VERSION="2.10.2"
 PC_VERSION="23.2.17"
@@ -106,9 +104,7 @@ fi
 
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/freetype2.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/freetype2.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/freetype2.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -124,7 +120,6 @@ Libs: -lfreetype
 Libs.private:
 Cflags:
 EOF
-fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION_MAJOR "$OPTPATH/objs/.libs/libfreetype.so.$SO_VERSION"

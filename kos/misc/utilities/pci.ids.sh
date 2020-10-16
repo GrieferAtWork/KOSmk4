@@ -1,3 +1,4 @@
+#TEST: require_utility pci.ids "$TARGET_SYSROOT/usr/share/hwdata/pci.ids.gz"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

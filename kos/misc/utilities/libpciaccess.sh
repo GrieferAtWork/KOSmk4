@@ -1,3 +1,4 @@
+#TEST: require_utility libpciaccess "$PKG_CONFIG_PATH/pciaccess.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,18 +18,18 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: libzlib
+require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 
 # xorg-macros
-. "$KOS_MISC/utilities/misc/xorg-macros.sh"
+. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
 
 VERSION="0.16"
 SO_VERSION_MAJOR="0"
 SO_VERSION="$SO_VERSION_MAJOR.11.1"
 COMMIT="fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6"
 
-SRCPATH="$KOS_ROOT/binutils/src/x/libpciaccess-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/x/libpciaccess-$VERSION"
+SRCPATH="$KOS_ROOT/binutils/src/libpciaccess-$VERSION"
+OPTPATH="$BINUTILS_SYSROOT/opt/libpciaccess-$VERSION"
 
 # libpciaccess
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
@@ -36,7 +37,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$
 		if ! [ -f "$SRCPATH/configure" ]; then
 			if ! [ -f "$SRCPATH/configure.ac" ]; then
 				cmd rm -rf "$SRCPATH"
-				cmd cd "$KOS_ROOT/binutils/src/x"
+				cmd cd "$KOS_ROOT/binutils/src"
 				cmd git clone "https://gitlab.freedesktop.org/xorg/lib/libpciaccess"
 				cmd mv "libpciaccess" "libpciaccess-$VERSION"
 				cmd cd "$SRCPATH"
@@ -60,7 +61,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$
 			export CXX="${CROSS_PREFIX}g++"
 			export CXXCPP="${CROSS_PREFIX}cpp"
 			export CXXFLAGS="-ggdb"
-			cmd bash "../../../../src/x/libpciaccess-$VERSION/configure" \
+			cmd bash "../../../src/libpciaccess-$VERSION/configure" \
 				--prefix="/" \
 				--exec-prefix="/" \
 				--bindir="/bin" \
@@ -104,9 +105,7 @@ fi
 #     >> Cflags: -I${includedir}
 #     Which in combination would cause the ~real~ system include
 #     path to be added to include path, so we need to edit the file
-if ! [ -f "$PKG_CONFIG_PATH/pciaccess.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/pciaccess.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/pciaccess.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -118,7 +117,6 @@ Version: $VERSION
 Cflags:
 Libs: -lpciaccess
 EOF
-fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libpciaccess.so.$SO_VERSION_MAJOR "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION"

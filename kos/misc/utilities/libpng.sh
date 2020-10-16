@@ -1,3 +1,4 @@
+#TEST: require_utility libpng "$PKG_CONFIG_PATH/libpng.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -81,9 +82,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libpng$SO_VERSION_MAJ
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/libpng.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/libpng.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/libpng.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -96,7 +95,6 @@ Requires: zlib
 Libs: -lpng$SO_VERSION_MAJOR
 Cflags:
 EOF
-fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libpng$SO_VERSION_MAJOR.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libpng$SO_VERSION_MAJOR.so.$SO_VERSION"
@@ -107,9 +105,7 @@ install_file_nodisk /$TARGET_LIBPATH/libpng$SO_VERSION_MAJOR.a "$OPTPATH/.libs/l
 install_rawfile "$KOS_ROOT/kos/include/libpng/png.h" "$SRCPATH/png.h"
 install_rawfile "$KOS_ROOT/kos/include/libpng/pngconf.h" "$SRCPATH/pngconf.h"
 install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/libpng/pnglibconf.h" "$OPTPATH/pnglibconf.h"
-if ! [ -f "$KOS_ROOT/kos/include/libpng/pnglibconf.h" ]; then
-	echo "Installing file $KOS_ROOT/kos/include/libpng/pnglibconf.h"
-	cat > "$KOS_ROOT/kos/include/libpng/pnglibconf.h" <<EOF
+install_rawfile_stdin "$KOS_ROOT/kos/include/libpng/pnglibconf.h" <<EOF
 #ifndef PNGLCONF_H
 #include <libpng/pnglibconf.h> /* arch-specific header */
 #ifndef PNGLCONF_H
@@ -117,17 +113,11 @@ if ! [ -f "$KOS_ROOT/kos/include/libpng/pnglibconf.h" ]; then
 #endif /* !PNGLCONF_H */
 #endif /* !PNGLCONF_H */
 EOF
-else
-	echo "Installing file $KOS_ROOT/kos/include/libpng/pnglibconf.h (up to date)"
-fi
 
 install_proxy_c_header() {
-	if ! [ -f "$1" ]; then
-		echo "Installing file $1"
-		echo "#include \"$2\"" > "$1"
-	else
-		echo "Installing file $1 (up to date)"
-	fi
+	install_rawfile_stdin "$1" <<EOF
+#include "$2"
+EOF
 }
 cmd mkdir -p "$KOS_ROOT/kos/include/libpng$SO_VERSION_MAJOR"
 cmd mkdir -p "$KOS_ROOT/kos/include/libpng"

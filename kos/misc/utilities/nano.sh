@@ -1,3 +1,4 @@
+#TEST: require_utility nano "$TARGET_SYSROOT/bin/nano"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -16,6 +17,8 @@
 # 2. Altered source versions must be plainly marked as such, and must not be
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
+
+require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
 
 if [ -z "$VERSION" ]; then VERSION="4.4"; fi
 
@@ -62,6 +65,4 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/nano" ]; then
 fi
 
 install_file /bin/nano "$OPTPATH/src/nano"
-
-
 

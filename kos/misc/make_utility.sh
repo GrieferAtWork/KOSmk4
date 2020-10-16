@@ -143,6 +143,16 @@ require_program() {
 	}
 }
 
+# require_utility <UTILITY_NAME> <INDICATOR_FILE>
+require_utility() {
+	if ! [ -f "$2" ]; then
+		echo "Required untility not installed: $1 (file '$2' does't exist)"
+		echo "Resolve this issue by running:"
+		echo "\$ bash make_utility.sh $TARGET_NAME $1"
+		exit 1
+	fi
+}
+
 
 #>> mtools_makedir <DISKIMAGE> <ABSOLUTE_DISK_PATH>
 mtools_makedir() {
@@ -184,6 +194,18 @@ install_rawfile() {
 		echo "Installing file $1 (up to date)"
 	fi
 }
+
+#>> install_rawfile_stdin <DEST> <<EOF ... EOF
+install_rawfile_stdin() {
+	if ! [ -f "$1" ]; then
+		echo "Installing file $1"
+		cmd mkdir -p "$(dirname "$1")"
+		cat > "$1" < /dev/stdin
+	else
+		echo "Installing file $1 (up to date)"
+	fi
+}
+
 
 #>> install_file <ABSOLUTE_DISK_PATH> <SOURCE>
 install_file() {
@@ -358,7 +380,6 @@ install_path() {
 	if ! [ -e "$TARGET_DISPATH" ]; then
 		echo "Installing path ${TARGET_NAME}-kos:/$DISPATH/*"
 		if ! ln -r -s "$2" "$TARGET_DISPATH" > /dev/null 2>&1; then
-			echo "HERE: $TARGET_DISPATH"
 			cmd mkdir -p "$(dirname "$TARGET_DISPATH")"
 			cmd ln -r -s "$2" "$TARGET_DISPATH"
 		fi

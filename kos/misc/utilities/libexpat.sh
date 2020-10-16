@@ -1,3 +1,4 @@
+#TEST: require_utility libexpat "$PKG_CONFIG_PATH/expat.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: libzlib
+require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 
 VERSION="2.2.9"
 SO_VERSION_MAJOR="1"
@@ -92,9 +93,7 @@ EOF
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/expat.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/expat.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/expat.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -107,7 +106,6 @@ URL: http://www.libexpat.org
 Libs: -lexpat
 Cflags:
 EOF
-fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libexpat.so.$SO_VERSION_MAJOR "$OPTPATH/lib/.libs/libexpat.so.$SO_VERSION"

@@ -1,3 +1,4 @@
+#TEST: require_utility busybox "$TARGET_SYSROOT/bin/busybox"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

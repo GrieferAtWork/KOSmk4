@@ -1,3 +1,4 @@
+#TEST: require_utility libdrm "$PKG_CONFIG_PATH/libdrm.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,24 +18,21 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends: libpciaccess
-
-# xorg-macros
-. "$KOS_MISC/utilities/misc/xorg-macros.sh"
+require_utility libpciaccess "$PKG_CONFIG_PATH/pciaccess.pc"
 
 VERSION="2.4.82"
 SO_VERSION_MAJOR="2"
 SO_VERSION="$SO_VERSION_MAJOR.4.0"
 
-SRCPATH="$KOS_ROOT/binutils/src/x/libdrm-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/x/libdrm-$VERSION"
+SRCPATH="$KOS_ROOT/binutils/src/libdrm-$VERSION"
+OPTPATH="$BINUTILS_SYSROOT/opt/libdrm-$VERSION"
 
 # libdrm
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			if ! [ -f "$SRCPATH/configure.ac" ]; then
-				cmd cd "$KOS_ROOT/binutils/src/x"
+				cmd cd "$KOS_ROOT/binutils/src"
 				cmd rm -rf "libdrm-$VERSION"
 				cmd rm -rf "libdrm-libdrm-$VERSION"
 				download_file \
@@ -63,7 +61,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libdrm.so.$SO_VERSION
 			export CXX="${CROSS_PREFIX}g++"
 			export CXXCPP="${CROSS_PREFIX}cpp"
 			export CXXFLAGS="-ggdb"
-			cmd bash "../../../../src/x/libdrm-$VERSION/configure" \
+			cmd bash "../../../src/libdrm-$VERSION/configure" \
 				--prefix="/" \
 				--exec-prefix="/" \
 				--bindir="/bin" \
@@ -104,9 +102,7 @@ fi
 #     >> Cflags: -I${includedir}
 #     Which in combination would cause the ~real~ system include
 #     path to be added to include path, so we need to edit the file
-if ! [ -f "$PKG_CONFIG_PATH/libdrm.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/libdrm.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/libdrm.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -118,7 +114,6 @@ Version: $VERSION
 Cflags:
 Libs: -ldrm
 EOF
-fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libdrm.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libdrm.so.$SO_VERSION"
@@ -132,6 +127,6 @@ done
 install_rawfile "$KOS_ROOT/kos/include/xf86drm.h" "$SRCPATH/xf86drm.h"
 install_rawfile "$KOS_ROOT/kos/include/xf86drmMode.h" "$SRCPATH/xf86drmMode.h"
 
-if ! [ -f "$KOS_ROOT/kos/include/drm.h" ]; then
-	echo '#include "drm/drm.h"' > "$KOS_ROOT/kos/include/drm.h"
-fi
+install_rawfile_stdin "$KOS_ROOT/kos/include/drm.h" <<EOF
+#include "drm/drm.h"
+EOF

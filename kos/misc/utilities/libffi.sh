@@ -1,3 +1,4 @@
+#TEST: require_utility libffi "$TARGET_SYSROOT/$TARGET_LIBPATH/libffi.so"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -89,9 +90,7 @@ if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
 	fi
 	install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/_libffi/ffi${TARGET_EXT}.h" "$OPTPATH/include/ffi.h"
 	install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/_libffi/ffitarget${TARGET_EXT}.h" "$OPTPATH/include/ffitarget.h"
-	if ! [ -f "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffi.h" ]; then
-		echo "Installing file $KOS_ROOT/kos/include/$TARGET_INCPATH/ffi.h"
-		cat > "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffi.h" <<EOF
+	install_rawfile_stdin "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffi.h" <<EOF
 #ifndef _I386_KOS_FFI_H
 #define _I386_KOS_FFI_H 1
 
@@ -109,12 +108,7 @@ if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
 #endif /* !LIBFFI_H */
 #endif /* !_I386_KOS_FFI_H */
 EOF
-	else
-		echo "Installing file $KOS_ROOT/kos/include/$TARGET_INCPATH/ffi.h (up to date)"
-	fi
-	if ! [ -f "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffitarget.h" ]; then
-		echo "Installing file $KOS_ROOT/kos/include/$TARGET_INCPATH/ffitarget.h"
-		cat > "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffitarget.h" <<EOF
+	install_rawfile_stdin "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffitarget.h" <<EOF
 #ifndef _I386_KOS_FFITARGET_H
 #define _I386_KOS_FFITARGET_H 1
 
@@ -132,9 +126,6 @@ EOF
 #endif /* !LIBFFI_TARGET_H */
 #endif /* !_I386_KOS_FFITARGET_H */
 EOF
-	else
-		echo "Installing file $KOS_ROOT/kos/include/$TARGET_INCPATH/ffitarget.h (up to date)"
-	fi
 else
 	install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffi.h" "$OPTPATH/include/ffi.h"
 	install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffitarget.h" "$OPTPATH/include/ffitarget.h"

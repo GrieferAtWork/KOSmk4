@@ -1,3 +1,4 @@
+#TEST: require_utility libuuid "$PKG_CONFIG_PATH/uuid.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -77,9 +78,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libuuid.so.$SO_VERSIO
 fi
 
 # Install the PKG_CONFIG file
-if ! [ -f "$PKG_CONFIG_PATH/uuid.pc" ]; then
-	cmd mkdir -p "$PKG_CONFIG_PATH"
-	cat > "$PKG_CONFIG_PATH/uuid.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/uuid.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
@@ -92,7 +91,6 @@ Requires:
 Cflags:
 Libs: -luuid
 EOF
-fi
 
 # Install libraries
 install_file /$TARGET_LIBPATH/libuuid.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libuuid.so.$SO_VERSION"
@@ -103,11 +101,8 @@ install_file_nodisk /$TARGET_LIBPATH/libuuid.a "$OPTPATH/.libs/libuuid.a"
 install_rawfile "$KOS_ROOT/kos/include/uuid/uuid.h" "$SRCPATH/uuid.h"
 
 install_proxy_c_header() {
-	if ! [ -f "$1" ]; then
-		echo "Installing file $1"
-		echo "#include \"$2\"" > "$1"
-	else
-		echo "Installing file $1 (up to date)"
-	fi
+	install_rawfile_stdin "$1" <<EOF
+#include "$2"
+EOF
 }
 install_proxy_c_header "$KOS_ROOT/kos/include/uuid.h" "uuid/uuid.h"

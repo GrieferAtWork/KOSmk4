@@ -1,3 +1,4 @@
+#TEST: require_utility vitetris "$TARGET_SYSROOT/bin/tetris"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

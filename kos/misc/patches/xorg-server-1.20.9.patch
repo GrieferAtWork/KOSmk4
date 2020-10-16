@@ -1,0 +1,203 @@
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/common/xf86Init.c xorg-server-1.20.9/hw/xfree86/common/xf86Init.c
+--- xorg-server-1.20.9-orig/hw/xfree86/common/xf86Init.c	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/common/xf86Init.c	2020-10-16 17:47:03.405879200 +0200
+@@ -180,7 +180,7 @@
+             xf86ErrorFVerb(0, "Current Operating System: %s %s %s %s %s\n",
+                            name.sysname, name.nodename, name.release,
+                            name.version, name.machine);
+-#ifdef __linux__
++#if defined(__linux__) || defined(__KOS__)
+             do {
+                 char buf[80];
+                 int fd = open("/proc/cmdline", O_RDONLY);
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/common/xf86str.h xorg-server-1.20.9/hw/xfree86/common/xf86str.h
+--- xorg-server-1.20.9-orig/hw/xfree86/common/xf86str.h	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/common/xf86str.h	2020-10-16 17:48:14.413335200 +0200
+@@ -249,7 +249,7 @@
+  */
+ 
+ /* Tolerate prior #include <linux/input.h> */
+-#if defined(__linux__)
++#if defined(__linux__) || defined(__KOS__)
+ #undef BUS_NONE
+ #undef BUS_PCI
+ #undef BUS_SBUS
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/os-support/bus/Pci.h xorg-server-1.20.9/hw/xfree86/os-support/bus/Pci.h
+--- xorg-server-1.20.9-orig/hw/xfree86/os-support/bus/Pci.h	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/os-support/bus/Pci.h	2020-10-16 17:49:28.366511200 +0200
+@@ -135,7 +135,7 @@
+ #define PCI_BUS_NO_DOMAIN(bus) ((bus) & 0xffu)
+ #define PCI_TAG_NO_DOMAIN(tag) ((tag) & 0x00ffff00u)
+ 
+-#if defined(__linux__)
++#if defined(__linux__) || defined(__KOS__)
+ #define osPciInit(x) do {} while (0)
+ #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \
+ 	defined(__OpenBSD__) || defined(__NetBSD__) || \
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/os-support/bus/Sbus.c xorg-server-1.20.9/hw/xfree86/os-support/bus/Sbus.c
+--- xorg-server-1.20.9-orig/hw/xfree86/os-support/bus/Sbus.c	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/os-support/bus/Sbus.c	2020-10-16 17:56:52.122320600 +0200
+@@ -157,7 +157,7 @@
+ static void
+ promIsP1275(void)
+ {
+-#ifdef __linux__
++#if defined(__linux__) || defined(__KOS__)
+     FILE *f;
+     char buffer[1024];
+ 
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/os-support/linux/lnx_agp.c xorg-server-1.20.9/hw/xfree86/os-support/linux/lnx_agp.c
+--- xorg-server-1.20.9-orig/hw/xfree86/os-support/linux/lnx_agp.c	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/os-support/linux/lnx_agp.c	2020-10-16 17:50:20.160063000 +0200
+@@ -17,7 +17,7 @@
+ #include "xf86_OSlib.h"
+ #include "xf86OSpriv.h"
+ 
+-#if defined(__linux__)
++#if defined(__linux__) || defined(__KOS__)
+ #include <asm/ioctl.h>
+ #include <linux/agpgart.h>
+ #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
+@@ -91,7 +91,7 @@
+     }
+     xf86ReleaseGART(-1);
+ 
+-#if defined(__linux__)
++#if defined(__linux__) || defined(__KOS__)
+     /* Per Dave Jones, every effort will be made to keep the
+      * agpgart interface backwards compatible, so allow all
+      * future versions.
+@@ -196,7 +196,7 @@
+          * to give up access to the GART, but not to remove any
+          * allocations.
+          */
+-#if !defined(__linux__)
++#if !defined(__linux__) || defined(__KOS__)
+         if (screenNum == -1)
+ #endif
+         {
+@@ -263,7 +263,7 @@
+         return FALSE;
+     }
+ 
+-#ifdef __linux__
++#if defined(__linux__) || defined(__KOS__)
+     if (ioctl(gartFd, AGPIOC_DEALLOCATE, (int *) (uintptr_t) key) != 0) {
+ #else
+     if (ioctl(gartFd, AGPIOC_DEALLOCATE, &key) != 0) {
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/os-support/linux/lnx_apm.c xorg-server-1.20.9/hw/xfree86/os-support/linux/lnx_apm.c
+--- xorg-server-1.20.9-orig/hw/xfree86/os-support/linux/lnx_apm.c	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/os-support/linux/lnx_apm.c	2020-10-16 17:50:41.033234800 +0200
+@@ -141,8 +141,10 @@
+     if (!xf86acpiDisableFlag)
+         ret = lnxACPIOpen();
+ 
++#ifdef HAVE_APM
+     if (!ret)
+ #endif
++#endif
+ #ifdef HAVE_APM
+         ret = lnxAPMOpen();
+ #endif
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/os-support/linux/lnx_video.c xorg-server-1.20.9/hw/xfree86/os-support/linux/lnx_video.c
+--- xorg-server-1.20.9-orig/hw/xfree86/os-support/linux/lnx_video.c	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/os-support/linux/lnx_video.c	2020-10-16 17:51:09.752632300 +0200
+@@ -41,7 +41,9 @@
+ 
+ static Bool ExtendedEnabled = FALSE;
+ 
+-#ifdef __ia64__
++#ifdef __KOS__
++#include <sys/perm.h>
++#elif defined(__ia64__)
+ 
+ #include "compiler.h"
+ #include <sys/io.h>
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/os-support/xf86_OSlib.h xorg-server-1.20.9/hw/xfree86/os-support/xf86_OSlib.h
+--- xorg-server-1.20.9-orig/hw/xfree86/os-support/xf86_OSlib.h	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/os-support/xf86_OSlib.h	2020-10-16 17:51:55.088964900 +0200
+@@ -176,7 +176,7 @@
+ /**************************************************************************/
+ /* Linux or Glibc-based system                                            */
+ /**************************************************************************/
+-#if defined(__linux__) || defined(__GLIBC__) || defined(__CYGWIN__)
++#if defined(__linux__) || defined(__GLIBC__) || defined(__CYGWIN__) || defined(__KOS__)
+ #include <sys/ioctl.h>
+ #include <signal.h>
+ #include <stdlib.h>
+@@ -193,7 +193,7 @@
+ #include <sys/stat.h>
+ 
+ #include <sys/mman.h>
+-#ifdef __linux__
++#if defined(__linux__) || defined(__KOS__)
+ #define HAS_USL_VTS
+ #include <sys/kd.h>
+ #include <sys/vt.h>
+diff -Naur xorg-server-1.20.9-orig/hw/xfree86/vbe/vbeModes.c xorg-server-1.20.9/hw/xfree86/vbe/vbeModes.c
+--- xorg-server-1.20.9-orig/hw/xfree86/vbe/vbeModes.c	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/hw/xfree86/vbe/vbeModes.c	2020-10-16 17:53:03.539320600 +0200
+@@ -1,4 +1,4 @@
+-#define DEBUG_VERB 2
++#define DEBUG_VERB 4
+ /*
+  * Copyright © 2002 David Dawes
+  *
+diff -Naur xorg-server-1.20.9-orig/os/log.c xorg-server-1.20.9/os/log.c
+--- xorg-server-1.20.9-orig/os/log.c	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/os/log.c	2020-10-16 17:54:10.721680600 +0200
+@@ -212,7 +212,12 @@
+             }
+             free(suffix);
+ 
++again_rename_old_log:
+             if (rename(logFileName, oldLog) == -1) {
++                if (errno == EEXIST) {
++                    unlink(oldLog);
++                    goto again_rename_old_log;
++                }
+                 FatalError("Cannot move old log file \"%s\" to \"%s\"\n",
+                            logFileName, oldLog);
+             }
+diff -Naur xorg-server-1.20.9-orig/os/utils.c xorg-server-1.20.9/os/utils.c
+--- xorg-server-1.20.9-orig/os/utils.c	2020-08-25 17:39:55.000000000 +0200
++++ xorg-server-1.20.9/os/utils.c	2020-10-16 17:55:10.410599100 +0200
+@@ -195,7 +195,7 @@
+ 
+ sig_atomic_t inSignalContext = FALSE;
+ 
+-#if defined(SVR4) || defined(__linux__) || defined(CSRG_BASED)
++#if defined(SVR4) || defined(__linux__) || defined(__KOS__) || defined(CSRG_BASED)
+ #define HAS_SAVED_IDS_AND_SETEUID
+ #endif
+ 
+@@ -1388,6 +1388,9 @@
+             _exit(127);
+         if (setuid(getuid()) == -1)
+             _exit(127);
++#ifdef __KOS__
++        execl("/bin/busybox", "sh", "-c", command, (char *) NULL);
++#endif /* __KOS__ */
+         execl("/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     default:                   /* parent */
+@@ -1474,6 +1477,9 @@
+             }
+             close(pdes[1]);
+         }
++#ifdef __KOS__
++        execl("/bin/busybox", "sh", "-c", command, (char *) NULL);
++#endif /* __KOS__ */
+         execl("/bin/sh", "sh", "-c", command, (char *) NULL);
+         _exit(127);
+     }
+@@ -1552,6 +1558,9 @@
+             }
+             close(pdes[1]);
+         }
++#ifdef __KOS__
++        execl("/bin/busybox", "cat", file, (char *) NULL);
++#endif /* __KOS__ */
+         execl("/bin/cat", "cat", file, (char *) NULL);
+         _exit(127);
+     }

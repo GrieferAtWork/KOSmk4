@@ -1,3 +1,4 @@
+#TEST: require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -91,12 +92,9 @@ cmd mkdir -p "$KOS_ROOT/kos/include/ncursesw"
 
 install_header_ex() {
 	install_rawfile "$KOS_ROOT/kos/include/$2" "$1"
-	if ! [ -f "$KOS_ROOT/kos/include/ncursesw/$2" ]; then
-		echo "Installing file $KOS_ROOT/kos/include/ncursesw/$2"
-		echo "#include \"../$2\"" > "$KOS_ROOT/kos/include/ncursesw/$2"
-	else
-		echo "Installing file $KOS_ROOT/kos/include/ncursesw/$2 (up to date)"
-	fi
+	install_rawfile_stdin "$KOS_ROOT/kos/include/ncursesw/$2" <<EOF
+#include "../$2"
+EOF
 }
 
 install_header() {
@@ -111,18 +109,13 @@ install_header curses.h
 install_header ncurses_cfg.h
 install_header ncurses_def.h
 install_header_ex "$SRCPATH/include/nc_tparm.h" nc_tparm.h
-if ! [ -f "$KOS_ROOT/kos/include/ncurses.h" ]; then
-	echo "Installing file $KOS_ROOT/kos/include/ncurses.h"
-	echo '#include "curses.h"' > "$KOS_ROOT/kos/include/ncurses.h"
-else
-	echo "Installing file $KOS_ROOT/kos/include/ncurses.h (up to date)"
-fi
-if ! [ -f "$KOS_ROOT/kos/include/ncurses.h" ]; then
-	echo "Installing file $KOS_ROOT/kos/include/ncursesw/ncurses.h"
-	echo '#include "../curses.h"' > "$KOS_ROOT/kos/include/ncursesw/ncurses.h"
-else
-	echo "Installing file $KOS_ROOT/kos/include/ncursesw/ncurses.h (up to date)"
-fi
+
+install_rawfile_stdin "$KOS_ROOT/kos/include/ncurses.h" <<EOF
+#include "curses.h"
+EOF
+install_rawfile_stdin "$KOS_ROOT/kos/include/ncursesw/ncurses.h" <<EOF
+#include "../curses.h"
+EOF
 install_header ncurses_dll.h
 install_header term.h
 install_header_ex "$SRCPATH/include/term_entry.h" term_entry.h
