@@ -1,4 +1,4 @@
-#TEST: require_utility Xorg/proto.kbproto "$PKG_CONFIG_PATH/kbproto.pc"
+#TEST: require_utility Xorg/xtrans "$PKG_CONFIG_PATH/xtrans.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,39 +18,45 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-VERSION="1.0.7"
-SRCPATH="$KOS_ROOT/binutils/src/Xorg/kbproto-$VERSION"
+VERSION="1.4.0"
+SRCPATH="$KOS_ROOT/binutils/src/Xorg/xtrans-$VERSION"
 
-# kbproto
+# xtrans
 if ! [ -f "$SRCPATH/configure" ]; then
 	cmd mkdir -p "$KOS_ROOT/binutils/src/Xorg"
 	cmd cd "$KOS_ROOT/binutils/src/Xorg"
-	cmd rm -rf "kbproto-$VERSION"
+	cmd rm -rf "xtrans-$VERSION"
 	download_file \
-		"kbproto-$VERSION.tar.gz" \
-		"https://www.x.org/releases/individual/proto/kbproto-$VERSION.tar.gz"
-	cmd tar xvf "kbproto-$VERSION.tar.gz"
+		"xtrans-$VERSION.tar.gz" \
+		"https://www.x.org/releases/individual/lib/xtrans-$VERSION.tar.gz"
+	cmd tar xvf "xtrans-$VERSION.tar.gz"
 fi
 
-# Install headers
-install_header() {
-	install_rawfile "$KOS_ROOT/kos/include/X11/extensions/$1" "$SRCPATH/$1"
-}
-install_header "XKBgeom.h"
-install_header "XKB.h"
-install_header "XKBproto.h"
-install_header "XKBsrv.h"
-install_header "XKBstr.h"
+apply_patch "$SRCPATH" "$KOS_PATCHES/xtrans-$VERSION.patch"
+
+DSTPATH="$KOS_ROOT/kos/include/X11/Xtrans"
+INSTALL_FILES="Xtrans.h Xtrans.c Xtransint.h Xtranslcl.c"
+INSTALL_FILES="$INSTALL_FILES Xtranssock.c"
+INSTALL_FILES="$INSTALL_FILES Xtransutil.c transport.c"
+
+if [[ $VERSION == "1.2.7" ]]; then
+	INSTALL_FILES="$INSTALL_FILES Xtranstli.c"
+fi
+
+# Install the header files
+for f in $INSTALL_FILES; do
+	install_rawfile "$KOS_ROOT/kos/include/X11/Xtrans/$f" "$SRCPATH/$f"
+done
 
 # Install the PKG_CONFIG file
-install_rawfile_stdin "$PKG_CONFIG_PATH/kbproto.pc" <<EOF
+install_rawfile_stdin "$PKG_CONFIG_PATH/xtrans.pc" <<EOF
 prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
 includedir=$KOS_ROOT/kos/include
 
-Name: KBProto
-Description: KB extension headers
+Name: XTrans
+Description: Abstract network code for X
 Version: $VERSION
-Cflags:
+Cflags: -D_DEFAULT_SOURCE -D_BSD_SOURCE -DHAS_FCHOWN -DHAS_STICKY_DIR_BIT
 EOF

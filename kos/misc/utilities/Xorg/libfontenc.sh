@@ -18,8 +18,8 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility Xorg/proto.xproto "$PKG_CONFIG_PATH/xproto.pc"
-require_utility libzlib           "$PKG_CONFIG_PATH/zlib.pc"
+require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
+require_utility libzlib        "$PKG_CONFIG_PATH/zlib.pc"
 
 # xorg-macros
 . "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"

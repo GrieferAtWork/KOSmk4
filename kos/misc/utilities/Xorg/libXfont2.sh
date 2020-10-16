@@ -1,4 +1,4 @@
-#TEST: require_utility Xorg/proto.libXfont2 "$PKG_CONFIG_PATH/xfont2.pc"
+#TEST: require_utility Xorg/libXfont2 "$PKG_CONFIG_PATH/xfont2.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,13 +18,13 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility Xorg/libfontenc       "$PKG_CONFIG_PATH/fontenc.pc"
-require_utility Xorg/proto.xtrans     "$PKG_CONFIG_PATH/xtrans.pc"
-require_utility Xorg/proto.xproto     "$PKG_CONFIG_PATH/xproto.pc"
-require_utility Xorg/proto.fontsproto "$PKG_CONFIG_PATH/fontsproto.pc"
-require_utility libfreetype2          "$PKG_CONFIG_PATH/freetype2.pc"
-require_utility libbzip2              "$PKG_CONFIG_PATH/bzip2.pc"
-require_utility libzlib               "$PKG_CONFIG_PATH/zlib.pc"
+require_utility Xorg/libfontenc "$PKG_CONFIG_PATH/fontenc.pc"
+require_utility Xorg/xtrans     "$PKG_CONFIG_PATH/xtrans.pc"
+require_utility Xorg/xorgproto  "$PKG_CONFIG_PATH/xproto.pc"
+#equire_utility Xorg/xorgproto  "$PKG_CONFIG_PATH/fontsproto.pc"
+require_utility libfreetype2    "$PKG_CONFIG_PATH/freetype2.pc"
+require_utility libbzip2        "$PKG_CONFIG_PATH/bzip2.pc"
+require_utility libzlib         "$PKG_CONFIG_PATH/zlib.pc"
 
 # xorg-macros
 . "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"

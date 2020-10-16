@@ -18,8 +18,8 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility Xorg/proto.kbproto "$PKG_CONFIG_PATH/kbproto.pc"
-require_utility Xorg/libX11        "$PKG_CONFIG_PATH/x11.pc"
+require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/kbproto.pc"
+require_utility Xorg/libX11    "$PKG_CONFIG_PATH/x11.pc"
 
 # xorg-macros
 . "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"

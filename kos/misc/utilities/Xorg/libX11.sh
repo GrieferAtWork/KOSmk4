@@ -18,13 +18,13 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility Xorg/proto.xproto           "$PKG_CONFIG_PATH/xproto.pc"
-require_utility Xorg/proto.xextproto        "$PKG_CONFIG_PATH/xextproto.pc"
-require_utility Xorg/proto.xtrans           "$PKG_CONFIG_PATH/xtrans.pc"
-require_utility Xorg/proto.kbproto          "$PKG_CONFIG_PATH/kbproto.pc"
-require_utility Xorg/proto.inputproto       "$PKG_CONFIG_PATH/inputproto.pc"
-require_utility Xorg/proto.xf86bigfontproto "$PKG_CONFIG_PATH/xf86bigfontproto.pc"
-require_utility Xorg/libxcb                 "$PKG_CONFIG_PATH/xcb.pc"
+require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
+#equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xextproto.pc"
+#equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xtrans.pc"
+#equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/kbproto.pc"
+#equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/inputproto.pc"
+#equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xf86bigfontproto.pc"
+require_utility Xorg/libxcb    "$PKG_CONFIG_PATH/xcb.pc"
 
 # xorg-macros
 . "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"

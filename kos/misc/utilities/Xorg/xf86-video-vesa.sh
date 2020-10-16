@@ -19,12 +19,12 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 
-require_utility Xorg/proto.randrproto  "$PKG_CONFIG_PATH/randrproto.pc"
-require_utility Xorg/proto.renderproto "$PKG_CONFIG_PATH/renderproto.pc"
-require_utility Xorg/proto.xextproto   "$PKG_CONFIG_PATH/xextproto.pc"
-require_utility Xorg/proto.xproto      "$PKG_CONFIG_PATH/xproto.pc"
-require_utility Xorg/proto.fontsproto  "$PKG_CONFIG_PATH/fontsproto.pc"
-require_utility Xorg/xorg-server       "$PKG_CONFIG_PATH/xorg-server.pc"
+require_utility Xorg/xorgproto   "$PKG_CONFIG_PATH/xproto.pc"
+#equire_utility Xorg/xorgproto   "$PKG_CONFIG_PATH/randrproto.pc"
+#equire_utility Xorg/xorgproto   "$PKG_CONFIG_PATH/renderproto.pc"
+#equire_utility Xorg/xorgproto   "$PKG_CONFIG_PATH/xextproto.pc"
+#equire_utility Xorg/xorgproto   "$PKG_CONFIG_PATH/fontsproto.pc"
+require_utility Xorg/xorg-server "$PKG_CONFIG_PATH/xorg-server.pc"
 
 VERSION="2.5.0"
 NAME="xf86-video-vesa"
