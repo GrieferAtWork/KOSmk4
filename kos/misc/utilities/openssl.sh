@@ -69,47 +69,6 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libssl.so.$SO_VERSION" ]; t
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
-# Install the PKG_CONFIG files
-install_rawfile_stdin "$PKG_CONFIG_PATH/openssl.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: OpenSSL
-Description: Secure Sockets Layer and cryptography libraries and tools
-Version: $VERSION
-Requires: libssl libcrypto
-EOF
-
-install_rawfile_stdin "$PKG_CONFIG_PATH/libssl.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: OpenSSL-libssl
-Description: Secure Sockets Layer and cryptography libraries
-Version: $VERSION
-Requires.private: libcrypto
-Libs: -lssl
-Cflags:
-EOF
-
-install_rawfile_stdin "$PKG_CONFIG_PATH/libcrypto.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: OpenSSL-libcrypto
-Description: OpenSSL cryptography library
-Version: $VERSION
-Libs: -lcrypto
-Libs.private: -ldl -pthread
-Cflags:
-EOF
-
 # Install libraries:
 install_file /bin/c_rehash "$OPTPATH/tools/c_rehash"
 install_file /bin/openssl "$OPTPATH/apps/openssl"
@@ -242,3 +201,44 @@ install_header "openssl/x509err.h"
 install_header "openssl/x509v3.h"
 install_header "openssl/x509v3err.h"
 install_header "openssl/x509_vfy.h"
+
+# Install the PKG_CONFIG files
+install_rawfile_stdin "$PKG_CONFIG_PATH/openssl.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+
+Name: OpenSSL
+Description: Secure Sockets Layer and cryptography libraries and tools
+Version: $VERSION
+Requires: libssl libcrypto
+EOF
+
+install_rawfile_stdin "$PKG_CONFIG_PATH/libssl.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+
+Name: OpenSSL-libssl
+Description: Secure Sockets Layer and cryptography libraries
+Version: $VERSION
+Requires.private: libcrypto
+Libs: -lssl
+Cflags:
+EOF
+
+install_rawfile_stdin "$PKG_CONFIG_PATH/libcrypto.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+
+Name: OpenSSL-libcrypto
+Description: OpenSSL cryptography library
+Version: $VERSION
+Libs: -lcrypto
+Libs.private: -ldl -pthread
+Cflags:
+EOF

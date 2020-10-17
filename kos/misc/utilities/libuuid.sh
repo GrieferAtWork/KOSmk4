@@ -77,21 +77,6 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libuuid.so.$SO_VERSIO
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
-# Install the PKG_CONFIG file
-install_rawfile_stdin "$PKG_CONFIG_PATH/uuid.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: uuid
-Description: Universally unique id library
-Version: $VERSION
-Requires:
-Cflags:
-Libs: -luuid
-EOF
-
 # Install libraries
 install_file /$TARGET_LIBPATH/libuuid.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libuuid.so.$SO_VERSION"
 install_symlink /$TARGET_LIBPATH/libuuid.so.$SO_VERSION libuuid.so.$SO_VERSION_MAJOR
@@ -106,3 +91,18 @@ install_proxy_c_header() {
 EOF
 }
 install_proxy_c_header "$KOS_ROOT/kos/include/uuid.h" "uuid/uuid.h"
+
+# Install the PKG_CONFIG file
+install_rawfile_stdin "$PKG_CONFIG_PATH/uuid.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+
+Name: uuid
+Description: Universally unique id library
+Version: $VERSION
+Requires:
+Cflags:
+Libs: -luuid
+EOF

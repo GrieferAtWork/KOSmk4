@@ -165,22 +165,6 @@ if [ -f "$OPTPATH/python.exe" ]; then
 	PYTHON_EXE="$OPTPATH/python.exe"
 fi
 
-# Install the PKG_CONFIG file
-install_rawfile_stdin "$PKG_CONFIG_PATH/python-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: Python
-Description: Python library
-Requires:
-Version: ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
-Libs.private: -ldl
-Libs: -lpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
-Cflags: -I$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
-EOF
-
 # Install the python core
 install_file /bin/python "$PYTHON_EXE"
 PYTHON_LIB="libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}"
@@ -327,3 +311,19 @@ install_header "ucnhash.h"
 install_header "unicodeobject.h"
 install_header "warnings.h"
 install_header "weakrefobject.h"
+
+# Install the PKG_CONFIG file
+install_rawfile_stdin "$PKG_CONFIG_PATH/python-${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
+
+Name: Python
+Description: Python library
+Requires:
+Version: ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+Libs.private: -ldl
+Libs: -lpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+Cflags: -I$KOS_ROOT/kos/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+EOF

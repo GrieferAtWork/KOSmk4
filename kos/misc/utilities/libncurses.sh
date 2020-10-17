@@ -76,13 +76,15 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/lib/libncursesw.so" ]; then
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
+
 install_ncurses_library() {
-	install_file /$TARGET_LIBPATH/${1}.so.$NCURSES_VERSION_MAJOR "$OPTPATH/lib/${1}.so.$NCURSES_VERSION"
-	install_symlink /$TARGET_LIBPATH/${1}.so.$NCURSES_VERSION ${1}.so.$NCURSES_VERSION_MAJOR
-	install_symlink /$TARGET_LIBPATH/${1}.so ${1}.so.$NCURSES_VERSION_MAJOR
-	install_file_nodisk /$TARGET_LIBPATH/${1}.a "$OPTPATH/lib/${1}.a"
-	install_file_nodisk /$TARGET_LIBPATH/${1}_g.a "$OPTPATH/lib/${1}_g.a"
+	install_file        /$TARGET_LIBPATH/${1}.so.$NCURSES_VERSION_MAJOR "$OPTPATH/lib/${1}.so.$NCURSES_VERSION"
+	install_symlink     /$TARGET_LIBPATH/${1}.so.$NCURSES_VERSION       ${1}.so.$NCURSES_VERSION_MAJOR
+	install_symlink     /$TARGET_LIBPATH/${1}.so                        ${1}.so.$NCURSES_VERSION_MAJOR
+	install_file_nodisk /$TARGET_LIBPATH/${1}.a                         "$OPTPATH/lib/${1}.a"
+	install_file_nodisk /$TARGET_LIBPATH/${1}_g.a                       "$OPTPATH/lib/${1}_g.a"
 }
+
 install_ncurses_library libformw
 install_ncurses_library libmenuw
 install_ncurses_library libncursesw

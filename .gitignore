@@ -104,6 +104,9 @@ __ice__
 /kos/include/uuid/
 /kos/include/uuid.h
 
+# These headers are installed by `make_utility.sh ... fontconfig`
+/kos/include/fontconfig/
+
 # These headers are installed by X11-related programs/libraries
 /kos/include/X11/
 /kos/include/xcb/

@@ -62,6 +62,13 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libbz2.a" ]; then
 	vcmd "${CROSS_PREFIX}ar" rcs "$OPTPATH/libbz2.a" ${SOURCES//.c/.o}
 fi
 
+# Install libraries
+install_file /$TARGET_LIBPATH/libbz2.so "$OPTPATH/libbz2.so"
+install_file_nodisk /$TARGET_LIBPATH/libbz2.a "$OPTPATH/libbz2.a"
+
+# Install headers
+install_rawfile "$KOS_ROOT/kos/include/bzlib.h" "$SRCPATH/bzlib.h"
+
 # Install the PKG_CONFIG file
 install_rawfile_stdin "$PKG_CONFIG_PATH/bzip2.pc" <<EOF
 prefix=/
@@ -75,10 +82,3 @@ Version: $VERSION
 Cflags:
 Libs: -lbz2
 EOF
-
-# Install libraries
-install_file /$TARGET_LIBPATH/libbz2.so "$OPTPATH/libbz2.so"
-install_file_nodisk /$TARGET_LIBPATH/libbz2.a "$OPTPATH/libbz2.a"
-
-# Install headers
-install_rawfile "$KOS_ROOT/kos/include/bzlib.h" "$SRCPATH/bzlib.h"

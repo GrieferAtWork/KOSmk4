@@ -81,21 +81,6 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libpng$SO_VERSION_MAJ
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
-# Install the PKG_CONFIG file
-install_rawfile_stdin "$PKG_CONFIG_PATH/libpng.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include/libpng$SO_VERSION_MAJOR
-
-Name: libpng
-Description: Loads and saves PNG files
-Version: $VERSION
-Requires: zlib
-Libs: -lpng$SO_VERSION_MAJOR
-Cflags:
-EOF
-
 # Install libraries
 install_file /$TARGET_LIBPATH/libpng$SO_VERSION_MAJOR.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libpng$SO_VERSION_MAJOR.so.$SO_VERSION"
 install_symlink /$TARGET_LIBPATH/libpng$SO_VERSION_MAJOR.so.$SO_VERSION libpng$SO_VERSION_MAJOR.so.$SO_VERSION_MAJOR
@@ -129,3 +114,18 @@ install_proxy_c_header "$KOS_ROOT/kos/include/pngconf.h" "libpng/pngconf.h"
 install_proxy_c_header "$KOS_ROOT/kos/include/pnglibconf.h" "libpng/pnglibconf.h"
 
 
+
+# Install the PKG_CONFIG file
+install_rawfile_stdin "$PKG_CONFIG_PATH/libpng.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include/libpng$SO_VERSION_MAJOR
+
+Name: libpng
+Description: Loads and saves PNG files
+Version: $VERSION
+Requires: zlib
+Libs: -lpng$SO_VERSION_MAJOR
+Cflags:
+EOF

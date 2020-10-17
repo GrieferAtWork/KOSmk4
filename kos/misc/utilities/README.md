@@ -90,6 +90,7 @@ Sources for recent releases can all be found here: https://www.x.org/releases/in
 - [libdrm-2.4.100](https://dri.freedesktop.org/libdrm/)
 - [libfreetype2-2.10.2](https://www.freetype.org/)
 - [libpixman-0.40.0](http://pixman.org/)
+- [fontconfig-2.13.92](https://www.freedesktop.org/software/fontconfig/release/fontconfig-2.13.92.tar.gz)
 - Xorg (old)
 	- [xtrans-1.2.7](https://www.x.org/releases/X11R7.7/src/lib)
 	- [libfontenc-1.1.1](https://www.x.org/releases/X11R7.7/src/everything)

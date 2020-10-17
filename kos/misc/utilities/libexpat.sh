@@ -92,6 +92,17 @@ EOF
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
+# Install libraries
+install_file /$TARGET_LIBPATH/libexpat.so.$SO_VERSION_MAJOR "$OPTPATH/lib/.libs/libexpat.so.$SO_VERSION"
+install_symlink /$TARGET_LIBPATH/libexpat.so.$SO_VERSION libexpat.so.$SO_VERSION_MAJOR
+install_symlink /$TARGET_LIBPATH/libexpat.so libexpat.so.$SO_VERSION_MAJOR
+install_file_nodisk /$TARGET_LIBPATH/libexpat.a "$OPTPATH/lib/.libs/libexpat.a"
+
+# Install headers
+install_rawfile "$KOS_ROOT/kos/include/expat.h" "$SRCPATH/lib/expat.h"
+install_rawfile "$KOS_ROOT/kos/include/expat_external.h" "$SRCPATH/lib/expat_external.h"
+install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/expat_config.h" "$OPTPATH/expat_config.h"
+
 # Install the PKG_CONFIG file
 install_rawfile_stdin "$PKG_CONFIG_PATH/expat.pc" <<EOF
 prefix=/
@@ -106,14 +117,3 @@ URL: http://www.libexpat.org
 Libs: -lexpat
 Cflags:
 EOF
-
-# Install libraries
-install_file /$TARGET_LIBPATH/libexpat.so.$SO_VERSION_MAJOR "$OPTPATH/lib/.libs/libexpat.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libexpat.so.$SO_VERSION libexpat.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libexpat.so libexpat.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libexpat.a "$OPTPATH/lib/.libs/libexpat.a"
-
-# Install headers
-install_rawfile "$KOS_ROOT/kos/include/expat.h" "$SRCPATH/lib/expat.h"
-install_rawfile "$KOS_ROOT/kos/include/expat_external.h" "$SRCPATH/lib/expat_external.h"
-install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/expat_config.h" "$OPTPATH/expat_config.h"

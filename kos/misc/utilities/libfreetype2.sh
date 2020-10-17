@@ -18,9 +18,9 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
+require_utility libzlib  "$PKG_CONFIG_PATH/zlib.pc"
 require_utility libbzip2 "$PKG_CONFIG_PATH/bzip2.pc"
-require_utility libpng "$PKG_CONFIG_PATH/libpng.pc"
+require_utility libpng   "$PKG_CONFIG_PATH/libpng.pc"
 
 VERSION="2.10.2"
 PC_VERSION="23.2.17"
@@ -102,6 +102,18 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/objs/.libs/libfreetype.so.$
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
+# Install libraries
+install_file /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION_MAJOR "$OPTPATH/objs/.libs/libfreetype.so.$SO_VERSION"
+install_symlink /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION libfreetype.so.$SO_VERSION_MAJOR
+install_symlink /$TARGET_LIBPATH/libfreetype.so libfreetype.so.$SO_VERSION_MAJOR
+install_file_nodisk /$TARGET_LIBPATH/libfreetype.a "$OPTPATH/objs/.libs/libfreetype.a"
+
+# Install headers
+if ! [ -f "$KOS_ROOT/kos/include/freetype/freetype.h" ]; then
+	cmd rm -rf "$KOS_ROOT/kos/include/freetype"
+	cmd cp -R -v "$OPTPATH/include/freetype" "$KOS_ROOT/kos/include"
+fi
+install_rawfile "$KOS_ROOT/kos/include/ft2build.h" "$OPTPATH/include/ft2build.h"
 
 # Install the PKG_CONFIG file
 install_rawfile_stdin "$PKG_CONFIG_PATH/freetype2.pc" <<EOF
@@ -120,16 +132,3 @@ Libs: -lfreetype
 Libs.private:
 Cflags:
 EOF
-
-# Install libraries
-install_file /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION_MAJOR "$OPTPATH/objs/.libs/libfreetype.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libfreetype.so.$SO_VERSION libfreetype.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libfreetype.so libfreetype.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libfreetype.a "$OPTPATH/objs/.libs/libfreetype.a"
-
-# Install headers
-if ! [ -f "$KOS_ROOT/kos/include/freetype/freetype.h" ]; then
-	cmd rm -rf "$KOS_ROOT/kos/include/freetype"
-	cmd cp -R -v "$OPTPATH/include/freetype" "$KOS_ROOT/kos/include"
-fi
-install_rawfile "$KOS_ROOT/kos/include/ft2build.h" "$OPTPATH/include/ft2build.h"

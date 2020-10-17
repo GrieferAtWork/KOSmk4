@@ -53,6 +53,17 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libz.so.$ZLIB_VERSION" ]; t
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
+# Install libraries
+install_file /$TARGET_LIBPATH/libz.so "$OPTPATH/libz.so.$ZLIB_VERSION"
+install_symlink /$TARGET_LIBPATH/libz.so.$ZLIB_VERSION libz.so
+install_symlink /$TARGET_LIBPATH/libz.so.$ZLIB_VERSION_MAJOR libz.so
+install_file_nodisk /$TARGET_LIBPATH/libz.a "$OPTPATH/libz.a"
+
+# Install headers
+install_rawfile "$KOS_ROOT/kos/include/zconf.h" "$OPTPATH/zconf.h"
+install_rawfile "$KOS_ROOT/kos/include/zlib.h"  "$SRCPATH/zlib.h"
+
+
 # Install the PKG_CONFIG file
 install_rawfile_stdin "$PKG_CONFIG_PATH/zlib.pc" <<EOF
 prefix=/
@@ -69,14 +80,3 @@ Requires:
 Libs: -lz
 Cflags:
 EOF
-
-# Install libraries
-install_file /$TARGET_LIBPATH/libz.so "$OPTPATH/libz.so.$ZLIB_VERSION"
-install_symlink /$TARGET_LIBPATH/libz.so.$ZLIB_VERSION libz.so
-install_symlink /$TARGET_LIBPATH/libz.so.$ZLIB_VERSION_MAJOR libz.so
-install_file_nodisk /$TARGET_LIBPATH/libz.a "$OPTPATH/libz.a"
-
-# Install headers
-install_rawfile "$KOS_ROOT/kos/include/zconf.h" "$OPTPATH/zconf.h"
-install_rawfile "$KOS_ROOT/kos/include/zlib.h"  "$SRCPATH/zlib.h"
-
