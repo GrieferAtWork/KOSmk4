@@ -578,23 +578,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* Xorg X-Window server support roadmap.
 	 *
-	 * Run x as (from inside KOS):
-	 *     $ xinit /bin/twm -- -dumbSched
+	 * from inside KOS:
+	 *     $ xinit /bin/xclock -- -dumbSched
 	 *
 	 * TODO:
 	 *     - Finish implementing ancillary data support for unix domain sockets
 	 *     - Properly implement libc's regex functions
-	 *     - Scrap all of the Xorg stuff already ported, and start from srcatch,
-	 *       using the most recent versions of everything. Just to explain myself,
-	 *       when I started porting Xorg, I read something about issues with how
-	 *       newer versions are supposedly licensed, but I miss-understood some
-	 *       stuff, and I was always free to just port the most recent version.
-	 *       The blocker above has (likely) been fixed a long time ago, and who's
-	 *       to say that there aren't a bunch of similar bugs.
-	 *       So rather than trying to fix age-old, outdated software, I think it's
-	 *       best to just admit my losses and start over with the most recent stuff.
-	 *       -> Sources for recent releases can all be found here:
-	 *       https://www.x.org/releases/individual/
+	 *     - Implement support for `sys_epoll_create1(2)'
 	 */
 
 	return state;
