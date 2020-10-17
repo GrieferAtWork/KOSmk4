@@ -38,8 +38,8 @@ require_program xsltproc
 # that `libpthread-stubs` is there to stub out, so rather than
 # actually building that library, we can stub _IT_ out.
 install_rawfile_stdin "$PKG_CONFIG_PATH/pthread-stubs.pc" <<EOF
-prefix=/
-exec_prefix=/
+prefix=$XORG_CONFIGURE_PREFIX
+exec_prefix=$XORG_CONFIGURE_EXEC_PREFIX
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
 
 Name: pthread stubs

@@ -147,4 +147,11 @@ Sources for recent releases can all be found here: https://www.x.org/releases/in
 	- [xkeyboard-config-2.31](https://www.x.org/releases/individual/data/xkeyboard-config/xkeyboard-config-2.31.tar.gz)
 	- [xorg-server-1.20.9](https://www.x.org/releases/individual/xserver/xorg-server-1.20.9.tar.gz)
 	- [xf86-video-vesa-2.5.0](https://www.x.org/releases/individual/driver/xf86-video-vesa-2.5.0.tar.gz)
+	- [libICE-1.0.10](https://www.x.org/releases/individual/lib/libICE-1.0.10.tar.gz)
+	- [libSM-1.2.3](https://www.x.org/releases/individual/lib/libSM-1.2.3.tar.gz)
+	- [libXaw-1.0.13](https://www.x.org/releases/individual/lib/libXaw-1.0.13.tar.gz)
+	- [libXext-1.3.4](https://www.x.org/releases/individual/lib/libXext-1.3.4.tar.gz)
+	- [libXmu-1.1.3](https://www.x.org/releases/individual/lib/libXmu-1.1.3.tar.gz)
+	- [libXpm-3.5.13](https://www.x.org/releases/individual/lib/libXpm-3.5.13.tar.gz)
+	- [libXt-1.2.0](https://www.x.org/releases/individual/lib/libXt-1.2.0.tar.gz)
 

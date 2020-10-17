@@ -467,8 +467,8 @@ install_rawfile "$INCPATH/xserver_poll.h"     "$SRCPATH/include/xserver_poll.h"
 
 # Install the PKG_CONFIG file
 install_rawfile_stdin "$PKG_CONFIG_PATH/xorg-server.pc" <<EOF
-prefix=/
-exec_prefix=/
+prefix=$XORG_CONFIGURE_PREFIX
+exec_prefix=$XORG_CONFIGURE_EXEC_PREFIX
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
 includedir=$KOS_ROOT/kos/include
 datarootdir=${BINUTILS_SYSROOT}$XORG_CONFIGURE_DATAROOTDIR

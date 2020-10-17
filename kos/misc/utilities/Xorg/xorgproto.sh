@@ -59,8 +59,8 @@ make_pkg_config() {
 	fi
 	if test -z "$5"; then
 		install_rawfile_stdin "$PKG_CONFIG_PATH/$1" <<EOF
-prefix=/
-exec_prefix=/
+prefix=$XORG_CONFIGURE_PREFIX
+exec_prefix=$XORG_CONFIGURE_EXEC_PREFIX
 includedir=$KOS_ROOT/kos/include
 
 Name: $USED_NAME
@@ -70,8 +70,8 @@ Cflags:
 EOF
 	else
 		install_rawfile_stdin "$PKG_CONFIG_PATH/$1" <<EOF
-prefix=/
-exec_prefix=/
+prefix=$XORG_CONFIGURE_PREFIX
+exec_prefix=$XORG_CONFIGURE_EXEC_PREFIX
 includedir=$KOS_ROOT/kos/include
 
 Name: $USED_NAME
@@ -116,8 +116,8 @@ make_pkg_config "xextproto.pc"        "7.3.0"  "XExt"
 make_pkg_config "xf86bigfontproto.pc" "1.2.0"  "XF86BigFont"
 make_pkg_config "xf86dgaproto.pc"     "2.1"    "XF86DGA"
 install_rawfile_stdin "$PKG_CONFIG_PATH/xf86driproto.pc" <<EOF
-prefix=/
-exec_prefix=/
+prefix=$XORG_CONFIGURE_PREFIX
+exec_prefix=$XORG_CONFIGURE_EXEC_PREFIX
 includedir=$KOS_ROOT/kos/include
 
 Name: XF86DRIProto
