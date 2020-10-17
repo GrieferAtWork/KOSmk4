@@ -184,7 +184,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/hw/xfree86/Xorg" ]; then
 				--disable-glamor `# ???` \
 				--disable-kdrive \
 				--disable-xephyr \
-				--enable-libunwind \
+				--disable-libunwind `# Can/will never be ported due to incompatibility with KOS´s native libunwind` \
 				--enable-xshmfence \
 				--disable-install-setuid `# Wouldn´t matter; We do our own install` \
 				--enable-unix-transport `# Unix domain socket support` \

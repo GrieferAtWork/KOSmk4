@@ -394,24 +394,6 @@ __SYSDECL_BEGIN
 #endif /* !F_SETLKW64 && __F_SETLKW64 */
 #endif /* !__USE_LARGEFILE64 */
 
-#ifdef __USE_GNU
-/* [struct flock *arg] */
-#if !defined(F_OFD_GETLK) && defined(__F_OFD_GETLK)
-#define F_OFD_GETLK  __F_OFD_GETLK
-#endif /* !F_OFD_GETLK && __F_OFD_GETLK */
-
-/* [struct flock const *arg] */
-#if !defined(F_OFD_SETLK) && defined(__F_OFD_SETLK)
-#define F_OFD_SETLK  __F_OFD_SETLK
-#endif /* !F_OFD_SETLK && __F_OFD_SETLK */
-
-/* [struct flock const *arg] */
-#if !defined(F_OFD_SETLKW) && defined(__F_OFD_SETLKW)
-#define F_OFD_SETLKW __F_OFD_SETLKW
-#endif /* !F_OFD_SETLKW && __F_OFD_SETLKW */
-#endif /* __USE_GNU */
-
-
 /* [void arg] Duplicate and return file descriptor. (may be used to implement `dup(2)') */
 #if !defined(F_DUPFD) && defined(__F_DUPFD)
 #define F_DUPFD __F_DUPFD
@@ -456,6 +438,21 @@ __SYSDECL_BEGIN
 
 
 #ifdef __USE_GNU
+/* [struct flock *arg] */
+#if !defined(F_OFD_GETLK) && defined(__F_OFD_GETLK)
+#define F_OFD_GETLK  __F_OFD_GETLK
+#endif /* !F_OFD_GETLK && __F_OFD_GETLK */
+
+/* [struct flock const *arg] */
+#if !defined(F_OFD_SETLK) && defined(__F_OFD_SETLK)
+#define F_OFD_SETLK  __F_OFD_SETLK
+#endif /* !F_OFD_SETLK && __F_OFD_SETLK */
+
+/* [struct flock const *arg] */
+#if !defined(F_OFD_SETLKW) && defined(__F_OFD_SETLKW)
+#define F_OFD_SETLKW __F_OFD_SETLKW
+#endif /* !F_OFD_SETLKW && __F_OFD_SETLKW */
+
 /* [int signo] Set number of signal to be sent. */
 #if !defined(F_SETSIG) && defined(__F_SETSIG)
 #define F_SETSIG __F_SETSIG
@@ -476,10 +473,7 @@ __SYSDECL_BEGIN
 #if !defined(F_GETOWN_EX) && defined(__F_GETOWN_EX)
 #define F_GETOWN_EX __F_GETOWN_EX
 #endif /* !F_GETOWN_EX && __F_GETOWN_EX */
-#endif /* __USE_GNU */
 
-
-#ifdef __USE_GNU
 /* [int arg = <One of `F_RDLCK', `F_WRLCK', `F_UNLCK'>] Set a lease. */
 #if !defined(F_SETLEASE) && defined(__F_SETLEASE)
 #define F_SETLEASE __F_SETLEASE
@@ -506,6 +500,38 @@ __SYSDECL_BEGIN
 #if !defined(F_GETPIPE_SZ) && defined(__F_GETPIPE_SZ)
 #define F_GETPIPE_SZ __F_GETPIPE_SZ
 #endif /* !F_GETPIPE_SZ && __F_GETPIPE_SZ */
+
+/* [unsigned int seals] Set file seals (`seals' is a set of `F_SEAL_*') */
+#if !defined(F_ADD_SEALS) && defined(__F_ADD_SEALS)
+#define F_ADD_SEALS __F_ADD_SEALS
+#endif /* !F_ADD_SEALS && __F_ADD_SEALS */
+
+/* [void arg] Get active file seals.
+ * @return: * : Active seals (set of `F_SEAL_*') */
+#if !defined(F_GET_SEALS) && defined(__F_GET_SEALS)
+#define F_GET_SEALS __F_GET_SEALS
+#endif /* !F_GET_SEALS && __F_GET_SEALS */
+
+/* [uint64_t *arg] ??? */
+#if !defined(F_GET_RW_HINT) && defined(__F_GET_RW_HINT)
+#define F_GET_RW_HINT __F_GET_RW_HINT
+#endif /* !F_GET_RW_HINT && __F_GET_RW_HINT */
+
+/* [uint64_t const *arg] ??? */
+#if !defined(F_SET_RW_HINT) && defined(__F_SET_RW_HINT)
+#define F_SET_RW_HINT __F_SET_RW_HINT
+#endif /* !F_SET_RW_HINT && __F_SET_RW_HINT */
+
+/* [uint64_t *arg] ??? */
+#if !defined(F_GET_FILE_RW_HINT) && defined(__F_GET_FILE_RW_HINT)
+#define F_GET_FILE_RW_HINT __F_GET_FILE_RW_HINT
+#endif /* !F_GET_FILE_RW_HINT && __F_GET_FILE_RW_HINT */
+
+/* [uint64_t const *arg] ??? */
+#if !defined(F_SET_FILE_RW_HINT) && defined(__F_SET_FILE_RW_HINT)
+#define F_SET_FILE_RW_HINT __F_SET_FILE_RW_HINT
+#endif /* !F_SET_FILE_RW_HINT && __F_SET_FILE_RW_HINT */
+
 #endif /* __USE_GNU */
 
 #if defined(__USE_XOPEN2K8) || defined(__USE_NETBSD)
@@ -695,59 +721,59 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_GNU
 /* This is a mandatory flock: */
-#ifdef __LOCK_MAND
+#if !defined(LOCK_MAND) && defined(__LOCK_MAND)
 #define LOCK_MAND __LOCK_MAND
-#endif /* __LOCK_MAND */
+#endif /* !LOCK_MAND && __LOCK_MAND */
 
 /* ... which allows concurrent read operations. */
-#ifdef __LOCK_READ
+#if !defined(LOCK_READ) && defined(__LOCK_READ)
 #define LOCK_READ __LOCK_READ
-#endif /* __LOCK_READ */
+#endif /* !LOCK_READ && __LOCK_READ */
 
 /* ... which allows concurrent write operations. */
-#ifdef __LOCK_WRITE
+#if !defined(LOCK_WRITE) && defined(__LOCK_WRITE)
 #define LOCK_WRITE __LOCK_WRITE
-#endif /* __LOCK_WRITE */
+#endif /* !LOCK_WRITE && __LOCK_WRITE */
 
 /* ... Which allows concurrent read & write operations. */
-#ifdef __LOCK_RW
+#if !defined(LOCK_RW) && defined(__LOCK_RW)
 #define LOCK_RW __LOCK_RW
-#endif /* __LOCK_RW */
+#endif /* !LOCK_RW && __LOCK_RW */
 
 /* File accessed. */
-#ifdef __DN_ACCESS
+#if !defined(DN_ACCESS) && defined(__DN_ACCESS)
 #define DN_ACCESS __DN_ACCESS
-#endif /* __DN_ACCESS */
+#endif /* !DN_ACCESS && __DN_ACCESS */
 
 /* File modified. */
-#ifdef __DN_MODIFY
+#if !defined(DN_MODIFY) && defined(__DN_MODIFY)
 #define DN_MODIFY __DN_MODIFY
-#endif /* __DN_MODIFY */
+#endif /* !DN_MODIFY && __DN_MODIFY */
 
 /* File created. */
-#ifdef __DN_CREATE
+#if !defined(DN_CREATE) && defined(__DN_CREATE)
 #define DN_CREATE __DN_CREATE
-#endif /* __DN_CREATE */
+#endif /* !DN_CREATE && __DN_CREATE */
 
 /* File removed. */
-#ifdef __DN_DELETE
+#if !defined(DN_DELETE) && defined(__DN_DELETE)
 #define DN_DELETE __DN_DELETE
-#endif /* __DN_DELETE */
+#endif /* !DN_DELETE && __DN_DELETE */
 
 /* File renamed. */
-#ifdef __DN_RENAME
+#if !defined(DN_RENAME) && defined(__DN_RENAME)
 #define DN_RENAME __DN_RENAME
-#endif /* __DN_RENAME */
+#endif /* !DN_RENAME && __DN_RENAME */
 
 /* File changed attributes. */
-#ifdef __DN_ATTRIB
+#if !defined(DN_ATTRIB) && defined(__DN_ATTRIB)
 #define DN_ATTRIB __DN_ATTRIB
-#endif /* __DN_ATTRIB */
+#endif /* !DN_ATTRIB && __DN_ATTRIB */
 
 /* Don't remove notifier. */
-#ifdef __DN_MULTISHOT
+#if !defined(DN_MULTISHOT) && defined(__DN_MULTISHOT)
 #define DN_MULTISHOT __DN_MULTISHOT
-#endif /* __DN_MULTISHOT */
+#endif /* !DN_MULTISHOT && __DN_MULTISHOT */
 
 
 #if (defined(__F_OWNER_TID) || defined(__F_OWNER_PID) || \
@@ -801,60 +827,101 @@ enum __pid_type {
 #endif /* __F_OWNER_TID || __F_OWNER_PID || __F_OWNER_PGRP || __F_OWNER_GID */
 
 /* Wait upon writeout of all pages in the range before performing the write. */
-#ifdef __SYNC_FILE_RANGE_WAIT_BEFORE
+#if !defined(SYNC_FILE_RANGE_WAIT_BEFORE) && defined(__SYNC_FILE_RANGE_WAIT_BEFORE)
 #define SYNC_FILE_RANGE_WAIT_BEFORE __SYNC_FILE_RANGE_WAIT_BEFORE
-#endif /* __SYNC_FILE_RANGE_WAIT_BEFORE */
+#endif /* !SYNC_FILE_RANGE_WAIT_BEFORE && __SYNC_FILE_RANGE_WAIT_BEFORE */
 
 /* Initiate writeout of all those dirty pages in the range which are not presently under writeback. */
-#ifdef __SYNC_FILE_RANGE_WRITE
+#if !defined(SYNC_FILE_RANGE_WRITE) && defined(__SYNC_FILE_RANGE_WRITE)
 #define SYNC_FILE_RANGE_WRITE __SYNC_FILE_RANGE_WRITE
-#endif /* __SYNC_FILE_RANGE_WRITE */
+#endif /* !SYNC_FILE_RANGE_WRITE && __SYNC_FILE_RANGE_WRITE */
 
 /* Wait upon writeout of all pages in the range after performing the write. */
-#ifdef __SYNC_FILE_RANGE_WAIT_AFTER
+#if !defined(SYNC_FILE_RANGE_WAIT_AFTER) && defined(__SYNC_FILE_RANGE_WAIT_AFTER)
 #define SYNC_FILE_RANGE_WAIT_AFTER __SYNC_FILE_RANGE_WAIT_AFTER
-#endif /* __SYNC_FILE_RANGE_WAIT_AFTER */
+#endif /* !SYNC_FILE_RANGE_WAIT_AFTER && __SYNC_FILE_RANGE_WAIT_AFTER */
 
 /* Move pages instead of copying. */
-#ifdef __SPLICE_F_MOVE
+#if !defined(SPLICE_F_MOVE) && defined(__SPLICE_F_MOVE)
 #define SPLICE_F_MOVE __SPLICE_F_MOVE
-#endif /* __SPLICE_F_MOVE */
+#endif /* !SPLICE_F_MOVE && __SPLICE_F_MOVE */
 
 /* Don't block on the pipe splicing (but we may still block on the fd we splice from/to). */
-#ifdef __SPLICE_F_NONBLOCK
+#if !defined(SPLICE_F_NONBLOCK) && defined(__SPLICE_F_NONBLOCK)
 #define SPLICE_F_NONBLOCK __SPLICE_F_NONBLOCK
-#endif /* __SPLICE_F_NONBLOCK */
+#endif /* !SPLICE_F_NONBLOCK && __SPLICE_F_NONBLOCK */
 
 /* Expect more data. */
-#ifdef __SPLICE_F_MORE
+#if !defined(SPLICE_F_MORE) && defined(__SPLICE_F_MORE)
 #define SPLICE_F_MORE __SPLICE_F_MORE
-#endif /* __SPLICE_F_MORE */
+#endif /* !SPLICE_F_MORE && __SPLICE_F_MORE */
 
 /* Pages passed in are a gift. */
-#ifdef __SPLICE_F_GIFT
+#if !defined(SPLICE_F_GIFT) && defined(__SPLICE_F_GIFT)
 #define SPLICE_F_GIFT __SPLICE_F_GIFT
-#endif /* __SPLICE_F_GIFT */
+#endif /* !SPLICE_F_GIFT && __SPLICE_F_GIFT */
 
 /* Don't extend size of file even if offset + len is greater than file size. */
-#ifdef __FALLOC_FL_KEEP_SIZE
+#if !defined(FALLOC_FL_KEEP_SIZE) && defined(__FALLOC_FL_KEEP_SIZE)
 #define FALLOC_FL_KEEP_SIZE __FALLOC_FL_KEEP_SIZE
-#endif /* __FALLOC_FL_KEEP_SIZE */
+#endif /* !FALLOC_FL_KEEP_SIZE && __FALLOC_FL_KEEP_SIZE */
 /* Create a hole in the file. */
-#ifdef __FALLOC_FL_PUNCH_HOLE
+#if !defined(FALLOC_FL_PUNCH_HOLE) && defined(__FALLOC_FL_PUNCH_HOLE)
 #define FALLOC_FL_PUNCH_HOLE __FALLOC_FL_PUNCH_HOLE
-#endif /* __FALLOC_FL_PUNCH_HOLE */
+#endif /* !FALLOC_FL_PUNCH_HOLE && __FALLOC_FL_PUNCH_HOLE */
 /* Remove a range of a file without leaving a hole. */
-#ifdef __FALLOC_FL_COLLAPSE_RANGE
+#if !defined(FALLOC_FL_COLLAPSE_RANGE) && defined(__FALLOC_FL_COLLAPSE_RANGE)
 #define FALLOC_FL_COLLAPSE_RANGE __FALLOC_FL_COLLAPSE_RANGE
-#endif /* __FALLOC_FL_COLLAPSE_RANGE */
+#endif /* !FALLOC_FL_COLLAPSE_RANGE && __FALLOC_FL_COLLAPSE_RANGE */
 /* Convert a range of a file to zeros. */
-#ifdef __FALLOC_FL_ZERO_RANGE
+#if !defined(FALLOC_FL_ZERO_RANGE) && defined(__FALLOC_FL_ZERO_RANGE)
 #define FALLOC_FL_ZERO_RANGE __FALLOC_FL_ZERO_RANGE
-#endif /* __FALLOC_FL_ZERO_RANGE */
+#endif /* !FALLOC_FL_ZERO_RANGE && __FALLOC_FL_ZERO_RANGE */
 
-#ifdef __MAX_HANDLE_SZ
-#define MAX_HANDLE_SZ    __MAX_HANDLE_SZ
-#endif /* __MAX_HANDLE_SZ */
+#if !defined(MAX_HANDLE_SZ) && defined(__MAX_HANDLE_SZ)
+#define MAX_HANDLE_SZ __MAX_HANDLE_SZ
+#endif /* !MAX_HANDLE_SZ && __MAX_HANDLE_SZ */
+
+/* For use with `F_ADD_SEALS' and `F_GET_SEALS' */
+#if !defined(F_SEAL_SEAL) && defined(__F_SEAL_SEAL)
+#define F_SEAL_SEAL         __F_SEAL_SEAL         /* Prevent further modification of seals */
+#endif /* !F_SEAL_SEAL && __F_SEAL_SEAL */
+#if !defined(F_SEAL_SHRINK) && defined(__F_SEAL_SHRINK)
+#define F_SEAL_SHRINK       __F_SEAL_SHRINK       /* Prevent the file's size from being truncated */
+#endif /* !F_SEAL_SHRINK && __F_SEAL_SHRINK */
+#if !defined(F_SEAL_GROW) && defined(__F_SEAL_GROW)
+#define F_SEAL_GROW         __F_SEAL_GROW         /* Prevent the file's size from being increased */
+#endif /* !F_SEAL_GROW && __F_SEAL_GROW */
+#if !defined(F_SEAL_WRITE) && defined(__F_SEAL_WRITE)
+#define F_SEAL_WRITE        __F_SEAL_WRITE        /* Prevent any modifications to the file's contents.
+                                                   * If writable memory mappings exist, trying to set
+                                                   * this flag fails with TODO:EXCEPTION_FOR_EBUSY */
+#endif /* !F_SEAL_WRITE && __F_SEAL_WRITE */
+#if !defined(F_SEAL_FUTURE_WRITE) && defined(__F_SEAL_FUTURE_WRITE)
+#define F_SEAL_FUTURE_WRITE __F_SEAL_FUTURE_WRITE /* Same as `F_SEAL_WRITE', but pre-existing, writable
+                                                   * memory mappings continue to work. */
+#endif /* !F_SEAL_FUTURE_WRITE && __F_SEAL_FUTURE_WRITE */
+
+/* For use with `F_GET_RW_HINT' and `F_SET_RW_HINT' */
+#if !defined(RWF_WRITE_LIFE_NOT_SET) && defined(__RWF_WRITE_LIFE_NOT_SET)
+#define RWF_WRITE_LIFE_NOT_SET __RWF_WRITE_LIFE_NOT_SET /* ??? */
+#endif /* !RWF_WRITE_LIFE_NOT_SET && __RWF_WRITE_LIFE_NOT_SET */
+#if !defined(RWH_WRITE_LIFE_NONE) && defined(__RWH_WRITE_LIFE_NONE)
+#define RWH_WRITE_LIFE_NONE    __RWH_WRITE_LIFE_NONE    /* ??? */
+#endif /* !RWH_WRITE_LIFE_NONE && __RWH_WRITE_LIFE_NONE */
+#if !defined(RWH_WRITE_LIFE_SHORT) && defined(__RWH_WRITE_LIFE_SHORT)
+#define RWH_WRITE_LIFE_SHORT   __RWH_WRITE_LIFE_SHORT   /* ??? */
+#endif /* !RWH_WRITE_LIFE_SHORT && __RWH_WRITE_LIFE_SHORT */
+#if !defined(RWH_WRITE_LIFE_MEDIUM) && defined(__RWH_WRITE_LIFE_MEDIUM)
+#define RWH_WRITE_LIFE_MEDIUM  __RWH_WRITE_LIFE_MEDIUM  /* ??? */
+#endif /* !RWH_WRITE_LIFE_MEDIUM && __RWH_WRITE_LIFE_MEDIUM */
+#if !defined(RWH_WRITE_LIFE_LONG) && defined(__RWH_WRITE_LIFE_LONG)
+#define RWH_WRITE_LIFE_LONG    __RWH_WRITE_LIFE_LONG    /* ??? */
+#endif /* !RWH_WRITE_LIFE_LONG && __RWH_WRITE_LIFE_LONG */
+#if !defined(RWH_WRITE_LIFE_EXTREME) && defined(__RWH_WRITE_LIFE_EXTREME)
+#define RWH_WRITE_LIFE_EXTREME __RWH_WRITE_LIFE_EXTREME /* ??? */
+#endif /* !RWH_WRITE_LIFE_EXTREME && __RWH_WRITE_LIFE_EXTREME */
+
 #endif /* __USE_GNU */
 
 

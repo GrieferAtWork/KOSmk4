@@ -26,40 +26,52 @@
 /* KOS/LINUX                                                            */
 /************************************************************************/
 
-#define __F_DUPFD         0    /* [void arg] Duplicate and return file descriptor. (may be used to implement `dup(2)') */
-#define __F_GETFD         1    /* [void arg] Get file descriptor flags.
-                                * @return: * : Set of `FD_CLOEXEC | FD_CLOFORK' */
-#define __F_SETFD         2    /* [int arg = <set of `FD_CLOEXEC', `FD_CLOFORK'>] Set file descriptor flags. */
-#define __F_GETFL         3    /* [void arg] Get file status flags.
-                                * @return: * : Set of `O_*' */
-#define __F_SETFL         4    /* [oflag_t arg] Set file status flags. */
-#define __F_GETLK         5    /* [struct flock *arg] Get record locking info. */
-#define __F_SETLK         6    /* [struct flock const *arg] Set record locking info (non-blocking). */
-#define __F_SETLKW        7    /* [struct flock const *arg] Set record locking info (blocking). */
-#define __F_SETOWN        8    /* [pid_t arg] Set owner (process receiving SIGIO). */
-#define __F_GETOWN        9    /* [void arg] Get owner (process receiving SIGIO).
-                                * @return: * : The PID of the process (warning: the PID may not
-                                *              fit into an int and -EOVERFLOW may be returned) */
-#define __F_SETSIG        10   /* [int signo] Set number of signal to be sent. */
-#define __F_GETSIG        11   /* [void arg] Get number of signal to be sent.
-                                * @return: * : One of `SIG*' */
-#define __F_GETLK64       12   /* [struct flock64 *arg] Get record locking info. */
-#define __F_SETLK64       13   /* [struct flock64 const *arg] Set record locking info (non-blocking). */
-#define __F_SETLKW64      14   /* [struct flock64 const *arg] Set record locking info (blocking). */
-#define __F_SETOWN_EX     15   /* [struct f_owner_ex const *arg] Set owner (thread receiving SIGIO). */
-#define __F_GETOWN_EX     16   /* [struct f_owner_ex *arg] Get owner (thread receiving SIGIO). */
-#define __F_OFD_GETLK     36   /* [struct flock *arg] */
-#define __F_OFD_SETLK     37   /* [struct flock const *arg] */
-#define __F_OFD_SETLKW    38   /* [struct flock const *arg] */
-#define __F_SETLEASE      1024 /* [int arg = <One of `F_RDLCK', `F_WRLCK', `F_UNLCK'>] Set a lease. */
-#define __F_GETLEASE      1025 /* [void arg] Enquire what lease is active.
-                                * @return: * : One of `F_RDLCK', `F_WRLCK', `F_UNLCK' */
-#define __F_NOTIFY        1026 /* [int arg = <Set of `DN_*'>] Request notifications on a directory. */
-#define __F_DUPFD_CLOEXEC 1030 /* [void arg] Duplicate file descriptor with close-on-exit set.
-                                * @[fd_t return]: * : A new FD for the same kernel object. */
-#define __F_SETPIPE_SZ    1031 /* [unsigned int arg] Set pipe buffer size (in bytes). */
-#define __F_GETPIPE_SZ    1032 /* [void arg] Get pipe buffer size (in bytes).
-                                * @return: * : The buffer size (in bytes) */
+#define __F_DUPFD             0    /* [void arg] Duplicate and return file descriptor. (may be used to implement `dup(2)') */
+#define __F_GETFD             1    /* [void arg] Get file descriptor flags.
+                                    * @return: * : Set of `FD_CLOEXEC | FD_CLOFORK' */
+#define __F_SETFD             2    /* [int arg = <set of `FD_CLOEXEC', `FD_CLOFORK'>] Set file descriptor flags. */
+#define __F_GETFL             3    /* [void arg] Get file status flags.
+                                    * @return: * : Set of `O_*' */
+#define __F_SETFL             4    /* [oflag_t arg] Set file status flags. */
+#define __F_GETLK             5    /* [struct flock *arg] Get record locking info. */
+#define __F_SETLK             6    /* [struct flock const *arg] Set record locking info (non-blocking). */
+#define __F_SETLKW            7    /* [struct flock const *arg] Set record locking info (blocking). */
+#define __F_SETOWN            8    /* [pid_t arg] Set owner (process receiving SIGIO). */
+#define __F_GETOWN            9    /* [void arg] Get owner (process receiving SIGIO).
+                                    * @return: * : The PID of the process (warning: the PID may not
+                                    *              fit into an int and -EOVERFLOW may be returned) */
+#define __F_SETSIG            10   /* [int signo] Set number of signal to be sent. */
+#define __F_GETSIG            11   /* [void arg] Get number of signal to be sent.
+                                    * @return: * : One of `SIG*' */
+#define __F_GETLK64           12   /* [struct flock64 *arg] Get record locking info. */
+#define __F_SETLK64           13   /* [struct flock64 const *arg] Set record locking info (non-blocking). */
+#define __F_SETLKW64          14   /* [struct flock64 const *arg] Set record locking info (blocking). */
+#define __F_SETOWN_EX         15   /* [struct f_owner_ex const *arg] Set owner (thread receiving SIGIO). */
+#define __F_GETOWN_EX         16   /* [struct f_owner_ex *arg] Get owner (thread receiving SIGIO). */
+#define __F_OFD_GETLK         36   /* [struct flock *arg] */
+#define __F_OFD_SETLK         37   /* [struct flock const *arg] */
+#define __F_OFD_SETLKW        38   /* [struct flock const *arg] */
+#define __F_SETLEASE          1024 /* [int arg = <One of `F_RDLCK', `F_WRLCK', `F_UNLCK'>] Set a lease. */
+#define __F_GETLEASE          1025 /* [void arg] Enquire what lease is active.
+                                    * @return: * : One of `F_RDLCK', `F_WRLCK', `F_UNLCK' */
+#define __F_NOTIFY            1026 /* [int arg = <Set of `DN_*'>] Request notifications on a directory. */
+/*      __F_                  1027  * ... */
+/*      __F_                  1028  * ... */
+/*      __F_                  1029  * ... */
+#define __F_DUPFD_CLOEXEC     1030 /* [void arg] Duplicate file descriptor with close-on-exit set.
+                                    * @[fd_t return]: * : A new FD for the same kernel object. */
+#define __F_SETPIPE_SZ        1031 /* [unsigned int arg] Set pipe buffer size (in bytes). */
+#define __F_GETPIPE_SZ        1032 /* [void arg] Get pipe buffer size (in bytes).
+                                    * @return: * : The buffer size (in bytes) */
+#define __F_ADD_SEALS         1033 /* [unsigned int seals] Set file seals (`seals' is a set of `F_SEAL_*') */
+#define __F_GET_SEALS         1034 /* [void arg] Get active file seals.
+                                    * @return: * : Active seals (set of `F_SEAL_*') */
+#define __F_GET_RW_HINT       1035 /* [uint64_t *arg] ??? */
+#define __F_SET_RW_HINT       1036 /* [uint64_t const *arg] ??? */
+#define __F_GET_FILE_RW_HINT  1037 /* [uint64_t *arg] ??? */
+#define __F_SET_FILE_RW_HINT  1038 /* [uint64_t const *arg] ??? */
+
+
 #ifdef __KOS__
 #define __F_SETFL_XCH      5163 /* [int flags] Same as 'F_SETFL', but return the old set of flags instead of `-EOK' upon success. */
 #define __F_NEXT           5164 /* [void arg] Return the next open handle id >= the given fd, or `-EBADF' if no such FD exists. (s.a. `https://lkml.org/lkml/2012/4/1/71') */
@@ -69,6 +81,23 @@
 #define __F_DUP2FD_CLOEXEC 5168 /* [fd_t arg] Same as `F_DUP2FD', but set `FD_CLOEXEC'. */
 #endif /* __KOS__ */
 
+/* For use with `F_ADD_SEALS' and `F_GET_SEALS' */
+#define __F_SEAL_SEAL         0x0001 /* Prevent further modification of seals */
+#define __F_SEAL_SHRINK       0x0002 /* Prevent the file's size from being truncated */
+#define __F_SEAL_GROW         0x0004 /* Prevent the file's size from being increased */
+#define __F_SEAL_WRITE        0x0008 /* Prevent any modifications to the file's contents.
+                                      * If writable memory mappings exist, trying to set
+                                      * this flag fails with TODO:EXCEPTION_FOR_EBUSY */
+#define __F_SEAL_FUTURE_WRITE 0x0010 /* Same as `F_SEAL_WRITE', but pre-existing, writable
+                                      * memory mappings continue to work. */
+
+/* For use with `F_GET_RW_HINT' and `F_SET_RW_HINT' */
+#define __RWF_WRITE_LIFE_NOT_SET 0 /* ??? */
+#define __RWH_WRITE_LIFE_NONE    1 /* ??? */
+#define __RWH_WRITE_LIFE_SHORT   2 /* ??? */
+#define __RWH_WRITE_LIFE_MEDIUM  3 /* ??? */
+#define __RWH_WRITE_LIFE_LONG    4 /* ??? */
+#define __RWH_WRITE_LIFE_EXTREME 5 /* ??? */
 
 /* *at function flags (s.a. `atflag_t') */
 #define __AT_SYMLINK_NOFOLLOW  0x0100 /* If the last path component is a symlink, don't follow it. */
