@@ -17,23 +17,26 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# depends xorg-server
+require_utility Xorg/xorg-server "$PKG_CONFIG_PATH/xorg-server.pc"
+require_utility Xorg/libX11      "$PKG_CONFIG_PATH/x11.pc"
+require_utility Xorg/xorgproto   "$PKG_CONFIG_PATH/xproto.pc"
 
 # xorg-macros
-. "$KOS_MISC/utilities/misc/xorg-macros.sh"
+. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
 
-VERSION="1.3.2"
-SRCPATH="$KOS_ROOT/binutils/src/x/xinit-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/x/xinit-$VERSION"
+VERSION="1.4.1"
+SRCPATH="$KOS_ROOT/binutils/src/Xorg/xinit-$VERSION"
+OPTPATH="$BINUTILS_SYSROOT/opt/Xorg/xinit-$VERSION"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/xinit" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
-			cmd cd "$KOS_ROOT/binutils/src/x"
+			cmd mkdir -p "$KOS_ROOT/binutils/src/Xorg"
+			cmd cd "$KOS_ROOT/binutils/src/Xorg"
 			cmd rm -rf "xinit-$VERSION"
 			download_file \
 				"xinit-$VERSION.tar.gz" \
-				"https://www.x.org/archive//individual/app/xinit-$VERSION.tar.gz"
+				"https://www.x.org/releases/individual/app/xinit-$VERSION.tar.gz"
 			cmd tar xvf "xinit-$VERSION.tar.gz"
 		fi
 		apply_patch "$SRCPATH" "$KOS_PATCHES/xinit-$VERSION.patch"
@@ -47,48 +50,46 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/xinit" ]; then
 			export CXX="${CROSS_PREFIX}g++"
 			export CXXCPP="${CROSS_PREFIX}cpp"
 			export CXXFLAGS="-ggdb"
-			cmd bash "../../../../src/x/xinit-$VERSION/configure" \
-				--prefix="/" \
-				--exec-prefix="/" \
-				--bindir="/bin" \
-				--sbindir="/bin" \
-				--libexecdir="/libexec" \
-				--sysconfdir="/etc" \
-				--sharedstatedir="/usr/com" \
-				--localstatedir="/var" \
-				--libdir="/$TARGET_LIBPATH" \
-				--includedir="/usr/include" \
-				--oldincludedir="/usr/include" \
-				--datarootdir="/usr/share" \
-				--datadir="/usr/share" \
-				--infodir="/usr/share/info" \
-				--localedir="/usr/share/locale" \
-				--mandir="/usr/share/man" \
-				--docdir="/usr/share/doc/xinit" \
-				--htmldir="/usr/share/doc/xinit" \
-				--dvidir="/usr/share/doc/xinit" \
-				--pdfdir="/usr/share/doc/xinit" \
-				--psdir="/usr/share/doc/xinit" \
+			cmd bash "../../../../src/Xorg/xinit-$VERSION/configure" \
+				--prefix="$XORG_CONFIGURE_PREFIX" \
+				--exec-prefix="$XORG_CONFIGURE_EXEC_PREFIX" \
+				--bindir="$XORG_CONFIGURE_BINDIR" \
+				--sbindir="$XORG_CONFIGURE_SBINDIR" \
+				--libexecdir="$XORG_CONFIGURE_LIBEXECDIR" \
+				--sysconfdir="$XORG_CONFIGURE_SYSCONFDIR" \
+				--sharedstatedir="$XORG_CONFIGURE_SHAREDSTATEDIR" \
+				--localstatedir="$XORG_CONFIGURE_LOCALSTATEDIR" \
+				--libdir="$XORG_CONFIGURE_LIBDIR" \
+				--includedir="$XORG_CONFIGURE_INCLUDEDIR" \
+				--oldincludedir="$XORG_CONFIGURE_OLDINCLUDEDIR" \
+				--datarootdir="$XORG_CONFIGURE_DATAROOTDIR" \
+				--datadir="$XORG_CONFIGURE_DATADIR" \
+				--infodir="$XORG_CONFIGURE_INFODIR" \
+				--localedir="$XORG_CONFIGURE_LOCALEDIR" \
+				--mandir="$XORG_CONFIGURE_MANDIR" \
+				--docdir="$XORG_CONFIGURE_DOCDIR_PREFIX/xinit" \
+				--htmldir="$XORG_CONFIGURE_HTMLDIR_PREFIX/xinit" \
+				--dvidir="$XORG_CONFIGURE_DVIDIR_PREFIX/xinit" \
+				--pdfdir="$XORG_CONFIGURE_PDFDIR_PREFIX/xinit" \
+				--psdir="$XORG_CONFIGURE_PSDIR_PREFIX/xinit" \
 				--build="$(gcc -dumpmachine)" \
 				--host="$TARGET_NAME-linux-gnu" \
+				--with-xrdb="/bin/xrdb" \
+				--with-xmodmap="/bin/xmodmap" \
 				--with-twm="/bin/twm" \
+				--with-xclock="/bin/xclock" \
+				--with-xterm="/bin/xterm" \
 				--with-xserver="/bin/Xorg" \
+				--with-xauth="/bin/xauth" \
 				--with-xinit="/bin/xinit" \
 				--with-xinitdir="/$TARGET_LIBPATH/X11/xinit" \
-				--with-xterm="/bin/xterm" \
-				--with-xclock="/bin/xclock" \
-				--with-xauth="/bin/xauth" \
-				--with-xrdb="/bin/xrdb" \
-				--with-xmodmap="/bin/xmodmap"
 		) || exit $?
 	fi
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
-#Usage: `xinit twm`
 install_file /bin/xinit "$OPTPATH/xinit"
-
 
 # xinit: /etc/X11/xinit/xinitrc
 # xinit: /etc/X11/xinit/xserverrc

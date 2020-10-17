@@ -1,0 +1,15 @@
+diff -Naur xinit-1.4.1-orig/xinit.c xinit-1.4.1/xinit.c
+--- xinit-1.4.1-orig/xinit.c	2019-03-03 20:58:11.000000000 +0100
++++ xinit-1.4.1/xinit.c	2020-10-17 14:29:56.400224700 +0200
+@@ -90,7 +90,11 @@
+ #define TRUE 1
+ #define FALSE 0
+ 
++#ifdef __KOS__
++static char *default_server = "Xorg";
++#else /* __KOS__ */
+ static char *default_server = "X";
++#endif /* !__KOS__ */
+ static char *default_display = ":0";        /* choose most efficient */
+ static char *default_client[] = {"xterm", "-geometry", "+1+1", "-n", "login", NULL};
+ static char *serverargv[100];

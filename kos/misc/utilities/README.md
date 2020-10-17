@@ -158,4 +158,5 @@ Sources for recent releases can all be found here: https://www.x.org/releases/in
 	- [libXrender-0.9.10](https://www.x.org/releases/individual/lib/libXrender-0.9.10.tar.gz)
 	- [libXft-2.3.3](https://www.x.org/releases/individual/lib/libXft-2.3.3.tar.gz)
 	- [xclock-1.0.9](https://www.x.org/releases/individual/app/xclock-1.0.9.tar.gz)
+	- [xinit-1.4.1](https://www.x.org/releases/individual/app/xinit-1.4.1.tar.gz)
 
