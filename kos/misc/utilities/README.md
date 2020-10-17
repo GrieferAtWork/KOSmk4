@@ -2,27 +2,6 @@
 <a name="X-server"></a>
 ## Experimental utilities for X-server support:
 
-### Invocation
-
-From inside of KOS, run the following:
-
-```sh
-xinit /bin/xclock -- -dumbSched
-```
-
-
-### TODO
-
-The X-server currently fails to start because of:
-
-```
-[trace ][6] sys_epoll_create1(flags: 524288)
-[trace ][6][except] Translate exception 0x8:0x0[0x8101,0x20,0x80000] into errno=-38
-```
-
-Which is because KOS has yet to implement that system call.
-
-
 ### Ported
 
 - [libdrm-2.4.100](https://dri.freedesktop.org/libdrm/)
@@ -54,4 +33,25 @@ Which is because KOS has yet to implement that system call.
 	- [libXft-2.3.3](https://www.x.org/releases/individual/lib/libXft-2.3.3.tar.gz)
 	- [xclock-1.0.9](https://www.x.org/releases/individual/app/xclock-1.0.9.tar.gz)
 	- [xinit-1.4.1](https://www.x.org/releases/individual/app/xinit-1.4.1.tar.gz)
+
+
+### Invocation
+
+From inside of KOS, run the following:
+
+```sh
+xinit /bin/xclock -- -dumbSched
+```
+
+
+### TODO
+
+The X-server currently fails to start because of:
+
+```
+[trace ][6] sys_epoll_create1(flags: 524288)
+[trace ][6][except] Translate exception 0x8:0x0[0x8101,0x20,0x80000] into errno=-38
+```
+
+Which is because KOS has yet to implement that system call.
 

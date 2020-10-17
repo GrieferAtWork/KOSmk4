@@ -43,6 +43,7 @@
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state-helpers.h>
 
+#include <assert.h>
 #include <format-printer.h>
 #include <inttypes.h>
 #include <signal.h>
@@ -668,6 +669,14 @@ NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	unwind_fde_t fde;
 	struct kcpustate old_state;
 	void *pc;
+#ifndef NDEBUG
+	{
+		struct exception_info *info;
+		info = error_info();
+		assertf(info->ei_code != E_OK,
+		        "In error_unwind(), but no exception set");
+	}
+#endif /* !NDEBUG */
 
 search_fde:
 	/* unwind `state' until the nearest exception handler, or until user-space is reached.
@@ -965,6 +974,15 @@ PUBLIC ATTR_CONST void *__cxa_begin_catch(void *ptr) {
 	 * >> }
 	 * The given `ptr' is what `libc_error_unwind()' originally set as value
 	 * for the `CFI_UNWIND_REGISTER_EXCEPTION' register. */
+#ifndef NDEBUG
+	{
+		struct exception_info *info;
+		info = error_info();
+		assertf(info->ei_code != E_OK,
+		        "Exception handler entered, but no exception set");
+	}
+#endif /* !NDEBUG */
+
 	return ptr;
 }
 
@@ -997,6 +1015,13 @@ PUBLIC void __cxa_end_catch(void) {
 		 *       must set some kind of thread-local flag to have it be re-thrown
 		 *       the next time the a call to `task_serve()' is made! */
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+	} else {
+#ifndef NDEBUG
+		struct exception_info *info;
+		info = error_info();
+		assertf(info->ei_code != E_OK,
+		        "Exception deleted after RETHROW() from exception handler");
+#endif /* !NDEBUG */
 	}
 	PERTASK_SET(this_exception_flags, flags & ~EXCEPT_FRETHROW);
 }

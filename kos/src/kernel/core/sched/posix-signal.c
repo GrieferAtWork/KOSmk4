@@ -1724,8 +1724,33 @@ no_perthread_pending:
 PUBLIC void FCALL
 sigmask_check_after_except(void)
 		THROWS(E_INTERRUPT, E_WOULDBLOCK) {
-	/* TODO: implement this properly! */
-	sigmask_check();
+	struct exception_info oldinfo, newinfo;
+	struct exception_info *info = error_info();
+	memcpy(&oldinfo, info, sizeof(oldinfo));
+	/* FIXME: We might get here due to a prior E_INTERRUPT_USER_RPC exception
+	 *        as the result of `task_sigmask_check_rpc_handler' being sent to
+	 *        us. In this case, us repeating the signal-mask check will result
+	 *        in that RPC function being invoked twice, which may causes it to
+	 *        return with `TASK_RPC_RESTART_SYSCALL' the second time around,
+	 *        since there won't be any unhandled signals left at that point.
+	 */
+	TRY {
+		sigmask_check();
+	} EXCEPT {
+		/* Now we've got 2 exceptions (prioritize) */
+		memcpy(&newinfo, info, sizeof(newinfo));
+		goto handle_2_exceptions;
+	}
+	__IF0 {
+handle_2_exceptions:
+		if (ERRORCLASS_ISRTLPRIORITY(newinfo.ei_class) ||
+		    ERRORCLASS_ISLOWPRIORITY(oldinfo.ei_class))
+			memcpy(info, &newinfo, sizeof(newinfo));
+		else {
+			memcpy(info, &oldinfo, sizeof(oldinfo));
+		}
+		error_rethrow();
+	}
 }
 
 
@@ -3724,7 +3749,7 @@ sys_rt_sigsuspend_impl(struct icpustate *__restrict state,
 		 * so-as to prevent signals that always have to be masked from
 		 * ever being unmasked. */
 		memcpy(mymask, &oldmask, sizeof(sigset_t));
-		sigmask_check();
+		sigmask_check_after_except();
 		RETHROW();
 	}
 	TRY {
