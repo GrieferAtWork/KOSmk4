@@ -99,7 +99,11 @@ install_symlink /$TARGET_LIBPATH/libdrm.so libdrm.so.$SO_VERSION_MAJOR
 
 # Install headers
 for f in "$SRCPATH"/include/drm/*.h; do
-	install_rawfile "$KOS_ROOT/kos/include/drm/$(basename "$f")" "$f"
+	BASEf="$(basename "$f")"
+	install_rawfile "$KOS_ROOT/kos/include/drm/$BASEf" "$f"
+	install_rawfile_stdin "$KOS_ROOT/kos/include/libdrm/$BASEf" <<EOF
+#include "../drm/$BASEf"
+EOF
 done
 
 install_rawfile "$KOS_ROOT/kos/include/libsync.h" "$SRCPATH/libsync.h"
@@ -127,6 +131,6 @@ includedir=$KOS_ROOT/kos/include
 Name: libdrm
 Description: Userspace interface to kernel DRM services
 Version: $VERSION
-Cflags:
+Cflags: -I$KOS_ROOT/kos/include/drm
 Libs: -ldrm
 EOF

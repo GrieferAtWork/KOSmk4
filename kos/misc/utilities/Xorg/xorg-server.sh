@@ -146,7 +146,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/hw/xfree86/Xorg" ]; then
 				--disable-dri `# TODO` \
 				--disable-dri2 `# TODO` \
 				--disable-dri3 `# TODO` \
-				--disable-present `# TODO` \
+				--enable-present \
 				--disable-xinerama `# Multi-monitor extension` \
 				--enable-xf86vidmode \
 				--disable-xace `# X-Access-Control-Extension` \
@@ -237,43 +237,46 @@ $X_fontrootdir/Type1/,$X_fontrootdir/100dpi/,$X_fontrootdir/75dpi/" \
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 
-exit 0
-
 
 # This file is needed in order to run `autoreconf` on X server extensions
 # From what I understand, properly configured extensions should be able to
 # find this file via `${datarootdir}/aclocal/xorg-server.m4`, where `datarootdir`
-# originates from the PKG_CONFIG file above.
+# originates from the PKG_CONFIG file below.
 install_rawfile \
-	"$BINUTILS_SYSROOT/usr/local/share/aclocal/xorg-server.m4" \
+	"$BINUTILS_SYSROOT/usr/share/aclocal/xorg-server.m4" \
 	"$SRCPATH/xorg-server.m4"
 
 
-# Install libraries and executables
+# Install executables
 install_file    $X_xkb_bin_directory/cvt                "$OPTPATH/hw/xfree86/utils/cvt/cvt"
 install_file    $X_xkb_bin_directory/gtf                "$OPTPATH/hw/xfree86/utils/gtf/gtf"
 install_symlink $X_xkb_bin_directory/X                  "Xorg"
 install_file    $X_xkb_bin_directory/Xorg               "$OPTPATH/hw/xfree86/Xorg"
-install_file    $X_module_dir/extensions/libdbe.so      "$OPTPATH/hw/xfree86/dixmods/.libs/libdbe.so"
-install_file    $X_module_dir/extensions/libextmod.so   "$OPTPATH/hw/xfree86/dixmods/extmod/.libs/libextmod.so"
-install_file    $X_module_dir/extensions/librecord.so   "$OPTPATH/hw/xfree86/dixmods/.libs/librecord.so"
-install_file    $X_module_dir/libexa.so                 "$OPTPATH/hw/xfree86/exa/.libs/libexa.so"
-install_file    $X_module_dir/libfb.so                  "$OPTPATH/hw/xfree86/dixmods/.libs/libfb.so"
-install_file    $X_module_dir/libfbdevhw.so             "$OPTPATH/hw/xfree86/fbdevhw/.libs/libfbdevhw.so"
-install_file    $X_module_dir/libint10.so               "$OPTPATH/hw/xfree86/int10/.libs/libint10.so"
-install_file    $X_module_dir/libshadow.so              "$OPTPATH/hw/xfree86/dixmods/.libs/libshadow.so"
-install_file    $X_module_dir/libshadowfb.so            "$OPTPATH/hw/xfree86/shadowfb/.libs/libshadowfb.so"
-install_file    $X_module_dir/libvbe.so                 "$OPTPATH/hw/xfree86/vbe/.libs/libvbe.so"
-install_file    $X_module_dir/libvgahw.so               "$OPTPATH/hw/xfree86/vgahw/.libs/libvgahw.so"
-install_file    $X_module_dir/libwfb.so                 "$OPTPATH/hw/xfree86/dixmods/.libs/libwfb.so"
-install_file    $X_module_dir/libxaa.so                 "$OPTPATH/hw/xfree86/xaa/.libs/libxaa.so"
-install_file    $X_module_dir/multimedia/bt829_drv.so   "$OPTPATH/hw/xfree86/i2c/.libs/bt829_drv.so"
-install_file    $X_module_dir/multimedia/fi1236_drv.so  "$OPTPATH/hw/xfree86/i2c/.libs/fi1236_drv.so"
-install_file    $X_module_dir/multimedia/msp3430_drv.so "$OPTPATH/hw/xfree86/i2c/.libs/msp3430_drv.so"
-install_file    $X_module_dir/multimedia/tda8425_drv.so "$OPTPATH/hw/xfree86/i2c/.libs/tda8425_drv.so"
-install_file    $X_module_dir/multimedia/tda9850_drv.so "$OPTPATH/hw/xfree86/i2c/.libs/tda9850_drv.so"
-install_file    $X_module_dir/multimedia/tda9885_drv.so "$OPTPATH/hw/xfree86/i2c/.libs/tda9885_drv.so"
-install_file    $X_module_dir/multimedia/uda1380_drv.so "$OPTPATH/hw/xfree86/i2c/.libs/uda1380_drv.so"
+
+# Install libraries
+install_file    $X_module_dir/drivers/modesetting_drv.so "$OPTPATH/hw/xfree86/drivers/modesetting/.libs/modesetting_drv.so"
+install_file    $X_module_dir/libexa.so                  "$OPTPATH/hw/xfree86/exa/.libs/libexa.so"
+install_file    $X_module_dir/libfb.so                   "$OPTPATH/hw/xfree86/dixmods/.libs/libfb.so"
+install_file    $X_module_dir/libfbdevhw.so              "$OPTPATH/hw/xfree86/fbdevhw/.libs/libfbdevhw.so"
+install_file    $X_module_dir/libint10.so                "$OPTPATH/hw/xfree86/int10/.libs/libint10.so"
+install_file    $X_module_dir/libshadow.so               "$OPTPATH/hw/xfree86/dixmods/.libs/libshadow.so"
+install_file    $X_module_dir/libshadowfb.so             "$OPTPATH/hw/xfree86/shadowfb/.libs/libshadowfb.so"
+install_file    $X_module_dir/libvbe.so                  "$OPTPATH/hw/xfree86/vbe/.libs/libvbe.so"
+install_file    $X_module_dir/libvgahw.so                "$OPTPATH/hw/xfree86/vgahw/.libs/libvgahw.so"
+install_file    $X_module_dir/libwfb.so                  "$OPTPATH/hw/xfree86/dixmods/.libs/libwfb.so"
+#install_file   $X_module_dir/extensions/libdbe.so       "$OPTPATH/hw/xfree86/dixmods/.libs/libdbe.so"
+#install_file   $X_module_dir/extensions/libextmod.so    "$OPTPATH/hw/xfree86/dixmods/extmod/.libs/libextmod.so"
+#install_file   $X_module_dir/extensions/librecord.so    "$OPTPATH/hw/xfree86/dixmods/.libs/librecord.so"
+#install_file   $X_module_dir/libxaa.so                  "$OPTPATH/hw/xfree86/xaa/.libs/libxaa.so"
+#install_file   $X_module_dir/multimedia/bt829_drv.so    "$OPTPATH/hw/xfree86/i2c/.libs/bt829_drv.so"
+#install_file   $X_module_dir/multimedia/fi1236_drv.so   "$OPTPATH/hw/xfree86/i2c/.libs/fi1236_drv.so"
+#install_file   $X_module_dir/multimedia/msp3430_drv.so  "$OPTPATH/hw/xfree86/i2c/.libs/msp3430_drv.so"
+#install_file   $X_module_dir/multimedia/tda8425_drv.so  "$OPTPATH/hw/xfree86/i2c/.libs/tda8425_drv.so"
+#install_file   $X_module_dir/multimedia/tda9850_drv.so  "$OPTPATH/hw/xfree86/i2c/.libs/tda9850_drv.so"
+#install_file   $X_module_dir/multimedia/tda9885_drv.so  "$OPTPATH/hw/xfree86/i2c/.libs/tda9885_drv.so"
+#install_file   $X_module_dir/multimedia/uda1380_drv.so  "$OPTPATH/hw/xfree86/i2c/.libs/uda1380_drv.so"
+
+# Install misc. files
 install_file    $X_serverconfig_path/protocol.txt       "$SRCPATH/dix/protocol.txt"
 install_file    $X_xkb_output/README.compiled           "$SRCPATH/xkb/README.compiled"
 install_mkdir   $X_log_dir
@@ -335,8 +338,8 @@ install_header "scrnintstr.h"
 install_header "selection.h"
 install_header "servermd.h"
 install_header "site.h"
-install_header "swaprep.h"
-install_header "swapreq.h"
+#install_header"swaprep.h"
+#install_header"swapreq.h"
 install_header "validate.h"
 install_header "window.h"
 install_header "windowstr.h"
@@ -363,7 +366,7 @@ install_rawfile "$INCPATH/fbrop.h"          "$SRCPATH/fb/fbrop.h"
 install_rawfile "$INCPATH/wfbrename.h"      "$SRCPATH/fb/wfbrename.h"
 install_rawfile "$INCPATH/compiler.h"       "$SRCPATH/hw/xfree86/common/compiler.h"
 install_rawfile "$INCPATH/fourcc.h"         "$SRCPATH/hw/xfree86/common/fourcc.h"
-install_rawfile "$INCPATH/vidmodeproc.h"    "$SRCPATH/hw/xfree86/common/vidmodeproc.h"
+#install_rawfile"$INCPATH/vidmodeproc.h"    "$SRCPATH/hw/xfree86/common/vidmodeproc.h"
 install_rawfile "$INCPATH/xf86.h"           "$SRCPATH/hw/xfree86/common/xf86.h"
 install_rawfile "$INCPATH/xf86Module.h"     "$SRCPATH/hw/xfree86/common/xf86Module.h"
 install_rawfile "$INCPATH/xf86Opt.h"        "$SRCPATH/hw/xfree86/common/xf86Opt.h"
@@ -384,22 +387,23 @@ install_rawfile "$INCPATH/xisb.h"           "$SRCPATH/hw/xfree86/common/xisb.h"
 install_rawfile "$INCPATH/xorgVersion.h"    "$SRCPATH/hw/xfree86/common/xorgVersion.h"
 install_rawfile "$INCPATH/edid.h"           "$SRCPATH/hw/xfree86/ddc/edid.h"
 install_rawfile "$INCPATH/xf86DDC.h"        "$SRCPATH/hw/xfree86/ddc/xf86DDC.h"
-install_rawfile "$INCPATH/dgaproc.h"        "$SRCPATH/hw/xfree86/dixmods/extmod/dgaproc.h"
+install_rawfile "$INCPATH/dgaproc.h"        "$SRCPATH/hw/xfree86/common/dgaproc.h"
+#install_rawfile"$INCPATH/dgaproc.h"        "$SRCPATH/hw/xfree86/dixmods/extmod/dgaproc.h"
 install_rawfile "$INCPATH/fbdevhw.h"        "$SRCPATH/hw/xfree86/fbdevhw/fbdevhw.h"
-install_rawfile "$INCPATH/bt829.h"          "$SRCPATH/hw/xfree86/i2c/bt829.h"
-install_rawfile "$INCPATH/fi1236.h"         "$SRCPATH/hw/xfree86/i2c/fi1236.h"
+#install_rawfile"$INCPATH/bt829.h"          "$SRCPATH/hw/xfree86/i2c/bt829.h"
+#install_rawfile"$INCPATH/fi1236.h"         "$SRCPATH/hw/xfree86/i2c/fi1236.h"
 install_rawfile "$INCPATH/i2c_def.h"        "$SRCPATH/hw/xfree86/i2c/i2c_def.h"
-install_rawfile "$INCPATH/msp3430.h"        "$SRCPATH/hw/xfree86/i2c/msp3430.h"
-install_rawfile "$INCPATH/tda8425.h"        "$SRCPATH/hw/xfree86/i2c/tda8425.h"
-install_rawfile "$INCPATH/tda9850.h"        "$SRCPATH/hw/xfree86/i2c/tda9850.h"
-install_rawfile "$INCPATH/tda9885.h"        "$SRCPATH/hw/xfree86/i2c/tda9885.h"
-install_rawfile "$INCPATH/uda1380.h"        "$SRCPATH/hw/xfree86/i2c/uda1380.h"
+#install_rawfile"$INCPATH/msp3430.h"        "$SRCPATH/hw/xfree86/i2c/msp3430.h"
+#install_rawfile"$INCPATH/tda8425.h"        "$SRCPATH/hw/xfree86/i2c/tda8425.h"
+#install_rawfile"$INCPATH/tda9850.h"        "$SRCPATH/hw/xfree86/i2c/tda9850.h"
+#install_rawfile"$INCPATH/tda9885.h"        "$SRCPATH/hw/xfree86/i2c/tda9885.h"
+#install_rawfile"$INCPATH/uda1380.h"        "$SRCPATH/hw/xfree86/i2c/uda1380.h"
 install_rawfile "$INCPATH/xf86i2c.h"        "$SRCPATH/hw/xfree86/i2c/xf86i2c.h"
 install_rawfile "$INCPATH/xf86int10.h"      "$SRCPATH/hw/xfree86/int10/xf86int10.h"
 install_rawfile "$INCPATH/xf86Crtc.h"       "$SRCPATH/hw/xfree86/modes/xf86Crtc.h"
 install_rawfile "$INCPATH/xf86Modes.h"      "$SRCPATH/hw/xfree86/modes/xf86Modes.h"
 install_rawfile "$INCPATH/xf86RandR12.h"    "$SRCPATH/hw/xfree86/modes/xf86RandR12.h"
-install_rawfile "$INCPATH/xf86Rename.h"     "$SRCPATH/hw/xfree86/modes/xf86Rename.h"
+#install_rawfile"$INCPATH/xf86Rename.h"     "$SRCPATH/hw/xfree86/modes/xf86Rename.h"
 install_rawfile "$INCPATH/xf86Pci.h"        "$SRCPATH/hw/xfree86/os-support/bus/xf86Pci.h"
 install_rawfile "$INCPATH/xf86_OSlib.h"     "$SRCPATH/hw/xfree86/os-support/xf86_OSlib.h"
 install_rawfile "$INCPATH/xf86_OSproc.h"    "$SRCPATH/hw/xfree86/os-support/xf86_OSproc.h"
@@ -414,23 +418,24 @@ install_rawfile "$INCPATH/shadowfb.h"       "$SRCPATH/hw/xfree86/shadowfb/shadow
 install_rawfile "$INCPATH/vbe.h"            "$SRCPATH/hw/xfree86/vbe/vbe.h"
 install_rawfile "$INCPATH/vbeModes.h"       "$SRCPATH/hw/xfree86/vbe/vbeModes.h"
 install_rawfile "$INCPATH/vgaHW.h"          "$SRCPATH/hw/xfree86/vgahw/vgaHW.h"
-install_rawfile "$INCPATH/xaa.h"            "$SRCPATH/hw/xfree86/xaa/xaa.h"
-install_rawfile "$INCPATH/xaalocal.h"       "$SRCPATH/hw/xfree86/xaa/xaalocal.h"
-install_rawfile "$INCPATH/xaarop.h"         "$SRCPATH/hw/xfree86/xaa/xaarop.h"
+#install_rawfile"$INCPATH/xaa.h"            "$SRCPATH/hw/xfree86/xaa/xaa.h"
+#install_rawfile"$INCPATH/xaalocal.h"       "$SRCPATH/hw/xfree86/xaa/xaalocal.h"
+install_rawfile "$INCPATH/xaarop.h"         "$SRCPATH/hw/xfree86/common/xaarop.h"
+#install_rawfile"$INCPATH/xaarop.h"         "$SRCPATH/hw/xfree86/xaa/xaarop.h"
 install_rawfile "$INCPATH/mi.h"             "$SRCPATH/mi/mi.h"
-install_rawfile "$INCPATH/mibstore.h"       "$SRCPATH/mi/mibstore.h"
+#install_rawfile"$INCPATH/mibstore.h"       "$SRCPATH/mi/mibstore.h"
 install_rawfile "$INCPATH/micmap.h"         "$SRCPATH/mi/micmap.h"
 install_rawfile "$INCPATH/micoord.h"        "$SRCPATH/mi/micoord.h"
-install_rawfile "$INCPATH/mifillarc.h"      "$SRCPATH/mi/mifillarc.h"
-install_rawfile "$INCPATH/mifpoly.h"        "$SRCPATH/mi/mifpoly.h"
+#install_rawfile"$INCPATH/mifillarc.h"      "$SRCPATH/mi/mifillarc.h"
+#install_rawfile"$INCPATH/mifpoly.h"        "$SRCPATH/mi/mifpoly.h"
 install_rawfile "$INCPATH/migc.h"           "$SRCPATH/mi/migc.h"
 install_rawfile "$INCPATH/miline.h"         "$SRCPATH/mi/miline.h"
 install_rawfile "$INCPATH/mioverlay.h"      "$SRCPATH/mi/mioverlay.h"
 install_rawfile "$INCPATH/mipointer.h"      "$SRCPATH/mi/mipointer.h"
 install_rawfile "$INCPATH/mipointrst.h"     "$SRCPATH/mi/mipointrst.h"
-install_rawfile "$INCPATH/mispans.h"        "$SRCPATH/mi/mispans.h"
+#install_rawfile"$INCPATH/mispans.h"        "$SRCPATH/mi/mispans.h"
 install_rawfile "$INCPATH/mistruct.h"       "$SRCPATH/mi/mistruct.h"
-install_rawfile "$INCPATH/miwideline.h"     "$SRCPATH/mi/miwideline.h"
+#install_rawfile"$INCPATH/miwideline.h"     "$SRCPATH/mi/miwideline.h"
 install_rawfile "$INCPATH/mizerarc.h"       "$SRCPATH/mi/mizerarc.h"
 install_rawfile "$INCPATH/damage.h"         "$SRCPATH/miext/damage/damage.h"
 install_rawfile "$INCPATH/damagestr.h"      "$SRCPATH/miext/damage/damagestr.h"
@@ -443,10 +448,21 @@ install_rawfile "$INCPATH/glyphstr.h"       "$SRCPATH/render/glyphstr.h"
 install_rawfile "$INCPATH/mipict.h"         "$SRCPATH/render/mipict.h"
 install_rawfile "$INCPATH/picture.h"        "$SRCPATH/render/picture.h"
 install_rawfile "$INCPATH/picturestr.h"     "$SRCPATH/render/picturestr.h"
-install_rawfile "$INCPATH/xfixes.h"         "$SRCPATH/xfixes/xfixes.h"
+#install_rawfile"$INCPATH/xfixes.h"         "$SRCPATH/xfixes/xfixes.h"
 
 
-
+# New headers
+install_rawfile "$INCPATH/displaymode.h"      "$SRCPATH/include/displaymode.h"
+install_rawfile "$INCPATH/glxvndabi.h"        "$SRCPATH/include/glxvndabi.h"
+install_rawfile "$INCPATH/glx_extinit.h"      "$SRCPATH/include/glx_extinit.h"
+install_rawfile "$INCPATH/misyncfd.h"         "$SRCPATH/miext/sync/misyncfd.h"
+install_rawfile "$INCPATH/misyncshm.h"        "$SRCPATH/miext/sync/misyncshm.h"
+install_rawfile "$INCPATH/nonsdk_extinit.h"   "$SRCPATH/include/nonsdk_extinit.h"
+install_rawfile "$INCPATH/present.h"          "$SRCPATH/present/present.h"
+install_rawfile "$INCPATH/presentext.h"       "$SRCPATH/present/presentext.h"
+install_rawfile "$INCPATH/xf86MatchDrivers.h" "$SRCPATH/hw/xfree86/common/xf86MatchDrivers.h"
+install_rawfile "$INCPATH/xf86platformBus.h"  "$SRCPATH/hw/xfree86/common/xf86platformBus.h"
+install_rawfile "$INCPATH/xserver_poll.h"     "$SRCPATH/include/xserver_poll.h"
 
 
 # Install the PKG_CONFIG file
@@ -455,21 +471,20 @@ prefix=/
 exec_prefix=/
 libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
 includedir=$KOS_ROOT/kos/include
-datarootdir=$BINUTILS_SYSROOT/usr/local/share
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+datarootdir=${BINUTILS_SYSROOT}$XORG_CONFIGURE_DATAROOTDIR
 moduledir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH/xorg/modules
 sdkdir=$KOS_ROOT/kos/include/xorg
 sysconfigdir=$KOS_ROOT/bin/$TARGET_NAME-kos/usr/share/X11/xorg.conf.d
 
 abi_ansic=0.4
-abi_videodrv=12.0
-abi_xinput=16.0
-abi_extension=6.0
+abi_videodrv=24.1
+abi_xinput=24.1
+abi_extension=10.0
 
 Name: xorg-server
 Description: Modular X.Org X Server
 Version: $VERSION
-Requires.private: xproto >= 7.0.22 randrproto >= 1.2.99.3 renderproto >= 0.11 xextproto >= 7.1.99 inputproto >= 2.1.99.6 kbproto >= 1.0.3 fontsproto pixman-1 >= 0.21.8 videoproto pciaccess >= 0.12.901
+Requires.private: xproto >= 7.0.31 randrproto >= 1.6.0 renderproto >= 0.11 xextproto >= 7.2.99.901 inputproto >= 2.3 kbproto >= 1.0.3 fontsproto >= 2.1.3 pixman-1 >= 0.27.2 videoproto scrnsaverproto >= 1.1 resourceproto >= 1.2.0 presentproto >= 1.1 xf86bigfontproto >= 1.2.0 pciaccess >= 0.12.901
 Cflags: -I$KOS_ROOT/kos/include/xorg -fvisibility=hidden
 Libs:
 EOF
