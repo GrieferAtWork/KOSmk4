@@ -61,7 +61,6 @@ Add support for *_chk variants (using __builtin_object_size())
 <sys/vlimit.h>
 <sys/vtimes.h>
 <sys/soundcard.h>
-<sys/memfd.h>  (http://manpages.ubuntu.com/manpages/bionic/man2/memfd_create.2.html)
 <sys/bsdtypes.h>
 
 <sys/_default_fcntl.h>
