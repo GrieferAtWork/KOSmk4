@@ -160,20 +160,8 @@ FUNDEF void FCALL sigmask_check(void) THROWS(E_INTERRUPT, E_WOULDBLOCK);
  * >> memcpy(&oldmask, mymask, sizeof(sigset_t));
  * >> TRY {
  * >>     memcpy(mymask, &newmask, sizeof(sigset_t));
- * >>     if unlikely(sigismember(mymask, SIGKILL) ||
- * >>                 sigismember(mymask, SIGSTOP)) {
- * >>         sigdelset(mymask, SIGKILL);
- * >>         sigdelset(mymask, SIGSTOP);
- * >>         COMPILER_BARRIER();
- * >>         sigmask_check();
- * >>     }
  * >> } EXCEPT {
- * >>     bool mandatory_were_masked;
- * >>     mandatory_were_masked = sigismember(mymask, SIGKILL) ||
- * >>                             sigismember(mymask, SIGSTOP);
  * >>     memcpy(mymask, &oldmask, sizeof(sigset_t));
- * >>     if (mandatory_were_masked)
- * >>         sigmask_check_after_except();
  * >>     RETHROW();
  * >> }
  * >> TRY {

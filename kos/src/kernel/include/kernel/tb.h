@@ -66,7 +66,7 @@ LOCAL void FCALL tb(struct kcpustate const *__restrict state, unsigned int n_ski
 LOCAL void FCALL tb(struct icpustate const *__restrict state, unsigned int n_skip DFL(0)) { tb_icpustate(state, n_skip); }
 LOCAL void FCALL tb(struct scpustate const *__restrict state, unsigned int n_skip DFL(0)) { tb_scpustate(state, n_skip); }
 LOCAL void FCALL tb(struct fcpustate const *__restrict state, unsigned int n_skip DFL(0)) { tb_fcpustate(state, n_skip); }
-}
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 
