@@ -32,11 +32,11 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:libc_epoll_create,hash:CRC-32=0xd315b7af]]]*/
-/* Creates an epoll instance.  Returns an fd for the new instance.
- * The "size" parameter is a hint specifying the number of file
- * descriptors to be associated with the new instance. The fd
- * returned by epoll_create() should be closed with close() */
+/*[[[head:libc_epoll_create,hash:CRC-32=0x5d5fd124]]]*/
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.io.poll") WUNUSED fd_t
 NOTHROW_NCX(LIBCCALL libc_epoll_create)(__STDC_INT_AS_SIZE_T size)
 /*[[[body:libc_epoll_create]]]*/
@@ -47,10 +47,14 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create)(__STDC_INT_AS_SIZE_T size)
 }
 /*[[[end:libc_epoll_create]]]*/
 
-/*[[[head:libc_epoll_create1,hash:CRC-32=0x482bd0b0]]]*/
-/* Same as epoll_create but with an FLAGS parameter.
- * The unused SIZE parameter has been dropped
- * @param: flags: Set of `EPOLL_*' */
+/*[[[head:libc_epoll_create1,hash:CRC-32=0xb724f3af]]]*/
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_*'
+ * @return: * :   The newly created epoll control descriptor.
+ * @return: -1:   [errno=EINVAL] Invalid `flags'
+ * @return: -1:   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.io.poll") WUNUSED fd_t
 NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_epoll_create1]]]*/
@@ -61,13 +65,16 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags)
 }
 /*[[[end:libc_epoll_create1]]]*/
 
-/*[[[head:libc_epoll_ctl,hash:CRC-32=0x42d08fd0]]]*/
-/* Manipulate an epoll instance "epfd". Returns 0 in case of success,
- * -1 in case of error (the "errno" variable will contain the
- * specific error code) The "op" parameter is one of the EPOLL_CTL_*
- * constants defined above. The "fd" parameter is the target of the
- * operation. The "event" parameter describes which events the caller
- * is interested in and any associated user data */
+/*[[[head:libc_epoll_ctl,hash:CRC-32=0x62de7d0b]]]*/
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:    One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:    The file descriptor to add/remove/modify
+ * @param: event: The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :   Success
+ * @return: -1:   Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.io.poll") int
 NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd,
                                      __epoll_ctl_t op,
@@ -81,15 +88,21 @@ NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd,
 }
 /*[[[end:libc_epoll_ctl]]]*/
 
-/*[[[head:libc_epoll_wait,hash:CRC-32=0xc0d04753]]]*/
-/* Wait for events on an epoll instance "epfd". Returns the number of
- * triggered events returned in "events" buffer. Or -1 in case of
- * error with the "errno" variable set to the specific error code. The
- * "events" parameter is a buffer that will contain triggered
- * events. The "maxevents" is the maximum number of events to be
- * returned (usually size of "events"). The "timeout" parameter
- * specifies the maximum wait time in milliseconds (-1 == infinite). */
-INTERN ATTR_SECTION(".text.crt.io.poll") int
+/*[[[head:libc_epoll_wait,hash:CRC-32=0x894911ba]]]*/
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd,
                                       struct epoll_event *events,
                                       __STDC_INT_AS_SIZE_T maxevents,
@@ -105,10 +118,23 @@ NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd,
 }
 /*[[[end:libc_epoll_wait]]]*/
 
-/*[[[head:libc_epoll_pwait,hash:CRC-32=0xb11db1c6]]]*/
-/* Same as epoll_wait, but the thread's signal mask is temporarily
- * and atomically replaced with the one provided as parameter */
-INTERN ATTR_SECTION(".text.crt.io.poll") int
+/*[[[head:libc_epoll_pwait,hash:CRC-32=0xc63263ae]]]*/
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.io.poll") NONNULL((2)) __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
                                        struct epoll_event *events,
                                        __STDC_INT_AS_SIZE_T maxevents,

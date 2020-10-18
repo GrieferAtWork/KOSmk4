@@ -41,7 +41,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 set(CMAKE_INSTALL_LIBDIR "$TARGET_LIBPATH")
 EOF
 
-unlink "$CMAKE_MODULE_PATH/Platform/Kos.cmake"
 install_rawfile_stdin "$CMAKE_MODULE_PATH/Platform/Kos.cmake" <<EOF
 # Act like we're actually linux...
 set(CMAKE_SYSTEM_NAME Linux)

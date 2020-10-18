@@ -34,28 +34,9 @@
 #include <stdint.h>
 #endif /* __USE_GLIBC */
 
-
-/* Documentation taken from Glibc /usr/include/i386-linux-gnu/sys/epoll.h */
-/* Copyright (C) 2002-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
 __SYSDECL_BEGIN
 
-/* Flags to be passed to `epoll_create1()'. */
+/* Flags accepted by `epoll_create1(2)'. */
 #ifdef __EPOLL_CLOEXEC
 /*[[[enum]]]*/
 #ifdef __CC__
@@ -72,6 +53,7 @@ enum {
 /*[[[end]]]*/
 #endif /* __EPOLL_CLOEXEC */
 
+/* EPOLL_EVENTS */
 #if (defined(__EPOLLIN) || defined(__EPOLLPRI) ||        \
      defined(__EPOLLOUT) || defined(__EPOLLERR) ||       \
      defined(__EPOLLHUP) || defined(__EPOLLRDNORM) ||    \
@@ -83,177 +65,180 @@ enum {
 #ifdef __CC__
 enum EPOLL_EVENTS {
 #ifdef __EPOLLIN
-	EPOLLIN = __EPOLLIN, /* ... */
+	EPOLLIN      = __EPOLLIN,      /* There is data to read. (`read' & friends won't block when invoked) */
 #endif /* __EPOLLIN */
 #ifdef __EPOLLPRI
-	EPOLLPRI = __EPOLLPRI, /* ... */
+	EPOLLPRI     = __EPOLLPRI,     /* There is urgent data to read. */
 #endif /* __EPOLLPRI */
 #ifdef __EPOLLOUT
-	EPOLLOUT = __EPOLLOUT, /* ... */
+	EPOLLOUT     = __EPOLLOUT,     /* Writing now will not block. (`write' & friends won't block when invoked) */
 #endif /* __EPOLLOUT */
-#ifdef __EPOLLERR
-	EPOLLERR = __EPOLLERR, /* ... */
-#endif /* __EPOLLERR */
-#ifdef __EPOLLHUP
-	EPOLLHUP = __EPOLLHUP, /* ... */
-#endif /* __EPOLLHUP */
 #ifdef __EPOLLRDNORM
-	EPOLLRDNORM = __EPOLLRDNORM, /* ... */
+	EPOLLRDNORM  = __EPOLLRDNORM,  /* 100% identical to `POLLIN' (Normal data may be read). */
 #endif /* __EPOLLRDNORM */
 #ifdef __EPOLLRDBAND
-	EPOLLRDBAND = __EPOLLRDBAND, /* ... */
+	EPOLLRDBAND  = __EPOLLRDBAND,  /* Priority data may be read. */
 #endif /* __EPOLLRDBAND */
 #ifdef __EPOLLWRNORM
-	EPOLLWRNORM = __EPOLLWRNORM, /* ... */
+	EPOLLWRNORM  = __EPOLLWRNORM,  /* 100% identical to `POLLOUT' (Writing now will not block). */
 #endif /* __EPOLLWRNORM */
 #ifdef __EPOLLWRBAND
-	EPOLLWRBAND = __EPOLLWRBAND, /* ... */
+	EPOLLWRBAND  = __EPOLLWRBAND,  /* Priority data may be written. */
 #endif /* __EPOLLWRBAND */
 #ifdef __EPOLLMSG
-	EPOLLMSG = __EPOLLMSG, /* ... */
+	EPOLLMSG     = __EPOLLMSG,     /* Documented as unused */
 #endif /* __EPOLLMSG */
 #ifdef __EPOLLRDHUP
-	EPOLLRDHUP = __EPOLLRDHUP, /* ... */
+	EPOLLRDHUP   = __EPOLLRDHUP,   /* Socket peer closed connection, or shut down writing half of its connection */
 #endif /* __EPOLLRDHUP */
 #ifdef __EPOLLWAKEUP
-	EPOLLWAKEUP = __EPOLLWAKEUP, /* ... */
+	EPOLLWAKEUP  = __EPOLLWAKEUP,  /* Currently ignored */
 #endif /* __EPOLLWAKEUP */
 #ifdef __EPOLLONESHOT
-	EPOLLONESHOT = __EPOLLONESHOT, /* ... */
+	EPOLLONESHOT = __EPOLLONESHOT, /* Automatically stop monitoring the file descriptor once it's condition is met. */
 #endif /* __EPOLLONESHOT */
 #ifdef __EPOLLET
-	EPOLLET = __EPOLLET /* ... */
+	EPOLLET      = __EPOLLET,      /* Enable edge-triggered monitoring (not supported on KOS) */
 #endif /* __EPOLLET */
+/* Event types always implicitly polled for. */
+#ifdef __EPOLLERR
+	EPOLLERR     = __EPOLLERR, /* Error condition. */
+#endif /* __EPOLLERR */
+#ifdef __EPOLLHUP
+	EPOLLHUP     = __EPOLLHUP, /* Hung up. (writes are no longer possible) */
+#endif /* __EPOLLHUP */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #ifdef __EPOLLIN
-#define EPOLLIN      EPOLLIN      /* ... */
+#define EPOLLIN      EPOLLIN      /* There is data to read. (`read' & friends won't block when invoked) */
 #endif /* __EPOLLIN */
 #ifdef __EPOLLPRI
-#define EPOLLPRI     EPOLLPRI     /* ... */
+#define EPOLLPRI     EPOLLPRI     /* There is urgent data to read. */
 #endif /* __EPOLLPRI */
 #ifdef __EPOLLOUT
-#define EPOLLOUT     EPOLLOUT     /* ... */
+#define EPOLLOUT     EPOLLOUT     /* Writing now will not block. (`write' & friends won't block when invoked) */
 #endif /* __EPOLLOUT */
-#ifdef __EPOLLERR
-#define EPOLLERR     EPOLLERR     /* ... */
-#endif /* __EPOLLERR */
-#ifdef __EPOLLHUP
-#define EPOLLHUP     EPOLLHUP     /* ... */
-#endif /* __EPOLLHUP */
 #ifdef __EPOLLRDNORM
-#define EPOLLRDNORM  EPOLLRDNORM  /* ... */
+#define EPOLLRDNORM  EPOLLRDNORM  /* 100% identical to `POLLIN' (Normal data may be read). */
 #endif /* __EPOLLRDNORM */
 #ifdef __EPOLLRDBAND
-#define EPOLLRDBAND  EPOLLRDBAND  /* ... */
+#define EPOLLRDBAND  EPOLLRDBAND  /* Priority data may be read. */
 #endif /* __EPOLLRDBAND */
 #ifdef __EPOLLWRNORM
-#define EPOLLWRNORM  EPOLLWRNORM  /* ... */
+#define EPOLLWRNORM  EPOLLWRNORM  /* 100% identical to `POLLOUT' (Writing now will not block). */
 #endif /* __EPOLLWRNORM */
 #ifdef __EPOLLWRBAND
-#define EPOLLWRBAND  EPOLLWRBAND  /* ... */
+#define EPOLLWRBAND  EPOLLWRBAND  /* Priority data may be written. */
 #endif /* __EPOLLWRBAND */
 #ifdef __EPOLLMSG
-#define EPOLLMSG     EPOLLMSG     /* ... */
+#define EPOLLMSG     EPOLLMSG     /* Documented as unused */
 #endif /* __EPOLLMSG */
 #ifdef __EPOLLRDHUP
-#define EPOLLRDHUP   EPOLLRDHUP   /* ... */
+#define EPOLLRDHUP   EPOLLRDHUP   /* Socket peer closed connection, or shut down writing half of its connection */
 #endif /* __EPOLLRDHUP */
 #ifdef __EPOLLWAKEUP
-#define EPOLLWAKEUP  EPOLLWAKEUP  /* ... */
+#define EPOLLWAKEUP  EPOLLWAKEUP  /* Currently ignored */
 #endif /* __EPOLLWAKEUP */
 #ifdef __EPOLLONESHOT
-#define EPOLLONESHOT EPOLLONESHOT /* ... */
+#define EPOLLONESHOT EPOLLONESHOT /* Automatically stop monitoring the file descriptor once it's condition is met. */
 #endif /* __EPOLLONESHOT */
 #ifdef __EPOLLET
-#define EPOLLET      EPOLLET      /* ... */
+#define EPOLLET      EPOLLET      /* Enable edge-triggered monitoring (not supported on KOS) */
 #endif /* __EPOLLET */
+/* Event types always implicitly polled for. */
+#ifdef __EPOLLERR
+#define EPOLLERR     EPOLLERR     /* Error condition. */
+#endif /* __EPOLLERR */
+#ifdef __EPOLLHUP
+#define EPOLLHUP     EPOLLHUP     /* Hung up. (writes are no longer possible) */
+#endif /* __EPOLLHUP */
 #else /* __COMPILER_PREFERR_ENUMS */
 #ifdef __EPOLLIN
-#define EPOLLIN      __EPOLLIN      /* ... */
+#define EPOLLIN      __EPOLLIN      /* There is data to read. (`read' & friends won't block when invoked) */
 #endif /* __EPOLLIN */
 #ifdef __EPOLLPRI
-#define EPOLLPRI     __EPOLLPRI     /* ... */
+#define EPOLLPRI     __EPOLLPRI     /* There is urgent data to read. */
 #endif /* __EPOLLPRI */
 #ifdef __EPOLLOUT
-#define EPOLLOUT     __EPOLLOUT     /* ... */
+#define EPOLLOUT     __EPOLLOUT     /* Writing now will not block. (`write' & friends won't block when invoked) */
 #endif /* __EPOLLOUT */
-#ifdef __EPOLLERR
-#define EPOLLERR     __EPOLLERR     /* ... */
-#endif /* __EPOLLERR */
-#ifdef __EPOLLHUP
-#define EPOLLHUP     __EPOLLHUP     /* ... */
-#endif /* __EPOLLHUP */
 #ifdef __EPOLLRDNORM
-#define EPOLLRDNORM  __EPOLLRDNORM  /* ... */
+#define EPOLLRDNORM  __EPOLLRDNORM  /* 100% identical to `POLLIN' (Normal data may be read). */
 #endif /* __EPOLLRDNORM */
 #ifdef __EPOLLRDBAND
-#define EPOLLRDBAND  __EPOLLRDBAND  /* ... */
+#define EPOLLRDBAND  __EPOLLRDBAND  /* Priority data may be read. */
 #endif /* __EPOLLRDBAND */
 #ifdef __EPOLLWRNORM
-#define EPOLLWRNORM  __EPOLLWRNORM  /* ... */
+#define EPOLLWRNORM  __EPOLLWRNORM  /* 100% identical to `POLLOUT' (Writing now will not block). */
 #endif /* __EPOLLWRNORM */
 #ifdef __EPOLLWRBAND
-#define EPOLLWRBAND  __EPOLLWRBAND  /* ... */
+#define EPOLLWRBAND  __EPOLLWRBAND  /* Priority data may be written. */
 #endif /* __EPOLLWRBAND */
 #ifdef __EPOLLMSG
-#define EPOLLMSG     __EPOLLMSG     /* ... */
+#define EPOLLMSG     __EPOLLMSG     /* Documented as unused */
 #endif /* __EPOLLMSG */
 #ifdef __EPOLLRDHUP
-#define EPOLLRDHUP   __EPOLLRDHUP   /* ... */
+#define EPOLLRDHUP   __EPOLLRDHUP   /* Socket peer closed connection, or shut down writing half of its connection */
 #endif /* __EPOLLRDHUP */
 #ifdef __EPOLLWAKEUP
-#define EPOLLWAKEUP  __EPOLLWAKEUP  /* ... */
+#define EPOLLWAKEUP  __EPOLLWAKEUP  /* Currently ignored */
 #endif /* __EPOLLWAKEUP */
 #ifdef __EPOLLONESHOT
-#define EPOLLONESHOT __EPOLLONESHOT /* ... */
+#define EPOLLONESHOT __EPOLLONESHOT /* Automatically stop monitoring the file descriptor once it's condition is met. */
 #endif /* __EPOLLONESHOT */
 #ifdef __EPOLLET
-#define EPOLLET      __EPOLLET      /* ... */
+#define EPOLLET      __EPOLLET      /* Enable edge-triggered monitoring (not supported on KOS) */
 #endif /* __EPOLLET */
+/* Event types always implicitly polled for. */
+#ifdef __EPOLLERR
+#define EPOLLERR     __EPOLLERR     /* Error condition. */
+#endif /* __EPOLLERR */
+#ifdef __EPOLLHUP
+#define EPOLLHUP     __EPOLLHUP     /* Hung up. (writes are no longer possible) */
+#endif /* __EPOLLHUP */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
 
+/* Command codes for the `op' argument of `epoll_ctl(2)'. */
 #if (defined(__EPOLL_CTL_ADD) || defined(__EPOLL_CTL_DEL) || \
      defined(__EPOLL_CTL_MOD))
-/* Valid opcodes ("op" parameter) to issue to `epoll_ctl()'. */
 /*[[[enum]]]*/
 #ifdef __CC__
 typedef enum __epoll_ctl {
 #ifdef __EPOLL_CTL_ADD
-	EPOLL_CTL_ADD = __EPOLL_CTL_ADD, /* Add a file descriptor to the interface.  */
+	EPOLL_CTL_ADD = __EPOLL_CTL_ADD, /* Add a new file to-be monitored. */
 #endif /* __EPOLL_CTL_ADD */
 #ifdef __EPOLL_CTL_DEL
-	EPOLL_CTL_DEL = __EPOLL_CTL_DEL, /* Remove a file descriptor from the interface.  */
+	EPOLL_CTL_DEL = __EPOLL_CTL_DEL, /* Stop monitoring a given file. */
 #endif /* __EPOLL_CTL_DEL */
 #ifdef __EPOLL_CTL_MOD
-	EPOLL_CTL_MOD = __EPOLL_CTL_MOD  /* Change file descriptor epoll_event structure.  */
+	EPOLL_CTL_MOD = __EPOLL_CTL_MOD  /* Change the `struct epoll_event' associated with a given file descriptor. */
 #endif /* __EPOLL_CTL_MOD */
 } __epoll_ctl_t;
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
 #ifdef __EPOLL_CTL_ADD
-#define EPOLL_CTL_ADD EPOLL_CTL_ADD /* Add a file descriptor to the interface.  */
+#define EPOLL_CTL_ADD EPOLL_CTL_ADD /* Add a new file to-be monitored. */
 #endif /* __EPOLL_CTL_ADD */
 #ifdef __EPOLL_CTL_DEL
-#define EPOLL_CTL_DEL EPOLL_CTL_DEL /* Remove a file descriptor from the interface.  */
+#define EPOLL_CTL_DEL EPOLL_CTL_DEL /* Stop monitoring a given file. */
 #endif /* __EPOLL_CTL_DEL */
 #ifdef __EPOLL_CTL_MOD
-#define EPOLL_CTL_MOD EPOLL_CTL_MOD /* Change file descriptor epoll_event structure.  */
+#define EPOLL_CTL_MOD EPOLL_CTL_MOD /* Change the `struct epoll_event' associated with a given file descriptor. */
 #endif /* __EPOLL_CTL_MOD */
 #else /* __COMPILER_PREFERR_ENUMS */
 #ifdef __EPOLL_CTL_ADD
-#define EPOLL_CTL_ADD __EPOLL_CTL_ADD /* Add a file descriptor to the interface.  */
+#define EPOLL_CTL_ADD __EPOLL_CTL_ADD /* Add a new file to-be monitored. */
 #endif /* __EPOLL_CTL_ADD */
 #ifdef __EPOLL_CTL_DEL
-#define EPOLL_CTL_DEL __EPOLL_CTL_DEL /* Remove a file descriptor from the interface.  */
+#define EPOLL_CTL_DEL __EPOLL_CTL_DEL /* Stop monitoring a given file. */
 #endif /* __EPOLL_CTL_DEL */
 #ifdef __EPOLL_CTL_MOD
-#define EPOLL_CTL_MOD __EPOLL_CTL_MOD /* Change file descriptor epoll_event structure.  */
+#define EPOLL_CTL_MOD __EPOLL_CTL_MOD /* Change the `struct epoll_event' associated with a given file descriptor. */
 #endif /* __EPOLL_CTL_MOD */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
@@ -274,48 +259,74 @@ typedef struct __sigset_struct sigset_t;
 %[define_replacement(__epoll_ctl_t = int)]
 
 
-@@Creates an epoll instance.  Returns an fd for the new instance.
-@@The "size" parameter is a hint specifying the number of file
-@@descriptors to be associated with the new instance. The fd
-@@returned by epoll_create() should be closed with close()
+@@>> epoll_create(2)
+@@Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+@@@return: * : The newly created epoll control descriptor.
+@@@return: -1: Error (s.a. `errno')
 [[wunused, decl_include("<features.h>")]]
 $fd_t epoll_create(__STDC_INT_AS_SIZE_T size);
 
-@@Same as epoll_create but with an FLAGS parameter.
-@@The unused SIZE parameter has been dropped
+@@>> epoll_create1(2)
+@@Create a new epoll control descriptor which can be used for
+@@monitoring of pollable events happening in registered files.
 @@@param: flags: Set of `EPOLL_*'
+@@@return: * :   The newly created epoll control descriptor.
+@@@return: -1:   [errno=EINVAL] Invalid `flags'
+@@@return: -1:   Error (s.a. `errno')
 [[wunused, decl_include("<features.h>")]]
 $fd_t epoll_create1(__STDC_INT_AS_UINT_T flags);
 
 
-@@Manipulate an epoll instance "epfd". Returns 0 in case of success,
-@@-1 in case of error (the "errno" variable will contain the
-@@specific error code) The "op" parameter is one of the EPOLL_CTL_*
-@@constants defined above. The "fd" parameter is the target of the
-@@operation. The "event" parameter describes which events the caller
-@@is interested in and any associated user data
+@@>> epoll_ctl(2)
+@@Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+@@in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+@@the file descriptors being monitored
+@@@param: op:    One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+@@@param: fd:    The file descriptor to add/remove/modify
+@@@param: event: The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+@@@return: 0 :   Success
+@@@return: -1:   Error (s.a. `errno')
 [[decl_include("<bits/epoll.h>")]]
 int epoll_ctl($fd_t epfd, __epoll_ctl_t op,
               $fd_t fd, struct epoll_event *event);
 
 
-@@Wait for events on an epoll instance "epfd". Returns the number of
-@@triggered events returned in "events" buffer. Or -1 in case of
-@@error with the "errno" variable set to the specific error code. The
-@@"events" parameter is a buffer that will contain triggered
-@@events. The "maxevents" is the maximum number of events to be
-@@returned (usually size of "events"). The "timeout" parameter
-@@specifies the maximum wait time in milliseconds (-1 == infinite).
+@@>> epoll_wait(2)
+@@Wait until at least one of the conditions monitored by `epfd' to be met.
+@@@param: epfd:      The epoll controller on which to wait.
+@@@param: events:    A buffer where the kernel can store information on the
+@@                   events that actually took place.
+@@@param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+@@@param: timeout:   The max amount of time (in milliseconds) before returning
+@@                   in the case where no event occurred in the mean time. When
+@@                   set to `-1', wait indefinitely
+@@@return: >= 1:     The # of events that happened (written to the first `return'
+@@                   items of `events')
+@@@return: 0:        No events happened before `timeout' expired.
+@@@return: -1:       Error (s.a. `errno')
 [[cp, decl_include("<features.h>", "<bits/epoll.h>")]]
-int epoll_wait($fd_t epfd, struct epoll_event *events,
-               __STDC_INT_AS_SIZE_T maxevents, int timeout);
+__STDC_INT_AS_SSIZE_T epoll_wait($fd_t epfd, [[nonnull]] struct epoll_event *events,
+                                 __STDC_INT_AS_SIZE_T maxevents, int timeout);
 
-@@Same as epoll_wait, but the thread's signal mask is temporarily
-@@and atomically replaced with the one provided as parameter
+@@>> epoll_pwait(2)
+@@Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+@@waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+@@@param: epfd:      The epoll controller on which to wait.
+@@@param: events:    A buffer where the kernel can store information on the
+@@                   events that actually took place.
+@@@param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+@@@param: timeout:   The max amount of time (in milliseconds) before returning
+@@                   in the case where no event occurred in the mean time. When
+@@                   set to `-1', wait indefinitely
+@@@param: ss:        The signal mask to apply while waiting for an event to happen.
+@@@return: >= 1:     The # of events that happened (written to the first `return'
+@@                   items of `events')
+@@@return: 0:        No events happened before `timeout' expired.
+@@@return: -1:       Error (s.a. `errno')
 [[cp, decl_include("<features.h>", "<bits/epoll.h>")]]
-int epoll_pwait($fd_t epfd, struct epoll_event *events,
-                __STDC_INT_AS_SIZE_T maxevents, int timeout,
-                sigset_t const *ss);
+__STDC_INT_AS_SSIZE_T epoll_pwait($fd_t epfd, [[nonnull]] struct epoll_event *events,
+                                  __STDC_INT_AS_SIZE_T maxevents, int timeout,
+                                  sigset_t const *ss);
 
 
 
