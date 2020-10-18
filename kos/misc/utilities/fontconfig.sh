@@ -20,6 +20,7 @@
 
 require_utility libfreetype2 "$PKG_CONFIG_PATH/freetype2.pc"
 require_utility libexpat     "$PKG_CONFIG_PATH/expat.pc"
+require_utility libjson-c    "$PKG_CONFIG_PATH/json-c.pc"
 
 VERSION="2.13.92"
 SO_VERSION_MAJOR="1"

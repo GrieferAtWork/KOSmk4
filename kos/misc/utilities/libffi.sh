@@ -1,4 +1,4 @@
-#TEST: require_utility libffi "$TARGET_SYSROOT/$TARGET_LIBPATH/libffi.so"
+#TEST: require_utility libffi "$PKG_CONFIG_PATH/libffi.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

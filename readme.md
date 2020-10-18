@@ -59,6 +59,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [libexpat-2.2.9](https://github.com/libexpat/libexpat)
 	- [libbzip2-1.0.8](https://sourceware.org/bzip2/index.html)
 	- [libuuid-1.0.3](https://sourceforge.net/projects/libuuid/files/)
+	- [libjson-c-0.15-20200726](https://github.com/json-c/json-c)
 	- [X-Server (Experimental)](kos/misc/utilities/README.md#X-server)
 
 <a name="features"></a>
