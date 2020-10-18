@@ -18,19 +18,21 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-LIBFFI_VERSION="3.3"
-LIBFFI_SHLIB_VERSION_MAJOR="7"
-LIBFFI_SHLIB_VERSION="$LIBFFI_SHLIB_VERSION_MAJOR.1.0"
-SRCPATH="$KOS_ROOT/binutils/src/libffi-$LIBFFI_VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/libffi-$LIBFFI_VERSION"
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libffi.so.$LIBFFI_SHLIB_VERSION" ]; then
+VERSION="3.3"
+SHLIB_VERSION_MAJOR="7"
+SHLIB_VERSION="$SHLIB_VERSION_MAJOR.1.0"
+
+SRCPATH="$KOS_ROOT/binutils/src/libffi-$VERSION"
+OPTPATH="$BINUTILS_SYSROOT/opt/libffi-$VERSION"
+
+if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libffi.so.$SHLIB_VERSION" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			cmd cd "$KOS_ROOT/binutils/src"
 			download_file \
-				"libffi-${LIBFFI_VERSION}.tar.gz" \
-				"https://github.com/libffi/libffi/releases/download/v${LIBFFI_VERSION}/libffi-${LIBFFI_VERSION}.tar.gz"
-			cmd tar xvf "libffi-${LIBFFI_VERSION}.tar.gz"
+				"libffi-$VERSION.tar.gz" \
+				"https://github.com/libffi/libffi/releases/download/v$VERSION/libffi-$VERSION.tar.gz"
+			cmd tar xvf "libffi-$VERSION.tar.gz"
 		fi
 		rm -rf "$OPTPATH" > /dev/null 2>&1
 		cmd mkdir -p "$OPTPATH"
@@ -41,7 +43,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libffi.so.$LIBFFI_SHL
 		export CXX="${CROSS_PREFIX}g++"
 		export CXXCPP="${CROSS_PREFIX}cpp"
 		export CXXFLAGS="-ggdb"
-		cmd bash ../../../src/libffi-$LIBFFI_VERSION/configure \
+		cmd bash ../../../src/libffi-$VERSION/configure \
 			--prefix="/" \
 			--exec-prefix="/" \
 			--bindir="/bin" \
@@ -74,12 +76,11 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libffi.so.$LIBFFI_SHL
 fi
 
 # Install libraries
-install_file /$TARGET_LIBPATH/libffi.so.$LIBFFI_SHLIB_VERSION_MAJOR "$OPTPATH/.libs/libffi.so.$LIBFFI_SHLIB_VERSION"
-install_symlink /$TARGET_LIBPATH/libffi.so.$LIBFFI_SHLIB_VERSION libffi.so.$LIBFFI_SHLIB_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libffi.so libffi.so.$LIBFFI_SHLIB_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libffi.a "$OPTPATH/.libs/libffi.a"
-install_file_nodisk /$TARGET_LIBPATH/libffi_convenience.a "$OPTPATH/.libs/libffi_convenience.a"
-
+install_file        /$TARGET_LIBPATH/libffi.so.$SHLIB_VERSION_MAJOR "$OPTPATH/.libs/libffi.so.$SHLIB_VERSION"
+install_symlink     /$TARGET_LIBPATH/libffi.so.$SHLIB_VERSION       libffi.so.$SHLIB_VERSION_MAJOR
+install_symlink     /$TARGET_LIBPATH/libffi.so                      libffi.so.$SHLIB_VERSION_MAJOR
+install_file_nodisk /$TARGET_LIBPATH/libffi.a                       "$OPTPATH/.libs/libffi.a"
+install_file_nodisk /$TARGET_LIBPATH/libffi_convenience.a           "$OPTPATH/.libs/libffi_convenience.a"
 
 # Install headers
 if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
@@ -127,9 +128,21 @@ EOF
 #endif /* !_I386_KOS_FFITARGET_H */
 EOF
 else
-	install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffi.h" "$OPTPATH/include/ffi.h"
+	install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffi.h"       "$OPTPATH/include/ffi.h"
 	install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/ffitarget.h" "$OPTPATH/include/ffitarget.h"
 fi
 
+# Install the PKG_CONFIG file
+install_rawfile_stdin "$PKG_CONFIG_PATH/libffi.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+toolexeclibdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
+includedir=$KOS_ROOT/kos/include
 
-
+Name: libffi
+Description: Library supporting Foreign Function Interfaces
+Version: $VERSION
+Libs: -lffi
+Cflags:
+EOF
