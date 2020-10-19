@@ -47,6 +47,12 @@
 #include <kos/kernel/segment.h>
 #endif /* __i386__ || __x86_64__ */
 
+#ifdef NDEBUG
+#define DBG_memset(ptr, byte, num_bytes) (void)0
+#else /* NDEBUG */
+#define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
+#endif /* !NDEBUG */
+
 DECL_BEGIN
 
 /* Root connections set. */
@@ -123,9 +129,7 @@ NOTHROW(FCALL task_pushconnections)(struct task_connections *__restrict cons) {
 	cons->tcs_thread = ATOMIC_XCH(oldcons->tcs_thread, NULL);
 	cons->tcs_con    = NULL; /* No connections in use (yet) */
 	cons->tcs_dlvr   = NULL; /* Nothing was delivered (yet) */
-#ifndef NDEBUG
-	memset(cons->tcs_static, 0xcc, sizeof(cons->tcs_static));
-#endif /* !NDEBUG */
+	DBG_memset(cons->tcs_static, 0xcc, sizeof(cons->tcs_static));
 	/* Set-up statically allocated connections. */
 	for (i = 0; i < CONFIG_TASK_STATIC_CONNECTIONS; ++i)
 		cons->tcs_static[i].tc_sig = NULL; /* Available for use. */
@@ -153,9 +157,7 @@ NOTHROW(FCALL task_popconnections)(void) {
 	ATOMIC_WRITE(oldcons->tcs_thread, THIS_TASK);
 
 	/* Make bad usage consistent by filling memory with garbage. */
-#ifndef NDEBUG
-	memset(cons, 0xcc, sizeof(*cons));
-#endif /* !NDEBUG */
+	DBG_memset(cons, 0xcc, sizeof(*cons));
 
 	return cons;
 }
@@ -369,9 +371,7 @@ again:
 		/* Unlink the element. */
 		*pchain = chain->tc_signext;
 	}
-#ifndef NDEBUG
-	memset(&chain->tc_signext, 0xcc, sizeof(chain->tc_signext));
-#endif /* !NDEBUG */
+	DBG_memset(&chain->tc_signext, 0xcc, sizeof(chain->tc_signext));
 }
 
 
@@ -421,9 +421,7 @@ again:
 		/* Clear the SMP-lock bit. */
 		ATOMIC_AND(self->s_ctl, ~SIG_CONTROL_SMPLOCK);
 	}
-#ifndef NDEBUG
-	memset(&chain->tc_signext, 0xcc, sizeof(chain->tc_signext));
-#endif /* !NDEBUG */
+	DBG_memset(&chain->tc_signext, 0xcc, sizeof(chain->tc_signext));
 }
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 
@@ -469,9 +467,8 @@ NOTHROW(FCALL sig_completion_chain_phase_2)(struct sig_completion *sc_pending,
 		 * invoked C's callback, there is no race condition. */
 		struct sig_completion *next;
 		next = (struct sig_completion *)sc_pending->tc_connext;
-#ifndef NDEBUG
-		memset(&sc_pending->tc_connext, 0xcc, sizeof(sc_pending->tc_connext));
-#endif /* !NDEBUG */
+		DBG_memset(&sc_pending->tc_connext, 0xcc,
+		           sizeof(sc_pending->tc_connext));
 		(*sc_pending->sc_cb)(sc_pending, self, sender_thread,
 		                     SIG_COMPLETION_PHASE_PAYLOAD,
 		                     pdestroy_later, sender);
@@ -1042,9 +1039,8 @@ NOTHROW(FCALL sig_connect_completion)(struct sig *__restrict self,
 	/* Re-write the status of `self' to match the request. */
 	completion->tc_stat = TASK_CONNECTION_STAT_COMPLETION;
 	completion->tc_sig  = self;
-#ifndef NDEBUG
-	memset(&completion->tc_connext, 0xcc, sizeof(completion->tc_connext));
-#endif /* !NDEBUG */
+	DBG_memset(&completion->tc_connext, 0xcc,
+	           sizeof(completion->tc_connext));
 	/* Now we must insert `completion' into the chain of `self' */
 	do {
 		next = ATOMIC_READ(self->s_con);
@@ -1061,9 +1057,8 @@ NOTHROW(FCALL sig_connect_completion_for_poll)(struct sig *__restrict self,
 	/* Re-write the status of `self' to match the request. */
 	completion->tc_stat = TASK_CONNECTION_STAT_COMPLETION_FOR_POLL;
 	completion->tc_sig  = self;
-#ifndef NDEBUG
-	memset(&completion->tc_connext, 0xcc, sizeof(completion->tc_connext));
-#endif /* !NDEBUG */
+	DBG_memset(&completion->tc_connext, 0xcc,
+	           sizeof(completion->tc_connext));
 	/* Now we must insert `completion' into the chain of `self' */
 	do {
 		next = ATOMIC_READ(self->s_con);
@@ -1141,10 +1136,8 @@ again_signal_cons:
 			       self);
 		}
 	}
-done:;
-#ifndef NDEBUG
-	memset(&self->tc_sig, 0xcc, sizeof(self->tc_sig));
-#endif /* !NDEBUG */
+done:
+	DBG_memset(&self->tc_sig, 0xcc, sizeof(self->tc_sig));
 }
 
 /* @return: true:  Completion function was disconnected before it could be triggered,
@@ -1202,11 +1195,9 @@ again_signal_cons:
 	 * the connection queue of `signal' */
 	task_connection_unlink_from_sig_and_unlock(signal, self);
 	PREEMPTION_POP(was);
-#ifndef NDEBUG
-	memset(&self->tc_sig, 0xcc, sizeof(self->tc_sig));
-	memset(&self->tc_connext, 0xcc, sizeof(self->tc_connext));
-	memset(&self->tc_signext, 0xcc, sizeof(self->tc_signext));
-#endif /* !NDEBUG */
+	DBG_memset(&self->tc_sig, 0xcc, sizeof(self->tc_sig));
+	DBG_memset(&self->tc_connext, 0xcc, sizeof(self->tc_connext));
+	DBG_memset(&self->tc_signext, 0xcc, sizeof(self->tc_signext));
 	COMPILER_WRITE_BARRIER();
 	self->tc_stat = TASK_CONNECTION_STAT_BROADCAST;
 	return true;
