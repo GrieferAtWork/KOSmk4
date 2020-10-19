@@ -201,6 +201,13 @@ again_select_receiver:
 #ifndef CONFIG_NO_SMP
 again_read_target_cons:
 		target_cons = ATOMIC_READ(receiver->tc_cons);
+		/* NOTE: Waiting until we can lock the connection here is allowed, since
+		 *       you're allowed to (and required to) acquire connection locks
+		 *       without having to release the associated signal-lock.
+		 * Doing this doesn't result in a race condition, since the other end
+		 * of this syncing mechanism (which is `task_disconnect()') will release
+		 * its initial connection-lock if it fails to acquire the signal lock,
+		 * which it will because we're already holding that one! */
 		while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 			task_pause();
 			target_cons = ATOMIC_READ(receiver->tc_cons);
@@ -325,6 +332,13 @@ again_read_target_cons:
 again_read_target_cons:
 		target_cons = ATOMIC_READ(receiver->tc_cons);
 #ifndef CONFIG_NO_SMP
+		/* NOTE: Waiting until we can lock the connection here is allowed, since
+		 *       you're allowed to (and required to) acquire connection locks
+		 *       without having to release the associated signal-lock.
+		 * Doing this doesn't result in a race condition, since the other end
+		 * of this syncing mechanism (which is `task_disconnect()') will release
+		 * its initial connection-lock if it fails to acquire the signal lock,
+		 * which it will because we're already holding that one! */
 		while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
 			task_pause();
 			target_cons = ATOMIC_READ(receiver->tc_cons);
