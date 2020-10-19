@@ -62,8 +62,11 @@ DECL_BEGIN
 #define INITIALIZE_USER_POINTER_HEAD(base, size) \
 	mempatl((byte_t *)(base), CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE)
 #endif /* (CONFIG_MALL_HEAD_SIZE & 3) != 0 */
+#define BZERO_USER_POINTER_HEAD(base, size) \
+	memset((byte_t *)(base), 0, CONFIG_MALL_HEAD_SIZE)
 #else /* CONFIG_MALL_HEAD_SIZE != 0 */
 #define INITIALIZE_USER_POINTER_HEAD(base, size) (void)0
+#define BZERO_USER_POINTER_HEAD(base, size)      (void)0
 #endif /* CONFIG_MALL_HEAD_SIZE == 0 */
 #if CONFIG_MALL_TAIL_SIZE != 0
 #if (CONFIG_MALL_TAIL_SIZE & 3) == 0
@@ -75,12 +78,18 @@ DECL_BEGIN
 	mempatl((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, \
 	        CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE)
 #endif /* (CONFIG_MALL_TAIL_SIZE & 3) != 0 */
+#define BZERO_USER_POINTER_TAIL(base, size) \
+	memset((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, 0, CONFIG_MALL_TAIL_SIZE)
 #else /* CONFIG_MALL_TAIL_SIZE != 0 */
 #define INITIALIZE_USER_POINTER_TAIL(base, size) (void)0
+#define BZERO_USER_POINTER_TAIL(base, size)      (void)0
 #endif /* CONFIG_MALL_TAIL_SIZE == 0 */
 #define INITIALIZE_USER_POINTER(base, size)    \
 	(INITIALIZE_USER_POINTER_HEAD(base, size), \
 	 INITIALIZE_USER_POINTER_TAIL(base, size))
+#define BZERO_USER_POINTER_HEADTAIL(base, size) \
+	(BZERO_USER_POINTER_HEAD(base, size),       \
+	 BZERO_USER_POINTER_TAIL(base, size))
 #endif /* !INITIALIZE_USER_POINTER */
 
 
@@ -188,7 +197,8 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 #ifdef DEFINE_X_except
 	EXCEPT {
 		heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-		                   result.hp_ptr, result.hp_siz, flags);
+		                   result.hp_ptr, result.hp_siz,
+		                   flags & ~GFP_CALLOC);
 		RETHROW();
 	}
 #endif /* DEFINE_X_noexcept */
@@ -198,7 +208,8 @@ err_result_node:
 	trace_node_free(node);
 err_result:
 	heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                   result.hp_ptr, result.hp_siz, flags);
+	                   result.hp_ptr, result.hp_siz,
+	                   flags & ~GFP_CALLOC);
 err:
 	return NULL;
 #endif /* DEFINE_X_noexcept */
@@ -288,7 +299,8 @@ do_normal_malloc:
 #ifdef DEFINE_X_except
 		EXCEPT {
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-			                   result.hp_ptr, result.hp_siz, flags);
+			                   result.hp_ptr, result.hp_siz,
+			                   flags & ~GFP_CALLOC);
 			RETHROW();
 		}
 #endif /* DEFINE_X_noexcept */
@@ -358,7 +370,8 @@ again_nonnull_ptr:
 #ifdef DEFINE_X_except
 		EXCEPT {
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-			                   result.hp_ptr, result.hp_siz, flags);
+			                   result.hp_ptr, result.hp_siz,
+			                   flags & ~GFP_CALLOC);
 			RETHROW();
 		}
 #endif /* DEFINE_X_noexcept */
@@ -512,6 +525,10 @@ again_remove_node_for_newchunk:
 				if (node)
 					trace_node_tree_insert(&nodes, node);
 				lock_break();
+				if (flags & GFP_CALLOC) {
+					BZERO_USER_POINTER_HEADTAIL(result.hp_ptr,
+					                            result.hp_siz);
+				}
 				heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 				                   result.hp_ptr, result.hp_siz, flags);
 				goto again_nonnull_ptr;
@@ -550,7 +567,8 @@ again_remove_node_for_newchunk:
 				{
 #ifdef DEFINE_X_except
 					heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-					                   result.hp_ptr, result.hp_siz, flags);
+					                   result.hp_ptr, result.hp_siz,
+					                   flags & ~GFP_CALLOC);
 					RETHROW();
 #elif defined(DEFINE_X_noexcept)
 					goto err_result;
@@ -564,6 +582,7 @@ again_remove_node_for_newchunk:
 			result.hp_ptr = memcpy((byte_t *)result.hp_ptr + CONFIG_MALL_HEAD_SIZE,
 			                       ptr, old_user_size);
 			/* Free the old block. */
+			assert(!(extension_flags & GFP_CALLOC));
 			heap_free_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 			                   oldblock_base, oldblock_size, extension_flags);
 			return result.hp_ptr;
@@ -581,6 +600,7 @@ again_remove_node_for_oldchunk:
 			if (node)
 				trace_node_tree_insert(&nodes, node);
 			lock_break();
+			assert(!(extension_flags & GFP_CALLOC));
 			heap_free_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 			                   extension_base, num_allocated, extension_flags);
 			goto again_nonnull_ptr;
@@ -620,6 +640,7 @@ again_remove_node_for_oldchunk:
 			                                             flags, 1, LOCK_ARGS))
 #endif /* DEFINE_X_noexcept */
 			{
+				assert(!(extension_flags & GFP_CALLOC));
 				heap_free_untraced(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 				                   extension_base, num_allocated, extension_flags);
 #ifdef DEFINE_X_except
@@ -650,7 +671,8 @@ err_result_node:
 	trace_node_free(node);
 err_result:
 	heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
-	                   result.hp_ptr, result.hp_siz, flags);
+	                   result.hp_ptr, result.hp_siz,
+	                   flags & ~GFP_CALLOC);
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 #endif /* DEFINE_X_noexcept */
 #if defined(DEFINE_METHOD_kmalloc_in_place) || defined(DEFINE_X_noexcept)
