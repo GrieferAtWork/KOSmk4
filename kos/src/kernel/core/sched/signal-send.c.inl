@@ -391,13 +391,14 @@ again_read_target_cons:
 #define LOCAL_pdestroy_later (&destroy_later)
 				REF struct task *destroy_later = NULL;
 #endif /* !HAVE_DESTROYLATER */
-				(*sc->sc_cb)(sc, self, LOCAL_sender_thread,
+				assert(sc->tc_sig == self);
+				(*sc->sc_cb)(sc, LOCAL_sender_thread,
 				             SIG_COMPLETION_PHASE_SETUP,
 				             LOCAL_pdestroy_later, LOCAL_sender);
 				/* Unlock the signal. */
 				sig_smplock_release_nopr(self);
 				/* Invoke phase #2. (this one also unlocks `receiver') */
-				(*sc->sc_cb)(sc, self, LOCAL_sender_thread,
+				(*sc->sc_cb)(sc, LOCAL_sender_thread,
 				             SIG_COMPLETION_PHASE_PAYLOAD,
 				             LOCAL_pdestroy_later, LOCAL_sender);
 				LOCAL_PREEMPTION_POP();
