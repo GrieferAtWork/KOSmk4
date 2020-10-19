@@ -468,11 +468,12 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
  * >> 	bool       red_detected; // Set to true when a rising edge was detected
  * >> 	struct sig red_ondetect; // Broadcast when `red_detected' becomes true
  * >> };
- * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
+ * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 5)) void
  * >> NOTHROW(KCALL rising_edge_detector_completion)(struct sig_completion *__restrict self,
  * >>                                                struct sig *__restrict signal,
+ * >>                                                struct task *__restrict sender_thread,
  * >>                                                unsigned int phase,
- * >>                                                struct task **__restrict UNUSED(pdestroy_later),
+ * >>                                                struct task **__restrict pdestroy_later,
  * >>                                                struct sig *UNUSED(sender)) {
  * >> 	struct rising_edge_detector *me;
  * >> 	me = (struct rising_edge_detector *)self;
@@ -484,8 +485,11 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
  * >> 		break;
  * >> 	case SIG_COMPLETION_PHASE_PAYLOAD:
  * >> 		sig_completion_release(me);
- * >> 		if (!ATOMIC_XCH(me->red_detected, true))
- * >> 			sig_broadcast(&me->red_ondetect);
+ * >> 		if (!ATOMIC_XCH(me->red_detected, true)) {
+ * >> 			sig_broadcast_as_destroylater_nopr(&me->red_ondetect,
+ * >> 			                                   sender_thread,
+ * >> 			                                   pdestroy_later);
+ * >> 		}
  * >> 		break;
  * >> 	default: __builtin_unreachable();
  * >> 	}
@@ -537,9 +541,10 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
 struct sig_completion;
 struct task;
 /* Callback prototype for signal completion functions.
- * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
+ * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 5)) void
  * >> NOTHROW(KCALL my_sig_completion)(struct sig_completion *__restrict self,
  * >>                                  struct sig *__restrict signal,
+ * >>                                  struct task *__restrict sender_thread,
  * >>                                  unsigned int phase,
  * >>                                  struct task **__restrict pdestroy_later,
  * >>                                  struct sig *sender) {
@@ -556,9 +561,10 @@ struct task;
  * @param: self:          The signal completion controller.
  * @param: phase:         One of `SIG_COMPLETION_PHASE_*'
  * @param: pdestroy_later: Chain of threads to-be destroyed later (s.a. `sig_broadcast_destroylater_nopr()') */
-typedef NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
+typedef NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 5)) void
 /*NOTHROW*/ (KCALL *sig_completion_t)(struct sig_completion *__restrict self,
                                       struct sig *__restrict signal,
+                                      struct task *__restrict sender_thread,
                                       unsigned int phase,
                                       struct task **__restrict pdestroy_later,
                                       struct sig *sender);

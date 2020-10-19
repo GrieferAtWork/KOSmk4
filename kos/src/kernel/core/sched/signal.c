@@ -450,10 +450,11 @@ NOTHROW(FCALL destroy_tasks)(struct task *destroy_later) {
 /* Trigger phase #2 for pending signal-completion functions.
  * NOTE: During this, the completion callback will clear the
  *       SMP lock bit of its own completion controller. */
-LOCAL NOBLOCK NONNULL((2, 3, 4)) void
+LOCAL NOBLOCK NONNULL((2, 3, 4, 5)) void
 NOTHROW(FCALL sig_completion_chain_phase_2)(struct sig_completion *sc_pending,
                                             struct sig *self,
                                             struct sig *sender,
+                                            struct task *__restrict sender_thread,
                                             struct task **__restrict pdestroy_later) {
 	while (sc_pending) {
 		/* NOTE: Our use of `tc_connext' here is save:
@@ -471,7 +472,8 @@ NOTHROW(FCALL sig_completion_chain_phase_2)(struct sig_completion *sc_pending,
 #ifndef NDEBUG
 		memset(&sc_pending->tc_connext, 0xcc, sizeof(sc_pending->tc_connext));
 #endif /* !NDEBUG */
-		(*sc_pending->sc_cb)(sc_pending, self, SIG_COMPLETION_PHASE_PAYLOAD,
+		(*sc_pending->sc_cb)(sc_pending, self, sender_thread,
+		                     SIG_COMPLETION_PHASE_PAYLOAD,
 		                     pdestroy_later, sender);
 		sc_pending = next;
 	}
@@ -490,7 +492,7 @@ NOTHROW(FCALL sig_broadcast_as_destroylater_with_initial_completion_nopr)(struct
 	size_t result = 0;
 	/* Signal completion callback. */
 	if (sc_pending) {
-		(*sc_pending->sc_cb)(sc_pending, self,
+		(*sc_pending->sc_cb)(sc_pending, self, sender_thread,
 		                     SIG_COMPLETION_PHASE_SETUP,
 		                     pdestroy_later, sender);
 		sc_pending->tc_connext = NULL;
@@ -513,7 +515,8 @@ no_cons:
 		/* Trigger phase #2 for pending signal-completion functions.
 		 * NOTE: During this, the completion callback will clear the
 		 *       SMP lock bit of its own completion controller. */
-		sig_completion_chain_phase_2(sc_pending, self, sender, pdestroy_later);
+		sig_completion_chain_phase_2(sc_pending, self, sender,
+		                             sender_thread, pdestroy_later);
 		return result;
 	}
 	if (!is_connection_is_chain(sc_pending, con)) {
@@ -569,7 +572,9 @@ again_read_target_cons:
 			goto again;
 		sc = (struct sig_completion *)receiver;
 		/* Signal completion callback. */
-		(*sc->sc_cb)(sc, self, SIG_COMPLETION_PHASE_SETUP, pdestroy_later, sender);
+		(*sc->sc_cb)(sc, self, sender_thread,
+		             SIG_COMPLETION_PHASE_SETUP,
+		             pdestroy_later, sender);
 		/* Enqueue `sc' for phase #2. */
 		sc->tc_connext = sc_pending;
 		sc_pending     = sc;
@@ -635,7 +640,9 @@ NOTHROW(FCALL sig_send_as_destroylater_with_initial_completion_nopr)(struct sig 
 	struct task_connection *con;
 	/* Signal completion callback. */
 	if (sc_pending) {
-		(*sc_pending->sc_cb)(sc_pending, self, SIG_COMPLETION_PHASE_SETUP, pdestroy_later, sender);
+		(*sc_pending->sc_cb)(sc_pending, self, sender_thread,
+		                     SIG_COMPLETION_PHASE_SETUP,
+		                     pdestroy_later, sender);
 		sc_pending->tc_connext = NULL;
 	}
 again:
@@ -654,7 +661,8 @@ again:
 		/* Trigger phase #2 for pending signal-completion functions.
 		 * NOTE: During this, the completion callback will clear the
 		 *       SMP lock bit of its own completion controller. */
-		sig_completion_chain_phase_2(sc_pending, self, sender, pdestroy_later);
+		sig_completion_chain_phase_2(sc_pending, self, sender,
+		                             sender_thread, pdestroy_later);
 		return false;
 	}
 	/* Find a suitable candidate:
@@ -723,7 +731,8 @@ again_read_target_cons:
 		task_connection_unlink_from_sig(self, receiver);
 		sc = (struct sig_completion *)receiver;
 		/* Trigger phase #1 */
-		(*sc->sc_cb)(sc, self, SIG_COMPLETION_PHASE_SETUP,
+		(*sc->sc_cb)(sc, self, sender_thread,
+		             SIG_COMPLETION_PHASE_SETUP,
 		             pdestroy_later, sender);
 		if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
 			/* Enqueue the completion function to have its phase#2 executed later. */
@@ -735,7 +744,8 @@ again_read_target_cons:
 		/* Unlock the signal. */
 		sig_smplock_release_nopr(self);
 		/* Invoke phase #2. (this one also unlocks `receiver') */
-		(*sc->sc_cb)(sc, self, SIG_COMPLETION_PHASE_PAYLOAD,
+		(*sc->sc_cb)(sc, self, sender_thread,
+		             SIG_COMPLETION_PHASE_PAYLOAD,
 		             pdestroy_later, sender);
 		goto success;
 	}
@@ -802,8 +812,8 @@ again_read_target_cons:
 	}
 success:
 	/* Trigger phase #2 for all of the pending completion function. */
-	sig_completion_chain_phase_2(sc_pending, self,
-	                             sender, pdestroy_later);
+	sig_completion_chain_phase_2(sc_pending, self, sender,
+	                             sender_thread, pdestroy_later);
 	return true;
 }
 
@@ -924,7 +934,9 @@ no_cons:
 		/* Unlink `sc' from the signal. */
 		task_connection_unlink_from_sig(self, receiver);
 		/* Signal completion callback. */
-		(*sc->sc_cb)(sc, self, SIG_COMPLETION_PHASE_SETUP, &destroy_later, sender);
+		(*sc->sc_cb)(sc, self, THIS_TASK,
+		             SIG_COMPLETION_PHASE_SETUP,
+		             &destroy_later, sender);
 		/* Enqueue `sc' for phase #2. */
 		sc->tc_connext = sc_pending;
 		sc_pending     = sc;
@@ -978,8 +990,8 @@ done:
 	/* Trigger phase #2 for pending signal-completion functions.
 	 * NOTE: During this, the completion callback will clear the
 	 *       SMP lock bit of its own completion controller. */
-	sig_completion_chain_phase_2(sc_pending, self,
-	                             sender, &destroy_later);
+	sig_completion_chain_phase_2(sc_pending, self, sender,
+	                             THIS_TASK, &destroy_later);
 	PREEMPTION_POP(was);
 	/* Destroy pending threads. */
 	while (destroy_later) {
