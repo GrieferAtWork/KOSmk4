@@ -19,12 +19,12 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-//#define DEFINE_sig_send 1
+#define DEFINE_sig_send 1
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_broadcast 1
 //#define DEFINE_sig_altbroadcast 1
 //#define DEFINE_sig_broadcast_as_nopr 1
-#define DEFINE_sig_broadcast_destroylater_nopr 1
+//#define DEFINE_sig_broadcast_destroylater_nopr 1
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_sig_send) /**/ + defined(DEFINE_sig_altsend) +      \
@@ -90,8 +90,8 @@ NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
  * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
  * >> NOTHROW(FCALL my_aio_completion)(struct aio_handle *__restrict self,
  * >>                                  unsigned int status) {
- * >>     struct task *delme_threads;
- * >>     delme_threads = sig_broadcast_destroylater_nopr((struct sig *)self->ah_data[0]);
+ * >>     struct task *delme_threads = NULL;
+ * >>     sig_broadcast_destroylater_nopr((struct sig *)self->ah_data[0], &delme_threads);
  * >>     aio_handle_release(self);
  * >>     while (unlikely(delme_threads)) {
  * >>         struct task *next;
@@ -100,10 +100,379 @@ NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
  * >>         delme_threads = next;
  * >>     }
  * >> } */
-PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct task *
-NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self)
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self,
+                                               struct task **__restrict pdestroy_later)
 #endif /* ... */
 {
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+	struct task_connection *con;
+#ifdef HAVE_BROADCAST
+	size_t result = 0;
+#endif /* HAVE_BROADCAST */
+#ifdef HAVE_SENDER
+#define LOCAL_sender sender
+	assert(sender);
+#else /* HAVE_SENDER */
+#define LOCAL_sender self
+#endif /* !HAVE_SENDER */
+#ifdef HAVE_NOPREEMPT
+	assert(!PREEMPTION_ENABLED());
+#define LOCAL_PREEMPTION_PUSHOFF() (void)0
+#define LOCAL_PREEMPTION_POP()     (void)0
+#define LOCAL_was       PREEMPTION_DISABLED_VALUE
+#else /* HAVE_NOPREEMPT */
+	pflag_t was;
+#define LOCAL_PREEMPTION_PUSHOFF() was = PREEMPTION_PUSHOFF()
+#define LOCAL_PREEMPTION_POP()     PREEMPTION_POP(was)
+#define LOCAL_was       was
+#endif /* !HAVE_NOPREEMPT */
+#ifdef HAVE_SENDER_THREAD
+#define LOCAL_sender_thread     sender_thread
+#define LOCAL_task_wake(thread) task_wake_as(thread, sender_thread)
+#else /* HAVE_SENDER_THREAD */
+#define LOCAL_sender_thread     THIS_TASK
+#define LOCAL_task_wake(thread) task_wake(thread)
+#endif /* !HAVE_SENDER_THREAD */
+#ifdef HAVE_DESTROYLATER
+#define LOCAL_decref_task(thread)                               \
+	(assert((thread)->t_refcnt >= 1),                           \
+	 (ATOMIC_FETCHDEC((thread)->t_refcnt) == 1                  \
+	  ? (void)(sig_destroylater_next(thread) = *pdestroy_later, \
+	           *pdestroy_later                = (thread))       \
+	  : (void)0))
+#else /* HAVE_DESTROYLATER */
+#define LOCAL_decref_task(thread) decref(thread)
+#endif /* !HAVE_DESTROYLATER */
+again_disable_preemption:
+	LOCAL_PREEMPTION_PUSHOFF();
+#ifdef CONFIG_NO_SMP
+again:
+#endif /* CONFIG_NO_SMP */
+	con = ATOMIC_READ(self->s_con);
+	if (con) {
+#ifdef HAVE_BROADCAST
+		struct task_connection *next;
+#endif /* HAVE_BROADCAST */
+		struct task_connection *receiver;
+		struct task_connections *target_cons;
+#ifndef CONFIG_NO_SMP
+		/* Wait if the SMP lock isn't available at the moment. */
+		if unlikely((uintptr_t)con & SIG_CONTROL_SMPLOCK) {
+			LOCAL_PREEMPTION_POP();
+			task_pause();
+			goto again_disable_preemption;
+		}
+		/* Acquire the SMP-lock and validate that `con' is still correct. */
+		if (!ATOMIC_CMPXCH_WEAK(self->s_con, con,
+		                        sig_smplock_set(con)))
+			goto again_disable_preemption;
+		con = sig_smplock_set(con);
+		__IF0 {
+again:
+			con = ATOMIC_READ(self->s_con);
+			assert(sig_smplock_tst(con));
+			if (!sig_smplock_clr(con)) {
+				if (!ATOMIC_CMPXCH_WEAK(self->s_con, con, 0))
+					goto again;
+				goto done;
+			}
+		}
+#endif /* !CONFIG_NO_SMP */
+#ifdef HAVE_BROADCAST
+again_select_receiver:
+		/* Find a suitable candidate:
+		 *    During broadcast:
+		 *       #1: Just use the first connection */
+		receiver = sig_smplock_clr(con);
+		assert(receiver);
+		/* Unlink `receiver' from the connection chain, but keep ahold of the signal lock.
+		 * The later must be done to ensure that the signal isn't broadcast again until
+		 * we're done, so-as to ensure that auto-re-prime completion callbacks are invoked
+		 * for every time they are selected as signal targets. */
+		if (!ATOMIC_CMPXCH_WEAK(self->s_con, con,
+		                        sig_smplock_set(receiver->tc_signext))) {
+			con = ATOMIC_READ(self->s_con);
+			assert(sig_smplock_tst(con));
+			assert(sig_smplock_clr(con) != NULL);
+			goto again_select_receiver;
+		}
+		/* Acquire a lock to `receiver' */
+#ifndef CONFIG_NO_SMP
+again_read_target_cons:
+		target_cons = ATOMIC_READ(receiver->tc_cons);
+		while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
+			task_pause();
+			target_cons = ATOMIC_READ(receiver->tc_cons);
+		}
+		/* Mark the receiver for broadcast, and acquire a lock to it. */
+		if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+		                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
+		                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
+			goto again_read_target_cons;
+#else /* !CONFIG_NO_SMP */
+		target_cons = ATOMIC_XCH(receiver->tc_cons,
+		                         (struct task_connections *)TASK_CONNECTION_STAT_BROADCAST);
+#endif /* CONFIG_NO_SMP */
+		/* Unlink `receiver' from our chain and unlock `self' */
+		next = receiver->tc_signext;
+#ifndef CONFIG_NO_SMP
+		assert(!sig_smplock_tst(next));
+#endif /* !CONFIG_NO_SMP */
+		ATOMIC_WRITE(self->s_con, sig_smplock_set(next));
+		/* Deal with special connections. */
+		if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
+			if (TASK_CONNECTION_STAT_ISDONE(target_cons))
+				goto again;
+			/* Special case: broadcast includes completion callbacks.
+			 * Do this in a separate function so-as to keep the additional overhead outside of this function. */
+#ifdef HAVE_DESTROYLATER
+			result += sig_broadcast_as_destroylater_with_initial_completion_nopr(self,
+			                                                                     LOCAL_sender_thread,
+			                                                                     LOCAL_sender,
+			                                                                     (struct sig_completion *)receiver,
+			                                                                     pdestroy_later);
+			goto done;
+#else /* HAVE_DESTROYLATER */
+			result += sig_broadcast_as_with_initial_completion_nopr(self,
+			                                                        LOCAL_sender_thread,
+			                                                        LOCAL_sender,
+			                                                        LOCAL_was,
+			                                                        (struct sig_completion *)receiver);
+			return result;
+#endif /* !HAVE_DESTROYLATER */
+		}
+		target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
+		/* Try to set our signal as the one delivered to `target_cons'. */
+		if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
+			ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			goto again;
+		}
+		/* Suitable receiver. */
+		++result;
+		/* Wake-up the thread attached to the connection */
+		{
+			REF struct task *thread;
+			thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+			ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			if likely(thread) {
+#ifdef CONFIG_NO_SMP
+				if (!next)
+#else /* CONFIG_NO_SMP */
+				if (!next && ATOMIC_CMPXCH(self->s_ctl, SIG_CONTROL_SMPLOCK, 0))
+#endif /* !CONFIG_NO_SMP */
+				{
+					/* Special case: No other remaining signals. - In this case, do the
+					 * wake-up of `thread' while no longer holding the SMP-lock to `self'
+					 * We do this because `task_wake()' can be a bit smarter when it comes
+					 * to scheduling if preemption is enabled (since in that case, it can
+					 * do direct context switches, possibly even over to `thread' itself) */
+					LOCAL_PREEMPTION_POP();
+					LOCAL_task_wake(thread);
+					LOCAL_decref_task(thread);
+					return result;
+				}
+				LOCAL_task_wake(thread);
+#ifdef HAVE_DESTROYLATER
+				LOCAL_decref_task(thread);
+#else /* HAVE_DESTROYLATER */
+				/* Only destroy dead threads _after_ we've released the SMP-lock to `self' */
+				assert(thread->t_refcnt >= 1);
+				if unlikely(ATOMIC_FETCHDEC(thread->t_refcnt) == 1) {
+					result += sig_broadcast_as_with_initial_destroylater_nopr(self,
+					                                                          LOCAL_sender_thread,
+					                                                          LOCAL_sender,
+					                                                          LOCAL_was,
+					                                                          thread);
+					return result;
+				}
+#endif /* !HAVE_DESTROYLATER */
+			}
+		}
+		goto again;
+#else /* HAVE_BROADCAST */
+		/* Find a suitable candidate:
+		 *    During send:
+		 *       #1: Use the last-in-chain, non-poll connection
+		 *       #2: Broadcast all poll connections (but stop if
+		 *           a non-poll connection shows up before we're
+		 *           down)
+		 *       #3: If no non-poll connection could be found,
+		 *           return `false' */
+		receiver = sig_smplock_clr(con);
+		if (!receiver->tc_signext) {
+			/* Special case: Only one connection to choose from... */
+		} else {
+			struct task_connection *iter;
+			iter = receiver;
+			if (TASK_CONNECTION_STAT_ISPOLL(receiver->tc_stat))
+				receiver = NULL;
+			/* Find the last non-poll connection. */
+			do {
+				if (!TASK_CONNECTION_STAT_ISPOLL(iter->tc_stat))
+					receiver = iter;
+			} while ((iter = iter->tc_signext) != NULL);
+			if (!receiver) {
+				/* No non-poll connections found.
+				 * Just use the last connection in-chain. */
+				receiver = sig_smplock_clr(con);
+				while (receiver->tc_signext)
+					receiver = receiver->tc_signext;
+			}
+		}
+
+		/* Acquire a lock to `receiver' */
+again_read_target_cons:
+		target_cons = ATOMIC_READ(receiver->tc_cons);
+#ifndef CONFIG_NO_SMP
+		while (unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK)) {
+			task_pause();
+			target_cons = ATOMIC_READ(receiver->tc_cons);
+		}
+#endif /* !CONFIG_NO_SMP */
+		if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
+			struct sig_completion *sc;
+			if unlikely(TASK_CONNECTION_STAT_ISDEAD(target_cons)) {
+				/* The target is already dead. (change it to broadcast) */
+				if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+				                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
+				                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
+					goto again_read_target_cons;
+				task_connection_unlink_from_sig(self, receiver);
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
+				ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
+				goto again;
+			}
+			/* Signal completion callback. */
+			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+			                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
+			                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
+				goto again_read_target_cons;
+			task_connection_unlink_from_sig(self, receiver);
+			sc = (struct sig_completion *)receiver;
+			if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
+				/* Special case: Deal with poll-based connections receiver. */
+#ifdef HAVE_DESTROYLATER
+				bool result;
+				result = sig_send_as_destroylater_with_initial_completion_nopr(self,
+				                                                               LOCAL_sender_thread,
+				                                                               LOCAL_sender,
+				                                                               sc,
+				                                                               pdestroy_later);
+				LOCAL_PREEMPTION_POP();
+				return result;
+#else /* HAVE_DESTROYLATER */
+				return sig_send_as_with_initial_completion_nopr(self,
+				                                                LOCAL_sender_thread,
+				                                                LOCAL_sender,
+				                                                sc,
+				                                                LOCAL_was);
+#endif /* !HAVE_DESTROYLATER */
+			} else {
+				/* Invoke the phase-1 callback. */
+#ifdef HAVE_DESTROYLATER
+#define LOCAL_pdestroy_later pdestroy_later
+#else /* HAVE_DESTROYLATER */
+#define LOCAL_pdestroy_later (&destroy_later)
+				REF struct task *destroy_later = NULL;
+#endif /* !HAVE_DESTROYLATER */
+				(*sc->sc_cb)(sc, self, SIG_COMPLETION_PHASE_SETUP,
+				             LOCAL_pdestroy_later, LOCAL_sender);
+				/* Unlock the signal. */
+				sig_smplock_release_nopr(self);
+				/* Invoke phase #2. (this one also unlocks `receiver') */
+				(*sc->sc_cb)(sc, self, SIG_COMPLETION_PHASE_PAYLOAD,
+				             LOCAL_pdestroy_later, LOCAL_sender);
+				LOCAL_PREEMPTION_POP();
+#ifndef HAVE_DESTROYLATER
+				destroy_tasks(destroy_later);
+#endif /* !HAVE_DESTROYLATER */
+			}
+			return true;
+		}
+		if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
+			REF struct task *thread;
+			/* Special case: poll-based connections don't (really) count.
+			 * Instead, those get marked for broadcast. */
+			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+			                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
+			                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
+				goto again_read_target_cons;
+			task_connection_unlink_from_sig(self, receiver);
+			target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
+			thread = NULL;
+			/* Set the delivered signal, and capture
+			 * the thread thread, if there is one */
+			if (ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender))
+				thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+			/* Unlock the connection. */
+			ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			if (thread) {
+				LOCAL_task_wake(thread);
+#ifdef HAVE_DESTROYLATER
+				LOCAL_decref_task(thread);
+#else /* HAVE_DESTROYLATER */
+				/* Only destroy dead threads _after_ we've released the SMP-lock to `self' */
+				assert(thread->t_refcnt >= 1);
+				if unlikely(ATOMIC_FETCHDEC(thread->t_refcnt) == 1) {
+					return sig_send_as_with_initial_destroylater_nopr(self,
+					                                                  LOCAL_sender_thread,
+					                                                  LOCAL_sender,
+					                                                  LOCAL_was,
+					                                                  thread);
+				}
+#endif /* !HAVE_DESTROYLATER */
+			}
+			goto again;
+		}
+		/* Mark the receiver as sent, and acquire a lock to it. */
+		if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+		                        (struct task_connections *)(TASK_CONNECTION_STAT_SENT |
+		                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
+			goto again_read_target_cons;
+		/* Set the signal sender as being delivered for the target connection set. */
+		if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, LOCAL_sender)) {
+			/* Unlink the signal, and mark it as broadcast. */
+			task_connection_unlink_from_sig(self, receiver);
+			ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+			goto again;
+		}
+		/* The simple case: We managed to deliver the signal, and now we must wake-up
+		 * the connected thread (if any) */
+		{
+			REF struct task *thread;
+			thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+#ifndef CONFIG_NO_SMP
+			ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
+#endif /* !CONFIG_NO_SMP */
+			sig_smplock_release_nopr(self);
+			LOCAL_PREEMPTION_POP();
+			/* Wake-up the thread. */
+			if likely(thread) {
+				LOCAL_task_wake(thread);
+				LOCAL_decref_task(thread);
+			}
+		}
+		return true;
+#endif /* !HAVE_BROADCAST */
+	}
+done:
+	LOCAL_PREEMPTION_POP();
+#undef LOCAL_was
+#undef LOCAL_PREEMPTION_PUSHOFF
+#undef LOCAL_PREEMPTION_POP
+#undef LOCAL_sender_thread
+#undef LOCAL_task_wake
+#undef LOCAL_decref_task
+#undef LOCAL_sender
+#ifdef HAVE_BROADCAST
+	return result;
+#else /* HAVE_BROADCAST */
+	return false;
+#endif /* !HAVE_BROADCAST */
+#else /* CONFIG_USE_NEW_SIGNAL_API */
+
 #ifdef HAVE_BROADCAST_RESULT
 	size_t result = 0;
 #endif /* HAVE_BROADCAST_RESULT */
@@ -383,6 +752,7 @@ done_nocon_nounlock:
 	return false;
 #endif /* !... */
 #undef SIG_SENDER
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 }
 
 #undef HAVE_SENDER_THREAD

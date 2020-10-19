@@ -68,7 +68,8 @@ NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict se
 		       sizeof(struct exception_data));
 	}
 	COMPILER_WRITE_BARRIER();
-	delme_threads = sig_broadcast_destroylater_nopr(&self->hg_signal);
+	delme_threads = NULL;
+	sig_broadcast_destroylater_nopr(&self->hg_signal, &delme_threads);
 	aio_handle_release(self);
 	while (unlikely(delme_threads)) {
 		struct task *next;

@@ -21,9 +21,12 @@
 #define GUARD_KERNEL_INCLUDE_SCHED_SIGNAL_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
 
+#include <kernel/types.h>
+#include <sched/arch/task.h> /* pflag_t */
 #include <sched/pertask.h>
+
+#include <hybrid/__atomic.h>
 
 DECL_BEGIN
 
@@ -45,6 +48,11 @@ DECL_BEGIN
 #define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite) /* nothing */
 #endif /* !__cplusplus || !__CC__ */
 
+#undef CONFIG_USE_NEW_SIGNAL_API
+#if 1
+#define CONFIG_USE_NEW_SIGNAL_API 1
+#endif
+
 
 #ifdef __CC__
 
@@ -54,7 +62,17 @@ struct task_connection;
 struct task_connections;
 
 struct sig {
-#ifdef __SIG_INTERNAL_EXPOSE_CONTROL_WORD
+#ifdef CONFIG_NO_SMP
+	struct task_connection *s_con; /* [0..1][chain(->tc_signext)]
+	                                * [lock(INSERT(ATOMIC))]
+	                                * [lock(REMOVE(!PREEMPTION_ENABLED() && IF_SMP(SMP_LOCK(tc_sig))))]
+	                                * Chain of established connections.
+	                                * In SMP, the least significant bit is a lock that needs to be
+	                                * held when connections are removed. Note however that this lock
+	                                * may only be acquired when preemption is disabled, as it must
+	                                * be guarantied that the lock always becomes available while doing
+	                                * a `while (!trylock()) task_pause()'-loop. */
+#else /* CONFIG_NO_SMP */
 	union {
 		struct task_connection *s_con; /* [0..1][chain(->tc_signext)]
 		                                * [lock(INSERT(ATOMIC))]
@@ -67,25 +85,20 @@ struct sig {
 		                                * a `while (!trylock()) task_pause()'-loop. */
 		uintptr_t               s_ctl; /* Signal control word */
 	};
-#else /* __SIG_INTERNAL_EXPOSE_CONTROL_WORD */
-	struct task_connection *s_con; /* [0..1][chain(->tc_signext)]
-	                                * [lock(INSERT(ATOMIC))]
-	                                * [lock(REMOVE(!PREEMPTION_ENABLED() && IF_SMP(SMP_LOCK(tc_sig))))]
-	                                * Chain of established connections.
-	                                * In SMP, the least significant bit is a lock that needs to be
-	                                * held when connections are removed. Note however that this lock
-	                                * may only be acquired when preemption is disabled, as it must
-	                                * be guarantied that the lock always becomes available while doing
-	                                * a `while (!trylock()) task_pause()'-loop. */
-#endif /* !__SIG_INTERNAL_EXPOSE_CONTROL_WORD */
+#endif /* !CONFIG_NO_SMP */
 };
 
-#ifdef __SIG_INTERNAL_EXPOSE_CONTROL_WORD
-#define SIG_INIT { { __NULLPTR } }
-#else /* __SIG_INTERNAL_EXPOSE_CONTROL_WORD */
-#define SIG_INIT { __NULLPTR }
-#endif /* !__SIG_INTERNAL_EXPOSE_CONTROL_WORD */
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+#ifndef CONFIG_NO_SMP
+#define SIG_CONTROL_SMPLOCK 0x0001 /* SMP lock bit for `struct sig::s_ctl' */
+#endif /* !CONFIG_NO_SMP */
+#endif /* CONFIG_USE_NEW_SIGNAL_API */
 
+#ifdef CONFIG_NO_SMP
+#define SIG_INIT     { __NULLPTR }
+#else /* CONFIG_NO_SMP */
+#define SIG_INIT     { { __NULLPTR } }
+#endif /* !CONFIG_NO_SMP */
 #define sig_init(x)  (void)((x)->s_con = __NULLPTR)
 #define sig_cinit(x) (void)(__hybrid_assert((x)->s_con == __NULLPTR))
 
@@ -159,8 +172,8 @@ NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
  * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
  * >> NOTHROW(FCALL my_aio_completion)(struct aio_handle *__restrict self,
  * >>                                  unsigned int status) {
- * >>     struct task *delme_threads;
- * >>     delme_threads = sig_broadcast_destroylater_nopr((struct sig *)self->ah_data[0]);
+ * >>     struct task *delme_threads = NULL;
+ * >>     sig_broadcast_destroylater_nopr((struct sig *)self->ah_data[0], &delme_threads);
  * >>     aio_handle_release(self);
  * >>     while (unlikely(delme_threads)) {
  * >>         struct task *next;
@@ -169,8 +182,9 @@ NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
  * >>         delme_threads = next;
  * >>     }
  * >> } */
-FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) struct task *
-NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self,
+                                               struct task **__restrict pdestroy_later);
 #define sig_destroylater_next(thread) KEY_task_vm_dead__next(thread)
 
 
@@ -186,6 +200,34 @@ NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self);
  * though this invariant is only true when interlocked with the SMP-locks of
  * all attached signals. (s.a. `tcs_dlvr')
  */
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+#define TASK_CONNECTION_STAT_BROADCAST           0x0000 /* Signal was broadcast (forwarding is unnecessary if ignored)
+                                                         * In this state, `tc_sig' must be considered to be `[valid_if(false)]', and the
+                                                         * thread that originally connected to the signal mustn't directly re-connect.
+                                                         * When all (past) connections have entered this state, the associated signal is
+                                                         * allowed to have it's backing memory be free'd!
+                                                         * NOTE: THIS STATUS WILL NEVER APPEAR IN SIGNAL CONNECTION CHAINS! */
+#define TASK_CONNECTION_STAT_SENT                0x0002 /* Signal was sent, and must be forwarded if not received via `task_waitfor()'
+                                                         * In this state, the attached signal must not be free'd, though this case can
+                                                         * easily be handled by broadcasting signals one last time before disconnecting.
+                                                         * Transitions to (with [lock(SMP_LOCK(tc_sig))]):
+                                                         *   - TASK_CONNECTION_STAT_BROADCAST: Any thread called `sig_broadcast()'
+                                                         *                                     on the attached signal. */
+#ifndef CONFIG_NO_SMP
+#define TASK_CONNECTION_STAT_FLOCK               0x0001 /* SMP lock (must be held when removing the associated connection from the signal) */
+#endif /* !CONFIG_NO_SMP */
+#define TASK_CONNECTION_STAT_FPOLL               0x0002 /* This is a POLL-based connection. */
+#define TASK_CONNECTION_STAT_FMASK               0x0003 /* Mask of flags */
+#define TASK_CONNECTION_STAT_COMPLETION          0x0004 /* Special type: This is actually a `struct sig_completion' */
+#define TASK_CONNECTION_STAT_COMPLETION_FOR_POLL 0x0006 /* Special type: This is actually a `struct sig_completion' established for polling */
+
+#define TASK_CONNECTION_STAT_ISDEAD(x) ((uintptr_t)(x) <= 1) /* Connection has been disconnected. (`tc_sig' may point to deallocated memory) */
+#define TASK_CONNECTION_STAT_ISDONE(x) ((uintptr_t)(x) <= 3) /* Signal has been delivered. */
+#define TASK_CONNECTION_STAT_ISSPEC(x) ((uintptr_t)(x) <= 7) /* Connection requires special treatment. */
+#define TASK_CONNECTION_STAT_ISCOMP(x) ((uintptr_t)(x) >= 4) /* Connection is a `struct sig_completion' (assumes that `TASK_CONNECTION_STAT_ISSPEC() == true') */
+#define TASK_CONNECTION_STAT_ISPOLL(x) ((uintptr_t)(x) & TASK_CONNECTION_STAT_FPOLL) /* Connection is poll-based. */
+#define TASK_CONNECTION_STAT_ASCONS(x) ((struct task_connections *)((uintptr_t)(x) & ~3)) /* When `!TASK_CONNECTION_STAT_ISSPEC(x)', return the underlying `struct task_connections' */
+#else /* CONFIG_USE_NEW_SIGNAL_API */
 #define TASK_CONNECTION_STAT_SENT         ((uintptr_t)-1) /* Signal was sent, and must be forwarded if not received via `task_waitfor()'
                                                            * In this state, the attached signal must not be free'd, though this case can
                                                            * easily be handled by broadcasting signals one last time before disconnecting.
@@ -204,6 +246,7 @@ NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self);
 #define TASK_CONNECTION_STAT_GETCONS(x)   ((struct task_connections *)((uintptr_t)(x) & ~1))
 #define TASK_CONNECTION_STAT_ISNORM(x)    (((uintptr_t)(x) & 1) == 0)
 #define TASK_CONNECTION_STAT_ISPOLL(x)    (((uintptr_t)(x) & 1) != 0)
+#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 struct task_connection {
 	struct sig                  *tc_sig;     /* [1..1][const] The connected signal. */
@@ -414,6 +457,187 @@ NOTHROW(FCALL task_waitfor_norpc_nx)(struct timespec const *abs_timeout DFL(__NU
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
+
+
+#ifdef CONFIG_USE_NEW_SIGNAL_API
+/* Signal completion usage example:
+ * >> // `struct rising_edge_detector' can be used for implementing an asynchronous
+ * >> // connection to a signal (i.e. do the equivalent of `task_connect()' asynchronous,
+ * >> // including across return-to-userspace-and-back-via-syscall and similar conditions)
+ * >> struct rising_edge_detector: sig_completion {
+ * >> 	bool       red_detected; // Set to true when a rising edge was detected
+ * >> 	struct sig red_ondetect; // Broadcast when `red_detected' becomes true
+ * >> };
+ * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
+ * >> NOTHROW(KCALL rising_edge_detector_completion)(struct sig_completion *__restrict self,
+ * >>                                                struct sig *__restrict signal,
+ * >>                                                unsigned int phase,
+ * >>                                                struct task **__restrict UNUSED(pdestroy_later),
+ * >>                                                struct sig *UNUSED(sender)) {
+ * >> 	struct rising_edge_detector *me;
+ * >> 	me = (struct rising_edge_detector *)self;
+ * >> 	switch (phase) {
+ * >> 	case SIG_COMPLETION_PHASE_SETUP:
+ * >> #if 0 // (optional): Automatic re-prime
+ * >> 		sig_completion_reprime(self, signal, true);
+ * >> #endif
+ * >> 		break;
+ * >> 	case SIG_COMPLETION_PHASE_PAYLOAD:
+ * >> 		sig_completion_release(me);
+ * >> 		if (!ATOMIC_XCH(me->red_detected, true))
+ * >> 			sig_broadcast(&me->red_ondetect);
+ * >> 		break;
+ * >> 	default: __builtin_unreachable();
+ * >> 	}
+ * >> }
+ * >> 
+ * >> PRIVATE NOBLOCK NONNULL((1)) void
+ * >> NOTHROW(FCALL rising_edge_detector_init)(struct rising_edge_detector *__restrict self,
+ * >>                                          struct sig *__restrict signal) {
+ * >> 	sig_completion_init(self, &rising_edge_detector_completion);
+ * >> 	sig_init(&self->red_ondetect);
+ * >> 	self->red_detected = false;
+ * >> 	sig_connect_completion_for_poll(signal, self);
+ * >> }
+ * >> 
+ * >> PRIVATE NOBLOCK NONNULL((1)) void
+ * >> NOTHROW(FCALL rising_edge_detector_fini)(struct rising_edge_detector *__restrict self) {
+ * >> 	sig_completion_disconnect(self);
+ * >> }
+ * >> 
+ * >> PRIVATE NOBLOCK NONNULL((1)) void FCALL
+ * >> rising_edge_detector_waitfor(struct rising_edge_detector *__restrict self) {
+ * >> 	while (!ATOMIC_XCH(self->red_detected, false)) {
+ * >> 		task_connect(&self->red_ondetect);
+ * >> 		if unlikely(ATOMIC_XCH(self->red_detected, false)) {
+ * >> 			task_disconnectall();
+ * >> 			break;
+ * >> 		}
+ * >> 		task_waitfor();
+ * >> 	}
+ * >> }
+ * >>
+ * >> PRIVATE struct sig mysig = SIG_INIT;
+ * >>
+ * >> PRIVATE void demo(void) {
+ * >> 	struct rising_edge_detector red;
+ * >> 	// Async task_connect()
+ * >> 	rising_edge_detector_init(&red, &mysig);
+ * >> 
+ * >> 	sig_broadcast(&mysig);
+ * >> 
+ * >> 	// Async task_waitfor()
+ * >> 	rising_edge_detector_waitfor(&red);
+ * >> 	rising_edge_detector_fini(&red);
+ * >> }
+ */
+
+
+
+struct sig_completion;
+struct task;
+/* Callback prototype for signal completion functions.
+ * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
+ * >> NOTHROW(KCALL my_sig_completion)(struct sig_completion *__restrict self,
+ * >>                                  struct sig *__restrict signal,
+ * >>                                  unsigned int phase,
+ * >>                                  struct task **__restrict pdestroy_later,
+ * >>                                  struct sig *sender) {
+ * >>     switch (phase) {
+ * >>     case SIG_COMPLETION_PHASE_SETUP:
+ * >>         sig_completion_reprime(self, signal); // Optional!
+ * >>         break;
+ * >>     case SIG_COMPLETION_PHASE_PAYLOAD:
+ * >>         sig_completion_release(self);
+ * >>         break;
+ * >>     default: __builtin_unreachable();
+ * >>     }
+ * >> }
+ * @param: self:          The signal completion controller.
+ * @param: phase:         One of `SIG_COMPLETION_PHASE_*'
+ * @param: pdestroy_later: Chain of threads to-be destroyed later (s.a. `sig_broadcast_destroylater_nopr()') */
+typedef NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
+/*NOTHROW*/ (KCALL *sig_completion_t)(struct sig_completion *__restrict self,
+                                      struct sig *__restrict signal,
+                                      unsigned int phase,
+                                      struct task **__restrict pdestroy_later,
+                                      struct sig *sender);
+#define SIG_COMPLETION_PHASE_SETUP   0 /* First phase: At this point, the SMP-lock for `signal' is
+                                        * still held, During this phase, the completion function
+                                        * may use `sig_completion_reprime()' to re-prime itself.
+                                        * Note that even NOBLOCK operation may not be safe during
+                                        * this phase due to the internal SMP-lock. Such operations must
+                                        * instead be performed during the `SIG_COMPLETION_PHASE_PAYLOAD'
+                                        * phase. */
+#define SIG_COMPLETION_PHASE_PAYLOAD 1 /* The payload phase: During this phase, the callback is
+                                        * required to invoke `sig_completion_release(self)' in
+                                        * order to unlock the completion callback, allowing a
+                                        * potential other thread to cancel/destroy/re-connect the
+                                        * completion function.
+                                        * During this phase, the callback is also allowed to trigger
+                                        * other signals (but should be aware that doing so may cause
+                                        * other signal completion functions to do the same, possibly
+                                        * resulting in a stack-overflow if this goes on for too long) */
+
+/* Re-prime the completion callback to be invoked once again the next time that the
+ * attached signal is delivered. In this case, the completion function is responsible
+ * to ensure that no-one is currently trying to destroy the associated signal. */
+FUNDEF NOBLOCK NOPREEMPT void
+NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
+                                      struct sig *__restrict signal,
+                                      bool for_poll);
+#ifdef CONFIG_NO_SMP
+#define sig_completion_release(self) (void)0
+#else /* CONFIG_NO_SMP */
+#define sig_completion_release(self)                       \
+	__hybrid_atomic_and(_sig_completion_con(self).tc_stat, \
+	                    ~TASK_CONNECTION_STAT_FLOCK,       \
+	                    __ATOMIC_RELEASE)
+#endif /* !CONFIG_NO_SMP */
+
+
+
+struct sig_completion
+#ifdef __cplusplus
+    : task_connection              /* The underlying connection */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct task_connection sc_con; /* The underlying connection */
+#endif /* __cplusplus */
+	sig_completion_t       sc_cb;  /* Completion callback. */
+};
+
+#ifdef __cplusplus
+#define _sig_completion_con(self) (*(self))
+#else /* __cplusplus */
+#define _sig_completion_con(self) (self)->sc_con
+#endif /* !__cplusplus */
+
+/* Initialize a given signal completion controller. */
+#define sig_completion_init(self, cb)                                    \
+	(_sig_completion_con(self).tc_stat = TASK_CONNECTION_STAT_BROADCAST, \
+	 (self)->sc_cb                     = (cb))
+
+/* Connect the given signal completion controller to the specified signal.
+ * The caller must ensure that `completion' hasn't been connected, yet. */
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL sig_connect_completion)(struct sig *__restrict self,
+                                      struct sig_completion *__restrict completion);
+FUNDEF NOBLOCK NONNULL((1, 2)) void
+NOTHROW(FCALL sig_connect_completion_for_poll)(struct sig *__restrict self,
+                                               struct sig_completion *__restrict completion);
+
+/* @return: true:  Completion function was disconnected before it could be triggered,
+ *                 or the last time the completion function was triggered, it made use
+ *                 of `sig_completion_reprime()' to re-prime itself.
+ * @return: false: Completion function was already triggered, but not re-primed.
+ *                 Alternatively, the signal completion function had already been
+ *                 disconnected, or had never been connected to begin with. */
+FUNDEF NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL sig_completion_disconnect)(struct sig_completion *__restrict self);
+
+#endif /* CONFIG_USE_NEW_SIGNAL_API */
 
 #endif /* __CC__ */
 

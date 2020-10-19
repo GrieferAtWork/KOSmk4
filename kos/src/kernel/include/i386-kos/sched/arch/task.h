@@ -116,7 +116,9 @@ FORCELOCAL ATTR_ARTIFICIAL void (__x86_task_yield)(void) {
 
 /* Preemption control. */
 typedef uintptr_t pflag_t;
-#define PREEMPTION_WASENABLED(flag) ((flag) & 0x00000200 /* EFLAGS_IF */)
+#define PREEMPTION_WASENABLED(flag) ((flag) & 0x200 /* EFLAGS_IF */)
+#define PREEMPTION_ENABLED_VALUE  0x200
+#define PREEMPTION_DISABLED_VALUE 0
 
 #ifdef __NO_XBLOCK
 #define PREEMPTION_ENABLE()              __x86_preemption_enable()
