@@ -54,6 +54,53 @@ DECL_BEGIN
 #endif
 
 
+/* Signal reception priority order:
+ *
+ * In order to improve performance, signal sent through `struct sig'
+ * may not always reach all waiting / some specific waiting thread.
+ *
+ * sig_send():
+ *    #1: Try to send a signal to the longest-living connection that
+ *        wasn't established as a poll-connection, and return `true'
+ *    #2: If no such connection exists, but there are still (alive)
+ *        connections (iow: only poll-connections remain), randomly
+ *        select one of the poll-based connections and signal it.
+ *        (Note that "random" here may not actually be random at all,
+ *        but, in fact, be allowed to depend to the order in which
+ *        connections had been enqueued).
+ *        Continue with step #1
+ *    #3: If no (alive) connections are left, return `false'
+ *
+ * sig_broadcast():
+ *    #1: If there is any (alive) connection (irregardless of that
+ *        connection being non-poll-, or poll-based), simply signal
+ *        that connection. If the connection was non-poll-based, the
+ *        value to-be returned by sig_broadcast() is incremented by
+ *        one.
+ *        Continue with step #1
+ *    #2: If no (alive) connections are left, return the number of
+ *        signaled non-poll connections.
+ *
+ * sig_sendto():
+ *    #1: Check if there is some (non-completion) connection that is
+ *        connected to the given thread. If such a connection exists,
+ *        signal it and return `true'
+ *    #2: If no such connection exists, return `false'
+ *
+ *
+ * Normal (non-poll) connections:
+ *   - task_connect()
+ *   - sig_connect_completion()
+ *   - sig_completion_reprime(for_poll: false)
+ *
+ * Poll connections:
+ *   - task_connect_for_poll()
+ *   - sig_connect_completion_for_poll()
+ *   - sig_completion_reprime(for_poll: true)
+ *
+ */
+
+
 #ifdef __CC__
 
 struct sig;
@@ -115,6 +162,22 @@ NOTHROW(FCALL sig_send)(struct sig *__restrict self);
 FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL sig_altsend)(struct sig *self,
                            struct sig *sender);
+
+/* TODO:
+// Send a signal to a specific thread. The case where the connection to which `self'
+// is attached isn't apart of `target's active set of connections can easily be
+// handled by first searching for a connection who's `tc_cons->tcs_thread' fields
+// equals `target'. If no such entry can be found, the search is performed once again,
+// only this time, in addition to testing the `tcs_thread' field of connections, the
+// `tsc_prev' chain is traversed until `this_root_connections' is reached (s.a. the
+// guaranty that `(CONS->tsc_prev != NULL) == (CONS == &this_root_connections)'), at
+// which point target can be matched by `CONS == FORTASK(target, &this_root_connections)'
+// @return: true:  Successfully delivered a signal to a connected held by `target'
+// @return: false: The thread `target' doesn't have any connections to `self'
+FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL sig_sendto)(struct sig *__restrict self,
+                          struct task *__restrict target);
+ */
 
 /* Same as `sig_send()', but repeat the operation up to `maxcount' times,
  * and return the # of times that `sig_send()' would have returned `true'
@@ -461,14 +524,16 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
 
 #ifdef CONFIG_USE_NEW_SIGNAL_API
 /* Signal completion usage example:
+ * >>
  * >> // `struct rising_edge_detector' can be used for implementing an asynchronous
  * >> // connection to a signal (i.e. do the equivalent of `task_connect()' asynchronous,
- * >> // including across return-to-userspace-and-back-via-syscall and similar conditions)
+ * >> // including across return-to-userspace-and-back-via-syscall and similar situations)
  * >> struct rising_edge_detector: sig_completion {
  * >> 	bool       red_detected; // Set to true when a rising edge was detected
  * >> 	struct sig red_ondetect; // Broadcast when `red_detected' becomes true
  * >> };
- * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
+ * >>
+ * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 4, 5)) void
  * >> NOTHROW(KCALL rising_edge_detector_completion)(struct sig_completion *__restrict self,
  * >>                                                struct task *__restrict sender_thread,
  * >>                                                unsigned int phase,
@@ -484,6 +549,11 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
  * >> 		break;
  * >> 	case SIG_COMPLETION_PHASE_PAYLOAD:
  * >> 		sig_completion_release(me);
+ * >> 		// NOTE: There is a race here, since we've already unlocked `sig_completion_release()',
+ * >> 		//       but are still accessing fields of `me'. This race could be fixed by making
+ * >> 		//       `struct rising_edge_detector' heap-allocated & reference counted, with an
+ * >> 		//       `incref(me)' before `sig_completion_release(me)', and a decref further down
+ * >> 		//       below.
  * >> 		if (!ATOMIC_XCH(me->red_detected, true)) {
  * >> 			sig_broadcast_as_destroylater_nopr(&me->red_ondetect,
  * >> 			                                   sender_thread,
@@ -493,7 +563,7 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
  * >> 	default: __builtin_unreachable();
  * >> 	}
  * >> }
- * >> 
+ * >>
  * >> PRIVATE NOBLOCK NONNULL((1)) void
  * >> NOTHROW(FCALL rising_edge_detector_init)(struct rising_edge_detector *__restrict self,
  * >>                                          struct sig *__restrict signal) {
@@ -502,12 +572,12 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
  * >> 	self->red_detected = false;
  * >> 	sig_connect_completion_for_poll(signal, self);
  * >> }
- * >> 
+ * >>
  * >> PRIVATE NOBLOCK NONNULL((1)) void
  * >> NOTHROW(FCALL rising_edge_detector_fini)(struct rising_edge_detector *__restrict self) {
  * >> 	sig_completion_disconnect(self);
  * >> }
- * >> 
+ * >>
  * >> PRIVATE NOBLOCK NONNULL((1)) void FCALL
  * >> rising_edge_detector_waitfor(struct rising_edge_detector *__restrict self) {
  * >> 	while (!ATOMIC_XCH(self->red_detected, false)) {
@@ -521,14 +591,18 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
  * >> }
  * >>
  * >> PRIVATE struct sig mysig = SIG_INIT;
+ * >> PRIVATE struct rising_edge_detector red;
  * >>
  * >> PRIVATE void demo(void) {
- * >> 	struct rising_edge_detector red;
  * >> 	// Async task_connect()
  * >> 	rising_edge_detector_init(&red, &mysig);
- * >> 
+ * >>
+ * >> 	// At this point, control flow could even return
+ * >> 	// back to user-space, and `red' would still be
+ * >> 	// able to pick up on `mysig' being triggered.
+ * >>
  * >> 	sig_broadcast(&mysig);
- * >> 
+ * >>
  * >> 	// Async task_waitfor()
  * >> 	rising_edge_detector_waitfor(&red);
  * >> 	rising_edge_detector_fini(&red);
@@ -540,7 +614,7 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
 struct sig_completion;
 struct task;
 /* Callback prototype for signal completion functions.
- * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 5)) void
+ * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 4, 5)) void
  * >> NOTHROW(KCALL my_sig_completion)(struct sig_completion *__restrict self,
  * >>                                  struct task *__restrict sender_thread,
  * >>                                  unsigned int phase,
@@ -557,9 +631,19 @@ struct task;
  * >>     }
  * >> }
  * @param: self:           The signal completion controller.
+ * @param: sender_thread:  The thread that (supposedly) is sending the signal.
+ *                         In order to support functions like `sig_broadcast_as_nopr()',
+ *                         the sig-completion callback should not make use of THIS_TASK,
+ *                         but instead assume that `sender_thread' is the caller's thread.
  * @param: phase:          One of `SIG_COMPLETION_PHASE_*'
- * @param: pdestroy_later: Chain of threads to-be destroyed later (s.a. `sig_broadcast_destroylater_nopr()') */
-typedef NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
+ *                         Note that once the first phase is triggered for any signal
+ *                         completion function, it is guarantied that the second phase
+ *                         will also be triggered before the next time preemption gets
+ *                         re-enabled, _and_ before the SMP-lock of `self' is released.
+ * @param: pdestroy_later: Chain of threads to-be destroyed later (s.a. `sig_broadcast_destroylater_nopr()')
+ * @param: sender:         The sender-signal (which may differ from `self->tc_sig') when
+ *                         the signal is being sent through a function like `sig_altsend()' */
+typedef NOBLOCK NOPREEMPT NONNULL((1, 2, 4, 5)) void
 /*NOTHROW*/ (KCALL *sig_completion_t)(struct sig_completion *__restrict self,
                                       struct task *__restrict sender_thread,
                                       unsigned int phase,
@@ -588,6 +672,21 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2, 4)) void
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
                                       bool for_poll);
+
+/* Release the SMP-lock of `self'. This function must be invoked from every signal
+ * completion function when invoked with `phase == SIG_COMPLETION_PHASE_PAYLOAD'.
+ * Once this function returns, `self' (i.e. the `struct sig_completion' argument)
+ * must be thought of as pointing to free'd memory, since the return of this
+ * function means that the completion function...
+ *   ... can now get invoked again (assuming that the completion function
+ *       used `sig_completion_reprime()' during the SETUP phase)
+ *   ... may have already been disconnected (in case it reprimed itself
+ *       earlier, which is done by `sig_completion_disconnect()', which
+ *       in turn stops blocking once `sig_completion_release()' is called
+ *       from the completion callback), following which the completion
+ *       function's controller's backing memory may have been free'd.
+ * Essentially, this function must be used in the same way as `aio_handle_release()'
+ * has to be used from AIO completion functions. */
 #ifdef CONFIG_NO_SMP
 #define sig_completion_release(self) (void)0
 #else /* CONFIG_NO_SMP */
