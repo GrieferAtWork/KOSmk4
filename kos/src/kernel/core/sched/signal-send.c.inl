@@ -28,6 +28,7 @@
 //#define DEFINE_sig_broadcast_nopr 1
 //#define DEFINE_sig_altbroadcast_nopr 1
 //#define DEFINE_sig_broadcast_as_nopr 1
+//#define DEFINE_sig_broadcast_destroylater 1
 //#define DEFINE_sig_broadcast_destroylater_nopr 1
 //#define DEFINE_sig_broadcast_as_destroylater_nopr 1
 //#define DEFINE_sig_broadcast_for_fini 1
@@ -48,6 +49,7 @@
      defined(DEFINE_sig_altbroadcast) +                         \
      defined(DEFINE_sig_altbroadcast_nopr) +                    \
      defined(DEFINE_sig_broadcast_as_nopr) +                    \
+     defined(DEFINE_sig_broadcast_destroylater) +               \
      defined(DEFINE_sig_broadcast_destroylater_nopr) +          \
      defined(DEFINE_sig_broadcast_as_destroylater_nopr) +       \
      defined(DEFINE_sig_broadcast_for_fini) +                   \
@@ -123,6 +125,12 @@ NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self,
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
                                      struct task *__restrict sender_thread)
+#elif defined(DEFINE_sig_broadcast_destroylater)
+#define HAVE_BROADCAST
+#define HAVE_DESTROYLATER
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_broadcast_destroylater)(struct sig *__restrict self,
+                                          struct task **__restrict pdestroy_later)
 #elif defined(DEFINE_sig_broadcast_destroylater_nopr)
 #define HAVE_BROADCAST
 #define HAVE_DESTROYLATER
@@ -511,12 +519,23 @@ again_read_target_cons:
 				                                                LOCAL_was);
 #endif /* !HAVE_DESTROYLATER */
 			} else {
+#ifdef HAVE_DESTROYLATER
+#define LOCAL_pdestroy_later pdestroy_later
+#else /* HAVE_DESTROYLATER */
+#define LOCAL_pdestroy_later (&destroy_later)
+				REF struct task *destroy_later = NULL;
+#endif /* !HAVE_DESTROYLATER */
 				/* Invoke this completion function as the only thing we do. */
 				sig_completion_runsingle(self,
 				                         sc,
 				                         LOCAL_sender_thread,
+				                         LOCAL_pdestroy_later,
 				                         LOCAL_sender,
 				                         LOCAL_was);
+#ifndef HAVE_DESTROYLATER
+				destroy_tasks(destroy_later);
+#endif /* !HAVE_DESTROYLATER */
+#undef LOCAL_pdestroy_later
 			}
 			return true;
 		}
@@ -904,6 +923,7 @@ DECL_END
 #undef DEFINE_sig_altbroadcast
 #undef DEFINE_sig_altbroadcast_nopr
 #undef DEFINE_sig_broadcast_as_nopr
+#undef DEFINE_sig_broadcast_destroylater
 #undef DEFINE_sig_broadcast_destroylater_nopr
 #undef DEFINE_sig_broadcast_as_destroylater_nopr
 #undef DEFINE_sig_broadcast_for_fini

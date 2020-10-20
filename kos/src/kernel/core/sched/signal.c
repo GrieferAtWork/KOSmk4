@@ -464,6 +464,8 @@ struct sig_post_completion {
 	do {                                                           \
 		size_t _pc_reqlen;                                         \
 		(context)->scc_post = NULL;                                \
+		DBG_memset(&(context)->scc_destroy_later, 0xcc,            \
+		           sizeof((context)->scc_destroy_later));          \
 		_pc_reqlen = (*(sc)->sc_cb)(sc, context, NULL, 0);         \
 		if ((context)->scc_post != NULL) {                         \
 			struct sig_post_completion *_pc_ent;                   \
@@ -496,14 +498,18 @@ struct sig_post_completion {
 /* Trigger phase #2 for pending signal-completion functions.
  * NOTE: During this, the completion callback will clear the
  *       SMP lock bit of its own completion controller. */
-LOCAL NOBLOCK void
-NOTHROW(FCALL sig_run_phase_2)(struct sig_post_completion *chain,
-                               struct sig_completion_context const *__restrict context) {
-	while (chain) {
-		(*chain->spc_cb)(context, chain->spc_buf);
-		chain = chain->spc_next;
-	}
-}
+#define sig_run_phase_2(chain, context, pdestroy_later)       \
+	do {                                                      \
+		if (chain) {                                          \
+			(context)->scc_destroy_later = *(pdestroy_later); \
+			do {                                              \
+				(*chain->spc_cb)(context, chain->spc_buf);    \
+			} while ((chain = chain->spc_next) != NULL);      \
+			*(pdestroy_later) = (context)->scc_destroy_later; \
+		}                                                     \
+	}	__WHILE0
+
+
 
 #ifndef CONFIG_NO_SMP
 #define sig_completion_unlock(self) ATOMIC_AND((self)->tc_stat, ~TASK_CONNECTION_STAT_FLOCK)
@@ -565,7 +571,7 @@ no_cons:
 		 * NOTE: During this, the completion callback will clear the
 		 *       SMP lock bit of its own completion controller. */
 		sig_unlock_pending(sc_pending);
-		sig_run_phase_2(phase2, &context);
+		sig_run_phase_2(phase2, &context, pdestroy_later);
 		return result;
 	}
 	if (!is_connection_is_chain(sc_pending, con)) {
@@ -729,7 +735,7 @@ again:
 		 * NOTE: During this, the completion callback will clear the
 		 *       SMP lock bit of its own completion controller. */
 		sig_unlock_pending(sc_pending);
-		sig_run_phase_2(phase2, &context);
+		sig_run_phase_2(phase2, &context, pdestroy_later);
 		return false;
 	}
 	/* Find a suitable candidate:
@@ -876,7 +882,7 @@ again_read_target_cons:
 success:
 	/* Trigger phase #2 for all of the pending completion function. */
 	sig_unlock_pending(sc_pending);
-	sig_run_phase_2(phase2, &context);
+	sig_run_phase_2(phase2, &context, pdestroy_later);
 	return true;
 }
 
@@ -917,10 +923,11 @@ NOTHROW(FCALL sig_send_as_with_initial_destroylater_nopr)(struct sig *self,
 }
 
 
-PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 4)) void
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5)) void
 NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
                                         struct sig_completion *__restrict sc,
                                         struct task *__restrict sender_thread,
+                                        struct task **__restrict pdestroy_later,
                                         struct sig *sender, pflag_t was) {
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
@@ -933,7 +940,7 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
 	sig_smplock_release_nopr(self);
 	PREEMPTION_POP(was);
 	/* Run phase #2 callback. */
-	sig_run_phase_2(phase2, &context);
+	sig_run_phase_2(phase2, &context, pdestroy_later);
 }
 
 
@@ -1088,10 +1095,10 @@ done:
 	 *       SMP lock bit of its own completion controller. */
 	sig_unlock_pending(sc_pending);
 	PREEMPTION_POP(was);
+	/* Invoke phase-2 callbacks. */
+	sig_run_phase_2(phase2, &context, &destroy_later);
 	/* Destroy pending threads. */
 	destroy_tasks(destroy_later);
-	/* Invoke phase-2 callbacks. */
-	sig_run_phase_2(phase2, &context);
 	return result;
 }
 
@@ -2161,6 +2168,9 @@ DECL_END
 #include "signal-send.c.inl"
 
 #define DEFINE_sig_broadcast_as_nopr 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_broadcast_destroylater 1
 #include "signal-send.c.inl"
 
 #define DEFINE_sig_broadcast_destroylater_nopr 1

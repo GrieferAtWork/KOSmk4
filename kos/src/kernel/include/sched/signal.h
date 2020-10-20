@@ -284,6 +284,9 @@ NOTHROW(FCALL sig_broadcast_for_fini_as_nopr)(struct sig *__restrict self,
  * >>     }
  * >> } */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_broadcast_destroylater)(struct sig *__restrict self,
+                                          struct task **__restrict pdestroy_later);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self,
                                                struct task **__restrict pdestroy_later);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t

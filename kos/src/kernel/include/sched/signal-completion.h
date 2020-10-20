@@ -29,41 +29,48 @@ DECL_BEGIN
 
 #ifdef CONFIG_USE_NEW_SIGNAL_API
 
-struct sig_completion;
 struct task;
+struct sig_completion;
+struct sig_completion_context;
 
 /* Signal post-completion callback (to-be registered from `sig_completion_t()')
  * NOTE: `context->scc_post' is unused and its value is undefined when this
- *       callback is invoked. */
+ *       callback is invoked. The only reason that this one's here is so this
+ *       function can make use of `scc_destroy_later' to prevent the dead-lock
+ *       scenario described in `sig_broadcast_destroylater_nopr()' */
 typedef NOBLOCK NONNULL((1)) void
-/*NOTHROW*/ (FCALL *sig_postcompletion_t)(struct sig_completion_context const *__restrict context,
+/*NOTHROW*/ (FCALL *sig_postcompletion_t)(struct sig_completion_context *__restrict context,
                                           void *buf);
 
 struct sig_completion_context {
-	struct sig          *scc_sender; /* [1..1][const] The sender-signal (which may differ from `self->tc_sig')
-	                                  * when the signal is being sent through a function like `sig_altsend()' */
-	struct task         *scc_caller; /* [1..1][const] The thread that (supposedly) is sending the signal.
-	                                  * In order to support functions like `sig_broadcast_as_nopr()',
-	                                  * the sig-completion callback should not make use of THIS_TASK,
-	                                  * but instead assume that `sender_thread' is the caller's thread. */
-	sig_postcompletion_t scc_post;   /* [0..1][out] When non-NULL upon return of `sig_completion_t()',
-	                                  * this callback will be enqueued to-be executed the buffer given
-	                                  * to `sig_completion_t()' once all SMP-locks have been released.
-	                                  * Using this mechanism, a signal completion callback can schedule
-	                                  * further operations which may not necessarily be SMP-lock friendly
-	                                  * to-be performed at a later point, once all SMP-locks have been
-	                                  * released.
-	                                  * Note that even NOBLOCK functions may not always be SMP-lock-safe,
-	                                  * which includes further calls to `sig_send()' / `sig_broadcast()'
-	                                  * When using this mechanism, you must also make sure to account
-	                                  * for the possibility that either the associated signal and/or
-	                                  * used sig_completion descriptor get destroyed before/while this
-	                                  * callback will eventually be executed. As such it is recommended
-	                                  * to have use the normal signal completion function as a first-stage
-	                                  * callback to construct references to objects which are then written
-	                                  * back to the shared buffer and eventually inherited by a second
-	                                  * stage callback pointed to by this field. For an example of this,
-	                                  * look at the example code at the bottom of this file. */
+	struct sig          *scc_sender;        /* [1..1][const] The sender-signal (which may differ from `self->tc_sig')
+	                                         * when the signal is being sent through a function like `sig_altsend()' */
+	struct task         *scc_caller;        /* [1..1][const] The thread that (supposedly) is sending the signal.
+	                                         * In order to support functions like `sig_broadcast_as_nopr()',
+	                                         * the sig-completion callback should not make use of THIS_TASK,
+	                                         * but instead assume that `sender_thread' is the caller's thread. */
+	sig_postcompletion_t scc_post;          /* [0..1][out] When non-NULL upon return of `sig_completion_t()',
+	                                         * this callback will be enqueued to-be executed the buffer given
+	                                         * to `sig_completion_t()' once all SMP-locks have been released.
+	                                         * Using this mechanism, a signal completion callback can schedule
+	                                         * further operations which may not necessarily be SMP-lock friendly
+	                                         * to-be performed at a later point, once all SMP-locks have been
+	                                         * released.
+	                                         * Note that even NOBLOCK functions may not always be SMP-lock-safe,
+	                                         * which includes further calls to `sig_send()' / `sig_broadcast()'
+	                                         * When using this mechanism, you must also make sure to account
+	                                         * for the possibility that either the associated signal and/or
+	                                         * used sig_completion descriptor get destroyed before/while this
+	                                         * callback will eventually be executed. As such it is recommended
+	                                         * to have use the normal signal completion function as a first-stage
+	                                         * callback to construct references to objects which are then written
+	                                         * back to the shared buffer and eventually inherited by a second
+	                                         * stage callback pointed to by this field. For an example of this,
+	                                         * look at the example code at the bottom of this file. */
+	REF struct task     *scc_destroy_later; /* [0..1] Chain of threads to-be destroyed later
+	                                         * s.a. `sig_broadcast_destroylater_nopr()'
+	                                         * WARNING: This pointer is only valid during execution of `sig_postcompletion_t()'
+	                                         *          It is not valid during `sig_completion_t()'! */
 };
 
 
@@ -79,7 +86,9 @@ struct sig_completion_context {
  * @return: >  bufsize: The given `buf' is too small, and the caller must allocate a larger
  *                      buffer of at least `return' bytes and call this function once again.
  * @return: <= bufsize: Success (when `context->scc_post' is non-NULL, that function will be
- *                      invoked once all SMP-locks have been released) */
+ *                      invoked once all SMP-locks have been released). Warning: Try to keep
+ *                      the required buffer size as small as possible. - The associated buffer
+ *                      needs to be allocated on-stack, and that space might be very limited. */
 typedef NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 /*NOTHROW*/ (FCALL *sig_completion_t)(struct sig_completion *__restrict self,
                                       struct sig_completion_context *__restrict context,
@@ -159,10 +168,11 @@ NOTHROW(FCALL rising_edge_detector_destroy)(struct rising_edge_detector *__restr
 DEFINE_REFCOUNT_FUNCTIONS(struct rising_edge_detector, red_refcnt, rising_edge_detector_destroy)
 
 PRIVATE NOBLOCK void
-NOTHROW(FCALL red_phase2)(void *buf) {
+NOTHROW(FCALL red_phase2)(struct sig_completion_context *__restrict context,
+                          void *buf) {
 	REF struct rising_edge_detector *me;
 	me = *(REF struct rising_edge_detector **)buf;
-	sig_broadcast(&me->red_ondetect);
+	sig_broadcast_destroylater(&me->red_ondetect, &context->scc_destroy_later);
 	decref_unlikely(me);
 }
 
@@ -172,9 +182,11 @@ NOTHROW(FCALL red_phase1)(struct sig_completion *__restrict self,
                           void *buf, size_t bufsize) {
 	struct rising_edge_detector *me;
 	me = (struct rising_edge_detector *)self;
-#if 0 /* (optional): Automatic re-prime */
+	/* Automatic re-prime. Could also be implemented by counting the # of
+	 * detected raising edges, rather than keeping a boolean flag, and re-
+	 * connecting `me' to its signal prior to decrementing the edge-counter
+	 * to `0' in `rising_edge_detector_waitfor()' */
 	sig_completion_reprime(self, true);
-#endif
 	if (me->red_detected)
 		return 0;
 	if (bufsize < sizeof(void *))
@@ -215,16 +227,16 @@ PRIVATE struct sig mysig = SIG_INIT;
 PRIVATE REF struct rising_edge_detector *red;
 
 PRIVATE void demo(void) {
-	// This is essentially an async task_connect()
+	/* This is essentially an async task_connect() */
 	red = rising_edge_detector_create(&mysig);
 
-	// At this point, control flow could even return
-	// back to user-space, and `red' would still be
-	// able to pick up on `mysig' being triggered.
+	/* At this point, control flow could even return
+	 * back to user-space, and `red' would still be
+	 * able to pick up on `mysig' being triggered. */
 
 	sig_broadcast(&mysig);
 
-	// Async task_waitfor()
+	/* Async task_waitfor() */
 	rising_edge_detector_waitfor(red);
 	decref(red);
 }
