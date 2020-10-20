@@ -36,6 +36,7 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -446,35 +447,79 @@ NOTHROW(FCALL destroy_tasks)(struct task *destroy_later) {
 	}
 }
 
+
+struct sig_post_completion {
+	struct sig_post_completion     *spc_next; /* [0..1] Next post-completion descriptor. */
+	sig_postcompletion_t            spc_cb;   /* [1..1] Post-completion callback to-be invoked. */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, spc_buf); /* Buffer to-be passed to `spc_cb' */
+};
+
+#define sig_post_completion_alloc(bufsize) \
+	((struct sig_post_completion *)alloca(offsetof(struct sig_post_completion, spc_buf) + (bufsize)))
+
+/* @param: struct sig_post_completion   **ppost_completion_chain: ...
+ * @param: struct sig_completion         *sc:                     ...
+ * @param: struct sig_completion_context *context:                ... */
+#define invoke_sig_completion(ppost_completion_chain, sc, context) \
+	do {                                                           \
+		size_t _pc_reqlen;                                         \
+		(context)->scc_post = NULL;                                \
+		_pc_reqlen = (*(sc)->sc_cb)(sc, context, NULL, 0);         \
+		if ((context)->scc_post != NULL) {                         \
+			struct sig_post_completion *_pc_ent;                   \
+			for (;;) {                                             \
+				_pc_ent = sig_post_completion_alloc(_pc_reqlen);   \
+				if likely (_pc_reqlen == 0) {                      \
+					size_t _pc_newlen;                             \
+					_pc_newlen = (*(sc)->sc_cb)(sc, context,       \
+					                            _pc_ent->spc_buf,  \
+					                            _pc_reqlen);       \
+					if unlikely(_pc_newlen > _pc_reqlen) {         \
+						_pc_reqlen = _pc_newlen;                   \
+						continue;                                  \
+					}                                              \
+					if unlikely((context)->scc_post == NULL)       \
+						break;                                     \
+				}                                                  \
+				/* Finish fill in `_pc_ent' and enqueue it. */     \
+				_pc_ent->spc_cb   = (context)->scc_post;           \
+				_pc_ent->spc_next = *(ppost_completion_chain);     \
+				*(ppost_completion_chain) = _pc_ent;               \
+				break;                                             \
+			}                                                      \
+		}                                                          \
+	}	__WHILE0
+
+
+
+
 /* Trigger phase #2 for pending signal-completion functions.
  * NOTE: During this, the completion callback will clear the
  *       SMP lock bit of its own completion controller. */
-LOCAL NOBLOCK NONNULL((2, 3, 4)) void
-NOTHROW(FCALL sig_completion_chain_phase_2)(struct sig_completion *sc_pending,
-                                            struct sig *sender,
-                                            struct task *__restrict sender_thread,
-                                            struct task **__restrict pdestroy_later) {
+LOCAL NOBLOCK void
+NOTHROW(FCALL sig_run_phase_2)(struct sig_post_completion *chain,
+                               struct sig_completion_context const *__restrict context) {
+	while (chain) {
+		(*chain->spc_cb)(context, chain->spc_buf);
+		chain = chain->spc_next;
+	}
+}
+
+#ifndef CONFIG_NO_SMP
+#define sig_completion_unlock(self) ATOMIC_AND((self)->tc_stat, ~TASK_CONNECTION_STAT_FLOCK)
+LOCAL NOBLOCK void
+NOTHROW(FCALL sig_unlock_pending)(struct sig_completion *sc_pending) {
 	while (sc_pending) {
-		/* NOTE: Our use of `tc_connext' here is save:
-		 *
-		 * Even if the completion function used `sig_completion_reprime()'
-		 * during the SETUP-phase, and the second we've released our
-		 * SMP-lock from the signal (ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, 0)),
-		 * another CPU has began broadcasting our signal, it would still
-		 * not be able to clobber the `tc_connext' field until the completion
-		 * function has released the connection's SMP-lock, too. And since
-		 * we don't use `tc_connext' of some connection C after having
-		 * invoked C's callback, there is no race condition. */
 		struct sig_completion *next;
 		next = (struct sig_completion *)sc_pending->tc_connext;
-		DBG_memset(&sc_pending->tc_connext, 0xcc,
-		           sizeof(sc_pending->tc_connext));
-		(*sc_pending->sc_cb)(sc_pending, sender_thread,
-		                     SIG_COMPLETION_PHASE_PAYLOAD,
-		                     pdestroy_later, sender);
+		sig_completion_unlock(sc_pending);
 		sc_pending = next;
 	}
 }
+#else /* !CONFIG_NO_SMP */
+#define sig_completion_unlock(self) (void)0
+#define sig_unlock_pending(chain)   (void)0
+#endif /* CONFIG_NO_SMP */
 
 
 
@@ -486,17 +531,19 @@ NOTHROW(FCALL sig_broadcast_as_destroylater_with_initial_completion_nopr)(struct
                                                                           struct task **__restrict pdestroy_later,
                                                                           uintptr_t phase_one_state) {
 	uintptr_t ctl;
+	struct sig_post_completion *phase2 = NULL;
+	struct sig_completion_context context;
 	struct task_connections *target_cons;
 	struct task_connection *receiver;
 	struct task_connection *con;
 	size_t result = 0;
 	/* Signal completion callback. */
+	context.scc_sender = sender;
+	context.scc_caller = sender_thread;
 	if (sc_pending) {
 		ATOMIC_WRITE(sc_pending->tc_stat, phase_one_state);
 		assert(sc_pending->tc_sig == self);
-		(*sc_pending->sc_cb)(sc_pending, sender_thread,
-		                     SIG_COMPLETION_PHASE_SETUP,
-		                     pdestroy_later, sender);
+		invoke_sig_completion(&phase2, sc_pending, &context);
 		sc_pending->tc_connext = NULL;
 		++result;
 	}
@@ -517,9 +564,8 @@ no_cons:
 		/* Trigger phase #2 for pending signal-completion functions.
 		 * NOTE: During this, the completion callback will clear the
 		 *       SMP lock bit of its own completion controller. */
-		sig_completion_chain_phase_2(sc_pending, sender,
-		                             sender_thread,
-		                             pdestroy_later);
+		sig_unlock_pending(sc_pending);
+		sig_run_phase_2(phase2, &context);
 		return result;
 	}
 	if (!is_connection_is_chain(sc_pending, con)) {
@@ -576,10 +622,8 @@ again_read_target_cons:
 		sc = (struct sig_completion *)receiver;
 		ATOMIC_WRITE(sc->tc_stat, phase_one_state);
 		/* Signal completion callback. */
-		(*sc->sc_cb)(sc, sender_thread,
-		             SIG_COMPLETION_PHASE_SETUP,
-		             pdestroy_later, sender);
-		/* Enqueue `sc' for phase #2. */
+		invoke_sig_completion(&phase2, sc, &context);
+		/* Enqueue `sc' for unlock before phase #2. */
 		sc->tc_connext = sc_pending;
 		sc_pending     = sc;
 	} else {
@@ -609,7 +653,7 @@ again_read_target_cons:
 }
 
 /* NOTE: This function will restore preemption behave, as specified by `was' */
-PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) size_t
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL sig_broadcast_as_with_initial_completion_nopr)(struct sig *self,
                                                              struct task *__restrict sender_thread,
                                                              struct sig *sender,
@@ -629,7 +673,7 @@ NOTHROW(FCALL sig_broadcast_as_with_initial_completion_nopr)(struct sig *self,
 	return result;
 }
 
-PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) size_t
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 5)) size_t
 NOTHROW(FCALL sig_broadcast_as_with_initial_destroylater_nopr)(struct sig *self,
                                                                struct task *__restrict sender_thread,
                                                                struct sig *sender,
@@ -656,14 +700,16 @@ NOTHROW(FCALL sig_send_as_destroylater_with_initial_completion_nopr)(struct sig 
                                                                      struct sig_completion *sc_pending,
                                                                      struct task **__restrict pdestroy_later) {
 	uintptr_t ctl;
+	struct sig_post_completion *phase2 = NULL;
+	struct sig_completion_context context;
 	struct task_connections *target_cons;
 	struct task_connection *receiver;
 	struct task_connection *con;
+	context.scc_sender = sender;
+	context.scc_caller = sender_thread;
 	/* Signal completion callback. */
 	if (sc_pending) {
-		(*sc_pending->sc_cb)(sc_pending, sender_thread,
-		                     SIG_COMPLETION_PHASE_SETUP,
-		                     pdestroy_later, sender);
+		invoke_sig_completion(&phase2, sc_pending, &context);
 		sc_pending->tc_connext = NULL;
 	}
 again:
@@ -682,8 +728,8 @@ again:
 		/* Trigger phase #2 for pending signal-completion functions.
 		 * NOTE: During this, the completion callback will clear the
 		 *       SMP lock bit of its own completion controller. */
-		sig_completion_chain_phase_2(sc_pending, sender,
-		                             sender_thread, pdestroy_later);
+		sig_unlock_pending(sc_pending);
+		sig_run_phase_2(phase2, &context);
 		return false;
 	}
 	/* Find a suitable candidate:
@@ -752,11 +798,9 @@ again_read_target_cons:
 		task_connection_unlink_from_sig(self, receiver);
 		sc = (struct sig_completion *)receiver;
 		/* Trigger phase #1 */
-		(*sc->sc_cb)(sc, sender_thread,
-		             SIG_COMPLETION_PHASE_SETUP,
-		             pdestroy_later, sender);
+		invoke_sig_completion(&phase2, sc, &context);
 		if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
-			/* Enqueue the completion function to have its phase#2 executed later. */
+			/* Enqueue the completion function so we don't re-trigger it. */
 			sc->tc_signext = sc_pending;
 			sc_pending     = sc;
 			/* Search for more connections (preferably one that isn't poll-based) */
@@ -764,10 +808,8 @@ again_read_target_cons:
 		}
 		/* Unlock the signal. */
 		sig_smplock_release_nopr(self);
-		/* Invoke phase #2. (this one also unlocks `receiver') */
-		(*sc->sc_cb)(sc, sender_thread,
-		             SIG_COMPLETION_PHASE_PAYLOAD,
-		             pdestroy_later, sender);
+		/* Instead of enqueuing `sc' to-be unlocked later, do so immediately. */
+		sig_completion_unlock(sc);
 		goto success;
 	}
 	/* Check if the selected receiver is poll-based */
@@ -833,13 +875,12 @@ again_read_target_cons:
 	}
 success:
 	/* Trigger phase #2 for all of the pending completion function. */
-	sig_completion_chain_phase_2(sc_pending, sender,
-	                             sender_thread,
-	                             pdestroy_later);
+	sig_unlock_pending(sc_pending);
+	sig_run_phase_2(phase2, &context);
 	return true;
 }
 
-PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) bool
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL sig_send_as_with_initial_completion_nopr)(struct sig *self,
                                                         struct task *__restrict sender_thread,
                                                         struct sig *sender,
@@ -857,7 +898,7 @@ NOTHROW(FCALL sig_send_as_with_initial_completion_nopr)(struct sig *self,
 	return result;
 }
 
-PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 5)) bool
 NOTHROW(FCALL sig_send_as_with_initial_destroylater_nopr)(struct sig *self,
                                                           struct task *__restrict sender_thread,
                                                           struct sig *sender,
@@ -876,6 +917,25 @@ NOTHROW(FCALL sig_send_as_with_initial_destroylater_nopr)(struct sig *self,
 }
 
 
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 4)) void
+NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
+                                        struct sig_completion *__restrict sc,
+                                        struct task *__restrict sender_thread,
+                                        struct sig *sender, pflag_t was) {
+	struct sig_post_completion *phase2 = NULL;
+	struct sig_completion_context context;
+	context.scc_sender = sender;
+	context.scc_caller = sender_thread;
+	/* Trigger phase #1 */
+	invoke_sig_completion(&phase2, sc, &context);
+	/* Release locks. */
+	sig_completion_unlock(sc);
+	sig_smplock_release_nopr(self);
+	PREEMPTION_POP(was);
+	/* Run phase #2 callback. */
+	sig_run_phase_2(phase2, &context);
+}
+
 
 
 /* Try to send the signal to a single, other thread, for the purpose
@@ -891,6 +951,8 @@ NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
 	struct task_connections *target_cons;
 	struct task_connection *receiver;
 	struct task_connection *con;
+	struct sig_post_completion *phase2 = NULL;
+	struct sig_completion_context context;
 	REF struct task *destroy_later = NULL;
 again:
 	ctl = ATOMIC_READ(self->s_ctl);
@@ -968,10 +1030,10 @@ no_cons:
 		/* Unlink `sc' from the signal. */
 		task_connection_unlink_from_sig(self, receiver);
 		/* Signal completion callback. */
-		(*sc->sc_cb)(sc, THIS_TASK,
-		             SIG_COMPLETION_PHASE_SETUP,
-		             &destroy_later, sender);
-		/* Enqueue `sc' for phase #2. */
+		context.scc_sender = sender;
+		context.scc_caller = THIS_TASK;
+		invoke_sig_completion(&phase2, sc, &context);
+		/* Enqueue `sc' for unlock before phase #2. */
 		sc->tc_connext = sc_pending;
 		sc_pending     = sc;
 		if unlikely(TASK_CONNECTION_STAT_ISPOLL(target_cons))
@@ -1024,18 +1086,17 @@ done:
 	/* Trigger phase #2 for pending signal-completion functions.
 	 * NOTE: During this, the completion callback will clear the
 	 *       SMP lock bit of its own completion controller. */
-	sig_completion_chain_phase_2(sc_pending, sender,
-	                             THIS_TASK, &destroy_later);
+	sig_unlock_pending(sc_pending);
 	PREEMPTION_POP(was);
 	/* Destroy pending threads. */
-	while (destroy_later) {
-		struct task *next;
-		next = sig_destroylater_next(destroy_later);
-		destroy(destroy_later);
-		destroy_later = next;
-	}
+	destroy_tasks(destroy_later);
+	/* Invoke phase-2 callbacks. */
+	sig_run_phase_2(phase2, &context);
 	return result;
 }
+
+
+
 
 /* Re-prime the completion callback to be invoked once again the next time that the
  * attached signal is delivered. In this case, the completion function is responsible

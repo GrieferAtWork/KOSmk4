@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-//#define DEFINE_sig_send 1
+#define DEFINE_sig_send 1
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_send_nopr 1
 //#define DEFINE_sig_altsend_nopr 1
@@ -36,7 +36,7 @@
 //#define DEFINE_sig_altbroadcast_for_fini_nopr 1
 //#define DEFINE_sig_broadcast_for_fini_as_nopr 1
 //#define DEFINE_sig_broadcast_for_fini_destroylater_nopr 1
-#define DEFINE_sig_broadcast_for_fini_as_destroylater_nopr 1
+//#define DEFINE_sig_broadcast_for_fini_as_destroylater_nopr 1
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_sig_send) +                                 \
@@ -511,29 +511,12 @@ again_read_target_cons:
 				                                                LOCAL_was);
 #endif /* !HAVE_DESTROYLATER */
 			} else {
-				/* Invoke the phase-1 callback. */
-#ifdef HAVE_DESTROYLATER
-#define LOCAL_pdestroy_later pdestroy_later
-#else /* HAVE_DESTROYLATER */
-#define LOCAL_pdestroy_later (&destroy_later)
-				REF struct task *destroy_later = NULL;
-#endif /* !HAVE_DESTROYLATER */
-				assert(sc->tc_sig == self);
-				(*sc->sc_cb)(sc, LOCAL_sender_thread,
-				             SIG_COMPLETION_PHASE_SETUP,
-				             LOCAL_pdestroy_later,
-				             LOCAL_sender);
-				/* Unlock the signal. */
-				sig_smplock_release_nopr(self);
-				/* Invoke phase #2. (this one also unlocks `receiver') */
-				(*sc->sc_cb)(sc, LOCAL_sender_thread,
-				             SIG_COMPLETION_PHASE_PAYLOAD,
-				             LOCAL_pdestroy_later,
-				             LOCAL_sender);
-				LOCAL_PREEMPTION_POP();
-#ifndef HAVE_DESTROYLATER
-				destroy_tasks(destroy_later);
-#endif /* !HAVE_DESTROYLATER */
+				/* Invoke this completion function as the only thing we do. */
+				sig_completion_runsingle(self,
+				                         sc,
+				                         LOCAL_sender_thread,
+				                         LOCAL_sender,
+				                         LOCAL_was);
 			}
 			return true;
 		}
