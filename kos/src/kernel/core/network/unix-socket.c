@@ -120,7 +120,7 @@ NOTHROW(FCALL unix_client_destroy)(struct unix_client *__restrict self) {
 		pb_buffer_fini_ex(&self->uc_bufs[i],
 		                  unix_ancillary_data_fini);
 	}
-	sig_broadcast(&self->uc_status_sig); /* In case someone was still connected... */
+	sig_broadcast_for_fini(&self->uc_status_sig); /* In case someone was still connected... */
 	kfree(self);
 }
 
@@ -191,7 +191,7 @@ NOTHROW(FCALL unix_server_fini)(struct unix_server *__restrict self) {
 
 	/* Broadcast the signal one last time, just in case someone was
 	 * still listening, thus telling them that we're about to go away. */
-	sig_broadcast(&self->us_acceptme_sig);
+	sig_broadcast_for_fini(&self->us_acceptme_sig);
 }
 
 

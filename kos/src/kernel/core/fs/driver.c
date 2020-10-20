@@ -1066,7 +1066,7 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	printk(KERN_NOTICE "[mod][-] Delmod: %q\n", self->d_name);
 
 	/* Wake up someone who might be waiting for the driver to get unloaded. */
-	sig_broadcast(&self->d_destroyed);
+	sig_broadcast_for_fini(&self->d_destroyed);
 
 	/* Service any remaining dead sections! */
 	driver_do_service_dead_sections(self);

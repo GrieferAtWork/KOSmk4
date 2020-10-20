@@ -224,6 +224,24 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self,
                                      struct sig *sender);
 
+/* Same as the regular `sig_broadcast' function, but must be used of
+ * `self' is being broadcast one last time prior to being destroyed.
+ * When these functions are used, signal completion callbacks are not
+ * allowed to make use of `sig_completion_reprime()', but instead,
+ * that function will return `false' and do nothing.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self);
+FUNDEF NOBLOCK NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self,
+                                         struct sig *sender);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self,
+                                              struct sig *sender);
+
 /* Check if the given signal has viable recipients.
  * This includes poll-based connections. */
 FUNDEF NOBLOCK NONNULL((1)) __BOOL
@@ -242,6 +260,9 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
                                      struct task *__restrict sender_thread);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini_as_nopr)(struct sig *__restrict self,
+                                              struct task *__restrict sender_thread);
 
 /* Same as `sig_broadcast()', don't immediatly destroy threads when their
  * reference counter reaches 0. Instead, chain those threads together and
@@ -269,6 +290,13 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL sig_broadcast_as_destroylater_nopr)(struct sig *__restrict self,
                                                   struct task *__restrict sender_thread,
                                                   struct task **__restrict pdestroy_later);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini_destroylater_nopr)(struct sig *__restrict self,
+                                                        struct task **__restrict pdestroy_later);
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini_as_destroylater_nopr)(struct sig *__restrict self,
+                                                           struct task *__restrict sender_thread,
+                                                           struct task **__restrict pdestroy_later);
 #define sig_destroylater_next(thread) KEY_task_vm_dead__next(thread)
 
 
@@ -300,6 +328,7 @@ NOTHROW(FCALL sig_broadcast_as_destroylater_nopr)(struct sig *__restrict self,
 #ifndef CONFIG_NO_SMP
 #define TASK_CONNECTION_STAT_FLOCK               0x0001 /* SMP lock (must be held when removing the associated connection from the signal) */
 #endif /* !CONFIG_NO_SMP */
+#define TASK_CONNECTION_STAT_FFINI               0x0002 /* For signal completion functions only: Signal was finalized. */
 #define TASK_CONNECTION_STAT_FPOLL               0x0002 /* This is a POLL-based connection. */
 #define TASK_CONNECTION_STAT_FMASK               0x0003 /* Mask of flags */
 #define TASK_CONNECTION_STAT_COMPLETION          0x0004 /* Special type: This is actually a `struct sig_completion' */

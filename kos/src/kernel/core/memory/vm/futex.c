@@ -88,7 +88,7 @@ NOTHROW(KCALL vm_futex_destroy)(struct vm_futex *__restrict self) {
 	 * with the extension of `struct sig's behavior of allowing task_waitfor()
 	 * on signal objects that may have already been destroyed by the time that
 	 * task_waitfor() gets called. */
-	sig_broadcast(&self->f_signal);
+	sig_broadcast_for_fini(&self->f_signal);
 
 	/* Try to lock the associated data part. */
 	part = self->f_part.get();

@@ -19,7 +19,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-#define DEFINE_sig_send 1
+//#define DEFINE_sig_send 1
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_send_nopr 1
 //#define DEFINE_sig_altsend_nopr 1
@@ -30,19 +30,33 @@
 //#define DEFINE_sig_broadcast_as_nopr 1
 //#define DEFINE_sig_broadcast_destroylater_nopr 1
 //#define DEFINE_sig_broadcast_as_destroylater_nopr 1
+//#define DEFINE_sig_broadcast_for_fini 1
+//#define DEFINE_sig_altbroadcast_for_fini 1
+//#define DEFINE_sig_broadcast_for_fini_nopr 1
+//#define DEFINE_sig_altbroadcast_for_fini_nopr 1
+//#define DEFINE_sig_broadcast_for_fini_as_nopr 1
+//#define DEFINE_sig_broadcast_for_fini_destroylater_nopr 1
+#define DEFINE_sig_broadcast_for_fini_as_destroylater_nopr 1
 #endif /* __INTELLISENSE__ */
 
-#if (defined(DEFINE_sig_send) +                        \
-     defined(DEFINE_sig_send_nopr) +                   \
-     defined(DEFINE_sig_altsend) +                     \
-     defined(DEFINE_sig_altsend_nopr) +                \
-     defined(DEFINE_sig_broadcast) +                   \
-     defined(DEFINE_sig_broadcast_nopr) +              \
-     defined(DEFINE_sig_altbroadcast) +                \
-     defined(DEFINE_sig_altbroadcast_nopr) +           \
-     defined(DEFINE_sig_broadcast_as_nopr) +           \
-     defined(DEFINE_sig_broadcast_destroylater_nopr) + \
-     defined(DEFINE_sig_broadcast_as_destroylater_nopr)) != 1
+#if (defined(DEFINE_sig_send) +                                 \
+     defined(DEFINE_sig_send_nopr) +                            \
+     defined(DEFINE_sig_altsend) +                              \
+     defined(DEFINE_sig_altsend_nopr) +                         \
+     defined(DEFINE_sig_broadcast) +                            \
+     defined(DEFINE_sig_broadcast_nopr) +                       \
+     defined(DEFINE_sig_altbroadcast) +                         \
+     defined(DEFINE_sig_altbroadcast_nopr) +                    \
+     defined(DEFINE_sig_broadcast_as_nopr) +                    \
+     defined(DEFINE_sig_broadcast_destroylater_nopr) +          \
+     defined(DEFINE_sig_broadcast_as_destroylater_nopr) +       \
+     defined(DEFINE_sig_broadcast_for_fini) +                   \
+     defined(DEFINE_sig_broadcast_for_fini_nopr) +              \
+     defined(DEFINE_sig_altbroadcast_for_fini) +                \
+     defined(DEFINE_sig_altbroadcast_for_fini_nopr) +           \
+     defined(DEFINE_sig_broadcast_for_fini_as_nopr) +           \
+     defined(DEFINE_sig_broadcast_for_fini_destroylater_nopr) + \
+     defined(DEFINE_sig_broadcast_for_fini_as_destroylater_nopr)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
@@ -144,6 +158,65 @@ PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL sig_broadcast_as_destroylater_nopr)(struct sig *__restrict self,
                                                   struct task *__restrict sender_thread,
                                                   struct task **__restrict pdestroy_later)
+#elif defined(DEFINE_sig_broadcast_for_fini)
+#define HAVE_BROADCAST
+#define HAVE_FOR_FINI
+/* Same as the regular `sig_broadcast' function, but must be used of
+ * `self' is being broadcast one last time prior to being destroyed.
+ * When these functions are used, signal completion callbacks are not
+ * allowed to make use of `sig_completion_reprime()', but instead,
+ * that function will return `false' and do nothing.
+ * @return: * : The actual number of threads notified,
+ *              not counting poll-based connections. */
+PUBLIC NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini)(struct sig *__restrict self)
+#elif defined(DEFINE_sig_altbroadcast_for_fini)
+#define HAVE_BROADCAST
+#define HAVE_FOR_FINI
+#define HAVE_SENDER
+PUBLIC NOBLOCK NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altbroadcast_for_fini)(struct sig *self,
+                                         struct sig *sender)
+#elif defined(DEFINE_sig_broadcast_for_fini_nopr)
+#define HAVE_BROADCAST
+#define HAVE_FOR_FINI
+#define HAVE_NOPREEMPT
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini_nopr)(struct sig *__restrict self)
+#elif defined(DEFINE_sig_altbroadcast_for_fini_nopr)
+#define HAVE_BROADCAST
+#define HAVE_FOR_FINI
+#define HAVE_NOPREEMPT
+#define HAVE_SENDER
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self,
+                                              struct sig *sender)
+#elif defined(DEFINE_sig_broadcast_for_fini_as_nopr)
+#define HAVE_BROADCAST
+#define HAVE_FOR_FINI
+#define HAVE_SENDER_THREAD
+#define HAVE_NOPREEMPT
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini_as_nopr)(struct sig *__restrict self,
+                                              struct task *__restrict sender_thread)
+#elif defined(DEFINE_sig_broadcast_for_fini_destroylater_nopr)
+#define HAVE_BROADCAST
+#define HAVE_FOR_FINI
+#define HAVE_DESTROYLATER
+#define HAVE_NOPREEMPT
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini_destroylater_nopr)(struct sig *__restrict self,
+                                                        struct task **__restrict pdestroy_later)
+#elif defined(DEFINE_sig_broadcast_for_fini_as_destroylater_nopr)
+#define HAVE_BROADCAST
+#define HAVE_FOR_FINI
+#define HAVE_DESTROYLATER
+#define HAVE_SENDER_THREAD
+#define HAVE_NOPREEMPT
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
+NOTHROW(FCALL sig_broadcast_for_fini_as_destroylater_nopr)(struct sig *__restrict self,
+                                                           struct task *__restrict sender_thread,
+                                                           struct task **__restrict pdestroy_later)
 #endif /* ... */
 {
 #ifdef CONFIG_USE_NEW_SIGNAL_API
@@ -185,6 +258,11 @@ NOTHROW(FCALL sig_broadcast_as_destroylater_nopr)(struct sig *__restrict self,
 #else /* HAVE_DESTROYLATER */
 #define LOCAL_decref_task(thread) decref(thread)
 #endif /* !HAVE_DESTROYLATER */
+#ifdef HAVE_FOR_FINI
+#define LOCAL_TASK_CONNECTION_STAT_FFINI TASK_CONNECTION_STAT_FFINI
+#else /* HAVE_FOR_FINI */
+#define LOCAL_TASK_CONNECTION_STAT_FFINI 0
+#endif /* !HAVE_FOR_FINI */
 again_disable_preemption:
 	LOCAL_PREEMPTION_PUSHOFF();
 #ifdef CONFIG_NO_SMP
@@ -279,14 +357,20 @@ again_read_target_cons:
 			                                                                     LOCAL_sender_thread,
 			                                                                     LOCAL_sender,
 			                                                                     (struct sig_completion *)receiver,
-			                                                                     pdestroy_later);
+			                                                                     pdestroy_later,
+			                                                                     TASK_CONNECTION_STAT_BROADCAST |
+			                                                                     TASK_CONNECTION_STAT_FLOCK_OPT |
+			                                                                     LOCAL_TASK_CONNECTION_STAT_FFINI);
 			goto done;
 #else /* HAVE_DESTROYLATER */
 			result += sig_broadcast_as_with_initial_completion_nopr(self,
 			                                                        LOCAL_sender_thread,
 			                                                        LOCAL_sender,
 			                                                        LOCAL_was,
-			                                                        (struct sig_completion *)receiver);
+			                                                        (struct sig_completion *)receiver,
+			                                                        TASK_CONNECTION_STAT_BROADCAST |
+			                                                        TASK_CONNECTION_STAT_FLOCK_OPT |
+			                                                        LOCAL_TASK_CONNECTION_STAT_FFINI);
 			return result;
 #endif /* !HAVE_DESTROYLATER */
 		}
@@ -331,7 +415,8 @@ again_read_target_cons:
 					                                                          LOCAL_sender_thread,
 					                                                          LOCAL_sender,
 					                                                          LOCAL_was,
-					                                                          thread);
+					                                                          thread,
+					                                                          LOCAL_TASK_CONNECTION_STAT_FFINI);
 					return result;
 				}
 #endif /* !HAVE_DESTROYLATER */
@@ -402,6 +487,7 @@ again_read_target_cons:
 			/* Signal completion callback. */
 			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
 			                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
+			                                                    LOCAL_TASK_CONNECTION_STAT_FFINI |
 			                                                    TASK_CONNECTION_STAT_FLOCK_OPT)))
 				goto again_read_target_cons;
 			task_connection_unlink_from_sig(self, receiver);
@@ -435,13 +521,15 @@ again_read_target_cons:
 				assert(sc->tc_sig == self);
 				(*sc->sc_cb)(sc, LOCAL_sender_thread,
 				             SIG_COMPLETION_PHASE_SETUP,
-				             LOCAL_pdestroy_later, LOCAL_sender);
+				             LOCAL_pdestroy_later,
+				             LOCAL_sender);
 				/* Unlock the signal. */
 				sig_smplock_release_nopr(self);
 				/* Invoke phase #2. (this one also unlocks `receiver') */
 				(*sc->sc_cb)(sc, LOCAL_sender_thread,
 				             SIG_COMPLETION_PHASE_PAYLOAD,
-				             LOCAL_pdestroy_later, LOCAL_sender);
+				             LOCAL_pdestroy_later,
+				             LOCAL_sender);
 				LOCAL_PREEMPTION_POP();
 #ifndef HAVE_DESTROYLATER
 				destroy_tasks(destroy_later);
@@ -517,6 +605,7 @@ again_read_target_cons:
 	}
 done:
 	LOCAL_PREEMPTION_POP();
+#undef LOCAL_TASK_CONNECTION_STAT_FFINI
 #undef LOCAL_was
 #undef LOCAL_PREEMPTION_PUSHOFF
 #undef LOCAL_PREEMPTION_POP
@@ -816,6 +905,7 @@ done_nocon_nounlock:
 #undef HAVE_SENDER_THREAD
 #undef HAVE_DESTROYLATER
 #undef HAVE_BROADCAST
+#undef HAVE_FOR_FINI
 #undef HAVE_SENDER
 #undef HAVE_NOPREEMPT
 
@@ -833,4 +923,11 @@ DECL_END
 #undef DEFINE_sig_broadcast_as_nopr
 #undef DEFINE_sig_broadcast_destroylater_nopr
 #undef DEFINE_sig_broadcast_as_destroylater_nopr
+#undef DEFINE_sig_broadcast_for_fini
+#undef DEFINE_sig_broadcast_for_fini_nopr
+#undef DEFINE_sig_altbroadcast_for_fini
+#undef DEFINE_sig_altbroadcast_for_fini_nopr
+#undef DEFINE_sig_broadcast_for_fini_as_nopr
+#undef DEFINE_sig_broadcast_for_fini_destroylater_nopr
+#undef DEFINE_sig_broadcast_for_fini_as_destroylater_nopr
 

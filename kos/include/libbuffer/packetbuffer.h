@@ -417,12 +417,16 @@ struct pb_buffer {
  *       since other code uses the value of the signal itself for inter-locking
  *       with the monitoring of changes made to components affected by the signal. */
 #ifdef __KERNEL__
-#define pb_buffer_psta_broadcast(self) sig_broadcast(&(self)->pb_psta)
-#define pb_buffer_psta_send(self)      sig_send(&(self)->pb_psta)
+#define pb_buffer_psta_broadcast(self)          sig_broadcast(&(self)->pb_psta)
+#define pb_buffer_psta_broadcast_for_fini(self) sig_broadcast_for_fini(&(self)->pb_psta)
+#define pb_buffer_psta_send(self)               sig_send(&(self)->pb_psta)
 #else /* __KERNEL__ */
 #define pb_buffer_psta_broadcast(self)                       \
 	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_broadcast(&(self)->pb_psta))
+#define pb_buffer_psta_broadcast_for_fini(self)              \
+	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
+	 sched_signal_broadcast_for_fini(&(self)->pb_psta))
 #define pb_buffer_psta_send(self)                            \
 	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_send(&(self)->pb_psta))

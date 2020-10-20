@@ -479,9 +479,12 @@ NOTHROW(FCALL sig_completion_chain_phase_2)(struct sig_completion *sc_pending,
 
 
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) size_t
-NOTHROW(FCALL sig_broadcast_as_destroylater_with_initial_completion_nopr)(struct sig *self, struct task *__restrict sender_thread,
-                                                                          struct sig *sender, struct sig_completion *sc_pending,
-                                                                          struct task **__restrict pdestroy_later) {
+NOTHROW(FCALL sig_broadcast_as_destroylater_with_initial_completion_nopr)(struct sig *self,
+                                                                          struct task *__restrict sender_thread,
+                                                                          struct sig *sender,
+                                                                          struct sig_completion *sc_pending,
+                                                                          struct task **__restrict pdestroy_later,
+                                                                          uintptr_t phase_one_state) {
 	uintptr_t ctl;
 	struct task_connections *target_cons;
 	struct task_connection *receiver;
@@ -489,6 +492,7 @@ NOTHROW(FCALL sig_broadcast_as_destroylater_with_initial_completion_nopr)(struct
 	size_t result = 0;
 	/* Signal completion callback. */
 	if (sc_pending) {
+		ATOMIC_WRITE(sc_pending->tc_stat, phase_one_state);
 		assert(sc_pending->tc_sig == self);
 		(*sc_pending->sc_cb)(sc_pending, sender_thread,
 		                     SIG_COMPLETION_PHASE_SETUP,
@@ -570,6 +574,7 @@ again_read_target_cons:
 		if (TASK_CONNECTION_STAT_ISDONE(target_cons))
 			goto again;
 		sc = (struct sig_completion *)receiver;
+		ATOMIC_WRITE(sc->tc_stat, phase_one_state);
 		/* Signal completion callback. */
 		(*sc->sc_cb)(sc, sender_thread,
 		             SIG_COMPLETION_PHASE_SETUP,
@@ -605,33 +610,50 @@ again_read_target_cons:
 
 /* NOTE: This function will restore preemption behave, as specified by `was' */
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) size_t
-NOTHROW(FCALL sig_broadcast_as_with_initial_completion_nopr)(struct sig *self, struct task *__restrict sender_thread,
-                                                             struct sig *sender, pflag_t was,
-                                                             struct sig_completion *sc_pending) {
+NOTHROW(FCALL sig_broadcast_as_with_initial_completion_nopr)(struct sig *self,
+                                                             struct task *__restrict sender_thread,
+                                                             struct sig *sender,
+                                                             pflag_t was,
+                                                             struct sig_completion *sc_pending,
+                                                             uintptr_t phase_one_state) {
 	struct task *destroy_later = NULL;
 	size_t result;
-	result = sig_broadcast_as_destroylater_with_initial_completion_nopr(self, sender_thread, sender,
-	                                                                    sc_pending, &destroy_later);
+	result = sig_broadcast_as_destroylater_with_initial_completion_nopr(self,
+	                                                                    sender_thread,
+	                                                                    sender,
+	                                                                    sc_pending,
+	                                                                    &destroy_later,
+	                                                                    phase_one_state);
 	PREEMPTION_POP(was);
 	destroy_tasks(destroy_later);
 	return result;
 }
 
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) size_t
-NOTHROW(FCALL sig_broadcast_as_with_initial_destroylater_nopr)(struct sig *self, struct task *__restrict sender_thread,
-                                                               struct sig *sender, pflag_t was, struct task *destroy_later) {
+NOTHROW(FCALL sig_broadcast_as_with_initial_destroylater_nopr)(struct sig *self,
+                                                               struct task *__restrict sender_thread,
+                                                               struct sig *sender,
+                                                               pflag_t was,
+                                                               struct task *destroy_later,
+                                                               uintptr_t phase_one_state) {
 	size_t result;
 	sig_destroylater_next(destroy_later) = NULL;
-	result = sig_broadcast_as_destroylater_with_initial_completion_nopr(self, sender_thread, sender,
-	                                                                    NULL, &destroy_later);
+	result = sig_broadcast_as_destroylater_with_initial_completion_nopr(self,
+	                                                                    sender_thread,
+	                                                                    sender,
+	                                                                    NULL,
+	                                                                    &destroy_later,
+	                                                                    phase_one_state);
 	PREEMPTION_POP(was);
 	destroy_tasks(destroy_later);
 	return result;
 }
 
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
-NOTHROW(FCALL sig_send_as_destroylater_with_initial_completion_nopr)(struct sig *self, struct task *__restrict sender_thread,
-                                                                     struct sig *sender, struct sig_completion *sc_pending,
+NOTHROW(FCALL sig_send_as_destroylater_with_initial_completion_nopr)(struct sig *self,
+                                                                     struct task *__restrict sender_thread,
+                                                                     struct sig *sender,
+                                                                     struct sig_completion *sc_pending,
                                                                      struct task **__restrict pdestroy_later) {
 	uintptr_t ctl;
 	struct task_connections *target_cons;
@@ -818,24 +840,36 @@ success:
 }
 
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) bool
-NOTHROW(FCALL sig_send_as_with_initial_completion_nopr)(struct sig *self, struct task *__restrict sender_thread,
-                                                        struct sig *sender, struct sig_completion *sc_pending, pflag_t was) {
+NOTHROW(FCALL sig_send_as_with_initial_completion_nopr)(struct sig *self,
+                                                        struct task *__restrict sender_thread,
+                                                        struct sig *sender,
+                                                        struct sig_completion *sc_pending,
+                                                        pflag_t was) {
 	bool result;
 	struct task *destroy_later = NULL;
-	result = sig_send_as_destroylater_with_initial_completion_nopr(self, sender_thread, sender,
-	                                                               sc_pending, &destroy_later);
+	result = sig_send_as_destroylater_with_initial_completion_nopr(self,
+	                                                               sender_thread,
+	                                                               sender,
+	                                                               sc_pending,
+	                                                               &destroy_later);
 	PREEMPTION_POP(was);
 	destroy_tasks(destroy_later);
 	return result;
 }
 
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
-NOTHROW(FCALL sig_send_as_with_initial_destroylater_nopr)(struct sig *self, struct task *__restrict sender_thread,
-                                                          struct sig *sender, pflag_t was, struct task *destroy_later) {
+NOTHROW(FCALL sig_send_as_with_initial_destroylater_nopr)(struct sig *self,
+                                                          struct task *__restrict sender_thread,
+                                                          struct sig *sender,
+                                                          pflag_t was,
+                                                          struct task *destroy_later) {
 	bool result;
 	sig_destroylater_next(destroy_later) = NULL;
-	result = sig_send_as_destroylater_with_initial_completion_nopr(self, sender_thread, sender,
-	                                                               NULL, &destroy_later);
+	result = sig_send_as_destroylater_with_initial_completion_nopr(self,
+	                                                               sender_thread,
+	                                                               sender,
+	                                                               NULL,
+	                                                               &destroy_later);
 	PREEMPTION_POP(was);
 	destroy_tasks(destroy_later);
 	return result;
@@ -1006,7 +1040,7 @@ done:
 /* Re-prime the completion callback to be invoked once again the next time that the
  * attached signal is delivered. In this case, the completion function is responsible
  * to ensure that no-one is currently trying to destroy the associated signal. */
-PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) bool
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
                                       bool for_poll) {
 	struct task_connection *next;
@@ -1017,6 +1051,12 @@ NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
 	assert(signal->s_ctl & SIG_CONTROL_SMPLOCK);
 	assert(self->tc_stat & TASK_CONNECTION_STAT_FLOCK);
 #endif /* !CONFIG_NO_SMP */
+	/* If the signal was sent for the purpose of finalization, then don't
+	 * allow completion callback re-priming, since we're supposed to take
+	 * care of all connections going away. */
+	if unlikely(self->tc_stat & TASK_CONNECTION_STAT_FFINI)
+		return false;
+
 	/* Re-write the status of `self' to match the request. */
 	ATOMIC_WRITE(self->tc_stat,
 	             for_poll ? TASK_CONNECTION_STAT_FLOCK_OPT | TASK_CONNECTION_STAT_COMPLETION_FOR_POLL
@@ -1031,6 +1071,7 @@ NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
 		COMPILER_WRITE_BARRIER();
 	} while (!ATOMIC_CMPXCH_WEAK(signal->s_con, next,
 	                             sig_smplock_set(self)));
+	return true;
 }
 
 /* Connect the given signal completion controller to the specified signal.
@@ -2065,6 +2106,27 @@ DECL_END
 #include "signal-send.c.inl"
 
 #define DEFINE_sig_broadcast_as_destroylater_nopr 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_broadcast_for_fini 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_broadcast_for_fini_nopr 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_altbroadcast_for_fini 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_altbroadcast_for_fini_nopr 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_broadcast_for_fini_as_nopr 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_broadcast_for_fini_destroylater_nopr 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_broadcast_for_fini_as_destroylater_nopr 1
 #include "signal-send.c.inl"
 
 #define DEFINE_task_waitfor 1

@@ -67,11 +67,12 @@ __SIZE_TYPE__ sched_signal_sendmany(sched_signal_t *__self, __SIZE_TYPE__ __max_
 
 #elif defined(__KERNEL__)
 
-#define sched_signal_init        sig_init
-#define sched_signal_cinit       sig_cinit
-#define sched_signal_broadcast   sig_broadcast
-#define sched_signal_send        sig_send
-#define sched_signal_sendmany    sig_sendmany
+#define sched_signal_init               sig_init
+#define sched_signal_cinit              sig_cinit
+#define sched_signal_broadcast          sig_broadcast
+#define sched_signal_broadcast_for_fini sig_broadcast_for_fini
+#define sched_signal_send               sig_send
+#define sched_signal_sendmany           sig_sendmany
 
 #else /* __KERNEL__ */
 
@@ -79,9 +80,11 @@ __SIZE_TYPE__ sched_signal_sendmany(sched_signal_t *__self, __SIZE_TYPE__ __max_
 #define sched_signal_cinit(self) (__hybrid_assert(*(self) == 0))
 
 #ifdef __CRT_HAVE_futexlock_wakeall
-#define sched_signal_broadcast futexlock_wakeall
+#define sched_signal_broadcast          futexlock_wakeall
+#define sched_signal_broadcast_for_fini futexlock_wakeall
 #else /* __CRT_HAVE_futexlock_wakeall */
-#define sched_signal_broadcast(self) __hybrid_assertion_failed("Missing CRT feature: __CRT_HAVE_futexlock_wakeall")
+#define sched_signal_broadcast(self)          __hybrid_assertion_failed("Missing CRT feature: __CRT_HAVE_futexlock_wakeall")
+#define sched_signal_broadcast_for_fini(self) __hybrid_assertion_failed("Missing CRT feature: __CRT_HAVE_futexlock_wakeall")
 #endif /* !__CRT_HAVE_futexlock_wakeall */
 
 #ifdef __CRT_HAVE_futexlock_wake

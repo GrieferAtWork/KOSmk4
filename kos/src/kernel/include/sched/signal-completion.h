@@ -174,9 +174,9 @@ typedef NOBLOCK NOPREEMPT NONNULL((1, 2, 4, 5)) void
 /* Re-prime the completion callback to be invoked once again the next time that the
  * attached signal is delivered. In this case, the completion function is responsible
  * to ensure that no-one is currently trying to destroy the associated signal. */
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL
 NOTHROW(KCALL sig_completion_reprime)(struct sig_completion *__restrict self,
-                                      bool for_poll);
+                                      __BOOL for_poll);
 
 /* Release the SMP-lock of `self'. This function must be invoked from every signal
  * completion function when invoked with `phase == SIG_COMPLETION_PHASE_PAYLOAD'.
@@ -211,7 +211,7 @@ struct sig_completion
 #ifndef __cplusplus
 	struct task_connection sc_con; /* The underlying connection */
 #endif /* __cplusplus */
-	sig_completion_t       sc_cb;  /* Completion callback. */
+	sig_completion_t       sc_cb;  /* [1..1][const] Completion callback. */
 };
 
 #ifdef __cplusplus
@@ -243,7 +243,7 @@ NOTHROW(FCALL sig_connect_completion_for_poll)(struct sig *__restrict self,
  * @return: false: Completion function was already triggered, but not re-primed.
  *                 Alternatively, the signal completion function had already been
  *                 disconnected, or had never been connected to begin with. */
-FUNDEF NOBLOCK NONNULL((1)) bool
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL sig_completion_disconnect)(struct sig_completion *__restrict self);
 
 #endif /* CONFIG_USE_NEW_SIGNAL_API */
