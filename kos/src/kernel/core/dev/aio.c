@@ -330,6 +330,10 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 	}
 	if ((old_status & AIO_MULTIHANDLE_STATUS_RUNMASK) == 0) {
 		unsigned int status;
+		pflag_t was;
+		/* Completion functions must be called with preemption disabled,
+		 * so satisfy that requirement by disabling preemption temporarily. */
+		was = PREEMPTION_PUSHOFF();
 		/* All handles have already completed. */
 		status = (old_status & AIO_MULTIHANDLE_STATUS_STATUSMASK) >> AIO_MULTIHANDLE_STATUS_STATUSSHFT;
 		if (status == AIO_COMPLETION_FAILURE) {
@@ -344,6 +348,7 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 			/* Invoke the completion callback. */
 			(*self->am_func)(self, status);
 		}
+		PREEMPTION_POP(was);
 	}
 }
 
