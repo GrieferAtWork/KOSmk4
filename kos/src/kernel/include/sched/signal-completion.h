@@ -22,7 +22,12 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/types.h>
 #include <sched/signal.h>
+
+#if TASK_CONNECTION_STAT_BROADCAST == 0 && !defined(NDEBUG)
+#include <hybrid/__assert.h>
+#endif /* TASK_CONNECTION_STAT_BROADCAST == 0 && !NDEBUG */
 
 #ifdef __CC__
 DECL_BEGIN
@@ -146,6 +151,182 @@ NOTHROW(FCALL sig_connect_completion_for_poll)(struct sig *__restrict self,
 FUNDEF NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL sig_completion_disconnect)(struct sig_completion *__restrict self);
 
+
+
+
+
+/************************************************************************/
+/* SIGNAL MULTI-COMPLETION API                                          */
+/************************************************************************/
+
+/* Signal multi-completion routing.
+ * Using this, you can connect a single completion function onto multiple
+ * signals, where the completion function itself is then invoked whenever
+ * any of the signal are triggered. Note however, that the completion
+ * callback must still behave just like a regular `sig_completion_t',
+ * with the only addition being that it can extract the completion controller
+ * via `((struct sig_multicompletion_route *)self)->mr_con'. Also note that
+ * as far as re-priming goes, the completion function has to decide this on
+ * a per-signal basis, and as far as synchronization goes, the completion
+ * function itself may be invoked simultaneously for different signals,
+ * though is guarantied to not be invoked again for the same signal until
+ * the mandatory call to `sig_completion_release()' during the PAYLOAD phase.
+ *
+ * A multi-completion controller can be disconnected from all attached signals
+ * by using `sig_multicompletion_disconnect_all()', which also guaranties that
+ * any completion function which have be getting invoked on some other CPU has
+ * already passed the point of `sig_completion_release()' */
+struct sig_multicompletion;
+struct _sig_multicompletion_route
+#ifdef __cplusplus
+    : sig_completion                    /* The underlying completion function */
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct sig_completion       mr_com; /* The underlying completion function */
+#endif /* __cplusplus */
+	struct sig_multicompletion *mr_con; /* [1..1][const] The attached controller. */
+};
+
+/* Given a given `struct sig_completion *sc', as passed to
+ * a `sig_completion_t()', return the associated multi-completion
+ * controller. The caller must ensure that `sc' is a completion
+ * controller owned by some `struct sig_multicompletion', which
+ * can easily be done by only invoking this function from callbacks
+ * registered by
+ *   - `sig_multicompletion_alloc()' or
+ *   - `sig_multicompletion_connect()' */
+#define sig_multicompletion_controller(sc) \
+	(((struct _sig_multicompletion_route *)(sc))->mr_con)
+
+
+
+struct _sig_multicompletion_set {
+	struct _sig_multicompletion_set  *sms_next; /* [0..1][owned][WRITE_ONCE] More connections. */
+	struct _sig_multicompletion_route sms_routes[CONFIG_TASK_STATIC_CONNECTIONS]; /* Static routes */
+};
+
+struct sig_multicompletion {
+	struct _sig_multicompletion_set sm_set; /* Set of connections */
+};
+
+
+/* Initialize the given signal multi-completion controller. */
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sig_multicompletion_init)(struct sig_multicompletion *__restrict self) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
+		self->sm_set.sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+}
+
+/* Initialize the given signal multi-completion controller.
+ * This function is allowed to assume that `self' was pre-
+ * initialized to all zeroes, as may be done by GFP_CALLOC. */
+#if TASK_CONNECTION_STAT_BROADCAST != 0 || !defined(NDEBUG)
+LOCAL NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sig_multicompletion_cinit)(struct sig_multicompletion *__restrict self) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i) {
+#if TASK_CONNECTION_STAT_BROADCAST != 0
+		self->sm_set.sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+#else /* TASK_CONNECTION_STAT_BROADCAST != 0 */
+		__hybrid_assert(self->sm_set.sms_routes[i].tc_stat == 0);
+#endif /* TASK_CONNECTION_STAT_BROADCAST == 0 */
+	}
+}
+#else /* TASK_CONNECTION_STAT_BROADCAST != 0 || !NDEBUG */
+#define sig_multicompletion_cinit(self) (void)0
+#endif /* TASK_CONNECTION_STAT_BROADCAST == 0 && NDEBUG */
+
+/* Finalize a given signal multi-completion controller.
+ * This function will also disconnect any remaining signal that
+ * may still be connected to one of the completion descriptors
+ * allocated by `self', essentially doing the same as would also
+ * be done by `sig_multicompletion_disconnect()' (though in
+ * addition to this, this function will also free dynamically
+ * allocated data owned by `self') */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict self);
+
+
+/* Sever all (still-alive) connections that are active for `self'. Note that this function may
+ * not be called from inside of signal-completion-callbacks, or any other callback that may be
+ * executed in the context of holding an SMP-lock.
+ * WARNING: This callback (if used) can only be invoked from `sig_postcompletion_t()'.
+ *          Attempting to invoke it from `sig_completion_t()' will result in a dead-lock! */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sig_multicompletion_disconnect)(struct sig_multicompletion *__restrict self);
+
+/* Allocate and return a new signal completion descriptor that is attached to the
+ * signal multi-completion controller `self', and will invoke `cb' when triggered.
+ * The returned pointer is owned by `self', meaning that the caller doesn't have
+ * to bother ith ownership themself. Also note that this these functions will keep
+ * on returning the same completion until that completion has been connected, and
+ * will re-use older completions if those got tripped, but didn't re-prime themself.
+ *
+ * If all of that sounds too complicated for you, then just use `sig_connect_multicompletion',
+ * which encapsulates the job of allocating+connecting to a signal for you. */
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct sig_completion *FCALL
+sig_multicompletion_alloc(struct sig_multicompletion *__restrict self,
+                          sig_completion_t cb)
+		THROWS(E_BADALLOC);
+FUNDEF WUNUSED NONNULL((1)) struct sig_completion *
+NOTHROW(FCALL sig_multicompletion_alloc_nx)(struct sig_multicompletion *__restrict self,
+                                            sig_completion_t cb);
+
+/* Allocate a completion descriptor from `completion' and connect it to `self' */
+FUNDEF NOBLOCK NONNULL((1, 2, 3)) void FCALL
+sig_connect_multicompletion(struct sig *__restrict self,
+                            struct sig_multicompletion *__restrict completion,
+                            sig_completion_t cb)
+		THROWS(E_BADALLOC);
+
+/* No-except version of `sig_connect_multicompletion()'. Returns `false' if no
+ * completion descriptor could be allocated from the pool of `completion', and
+ * `true' if a completion descriptor could be allocated and was subsequently
+ * connected. */
+FUNDEF NOBLOCK WUNUSED NONNULL((1, 2, 3)) __BOOL
+NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
+                                              struct sig_multicompletion *__restrict completion,
+                                              sig_completion_t cb);
+
+
+/* Connect `completion' to all signals currently connected to by the calling thread.
+ * In other words: all signals the caller is connected to via `task_connect()'
+ * Note that for this purpose, only signals from the currently active set of task
+ * connections will be connected. Connections established outside the bounds of
+ * the current `task_pushconnections()...task_popconnections()' pair will _NOT_
+ * be connected. If one of the signals which the calling thread is connected to
+ * has already been sent (i.e. `task_waitfor()' wouldn't block), then this function
+ * will return early, and the exact (if any) signals that were connected to `completion'
+ * are left undefined (meaning that the caller can really only handle this happening
+ * by using `sig_multicompletion_disconnect()', but also meaning that `cb' may still
+ * get invoked in case the caller was connected to more than one signal, and more
+ * than one of those gets triggered before connections of `completion' get disconnected)
+ * As such, the safe way to use this function is as
+ * follows (exception handling not displayed for brevity):
+ * >> task_connect(&foo);
+ * >> task_connect(&bar);
+ * >> task_connect(&foobar);
+ * >> ...
+ * >> struct sig_multicompletion smc;
+ * >> sig_multicompletion_init(&smc);
+ * >> sig_multicompletion_connect_from_task(&smc, &my_callback);
+ * >> if (task_trywait()) {  // Or `task_receiveall()' if the caller only wants connections to remain in `smc'
+ * >>     sig_multicompletion_disconnect(&smc);
+ * >>     // Error:   One of the caller's signals may already have
+ * >>     //          been delivered before `smc' could connect to
+ * >>     //          all of them.
+ * >> } else {
+ * >>     // Success: Connections established
+ * >> }
+ * This function is used to implement epoll objects using the regular,
+ * old poll-api already exposed via `handle_poll()', without the need
+ * of complicating that existing ABI. */
+FUNDEF NOBLOCK NONNULL((1)) void FCALL
+sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict completion,
+                                      sig_completion_t cb, bool for_poll)
+		THROWS(E_BADALLOC);
 
 
 

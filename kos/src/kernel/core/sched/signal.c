@@ -38,6 +38,7 @@
 
 #include <alloca.h>
 #include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -1458,6 +1459,313 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
 	}
 	return result;
 }
+
+
+
+/************************************************************************/
+/* SIGNAL MULTI-COMPLETION API                                          */
+/************************************************************************/
+
+/* Finalize a given signal multi-completion controller.
+ * This function will also disconnect any remaining signal that
+ * may still be connected to one of the completion descriptors
+ * allocated by `self', essentially doing the same as would also
+ * be done by `sig_multicompletion_disconnect()' (though in
+ * addition to this, this function will also free dynamically
+ * allocated data owned by `self') */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict self) {
+	struct _sig_multicompletion_set *ext;
+	/* Disconnect all established signals. */
+	sig_multicompletion_disconnect(self);
+	/* Free all extended connection sets. */
+	ext = self->sm_set.sms_next;
+	DBG_memset(self, 0xcc, sizeof(*self));
+	while (ext) {
+		struct _sig_multicompletion_set *next;
+		next = ext->sms_next;
+		kfree(ext);
+		ext = next;
+	}
+}
+
+
+/* Sever all (still-alive) connections that are active for `self'. Note that this function may
+ * not be called from inside of signal-completion-callbacks, or any other callback that may be
+ * executed in the context of holding an SMP-lock.
+ * WARNING: This callback (if used) can only be invoked from `sig_postcompletion_t()'.
+ *          Attempting to invoke it from `sig_completion_t()' will result in a dead-lock! */
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL sig_multicompletion_disconnect)(struct sig_multicompletion *__restrict self) {
+	struct _sig_multicompletion_set *set;
+	set = &self->sm_set;
+	do {
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(set->sms_routes); ++i) {
+#ifndef __OPTIMIZE_SIZE__
+			if (set->sms_routes[i].tc_stat != TASK_CONNECTION_STAT_BROADCAST)
+#endif /* !__OPTIMIZE_SIZE__ */
+			{
+				sig_completion_disconnect(&set->sms_routes[i]);
+			}
+		}
+	} while ((set = set->sms_next) != NULL);
+}
+
+/* Allocate and return a new signal completion descriptor that is attached to the
+ * signal multi-completion controller `self', and will invoke `cb' when triggered.
+ * The returned pointer is owned by `self', meaning that the caller doesn't have
+ * to bother ith ownership themself. Also note that this these functions will keep
+ * on returning the same completion until that completion has been connected, and
+ * will re-use older completions if those got tripped, but didn't re-prime themself.
+ *
+ * If all of that sounds too complicated for you, then just use `sig_connect_multicompletion',
+ * which encapsulates the job of allocating+connecting to a signal for you. */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct sig_completion *FCALL
+sig_multicompletion_alloc(struct sig_multicompletion *__restrict self,
+                          sig_completion_t cb)
+		THROWS(E_BADALLOC) {
+	struct _sig_multicompletion_route *result;
+	struct _sig_multicompletion_set *set;
+	unsigned int i;
+	set = &self->sm_set;
+	do {
+		for (i = 0; i < COMPILER_LENOF(set->sms_routes); ++i) {
+			result = &set->sms_routes[i];
+			if (result->tc_stat == TASK_CONNECTION_STAT_BROADCAST)
+				goto done; /* Unused completion entry. */
+		}
+	} while ((set = set->sms_next) != NULL);
+	/* Must allocate a new set of completion descriptors.
+	 * NOTE: These descriptors must be allocated as LOCKED, since they're made
+	 *       use of by code that may be running with preemption disabled. */
+	set = (struct _sig_multicompletion_set *)kmalloc(sizeof(struct _sig_multicompletion_set),
+	                                                 GFP_LOCKED | GFP_PREFLT);
+	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
+		set->sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+	/* Insert the set into the list of known sets. */
+	set->sms_next         = self->sm_set.sms_next;
+	self->sm_set.sms_next = set;
+	/* Use the first descriptor from the newly allocated set. */
+	result = &set->sms_routes[0];
+done:
+	result->mr_con = self;
+	result->sc_cb  = cb;
+	return result;
+}
+
+PUBLIC WUNUSED NONNULL((1)) struct sig_completion *
+NOTHROW(FCALL sig_multicompletion_alloc_nx)(struct sig_multicompletion *__restrict self,
+                                            sig_completion_t cb) {
+	struct _sig_multicompletion_route *result;
+	struct _sig_multicompletion_set *set;
+	unsigned int i;
+	set = &self->sm_set;
+	do {
+		for (i = 0; i < COMPILER_LENOF(set->sms_routes); ++i) {
+			result = &set->sms_routes[i];
+			if (result->tc_stat == TASK_CONNECTION_STAT_BROADCAST)
+				goto done; /* Unused completion entry. */
+		}
+	} while ((set = set->sms_next) != NULL);
+	/* Must allocate a new set of completion descriptors.
+	 * NOTE: These descriptors must be allocated as LOCKED, since they're made
+	 *       use of by code that may be running with preemption disabled. */
+	set = (struct _sig_multicompletion_set *)kmalloc_nx(sizeof(struct _sig_multicompletion_set),
+	                                                    GFP_LOCKED | GFP_PREFLT);
+	if unlikely(!set)
+		return NULL; /* Allocation failed. */
+	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
+		set->sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+	/* Insert the set into the list of known sets. */
+	set->sms_next         = self->sm_set.sms_next;
+	self->sm_set.sms_next = set;
+	/* Use the first descriptor from the newly allocated set. */
+	result = &set->sms_routes[0];
+done:
+	result->mr_con = self;
+	result->sc_cb  = cb;
+	return result;
+}
+
+/* Allocate a completion descriptor from `completion' and connect it to `self' */
+PUBLIC NOBLOCK NONNULL((1, 2, 3)) void FCALL
+sig_connect_multicompletion(struct sig *__restrict self,
+                            struct sig_multicompletion *__restrict completion,
+                            sig_completion_t cb)
+		THROWS(E_BADALLOC) {
+	struct sig_completion *route;
+	route = sig_multicompletion_alloc(completion, cb);
+	sig_connect_completion(self, route);
+}
+
+/* No-except version of `sig_connect_multicompletion()'. Returns `false' if no
+ * completion descriptor could be allocated from the pool of `completion', and
+ * `true' if a completion descriptor could be allocated and was subsequently
+ * connected. */
+PUBLIC NOBLOCK WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
+                                              struct sig_multicompletion *__restrict completion,
+                                              sig_completion_t cb) {
+	struct sig_completion *route;
+	route = sig_multicompletion_alloc_nx(completion, cb);
+	if unlikely(!route)
+		return false;
+	sig_connect_completion(self, route);
+	return true;
+}
+
+
+/* Connect `completion' to all signals currently connected to by the calling thread.
+ * In other words: all signals the caller is connected to via `task_connect()'
+ * Note that for this purpose, only signals from the currently active set of task
+ * connections will be connected. Connections established outside the bounds of
+ * the current `task_pushconnections()...task_popconnections()' pair will _NOT_
+ * be connected. If one of the signals which the calling thread is connected to
+ * has already been sent (i.e. `task_waitfor()' wouldn't block), then this function
+ * will return early, and the exact (if any) signals that were connected to `completion'
+ * are left undefined (meaning that the caller can really only handle this happening
+ * by using `sig_multicompletion_disconnect()', but also meaning that `cb' may still
+ * get invoked in case the caller was connected to more than one signal, and more
+ * than one of those gets triggered before connections of `completion' get disconnected)
+ * As such, the safe way to use this function is as
+ * follows (exception handling not displayed for brevity):
+ * >> task_connect(&foo);
+ * >> task_connect(&bar);
+ * >> task_connect(&foobar);
+ * >> ...
+ * >> struct sig_multicompletion smc;
+ * >> sig_multicompletion_init(&smc);
+ * >> sig_multicompletion_connect_from_task(&smc, &my_callback);
+ * >> if (task_trywait()) {  // Or `task_receiveall()' if the caller only wants connections to remain in `smc'
+ * >>     sig_multicompletion_disconnect(&smc);
+ * >>     // Error:   One of the caller's signals may already have
+ * >>     //          been delivered before `smc' could connect to
+ * >>     //          all of them.
+ * >> } else {
+ * >>     // Success: Connections established
+ * >> }
+ * This function is used to implement epoll objects using the regular,
+ * old poll-api already exposed via `handle_poll()', without the need
+ * of complicating that existing ABI. */
+PUBLIC NOBLOCK NONNULL((1)) void FCALL
+sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict completion,
+                                      sig_completion_t cb, bool for_poll)
+		THROWS(E_BADALLOC) {
+	struct task_connection *con;
+	struct task_connections *cons;
+	uintptr_t newroute_status;
+	cons = THIS_CONNECTIONS;
+#ifndef __OPTIMIZE_SIZE__
+	/* Quick check: was one of the calling thread's signals already delivered? */
+	if (cons->tcs_dlvr != NULL)
+		return;
+#endif /* !__OPTIMIZE_SIZE__ */
+	newroute_status = for_poll ? TASK_CONNECTION_STAT_COMPLETION_FOR_POLL
+	                           : TASK_CONNECTION_STAT_COMPLETION;
+	for (con = cons->tcs_con; con; con = con->tc_connext) {
+		struct sig_completion *route;
+		struct task_connection *signext;
+		struct sig *signal;
+		pflag_t was;
+		route  = sig_multicompletion_alloc(completion, cb);
+		signal = con->tc_sig;
+		/* Initialize `route' as needed prior to a connection being made. */
+		route->tc_stat = newroute_status;
+		route->tc_sig  = signal;
+		DBG_memset(&route->tc_connext, 0xcc, sizeof(route->tc_connext));
+
+		/* This is where it gets complicated, because we must:
+		 *    #1: Disable preemption
+		 *    #2: Acquire the SMP-lock of `con', and make sure that `con'
+		 *        wasn't been delivered, yet. This way we know that the
+		 *        signal pointed to by `con->tc_sig' hasn't been destroyed,
+		 *        yet.
+		 *    #3: While holding the SMP-lock of `con', insert our new connection
+		 *        `route' into the signal's connection queue.
+		 *    #4: Release our SMP-lock on `con'
+		 *    #5: Re-enable preemption (if it was enabled before)
+		 *
+		 * Note that in order to append a connection onto the wait-queue
+		 * of some signal, one normally doesn't need to acquire any SMP-
+		 * locks. In this case however, we still need to acquire the SMP-
+		 * lock of `con', with which we can prevent any other CPU from
+		 * (fully) broadcasting the attached signal as part of finalizing
+		 * that signal (~ala `sig_broadcast_for_fini()') */
+		/* Step #1 */
+		was = PREEMPTION_PUSHOFF();
+		/* Step #2 */
+#ifndef CONFIG_NO_SMP
+		for (;;)
+#endif /* !CONFIG_NO_SMP */
+		{
+			uintptr_t status;
+			status = ATOMIC_READ(con->tc_stat);
+			if (TASK_CONNECTION_STAT_ISSPEC(status)) {
+				assertf(!TASK_CONNECTION_STAT_ISCOMP(status),
+				        "This should be a task connection, so why does "
+				        "its status indicate a completion function?\n"
+				        "status = %#" PRIxPTR,
+				        status);
+				/* Connection is already dead.
+				 * Abort everything and make sure that our thread's
+				 * delivered-connection field is non-NULL (since that
+				 * field may not have been set yet by whoever had sent
+				 * the signal) */
+				PREEMPTION_POP(was);
+
+				/* Mark `route' as unused (since it was never fully connected)
+				 * This must be done to ensure that `self' remains in a consistent
+				 * state in regards to finalization (or rather: disconnect in general) */
+				route->tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+
+#ifdef CONFIG_NO_SMP
+				assert(ATOMIC_READ(cons->tcs_dlvr) != NULL);
+#else /* CONFIG_NO_SMP */
+				/* If the signal was send by some other CPU, our thread's
+				 * delivered-signal field may not have become non-NULL, yet.
+				 * In this case, simply pause until that happens. */
+				while (ATOMIC_READ(cons->tcs_dlvr) == NULL)
+					task_pause();
+#endif /* !CONFIG_NO_SMP */
+				return;
+			}
+
+#ifndef CONFIG_NO_SMP
+			/* Make sure that `con' isn't already locked. */
+			if unlikely(status & TASK_CONNECTION_STAT_FLOCK) {
+				/* Pausing w/ preemption may do better than pausing w/o
+				 * As such, try to re-enable preemption while we do this. */
+				PREEMPTION_POP(was);
+				task_pause();
+				was = PREEMPTION_PUSHOFF();
+				continue;
+			}
+
+			/* Acquire a lock to `con' */
+			if (ATOMIC_CMPXCH_WEAK(con->tc_stat,
+			                       status,
+			                       status | TASK_CONNECTION_STAT_FLOCK))
+				break;
+#endif /* !CONFIG_NO_SMP */
+		}
+		/* Step #3 (Do the actual job of inserting `route' into the signal) */
+		do {
+			signext = ATOMIC_READ(signal->s_con);
+			route->tc_signext = sig_smplock_clr(signext);
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(signal->s_con, signext,
+		                             sig_smplock_cpy(route, signext)));
+#ifndef CONFIG_NO_SMP
+		/* Step #4 */
+		ATOMIC_ADD(con->tc_stat, ~TASK_CONNECTION_STAT_FLOCK);
+#endif /* !CONFIG_NO_SMP */
+		/* Step #5 */
+		PREEMPTION_POP(was);
+
+	}
+}
+
 
 
 #else /* CONFIG_USE_NEW_SIGNAL_API */
