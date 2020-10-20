@@ -70,7 +70,7 @@ NOTHROW(KCALL AtaDrive_Fini)(struct block_device *__restrict self) {
 
 
 
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT bool KCALL
+PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
 Ata_InitializeDrive(struct ata_ports *__restrict ports,
                     /*(in|out)_opt*/ REF AtaBus **__restrict pbus,
                     u8 drive_id, bool is_primary_bus,
@@ -360,7 +360,7 @@ calculate_chs:
 	return false;
 }
 
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT bool KCALL
+PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
 initialize_ata(struct ata_ports *__restrict ports,
                bool is_primary_bus,
                bool is_default_ide) {
@@ -377,7 +377,7 @@ initialize_ata(struct ata_ports *__restrict ports,
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT bool KCALL
+PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
 initialize_ide(struct ide_ports *__restrict self, bool is_default_ide) {
 	struct ata_ports a;
 	bool result;
@@ -407,7 +407,7 @@ initialize_ide(struct ide_ports *__restrict self, bool is_default_ide) {
 
 /* @return: true:  Primary IDE device found.
  * @return: false: Secondary IDE device found, or initialization failed. */
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT bool KCALL
+PRIVATE ATTR_FREETEXT ATTR_NOINLINE bool KCALL
 kernel_load_pci_ide(struct pci_device *__restrict dev) {
 	bool result = false;
 	struct ide_ports i;

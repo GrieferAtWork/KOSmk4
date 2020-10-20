@@ -120,7 +120,7 @@ template<class T> struct atomic_ref {
 	}
 
 	/* Return a reference to the current pointed-to value */
-	__CXX_CLASSMEMBER NOPREEMPT NOBLOCK ATTR_LEAF ATTR_RETNONNULL WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT {
+	__CXX_CLASSMEMBER NOBLOCK NOPREEMPT ATTR_LEAF ATTR_RETNONNULL WUNUSED REF T *KCALL get_nopr() __CXX_NOEXCEPT {
 		REF T *result;
 		__hybrid_assert(!PREEMPTION_ENABLED());
 #ifndef CONFIG_NO_SMP

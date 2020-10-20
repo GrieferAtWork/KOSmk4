@@ -380,7 +380,7 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 
 DATDEF VIRT byte_t volatile *x86_lapicbase_ ASMNAME("x86_lapicbase");
 
-PRIVATE ATTR_FREETEXT NOBLOCK void
+PRIVATE NOBLOCK ATTR_FREETEXT void
 NOTHROW(FCALL pagedir_unmap_and_sync_one)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	pagedir_unmapone(addr);
 	pagedir_syncone(addr);

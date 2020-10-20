@@ -21,15 +21,28 @@
 #include "signal.c"
 #define DEFINE_sig_send 1
 //#define DEFINE_sig_altsend 1
+//#define DEFINE_sig_send_nopr 1
+//#define DEFINE_sig_altsend_nopr 1
 //#define DEFINE_sig_broadcast 1
 //#define DEFINE_sig_altbroadcast 1
+//#define DEFINE_sig_broadcast_nopr 1
+//#define DEFINE_sig_altbroadcast_nopr 1
 //#define DEFINE_sig_broadcast_as_nopr 1
 //#define DEFINE_sig_broadcast_destroylater_nopr 1
+//#define DEFINE_sig_broadcast_as_destroylater_nopr 1
 #endif /* __INTELLISENSE__ */
 
-#if (defined(DEFINE_sig_send) /**/ + defined(DEFINE_sig_altsend) +      \
-     defined(DEFINE_sig_broadcast) + defined(DEFINE_sig_altbroadcast) + \
-     defined(DEFINE_sig_broadcast_as_nopr) + defined(DEFINE_sig_broadcast_destroylater_nopr)) != 1
+#if (defined(DEFINE_sig_send) +                        \
+     defined(DEFINE_sig_send_nopr) +                   \
+     defined(DEFINE_sig_altsend) +                     \
+     defined(DEFINE_sig_altsend_nopr) +                \
+     defined(DEFINE_sig_broadcast) +                   \
+     defined(DEFINE_sig_broadcast_nopr) +              \
+     defined(DEFINE_sig_altbroadcast) +                \
+     defined(DEFINE_sig_altbroadcast_nopr) +           \
+     defined(DEFINE_sig_broadcast_as_nopr) +           \
+     defined(DEFINE_sig_broadcast_destroylater_nopr) + \
+     defined(DEFINE_sig_broadcast_as_destroylater_nopr)) != 1
 #error "Must #define exactly one of these macros!"
 #endif /* ... */
 
@@ -49,9 +62,18 @@ NOTHROW(FCALL sig_send)(struct sig *__restrict self)
 PUBLIC NOBLOCK NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL sig_altsend)(struct sig *self,
                            struct sig *sender)
+#elif defined(DEFINE_sig_send_nopr)
+#define HAVE_NOPREEMPT
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) __BOOL
+NOTHROW(FCALL sig_send_nopr)(struct sig *__restrict self)
+#elif defined(DEFINE_sig_altsend_nopr)
+#define HAVE_SENDER
+#define HAVE_NOPREEMPT
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL
+NOTHROW(FCALL sig_altsend_nopr)(struct sig *self,
+                                struct sig *sender)
 #elif defined(DEFINE_sig_broadcast)
 #define HAVE_BROADCAST
-#define HAVE_BROADCAST_RESULT
 /* Send signal to all connected threads.
  * @return: * : The actual number of threads notified,
  *              not counting poll-based connections. */
@@ -59,14 +81,24 @@ PUBLIC NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast)(struct sig *__restrict self)
 #elif defined(DEFINE_sig_altbroadcast)
 #define HAVE_BROADCAST
-#define HAVE_BROADCAST_RESULT
 #define HAVE_SENDER
 PUBLIC NOBLOCK NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast)(struct sig *self,
                                 struct sig *sender)
+#elif defined(DEFINE_sig_broadcast_nopr)
+#define HAVE_BROADCAST
+#define HAVE_NOPREEMPT
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
+NOTHROW(FCALL sig_broadcast_nopr)(struct sig *__restrict self)
+#elif defined(DEFINE_sig_altbroadcast_nopr)
+#define HAVE_BROADCAST
+#define HAVE_NOPREEMPT
+#define HAVE_SENDER
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altbroadcast_nopr)(struct sig *self,
+                                     struct sig *sender)
 #elif defined(DEFINE_sig_broadcast_as_nopr)
 #define HAVE_BROADCAST
-#define HAVE_BROADCAST_RESULT
 #define HAVE_SENDER_THREAD
 #define HAVE_NOPREEMPT
 /* Same as `sig_broadcast()', but impersonate `sender_thread', and
@@ -103,6 +135,15 @@ NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self,
                                                struct task **__restrict pdestroy_later)
+#elif defined(DEFINE_sig_broadcast_as_destroylater_nopr)
+#define HAVE_BROADCAST
+#define HAVE_DESTROYLATER
+#define HAVE_SENDER_THREAD
+#define HAVE_NOPREEMPT
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
+NOTHROW(FCALL sig_broadcast_as_destroylater_nopr)(struct sig *__restrict self,
+                                                  struct task *__restrict sender_thread,
+                                                  struct task **__restrict pdestroy_later)
 #endif /* ... */
 {
 #ifdef CONFIG_USE_NEW_SIGNAL_API
@@ -490,9 +531,9 @@ done:
 #endif /* !HAVE_BROADCAST */
 #else /* CONFIG_USE_NEW_SIGNAL_API */
 
-#ifdef HAVE_BROADCAST_RESULT
+#ifdef HAVE_BROADCAST
 	size_t result = 0;
-#endif /* HAVE_BROADCAST_RESULT */
+#endif /* HAVE_BROADCAST */
 #ifdef HAVE_DESTROYLATER
 	struct task *destroylater_threads = NULL;
 #endif /* HAVE_DESTROYLATER */
@@ -602,10 +643,10 @@ preemption_pop_and_lock:
 #endif /* !HAVE_DESTROYLATER */
 			}
 			/* Only normal connections count towards the returned # of threads. */
-#ifdef HAVE_BROADCAST_RESULT
+#ifdef HAVE_BROADCAST
 			if (TASK_CONNECTION_STAT_ISNORM(target_cons))
 				++result;
-#endif /* HAVE_BROADCAST_RESULT */
+#endif /* HAVE_BROADCAST */
 		}
 		/* Try to wake up the remaining threads. */
 #ifdef __OPTIMIZE_SIZE__
@@ -761,7 +802,7 @@ again_find_receiver:
 #undef NEED_done_nocon_nounlock
 done_nocon_nounlock:
 #endif /* NEED_done_nocon_nounlock */
-#ifdef HAVE_BROADCAST_RESULT
+#ifdef HAVE_BROADCAST
 	return result;
 #elif defined(HAVE_DESTROYLATER)
 	return destroylater_threads;
@@ -774,7 +815,6 @@ done_nocon_nounlock:
 
 #undef HAVE_SENDER_THREAD
 #undef HAVE_DESTROYLATER
-#undef HAVE_BROADCAST_RESULT
 #undef HAVE_BROADCAST
 #undef HAVE_SENDER
 #undef HAVE_NOPREEMPT
@@ -782,10 +822,15 @@ done_nocon_nounlock:
 
 DECL_END
 
-#undef DEFINE_sig_broadcast_destroylater_nopr
-#undef DEFINE_sig_broadcast_as_nopr
-#undef DEFINE_sig_altbroadcast
-#undef DEFINE_sig_broadcast
-#undef DEFINE_sig_altsend
 #undef DEFINE_sig_send
+#undef DEFINE_sig_send_nopr
+#undef DEFINE_sig_altsend
+#undef DEFINE_sig_altsend_nopr
+#undef DEFINE_sig_broadcast
+#undef DEFINE_sig_broadcast_nopr
+#undef DEFINE_sig_altbroadcast
+#undef DEFINE_sig_altbroadcast_nopr
+#undef DEFINE_sig_broadcast_as_nopr
+#undef DEFINE_sig_broadcast_destroylater_nopr
+#undef DEFINE_sig_broadcast_as_destroylater_nopr
 

@@ -307,7 +307,7 @@ NOTHROW(KCALL Ne2k_ReleaseUIO)(Ne2kDevice *__restrict self) {
 
 
 /* @param: tsr: Set of `ENISR_*' */
-PRIVATE NOPREEMPT ATTR_NOINLINE NOBLOCK void
+PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL Ne2k_HandleAioTxError)(Ne2kDevice *__restrict self,
                                      struct aio_handle *__restrict aio,
                                      u8 tsr) {
@@ -380,7 +380,7 @@ switch_state_after_rx:
 			}
 			/* Broadcast that a packet should now be downloaded. */
 			if (new_state.ns_state == NE2K_STATE_RX_DNLOAD)
-				sig_broadcast(&me->nk_stpkld);
+				sig_broadcast_nopr(&me->nk_stpkld);
 		} else {
 warn_rx_set:
 			printk(KERN_WARNING "[ne2k] RX-interrupt with RXPEND already set\n");

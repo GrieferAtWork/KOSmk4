@@ -100,7 +100,7 @@ NOTHROW(KCALL keyboard_buffer_putkey)(struct keyboard_buffer *__restrict self, u
 	return result;
 }
 
-PUBLIC NOBLOCK bool
+PUBLIC NOBLOCK NOPREEMPT bool
 NOTHROW(KCALL keyboard_buffer_putkey_nopr)(struct keyboard_buffer *__restrict self, u16 key) {
 	union keyboard_buffer_state oldstate, newstate;
 	assert(!PREEMPTION_ENABLED());
@@ -132,7 +132,7 @@ NOTHROW(KCALL keyboard_buffer_putkey_nopr)(struct keyboard_buffer *__restrict se
 #endif /* !NDEBUG */
 	}
 	/* Send the signal for every key enqueued. */
-	sig_send(&self->kb_avail);
+	sig_send_nopr(&self->kb_avail);
 	return true;
 }
 

@@ -363,7 +363,7 @@ err:
  * point somewhere into an address range that has previously
  * been registered by `kmalloc_trace()'.
  * NOTE: When `ptr' is `NULL', then this function does nothing. */
-PUBLIC ATTR_NOINLINE NOBLOCK void
+PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 	struct trace_node *node;
 	if unlikely(!ptr)
@@ -440,7 +440,7 @@ NOTHROW(KCALL kmalloc_untrace)(void *ptr) {
 
 
 
-PRIVATE ATTR_NOINLINE NOBLOCK void
+PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_untrace_n_impl)(void *base, size_t num_bytes,
                                       unsigned int n_skip) {
 	uintptr_t endaddr;
@@ -616,7 +616,7 @@ again_while_num_bytes:
  * pre-existing trace-node), that node will be changed such that the given range is marked
  * as untraced, which will prevent the kernel from accessing its contents during GC scans.
  * In practice though, you shouldn't need to concern yourself with this behavior. */
-PUBLIC ATTR_NOINLINE NOBLOCK void
+PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_untrace_n)(void *base, size_t num_bytes) {
 	kmalloc_untrace_n_impl(base, num_bytes, 1);
 }
@@ -636,7 +636,7 @@ NOTHROW(KCALL kmalloc_untrace_n)(void *base, size_t num_bytes) {
  * @return: * :    The total number of traceback PC-locations available for `ptr'
  *                 When `> buflen', not all locations were written to `*tb', and
  *                 the caller should re-attempt the call with more space. */
-PUBLIC ATTR_NOINLINE NOBLOCK size_t
+PUBLIC NOBLOCK ATTR_NOINLINE size_t
 NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
                                  pid_t *p_alloc_roottid) {
 	size_t result;
@@ -674,7 +674,7 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
 
 #if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
 #define HAVE_kmalloc_validate_node
-PRIVATE ATTR_NOINLINE NOBLOCK bool
+PRIVATE NOBLOCK ATTR_NOINLINE bool
 NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
                                      struct trace_node *__restrict node) {
 	unsigned int i;
@@ -733,7 +733,7 @@ done:
 }
 
 
-PRIVATE ATTR_NOINLINE NOBLOCK void
+PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_validate_walktree)(unsigned int n_skip,
                                          struct trace_node *__restrict node) {
 again:
@@ -756,7 +756,7 @@ again:
  * errors, such as array over-/under-runs)
  * If inconsistencies are found, the kernel will panic.
  * s.a. `heap_validate()' and `heap_validate_all()' */
-PUBLIC ATTR_NOINLINE NOBLOCK void
+PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_validate)(void) {
 #if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
 	lock_acquire();
@@ -1872,7 +1872,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 /* Auto-tracing heap functions                                          */
 /************************************************************************/
 
-PUBLIC ATTR_NOINLINE NOBLOCK void
+PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL heap_free)(struct heap *__restrict self,
                          VIRT void *ptr, size_t num_bytes,
                          gfp_t flags) {
@@ -1911,7 +1911,7 @@ return_old_size:
 	return old_size;
 }
 
-PUBLIC ATTR_NOINLINE NOBLOCK WUNUSED size_t
+PUBLIC NOBLOCK ATTR_NOINLINE WUNUSED size_t
 NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	struct trace_node *node;
 	size_t result;
@@ -1971,7 +1971,7 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	return result;
 }
 
-PUBLIC ATTR_NOINLINE NOBLOCK void
+PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	struct heapptr user_area;
 	struct trace_node *node;
@@ -2059,7 +2059,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	trace_node_free(node);
 }
 
-PUBLIC ATTR_NOINLINE NOBLOCK void
+PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	struct heapptr user_area;
 	struct trace_node *node;

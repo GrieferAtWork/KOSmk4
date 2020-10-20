@@ -260,11 +260,11 @@ INTDEF NOBLOCK size_t
 NOTHROW(FCALL AtaBus_HW_GetDmaProgress)(AtaBus *__restrict self);
 
 /* Interrupt handler for ATA BUS controllers. */
-INTDEF NOPREEMPT NOBLOCK bool
+INTDEF NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL AtaBus_HW_InterruptHandler)(AtaBus *__restrict self);
 
 /* Same as `AtaBus_HW_InterruptHandler()', but used if the bus supports DMA */
-INTDEF NOPREEMPT NOBLOCK bool
+INTDEF NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL AtaBus_HW_DmaInterruptHandler)(AtaBus *__restrict self);
 
 /* Return the interrupt handler to use for `AtaBus *self' */
@@ -335,7 +335,7 @@ NOTHROW(FCALL AioHandle_CompleteWithAtaError)(struct aio_handle *__restrict self
                                               AtaError_t error);
 
 /* Complete successfully. */
-INTDEF NOPREEMPT NOBLOCK NONNULL((1)) void
+INTDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL AtaDrive_DmaAioHandle_Complete_NoPR)(struct aio_handle *__restrict self);
 
 

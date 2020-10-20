@@ -79,14 +79,14 @@ NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict se
 	}
 }
 
-FUNDEF NOBLOCK NONNULL((1)) void
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
                                              unsigned int status)
 		ASMNAME("aio_multihandle_generic_func");
-PUBLIC NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL aio_multihandle_generic_func_)(struct aio_multihandle_generic *__restrict self,
                                              unsigned int UNUSED(status)) {
-	sig_broadcast(&self->mg_signal);
+	sig_broadcast_nopr(&self->mg_signal);
 }
 
 

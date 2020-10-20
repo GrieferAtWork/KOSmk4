@@ -85,7 +85,7 @@ NOTHROW(FCALL AtaDrive_DmaAioHandle_CompleteWithError)(struct aio_handle *__rest
 }
 
 /* Complete successfully. */
-INTERN NOPREEMPT NOBLOCK NONNULL((1)) void
+INTERN NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL AtaDrive_DmaAioHandle_Complete_NoPR)(struct aio_handle *__restrict self) {
 	/* Release DMA locks before calling the completion function. */
 	AtaDrive_DmaAioHandle_ReleaseDmaLocks(self);
@@ -97,7 +97,7 @@ NOTHROW(FCALL AtaDrive_DmaAioHandle_Complete_NoPR)(struct aio_handle *__restrict
 
 
 /* Implementation of the `RESTORE_ALL()' function from <kernel/aio.h> */
-PRIVATE NOPREEMPT NOBLOCK NONNULL((1, 2, 3)) void
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) void
 NOTHROW(KCALL AtaBus_RestorePendingAioHandles)(AtaBus *__restrict self,
                                                struct aio_handle *first,
                                                struct aio_handle *last) {
@@ -109,7 +109,7 @@ NOTHROW(KCALL AtaBus_RestorePendingAioHandles)(AtaBus *__restrict self,
 	                             next, first));
 #if 0 /* We have no AIO-avail signal, because we don't use an async-worker! */
 	if (!next)
-		sig_broadcast(&self->d_aio_avail);
+		sig_broadcast_nopr(&self->d_aio_avail);
 #endif
 }
 
@@ -278,7 +278,7 @@ NOTHROW(KCALL AtaBus_TryStartNextDmaOperation)(AtaBus *__restrict self) {
  * removed.
  * @return: true:  `handle' was removed
  * @return: false: `handle' could not be found. */
-PRIVATE NOPREEMPT NOBLOCK bool
+PRIVATE NOBLOCK NOPREEMPT bool
 NOTHROW(KCALL AioHandleChain_RemoveSpecific)(/*in|out*/ struct aio_handle **__restrict pchain,
                                              /*   out*/ struct aio_handle **__restrict pchain_last,
                                              /*in    */ struct aio_handle *__restrict handle) {
@@ -323,7 +323,7 @@ NOTHROW(KCALL AioHandleChain_RemoveSpecific)(/*in|out*/ struct aio_handle **__re
  * The caller must have already cleared the command descriptor of `handle' before
  * calling this function, and preemption must be disabled.
  * HINT: This function implements the `d_aio_pending.REMOVE' operation from <kernel/aio.h> */
-PRIVATE NOPREEMPT NOBLOCK void
+PRIVATE NOBLOCK NOPREEMPT void
 NOTHROW(KCALL AtaBus_RemoveSpecificPendingAioHandle_NoPR)(AtaBus *__restrict self,
                                                           struct aio_handle *__restrict handle) {
 	struct aio_handle *chain, *last;

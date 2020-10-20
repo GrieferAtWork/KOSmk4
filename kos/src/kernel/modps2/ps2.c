@@ -55,7 +55,7 @@ DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_attempts, "attempts_command", 3);
 
 
 /* Probing code from here on... */
-PRIVATE NOBLOCK ATTR_FREETEXT void
+PRIVATE NOBLOCK NOPREEMPT ATTR_FREETEXT void
 NOTHROW(FCALL ps2_probe_process_data)(struct ps2_probe_data *__restrict probe_data,
                                       ps2_portid_t portno, u8 data) {
 	struct ps2_probe_data &port = probe_data[portno];
@@ -109,11 +109,11 @@ handle_resend_or_other:
 	default:
 		break;
 	}
-	sig_broadcast(&port.pd_avail);
+	sig_broadcast_nopr(&port.pd_avail);
 }
 
 
-PRIVATE NOBLOCK ATTR_FREETEXT bool
+PRIVATE NOBLOCK NOPREEMPT ATTR_FREETEXT bool
 NOTHROW(FCALL ps2_probe_handle_interrupt)(void *arg) {
 	u8 data, status = inb(PS2_STATUS);
 	printk(KERN_TRACE "[ps2] ps2_probe_handle_interrupt: %#.2I8x\n", status);

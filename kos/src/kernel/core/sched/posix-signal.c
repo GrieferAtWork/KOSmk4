@@ -255,7 +255,7 @@ STATIC_ASSERT(SIGMASK_ISMASKED_YES == (int)(10 != 0));
  * If any of these steps fail, simply return `SIGMASK_ISMASKED_MAYBE'
  * NOTE: The caller is responsible to ensure that `self->t_cpu == THIS_CPU',
  *       as well as that preemption has been disabled. */
-PRIVATE NOPREEMPT NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
+PRIVATE NOBLOCK NOPREEMPT ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict self,
                                                      signo_t signo) {
 	int result = SIGMASK_ISMASKED_MAYBE;

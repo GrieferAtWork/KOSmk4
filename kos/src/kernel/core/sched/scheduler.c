@@ -825,7 +825,7 @@ do_switch_to_result:
  * so were to cause the run queue to become empty, then the IDLE thread will be added
  * to the run queue, as well as be returned.
  * Note that it is illegal to call this function as the IDLE thread! */
-PUBLIC NOPREEMPT NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
+PUBLIC NOBLOCK NOPREEMPT ATTR_RETNONNULL NONNULL((1, 2)) struct task *
 NOTHROW(FCALL sched_intern_yield_onexit)(struct cpu *__restrict me,
                                          struct task *__restrict caller) {
 	tsc_t tsc_now;
@@ -1109,7 +1109,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(struct timespec const *abs_timeout) {
  * This function is called from arch-specific code as the result of a
  * previously set deadline, and will be invoked no sooner than the point
  * in time when `tsc_get() >= deadline' */
-PUBLIC NOPREEMPT NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
+PUBLIC NOBLOCK NOPREEMPT ATTR_RETNONNULL NONNULL((1, 2)) struct task *
 NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
                                    struct task *__restrict caller,
                                    tsc_t tsc_now) {

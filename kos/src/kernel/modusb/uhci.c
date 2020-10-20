@@ -774,7 +774,7 @@ NOTHROW(FCALL uhci_osqh_aio_docomplete)(struct aio_handle *__restrict aio,
 	}
 }
 
-PRIVATE ATTR_NOINLINE NOBLOCK void
+PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict UNUSED(self),
                                            struct uhci_osqh *__restrict osqh,
                                            error_code_t code,
@@ -916,7 +916,7 @@ do_stop:
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE NOBLOCK unsigned int
+PRIVATE NOBLOCK ATTR_NOINLINE unsigned int
 NOTHROW(FCALL uhci_int_completed_ioerror)(struct uhci_interrupt *__restrict ui,
                                           void const *data, size_t datalen,
                                           error_code_t code,
@@ -1407,7 +1407,7 @@ do_try_write:
 }
 
 
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	u16 status, ack;
 	struct uhci_controller *self;
@@ -1477,7 +1477,7 @@ done_tdint:
 		UHCI_DEBUG(KERN_TRACE "[usb][pci:%I32p,io:%#Ix] uhci:Resume-Detect (status=%#I8x)\n",
 		           self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
 		if (!(ATOMIC_FETCHOR(self->uc_flags, UHCI_CONTROLLER_FLAG_RESDECT) & UHCI_CONTROLLER_FLAG_RESDECT))
-			sig_broadcast(&self->uc_resdec);
+			sig_broadcast_nopr(&self->uc_resdec);
 		uhci_wrw(self, UHCI_USBSTS, UHCI_USBSTS_RD);
 		ack |= UHCI_USBSTS_RD;
 	}

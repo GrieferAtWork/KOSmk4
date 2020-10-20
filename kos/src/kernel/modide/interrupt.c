@@ -36,7 +36,7 @@
 DECL_BEGIN
 
 /* Handle an unexpected ATA interrupt. */
-PRIVATE NOPREEMPT NOBLOCK bool
+PRIVATE NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL AtaBus_HW_UnexpectedInterrupt)(AtaBus *__restrict self) {
 	printk(KERN_WARNING "[ata] Unexpected IDE interrupt ("
 	                    "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","
@@ -47,7 +47,7 @@ NOTHROW(FCALL AtaBus_HW_UnexpectedInterrupt)(AtaBus *__restrict self) {
 }
 
 /* Same as `AtaBus_HW_InterruptHandler()', but used if the bus supports DMA */
-INTERN NOPREEMPT NOBLOCK bool
+INTERN NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL AtaBus_HW_DmaInterruptHandler)(AtaBus *__restrict self) {
 	u8 status, dma_status;
 	dma_status = inb(self->ab_dmaio + DMA_PRIMARY_STATUS);
@@ -96,7 +96,7 @@ NOTHROW(FCALL AtaBus_HW_DmaInterruptHandler)(AtaBus *__restrict self) {
 
 	case ATA_BUS_STATE_INPIO:
 		/* Broadcast the bus status. */
-		sig_altbroadcast(&self->ab_piointr, ATA_PIOINTR_ALT_ENCODE(status));
+		sig_altbroadcast_nopr(&self->ab_piointr, ATA_PIOINTR_ALT_ENCODE(status));
 		break;
 
 	default:
@@ -106,7 +106,7 @@ NOTHROW(FCALL AtaBus_HW_DmaInterruptHandler)(AtaBus *__restrict self) {
 }
 
 /* Interrupt handler for ATA BUS controllers. */
-INTERN NOPREEMPT NOBLOCK bool
+INTERN NOBLOCK NOPREEMPT bool
 NOTHROW(FCALL AtaBus_HW_InterruptHandler)(AtaBus *__restrict self) {
 	u8 status;
 	/* BUS without DMA support */

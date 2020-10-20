@@ -70,12 +70,12 @@ PRIVATE ATTR_COLDBSS WEAK unsigned int super_override_ack = 0;
  * >> if (FORCPU(me, thiscpu_sched_current) != THIS_TASK)
  * >>     return CPU_IPI_MODE_SWITCH_TASKS;
  * >> return state; */
-INTDEF NOPREEMPT NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
+INTDEF NOBLOCK NOPREEMPT ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
 NOTHROW(FCALL arch_sched_super_override_ipi)(struct icpustate *__restrict state,
                                              void *args[CPU_IPI_ARGCOUNT]);
 
 /* Callback invoked by `arch_sched_super_override_ipi()' */
-INTERN ATTR_COLDTEXT NOPREEMPT NOBLOCK ATTR_COLDTEXT void
+INTERN ATTR_COLDTEXT NOBLOCK NOPREEMPT ATTR_COLDTEXT void
 NOTHROW(FCALL sched_super_override_ipi)(void) {
 	struct task_connections cons;
 

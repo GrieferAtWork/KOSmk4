@@ -117,7 +117,7 @@ do128:
  * relative error with the kernel's TSC-based idea of what realtime
  * should be.
  * @param: new_ktime: The new RTC time (as returned by `tsc_resync_realtime()') */
-PUBLIC NOPREEMPT NOBLOCK void
+PUBLIC NOBLOCK NOPREEMPT void
 NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	struct cpu *me = THIS_CPU;
 	struct timestamp now;
@@ -302,7 +302,7 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 
 /* Perform the initial TSC resync for the calling CPU.
  * This function will also calculate and set the initial TSC deadline. */
-PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL tsc_resync_init)(struct cpu *__restrict me) {
 	struct timestamp ts;
 	COMPILER_BARRIER();
@@ -406,7 +406,7 @@ NOTHROW(FCALL tsc_to_ktime)(struct cpu const *__restrict me,
  *          will result in an infinite loop caused by printk
  *          calling realtime()->ktime()->tsc_now_to_ktime()->tsc_fix_overflow()
  */
-PRIVATE NOPREEMPT NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL tsc_fix_overflow)(struct cpu *__restrict me,
                                 tsc_t tsc_elapsed) {
 	ktime_t seconds;

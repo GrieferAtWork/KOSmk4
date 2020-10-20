@@ -171,7 +171,7 @@ DECL_BEGIN
 
 
 #ifdef HYBRID_PAGING_MODE
-LOCAL ATTR_FREETEXT NOBLOCK void
+LOCAL NOBLOCK ATTR_FREETEXT void
 NOTHROW(FCALL pagedir_install_jmp)(void *redirection_addr,
                                    void const *redirection_target) {
 	byte_t *dst = (byte_t *)redirection_addr;

@@ -410,7 +410,7 @@ END(cpu_run_current_nopr)
 
 #ifndef CONFIG_NO_SMP
 .section .text.cold
-/* >> INTDEF NOPREEMPT NOBLOCK ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
+/* >> INTDEF NOBLOCK NOPREEMPT ATTR_COLDTEXT NONNULL((1, 2)) struct icpustate *
  * >> NOTHROW(FCALL arch_sched_super_override_ipi)(struct icpustate *__restrict state,
  * >>                                              void *args[CPU_IPI_ARGCOUNT]);  */
 INTERN_FUNCTION(arch_sched_super_override_ipi)

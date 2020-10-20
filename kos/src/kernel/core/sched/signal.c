@@ -29,6 +29,7 @@
 #include <kernel/printk.h>
 #include <kernel/selftest.h> /* DEFINE_TEST */
 #include <sched/rpc.h>
+#include <sched/signal-completion.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
@@ -336,7 +337,7 @@ task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 }
 
 /* Remove `con' from the linked list of active connections of `self'. */
-LOCAL NOPREEMPT NOBLOCK NONNULL((1, 2)) void
+LOCAL NOBLOCK NOPREEMPT NONNULL((1, 2)) void
 NOTHROW(FCALL task_connection_unlink_from_sig)(struct sig *__restrict self,
                                                struct task_connection *__restrict con) {
 	struct task_connection *chain;
@@ -382,7 +383,7 @@ again:
 #define task_connection_unlink_from_sig_and_unlock(self, con) \
 	task_connection_unlink_from_sig(self, con)
 #else /* SIG_CONTROL_SMPLOCK == 0 */
-LOCAL NOPREEMPT NOBLOCK NONNULL((1, 2)) void
+LOCAL NOBLOCK NOPREEMPT NONNULL((1, 2)) void
 NOTHROW(FCALL task_connection_unlink_from_sig_and_unlock)(struct sig *__restrict self,
                                                           struct task_connection *__restrict con) {
 	struct task_connection *chain;
@@ -477,7 +478,7 @@ NOTHROW(FCALL sig_completion_chain_phase_2)(struct sig_completion *sc_pending,
 
 
 
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2, 3, 5)) size_t
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) size_t
 NOTHROW(FCALL sig_broadcast_as_destroylater_with_initial_completion_nopr)(struct sig *self, struct task *__restrict sender_thread,
                                                                           struct sig *sender, struct sig_completion *sc_pending,
                                                                           struct task **__restrict pdestroy_later) {
@@ -603,7 +604,7 @@ again_read_target_cons:
 }
 
 /* NOTE: This function will restore preemption behave, as specified by `was' */
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2, 3)) size_t
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) size_t
 NOTHROW(FCALL sig_broadcast_as_with_initial_completion_nopr)(struct sig *self, struct task *__restrict sender_thread,
                                                              struct sig *sender, pflag_t was,
                                                              struct sig_completion *sc_pending) {
@@ -616,7 +617,7 @@ NOTHROW(FCALL sig_broadcast_as_with_initial_completion_nopr)(struct sig *self, s
 	return result;
 }
 
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2, 3, 5)) size_t
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) size_t
 NOTHROW(FCALL sig_broadcast_as_with_initial_destroylater_nopr)(struct sig *self, struct task *__restrict sender_thread,
                                                                struct sig *sender, pflag_t was, struct task *destroy_later) {
 	size_t result;
@@ -628,7 +629,7 @@ NOTHROW(FCALL sig_broadcast_as_with_initial_destroylater_nopr)(struct sig *self,
 	return result;
 }
 
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
 NOTHROW(FCALL sig_send_as_destroylater_with_initial_completion_nopr)(struct sig *self, struct task *__restrict sender_thread,
                                                                      struct sig *sender, struct sig_completion *sc_pending,
                                                                      struct task **__restrict pdestroy_later) {
@@ -816,7 +817,7 @@ success:
 	return true;
 }
 
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2, 3)) bool
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) bool
 NOTHROW(FCALL sig_send_as_with_initial_completion_nopr)(struct sig *self, struct task *__restrict sender_thread,
                                                         struct sig *sender, struct sig_completion *sc_pending, pflag_t was) {
 	bool result;
@@ -828,7 +829,7 @@ NOTHROW(FCALL sig_send_as_with_initial_completion_nopr)(struct sig *self, struct
 	return result;
 }
 
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
 NOTHROW(FCALL sig_send_as_with_initial_destroylater_nopr)(struct sig *self, struct task *__restrict sender_thread,
                                                           struct sig *sender, pflag_t was, struct task *destroy_later) {
 	bool result;
@@ -845,7 +846,7 @@ NOTHROW(FCALL sig_send_as_with_initial_destroylater_nopr)(struct sig *self, stru
 
 /* Try to send the signal to a single, other thread, for the purpose
  * of forwarding. Additionally, release the SMP-lock of `self' */
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2)) bool
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
                                                      struct sig *sender,
                                                      pflag_t was) {
@@ -1517,7 +1518,7 @@ task_connect_for_poll(struct sig *__restrict target) /*THROWS(E_BADALLOC)*/ {
 
 
 /* Remove `con' from the linked list of active connections of `self'. */
-LOCAL NOPREEMPT NOBLOCK NONNULL((1, 2)) void
+LOCAL NOBLOCK NOPREEMPT NONNULL((1, 2)) void
 NOTHROW(FCALL task_connection_unlink_from_sig)(struct sig *__restrict self,
                                                struct task_connection *__restrict con) {
 	struct task_connection *chain;
@@ -1563,7 +1564,7 @@ again:
 #define task_connection_unlink_from_sig_and_unlock(self, con) \
 	task_connection_unlink_from_sig(self, con)
 #else /* SIG_CONTROL_SMPLOCK == 0 */
-LOCAL NOPREEMPT NOBLOCK NONNULL((1, 2)) void
+LOCAL NOBLOCK NOPREEMPT NONNULL((1, 2)) void
 NOTHROW(FCALL task_connection_unlink_from_sig_and_unlock)(struct sig *__restrict self,
                                                           struct task_connection *__restrict con) {
 	struct task_connection *chain;
@@ -1608,7 +1609,7 @@ again:
 
 /* Try to send the signal to a single, other thread, for the purpose
  * of forwarding. Additionally, release the SMP-lock of `self' */
-PRIVATE NOPREEMPT NOBLOCK ATTR_NOINLINE NONNULL((1, 2)) bool
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2)) bool
 NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
                                                      struct sig *sender) {
 	bool is_broadcasting_poll = false;
@@ -1967,6 +1968,35 @@ NOTHROW(FCALL sig_altsendmany)(struct sig *self,
 	return result;
 }
 
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) size_t
+NOTHROW(FCALL sig_sendmany_nopr)(struct sig *__restrict self,
+                                 size_t maxcount) {
+	size_t result = 0;
+	while (maxcount) {
+		if (!sig_send_nopr(self))
+			break;
+		--maxcount;
+		++result;
+	}
+	return result;
+}
+
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
+NOTHROW(FCALL sig_altsendmany_nopr)(struct sig *self,
+                                    struct sig *sender,
+                                    size_t maxcount) {
+	size_t result = 0;
+	while (maxcount) {
+		if (!sig_altsend_nopr(self, sender))
+			break;
+		--maxcount;
+		++result;
+	}
+	return result;
+}
+
+
+
 #ifdef DEFINE_TEST
 DEFINE_TEST(recursive_signals) {
 	struct task_connections cons;
@@ -2007,19 +2037,34 @@ DECL_END
 #define DEFINE_sig_send 1
 #include "signal-send.c.inl"
 
+#define DEFINE_sig_send_nopr 1
+#include "signal-send.c.inl"
+
 #define DEFINE_sig_altsend 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_altsend_nopr 1
 #include "signal-send.c.inl"
 
 #define DEFINE_sig_broadcast 1
 #include "signal-send.c.inl"
 
+#define DEFINE_sig_broadcast_nopr 1
+#include "signal-send.c.inl"
+
 #define DEFINE_sig_altbroadcast 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_altbroadcast_nopr 1
 #include "signal-send.c.inl"
 
 #define DEFINE_sig_broadcast_as_nopr 1
 #include "signal-send.c.inl"
 
 #define DEFINE_sig_broadcast_destroylater_nopr 1
+#include "signal-send.c.inl"
+
+#define DEFINE_sig_broadcast_as_destroylater_nopr 1
 #include "signal-send.c.inl"
 
 #define DEFINE_task_waitfor 1

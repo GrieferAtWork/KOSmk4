@@ -78,7 +78,7 @@ DATDEF ATTR_PERCPU tsc_hz_t thiscpu_tsc_hzmax;
  * booted, or more precisely: some point in time during before the
  * CPU completed its low-level, arch-specific startup initialization.
  * This function may only be called with preemption disabled. */
-FUNDEF NOPREEMPT NOBLOCK WUNUSED NONNULL((1)) tsc_t
+FUNDEF NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
 NOTHROW(FCALL tsc_get)(struct cpu *__restrict me);
 
 /* Set the TSC deadline, that is: the point in time when `tsc_interrupt()'
@@ -91,7 +91,7 @@ NOTHROW(FCALL tsc_get)(struct cpu *__restrict me);
  * @return: * :          The timestamp at the time of the deadline being set.
  * @return: >= deadline: The given `deadline' has already expired.
  * @return: < deadline:  Successfully set the new deadline. */
-FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) tsc_t
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) tsc_t
 NOTHROW(FCALL tsc_deadline)(struct cpu *__restrict me,
                             tsc_t deadline);
 
@@ -103,7 +103,7 @@ NOTHROW(FCALL tsc_getdeadline)(struct cpu *__restrict me);
  * very least: won't trigger until in a couple of months or something
  * like that...)
  * After this function is called, `tsc_getdeadline()' will return `TSC_MAX' */
-FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) void
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me);
 
 /* Interrupt handler callback for `tsc_deadline()'.
@@ -113,7 +113,7 @@ NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me);
  * @return: * : The new thread to which to switch contexts.
  *              The caller is responsible to assign this thread
  *              to `FORCPU(me, thiscpu_sched_current)' * */
-FUNDEF NOPREEMPT NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
+FUNDEF NOBLOCK NOPREEMPT ATTR_RETNONNULL NONNULL((1, 2)) struct task *
 NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
                                    struct task *__restrict caller,
                                    tsc_t now);
@@ -125,19 +125,19 @@ NOTHROW(FCALL tsc_deadline_passed)(struct cpu *__restrict me,
  * relative error with the kernel's TSC-based idea of what realtime
  * should be.
  * @param: new_ktime: The new RTC time (as returned by `tsc_resync_realtime()') */
-FUNDEF NOPREEMPT NOBLOCK void
+FUNDEF NOBLOCK NOPREEMPT void
 NOTHROW(FCALL tsc_resync_interrupt)(ktime_t new_ktime);
 
 /* Perform the initial TSC resync for the calling CPU.
  * This function will also calculate and set the initial TSC deadline.*/
-FUNDEF NOPREEMPT NOBLOCK NONNULL((1)) void
+FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL tsc_resync_init)(struct cpu *__restrict me);
 
 /* Retrieve the current realtime, as read from an external clock source.
  * This function's implementation is arch-specific, and should only be
  * called from within `tsc_resync_interrupt()' in order to determine the
  * actual current realtime timestamp. */
-FUNDEF NOPREEMPT NOBLOCK ktime_t NOTHROW(FCALL tsc_resync_realtime)(void);
+FUNDEF NOBLOCK NOPREEMPT ktime_t NOTHROW(FCALL tsc_resync_realtime)(void);
 
 /* The max error by which `tsc_resync_realtime()' may be off. */
 DATDEF ktime_t const tsc_realtime_err;

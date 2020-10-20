@@ -102,7 +102,7 @@ x86_syslog_printer(void *UNUSED(ignored_arg),
 	return (ssize_t)datalen;
 }
 
-PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) size_t FCALL
+PRIVATE NOBLOCK ATTR_NOINLINE NONNULL((1)) size_t FCALL
 syslog_alloca_buffer(/*utf-8*/ char const *__restrict format,
                      va_list args) {
 	size_t avail = get_stack_avail();

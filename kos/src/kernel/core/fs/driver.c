@@ -1239,14 +1239,14 @@ PUBLIC struct driver kernel_driver = {
 };
 
 
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT void
+PRIVATE ATTR_FREETEXT ATTR_NOINLINE void
 NOTHROW(KCALL malformed_argument)(char const *__restrict optname,
                                   char const *__restrict argstr) {
 	kernel_panic(FREESTR("Malformed commandline argument for %q: %q"),
 	             optname, argstr);
 }
 
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT void
+PRIVATE ATTR_FREETEXT ATTR_NOINLINE void
 NOTHROW(KCALL initialize_cmdline)(struct kernel_commandline_option const *start,
                                   struct kernel_commandline_option const *end) {
 	size_t i;

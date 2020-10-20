@@ -342,7 +342,7 @@ INTERN ATTR_PERCPU tsc_t thiscpu_x86_last_tsc = 0;
  * booted, or more precisely: some point in time during before the
  * CPU completed its low-level, arch-specific startup initialization.
  * This function may only be called with preemption disabled. */
-PUBLIC NOPREEMPT NOBLOCK WUNUSED NONNULL((1)) tsc_t
+PUBLIC NOBLOCK NOPREEMPT WUNUSED NONNULL((1)) tsc_t
 NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
 	tsc_t result;
 	u64 tscbase;
@@ -378,7 +378,7 @@ NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
 /* Disable the TSC deadline, such that it will never trigger (or at the
  * very least: won't trigger until in a couple of months or something
  * like that...) */
-PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) void
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) void
 NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
 	u32 current_reg;
 	u32 old_current_reg;
@@ -466,7 +466,7 @@ again_with_timer:
  * @return: * :          The timestamp at the time of the deadline being set.
  * @return: >= deadline: The given `deadline' has already expired.
  * @return: < deadline:  Successfully set the new deadline. */
-PUBLIC NOPREEMPT NOBLOCK NONNULL((1)) tsc_t
+PUBLIC NOBLOCK NOPREEMPT NONNULL((1)) tsc_t
 NOTHROW(FCALL tsc_deadline)(struct cpu *__restrict me,
                             tsc_t deadline) {
 	u32 current;
@@ -653,7 +653,7 @@ STATIC_ASSERT_MSG(PIT_HZ_DIV(X86_TSC_CALIBRATE_DELAY_HZ) <= UINT16_MAX,
 /* (Re-)calibrate `thiscpu_tsc_hz' for the calling CPU.
  * This function is arch-specific and called once for each CPU during bootup.
  * NOTE: This function is only called when `X86_HAVE_LAPIC == true' */
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT NOPREEMPT NOBLOCK WUNUSED tsc_hz_t
+PRIVATE NOBLOCK NOPREEMPT ATTR_FREETEXT ATTR_NOINLINE WUNUSED tsc_hz_t
 NOTHROW(FCALL x86_tsc_calibrate_hz_cali)(void) {
 	u32 remaining;
 	tsc_hz_t result;
@@ -735,7 +735,7 @@ again_calibrate:
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT NOPREEMPT NOBLOCK WUNUSED tsc_hz_t
+PRIVATE NOBLOCK NOPREEMPT ATTR_FREETEXT ATTR_NOINLINE WUNUSED tsc_hz_t
 NOTHROW(FCALL x86_tsc_calibrate_hz_offs)(void) {
 	u32 remaining;
 	tsc_hz_t result;
@@ -777,7 +777,7 @@ NOTHROW(FCALL x86_tsc_calibrate_hz_offs)(void) {
 	return result;
 }
 
-PRIVATE ATTR_NOINLINE ATTR_FREETEXT NOPREEMPT NOBLOCK WUNUSED tsc_hz_t
+PRIVATE NOBLOCK NOPREEMPT ATTR_FREETEXT ATTR_NOINLINE WUNUSED tsc_hz_t
 NOTHROW(FCALL x86_tsc_calibrate_hz)(void) {
 	tsc_hz_t result;
 	/* Do the initial calibration. */

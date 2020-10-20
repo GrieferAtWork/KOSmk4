@@ -215,7 +215,7 @@ PUBLIC_CONST ktime_t const tsc_realtime_err = NSEC_PER_SEC; /* 1 second */
  * This function's implementation is arch-specific, and should only be
  * called from within `tsc_resync_interrupt()' in order to determine the
  * actual current realtime timestamp. */
-PUBLIC NOPREEMPT NOBLOCK ktime_t NOTHROW(FCALL tsc_resync_realtime)(void) {
+PUBLIC NOBLOCK NOPREEMPT ktime_t NOTHROW(FCALL tsc_resync_realtime)(void) {
 	return (ktime_t)(cmos_gettime(true) - boottime.tv_sec) * NSEC_PER_SEC;
 }
 
@@ -280,7 +280,7 @@ NOTHROW(FCALL cmos_resync_ipi)(struct icpustate *__restrict state,
 }
 #endif /* !CONFIG_NO_SMP */
 
-INTERN NOPREEMPT NOBLOCK void
+INTERN NOBLOCK NOPREEMPT void
 NOTHROW(KCALL x86_cmos_interrupt)(void) {
 	time_t cmos_now, then;
 	ktime_t now;

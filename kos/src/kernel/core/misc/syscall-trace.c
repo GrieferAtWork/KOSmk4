@@ -256,7 +256,7 @@ again_insert:
 
 
 
-PRIVATE ATTR_NOINLINE NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK ATTR_NOINLINE NONNULL((1)) void
 NOTHROW(FCALL sct_table_truncate)(struct sct_table_struct *old_table)  {
 	size_t i, new_count;
 	struct sct_table_struct *new_table;

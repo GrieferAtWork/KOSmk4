@@ -46,7 +46,7 @@
 DECL_BEGIN
 
 
-PUBLIC NOBLOCK bool
+PUBLIC NOBLOCK NOPREEMPT bool
 NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
                                            mouse_packet_t packet) {
 	union mouse_buffer_state oldstate, newstate;
@@ -79,7 +79,7 @@ NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mouse_buffer *__restrict self,
 #endif /* !NDEBUG */
 	}
 	/* Send the signal for every packet enqueued. */
-	sig_send(&self->mb_avail);
+	sig_send_nopr(&self->mb_avail);
 	return true;
 }
 

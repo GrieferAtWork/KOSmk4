@@ -1179,7 +1179,7 @@ NOTHROW(KCALL isr_vector_trigger_impl)(size_t index) {
 
 /* Trigger the given ISR vector, returning true if any handler returned
  * true, or if a greedy handler was defined. Otherwise, return `false'. */
-PUBLIC ATTR_NOINLINE NOBLOCK bool
+PUBLIC NOBLOCK ATTR_NOINLINE bool
 NOTHROW(KCALL isr_vector_trigger)(isr_vector_t vector) {
 	assert(!PREEMPTION_ENABLED());
 	if unlikely_untraced(!ISR_VECTOR_IS_VALID(vector))
