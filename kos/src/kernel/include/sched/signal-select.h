@@ -28,11 +28,11 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* Signal types for `struct sig_select_context::ssc_type' */
+/* Connection types for `struct sig_select_context::ssc_type' */
 #define SIG_SELECT_TYPE_THREAD     0 /* Connection is bound to a thread. */
 #define SIG_SELECT_TYPE_COMPLETION 1 /* Connection is bound to a completion callback. */
 
-/* Signal flags for `struct sig_select_context::ssc_flag' */
+/* Connection flags for `struct sig_select_context::ssc_flag' */
 #define SIG_SELECT_FLAG_NORMAL  0                          /* Normal flags. */
 #define SIG_SELECT_FLAG_FORPOLL TASK_CONNECTION_STAT_FPOLL /* Poll-based connection. */
 
