@@ -101,7 +101,11 @@ struct epoll_controller {
  * >>     sig_send(&self->ec_avail);
  * >>     decref_unlikely(self);
  * >> }
- * >>
+ *
+ * NOTE: Inside of `epoll_wait(2)', code will check the list of raised
+ *       monitors and check if they are still ready then. This check can
+ *       be skipped by employing `EPOLLET', meaning that past rising edge
+ *       events can still be detected by looking at 
  */
 
 

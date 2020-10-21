@@ -72,10 +72,6 @@ struct sig_completion_context {
 	                                         * back to the shared buffer and eventually inherited by a second
 	                                         * stage callback pointed to by this field. For an example of this,
 	                                         * look at the example code at the bottom of this file. */
-	REF struct task     *scc_destroy_later; /* [0..1] Chain of threads to-be destroyed later
-	                                         * s.a. `sig_broadcast_destroylater_nopr()'
-	                                         * WARNING: This pointer is only valid during execution of `sig_postcompletion_t()'
-	                                         *          It is not valid during `sig_completion_t()'! */
 };
 
 

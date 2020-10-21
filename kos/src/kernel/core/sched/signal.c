@@ -56,6 +56,9 @@
 #define DBG_memset(ptr, byte, num_bytes) memset(ptr, byte, num_bytes)
 #endif /* !NDEBUG */
 
+/* Internal key used to chain threads that have to be destroyed. */
+#define sig_destroylater_next(thread) KEY_task_vm_dead__next(thread)
+
 DECL_BEGIN
 
 /* Root connections set. */
@@ -465,8 +468,6 @@ struct sig_post_completion {
 	do {                                                           \
 		size_t _pc_reqlen;                                         \
 		(context)->scc_post = NULL;                                \
-		DBG_memset(&(context)->scc_destroy_later, 0xcc,            \
-		           sizeof((context)->scc_destroy_later));          \
 		_pc_reqlen = (*(sc)->sc_cb)(sc, context, NULL, 0);         \
 		if ((context)->scc_post != NULL) {                         \
 			struct sig_post_completion *_pc_ent;                   \
@@ -499,15 +500,10 @@ struct sig_post_completion {
 /* Trigger phase #2 for pending signal-completion functions.
  * NOTE: During this, the completion callback will clear the
  *       SMP lock bit of its own completion controller. */
-#define sig_run_phase_2(chain, context, pdestroy_later)       \
-	do {                                                      \
-		if (chain) {                                          \
-			(context)->scc_destroy_later = *(pdestroy_later); \
-			do {                                              \
-				(*chain->spc_cb)(context, chain->spc_buf);    \
-			} while ((chain = chain->spc_next) != NULL);      \
-			*(pdestroy_later) = (context)->scc_destroy_later; \
-		}                                                     \
+#define sig_run_phase_2(chain, context)                \
+	do {                                               \
+		for (; chain; chain = chain->spc_next)         \
+			(*chain->spc_cb)(context, chain->spc_buf); \
 	}	__WHILE0
 
 
@@ -529,14 +525,40 @@ NOTHROW(FCALL sig_unlock_pending)(struct sig_completion *sc_pending) {
 #endif /* CONFIG_NO_SMP */
 
 
-
-PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) size_t
-NOTHROW(FCALL sig_broadcast_as_destroylater_with_initial_completion_nopr)(struct sig *self,
-                                                                          struct task *__restrict sender_thread,
-                                                                          struct sig *sender,
-                                                                          struct sig_completion *sc_pending,
-                                                                          struct task **__restrict pdestroy_later,
-                                                                          uintptr_t phase_one_state) {
+/* Internal, extended signal broadcast function:
+ *   #1: Perform a broadcast, alongside a number of optional, additional actions
+ *   #2: Release all internal SMP-locks
+ *   #3: Invoke `cleanup' (if non-NULL)
+ *   #4: Restore the preemption behavior according to `was'
+ *   #5: Destroy all threads who's reference counters dropped to 0 in the mean time
+ *   #6: Invoke phase-2 completion callbacks, as have been registered by completion functions
+ *   #7: Return the # of non-polling connections to which the signal was delivered
+ * @param: self:            [1..1] The signal to broadcast
+ * @param: sender:          [1..1] The sending signal (s.a. `sig_altbroadcast()')
+ * @param: caller:          [1..1] The sending thread (s.a. `sig_broadcast_as()')
+ * @param: sc_pending:      [0..1] When non-NULL, invoke this completion function,
+ *                                 and remember it as having been invoked.
+ * @param: destroy_later:   [0..1] A chain of threads that must be destroyed during step #5
+ *                                 This chain uses `sig_destroylater_next()' for links.
+ * @param: cleanup:         [0..1] When non-NULL, invoke this callback during step #3
+ * @param: phase_one_state:        The state that must be written to sig_completion descriptors
+ *                                 prior to invocation of their phase-1 callback. Should be one of:
+ *                                  - TASK_CONNECTION_STAT_BROADCAST | TASK_CONNECTION_STAT_FLOCK_OPT | TASK_CONNECTION_STAT_FFINI
+ *                                  - TASK_CONNECTION_STAT_BROADCAST | TASK_CONNECTION_STAT_FLOCK_OPT
+ *                                 When `TASK_CONNECTION_STAT_FFINI' is set, this will prevent the
+ *                                 completion function from repriming itself (s.a. `sig_broadcast_for_fini()')
+ * @param: was:                    The preemption-enabled state to restore during step #4
+ * @return: * :                    The # of (additional, non-poll) connections that received the signal.
+ *                                 Does not include `sc_pending' when that one is non-NULL. */
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3)) size_t
+NOTHROW(FCALL sig_intern_broadcast)(struct sig *self,
+                                    struct sig *sender,
+                                    struct task *__restrict caller,
+                                    struct sig_completion *sc_pending,
+                                    struct task *destroy_later,
+                                    struct sig_cleanup_callback *cleanup,
+                                    uintptr_t phase_one_state,
+                                    pflag_t was) {
 	uintptr_t ctl;
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
@@ -546,13 +568,12 @@ NOTHROW(FCALL sig_broadcast_as_destroylater_with_initial_completion_nopr)(struct
 	size_t result = 0;
 	/* Signal completion callback. */
 	context.scc_sender = sender;
-	context.scc_caller = sender_thread;
+	context.scc_caller = caller;
 	if (sc_pending) {
 		ATOMIC_WRITE(sc_pending->tc_stat, phase_one_state);
 		assert(sc_pending->tc_sig == self);
 		invoke_sig_completion(&phase2, sc_pending, &context);
 		sc_pending->tc_connext = NULL;
-		++result;
 	}
 again:
 	ctl = ATOMIC_READ(self->s_ctl);
@@ -572,7 +593,11 @@ no_cons:
 		 * NOTE: During this, the completion callback will clear the
 		 *       SMP lock bit of its own completion controller. */
 		sig_unlock_pending(sc_pending);
-		sig_run_phase_2(phase2, &context, pdestroy_later);
+		if (cleanup)
+			(*cleanup->scc_cb)(cleanup);
+		PREEMPTION_POP(was);
+		destroy_tasks(destroy_later);
+		sig_run_phase_2(phase2, &context);
 		return result;
 	}
 	if (!is_connection_is_chain(sc_pending, con)) {
@@ -647,11 +672,11 @@ again_read_target_cons:
 			thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
 			ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 			if likely(thread) {
-				task_wake_as(thread, sender_thread);
+				task_wake_as(thread, caller);
 				assert(thread->t_refcnt >= 1);
 				if unlikely(ATOMIC_FETCHDEC(thread->t_refcnt) == 1) {
-					sig_destroylater_next(thread) = *pdestroy_later;
-					*pdestroy_later               = thread;
+					sig_destroylater_next(thread) = destroy_later;
+					destroy_later                 = thread;
 				}
 			}
 		}
@@ -659,53 +684,15 @@ again_read_target_cons:
 	goto again;
 }
 
-/* NOTE: This function will restore preemption behave, as specified by `was' */
-PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
-NOTHROW(FCALL sig_broadcast_as_with_initial_completion_nopr)(struct sig *self,
-                                                             struct task *__restrict sender_thread,
-                                                             struct sig *sender,
-                                                             pflag_t was,
-                                                             struct sig_completion *sc_pending,
-                                                             uintptr_t phase_one_state) {
-	struct task *destroy_later = NULL;
-	size_t result;
-	result = sig_broadcast_as_destroylater_with_initial_completion_nopr(self,
-	                                                                    sender_thread,
-	                                                                    sender,
-	                                                                    sc_pending,
-	                                                                    &destroy_later,
-	                                                                    phase_one_state);
-	PREEMPTION_POP(was);
-	destroy_tasks(destroy_later);
-	return result;
-}
-
-PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 5)) size_t
-NOTHROW(FCALL sig_broadcast_as_with_initial_destroylater_nopr)(struct sig *self,
-                                                               struct task *__restrict sender_thread,
-                                                               struct sig *sender,
-                                                               pflag_t was,
-                                                               struct task *destroy_later,
-                                                               uintptr_t phase_one_state) {
-	size_t result;
-	sig_destroylater_next(destroy_later) = NULL;
-	result = sig_broadcast_as_destroylater_with_initial_completion_nopr(self,
-	                                                                    sender_thread,
-	                                                                    sender,
-	                                                                    NULL,
-	                                                                    &destroy_later,
-	                                                                    phase_one_state);
-	PREEMPTION_POP(was);
-	destroy_tasks(destroy_later);
-	return result;
-}
-
 PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 5)) bool
-NOTHROW(FCALL sig_send_as_destroylater_with_initial_completion_nopr)(struct sig *self,
-                                                                     struct task *__restrict sender_thread,
-                                                                     struct sig *sender,
-                                                                     struct sig_completion *sc_pending,
-                                                                     struct task **__restrict pdestroy_later) {
+NOTHROW(FCALL sig_intern_send)(struct sig *self,
+                               struct sig *sender,
+                               struct task *__restrict caller,
+                               struct sig_completion *sc_pending,
+                               struct task *destroy_later,
+                               struct sig_cleanup_callback *cleanup,
+                               pflag_t was) {
+	bool result;
 	uintptr_t ctl;
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
@@ -713,7 +700,7 @@ NOTHROW(FCALL sig_send_as_destroylater_with_initial_completion_nopr)(struct sig 
 	struct task_connection *receiver;
 	struct task_connection *con;
 	context.scc_sender = sender;
-	context.scc_caller = sender_thread;
+	context.scc_caller = caller;
 	/* Signal completion callback. */
 	if (sc_pending) {
 		invoke_sig_completion(&phase2, sc_pending, &context);
@@ -735,9 +722,8 @@ again:
 		/* Trigger phase #2 for pending signal-completion functions.
 		 * NOTE: During this, the completion callback will clear the
 		 *       SMP lock bit of its own completion controller. */
-		sig_unlock_pending(sc_pending);
-		sig_run_phase_2(phase2, &context, pdestroy_later);
-		return false;
+		result = false;
+		goto done;
 	}
 	/* Find a suitable candidate:
 	 *    During send:
@@ -838,12 +824,12 @@ again_read_target_cons:
 		/* Unlock the connection. */
 		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 		if (thread) {
-			task_wake_as(thread, sender_thread);
+			task_wake_as(thread, caller);
 			/* Only destroy dead threads _after_ we've released the SMP-lock to `self' */
 			assert(thread->t_refcnt >= 1);
 			if unlikely(ATOMIC_FETCHDEC(thread->t_refcnt) == 1) {
-				sig_destroylater_next(thread) = *pdestroy_later;
-				*pdestroy_later = thread;
+				sig_destroylater_next(thread) = destroy_later;
+				destroy_later                 = thread;
 			}
 		}
 		goto again;
@@ -871,69 +857,39 @@ again_read_target_cons:
 		sig_smplock_release_nopr(self);
 		/* Wake-up the thread. */
 		if likely(thread) {
-			task_wake_as(thread, sender_thread);
+			task_wake_as(thread, caller);
 			/* Only destroy dead threads _after_ we've released the SMP-lock to `self' */
 			assert(thread->t_refcnt >= 1);
 			if unlikely(ATOMIC_FETCHDEC(thread->t_refcnt) == 1) {
-				sig_destroylater_next(thread) = *pdestroy_later;
-				*pdestroy_later = thread;
+				sig_destroylater_next(thread) = destroy_later;
+				destroy_later                 = thread;
 			}
 		}
 	}
 success:
+	result = true;
+done:
 	/* Trigger phase #2 for all of the pending completion function. */
 	sig_unlock_pending(sc_pending);
-	sig_run_phase_2(phase2, &context, pdestroy_later);
-	return true;
-}
-
-PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) bool
-NOTHROW(FCALL sig_send_as_with_initial_completion_nopr)(struct sig *self,
-                                                        struct task *__restrict sender_thread,
-                                                        struct sig *sender,
-                                                        struct sig_completion *sc_pending,
-                                                        pflag_t was) {
-	bool result;
-	struct task *destroy_later = NULL;
-	result = sig_send_as_destroylater_with_initial_completion_nopr(self,
-	                                                               sender_thread,
-	                                                               sender,
-	                                                               sc_pending,
-	                                                               &destroy_later);
+	if (cleanup)
+		(*cleanup->scc_cb)(cleanup);
 	PREEMPTION_POP(was);
 	destroy_tasks(destroy_later);
-	return result;
-}
-
-PRIVATE NOBLOCK NOPREEMPT NONNULL((1, 2, 3, 5)) bool
-NOTHROW(FCALL sig_send_as_with_initial_destroylater_nopr)(struct sig *self,
-                                                          struct task *__restrict sender_thread,
-                                                          struct sig *sender,
-                                                          pflag_t was,
-                                                          struct task *destroy_later) {
-	bool result;
-	sig_destroylater_next(destroy_later) = NULL;
-	result = sig_send_as_destroylater_with_initial_completion_nopr(self,
-	                                                               sender_thread,
-	                                                               sender,
-	                                                               NULL,
-	                                                               &destroy_later);
-	PREEMPTION_POP(was);
-	destroy_tasks(destroy_later);
+	sig_run_phase_2(phase2, &context);
 	return result;
 }
 
 
-PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 4, 5)) void
+PRIVATE NOBLOCK NOPREEMPT ATTR_NOINLINE NONNULL((1, 2, 3, 4)) void
 NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
                                         struct sig_completion *__restrict sc,
-                                        struct task *__restrict sender_thread,
-                                        struct task **__restrict pdestroy_later,
-                                        struct sig *sender, pflag_t was) {
+                                        struct task *__restrict caller,
+                                        struct sig *sender,
+                                        pflag_t was) {
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
 	context.scc_sender = sender;
-	context.scc_caller = sender_thread;
+	context.scc_caller = caller;
 	/* Trigger phase #1 */
 	invoke_sig_completion(&phase2, sc, &context);
 	/* Release locks. */
@@ -941,7 +897,7 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
 	sig_smplock_release_nopr(self);
 	PREEMPTION_POP(was);
 	/* Run phase #2 callback. */
-	sig_run_phase_2(phase2, &context, pdestroy_later);
+	sig_run_phase_2(phase2, &context);
 }
 
 
@@ -1097,7 +1053,7 @@ done:
 	sig_unlock_pending(sc_pending);
 	PREEMPTION_POP(was);
 	/* Invoke phase-2 callbacks. */
-	sig_run_phase_2(phase2, &context, &destroy_later);
+	sig_run_phase_2(phase2, &context);
 	/* Destroy pending threads. */
 	destroy_tasks(destroy_later);
 	return result;
@@ -2492,13 +2448,10 @@ DECL_END
 #define DEFINE_sig_broadcast_as_nopr 1
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_destroylater 1
+#define DEFINE_sig_broadcast_cleanup_nopr 1
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_destroylater_nopr 1
-#include "signal-send.c.inl"
-
-#define DEFINE_sig_broadcast_as_destroylater_nopr 1
+#define DEFINE_sig_broadcast_as_cleanup_nopr 1
 #include "signal-send.c.inl"
 
 #define DEFINE_sig_broadcast_for_fini 1
@@ -2513,13 +2466,13 @@ DECL_END
 #define DEFINE_sig_altbroadcast_for_fini_nopr 1
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_for_fini_as_nopr 1
+#define DEFINE_sig_broadcast_as_for_fini_nopr 1
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_for_fini_destroylater_nopr 1
+#define DEFINE_sig_broadcast_for_fini_cleanup_nopr 1
 #include "signal-send.c.inl"
 
-#define DEFINE_sig_broadcast_for_fini_as_destroylater_nopr 1
+#define DEFINE_sig_broadcast_as_for_fini_cleanup_nopr 1
 #include "signal-send.c.inl"
 
 #define DEFINE_task_waitfor 1

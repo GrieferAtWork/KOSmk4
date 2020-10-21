@@ -53,6 +53,17 @@ PUBLIC struct aio_handle_type aio_noop_type = {
 
 
 
+struct sig_cleanup_callback_for_aio_completion: sig_cleanup_callback {
+	struct aio_handle_generic *self;
+};
+PRIVATE NOBLOCK NOPREEMPT void
+NOTHROW(FCALL sig_cleanup_for_aio_completion)(struct sig_cleanup_callback *self) {
+	struct sig_cleanup_callback_for_aio_completion *me;
+	me = (struct sig_cleanup_callback_for_aio_completion *)self;
+	aio_handle_release(me->self);
+}
+
+
 /* Callback for `aio_handle_generic' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
@@ -61,22 +72,20 @@ NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict se
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
                                         unsigned int status) {
-	struct task *delme_threads;
+	struct sig_cleanup_callback_for_aio_completion cleanup;
 	self->hg_status = status;
 	if (status == AIO_COMPLETION_FAILURE) {
 		memcpy(&self->hg_error, &THIS_EXCEPTION_DATA,
 		       sizeof(struct exception_data));
 	}
 	COMPILER_WRITE_BARRIER();
-	delme_threads = NULL;
-	sig_broadcast_destroylater_nopr(&self->hg_signal, &delme_threads);
-	aio_handle_release(self);
-	while (unlikely(delme_threads)) {
-		struct task *next;
-		next = sig_destroylater_next(delme_threads);
-		destroy(delme_threads);
-		delme_threads = next;
-	}
+	/* Use a cleanup-callback to unlock the AIO handle before other
+	 * non-SMP-lock-compatible cleanup operations are performed, or
+	 * post-completion callbacks get invoked. (which may not actually
+	 * be SMP-lock-safe) */
+	cleanup.scc_cb = &sig_cleanup_for_aio_completion;
+	cleanup.self   = self;
+	sig_broadcast_cleanup_nopr(&self->hg_signal, &cleanup);
 }
 
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void

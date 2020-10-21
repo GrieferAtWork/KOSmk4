@@ -329,55 +329,78 @@ NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) size_t
 NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
 
-/* Same as `sig_broadcast()', but impersonate `sender_thread', and
+/* Same as `sig_broadcast()', but impersonate `caller', and
  * wake up thread through use of `task_wake_as()'. The same rules
  * apply, meaning that the (true) caller must ensure that their
- * CPU won't change, and that `sender_thread' is also running as
+ * CPU won't change, and that `caller' is also running as
  * part of their CPU. */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t
 NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
-                                     struct task *__restrict sender_thread);
+                                     struct task *__restrict caller);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) size_t
-NOTHROW(FCALL sig_broadcast_for_fini_as_nopr)(struct sig *__restrict self,
-                                              struct task *__restrict sender_thread);
+NOTHROW(FCALL sig_broadcast_as_for_fini_nopr)(struct sig *__restrict self,
+                                              struct task *__restrict caller);
 
-/* Same as `sig_broadcast()', don't immediatly destroy threads when their
- * reference counter reaches 0. Instead, chain those threads together and
- * return them to the caller, to-be destroyed at their leisure.
+
+/* Cleanup function which may be scheduled for invocation before internal resources
+ * are released and post-completion callbacks defined by signal completion functions
+ * are run. This is a special mechanism that is required to prevent certain race
+ * conditions, and should be used in situations where a signal is kept allocated
+ * through use of an SMP-lock which must be released once the `struct sig' itself
+ * no longer needs to be used, but before any possible extended callbacks are invoked,
+ * as may be the result of decref()-ing woken threads (which may end up being destroyed,
+ * and consequently destroying a whole bunch of other things, including open handles)
  *
- * This function is needed to comply with the no-decref requirement of AIO
- * completion functions that have yet to invoke `aio_handle_release()':
- * >> PRIVATE NOBLOCK NOPREEMPT NONNULL((1)) void
- * >> NOTHROW(FCALL my_aio_completion)(struct aio_handle *__restrict self,
- * >>                                  unsigned int status) {
- * >>     struct task *delme_threads = NULL;
- * >>     sig_broadcast_destroylater_nopr((struct sig *)self->ah_data[0], &delme_threads);
- * >>     aio_handle_release(self);
- * >>     while (unlikely(delme_threads)) {
- * >>         struct task *next;
- * >>         next = sig_destroylater_next(delme_threads);
- * >>         destroy(delme_threads);
- * >>         delme_threads = next;
- * >>     }
- * >> } */
+ * On example of a race condition prevented by this is:
+ *      _asyncjob_main()
+ *      aio_handle_complete_nopr()          // The connect() operation has completed
+ *      aio_handle_generic_func()           // == ah_func  (note: this one must also invoke `aio_handle_release()')
+ *      sig_broadcast()                     // Wrong usage here
+ *          decref_unlikely(target_thread)  // This actually ends up destroying `target_thread'
+ *      task_destroy()
+ *      fini_this_handle_manager()
+ *      handle_manager_destroy()
+ *      handle_socket_decref()
+ *      socket_destroy()
+ *          decref_likely(self->sk_ncon.m_pointer)
+ *      socket_connect_aio_destroy()
+ *          aio_handle_generic_fini()
+ *              aio_handle_fini()
+ *              >> Deadlock here, since aio_handle_fini() can only return once
+ *                 aio_handle_release() has been called for the attached AIO.
+ * The solution is to invoke `aio_handle_release(self)' from inside `scc_cb'
+ *
+ * NOTE: The cleanup callback itself gets invoked immediately after all internal
+ *       SMP-lock have been released (but before preemption is re-enabled, or
+ *       post-exec signal completion callbacks are invoked)
+ */
+struct sig_cleanup_callback;
+struct sig_cleanup_callback {
+	/* [1..1] Cleanup callback. */
+	NOBLOCK NOPREEMPT void /*NOTHROW*/ (FCALL *scc_cb)(struct sig_cleanup_callback *self);
+	/* User-data goes here. */
+};
+
+/* Same as `sig_broadcast()', but invoke a given `cleanup' prior to doing any other
+ * kind of cleanup, but after having released all internal SMP-locks. May be used to
+ * release further SMP-locks which may have been used to guard `self' from being
+ * destroyed (such as calling `aio_handle_release()' when sending a signal from
+ * inside of an AIO completion function)
+ * Note that all of these functions guaranty that `callback' is invoked eactly once. */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_broadcast_destroylater)(struct sig *__restrict self,
-                                          struct task **__restrict pdestroy_later);
-FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_broadcast_destroylater_nopr)(struct sig *__restrict self,
-                                               struct task **__restrict pdestroy_later);
+NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self,
+                                          struct sig_cleanup_callback *__restrict cleanup);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
-NOTHROW(FCALL sig_broadcast_as_destroylater_nopr)(struct sig *__restrict self,
-                                                  struct task *__restrict sender_thread,
-                                                  struct task **__restrict pdestroy_later);
+NOTHROW(FCALL sig_broadcast_as_cleanup_nopr)(struct sig *__restrict self,
+                                             struct task *__restrict caller,
+                                             struct sig_cleanup_callback *__restrict cleanup);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
-NOTHROW(FCALL sig_broadcast_for_fini_destroylater_nopr)(struct sig *__restrict self,
-                                                        struct task **__restrict pdestroy_later);
+NOTHROW(FCALL sig_broadcast_for_fini_cleanup_nopr)(struct sig *__restrict self,
+                                                   struct sig_cleanup_callback *__restrict cleanup);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2, 3)) size_t
-NOTHROW(FCALL sig_broadcast_for_fini_as_destroylater_nopr)(struct sig *__restrict self,
-                                                           struct task *__restrict sender_thread,
-                                                           struct task **__restrict pdestroy_later);
-#define sig_destroylater_next(thread) KEY_task_vm_dead__next(thread)
+NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict self,
+                                                      struct task *__restrict caller,
+                                                      struct sig_cleanup_callback *__restrict cleanup);
 
 
 

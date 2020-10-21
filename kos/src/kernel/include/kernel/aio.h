@@ -324,7 +324,7 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
  *      _asyncjob_main()
  *      aio_handle_complete_nopr()          // The connect() operation has completed
  *      aio_handle_generic_func()           // == ah_func  (note: this one must also invoke `aio_handle_release()')
- *      sig_broadcast()                     // Wrong usage here
+ *      sig_broadcast()                     // Wrong usage here (s.a. `struct sig_cleanup_callback')
  *          decref_unlikely(target_thread)  // This actually ends up destroying `target_thread'
  *      task_destroy()
  *      fini_this_handle_manager()
