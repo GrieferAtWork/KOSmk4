@@ -745,10 +745,11 @@ NOTHROW(KCALL mouse_device_hwheel_nopr)(struct mouse_device *__restrict self,
 PUBLIC NOBLOCK void
 NOTHROW(KCALL mouse_device_init)(struct mouse_device *__restrict self) {
 	assert(self->cd_type.ct_driver != NULL);
-	self->cd_type.ct_read  = &mouse_device_read;
-	self->cd_type.ct_ioctl = &mouse_device_ioctl;
-	self->cd_type.ct_stat  = &mouse_device_stat;
-	self->cd_type.ct_poll  = &mouse_device_poll;
+	self->cd_type.ct_read        = &mouse_device_read;
+	self->cd_type.ct_ioctl       = &mouse_device_ioctl;
+	self->cd_type.ct_stat        = &mouse_device_stat;
+	self->cd_type.ct_pollconnect = &mouse_device_pollconnect;
+	self->cd_type.ct_polltest    = &mouse_device_polltest;
 	atomic_rwlock_cinit(&self->md_lock);
 }
 
@@ -812,17 +813,23 @@ mouse_device_canread(struct mouse_device *__restrict self) {
 }
 
 
-PUBLIC NONNULL((1)) poll_mode_t KCALL
-mouse_device_poll(struct character_device *__restrict self,
-                  poll_mode_t what) THROWS(...) {
+PUBLIC NONNULL((1)) void KCALL
+mouse_device_pollconnect(struct character_device *__restrict self,
+                         poll_mode_t what) THROWS(...) {
 	struct mouse_device *me;
 	me = (struct mouse_device *)self;
-	if (what & POLLIN) {
-		if (mouse_device_canread(me))
-			return POLLIN;
+	if (what & POLLINMASK)
 		task_connect_for_poll(&me->md_buf.mb_avail);
+}
+
+PUBLIC NONNULL((1)) poll_mode_t KCALL
+mouse_device_polltest(struct character_device *__restrict self,
+                      poll_mode_t what) THROWS(...) {
+	struct mouse_device *me;
+	me = (struct mouse_device *)self;
+	if (what & POLLINMASK) {
 		if (mouse_device_canread(me))
-			return POLLIN;
+			return POLLINMASK;
 	}
 	return 0;
 }

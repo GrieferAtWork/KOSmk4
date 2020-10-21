@@ -328,15 +328,20 @@ handle_file_stat(struct file *__restrict self,
 	inode_stat(self->f_node, result);
 }
 
+INTERN void KCALL
+handle_file_pollconnect(struct file *__restrict self, poll_mode_t what) {
+	if (what & (POLLINMASK | POLLOUTMASK))
+		rwlock_pollconnect(&self->f_node->db_lock);
+}
+
 INTERN poll_mode_t KCALL
-handle_file_poll(struct file *__restrict self, poll_mode_t what) {
-	if (what & POLLOUT) {
-		if (rwlock_pollwrite(&self->f_node->db_lock))
-			return POLLOUT | POLLIN;
-	} else if (what & POLLIN) {
-		/* TODO: Poll until the file is larger than the current read-pointer. */
-		if (rwlock_pollread(&self->f_node->db_lock))
-			return POLLIN;
+handle_file_polltest(struct file *__restrict self, poll_mode_t what) {
+	if (what & POLLOUTMASK) {
+		if (rwlock_canwrite(&self->f_node->db_lock))
+			return POLLOUTMASK | POLLINMASK;
+	} else if (what & POLLINMASK) {
+		if (rwlock_canread(&self->f_node->db_lock))
+			return POLLINMASK;
 	}
 	return 0;
 }
@@ -1000,18 +1005,11 @@ DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_readv, handle_file_readv);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_writev, handle_file_writev);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_preadv, handle_file_preadv);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pwritev, handle_file_pwritev);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_aread, handle_file_aread);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_awrite, handle_file_awrite);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_apread, handle_file_apread);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_apwrite, handle_file_apwrite);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_areadv, handle_file_areadv);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_awritev, handle_file_awritev);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_apreadv, handle_file_apreadv);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_apwritev, handle_file_apwritev);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_mmap, handle_file_mmap);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_sync, handle_file_sync);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_datasync, handle_file_datasync);
-DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_poll, handle_file_poll);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_pollconnect, handle_file_pollconnect);
+DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_polltest, handle_file_polltest);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_stat, handle_file_stat);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_ioctl, handle_file_ioctl);
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_hop, handle_file_hop);

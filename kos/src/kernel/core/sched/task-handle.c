@@ -59,20 +59,20 @@ handle_task_stat(struct taskpid *__restrict self,
 	(void)self;
 }
 
+INTERN void KCALL
+handle_task_pollconnect(struct taskpid *__restrict self, poll_mode_t what) {
+	/* POLLIN: Terminated */
+	if (what & POLLIN)
+		task_connect_for_poll(&self->tp_changed);
+}
+
 INTERN poll_mode_t KCALL
-handle_task_poll(struct taskpid *__restrict self, poll_mode_t what) {
+handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) {
 	poll_mode_t result = 0;
 	/* POLLIN: Terminated */
 	if (what & POLLIN) {
-		COMPILER_READ_BARRIER();
 		if (WIFEXITED(self->tp_status))
 			result |= POLLIN;
-		else {
-			task_connect_for_poll(&self->tp_changed);
-			COMPILER_READ_BARRIER();
-			if (WIFEXITED(self->tp_status))
-				result |= POLLIN;
-		}
 	}
 	return result;
 }

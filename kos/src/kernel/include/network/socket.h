@@ -223,9 +223,12 @@ struct socket_ops {
 	 *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
 	 *    POLLHUP:   Socket peer has disconnected (ignored in `what'; always returned when condition is met)
 	 * Other conditions may be defined that are specific to individual socket types. */
+	NONNULL((1)) void
+	(KCALL *so_pollconnect)(struct socket *__restrict self,
+	                        poll_mode_t what);
 	NONNULL((1)) poll_mode_t
-	(KCALL *so_poll)(struct socket *__restrict self,
-	                 poll_mode_t what);
+	(KCALL *so_polltest)(struct socket *__restrict self,
+	                     poll_mode_t what);
 
 	/* [1..1]
 	 * Determine the local address (aka. name) for the given socket.
@@ -617,8 +620,10 @@ socket_isconnected(struct socket *__restrict self);
  *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
  *    POLLHUP:   Socket peer has disconnected (ignored in `what'; always returned when condition is met)
  * Other conditions may be defined that are specific to individual socket types. */
+FUNDEF NONNULL((1)) void KCALL
+socket_pollconnect(struct socket *__restrict self, poll_mode_t what);
 FUNDEF NONNULL((1)) poll_mode_t KCALL
-socket_poll(struct socket *__restrict self, poll_mode_t what);
+socket_polltest(struct socket *__restrict self, poll_mode_t what);
 
 #ifdef __INTELLISENSE__
 /* Determine the local address (aka. name) for the given socket.

@@ -87,10 +87,14 @@ struct character_device_type {
 	                 USER CHECKED struct stat *result)
 			THROWS(...);
 
+	NONNULL((1)) void
+	(KCALL *ct_pollconnect)(struct character_device *__restrict self,
+	                        poll_mode_t what)
+			THROWS(...);
 	/* @return: * : Set of available signals. */
 	NONNULL((1)) poll_mode_t
-	(KCALL *ct_poll)(struct character_device *__restrict self,
-	                 poll_mode_t what)
+	(KCALL *ct_polltest)(struct character_device *__restrict self,
+	                     poll_mode_t what)
 			THROWS(...);
 
 	/* [0..1] Optional callback that is invoked when the device is opened by user-space.
@@ -265,9 +269,14 @@ character_device_stat(struct character_device *__restrict self,
                       USER CHECKED struct stat *result)
 		THROWS(...);
 
+FUNDEF NONNULL((1)) void KCALL
+character_device_pollconnect(struct character_device *__restrict self,
+                             poll_mode_t what)
+		THROWS(...);
+
 FUNDEF NONNULL((1)) poll_mode_t KCALL
-character_device_poll(struct character_device *__restrict self,
-                      poll_mode_t what)
+character_device_polltest(struct character_device *__restrict self,
+                          poll_mode_t what)
 		THROWS(...);
 
 

@@ -65,6 +65,10 @@ __BOOL sched_signal_send(sched_signal_t *__self);
 /* Wake a single thread waiting on the given signal. */
 __SIZE_TYPE__ sched_signal_sendmany(sched_signal_t *__self, __SIZE_TYPE__ __max_count);
 
+#ifdef __KERNEL__
+#define sched_signal_connect          task_connect
+#define sched_signal_connect_for_poll task_connect_for_poll
+#endif /* __KERNEL__ */
 #elif defined(__KERNEL__)
 
 #define sched_signal_init               sig_init
@@ -73,6 +77,8 @@ __SIZE_TYPE__ sched_signal_sendmany(sched_signal_t *__self, __SIZE_TYPE__ __max_
 #define sched_signal_broadcast_for_fini sig_broadcast_for_fini
 #define sched_signal_send               sig_send
 #define sched_signal_sendmany           sig_sendmany
+#define sched_signal_connect            task_connect
+#define sched_signal_connect_for_poll   task_connect_for_poll
 
 #else /* __KERNEL__ */
 

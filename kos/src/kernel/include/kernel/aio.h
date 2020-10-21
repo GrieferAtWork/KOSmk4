@@ -510,7 +510,7 @@ aio_handle_generic_checkerror(struct aio_handle_generic *__restrict self)
 
 /* Connect to the given AIO handle. */
 LOCAL NONNULL((1)) void KCALL
-aio_handle_generic_connect(struct aio_handle_generic *__restrict self)
+aio_handle_generic_connect_for_poll(struct aio_handle_generic *__restrict self)
 		THROWS(E_BADALLOC) {
 	task_connect_for_poll(&self->hg_signal);
 }
@@ -520,22 +520,8 @@ aio_handle_generic_poll(struct aio_handle_generic *__restrict self)
 		THROWS(...) {
 	if (aio_handle_generic_hascompleted(self))
 		return true;
-	aio_handle_generic_connect(self);
+	aio_handle_generic_connect_for_poll(self);
 	return aio_handle_generic_hascompleted(self);
-}
-
-LOCAL NONNULL((1)) bool KCALL
-aio_handle_generic_poll_err(struct aio_handle_generic *__restrict self)
-		THROWS(...) {
-	if (aio_handle_generic_hascompleted(self))
-		goto check_error_and_return_true;
-	aio_handle_generic_connect(self);
-	if (aio_handle_generic_hascompleted(self))
-		goto check_error_and_return_true;
-	return false;
-check_error_and_return_true:
-	aio_handle_generic_checkerror(self);
-	return true;
 }
 
 struct timespec;
@@ -546,7 +532,7 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
 	__hybrid_assert(!task_wasconnected());
 	while (!aio_handle_generic_hascompleted(self)) {
 		TRY {
-			aio_handle_generic_connect(self);
+			aio_handle_generic_connect_for_poll(self);
 			if unlikely(aio_handle_generic_hascompleted(self)) {
 				task_disconnectall();
 				break;

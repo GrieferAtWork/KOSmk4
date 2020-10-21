@@ -917,48 +917,40 @@ done:
 
 
 
-PRIVATE WUNUSED NONNULL((1)) poll_mode_t KCALL
-uvio_server_poll(struct vm_datablock *__restrict self,
-	             poll_mode_t what) THROWS(...) {
+PRIVATE NONNULL((1)) void KCALL
+uvio_server_pollconnect(struct vm_datablock *__restrict self,
+                        poll_mode_t what) THROWS(...) {
+	struct uvio *me = (struct uvio *)self;
+	/* Poll for pending UVIO requests (read) and delivered-but-not-completed requests (write) */
+	if (what & (POLLINMASK | POLLOUTMASK))
+		task_connect_for_poll(&me->uv_reqmore);
+}
+
+PRIVATE WUNUSED NONNULL((1)) poll_mode_t
+NOTHROW(KCALL uvio_server_polltest)(struct vm_datablock *__restrict self,
+                                    poll_mode_t what) THROWS(...) {
 	poll_mode_t result = 0;
-	struct uvio *me;
-	me = (struct uvio *)self;
-	/* Poll for pending UVIO requests (read) and
-	 * delivered-but-not-completed requests (write) */
-	if (what & POLLIN) {
-		/* Check for PENDING requests (which are returned by read()) */
-		if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_PENDING))
-			result |= POLLIN;
-		else {
-			task_connect_for_poll(&me->uv_reqmore);
-			if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_PENDING))
-				result |= POLLIN;
-		}
-	}
-	if (what & POLLOUT) {
-		/* Check for DELIVERED requests (which can be responded to by write()) */
-		if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_DELIVERED))
-			result |= POLLOUT;
-		else {
-			task_connect_for_poll(&me->uv_reqmore);
-			if (uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_DELIVERED))
-				result |= POLLOUT;
-		}
-	}
+	struct uvio *me = (struct uvio *)self;
+	/* Poll for pending UVIO requests (read) and delivered-but-not-completed requests (write) */
+	if ((what & POLLINMASK) && uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_PENDING))
+		result |= POLLINMASK;
+	if ((what & POLLOUTMASK) && uvio_server_has_request_with_status(me, KERNEL_UVIO_REQUEST_STATUS_DELIVERED))
+		result |= POLLOUTMASK;
 	return result;
 }
 
 
 /* The datablock type used by UVIO objects. */
 PUBLIC_CONST struct vm_datablock_type const uvio_datablock_type = {
-	/* .dt_destroy      = */ NULL,
-	/* .dt_initpart     = */ NULL,
-	/* .dt_loadpart     = */ NULL,
-	/* .dt_savepart     = */ NULL,
-	/* .dt_changed      = */ NULL,
-	/* .dt_handle_read  = */ &uvio_server_read,
-	/* .dt_handle_write = */ &uvio_server_write,
-	/* .dt_handle_poll  = */ &uvio_server_poll,
+	/* .dt_destroy            = */ NULL,
+	/* .dt_initpart           = */ NULL,
+	/* .dt_loadpart           = */ NULL,
+	/* .dt_savepart           = */ NULL,
+	/* .dt_changed            = */ NULL,
+	/* .dt_handle_read        = */ &uvio_server_read,
+	/* .dt_handle_write       = */ &uvio_server_write,
+	/* .dt_handle_pollconnect = */ &uvio_server_pollconnect,
+	/* .dt_handle_polltest    = */ &uvio_server_polltest,
 };
 
 /* Construct a new UVIO object.

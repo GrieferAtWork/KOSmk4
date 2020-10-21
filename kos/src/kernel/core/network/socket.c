@@ -138,11 +138,35 @@ socket_isconnected(struct socket *__restrict self) {
  *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
  *    POLLHUP:   Socket peer has disconnected (ignored in `what'; always returned when condition is met)
  * Other conditions may be defined that are specific to individual socket types. */
+PUBLIC NONNULL((1)) void KCALL
+socket_pollconnect(struct socket *__restrict self, poll_mode_t what) {
+	assert((self->sk_ops->so_pollconnect != NULL) ==
+	       (self->sk_ops->so_polltest != NULL));
+	if likely(self->sk_ops->so_pollconnect)
+		(*self->sk_ops->so_pollconnect)(self, what);
+	if (what & POLLOUT) {
+		/* Check if there is a background connect() operation in progress... */
+		REF struct socket_connect_aio *nc;
+		nc = self->sk_ncon.get();
+		if (nc) {
+			/* Connection is being established right _now_! */
+			FINALLY_DECREF_UNLIKELY(nc);
+			/* Poll for connect() to complete.
+			 * Note that we don't poll the connect exception here,
+			 * as any possible connect() error has to be retrieved
+			 * through use of `SOL_SOCKET,SO_ERROR' */
+			aio_handle_generic_connect_for_poll(&nc->sca_aio);
+		}
+	}
+}
+
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-socket_poll(struct socket *__restrict self, poll_mode_t what) {
+socket_polltest(struct socket *__restrict self, poll_mode_t what) {
 	poll_mode_t result = 0;
-	if likely(self->sk_ops->so_poll)
-		result = (*self->sk_ops->so_poll)(self, what);
+	assert((self->sk_ops->so_pollconnect != NULL) ==
+	       (self->sk_ops->so_polltest != NULL));
+	if likely(self->sk_ops->so_polltest)
+		result = (*self->sk_ops->so_polltest)(self, what);
 	if (what & POLLOUT) {
 		/* Check if there is a background connect() operation in progress... */
 		REF struct socket_connect_aio *nc;
@@ -153,20 +177,17 @@ socket_poll(struct socket *__restrict self, poll_mode_t what) {
 				result |= POLLOUT;
 		} else {
 			/* Connection is being established right _now_! */
-			FINALLY_DECREF_UNLIKELY(nc);
-			/* Poll for connect() to complete.
-			 * Note that we don't poll the connect exception here,
-			 * as any possible connect() error has to be retrieved
-			 * through use of `SOL_SOCKET,SO_ERROR' */
-			if (aio_handle_generic_poll(&nc->sca_aio))
+			if (aio_handle_generic_hascompleted(&nc->sca_aio))
 				result |= POLLOUT;
+			decref_unlikely(nc);
 		}
 	}
 	return result;
 }
 
 /* Define the socket poll() handle operator */
-DEFINE_INTERN_ALIAS(handle_socket_poll, socket_poll);
+DEFINE_INTERN_ALIAS(handle_socket_pollconnect, socket_pollconnect);
+DEFINE_INTERN_ALIAS(handle_socket_polltest, socket_polltest);
 
 
 

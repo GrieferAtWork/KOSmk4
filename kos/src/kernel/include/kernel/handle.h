@@ -159,9 +159,11 @@ struct handle_types {
 	                                                     USER CHECKED struct stat *result)
 			/*THROWS(...)*/;
 
+	/* Connect to the signals for monitoring `what' */
+	void (NONNULL((1)) KCALL *h_pollconnect[HANDLE_TYPE_COUNT])(void *__restrict ptr, poll_mode_t what)
+			/*THROWS(...)*/;
 	/* @return: * : Set of available signals. */
-	poll_mode_t (WUNUSED NONNULL((1)) KCALL *h_poll[HANDLE_TYPE_COUNT])(void *__restrict ptr,
-	                                                                    poll_mode_t what)
+	poll_mode_t (WUNUSED NONNULL((1)) KCALL *h_polltest[HANDLE_TYPE_COUNT])(void *__restrict ptr, poll_mode_t what)
 			/*THROWS(...)*/;
 
 	/* Implement handle control operations (s.a. `<kos/hop/[...].h>')
@@ -253,8 +255,25 @@ FUNDEF NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict
 #define handle_sync(self)                                        HANDLE_FUNC(self, h_sync)((self).h_data)
 #define handle_datasync(self)                                    HANDLE_FUNC(self, h_datasync)((self).h_data)
 #define handle_stat(self, result)                                HANDLE_FUNC(self, h_stat)((self).h_data, result)
-#define handle_poll(self, what)                                  HANDLE_FUNC(self, h_poll)((self).h_data, what)
+#define handle_pollconnect(self, what)                           HANDLE_FUNC(self, h_pollconnect)((self).h_data, what)
+#define handle_polltest(self, what)                              HANDLE_FUNC(self, h_polltest)((self).h_data, what)
+#define handle_poll(self, what)                                  _handle_poll(&(self), what)
 #define _handle_tryas(self, wanted_type)                         HANDLE_FUNC(self, h_tryas)((self).h_data, wanted_type)
+
+FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) poll_mode_t KCALL
+_handle_poll(struct handle *__restrict self, poll_mode_t what) {
+	poll_mode_t result;
+#ifndef __OPTIMIZE_SIZE__
+	result = handle_polltest(*self, what);
+	if (result == 0)
+#endif /* !__OPTIMIZE_SIZE__ */
+	{
+		handle_pollconnect(*self, what);
+		result = handle_polltest(*self, what);
+	}
+	return result;
+}
+
 
 #ifdef __cplusplus
 extern "C++" {
@@ -300,7 +319,7 @@ NOTHROW(KCALL decref_unlikely)(struct handle const *__restrict self) {
 	decref_unlikely(*self);
 }
 
-}
+} /* extern "C++" */
 #endif /* __cplusplus */
 #endif /* __CC__ */
 

@@ -494,11 +494,33 @@ NOTHROW(FCALL rwlock_end)(struct rwlock *__restrict self) {
 }
 #endif /* !__INTELLISENSE__ */
 
-/* Asynchronously connect to the given R/W-lock for reading or writing.
- * @return: true:  The rwlock is currently available for reading or writing.
- * @return: false: The rwlock wasn't available, and a connection was made to the proper signal. */
-FUNDEF WUNUSED NONNULL((1)) bool FCALL rwlock_pollread(struct rwlock *__restrict self) THROWS(E_BADALLOC);
-FUNDEF WUNUSED NONNULL((1)) bool FCALL rwlock_pollwrite(struct rwlock *__restrict self) THROWS(E_BADALLOC);
+/* R/W-lock polling functions. */
+#define rwlock_pollconnect_ex(self, cb)       cb(&(self)->rw_chmode)
+#define rwlock_pollconnect_read_ex(self, cb)  cb(&(self)->rw_chmode)
+#define rwlock_pollconnect_write_ex(self, cb) cb(&(self)->rw_chmode)
+#ifdef __OPTIMIZE_SIZE__
+#define rwlock_pollread_ex(self, cb)       \
+	(rwlock_pollconnect_read_ex(self, cb), \
+	 rwlock_canread(self))
+#define rwlock_pollwrite_ex(self, cb)       \
+	(rwlock_pollconnect_write_ex(self, cb), \
+	 rwlock_canwrite(self))
+#else /* __OPTIMIZE_SIZE__ */
+#define rwlock_pollread_ex(self, cb)        \
+	(rwlock_canread(self) ||                \
+	 (rwlock_pollconnect_read_ex(self, cb), \
+	  rwlock_canread(self)))
+#define rwlock_pollwrite_ex(self, cb)        \
+	(rwlock_canwrite(self) ||                \
+	 (rwlock_pollconnect_write_ex(self, cb), \
+	  rwlock_canwrite(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#define rwlock_pollconnect(self)       rwlock_pollconnect_ex(self, task_connect_for_poll)
+#define rwlock_pollconnect_read(self)  rwlock_pollconnect_read_ex(self, task_connect_for_poll)
+#define rwlock_pollconnect_write(self) rwlock_pollconnect_write_ex(self, task_connect_for_poll)
+#define rwlock_pollread(self)          rwlock_pollread_ex(self, task_connect_for_poll)
+#define rwlock_pollwrite(self)         rwlock_pollwrite_ex(self, task_connect_for_poll)
+
 
 #ifdef __INTELLISENSE__
 /* Check if a read/write-lock can be acquired without blocking */
@@ -537,9 +559,6 @@ __DEFINE_SYNC_RWLOCK(struct rwlock,
                      rwlock_upgrade,
                      rwlock_upgrade_nx,
                      rwlock_downgrade)
-__DEFINE_SYNC_POLL(struct rwlock,
-                   rwlock_pollread,
-                   rwlock_pollwrite)
 
 
 DECL_END

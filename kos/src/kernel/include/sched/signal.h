@@ -125,24 +125,6 @@
 
 DECL_BEGIN
 
-/* Declare support for signal-driven poll operations
- * >> bool pollread(MyType *self) {
- * >>     if (sync_canread(self))
- * >>         return true;
- * >>     task_connect_for_poll(&self->m_signal);
- * >>     return unlikely(sync_canread(self)); // Re-check to prevent race condition
- * >> }
- */
-#if defined(__cplusplus) && defined(__CC__)
-#define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite)                                                                                                  \
-	extern "C++" {                                                                                                                                    \
-	FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollread)(T *__restrict self) THROWS(E_BADALLOC) { return _pollread(self); }   \
-	FORCELOCAL ATTR_ARTIFICIAL WUNUSED NONNULL((1)) __BOOL (KCALL sync_pollwrite)(T *__restrict self) THROWS(E_BADALLOC) { return _pollwrite(self); } \
-	}
-#else /* __cplusplus && __CC__ */
-#define __DEFINE_SYNC_POLL(T, _pollread, _pollwrite) /* nothing */
-#endif /* !__cplusplus || !__CC__ */
-
 #undef CONFIG_USE_NEW_SIGNAL_API
 #if 1
 #define CONFIG_USE_NEW_SIGNAL_API 1

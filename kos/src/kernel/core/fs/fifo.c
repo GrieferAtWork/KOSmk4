@@ -379,11 +379,28 @@ handle_fifo_user_stat(struct fifo_user *__restrict self,
 	result->st_blocks  = size;
 }
 
-INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
-handle_fifo_user_poll(struct fifo_user *__restrict self,
-                      poll_mode_t what)
+INTERN NONNULL((1)) void KCALL
+handle_fifo_user_pollconnect(struct fifo_user *__restrict self,
+                             poll_mode_t what)
 		THROWS(...) {
-	return ringbuffer_poll(fifo_buffer(self), what);
+	struct ringbuffer *rb = fifo_buffer(self);
+	if (what & POLLINMASK)
+		ringbuffer_pollconnect_read(rb);
+	if (what & POLLOUTMASK)
+		ringbuffer_pollconnect_write(rb);
+}
+
+INTERN WUNUSED NONNULL((1)) poll_mode_t KCALL
+handle_fifo_user_polltest(struct fifo_user *__restrict self,
+                          poll_mode_t what)
+		THROWS(...) {
+	poll_mode_t result = 0;
+	struct ringbuffer *rb = fifo_buffer(self);
+	if ((what & POLLINMASK) && ringbuffer_canread(rb))
+		result |= POLLINMASK;
+	if ((what & POLLOUTMASK) && ringbuffer_canwrite(rb))
+		result |= POLLOUTMASK;
+	return result;
 }
 
 INTERN NONNULL((1)) syscall_slong_t KCALL

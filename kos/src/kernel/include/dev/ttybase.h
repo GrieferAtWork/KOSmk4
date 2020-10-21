@@ -69,43 +69,31 @@ FUNDEF void KCALL kernel_terminal_check_sigttin(struct terminal *__restrict self
 
 /* Initialize a given TTY character device.
  * NOTE: This function initializes the following operators:
- *   - cd_type.ct_fini  = &ttybase_device_fini;  // Must be called as fallback by overrides
- *   - cd_type.ct_read  = &ttybase_device_iread; // Must invoke `kernel_terminal_check_sigttin()'
- *   - cd_type.ct_write = &ttybase_device_owrite;
- *   - cd_type.ct_ioctl = &ttybase_device_ioctl; // Must be called as fallback by overrides
- *   - cd_type.ct_poll  = &ttybase_device_poll;
- *   - cd_type.ct_stat  = &ttybase_device_stat;
+ *   - cd_type.ct_fini        = &ttybase_device_fini;  // Must be called as fallback by overrides
+ *   - cd_type.ct_read        = &ttybase_device_iread; // Must invoke `kernel_terminal_check_sigttin()'
+ *   - cd_type.ct_write       = &ttybase_device_owrite;
+ *   - cd_type.ct_ioctl       = &ttybase_device_ioctl; // Must be called as fallback by overrides
+ *   - cd_type.ct_pollconnect = &ttybase_device_pollconnect;
+ *   - cd_type.ct_polltest    = &ttybase_device_polltest;
+ *   - cd_type.ct_stat        = &ttybase_device_stat;
  */
 FUNDEF NOBLOCK void
 NOTHROW(KCALL ttybase_device_cinit)(struct ttybase_device *__restrict self,
                                     pterminal_oprinter_t oprinter);
+struct stat;
 
 /* Default character-device read/write operator implementations for tty devices
  * These functions will call forward to `terminal_iread()' and `terminal_owrite()'
  * NOTE: The implementation of these functions assumes that the oprinter associated
  *       with the terminal never returns negative values! */
-FUNDEF NONNULL((1)) size_t KCALL
-ttybase_device_iread(struct character_device *__restrict self,
-                     USER CHECKED void *dst, size_t num_bytes,
-                     iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) size_t KCALL
-ttybase_device_owrite(struct character_device *__restrict self,
-                      USER CHECKED void const *src,
-                      size_t num_bytes, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL
-ttybase_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
-                     USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) syscall_slong_t KCALL /* @return: -EINVAL: Unsupported `cmd' */
-ttybase_device_tryioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
-                        USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL
-ttybase_device_poll(struct character_device *__restrict self,
-                    poll_mode_t what) THROWS(...);
-
-struct stat;
-FUNDEF NONNULL((1)) void KCALL
-ttybase_device_stat(struct character_device *__restrict self,
-                    USER CHECKED struct stat *result) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL ttybase_device_iread(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL ttybase_device_owrite(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) syscall_slong_t KCALL ttybase_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+/* @return: -EINVAL: Unsupported `cmd' */
+FUNDEF NONNULL((1)) syscall_slong_t KCALL ttybase_device_tryioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL ttybase_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL ttybase_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL ttybase_device_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
 
 
 /* [IMPL(TIOCSCTTY)] Set the given tty device as the controlling terminal of the calling session.

@@ -151,27 +151,33 @@ handle_path_stat(struct path *__restrict self,
 	decref(node);
 }
 
+INTERN void KCALL
+handle_path_pollconnect(struct path *__restrict self,
+                        poll_mode_t what) {
+	if (what & (POLLIN | POLLOUT)) {
+		REF struct inode *node;
+		sync_read(self);
+		node = (REF struct inode *)incref(self->p_inode);
+		sync_endread(self);
+		FINALLY_DECREF_UNLIKELY(node);
+		rwlock_pollconnect(&node->db_lock);
+	}
+}
+
 INTERN poll_mode_t KCALL
-handle_path_poll(struct path *__restrict self,
-                 poll_mode_t what) {
+handle_path_polltest(struct path *__restrict self,
+                     poll_mode_t what) {
 	REF struct inode *node;
 	poll_mode_t result = 0;
 	sync_read(self);
 	node = (REF struct inode *)incref(self->p_inode);
 	sync_endread(self);
-	TRY {
-		if (what & POLLOUT) {
-			if (rwlock_pollwrite(&node->db_lock))
-				result = POLLOUT | POLLIN;
-		} else if (what & POLLIN) {
-			/* TODO: Poll until the file is larger than the current read-pointer. */
-			if (rwlock_pollread(&node->db_lock))
-				result = POLLIN;
-		}
-		return 0;
-	} EXCEPT {
-		decref(node);
-		RETHROW();
+	if (what & POLLOUT) {
+		if (rwlock_canwrite(&node->db_lock))
+			result = POLLOUT | POLLIN;
+	} else if (what & POLLIN) {
+		if (rwlock_canread(&node->db_lock))
+			result = POLLIN;
 	}
 	decref(node);
 	return result;

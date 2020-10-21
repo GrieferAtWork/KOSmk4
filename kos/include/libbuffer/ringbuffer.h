@@ -109,6 +109,50 @@ struct ringbuffer {
 #endif /* !__KERNEL__ */
 
 
+/* Polling API */
+#define ringbuffer_canread(self)                                      \
+	(__hybrid_atomic_load((self)->rb_avail, __ATOMIC_ACQUIRE) != 0 || \
+	 __hybrid_atomic_load((self)->rb_limit, __ATOMIC_ACQUIRE) == 0)
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
+__NOTHROW(LIBBUFFER_CC ringbuffer_canwrite)(struct ringbuffer const *__restrict __self) {
+	__size_t __limit = __hybrid_atomic_load(__self->rb_limit, __ATOMIC_ACQUIRE);
+	return __limit == 0 || __hybrid_atomic_load(__self->rb_avail, __ATOMIC_ACQUIRE) < __limit;
+}
+#define ringbuffer_pollconnect_read_ex(self, cb)  cb(&(self)->rb_nempty)
+#define ringbuffer_pollconnect_write_ex(self, cb) cb(&(self)->rb_nfull)
+#define ringbuffer_pollread_unlikely_ex(self, cb) \
+	(ringbuffer_pollconnect_read_ex(self, cb),    \
+	 ringbuffer_canread(self))
+#define ringbuffer_pollwrite_unlikely_ex(self, cb) \
+	(ringbuffer_pollconnect_write_ex(self, cb),    \
+	 ringbuffer_canwrite(self))
+#ifdef __OPTIMIZE_SIZE__
+#define ringbuffer_pollread_ex(self, cb) \
+	ringbuffer_pollread_unlikely_ex(self, cb)
+#define ringbuffer_pollwrite_ex(self, cb) \
+	ringbuffer_pollwrite_unlikely_ex(self, cb)
+#else /* __OPTIMIZE_SIZE__ */
+#define ringbuffer_pollread_ex(self, cb)        \
+	(ringbuffer_canread(self) ||                \
+	 (ringbuffer_pollconnect_read_ex(self, cb), \
+	  ringbuffer_canread(self)))
+#define ringbuffer_pollwrite_ex(self, cb)        \
+	(ringbuffer_canwrite(self) ||                \
+	 (ringbuffer_pollconnect_write_ex(self, cb), \
+	  ringbuffer_canwrite(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#ifdef sched_signal_connect_for_poll
+#define ringbuffer_pollconnect_read(self)   ringbuffer_pollconnect_read_ex(self, sched_signal_connect_for_poll)
+#define ringbuffer_pollconnect_write(self)  ringbuffer_pollconnect_write_ex(self, sched_signal_connect_for_poll)
+#define ringbuffer_pollread(self)           ringbuffer_pollread_ex(self, sched_signal_connect_for_poll)
+#define ringbuffer_pollread_unlikely(self)  ringbuffer_pollread_unlikely_ex(self, sched_signal_connect_for_poll)
+#define ringbuffer_pollwrite(self)          ringbuffer_pollwrite_ex(self, sched_signal_connect_for_poll)
+#define ringbuffer_pollwrite_unlikely(self) ringbuffer_pollwrite_unlikely_ex(self, sched_signal_connect_for_poll)
+#endif /* sched_signal_connect_for_poll */
+
+
+
+
 /* Close the given ring buffer, waking any remaining readers or writers. */
 #ifdef __INTELLISENSE__
 __NOBLOCK __ATTR_NONNULL((1)) void
@@ -334,28 +378,6 @@ LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_setwritten(struct ringbuffer *__restrict __self, __size_t __num_bytes)
 		__THROWS(E_WOULDBLOCK);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
-
-#ifdef __KERNEL__
-
-#ifndef __poll_mode_t_defined
-#define __poll_mode_t_defined 1
-typedef unsigned int poll_mode_t; /* Set of `POLL*' */
-#endif /* !poll_mode_t_defined */
-
-/* Poll the given ring buffer `self' for reading (`POLLIN') or writing (`POLLOUT') */
-typedef __ATTR_NONNULL((1)) poll_mode_t
-(LIBBUFFER_CC *PRINGBUFFER_POLL)(struct ringbuffer *__restrict __self,
-                                 poll_mode_t __what)
-		/*__THROWS(E_BADALLOC, E_WOULDBLOCK)*/;
-#ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __ATTR_NONNULL((1)) poll_mode_t LIBBUFFER_CC
-ringbuffer_poll(struct ringbuffer *__restrict __self,
-                poll_mode_t __what)
-		__THROWS(E_BADALLOC, E_WOULDBLOCK);
-#endif /* LIBBUFFER_WANT_PROTOTYPES */
-
-#endif /* __KERNEL__ */
-
 
 #endif /* __CC__ */
 

@@ -22,6 +22,7 @@
 
 #include "api.h"
 
+#include <hybrid/__atomic.h>
 #include <hybrid/sync/atomic-lock.h>
 
 #include <bits/types.h>
@@ -117,15 +118,36 @@ struct linebuffer {
 #define linebuffer_fini(self)   (linebuffer_close(self), linecapture_fini(&(self)->lb_line))
 
 
+/* Poll for writing to become possible. */
+#define linebuffer_canwrite(self)                                      \
+	(__hybrid_atomic_load((self)->lb_line.lc_size, __ATOMIC_ACQUIRE) < \
+	 __hybrid_atomic_load((self)->lb_limt, __ATOMIC_ACQUIRE))
+#define linebuffer_pollconnect_write_ex(self, cb) cb(&(self)->lb_nful)
+#ifdef __OPTIMIZE_SIZE__
+#define linebuffer_pollwrite_ex(self, cb)       \
+	(linebuffer_pollconnect_write_ex(self, cb), \
+	 linebuffer_canwrite(self))
+#else /* __OPTIMIZE_SIZE__ */
+#define linebuffer_pollwrite_ex(self, cb)        \
+	(linebuffer_canwrite(self) ||                \
+	 (linebuffer_pollconnect_write_ex(self, cb), \
+	  linebuffer_canwrite(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#ifdef sched_signal_connect_for_poll
+#define linebuffer_pollconnect_write(self) linebuffer_pollconnect_write_ex(self, sched_signal_connect_for_poll)
+#define linebuffer_pollwrite(self)         linebuffer_pollwrite_ex(self, sched_signal_connect_for_poll)
+#endif /* sched_signal_connect_for_poll */
+
+
 /* Close the given line buffer, waking any remaining readers or writers. */
 #ifdef __INTELLISENSE__
 LIBBUFFER_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBBUFFER_CC linebuffer_close)(struct linebuffer *__restrict __self);
-#else
+#else /* __INTELLISENSE__ */
 #define linebuffer_close(self)                                    \
 	(__hybrid_atomic_store((self)->lb_limt, 0, __ATOMIC_RELEASE), \
 	 sched_signal_broadcast(&(self)->lb_nful))
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 /* Acquire a capture of the given linebuffer */

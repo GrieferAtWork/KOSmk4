@@ -37,6 +37,7 @@
 #include <sched/async.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
@@ -92,52 +93,41 @@ NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 
 
 
-PUBLIC NONNULL((1)) poll_mode_t KCALL
-tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...) {
+PUBLIC NONNULL((1)) void KCALL
+tty_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...) {
 	struct tty_device *me;
-	int error;
 	me = (struct tty_device *)self;
-	if (what & POLLIN) {
-		/* Poll the input buffer, as well as the underlying input driver for reading. */
-		error = terminal_poll_iread(&me->t_term);
-		if (error == TERMINAL_POLL_NONBLOCK)
-			return POLLIN;
-#if 0
-		{
-			poll_mode_t result;
-			error = terminal_poll_iwrite(&me->t_term);
-			if (error == TERMINAL_POLL_MAYBLOCK)
-				goto done_read; /* Writing additional input will block because buffers are full. */
-			if (error == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
-				/* Because terminal input is being echoed, we must poll if we're
-				 * able to write output when we actually just want to read input. */
-				result = (*handle_type_db.h_poll[me->t_ohandle_typ])(me->t_ohandle_ptr,
-				                                                   POLLOUT);
-				if (!result)
-					goto done_read;
-			}
-			/* Actually check if reading additional input would block. */
-			result = (*handle_type_db.h_poll[me->t_ihandle_typ])(me->t_ihandle_ptr, POLLIN);
-			if (result)
-				return result; /* No, it wouldn't! */
-		}
-#endif
+	if (what & POLLINMASK) {
+		/* Poll the input buffer. */
+		terminal_pollconnect_iread(&me->t_term);
 	}
-/*done_read:*/
-	if (what & POLLOUT) {
+	if (what & POLLOUTMASK) {
 		/* Poll the output buffer, as well as the underlying output driver for writing. */
-		error = terminal_poll_owrite(&me->t_term);
-		if (error == TERMINAL_POLL_NONBLOCK)
-			return POLLOUT;
-		if (error == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
-			poll_mode_t result;
-			/* Check if writing to the display would block. */
-			result = (*handle_type_db.h_poll[me->t_ohandle_typ])(me->t_ohandle_ptr,
-			                                                     POLLOUT);
-			return result;
-		}
+#define connect_to_output_driver_write(cb) \
+		(*handle_type_db.h_pollconnect[me->t_ohandle_typ])(me->t_ohandle_ptr, POLLOUTMASK)
+		terminal_pollconnect_owrite(&me->t_term, connect_to_output_driver_write);
+#undef connect_to_output_driver_write
 	}
-	return 0;
+}
+
+PUBLIC NONNULL((1)) poll_mode_t KCALL
+tty_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...) {
+	poll_mode_t result = 0;
+	struct tty_device *me;
+	me = (struct tty_device *)self;
+	if (what & POLLINMASK) {
+		/* Poll the input buffer, as well as the underlying input driver for reading. */
+		if (terminal_caniread(&me->t_term))
+			result |= POLLINMASK;
+	}
+	if (what & POLLOUTMASK) {
+		/* Poll the output buffer, as well as the underlying output driver for writing. */
+		if (terminal_canowrite(&me->t_term,
+		                       (*handle_type_db.h_polltest[me->t_ohandle_typ])(me->t_ohandle_ptr,
+		                                                                       POLLOUTMASK) != 0))
+			result |= POLLOUTMASK;
+	}
+	return result;
 }
 
 PRIVATE NONNULL((1, 2)) bool ASYNC_CALLBACK_CC
@@ -146,8 +136,12 @@ ttyfwd_poll(void *__restrict arg,
 	struct tty_device *tty;
 	poll_mode_t what;
 	tty  = (struct tty_device *)arg;
-	what = (*tty->t_ihandle_poll)(tty->t_ihandle_ptr, POLLIN);
-	return (what & POLLIN) != 0;
+	what = (*tty->t_ihandle_polltest)(tty->t_ihandle_ptr, POLLINMASK) & POLLINMASK;
+	if (what)
+		return true;
+	(*tty->t_ihandle_pollconnect)(tty->t_ihandle_ptr, POLLINMASK);
+	what = (*tty->t_ihandle_polltest)(tty->t_ihandle_ptr, POLLINMASK) & POLLINMASK;
+	return what != 0;
 }
 
 PRIVATE NONNULL((1)) void ASYNC_CALLBACK_CC
@@ -344,32 +338,39 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	typedef size_t (KCALL *phandle_read_function_t)(void *__restrict ptr, USER CHECKED void *, size_t, iomode_t) /*THROWS(...)*/;
 	typedef size_t (KCALL *phandle_write_function_t)(void *__restrict ptr, USER CHECKED void const *, size_t, iomode_t) /*THROWS(...)*/;
-	typedef poll_mode_t (KCALL *phandle_poll_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
+	typedef void (KCALL *phandle_pollconnect_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
+	typedef poll_mode_t (KCALL *phandle_polltest_function_t)(void *__restrict ptr, poll_mode_t) /*THROWS(...)*/;
 	REF struct tty_device *result;
 	assert(ihandle_typ < HANDLE_TYPE_COUNT);
 	assert(ohandle_typ < HANDLE_TYPE_COUNT);
 	result = CHARACTER_DEVICE_ALLOC(struct tty_device);
 	ttybase_device_cinit(result, &tty_device_oprinter);
-	result->cd_type.ct_fini  = &tty_device_fini;
-	result->cd_type.ct_write = &ttybase_device_owrite;
-	result->cd_type.ct_poll  = &tty_device_poll;
-	result->cd_type.ct_ioctl = &tty_device_ioctl;
-	result->cd_type.ct_mmap  = &tty_device_mmap;
-	result->t_ihandle_typ    = ihandle_typ;
-	result->t_ohandle_typ    = ohandle_typ;
-	result->t_ihandle_ptr    = ihandle_ptr;
-	result->t_ohandle_ptr    = ohandle_ptr;
-	result->t_ihandle_read   = handle_type_db.h_read[ihandle_typ];
-	result->t_ihandle_poll   = handle_type_db.h_poll[ihandle_typ];
-	result->t_ohandle_write  = handle_type_db.h_write[ohandle_typ];
+	result->cd_type.ct_fini        = &tty_device_fini;
+	result->cd_type.ct_write       = &ttybase_device_owrite;
+	result->cd_type.ct_pollconnect = &tty_device_pollconnect;
+	result->cd_type.ct_polltest    = &tty_device_polltest;
+	result->cd_type.ct_ioctl       = &tty_device_ioctl;
+	result->cd_type.ct_mmap        = &tty_device_mmap;
+	result->t_ihandle_typ          = ihandle_typ;
+	result->t_ohandle_typ          = ohandle_typ;
+	result->t_ihandle_ptr          = ihandle_ptr;
+	result->t_ohandle_ptr          = ohandle_ptr;
+	result->t_ihandle_read         = handle_type_db.h_read[ihandle_typ];
+	result->t_ihandle_pollconnect  = handle_type_db.h_pollconnect[ihandle_typ];
+	result->t_ihandle_polltest     = handle_type_db.h_polltest[ihandle_typ];
+	result->t_ohandle_write        = handle_type_db.h_write[ohandle_typ];
 	/* Optimization to by-pass handle operators for known character devices. */
 	if (ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
 		struct character_device *cdev;
 		cdev = (struct character_device *)ihandle_ptr;
 		if (cdev->cd_type.ct_read)
 			result->t_ihandle_read = (phandle_read_function_t)cdev->cd_type.ct_read;
-		if (cdev->cd_type.ct_poll)
-			result->t_ihandle_poll = (phandle_poll_function_t)cdev->cd_type.ct_poll;
+		assert((cdev->cd_type.ct_pollconnect != NULL) ==
+		       (cdev->cd_type.ct_polltest != NULL));
+		if (cdev->cd_type.ct_pollconnect) {
+			result->t_ihandle_pollconnect = (phandle_pollconnect_function_t)cdev->cd_type.ct_pollconnect;
+			result->t_ihandle_polltest    = (phandle_polltest_function_t)cdev->cd_type.ct_polltest;
+		}
 	}
 	if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE) {
 		struct character_device *cdev;

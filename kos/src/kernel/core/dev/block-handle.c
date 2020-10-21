@@ -429,27 +429,38 @@ handle_blockdevice_stat(struct basic_block_device *__restrict self,
 	result->st_blocks  = (__blkcnt64_t)self->bd_sector_count;
 }
 
+INTERN void KCALL
+handle_blockdevice_pollconnect(struct basic_block_device *__restrict self, poll_mode_t what) {
+	if (what & (POLLINMASK | POLLOUTMASK)) {
+		struct block_device *block;
+		block = (struct block_device *)self;
+		if (block_device_ispartition(self))
+			block = ((struct block_device_partition *)self)->bp_master;
+		rwlock_pollconnect(&block->bd_cache_lock);
+	}
+}
+
 INTERN poll_mode_t KCALL
-handle_blockdevice_poll(struct basic_block_device *__restrict self, poll_mode_t what) {
+handle_blockdevice_polltest(struct basic_block_device *__restrict self, poll_mode_t what) {
 	struct block_device *block;
 	block = (struct block_device *)self;
 	if (block_device_ispartition(self))
 		block = ((struct block_device_partition *)self)->bp_master;
-	if (what & POLLOUT) {
-		if (rwlock_pollwrite(&block->bd_cache_lock))
-			return POLLOUT | POLLIN;
-	} else if (what & POLLIN) {
-		if (rwlock_pollread(&block->bd_cache_lock))
-			return POLLIN;
+	if (what & POLLOUTMASK) {
+		if (rwlock_canwrite(&block->bd_cache_lock))
+			return POLLOUTMASK | POLLINMASK;
+	} else if (what & POLLINMASK) {
+		if (rwlock_canread(&block->bd_cache_lock))
+			return POLLINMASK;
 	}
 	return 0;
 }
 
-INTERN syscall_slong_t
-(KCALL handle_blockdevice_hop)(struct basic_block_device *__restrict self,
-                               syscall_ulong_t cmd,
-                               USER UNCHECKED void *arg,
-                               iomode_t mode) {
+INTERN syscall_slong_t KCALL
+handle_blockdevice_hop(struct basic_block_device *__restrict self,
+                       syscall_ulong_t cmd,
+                       USER UNCHECKED void *arg,
+                       iomode_t mode) {
 	switch (cmd) {
 
 	case HOP_BLOCKDEVICE_STAT: {

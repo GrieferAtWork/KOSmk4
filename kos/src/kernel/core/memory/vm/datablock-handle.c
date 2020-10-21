@@ -43,6 +43,7 @@
 #include <kos/hop/datablock.h>
 #include <sys/stat.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 
@@ -163,23 +164,33 @@ handle_datablock_datasync(struct vm_datablock *__restrict self) {
 	vm_datablock_sync(self);
 }
 
-INTERN NONNULL((1)) poll_mode_t KCALL
-handle_datablock_poll(struct vm_datablock *__restrict self,
-                      poll_mode_t what) {
-	poll_mode_t result;
-	if (self->db_type->dt_handle_poll) {
-		result = (*self->db_type->dt_handle_poll)(self, what);
-	} else {
-		result = 0;
-		if (what & POLLOUT) {
-			if (rwlock_pollwrite(&self->db_lock))
-				result = POLLOUT | POLLIN;
-		} else if (what & POLLIN) {
-			if (rwlock_pollread(&self->db_lock))
-				result = POLLIN;
-		}
+INTERN NONNULL((1)) void KCALL
+handle_datablock_pollconnect(struct vm_datablock *__restrict self,
+                             poll_mode_t what) {
+	assert((self->db_type->dt_handle_pollconnect != NULL) ==
+	       (self->db_type->dt_handle_polltest != NULL));
+	if (self->db_type->dt_handle_pollconnect) {
+		(*self->db_type->dt_handle_pollconnect)(self, what);
+	} else if (what & (POLLOUTMASK | POLLINMASK)) {
+		rwlock_pollconnect(&self->db_lock);
 	}
-	return result;
+}
+
+INTERN NONNULL((1)) poll_mode_t KCALL
+handle_datablock_polltest(struct vm_datablock *__restrict self,
+                          poll_mode_t what) {
+	assert((self->db_type->dt_handle_pollconnect != NULL) ==
+	       (self->db_type->dt_handle_polltest != NULL));
+	if (self->db_type->dt_handle_polltest)
+		return (*self->db_type->dt_handle_polltest)(self, what);
+	if (what & POLLOUTMASK) {
+		if (rwlock_canwrite(&self->db_lock))
+			return POLLOUTMASK | POLLINMASK;
+	} else if (what & POLLINMASK) {
+		if (rwlock_canread(&self->db_lock))
+			return POLLINMASK;
+	}
+	return 0;
 }
 
 

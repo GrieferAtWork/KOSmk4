@@ -23,6 +23,7 @@
 #include "api.h"
 /**/
 
+#include <hybrid/__atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/crt/format-printer.h>
@@ -103,10 +104,12 @@ struct terminal {
 	struct linebuffer         t_canon;       /* Canonical buffer for line-wise input (used for input when `t_ios.c_lflag & ICANON' is set)
 	                                          * NOTE: When `ICANON' is cleared, `t_canon.lb_nful' must be broadcast! */
 	struct linebuffer         t_opend;       /* Buffer for pending output text (used when `t_ios.c_iflag & IXOFF' is set)
-	                                          * NOTE: When `IXOFF' is cleared, `t_opend.lb_nful' must be broadcast! */
+	                                          * NOTE: When `IXOFF' is cleared, `t_opend.lb_nful' must be broadcast!
+	                                          * NOTE: When `(c_lflag & (ECHO | EXTPROC)) != ECHO', `t_opend.lb_nful' must be broadcast! */
 	struct linebuffer         t_ipend;       /* Buffer for pending input text (used when `t_ios.c_iflag & __IIOFF' is set)
 	                                          * NOTE: When `__IIOFF' is cleared, `t_ipend.lb_nful' must be broadcast! */
 	struct termios            t_ios;         /* Terminal I/O configuration. */
+	sched_signal_t            t_ioschange;   /* Signal broadcast when: `IXOFF' is set, `(c_lflag & (ECHO | EXTPROC)) != ECHO' */
 };
 
 #define terminal_fini(self)             \
@@ -222,25 +225,110 @@ terminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
 #endif /* LIBTERM_WANT_PROTOTYPES */
 
-#ifdef __KERNEL__
-#define TERMINAL_POLL_NONBLOCK              1  /* The operation would not block */
-#define TERMINAL_POLL_MAYBLOCK              0  /* The operation would block */
-#define TERMINAL_POLL_MAYBLOCK_UNDERLYING (-1) /* The operation would block if operating on the underlying component blocks:
-                                                *  - terminal_poll_iread():  Whoever is responsible for providing data through `terminal_iwrite()'
-                                                *  - terminal_poll_iwrite(): Whoever is responsible for accepting data from `terminal_owrite()' (in case input is echoed)
-                                                *  - terminal_poll_owrite(): Whoever is responsible for accepting data from `terminal_owrite()' */
 
-/* Poll the given terminal for various operations being non-blocking.
- * @return: * : One of `TERMINAL_POLL_*' */
-typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_IREAD)(struct terminal *__restrict self) /*__THROWS(E_WOULDBLOCK, E_BADALLOC)*/;
-typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_IWRITE)(struct terminal *__restrict self) /*__THROWS(E_WOULDBLOCK, E_BADALLOC)*/;
-typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_OWRITE)(struct terminal *__restrict self) /*__THROWS(E_WOULDBLOCK, E_BADALLOC)*/;
-#ifdef LIBTERM_WANT_PROTOTYPES
-LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC terminal_poll_iread(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC terminal_poll_iwrite(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC terminal_poll_owrite(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-#endif /* LIBTERM_WANT_PROTOTYPES */
-#endif /* __KERNEL__ */
+/* Poll for `terminal_iread()' to become non-blocking. */
+#define terminal_caniread(self)                                                     \
+	((__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & __IEOFING) || \
+	 ringbuffer_canread(&(self)->t_ibuf))
+#define terminal_pollconnect_iread_ex(self, cb) \
+	ringbuffer_pollconnect_read_ex(&(self)->t_ibuf, cb)
+#ifdef __OPTIMIZE_SIZE__
+#define terminal_polliread_ex(self, cb)       \
+	(terminal_pollconnect_iread_ex(self, cb), \
+	 terminal_caniread(self))
+#else /* __OPTIMIZE_SIZE__ */
+#define terminal_polliread_ex(self, cb)        \
+	(terminal_caniread(self) ||                \
+	 (terminal_pollconnect_iread_ex(self, cb), \
+	  terminal_caniread(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#ifdef ringbuffer_pollconnect_read
+#define terminal_pollconnect_iread(self) \
+	ringbuffer_pollconnect_read(&(self)->t_ibuf)
+#endif /* ringbuffer_pollconnect_read */
+#ifdef terminal_pollconnect_iread
+#ifdef __OPTIMIZE_SIZE__
+#define terminal_polliread(self)       \
+	(terminal_pollconnect_iread(self), \
+	 terminal_caniread(self))
+#else /* __OPTIMIZE_SIZE__ */
+#define terminal_polliread(self)        \
+	(terminal_caniread(self) ||         \
+	 (terminal_pollconnect_iread(self), \
+	  terminal_caniread(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* terminal_pollconnect_iread */
+
+
+/* Poll for `terminal_owrite()' to become non-blocking. */
+#define terminal_canowrite(self, t_oprint_canwrite)                          \
+	((__hybrid_atomic_load((self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & IXOFF) \
+	 ? linebuffer_canwrite(&(self)->t_opend)                                 \
+	 : (t_oprint_canwrite))
+#define terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, cb)        \
+	((__hybrid_atomic_load((self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & IXOFF) \
+	 ? linebuffer_pollconnect_write_ex(&(self)->t_opend, cb)                 \
+	 : (cb(&(self)->t_ioschange), /* Listen for `IXOFF' being set */         \
+	    t_oprint_connect_ex(cb) /* Listen for the underlying device */))
+#ifdef __OPTIMIZE_SIZE__
+#define terminal_pollowrite_ex(self, t_oprint_canwrite, t_oprint_connect_ex, cb) \
+	(terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, cb),              \
+	 terminal_canowrite(self, t_oprint_canwrite))
+#else /* __OPTIMIZE_SIZE__ */
+#define terminal_pollowrite_ex(self, t_oprint_canwrite, t_oprint_connect_ex, cb) \
+	(terminal_canowrite(self, t_oprint_canwrite) ||                              \
+	 (terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, cb),             \
+	  terminal_canowrite(self, t_oprint_canwrite)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#ifdef sched_signal_connect_for_poll
+#define terminal_pollconnect_owrite(self, t_oprint_connect_ex) \
+	terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, sched_signal_connect_for_poll)
+#define terminal_pollowrite(self, t_oprint_canwrite, t_oprint_connect_ex) \
+	terminal_pollowrite_ex(self, t_oprint_canwrite, t_oprint_connect_ex, sched_signal_connect_for_poll)
+#endif /* sched_signal_connect_for_poll */
+
+
+
+/* Poll for `terminal_iwrite()' to become non-blocking. */
+#define terminal_caniwrite(self, t_oprint_canwrite)                             \
+	((__hybrid_atomic_load((self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IIOFF)  \
+	 ? linebuffer_canwrite(&(self)->t_ipend)                                    \
+	 : (__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & ICANON) \
+	   ? linebuffer_canwrite(&(self)->t_canon)                                  \
+	   : (ringbuffer_canwrite(&(self)->t_ibuf) &&                               \
+	      ((__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) &     \
+	        (ECHO | EXTPROC)) != ECHO ||                                        \
+	       terminal_canowrite(self, t_oprint_canwrite) /* For echo */)))
+#define terminal_pollconnect_iwrite_ex(self, t_oprint_connect_ex, cb)            \
+	((__hybrid_atomic_load((self)->t_ios.c_iflag, __ATOMIC_ACQUIRE) & __IIOFF)   \
+	 ? (void)linebuffer_pollconnect_write_ex(&(self)->t_ipend, cb)               \
+	 : (__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) & ICANON)  \
+	   ? (void)linebuffer_pollconnect_write_ex(&(self)->t_canon, cb)             \
+	   : (ringbuffer_pollconnect_write_ex(&(self)->t_ibuf, cb),                  \
+	      ((__hybrid_atomic_load((self)->t_ios.c_lflag, __ATOMIC_ACQUIRE) &      \
+	        (ECHO | EXTPROC)) == ECHO                                            \
+	       ? (void)terminal_pollconnect_owrite_ex(self, t_oprint_connect_ex, cb) \
+	       : (void)0)))
+#define terminal_polliwrite_unlikely_ex(self, t_oprint_canwrite, t_oprint_connect_ex, cb) \
+	(terminal_pollconnect_iwrite_ex(self, t_oprint_connect_ex, cb),                       \
+	 terminal_caniwrite(self, t_oprint_canwrite))
+#ifdef __OPTIMIZE_SIZE__
+#define terminal_polliwrite_ex(self, t_oprint_canwrite, t_oprint_connect_ex, cb) \
+	terminal_polliwrite_unlikely_ex(self, t_oprint_canwrite, t_oprint_connect_ex, cb)
+#else /* __OPTIMIZE_SIZE__ */
+#define terminal_polliwrite_ex(self, t_oprint_canwrite, t_oprint_connect_ex, cb) \
+	(terminal_caniwrite(self, t_oprint_canwrite) ||                              \
+	 (terminal_pollconnect_iwrite_ex(self, t_oprint_connect_ex, cb),             \
+	  terminal_caniwrite(self, t_oprint_canwrite)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#ifdef sched_signal_connect_for_poll
+#define terminal_pollconnect_iwrite(self, t_oprint_connect_ex) \
+	terminal_pollconnect_iwrite_ex(self, t_oprint_connect_ex, sched_signal_connect_for_poll)
+#define terminal_polliwrite(self, t_oprint_canwrite, t_oprint_connect_ex) \
+	terminal_polliwrite_ex(self, t_oprint_canwrite, t_oprint_connect_ex, sched_signal_connect_for_poll)
+#define terminal_polliwrite_unlikely(self, t_oprint_canwrite, t_oprint_connect_ex) \
+	terminal_polliwrite_unlikely_ex(self, t_oprint_canwrite, t_oprint_connect_ex, sched_signal_connect_for_poll)
+#endif /* sched_signal_connect_for_poll */
 
 #undef __KERNEL_SELECT
 

@@ -123,7 +123,8 @@ struct keyboard_device
 FUNDEF NONNULL((1)) size_t KCALL keyboard_device_read(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) syscall_slong_t KCALL keyboard_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL keyboard_device_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-FUNDEF NONNULL((1)) poll_mode_t KCALL keyboard_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) void KCALL keyboard_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL keyboard_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
 
 /* Initialize/finalize the given keyboard device.
  * NOTE: Drivers that override the `ct_fini' operator of a given keyboard

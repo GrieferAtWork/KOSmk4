@@ -357,12 +357,11 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_endwrite)(struct
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_endread)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_end)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_datapart_lock_downgrade)(struct vm_datapart *__restrict self);
-#define vm_datapart_lock_reading(self)   shared_rwlock_reading(&(self)->dp_lock)
-#define vm_datapart_lock_writing(self)   shared_rwlock_writing(&(self)->dp_lock)
-#define vm_datapart_lock_canread(self)   shared_rwlock_canread(&(self)->dp_lock)
-#define vm_datapart_lock_canwrite(self)  shared_rwlock_canwrite(&(self)->dp_lock)
-#define vm_datapart_lock_pollread(self)  shared_rwlock_pollread(&(self)->dp_lock)
-#define vm_datapart_lock_pollwrite(self) shared_rwlock_pollwrite(&(self)->dp_lock)
+#define vm_datapart_lock_reading(self)          shared_rwlock_reading(&(self)->dp_lock)
+#define vm_datapart_lock_writing(self)          shared_rwlock_writing(&(self)->dp_lock)
+#define vm_datapart_lock_canread(self)          shared_rwlock_canread(&(self)->dp_lock)
+#define vm_datapart_lock_canwrite(self)         shared_rwlock_canwrite(&(self)->dp_lock)
+#define vm_datapart_lock_connect_for_poll(self) shared_rwlock_connect_for_poll(&(self)->dp_lock)
 
 /* Define C++ sync API hooks. */
 __DEFINE_SYNC_RWLOCK(struct vm_datapart,
@@ -383,9 +382,6 @@ __DEFINE_SYNC_RWLOCK(struct vm_datapart,
                      vm_datapart_lock_upgrade,
                      vm_datapart_lock_upgrade_nx,
                      vm_datapart_lock_downgrade)
-__DEFINE_SYNC_POLL(struct vm_datapart,
-                   vm_datapart_lock_pollread,
-                   vm_datapart_lock_pollwrite)
 
 
 
@@ -987,9 +983,12 @@ struct vm_datablock_type {
 	/* [0..1] Same as above, but used when polling for data being available.
 	 * When not implemented (i.e. when set to `NULL'), poll is implemented for
 	 * the datablock through use of `rwlock_poll(read|write)(&self->db_lock)' */
+	NONNULL((1)) void
+	(KCALL *dt_handle_pollconnect)(struct vm_datablock *__restrict self,
+	                               poll_mode_t what) THROWS(...);
 	WUNUSED NONNULL((1)) poll_mode_t
-	(KCALL *dt_handle_poll)(struct vm_datablock *__restrict self,
-	                        poll_mode_t what) THROWS(...);
+	(KCALL *dt_handle_polltest)(struct vm_datablock *__restrict self,
+	                            poll_mode_t what) THROWS(...);
 };
 
 
@@ -1173,25 +1172,24 @@ FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_end)(void);
 FUNDEF NOBLOCK bool NOTHROW(KCALL devfs_lock_downgrade)(void);
 
 /* Locking functions for data blocks */
-#define vm_datablock_lock_read(self)       (unlikely((self) == &__devfs_datablock) ? devfs_lock_read() : (void)rwlock_read(&(self)->db_lock))
-#define vm_datablock_lock_write(self)      (unlikely((self) == &__devfs_datablock) ? devfs_lock_write() : (void)rwlock_write(&(self)->db_lock))
-#define vm_datablock_lock_upgrade(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_upgrade() : rwlock_upgrade(&(self)->db_lock))
-#define vm_datablock_lock_read_nx(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_read_nx() : rwlock_read_nx(&(self)->db_lock))
-#define vm_datablock_lock_write_nx(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_write_nx() : rwlock_write_nx(&(self)->db_lock))
-#define vm_datablock_lock_upgrade_nx(self) (unlikely((self) == &__devfs_datablock) ? devfs_lock_upgrade_nx() : rwlock_upgrade_nx(&(self)->db_lock))
-#define vm_datablock_lock_tryread(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_tryread() : rwlock_tryread(&(self)->db_lock))
-#define vm_datablock_lock_trywrite(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_trywrite() : rwlock_trywrite(&(self)->db_lock))
-#define vm_datablock_lock_tryupgrade(self) (unlikely((self) == &__devfs_datablock) ? devfs_lock_tryupgrade() : rwlock_tryupgrade(&(self)->db_lock))
-#define vm_datablock_lock_endwrite(self)   (unlikely((self) == &__devfs_datablock) ? devfs_lock_endwrite() : rwlock_endwrite(&(self)->db_lock))
-#define vm_datablock_lock_endread(self)    (unlikely((self) == &__devfs_datablock) ? devfs_lock_endread() : rwlock_endread(&(self)->db_lock))
-#define vm_datablock_lock_end(self)        (unlikely((self) == &__devfs_datablock) ? devfs_lock_end() : rwlock_end(&(self)->db_lock))
-#define vm_datablock_lock_downgrade(self)  (unlikely((self) == &__devfs_datablock) ? devfs_lock_downgrade() : rwlock_downgrade(&(self)->db_lock))
-#define vm_datablock_lock_reading(self)    rwlock_reading(&(self)->db_lock)
-#define vm_datablock_lock_writing(self)    rwlock_writing(&(self)->db_lock)
-#define vm_datablock_lock_canread(self)    rwlock_canread(&(self)->db_lock)
-#define vm_datablock_lock_canwrite(self)   rwlock_canwrite(&(self)->db_lock)
-#define vm_datablock_lock_pollread(self)   rwlock_pollread(&(self)->db_lock)
-#define vm_datablock_lock_pollwrite(self)  rwlock_pollwrite(&(self)->db_lock)
+#define vm_datablock_lock_read(self)             (unlikely((self) == &__devfs_datablock) ? devfs_lock_read() : (void)rwlock_read(&(self)->db_lock))
+#define vm_datablock_lock_write(self)            (unlikely((self) == &__devfs_datablock) ? devfs_lock_write() : (void)rwlock_write(&(self)->db_lock))
+#define vm_datablock_lock_upgrade(self)          (unlikely((self) == &__devfs_datablock) ? devfs_lock_upgrade() : rwlock_upgrade(&(self)->db_lock))
+#define vm_datablock_lock_read_nx(self)          (unlikely((self) == &__devfs_datablock) ? devfs_lock_read_nx() : rwlock_read_nx(&(self)->db_lock))
+#define vm_datablock_lock_write_nx(self)         (unlikely((self) == &__devfs_datablock) ? devfs_lock_write_nx() : rwlock_write_nx(&(self)->db_lock))
+#define vm_datablock_lock_upgrade_nx(self)       (unlikely((self) == &__devfs_datablock) ? devfs_lock_upgrade_nx() : rwlock_upgrade_nx(&(self)->db_lock))
+#define vm_datablock_lock_tryread(self)          (unlikely((self) == &__devfs_datablock) ? devfs_lock_tryread() : rwlock_tryread(&(self)->db_lock))
+#define vm_datablock_lock_trywrite(self)         (unlikely((self) == &__devfs_datablock) ? devfs_lock_trywrite() : rwlock_trywrite(&(self)->db_lock))
+#define vm_datablock_lock_tryupgrade(self)       (unlikely((self) == &__devfs_datablock) ? devfs_lock_tryupgrade() : rwlock_tryupgrade(&(self)->db_lock))
+#define vm_datablock_lock_endwrite(self)         (unlikely((self) == &__devfs_datablock) ? devfs_lock_endwrite() : rwlock_endwrite(&(self)->db_lock))
+#define vm_datablock_lock_endread(self)          (unlikely((self) == &__devfs_datablock) ? devfs_lock_endread() : rwlock_endread(&(self)->db_lock))
+#define vm_datablock_lock_end(self)              (unlikely((self) == &__devfs_datablock) ? devfs_lock_end() : rwlock_end(&(self)->db_lock))
+#define vm_datablock_lock_downgrade(self)        (unlikely((self) == &__devfs_datablock) ? devfs_lock_downgrade() : rwlock_downgrade(&(self)->db_lock))
+#define vm_datablock_lock_reading(self)          rwlock_reading(&(self)->db_lock)
+#define vm_datablock_lock_writing(self)          rwlock_writing(&(self)->db_lock)
+#define vm_datablock_lock_canread(self)          rwlock_canread(&(self)->db_lock)
+#define vm_datablock_lock_canwrite(self)         rwlock_canwrite(&(self)->db_lock)
+#define vm_datablock_lock_connect_for_poll(self) rwlock_connect_for_poll(&(self)->db_lock)
 
 /* Define C++ sync API hooks. */
 __DEFINE_SYNC_RWLOCK(struct vm_datablock,
@@ -1212,9 +1210,6 @@ __DEFINE_SYNC_RWLOCK(struct vm_datablock,
                      vm_datablock_lock_upgrade,
                      vm_datablock_lock_upgrade_nx,
                      vm_datablock_lock_downgrade)
-__DEFINE_SYNC_POLL(struct vm_datablock,
-                   vm_datablock_lock_pollread,
-                   vm_datablock_lock_pollwrite)
 
 
 /* The data block type used to identify INodes. */

@@ -74,11 +74,17 @@ null_pwrite(struct character_device *__restrict UNUSED(self),
 	return num_bytes;
 }
 
-PRIVATE NONNULL((1)) poll_mode_t KCALL
-null_poll(struct character_device *__restrict UNUSED(self),
-          poll_mode_t what)
+PRIVATE NONNULL((1)) void KCALL
+null_pollconnect(struct character_device *__restrict UNUSED(self),
+                 poll_mode_t UNUSED(what))
 		THROWS(...) {
-	return what;
+}
+
+PRIVATE NONNULL((1)) poll_mode_t KCALL
+null_polltest(struct character_device *__restrict UNUSED(self),
+              poll_mode_t what)
+		THROWS(...) {
+	return what & (POLLINMASK | POLLOUTMASK);
 }
 
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL
@@ -226,11 +232,12 @@ urandom_pread(struct character_device *__restrict self,
 	return urandom_read(self, dst, num_bytes, mode);
 }
 
+#define urandom_pollconnect null_pollconnect
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-urandom_poll(struct character_device *__restrict UNUSED(self),
-             poll_mode_t what)
+urandom_polltest(struct character_device *__restrict UNUSED(self),
+                 poll_mode_t what)
 		THROWS(...) {
-	return what & POLLIN;
+	return what & POLLINMASK;
 }
 
 
@@ -279,12 +286,13 @@ random_pread(struct character_device *__restrict self,
 	return random_read(self, dst, num_bytes, mode);
 }
 
+#define random_pollconnect null_pollconnect
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-random_poll(struct character_device *__restrict UNUSED(self),
-            poll_mode_t what)
+random_polltest(struct character_device *__restrict UNUSED(self),
+                poll_mode_t what)
 		THROWS(...) {
 	/* TODO: Wait for non-deterministic random data to become available! */
-	return what & POLLIN;
+	return what & POLLINMASK;
 }
 
 
@@ -295,11 +303,12 @@ kmsg_write(struct character_device *__restrict UNUSED(self),
 	return (size_t)syslog_printer(SYSLOG_LEVEL_RAW, (char const *)src, num_bytes);
 }
 
+#define kmsg_pollconnect null_pollconnect
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-kmsg_poll(struct character_device *__restrict UNUSED(self),
-          poll_mode_t what)
+kmsg_polltest(struct character_device *__restrict UNUSED(self),
+              poll_mode_t what)
 		THROWS(...) {
-	return what & POLLOUT;
+	return what & POLLOUTMASK;
 }
 
 
@@ -453,23 +462,25 @@ urandom_mmap(struct character_device *__restrict UNUSED(self),
 
 
 #define INIT_DEVICE(name, mkdev, read, write, pread,          \
-                    pwrite, mmap, stat, poll, open)           \
+                    pwrite, mmap, stat,                       \
+                    pollconnect, polltest, open)              \
 	{                                                         \
 		/* .cd_refcnt   = */ 1,                               \
 		/* .cd_heapsize = */ sizeof(struct character_device), \
 		/* .cd_type     = */ {                                \
-			/* .ct_driver    = */ &drv_self,                  \
-			/* .ct_fini      = */ NULL,                       \
-			/* .ct_read      = */ read,                       \
-			/* .ct_write     = */ write,                      \
-			/* .ct_pread     = */ pread,                      \
-			/* .ct_pwrite    = */ pwrite,                     \
-			/* .ct_ioctl     = */ NULL,                       \
-			/* .ct_mmap      = */ mmap,                       \
-			/* .ct_sync      = */ NULL,                       \
-			/* .ct_stat      = */ stat,                       \
-			/* .ct_poll      = */ poll,                       \
-			/* .ct_open      = */ open                        \
+			/* .ct_driver      = */ &drv_self,                \
+			/* .ct_fini        = */ NULL,                     \
+			/* .ct_read        = */ read,                     \
+			/* .ct_write       = */ write,                    \
+			/* .ct_pread       = */ pread,                    \
+			/* .ct_pwrite      = */ pwrite,                   \
+			/* .ct_ioctl       = */ NULL,                     \
+			/* .ct_mmap        = */ mmap,                     \
+			/* .ct_sync        = */ NULL,                     \
+			/* .ct_stat        = */ stat,                     \
+			/* .ct_pollconnect = */ pollconnect,              \
+			/* .ct_polltest    = */ polltest,                 \
+			/* .ct_open        = */ open                      \
 		},                                                    \
 		/* .cd_devlink     = */ { NULL, NULL, mkdev },        \
 		/* .cd_flags       = */ CHARACTER_DEVICE_FLAG_NORMAL, \
@@ -480,15 +491,15 @@ urandom_mmap(struct character_device *__restrict UNUSED(self),
 
 
 PRIVATE struct character_device null_devices[] = {
-	INIT_DEVICE("mem", MKDEV(1, 1), NULL, NULL, &mem_pread, &mem_pwrite, &phys_mmap, NULL, &null_poll, NULL),
-	INIT_DEVICE("kmem", MKDEV(1, 2), NULL, NULL, &kmem_pread, &kmem_pwrite, NULL, NULL, &null_poll, NULL),
-	INIT_DEVICE("null", MKDEV(1, 3), &null_read, &null_write, &null_pread, &null_pwrite, &zero_mmap, NULL, &null_poll, NULL),
-	INIT_DEVICE("port", MKDEV(1, 4), NULL, NULL, &port_pread, &port_pwrite, PORT_MMAP_POINTER, NULL, &null_poll, &port_open),
-	INIT_DEVICE("zero", MKDEV(1, 5), &zero_read, &null_write, &zero_pread, &null_pwrite, &zero_mmap, NULL, &null_poll, NULL),
-	INIT_DEVICE("full", MKDEV(1, 7), &zero_read, &full_write, &zero_pread, &full_pwrite, &zero_mmap, NULL, &null_poll, NULL),
-	INIT_DEVICE("random", MKDEV(1, 8), &random_read, NULL, &random_pread, NULL, RANDOM_MMAP_POINTER, NULL, &random_poll, NULL),
-	INIT_DEVICE("urandom", MKDEV(1, 9), &urandom_read, NULL, &urandom_pread, NULL, URANDOM_MMAP_POINTER, NULL, &urandom_poll, NULL),
-	INIT_DEVICE("kmsg", MKDEV(1, 11), NULL, &kmsg_write, NULL, NULL, NULL, NULL, &kmsg_poll, NULL),
+	INIT_DEVICE("mem", MKDEV(1, 1), NULL, NULL, &mem_pread, &mem_pwrite, &phys_mmap, NULL, &null_pollconnect, &null_polltest, NULL),
+	INIT_DEVICE("kmem", MKDEV(1, 2), NULL, NULL, &kmem_pread, &kmem_pwrite, NULL, NULL, &null_pollconnect, &null_polltest, NULL),
+	INIT_DEVICE("null", MKDEV(1, 3), &null_read, &null_write, &null_pread, &null_pwrite, &zero_mmap, NULL, &null_pollconnect, &null_polltest, NULL),
+	INIT_DEVICE("port", MKDEV(1, 4), NULL, NULL, &port_pread, &port_pwrite, PORT_MMAP_POINTER, NULL, &null_pollconnect, &null_polltest, &port_open),
+	INIT_DEVICE("zero", MKDEV(1, 5), &zero_read, &null_write, &zero_pread, &null_pwrite, &zero_mmap, NULL, &null_pollconnect, &null_polltest, NULL),
+	INIT_DEVICE("full", MKDEV(1, 7), &zero_read, &full_write, &zero_pread, &full_pwrite, &zero_mmap, NULL, &null_pollconnect, &null_polltest, NULL),
+	INIT_DEVICE("random", MKDEV(1, 8), &random_read, NULL, &random_pread, NULL, RANDOM_MMAP_POINTER, NULL, &random_pollconnect, &random_polltest, NULL),
+	INIT_DEVICE("urandom", MKDEV(1, 9), &urandom_read, NULL, &urandom_pread, NULL, URANDOM_MMAP_POINTER, NULL, &urandom_pollconnect, &urandom_polltest, NULL),
+	INIT_DEVICE("kmsg", MKDEV(1, 11), NULL, &kmsg_write, NULL, NULL, NULL, NULL, &kmsg_pollconnect, &kmsg_polltest, NULL),
 };
 
 

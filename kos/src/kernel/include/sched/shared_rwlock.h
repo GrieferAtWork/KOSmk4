@@ -112,13 +112,32 @@ NOTHROW(FCALL shared_rwlock_endread)(struct shared_rwlock *__restrict self);
 LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_end)(struct shared_rwlock *__restrict self);
 
-/* Poll for reading/writing */
-LOCAL WUNUSED NONNULL((1)) __BOOL
-(FCALL shared_rwlock_pollread)(struct shared_rwlock *__restrict self)
-		THROWS(E_BADALLOC);
-LOCAL WUNUSED NONNULL((1)) __BOOL
-(FCALL shared_rwlock_pollwrite)(struct shared_rwlock *__restrict self)
-		THROWS(E_BADALLOC);
+/* Shared R/W-lock polling functions. */
+#define shared_rwlock_pollconnect_ex(self, cb)       cb(&(self)->sl_ulck)
+#define shared_rwlock_pollconnect_read_ex(self, cb)  cb(&(self)->sl_ulck)
+#define shared_rwlock_pollconnect_write_ex(self, cb) cb(&(self)->sl_ulck)
+#ifdef __OPTIMIZE_SIZE__
+#define shared_rwlock_pollread_ex(self, cb)       \
+	(shared_rwlock_pollconnect_read_ex(self, cb), \
+	 shared_rwlock_canread(self))
+#define shared_rwlock_pollwrite_ex(self, cb)       \
+	(shared_rwlock_pollconnect_write_ex(self, cb), \
+	 shared_rwlock_canwrite(self))
+#else /* __OPTIMIZE_SIZE__ */
+#define shared_rwlock_pollread_ex(self, cb)        \
+	(shared_rwlock_canread(self) ||                \
+	 (shared_rwlock_pollconnect_read_ex(self, cb), \
+	  shared_rwlock_canread(self)))
+#define shared_rwlock_pollwrite_ex(self, cb)        \
+	(shared_rwlock_canwrite(self) ||                \
+	 (shared_rwlock_pollconnect_write_ex(self, cb), \
+	  shared_rwlock_canwrite(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#define shared_rwlock_pollconnect(self)       shared_rwlock_pollconnect_ex(self, task_connect_for_poll)
+#define shared_rwlock_pollconnect_read(self)  shared_rwlock_pollconnect_read_ex(self, task_connect_for_poll)
+#define shared_rwlock_pollconnect_write(self) shared_rwlock_pollconnect_write_ex(self, task_connect_for_poll)
+#define shared_rwlock_pollread(self)          shared_rwlock_pollread_ex(self, task_connect_for_poll)
+#define shared_rwlock_pollwrite(self)         shared_rwlock_pollwrite_ex(self, task_connect_for_poll)
 
 
 #if !defined(__INTELLISENSE__)
@@ -345,25 +364,6 @@ NOTHROW(FCALL shared_rwlock_downgrade)(struct shared_rwlock *__restrict self) {
 	sig_broadcast(&self->sl_ulck); /* Allow for more readers. */
 #endif /* !NDEBUG */
 }
-
-LOCAL WUNUSED NONNULL((1)) __BOOL
-(FCALL shared_rwlock_pollread)(struct shared_rwlock *__restrict self)
-		THROWS(E_BADALLOC) {
-	if (shared_rwlock_canread(self))
-		return true;
-	task_connect_for_poll(&self->sl_ulck);
-	return shared_rwlock_canread(self);
-}
-
-LOCAL WUNUSED NONNULL((1)) __BOOL
-(FCALL shared_rwlock_pollwrite)(struct shared_rwlock *__restrict self)
-		THROWS(E_BADALLOC) {
-	if (shared_rwlock_canwrite(self))
-		return true;
-	task_connect_for_poll(&self->sl_ulck);
-	return shared_rwlock_canwrite(self);
-}
-
 #endif /* !__INTELLISENSE__ */
 
 __DEFINE_SYNC_RWLOCK(struct shared_rwlock,
@@ -384,9 +384,6 @@ __DEFINE_SYNC_RWLOCK(struct shared_rwlock,
                      shared_rwlock_upgrade,
                      shared_rwlock_upgrade_nx,
                      shared_rwlock_downgrade)
-__DEFINE_SYNC_POLL(struct shared_rwlock,
-                   shared_rwlock_pollread,
-                   shared_rwlock_pollwrite)
 
 DECL_END
 #endif /* __CC__ */

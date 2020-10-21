@@ -82,12 +82,13 @@ NOTHROW(KCALL ttybase_device_cinit)(struct ttybase_device *__restrict self,
                                     pterminal_oprinter_t oprinter) {
 	assert(self->t_cproc.m_pointer == NULL);
 	assert(self->t_fproc.m_pointer == NULL);
-	self->cd_type.ct_fini  = &ttybase_device_fini;
-	self->cd_type.ct_read  = &ttybase_device_iread;
-	self->cd_type.ct_write = &ttybase_device_owrite;
-	self->cd_type.ct_poll  = &ttybase_device_poll;
-	self->cd_type.ct_ioctl = &ttybase_device_ioctl;
-	self->cd_type.ct_stat  = &ttybase_device_stat;
+	self->cd_type.ct_fini        = &ttybase_device_fini;
+	self->cd_type.ct_read        = &ttybase_device_iread;
+	self->cd_type.ct_write       = &ttybase_device_owrite;
+	self->cd_type.ct_pollconnect = &ttybase_device_pollconnect;
+	self->cd_type.ct_polltest    = &ttybase_device_polltest;
+	self->cd_type.ct_ioctl       = &ttybase_device_ioctl;
+	self->cd_type.ct_stat        = &ttybase_device_stat;
 	/* Initialize the terminal driver. */
 	terminal_init(&self->t_term,
 	              oprinter,
@@ -890,24 +891,39 @@ ttybase_device_ioctl(struct character_device *__restrict self, syscall_ulong_t c
 	return result;
 }
 
-PUBLIC NONNULL((1)) poll_mode_t KCALL
-ttybase_device_poll(struct character_device *__restrict self,
-                    poll_mode_t what) THROWS(...) {
-	int error;
+PUBLIC NONNULL((1)) void KCALL
+ttybase_device_pollconnect(struct character_device *__restrict self,
+                           poll_mode_t what) THROWS(...) {
 	struct ttybase_device *me;
 	assert(character_device_isattybase(self));
 	me = (struct ttybase_device *)self;
-	if (what & POLLIN) {
-		error = terminal_poll_iread(&me->t_term);
-		if (error == TERMINAL_POLL_NONBLOCK)
-			return POLLIN;
+	if (what & POLLINMASK)
+		terminal_pollconnect_iread(&me->t_term);
+	if (what & POLLOUTMASK) {
+		/* Assume that writing output never blocks. */
+#define noop_connect_ex(cb) (void)0
+		terminal_pollconnect_owrite(&me->t_term, noop_connect_ex);
+#undef noop_connect_ex
 	}
-	if (what & POLLOUT) {
-		error = terminal_poll_owrite(&me->t_term);
-		if (error == TERMINAL_POLL_NONBLOCK)
-			return POLLOUT;
+}
+
+PUBLIC NONNULL((1)) poll_mode_t KCALL
+ttybase_device_polltest(struct character_device *__restrict self,
+                        poll_mode_t what) THROWS(...) {
+	poll_mode_t result = 0;
+	struct ttybase_device *me;
+	assert(character_device_isattybase(self));
+	me = (struct ttybase_device *)self;
+	if (what & POLLINMASK) {
+		if (terminal_caniread(&me->t_term))
+			result |= POLLINMASK;
 	}
-	return 0;
+	if (what & POLLOUTMASK) {
+		/* Assume that output writing never blocks. */
+		if (terminal_canowrite(&me->t_term, 1))
+			result |= POLLOUTMASK;
+	}
+	return result;
 }
 
 

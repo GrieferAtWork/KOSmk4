@@ -192,25 +192,21 @@ DEFINE_INTERN_ALIAS(handle_eventfd_sema_write, handle_eventfd_fence_write);
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_writev, handle_eventfd_fence_writev);
 
 
-INTERN poll_mode_t KCALL
-handle_eventfd_fence_poll(struct eventfd *__restrict self,
-                          poll_mode_t what) {
-	poll_mode_t result;
-	/* Check what operations are currently available. */
-	result = evenfd_getavail(self);
-	result &= what;
-	if (!result) {
-		/* If none of the masked operations are
-		 * available, connect to the signal. */
-		task_connect_for_poll(&self->ef_signal);
-		/* Check for available operations one more time. */
-		result = evenfd_getavail(self);
-		result &= what;
-	}
-	return result;
+INTERN void KCALL
+handle_eventfd_fence_pollconnect(struct eventfd *__restrict self,
+                                 poll_mode_t UNUSED(what)) {
+	task_connect_for_poll(&self->ef_signal);
 }
 
-DEFINE_INTERN_ALIAS(handle_eventfd_sema_poll, handle_eventfd_fence_poll);
+INTERN poll_mode_t KCALL
+handle_eventfd_fence_polltest(struct eventfd *__restrict self,
+                              poll_mode_t what) {
+	/* Check what operations are currently available. */
+	return evenfd_getavail(self) & what;
+}
+
+DEFINE_INTERN_ALIAS(handle_eventfd_sema_pollconnect, handle_eventfd_fence_pollconnect);
+DEFINE_INTERN_ALIAS(handle_eventfd_sema_polltest, handle_eventfd_fence_polltest);
 
 
 

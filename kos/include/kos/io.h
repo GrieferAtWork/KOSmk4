@@ -115,6 +115,31 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define POLLSELECT_EXCEPTFDS __POLLSELECT_EXCEPTFDS /* select(2).exceptfds */
 #endif /* !POLLSELECT_EXCEPTFDS && __POLLSELECT_EXCEPTFDS */
 
+#ifndef POLLINMASK
+#if defined(__POLLIN) && defined(__POLLRDNORM)
+#define POLLINMASK (__POLLIN | __POLLRDNORM)
+#elif defined(__POLLIN)
+#define POLLINMASK __POLLIN
+#elif defined(__POLLRDNORM)
+#define POLLINMASK __POLLRDNORM
+#else /* ... */
+#define POLLINMASK 0
+#endif /* !... */
+#endif /* !POLLINMASK */
+
+#ifndef POLLOUTMASK
+#if defined(__POLLOUT) && defined(__POLLWRNORM)
+#define POLLOUTMASK (__POLLOUT | __POLLWRNORM)
+#elif defined(__POLLOUT)
+#define POLLOUTMASK __POLLOUT
+#elif defined(__POLLWRNORM)
+#define POLLOUTMASK __POLLWRNORM
+#else /* ... */
+#define POLLOUTMASK 0
+#endif /* !... */
+#endif /* !POLLOUTMASK */
+
+
 
 
 

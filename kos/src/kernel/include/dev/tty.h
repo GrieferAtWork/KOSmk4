@@ -72,7 +72,8 @@ struct tty_device
 	size_t (KCALL *t_ihandle_read)(void *__restrict ptr, USER CHECKED void *dst,
 	                               size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
 	/* [1..1][const] Input handle poll operator callback. */
-	poll_mode_t (KCALL *t_ihandle_poll)(void *__restrict ptr, poll_mode_t what) /*THROWS(...)*/;
+	void (KCALL *t_ihandle_pollconnect)(void *__restrict ptr, poll_mode_t what) /*THROWS(...)*/;
+	poll_mode_t (KCALL *t_ihandle_polltest)(void *__restrict ptr, poll_mode_t what) /*THROWS(...)*/;
 	/* [1..1][const] Output handle write operator callback. */
 	size_t (KCALL *t_ohandle_write)(void *__restrict ptr, USER CHECKED void const *src,
 	                                size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
@@ -81,11 +82,11 @@ struct tty_device
 
 
 #define ttybase_isatty(self) \
-	((self)->cd_type.ct_poll == &tty_device_poll)
+	((self)->cd_type.ct_pollconnect == &tty_device_pollconnect)
 #define character_device_isatty(self) \
-	((self)->cd_type.ct_poll == &tty_device_poll)
-FUNDEF NONNULL((1)) poll_mode_t KCALL
-tty_device_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+	((self)->cd_type.ct_pollconnect == &tty_device_pollconnect)
+FUNDEF NONNULL((1)) void KCALL tty_device_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+FUNDEF NONNULL((1)) poll_mode_t KCALL tty_device_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
 
 /* Create (but don't register) a new TTY device that connects the two given
  * handles, such that character-based keyboard input is taken from `ihandle_ptr',

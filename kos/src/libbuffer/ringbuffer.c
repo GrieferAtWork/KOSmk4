@@ -982,54 +982,6 @@ libringbuffer_setwritten(struct ringbuffer *__restrict self, size_t num_bytes)
 	return result;
 }
 
-#ifdef __KERNEL__
-
-/* Poll the given ring buffer `self' for reading (`POLLIN') or writing (`POLLOUT') */
-INTERN NONNULL((1)) poll_mode_t CC
-libringbuffer_poll(struct ringbuffer *__restrict self,
-                   poll_mode_t what)
-		__THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	poll_mode_t result = 0;
-	if (what & POLLIN) {
-		if (ATOMIC_READ(self->rb_avail) != 0 ||
-		    ATOMIC_READ(self->rb_limit) == 0)
-			result |= POLLIN;
-		else {
-			task_connect_for_poll(&self->rb_nempty);
-			if (ATOMIC_READ(self->rb_avail) != 0 ||
-			    ATOMIC_READ(self->rb_limit) == 0)
-				result |= POLLIN;
-		}
-	}
-	if (what & POLLOUT) {
-		size_t limit;
-		limit = ATOMIC_READ(self->rb_limit);
-		if (limit == 0)
-			result |= POLLOUT;
-		else {
-			atomic_rwlock_read(&self->rb_lock);
-			if (self->rb_avail < limit) {
-				result |= POLLOUT;
-				atomic_rwlock_endread(&self->rb_lock);
-			} else {
-				atomic_rwlock_endread(&self->rb_lock);
-				task_connect_for_poll(&self->rb_nempty);
-				atomic_rwlock_read(&self->rb_lock);
-				limit = ATOMIC_READ(self->rb_limit);
-				if (self->rb_avail < limit || limit == 0)
-					result |= POLLOUT;
-				atomic_rwlock_endread(&self->rb_lock);
-			}
-		}
-	}
-	return result;
-}
-
-#endif /* __KERNEL__ */
-
-
-
-
 DEFINE_PUBLIC_ALIAS(ringbuffer_read, libringbuffer_read);
 DEFINE_PUBLIC_ALIAS(ringbuffer_read_nonblock, libringbuffer_read_nonblock);
 DEFINE_PUBLIC_ALIAS(ringbuffer_write, libringbuffer_write);
@@ -1042,10 +994,6 @@ DEFINE_PUBLIC_ALIAS(ringbuffer_rseek, libringbuffer_rseek);
 DEFINE_PUBLIC_ALIAS(ringbuffer_unwrite, libringbuffer_unwrite);
 DEFINE_PUBLIC_ALIAS(ringbuffer_wseek, libringbuffer_wseek);
 DEFINE_PUBLIC_ALIAS(ringbuffer_setwritten, libringbuffer_setwritten);
-#ifdef __KERNEL__
-DEFINE_PUBLIC_ALIAS(ringbuffer_poll, libringbuffer_poll);
-#endif /* __KERNEL__ */
-
 
 DECL_END
 

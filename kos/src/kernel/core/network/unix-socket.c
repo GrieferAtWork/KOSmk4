@@ -989,23 +989,6 @@ NOTHROW(FCALL unix_server_can_accept)(struct unix_server const *__restrict self)
 	return clients != NULL;
 }
 
-
-/* Poll for pending clients to-be accept(2)-ed
- * @return: true:  Clients are available, or the server was shut down.
- * @return: false: Caller should task_waitfor() for clients. */
-PRIVATE WUNUSED NONNULL((1)) bool FCALL
-unix_server_poll_accept(struct unix_server *__restrict self) {
-	bool result;
-	result = unix_server_can_accept(self);
-	if (!result) {
-		/* Connect to the clients-became-available signal. */
-		task_connect_for_poll(&self->us_acceptme_sig);
-		/* Interlocked test. */
-		result = unix_server_can_accept(self);
-	}
-	return result;
-}
-
 /* Test the given client for a hang-up condition */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL unix_client_test_hup)(struct unix_client const *__restrict self) {
@@ -1014,21 +997,33 @@ NOTHROW(FCALL unix_client_test_hup)(struct unix_client const *__restrict self) {
 	return UNIX_CLIENT_STATUS_ISHUP(status);
 }
 
-/* Poll the given client for a hang-up condition */
-PRIVATE WUNUSED NONNULL((1)) bool FCALL
-unix_client_poll_hup(struct unix_client *__restrict self) {
-	if (unix_client_test_hup(self))
-		return true;
-	task_connect_for_poll(&self->uc_status_sig);
-	return unix_client_test_hup(self);
+
+
+
+PRIVATE NONNULL((1)) void KCALL
+UnixSocket_PollConnect(struct socket *__restrict self,
+                       poll_mode_t what) {
+	UnixSocket *me;
+	struct socket_node *node;
+	me   = (UnixSocket *)self;
+	node = ATOMIC_READ(me->us_node);
+	if (!node || node == (struct socket_node *)-1) {
+	} else if (me->us_client) {
+		/* Client socket (poll against recv()) */
+		pb_buffer_pollconnect_read(me->us_recvbuf);
+		task_connect_for_poll(&me->us_client->uc_status_sig); /* for HUP */
+	} else {
+		/* Server socket (poll against accept()) */
+		if (what & POLLIN) {
+			/* Connect to the clients-became-available signal. */
+			task_connect_for_poll(&node->s_server.us_acceptme_sig);
+		}
+	}
 }
 
-
-
-
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-UnixSocket_Poll(struct socket *__restrict self,
-                poll_mode_t what) {
+UnixSocket_PollTest(struct socket *__restrict self,
+                    poll_mode_t what) {
 	poll_mode_t result = 0;
 	UnixSocket *me;
 	struct socket_node *node;
@@ -1037,36 +1032,29 @@ UnixSocket_Poll(struct socket *__restrict self,
 	if (!node || node == (struct socket_node *)-1) {
 		/* Technically true, as neither will block (both
 		 * `recv()' and `accept()' will throw errors!) */
-		result |= what & POLLIN;
+		result |= what & POLLINMASK;
 	} else if (me->us_client) {
 		struct unix_client *client;
 		client = me->us_client;
 		/* Client socket (poll against recv()) */
-		if (what & POLLIN) {
-			if (pb_buffer_pollread(me->us_recvbuf))
-				result |= POLLIN;
+		if (what & POLLINMASK) {
+			if (pb_buffer_canread(me->us_recvbuf))
+				result |= POLLINMASK;
 		}
 		/* Always poll for HUP conditions */
-		if (unix_client_poll_hup(client)) {
+		if (unix_client_test_hup(client)) {
 			result |= POLLHUP;
 			result |= what & POLLRDHUP;
 		} else if (what & POLLRDHUP) {
 			/* Poll if the other end has shut down its write-end */
 			if (pb_buffer_closed(me->us_recvbuf))
 				result |= POLLRDHUP;
-			else if (!(what & POLLIN)) {
-				/* When POLLIN was tested, then we're already
-				 * connected to `me->us_recvbuf->pb_psta' */
-				task_connect_for_poll(&me->us_recvbuf->pb_psta);
-				if (pb_buffer_closed(me->us_recvbuf))
-					result |= POLLRDHUP;
-			}
 		}
 	} else {
 		/* Server socket (poll against accept()) */
-		if (what & POLLIN) {
-			if (unix_server_poll_accept(&node->s_server))
-				result |= POLLIN;
+		if (what & POLLINMASK) {
+			if (unix_server_can_accept(&node->s_server))
+				result |= POLLINMASK;
 		}
 	}
 	return result;
@@ -1659,7 +1647,8 @@ UnixSocket_Shutdown(struct socket *__restrict self,
 PUBLIC struct socket_ops unix_socket_ops = {
 	/* .so_family      = */ AF_UNIX,
 	/* .so_fini        = */ &UnixSocket_Fini,
-	/* .so_poll        = */ &UnixSocket_Poll,
+	/* .so_pollconnect = */ &UnixSocket_PollConnect,
+	/* .so_polltest    = */ &UnixSocket_PollTest,
 	/* .so_getsockname = */ &UnixSocket_GetSockName,
 	/* .so_getpeername = */ &UnixSocket_GetPeerName,
 	/* .so_bind        = */ &UnixSocket_Bind,

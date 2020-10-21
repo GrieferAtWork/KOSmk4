@@ -767,12 +767,23 @@ handle_characterdevice_stat(struct character_device *__restrict self,
 		(*self->cd_type.ct_stat)(self, result);
 }
 
+INTERN void KCALL
+handle_characterdevice_pollconnect(struct character_device *__restrict self,
+                                   poll_mode_t what) {
+	assert((self->cd_type.ct_pollconnect != NULL) ==
+	       (self->cd_type.ct_polltest != NULL));
+	if likely(self->cd_type.ct_pollconnect)
+		(*self->cd_type.ct_pollconnect)(self, what);
+}
+
 INTERN poll_mode_t KCALL
-handle_characterdevice_poll(struct character_device *__restrict self,
-                            poll_mode_t what) {
-	if unlikely(!self->cd_type.ct_poll)
+handle_characterdevice_polltest(struct character_device *__restrict self,
+                                poll_mode_t what) {
+	assert((self->cd_type.ct_pollconnect != NULL) ==
+	       (self->cd_type.ct_polltest != NULL));
+	if unlikely(!self->cd_type.ct_polltest)
 		return 0;
-	return (*self->cd_type.ct_poll)(self, what);
+	return (*self->cd_type.ct_polltest)(self, what);
 }
 
 INTERN syscall_slong_t KCALL
@@ -832,7 +843,8 @@ DEFINE_PUBLIC_ALIAS(character_device_ioctl, handle_characterdevice_ioctl);
 DEFINE_PUBLIC_ALIAS(character_device_mmap, handle_characterdevice_mmap);
 DEFINE_PUBLIC_ALIAS(character_device_sync, handle_characterdevice_sync);
 DEFINE_PUBLIC_ALIAS(character_device_stat, handle_characterdevice_stat);
-DEFINE_PUBLIC_ALIAS(character_device_poll, handle_characterdevice_poll);
+DEFINE_PUBLIC_ALIAS(character_device_pollconnect, handle_characterdevice_pollconnect);
+DEFINE_PUBLIC_ALIAS(character_device_polltest, handle_characterdevice_polltest);
 
 
 #ifdef CONFIG_HAVE_DEBUGGER
@@ -871,7 +883,7 @@ do_dump_character_device(struct character_device *__restrict self,
 	dbg_putc(self->cd_type.ct_mmap ? 'm' : '-');
 	dbg_putc(self->cd_type.ct_sync ? 's' : '-');
 	dbg_putc(self->cd_type.ct_stat ? 't' : '-');
-	dbg_putc(self->cd_type.ct_poll ? 'p' : '-');
+	dbg_putc(self->cd_type.ct_pollconnect ? 'p' : '-');
 	dbg_putc('\n');
 }
 

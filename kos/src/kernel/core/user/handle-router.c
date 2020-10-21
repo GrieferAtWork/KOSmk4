@@ -61,7 +61,7 @@ for (local l: File.open("../../../../include/kos/kernel/handle.h")) {
 		continue;
 	id = int(id);
 	if (id >= #handle_types)
-		handle_types.resize(id + 1, "undefined");
+		handle_types.resize(id + 1, ("undefined", ""));
 	tail = try tail.scanf(" /" "* `%[^']")[0] catch (...) "";
 	handle_types[id] = (name.lower(), tail);
 }
@@ -140,7 +140,7 @@ for (local h_name, none: handle_types) {
 print "PUBLIC_CONST struct handle_types const handle_type_db = {";
 print "\t/" "* .h_typename = *" "/ {";
 local is_first = true;
-for (local h_name, h_typ: handle_types) {
+for (local h_name, none: handle_types) {
 	if (!is_first)
 		print ",";
 	is_first = false;
@@ -158,7 +158,7 @@ for (local ARGS: ops) {
 	print name,;
 	print " = *" "/ {";
 	local is_first = true;
-	for (local h_name, h_typ: handle_types) {
+	for (local h_name, none: handle_types) {
 		if (!is_first)
 			print ",";
 		is_first = false;
@@ -291,7 +291,8 @@ INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.allocate") pos_t
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.sync") void KCALL handle_undefined_sync(void *__restrict UNUSED(self)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SYNC); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.datasync") void KCALL handle_undefined_datasync(void *__restrict UNUSED(self)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_DATASYNC); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.stat") void KCALL handle_undefined_stat(void *__restrict UNUSED(self), USER CHECKED struct stat *UNUSED(result)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT); }
-INTERN WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.poll") poll_mode_t KCALL handle_undefined_poll(void *__restrict UNUSED(self), poll_mode_t UNUSED(what)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL); }
+INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.pollconnect") void KCALL handle_undefined_pollconnect(void *__restrict UNUSED(self), poll_mode_t UNUSED(what)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL); }
+INTERN WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.polltest") poll_mode_t KCALL handle_undefined_polltest(void *__restrict UNUSED(self), poll_mode_t UNUSED(what)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.hop") syscall_slong_t KCALL handle_undefined_hop(void *__restrict UNUSED(self), syscall_ulong_t cmd, USER UNCHECKED void *UNUSED(arg), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND, cmd); }
 INTERN NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.tryas") REF void *KCALL handle_undefined_tryas(void *__restrict UNUSED(self), uintptr_half_t UNUSED(wanted_type)) THROWS(E_WOULDBLOCK) { return NULL; }
 
@@ -309,7 +310,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ "fs",
 		/* [HANDLE_TYPE_VM]                     = */ "vm",
 		/* [HANDLE_TYPE_TASK]                   = */ "task",
-		/* [HANDLE_TYPE_CLOCK]                  = */ "clock",
+		/* [HANDLE_TYPE_UNDEFINED]              = */ "undefined",
 		/* [HANDLE_TYPE_DRIVER]                 = */ "driver",
 		/* [HANDLE_TYPE_PIPE]                   = */ "pipe",
 		/* [HANDLE_TYPE_PIPE_READER]            = */ "pipe_reader",
@@ -339,7 +340,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_fs_tryincref,
 		/* [HANDLE_TYPE_VM]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_vm_tryincref,
 		/* [HANDLE_TYPE_TASK]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_task_tryincref,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_clock_tryincref,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_tryincref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_tryincref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_reader_tryincref,
@@ -369,7 +370,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (FCALL *)(void *__restrict))&handle_fs_incref,
 		/* [HANDLE_TYPE_VM]                     = */ (void (FCALL *)(void *__restrict))&handle_vm_incref,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (FCALL *)(void *__restrict))&handle_task_incref,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (void (FCALL *)(void *__restrict))&handle_clock_incref,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_incref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (FCALL *)(void *__restrict))&handle_driver_incref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(void *__restrict))&handle_pipe_incref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (FCALL *)(void *__restrict))&handle_pipe_reader_incref,
@@ -399,7 +400,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (FCALL *)(void *__restrict))&handle_fs_decref,
 		/* [HANDLE_TYPE_VM]                     = */ (void (FCALL *)(void *__restrict))&handle_vm_decref,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (FCALL *)(void *__restrict))&handle_task_decref,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (void (FCALL *)(void *__restrict))&handle_clock_decref,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_decref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (FCALL *)(void *__restrict))&handle_driver_decref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(void *__restrict))&handle_pipe_decref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (FCALL *)(void *__restrict))&handle_pipe_reader_decref,
@@ -429,7 +430,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_fs_refcnt,
 		/* [HANDLE_TYPE_VM]                     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_vm_refcnt,
 		/* [HANDLE_TYPE_TASK]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_task_refcnt,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_clock_refcnt,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_refcnt,
 		/* [HANDLE_TYPE_PIPE]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_refcnt,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_reader_refcnt,
@@ -459,7 +460,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fs_read,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_vm_read,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_task_read,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_clock_read,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_undefined_read,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_driver_read,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_read,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_reader_read,
@@ -489,7 +490,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fs_write,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_vm_write,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_task_write,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_clock_write,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_undefined_write,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_driver_write,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_write,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_reader_write,
@@ -519,7 +520,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fs_pread,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_vm_pread,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_task_pread,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_clock_pread,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_undefined_pread,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_driver_pread,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_pread,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_reader_pread,
@@ -549,7 +550,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fs_pwrite,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_vm_pwrite,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_task_pwrite,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_clock_pwrite,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_undefined_pwrite,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_driver_pwrite,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_pwrite,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_reader_pwrite,
@@ -579,7 +580,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_fs_readv,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_vm_readv,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_task_readv,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_clock_readv,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_undefined_readv,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_driver_readv,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_pipe_readv,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_pipe_reader_readv,
@@ -609,7 +610,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_fs_writev,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_vm_writev,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_task_writev,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_clock_writev,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_undefined_writev,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_driver_writev,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_pipe_writev,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_pipe_reader_writev,
@@ -639,7 +640,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_preadv,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_vm_preadv,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_task_preadv,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_clock_preadv,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_preadv,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_preadv,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_preadv,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_reader_preadv,
@@ -669,7 +670,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_pwritev,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_vm_pwritev,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_task_pwritev,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_clock_pwritev,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_pwritev,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_pwritev,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_pwritev,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_reader_pwritev,
@@ -699,7 +700,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fs_readdir,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_vm_readdir,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_task_readdir,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_clock_readdir,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_undefined_readdir,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_driver_readdir,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_readdir,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_reader_readdir,
@@ -729,7 +730,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fs_seek,
 		/* [HANDLE_TYPE_VM]                     = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_vm_seek,
 		/* [HANDLE_TYPE_TASK]                   = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_task_seek,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_clock_seek,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_undefined_seek,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_driver_seek,
 		/* [HANDLE_TYPE_PIPE]                   = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_seek,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_reader_seek,
@@ -759,7 +760,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_ioctl,
 		/* [HANDLE_TYPE_VM]                     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_vm_ioctl,
 		/* [HANDLE_TYPE_TASK]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_task_ioctl,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_clock_ioctl,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_ioctl,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_ioctl,
 		/* [HANDLE_TYPE_PIPE]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_ioctl,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_ioctl,
@@ -789,7 +790,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict, pos_t))&handle_fs_truncate,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict, pos_t))&handle_vm_truncate,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict, pos_t))&handle_task_truncate,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (void (KCALL *)(void *__restrict, pos_t))&handle_clock_truncate,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, pos_t))&handle_undefined_truncate,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict, pos_t))&handle_driver_truncate,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_truncate,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_reader_truncate,
@@ -819,7 +820,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_fs_mmap,
 		/* [HANDLE_TYPE_VM]                     = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_vm_mmap,
 		/* [HANDLE_TYPE_TASK]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_task_mmap,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_clock_mmap,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_undefined_mmap,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_driver_mmap,
 		/* [HANDLE_TYPE_PIPE]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_pipe_mmap,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_pipe_reader_mmap,
@@ -849,7 +850,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fs_allocate,
 		/* [HANDLE_TYPE_VM]                     = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_vm_allocate,
 		/* [HANDLE_TYPE_TASK]                   = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_task_allocate,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_clock_allocate,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_undefined_allocate,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_driver_allocate,
 		/* [HANDLE_TYPE_PIPE]                   = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_allocate,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_reader_allocate,
@@ -879,7 +880,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict))&handle_fs_sync,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict))&handle_vm_sync,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict))&handle_task_sync,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (void (KCALL *)(void *__restrict))&handle_clock_sync,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict))&handle_undefined_sync,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict))&handle_driver_sync,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict))&handle_pipe_sync,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict))&handle_pipe_reader_sync,
@@ -909,7 +910,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict))&handle_fs_datasync,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict))&handle_vm_datasync,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict))&handle_task_datasync,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (void (KCALL *)(void *__restrict))&handle_clock_datasync,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict))&handle_undefined_datasync,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict))&handle_driver_datasync,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict))&handle_pipe_datasync,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict))&handle_pipe_reader_datasync,
@@ -939,7 +940,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fs_stat,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_vm_stat,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_task_stat,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_clock_stat,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_undefined_stat,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_driver_stat,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_stat,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_reader_stat,
@@ -958,35 +959,65 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_uaio_stat,
 		/* [HANDLE_TYPE_FIFO_USER]              = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fifo_user_stat
 	},
-	/* .h_poll = */ {
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_poll,
-		/* [HANDLE_TYPE_DATABLOCK]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_datablock_poll,
-		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_blockdevice_poll,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_directoryentry_poll,
-		/* [HANDLE_TYPE_FILE]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_file_poll,
-		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_oneshot_directory_file_poll,
-		/* [HANDLE_TYPE_PATH]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_path_poll,
-		/* [HANDLE_TYPE_FS]                     = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_poll,
-		/* [HANDLE_TYPE_VM]                     = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_vm_poll,
-		/* [HANDLE_TYPE_TASK]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_task_poll,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_clock_poll,
-		/* [HANDLE_TYPE_DRIVER]                 = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_poll,
-		/* [HANDLE_TYPE_PIPE]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_poll,
-		/* [HANDLE_TYPE_PIPE_READER]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_poll,
-		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_writer_poll,
-		/* [HANDLE_TYPE_PIDNS]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_poll,
-		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_state_poll,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_characterdevice_poll,
-		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_poll,
-		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_poll,
-		/* [HANDLE_TYPE_SIGNALFD]               = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_poll,
-		/* [HANDLE_TYPE_DATAPART]               = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_datapart_poll,
-		/* [HANDLE_TYPE_FUTEX]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futex_poll,
-		/* [HANDLE_TYPE_FUTEXFD]                = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_poll,
-		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_section_poll,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_poll,
-		/* [HANDLE_TYPE_UAIO]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_uaio_poll,
-		/* [HANDLE_TYPE_FIFO_USER]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fifo_user_poll
+	/* .h_pollconnect = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_pollconnect,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_datablock_pollconnect,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_blockdevice_pollconnect,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_directoryentry_pollconnect,
+		/* [HANDLE_TYPE_FILE]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_file_pollconnect,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_oneshot_directory_file_pollconnect,
+		/* [HANDLE_TYPE_PATH]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_path_pollconnect,
+		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_pollconnect,
+		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_vm_pollconnect,
+		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_task_pollconnect,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_pollconnect,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_pollconnect,
+		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_pollconnect,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_pollconnect,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_writer_pollconnect,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_pollconnect,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_state_pollconnect,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_characterdevice_pollconnect,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_pollconnect,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_pollconnect,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_pollconnect,
+		/* [HANDLE_TYPE_DATAPART]               = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_datapart_pollconnect,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_futex_pollconnect,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_pollconnect,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_section_pollconnect,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_pollconnect,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_uaio_pollconnect,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fifo_user_pollconnect
+	},
+	/* .h_polltest = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_polltest,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_datablock_polltest,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_blockdevice_polltest,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_directoryentry_polltest,
+		/* [HANDLE_TYPE_FILE]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_file_polltest,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_oneshot_directory_file_polltest,
+		/* [HANDLE_TYPE_PATH]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_path_polltest,
+		/* [HANDLE_TYPE_FS]                     = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_polltest,
+		/* [HANDLE_TYPE_VM]                     = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_vm_polltest,
+		/* [HANDLE_TYPE_TASK]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_task_polltest,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_polltest,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_polltest,
+		/* [HANDLE_TYPE_PIPE]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_polltest,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_polltest,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_writer_polltest,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pidns_polltest,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_state_polltest,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_characterdevice_polltest,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_fence_polltest,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_eventfd_sema_polltest,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_signalfd_polltest,
+		/* [HANDLE_TYPE_DATAPART]               = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_datapart_polltest,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futex_polltest,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_futexfd_polltest,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_section_polltest,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_socket_polltest,
+		/* [HANDLE_TYPE_UAIO]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_uaio_polltest,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fifo_user_polltest
 	},
 	/* .h_hop = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
@@ -999,7 +1030,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_hop,
 		/* [HANDLE_TYPE_VM]                     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_vm_hop,
 		/* [HANDLE_TYPE_TASK]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_task_hop,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_clock_hop,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_hop,
 		/* [HANDLE_TYPE_PIPE]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_hop,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_hop,
@@ -1029,7 +1060,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fs_tryas,
 		/* [HANDLE_TYPE_VM]                     = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_vm_tryas,
 		/* [HANDLE_TYPE_TASK]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_task_tryas,
-		/* [HANDLE_TYPE_CLOCK]                  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_clock_tryas,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_undefined_tryas,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_tryas,
 		/* [HANDLE_TYPE_PIPE]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_tryas,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_reader_tryas,
@@ -1074,7 +1105,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_datablock_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_datablock_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_tryas, handle_undefined_tryas);
 
@@ -1100,7 +1132,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_allocate, handle_undefined_allocate)
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_tryas, handle_undefined_tryas);
 
@@ -1126,7 +1159,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_allocate, handle_undefined_alloca
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryas, handle_undefined_tryas);
 
@@ -1152,7 +1186,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_file_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_file_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_file_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_tryas, handle_undefined_tryas);
 
@@ -1178,7 +1213,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_allocate, handle_undefine
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_tryas, handle_undefined_tryas);
 
@@ -1204,7 +1240,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_path_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_tryas, handle_undefined_tryas);
 
@@ -1230,7 +1267,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_fs_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryas, handle_undefined_tryas);
 
@@ -1256,7 +1294,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_vm_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_vm_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_tryas, handle_undefined_tryas);
 
@@ -1282,35 +1321,10 @@ DEFINE_INTERN_WEAK_ALIAS(handle_task_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_task_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_task_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_tryas, handle_undefined_tryas);
-
-/* Weakly define operators for `HANDLE_TYPE_CLOCK' (`struct realtime_clock_struct') */
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_tryincref, handle_undefined_tryincref);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_incref, handle_undefined_incref);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_refcnt, handle_undefined_refcnt);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_read, handle_undefined_read);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_write, handle_undefined_write);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_pread, handle_undefined_pread);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_pwrite, handle_undefined_pwrite);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_readv, handle_undefined_readv);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_writev, handle_undefined_writev);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_preadv, handle_undefined_preadv);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_pwritev, handle_undefined_pwritev);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_readdir, handle_undefined_readdir);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_seek, handle_undefined_seek);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_ioctl, handle_undefined_ioctl);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_truncate, handle_undefined_truncate);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_mmap, handle_undefined_mmap);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_allocate, handle_undefined_allocate);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_sync, handle_undefined_sync);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_datasync, handle_undefined_datasync);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_poll, handle_undefined_poll);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_hop, handle_undefined_hop);
-DEFINE_INTERN_WEAK_ALIAS(handle_clock_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_tryincref, handle_undefined_tryincref);
@@ -1334,7 +1348,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_tryas, handle_undefined_tryas);
 
@@ -1360,7 +1375,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_tryas, handle_undefined_tryas);
 
@@ -1386,7 +1402,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_allocate, handle_undefined_allocate)
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_tryas, handle_undefined_tryas);
 
@@ -1412,7 +1429,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_allocate, handle_undefined_allocate)
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_tryas, handle_undefined_tryas);
 
@@ -1438,7 +1456,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pidns_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryas, handle_undefined_tryas);
 
@@ -1464,7 +1483,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_allocate, handle_undefined_allocate
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_tryas, handle_undefined_tryas);
 
@@ -1490,7 +1510,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_allocate, handle_undefined_alloc
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryas, handle_undefined_tryas);
 
@@ -1516,7 +1537,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_allocate, handle_undefined_allocat
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_tryas, handle_undefined_tryas);
 
@@ -1542,7 +1564,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_allocate, handle_undefined_allocate
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_tryas, handle_undefined_tryas);
 
@@ -1568,7 +1591,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryas, handle_undefined_tryas);
 
@@ -1594,7 +1618,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_datapart_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_datapart_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_tryas, handle_undefined_tryas);
 
@@ -1620,7 +1645,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futex_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryas, handle_undefined_tryas);
 
@@ -1646,7 +1672,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryas, handle_undefined_tryas);
 
@@ -1672,7 +1699,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_allocate, handle_undefined_alloca
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_tryas, handle_undefined_tryas);
 
@@ -1698,7 +1726,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_socket_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_socket_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_tryas, handle_undefined_tryas);
 
@@ -1724,7 +1753,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_uaio_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryas, handle_undefined_tryas);
 
@@ -1750,7 +1780,8 @@ DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_allocate, handle_undefined_allocate);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_sync, handle_undefined_sync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_datasync, handle_undefined_datasync);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_stat, handle_undefined_stat);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_tryas, handle_undefined_tryas);
 //[[[end]]]

@@ -924,15 +924,21 @@ keyboard_device_canread(struct keyboard_device *__restrict self) {
 	return used != 0;
 }
 
+PUBLIC NONNULL((1)) void KCALL
+keyboard_device_pollconnect(struct character_device *__restrict self,
+                            poll_mode_t what) THROWS(...) {
+	struct keyboard_device *me;
+	me = (struct keyboard_device *)self;
+	if (what & POLLIN)
+		task_connect_for_poll(&me->kd_buf.kb_avail);
+}
+
 PUBLIC NONNULL((1)) poll_mode_t KCALL
-keyboard_device_poll(struct character_device *__restrict self,
-                     poll_mode_t what) THROWS(...) {
+keyboard_device_polltest(struct character_device *__restrict self,
+                         poll_mode_t what) THROWS(...) {
 	struct keyboard_device *me;
 	me = (struct keyboard_device *)self;
 	if (what & POLLIN) {
-		if (keyboard_device_canread(me))
-			return POLLIN;
-		task_connect_for_poll(&me->kd_buf.kb_avail);
 		if (keyboard_device_canread(me))
 			return POLLIN;
 	}
@@ -1451,11 +1457,12 @@ NOTHROW(KCALL keyboard_device_init)(struct keyboard_device *__restrict self,
                                     struct keyboard_device_ops const *__restrict ops) {
 	memcpy(&self->kd_ops, ops, sizeof(struct keyboard_device_ops));
 	assert(self->cd_type.ct_driver != NULL);
-	self->cd_type.ct_fini  = (void(KCALL *)(struct character_device *__restrict))&keyboard_device_fini;
-	self->cd_type.ct_read  = &keyboard_device_read;
-	self->cd_type.ct_ioctl = &keyboard_device_ioctl;
-	self->cd_type.ct_stat  = &keyboard_device_stat;
-	self->cd_type.ct_poll  = &keyboard_device_poll;
+	self->cd_type.ct_fini        = (void(KCALL *)(struct character_device *__restrict))&keyboard_device_fini;
+	self->cd_type.ct_read        = &keyboard_device_read;
+	self->cd_type.ct_ioctl       = &keyboard_device_ioctl;
+	self->cd_type.ct_stat        = &keyboard_device_stat;
+	self->cd_type.ct_pollconnect = &keyboard_device_pollconnect;
+	self->cd_type.ct_polltest    = &keyboard_device_polltest;
 	self->kd_flags = K_UNICODE; /* Use unicode by default. */
 	/* Enable DBGF12 by default when building with the builtin debugger enabled. */
 #if !defined(CONFIG_NO_DEBUGGER) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)

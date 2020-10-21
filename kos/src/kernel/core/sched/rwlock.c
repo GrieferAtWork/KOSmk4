@@ -1656,46 +1656,6 @@ NOTHROW(FCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 	return false;
 }
 
-PUBLIC WUNUSED NONNULL((1)) bool
-(FCALL rwlock_pollread)(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
-	u32 state;
-	state = ATOMIC_READ(self->rw_state);
-	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING ||
-	    self->rw_xowner == THIS_TASK)
-		return true;
-	task_connect_for_poll(&self->rw_chmode);
-	COMPILER_READ_BARRIER();
-	state = ATOMIC_READ(self->rw_state);
-	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING)
-		return true;
-	return false;
-}
-
-PUBLIC WUNUSED NONNULL((1)) bool
-(FCALL rwlock_pollwrite)(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
-	u32 state;
-	state = ATOMIC_READ(self->rw_state);
-	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
-		if (RWLOCK_IND(state) == 0 ||
-		    (RWLOCK_IND(state) == 1 && rwlock_find_readlock(self)))
-			return true; /* No [other] readers -> Write lock is available. */
-	} else if (self->rw_xowner == THIS_TASK) {
-		/* Caller is holding the write-lock. */
-		return true;
-	}
-	task_connect_for_poll(&self->rw_chmode);
-	COMPILER_READ_BARRIER();
-	state = ATOMIC_READ(self->rw_state);
-	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
-		if (RWLOCK_IND(state) == 0 ||
-		    (RWLOCK_IND(state) == 1 && rwlock_find_readlock(self))) {
-			/* No [other] readers -> Write lock is available. */
-			return true;
-		}
-	}
-	return false;
-}
-
 PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL rwlock_canwrite)(struct rwlock const *__restrict self) {
 	u32 state;

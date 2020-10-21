@@ -204,24 +204,23 @@ NOTHROW(KCALL mutex_available)(struct mutex const *__restrict self) {
 	return !owner || owner == THIS_TASK;
 }
 
-
-/* Poll the mutex for being available.
- * @return: true:  The mutex is currently available.
- * @return: false: The mutex wasn't available, and a connection was made to its signal. */
-LOCAL WUNUSED NONNULL((1)) bool
-(KCALL mutex_poll)(struct mutex *__restrict self) THROWS(E_BADALLOC) {
-	struct task *old_task;
-	old_task = __hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE);
-	if (!old_task || old_task == THIS_TASK)
-		return true;
-	task_connect_for_poll(&self->m_unlock);
-	old_task = __hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE);
-	if unlikely(!old_task)
-		return true;
-	return false;
-}
+/* Mutex polling functions. */
+#define mutex_pollconnect_ex(self, cb) cb(&(self)->m_unlock)
+#ifdef __OPTIMIZE_SIZE__
+#define mutex_poll_ex(self, cb)      \
+	(mutex_pollconnect_ex(self, cb), \
+	 mutex_available(self))
+#else /* __OPTIMIZE_SIZE__ */
+#define mutex_poll_ex(self, cb)       \
+	(mutex_available(self) ||         \
+	 (mutex_pollconnect_ex(self, cb), \
+	  mutex_available(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#define mutex_pollconnect(self) mutex_pollconnect_ex(self, task_connect_for_poll)
+#define mutex_poll(self)        mutex_poll_ex(self, task_connect_for_poll)
 
 
+/* Integration into the sync_* API-system. */
 __DEFINE_SYNC_MUTEX(struct mutex,
                     mutex_tryacquire,
                     mutex_acquire,
@@ -229,9 +228,6 @@ __DEFINE_SYNC_MUTEX(struct mutex,
                     mutex_release,
                     mutex_acquired,
                     mutex_available)
-__DEFINE_SYNC_POLL(struct mutex,
-                   mutex_poll,
-                   mutex_poll)
 
 #endif /* __CC__ */
 

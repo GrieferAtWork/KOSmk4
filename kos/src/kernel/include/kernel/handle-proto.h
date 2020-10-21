@@ -157,7 +157,12 @@ DECL_BEGIN
 		   ("USER CHECKED struct stat *", "result") },                                                         \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT);"),                              \
-		("poll", "WUNUSED NONNULL((1))", "poll_mode_t", "", "KCALL",                                           \
+		("pollconnect", "NONNULL((1))", "void", "", "KCALL",                                                   \
+		 { ("void *__restrict", "self"),                                                                       \
+		   ("poll_mode_t", "what") },                                                                          \
+		 "THROWS(...)",                                                                                        \
+		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                              \
+		("polltest", "WUNUSED NONNULL((1))", "poll_mode_t", "", "KCALL",                                       \
 		 { ("void *__restrict", "self"),                                                                       \
 		   ("poll_mode_t", "what") },                                                                          \
 		 "THROWS(...)",                                                                                        \
@@ -194,7 +199,7 @@ for (local l: File.open("../../../../include/kos/kernel/handle.h")) {
 		continue;
 	id = int(id);
 	if (id >= #handle_types)
-		handle_types.resize(id + 1, "undefined");
+		handle_types.resize(id + 1, ("undefined", ""));
 	tail = try tail.scanf(" /" "* `%[^']")[0] catch (...) "";
 	handle_types[id] = (name.lower(), tail);
 }
@@ -287,7 +292,6 @@ struct path;
 struct fs;
 struct vm;
 struct taskpid;
-struct realtime_clock_struct;
 struct driver;
 struct pipe;
 struct pipe_reader;
@@ -329,7 +333,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_datablock_allocate(struct vm_datablock *_
 INTDEF NONNULL((1)) void KCALL handle_datablock_sync(struct vm_datablock *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datablock_datasync(struct vm_datablock *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datablock_stat(struct vm_datablock *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_datablock_poll(struct vm_datablock *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_datablock_pollconnect(struct vm_datablock *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_datablock_polltest(struct vm_datablock *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datablock_hop(struct vm_datablock *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_datablock_tryas(struct vm_datablock *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -355,7 +360,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_blockdevice_allocate(struct basic_block_d
 INTDEF NONNULL((1)) void KCALL handle_blockdevice_sync(struct basic_block_device *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_blockdevice_datasync(struct basic_block_device *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_blockdevice_stat(struct basic_block_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_blockdevice_poll(struct basic_block_device *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_blockdevice_pollconnect(struct basic_block_device *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_blockdevice_polltest(struct basic_block_device *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blockdevice_hop(struct basic_block_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_blockdevice_tryas(struct basic_block_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -381,7 +387,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_directoryentry_allocate(struct directory_
 INTDEF NONNULL((1)) void KCALL handle_directoryentry_sync(struct directory_entry *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_directoryentry_datasync(struct directory_entry *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_directoryentry_stat(struct directory_entry *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_directoryentry_poll(struct directory_entry *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_directoryentry_pollconnect(struct directory_entry *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_directoryentry_polltest(struct directory_entry *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_directoryentry_hop(struct directory_entry *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_directoryentry_tryas(struct directory_entry *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -407,7 +414,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_file_allocate(struct file *__restrict sel
 INTDEF NONNULL((1)) void KCALL handle_file_sync(struct file *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_file_datasync(struct file *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_file_stat(struct file *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_file_poll(struct file *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_file_pollconnect(struct file *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_file_polltest(struct file *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_file_hop(struct file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_file_tryas(struct file *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -433,7 +441,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_oneshot_directory_file_allocate(struct on
 INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_sync(struct oneshot_directory_file *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_datasync(struct oneshot_directory_file *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_stat(struct oneshot_directory_file *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_oneshot_directory_file_poll(struct oneshot_directory_file *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_oneshot_directory_file_pollconnect(struct oneshot_directory_file *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_oneshot_directory_file_polltest(struct oneshot_directory_file *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_oneshot_directory_file_hop(struct oneshot_directory_file *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_oneshot_directory_file_tryas(struct oneshot_directory_file *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -459,7 +468,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_path_allocate(struct path *__restrict sel
 INTDEF NONNULL((1)) void KCALL handle_path_sync(struct path *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_path_datasync(struct path *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_path_stat(struct path *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_path_poll(struct path *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_path_pollconnect(struct path *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_path_polltest(struct path *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_hop(struct path *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_path_tryas(struct path *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -485,7 +495,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_fs_allocate(struct fs *__restrict self, f
 INTDEF NONNULL((1)) void KCALL handle_fs_sync(struct fs *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fs_datasync(struct fs *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fs_stat(struct fs *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fs_poll(struct fs *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fs_pollconnect(struct fs *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fs_polltest(struct fs *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_hop(struct fs *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_fs_tryas(struct fs *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -511,7 +522,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_vm_allocate(struct vm *__restrict self, f
 INTDEF NONNULL((1)) void KCALL handle_vm_sync(struct vm *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_vm_datasync(struct vm *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_vm_stat(struct vm *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_vm_poll(struct vm *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_vm_pollconnect(struct vm *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_vm_polltest(struct vm *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_vm_hop(struct vm *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_vm_tryas(struct vm *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -537,35 +549,10 @@ INTDEF NONNULL((1)) pos_t KCALL handle_task_allocate(struct taskpid *__restrict 
 INTDEF NONNULL((1)) void KCALL handle_task_sync(struct taskpid *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_task_datasync(struct taskpid *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_task_stat(struct taskpid *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_task_poll(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_task_pollconnect(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_task_tryas(struct taskpid *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
-
-/* Handle operators for `HANDLE_TYPE_CLOCK' (`struct realtime_clock_struct') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_clock_tryincref)(struct realtime_clock_struct *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_clock_incref)(struct realtime_clock_struct *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_clock_decref)(struct realtime_clock_struct *__restrict self);
-INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_clock_refcnt)(struct realtime_clock_struct const *__restrict self);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_read(struct realtime_clock_struct *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_write(struct realtime_clock_struct *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_pread(struct realtime_clock_struct *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_pwrite(struct realtime_clock_struct *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_readv(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_writev(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_preadv(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1, 2)) size_t KCALL handle_clock_pwritev(struct realtime_clock_struct *__restrict self, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_clock_readdir(struct realtime_clock_struct *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_clock_seek(struct realtime_clock_struct *__restrict self, off_t offset, unsigned int whence) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_clock_ioctl(struct realtime_clock_struct *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_clock_truncate(struct realtime_clock_struct *__restrict self, pos_t new_size) THROWS(...);
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) REF struct vm_datablock *KCALL handle_clock_mmap(struct realtime_clock_struct *__restrict self, pos_t *__restrict pminoffset, pos_t *__restrict pnumbytes, REF struct path **__restrict  pdatablock_fspath, REF struct directory_entry **__restrict pdatablock_fsname) THROWS(...);
-INTDEF NONNULL((1)) pos_t KCALL handle_clock_allocate(struct realtime_clock_struct *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_clock_sync(struct realtime_clock_struct *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_clock_datasync(struct realtime_clock_struct *__restrict self) THROWS(...);
-INTDEF NONNULL((1)) void KCALL handle_clock_stat(struct realtime_clock_struct *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_clock_poll(struct realtime_clock_struct *__restrict self, poll_mode_t what) THROWS(...);
-INTDEF NONNULL((1)) syscall_slong_t KCALL handle_clock_hop(struct realtime_clock_struct *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
-INTDEF NONNULL((1)) REF void *KCALL handle_clock_tryas(struct realtime_clock_struct *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
 INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_tryincref)(struct driver *__restrict self);
@@ -589,7 +576,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_driver_allocate(struct driver *__restrict
 INTDEF NONNULL((1)) void KCALL handle_driver_sync(struct driver *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_datasync(struct driver *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_stat(struct driver *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_poll(struct driver *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_pollconnect(struct driver *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_polltest(struct driver *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_hop(struct driver *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_driver_tryas(struct driver *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -615,7 +603,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_pipe_allocate(struct pipe *__restrict sel
 INTDEF NONNULL((1)) void KCALL handle_pipe_sync(struct pipe *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_datasync(struct pipe *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_stat(struct pipe *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_poll(struct pipe *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pipe_pollconnect(struct pipe *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_polltest(struct pipe *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_hop(struct pipe *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_tryas(struct pipe *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -641,7 +630,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_pipe_reader_allocate(struct pipe_reader *
 INTDEF NONNULL((1)) void KCALL handle_pipe_reader_sync(struct pipe_reader *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_reader_datasync(struct pipe_reader *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_reader_stat(struct pipe_reader *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_reader_poll(struct pipe_reader *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pipe_reader_pollconnect(struct pipe_reader *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_reader_polltest(struct pipe_reader *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_reader_hop(struct pipe_reader *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_reader_tryas(struct pipe_reader *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -667,7 +657,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_pipe_writer_allocate(struct pipe_writer *
 INTDEF NONNULL((1)) void KCALL handle_pipe_writer_sync(struct pipe_writer *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_writer_datasync(struct pipe_writer *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pipe_writer_stat(struct pipe_writer *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_writer_poll(struct pipe_writer *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pipe_writer_pollconnect(struct pipe_writer *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pipe_writer_polltest(struct pipe_writer *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_writer_hop(struct pipe_writer *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_writer_tryas(struct pipe_writer *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -693,7 +684,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_pidns_allocate(struct pidns *__restrict s
 INTDEF NONNULL((1)) void KCALL handle_pidns_sync(struct pidns *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pidns_datasync(struct pidns *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_pidns_stat(struct pidns *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pidns_poll(struct pidns *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_pidns_pollconnect(struct pidns *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_pidns_polltest(struct pidns *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_hop(struct pidns *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_pidns_tryas(struct pidns *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -719,7 +711,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_driver_state_allocate(struct driver_state
 INTDEF NONNULL((1)) void KCALL handle_driver_state_sync(struct driver_state *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_state_datasync(struct driver_state *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_state_stat(struct driver_state *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_state_poll(struct driver_state *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_state_pollconnect(struct driver_state *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_state_polltest(struct driver_state *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_state_hop(struct driver_state *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_driver_state_tryas(struct driver_state *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -745,7 +738,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_characterdevice_allocate(struct character
 INTDEF NONNULL((1)) void KCALL handle_characterdevice_sync(struct character_device *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_characterdevice_datasync(struct character_device *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_characterdevice_stat(struct character_device *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_characterdevice_poll(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_characterdevice_pollconnect(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_characterdevice_polltest(struct character_device *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_hop(struct character_device *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_characterdevice_tryas(struct character_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -771,7 +765,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_eventfd_fence_allocate(struct eventfd *__
 INTDEF NONNULL((1)) void KCALL handle_eventfd_fence_sync(struct eventfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_fence_datasync(struct eventfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_fence_stat(struct eventfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_eventfd_fence_poll(struct eventfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_eventfd_fence_pollconnect(struct eventfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_eventfd_fence_polltest(struct eventfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_fence_hop(struct eventfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_eventfd_fence_tryas(struct eventfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -797,7 +792,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_eventfd_sema_allocate(struct eventfd *__r
 INTDEF NONNULL((1)) void KCALL handle_eventfd_sema_sync(struct eventfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_sema_datasync(struct eventfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_eventfd_sema_stat(struct eventfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_eventfd_sema_poll(struct eventfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_eventfd_sema_pollconnect(struct eventfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_eventfd_sema_polltest(struct eventfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_sema_hop(struct eventfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_eventfd_sema_tryas(struct eventfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -823,7 +819,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_signalfd_allocate(struct signalfd *__rest
 INTDEF NONNULL((1)) void KCALL handle_signalfd_sync(struct signalfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_signalfd_datasync(struct signalfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_signalfd_stat(struct signalfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_signalfd_poll(struct signalfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_signalfd_pollconnect(struct signalfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_signalfd_polltest(struct signalfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_signalfd_hop(struct signalfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_signalfd_tryas(struct signalfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -849,7 +846,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_datapart_allocate(struct vm_datapart *__r
 INTDEF NONNULL((1)) void KCALL handle_datapart_sync(struct vm_datapart *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datapart_datasync(struct vm_datapart *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_datapart_stat(struct vm_datapart *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_datapart_poll(struct vm_datapart *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_datapart_pollconnect(struct vm_datapart *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_datapart_polltest(struct vm_datapart *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datapart_hop(struct vm_datapart *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_datapart_tryas(struct vm_datapart *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -875,7 +873,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_futex_allocate(struct vm_futex *__restric
 INTDEF NONNULL((1)) void KCALL handle_futex_sync(struct vm_futex *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futex_datasync(struct vm_futex *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futex_stat(struct vm_futex *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futex_poll(struct vm_futex *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futex_pollconnect(struct vm_futex *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futex_polltest(struct vm_futex *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_futex_tryas(struct vm_futex *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -901,7 +900,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_futexfd_allocate(struct vm_futexfd *__res
 INTDEF NONNULL((1)) void KCALL handle_futexfd_sync(struct vm_futexfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futexfd_datasync(struct vm_futexfd *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_futexfd_stat(struct vm_futexfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futexfd_poll(struct vm_futexfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_futexfd_pollconnect(struct vm_futexfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_futexfd_polltest(struct vm_futexfd *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_hop(struct vm_futexfd *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_futexfd_tryas(struct vm_futexfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -927,7 +927,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_driver_section_allocate(struct driver_sec
 INTDEF NONNULL((1)) void KCALL handle_driver_section_sync(struct driver_section *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_section_datasync(struct driver_section *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_driver_section_stat(struct driver_section *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_section_poll(struct driver_section *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_driver_section_pollconnect(struct driver_section *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_driver_section_polltest(struct driver_section *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_section_hop(struct driver_section *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_driver_section_tryas(struct driver_section *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -953,7 +954,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_socket_allocate(struct socket *__restrict
 INTDEF NONNULL((1)) void KCALL handle_socket_sync(struct socket *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_socket_datasync(struct socket *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_socket_stat(struct socket *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_socket_poll(struct socket *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_socket_pollconnect(struct socket *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_socket_polltest(struct socket *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_hop(struct socket *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_socket_tryas(struct socket *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -979,7 +981,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_uaio_allocate(struct uaio_controller *__r
 INTDEF NONNULL((1)) void KCALL handle_uaio_sync(struct uaio_controller *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_uaio_datasync(struct uaio_controller *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_uaio_stat(struct uaio_controller *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_uaio_poll(struct uaio_controller *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_uaio_pollconnect(struct uaio_controller *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_uaio_polltest(struct uaio_controller *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_hop(struct uaio_controller *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_uaio_tryas(struct uaio_controller *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
@@ -1005,7 +1008,8 @@ INTDEF NONNULL((1)) pos_t KCALL handle_fifo_user_allocate(struct fifo_user *__re
 INTDEF NONNULL((1)) void KCALL handle_fifo_user_sync(struct fifo_user *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fifo_user_datasync(struct fifo_user *__restrict self) THROWS(...);
 INTDEF NONNULL((1)) void KCALL handle_fifo_user_stat(struct fifo_user *__restrict self, USER CHECKED struct stat *result) THROWS(...);
-INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fifo_user_poll(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF NONNULL((1)) void KCALL handle_fifo_user_pollconnect(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF WUNUSED NONNULL((1)) poll_mode_t KCALL handle_fifo_user_polltest(struct fifo_user *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fifo_user_hop(struct fifo_user *__restrict self, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
 INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 

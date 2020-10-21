@@ -248,15 +248,19 @@ handle_signalfd_read(struct signalfd *__restrict self,
 }
 
 
-INTERN poll_mode_t KCALL
-handle_signalfd_poll(struct signalfd *__restrict self,
-                     poll_mode_t what) {
-	if (what & POLLIN) {
-		if (signalfd_try_read(self, NULL))
-			return POLLIN;
+INTERN void KCALL
+handle_signalfd_pollconnect(struct signalfd *__restrict UNUSED(self),
+                            poll_mode_t what) {
+	if (what & POLLINMASK)
 		connect_to_my_signal_queues_for_poll();
+}
+
+INTERN poll_mode_t KCALL
+handle_signalfd_polltest(struct signalfd *__restrict self,
+                         poll_mode_t what) {
+	if (what & POLLINMASK) {
 		if (signalfd_try_read(self, NULL))
-			return POLLIN;
+			return POLLINMASK;
 	}
 	return 0;
 }

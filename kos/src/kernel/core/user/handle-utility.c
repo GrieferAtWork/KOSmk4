@@ -367,13 +367,6 @@ handle_print(struct handle const *__restrict self,
 		                       taskpid_getpid_s(t));
 	}	break;
 
-	case HANDLE_TYPE_CLOCK: {
-		struct wall_clock *c = (struct wall_clock *)self->h_data;
-		result = format_printf(printer, arg,
-		                       "anon_inode:[wall_clock:%" PRIuPTR "]",
-		                       skew_kernel_pointer(c));
-	}	break;
-
 	case HANDLE_TYPE_DRIVER: {
 		struct driver *d = (struct driver *)self->h_data;
 		result = format_printf(printer, arg,

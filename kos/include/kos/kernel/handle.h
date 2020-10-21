@@ -64,7 +64,7 @@
 #define HANDLE_TYPE_VM              0x0008 /* `struct vm' */
 #define HANDLE_TYPE_TASK            0x0009 /* `struct taskpid'
                                             * Castable into: HANDLE_TYPE_FS, HANDLE_TYPE_VM, HANDLE_TYPE_PIDNS */
-#define HANDLE_TYPE_CLOCK           0x000a /* `struct realtime_clock_struct' */
+//      HANDLE_TYPE_CLOCK           0x000a /* `struct realtime_clock_struct' */
 #define HANDLE_TYPE_DRIVER          0x000b /* `struct driver' */
 #define HANDLE_TYPE_PIPE            0x000c /* `struct pipe' */
 #define HANDLE_TYPE_PIPE_READER     0x000d /* `struct pipe_reader' */
@@ -98,7 +98,6 @@
 	cb(HANDLE_TYPE_FS, struct fs)                                         \
 	cb(HANDLE_TYPE_VM, struct vm)                                         \
 	cb(HANDLE_TYPE_TASK, struct taskpid)                                  \
-	cb(HANDLE_TYPE_CLOCK, struct realtime_clock_struct)                   \
 	cb(HANDLE_TYPE_DRIVER, struct driver)                                 \
 	cb(HANDLE_TYPE_PIPE, struct pipe)                                     \
 	cb(HANDLE_TYPE_PIPE_READER, struct pipe_reader)                       \
@@ -121,7 +120,6 @@
 	cb(HANDLE_TYPE_DATABLOCK, struct vm_datablock)           \
 	cb(HANDLE_TYPE_BLOCKDEVICE, struct basic_block_device)   \
 	cb(HANDLE_TYPE_VM, struct vm)                            \
-	cb(HANDLE_TYPE_CLOCK, struct realtime_clock_struct)      \
 	cb(HANDLE_TYPE_DRIVER, struct driver)                    \
 	cb(HANDLE_TYPE_CHARACTERDEVICE, struct character_device) \
 	cb(HANDLE_TYPE_SOCKET, struct socket)                    \

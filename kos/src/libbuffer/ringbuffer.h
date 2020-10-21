@@ -136,17 +136,6 @@ INTDEF NONNULL((1)) size_t CC
 libringbuffer_setwritten(struct ringbuffer *__restrict self, size_t num_bytes)
 		__THROWS(E_WOULDBLOCK);
 
-#ifdef __KERNEL__
-
-/* Poll the given ring buffer `self' for reading (`POLLIN') or writing (`POLLOUT') */
-INTDEF NONNULL((1)) poll_mode_t CC
-libringbuffer_poll(struct ringbuffer *__restrict self,
-                   poll_mode_t what)
-		__THROWS(E_BADALLOC, E_WOULDBLOCK);
-
-#endif /* __KERNEL__ */
-
-
 DECL_END
 
 #endif /* !GUARD_LIBBUFFER_RINGBUFFER_H */

@@ -86,6 +86,7 @@ NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
 	linebuffer_init_ex(&self->t_canon, _POSIX_MAX_CANON * 4);
 	linebuffer_init_ex(&self->t_opend, MAX_C(_POSIX_MAX_INPUT / 2, 64));
 	linebuffer_init_ex(&self->t_ipend, MAX_C(_POSIX_MAX_INPUT / 2, 64));
+	sched_signal_init(&self->t_ioschange);
 	/* Initialize the IOS to default values. */
 	cfmakesane(&self->t_ios);
 }
@@ -1540,6 +1541,7 @@ libterminal_setios(struct terminal *__restrict self,
 		              __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	ssize_t error;
 	struct termios old;
+	bool echo_disabled;
 again:
 	old.c_iflag = ATOMIC_READ(self->t_ios.c_iflag);
 	if (!(tio->c_iflag & IXOFF) && (old.c_iflag & IXOFF) &&
@@ -1591,13 +1593,17 @@ again:
 	memcpy(old.c_cc, self->t_ios.c_cc, sizeof(old.c_cc));
 	memcpy(self->t_ios.c_cc, tio->c_cc, sizeof(old.c_cc));
 	/* Broadcast signals when certain flags change. */
+	echo_disabled = ((old.c_lflag & (ECHO | EXTPROC)) == ECHO && (tio->c_lflag & (ECHO | EXTPROC)) != ECHO);
 	if ((old.c_lflag & __IEOFING) == 0 && (tio->c_lflag & __IEOFING) != 0)
 		sched_signal_broadcast(&self->t_ibuf.rb_nempty);
 	if ((old.c_lflag & ICANON) != 0 && (tio->c_lflag & ICANON) == 0)
 		sched_signal_broadcast(&self->t_canon.lb_nful);
-	if ((old.c_iflag & IXOFF) != 0 && (tio->c_iflag & IXOFF) == 0)
+	if (((old.c_iflag & IXOFF) != 0 && (tio->c_iflag & IXOFF) == 0) || echo_disabled)
 		sched_signal_broadcast(&self->t_opend.lb_nful);
-	if ((old.c_iflag & __IIOFF) != 0 && (tio->c_iflag & __IIOFF) == 0)
+	else if ((old.c_iflag & IXOFF) == 0 && (tio->c_iflag & IXOFF) != 0) {
+		sched_signal_broadcast(&self->t_ioschange);
+	}
+	if (((old.c_iflag & __IIOFF) != 0 && (tio->c_iflag & __IIOFF) == 0) || echo_disabled)
 		sched_signal_broadcast(&self->t_ipend.lb_nful);
 	/* Given the caller the old TIO descriptor, if they requested it. */
 	if (old_tio)
@@ -1607,82 +1613,12 @@ err:
 	return error;
 }
 
-
-#ifdef __KERNEL__
-/* Poll the given terminal for various operations being non-blocking.
- * @return: * : One of `TERMINAL_POLL_*' */
-INTERN NONNULL((1)) int CC
-libterminal_poll_iread(struct terminal *__restrict self)
-		__THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	if (ATOMIC_READ(self->t_ios.c_lflag) & __IEOFING)
-		return TERMINAL_POLL_NONBLOCK;
-	if (ringbuffer_poll(&self->t_ibuf, POLLIN))
-		return TERMINAL_POLL_NONBLOCK;
-	if unlikely(ATOMIC_READ(self->t_ios.c_lflag) & __IEOFING)
-		return TERMINAL_POLL_NONBLOCK;
-	return TERMINAL_POLL_MAYBLOCK_UNDERLYING;
-}
-
-INTERN NONNULL((1)) int CC
-libterminal_poll_iwrite(struct terminal *__restrict self)
-		__THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	if (ATOMIC_READ(self->t_ios.c_iflag) & __IIOFF) {
-		if (ATOMIC_READ(self->t_ipend.lb_line.lc_size) < ATOMIC_READ(self->t_ipend.lb_limt))
-			return TERMINAL_POLL_NONBLOCK;
-		task_connect_for_poll(&self->t_ipend.lb_nful);
-		if unlikely(ATOMIC_READ(self->t_ipend.lb_line.lc_size) < ATOMIC_READ(self->t_ipend.lb_limt))
-			return TERMINAL_POLL_NONBLOCK;
-		if likely(ATOMIC_READ(self->t_ios.c_iflag) & __IIOFF)
-			return TERMINAL_POLL_MAYBLOCK;
-	}
-	if (ATOMIC_READ(self->t_ios.c_lflag) & ICANON) {
-		if (ATOMIC_READ(self->t_canon.lb_line.lc_size) < ATOMIC_READ(self->t_canon.lb_limt))
-			return TERMINAL_POLL_NONBLOCK;
-		task_connect_for_poll(&self->t_canon.lb_nful);
-		if unlikely(ATOMIC_READ(self->t_canon.lb_line.lc_size) < ATOMIC_READ(self->t_canon.lb_limt))
-			return TERMINAL_POLL_NONBLOCK;
-		if likely(ATOMIC_READ(self->t_ios.c_lflag) & ICANON)
-			return TERMINAL_POLL_MAYBLOCK;
-	}
-	if (!ringbuffer_poll(&self->t_ibuf, POLLOUT))
-		return TERMINAL_POLL_MAYBLOCK;
-	if ((ATOMIC_READ(self->t_ios.c_lflag) & (ECHO | EXTPROC)) == ECHO)
-		return TERMINAL_POLL_MAYBLOCK_UNDERLYING;
-	return TERMINAL_POLL_NONBLOCK;
-}
-
-INTERN NONNULL((1)) int CC
-libterminal_poll_owrite(struct terminal *__restrict self)
-		__THROWS(E_WOULDBLOCK, E_BADALLOC) {
-	if (ATOMIC_READ(self->t_ios.c_iflag) & IXOFF) {
-		if (ATOMIC_READ(self->t_opend.lb_line.lc_size) < ATOMIC_READ(self->t_opend.lb_limt))
-			return TERMINAL_POLL_NONBLOCK;
-		task_connect_for_poll(&self->t_opend.lb_nful);
-		if unlikely(ATOMIC_READ(self->t_opend.lb_line.lc_size) < ATOMIC_READ(self->t_opend.lb_limt))
-			return TERMINAL_POLL_NONBLOCK;
-		if likely(ATOMIC_READ(self->t_ios.c_iflag) & IXOFF)
-			return TERMINAL_POLL_MAYBLOCK;
-	}
-	/* Only the actual display-output may block, however that
-	 * is something that we're not responsible for, and that
-	 * the caller must check if they're interested is this. */
-	return TERMINAL_POLL_MAYBLOCK_UNDERLYING;
-}
-#endif /* __KERNEL__ */
-
-
-
 DEFINE_PUBLIC_ALIAS(terminal_init, libterminal_init);
 DEFINE_PUBLIC_ALIAS(terminal_owrite, libterminal_owrite);
 DEFINE_PUBLIC_ALIAS(terminal_iwrite, libterminal_iwrite);
 DEFINE_PUBLIC_ALIAS(terminal_iread, libterminal_iread);
 DEFINE_PUBLIC_ALIAS(terminal_setios, libterminal_setios);
 DEFINE_PUBLIC_ALIAS(terminal_flush_icanon, libterminal_flush_icanon);
-#ifdef __KERNEL__
-DEFINE_PUBLIC_ALIAS(terminal_poll_iread, libterminal_poll_iread);
-DEFINE_PUBLIC_ALIAS(terminal_poll_iwrite, libterminal_poll_iwrite);
-DEFINE_PUBLIC_ALIAS(terminal_poll_owrite, libterminal_poll_owrite);
-#endif /* __KERNEL__ */
 
 DECL_END
 

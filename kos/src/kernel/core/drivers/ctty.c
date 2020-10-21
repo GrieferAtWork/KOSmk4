@@ -136,13 +136,21 @@ ctty_stat(struct character_device *__restrict UNUSED(self),
 	character_device_stat(ctty, result);
 }
 
+PRIVATE NONNULL((1)) void KCALL
+ctty_pollconnect(struct character_device *__restrict UNUSED(self),
+                 poll_mode_t what) THROWS(...) {
+	REF struct ttybase_device *ctty = getctty();
+	FINALLY_DECREF_UNLIKELY(ctty);
+	character_device_pollconnect(ctty, what);
+}
+
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-ctty_poll(struct character_device *__restrict UNUSED(self),
-          poll_mode_t what) THROWS(...) {
+ctty_polltest(struct character_device *__restrict UNUSED(self),
+              poll_mode_t what) THROWS(...) {
 	poll_mode_t result;
 	REF struct ttybase_device *ctty = getctty();
 	FINALLY_DECREF_UNLIKELY(ctty);
-	result = character_device_poll(ctty, what);
+	result = character_device_polltest(ctty, what);
 	return result;
 }
 
@@ -164,18 +172,19 @@ PUBLIC struct character_device dev_tty = {
 	/* .cd_refcnt   = */ 1,
 	/* .cd_heapsize = */ sizeof(dev_tty),
 	/* .cd_type     = */ {
-		/* .ct_driver = */ &drv_self,
-		/* .ct_fini   = */ NULL,
-		/* .ct_read   = */ &ctty_read,
-		/* .ct_write  = */ &ctty_write,
-		/* .ct_pread  = */ &ctty_pread,
-		/* .ct_pwrite = */ &ctty_pwrite,
-		/* .ct_ioctl  = */ &ctty_ioctl,
-		/* .ct_mmap   = */ &ctty_mmap,
-		/* .ct_sync   = */ &ctty_sync,
-		/* .ct_stat   = */ &ctty_stat,
-		/* .ct_poll   = */ &ctty_poll,
-		/* .ct_open   = */ &ctty_open
+		/* .ct_driver      = */ &drv_self,
+		/* .ct_fini        = */ NULL,
+		/* .ct_read        = */ &ctty_read,
+		/* .ct_write       = */ &ctty_write,
+		/* .ct_pread       = */ &ctty_pread,
+		/* .ct_pwrite      = */ &ctty_pwrite,
+		/* .ct_ioctl       = */ &ctty_ioctl,
+		/* .ct_mmap        = */ &ctty_mmap,
+		/* .ct_sync        = */ &ctty_sync,
+		/* .ct_stat        = */ &ctty_stat,
+		/* .ct_pollconnect = */ &ctty_pollconnect,
+		/* .ct_polltest    = */ &ctty_polltest,
+		/* .ct_open        = */ &ctty_open
 	},
 	/* .cd_devlink     = */ { NULL, NULL, 0 },
 	/* .cd_flags       = */ CHARACTER_DEVICE_FLAG_NORMAL,

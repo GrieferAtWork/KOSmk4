@@ -94,15 +94,6 @@ libterminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 		KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...));
 
-#ifdef __KERNEL__
-/* Poll the given terminal for various operations being non-blocking.
- * @return: * : One of `TERMINAL_POLL_*' */
-INTDEF NONNULL((1)) int CC libterminal_poll_iread(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-INTDEF NONNULL((1)) int CC libterminal_poll_iwrite(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-INTDEF NONNULL((1)) int CC libterminal_poll_owrite(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-#endif /* __KERNEL__ */
-
-
 DECL_END
 
 #endif /* !GUARD_LIBTERM_TERMIO_H */

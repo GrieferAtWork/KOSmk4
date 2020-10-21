@@ -50,7 +50,6 @@ struct semaphore {
 	 ? (__hybrid_assert((x)->s_count == 0)) \
 	 : (void)((x)->s_count = (n)))
 #define semaphore_count(x) __hybrid_atomic_load((x)->s_count, __ATOMIC_ACQUIRE)
-#define semaphore_available(x) (semaphore_count(x) != 0)
 
 /* Try to acquire a tick to the given semaphore. */
 LOCAL NOBLOCK WUNUSED NONNULL((1)) bool
@@ -160,32 +159,30 @@ NOTHROW(FCALL semaphore_postmany)(struct semaphore *__restrict self, size_t coun
 	return sig_sendmany(&self->s_avail, count);
 }
 
-/* Poll the given semaphore for being available, returning `true'
- * if it is, or `false' after connecting to the signal used to
- * indicate a ticket being available. */
-LOCAL WUNUSED NONNULL((1)) bool
-(FCALL semaphore_poll)(struct semaphore *__restrict self) THROWS(E_BADALLOC) {
-	uintptr_t count;
-	count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
-	if (count)
-		return true;
-	task_connect_for_poll(&self->s_avail);
-	/* Must check again, now that we're connected. */
-	count = __hybrid_atomic_load(self->s_count, __ATOMIC_ACQUIRE);
-	if unlikely(count)
-		return true;
-	return false;
-}
+/* Semaphore polling functions. */
+#define semaphore_available(x)             (semaphore_count(x) != 0)
+#define semaphore_pollconnect_ex(self, cb) cb(&(self)->s_avail)
+#ifdef __OPTIMIZE_SIZE__
+#define semaphore_poll_ex(self, cb)      \
+	(semaphore_pollconnect_ex(self, cb), \
+	 semaphore_available(self))
+#else /* __OPTIMIZE_SIZE__ */
+#define semaphore_poll_ex(self, cb)       \
+	(semaphore_available(self) ||         \
+	 (semaphore_pollconnect_ex(self, cb), \
+	  semaphore_available(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
+#define semaphore_pollconnect(self) semaphore_pollconnect_ex(self, task_connect_for_poll)
+#define semaphore_poll(self)        semaphore_poll_ex(self, task_connect_for_poll)
 
+
+/* Integration into the sync_* API-system. */
 __DEFINE_SYNC_SEMAPHORE(struct semaphore,
                         semaphore_trywait,
                         semaphore_wait,
                         semaphore_wait_nx,
                         semaphore_post,
                         semaphore_available)
-__DEFINE_SYNC_POLL(struct semaphore,
-                   semaphore_poll,
-                   semaphore_poll)
 
 
 #endif /* __CC__ */

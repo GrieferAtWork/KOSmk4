@@ -143,16 +143,14 @@ again_read:
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL); /* No data available. */
 		} else {
 			/* Must not keep a reference to the slave while sleeping! */
-			poll_mode_t what;
 			TRY {
-				what = ringbuffer_poll(&slave->ps_obuf, POLLIN);
+				if (ringbuffer_pollread_unlikely(&slave->ps_obuf)) {
+					task_disconnectall();
+					goto again_read;
+				}
 			} EXCEPT {
 				decref_unlikely(slave);
 				RETHROW();
-			}
-			if (what & POLLIN) {
-				task_disconnectall();
-				goto again_read;
 			}
 			/* Wait for something to happen without holding a reference to the slave! */
 			decref_unlikely(slave);
@@ -194,29 +192,18 @@ again_write:
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 		} else {
 			/* Must not keep a reference to the slave while sleeping! */
-			int how;
 			TRY {
-				how = terminal_poll_iwrite(&slave->t_term);
-			} EXCEPT {
-				decref_unlikely(slave);
-				RETHROW();
-			}
-			if (how == TERMINAL_POLL_NONBLOCK) {
-				task_disconnectall();
-				goto again_write;
-			}
-			if (how == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
-				poll_mode_t what;
-				TRY {
-					what = ringbuffer_poll(&slave->ps_obuf, POLLOUT);
-				} EXCEPT {
-					decref_unlikely(slave);
-					RETHROW();
-				}
-				if (what & POLLOUT) {
+#define connect_to_slave_ps_obuf_ex(cb) ringbuffer_pollconnect_write_ex(&slave->ps_obuf, cb)
+				if (terminal_polliwrite_unlikely(&slave->t_term,
+				                                 ringbuffer_canwrite(&slave->ps_obuf),
+				                                 connect_to_slave_ps_obuf_ex)) {
 					task_disconnectall();
 					goto again_write;
 				}
+#undef connect_to_slave_ps_obuf_ex
+			} EXCEPT {
+				decref_unlikely(slave);
+				RETHROW();
 			}
 			/* Wait for something to happen without holding a reference to the slave! */
 			decref_unlikely(slave);
@@ -267,9 +254,32 @@ pty_master_stat(struct character_device *__restrict self,
 	}
 }
 
+PRIVATE NONNULL((1)) void KCALL
+pty_master_pollconnect(struct character_device *__restrict self,
+                       poll_mode_t what)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	struct pty_master *me;
+	REF struct pty_slave *slave;
+	me    = (struct pty_master *)self;
+	slave = me->pm_slave.get();
+	if (!slave)
+		;
+	else {
+		FINALLY_DECREF_UNLIKELY(slave);
+		if (what & POLLINMASK)
+			ringbuffer_pollconnect_read(&slave->ps_obuf); /* Poll for read() */
+		if (what & POLLOUTMASK) {
+			/* Poll for write() */
+#define connect_to_slave_ps_obuf_ex(cb) ringbuffer_pollconnect_write_ex(&slave->ps_obuf, cb)
+			terminal_pollconnect_iwrite(&slave->t_term, connect_to_slave_ps_obuf_ex);
+#undef connect_to_slave_ps_obuf_ex
+		}
+	}
+}
+
 PRIVATE NONNULL((1)) poll_mode_t KCALL
-pty_master_poll(struct character_device *__restrict self,
-                poll_mode_t what)
+pty_master_polltest(struct character_device *__restrict self,
+                    poll_mode_t what)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	struct pty_master *me;
 	REF struct pty_slave *slave;
@@ -280,20 +290,10 @@ pty_master_poll(struct character_device *__restrict self,
 		result = what;
 	else {
 		FINALLY_DECREF_UNLIKELY(slave);
-		if (what & POLLIN) {
-			/* Poll for read() */
-			result |= ringbuffer_poll(&slave->ps_obuf, POLLIN);
-		}
-		if (what & POLLOUT) {
-			/* Poll for write() */
-			int how;
-			how = terminal_poll_iwrite(&slave->t_term);
-			if (how == TERMINAL_POLL_NONBLOCK) {
-				result |= POLLOUT;
-			} else if (how == TERMINAL_POLL_MAYBLOCK_UNDERLYING) {
-				result |= ringbuffer_poll(&slave->ps_obuf, POLLOUT);
-			}
-		}
+		if ((what & POLLINMASK) && ringbuffer_canread(&slave->ps_obuf))
+			result |= POLLINMASK; /* Test for read() */
+		if ((what & POLLOUTMASK) && terminal_caniwrite(&slave->t_term, ringbuffer_canwrite(&slave->ps_obuf)))
+			result |= POLLOUTMASK;
 	}
 	return result;
 }
@@ -317,12 +317,13 @@ LOCAL REF struct pty_master *KCALL pty_master_alloc(void) {
 	REF struct pty_master *result;
 	result = CHARACTER_DEVICE_ALLOC(struct pty_master);
 	/* Initialize device operators. */
-	result->cd_type.ct_fini  = &pty_master_fini;
-	result->cd_type.ct_read  = &pty_master_read;
-	result->cd_type.ct_write = &pty_master_write;
-	result->cd_type.ct_ioctl = &pty_master_ioctl;
-	result->cd_type.ct_stat  = &pty_master_stat;
-	result->cd_type.ct_poll  = &pty_master_poll;
+	result->cd_type.ct_fini        = &pty_master_fini;
+	result->cd_type.ct_read        = &pty_master_read;
+	result->cd_type.ct_write       = &pty_master_write;
+	result->cd_type.ct_ioctl       = &pty_master_ioctl;
+	result->cd_type.ct_stat        = &pty_master_stat;
+	result->cd_type.ct_pollconnect = &pty_master_pollconnect;
+	result->cd_type.ct_polltest    = &pty_master_polltest;
 	return result;
 }
 

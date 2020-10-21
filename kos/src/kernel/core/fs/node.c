@@ -148,9 +148,14 @@ handle_directoryentry_stat(struct directory_entry *__restrict self,
 	result->st_mode = DTTOIF(self->de_type);
 }
 
+INTERN NONNULL((1)) void KCALL
+handle_directoryentry_pollconnect(struct directory_entry *__restrict UNUSED(self),
+                                  poll_mode_t UNUSED(what)) {
+}
+
 INTERN ATTR_CONST NONNULL((1)) poll_mode_t KCALL
-handle_directoryentry_poll(struct directory_entry *__restrict UNUSED(self),
-                           poll_mode_t what) {
+handle_directoryentry_polltest(struct directory_entry *__restrict UNUSED(self),
+                               poll_mode_t what) {
 	return what & POLLIN;
 }
 
