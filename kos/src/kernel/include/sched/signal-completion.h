@@ -32,8 +32,6 @@
 #ifdef __CC__
 DECL_BEGIN
 
-#ifdef CONFIG_USE_NEW_SIGNAL_API
-
 struct task;
 struct sig_completion;
 struct sig_completion_context;
@@ -418,9 +416,6 @@ PRIVATE void demo(void) {
 	decref(red);
 }
 #endif
-
-
-#endif /* CONFIG_USE_NEW_SIGNAL_API */
 
 DECL_END
 #endif /* __CC__ */

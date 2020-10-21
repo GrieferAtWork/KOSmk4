@@ -31,7 +31,6 @@
 #include <sys/epoll.h>
 
 #ifdef __CC__
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 DECL_BEGIN
 
 struct epoll_controller;
@@ -113,7 +112,6 @@ struct epoll_controller {
 
 
 DECL_END
-#endif /* CONFIG_USE_NEW_SIGNAL_API */
 #endif /* __CC__ */
 
 

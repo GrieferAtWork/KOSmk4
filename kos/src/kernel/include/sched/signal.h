@@ -125,12 +125,6 @@
 
 DECL_BEGIN
 
-#undef CONFIG_USE_NEW_SIGNAL_API
-#if 1
-#define CONFIG_USE_NEW_SIGNAL_API 1
-#endif
-
-
 /* Signal reception priority order:
  *
  * In order to improve performance, signal sent through `struct sig'
@@ -212,11 +206,9 @@ struct sig {
 #endif /* !CONFIG_NO_SMP */
 };
 
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 #ifndef CONFIG_NO_SMP
 #define SIG_CONTROL_SMPLOCK 0x0001 /* SMP lock bit for `struct sig::s_ctl' */
 #endif /* !CONFIG_NO_SMP */
-#endif /* CONFIG_USE_NEW_SIGNAL_API */
 
 #ifdef CONFIG_NO_SMP
 #define SIG_INIT     { __NULLPTR }
@@ -415,7 +407,6 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
  * though this invariant is only true when interlocked with the SMP-locks of
  * all attached signals. (s.a. `tcs_dlvr')
  */
-#ifdef CONFIG_USE_NEW_SIGNAL_API
 #define TASK_CONNECTION_STAT_BROADCAST           0x0000 /* Signal was broadcast (forwarding is unnecessary if ignored)
                                                          * In this state, `tc_sig' must be considered to be `[valid_if(false)]', and the
                                                          * thread that originally connected to the signal mustn't directly re-connect.
@@ -443,26 +434,6 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 #define TASK_CONNECTION_STAT_ISCOMP(x) ((uintptr_t)(x) >= 4) /* Connection is a `struct sig_completion' (assumes that `TASK_CONNECTION_STAT_ISSPEC() == true') */
 #define TASK_CONNECTION_STAT_ISPOLL(x) ((uintptr_t)(x) & TASK_CONNECTION_STAT_FPOLL) /* Connection is poll-based. */
 #define TASK_CONNECTION_STAT_ASCONS(x) ((struct task_connections *)((uintptr_t)(x) & ~3)) /* When `!TASK_CONNECTION_STAT_ISSPEC(x)', return the underlying `struct task_connections' */
-#else /* CONFIG_USE_NEW_SIGNAL_API */
-#define TASK_CONNECTION_STAT_SENT         ((uintptr_t)-1) /* Signal was sent, and must be forwarded if not received via `task_waitfor()'
-                                                           * In this state, the attached signal must not be free'd, though this case can
-                                                           * easily be handled by broadcasting signals one last time before disconnecting.
-                                                           * Transitions to (with [lock(SMP_LOCK(tc_sig))]):
-                                                           *   - TASK_CONNECTION_STAT_BROADCAST: Any thread called `sig_broadcast()'
-                                                           *                                     on the attached signal. */
-#define TASK_CONNECTION_STAT_BROADCAST    ((uintptr_t)-2) /* Signal was broadcast (forwarding is unnecessary if ignored)
-                                                           * In this state, `tc_sig' must be considered to be `[valid_if(false)]', and the
-                                                           * thread that originally connected to the signal mustn't directly re-connect.
-                                                           * When all (past) connections have entered this state, the associated signal is
-                                                           * allowed to have it's backing memory be free'd!
-                                                           * NOTE: THIS STATUS WILL NEVER APPEAR IN SIGNAL CONNECTION CHAINS! */
-#define TASK_CONNECTION_STAT_CHECK(x)     ((uintptr_t)(x) >= (uintptr_t)-2)
-
-/* For use when `!TASK_CONNECTION_STAT_CHECK(x)': check for poll-connections. */
-#define TASK_CONNECTION_STAT_GETCONS(x)   ((struct task_connections *)((uintptr_t)(x) & ~1))
-#define TASK_CONNECTION_STAT_ISNORM(x)    (((uintptr_t)(x) & 1) == 0)
-#define TASK_CONNECTION_STAT_ISPOLL(x)    (((uintptr_t)(x) & 1) != 0)
-#endif /* !CONFIG_USE_NEW_SIGNAL_API */
 
 struct task_connection {
 	struct sig                  *tc_sig;     /* [1..1][const] The connected signal. */
