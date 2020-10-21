@@ -56,6 +56,7 @@ PUBLIC struct aio_handle_type aio_noop_type = {
 struct sig_cleanup_callback_for_aio_completion: sig_cleanup_callback {
 	struct aio_handle_generic *self;
 };
+
 PRIVATE NOBLOCK NOPREEMPT void
 NOTHROW(FCALL sig_cleanup_for_aio_completion)(struct sig_cleanup_callback *self) {
 	struct sig_cleanup_callback_for_aio_completion *me;

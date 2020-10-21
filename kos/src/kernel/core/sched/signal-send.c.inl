@@ -132,7 +132,7 @@ NOTHROW(FCALL sig_broadcast_as_nopr)(struct sig *__restrict self,
  * release further SMP-locks which may have been used to guard `self' from being
  * destroyed (such as calling `aio_handle_release()' when sending a signal from
  * inside of an AIO completion function)
- * Note that all of these functions guaranty that `callback' is invoked eactly once. */
+ * Note that all of these functions guaranty that `callback' is invoked exactly once. */
 PUBLIC NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self,
                                           struct sig_cleanup_callback *__restrict cleanup)
@@ -493,13 +493,11 @@ again_read_target_cons:
 			                       LOCAL_was);
 		} else {
 			/* Invoke this completion function as the only thing we do. */
-#ifdef HAVE_CLEANUP
-#error "Must extend `sig_completion_runsingle()' to accept an optional cleanup"
-#endif /* HAVE_CLEANUP */
 			sig_completion_runsingle(self,
 			                         sc,
 			                         LOCAL_caller,
 			                         LOCAL_sender,
+			                         LOCAL_cleanup,
 			                         LOCAL_was);
 		}
 		return true;
@@ -550,15 +548,15 @@ again_read_target_cons:
 		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
 		goto again;
 	}
+	sig_smplock_release_nopr(self);
 	/* The simple case: We managed to deliver the signal, and now we must wake-up
 	 * the connected thread (if any) */
 	{
 		REF struct task *thread;
 		thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
-#ifndef CONFIG_NO_SMP
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
 		ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
-#endif /* !CONFIG_NO_SMP */
-		sig_smplock_release_nopr(self);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
 		LOCAL_exec_cleanup();
 		LOCAL_PREEMPTION_POP();
 		/* Wake-up the thread. */

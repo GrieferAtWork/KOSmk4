@@ -30,6 +30,7 @@
 #include <kernel/selftest.h> /* DEFINE_TEST */
 #include <sched/rpc.h>
 #include <sched/signal-completion.h>
+#include <sched/signal-select.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
@@ -884,6 +885,7 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
                                         struct sig_completion *__restrict sc,
                                         struct task *__restrict caller,
                                         struct sig *sender,
+                                        struct sig_cleanup_callback *cleanup,
                                         pflag_t was) {
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
@@ -894,6 +896,8 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
 	/* Release locks. */
 	sig_completion_unlock(sc);
 	sig_smplock_release_nopr(self);
+	if (cleanup)
+		(*cleanup->scc_cb)(cleanup);
 	PREEMPTION_POP(was);
 	/* Run phase #2 callback. */
 	sig_run_phase_2(phase2, &context);
@@ -1801,6 +1805,221 @@ NOTHROW(FCALL sig_altsendmany_nopr)(struct sig *self,
 	}
 	return result;
 }
+
+
+
+
+/* Send a signal to the oldest (and preferably non-poll-based) connection of
+ * `self' for which `selector' returns non-NULL. Connections are enumerated
+ * twice from oldest to most recent, only including non-poll-based during the
+ * first pass, and only including poll-based ones during the second pass.
+ * @param: self:     The signal which should be sent.
+ * @param: selector: A selector callback that can be used to select the
+ *                   connection that should be sent.
+ * @param: cookie:   An argument that should be passed to `selector'
+ * @param: caller:   The (supposed) calling thread (s.a. `sig_broadcast_as()')
+ * @param: cleanup:  When non-NULL, an optional cleanup callback (s.a. `sig_broadcast_cleanup_nopr()')
+ * @param: run_cleanup_when_notarget: If true, also run `cleanup' when returning `SIG_SEND_SELECT_NOTARGET'
+ * @return: * :      One of `SIG_SEND_SELECT_*' */
+PUBLIC NOBLOCK NONNULL((1, 2, 4)) unsigned int
+NOTHROW(FCALL sig_send_select_as)(struct sig *__restrict self,
+                                  sig_send_selector_t selector, void *cookie,
+                                  struct task *__restrict caller,
+                                  struct sig_cleanup_callback *cleanup,
+                                  bool run_cleanup_when_notarget) {
+	pflag_t was;
+	struct sig *sender;
+	struct task_connection *sig_con;
+	struct task_connection *receiver;
+	struct task_connection *last_ingored_connection;
+	struct sig_select_context context;
+	bool select_poll = false;
+	context.ssc_signal    = self;
+	context.ssc_flag      = SIG_SELECT_FLAG_NORMAL;
+	context.ssc_wakeflags = TASK_WAKE_FNORMAL;
+	context.ssc_caller    = caller;
+	was = PREEMPTION_PUSHOFF();
+#ifdef CONFIG_NO_SMP
+	sig_con = ATOMIC_READ(self->s_con);
+	if (!sig_con)
+		goto done;
+#else /* CONFIG_NO_SMP */
+	for (;;) {
+		sig_con = ATOMIC_READ(self->s_con);
+		if (!sig_con)
+			goto done;
+		if unlikely((uintptr_t)sig_con & SIG_CONTROL_SMPLOCK) {
+			PREEMPTION_POP(was);
+			task_pause();
+			was = PREEMPTION_PUSHOFF();
+			continue;
+		}
+		if (ATOMIC_CMPXCH_WEAK(self->s_con, sig_con,
+		                       sig_smplock_set(sig_con)))
+			break;
+	}
+#endif /* !CONFIG_NO_SMP */
+	/* Figure out which signal we should select. */
+	last_ingored_connection = NULL;
+again:
+	for (;;) {
+		struct task_connections *target_cons;
+		for (receiver = sig_con;
+		     receiver->tc_connext != last_ingored_connection;
+		     receiver = receiver->tc_signext)
+			;
+#ifndef CONFIG_NO_SMP
+again_read_cons:
+#endif /* !CONFIG_NO_SMP */
+		target_cons = ATOMIC_READ(receiver->tc_cons);
+		if (!TASK_CONNECTION_STAT_ISDEAD(target_cons) &&
+		    (!!TASK_CONNECTION_STAT_ISPOLL(target_cons)) == select_poll) {
+#ifndef CONFIG_NO_SMP
+			/* NOTE: Waiting until we can lock the connection here is allowed, since
+			 *       you're allowed to (and required to) acquire connection locks
+			 *       without having to release the associated signal-lock.
+			 * Doing this doesn't result in a race condition, since the other end
+			 * of this syncing mechanism (which is `task_disconnect()') will release
+			 * its initial connection-lock if it fails to acquire the signal lock,
+			 * which it will because we're already holding that one! */
+			if unlikely((uintptr_t)target_cons & TASK_CONNECTION_STAT_FLOCK) {
+				task_pause();
+				goto again_read_cons;
+			}
+			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
+			                        (struct task_connections *)((uintptr_t)target_cons |
+			                                                    TASK_CONNECTION_STAT_FLOCK)))
+				goto again_read_cons;
+#endif /* !CONFIG_NO_SMP */
+			/* Figure out if we want to send to this connection. */
+			if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
+				/* Completion callback */
+				context.ssc_type  = SIG_SELECT_TYPE_COMPLETION;
+				context.ssc_compl = (struct sig_completion *)receiver;
+			} else {
+				/* Sleeping thread */
+				struct task_connections *chain;
+				context.ssc_type = SIG_SELECT_TYPE_THREAD;
+				for (chain = TASK_CONNECTION_STAT_ASCONS(target_cons);;) {
+					if (chain->tcs_thread) {
+						context.ssc_thread = chain->tcs_thread;
+						break;
+					}
+					if (!chain->tsc_prev) {
+						/* Assume that `chain' is `this_root_connections' of the
+						 * target thread, which we can use to reverse-engineer
+						 * the actual thread */
+						context.ssc_thread = (struct task *)((uintptr_t)chain -
+						                                     (uintptr_t)&this_root_connections);
+						break;
+					}
+					chain = chain->tsc_prev;
+				}
+			}
+			sender = (*selector)(cookie, &context);
+			if (sender != NULL) {
+				REF struct task *thread;
+				if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
+					/* Invoke a completion function. */
+					task_connection_unlink_from_sig(self, receiver);
+					sig_completion_runsingle(self,
+					                         (struct sig_completion *)receiver,
+					                         context.ssc_caller, sender,
+					                         cleanup, was);
+					return SIG_SEND_SELECT_SUCCESS;
+				}
+				/* Send the signal to a normal thread. */
+				if (TASK_CONNECTION_STAT_ISPOLL(target_cons)) {
+					/* Send the signal to a normal thread. */
+					ATOMIC_WRITE(receiver->tc_stat,
+					             TASK_CONNECTION_STAT_BROADCAST |
+					             TASK_CONNECTION_STAT_FLOCK_OPT);
+					task_connection_unlink_from_sig_and_unlock(self, receiver);
+					target_cons = TASK_CONNECTION_STAT_ASCONS(target_cons);
+					if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, sender))
+						goto unlock_receiver_and_return_already;
+					thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
+					ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
+				} else {
+					ATOMIC_WRITE(receiver->tc_stat,
+					             TASK_CONNECTION_STAT_SENT |
+					             TASK_CONNECTION_STAT_FLOCK_OPT);
+					assert(target_cons == TASK_CONNECTION_STAT_ASCONS(target_cons));
+					if (!ATOMIC_CMPXCH(target_cons->tcs_dlvr, NULL, sender)) {
+						/* Another signal was already delivered to the specified thread. */
+						task_connection_unlink_from_sig_and_unlock(self, receiver);
+unlock_receiver_and_return_already:
+						ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_BROADCAST);
+						if (cleanup)
+							(*cleanup->scc_cb)(cleanup);
+						PREEMPTION_POP(was);
+						return SIG_SEND_SELECT_ALREADY;
+					}
+					sig_smplock_release_nopr(self);
+					thread = xincref(ATOMIC_READ(target_cons->tcs_thread));
+#if TASK_CONNECTION_STAT_FLOCK_OPT != 0
+					ATOMIC_WRITE(receiver->tc_stat, TASK_CONNECTION_STAT_SENT);
+#endif /* TASK_CONNECTION_STAT_FLOCK_OPT != 0 */
+				}
+				if (cleanup)
+					(*cleanup->scc_cb)(cleanup);
+				PREEMPTION_POP(was);
+				/* Wake-up the thread. */
+				if likely(thread) {
+					task_wake_as(thread,
+					             context.ssc_caller,
+					             context.ssc_wakeflags);
+					decref_unlikely(thread);
+				}
+				return SIG_SEND_SELECT_SUCCESS;
+			}
+			ATOMIC_AND(receiver->tc_stat, ~TASK_CONNECTION_STAT_FLOCK);
+		}
+		if (receiver == sig_con)
+			break;
+		last_ingored_connection = receiver;
+	}
+	if (!select_poll) {
+		context.ssc_flag = SIG_SELECT_FLAG_FORPOLL;
+		select_poll      = true;
+		goto again;
+	}
+	sig_smplock_release_nopr(self);
+done:
+	if (cleanup && run_cleanup_when_notarget)
+		(*cleanup->scc_cb)(cleanup);
+	PREEMPTION_POP(was);
+	return SIG_SEND_SELECT_NOTARGET;
+}
+
+PUBLIC NOBLOCK NONNULL((1, 2)) unsigned int
+NOTHROW(FCALL sig_send_select)(struct sig *__restrict self,
+                               sig_send_selector_t selector, void *cookie,
+                               struct sig_cleanup_callback *cleanup,
+                               bool run_cleanup_when_notarget) {
+	unsigned int result;
+	result = sig_send_select_as(self,
+	                            selector,
+	                            cookie,
+	                            THIS_TASK,
+	                            cleanup,
+	                            run_cleanup_when_notarget);
+	return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

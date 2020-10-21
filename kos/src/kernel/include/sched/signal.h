@@ -152,13 +152,6 @@ DECL_BEGIN
  *    #2: If no (alive) connections are left, return the number of
  *        signaled non-poll connections.
  *
- * sig_sendto():
- *    #1: Check if there is some (non-completion) connection that is
- *        connected to the given thread. If such a connection exists,
- *        signal it and return `true'
- *    #2: If no such connection exists, return `false'
- *
- *
  * Normal (non-poll) connections:
  *   - task_connect()
  *   - sig_connect_completion()
@@ -237,22 +230,6 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) __BOOL
 NOTHROW(FCALL sig_altsend_nopr)(struct sig *self,
                                 struct sig *sender);
 
-/* TODO:
-// Send a signal to a specific thread. The case where the connection to which `self'
-// is attached isn't apart of `target's active set of connections can easily be
-// handled by first searching for a connection who's `tc_cons->tcs_thread' fields
-// equals `target'. If no such entry can be found, the search is performed once again,
-// only this time, in addition to testing the `tcs_thread' field of connections, the
-// `tsc_prev' chain is traversed until `this_root_connections' is reached (s.a. the
-// guaranty that `(CONS->tsc_prev != NULL) == (CONS == &this_root_connections)'), at
-// which point target can be matched by `CONS == FORTASK(target, &this_root_connections)'
-// @return: true:  Successfully delivered a signal to a connected held by `target'
-// @return: false: The thread `target' doesn't have any connections to `self'
-FUNDEF NOBLOCK NONNULL((1, 2)) __BOOL
-NOTHROW(FCALL sig_sendto)(struct sig *__restrict self,
-                          struct task *__restrict target);
- */
-
 /* Same as `sig_send()', but repeat the operation up to `maxcount' times,
  * and return the # of times that `sig_send()' would have returned `true'
  * Equivalent to:
@@ -311,16 +288,6 @@ FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_altbroadcast_for_fini_nopr)(struct sig *self,
                                               struct sig *sender);
 
-/* Check if the given signal has viable recipients.
- * This includes poll-based connections. */
-FUNDEF NOBLOCK NONNULL((1)) __BOOL
-NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self);
-
-/* Count the # of viable recipients of the given signal.
- * This includes poll-based connections. */
-FUNDEF NOBLOCK NONNULL((1)) size_t
-NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
-
 /* Same as `sig_broadcast()', but impersonate `caller', and
  * wake up thread through use of `task_wake_as()'. The same rules
  * apply, meaning that the (true) caller must ensure that their
@@ -378,7 +345,7 @@ struct sig_cleanup_callback {
  * release further SMP-locks which may have been used to guard `self' from being
  * destroyed (such as calling `aio_handle_release()' when sending a signal from
  * inside of an AIO completion function)
- * Note that all of these functions guaranty that `callback' is invoked eactly once. */
+ * Note that all of these functions guaranty that `callback' is invoked exactly once. */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1, 2)) size_t
 NOTHROW(FCALL sig_broadcast_cleanup_nopr)(struct sig *__restrict self,
                                           struct sig_cleanup_callback *__restrict cleanup);
@@ -394,7 +361,15 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
                                                       struct task *__restrict caller,
                                                       struct sig_cleanup_callback *__restrict cleanup);
 
+/* Check if the given signal has viable recipients.
+ * This includes poll-based connections. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL sig_iswaiting)(struct sig *__restrict self);
 
+/* Count the # of viable recipients of the given signal.
+ * This includes poll-based connections. */
+FUNDEF NOBLOCK NONNULL((1)) size_t
+NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self);
 
 
 /* Connection status values (is-connected is every `x' with `!TASK_CONNECTION_STAT_CHECK(x)')
