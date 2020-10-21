@@ -182,7 +182,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
                      USER CHECKED void *dst,
                      size_t num_bytes, iomode_t mode) {
 	size_t result;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	if unlikely(num_bytes < sizeof(struct signalfd_siginfo)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_EVENTFD_BUFSIZE,
@@ -201,7 +201,7 @@ handle_signalfd_read(struct signalfd *__restrict self,
 					break;
 				THROW(E_WOULDBLOCK_WAITFORSIGNAL);
 			}
-			assert(!task_isconnected());
+			assert(!task_wasconnected());
 			TRY {
 				connect_to_my_signal_queues();
 				read_ok = signalfd_try_read(self, &si);

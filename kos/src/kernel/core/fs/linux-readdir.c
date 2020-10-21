@@ -162,7 +162,7 @@ PRIVATE void KCALL
 readdir_lock_acquire(void *h_data) {
 	unsigned int index, word;
 	uintptr_t mask;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	index = readdir_lock_index(h_data);
 	word  = readdir_lockbits_word(index);
 	mask  = readdir_lockbits_mask(index);

@@ -486,7 +486,7 @@ NOTHROW(KCALL mouse_buffer_trygetpacket)(struct mouse_buffer *__restrict self) {
 PUBLIC mouse_packet_t KCALL
 mouse_buffer_getpacket(struct mouse_buffer *__restrict self) THROWS(E_WOULDBLOCK) {
 	mouse_packet_t result;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	for (;;) {
 		result = mouse_buffer_trygetpacket(self);
 		if (result.mp_type != MOUSE_PACKET_TYPE_NONE)

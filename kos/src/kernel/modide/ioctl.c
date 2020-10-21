@@ -103,7 +103,7 @@ do_compat_hdio_getgeo:
 		bus = self->ad_bus;
 		AtaBus_LockPIO(bus);
 		TRY {
-			assert(!task_isconnected());
+			assert(!task_wasconnected());
 			task_connect(&bus->ab_piointr);
 			outb(bus->ab_busio + ATA_DRIVE_SELECT,
 			     0xa0 + (self->ad_drive - ATA_DRIVE_MASTER));

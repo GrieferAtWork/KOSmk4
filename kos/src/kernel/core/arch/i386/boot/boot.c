@@ -407,6 +407,59 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: Add `__USE_ISOC2X' to <features.h> */
+	/* TODO: Add FLT_NORM_MAX, DBL_NORM_MAX and LDBL_NORM_MAX to <float.h> under #ifdef __USE_ISOC2X
+	 *       Also add DEC32_TRUE_MIN, DEC64_TRUE_MIN and DEC128_TRUE_MIN, alongside everything from
+	 *       `__STDC_WANT_DEC_FP__' under `__USE_ISOC2X' (for this purpose, <hybrid/floatcore.h>
+	 *       will also have to be adjusted) */
+
+	/* TODO: In order to properly support EPOLLET, the `handle_poll()' operation must
+	 *       be split into 2 parts: `handle_poll_test()' and `handle_poll_connect()',
+	 *       where the former will check if a pollable condition is currently met, by
+	 *       returning the set of currently met conditions, while the later will make
+	 *       calls to `task_connect()' to establish connections to all of the signals
+	 *       which must be monitored for a given set of pollable conditions. */
+
+	/* TODO: Update poll(2) and select(2) to only use `handle_poll_test()' during the
+	 *       initial scan for ready files. Afterwards, scan all monitored files again,
+	 *       but this time do `connect+test' on each one of them. The second test
+	 *       must be done immediately following the connect not due to race conditions,
+	 *       but due to malicious user-space programs that might otherwise change the
+	 *       underlying files in the mean time. This can still happen between the first
+	 *       test and the intermediate connect, but won't introduce any races. In fact:
+	 *       the initial test itself is completely optional and only done to quickly
+	 *       chatch files that have become ready without having to do any connect()s
+	 *       before noticing them. (only the second test is integral for synchronization,
+	 *       as it is the one that happens interlocked with the associated connect()) */
+
+	/* TODO: Now that we've got signal completion callbacks, it's also possible to
+	 *       implement `SIGIO' and `O_ASYNC'. Note that linux documentation states
+	 *       that O_ASYNC should work for ttys, ptys, sockets, pipes and fifos, all
+	 *       of which KOS is already implementing, but currently does so w/o support
+	 *       for SIGIO.
+	 *       Note that in all of these cases, we an make the jump from the NOBLOCK
+	 *       world that `sig_postcompletion_t' would still be stuck in by posting an
+	 *       event to an async worker that is registered using `register_async_worker()'
+	 *       on a per-object basis. (and gets enabled/disabled as O_ASYNC is set/cleared)
+	 *       Essentially, SIGIO should be send whenever there's a rising-edge event for
+	 *       either readable or writable in the associated object. */
+
+	/* TODO: Using signal completion functions, we can also simplify the implementation
+	 *       of polling an async worker/job to where we don't have to re-poll all defined
+	 *       workers every time that one of them becomes triggered. - Instead, we could
+	 *       use one `struct sig_multicompletion' for every worker/job, which then carry
+	 *       a per-worker is-ready flag, alongside sig_send()ing a single, common signal
+	 *       whenever one of them becomes ready. Further still, we can also implement a
+	 *       singly linked list of ready workers/jobs, such that the async worker main
+	 *       thread essentially only has to `ATOMIC_XCH(ready_jobs, NULL)', followed by
+	 *       iterating that chain and servicing each job individually before re-creating
+	 *       the `struct sig_multicompletion' of all jobs that should remain registered.
+	 *       This system could then be extended to allow use of more than a single async
+	 *       worker thread by having the async-thread-main function re-insert all but the
+	 *       first (or better yet: last, thus following first-in-last-out) ready async job,
+	 *       and if there were any, doing a `sig_send()' on the internal ready-jobs signal,
+	 *       thus waking up a variable number of secondary async workers threads. */
+
 	/* TODO: Add drivers for loading binaries:
 	 *   - binfmt_misc   Allows user-space to register custom interpreters
 	 *                   for arbitrary magic byte sequences.
@@ -464,6 +517,15 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Make the x86 LDT object ATTR_PERVM, and reload LDT registers during a VM switch.
 	 *       On linux, they're PERVM, too, so we really should do the same. */
+
+	/* TODO: Killing `playground forkbomb' results in kernel panic on handle_pagefault.c:1145
+	 *       that is caused by the `info->ei_code != E_OK' assertion in `libc_error_unwind'.
+	 * Something is causing the exception to be deleted when that shouldn't happen.
+	 * 
+	 * Ugh... I really feel like the whole c++ exception integration needs to be re-worked
+	 * in order to function better. (Also: when re-working implement the delayed exception
+	 * mechanism by which ignoring rtl-priority exceptions will cause those exceptions to
+	 * be re-thrown the next time task_serve() is called) */
 
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:

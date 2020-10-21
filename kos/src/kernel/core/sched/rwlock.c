@@ -544,7 +544,7 @@ PUBLIC NONNULL((1)) bool
 	struct read_lock *desc;
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_read", abs_timeout);
-	assertf(!task_isconnected(),
+	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
 	if (self->rw_mode == RWLOCK_MODE_FWRITING) {
 		if (self->rw_xowner == THIS_TASK) {
@@ -616,7 +616,7 @@ NOTHROW(FCALL __os_rwlock_read_nx)(struct rwlock *__restrict self,
 	struct read_lock *desc;
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_read", abs_timeout);
-	assertf(!task_isconnected(),
+	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
 	if (self->rw_mode == RWLOCK_MODE_FWRITING) {
 		if (self->rw_xowner == THIS_TASK) {
@@ -742,7 +742,7 @@ PUBLIC NONNULL((1)) bool
 	return __os_rwlock_write_aggressive(self, abs_timeout);
 #else
 	u32 control_word;
-	assertf(!task_isconnected(),
+	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
 	RWLOCK_TRACE_F2("rwlock_write", abs_timeout);
 again:
@@ -871,7 +871,7 @@ PUBLIC WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL __os_rwlock_write_nx)(struct rwlock *__restrict self,
                                     struct timespec const *abs_timeout) {
 	u32 control_word;
-	assertf(!task_isconnected(),
+	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
 	RWLOCK_TRACE_F2("rwlock_write", abs_timeout);
 again:
@@ -1064,7 +1064,7 @@ PUBLIC NONNULL((1)) bool
 (FCALL __os_rwlock_write_aggressive)(struct rwlock *__restrict self,
                                      struct timespec const *abs_timeout) {
 	u32 control_word;
-	assertf(!task_isconnected(),
+	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
 	RWLOCK_TRACE_F("rwlock_write_aggressive");
 again:
@@ -1257,7 +1257,7 @@ PUBLIC NONNULL((1)) bool
 	 * read-lock to an exclusive write-lock. */
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_upgrade", abs_timeout);
-	assertf(!task_isconnected(),
+	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
 again:
 	control_word = ATOMIC_READ(self->rw_state);
@@ -1369,7 +1369,7 @@ NOTHROW(FCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self,
 	 * read-lock to an exclusive write-lock. */
 	u32 control_word;
 	RWLOCK_TRACE_F2("rwlock_upgrade", abs_timeout);
-	assertf(!task_isconnected(),
+	assertf(!task_wasconnected(),
 	        "You mustn't be connected when calling this function");
 again:
 	control_word = ATOMIC_READ(self->rw_state);

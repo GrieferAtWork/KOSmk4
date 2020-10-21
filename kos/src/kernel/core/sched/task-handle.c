@@ -120,7 +120,7 @@ again_waitfor:
 				ATOMIC_WRITE(data->tj_status, 0);
 				return -ETIMEDOUT; /* Timeout */
 			}
-			assert(!task_isconnected());
+			assert(!task_wasconnected());
 			if (WIFEXITED(self->tp_status)) {
 				ATOMIC_WRITE(data->tj_status, (u32)self->tp_status.w_status);
 				break;

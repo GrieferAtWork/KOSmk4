@@ -141,7 +141,7 @@ do_return_with_disconnect:
 #undef NEED_done
 done:
 #endif /* NEED_done */
-	assert(!task_isconnected()); /* Sanity check */
+	assert(!task_wasconnected()); /* Sanity check */
 	return result;
 }
 

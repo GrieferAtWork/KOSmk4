@@ -427,7 +427,7 @@ PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED NONNULL((1)) REF struct fifo_user *FC
 fifo_user_create(struct fifo_node *__restrict self, iomode_t iomode)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INVALID_ARGUMENT_BAD_STATE) {
 	REF struct fifo_user *result;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	assert((iomode & ~(IO_ACCMODE | IO_NONBLOCK)) == 0);
 	result = (REF struct fifo_user *)kmalloc(sizeof(struct fifo_user),
 	                                         GFP_NORMAL);

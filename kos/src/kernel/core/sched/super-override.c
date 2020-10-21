@@ -132,7 +132,7 @@ PRIVATE ATTR_COLDTEXT NOBLOCK NOCONNECT bool FCALL
 sched_super_override_start_impl(bool force) THROWS(E_WOULDBLOCK, ...) {
 	struct cpu *me;
 	bool was_already_override;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	assert(!super_override_active);
 
 	/* Start by acquiring the regular scheduler override. */

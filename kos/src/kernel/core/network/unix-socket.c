@@ -1424,7 +1424,7 @@ UnixSocket_Recvv(struct socket *__restrict self,
 	UnixSocket *me;
 	struct pb_buffer *pbuf;
 	struct pb_packet *packet;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	me = (UnixSocket *)self;
 	{
 		struct socket_node *node;

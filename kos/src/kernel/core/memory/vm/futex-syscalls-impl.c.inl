@@ -108,7 +108,7 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 {
 	syscall_slong_t result;
 	REF struct vm_futex *f;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	switch (futex_op & LFUTEX_CMDMASK) {
 
 	case LFUTEX_WAKE: {

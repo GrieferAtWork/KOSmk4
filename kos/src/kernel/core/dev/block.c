@@ -988,7 +988,7 @@ _block_device_sync(struct block_device *__restrict self)
 	if (block_device_ispartition(self))
 		self = ((struct block_device_partition *)self)->bp_master;
 	assert(!block_device_ispartition(self));
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	assert(self->bd_cache_ssiz != 0);
 	SCOPED_WRITELOCK(&self->bd_cache_lock);
 	aio_multihandle_generic_init(&hand);
@@ -1070,7 +1070,7 @@ allocate_cache_sector(struct block_device *__restrict self, lba_t addr) {
 	byte_t *cache_addr;
 	struct aio_handle_generic handle;
 again:
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	assert(self->bd_cache_ssiz >= self->bd_sector_size);
 	assert(self->bd_sector_size != 0);
 	/* Load a new sector from cache. */
@@ -1445,7 +1445,7 @@ _block_device_read(struct block_device *__restrict self,
 		memset((byte_t *)dst + new_num_bytes, 0, num_bytes - new_num_bytes);
 		num_bytes = new_num_bytes;
 	}
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	/* Deal with partition offsets. */
 	if likely(block_device_ispartition(self)) {
 		device_position += ((struct block_device_partition *)self)->bp_minaddr;
@@ -1505,7 +1505,7 @@ _block_device_write(struct block_device *__restrict self,
 	if unlikely(OVERFLOW_UADD(device_position, num_bytes, &end_addr) ||
 	            end_addr >= self->bd_total_bytes)
 		THROW(E_IOERROR_BADBOUNDS, (uintptr_t)E_IOERROR_SUBSYSTEM_HARDDISK);
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	/* Deal with partition offsets. */
 	if likely(block_device_ispartition(self)) {
 		device_position += ((struct block_device_partition *)self)->bp_minaddr;

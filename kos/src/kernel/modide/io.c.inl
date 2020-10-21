@@ -368,7 +368,7 @@ again_service_io:
 	TRY {
 		for (;;) {
 			_ATA_MAX_SECTORS_PER_TRANSFER_T part_sectors;
-			assert(!task_isconnected());
+			assert(!task_wasconnected());
 			part_sectors = _ATA_MAX_SECTORS_PER_TRANSFER;
 			if ((size_t)part_sectors > num_sectors)
 				part_sectors = (_ATA_MAX_SECTORS_PER_TRANSFER_T)num_sectors;
@@ -434,7 +434,7 @@ again_service_io:
 			/* Transfer sectors! */
 			error = PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(bus, self, buf,
 			                                                                    part_sectors);
-			assert(!task_isconnected());
+			assert(!task_wasconnected());
 			if unlikely(error != ATA_ERROR_OK)
 				goto err_io_error;
 
@@ -470,7 +470,7 @@ again_service_io:
 	return;
 err_io_error:
 	/* Always reset the bus (even if merely done for the next access) */
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	printk(KERN_ERR "Reseting IDE on PIO-I/O error code "
 	                "%#" PRIx16 ":%#" PRIx16 ":%#" PRIx16 " ("
 	                "bus:%#" PRIxN(__SIZEOF_PORT_T__) ","

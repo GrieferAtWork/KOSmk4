@@ -543,7 +543,7 @@ LOCAL NONNULL((1)) bool KCALL
 aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self,
                            struct timespec const *timeout DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_isconnected());
+	__hybrid_assert(!task_wasconnected());
 	while (!aio_handle_generic_hascompleted(self)) {
 		TRY {
 			aio_handle_generic_connect(self);
@@ -782,7 +782,7 @@ LOCAL NONNULL((1)) bool KCALL
 aio_multihandle_generic_waitfor(struct aio_multihandle_generic *__restrict self,
                                 struct timespec const *timeout DFL(__NULLPTR))
 		THROWS(E_WOULDBLOCK, ...) {
-	__hybrid_assert(!task_isconnected());
+	__hybrid_assert(!task_wasconnected());
 	while (!aio_multihandle_generic_hascompleted(self)) {
 		TRY {
 			aio_multihandle_generic_connect(self);

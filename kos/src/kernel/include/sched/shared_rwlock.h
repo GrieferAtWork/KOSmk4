@@ -203,7 +203,7 @@ LOCAL NONNULL((1)) void
 (FCALL shared_rwlock_read)(struct shared_rwlock *__restrict self,
                            struct timespec const *abs_timeout)
 		THROWS(E_WOULDBLOCK) {
-	__hybrid_assert(!task_isconnected());
+	__hybrid_assert(!task_wasconnected());
 	while (!shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (shared_rwlock_tryread(self))
@@ -224,7 +224,7 @@ LOCAL NONNULL((1)) void
 (FCALL shared_rwlock_write)(struct shared_rwlock *__restrict self,
                             struct timespec const *abs_timeout)
 		THROWS(E_WOULDBLOCK) {
-	__hybrid_assert(!task_isconnected());
+	__hybrid_assert(!task_wasconnected());
 	while (!shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (shared_rwlock_trywrite(self))
@@ -244,7 +244,7 @@ success:
 LOCAL NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self,
                                      struct timespec const *abs_timeout) {
-	__hybrid_assert(!task_isconnected());
+	__hybrid_assert(!task_wasconnected());
 	while (!shared_rwlock_tryread(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (shared_rwlock_tryread(self))
@@ -266,7 +266,7 @@ success:
 LOCAL NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self,
                                       struct timespec const *abs_timeout) {
-	__hybrid_assert(!task_isconnected());
+	__hybrid_assert(!task_wasconnected());
 	while (!shared_rwlock_trywrite(self)) {
 		TASK_POLL_BEFORE_CONNECT({
 			if (shared_rwlock_trywrite(self))

@@ -1092,18 +1092,18 @@ PRIVATE void KCALL do_flash_screen_pause(void) THROWS(E_WOULDBLOCK, ...) {
 
 
 PRIVATE void KCALL flash_current_line_pause(void) THROWS(E_WOULDBLOCK, ...) {
-	if unlikely(task_isconnected()) {
+	if unlikely(task_wasconnected()) {
 		struct task_connections con;
 		task_pushconnections(&con);
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 		TRY {
 			do_flash_screen_pause();
 		} EXCEPT {
-			assert(!task_isconnected());
+			assert(!task_wasconnected());
 			task_popconnections();
 			RETHROW();
 		}
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 		task_popconnections();
 	} else {
 		do_flash_screen_pause();

@@ -172,7 +172,7 @@ PUBLIC u16 KCALL
 keyboard_buffer_getkey(struct keyboard_buffer *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	u16 result;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	while ((result = keyboard_buffer_trygetkey(self)) == KEY_NONE) {
 		task_connect(&self->kb_avail);
 		result = keyboard_buffer_trygetkey(self);
@@ -406,7 +406,7 @@ PUBLIC struct keyboard_key_packet KCALL
 keyboard_device_getkey(struct keyboard_device *__restrict self)
 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
 	struct keyboard_key_packet result;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	for (;;) {
 		result = keyboard_device_trygetkey(self);
 		if (result.kp_key != KEY_NONE)

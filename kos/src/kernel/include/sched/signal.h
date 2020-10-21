@@ -607,19 +607,32 @@ NOTHROW(FCALL task_disconnectall)(void);
 FUNDEF NOBLOCK WUNUSED struct sig *
 NOTHROW(FCALL task_receiveall)(void);
 
-/* Check if the calling thread is connected to any signal. */
+/* Check if the calling thread was connected to any signal.
+ * For this purpose, it doesn't matter if a connected signal
+ * has already been sent or not (iow: both alive and dead
+ * connections will cause this function to return `true')
+ * As far as this function is concerned, a connection is only fully
+ * released once the calling thread has done one of the following:
+ *  - Called `task_disconnect()' on every connected signal
+ *  - Called `task_disconnectall()'
+ *  - Called `task_receiveall()'
+ *  - Called `task_trywait()' (and a non-NULL value was returned)
+ *  - Called `task_waitfor()'
+ *  - Called `task_waitfor_nx()'
+ *  - Called `task_waitfor_norpc()'
+ *  - Called `task_waitfor_norpc_nx()' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
-NOTHROW(FCALL task_isconnected)(void);
+NOTHROW(FCALL task_wasconnected)(void);
 
-/* Check if the calling thread is connected to the given signal. */
+/* Check if the calling thread was connected to the given signal. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
-NOTHROW(FCALL task_isconnected_to)(struct sig const *__restrict target);
+NOTHROW(FCALL task_wasconnected_to)(struct sig const *__restrict target);
 
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF NOBLOCK ATTR_PURE WUNUSED __BOOL
-NOTHROW(FCALL task_isconnected)(struct sig const *__restrict target)
-		ASMNAME("task_isconnected_to");
+NOTHROW(FCALL task_wasconnected)(struct sig const *__restrict target)
+		ASMNAME("task_wasconnected_to");
 } /* extern "C++" */
 #endif /* __cplusplus */
 
@@ -704,7 +717,7 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self);
  * >>         if (try_lock())
  * >>             return true;
  * >>     });
- * >>     assert(!task_isconnected());
+ * >>     assert(!task_wasconnected());
  * >>     task_connect(&lock_signal);
  * >>     TRY {
  * >>         if unlikely(try_lock()) {

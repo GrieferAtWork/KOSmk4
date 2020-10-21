@@ -180,7 +180,7 @@ uvio_request(/*in|out*/ struct vio_args *__restrict args, vio_addr_t addr, u16 c
 	struct uvio *self;
 	unsigned int reqid;
 	struct kernel_uvio_request *slot;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	self = (struct uvio *)args->va_block;
 	assert(self->db_type == &uvio_datablock_type);
 	assert(self->db_vio == &uvio_operators);
@@ -582,7 +582,7 @@ uvio_server_read(struct vm_datablock *__restrict self,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	struct uvio *me;
 	USER CHECKED struct uvio_request *req;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	me = (struct uvio *)self;
 	/* Have the caller check for (IO_NONBLOCK), or wait (!IO_NONBLOCK) until
 	 * a UVIO request has become available, at which point the request should

@@ -188,7 +188,7 @@ socket_connect(struct socket *__restrict self,
 	/* First step: Check if there is a background connection attempt in progress. */
 	REF struct socket_connect_aio *nc;
 again:
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	nc = self->sk_ncon.get();
 	if unlikely(nc) {
 		/* A previous connect() is still in progress... */

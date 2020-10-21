@@ -310,7 +310,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			return;
 		}
 #endif /* LIBVIO_CONFIG_ENABLED */
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 
 #ifdef DEFINE_IO_VECTOR
 		buf_offset = 0;
@@ -319,7 +319,7 @@ load_next_part:
 
 		/* Locate the part concerning the requested IO, while trying to automatically
 		 * include all of the data-pages that the IO could potentially ever perform. */
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 		part = vm_datablock_locatepart(self,
 		                               FLOOR_ALIGN(file_position, PAGESIZE),
 		                               CEIL_ALIGN(num_bytes + (file_position % PAGESIZE), PAGESIZE));
@@ -369,7 +369,7 @@ load_next_part:
 #endif
 		file_position += max_io_bytes;
 		num_bytes -= max_io_bytes;
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 		goto load_next_part;
 	} EXCEPT {
 		aio_multihandle_fail(aio);
@@ -377,7 +377,7 @@ load_next_part:
 #else /* DEFINE_IO_ASYNC */
 	struct aio_multihandle_generic hand;
 	aio_multihandle_generic_init(&hand);
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	TRY {
 		TRY {
 			FUNC1(inode_a)(self,

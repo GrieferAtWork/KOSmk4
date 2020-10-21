@@ -98,7 +98,7 @@ INTERN byte_t NOTHROW(FCALL GDBRemote_GetByte)(void) {
 	int result;
 	for (;;) {
 		assert(PREEMPTION_ENABLED());
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 		result = GDBRemote_TryGetByte();
 		if (result >= 0)
 			break;
@@ -124,7 +124,7 @@ INTERN int NOTHROW(FCALL GDBRemote_TimedGetByte)(void) {
 	for (;;) {
 		struct timespec timeout;
 		assert(PREEMPTION_ENABLED());
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 		result = GDBRemote_TryGetByte();
 		if (result >= 0)
 			break;

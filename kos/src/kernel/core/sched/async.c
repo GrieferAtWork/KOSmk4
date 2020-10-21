@@ -289,7 +289,7 @@ NOTHROW(FCALL _asyncmain)(void) {
 		REF struct awork_vector *workers;
 again:
 		assert(PREEMPTION_ENABLED());
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 		PREEMPTION_DISABLE();
 		workers = awork.get_nopr();
 		PREEMPTION_ENABLE();
@@ -324,12 +324,12 @@ again:
 			}
 			IF_SMP(ATOMIC_DEC(w->aw_inuse));
 			PREEMPTION_ENABLE();
-			assert(!task_isconnected());
+			assert(!task_wasconnected());
 			if (aworker_calltest(w, obj)) {
-				assert(!task_isconnected());
+				assert(!task_wasconnected());
 				/* Service this worker. */
 				aworker_callwork(w, obj);
-				assert(!task_isconnected());
+				assert(!task_wasconnected());
 				/* TODO: Do automatic re-ordering of async workers based on how often
 				 *       they are being triggered. (workers that have work more often
 				 *       should come before those that have less often) */

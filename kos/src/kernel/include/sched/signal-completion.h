@@ -260,7 +260,7 @@ NOTHROW(FCALL sig_multicompletion_disconnect)(struct sig_multicompletion *__rest
 /* Allocate and return a new signal completion descriptor that is attached to the
  * signal multi-completion controller `self', and will invoke `cb' when triggered.
  * The returned pointer is owned by `self', meaning that the caller doesn't have
- * to bother ith ownership themself. Also note that this these functions will keep
+ * to bother with ownership themself. Also note that this these functions will keep
  * on returning the same completion until that completion has been connected, and
  * will re-use older completions if those got tripped, but didn't re-prime themself.
  *
@@ -314,7 +314,7 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
  * >> sig_multicompletion_connect_from_task(&smc, &my_callback);
  * >> if (task_trywait()) {  // Or `task_receiveall()' if the caller only wants connections to remain in `smc'
  * >>     sig_multicompletion_disconnect(&smc);
- * >>     // Error:   One of the caller's signals may already have
+ * >>     // Error:   One of the caller's signals may have already
  * >>     //          been delivered before `smc' could connect to
  * >>     //          all of them.
  * >> } else {

@@ -229,7 +229,7 @@ PP_CAT4(AtaBus_, _ATA_RW_Name, DataSectors, _ATA_DATA_Name)(AtaBus *__restrict b
 		AtaBus_HW_ResetBusAuto(bus);
 		RETHROW();
 	}
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	return ATA_ERROR_OK;
 }
 

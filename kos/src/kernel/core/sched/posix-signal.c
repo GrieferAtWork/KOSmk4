@@ -3491,7 +3491,7 @@ signal_waitfor(CHECKED USER sigset_t const *uthese,
                struct timespec const *abs_timeout) {
 	sigset_t these;
 	syscall_ulong_t result;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	memcpy(&these, uthese, sizeof(sigset_t));
 	COMPILER_BARRIER();
 	/* Make sure that we don't steal these signals */

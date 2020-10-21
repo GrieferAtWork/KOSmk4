@@ -1691,7 +1691,7 @@ do_poll(USER CHECKED struct pollfd *fds,
         size_t nfds, struct timespec const *timeout) {
 	size_t i, result = 0;
 again:
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	for (i = 0; i < nfds; ++i) {
 		struct handle hnd;
 		struct pollfd pfd;
@@ -1764,7 +1764,7 @@ do_select(size_t nfds,
 	enum { BITS_PER_FDS_WORD = 8 };
 	size_t nfds_words, i, result = 0;
 again:
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	nfds_words = CEILDIV(nfds, BITS_PER_FDS_WORD);
 	for (i = 0; i < nfds_words; ++i) {
 		fds_word_t rbits, wbits, ebits, mask;
@@ -2587,7 +2587,7 @@ DEFINE_COMPAT_SYSCALL6(ssize_t, pselect6_time64, size_t, nfds,
 #ifdef __ARCH_WANT_SYSCALL_PAUSE
 DEFINE_SYSCALL0(errno_t, pause) {
 	for (;;) {
-		assert(!task_isconnected());
+		assert(!task_wasconnected());
 		/* Wait forever (equivalent to `select(0, NULL, NULL, NULL, NULL)')
 		 * NOTE: `task_waitfor()' calls `task_serve()', which may in turn throw
 		 *       `E_INTERRUPT' when a signal gets delivered to our thread. */

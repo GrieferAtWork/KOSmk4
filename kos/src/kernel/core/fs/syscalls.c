@@ -1979,7 +1979,7 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 	struct fs *filesystem = THIS_FS;
 	fsmode_t fsmode;
 	REF struct handle result_handle;
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	validate_readable(filename, 1);
 	if (oflags & O_CREAT) {
 		if (has_personality(KP_OPEN_CREAT_CHECK_MODE)) {
@@ -2086,7 +2086,7 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 		RETHROW();
 	}
 	decref(result_handle);
-	assert(!task_isconnected());
+	assert(!task_wasconnected());
 	return (fd_t)result;
 }
 #endif /* __ARCH_WANT_SYSCALL_OPENAT */
@@ -3301,7 +3301,7 @@ kernel_execveat(fd_t dirfd,
 			incref(args.ea_xpath);
 			incref(args.ea_xnode);
 			TRY {
-				assert(!task_isconnected());
+				assert(!task_wasconnected());
 				task_connect(&data->er_error);
 				if (!task_schedule_synchronous_rpc(proc,
 				                                   &kernel_exec_rpc_func,
