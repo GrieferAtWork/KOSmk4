@@ -58,6 +58,7 @@ void sched_signal_cinit(sched_signal_t *__self);
 
 /* Broadcast a signal, waking all threads waiting on it. */
 __SIZE_TYPE__ sched_signal_broadcast(sched_signal_t *__self);
+__SIZE_TYPE__ sched_signal_broadcast_for_fini(sched_signal_t *__self);
 
 /* Wake a single thread waiting on the given signal. */
 __BOOL sched_signal_send(sched_signal_t *__self);

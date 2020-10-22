@@ -96,15 +96,15 @@ struct ringbuffer {
 
 #ifdef __KERNEL__
 #define ringbuffer_fini(self)                                                        \
-	(sched_signal_broadcast(&(self)->rb_nempty),                                     \
-	 sched_signal_broadcast(&(self)->rb_nfull),                                      \
+	(sched_signal_broadcast_for_fini(&(self)->rb_nempty),                            \
+	 sched_signal_broadcast_for_fini(&(self)->rb_nfull),                             \
 	 (self)->rb_size                                                                 \
 	 ? heap_free(&kernel_default_heap, (self)->rb_data, (self)->rb_size, GFP_NORMAL) \
 	 : (void)0)
 #else /* __KERNEL__ */
-#define ringbuffer_fini(self)                    \
-	(sched_signal_broadcast(&(self)->rb_nempty), \
-	 sched_signal_broadcast(&(self)->rb_nfull),  \
+#define ringbuffer_fini(self)                             \
+	(sched_signal_broadcast_for_fini(&(self)->rb_nempty), \
+	 sched_signal_broadcast_for_fini(&(self)->rb_nfull),  \
 	 __libc_free((self)->rb_data))
 #endif /* !__KERNEL__ */
 

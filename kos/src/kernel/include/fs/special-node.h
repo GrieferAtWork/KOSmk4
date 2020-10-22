@@ -72,7 +72,7 @@ struct socket_node /* S_ISSOCK */
 };
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
-__DEFINE_SYNC_PROXY(struct symlink_node,sl_node)
+__DEFINE_SYNC_PROXY(struct symlink_node, sl_node)
 #endif /* !__cplusplus || CONFIG_WANT_FS_AS_STRUCT */
 
 

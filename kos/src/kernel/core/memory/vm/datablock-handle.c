@@ -50,7 +50,7 @@
 DECL_BEGIN
 
 /* DATABLOCK HANDLE OPERATIONS */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(datablock, struct vm_datablock)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(datablock, struct vm_datablock);
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_datablock_read(struct vm_datablock *__restrict self,

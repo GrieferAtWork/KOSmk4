@@ -48,7 +48,7 @@
 DECL_BEGIN
 
 /* Task HOP functions */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(task, struct taskpid)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(task, struct taskpid);
 INTERN void KCALL
 handle_task_stat(struct taskpid *__restrict self,
                  USER CHECKED struct stat *result) {

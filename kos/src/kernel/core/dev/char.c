@@ -534,7 +534,7 @@ character_device_register_auto(struct character_device *__restrict self)
 
 
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(characterdevice, struct character_device)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(characterdevice, struct character_device);
 
 INTERN size_t KCALL
 handle_characterdevice_read(struct character_device *__restrict self,

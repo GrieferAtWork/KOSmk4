@@ -90,7 +90,7 @@
 
 DECL_BEGIN
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(directoryentry, struct directory_entry)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(directoryentry, struct directory_entry);
 
 INTERN size_t KCALL
 handle_directoryentry_pread(struct directory_entry *__restrict self,

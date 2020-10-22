@@ -41,7 +41,7 @@
 DECL_BEGIN
 
 /* futex handle operation. */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(futex, struct vm_futex)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(futex, struct vm_futex);
 
 INTDEF NONNULL((1)) syscall_slong_t KCALL
 handle_futex_hop(struct vm_futex *__restrict self, syscall_ulong_t cmd,

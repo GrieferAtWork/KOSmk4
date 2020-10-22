@@ -467,6 +467,9 @@
                                                                                  * [fld(action: syscall_ulong_t, "The illegal action that was attempted (One of `E_ILLEGAL_PROCESS_OPERATION_*')")]
                                                                                  * [fld(pid2:   pid_t,           "A second pid, or 0 if unused")] */
 #endif /* !E_ILLEGAL_PROCESS_OPERATION */
+#ifndef E_ILLEGAL_REFERENCE_LOOP
+#define E_ILLEGAL_REFERENCE_LOOP                  (E_ILLEGAL_OPERATION, 0x0002) /* [errno(ELOOP), msg("Reference loop detected")] */
+#endif /* !E_ILLEGAL_REFERENCE_LOOP */
 /*[[[end]]]*/
 #ifndef E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER
 #define E_ILLEGAL_PROCESS_OPERATION_SETPGID_LEADER 0x0001 /* Attempted to move the leader of a process group into a different

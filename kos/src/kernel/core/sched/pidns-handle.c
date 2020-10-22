@@ -37,7 +37,7 @@
 DECL_BEGIN
 
 /* Pidns HOP functions */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(pidns, struct pidns)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(pidns, struct pidns);
 INTERN syscall_slong_t KCALL
 handle_pidns_hop(struct pidns *__restrict self,
                  syscall_ulong_t cmd,

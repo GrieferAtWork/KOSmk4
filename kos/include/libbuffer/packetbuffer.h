@@ -424,9 +424,8 @@ struct pb_buffer {
 #define pb_buffer_psta_broadcast(self)                       \
 	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_broadcast(&(self)->pb_psta))
-#define pb_buffer_psta_broadcast_for_fini(self)              \
-	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
-	 sched_signal_broadcast_for_fini(&(self)->pb_psta))
+#define pb_buffer_psta_broadcast_for_fini(self) \
+	sched_signal_broadcast_for_fini(&(self)->pb_psta)
 #define pb_buffer_psta_send(self)                            \
 	(__hybrid_atomic_inc((self)->pb_psta, __ATOMIC_SEQ_CST), \
 	 sched_signal_send(&(self)->pb_psta))
@@ -507,6 +506,7 @@ __NOBLOCK __ATTR_NONNULL((1)) void __NOTHROW(pb_buffer_cinit_ex)(struct pb_buffe
 		pb_buffer_blob_free_p((self)->pb_bbas,                         \
 		                      (__size_t)((self)->pb_bend -             \
 		                                 (self)->pb_bbas));            \
+		pb_buffer_psta_broadcast_for_fini(self);                       \
 		__pb_buffer_fini_debug(self);                                  \
 	}	__WHILE0
 

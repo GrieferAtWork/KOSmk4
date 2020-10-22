@@ -78,7 +78,7 @@ NOTHROW(KCALL translate_read_exceptions)(struct file *__restrict self) {
 	}
 }
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(file, struct file)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(file, struct file);
 INTERN size_t KCALL
 handle_file_read(struct file *__restrict self,
                  USER CHECKED void *dst,
@@ -994,7 +994,7 @@ read_entry_pos_0:
 	return result;
 }
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(oneshot_directory_file, struct oneshot_directory_file)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(oneshot_directory_file, struct oneshot_directory_file);
 /* TODO: Other handle operators */
 
 DEFINE_INTERN_ALIAS(handle_oneshot_directory_file_read, handle_file_read);

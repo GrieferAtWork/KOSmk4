@@ -1491,7 +1491,7 @@ DEFINE_INTERN_ALIAS(handle_socket_ioctl, socket_ioctl);
 
 
 /* Handle operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(socket, struct socket)
+DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(socket, struct socket);
 
 /* read() and write() operators for socket handles. */
 INTERN WUNUSED NONNULL((1)) size_t KCALL

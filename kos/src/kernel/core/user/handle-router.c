@@ -53,6 +53,22 @@ import * from deemon;
 @@List of (name, type)
 local handle_types: {(string, string)...} = [];
 
+function injectObjectType(type_expr: string, typename: string): string {
+	if (!typename) typename = "void";
+	switch (type_expr) {
+	case "T *":                    return typename + " *";
+	case "T *__restrict":          return typename + " *__restrict";
+	case "T const *":              return typename + " const *";
+	case "T const *__restrict":    return typename + " const *__restrict";
+	case "REF T *":                return "REF " + typename + " *";
+	case "REF T *__restrict":      return "REF " + typename + " *__restrict";
+	case "WEAK REF T *":           return "WEAK REF " + typename + " *";
+	case "WEAK REF T *__restrict": return "WEAK REF " + typename + " *__restrict";
+	default: break;
+	}
+	return type_expr;
+}
+
 for (local l: File.open("../../../../include/kos/kernel/handle.h")) {
 	local name, id, tail;
 	try name, id, tail = l.scanf(" # define HANDLE_TYPE_%[^ ] %[^ /] %[^]")...;
@@ -70,7 +86,7 @@ for (local l: File.open("../../../../include/kos/kernel/handle.h")) {
 local ops = HANDLE_OPERATOR_PROTOTYPES;
 
 function needsPerTypeImpl(default_impl) {
-	return "{HANDLE_TYPE}" in default_impl;
+	return "{" in default_impl;
 }
 
 print "/" "* Fallback handle operators *" "/";
@@ -84,6 +100,7 @@ for (local ARGS: ops) {
 	print " ATTR_SECTION(\".text.kernel.handle_undefined.",;
 	print name,;
 	print "\") ",;
+	return_type = injectObjectType(return_type, "void");
 	print return_type,;
 	if (!return_type.endswith("*"))
 		print " ",;
@@ -99,10 +116,11 @@ for (local ARGS: ops) {
 	for (local t, n: argv) {
 		if (!is_first)
 			print ", ",;
+		t = injectObjectType(t, "void");
 		print t,;
 		if (!t.endswith("*"))
 			print " ",;
-		if (!needPerType && (n !in ["cmd"] || name !in ["ioctl", "hop"])) {
+		if (!needPerType && name !in ["weakgetref"] && (n !in ["cmd"] || name !in ["ioctl", "hop"])) {
 			print "UNUSED(",;
 			print n,;
 			print ")",;
@@ -119,7 +137,8 @@ for (local ARGS: ops) {
 	print "{ ",;
 	if (needPerType) {
 		print default_impl.format({
-			"HANDLE_TYPE" : "HANDLE_TYPE_UNDEFINED"
+			"HANDLE_TYPE" : "HANDLE_TYPE_UNDEFINED",
+			"h_name" : "undefined"
 		}),;
 	} else {
 		print default_impl,;
@@ -167,6 +186,7 @@ for (local ARGS: ops) {
 		print "] ",;
 		print " " * (longest_handle_name_length - #h_name),;
 		print "= *" "/ (",;
+		return_type = injectObjectType(return_type, "void");
 		print return_type,;
 		if (!return_type.endswith("*"))
 			print " ",;
@@ -177,6 +197,7 @@ for (local ARGS: ops) {
 		for (local t, n: argv) {
 			if (!is_first)
 				print ", ",;
+			t = injectObjectType(t, "void");
 			print t,;
 			is_first = false;
 		}
@@ -217,6 +238,7 @@ for (local h_name, h_typ: handle_types) {
 			print ".",;
 			print name,;
 			print "\") ",;
+			return_type = injectObjectType(return_type, h_typ);
 			print return_type,;
 			if (!return_type.endswith("*"))
 				print " ",;
@@ -233,8 +255,7 @@ for (local h_name, h_typ: handle_types) {
 			print "(",;
 			local is_first = true;
 			for (local t, n: argv) {
-				if (n == "self")
-					t = h_typ + t.lsstrip("void");
+				t = injectObjectType(t, h_typ);
 				if (!is_first)
 					print ", ",;
 				print t,;
@@ -251,7 +272,8 @@ for (local h_name, h_typ: handle_types) {
 			print "{";
 			print "\t",;
 			print default_impl.format({
-				"HANDLE_TYPE" : "HANDLE_TYPE_" + h_name.upper()
+				"HANDLE_TYPE" : "HANDLE_TYPE_" + h_name.upper(),
+				"h_name" : h_name
 			});
 			print "}";
 			continue;
@@ -270,10 +292,13 @@ for (local h_name, h_typ: handle_types) {
 
 ]]]*/
 /* Fallback handle operators */
-INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.tryincref") __BOOL NOTHROW(FCALL handle_undefined_tryincref)(void *__restrict UNUSED(self)) { return 1; }
-INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.incref") void NOTHROW(FCALL handle_undefined_incref)(void *__restrict UNUSED(self)) {  }
-INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.decref") void NOTHROW(FCALL handle_undefined_decref)(void *__restrict UNUSED(self)) {  }
 INTERN NOBLOCK WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.refcnt") refcnt_t NOTHROW(FCALL handle_undefined_refcnt)(void const *__restrict UNUSED(self)) { return 0; }
+INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.incref") void NOTHROW(FCALL handle_undefined_incref)(void *__restrict UNUSED(self)) {  }
+INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.decref") void NOTHROW(FCALL handle_undefined_decref)(REF void *__restrict UNUSED(self)) {  }
+INTERN NOBLOCK WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.tryincref") __BOOL NOTHROW(FCALL handle_undefined_tryincref)(void *__restrict UNUSED(self)) { return 1; }
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.weakgetref") WEAK REF void *NOTHROW(FCALL handle_undefined_weakgetref)(void *__restrict self) { return self; }
+INTERN NOBLOCK WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.weaklckref") REF void *NOTHROW(FCALL handle_undefined_weaklckref)(void *__restrict UNUSED(weakref_ptr)) { return NULL; }
+INTERN NOBLOCK NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.weakdecref") void NOTHROW(FCALL handle_undefined_weakdecref)(WEAK REF void *__restrict UNUSED(weakref_ptr)) {  }
 INTERN WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.read") size_t KCALL handle_undefined_read(void *__restrict UNUSED(self), USER CHECKED void *UNUSED(dst), size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ); }
 INTERN WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.write") size_t KCALL handle_undefined_write(void *__restrict UNUSED(self), USER CHECKED void const *UNUSED(src), size_t UNUSED(num_bytes), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE); }
 INTERN WUNUSED NONNULL((1)) ATTR_SECTION(".text.kernel.handle_undefined.pread") size_t KCALL handle_undefined_pread(void *__restrict UNUSED(self), USER CHECKED void *UNUSED(dst), size_t UNUSED(num_bytes), pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) { THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ); }
@@ -329,35 +354,35 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_UAIO]                   = */ "uaio",
 		/* [HANDLE_TYPE_FIFO_USER]              = */ "fifo_user"
 	},
-	/* .h_tryincref = */ {
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
-		/* [HANDLE_TYPE_DATABLOCK]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_datablock_tryincref,
-		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_blockdevice_tryincref,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (__BOOL (FCALL *)(void *__restrict))&handle_directoryentry_tryincref,
-		/* [HANDLE_TYPE_FILE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_file_tryincref,
-		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (__BOOL (FCALL *)(void *__restrict))&handle_oneshot_directory_file_tryincref,
-		/* [HANDLE_TYPE_PATH]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_path_tryincref,
-		/* [HANDLE_TYPE_FS]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_fs_tryincref,
-		/* [HANDLE_TYPE_VM]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_vm_tryincref,
-		/* [HANDLE_TYPE_TASK]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_task_tryincref,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
-		/* [HANDLE_TYPE_DRIVER]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_tryincref,
-		/* [HANDLE_TYPE_PIPE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_tryincref,
-		/* [HANDLE_TYPE_PIPE_READER]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_reader_tryincref,
-		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_writer_tryincref,
-		/* [HANDLE_TYPE_PIDNS]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_pidns_tryincref,
-		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_state_tryincref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (__BOOL (FCALL *)(void *__restrict))&handle_characterdevice_tryincref,
-		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_fence_tryincref,
-		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_sema_tryincref,
-		/* [HANDLE_TYPE_SIGNALFD]               = */ (__BOOL (FCALL *)(void *__restrict))&handle_signalfd_tryincref,
-		/* [HANDLE_TYPE_DATAPART]               = */ (__BOOL (FCALL *)(void *__restrict))&handle_datapart_tryincref,
-		/* [HANDLE_TYPE_FUTEX]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_futex_tryincref,
-		/* [HANDLE_TYPE_FUTEXFD]                = */ (__BOOL (FCALL *)(void *__restrict))&handle_futexfd_tryincref,
-		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_section_tryincref,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_socket_tryincref,
-		/* [HANDLE_TYPE_UAIO]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_uaio_tryincref,
-		/* [HANDLE_TYPE_FIFO_USER]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_fifo_user_tryincref
+	/* .h_refcnt = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_datablock_refcnt,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_blockdevice_refcnt,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_directoryentry_refcnt,
+		/* [HANDLE_TYPE_FILE]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_file_refcnt,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_oneshot_directory_file_refcnt,
+		/* [HANDLE_TYPE_PATH]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_path_refcnt,
+		/* [HANDLE_TYPE_FS]                     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_fs_refcnt,
+		/* [HANDLE_TYPE_VM]                     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_vm_refcnt,
+		/* [HANDLE_TYPE_TASK]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_task_refcnt,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_refcnt,
+		/* [HANDLE_TYPE_PIPE]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_refcnt,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_reader_refcnt,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_writer_refcnt,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pidns_refcnt,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_state_refcnt,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_characterdevice_refcnt,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_fence_refcnt,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_sema_refcnt,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_signalfd_refcnt,
+		/* [HANDLE_TYPE_DATAPART]               = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_datapart_refcnt,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_futex_refcnt,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_futexfd_refcnt,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_section_refcnt,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_socket_refcnt,
+		/* [HANDLE_TYPE_UAIO]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_uaio_refcnt,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_fifo_user_refcnt
 	},
 	/* .h_incref = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_incref,
@@ -390,64 +415,154 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FIFO_USER]              = */ (void (FCALL *)(void *__restrict))&handle_fifo_user_incref
 	},
 	/* .h_decref = */ {
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_decref,
-		/* [HANDLE_TYPE_DATABLOCK]              = */ (void (FCALL *)(void *__restrict))&handle_datablock_decref,
-		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (void (FCALL *)(void *__restrict))&handle_blockdevice_decref,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (void (FCALL *)(void *__restrict))&handle_directoryentry_decref,
-		/* [HANDLE_TYPE_FILE]                   = */ (void (FCALL *)(void *__restrict))&handle_file_decref,
-		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (FCALL *)(void *__restrict))&handle_oneshot_directory_file_decref,
-		/* [HANDLE_TYPE_PATH]                   = */ (void (FCALL *)(void *__restrict))&handle_path_decref,
-		/* [HANDLE_TYPE_FS]                     = */ (void (FCALL *)(void *__restrict))&handle_fs_decref,
-		/* [HANDLE_TYPE_VM]                     = */ (void (FCALL *)(void *__restrict))&handle_vm_decref,
-		/* [HANDLE_TYPE_TASK]                   = */ (void (FCALL *)(void *__restrict))&handle_task_decref,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_decref,
-		/* [HANDLE_TYPE_DRIVER]                 = */ (void (FCALL *)(void *__restrict))&handle_driver_decref,
-		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(void *__restrict))&handle_pipe_decref,
-		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (FCALL *)(void *__restrict))&handle_pipe_reader_decref,
-		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (void (FCALL *)(void *__restrict))&handle_pipe_writer_decref,
-		/* [HANDLE_TYPE_PIDNS]                  = */ (void (FCALL *)(void *__restrict))&handle_pidns_decref,
-		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (void (FCALL *)(void *__restrict))&handle_driver_state_decref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (void (FCALL *)(void *__restrict))&handle_characterdevice_decref,
-		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (FCALL *)(void *__restrict))&handle_eventfd_fence_decref,
-		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (FCALL *)(void *__restrict))&handle_eventfd_sema_decref,
-		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (FCALL *)(void *__restrict))&handle_signalfd_decref,
-		/* [HANDLE_TYPE_DATAPART]               = */ (void (FCALL *)(void *__restrict))&handle_datapart_decref,
-		/* [HANDLE_TYPE_FUTEX]                  = */ (void (FCALL *)(void *__restrict))&handle_futex_decref,
-		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (FCALL *)(void *__restrict))&handle_futexfd_decref,
-		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (FCALL *)(void *__restrict))&handle_driver_section_decref,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(void *__restrict))&handle_socket_decref,
-		/* [HANDLE_TYPE_UAIO]                   = */ (void (FCALL *)(void *__restrict))&handle_uaio_decref,
-		/* [HANDLE_TYPE_FIFO_USER]              = */ (void (FCALL *)(void *__restrict))&handle_fifo_user_decref
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(REF void *__restrict))&handle_undefined_decref,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (void (FCALL *)(REF void *__restrict))&handle_datablock_decref,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (void (FCALL *)(REF void *__restrict))&handle_blockdevice_decref,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (void (FCALL *)(REF void *__restrict))&handle_directoryentry_decref,
+		/* [HANDLE_TYPE_FILE]                   = */ (void (FCALL *)(REF void *__restrict))&handle_file_decref,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (FCALL *)(REF void *__restrict))&handle_oneshot_directory_file_decref,
+		/* [HANDLE_TYPE_PATH]                   = */ (void (FCALL *)(REF void *__restrict))&handle_path_decref,
+		/* [HANDLE_TYPE_FS]                     = */ (void (FCALL *)(REF void *__restrict))&handle_fs_decref,
+		/* [HANDLE_TYPE_VM]                     = */ (void (FCALL *)(REF void *__restrict))&handle_vm_decref,
+		/* [HANDLE_TYPE_TASK]                   = */ (void (FCALL *)(REF void *__restrict))&handle_task_decref,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(REF void *__restrict))&handle_undefined_decref,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (void (FCALL *)(REF void *__restrict))&handle_driver_decref,
+		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(REF void *__restrict))&handle_pipe_decref,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (FCALL *)(REF void *__restrict))&handle_pipe_reader_decref,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (void (FCALL *)(REF void *__restrict))&handle_pipe_writer_decref,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (void (FCALL *)(REF void *__restrict))&handle_pidns_decref,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (void (FCALL *)(REF void *__restrict))&handle_driver_state_decref,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (void (FCALL *)(REF void *__restrict))&handle_characterdevice_decref,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (FCALL *)(REF void *__restrict))&handle_eventfd_fence_decref,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (FCALL *)(REF void *__restrict))&handle_eventfd_sema_decref,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (FCALL *)(REF void *__restrict))&handle_signalfd_decref,
+		/* [HANDLE_TYPE_DATAPART]               = */ (void (FCALL *)(REF void *__restrict))&handle_datapart_decref,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (void (FCALL *)(REF void *__restrict))&handle_futex_decref,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (FCALL *)(REF void *__restrict))&handle_futexfd_decref,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (FCALL *)(REF void *__restrict))&handle_driver_section_decref,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(REF void *__restrict))&handle_socket_decref,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (FCALL *)(REF void *__restrict))&handle_uaio_decref,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (void (FCALL *)(REF void *__restrict))&handle_fifo_user_decref
 	},
-	/* .h_refcnt = */ {
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
-		/* [HANDLE_TYPE_DATABLOCK]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_datablock_refcnt,
-		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_blockdevice_refcnt,
-		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_directoryentry_refcnt,
-		/* [HANDLE_TYPE_FILE]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_file_refcnt,
-		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_oneshot_directory_file_refcnt,
-		/* [HANDLE_TYPE_PATH]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_path_refcnt,
-		/* [HANDLE_TYPE_FS]                     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_fs_refcnt,
-		/* [HANDLE_TYPE_VM]                     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_vm_refcnt,
-		/* [HANDLE_TYPE_TASK]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_task_refcnt,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
-		/* [HANDLE_TYPE_DRIVER]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_refcnt,
-		/* [HANDLE_TYPE_PIPE]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_refcnt,
-		/* [HANDLE_TYPE_PIPE_READER]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_reader_refcnt,
-		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_writer_refcnt,
-		/* [HANDLE_TYPE_PIDNS]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pidns_refcnt,
-		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_state_refcnt,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_characterdevice_refcnt,
-		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_fence_refcnt,
-		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_eventfd_sema_refcnt,
-		/* [HANDLE_TYPE_SIGNALFD]               = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_signalfd_refcnt,
-		/* [HANDLE_TYPE_DATAPART]               = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_datapart_refcnt,
-		/* [HANDLE_TYPE_FUTEX]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_futex_refcnt,
-		/* [HANDLE_TYPE_FUTEXFD]                = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_futexfd_refcnt,
-		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_section_refcnt,
-		/* [HANDLE_TYPE_SOCKET]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_socket_refcnt,
-		/* [HANDLE_TYPE_UAIO]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_uaio_refcnt,
-		/* [HANDLE_TYPE_FIFO_USER]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_fifo_user_refcnt
+	/* .h_tryincref = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_datablock_tryincref,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_blockdevice_tryincref,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (__BOOL (FCALL *)(void *__restrict))&handle_directoryentry_tryincref,
+		/* [HANDLE_TYPE_FILE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_file_tryincref,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (__BOOL (FCALL *)(void *__restrict))&handle_oneshot_directory_file_tryincref,
+		/* [HANDLE_TYPE_PATH]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_path_tryincref,
+		/* [HANDLE_TYPE_FS]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_fs_tryincref,
+		/* [HANDLE_TYPE_VM]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_vm_tryincref,
+		/* [HANDLE_TYPE_TASK]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_task_tryincref,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_tryincref,
+		/* [HANDLE_TYPE_PIPE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_tryincref,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_reader_tryincref,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_writer_tryincref,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_pidns_tryincref,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_state_tryincref,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (__BOOL (FCALL *)(void *__restrict))&handle_characterdevice_tryincref,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_fence_tryincref,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (__BOOL (FCALL *)(void *__restrict))&handle_eventfd_sema_tryincref,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (__BOOL (FCALL *)(void *__restrict))&handle_signalfd_tryincref,
+		/* [HANDLE_TYPE_DATAPART]               = */ (__BOOL (FCALL *)(void *__restrict))&handle_datapart_tryincref,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_futex_tryincref,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (__BOOL (FCALL *)(void *__restrict))&handle_futexfd_tryincref,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_section_tryincref,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_socket_tryincref,
+		/* [HANDLE_TYPE_UAIO]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_uaio_tryincref,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_fifo_user_tryincref
+	},
+	/* .h_weakgetref = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_undefined_weakgetref,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_datablock_weakgetref,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_blockdevice_weakgetref,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_directoryentry_weakgetref,
+		/* [HANDLE_TYPE_FILE]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_file_weakgetref,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_oneshot_directory_file_weakgetref,
+		/* [HANDLE_TYPE_PATH]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_path_weakgetref,
+		/* [HANDLE_TYPE_FS]                     = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_fs_weakgetref,
+		/* [HANDLE_TYPE_VM]                     = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_vm_weakgetref,
+		/* [HANDLE_TYPE_TASK]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_task_weakgetref,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_undefined_weakgetref,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_weakgetref,
+		/* [HANDLE_TYPE_PIPE]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_weakgetref,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_reader_weakgetref,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_writer_weakgetref,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_pidns_weakgetref,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_state_weakgetref,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_characterdevice_weakgetref,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_fence_weakgetref,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weakgetref,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_signalfd_weakgetref,
+		/* [HANDLE_TYPE_DATAPART]               = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_datapart_weakgetref,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_futex_weakgetref,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_futexfd_weakgetref,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_section_weakgetref,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_socket_weakgetref,
+		/* [HANDLE_TYPE_UAIO]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_uaio_weakgetref,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_fifo_user_weakgetref
+	},
+	/* .h_weaklckref = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF void *(FCALL *)(void *__restrict))&handle_undefined_weaklckref,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (REF void *(FCALL *)(void *__restrict))&handle_datablock_weaklckref,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (REF void *(FCALL *)(void *__restrict))&handle_blockdevice_weaklckref,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (REF void *(FCALL *)(void *__restrict))&handle_directoryentry_weaklckref,
+		/* [HANDLE_TYPE_FILE]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_file_weaklckref,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (REF void *(FCALL *)(void *__restrict))&handle_oneshot_directory_file_weaklckref,
+		/* [HANDLE_TYPE_PATH]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_path_weaklckref,
+		/* [HANDLE_TYPE_FS]                     = */ (REF void *(FCALL *)(void *__restrict))&handle_fs_weaklckref,
+		/* [HANDLE_TYPE_VM]                     = */ (REF void *(FCALL *)(void *__restrict))&handle_vm_weaklckref,
+		/* [HANDLE_TYPE_TASK]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_task_weaklckref,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF void *(FCALL *)(void *__restrict))&handle_undefined_weaklckref,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (REF void *(FCALL *)(void *__restrict))&handle_driver_weaklckref,
+		/* [HANDLE_TYPE_PIPE]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_pipe_weaklckref,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF void *(FCALL *)(void *__restrict))&handle_pipe_reader_weaklckref,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (REF void *(FCALL *)(void *__restrict))&handle_pipe_writer_weaklckref,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (REF void *(FCALL *)(void *__restrict))&handle_pidns_weaklckref,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (REF void *(FCALL *)(void *__restrict))&handle_driver_state_weaklckref,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (REF void *(FCALL *)(void *__restrict))&handle_characterdevice_weaklckref,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (REF void *(FCALL *)(void *__restrict))&handle_eventfd_fence_weaklckref,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (REF void *(FCALL *)(void *__restrict))&handle_eventfd_sema_weaklckref,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (REF void *(FCALL *)(void *__restrict))&handle_signalfd_weaklckref,
+		/* [HANDLE_TYPE_DATAPART]               = */ (REF void *(FCALL *)(void *__restrict))&handle_datapart_weaklckref,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (REF void *(FCALL *)(void *__restrict))&handle_futex_weaklckref,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (REF void *(FCALL *)(void *__restrict))&handle_futexfd_weaklckref,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (REF void *(FCALL *)(void *__restrict))&handle_driver_section_weaklckref,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (REF void *(FCALL *)(void *__restrict))&handle_socket_weaklckref,
+		/* [HANDLE_TYPE_UAIO]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_uaio_weaklckref,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (REF void *(FCALL *)(void *__restrict))&handle_fifo_user_weaklckref
+	},
+	/* .h_weakdecref = */ {
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_undefined_weakdecref,
+		/* [HANDLE_TYPE_DATABLOCK]              = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_datablock_weakdecref,
+		/* [HANDLE_TYPE_BLOCKDEVICE]            = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_blockdevice_weakdecref,
+		/* [HANDLE_TYPE_DIRECTORYENTRY]         = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_directoryentry_weakdecref,
+		/* [HANDLE_TYPE_FILE]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_file_weakdecref,
+		/* [HANDLE_TYPE_ONESHOT_DIRECTORY_FILE] = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_oneshot_directory_file_weakdecref,
+		/* [HANDLE_TYPE_PATH]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_path_weakdecref,
+		/* [HANDLE_TYPE_FS]                     = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_fs_weakdecref,
+		/* [HANDLE_TYPE_VM]                     = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_vm_weakdecref,
+		/* [HANDLE_TYPE_TASK]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_task_weakdecref,
+		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_undefined_weakdecref,
+		/* [HANDLE_TYPE_DRIVER]                 = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_weakdecref,
+		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_weakdecref,
+		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_reader_weakdecref,
+		/* [HANDLE_TYPE_PIPE_WRITER]            = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_writer_weakdecref,
+		/* [HANDLE_TYPE_PIDNS]                  = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_pidns_weakdecref,
+		/* [HANDLE_TYPE_DRIVER_STATE]           = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_state_weakdecref,
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_characterdevice_weakdecref,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_fence_weakdecref,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_eventfd_sema_weakdecref,
+		/* [HANDLE_TYPE_SIGNALFD]               = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_signalfd_weakdecref,
+		/* [HANDLE_TYPE_DATAPART]               = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_datapart_weakdecref,
+		/* [HANDLE_TYPE_FUTEX]                  = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_futex_weakdecref,
+		/* [HANDLE_TYPE_FUTEXFD]                = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_futexfd_weakdecref,
+		/* [HANDLE_TYPE_DRIVER_SECTION]         = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_section_weakdecref,
+		/* [HANDLE_TYPE_SOCKET]                 = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_socket_weakdecref,
+		/* [HANDLE_TYPE_UAIO]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_uaio_weakdecref,
+		/* [HANDLE_TYPE_FIFO_USER]              = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_fifo_user_weakdecref
 	},
 	/* .h_read = */ {
 		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_undefined_read,
@@ -1084,10 +1199,13 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 
 
 /* Weakly define operators for `HANDLE_TYPE_DATABLOCK' (`struct vm_datablock') */
-DEFINE_INTERN_WEAK_ALIAS(handle_datablock_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_datablock_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_datablock_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_pread, handle_undefined_pread);
@@ -1111,10 +1229,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_datablock_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_datablock_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_BLOCKDEVICE' (`struct basic_block_device') */
-DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_pread, handle_undefined_pread);
@@ -1138,10 +1259,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_blockdevice_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DIRECTORYENTRY' (`struct directory_entry') */
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_pread, handle_undefined_pread);
@@ -1165,10 +1289,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_directoryentry_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FILE' (`struct file') */
-DEFINE_INTERN_WEAK_ALIAS(handle_file_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_file_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_file_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_file_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_file_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_file_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_file_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_pread, handle_undefined_pread);
@@ -1192,10 +1319,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_file_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_file_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_ONESHOT_DIRECTORY_FILE' (`struct oneshot_directory_file') */
-DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_pread, handle_undefined_pread);
@@ -1219,10 +1349,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_hop, handle_undefined_hop
 DEFINE_INTERN_WEAK_ALIAS(handle_oneshot_directory_file_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PATH' (`struct path') */
-DEFINE_INTERN_WEAK_ALIAS(handle_path_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_path_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_path_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_pread, handle_undefined_pread);
@@ -1246,10 +1379,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_path_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_path_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FS' (`struct fs') */
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fs_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fs_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_pread, handle_undefined_pread);
@@ -1273,10 +1409,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_fs_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_fs_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_VM' (`struct vm') */
-DEFINE_INTERN_WEAK_ALIAS(handle_vm_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_vm_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_vm_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_pread, handle_undefined_pread);
@@ -1300,10 +1439,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_vm_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_vm_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
-DEFINE_INTERN_WEAK_ALIAS(handle_task_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_task_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_task_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_task_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_task_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_task_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_task_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_pread, handle_undefined_pread);
@@ -1327,10 +1469,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_task_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_pread, handle_undefined_pread);
@@ -1354,10 +1499,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE' (`struct pipe') */
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_pread, handle_undefined_pread);
@@ -1381,10 +1529,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE_READER' (`struct pipe_reader') */
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_pread, handle_undefined_pread);
@@ -1408,10 +1559,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_reader_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PIPE_WRITER' (`struct pipe_writer') */
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_pread, handle_undefined_pread);
@@ -1435,10 +1589,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pipe_writer_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_pidns_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_pidns_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_pread, handle_undefined_pread);
@@ -1462,10 +1619,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_pidns_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_pidns_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER_STATE' (`struct driver_state') */
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_pread, handle_undefined_pread);
@@ -1489,10 +1649,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_state_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_pread, handle_undefined_pread);
@@ -1516,10 +1679,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */
-DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_pread, handle_undefined_pread);
@@ -1543,10 +1709,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_EVENTFD_SEMA' (`struct eventfd') */
-DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_pread, handle_undefined_pread);
@@ -1570,10 +1739,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_SIGNALFD' (`struct signalfd') */
-DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_pread, handle_undefined_pread);
@@ -1597,10 +1769,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_signalfd_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DATAPART' (`struct vm_datapart') */
-DEFINE_INTERN_WEAK_ALIAS(handle_datapart_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_datapart_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_datapart_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_pread, handle_undefined_pread);
@@ -1624,10 +1799,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_datapart_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_datapart_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FUTEX' (`struct vm_futex') */
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_futex_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_futex_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_pread, handle_undefined_pread);
@@ -1651,10 +1829,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futex_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_futex_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FUTEXFD' (`struct vm_futexfd') */
-DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_pread, handle_undefined_pread);
@@ -1678,10 +1859,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_futexfd_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER_SECTION' (`struct driver_section') */
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_pread, handle_undefined_pread);
@@ -1705,10 +1889,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_section_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
-DEFINE_INTERN_WEAK_ALIAS(handle_socket_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_socket_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_socket_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_pread, handle_undefined_pread);
@@ -1732,10 +1919,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_socket_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_socket_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_UAIO' (`struct uaio_controller') */
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_uaio_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_uaio_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_pread, handle_undefined_pread);
@@ -1759,10 +1949,13 @@ DEFINE_INTERN_WEAK_ALIAS(handle_uaio_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_uaio_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_FIFO_USER' (`struct fifo_user') */
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_refcnt, handle_undefined_refcnt);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_incref, handle_undefined_incref);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_decref, handle_undefined_decref);
-DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_weakdecref, handle_undefined_weakdecref);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_read, handle_undefined_read);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_write, handle_undefined_write);
 DEFINE_INTERN_WEAK_ALIAS(handle_fifo_user_pread, handle_undefined_pread);

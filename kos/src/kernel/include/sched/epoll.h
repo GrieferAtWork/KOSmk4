@@ -23,8 +23,9 @@
 #include <kernel/compiler.h>
 
 #include <kernel/handle.h>
+#include <kernel/malloc.h>
 #include <kernel/types.h>
-#include <sched/rwlock.h>
+#include <sched/mutex.h>
 #include <sched/signal-completion.h>
 #include <sched/signal.h>
 
@@ -33,46 +34,166 @@
 #ifdef __CC__
 DECL_BEGIN
 
+
+#ifndef CONFIG_EPOLL_MAX_NESTING
+#define CONFIG_EPOLL_MAX_NESTING 4 /* NOTE: Linux also uses `4' for this */
+#endif /* !CONFIG_EPOLL_MAX_NESTING */
+
 struct epoll_controller;
 struct epoll_handle_monitor {
-	struct epoll_controller     *ehm_ctrl;   /* [1..1][const] The primary epoll controller (exists once
-	                                          * for every epoll-fd that is created by user-space, whereas
-	                                          * this `struct epoll_handle_monitor' exists once for every
-	                                          * monitored file descriptor, aka. handle) */
-	struct handle                ehm_hand;   /* [1..1][const] The handle that is being monitored. */
-	struct sig_multicompletion   ehm_comp;   /* Completion controller attached to pollable signals of `ehm_hand'
-	                                          * Signals monitored by this controller are established by doing a
-	                                          * regular `handle_poll()' on `ehm_hand', followed by making use of
-	                                          * `sig_multicompletion_connect_from_task()'. */
-	struct epoll_event           ehm_info;   /* [lock(ehm_ctrl->ec_lock)] Currently-set epoll information.
-	                                          * This is the set of EPOLL* conditions to wait for, as well as
-	                                          * the user-data-field that is handed back to user-space when the
-	                                          * condition is met. */
-	struct epoll_handle_monitor *ehm_rnext;  /* [0..1] Next monitor that has been raised. */
-	WEAK bool                    ehm_raised; /* [lock(ATOMIC)] set to `true' once the monitored condition is met.
-	                                          * When this happens, the monitor is added to the chain of raised
-	                                          * monitors, and `ehm_ctrl->ec_avail' will be send (using `sig_send()',
-	                                          * thus waking up whatever a thread waiting in `epoll_wait(2)')
-	                                          * Note that `ehm_comp' doesn't (and can't) use `sig_completion_reprime()',
-	                                          * since the effective set of signals to which one must listen when polling
-	                                          * `ehm_hand' may depend on some internal state, and may change over time.
-	                                          * As such, the consumer of epoll events is responsible for resetting
-	                                          * the set of signals monitored by `ehm_comp' every time that signal is
-	                                          * broadcast. */
+	uintptr_half_t               ehm_pollwht; /* [const] Set of `EPOLL*' describing what exactly is being polled. */
+	uintptr_half_t               ehm_handtyp; /* [const] The type of handle being monitored. */
+	WEAK REF void               *ehm_handptr; /* Handle type pointer. */
+	union epoll_data             ehm_data;    /* [lock(ehm_ctrl->ec_lock)] User-data to return when an event triggers. */
+	struct epoll_controller     *ehm_ctrl;    /* [1..1][const] The primary epoll controller (exists once
+	                                           * for every epoll-fd that is created by user-space, whereas
+	                                           * this `struct epoll_handle_monitor' exists once for every
+	                                           * monitored file descriptor, aka. handle) */
+	struct sig_multicompletion   ehm_comp;    /* Completion controller attached to pollable signals of `ehm_hand'
+	                                           * Signals monitored by this controller are established by doing a
+	                                           * regular `handle_poll()' on `ehm_hand', followed by making use of
+	                                           * `sig_multicompletion_connect_from_task()'. */
+	struct epoll_handle_monitor *ehm_rnext;   /* [0..1] Next monitor that has been raised. */
+	WEAK uintptr_t               ehm_raised;  /* [lock(ATOMIC)] Incremented once the monitored condition is met.
+	                                           * When this happens, the monitor is added to the chain of raised
+	                                           * monitors, and `ehm_ctrl->ec_avail' will be send (using `sig_send()',
+	                                           * thus waking up whatever a thread waiting in `epoll_wait(2)')
+	                                           * Note that `ehm_comp' doesn't (and can't) use `sig_completion_reprime()',
+	                                           * since the effective set of signals to which one must listen when polling
+	                                           * `ehm_hand' may depend on some internal state, and may change over time.
+	                                           * As such, the consumer of epoll events is responsible for resetting
+	                                           * the set of signals monitored by `ehm_comp' every time that signal is
+	                                           * broadcast. */
+};
+
+struct epoll_controller_ent {
+	struct epoll_handle_monitor *ece_mon; /* [0..1] Pointed-to monitor (NULL for sentinel, -1 for deleted) */
 };
 
 struct epoll_controller {
-	WEAK refcnt_t                     ec_refcnt; /* Reference counter. */
-	struct rwlock                     ec_lock;   /* Lock for this epoll controller. This one has to be held whenever
-	                                              * making modifications to, or scanning the set of monitored file
-	                                              * descriptors. Additionally, `epoll_wait(2)' will temporarily acquire
-	                                              * a read-lock to this rwlock while searching for handle monitors that
-	                                              * may have been raised in the mean time. */
-	WEAK struct epoll_handle_monitor *ec_raised; /* [0..1][lock(ATOMIC)] Singly linked list of
-	                                              * raised monitors (chained via `ehm_rnext'). */
-	struct sig                        ec_avail;  /* Send once every time that `ec_raised' becomes non-NULL. */
-	/* TODO: (some kind of) list of all defined monitors. */
+	/* NOTE: `struct epoll_controller' needs weak reference counting support because
+	 *       it can be used to reference other, arbitrary handle objects. As such, it
+	 *       would be possible to form a reference loop using the epoll controller and
+	 *       some other handle that can reference other handles (such as encapsulating
+	 *       an epoll controller within a unix-domain socket datagram, when the epoll
+	 *       controller is already monitoring some socket also holding a reference to
+	 *       the send-queue) */
+	WEAK refcnt_t                     ec_refcnt;     /* Reference counter. */
+	WEAK refcnt_t                     ec_weakrefcnt; /* Weak reference counter. */
+	struct mutex                      ec_lock;       /* Lock for this epoll controller. This one has to be held whenever
+	                                                  * making modifications to, or scanning the set of monitored file
+	                                                  * descriptors. Additionally, `epoll_wait(2)' will temporarily acquire
+	                                                  * a read-lock to this rwlock while searching for handle monitors that
+	                                                  * may have been raised in the mean time. */
+	WEAK struct epoll_handle_monitor *ec_raised;     /* [0..1][lock(APPEND(ATOMIC), CLEAR(ec_lock))]
+	                                                  * Singly linked list of raised monitors (chained via `ehm_rnext').
+	                                                  * By taking an element from this chain, you implicitly acquire a lock
+	                                                  * to its `ehm_comp', `ehm_rnext' and `ehm_raised' fields, which you
+	                                                  * release by re-connecting its completion controller. */
+	struct sig                        ec_avail;      /* Send once every time that `ec_raised' becomes non-NULL. */
+	size_t                            ec_used;       /* [lock(ec_lock)] Amount of used (non-NULL and non-deleted) entries */
+	size_t                            ec_size;       /* [lock(ec_lock)] Amount of (non-NULL) entires. */
+	size_t                            ec_mask;       /* [lock(ec_lock)] Hash-mask for `pn_list' */
+	struct epoll_controller_ent      *ec_list;       /* [1..sc_mask+1][owned][lock(ec_lock)] Hash-vector of monitors.
+	                                                  * For hashing, the `h_data' pointer of handles is used. */
 };
+#define epoll_controller_hashnx(i, perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
+
+/* Destroy the given epoll controller. */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL epoll_controller_destroy)(struct epoll_controller *__restrict self);
+DEFINE_WEAKREFCOUNT_FUNCTIONS(struct epoll_controller, ec_weakrefcnt, kfree)
+DEFINE_REFCOUNT_FUNCTIONS(struct epoll_controller, ec_refcnt, epoll_controller_destroy)
+
+/* Create a new epoll controller and return a reference to it.
+ * This function is used by the `epoll_create(2)' syscall family. */
+FUNDEF ATTR_RETNONNULL WUNUSED REF struct epoll_controller *KCALL
+epoll_controller_create(void) THROWS(E_BADALLOC);
+
+/* Add a monitor for `hand' to the given epoll controller.
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
+ *                                   as `self', or is already monitoring `self'. Also thrown if
+ *                                   the max depth of nested epoll controllers would exceed the
+ *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
+ * @return: true:  Success
+ * @return: false: Another monitor for `hand' already exists. */
+FUNDEF NONNULL((1, 2)) bool KCALL
+epoll_controller_addmonitor(struct epoll_controller *__restrict self,
+                            struct handle const *__restrict hand,
+                            USER CHECKED struct epoll_event const *info)
+	THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT,
+	       E_ILLEGAL_REFERENCE_LOOP);
+
+/* Modify the monitor for `hand' within the given epoll controller.
+ * @return: true:  Success
+ * @return: false: The given `hand' isn't being monitored by `self'. */
+FUNDEF NONNULL((1, 2)) bool KCALL
+epoll_controller_modmonitor(struct epoll_controller *__restrict self,
+                            struct handle const *__restrict hand,
+                            USER CHECKED struct epoll_event const *info)
+	THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
+
+/* Delete the monitor for `hand' within the given epoll controller.
+ * @return: true:  Success
+ * @return: false: The given `hand' isn't being monitored by `self'. */
+FUNDEF NONNULL((1, 2)) bool KCALL
+epoll_controller_delmonitor(struct epoll_controller *__restrict self,
+                            struct handle const *__restrict hand)
+	THROWS(E_WOULDBLOCK);
+
+
+/* Try to consume pending events from `self'. Note that this
+ * function can throw E_BADALLOC because in the event that a
+ * monitor has to be re-primed, there is a chance that doing
+ * so might require more signal connection descriptors to be
+ * allocated, which in turn might cause that allocation to fail.
+ * When this happens, all already-consumed events will be marked
+ * as raised once again, and be back onto the queue of pending
+ * events. The same thing also happens when writing to `events'
+ * would result in a SEGFAULT.
+ * @return: * : The actual number of consumed events.
+ *              When non-zero, the calling thread's set of connected
+ *              signals (~ala task_connect()) may have been clobbered.
+ * @return: 0 : No monitors have been raised at this time. Once any
+ *              monitor becomes raised, `self->ec_avail' will be send. */
+FUNDEF NONNULL((1)) size_t KCALL
+epoll_controller_trywait(struct epoll_controller *__restrict self,
+                         USER CHECKED struct epoll_event *events,
+                         size_t maxevents)
+	THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
+
+/* Same as `epoll_controller_trywait()', but blocking wait until
+ * at least 1 event could be consumed. If `timeout' is non-NULL,
+ * and expires while waiting for the first event to appear, then
+ * this function will return `0' (note that if `timeout' was already
+ * expired from the get-go, this function will still try to consume
+ * already-pending events, thus behaving identical to a call to
+ * `epoll_controller_trywait()') */
+FUNDEF NONNULL((1)) size_t KCALL
+epoll_controller_wait(struct epoll_controller *__restrict self,
+                      USER CHECKED struct epoll_event *events,
+                      size_t maxevents,
+                      struct timespec const *timeout)
+	THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
+
+/* Quickly check if there are pending events that can be waited upon. */
+#define epoll_controller_canwait(self) \
+	(__hybrid_atomic_load((self)->ec_raised, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define epoll_controller_pollconnect_ex(self, cb) cb(&(self)->ec_avail)
+#define epoll_controller_pollconnect(self)        epoll_controller_pollconnect_ex(self, task_connect_for_poll)
+
+#define epoll_controller_poll_unlikely(self) \
+	(epoll_controller_pollconnect(self),     \
+	 epoll_controller_canwait(self))
+#ifdef __OPTIMIZE_SIZE__
+#define epoll_controller_poll(self) \
+	epoll_controller_poll_unlikely(self)
+#else /* __OPTIMIZE_SIZE__ */
+#define epoll_controller_poll(self)       \
+	(epoll_controller_canwait(self) ||    \
+	 (epoll_controller_pollconnect(self), \
+	  epoll_controller_canwait(self)))
+#endif /* !__OPTIMIZE_SIZE__ */
 
 
 

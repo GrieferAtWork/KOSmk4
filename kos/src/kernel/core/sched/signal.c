@@ -1891,7 +1891,7 @@ again_read_cons:
 			                                                    TASK_CONNECTION_STAT_FLOCK)))
 				goto again_read_cons;
 #endif /* !CONFIG_NO_SMP */
-			/* Figure out if we want to send to this connection. */
+			/* Figure out the exact details of this receiver. */
 			if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
 				/* Completion callback */
 				context.ssc_type  = SIG_SELECT_TYPE_COMPLETION;
@@ -1916,6 +1916,7 @@ again_read_cons:
 					chain = chain->tsc_prev;
 				}
 			}
+			/* Figure out if we want to send to this connection. */
 			sender = (*selector)(cookie, &context);
 			if (sender != NULL) {
 				REF struct task *thread;

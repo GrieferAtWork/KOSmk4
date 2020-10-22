@@ -64,7 +64,7 @@ signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC) {
 }
 
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(signalfd, struct signalfd)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(signalfd, struct signalfd);
 
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,

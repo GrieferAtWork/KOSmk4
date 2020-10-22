@@ -103,7 +103,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define POLLRDHUP            __POLLRDHUP            /* Socket peer closed connection, or shut down writing half of its connection */
 #endif /* !POLLRDHUP && __POLLRDHUP */
 #if !defined(POLLHUP) && defined(__POLLHUP)
-#define POLLHUP            __POLLHUP               /* Hung up. (writes are no longer possible) */
+#define POLLHUP              __POLLHUP              /* Hung up. (writes are no longer possible) */
 #endif /* !POLLHUP && __POLLHUP */
 #if !defined(POLLSELECT_READFDS) && defined(__POLLSELECT_READFDS)
 #define POLLSELECT_READFDS   __POLLSELECT_READFDS   /* select(2).readfds */

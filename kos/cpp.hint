@@ -894,7 +894,22 @@
 #define ATREE_NODE(T,Tkey)        struct { T *a_min, *a_max; Tkey a_vmin, a_vmax; }
 #define ATREE_NODE_SINGLE(T,Tkey) struct { T *a_min, *a_max; Tkey a_vaddr; }
 #define ATREE_XNODE(T)            struct { T *a_min, *a_max; }
-#define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) refcnt_t handle_##name##_refcnt(T *self); void handle_##name##_incref(T *self); void handle_##name##_decref(T *self);
+#define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) \
+	refcnt_t handle_##name##_refcnt(T const *__restrict self) {} \
+	void handle_##name##_incref(T *__restrict self) {} \
+	void handle_##name##_decref(T *__restrict self) {} \
+	bool handle_##name##_tryincref(T *__restrict self) {} \
+	void *handle_##name##_weakgetref(T *__restrict self) {} \
+	T *handle_##name##_weaklckref(void *__restrict weakref_ptr) {} \
+	void handle_##name##_weakdecref(void *__restrict self) {}
+#define DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(name,T) \
+	refcnt_t handle_##name##_refcnt(T const *__restrict self) {} \
+	void handle_##name##_incref(T *__restrict self) {} \
+	void handle_##name##_decref(T *__restrict self) {} \
+	bool handle_##name##_tryincref(T *__restrict self) {} \
+	void *handle_##name##_weakgetref(T *__restrict self) {} \
+	T *handle_##name##_weaklckref(void *__restrict weakref_ptr) {} \
+	void handle_##name##_weakdecref(void *__restrict self) {}
 
 #define ATOMIC_REF(...)               atomic_ref< __VA_ARGS__ >
 #define XATOMIC_REF_STRUCT(...)       xatomic_ref_struct< __VA_ARGS__ >
@@ -1365,6 +1380,12 @@
 #define DLMALLOC_EXPORT
 #define FFI_API
 #define FFI_EXTERN
+#define JSON_EXPORT
+#define JSON_C_CONST_FUNCTION(func) func
+#define _FCFUNCPROTOBEGIN extern "C" {
+#define _FCFUNCPROTOEND }
+#define FcPublic
+#define FC_ATTRIBUTE_SENTINEL(x)
 
 
 /* All of these are only here to make code navigation use non-escaped type names */

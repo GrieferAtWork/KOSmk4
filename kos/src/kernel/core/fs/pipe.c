@@ -620,17 +620,20 @@ handle_pipe_reader_stat(struct pipe_reader *__restrict self,
 
 INTERN void KCALL
 handle_pipe_reader_pollconnect(struct pipe_reader *__restrict self,
-                               poll_mode_t what) {
-	if (what & POLLINMASK)
-		ringbuffer_pollconnect_read(&self->pr_pipe->p_buffer);
+                               poll_mode_t UNUSED(what)) {
+	ringbuffer_pollconnect_read(&self->pr_pipe->p_buffer);
 }
 
 INTERN poll_mode_t KCALL
 handle_pipe_reader_polltest(struct pipe_reader *__restrict self,
                             poll_mode_t what) {
-	if ((what & POLLINMASK) && ringbuffer_canread(&self->pr_pipe->p_buffer))
-		return POLLINMASK;
-	return 0;
+	poll_mode_t result = 0;
+	struct ringbuffer *rb = &self->pr_pipe->p_buffer;
+	if ((what & POLLINMASK) && ringbuffer_canread(rb))
+		result |= POLLINMASK;
+	if (ringbuffer_closed(rb))
+		result |= POLLHUP;
+	return result;
 }
 
 INTERN syscall_slong_t KCALL
@@ -678,16 +681,20 @@ handle_pipe_writer_stat(struct pipe_writer *__restrict self,
 }
 
 INTERN void KCALL
-handle_pipe_writer_pollconnect(struct pipe_writer *__restrict self, poll_mode_t what) {
-	if (what & POLLOUTMASK)
-		ringbuffer_pollconnect_write(&self->pw_pipe->p_buffer);
+handle_pipe_writer_pollconnect(struct pipe_writer *__restrict self,
+                               poll_mode_t UNUSED(what)) {
+	ringbuffer_pollconnect_write(&self->pw_pipe->p_buffer);
 }
 
 INTERN poll_mode_t KCALL
 handle_pipe_writer_polltest(struct pipe_writer *__restrict self, poll_mode_t what) {
-	if ((what & POLLOUTMASK) && ringbuffer_canwrite(&self->pw_pipe->p_buffer))
-		return POLLOUTMASK;
-	return 0;
+	poll_mode_t result = 0;
+	struct ringbuffer *rb = &self->pw_pipe->p_buffer;
+	if ((what & POLLOUTMASK) && ringbuffer_canwrite(rb))
+		result |= POLLOUTMASK;
+	if (ringbuffer_closed(rb))
+		result |= POLLHUP;
+	return result;
 }
 
 INTERN syscall_slong_t KCALL

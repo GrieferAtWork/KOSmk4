@@ -31,34 +31,43 @@ DECL_BEGIN
 #ifdef __DEEMON__
 #define HANDLE_OPERATOR_PROTOTYPES                                                                             \
 	{                                                                                                          \
-		("tryincref", "NOBLOCK NONNULL((1))", "__BOOL", "NOTHROW", "FCALL",                                    \
-		 { ("void *__restrict", "self") },                                                                     \
-		 "", "return 1;"),                                                                                     \
+		("refcnt", "NOBLOCK WUNUSED NONNULL((1))", "refcnt_t", "NOTHROW", "FCALL",                             \
+		 { ("T const *__restrict", "self") },                                                                  \
+		 "", "return 0;"),                                                                                     \
 		("incref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                         \
-		 { ("void *__restrict", "self") },                                                                     \
+		 { ("T *__restrict", "self") },                                                                        \
 		 "", ""),                                                                                              \
 		("decref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                         \
-		 { ("void *__restrict", "self") },                                                                     \
+		 { ("REF T *__restrict", "self") },                                                                    \
 		 "", ""),                                                                                              \
-		("refcnt", "NOBLOCK WUNUSED NONNULL((1))", "refcnt_t", "NOTHROW", "FCALL",                             \
-		 { ("void const *__restrict", "self") },                                                               \
-		 "", "return 0;"),                                                                                     \
+		("tryincref", "NOBLOCK WUNUSED NONNULL((1))", "__BOOL", "NOTHROW", "FCALL",                            \
+		 { ("T *__restrict", "self") },                                                                        \
+		 "", "return 1;"),                                                                                     \
+		("weakgetref", "NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1))", "WEAK REF void *", "NOTHROW", "FCALL",  \
+		 { ("T *__restrict", "self") },                                                                        \
+		 "", "return self;"),                                                                                  \
+		("weaklckref", "NOBLOCK WUNUSED NONNULL((1))", "REF T *", "NOTHROW", "FCALL",                          \
+		 { ("void *__restrict", "weakref_ptr") },                                                              \
+		 "", "return NULL;"),                                                                                  \
+		("weakdecref", "NOBLOCK NONNULL((1))", "void", "NOTHROW", "FCALL",                                     \
+		 { ("WEAK REF void *__restrict", "weakref_ptr") },                                                     \
+		 "", ""),                                                                                              \
 		("read", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                                \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("USER CHECKED void *", "dst"),                                                                     \
 		   ("size_t", "num_bytes"),                                                                            \
 		   ("iomode_t", "mode") },                                                                             \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                              \
 		("write", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                               \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("USER CHECKED void const *", "src"),                                                               \
 		   ("size_t", "num_bytes"),                                                                            \
 		   ("iomode_t", "mode") },                                                                             \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                             \
 		("pread", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                               \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("USER CHECKED void *", "dst"),                                                                     \
 		   ("size_t", "num_bytes"),                                                                            \
 		   ("pos_t", "addr"),                                                                                  \
@@ -66,7 +75,7 @@ DECL_BEGIN
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                              \
 		("pwrite", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                              \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("USER CHECKED void const *", "src"),                                                               \
 		   ("size_t", "num_bytes"),                                                                            \
 		   ("pos_t", "addr"),                                                                                  \
@@ -74,21 +83,21 @@ DECL_BEGIN
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                             \
 		("readv", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                            \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("struct aio_buffer *__restrict", "dst"),                                                           \
 		   ("size_t", "num_bytes"),                                                                            \
 		   ("iomode_t", "mode") },                                                                             \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                              \
 		("writev", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                           \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("struct aio_buffer *__restrict", "src"),                                                           \
 		   ("size_t", "num_bytes"),                                                                            \
 		   ("iomode_t", "mode") },                                                                             \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                             \
 		("preadv", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                           \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("struct aio_buffer *__restrict", "dst"),                                                           \
 		   ("size_t", "num_bytes"),                                                                            \
 		   ("pos_t", "addr"),                                                                                  \
@@ -96,7 +105,7 @@ DECL_BEGIN
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);"),                              \
 		("pwritev", "WUNUSED NONNULL((1, 2))", "size_t", "", "KCALL",                                          \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("struct aio_buffer *__restrict", "src"),                                                           \
 		   ("size_t", "num_bytes"),                                                                            \
 		   ("pos_t", "addr"),                                                                                  \
@@ -104,7 +113,7 @@ DECL_BEGIN
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);"),                             \
 		("readdir", "WUNUSED NONNULL((1))", "size_t", "", "KCALL",                                             \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("USER CHECKED struct dirent *", "buf"),                                                            \
 		   ("size_t", "bufsize"),                                                                              \
 		   ("readdir_mode_t", "readdir_mode"),                                                                 \
@@ -112,25 +121,25 @@ DECL_BEGIN
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READDIR);"),                           \
 		("seek", "NONNULL((1))", "pos_t", "", "KCALL",                                                         \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("off_t", "offset"),                                                                                \
 		   ("unsigned int", "whence") },                                                                       \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SEEK);"),                              \
 		("ioctl", "NONNULL((1))", "syscall_slong_t", "", "KCALL",                                              \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("syscall_ulong_t", "cmd"),                                                                         \
 		   ("USER UNCHECKED void *", "arg"),                                                                   \
 		   ("iomode_t", "mode") },                                                                             \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND, cmd);"),         \
 		("truncate", "NONNULL((1))", "void", "", "KCALL",                                                      \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("pos_t", "new_size") },                                                                            \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_TRUNC);"),                             \
 		("mmap", "ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5))", "REF struct vm_datablock *", "", "KCALL", \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("pos_t *__restrict", "pminoffset"),                                                                \
 		   ("pos_t *__restrict", "pnumbytes"),                                                                 \
 		   ("REF struct path **__restrict ", "pdatablock_fspath"),                                             \
@@ -138,44 +147,44 @@ DECL_BEGIN
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_MMAP);"),                              \
 		("allocate", "NONNULL((1))", "pos_t", "", "KCALL",                                                     \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("fallocate_mode_t", "mode"),                                                                       \
 		   ("pos_t", "start"),                                                                                 \
 		   ("pos_t", "length") },                                                                              \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_ALLOCATE);"),                          \
 		("sync", "NONNULL((1))", "void", "", "KCALL",                                                          \
-		 { ("void *__restrict", "self") },                                                                     \
+		 { ("T *__restrict", "self") },                                                                        \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_SYNC);"),                              \
 		("datasync", "NONNULL((1))", "void", "", "KCALL",                                                      \
-		 { ("void *__restrict", "self") },                                                                     \
+		 { ("T *__restrict", "self") },                                                                        \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_DATASYNC);"),                          \
 		("stat", "NONNULL((1))", "void", "", "KCALL",                                                          \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("USER CHECKED struct stat *", "result") },                                                         \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_STAT);"),                              \
 		("pollconnect", "NONNULL((1))", "void", "", "KCALL",                                                   \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("poll_mode_t", "what") },                                                                          \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                              \
 		("polltest", "WUNUSED NONNULL((1))", "poll_mode_t", "", "KCALL",                                       \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("poll_mode_t", "what") },                                                                          \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_POLL);"),                              \
 		("hop", "NONNULL((1))", "syscall_slong_t", "", "KCALL",                                                \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("syscall_ulong_t", "cmd"),                                                                         \
 		   ("USER UNCHECKED void *", "arg"),                                                                   \
 		   ("iomode_t", "mode") },                                                                             \
 		 "THROWS(...)",                                                                                        \
 		 "THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_INVALID_ARGUMENT_CONTEXT_HOP_COMMAND, cmd);"),           \
 		("tryas", "NONNULL((1))", "REF void *", "", "KCALL",                                                   \
-		 { ("void *__restrict", "self"),                                                                       \
+		 { ("T *__restrict", "self"),                                                                          \
 		   ("uintptr_half_t", "wanted_type") },                                                                \
 		 "THROWS(E_WOULDBLOCK)",                                                                               \
 		 "return NULL;"),                                                                                      \
@@ -190,6 +199,22 @@ import * from deemon;
 
 @@List of (name, type)
 local handle_types: {(string, string)...} = [];
+
+function injectObjectType(type_expr: string, typename: string): string {
+	if (!typename) typename = "void";
+	switch (type_expr) {
+	case "T *":                    return typename + " *";
+	case "T *__restrict":          return typename + " *__restrict";
+	case "T const *":              return typename + " const *";
+	case "T const *__restrict":    return typename + " const *__restrict";
+	case "REF T *":                return "REF " + typename + " *";
+	case "REF T *__restrict":      return "REF " + typename + " *__restrict";
+	case "WEAK REF T *":           return "WEAK REF " + typename + " *";
+	case "WEAK REF T *__restrict": return "WEAK REF " + typename + " *__restrict";
+	default: break;
+	}
+	return type_expr;
+}
 
 for (local l: File.open("../../../../include/kos/kernel/handle.h")) {
 	local name, id, tail;
@@ -243,6 +268,7 @@ for (local h_name, h_typ: handle_types) {
 			print attr,;
 			print " ",;
 		}
+		return_type = injectObjectType(return_type, h_typ);
 		print return_type,;
 		if (!return_type.endswith("*"))
 			print " ",;
@@ -258,8 +284,7 @@ for (local h_name, h_typ: handle_types) {
 		print "(",;
 		local is_first = true;
 		for (local t, n: argv) {
-			if (n == "self")
-				t = h_typ + t.lsstrip("void");
+			t = injectObjectType(t, h_typ);
 			if (!is_first)
 				print ", ",;
 			print t,;
@@ -312,10 +337,13 @@ struct fifo_user;
 
 
 /* Handle operators for `HANDLE_TYPE_DATABLOCK' (`struct vm_datablock') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_datablock_tryincref)(struct vm_datablock *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_incref)(struct vm_datablock *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_decref)(struct vm_datablock *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_datablock_refcnt)(struct vm_datablock const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_incref)(struct vm_datablock *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_decref)(REF struct vm_datablock *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_datablock_tryincref)(struct vm_datablock *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_datablock_weakgetref)(struct vm_datablock *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm_datablock *NOTHROW(FCALL handle_datablock_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datablock_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_read(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_write(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datablock_pread(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -339,10 +367,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datablock_hop(struct vm_datablo
 INTDEF NONNULL((1)) REF void *KCALL handle_datablock_tryas(struct vm_datablock *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_BLOCKDEVICE' (`struct basic_block_device') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_blockdevice_tryincref)(struct basic_block_device *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_incref)(struct basic_block_device *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_decref)(struct basic_block_device *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_blockdevice_refcnt)(struct basic_block_device const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_incref)(struct basic_block_device *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_decref)(REF struct basic_block_device *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_blockdevice_tryincref)(struct basic_block_device *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_blockdevice_weakgetref)(struct basic_block_device *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct basic_block_device *NOTHROW(FCALL handle_blockdevice_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_blockdevice_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_read(struct basic_block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_write(struct basic_block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_blockdevice_pread(struct basic_block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -366,10 +397,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_blockdevice_hop(struct basic_bl
 INTDEF NONNULL((1)) REF void *KCALL handle_blockdevice_tryas(struct basic_block_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_DIRECTORYENTRY' (`struct directory_entry') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_directoryentry_tryincref)(struct directory_entry *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_incref)(struct directory_entry *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_decref)(struct directory_entry *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_directoryentry_refcnt)(struct directory_entry const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_incref)(struct directory_entry *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_decref)(REF struct directory_entry *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_directoryentry_tryincref)(struct directory_entry *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_directoryentry_weakgetref)(struct directory_entry *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct directory_entry *NOTHROW(FCALL handle_directoryentry_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_directoryentry_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_read(struct directory_entry *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_write(struct directory_entry *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_directoryentry_pread(struct directory_entry *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -393,10 +427,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_directoryentry_hop(struct direc
 INTDEF NONNULL((1)) REF void *KCALL handle_directoryentry_tryas(struct directory_entry *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_FILE' (`struct file') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_file_tryincref)(struct file *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_file_incref)(struct file *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_file_decref)(struct file *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_file_refcnt)(struct file const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_file_incref)(struct file *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_file_decref)(REF struct file *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_file_tryincref)(struct file *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_file_weakgetref)(struct file *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct file *NOTHROW(FCALL handle_file_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_file_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_file_read(struct file *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_file_write(struct file *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_file_pread(struct file *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -420,10 +457,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_file_hop(struct file *__restric
 INTDEF NONNULL((1)) REF void *KCALL handle_file_tryas(struct file *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_ONESHOT_DIRECTORY_FILE' (`struct oneshot_directory_file') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_oneshot_directory_file_tryincref)(struct oneshot_directory_file *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_incref)(struct oneshot_directory_file *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_decref)(struct oneshot_directory_file *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_oneshot_directory_file_refcnt)(struct oneshot_directory_file const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_incref)(struct oneshot_directory_file *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_decref)(REF struct oneshot_directory_file *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_oneshot_directory_file_tryincref)(struct oneshot_directory_file *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_oneshot_directory_file_weakgetref)(struct oneshot_directory_file *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct oneshot_directory_file *NOTHROW(FCALL handle_oneshot_directory_file_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_oneshot_directory_file_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_read(struct oneshot_directory_file *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_write(struct oneshot_directory_file *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_oneshot_directory_file_pread(struct oneshot_directory_file *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -447,10 +487,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_oneshot_directory_file_hop(stru
 INTDEF NONNULL((1)) REF void *KCALL handle_oneshot_directory_file_tryas(struct oneshot_directory_file *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_PATH' (`struct path') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_path_tryincref)(struct path *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_incref)(struct path *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_decref)(struct path *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_path_refcnt)(struct path const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_incref)(struct path *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_decref)(REF struct path *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_path_tryincref)(struct path *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_path_weakgetref)(struct path *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct path *NOTHROW(FCALL handle_path_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_path_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_read(struct path *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_write(struct path *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_path_pread(struct path *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -474,10 +517,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_path_hop(struct path *__restric
 INTDEF NONNULL((1)) REF void *KCALL handle_path_tryas(struct path *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_FS' (`struct fs') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_fs_tryincref)(struct fs *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_incref)(struct fs *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_decref)(struct fs *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fs_refcnt)(struct fs const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_incref)(struct fs *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_decref)(REF struct fs *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_fs_tryincref)(struct fs *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_fs_weakgetref)(struct fs *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct fs *NOTHROW(FCALL handle_fs_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fs_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_read(struct fs *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_write(struct fs *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fs_pread(struct fs *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -501,10 +547,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_fs_hop(struct fs *__restrict se
 INTDEF NONNULL((1)) REF void *KCALL handle_fs_tryas(struct fs *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_VM' (`struct vm') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_vm_tryincref)(struct vm *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_incref)(struct vm *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_decref)(struct vm *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_vm_refcnt)(struct vm const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_incref)(struct vm *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_decref)(REF struct vm *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_vm_tryincref)(struct vm *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_vm_weakgetref)(struct vm *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm *NOTHROW(FCALL handle_vm_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_vm_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_read(struct vm *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_write(struct vm *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_vm_pread(struct vm *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -528,10 +577,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_vm_hop(struct vm *__restrict se
 INTDEF NONNULL((1)) REF void *KCALL handle_vm_tryas(struct vm *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_TASK' (`struct taskpid') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_task_tryincref)(struct taskpid *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_incref)(struct taskpid *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_decref)(struct taskpid *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_task_refcnt)(struct taskpid const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_incref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_decref)(REF struct taskpid *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_task_tryincref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_task_weakgetref)(struct taskpid *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct taskpid *NOTHROW(FCALL handle_task_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_task_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_read(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_write(struct taskpid *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_task_pread(struct taskpid *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -555,10 +607,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_task_hop(struct taskpid *__rest
 INTDEF NONNULL((1)) REF void *KCALL handle_task_tryas(struct taskpid *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_tryincref)(struct driver *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_incref)(struct driver *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_decref)(struct driver *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_refcnt)(struct driver const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_incref)(struct driver *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_decref)(REF struct driver *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_tryincref)(struct driver *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_weakgetref)(struct driver *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver *NOTHROW(FCALL handle_driver_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_read(struct driver *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_write(struct driver *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_pread(struct driver *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -582,10 +637,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_hop(struct driver *__res
 INTDEF NONNULL((1)) REF void *KCALL handle_driver_tryas(struct driver *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_PIPE' (`struct pipe') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_tryincref)(struct pipe *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_incref)(struct pipe *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_decref)(struct pipe *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_refcnt)(struct pipe const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_incref)(struct pipe *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_decref)(REF struct pipe *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_tryincref)(struct pipe *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_pipe_weakgetref)(struct pipe *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct pipe *NOTHROW(FCALL handle_pipe_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_read(struct pipe *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_write(struct pipe *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_pread(struct pipe *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -609,10 +667,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_hop(struct pipe *__restric
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_tryas(struct pipe *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_PIPE_READER' (`struct pipe_reader') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_reader_tryincref)(struct pipe_reader *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_reader_incref)(struct pipe_reader *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_reader_decref)(struct pipe_reader *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_reader_refcnt)(struct pipe_reader const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_reader_incref)(struct pipe_reader *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_reader_decref)(REF struct pipe_reader *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_reader_tryincref)(struct pipe_reader *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_pipe_reader_weakgetref)(struct pipe_reader *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct pipe_reader *NOTHROW(FCALL handle_pipe_reader_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_reader_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_reader_read(struct pipe_reader *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_reader_write(struct pipe_reader *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_reader_pread(struct pipe_reader *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -636,10 +697,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_reader_hop(struct pipe_rea
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_reader_tryas(struct pipe_reader *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_PIPE_WRITER' (`struct pipe_writer') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_writer_tryincref)(struct pipe_writer *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_writer_incref)(struct pipe_writer *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_writer_decref)(struct pipe_writer *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pipe_writer_refcnt)(struct pipe_writer const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_writer_incref)(struct pipe_writer *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_writer_decref)(REF struct pipe_writer *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_pipe_writer_tryincref)(struct pipe_writer *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_pipe_writer_weakgetref)(struct pipe_writer *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct pipe_writer *NOTHROW(FCALL handle_pipe_writer_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pipe_writer_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_writer_read(struct pipe_writer *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_writer_write(struct pipe_writer *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pipe_writer_pread(struct pipe_writer *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -663,10 +727,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pipe_writer_hop(struct pipe_wri
 INTDEF NONNULL((1)) REF void *KCALL handle_pipe_writer_tryas(struct pipe_writer *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_PIDNS' (`struct pidns') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_pidns_tryincref)(struct pidns *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_incref)(struct pidns *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_decref)(struct pidns *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_pidns_refcnt)(struct pidns const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_incref)(struct pidns *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_decref)(REF struct pidns *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_pidns_tryincref)(struct pidns *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_pidns_weakgetref)(struct pidns *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct pidns *NOTHROW(FCALL handle_pidns_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_pidns_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_read(struct pidns *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_write(struct pidns *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_pidns_pread(struct pidns *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -690,10 +757,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_pidns_hop(struct pidns *__restr
 INTDEF NONNULL((1)) REF void *KCALL handle_pidns_tryas(struct pidns *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_DRIVER_STATE' (`struct driver_state') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_state_tryincref)(struct driver_state *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_incref)(struct driver_state *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_decref)(struct driver_state *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_state_refcnt)(struct driver_state const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_incref)(struct driver_state *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_decref)(REF struct driver_state *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_state_tryincref)(struct driver_state *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_state_weakgetref)(struct driver_state *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver_state *NOTHROW(FCALL handle_driver_state_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_state_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_read(struct driver_state *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_write(struct driver_state *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_state_pread(struct driver_state *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -717,10 +787,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_state_hop(struct driver_
 INTDEF NONNULL((1)) REF void *KCALL handle_driver_state_tryas(struct driver_state *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_CHARACTERDEVICE' (`struct character_device') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_characterdevice_tryincref)(struct character_device *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_incref)(struct character_device *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_decref)(struct character_device *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_characterdevice_refcnt)(struct character_device const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_incref)(struct character_device *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_decref)(REF struct character_device *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_characterdevice_tryincref)(struct character_device *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_characterdevice_weakgetref)(struct character_device *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct character_device *NOTHROW(FCALL handle_characterdevice_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_characterdevice_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_read(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_write(struct character_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_characterdevice_pread(struct character_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -744,10 +817,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_characterdevice_hop(struct char
 INTDEF NONNULL((1)) REF void *KCALL handle_characterdevice_tryas(struct character_device *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_EVENTFD_FENCE' (`struct eventfd') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_eventfd_fence_tryincref)(struct eventfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_fence_incref)(struct eventfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_fence_decref)(struct eventfd *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_eventfd_fence_refcnt)(struct eventfd const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_fence_incref)(struct eventfd *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_fence_decref)(REF struct eventfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_eventfd_fence_tryincref)(struct eventfd *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_eventfd_fence_weakgetref)(struct eventfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct eventfd *NOTHROW(FCALL handle_eventfd_fence_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_fence_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_eventfd_fence_read(struct eventfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_eventfd_fence_write(struct eventfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_eventfd_fence_pread(struct eventfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -771,10 +847,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_fence_hop(struct eventf
 INTDEF NONNULL((1)) REF void *KCALL handle_eventfd_fence_tryas(struct eventfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_EVENTFD_SEMA' (`struct eventfd') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_eventfd_sema_tryincref)(struct eventfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_sema_incref)(struct eventfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_sema_decref)(struct eventfd *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_eventfd_sema_refcnt)(struct eventfd const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_sema_incref)(struct eventfd *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_sema_decref)(REF struct eventfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_eventfd_sema_tryincref)(struct eventfd *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_eventfd_sema_weakgetref)(struct eventfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct eventfd *NOTHROW(FCALL handle_eventfd_sema_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_eventfd_sema_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_eventfd_sema_read(struct eventfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_eventfd_sema_write(struct eventfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_eventfd_sema_pread(struct eventfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -798,10 +877,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_eventfd_sema_hop(struct eventfd
 INTDEF NONNULL((1)) REF void *KCALL handle_eventfd_sema_tryas(struct eventfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_SIGNALFD' (`struct signalfd') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_signalfd_tryincref)(struct signalfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_signalfd_incref)(struct signalfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_signalfd_decref)(struct signalfd *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_signalfd_refcnt)(struct signalfd const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_signalfd_incref)(struct signalfd *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_signalfd_decref)(REF struct signalfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_signalfd_tryincref)(struct signalfd *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_signalfd_weakgetref)(struct signalfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct signalfd *NOTHROW(FCALL handle_signalfd_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_signalfd_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_signalfd_read(struct signalfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_signalfd_write(struct signalfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_signalfd_pread(struct signalfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -825,10 +907,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_signalfd_hop(struct signalfd *_
 INTDEF NONNULL((1)) REF void *KCALL handle_signalfd_tryas(struct signalfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_DATAPART' (`struct vm_datapart') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_datapart_tryincref)(struct vm_datapart *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_incref)(struct vm_datapart *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_decref)(struct vm_datapart *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_datapart_refcnt)(struct vm_datapart const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_incref)(struct vm_datapart *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_decref)(REF struct vm_datapart *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_datapart_tryincref)(struct vm_datapart *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_datapart_weakgetref)(struct vm_datapart *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm_datapart *NOTHROW(FCALL handle_datapart_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_datapart_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_datapart_pread(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -852,10 +937,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_datapart_hop(struct vm_datapart
 INTDEF NONNULL((1)) REF void *KCALL handle_datapart_tryas(struct vm_datapart *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_FUTEX' (`struct vm_futex') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_futex_tryincref)(struct vm_futex *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_incref)(struct vm_futex *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_decref)(struct vm_futex *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futex_refcnt)(struct vm_futex const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_incref)(struct vm_futex *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_decref)(REF struct vm_futex *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_futex_tryincref)(struct vm_futex *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_futex_weakgetref)(struct vm_futex *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm_futex *NOTHROW(FCALL handle_futex_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futex_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_read(struct vm_futex *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_write(struct vm_futex *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futex_pread(struct vm_futex *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -879,10 +967,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futex_hop(struct vm_futex *__re
 INTDEF NONNULL((1)) REF void *KCALL handle_futex_tryas(struct vm_futex *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_FUTEXFD' (`struct vm_futexfd') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_futexfd_tryincref)(struct vm_futexfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_incref)(struct vm_futexfd *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_decref)(struct vm_futexfd *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_futexfd_refcnt)(struct vm_futexfd const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_incref)(struct vm_futexfd *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_decref)(REF struct vm_futexfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_futexfd_tryincref)(struct vm_futexfd *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_futexfd_weakgetref)(struct vm_futexfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct vm_futexfd *NOTHROW(FCALL handle_futexfd_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_futexfd_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_read(struct vm_futexfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_write(struct vm_futexfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_futexfd_pread(struct vm_futexfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -906,10 +997,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_futexfd_hop(struct vm_futexfd *
 INTDEF NONNULL((1)) REF void *KCALL handle_futexfd_tryas(struct vm_futexfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_DRIVER_SECTION' (`struct driver_section') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_section_tryincref)(struct driver_section *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_incref)(struct driver_section *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_decref)(struct driver_section *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_driver_section_refcnt)(struct driver_section const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_incref)(struct driver_section *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_decref)(REF struct driver_section *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_driver_section_tryincref)(struct driver_section *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_driver_section_weakgetref)(struct driver_section *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct driver_section *NOTHROW(FCALL handle_driver_section_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_driver_section_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_read(struct driver_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_write(struct driver_section *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_driver_section_pread(struct driver_section *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -933,10 +1027,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_driver_section_hop(struct drive
 INTDEF NONNULL((1)) REF void *KCALL handle_driver_section_tryas(struct driver_section *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_SOCKET' (`struct socket') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_socket_tryincref)(struct socket *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_incref)(struct socket *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_decref)(struct socket *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_socket_refcnt)(struct socket const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_incref)(struct socket *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_decref)(REF struct socket *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_socket_tryincref)(struct socket *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_socket_weakgetref)(struct socket *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct socket *NOTHROW(FCALL handle_socket_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_socket_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_read(struct socket *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_write(struct socket *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_socket_pread(struct socket *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -960,10 +1057,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_socket_hop(struct socket *__res
 INTDEF NONNULL((1)) REF void *KCALL handle_socket_tryas(struct socket *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_UAIO' (`struct uaio_controller') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_uaio_tryincref)(struct uaio_controller *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_incref)(struct uaio_controller *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_decref)(struct uaio_controller *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_uaio_refcnt)(struct uaio_controller const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_incref)(struct uaio_controller *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_decref)(REF struct uaio_controller *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_uaio_tryincref)(struct uaio_controller *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_uaio_weakgetref)(struct uaio_controller *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct uaio_controller *NOTHROW(FCALL handle_uaio_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_uaio_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_read(struct uaio_controller *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_write(struct uaio_controller *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_uaio_pread(struct uaio_controller *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -987,10 +1087,13 @@ INTDEF NONNULL((1)) syscall_slong_t KCALL handle_uaio_hop(struct uaio_controller
 INTDEF NONNULL((1)) REF void *KCALL handle_uaio_tryas(struct uaio_controller *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 
 /* Handle operators for `HANDLE_TYPE_FIFO_USER' (`struct fifo_user') */
-INTDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL handle_fifo_user_tryincref)(struct fifo_user *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_incref)(struct fifo_user *__restrict self);
-INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_decref)(struct fifo_user *__restrict self);
 INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_fifo_user_refcnt)(struct fifo_user const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_incref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_decref)(REF struct fifo_user *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_fifo_user_tryincref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_fifo_user_weakgetref)(struct fifo_user *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct fifo_user *NOTHROW(FCALL handle_fifo_user_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_fifo_user_weakdecref)(WEAK REF void *__restrict weakref_ptr);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_read(struct fifo_user *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_write(struct fifo_user *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
 INTDEF WUNUSED NONNULL((1)) size_t KCALL handle_fifo_user_pread(struct fifo_user *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
@@ -1025,23 +1128,66 @@ INTDEF NONNULL((1)) REF void *KCALL handle_fifo_user_tryas(struct fifo_user *__r
 
 /* `name' must be the lower-case form of the `*' in one of the `HANDLE_TYPE_*' macros.
  * `T' must be the actual object type (one implementing the refcnt protocol or deriving from another that does) */
-#define DEFINE_HANDLE_REFCNT_FUNCTIONS(name, T)                       \
-	INTERN NOBLOCK WUNUSED NONNULL((1)) refcnt_t                      \
-	NOTHROW(FCALL handle_##name##_refcnt)(T const *__restrict self) { \
-		return getrefcnt(self);                                       \
-	}                                                                 \
-	INTERN NOBLOCK NONNULL((1)) __BOOL                                \
-	NOTHROW(FCALL handle_##name##_tryincref)(T *__restrict self) {    \
-		return tryincref(self);                                       \
-	}                                                                 \
-	INTERN NOBLOCK NONNULL((1)) void                                  \
-	NOTHROW(FCALL handle_##name##_incref)(T *__restrict self) {       \
-		incref(self);                                                 \
-	}                                                                 \
-	INTERN NOBLOCK NONNULL((1)) void                                  \
-	NOTHROW(FCALL handle_##name##_decref)(REF T *__restrict self) {   \
-		decref(self);                                                 \
+#define DEFINE_HANDLE_REFCNT_FUNCTIONS(name, T)                                  \
+	INTERN NOBLOCK WUNUSED NONNULL((1)) refcnt_t                                 \
+	NOTHROW(FCALL handle_##name##_refcnt)(T const *__restrict self) {            \
+		return getrefcnt(self);                                                  \
+	}                                                                            \
+	INTERN NOBLOCK NONNULL((1)) WEAK REF void *                                  \
+	NOTHROW(FCALL handle_##name##_weakgetref)(T *__restrict self) {              \
+		return incref(self);                                                     \
+	}                                                                            \
+	INTERN NOBLOCK NONNULL((1)) void                                             \
+	NOTHROW(FCALL handle_##name##_decref)(REF T *__restrict self) {              \
+		decref(self);                                                            \
+	}                                                                            \
+	INTERN NOBLOCK NONNULL((1)) __BOOL                                           \
+	NOTHROW(FCALL handle_##name##_tryincref)(T *__restrict self) {               \
+		return tryincref(self);                                                  \
+	}                                                                            \
+	DEFINE_INTERN_ALIAS(handle_##name##_incref, handle_##name##_weakgetref);     \
+	DEFINE_INTERN_ALIAS(handle_##name##_weaklckref, handle_##name##_weakgetref); \
+	DEFINE_INTERN_ALIAS(handle_##name##_weakdecref, handle_##name##_decref)
+
+
+/* Same as `DEFINE_HANDLE_REFCNT_FUNCTIONS', but include dedicated weak referencing support
+ * in terms of `weakincref()' and friends. The regular `DEFINE_HANDLE_REFCNT_FUNCTIONS()'
+ * will implement those functions in terms of the regular reference counter, such that
+ * anyone holding a weak reference is actually holding a regular reference. This behavior
+ * is ok in most cases, however objects which can exist as handles and could be made to
+ * form reference loops should only ever store weak references to other handles, and
+ * should themself have a dedicated weakref mechanism. One example of such an object
+ * is `struct epoll_controller' * */
+#define DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(name, T)            \
+	INTERN NOBLOCK WUNUSED NONNULL((1)) refcnt_t                                \
+	NOTHROW(FCALL handle_##name##_refcnt)(T const *__restrict self) {           \
+		return getrefcnt(self);                                                 \
+	}                                                                           \
+	INTERN NOBLOCK NONNULL((1)) void                                            \
+	NOTHROW(FCALL handle_##name##_incref)(T *__restrict self) {                 \
+		incref(self);                                                           \
+	}                                                                           \
+	INTERN NOBLOCK NONNULL((1)) void                                            \
+	NOTHROW(FCALL handle_##name##_decref)(REF T *__restrict self) {             \
+		decref(self);                                                           \
+	}                                                                           \
+	INTERN NOBLOCK NONNULL((1)) __BOOL                                          \
+	NOTHROW(FCALL handle_##name##_tryincref)(T *__restrict self) {              \
+		return tryincref(self);                                                 \
+	}                                                                           \
+	INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *         \
+	NOTHROW(FCALL handle_##name##_weakgetref)(T *__restrict self) {             \
+		return weakincref(self);                                                \
+	}                                                                           \
+	INTERN NOBLOCK WUNUSED NONNULL((1)) REF T *                                 \
+	NOTHROW(FCALL handle_##name##_weaklckref)(void *__restrict weakref_ptr) {   \
+		return tryincref((T *)weakref_ptr) ? (T *)weakref_ptr : __NULLPTR;      \
+	}                                                                           \
+	INTERN NOBLOCK NONNULL((1)) void                                            \
+	NOTHROW(FCALL handle_##name##_weakdecref)(WEAK REF void *__restrict self) { \
+		weakdecref((T *)self);                                                  \
 	}
+
 #endif /* __CC__ */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 

@@ -413,13 +413,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       `__STDC_WANT_DEC_FP__' under `__USE_ISOC2X' (for this purpose, <hybrid/floatcore.h>
 	 *       will also have to be adjusted) */
 
-	/* TODO: In order to properly support EPOLLET, the `handle_poll()' operation must
-	 *       be split into 2 parts: `handle_poll_test()' and `handle_poll_connect()',
-	 *       where the former will check if a pollable condition is currently met, by
-	 *       returning the set of currently met conditions, while the later will make
-	 *       calls to `task_connect()' to establish connections to all of the signals
-	 *       which must be monitored for a given set of pollable conditions. */
-
 	/* TODO: Update poll(2) and select(2) to only use `handle_poll_test()' during the
 	 *       initial scan for ready files. Afterwards, scan all monitored files again,
 	 *       but this time do `connect+test' on each one of them. The second test

@@ -50,6 +50,29 @@ struct aio_multihandle;
 struct path;
 struct directory_entry;
 
+/* Closing a handle (for the last time) is allowed to automatically remove
+ * that handle from every epoll controller that may have been monitoring it.
+ *
+ * Using this mechanic, kernel objects that need it can be made to implement
+ * a weak reference system (while objects that don't need this can just be
+ * made to use normal references in place of weak ones)
+ *
+ * For this purpose, the following weak reference API exists. */
+struct handle_weakref_ops {
+	/* [1..1] Return a new weak reference, given a proper object pointer.
+	 * Note that the returned pointer may differ from `obj_ptr'! */
+	NOBLOCK NONNULL((1)) WEAK REF void * /*NOTHROW*/ (FCALL *hwo_weakincref)(void *__restrict obj_ptr);
+	/* [1..1] Decrement the weak reference counter of `weakref_ptr' */
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/ (FCALL *hwo_weakdecref)(void *__restrict weakref_ptr);
+	/* [1..1] Given a weak reference `weakref_ptr', try to acquire a reference to
+	 *        the proper handle object (to which a reference is returned on success)
+	 * Note that the returned pointer may differ from `weakref_ptr' when the object
+	 * uses a weak reference proxy object (like `struct taskpid' is for `struct task'),
+	 * instead of a dedicated weak reference counter (like found in `struct driver') */
+	NOBLOCK WUNUSED NONNULL((1)) REF void * /*NOTHROW*/ (FCALL *hwo_weaklckref)(void *__restrict weakref_ptr);
+};
+
+
 #ifdef __INTELLISENSE__
 DATDEF
 #endif /* __INTELLISENSE__ */
@@ -71,41 +94,48 @@ struct handle_types {
 	 *       >> calll  *handle_type_db+h_sync(,%eax,4)
 	 */
 	char const *h_typename[HANDLE_TYPE_COUNT];
-	__BOOL /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_tryincref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
-	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_incref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
-	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_decref[HANDLE_TYPE_COUNT])(void *__restrict ptr);
-	refcnt_t /*NOTHROW*/ (NOBLOCK WUNUSED NONNULL((1)) FCALL *h_refcnt[HANDLE_TYPE_COUNT])(void const *__restrict ptr);
+
+	/* ============== Normal (strong) reference counting API */
+	refcnt_t /*NOTHROW*/ (NOBLOCK WUNUSED NONNULL((1)) FCALL *h_refcnt[HANDLE_TYPE_COUNT])(/*T*/ void const *__restrict ptr);
+	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_incref[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr);
+	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_decref[HANDLE_TYPE_COUNT])(REF /*T*/ void *__restrict ptr);
+	__BOOL /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_tryincref[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr);
+
+	/* ============== Weak reference counting API */
+	WEAK REF void * /*NOTHROW*/ (NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) FCALL *h_weakgetref[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr);
+	REF /*T*/ void * /*NOTHROW*/ (NOBLOCK WUNUSED NONNULL((1)) FCALL *h_weaklckref[HANDLE_TYPE_COUNT])(void *__restrict weakref_ptr);
+	void /*NOTHROW*/ (NOBLOCK NONNULL((1)) FCALL *h_weakdecref[HANDLE_TYPE_COUNT])(WEAK REF void *__restrict weakref_ptr);
 
 	/* Basic read/write primitives.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: 0 : EOF has been reached
 	 * @return: * : The amount of read/written bytes (`<= num_bytes') */
-	size_t (WUNUSED NONNULL((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1)) KCALL *h_write[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1)) KCALL *h_read[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1)) KCALL *h_write[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
 
 	/* Position-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
 	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (WUNUSED NONNULL((1)) KCALL *h_pread[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1)) KCALL *h_pwrite[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1)) KCALL *h_pread[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1)) KCALL *h_pwrite[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
 
 	/* Vector-based read/write primitives.
 	 * @throws: * : Same as `h_read' / `h_write'
 	 * @return: * : Same as `h_read' / `h_write' */
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_readv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_writev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
-	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_readv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_writev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_preadv[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
+	size_t (WUNUSED NONNULL((1, 2)) KCALL *h_pwritev[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) /*THROWS(...)*/;
 
 	/* Read a directory entry from the given handle.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @return: * : The required buffer size for the current entry */
-	size_t (NONNULL((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED struct dirent *buf,
+	size_t (NONNULL((1)) KCALL *h_readdir[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, USER CHECKED struct dirent *buf,
 	                                                          size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode)
 			/*THROWS(...)*/;
 
 	/* Seek within the data stream. */
-	pos_t (NONNULL((1)) KCALL *h_seek[HANDLE_TYPE_COUNT])(void *__restrict ptr,
+	pos_t (NONNULL((1)) KCALL *h_seek[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
 	                                                      off_t offset,
 	                                                      unsigned int whence)
 			/*THROWS(...)*/;
@@ -113,12 +143,12 @@ struct handle_types {
 	/* Perform an ioctl() operation.
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment)
 	 * @throws: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND: [...] */
-	syscall_slong_t (NONNULL((1)) KCALL *h_ioctl[HANDLE_TYPE_COUNT])(void *__restrict ptr, syscall_ulong_t cmd,
+	syscall_slong_t (NONNULL((1)) KCALL *h_ioctl[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t cmd,
 	                                                                 USER UNCHECKED void *arg, iomode_t mode)
 			/*THROWS(E_INVALID_ARGUMENT_UNKNOWN_COMMAND, ...)*/;
 
 	/* Change the effective size of the object (s.a. `ftruncate()'). */
-	void (NONNULL((1)) KCALL *h_truncate[HANDLE_TYPE_COUNT])(void *__restrict ptr, pos_t new_size)
+	void (NONNULL((1)) KCALL *h_truncate[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, pos_t new_size)
 			/*THROWS(...)*/;
 
 	/* @param: pminoffset: Set to a base offset to-be added to the mmap file-offset when mapping memory.
@@ -136,7 +166,7 @@ struct handle_types {
 	 * @return: * :        The datablock to-be used for mapping this handle into memory (never NULL). */
 	REF struct vm_datablock *
 	(ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 4, 5)) KCALL *
-	 h_mmap[HANDLE_TYPE_COUNT])(void *__restrict ptr,
+	 h_mmap[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
 	                            pos_t *__restrict pminoffset,
 	                            pos_t *__restrict pnumbytes,
 	                            REF struct path **__restrict pdatablock_fspath,
@@ -144,31 +174,31 @@ struct handle_types {
 			/*THROWS(...)*/;
 
 	/* @return: * : The amount of newly allocated bytes. */
-	pos_t (NONNULL((1)) KCALL *h_allocate[HANDLE_TYPE_COUNT])(void *__restrict ptr,
+	pos_t (NONNULL((1)) KCALL *h_allocate[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
 	                                                          fallocate_mode_t mode,
 	                                                          pos_t start, pos_t length)
 			/*THROWS(...)*/;
 
 	/* Synchronize data */
-	void (NONNULL((1)) KCALL *h_sync[HANDLE_TYPE_COUNT])(void *__restrict ptr) /*THROWS(...)*/;
-	void (NONNULL((1)) KCALL *h_datasync[HANDLE_TYPE_COUNT])(void *__restrict ptr) /*THROWS(...)*/;
+	void (NONNULL((1)) KCALL *h_sync[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr) /*THROWS(...)*/;
+	void (NONNULL((1)) KCALL *h_datasync[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr) /*THROWS(...)*/;
 
 	/* Gather stat-information (s.a. `fstat()')
 	 * NOTE: The given `result' will _NOT_ have been initialized already! */
-	void (NONNULL((1)) KCALL *h_stat[HANDLE_TYPE_COUNT])(void *__restrict ptr,
+	void (NONNULL((1)) KCALL *h_stat[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr,
 	                                                     USER CHECKED struct stat *result)
 			/*THROWS(...)*/;
 
 	/* Connect to the signals for monitoring `what' */
-	void (NONNULL((1)) KCALL *h_pollconnect[HANDLE_TYPE_COUNT])(void *__restrict ptr, poll_mode_t what)
+	void (NONNULL((1)) KCALL *h_pollconnect[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, poll_mode_t what)
 			/*THROWS(...)*/;
 	/* @return: * : Set of available signals. */
-	poll_mode_t (WUNUSED NONNULL((1)) KCALL *h_polltest[HANDLE_TYPE_COUNT])(void *__restrict ptr, poll_mode_t what)
+	poll_mode_t (WUNUSED NONNULL((1)) KCALL *h_polltest[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, poll_mode_t what)
 			/*THROWS(...)*/;
 
 	/* Implement handle control operations (s.a. `<kos/hop/[...].h>')
 	 * @throws: E_WOULDBLOCK: `IO_NONBLOCK' was given and no data/space was available (at the moment) */
-	syscall_slong_t (NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(void *__restrict ptr, syscall_ulong_t cmd,
+	syscall_slong_t (NONNULL((1)) KCALL *h_hop[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, syscall_ulong_t cmd,
 	                                                               USER UNCHECKED void *arg, iomode_t mode)
 			/*THROWS(...)*/;
 
@@ -177,7 +207,7 @@ struct handle_types {
 	 * NOTE: This operator is allowed to throw exceptions, however only as the result
 	 *       of attempting to acquire some kind of lock while preemption was disabled.
 	 * The caller must ensure that `wanted_type' isn't already this handle's type. */
-	REF void *(NONNULL((1)) KCALL *h_tryas[HANDLE_TYPE_COUNT])(void *__restrict ptr, uintptr_half_t wanted_type)
+	REF void *(NONNULL((1)) KCALL *h_tryas[HANDLE_TYPE_COUNT])(/*T*/ void *__restrict ptr, uintptr_half_t wanted_type)
 			/*THROWS(E_WOULDBLOCK)*/;
 }
 #ifdef __INTELLISENSE__
@@ -224,10 +254,11 @@ FUNDEF NONNULL((2)) __BOOL KCALL handle_datasize(struct handle const &__restrict
 #define HANDLE_FUNC(self, name) (*handle_type_db.name[(self).h_type])
 
 #define handle_typename(self)                                    handle_type_db.h_typename[(self).h_type]
-#define handle_refcnt(self)                                      HANDLE_FUNC(self, h_refcnt)((self).h_data)
-#define handle_tryincref(self)                                   HANDLE_FUNC(self, h_tryincref)((self).h_data)
 #define handle_incref(self)                                      HANDLE_FUNC(self, h_incref)((self).h_data)
 #define handle_decref(self)                                      HANDLE_FUNC(self, h_decref)((self).h_data)
+#define handle_refcnt(self)                                      HANDLE_FUNC(self, h_refcnt)((self).h_data)
+#define handle_tryincref(self)                                   HANDLE_FUNC(self, h_tryincref)((self).h_data)
+#define handle_weakgetref(self)                                  HANDLE_FUNC(self, h_weakgetref)((self).h_data)
 #define handle_read(self, dst, num_bytes)                        HANDLE_FUNC(self, h_read)((self).h_data, dst, num_bytes, (self).h_mode)
 #define handle_write(self, src, num_bytes)                       HANDLE_FUNC(self, h_write)((self).h_data, src, num_bytes, (self).h_mode)
 #define handle_readf(self, dst, num_bytes, mode)                 HANDLE_FUNC(self, h_read)((self).h_data, dst, num_bytes, mode)
@@ -273,7 +304,6 @@ _handle_poll(struct handle *__restrict self, poll_mode_t what) {
 	}
 	return result;
 }
-
 
 #ifdef __cplusplus
 extern "C++" {

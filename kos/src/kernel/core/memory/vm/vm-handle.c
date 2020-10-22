@@ -40,7 +40,7 @@
 DECL_BEGIN
 
 /* VM HANDLE OPERATIONS */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(vm, struct vm)
+DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(vm, struct vm)
 
 INTERN WUNUSED NONNULL((1)) size_t KCALL
 handle_vm_pread(struct vm *__restrict self,

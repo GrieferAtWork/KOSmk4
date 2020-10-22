@@ -41,9 +41,10 @@
 DECL_BEGIN
 
 /* Driver-handle API */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(driver, struct driver);
+DEFINE_HANDLE_REFCNT_FUNCTIONS_WITH_WEAKREF_SUPPORT(driver, struct driver);
 DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_state, struct driver_state);
 DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_section, struct driver_section);
+
 
 PRIVATE NOBLOCK uintptr_t
 NOTHROW(KCALL hop_driver_getstate)(struct driver const *__restrict self) {

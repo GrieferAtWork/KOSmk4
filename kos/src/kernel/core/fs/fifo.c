@@ -48,7 +48,7 @@
 
 DECL_BEGIN
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(fifo_user, struct fifo_user)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(fifo_user, struct fifo_user);
 
 INTDEF syscall_slong_t KCALL
 ringbuffer_pipe_hop(struct ringbuffer *__restrict self,

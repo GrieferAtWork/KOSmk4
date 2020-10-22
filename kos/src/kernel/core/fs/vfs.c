@@ -59,9 +59,7 @@ DECL_BEGIN
 /* Path allocation functions. (using a cache, because of how
  * often path objects can potentially be allocated and freed) */
 DEFINE_PREALLOCATION_CACHE(PUBLIC, path, struct path, 256)
-
-
-DEFINE_HANDLE_REFCNT_FUNCTIONS(path, struct path)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(path, struct path);
 
 INTERN NONNULL((1)) REF void *KCALL
 handle_path_tryas(struct path *__restrict self,
@@ -266,7 +264,7 @@ handle_path_hop(struct path *__restrict self,
 
 
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(fs, struct fs)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(fs, struct fs);
 /* TODO: Other handle operators */
 
 

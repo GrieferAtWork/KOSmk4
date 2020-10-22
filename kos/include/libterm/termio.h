@@ -116,7 +116,8 @@ struct terminal {
 	(ringbuffer_fini(&(self)->t_ibuf),  \
 	 linebuffer_fini(&(self)->t_canon), \
 	 linebuffer_fini(&(self)->t_opend), \
-	 linebuffer_fini(&(self)->t_ipend))
+	 linebuffer_fini(&(self)->t_ipend), \
+	 sched_signal_broadcast_for_fini(&(self)->t_ioschange))
 
 /* Initialize/Finalize the given terminal controller. */
 typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void

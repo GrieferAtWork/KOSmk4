@@ -115,7 +115,9 @@ struct linebuffer {
 	 sched_signal_cinit(&(self)->lb_nful))
 #define linebuffer_init(self)   linebuffer_init_ex(self, LINEBUFFER_DEFAULT_LIMIT)
 #define linebuffer_cinit(self)  linebuffer_cinit_ex(self, LINEBUFFER_DEFAULT_LIMIT)
-#define linebuffer_fini(self)   (linebuffer_close(self), linecapture_fini(&(self)->lb_line))
+#define linebuffer_fini(self)                           \
+	(sched_signal_broadcast_for_fini(&(self)->lb_nful), \
+	 linecapture_fini(&(self)->lb_line))
 
 
 /* Poll for writing to become possible. */

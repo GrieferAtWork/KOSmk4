@@ -47,7 +47,7 @@
 DECL_BEGIN
 
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(blockdevice, struct basic_block_device)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(blockdevice, struct basic_block_device);
 
 INTERN NONNULL((1)) REF void *KCALL
 handle_blockdevice_tryas(struct basic_block_device *__restrict self,
