@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8180ab1d */
+/* HASH CRC-32:0x6bdf097f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -510,7 +510,7 @@
 #define __NR32AN0_epoll_ctl                    epfd
 #define __NR32AN1_epoll_ctl                    op
 #define __NR32AN2_epoll_ctl                    fd
-#define __NR32AN3_epoll_ctl                    event
+#define __NR32AN3_epoll_ctl                    info
 #define __NR32AN0_epoll_wait                   epfd
 #define __NR32AN1_epoll_wait                   events
 #define __NR32AN2_epoll_wait                   maxevents
@@ -684,6 +684,7 @@
 #define __NR32AN2_epoll_pwait                  maxevents
 #define __NR32AN3_epoll_pwait                  timeout
 #define __NR32AN4_epoll_pwait                  ss
+#define __NR32AN5_epoll_pwait                  sigsetsize
 #define __NR32AN0_utimensat                    dirfd
 #define __NR32AN1_utimensat                    filename
 #define __NR32AN2_utimensat                    times
@@ -1955,13 +1956,13 @@
 #define __NR32ATR0_epoll_ctl                    SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR32ATR1_epoll_ctl                    SC_REPR_EPOLL_OP                                                     /* op */ 
 #define __NR32ATR2_epoll_ctl                    SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR3_epoll_ctl                    SC_REPR_POINTER                                                      /* event */ 
+#define __NR32ATR3_epoll_ctl                    SC_REPR_POINTER                                                      /* info */ 
 #define __NR32RTR_epoll_ctl                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_epoll_wait                   SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR32ATR1_epoll_wait                   SC_REPR_POINTER                                                      /* events */ 
-#define __NR32ATR2_epoll_wait                   SC_REPR_SYSCALL_ULONG_T                                              /* maxevents */ 
+#define __NR32ATR2_epoll_wait                   SC_REPR_SIZE_T                                                       /* maxevents */ 
 #define __NR32ATR3_epoll_wait                   SC_REPR_SYSCALL_SLONG_T                                              /* timeout */ 
-#define __NR32RTR_epoll_wait                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32RTR_epoll_wait                    SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_remap_file_pages             SC_REPR_POINTER                                                      /* start */ 
 #define __NR32ATR1_remap_file_pages             SC_REPR_SIZE_T                                                       /* size */ 
 #define __NR32ATR2_remap_file_pages             SC_REPR_MMAP_PROT                                                    /* prot */ 
@@ -2217,10 +2218,12 @@
 #define __NR32RTR_getcpu                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_epoll_pwait                  SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR32ATR1_epoll_pwait                  SC_REPR_POINTER                                                      /* events */ 
-#define __NR32ATR2_epoll_pwait                  SC_REPR_SYSCALL_ULONG_T                                              /* maxevents */ 
+#define __NR32ATR2_epoll_pwait                  SC_REPR_SIZE_T                                                       /* maxevents */ 
 #define __NR32ATR3_epoll_pwait                  SC_REPR_SYSCALL_SLONG_T                                              /* timeout */ 
 #define __NR32ATR4_epoll_pwait                  SC_REPR_STRUCT_SIGSET                                                /* ss */ 
-#define __NR32RTR_epoll_pwait                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATL4_epoll_pwait                  5                                                                    /* ss -> sigsetsize */ 
+#define __NR32ATR5_epoll_pwait                  SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NR32RTR_epoll_pwait                   SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_utimensat                    SC_REPR_FD_T                                                         /* dirfd */ 
 #define __NR32ATR1_utimensat                    SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATL1_utimensat                    0                                                                    /* filename -> dirfd */ 
@@ -2260,7 +2263,7 @@
 #define __NR32ATR0_eventfd2                     SC_REPR_SYSCALL_ULONG_T                                              /* initval */ 
 #define __NR32ATR1_eventfd2                     SC_REPR_EVENTFD2_FLAGS                                               /* flags */ 
 #define __NR32RTR_eventfd2                      SC_REPR_FD_T                                                         /* return */
-#define __NR32ATR0_epoll_create1                SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR32ATR0_epoll_create1                SC_REPR_EPOLL_CREATE1_FLAGS                                          /* flags */ 
 #define __NR32RTR_epoll_create1                 SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_dup3                         SC_REPR_FD_T                                                         /* oldfd */ 
 #define __NR32ATR1_dup3                         SC_REPR_FD_T                                                         /* newfd */ 

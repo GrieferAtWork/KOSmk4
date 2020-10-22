@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37733554 */
+/* HASH CRC-32:0x96746adc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,12 +82,13 @@
 #define __NRAN0_epoll_ctl              epfd
 #define __NRAN1_epoll_ctl              op
 #define __NRAN2_epoll_ctl              fd
-#define __NRAN3_epoll_ctl              event
+#define __NRAN3_epoll_ctl              info
 #define __NRAN0_epoll_pwait            epfd
 #define __NRAN1_epoll_pwait            events
 #define __NRAN2_epoll_pwait            maxevents
 #define __NRAN3_epoll_pwait            timeout
 #define __NRAN4_epoll_pwait            ss
+#define __NRAN5_epoll_pwait            sigsetsize
 #define __NRAN0_dup                    fd
 #define __NRAN0_dup3                   oldfd
 #define __NRAN1_dup3                   newfd
@@ -852,19 +853,21 @@
 #define __NRATR0_eventfd2               SC_REPR_SYSCALL_ULONG_T                                 /* initval */ 
 #define __NRATR1_eventfd2               SC_REPR_EVENTFD2_FLAGS                                  /* flags */ 
 #define __NRRTR_eventfd2                SC_REPR_FD_T                                            /* return */
-#define __NRATR0_epoll_create1          SC_REPR_SYSCALL_ULONG_T                                 /* flags */ 
+#define __NRATR0_epoll_create1          SC_REPR_EPOLL_CREATE1_FLAGS                             /* flags */ 
 #define __NRRTR_epoll_create1           SC_REPR_FD_T                                            /* return */
 #define __NRATR0_epoll_ctl              SC_REPR_FD_T                                            /* epfd */ 
 #define __NRATR1_epoll_ctl              SC_REPR_EPOLL_OP                                        /* op */ 
 #define __NRATR2_epoll_ctl              SC_REPR_FD_T                                            /* fd */ 
-#define __NRATR3_epoll_ctl              SC_REPR_POINTER                                         /* event */ 
+#define __NRATR3_epoll_ctl              SC_REPR_POINTER                                         /* info */ 
 #define __NRRTR_epoll_ctl               SC_REPR_ERRNO_T                                         /* return */
 #define __NRATR0_epoll_pwait            SC_REPR_FD_T                                            /* epfd */ 
 #define __NRATR1_epoll_pwait            SC_REPR_POINTER                                         /* events */ 
-#define __NRATR2_epoll_pwait            SC_REPR_SYSCALL_ULONG_T                                 /* maxevents */ 
+#define __NRATR2_epoll_pwait            SC_REPR_SIZE_T                                          /* maxevents */ 
 #define __NRATR3_epoll_pwait            SC_REPR_SYSCALL_SLONG_T                                 /* timeout */ 
 #define __NRATR4_epoll_pwait            SC_REPR_STRUCT_SIGSET                                   /* ss */ 
-#define __NRRTR_epoll_pwait             SC_REPR_ERRNO_T                                         /* return */
+#define __NRATL4_epoll_pwait            5                                                       /* ss -> sigsetsize */ 
+#define __NRATR5_epoll_pwait            SC_REPR_SIZE_T                                          /* sigsetsize */ 
+#define __NRRTR_epoll_pwait             SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_dup                    SC_REPR_FD_T                                            /* fd */ 
 #define __NRRTR_dup                     SC_REPR_FD_T                                            /* return */
 #define __NRATR0_dup3                   SC_REPR_FD_T                                            /* oldfd */ 
@@ -1874,9 +1877,9 @@
 #define __NRRTR_poll                    SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_epoll_wait             SC_REPR_FD_T                                            /* epfd */ 
 #define __NRATR1_epoll_wait             SC_REPR_POINTER                                         /* events */ 
-#define __NRATR2_epoll_wait             SC_REPR_SYSCALL_ULONG_T                                 /* maxevents */ 
+#define __NRATR2_epoll_wait             SC_REPR_SIZE_T                                          /* maxevents */ 
 #define __NRATR3_epoll_wait             SC_REPR_SYSCALL_SLONG_T                                 /* timeout */ 
-#define __NRRTR_epoll_wait              SC_REPR_ERRNO_T                                         /* return */
+#define __NRRTR_epoll_wait              SC_REPR_SSIZE_T                                         /* return */
 #define __NRATR0_ustat                  SC_REPR_DEV_BLK                                         /* dev */ 
 #define __NRATR1_ustat                  SC_REPR_POINTER                                         /* ubuf */ 
 #define __NRRTR_ustat                   SC_REPR_ERRNO_T                                         /* return */

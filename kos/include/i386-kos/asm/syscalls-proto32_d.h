@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafdbdfe8 */
+/* HASH CRC-32:0xaecadce2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -353,7 +353,7 @@
 #define __NR32AC_vmsplice                     4
 #define __NR32AC_move_pages                   1
 #define __NR32AC_getcpu                       3
-#define __NR32AC_epoll_pwait                  5
+#define __NR32AC_epoll_pwait                  6
 #define __NR32AC_utimensat                    4
 #define __NR32AC_signalfd                     3
 #define __NR32AC_timerfd_create               2
@@ -796,7 +796,7 @@
 #define __NR32RT_lookup_dcookie               (errno_t, __errno_t)
 #define __NR32RT_epoll_create                 (fd_t, __fd_t)
 #define __NR32RT_epoll_ctl                    (errno_t, __errno_t)
-#define __NR32RT_epoll_wait                   (errno_t, __errno_t)
+#define __NR32RT_epoll_wait                   (ssize_t, __ssize_t)
 #define __NR32RT_remap_file_pages             (errno_t, __errno_t)
 #define __NR32RT_set_tid_address              (pid_t, __pid_t)
 #define __NR32RT_timer_create                 (errno_t, __errno_t)
@@ -858,7 +858,7 @@
 #define __NR32RT_vmsplice                     (ssize_t, __ssize_t)
 #define __NR32RT_move_pages                   (errno_t, __errno_t)
 #define __NR32RT_getcpu                       (errno_t, __errno_t)
-#define __NR32RT_epoll_pwait                  (errno_t, __errno_t)
+#define __NR32RT_epoll_pwait                  (ssize_t, __ssize_t)
 #define __NR32RT_utimensat                    (errno_t, __errno_t)
 #define __NR32RT_signalfd                     (errno_t, __errno_t)
 #define __NR32RT_timerfd_create               (fd_t, __fd_t)
@@ -1535,7 +1535,7 @@
 #define __NR32AT3_epoll_ctl                    (struct epoll_event *, struct epoll_event *)
 #define __NR32AT0_epoll_wait                   (fd_t, __fd_t)
 #define __NR32AT1_epoll_wait                   (struct epoll_event *, struct epoll_event *)
-#define __NR32AT2_epoll_wait                   (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT2_epoll_wait                   (size_t, __size_t)
 #define __NR32AT3_epoll_wait                   (syscall_slong_t, __syscall_slong_t)
 #define __NR32AT0_remap_file_pages             (void *, void *)
 #define __NR32AT1_remap_file_pages             (size_t, __size_t)
@@ -1703,9 +1703,10 @@
 #define __NR32AT2_getcpu                       (struct getcpu_cache *, struct getcpu_cache *)
 #define __NR32AT0_epoll_pwait                  (fd_t, __fd_t)
 #define __NR32AT1_epoll_pwait                  (struct epoll_event *, struct epoll_event *)
-#define __NR32AT2_epoll_pwait                  (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT2_epoll_pwait                  (size_t, __size_t)
 #define __NR32AT3_epoll_pwait                  (syscall_slong_t, __syscall_slong_t)
 #define __NR32AT4_epoll_pwait                  (struct __sigset_struct const *, struct __sigset_struct const *)
+#define __NR32AT5_epoll_pwait                  (size_t, __size_t)
 #define __NR32AT0_utimensat                    (fd_t, __fd_t)
 #define __NR32AT1_utimensat                    (char const *, char const *)
 #define __NR32AT2_utimensat                    (struct timespecx32 const *, struct __timespecx32 const *)
@@ -2463,7 +2464,7 @@
 #define __NR32AM_lookup_dcookie(a, b, c, d, e, f)               (int)a
 #define __NR32AM_epoll_create(a, b, c, d, e, f)                 (__syscall_ulong_t)a
 #define __NR32AM_epoll_ctl(a, b, c, d, e, f)                    (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
-#define __NR32AM_epoll_wait(a, b, c, d, e, f)                   (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d
+#define __NR32AM_epoll_wait(a, b, c, d, e, f)                   (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d
 #define __NR32AM_remap_file_pages(a, b, c, d, e, f)             (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__size_t)d, (__syscall_ulong_t)e
 #define __NR32AM_set_tid_address(a, b, c, d, e, f)              (__pid_t *)a
 #define __NR32AM_timer_create(a, b, c, d, e, f)                 (__clockid_t)a, (struct sigevent *)b, (__timer_t *)c
@@ -2525,7 +2526,7 @@
 #define __NR32AM_vmsplice(a, b, c, d, e, f)                     (__fd_t)a, (struct __iovecx32 const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NR32AM_move_pages(a, b, c, d, e, f)                   (int)a
 #define __NR32AM_getcpu(a, b, c, d, e, f)                       (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
-#define __NR32AM_epoll_pwait(a, b, c, d, e, f)                  (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e
+#define __NR32AM_epoll_pwait(a, b, c, d, e, f)                  (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e, (__size_t)f
 #define __NR32AM_utimensat(a, b, c, d, e, f)                    (__fd_t)a, (char const *)b, (struct __timespecx32 const *)c, (__atflag_t)d
 #define __NR32AM_signalfd(a, b, c, d, e, f)                     (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c
 #define __NR32AM_timerfd_create(a, b, c, d, e, f)               (__clockid_t)a, (__syscall_ulong_t)b
@@ -3030,7 +3031,7 @@
 #define __NR32AP_vmsplice(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_move_pages(a)                                  (__syscall_ulong_t)a
 #define __NR32AP_getcpu(a, b, c)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
-#define __NR32AP_epoll_pwait(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR32AP_epoll_pwait(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_utimensat(a, b, c, d)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_signalfd(a, b, c)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_timerfd_create(a, b)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b

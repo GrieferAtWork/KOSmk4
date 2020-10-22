@@ -1624,18 +1624,19 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
      defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64))
 #define WANT_SYS_SELECT 1
 #endif /* select... */
-#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||               \
-     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||             \
-     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) ||        \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6) ||            \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||         \
-     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) ||     \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||        \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) ||      \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64) || \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) ||     \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64) ||  \
-     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64))
+#if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||                  \
+     defined(__ARCH_WANT_SYSCALL_PPOLL64) ||                \
+     defined(__ARCH_WANT_SYSCALL_PPOLL_TIME64) ||           \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6) ||               \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_64) ||            \
+     defined(__ARCH_WANT_SYSCALL_PSELECT6_TIME64) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL) ||           \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL64) ||         \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PPOLL_TIME64) ||    \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6) ||        \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_64) ||     \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_PSELECT6_TIME64) || \
+     defined(__ARCH_WANT_SYSCALL_EPOLL_PWAIT))
 #define WANT_SYS_POLLSELECT_SIGSET 1
 #endif /* p(poll|select)... */
 #if (defined(__ARCH_WANT_SYSCALL_PPOLL) ||          \
@@ -1897,6 +1898,36 @@ atomic_sigmask_return(USER CHECKED sigset_t *mymask,
 	sigmask_check_after_syscall(syscall_result);
 }
 #endif /* WANT_SYS_POLLSELECT_SIGSET */
+
+#ifdef __ARCH_WANT_SYSCALL_EPOLL_PWAIT
+#undef sigmask
+DEFINE_SYSCALL6(ssize_t, epoll_pwait,
+                fd_t, epfd, USER UNCHECKED struct epoll_event *, events,
+                size_t, maxevents, syscall_slong_t, timeout,
+                USER UNCHECKED sigset_t const *, sigmask, size_t, sigsetsize) {
+	ssize_t result;
+	if unlikely(sigsetsize != sizeof(sigset_t))
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGNAL_SIGSET_SIZE,
+		      sigsetsize);
+	if (sigmask) {
+		sigset_t oldmask;
+		USER CHECKED sigset_t *mymask;
+		mymask = sigmask_getwr();
+		atomic_sigmask_begin(mymask, &oldmask, sigmask);
+		TRY {
+			result = sys_epoll_wait(epfd, events, maxevents, timeout);
+		} EXCEPT {
+			atomic_sigmask_except(mymask, &oldmask);
+			RETHROW();
+		}
+		atomic_sigmask_return(mymask, &oldmask, result);
+	} else {
+		result = sys_epoll_wait(epfd, events, maxevents, timeout);
+	}
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_EPOLL_PWAIT */
 
 #ifdef WANT_SYS_POLL_SIGSET
 #undef sigmask

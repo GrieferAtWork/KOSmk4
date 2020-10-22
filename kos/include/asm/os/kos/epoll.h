@@ -38,7 +38,7 @@
 #define __EPOLLRDHUP    0x00002000 /* Socket peer closed connection, or shut down writing half of its connection */
 #define __EPOLLWAKEUP   0x20000000 /* Currently ignored */
 #define __EPOLLONESHOT  0x40000000 /* Automatically stop monitoring the file descriptor once it's condition is met. */
-#define __EPOLLET       0x80000000 /* Enable edge-triggered monitoring (not supported on KOS) */
+#define __EPOLLET       0x80000000 /* Enable edge-triggered monitoring */
 
 /* Event types always implicitly polled for. */
 #define __EPOLLERR      0x00000008 /* Error condition. */
@@ -50,6 +50,9 @@
 #define __EPOLL_CTL_MOD 3 /* Change the `struct epoll_event' associated with a given file descriptor. */
 
 /* Flags accepted by `epoll_create1(2)'. */
-#define __EPOLL_CLOEXEC 0x80000 /* Set the IO_CLOEXEC flag */
+#define __EPOLL_CLOEXEC 0x080000 /* Set the IO_CLOEXEC flag */
+#ifdef __KOS__
+#define __EPOLL_CLOFORK 0x100000 /* Set the IO_CLOFORK flag */
+#endif /* __KOS__ */
 
 #endif /* !_ASM_OS_KOS_EPOLL_H */

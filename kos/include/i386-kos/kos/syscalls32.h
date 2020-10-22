@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38a0f48f */
+/* HASH CRC-32:0x1c5f7f2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -473,20 +473,70 @@ __CDECLARE_SC(,__fd_t,dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 __CDECLARE_SC(,__fd_t,dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
 #endif /* __CRT_HAVE_SC(dup3) */
 #if __CRT_HAVE_SC(epoll_create)
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_SC(,__fd_t,epoll_create,(__syscall_ulong_t __size),(__size))
 #endif /* __CRT_HAVE_SC(epoll_create) */
 #if __CRT_HAVE_SC(epoll_create1)
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
+ * @return: * :   The newly created epoll control descriptor.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 __CDECLARE_SC(,__fd_t,epoll_create1,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_SC(epoll_create1) */
 #if __CRT_HAVE_SC(epoll_ctl)
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-__CDECLARE_SC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_t __fd, struct epoll_event *__event),(__epfd,__op,__fd,__event))
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+__CDECLARE_SC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_t __fd, struct epoll_event *__info),(__epfd,__op,__fd,__info))
 #endif /* __CRT_HAVE_SC(epoll_ctl) */
 #if __CRT_HAVE_SC(epoll_pwait)
-__CDECLARE_SC(,__errno_t,epoll_pwait,(__fd_t __epfd, struct epoll_event *__events, __syscall_ulong_t __maxevents, __syscall_slong_t __timeout, struct __sigset_struct const *__ss),(__epfd,__events,__maxevents,__timeout,__ss))
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+__CDECLARE_SC(,__ssize_t,epoll_pwait,(__fd_t __epfd, struct epoll_event *__events, __size_t __maxevents, __syscall_slong_t __timeout, struct __sigset_struct const *__ss, __size_t __sigsetsize),(__epfd,__events,__maxevents,__timeout,__ss,__sigsetsize))
 #endif /* __CRT_HAVE_SC(epoll_pwait) */
 #if __CRT_HAVE_SC(epoll_wait)
-__CDECLARE_SC(,__errno_t,epoll_wait,(__fd_t __epfd, struct epoll_event *__events, __syscall_ulong_t __maxevents, __syscall_slong_t __timeout),(__epfd,__events,__maxevents,__timeout))
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+__CDECLARE_SC(,__ssize_t,epoll_wait,(__fd_t __epfd, struct epoll_event *__events, __size_t __maxevents, __syscall_slong_t __timeout),(__epfd,__events,__maxevents,__timeout))
 #endif /* __CRT_HAVE_SC(epoll_wait) */
 #if __CRT_HAVE_SC(eventfd)
 __CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
@@ -2830,20 +2880,70 @@ __CDECLARE_XSC(,__fd_t,dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,__newfd))
 __CDECLARE_XSC(,__fd_t,dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
 #endif /* __CRT_HAVE_XSC(dup3) */
 #if __CRT_HAVE_XSC(epoll_create)
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 __CDECLARE_XSC(,__fd_t,epoll_create,(__syscall_ulong_t __size),(__size))
 #endif /* __CRT_HAVE_XSC(epoll_create) */
 #if __CRT_HAVE_XSC(epoll_create1)
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
+ * @return: * :   The newly created epoll control descriptor.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 __CDECLARE_XSC(,__fd_t,epoll_create1,(__syscall_ulong_t __flags),(__flags))
 #endif /* __CRT_HAVE_XSC(epoll_create1) */
 #if __CRT_HAVE_XSC(epoll_ctl)
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-__CDECLARE_XSC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_t __fd, struct epoll_event *__event),(__epfd,__op,__fd,__event))
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+__CDECLARE_XSC(,__errno_t,epoll_ctl,(__fd_t __epfd, __syscall_ulong_t __op, __fd_t __fd, struct epoll_event *__info),(__epfd,__op,__fd,__info))
 #endif /* __CRT_HAVE_XSC(epoll_ctl) */
 #if __CRT_HAVE_XSC(epoll_pwait)
-__CDECLARE_XSC(,__errno_t,epoll_pwait,(__fd_t __epfd, struct epoll_event *__events, __syscall_ulong_t __maxevents, __syscall_slong_t __timeout, struct __sigset_struct const *__ss),(__epfd,__events,__maxevents,__timeout,__ss))
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+__CDECLARE_XSC(,__ssize_t,epoll_pwait,(__fd_t __epfd, struct epoll_event *__events, __size_t __maxevents, __syscall_slong_t __timeout, struct __sigset_struct const *__ss, __size_t __sigsetsize),(__epfd,__events,__maxevents,__timeout,__ss,__sigsetsize))
 #endif /* __CRT_HAVE_XSC(epoll_pwait) */
 #if __CRT_HAVE_XSC(epoll_wait)
-__CDECLARE_XSC(,__errno_t,epoll_wait,(__fd_t __epfd, struct epoll_event *__events, __syscall_ulong_t __maxevents, __syscall_slong_t __timeout),(__epfd,__events,__maxevents,__timeout))
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+__CDECLARE_XSC(,__ssize_t,epoll_wait,(__fd_t __epfd, struct epoll_event *__events, __size_t __maxevents, __syscall_slong_t __timeout),(__epfd,__events,__maxevents,__timeout))
 #endif /* __CRT_HAVE_XSC(epoll_wait) */
 #if __CRT_HAVE_XSC(eventfd)
 __CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))

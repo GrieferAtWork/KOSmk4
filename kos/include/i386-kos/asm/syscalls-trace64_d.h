@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90ad1d01 */
+/* HASH CRC-32:0xee70ca6f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -466,7 +466,7 @@
 #define __NR64AN0_epoll_ctl_old            epfd
 #define __NR64AN1_epoll_ctl_old            op
 #define __NR64AN2_epoll_ctl_old            fd
-#define __NR64AN3_epoll_ctl_old            event
+#define __NR64AN3_epoll_ctl_old            info
 #define __NR64AN0_epoll_wait_old           epfd
 #define __NR64AN1_epoll_wait_old           events
 #define __NR64AN2_epoll_wait_old           maxevents
@@ -511,7 +511,7 @@
 #define __NR64AN0_epoll_ctl                epfd
 #define __NR64AN1_epoll_ctl                op
 #define __NR64AN2_epoll_ctl                fd
-#define __NR64AN3_epoll_ctl                event
+#define __NR64AN3_epoll_ctl                info
 #define __NR64AN0_tgkill                   pid
 #define __NR64AN1_tgkill                   tid
 #define __NR64AN2_tgkill                   signo
@@ -650,6 +650,7 @@
 #define __NR64AN2_epoll_pwait              maxevents
 #define __NR64AN3_epoll_pwait              timeout
 #define __NR64AN4_epoll_pwait              ss
+#define __NR64AN5_epoll_pwait              sigsetsize
 #define __NR64AN0_signalfd                 fd
 #define __NR64AN1_signalfd                 sigmask
 #define __NR64AN2_signalfd                 sigmasksize
@@ -1667,13 +1668,13 @@
 #define __NR64ATR0_epoll_ctl_old            SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_ctl_old            SC_REPR_EPOLL_OP                                                     /* op */ 
 #define __NR64ATR2_epoll_ctl_old            SC_REPR_FD_T                                                         /* fd */ 
-#define __NR64ATR3_epoll_ctl_old            SC_REPR_POINTER                                                      /* event */ 
+#define __NR64ATR3_epoll_ctl_old            SC_REPR_POINTER                                                      /* info */ 
 #define __NR64RTR_epoll_ctl_old             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_epoll_wait_old           SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_wait_old           SC_REPR_POINTER                                                      /* events */ 
-#define __NR64ATR2_epoll_wait_old           SC_REPR_SYSCALL_ULONG_T                                              /* maxevents */ 
+#define __NR64ATR2_epoll_wait_old           SC_REPR_SIZE_T                                                       /* maxevents */ 
 #define __NR64ATR3_epoll_wait_old           SC_REPR_SYSCALL_SLONG_T                                              /* timeout */ 
-#define __NR64RTR_epoll_wait_old            SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64RTR_epoll_wait_old            SC_REPR_SSIZE_T                                                      /* return */
 #define __NR64ATR0_remap_file_pages         SC_REPR_POINTER                                                      /* start */ 
 #define __NR64ATR1_remap_file_pages         SC_REPR_SIZE_T                                                       /* size */ 
 #define __NR64ATR2_remap_file_pages         SC_REPR_MMAP_PROT                                                    /* prot */ 
@@ -1725,13 +1726,13 @@
 #define __NR64RTR_exit_group                SC_REPR_SIGHANDLER_T                                                 /* return */
 #define __NR64ATR0_epoll_wait               SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_wait               SC_REPR_POINTER                                                      /* events */ 
-#define __NR64ATR2_epoll_wait               SC_REPR_SYSCALL_ULONG_T                                              /* maxevents */ 
+#define __NR64ATR2_epoll_wait               SC_REPR_SIZE_T                                                       /* maxevents */ 
 #define __NR64ATR3_epoll_wait               SC_REPR_SYSCALL_SLONG_T                                              /* timeout */ 
-#define __NR64RTR_epoll_wait                SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64RTR_epoll_wait                SC_REPR_SSIZE_T                                                      /* return */
 #define __NR64ATR0_epoll_ctl                SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_ctl                SC_REPR_EPOLL_OP                                                     /* op */ 
 #define __NR64ATR2_epoll_ctl                SC_REPR_FD_T                                                         /* fd */ 
-#define __NR64ATR3_epoll_ctl                SC_REPR_POINTER                                                      /* event */ 
+#define __NR64ATR3_epoll_ctl                SC_REPR_POINTER                                                      /* info */ 
 #define __NR64RTR_epoll_ctl                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_tgkill                   SC_REPR_PID_T                                                        /* pid */ 
 #define __NR64ATR1_tgkill                   SC_REPR_PID_T                                                        /* tid */ 
@@ -1945,10 +1946,12 @@
 #define __NR64RTR_utimensat                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_epoll_pwait              SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_pwait              SC_REPR_POINTER                                                      /* events */ 
-#define __NR64ATR2_epoll_pwait              SC_REPR_SYSCALL_ULONG_T                                              /* maxevents */ 
+#define __NR64ATR2_epoll_pwait              SC_REPR_SIZE_T                                                       /* maxevents */ 
 #define __NR64ATR3_epoll_pwait              SC_REPR_SYSCALL_SLONG_T                                              /* timeout */ 
 #define __NR64ATR4_epoll_pwait              SC_REPR_STRUCT_SIGSET                                                /* ss */ 
-#define __NR64RTR_epoll_pwait               SC_REPR_ERRNO_T                                                      /* return */
+#define __NR64ATL4_epoll_pwait              5                                                                    /* ss -> sigsetsize */ 
+#define __NR64ATR5_epoll_pwait              SC_REPR_SIZE_T                                                       /* sigsetsize */ 
+#define __NR64RTR_epoll_pwait               SC_REPR_SSIZE_T                                                      /* return */
 #define __NR64ATR0_signalfd                 SC_REPR_FD_T                                                         /* fd */ 
 #define __NR64ATR1_signalfd                 SC_REPR_STRUCT_SIGSET                                                /* sigmask */ 
 #define __NR64ATL1_signalfd                 2                                                                    /* sigmask -> sigmasksize */ 
@@ -1986,7 +1989,7 @@
 #define __NR64ATR0_eventfd2                 SC_REPR_SYSCALL_ULONG_T                                              /* initval */ 
 #define __NR64ATR1_eventfd2                 SC_REPR_EVENTFD2_FLAGS                                               /* flags */ 
 #define __NR64RTR_eventfd2                  SC_REPR_FD_T                                                         /* return */
-#define __NR64ATR0_epoll_create1            SC_REPR_SYSCALL_ULONG_T                                              /* flags */ 
+#define __NR64ATR0_epoll_create1            SC_REPR_EPOLL_CREATE1_FLAGS                                          /* flags */ 
 #define __NR64RTR_epoll_create1             SC_REPR_FD_T                                                         /* return */
 #define __NR64ATR0_dup3                     SC_REPR_FD_T                                                         /* oldfd */ 
 #define __NR64ATR1_dup3                     SC_REPR_FD_T                                                         /* newfd */ 

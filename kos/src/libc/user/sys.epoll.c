@@ -47,14 +47,14 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create)(__STDC_INT_AS_SIZE_T size)
 }
 /*[[[end:libc_epoll_create]]]*/
 
-/*[[[head:libc_epoll_create1,hash:CRC-32=0xb724f3af]]]*/
+/*[[[head:libc_epoll_create1,hash:CRC-32=0xd1c419fb]]]*/
 /* >> epoll_create1(2)
  * Create a new epoll control descriptor which can be used for
  * monitoring of pollable events happening in registered files.
- * @param: flags: Set of `EPOLL_*'
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
  * @return: * :   The newly created epoll control descriptor.
- * @return: -1:   [errno=EINVAL] Invalid `flags'
- * @return: -1:   Error (s.a. `errno') */
+ * @return: -1:   Error (s.a. `errno')
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 INTERN ATTR_SECTION(".text.crt.io.poll") WUNUSED fd_t
 NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags)
 /*[[[body:libc_epoll_create1]]]*/
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags)
 }
 /*[[[end:libc_epoll_create1]]]*/
 
-/*[[[head:libc_epoll_ctl,hash:CRC-32=0x62de7d0b]]]*/
+/*[[[head:libc_epoll_ctl,hash:CRC-32=0xbc109700]]]*/
 /* >> epoll_ctl(2)
  * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
  * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
@@ -74,7 +74,12 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags)
  * @param: fd:    The file descriptor to add/remove/modify
  * @param: event: The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
  * @return: 0 :   Success
- * @return: -1:   Error (s.a. `errno') */
+ * @return: -1:   [errno=EEXIST][op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -1:   [errno=ENOENT][op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @return: -1:   Error (s.a. `errno')
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
 INTERN ATTR_SECTION(".text.crt.io.poll") int
 NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd,
                                      __epoll_ctl_t op,
@@ -147,7 +152,8 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
 	                         events,
 	                         (syscall_ulong_t)maxevents,
 	                         (syscall_slong_t)timeout,
-	                         ss);
+	                         ss,
+	                         sizeof(sigset_t));
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_epoll_pwait]]]*/

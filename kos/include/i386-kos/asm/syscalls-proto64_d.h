@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78a6c14f */
+/* HASH CRC-32:0x1251c7e7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -319,7 +319,7 @@
 #define __NR64AC_vmsplice                 4
 #define __NR64AC_move_pages               1
 #define __NR64AC_utimensat                4
-#define __NR64AC_epoll_pwait              5
+#define __NR64AC_epoll_pwait              6
 #define __NR64AC_signalfd                 3
 #define __NR64AC_timerfd_create           2
 #define __NR64AC_eventfd                  1
@@ -663,7 +663,7 @@
 #define __NR64RT_lookup_dcookie           (errno_t, __errno_t)
 #define __NR64RT_epoll_create             (fd_t, __fd_t)
 #define __NR64RT_epoll_ctl_old            (errno_t, __errno_t)
-#define __NR64RT_epoll_wait_old           (errno_t, __errno_t)
+#define __NR64RT_epoll_wait_old           (ssize_t, __ssize_t)
 #define __NR64RT_remap_file_pages         (errno_t, __errno_t)
 #define __NR64RT_getdents64               (ssize_t, __ssize_t)
 #define __NR64RT_set_tid_address          (pid_t, __pid_t)
@@ -680,7 +680,7 @@
 #define __NR64RT_clock_getres             (errno_t, __errno_t)
 #define __NR64RT_clock_nanosleep          (errno_t, __errno_t)
 #define __NR64RT_exit_group               (void, void)
-#define __NR64RT_epoll_wait               (errno_t, __errno_t)
+#define __NR64RT_epoll_wait               (ssize_t, __ssize_t)
 #define __NR64RT_epoll_ctl                (errno_t, __errno_t)
 #define __NR64RT_tgkill                   (errno_t, __errno_t)
 #define __NR64RT_utimes                   (errno_t, __errno_t)
@@ -729,7 +729,7 @@
 #define __NR64RT_vmsplice                 (ssize_t, __ssize_t)
 #define __NR64RT_move_pages               (errno_t, __errno_t)
 #define __NR64RT_utimensat                (errno_t, __errno_t)
-#define __NR64RT_epoll_pwait              (errno_t, __errno_t)
+#define __NR64RT_epoll_pwait              (ssize_t, __ssize_t)
 #define __NR64RT_signalfd                 (errno_t, __errno_t)
 #define __NR64RT_timerfd_create           (fd_t, __fd_t)
 #define __NR64RT_eventfd                  (fd_t, __fd_t)
@@ -1301,7 +1301,7 @@
 #define __NR64AT3_epoll_ctl_old            (struct epoll_event *, struct epoll_event *)
 #define __NR64AT0_epoll_wait_old           (fd_t, __fd_t)
 #define __NR64AT1_epoll_wait_old           (struct epoll_event *, struct epoll_event *)
-#define __NR64AT2_epoll_wait_old           (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_epoll_wait_old           (size_t, __size_t)
 #define __NR64AT3_epoll_wait_old           (syscall_slong_t, __syscall_slong_t)
 #define __NR64AT0_remap_file_pages         (void *, void *)
 #define __NR64AT1_remap_file_pages         (size_t, __size_t)
@@ -1338,7 +1338,7 @@
 #define __NR64AT0_exit_group               (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT0_epoll_wait               (fd_t, __fd_t)
 #define __NR64AT1_epoll_wait               (struct epoll_event *, struct epoll_event *)
-#define __NR64AT2_epoll_wait               (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_epoll_wait               (size_t, __size_t)
 #define __NR64AT3_epoll_wait               (syscall_slong_t, __syscall_slong_t)
 #define __NR64AT0_epoll_ctl                (fd_t, __fd_t)
 #define __NR64AT1_epoll_ctl                (syscall_ulong_t, __syscall_ulong_t)
@@ -1479,9 +1479,10 @@
 #define __NR64AT3_utimensat                (atflag_t, __atflag_t)
 #define __NR64AT0_epoll_pwait              (fd_t, __fd_t)
 #define __NR64AT1_epoll_pwait              (struct epoll_event *, struct epoll_event *)
-#define __NR64AT2_epoll_pwait              (syscall_ulong_t, __syscall_ulong_t)
+#define __NR64AT2_epoll_pwait              (size_t, __size_t)
 #define __NR64AT3_epoll_pwait              (syscall_slong_t, __syscall_slong_t)
 #define __NR64AT4_epoll_pwait              (struct __sigset_struct const *, struct __sigset_struct const *)
+#define __NR64AT5_epoll_pwait              (size_t, __size_t)
 #define __NR64AT0_signalfd                 (fd_t, __fd_t)
 #define __NR64AT1_signalfd                 (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NR64AT2_signalfd                 (size_t, __size_t)
@@ -2022,7 +2023,7 @@
 #define __NR64AM_lookup_dcookie(a, b, c, d, e, f)           (int)a
 #define __NR64AM_epoll_create(a, b, c, d, e, f)             (__syscall_ulong_t)a
 #define __NR64AM_epoll_ctl_old(a, b, c, d, e, f)            (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
-#define __NR64AM_epoll_wait_old(a, b, c, d, e, f)           (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d
+#define __NR64AM_epoll_wait_old(a, b, c, d, e, f)           (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d
 #define __NR64AM_remap_file_pages(a, b, c, d, e, f)         (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__size_t)d, (__syscall_ulong_t)e
 #define __NR64AM_getdents64(a, b, c, d, e, f)               (__fd_t)a, (struct linux_dirent64 *)b, (__size_t)c
 #define __NR64AM_set_tid_address(a, b, c, d, e, f)          (__pid_t *)a
@@ -2039,7 +2040,7 @@
 #define __NR64AM_clock_getres(a, b, c, d, e, f)             (__clockid_t)a, (struct __timespecx64 *)b
 #define __NR64AM_clock_nanosleep(a, b, c, d, e, f)          (__clockid_t)a, (__syscall_ulong_t)b, (struct __timespecx64 const *)c, (struct __timespecx64 *)d
 #define __NR64AM_exit_group(a, b, c, d, e, f)               (__syscall_ulong_t)a
-#define __NR64AM_epoll_wait(a, b, c, d, e, f)               (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d
+#define __NR64AM_epoll_wait(a, b, c, d, e, f)               (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d
 #define __NR64AM_epoll_ctl(a, b, c, d, e, f)                (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
 #define __NR64AM_tgkill(a, b, c, d, e, f)                   (__pid_t)a, (__pid_t)b, (__signo_t)c
 #define __NR64AM_utimes(a, b, c, d, e, f)                   (char const *)a, (struct __timevalx64 const *)b
@@ -2088,7 +2089,7 @@
 #define __NR64AM_vmsplice(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NR64AM_move_pages(a, b, c, d, e, f)               (int)a
 #define __NR64AM_utimensat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (struct __timespecx64 const *)c, (__atflag_t)d
-#define __NR64AM_epoll_pwait(a, b, c, d, e, f)              (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e
+#define __NR64AM_epoll_pwait(a, b, c, d, e, f)              (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e, (__size_t)f
 #define __NR64AM_signalfd(a, b, c, d, e, f)                 (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c
 #define __NR64AM_timerfd_create(a, b, c, d, e, f)           (__clockid_t)a, (__syscall_ulong_t)b
 #define __NR64AM_eventfd(a, b, c, d, e, f)                  (__syscall_ulong_t)a
@@ -2498,7 +2499,7 @@
 #define __NR64AP_vmsplice(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_move_pages(a)                              (__syscall_ulong_t)a
 #define __NR64AP_utimensat(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NR64AP_epoll_pwait(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NR64AP_epoll_pwait(a, b, c, d, e, f)              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR64AP_signalfd(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR64AP_timerfd_create(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_eventfd(a)                                 (__syscall_ulong_t)a

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69714a6e */
+/* HASH CRC-32:0x1ff1e56 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,7 @@
 #define HAVE_SC_REPR_CPUSET
 #define HAVE_SC_REPR_DEV_BLK
 #define HAVE_SC_REPR_DEV_T
+#define HAVE_SC_REPR_EPOLL_CREATE1_FLAGS
 #define HAVE_SC_REPR_EPOLL_OP
 #define HAVE_SC_REPR_EVENTFD2_FLAGS
 #define HAVE_SC_REPR_EXIT_STATUS
@@ -171,6 +172,7 @@ __SYSCALL_REPR(SC_REPR_CLONE_FLAGS_UNSHARE)
 __SYSCALL_REPR(SC_REPR_CPUSET)
 __SYSCALL_REPR(SC_REPR_DEV_BLK)
 __SYSCALL_REPR(SC_REPR_DEV_T)
+__SYSCALL_REPR(SC_REPR_EPOLL_CREATE1_FLAGS)
 __SYSCALL_REPR(SC_REPR_EPOLL_OP)
 __SYSCALL_REPR(SC_REPR_EVENTFD2_FLAGS)
 __SYSCALL_REPR(SC_REPR_EXIT_STATUS)

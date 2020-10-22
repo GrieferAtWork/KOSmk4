@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a3b4343 */
+/* HASH CRC-32:0x178b4a23 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6755,6 +6755,10 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_lookup_dcookie)
 	.cfi_endproc
 END(__x86_asm64_syscall_lookup_dcookie)
 
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 /* fd_t epoll_create(syscall_ulong_t size) */
 .section .text.x86.asm64_syscall.epoll_create
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_create)
@@ -6785,8 +6789,20 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_create)
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_create)
 
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-/* errno_t epoll_ctl_old(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+/* errno_t epoll_ctl_old(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *info) */
 .section .text.x86.asm64_syscall.epoll_ctl_old
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl_old)
 	.cfi_startproc simple
@@ -6817,7 +6833,20 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl_old)
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_ctl_old)
 
-/* errno_t epoll_wait_old(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_wait_old(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout) */
 .section .text.x86.asm64_syscall.epoll_wait_old
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_wait_old)
 	.cfi_startproc simple
@@ -7336,7 +7365,20 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_exit_group)
 	.cfi_endproc
 END(__x86_asm64_syscall_exit_group)
 
-/* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_wait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout) */
 .section .text.x86.asm64_syscall.epoll_wait
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_wait)
 	.cfi_startproc simple
@@ -7367,8 +7409,20 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_wait)
 	.cfi_endproc
 END(__x86_asm64_syscall_epoll_wait)
 
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *info) */
 .section .text.x86.asm64_syscall.epoll_ctl
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_ctl)
 	.cfi_startproc simple
@@ -8863,7 +8917,22 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_utimensat)
 	.cfi_endproc
 END(__x86_asm64_syscall_utimensat)
 
-/* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_pwait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss, size_t sigsetsize) */
 .section .text.x86.asm64_syscall.epoll_pwait
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_pwait)
 	.cfi_startproc simple
@@ -9196,6 +9265,12 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_eventfd2)
 	.cfi_endproc
 END(__x86_asm64_syscall_eventfd2)
 
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
+ * @return: * :   The newly created epoll control descriptor.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 /* fd_t epoll_create1(syscall_ulong_t flags) */
 .section .text.x86.asm64_syscall.epoll_create1
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_epoll_create1)
@@ -21219,6 +21294,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lookup_dcookie)
 	.cfi_endproc
 END(__x86_asm32_int80_lookup_dcookie)
 
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 /* fd_t epoll_create(syscall_ulong_t size) */
 .section .text.x86.asm32_syscall_int80.epoll_create
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create)
@@ -21250,8 +21329,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create)
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_create)
 
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *info) */
 .section .text.x86.asm32_syscall_int80.epoll_ctl
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_ctl)
 	.cfi_startproc simple
@@ -21286,7 +21377,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_ctl)
 	.cfi_endproc
 END(__x86_asm32_int80_epoll_ctl)
 
-/* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_wait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout) */
 .section .text.x86.asm32_syscall_int80.epoll_wait
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_wait)
 	.cfi_startproc simple
@@ -23378,7 +23482,22 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_getcpu)
 	.cfi_endproc
 END(__x86_asm32_int80_getcpu)
 
-/* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_pwait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_int80.epoll_pwait
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	.cfi_startproc simple
@@ -23395,6 +23514,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_pwait)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq %edi, %r8 /* ARG4 = REG4 */
+	movzlq %ebp, %r9 /* ARG5 = REG5 */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movslq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
@@ -23729,6 +23849,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_eventfd2)
 	.cfi_endproc
 END(__x86_asm32_int80_eventfd2)
 
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
+ * @return: * :   The newly created epoll control descriptor.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 /* fd_t epoll_create1(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_int80.epoll_create1
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_epoll_create1)
@@ -31485,14 +31611,43 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_exit_group, __x86_asm32_int80_exit
 /* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_lookup_dcookie, __x86_asm32_int80_lookup_dcookie)
 
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 /* fd_t epoll_create(syscall_ulong_t size) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_epoll_create, __x86_asm32_int80_epoll_create)
 
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *info) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_epoll_ctl, __x86_asm32_int80_epoll_ctl)
 
-/* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_wait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_epoll_wait, __x86_asm32_int80_epoll_wait)
 
 /* errno_t remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
@@ -32051,7 +32206,22 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_move_pages, __x86_asm32_int80_move
 /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_getcpu, __x86_asm32_int80_getcpu)
 
-/* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_pwait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysenter.epoll_pwait
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_pwait)
 	.cfi_startproc simple
@@ -32068,6 +32238,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_epoll_pwait)
 	pushq_cfi_r %r10
 	pushq_cfi_r %r11
 	movzlq 0(%ebp), %r8 /* ARG4 = 0(%ebp) */
+	movzlq 4(%ebp), %r9 /* ARG5 = 4(%ebp) */
 	movzlq %edx, %rdx /* ARG2 = REG2 */
 	movslq %esi, %rsi /* ARG1 = REG3 */
 	movzlq %ecx, %rcx /* ARG3 = REG1 */
@@ -32129,6 +32300,12 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_signalfd4, __x86_asm32_int80_signa
 /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_eventfd2, __x86_asm32_int80_eventfd2)
 
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
+ * @return: * :   The newly created epoll control descriptor.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 /* fd_t epoll_create1(syscall_ulong_t flags) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_epoll_create1, __x86_asm32_int80_epoll_create1)
 
@@ -37277,6 +37454,10 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_lookup_dcookie)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_lookup_dcookie)
 
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 /* fd_t epoll_create(syscall_ulong_t size) */
 .section .text.x86.asm32_syscall_sysrun32.epoll_create
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_create)
@@ -37287,8 +37468,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_create)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_epoll_create)
 
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+/* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *info) */
 .section .text.x86.asm32_syscall_sysrun32.epoll_ctl
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_ctl)
 	.cfi_startproc
@@ -37301,7 +37494,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_ctl)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_epoll_ctl)
 
-/* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_wait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout) */
 .section .text.x86.asm32_syscall_sysrun32.epoll_wait
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_wait)
 	.cfi_startproc
@@ -38069,10 +38275,26 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_getcpu)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_getcpu)
 
-/* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+/* ssize_t epoll_pwait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss, size_t sigsetsize) */
 .section .text.x86.asm32_syscall_sysrun32.epoll_pwait
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_pwait)
 	.cfi_startproc
+	movzlq 40(%rdi), %r9
 	movzlq 32(%rdi), %r8
 	movzlq 24(%rdi), %rcx
 	movzlq 16(%rdi), %rdx
@@ -38205,6 +38427,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_eventfd2)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_eventfd2)
 
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
+ * @return: * :   The newly created epoll control descriptor.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 /* fd_t epoll_create1(syscall_ulong_t flags) */
 .section .text.x86.asm32_syscall_sysrun32.epoll_create1
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_epoll_create1)

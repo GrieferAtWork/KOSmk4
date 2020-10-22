@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3cab2a25 */
+/* HASH CRC-32:0xd55e0728 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,21 +43,37 @@
 __SYSDECL_BEGIN
 
 /* Flags accepted by `epoll_create1(2)'. */
-#ifdef __EPOLL_CLOEXEC
+#if defined(__EPOLL_CLOEXEC) || defined(__EPOLL_CLOFORK)
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	EPOLL_CLOEXEC = __EPOLL_CLOEXEC /* Set the IO_CLOEXEC flag */
+#ifdef __EPOLL_CLOEXEC
+	EPOLL_CLOEXEC = __EPOLL_CLOEXEC, /* Set the IO_CLOEXEC flag */
+#endif /* __EPOLL_CLOEXEC */
+#ifdef __EPOLL_CLOFORK
+	EPOLL_CLOFORK = __EPOLL_CLOFORK, /* Set the IO_CLOFORK flag */
+#endif /* __EPOLL_CLOFORK */
+
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
+#ifdef __EPOLL_CLOEXEC
 #define EPOLL_CLOEXEC EPOLL_CLOEXEC /* Set the IO_CLOEXEC flag */
+#endif /* __EPOLL_CLOEXEC */
+#ifdef __EPOLL_CLOFORK
+#define EPOLL_CLOFORK EPOLL_CLOFORK /* Set the IO_CLOFORK flag */
+#endif /* __EPOLL_CLOFORK */
 #else /* __COMPILER_PREFERR_ENUMS */
+#ifdef __EPOLL_CLOEXEC
 #define EPOLL_CLOEXEC __EPOLL_CLOEXEC /* Set the IO_CLOEXEC flag */
+#endif /* __EPOLL_CLOEXEC */
+#ifdef __EPOLL_CLOFORK
+#define EPOLL_CLOFORK __EPOLL_CLOFORK /* Set the IO_CLOFORK flag */
+#endif /* __EPOLL_CLOFORK */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
-#endif /* __EPOLL_CLOEXEC */
+#endif /* __EPOLL_CLOEXEC || __EPOLL_CLOFORK */
 
 /* EPOLL_EVENTS */
 #if (defined(__EPOLLIN) || defined(__EPOLLPRI) ||        \
@@ -104,14 +120,14 @@ enum EPOLL_EVENTS {
 	EPOLLONESHOT = __EPOLLONESHOT, /* Automatically stop monitoring the file descriptor once it's condition is met. */
 #endif /* __EPOLLONESHOT */
 #ifdef __EPOLLET
-	EPOLLET      = __EPOLLET,      /* Enable edge-triggered monitoring (not supported on KOS) */
+	EPOLLET      = __EPOLLET,      /* Enable edge-triggered monitoring */
 #endif /* __EPOLLET */
 /* Event types always implicitly polled for. */
 #ifdef __EPOLLERR
-	EPOLLERR     = __EPOLLERR, /* Error condition. */
+	EPOLLERR     = __EPOLLERR,     /* Error condition. */
 #endif /* __EPOLLERR */
 #ifdef __EPOLLHUP
-	EPOLLHUP     = __EPOLLHUP, /* Hung up. (writes are no longer possible) */
+	EPOLLHUP     = __EPOLLHUP,     /* Hung up. (writes are no longer possible) */
 #endif /* __EPOLLHUP */
 };
 #endif /* __CC__ */
@@ -151,7 +167,7 @@ enum EPOLL_EVENTS {
 #define EPOLLONESHOT EPOLLONESHOT /* Automatically stop monitoring the file descriptor once it's condition is met. */
 #endif /* __EPOLLONESHOT */
 #ifdef __EPOLLET
-#define EPOLLET      EPOLLET      /* Enable edge-triggered monitoring (not supported on KOS) */
+#define EPOLLET      EPOLLET      /* Enable edge-triggered monitoring */
 #endif /* __EPOLLET */
 /* Event types always implicitly polled for. */
 #ifdef __EPOLLERR
@@ -195,7 +211,7 @@ enum EPOLL_EVENTS {
 #define EPOLLONESHOT __EPOLLONESHOT /* Automatically stop monitoring the file descriptor once it's condition is met. */
 #endif /* __EPOLLONESHOT */
 #ifdef __EPOLLET
-#define EPOLLET      __EPOLLET      /* Enable edge-triggered monitoring (not supported on KOS) */
+#define EPOLLET      __EPOLLET      /* Enable edge-triggered monitoring */
 #endif /* __EPOLLET */
 /* Event types always implicitly polled for. */
 #ifdef __EPOLLERR
@@ -261,6 +277,39 @@ typedef union epoll_data epoll_data_t;
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
 
+/*
+ * PORTABILITY NOTES:
+ *
+ * The KOS implementation of epoll somewhat differs from the one provided by linux:
+ *   >> epfd   = epoll_create();
+ *   >> somefd = get_some_fd();
+ *   >> epoll_ctl(epfd, EPOLL_CTL_MOD, somefd, { ... });
+ *   >> close(somefd);
+ *   Linux behavior:
+ *    - `somefd' is automatically removed from `epfd'
+ *   KOS behavior:
+ *    - `somefd' may or may not be automatically removed from `epfd'.
+ *      The actual internal behavior depends on how epfd stores its reference
+ *      to `somefd'. For this, the KOS kernel has 2 cases: 1 where `epfd' stores
+ *      a normal, full reference to `somefd', and one where it stores a weak
+ *      reference (such that closing and destroying `somefd' is not prevented
+ *      from doing so by being apart of an epoll fd-set)
+ *    - Which of these 2 behaviors is used depends on the internal handle type
+ *      associated with `somefd' (one of `HANDLE_TYPE_*' from <kos/kernel/handle.h>),
+ *      though when which behavior is used is an implementation detail that is
+ *      subject to change over time.
+ *   Recommended behavior for maximum portability:
+ *    - As linux documentation already suggests, relying on the auto-removal
+ *      behavior of closing monitored files isn't something that ever has to
+ *      be used and more often than not only introduces unnecessary complexity.
+ *      Furthermore, often this behavior can't even be done reliably since a
+ *      monitored handled may get duplicated by any number of events (including
+ *      fork(2) calls made by other threads). As such, explicitly removing
+ *      handles from the associated epoll descriptor is always a good idea.
+ *
+ */
+
+
 /* >> epoll_create(2)
  * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
  * @return: * : The newly created epoll control descriptor.
@@ -269,10 +318,10 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create,(__STDC_INT_AS_S
 /* >> epoll_create1(2)
  * Create a new epoll control descriptor which can be used for
  * monitoring of pollable events happening in registered files.
- * @param: flags: Set of `EPOLL_*'
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
  * @return: * :   The newly created epoll control descriptor.
- * @return: -1:   [errno=EINVAL] Invalid `flags'
- * @return: -1:   Error (s.a. `errno') */
+ * @return: -1:   Error (s.a. `errno')
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create1,(__STDC_INT_AS_UINT_T __flags),(__flags))
 /* >> epoll_ctl(2)
  * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
@@ -282,7 +331,12 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create1,(__STDC_INT_AS_
  * @param: fd:    The file descriptor to add/remove/modify
  * @param: event: The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
  * @return: 0 :   Success
- * @return: -1:   Error (s.a. `errno') */
+ * @return: -1:   [errno=EEXIST][op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -1:   [errno=ENOENT][op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @return: -1:   Error (s.a. `errno')
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,epoll_ctl,(__fd_t __epfd, __epoll_ctl_t __op, __fd_t __fd, struct epoll_event *__event),(__epfd,__op,__fd,__event))
 /* >> epoll_wait(2)
  * Wait until at least one of the conditions monitored by `epfd' to be met.

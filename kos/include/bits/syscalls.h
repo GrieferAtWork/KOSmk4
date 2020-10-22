@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdfbf2b5b */
+/* HASH CRC-32:0x397fad6a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,10 +50,43 @@
 #define SYS_lookup_dcookie         __NR_lookup_dcookie         /* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 #define SYS_eventfd2               __NR_eventfd2               /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
+ * @return: * :   The newly created epoll control descriptor.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 #define SYS_epoll_create1          __NR_epoll_create1          /* fd_t epoll_create1(syscall_ulong_t flags) */
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-#define SYS_epoll_ctl              __NR_epoll_ctl              /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
-#define SYS_epoll_pwait            __NR_epoll_pwait            /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+#define SYS_epoll_ctl              __NR_epoll_ctl              /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *info) */
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+#define SYS_epoll_pwait            __NR_epoll_pwait            /* ssize_t epoll_pwait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss, size_t sigsetsize) */
 #define SYS_dup                    __NR_dup                    /* fd_t dup(fd_t fd) */
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define SYS_dup3                   __NR_dup3                   /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
@@ -667,6 +700,10 @@
 #define SYS_utimes                 __NR_utimes                 /* errno_t utimes(char const *filename, struct timeval const[2] times) */
 #define SYS_pipe                   __NR_pipe                   /* errno_t pipe(fd_t[2] pipedes) */
 #define SYS_dup2                   __NR_dup2                   /* fd_t dup2(fd_t oldfd, fd_t newfd) */
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 #define SYS_epoll_create           __NR_epoll_create           /* fd_t epoll_create(syscall_ulong_t size) */
 #define SYS_inotify_init           __NR_inotify_init           /* errno_t inotify_init(int TODO_PROTOTYPE) */
 #define SYS_eventfd                __NR_eventfd                /* fd_t eventfd(syscall_ulong_t initval) */
@@ -705,7 +742,20 @@
 #define SYS_futimesat              __NR_futimesat              /* errno_t futimesat(fd_t dirfd, char const *filename, struct timeval const[2] times) */
 #define SYS_select                 __NR_select                 /* ssize_t select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval *timeout) */
 #define SYS_poll                   __NR_poll                   /* ssize_t poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout) */
-#define SYS_epoll_wait             __NR_epoll_wait             /* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+#define SYS_epoll_wait             __NR_epoll_wait             /* ssize_t epoll_wait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout) */
 #define SYS_ustat                  __NR_ustat                  /* errno_t ustat(dev_t dev, struct ustat *ubuf) */
 /* Same as `fork(2)', but the child process may be executed within in the same VM
  * as the parent process, with the parent process remaining suspended until the

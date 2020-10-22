@@ -208,43 +208,6 @@ epoll_controller_wait(struct epoll_controller *__restrict self,
 	  epoll_controller_canwait(self)))
 #endif /* !__OPTIMIZE_SIZE__ */
 
-
-
-/* NOTE: Completion functions for `epoll_handle_monitor' do this:
- * >> PHASE_1() {
- * >>     struct epoll_handle_monitor *me;
- * >>     me = container_of(sig_multicompletion_controller(self),
- * >>                       struct epoll_handle_monitor, ehm_comp);
- * >>     // TODO: sig_multicompletion_trydisconnect(&me->ehm_comp);
- * >>     //       Tries to disconnect the controller from as many
- * >>     //       signals as possible, but simply skips+ignores
- * >>     //       signals for which it cannot acquire the SMP-lock.
- * >>     // >> As far as semantics go, this is completely unnecessary,
- * >>     //    but doing this may still be able to still improve
- * >>     //    performace, since none of the other signals which
- * >>     //    we may be connected to at the moment won't cause
- * >>     //    us to be invoked as often.
- * >>     bool did_raise = ATOMIC_XCH(me->ehm_raised, true);
- * >>     if likely(did_raise && tryincref(me->ehm_ctrl)) {
- * >>         ATOMIC_SLIST_INSERT(me, me->ehm_ctrl->ec_raised);
- * >>         PHASE_2.args[0] = me->ehm_ctrl;
- * >>     }
- * >> }
- * >> PHASE_2(struct epoll_controller *self) {
- * >>     sig_send(&self->ec_avail);
- * >>     decref_unlikely(self);
- * >> }
- *
- * NOTE: Inside of `epoll_wait(2)', code will check the list of raised
- *       monitors and check if they are still ready then. This check can
- *       be skipped by employing `EPOLLET', meaning that past rising edge
- *       events can still be detected by looking at 
- */
-
-
-/* TODO */
-
-
 DECL_END
 #endif /* __CC__ */
 

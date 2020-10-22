@@ -672,6 +672,7 @@ struct pipe;
 struct driver;
 struct pidns;
 struct socket;
+struct epoll_controller;
 
 /* Directly translate handlers to references to objects of specific types. */
 FUNDEF ATTR_RETNONNULL WUNUSED REF void *FCALL
@@ -721,16 +722,17 @@ handle_get_vfs(unsigned int fd)
 		       E_INVALID_HANDLE_FILETYPE);
 
 
-#define handle_get_datablock(fd)       ((REF struct vm_datablock *)handle_getas(fd, HANDLE_TYPE_DATABLOCK))
-#define handle_get_directory_entry(fd) ((REF struct directory_entry *)handle_getas(fd, HANDLE_TYPE_DIRECTORYENTRY))
-#define handle_get_path(fd)            ((REF struct path *)handle_getas(fd, HANDLE_TYPE_PATH))
-#define handle_get_taskpid(fd)         ((REF struct taskpid *)handle_getas(fd, HANDLE_TYPE_TASK))
-#define handle_get_vm(fd)              ((REF struct vm *)handle_getas(fd, HANDLE_TYPE_VM))
-#define handle_get_fs(fd)              ((REF struct fs *)handle_getas(fd, HANDLE_TYPE_FS))
-#define handle_get_pipe(fd)            ((REF struct pipe *)handle_getas(fd, HANDLE_TYPE_PIPE))
-#define handle_get_driver(fd)          ((REF struct driver *)handle_getas(fd, HANDLE_TYPE_DRIVER))
-#define handle_get_pidns(fd)           ((REF struct pidns *)handle_getas(fd, HANDLE_TYPE_PIDNS))
-#define handle_get_socket(fd)          ((REF struct socket *)handle_getas(fd, HANDLE_TYPE_SOCKET))
+#define handle_get_datablock(fd)        ((REF struct vm_datablock *)handle_getas(fd, HANDLE_TYPE_DATABLOCK))
+#define handle_get_directory_entry(fd)  ((REF struct directory_entry *)handle_getas(fd, HANDLE_TYPE_DIRECTORYENTRY))
+#define handle_get_path(fd)             ((REF struct path *)handle_getas(fd, HANDLE_TYPE_PATH))
+#define handle_get_taskpid(fd)          ((REF struct taskpid *)handle_getas(fd, HANDLE_TYPE_TASK))
+#define handle_get_vm(fd)               ((REF struct vm *)handle_getas(fd, HANDLE_TYPE_VM))
+#define handle_get_fs(fd)               ((REF struct fs *)handle_getas(fd, HANDLE_TYPE_FS))
+#define handle_get_pipe(fd)             ((REF struct pipe *)handle_getas(fd, HANDLE_TYPE_PIPE))
+#define handle_get_driver(fd)           ((REF struct driver *)handle_getas(fd, HANDLE_TYPE_DRIVER))
+#define handle_get_pidns(fd)            ((REF struct pidns *)handle_getas(fd, HANDLE_TYPE_PIDNS))
+#define handle_get_socket(fd)           ((REF struct socket *)handle_getas(fd, HANDLE_TYPE_SOCKET))
+#define handle_get_epoll_controller(fd) ((REF struct epoll_controller *)handle_getas(fd, HANDLE_TYPE_EPOLL))
 
 /* Cast the given handle `self' into `wanted_type', and return a reference
  * to a handle-compatible object with type `wanted_type'. If such a cast is
@@ -804,16 +806,17 @@ handle_as_vfs(/*inherit(on_success)*/ REF struct handle const *__restrict self)
 		THROWS(E_INVALID_HANDLE_FILETYPE);
 
 
-#define handle_as_datablock(self)       ((REF struct vm_datablock *)handle_as(self, HANDLE_TYPE_DATABLOCK))
-#define handle_as_directory_entry(self) ((REF struct directory_entry *)handle_as(self, HANDLE_TYPE_DIRECTORYENTRY))
-#define handle_as_path(self)            ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
-#define handle_as_taskpid(self)         ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_TASK))
-#define handle_as_vm(self)              ((REF struct vm *)handle_as(self, HANDLE_TYPE_VM))
-#define handle_as_fs(self)              ((REF struct fs *)handle_as(self, HANDLE_TYPE_FS))
-#define handle_as_pipe(self)            ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
-#define handle_as_driver(self)          ((REF struct driver *)handle_as(self, HANDLE_TYPE_DRIVER))
-#define handle_as_pidns(self)           ((REF struct pidns *)handle_as(self, HANDLE_TYPE_PIDNS))
-#define handle_as_socket(self)          ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))
+#define handle_as_datablock(self)        ((REF struct vm_datablock *)handle_as(self, HANDLE_TYPE_DATABLOCK))
+#define handle_as_directory_entry(self)  ((REF struct directory_entry *)handle_as(self, HANDLE_TYPE_DIRECTORYENTRY))
+#define handle_as_path(self)             ((REF struct path *)handle_as(self, HANDLE_TYPE_PATH))
+#define handle_as_taskpid(self)          ((REF struct taskpid *)handle_as(self, HANDLE_TYPE_TASK))
+#define handle_as_vm(self)               ((REF struct vm *)handle_as(self, HANDLE_TYPE_VM))
+#define handle_as_fs(self)               ((REF struct fs *)handle_as(self, HANDLE_TYPE_FS))
+#define handle_as_pipe(self)             ((REF struct pipe *)handle_as(self, HANDLE_TYPE_PIPE))
+#define handle_as_driver(self)           ((REF struct driver *)handle_as(self, HANDLE_TYPE_DRIVER))
+#define handle_as_pidns(self)            ((REF struct pidns *)handle_as(self, HANDLE_TYPE_PIDNS))
+#define handle_as_socket(self)           ((REF struct socket *)handle_as(self, HANDLE_TYPE_SOCKET))
+#define handle_as_epoll_controller(self) ((REF struct epoll_controller *)handle_as(self, HANDLE_TYPE_EPOLL))
 
 #if defined(__cplusplus) && !defined(NO_CXX_HANDLE_AS_OVERLOADS)
 extern "C++" {

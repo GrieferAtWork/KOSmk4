@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7336da2d */
+/* HASH CRC-32:0x92a4479a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -450,10 +450,39 @@
  * @param: exit_code: Thread exit code (as returned by `wait(2)') */
 #define __NR_exit_group                   0xfc                   /* void exit_group(syscall_ulong_t exit_code) */
 #define __NR_lookup_dcookie               0xfd                   /* errno_t lookup_dcookie(int TODO_PROTOTYPE) */
+/* >> epoll_create(2)
+ * Deprecated alias for `epoll_create1(0)' (the `size' argument is ignored)
+ * @return: * : The newly created epoll control descriptor.
+ * @return: -1: Error (s.a. `errno') */
 #define __NR_epoll_create                 0xfe                   /* fd_t epoll_create(syscall_ulong_t size) */
-/* @param: op: One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL', `EPOLL_CTL_MOD' */
-#define __NR_epoll_ctl                    0xff                   /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *event) */
-#define __NR_epoll_wait                   0x100                  /* errno_t epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout) */
+/* >> epoll_ctl(2)
+ * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
+ * in order to register (`EPOLL_CTL_ADD'), remove (`EPOLL_CTL_DEL') or modify (`EPOLL_CTL_MOD')
+ * the file descriptors being monitored
+ * @param: op:       One of `EPOLL_CTL_ADD', `EPOLL_CTL_DEL' or `EPOLL_CTL_MOD'
+ * @param: fd:       The file descriptor to add/remove/modify
+ * @param: info:     The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
+ * @return: 0 :      Success
+ * @return: -EEXIST: [op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -ENOENT: [op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
+#define __NR_epoll_ctl                    0xff                   /* errno_t epoll_ctl(fd_t epfd, syscall_ulong_t op, fd_t fd, struct epoll_event *info) */
+/* >> epoll_wait(2)
+ * Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+#define __NR_epoll_wait                   0x100                  /* ssize_t epoll_wait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout) */
 #define __NR_remap_file_pages             0x101                  /* errno_t remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags) */
 #define __NR_set_tid_address              0x102                  /* pid_t set_tid_address(pid_t *tidptr) */
 #define __NR_timer_create                 0x103                  /* errno_t timer_create(clockid_t clock_id, struct sigevent *evp, timer_t *timerid) */
@@ -551,7 +580,22 @@
 #define __NR_vmsplice                     0x13c                  /* ssize_t vmsplice(fd_t fdout, struct iovecx32 const *iov, size_t count, syscall_ulong_t flags) */
 #define __NR_move_pages                   0x13d                  /* errno_t move_pages(int TODO_PROTOTYPE) */
 #define __NR_getcpu                       0x13e                  /* errno_t getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache) */
-#define __NR_epoll_pwait                  0x13f                  /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
+/* >> epoll_pwait(2)
+ * Same as `epoll_wait(2)', but change the calling thread's signal mask to `ss' while
+ * waiting. Wait until at least one of the conditions monitored by `epfd' to be met.
+ * @param: epfd:      The epoll controller on which to wait.
+ * @param: events:    A buffer where the kernel can store information on the
+ *                    events that actually took place.
+ * @param: maxevents: The # of events that can be stored in `events' (must be >= 1)
+ * @param: timeout:   The max amount of time (in milliseconds) before returning
+ *                    in the case where no event occurred in the mean time. When
+ *                    set to `-1', wait indefinitely
+ * @param: ss:        The signal mask to apply while waiting for an event to happen.
+ * @return: >= 1:     The # of events that happened (written to the first `return'
+ *                    items of `events')
+ * @return: 0:        No events happened before `timeout' expired.
+ * @return: -1:       Error (s.a. `errno') */
+#define __NR_epoll_pwait                  0x13f                  /* ssize_t epoll_pwait(fd_t epfd, struct epoll_event *events, size_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss, size_t sigsetsize) */
 /* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_CHANGE_CTIME | AT_DOSPATH' */
 #define __NR_utimensat                    0x140                  /* errno_t utimensat(fd_t dirfd, char const *filename, struct timespecx32 const[2] times, atflag_t flags) */
 /* Create a poll(2)-able file descriptor which can be used to wait for the
@@ -576,6 +620,12 @@
 #define __NR_signalfd4                    0x147                  /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigmasksize, syscall_ulong_t flags) */
 /* @param: flags: Set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 #define __NR_eventfd2                     0x148                  /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
+/* >> epoll_create1(2)
+ * Create a new epoll control descriptor which can be used for
+ * monitoring of pollable events happening in registered files.
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
+ * @return: * :   The newly created epoll control descriptor.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 #define __NR_epoll_create1                0x149                  /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC | O_CLOFORK' */
 #define __NR_dup3                         0x14a                  /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
@@ -2452,7 +2502,7 @@
 #define __NRRC_vmsplice                     4
 #define __NRRC_move_pages                   1
 #define __NRRC_getcpu                       3
-#define __NRRC_epoll_pwait                  5
+#define __NRRC_epoll_pwait                  6
 #define __NRRC_utimensat                    4
 #define __NRRC_signalfd                     3
 #define __NRRC_timerfd_create               2

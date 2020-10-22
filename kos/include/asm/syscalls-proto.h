@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7da7e9a */
+/* HASH CRC-32:0x5adb3f02 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@
 #define __NRAC_eventfd2               2
 #define __NRAC_epoll_create1          1
 #define __NRAC_epoll_ctl              4
-#define __NRAC_epoll_pwait            5
+#define __NRAC_epoll_pwait            6
 #define __NRAC_dup                    1
 #define __NRAC_dup3                   3
 #define __NRAC_inotify_init1          1
@@ -382,7 +382,7 @@
 #define __NRRT_eventfd2               (fd_t, __fd_t)
 #define __NRRT_epoll_create1          (fd_t, __fd_t)
 #define __NRRT_epoll_ctl              (errno_t, __errno_t)
-#define __NRRT_epoll_pwait            (errno_t, __errno_t)
+#define __NRRT_epoll_pwait            (ssize_t, __ssize_t)
 #define __NRRT_dup                    (fd_t, __fd_t)
 #define __NRRT_dup3                   (fd_t, __fd_t)
 #define __NRRT_inotify_init1          (errno_t, __errno_t)
@@ -661,7 +661,7 @@
 #define __NRRT_futimesat              (errno_t, __errno_t)
 #define __NRRT_select                 (ssize_t, __ssize_t)
 #define __NRRT_poll                   (ssize_t, __ssize_t)
-#define __NRRT_epoll_wait             (errno_t, __errno_t)
+#define __NRRT_epoll_wait             (ssize_t, __ssize_t)
 #define __NRRT_ustat                  (errno_t, __errno_t)
 #define __NRRT_vfork                  (pid_t, __pid_t)
 #define __NRRT_oldwait4               (pid_t, __pid_t)
@@ -741,9 +741,10 @@
 #define __NRAT3_epoll_ctl              (struct epoll_event *, struct epoll_event *)
 #define __NRAT0_epoll_pwait            (fd_t, __fd_t)
 #define __NRAT1_epoll_pwait            (struct epoll_event *, struct epoll_event *)
-#define __NRAT2_epoll_pwait            (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_epoll_pwait            (size_t, __size_t)
 #define __NRAT3_epoll_pwait            (syscall_slong_t, __syscall_slong_t)
 #define __NRAT4_epoll_pwait            (struct __sigset_struct const *, struct __sigset_struct const *)
+#define __NRAT5_epoll_pwait            (size_t, __size_t)
 #define __NRAT0_dup                    (fd_t, __fd_t)
 #define __NRAT0_dup3                   (fd_t, __fd_t)
 #define __NRAT1_dup3                   (fd_t, __fd_t)
@@ -1400,7 +1401,7 @@
 #define __NRAT2_poll                   (syscall_slong_t, __syscall_slong_t)
 #define __NRAT0_epoll_wait             (fd_t, __fd_t)
 #define __NRAT1_epoll_wait             (struct epoll_event *, struct epoll_event *)
-#define __NRAT2_epoll_wait             (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_epoll_wait             (size_t, __size_t)
 #define __NRAT3_epoll_wait             (syscall_slong_t, __syscall_slong_t)
 #define __NRAT0_ustat                  (dev_t, __dev_t)
 #define __NRAT1_ustat                  (struct ustat *, struct ustat *)
@@ -1452,7 +1453,7 @@
 #define __NRAM_eventfd2(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAM_epoll_create1(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (__syscall_ulong_t)a
 #define __NRAM_epoll_ctl(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
-#define __NRAM_epoll_pwait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e
+#define __NRAM_epoll_pwait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)            (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e, (__size_t)f
 #define __NRAM_dup(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                    (__fd_t)a
 #define __NRAM_dup3(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (__fd_t)a, (__fd_t)b, (__oflag_t)c
 #define __NRAM_inotify_init1(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)          (int)a
@@ -1731,7 +1732,7 @@
 #define __NRAM_futimesat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)              (__fd_t)a, (char const *)b, (struct timeval const *)c
 #define __NRAM_select(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                 (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct timeval *)e
 #define __NRAM_poll(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                   (struct pollfd *)a, (__size_t)b, (__syscall_slong_t)c
-#define __NRAM_epoll_wait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d
+#define __NRAM_epoll_wait(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)             (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d
 #define __NRAM_ustat(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  (__dev_t)a, (struct ustat *)b
 #define __NRAM_vfork(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)                  /* nothing */
 #define __NRAM_oldwait4(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z)               (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct rusage *)d
@@ -1774,7 +1775,7 @@
 #define __NRAP_eventfd2(a, b)                                                                                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_epoll_create1(a)                                                                                     (__syscall_ulong_t)a
 #define __NRAP_epoll_ctl(a, b, c, d)                                                                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_epoll_pwait(a, b, c, d, e)                                                                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_epoll_pwait(a, b, c, d, e, f)                                                                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_dup(a)                                                                                               (__syscall_ulong_t)a
 #define __NRAP_dup3(a, b, c)                                                                                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_inotify_init1(a)                                                                                     (__syscall_ulong_t)a

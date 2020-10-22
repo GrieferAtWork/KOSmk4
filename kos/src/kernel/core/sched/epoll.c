@@ -29,17 +29,21 @@
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 #include <sched/epoll.h>
 #include <sched/signal-completion.h>
 #include <sched/signal.h>
+#include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
 
+#include <kos/except/reason/inval.h>
 #include <kos/io.h>
 #include <sys/epoll.h>
 #include <sys/poll.h>
 
 #include <assert.h>
+#include <errno.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -412,11 +416,22 @@ epoll_controller_checkloop(struct epoll_controller *self,
 		if (mon->ehm_handtyp == HANDLE_TYPE_EPOLL) {
 			struct epoll_controller *inner;
 			inner = (struct epoll_controller *)mon->ehm_handptr;
+			/* TODO: Currently, user-space can do the following to circumvent the
+			 *       CONFIG_EPOLL_MAX_NESTING restriction:
+			 * Instead of adding an already-deeply nested epoll-fd to a new epoll-fd,
+			 * which is caught and handled by this code right here, do the following:
+			 * >> epfd_outer = epoll_create();
+			 * >> for (;;) {
+			 * >>     epfd_inner = epoll_create();
+			 * >>     epoll_ctl(epfd_outer, EPOLL_CTL_ADD, epfd_inner, { ... });
+			 * >>     epfd_outer = epfd_inner;
+			 * >> }
+			 */
 			if (inner == findme || current_depth >= CONFIG_EPOLL_MAX_NESTING) {
 				result = EPOLL_LOOP;
 				goto done;
 			}
-			/* Try to acquire acquire a reference to the innter controller. */
+			/* Try to acquire acquire a reference to the inner controller. */
 			if (!tryincref(inner)) {
 				assert(inner != findme);
 				continue; /* Inner controller is already dead. - Just skip it. */
@@ -1199,6 +1214,117 @@ again:
 	}
 	return result;
 }
+
+
+
+
+/************************************************************************/
+/* EPOLL syscall API                                                    */
+/************************************************************************/
+#ifdef __ARCH_WANT_SYSCALL_EPOLL_CREATE1
+DEFINE_SYSCALL1(fd_t, epoll_create1, syscall_ulong_t, flags) {
+	unsigned int result;
+	struct handle hand;
+	VALIDATE_FLAGSET(flags, EPOLL_CLOEXEC | EPOLL_CLOFORK,
+	                 E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS);
+	hand.h_type = HANDLE_TYPE_EPOLL;
+	hand.h_mode = IO_RDWR;
+#define EPOLL_CREATE_FLAGS_IO_SHIFT 17
+#if ((EPOLL_CLOEXEC >> EPOLL_CREATE_FLAGS_IO_SHIFT) == IO_CLOEXEC && \
+     (EPOLL_CLOFORK >> EPOLL_CREATE_FLAGS_IO_SHIFT) == IO_CLOFORK)
+	hand.h_mode |= flags >> EPOLL_CREATE_FLAGS_IO_SHIFT;
+#else /* ... */
+	if (flags & EPOLL_CLOEXEC)
+		hand.h_mode |= IO_CLOEXEC;
+	if (flags & EPOLL_CLOFORK)
+		hand.h_mode |= IO_CLOFORK;
+#endif /* !... */
+	/* Create the actual epoll object. */
+	hand.h_data = epoll_controller_create();
+	TRY {
+		/* Register the handle. */
+		result = handle_install(THIS_HANDLE_MANAGER, hand);
+	} EXCEPT {
+		decref_likely((REF struct epoll_controller *)hand.h_data);
+		RETHROW();
+	}
+	return (fd_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_EPOLL_CREATE1 */
+
+#ifdef __ARCH_WANT_SYSCALL_EPOLL_CREATE
+DEFINE_SYSCALL1(fd_t, epoll_create, syscall_ulong_t, size) {
+	(void)size;
+	return sys_epoll_create1(0);
+}
+#endif /* __ARCH_WANT_SYSCALL_EPOLL_CREATE */
+
+#ifdef __ARCH_WANT_SYSCALL_EPOLL_CTL
+DEFINE_SYSCALL4(errno_t, epoll_ctl,
+                fd_t, epfd, syscall_ulong_t, op, fd_t, fd,
+                USER UNCHECKED struct epoll_event *, info) {
+	errno_t result = -EOK;
+	REF struct epoll_controller *self;
+	REF struct handle fd_handle;
+	self = handle_get_epoll_controller(epfd);
+	FINALLY_DECREF_UNLIKELY(self);
+	fd_handle = handle_lookup(fd);
+	TRY {
+		switch (op) {
+	
+		case EPOLL_CTL_ADD:
+			validate_readable(info, sizeof(*info));
+			if (!epoll_controller_addmonitor(self, &fd_handle, (uint32_t)fd, info))
+				result = -EEXIST;
+			break;
+	
+		case EPOLL_CTL_MOD:
+			validate_readable(info, sizeof(*info));
+			if (!epoll_controller_modmonitor(self, &fd_handle, (uint32_t)fd, info))
+				result = -ENOENT;
+			break;
+	
+		case EPOLL_CTL_DEL:
+			if (!epoll_controller_delmonitor(self, &fd_handle, (uint32_t)fd))
+				result = -ENOENT;
+			break;
+	
+		default:
+			THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+			      E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP,
+			      op);
+		}
+	} EXCEPT {
+		decref(fd_handle);
+		RETHROW();
+	}
+	decref(fd_handle);
+	return result;
+}
+#endif /* __ARCH_WANT_SYSCALL_EPOLL_CTL */
+
+#ifdef __ARCH_WANT_SYSCALL_EPOLL_WAIT
+DEFINE_SYSCALL4(ssize_t, epoll_wait,
+                fd_t, epfd, USER UNCHECKED struct epoll_event *, events,
+                size_t, maxevents, syscall_slong_t, timeout) {
+	size_t result;
+	REF struct epoll_controller *self;
+	validate_writablem(events, maxevents, sizeof(struct epoll_event));
+	self = handle_get_epoll_controller(epfd);
+	FINALLY_DECREF_UNLIKELY(self);
+	if (timeout < 0) {
+		result = epoll_controller_wait(self, events, maxevents, NULL);
+	} else if (timeout == 0) {
+		result = epoll_controller_trywait(self, events, maxevents);
+	} else {
+		struct timespec then = realtime();
+		then.add_milliseconds((unsigned int)timeout);
+		result = epoll_controller_wait(self, events, maxevents, &then);
+	}
+	return (ssize_t)result;
+}
+#endif /* __ARCH_WANT_SYSCALL_EPOLL_WAIT */
+
 
 
 

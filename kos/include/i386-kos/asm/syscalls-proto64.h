@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe61234a9 */
+/* HASH CRC-32:0xab90ee69 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -319,7 +319,7 @@
 #define __NRAC_vmsplice                 4
 #define __NRAC_move_pages               1
 #define __NRAC_utimensat                4
-#define __NRAC_epoll_pwait              5
+#define __NRAC_epoll_pwait              6
 #define __NRAC_signalfd                 3
 #define __NRAC_timerfd_create           2
 #define __NRAC_eventfd                  1
@@ -663,7 +663,7 @@
 #define __NRRT_lookup_dcookie           (errno_t, __errno_t)
 #define __NRRT_epoll_create             (fd_t, __fd_t)
 #define __NRRT_epoll_ctl_old            (errno_t, __errno_t)
-#define __NRRT_epoll_wait_old           (errno_t, __errno_t)
+#define __NRRT_epoll_wait_old           (ssize_t, __ssize_t)
 #define __NRRT_remap_file_pages         (errno_t, __errno_t)
 #define __NRRT_getdents64               (ssize_t, __ssize_t)
 #define __NRRT_set_tid_address          (pid_t, __pid_t)
@@ -680,7 +680,7 @@
 #define __NRRT_clock_getres             (errno_t, __errno_t)
 #define __NRRT_clock_nanosleep          (errno_t, __errno_t)
 #define __NRRT_exit_group               (void, void)
-#define __NRRT_epoll_wait               (errno_t, __errno_t)
+#define __NRRT_epoll_wait               (ssize_t, __ssize_t)
 #define __NRRT_epoll_ctl                (errno_t, __errno_t)
 #define __NRRT_tgkill                   (errno_t, __errno_t)
 #define __NRRT_utimes                   (errno_t, __errno_t)
@@ -729,7 +729,7 @@
 #define __NRRT_vmsplice                 (ssize_t, __ssize_t)
 #define __NRRT_move_pages               (errno_t, __errno_t)
 #define __NRRT_utimensat                (errno_t, __errno_t)
-#define __NRRT_epoll_pwait              (errno_t, __errno_t)
+#define __NRRT_epoll_pwait              (ssize_t, __ssize_t)
 #define __NRRT_signalfd                 (errno_t, __errno_t)
 #define __NRRT_timerfd_create           (fd_t, __fd_t)
 #define __NRRT_eventfd                  (fd_t, __fd_t)
@@ -1301,7 +1301,7 @@
 #define __NRAT3_epoll_ctl_old            (struct epoll_event *, struct epoll_event *)
 #define __NRAT0_epoll_wait_old           (fd_t, __fd_t)
 #define __NRAT1_epoll_wait_old           (struct epoll_event *, struct epoll_event *)
-#define __NRAT2_epoll_wait_old           (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_epoll_wait_old           (size_t, __size_t)
 #define __NRAT3_epoll_wait_old           (syscall_slong_t, __syscall_slong_t)
 #define __NRAT0_remap_file_pages         (void *, void *)
 #define __NRAT1_remap_file_pages         (size_t, __size_t)
@@ -1338,7 +1338,7 @@
 #define __NRAT0_exit_group               (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_epoll_wait               (fd_t, __fd_t)
 #define __NRAT1_epoll_wait               (struct epoll_event *, struct epoll_event *)
-#define __NRAT2_epoll_wait               (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_epoll_wait               (size_t, __size_t)
 #define __NRAT3_epoll_wait               (syscall_slong_t, __syscall_slong_t)
 #define __NRAT0_epoll_ctl                (fd_t, __fd_t)
 #define __NRAT1_epoll_ctl                (syscall_ulong_t, __syscall_ulong_t)
@@ -1479,9 +1479,10 @@
 #define __NRAT3_utimensat                (atflag_t, __atflag_t)
 #define __NRAT0_epoll_pwait              (fd_t, __fd_t)
 #define __NRAT1_epoll_pwait              (struct epoll_event *, struct epoll_event *)
-#define __NRAT2_epoll_pwait              (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_epoll_pwait              (size_t, __size_t)
 #define __NRAT3_epoll_pwait              (syscall_slong_t, __syscall_slong_t)
 #define __NRAT4_epoll_pwait              (struct __sigset_struct const *, struct __sigset_struct const *)
+#define __NRAT5_epoll_pwait              (size_t, __size_t)
 #define __NRAT0_signalfd                 (fd_t, __fd_t)
 #define __NRAT1_signalfd                 (struct __sigset_struct const *, struct __sigset_struct const *)
 #define __NRAT2_signalfd                 (size_t, __size_t)
@@ -2022,7 +2023,7 @@
 #define __NRAM_lookup_dcookie(a, b, c, d, e, f)           (int)a
 #define __NRAM_epoll_create(a, b, c, d, e, f)             (__syscall_ulong_t)a
 #define __NRAM_epoll_ctl_old(a, b, c, d, e, f)            (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
-#define __NRAM_epoll_wait_old(a, b, c, d, e, f)           (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d
+#define __NRAM_epoll_wait_old(a, b, c, d, e, f)           (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d
 #define __NRAM_remap_file_pages(a, b, c, d, e, f)         (void *)a, (__size_t)b, (__syscall_ulong_t)c, (__size_t)d, (__syscall_ulong_t)e
 #define __NRAM_getdents64(a, b, c, d, e, f)               (__fd_t)a, (struct linux_dirent64 *)b, (__size_t)c
 #define __NRAM_set_tid_address(a, b, c, d, e, f)          (__pid_t *)a
@@ -2039,7 +2040,7 @@
 #define __NRAM_clock_getres(a, b, c, d, e, f)             (__clockid_t)a, (struct __timespecx64 *)b
 #define __NRAM_clock_nanosleep(a, b, c, d, e, f)          (__clockid_t)a, (__syscall_ulong_t)b, (struct __timespecx64 const *)c, (struct __timespecx64 *)d
 #define __NRAM_exit_group(a, b, c, d, e, f)               (__syscall_ulong_t)a
-#define __NRAM_epoll_wait(a, b, c, d, e, f)               (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d
+#define __NRAM_epoll_wait(a, b, c, d, e, f)               (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d
 #define __NRAM_epoll_ctl(a, b, c, d, e, f)                (__fd_t)a, (__syscall_ulong_t)b, (__fd_t)c, (struct epoll_event *)d
 #define __NRAM_tgkill(a, b, c, d, e, f)                   (__pid_t)a, (__pid_t)b, (__signo_t)c
 #define __NRAM_utimes(a, b, c, d, e, f)                   (char const *)a, (struct __timevalx64 const *)b
@@ -2088,7 +2089,7 @@
 #define __NRAM_vmsplice(a, b, c, d, e, f)                 (__fd_t)a, (struct __iovecx64 const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_move_pages(a, b, c, d, e, f)               (int)a
 #define __NRAM_utimensat(a, b, c, d, e, f)                (__fd_t)a, (char const *)b, (struct __timespecx64 const *)c, (__atflag_t)d
-#define __NRAM_epoll_pwait(a, b, c, d, e, f)              (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e
+#define __NRAM_epoll_pwait(a, b, c, d, e, f)              (__fd_t)a, (struct epoll_event *)b, (__size_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e, (__size_t)f
 #define __NRAM_signalfd(a, b, c, d, e, f)                 (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c
 #define __NRAM_timerfd_create(a, b, c, d, e, f)           (__clockid_t)a, (__syscall_ulong_t)b
 #define __NRAM_eventfd(a, b, c, d, e, f)                  (__syscall_ulong_t)a
@@ -2498,7 +2499,7 @@
 #define __NRAP_vmsplice(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_move_pages(a)                              (__syscall_ulong_t)a
 #define __NRAP_utimensat(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
-#define __NRAP_epoll_pwait(a, b, c, d, e)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_epoll_pwait(a, b, c, d, e, f)              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NRAP_signalfd(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_timerfd_create(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_eventfd(a)                                 (__syscall_ulong_t)a

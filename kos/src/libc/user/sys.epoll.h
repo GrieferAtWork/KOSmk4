@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9591569f */
+/* HASH CRC-32:0x5751a5f2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,10 +39,10 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create)(__STDC_INT_AS_SIZE_T
 /* >> epoll_create1(2)
  * Create a new epoll control descriptor which can be used for
  * monitoring of pollable events happening in registered files.
- * @param: flags: Set of `EPOLL_*'
+ * @param: flags: Set of `EPOLL_CLOEXEC | EPOLL_CLOFORK'
  * @return: * :   The newly created epoll control descriptor.
- * @return: -1:   [errno=EINVAL] Invalid `flags'
- * @return: -1:   Error (s.a. `errno') */
+ * @return: -1:   Error (s.a. `errno')
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_FLAG:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS: [...] */
 INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_T flags);
 /* >> epoll_ctl(2)
  * Manipulate a given epoll controller `epfd', as previously returned by `epoll_create1(2)'
@@ -52,7 +52,12 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_epoll_create1)(__STDC_INT_AS_UINT_
  * @param: fd:    The file descriptor to add/remove/modify
  * @param: event: The new configuration for `fd' (ignored when `op' is `EPOLL_CTL_DEL')
  * @return: 0 :   Success
- * @return: -1:   Error (s.a. `errno') */
+ * @return: -1:   [errno=EEXIST][op=EPOLL_CTL_ADD] The given `fd' (and its kernel object) has already been registered
+ * @return: -1:   [errno=ENOENT][op=EPOLL_CTL_MOD|EPOLL_CTL_DEL] The given `fd' (and its kernel object) aren't registered
+ * @return: -1:   Error (s.a. `errno')
+ * @throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
+ *                                   forms a loop with `epfd', or has too many nested.
+ * @throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...] */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd, __epoll_ctl_t op, fd_t fd, struct epoll_event *event);
 /* >> epoll_wait(2)
  * Wait until at least one of the conditions monitored by `epfd' to be met.
