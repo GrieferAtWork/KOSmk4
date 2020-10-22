@@ -335,7 +335,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ "fs",
 		/* [HANDLE_TYPE_VM]                     = */ "vm",
 		/* [HANDLE_TYPE_TASK]                   = */ "task",
-		/* [HANDLE_TYPE_UNDEFINED]              = */ "undefined",
+		/* [HANDLE_TYPE_EPOLL]                  = */ "epoll",
 		/* [HANDLE_TYPE_DRIVER]                 = */ "driver",
 		/* [HANDLE_TYPE_PIPE]                   = */ "pipe",
 		/* [HANDLE_TYPE_PIPE_READER]            = */ "pipe_reader",
@@ -365,7 +365,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_fs_refcnt,
 		/* [HANDLE_TYPE_VM]                     = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_vm_refcnt,
 		/* [HANDLE_TYPE_TASK]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_task_refcnt,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_undefined_refcnt,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_epoll_refcnt,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_driver_refcnt,
 		/* [HANDLE_TYPE_PIPE]                   = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_refcnt,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (refcnt_t (FCALL *)(void const *__restrict))&handle_pipe_reader_refcnt,
@@ -395,7 +395,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (FCALL *)(void *__restrict))&handle_fs_incref,
 		/* [HANDLE_TYPE_VM]                     = */ (void (FCALL *)(void *__restrict))&handle_vm_incref,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (FCALL *)(void *__restrict))&handle_task_incref,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(void *__restrict))&handle_undefined_incref,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (void (FCALL *)(void *__restrict))&handle_epoll_incref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (FCALL *)(void *__restrict))&handle_driver_incref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(void *__restrict))&handle_pipe_incref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (FCALL *)(void *__restrict))&handle_pipe_reader_incref,
@@ -425,7 +425,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (FCALL *)(REF void *__restrict))&handle_fs_decref,
 		/* [HANDLE_TYPE_VM]                     = */ (void (FCALL *)(REF void *__restrict))&handle_vm_decref,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (FCALL *)(REF void *__restrict))&handle_task_decref,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(REF void *__restrict))&handle_undefined_decref,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (void (FCALL *)(REF void *__restrict))&handle_epoll_decref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (FCALL *)(REF void *__restrict))&handle_driver_decref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(REF void *__restrict))&handle_pipe_decref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (FCALL *)(REF void *__restrict))&handle_pipe_reader_decref,
@@ -455,7 +455,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_fs_tryincref,
 		/* [HANDLE_TYPE_VM]                     = */ (__BOOL (FCALL *)(void *__restrict))&handle_vm_tryincref,
 		/* [HANDLE_TYPE_TASK]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_task_tryincref,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (__BOOL (FCALL *)(void *__restrict))&handle_undefined_tryincref,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (__BOOL (FCALL *)(void *__restrict))&handle_epoll_tryincref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (__BOOL (FCALL *)(void *__restrict))&handle_driver_tryincref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_tryincref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (__BOOL (FCALL *)(void *__restrict))&handle_pipe_reader_tryincref,
@@ -485,7 +485,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_fs_weakgetref,
 		/* [HANDLE_TYPE_VM]                     = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_vm_weakgetref,
 		/* [HANDLE_TYPE_TASK]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_task_weakgetref,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_undefined_weakgetref,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_epoll_weakgetref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_driver_weakgetref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_weakgetref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (WEAK REF void *(FCALL *)(void *__restrict))&handle_pipe_reader_weakgetref,
@@ -515,7 +515,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (REF void *(FCALL *)(void *__restrict))&handle_fs_weaklckref,
 		/* [HANDLE_TYPE_VM]                     = */ (REF void *(FCALL *)(void *__restrict))&handle_vm_weaklckref,
 		/* [HANDLE_TYPE_TASK]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_task_weaklckref,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF void *(FCALL *)(void *__restrict))&handle_undefined_weaklckref,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (REF void *(FCALL *)(void *__restrict))&handle_epoll_weaklckref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (REF void *(FCALL *)(void *__restrict))&handle_driver_weaklckref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (REF void *(FCALL *)(void *__restrict))&handle_pipe_weaklckref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF void *(FCALL *)(void *__restrict))&handle_pipe_reader_weaklckref,
@@ -545,7 +545,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_fs_weakdecref,
 		/* [HANDLE_TYPE_VM]                     = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_vm_weakdecref,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_task_weakdecref,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_undefined_weakdecref,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_epoll_weakdecref,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_driver_weakdecref,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_weakdecref,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (FCALL *)(WEAK REF void *__restrict))&handle_pipe_reader_weakdecref,
@@ -575,7 +575,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_fs_read,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_vm_read,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_task_read,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_undefined_read,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_epoll_read,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_driver_read,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_read,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, iomode_t))&handle_pipe_reader_read,
@@ -605,7 +605,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_fs_write,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_vm_write,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_task_write,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_undefined_write,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_epoll_write,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_driver_write,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_write,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, iomode_t))&handle_pipe_reader_write,
@@ -635,7 +635,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_fs_pread,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_vm_pread,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_task_pread,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_undefined_pread,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_epoll_pread,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_driver_pread,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_pread,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void *, size_t, pos_t, iomode_t))&handle_pipe_reader_pread,
@@ -665,7 +665,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_fs_pwrite,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_vm_pwrite,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_task_pwrite,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_undefined_pwrite,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_epoll_pwrite,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_driver_pwrite,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_pwrite,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED void const *, size_t, pos_t, iomode_t))&handle_pipe_reader_pwrite,
@@ -695,7 +695,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_fs_readv,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_vm_readv,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_task_readv,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_undefined_readv,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_epoll_readv,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_driver_readv,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_pipe_readv,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_pipe_reader_readv,
@@ -725,7 +725,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_fs_writev,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_vm_writev,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_task_writev,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_undefined_writev,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_epoll_writev,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_driver_writev,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_pipe_writev,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, iomode_t))&handle_pipe_reader_writev,
@@ -755,7 +755,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_preadv,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_vm_preadv,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_task_preadv,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_preadv,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_epoll_preadv,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_preadv,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_preadv,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_reader_preadv,
@@ -785,7 +785,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_fs_pwritev,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_vm_pwritev,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_task_pwritev,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_undefined_pwritev,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_epoll_pwritev,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_driver_pwritev,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_pwritev,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, struct aio_buffer *__restrict, size_t, pos_t, iomode_t))&handle_pipe_reader_pwritev,
@@ -815,7 +815,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_fs_readdir,
 		/* [HANDLE_TYPE_VM]                     = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_vm_readdir,
 		/* [HANDLE_TYPE_TASK]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_task_readdir,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_undefined_readdir,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_epoll_readdir,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_driver_readdir,
 		/* [HANDLE_TYPE_PIPE]                   = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_readdir,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (size_t (KCALL *)(void *__restrict, USER CHECKED struct dirent *, size_t, readdir_mode_t, iomode_t))&handle_pipe_reader_readdir,
@@ -845,7 +845,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_fs_seek,
 		/* [HANDLE_TYPE_VM]                     = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_vm_seek,
 		/* [HANDLE_TYPE_TASK]                   = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_task_seek,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_undefined_seek,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_epoll_seek,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_driver_seek,
 		/* [HANDLE_TYPE_PIPE]                   = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_seek,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (pos_t (KCALL *)(void *__restrict, off_t, unsigned int))&handle_pipe_reader_seek,
@@ -875,7 +875,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_ioctl,
 		/* [HANDLE_TYPE_VM]                     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_vm_ioctl,
 		/* [HANDLE_TYPE_TASK]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_task_ioctl,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_ioctl,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_epoll_ioctl,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_ioctl,
 		/* [HANDLE_TYPE_PIPE]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_ioctl,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_ioctl,
@@ -905,7 +905,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict, pos_t))&handle_fs_truncate,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict, pos_t))&handle_vm_truncate,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict, pos_t))&handle_task_truncate,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, pos_t))&handle_undefined_truncate,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict, pos_t))&handle_epoll_truncate,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict, pos_t))&handle_driver_truncate,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_truncate,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict, pos_t))&handle_pipe_reader_truncate,
@@ -935,7 +935,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_fs_mmap,
 		/* [HANDLE_TYPE_VM]                     = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_vm_mmap,
 		/* [HANDLE_TYPE_TASK]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_task_mmap,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_undefined_mmap,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_epoll_mmap,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_driver_mmap,
 		/* [HANDLE_TYPE_PIPE]                   = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_pipe_mmap,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF struct vm_datablock *(KCALL *)(void *__restrict, pos_t *__restrict, pos_t *__restrict, REF struct path **__restrict , REF struct directory_entry **__restrict))&handle_pipe_reader_mmap,
@@ -965,7 +965,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_fs_allocate,
 		/* [HANDLE_TYPE_VM]                     = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_vm_allocate,
 		/* [HANDLE_TYPE_TASK]                   = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_task_allocate,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_undefined_allocate,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_epoll_allocate,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_driver_allocate,
 		/* [HANDLE_TYPE_PIPE]                   = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_allocate,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (pos_t (KCALL *)(void *__restrict, fallocate_mode_t, pos_t, pos_t))&handle_pipe_reader_allocate,
@@ -995,7 +995,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict))&handle_fs_sync,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict))&handle_vm_sync,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict))&handle_task_sync,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict))&handle_undefined_sync,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict))&handle_epoll_sync,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict))&handle_driver_sync,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict))&handle_pipe_sync,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict))&handle_pipe_reader_sync,
@@ -1025,7 +1025,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict))&handle_fs_datasync,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict))&handle_vm_datasync,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict))&handle_task_datasync,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict))&handle_undefined_datasync,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict))&handle_epoll_datasync,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict))&handle_driver_datasync,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict))&handle_pipe_datasync,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict))&handle_pipe_reader_datasync,
@@ -1055,7 +1055,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_fs_stat,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_vm_stat,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_task_stat,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_undefined_stat,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_epoll_stat,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_driver_stat,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_stat,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict, USER CHECKED struct stat *))&handle_pipe_reader_stat,
@@ -1085,7 +1085,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_pollconnect,
 		/* [HANDLE_TYPE_VM]                     = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_vm_pollconnect,
 		/* [HANDLE_TYPE_TASK]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_task_pollconnect,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_pollconnect,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_epoll_pollconnect,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_pollconnect,
 		/* [HANDLE_TYPE_PIPE]                   = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_pollconnect,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (void (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_pollconnect,
@@ -1115,7 +1115,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_fs_polltest,
 		/* [HANDLE_TYPE_VM]                     = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_vm_polltest,
 		/* [HANDLE_TYPE_TASK]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_task_polltest,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_undefined_polltest,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_epoll_polltest,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_driver_polltest,
 		/* [HANDLE_TYPE_PIPE]                   = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_polltest,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (poll_mode_t (KCALL *)(void *__restrict, poll_mode_t))&handle_pipe_reader_polltest,
@@ -1145,7 +1145,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_fs_hop,
 		/* [HANDLE_TYPE_VM]                     = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_vm_hop,
 		/* [HANDLE_TYPE_TASK]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_task_hop,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_undefined_hop,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_epoll_hop,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_driver_hop,
 		/* [HANDLE_TYPE_PIPE]                   = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_hop,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (syscall_slong_t (KCALL *)(void *__restrict, syscall_ulong_t, USER UNCHECKED void *, iomode_t))&handle_pipe_reader_hop,
@@ -1175,7 +1175,7 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_FS]                     = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_fs_tryas,
 		/* [HANDLE_TYPE_VM]                     = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_vm_tryas,
 		/* [HANDLE_TYPE_TASK]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_task_tryas,
-		/* [HANDLE_TYPE_UNDEFINED]              = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_undefined_tryas,
+		/* [HANDLE_TYPE_EPOLL]                  = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_epoll_tryas,
 		/* [HANDLE_TYPE_DRIVER]                 = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_driver_tryas,
 		/* [HANDLE_TYPE_PIPE]                   = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_tryas,
 		/* [HANDLE_TYPE_PIPE_READER]            = */ (REF void *(KCALL *)(void *__restrict, uintptr_half_t))&handle_pipe_reader_tryas,
@@ -1467,6 +1467,36 @@ DEFINE_INTERN_WEAK_ALIAS(handle_task_pollconnect, handle_undefined_pollconnect);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_polltest, handle_undefined_polltest);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_hop, handle_undefined_hop);
 DEFINE_INTERN_WEAK_ALIAS(handle_task_tryas, handle_undefined_tryas);
+
+/* Weakly define operators for `HANDLE_TYPE_EPOLL' (`struct epoll_controller') */
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_tryincref, handle_undefined_tryincref);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_weakgetref, handle_undefined_weakgetref);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_weaklckref, handle_undefined_weaklckref);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_weakdecref, handle_undefined_weakdecref);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_readv, handle_undefined_readv);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_writev, handle_undefined_writev);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_preadv, handle_undefined_preadv);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_pwritev, handle_undefined_pwritev);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_pollconnect, handle_undefined_pollconnect);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_polltest, handle_undefined_polltest);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_epoll_tryas, handle_undefined_tryas);
 
 /* Weakly define operators for `HANDLE_TYPE_DRIVER' (`struct driver') */
 DEFINE_INTERN_WEAK_ALIAS(handle_driver_refcnt, handle_undefined_refcnt);

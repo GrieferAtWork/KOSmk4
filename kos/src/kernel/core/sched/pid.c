@@ -1436,7 +1436,7 @@ NOTHROW(KCALL pidns_prepare_for_insert_nx)(struct pidns *__restrict self) {
 		new_list = (struct pidns_entry *)kmalloc_nx((new_mask + 1) * sizeof(struct pidns_entry),
 		                                            GFP_ATOMIC | GFP_CALLOC);
 		if unlikely(!new_list)
-			return (self->pn_size + 1) >= self->pn_mask;
+			return (self->pn_size + 1) <= self->pn_mask;
 		/* Install the new list */
 		pidns_install_list(self, new_list, new_mask);
 		assert(self->pn_used == self->pn_size);
@@ -1460,7 +1460,7 @@ pidns_prepare_for_insert(struct pidns *__restrict self)
 		} EXCEPT {
 			if (!was_thrown(E_BADALLOC))
 				RETHROW();
-			if ((self->pn_size + 1) >= self->pn_mask)
+			if ((self->pn_size + 1) <= self->pn_mask)
 				return; /* Still enough space... */
 			RETHROW();
 		}

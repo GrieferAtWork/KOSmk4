@@ -64,7 +64,7 @@
 #define HANDLE_TYPE_VM              0x0008 /* `struct vm' */
 #define HANDLE_TYPE_TASK            0x0009 /* `struct taskpid'
                                             * Castable into: HANDLE_TYPE_FS, HANDLE_TYPE_VM, HANDLE_TYPE_PIDNS */
-//      HANDLE_TYPE_CLOCK           0x000a /* `struct realtime_clock_struct' */
+#define HANDLE_TYPE_EPOLL           0x000a /* `struct epoll_controller' */
 #define HANDLE_TYPE_DRIVER          0x000b /* `struct driver' */
 #define HANDLE_TYPE_PIPE            0x000c /* `struct pipe' */
 #define HANDLE_TYPE_PIPE_READER     0x000d /* `struct pipe_reader' */

@@ -153,8 +153,11 @@ NOTHROW(FCALL task_popconnections)(void) {
 	assertf(cons != THIS_ROOT_CONNECTIONS,
 	        "Cannot pop connections: Root connection set %p is already active",
 	        cons);
-	/* Terminate all connections that may still be active for `cons'. */
-	task_disconnectall();
+	/* Make sure that no connections are left active. */
+	assertf(cons->tcs_con == NULL,
+	        "Cannot call `task_popconnections()' when you've still "
+	        "got connections that havn't been disconnected, yet\n"
+	        "call `task_disconnectall()' first!");
 
 	/* Set the TLS pointer for the current set of connection to the old set. */
 	oldcons = cons->tsc_prev;
@@ -1440,17 +1443,15 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
 /************************************************************************/
 
 /* Finalize a given signal multi-completion controller.
- * This function will also disconnect any remaining signal that
- * may still be connected to one of the completion descriptors
- * allocated by `self', essentially doing the same as would also
- * be done by `sig_multicompletion_disconnect()' (though in
- * addition to this, this function will also free dynamically
- * allocated data owned by `self') */
+ * WARNING: This function will _not_ disconnect any remaining signals.
+ *          If active connections could possibly remain, it is up to
+ *          the caller to call `sig_multicompletion_disconnect()' first! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict self) {
 	struct _sig_multicompletion_set *ext;
-	/* Disconnect all established signals. */
-	sig_multicompletion_disconnect(self);
+	/* Make sure that `self' isn't still connected. */
+	assert(!sig_multicompletion_wasconnected(self));
+
 	/* Free all extended connection sets. */
 	ext = self->sm_set.sms_next;
 	DBG_memset(self, 0xcc, sizeof(*self));
@@ -1484,6 +1485,22 @@ NOTHROW(FCALL sig_multicompletion_disconnect)(struct sig_multicompletion *__rest
 		}
 	} while ((set = set->sms_next) != NULL);
 }
+
+/* Check if the given signal multi-completion controller `self' was connected. */
+PUBLIC NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion *__restrict self) {
+	struct _sig_multicompletion_set *set;
+	set = &self->sm_set;
+	do {
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(set->sms_routes); ++i) {
+			if (sig_completion_wasconnected(&set->sms_routes[i]))
+				return true;
+		}
+	} while ((set = set->sms_next) != NULL);
+	return false;
+}
+
 
 /* Allocate and return a new signal completion descriptor that is attached to the
  * signal multi-completion controller `self', and will invoke `cb' when triggered.

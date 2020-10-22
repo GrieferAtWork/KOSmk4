@@ -124,6 +124,10 @@ struct sig_completion
 	(_sig_completion_con(self).tc_stat = TASK_CONNECTION_STAT_BROADCAST, \
 	 (self)->sc_cb                     = (cb))
 
+/* Check if the given signal completion controller `self' was connected. */
+#define sig_completion_wasconnected(self) \
+	(!TASK_CONNECTION_STAT_ISDONE(__hybrid_atomic_load(_sig_completion_con(self).tc_stat, __ATOMIC_ACQUIRE)))
+
 /* Connect the given signal completion controller to the specified signal.
  * The caller must ensure that `completion' hasn't been connected, yet. */
 FUNDEF NOBLOCK NONNULL((1, 2)) void
@@ -204,7 +208,6 @@ struct sig_multicompletion {
 	struct _sig_multicompletion_set sm_set; /* Set of connections */
 };
 
-
 /* Initialize the given signal multi-completion controller. */
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_init)(struct sig_multicompletion *__restrict self) {
@@ -233,12 +236,9 @@ NOTHROW(FCALL sig_multicompletion_cinit)(struct sig_multicompletion *__restrict 
 #endif /* TASK_CONNECTION_STAT_BROADCAST == 0 && NDEBUG */
 
 /* Finalize a given signal multi-completion controller.
- * This function will also disconnect any remaining signal that
- * may still be connected to one of the completion descriptors
- * allocated by `self', essentially doing the same as would also
- * be done by `sig_multicompletion_disconnect()' (though in
- * addition to this, this function will also free dynamically
- * allocated data owned by `self') */
+ * WARNING: This function will _not_ disconnect any remaining signals.
+ *          If active connections could possibly remain, it is up to
+ *          the caller to call `sig_multicompletion_disconnect()' first! */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict self);
 
@@ -250,6 +250,10 @@ NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict s
  *          Attempting to invoke it from `sig_completion_t()' will result in a dead-lock! */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_disconnect)(struct sig_multicompletion *__restrict self);
+
+/* Check if the given signal multi-completion controller `self' was connected. */
+FUNDEF NOBLOCK NONNULL((1)) __BOOL
+NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion *__restrict self);
 
 /* Allocate and return a new signal completion descriptor that is attached to the
  * signal multi-completion controller `self', and will invoke `cb' when triggered.

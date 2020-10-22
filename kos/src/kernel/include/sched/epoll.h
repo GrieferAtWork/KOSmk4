@@ -41,20 +41,12 @@ DECL_BEGIN
 
 struct epoll_controller;
 struct epoll_handle_monitor {
-	uintptr_half_t               ehm_pollwht; /* [const] Set of `EPOLL*' describing what exactly is being polled. */
-	uintptr_half_t               ehm_handtyp; /* [const] The type of handle being monitored. */
-	WEAK REF void               *ehm_handptr; /* Handle type pointer. */
-	union epoll_data             ehm_data;    /* [lock(ehm_ctrl->ec_lock)] User-data to return when an event triggers. */
 	struct epoll_controller     *ehm_ctrl;    /* [1..1][const] The primary epoll controller (exists once
 	                                           * for every epoll-fd that is created by user-space, whereas
 	                                           * this `struct epoll_handle_monitor' exists once for every
 	                                           * monitored file descriptor, aka. handle) */
-	struct sig_multicompletion   ehm_comp;    /* Completion controller attached to pollable signals of `ehm_hand'
-	                                           * Signals monitored by this controller are established by doing a
-	                                           * regular `handle_poll()' on `ehm_hand', followed by making use of
-	                                           * `sig_multicompletion_connect_from_task()'. */
 	struct epoll_handle_monitor *ehm_rnext;   /* [0..1] Next monitor that has been raised. */
-	WEAK uintptr_t               ehm_raised;  /* [lock(ATOMIC)] Incremented once the monitored condition is met.
+	uintptr_half_t               ehm_raised;  /* [lock(ATOMIC)] Incremented once the monitored condition is met.
 	                                           * When this happens, the monitor is added to the chain of raised
 	                                           * monitors, and `ehm_ctrl->ec_avail' will be send (using `sig_send()',
 	                                           * thus waking up whatever a thread waiting in `epoll_wait(2)')
@@ -64,10 +56,20 @@ struct epoll_handle_monitor {
 	                                           * As such, the consumer of epoll events is responsible for resetting
 	                                           * the set of signals monitored by `ehm_comp' every time that signal is
 	                                           * broadcast. */
+	uintptr_half_t               ehm_handtyp; /* [const] The type of handle being monitored. */
+	WEAK REF void               *ehm_handptr; /* [const][1..1] Handle type pointer. (always valid in the context of `ehm_handtyp') */
+	uint32_t                     ehm_fdkey;   /* [const] FD-key used to differentiate monitors for the same file. */
+	uint32_t                     ehm_events;  /* [lock(ehm_ctrl->ec_lock)] Epoll events (Set of `EPOLL*'; s.a. `EPOLL_EVENTS') */
+	union epoll_data             ehm_data;    /* [lock(ehm_ctrl->ec_lock)] Epoll user data. */
+	struct sig_multicompletion   ehm_comp;    /* Completion controller attached to pollable signals of `ehm_hand'
+	                                           * Signals monitored by this controller are established by doing a
+	                                           * regular `handle_poll()' on `ehm_hand', followed by making use of
+	                                           * `sig_multicompletion_connect_from_task()'. */
+	struct epoll_handle_monitor *ehm_wnext;   /* Used internally by `epoll_controller_trywait()' */
 };
 
 struct epoll_controller_ent {
-	struct epoll_handle_monitor *ece_mon; /* [0..1] Pointed-to monitor (NULL for sentinel, -1 for deleted) */
+	struct epoll_handle_monitor *ece_mon; /* [0..1][owned] Pointed-to monitor (NULL for sentinel, INTERNAL_STUB for deleted) */
 };
 
 struct epoll_controller {
@@ -97,7 +99,14 @@ struct epoll_controller {
 	struct epoll_controller_ent      *ec_list;       /* [1..sc_mask+1][owned][lock(ec_lock)] Hash-vector of monitors.
 	                                                  * For hashing, the `h_data' pointer of handles is used. */
 };
-#define epoll_controller_hashnx(i, perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
+
+/* Hash-vector iteration helper macros */
+#define epoll_controller_hashof(monitor) \
+	((uintptr_t)(monitor)->ehm_handptr ^ (uintptr_t)(monitor)->ehm_fdkey)
+#define epoll_controller_hashof_ex(handptr, fd_key) \
+	((uintptr_t)(handptr) ^ (uintptr_t)(fd_key))
+#define epoll_controller_hashnx(i, perturb) \
+	((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
 
 /* Destroy the given epoll controller. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -120,9 +129,10 @@ epoll_controller_create(void) THROWS(E_BADALLOC);
 FUNDEF NONNULL((1, 2)) bool KCALL
 epoll_controller_addmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
+                            uint32_t fd_key,
                             USER CHECKED struct epoll_event const *info)
-	THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT,
-	       E_ILLEGAL_REFERENCE_LOOP);
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT,
+		       E_ILLEGAL_REFERENCE_LOOP);
 
 /* Modify the monitor for `hand' within the given epoll controller.
  * @return: true:  Success
@@ -130,16 +140,18 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 FUNDEF NONNULL((1, 2)) bool KCALL
 epoll_controller_modmonitor(struct epoll_controller *__restrict self,
                             struct handle const *__restrict hand,
+                            uint32_t fd_key,
                             USER CHECKED struct epoll_event const *info)
-	THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
 
 /* Delete the monitor for `hand' within the given epoll controller.
  * @return: true:  Success
  * @return: false: The given `hand' isn't being monitored by `self'. */
 FUNDEF NONNULL((1, 2)) bool KCALL
 epoll_controller_delmonitor(struct epoll_controller *__restrict self,
-                            struct handle const *__restrict hand)
-	THROWS(E_WOULDBLOCK);
+                            struct handle const *__restrict hand,
+                            uint32_t fd_key)
+		THROWS(E_WOULDBLOCK);
 
 
 /* Try to consume pending events from `self'. Note that this
@@ -151,6 +163,7 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
  * as raised once again, and be back onto the queue of pending
  * events. The same thing also happens when writing to `events'
  * would result in a SEGFAULT.
+ * @param: maxevents: The max number of events to consume (asserted to be >= 1)
  * @return: * : The actual number of consumed events.
  *              When non-zero, the calling thread's set of connected
  *              signals (~ala task_connect()) may have been clobbered.
@@ -160,7 +173,7 @@ FUNDEF NONNULL((1)) size_t KCALL
 epoll_controller_trywait(struct epoll_controller *__restrict self,
                          USER CHECKED struct epoll_event *events,
                          size_t maxevents)
-	THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT);
 
 /* Same as `epoll_controller_trywait()', but blocking wait until
  * at least 1 event could be consumed. If `timeout' is non-NULL,
@@ -174,7 +187,7 @@ epoll_controller_wait(struct epoll_controller *__restrict self,
                       USER CHECKED struct epoll_event *events,
                       size_t maxevents,
                       struct timespec const *timeout)
-	THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
+		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 
 /* Quickly check if there are pending events that can be waited upon. */
 #define epoll_controller_canwait(self) \
@@ -212,9 +225,9 @@ epoll_controller_wait(struct epoll_controller *__restrict self,
  * >>     //    we may be connected to at the moment won't cause
  * >>     //    us to be invoked as often.
  * >>     bool did_raise = ATOMIC_XCH(me->ehm_raised, true);
- * >>     if likely(did_raise) {
+ * >>     if likely(did_raise && tryincref(me->ehm_ctrl)) {
  * >>         ATOMIC_SLIST_INSERT(me, me->ehm_ctrl->ec_raised);
- * >>         PHASE_2.args[0] = incref(me->ehm_ctrl);
+ * >>         PHASE_2.args[0] = me->ehm_ctrl;
  * >>     }
  * >> }
  * >> PHASE_2(struct epoll_controller *self) {

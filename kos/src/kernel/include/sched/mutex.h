@@ -47,7 +47,7 @@ struct mutex {
 #define mutex_cinit(x)      (void)(sig_cinit(&(x)->m_unlock), __hybrid_assert((x)->m_owner == __NULLPTR), __hybrid_assert((x)->m_count == 0))
 #define mutex_init_held(x)  (void)(sig_init(&(x)->m_unlock), (x)->m_owner = THIS_TASK, (x)->m_count = 1)
 #define mutex_cinit_held(x) (void)(sig_cinit(&(x)->m_unlock), (x)->m_owner = THIS_TASK, (x)->m_count = 1)
-#define mutex_acquired(x)   (__hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE) == THIS_TASK)
+#define mutex_acquired(x)   (__hybrid_atomic_load((x)->m_owner, __ATOMIC_ACQUIRE) == THIS_TASK)
 
 /* Try to acquire a lock to the given mutex without blocking. */
 LOCAL NOBLOCK WUNUSED NONNULL((1)) bool
@@ -206,18 +206,21 @@ NOTHROW(KCALL mutex_available)(struct mutex const *__restrict self) {
 
 /* Mutex polling functions. */
 #define mutex_pollconnect_ex(self, cb) cb(&(self)->m_unlock)
+#define mutex_poll_unlikely_ex(self, cb) \
+	(mutex_pollconnect_ex(self, cb),     \
+	 mutex_available(self))
 #ifdef __OPTIMIZE_SIZE__
 #define mutex_poll_ex(self, cb)      \
-	(mutex_pollconnect_ex(self, cb), \
-	 mutex_available(self))
+	mutex_poll_unlikely_ex(self, cb)
 #else /* __OPTIMIZE_SIZE__ */
 #define mutex_poll_ex(self, cb)       \
 	(mutex_available(self) ||         \
 	 (mutex_pollconnect_ex(self, cb), \
 	  mutex_available(self)))
 #endif /* !__OPTIMIZE_SIZE__ */
-#define mutex_pollconnect(self) mutex_pollconnect_ex(self, task_connect_for_poll)
-#define mutex_poll(self)        mutex_poll_ex(self, task_connect_for_poll)
+#define mutex_pollconnect(self)   mutex_pollconnect_ex(self, task_connect_for_poll)
+#define mutex_poll(self)          mutex_poll_ex(self, task_connect_for_poll)
+#define mutex_poll_unlikely(self) mutex_poll_unlikely_ex(self, task_connect_for_poll)
 
 
 /* Integration into the sync_* API-system. */
