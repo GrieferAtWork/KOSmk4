@@ -92,9 +92,28 @@ install_file $OPENSSLDIR/openssl.cnf.dist  "$SRCPATH/apps/openssl.cnf"
 
 
 # Install headers:
-install_rawfile \
-	"$KOS_ROOT/kos/include/$TARGET_INCPATH/openssl/opensslconf.h" \
-	"$OPTPATH/include/openssl/opensslconf.h"
+if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
+	TARGET_EXT="32"
+	if [ "$TARGET_NAME" == "x86_64" ]; then
+		TARGET_EXT="64"
+	fi
+	install_rawfile \
+		"$KOS_ROOT/kos/include/$TARGET_INCPATH/openssl/opensslconf$TARGET_EXT.h" \
+		"$OPTPATH/include/openssl/opensslconf.h"
+	install_rawfile_stdin "$KOS_ROOT/kos/include/$TARGET_INCPATH/openssl/opensslconf.h" <<EOF
+#include <hybrid/host.h>
+#ifdef __x86_64__
+#include "opensslconf64.h"
+#else /* __x86_64__ */
+#include "opensslconf32.h"
+#endif /* !__x86_64__ */
+EOF
+else
+	install_rawfile \
+		"$KOS_ROOT/kos/include/$TARGET_INCPATH/openssl/opensslconf.h" \
+		"$OPTPATH/include/openssl/opensslconf.h"
+fi
+
 install_header() {
 	install_rawfile "$KOS_ROOT/kos/include/$1" "$SRCPATH/include/$1"
 }

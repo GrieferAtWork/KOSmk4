@@ -134,7 +134,8 @@ struct process_sigqueue {
 	struct sigqueue      psq_queue; /* The underlying queue. */
 };
 
-FUNDEF NOBLOCK void NOTHROW(KCALL sigqueue_fini)(struct sigqueue *__restrict self);
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL sigqueue_fini)(struct sigqueue *__restrict self);
 
 /* [valid_if(!TASK_FKERNTHREAD)]
  * [lock(LINKED_LIST(APPEND(ATOMIC),CLEAR(THIS_TASK)))]

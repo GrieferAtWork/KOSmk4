@@ -86,10 +86,11 @@ NOTHROW(KCALL sigqueue_entry_freechain)(struct sigqueue_entry *head) {
 	}
 }
 
-PUBLIC NOBLOCK void
+PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL sigqueue_fini)(struct sigqueue *__restrict self) {
 	if (self->sq_queue != SIGQUEUE_SQ_QUEUE_TERMINATED)
 		sigqueue_entry_freechain(self->sq_queue);
+	sig_broadcast_for_fini(&self->sq_newsig);
 }
 
 LOCAL NOBLOCK void
@@ -119,14 +120,15 @@ NOTHROW(KCALL process_sigqueue_set_term)(struct process_sigqueue *__restrict sel
 	FORTASK(x, this_taskgroup).tg_proc_group_siblings
 
 
-PRIVATE NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL pidns_remove)(struct pidns *__restrict self,
-                            struct taskpid *__restrict pid);
+                            /*inherit(always)*/ struct taskpid *__restrict pid);
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL taskpid_destroy)(struct taskpid *__restrict self) {
 	struct pidns *ns = self->tp_pidns;
 	assert(!self->tp_thread.is_nonnull());
+	sig_broadcast_for_fini(&self->tp_changed);
 	/* shouldn't be NULL, but may be in case of incomplete initialization... */
 	if unlikely(!ns) {
 		kfree(self);
@@ -1054,9 +1056,9 @@ NOTHROW(KCALL pidns_do_remove)(struct pidns *__restrict self,
 	--self->pn_used;
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL pidns_remove)(struct pidns *__restrict self,
-                            struct taskpid *__restrict pid) {
+                            /*inherit(always)*/ struct taskpid *__restrict pid) {
 again:
 	if (sync_trywrite(self)) {
 		pidns_do_remove(self, pid);

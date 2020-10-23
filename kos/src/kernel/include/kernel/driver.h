@@ -40,8 +40,10 @@
 
 DECL_BEGIN
 
+/* Fallback for the default driver library search path.
+ * This string may have already been defined in `<kernel/arch/driver.h>'. */
 #ifndef KERNEL_DRIVER_DEFAULT_LIBRARY_PATH
-#define KERNEL_DRIVER_DEFAULT_LIBRARY_PATH    "/os/drivers"
+#define KERNEL_DRIVER_DEFAULT_LIBRARY_PATH "/os/drivers"
 #endif /* !KERNEL_DRIVER_DEFAULT_LIBRARY_PATH */
 
 
@@ -382,12 +384,13 @@ struct driver {
 	REF struct driver_section*d_dangsect;   /* [0..1][lock(d_sections_lock)] Chain of dangling sections (sections no longer referenced, but kept in memory for caching) */
 	char const               *d_shstrtab;   /* [lock(WRITE_ONCE)][0..1][owned] Section headers name table (or `NULL' if not loaded). */
 	char const               *d_shstrtab_end;/* [lock(WRITE_ONCE)][0..1] End pointer for the `d_shstrtab' section (points to a NUL-character). */
-	struct sig                d_destroyed;    /* Signal broadcast during driver destruction, after the driver was (attempted to be) removed from `current_driver_state' */
+	struct sig                d_destroyed;  /* Signal broadcast during driver destruction, after the driver was (attempted to be) removed from `current_driver_state' */
 
 	/* Module program headers */
 	ElfW(Half)   DRIVER_CONST d_phnum;      /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][!0] (Max) number of program headers. */
 	byte_t                    d_pad3[sizeof(void *) - sizeof(ElfW(Half))];
-	COMPILER_FLEXIBLE_ARRAY(ElfW(Phdr)   DRIVER_CONST, d_phdr); /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][d_phnum] Vector of program headers. */
+	COMPILER_FLEXIBLE_ARRAY(ElfW(Phdr) DRIVER_CONST,
+	                          d_phdr);      /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][d_phnum] Vector of program headers. */
 };
 
 #define driver_isfinalizing(self)                            \
@@ -467,7 +470,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct driver_library_path_string, dlp_refcnt, kfree);
 /* [1..1] The current driver library path.
  * This path is a ':'-separated list of UNIX-style pathnames
  * that are used to resolve dependencies of kernel driver modules.
- * By default, this string is simply set to "/os/drivers" */
+ * By default, this string is KERNEL_DRIVER_DEFAULT_LIBRARY_PATH */
 DATDEF ATOMIC_REF(struct driver_library_path_string) driver_library_path;
 
 

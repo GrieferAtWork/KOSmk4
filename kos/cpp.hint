@@ -1314,7 +1314,6 @@
 #define PNG_FP_EXPORT(v,x,y,z) x y z;
 #define PNG_FIXED_EXPORT(v,x,y,z) x y z;
 #define PNG_REMOVED(v,x,y,z,a)
-#define DECLARE_DEPRECATED(f) f;
 #define OF(x) x
 #define Z_ARG(x) x
 #define z_const const
@@ -1366,6 +1365,11 @@
 #define DEFINE_STACK_OF(t)
 #define DEFINE_SPECIAL_STACK_OF_CONST(t1,t2)
 #define DEFINE_STACK_OF_CONST(t)
+#define DECLARE_DEPRECATED(f) f;
+#define DEPRECATEDIN_1_2_0(f) f;
+#define DEPRECATEDIN_1_1_0(f) f;
+#define DEPRECATEDIN_1_0_0(f) f;
+#define DEPRECATEDIN_0_9_8(f) f;
 #define PIXMAN_BEGIN_DECLS
 #define PIXMAN_END_DECLS
 #define __REPB_PREFIX(name) name

@@ -165,7 +165,7 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 	 * our caller is preventing `self' from being destroyed by holding onto
 	 * an internal SMP-lock that will block:
 	 *  - `sig_completion_disconnect()', as called by
-	 *  - `sig_multicompletion_disconnect()', as called by
+	 *  - `sig_multicompletion_disconnectall()', as called by
 	 *  - `epoll_controller_destroy()' */
 	monitor = container_of(sig_multicompletion_controller(self),
 	                       struct epoll_handle_monitor, ehm_comp);
@@ -215,7 +215,8 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 /* Destroy the given monitor */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL epoll_handle_monitor_destroy)(struct epoll_handle_monitor *__restrict self) {
-	/* NOTE: This fini call also ensure that all connections have gone away! */
+	/* NOTE: The caller must ensure that `&self->ehm_comp'
+	 *       has been diconnected before we get here! */
 	sig_multicompletion_fini(&self->ehm_comp);
 	/* Drop our weak reference from the associated handle. */
 	(*handle_type_db.h_weakdecref[self->ehm_handtyp])(self->ehm_handptr);
@@ -241,16 +242,18 @@ again:
 		/* Connect to monitored signals. */
 		(*handle_type_db.h_pollconnect[self->ehm_handtyp])(handle_obptr,
 		                                                   self->ehm_events);
-		sig_multicompletion_connect_from_task(&self->ehm_comp, &epoll_completion, true);
+		sig_multicompletion_connect_from_task(/* completion: */ &self->ehm_comp,
+		                                      /* cb:         */ &epoll_completion,
+		                                      /* for_poll:   */ true);
 	} EXCEPT {
-		sig_multicompletion_disconnect(&self->ehm_comp);
+		sig_multicompletion_disconnectall(&self->ehm_comp);
 		task_disconnectall();
 		RETHROW();
 	}
 	if unlikely(task_receiveall() != NULL) {
 		/* Signals were delivered in the mean time, and we have not have been able
 		 * to transfer all of them over to `self->ehm_comp'. -> Try again. */
-		sig_multicompletion_disconnect(&self->ehm_comp);
+		sig_multicompletion_disconnectall(&self->ehm_comp);
 		task_disconnectall();
 		goto again;
 	}
@@ -266,7 +269,7 @@ PRIVATE void KCALL
 epoll_handle_monitor_prime(struct epoll_handle_monitor *__restrict self,
                            void *handptr, bool test_before_connect) {
 	assert(mutex_acquired(&self->ehm_ctrl->ec_lock));
-	sig_multicompletion_disconnect(&self->ehm_comp);
+	assert(!sig_multicompletion_wasconnected(&self->ehm_comp));
 	COMPILER_BARRIER();
 	self->ehm_raised = 0;
 #ifndef NDEBUG
@@ -296,11 +299,11 @@ was_asserted:
 		TRY {
 			if (epoll_handle_monitor_polltest(self, handptr)) {
 				/* Disconnect */
-				sig_multicompletion_disconnect(&self->ehm_comp);
+				sig_multicompletion_disconnectall(&self->ehm_comp);
 				goto was_asserted;
 			}
 		} EXCEPT {
-			sig_multicompletion_disconnect(&self->ehm_comp);
+			sig_multicompletion_disconnectall(&self->ehm_comp);
 			/* Deal with the case where the handle was already raised.
 			 * In this case, we must remove it from the queue of raised
 			 * monitors in order to ensure consistency. */
@@ -343,7 +346,7 @@ NOTHROW(FCALL epoll_controller_destroy)(struct epoll_controller *__restrict self
 			continue;
 		assert(mon->ehm_ctrl == self);
 		/* Make sure that this monitor isn't still connected to anything! */
-		sig_multicompletion_disconnect(&mon->ehm_comp);
+		sig_multicompletion_disconnectall(&mon->ehm_comp);
 		epoll_handle_monitor_destroy(mon);
 	}
 	kfree(self->ec_list);
@@ -473,6 +476,9 @@ again:
 			if (error == EPOLL_LOOP) {
 epoll_loop:
 				mutex_release(&self->ec_lock);
+				/* TODO: Linux returns -EINVAL when `hand_epoll == self',
+				 *       and -ELOOP in all other cases. This right here
+				 *       causes -ELOOP for all cases! */
 				THROW(E_ILLEGAL_REFERENCE_LOOP);
 			}
 			mutex_release(&self->ec_lock);
@@ -817,7 +823,7 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 		if ((monitor->ehm_events & EPOLL_WHATMASK) !=
 		    (new_events.events & EPOLL_WHATMASK)) {
 			/* Change monitored events. */
-			sig_multicompletion_disconnect(&monitor->ehm_comp);
+			sig_multicompletion_disconnectall(&monitor->ehm_comp);
 			COMPILER_BARRIER();
 			/* If the monitor has already been raised, then we
 			 * must remove it from the raised-monitor queue. */
@@ -881,8 +887,8 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 	}
 	/* Note that we've just inherited `monitor',
 	 * so now we have to destroy it! */
-	sig_multicompletion_disconnect(&monitor->ehm_comp);
-	/* With signal completion callbacks all diconnected (by `sig_multicompletion_disconnect()'),
+	sig_multicompletion_disconnectall(&monitor->ehm_comp);
+	/* With signal completion callbacks all diconnected (by `sig_multicompletion_disconnectall()'),
 	 * we must also ensure that `monitor' isn't apart of the raised monitor chain.
 	 * If it is, then we must remove it prior to releasing our lock from `ec_lock' */
 	if (monitor->ehm_raised != 0)
@@ -1045,7 +1051,7 @@ again_piter:
 				poll_mode_t what;
 				assert(result < maxevents);
 				/* Disconnect all still-connected signals of this monitor. */
-				sig_multicompletion_disconnect(&iter->ehm_comp);
+				sig_multicompletion_disconnectall(&iter->ehm_comp);
 				assert(ATOMIC_READ(iter->ehm_raised) != 0);
 				handptr = (*handle_type_db.h_weaklckref[iter->ehm_handtyp])(iter->ehm_handptr);
 				if unlikely(!handptr) {
@@ -1087,7 +1093,7 @@ again_piter:
 							what = (*handle_type_db.h_polltest[iter->ehm_handtyp])(handptr, iter->ehm_events);
 							what &= iter->ehm_events & EPOLL_WHATMASK;
 							if unlikely(what) {
-								sig_multicompletion_disconnect(&iter->ehm_comp);
+								sig_multicompletion_disconnectall(&iter->ehm_comp);
 								COMPILER_WRITE_BARRIER();
 								iter->ehm_raised = 0;
 								COMPILER_WRITE_BARRIER();
@@ -1140,7 +1146,7 @@ got_what:
 			 * for availability. */
 			struct epoll_handle_monitor *iter;
 			for (iter = monitors; iter; iter = iter->ehm_wnext) {
-				sig_multicompletion_disconnect(&iter->ehm_comp);
+				sig_multicompletion_disconnectall(&iter->ehm_comp);
 				COMPILER_READ_BARRIER();
 				/* Because  */
 				if (iter->ehm_raised != 0)

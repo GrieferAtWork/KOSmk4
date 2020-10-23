@@ -1445,7 +1445,7 @@ NOTHROW(FCALL sig_numwaiting)(struct sig *__restrict self) {
 /* Finalize a given signal multi-completion controller.
  * WARNING: This function will _not_ disconnect any remaining signals.
  *          If active connections could possibly remain, it is up to
- *          the caller to call `sig_multicompletion_disconnect()' first! */
+ *          the caller to call `sig_multicompletion_disconnectall()' first! */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict self) {
 	struct _sig_multicompletion_set *ext;
@@ -1470,7 +1470,7 @@ NOTHROW(FCALL sig_multicompletion_fini)(struct sig_multicompletion *__restrict s
  * WARNING: This callback (if used) can only be invoked from `sig_postcompletion_t()'.
  *          Attempting to invoke it from `sig_completion_t()' will result in a dead-lock! */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL sig_multicompletion_disconnect)(struct sig_multicompletion *__restrict self) {
+NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__restrict self) {
 	struct _sig_multicompletion_set *set;
 	set = &self->sm_set;
 	do {
@@ -1615,7 +1615,7 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
  * has already been sent (i.e. `task_waitfor()' wouldn't block), then this function
  * will return early, and the exact (if any) signals that were connected to `completion'
  * are left undefined (meaning that the caller can really only handle this happening
- * by using `sig_multicompletion_disconnect()', but also meaning that `cb' may still
+ * by using `sig_multicompletion_disconnectall()', but also meaning that `cb' may still
  * get invoked in case the caller was connected to more than one signal, and more
  * than one of those gets triggered before connections of `completion' get disconnected)
  * As such, the safe way to use this function is as
@@ -1628,7 +1628,7 @@ NOTHROW(FCALL sig_connect_multicompletion_nx)(struct sig *__restrict self,
  * >> sig_multicompletion_init(&smc);
  * >> sig_multicompletion_connect_from_task(&smc, &my_callback);
  * >> if (task_trywait()) {  // Or `task_receiveall()' if the caller only wants connections to remain in `smc'
- * >>     sig_multicompletion_disconnect(&smc);
+ * >>     sig_multicompletion_disconnectall(&smc);
  * >>     // Error:   One of the caller's signals may have already
  * >>     //          been delivered before `smc' could connect to
  * >>     //          all of them.

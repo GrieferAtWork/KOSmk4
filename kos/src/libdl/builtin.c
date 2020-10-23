@@ -1995,7 +1995,7 @@ DlModule_IteratePhdr(DlModule *__restrict self,
 		ph[0].p_align   = 1;
 		info.dlpi_phdr  = ph;
 		info.dlpi_phnum = COMPILER_LENOF(ph);
-		result = (*self->dm_ops->df_lsphdrs)(self, &info, callback, arg);
+		result = (*callback)(&info, sizeof(info), arg);
 	}
 	return result;
 }

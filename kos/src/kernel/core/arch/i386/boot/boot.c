@@ -413,7 +413,26 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       `__STDC_WANT_DEC_FP__' under `__USE_ISOC2X' (for this purpose, <hybrid/floatcore.h>
 	 *       will also have to be adjusted) */
 
-	/* TODO: Update poll(2) and select(2) to only use `handle_poll_test()' during the
+	/* TODO: Functions like sigaddset() are supposed to set `errno=EINVAL' when the
+	 *       given signal isn't valid. (signo <= 0 || signo >= NSIG) */
+
+	/* TODO: Change cheader.dee to generate smaller code for the following:
+	 * >> #ifndef __openpty_defined
+	 * >> #define __openpty_defined 1
+	 * >> #ifdef __CRT_HAVE_openpty
+	 * >> ...
+	 * >> #else // __CRT_HAVE_openpty
+	 * >> #undef __openpty_defined
+	 * >> #endif // !__CRT_HAVE_openpty
+	 * >> #endif // !__openpty_defined
+	 * Replace with this:
+	 * >> #if !defined(__openpty_defined) && defined(__CRT_HAVE_openpty)
+	 * >> #define __openpty_defined 1
+	 * >> ...
+	 * >> #endif // !__openpty_defined && __CRT_HAVE_openpty
+	 */
+
+	/* TODO: Update poll(2) and select(2) to only use `handle_polltest()' during the
 	 *       initial scan for ready files. Afterwards, scan all monitored files again,
 	 *       but this time do `connect+test' on each one of them. The second test
 	 *       must be done immediately following the connect not due to race conditions,

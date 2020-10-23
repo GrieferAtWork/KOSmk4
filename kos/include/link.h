@@ -42,9 +42,8 @@
 #define __ELF_NATIVE_CLASS 64
 #endif /* ELF_ARCH_CLASS == ... */
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* Module handles (as returned by `dlopen()') can be cast to this structure. */
 struct link_map {
@@ -63,10 +62,10 @@ struct link_map {
 
 
 struct dl_phdr_info {
-	ElfW(Addr)        dlpi_addr;  /* Load address (offset added to `p_vaddr' in `dlpi_phdr') of this module. */
-	char const       *dlpi_name;  /* [1..1] File name of this module. */
-	ElfW(Phdr) const *dlpi_phdr;  /* [1..dlpi_phnum] Vector of program headers. */
-	ElfW(Half)        dlpi_phnum; /* # of program headers. */
+	ElfW(Addr)        dlpi_addr;      /* Load address (offset added to `p_vaddr' in `dlpi_phdr') of this module. */
+	char const       *dlpi_name;      /* [1..1] File name of this module. */
+	ElfW(Phdr) const *dlpi_phdr;      /* [1..dlpi_phnum] Vector of program headers. */
+	ElfW(Half)        dlpi_phnum;     /* # of program headers. */
 	/* NOTE: Everything that follows may only be available if `size' passed by
 	 *      `dl_iterate_phdr()' to the given callback is >= offsetafter(...) */
 	__uint64_t        dlpi_adds;      /* Incremented when a new object may have been added.  */
@@ -99,8 +98,7 @@ __NOTHROW_NCX(__DLFCN_CC dl_iterate_phdr)(__dl_iterator_callback __callback,
 extern ElfW(Dyn) _DYNAMIC[];
 #endif /* __ELF__ */
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_LINK_H */

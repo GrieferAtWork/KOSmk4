@@ -37,7 +37,11 @@ struct eventfd {
 	atomic64_t    ef_value;  /* Eventfd value. */
 };
 
-DEFINE_REFCOUNT_FUNCTIONS(struct eventfd, ef_refcnt, kfree)
+/* Destroy a given eventfd object. */
+#define eventfd_destroy(self)                    \
+	(sig_broadcast_for_fini(&(self)->ef_signal), \
+	 kfree(self))
+DEFINE_REFCOUNT_FUNCTIONS(struct eventfd, ef_refcnt, eventfd_destroy)
 
 #endif /* __CC__ */
 
