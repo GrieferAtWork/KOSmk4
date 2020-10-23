@@ -853,110 +853,6 @@ int main_sigbounce(int argc, char *argv[], char *envp[]) {
 
 
 
-/************************************************************************/
-int main_udsocket(int argc, char *argv[], char *envp[]) {
-	fd_t server_sock;
-	fd_t client_sock;
-	fd_t accept_sock;
-	struct sockaddr_un sa;
-	struct stat st;
-	(void)argc, (void)argv, (void)envp;
-
-	/* Server */
-	server_sock = socket(AF_UNIX, SOCK_STREAM, PF_UNIX);
-	if (server_sock < 0)
-		err(1, "socket() failed");
-	sa.sun_family = AF_UNIX;
-	sprintf(sa.sun_path, "/tmp/.my_unix_socket");
-	unlink(sa.sun_path);
-	if (bind(server_sock, (struct sockaddr *)&sa, sizeof(sa)) < 0)
-		err(1, "bind() failed");
-	if (listen(server_sock, 8) < 0)
-		err(1, "listen() failed");
-	if (stat(sa.sun_path, &st) < 0)
-		err(1, "stat() failed");
-
-	/* Client (NOTE: `SOCK_NONBLOCK' means async connect) */
-	client_sock = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, PF_UNIX);
-	if (client_sock < 0)
-		err(1, "socket() failed");
-	if (connect(client_sock, (struct sockaddr *)&sa, sizeof(sa)) < 0)
-		err(1, "connect() failed");
-
-	/* Accept the client */
-	accept_sock = accept(server_sock, NULL, NULL);
-	if (accept_sock < 0)
-		err(1, "accept() failed");
-
-	/* Acknowledge the accept from the client-side, and check for errors. */
-	{
-		struct pollfd pfd[1];
-		pfd[0].fd     = client_sock;
-		pfd[0].events = POLLOUT;
-		if (poll(pfd, 1, -1) <= 0)
-			err(1, "poll() failed");
-	}
-
-	/* Make the client socket synchronous */
-	fcntl(client_sock, F_SETFL, fcntl(client_sock, F_GETFL) & ~O_NONBLOCK);
-
-	/* Read out the connect error from the client socket. */
-	{
-		int error = ENOSYS;
-		socklen_t error_len = sizeof(error);
-		if (getsockopt(client_sock, SOL_SOCKET, SO_ERROR, &error, &error_len) < 0)
-			err(1, "getsockopt() failed");
-		if (error_len != sizeof(error))
-			errc(1, EINVAL, "getsockopt(SO_ERROR) returned error_len=%u", (unsigned int)error_len);
-		if (error != EOK)
-			errc(1, error, "getsockopt(SO_ERROR) returned an error");
-	}
-
-	/* At this point, we've got a full-duplex connection.
-	 * Time to send some data. */
-	{
-		char buf[128];
-		ssize_t len;
-		static char const msg1[] = "A->C";
-		static char const msg2[] = "C->A";
-		static char const msg3[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
-		len = write(accept_sock, msg1, sizeof(msg1) - sizeof(char));
-		if (len != sizeof(msg1) - sizeof(char))
-			err(1, "write(accept_sock) returned: %" PRIdSIZ, len);
-		len = read(client_sock, buf, sizeof(buf));
-		if (len != sizeof(msg1) - sizeof(char))
-			err(1, "read(client_sock) returned: %" PRIdSIZ, len);
-		if (memcmp(buf, msg1, sizeof(msg1) - sizeof(char)) != 0)
-			errc(1, EINVAL, "read(client_sock) returned data %$q", len, buf);
-		len = write(client_sock, msg2, sizeof(msg2) - sizeof(char));
-		if (len != sizeof(msg2) - sizeof(char))
-			err(1, "write(client_sock) returned: %" PRIdSIZ, len);
-		len = read(accept_sock, buf, sizeof(buf));
-		if (len != sizeof(msg2) - sizeof(char))
-			err(1, "read(accept_sock) returned: %" PRIdSIZ, len);
-		if (memcmp(buf, msg2, sizeof(msg2) - sizeof(char)) != 0)
-			errc(1, EINVAL, "read(accept_sock) returned data %$q", len, buf);
-
-		len = write(accept_sock, msg3, sizeof(msg3) - sizeof(char));
-		if (len != sizeof(msg3) - sizeof(char))
-			err(1, "write(accept_sock) returned: %" PRIdSIZ, len);
-		len = read(client_sock, buf, sizeof(buf));
-		if (len != sizeof(msg3) - sizeof(char))
-			err(1, "read(client_sock) returned: %" PRIdSIZ, len);
-		if (memcmp(buf, msg3, sizeof(msg3) - sizeof(char)) != 0)
-			errc(1, EINVAL, "read(client_sock) returned data %$q", len, buf);
-	}
-
-	close(accept_sock);
-	close(client_sock);
-	close(server_sock);
-	return 0;
-}
-/************************************************************************/
-
-
-
 typedef int (*FUN)(int argc, char *argv[], char *envp[]);
 typedef struct {
 	char const *n;
@@ -991,7 +887,6 @@ PRIVATE DEF defs[] = {
 	{ "leak", &main_leak },
 	{ "vfork", &main_vfork },
 	{ "sigbounce", &main_sigbounce },
-	{ "udsocket", &main_udsocket },
 	/* TODO: On x86_64, add a playground that:
 	 *   - mmap(0x00007ffffffff000, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_ANON|MAP_FIXED);
 	 *   - WRITE(0x00007ffffffffffe, [0x0f, 0x05]); // syscall
