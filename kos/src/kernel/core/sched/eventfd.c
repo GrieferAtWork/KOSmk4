@@ -172,15 +172,15 @@ handle_eventfd_fence_write(struct eventfd *__restrict self,
 }
 
 
-LOCAL WUNUSED NONNULL((1)) poll_mode_t KCALL
+LOCAL ATTR_PURE WUNUSED NONNULL((1)) poll_mode_t KCALL
 evenfd_getavail(struct eventfd *__restrict self) {
 	u64 value;
 	poll_mode_t result = 0;
 	value = atomic64_read(&self->ef_value);
 	if (value > 0)
-		result |= POLLIN; /* read() wouldn't block */
+		result |= POLLINMASK; /* read() wouldn't block */
 	if (value < (u64)UINT64_C(0xfffffffffffffffe))
-		result |= POLLOUT; /* write() wouldn't block */
+		result |= POLLOUTMASK; /* write() wouldn't block */
 	return result;
 }
 
@@ -198,7 +198,7 @@ handle_eventfd_fence_pollconnect(struct eventfd *__restrict self,
 	task_connect_for_poll(&self->ef_signal);
 }
 
-INTERN poll_mode_t KCALL
+INTERN ATTR_PURE poll_mode_t KCALL
 handle_eventfd_fence_polltest(struct eventfd *__restrict self,
                               poll_mode_t what) {
 	/* Check what operations are currently available. */

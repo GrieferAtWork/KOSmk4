@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72cab3f9 */
+/* HASH CRC-32:0x8f58261d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -341,6 +341,17 @@ for (local name: classes.keys.sorted()) {
 		__result = __EPERM;
 		break;
 #endif /* __EPERM && (__i386__ || __x86_64__) */
+
+	case E_ILLEGAL_OPERATION:
+		switch(__self->e_subclass) {
+#ifdef __ELOOP
+		case ERROR_SUBCLASS(ERROR_CODEOF(E_ILLEGAL_REFERENCE_LOOP)):
+			__result = __ELOOP;
+			break;
+#endif /* __ELOOP */
+		default: break;
+		}
+		break;
 
 #ifdef __ERANGE
 	case E_INDEX_ERROR:
