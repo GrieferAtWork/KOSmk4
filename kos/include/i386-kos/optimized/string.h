@@ -121,7 +121,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 
 		case 12:
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
-			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
+			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			return __dst;
 
 		case 16:
@@ -313,10 +313,36 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 			((__UINT16_TYPE__ *)__dst)[2] = ((__UINT16_TYPE__ const *)__src)[2];
 			return (__UINT8_TYPE__ *)__dst + 6;
 
+#ifdef __x86_64__
+		case 8:
+			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
+			return (__UINT8_TYPE__ *)__dst + 8;
+
+		case 9:
+			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
+			((__UINT8_TYPE__ *)__dst)[8] = ((__UINT8_TYPE__ const *)__src)[8];
+			return (__UINT8_TYPE__ *)__dst + 9;
+
+		case 10:
+			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
+			((__UINT16_TYPE__ *)__dst)[4] = ((__UINT16_TYPE__ const *)__src)[4];
+			return (__UINT8_TYPE__ *)__dst + 10;
+
+		case 12:
+			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
+			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
+			return (__UINT8_TYPE__ *)__dst + 12;
+
+		case 16:
+			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
+			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
+			return (__UINT8_TYPE__ *)__dst + 16;
+#else /* __x86_64__ */
 		case 8:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT8_TYPE__ *)__dst + 8;
+#endif /* !__x86_64__ */
 
 		default:
 			break;
