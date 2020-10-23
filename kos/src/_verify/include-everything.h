@@ -53,151 +53,68 @@
  */
 
 /*[[[deemon
-#define IS_CHK_INCLUDE(x)         \
-	(x in chk_include ||          \
-	 x.startswith("ncursesw/") || \
-	 x.startswith("drm/") ||      \
-	 x.startswith("libpng") ||    \
-	 x.startswith("openssl/") ||  \
-	 x.startswith("pixman-1/"))
-
-local chk_include = {
-	"eti.h",
-	"etip.h",
-	"form.h",
-	"menu.h",
-	"panel.h",
-	"curses.h",
-	"ncurses_cfg.h",
-	"ncurses_def.h",
-	"nc_tparm.h",
-	"ncurses.h",
-	"ncurses_dll.h",
-	"term.h",
-	"term_entry.h",
-	"termcap.h",
-	"tic.h",
-	"unctrl.h",
-	"cursesapp.h",
-	"cursesf.h",
-	"cursesm.h",
-	"cursesp.h",
-	"cursesw.h",
-	"cursslk.h",
-
-	"pciaccess.h",
-	"drm.h",
-	"xf86drm.h",
-	"xf86drmMode.h",
-
-	"png.h",
-	"pngconf.h",
-	"pnglibconf.h",
-
-	"expat.h",
-	"expat_external.h",
-
-	"bzlib.h",
-
-	"ft2build.h",
-
-	"uuid.h",
-	"uuid/uuid.h",
-
-	"pixman.h",
-	"pixman-version.h",
-
-	"zconf.h",
-	"zlib.h",
-};
-
-local cxx_include = {
-	"__stdcxx.h",
-
-	"cursesapp.h",
-	"cursesf.h",
-	"cursesm.h",
-	"cursesp.h",
-	"cursesw.h",
-	"cursslk.h",
-	"etip.h",
-
-	"ncursesw/cursesapp.h",
-	"ncursesw/cursesf.h",
-	"ncursesw/cursesm.h",
-	"ncursesw/cursesp.h",
-	"ncursesw/cursesw.h",
-	"ncursesw/cursslk.h",
-	"ncursesw/etip.h",
-};
-
 import fs;
-function incdir(prefix, path) {
-	for (local x: fs.dir(path).sorted()) {
-		local total = fs.joinpath(path, x);
-		if (fs.stat.isdir(total)) {
-			if (x in [
-					"i386-kos", "c++", "local", "compiler",
-					"crt-features", "__ice__", "system-test",
-					"libdl", "X11", "xcb", "freetype", "GL",
-					"xorg", "python2.7"])
+import * from deemon;
+
+local badFiles = List({
+	"__stdcxx.h",
+	"hybrid/__atomic-gasm.h",
+	"hybrid/__atomic-libatomic.h",
+	"hybrid/__atomic-msvc.h",
+	"hybrid/sequence/atree-abi.h",
+	"hybrid/__pointer-cxx-impl.h",
+	"hybrid/sync/service-lock.h",
+	"asm/os/",
+	"bits/os/",
+	"i386-kos",
+	"libc/local",
+	"c++",
+	"compiler",
+	"crt-features",
+	"libdl/module.h",
+	"system-test/ctest.h",
+});
+
+// Include everything from the .gitignore
+for (local l: File.open("../../../.gitignore", "r")) {
+	l = l.strip();
+	if (!l || l.startswith("#"))
+		continue;
+	l = l.strip("/");
+	if (!l.startswith("kos/"))
+		continue;
+	l = l[4:].lstrip("/");
+	if (!l.startswith("include/"))
+		continue;
+	l = l[8:].lstrip("/");
+	badFiles.append(l);
+}
+
+
+final global INCLUDE_PATH = "../../include/";
+function incdir(path) {
+	for (local x: fs.dir(INCLUDE_PATH + path).sorted()) {
+		if (x in ["__ice__"])
+			continue;
+		x = fs.joinpath(path, x).replace("\\", "/");
+		if (x in badFiles)
+			continue;
+		if (fs.stat.isdir(INCLUDE_PATH + x)) {
+			if ((path + "/") in badFiles)
 				continue;
-			if (prefix.rstrip("\\/").endswith("/os"))
-				continue;
-			incdir(prefix + x + "/", total);
+			incdir(x);
 			continue;
 		}
-		if ("." !in x) {
-			// c++ header
-		} else if (x in cxx_include) {
-			local full;
-			x = prefix + x;
-			if (".." in prefix) {
-				full = "\"" + x + "\"";
-			} else {
-				full = "<" + x + ">";
-			}
-			if (IS_CHK_INCLUDE(x)) {
-				print("#if defined(__cpluslus) && __has_include(", full, ")");
-				print("#include ", full);
-				print("#endif /" "* __cpluslus && __has_include(", full, ") *" "/");
-			} else {
-				print("#ifdef __cpluslus");
-				print("#include ", full);
-				print("#endif /" "* __cpluslus *" "/");
-			}
-		} else if (x !in [
-			"atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h",
-			"__atomic-libatomic.h", "service-lock.h",
-			"pixman-version.h"
-		]) {
-			if (x.endswith(".h") && !x.endswith("-impl.h")) {
-				local full;
-				x = prefix + x;
-				if (".." in prefix) {
-					full = "\"" + x + "\"";
-				} else {
-					full = "<" + x + ">";
-				}
-				if (IS_CHK_INCLUDE(x)) {
-					print("#if __has_include(", full, ")");
-					print("#include ", full);
-					print("#endif /" "* __has_include(", full, ") *" "/");
-				} else {
-					print("#include ", full);
-				}
-			}
-		}
+		if (!x.endswith(".h"))
+			continue;
+		print("#include <", x, ">");
 	}
 }
-incdir("", "../../include");
+incdir("");
 
 ]]]*/
 #include <ConcurrencySal.h>
 #include <__crt.h>
-#ifdef __cpluslus
-#include <__stdcxx.h>
-#endif /* __cpluslus */
 #include <__stdinc.h>
 #include <_ansi.h>
 #include <_lfs_64.h>
@@ -212,6 +129,7 @@ incdir("", "../../include");
 #include <asm/asmword.h>
 #include <asm/cacheline.h>
 #include <asm/crt/confname.h>
+#include <asm/crt/glob.h>
 #include <asm/crt/limits.h>
 #include <asm/crt/malloc.h>
 #include <asm/crt/math-exception.h>
@@ -219,6 +137,7 @@ incdir("", "../../include");
 #include <asm/crt/posix_spawn.h>
 #include <asm/crt/process.h>
 #include <asm/crt/pthreadvalues.h>
+#include <asm/crt/semaphore.h>
 #include <asm/crt/stdio.h>
 #include <asm/crt/stdio_ext.h>
 #include <asm/crt/stdlib.h>
@@ -305,6 +224,8 @@ incdir("", "../../include");
 #include <bits/crt/fenv-inline.h>
 #include <bits/crt/fenv.h>
 #include <bits/crt/format-printer.h>
+#include <bits/crt/glob.h>
+#include <bits/crt/ifaddrs.h>
 #include <bits/crt/inttypes.h>
 #include <bits/crt/io-file.h>
 #include <bits/crt/lconv.h>
@@ -437,14 +358,54 @@ incdir("", "../../include");
 #include <bsd/sys/param.h>
 #include <bsd/sys/poll.h>
 #include <byteswap.h>
-#if __has_include(<bzlib.h>)
-#include <bzlib.h>
-#endif /* __has_include(<bzlib.h>) */
 #include <compat/bits/os/cmsghdr.h>
 #include <compat/bits/os/flock.h>
+#include <compat/bits/os/generic/cmsghdr.h>
+#include <compat/bits/os/generic/flock.h>
+#include <compat/bits/os/generic/iovec.h>
+#include <compat/bits/os/generic/itimerspec.h>
+#include <compat/bits/os/generic/itimerval.h>
+#include <compat/bits/os/generic/mmsghdr.h>
+#include <compat/bits/os/generic/msghdr.h>
+#include <compat/bits/os/generic/rusage-convert.h>
+#include <compat/bits/os/generic/rusage.h>
+#include <compat/bits/os/generic/sigaction.h>
+#include <compat/bits/os/generic/sigevent.h>
+#include <compat/bits/os/generic/siginfo-convert.h>
+#include <compat/bits/os/generic/siginfo.h>
+#include <compat/bits/os/generic/sigstack.h>
+#include <compat/bits/os/generic/sigval.h>
+#include <compat/bits/os/generic/stat-convert.h>
+#include <compat/bits/os/generic/stat.h>
+#include <compat/bits/os/generic/statfs-convert.h>
+#include <compat/bits/os/generic/statfs.h>
+#include <compat/bits/os/generic/timeb.h>
+#include <compat/bits/os/generic/timespec.h>
+#include <compat/bits/os/generic/timeval.h>
+#include <compat/bits/os/generic/tms.h>
+#include <compat/bits/os/generic/utimbuf.h>
 #include <compat/bits/os/iovec.h>
 #include <compat/bits/os/itimerspec.h>
 #include <compat/bits/os/itimerval.h>
+#include <compat/bits/os/kos/cmsghdr.h>
+#include <compat/bits/os/kos/flock.h>
+#include <compat/bits/os/kos/mmsghdr.h>
+#include <compat/bits/os/kos/msghdr.h>
+#include <compat/bits/os/kos/rusage-convert.h>
+#include <compat/bits/os/kos/rusage.h>
+#include <compat/bits/os/kos/sigaction.h>
+#include <compat/bits/os/kos/sigevent.h>
+#include <compat/bits/os/kos/siginfo-convert.h>
+#include <compat/bits/os/kos/siginfo.h>
+#include <compat/bits/os/kos/sigstack.h>
+#include <compat/bits/os/kos/sigval.h>
+#include <compat/bits/os/kos/stat-convert.h>
+#include <compat/bits/os/kos/stat.h>
+#include <compat/bits/os/kos/statfs-convert.h>
+#include <compat/bits/os/kos/statfs.h>
+#include <compat/bits/os/kos/timeb.h>
+#include <compat/bits/os/kos/tms.h>
+#include <compat/bits/os/kos/utimbuf.h>
 #include <compat/bits/os/mcontext.h>
 #include <compat/bits/os/mmsghdr.h>
 #include <compat/bits/os/msghdr.h>
@@ -493,111 +454,18 @@ incdir("", "../../include");
 #include <crtdefs.h>
 #include <crypt.h>
 #include <ctype.h>
-#if __has_include(<curses.h>)
-#include <curses.h>
-#endif /* __has_include(<curses.h>) */
-#if defined(__cpluslus) && __has_include(<cursesapp.h>)
-#include <cursesapp.h>
-#endif /* __cpluslus && __has_include(<cursesapp.h>) */
-#if defined(__cpluslus) && __has_include(<cursesf.h>)
-#include <cursesf.h>
-#endif /* __cpluslus && __has_include(<cursesf.h>) */
-#if defined(__cpluslus) && __has_include(<cursesm.h>)
-#include <cursesm.h>
-#endif /* __cpluslus && __has_include(<cursesm.h>) */
-#if defined(__cpluslus) && __has_include(<cursesp.h>)
-#include <cursesp.h>
-#endif /* __cpluslus && __has_include(<cursesp.h>) */
-#if defined(__cpluslus) && __has_include(<cursesw.h>)
-#include <cursesw.h>
-#endif /* __cpluslus && __has_include(<cursesw.h>) */
-#if defined(__cpluslus) && __has_include(<cursslk.h>)
-#include <cursslk.h>
-#endif /* __cpluslus && __has_include(<cursslk.h>) */
 #include <dir.h>
 #include <direct.h>
 #include <dirent.h>
 #include <dlfcn.h>
 #include <dos.h>
-#if __has_include(<drm/amdgpu_drm.h>)
-#include <drm/amdgpu_drm.h>
-#endif /* __has_include(<drm/amdgpu_drm.h>) */
-#if __has_include(<drm/drm.h>)
-#include <drm/drm.h>
-#endif /* __has_include(<drm/drm.h>) */
-#if __has_include(<drm/drm_fourcc.h>)
-#include <drm/drm_fourcc.h>
-#endif /* __has_include(<drm/drm_fourcc.h>) */
-#if __has_include(<drm/drm_mode.h>)
-#include <drm/drm_mode.h>
-#endif /* __has_include(<drm/drm_mode.h>) */
-#if __has_include(<drm/drm_sarea.h>)
-#include <drm/drm_sarea.h>
-#endif /* __has_include(<drm/drm_sarea.h>) */
-#if __has_include(<drm/i915_drm.h>)
-#include <drm/i915_drm.h>
-#endif /* __has_include(<drm/i915_drm.h>) */
-#if __has_include(<drm/mach64_drm.h>)
-#include <drm/mach64_drm.h>
-#endif /* __has_include(<drm/mach64_drm.h>) */
-#if __has_include(<drm/mga_drm.h>)
-#include <drm/mga_drm.h>
-#endif /* __has_include(<drm/mga_drm.h>) */
-#if __has_include(<drm/nouveau_drm.h>)
-#include <drm/nouveau_drm.h>
-#endif /* __has_include(<drm/nouveau_drm.h>) */
-#if __has_include(<drm/qxl_drm.h>)
-#include <drm/qxl_drm.h>
-#endif /* __has_include(<drm/qxl_drm.h>) */
-#if __has_include(<drm/r128_drm.h>)
-#include <drm/r128_drm.h>
-#endif /* __has_include(<drm/r128_drm.h>) */
-#if __has_include(<drm/radeon_drm.h>)
-#include <drm/radeon_drm.h>
-#endif /* __has_include(<drm/radeon_drm.h>) */
-#if __has_include(<drm/savage_drm.h>)
-#include <drm/savage_drm.h>
-#endif /* __has_include(<drm/savage_drm.h>) */
-#if __has_include(<drm/sis_drm.h>)
-#include <drm/sis_drm.h>
-#endif /* __has_include(<drm/sis_drm.h>) */
-#if __has_include(<drm/tegra_drm.h>)
-#include <drm/tegra_drm.h>
-#endif /* __has_include(<drm/tegra_drm.h>) */
-#if __has_include(<drm/vc4_drm.h>)
-#include <drm/vc4_drm.h>
-#endif /* __has_include(<drm/vc4_drm.h>) */
-#if __has_include(<drm/via_drm.h>)
-#include <drm/via_drm.h>
-#endif /* __has_include(<drm/via_drm.h>) */
-#if __has_include(<drm/virtgpu_drm.h>)
-#include <drm/virtgpu_drm.h>
-#endif /* __has_include(<drm/virtgpu_drm.h>) */
-#if __has_include(<drm/vmwgfx_drm.h>)
-#include <drm/vmwgfx_drm.h>
-#endif /* __has_include(<drm/vmwgfx_drm.h>) */
-#if __has_include(<drm.h>)
-#include <drm.h>
-#endif /* __has_include(<drm.h>) */
 #include <elf.h>
 #include <endian.h>
 #include <envz.h>
 #include <err.h>
 #include <errno.h>
 #include <error.h>
-#if __has_include(<eti.h>)
-#include <eti.h>
-#endif /* __has_include(<eti.h>) */
-#if defined(__cpluslus) && __has_include(<etip.h>)
-#include <etip.h>
-#endif /* __cpluslus && __has_include(<etip.h>) */
 #include <execinfo.h>
-#if __has_include(<expat.h>)
-#include <expat.h>
-#endif /* __has_include(<expat.h>) */
-#if __has_include(<expat_external.h>)
-#include <expat_external.h>
-#endif /* __has_include(<expat_external.h>) */
 #include <fastmath.h>
 #include <fcntl.h>
 #include <features.h>
@@ -605,14 +473,8 @@ incdir("", "../../include");
 #include <file.h>
 #include <float.h>
 #include <fnmatch.h>
-#if __has_include(<form.h>)
-#include <form.h>
-#endif /* __has_include(<form.h>) */
 #include <format-printer.h>
 #include <format-reader.h>
-#if __has_include(<ft2build.h>)
-#include <ft2build.h>
-#endif /* __has_include(<ft2build.h>) */
 #include <getopt.h>
 #include <getpagesize.h>
 #include <glob.h>
@@ -839,6 +701,10 @@ incdir("", "../../include");
 #include <libdisasm/api.h>
 #include <libdisasm/disassembler.h>
 #include <libdisasm/format.h>
+#include <libdl/api.h>
+#include <libdl/asm/dlfcn.h>
+#include <libdl/bits/dlfcn.h>
+#include <libdl/extension.h>
 #include <libemu86/api.h>
 #include <libemu86/eflags.h>
 #include <libemu86/emu/push-pop-util.h>
@@ -914,24 +780,6 @@ incdir("", "../../include");
 #include <libm/significand.h>
 #include <libm/sqrt.h>
 #include <libm/trunc.h>
-#if __has_include(<libpng/png.h>)
-#include <libpng/png.h>
-#endif /* __has_include(<libpng/png.h>) */
-#if __has_include(<libpng/pngconf.h>)
-#include <libpng/pngconf.h>
-#endif /* __has_include(<libpng/pngconf.h>) */
-#if __has_include(<libpng/pnglibconf.h>)
-#include <libpng/pnglibconf.h>
-#endif /* __has_include(<libpng/pnglibconf.h>) */
-#if __has_include(<libpng16/png.h>)
-#include <libpng16/png.h>
-#endif /* __has_include(<libpng16/png.h>) */
-#if __has_include(<libpng16/pngconf.h>)
-#include <libpng16/pngconf.h>
-#endif /* __has_include(<libpng16/pngconf.h>) */
-#if __has_include(<libpng16/pnglibconf.h>)
-#include <libpng16/pnglibconf.h>
-#endif /* __has_include(<libpng16/pnglibconf.h>) */
 #include <libregdump/api.h>
 #include <libregdump/printer.h>
 #include <libregex/api.h>
@@ -1037,94 +885,10 @@ incdir("", "../../include");
 #include <math.h>
 #include <mem.h>
 #include <memory.h>
-#if __has_include(<menu.h>)
-#include <menu.h>
-#endif /* __has_include(<menu.h>) */
 #include <minmax.h>
 #include <mntent.h>
 #include <monetary.h>
 #include <mqueue.h>
-#if __has_include(<nc_tparm.h>)
-#include <nc_tparm.h>
-#endif /* __has_include(<nc_tparm.h>) */
-#if __has_include(<ncurses.h>)
-#include <ncurses.h>
-#endif /* __has_include(<ncurses.h>) */
-#if __has_include(<ncurses_cfg.h>)
-#include <ncurses_cfg.h>
-#endif /* __has_include(<ncurses_cfg.h>) */
-#if __has_include(<ncurses_def.h>)
-#include <ncurses_def.h>
-#endif /* __has_include(<ncurses_def.h>) */
-#if __has_include(<ncurses_dll.h>)
-#include <ncurses_dll.h>
-#endif /* __has_include(<ncurses_dll.h>) */
-#if __has_include(<ncursesw/curses.h>)
-#include <ncursesw/curses.h>
-#endif /* __has_include(<ncursesw/curses.h>) */
-#if defined(__cpluslus) && __has_include(<ncursesw/cursesapp.h>)
-#include <ncursesw/cursesapp.h>
-#endif /* __cpluslus && __has_include(<ncursesw/cursesapp.h>) */
-#if defined(__cpluslus) && __has_include(<ncursesw/cursesf.h>)
-#include <ncursesw/cursesf.h>
-#endif /* __cpluslus && __has_include(<ncursesw/cursesf.h>) */
-#if defined(__cpluslus) && __has_include(<ncursesw/cursesm.h>)
-#include <ncursesw/cursesm.h>
-#endif /* __cpluslus && __has_include(<ncursesw/cursesm.h>) */
-#if defined(__cpluslus) && __has_include(<ncursesw/cursesp.h>)
-#include <ncursesw/cursesp.h>
-#endif /* __cpluslus && __has_include(<ncursesw/cursesp.h>) */
-#if defined(__cpluslus) && __has_include(<ncursesw/cursesw.h>)
-#include <ncursesw/cursesw.h>
-#endif /* __cpluslus && __has_include(<ncursesw/cursesw.h>) */
-#if defined(__cpluslus) && __has_include(<ncursesw/cursslk.h>)
-#include <ncursesw/cursslk.h>
-#endif /* __cpluslus && __has_include(<ncursesw/cursslk.h>) */
-#if __has_include(<ncursesw/eti.h>)
-#include <ncursesw/eti.h>
-#endif /* __has_include(<ncursesw/eti.h>) */
-#if defined(__cpluslus) && __has_include(<ncursesw/etip.h>)
-#include <ncursesw/etip.h>
-#endif /* __cpluslus && __has_include(<ncursesw/etip.h>) */
-#if __has_include(<ncursesw/form.h>)
-#include <ncursesw/form.h>
-#endif /* __has_include(<ncursesw/form.h>) */
-#if __has_include(<ncursesw/menu.h>)
-#include <ncursesw/menu.h>
-#endif /* __has_include(<ncursesw/menu.h>) */
-#if __has_include(<ncursesw/nc_tparm.h>)
-#include <ncursesw/nc_tparm.h>
-#endif /* __has_include(<ncursesw/nc_tparm.h>) */
-#if __has_include(<ncursesw/ncurses.h>)
-#include <ncursesw/ncurses.h>
-#endif /* __has_include(<ncursesw/ncurses.h>) */
-#if __has_include(<ncursesw/ncurses_cfg.h>)
-#include <ncursesw/ncurses_cfg.h>
-#endif /* __has_include(<ncursesw/ncurses_cfg.h>) */
-#if __has_include(<ncursesw/ncurses_def.h>)
-#include <ncursesw/ncurses_def.h>
-#endif /* __has_include(<ncursesw/ncurses_def.h>) */
-#if __has_include(<ncursesw/ncurses_dll.h>)
-#include <ncursesw/ncurses_dll.h>
-#endif /* __has_include(<ncursesw/ncurses_dll.h>) */
-#if __has_include(<ncursesw/panel.h>)
-#include <ncursesw/panel.h>
-#endif /* __has_include(<ncursesw/panel.h>) */
-#if __has_include(<ncursesw/term.h>)
-#include <ncursesw/term.h>
-#endif /* __has_include(<ncursesw/term.h>) */
-#if __has_include(<ncursesw/term_entry.h>)
-#include <ncursesw/term_entry.h>
-#endif /* __has_include(<ncursesw/term_entry.h>) */
-#if __has_include(<ncursesw/termcap.h>)
-#include <ncursesw/termcap.h>
-#endif /* __has_include(<ncursesw/termcap.h>) */
-#if __has_include(<ncursesw/tic.h>)
-#include <ncursesw/tic.h>
-#endif /* __has_include(<ncursesw/tic.h>) */
-#if __has_include(<ncursesw/unctrl.h>)
-#include <ncursesw/unctrl.h>
-#endif /* __has_include(<ncursesw/unctrl.h>) */
 #include <ndir.h>
 #include <net/bits/types.h>
 #include <net/ethernet.h>
@@ -1150,321 +914,12 @@ incdir("", "../../include");
 #include <netinet/udp.h>
 #include <netpacket/packet.h>
 #include <newlib.h>
-#if __has_include(<openssl/aes.h>)
-#include <openssl/aes.h>
-#endif /* __has_include(<openssl/aes.h>) */
-#if __has_include(<openssl/asn1.h>)
-#include <openssl/asn1.h>
-#endif /* __has_include(<openssl/asn1.h>) */
-#if __has_include(<openssl/asn1err.h>)
-#include <openssl/asn1err.h>
-#endif /* __has_include(<openssl/asn1err.h>) */
-#if __has_include(<openssl/asn1t.h>)
-#include <openssl/asn1t.h>
-#endif /* __has_include(<openssl/asn1t.h>) */
-#if __has_include(<openssl/async.h>)
-#include <openssl/async.h>
-#endif /* __has_include(<openssl/async.h>) */
-#if __has_include(<openssl/asyncerr.h>)
-#include <openssl/asyncerr.h>
-#endif /* __has_include(<openssl/asyncerr.h>) */
-#if __has_include(<openssl/bio.h>)
-#include <openssl/bio.h>
-#endif /* __has_include(<openssl/bio.h>) */
-#if __has_include(<openssl/bioerr.h>)
-#include <openssl/bioerr.h>
-#endif /* __has_include(<openssl/bioerr.h>) */
-#if __has_include(<openssl/blowfish.h>)
-#include <openssl/blowfish.h>
-#endif /* __has_include(<openssl/blowfish.h>) */
-#if __has_include(<openssl/bn.h>)
-#include <openssl/bn.h>
-#endif /* __has_include(<openssl/bn.h>) */
-#if __has_include(<openssl/bnerr.h>)
-#include <openssl/bnerr.h>
-#endif /* __has_include(<openssl/bnerr.h>) */
-#if __has_include(<openssl/buffer.h>)
-#include <openssl/buffer.h>
-#endif /* __has_include(<openssl/buffer.h>) */
-#if __has_include(<openssl/buffererr.h>)
-#include <openssl/buffererr.h>
-#endif /* __has_include(<openssl/buffererr.h>) */
-#if __has_include(<openssl/camellia.h>)
-#include <openssl/camellia.h>
-#endif /* __has_include(<openssl/camellia.h>) */
-#if __has_include(<openssl/cast.h>)
-#include <openssl/cast.h>
-#endif /* __has_include(<openssl/cast.h>) */
-#if __has_include(<openssl/cmac.h>)
-#include <openssl/cmac.h>
-#endif /* __has_include(<openssl/cmac.h>) */
-#if __has_include(<openssl/cms.h>)
-#include <openssl/cms.h>
-#endif /* __has_include(<openssl/cms.h>) */
-#if __has_include(<openssl/cmserr.h>)
-#include <openssl/cmserr.h>
-#endif /* __has_include(<openssl/cmserr.h>) */
-#if __has_include(<openssl/comp.h>)
-#include <openssl/comp.h>
-#endif /* __has_include(<openssl/comp.h>) */
-#if __has_include(<openssl/comperr.h>)
-#include <openssl/comperr.h>
-#endif /* __has_include(<openssl/comperr.h>) */
-#if __has_include(<openssl/conf.h>)
-#include <openssl/conf.h>
-#endif /* __has_include(<openssl/conf.h>) */
-#if __has_include(<openssl/conf_api.h>)
-#include <openssl/conf_api.h>
-#endif /* __has_include(<openssl/conf_api.h>) */
-#if __has_include(<openssl/conferr.h>)
-#include <openssl/conferr.h>
-#endif /* __has_include(<openssl/conferr.h>) */
-#if __has_include(<openssl/crypto.h>)
-#include <openssl/crypto.h>
-#endif /* __has_include(<openssl/crypto.h>) */
-#if __has_include(<openssl/cryptoerr.h>)
-#include <openssl/cryptoerr.h>
-#endif /* __has_include(<openssl/cryptoerr.h>) */
-#if __has_include(<openssl/ct.h>)
-#include <openssl/ct.h>
-#endif /* __has_include(<openssl/ct.h>) */
-#if __has_include(<openssl/cterr.h>)
-#include <openssl/cterr.h>
-#endif /* __has_include(<openssl/cterr.h>) */
-#if __has_include(<openssl/des.h>)
-#include <openssl/des.h>
-#endif /* __has_include(<openssl/des.h>) */
-#if __has_include(<openssl/dh.h>)
-#include <openssl/dh.h>
-#endif /* __has_include(<openssl/dh.h>) */
-#if __has_include(<openssl/dherr.h>)
-#include <openssl/dherr.h>
-#endif /* __has_include(<openssl/dherr.h>) */
-#if __has_include(<openssl/dsa.h>)
-#include <openssl/dsa.h>
-#endif /* __has_include(<openssl/dsa.h>) */
-#if __has_include(<openssl/dsaerr.h>)
-#include <openssl/dsaerr.h>
-#endif /* __has_include(<openssl/dsaerr.h>) */
-#if __has_include(<openssl/dtls1.h>)
-#include <openssl/dtls1.h>
-#endif /* __has_include(<openssl/dtls1.h>) */
-#if __has_include(<openssl/e_os2.h>)
-#include <openssl/e_os2.h>
-#endif /* __has_include(<openssl/e_os2.h>) */
-#if __has_include(<openssl/ebcdic.h>)
-#include <openssl/ebcdic.h>
-#endif /* __has_include(<openssl/ebcdic.h>) */
-#if __has_include(<openssl/ec.h>)
-#include <openssl/ec.h>
-#endif /* __has_include(<openssl/ec.h>) */
-#if __has_include(<openssl/ecdh.h>)
-#include <openssl/ecdh.h>
-#endif /* __has_include(<openssl/ecdh.h>) */
-#if __has_include(<openssl/ecdsa.h>)
-#include <openssl/ecdsa.h>
-#endif /* __has_include(<openssl/ecdsa.h>) */
-#if __has_include(<openssl/ecerr.h>)
-#include <openssl/ecerr.h>
-#endif /* __has_include(<openssl/ecerr.h>) */
-#if __has_include(<openssl/engine.h>)
-#include <openssl/engine.h>
-#endif /* __has_include(<openssl/engine.h>) */
-#if __has_include(<openssl/engineerr.h>)
-#include <openssl/engineerr.h>
-#endif /* __has_include(<openssl/engineerr.h>) */
-#if __has_include(<openssl/err.h>)
-#include <openssl/err.h>
-#endif /* __has_include(<openssl/err.h>) */
-#if __has_include(<openssl/evp.h>)
-#include <openssl/evp.h>
-#endif /* __has_include(<openssl/evp.h>) */
-#if __has_include(<openssl/evperr.h>)
-#include <openssl/evperr.h>
-#endif /* __has_include(<openssl/evperr.h>) */
-#if __has_include(<openssl/hmac.h>)
-#include <openssl/hmac.h>
-#endif /* __has_include(<openssl/hmac.h>) */
-#if __has_include(<openssl/idea.h>)
-#include <openssl/idea.h>
-#endif /* __has_include(<openssl/idea.h>) */
-#if __has_include(<openssl/kdf.h>)
-#include <openssl/kdf.h>
-#endif /* __has_include(<openssl/kdf.h>) */
-#if __has_include(<openssl/kdferr.h>)
-#include <openssl/kdferr.h>
-#endif /* __has_include(<openssl/kdferr.h>) */
-#if __has_include(<openssl/lhash.h>)
-#include <openssl/lhash.h>
-#endif /* __has_include(<openssl/lhash.h>) */
-#if __has_include(<openssl/md2.h>)
-#include <openssl/md2.h>
-#endif /* __has_include(<openssl/md2.h>) */
-#if __has_include(<openssl/md4.h>)
-#include <openssl/md4.h>
-#endif /* __has_include(<openssl/md4.h>) */
-#if __has_include(<openssl/md5.h>)
-#include <openssl/md5.h>
-#endif /* __has_include(<openssl/md5.h>) */
-#if __has_include(<openssl/mdc2.h>)
-#include <openssl/mdc2.h>
-#endif /* __has_include(<openssl/mdc2.h>) */
-#if __has_include(<openssl/modes.h>)
-#include <openssl/modes.h>
-#endif /* __has_include(<openssl/modes.h>) */
-#if __has_include(<openssl/obj_mac.h>)
-#include <openssl/obj_mac.h>
-#endif /* __has_include(<openssl/obj_mac.h>) */
-#if __has_include(<openssl/objects.h>)
-#include <openssl/objects.h>
-#endif /* __has_include(<openssl/objects.h>) */
-#if __has_include(<openssl/objectserr.h>)
-#include <openssl/objectserr.h>
-#endif /* __has_include(<openssl/objectserr.h>) */
-#if __has_include(<openssl/ocsp.h>)
-#include <openssl/ocsp.h>
-#endif /* __has_include(<openssl/ocsp.h>) */
-#if __has_include(<openssl/ocsperr.h>)
-#include <openssl/ocsperr.h>
-#endif /* __has_include(<openssl/ocsperr.h>) */
-#if __has_include(<openssl/opensslv.h>)
-#include <openssl/opensslv.h>
-#endif /* __has_include(<openssl/opensslv.h>) */
-#if __has_include(<openssl/ossl_typ.h>)
-#include <openssl/ossl_typ.h>
-#endif /* __has_include(<openssl/ossl_typ.h>) */
-#if __has_include(<openssl/pem.h>)
-#include <openssl/pem.h>
-#endif /* __has_include(<openssl/pem.h>) */
-#if __has_include(<openssl/pem2.h>)
-#include <openssl/pem2.h>
-#endif /* __has_include(<openssl/pem2.h>) */
-#if __has_include(<openssl/pemerr.h>)
-#include <openssl/pemerr.h>
-#endif /* __has_include(<openssl/pemerr.h>) */
-#if __has_include(<openssl/pkcs12.h>)
-#include <openssl/pkcs12.h>
-#endif /* __has_include(<openssl/pkcs12.h>) */
-#if __has_include(<openssl/pkcs12err.h>)
-#include <openssl/pkcs12err.h>
-#endif /* __has_include(<openssl/pkcs12err.h>) */
-#if __has_include(<openssl/pkcs7.h>)
-#include <openssl/pkcs7.h>
-#endif /* __has_include(<openssl/pkcs7.h>) */
-#if __has_include(<openssl/pkcs7err.h>)
-#include <openssl/pkcs7err.h>
-#endif /* __has_include(<openssl/pkcs7err.h>) */
-#if __has_include(<openssl/rand.h>)
-#include <openssl/rand.h>
-#endif /* __has_include(<openssl/rand.h>) */
-#if __has_include(<openssl/rand_drbg.h>)
-#include <openssl/rand_drbg.h>
-#endif /* __has_include(<openssl/rand_drbg.h>) */
-#if __has_include(<openssl/randerr.h>)
-#include <openssl/randerr.h>
-#endif /* __has_include(<openssl/randerr.h>) */
-#if __has_include(<openssl/rc2.h>)
-#include <openssl/rc2.h>
-#endif /* __has_include(<openssl/rc2.h>) */
-#if __has_include(<openssl/rc4.h>)
-#include <openssl/rc4.h>
-#endif /* __has_include(<openssl/rc4.h>) */
-#if __has_include(<openssl/rc5.h>)
-#include <openssl/rc5.h>
-#endif /* __has_include(<openssl/rc5.h>) */
-#if __has_include(<openssl/ripemd.h>)
-#include <openssl/ripemd.h>
-#endif /* __has_include(<openssl/ripemd.h>) */
-#if __has_include(<openssl/rsa.h>)
-#include <openssl/rsa.h>
-#endif /* __has_include(<openssl/rsa.h>) */
-#if __has_include(<openssl/rsaerr.h>)
-#include <openssl/rsaerr.h>
-#endif /* __has_include(<openssl/rsaerr.h>) */
-#if __has_include(<openssl/safestack.h>)
-#include <openssl/safestack.h>
-#endif /* __has_include(<openssl/safestack.h>) */
-#if __has_include(<openssl/seed.h>)
-#include <openssl/seed.h>
-#endif /* __has_include(<openssl/seed.h>) */
-#if __has_include(<openssl/sha.h>)
-#include <openssl/sha.h>
-#endif /* __has_include(<openssl/sha.h>) */
-#if __has_include(<openssl/srp.h>)
-#include <openssl/srp.h>
-#endif /* __has_include(<openssl/srp.h>) */
-#if __has_include(<openssl/srtp.h>)
-#include <openssl/srtp.h>
-#endif /* __has_include(<openssl/srtp.h>) */
-#if __has_include(<openssl/ssl.h>)
-#include <openssl/ssl.h>
-#endif /* __has_include(<openssl/ssl.h>) */
-#if __has_include(<openssl/ssl2.h>)
-#include <openssl/ssl2.h>
-#endif /* __has_include(<openssl/ssl2.h>) */
-#if __has_include(<openssl/ssl3.h>)
-#include <openssl/ssl3.h>
-#endif /* __has_include(<openssl/ssl3.h>) */
-#if __has_include(<openssl/sslerr.h>)
-#include <openssl/sslerr.h>
-#endif /* __has_include(<openssl/sslerr.h>) */
-#if __has_include(<openssl/stack.h>)
-#include <openssl/stack.h>
-#endif /* __has_include(<openssl/stack.h>) */
-#if __has_include(<openssl/store.h>)
-#include <openssl/store.h>
-#endif /* __has_include(<openssl/store.h>) */
-#if __has_include(<openssl/storeerr.h>)
-#include <openssl/storeerr.h>
-#endif /* __has_include(<openssl/storeerr.h>) */
-#if __has_include(<openssl/symhacks.h>)
-#include <openssl/symhacks.h>
-#endif /* __has_include(<openssl/symhacks.h>) */
-#if __has_include(<openssl/tls1.h>)
-#include <openssl/tls1.h>
-#endif /* __has_include(<openssl/tls1.h>) */
-#if __has_include(<openssl/ts.h>)
-#include <openssl/ts.h>
-#endif /* __has_include(<openssl/ts.h>) */
-#if __has_include(<openssl/tserr.h>)
-#include <openssl/tserr.h>
-#endif /* __has_include(<openssl/tserr.h>) */
-#if __has_include(<openssl/txt_db.h>)
-#include <openssl/txt_db.h>
-#endif /* __has_include(<openssl/txt_db.h>) */
-#if __has_include(<openssl/ui.h>)
-#include <openssl/ui.h>
-#endif /* __has_include(<openssl/ui.h>) */
-#if __has_include(<openssl/uierr.h>)
-#include <openssl/uierr.h>
-#endif /* __has_include(<openssl/uierr.h>) */
-#if __has_include(<openssl/whrlpool.h>)
-#include <openssl/whrlpool.h>
-#endif /* __has_include(<openssl/whrlpool.h>) */
-#if __has_include(<openssl/x509.h>)
-#include <openssl/x509.h>
-#endif /* __has_include(<openssl/x509.h>) */
-#if __has_include(<openssl/x509_vfy.h>)
-#include <openssl/x509_vfy.h>
-#endif /* __has_include(<openssl/x509_vfy.h>) */
-#if __has_include(<openssl/x509err.h>)
-#include <openssl/x509err.h>
-#endif /* __has_include(<openssl/x509err.h>) */
-#if __has_include(<openssl/x509v3.h>)
-#include <openssl/x509v3.h>
-#endif /* __has_include(<openssl/x509v3.h>) */
-#if __has_include(<openssl/x509v3err.h>)
-#include <openssl/x509v3err.h>
-#endif /* __has_include(<openssl/x509v3err.h>) */
 #include <optimized/error.h>
 #include <optimized/fenv.h>
 #include <optimized/ssp.string.h>
 #include <optimized/string.h>
 #include <optimized/unistd.h>
 #include <osfcn.h>
-#if __has_include(<panel.h>)
-#include <panel.h>
-#endif /* __has_include(<panel.h>) */
 #include <parts/assert-failed.h>
 #include <parts/assert.h>
 #include <parts/malloca.h>
@@ -1495,24 +950,6 @@ incdir("", "../../include");
 #include <parts/wchar/unistd.h>
 #include <parts/wchar/utime.h>
 #include <paths.h>
-#if __has_include(<pciaccess.h>)
-#include <pciaccess.h>
-#endif /* __has_include(<pciaccess.h>) */
-#if __has_include(<pixman-1/pixman.h>)
-#include <pixman-1/pixman.h>
-#endif /* __has_include(<pixman-1/pixman.h>) */
-#if __has_include(<pixman.h>)
-#include <pixman.h>
-#endif /* __has_include(<pixman.h>) */
-#if __has_include(<png.h>)
-#include <png.h>
-#endif /* __has_include(<png.h>) */
-#if __has_include(<pngconf.h>)
-#include <pngconf.h>
-#endif /* __has_include(<pngconf.h>) */
-#if __has_include(<pnglibconf.h>)
-#include <pnglibconf.h>
-#endif /* __has_include(<pnglibconf.h>) */
 #include <poll.h>
 #include <process.h>
 #include <pthread.h>
@@ -1651,30 +1088,16 @@ incdir("", "../../include");
 #include <sysexits.h>
 #include <syslimits.h>
 #include <syslog.h>
+#include <system-test/api.h>
 #include <tar.h>
-#if __has_include(<term.h>)
-#include <term.h>
-#endif /* __has_include(<term.h>) */
-#if __has_include(<term_entry.h>)
-#include <term_entry.h>
-#endif /* __has_include(<term_entry.h>) */
-#if __has_include(<termcap.h>)
-#include <termcap.h>
-#endif /* __has_include(<termcap.h>) */
 #include <termio.h>
 #include <termios.h>
 #include <threads.h>
-#if __has_include(<tic.h>)
-#include <tic.h>
-#endif /* __has_include(<tic.h>) */
 #include <time.h>
 #include <ttyent.h>
 #include <uchar.h>
 #include <ucontext.h>
 #include <ulimit.h>
-#if __has_include(<unctrl.h>)
-#include <unctrl.h>
-#endif /* __has_include(<unctrl.h>) */
 #include <unicode.h>
 #include <unistd.h>
 #include <unwind.h>
@@ -1683,31 +1106,13 @@ incdir("", "../../include");
 #include <utime.h>
 #include <utmp.h>
 #include <utmpx.h>
-#if __has_include(<uuid/uuid.h>)
-#include <uuid/uuid.h>
-#endif /* __has_include(<uuid/uuid.h>) */
-#if __has_include(<uuid.h>)
-#include <uuid.h>
-#endif /* __has_include(<uuid.h>) */
 #include <vadefs.h>
 #include <values.h>
 #include <vfork.h>
 #include <wait.h>
 #include <wchar.h>
 #include <wctype.h>
-#if __has_include(<xf86drm.h>)
-#include <xf86drm.h>
-#endif /* __has_include(<xf86drm.h>) */
-#if __has_include(<xf86drmMode.h>)
-#include <xf86drmMode.h>
-#endif /* __has_include(<xf86drmMode.h>) */
 #include <xlocale.h>
-#if __has_include(<zconf.h>)
-#include <zconf.h>
-#endif /* __has_include(<zconf.h>) */
-#if __has_include(<zlib.h>)
-#include <zlib.h>
-#endif /* __has_include(<zlib.h>) */
 //[[[end]]]
 
 

@@ -624,7 +624,7 @@ driver_finalize(struct driver *__restrict self)
  * as task callbacks and interrupt hooks, etc...
  * @return: true:  At least one global hook was cleared.
  * @return: false: No global hooks were defined. */
-FUNDEF NONNULL((1)) bool KCALL
+FUNDEF NONNULL((1)) __BOOL KCALL
 driver_clear_globals(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 

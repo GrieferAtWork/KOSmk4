@@ -87,6 +87,7 @@ __ice__
 
 # These headers are installed by `make_utility.sh ... openssl`
 /kos/include/openssl/
+/kos/include/i386-kos/openssl/
 
 # These headers are installed by `make_utility.sh ... libbzip2`
 /kos/include/bzlib.h
