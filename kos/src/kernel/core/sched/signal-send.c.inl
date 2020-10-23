@@ -210,6 +210,20 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 	struct task_connection *receiver;
 	struct task_connections *target_cons;
 #ifdef HAVE_BROADCAST
+	/* FIXME: Broadcasting to a large number other threads running on another CPU
+	 *        can lead to a (not-really?) soft-lock scenario that can randomly
+	 *        resolve itself after an arbitrary amount of time.
+	 * The problem is that the condition which our caller is broadcasting may have
+	 * gone away before we've finished broadcasting to all listening threads. When
+	 * this happens, it can be that other threads which we've already send a signal
+	 * to re-add themself to the signal queue before we're done, at which point we'll
+	 * end up broadcasting to them once again.
+	 * Solution: Instead of implementing sig_broadcast() as
+	 *           `while (try_broadcast_one()) ++result',
+	 *           implement it as this instead:
+	 *           recv = ATOMIC_XCH(self->s_con, SMP_LOCK);
+	 *           while (recv) { next = ...; broadcast_to(...); ++result; recv = next; }
+	 */
 	struct task_connection *next;
 	size_t result = 0;
 #endif /* HAVE_BROADCAST */
@@ -462,7 +476,7 @@ again_read_target_cons:
 #endif /* !CONFIG_NO_SMP */
 	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
 		struct sig_completion *sc;
-		if unlikely(TASK_CONNECTION_STAT_ISDEAD(target_cons)) {
+		if unlikely(TASK_CONNECTION_STAT_ISDONE(target_cons)) {
 			/* The target is already dead. (change it to broadcast) */
 			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
 			                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |

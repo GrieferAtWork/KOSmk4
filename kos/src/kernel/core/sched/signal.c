@@ -772,7 +772,7 @@ again_read_target_cons:
 #endif /* !CONFIG_NO_SMP */
 	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
 		struct sig_completion *sc;
-		if unlikely(TASK_CONNECTION_STAT_ISDEAD(target_cons)) {
+		if unlikely(TASK_CONNECTION_STAT_ISDONE(target_cons)) {
 			/* The target is already dead. (change it to broadcast) */
 			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,
 			                        (struct task_connections *)(TASK_CONNECTION_STAT_BROADCAST |
@@ -1887,7 +1887,7 @@ again:
 again_read_cons:
 #endif /* !CONFIG_NO_SMP */
 		target_cons = ATOMIC_READ(receiver->tc_cons);
-		if (!TASK_CONNECTION_STAT_ISDEAD(target_cons) &&
+		if (!TASK_CONNECTION_STAT_ISDONE(target_cons) &&
 		    (!!TASK_CONNECTION_STAT_ISPOLL(target_cons)) == select_poll) {
 #ifndef CONFIG_NO_SMP
 			/* NOTE: Waiting until we can lock the connection here is allowed, since
