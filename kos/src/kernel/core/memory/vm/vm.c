@@ -146,6 +146,7 @@ NOTHROW(KCALL vm_datapart_destroy)(struct vm_datapart *__restrict self,
 	assert(!self->dp_crefs);
 	assert(!self->dp_srefs);
 	assert(!self->dp_stale);
+	shared_rwlock_broadcast_for_fini(&self->dp_lock);
 	switch (self->dp_state) {
 
 	case VM_DATAPART_STATE_INCORE:

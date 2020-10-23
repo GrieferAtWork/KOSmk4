@@ -51,19 +51,23 @@ DECL_BEGIN
 #endif /* __SIZEOF_POINTER__ < 8 */
 
 struct shared_rwlock {
-	WEAK uintptr_t sl_lock; /* Lock state (Set of `SHARED_RWLOCK_*') */
-	struct sig     sl_ulck; /* Signal boardcast whenever the R/W-lock gets fully unlocked. */
+	WEAK uintptr_t sl_lock;   /* Lock state (Set of `SHARED_RWLOCK_*') */
+	struct sig     sl_rdwait; /* Signal broadcast to wake-up readers. */
+	struct sig     sl_wrwait; /* Signal broadcast to wake-up writers. */
 };
 
-#define SHARED_RWLOCK_INIT              { 0, SIG_INIT }
-#define SHARED_RWLOCK_INIT_READ         { 1, SIG_INIT }
-#define SHARED_RWLOCK_INIT_WRITE        { SHARED_RWLOCK_WFLAG, SIG_INIT }
-#define shared_rwlock_init(self)        ((self)->sl_lock = 0, sig_init(&(self)->sl_ulck))
-#define shared_rwlock_init_read(self)   (void)((self)->sl_lock = 1, sig_init(&(self)->sl_ulck))
-#define shared_rwlock_init_write(self)  (void)((self)->sl_lock = SHARED_RWLOCK_WFLAG, sig_init(&(self)->sl_ulck))
-#define shared_rwlock_cinit(self)       (__hybrid_assert((self)->sl_lock == 0), sig_cinit(&(self)->sl_ulck))
-#define shared_rwlock_cinit_read(self)  (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, sig_cinit(&(self)->sl_ulck))
-#define shared_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = SHARED_RWLOCK_WFLAG, sig_cinit(&(self)->sl_ulck))
+#define SHARED_RWLOCK_INIT              { 0, SIG_INIT, SIG_INIT }
+#define SHARED_RWLOCK_INIT_READ         { 1, SIG_INIT, SIG_INIT }
+#define SHARED_RWLOCK_INIT_WRITE        { SHARED_RWLOCK_WFLAG, SIG_INIT, SIG_INIT }
+#define shared_rwlock_init(self)        ((self)->sl_lock = 0, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
+#define shared_rwlock_init_read(self)   (void)((self)->sl_lock = 1, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
+#define shared_rwlock_init_write(self)  (void)((self)->sl_lock = SHARED_RWLOCK_WFLAG, sig_init(&(self)->sl_rdwait), sig_init(&(self)->sl_wrwait))
+#define shared_rwlock_cinit(self)       (__hybrid_assert((self)->sl_lock == 0), sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
+#define shared_rwlock_cinit_read(self)  (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
+#define shared_rwlock_cinit_write(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = SHARED_RWLOCK_WFLAG, sig_cinit(&(self)->sl_rdwait), sig_cinit(&(self)->sl_wrwait))
+#define shared_rwlock_broadcast_for_fini(self)   \
+	(sig_broadcast_for_fini(&(self)->sl_rdwait), \
+	 sig_broadcast_for_fini(&(self)->sl_wrwait))
 
 #define shared_rwlock_reading(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
 #define shared_rwlock_writing(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) & SHARED_RWLOCK_WFLAG)
@@ -113,9 +117,8 @@ LOCAL NOBLOCK NONNULL((1)) __BOOL
 NOTHROW(FCALL shared_rwlock_end)(struct shared_rwlock *__restrict self);
 
 /* Shared R/W-lock polling functions. */
-#define shared_rwlock_pollconnect_ex(self, cb)       cb(&(self)->sl_ulck)
-#define shared_rwlock_pollconnect_read_ex(self, cb)  cb(&(self)->sl_ulck)
-#define shared_rwlock_pollconnect_write_ex(self, cb) cb(&(self)->sl_ulck)
+#define shared_rwlock_pollconnect_read_ex(self, cb)  cb(&(self)->sl_rdwait)
+#define shared_rwlock_pollconnect_write_ex(self, cb) cb(&(self)->sl_wrwait)
 #ifdef __OPTIMIZE_SIZE__
 #define shared_rwlock_pollread_ex(self, cb)       \
 	(shared_rwlock_pollconnect_read_ex(self, cb), \
@@ -133,7 +136,6 @@ NOTHROW(FCALL shared_rwlock_end)(struct shared_rwlock *__restrict self);
 	 (shared_rwlock_pollconnect_write_ex(self, cb), \
 	  shared_rwlock_canwrite(self)))
 #endif /* !__OPTIMIZE_SIZE__ */
-#define shared_rwlock_pollconnect(self)       shared_rwlock_pollconnect_ex(self, task_connect_for_poll)
 #define shared_rwlock_pollconnect_read(self)  shared_rwlock_pollconnect_read_ex(self, task_connect_for_poll)
 #define shared_rwlock_pollconnect_write(self) shared_rwlock_pollconnect_write_ex(self, task_connect_for_poll)
 #define shared_rwlock_pollread(self)          shared_rwlock_pollread_ex(self, task_connect_for_poll)
@@ -153,7 +155,8 @@ NOTHROW(FCALL shared_rwlock_endwrite)(struct shared_rwlock *__restrict self) {
 		__hybrid_assertf(f & SHARED_RWLOCK_WFLAG, "Lock isn't in write-mode (%x)", f);
 	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, f, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 #endif /* !NDEBUG */
-	sig_broadcast(&self->sl_ulck);
+	if (!sig_send(&self->sl_wrwait))
+		sig_broadcast(&self->sl_rdwait);
 }
 
 LOCAL NOBLOCK NONNULL((1)) __BOOL
@@ -163,7 +166,7 @@ NOTHROW(FCALL shared_rwlock_endread)(struct shared_rwlock *__restrict self) {
 	uintptr_t result;
 	result = __hybrid_atomic_decfetch(self->sl_lock, __ATOMIC_RELEASE);
 	if (result == 0)
-		sig_broadcast(&self->sl_ulck);
+		sig_send(&self->sl_wrwait);
 	return result == 0;
 #else /* NDEBUG */
 	uintptr_t f;
@@ -171,9 +174,10 @@ NOTHROW(FCALL shared_rwlock_endread)(struct shared_rwlock *__restrict self) {
 		f = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
 		__hybrid_assertf(!(f & SHARED_RWLOCK_WFLAG), "Lock is in write-mode (%x)", f);
 		__hybrid_assertf(f != 0, "Lock isn't held by anyone");
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, f, f - 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
+	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, f, f - 1,
+	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	if (f == 1)
-		sig_broadcast(&self->sl_ulck);
+		sig_send(&self->sl_wrwait);
 	return f == 1;
 #endif /* !NDEBUG */
 }
@@ -191,9 +195,12 @@ NOTHROW(FCALL shared_rwlock_end)(struct shared_rwlock *__restrict self) {
 			__hybrid_assertf(__temp != 0, "No remaining read-locks");
 			__newval = __temp - 1;
 		}
-	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, __temp, __newval, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-	if (!__newval)
-		sig_broadcast(&self->sl_ulck);
+	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, __temp, __newval,
+	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
+	if (!__newval) {
+		if (!sig_send(&self->sl_wrwait))
+			sig_broadcast(&self->sl_rdwait);
+	}
 	return __newval == 0;
 }
 
@@ -228,7 +235,7 @@ LOCAL NONNULL((1)) void
 			if (shared_rwlock_tryread(self))
 				goto success;
 		});
-		task_connect(&self->sl_ulck);
+		task_connect(&self->sl_rdwait);
 		if unlikely(shared_rwlock_tryread(self)) {
 			task_disconnectall();
 			break;
@@ -249,7 +256,7 @@ LOCAL NONNULL((1)) void
 			if (shared_rwlock_trywrite(self))
 				goto success;
 		});
-		task_connect(&self->sl_ulck);
+		task_connect(&self->sl_wrwait);
 		if unlikely(shared_rwlock_trywrite(self)) {
 			task_disconnectall();
 			break;
@@ -269,7 +276,7 @@ NOTHROW(FCALL shared_rwlock_read_nx)(struct shared_rwlock *__restrict self,
 			if (shared_rwlock_tryread(self))
 				goto success;
 		});
-		task_connect(&self->sl_ulck);
+		task_connect(&self->sl_rdwait);
 		if unlikely(shared_rwlock_tryread(self)) {
 			task_disconnectall();
 			break;
@@ -291,7 +298,7 @@ NOTHROW(FCALL shared_rwlock_write_nx)(struct shared_rwlock *__restrict self,
 			if (shared_rwlock_trywrite(self))
 				goto success;
 		});
-		task_connect(&self->sl_ulck);
+		task_connect(&self->sl_wrwait);
 		if unlikely(shared_rwlock_trywrite(self)) {
 			task_disconnectall();
 			break;
@@ -361,7 +368,7 @@ NOTHROW(FCALL shared_rwlock_downgrade)(struct shared_rwlock *__restrict self) {
 		__hybrid_assertf(f == SHARED_RWLOCK_WFLAG, "Lock not in write-mode (%x)", f);
 	} while (!__hybrid_atomic_cmpxch_weak(self->sl_lock, f, 1,
 	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
-	sig_broadcast(&self->sl_ulck); /* Allow for more readers. */
+	sig_broadcast(&self->sl_rdwait); /* Allow for more readers. */
 #endif /* !NDEBUG */
 }
 #endif /* !__INTELLISENSE__ */
