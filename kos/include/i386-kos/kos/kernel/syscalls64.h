@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d647ad4 */
+/* HASH CRC-32:0x89bf091 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -435,9 +435,6 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_CLONE
 #define __ARCH_WANT_COMPAT_SYSCALL_COREDUMP
 #define __ARCH_WANT_COMPAT_SYSCALL_DEBUGTRAP
-#define __ARCH_WANT_COMPAT_SYSCALL_EPOLL_CTL
-#define __ARCH_WANT_COMPAT_SYSCALL_EPOLL_PWAIT
-#define __ARCH_WANT_COMPAT_SYSCALL_EPOLL_WAIT
 #define __ARCH_WANT_COMPAT_SYSCALL_EXECVE
 #define __ARCH_WANT_COMPAT_SYSCALL_EXECVEAT
 #define __ARCH_WANT_COMPAT_SYSCALL_FADVISE64_64

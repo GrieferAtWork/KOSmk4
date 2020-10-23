@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d9fc75c */
+/* HASH CRC-32:0x25243f80 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,6 +52,9 @@
 #define __NR3264COMPAT_dup3                     1(dup3)
 #define __NR3264COMPAT_epoll_create             1(epoll_create)
 #define __NR3264COMPAT_epoll_create1            1(epoll_create1)
+#define __NR3264COMPAT_epoll_ctl                1(epoll_ctl)
+#define __NR3264COMPAT_epoll_pwait              1(epoll_pwait)
+#define __NR3264COMPAT_epoll_wait               1(epoll_wait)
 #define __NR3264COMPAT_eventfd                  1(eventfd)
 #define __NR3264COMPAT_eventfd2                 1(eventfd2)
 #define __NR3264COMPAT_exit                     1(exit)

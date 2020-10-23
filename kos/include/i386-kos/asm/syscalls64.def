@@ -30,6 +30,8 @@
 /* Define type compatibilities between x86_64 and i386 */
 %[typecompat(x86_64:[sigset_t,__sigset_struct] = *:[__sigset_struct,sigset_t])]
 %[typecompat(x86_64:[fd_set,__fd_set_struct] = *:[fd_set,__fd_set_struct])]
+%[typecompat(x86_64:[epoll_data] = *:[epoll_data])]
+%[typecompat(x86_64:[epoll_event] = *:[epoll_event])]
 %[typecompat(x86_64:sockaddr = *:sockaddr)]
 %[typecompat(x86_64:pollfd = *:pollfd)]
 %[typecompat(x86_64:dirent = *:dirent)]
