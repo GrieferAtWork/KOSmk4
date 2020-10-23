@@ -102,23 +102,20 @@ DECL_BEGIN
 	                          min_alignment,                           \
 	                          offset +                                 \
 	                          CONFIG_MALL_HEAD_SIZE,                   \
-	                          CONFIG_MALL_HEAD_SIZE + (n_bytes) +      \
-	                          CONFIG_MALL_TAIL_SIZE,                   \
+	                          n_bytes,                                 \
 	                          flags)
 #else /* LOCAL_HAVE_offset */
 #define MY_heap_alloc_untraced(n_bytes, flags)                         \
 	LOCAL_heap_align_untraced(&kernel_heaps[(flags) & __GFP_HEAPMASK], \
 	                          min_alignment,                           \
 	                          CONFIG_MALL_HEAD_SIZE,                   \
-	                          CONFIG_MALL_HEAD_SIZE + (n_bytes) +      \
-	                          CONFIG_MALL_TAIL_SIZE,                   \
+	                          n_bytes,                                 \
 	                          flags)
 #endif /* !LOCAL_HAVE_offset */
 #else /* LOCAL_HAVE_min_alignment */
 #define MY_heap_alloc_untraced(n_bytes, flags)                         \
 	LOCAL_heap_alloc_untraced(&kernel_heaps[(flags) & __GFP_HEAPMASK], \
-	                          CONFIG_MALL_HEAD_SIZE + (n_bytes) +      \
-	                          CONFIG_MALL_TAIL_SIZE,                   \
+	                          n_bytes,                                 \
 	                          flags)
 #endif /* !LOCAL_HAVE_min_alignment */
 
@@ -154,7 +151,10 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
                                          gfp_t flags) {
 	struct heapptr result;
 	struct trace_node *node;
-	result = MY_heap_alloc_untraced(n_bytes, flags);
+	result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
+	                                n_bytes +
+	                                CONFIG_MALL_TAIL_SIZE,
+	                                flags);
 #ifdef DEFINE_X_noexcept
 	if unlikely(result.hp_siz == 0)
 		goto err;
@@ -256,7 +256,10 @@ do_normal_malloc:
 #ifdef DEFINE_METHOD_kmalloc_in_place
 		goto err;
 #else /* DEFINE_METHOD_kmalloc_in_place */
-		result = MY_heap_alloc_untraced(n_bytes, flags);
+		result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
+		                                n_bytes +
+		                                CONFIG_MALL_TAIL_SIZE,
+		                                flags);
 #ifdef DEFINE_X_noexcept
 		if unlikely(result.hp_siz == 0)
 			goto err;
@@ -308,15 +311,6 @@ do_normal_malloc:
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 	}
 again_nonnull_ptr:
-	/* Calculate the actual needed size. */
-	if unlikely(OVERFLOW_UADD(n_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result.hp_siz)) {
-#ifdef DEFINE_X_except
-		THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes);
-#elif defined(DEFINE_X_noexcept)
-		goto err;
-#endif /* ... */
-	}
-	result.hp_siz &= ~(HEAP_ALIGNMENT - 1);
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	/* Special case: krealloc() a slab pointer */
@@ -328,7 +322,10 @@ again_nonnull_ptr:
 		goto err; /* Cannot realloc-in-place */
 #else /* DEFINE_METHOD_kmalloc_in_place */
 		/* Allocate a new, non-slab chunk, and copy existing data into it. */
-		result = MY_heap_alloc_untraced(result.hp_siz, flags);
+		result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
+		                                n_bytes +
+		                                CONFIG_MALL_TAIL_SIZE,
+		                                flags);
 #ifdef DEFINE_X_noexcept
 		if unlikely(result.hp_siz == 0)
 			goto err;
@@ -376,7 +373,7 @@ again_nonnull_ptr:
 		}
 #endif /* DEFINE_X_noexcept */
 		result.hp_ptr = (byte_t *)result.hp_ptr + CONFIG_MALL_HEAD_SIZE;
-		memcpy(result.hp_ptr, ptr, old_user_size);
+		result.hp_ptr = memcpy(result.hp_ptr, ptr, old_user_size);
 		slab_free(ptr);
 		return result.hp_ptr;
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
@@ -435,16 +432,19 @@ again_nonnull_ptr:
 	/* Calculate the old user-size */
 	old_user_size = trace_node_usize(node) - (CONFIG_MALL_HEAD_SIZE +
 	                                          CONFIG_MALL_TAIL_SIZE);
-	if (result.hp_siz <= old_user_size) {
+	if (n_bytes <= old_user_size) {
 		/* Size should be decreased (just try to truncate the node) */
 		size_t num_free;
-		/* Make sure that the truncated block remains large enough! */
-		if unlikely(result.hp_siz < HEAP_MINSIZE) {
-			result.hp_siz = HEAP_MINSIZE;
-			if (result.hp_siz >= old_user_size)
+		if unlikely(n_bytes < HEAP_MINSIZE) {
+			/* Make sure that the truncated block remains large enough! */
+			n_bytes = HEAP_MINSIZE;
+			if (n_bytes >= old_user_size)
 				goto realloc_unchanged;
+		} else {
+			/* Make sure that `n_bytes' is properly aligned */
+			n_bytes = CEIL_ALIGN(n_bytes, HEAP_ALIGNMENT);
 		}
-		num_free = old_user_size - result.hp_siz;
+		num_free = old_user_size - n_bytes;
 		if (num_free >= HEAP_MINSIZE) {
 			u8 node_flags = node->tn_flags;
 			trace_node_tree_remove(&nodes, (uintptr_t)ptr);
@@ -487,7 +487,7 @@ realloc_unchanged:
 		size_t num_extend;
 		void *extension_base;
 		gfp_t extension_flags;
-		num_extend = result.hp_siz - old_user_size;
+		num_extend = n_bytes - old_user_size;
 		if (num_extend < HEAP_MINSIZE)
 			num_extend = HEAP_MINSIZE;
 		extension_base  = trace_node_uend(node);
@@ -507,7 +507,10 @@ realloc_unchanged:
 			void *oldblock_base;
 			size_t oldblock_size;
 			/* Must allocate a new block */
-			result = MY_heap_alloc_untraced(n_bytes, flags);
+			result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
+			                                n_bytes +
+			                                CONFIG_MALL_TAIL_SIZE,
+			                                flags);
 #ifdef DEFINE_X_noexcept
 			if unlikely(result.hp_siz == 0)
 				goto err;
