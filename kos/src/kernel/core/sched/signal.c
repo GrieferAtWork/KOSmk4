@@ -434,9 +434,9 @@ again:
 }
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 
-PRIVATE NOBLOCK WUNUSED NONNULL((2)) bool
+PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((2)) bool
 NOTHROW(FCALL is_connection_is_chain)(struct task_connection *chain,
-                                      struct task_connection *__restrict con) {
+                                      struct task_connection *con) {
 	for (; chain; chain = chain->tc_signext) {
 		if (chain == con)
 			return true;

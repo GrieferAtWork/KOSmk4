@@ -240,9 +240,9 @@ err_overlap:
 			/* Create a memory mapping for the PEB containing `args->ea_argv' and `args->ea_envp' */
 #ifdef LOCAL_EXEC_ARGV_SIZE
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
-			if (argv_is_compat)
+			if (args->ea_argv_is_compat)
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8
-			if (!argv_is_compat)
+			if (!args->ea_argv_is_compat)
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
 #error "Unsupported `__ARCH_COMPAT_SIZEOF_POINTER'"
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */

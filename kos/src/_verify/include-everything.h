@@ -66,6 +66,8 @@ local badFiles = List({
 	"hybrid/sync/service-lock.h",
 	"asm/os/",
 	"bits/os/",
+	"compat/asm/os/",
+	"compat/bits/os/",
 	"i386-kos",
 	"libc/local",
 	"c++",
@@ -360,52 +362,9 @@ incdir("");
 #include <byteswap.h>
 #include <compat/bits/os/cmsghdr.h>
 #include <compat/bits/os/flock.h>
-#include <compat/bits/os/generic/cmsghdr.h>
-#include <compat/bits/os/generic/flock.h>
-#include <compat/bits/os/generic/iovec.h>
-#include <compat/bits/os/generic/itimerspec.h>
-#include <compat/bits/os/generic/itimerval.h>
-#include <compat/bits/os/generic/mmsghdr.h>
-#include <compat/bits/os/generic/msghdr.h>
-#include <compat/bits/os/generic/rusage-convert.h>
-#include <compat/bits/os/generic/rusage.h>
-#include <compat/bits/os/generic/sigaction.h>
-#include <compat/bits/os/generic/sigevent.h>
-#include <compat/bits/os/generic/siginfo-convert.h>
-#include <compat/bits/os/generic/siginfo.h>
-#include <compat/bits/os/generic/sigstack.h>
-#include <compat/bits/os/generic/sigval.h>
-#include <compat/bits/os/generic/stat-convert.h>
-#include <compat/bits/os/generic/stat.h>
-#include <compat/bits/os/generic/statfs-convert.h>
-#include <compat/bits/os/generic/statfs.h>
-#include <compat/bits/os/generic/timeb.h>
-#include <compat/bits/os/generic/timespec.h>
-#include <compat/bits/os/generic/timeval.h>
-#include <compat/bits/os/generic/tms.h>
-#include <compat/bits/os/generic/utimbuf.h>
 #include <compat/bits/os/iovec.h>
 #include <compat/bits/os/itimerspec.h>
 #include <compat/bits/os/itimerval.h>
-#include <compat/bits/os/kos/cmsghdr.h>
-#include <compat/bits/os/kos/flock.h>
-#include <compat/bits/os/kos/mmsghdr.h>
-#include <compat/bits/os/kos/msghdr.h>
-#include <compat/bits/os/kos/rusage-convert.h>
-#include <compat/bits/os/kos/rusage.h>
-#include <compat/bits/os/kos/sigaction.h>
-#include <compat/bits/os/kos/sigevent.h>
-#include <compat/bits/os/kos/siginfo-convert.h>
-#include <compat/bits/os/kos/siginfo.h>
-#include <compat/bits/os/kos/sigstack.h>
-#include <compat/bits/os/kos/sigval.h>
-#include <compat/bits/os/kos/stat-convert.h>
-#include <compat/bits/os/kos/stat.h>
-#include <compat/bits/os/kos/statfs-convert.h>
-#include <compat/bits/os/kos/statfs.h>
-#include <compat/bits/os/kos/timeb.h>
-#include <compat/bits/os/kos/tms.h>
-#include <compat/bits/os/kos/utimbuf.h>
 #include <compat/bits/os/mcontext.h>
 #include <compat/bits/os/mmsghdr.h>
 #include <compat/bits/os/msghdr.h>

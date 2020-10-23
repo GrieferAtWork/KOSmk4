@@ -1004,11 +1004,11 @@ epoll_controller_trywait(struct epoll_controller *__restrict self,
 	/* Acquire a lock to the controller, but make sure not to clobber
 	 * the calling thread's current set of active connections. */
 	mutex_acquire(&self->ec_lock);
-	TRY {
-		result_events = self->ec_pending;
+	result_events = self->ec_pending;
 #ifdef EC_PENDING_INUSE
-		self->ec_pending = EC_PENDING_INUSE;
+	self->ec_pending = EC_PENDING_INUSE;
 #endif /* EC_PENDING_INUSE */
+	TRY {
 		{
 			struct epoll_handle_monitor *monitor;
 			monitor = ATOMIC_XCH(self->ec_raised, NULL);

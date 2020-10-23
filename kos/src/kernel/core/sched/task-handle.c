@@ -66,7 +66,7 @@ handle_task_pollconnect(struct taskpid *__restrict self, poll_mode_t what) {
 		task_connect_for_poll(&self->tp_changed);
 }
 
-INTERN poll_mode_t KCALL
+INTERN ATTR_PURE WUNUSED poll_mode_t KCALL
 handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) {
 	poll_mode_t result = 0;
 	/* POLLIN: Terminated */
