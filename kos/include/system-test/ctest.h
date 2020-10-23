@@ -34,7 +34,10 @@
 
 #include <hybrid/__assert.h>
 
-#ifndef __INSIDE_LIBTEST
+#include <err.h>
+#include <inttypes.h>
+
+#if !defined(__INSIDE_LIBTEST) && !defined(__DEEMON__)
 #error "Only include this file from within *.ctest files that are apart of /bin/system-test"
 #endif /* __INSIDE_LIBTEST */
 
@@ -67,6 +70,122 @@ __INTDEF void __NOTHROW_NCX(__LIBKCALL ctest_vsubstatf)(char const *__restrict _
 
 __DECL_END
 #endif /* __CC__ */
+
+
+#define _OPt(a, op, b, T, PRIt)                                                    \
+	do {                                                                           \
+		T _a = (a), _b = (b);                                                      \
+		if (!(_a op _b)) {                                                         \
+			err(1, "fail:%d: " #a " " #op " " #b " (%" PRIt " " #op " %" PRIt ")", \
+			    __LINE__, _a, _b);                                                 \
+		}                                                                          \
+	}	__WHILE0
+/*[[[deemon
+for (local name, op: {
+	("LO", "<"),
+	("LE", "<="),
+	("EQ", "=="),
+	("NE", "!="),
+	("GR", ">"),
+	("GE", ">="),
+}) {
+	for (local i, T, PRIt: {
+		("d", "int", "\"d\""),
+		("u", "unsigned int", "\"u\""),
+		("x", "unsigned int", "\"x\""),
+		("s", "size_t", "PRIuSIZ"),
+		("ss", "ssize_t", "PRIdSIZ"),
+		("p", "uintptr_t", "\"p\""),
+		("x32", "uint32_t", "PRIx32"),
+		("u32", "uint32_t", "PRIu32"),
+		("d32", "int32_t", "PRId32"),
+		("x64", "uint64_t", "PRIx64"),
+		("u64", "uint64_t", "PRIu64"),
+		("d64", "int64_t", "PRId64"),
+	}) {
+		print("#define ", name, i, "(a, b) _OPt(a, ", op, ", b, ", T, ", ", PRIt, ")");
+	}
+	print;
+}
+]]]*/
+#define LOd(a, b) _OPt(a, <, b, int, "d")
+#define LOu(a, b) _OPt(a, <, b, unsigned int, "u")
+#define LOx(a, b) _OPt(a, <, b, unsigned int, "x")
+#define LOs(a, b) _OPt(a, <, b, size_t, PRIuSIZ)
+#define LOss(a, b) _OPt(a, <, b, ssize_t, PRIdSIZ)
+#define LOp(a, b) _OPt(a, <, b, uintptr_t, "p")
+#define LOx32(a, b) _OPt(a, <, b, uint32_t, PRIx32)
+#define LOu32(a, b) _OPt(a, <, b, uint32_t, PRIu32)
+#define LOd32(a, b) _OPt(a, <, b, int32_t, PRId32)
+#define LOx64(a, b) _OPt(a, <, b, uint64_t, PRIx64)
+#define LOu64(a, b) _OPt(a, <, b, uint64_t, PRIu64)
+#define LOd64(a, b) _OPt(a, <, b, int64_t, PRId64)
+
+#define LEd(a, b) _OPt(a, <=, b, int, "d")
+#define LEu(a, b) _OPt(a, <=, b, unsigned int, "u")
+#define LEx(a, b) _OPt(a, <=, b, unsigned int, "x")
+#define LEs(a, b) _OPt(a, <=, b, size_t, PRIuSIZ)
+#define LEss(a, b) _OPt(a, <=, b, ssize_t, PRIdSIZ)
+#define LEp(a, b) _OPt(a, <=, b, uintptr_t, "p")
+#define LEx32(a, b) _OPt(a, <=, b, uint32_t, PRIx32)
+#define LEu32(a, b) _OPt(a, <=, b, uint32_t, PRIu32)
+#define LEd32(a, b) _OPt(a, <=, b, int32_t, PRId32)
+#define LEx64(a, b) _OPt(a, <=, b, uint64_t, PRIx64)
+#define LEu64(a, b) _OPt(a, <=, b, uint64_t, PRIu64)
+#define LEd64(a, b) _OPt(a, <=, b, int64_t, PRId64)
+
+#define EQd(a, b) _OPt(a, ==, b, int, "d")
+#define EQu(a, b) _OPt(a, ==, b, unsigned int, "u")
+#define EQx(a, b) _OPt(a, ==, b, unsigned int, "x")
+#define EQs(a, b) _OPt(a, ==, b, size_t, PRIuSIZ)
+#define EQss(a, b) _OPt(a, ==, b, ssize_t, PRIdSIZ)
+#define EQp(a, b) _OPt(a, ==, b, uintptr_t, "p")
+#define EQx32(a, b) _OPt(a, ==, b, uint32_t, PRIx32)
+#define EQu32(a, b) _OPt(a, ==, b, uint32_t, PRIu32)
+#define EQd32(a, b) _OPt(a, ==, b, int32_t, PRId32)
+#define EQx64(a, b) _OPt(a, ==, b, uint64_t, PRIx64)
+#define EQu64(a, b) _OPt(a, ==, b, uint64_t, PRIu64)
+#define EQd64(a, b) _OPt(a, ==, b, int64_t, PRId64)
+
+#define NEd(a, b) _OPt(a, !=, b, int, "d")
+#define NEu(a, b) _OPt(a, !=, b, unsigned int, "u")
+#define NEx(a, b) _OPt(a, !=, b, unsigned int, "x")
+#define NEs(a, b) _OPt(a, !=, b, size_t, PRIuSIZ)
+#define NEss(a, b) _OPt(a, !=, b, ssize_t, PRIdSIZ)
+#define NEp(a, b) _OPt(a, !=, b, uintptr_t, "p")
+#define NEx32(a, b) _OPt(a, !=, b, uint32_t, PRIx32)
+#define NEu32(a, b) _OPt(a, !=, b, uint32_t, PRIu32)
+#define NEd32(a, b) _OPt(a, !=, b, int32_t, PRId32)
+#define NEx64(a, b) _OPt(a, !=, b, uint64_t, PRIx64)
+#define NEu64(a, b) _OPt(a, !=, b, uint64_t, PRIu64)
+#define NEd64(a, b) _OPt(a, !=, b, int64_t, PRId64)
+
+#define GRd(a, b) _OPt(a, >, b, int, "d")
+#define GRu(a, b) _OPt(a, >, b, unsigned int, "u")
+#define GRx(a, b) _OPt(a, >, b, unsigned int, "x")
+#define GRs(a, b) _OPt(a, >, b, size_t, PRIuSIZ)
+#define GRss(a, b) _OPt(a, >, b, ssize_t, PRIdSIZ)
+#define GRp(a, b) _OPt(a, >, b, uintptr_t, "p")
+#define GRx32(a, b) _OPt(a, >, b, uint32_t, PRIx32)
+#define GRu32(a, b) _OPt(a, >, b, uint32_t, PRIu32)
+#define GRd32(a, b) _OPt(a, >, b, int32_t, PRId32)
+#define GRx64(a, b) _OPt(a, >, b, uint64_t, PRIx64)
+#define GRu64(a, b) _OPt(a, >, b, uint64_t, PRIu64)
+#define GRd64(a, b) _OPt(a, >, b, int64_t, PRId64)
+
+#define GEd(a, b) _OPt(a, >=, b, int, "d")
+#define GEu(a, b) _OPt(a, >=, b, unsigned int, "u")
+#define GEx(a, b) _OPt(a, >=, b, unsigned int, "x")
+#define GEs(a, b) _OPt(a, >=, b, size_t, PRIuSIZ)
+#define GEss(a, b) _OPt(a, >=, b, ssize_t, PRIdSIZ)
+#define GEp(a, b) _OPt(a, >=, b, uintptr_t, "p")
+#define GEx32(a, b) _OPt(a, >=, b, uint32_t, PRIx32)
+#define GEu32(a, b) _OPt(a, >=, b, uint32_t, PRIu32)
+#define GEd32(a, b) _OPt(a, >=, b, int32_t, PRId32)
+#define GEx64(a, b) _OPt(a, >=, b, uint64_t, PRIx64)
+#define GEu64(a, b) _OPt(a, >=, b, uint64_t, PRIu64)
+#define GEd64(a, b) _OPt(a, >=, b, int64_t, PRId64)
+/*[[[end]]]*/
 
 
 #endif /* !__KOS__ || !__KERNEL__ */

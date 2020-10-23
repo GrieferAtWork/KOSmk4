@@ -160,7 +160,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		dump_branch_stats();
 		return 0;
 
-	case KSYSCTL_SYSCALL_GET_PERSONALITY: {
+	case KSYSCTL_KERNEL_GET_PERSONALITY: {
 		uintptr_t kp;
 		if unlikely((uintptr_t)arg & 1) {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
@@ -177,7 +177,7 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		return has_personality(kp) ? 1 : 0;
 	}	break;
 
-	case KSYSCTL_SYSCALL_SET_PERSONALITY: {
+	case KSYSCTL_KERNEL_SET_PERSONALITY: {
 		uintptr_t kp, index;
 		bool enable = ((uintptr_t)arg & 1) != 0;
 		byte_t oldbyte, mask;

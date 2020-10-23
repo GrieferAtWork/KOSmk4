@@ -59,6 +59,7 @@ DATDEF ATTR_PERTASK struct read_locks this_read_locks;
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL pertask_readlocks_reinit)(struct task *__restrict thread);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */

@@ -278,8 +278,8 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #define KSYSCTL_SYSTEM_BRANCH_DUMP_STATS       0xc05ef001 /* Dump kernel branch statistics to the system log */
 
 /* Kernel configuration */
-#define KSYSCTL_SYSCALL_GET_PERSONALITY        0x005f0001 /* [int kp << 1] Return 0/1 if the given personality code `kp' (one of `KP_*' from `<kos/personality>') is enabled or not. */
-#define KSYSCTL_SYSCALL_SET_PERSONALITY        0x005f0002 /* [int kp << 1 | (enabled & 1)] Enable/Disable the given personality `kp'. (return 0/1 indicative of the old state) */
+#define KSYSCTL_KERNEL_GET_PERSONALITY         0x005f0001 /* [int kp << 1] Return 0/1 if the given personality code `kp' (one of `KP_*' from `<kos/personality>') is enabled or not. */
+#define KSYSCTL_KERNEL_SET_PERSONALITY         0x005f0002 /* [int kp << 1 | (enabled & 1)] Enable/Disable the given personality `kp'. (return 0/1 indicative of the old state) */
 
 /* Driver related */
 #define KSYSCTL_DRIVER_LSMOD                   0x000d0001 /* [struct hop_openfd *result] Capture a snapshot of all currently loaded kernel
@@ -415,6 +415,16 @@ __NOTHROW_NCX(__LIBCCALL ksysctl_set_driver_library_path)(char const *__path) {
 	return (int)ksysctl(KSYSCTL_DRIVER_SET_LIBRARY_PATH, &__args);
 }
 
+__LOCAL __ATTR_WUNUSED int
+__NOTHROW_NCX(__LIBCCALL ksysctl_get_personality)(unsigned int perso) {
+	return (int)ksysctl(KSYSCTL_KERNEL_GET_PERSONALITY, perso << 1);
+}
+
+__LOCAL int
+__NOTHROW_NCX(__LIBCCALL ksysctl_set_personality)(unsigned int perso, __BOOL enabled) {
+	return (int)ksysctl(KSYSCTL_KERNEL_SET_PERSONALITY, (perso << 1) | (enabled ? 1 : 0));
+}
+
 #endif /* __ksysctl_defined */
 
 
@@ -495,6 +505,16 @@ KSysctlSetDriverLibraryPath(char const *__path) {
 	__args.slp_struct_size = sizeof(__args);
 	__args.slp_newpath     = __path;
 	KSysctl(KSYSCTL_DRIVER_SET_LIBRARY_PATH, &__args);
+}
+
+__LOCAL __ATTR_WUNUSED __BOOL
+__NOTHROW_NCX(__LIBCCALL KSysctlGetPersonality)(unsigned int perso) {
+	return KSysctl(KSYSCTL_KERNEL_GET_PERSONALITY, perso << 1) != 0;
+}
+
+__LOCAL void
+__NOTHROW_NCX(__LIBCCALL KSysctlSetPersonality)(unsigned int perso, __BOOL enabled) {
+	KSysctl(KSYSCTL_KERNEL_SET_PERSONALITY, (perso << 1) | (enabled ? 1 : 0));
 }
 
 #endif /* __KSysctl_defined */

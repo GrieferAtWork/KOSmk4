@@ -679,7 +679,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_init(void) {
 		       sizeof(struct read_locks));
 		initok |= INITOK_READLOCKS;
 	}
-	pertask_readlocks_init(mythread);
+
+	/* Re-initialize the readlock TLS area. */
+	pertask_readlocks_reinit(mythread);
 
 	/* Make sure that the signal connections sub-system is initialized. */
 	if (!FORTASK(mythread, this_connections) ||
@@ -940,7 +942,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	ATOMIC_OR(mythread->t_flags, TASK_FKEEPCORE);
 	FORCPU(me, thiscpu_sched_override) = mythread;
 	x86_init_psp0(me, mythread);
-	pertask_readlocks_init(mythread);
+
+	/* Re-initialize the readlock TLS area. */
+	pertask_readlocks_reinit(mythread);
 
 	/* Make sure that the signal connections sub-system is (still) initialized. */
 	if (!FORTASK(mythread, this_connections) ||

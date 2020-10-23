@@ -472,22 +472,20 @@ struct sig_post_completion {
 		size_t _pc_reqlen;                                         \
 		(context)->scc_post = NULL;                                \
 		_pc_reqlen = (*(sc)->sc_cb)(sc, context, NULL, 0);         \
-		if ((context)->scc_post != NULL) {                         \
+		if (_pc_reqlen != 0 || (context)->scc_post != NULL) {      \
 			struct sig_post_completion *_pc_ent;                   \
 			for (;;) {                                             \
+				size_t _pc_newlen;                                 \
 				_pc_ent = sig_post_completion_alloc(_pc_reqlen);   \
-				if likely (_pc_reqlen == 0) {                      \
-					size_t _pc_newlen;                             \
-					_pc_newlen = (*(sc)->sc_cb)(sc, context,       \
-					                            _pc_ent->spc_buf,  \
-					                            _pc_reqlen);       \
-					if unlikely(_pc_newlen > _pc_reqlen) {         \
-						_pc_reqlen = _pc_newlen;                   \
-						continue;                                  \
-					}                                              \
-					if unlikely((context)->scc_post == NULL)       \
-						break;                                     \
+				_pc_newlen = (*(sc)->sc_cb)(sc, context,           \
+				                            _pc_ent->spc_buf,      \
+				                            _pc_reqlen);           \
+				if unlikely(_pc_newlen > _pc_reqlen) {             \
+					_pc_reqlen = _pc_newlen;                       \
+					continue;                                      \
 				}                                                  \
+				if unlikely((context)->scc_post == NULL)           \
+					break;                                         \
 				/* Finish fill in `_pc_ent' and enqueue it. */     \
 				_pc_ent->spc_cb   = (context)->scc_post;           \
 				_pc_ent->spc_next = *(ppost_completion_chain);     \
@@ -1748,7 +1746,7 @@ sig_multicompletion_connect_from_task(struct sig_multicompletion *__restrict com
 		                             sig_smplock_cpy(route, signext)));
 #ifndef CONFIG_NO_SMP
 		/* Step #4 */
-		ATOMIC_ADD(con->tc_stat, ~TASK_CONNECTION_STAT_FLOCK);
+		ATOMIC_AND(con->tc_stat, ~TASK_CONNECTION_STAT_FLOCK);
 #endif /* !CONFIG_NO_SMP */
 		/* Step #5 */
 		PREEMPTION_POP(was);

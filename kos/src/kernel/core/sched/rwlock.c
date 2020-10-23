@@ -96,6 +96,20 @@ NOTHROW(KCALL pertask_readlocks_init)(struct task *__restrict thread) {
 	locks->rls_vec = locks->rls_sbuf;
 }
 
+INTDEF struct task pertask_template ASMNAME("__kernel_pertask_start");
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL pertask_readlocks_reinit)(struct task *__restrict thread) {
+	/* Restore read-locks from the per-task initialization template.
+	 * The `pertask_readlocks_init()' initialization function expects
+	 * its contents as the initial state. */
+	memcpy(&FORTASK(thread, this_read_locks),
+	       &FORTASK(&pertask_template, this_read_locks),
+	       sizeof(this_read_locks));
+	/* The the tast-level init. */
+	pertask_readlocks_init(thread);
+}
+
+
 DEFINE_PERTASK_FINI(pertask_readlocks_fini);
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread) {
@@ -191,8 +205,12 @@ again:
 	perturb = j = RWLOCK_HASH(lock) & locks->rls_msk;
 	for (;; j = ((j << 2) + j + perturb + 1), perturb >>= 5) {
 		lockdesc = &locks->rls_vec[j & locks->rls_msk];
-		if (lockdesc->rl_rwlock == lock)
+		if (lockdesc->rl_rwlock == lock) {
+			assert(locks->rls_use != 0);
+			assert(!lockdesc->rl_recursion || lock->rw_mode != RWLOCK_MODE_FWRITING);
+			assert(!lockdesc->rl_recursion || lock->rw_scnt != 0);
 			return lockdesc; /* Existing descriptor. */
+		}
 		if (!lockdesc->rl_rwlock) {
 			/* End of chain (if no dummy was found, use this entry). */
 			if (!result) {

@@ -71,6 +71,10 @@ NOTHROW(KCALL mutex_tryacquire)(struct mutex *__restrict self) {
 	return true;
 }
 
+/* Same as `mutex_acquire()', but it's unlikely that
+ * the lock can be acquired without blocking. */
+#define mutex_acquire_unlikely mutex_acquire
+
 /* Acquire a lock to the given mutex, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
  * @return: false: The given `abs_timeout' has expired. */

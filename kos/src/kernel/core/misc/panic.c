@@ -81,7 +81,7 @@ NOTHROW(KCALL fixup_uninitialized_thread)(struct task *__restrict thread) {
 	if (thread->t_self != thread)
 		thread->t_self = thread; /* Shouldn't happen... */
 	if (!FORTASK(thread, this_read_locks).rls_vec)
-		pertask_readlocks_init(thread);
+		pertask_readlocks_reinit(thread);
 	if (!FORTASK(thread, this_connections) ||
 	    (FORTASK(thread, this_connections)->tcs_thread != thread))
 		pertask_init_task_connections(thread);

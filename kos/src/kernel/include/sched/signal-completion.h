@@ -214,6 +214,7 @@ NOTHROW(FCALL sig_multicompletion_init)(struct sig_multicompletion *__restrict s
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
 		self->sm_set.sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
+	self->sm_set.sms_next = __NULLPTR;
 }
 
 /* Initialize the given signal multi-completion controller.

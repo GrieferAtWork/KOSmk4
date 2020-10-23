@@ -65,8 +65,15 @@ struct epoll_handle_monitor {
 	                                           * Signals monitored by this controller are established by doing a
 	                                           * regular `handle_poll()' on `ehm_hand', followed by making use of
 	                                           * `sig_multicompletion_connect_from_task()'. */
-	struct epoll_handle_monitor *ehm_wnext;   /* Used internally by `epoll_controller_trywait()' */
 };
+
+/* Get/set the mask of raised, pollable data channels. The field accessed
+ * by these macros is only valid for monitors from the `ec_pending' chain. */
+#define epoll_handle_monitor_getwtest(self) \
+	((uint32_t)(uintptr_t)(self)->ehm_comp.sm_set.sms_routes[0].tc_signext)
+#define epoll_handle_monitor_setwtest(self, value) \
+	((self)->ehm_comp.sm_set.sms_routes[0].tc_signext = (struct task_connection *)(uintptr_t)(uint32_t)(value))
+
 
 struct epoll_controller_ent {
 	struct epoll_handle_monitor *ece_mon; /* [0..1][owned] Pointed-to monitor (NULL for sentinel, INTERNAL_STUB for deleted) */
@@ -92,6 +99,11 @@ struct epoll_controller {
 	                                                  * By taking an element from this chain, you implicitly acquire a lock
 	                                                  * to its `ehm_comp', `ehm_rnext' and `ehm_raised' fields, which you
 	                                                  * release by re-connecting its completion controller. */
+	WEAK struct epoll_handle_monitor *ec_pending;    /* [0..1][lock(ec_lock)] Similar to `ec_raised', but this chain
+	                                                  * contains all monitors that have been raised, and confirmed to
+	                                                  * be asserted, but have yet to consumed by user-space. The chain
+	                                                  * is sorted from least-recently-raised to most-recently-raised, and
+	                                                  * the `ehm_wtest' field */
 	struct sig                        ec_avail;      /* Send once every time that `ec_raised' becomes non-NULL. */
 	size_t                            ec_used;       /* [lock(ec_lock)] Amount of used (non-NULL and non-deleted) entries */
 	size_t                            ec_size;       /* [lock(ec_lock)] Amount of (non-NULL) entires. */
@@ -165,11 +177,9 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
  * would result in a SEGFAULT.
  * @param: maxevents: The max number of events to consume (asserted to be >= 1)
  * @return: * : The actual number of consumed events.
- *              When non-zero, the calling thread's set of connected
- *              signals (~ala task_connect()) may have been clobbered.
  * @return: 0 : No monitors have been raised at this time. Once any
  *              monitor becomes raised, `self->ec_avail' will be send. */
-FUNDEF NONNULL((1)) size_t KCALL
+FUNDEF NOCONNECT NONNULL((1)) size_t KCALL
 epoll_controller_trywait(struct epoll_controller *__restrict self,
                          USER CHECKED struct epoll_event *events,
                          size_t maxevents)
@@ -190,8 +200,9 @@ epoll_controller_wait(struct epoll_controller *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT);
 
 /* Quickly check if there are pending events that can be waited upon. */
-#define epoll_controller_canwait(self) \
-	(__hybrid_atomic_load((self)->ec_raised, __ATOMIC_ACQUIRE) != __NULLPTR)
+#define epoll_controller_canwait(self)                                         \
+	(__hybrid_atomic_load((self)->ec_raised, __ATOMIC_ACQUIRE) != __NULLPTR || \
+	 __hybrid_atomic_load((self)->ec_pending, __ATOMIC_ACQUIRE) != __NULLPTR)
 #define epoll_controller_pollconnect_ex(self, cb) cb(&(self)->ec_avail)
 #define epoll_controller_pollconnect(self)        epoll_controller_pollconnect_ex(self, task_connect_for_poll)
 

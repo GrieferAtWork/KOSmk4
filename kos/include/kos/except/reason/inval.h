@@ -194,6 +194,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS,                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 	E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS,                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `epoll_create1(2)' cannot be masked by `EPOLL_CLOEXEC | EPOLL_CLOFORK' */
 	E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP,                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
+	E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS,          /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -363,6 +364,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS                E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS                E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS                /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `epoll_create1(2)' cannot be masked by `EPOLL_CLOEXEC | EPOLL_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                       E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
+#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS          E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS          /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_FD_FLAG                      1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -529,6 +531,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_DELETE_MODULE_FLAGS                145 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `delete_module(2)' cannot be masked by `O_TRUNC | O_NONBLOCK' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CREATE1_FLAGS                146 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `epoll_create1(2)' cannot be masked by `EPOLL_CLOEXEC | EPOLL_CLOFORK' */
 #define E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP                       147 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `op' argument passed to `epoll_ctl(2)' isn't one of `EPOLL_CTL_*' from `<sys/epoll.h>' */
+#define E_INVALID_ARGUMENT_CONTEXT_EPOLL_WAIT_ZERO_MAXEVENTS          148 /* E_INVALID_ARGUMENT_BAD_VALUE: The `maxevents' argument passed to `epoll_wait(2)' is `<= 0' */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
