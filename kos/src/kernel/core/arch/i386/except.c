@@ -29,6 +29,7 @@
 #include <debugger/io.h>
 #include <debugger/util.h>
 #include <kernel/addr2line.h>
+#include <kernel/arch/syslog.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/panic.h>
@@ -1010,6 +1011,23 @@ PUBLIC void __cxa_end_catch(void) {
 	 * its end, and we delete the exception if it wasn't re-thrown. */
 	uintptr_t flags;
 	flags = PERTASK_GET(this_exception_flags);
+#if 0
+	{
+		error_code_t code = error_code();
+		x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
+		                  "__cxa_end_catch%s [%#Ix] [error=%s ("
+		                  "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+		                  "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ")]\n",
+		                  __builtin_return_address(0),
+		                  __builtin_return_address(0),
+		                  THIS_TASK,
+		                  flags & EXCEPT_FRETHROW ? "" : " [delete]",
+		                  flags,
+		                  error_name(code),
+		                  ERROR_CLASS(code),
+		                  ERROR_SUBCLASS(code));
+	}
+#endif
 	if (!(flags & EXCEPT_FRETHROW)) {
 		/* TODO: If `this_exception_code' is an RT-level exception, then we
 		 *       must set some kind of thread-local flag to have it be re-thrown

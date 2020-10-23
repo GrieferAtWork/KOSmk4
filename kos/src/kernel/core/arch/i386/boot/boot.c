@@ -407,6 +407,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: Figure out a clean and simple-to-use system with which nested exception handling
+	 *       can be done. Also: Make some improvements to how exceptions are prioritized.
+	 *       In general: Add an API function `unsigned int error_priority(error_code_t)'
+	 *       that returns an integer which can be compared against the priority of other
+	 *       error codes in order to determine which of 2 (if any) should be propagated. */
+
 	/* TODO: Add `__USE_ISOC2X' to <features.h> */
 	/* TODO: Add FLT_NORM_MAX, DBL_NORM_MAX and LDBL_NORM_MAX to <float.h> under #ifdef __USE_ISOC2X
 	 *       Also add DEC32_TRUE_MIN, DEC64_TRUE_MIN and DEC128_TRUE_MIN, alongside everything from
@@ -529,15 +535,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* TODO: Make the x86 LDT object ATTR_PERVM, and reload LDT registers during a VM switch.
 	 *       On linux, they're PERVM, too, so we really should do the same. */
-
-	/* TODO: Killing `playground forkbomb' results in kernel panic on handle_pagefault.c:1145
-	 *       that is caused by the `info->ei_code != E_OK' assertion in `libc_error_unwind'.
-	 * Something is causing the exception to be deleted when that shouldn't happen.
-	 * 
-	 * Ugh... I really feel like the whole c++ exception integration needs to be re-worked
-	 * in order to function better. (Also: when re-working implement the delayed exception
-	 * mechanism by which ignoring rtl-priority exceptions will cause those exceptions to
-	 * be re-thrown the next time task_serve() is called) */
 
 	/* TODO: deemon's module system appears somewhat broken on KOS.
 	 *       Fix stuff both in KOS, and DEEMON itself until the following works from within KOS:
