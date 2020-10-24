@@ -961,6 +961,7 @@ incdir("");
 #include <sys/auxv.h>
 #include <sys/bitstring.h>
 #include <sys/bitypes.h>
+#include <sys/byteorder.h>
 #include <sys/cdefs.h>
 #include <sys/config.h>
 #include <sys/dir.h>
@@ -970,10 +971,12 @@ incdir("");
 #include <sys/errno.h>
 #include <sys/eventfd.h>
 #include <sys/fcntl.h>
+#include <sys/feature_tests.h>
 #include <sys/features.h>
 #include <sys/file.h>
 #include <sys/filio.h>
 #include <sys/fsuid.h>
+#include <sys/int_types.h>
 #include <sys/inttypes.h>
 #include <sys/io.h>
 #include <sys/ioccom.h>
