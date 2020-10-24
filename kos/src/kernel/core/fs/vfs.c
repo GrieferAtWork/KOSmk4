@@ -152,7 +152,7 @@ handle_path_stat(struct path *__restrict self,
 INTERN void KCALL
 handle_path_pollconnect(struct path *__restrict self,
                         poll_mode_t what) {
-	if (what & (POLLIN | POLLOUT)) {
+	if (what & (POLLINMASK | POLLOUTMASK)) {
 		REF struct inode *node;
 		sync_read(self);
 		node = (REF struct inode *)incref(self->p_inode);
@@ -170,12 +170,12 @@ handle_path_polltest(struct path *__restrict self,
 	sync_read(self);
 	node = (REF struct inode *)incref(self->p_inode);
 	sync_endread(self);
-	if (what & POLLOUT) {
+	if (what & POLLOUTMASK) {
 		if (rwlock_canwrite(&node->db_lock))
-			result = POLLOUT | POLLIN;
-	} else if (what & POLLIN) {
+			result = POLLOUTMASK | POLLINMASK;
+	} else if (what & POLLINMASK) {
 		if (rwlock_canread(&node->db_lock))
-			result = POLLIN;
+			result = POLLINMASK;
 	}
 	decref(node);
 	return result;

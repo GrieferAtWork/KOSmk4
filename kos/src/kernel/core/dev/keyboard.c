@@ -929,7 +929,7 @@ keyboard_device_pollconnect(struct character_device *__restrict self,
                             poll_mode_t what) THROWS(...) {
 	struct keyboard_device *me;
 	me = (struct keyboard_device *)self;
-	if (what & POLLIN)
+	if (what & POLLINMASK)
 		task_connect_for_poll(&me->kd_buf.kb_avail);
 }
 
@@ -938,9 +938,9 @@ keyboard_device_polltest(struct character_device *__restrict self,
                          poll_mode_t what) THROWS(...) {
 	struct keyboard_device *me;
 	me = (struct keyboard_device *)self;
-	if (what & POLLIN) {
+	if (what & POLLINMASK) {
 		if (keyboard_device_canread(me))
-			return POLLIN;
+			return POLLINMASK;
 	}
 	return 0;
 }

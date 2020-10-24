@@ -1014,7 +1014,7 @@ UnixSocket_PollConnect(struct socket *__restrict self,
 		task_connect_for_poll(&me->us_client->uc_status_sig); /* for HUP */
 	} else {
 		/* Server socket (poll against accept()) */
-		if (what & POLLIN) {
+		if (what & POLLINMASK) {
 			/* Connect to the clients-became-available signal. */
 			task_connect_for_poll(&node->s_server.us_acceptme_sig);
 		}

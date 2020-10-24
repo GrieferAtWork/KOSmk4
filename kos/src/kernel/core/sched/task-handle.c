@@ -61,18 +61,18 @@ handle_task_stat(struct taskpid *__restrict self,
 
 INTERN void KCALL
 handle_task_pollconnect(struct taskpid *__restrict self, poll_mode_t what) {
-	/* POLLIN: Terminated */
-	if (what & POLLIN)
+	/* POLLINMASK: Terminated */
+	if (what & POLLINMASK)
 		task_connect_for_poll(&self->tp_changed);
 }
 
 INTERN ATTR_PURE WUNUSED poll_mode_t KCALL
 handle_task_polltest(struct taskpid *__restrict self, poll_mode_t what) {
 	poll_mode_t result = 0;
-	/* POLLIN: Terminated */
-	if (what & POLLIN) {
+	/* POLLINMASK: Terminated */
+	if (what & POLLINMASK) {
 		if (WIFEXITED(self->tp_status))
-			result |= POLLIN;
+			result |= POLLINMASK;
 	}
 	return result;
 }

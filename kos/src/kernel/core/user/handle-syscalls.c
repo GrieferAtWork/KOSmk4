@@ -1662,11 +1662,11 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 	poll_mode_t result;
 	/* Verify that the caller has access to the
 	 * indicated data channel of the handle. */
-	if (what & POLLIN) {
+	if (what & POLLINMASK) {
 		if unlikely(!IO_CANREAD(hnd.h_mode))
 			return POLLERR;
 	}
-	if (what & POLLOUT) {
+	if (what & POLLOUTMASK) {
 		if unlikely(!IO_CANWRITE(hnd.h_mode))
 			return POLLERR;
 	}
@@ -1714,7 +1714,7 @@ again:
 		TRY {
 			poll_mode_t what;
 #if 0 /* POSIX doesn't specify this... (as a matter of fact: certain bits _should_ be ignored) */
-			if unlikely(pfd.events & ~(POLLIN | POLLPRI | POLLOUT)) {
+			if unlikely(pfd.events & ~(POLLINMASK | POLLPRI | POLLOUTMASK)) {
 				fds[i].revents = POLLNVAL; /* Invalid poll mode. */
 				goto decref_hnd_and_continue;
 			}
@@ -1727,7 +1727,7 @@ again:
 #endif /* !__OPTIMIZE_SIZE__ */
 			/* Actually perform the poll. */
 			what = do_poll_handle(hnd, pfd.events);
-			if (what & (POLLIN | POLLPRI | POLLOUT))
+			if (what & (POLLINMASK | POLLPRI | POLLOUTMASK))
 				++result; /* Got something! */
 			fds[i].revents = what;
 		} EXCEPT {

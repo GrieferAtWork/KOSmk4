@@ -156,7 +156,7 @@ handle_directoryentry_pollconnect(struct directory_entry *__restrict UNUSED(self
 INTERN ATTR_CONST NONNULL((1)) poll_mode_t KCALL
 handle_directoryentry_polltest(struct directory_entry *__restrict UNUSED(self),
                                poll_mode_t what) {
-	return what & POLLIN;
+	return what & POLLINMASK;
 }
 
 INTERN syscall_slong_t KCALL /* TODO: Add hop functions for reading all of the different fields. */

@@ -131,12 +131,12 @@ socket_isconnected(struct socket *__restrict self) {
 
 /* Poll for special condition
  * The following conditions are defined:
- *    POLLIN:    if not listening: `socket_recv()' or `socket_recvfrom()' can be called
- *               if listening :    `socket_accept()' can be called.
- *    POLLOUT:   The socket is connected, or a previous connection request failed.
- *    POLLPRI:   Socket-specific, for tcp: out-of-band data available
- *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
- *    POLLHUP:   Socket peer has disconnected (ignored in `what'; always returned when condition is met)
+ *    POLLINMASK:  if not listening: `socket_recv()' or `socket_recvfrom()' can be called
+ *                 if listening :    `socket_accept()' can be called.
+ *    POLLOUTMASK: The socket is connected, or a previous connection request failed.
+ *    POLLPRI:     Socket-specific, for tcp: out-of-band data available
+ *    POLLRDHUP:   Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
+ *    POLLHUP:     Socket peer has disconnected (ignored in `what'; always returned when condition is met)
  * Other conditions may be defined that are specific to individual socket types. */
 PUBLIC NONNULL((1)) void KCALL
 socket_pollconnect(struct socket *__restrict self, poll_mode_t what) {
@@ -144,7 +144,7 @@ socket_pollconnect(struct socket *__restrict self, poll_mode_t what) {
 	       (self->sk_ops->so_polltest != NULL));
 	if likely(self->sk_ops->so_pollconnect)
 		(*self->sk_ops->so_pollconnect)(self, what);
-	if (what & POLLOUT) {
+	if (what & POLLOUTMASK) {
 		/* Check if there is a background connect() operation in progress... */
 		REF struct socket_connect_aio *nc;
 		nc = self->sk_ncon.get();
@@ -167,18 +167,18 @@ socket_polltest(struct socket *__restrict self, poll_mode_t what) {
 	       (self->sk_ops->so_polltest != NULL));
 	if likely(self->sk_ops->so_polltest)
 		result = (*self->sk_ops->so_polltest)(self, what);
-	if (what & POLLOUT) {
+	if (what & POLLOUTMASK) {
 		/* Check if there is a background connect() operation in progress... */
 		REF struct socket_connect_aio *nc;
 		nc = self->sk_ncon.get();
 		if (!nc) {
 			/* Not connected, or sync-connected. */
 			if (socket_isconnected(self))
-				result |= POLLOUT;
+				result |= POLLOUTMASK;
 		} else {
 			/* Connection is being established right _now_! */
 			if (aio_handle_generic_hascompleted(&nc->sca_aio))
-				result |= POLLOUT;
+				result |= POLLOUTMASK;
 			decref_unlikely(nc);
 		}
 	}
@@ -1164,7 +1164,7 @@ socket_listen(struct socket *__restrict self,
 /* Accept incoming client (aka. peer) connection requests.
  * NOTE: This function blocks unless `IO_NONBLOCK' is specified,
  *       or the `MSG_DONTWAIT' bit has been set in `self->sk_msgflags'.
- *       In this case, you may poll() for clients via `POLLIN'
+ *       In this case, you may poll() for clients via `POLLINMASK'
  * @return: * :   A reference to a socket that has been connected to a peer.
  * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]

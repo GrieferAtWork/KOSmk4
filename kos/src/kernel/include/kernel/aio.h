@@ -477,7 +477,8 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_generic
 };
 
 #define aio_handle_generic_fini(self) \
-	aio_handle_fini(self)
+	(aio_handle_fini(self),           \
+	 sig_broadcast_for_fini(&(self)->hg_signal))
 
 /* Callback for `aio_handle_generic' */
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) void

@@ -203,7 +203,7 @@ struct socket_ops {
 	 *       immediately trying to cancel the associated AIO operation. If
 	 *       the send could be done without blocking, then the AIO handle
 	 *       will indicate success, rather than cancel.
-	 * NOTE: Non-blocking recv() can be done by first polling for `POLLIN',
+	 * NOTE: Non-blocking recv() can be done by first polling for `POLLINMASK',
 	 *       then performing the recv() and once again immediately canceling
 	 *       the AIO operation. (if the AIO stopped with cancel, handle this
 	 *       the same as so_poll() indicate that no data can be received) */
@@ -217,11 +217,11 @@ struct socket_ops {
 
 	/* [0..1] Poll for special condition
 	 * The following conditions are defined:
-	 *    POLLIN:    Can call: if not listening: `so_recv()' or `so_recvfrom()'
-	 *                         if listening:     `so_accept()'
-	 *    POLLPRI:   Socket-specific, for tcp: out-of-band data available
-	 *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
-	 *    POLLHUP:   Socket peer has disconnected (ignored in `what'; always returned when condition is met)
+	 *    POLLINMASK: Can call: if not listening: `so_recv()' or `so_recvfrom()'
+	 *                          if listening:     `so_accept()'
+	 *    POLLPRI:    Socket-specific, for tcp: out-of-band data available
+	 *    POLLRDHUP:  Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
+	 *    POLLHUP:    Socket peer has disconnected (ignored in `what'; always returned when condition is met)
 	 * Other conditions may be defined that are specific to individual socket types. */
 	NONNULL((1)) void
 	(KCALL *so_pollconnect)(struct socket *__restrict self,
@@ -457,7 +457,7 @@ struct socket_ops {
 	/* [0..1][(!= NULL) == (so_listen != NULL)]
 	 * Accept incoming client (aka. peer) connection requests.
 	 * NOTE: This function blocks unless `IO_NONBLOCK' is specified.
-	 *       In the later case, you may poll() for clients via `POLLIN'
+	 *       In the later case, you may poll() for clients via `POLLINMASK'
 	 * @return: * :   A reference to a socket that has been connected to a peer.
 	 * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
 	 * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
@@ -548,7 +548,7 @@ struct socket {
 	XATOMIC_REF(struct socket_connect_aio) sk_ncon;       /* [0..1] Non-blocking connect controller.
 	                                                       * This one's used for `socket_connect()' when called as a non-blocking operation.
 	                                                       * NOTE: Socket implementation should not touch this field!
-	                                                       * HINT: `POLLOUT' is indicated when this is `NULL', or when contained AIO has completed! */
+	                                                       * HINT: `POLLOUTMASK' is indicated when this is `NULL', or when contained AIO has completed! */
 	WEAK uintptr_t                         sk_msgflags;   /* Additional message flags or'd to `send()' and `recv()' requests (but see `SOCKET_MSGFLAGS_ADDEND_(SEND|RECV)MASK' */
 	/* Socket-specific data goes here... */
 };
@@ -613,12 +613,12 @@ socket_isconnected(struct socket *__restrict self);
 
 /* Poll for special condition
  * The following conditions are defined:
- *    POLLIN:    if not listening: `socket_recv()' or `socket_recvfrom()' can be called
- *               if listening :    `socket_accept()' can be called.
- *    POLLOUT:   The socket is connected, or a previous connection request failed.
- *    POLLPRI:   Socket-specific, for tcp: out-of-band data available
- *    POLLRDHUP: Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
- *    POLLHUP:   Socket peer has disconnected (ignored in `what'; always returned when condition is met)
+ *    POLLINMASK:  if not listening: `socket_recv()' or `socket_recvfrom()' can be called
+ *                 if listening :    `socket_accept()' can be called.
+ *    POLLOUTMASK: The socket is connected, or a previous connection request failed.
+ *    POLLPRI:     Socket-specific, for tcp: out-of-band data available
+ *    POLLRDHUP:   Socket peer has disconnected, or `so_shutdown(SHUT_WR)' was called
+ *    POLLHUP:     Socket peer has disconnected (ignored in `what'; always returned when condition is met)
  * Other conditions may be defined that are specific to individual socket types. */
 FUNDEF NONNULL((1)) void KCALL
 socket_pollconnect(struct socket *__restrict self, poll_mode_t what);
@@ -688,7 +688,7 @@ socket_aconnect(struct socket *__restrict self,
 
 /* The synchronous / non-blocking version of the async function `socket_aconnect()'.
  * When called with `IO_NONBLOCK', the connect will be done in the background through
- * use of `self->sk_ncon' (which can be waited for through use of `socket_poll(POLLOUT)').
+ * use of `self->sk_ncon' (which can be waited for through use of `socket_poll(POLLOUTMASK)').
  * When `IO_NONBLOCK' isn't specified, this function simply calls its async variant
  * before waiting for the connect() to complete, canceling it if anything goes wrong.
  * @return: * : One of `SOCKET_CONNECT_*' */
@@ -901,7 +901,7 @@ socket_listen(struct socket *__restrict self,
 /* Accept incoming client (aka. peer) connection requests.
  * NOTE: This function blocks unless `IO_NONBLOCK' is specified,
  *       or the `MSG_DONTWAIT' bit has been set in `self->sk_msgflags'.
- *       In this case, you may poll() for clients via `POLLIN'
+ *       In this case, you may poll() for clients via `POLLINMASK'
  * @return: * :   A reference to a socket that has been connected to a peer.
  * @return: NULL: `IO_NONBLOCK' was given, and no client socket is available right now.
  * @throws: E_INVALID_ARGUMENT_BAD_STATE:E_INVALID_ARGUMENT_CONTEXT_SOCKET_NOT_LISTENING: [...]
