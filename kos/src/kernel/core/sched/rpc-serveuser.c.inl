@@ -52,7 +52,14 @@ NOTHROW(FCALL rpc_serve_async_user_redirection)(struct icpustate *__restrict sta
 	must_restart_syscall = reason == TASK_RPC_REASON_SYSCALL;
 #endif /* RPC_SERVE_ALL */
 	tls_error = error_info();
+
+	/* Save current exception information. */
 	memcpy(&last_error, tls_error, sizeof(last_error));
+
+	/* Clear the currently thrown exception. */
+	tls_error->ei_code = ERROR_CODEOF(E_OK);
+	tls_error->ei_flags &= ~EXCEPT_FINCATCH;
+
 again_capture_chain:
 	chain = ATOMIC_XCH(PERTASK(this_rpcs_pending), NULL);
 again_chain:
@@ -147,9 +154,7 @@ restore_rpc:
 			assert(tls_error->ei_code != E_OK);
 			STATIC_ASSERT(ERRORCLASS_ISLOWPRIORITY(ERROR_CLASS(ERROR_CODEOF(E_INTERRUPT_USER_RPC))));
 			/* Propagate only the more important exception. */
-			if (last_error.ei_code == E_OK ||
-			    ERRORCLASS_ISLOWPRIORITY(last_error.ei_class) ||
-			    ERRORCLASS_ISHIGHPRIORITY(tls_error->ei_class))
+			if (error_priority(last_error.ei_code) < error_priority(tls_error->ei_code))
 				memcpy(&last_error, tls_error, sizeof(last_error));
 		}
 		if (chain->re_kind & RPC_KIND_INTERRUPT)

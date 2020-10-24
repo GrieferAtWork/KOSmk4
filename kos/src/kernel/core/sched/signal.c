@@ -2070,6 +2070,14 @@ DEFINE_TEST(recursive_signals) {
 	assert(task_trywait() == &s);
 	assert(task_trywait() == NULL);
 }
+
+DEFINE_TEST(broadcast_after_send) {
+	struct sig s = SIG_INIT;
+	task_connect(&s);
+	assert(sig_send(&s));
+	assert(sig_broadcast(&s) == 0);
+	task_disconnectall();
+}
 #endif /* DEFINE_TEST */
 
 

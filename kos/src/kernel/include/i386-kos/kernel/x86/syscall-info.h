@@ -158,9 +158,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
 	if (regcount >= 5) {
 		u32 *ebp = (u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ucs_gpregs);
 		if (ADDR_ISUSER(ebp)) {
-			struct exception_info old_info;
-			memcpy(&old_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
-			TRY {
+			NESTED_TRY {
 				self->rsi_regs[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
 				self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(4);
 				if (regcount >= 6) {
@@ -168,11 +166,9 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
 					self->rsi_regs[5] = __hybrid_atomic_load(ebp[1], __ATOMIC_ACQUIRE);
 				}
 			} EXCEPT {
-				goto restore_exception;
-			}
-			__IF0 {
-restore_exception:
-				memcpy(&THIS_EXCEPTION_INFO, &old_info, sizeof(struct exception_info));
+				error_class_t cls = error_class();
+				if (ERRORCLASS_ISRTLPRIORITY(cls))
+					RETHROW();
 			}
 		}
 	}
@@ -231,23 +227,16 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 		USER UNCHECKED u32 *sp;
 		sp = (USER UNCHECKED u32 *)gpregs_getpsp(&state->ucs_gpregs);
 		if (ADDR_ISUSER(sp)) {
-			struct exception_info old_info;
-			unsigned int i;
-			memcpy(&old_info, &THIS_EXCEPTION_INFO,
-			       sizeof(struct exception_info));
-			TRY {
+			NESTED_TRY {
+				unsigned int i;
 				for (i = 0; i < argc; ++i) {
 					self->rsi_regs[i] = __hybrid_atomic_load(sp[i], __ATOMIC_ACQUIRE);
 					self->rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 				}
 			} EXCEPT {
-				goto restore_exception;
-			}
-			__IF0 {
-restore_exception:
-				memcpy(&THIS_EXCEPTION_INFO,
-				       &old_info,
-				       sizeof(struct exception_info));
+				error_class_t cls = error_class();
+				if (ERRORCLASS_ISRTLPRIORITY(cls))
+					RETHROW();
 			}
 		}
 	}

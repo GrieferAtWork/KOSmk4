@@ -489,18 +489,13 @@ PUBLIC WUNUSED NONNULL((1)) REF struct usermod_section *
 NOTHROW(KCALL usermod_section_lock_nx)(struct usermod *__restrict self,
                                        USER CHECKED char const *name,
                                        unsigned int flags) {
-	struct exception_info exinfo;
 	REF struct usermod_section *result;
-	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
-	TRY {
+	NESTED_TRY {
 		result = usermod_section_lock(self, name, flags);
 	} EXCEPT {
-		goto restore_except;
+		return NULL;
 	}
 	return result;
-restore_except:
-	memcpy(error_info(), &exinfo, sizeof(struct exception_info));
-	return NULL;
 }
 
 
@@ -991,18 +986,13 @@ PUBLIC REF struct usermod *
 NOTHROW(FCALL vm_getusermod_nx)(struct vm *__restrict self,
                                 USER void const *addr,
                                 bool addr_must_be_executable) {
-	struct exception_info exinfo;
 	REF struct usermod *result;
-	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
-	TRY {
+	NESTED_TRY {
 		result = vm_getusermod(self, addr, addr_must_be_executable);
 	} EXCEPT {
-		goto restore_except;
+		return NULL;
 	}
 	return result;
-restore_except:
-	memcpy(error_info(), &exinfo, sizeof(struct exception_info));
-	return NULL;
 }
 
 
@@ -1306,12 +1296,9 @@ unwind_userspace(void *absolute_pc,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	/* Unwind a user-space location. */
 	unsigned int result = UNWIND_NO_FRAME;
-	struct exception_info exinfo;
 	REF struct usermod *um;
 	REF struct usermod_section *eh_frame;
-	/* Preserve exception information. */
-	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
-	TRY {
+	NESTED_TRY {
 		um = getusermod(absolute_pc, true);
 		if (!um)
 			goto done;
@@ -1328,10 +1315,10 @@ unwind_userspace(void *absolute_pc,
 			                                DRIVER_SECTION_LOCK_FNODATA);
 		} EXCEPT {
 			decref_unlikely(um);
-			goto restore_except;
+			RETHROW();
 		}
 	} EXCEPT {
-		goto restore_except;
+		goto done;
 	}
 	if unlikely(!eh_frame)
 		goto done_um;
@@ -1364,12 +1351,12 @@ done_um:
 		 * Also do this if .eh_frame wasn't enough. - Some programs can
 		 * end up having both an .eh_frame, _and_ a .debug_frame section,
 		 * but only .debug_frame actually contains what we need! */
-		TRY {
+		NESTED_TRY {
 			eh_frame = usermod_section_lock(um, ".debug_frame",
 			                                DRIVER_SECTION_LOCK_FNORMAL);
 		} EXCEPT {
 			decref_unlikely(um);
-			goto restore_except;
+			goto done;
 		}
 		if (eh_frame) {
 			void *cdata;
@@ -1385,9 +1372,6 @@ done_um:
 	decref_unlikely(um);
 done:
 	return result;
-restore_except:
-	memcpy(error_info(), &exinfo, sizeof(struct exception_info));
-	goto done;
 }
 
 

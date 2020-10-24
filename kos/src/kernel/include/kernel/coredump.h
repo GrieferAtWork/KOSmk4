@@ -123,8 +123,9 @@ coredump_create_for_signal(struct icpustate *__restrict state,
  *                                      the kernel through use of `THROW()', but `false'
  *                                      if the exception being handled was caused by
  *                                      user-space, such as an E_SEGFAULT */
-FUNDEF NONNULL((1)) void FCALL
+FUNDEF NONNULL((1, 2)) void FCALL
 coredump_create_for_exception(struct icpustate *__restrict state,
+                              struct exception_info const *__restrict info,
                               bool originates_from_kernelspace);
 
 

@@ -29,38 +29,36 @@
 #include <bits/types.h>
 #include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
+#include <kos/bits/exception_nest.h> /* __EXCEPT_BACKTRACE_SIZE */
 
-#ifndef EXCEPT_BACKTRACE_SIZE
-#ifdef NDEBUG
-#define EXCEPT_BACKTRACE_SIZE 0
-#else /* NDEBUG */
-#define EXCEPT_BACKTRACE_SIZE 16
-#endif /* !NDEBUG */
-#endif /* !EXCEPT_BACKTRACE_SIZE */
-#define EXCEPT_FNORMAL    0x0000 /* Normal exception handler flags. */
-#define EXCEPT_FRETHROW   0x0001 /* FLAG: The exception should be rethrown.
-                                  * Unless set when `__cxa_end_catch()' is called, `ei_code'
-                                  * will be changed to `E_OK', indicating no exception. */
+#undef EXCEPT_BACKTRACE_SIZE
+#define EXCEPT_BACKTRACE_SIZE __EXCEPT_BACKTRACE_SIZE
+
+#define EXCEPT_FNORMAL    0x00 /* Normal exception handler flags. */
+#define EXCEPT_FRETHROW   0x01 /* FLAG: The exception should be rethrown.
+                                * Unless set when `__cxa_end_catch()' is called, `ei_code'
+                                * will be changed to `E_OK', indicating no exception. */
+#define EXCEPT_FINCATCH   0x02 /* FLAG: Inside of a catch-handler. */
 #ifndef __KERNEL__
-#define EXCEPT_FINEXCEPT  0x0002 /* FLAG: Currently within `libc_except_handler(3|4)()' (used to prevent
-                                  *       an infinite loop when the exception handler itself is faulting) */
-#define EXCEPT_FINEXCEPT2 0x0004 /* FLAG: Same as `EXCEPT_FINEXCEPT', but set when that flag was already set.
-                                  *       When both flags are already set, a coredump is triggered.
-                                  *       Using this double-indirection mechanism, it becomes possible to handle
-                                  *       things such as segmentation faults when accessing memory during unwinding,
-                                  *       and ensuring that the correct unwind error codes (in this case `UNWIND_SEGFAULT')
-                                  *       get produced instead of always causing `UNWIND_USER_RECURSION' (which should only
-                                  *       be produced if the unwind machinery itself has become faulty) */
-#define EXCEPT_FMAYSIGNAL 0x0008 /* FLAG: The exception may be converted into a signal when `error_unwind(3)' cannot find
-                                  *       a handler apart of some except-aware module (s.a. set_exception_handler:#4).
-                                  *       If the exception cannot be translated, a coredump is performed. */
+#define EXCEPT_FINEXCEPT  0x20 /* FLAG: Currently within `libc_except_handler(3|4)()' (used to prevent
+                                *       an infinite loop when the exception handler itself is faulting) */
+#define EXCEPT_FINEXCEPT2 0x40 /* FLAG: Same as `EXCEPT_FINEXCEPT', but set when that flag was already set.
+                                *       When both flags are already set, a coredump is triggered.
+                                *       Using this double-indirection mechanism, it becomes possible to handle
+                                *       things such as segmentation faults when accessing memory during unwinding,
+                                *       and ensuring that the correct unwind error codes (in this case `UNWIND_SEGFAULT')
+                                *       get produced instead of always causing `UNWIND_USER_RECURSION' (which should only
+                                *       be produced if the unwind machinery itself has become faulty) */
+#define EXCEPT_FMAYSIGNAL 0x80 /* FLAG: The exception may be converted into a signal when `error_unwind(3)' cannot find
+                                *       a handler apart of some except-aware module (s.a. set_exception_handler:#4).
+                                *       If the exception cannot be translated, a coredump is performed. */
 #endif /* !__KERNEL__ */
 #define OFFSET_EXCEPTION_INFO_STATE    0
-#define OFFSET_EXCEPTION_INFO_TRACE    __SIZEOF_ERROR_REGISTER_STATE
-#define OFFSET_EXCEPTION_INFO_FLAGS    (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * EXCEPT_BACKTRACE_SIZE))
-#define OFFSET_EXCEPTION_INFO_CODE     (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE + 1)))
-#define OFFSET_EXCEPTION_INFO_DATA     (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE + 1)))
-#define OFFSET_EXCEPTION_INFO_POINTERS (__SIZEOF_ERROR_REGISTER_STATE + (__SIZEOF_POINTER__ * (EXCEPT_BACKTRACE_SIZE + 2)))
+#define OFFSET_EXCEPTION_INFO_DATA     __SIZEOF_ERROR_REGISTER_STATE
+#define OFFSET_EXCEPTION_INFO_CODE     (__SIZEOF_ERROR_REGISTER_STATE + __OFFSET_EXCEPTION_DATA_CODE)
+#define OFFSET_EXCEPTION_INFO_POINTERS (__SIZEOF_ERROR_REGISTER_STATE + __OFFSET_EXCEPTION_DATA_ARGS)
+#define OFFSET_EXCEPTION_INFO_TRACE    (__SIZEOF_ERROR_REGISTER_STATE + __SIZEOF_EXCEPTION_DATA)
+#define OFFSET_EXCEPTION_INFO_FLAGS    (__SIZEOF_ERROR_REGISTER_STATE + __SIZEOF_EXCEPTION_DATA + (__EXCEPT_BACKTRACE_SIZE * __SIZEOF_POINTER__))
 
 #ifndef __ERROR_REGISTER_STATE_TYPE
 #include <bits/os/mcontext.h>
@@ -94,24 +92,7 @@ struct exception_info {
 	 *       you must always subtract `1' from the address, such as when
 	 *       calling `unwind_at()', which requires you to provide `PC - 1'
 	 *       for its `abs_pc' argument. */
-	error_register_state_t    ei_state;
-#if EXCEPT_BACKTRACE_SIZE != 0
-	/* Exception backtrace (from least-recent[0] to most-recent[EXCEPT_BACKTRACE_SIZE - 1])
-	 * This vector is populated as the stack is unwound, until it is either full, or until
-	 * a new exception is thrown.
-	 * The vector's ends either when `EXCEPT_BACKTRACE_SIZE' were found, or upon the first
-	 * entry that evaluates to `NULL'. If a `NULL' entry was found, and the caller is currently
-	 * in the process of unwinding the stack, the traceback continues where their CPU context
-	 * meets with the next unwind location.
-	 * NOTE: In order to prevent redundancy, this trace only starts with the first unwind
-	 *       location of the exception, with the exception's original throw-location found
-	 *       stored within the PC register of `ei_state'
-	 * NOTE: The pointers in this traceback have not been adjusted, meaning that they probably
-	 *       point to the first instruction after some `call' instruction (i.e. they're the
-	 *       return addresses loaded during unwinding) */
-	void                      *ei_trace[EXCEPT_BACKTRACE_SIZE];
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-	__uintptr_t                ei_flags;    /* Flags describing the current exception state (Set of `EXCEPT_F*'). */
+	error_register_state_t     ei_state;
 	union {
 		__error_code_t         ei_code;     /* Current exception code. */
 		struct {
@@ -133,6 +114,34 @@ struct exception_info {
 	_ei_code_data
 #endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
 	;
+#if __EXCEPT_BACKTRACE_SIZE != 0
+	/* Exception backtrace (from least-recent[0] to most-recent[__EXCEPT_BACKTRACE_SIZE - 1])
+	 * This vector is populated as the stack is unwound, until it is either full, or until
+	 * a new exception is thrown.
+	 * The vector's ends either when `__EXCEPT_BACKTRACE_SIZE' were found, or upon the first
+	 * entry that evaluates to `NULL'. If a `NULL' entry was found, and the caller is currently
+	 * in the process of unwinding the stack, the traceback continues where their CPU context
+	 * meets with the next unwind location.
+	 * NOTE: In order to prevent redundancy, this trace only starts with the first unwind
+	 *       location of the exception, with the exception's original throw-location found
+	 *       stored within the PC register of `ei_state'
+	 * NOTE: The pointers in this traceback have not been adjusted, meaning that they probably
+	 *       point to the first instruction after some `call' instruction (i.e. they're the
+	 *       return addresses loaded during unwinding) */
+	void                      *ei_trace[__EXCEPT_BACKTRACE_SIZE];
+#endif /* __EXCEPT_BACKTRACE_SIZE != 0 */
+	__uint8_t                 ei_flags;    /* Flags describing the current exception state (Set of `EXCEPT_F*'). */
+#if __SIZEOF_POINTER__ < 4
+	__uint8_t                 ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+#elif __SIZEOF_POINTER__ == 4
+	__uint8_t               __ei_pad[1];   /* ... */
+	__uint16_t                ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+#elif __SIZEOF_POINTER__ == 8
+	__uint8_t               __ei_pad[3];   /* ... */
+	__uint32_t                ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported `__SIZEOF_POINTER__'"
+#endif /* __SIZEOF_POINTER__ != ... */
 };
 #if !defined(__COMPILER_HAVE_TRANSPARENT_UNION) && !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
 #define ei_data      _ei_code_data.ei_data

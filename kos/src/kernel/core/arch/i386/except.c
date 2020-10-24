@@ -674,7 +674,7 @@ NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	{
 		struct exception_info *info;
 		info = error_info();
-		assertf(info->ei_code != E_OK,
+		assertf(info->ei_code != E_OK || info->ei_nesting != 0,
 		        "In error_unwind(), but no exception set");
 	}
 #endif /* !NDEBUG */
@@ -964,6 +964,45 @@ NOTHROW(KCALL x86_asm_except_personality)(struct unwind_fde_struct *__restrict U
 
 
 
+/*
+ *
+ * [ 1] TRY {
+ * [ 2]     foo();
+ * [ 3] } EXCEPT {
+ * [ 4]     NESTED_TRY {
+ * [ 5]         bar();
+ * [ 6]     } EXCEPT {
+ * [ 7]         foobar();
+ * [ 8]         RETHROW();
+ * [ 9]     }
+ * [10]     RETHROW();
+ * [11] }
+ *
+ * Equivalent:
+ * >> foo();                                // [ 2]
+ * >> if (EXCEPTION_THROWN) {
+ * >>     __cxa_begin_catch();              // [ 3]
+ * >>     struct _exception_nesting_data nest;
+ * >>     error_nesting_begin(&nest);
+ * >>     bar();                            // [ 5]
+ * >>     if (EXCEPTION_THROWN) {
+ * >>         __cxa_begin_catch();          // [ 6]
+ * >>         foobar();                     // [ 7]
+ * >>         error_rethrow();              // [ 8]
+ * >>         __cxa_end_catch();            // [ 9]
+ * >>         error_nesting_end(&nest);
+ * >>     } else {
+ * >>         error_nesting_end(&nest);
+ * >>         error_rethrow();              // [10]
+ * >>     }
+ * >>     __cxa_end_catch();                // [11]
+ * >> }
+ *
+ *
+ */
+
+
+
 
 PUBLIC ATTR_CONST void *__cxa_begin_catch(void *ptr) {
 	/* This function returns the address that would
@@ -975,15 +1014,26 @@ PUBLIC ATTR_CONST void *__cxa_begin_catch(void *ptr) {
 	 * >> }
 	 * The given `ptr' is what `libc_error_unwind()' originally set as value
 	 * for the `CFI_UNWIND_REGISTER_EXCEPTION' register. */
-#ifndef NDEBUG
-	{
-		struct exception_info *info;
-		info = error_info();
-		assertf(info->ei_code != E_OK,
-		        "Exception handler entered, but no exception set");
-	}
-#endif /* !NDEBUG */
-
+	struct exception_info *info;
+	info = error_info();
+	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
+	        "Exception handler entered, but no exception set");
+	assertf(!(info->ei_flags & EXCEPT_FINCATCH),
+	        "Invalid nested-try block (use `NESTED_TRY' or `NESTED_EXCEPTION')");
+	info->ei_flags |= EXCEPT_FINCATCH;
+#if 0
+	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
+	                  "__cxa_begin_catch [%#Ix] [error=%s ("
+	                  "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+	                  "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ")]\n",
+	                  __builtin_return_address(0),
+	                  __builtin_return_address(0),
+	                  THIS_TASK,
+	                  info->ei_flags,
+	                  error_name(info->ei_code),
+	                  ERROR_CLASS(info->ei_code),
+	                  ERROR_SUBCLASS(info->ei_code));
+#endif
 	return ptr;
 }
 
@@ -1009,39 +1059,33 @@ PUBLIC void __cxa_end_catch(void) {
 
 	/* For our purposes, we only get here when an EXCEPT block reaches
 	 * its end, and we delete the exception if it wasn't re-thrown. */
-	uintptr_t flags;
-	flags = PERTASK_GET(this_exception_flags);
+	struct exception_info *info;
+	info = error_info();
 #if 0
-	{
-		error_code_t code = error_code();
-		x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
-		                  "__cxa_end_catch%s [%#Ix] [error=%s ("
-		                  "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
-		                  "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ")]\n",
-		                  __builtin_return_address(0),
-		                  __builtin_return_address(0),
-		                  THIS_TASK,
-		                  flags & EXCEPT_FRETHROW ? "" : " [delete]",
-		                  flags,
-		                  error_name(code),
-		                  ERROR_CLASS(code),
-		                  ERROR_SUBCLASS(code));
-	}
+	x86_syslog_printf("%%{vinfo:/os/kernel.bin:%p:%p:%%f(%%l,%%c) : %%n : %%p} : %p : "
+	                  "__cxa_end_catch%s [%#Ix] [error=%s ("
+	                  "%.4" PRIxN(__SIZEOF_ERROR_CLASS_T__) ":"
+	                  "%.4" PRIxN(__SIZEOF_ERROR_SUBCLASS_T__) ")]\n",
+	                  __builtin_return_address(0),
+	                  __builtin_return_address(0),
+	                  THIS_TASK,
+	                  info->ei_flags & EXCEPT_FRETHROW ? "" : " [delete]",
+	                  info->ei_flags,
+	                  error_name(info->ei_code),
+	                  ERROR_CLASS(info->ei_code),
+	                  ERROR_SUBCLASS(info->ei_code));
 #endif
-	if (!(flags & EXCEPT_FRETHROW)) {
+	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
+	        "Exception handler entered, but no exception set");
+	assertf(info->ei_flags & EXCEPT_FINCATCH,
+	        "Call to `__cxa_end_catch' when `EXCEPT_FINCATCH' wasn't set");
+	if (!(info->ei_flags & EXCEPT_FRETHROW)) {
 		/* TODO: If `this_exception_code' is an RT-level exception, then we
 		 *       must set some kind of thread-local flag to have it be re-thrown
 		 *       the next time the a call to `task_serve()' is made! */
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
-	} else {
-#ifndef NDEBUG
-		struct exception_info *info;
-		info = error_info();
-		assertf(info->ei_code != E_OK,
-		        "Exception deleted after RETHROW() from exception handler");
-#endif /* !NDEBUG */
+		info->ei_code = ERROR_CODEOF(E_OK);
 	}
-	PERTASK_SET(this_exception_flags, flags & ~EXCEPT_FRETHROW);
+	info->ei_flags &= ~(EXCEPT_FINCATCH | EXCEPT_FRETHROW);
 }
 
 

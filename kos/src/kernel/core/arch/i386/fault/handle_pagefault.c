@@ -350,28 +350,16 @@ NOTHROW(KCALL x86_repair_broken_tls_state)(void);
 
 
 
-PRIVATE ATTR_NORETURN ATTR_NOINLINE void FCALL
+PRIVATE ATTR_NORETURN void FCALL
 rethrow_exception_from_pf_handler(struct icpustate *__restrict state, uintptr_t pc) {
-	struct exception_info old_info, new_info;
-	struct exception_info *info = error_info();
-	memcpy(&old_info, info, sizeof(struct exception_info));
-	TRY {
+	NESTED_TRY {
 		pc = (uintptr_t)instruction_trysucc((void const *)pc,
 		                                    instrlen_isa_from_icpustate(state));
 	} EXCEPT {
-		memcpy(&new_info, info, sizeof(struct exception_info));
-		goto handle_double_error;
+		icpustate_setpc(state, pc + 1);
+		RETHROW();
 	}
 	icpustate_setpc(state, pc);
-	RETHROW();
-handle_double_error:
-	if (ERRORCLASS_COMPARE(old_info.ei_class,
-	                       new_info.ei_class) < 0) {
-		memcpy(info, &old_info, sizeof(struct exception_info));
-	} else {
-		memcpy(info, &new_info, sizeof(struct exception_info));
-	}
-	icpustate_setpc(state, pc + 1);
 	RETHROW();
 }
 
@@ -872,6 +860,11 @@ cleanup_vio_and_pop_connections_and_set_exception_pointers2:
 							task_popconnections();
 							if (isuser())
 								PERTASK_SET(this_exception_faultaddr, (void *)icpustate_getpc(state));
+							/* Manually fix-up exception flags since we're not actually going
+							 * to call `__cxa_end_catch()' because of the direct unwinding
+							 * used here. As such, we must manually ensure that `EXCEPT_FINCATCH'
+							 * isn't set once we return to our caller. */
+							PERTASK_SET(this_exception_flags, (uint8_t)EXCEPT_FNORMAL);
 							x86_userexcept_unwind_interrupt(state);
 						}
 						assert(args.vea_args.va_part == part);

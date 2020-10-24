@@ -423,6 +423,11 @@ NOTHROW(FCALL unwind)(struct icpustate *__restrict self) {
 			PERTASK_SET(this_exception_trace[i], (void *)0);
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+	/* Manually fix-up exception flags since we're not actually going
+	 * to call `__cxa_end_catch()' because of the direct unwinding
+	 * used here. As such, we must manually ensure that `EXCEPT_FINCATCH'
+	 * isn't set once we return to our caller. */
+	PERTASK_SET(this_exception_flags, (uint8_t)EXCEPT_FNORMAL);
 	x86_userexcept_unwind_interrupt(self);
 }
 

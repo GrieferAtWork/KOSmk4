@@ -129,21 +129,8 @@
 #define ERRORCLASS_ISRTLPRIORITY(x) ((x) >= ERRORCLASS_RTL_MIN && (x) <= ERRORCLASS_RTL_MAX)
 #endif /* !ERRORCLASS_ISRTLPRIORITY */
 
-/* Compare 2 given error classes by priority, returning `-1'
- * if `a' is more important than `b', `1' if `b' is more
- * important than `a' and `0' if they are equally as important,
- * or unimportant (in the last case, the caller should pick
- * whatever exception came first) */
-#define ERRORCLASS_COMPARE(a, b)                                    \
-	((ERRORCLASS_ISRTLPRIORITY(a) || ERRORCLASS_ISLOWPRIORITY(b))   \
-	 ? -1                                                           \
-	 : (ERRORCLASS_ISRTLPRIORITY(b) || ERRORCLASS_ISLOWPRIORITY(a)) \
-	   ? 1                                                          \
-	   : ERRORCLASS_ISHIGHPRIORITY(a)                               \
-	     ? -1                                                       \
-	     : ERRORCLASS_ISHIGHPRIORITY(b)                             \
-	       ? 1                                                      \
-	       : 0)
+
+
 
 
 

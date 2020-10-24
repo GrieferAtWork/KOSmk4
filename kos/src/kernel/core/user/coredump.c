@@ -395,17 +395,15 @@ coredump_create(struct ucpustate const *curr_ustate,
 
 
 /* Create a coredump because of the currently thrown exception */
-PUBLIC ATTR_NOINLINE NONNULL((1)) void FCALL
+PUBLIC ATTR_NOINLINE NONNULL((1, 2)) void FCALL
 coredump_create_for_exception(struct icpustate *__restrict state,
+                              struct exception_info const *__restrict info,
                               bool originates_from_kernelspace) {
 	struct ucpustate ust;
-	struct exception_data error;
-	struct exception_info *info = error_info();
 	siginfo_t si;
 	bool has_si;
-	memcpy(&error, &info->ei_data, sizeof(struct exception_data));
 	icpustate_user_to_ucpustate(state, &ust);
-	has_si = error_as_signal(&error, &si);
+	has_si = error_as_signal(&info->ei_data, &si);
 	if (!originates_from_kernelspace) {
 		/* If the exception doesn't originate from kernel-space, such
 		 * as an E_SEGFAULT propagated by `x86_userexcept_unwind_interrupt()',
@@ -416,7 +414,8 @@ coredump_create_for_exception(struct icpustate *__restrict state,
 		 * Also: The current exception doesn't actually have a kernel side. */
 		coredump_create(&ust, NULL, 0, &ust,
 		                NULL, 0, NULL,
-		                &error, has_si ? &si : NULL,
+		                &info->ei_data,
+		                has_si ? &si : NULL,
 		                UNWIND_USER_DISABLED);
 	} else {
 #if EXCEPT_BACKTRACE_SIZE != 0
@@ -429,13 +428,15 @@ coredump_create_for_exception(struct icpustate *__restrict state,
 			coredump_create(&ust, NULL, 0, &ust,
 			                i ? info->ei_trace : NULL, i,
 			                &info->ei_state,
-			                &error, has_si ? &si : NULL,
+			                &info->ei_data,
+			                has_si ? &si : NULL,
 			                UNWIND_USER_DISABLED);
 		}
 #else /* EXCEPT_BACKTRACE_SIZE != 0 */
 		coredump_create(&ust, NULL, 0, &ust,
 		                NULL, 0, &info->ei_state,
-		                &error, has_si ? &si : NULL,
+		                &info->ei_data,
+		                has_si ? &si : NULL,
 		                UNWIND_USER_DISABLED);
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
 	}

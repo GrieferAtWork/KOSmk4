@@ -3085,9 +3085,9 @@ NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
 	if unlikely(!dl_handle)
 		return;
 	/* Special handling for .eh_frame */
-	dl_sections->ds_eh_frame = module_locksection(dl_handle, module_type,
-	                                              secname_eh_frame,
-	                                              MODULE_LOCKSECTION_FNODATA);
+	dl_sections->ds_eh_frame = module_locksection_nx(dl_handle, module_type,
+	                                                 secname_eh_frame,
+	                                                 MODULE_LOCKSECTION_FNODATA);
 	if (dl_sections->ds_eh_frame) {
 		/* Make sure that user-level data for the section is available.
 		 * This is essentially a portable way to assert that SHF_ALLOC was set. */
@@ -3099,7 +3099,7 @@ NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
 	}
 	/* Lock sections into memory */
 #define LOCK_SECTION(name) \
-	module_locksection(dl_handle, module_type, name, MODULE_LOCKSECTION_FNORMAL)
+	module_locksection_nx(dl_handle, module_type, name, MODULE_LOCKSECTION_FNORMAL)
 	dl_sections->ds_debug_frame   = LOCK_SECTION(secname_debug_frame);
 	dl_sections->ds_debug_addr    = LOCK_SECTION(secname_debug_addr);
 	dl_sections->ds_debug_loc     = LOCK_SECTION(secname_debug_loc);

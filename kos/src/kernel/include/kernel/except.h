@@ -47,7 +47,7 @@ DATDEF ATTR_PERTASK error_register_state_t this_exception_state; /* ALIAS:this_e
 DATDEF ATTR_PERTASK error_code_t this_exception_code;                  /* ALIAS:this_exception_info.ei_code */
 DATDEF ATTR_PERTASK error_class_t this_exception_class;                /* ALIAS:this_exception_info.ei_class */
 DATDEF ATTR_PERTASK error_subclass_t this_exception_subclass;          /* ALIAS:this_exception_info.ei_subclass */
-DATDEF ATTR_PERTASK __uintptr_t this_exception_flags;                  /* ALIAS:this_exception_info.ei_flags */
+DATDEF ATTR_PERTASK uint8_t this_exception_flags;                      /* ALIAS:this_exception_info.ei_flags */
 DATDEF ATTR_PERTASK union exception_data_pointers this_exception_args; /* ALIAS:this_exception_info.ei_data.e_args */
 DATDEF ATTR_PERTASK void *this_exception_faultaddr;                    /* ALIAS:this_exception_info.ei_data.e_faultaddr */
 #if EXCEPT_BACKTRACE_SIZE != 0

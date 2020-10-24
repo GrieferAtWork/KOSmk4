@@ -2925,18 +2925,13 @@ PUBLIC WUNUSED NONNULL((1)) REF struct driver_section *
 NOTHROW(KCALL driver_section_lock_nx)(struct driver *__restrict self,
                                       USER CHECKED char const *name,
                                       unsigned int flags) {
-	struct exception_info exinfo;
 	REF struct driver_section *result;
-	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
-	TRY {
+	NESTED_TRY {
 		result = driver_section_lock(self, name, flags);
 	} EXCEPT {
-		goto restore_except;
+		result = NULL;
 	}
 	return result;
-restore_except:
-	memcpy(error_info(), &exinfo, sizeof(struct exception_info));
-	return NULL;
 }
 
 

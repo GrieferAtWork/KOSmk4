@@ -1256,9 +1256,7 @@ libregdump_ip(struct regdump_printer *__restrict self,
 			}
 		}
 		if (ENSURE_LIBDISASM()) {
-			struct exception_info saved_except;
-			memcpy(&saved_except, error_info(), sizeof(saved_except));
-			TRY {
+			NESTED_TRY {
 				if (did_lf_after_eip)
 					format(REGDUMP_FORMAT_INDENT);
 				else {
@@ -1272,11 +1270,9 @@ libregdump_ip(struct regdump_printer *__restrict self,
 				did_lf_after_eip = true;
 #endif /* !__KERNEL__ */
 			} EXCEPT {
-				goto restore_old_except_after_disasm;
-			}
-			__IF0 {
-restore_old_except_after_disasm:
-				memcpy(error_info(), &saved_except, sizeof(saved_except));
+				error_class_t cls = error_class();
+				if (ERRORCLASS_ISRTLPRIORITY(cls))
+					RETHROW();
 			}
 		}
 #ifndef __KERNEL__

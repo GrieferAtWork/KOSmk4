@@ -54,17 +54,12 @@ DECL_BEGIN
 
 PRIVATE ATTR_COLDTEXT WUNUSED bool
 NOTHROW(FCALL try_read_pointer)(void **src, void **dst) {
-	struct exception_info saved_except;
-	memcpy(&saved_except, &THIS_EXCEPTION_INFO, sizeof(saved_except));
-	TRY {
+	NESTED_TRY {
 		*dst = *src;
 	} EXCEPT {
-		goto err;
+		return false;
 	}
 	return true;
-err:
-	memcpy(&THIS_EXCEPTION_INFO, &saved_except, sizeof(saved_except));
-	return false;
 }
 
 PRIVATE ATTR_COLDTEXT NOBLOCK bool

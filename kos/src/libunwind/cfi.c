@@ -72,84 +72,53 @@
 
 DECL_BEGIN
 
-#define EXCEPTION_INFO_SAVE()         \
-	struct exception_info old_except; \
-	memcpy(&old_except, error_info(), sizeof(struct exception_info))
-#define EXCEPTION_INFO_LOAD() \
-	memcpy(error_info(), &old_except, sizeof(struct exception_info))
-
-
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	uint8_t value;
-	EXCEPTION_INFO_SAVE();
-	TRY {
+	NESTED_TRY {
 		value = *ptr;
 	} EXCEPT {
-		if (!WAS_SEGFAULT_THROWN())
-			RETHROW(); /* This will panic() because we're NOTHROW */
-		goto err_segfault;
+		return false;
 	}
 	*result = (uintptr_t)value;
 	return true;
-err_segfault:
-	EXCEPTION_INFO_LOAD();
-	return false;
 }
 
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 	uint16_t value;
-	EXCEPTION_INFO_SAVE();
-	TRY {
+	NESTED_TRY {
 		value = UNALIGNED_GET16(ptr);
 	} EXCEPT {
-		if (!WAS_SEGFAULT_THROWN())
-			RETHROW(); /* This will panic() because we're NOTHROW */
-		goto err_segfault;
+		return false;
 	}
 	*result = (uintptr_t)value;
 	return true;
-err_segfault:
-	EXCEPTION_INFO_LOAD();
-	return false;
 }
 
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 	uint32_t value;
-	EXCEPTION_INFO_SAVE();
-	TRY {
+	NESTED_TRY {
 		value = UNALIGNED_GET32(ptr);
 	} EXCEPT {
-		if (!WAS_SEGFAULT_THROWN())
-			RETHROW(); /* This will panic() because we're NOTHROW */
-		goto err_segfault;
+		return false;
 	}
 	*result = (uintptr_t)value;
 	return true;
-err_segfault:
-	EXCEPTION_INFO_LOAD();
-	return false;
 }
 
 #if __SIZEOF_POINTER__ > 4
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 	uint64_t value;
-	EXCEPTION_INFO_SAVE();
-	TRY {
+	NESTED_TRY {
 		value = UNALIGNED_GET64(ptr);
 	} EXCEPT {
-		if (!WAS_SEGFAULT_THROWN())
-			RETHROW(); /* This will panic() because we're NOTHROW */
-		goto err_segfault;
+		return false;
 	}
 	*result = (uintptr_t)value;
 	return true;
-err_segfault:
-	EXCEPTION_INFO_LOAD();
-	return false;
 }
 #define guarded_readptr guarded_readq
 #else /* __SIZEOF_POINTER__ > 4 */
@@ -158,18 +127,12 @@ err_segfault:
 
 INTERN WUNUSED bool
 NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes) {
-	EXCEPTION_INFO_SAVE();
-	TRY {
+	NESTED_TRY {
 		memcpy(dst, src, num_bytes);
 	} EXCEPT {
-		if (!WAS_SEGFAULT_THROWN())
-			RETHROW(); /* This will panic() because we're NOTHROW */
-		goto err_segfault;
+		return false;
 	}
 	return true;
-err_segfault:
-	EXCEPTION_INFO_LOAD();
-	return false;
 }
 
 
@@ -513,15 +476,13 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 			lvalue = (byte_t *)regval.p + ste->s_regoffset;
 		}
 		/* Copy data into the l-value. */
-		TRY {
+		NESTED_TRY {
 			copy_bits(lvalue,
 			          target_left_shift,
 			          self->ue_piecebuf,
 			          self->ue_piecebits,
 			          num_bits);
 		} EXCEPT {
-			if (!WAS_SEGFAULT_THROWN())
-				RETHROW();
 			ERROR(err_segfault);
 		}
 	}	break;

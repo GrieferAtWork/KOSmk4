@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e81b8d9 */
+/* HASH CRC-32:0x62829ef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,6 +36,7 @@
 #include <kos/anno.h>
 #include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
+#include <kos/bits/exception_nest.h> /* struct _exception_nesting_data */
 #include <kos/except/codes.h>        /* E_OK, ... */
 #include <kos/bits/fastexcept.h>
 
@@ -59,14 +60,18 @@ __SYSDECL_BEGIN
 #ifndef __ERROR_THROW_CC
 #define __ERROR_THROW_CC __LIBKCALL
 #endif /* !__ERROR_THROW_CC */
-
 #ifndef __ERROR_THROWN_CC
 #define __ERROR_THROWN_CC __LIBKCALL
 #endif /* !__ERROR_THROWN_CC */
-
 #ifndef __ERROR_UNWIND_CC
 #define __ERROR_UNWIND_CC __LIBKCALL
 #endif /* !__ERROR_UNWIND_CC */
+#ifndef __ERROR_NESTING_BEGIN_CC
+#define __ERROR_NESTING_BEGIN_CC __LIBKCALL
+#endif /* !__ERROR_NESTING_BEGIN_CC */
+#ifndef __ERROR_NESTING_END_CC
+#define __ERROR_NESTING_END_CC __LIBKCALL
+#endif /* !__ERROR_NESTING_END_CC */
 
 
 #ifndef __error_register_state_t_defined
@@ -159,6 +164,20 @@ __LIBC __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL error_name)(
  * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
 __NAMESPACE_LOCAL_USING_OR_IMPL(error_name, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(__LIBKCALL error_name)(error_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_name))(__code); })
 #endif /* !__CRT_HAVE_error_name */
+#ifdef __CRT_HAVE_error_priority
+/* Return the priority for a given error code, where exceptions
+ * with greater priorities should take the place of ones with
+ * lower priorities in situations where multiple simultanious
+ * errors can't be prevented. */
+__LIBC __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL error_priority)(error_code_t __code) __CASMNAME_SAME("error_priority");
+#else /* __CRT_HAVE_error_priority */
+#include <libc/local/kos.except/error_priority.h>
+/* Return the priority for a given error code, where exceptions
+ * with greater priorities should take the place of ones with
+ * lower priorities in situations where multiple simultanious
+ * errors can't be prevented. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(error_priority, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED unsigned int __NOTHROW(__LIBKCALL error_priority)(error_code_t __code) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(error_priority))(__code); })
+#endif /* !__CRT_HAVE_error_priority */
 #ifdef __USE_KOS_KERNEL
 #if defined(__arch_error_info) && defined(__CRT_HAVE_error_info)
 __COMPILER_EIDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_info *,__NOTHROW,__LIBKCALL,error_info,(void),{ return __arch_error_info(); })
@@ -283,6 +302,24 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_c
 #define was_thrown(code)                                    __PRIVATE_WAS_THROWN_PACKAGE_CODE code
 #endif /* !was_thrown */
 #endif /* !__INTELLISENSE__ */
+#ifndef __error_nesting_begin_defined
+#define __error_nesting_begin_defined 1
+#ifdef __CRT_HAVE_error_nesting_begin
+/* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
+__LIBC __ATTR_NONNULL((1)) void (__ERROR_NESTING_BEGIN_CC error_nesting_begin)(struct _exception_nesting_data *__restrict __saved) __THROWS(...) __CASMNAME_SAME("error_nesting_begin");
+#else /* __CRT_HAVE_error_nesting_begin */
+#undef __error_nesting_begin_defined
+#endif /* !__CRT_HAVE_error_nesting_begin */
+#endif /* !__error_nesting_begin_defined */
+#ifndef __error_nesting_end_defined
+#define __error_nesting_end_defined 1
+#ifdef __CRT_HAVE_error_nesting_end
+/* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
+__LIBC __ATTR_NONNULL((1)) void (__ERROR_NESTING_END_CC error_nesting_end)(struct _exception_nesting_data *__restrict __saved) __THROWS(...) __CASMNAME_SAME("error_nesting_end");
+#else /* __CRT_HAVE_error_nesting_end */
+#undef __error_nesting_end_defined
+#endif /* !__CRT_HAVE_error_nesting_end */
+#endif /* !__error_nesting_end_defined */
 #ifdef __cplusplus
 /* TODO: In user-space, using TRY and EXCEPT should leave some sort of marker in the
  *       binary that allows for libc to consider these handlers as `dlexceptaware(3)'
@@ -296,13 +333,43 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_c
 #ifndef __EXCEPT
 #define __EXCEPT catch(...)
 #endif /* !__EXCEPT */
-#ifndef TRY
-#define TRY      __TRY
-#endif /* !TRY */
-#ifndef EXCEPT
-#define EXCEPT   __EXCEPT
-#endif /* !EXCEPT */
+
+/* Nested exception support */
+#if defined(__error_nesting_begin_defined) && defined(__error_nesting_end_defined)
+class __cxx_exception_nesting: public _exception_nesting_data {
+public:
+	__ATTR_FORCEINLINE operator bool() const __CXX_NOEXCEPT { return false; }
+	__ATTR_FORCEINLINE __cxx_exception_nesting() {
+		en_size = _EXCEPTION_NESTING_DATA_SIZE;
+		error_nesting_begin(this);
+	}
+	__ATTR_FORCEINLINE ~__cxx_exception_nesting() {
+		error_nesting_end(this);
+	}
+};
+#ifdef __COUNTER__
+#define __PRIVATE_CXX_EXCEPT_NESTING_NAME __PP_CAT2(__local_cxx_exception_nesting, __COUNTER__)
+#else /* __COUNTER__ */
+#define __PRIVATE_CXX_EXCEPT_NESTING_NAME __PP_CAT2(__local_cxx_exception_nesting, __LINE__)
+#endif /* !__COUNTER__ */
+#define __NESTED_TRY       if(__cxx_exception_nesting __PRIVATE_CXX_EXCEPT_NESTING_NAME {});else try
+#define __NESTED_EXCEPTION __cxx_exception_nesting __PRIVATE_CXX_EXCEPT_NESTING_NAME
+#endif /* __error_nesting_begin_defined && __error_nesting_end_defined */
 #endif /* __cplusplus */
+
+
+#if !defined(TRY) && defined(__TRY)
+#define TRY __TRY
+#endif /* !TRY && __TRY */
+#if !defined(EXCEPT) && defined(__EXCEPT)
+#define EXCEPT __EXCEPT
+#endif /* !EXCEPT && __EXCEPT */
+#if !defined(NESTED_TRY) && defined(__NESTED_TRY)
+#define NESTED_TRY __NESTED_TRY
+#endif /* !NESTED_TRY && __NESTED_TRY */
+#if !defined(NESTED_EXCEPTION) && defined(__NESTED_EXCEPTION)
+#define NESTED_EXCEPTION __NESTED_EXCEPTION
+#endif /* !NESTED_EXCEPTION && __NESTED_EXCEPTION */
 
 
 #ifndef __INTELLISENSE__

@@ -102,7 +102,7 @@ INTERN_FUNCTION(libc_error_rethrow)
 	PUSH_KCPUSTATE_ON_FUNCTION_ENTRY_WITH_CFI_FOR_ESP
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
-	orl    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
+	orb    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
 .Ldo_unwind_esp:
 	movl   %esp, %ecx
 	INTERN(libc_error_unwind)
@@ -350,7 +350,7 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_EIP)
 	movl   %ecx, FIELD_ERROR_FAULTADDR
 	/* Copy exception information. */
-	movl   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
+	movb   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 	leal   SIZEOF_KCPUSTATE(%esp), %esi /* %esi = &code */
 IK(	movl   $(this_exception_code), %edi)
 IK(	addl   %fs:0, %edi                            /* %edi = &%fs:this_exception_code */)
@@ -438,7 +438,7 @@ IU(	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_E
 	movl   OFFSET_KCPUSTATE_EIP(%esp), %ecx
 	movl   %ecx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_EIP)
 /*	movl   %ecx, FIELD_ERROR_FAULTADDR */
-	movl   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
+	movb   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 #if EXCEPT_BACKTRACE_SIZE != 0
 .Ldo_fill_trace:
 	.Lindex = 0

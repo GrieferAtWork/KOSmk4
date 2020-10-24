@@ -808,7 +808,7 @@ NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
 	if unlikely(!dl_handle)
 		goto err_no_data;
 #define LOCK_SECTION(name) \
-	module_locksection(dl_handle, module_type, name, MODULE_LOCKSECTION_FNORMAL)
+	module_locksection_nx(dl_handle, module_type, name, MODULE_LOCKSECTION_FNORMAL)
 	dl_sections->dl_debug_line = LOCK_SECTION(secname_debug_line);
 	if (!dl_sections->dl_debug_line) {
 		/* No debug information sections */

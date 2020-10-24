@@ -187,10 +187,7 @@ INTERN ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_succ_nx)(void const *pc, instrlen_isa_t isa) {
 	byte_t *result;
 #ifdef __NON_CALL_EXCEPTIONS
-	struct exception_info old_info;
-	/* Save old exception */
-	memcpy(&old_info, error_info(), sizeof(struct exception_info));
-	TRY
+	NESTED_TRY
 #endif /* __NON_CALL_EXCEPTIONS */
 	{
 		result = libil_instruction_succ(pc, isa);
@@ -201,8 +198,6 @@ NOTHROW_NCX(CC libil_instruction_succ_nx)(void const *pc, instrlen_isa_t isa) {
 			RETHROW();
 		result = NULL;
 	}
-	/* Restore old exception */
-	memcpy(error_info(), &old_info, sizeof(struct exception_info));
 #endif /* __NON_CALL_EXCEPTIONS */
 	return result;
 }
@@ -213,10 +208,7 @@ INTERN ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
 	byte_t *result;
 #ifdef __NON_CALL_EXCEPTIONS
-	struct exception_info old_info;
-	/* Save old exception */
-	memcpy(&old_info, error_info(), sizeof(struct exception_info));
-	TRY
+	NESTED_TRY
 #endif /* __NON_CALL_EXCEPTIONS */
 	{
 		result = libil_instruction_pred(pc, isa);
@@ -227,8 +219,6 @@ NOTHROW_NCX(CC libil_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
 			RETHROW();
 		result = NULL;
 	}
-	/* Restore old exception */
-	memcpy(error_info(), &old_info, sizeof(struct exception_info));
 #endif /* __NON_CALL_EXCEPTIONS */
 	return result;
 }

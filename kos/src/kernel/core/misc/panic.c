@@ -173,13 +173,17 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	unsigned int error;
 	struct ucpustate state;
 	struct exception_info saved_info;
+	struct exception_info *tls_info;
 	instrlen_isa_t isa;
 #ifdef LOG_STACK_REMAINDER
 	uintptr_t last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
 	_kernel_poison();
 	memcpy(&state, dumpstate, sizeof(struct ucpustate));
-	memcpy(&saved_info, &THIS_EXCEPTION_INFO, sizeof(struct exception_info));
+	tls_info = error_info();
+	memcpy(&saved_info, tls_info, sizeof(struct exception_info));
+	tls_info->ei_code = ERROR_CODEOF(E_OK);
+	tls_info->ei_flags &= ~EXCEPT_FINCATCH;
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
@@ -267,7 +271,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	} EXCEPT {
 	}
 #endif /* LOG_STACK_REMAINDER */
-	memcpy(&THIS_EXCEPTION_INFO, &saved_info, sizeof(struct exception_info));
+	memcpy(tls_info, &saved_info, sizeof(struct exception_info));
 }
 
 

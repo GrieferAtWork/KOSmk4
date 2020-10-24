@@ -40,21 +40,24 @@ DECL_BEGIN
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space exception handler once user-space execution
  *                  resumes. */
-FUNDEF WUNUSED NONNULL((1)) struct icpustate *FCALL
+FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_callhandler(struct icpustate *__restrict state,
-                           struct rpc_syscall_info const *sc_info)
+                           struct rpc_syscall_info const *sc_info,
+                           struct exception_data const *__restrict except_data)
 		THROWS(E_SEGFAULT);
 
 #ifdef __x86_64__
 /* Dedicated functions which may be used if the caller already
  * knows the result of `icpustate_is32bit(state)' and related helpers. */
-FUNDEF WUNUSED NONNULL((1)) struct icpustate *FCALL
+FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_callhandler32(struct icpustate *__restrict state,
-                             struct rpc_syscall_info const *sc_info)
+                             struct rpc_syscall_info const *sc_info,
+                             struct exception_data const *__restrict except_data)
 		THROWS(E_SEGFAULT);
-FUNDEF WUNUSED NONNULL((1)) struct icpustate *FCALL
+FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_callhandler64(struct icpustate *__restrict state,
-                             struct rpc_syscall_info const *sc_info)
+                             struct rpc_syscall_info const *sc_info,
+                             struct exception_data const *__restrict except_data)
 		THROWS(E_SEGFAULT);
 #else /* __x86_64__ */
 #define x86_userexcept_callhandler32 x86_userexcept_callhandler
@@ -70,7 +73,7 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
  *            HINT: Additional information about how the system call was invoked can be extracted
  *                  from `sc_info->rsi_flags'! (s.a. `<librpc/bits/rpc-common.h>')
  * @param: siginfo: The signal that is being raised
- * @param: derived_from_exception: If true, `siginfo' was generated through `error_as_signal()',
+ * @param: except_info: When non-NULL, `siginfo' was generated through `error_as_signal(&except_info->ei_data)',
  *                  and if a coredump ends up being generated as a result of the signal being
  *                  raised, that coredump will include information about `error_info()', rather
  *                  than the given `siginfo'
@@ -83,7 +86,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct icpustate *FCALL
 x86_userexcept_raisesignal(struct icpustate *__restrict state,
                            struct rpc_syscall_info const *sc_info,
                            struct __siginfo_struct const *__restrict siginfo,
-                           bool derived_from_exception DFL(false));
+                           struct exception_info const *except_info DFL(__NULLPTR));
 
 /* Helper function for `x86_userexcept_raisesignal()' that may be used
  * to raise the appropriate POSIX signal for the currently set exception.
@@ -91,25 +94,29 @@ x86_userexcept_raisesignal(struct icpustate *__restrict state,
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space signal handler once user-space execution
  *                  resumes. */
-FUNDEF WUNUSED NONNULL((1)) struct icpustate *FCALL
+FUNDEF WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
 x86_userexcept_raisesignal_from_exception(struct icpustate *__restrict state,
-                                          struct rpc_syscall_info const *sc_info);
+                                          struct rpc_syscall_info const *sc_info,
+                                          struct exception_info const *__restrict except_info);
 
 /* Translate the current exception into an errno and set that errno
  * as the return value of the system call described by `sc_info'. */
-FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
-x86_userexcept_seterrno(struct icpustate *__restrict state,
-                        struct rpc_syscall_info const *__restrict sc_info);
+FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
+                                       struct rpc_syscall_info const *__restrict sc_info,
+                                       struct exception_data const *__restrict except_data);
 
 #ifdef __x86_64__
 /* Dedicated functions which may be used if the caller already
  * knows the result of `icpustate_is32bit(state)' and related helpers. */
-FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
-x86_userexcept_seterrno32(struct icpustate *__restrict state,
-                          struct rpc_syscall_info const *__restrict sc_info);
-FUNDEF WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
-x86_userexcept_seterrno64(struct icpustate *__restrict state,
-                          struct rpc_syscall_info const *__restrict sc_info);
+FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL x86_userexcept_seterrno32)(struct icpustate *__restrict state,
+                                         struct rpc_syscall_info const *__restrict sc_info,
+                                         struct exception_data const *__restrict except_data);
+FUNDEF WUNUSED NONNULL((1, 2, 3)) struct icpustate *
+NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
+                                         struct rpc_syscall_info const *__restrict sc_info,
+                                         struct exception_data const *__restrict except_data);
 #else /* __x86_64__ */
 #define x86_userexcept_seterrno32 x86_userexcept_seterrno
 #endif /* !__x86_64__ */

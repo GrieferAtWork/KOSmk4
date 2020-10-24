@@ -62,6 +62,7 @@ STATIC_ASSERT(offsetof(struct exception_info, ei_trace) == OFFSET_EXCEPTION_INFO
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 STATIC_ASSERT(offsetof(struct exception_info, ei_flags) == OFFSET_EXCEPTION_INFO_FLAGS);
 STATIC_ASSERT(offsetof(struct exception_info, ei_code)  == OFFSET_EXCEPTION_INFO_CODE);
+STATIC_ASSERT(offsetof(struct exception_info, ei_data) == OFFSET_EXCEPTION_INFO_DATA);
 STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFSET_EXCEPTION_INFO_POINTERS);
 
 
@@ -249,18 +250,26 @@ libc_cxa_begin_catch(struct _Unwind_Exception *ptr) {
 	 * >>     printk("exc @ %p\n", &exc); // Prints the address that this function returns.
 	 * >> }
 	 * The given `ptr' is what `libc_error_unwind()' originally set as value
-	 * for the `__ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION' register. */
+	 * for the `CFI_UNWIND_REGISTER_EXCEPTION' register. */
+	struct exception_info *info;
+	info = &current.pt_except;
+	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
+	        "Exception handler entered, but no exception set");
+	assertf(!(info->ei_flags & EXCEPT_FINCATCH),
+	        "Invalid nested-try block (use `NESTED_TRY' or `NESTED_EXCEPTION')");
+	info->ei_flags |= EXCEPT_FINCATCH;
 	return ptr;
 }
 
 INTERN SECTION_EXCEPT_TEXT void LIBCCALL
 libc_cxa_end_catch(void) {
-	/* This function is called at the end of any user-defined catch-block,
-	 * similar to how `__cxa_begin_catch()' is always called at the start:
+	/* This function is called at the end of any user-defined catch-block
+	 * (that isn't noexcept), similar to how `__cxa_begin_catch()' is always
+	 * called at the start:
 	 * >> try {
 	 * >>     ...
 	 * >> } catch (MyException) {
-	 * >>     MyException &exc = *__cxa_begin_catch(%eax);
+	 * >>     MyException &exc = *__cxa_begin_catch(?);
 	 * >>     try {
 	 * >>         printk("exc @ %p\n", &exc);
 	 * >>     } finally {
@@ -268,17 +277,22 @@ libc_cxa_end_catch(void) {
 	 * >>     }
 	 * >> }
 	 * Looking at this, you should realize that it is therefor guarantied that
-	 * every call to `__cxa_begin_catch()' is followed by `__cxa_end_catch()'
+	 * every call to `__cxa_begin_catch()' is followed by `__cxa_end_catch()'.
 	 * The book recommends that these functions should be used for reference
 	 * counting of the number of recursive location where the exception object
 	 * is being used. */
 
 	/* For our purposes, we only get here when an EXCEPT block reaches
-	 * its end without the associated exception having been re-thrown. */
-	struct exception_info *info = &current.pt_except;
+	 * its end, and we delete the exception if it wasn't re-thrown. */
+	struct exception_info *info;
+	info = &current.pt_except;
+	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
+	        "Exception handler entered, but no exception set");
+	assertf(info->ei_flags & EXCEPT_FINCATCH,
+	        "Call to `__cxa_end_catch' when `EXCEPT_FINCATCH' wasn't set");
 	if (!(info->ei_flags & EXCEPT_FRETHROW))
-		info->ei_code = E_OK;
-	info->ei_flags &= ~EXCEPT_FRETHROW;
+		info->ei_code = ERROR_CODEOF(E_OK);
+	info->ei_flags &= ~(EXCEPT_FINCATCH | EXCEPT_FRETHROW);
 }
 
 

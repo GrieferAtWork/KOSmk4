@@ -91,7 +91,7 @@ INTERN_FUNCTION(libc_error_rethrow)
 	ASM_PUSH_KCPUSTATE_AFTER_RIP
 IU(	INTERN(libc_error_info))
 IU(	call   libc_error_info)
-	orq    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
+	orb    $(EXCEPT_FRETHROW), FIELD_ERROR_FLAGS
 .Ldo_unwind_rsp:
 	movq   %rsp, %rdi
 	INTERN(libc_error_unwind)
@@ -362,7 +362,7 @@ IU(	movq   %rbx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 	movq   %rbx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_RIP)
 	movq   %rbx, FIELD_ERROR_FAULTADDR
 	/* Copy exception information. */
-	movq   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
+	movb   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 
 	/* %edi:                          error_code_t code
 	 * %esi:                          unsigned int argc
@@ -480,7 +480,7 @@ IU(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 	movq   OFFSET_KCPUSTATE_RIP(%rsp), %rcx
 	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_RIP)
 /*	movq   %rcx, FIELD_ERROR_FAULTADDR */
-	movq   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
+	movb   $(EXCEPT_FNORMAL), FIELD_ERROR_FLAGS
 #if EXCEPT_BACKTRACE_SIZE != 0
 .Ldo_fill_trace:
 	.Lindex = 0

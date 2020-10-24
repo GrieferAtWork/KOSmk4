@@ -281,7 +281,7 @@ do_syscall:
 	} EXCEPT {
 		/* Service user-redirection RPCs to try and resolve the problem. */
 		bool must_restart_syscall;
-		error_class_t cls = PERTASK_GET(this_exception_class);
+		error_class_t cls = error_class();
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
 		                                       TASK_RPC_REASON_SYSCALL,
@@ -299,7 +299,7 @@ do_syscall:
 			RETHROW();
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
-		state = x86_userexcept_seterrno64(state, sc_info);
+		state = x86_userexcept_seterrno64(state, sc_info, error_data());
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
 	}
 done:
@@ -362,7 +362,7 @@ do_syscall32:
 	} EXCEPT {
 		/* Service user-redirection RPCs to try and resolve the problem. */
 		bool must_restart_syscall;
-		error_class_t cls = PERTASK_GET(this_exception_class);
+		error_class_t cls = error_class();
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
 		                                       TASK_RPC_REASON_SYSCALL,
@@ -380,7 +380,7 @@ do_syscall32:
 			RETHROW();
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
-		state = x86_userexcept_seterrno32(state, sc_info);
+		state = x86_userexcept_seterrno32(state, sc_info, error_data());
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
 	}
 done:
@@ -451,7 +451,7 @@ do_syscall32:
 	} EXCEPT {
 		/* Service user-redirection RPCs to try and resolve the problem. */
 		bool must_restart_syscall;
-		error_class_t cls = PERTASK_GET(this_exception_class);
+		error_class_t cls = error_class();
 		must_restart_syscall = false;
 		state = rpc_serve_user_redirection_all(state,
 		                                       TASK_RPC_REASON_SYSCALL,
@@ -469,7 +469,7 @@ do_syscall32:
 			RETHROW();
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
-		state = x86_userexcept_seterrno32(state, sc_info);
+		state = x86_userexcept_seterrno32(state, sc_info, error_data());
 		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
 	}
 done:

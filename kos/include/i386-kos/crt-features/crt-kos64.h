@@ -1526,8 +1526,11 @@
 #define __CRT_HAVE_error_info
 #define __CRT_HAVE_error_message_count
 #define __CRT_HAVE_error_name
+#define __CRT_HAVE_error_nesting_begin
+#define __CRT_HAVE_error_nesting_end
 #define __CRT_HAVE_error_one_per_line
 #define __CRT_HAVE_error_print_progname
+#define __CRT_HAVE_error_priority
 #define __CRT_HAVE_error_register_state
 #define __CRT_HAVE_error_rethrow
 #define __CRT_HAVE_error_subclass

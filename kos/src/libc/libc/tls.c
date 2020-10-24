@@ -62,14 +62,18 @@ INTERN ATTR_THREAD struct pthread current = {
 	/* .pt_cpuset      = */ NULL,
 	/* .pt_cpusetsize  = */ 0,
 	/* .pt_except      = */ {
-		/* .ei_state = */ {},
-#if EXCEPT_BACKTRACE_SIZE != 0
-		/* .ei_trace = */ {},
-#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-		/* .ei_flags = */ EXCEPT_FNORMAL,
+		/* .ei_state   = */ {},
 		{
 			/* .ei_code = */ ERROR_CODEOF(E_OK)
-		}
+		},
+#if EXCEPT_BACKTRACE_SIZE != 0
+		/* .ei_trace   = */ {},
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+		/* .ei_flags   = */ EXCEPT_FNORMAL,
+#if __SIZEOF_POINTER__ >= 4
+		/* .__ei_pad   = */ { 0, },
+#endif /* __SIZEOF_POINTER__ >= 4 */
+		/* .ei_nesting = */ 0,
 	},
 	/* .pt_errno_kind  = */ LIBC_ERRNO_KIND_KOS,
 	/* .pt_errno_value = */ EOK

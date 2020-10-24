@@ -22,8 +22,8 @@
 //#define DEFINE_sig_send 1
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_send_nopr 1
-#define DEFINE_sig_altsend_nopr 1
-//#define DEFINE_sig_broadcast 1
+//#define DEFINE_sig_altsend_nopr 1
+#define DEFINE_sig_broadcast 1
 //#define DEFINE_sig_altbroadcast 1
 //#define DEFINE_sig_broadcast_nopr 1
 //#define DEFINE_sig_altbroadcast_nopr 1

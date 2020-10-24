@@ -1715,9 +1715,6 @@ no_perthread_pending:
 PUBLIC void FCALL
 sigmask_check_after_except(void)
 		THROWS(E_INTERRUPT, E_WOULDBLOCK) {
-	struct exception_info oldinfo, newinfo;
-	struct exception_info *info = error_info();
-	memcpy(&oldinfo, info, sizeof(oldinfo));
 	/* FIXME: We might get here due to a prior E_INTERRUPT_USER_RPC exception
 	 *        as the result of `task_sigmask_check_rpc_handler' being sent to
 	 *        us. In this case, us repeating the signal-mask check will result
@@ -1758,22 +1755,13 @@ sigmask_check_after_except(void)
 	 * thing that's different, yet...
 	 * Maybe call it a SYSRET-RPC?
 	 */
-	TRY {
+	NESTED_TRY {
 		sigmask_check();
 	} EXCEPT {
-		/* Now we've got 2 exceptions (prioritize) */
-		memcpy(&newinfo, info, sizeof(newinfo));
-		goto handle_2_exceptions;
-	}
-	__IF0 {
-handle_2_exceptions:
-		if (ERRORCLASS_ISRTLPRIORITY(newinfo.ei_class) ||
-		    ERRORCLASS_ISLOWPRIORITY(oldinfo.ei_class))
-			memcpy(info, &newinfo, sizeof(newinfo));
-		else {
-			memcpy(info, &oldinfo, sizeof(oldinfo));
-		}
-		error_rethrow();
+		/* Rethrow the inner exception and unwind the exception nesting.
+		 * This way, the more important of the two exception will
+		 * automatically be re-thrown, while the other becomes lost. */
+		RETHROW();
 	}
 }
 

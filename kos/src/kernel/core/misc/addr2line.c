@@ -51,10 +51,7 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level) {
 #ifdef CONFIG_HAVE_USERMOD
-	struct exception_info exinfo;
-	/* Preserve exception information. */
-	memcpy(&exinfo, error_info(), sizeof(struct exception_info));
-	TRY
+	NESTED_TRY
 #endif /* CONFIG_HAVE_USERMOD */
 	{
 		return debug_addr2line(&info->ds_info,
@@ -67,7 +64,6 @@ NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
 	EXCEPT {
 		/* XXX: What do we do about RT-level exceptions? */
 	}
-	memcpy(error_info(), &exinfo, sizeof(struct exception_info));
 	return DEBUG_INFO_ERROR_CORRUPT;
 #endif /* CONFIG_HAVE_USERMOD */
 }
@@ -339,30 +335,17 @@ addr2line_vprintf(pformatprinter printer, void *arg, void const *start_pc,
 	ssize_t result;
 	uintptr_t module_relative_pc;
 	struct addr2line_buf ainfo;
-	REF module_t *mod;
-	module_type_var(modtype);
-	mod = module_ataddr_nx(start_pc, modtype);
-	if unlikely(!mod) {
-		memset(&ainfo, 0, sizeof(ainfo));
-		module_relative_pc = (uintptr_t)start_pc;
-	} else {
-		if (debug_addr2line_sections_lock(mod, &ainfo.ds_info, &ainfo.ds_sect
-		                                  module_type__arg(modtype)) !=
-		    DEBUG_INFO_ERROR_SUCCESS)
-			memset(&ainfo, 0, sizeof(ainfo));
-		module_relative_pc = (uintptr_t)start_pc -
-		                     module_getloadaddr(mod, modtype);
-	}
+	module_relative_pc = addr2line_begin(&ainfo, start_pc, NULL);
 	result = do_addr2line_vprintf(&ainfo,
 	                              printer,
 	                              arg,
-	                              mod module_type__arg(modtype),
+	                              ainfo.ds_mod
+	                              module_type__arg(ainfo.ds_modtype),
 	                              module_relative_pc,
 	                              start_pc,
 	                              end_pc,
 	                              message_format,
 	                              args);
-	module_xdecref(mod, modtype);
 	addr2line_end(&ainfo);
 	return result;
 }

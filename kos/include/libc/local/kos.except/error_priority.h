@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc4da800 */
+/* HASH CRC-32:0x2e967578 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,37 +18,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_KOS_EXCEPT_H
-#define GUARD_LIBC_AUTO_KOS_EXCEPT_H 1
-
-#include "../api.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <kos/except.h>
-
-DECL_BEGIN
-
-/* Transform the given exception into a posix errno value */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) errno_t NOTHROW_NCX(LIBKCALL libc_error_as_errno)(struct exception_data const *__restrict self);
-/* Transform the given exception into a posix signal.
- * If doing this is possible, fill in `*result' and return `true'.
- * Otherwise, `*result' is left in an undefined state, and `false' is returned. */
-INTDEF WUNUSED NONNULL((1, 2)) bool NOTHROW_NCX(LIBKCALL libc_error_as_signal)(struct exception_data const *__restrict self, struct __siginfo_struct *__restrict result);
-/* Return the name of the given error, or `NULL` if unknown.
- * This name is the same as the `E_*` identifier.
- * E.g.: `error_name(ERROR_CODEOF(E_BADALLOC))` -> "E_BADALLOC" */
-INTDEF ATTR_CONST WUNUSED char const *NOTHROW(LIBKCALL libc_error_name)(error_code_t code);
+#ifndef __local_error_priority_defined
+#define __local_error_priority_defined 1
+#include <__crt.h>
+#include <kos/bits/exception_data.h>
+#include <kos/except/codes.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Return the priority for a given error code, where exceptions
  * with greater priorities should take the place of ones with
  * lower priorities in situations where multiple simultanious
  * errors can't be prevented. */
-INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBKCALL libc_error_priority)(error_code_t code);
-/* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
-INTDEF NONNULL((1)) void (__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) THROWS(...);
-/* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
-INTDEF NONNULL((1)) void (__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting_data *__restrict saved) THROWS(...);
-
-DECL_END
-
-#endif /* !GUARD_LIBC_AUTO_KOS_EXCEPT_H */
+__LOCAL_LIBC(error_priority) __ATTR_CONST __ATTR_WUNUSED unsigned int
+__NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(error_priority))(__error_code_t __code) {
+	__error_class_t __code_class = ERROR_CLASS(__code);
+	if (ERRORCLASS_ISRTLPRIORITY(__code_class))
+		return 4 + (__code_class - ERRORCLASS_RTL_MIN);
+	if (ERRORCLASS_ISHIGHPRIORITY(__code_class))
+		return 3;
+	if (!ERRORCLASS_ISLOWPRIORITY(__code_class))
+		return 2;
+	if (__code_class != ERROR_CLASS(ERROR_CODEOF(E_OK)))
+		return 1;
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_error_priority_defined
+#define __local___localdep_error_priority_defined 1
+#define __localdep_error_priority __LIBC_LOCAL_NAME(error_priority)
+#endif /* !__local___localdep_error_priority_defined */
+#endif /* !__local_error_priority_defined */

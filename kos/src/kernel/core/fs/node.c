@@ -3634,20 +3634,13 @@ NOTHROW(FCALL superblock_cleanup_unmounted)(void *pfun, unsigned int action) {
 	superblock_clear_delnodes(self);
 	/* Set the unmounted-flag. */
 	if (!(ATOMIC_FETCHOR(self->s_flags, SUPERBLOCK_FUNMOUNTED) & SUPERBLOCK_FUNMOUNTED)) {
-		struct exception_info old_except;
 		assert(self->s_nodes != NULL);
 		inode_set_closed_tree(self->s_nodes);
-		memcpy(&old_except, &THIS_EXCEPTION_INFO, sizeof(old_except));
-		TRY {
+		NESTED_TRY {
 			/* Synchronize all remaining nodes to flush changes. */
 			superblock_sync(self);
 		} EXCEPT {
 			error_printf("Synchronizing unmounted superblock");
-			goto restore_old_except;
-		}
-		__IF0 {
-restore_old_except:
-			memcpy(&THIS_EXCEPTION_INFO, &old_except, sizeof(old_except));
 		}
 		assert(self->s_nodes);
 		/* Remove all INodes with the PERSISTENT flag from the file-free */

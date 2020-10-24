@@ -34,6 +34,7 @@
 #include <kos/anno.h>
 #include <kos/bits/except.h>         /* __ERROR_REGISTER_STATE_TYPE */
 #include <kos/bits/exception_data.h> /* struct exception_data */
+#include <kos/bits/exception_nest.h> /* struct _exception_nesting_data */
 #include <kos/except/codes.h>        /* E_OK, ... */
 }%[insert:prefix(
 #include <kos/bits/fastexcept.h>
@@ -61,14 +62,18 @@ __SYSDECL_BEGIN
 #ifndef __ERROR_THROW_CC
 #define __ERROR_THROW_CC __LIBKCALL
 #endif /* !__ERROR_THROW_CC */
-
 #ifndef __ERROR_THROWN_CC
 #define __ERROR_THROWN_CC __LIBKCALL
 #endif /* !__ERROR_THROWN_CC */
-
 #ifndef __ERROR_UNWIND_CC
 #define __ERROR_UNWIND_CC __LIBKCALL
 #endif /* !__ERROR_UNWIND_CC */
+#ifndef __ERROR_NESTING_BEGIN_CC
+#define __ERROR_NESTING_BEGIN_CC __LIBKCALL
+#endif /* !__ERROR_NESTING_BEGIN_CC */
+#ifndef __ERROR_NESTING_END_CC
+#define __ERROR_NESTING_END_CC __LIBKCALL
+#endif /* !__ERROR_NESTING_END_CC */
 
 
 #ifndef __error_register_state_t_defined
@@ -1251,6 +1256,29 @@ non_linear_prefix:
 
 
 
+@@Return the priority for a given error code, where exceptions
+@@with greater priorities should take the place of ones with
+@@lower priorities in situations where multiple simultanious
+@@errors can't be prevented.
+[[kernel, no_crt_dos_wrapper, cc(LIBKCALL)]]
+[[wunused, const, nothrow]]
+[[impl_include("<kos/except/codes.h>")]]
+[[impl_include("<kos/bits/exception_data.h>")]]
+[[decl_include("<kos/bits/exception_data.h>")]]
+unsigned int error_priority(error_code_t code) {
+	error_class_t code_class = @ERROR_CLASS@(code);
+	if (@ERRORCLASS_ISRTLPRIORITY@(code_class))
+		return 4 + (code_class - @ERRORCLASS_RTL_MIN@);
+	if (@ERRORCLASS_ISHIGHPRIORITY@(code_class))
+		return 3;
+	if (!@ERRORCLASS_ISLOWPRIORITY@(code_class))
+		return 2;
+	if (code_class != @ERROR_CLASS@(@ERROR_CODEOF@(@E_OK@)))
+		return 1;
+	return 0;
+}
+
+
 
 
 %#ifdef __USE_KOS_KERNEL
@@ -1409,6 +1437,118 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 
 %#endif /* !__INTELLISENSE__ */
 
+@@Begin a nested TRY-block. (i.e. inside of another EXCEPT block)
+[[guard, no_local, decl_prefix(
+#ifndef __ERROR_NESTING_BEGIN_CC
+#define __ERROR_NESTING_BEGIN_CC __LIBKCALL
+#endif /* !__ERROR_NESTING_BEGIN_CC */
+), throws, kernel, no_crt_dos_wrapper, cc(__ERROR_NESTING_BEGIN_CC)]]
+[[decl_include("<kos/bits/exception_info.h>", "<bits/types.h>")]]
+void error_nesting_begin([[nonnull]] struct _exception_nesting_data *__restrict saved) {
+	struct exception_info *info = error_info();
+	if (!(info->@ei_flags@ & @EXCEPT_FINCATCH@)) {
+		/* Not inside of a catch-block (ignore the nesting request)
+		 * This can happen if the caller is only using the nest for
+		 * safety (in case a sub-function needs to be able to handle
+		 * its own exceptions, but may be called from an unaware
+		 * exception handler), or is using more than one nest.
+		 * In all of these cases, just ignore the nest, and also make
+		 * it so that the associated `error_nesting_end()' is a no-op */
+		saved->@en_size@ = 0;
+	} else {
+		__hybrid_assertf(info->@ei_code@ != @ERROR_CODEOF@(@E_OK@),
+		                 "No exception set in `error_nesting_begin()'");
+		if unlikely(saved->@en_size@ > @_EXCEPTION_NESTING_DATA_SIZE@)
+			saved->@en_size@ = @_EXCEPTION_NESTING_DATA_SIZE@;
+		memcpy(&saved->@en_state@, info, saved->@en_size@);
+		info->@ei_flags@ &= ~@EXCEPT_FINCATCH@;
+		info->@ei_code@   = @ERROR_CODEOF@(@E_OK@);
+		++info->@ei_nesting@;
+	}
+}
+
+@@End a nested TRY-block. (i.e. inside of another EXCEPT block)
+[[guard, no_local, decl_prefix(
+#ifndef __ERROR_NESTING_END_CC
+#define __ERROR_NESTING_END_CC __LIBKCALL
+#endif /* !__ERROR_NESTING_END_CC */
+), throws, kernel, no_crt_dos_wrapper, cc(__ERROR_NESTING_END_CC)]]
+[[decl_include("<kos/bits/exception_info.h>")]]
+[[impl_include("<hybrid/__assert.h>")]]
+void error_nesting_end([[nonnull]] struct _exception_nesting_data *__restrict saved) {
+	struct exception_info *info;
+	if unlikely(!saved->@en_size@)
+		return; /* No-op */
+	info = error_info();
+	__hybrid_assertf(info->@ei_nesting@ != 0,
+	                 "Error-nesting stack is empty");
+	--info->@ei_nesting@;
+	__hybrid_assertf(!(info->@ei_flags@ & @EXCEPT_FINCATCH@),
+	                 "This flag should have been cleared by `error_nesting_begin()'");
+	__hybrid_assertf(saved->@en_data@.@e_code@ != @ERROR_CODEOF@(@E_OK@),
+	                 "No saved exception in `error_nesting_end()'");
+	if (info->@ei_code@ == @ERROR_CODEOF@(@E_OK@)) {
+		/* No newly thrown exception. (meaning we're currently not propagating
+		 * any exceptions, so we also shouldn't try to set the RETHROW flag!) */
+restore_saved_exception:
+		memcpy(info, &saved->@en_state@, saved->@en_size@);
+	} else {
+		/* An Exception is currently being handled, and we must prevent that
+		 * exception from being deleted by an outer `__cxa_end_catch()'. Therefor
+		 * we must set the RETHROW flag to essentially re-throw the merged
+		 * exception from outside of the inner try-block:
+		 * [ 1] TRY {
+		 * [ 2]     foo();
+		 * [ 3] } EXCEPT {
+		 * [ 4]     NESTED_TRY {
+		 * [ 5]         bar();
+		 * [ 6]     } EXCEPT {
+		 * [ 7]         foobar();
+		 * [ 8]         RETHROW();
+		 * [ 9]     }
+		 * [10]     RETHROW();
+		 * [11] }
+		 *
+		 * Equivalent:
+		 * [ 1] foo();                                // [ 2]
+		 * [ 2] if (EXCEPTION_THROWN) {
+		 * [ 3]     __cxa_begin_catch();              // [ 3]
+		 * [ 4]     struct _exception_nesting_data nest;
+		 * [ 5]     error_nesting_begin(&nest);
+		 * [ 6]     bar();                            // [ 5]
+		 * [ 7]     if (EXCEPTION_THROWN) {
+		 * [ 8]         __cxa_begin_catch();          // [ 6]
+		 * [ 9]         foobar();                     // [ 7]
+		 * [10]         error_rethrow();              // [ 8]
+		 * [11]         __cxa_end_catch();            // [ 9]
+		 * [12]         error_nesting_end(&nest);
+		 * [13]     } else {
+		 * [14]         error_nesting_end(&nest);
+		 * [15]         error_rethrow();              // [10]
+		 * [16]     }
+		 * [17]     __cxa_end_catch();                // [11]
+		 * [18] }
+		 *
+		 * We get here from EQ[12], which is followed by EQ[17], which
+		 * would normally delete the exception because it wasn't re-thrown
+		 * from anywhere. But if you think of all of the possible constellation
+		 * where this function might be called, in all cases where we know
+		 * that there's currently an active exception (i.e. ei_code != E_OK),
+		 * it's always acceptable to set the RETHROW flag for the outer
+		 * call to `__cxa_end_catch()' (on line EQ[17])
+		 */
+		info->@ei_flags@ |= @EXCEPT_FRETHROW@;
+		/* Select the more important exception. */
+		if (error_priority(saved->@en_data@.@e_code@) >=
+		    error_priority(info->@ei_code@))
+			goto restore_saved_exception;
+		/* Keep the newly set exception. */
+	}
+	/* Indicate that exception nesting is once again no longer allowed. */
+	info->@ei_flags@ |= @EXCEPT_FINCATCH@;
+}
+
+
 %{
 #ifdef __cplusplus
 /* TODO: In user-space, using TRY and EXCEPT should leave some sort of marker in the
@@ -1423,13 +1563,43 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 #ifndef __EXCEPT
 #define __EXCEPT catch(...)
 #endif /* !__EXCEPT */
-#ifndef TRY
-#define TRY      __TRY
-#endif /* !TRY */
-#ifndef EXCEPT
-#define EXCEPT   __EXCEPT
-#endif /* !EXCEPT */
+
+/* Nested exception support */
+#if defined(__error_nesting_begin_defined) && defined(__error_nesting_end_defined)
+class __cxx_exception_nesting: public _exception_nesting_data {
+public:
+	__ATTR_FORCEINLINE operator bool() const __CXX_NOEXCEPT { return false; }
+	__ATTR_FORCEINLINE __cxx_exception_nesting() {
+		en_size = _EXCEPTION_NESTING_DATA_SIZE;
+		error_nesting_begin(this);
+	}
+	__ATTR_FORCEINLINE ~__cxx_exception_nesting() {
+		error_nesting_end(this);
+	}
+};
+#ifdef __COUNTER__
+#define __PRIVATE_CXX_EXCEPT_NESTING_NAME __PP_CAT2(__local_cxx_exception_nesting, __COUNTER__)
+#else /* __COUNTER__ */
+#define __PRIVATE_CXX_EXCEPT_NESTING_NAME __PP_CAT2(__local_cxx_exception_nesting, __LINE__)
+#endif /* !__COUNTER__ */
+#define __NESTED_TRY       if(__cxx_exception_nesting __PRIVATE_CXX_EXCEPT_NESTING_NAME {});else try
+#define __NESTED_EXCEPTION __cxx_exception_nesting __PRIVATE_CXX_EXCEPT_NESTING_NAME
+#endif /* __error_nesting_begin_defined && __error_nesting_end_defined */
 #endif /* __cplusplus */
+
+
+#if !defined(TRY) && defined(__TRY)
+#define TRY __TRY
+#endif /* !TRY && __TRY */
+#if !defined(EXCEPT) && defined(__EXCEPT)
+#define EXCEPT __EXCEPT
+#endif /* !EXCEPT && __EXCEPT */
+#if !defined(NESTED_TRY) && defined(__NESTED_TRY)
+#define NESTED_TRY __NESTED_TRY
+#endif /* !NESTED_TRY && __NESTED_TRY */
+#if !defined(NESTED_EXCEPTION) && defined(__NESTED_EXCEPTION)
+#define NESTED_EXCEPTION __NESTED_EXCEPTION
+#endif /* !NESTED_EXCEPTION && __NESTED_EXCEPTION */
 
 
 #ifndef __INTELLISENSE__

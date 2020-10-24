@@ -3174,11 +3174,15 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
                      struct rpc_syscall_info const *UNUSED(sc_info)) {
 	struct kernel_exec_rpc_data *data;
 	struct exception_info old_exception_info;
+	struct exception_info *tls_info;
 	assert(reason == TASK_RPC_REASON_ASYNCUSER ||
 	       reason == TASK_RPC_REASON_SYSCALL ||
 	       reason == TASK_RPC_REASON_SHUTDOWN);
 	data = (struct kernel_exec_rpc_data *)arg;
-	memcpy(&old_exception_info, &THIS_EXCEPTION_INFO, sizeof(old_exception_info));
+	tls_info = error_info();
+	memcpy(&old_exception_info, tls_info, sizeof(old_exception_info));
+	tls_info->ei_code = ERROR_CODEOF(E_OK);
+	tls_info->ei_flags &= ~EXCEPT_FINCATCH;
 	TRY {
 		/* Check for race condition: Our RPC only got executed because the
 		 * main thread is currently being terminated. - In this case it wouldn't
@@ -3205,6 +3209,7 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 		       sizeof(data->er_except));
 		goto restore_exception;
 	}
+	memcpy(tls_info, &old_exception_info, sizeof(old_exception_info));
 	/* Success! -> In this case _we_ must inherit the given RPC data packet,
 	 *             since the sending thread will terminate (or has already
 	 *             terminated) by having its `task_waitfor()' function return
@@ -3215,9 +3220,7 @@ kernel_exec_rpc_func(void *arg, struct icpustate *__restrict state,
 	kfree(data);
 	return state;
 restore_exception:
-	memcpy(&THIS_EXCEPTION_INFO,
-	       &old_exception_info,
-	       sizeof(old_exception_info));
+	memcpy(tls_info, &old_exception_info, sizeof(old_exception_info));
 done_signal_exception:
 	if (sig_broadcast(&data->er_error) == 0) {
 		/* Can't deliver the error to the original caller of `exec()', since

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44705164 */
+/* HASH CRC-32:0x5ab0627c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1063,11 +1063,130 @@ non_linear_prefix:
 #endif /* !... */
 /*[[[end]]]*/
 }
+/* Return the priority for a given error code, where exceptions
+ * with greater priorities should take the place of ones with
+ * lower priorities in situations where multiple simultanious
+ * errors can't be prevented. */
+INTERN ATTR_SECTION(".text.crt.except.io.utility") ATTR_CONST WUNUSED unsigned int
+NOTHROW(LIBKCALL libc_error_priority)(error_code_t code) {
+	error_class_t code_class = ERROR_CLASS(code);
+	if (ERRORCLASS_ISRTLPRIORITY(code_class))
+		return 4 + (code_class - ERRORCLASS_RTL_MIN);
+	if (ERRORCLASS_ISHIGHPRIORITY(code_class))
+		return 3;
+	if (!ERRORCLASS_ISLOWPRIORITY(code_class))
+		return 2;
+	if (code_class != ERROR_CLASS(ERROR_CODEOF(E_OK)))
+		return 1;
+	return 0;
+}
+/* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
+INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
+(__ERROR_NESTING_BEGIN_CC libc_error_nesting_begin)(struct _exception_nesting_data *__restrict saved) THROWS(...) {
+	struct exception_info *info = libc_error_info();
+	if (!(info->ei_flags & EXCEPT_FINCATCH)) {
+		/* Not inside of a catch-block (ignore the nesting request)
+		 * This can happen if the caller is only using the nest for
+		 * safety (in case a sub-function needs to be able to handle
+		 * its own exceptions, but may be called from an unaware
+		 * exception handler), or is using more than one nest.
+		 * In all of these cases, just ignore the nest, and also make
+		 * it so that the associated `error_nesting_end()' is a no-op */
+		saved->en_size = 0;
+	} else {
+		__hybrid_assertf(info->ei_code != ERROR_CODEOF(E_OK),
+		                 "No exception set in `error_nesting_begin()'");
+		if unlikely(saved->en_size > _EXCEPTION_NESTING_DATA_SIZE)
+			saved->en_size = _EXCEPTION_NESTING_DATA_SIZE;
+		libc_memcpy(&saved->en_state, info, saved->en_size);
+		info->ei_flags &= ~EXCEPT_FINCATCH;
+		info->ei_code   = ERROR_CODEOF(E_OK);
+		++info->ei_nesting;
+	}
+}
+#include <hybrid/__assert.h>
+/* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
+INTERN ATTR_SECTION(".text.crt.except.io.utility") NONNULL((1)) void
+(__ERROR_NESTING_END_CC libc_error_nesting_end)(struct _exception_nesting_data *__restrict saved) THROWS(...) {
+	struct exception_info *info;
+	if unlikely(!saved->en_size)
+		return; /* No-op */
+	info = libc_error_info();
+	__hybrid_assertf(info->ei_nesting != 0,
+	                 "Error-nesting stack is empty");
+	--info->ei_nesting;
+	__hybrid_assertf(!(info->ei_flags & EXCEPT_FINCATCH),
+	                 "This flag should have been cleared by `error_nesting_begin()'");
+	__hybrid_assertf(saved->en_data.e_code != ERROR_CODEOF(E_OK),
+	                 "No saved exception in `error_nesting_end()'");
+	if (info->ei_code == ERROR_CODEOF(E_OK)) {
+		/* No newly thrown exception. (meaning we're currently not propagating
+		 * any exceptions, so we also shouldn't try to set the RETHROW flag!) */
+restore_saved_exception:
+		libc_memcpy(info, &saved->en_state, saved->en_size);
+	} else {
+		/* An Exception is currently being handled, and we must prevent that
+		 * exception from being deleted by an outer `__cxa_end_catch()'. Therefor
+		 * we must set the RETHROW flag to essentially re-throw the merged
+		 * exception from outside of the inner try-block:
+		 * [ 1] TRY {
+		 * [ 2]     foo();
+		 * [ 3] } EXCEPT {
+		 * [ 4]     NESTED_TRY {
+		 * [ 5]         bar();
+		 * [ 6]     } EXCEPT {
+		 * [ 7]         foobar();
+		 * [ 8]         RETHROW();
+		 * [ 9]     }
+		 * [10]     RETHROW();
+		 * [11] }
+		 *
+		 * Equivalent:
+		 * [ 1] foo();                                // [ 2]
+		 * [ 2] if (EXCEPTION_THROWN) {
+		 * [ 3]     __cxa_begin_catch();              // [ 3]
+		 * [ 4]     struct _exception_nesting_data nest;
+		 * [ 5]     error_nesting_begin(&nest);
+		 * [ 6]     bar();                            // [ 5]
+		 * [ 7]     if (EXCEPTION_THROWN) {
+		 * [ 8]         __cxa_begin_catch();          // [ 6]
+		 * [ 9]         foobar();                     // [ 7]
+		 * [10]         error_rethrow();              // [ 8]
+		 * [11]         __cxa_end_catch();            // [ 9]
+		 * [12]         error_nesting_end(&nest);
+		 * [13]     } else {
+		 * [14]         error_nesting_end(&nest);
+		 * [15]         error_rethrow();              // [10]
+		 * [16]     }
+		 * [17]     __cxa_end_catch();                // [11]
+		 * [18] }
+		 *
+		 * We get here from EQ[12], which is followed by EQ[17], which
+		 * would normally delete the exception because it wasn't re-thrown
+		 * from anywhere. But if you think of all of the possible constellation
+		 * where this function might be called, in all cases where we know
+		 * that there's currently an active exception (i.e. ei_code != E_OK),
+		 * it's always acceptable to set the RETHROW flag for the outer
+		 * call to `__cxa_end_catch()' (on line EQ[17])
+		 */
+		info->ei_flags |= EXCEPT_FRETHROW;
+		/* Select the more important exception. */
+		if (libc_error_priority(saved->en_data.e_code) >=
+		    libc_error_priority(info->ei_code))
+			goto restore_saved_exception;
+		/* Keep the newly set exception. */
+	}
+	/* Indicate that exception nesting is once again no longer allowed. */
+	info->ei_flags |= EXCEPT_FINCATCH;
+}
 
 DECL_END
 
 DEFINE_PUBLIC_ALIAS(error_as_errno, libc_error_as_errno);
 DEFINE_PUBLIC_ALIAS(error_as_signal, libc_error_as_signal);
 DEFINE_PUBLIC_ALIAS(error_name, libc_error_name);
+DEFINE_PUBLIC_ALIAS(error_priority, libc_error_priority);
+DEFINE_PUBLIC_ALIAS(error_nesting_begin, libc_error_nesting_begin);
+DEFINE_PUBLIC_ALIAS(error_nesting_end, libc_error_nesting_end);
 
 #endif /* !GUARD_LIBC_AUTO_KOS_EXCEPT_C */
