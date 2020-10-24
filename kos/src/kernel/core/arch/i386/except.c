@@ -873,6 +873,9 @@ err:
 
 
 DEFINE_PUBLIC_ALIAS(__gcc_personality_v0, __gxx_personality_v0);
+
+/* This function is hooked by CFI under `struct unwind_fde_struct::f_persofun'
+ * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
 PUBLIC NONNULL((1, 2, 3)) unsigned int
 NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
                                     struct kcpustate *__restrict state,
@@ -882,8 +885,6 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 	uint8_t *callsite_end;
 	size_t callsite_size;
 
-	/* This function is hooked by CFI under `struct unwind_fde_struct::f_persofun'
-	 * It's exact prototype and behavior are therefor not mandated by how GCC uses it. */
 	landingpad = (uintptr_t)fde->f_pcstart;
 
 	/* NOTE: `reader' points to a `struct gcc_lsda' */
@@ -924,7 +925,7 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 				 * implementation detail of the runtime, but rather stored in an exposed, per-task variable.
 				 * So while what we write here really doesn't matter at all, let's just put in something
 				 * that at the very least makes a bit of sense. */
-				gpregs_setpax(&state->kcs_gpregs, (uintptr_t)&THIS_EXCEPTION_INFO);
+				gpregs_setpax(&state->kcs_gpregs, error_code());
 			}
 			return DWARF_PERSO_EXECUTE_HANDLER;
 		}
