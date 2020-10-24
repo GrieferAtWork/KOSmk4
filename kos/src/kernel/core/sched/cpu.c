@@ -120,14 +120,13 @@ NOTHROW(FCALL panic_critical_thread_exited)(void) {
  *          task that is critical will cause the kernel to PANIC! */
 PUBLIC ATTR_NORETURN void
 NOTHROW(FCALL task_exit)(int w_status) {
-	struct task *caller, *next;
+	struct task *caller = THIS_TASK, *next;
 	struct cpu *me;
 	struct taskpid *pid = THIS_TASKPID;
 	assert(!WIFSTOPPED(w_status));
 	assert(!WIFCONTINUED(w_status));
 	assertf(PREEMPTION_ENABLED(),
 	        "Without preemption, how do you want to switch tasks?");
-	caller = THIS_TASK;
 	assert(caller->t_flags & TASK_FRUNNING);
 	if unlikely(caller->t_flags & TASK_FCRITICAL) {
 		panic_critical_thread_exited();

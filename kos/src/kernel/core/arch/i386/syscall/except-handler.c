@@ -598,6 +598,8 @@ again:
 	        "Unexpected exception flags");
 	assertf(tls_info->ei_nesting == 0,
 	        "There are still saved, nested exception somewhere on our stack");
+	assertf(PREEMPTION_ENABLED(),
+	        "Preemption must be enabled to propagate exceptions to user-space.");
 
 	/* Handle special exception codes */
 	switch (info.ei_code) {
@@ -661,6 +663,7 @@ again:
 		error_printf("raising exception/signal");
 		if (error_priority(tls_info->ei_code) > error_priority(info.ei_code)) {
 			memcpy(&info, tls_info, sizeof(info));
+			assert(PREEMPTION_ENABLED());
 			goto again;
 		}
 	}
@@ -827,6 +830,8 @@ NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
 	assert(!task_wasconnected());
 	assertf(!(PERTASK_GET(this_exception_flags) & EXCEPT_FINCATCH),
 	        "Direct unwinding from inside of a catch-block isn't allowed!");
+	assertf(PREEMPTION_ENABLED(),
+	        "Preemption must be enabled to propagate exceptions to user-space.");
 
 	if (sc_info) {
 		bool must_restart_syscall;
@@ -835,6 +840,7 @@ NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
 		                                       TASK_RPC_REASON_SYSCALL,
 		                                       sc_info,
 		                                       &must_restart_syscall);
+		assert(PREEMPTION_ENABLED());
 		/* If there is still an active exception (i.e. RPC handling didn't resolve
 		 * the exception, as would be the case for `E_INTERRUPT_USER_RPC'), then we
 		 * must somehow propagate the exception into user-space. */

@@ -52,6 +52,7 @@ NOTHROW(FCALL rpc_serve_async_user_redirection)(struct icpustate *__restrict sta
 	must_restart_syscall = reason == TASK_RPC_REASON_SYSCALL;
 #endif /* RPC_SERVE_ALL */
 	tls_error = error_info();
+	assert(PREEMPTION_ENABLED());
 
 	/* Save current exception information. */
 	memcpy(&last_error, tls_error, sizeof(last_error));
@@ -127,19 +128,23 @@ restore_rpc:
 		}
 		TRY {
 #ifndef RPC_SERVE_ALL
+			assert(PREEMPTION_ENABLED());
 			new_state = (*chain->re_func)(chain->re_arg,
 			                              state,
 			                              TASK_RPC_REASON_ASYNCUSER,
 			                              NULL);
+			assert(PREEMPTION_ENABLED());
 			if unlikely(new_state != state)
 				goto load_new_state;
 			assert(new_state != TASK_RPC_RESTART_SYSCALL);
 #else /* !RPC_SERVE_ALL */
 			struct icpustate *new_state;
+			assert(PREEMPTION_ENABLED());
 			new_state = (*chain->re_func)(chain->re_arg,
 			                              state,
 			                              reason,
 			                              sc_info);
+			assert(PREEMPTION_ENABLED());
 			if (new_state == TASK_RPC_RESTART_SYSCALL) {
 				assert(reason == TASK_RPC_REASON_SYSCALL);
 				must_restart_syscall = true;
@@ -177,6 +182,7 @@ restore_rpc:
 
 	/* Set the last exception. */
 	memcpy(tls_error, &last_error, sizeof(last_error));
+	assert(PREEMPTION_ENABLED());
 	return state;
 #ifndef RPC_SERVE_ALL
 load_new_state:
@@ -187,6 +193,7 @@ load_new_state:
 	memcpy(tls_error, &last_error, sizeof(last_error));
 	rpcentry_free(chain);
 	/* Let the caller load the new state, then continue serving pending RPCs. */
+	assert(PREEMPTION_ENABLED());
 	return new_state;
 #endif /* !RPC_SERVE_ALL */
 }
