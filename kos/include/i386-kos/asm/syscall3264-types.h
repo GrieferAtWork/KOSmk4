@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83e5e053 */
+/* HASH CRC-32:0x2fe9da63 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,6 @@
 #define HAVE_SC_REPR_KSYSCTL_COMMAND
 #define HAVE_SC_REPR_LFUTEX_OP
 #define HAVE_SC_REPR_LFUTEX_TIMEOUT_FLAGS
-#define HAVE_SC_REPR_MAPLIBRARY_FLAGS
 #define HAVE_SC_REPR_MEMFD_CREATE_FLAGS
 #define HAVE_SC_REPR_MLOCKALL_FLAGS
 #define HAVE_SC_REPR_MMAP_FLAGS
@@ -284,7 +283,6 @@ __SYSCALL_REPR(SC_REPR_KSYSCTL_ARG)
 __SYSCALL_REPR(SC_REPR_KSYSCTL_COMMAND)
 __SYSCALL_REPR(SC_REPR_LFUTEX_OP)
 __SYSCALL_REPR(SC_REPR_LFUTEX_TIMEOUT_FLAGS)
-__SYSCALL_REPR(SC_REPR_MAPLIBRARY_FLAGS)
 __SYSCALL_REPR(SC_REPR_MEMFD_CREATE_FLAGS)
 __SYSCALL_REPR(SC_REPR_MLOCKALL_FLAGS)
 __SYSCALL_REPR(SC_REPR_MMAP_FLAGS)

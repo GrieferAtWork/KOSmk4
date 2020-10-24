@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bdf097f */
+/* HASH CRC-32:0x651263ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2804,7 +2804,7 @@
 #define __NR32ATR2_setitimer64                  SC_REPR_POINTER                                                      /* oldval */ 
 #define __NR32RTR_setitimer64                   SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_maplibrary                   SC_REPR_POINTER                                                      /* addr */ 
-#define __NR32ATR1_maplibrary                   SC_REPR_MAPLIBRARY_FLAGS                                             /* flags */ 
+#define __NR32ATR1_maplibrary                   SC_REPR_MMAP_FLAGS                                                   /* flags */ 
 #define __NR32ATR2_maplibrary                   SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR3_maplibrary                   SC_REPR_STRUCT_ELF_PHDR32_VECTOR                                     /* hdrv */ 
 #define __NR32ATL3_maplibrary                   4                                                                    /* hdrv -> hdrc */ 

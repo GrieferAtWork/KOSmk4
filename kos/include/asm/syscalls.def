@@ -761,10 +761,10 @@ mmap2:(void *addr, size_t len, [tostr(MMAP_PROT)] syscall_ulong_t prot,
 @@               (depending on the caller running in 32- or 64-bit mode)
 @@@param: hdrc:  The number of program headers
 maplibrary:(void *addr,
-	[tostr(MAPLIBRARY_FLAGS)] syscall_ulong_t flags, fd_t fd,
+	[tostr(MMAP_FLAGS)] syscall_ulong_t flags, fd_t fd,
 	[tostr(STRUCT_ELF_PHDR_VECTOR:hdrc)] ElfW(Phdr) const *hdrv, size_t hdrc) -> void *;
-[doc_alias(maplibrary)] maplibraryx32:(void *addr, [tostr(MAPLIBRARY_FLAGS)] syscall_ulong_t flags, fd_t fd, [tostr(STRUCT_ELF_PHDR32_VECTOR:hdrc)] struct elf32_phdr const *hdrv, size_t hdrc) -> void *;
-[doc_alias(maplibrary)] maplibraryx64:(void *addr, [tostr(MAPLIBRARY_FLAGS)] syscall_ulong_t flags, fd_t fd, [tostr(STRUCT_ELF_PHDR64_VECTOR:hdrc)] struct elf64_phdr const *hdrv, size_t hdrc) -> void *;
+[doc_alias(maplibrary)] maplibraryx32:(void *addr, [tostr(MMAP_FLAGS)] syscall_ulong_t flags, fd_t fd, [tostr(STRUCT_ELF_PHDR32_VECTOR:hdrc)] struct elf32_phdr const *hdrv, size_t hdrc) -> void *;
+[doc_alias(maplibrary)] maplibraryx64:(void *addr, [tostr(MMAP_FLAGS)] syscall_ulong_t flags, fd_t fd, [tostr(STRUCT_ELF_PHDR64_VECTOR:hdrc)] struct elf64_phdr const *hdrv, size_t hdrc) -> void *;
 %[endgroup]
 
 @@@param: flags: Set of `MREMAP_MAYMOVE | MREMAP_FIXED'
