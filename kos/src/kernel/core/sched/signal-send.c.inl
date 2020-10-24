@@ -19,11 +19,11 @@
  */
 #ifdef __INTELLISENSE__
 #include "signal.c"
-//#define DEFINE_sig_send 1
+#define DEFINE_sig_send 1
 //#define DEFINE_sig_altsend 1
 //#define DEFINE_sig_send_nopr 1
 //#define DEFINE_sig_altsend_nopr 1
-#define DEFINE_sig_broadcast 1
+//#define DEFINE_sig_broadcast 1
 //#define DEFINE_sig_altbroadcast 1
 //#define DEFINE_sig_broadcast_nopr 1
 //#define DEFINE_sig_altbroadcast_nopr 1
@@ -476,6 +476,7 @@ again_read_target_cons:
 #endif /* !CONFIG_NO_SMP */
 	if (TASK_CONNECTION_STAT_ISSPEC(target_cons)) {
 		struct sig_completion *sc;
+		assert(!TASK_CONNECTION_STAT_ISDEAD(target_cons));
 		if unlikely(TASK_CONNECTION_STAT_ISDONE(target_cons)) {
 			/* The target is already dead. (change it to broadcast) */
 			if (!ATOMIC_CMPXCH_WEAK(receiver->tc_cons, target_cons,

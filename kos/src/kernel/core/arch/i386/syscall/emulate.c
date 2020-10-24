@@ -300,7 +300,8 @@ do_syscall:
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
 		state = x86_userexcept_seterrno64(state, sc_info, error_data());
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+		/* Done by not RETHROW()-ing the exception: */
+		/*PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));*/
 	}
 done:
 	return state;
@@ -381,7 +382,8 @@ do_syscall32:
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
 		state = x86_userexcept_seterrno32(state, sc_info, error_data());
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+		/* Done by not RETHROW()-ing the exception: */
+		/*PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));*/
 	}
 done:
 	return state;
@@ -470,7 +472,8 @@ do_syscall32:
 		/* Store the errno variant of the current exception
 		 * in the user-space register context. */
 		state = x86_userexcept_seterrno32(state, sc_info, error_data());
-		PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+		/* Done by not RETHROW()-ing the exception: */
+		/*PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));*/
 	}
 done:
 	return state;

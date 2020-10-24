@@ -413,6 +413,13 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       `__STDC_WANT_DEC_FP__' under `__USE_ISOC2X' (for this purpose, <hybrid/floatcore.h>
 	 *       will also have to be adjusted) */
 
+	/* TODO: User-space VIO callback functions should only be allowed to
+	 *       throw a white-listed sub-set of exceptions. Or better yet:
+	 *       user-space VIO exceptions should be encapsulated differently
+	 *       whilst in kernel-space, such that they always appear as E_SEGFAULT
+	 *       for as long as a thread is in kernel-space, but will be changed
+	 *       to the original error code prior to returning back to user-space. */
+
 	/* TODO: Functions like sigaddset() are supposed to set `errno=EINVAL' when the
 	 *       given signal isn't valid. (signo <= 0 || signo >= NSIG) */
 
