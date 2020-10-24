@@ -17,25 +17,50 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_IOCCOM_H
-#define _SYS_IOCCOM_H 1
+#ifndef _SYS_INT_CONST_H
+#define _SYS_INT_CONST_H 1
+
+/* API_LEVEL: opensolaris */
 
 #include <__stdinc.h>
 
-#include <asm/ioctl.h>
+#include <hybrid/typecore.h>
 
-#define IOCPARM_MASK        _IOC_SIZEMASK
-#define IOCPARM_LEN         _IOC_SIZE
-#define IOCBASECMD(x)       ((x) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT))
-#define IOCGROUP            _IOC_TYPE
-#define IOCPARM_MAX         _IOC_SIZEMASK
-#define IOC_VOID            0
-#define IOC_DIRMASK         _IOC_DIRMASK
-#define IOC_OUT             _IOC_OUT
-#define IOC_IN              _IOC_IN
-#define IOC_INOUT           (IOC_IN | IOC_OUT)
-#define _IORN(type, nr, T)  _IOC(_IOC_READ, type, nr, T)
-#define _IOWN(type, nr, T)  _IOC(_IOC_WRITE, type, nr, T)
-#define _IOWRN(type, nr, T) _IOC(_IOC_READ | _IOC_WRITE, type, nr, T)
+#ifndef INT8_C
+#define INT8_C(c) __INT8_C(c)
+#endif /* !INT8_C */
+#ifndef UINT8_C
+#define UINT8_C(c) __UINT8_C(c)
+#endif /* !UINT8_C */
 
-#endif /* !_SYS_IOCCOM_H */
+#ifndef INT16_C
+#define INT16_C(c) __INT16_C(c)
+#endif /* !INT16_C */
+#ifndef UINT16_C
+#define UINT16_C(c) __UINT16_C(c)
+#endif /* !UINT16_C */
+
+#ifndef INT32_C
+#define INT32_C(c) __INT32_C(c)
+#endif /* !INT32_C */
+#ifndef UINT32_C
+#define UINT32_C(c) __UINT32_C(c)
+#endif /* !UINT32_C */
+
+#ifdef __UINT64_C
+#ifndef INT64_C
+#define INT64_C(c) __INT64_C(c)
+#endif /* !INT64_C */
+#ifndef UINT64_C
+#define UINT64_C(c) __UINT64_C(c)
+#endif /* !UINT64_C */
+#endif /* __UINT64_C */
+
+#ifndef INTMAX_C
+#define INTMAX_C(c) __INTMAX_C(c)
+#endif /* !INTMAX_C */
+#ifndef UINTMAX_C
+#define UINTMAX_C(c) __UINTMAX_C(c)
+#endif /* !UINTMAX_C */
+
+#endif /* !_SYS_INT_CONST_H */

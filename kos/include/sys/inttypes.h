@@ -20,6 +20,16 @@
 #ifndef _SYS_INTTYPES_H
 #define _SYS_INTTYPES_H 1
 
-#include <inttypes.h>
+/* API_LEVEL: opensolaris */
+
+#include <features.h>
+
+#include <sys/feature_tests.h>
+#include <sys/int_types.h>
+#if !defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_SOLARIS)
+#include <sys/int_limits.h>
+#include <sys/int_const.h>
+#include <sys/int_fmtio.h>
+#endif /* !__USE_XOPEN || __USE_XOPEN2K || __USE_SOLARIS */
 
 #endif /* !_SYS_INTTYPES_H */

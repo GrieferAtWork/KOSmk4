@@ -17,25 +17,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_IOCCOM_H
-#define _SYS_IOCCOM_H 1
+#ifndef _SYS_INT_FMTIO_H
+#define _SYS_INT_FMTIO_H 1
+
+/* API_LEVEL: opensolaris */
 
 #include <__stdinc.h>
+#include <inttypes.h> /* Only need non-extension PRI* and SCA* macros. */
 
-#include <asm/ioctl.h>
+/* For some reason, these are also defined here? */
+#ifndef SCNX8
+#define SCNX8       __SCA1_PREFIX "X"
+#define SCNX16      __SCA2_PREFIX "X"
+#define SCNX32      __SCA4_PREFIX "X"
+#define SCNX64      __SCA8_PREFIX "X"
+#define SCNXLEAST8  __SCAL1_PREFIX "X"
+#define SCNXLEAST16 __SCAL2_PREFIX "X"
+#define SCNXLEAST32 __SCAL4_PREFIX "X"
+#define SCNXLEAST64 __SCAL8_PREFIX "X"
+#define SCNXFAST8   __SCAF1_PREFIX "X"
+#define SCNXFAST16  __SCAF2_PREFIX "X"
+#define SCNXFAST32  __SCAF4_PREFIX "X"
+#define SCNXFAST64  __SCAF8_PREFIX "X"
+#define SCNXMAX     __SCA8_PREFIX "X"
+#define SCNXPTR     __SCAP_PREFIX "X"
+#endif /* !SCNX8 */
 
-#define IOCPARM_MASK        _IOC_SIZEMASK
-#define IOCPARM_LEN         _IOC_SIZE
-#define IOCBASECMD(x)       ((x) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT))
-#define IOCGROUP            _IOC_TYPE
-#define IOCPARM_MAX         _IOC_SIZEMASK
-#define IOC_VOID            0
-#define IOC_DIRMASK         _IOC_DIRMASK
-#define IOC_OUT             _IOC_OUT
-#define IOC_IN              _IOC_IN
-#define IOC_INOUT           (IOC_IN | IOC_OUT)
-#define _IORN(type, nr, T)  _IOC(_IOC_READ, type, nr, T)
-#define _IOWN(type, nr, T)  _IOC(_IOC_WRITE, type, nr, T)
-#define _IOWRN(type, nr, T) _IOC(_IOC_READ | _IOC_WRITE, type, nr, T)
-
-#endif /* !_SYS_IOCCOM_H */
+#endif /* !_SYS_INT_FMTIO_H */

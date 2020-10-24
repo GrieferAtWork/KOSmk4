@@ -966,6 +966,11 @@ incdir("");
 #include <sys/config.h>
 #include <sys/dir.h>
 #include <sys/elf.h>
+#include <sys/elf_386.h>
+#include <sys/elf_SPARC.h>
+#include <sys/elf_amd64.h>
+#include <sys/elf_notes.h>
+#include <sys/elftypes.h>
 #include <sys/endian.h>
 #include <sys/epoll.h>
 #include <sys/errno.h>
@@ -976,6 +981,9 @@ incdir("");
 #include <sys/file.h>
 #include <sys/filio.h>
 #include <sys/fsuid.h>
+#include <sys/int_const.h>
+#include <sys/int_fmtio.h>
+#include <sys/int_limits.h>
 #include <sys/int_types.h>
 #include <sys/inttypes.h>
 #include <sys/io.h>

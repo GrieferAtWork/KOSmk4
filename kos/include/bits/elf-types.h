@@ -83,5 +83,4 @@ typedef Elf64_Half Elf64_Versym;
 __DECL_END
 #endif /* __CC__ */
 
-
 #endif /* !_BITS_ELF_TYPES_H */

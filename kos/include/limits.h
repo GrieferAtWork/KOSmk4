@@ -41,32 +41,74 @@
 #endif /* !... */
 #endif /* !MB_LEN_MAX */
 
-#define CHAR_BIT    __CHAR_BIT__
-#define SCHAR_MIN   __SCHAR_MIN__
-#define SCHAR_MAX   __SCHAR_MAX__
-#define UCHAR_MAX   __UCHAR_MAX__
-#define CHAR_MIN    __CHAR_MIN__
-#define CHAR_MAX    __CHAR_MAX__
-#define SHRT_MIN    __SHRT_MIN__
-#define SHRT_MAX    __SHRT_MAX__
-#define USHRT_MAX   __USHRT_MAX__
-#define INT_MIN     __INT_MIN__
-#define INT_MAX     __INT_MAX__
-#define UINT_MAX    __UINT_MAX__
-#define LONG_MIN    __LONG_MIN__
-#define LONG_MAX    __LONG_MAX__
-#define ULONG_MAX   __ULONG_MAX__
+#ifndef CHAR_BIT
+#define CHAR_BIT  __CHAR_BIT__
+#endif /* !CHAR_BIT */
+#ifndef SCHAR_MIN
+#define SCHAR_MIN __SCHAR_MIN__
+#endif /* !SCHAR_MIN */
+#ifndef SCHAR_MAX
+#define SCHAR_MAX __SCHAR_MAX__
+#endif /* !SCHAR_MAX */
+#ifndef UCHAR_MAX
+#define UCHAR_MAX __UCHAR_MAX__
+#endif /* !UCHAR_MAX */
+#ifndef CHAR_MIN
+#define CHAR_MIN  __CHAR_MIN__
+#endif /* !CHAR_MIN */
+#ifndef CHAR_MAX
+#define CHAR_MAX  __CHAR_MAX__
+#endif /* !CHAR_MAX */
+#ifndef SHRT_MIN
+#define SHRT_MIN  __SHRT_MIN__
+#endif /* !SHRT_MIN */
+#ifndef SHRT_MAX
+#define SHRT_MAX  __SHRT_MAX__
+#endif /* !SHRT_MAX */
+#ifndef USHRT_MAX
+#define USHRT_MAX __USHRT_MAX__
+#endif /* !USHRT_MAX */
+#ifndef INT_MIN
+#define INT_MIN   __INT_MIN__
+#endif /* !INT_MIN */
+#ifndef INT_MAX
+#define INT_MAX   __INT_MAX__
+#endif /* !INT_MAX */
+#ifndef UINT_MAX
+#define UINT_MAX  __UINT_MAX__
+#endif /* !UINT_MAX */
+#ifndef LONG_MIN
+#define LONG_MIN  __LONG_MIN__
+#endif /* !LONG_MIN */
+#ifndef LONG_MAX
+#define LONG_MAX  __LONG_MAX__
+#endif /* !LONG_MAX */
+#ifndef ULONG_MAX
+#define ULONG_MAX __ULONG_MAX__
+#endif /* !ULONG_MAX */
 
 #ifdef __USE_ISOC99
-#define LLONG_MIN   __LONG_LONG_MIN__
-#define LLONG_MAX   __LONG_LONG_MAX__
-#define ULLONG_MAX  __ULONG_LONG_MAX__
+#if !defined(LLONG_MIN) && defined(__LONG_LONG_MIN__)
+#define LLONG_MIN  __LONG_LONG_MIN__
+#endif /* !LLONG_MIN && __LONG_LONG_MIN__ */
+#if !defined(LLONG_MAX) && defined(__LONG_LONG_MAX__)
+#define LLONG_MAX  __LONG_LONG_MAX__
+#endif /* !LLONG_MAX && __LONG_LONG_MAX__ */
+#if !defined(ULLONG_MAX) && defined(__ULONG_LONG_MAX__)
+#define ULLONG_MAX __ULONG_LONG_MAX__
+#endif /* !ULLONG_MAX && __ULONG_LONG_MAX__ */
 #endif /* __USE_ISOC99 */
 
 #ifdef __USE_GNU
+#if !defined(LONG_LONG_MIN) && defined(__LONG_LONG_MIN__)
 #define LONG_LONG_MIN  __LONG_LONG_MIN__
+#endif /* !LONG_LONG_MIN && __LONG_LONG_MIN__ */
+#if !defined(LONG_LONG_MAX) && defined(__LONG_LONG_MAX__)
 #define LONG_LONG_MAX  __LONG_LONG_MAX__
+#endif /* !LONG_LONG_MAX && __LONG_LONG_MAX__ */
+#if !defined(ULONG_LONG_MAX) && defined(__ULONG_LONG_MAX__)
 #define ULONG_LONG_MAX __ULONG_LONG_MAX__
+#endif /* !ULONG_LONG_MAX && __ULONG_LONG_MAX__ */
 #endif /* __USE_GNU */
 
 #ifdef __USE_DOS
@@ -79,9 +121,11 @@
 #define _I32_MIN    __PRIVATE_MIN_S4
 #define _I32_MAX    __PRIVATE_MAX_S4
 #define _UI32_MAX   __PRIVATE_MIN_U4
+#ifdef __PRIVATE_MIN_S8
 #define _I64_MIN    __PRIVATE_MIN_S8
 #define _I64_MAX    __PRIVATE_MAX_S8
 #define _UI64_MAX   __PRIVATE_MIN_U8
+#endif /* __PRIVATE_MIN_S8 */
 #ifdef __PRIVATE_MIN_S16
 #define _I128_MIN   __PRIVATE_MIN_S16
 #define _I128_MAX   __PRIVATE_MAX_S16

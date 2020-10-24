@@ -17,25 +17,20 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _SYS_IOCCOM_H
-#define _SYS_IOCCOM_H 1
+#ifndef _SYS_ELFTYPES_H
+#define _SYS_ELFTYPES_H 1
 
-#include <__stdinc.h>
+/* API_LEVEL: opensolaris */
 
-#include <asm/ioctl.h>
+#include <bits/elf-types.h>
 
-#define IOCPARM_MASK        _IOC_SIZEMASK
-#define IOCPARM_LEN         _IOC_SIZE
-#define IOCBASECMD(x)       ((x) & ~(_IOC_SIZEMASK << _IOC_SIZESHIFT))
-#define IOCGROUP            _IOC_TYPE
-#define IOCPARM_MAX         _IOC_SIZEMASK
-#define IOC_VOID            0
-#define IOC_DIRMASK         _IOC_DIRMASK
-#define IOC_OUT             _IOC_OUT
-#define IOC_IN              _IOC_IN
-#define IOC_INOUT           (IOC_IN | IOC_OUT)
-#define _IORN(type, nr, T)  _IOC(_IOC_READ, type, nr, T)
-#define _IOWN(type, nr, T)  _IOC(_IOC_WRITE, type, nr, T)
-#define _IOWRN(type, nr, T) _IOC(_IOC_READ | _IOC_WRITE, type, nr, T)
+#ifdef __CC__
+__DECL_BEGIN
 
-#endif /* !_SYS_IOCCOM_H */
+typedef Elf32_Xword Elf32_Lword; /* ??? */
+typedef Elf64_Xword Elf64_Lword; /* ??? */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_SYS_ELFTYPES_H */
