@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5078ce3e */
+/* HASH CRC-32:0xf057270d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,14 +83,10 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,_chdrive,(int __drive),(__drive))
 __CDECLARE_OPT(,int,__NOTHROW_RPC,_getdrive,(void),())
 __CDECLARE_OPT(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
 
-#ifndef _GETDISKFREE_DEFINED
+#if !defined(_GETDISKFREE_DEFINED) && defined(__CRT_HAVE__getdiskfree)
 #define _GETDISKFREE_DEFINED 1
-#ifdef __CRT_HAVE__getdiskfree
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
-#else /* __CRT_HAVE__getdiskfree */
-#undef _GETDISKFREE_DEFINED
-#endif /* !__CRT_HAVE__getdiskfree */
-#endif /* !_GETDISKFREE_DEFINED */
+#endif /* !_GETDISKFREE_DEFINED && __CRT_HAVE__getdiskfree */
 #ifndef __getcwd_defined
 #define __getcwd_defined 1
 #ifdef __CRT_HAVE_getcwd

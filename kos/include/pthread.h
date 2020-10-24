@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64515365 */
+/* HASH CRC-32:0x212017d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -856,18 +856,14 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getname_np,(p
 __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),(__target_thread,__name))
 #endif /* __USE_GNU */
 #ifdef __USE_KOS
-#ifndef __pthread_gettid_np_defined
+#if !defined(__pthread_gettid_np_defined) && defined(__CRT_HAVE_pthread_gettid_np)
 #define __pthread_gettid_np_defined 1
-#ifdef __CRT_HAVE_pthread_gettid_np
 /* Return the TID of the given `target_thread'.
  * If the given `target_thread' has already terminated, 0 is returned
  * @return: * : The PID OF the given thread
  * @return: 0 : The given `target_thread' has already terminated */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
-#else /* __CRT_HAVE_pthread_gettid_np */
-#undef __pthread_gettid_np_defined
-#endif /* !__CRT_HAVE_pthread_gettid_np */
-#endif /* !__pthread_gettid_np_defined */
+#endif /* !__pthread_gettid_np_defined && __CRT_HAVE_pthread_gettid_np */
 #endif /* __USE_KOS */
 #ifdef __USE_UNIX98
 /* Determine level of concurrency
@@ -965,18 +961,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_once, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `state' */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setcancelstate,(int __state, int *__oldstate),(__state,__oldstate))
-#ifndef __pthread_setcanceltype_defined
+#if !defined(__pthread_setcanceltype_defined) && defined(__CRT_HAVE_pthread_setcanceltype)
 #define __pthread_setcanceltype_defined 1
-#ifdef __CRT_HAVE_pthread_setcanceltype
 /* Set cancellation state of current thread to TYPE,
  * returning the old type in *OLDTYPE if OLDTYPE is not NULL
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `type' */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_setcanceltype,(int __type, int *__oldtype),(__type,__oldtype))
-#else /* __CRT_HAVE_pthread_setcanceltype */
-#undef __pthread_setcanceltype_defined
-#endif /* !__CRT_HAVE_pthread_setcanceltype */
-#endif /* !__pthread_setcanceltype_defined */
+#endif /* !__pthread_setcanceltype_defined && __CRT_HAVE_pthread_setcanceltype */
 /* Cancel THREAD immediately or at the next possibility
  * @return: EOK:   Success
  * @return: ESRCH: `pthread' has already exited */
@@ -1773,9 +1765,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid
 #define ____pthread_atfork_func_t_defined 1
 typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 #endif /* !____pthread_atfork_func_t_defined */
-#ifndef __pthread_atfork_defined
+#if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined 1
-#ifdef __CRT_HAVE_pthread_atfork
 /* Install handlers to be called when a new process is created with FORK.
  * The PREPARE handler is called in the parent process just before performing
  * FORK. The PARENT handler is called in the parent process just after FORK.
@@ -1789,10 +1780,7 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
-#else /* __CRT_HAVE_pthread_atfork */
-#undef __pthread_atfork_defined
-#endif /* !__CRT_HAVE_pthread_atfork */
-#endif /* !__pthread_atfork_defined */
+#endif /* !__pthread_atfork_defined && __CRT_HAVE_pthread_atfork */
 
 
 /* Some more functions from winpthread. */

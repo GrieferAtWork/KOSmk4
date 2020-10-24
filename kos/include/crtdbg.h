@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd626ee97 */
+/* HASH CRC-32:0x8715a9fb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -251,14 +251,10 @@ typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
 #ifdef __CRT_HAVE__crtAssertBusy
 __LIBC __LONG32_TYPE__ _crtAssertBusy;
 #else /* __CRT_HAVE__crtAssertBusy */
-#ifndef ____p__crtAssertBusy_defined
+#if !defined(____p__crtAssertBusy_defined) && defined(__CRT_HAVE___p__crtAssertBusy)
 #define ____p__crtAssertBusy_defined 1
-#ifdef __CRT_HAVE___p__crtAssertBusy
 __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtAssertBusy)(void) __CASMNAME_SAME("__p__crtAssertBusy");
-#else /* __CRT_HAVE___p__crtAssertBusy */
-#undef ____p__crtAssertBusy_defined
-#endif /* !__CRT_HAVE___p__crtAssertBusy */
-#endif /* !____p__crtAssertBusy_defined */
+#endif /* !____p__crtAssertBusy_defined && __CRT_HAVE___p__crtAssertBusy */
 #ifdef ____p__crtAssertBusy_defined
 #define _crtAssertBusy  (*__p__crtAssertBusy())
 #endif /* ____p__crtAssertBusy_defined */
@@ -266,14 +262,10 @@ __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtAssertBusy)(void) __CAS
 #ifdef __CRT_HAVE__crtBreakAlloc
 __LIBC __LONG32_TYPE__ _crtBreakAlloc;
 #else /* __CRT_HAVE__crtBreakAlloc */
-#ifndef ____p__crtBreakAlloc_defined
+#if !defined(____p__crtBreakAlloc_defined) && defined(__CRT_HAVE___p__crtBreakAlloc)
 #define ____p__crtBreakAlloc_defined 1
-#ifdef __CRT_HAVE___p__crtBreakAlloc
 __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtBreakAlloc)(void) __CASMNAME_SAME("__p__crtBreakAlloc");
-#else /* __CRT_HAVE___p__crtBreakAlloc */
-#undef ____p__crtBreakAlloc_defined
-#endif /* !__CRT_HAVE___p__crtBreakAlloc */
-#endif /* !____p__crtBreakAlloc_defined */
+#endif /* !____p__crtBreakAlloc_defined && __CRT_HAVE___p__crtBreakAlloc */
 #ifdef ____p__crtBreakAlloc_defined
 #define _crtBreakAlloc  (*__p__crtBreakAlloc())
 #endif /* ____p__crtBreakAlloc_defined */
@@ -281,14 +273,10 @@ __LIBC __LONG32_TYPE__ *__NOTHROW_NCX(__LIBDCALL __p__crtBreakAlloc)(void) __CAS
 #ifdef __CRT_HAVE__crtDbgFlag
 __LIBC int _crtDbgFlag;
 #else /* __CRT_HAVE__crtDbgFlag */
-#ifndef ____p__crtDbgFlag_defined
+#if !defined(____p__crtDbgFlag_defined) && defined(__CRT_HAVE___p__crtDbgFlag)
 #define ____p__crtDbgFlag_defined 1
-#ifdef __CRT_HAVE___p__crtDbgFlag
 __LIBC int *__NOTHROW_NCX(__LIBDCALL __p__crtDbgFlag)(void) __CASMNAME_SAME("__p__crtDbgFlag");
-#else /* __CRT_HAVE___p__crtDbgFlag */
-#undef ____p__crtDbgFlag_defined
-#endif /* !__CRT_HAVE___p__crtDbgFlag */
-#endif /* !____p__crtDbgFlag_defined */
+#endif /* !____p__crtDbgFlag_defined && __CRT_HAVE___p__crtDbgFlag */
 #ifdef ____p__crtDbgFlag_defined
 #define _crtDbgFlag  (*__p__crtDbgFlag())
 #endif /* ____p__crtDbgFlag_defined */
@@ -333,14 +321,10 @@ __LIBC _HFILE __NOTHROW_NCX(__LIBDCALL _CrtSetReportFile)(int __report_type, _HF
 #ifdef __CRT_HAVE__CrtSetDebugFillThreshold
 __LIBC __SIZE_TYPE__ __NOTHROW_NCX(__LIBDCALL _CrtSetDebugFillThreshold)(__SIZE_TYPE__ __new_debug_fill_threshold) __CASMNAME_SAME("_CrtSetDebugFillThreshold");
 #endif /* __CRT_HAVE__CrtSetDebugFillThreshold */
-#ifndef ___CrtDbgReport_defined
+#if !defined(___CrtDbgReport_defined) && defined(__CRT_HAVE__CrtDbgReport)
 #define ___CrtDbgReport_defined 1
-#ifdef __CRT_HAVE__CrtDbgReport
 __LIBC int __NOTHROW_NCX(__VLIBDCALL _CrtDbgReport)(int __report_type, char const *__filename, int __line, char const *__module_name, char const *__format, ...) __CASMNAME_SAME("_CrtDbgReport");
-#else /* __CRT_HAVE__CrtDbgReport */
-#undef ___CrtDbgReport_defined
-#endif /* !__CRT_HAVE__CrtDbgReport */
-#endif /* !___CrtDbgReport_defined */
+#endif /* !___CrtDbgReport_defined && __CRT_HAVE__CrtDbgReport */
 #ifndef ___CrtDbgReportW_defined
 #define ___CrtDbgReportW_defined 1
 #ifdef __CRT_HAVE__CrtDbgReportW
@@ -351,14 +335,10 @@ __LIBC int __NOTHROW_NCX(__VLIBDCALL _CrtDbgReportW)(int __report_type, __WCHAR1
 #undef ___CrtDbgReportW_defined
 #endif /* !... */
 #endif /* !___CrtDbgReportW_defined */
-#ifndef ___CrtDbgBreak_defined
+#if !defined(___CrtDbgBreak_defined) && defined(__CRT_HAVE__CrtDbgBreak)
 #define ___CrtDbgBreak_defined 1
-#ifdef __CRT_HAVE__CrtDbgBreak
 __LIBC void __NOTHROW_NCX(__LIBDCALL _CrtDbgBreak)(void) __CASMNAME_SAME("_CrtDbgBreak");
-#else /* __CRT_HAVE__CrtDbgBreak */
-#undef ___CrtDbgBreak_defined
-#endif /* !__CRT_HAVE__CrtDbgBreak */
-#endif /* !___CrtDbgBreak_defined */
+#endif /* !___CrtDbgBreak_defined && __CRT_HAVE__CrtDbgBreak */
 #ifdef __CRT_HAVE__CrtSetBreakAlloc
 __LIBC __LONG32_TYPE__ __NOTHROW_NCX(__LIBDCALL _CrtSetBreakAlloc)(__LONG32_TYPE__ __break_alloc) __CASMNAME_SAME("_CrtSetBreakAlloc");
 #endif /* __CRT_HAVE__CrtSetBreakAlloc */

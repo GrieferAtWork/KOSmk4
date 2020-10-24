@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a9215e3 */
+/* HASH CRC-32:0x7ba852b7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1576,14 +1576,10 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cfree,(void *__mallptr),(__mallptr))
 #endif /* !... */
 #endif /* !__cfree_defined */
 #ifndef __NO_FPU
-#ifndef __getloadavg_defined
+#if !defined(__getloadavg_defined) && defined(__CRT_HAVE_getloadavg)
 #define __getloadavg_defined 1
-#ifdef __CRT_HAVE_getloadavg
 __CDECLARE(,int,__NOTHROW_RPC,getloadavg,(double __loadavg[], __STDC_INT_AS_SIZE_T __nelem),(__loadavg,__nelem))
-#else /* __CRT_HAVE_getloadavg */
-#undef __getloadavg_defined
-#endif /* !__CRT_HAVE_getloadavg */
-#endif /* !__getloadavg_defined */
+#endif /* !__getloadavg_defined && __CRT_HAVE_getloadavg */
 #endif /* !__NO_FPU */
 #endif /* __USE_MISC */
 
@@ -2307,22 +2303,14 @@ __CREDIRECT(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd
 #undef __getcwd_defined
 #endif /* !... */
 #endif /* !__getcwd_defined */
-#ifndef __getlogin_defined
+#if !defined(__getlogin_defined) && defined(__CRT_HAVE_getlogin)
 #define __getlogin_defined 1
-#ifdef __CRT_HAVE_getlogin
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
-#else /* __CRT_HAVE_getlogin */
-#undef __getlogin_defined
-#endif /* !__CRT_HAVE_getlogin */
-#endif /* !__getlogin_defined */
-#ifndef __getpass_defined
+#endif /* !__getlogin_defined && __CRT_HAVE_getlogin */
+#if !defined(__getpass_defined) && defined(__CRT_HAVE_getpass)
 #define __getpass_defined 1
-#ifdef __CRT_HAVE_getpass
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
-#else /* __CRT_HAVE_getpass */
-#undef __getpass_defined
-#endif /* !__CRT_HAVE_getpass */
-#endif /* !__getpass_defined */
+#endif /* !__getpass_defined && __CRT_HAVE_getpass */
 #ifndef __getpw_defined
 #define __getpw_defined 1
 #ifdef __CRT_HAVE_getpw
@@ -2373,16 +2361,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memalign, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #undef __memalign_defined
 #endif /* !... */
 #endif /* !__memalign_defined */
-#ifndef __ttyname_defined
+#if !defined(__ttyname_defined) && defined(__CRT_HAVE_ttyname)
 #define __ttyname_defined 1
-#ifdef __CRT_HAVE_ttyname
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
-#else /* __CRT_HAVE_ttyname */
-#undef __ttyname_defined
-#endif /* !__CRT_HAVE_ttyname */
-#endif /* !__ttyname_defined */
+#endif /* !__ttyname_defined && __CRT_HAVE_ttyname */
 #ifdef __CRT_HAVE_getexecname
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,getexecname,(void),())
@@ -2497,14 +2481,10 @@ __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_errno,(errno_t *__perr),(__perr))
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_errno,(errno_t __err),(__err))
 #endif /* !_CRT_ERRNO_DEFINED */
 
-#ifndef ____doserrno_defined
+#if !defined(____doserrno_defined) && defined(__CRT_HAVE___doserrno)
 #define ____doserrno_defined 1
-#ifdef __CRT_HAVE___doserrno
 __CDECLARE(__ATTR_CONST,__UINT32_TYPE__ *,__NOTHROW_NCX,__doserrno,(void),())
-#else /* __CRT_HAVE___doserrno */
-#undef ____doserrno_defined
-#endif /* !__CRT_HAVE___doserrno */
-#endif /* !____doserrno_defined */
+#endif /* !____doserrno_defined && __CRT_HAVE___doserrno */
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_get_doserrno,(__UINT32_TYPE__ *__perr),(__perr))
 __CDECLARE_OPT(,errno_t,__NOTHROW_NCX,_set_doserrno,(__UINT32_TYPE__ __err),(__err))
 #ifdef ____doserrno_defined
@@ -2553,14 +2533,10 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 __LIBC int __argc;
 #define __argc __argc
 #else /* __CRT_HAVE___argc */
-#ifndef ____p___argc_defined
+#if !defined(____p___argc_defined) && defined(__CRT_HAVE___p___argc)
 #define ____p___argc_defined 1
-#ifdef __CRT_HAVE___p___argc
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p___argc,(void),())
-#else /* __CRT_HAVE___p___argc */
-#undef ____p___argc_defined
-#endif /* !__CRT_HAVE___p___argc */
-#endif /* !____p___argc_defined */
+#endif /* !____p___argc_defined && __CRT_HAVE___p___argc */
 #ifdef ____p___argc_defined
 #define __argc (*__p___argc())
 #endif /* ____p___argc_defined */
@@ -2571,14 +2547,10 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p
 #ifdef __CRT_HAVE___argv
 __LIBC char **__argv;
 #else /* __CRT_HAVE___argv */
-#ifndef ____p___argv_defined
+#if !defined(____p___argv_defined) && defined(__CRT_HAVE___p___argv)
 #define ____p___argv_defined 1
-#ifdef __CRT_HAVE___p___argv
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,__p___argv,(void),())
-#else /* __CRT_HAVE___p___argv */
-#undef ____p___argv_defined
-#endif /* !__CRT_HAVE___p___argv */
-#endif /* !____p___argv_defined */
+#endif /* !____p___argv_defined && __CRT_HAVE___p___argv */
 #ifdef ____p___argv_defined
 #define __argv (*__p___argv())
 #endif /* ____p___argv_defined */
@@ -2590,14 +2562,10 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,
 __LIBC wchar_t **__wargv;
 #define __wargv __wargv
 #else /* __CRT_HAVE___wargv */
-#ifndef ____p___wargv_defined
+#if !defined(____p___wargv_defined) && defined(__CRT_HAVE___p___wargv)
 #define ____p___wargv_defined 1
-#ifdef __CRT_HAVE___p___wargv
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p___wargv,(void),())
-#else /* __CRT_HAVE___p___wargv */
-#undef ____p___wargv_defined
-#endif /* !__CRT_HAVE___p___wargv */
-#endif /* !____p___wargv_defined */
+#endif /* !____p___wargv_defined && __CRT_HAVE___p___wargv */
 #ifdef ____p___wargv_defined
 #define __wargv (*__p___wargv())
 #endif /* ____p___wargv_defined */
@@ -2609,14 +2577,10 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_N
 __LIBC wchar_t **_wenviron;
 #define _wenviron _wenviron
 #else /* __CRT_HAVE__wenviron */
-#ifndef ____p__wenviron_defined
+#if !defined(____p__wenviron_defined) && defined(__CRT_HAVE___p__wenviron)
 #define ____p__wenviron_defined 1
-#ifdef __CRT_HAVE___p__wenviron
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p__wenviron,(void),())
-#else /* __CRT_HAVE___p__wenviron */
-#undef ____p__wenviron_defined
-#endif /* !__CRT_HAVE___p__wenviron */
-#endif /* !____p__wenviron_defined */
+#endif /* !____p__wenviron_defined && __CRT_HAVE___p__wenviron */
 #ifdef ____p__wenviron_defined
 #define _wenviron (*__p__wenviron())
 #endif /* ____p__wenviron_defined */
@@ -2628,14 +2592,10 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_N
 __LIBC wchar_t *_wpgmptr;
 #define _wpgmptr _wpgmptr
 #else /* __CRT_HAVE__wpgmptr */
-#ifndef ____p__wpgmptr_defined
+#if !defined(____p__wpgmptr_defined) && defined(__CRT_HAVE___p__wpgmptr)
 #define ____p__wpgmptr_defined 1
-#ifdef __CRT_HAVE___p__wpgmptr
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t **,__NOTHROW_NCX,__p__wpgmptr,(void),())
-#else /* __CRT_HAVE___p__wpgmptr */
-#undef ____p__wpgmptr_defined
-#endif /* !__CRT_HAVE___p__wpgmptr */
-#endif /* !____p__wpgmptr_defined */
+#endif /* !____p__wpgmptr_defined && __CRT_HAVE___p__wpgmptr */
 #ifdef ____p__wpgmptr_defined
 #define _wpgmptr (*__p__wpgmptr())
 #endif /* ____p__wpgmptr_defined */
@@ -2701,15 +2661,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__p__pgmptr, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #ifdef __CRT_HAVE___initenv
 __LIBC char **__initenv;
 #else /* __CRT_HAVE___initenv */
-#ifndef ____p___initenv_defined
+#if !defined(____p___initenv_defined) && defined(__CRT_HAVE___p___initenv)
 #define ____p___initenv_defined 1
-#ifdef __CRT_HAVE___p___initenv
 /* Access to the initial environment block */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,__p___initenv,(void),())
-#else /* __CRT_HAVE___p___initenv */
-#undef ____p___initenv_defined
-#endif /* !__CRT_HAVE___p___initenv */
-#endif /* !____p___initenv_defined */
+#endif /* !____p___initenv_defined && __CRT_HAVE___p___initenv */
 #ifdef ____p___initenv_defined
 #define __initenv (*__p___initenv())
 #endif /* ____p___initenv_defined */
@@ -2719,15 +2675,11 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,
 #ifdef __CRT_HAVE___winitenv
 __LIBC wchar_t **__winitenv;
 #else /* __CRT_HAVE___winitenv */
-#ifndef ____p___winitenv_defined
+#if !defined(____p___winitenv_defined) && defined(__CRT_HAVE___p___winitenv)
 #define ____p___winitenv_defined 1
-#ifdef __CRT_HAVE___p___winitenv
 /* Access to the initial environment block */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p___winitenv,(void),())
-#else /* __CRT_HAVE___p___winitenv */
-#undef ____p___winitenv_defined
-#endif /* !__CRT_HAVE___p___winitenv */
-#endif /* !____p___winitenv_defined */
+#endif /* !____p___winitenv_defined && __CRT_HAVE___p___winitenv */
 #ifdef ____p___winitenv_defined
 #define __winitenv (*__p___winitenv())
 #endif /* ____p___winitenv_defined */
@@ -2772,14 +2724,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_get_wpgmptr, __FORCELOCAL __ATTR_ARTIFICIAL err
 #ifdef __CRT_HAVE__fmode
 __LIBC int _fmode;
 #else /* ... */
-#ifndef ____p__fmode_defined
+#if !defined(____p__fmode_defined) && defined(__CRT_HAVE___p__fmode)
 #define ____p__fmode_defined 1
-#ifdef __CRT_HAVE___p__fmode
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p__fmode,(void),())
-#else /* __CRT_HAVE___p__fmode */
-#undef ____p__fmode_defined
-#endif /* !__CRT_HAVE___p__fmode */
-#endif /* !____p__fmode_defined */
+#endif /* !____p__fmode_defined && __CRT_HAVE___p__fmode */
 #ifdef ____p__fmode_defined
 #define _fmode (*__p__fmode())
 #endif /* ____p__fmode_defined */
@@ -3854,30 +3802,18 @@ __CREDIRECT(,onexit_t,__NOTHROW_NCX,onexit,(onexit_t __func),_onexit,(__func))
 #endif /* ... */
 #ifndef _WSTDLIB_DEFINED
 #define _WSTDLIB_DEFINED
-#ifndef ___wgetenv_defined
+#if !defined(___wgetenv_defined) && defined(__CRT_HAVE__wgetenv)
 #define ___wgetenv_defined 1
-#ifdef __CRT_HAVE__wgetenv
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wgetenv,(wchar_t const *__varname),(__varname))
-#else /* __CRT_HAVE__wgetenv */
-#undef ___wgetenv_defined
-#endif /* !__CRT_HAVE__wgetenv */
-#endif /* !___wgetenv_defined */
-#ifndef ___wgetenv_s_defined
+#endif /* !___wgetenv_defined && __CRT_HAVE__wgetenv */
+#if !defined(___wgetenv_s_defined) && defined(__CRT_HAVE__wgetenv_s)
 #define ___wgetenv_s_defined 1
-#ifdef __CRT_HAVE__wgetenv_s
 __CDECLARE(__ATTR_NONNULL((1, 4)),errno_t,__NOTHROW_NCX,_wgetenv_s,(__SIZE_TYPE__ *__return_size, wchar_t *__buf, __SIZE_TYPE__ __buflen, wchar_t const *__varname),(__return_size,__buf,__buflen,__varname))
-#else /* __CRT_HAVE__wgetenv_s */
-#undef ___wgetenv_s_defined
-#endif /* !__CRT_HAVE__wgetenv_s */
-#endif /* !___wgetenv_s_defined */
-#ifndef ___wdupenv_s_defined
+#endif /* !___wgetenv_s_defined && __CRT_HAVE__wgetenv_s */
+#if !defined(___wdupenv_s_defined) && defined(__CRT_HAVE__wdupenv_s)
 #define ___wdupenv_s_defined 1
-#ifdef __CRT_HAVE__wdupenv_s
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_NCX,_wdupenv_s,(wchar_t **__pbuf, __SIZE_TYPE__ *__pbuflen, wchar_t const *__varname),(__pbuf,__pbuflen,__varname))
-#else /* __CRT_HAVE__wdupenv_s */
-#undef ___wdupenv_s_defined
-#endif /* !__CRT_HAVE__wdupenv_s */
-#endif /* !___wdupenv_s_defined */
+#endif /* !___wdupenv_s_defined && __CRT_HAVE__wdupenv_s */
 #ifndef _CRT_WSYSTEM_DEFINED
 #define _CRT_WSYSTEM_DEFINED 1
 #ifdef __CRT_HAVE_wsystem
@@ -4481,14 +4417,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wtoll_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !_WSTDLIB_DEFINED */
 #ifndef _WSTDLIBP_DEFINED
 #define _WSTDLIBP_DEFINED 1
-#ifndef ___wfullpath_defined
+#if !defined(___wfullpath_defined) && defined(__CRT_HAVE__wfullpath)
 #define ___wfullpath_defined 1
-#ifdef __CRT_HAVE__wfullpath
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,_wfullpath,(wchar_t *__buf, wchar_t const *__path, __SIZE_TYPE__ __buflen),(__buf,__path,__buflen))
-#else /* __CRT_HAVE__wfullpath */
-#undef ___wfullpath_defined
-#endif /* !__CRT_HAVE__wfullpath */
-#endif /* !___wfullpath_defined */
+#endif /* !___wfullpath_defined && __CRT_HAVE__wfullpath */
 #ifndef ___wmakepath_s_defined
 #define ___wmakepath_s_defined 1
 #ifdef __CRT_HAVE__wmakepath_s
@@ -4522,30 +4454,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_wperror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __NO_STDSTREAMS || !__libc_geterrno || (!__CRT_HAVE_fprintf && !__CRT_HAVE__IO_fprintf && !__CRT_HAVE_fprintf_s && !__CRT_HAVE_fprintf_unlocked && !__CRT_HAVE_vfprintf && !__CRT_HAVE_vfprintf_s && !__CRT_HAVE__IO_vfprintf && !__CRT_HAVE_vfprintf_unlocked && !__CRT_HAVE_file_printer && !__CRT_HAVE_file_printer_unlocked && !__CRT_HAVE_fputc && !__CRT_HAVE_putc && !__CRT_HAVE__IO_putc && !__CRT_HAVE_fputc_unlocked && !__CRT_HAVE_putc_unlocked && (!__CRT_DOS || !__CRT_HAVE__flsbuf) && !__CRT_HAVE_fwrite && !__CRT_HAVE__IO_fwrite && !__CRT_HAVE_fwrite_s && !__CRT_HAVE_fwrite_unlocked && !__CRT_HAVE__fwrite_nolock) */
 #endif /* !__CRT_HAVE__wperror */
 #endif /* !_CRT_WPERROR_DEFINED */
-#ifndef ___wputenv_defined
+#if !defined(___wputenv_defined) && defined(__CRT_HAVE__wputenv)
 #define ___wputenv_defined 1
-#ifdef __CRT_HAVE__wputenv
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wputenv,(wchar_t *__string),(__string))
-#else /* __CRT_HAVE__wputenv */
-#undef ___wputenv_defined
-#endif /* !__CRT_HAVE__wputenv */
-#endif /* !___wputenv_defined */
-#ifndef ___wputenv_s_defined
+#endif /* !___wputenv_defined && __CRT_HAVE__wputenv */
+#if !defined(___wputenv_s_defined) && defined(__CRT_HAVE__wputenv_s)
 #define ___wputenv_s_defined 1
-#ifdef __CRT_HAVE__wputenv_s
 __CDECLARE(,errno_t,__NOTHROW_NCX,_wputenv_s,(wchar_t const *__varname, wchar_t const *__val),(__varname,__val))
-#else /* __CRT_HAVE__wputenv_s */
-#undef ___wputenv_s_defined
-#endif /* !__CRT_HAVE__wputenv_s */
-#endif /* !___wputenv_s_defined */
-#ifndef ___wsearchenv_s_defined
+#endif /* !___wputenv_s_defined && __CRT_HAVE__wputenv_s */
+#if !defined(___wsearchenv_s_defined) && defined(__CRT_HAVE__wsearchenv_s)
 #define ___wsearchenv_s_defined 1
-#ifdef __CRT_HAVE__wsearchenv_s
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),errno_t,__NOTHROW_RPC,_wsearchenv_s,(wchar_t const *__file, wchar_t const *__envvar, wchar_t *__restrict __resultpath, __SIZE_TYPE__ __buflen),(__file,__envvar,__resultpath,__buflen))
-#else /* __CRT_HAVE__wsearchenv_s */
-#undef ___wsearchenv_s_defined
-#endif /* !__CRT_HAVE__wsearchenv_s */
-#endif /* !___wsearchenv_s_defined */
+#endif /* !___wsearchenv_s_defined && __CRT_HAVE__wsearchenv_s */
 #ifndef ___wsearchenv_defined
 #define ___wsearchenv_defined 1
 #ifdef __CRT_HAVE__wsearchenv

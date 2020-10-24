@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b53ce91 */
+/* HASH CRC-32:0x2fc99f6c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -250,15 +250,11 @@ struct gaicb {
 
 
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
-#ifndef ____h_errno_location_defined
+#if !defined(____h_errno_location_defined) && defined(__CRT_HAVE___h_errno_location)
 #define ____h_errno_location_defined 1
-#ifdef __CRT_HAVE___h_errno_location
 /* Function to get address of global `h_errno' variable */
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__h_errno_location,(void),())
-#else /* __CRT_HAVE___h_errno_location */
-#undef ____h_errno_location_defined
-#endif /* !__CRT_HAVE___h_errno_location */
-#endif /* !____h_errno_location_defined */
+#endif /* !____h_errno_location_defined && __CRT_HAVE___h_errno_location */
 /* Error status for non-reentrant lookup functions.
  * We use a macro to access always the thread-specific `h_errno' variable. */
 #ifdef ____h_errno_location_defined
@@ -457,18 +453,14 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,rcmd_af,(char **__restrict __ahost, __UINT16_T
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,rexec,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p),(__ahost,__rport,__name,__pass,__cmd,__fd2p))
-#ifndef __rexec_af_defined
+#if !defined(__rexec_af_defined) && defined(__CRT_HAVE_rexec_af)
 #define __rexec_af_defined 1
-#ifdef __CRT_HAVE_rexec_af
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, __UINT16_TYPE__ __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
-#else /* __CRT_HAVE_rexec_af */
-#undef __rexec_af_defined
-#endif /* !__CRT_HAVE_rexec_af */
-#endif /* !__rexec_af_defined */
+#endif /* !__rexec_af_defined && __CRT_HAVE_rexec_af */
 /* Check whether user REMUSER on system RHOST is allowed to login as LOCUSER.
  * If SUSER is not zero the user tries to become superuser. Return 0 if
  * it is possible.
@@ -499,18 +491,14 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,iruserok_af,(void const *__raddr, int __suser,
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,rresvport,(int *__alport),(__alport))
-#ifndef __rresvport_af_defined
+#if !defined(__rresvport_af_defined) && defined(__CRT_HAVE_rresvport_af)
 #define __rresvport_af_defined 1
-#ifdef __CRT_HAVE_rresvport_af
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, __UINT16_TYPE__ __af),(__alport,__af))
-#else /* __CRT_HAVE_rresvport_af */
-#undef __rresvport_af_defined
-#endif /* !__CRT_HAVE_rresvport_af */
-#endif /* !__rresvport_af_defined */
+#endif /* !__rresvport_af_defined && __CRT_HAVE_rresvport_af */
 #endif /* __USE_MISC */
 
 /* Extension from POSIX.1:2001. */

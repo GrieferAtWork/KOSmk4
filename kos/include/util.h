@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x159f0a40 */
+/* HASH CRC-32:0xa89fddb3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,15 +88,11 @@ typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 
-#ifndef __login_defined
+#if !defined(__login_defined) && defined(__CRT_HAVE_login)
 #define __login_defined 1
-#ifdef __CRT_HAVE_login
 /* Write the given entry into utmp and wtmp */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_RPC_KOS,login,(struct utmp const *__entry),(__entry))
-#else /* __CRT_HAVE_login */
-#undef __login_defined
-#endif /* !__CRT_HAVE_login */
-#endif /* !__login_defined */
+#endif /* !__login_defined && __CRT_HAVE_login */
 #ifndef __login_tty_defined
 #define __login_tty_defined 1
 #ifdef __CRT_HAVE_login_tty
@@ -115,29 +111,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(login_tty, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #endif /* !__TIOCSCTTY || !__CRT_HAVE_ioctl || !__CRT_HAVE_setsid || (!__CRT_HAVE_dup2 && !__CRT_HAVE__dup2 && !__CRT_HAVE___dup2) || (!__CRT_HAVE_close && !__CRT_HAVE__close && !__CRT_HAVE___close) */
 #endif /* !__CRT_HAVE_login_tty */
 #endif /* !__login_tty_defined */
-#ifndef __logout_defined
+#if !defined(__logout_defined) && defined(__CRT_HAVE_logout)
 #define __logout_defined 1
-#ifdef __CRT_HAVE_logout
 /* Write the utmp entry to say the user on UT_LINE has logged out */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,logout,(char const *__ut_line),(__ut_line))
-#else /* __CRT_HAVE_logout */
-#undef __logout_defined
-#endif /* !__CRT_HAVE_logout */
-#endif /* !__logout_defined */
-#ifndef __logwtmp_defined
+#endif /* !__logout_defined && __CRT_HAVE_logout */
+#if !defined(__logwtmp_defined) && defined(__CRT_HAVE_logwtmp)
 #define __logwtmp_defined 1
-#ifdef __CRT_HAVE_logwtmp
 /* Append to wtmp an entry for the current time and the given info */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_RPC_KOS,logwtmp,(char const *__ut_line, char const *__ut_name, char const *__ut_host),(__ut_line,__ut_name,__ut_host))
-#else /* __CRT_HAVE_logwtmp */
-#undef __logwtmp_defined
-#endif /* !__CRT_HAVE_logwtmp */
-#endif /* !__logwtmp_defined */
+#endif /* !__logwtmp_defined && __CRT_HAVE_logwtmp */
 /* @param: dflags: Set of `0 | OPENDEV_PART | OPENDEV_BLCK' */
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,opendev,(char const *__path, __oflag_t __oflags, __STDC_INT_AS_UINT_T __dflags, char **__realpath),(__path,__oflags,__dflags,__realpath))
-#ifndef __openpty_defined
+#if !defined(__openpty_defined) && defined(__CRT_HAVE_openpty)
 #define __openpty_defined 1
-#ifdef __CRT_HAVE_openpty
 /* >> openpty(2)
  * Create a new ptty (psuedo tty), storing the handles for the
  * master/slave adapters in `*amaster' and `*aslave'. Additionally,
@@ -155,10 +142,7 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,opendev,(
  *       operating system it is often implemented via `open(2)',
  *       possibly combined with `ioctl(2)'. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,openpty,(__fd_t *__amaster, __fd_t *__aslave, char *__name, struct termios const *__termp, struct winsize const *__winp),(__amaster,__aslave,__name,__termp,__winp))
-#else /* __CRT_HAVE_openpty */
-#undef __openpty_defined
-#endif /* !__CRT_HAVE_openpty */
-#endif /* !__openpty_defined */
+#endif /* !__openpty_defined && __CRT_HAVE_openpty */
 #ifndef __forkpty_defined
 #define __forkpty_defined 1
 #ifdef __CRT_HAVE_forkpty

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc54b64d0 */
+/* HASH CRC-32:0x1c75bc13 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,51 +57,35 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifndef __hop_defined
+#if !defined(__hop_defined) && defined(__CRT_HAVE_hop)
 #define __hop_defined 1
-#ifdef __CRT_HAVE_hop
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __CASMNAME_SAME("hop");
-#else /* __CRT_HAVE_hop */
-#undef __hop_defined
-#endif /* !__CRT_HAVE_hop */
-#endif /* !__hop_defined */
-#ifndef __hopf_defined
+#endif /* !__hop_defined && __CRT_HAVE_hop */
+#if !defined(__hopf_defined) && defined(__CRT_HAVE_hopf)
 #define __hopf_defined 1
-#ifdef __CRT_HAVE_hopf
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t __NOTHROW_NCX(__VLIBCCALL hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __CASMNAME_SAME("hopf");
-#else /* __CRT_HAVE_hopf */
-#undef __hopf_defined
-#endif /* !__CRT_HAVE_hopf */
-#endif /* !__hopf_defined */
+#endif /* !__hopf_defined && __CRT_HAVE_hopf */
 
 
 
 /* Exception-enabled variants */
 
-#ifndef __Hop_defined
+#if !defined(__Hop_defined) && defined(__CRT_HAVE_Hop)
 #define __Hop_defined 1
-#ifdef __CRT_HAVE_Hop
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t (__VLIBCCALL Hop)(__fd_t __fd, __syscall_ulong_t __cmd, ...) __THROWS(...) __CASMNAME_SAME("Hop");
-#else /* __CRT_HAVE_Hop */
-#undef __Hop_defined
-#endif /* !__CRT_HAVE_Hop */
-#endif /* !__Hop_defined */
-#ifndef __Hopf_defined
+#endif /* !__Hop_defined && __CRT_HAVE_Hop */
+#if !defined(__Hopf_defined) && defined(__CRT_HAVE_Hopf)
 #define __Hopf_defined 1
-#ifdef __CRT_HAVE_Hopf
 /* Perform a handle operation specified by `cmd'
  * @param: cmd: One of `HOP_<type>_<command>' */
 __LIBC __syscall_slong_t (__VLIBCCALL Hopf)(__fd_t __fd, __syscall_ulong_t __cmd, __iomode_t __mode, ...) __THROWS(...) __CASMNAME_SAME("Hopf");
-#else /* __CRT_HAVE_Hopf */
-#undef __Hopf_defined
-#endif /* !__CRT_HAVE_Hopf */
-#endif /* !__Hopf_defined */
+#endif /* !__Hopf_defined && __CRT_HAVE_Hopf */
 
 __SYSDECL_END
 #endif /* __CC__ */

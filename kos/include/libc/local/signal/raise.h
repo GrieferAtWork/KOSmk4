@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf97598a */
+/* HASH CRC-32:0x282f8725 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,9 +66,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(voi
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo),kill,(__pid,__signo))
 #endif /* !__local___localdep_kill_defined && __CRT_HAVE_kill */
 /* Dependency: pthread_kill from signal */
-#ifndef __local___localdep_pthread_kill_defined
+#if !defined(__local___localdep_pthread_kill_defined) && defined(__CRT_HAVE_pthread_kill)
 #define __local___localdep_pthread_kill_defined 1
-#ifdef __CRT_HAVE_pthread_kill
 __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -77,10 +76,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: EOK:    Success
  * @return: EINVAL: The given `signo' is invalid */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_kill,(__pthread_t __pthread, __signo_t __signo),pthread_kill,(__pthread,__signo))
-#else /* __CRT_HAVE_pthread_kill */
-#undef __local___localdep_pthread_kill_defined
-#endif /* !__CRT_HAVE_pthread_kill */
-#endif /* !__local___localdep_pthread_kill_defined */
+#endif /* !__local___localdep_pthread_kill_defined && __CRT_HAVE_pthread_kill */
 /* Dependency: pthread_self from pthread */
 #ifndef __local___localdep_pthread_self_defined
 #define __local___localdep_pthread_self_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb931db4c */
+/* HASH CRC-32:0x6f0001a1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -151,9 +151,8 @@ struct option {
 	__INT32_TYPE__   val;
 };
 
-#ifndef __getopt_defined
+#if !defined(__getopt_defined) && defined(__CRT_HAVE_getopt)
 #define __getopt_defined 1
-#ifdef __CRT_HAVE_getopt
 /* Return the option character from OPTS just read.  Return -1 when
  * there are no more options.  For unrecognized options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
@@ -170,10 +169,7 @@ struct option {
  *   arguments to the option '\0'.  This behavior is specific to the GNU
  *   `getopt' */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___argv[], char const *__shortopts),(___argc,___argv,__shortopts))
-#else /* __CRT_HAVE_getopt */
-#undef __getopt_defined
-#endif /* !__CRT_HAVE_getopt */
-#endif /* !__getopt_defined */
+#endif /* !__getopt_defined && __CRT_HAVE_getopt */
 /* Return the option character from OPTS just read.  Return -1 when
  * there are no more options.  For unrecognized options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is

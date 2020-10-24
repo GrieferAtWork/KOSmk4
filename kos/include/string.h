@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf6ea482 */
+/* HASH CRC-32:0x4e938351 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7295,38 +7295,22 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),wchar_t *,__NOTHROW_NCX,wcstok,(wchar_t *__st
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcstok, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2, 3)) wchar_t *__NOTHROW_NCX(__LIBCCALL wcstok)(wchar_t *__string, wchar_t const *__restrict __delim, wchar_t **__restrict __save_ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcstok))(__string, __delim, __save_ptr); })
 #endif /* !... */
 #endif /* !__wcstok_defined */
-#ifndef ___wcserror_defined
+#if !defined(___wcserror_defined) && defined(__CRT_HAVE__wcserror)
 #define ___wcserror_defined 1
-#ifdef __CRT_HAVE__wcserror
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,_wcserror,(int __errno_value),(__errno_value))
-#else /* __CRT_HAVE__wcserror */
-#undef ___wcserror_defined
-#endif /* !__CRT_HAVE__wcserror */
-#endif /* !___wcserror_defined */
-#ifndef ___wcserror_s_defined
+#endif /* !___wcserror_defined && __CRT_HAVE__wcserror */
+#if !defined(___wcserror_s_defined) && defined(__CRT_HAVE__wcserror_s)
 #define ___wcserror_s_defined 1
-#ifdef __CRT_HAVE__wcserror_s
 __CDECLARE(,__errno_t,__NOTHROW_NCX,_wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, int __errno_value),(__buf,__bufsize,__errno_value))
-#else /* __CRT_HAVE__wcserror_s */
-#undef ___wcserror_s_defined
-#endif /* !__CRT_HAVE__wcserror_s */
-#endif /* !___wcserror_s_defined */
-#ifndef ____wcserror_defined
+#endif /* !___wcserror_s_defined && __CRT_HAVE__wcserror_s */
+#if !defined(____wcserror_defined) && defined(__CRT_HAVE___wcserror)
 #define ____wcserror_defined 1
-#ifdef __CRT_HAVE___wcserror
 __CDECLARE(,wchar_t *,__NOTHROW_NCX,__wcserror,(wchar_t const *__message),(__message))
-#else /* __CRT_HAVE___wcserror */
-#undef ____wcserror_defined
-#endif /* !__CRT_HAVE___wcserror */
-#endif /* !____wcserror_defined */
-#ifndef ____wcserror_s_defined
+#endif /* !____wcserror_defined && __CRT_HAVE___wcserror */
+#if !defined(____wcserror_s_defined) && defined(__CRT_HAVE___wcserror_s)
 #define ____wcserror_s_defined 1
-#ifdef __CRT_HAVE___wcserror_s
 __CDECLARE(,__errno_t,__NOTHROW_NCX,__wcserror_s,(wchar_t *__buf, __SIZE_TYPE__ __bufsize, wchar_t const *__message),(__buf,__bufsize,__message))
-#else /* __CRT_HAVE___wcserror_s */
-#undef ____wcserror_s_defined
-#endif /* !__CRT_HAVE___wcserror_s */
-#endif /* !____wcserror_s_defined */
+#endif /* !____wcserror_s_defined && __CRT_HAVE___wcserror_s */
 #ifndef ___wcsicmp_defined
 #define ___wcsicmp_defined 1
 #ifdef __CRT_HAVE_wcscasecmp

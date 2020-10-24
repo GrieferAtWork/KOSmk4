@@ -526,6 +526,7 @@ incdir("");
 #include <kos/bits/except.h>
 #include <kos/bits/exception_data.h>
 #include <kos/bits/exception_info.h>
+#include <kos/bits/exception_nest.h>
 #include <kos/bits/fastexcept.h>
 #include <kos/bits/futex-expr.h>
 #include <kos/bits/futex.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1841fd9f */
+/* HASH CRC-32:0xc5ed13d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -282,33 +282,21 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,getpmsg,(__fd_t __fd, struct strbuf *__restric
 __CDECLARE_OPT(,int,__NOTHROW_RPC,putmsg,(__fd_t __fd, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, __STDC_INT_AS_UINT_T __flags),(__fd,__ctlptr,__dataptr,__flags))
 /* @param: flags: Set of `MSG_HIPRI | MSG_ANY | MSG_BAND' */
 __CDECLARE_OPT(,int,__NOTHROW_RPC,putpmsg,(__fd_t __fd, struct strbuf const *__ctlptr, struct strbuf const *__dataptr, __STDC_INT_AS_UINT_T __band, __STDC_INT_AS_UINT_T __flags),(__fd,__ctlptr,__dataptr,__band,__flags))
-#ifndef __fattach_defined
+#if !defined(__fattach_defined) && defined(__CRT_HAVE_fattach)
 #define __fattach_defined 1
-#ifdef __CRT_HAVE_fattach
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
-#else /* __CRT_HAVE_fattach */
-#undef __fattach_defined
-#endif /* !__CRT_HAVE_fattach */
-#endif /* !__fattach_defined */
-#ifndef __fdetach_defined
+#endif /* !__fattach_defined && __CRT_HAVE_fattach */
+#if !defined(__fdetach_defined) && defined(__CRT_HAVE_fdetach)
 #define __fdetach_defined 1
-#ifdef __CRT_HAVE_fdetach
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
-#else /* __CRT_HAVE_fdetach */
-#undef __fdetach_defined
-#endif /* !__CRT_HAVE_fdetach */
-#endif /* !__fdetach_defined */
-#ifndef __ioctl_defined
+#endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
+#if !defined(__ioctl_defined) && defined(__CRT_HAVE_ioctl)
 #define __ioctl_defined 1
-#ifdef __CRT_HAVE_ioctl
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
 __LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ULONGPTR_TYPE__ __request, ...) __CASMNAME_SAME("ioctl");
-#else /* __CRT_HAVE_ioctl */
-#undef __ioctl_defined
-#endif /* !__CRT_HAVE_ioctl */
-#endif /* !__ioctl_defined */
+#endif /* !__ioctl_defined && __CRT_HAVE_ioctl */
 
 __SYSDECL_END
 #endif /* __CC__ */

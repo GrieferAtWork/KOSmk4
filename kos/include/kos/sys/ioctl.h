@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5e592e7 */
+/* HASH CRC-32:0xc47524bd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,17 +33,13 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifndef __Ioctl_defined
+#if !defined(__Ioctl_defined) && defined(__CRT_HAVE_Ioctl)
 #define __Ioctl_defined 1
-#ifdef __CRT_HAVE_Ioctl
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
 __LIBC __SSIZE_TYPE__ (__VLIBCCALL Ioctl)(__fd_t __fd, unsigned long int __request, ...) __THROWS(...) __CASMNAME_SAME("Ioctl");
-#else /* __CRT_HAVE_Ioctl */
-#undef __Ioctl_defined
-#endif /* !__CRT_HAVE_Ioctl */
-#endif /* !__Ioctl_defined */
+#endif /* !__Ioctl_defined && __CRT_HAVE_Ioctl */
 
 __SYSDECL_END
 #endif /* __CC__ */

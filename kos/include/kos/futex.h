@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73b3b82a */
+/* HASH CRC-32:0x8ba79b39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1273,17 +1273,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,futex_timedwaitwhile_allbits64
 __NAMESPACE_LOCAL_USING_OR_IMPL(futex_timedwaitwhile_allbits64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL futex_timedwaitwhile_allbits64)(lfutex_t *__uaddr, lfutex_t __bitmask, struct timespec64 const *__rel_timeout) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_timedwaitwhile_allbits64))(__uaddr, __bitmask, __rel_timeout); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
-#ifndef ____os_gettid_defined
+#if !defined(____os_gettid_defined) && defined(__CRT_HAVE_gettid)
 #define ____os_gettid_defined 1
-#ifdef __CRT_HAVE_gettid
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__os_gettid,(void),gettid,())
-#else /* __CRT_HAVE_gettid */
-#undef ____os_gettid_defined
-#endif /* !__CRT_HAVE_gettid */
-#endif /* !____os_gettid_defined */
+#endif /* !____os_gettid_defined && __CRT_HAVE_gettid */
 
 
 

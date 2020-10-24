@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe097c175 */
+/* HASH CRC-32:0xcfb44823 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -571,17 +571,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 #ifdef __USE_XOPEN2K8
-#ifndef __FExecve_defined
+#if !defined(__FExecve_defined) && defined(__CRT_HAVE_FExecve)
 #define __FExecve_defined 1
-#ifdef __CRT_HAVE_FExecve
 /* >> fexecve(2)
  * Replace the calling process with the application image referred to by `FD' and
  * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CDECLARE_VOID(__ATTR_NORETURN __ATTR_NONNULL((2, 3)),__THROWING,FExecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
-#else /* __CRT_HAVE_FExecve */
-#undef __FExecve_defined
-#endif /* !__CRT_HAVE_FExecve */
-#endif /* !__FExecve_defined */
+#endif /* !__FExecve_defined && __CRT_HAVE_FExecve */
 #endif /* __USE_XOPEN2K8 */
 #ifdef __USE_GNU
 /* >> execvpe(3)

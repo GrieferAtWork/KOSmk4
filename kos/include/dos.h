@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3544fd8 */
+/* HASH CRC-32:0x964d9008 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,14 +58,10 @@ __SYSDECL_BEGIN
 
 #define diskfree_t _diskfree_t
 
-#ifndef _GETDISKFREE_DEFINED
+#if !defined(_GETDISKFREE_DEFINED) && defined(__CRT_HAVE__getdiskfree)
 #define _GETDISKFREE_DEFINED 1
-#ifdef __CRT_HAVE__getdiskfree
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
-#else /* __CRT_HAVE__getdiskfree */
-#undef _GETDISKFREE_DEFINED
-#endif /* !__CRT_HAVE__getdiskfree */
-#endif /* !_GETDISKFREE_DEFINED */
+#endif /* !_GETDISKFREE_DEFINED && __CRT_HAVE__getdiskfree */
 
 #if defined(__i386__) || defined(__x86_64__)
 __FORCELOCAL void (_disable)(void) { __cli(); }

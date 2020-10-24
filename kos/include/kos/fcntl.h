@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bf97a42 */
+/* HASH CRC-32:0xaf7ed184 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,14 +35,10 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifndef __Fcntl_defined
+#if !defined(__Fcntl_defined) && defined(__CRT_HAVE_Fcntl)
 #define __Fcntl_defined 1
-#ifdef __CRT_HAVE_Fcntl
 __LIBC __STDC_INT_AS_SSIZE_T (__VLIBCCALL Fcntl)(__fd_t __fd, int __cmd, ...) __THROWS(...) __CASMNAME_SAME("Fcntl");
-#else /* __CRT_HAVE_Fcntl */
-#undef __Fcntl_defined
-#endif /* !__CRT_HAVE_Fcntl */
-#endif /* !__Fcntl_defined */
+#endif /* !__Fcntl_defined && __CRT_HAVE_Fcntl */
 #ifndef __Open_defined
 #define __Open_defined 1
 #if defined(__CRT_HAVE_Open64) && defined(__USE_FILE_OFFSET64)

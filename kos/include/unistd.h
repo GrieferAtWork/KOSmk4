@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aa8275a */
+/* HASH CRC-32:0x58b3213d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -578,17 +578,13 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,getpid,(void),__getpid
 #endif /* !__getpid_defined */
 
 #ifdef __USE_KOS
-#ifndef __gettid_defined
+#if !defined(__gettid_defined) && defined(__CRT_HAVE_gettid)
 #define __gettid_defined 1
-#ifdef __CRT_HAVE_gettid
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,gettid,(void),())
-#else /* __CRT_HAVE_gettid */
-#undef __gettid_defined
-#endif /* !__CRT_HAVE_gettid */
-#endif /* !__gettid_defined */
+#endif /* !__gettid_defined && __CRT_HAVE_gettid */
 #endif /* __USE_KOS */
 
 #ifdef __CRT_HAVE_pipe
@@ -785,16 +781,12 @@ __CDECLARE_OPT(,int,__NOTHROW_RPC,pause,(void),())
  * return: -1: [errno=<unchanged>] The configuration specified by `NAME' is unlimited for `FD'
  * return: -1: [errno=EINVAL]      The given `NAME' isn't a recognized config option */
 __CDECLARE_OPT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,fpathconf,(__fd_t __fd, __STDC_INT_AS_UINT_T __name),(__fd,__name))
-#ifndef __ttyname_defined
+#if !defined(__ttyname_defined) && defined(__CRT_HAVE_ttyname)
 #define __ttyname_defined 1
-#ifdef __CRT_HAVE_ttyname
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,ttyname,(__fd_t __fd),(__fd))
-#else /* __CRT_HAVE_ttyname */
-#undef __ttyname_defined
-#endif /* !__CRT_HAVE_ttyname */
-#endif /* !__ttyname_defined */
+#endif /* !__ttyname_defined && __CRT_HAVE_ttyname */
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,ttyname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))
@@ -805,14 +797,10 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__f
  * Set the foreground process group of a given TTY file descriptor */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
 /* ... */
-#ifndef __getlogin_defined
+#if !defined(__getlogin_defined) && defined(__CRT_HAVE_getlogin)
 #define __getlogin_defined 1
-#ifdef __CRT_HAVE_getlogin
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
-#else /* __CRT_HAVE_getlogin */
-#undef __getlogin_defined
-#endif /* !__CRT_HAVE_getlogin */
-#endif /* !__getlogin_defined */
+#endif /* !__getlogin_defined && __CRT_HAVE_getlogin */
 #ifdef __CRT_HAVE_chown
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -1732,17 +1720,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(truncate64, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 #ifdef __USE_XOPEN2K8
 
-#ifndef __fexecve_defined
+#if !defined(__fexecve_defined) && defined(__CRT_HAVE_fexecve)
 #define __fexecve_defined 1
-#ifdef __CRT_HAVE_fexecve
 /* >> fexecve(2)
  * Replace the calling process with the application image referred to by `FD' and
  * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CDECLARE(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,fexecve,(__fd_t __fd, __TARGV, __TENVP),(__fd,___argv,___envp))
-#else /* __CRT_HAVE_fexecve */
-#undef __fexecve_defined
-#endif /* !__CRT_HAVE_fexecve */
-#endif /* !__fexecve_defined */
+#endif /* !__fexecve_defined && __CRT_HAVE_fexecve */
 #endif /* __USE_XOPEN2K8 */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
@@ -2072,14 +2056,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getentropy, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chroot,(char const *__restrict __path),(__path))
 
 /* ... */
-#ifndef __getpass_defined
+#if !defined(__getpass_defined) && defined(__CRT_HAVE_getpass)
 #define __getpass_defined 1
-#ifdef __CRT_HAVE_getpass
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))
-#else /* __CRT_HAVE_getpass */
-#undef __getpass_defined
-#endif /* !__CRT_HAVE_getpass */
-#endif /* !__getpass_defined */
+#endif /* !__getpass_defined && __CRT_HAVE_getpass */
 #endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
@@ -2170,22 +2150,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fdatasync, __FORCELOCAL __ATTR_ARTIFICIAL int __
 #endif /* __USE_POSIX199309 || __USE_UNIX98 */
 
 #ifdef __USE_XOPEN
-#ifndef __crypt_defined
+#if !defined(__crypt_defined) && defined(__CRT_HAVE_crypt)
 #define __crypt_defined 1
-#ifdef __CRT_HAVE_crypt
 __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
-#else /* __CRT_HAVE_crypt */
-#undef __crypt_defined
-#endif /* !__CRT_HAVE_crypt */
-#endif /* !__crypt_defined */
-#ifndef __encrypt_defined
+#endif /* !__crypt_defined && __CRT_HAVE_crypt */
+#if !defined(__encrypt_defined) && defined(__CRT_HAVE_encrypt)
 #define __encrypt_defined 1
-#ifdef __CRT_HAVE_encrypt
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, __STDC_INT_AS_UINT_T __edflag),(__glibc_block,__edflag))
-#else /* __CRT_HAVE_encrypt */
-#undef __encrypt_defined
-#endif /* !__CRT_HAVE_encrypt */
-#endif /* !__encrypt_defined */
+#endif /* !__encrypt_defined && __CRT_HAVE_encrypt */
 
 #ifndef __swab_defined
 #define __swab_defined 1
@@ -2213,24 +2185,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 #if (defined(_EVERY_SOURCE) || defined(__USE_SOLARIS) || \
      (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 /* ... */
-#ifndef __ctermid_defined
+#if !defined(__ctermid_defined) && defined(__CRT_HAVE_ctermid)
 #define __ctermid_defined 1
-#ifdef __CRT_HAVE_ctermid
 __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
-#else /* __CRT_HAVE_ctermid */
-#undef __ctermid_defined
-#endif /* !__CRT_HAVE_ctermid */
-#endif /* !__ctermid_defined */
-#ifndef __cuserid_defined
+#endif /* !__ctermid_defined && __CRT_HAVE_ctermid */
+#if !defined(__cuserid_defined) && defined(__CRT_HAVE_cuserid)
 #define __cuserid_defined 1
-#ifdef __CRT_HAVE_cuserid
 /* Return the name of the current user (`getpwuid(geteuid())'), storing
  * that name in `S'. When `S' is NULL, a static buffer is used instead */
 __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
-#else /* __CRT_HAVE_cuserid */
-#undef __cuserid_defined
-#endif /* !__CRT_HAVE_cuserid */
-#endif /* !__cuserid_defined */
+#endif /* !__cuserid_defined && __CRT_HAVE_cuserid */
 #endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
@@ -2241,9 +2205,8 @@ __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
 typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 #endif /* !____pthread_atfork_func_t_defined */
 
-#ifndef __pthread_atfork_defined
+#if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined 1
-#ifdef __CRT_HAVE_pthread_atfork
 /* Install handlers to be called when a new process is created with FORK.
  * The PREPARE handler is called in the parent process just before performing
  * FORK. The PARENT handler is called in the parent process just after FORK.
@@ -2257,10 +2220,7 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory to register callbacks */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_atfork,(__pthread_atfork_func_t __prepare, __pthread_atfork_func_t __parent, __pthread_atfork_func_t __child),(__prepare,__parent,__child))
-#else /* __CRT_HAVE_pthread_atfork */
-#undef __pthread_atfork_defined
-#endif /* !__CRT_HAVE_pthread_atfork */
-#endif /* !__pthread_atfork_defined */
+#endif /* !__pthread_atfork_defined && __CRT_HAVE_pthread_atfork */
 #endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_UNIX98 && !__USE_XOPEN2K) */
 
 
@@ -2411,57 +2371,37 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(closefrom, __FORCELOCAL __ATTR_ARTIFICIAL void _
 #endif /* __USE_BSD */
 
 #ifdef __USE_SOLARIS
-#ifndef __fattach_defined
+#if !defined(__fattach_defined) && defined(__CRT_HAVE_fattach)
 #define __fattach_defined 1
-#ifdef __CRT_HAVE_fattach
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC_KOS,fattach,(__fd_t __fd, char const *__restrict __path),(__fd,__path))
-#else /* __CRT_HAVE_fattach */
-#undef __fattach_defined
-#endif /* !__CRT_HAVE_fattach */
-#endif /* !__fattach_defined */
-#ifndef __fdetach_defined
+#endif /* !__fattach_defined && __CRT_HAVE_fattach */
+#if !defined(__fdetach_defined) && defined(__CRT_HAVE_fdetach)
 #define __fdetach_defined 1
-#ifdef __CRT_HAVE_fdetach
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_KOS,fdetach,(char const *__restrict __path),(__path))
-#else /* __CRT_HAVE_fdetach */
-#undef __fdetach_defined
-#endif /* !__CRT_HAVE_fdetach */
-#endif /* !__fdetach_defined */
-#ifndef __ioctl_defined
+#endif /* !__fdetach_defined && __CRT_HAVE_fdetach */
+#if !defined(__ioctl_defined) && defined(__CRT_HAVE_ioctl)
 #define __ioctl_defined 1
-#ifdef __CRT_HAVE_ioctl
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
 __LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_RPC(__VLIBCCALL ioctl)(__fd_t __fd, __ULONGPTR_TYPE__ __request, ...) __CASMNAME_SAME("ioctl");
-#else /* __CRT_HAVE_ioctl */
-#undef __ioctl_defined
-#endif /* !__CRT_HAVE_ioctl */
-#endif /* !__ioctl_defined */
-#ifndef __rexec_af_defined
+#endif /* !__ioctl_defined && __CRT_HAVE_ioctl */
+#if !defined(__rexec_af_defined) && defined(__CRT_HAVE_rexec_af)
 #define __rexec_af_defined 1
-#ifdef __CRT_HAVE_rexec_af
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,rexec_af,(char **__restrict __ahost, int __rport, char const *__restrict __name, char const *__restrict __pass, char const *__restrict __cmd, int *__restrict __fd2p, __UINT16_TYPE__ __af),(__ahost,__rport,__name,__pass,__cmd,__fd2p,__af))
-#else /* __CRT_HAVE_rexec_af */
-#undef __rexec_af_defined
-#endif /* !__CRT_HAVE_rexec_af */
-#endif /* !__rexec_af_defined */
-#ifndef __rresvport_af_defined
+#endif /* !__rexec_af_defined && __CRT_HAVE_rexec_af */
+#if !defined(__rresvport_af_defined) && defined(__CRT_HAVE_rresvport_af)
 #define __rresvport_af_defined 1
-#ifdef __CRT_HAVE_rresvport_af
 /* This is the equivalent function where the protocol can be selected
  * and which therefore can be used for IPv6.
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,rresvport_af,(int *__alport, __UINT16_TYPE__ __af),(__alport,__af))
-#else /* __CRT_HAVE_rresvport_af */
-#undef __rresvport_af_defined
-#endif /* !__CRT_HAVE_rresvport_af */
-#endif /* !__rresvport_af_defined */
+#endif /* !__rresvport_af_defined && __CRT_HAVE_rresvport_af */
 #ifndef __stime_defined
 #define __stime_defined 1
 #if defined(__CRT_HAVE_stime64) && defined(__USE_TIME_BITS64)

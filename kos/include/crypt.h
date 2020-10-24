@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20ef7ad5 */
+/* HASH CRC-32:0xe1257e6f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,22 +38,14 @@
 __SYSDECL_BEGIN
 
 __CDECLARE_VOID_OPT(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
-#ifndef __crypt_defined
+#if !defined(__crypt_defined) && defined(__CRT_HAVE_crypt)
 #define __crypt_defined 1
-#ifdef __CRT_HAVE_crypt
 __CDECLARE(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,crypt,(char const *__key, char const *__salt),(__key,__salt))
-#else /* __CRT_HAVE_crypt */
-#undef __crypt_defined
-#endif /* !__CRT_HAVE_crypt */
-#endif /* !__crypt_defined */
-#ifndef __encrypt_defined
+#endif /* !__crypt_defined && __CRT_HAVE_crypt */
+#if !defined(__encrypt_defined) && defined(__CRT_HAVE_encrypt)
 #define __encrypt_defined 1
-#ifdef __CRT_HAVE_encrypt
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,encrypt,(char *__glibc_block, __STDC_INT_AS_UINT_T __edflag),(__glibc_block,__edflag))
-#else /* __CRT_HAVE_encrypt */
-#undef __encrypt_defined
-#endif /* !__CRT_HAVE_encrypt */
-#endif /* !__encrypt_defined */
+#endif /* !__encrypt_defined && __CRT_HAVE_encrypt */
 
 #ifdef __USE_GNU
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,crypt_r,(char const *__key, char const *__salt, struct crypt_data *__restrict __data),(__key,__salt,__data))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62829ef */
+/* HASH CRC-32:0x8580a166 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,15 +197,11 @@ __LIBC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) error_register_state
 /* Throw the currently set (in `error_data()') exception. */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_throw_current)(void) __THROWS(...) __CASMNAME_SAME("error_throw_current");
 #endif /* __CRT_HAVE_error_throw_current */
-#ifndef __error_rethrow_defined
+#if !defined(__error_rethrow_defined) && defined(__CRT_HAVE_error_rethrow)
 #define __error_rethrow_defined 1
-#ifdef __CRT_HAVE_error_rethrow
 /* Rethrow the current exception (same as a c++ `throw;' expression) */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__LIBKCALL error_rethrow)(void) __THROWS(...) __CASMNAME_SAME("error_rethrow");
-#else /* __CRT_HAVE_error_rethrow */
-#undef __error_rethrow_defined
-#endif /* !__CRT_HAVE_error_rethrow */
-#endif /* !__error_rethrow_defined */
+#endif /* !__error_rethrow_defined && __CRT_HAVE_error_rethrow */
 /* Rethrow the last exception */
 #ifdef __error_rethrow_defined
 #define RETHROW() error_rethrow()
@@ -237,24 +233,16 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(error_code_t __code);
 #else /* __INTELLISENSE__ */
 
 #ifndef THROW
-#ifndef __error_throw_defined
+#if !defined(__error_throw_defined) && defined(__CRT_HAVE_error_throw)
 #define __error_throw_defined 1
-#ifdef __CRT_HAVE_error_throw
 /* Throw an exception and fill exception pointers with all zeroes */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROW_CC error_throw)(error_code_t __code) __THROWS(...) __CASMNAME_SAME("error_throw");
-#else /* __CRT_HAVE_error_throw */
-#undef __error_throw_defined
-#endif /* !__CRT_HAVE_error_throw */
-#endif /* !__error_throw_defined */
-#ifndef __error_thrown_defined
+#endif /* !__error_throw_defined && __CRT_HAVE_error_throw */
+#if !defined(__error_thrown_defined) && defined(__CRT_HAVE_error_thrown)
 #define __error_thrown_defined 1
-#ifdef __CRT_HAVE_error_thrown
 /* Throw an exception and load `argc' pointers from varargs */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME_SAME("error_thrown");
-#else /* __CRT_HAVE_error_thrown */
-#undef __error_thrown_defined
-#endif /* !__CRT_HAVE_error_thrown */
-#endif /* !__error_thrown_defined */
+#endif /* !__error_thrown_defined && __CRT_HAVE_error_thrown */
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code
 #define __PRIVATE_THROW_PACKAGE_CODE2       ERROR_CODE
 #define __PRIVATE_THROW_PACKAGE_CODEN2(n)   __PRIVATE_THROW_PACKAGE_CODE##n
@@ -302,24 +290,16 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_c
 #define was_thrown(code)                                    __PRIVATE_WAS_THROWN_PACKAGE_CODE code
 #endif /* !was_thrown */
 #endif /* !__INTELLISENSE__ */
-#ifndef __error_nesting_begin_defined
+#if !defined(__error_nesting_begin_defined) && defined(__CRT_HAVE_error_nesting_begin)
 #define __error_nesting_begin_defined 1
-#ifdef __CRT_HAVE_error_nesting_begin
 /* Begin a nested TRY-block. (i.e. inside of another EXCEPT block) */
 __LIBC __ATTR_NONNULL((1)) void (__ERROR_NESTING_BEGIN_CC error_nesting_begin)(struct _exception_nesting_data *__restrict __saved) __THROWS(...) __CASMNAME_SAME("error_nesting_begin");
-#else /* __CRT_HAVE_error_nesting_begin */
-#undef __error_nesting_begin_defined
-#endif /* !__CRT_HAVE_error_nesting_begin */
-#endif /* !__error_nesting_begin_defined */
-#ifndef __error_nesting_end_defined
+#endif /* !__error_nesting_begin_defined && __CRT_HAVE_error_nesting_begin */
+#if !defined(__error_nesting_end_defined) && defined(__CRT_HAVE_error_nesting_end)
 #define __error_nesting_end_defined 1
-#ifdef __CRT_HAVE_error_nesting_end
 /* End a nested TRY-block. (i.e. inside of another EXCEPT block) */
 __LIBC __ATTR_NONNULL((1)) void (__ERROR_NESTING_END_CC error_nesting_end)(struct _exception_nesting_data *__restrict __saved) __THROWS(...) __CASMNAME_SAME("error_nesting_end");
-#else /* __CRT_HAVE_error_nesting_end */
-#undef __error_nesting_end_defined
-#endif /* !__CRT_HAVE_error_nesting_end */
-#endif /* !__error_nesting_end_defined */
+#endif /* !__error_nesting_end_defined && __CRT_HAVE_error_nesting_end */
 #ifdef __cplusplus
 /* TODO: In user-space, using TRY and EXCEPT should leave some sort of marker in the
  *       binary that allows for libc to consider these handlers as `dlexceptaware(3)'

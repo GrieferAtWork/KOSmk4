@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3e0a54f */
+/* HASH CRC-32:0xd347c36 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,17 +142,13 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
 #endif /* !... */
 #endif /* !__local___localdep_dup2_defined */
 /* Dependency: fexecve from unistd */
-#ifndef __local___localdep_fexecve_defined
+#if !defined(__local___localdep_fexecve_defined) && defined(__CRT_HAVE_fexecve)
 #define __local___localdep_fexecve_defined 1
-#ifdef __CRT_HAVE_fexecve
 /* >> fexecve(2)
  * Replace the calling process with the application image referred to by `FD' and
  * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_fexecve,(__fd_t __fd, __TARGV, __TENVP),fexecve,(__fd,___argv,___envp))
-#else /* __CRT_HAVE_fexecve */
-#undef __local___localdep_fexecve_defined
-#endif /* !__CRT_HAVE_fexecve */
-#endif /* !__local___localdep_fexecve_defined */
+#endif /* !__local___localdep_fexecve_defined && __CRT_HAVE_fexecve */
 /* Dependency: fork from unistd */
 #ifndef __local___localdep_fork_defined
 #define __local___localdep_fork_defined 1

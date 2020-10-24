@@ -2630,27 +2630,27 @@ no_usable_bindings:
 			ignoreNamespaceBindings: bool = false,
 			ignoreFastBindings: bool = false) {
 		try {
-			local usedBindings = functionBindings;
-			if (ignoreFastBindings) {
-				for (local b: usedBindings) {
-					b = b.functionBinding;
-					if (b !is InlineFunction || !b.isFastBinding)
+			local usedBindings = [];
+			if (exposedName is none)
+				exposedName = this.name;
+			for (local b: functionBindings) {
+				local bBind = b.functionBinding;
+				if (bBind is InlineFunction) {
+					if (ignoreFastBindings && bBind.isFastBinding)
 						continue;
-					local realUsedBindings = [];
-					for (local b: usedBindings) {
-						local bBind = b.functionBinding;
-						if (bBind !is InlineFunction || !bBind.isFastBinding)
-							realUsedBindings.append(b);
-					}
-					usedBindings = realUsedBindings;
-					break;
+				} else if (bBind is NamespaceBinding) {
+					if (ignoreNamespaceBindings)
+						continue;
+					if (bBind.namespace === fp.namespace)
+						continue;
+					if (bBind.importName != exposedName)
+						continue;
 				}
+				usedBindings.append(b);
 			}
 			if (!usedBindings)
 				return; /* No bindings -> Noop */
 			local doc = documentationString;
-			if (exposedName is none)
-				exposedName = this.name;
 			if (guardName is bool) {
 				guardName = guardName
 					? fp.namespace.keyDefaultGuard(exposedName)
@@ -2682,11 +2682,6 @@ no_usable_bindings:
 					local bind = usedBindings.first;
 					/* Special case: Can't bind against a declaration from the current namespace! */
 					local bindBinding = bind.functionBinding;
-					if (bindBinding is NamespaceBinding &&
-					    (ignoreNamespaceBindings ||
-					     bindBinding.namespace === fp.namespace ||
-					     bindBinding.importName != exposedName))
-						return;
 					local extendedPrefixes = [];
 					for (local x: bind.ppCondPrefix) {
 						if (!fp.wasPrefixPrinted(escapeText(x, escapeMode,
@@ -2757,14 +2752,6 @@ normal_guardName_binding:
 			for (local bind: usedBindings) {
 				/* Special case: Can't bind against a declaration from the current namespace! */
 				local bindBinding = bind.functionBinding;
-				if (bindBinding is NamespaceBinding) {
-					if (ignoreNamespaceBindings)
-						continue;
-					if (bindBinding.namespace === fp.namespace)
-						continue;
-					if (bindBinding.importName != exposedName)
-						continue;
-				}
 				local extendedPrefixes = [];
 				local newExtendedPrefixes = [];
 				local usedPpCond = escapeText(

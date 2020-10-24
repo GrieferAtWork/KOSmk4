@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce02546a */
+/* HASH CRC-32:0x5b615831 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1379,14 +1379,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(siggetmask, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #ifdef _sys_siglist
 #define sys_siglist _sys_siglist
 #else /* _sys_siglist */
-#ifndef ____p_sys_siglist_defined
+#if !defined(____p_sys_siglist_defined) && defined(__CRT_HAVE___p_sys_siglist)
 #define ____p_sys_siglist_defined 1
-#ifdef __CRT_HAVE___p_sys_siglist
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__NOTHROW,__p_sys_siglist,(void),())
-#else /* __CRT_HAVE___p_sys_siglist */
-#undef ____p_sys_siglist_defined
-#endif /* !__CRT_HAVE___p_sys_siglist */
-#endif /* !____p_sys_siglist_defined */
+#endif /* !____p_sys_siglist_defined && __CRT_HAVE___p_sys_siglist */
 #ifdef ____p_sys_siglist_defined
 #define sys_siglist  __p_sys_siglist()
 #define _sys_siglist __p_sys_siglist()
@@ -2015,22 +2011,17 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_sigmask,(__STDC_INT_AS_UINT_T __how
 #undef __pthread_sigmask_defined
 #endif /* !... */
 #endif /* !__pthread_sigmask_defined */
-#ifndef __pthread_kill_defined
+#if !defined(__pthread_kill_defined) && defined(__CRT_HAVE_pthread_kill)
 #define __pthread_kill_defined 1
-#ifdef __CRT_HAVE_pthread_kill
 /* >> pthread_kill(3)
  * Portable function for sending a signal to a specific `pthread' within one's own process.
  * @return: EOK:    Success
  * @return: EINVAL: The given `signo' is invalid */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo_t __signo),(__pthread,__signo))
-#else /* __CRT_HAVE_pthread_kill */
-#undef __pthread_kill_defined
-#endif /* !__CRT_HAVE_pthread_kill */
-#endif /* !__pthread_kill_defined */
+#endif /* !__pthread_kill_defined && __CRT_HAVE_pthread_kill */
 #ifdef __USE_GNU
-#ifndef __pthread_sigqueue_defined
+#if !defined(__pthread_sigqueue_defined) && defined(__CRT_HAVE_pthread_sigqueue)
 #define __pthread_sigqueue_defined 1
-#ifdef __CRT_HAVE_pthread_sigqueue
 /* >> pthread_sigqueue(3)
  * This function is for `pthread_kill(3)', what `sigqueue(2)' is for `kill(2)',
  * in that it sends a signal to `pthread', alongside a custom signal value `val'
@@ -2045,10 +2036,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_kill,(__pthread_t __pthread, __signo
  * @return: EINVAL: The given `signo' is invalid
  * @return: ESRCH:  The given `pthread' has already terminated, and could no longer handle the signal */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_sigqueue,(__pthread_t __pthread, __signo_t __signo, union sigval const __val),(__pthread,__signo,__val))
-#else /* __CRT_HAVE_pthread_sigqueue */
-#undef __pthread_sigqueue_defined
-#endif /* !__CRT_HAVE_pthread_sigqueue */
-#endif /* !__pthread_sigqueue_defined */
+#endif /* !__pthread_sigqueue_defined && __CRT_HAVE_pthread_sigqueue */
 #endif /* __USE_GNU */
 #endif /* __USE_POSIX199506 || __USE_UNIX98 */
 #ifdef __USE_KOS

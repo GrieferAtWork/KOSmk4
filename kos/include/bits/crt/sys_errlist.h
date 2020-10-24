@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1eed9eea */
+/* HASH CRC-32:0x73054274 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,14 +40,10 @@ __SYSDECL_BEGIN
 #ifdef sys_errlist
 #define _sys_errlist sys_errlist
 #else /* sys_errlist */
-#ifndef ____sys_errlist_defined
+#if !defined(____sys_errlist_defined) && defined(__CRT_HAVE___sys_errlist)
 #define ____sys_errlist_defined 1
-#ifdef __CRT_HAVE___sys_errlist
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__NOTHROW,__sys_errlist,(void),())
-#else /* __CRT_HAVE___sys_errlist */
-#undef ____sys_errlist_defined
-#endif /* !__CRT_HAVE___sys_errlist */
-#endif /* !____sys_errlist_defined */
+#endif /* !____sys_errlist_defined && __CRT_HAVE___sys_errlist */
 #ifdef ____sys_errlist_defined
 #define _sys_errlist (__sys_errlist())
 #endif /* ____sys_errlist_defined */
@@ -73,14 +69,10 @@ __LIBC char const *const sys_errlist[];
 #ifdef sys_nerr
 #define _sys_nerr sys_nerr
 #else /* sys_nerr */
-#ifndef ____sys_nerr_defined
+#if !defined(____sys_nerr_defined) && defined(__CRT_HAVE___sys_nerr)
 #define ____sys_nerr_defined 1
-#ifdef __CRT_HAVE___sys_nerr
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__sys_nerr,(void),())
-#else /* __CRT_HAVE___sys_nerr */
-#undef ____sys_nerr_defined
-#endif /* !__CRT_HAVE___sys_nerr */
-#endif /* !____sys_nerr_defined */
+#endif /* !____sys_nerr_defined && __CRT_HAVE___sys_nerr */
 #ifdef ____sys_nerr_defined
 #define _sys_nerr (*__sys_nerr())
 #endif /* ____sys_nerr_defined */
@@ -108,14 +100,10 @@ __LIBC int sys_nerr;
 #ifdef _sys_errlist
 #define sys_errlist _sys_errlist
 #else /* _sys_errlist */
-#ifndef ____sys_errlist_defined
+#if !defined(____sys_errlist_defined) && defined(__CRT_HAVE___sys_errlist)
 #define ____sys_errlist_defined 1
-#ifdef __CRT_HAVE___sys_errlist
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *const *,__NOTHROW,__sys_errlist,(void),())
-#else /* __CRT_HAVE___sys_errlist */
-#undef ____sys_errlist_defined
-#endif /* !__CRT_HAVE___sys_errlist */
-#endif /* !____sys_errlist_defined */
+#endif /* !____sys_errlist_defined && __CRT_HAVE___sys_errlist */
 #ifdef ____sys_errlist_defined
 #define sys_errlist (__sys_errlist())
 #endif /* ____sys_errlist_defined */
@@ -141,14 +129,10 @@ __LIBC char const *const sys_errlist[];
 #ifdef _sys_nerr
 #define sys_nerr _sys_nerr
 #else /* _sys_nerr */
-#ifndef ____sys_nerr_defined
+#if !defined(____sys_nerr_defined) && defined(__CRT_HAVE___sys_nerr)
 #define ____sys_nerr_defined 1
-#ifdef __CRT_HAVE___sys_nerr
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW,__sys_nerr,(void),())
-#else /* __CRT_HAVE___sys_nerr */
-#undef ____sys_nerr_defined
-#endif /* !__CRT_HAVE___sys_nerr */
-#endif /* !____sys_nerr_defined */
+#endif /* !____sys_nerr_defined && __CRT_HAVE___sys_nerr */
 #ifdef ____sys_nerr_defined
 #define sys_nerr (*__sys_nerr())
 #endif /* ____sys_nerr_defined */

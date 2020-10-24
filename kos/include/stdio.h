@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x355ea940 */
+/* HASH CRC-32:0xdd689b60 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2257,14 +2257,10 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,ftrylockfile,(_
 #endif /* __USE_POSIX || __USE_REENTRANT */
 
 #ifdef __USE_POSIX
-#ifndef __ctermid_defined
+#if !defined(__ctermid_defined) && defined(__CRT_HAVE_ctermid)
 #define __ctermid_defined 1
-#ifdef __CRT_HAVE_ctermid
 __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
-#else /* __CRT_HAVE_ctermid */
-#undef __ctermid_defined
-#endif /* !__CRT_HAVE_ctermid */
-#endif /* !__ctermid_defined */
+#endif /* !__ctermid_defined && __CRT_HAVE_ctermid */
 #endif /* __USE_POSIX */
 
 #ifdef __USE_REENTRANT
@@ -2284,16 +2280,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *
 #endif /* __USE_REENTRANT */
 
 #ifdef __USE_XOPEN
-#ifndef __cuserid_defined
+#if !defined(__cuserid_defined) && defined(__CRT_HAVE_cuserid)
 #define __cuserid_defined 1
-#ifdef __CRT_HAVE_cuserid
 /* Return the name of the current user (`getpwuid(geteuid())'), storing
  * that name in `S'. When `S' is NULL, a static buffer is used instead */
 __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
-#else /* __CRT_HAVE_cuserid */
-#undef __cuserid_defined
-#endif /* !__CRT_HAVE_cuserid */
-#endif /* !__cuserid_defined */
+#endif /* !__cuserid_defined && __CRT_HAVE_cuserid */
 #endif /* Use X/Open, but not issue 6.  */
 
 #ifdef __USE_POSIX2
@@ -5514,14 +5506,10 @@ __LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NO
 #define swscanf_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swscanf))
 #endif /* !__CRT_HAVE_swscanf */
 #endif /* !__swscanf_s_defined */
-#ifndef __vfwscanf_s_defined
+#if !defined(__vfwscanf_s_defined) && defined(__CRT_HAVE_vfwscanf)
 #define __vfwscanf_s_defined 1
-#ifdef __CRT_HAVE_vfwscanf
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__THROWING,vfwscanf_s,(FILE *__restrict __stream, wchar_t const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
-#else /* __CRT_HAVE_vfwscanf */
-#undef __vfwscanf_s_defined
-#endif /* !__CRT_HAVE_vfwscanf */
-#endif /* !__vfwscanf_s_defined */
+#endif /* !__vfwscanf_s_defined && __CRT_HAVE_vfwscanf */
 #ifndef __fwscanf_s_defined
 #define __fwscanf_s_defined 1
 #ifdef __CRT_HAVE_fwscanf
@@ -6140,38 +6128,22 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__VLIBCCALL _ws
 #undef ___wscanf_s_l_defined
 #endif /* !... */
 #endif /* !___wscanf_s_l_defined */
-#ifndef ___wfsopen_defined
+#if !defined(___wfsopen_defined) && defined(__CRT_HAVE__wfsopen)
 #define ___wfsopen_defined 1
-#ifdef __CRT_HAVE__wfsopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,_wfsopen,(wchar_t const *__filename, wchar_t const *__mode, __STDC_INT_AS_UINT_T __sh_flag),(__filename,__mode,__sh_flag))
-#else /* __CRT_HAVE__wfsopen */
-#undef ___wfsopen_defined
-#endif /* !__CRT_HAVE__wfsopen */
-#endif /* !___wfsopen_defined */
-#ifndef ___wfdopen_defined
+#endif /* !___wfsopen_defined && __CRT_HAVE__wfsopen */
+#if !defined(___wfdopen_defined) && defined(__CRT_HAVE__wfdopen)
 #define ___wfdopen_defined 1
-#ifdef __CRT_HAVE__wfdopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),__FILE *,__NOTHROW_NCX,_wfdopen,(__fd_t __fd, wchar_t const *__mode),(__fd,__mode))
-#else /* __CRT_HAVE__wfdopen */
-#undef ___wfdopen_defined
-#endif /* !__CRT_HAVE__wfdopen */
-#endif /* !___wfdopen_defined */
-#ifndef ___wfopen_s_defined
+#endif /* !___wfdopen_defined && __CRT_HAVE__wfdopen */
+#if !defined(___wfopen_s_defined) && defined(__CRT_HAVE__wfopen_s)
 #define ___wfopen_s_defined 1
-#ifdef __CRT_HAVE__wfopen_s
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,_wfopen_s,(__FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode),(__pstream,__filename,__mode))
-#else /* __CRT_HAVE__wfopen_s */
-#undef ___wfopen_s_defined
-#endif /* !__CRT_HAVE__wfopen_s */
-#endif /* !___wfopen_s_defined */
-#ifndef ___wfreopen_s_defined
+#endif /* !___wfopen_s_defined && __CRT_HAVE__wfopen_s */
+#if !defined(___wfreopen_s_defined) && defined(__CRT_HAVE__wfreopen_s)
 #define ___wfreopen_s_defined 1
-#ifdef __CRT_HAVE__wfreopen_s
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,_wfreopen_s,(__FILE **__pstream, wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),(__pstream,__filename,__mode,__stream))
-#else /* __CRT_HAVE__wfreopen_s */
-#undef ___wfreopen_s_defined
-#endif /* !__CRT_HAVE__wfreopen_s */
-#endif /* !___wfreopen_s_defined */
+#endif /* !___wfreopen_s_defined && __CRT_HAVE__wfreopen_s */
 #ifndef ___wfopen_defined
 #define ___wfopen_defined 1
 #ifdef __CRT_HAVE_wfopen
@@ -6240,14 +6212,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_putws, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NO
 #undef ___putws_defined
 #endif /* !... */
 #endif /* !___putws_defined */
-#ifndef ___wtempnam_defined
+#if !defined(___wtempnam_defined) && defined(__CRT_HAVE__wtempnam)
 #define ___wtempnam_defined 1
-#ifdef __CRT_HAVE__wtempnam
 __CDECLARE(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,_wtempnam,(wchar_t const *__directory, wchar_t const *__file_prefix),(__directory,__file_prefix))
-#else /* __CRT_HAVE__wtempnam */
-#undef ___wtempnam_defined
-#endif /* !__CRT_HAVE__wtempnam */
-#endif /* !___wtempnam_defined */
+#endif /* !___wtempnam_defined && __CRT_HAVE__wtempnam */
 #ifndef _CRT_WPERROR_DEFINED
 #define _CRT_WPERROR_DEFINED 1
 #ifdef __CRT_HAVE__wperror
@@ -6294,14 +6262,10 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_wremove,(wchar_t const *__file
 #undef ___wremove_defined
 #endif /* !... */
 #endif /* !___wremove_defined */
-#ifndef ___wtmpnam_s_defined
+#if !defined(___wtmpnam_s_defined) && defined(__CRT_HAVE__wtmpnam_s)
 #define ___wtmpnam_s_defined 1
-#ifdef __CRT_HAVE__wtmpnam_s
 __CDECLARE(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,_wtmpnam_s,(wchar_t *__dst, __SIZE_TYPE__ __wchar_count),(__dst,__wchar_count))
-#else /* __CRT_HAVE__wtmpnam_s */
-#undef ___wtmpnam_s_defined
-#endif /* !__CRT_HAVE__wtmpnam_s */
-#endif /* !___wtmpnam_s_defined */
+#endif /* !___wtmpnam_s_defined && __CRT_HAVE__wtmpnam_s */
 #ifndef ___fgetwc_nolock_defined
 #define ___fgetwc_nolock_defined 1
 #ifdef __CRT_HAVE_fgetwc_unlocked
