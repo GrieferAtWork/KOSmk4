@@ -38,7 +38,10 @@
 #define EXCEPT_FRETHROW   0x01 /* FLAG: The exception should be rethrown.
                                 * Unless set when `__cxa_end_catch()' is called, `ei_code'
                                 * will be changed to `E_OK', indicating no exception. */
-#define EXCEPT_FINCATCH   0x02 /* FLAG: Inside of a catch-handler. */
+#define EXCEPT_FINCATCH   0x02 /* FLAG: Inside of a catch-handler. When this flag is set,
+                                * the currently thrown exception must not be modified, and
+                                * attempting to throw an additional exception causes kernel
+                                * panic / triggers a segfault. */
 #ifndef __KERNEL__
 #define EXCEPT_FINEXCEPT  0x20 /* FLAG: Currently within `libc_except_handler(3|4)()' (used to prevent
                                 *       an infinite loop when the exception handler itself is faulting) */

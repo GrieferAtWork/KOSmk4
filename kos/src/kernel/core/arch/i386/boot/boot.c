@@ -407,12 +407,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
-	/* TODO: Figure out a clean and simple-to-use system with which nested exception handling
-	 *       can be done. Also: Make some improvements to how exceptions are prioritized.
-	 *       In general: Add an API function `unsigned int error_priority(error_code_t)'
-	 *       that returns an integer which can be compared against the priority of other
-	 *       error codes in order to determine which of 2 (if any) should be propagated. */
-
 	/* TODO: Add `__USE_ISOC2X' to <features.h> */
 	/* TODO: Add FLT_NORM_MAX, DBL_NORM_MAX and LDBL_NORM_MAX to <float.h> under #ifdef __USE_ISOC2X
 	 *       Also add DEC32_TRUE_MIN, DEC64_TRUE_MIN and DEC128_TRUE_MIN, alongside everything from

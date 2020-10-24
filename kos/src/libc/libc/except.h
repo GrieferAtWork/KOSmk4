@@ -30,6 +30,8 @@
 
 #include <libunwind/except.h>
 
+#include "tls.h"
+
 #ifndef __KERNEL__
 #include <kos/except-handler.h> /* __EXCEPT_HANDLER_CC */
 #endif /* !__KERNEL__ */
@@ -48,6 +50,38 @@
 #define SECTION_EXCEPT_RODATA  .rodata.crt.except
 #define SECTION_EXCEPT_STRING  .rodata.crt.except
 #endif /* !__CC__ */
+
+
+#undef libc_error_info
+#undef libc_error_data
+#undef libc_error_register_state
+#undef libc_error_code
+#undef libc_error_active
+#undef libc_error_class
+#undef libc_error_subclass
+#undef error_info
+#undef error_data
+#undef error_register_state
+#undef error_code
+#undef error_active
+#undef error_class
+#undef error_subclass
+
+/* Re-link direct use of error accessors to the TLS segment. */
+#define libc_error_info()           (&current.pt_except)
+#define libc_error_data()           (&current.pt_except.ei_data)
+#define libc_error_register_state() (&current.pt_except.ei_state)
+#define libc_error_code()           (current.pt_except.ei_code)
+#define libc_error_active()         (current.pt_except.ei_code != ERROR_CODEOF(E_OK))
+#define libc_error_class()          (current.pt_except.ei_class)
+#define libc_error_subclass()       (current.pt_except.ei_subclass)
+#define error_info()                libc_error_info()
+#define error_data()                libc_error_data()
+#define error_register_state()      libc_error_register_state()
+#define error_code()                libc_error_code()
+#define error_active()              libc_error_active()
+#define error_class()               libc_error_class()
+#define error_subclass()            libc_error_subclass()
 
 
 DECL_BEGIN

@@ -86,7 +86,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	/* Throw a would-block error if we're not allowed to map new memory. */
 	if (flags & GFP_NOMMAP)
 		IFELSE_NX(return CORE_PAGE_MALLOC_ERROR, THROW(E_WOULDBLOCK_PREEMPTED));
-	heap_validate_all_pedantic();
+	heap_validate_all_paranoid();
 	/* Only allocate using corebase when `GFP_SHARED|GFP_LOCKED'
 	 * Otherwise, we can allocate the region and node using
 	 * that same set of flags in a call to `kmalloc()'. */
@@ -533,7 +533,7 @@ again_tryhard_mapping_target:
 		 *     will automatically get created once the node gets accessed. */
 		vm_node_insert(corepair.cp_node);
 		vm_kernel_treelock_endwrite();
-		heap_validate_all_pedantic();
+		heap_validate_all_paranoid();
 		return mapping_target;
 	}
 #ifndef HEAP_NX
@@ -616,6 +616,7 @@ NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
                                             size_t num_bytes, gfp_t flags) {
 	struct heapptr result;
 	struct mfree **iter, **end;
+	heap_validate_all_paranoid();
 	TRACE(PP_STR(FUNC(heap_alloc_untraced)) "(%p, %" PRIuSIZ ", %#x)\n", self, num_bytes, flags);
 	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result.hp_siz))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
@@ -641,12 +642,19 @@ search_heap:
 		gfp_t chain_flags;
 		/* Search this bucket. */
 		chain = *iter;
-		while (chain &&
-		       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
-		                     "MFREE_SIZE(chain) = %#" PRIxSIZ "\n",
-		                     MFREE_SIZE(chain)),
-		        MFREE_SIZE(chain) < result.hp_siz))
+		while (chain) {
+			if (!pagedir_iswritable(chain)) {
+				HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
+				             "MFREE_SIZE(chain) = %#" PRIxSIZ "\n",
+				             MFREE_SIZE(chain));
+			}
+			HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
+			             "MFREE_SIZE(chain) = %#" PRIxSIZ "\n",
+			             MFREE_SIZE(chain));
+			if (MFREE_SIZE(chain) >= result.hp_siz)
+				break;
 			chain = LLIST_NEXT(chain, mf_lsize);
+		}
 		if (!chain)
 			continue;
 		HEAP_ASSERTE(mfree_tree_remove(&self->h_addr, (uintptr_t)MFREE_BEGIN(chain)) == chain);
@@ -740,7 +748,7 @@ search_heap:
 		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
 		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 		HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
-		heap_validate_all_pedantic();
+		heap_validate_all_paranoid();
 		return result;
 	}
 #ifdef CONFIG_HEAP_TRACE_DANGLE
@@ -856,7 +864,7 @@ allocate_without_overalloc:
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 	HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
-	heap_validate_all_pedantic();
+	heap_validate_all_paranoid();
 	return result;
 #ifdef HEAP_NX
 err:
@@ -1023,7 +1031,7 @@ again:
 	if ((flags & GFP_CALLOC) && !(slot_flags & GFP_CALLOC))
 		memset(ptr, 0, result);
 	HEAP_ASSERT(result >= HEAP_MINSIZE);
-	heap_validate_all_pedantic();
+	heap_validate_all_paranoid();
 	return result;
 }
 
@@ -1255,7 +1263,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			             (uintptr_t)min_alignment);
 			HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 			HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
-			heap_validate_all_pedantic();
+			heap_validate_all_paranoid();
 			return result;
 		}
 		sync_endwrite(&self->h_lock);
@@ -1304,7 +1312,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	result.hp_siz = result_base.hp_siz;
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 	HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
-	heap_validate_all_pedantic();
+	heap_validate_all_paranoid();
 	return result;
 #ifdef HEAP_NX
 err:

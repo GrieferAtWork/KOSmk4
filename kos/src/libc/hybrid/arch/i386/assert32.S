@@ -23,9 +23,10 @@
 #define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
+
 #include <asm/cfi.h>
-#include <kos/kernel/cpu-state.h>
 #include <asm/cpu-flags.h>
+#include <kos/kernel/cpu-state.h>
 
 
 #ifdef __KERNEL__

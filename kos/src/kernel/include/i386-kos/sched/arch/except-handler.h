@@ -127,9 +127,9 @@ NOTHROW(FCALL x86_userexcept_seterrno64)(struct icpustate *__restrict state,
  * E* error code in the event of a system call with exceptions disabled (on x86, except-
  * enabled is usually controlled by the CF bit, however this function takes that information
  * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
-FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-x86_userexcept_propagate(struct icpustate *__restrict state,
-                         struct rpc_syscall_info const *sc_info);
+FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+NOTHROW(FCALL x86_userexcept_propagate)(struct icpustate *__restrict state,
+                                        struct rpc_syscall_info const *sc_info);
 
 
 /* Given a user-space UCPUSTATE, load that state into the active IRET tail, whilst
@@ -140,15 +140,15 @@ x86_userexcept_propagate(struct icpustate *__restrict state,
  * and finally fully unwind into user-space by use of `x86_userexcept_unwind_interrupt()'.
  * NOTE: This is the function that should be called by the personality functions of
  *       custom system call handlers that also reset the kernel-space stack. */
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL
-x86_userexcept_unwind(struct ucpustate *__restrict state,
-                      struct rpc_syscall_info const *sc_info);
+FUNDEF ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict state,
+                                     struct rpc_syscall_info const *sc_info);
 
 /* Same as `x86_userexcept_unwind()', however the caller has already done the work
  * of constructing a `struct icpustate *' at the base of the current thread's kernel stack. */
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL
-x86_userexcept_unwind_i(struct icpustate *__restrict state,
-                        struct rpc_syscall_info const *sc_info);
+FUNDEF ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
+                                       struct rpc_syscall_info const *sc_info);
 
 /* Unwind the currently set exception through an interrupt.
  * If the interrupt leads into user-space, service user-space RPC functions before
@@ -159,18 +159,24 @@ x86_userexcept_unwind_i(struct icpustate *__restrict state,
  * even when `error_code() == E_OK' (this is required to correctly handle the case of unwinding
  * an interrupt after an exception was propagated into user-space, before an RPC caused the
  * kernel's IRET tail to be re-directed once again) */
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL
-x86_userexcept_unwind_interrupt(struct icpustate *__restrict state);
+FUNDEF ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL x86_userexcept_unwind_interrupt)(struct icpustate *__restrict state);
 
 /* Same as `x86_userexcept_unwind_interrupt()', but `struct icpustate *state'
  * was already loaded into the `%esp' / `%rsp' register. */
-FUNDEF ATTR_NORETURN void ASMCALL
-x86_userexcept_unwind_interrupt_esp(void);
+#ifdef __x86_64__
+FUNDEF ATTR_NORETURN void NOTHROW(ASMCALL x86_userexcept_unwind_interrupt_rsp)(void);
+#else /* __x86_64__ */
+FUNDEF ATTR_NORETURN void NOTHROW(ASMCALL x86_userexcept_unwind_interrupt_esp)(void);
+#endif /* !__x86_64__ */
 
 /* Function for the sub-branch of `x86_userexcept_unwind_interrupt_esp()'
  * that assumes that the target is located in kernel-space. */
-FUNDEF ATTR_NORETURN void ASMCALL
-x86_userexcept_unwind_interrupt_kernel_esp(void);
+#ifdef __x86_64__
+FUNDEF ATTR_NORETURN void NOTHROW(ASMCALL x86_userexcept_unwind_interrupt_kernel_rsp)(void);
+#else /* __x86_64__ */
+FUNDEF ATTR_NORETURN void NOTHROW(ASMCALL x86_userexcept_unwind_interrupt_kernel_esp)(void);
+#endif /* !__x86_64__ */
 
 
 

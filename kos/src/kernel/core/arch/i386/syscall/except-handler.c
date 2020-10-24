@@ -568,9 +568,9 @@ NOTHROW(FCALL x86_userexcept_seterrno)(struct icpustate *__restrict state,
  * E* error code in the event of a system call with exceptions disabled (on x86, except-
  * enabled is usually controlled by the CF bit, however this function takes that information
  * from the `RPC_SYSCALL_INFO_FEXCEPT' bit in `sc_info->rsi_flags'). */
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-x86_userexcept_propagate(struct icpustate *__restrict state,
-                         struct rpc_syscall_info const *sc_info) {
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
+NOTHROW(FCALL x86_userexcept_propagate)(struct icpustate *__restrict state,
+                                        struct rpc_syscall_info const *sc_info) {
 	struct icpustate *result;
 	struct exception_info info;
 	struct exception_info *tls_info;
@@ -699,9 +699,9 @@ NOTHROW(FCALL rpc_serve_user_redirection_all)(struct icpustate *__restrict state
  * into user-space with the help of `x86_userexcept_propagate()'.
  * Afterwards, load the updated icpustate at the base of the calling thread's stack,
  * and finally fully unwind into user-space by use of `'. */
-PUBLIC ATTR_NORETURN NONNULL((1)) void FCALL
-x86_userexcept_unwind(struct ucpustate *__restrict ustate,
-                      struct rpc_syscall_info const *sc_info) {
+PUBLIC ATTR_NORETURN NONNULL((1)) void 
+NOTHROW(FCALL x86_userexcept_unwind)(struct ucpustate *__restrict ustate,
+                                     struct rpc_syscall_info const *sc_info) {
 	struct icpustate *return_state;
 	assert(!(PERTASK_GET(this_task.t_flags) & TASK_FKERNTHREAD));
 	/* Disable interrupts to prevent Async-RPCs from doing even more re-directions! */
@@ -820,9 +820,9 @@ x86_userexcept_unwind(struct ucpustate *__restrict ustate,
 
 /* Same as `x86_userexcept_unwind()', however the caller has already done the work
  * of constructing a `struct icpustate *' at the base of the current thread's kernel stack. */
-PUBLIC ATTR_NORETURN NONNULL((1)) void FCALL
-x86_userexcept_unwind_i(struct icpustate *__restrict state,
-                        struct rpc_syscall_info const *sc_info) {
+PUBLIC ATTR_NORETURN NONNULL((1)) void
+NOTHROW(FCALL x86_userexcept_unwind_i)(struct icpustate *__restrict state,
+                                       struct rpc_syscall_info const *sc_info) {
 	/* Service RPCs before returning to user-space. */
 	assert(!task_wasconnected());
 	assertf(!(PERTASK_GET(this_exception_flags) & EXCEPT_FINCATCH),

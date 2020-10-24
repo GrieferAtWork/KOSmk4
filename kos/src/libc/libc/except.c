@@ -237,63 +237,6 @@ libc_get_kos_unwind_exception(void) {
  *       when interfaced with the standard c++ API (which they do) */
 DEFINE_PUBLIC_WEAK_ALIAS(__gxx_personality_v0, libc_gxx_personality_v0);
 DEFINE_PUBLIC_WEAK_ALIAS(__gcc_personality_v0, libc_gxx_personality_v0);
-DEFINE_PUBLIC_WEAK_ALIAS(__cxa_begin_catch, libc_cxa_begin_catch);
-DEFINE_PUBLIC_WEAK_ALIAS(__cxa_end_catch, libc_cxa_end_catch);
-
-INTERN SECTION_EXCEPT_TEXT ATTR_CONST void *LIBCCALL
-libc_cxa_begin_catch(struct _Unwind_Exception *ptr) {
-	/* This function returns the address that would
-	 * be assigned to the exception storage object:
-	 * >> try {
-	 * >>     ...
-	 * >> } catch (MyException &exc) {
-	 * >>     printk("exc @ %p\n", &exc); // Prints the address that this function returns.
-	 * >> }
-	 * The given `ptr' is what `libc_error_unwind()' originally set as value
-	 * for the `CFI_UNWIND_REGISTER_EXCEPTION' register. */
-	struct exception_info *info;
-	info = &current.pt_except;
-	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
-	        "Exception handler entered, but no exception set");
-	assertf(!(info->ei_flags & EXCEPT_FINCATCH),
-	        "Invalid nested-try block (use `NESTED_TRY' or `NESTED_EXCEPTION')");
-	info->ei_flags |= EXCEPT_FINCATCH;
-	return ptr;
-}
-
-INTERN SECTION_EXCEPT_TEXT void LIBCCALL
-libc_cxa_end_catch(void) {
-	/* This function is called at the end of any user-defined catch-block
-	 * (that isn't noexcept), similar to how `__cxa_begin_catch()' is always
-	 * called at the start:
-	 * >> try {
-	 * >>     ...
-	 * >> } catch (MyException) {
-	 * >>     MyException &exc = *__cxa_begin_catch(?);
-	 * >>     try {
-	 * >>         printk("exc @ %p\n", &exc);
-	 * >>     } finally {
-	 * >>         __cxa_end_catch();
-	 * >>     }
-	 * >> }
-	 * Looking at this, you should realize that it is therefor guarantied that
-	 * every call to `__cxa_begin_catch()' is followed by `__cxa_end_catch()'.
-	 * The book recommends that these functions should be used for reference
-	 * counting of the number of recursive location where the exception object
-	 * is being used. */
-
-	/* For our purposes, we only get here when an EXCEPT block reaches
-	 * its end, and we delete the exception if it wasn't re-thrown. */
-	struct exception_info *info;
-	info = &current.pt_except;
-	assertf(info->ei_code != E_OK || info->ei_nesting != 0,
-	        "Exception handler entered, but no exception set");
-	assertf(info->ei_flags & EXCEPT_FINCATCH,
-	        "Call to `__cxa_end_catch' when `EXCEPT_FINCATCH' wasn't set");
-	if (!(info->ei_flags & EXCEPT_FRETHROW))
-		info->ei_code = ERROR_CODEOF(E_OK);
-	info->ei_flags &= ~(EXCEPT_FINCATCH | EXCEPT_FRETHROW);
-}
 
 
 INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL

@@ -76,7 +76,7 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 #define heap_validate_all() (void)0
 #endif /* NDEBUG */
 
-#if defined(NDEBUG) || 1 /* Pedantic heap validation enable/disable */
+#if defined(NDEBUG) || 1 /* Paranoid heap validation enable/disable */
 #define heap_validate_after_free(heap) (void)0
 #define heap_validate_all_after_free() (void)0
 #else /* NDEBUG */
@@ -84,12 +84,12 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 #define heap_validate_all_after_free() heap_validate_all()
 #endif /* !NDEBUG */
 
-#if defined(NDEBUG) || 1 /* Pedantic heap validation enable/disable */
-#define heap_validate_pedantic(heap) (void)0
-#define heap_validate_all_pedantic() (void)0
+#if defined(NDEBUG) || 1 /* Paranoid heap validation enable/disable */
+#define heap_validate_paranoid(heap) (void)0
+#define heap_validate_all_paranoid() (void)0
 #else /* NDEBUG */
-#define heap_validate_pedantic(heap) heap_validate(heap)
-#define heap_validate_all_pedantic() heap_validate_all()
+#define heap_validate_paranoid(heap) heap_validate(heap)
+#define heap_validate_all_paranoid() heap_validate_all()
 #endif /* !NDEBUG */
 
 #undef TRACE
@@ -649,7 +649,7 @@ LOCAL NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL heap_free_raw_lock_and_maybe_unlock_impl)(struct heap *__restrict self,
                                                         VIRT void *ptr, size_t num_bytes,
                                                         gfp_t flags) {
-	heap_validate_all_pedantic();
+	heap_validate_all_paranoid();
 	if (!heap_acquirelock_atomic(self)) {
 		/* Set up `ptr...num_bytes' as a pending free-block of the heap,
 		 * to-be freed by whoever will be next to acquire a lock. */
@@ -736,16 +736,16 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 			sync_endwrite(&self->h_lock);
 			if (flags & GFP_CALLOC) {
-				heap_validate_all_pedantic();
+				heap_validate_all_paranoid();
 				reset_heap_data((byte_t *)ptr, DEBUGHEAP_NO_MANS_LAND, num_bytes);
-				heap_validate_all_pedantic();
+				heap_validate_all_paranoid();
 				flags &= ~GFP_CALLOC;
 			}
 			if (slot->mf_flags & GFP_CALLOC) {
-				heap_validate_all_pedantic();
+				heap_validate_all_paranoid();
 				reset_heap_data((byte_t *)((uintptr_t)slot + SIZEOF_MFREE),
 				                DEBUGHEAP_NO_MANS_LAND, slot->mf_size - SIZEOF_MFREE);
-				heap_validate_all_pedantic();
+				heap_validate_all_paranoid();
 			}
 			ptr = (VIRT void *)slot;
 			num_bytes += slot->mf_size;
@@ -789,18 +789,18 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 #endif /* CONFIG_HEAP_TRACE_DANGLE */
 				sync_endwrite(&self->h_lock);
 				if (slot->mf_flags & GFP_CALLOC) {
-					heap_validate_all_pedantic();
+					heap_validate_all_paranoid();
 					reset_heap_data((byte_t *)((uintptr_t)slot + SIZEOF_MFREE),
 					                DEBUGHEAP_NO_MANS_LAND,
 					                slot->mf_size - SIZEOF_MFREE);
-					heap_validate_all_pedantic();
+					heap_validate_all_paranoid();
 				}
 				if (high_slot->mf_flags & GFP_CALLOC) {
-					heap_validate_all_pedantic();
+					heap_validate_all_paranoid();
 					reset_heap_data((byte_t *)((uintptr_t)high_slot + SIZEOF_MFREE),
 					                DEBUGHEAP_NO_MANS_LAND,
 					                high_slot->mf_size - SIZEOF_MFREE);
-					heap_validate_all_pedantic();
+					heap_validate_all_paranoid();
 				}
 				ptr       = (VIRT void *)slot;
 				num_bytes = slot->mf_size + high_slot->mf_size;
