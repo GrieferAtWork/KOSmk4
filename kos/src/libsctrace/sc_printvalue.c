@@ -86,6 +86,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <compat/bits/os/iovec.h>
 #include <compat/bits/os/itimerspec.h>
 #include <compat/bits/os/itimerval.h>
+#include <compat/bits/os/sigaction.h>
 #include <compat/bits/os/timespec.h>
 #include <compat/bits/os/timeval.h>
 #endif /* __ARCH_HAVE_COMPAT */
@@ -461,11 +462,22 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_kreaddir_mode
 #endif /* HAVE_SC_REPR_KREADDIR_MODE */
 
+#ifdef HAVE_SC_REPR_STRUCT_SIGACTIONX32
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX32 */
+
+
 
 
 
 
 /* Inter-printer dependencies */
+#ifdef NEED_print_sigaction
+#define NEED_print_sighandler_t
+#define NEED_print_sigset
+#define NEED_print_sigaction_flags
+#endif /* NEED_print_sigaction */
+
 #ifdef NEED_print_pollfds
 #define NEED_print_pollfd
 #endif /* NEED_print_pollfds */
@@ -3365,6 +3377,102 @@ err:
 
 
 
+#ifdef NEED_print_sigaction_flags
+struct sigaction_flag {
+	uint32_t sf_flag;     /* The sigaction flag */
+	char     sf_name[12]; /* Flag name. */
+};
+
+PRIVATE struct sigaction_flag const sigaction_flags[] = {
+#ifdef SA_NOCLDSTOP
+	{ SA_NOCLDSTOP, "NOCLDSTOP" },
+#endif /* SA_NOCLDSTOP */
+#ifdef SA_NOCLDWAIT
+	{ SA_NOCLDWAIT, "NOCLDWAIT" },
+#endif /* SA_NOCLDWAIT */
+#ifdef SA_SIGINFO
+	{ SA_SIGINFO,   "SIGINFO" },
+#endif /* SA_SIGINFO */
+#ifdef SA_RESTORER
+	{ SA_RESTORER,  "RESTORER" },
+#endif /* SA_RESTORER */
+#ifdef SA_ONSTACK
+	{ SA_ONSTACK,   "ONSTACK" },
+#endif /* SA_ONSTACK */
+#ifdef SA_RESTART
+	{ SA_RESTART,   "RESTART" },
+#endif /* SA_RESTART */
+#ifdef SA_NODEFER
+	{ SA_NODEFER,   "NODEFER" },
+#endif /* SA_NODEFER */
+#ifdef SA_RESETHAND
+	{ SA_RESETHAND, "RESETHAND" },
+#endif /* SA_RESETHAND */
+#ifdef SA_INTERRUPT
+	{ SA_INTERRUPT, "INTERRUPT" },
+#endif /* SA_INTERRUPT */
+};
+
+PRIVATE ssize_t CC
+print_sigaction_flags(pformatprinter printer, void *arg,
+                      syscall_ulong_t flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(sigaction_flags); ++i) {
+		if (!(flags & sigaction_flags[i].sf_flag))
+			continue;
+		PRINTF("%sSA_%s",
+		       is_first ? "" : PIPESTR,
+		       sigaction_flags[i].sf_name);
+		flags &= ~sigaction_flags[i].sf_flag;
+		is_first = false;
+	}
+	if unlikely(flags) {
+		/* Print unknown flags. */
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_mmap_flags */
+
+
+
+
+
+#ifdef NEED_print_sigaction
+PRIVATE ssize_t CC
+print_sigaction(pformatprinter printer, void *arg,
+                USER UNCHECKED sighandler_t sa_handler,
+                USER CHECKED sigset_t *sa_mask, size_t sigsetsize,
+                syscall_ulong_t sa_flags,
+                USER UNCHECKED void *sa_restorer) {
+	ssize_t temp, result;
+	result = DOPRINT("{" SYNSPACE SYNFIELD("sa_handler"));
+	if unlikely(result < 0)
+		goto done;
+	DO(print_sighandler_t(printer, arg, sa_handler));
+	PRINT("," SYNSPACE SYNFIELD("sa_mask"));
+	DO(print_sigset(printer, arg, sa_mask, sigsetsize));
+	PRINT("," SYNSPACE SYNFIELD("sa_flags"));
+	DO(print_sigaction_flags(printer, arg, sa_flags));
+	if (sa_restorer)
+		PRINTF("," SYNSPACE SYNFIELD("sa_restorer") "%#" PRIxPTR, sa_restorer);
+	PRINT(SYNSPACE "}");
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_sigaction */
+
+
+
+
+
 
 
 
@@ -3458,8 +3566,6 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_STRUCT_RPC_SYSCALL_INFO 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_RPC_SYSCALL_INFO32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SCHED_PARAM 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_SIGACTIONX32 1
-	// TODO: #define HAVE_SC_REPR_STRUCT_SIGACTIONX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGALTSTACKX32 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGALTSTACKX64 1
 	// TODO: #define HAVE_SC_REPR_STRUCT_SIGEVENT 1
@@ -3490,6 +3596,66 @@ libsc_printvalue(pformatprinter printer, void *arg,
 	// TODO: #define HAVE_SC_REPR_WAITFLAG 1
 	// TODO: #define HAVE_SC_REPR_WAITID_OPTIONS 1
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS 1
+
+#ifdef HAVE_SC_REPR_STRUCT_SIGACTION
+	case SC_REPR_STRUCT_SIGACTION: {
+		USER UNCHECKED struct sigaction *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct sigaction *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa || sigsetsize != sizeof(sa->sa_mask))
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTION */
+
+#ifdef HAVE_SC_REPR_STRUCT_SIGACTIONX32
+	case SC_REPR_STRUCT_SIGACTIONX32: {
+		USER UNCHECKED struct __sigactionx32 *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct __sigactionx32 *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa || sigsetsize != sizeof(sa->sa_mask))
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_SIGACTIONX64
+	case SC_REPR_STRUCT_SIGACTIONX64: {
+		USER UNCHECKED struct __sigactionx64 *sa;
+		size_t sigsetsize = sizeof(sa->sa_mask);
+		sa = (USER UNCHECKED struct __sigactionx64 *)(uintptr_t)value.sv_u64;
+		if (link)
+			sigsetsize = (size_t)link->sa_value.sv_u64;
+		if (!sa || sigsetsize != sizeof(sa->sa_mask))
+			goto do_pointer;
+		validate_readable(sa, sizeof(*sa));
+		result = print_sigaction(printer,
+		                         arg,
+		                         (sighandler_t)(void *)sa->sa_handler,
+		                         (USER CHECKED sigset_t *)&sa->sa_mask,
+		                         sigsetsize,
+		                         sa->sa_flags,
+		                         (void *)sa->sa_restorer);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX64 */
 
 #ifdef HAVE_SC_REPR_KREADDIR_MODE
 	case SC_REPR_KREADDIR_MODE:
@@ -3525,7 +3691,7 @@ libsc_printvalue(pformatprinter printer, void *arg,
 		size_t sigsetsize;
 		if unlikely(!link)
 			goto do_pointer;
-		sigset = (USER UNCHECKED sigset_t *)(syscall_ulong_t)value.sv_u64;
+		sigset = (USER UNCHECKED sigset_t *)(uintptr_t)value.sv_u64;
 		if (!sigset)
 			goto do_pointer;
 		sigsetsize = (size_t)(syscall_ulong_t)link->sa_value.sv_u64;

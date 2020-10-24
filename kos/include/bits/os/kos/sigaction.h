@@ -73,7 +73,7 @@ struct sigaction /*[PREFIX(sa_)]*/ {
 	__sighandler_t sa_handler;
 #endif /* !__USE_POSIX199309 */
 	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
-	int                    sa_flags; /* Special flags. */
+	int                    sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
 #if __SIZEOF_POINTER__ > __SIZEOF_INT__
 	__byte_t             __sa_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__]; /* ... */
 #endif /* __SIZEOF_POINTER__ > __SIZEOF_INT__ */

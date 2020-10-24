@@ -81,7 +81,7 @@ struct __sigaction_cygwin /*[NAME(sigaction_cygwin)][PREFIX(sa_)]*/ {
 #endif /* !__USE_POSIX199309 */
 	/* XXX: Doesn't sigset_t have a different size in cygwin? */
 	struct __sigset_struct sa_mask;  /* Additional set of signals to be blocked. */
-	__uint32_t             sa_flags; /* Special flags. */
+	__uint32_t             sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
 };
 #endif /* __CC__ */
 

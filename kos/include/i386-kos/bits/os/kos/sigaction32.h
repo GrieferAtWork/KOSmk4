@@ -122,7 +122,7 @@ struct __ATTR_ALIGNED(__ALIGNOF_SIGACTIONX32) __sigactionx32 /*[NAME(sigactionx3
 	__sighandlerx32_t sa_handler;
 #endif /* !__USE_POSIX199309 */
 	struct __sigset_structx32 sa_mask;  /* Additional set of signals to be blocked. */
-	__uint32_t                sa_flags; /* Special flags. */
+	__uint32_t                sa_flags; /* Special flags (set of `SA_*' from <signal.h>) */
 #ifdef __x86_64__
 	__HYBRID_FUNCPTR32(void, , sa_restorer, (void)); /* Restore handler. */
 #else /* __x86_64__ */
