@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49e66b1 */
+/* HASH CRC-32:0x9ae0d899 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,38 +116,83 @@ NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
 #endif /* !... */
 	return 0;
 }
+#include <libc/errno.h>
+#include <asm/os/signal.h>
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set,
                                      signo_t signo) {
-	ulongptr_t mask = __sigset_mask(signo);
-	ulongptr_t word = __sigset_word(signo);
+	ulongptr_t mask, word;
+	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
+	mask = __sigset_mask(signo);
+	word = __sigset_word(signo);
 	set->__val[word] |= mask;
 	return 0;
 }
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set,
                                      signo_t signo) {
-	ulongptr_t mask = __sigset_mask(signo);
-	ulongptr_t word = __sigset_word(signo);
+	ulongptr_t mask, word;
+	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
+	mask = __sigset_mask(signo);
+	word = __sigset_word(signo);
 	set->__val[word] &= ~mask;
 	return 0;
 }
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
                                        signo_t signo) {
-	ulongptr_t mask = __sigset_mask(signo);
-	ulongptr_t word = __sigset_word(signo);
-	return (int)(set->__val[word] & mask);
+	ulongptr_t mask, word;
+	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
+	mask = __sigset_mask(signo);
+	word = __sigset_word(signo);
+	return (set->__val[word] & mask) __PRIVATE_SIGSET_ISMEMBER_EXT;
 }
 /* >> sigisemptyset(3)
  * Check if the given signal set is empty
@@ -213,7 +258,6 @@ NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp,
                                   signo_t signo) {
 	return libc_kill(-pgrp, signo);
 }
-#include <asm/os/signal.h>
 #include <bits/os/sigstack.h>
 /* >> sigstack(2)
  * Deprecated, and slightly different version of `sigaltstack(2)'
@@ -247,7 +291,6 @@ NOTHROW_NCX(LIBCCALL libc_set_single_signal_action)(int sig,
 	libc_sigaddset(&set, sig);
 	return libc_sigprocmask(how, &set, NULL);
 }
-#include <asm/os/signal.h>
 /* >> sighold(3)
  * Mask a single signal `signo', which is the same
  * as `sigprocmask(SIG_BLOCK, MASKFOR(signo), NULL)'
@@ -257,7 +300,6 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sighold)(signo_t signo) {
 	return libc_set_single_signal_action(signo, __SIG_BLOCK);
 }
-#include <asm/os/signal.h>
 /* >> sighold(3)
  * Unmask a single signal `signo', which is the same
  * as `sigprocmask(SIG_UNBLOCK, MASKFOR(signo), NULL)'
@@ -267,7 +309,6 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigrelse)(signo_t signo) {
 	return libc_set_single_signal_action(signo, __SIG_UNBLOCK);
 }
-#include <asm/os/signal.h>
 /* >> sigignore(3)
  * Change the disposition of `signo' to `SIG_IGN' using `bsd_signal(3)'
  * @return: 0:  Success
@@ -276,8 +317,6 @@ INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigignore)(signo_t signo) {
 	return libc_bsd_signal(signo, (sighandler_t)__SIG_IGN) == (sighandler_t)__SIG_ERR ? -1 : 0;
 }
-#include <libc/errno.h>
-#include <asm/os/signal.h>
 #include <bits/os/sigaction.h>
 /* >> sigset(3)
  * Set the handler of `signo' to `disp', or add `signo' to

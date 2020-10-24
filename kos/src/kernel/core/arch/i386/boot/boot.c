@@ -420,9 +420,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       for as long as a thread is in kernel-space, but will be changed
 	 *       to the original error code prior to returning back to user-space. */
 
-	/* TODO: Functions like sigaddset() are supposed to set `errno=EINVAL' when the
-	 *       given signal isn't valid. (signo <= 0 || signo >= NSIG) */
-
 	/* TODO: Update poll(2) and select(2) to only use `handle_polltest()' during the
 	 *       initial scan for ready files. Afterwards, scan all monitored files again,
 	 *       but this time do `connect+test' on each one of them. The second test

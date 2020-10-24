@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b615831 */
+/* HASH CRC-32:0xeda4a5dd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,6 +57,7 @@ __NAMESPACE_STD_USING(signal)
 #include <asm/os/signal.h>
 #include <bits/os/sigset.h>
 #include <bits/types.h>
+#include <libc/errno.h>
 
 #ifdef __USE_POSIX199309
 #include <bits/os/timespec.h>
@@ -1113,6 +1114,36 @@ typedef __sighandler_t sighandler_t;
 typedef __sighandler_t sig_t;
 #endif /* __USE_MISC */
 
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __std_size_t_defined
 #define __std_size_t_defined 1
@@ -1209,9 +1240,7 @@ __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(__signo_t __signo, __si
  * @return: * :      The previous signal handler function.
  * @return: SIG_ERR: Error (s.a. `errno') */
 __CDECLARE(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(__signo_t __signo, __sighandler_t __handler),(__signo,__handler))
-#else /* ... */
-#include <asm/os/signal.h>
-#if defined(__SA_RESETHAND) && defined(__SA_NODEFER) && defined(__SIG_ERR) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
+#elif defined(__SA_RESETHAND) && defined(__SA_NODEFER) && defined(__SIG_ERR) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
 #include <libc/local/signal/sysv_signal.h>
 /* >> sysv_signal(3)
  * Wrapper for `sigaction(2)' to establish a signal handler as:
@@ -1225,8 +1254,7 @@ __CDECLARE(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(__signo_t __signo, __sig
  * @return: * :      The previous signal handler function.
  * @return: SIG_ERR: Error (s.a. `errno') */
 __FORCELOCAL __ATTR_ARTIFICIAL __sighandler_t __NOTHROW_NCX(__LIBCCALL __sysv_signal)(__signo_t __signo, __sighandler_t __handler) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sysv_signal))(__signo, __handler); }
-#endif /* __SA_RESETHAND && __SA_NODEFER && __SIG_ERR && (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) */
-#endif /* !... */
+#endif /* ... */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sysv_signal
 /* >> sysv_signal(3)
@@ -1254,9 +1282,7 @@ __CDECLARE(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(__signo_t __signo, __sigha
  * @return: * :      The previous signal handler function.
  * @return: SIG_ERR: Error (s.a. `errno') */
 __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(__signo_t __signo, __sighandler_t __handler),__sysv_signal,(__signo,__handler))
-#else /* ... */
-#include <asm/os/signal.h>
-#if defined(__SA_RESETHAND) && defined(__SA_NODEFER) && defined(__SIG_ERR) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
+#elif defined(__SA_RESETHAND) && defined(__SA_NODEFER) && defined(__SIG_ERR) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
 #include <libc/local/signal/sysv_signal.h>
 /* >> sysv_signal(3)
  * Wrapper for `sigaction(2)' to establish a signal handler as:
@@ -1270,8 +1296,7 @@ __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(__signo_t __signo, __sigh
  * @return: * :      The previous signal handler function.
  * @return: SIG_ERR: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sysv_signal, __FORCELOCAL __ATTR_ARTIFICIAL __sighandler_t __NOTHROW_NCX(__LIBCCALL sysv_signal)(__signo_t __signo, __sighandler_t __handler) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sysv_signal))(__signo, __handler); })
-#endif /* __SA_RESETHAND && __SA_NODEFER && __SIG_ERR && (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) */
-#endif /* !... */
+#endif /* ... */
 #endif /* __USE_GNU */
 #ifndef __CXX_SYSTEM_HEADER
 #if (defined(__CRT_HAVE_signal) && defined(__USE_MISC)) || (defined(__CRT_HAVE__signal) && defined(__USE_MISC)) || defined(__CRT_HAVE_sysv_signal)
@@ -1328,34 +1353,28 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(gsignal, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
  * Modern code should use `sigprocmask()' instead.
  * @return: 0: Success */
 __CDECLARE(__ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead"),int,__NOTHROW_NCX,sigblock,(int __mask),(__mask))
-#else /* __CRT_HAVE_sigblock */
-#include <asm/os/signal.h>
-#if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#elif defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 #include <libc/local/signal/sigblock.h>
 /* >> sigblock(3)
  * Deprecated method of SIG_BLOCK-ing a given set of signals.
  * Modern code should use `sigprocmask()' instead.
  * @return: 0: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigblock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int __NOTHROW_NCX(__LIBCCALL sigblock)(int __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigblock))(__mask); })
-#endif /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) */
-#endif /* !__CRT_HAVE_sigblock */
+#endif /* ... */
 #ifdef __CRT_HAVE_sigsetmask
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should use `sigprocmask(SIG_SETMASK)' instead.
  * @return: 0: Success */
 __CDECLARE(__ATTR_DEPRECATED("Using `sigprocmask()\' instead"),int,__NOTHROW_NCX,sigsetmask,(int __mask),(__mask))
-#else /* __CRT_HAVE_sigsetmask */
-#include <asm/os/signal.h>
-#if defined(__SIG_SETMASK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#elif defined(__SIG_SETMASK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 #include <libc/local/signal/sigsetmask.h>
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should use `sigprocmask(SIG_SETMASK)' instead.
  * @return: 0: Success */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigsetmask, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Using `sigprocmask()\' instead") int __NOTHROW_NCX(__LIBCCALL sigsetmask)(int __mask) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigsetmask))(__mask); })
-#endif /* __SIG_SETMASK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) */
-#endif /* !__CRT_HAVE_sigsetmask */
+#endif /* ... */
 #ifdef __CRT_HAVE_siggetmask
 /* >> sigsetmask(3)
  * Deprecated method of retrieving the masking-state of
@@ -1491,56 +1510,74 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigfillset, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #ifdef __CRT_HAVE_sigaddset
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(struct __sigset_struct *__set, __signo_t __signo),(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(struct __sigset_struct *__set, __signo_t __signo),{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #elif defined(__CRT_HAVE___sigaddset)
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(struct __sigset_struct *__set, __signo_t __signo),__sigaddset,(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigaddset,(struct __sigset_struct *__set, __signo_t __signo),__sigaddset,{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #else /* ... */
-#include <libc/local/signal/sigaddset.h>
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigaddset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigaddset))(__set, __signo); })
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; }
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdelset
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(struct __sigset_struct *__set, __signo_t __signo),(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(struct __sigset_struct *__set, __signo_t __signo),{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] &= ~__mask; return 0; })
 #elif defined(__CRT_HAVE___sigdelset)
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(struct __sigset_struct *__set, __signo_t __signo),__sigdelset,(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigdelset,(struct __sigset_struct *__set, __signo_t __signo),__sigdelset,{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] &= ~__mask; return 0; })
 #else /* ... */
-#include <libc/local/signal/sigdelset.h>
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigdelset, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigdelset)(struct __sigset_struct *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdelset))(__set, __signo); })
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigdelset)(struct __sigset_struct *__set, __signo_t __signo) { ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] &= ~__mask; return 0; }
 #endif /* !... */
 #ifdef __CRT_HAVE_sigismember
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(struct __sigset_struct const *__set, __signo_t __signo),(__set,__signo))
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(struct __sigset_struct const *__set, __signo_t __signo),{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; })
 #elif defined(__CRT_HAVE___sigismember)
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(struct __sigset_struct const *__set, __signo_t __signo),__sigismember,(__set,__signo))
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigismember,(struct __sigset_struct const *__set, __signo_t __signo),__sigismember,{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; })
 #else /* ... */
-#include <libc/local/signal/sigismember.h>
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(sigismember, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(struct __sigset_struct const *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); })
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL sigismember)(struct __sigset_struct const *__set, __signo_t __signo) { ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; }
 #endif /* !... */
 #ifdef __CRT_HAVE_sigprocmask
 /* Change the signal mask for the calling thread. Note that portable
@@ -1870,17 +1907,14 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,siginterrupt,(__signo_t __signo, __STDC_INT_AS
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,int,__NOTHROW_NCX,sigstack,(struct sigstack *__ss, struct sigstack *__oss),(__ss,__oss))
-#else /* __CRT_HAVE_sigstack */
-#include <asm/os/signal.h>
-#if defined(__SS_ONSTACK) && defined(__SS_DISABLE) && defined(__CRT_HAVE_sigaltstack)
+#elif defined(__SS_ONSTACK) && defined(__SS_DISABLE) && defined(__CRT_HAVE_sigaltstack)
 #include <libc/local/signal/sigstack.h>
 /* >> sigstack(2)
  * Deprecated, and slightly different version of `sigaltstack(2)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigstack, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sigstack)(struct sigstack *__ss, struct sigstack *__oss) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigstack))(__ss, __oss); })
-#endif /* __SS_ONSTACK && __SS_DISABLE && __CRT_HAVE_sigaltstack */
-#endif /* !__CRT_HAVE_sigstack */
+#endif /* ... */
 /* >> sigaltstack(2)
  * Get/Set the alternate signal stack for the calling thread. When set,
  * the alternate signal stack can be used to host signal handlers that
@@ -1898,9 +1932,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,sigaltstack,(struct sigaltstack const *__ss, s
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,int,__NOTHROW_NCX,sighold,(__signo_t __signo),(__signo))
-#else /* __CRT_HAVE_sighold */
-#include <asm/os/signal.h>
-#if defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#elif defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 #include <libc/local/signal/sighold.h>
 /* >> sighold(3)
  * Mask a single signal `signo', which is the same
@@ -1908,8 +1940,7 @@ __CDECLARE(,int,__NOTHROW_NCX,sighold,(__signo_t __signo),(__signo))
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sighold, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sighold)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sighold))(__signo); })
-#endif /* __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) */
-#endif /* !__CRT_HAVE_sighold */
+#endif /* ... */
 #ifdef __CRT_HAVE_sigrelse
 /* >> sighold(3)
  * Unmask a single signal `signo', which is the same
@@ -1917,9 +1948,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sighold, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,int,__NOTHROW_NCX,sigrelse,(__signo_t __signo),(__signo))
-#else /* __CRT_HAVE_sigrelse */
-#include <asm/os/signal.h>
-#if defined(__SIG_UNBLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
+#elif defined(__SIG_UNBLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask))
 #include <libc/local/signal/sigrelse.h>
 /* >> sighold(3)
  * Unmask a single signal `signo', which is the same
@@ -1927,25 +1956,21 @@ __CDECLARE(,int,__NOTHROW_NCX,sigrelse,(__signo_t __signo),(__signo))
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigrelse, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sigrelse)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigrelse))(__signo); })
-#endif /* __SIG_UNBLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) */
-#endif /* !__CRT_HAVE_sigrelse */
+#endif /* ... */
 #ifdef __CRT_HAVE_sigignore
 /* >> sigignore(3)
  * Change the disposition of `signo' to `SIG_IGN' using `bsd_signal(3)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,int,__NOTHROW_NCX,sigignore,(__signo_t __signo),(__signo))
-#else /* __CRT_HAVE_sigignore */
-#include <asm/os/signal.h>
-#if defined(__SIG_IGN) && defined(__SIG_ERR) && defined(__CRT_HAVE_bsd_signal)
+#elif defined(__SIG_IGN) && defined(__SIG_ERR) && defined(__CRT_HAVE_bsd_signal)
 #include <libc/local/signal/sigignore.h>
 /* >> sigignore(3)
  * Change the disposition of `signo' to `SIG_IGN' using `bsd_signal(3)'
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigignore, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL sigignore)(__signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigignore))(__signo); })
-#endif /* __SIG_IGN && __SIG_ERR && __CRT_HAVE_bsd_signal */
-#endif /* !__CRT_HAVE_sigignore */
+#endif /* ... */
 #ifdef __CRT_HAVE_sigset
 /* >> sigset(3)
  * Set the handler of `signo' to `disp', or add `signo' to
@@ -1953,9 +1978,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(sigignore, __FORCELOCAL __ATTR_ARTIFICIAL int __
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __CDECLARE(,__sighandler_t,__NOTHROW_NCX,sigset,(__signo_t __signo, __sighandler_t __disp),(__signo,__disp))
-#else /* __CRT_HAVE_sigset */
-#include <asm/os/signal.h>
-#if defined(__SIG_ERR) && defined(__SIG_HOLD) && defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
+#elif defined(__SIG_ERR) && defined(__SIG_HOLD) && defined(__SIG_BLOCK) && (defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask)) && (defined(__CRT_HAVE_sigaction) || defined(__CRT_HAVE___sigaction))
 #include <libc/local/signal/sigset.h>
 /* >> sigset(3)
  * Set the handler of `signo' to `disp', or add `signo' to
@@ -1963,28 +1986,21 @@ __CDECLARE(,__sighandler_t,__NOTHROW_NCX,sigset,(__signo_t __signo, __sighandler
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sigset, __FORCELOCAL __ATTR_ARTIFICIAL __sighandler_t __NOTHROW_NCX(__LIBCCALL sigset)(__signo_t __signo, __sighandler_t __disp) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigset))(__signo, __disp); })
-#endif /* __SIG_ERR && __SIG_HOLD && __SIG_BLOCK && (__CRT_HAVE_sigprocmask || __CRT_HAVE_pthread_sigmask) && (__CRT_HAVE_sigaction || __CRT_HAVE___sigaction) */
-#endif /* !__CRT_HAVE_sigset */
+#endif /* ... */
 #endif /* __USE_XOPEN_EXTENDED */
 
 #ifdef __CRT_HAVE___libc_current_sigrtmin
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmin,(void),())
-#else /* __CRT_HAVE___libc_current_sigrtmin */
-#include <asm/os/signal.h>
-#ifdef __SIGRTMIN
+#elif defined(__SIGRTMIN)
 #include <libc/local/signal/__libc_current_sigrtmin.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmin))(); })
-#endif /* __SIGRTMIN */
-#endif /* !__CRT_HAVE___libc_current_sigrtmin */
+#endif /* ... */
 #ifdef __CRT_HAVE___libc_current_sigrtmax
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__signo_t,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
-#else /* __CRT_HAVE___libc_current_sigrtmax */
-#include <asm/os/signal.h>
-#ifdef __SIGRTMAX
+#elif defined(__SIGRTMAX)
 #include <libc/local/signal/__libc_current_sigrtmax.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__libc_current_sigrtmax, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __signo_t __NOTHROW_NCX(__LIBCCALL __libc_current_sigrtmax)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__libc_current_sigrtmax))(); })
-#endif /* __SIGRTMAX */
-#endif /* !__CRT_HAVE___libc_current_sigrtmax */
+#endif /* ... */
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 #ifndef __pthread_sigmask_defined
@@ -2123,56 +2139,74 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_NCX(__LIB
 #ifdef __CRT_HAVE_sigismember
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigismember,(struct __sigset_struct const *__set, __signo_t __signo),sigismember,(__set,__signo))
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigismember,(struct __sigset_struct const *__set, __signo_t __signo),sigismember,{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; })
 #elif defined(__CRT_HAVE___sigismember)
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigismember,(struct __sigset_struct const *__set, __signo_t __signo),(__set,__signo))
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigismember,(struct __sigset_struct const *__set, __signo_t __signo),{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; })
 #else /* ... */
-#include <libc/local/signal/sigismember.h>
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigismember)(struct __sigset_struct const *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigismember))(__set, __signo); }
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigismember)(struct __sigset_struct const *__set, __signo_t __signo) { ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; }
 #endif /* !... */
 #ifdef __CRT_HAVE_sigaddset
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigaddset,(struct __sigset_struct *__set, __signo_t __signo),sigaddset,(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigaddset,(struct __sigset_struct *__set, __signo_t __signo),sigaddset,{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #elif defined(__CRT_HAVE___sigaddset)
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigaddset,(struct __sigset_struct *__set, __signo_t __signo),(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigaddset,(struct __sigset_struct *__set, __signo_t __signo),{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #else /* ... */
-#include <libc/local/signal/sigaddset.h>
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigaddset))(__set, __signo); }
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; }
 #endif /* !... */
 #ifdef __CRT_HAVE_sigdelset
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigdelset,(struct __sigset_struct *__set, __signo_t __signo),sigdelset,(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigdelset,(struct __sigset_struct *__set, __signo_t __signo),sigdelset,{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] &= ~__mask; return 0; })
 #elif defined(__CRT_HAVE___sigdelset)
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigdelset,(struct __sigset_struct *__set, __signo_t __signo),(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigdelset,(struct __sigset_struct *__set, __signo_t __signo),{ ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] &= ~__mask; return 0; })
 #else /* ... */
-#include <libc/local/signal/sigdelset.h>
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigdelset)(struct __sigset_struct *__set, __signo_t __signo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sigdelset))(__set, __signo); }
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __sigdelset)(struct __sigset_struct *__set, __signo_t __signo) { ulongptr_t __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] &= ~__mask; return 0; }
 #endif /* !... */
 /* These appear in glibc under these names, however these names collide with
  * some escapes in a couple of places, so only define them when we're supposed

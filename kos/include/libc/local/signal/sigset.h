@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b4ab21b */
+/* HASH CRC-32:0xdcb0945e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,27 +62,126 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sigaction,(__signo_t __signo, struct s
 #ifdef __CRT_HAVE_sigaddset
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
+#include <libc/errno.h>
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),sigaddset,(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),sigaddset,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #elif defined(__CRT_HAVE___sigaddset)
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
+#include <libc/errno.h>
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),__sigaddset,(__set,__signo))
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),__sigaddset,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/signal/sigaddset.h>
+#include <bits/os/sigset.h>
+#include <libc/errno.h>
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
-#define __localdep_sigaddset __LIBC_LOCAL_NAME(sigaddset)
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__LOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __localdep_sigaddset)(struct __sigset_struct *__set, __signo_t __signo) { __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; }
 #endif /* !... */
 #endif /* !__local___localdep_sigaddset_defined */
 /* Dependency: sigemptyset from signal */
@@ -112,30 +211,129 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_sigismember
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigismember,(struct __sigset_struct const *__set, __signo_t __signo),sigismember,(__set,__signo))
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigismember,(struct __sigset_struct const *__set, __signo_t __signo),sigismember,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; })
 #elif defined(__CRT_HAVE___sigismember)
 __NAMESPACE_LOCAL_END
 #include <bits/os/sigset.h>
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigismember,(struct __sigset_struct const *__set, __signo_t __signo),__sigismember,(__set,__signo))
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_sigismember,(struct __sigset_struct const *__set, __signo_t __signo),__sigismember,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; })
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/signal/sigismember.h>
+#include <bits/os/sigset.h>
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo)     \
+	if __unlikely(signo <= 0 || signo >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(signo) \
+	if __unlikely(signo <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
 __NAMESPACE_LOCAL_BEGIN
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
-#define __localdep_sigismember __LIBC_LOCAL_NAME(sigismember)
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL __localdep_sigismember)(struct __sigset_struct const *__set, __signo_t __signo) { __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); return (__set->__val[__word] & __mask) __PRIVATE_SIGSET_ISMEMBER_EXT; }
 #endif /* !... */
 #endif /* !__local___localdep_sigismember_defined */
 /* Dependency: sigprocmask from signal */

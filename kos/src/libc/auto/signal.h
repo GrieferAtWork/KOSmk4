@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x120097d */
+/* HASH CRC-32:0xa277a172 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,34 +124,48 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigaddset)(sigset_t *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigaddset(3)
  * Add only the given `signo' to the given signal set
- * @return: 0: Always returns `0' */
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set, signo_t signo);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigdelset)(sigset_t *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigdelset(3)
  * Remove only the given `signo' from the given signal set
- * @return: 0: Always returns `0' */
+ * @return: 0:  Success (Always returned by the kernel-version)
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set, signo_t signo);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_sigismember)(sigset_t const *set, signo_t signo);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> sigismember(3)
  * Check if a given `signo' is apart of the a given signal set
- * @return: != 0: The given `signo' is apart of `set'
- * @return: == 0: The given `signo' isn't apart of `set' */
+ * @return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+ * @return:  1: The given `signo' is apart of `set'
+ * @return:  0: The given `signo' isn't apart of `set'
+ * @return: -1: [errno=EINVAL] invalid `signo'.
+ *              Not returned by the kernel-version of this function! */
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set, signo_t signo);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Change the signal mask for the calling thread. Note that portable

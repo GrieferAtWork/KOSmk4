@@ -31,6 +31,7 @@
 %[define_replacement(sig_atomic_t = __SIG_ATOMIC_TYPE__)]
 %[define_replacement(sig_t        = __sighandler_t)]
 %[define_replacement(timespec64   = __timespec64)]
+%[define_replacement(NSIG         = __NSIG)]
 %[define_type_class(__sighandler_t = "TP")]
 %[default:section(".text.crt{|.dos}.sched.signal")]
 
@@ -38,12 +39,19 @@
 #include <pthread.h>
 }
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%{
 
+}%[insert:prefix(
 #include <asm/os/signal.h>
+)]%[insert:prefix(
 #include <bits/os/sigset.h>
+)]%[insert:prefix(
 #include <bits/types.h>
+)]%[insert:prefix(
+#include <libc/errno.h>
+)]%{
 
 #ifdef __USE_POSIX199309
 #include <bits/os/timespec.h>
@@ -1102,7 +1110,48 @@ typedef __sighandler_t sighandler_t;
 typedef __sighandler_t sig_t;
 #endif /* __USE_MISC */
 
-}%(c, ccompat){
+}
+
+%[define(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO =
+#ifndef __PRIVATE_SIGSET_VALIDATE_SIGNO
+#ifdef __KERNEL__
+#define __PRIVATE_SIGSET_ISMEMBER_EXT /* nothing */
+#else /* __KERNEL__ */
+#define __PRIVATE_SIGSET_ISMEMBER_EXT != 0
+#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) && defined(__KOS__)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(@signo@) /* nothing */
+#elif defined(__NSIG) && defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(@signo@)     \
+	if __unlikely(@signo@ <= 0 || @signo@ >= __NSIG) { \
+		return __libc_seterrno(__EINVAL);          \
+	}
+#elif defined(__NSIG)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(@signo@)     \
+	if __unlikely(@signo@ <= 0 || @signo@ >= __NSIG) { \
+		return __libc_seterrno(1);                 \
+	}
+#elif defined(__EINVAL)
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(@signo@) \
+	if __unlikely(@signo@ <= 0) {                \
+		return __libc_seterrno(__EINVAL);      \
+	}
+#else /* ... */
+#define __PRIVATE_SIGSET_VALIDATE_SIGNO(@signo@) \
+	if __unlikely(@signo@ <= 0) {                \
+		return __libc_seterrno(1);             \
+	}
+#endif /* !... */
+#endif /* !__PRIVATE_SIGSET_VALIDATE_SIGNO */
+)]
+
+%[insert:prefix(
+DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
+)]
+
+
+
+%(c, ccompat){
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 }%{
 #ifndef __std_size_t_defined
@@ -1405,43 +1454,62 @@ int sigfillset([[nonnull]] $sigset_t *set) {
 	return 0;
 }
 
+
 @@>> sigaddset(3)
 @@Add only the given `signo' to the given signal set
-@@@return: 0: Always returns `0'
-[[kernel, alias("__sigaddset")]]
+@@@return: 0:  Success (Always returned by the kernel-version)
+@@@return: -1: [errno=EINVAL] invalid `signo'.
+@@             Not returned by the kernel-version of this function!
+[[kernel, extern_inline, alias("__sigaddset")]]
 [[if(!defined(__KERNEL__)), export_as("__sigaddset")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
+[[impl_include("<libc/errno.h>", "<asm/os/signal.h>")]]
+[[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
-	ulongptr_t mask = __sigset_mask(signo);
-	ulongptr_t word = __sigset_word(signo);
+	ulongptr_t mask, word;
+	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
+	mask = __sigset_mask(signo);
+	word = __sigset_word(signo);
 	set->__val[word] |= mask;
 	return 0;
 }
 
 @@>> sigdelset(3)
 @@Remove only the given `signo' from the given signal set
-@@@return: 0: Always returns `0'
-[[kernel, alias("__sigdelset")]]
+@@@return: 0:  Success (Always returned by the kernel-version)
+@@@return: -1: [errno=EINVAL] invalid `signo'.
+@@             Not returned by the kernel-version of this function!
+[[kernel, extern_inline, alias("__sigdelset")]]
 [[if(!defined(__KERNEL__)), export_as("__sigdelset")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
+[[impl_include("<libc/errno.h>", "<asm/os/signal.h>")]]
+[[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
-	ulongptr_t mask = __sigset_mask(signo);
-	ulongptr_t word = __sigset_word(signo);
+	ulongptr_t mask, word;
+	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
+	mask = __sigset_mask(signo);
+	word = __sigset_word(signo);
 	set->__val[word] &= ~mask;
 	return 0;
 }
 
 @@>> sigismember(3)
 @@Check if a given `signo' is apart of the a given signal set
-@@@return: != 0: The given `signo' is apart of `set'
-@@@return: == 0: The given `signo' isn't apart of `set'
-[[kernel, wunused, ATTR_PURE, alias("__sigismember")]]
+@@@return: >1: The given `signo' is apart of `set' (may be returned by the kernel-version of this function)
+@@@return:  1: The given `signo' is apart of `set'
+@@@return:  0: The given `signo' isn't apart of `set'
+@@@return: -1: [errno=EINVAL] invalid `signo'.
+@@             Not returned by the kernel-version of this function!
+[[kernel, extern_inline, wunused, ATTR_PURE, alias("__sigismember")]]
 [[if(!defined(__KERNEL__)), export_as("__sigismember")]]
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
+[[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
-	ulongptr_t mask = __sigset_mask(signo);
-	ulongptr_t word = __sigset_word(signo);
-	return (int)(set->__val[word] & mask);
+	ulongptr_t mask, word;
+	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
+	mask = __sigset_mask(signo);
+	word = __sigset_word(signo);
+	return (set->__val[word] & mask) __PRIVATE_SIGSET_ISMEMBER_EXT;
 }
 
 @@Change the signal mask for the calling thread. Note that portable
@@ -1987,6 +2055,9 @@ $errno_t pthread_sigqueue($pthread_t pthread,
 %[insert:function(__sigandset = sigandset)]
 %[insert:function(__sigorset = sigorset)]
 %#endif /* __USE_GNU */
+%[insert:prefix(
+DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
+)]
 %[insert:function(__sigismember = sigismember)]
 %[insert:function(__sigaddset = sigaddset)]
 %[insert:function(__sigdelset = sigdelset)]
