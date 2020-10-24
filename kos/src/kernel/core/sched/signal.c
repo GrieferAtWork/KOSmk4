@@ -1233,20 +1233,24 @@ NOTHROW(FCALL sig_completion_disconnect)(struct sig_completion *__restrict self)
 #ifdef CONFIG_NO_SMP
 	was    = PREEMPTION_PUSHOFF();
 	status = ATOMIC_READ(self->tc_stat);
-	if (TASK_CONNECTION_STAT_ISDEAD(status)) {
+	if (TASK_CONNECTION_STAT_ISDONE(status)) {
 		PREEMPTION_POP(was);
 		return false; /* Dead connection */
 	}
+	assert(status == TASK_CONNECTION_STAT_COMPLETION ||
+	       status == TASK_CONNECTION_STAT_COMPLETION_FOR_POLL);
 	signal_cons = ATOMIC_READ(signal->s_con);
 #else /* CONFIG_NO_SMP */
 again:
 	status = ATOMIC_READ(self->tc_stat);
-	if (TASK_CONNECTION_STAT_ISDEAD(status))
+	if (TASK_CONNECTION_STAT_ISDONE(status))
 		return false; /* Dead connection */
 	if unlikely(status & TASK_CONNECTION_STAT_FLOCK) {
 		task_pause();
 		goto again;
 	}
+	assert(status == TASK_CONNECTION_STAT_COMPLETION ||
+	       status == TASK_CONNECTION_STAT_COMPLETION_FOR_POLL);
 	was = PREEMPTION_PUSHOFF();
 	if (!ATOMIC_CMPXCH_WEAK(self->tc_stat, status,
 	                        status | TASK_CONNECTION_STAT_FLOCK)) {
