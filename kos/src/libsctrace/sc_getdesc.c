@@ -389,7 +389,7 @@ NOTHROW_NCX(CC sc_lookup)(struct rpc_syscall_info const *__restrict sc_info) {
 			result = (byte_t const *)&compat_syscalldb##table_id;                               \
 			offset = offset_compat_syscalldb##table_id[sysno - __NR32_syscall##table_id##_min]; \
 		} else
-		__NRFEAT_SYSCALL_TABLE_FOREACH(CHECK_SYSCALL_IN_TABLE)
+		__NR32FEAT_SYSCALL_TABLE_FOREACH(CHECK_SYSCALL_IN_TABLE)
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8
 #define CHECK_SYSCALL_IN_TABLE(table_id)                                                        \
 		if (sysno >= __NR64_syscall##table_id##_min &&                                          \
@@ -397,7 +397,7 @@ NOTHROW_NCX(CC sc_lookup)(struct rpc_syscall_info const *__restrict sc_info) {
 			result = (byte_t const *)&compat_syscalldb##table_id;                               \
 			offset = offset_compat_syscalldb##table_id[sysno - __NR64_syscall##table_id##_min]; \
 		} else
-		__NRFEAT_SYSCALL_TABLE_FOREACH(CHECK_SYSCALL_IN_TABLE)
+		__NR64FEAT_SYSCALL_TABLE_FOREACH(CHECK_SYSCALL_IN_TABLE)
 #else /* __ARCH_COMPAT_SIZEOF_POINTER == ... */
 #error "Unsupported __ARCH_COMPAT_SIZEOF_POINTER"
 #endif /* __ARCH_COMPAT_SIZEOF_POINTER != ... */
@@ -490,7 +490,7 @@ NOTHROW_NCX(CC libsc_getdesc)(struct rpc_syscall_info const *__restrict sc_info,
 				 *      in total. However, since KOS doesn't actually have any 128-bit
 				 *      system calls when running with a 64-bit bus width, this functionality
 				 *      is unused, though still partially implemented in case such system
-				 *      calls ever need to be defined. */
+				 *      calls ever needs to be defined. */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 				desc->sc_argv[i].sa_value.sv_u64 = (uint64_t)((uint64_t)(uintptr_t)sc_info->rsi_regs[regi] |
 				                                              (uint64_t)(uintptr_t)sc_info->rsi_regs[regi + 1] << 32);

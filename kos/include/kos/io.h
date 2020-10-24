@@ -495,7 +495,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 /* Mask of flags accepted by the kos extension functions:
  *  `readf', `writef', `preadf', `pwritef', `ioctlf()', `hopf()' */
-#define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT | IO_NODATAZERO)
+#define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_DIRECT | IO_NODATAZERO)
 
 /* Mask of flags modifiable via `F_SETFD' / `F_SETFL' */
 #define IO_SETFL_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT | IO_NODATAZERO)

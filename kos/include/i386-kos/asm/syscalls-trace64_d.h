@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ff34291 */
+/* HASH CRC-32:0x71a53885 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1668,7 +1668,7 @@
 #define __NR64ATR0_epoll_ctl_old            SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_ctl_old            SC_REPR_EPOLL_OP                                                     /* op */ 
 #define __NR64ATR2_epoll_ctl_old            SC_REPR_FD_T                                                         /* fd */ 
-#define __NR64ATR3_epoll_ctl_old            SC_REPR_POINTER                                                      /* info */ 
+#define __NR64ATR3_epoll_ctl_old            SC_REPR_STRUCT_EPOLL_EVENT                                           /* info */ 
 #define __NR64RTR_epoll_ctl_old             SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_epoll_wait_old           SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_wait_old           SC_REPR_POINTER                                                      /* events */ 
@@ -1732,7 +1732,7 @@
 #define __NR64ATR0_epoll_ctl                SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR64ATR1_epoll_ctl                SC_REPR_EPOLL_OP                                                     /* op */ 
 #define __NR64ATR2_epoll_ctl                SC_REPR_FD_T                                                         /* fd */ 
-#define __NR64ATR3_epoll_ctl                SC_REPR_POINTER                                                      /* info */ 
+#define __NR64ATR3_epoll_ctl                SC_REPR_STRUCT_EPOLL_EVENT                                           /* info */ 
 #define __NR64RTR_epoll_ctl                 SC_REPR_ERRNO_T                                                      /* return */
 #define __NR64ATR0_tgkill                   SC_REPR_PID_T                                                        /* pid */ 
 #define __NR64ATR1_tgkill                   SC_REPR_PID_T                                                        /* tid */ 

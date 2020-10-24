@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x651263ae */
+/* HASH CRC-32:0x460713aa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1956,7 +1956,7 @@
 #define __NR32ATR0_epoll_ctl                    SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR32ATR1_epoll_ctl                    SC_REPR_EPOLL_OP                                                     /* op */ 
 #define __NR32ATR2_epoll_ctl                    SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR3_epoll_ctl                    SC_REPR_POINTER                                                      /* info */ 
+#define __NR32ATR3_epoll_ctl                    SC_REPR_STRUCT_EPOLL_EVENT                                           /* info */ 
 #define __NR32RTR_epoll_ctl                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_epoll_wait                   SC_REPR_FD_T                                                         /* epfd */ 
 #define __NR32ATR1_epoll_wait                   SC_REPR_POINTER                                                      /* events */ 

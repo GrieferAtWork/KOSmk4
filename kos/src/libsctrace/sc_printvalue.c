@@ -59,6 +59,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <linux/futex.h>
 #include <linux/hdreg.h>
 #include <linux/kd.h>
+#include <sys/epoll.h>
 #include <sys/filio.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -466,6 +467,18 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_sigaction
 #endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX32 */
 
+#ifdef HAVE_SC_REPR_EPOLL_CREATE1_FLAGS
+#define NEED_print_epoll_create1_flags
+#endif /* HAVE_SC_REPR_EPOLL_CREATE1_FLAGS */
+
+#ifdef HAVE_SC_REPR_EPOLL_OP
+#define NEED_print_epoll_ctl
+#endif /* HAVE_SC_REPR_EPOLL_OP */
+
+#ifdef HAVE_SC_REPR_STRUCT_EPOLL_EVENT
+#define NEED_print_epoll_event
+#endif /* HAVE_SC_REPR_STRUCT_EPOLL_EVENT */
+
 
 
 
@@ -478,14 +491,26 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_sigaction_flags
 #endif /* NEED_print_sigaction */
 
+#ifdef NEED_print_epoll_event
+#define NEED_print_epoll_what
+#endif /* NEED_print_epoll_event */
+
+#ifdef NEED_print_epoll_create1_flags
+#define NEED_print_flagset32
+#endif /* NEED_print_epoll_create1_flags */
+
 #ifdef NEED_print_pollfds
 #define NEED_print_pollfd
 #endif /* NEED_print_pollfds */
 
 #ifdef NEED_print_pollfd
 #define NEED_print_fd_t
-#define NEED_print_poll_events
+#define NEED_print_poll_what
 #endif /* NEED_print_pollfd */
+
+#ifdef NEED_print_poll_what
+#define NEED_print_flagset16
+#endif /* NEED_print_poll_what */
 
 #ifdef NEED_print_string_vector
 #define NEED_print_string
@@ -578,11 +603,40 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
+#if !defined(POLLRDNORM) && defined(__POLLRDNORM)
+#define POLLRDNORM __POLLRDNORM /* 100% identical to `POLLIN' (Normal data may be read). */
+#endif /* !POLLRDNORM && __POLLRDNORM */
+#if !defined(POLLRDBAND) && defined(__POLLRDBAND)
+#define POLLRDBAND __POLLRDBAND /* Priority data may be read. */
+#endif /* !POLLRDBAND && __POLLRDBAND */
+#if !defined(POLLWRNORM) && defined(__POLLWRNORM)
+#define POLLWRNORM __POLLWRNORM /* 100% identical to `POLLOUT' (Writing now will not block). */
+#endif /* !POLLWRNORM && __POLLWRNORM */
+#if !defined(POLLWRBAND) && defined(__POLLWRBAND)
+#define POLLWRBAND __POLLWRBAND /* Priority data may be written. */
+#endif /* !POLLWRBAND && __POLLWRBAND */
+
+#if !defined(EPOLLRDNORM) && defined(__EPOLLRDNORM)
+#define EPOLLRDNORM __EPOLLRDNORM /* 100% identical to `EPOLLIN' (Normal data may be read). */
+#endif /* !EPOLLRDNORM && __EPOLLRDNORM */
+#if !defined(EPOLLRDBAND) && defined(__EPOLLRDBAND)
+#define EPOLLRDBAND __EPOLLRDBAND /* Priority data may be read. */
+#endif /* !EPOLLRDBAND && __EPOLLRDBAND */
+#if !defined(EPOLLWRNORM) && defined(__EPOLLWRNORM)
+#define EPOLLWRNORM __EPOLLWRNORM /* 100% identical to `EPOLLOUT' (Writing now will not block). */
+#endif /* !EPOLLWRNORM && __EOLLWRNORM */
+#if !defined(EPOLLWRBAND) && defined(__EPOLLWRBAND)
+#define EPOLLWRBAND __EPOLLWRBAND /* Priority data may be written. */
+#endif /* !EPOLLWRBAND && __EPOLLWRBAND */
+
+
+#ifndef LINUX_FUTEX_USES_TIMEOUT
 #define LINUX_FUTEX_USES_TIMEOUT(futex_op)    \
 	(((futex_op)&127) == FUTEX_WAIT ||        \
 	 ((futex_op)&127) == FUTEX_LOCK_PI ||     \
 	 ((futex_op)&127) == FUTEX_WAIT_BITSET || \
 	 ((futex_op)&127) == FUTEX_WAIT_REQUEUE_PI)
+#endif /* !LINUX_FUTEX_USES_TIMEOUT */
 
 
 
@@ -642,6 +696,79 @@ typedef uint8_t va_uint_t;
 #elif !defined(__DEEMON__)
 #error "Unsupported `__VA_SIZE'"
 #endif
+
+
+
+
+#ifdef NEED_print_flagset16
+PRIVATE ssize_t CC
+print_flagset16(pformatprinter printer, void *arg,
+                void const *flags_db, size_t stride,
+                char const *flag_prefix, syscall_ulong_t flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0;; ++i) {
+		uint16_t const *pflag;
+		uint16_t flag;
+		pflag = (uint16_t const *)((byte_t const *)flags_db + i * stride);
+		if ((flag = *pflag) == 0)
+			break;
+		if (!(flags & flag))
+			continue;
+		PRINTF("%s%s%s",
+		       is_first ? "" : PIPESTR,
+		       flag_prefix, (char const *)(pflag + 1));
+		flags &= ~flag;
+		is_first = false;
+	}
+	if (flags || is_first) {
+		/* Print unknown flags. */
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_flagset16 */
+
+
+
+
+#ifdef NEED_print_flagset32
+PRIVATE ssize_t CC
+print_flagset32(pformatprinter printer, void *arg,
+                void const *flags_db, size_t stride,
+                char const *flag_prefix, syscall_ulong_t flags) {
+	ssize_t temp, result = 0;
+	bool is_first = true;
+	unsigned int i;
+	for (i = 0;; ++i) {
+		uint32_t const *pflag;
+		uint32_t flag;
+		pflag = (uint32_t const *)((byte_t const *)flags_db + i * stride);
+		if ((flag = *pflag) == 0)
+			break;
+		if (!(flags & flag))
+			continue;
+		PRINTF("%s%s%s",
+		       is_first ? "" : PIPESTR,
+		       flag_prefix, (char const *)(pflag + 1));
+		flags &= ~flag;
+		is_first = false;
+	}
+	if (flags || is_first) {
+		/* Print unknown flags. */
+		PRINTF("%s%#" PRIxN(__SIZEOF_SYSCALL_LONG_T__),
+		       is_first ? "" : PIPESTR, flags);
+	}
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_flagset32 */
+
 
 
 
@@ -993,7 +1120,6 @@ PRIVATE struct {
 	{ IO_APPEND,     "APPEND" },
 	{ IO_NONBLOCK,   "NONBLOCK" },
 	{ IO_SYNC,       "SYNC" },
-	{ IO_ASYNC,      "ASYNC" },
 	{ IO_DIRECT,     "DIRECT" },
 	{ IO_NODATAZERO, "NODATAZERO" },
 };
@@ -1007,7 +1133,7 @@ print_iomode_t_impl(pformatprinter printer, void *arg,
 	enum {
 		VALID_MASK = (IO_ACCMODE | IO_CLOEXEC | IO_CLOFORK |
 		              IO_APPEND | IO_NONBLOCK | IO_SYNC |
-		              IO_ASYNC | IO_DIRECT | IO_NODATAZERO)
+		              IO_DIRECT | IO_NODATAZERO)
 	};
 	if (force_accmode || (iomodes & IO_ACCMODE) != 0) {
 		/* Print the access mode */
@@ -1128,6 +1254,7 @@ PRIVATE struct {
 	clockid_t cn_clid;     /* Clock ID */
 	char      cn_name[20]; /* Clock ID name. */
 } const clockid_names[] = {
+	/* TODO: Use strend^n encoding for these! */
 	{ CLOCK_REALTIME,           "REALTIME" },
 	{ CLOCK_MONOTONIC,          "MONOTONIC" },
 	{ CLOCK_PROCESS_CPUTIME_ID, "PROCESS_CPUTIME_ID" },
@@ -1232,6 +1359,7 @@ is_printable_character(char ch) {
 	case '\'':
 	case '\"':
 		return true;
+
 	default:
 		break;
 	}
@@ -1293,16 +1421,36 @@ PRIVATE struct {
 	sighandler_t sn_hand;    /* Signal handler constant */
 	char         sn_name[8]; /* Signal handler name. */
 } const sighandler_names[] = {
+#ifdef SIG_ERR
 	{ SIG_ERR,  "ERR" },
+#endif /* SIG_ERR */
+#ifdef SIG_DFL
 	{ SIG_DFL,  "DFL" },
+#endif /* SIG_DFL */
+#ifdef SIG_IGN
 	{ SIG_IGN,  "IGN" },
+#endif /* SIG_IGN */
+#ifdef SIG_HOLD
 	{ SIG_HOLD, "HOLD" },
+#endif /* SIG_HOLD */
+#ifdef SIG_TERM
 	{ SIG_TERM, "TERM" },
+#endif /* SIG_TERM */
+#ifdef SIG_EXIT
 	{ SIG_EXIT, "EXIT" },
+#endif /* SIG_EXIT */
+#ifdef SIG_CONT
 	{ SIG_CONT, "CONT" },
+#endif /* SIG_CONT */
+#ifdef SIG_STOP
 	{ SIG_STOP, "STOP" },
+#endif /* SIG_STOP */
+#ifdef SIG_CORE
 	{ SIG_CORE, "CORE" },
+#endif /* SIG_CORE */
+#ifdef SIG_GET
 	{ SIG_GET,  "GET" }
+#endif /* SIG_GET */
 };
 
 PRIVATE ssize_t CC
@@ -1325,76 +1473,111 @@ done:
 }
 #endif /* NEED_print_sighandler_t */
 
-
-
-#ifdef NEED_print_poll_events
-#ifndef POLLRDNORM
-#define POLLRDNORM __POLLRDNORM /* 100% identical to `POLLIN' (Normal data may be read). */
-#endif /* !POLLRDNORM */
-#ifndef POLLRDBAND
-#define POLLRDBAND __POLLRDBAND /* Priority data may be read. */
-#endif /* !POLLRDBAND */
-#ifndef POLLWRNORM
-#define POLLWRNORM __POLLWRNORM /* 100% identical to `POLLOUT' (Writing now will not block). */
-#endif /* !POLLWRNORM */
-#ifndef POLLWRBAND
-#define POLLWRBAND __POLLWRBAND /* Priority data may be written. */
-#endif /* !POLLWRBAND */
-
+#ifdef NEED_print_poll_what
 PRIVATE struct {
 	uint16_t   pn_flag;
 	char const pn_name[8];
 } const poll_event_flag_names[] = {
+#ifdef POLLIN
 	{ POLLIN,     "IN" },
+#endif /* POLLIN */
+#ifdef POLLPRI
 	{ POLLPRI,    "PRI" },
+#endif /* POLLPRI */
+#ifdef POLLOUT
 	{ POLLOUT,    "OUT" },
+#endif /* POLLOUT */
+#ifdef POLLRDNORM
 	{ POLLRDNORM, "RDNORM" },
+#endif /* POLLRDNORM */
+#ifdef POLLRDBAND
 	{ POLLRDBAND, "RDBAND" },
+#endif /* POLLRDBAND */
+#ifdef POLLWRNORM
 	{ POLLWRNORM, "WRNORM" },
+#endif /* POLLWRNORM */
+#ifdef POLLWRBAND
 	{ POLLWRBAND, "WRBAND" },
+#endif /* POLLWRBAND */
+#ifdef POLLMSG
 	{ POLLMSG,    "MSG" },
+#endif /* POLLMSG */
+#ifdef POLLREMOVE
 	{ POLLREMOVE, "REMOVE" },
+#endif /* POLLREMOVE */
+#ifdef POLLRDHUP
 	{ POLLRDHUP,  "RDHUP" },
+#endif /* POLLRDHUP */
+#ifdef POLLERR
 	{ POLLERR,    "ERR" },
+#endif /* POLLERR */
+#ifdef POLLHUP
 	{ POLLHUP,    "HUP" },
-	{ POLLNVAL,   "NVAL" }
+#endif /* POLLHUP */
+#ifdef POLLNVAL
+	{ POLLNVAL,   "NVAL" },
+#endif /* POLLNVAL */
+	{ 0, "" }
 };
 
 PRIVATE ssize_t CC
-print_poll_events(pformatprinter printer, void *arg, uint16_t events) {
-	enum {
-		VALID_MASK = (POLLIN | POLLPRI | POLLOUT | POLLRDNORM |
-		              POLLRDBAND | POLLWRNORM | POLLWRBAND |
-		              POLLMSG | POLLREMOVE | POLLRDHUP |
-		              POLLERR | POLLHUP | POLLNVAL)
-	};
-	ssize_t temp, result = 0;
-	unsigned int i;
-	bool is_first = true;
-	for (i = 0; i < COMPILER_LENOF(poll_event_flag_names); ++i) {
-		char const *name;
-		if (!(events & poll_event_flag_names[i].pn_flag))
-			continue;
-		if (!is_first)
-			PRINT(PIPESTR);
-		name = poll_event_flag_names[i].pn_name;
-		PRINTF("POLL%s", name);
-		is_first = false;
-	}
-	if unlikely(events & ~VALID_MASK) {
-		if (!is_first)
-			PRINT(PIPESTR);
-		PRINTF("%#" PRIx16,
-		       (uint16_t)(events & ~VALID_MASK));
-		is_first = false;
-	}
-	if (is_first)
-		result = DOPRINT("0");
-	return result;
-err:
-	return temp;
+print_poll_what(pformatprinter printer, void *arg, uint16_t events) {
+	return print_flagset16(printer, arg,
+	                       poll_event_flag_names,
+	                       sizeof(*poll_event_flag_names),
+	                       "POLL", events);
 }
-#endif /* NEED_print_poll_events */
+#endif /* NEED_print_poll_what */
+
+#ifdef NEED_print_epoll_what
+PRIVATE struct {
+	uint16_t   pn_flag;
+	char const pn_name[8];
+} const epoll_event_flag_names[] = {
+#ifdef EPOLLIN
+	{ EPOLLIN,     "IN" },
+#endif /* EPOLLIN */
+#ifdef EPOLLPRI
+	{ EPOLLPRI,    "PRI" },
+#endif /* EPOLLPRI */
+#ifdef EPOLLOUT
+	{ EPOLLOUT,    "OUT" },
+#endif /* EPOLLOUT */
+#ifdef EPOLLRDNORM
+	{ EPOLLRDNORM, "RDNORM" },
+#endif /* EPOLLRDNORM */
+#ifdef EPOLLRDBAND
+	{ EPOLLRDBAND, "RDBAND" },
+#endif /* EPOLLRDBAND */
+#ifdef EPOLLWRNORM
+	{ EPOLLWRNORM, "WRNORM" },
+#endif /* EPOLLWRNORM */
+#ifdef EPOLLWRBAND
+	{ EPOLLWRBAND, "WRBAND" },
+#endif /* EPOLLWRBAND */
+#ifdef EPOLLMSG
+	{ EPOLLMSG,    "MSG" },
+#endif /* EPOLLMSG */
+#ifdef EPOLLRDHUP
+	{ EPOLLRDHUP,  "RDHUP" },
+#endif /* EPOLLRDHUP */
+#ifdef EPOLLERR
+	{ EPOLLERR,    "ERR" },
+#endif /* EPOLLERR */
+#ifdef EPOLLHUP
+	{ EPOLLHUP,    "HUP" },
+#endif /* EPOLLHUP */
+	{ 0, "" }
+};
+
+PRIVATE ssize_t CC
+print_epoll_what(pformatprinter printer, void *arg, uint16_t events) {
+	return print_flagset16(printer, arg,
+	                       epoll_event_flag_names,
+	                       sizeof(*epoll_event_flag_names),
+	                       "EPOLL", events);
+}
+#endif /* NEED_print_poll_what */
 
 
 
@@ -1408,7 +1591,7 @@ print_pollfd(pformatprinter printer, void *arg,
 		goto done;
 	DO(print_fd_t(printer, arg, pfd->fd));
 	PRINT("," SYNSPACE SYNFIELD("events"));
-	DO(print_poll_events(printer, arg, pfd->events));
+	DO(print_poll_what(printer, arg, pfd->events));
 	PRINT(SYNSPACE "}");
 done:
 	return result;
@@ -3475,6 +3658,94 @@ err:
 
 
 
+#ifdef NEED_print_epoll_create1_flags
+PRIVATE struct {
+	uint32_t   pn_flag;
+	char const pn_name[8];
+} const epoll_create1_flags[] = {
+	{ EPOLL_CLOEXEC, "CLOEXEC" },
+	{ EPOLL_CLOFORK, "CLOFORK" },
+	{ 0, "" }
+};
+
+PRIVATE ssize_t CC
+print_epoll_create1_flags(pformatprinter printer, void *arg,
+                          syscall_ulong_t flags) {
+	return print_flagset32(printer, arg, epoll_create1_flags,
+	                       sizeof(*epoll_create1_flags),
+	                       "EPOLL_", flags);
+}
+#endif /* NEED_print_epoll_create1_flags */
+
+
+
+
+
+#ifdef NEED_print_epoll_event
+PRIVATE ssize_t CC
+print_epoll_event(pformatprinter printer, void *arg,
+                  USER CHECKED struct epoll_event const *ee) {
+	ssize_t temp, result;
+	result = DOPRINT("{" SYNSPACE SYNFIELD("events"));
+	if unlikely(result < 0)
+		goto done;
+	DO(print_epoll_what(printer, arg, ee->events));
+	PRINTF("," SYNSPACE SYNFIELD("data")
+	       "{" SYNSPACE "%" PRIu64 SYNSPACE "}"
+	       SYNSPACE "}",
+	       ee->data.u64);
+done:
+	return result;
+err:
+	return temp;
+}
+#endif /* NEED_print_epoll_event */
+
+
+
+
+
+#if defined(NEED_print_epoll_ctl) || defined(__DEEMON__)
+/*[[[deemon
+import * from deemon;
+import * from ...misc.libgen.strendN;
+local epop = getPrefixedMacrosFromFile("../../include/asm/os/kos/epoll.h", "__EPOLL_CTL_");
+printStrendNDatabase("EPOLL_CTL", epop);
+]]]*/
+#define GETBASE_EPOLL_CTL(result, index) \
+	(((index) <= 0x3) ? ((result) = repr_EPOLL_CTL_0h, true) : false)
+PRIVATE char const repr_EPOLL_CTL_0h[] =
+"\0ADD\0DEL\0MOD";
+/*[[[end]]]*/
+
+PRIVATE ATTR_CONST WUNUSED char const *CC
+get_epoll_ctl_name(syscall_ulong_t op) {
+	char const *result = NULL;
+	if (!GETBASE_EPOLL_CTL(result, op))
+		goto done;
+	for (; op; --op)
+		result = strend(result) + 1;
+	if (!*result)
+		result = NULL;
+done:
+	return result;
+}
+
+PRIVATE ssize_t CC
+print_epoll_ctl(pformatprinter printer, void *arg,
+                syscall_ulong_t op) {
+	char const *name;
+	name = get_epoll_ctl_name(op);
+	if (name)
+		return format_printf(printer, arg, "EPOLL_CTL_%s", name);
+	return format_printf(printer, arg, "%" PRIuN(__SIZEOF_SYSCALL_LONG_T__), op);
+}
+#endif /* NEED_print_epoll_ctl */
+
+
+
+
+
 
 
 
@@ -3538,8 +3809,6 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_SETNS
 	// TODO: #define HAVE_SC_REPR_CLONE_FLAGS_UNSHARE
 	// TODO: #define HAVE_SC_REPR_CPUSET
-	// TODO: #define HAVE_SC_REPR_EPOLL_CREATE1_FLAGS
-	// TODO: #define HAVE_SC_REPR_EPOLL_OP
 	// TODO: #define HAVE_SC_REPR_EVENTFD2_FLAGS
 	// TODO: #define HAVE_SC_REPR_EXCEPTION_HANDLER_MODE
 	// TODO: #define HAVE_SC_REPR_EXIT_STATUS
@@ -3649,6 +3918,28 @@ for (local c: knownCases.sorted()) {
 	// TODO: #define HAVE_SC_REPR_XATTR_FLAGS
 /*[[[end]]]*/
 
+#ifdef HAVE_SC_REPR_EPOLL_OP
+	case SC_REPR_EPOLL_OP:
+		result = print_epoll_ctl(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_EPOLL_OP */
+
+#ifdef HAVE_SC_REPR_STRUCT_EPOLL_EVENT
+	case SC_REPR_STRUCT_EPOLL_EVENT: {
+		USER UNCHECKED struct epoll_event const *ee;
+		ee = (USER UNCHECKED struct epoll_event const *)(uintptr_t)value.sv_u64;
+		if (!ee)
+			goto do_pointer;
+		validate_readable(ee, sizeof(*ee));
+		result = print_epoll_event(printer, arg, ee);
+	}	break;
+#endif /* HAVE_SC_REPR_STRUCT_EPOLL_EVENT */
+
+#ifdef HAVE_SC_REPR_EPOLL_CREATE1_FLAGS
+	case SC_REPR_EPOLL_CREATE1_FLAGS:
+		result = print_epoll_create1_flags(printer, arg, (syscall_ulong_t)value.sv_u64);
+		break;
+#endif /* HAVE_SC_REPR_EPOLL_CREATE1_FLAGS */
 
 #ifdef HAVE_SC_REPR_STRUCT_SIGACTION
 	case SC_REPR_STRUCT_SIGACTION: {

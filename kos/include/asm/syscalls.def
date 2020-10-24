@@ -1931,10 +1931,12 @@ epoll_create1:([tostr(EPOLL_CREATE1_FLAGS)] syscall_ulong_t flags) -> fd_t;
 @@@throw: E_ILLEGAL_REFERENCE_LOOP: The given `fd' is another epoll that either
 @@                                  forms a loop with `epfd', or has too many nested.
 @@@throw: E_INVALID_ARGUMENT_UNKNOWN_COMMAND:E_INVALID_ARGUMENT_CONTEXT_EPOLL_CTL_OP: [...]
-epoll_ctl:(fd_t epfd, [tostr(EPOLL_OP)] syscall_ulong_t op, fd_t fd, struct epoll_event *info) -> errno_t;
+epoll_ctl:(fd_t epfd, [tostr(EPOLL_OP)] syscall_ulong_t op, fd_t fd,
+           [tostr(STRUCT_EPOLL_EVENT)] struct epoll_event *info) -> errno_t;
 
 [doc_alias(epoll_ctl)]
-epoll_ctl_old:(fd_t epfd, [tostr(EPOLL_OP)] syscall_ulong_t op, fd_t fd, struct epoll_event *info) -> errno_t;
+epoll_ctl_old:(fd_t epfd, [tostr(EPOLL_OP)] syscall_ulong_t op, fd_t fd,
+               [tostr(STRUCT_EPOLL_EVENT)] struct epoll_event *info) -> errno_t;
 
 @@>> epoll_wait(2)
 @@Wait until at least one of the conditions monitored by `epfd' to be met.

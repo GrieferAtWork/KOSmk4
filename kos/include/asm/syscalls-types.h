@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ff1e56 */
+/* HASH CRC-32:0xe67207c4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,6 +102,7 @@
 #define HAVE_SC_REPR_SPLICE_FLAGS
 #define HAVE_SC_REPR_STRING
 #define HAVE_SC_REPR_STRING_VECTOR
+#define HAVE_SC_REPR_STRUCT_EPOLL_EVENT
 #define HAVE_SC_REPR_STRUCT_FDSET
 #define HAVE_SC_REPR_STRUCT_FILE_HANDLE
 #define HAVE_SC_REPR_STRUCT_FPUSTATE
@@ -234,6 +235,7 @@ __SYSCALL_REPR(SC_REPR_SOCKOPT_OPTVAL)
 __SYSCALL_REPR(SC_REPR_SPLICE_FLAGS)
 __SYSCALL_REPR(SC_REPR_STRING)
 __SYSCALL_REPR(SC_REPR_STRING_VECTOR)
+__SYSCALL_REPR(SC_REPR_STRUCT_EPOLL_EVENT)
 __SYSCALL_REPR(SC_REPR_STRUCT_FDSET)
 __SYSCALL_REPR(SC_REPR_STRUCT_FILE_HANDLE)
 __SYSCALL_REPR(SC_REPR_STRUCT_FPUSTATE)
