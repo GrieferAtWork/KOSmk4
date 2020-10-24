@@ -65,7 +65,7 @@ DECL_BEGIN
 #endif /* !SECTION_EXCEPT_STRING */
 
 
-INTERN SECTION_EXCEPT_TEXT ATTR_CONST void *LIBCCALL
+INTERN SECTION_EXCEPT_TEXT ATTR_CONST void *CXA_CC
 libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	/* This function returns the address that would
 	 * be assigned to the exception storage object:
@@ -99,7 +99,7 @@ libc_cxa_begin_catch(cxa_unwind_exception_t *ptr) {
 	return ptr;
 }
 
-INTERN SECTION_EXCEPT_TEXT void LIBCCALL
+INTERN SECTION_EXCEPT_TEXT void CXA_CC
 libc_cxa_end_catch(void) {
 	/* This function is called at the end of any user-defined catch-block
 	 * (that isn't noexcept), similar to how `__cxa_begin_catch()' is always

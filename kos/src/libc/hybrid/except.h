@@ -35,6 +35,8 @@ DECL_BEGIN
 #define FCALL __FCALL
 #endif /* !FCALL */
 
+#define CXA_CC /* nothing */
+
 #ifdef __KERNEL__
 typedef void cxa_unwind_exception_t;
 #else /* __KERNEL__ */
@@ -42,8 +44,10 @@ struct _Unwind_Exception;
 typedef struct _Unwind_Exception cxa_unwind_exception_t;
 #endif /* !__KERNEL__ */
 
-INTDEF void *LIBCCALL libc_cxa_begin_catch(cxa_unwind_exception_t *ptr);
-INTDEF void LIBCCALL libc_cxa_end_catch(void);
+
+
+INTDEF void *CXA_CC libc_cxa_begin_catch(cxa_unwind_exception_t *ptr);
+INTDEF void CXA_CC libc_cxa_end_catch(void);
 
 
 #ifndef NDEBUG
