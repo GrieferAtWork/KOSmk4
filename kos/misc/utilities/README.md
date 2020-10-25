@@ -46,11 +46,40 @@ xinit /bin/xclock -- -dumbSched
 
 ### TODO
 
-The X-server currently fails to start because of:
+Running the above command causes `/bin/Xorg` to crash:
 
 ```
-[trace ][6] sys_epoll_create1(flags: 524288)
-[trace ][6][except] Translate exception 0x8:0x0[0x8101,0x20,0x80000] into errno=-38
+Coredump /bin/Xorg tid:4
+exception 0xff0e:0x1 [E_SEGFAULT_UNMAPPED] [cr2=1AF02E14] [f-u-]
+	pointer[0] = 1AF02E14
+	pointer[1] = 00000005
+signal 11
+	code:  1
+	errno: 14
+/kos/src/libc/auto/sys.socket.c(48,31) : 0D4BFEC8+2[/lib/libc.so][libc___cmsg_nxthdr+87] [faultaddr]
+/kos/src/libc/auto/sys.socket.c(48,60) : 0D4BFECA+3[/lib/libc.so][libc___cmsg_nxthdr+89] [orig_ustate]
+
+> trace
+/kos/src/libc/auto/sys.socket.c(46,2) : 0D4BFEC4+6[/lib/libc.so][libc___cmsg_nxthdr+83]
+/kos/include/X11/Xtrans/Xtranssock.c(2131,56) : 0820C7EE+5[/bin/Xorg][_XSERVTransSocketRead+300]
+/kos/include/X11/Xtrans/Xtrans.c(893,12) : 0820D8FA+2[/bin/Xorg][_XSERVTransRead+36]
+/binutils/src/Xorg/xorg-server-1.20.9/os/io.c(352,18) : 08203F4D+5[/bin/Xorg][ReadRequestFromClient+798]
+/binutils/src/Xorg/xorg-server-1.20.9/dix/dispatch.c(449,26) : 0806C7BD+6[/bin/Xorg][Dispatch+253]
+/binutils/src/Xorg/xorg-server-1.20.9/dix/main.c(276,9) : 0807980C+5[/bin/Xorg][dix_main+1302]
+/binutils/src/Xorg/xorg-server-1.20.9/dix/stubmain.c(34,12) : 0805EC4B+5[/bin/Xorg][main+41]
+/kos/src/crt0/i386/crt0_32.S(39) : 0805EC09+5[/bin/Xorg][_start+9]
+
+> lsthread
+program    pid tid S cpu location
+kernel     0       I #0  C02AA829:scheduler.c:1303:idle_unload_and_switch_to
+Xorg       4       R #0  D4BFECA:sys.socket.c:48:libc___cmsg_nxthdr
+init       1       S #0 
+busybox    2       S #0 
+kernel     0       S #0 
+xclock     6       S #0 
+???        0       R #1  C02AAE20:scheduler.c:1455:cpu_deepsleep
+xinit      3       S #1 
+>
 ```
 
 Which is because KOS has yet to implement that system call.

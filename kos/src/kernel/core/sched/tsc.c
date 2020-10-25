@@ -289,15 +289,17 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 		old_hz = FORCPU(me, thiscpu_tsc_hz);
 		FORCPU(me, thiscpu_tsc_hz) = hz;
 		increase = hz > old_hz;
-		printk(KERN_INFO "[cpu#%u][%c] Adjust tsc hz "
-		                 "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
-		                 "%" PRIuN(__SIZEOF_TSC_HZ_T__) " "
-		                 "(cpu clock was running too %s)\n",
-		       me->c_id,
-		       increase ? '+' : '-',
-		       old_hz,
-		       hz,
-		       increase ? "fast" : "slow");
+		if (!dbg_active) {
+			printk(KERN_INFO "[cpu#%u][%c] Adjust tsc hz "
+			                 "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
+			                 "%" PRIuN(__SIZEOF_TSC_HZ_T__) " "
+			                 "(cpu clock was running too %s)\n",
+			       me->c_id,
+			       increase ? '+' : '-',
+			       old_hz,
+			       hz,
+			       increase ? "fast" : "slow");
+		}
 		/* TODO: When TSC_HZ changes, we should probably re-calculate the
 		 *       current TSC deadline by re-doing the deadline calculation
 		 *       code as documented at the top of <sched/scheduler.h>, starting

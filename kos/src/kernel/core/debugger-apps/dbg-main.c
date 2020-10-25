@@ -962,6 +962,7 @@ continue_readline_noauto:
 			dbg_draweditfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
 			                  field_width, cmdline, DBG_MAXLINE,
 			                  &cursor_pos, &screen_left);
+			dbg_logecho(cmdline);
 			dbg_putc('\n');
 		}
 		dbg_loadcolor();
