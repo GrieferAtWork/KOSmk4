@@ -449,11 +449,13 @@ again_gethand:
 	}
 
 	/* Invoke a regular, old signal handler. */
-	FINALLY_XDECREF_UNLIKELY(action.sa_mask);
-	result = sighand_raise_signal(state,
-	                              &action,
-	                              siginfo,
-	                              sc_info);
+	{
+		FINALLY_XDECREF_UNLIKELY(action.sa_mask);
+		result = sighand_raise_signal(state,
+		                              &action,
+		                              siginfo,
+		                              sc_info);
+	}
 	if unlikely(!result)
 		goto again_gethand;
 	return result;
@@ -581,11 +583,9 @@ NOTHROW(FCALL x86_userexcept_propagate)(struct icpustate *__restrict state,
 		struct task_connections *self;
 		struct task_connection *con;
 		self = THIS_CONNECTIONS;
-		con = self->tcs_con;
+		con  = self->tcs_con;
 		assertf(con == NULL, "con = %p", con);
 	}
-#else /* NDEBUG */
-	assert(!task_wasconnected());
 #endif /* !NDEBUG */
 	tls_info = error_info();
 	memcpy(&info, tls_info, sizeof(info));
@@ -613,6 +613,8 @@ again:
 	case ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL): {
 		enum { MMASK = RPC_SYSCALL_INFO_FMETHOD & ~RPC_SYSCALL_INFO_METHOD_F3264 };
 		uintptr_t flags;
+		if (!sc_info)
+			break;
 		/* Amend missing information about how a system call was invoked. */
 		flags = info.ei_data.e_args.e_unknown_systemcall.us_flags;
 		if ((flags & MMASK) == (RPC_SYSCALL_INFO_METHOD_OTHER & ~RPC_SYSCALL_INFO_METHOD_F3264)) {
@@ -676,8 +678,10 @@ terminate_app:
 	process_exit_for_exception_after_coredump(&info.ei_data);
 	__builtin_unreachable();
 done:
-	/* Delete the currently set exception. */
-	PERTASK_SET(this_exception_code, ERROR_CODEOF(E_OK));
+	assert(tls_info->ei_code == ERROR_CODEOF(E_OK));
+	assert(tls_info->ei_flags == EXCEPT_FNORMAL);
+	assert(tls_info->ei_nesting == 0);
+	assert(PREEMPTION_ENABLED());
 	return result;
 }
 

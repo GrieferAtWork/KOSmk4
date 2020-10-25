@@ -133,15 +133,15 @@ struct exception_info {
 	 *       return addresses loaded during unwinding) */
 	void                      *ei_trace[__EXCEPT_BACKTRACE_SIZE];
 #endif /* __EXCEPT_BACKTRACE_SIZE != 0 */
-	__uint8_t                 ei_flags;    /* Flags describing the current exception state (Set of `EXCEPT_F*'). */
+	__uint8_t                  ei_flags;    /* Flags describing the current exception state (Set of `EXCEPT_F*'). */
 #if __SIZEOF_POINTER__ < 4
-	__uint8_t                 ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+	__uint8_t                  ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
 #elif __SIZEOF_POINTER__ == 4
-	__uint8_t               __ei_pad[1];   /* ... */
-	__uint16_t                ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+	__uint8_t                __ei_pad[1];   /* ... */
+	__uint16_t                 ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
 #elif __SIZEOF_POINTER__ == 8
-	__uint8_t               __ei_pad[3];   /* ... */
-	__uint32_t                ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
+	__uint8_t                __ei_pad[3];   /* ... */
+	__uint32_t                 ei_nesting;  /* # of times that `error_nesting_begin()' was called (as a non-no-op). */
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported `__SIZEOF_POINTER__'"
 #endif /* __SIZEOF_POINTER__ != ... */

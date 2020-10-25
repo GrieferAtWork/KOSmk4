@@ -53,6 +53,8 @@
 #include <kos/kernel/fpu-state32.h>      /* fpustate32 */
 #include <sys/ucontext.h>
 
+#include <assert.h>
+#include <errno.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>

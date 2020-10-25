@@ -21,8 +21,11 @@
 #define GUARD_LIBC_USER_SYS_EPOLL_C 1
 
 #include "../api.h"
-#include "sys.epoll.h"
+/**/
+
 #include <kos/syscalls.h>
+
+#include "sys.epoll.h"
 
 DECL_BEGIN
 
@@ -87,7 +90,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd,
                                      struct epoll_event *event)
 /*[[[body:libc_epoll_ctl]]]*/
 {
-	fd_t result;
+	errno_t result;
 	result = sys_epoll_ctl(epfd, (syscall_ulong_t)op, fd, event);
 	return libc_seterrno_syserr(result);
 }
@@ -114,7 +117,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd,
                                       int timeout)
 /*[[[body:libc_epoll_wait]]]*/
 {
-	fd_t result;
+	ssize_t result;
 	result = sys_epoll_wait(epfd,
 	                        events,
 	                        (syscall_ulong_t)maxevents,
@@ -147,7 +150,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
                                        sigset_t const *ss)
 /*[[[body:libc_epoll_pwait]]]*/
 {
-	fd_t result;
+	ssize_t result;
 	result = sys_epoll_pwait(epfd,
 	                         events,
 	                         (syscall_ulong_t)maxevents,

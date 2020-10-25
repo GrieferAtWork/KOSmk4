@@ -413,6 +413,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       `__STDC_WANT_DEC_FP__' under `__USE_ISOC2X' (for this purpose, <hybrid/floatcore.h>
 	 *       will also have to be adjusted) */
 
+	/* TODO: The kernel->user-space exception/posix-signal system needs a re-write.
+	 *       Right now, way too much of it resides in arch-specific code, and
+	 */
+
 	/* TODO: User-space VIO callback functions should only be allowed to
 	 *       throw a white-listed sub-set of exceptions. Or better yet:
 	 *       user-space VIO exceptions should be encapsulated differently

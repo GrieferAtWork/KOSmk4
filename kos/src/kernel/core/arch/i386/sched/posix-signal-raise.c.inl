@@ -19,8 +19,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "posix-signal.c"
-//#define DEFINE_RAISE32 1
-#define DEFINE_RAISE64 1
+#define DEFINE_RAISE32 1
+//#define DEFINE_RAISE64 1
 #endif /* __INTELLISENSE__ */
 
 #if (defined(DEFINE_RAISE32) + defined(DEFINE_RAISE64)) != 1
@@ -87,18 +87,42 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		if unlikely(!sighand_reset_handler(signo, action))
 			return NULL;
 	}
-	if (sc_info) {
+	if (sc_info != NULL) {
 		/* Figure out if we should really start a system call. */
 		int rmode;
+		bool delete_sc_info = false;
+
 		rmode = kernel_syscall_restartmode(sc_info->rsi_sysno);
 		if (rmode == SYSCALL_RESTART_MODE_MUST)
 			; /* Always restart */
 		else if (rmode == SYSCALL_RESTART_MODE_DONT)
-			sc_info = NULL; /* Never restart */
+			delete_sc_info = true; /* Never restart */
 		else if (rmode == SYSCALL_RESTART_MODE_AUTO) {
 			/* Only restart when `SIGACTION_SA_RESTART' is set. */
 			if (!(action->sa_flags & SIGACTION_SA_RESTART))
-				sc_info = NULL;
+				delete_sc_info = true;
+		}
+		/* When not restarting the system call, then we must
+		 * either have it return with -EINTR, or the signal
+		 * handler must return to the user-space exception
+		 * handler. */
+		if (delete_sc_info) {
+			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FEXCEPT) {
+				struct exception_info *tls_info;
+				tls_info = error_info();
+				memset(tls_info, 0, sizeof(*tls_info));
+				tls_info->ei_code             = ERROR_CODEOF(E_INTERRUPT);
+				tls_info->ei_data.e_faultaddr = (void *)icpustate_getpc(state);
+				/* FIXME: This function has a chance to never return when
+				 *        it causes the calling process to be terminated!
+				 * However, we need it to always return, since `sighand_raise_signal()'
+				 * must always return normally, or via an exception! */
+				state = x86_userexcept_propagate(state, sc_info);
+				assert(tls_info->ei_code == ERROR_CODEOF(E_OK));
+			} else {
+				gpregs_setpax(&state->ics_gpregs, -EINTR);
+			}
+			sc_info = NULL;
 		}
 	}
 	/* Figure out how, and if we need to mask signals. */
@@ -125,6 +149,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	/* Check if sigaltstack should be used. */
 	if (action->sa_flags & SIGACTION_SA_ONSTACK) {
 		/* TODO: SS_AUTODISARM */
+		/* TODO: If we raised an E_INTERRUPT above, then we mustn't
+		 *       switch to the alternate signal stack again here! */
 		usp = (USER CHECKED byte_t *)PERTASK_GET(this_user_except_handler.ueh_stack);
 	}
 #ifdef DEFINE_RAISE64
@@ -279,7 +305,8 @@ sighand_raise_signal(struct icpustate *__restrict state,
 			if (sc_info->rsi_flags & RPC_SYSCALL_INFO_FREGVALID(argc - 1))
 				break;
 		}
-		ob_size = (offsetof(struct NAME(rpc_syscall_info), rsi_regs) + (argc * 4));
+		ob_size = (offsetof(struct NAME(rpc_syscall_info), rsi_regs)) +
+		          (argc * sizeof(NAME(u)));
 		usp -= ob_size;
 		user_sc_info = (USER CHECKED struct NAME(rpc_syscall_info) *)usp;
 		validate_writable(user_sc_info, ob_size);
