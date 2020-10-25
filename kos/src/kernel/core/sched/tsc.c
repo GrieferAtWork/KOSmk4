@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/rt.h> /* dbg_active */
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <sched/atomic64.h>
@@ -190,16 +191,20 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 	        "hz_max = %" PRIuN(__SIZEOF_TSC_HZ_T__) "\n",
 	        hz_min, hz_max);
 	if (hz_min < FORCPU(me, thiscpu_tsc_hzmin)) {
-		printk(KERN_WARNING "[cpu#%u] hz_min widened ("
-		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
-		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) ")\n",
-		       me->c_id, FORCPU(me, thiscpu_tsc_hzmin), hz_min);
+		if (!dbg_active) {
+			printk(KERN_WARNING "[cpu#%u] hz_min widened ("
+			                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
+			                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) ")\n",
+			       me->c_id, FORCPU(me, thiscpu_tsc_hzmin), hz_min);
+		}
 	}
 	if (hz_max > FORCPU(me, thiscpu_tsc_hzmax)) {
-		printk(KERN_WARNING "[cpu#%u] hz_max widened ("
-		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
-		                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) ")\n",
-		       me->c_id, FORCPU(me, thiscpu_tsc_hzmax), hz_max);
+		if (!dbg_active) {
+			printk(KERN_WARNING "[cpu#%u] hz_max widened ("
+			                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) " -> "
+			                    "%" PRIuN(__SIZEOF_TSC_HZ_T__) ")\n",
+			       me->c_id, FORCPU(me, thiscpu_tsc_hzmax), hz_max);
+		}
 	}
 	FORCPU(me, thiscpu_tsc_hzmin) = hz_min;
 	FORCPU(me, thiscpu_tsc_hzmax) = hz_max;
@@ -258,10 +263,16 @@ NOTHROW(FCALL tsc_resync_interrupt)(ktime_t curr_ktime) {
 		now.ts_kt += tsc_realtime_err;
 		if (cpu_now > now.ts_kt) {
 			/* Difficult case: we have to turn the clock backwards... */
-			printk(KERN_WARNING "[cpu#%u] Turn back clock ("
-			                    "%#" PRIxN(__SIZEOF_KTIME_T__) " -> "
-			                    "%#" PRIxN(__SIZEOF_KTIME_T__) ")\n",
-			       me->c_id, cpu_now, now.ts_kt);
+			if (!dbg_active) {
+				ktime_t distance = cpu_now - now.ts_kt;
+				printk(KERN_WARNING "[cpu#%u] Turn back clock ("
+				                    "%#" PRIxN(__SIZEOF_KTIME_T__) " -> "
+				                    "%#" PRIxN(__SIZEOF_KTIME_T__) ", "
+				                    "-%" PRIu32 ".%.9" PRIu32 "sec)\n",
+				       me->c_id, cpu_now, now.ts_kt,
+				       (u32)(distance / NSEC_PER_SEC),
+				       (u32)(distance % NSEC_PER_SEC));
+			}
 			cpu_now = now.ts_kt;
 		}
 	}
