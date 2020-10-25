@@ -46,7 +46,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$BINFILE" ]; then
 			cmd tar xvf "$NAME-$VERSION.tar.gz"
 		fi
 		cmd cd "$SRCPATH"
-		if ! test -z "$PATCH"; then
+		if test -z "$PATCH"; then
+			PATCH="$KOS_PATCHES/$NAME-$VERSION.patch"
+		fi
+		if [ -f "$PATCH" ]; then
 			apply_patch "$SRCPATH" "$PATCH"
 		fi
 		cmd rm -rf "$OPTPATH"

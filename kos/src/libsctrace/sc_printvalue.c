@@ -3691,7 +3691,7 @@ print_epoll_event(pformatprinter printer, void *arg,
 		goto done;
 	DO(print_epoll_what(printer, arg, ee->events));
 	PRINTF("," SYNSPACE SYNFIELD("data")
-	       "{" SYNSPACE "%" PRIu64 SYNSPACE "}"
+	       "{" SYNSPACE "%#" PRIx64 SYNSPACE "}"
 	       SYNSPACE "}",
 	       ee->data.u64);
 done:

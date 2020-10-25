@@ -1,0 +1,52 @@
+diff -Naur xf86-video-vesa-2.5.0-orig/src/vesa.c xf86-video-vesa-2.5.0/src/vesa.c
+--- xf86-video-vesa-2.5.0-orig/src/vesa.c	2020-09-11 00:04:05.000000000 +0200
++++ xf86-video-vesa-2.5.0/src/vesa.c	2020-10-25 10:32:30.328469800 +0100
+@@ -858,27 +858,27 @@
+     if (!xf86GetOptValBool(pVesa->Options, OPTION_SHADOW_FB, &pVesa->shadowFB))
+     {
+ 	switch (pVesa->pciInfo->vendor_id) {
+-	    case 0x1234: /* bochs vga (not in pci.ids) */
+-	    case 0x15ad: /* vmware */
+-	    case 0x1b36: /* qemu qxl */
+-	    case 0x80ee: /* virtualbox */
+-	    case 0xaaaa: /* parallels (not in pci.ids) */
+-		pVesa->shadowFB = FALSE;
+-		break;
+-
+-	    case 0x1013: /* qemu's cirrus emulation */
+-		if (pVesa->pciInfo->subvendor_id == 0x1af4)
+-		    pVesa->shadowFB = FALSE;
+-		else
+-		    pVesa->shadowFB = TRUE;
+-		break;
+-
+-	    case 0x1414: /* microsoft hyper-v */
+-		if (pVesa->pciInfo->device_id == 0x5353)
+-		    pVesa->shadowFB = FALSE;
+-		else
+-		    pVesa->shadowFB = TRUE;
+-		break;
++//	    case 0x1234: /* bochs vga (not in pci.ids) */
++//	    case 0x15ad: /* vmware */
++//	    case 0x1b36: /* qemu qxl */
++//	    case 0x80ee: /* virtualbox */
++//	    case 0xaaaa: /* parallels (not in pci.ids) */
++//		pVesa->shadowFB = FALSE;
++//		break;
++//
++//	    case 0x1013: /* qemu's cirrus emulation */
++//		if (pVesa->pciInfo->subvendor_id == 0x1af4)
++//		    pVesa->shadowFB = FALSE;
++//		else
++//		    pVesa->shadowFB = TRUE;
++//		break;
++//
++//	    case 0x1414: /* microsoft hyper-v */
++//		if (pVesa->pciInfo->device_id == 0x5353)
++//		    pVesa->shadowFB = FALSE;
++//		else
++//		    pVesa->shadowFB = TRUE;
++//		break;
+ 
+ 	    default:
+ 		pVesa->shadowFB = TRUE;

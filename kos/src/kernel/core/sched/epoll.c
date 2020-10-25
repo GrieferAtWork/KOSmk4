@@ -1202,7 +1202,7 @@ do_destroy_result_event:
 				if (reraise_monitors)
 					epoll_controller_requeue_events_at_back_of_chain(self, reraise_monitors);
 			} /* Scope */
-		}     /* Scope */
+		}     /* if (result_events != NULL) */
 	} EXCEPT {
 		/* Re-insert all result-events into the raised-list on error.
 		 * That way, they can be received once again by the next one
