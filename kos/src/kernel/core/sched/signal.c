@@ -380,7 +380,7 @@ again:
 		/* Unlink the element. */
 		*pchain = chain->tc_signext;
 	}
-	DBG_memset(&chain->tc_signext, 0xcc, sizeof(chain->tc_signext));
+	DBG_memset(&con->tc_signext, 0xcc, sizeof(con->tc_signext));
 }
 
 
@@ -430,7 +430,7 @@ again:
 		/* Clear the SMP-lock bit. */
 		ATOMIC_AND(self->s_ctl, ~SIG_CONTROL_SMPLOCK);
 	}
-	DBG_memset(&chain->tc_signext, 0xcc, sizeof(chain->tc_signext));
+	DBG_memset(&con->tc_signext, 0xcc, sizeof(con->tc_signext));
 }
 #endif /* SIG_CONTROL_SMPLOCK != 0 */
 
