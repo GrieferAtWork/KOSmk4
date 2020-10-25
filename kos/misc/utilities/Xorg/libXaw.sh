@@ -99,13 +99,15 @@ if [ "$MODE_FORCE_MAKE" == yes ] || \
 fi
 
 # Install libraries
-install_file        /$TARGET_LIBPATH/libXaw6.so.6     "$OPTPATH/src/.libs/libXaw6.so.6.0.1"
-install_symlink     /$TARGET_LIBPATH/libXaw6.so.6.0.1 libXaw6.so.6
-install_symlink     /$TARGET_LIBPATH/libXaw6.so       libXaw6.so.6
+install_file        /$TARGET_LIBPATH/libXaw.so.6      "$OPTPATH/src/.libs/libXaw6.so.6.0.1"
+install_symlink     /$TARGET_LIBPATH/libXaw.so.6.0.1  libXaw.so.6
+install_symlink     /$TARGET_LIBPATH/libXaw6.so.6.0.1 libXaw.so.6
+install_symlink     /$TARGET_LIBPATH/libXaw6.so       libXaw.so.6
 install_file_nodisk /$TARGET_LIBPATH/libXaw6.a        "$OPTPATH/src/.libs/libXaw6.a"
-install_file        /$TARGET_LIBPATH/libXaw7.so.7     "$OPTPATH/src/.libs/libXaw7.so.7.0.0"
-install_symlink     /$TARGET_LIBPATH/libXaw7.so.7.0.0 libXaw7.so.7
-install_symlink     /$TARGET_LIBPATH/libXaw7.so       libXaw7.so.7
+install_file        /$TARGET_LIBPATH/libXaw.so.7      "$OPTPATH/src/.libs/libXaw7.so.7.0.0"
+install_symlink     /$TARGET_LIBPATH/libXaw.so.7.0.0  libXaw.so.7
+install_symlink     /$TARGET_LIBPATH/libXaw7.so.7.0.0 libXaw.so.7
+install_symlink     /$TARGET_LIBPATH/libXaw7.so       libXaw.so.7
 install_file_nodisk /$TARGET_LIBPATH/libXaw7.a        "$OPTPATH/src/.libs/libXaw7.a"
 
 # Install headers

@@ -27,15 +27,16 @@
 #ifdef __CC__
 DECL_BEGIN
 
-/* Try to invoke the user-space exception handler for the
- * currently set exception, as described by `error_info()'
+/* Try to invoke the user-space exception handler for `except_data'
+ * WARNING: Because this function writes to the user-space stack,
+ *          it is capable of throwing an E_SEGFAULT itself.
  * @param: state:   The user-space CPU state (note that `icpustate_isuser(state)' is assumed!)
  * @param: sc_info: When non-NULL, information about the system call that caused the exception.
  *                  Otherwise, if this argument is `NULL', the exception was caused by user-space,
  *                  such as a user-space program causing an `E_SEGFAULT', as opposed to the kernel
  *                  throwing an `E_FSERROR_FILE_NOT_FOUND'
  *            HINT: Additional information about how the system call was invoked can be extracted
- *                  from `sc_info->rsi_flags'! (s.a. `<librpc/bits/rpc-common.h>')
+ *                  from `sc_info->rsi_flags' (s.a. `<librpc/bits/rpc-common.h>')
  * @return: NULL:   User-space does not define an exception handler.
  * @return: * :     The updated interrupt CPU state, modified to invoke the
  *                  user-space exception handler once user-space execution
