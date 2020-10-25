@@ -40,6 +40,12 @@
 
 #include "vm-nodeapi.h"
 
+#if defined(NDEBUG) || 1
+#define VM_MAP_TRACE(...) (void)0
+#else
+#define VM_MAP_TRACE(...) printk(__VA_ARGS__)
+#endif
+
 DECL_BEGIN
 
 struct partnode_pair {
@@ -437,10 +443,10 @@ vm_mapat(struct vm *__restrict self,
 		partnode_pair_vector_fini_and_unlock_parts(&parts);
 		return false;
 	}
-	printk(KERN_DEBUG "[vm] Map %p...%p against %" PRIuSIZ " data parts\n",
-	       (byte_t *)addr,
-	       (byte_t *)addr + num_bytes - 1,
-	       parts.pv_cnt);
+	VM_MAP_TRACE(KERN_DEBUG "[vm] Map %p...%p against %" PRIuSIZ " data parts\n",
+	             (byte_t *)addr,
+	             (byte_t *)addr + num_bytes - 1,
+	             parts.pv_cnt);
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
 		if (!pagedir_prepare_map(addr, num_bytes)) {
@@ -627,9 +633,9 @@ again:
 	assertf(!vm_isused(self, result, num_bytes),
 	        "result = %p...%p\n",
 	        result, (byte_t *)result + num_bytes - 1);
-	printk(KERN_DEBUG "[vm] Map %p...%p against %" PRIuSIZ " data parts\n",
-	       result, (byte_t *)result + num_bytes - 1,
-	       parts.pv_cnt);
+	VM_MAP_TRACE(KERN_DEBUG "[vm] Map %p...%p against %" PRIuSIZ " data parts\n",
+	             result, (byte_t *)result + num_bytes - 1,
+	             parts.pv_cnt);
 	/* Must prepare the given address range beforehand! */
 	if (flag & VM_NODE_FLAG_PREPARED) {
 		if (!pagedir_prepare_map(result, num_bytes)) {
