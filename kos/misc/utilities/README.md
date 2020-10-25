@@ -81,6 +81,3 @@ xclock     6       S #0
 xinit      3       S #1 
 >
 ```
-
-Which is because KOS has yet to implement that system call.
-
