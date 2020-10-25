@@ -23,6 +23,7 @@
 /* API_LEVEL: opensolaris */
 
 #include <__stdinc.h>
+
 #include <inttypes.h> /* Only need non-extension PRI* and SCA* macros. */
 
 /* For some reason, these are also defined here? */

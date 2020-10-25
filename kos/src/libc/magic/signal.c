@@ -1466,7 +1466,7 @@ int sigfillset([[nonnull]] $sigset_t *set) {
 [[impl_include("<libc/errno.h>", "<asm/os/signal.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
-	ulongptr_t mask, word;
+	$ulongptr_t mask, word;
 	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
 	mask = __sigset_mask(signo);
 	word = __sigset_word(signo);
@@ -1485,7 +1485,7 @@ int sigaddset([[nonnull]] $sigset_t *set, $signo_t signo) {
 [[impl_include("<libc/errno.h>", "<asm/os/signal.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
-	ulongptr_t mask, word;
+	$ulongptr_t mask, word;
 	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
 	mask = __sigset_mask(signo);
 	word = __sigset_word(signo);
@@ -1505,7 +1505,7 @@ int sigdelset([[nonnull]] $sigset_t *set, $signo_t signo) {
 [[decl_include("<bits/types.h>", "<bits/os/sigset.h>")]]
 [[impl_prefix(DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO)]]
 int sigismember([[nonnull]] $sigset_t const *set, $signo_t signo) {
-	ulongptr_t mask, word;
+	$ulongptr_t mask, word;
 	__PRIVATE_SIGSET_VALIDATE_SIGNO(signo)
 	mask = __sigset_mask(signo);
 	word = __sigset_word(signo);
@@ -1605,7 +1605,7 @@ int sigwait([[nonnull]] sigset_t const *__restrict set,
 [[kernel, wunused, ATTR_PURE, decl_include("<bits/os/sigset.h>")]]
 int sigisemptyset([[nonnull]] $sigset_t const *__restrict set) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i) {
+	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i) {
 		if (set->__val[i])
 			return 0;
 	}
@@ -1620,7 +1620,7 @@ int sigandset([[nonnull]] $sigset_t *set,
               [[nonnull]] $sigset_t const *left,
               [[nonnull]] $sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i)
 		set->__val[i] = left->__val[i] & right->__val[i];
 	return 0;
 }
@@ -1633,7 +1633,7 @@ int sigorset([[nonnull]] $sigset_t *set,
              [[nonnull]] $sigset_t const *left,
              [[nonnull]] $sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i)
 		set->__val[i] = left->__val[i] | right->__val[i];
 	return 0;
 }
@@ -1649,7 +1649,7 @@ int signandset([[nonnull]] $sigset_t *set,
                [[nonnull]] $sigset_t const *left,
                [[nonnull]] $sigset_t const *right) {
 	size_t i;
-	for (i = 0; i < sizeof(sigset_t) / sizeof(ulongptr_t); ++i)
+	for (i = 0; i < sizeof(sigset_t) / sizeof($ulongptr_t); ++i)
 		set->__val[i] = left->__val[i] & ~right->__val[i];
 	return 0;
 }
