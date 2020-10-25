@@ -1044,6 +1044,10 @@ scan_monitors:
 							/* Monitor isn't actually raised (spurious
 							 * signal, or edge has already fallen again).
 							 * -> Handle this case by prime `monitor' once again. */
+#ifndef NDEBUG
+							memset(&monitor->ehm_rnext, 0xcc, sizeof(monitor->ehm_rnext));
+							COMPILER_WRITE_BARRIER();
+#endif /* !NDEBUG */
 							ATOMIC_WRITE(monitor->ehm_raised, 0);
 							epoll_handle_monitor_pollconnect(monitor, monitor_handptr);
 							what = epoll_handle_monitor_polltest(monitor, monitor_handptr);
@@ -1069,6 +1073,10 @@ scan_monitors:
 								}
 								goto got_monitor_what;
 							}
+							/* Now that the monitor has been re-connected,
+							 * it's time to leave it running once again */
+							epoll_handle_monitor_handle_decref(monitor, monitor_handptr);
+							goto next_monitor;
 						}
 					} EXCEPT {
 						epoll_handle_monitor_handle_decref(monitor, monitor_handptr);
@@ -1094,7 +1102,7 @@ next_monitor:
 		} /* Scope */
 		/* With the set of raised monitors confirmed as `result_events', write
 		 * back the results about their events to the user-supplied `events'. */
-		{
+		if (result_events != NULL) {
 			/* [0..1] The first monitor that is pending, but
 			 *        hasn't been written to user-space, yet. */
 			struct epoll_handle_monitor *next_monitor;
@@ -1238,7 +1246,7 @@ epoll_controller_wait(struct epoll_controller *__restrict self,
                       struct timespec const *timeout)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT, E_INTERRUPT) {
 	size_t result;
-	assert(task_wasconnected());
+	assert(!task_wasconnected());
 again:
 	result = epoll_controller_trywait(self, events, maxevents);
 	if (result == 0) {
