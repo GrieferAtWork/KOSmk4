@@ -1660,6 +1660,8 @@ DEFINE_SYSCALL5(ssize_t, kreaddirf,
 PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
                                          poll_mode_t what) {
 	poll_mode_t result;
+	/* Always allow polling for these conditions. */
+	what |= POLLERR | POLLHUP | POLLNVAL;
 	/* Verify that the caller has access to the
 	 * indicated data channel of the handle. */
 	if (what & POLLINMASK) {
@@ -1671,7 +1673,7 @@ PRIVATE poll_mode_t KCALL do_poll_handle(struct handle &hnd,
 			return POLLERR;
 	}
 	TRY {
-		result = handle_poll(hnd, what);
+		result = handle_poll(hnd, what) & what;
 	} EXCEPT {
 		if (was_thrown(E_FSERROR_UNSUPPORTED_OPERATION) &&
 		    PERTASK_GET(this_exception_args.e_invalid_argument.ia_context) == E_FILESYSTEM_OPERATION_POLL)
