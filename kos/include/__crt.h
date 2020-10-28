@@ -80,10 +80,10 @@
 
 
 
-#if defined(__KERNEL__) && defined(__KOS__)
+#if defined(__KERNEL__) && defined(__KOS__) && !defined(__HAVE_FPU)
 #undef __NO_FPU
 #define __NO_FPU /* Disable functions using FPU registers in kernel-mode. */
-#endif /* __KERNEL__ && __KOS__ */
+#endif /* __KERNEL__ && __KOS__ && !__HAVE_FPU */
 
 #ifdef __CRT_KOS_PRIMARY
 #ifndef __BUILDING_LIBC

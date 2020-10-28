@@ -700,7 +700,7 @@ typedef struct di_debuginfo_member_struct {
 	                                         * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
 	__uintptr_t           m_decl_line;      /* Declaring line number (or 0 if undefined) */
 	__uintptr_t           m_decl_column;    /* Declaring column offset (or 0 if undefined) */
-	__uintptr_t           m_offset;         /* offsetof() this member (or (__uintptr_t)-1 if undefined) */
+	__uintptr_t           m_offset;         /* offsetof() this member (or (uintptr_t)-1 if undefined) */
 	__uintptr_t           m_bit_size;       /* Number of bits apart of a bit-field (or `0' if this isn't a bit-field) */
 	__uintptr_t           m_bit_offset;     /* Number of bits to the left of the leftmost (most significant) bit of the bit field value. */
 } di_debuginfo_member_t;

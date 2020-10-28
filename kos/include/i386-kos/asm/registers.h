@@ -275,7 +275,7 @@
 #   define X86_REGISTER_MISC_FTW        __UINT16_C(0x9832) /* %ftw (FpuTagWord; `sfpuenv::fe_ftw,sfpustate::fs_ftw') */
 #   define X86_REGISTER_MISC_FTWX       __UINT16_C(0x9c33) /* %ftwx (FpuTagWordX; `xfpustate::fx_ftw') */
 #   define X86_REGISTER_MISC_FOP        __UINT16_C(0x9834) /* %fop (FpuOPcode; `sfpuenv::fe_fop,sfpustate::fs_fop,xfpustate::fx_fop')
-                                                * NOTE: actually an 11-bit register */
+                                                            * NOTE: actually an 11-bit register */
 #   define X86_REGISTER_MISC_FIPL       __UINT16_C(0x9435) /* %fipl (FpuInstructionPointer; `sfpuenv::fe_fip,sfpustate::fs_fip,xfpustate::fx_fip') */
 #   define X86_REGISTER_MISC_FCS        __UINT16_C(0x9836) /* %fcs (FpuCodeSegment; `sfpuenv::fe_fcs,sfpustate::fs_fcs') (NOTE: Always `0' for `xfpustate') */
 #   define X86_REGISTER_MISC_FDPL       __UINT16_C(0x9437) /* %fdpl (FpuDataPointer; `sfpuenv::fe_fdp,sfpustate::fs_fdp,xfpustate::fx_fdp') */

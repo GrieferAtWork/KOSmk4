@@ -17,27 +17,56 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_ASM___STDINC_H
-#define _I386_KOS_ASM___STDINC_H 1
+#ifndef GUARD_MODDBX_INIT_C
+#define GUARD_MODDBX_INIT_C 1
+#define _KOS_SOURCE 1
 
-#if (!defined(__INTELLISENSE__) && defined(__CC__) && \
-     defined(__KOS__) && defined(__KERNEL__) &&       \
-     defined(__COMPILER_HAVE_GCC_ASM) && !defined(__HAVE_FPU))
-/* Define some assembler macros to cause compiler error when GCC generates
- * floating-point instructions. This can unintentionally happen when 32-bit
- * codes uses ATOMIC_READ() or ATOMIC_WRITE() with 64-bit operands.
- *
- * These are set-up to cause linker errors (which include file+line info)
- * when an FPU instruction does end up being used. */
-__asm__(
-".macro fildq _a:vararg\n"
-"\t.hidden __x86_linkerror_fpu_instruction_fildq\n"
-"\tcall __x86_linkerror_fpu_instruction_fildq\n"
-".endm\n"
-".macro fistpq _a:vararg\n"
-"\t.hidden __x86_linkerror_fpu_instruction_fistpq\n"
-"\tcall __x86_linkerror_fpu_instruction_fistpq\n"
-".endm\n");
-#endif /* ... */
+/* DeBug eXtensions. */
 
-#endif /* !_I386_KOS_ASM___STDINC_H */
+#include <kernel/compiler.h>
+
+#include <debugger/config.h>
+#include <debugger/hook.h>
+
+#include <stddef.h>
+#include <string.h>
+
+/**/
+#include "include/ceval.h"
+#include "include/cexpr.h"
+#include "include/ctype.h"
+#include "include/malloc.h"
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DECL_BEGIN
+
+DBG_RESET(reset) {
+	ceval_comma_is_select2nd    = false;
+	cexpr_readonly              = false;
+	cexpr_typeonly              = false;
+	/* Set-up `cexpr_stack' that `cexpr_stacktop' could be used. */
+	cexpr_stack     = cexpr_stack_stub + 1;
+	cexpr_stacksize = 0;
+	memset(cexpr_stack_stub, 0, sizeof(cexpr_stack_stub));
+	cexpr_stack_stub[0].cv_type.ct_typ = &ctype_void;
+#if CVALUE_KIND_VOID != 0
+	cexpr_stack_stub[0].cv_kind = CVALUE_KIND_VOID;
+#endif /* CVALUE_KIND_VOID != 0 */
+	/* TODO: Re-initialize the debugger heap-system */
+}
+
+DBG_FINI(fini) {
+	/* Drop all external references held by `debugmodule_list' */
+	while (debugmodule_list) {
+		struct debugmodule *next;
+		next = debugmodule_list->dm_next;
+		debugmodule_fini(debugmodule_list);
+		debugmodule_list = next;
+	}
+	/* TODO: Free all dynamically allocated heap-pages */
+}
+
+DECL_END
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+#endif /* !GUARD_MODDBX_INIT_C */

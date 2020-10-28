@@ -17,27 +17,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_ASM___STDINC_H
-#define _I386_KOS_ASM___STDINC_H 1
+#ifndef GUARD_MODDBX_INCLUDE_ERROR_H
+#define GUARD_MODDBX_INCLUDE_ERROR_H 1
 
-#if (!defined(__INTELLISENSE__) && defined(__CC__) && \
-     defined(__KOS__) && defined(__KERNEL__) &&       \
-     defined(__COMPILER_HAVE_GCC_ASM) && !defined(__HAVE_FPU))
-/* Define some assembler macros to cause compiler error when GCC generates
- * floating-point instructions. This can unintentionally happen when 32-bit
- * codes uses ATOMIC_READ() or ATOMIC_WRITE() with 64-bit operands.
- *
- * These are set-up to cause linker errors (which include file+line info)
- * when an FPU instruction does end up being used. */
-__asm__(
-".macro fildq _a:vararg\n"
-"\t.hidden __x86_linkerror_fpu_instruction_fildq\n"
-"\tcall __x86_linkerror_fpu_instruction_fildq\n"
-".endm\n"
-".macro fistpq _a:vararg\n"
-"\t.hidden __x86_linkerror_fpu_instruction_fistpq\n"
-"\tcall __x86_linkerror_fpu_instruction_fistpq\n"
-".endm\n");
-#endif /* ... */
+/* DeBug eXtensions. */
 
-#endif /* !_I386_KOS_ASM___STDINC_H */
+#include <kernel/compiler.h>
+
+#include <debugger/config.h>
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DECL_BEGIN
+
+#define DBX_EISERR(x) ((x) < 0) /* Check for error */
+
+#define DBX_EOK      (0)  /* Success */
+#define DBX_ENOMEM   (-1) /* Out of memory */
+#define DBX_ESYNTAX  (-2) /* Syntax error */
+#define DBX_EDIVZERO (-3) /* Divide by zero */
+#define DBX_ENOENT   (-4) /* No such object */
+#define DBX_ERDONLY  (-5) /* Read-only */
+#define DBX_EINTERN  (-6) /* Internal error */
+#define DBX_EFAULT   (-7) /* Segmentation fault */
+typedef int dbx_errno_t;
+
+DECL_END
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+#endif /* !GUARD_MODDBX_INCLUDE_ERROR_H */

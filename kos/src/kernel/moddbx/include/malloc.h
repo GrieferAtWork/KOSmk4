@@ -17,27 +17,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_ASM___STDINC_H
-#define _I386_KOS_ASM___STDINC_H 1
+#ifndef GUARD_MODDBX_INCLUDE_MALLOC_H
+#define GUARD_MODDBX_INCLUDE_MALLOC_H 1
 
-#if (!defined(__INTELLISENSE__) && defined(__CC__) && \
-     defined(__KOS__) && defined(__KERNEL__) &&       \
-     defined(__COMPILER_HAVE_GCC_ASM) && !defined(__HAVE_FPU))
-/* Define some assembler macros to cause compiler error when GCC generates
- * floating-point instructions. This can unintentionally happen when 32-bit
- * codes uses ATOMIC_READ() or ATOMIC_WRITE() with 64-bit operands.
+/* DeBug eXtensions: Malloc function.
  *
- * These are set-up to cause linker errors (which include file+line info)
- * when an FPU instruction does end up being used. */
-__asm__(
-".macro fildq _a:vararg\n"
-"\t.hidden __x86_linkerror_fpu_instruction_fildq\n"
-"\tcall __x86_linkerror_fpu_instruction_fildq\n"
-".endm\n"
-".macro fistpq _a:vararg\n"
-"\t.hidden __x86_linkerror_fpu_instruction_fistpq\n"
-"\tcall __x86_linkerror_fpu_instruction_fistpq\n"
-".endm\n");
-#endif /* ... */
+ * Behaves just like the normal kmalloc, except that this one can only be used
+ * from within the debugger, and all memory allocated is forceably released when
+ * the debugger is reset/exited. Additionally, none of these functions make use
+ * of exceptions, but always return `NULL' if an allocation failed.
+ */
 
-#endif /* !_I386_KOS_ASM___STDINC_H */
+#include <kernel/compiler.h>
+
+#include <debugger/config.h>
+#include <kernel/types.h>
+
+#include <hybrid/typecore.h>
+
+#ifdef CONFIG_HAVE_DEBUGGER
+DECL_BEGIN
+
+FUNDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) ATTR_ASSUME_ALIGNED(__SIZEOF_POINTER__) void *
+NOTHROW(FCALL dbx_malloc)(size_t num_bytes);
+FUNDEF WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ASSUME_ALIGNED(__SIZEOF_POINTER__) void *
+NOTHROW(FCALL dbx_realloc)(void *ptr, size_t num_bytes);
+FUNDEF ATTR_PURE WUNUSED size_t NOTHROW(FCALL dbx_malloc_usable_size)(void *ptr);
+FUNDEF void NOTHROW(FCALL dbx_free)(void *ptr);
+
+DECL_END
+#endif /* CONFIG_HAVE_DEBUGGER */
+
+#endif /* !GUARD_MODDBX_INCLUDE_MALLOC_H */
