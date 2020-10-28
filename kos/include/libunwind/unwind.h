@@ -80,11 +80,11 @@ typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_ERROR_REGISTER_STATE;
  * caches for quick (O(1)) repeated access to an FDE located within a known
  * function. */
 typedef __ATTR_NONNULL((2)) unsigned int
-(LIBUNWIND_CC *PUNWIND_FDE_FIND)(void *__absolute_pc,
+(LIBUNWIND_CC *PUNWIND_FDE_FIND)(void const *__absolute_pc,
                                  unwind_fde_t *__restrict __result);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((2)) unsigned int
-__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void *__absolute_pc,
+__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void const *__absolute_pc,
                                             unwind_fde_t *__restrict __result);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
@@ -97,12 +97,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void *__absolute_pc,
  *       `ABSOLUTE_PC >= start && ABSOLUTE_PC < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 typedef __ATTR_NONNULL((2, 4)) unsigned int
-(LIBUNWIND_CC *PUNWIND)(void *__absolute_pc,
+(LIBUNWIND_CC *PUNWIND)(void const *__absolute_pc,
                         unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                         unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unsigned int
-(LIBUNWIND_CC unwind)(void *__absolute_pc,
+(LIBUNWIND_CC unwind)(void const *__absolute_pc,
                       unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                       unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */

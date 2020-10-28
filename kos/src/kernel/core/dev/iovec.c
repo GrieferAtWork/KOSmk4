@@ -153,7 +153,7 @@ aio_buffer_copyfrommem(struct aio_buffer const *__restrict self, uintptr_t dst_o
 		memcpy(ent.ab_base + dst_offset, src, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
-		src = (byte_t *)src + ent.ab_size;
+		src = (byte_t const *)src + ent.ab_size;
 		num_bytes -= ent.ab_size;
 		dst_offset = 0;
 	}
@@ -175,7 +175,7 @@ aio_pbuffer_copyfrommem(struct aio_pbuffer const *__restrict self,
 		vm_copytophys(ent.ab_base + dst_offset, src, ent.ab_size);
 		if (ent.ab_size >= num_bytes)
 			break;
-		src = (byte_t *)src + ent.ab_size;
+		src = (byte_t const *)src + ent.ab_size;
 		num_bytes -= ent.ab_size;
 		dst_offset = 0;
 	}

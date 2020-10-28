@@ -59,7 +59,7 @@ INTERN
 	IF_ZERO  (NONNULL((1, 2, 3)))
 	int
 NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restrict parser, )
-                                          byte_t **__restrict preader,
+                                          byte_t const **__restrict preader,
                                           void *__restrict dst_base,
                                           void *__restrict dst,
                                           uint8_t type
@@ -325,7 +325,7 @@ INTDEF
 	IF_ZERO  (NONNULL((1)))
 	int
 NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__restrict parser, )
-                                            byte_t **__restrict preader,
+                                            byte_t const **__restrict preader,
                                             void *__restrict dst,
                                             unsigned int gen_flags,
                                             void const *const *ext);
@@ -336,7 +336,7 @@ INTDEF
 	IF_ZERO  (NONNULL((1, 2)))
 	int
 NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restrict parser, )
-                                           byte_t **__restrict preader,
+                                           byte_t const **__restrict preader,
                                            void *__restrict dst,
                                            unsigned int gen_flags,
                                            void const *const *ext);
@@ -346,17 +346,17 @@ NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restr
 #define LIBJSON_DECODE_OBJECT_ZERO_DEFINED 1
 #ifdef MODE_DECODE
 INTERN NONNULL((1, 2)) int
-NOTHROW_NCX(CC libjson_decode_designator_zero)(byte_t **__restrict preader,
+NOTHROW_NCX(CC libjson_decode_designator_zero)(byte_t const **__restrict preader,
                                                void *__restrict dst,
                                                unsigned int gen_flags,
                                                void const *const *ext);
 INTDEF NONNULL((1, 2)) int
-NOTHROW_NCX(CC libjson_decode_OBJECT_zero)(byte_t **__restrict preader,
+NOTHROW_NCX(CC libjson_decode_OBJECT_zero)(byte_t const **__restrict preader,
                                            void *__restrict dst,
                                            unsigned int gen_flags,
                                            void const *const *ext);
 INTDEF NONNULL((1, 2)) int
-NOTHROW_NCX(CC libjson_decode_ARRAY_zero)(byte_t **__restrict preader,
+NOTHROW_NCX(CC libjson_decode_ARRAY_zero)(byte_t const **__restrict preader,
                                           void *__restrict dst,
                                           unsigned int gen_flags,
                                           void const *const *ext);
@@ -380,13 +380,15 @@ INTERN
 	IF_ZERO  (NONNULL((1, 2)))
 	int
 NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__restrict parser, )
-                                                byte_t **__restrict preader,
+                                                byte_t const **__restrict preader,
                                                 void *__restrict dst,
                                                 unsigned int gen_flags,
                                                 void const *const *ext) {
 	int result;
-	byte_t op, *reader = *preader;
-	op = *reader++;
+	byte_t op;
+	byte_t const *reader;
+	reader = *preader;
+	op     = *reader++;
 	switch (op) {
 
 	case JGEN_BEGINOBJECT:
@@ -399,12 +401,12 @@ NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__
 
 	case JGEN_EXTERN_OP: {
 		uint16_t offset, id;
-		byte_t *codec;
-		offset = UNALIGNED_GET16((uint16_t *)reader);
+		byte_t const *codec;
+		offset = UNALIGNED_GET16((uint16_t const *)reader);
 		reader += 2;
-		id = UNALIGNED_GET16((uint16_t *)reader);
+		id = UNALIGNED_GET16((uint16_t const *)reader);
 		reader += 2;
-		codec = (byte_t *)ext[id];
+		codec = (byte_t const *)ext[id];
 		if unlikely(*codec == JGEN_TERM) {
 			/* Allowed, but highly unlikely: An empty codec */
 			result = JSON_ERROR_OK;
@@ -429,9 +431,9 @@ NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__
 	case JGEN_INTO: {
 		uint16_t offset;
 		uint8_t type;
-		offset = UNALIGNED_GET16((uint16_t *)reader);
+		offset = UNALIGNED_GET16((uint16_t const *)reader);
 		reader += 2;
-		type = *(uint8_t *)reader;
+		type = *(uint8_t const *)reader;
 		reader += 1;
 		result = FUNC(libjson_decode_INTO)(IF_DECODE(parser, )&reader,
 		                                   dst, (byte_t *)dst + offset,
@@ -454,12 +456,13 @@ INTERN
 	IF_ZERO  (NONNULL((1, 2)))
 	int
 NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__restrict parser, )
-                                            byte_t **__restrict preader,
+                                            byte_t const **__restrict preader,
                                             void *__restrict dst,
                                             unsigned int gen_flags,
                                             void const *const *ext) {
 	int result;
-	byte_t op, *reader;
+	byte_t op;
+	byte_t const *reader;
 #ifdef MODE_DECODE
 	result = libjson_parser_enterobject(parser);
 	if (result != JSON_ERROR_OK) {
@@ -483,10 +486,10 @@ again_inner:
 		case JGEN_FIELD: {
 			IF_DECODE(size_t namelen;)
 #ifndef MODE_DECODE
-			reader = (byte_t *)(strend((char *)reader) + 1);
+			reader = (byte_t const *)(strend((char const *)reader) + 1);
 #else /* !MODE_DECODE */
-			namelen = strlen((char *)reader);
-			result  = libjson_parser_findkey(parser, (char *)reader, namelen);
+			namelen = strlen((char const *)reader);
+			result  = libjson_parser_findkey(parser, (char const *)reader, namelen);
 			reader += namelen + 1;
 			/* parse the field designator. */
 			if (result != JSON_ERROR_OK) {
@@ -541,12 +544,13 @@ INTERN
 	IF_ZERO  (NONNULL((1, 2)))
 	int
 NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restrict parser, )
-                                           byte_t **__restrict preader,
+                                           byte_t const **__restrict preader,
                                            void *__restrict dst,
                                            unsigned int gen_flags,
                                            void const *const *ext) {
 	int result;
-	byte_t op, *reader;
+	byte_t op;
+	byte_t const *reader;
 	IF_DECODE(bool is_first = true;)
 #ifdef MODE_DECODE
 	result = libjson_parser_enterarray(parser);
@@ -574,7 +578,7 @@ again_inner:
 #else /* !MODE_DECODE */
 			uint16_t index;
 			/* parse the array element designator. */
-			index = UNALIGNED_GET16((uint16_t *)reader);
+			index = UNALIGNED_GET16((uint16_t const *)reader);
 			reader += 2; /* Consume the index operand. */
 			if (!is_first) {
 				result = libjson_parser_yield(parser);
@@ -613,10 +617,10 @@ again_inner:
 			uint16_t count;
 			uint16_t stride;
 			size_t offset;
-			byte_t *orig_reader;
-			count   = UNALIGNED_GET16((uint16_t *)reader) + 1;
+			byte_t const *orig_reader;
+			count   = UNALIGNED_GET16((uint16_t const *)reader) + 1;
 			reader += 2;
-			stride  = UNALIGNED_GET16((uint16_t *)reader);
+			stride  = UNALIGNED_GET16((uint16_t const *)reader);
 			reader += 2;
 			offset  = 0;
 			orig_reader = reader;

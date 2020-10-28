@@ -88,7 +88,7 @@ DECL_BEGIN
 INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_state_t *__restrict result,
-                                      void *absolute_pc)
+                                      void const *absolute_pc)
 #elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
 /* Behaves identical to `unwind_fde_exec()', and doesn't actually ever have to be
  * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
@@ -106,7 +106,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
 INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
                                                unwind_cfa_sigframe_state_t *__restrict result,
-                                               void *absolute_pc)
+                                               void const *absolute_pc)
 #endif /* ... */
 {
 	unsigned int error;
@@ -184,7 +184,7 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes);
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
-                       unwind_fde_t const *__restrict fde, void *absolute_pc,
+                       unwind_fde_t const *__restrict fde, void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg)
 #elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
@@ -198,7 +198,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
-                                unwind_fde_t const *__restrict fde, void *absolute_pc,
+                                unwind_fde_t const *__restrict fde, void const *absolute_pc,
                                 unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                 unwind_setreg_t reg_setter, void *reg_setter_arg)
 #elif defined(EH_FRAME_CFA_LANDING_APPLY)
@@ -212,7 +212,7 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 PRIVATE NONNULL((1, 2, 4, 6)) unsigned int CC
 _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
-                          unwind_fde_t const *__restrict fde, void *absolute_pc,
+                          unwind_fde_t const *__restrict fde, void const *absolute_pc,
                           unwind_getreg_t reg_getter, void const *reg_getter_arg,
                           unwind_setreg_t reg_setter, void *reg_setter_arg)
 #endif /* ... */
@@ -407,7 +407,7 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 	}
 	assertf(self->cs_cfa.cv_type != UNWIND_CFA_VALUE_UNSET,
 	        "No CFA for %p...%p (GDB doesn't like this)",
-	        fde->f_pcstart, (byte_t *)fde->f_pcend - 1);
+	        fde->f_pcstart, (byte_t const *)fde->f_pcend - 1);
 
 #ifndef EH_FRAME_CFA_LANDING_APPLY
 	/* Set the new CFA value as content of the SP register. */

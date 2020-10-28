@@ -37,23 +37,23 @@ typedef struct di_addr2line_sections_struct {
 	/* Debug information sections required for implementing addr2line.
 	 * NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__byte_t *ds_debug_abbrev_start;  /* [0..1] `.debug_abbrev' start */
-	__byte_t *ds_debug_abbrev_end;    /* [0..1] `.debug_abbrev' end */
-	__byte_t *ds_debug_info_start;    /* [0..1] `.debug_info' start */
-	__byte_t *ds_debug_info_end;      /* [0..1] `.debug_info' end */
-	__byte_t *ds_debug_str_start;     /* [0..1] `.debug_str' start */
-	__byte_t *ds_debug_str_end;       /* [0..1] `.debug_str' end */
-	__byte_t *ds_debug_aranges_start; /* [0..1] `.debug_aranges' start */
-	__byte_t *ds_debug_aranges_end;   /* [0..1] `.debug_aranges' end */
-	__byte_t *ds_debug_ranges_start;  /* [0..1] `.debug_ranges' start */
-	__byte_t *ds_debug_ranges_end;    /* [0..1] `.debug_ranges' end */
-	__byte_t *ds_debug_line_start;    /* [0..1] `.debug_line' start */
-	__byte_t *ds_debug_line_end;      /* [0..1] `.debug_line' end */
-	__byte_t *ds_strtab_start;        /* [0..1] `.strtab' / `.dynstr' start */
-	__byte_t *ds_strtab_end;          /* [0..1] `.strtab' / `.dynstr' end */
-	__byte_t *ds_symtab_start;        /* [0..1] `.symtab' / `.dynsym' start */
-	__byte_t *ds_symtab_end;          /* [0..1] `.symtab' / `.dynsym' end */
-	__size_t  ds_symtab_ent;          /* Entity size of `.symtab' / `.dynsym' */
+	__byte_t const *ds_debug_abbrev_start;  /* [0..1] `.debug_abbrev' start */
+	__byte_t const *ds_debug_abbrev_end;    /* [0..1] `.debug_abbrev' end */
+	__byte_t const *ds_debug_info_start;    /* [0..1] `.debug_info' start */
+	__byte_t const *ds_debug_info_end;      /* [0..1] `.debug_info' end */
+	__byte_t const *ds_debug_str_start;     /* [0..1] `.debug_str' start */
+	__byte_t const *ds_debug_str_end;       /* [0..1] `.debug_str' end */
+	__byte_t const *ds_debug_aranges_start; /* [0..1] `.debug_aranges' start */
+	__byte_t const *ds_debug_aranges_end;   /* [0..1] `.debug_aranges' end */
+	__byte_t const *ds_debug_ranges_start;  /* [0..1] `.debug_ranges' start */
+	__byte_t const *ds_debug_ranges_end;    /* [0..1] `.debug_ranges' end */
+	__byte_t const *ds_debug_line_start;    /* [0..1] `.debug_line' start */
+	__byte_t const *ds_debug_line_end;      /* [0..1] `.debug_line' end */
+	__byte_t const *ds_strtab_start;        /* [0..1] `.strtab' / `.dynstr' start */
+	__byte_t const *ds_strtab_end;          /* [0..1] `.strtab' / `.dynstr' end */
+	__byte_t const *ds_symtab_start;        /* [0..1] `.symtab' / `.dynsym' start */
+	__byte_t const *ds_symtab_end;          /* [0..1] `.symtab' / `.dynsym' end */
+	__size_t        ds_symtab_ent;          /* Entity size of `.symtab' / `.dynsym' */
 } di_addr2line_sections_t;
 
 typedef struct di_addr2line_dl_sections_struct {
@@ -144,16 +144,16 @@ typedef struct {
 	__uintptr_t al_linestart; /* Starting address of the associated source location (module-relative). */
 	__uintptr_t al_lineend;   /* End address of the associated source location (module-relative). */
 	__uintptr_t al_linediscr; /* Source location discriminator. */
-	char       *al_rawname;   /* [0..1] Raw name of the surrounding symbol. */
-	char       *al_name;      /* [0..1] Symbol name of the surrounding symbol (managed). */
-	char       *al_cuname;    /* [0..1] Name of the associated compilation unit (aka. __BASENAME__). */
-	char       *al_cubase;    /* [0..1] First component of the associated source file. */
-	char       *al_srcpath;   /* [0..1] Second component of the associated source file. */
-	char       *al_srcfile;   /* [0..1] Third component of the associated source file. */
+	char const *al_rawname;   /* [0..1] Raw name of the surrounding symbol. */
+	char const *al_name;      /* [0..1] Symbol name of the surrounding symbol (managed). */
+	char const *al_cuname;    /* [0..1] Name of the associated compilation unit (aka. __BASENAME__). */
+	char const *al_cubase;    /* [0..1] First component of the associated source file. */
+	char const *al_srcpath;   /* [0..1] Second component of the associated source file. */
+	char const *al_srcfile;   /* [0..1] Third component of the associated source file. */
 	__uintptr_t al_srcline;   /* Source line number (1-based; 0 if unknown) */
 	__uintptr_t al_srccol;    /* Source column number (1-based; 0 if unknown) */
-	char       *al_dclpath;   /* [0..1] Second component of the source file that declared the function. */
-	char       *al_dclfile;   /* [0..1] Third component of the source file that declared the function. */
+	char const *al_dclpath;   /* [0..1] Second component of the source file that declared the function. */
+	char const *al_dclfile;   /* [0..1] Third component of the source file that declared the function. */
 	__uintptr_t al_dclline;   /* Declaration source line number of the surrounding function (1-based; 0 if unknown) */
 	__uintptr_t al_dclcol;    /* Declaration source column number of the surrounding function (1-based; 0 if unknown) */
 } di_debug_addr2line_t;

@@ -31,6 +31,7 @@
 #include <sched/cpu.h>
 #include <sched/rwlock-intern.h>
 
+#include <hybrid/host.h>
 #include <hybrid/sequence/list.h>
 
 #include <asm/intrin.h>
@@ -241,9 +242,16 @@ FUNDEF bool
 NOTHROW(KCALL x86_dbg_setregbyidp)(unsigned int level, unsigned int regno, uintptr_t value);
 
 /* Return the ID (one of `X86_REGISTER_*' from <asm/registers.h>,
- * or one of `X86_DBGREGISTER_*') from a given register name. */
+ * or one of `X86_DBGREGISTER_*') from a given register name.
+ * @return: X86_REGISTER_NONE: Unknown register. */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW(KCALL x86_dbg_regfromname)(char const *__restrict name, size_t namelen);
+
+/* Arch-specific register names. */
+#define arch_dbg_getregbyid  x86_dbg_getregbyid
+#define arch_dbg_setregbyid  x86_dbg_setregbyid
+#define arch_dbg_regfromname x86_dbg_regfromname
+#define ARCH_REGISTER_NONE   X86_REGISTER_NONE
 
 #endif /* __CC__ */
 
@@ -262,6 +270,13 @@ enum {
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
+
+#ifdef __x86_64__
+#define dbg_current_sizeof_pointer() \
+	(__KOS64_IS_CS32BIT(x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) ? 4 : 8)
+#else /* __x86_64__ */
+#define dbg_current_sizeof_pointer() 4
+#endif /* !__x86_64__ */
 
 
 /* CPU state kind codes. */

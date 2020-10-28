@@ -1221,7 +1221,7 @@ NOTHROW(FCALL getusermod_nx)(USER void const *addr,
 #endif /* CONFIG_HAVE_DEBUGGER */
 
 LOCAL NONNULL((1, 5, 7)) unsigned int LIBUNWIND_CC
-unwind_userspace_with_section(struct usermod *__restrict um, void *absolute_pc,
+unwind_userspace_with_section(struct usermod *__restrict um, void const *absolute_pc,
                               void *eh_frame_data, size_t eh_frame_size,
                               unwind_getreg_t reg_getter, void const *reg_getter_arg,
                               unwind_setreg_t reg_setter, void *reg_setter_arg,
@@ -1291,7 +1291,7 @@ unwind_userspace_with_section(struct usermod *__restrict um, void *absolute_pc,
 }
 
 PRIVATE ATTR_NOINLINE NONNULL((2, 4)) unsigned int LIBUNWIND_CC
-unwind_userspace(void *absolute_pc,
+unwind_userspace(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	/* Unwind a user-space location. */
@@ -1376,7 +1376,7 @@ done:
 
 
 PUBLIC NONNULL((2, 4)) unsigned int LIBDEBUGINFO_CC
-unwind_for_debug(void *absolute_pc,
+unwind_for_debug(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int result;

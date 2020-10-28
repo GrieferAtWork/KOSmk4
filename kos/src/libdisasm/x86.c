@@ -1173,7 +1173,7 @@ done_escape_register:
 				{
 					uintptr_t addr;
 				case OPC_MOFFS8:
-					addr = (uintptr_t) * (u8 *)self->d_pc;
+					addr = (uintptr_t)*(u8 *)self->d_pc;
 					self->d_pc += 1;
 					goto do_print_moffs;
 				case OPC_MOFFS16:

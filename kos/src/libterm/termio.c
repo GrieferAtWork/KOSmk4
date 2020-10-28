@@ -145,13 +145,14 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 		/* Check for simple case: No pre-processing required. */
 		result = libterminal_do_owrite_direct(self, src, num_bytes, mode);
 	} else {
-		byte_t *iter, *end, *flush_start;
+		byte_t const *iter, *end, *flush_start;
 		result      = 0;
-		end         = (iter = (byte_t *)src) + num_bytes;
+		iter        = (byte_t const *)src;
+		end         = iter + num_bytes;
 		flush_start = iter;
 		for (; iter < end; ++iter) {
 			byte_t ch = *iter;
-			assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
+			assert((size_t)result == (size_t)(flush_start - (byte_t const *)src));
 			switch (ch) {
 
 			case 'a' ... 'z':
@@ -252,7 +253,7 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 			default: break;
 			}
 		}
-		assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
+		assert((size_t)result == (size_t)(flush_start - (byte_t const *)src));
 		if (flush_start < end) {
 			temp = libterminal_do_owrite_direct(self, flush_start, (size_t)(end - flush_start), mode);
 			if unlikely(temp < 0)
@@ -335,14 +336,15 @@ libterminal_do_owrite_force_echo(struct terminal *__restrict self,
 		                                            lflag);
 	} else {
 		/* Must escape ASCII control characters (0x00 ... 0x1f) using the ^X notation */
-		byte_t *iter, *end, *flush_start;
+		byte_t const *iter, *end, *flush_start;
 		result      = 0;
-		end         = (iter = (byte_t *)src) + num_bytes;
+		iter        = (byte_t const *)src;
+		end         = iter + num_bytes;
 		flush_start = iter;
 		for (; iter < end; ++iter) {
 			byte_t buf[2];
 			byte_t ch = *iter;
-			assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
+			assert((size_t)result == (size_t)(flush_start - (byte_t const *)src));
 			if (ch >= 0x20)
 				continue;
 			if (ch == '\t' || ch == '\r' || ch == '\n')
@@ -405,7 +407,7 @@ libterminal_do_owrite_echo(struct terminal *__restrict self,
 			nl2 = ATOMIC_READ(self->t_ios.c_cc[VEOL2]);
 			for (i = 0; i < num_bytes; ++i) {
 				byte_t ch;
-				ch = ((byte_t *)src)[i];
+				ch = ((byte_t const *)src)[i];
 				if (ch == '\n' || ch == nl1 || ch == nl2) {
 					temp = libterminal_do_owrite_force_echo(self, &ch, 1, mode, lflag);
 					if unlikely(temp <= 0)
@@ -508,14 +510,15 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 		if (iflag & IUTF8) {
 			__USER __CHECKED char const *ptr, *nextptr, *start;
 			start = (__USER __CHECKED char const *)erased_data;
-			ptr   = (__USER __CHECKED char const *)((byte_t *)erased_data + num_bytes);
+			ptr   = (__USER __CHECKED char const *)((byte_t const *)erased_data + num_bytes);
 			/* Unwrite data-blocks one unicode character at a time. */
 			while (ptr > start) {
 				nextptr = ptr;
 				unicode_readutf8_rev_n(&nextptr, start);
 				temp = libterminal_do_owrite_echo(self,
 				                                  nextptr,
-				                                  (size_t)((byte_t *)ptr - (byte_t *)nextptr),
+				                                  (size_t)((byte_t const *)ptr -
+				                                           (byte_t const *)nextptr),
 				                                  mode,
 				                                  lflag);
 				if unlikely(temp <= 0)
@@ -528,7 +531,7 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 			while (num_bytes) {
 				--num_bytes;
 				temp = libterminal_do_owrite_echo(self,
-				                                  (byte_t *)erased_data + num_bytes,
+				                                  (byte_t const *)erased_data + num_bytes,
 				                                  1,
 				                                  mode,
 				                                  lflag);
@@ -580,13 +583,14 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 	struct linecapture capture;
 	if (lflag & ICANON) {
 		/* Canonical input mode */
-		byte_t *iter, *end, *flush_start;
+		byte_t const *iter, *end, *flush_start;
 		result      = 0;
-		end         = (iter = (byte_t *)src) + num_bytes;
+		iter        = (byte_t const *)src;
+		end         = iter + num_bytes;
 		flush_start = iter;
 		for (; iter < end; ++iter) {
 			byte_t ch = *iter;
-			assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
+			assert((size_t)result == (size_t)(flush_start - (byte_t const *)src));
 			/* Canon control characters (COMMIT, ERASE, etc.) */
 			if (ch == _POSIX_VDISABLE)
 				continue; /* Don't enable this. */
@@ -859,7 +863,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 	    (ATOMIC_FETCHAND(self->t_ios.c_lflag, ~__IESCAPING) & __IESCAPING)) {
 		byte_t ch;
 		/* Escape the first character. */
-		ch = ((byte_t *)src)[0];
+		ch = ((byte_t const *)src)[0];
 		if (lflag & ICANON) {
 			result = libterminal_do_iwrite_canon(self, &ch, 1, mode, iflag, lflag);
 		} else {
@@ -876,7 +880,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 		if unlikely(!result)
 			return 0;
 		result = libterminal_do_iwrite_formatted(self,
-		                                         (byte_t *)src + 1,
+		                                         (byte_t const *)src + 1,
 		                                         num_bytes - 1,
 		                                         mode,
 		                                         iflag,
@@ -891,9 +895,10 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 		                                          iflag,
 		                                          lflag);
 	} else {
-		byte_t *iter, *end, *flush_start;
+		byte_t const *iter, *end, *flush_start;
 		result      = 0;
-		end         = (iter = (byte_t *)src) + num_bytes;
+		iter        = (byte_t const *)src;
+		end         = iter + num_bytes;
 		flush_start = iter;
 		/* If any input is given (which was tested above), support the IXANY
 		 * flag which will restore output whenever any input is typed out. */
@@ -907,7 +912,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 		}
 		for (; iter < end; ++iter) {
 			byte_t ch = *iter;
-			assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
+			assert((size_t)result == (size_t)(flush_start - (byte_t const *)src));
 			if (ch == self->t_ios.c_cc[VINTR] && (lflag & ISIG)) {
 				size_t count;
 				assert(flush_start <= iter);
@@ -1087,9 +1092,10 @@ libterminal_do_iwrite(struct terminal *__restrict self,
 	} else if unlikely(!num_bytes) {
 		result = 0;
 	} else {
-		byte_t *iter, *end, *flush_start;
-		result = 0;
-		end = (iter = (byte_t *)src) + num_bytes;
+		byte_t const *iter, *end, *flush_start;
+		result      = 0;
+		iter        = (byte_t const *)src;
+		end         = iter + num_bytes;
 		flush_start = iter;
 		TRY {
 			byte_t ch;
@@ -1113,7 +1119,7 @@ libterminal_do_iwrite(struct terminal *__restrict self,
 			for (; iter < end; ++iter) {
 				ch = *iter;
 switch_ch:
-				assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
+				assert((size_t)result == (size_t)(flush_start - (byte_t const *)src));
 				switch (ch) {
 
 				case 255:
@@ -1163,13 +1169,13 @@ switch_ch:
 				case 'A' ... 'Z':
 					if ((lflag & (ICANON | XCASE)) == (ICANON | XCASE)) {
 						if (lflag & __IXCASEING) {
-							assert(flush_start == iter - 1 || iter == (byte_t *)src);
+							assert(flush_start == iter - 1 || iter == (byte_t const *)src);
 							ch += ('a' - 'A');
 							temp = libterminal_do_iwrite_formatted(self, &ch, 1,
 							                                       mode, iflag, lflag);
 							if unlikely(temp < 1)
 								goto err_or_done;
-							if (iter != (byte_t *)src)
+							if (iter != (byte_t const *)src)
 								++result; /* Account for the \-character */
 							++result; /* Account for the uppercase character */
 							flush_start = iter + 1;

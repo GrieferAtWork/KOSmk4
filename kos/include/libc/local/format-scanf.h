@@ -47,7 +47,7 @@
 #include <asm/crt/stdio.h> /* __EOF */
 
 #ifdef __INTELLISENSE__
-#include <bits/format-printer.h>
+#include <bits/crt/format-printer.h>
 #include <bits/math-constants.h>
 
 #include <libc/string.h>

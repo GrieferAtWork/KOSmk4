@@ -56,11 +56,11 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTERN TEXTSECTION NONNULL((1, 2, 3)) unsigned int
-NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t *__restrict debug_aranges_start,
-                                          byte_t *__restrict debug_aranges_end,
+NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t const *__restrict debug_aranges_start,
+                                          byte_t const *__restrict debug_aranges_end,
                                           uintptr_t *__restrict pdebug_info_cu_offset,
                                           uintptr_t module_relative_pc) {
-	byte_t *reader, *next;
+	byte_t const *reader, *next;
 	uintptr_t debug_info_cu_offset;
 	reader = debug_aranges_start;
 	while (reader < debug_aranges_end) {
@@ -68,7 +68,7 @@ NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t *__restrict debug_aranges_start
 		uint16_t version;
 		uint8_t addrsize, segsize;
 		/* 6.1.2 Lookup by Address */
-		length = UNALIGNED_GET32((uint32_t *)reader); /* unit_length */
+		length = UNALIGNED_GET32((uint32_t const *)reader); /* unit_length */
 		reader += 4;
 		if (length >= UINT32_C(0xfffffff0)) {
 			if (length == UINT32_C(0xffffffff)) {
@@ -76,7 +76,7 @@ NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t *__restrict debug_aranges_start
 				 * In the 64-bit DWARF format, an initial length field is 96 bits in size, and has two parts:
 				 *  - The first 32-bits have the value 0xffffffff.
 				 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
-				length = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+				length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 				reader += 8;
 			} else {
 				/* 7.2.2 Initial Length Values
@@ -89,18 +89,18 @@ NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t *__restrict debug_aranges_start
 			break;
 		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next))
 			next = (byte_t *)-1;
-		version = UNALIGNED_GET16((uint16_t *)reader); /* version */
+		version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
 		reader += 2;
 		if unlikely(version != 2)
 			return DEBUG_INFO_ERROR_CORRUPT;
-		debug_info_cu_offset = UNALIGNED_GET32((uint32_t *)reader); /* debug_info_offset */
+		debug_info_cu_offset = UNALIGNED_GET32((uint32_t const *)reader); /* debug_info_offset */
 		reader += 4;
 		if (debug_info_cu_offset == UINT32_C(0xffffffff)) {
-			length = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 			reader += 8;
 		}
-		addrsize = *(uint8_t *)reader, reader += 1; /* address_size */
-		segsize  = *(uint8_t *)reader, reader += 1; /* segment_size */
+		addrsize = *(uint8_t const *)reader, reader += 1; /* address_size */
+		segsize  = *(uint8_t const *)reader, reader += 1; /* segment_size */
 #if __SIZEOF_POINTER__ > 4
 		if unlikely(addrsize != 1 && addrsize != 2 && addrsize != 4 && addrsize != 8)
 			return DEBUG_INFO_ERROR_CORRUPT;
@@ -117,31 +117,31 @@ NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t *__restrict debug_aranges_start
 			switch (addrsize) {
 
 			case 1:
-				start = *(uint8_t *)reader;
+				start = *(uint8_t const *)reader;
 				reader += 1;
-				length = *(uint8_t *)reader;
+				length = *(uint8_t const *)reader;
 				reader += 1;
 				break;
 
 			case 2:
-				start = UNALIGNED_GET16((uint16_t *)reader);
+				start = UNALIGNED_GET16((uint16_t const *)reader);
 				reader += 2;
-				length = UNALIGNED_GET16((uint16_t *)reader);
+				length = UNALIGNED_GET16((uint16_t const *)reader);
 				reader += 2;
 				break;
 
 			case 4:
-				start = UNALIGNED_GET32((uint32_t *)reader);
+				start = UNALIGNED_GET32((uint32_t const *)reader);
 				reader += 4;
-				length = UNALIGNED_GET32((uint32_t *)reader);
+				length = UNALIGNED_GET32((uint32_t const *)reader);
 				reader += 4;
 				break;
 
 #if __SIZEOF_POINTER__ > 4
 			case 8:
-				start = UNALIGNED_GET64((uint64_t *)reader);
+				start = UNALIGNED_GET64((uint64_t const *)reader);
 				reader += 8;
-				length = UNALIGNED_GET64((uint64_t *)reader);
+				length = UNALIGNED_GET64((uint64_t const *)reader);
 				reader += 8;
 				break;
 #endif /* __SIZEOF_POINTER__ > 4 */

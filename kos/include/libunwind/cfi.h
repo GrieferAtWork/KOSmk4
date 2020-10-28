@@ -582,25 +582,25 @@ typedef struct unwind_emulator_sections_struct {
 	/* NOTE: When individual sections are empty, the associated instructions become illegal
 	 * NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__byte_t *ues_eh_frame_start;     /* [0..1][const] `.eh_frame' start (for `DW_OP_call_frame_cfa') */
-	__byte_t *ues_eh_frame_end;       /* [0..1][const] `.eh_frame' end */
-	__byte_t *ues_debug_frame_start;  /* [0..1][const] `.debug_frame' start (for `DW_OP_call_frame_cfa') */
-	__byte_t *ues_debug_frame_end;    /* [0..1][const] `.debug_frame' end */
-	__byte_t *ues_debug_addr_start;   /* [0..1][const] `.debug_addr' start (for `DW_OP_addrx' / `DW_OP_constx') */
-	__byte_t *ues_debug_addr_end;     /* [0..1][const] `.debug_addr' end */
-	__byte_t *ues_debug_loc_start;    /* [0..1][const] `.debug_loc' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t *ues_debug_loc_end;      /* [0..1][const] `.debug_loc' end */
-	__byte_t *ues_debug_abbrev_start; /* [0..1][const] `.debug_abbrev' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t *ues_debug_abbrev_end;   /* [0..1][const] `.debug_abbrev' end */
-	__byte_t *ues_debug_info_start;   /* [0..1][const] `.debug_info' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t *ues_debug_info_end;     /* [0..1][const] `.debug_info' end */
+	__byte_t const *ues_eh_frame_start;     /* [0..1][const] `.eh_frame' start (for `DW_OP_call_frame_cfa') */
+	__byte_t const *ues_eh_frame_end;       /* [0..1][const] `.eh_frame' end */
+	__byte_t const *ues_debug_frame_start;  /* [0..1][const] `.debug_frame' start (for `DW_OP_call_frame_cfa') */
+	__byte_t const *ues_debug_frame_end;    /* [0..1][const] `.debug_frame' end */
+	__byte_t const *ues_debug_addr_start;   /* [0..1][const] `.debug_addr' start (for `DW_OP_addrx' / `DW_OP_constx') */
+	__byte_t const *ues_debug_addr_end;     /* [0..1][const] `.debug_addr' end */
+	__byte_t const *ues_debug_loc_start;    /* [0..1][const] `.debug_loc' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t const *ues_debug_loc_end;      /* [0..1][const] `.debug_loc' end */
+	__byte_t const *ues_debug_abbrev_start; /* [0..1][const] `.debug_abbrev' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t const *ues_debug_abbrev_end;   /* [0..1][const] `.debug_abbrev' end */
+	__byte_t const *ues_debug_info_start;   /* [0..1][const] `.debug_info' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t const *ues_debug_info_end;     /* [0..1][const] `.debug_info' end */
 } unwind_emulator_sections_t;
 
 #ifndef __di_debuginfo_location_t_defined
 #define __di_debuginfo_location_t_defined 1
 typedef struct di_debuginfo_location_struct {
-	__byte_t    *l_expr;  /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
-	__byte_t    *l_llist; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
+	__byte_t const *l_expr;  /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
+	__byte_t const *l_llist; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
 } di_debuginfo_location_t;
 #endif /* !__di_debuginfo_location_t_defined */
 
@@ -609,9 +609,9 @@ typedef struct unwind_emulator_struct {
 	unwind_ste_t           *ue_stack;              /* [0..ue_stacksz|ALLOC(ue_stackmax)][const] Value stack for the emulator. */
 	__size_t                ue_stacksz;            /* Currently used stack size. */
 	__size_t                ue_stackmax;           /* [const] Max available stack size. */
-	__byte_t               *ue_pc;                 /* [1..1] Program counter position. */
-	__byte_t               *ue_pc_start;           /* [1..1][const] Program start pointer. */
-	__byte_t               *ue_pc_end;             /* [1..1][const] Program end pointer. */
+	__byte_t const         *ue_pc;                 /* [1..1] Program counter position. */
+	__byte_t const         *ue_pc_start;           /* [1..1][const] Program start pointer. */
+	__byte_t const         *ue_pc_end;             /* [1..1][const] Program end pointer. */
 	unwind_emulator_sections_t const
 	                       *ue_sectinfo;           /* [0..1][const] Emulator section information. */
 	unwind_getreg_t         ue_regget;             /* [1..1][const] Callback for reading out the value of a register. */
@@ -759,7 +759,7 @@ typedef __ATTR_NONNULL((1, 3, 7, 9)) unsigned int
                                              void *__restrict __buf, __size_t __bufsize,
                                              __size_t *__restrict __pnum_written_bits,
                                              di_debuginfo_location_t const *__frame_base_expression,
-                                             void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
+                                             void const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 typedef __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_SETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
@@ -781,7 +781,7 @@ debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict __self,
                             void *__restrict __buf, __size_t __bufsize,
                             __size_t *__restrict __pnum_written_bits,
                             di_debuginfo_location_t const *__frame_base_expression,
-                            void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
+                            void const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int LIBUNWIND_CC
 debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,

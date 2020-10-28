@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cdc73c */
+/* HASH CRC-32:0xd1c7b8f8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,12 +28,12 @@ __LOCAL_LIBC(memcpyq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UIN
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpyq))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_qwords) {
 #if __SIZEOF_BUSINT__ >= 8
 	__UINT64_TYPE__ *__pdst = (__UINT64_TYPE__ *)__dst;
-	__UINT64_TYPE__ *__psrc = (__UINT64_TYPE__ *)__src;
+	__UINT64_TYPE__ const *__psrc = (__UINT64_TYPE__ const *)__src;
 	while (__n_qwords--)
 		*__pdst++ = *__psrc++;
 #else /* __SIZEOF_BUSINT__ >= 8 */
 	__UINT32_TYPE__ *__pdst = (__UINT32_TYPE__ *)__dst;
-	__UINT32_TYPE__ *__psrc = (__UINT32_TYPE__ *)__src;
+	__UINT32_TYPE__ const *__psrc = (__UINT32_TYPE__ const *)__src;
 	while (__n_qwords--) {
 		*__pdst++ = *__psrc++;
 		*__pdst++ = *__psrc++;

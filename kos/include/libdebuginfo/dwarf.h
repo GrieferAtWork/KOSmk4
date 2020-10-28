@@ -494,9 +494,10 @@ typedef __uintptr_t dwarf_uleb128_t;
 
 /* Decode a signed/unsigned LEB128 integer and advance `*ptext' */
 __LOCAL __ATTR_NONNULL((1)) dwarf_sleb128_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128)(__byte_t **__restrict ptext) {
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128)(__byte_t const **__restrict ptext) {
 	/* TODO: Make this one an external in-library function! */
-	__byte_t byte,*text = *ptext;
+	__byte_t byte;
+	__byte_t const *text = *ptext;
 	dwarf_sleb128_t result = 0;
 	unsigned int shift = 0;
 	for (;;) {
@@ -514,9 +515,10 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_sleb128)(__byte_t **__restrict ptext)
 }
 
 __LOCAL __ATTR_NONNULL((1)) dwarf_uleb128_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128)(__byte_t **__restrict ptext) {
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128)(__byte_t const **__restrict ptext) {
 	/* TODO: Make this one an external in-library function! */
-	__byte_t byte,*text = *ptext;
+	__byte_t byte;
+	__byte_t const *text = *ptext;
 	unsigned int shift = 0;
 	dwarf_uleb128_t result = 0;
 	for (;;) {
@@ -532,7 +534,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_uleb128)(__byte_t **__restrict ptext)
 
 
 __LOCAL __ATTR_NONNULL((1)) __uintptr_t
-__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preader,
+__NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t const **__restrict preader,
                                                     __uint8_t encoding,
                                                     __uint8_t addrsize,
                                                     __uintptr_t textbase,
@@ -540,7 +542,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
                                                     __uintptr_t funcbase) {
 	/* TODO: Make this one an external in-library function! */
 	__uintptr_t result;
-	__byte_t *text = *preader;
+	__byte_t const *text = *preader;
 	/* Relative encoding formats. */
 	switch (encoding & 0x70) {
 
@@ -561,7 +563,7 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
 		break;
 
 	case DW_EH_PE_aligned:
-		text   = (__byte_t *)(((__uintptr_t)text + (addrsize - 1)) & ~(addrsize - 1));
+		text   = (__byte_t const *)(((__uintptr_t)text + (addrsize - 1)) & ~(addrsize - 1));
 		result = 0;
 		break;
 
@@ -574,57 +576,57 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
 
 	case DW_EH_PE_absptr:
 		if __untraced(addrsize >= sizeof(__uintptr_t)) {
-			result += __hybrid_unaligned_get((__uintptr_t *)text);
+			result += __hybrid_unaligned_get((__uintptr_t const *)text);
 #if __SIZEOF_POINTER__ > 4
 		} else if __untraced(addrsize >= 4) {
-			result += __hybrid_unaligned_get32((__uint32_t *)text);
+			result += __hybrid_unaligned_get32((__uint32_t const *)text);
 #endif /* __SIZEOF_POINTER__ > 4 */
 		} else if __untraced(addrsize >= 2) {
-			result += __hybrid_unaligned_get16((__uint16_t *)text);
+			result += __hybrid_unaligned_get16((__uint16_t const *)text);
 		} else if __untraced(addrsize >= 1) {
-			result += *(__uint8_t *)text;
+			result += *(__uint8_t const *)text;
 		}
 		text += addrsize;
 		break;
 
 	case DW_EH_PE_udata2:
-		result += __hybrid_unaligned_get16((__uint16_t *)text);
+		result += __hybrid_unaligned_get16((__uint16_t const *)text);
 		text += 2;
 		break;
 
 	case DW_EH_PE_udata4:
-		result += __hybrid_unaligned_get32((__uint32_t *)text);
+		result += __hybrid_unaligned_get32((__uint32_t const *)text);
 		text += 4;
 		break;
 
 	case DW_EH_PE_udata8:
 #if __SIZEOF_POINTER__ > 4
-		result += __hybrid_unaligned_get64((__uint64_t *)text);
+		result += __hybrid_unaligned_get64((__uint64_t const *)text);
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		result += __hybrid_unaligned_get32((__uint32_t *)text);
+		result += __hybrid_unaligned_get32((__uint32_t const *)text);
 #else /* ... */
-		result += __hybrid_unaligned_get32((__uint32_t *)text + 1);
+		result += __hybrid_unaligned_get32((__uint32_t const *)text + 1);
 #endif /* !... */
 		text += 8;
 		break;
 
 	case DW_EH_PE_sdata2:
-		result += (__int16_t)__hybrid_unaligned_get16((__uint16_t *)text);
+		result += (__int16_t)__hybrid_unaligned_get16((__uint16_t const *)text);
 		text += 2;
 		break;
 
 	case DW_EH_PE_sdata4:
-		result += (__int32_t)__hybrid_unaligned_get32((__uint32_t *)text);
+		result += (__int32_t)__hybrid_unaligned_get32((__uint32_t const *)text);
 		text += 4;
 		break;
 
 	case DW_EH_PE_sdata8:
 #if __SIZEOF_POINTER__ > 4
-		result += (__int64_t)__hybrid_unaligned_get64((__uint64_t *)text);
+		result += (__int64_t)__hybrid_unaligned_get64((__uint64_t const *)text);
 #elif __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-		result += (__int32_t)__hybrid_unaligned_get32((__uint32_t *)text);
+		result += (__int32_t)__hybrid_unaligned_get32((__uint32_t const *)text);
 #else /* ... */
-		result += (__int32_t)__hybrid_unaligned_get32((__uint32_t *)text + 1);
+		result += (__int32_t)__hybrid_unaligned_get32((__uint32_t const *)text + 1);
 #endif /* !... */
 		text += 8;
 		break;
@@ -643,15 +645,15 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
 	}
 	if __untraced(encoding & DW_EH_PE_indirect) {
 		if __untraced(addrsize >= sizeof(__uintptr_t)) {
-			result = __hybrid_unaligned_get((__uintptr_t *)result);
+			result = __hybrid_unaligned_get((__uintptr_t const *)result);
 #if __SIZEOF_POINTER__ > 4
 		} else if __untraced(addrsize >= 4) {
-			result = __hybrid_unaligned_get32((__uint32_t *)result);
+			result = __hybrid_unaligned_get32((__uint32_t const *)result);
 #endif /* __SIZEOF_POINTER__ > 4 */
 		} else if __untraced(addrsize >= 2) {
-			result = __hybrid_unaligned_get16((__uint16_t *)result);
+			result = __hybrid_unaligned_get16((__uint16_t const *)result);
 		} else if __untraced(addrsize >= 1) {
-			result = *(__uint8_t *)result;
+			result = *(__uint8_t const *)result;
 		}
 	}
 	*preader = text;

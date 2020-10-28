@@ -718,7 +718,7 @@ save_distance_and_length_and_yield:
 							partlen = bufsize;
 							if (!bufsize) {
 								u32 new_distance;
-								new_distance = ((byte_t *)buf - (byte_t *)src) + pattern_length;
+								new_distance = ((byte_t *)buf - (byte_t const *)src) + pattern_length;
 								if (distance < new_distance)
 									distance = new_distance;
 								goto save_distance_and_length_and_yield;

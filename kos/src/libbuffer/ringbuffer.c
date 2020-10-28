@@ -449,7 +449,7 @@ again_connect:
 	TRY {
 		/* Try to write more data. */
 		temp = libringbuffer_write_nonblock(self,
-		                                    (byte_t *)src + result,
+		                                    (byte_t const *)src + result,
 		                                    num_bytes - result);
 	} EXCEPT {
 		task_disconnectall();
@@ -488,7 +488,7 @@ again_connect:
 #endif /* !__KERNEL__ */
 	/* Try to read more data. */
 	temp = libringbuffer_write_nonblock(self,
-	                                    (byte_t *)src + result,
+	                                    (byte_t const *)src + result,
 	                                    num_bytes - result);
 #ifndef __KERNEL__
 	if unlikely(temp < 0) {
@@ -526,7 +526,7 @@ again_connect:
 	TRY {
 		/* Try to read write data. */
 		temp = libringbuffer_write_nonblock(self,
-		                                    (byte_t *)src + result,
+		                                    (byte_t const *)src + result,
 		                                    num_bytes - result);
 	} EXCEPT {
 		task_disconnectall();
@@ -562,7 +562,7 @@ again_connect:
 #endif /* !__KERNEL__ */
 	/* Try to read more data. */
 	temp = libringbuffer_write_nonblock(self,
-	                                    (byte_t *)src + result,
+	                                    (byte_t const *)src + result,
 	                                    num_bytes - result);
 	if (temp != 0) {
 #ifndef __KERNEL__
@@ -730,10 +730,10 @@ again_locked:
 		/* All data can be written linearly at `wptr...+=temp' */
 #ifndef __KERNEL__
 		memcpy(self->rb_data + wptr,
-		       (byte_t *)src + result, temp);
+		       (byte_t const *)src + result, temp);
 #else /* !__KERNEL__ */
 		copy_error = memcpy_nopf(self->rb_data + wptr,
-		                         (byte_t *)src + result, temp);
+		                         (byte_t const *)src + result, temp);
 		if unlikely(copy_error) {
 			/* Must copy the next byte without holding a lock. */
 			byte_t next_byte;
@@ -751,7 +751,7 @@ copy_faulting_byte:
 				sched_signal_broadcast(&self->rb_nempty);
 			/* Try to copy `next_byte' from the user-supplied buffer */
 			COMPILER_READ_BARRIER();
-			next_byte = ((byte_t *)src)[result]; /* CAUTION: SEGFAULT */
+			next_byte = ((byte_t const *)src)[result]; /* CAUTION: SEGFAULT */
 			COMPILER_READ_BARRIER();
 			/* Try to re-acquire the lock. */
 			if unlikely(!atomic_rwlock_trywrite(&self->rb_lock)) {
@@ -786,10 +786,10 @@ copy_faulting_byte:
 		 */
 #ifndef __KERNEL__
 		memcpy(self->rb_data + wptr,
-		       (byte_t *)src + result, linear);
+		       (byte_t const *)src + result, linear);
 #else /* !__KERNEL__ */
 		copy_error = memcpy_nopf(self->rb_data + wptr,
-		                         (byte_t *)src + result, linear);
+		                         (byte_t const *)src + result, linear);
 		if unlikely(copy_error) {
 			assert(copy_error <= linear);
 			linear -= copy_error;
@@ -804,11 +804,11 @@ copy_faulting_byte:
 		/* Copy low-memory */
 #ifndef __KERNEL__
 		memcpy(self->rb_data,
-		       (byte_t *)src + result + linear,
+		       (byte_t const *)src + result + linear,
 		       low_memory_bytes);
 #else /* !__KERNEL__ */
 		copy_error = memcpy_nopf(self->rb_data,
-		                         (byte_t *)src + result + linear,
+		                         (byte_t const *)src + result + linear,
 		                         low_memory_bytes);
 		if unlikely(copy_error) {
 			assert(copy_error <= low_memory_bytes);

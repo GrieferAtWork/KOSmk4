@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3bb8a99 */
+/* HASH CRC-32:0xadb3b57f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,10 @@ __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. (assumes that `DST <= SRC || !N_WORDS') */
 __LOCAL_LIBC(memmovedownw) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownw))(void *__dst, void const *__src, __SIZE_TYPE__ __n_words) {
-	__UINT16_TYPE__ *__pdst, *__psrc;
+	__UINT16_TYPE__ *__pdst;
+	__UINT16_TYPE__ const *__psrc;
 	__pdst = (__UINT16_TYPE__ *)__dst;
-	__psrc = (__UINT16_TYPE__ *)__src;
+	__psrc = (__UINT16_TYPE__ const *)__src;
 	__hybrid_assertf(__pdst <= __psrc || !__n_words, "%p > %p (count:%Iu)", __dst, __src, __n_words);
 	while (__n_words--)
 		*__pdst++ = *__psrc++;

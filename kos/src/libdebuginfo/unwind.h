@@ -49,7 +49,7 @@ DECL_BEGIN
  * to unwind them will fail with `UNWIND_NO_FRAME'.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 INTDEF NONNULL((2, 4)) unsigned int CC
-libdi_unwind_for_debug(void *absolute_pc,
+libdi_unwind_for_debug(void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg);
 

@@ -52,12 +52,12 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTDEF NONNULL((1, 2, 3, 4, 5)) unsigned int
-NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t **__restrict pdebug_info_reader,
-                                                   byte_t *__restrict debug_info_end,
+NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t const **__restrict pdebug_info_reader,
+                                                   byte_t const *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                    di_debuginfo_cu_parser_t *__restrict result,
                                                    di_debuginfo_cu_abbrev_t *__restrict abbrev,
-                                                   byte_t *first_component_pointer);
+                                                   byte_t const *first_component_pointer);
 
 
 /* Finalize the given abbreviation code controller. */
@@ -92,11 +92,11 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_d
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc */
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char **__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char const **__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, bool *__restrict presult);
-INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, byte_t **__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, byte_t const **__restrict presult);
 INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, di_debuginfo_location_t *__restrict result);
 
 

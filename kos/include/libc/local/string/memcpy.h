@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4f2e48 */
+/* HASH CRC-32:0x9eb34f1f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpy))(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes) {
 	__BYTE_TYPE__ *__pdst = (__BYTE_TYPE__ *)__dst;
-	__BYTE_TYPE__ *__psrc = (__BYTE_TYPE__ *)__src;
+	__BYTE_TYPE__ const *__psrc = (__BYTE_TYPE__ const *)__src;
 	while (__n_bytes--)
 		*__pdst++ = *__psrc++;
 	return __dst;

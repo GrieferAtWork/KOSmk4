@@ -890,21 +890,21 @@ NOTHROW(KCALL __gxx_personality_v0)(struct unwind_fde_struct *__restrict fde,
 	/* NOTE: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
 	if (temp != DW_EH_PE_omit) {
-		landingpad = dwarf_decode_pointer((byte_t **)&reader, temp, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gl_landing_pad */
+		landingpad = dwarf_decode_pointer((byte_t const **)&reader, temp, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gl_landing_pad */
 	}
 	temp = *reader++; /* gl_typetab_enc */
 	if (temp != DW_EH_PE_omit) {
-		dwarf_decode_uleb128((byte_t **)&reader); /* gl_typetab_off */
+		dwarf_decode_uleb128((byte_t const **)&reader); /* gl_typetab_off */
 	}
 	callsite_encoding = *reader++; /* gl_callsite_enc */
-	callsite_size     = dwarf_decode_uleb128((byte_t **)&reader);
+	callsite_size     = dwarf_decode_uleb128((byte_t const **)&reader);
 	callsite_end      = reader + callsite_size;
 	while (reader < callsite_end) {
 		uintptr_t start, size, handler, action;
-		start   = dwarf_decode_pointer((byte_t **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_start */
-		size    = dwarf_decode_pointer((byte_t **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_size */
-		handler = dwarf_decode_pointer((byte_t **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_handler */
-		action  = dwarf_decode_pointer((byte_t **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_action */
+		start   = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_start */
+		size    = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_size */
+		handler = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_handler */
+		action  = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)fde->f_pcstart); /* gcs_action */
 		start += landingpad;
 
 #if 1 /* Compare pointers like this, as `kcs_eip' is the _RETURN_ address \

@@ -162,7 +162,7 @@ vm_copytophys(PHYS physaddr_t dst,
 			break;
 		num_bytes -= page_bytes;
 		dst += page_bytes;
-		src = (void *)((byte_t *)src + page_bytes);
+		src = (void *)((byte_t const *)src + page_bytes);
 	}
 	pagedir_pop_mapone(tramp, backup);
 }
@@ -271,7 +271,7 @@ NOTHROW(KCALL vm_copytophys_nopf)(PHYS physaddr_t dst,
 			break;
 		num_bytes -= page_bytes;
 		dst += page_bytes;
-		src = (void *)((byte_t *)src + page_bytes);
+		src = (void *)((byte_t const *)src + page_bytes);
 	}
 	pagedir_pop_mapone(tramp, backup);
 done:

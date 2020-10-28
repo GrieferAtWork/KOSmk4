@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x692188f5 */
+/* HASH CRC-32:0xfb5b667d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpy)(void *__restrict dst,
                                   void const *__restrict src,
                                   size_t n_bytes) {
 	byte_t *pdst = (byte_t *)dst;
-	byte_t *psrc = (byte_t *)src;
+	byte_t const *psrc = (byte_t const *)src;
 	while (n_bytes--)
 		*pdst++ = *psrc++;
 	return dst;
@@ -52,15 +52,16 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmove)(void *dst,
                                    void const *src,
                                    size_t n_bytes) {
-	byte_t *pdst, *psrc;
+	byte_t *pdst;
+	byte_t const *psrc;
 	if (dst <= src) {
 		pdst = (byte_t *)dst;
-		psrc = (byte_t *)src;
+		psrc = (byte_t const *)src;
 		while (n_bytes--)
 			*pdst++ = *psrc++;
 	} else {
 		pdst = (byte_t *)dst + n_bytes;
-		psrc = (byte_t *)src + n_bytes;
+		psrc = (byte_t const *)src + n_bytes;
 		while (n_bytes--)
 			*--pdst = *--psrc;
 	}
@@ -637,7 +638,7 @@ NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst,
                                    void const *__restrict src,
                                    size_t n_bytes) {
 	byte_t *pdst = (byte_t *)dst;
-	byte_t *psrc = (byte_t *)src;
+	byte_t const *psrc = (byte_t const *)src;
 	while (n_bytes--)
 		*pdst++ = *psrc++;
 	return pdst;
@@ -1002,7 +1003,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpyw)(void *__restrict dst,
                                    void const *__restrict src,
                                    size_t n_words) {
 	u16 *pdst = (u16 *)dst;
-	u16 *psrc = (u16 *)src;
+	u16 const *psrc = (u16 const *)src;
 	while (n_words--)
 		*pdst++ = *psrc++;
 	return (u16 *)dst;
@@ -1024,7 +1025,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpyl)(void *__restrict dst,
                                    void const *__restrict src,
                                    size_t n_dwords) {
 	u32 *pdst = (u32 *)dst;
-	u32 *psrc = (u32 *)src;
+	u32 const *psrc = (u32 const *)src;
 	while (n_dwords--)
 		*pdst++ = *psrc++;
 	return (u32 *)dst;
@@ -1045,15 +1046,16 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmovew)(void *dst,
                                     void const *src,
                                     size_t n_words) {
-	u16 *pdst, *psrc;
+	u16 *pdst;
+	u16 const *psrc;
 	if (dst <= src) {
 		pdst = (u16 *)dst;
-		psrc = (u16 *)src;
+		psrc = (u16 const *)src;
 		while (n_words--)
 			*pdst++ = *psrc++;
 	} else {
 		pdst = (u16 *)dst + n_words;
-		psrc = (u16 *)src + n_words;
+		psrc = (u16 const *)src + n_words;
 		while (n_words--)
 			*--pdst = *--psrc;
 	}
@@ -1075,15 +1077,16 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmovel)(void *dst,
                                     void const *src,
                                     size_t n_dwords) {
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	if (dst <= src) {
 		pdst = (u32 *)dst;
-		psrc = (u32 *)src;
+		psrc = (u32 const *)src;
 		while (n_dwords--)
 			*pdst++ = *psrc++;
 	} else {
 		pdst = (u32 *)dst + n_dwords;
-		psrc = (u32 *)src + n_dwords;
+		psrc = (u32 const *)src + n_dwords;
 		while (n_dwords--)
 			*--pdst = *--psrc;
 	}
@@ -1106,9 +1109,10 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmoveupw)(void *dst,
                                       void const *src,
                                       size_t n_words) {
-	u16 *pdst, *psrc;
+	u16 *pdst;
+	u16 const *psrc;
 	pdst = (u16 *)dst + n_words;
-	psrc = (u16 *)src + n_words;
+	psrc = (u16 const *)src + n_words;
 	__hybrid_assertf(pdst >= psrc || !n_words, "%p < %p (count:%Iu)", dst, src, n_words);
 	while (n_words--)
 		*--pdst = *--psrc;
@@ -1122,9 +1126,10 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmovedownw)(void *dst,
                                         void const *src,
                                         size_t n_words) {
-	u16 *pdst, *psrc;
+	u16 *pdst;
+	u16 const *psrc;
 	pdst = (u16 *)dst;
-	psrc = (u16 *)src;
+	psrc = (u16 const *)src;
 	__hybrid_assertf(pdst <= psrc || !n_words, "%p > %p (count:%Iu)", dst, src, n_words);
 	while (n_words--)
 		*pdst++ = *psrc++;
@@ -1156,9 +1161,10 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmoveupl)(void *dst,
                                       void const *src,
                                       size_t n_dwords) {
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const  *psrc;
 	pdst = (u32 *)dst + n_dwords;
-	psrc = (u32 *)src + n_dwords;
+	psrc = (u32 const *)src + n_dwords;
 	__hybrid_assertf(pdst >= psrc || !n_dwords, "%p < %p (count:%Iu)", dst, src, n_dwords);
 	while (n_dwords--)
 		*--pdst = *--psrc;
@@ -1172,9 +1178,10 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmovedownl)(void *dst,
                                         void const *src,
                                         size_t n_dwords) {
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	pdst = (u32 *)dst;
-	psrc = (u32 *)src;
+	psrc = (u32 const *)src;
 	__hybrid_assertf(pdst <= psrc || !n_dwords, "%p > %p (count:%Iu)", dst, src, n_dwords);
 	while (n_dwords--)
 		*pdst++ = *psrc++;
@@ -1247,8 +1254,8 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2))
 NOTHROW_NCX(LIBCCALL libc_memcmpw)(void const *s1,
                                    void const *s2,
                                    size_t n_words) {
-	s16 *p1 = (s16 *)s1;
-	s16 *p2 = (s16 *)s2;
+	s16 const *p1 = (s16 const *)s1;
+	s16 const *p2 = (s16 const *)s2;
 	s16 v1, v2;
 	v1 = v2 = 0;
 	while (n_words-- && ((v1 = *p1++) == (v2 = *p2++)));
@@ -1261,8 +1268,8 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2))
 NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1,
                                    void const *s2,
                                    size_t n_dwords) {
-	s32 *p1 = (s32 *)s1;
-	s32 *p2 = (s32 *)s2;
+	s32 const *p1 = (s32 const *)s1;
+	s32 const *p2 = (s32 const *)s2;
 	s32 v1, v2;
 	v1 = v2 = 0;
 	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)));
@@ -1522,12 +1529,12 @@ NOTHROW_NCX(LIBCCALL libc_memcpyq)(void *__restrict dst,
                                    size_t n_qwords) {
 #if __SIZEOF_BUSINT__ >= 8
 	u64 *pdst = (u64 *)dst;
-	u64 *psrc = (u64 *)src;
+	u64 const *psrc = (u64 const *)src;
 	while (n_qwords--)
 		*pdst++ = *psrc++;
 #else /* __SIZEOF_BUSINT__ >= 8 */
 	u32 *pdst = (u32 *)dst;
-	u32 *psrc = (u32 *)src;
+	u32 const *psrc = (u32 const *)src;
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
@@ -1553,30 +1560,32 @@ NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
                                     void const *src,
                                     size_t n_qwords) {
 #if __SIZEOF_BUSINT__ >= 8
-	u64 *pdst, *psrc;
+	u64 *pdst;
+	u64 const *psrc;
 	if (dst <= src) {
 		pdst = (u64 *)dst;
-		psrc = (u64 *)src;
+		psrc = (u64 const *)src;
 		while (n_qwords--)
 			*pdst++ = *psrc++;
 	} else {
 		pdst = (u64 *)dst + n_qwords;
-		psrc = (u64 *)src + n_qwords;
+		psrc = (u64 const *)src + n_qwords;
 		while (n_qwords--)
 			*--pdst = *--psrc;
 	}
 #else /* __SIZEOF_BUSINT__ >= 8 */
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	if (dst <= src) {
 		pdst = (u32 *)dst;
-		psrc = (u32 *)src;
+		psrc = (u32 const *)src;
 		while (n_qwords--) {
 			*pdst++ = *psrc++;
 			*pdst++ = *psrc++;
 		}
 	} else {
 		pdst = (u32 *)dst + (n_qwords * 2);
-		psrc = (u32 *)src + (n_qwords * 2);
+		psrc = (u32 const *)src + (n_qwords * 2);
 		while (n_qwords--) {
 			*--pdst = *--psrc;
 			*--pdst = *--psrc;
@@ -1604,16 +1613,18 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
                                       void const *src,
                                       size_t n_qwords) {
 #if __SIZEOF_BUSINT__ >= 8
-	u64 *pdst, *psrc;
+	u64 *pdst;
+	u64 const *psrc;
 	pdst = (u64 *)dst + n_qwords;
-	psrc = (u64 *)src + n_qwords;
+	psrc = (u64 const *)src + n_qwords;
 	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*--pdst = *--psrc;
 #else /* __SIZEOF_BUSINT__ >= 8 */
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	pdst = (u32 *)dst + (n_qwords * 2);
-	psrc = (u32 *)src + (n_qwords * 2);
+	psrc = (u32 const *)src + (n_qwords * 2);
 	__hybrid_assertf(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--) {
 		*--pdst = *--psrc;
@@ -1632,16 +1643,18 @@ NOTHROW_NCX(LIBCCALL libc_memmovedownq)(void *dst,
                                         void const *src,
                                         size_t n_qwords) {
 #if __SIZEOF_BUSINT__ >= 8
-	u64 *pdst, *psrc;
+	u64 *pdst;
+	u64 const *psrc;
 	pdst = (u64 *)dst;
-	psrc = (u64 *)src;
+	psrc = (u64 const *)src;
 	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*pdst++ = *psrc++;
 #else /* __SIZEOF_BUSINT__ >= 8 */
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	pdst = (u32 *)dst;
-	psrc = (u32 *)src;
+	psrc = (u32 const *)src;
 	__hybrid_assertf(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
@@ -1696,8 +1709,8 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2))
 NOTHROW_NCX(LIBCCALL libc_memcmpq)(void const *s1,
                                    void const *s2,
                                    size_t n_dwords) {
-	s64 *p1 = (s64 *)s1;
-	s64 *p2 = (s64 *)s2;
+	s64 const *p1 = (s64 const *)s1;
+	s64 const *p2 = (s64 const *)s2;
 	s64 v1, v2;
 	v1 = v2 = 0;
 	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)));
@@ -2318,9 +2331,10 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmoveup)(void *dst,
                                      void const *src,
                                      size_t n_bytes) {
-	byte_t *pdst, *psrc;
+	byte_t *pdst;
+	byte_t const *psrc;
 	pdst = (byte_t *)dst + n_bytes;
-	psrc = (byte_t *)src + n_bytes;
+	psrc = (byte_t const *)src + n_bytes;
 	__hybrid_assertf(pdst >= psrc || !n_bytes, "%p < %p (count:%Iu)", dst, src, n_bytes);
 	while (n_bytes--)
 		*--pdst = *--psrc;
@@ -2335,9 +2349,10 @@ INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL
 NOTHROW_NCX(LIBCCALL libc_memmovedown)(void *dst,
                                        void const *src,
                                        size_t n_bytes) {
-	byte_t *pdst, *psrc;
+	byte_t *pdst;
+	byte_t const *psrc;
 	pdst = (byte_t *)dst;
-	psrc = (byte_t *)src;
+	psrc = (byte_t const *)src;
 	__hybrid_assertf(pdst <= psrc || !n_bytes, "%p > %p (count:%Iu)", dst, src, n_bytes);
 	while (n_bytes--)
 		*pdst++ = *psrc++;
@@ -2912,8 +2927,8 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED NONNULL
 NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
                                       void const *s2,
                                       size_t n_bytes) {
-	byte_t *p1 = (byte_t *)s1;
-	byte_t *p2 = (byte_t *)s2;
+	byte_t const *p1 = (byte_t const *)s1;
+	byte_t const *p2 = (byte_t const *)s2;
 	byte_t v1, v2;
 	v1 = v2 = 0;
 	while (n_bytes-- &&

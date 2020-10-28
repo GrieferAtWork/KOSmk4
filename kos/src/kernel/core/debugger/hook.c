@@ -94,7 +94,7 @@ dbg_overwrite_bytes(void const *dst,
 		if (do_copy >= num_bytes)
 			break;
 		dst = (byte_t *)dst + do_copy;
-		src = (byte_t *)src + do_copy;
+		src = (byte_t const *)src + do_copy;
 		num_bytes -= do_copy;
 	}
 	result = true;

@@ -72,7 +72,7 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 
 /* Return a pointer to a CFI expression that is applicable for `CU_BASE + MODULE_RELATIVE_PC'
  * If no such expression exists, return `NULL' instead. */
-INTDEF WUNUSED NONNULL((1, 5)) byte_t *
+INTDEF WUNUSED NONNULL((1, 5)) byte_t const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
@@ -121,7 +121,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
                                   void *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  void *objaddr, uint8_t addrsize, uint8_t ptrsize);
+                                  void const *objaddr, uint8_t addrsize, uint8_t ptrsize);
 INTDEF NONNULL((1, 3, 5, 9, 11)) unsigned int CC
 libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,

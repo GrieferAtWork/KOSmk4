@@ -193,33 +193,33 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restr
 }
 
 INTERN NONNULL((1, 2)) bool
-NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_do_lookup)(byte_t *__restrict reader,
-                                                    byte_t *__restrict abbrev_end,
+NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_do_lookup)(byte_t const *__restrict reader,
+                                                    byte_t const *__restrict abbrev_end,
                                                     di_debuginfo_component_t *__restrict result,
                                                     uintptr_t abbrev_code) {
 	while (reader < abbrev_end) {
 		uintptr_t code, tag;
 		uint8_t has_children;
-		byte_t *attrib_pointer;
+		byte_t const *attrib_pointer;
 		uintptr_t attr_name, attr_form;
-		code = dwarf_decode_uleb128((byte_t **)&reader);
+		code = dwarf_decode_uleb128((byte_t const **)&reader);
 		if (!code)
 			break;
-		tag = dwarf_decode_uleb128((byte_t **)&reader);
-		has_children = *(uint8_t *)reader;
+		tag = dwarf_decode_uleb128((byte_t const **)&reader);
+		has_children = *(uint8_t const *)reader;
 		reader += 1;
 		attrib_pointer = reader;
 		while (reader < abbrev_end) {
-			attr_name = dwarf_decode_uleb128((byte_t **)&reader);
-			attr_form = dwarf_decode_uleb128((byte_t **)&reader);
+			attr_name = dwarf_decode_uleb128((byte_t const **)&reader);
+			attr_form = dwarf_decode_uleb128((byte_t const **)&reader);
 			if (!attr_name && !attr_form)
 				break;
 		}
 		if (code == abbrev_code) {
 			result->dic_tag          = (uintptr_half_t)tag;
 			result->dic_haschildren  = has_children;
-			result->dic_attrib_start = (di_debuginfo_component_attrib_t *)attrib_pointer;
-			result->dic_attrib_end   = (di_debuginfo_component_attrib_t *)reader;
+			result->dic_attrib_start = (di_debuginfo_component_attrib_t const *)attrib_pointer;
+			result->dic_attrib_end   = (di_debuginfo_component_attrib_t const *)reader;
 			return true;
 		}
 	}
@@ -376,21 +376,21 @@ do_fill_dynamic_cache:
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTERN TEXTSECTION NONNULL((1, 2, 3, 4, 5)) unsigned int
-NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t **__restrict pdebug_info_reader,
-                                                   byte_t *__restrict debug_info_end,
+NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t const **__restrict pdebug_info_reader,
+                                                   byte_t const *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                    di_debuginfo_cu_parser_t *__restrict result,
                                                    di_debuginfo_cu_abbrev_t *__restrict abbrev,
-                                                   byte_t *first_component_pointer) {
+                                                   byte_t const *first_component_pointer) {
 	uintptr_t temp;
-	byte_t *reader;
+	byte_t const *reader;
 	reader = *pdebug_info_reader;
 again:
 	if (reader >= debug_info_end)
 		return DEBUG_INFO_ERROR_NOFRAME;
 	result->dup_cu_info_hdr = reader;
 	/* 7.5.1.1   Compilation Unit Header */
-	temp = UNALIGNED_GET32((uint32_t *)reader); /* unit_length */
+	temp = UNALIGNED_GET32((uint32_t const *)reader); /* unit_length */
 	reader += 4;
 	result->dup_ptrsize = 4;
 	if (temp >= UINT32_C(0xfffffff0)) {
@@ -400,7 +400,7 @@ again:
 			 *  - The first 32-bits have the value 0xffffffff.
 			 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
 			result->dup_ptrsize = 8;
-			temp = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			temp = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 			reader += 8;
 		} else {
 			/* 7.2.2 Initial Length Values
@@ -413,16 +413,16 @@ again:
 	if (OVERFLOW_UADD((uintptr_t)reader, temp, (uintptr_t *)&result->dup_cu_info_end) ||
 	    result->dup_cu_info_end > debug_info_end)
 		result->dup_cu_info_end = debug_info_end;
-	result->dup_version = UNALIGNED_GET16((uint16_t *)reader); /* version */
+	result->dup_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
 	reader += 2;
 #if 0
 	if unlikely(result->dup_version != 2)
 		return DEBUG_INFO_ERROR_CORRUPT;
 #endif
-	temp = UNALIGNED_GET32((uint32_t *)reader); /* debug_abbrev_offset */
+	temp = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
 	reader += 4;
 	if (temp == 0xffffffff) {
-		temp = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+		temp = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 		reader += 8;
 	}
 	if unlikely(OVERFLOW_UADD((uintptr_t)sectinfo->cps_debug_abbrev_start, temp,
@@ -430,7 +430,7 @@ again:
 	            abbrev->dua_abbrev_start >= sectinfo->cps_debug_abbrev_end)
 		return DEBUG_INFO_ERROR_CORRUPT;
 	abbrev->dua_abbrev_end = sectinfo->cps_debug_abbrev_end;
-	result->dup_addrsize   = *(uint8_t *)reader; /* address_size */
+	result->dup_addrsize   = *(uint8_t const *)reader; /* address_size */
 	reader += 1;
 #if __SIZEOF_POINTER__ > 4
 	if unlikely(result->dup_addrsize != 1 &&
@@ -495,7 +495,7 @@ decode_form:
 		length = *(uint8_t *)self->dup_cu_info_pos;
 		self->dup_cu_info_pos += 1;
 		if (OVERFLOW_UADD((uintptr_t)self->dup_cu_info_pos, length, (uintptr_t *)&self->dup_cu_info_pos))
-			self->dup_cu_info_pos = (byte_t *)-1;
+			self->dup_cu_info_pos = (byte_t const *)-1;
 	}	break;
 
 	case DW_FORM_block2: {
@@ -503,7 +503,7 @@ decode_form:
 		length = UNALIGNED_GET16((uint16_t *)self->dup_cu_info_pos);
 		self->dup_cu_info_pos += 2;
 		if (OVERFLOW_UADD((uintptr_t)self->dup_cu_info_pos, length, (uintptr_t *)&self->dup_cu_info_pos))
-			self->dup_cu_info_pos = (byte_t *)-1;
+			self->dup_cu_info_pos = (byte_t const *)-1;
 	}	break;
 
 	case DW_FORM_block4: {
@@ -511,15 +511,15 @@ decode_form:
 		length = UNALIGNED_GET32((uint32_t *)self->dup_cu_info_pos);
 		self->dup_cu_info_pos += 4;
 		if (OVERFLOW_UADD((uintptr_t)self->dup_cu_info_pos, length, (uintptr_t *)&self->dup_cu_info_pos))
-			self->dup_cu_info_pos = (byte_t *)-1;
+			self->dup_cu_info_pos = (byte_t const *)-1;
 	}	break;
 
 	case DW_FORM_block:
 	case DW_FORM_exprloc: {
 		uintptr_t length;
-		length = dwarf_decode_uleb128((byte_t **)&self->dup_cu_info_pos);
+		length = dwarf_decode_uleb128((byte_t const **)&self->dup_cu_info_pos);
 		if (OVERFLOW_UADD((uintptr_t)self->dup_cu_info_pos, length, (uintptr_t *)&self->dup_cu_info_pos))
-			self->dup_cu_info_pos = (byte_t *)-1;
+			self->dup_cu_info_pos = (byte_t const *)-1;
 	}	break;
 
 	case DW_FORM_flag:
@@ -545,25 +545,25 @@ decode_form:
 		break;
 
 	case DW_FORM_sdata:
-		dwarf_decode_sleb128((byte_t **)&self->dup_cu_info_pos);
+		dwarf_decode_sleb128((byte_t const **)&self->dup_cu_info_pos);
 		break;
 
 	case DW_FORM_udata:
 	case DW_FORM_ref_udata:
-		dwarf_decode_uleb128((byte_t **)&self->dup_cu_info_pos);
+		dwarf_decode_uleb128((byte_t const **)&self->dup_cu_info_pos);
 		break;
 
 	case DW_FORM_string:
-		self->dup_cu_info_pos = (byte_t *)strnend((char *)self->dup_cu_info_pos,
-		                                          (size_t)(self->dup_cu_info_end -
-		                                                   self->dup_cu_info_pos)) +
+		self->dup_cu_info_pos = (byte_t const *)strnend((char const *)self->dup_cu_info_pos,
+		                                                (size_t)(self->dup_cu_info_end -
+		                                                         self->dup_cu_info_pos)) +
 		                        1;
 		break;
 
 	case DW_FORM_indirect:
 		if unlikely(self->dup_cu_info_pos >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t **)&self->dup_cu_info_pos);
+		form = dwarf_decode_uleb128((byte_t const **)&self->dup_cu_info_pos);
 		goto decode_form;
 
 	case DW_FORM_flag_present:
@@ -609,7 +609,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_debuginfo_cu_parser_t *__
 
 INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *__restrict self) {
-	byte_t *reader;
+	byte_t const *reader;
 	if (self->dup_comp.dic_haschildren)
 		return false;
 	reader = self->dup_cu_info_pos;
@@ -621,7 +621,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *
 
 INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self) {
-	byte_t *reader;
+	byte_t const *reader;
 	if (self->dup_comp.dic_haschildren)
 		return false;
 	reader = self->dup_cu_info_pos;
@@ -659,8 +659,8 @@ INTERN_CONST STRINGSECTION char const unknown_string[] = "??" "?";
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc */
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self,
-                                                    uintptr_t form, char **__restrict presult) {
-	byte_t *reader;
+                                                    uintptr_t form, char const**__restrict presult) {
+	byte_t const *reader;
 	reader = self->dup_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -671,11 +671,11 @@ decode_form:
 		switch (self->dup_ptrsize) {
 
 		case 4:
-			offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+			offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
 			break;
 
 		case 8:
-			offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 			break;
 
 		default:
@@ -694,13 +694,13 @@ decode_form:
 	}	break;
 
 	case DW_FORM_string:
-		*presult = (char *)reader;
+		*presult = (char const *)reader;
 		return true;
 
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t **)&reader);
+		form = dwarf_decode_uleb128((byte_t const **)&reader);
 		goto decode_form;
 
 	default: break;
@@ -712,7 +712,7 @@ err:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_parser_t const *__restrict self,
                                                   uintptr_t form, uintptr_t *__restrict presult) {
-	byte_t *reader;
+	byte_t const *reader;
 	reader = self->dup_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -721,20 +721,20 @@ decode_form:
 		switch (self->dup_addrsize) {
 
 		case 1:
-			*presult = *(uint8_t *)reader;
+			*presult = *(uint8_t const *)reader;
 			break;
 
 		case 2:
-			*presult = UNALIGNED_GET16((uint16_t *)reader);
+			*presult = UNALIGNED_GET16((uint16_t const *)reader);
 			break;
 
 		case 4:
-			*presult = UNALIGNED_GET32((uint32_t *)reader);
+			*presult = UNALIGNED_GET32((uint32_t const *)reader);
 			break;
 
 #if __SIZEOF_POINTER__ > 4
 		case 8:
-			*presult = UNALIGNED_GET64((uint64_t *)reader);
+			*presult = UNALIGNED_GET64((uint64_t const *)reader);
 			break;
 #endif /* __SIZEOF_POINTER__ > 4 */
 
@@ -746,7 +746,7 @@ decode_form:
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t **)&reader);
+		form = dwarf_decode_uleb128((byte_t const **)&reader);
 		goto decode_form;
 
 	default: break;
@@ -757,7 +757,7 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_parser_t const *__restrict self,
                                                    uintptr_t form, uintptr_t *__restrict presult) {
-	byte_t *reader;
+	byte_t const *reader;
 	reader = self->dup_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -765,11 +765,11 @@ decode_form:
 		switch (self->dup_ptrsize) {
 
 		case 4:
-			*presult = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+			*presult = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
 			break;
 
 		case 8:
-			*presult = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			*presult = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 			break;
 
 		default:
@@ -778,33 +778,33 @@ decode_form:
 		return true;
 
 	case DW_FORM_data1: /* constant */
-		*presult = (uintptr_t) * (uint8_t *)reader;
+		*presult = (uintptr_t)*(uint8_t const *)reader;
 		return true;
 
 	case DW_FORM_data2: /* constant */
-		*presult = (uintptr_t)UNALIGNED_GET16((uint16_t *)reader);
+		*presult = (uintptr_t)UNALIGNED_GET16((uint16_t const *)reader);
 		return true;
 
 	case DW_FORM_data4: /* constant */
-		*presult = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+		*presult = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
 		return true;
 
 	case DW_FORM_data8: /* constant */
-		*presult = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+		*presult = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 		return true;
 
 	case DW_FORM_sdata: /* constant */
-		*presult = (uintptr_t)dwarf_decode_sleb128((byte_t **)&reader);
+		*presult = (uintptr_t)dwarf_decode_sleb128((byte_t const **)&reader);
 		return true;
 
 	case DW_FORM_udata: /* constant */
-		*presult = (uintptr_t)dwarf_decode_uleb128((byte_t **)&reader);
+		*presult = (uintptr_t)dwarf_decode_uleb128((byte_t const **)&reader);
 		return true;
 
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t **)&reader);
+		form = dwarf_decode_uleb128((byte_t const **)&reader);
 		goto decode_form;
 
 	default: break;
@@ -815,13 +815,13 @@ decode_form:
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_parser_t const *__restrict self,
                                                   uintptr_t form, bool *__restrict presult) {
-	byte_t *reader;
+	byte_t const *reader;
 	reader = self->dup_cu_info_pos;
 decode_form:
 	switch (form) {
 
 	case DW_FORM_flag: /* constant */
-		*presult = *(uint8_t *)reader ? true : false;
+		*presult = *(uint8_t const *)reader ? true : false;
 		return true;
 
 	case DW_FORM_flag_present: /* constant */
@@ -831,7 +831,7 @@ decode_form:
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t **)&reader);
+		form = dwarf_decode_uleb128((byte_t const **)&reader);
 		goto decode_form;
 
 	default: break;
@@ -841,8 +841,8 @@ decode_form:
 
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self,
-                                                 uintptr_t form, byte_t **__restrict presult) {
-	byte_t *reader;
+                                                 uintptr_t form, byte_t const **__restrict presult) {
+	byte_t const *reader;
 	uintptr_t offset;
 	reader = self->dup_cu_info_pos;
 decode_form:
@@ -852,11 +852,11 @@ decode_form:
 		switch (self->dup_ptrsize) {
 
 		case 4:
-			offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+			offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
 			break;
 
 		case 8:
-			offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 			break;
 
 		default:
@@ -865,30 +865,30 @@ decode_form:
 		break;
 
 	case DW_FORM_ref1:
-		offset = (uintptr_t) * (uint8_t *)reader;
+		offset = (uintptr_t)*(uint8_t const *)reader;
 		break;
 
 	case DW_FORM_ref2:
-		offset = (uintptr_t)UNALIGNED_GET16((uint16_t *)reader);
+		offset = (uintptr_t)UNALIGNED_GET16((uint16_t const *)reader);
 		break;
 
 	case DW_FORM_ref4:
-		offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+		offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
 		break;
 
 	case DW_FORM_ref8:
 	case DW_FORM_ref_sig8: /* ??? */
-		offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+		offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 		break;
 
 	case DW_FORM_ref_udata:
-		offset = dwarf_decode_uleb128((byte_t **)&reader);
+		offset = dwarf_decode_uleb128((byte_t const **)&reader);
 		break;
 
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			ERROR(err);
-		form = dwarf_decode_uleb128((byte_t **)&reader);
+		form = dwarf_decode_uleb128((byte_t const **)&reader);
 		goto decode_form;
 
 	default:
@@ -908,7 +908,7 @@ INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self,
                                                   uintptr_t form,
                                                   di_debuginfo_location_t *__restrict result) {
-	byte_t *reader;
+	byte_t const *reader;
 	reader = self->dup_cu_info_pos;
 decode_form:
 	switch (form) {
@@ -918,11 +918,11 @@ decode_form:
 		switch (self->dup_ptrsize) {
 
 		case 4:
-			offset = (uintptr_t)UNALIGNED_GET32((uint32_t *)reader);
+			offset = (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
 			break;
 
 		case 8:
-			offset = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+			offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 			break;
 
 		default:
@@ -949,7 +949,7 @@ decode_form:
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t **)&reader);
+		form = dwarf_decode_uleb128((byte_t const **)&reader);
 		goto decode_form;
 
 	default: break;
@@ -1260,7 +1260,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC ao_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self,
                                  di_debuginfo_type_t *__restrict result,
-                                 byte_t *__restrict abstract_origin) {
+                                 byte_t const *__restrict abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dup_cu_info_pos = abstract_origin;
@@ -1330,7 +1330,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t
 		switch (attr.dica_name) {
 
 		case DW_AT_abstract_origin: {
-			byte_t *abstract_origin;
+			byte_t const *abstract_origin;
 			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
 			                                              &abstract_origin))
 				ERROR(err);
@@ -1422,7 +1422,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC ao_loadattr_member)(di_debuginfo_cu_parser_t *__restrict self,
                                    di_debuginfo_member_t *__restrict result,
-                                   byte_t *__restrict abstract_origin) {
+                                   byte_t const *__restrict abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dup_cu_info_pos = abstract_origin;
@@ -1446,7 +1446,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser
 		switch (attr.dica_name) {
 
 		case DW_AT_abstract_origin: {
-			byte_t *abstract_origin;
+			byte_t const *abstract_origin;
 			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
 			                                              &abstract_origin))
 				ERROR(err);
@@ -1514,7 +1514,7 @@ err:
 PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC ao_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self,
                                      di_debuginfo_variable_t *__restrict result,
-                                     byte_t *__restrict abstract_origin) {
+                                     byte_t const *__restrict abstract_origin) {
 	di_debuginfo_cu_parser_t pp;
 	memcpy(&pp, self, sizeof(pp));
 	pp.dup_cu_info_pos = abstract_origin;
@@ -1538,7 +1538,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_pars
 		switch (attr.dica_name) {
 
 		case DW_AT_abstract_origin: {
-			byte_t *abstract_origin;
+			byte_t const *abstract_origin;
 			if unlikely(!libdi_debuginfo_cu_parser_getref(self, attr.dica_form,
 			                                              &abstract_origin))
 				ERROR(err);
@@ -1637,7 +1637,7 @@ libdi_debuginfo_print_typename_and_varname(pformatprinter printer, void *arg,
 	ssize_t result = 0, temp;
 	size_t namelen;
 	if unlikely(!type_name || !*type_name)
-		type_name = (char *)unknown_string;
+		type_name = unknown_string;
 	/* Fallback: type-name + " " + varname */
 	namelen = strlen(type_name);
 	FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX);
@@ -1679,7 +1679,7 @@ libdi_debuginfo_do_print_typename(pformatprinter printer, void *arg,
 	di_debuginfo_cu_parser_t pp;
 	di_debuginfo_type_t inner_type;
 	struct varname_prefix new_prefix;
-	char *type_name = type->t_name;
+	char const *type_name = type->t_name;
 	if unlikely(!type_name)
 		type_name = type->t_rawname;
 	switch (parser->dup_comp.dic_tag) {
@@ -1744,7 +1744,7 @@ do_varname_prefix3:
 		memcpy(&pp, parser, sizeof(pp));
 		if unlikely(!type->t_type) {
 			if (!type_name)
-				type_name = (char *)"void";
+				type_name = "void";
 			goto print_generic_vn_prefix;
 		}
 		pp.dup_cu_info_pos = type->t_type;
@@ -1852,8 +1852,8 @@ do_prefix_type:
 							DO((*printer)(arg, "...", 3));
 							FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX);
 						} else {
-							byte_t *parameter_type_pointer = NULL;
-							char *parameter_name           = NULL;
+							byte_t const *parameter_type_pointer = NULL;
+							char const *parameter_name           = NULL;
 							di_debuginfo_component_attrib_t attr;
 							di_debuginfo_cu_parser_t parameter_pp;
 							DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &pp) {
@@ -2447,12 +2447,12 @@ got_elem_count:
 				     inner_type.t_encoding == DW_ATE_UTF)) {
 					/* Try to print an encoded string.
 					 * NOTE: To be a valid string, the last character must be ZERO(0)! */
-					byte_t *last_char;
+					byte_t const *last_char;
 					if (inner_type.t_sizeof != 1 &&
 					    inner_type.t_sizeof != 2 &&
 					    inner_type.t_sizeof != 4)
 						goto print_as_array;
-					last_char = (byte_t *)data + (elem_count - 1) * inner_type.t_sizeof;
+					last_char = (byte_t const *)data + (elem_count - 1) * inner_type.t_sizeof;
 					for (i = 0; i < inner_type.t_sizeof; ++i) {
 						if (last_char[i] != 0)
 							goto print_as_array;
@@ -2506,7 +2506,7 @@ print_as_array:
 					                                   &pp,
 					                                   &inner_type,
 					                                   NULL,
-					                                   (byte_t *)data + offset,
+					                                   (byte_t const *)data + offset,
 					                                   elemavail,
 					                                   newline_indentation,
 					                                   format_printer,
@@ -2533,7 +2533,7 @@ print_unknown_inner_array_type:
 					}
 					FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX);
 					DO(libdi_debuginfo_do_print_unknown_data(printer, arg,
-					                                         (byte_t *)data + offset,
+					                                         (byte_t const *)data + offset,
 					                                         inner_type.t_sizeof));
 					FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX);
 				}
@@ -2556,7 +2556,7 @@ print_unknown_inner_array_type:
 		} else if (datasize >= 2) {
 			value = (uintptr_t)UNALIGNED_GET16((uint16_t *)data);
 		} else if (datasize >= 1) {
-			value = (uintptr_t) * (uint8_t *)data;
+			value = (uintptr_t)*(uint8_t *)data;
 		} else {
 			value = 0;
 		}
@@ -2566,8 +2566,8 @@ print_unknown_inner_array_type:
 			do {
 				if (pp.dup_child_depth == depth &&
 				    pp.dup_comp.dic_tag == DW_TAG_enumerator) {
-					char *enum_name      = NULL;
-					uintptr_t enum_value = 0;
+					char const *enum_name = NULL;
+					uintptr_t enum_value  = 0;
 					di_debuginfo_component_attrib_t attr;
 					DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &pp) {
 						if (attr.dica_name == DW_AT_name) {
@@ -2589,7 +2589,7 @@ print_unknown_inner_array_type:
 print_generic_enum:
 		result = 0;
 		if (!(flags & DEBUGINFO_PRINT_VALUE_FCASTALL)) {
-			char *type_name = type->t_name;
+			char const *type_name = type->t_name;
 			if (!type_name)
 				type_name = type->t_rawname;
 			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
@@ -2665,7 +2665,7 @@ print_generic_enum:
 						                                   &type_pp,
 						                                   &inner_type,
 						                                   NULL,
-						                                   (byte_t *)data + member.m_offset,
+						                                   (byte_t const *)data + member.m_offset,
 						                                   member_datasize,
 						                                   newline_indentation + 1,
 						                                   format_printer,
@@ -2875,10 +2875,9 @@ again_cu_component:
 			/* Scan components of this CU. */
 			switch (self->dup_comp.dic_tag) {
 
-			{
+			case DW_TAG_subprogram: {
 				di_debuginfo_subprogram_t sp;
 				uintptr_t subprogram_depth;
-			case DW_TAG_subprogram:
 				if (!libdi_debuginfo_cu_parser_loadattr_subprogram(self, &sp))
 					goto err;
 				subprogram_depth = self->dup_child_depth;
@@ -2907,13 +2906,12 @@ again_subprogram_component:
 						goto done_subprogram;
 					switch (self->dup_comp.dic_tag) {
 
-					{
+					case DW_TAG_variable:
+					case DW_TAG_formal_parameter: {
 						di_debuginfo_variable_t var;
 						di_debuginfo_type_t vartype;
 						di_debuginfo_cu_parser_t type_parser;
 						ssize_t temp;
-					case DW_TAG_variable:
-					case DW_TAG_formal_parameter:
 						if (!libdi_debuginfo_cu_parser_loadattr_variable(self, &var))
 							goto err;
 						memcpy(&type_parser, self, sizeof(type_parser));
@@ -3008,7 +3006,7 @@ libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo
 	ssize_t result = 0;
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
-	byte_t *debug_info_reader;
+	byte_t const *debug_info_reader;
 	uintptr_t cu_offset;
 	/* Try to make use of `.debug_aranges' to quickly locate the CU. */
 	if (libdi_debugaranges_locate(sectinfo->el_debug_aranges_start,
@@ -3134,14 +3132,14 @@ try_load_dynsym:
 #undef LOCK_SECTION
 	/* Bind section data */
 	if (dl_sections->ds_eh_frame) {
-		sections->ds_eh_frame_start = (byte_t *)module_section_getudata(dl_sections->ds_eh_frame, module_type);
+		sections->ds_eh_frame_start = (byte_t const *)module_section_getudata(dl_sections->ds_eh_frame, module_type);
 		sections->ds_eh_frame_end   = sections->ds_eh_frame_start + module_section_getsize(dl_sections->ds_eh_frame, module_type);
 	}
-#define BIND_SECTION(sect, lv_start, lv_end)                                    \
-	if (sect) {                                                                 \
-		size_t size;                                                            \
-		(lv_start) = (byte_t *)module_section_inflate(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                         \
+#define BIND_SECTION(sect, lv_start, lv_end)                                          \
+	if (sect) {                                                                       \
+		size_t size;                                                                  \
+		(lv_start) = (byte_t const *)module_section_inflate(sect, module_type, size); \
+		(lv_end)   = (lv_start) + size;                                               \
 	}
 	BIND_SECTION(dl_sections->ds_debug_frame, sections->ds_debug_frame_start, sections->ds_debug_frame_end);
 	BIND_SECTION(dl_sections->ds_debug_addr, sections->ds_debug_addr_start, sections->ds_debug_addr_end);
@@ -3156,11 +3154,11 @@ try_load_dynsym:
 	/* Bind symbol/string sections. */
 	if (dl_sections->ds_symtab) {
 		size_t size;
-		sections->ds_strtab_start = (byte_t *)module_section_inflate(dl_sections->ds_strtab,
-		                                                             module_type, size);
+		sections->ds_strtab_start = (byte_t const *)module_section_inflate(dl_sections->ds_strtab,
+		                                                                   module_type, size);
 		sections->ds_strtab_end   = sections->ds_strtab_start + size;
-		sections->ds_symtab_start = (byte_t *)module_section_inflate(dl_sections->ds_symtab,
-		                                                             module_type, size);
+		sections->ds_symtab_start = (byte_t const *)module_section_inflate(dl_sections->ds_symtab,
+		                                                                   module_type, size);
 		sections->ds_symtab_end   = sections->ds_symtab_start + size;
 		sections->ds_symtab_ent   = module_section_getentsize(dl_sections->ds_symtab, module_type);
 	}

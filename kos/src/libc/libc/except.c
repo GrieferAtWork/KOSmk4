@@ -243,9 +243,8 @@ INTERN SECTION_EXCEPT_TEXT _Unwind_Reason_Code LIBCCALL
 libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool phase_2) {
 	u8 temp, callsite_encoding;
 	uintptr_t landingpad, pc;
-	uint8_t *callsite_end;
+	byte_t const *reader, *callsite_end;
 	size_t callsite_size;
-	byte_t *reader;
 	reader     = (byte_t *)context->uc_fde.f_lsdaaddr;
 	landingpad = (uintptr_t)context->uc_fde.f_pcstart;
 	pc         = (uintptr_t)__ERROR_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
@@ -254,7 +253,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	temp = *reader++; /* gl_landing_enc */
 	if (temp != DW_EH_PE_omit) {
 		/* gl_landing_pad */
-		landingpad = dwarf_decode_pointer((byte_t **)&reader,
+		landingpad = dwarf_decode_pointer((byte_t const **)&reader,
 		                                  temp,
 		                                  sizeof(void *),
 		                                  0,
@@ -263,17 +262,17 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	}
 	temp = *reader++; /* gl_typetab_enc */
 	if (temp != DW_EH_PE_omit) {
-		dwarf_decode_uleb128((byte_t **)&reader); /* gl_typetab_off */
+		dwarf_decode_uleb128((byte_t const **)&reader); /* gl_typetab_off */
 	}
 	callsite_encoding = *reader++; /* gl_callsite_enc */
-	callsite_size     = dwarf_decode_uleb128((byte_t **)&reader);
+	callsite_size     = dwarf_decode_uleb128((byte_t const **)&reader);
 	callsite_end      = reader + callsite_size;
 	while (reader < callsite_end) {
 		uintptr_t start, size, handler, action;
-		start   = dwarf_decode_pointer((byte_t **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_start */
-		size    = dwarf_decode_pointer((byte_t **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_size */
-		handler = dwarf_decode_pointer((byte_t **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_handler */
-		action  = dwarf_decode_pointer((byte_t **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_action */
+		start   = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_start */
+		size    = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_size */
+		handler = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_handler */
+		action  = dwarf_decode_pointer((byte_t const **)&reader, callsite_encoding, sizeof(void *), 0, 0, (uintptr_t)context->uc_fde.f_pcstart); /* gcs_action */
 		start += landingpad;
 
 #if 1 /* Compare pointers like this, as `pc' is the _RETURN_ address \
@@ -883,7 +882,7 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void *pc) {
 	unwind_error = unwind_fde_find(pc, &fde);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
 		return NULL;
-	return fde.f_pcstart;
+	return (void *)fde.f_pcstart;
 }
 
 

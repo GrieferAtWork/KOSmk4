@@ -21,8 +21,8 @@
 #ifndef _FORMAT_PRINTER_H
 #include <format-printer.h>
 #endif /* !_FORMAT_PRINTER_H */
-#include <bits/format-printer.h>
-#include <bits/uformat-printer.h>
+#include <bits/crt/format-printer.h>
+#include <bits/crt/uformat-printer.h>
 #include <hybrid/__assert.h>
 #include <libc/string.h>
 #include <libc/parts.uchar.string.h>

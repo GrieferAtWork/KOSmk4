@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72c035eb */
+/* HASH CRC-32:0x9ee30d42 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,10 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: * : Always re-returns `dst' */
 __LOCAL_LIBC(memmoveup) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveup))(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) {
-	__BYTE_TYPE__ *__pdst, *__psrc;
+	__BYTE_TYPE__ *__pdst;
+	__BYTE_TYPE__ const *__psrc;
 	__pdst = (__BYTE_TYPE__ *)__dst + __n_bytes;
-	__psrc = (__BYTE_TYPE__ *)__src + __n_bytes;
+	__psrc = (__BYTE_TYPE__ const *)__src + __n_bytes;
 	__hybrid_assertf(__pdst >= __psrc || !__n_bytes, "%p < %p (count:%Iu)", __dst, __src, __n_bytes);
 	while (__n_bytes--)
 		*--__pdst = *--__psrc;

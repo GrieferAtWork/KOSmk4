@@ -80,17 +80,17 @@ LIBDEBUGINFO_DECL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(LIBDEBUGINFO
 */
 typedef __ATTR_NONNULL((1)) __ssize_t
 (LIBDEBUGINFO_CC *PDEBUG_REPR_DUMP)(__pformatprinter printer, void *arg,
-                                    __byte_t *debug_info_start, __byte_t *debug_info_end,
-                                    __byte_t *debug_abbrev_start, __byte_t *debug_abbrev_end,
-                                    __byte_t *debug_loc_start, __byte_t *debug_loc_end,
-                                    __byte_t *debug_str_start, __byte_t *debug_str_end);
+                                    __byte_t const *debug_info_start, __byte_t const *debug_info_end,
+                                    __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
+                                    __byte_t const *debug_loc_start, __byte_t const *debug_loc_end,
+                                    __byte_t const *debug_str_start, __byte_t const *debug_str_end);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
 (LIBDEBUGINFO_CC debug_repr_dump)(__pformatprinter printer, void *arg,
-                                  __byte_t *debug_info_start, __byte_t *debug_info_end,
-                                  __byte_t *debug_abbrev_start, __byte_t *debug_abbrev_end,
-                                  __byte_t *debug_loc_start, __byte_t *debug_loc_end,
-                                  __byte_t *debug_str_start, __byte_t *debug_str_end);
+                                  __byte_t const *debug_info_start, __byte_t const *debug_info_end,
+                                  __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
+                                  __byte_t const *debug_loc_start, __byte_t const *debug_loc_end,
+                                  __byte_t const *debug_str_start, __byte_t const *debug_str_end);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 #endif /* __KERNEL__ */

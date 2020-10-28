@@ -333,10 +333,10 @@ INTDEF char const unknown_string[];
 */
 INTERN REPR_TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
-                      byte_t *debug_info_start, byte_t *debug_info_end,
-                      byte_t *debug_abbrev_start, byte_t *debug_abbrev_end,
-                      byte_t *debug_loc_start, byte_t *debug_loc_end,
-                      byte_t *debug_str_start, byte_t *debug_str_end) {
+                      byte_t const *debug_info_start, byte_t const *debug_info_end,
+                      byte_t const *debug_abbrev_start, byte_t const *debug_abbrev_end,
+                      byte_t const *debug_loc_start, byte_t const *debug_loc_end,
+                      byte_t const *debug_str_start, byte_t const *debug_str_end) {
 	ssize_t temp, result = 0;
 	char const *s;
 	di_debuginfo_cu_parser_t parser;
@@ -379,7 +379,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 
 				case DW_FORM_strp:
 				case DW_FORM_string: {
-					char *value;
+					char const *value;
 					if (!libdi_debuginfo_cu_parser_getstring(&parser, attr.dica_form, &value))
 						goto err_bad_value;
 					DO(format_printf(printer, arg, REPR_STRING("%q"), value));
@@ -421,7 +421,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 				case DW_FORM_ref8:
 				case DW_FORM_ref_sig8:
 				case DW_FORM_ref_udata: {
-					byte_t *value;
+					byte_t const *value;
 					di_debuginfo_cu_parser_t p2;
 					if (!libdi_debuginfo_cu_parser_getref(&parser, attr.dica_form, &value))
 						goto err_bad_value;

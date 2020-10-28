@@ -151,7 +151,7 @@ liblinebuffer_write(struct linebuffer *__restrict self,
 again:
 	assert((size_t)result <= num_bytes);
 	temp = liblinebuffer_write_nonblock(self,
-	                                    (byte_t *)src + result,
+	                                    (byte_t const *)src + result,
 	                                    num_bytes - result);
 	if likely(temp) {
 #ifdef __KERNEL__
@@ -371,7 +371,7 @@ again_locked:
 #ifdef __KERNEL__
 	assert((result + maxwrite) <= num_bytes);
 	temp = memcpy_nopf(self->lb_line.lc_base + self->lb_line.lc_size,
-	                   (byte_t *)src + result, maxwrite);
+	                   (byte_t const *)src + result, maxwrite);
 	if unlikely(temp) {
 		byte_t next_byte;
 		maxwrite -= temp;
@@ -380,7 +380,7 @@ again_locked:
 		atomic_lock_release(&self->lb_lock);
 		/* Need to copy a single byte from the user-buffer. */
 		COMPILER_READ_BARRIER();
-		next_byte = ((byte_t *)src)[result];
+		next_byte = ((byte_t const *)src)[result];
 		COMPILER_READ_BARRIER();
 		atomic_lock_acquire(&self->lb_lock);
 		COMPILER_READ_BARRIER();

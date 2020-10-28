@@ -94,6 +94,11 @@ FUNDEF bool NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uint
 #define dbg_getspreg(level)        dbg_getregp(level, CFI_UNWIND_REGISTER_SP)
 #define dbg_setspreg(level, value) dbg_setregp(level, CFI_UNWIND_REGISTER_SP, value)
 
+/* Return the size of a pointer within the context of `dbg_current' */
+#ifndef dbg_current_sizeof_pointer
+#define dbg_current_sizeof_pointer() __SIZEOF_POINTER__
+#endif /* !dbg_current_sizeof_pointer */
+
 /* Return the fault program counter position
  * That is: the address of the last-executed instruction */
 #define dbg_getfaultpcreg(level)                         \

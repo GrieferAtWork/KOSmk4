@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac21fe34 */
+/* HASH CRC-32:0x35f147b4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,30 +27,32 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memmoveq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords) {
 #if __SIZEOF_BUSINT__ >= 8
-	__UINT64_TYPE__ *__pdst, *__psrc;
+	__UINT64_TYPE__ *__pdst;
+	__UINT64_TYPE__ const *__psrc;
 	if (__dst <= __src) {
 		__pdst = (__UINT64_TYPE__ *)__dst;
-		__psrc = (__UINT64_TYPE__ *)__src;
+		__psrc = (__UINT64_TYPE__ const *)__src;
 		while (__n_qwords--)
 			*__pdst++ = *__psrc++;
 	} else {
 		__pdst = (__UINT64_TYPE__ *)__dst + __n_qwords;
-		__psrc = (__UINT64_TYPE__ *)__src + __n_qwords;
+		__psrc = (__UINT64_TYPE__ const *)__src + __n_qwords;
 		while (__n_qwords--)
 			*--__pdst = *--__psrc;
 	}
 #else /* __SIZEOF_BUSINT__ >= 8 */
-	__UINT32_TYPE__ *__pdst, *__psrc;
+	__UINT32_TYPE__ *__pdst;
+	__UINT32_TYPE__ const *__psrc;
 	if (__dst <= __src) {
 		__pdst = (__UINT32_TYPE__ *)__dst;
-		__psrc = (__UINT32_TYPE__ *)__src;
+		__psrc = (__UINT32_TYPE__ const *)__src;
 		while (__n_qwords--) {
 			*__pdst++ = *__psrc++;
 			*__pdst++ = *__psrc++;
 		}
 	} else {
 		__pdst = (__UINT32_TYPE__ *)__dst + (__n_qwords * 2);
-		__psrc = (__UINT32_TYPE__ *)__src + (__n_qwords * 2);
+		__psrc = (__UINT32_TYPE__ const *)__src + (__n_qwords * 2);
 		while (__n_qwords--) {
 			*--__pdst = *--__psrc;
 			*--__pdst = *--__psrc;

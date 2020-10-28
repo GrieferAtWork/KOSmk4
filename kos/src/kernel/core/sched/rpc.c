@@ -479,7 +479,8 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 				sig_altbroadcast(&data->rpc_completed,
 				                 USER_RPC_SIGALT_TERMINATED);
 			} else {
-				byte_t *reader, opcode, operand;
+				byte_t const *reader;
+				byte_t opcode, operand;
 				struct rpc_register_state program_state;
 				unsigned int i;
 				uintptr_t rpc_reason;

@@ -297,7 +297,7 @@ again_create_new:
 	}
 	if (oldTextHash != oldTextRealHash) {
 		throw Error("File {!r} has been modified (hash miss-match: expected {!r}, but got {!r})"
-			.format({ oldTextRealHash.hex(), oldTextHash.hex() }));
+			.format({ filename, oldTextRealHash.hex(), oldTextHash.hex() }));
 	}
 	if (oldTextHash == newTextHash) {
 		if (oldText == newText)

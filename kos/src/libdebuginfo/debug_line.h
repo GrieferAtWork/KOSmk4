@@ -43,7 +43,7 @@ DECL_BEGIN
  * >> void print_addr2line(void *p) {
  * >>     struct dl_section *s = NULL;
  * >>     di_debugline_unit_t unit;
- * >>     byte_t *reader;
+ * >>     byte_t const *reader;
  * >>     uintptr_t relpc;
  * >>     void *m;
  * >>     if ((m = dlgethandle(p, DLGETHANDLE_FNORMAL)) == NULL)
@@ -72,8 +72,8 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTDEF NONNULL((1, 2, 3)) unsigned int
-NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t **__restrict preader,
-                                         byte_t *__restrict text_end,
+NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t const **__restrict preader,
+                                         byte_t const *__restrict text_end,
                                          di_debugline_unit_t *__restrict result);
 
 

@@ -621,7 +621,7 @@ rtm_memcpy_prefault(struct vm *__restrict effective_vm,
 		/* Account for data that could be copied. */
 		copy_ok = num_bytes - copy_error;
 		dst = (byte_t *)dst + copy_ok;
-		src = (byte_t *)src + copy_ok;
+		src = (byte_t const *)src + copy_ok;
 		num_bytes = copy_error;
 		/* Prefault the missing area. */
 #ifdef LIBVIO_CONFIG_ENABLED

@@ -127,7 +127,8 @@ again:
  * make use of the FDE cache of `self'.
  * @return: * : One of `UNWIND_*' from <libunwind/api.h> */
 PUBLIC NOBLOCK NONNULL((1)) unsigned int
-NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void *absolute_pc,
+NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self,
+                               void const *absolute_pc,
                                unwind_fde_t *__restrict result) {
 	unsigned int error;
 	struct driver_fde_cache_node *node;
@@ -238,7 +239,7 @@ done:
  * caches for quick (O(1)) repeated access to an FDE located within a known
  * function. */
 INTERN NOBLOCK unsigned int
-NOTHROW_NCX(KCALL libuw_unwind_fde_find)(void *absolute_pc,
+NOTHROW_NCX(KCALL libuw_unwind_fde_find)(void const *absolute_pc,
                                          unwind_fde_t *__restrict result) {
 	unsigned int error;
 	REF struct driver *d;

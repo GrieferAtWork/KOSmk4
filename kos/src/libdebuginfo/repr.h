@@ -73,10 +73,10 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint
 */
 INTDEF NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
-                      byte_t *debug_info_start, byte_t *debug_info_end,
-                      byte_t *debug_abbrev_start, byte_t *debug_abbrev_end,
-                      byte_t *debug_loc_start, byte_t *debug_loc_end,
-                      byte_t *debug_str_start, byte_t *debug_str_end);
+                      byte_t const *debug_info_start, byte_t const *debug_info_end,
+                      byte_t const *debug_abbrev_start, byte_t const *debug_abbrev_end,
+                      byte_t const *debug_loc_start, byte_t const *debug_loc_end,
+                      byte_t const *debug_str_start, byte_t const *debug_str_end);
 
 #endif /* __KERNEL__ */
 

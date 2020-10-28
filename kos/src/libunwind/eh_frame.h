@@ -35,8 +35,8 @@ DECL_BEGIN
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTDEF NONNULL((1, 2, 3)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t **__restrict peh_frame_reader,
-                                      byte_t *__restrict eh_frame_end,
+NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t const **__restrict peh_frame_reader,
+                                      byte_t const *__restrict eh_frame_end,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address);
 
@@ -45,9 +45,9 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t **__restrict peh_frame_reader,
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTDEF NONNULL((1, 2, 4)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t *__restrict eh_frame_start,
-                                      byte_t *__restrict eh_frame_end,
-                                      void *absolute_pc,
+NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t const *__restrict eh_frame_start,
+                                      byte_t const *__restrict eh_frame_end,
+                                      void const *absolute_pc,
                                       unwind_fde_t *__restrict result,
                                       uint8_t sizeof_address);
 
@@ -70,7 +70,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t *__restrict eh_frame_start,
 INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_state_t *__restrict result,
-                                      void *absolute_pc);
+                                      void const *absolute_pc);
 
 /* Behaves identical to `unwind_fde_exec()', and doesn't actually ever have to be
  * used, but performes better than `unwind_fde_exec()' when unwinding SIGNAL_FRAME
@@ -88,7 +88,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
 INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
                                                unwind_cfa_sigframe_state_t *__restrict result,
-                                               void *absolute_pc);
+                                               void const *absolute_pc);
 
 /* Behaves similar to `unwind_fde_exec()', but must be used to calculate the CFA
  * for the purpose of jumping to a custom `LANDINGPAD_PC' as part of handling an
@@ -107,7 +107,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict se
 INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t const *__restrict self,
                                               unwind_cfa_landing_state_t *__restrict result,
-                                              void *absolute_pc, void *landingpad_pc);
+                                              void const *absolute_pc, void const *landingpad_pc);
 
 /* Similar to `unwind_fde_exec()', but used to calculate the
  * unwind rule for `dw_regno' at the given text location.
@@ -126,7 +126,7 @@ INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_register_t *__restrict result,
                                       unwind_regno_t dw_regno,
-                                      void *absolute_pc);
+                                      void const *absolute_pc);
 
 /* Same as `unwind_fde_exec()', however only calculate the CFA restore descriptor.
  * @return: UNWIND_SUCCESS:                 ...
@@ -137,7 +137,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
 INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
                                           unwind_cfa_value_t *__restrict result,
-                                          void *absolute_pc);
+                                          void const *absolute_pc);
 
 /* Apply a given CFA unwind state in order to apply register information from from reg_getter to reg_setter.
  * Note however that only registers with a rule other than `DW_CFA_register_rule_undefined'
@@ -154,7 +154,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
-                       unwind_fde_t const *__restrict fde, void *absolute_pc,
+                       unwind_fde_t const *__restrict fde, void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg);
 
@@ -168,7 +168,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
-                                unwind_fde_t const *__restrict fde, void *absolute_pc,
+                                unwind_fde_t const *__restrict fde, void const *absolute_pc,
                                 unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                 unwind_setreg_t reg_setter, void *reg_setter_arg);
 
@@ -182,7 +182,7 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
 INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
-                               unwind_fde_t const *__restrict fde, void *absolute_pc,
+                               unwind_fde_t const *__restrict fde, void const *absolute_pc,
                                unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                unwind_setreg_t reg_setter, void *reg_setter_arg);
 

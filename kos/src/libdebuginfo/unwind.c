@@ -118,7 +118,7 @@ nope:
 
 #ifndef __KERNEL__
 PRIVATE ATTR_NOINLINE NONNULL((2, 4)) unsigned int CC
-unwind_through_debug_frame(void *absolute_pc,
+unwind_through_debug_frame(void const *absolute_pc,
                            unwind_getreg_t reg_getter, void const *reg_getter_arg,
                            unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int result = UNWIND_NO_FRAME;
@@ -139,8 +139,8 @@ unwind_through_debug_frame(void *absolute_pc,
 			if (debug_frame_data) {
 				unwind_fde_t fde;
 				/* Scan the .debug_frame section for an FDE matching `absolute_pc' */
-				result = libdi_unwind_fde_scan_df((byte_t *)debug_frame_data,
-				                                  (byte_t *)debug_frame_data + debug_frame_size,
+				result = libdi_unwind_fde_scan_df((byte_t const *)debug_frame_data,
+				                                  (byte_t const *)debug_frame_data + debug_frame_size,
 				                                  absolute_pc,
 				                                  &fde,
 				                                  sizeof(void *));
@@ -182,7 +182,7 @@ unwind_through_debug_frame(void *absolute_pc,
  * to unwind them will fail with `UNWIND_NO_FRAME'.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 INTERN NONNULL((2, 4)) unsigned int CC
-libdi_unwind_for_debug(void *absolute_pc,
+libdi_unwind_for_debug(void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int result;

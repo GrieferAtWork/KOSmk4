@@ -63,11 +63,11 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 	if (symtab_start >= symtab_end)
 		goto done_null;
 	if (symtab_entsize == sizeof(Elf32_Sym)) {
-		Elf32_Sym *iter;
+		Elf32_Sym const *iter;
 		Elf32_Addr result_value;
 		symtab_end -= sizeof(Elf32_Sym) - 1;
-		for (iter = (Elf32_Sym *)symtab_start;
-		     iter < (Elf32_Sym *)symtab_end; ++iter) {
+		for (iter = (Elf32_Sym const *)symtab_start;
+		     iter < (Elf32_Sym const *)symtab_end; ++iter) {
 			Elf32_Section st_shndx; /* Section index */
 			Elf32_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
@@ -78,13 +78,13 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 			if ((st_value == module_relative_pc) ||
 			    (module_relative_pc >= (uintptr_t)st_value &&
 			     module_relative_pc < (uintptr_t)st_value + UNALIGNED_GET(&iter->st_size)))
-				return (byte_t *)iter; /* Perfect match! */
+				return (byte_t const *)iter; /* Perfect match! */
 		}
 		/* Fallback: return the nearest symbol. */
 		result       = NULL;
 		result_value = (Elf32_Addr)-1;
-		for (iter = (Elf32_Sym *)symtab_start;
-		     iter < (Elf32_Sym *)symtab_end; ++iter) {
+		for (iter = (Elf32_Sym const *)symtab_start;
+		     iter < (Elf32_Sym const *)symtab_end; ++iter) {
 			Elf32_Section st_shndx; /* Section index */
 			Elf32_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
@@ -95,16 +95,16 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 			if (st_value > module_relative_pc)
 				continue; /* Defined above the result */
 			if (st_value < result_value) {
-				result       = (byte_t *)iter;
+				result       = (byte_t const *)iter;
 				result_value = st_value;
 			}
 		}
 	} else if (symtab_entsize == sizeof(Elf64_Sym)) {
-		Elf64_Sym *iter;
+		Elf64_Sym const *iter;
 		Elf64_Addr result_value;
 		symtab_end -= sizeof(Elf64_Sym) - 1;
-		for (iter = (Elf64_Sym *)symtab_start;
-		     iter < (Elf64_Sym *)symtab_end; ++iter) {
+		for (iter = (Elf64_Sym const *)symtab_start;
+		     iter < (Elf64_Sym const *)symtab_end; ++iter) {
 			Elf64_Section st_shndx; /* Section index */
 			Elf64_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
@@ -115,13 +115,13 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 			if ((st_value == module_relative_pc) ||
 			    (module_relative_pc >= st_value &&
 			     module_relative_pc < st_value + UNALIGNED_GET(&iter->st_size)))
-				return (byte_t *)iter; /* Perfect match! */
+				return (byte_t const *)iter; /* Perfect match! */
 		}
 		/* Fallback: return the nearest symbol. */
 		result       = NULL;
 		result_value = (Elf64_Addr)-1;
-		for (iter = (Elf64_Sym *)symtab_start;
-		     iter < (Elf64_Sym *)symtab_end; ++iter) {
+		for (iter = (Elf64_Sym const *)symtab_start;
+		     iter < (Elf64_Sym const *)symtab_end; ++iter) {
 			Elf64_Section st_shndx; /* Section index */
 			Elf64_Addr st_value;    /* Symbol value */
 			st_shndx = UNALIGNED_GET(&iter->st_shndx);
@@ -132,7 +132,7 @@ NOTHROW_NCX(CC libdi_symtab_scantable)(byte_t const *__restrict symtab_start,
 			if (st_value > module_relative_pc)
 				continue; /* Defined above the result */
 			if (st_value < result_value) {
-				result       = (byte_t *)iter;
+				result       = (byte_t const *)iter;
 				result_value = st_value;
 			}
 		}

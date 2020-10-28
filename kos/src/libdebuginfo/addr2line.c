@@ -146,7 +146,7 @@ NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict 
 		unsigned int error;
 		di_debugline_unit_t unit;
 		di_debugline_info_t info;
-		byte_t *debug_line_reader;
+		byte_t const *debug_line_reader;
 		debug_line_reader = sections->ds_debug_line_start + cu->cu_stmt_list;
 		error = libdi_debugline_loadunit(&debug_line_reader,
 		                                 sections->ds_debug_line_end,
@@ -229,9 +229,9 @@ again_cu_component:
 				di_debuginfo_inlined_subroutine_t is;
 				di_debugline_unit_t unit;
 				di_debugline_info_t info;
-				byte_t *debug_line_reader;
-				byte_t *subprogram_child_start;
-				byte_t *innermost_is_subprogram;
+				byte_t const *debug_line_reader;
+				byte_t const *subprogram_child_start;
+				byte_t const *innermost_is_subprogram;
 				size_t inline_recursion;
 				uintptr_t subprogram_depth;
 				if (!libdi_debuginfo_cu_parser_loadattr_subprogram(self, &sp))
@@ -598,7 +598,7 @@ err_nodata:
 		di_debuginfo_cu_abbrev_t abbrev;
 		di_debuginfo_cu_parser_sections_t cu_sections;
 		uintptr_t debuginfo_cu_offset;
-		byte_t *cu_start;
+		byte_t const *cu_start;
 		bool has_corruptions;
 		cu_sections.cps_debug_abbrev_start = sections->ds_debug_abbrev_start;
 		cu_sections.cps_debug_abbrev_end   = sections->ds_debug_abbrev_end;
@@ -668,7 +668,7 @@ err_nodata:
 
 	/* Fallback: Scan the .debug_line section in its entirety. */
 	{
-		byte_t *reader;
+		byte_t const *reader;
 		reader = sections->ds_debug_line_start;
 		for (;;) {
 			di_debugline_unit_t unit;
@@ -866,11 +866,11 @@ err_no_data:
 	}
 #undef LOCK_SECTION
 	/* Support for compressed sections. */
-#define LOAD_SECTION(sect, lv_start, lv_end)                                    \
-	do {                                                                        \
-		size_t size;                                                            \
-		(lv_start) = (byte_t *)module_section_inflate(sect, module_type, size); \
-		(lv_end)   = (lv_start) + size;                                         \
+#define LOAD_SECTION(sect, lv_start, lv_end)                                          \
+	do {                                                                              \
+		size_t size;                                                                  \
+		(lv_start) = (byte_t const *)module_section_inflate(sect, module_type, size); \
+		(lv_end)   = (lv_start) + size;                                               \
 	}	__WHILE0
 
 

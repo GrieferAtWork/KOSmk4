@@ -59,7 +59,7 @@ DECL_BEGIN
  * >> void print_addr2line(void *p) {
  * >>     struct dl_section *s = NULL;
  * >>     di_debugline_unit_t unit;
- * >>     byte_t *reader;
+ * >>     byte_t const *reader;
  * >>     uintptr_t relpc;
  * >>     void *m;
  * >>     if ((m = dlgethandle(p, DLGETHANDLE_FNORMAL)) == NULL)
@@ -88,40 +88,40 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 INTERN TEXTSECTION NONNULL((1, 2, 3)) unsigned int
-NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t **__restrict preader,
-                                         byte_t *__restrict text_end,
+NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t const **__restrict preader,
+                                         byte_t const *__restrict text_end,
                                          di_debugline_unit_t *__restrict result) {
 	uintptr_t length;
 	uint16_t version;
-	byte_t *reader;
-	byte_t *next_cu, *cu_text;
+	byte_t const *reader;
+	byte_t const *next_cu, *cu_text;
 	reader = *preader;
 again:
 	if (reader >= text_end)
 		goto section_eof;
-	length = UNALIGNED_GET32((uint32_t *)reader);
+	length = UNALIGNED_GET32((uint32_t const *)reader);
 	if (length <= 15)     /* 15: Minimum size of the DWARF LineInfo header. */
 		goto section_eof; /* Sentinel */
 	reader += 4;
 	if unlikely(length == UINT32_C(0xffffffff)) {
-		length = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+		length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 		if (length <= 15)
 			goto section_eof; /* Sentinel */
 		reader += 8;
 		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next_cu) || next_cu > text_end)
 			next_cu = text_end;
-		version = UNALIGNED_GET16((uint16_t *)reader);
+		version = UNALIGNED_GET16((uint16_t const *)reader);
 		reader += 2;
-		length = (uintptr_t)UNALIGNED_GET64((uint64_t *)reader);
+		length = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 		reader += 8;
 		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&cu_text) || cu_text > next_cu)
 			goto do_next_chunk;
 	} else {
 		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&next_cu) || next_cu > text_end)
 			next_cu = text_end;
-		version = UNALIGNED_GET16((uint16_t *)reader);
+		version = UNALIGNED_GET16((uint16_t const *)reader);
 		reader += 2;
-		length = UNALIGNED_GET32((uint32_t *)reader);
+		length = UNALIGNED_GET32((uint32_t const *)reader);
 		reader += 4;
 		if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&cu_text) || cu_text > next_cu) {
 do_next_chunk:
@@ -135,24 +135,24 @@ do_next_chunk:
 	result->dlu_cuend      = next_cu;
 	result->dlu_version    = version;
 	/* Decode the CU header. */
-	result->dlu_min_insn_length = *(uint8_t *)reader;
+	result->dlu_min_insn_length = *(uint8_t const *)reader;
 	if unlikely(!result->dlu_min_insn_length)
 		result->dlu_min_insn_length = 1;
 	reader += 1;
 	result->dlu_max_ops_per_insn = 1;
 	if (version >= 4) {
-		result->dlu_max_ops_per_insn = *(uint8_t *)reader;
+		result->dlu_max_ops_per_insn = *(uint8_t const *)reader;
 		reader += 1;
 		if unlikely(!result->dlu_max_ops_per_insn)
 			result->dlu_max_ops_per_insn = 1;
 	}
-	result->dlu_default_isstmt = *(uint8_t *)reader;
+	result->dlu_default_isstmt = *(uint8_t const *)reader;
 	reader += 1;
-	result->dlu_line_base = *(int8_t *)reader;
+	result->dlu_line_base = *(int8_t const *)reader;
 	reader += 1;
-	result->dlu_line_range = *(uint8_t *)reader;
+	result->dlu_line_range = *(uint8_t const *)reader;
 	reader += 1;
-	result->dlu_opcode_base = *(uint8_t *)reader;
+	result->dlu_opcode_base = *(uint8_t const *)reader;
 	reader += 1;
 	result->dlu_opcode_lengths = reader;
 	if unlikely(!result->dlu_line_range)
@@ -216,7 +216,7 @@ INTERN TEXTSECTION NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libdi_debugline_scanunit)(di_debugline_unit_t const *__restrict self,
                                          di_debugline_info_t *__restrict result,
                                          uintptr_t module_relative_pc) {
-	byte_t *reader = self->dlu_textbase;
+	byte_t const *reader = self->dlu_textbase;
 	dl_registers_t old_state, state;
 #define RESET_STATE()                                                        \
 	(memset(&state, 0, sizeof(state)),                                       \
@@ -269,7 +269,7 @@ found_state:
 			switch (opcode) {
 
 			case DW_LNS_extended_op: {
-				byte_t *ext_data;
+				byte_t const *ext_data;
 				uintptr_t temp;
 				temp     = dwarf_decode_uleb128(&reader);
 				ext_data = reader;
@@ -293,13 +293,13 @@ found_state:
 					case DW_LNE_set_address: {
 						uintptr_t new_address;
 						if ((size_t)temp - 1 >= 8)
-							new_address = (uintptr_t) * (__u64 *)ext_data;
+							new_address = (uintptr_t)*(uint64_t const *)ext_data;
 						else if ((size_t)temp - 1 >= 4)
-							new_address = (uintptr_t) * (__u32 *)ext_data;
+							new_address = (uintptr_t)*(uint32_t const *)ext_data;
 						else if ((size_t)temp - 1 >= 2)
-							new_address = (uintptr_t) * (__u16 *)ext_data;
+							new_address = (uintptr_t)*(uint16_t const *)ext_data;
 						else {
-							new_address = (uintptr_t) * (__u8 *)ext_data;
+							new_address = (uintptr_t)*(uint8_t const *)ext_data;
 						}
 						state.address  = new_address;
 						state.op_index = 0;
@@ -377,7 +377,7 @@ found_state:
 			}	break;
 
 			case DW_LNS_fixed_advance_pc:
-				state.address += UNALIGNED_GET16((uint16_t *)reader);
+				state.address += UNALIGNED_GET16((uint16_t const *)reader);
 				state.op_index = 0;
 				reader += 2;
 				break;

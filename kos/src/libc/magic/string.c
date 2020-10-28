@@ -506,7 +506,7 @@ typedef size_t rsize_t;
                          [[nonnull]] void const *__restrict src,
                          size_t n_bytes) {
 	byte_t *pdst = (byte_t *)dst;
-	byte_t *psrc = (byte_t *)src;
+	byte_t const *psrc = (byte_t const *)src;
 	while (n_bytes--)
 		*pdst++ = *psrc++;
 	return dst;
@@ -521,15 +521,16 @@ typedef size_t rsize_t;
 [[nonnull]] void *memmove([[nonnull]] void *dst,
                           [[nonnull]] void const *src,
                           size_t n_bytes) {
-	byte_t *pdst, *psrc;
+	byte_t *pdst;
+	byte_t const *psrc;
 	if (dst <= src) {
 		pdst = (byte_t *)dst;
-		psrc = (byte_t *)src;
+		psrc = (byte_t const *)src;
 		while (n_bytes--)
 			*pdst++ = *psrc++;
 	} else {
 		pdst = (byte_t *)dst + n_bytes;
-		psrc = (byte_t *)src + n_bytes;
+		psrc = (byte_t const *)src + n_bytes;
 		while (n_bytes--)
 			*--pdst = *--psrc;
 	}
@@ -1182,7 +1183,7 @@ mempcpy:([[nonnull]] void *__restrict dst,
          [[nonnull]] void const *__restrict src,
          $size_t n_bytes) -> [[== dst + n_bytes]] void * {
 	byte_t *pdst = (byte_t *)dst;
-	byte_t *psrc = (byte_t *)src;
+	byte_t const *psrc = (byte_t const *)src;
 	while (n_bytes--)
 		*pdst++ = *psrc++;
 	return pdst;
@@ -1662,7 +1663,7 @@ memcpyw:([[nonnull]] /*aligned(2)*/ void *__restrict dst,
          [[nonnull]] /*aligned(2)*/ void const *__restrict src,
          $size_t n_words) -> [[== dst]] $uint16_t * {
 	u16 *pdst = (u16 *)dst;
-	u16 *psrc = (u16 *)src;
+	u16 const *psrc = (u16 const *)src;
 	while (n_words--)
 		*pdst++ = *psrc++;
 	return (u16 *)dst;
@@ -1700,7 +1701,7 @@ memcpyl:([[nonnull]] /*aligned(4)*/ void *__restrict dst,
          [[nonnull]] /*aligned(4)*/ void const *__restrict src,
          $size_t n_dwords) -> [[== dst]] $uint32_t * {
 	u32 *pdst = (u32 *)dst;
-	u32 *psrc = (u32 *)src;
+	u32 const *psrc = (u32 const *)src;
 	while (n_dwords--)
 		*pdst++ = *psrc++;
 	return (u32 *)dst;
@@ -1753,15 +1754,16 @@ mempmoveb:([[nonnull]] /*aligned(1)*/ void *dst,
 memmovew:([[nonnull]] /*aligned(2)*/ void *dst,
           [[nonnull]] /*aligned(2)*/ void const *src,
           $size_t n_words) -> [[== dst]] $uint16_t * {
-	u16 *pdst, *psrc;
+	u16 *pdst;
+	u16 const *psrc;
 	if (dst <= src) {
 		pdst = (u16 *)dst;
-		psrc = (u16 *)src;
+		psrc = (u16 const *)src;
 		while (n_words--)
 			*pdst++ = *psrc++;
 	} else {
 		pdst = (u16 *)dst + n_words;
-		psrc = (u16 *)src + n_words;
+		psrc = (u16 const *)src + n_words;
 		while (n_words--)
 			*--pdst = *--psrc;
 	}
@@ -1798,15 +1800,16 @@ mempmovew:([[nonnull]] /*aligned(2)*/ void *dst,
 memmovel:([[nonnull]] /*aligned(4)*/ void *dst,
           [[nonnull]] /*aligned(4)*/ void const *src,
           $size_t n_dwords) -> [[== dst]] $uint32_t * {
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	if (dst <= src) {
 		pdst = (u32 *)dst;
-		psrc = (u32 *)src;
+		psrc = (u32 const *)src;
 		while (n_dwords--)
 			*pdst++ = *psrc++;
 	} else {
 		pdst = (u32 *)dst + n_dwords;
-		psrc = (u32 *)src + n_dwords;
+		psrc = (u32 const *)src + n_dwords;
 		while (n_dwords--)
 			*--pdst = *--psrc;
 	}
@@ -1876,9 +1879,10 @@ mempmovedownb:([[nonnull]] /*aligned(1)*/ void *dst,
 memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
             [[nonnull]] /*aligned(2)*/ void const *src,
             $size_t n_words) -> [[== dst]] $uint16_t * {
-	u16 *pdst, *psrc;
+	u16 *pdst;
+	u16 const *psrc;
 	pdst = (u16 *)dst + n_words;
-	psrc = (u16 *)src + n_words;
+	psrc = (u16 const *)src + n_words;
 	@__hybrid_assertf@(pdst >= psrc || !n_words, "%p < %p (count:%Iu)", dst, src, n_words);
 	while (n_words--)
 		*--pdst = *--psrc;
@@ -1899,9 +1903,10 @@ memmoveupw:([[nonnull]] /*aligned(2)*/ void *dst,
 memmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
               [[nonnull]] /*aligned(2)*/ void const *src,
               $size_t n_words) -> [[== dst]] $uint16_t * {
-	u16 *pdst, *psrc;
+	u16 *pdst;
+	u16 const *psrc;
 	pdst = (u16 *)dst;
-	psrc = (u16 *)src;
+	psrc = (u16 const *)src;
 	@__hybrid_assertf@(pdst <= psrc || !n_words, "%p > %p (count:%Iu)", dst, src, n_words);
 	while (n_words--)
 		*pdst++ = *psrc++;
@@ -1954,9 +1959,10 @@ mempmovedownw:([[nonnull]] /*aligned(2)*/ void *dst,
 memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
             [[nonnull]] /*aligned(4)*/ void const *src,
             $size_t n_dwords) -> [[== dst]] $uint32_t * {
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const  *psrc;
 	pdst = (u32 *)dst + n_dwords;
-	psrc = (u32 *)src + n_dwords;
+	psrc = (u32 const *)src + n_dwords;
 	@__hybrid_assertf@(pdst >= psrc || !n_dwords, "%p < %p (count:%Iu)", dst, src, n_dwords);
 	while (n_dwords--)
 		*--pdst = *--psrc;
@@ -1977,9 +1983,10 @@ memmoveupl:([[nonnull]] /*aligned(4)*/ void *dst,
 memmovedownl:([[nonnull]] /*aligned(4)*/ void *dst,
               [[nonnull]] /*aligned(4)*/ void const *src,
               $size_t n_dwords) -> [[== dst]] $uint32_t * {
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	pdst = (u32 *)dst;
-	psrc = (u32 *)src;
+	psrc = (u32 const *)src;
 	@__hybrid_assertf@(pdst <= psrc || !n_dwords, "%p > %p (count:%Iu)", dst, src, n_dwords);
 	while (n_dwords--)
 		*pdst++ = *psrc++;
@@ -2124,8 +2131,8 @@ int memcmpb([[nonnull]] /*aligned(1)*/ void const *s1,
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPW))]]
 $int16_t memcmpw([[nonnull]] /*aligned(2)*/ void const *s1,
                  [[nonnull]] /*aligned(2)*/ void const *s2, $size_t n_words) {
-	s16 *p1 = (s16 *)s1;
-	s16 *p2 = (s16 *)s2;
+	s16 const *p1 = (s16 const *)s1;
+	s16 const *p2 = (s16 const *)s2;
 	s16 v1, v2;
 	v1 = v2 = 0;
 	while (n_words-- && ((v1 = *p1++) == (v2 = *p2++)));
@@ -2145,8 +2152,8 @@ $int16_t memcmpw([[nonnull]] /*aligned(2)*/ void const *s1,
 $int32_t memcmpl([[nonnull]] /*aligned(4)*/ void const *s1,
                  [[nonnull]] /*aligned(4)*/ void const *s2,
                  $size_t n_dwords) {
-	s32 *p1 = (s32 *)s1;
-	s32 *p2 = (s32 *)s2;
+	s32 const *p1 = (s32 const *)s1;
+	s32 const *p2 = (s32 const *)s2;
 	s32 v1, v2;
 	v1 = v2 = 0;
 	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)));
@@ -2507,12 +2514,12 @@ memcpyq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
          $size_t n_qwords) -> [[== dst]] $uint64_t * {
 @@pp_if __SIZEOF_BUSINT__ >= 8@@
 	u64 *pdst = (u64 *)dst;
-	u64 *psrc = (u64 *)src;
+	u64 const *psrc = (u64 const *)src;
 	while (n_qwords--)
 		*pdst++ = *psrc++;
 @@pp_else@@
 	u32 *pdst = (u32 *)dst;
-	u32 *psrc = (u32 *)src;
+	u32 const *psrc = (u32 const *)src;
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
@@ -2538,30 +2545,32 @@ memmoveq:([[nonnull]] /*aligned(8)*/ void *dst,
           [[nonnull]] /*aligned(8)*/ void const *src,
           $size_t n_qwords) -> [[== dst]] $uint64_t * {
 @@pp_if __SIZEOF_BUSINT__ >= 8@@
-	u64 *pdst, *psrc;
+	u64 *pdst;
+	u64 const *psrc;
 	if (dst <= src) {
 		pdst = (u64 *)dst;
-		psrc = (u64 *)src;
+		psrc = (u64 const *)src;
 		while (n_qwords--)
 			*pdst++ = *psrc++;
 	} else {
 		pdst = (u64 *)dst + n_qwords;
-		psrc = (u64 *)src + n_qwords;
+		psrc = (u64 const *)src + n_qwords;
 		while (n_qwords--)
 			*--pdst = *--psrc;
 	}
 @@pp_else@@
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	if (dst <= src) {
 		pdst = (u32 *)dst;
-		psrc = (u32 *)src;
+		psrc = (u32 const *)src;
 		while (n_qwords--) {
 			*pdst++ = *psrc++;
 			*pdst++ = *psrc++;
 		}
 	} else {
 		pdst = (u32 *)dst + (n_qwords * 2);
-		psrc = (u32 *)src + (n_qwords * 2);
+		psrc = (u32 const *)src + (n_qwords * 2);
 		while (n_qwords--) {
 			*--pdst = *--psrc;
 			*--pdst = *--psrc;
@@ -2591,16 +2600,18 @@ memmoveupq:([[nonnull]] /*aligned(8)*/ void *dst,
             [[nonnull]] /*aligned(8)*/ void const *src,
             $size_t n_qwords) -> [[== dst]] $uint64_t * {
 @@pp_if __SIZEOF_BUSINT__ >= 8@@
-	u64 *pdst, *psrc;
+	u64 *pdst;
+	u64 const *psrc;
 	pdst = (u64 *)dst + n_qwords;
-	psrc = (u64 *)src + n_qwords;
+	psrc = (u64 const *)src + n_qwords;
 	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*--pdst = *--psrc;
 @@pp_else@@
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	pdst = (u32 *)dst + (n_qwords * 2);
-	psrc = (u32 *)src + (n_qwords * 2);
+	psrc = (u32 const *)src + (n_qwords * 2);
 	@__hybrid_assertf@(pdst >= psrc || !n_qwords, "%p < %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--) {
 		*--pdst = *--psrc;
@@ -2619,16 +2630,18 @@ memmovedownq:([[nonnull]] /*aligned(8)*/ void *dst,
               [[nonnull]] /*aligned(8)*/ void const *src,
               $size_t n_qwords) -> [[== dst]] $uint64_t * {
 @@pp_if __SIZEOF_BUSINT__ >= 8@@
-	u64 *pdst, *psrc;
+	u64 *pdst;
+	u64 const *psrc;
 	pdst = (u64 *)dst;
-	psrc = (u64 *)src;
+	psrc = (u64 const *)src;
 	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--)
 		*pdst++ = *psrc++;
 @@pp_else@@
-	u32 *pdst, *psrc;
+	u32 *pdst;
+	u32 const *psrc;
 	pdst = (u32 *)dst;
-	psrc = (u32 *)src;
+	psrc = (u32 const *)src;
 	@__hybrid_assertf@(pdst <= psrc || !n_qwords, "%p > %p (count:%Iu)", dst, src, n_qwords);
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
@@ -2685,8 +2698,8 @@ mempsetq:([[nonnull]] /*aligned(8)*/ void *__restrict dst,
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPQ))]]
 $int64_t memcmpq([[nonnull]] /*aligned(8)*/ void const *s1,
                  [[nonnull]] /*aligned(8)*/ void const *s2, $size_t n_dwords) {
-	s64 *p1 = (s64 *)s1;
-	s64 *p2 = (s64 *)s2;
+	s64 const *p1 = (s64 const *)s1;
+	s64 const *p2 = (s64 const *)s2;
 	s64 v1, v2;
 	v1 = v2 = 0;
 	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)));
@@ -3416,9 +3429,10 @@ $size_t rawmemrxlenq([[nonnull]] /*aligned(8)*/ void const *__restrict haystack,
 memmoveup:([[nonnull]] void *dst,
            [[nonnull]] void const *src,
            $size_t n_bytes) -> [[== dst]] void * {
-	byte_t *pdst, *psrc;
+	byte_t *pdst;
+	byte_t const *psrc;
 	pdst = (byte_t *)dst + n_bytes;
-	psrc = (byte_t *)src + n_bytes;
+	psrc = (byte_t const *)src + n_bytes;
 	@__hybrid_assertf@(pdst >= psrc || !n_bytes, "%p < %p (count:%Iu)", dst, src, n_bytes);
 	while (n_bytes--)
 		*--pdst = *--psrc;
@@ -3434,9 +3448,10 @@ memmoveup:([[nonnull]] void *dst,
 memmovedown:([[nonnull]] void *dst,
              [[nonnull]] void const *src,
              $size_t n_bytes) -> [[== dst]] void * {
-	byte_t *pdst, *psrc;
+	byte_t *pdst;
+	byte_t const *psrc;
 	pdst = (byte_t *)dst;
-	psrc = (byte_t *)src;
+	psrc = (byte_t const *)src;
 	@__hybrid_assertf@(pdst <= psrc || !n_bytes, "%p > %p (count:%Iu)", dst, src, n_bytes);
 	while (n_bytes--)
 		*pdst++ = *psrc++;
@@ -4075,8 +4090,8 @@ mempatq([[nonnull]] void *__restrict dst,
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
 int memcasecmp([[nonnull]] void const *s1,
                [[nonnull]] void const *s2, $size_t n_bytes) {
-	byte_t *p1 = (byte_t *)s1;
-	byte_t *p2 = (byte_t *)s2;
+	byte_t const *p1 = (byte_t const *)s1;
+	byte_t const *p2 = (byte_t const *)s2;
 	byte_t v1, v2;
 	v1 = v2 = 0;
 	while (n_bytes-- &&

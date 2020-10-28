@@ -50,7 +50,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 
 PRIVATE NONNULL((2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *absolute_pc,
+NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void const *absolute_pc,
                                           unwind_fde_t *__restrict result) {
 	void *module;
 	unsigned int error;
@@ -66,8 +66,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *absolute_pc,
 	if unlikely(!eh_frame_sect)
 		ERROR(err);
 	/* Scan the .eh_frame section of the associated module. */
-	error = libuw_unwind_fde_scan((byte_t *)eh_frame_sect->ds_data,
-	                              (byte_t *)eh_frame_sect->ds_data + eh_frame_sect->ds_size,
+	error = libuw_unwind_fde_scan((byte_t const *)eh_frame_sect->ds_data,
+	                              (byte_t const *)eh_frame_sect->ds_data + eh_frame_sect->ds_size,
 	                              absolute_pc,
 	                              result,
 	                              sizeof(void *));
@@ -84,7 +84,7 @@ err:
  * caches for quick (O(1)) repeated access to an FDE located within a known
  * function. */
 INTERN NONNULL((2)) unsigned int
-NOTHROW_NCX(CC libuw_unwind_fde_find)(void *absolute_pc,
+NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
                                       unwind_fde_t *__restrict result) {
 	unsigned int error;
 	/* TODO: Search the FDE-cache */
@@ -108,7 +108,7 @@ DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 INTERN NONNULL((2, 4)) unsigned int CC
-linuw_unwind(void *absolute_pc,
+linuw_unwind(void const *absolute_pc,
              unwind_getreg_t reg_getter, void const *reg_getter_arg,
              unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int result;

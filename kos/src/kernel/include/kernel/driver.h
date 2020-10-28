@@ -825,7 +825,7 @@ struct unwind_fde_struct;
  * make use of the FDE cache of `self'.
  * @return: * : One of `UNWIND_*' from <libunwind/api.h> */
 FUNDEF NOBLOCK NONNULL((1)) unsigned int
-NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void *absolute_pc,
+NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void const *absolute_pc,
                                struct unwind_fde_struct *__restrict result);
 
 /* Try to clear the FDE cache of the given, or of all loaded drivers.

@@ -1540,7 +1540,7 @@ _block_device_write(struct block_device *__restrict self,
 			self->bd_cache[cache_index].cs_flags |= BD_CACHED_SECTOR_FCHANGED;
 			if (block_size >= num_bytes)
 				break;
-			src = (byte_t *)src + block_size;
+			src = (byte_t const *)src + block_size;
 			device_position += (pos_t)block_size;
 			num_bytes -= block_size;
 		}

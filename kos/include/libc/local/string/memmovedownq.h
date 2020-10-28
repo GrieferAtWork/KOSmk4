@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x435ee650 */
+/* HASH CRC-32:0x1372e8b5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,16 +28,18 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memmovedownq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmovedownq))(void *__dst, void const *__src, __SIZE_TYPE__ __n_qwords) {
 #if __SIZEOF_BUSINT__ >= 8
-	__UINT64_TYPE__ *__pdst, *__psrc;
+	__UINT64_TYPE__ *__pdst;
+	__UINT64_TYPE__ const *__psrc;
 	__pdst = (__UINT64_TYPE__ *)__dst;
-	__psrc = (__UINT64_TYPE__ *)__src;
+	__psrc = (__UINT64_TYPE__ const *)__src;
 	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%Iu)", __dst, __src, __n_qwords);
 	while (__n_qwords--)
 		*__pdst++ = *__psrc++;
 #else /* __SIZEOF_BUSINT__ >= 8 */
-	__UINT32_TYPE__ *__pdst, *__psrc;
+	__UINT32_TYPE__ *__pdst;
+	__UINT32_TYPE__ const *__psrc;
 	__pdst = (__UINT32_TYPE__ *)__dst;
-	__psrc = (__UINT32_TYPE__ *)__src;
+	__psrc = (__UINT32_TYPE__ const *)__src;
 	__hybrid_assertf(__pdst <= __psrc || !__n_qwords, "%p > %p (count:%Iu)", __dst, __src, __n_qwords);
 	while (__n_qwords--) {
 		*__pdst++ = *__psrc++;

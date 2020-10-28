@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5491ff0 */
+/* HASH CRC-32:0x8526811a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,8 +26,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Compare memory buffers and return the difference of the first non-matching word */
 __LOCAL_LIBC(memcmpw) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT16_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpw))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words) {
-	__INT16_TYPE__ *__p1 = (__INT16_TYPE__ *)__s1;
-	__INT16_TYPE__ *__p2 = (__INT16_TYPE__ *)__s2;
+	__INT16_TYPE__ const *__p1 = (__INT16_TYPE__ const *)__s1;
+	__INT16_TYPE__ const *__p2 = (__INT16_TYPE__ const *)__s2;
 	__INT16_TYPE__ __v1, __v2;
 	__v1 = __v2 = 0;
 	while (__n_words-- && ((__v1 = *__p1++) == (__v2 = *__p2++)));

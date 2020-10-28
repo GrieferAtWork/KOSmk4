@@ -51,12 +51,12 @@ __DECL_BEGIN
  * to unwind them will fail with `UNWIND_NO_FRAME'.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
 typedef __ATTR_NONNULL((2, 4)) unsigned int
-(LIBDEBUGINFO_CC *PUNWIND_FOR_DEBUG)(void *__absolute_pc,
+(LIBDEBUGINFO_CC *PUNWIND_FOR_DEBUG)(void const *__absolute_pc,
                                      unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                      unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unsigned int
-(LIBDEBUGINFO_CC unwind_for_debug)(void *__absolute_pc,
+(LIBDEBUGINFO_CC unwind_for_debug)(void const *__absolute_pc,
                                    unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                    unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */

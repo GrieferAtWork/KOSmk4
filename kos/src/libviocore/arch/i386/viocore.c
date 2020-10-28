@@ -246,7 +246,7 @@ libviocore_write_with_partial_overlap(struct vio_emulate_args *__restrict self,
 		memcpy(addr, srcbuf, before_vio);
 		/* Copy the remainder from VIO memory */
 		vio_copytovio(&self->vea_args, self->vea_addr,
-		              (byte_t *)srcbuf + before_vio,
+		              (byte_t const *)srcbuf + before_vio,
 		              num_bytes - before_vio);
 	} else {
 		size_t within_vio;

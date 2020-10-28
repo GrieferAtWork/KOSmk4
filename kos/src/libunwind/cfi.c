@@ -257,10 +257,10 @@ libuw_unwind_emulator_make_top_const(unwind_emulator_t *__restrict self) {
 
 INTERN ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_call_function(unwind_emulator_t *__restrict self,
-                           byte_t *__restrict component_pointer) {
+                           byte_t const *__restrict component_pointer) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
-	byte_t *di_reader;
+	byte_t const *di_reader;
 	unsigned int di_error;
 	di_debuginfo_component_attrib_t attr;
 	di_debuginfo_cu_parser_sections_t sect;
@@ -290,7 +290,7 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 		unsigned int result;
 		di_debuginfo_location_t expr;
 		size_t length;
-		byte_t *old_pc_start, *old_pc_end;
+		byte_t const *old_pc_start, *old_pc_end;
 		if (attr.dica_name != DW_AT_location)
 			continue;
 		/* Found it! */
@@ -626,10 +626,12 @@ err_illegal_instruction:
  * @return: UNWIND_EMULATOR_*:       ... */
 INTERN ATTR_NOINLINE NONNULL((1)) unsigned int CC
 libuw_unwind_emulator_exec(unwind_emulator_t *__restrict self) {
-	byte_t *pc     = self->ue_pc;
-	size_t stacksz = self->ue_stacksz;
+	byte_t const *pc;
+	size_t stacksz;
 	byte_t opcode;
-	/*again:*/
+	pc      = self->ue_pc;
+	stacksz = self->ue_stacksz;
+/*again:*/
 	while (pc < self->ue_pc_end) {
 		opcode = *pc++;
 again_switch_opcode:
@@ -1179,7 +1181,7 @@ do_make_second_const:
 			break;
 
 		CASE(DW_OP_fbreg) {
-			byte_t *expr, *old_pc_start, *old_pc_end;
+			byte_t const *expr, *old_pc_start, *old_pc_end;
 			di_debuginfo_location_t const *old_frame_base;
 			unsigned int error;
 			size_t length;
@@ -1324,7 +1326,7 @@ do_read_bit_pieces:
 		CASE(DW_OP_call2)
 		CASE(DW_OP_call4)
 		CASE(DW_OP_call_ref) {
-			byte_t *component_address;
+			byte_t const *component_address;
 			unsigned int error;
 			if unlikely(!self->ue_sectinfo ||
 			             self->ue_sectinfo->ues_debug_info_start >= self->ue_sectinfo->ues_debug_info_end ||
@@ -1405,7 +1407,7 @@ do_read_bit_pieces:
 				ERROR(err_stack_overflow);
 			size                             = dwarf_decode_uleb128(&pc);
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_RO_LVALUE;
-			self->ue_stack[stacksz].s_lvalue = pc;
+			self->ue_stack[stacksz].s_lvalue = (byte_t *)pc;
 			self->ue_stack[stacksz].s_lsize  = (unwind_regno_t)size;
 			pc += size;
 			++stacksz;
@@ -1423,7 +1425,7 @@ do_read_bit_pieces:
 		CASE(DW_OP_GNU_addr_index)
 		CASE(DW_OP_constx)
 		CASE(DW_OP_GNU_const_index) {
-			byte_t *debug_addr_loc, *debug_addr_end;
+			byte_t const *debug_addr_loc, *debug_addr_end;
 			uintptr_t value;
 			if unlikely(!self->ue_sectinfo)
 				ERROR(err_illegal_instruction);
@@ -1828,7 +1830,7 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 	case DW_OP_GNU_addr_index:
 	case DW_OP_constx:
 	case DW_OP_GNU_const_index:
-		dwarf_decode_uleb128((byte_t **)&unwind_pc);
+		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		break;
 
 	case DW_OP_call_ref:
@@ -1869,29 +1871,29 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 	case DW_OP_breg30:
 	case DW_OP_breg31:
 	case DW_OP_fbreg:
-		dwarf_decode_sleb128((byte_t **)&unwind_pc);
+		dwarf_decode_sleb128((byte_t const **)&unwind_pc);
 		break;
 
 	case DW_OP_bregx:
-		dwarf_decode_uleb128((byte_t **)&unwind_pc);
-		dwarf_decode_sleb128((byte_t **)&unwind_pc);
+		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
+		dwarf_decode_sleb128((byte_t const **)&unwind_pc);
 		break;
 
 	case DW_OP_bit_piece:
-		dwarf_decode_uleb128((byte_t **)&unwind_pc);
-		dwarf_decode_uleb128((byte_t **)&unwind_pc);
+		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
+		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		break;
 
 	case DW_OP_implicit_value: {
 		dwarf_uleb128_t size;
-		size = dwarf_decode_uleb128((byte_t **)&unwind_pc);
+		size = dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		unwind_pc += size;
 	}	break;
 
 	case DW_OP_GNU_encoded_addr: {
 		uint8_t format;
 		format = *unwind_pc++;
-		dwarf_decode_pointer((byte_t **)&unwind_pc,
+		dwarf_decode_pointer((byte_t const **)&unwind_pc,
 		                     format, addrsize, 0, 0, 0);
 	}	break;
 
@@ -1906,14 +1908,14 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 
 /* Return a pointer to a CFI expression that is applicable for `CU_BASE + MODULE_RELATIVE_PC'
  * If no such expression exists, return `NULL' instead. */
-INTERN WUNUSED NONNULL((1, 5)) byte_t *
+INTERN WUNUSED NONNULL((1, 5)) byte_t const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
                                                 uint8_t addrsize,
                                                 size_t *__restrict pexpr_length) {
 	/* Check for simple case: Only a single, universal expression is defined */
-	byte_t *reader;
+	byte_t const *reader;
 	if (self->l_expr) {
 		reader        = self->l_expr;
 		*pexpr_length = dwarf_decode_uleb128(&reader);
@@ -1925,26 +1927,26 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 		reader = self->l_llist;
 		for (;;) {
 			if (addrsize >= sizeof(uintptr_t)) {
-				range_start = UNALIGNED_GET((uintptr_t *)reader);
+				range_start = UNALIGNED_GET((uintptr_t const *)reader);
 				reader += addrsize;
-				range_end = UNALIGNED_GET((uintptr_t *)reader);
+				range_end = UNALIGNED_GET((uintptr_t const *)reader);
 				reader += addrsize;
 #if __SIZEOF_POINTER__ > 4
 			} else if (addrsize >= 4) {
-				range_start = UNALIGNED_GET32((uint32_t *)reader);
+				range_start = UNALIGNED_GET32((uint32_t const *)reader);
 				reader += addrsize;
-				range_end = UNALIGNED_GET32((uint32_t *)reader);
+				range_end = UNALIGNED_GET32((uint32_t const *)reader);
 				reader += addrsize;
 #endif /* __SIZEOF_POINTER__ > 4 */
 			} else if (addrsize >= 2) {
-				range_start = UNALIGNED_GET16((uint16_t *)reader);
+				range_start = UNALIGNED_GET16((uint16_t const *)reader);
 				reader += addrsize;
-				range_end = UNALIGNED_GET16((uint16_t *)reader);
+				range_end = UNALIGNED_GET16((uint16_t const *)reader);
 				reader += addrsize;
 			} else {
-				range_start = *(uint8_t *)reader;
+				range_start = *(uint8_t const *)reader;
 				reader += addrsize;
-				range_end = *(uint8_t *)reader;
+				range_end = *(uint8_t const *)reader;
 				reader += addrsize;
 			}
 			/* Handle special entries */
@@ -1962,17 +1964,17 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
 			      reader - 2 * addrsize,
 			      range_start,
 			      range_end,
-			      UNALIGNED_GET16((uint16_t *)reader));
+			      UNALIGNED_GET16((uint16_t const *)reader));
 			if (module_relative_pc >= range_start &&
 			    module_relative_pc < range_end) {
-				*pexpr_length = (size_t)UNALIGNED_GET16((uint16_t *)reader);
+				*pexpr_length = (size_t)UNALIGNED_GET16((uint16_t const *)reader);
 				reader += 2;
 				return reader; /* Found it! */
 			}
 			/* Skip the associated expression. */
 			{
 				uint16_t expr_length;
-				expr_length = UNALIGNED_GET16((uint16_t *)reader);
+				expr_length = UNALIGNED_GET16((uint16_t const *)reader);
 				reader += 2;
 				reader += expr_length;
 			}
@@ -2026,7 +2028,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
                                   void *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
-                                  void *objaddr, uint8_t addrsize, uint8_t ptrsize) {
+                                  void const *objaddr, uint8_t addrsize, uint8_t ptrsize) {
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
@@ -2047,7 +2049,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	emulator.ue_regget             = regget;
 	emulator.ue_regget_arg         = regget_arg;
 	emulator.ue_framebase          = frame_base_expression;
-	emulator.ue_objaddr            = objaddr;
+	emulator.ue_objaddr            = (void *)objaddr;
 	emulator.ue_bjmprem            = UNWIND_EMULATOR_BJMPREM_DEFAULT;
 	emulator.ue_addrsize           = addrsize;
 	emulator.ue_ptrsize            = ptrsize;

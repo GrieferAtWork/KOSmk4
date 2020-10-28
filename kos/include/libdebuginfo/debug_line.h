@@ -43,47 +43,47 @@ typedef struct {
 
 typedef struct {
 	/* Compilation unit descriptor, as decoded from `.debug_line' */
-	__byte_t               *dlu_headerbase;       /* [1..1] Base address of the CU header. */
-	__byte_t               *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
-	__byte_t               *dlu_cuend;            /* [1..1] End address of the CU segment. */
-	char                   *dlu_pathtable;        /* [1..1] Table to path names (e.g. "include/headers\0source/files\0\0") */
-	__size_t                dlu_pathcount;        /* Number of path strings located in `dlu_pathtable' */
-	di_debugline_fileent_t *dlu_filetable;        /* [1..1] Table to file names */
-	__uint16_t              dlu_version;          /* Used during decoding... */
-	__uint8_t               dlu_min_insn_length;  /* Used during decoding... */
-	__uint8_t               dlu_max_ops_per_insn; /* Used during decoding... */
-	__uint8_t               dlu_default_isstmt;   /* Used during decoding... */
-	__int8_t                dlu_line_base;        /* Used during decoding... */
-	__uint8_t               dlu_line_range;       /* Used during decoding... */
-	__uint8_t               dlu_opcode_base;      /* Used during decoding... */
-	__uint8_t              *dlu_opcode_lengths;   /* Used during decoding... */
+	__byte_t const               *dlu_headerbase;       /* [1..1] Base address of the CU header. */
+	__byte_t const               *dlu_textbase;         /* [1..1] Base address of the CU resolver text. */
+	__byte_t const               *dlu_cuend;            /* [1..1] End address of the CU segment. */
+	char const                   *dlu_pathtable;        /* [1..1] Table to path names (e.g. "include/headers\0source/files\0\0") */
+	__size_t                      dlu_pathcount;        /* Number of path strings located in `dlu_pathtable' */
+	di_debugline_fileent_t const *dlu_filetable;        /* [1..1] Table to file names */
+	__uint16_t                    dlu_version;          /* Used during decoding... */
+	__uint8_t                     dlu_min_insn_length;  /* Used during decoding... */
+	__uint8_t                     dlu_max_ops_per_insn; /* Used during decoding... */
+	__uint8_t                     dlu_default_isstmt;   /* Used during decoding... */
+	__int8_t                      dlu_line_base;        /* Used during decoding... */
+	__uint8_t                     dlu_line_range;       /* Used during decoding... */
+	__uint8_t                     dlu_opcode_base;      /* Used during decoding... */
+	__uint8_t const              *dlu_opcode_lengths;   /* Used during decoding... */
 } di_debugline_unit_t;
 
 /* Decode a given file index into its filename and pathname components. */
 __LOCAL __ATTR_NONNULL((1, 3, 4)) void
 __NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadfile)(di_debugline_unit_t *__restrict self,
                                                   dwarf_uleb128_t index,
-                                                  char **__restrict ppathname,
-                                                  char **__restrict pfilename) {
+                                                  char const **__restrict ppathname,
+                                                  char const **__restrict pfilename) {
 	/* TODO: Make this one an external in-library function! */
 	if (!index) {
 		*ppathname = __NULLPTR;
 		*pfilename = __NULLPTR;
 	} else {
-		char *iter;
-		iter = (char *)self->dlu_filetable;
+		char const *iter;
+		iter = (char const *)self->dlu_filetable;
 		while (--index && (__byte_t *)iter < self->dlu_textbase) {
 			if (!*iter)
 				break; /* Invalid file ID */
 			iter = __libc_strend(iter) + 1;
-			dwarf_decode_uleb128((__byte_t **)&iter);
-			dwarf_decode_uleb128((__byte_t **)&iter);
-			dwarf_decode_uleb128((__byte_t **)&iter);
+			dwarf_decode_uleb128((__byte_t const **)&iter);
+			dwarf_decode_uleb128((__byte_t const **)&iter);
+			dwarf_decode_uleb128((__byte_t const **)&iter);
 		}
 		*pfilename = iter;
 		/* Parse the directory number. */
 		iter = __libc_strend(iter) + 1;
-		index = (__uintptr_t)dwarf_decode_uleb128((__byte_t **)&iter);
+		index = (__uintptr_t)dwarf_decode_uleb128((__byte_t const **)&iter);
 		if (!index || --index >= self->dlu_pathcount)
 			*ppathname = __NULLPTR;
 		else {
@@ -119,7 +119,7 @@ typedef struct {
  * >> void print_addr2line(void *p) {
  * >>     struct dl_section *s = NULL;
  * >>     di_debugline_unit_t unit;
- * >>     byte_t *reader;
+ * >>     byte_t const *reader;
  * >>     uintptr_t relpc;
  * >>     void *m;
  * >>     if ((m = dlgethandle(p, DLGETHANDLE_FNORMAL)) == NULL)
@@ -148,13 +148,13 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
 typedef __ATTR_NONNULL((1, 2, 3)) unsigned int
-(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__byte_t **__restrict preader,
-                                       __byte_t *__restrict text_end,
+(LIBDEBUGINFO_CC *PDEBUGLINE_LOADUNIT)(__byte_t const **__restrict preader,
+                                       __byte_t const *__restrict text_end,
                                        di_debugline_unit_t *__restrict result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3)) unsigned int
-__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__byte_t **__restrict preader,
-                                                  __byte_t *__restrict text_end,
+__NOTHROW_NCX(LIBDEBUGINFO_CC debugline_loadunit)(__byte_t const **__restrict preader,
+                                                  __byte_t const *__restrict text_end,
                                                   di_debugline_unit_t *__restrict result);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
