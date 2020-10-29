@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODDBX_INCLUDE_CPRINT_H
-#define GUARD_MODDBX_INCLUDE_CPRINT_H 1
+#ifndef GUARD_MODDBX_INCLUDE_CPRINTER_H
+#define GUARD_MODDBX_INCLUDE_CPRINTER_H 1
 
 /* DeBug eXtensions. */
 
@@ -61,4 +61,4 @@ ctype_printname(struct ctype const *__restrict self,
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-#endif /* !GUARD_MODDBX_INCLUDE_CPRINT_H */
+#endif /* !GUARD_MODDBX_INCLUDE_CPRINTER_H */

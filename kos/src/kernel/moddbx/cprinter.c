@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODDBX_CPRINT_C
-#define GUARD_MODDBX_CPRINT_C 1
+#ifndef GUARD_MODDBX_CPRINTER_C
+#define GUARD_MODDBX_CPRINTER_C 1
 #define _KOS_SOURCE 1
 
 /* DeBug eXtensions. */
@@ -34,7 +34,7 @@
 #include <string.h>
 
 /**/
-#include "include/cprint.h"
+#include "include/cprinter.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
 
@@ -497,4 +497,4 @@ ctype_printname(struct ctype const *__restrict self,
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-#endif /* !GUARD_MODDBX_CPRINT_C */
+#endif /* !GUARD_MODDBX_CPRINTER_C */

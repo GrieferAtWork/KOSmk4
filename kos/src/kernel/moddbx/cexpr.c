@@ -373,7 +373,7 @@ NOTHROW(FCALL cvalue_flush)(struct cvalue *__restrict self) {
 		                              bufneed);
 		if unlikely(reqsize != bufneed)
 			result = DBX_EINTERN;
-	} break;
+	}	break;
 
 	default:
 		break;
@@ -391,7 +391,7 @@ NOTHROW(FCALL cvalue_initcopy)(struct cvalue *__restrict self,
                                struct cvalue const *__restrict src) {
 	memcpy(self, src, sizeof(struct cvalue));
 	switch (self->cv_kind) {
-
+	
 	case CVALUE_KIND_DATA:
 		if (src->cv_data != NULL) {
 			size_t buflen;
@@ -404,7 +404,7 @@ NOTHROW(FCALL cvalue_initcopy)(struct cvalue *__restrict self,
 			self->cv_expr.v_buffer = buffer;
 		}
 		break;
-
+	
 	case CVALUE_KIND_EXPR:
 		if (self->cv_expr.v_buffer) {
 			void *buffer;
@@ -419,7 +419,7 @@ NOTHROW(FCALL cvalue_initcopy)(struct cvalue *__restrict self,
 	case CVALUE_KIND_IEXPR:
 		incref(self->cv_expr.v_expr.v_module);
 		break;
-
+	
 	default:
 		break;
 	}
@@ -463,8 +463,12 @@ NOTHROW(FCALL cexpr_pushaddr)(struct ctyperef const *__restrict typ,
 	if unlikely(!valp)
 		return DBX_ENOMEM;
 	ctyperef_initcopy(&valp->cv_type, typ);
-	valp->cv_kind = CVALUE_KIND_ADDR;
-	valp->cv_addr = addr;
+	if (cexpr_typeonly) {
+		valp->cv_kind = CVALUE_KIND_VOID;
+	} else {
+		valp->cv_kind = CVALUE_KIND_ADDR;
+		valp->cv_addr = addr;
+	}
 	++cexpr_stacksize;
 	return DBX_EOK;
 }
@@ -478,8 +482,10 @@ NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
 	if unlikely(!valp)
 		return DBX_ENOMEM;
 	ctyperef_initcopy(&valp->cv_type, typ);
-	/* Check for special case: non-CFI object-address expression. */
-	if (expr->v_objaddr && !expr->v_expr.l_expr && !expr->v_expr.l_llist) {
+	if (cexpr_typeonly) {
+		valp->cv_kind = CVALUE_KIND_VOID;
+	} else if (expr->v_objaddr && !expr->v_expr.l_expr && !expr->v_expr.l_llist) {
+		/* Special case: non-CFI object-address expression. */
 		valp->cv_kind = CVALUE_KIND_ADDR;
 		valp->cv_addr = (byte_t *)expr->v_objaddr + buflen;
 	} else {
@@ -502,18 +508,22 @@ NOTHROW(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
 		return DBX_ENOMEM;
-	buflen = ctype_sizeof(typ->ct_typ);
-	if (buflen <= sizeof(valp->cv_idata)) {
-		buffer        = valp->cv_idata;
-		valp->cv_kind = CVALUE_KIND_IDATA;
+	if (cexpr_typeonly) {
+		valp->cv_kind = CVALUE_KIND_VOID;
 	} else {
-		buffer = dbx_malloc(buflen);
-		if unlikely(!buffer)
-			return DBX_ENOMEM;
-		valp->cv_data = (byte_t *)buffer;
-		valp->cv_kind = CVALUE_KIND_DATA;
+		buflen = ctype_sizeof(typ->ct_typ);
+		if (buflen <= sizeof(valp->cv_idata)) {
+			buffer        = valp->cv_idata;
+			valp->cv_kind = CVALUE_KIND_IDATA;
+		} else {
+			buffer = dbx_malloc(buflen);
+			if unlikely(!buffer)
+				return DBX_ENOMEM;
+			valp->cv_data = (byte_t *)buffer;
+			valp->cv_kind = CVALUE_KIND_DATA;
+		}
+		memcpy(buffer, data, buflen);
 	}
-	memcpy(buffer, data, buflen);
 	ctyperef_initcopy(&valp->cv_type, typ);
 	++cexpr_stacksize;
 	return DBX_EOK;
@@ -527,16 +537,20 @@ NOTHROW(FCALL cexpr_pushint)(struct ctyperef const *__restrict typ,
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
 		return DBX_ENOMEM;
-	buflen = ctype_sizeof(typ->ct_typ);
-	switch (buflen) {
-	case 1: *(uint8_t *)valp->cv_idata = (uint8_t)value; break;
-	case 2: UNALIGNED_SET16((uint16_t *)valp->cv_idata, (uint16_t)value); break;
-	case 4: UNALIGNED_SET32((uint32_t *)valp->cv_idata, (uint32_t)value); break;
-	case 8: UNALIGNED_SET64((uint64_t *)valp->cv_idata, (uint64_t)value); break;
-	default:
-		return DBX_EINTERN;
+	if (cexpr_typeonly) {
+		valp->cv_kind = CVALUE_KIND_VOID;
+	} else {
+		buflen = ctype_sizeof(typ->ct_typ);
+		switch (buflen) {
+		case 1: *(uint8_t *)valp->cv_idata = (uint8_t)value; break;
+		case 2: UNALIGNED_SET16((uint16_t *)valp->cv_idata, (uint16_t)value); break;
+		case 4: UNALIGNED_SET32((uint32_t *)valp->cv_idata, (uint32_t)value); break;
+		case 8: UNALIGNED_SET64((uint64_t *)valp->cv_idata, (uint64_t)value); break;
+		default:
+			return DBX_EINTERN;
+		}
+		valp->cv_kind = CVALUE_KIND_IDATA;
 	}
-	valp->cv_kind = CVALUE_KIND_IDATA;
 	ctyperef_initcopy(&valp->cv_type, typ);
 	++cexpr_stacksize;
 	return DBX_EOK;
@@ -565,6 +579,9 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(unsigned int id) {
 		return DBX_EINTERN; /* Internal error */
 	ctypeinfo_init(&valp->cv_type.ct_info);
 	valp->cv_type.ct_flags = CTYPEREF_FLAG_NORMAL;
+	valp->cv_kind          = CVALUE_KIND_REGISTER;
+	if (cexpr_typeonly)
+		valp->cv_kind = CVALUE_KIND_VOID;
 	++cexpr_stacksize;
 	return DBX_EOK;
 }
@@ -732,7 +749,7 @@ again:
 		/* Adjust the buffer pointer for the expression-base-offset.
 		 * This is used (e.g.) for accessing struct-through-CFI fields. */
 		result += top->cv_expr.v_bufoff;
-	} break;
+	}	break;
 
 	case CVALUE_KIND_IEXPR:
 		result = top->cv_expr.v_ibuffer + top->cv_expr.v_bufoff;
@@ -774,7 +791,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_bool)(void) {
 	ct      = cexpr_stacktop.cv_type.ct_typ;
 	data    = cexpr_getdata();
 	datalen = cexpr_getsize();
-	if unlikely(!data)
+	if (!data && cexpr_stacktop.cv_kind != CVALUE_KIND_VOID)
 		return DBX_ENOMEM;
 	TRY {
 		switch (CTYPE_KIND_CLASSOF(ct->ct_kind)) {
@@ -783,44 +800,45 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_bool)(void) {
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
 do_check_for_non_zero_byte:
-			if (buffer_istrue(data, datalen))
+			if (data && buffer_istrue(data, datalen))
 				return 1;
 			break;
 
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_IEEE754_FLOAT):
-			switch (ct->ct_kind) {
-
-			case CTYPE_KIND_IEEE754_FLOAT: {
-				float f;
-				memcpy(&f, data, sizeof(f));
-				if (f != 0.0f)
-					return 1;
-			} break;
-
-			case CTYPE_KIND_IEEE754_DOUBLE: {
-				double d;
-				memcpy(&d, data, sizeof(d));
-				if (d != 0.0)
-					return 1;
-			} break;
-
-			case CTYPE_KIND_IEEE854_LONG_DOUBLE: {
-				__LONGDOUBLE ld;
-				memcpy(&ld, data, sizeof(ld));
-				if (ld != 0.0l)
-					return 1;
-			} break;
-
-			default:
-				goto do_check_for_non_zero_byte;
+			if (data) {
+				switch (ct->ct_kind) {
+	
+				case CTYPE_KIND_IEEE754_FLOAT: {
+					float f;
+					memcpy(&f, data, sizeof(f));
+					if (f != 0.0f)
+						return 1;
+				}	break;
+	
+				case CTYPE_KIND_IEEE754_DOUBLE: {
+					double d;
+					memcpy(&d, data, sizeof(d));
+					if (d != 0.0)
+						return 1;
+				}	break;
+	
+				case CTYPE_KIND_IEEE854_LONG_DOUBLE: {
+					__LONGDOUBLE ld;
+					memcpy(&ld, data, sizeof(ld));
+					if (ld != 0.0l)
+						return 1;
+				}	break;
+	
+				default:
+					goto do_check_for_non_zero_byte;
+				}
 			}
 			break;
 
 		default:
 			return DBX_ESYNTAX;
 		}
-	}
-	EXCEPT {
+	} EXCEPT {
 		return DBX_EFAULT;
 	}
 	return 0; /* false */
@@ -838,7 +856,6 @@ NOTHROW(FCALL cexpr_cast)(struct ctyperef const *__restrict typ) {
 	struct ctype *new_typ;
 	struct cvalue *top;
 	byte_t *data;
-	size_t old_size, new_size;
 again:
 	if unlikely(!cexpr_stacksize)
 		return DBX_EINTERN;
@@ -856,7 +873,8 @@ again:
 	if unlikely(result != DBX_EOK)
 		return result;
 	if unlikely(top->cv_kind != CVALUE_KIND_DATA &&
-	            top->cv_kind != CVALUE_KIND_IDATA)
+	            top->cv_kind != CVALUE_KIND_IDATA &&
+	            top->cv_kind != CVALUE_KIND_VOID)
 		return DBX_EINTERN; /* Shouldn't happen... */
 	data = top->cv_idata;
 	if (top->cv_kind == CVALUE_KIND_DATA)
@@ -866,13 +884,18 @@ again:
 	if (CTYPE_KIND_ISFLOAT(old_typ->ct_kind)) {
 		if (CTYPE_KIND_ISFLOAT(new_typ->ct_kind)) {
 			/* Cast between floating-point types. */
-			__LONGDOUBLE value;
-			GETFLOAT_BYKIND(old_typ->ct_kind, data, __LONGDOUBLE, value, return DBX_EINTERN, return DBX_EFAULT);
-			SETFLOAT_BYKIND(new_typ->ct_kind, data, value, return DBX_EINTERN, return DBX_EFAULT);
+			if (top->cv_kind != CVALUE_KIND_VOID) {
+				__LONGDOUBLE value;
+				GETFLOAT_BYKIND(old_typ->ct_kind, data, __LONGDOUBLE, value, return DBX_EINTERN, return DBX_EFAULT);
+				SETFLOAT_BYKIND(new_typ->ct_kind, data, value, return DBX_EINTERN, return DBX_EFAULT);
+			}
 		} else {
-			intmax_t floatval;
+			intmax_t floatval = 0;
 			/* Re-push the float value as an integer */
-			GETFLOAT_BYKIND(old_typ->ct_kind, data, intmax_t, floatval, return DBX_EINTERN, return DBX_EFAULT);
+			if (top->cv_kind != CVALUE_KIND_VOID) {
+				GETFLOAT_BYKIND(old_typ->ct_kind, data, intmax_t, floatval,
+				                return DBX_EINTERN, return DBX_EFAULT);
+			}
 			result = cexpr_pop();
 			if unlikely(result != DBX_EOK)
 				return result;
@@ -891,6 +914,8 @@ again:
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR): {
 			uintmax_t value;
+			if (top->cv_kind == CVALUE_KIND_VOID)
+				goto set_new_type;
 			TRY {
 				switch (CTYPE_KIND_SIZEOF(old_typ->ct_kind)) {
 				case 1: value = *(uint8_t *)data; break;
@@ -900,8 +925,7 @@ again:
 				default:
 					return DBX_EINTERN;
 				}
-			}
-			EXCEPT {
+			} EXCEPT {
 				return DBX_EFAULT;
 			}
 			if (CTYPE_KIND_CLASSOF(old_typ->ct_kind) ==
@@ -911,7 +935,7 @@ again:
 			SETFLOAT_BYKIND(new_typ->ct_kind, data, value,
 			                return DBX_EINTERN, return DBX_EFAULT);
 			goto set_new_type;
-		} break;
+		}	break;
 
 		default:
 			return DBX_ESYNTAX;
@@ -927,33 +951,35 @@ again:
 	return DBX_ESYNTAX;
 ok:
 	/* Confirmed (apply value transformations) */
-	old_size = ctype_sizeof(old_typ);
-	new_size = ctype_sizeof(new_typ);
-	if (new_size != old_size) {
-		if (new_size > CVALUE_INLINE_MAXSIZE) {
-			/* Must allocate a new heap-buffer */
-			byte_t *old_data;
-			byte_t *new_data;
-			old_data = data;
-			if (old_data == top->cv_idata)
-				old_data = NULL;
-			new_data = (byte_t *)dbx_realloc(old_data, new_size);
-			if unlikely(!new_data)
-				return DBX_ENOMEM;
-			if (data == top->cv_idata)
-				memcpy(new_data, data, old_size);
-			top->cv_data = data = new_data;
-			top->cv_kind = CVALUE_KIND_DATA;
+	if (top->cv_kind != CVALUE_KIND_VOID) {
+		size_t old_size, new_size;
+		old_size = ctype_sizeof(old_typ);
+		new_size = ctype_sizeof(new_typ);
+		if (new_size != old_size) {
+			if (new_size > CVALUE_INLINE_MAXSIZE) {
+				/* Must allocate a new heap-buffer */
+				byte_t *old_data;
+				byte_t *new_data;
+				old_data = data;
+				if (old_data == top->cv_idata)
+					old_data = NULL;
+				new_data = (byte_t *)dbx_realloc(old_data, new_size);
+				if unlikely(!new_data)
+					return DBX_ENOMEM;
+				if (data == top->cv_idata)
+					memcpy(new_data, data, old_size);
+				top->cv_data = data = new_data;
+				top->cv_kind = CVALUE_KIND_DATA;
+			}
+			/* Sign-/Zero-extend the value based on if the old type was signed. */
+			result = buffer_extend(data, old_size, new_size,
+			                       CTYPE_KIND_ISINT(old_typ->ct_kind) &&
+			                       !CTYPE_KIND_INT_ISUNSIGNED(old_typ->ct_kind));
+			if unlikely(result != DBX_EOK)
+				return result;
 		}
-		/* Sign-/Zero-extend the value based on if the old type was signed. */
-		result = buffer_extend(data, old_size, new_size,
-		                       CTYPE_KIND_ISINT(old_typ->ct_kind) &&
-		                       !CTYPE_KIND_INT_ISUNSIGNED(old_typ->ct_kind));
-		if unlikely(result != DBX_EOK)
-			return result;
 	}
 set_new_type:
-	old_typ = top->cv_type.ct_typ;
 	ctyperef_fini(&top->cv_type);
 	ctyperef_initcopy(&top->cv_type, typ);
 /*done:*/
@@ -991,7 +1017,8 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rvalue)(void) {
 		                  "This is required so we don't have to copy the old address into the "
 		                  "new inline-data field");
 		/* Check if the address of the top-element can be taken. */
-		if (top->cv_kind != CVALUE_KIND_ADDR)
+		if (top->cv_kind != CVALUE_KIND_ADDR &&
+		    top->cv_kind != CVALUE_KIND_VOID)
 			return DBX_ESYNTAX;
 		ctypeinfo_init(&array_elem_type.ct_info);
 		array_elem_type.ct_typ   = top->cv_type.ct_typ->ct_array.ca_elem;
@@ -1003,11 +1030,16 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rvalue)(void) {
 		ctypeinfo_init(&top->cv_type.ct_info);
 		top->cv_type.ct_typ   = array_elem_pointer_type; /* Inherit reference */
 		top->cv_type.ct_flags = CTYPEREF_FLAG_NORMAL;
-		top->cv_kind = CVALUE_KIND_IDATA; /* Re-use the address-field as inline-rvalue-data. */
+		if (top->cv_kind == CVALUE_KIND_ADDR)
+			top->cv_kind = CVALUE_KIND_IDATA; /* Re-use the address-field as inline-rvalue-data. */
 		return DBX_EOK;
 	}
 again_switch_kind:
 	switch (top->cv_kind) {
+
+	case CVALUE_KIND_VOID:
+		/* No-op */
+		break;
 
 	case CVALUE_KIND_EXPR: {
 		void *data = cexpr_getdata();
@@ -1019,9 +1051,8 @@ again_switch_kind:
 		cvalue_cfiexpr_fini(&top->cv_expr.v_expr);
 		top->cv_kind = CVALUE_KIND_DATA;
 		top->cv_data = (byte_t *)data;
-	} break;
+	}	break;
 
-	case CVALUE_KIND_VOID:
 	case CVALUE_KIND_ADDR:
 	case CVALUE_KIND_IEXPR:
 	case CVALUE_KIND_REGISTER: {
@@ -1041,10 +1072,6 @@ again_switch_kind:
 		TRY {
 			switch (top->cv_kind) {
 
-			case CVALUE_KIND_VOID:
-				memset(buffer, 0, buflen);
-				break;
-
 			case CVALUE_KIND_ADDR:
 				memcpy(buffer, top->cv_addr, buflen);
 				break;
@@ -1061,8 +1088,7 @@ again_switch_kind:
 			default:
 				__builtin_unreachable();
 			}
-		}
-		EXCEPT {
+		} EXCEPT {
 			result = DBX_EFAULT;
 		}
 		if unlikely(result != DBX_EOK) {
@@ -1073,7 +1099,7 @@ again_switch_kind:
 		top->cv_kind = newkind;
 		if (newkind == CVALUE_KIND_DATA)
 			top->cv_data = buffer;
-	} break;
+	}	break;
 
 	case CVALUE_KIND_DATA:
 	case CVALUE_KIND_IDATA:
@@ -1178,7 +1204,7 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
 			if likely(newbuf)
 				top->cv_data = newbuf;
 		}
-	} break;
+	}	break;
 
 	case CVALUE_KIND_IDATA:
 		memmovedown(&top->cv_idata[0],
@@ -1194,7 +1220,6 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
 		ctyperef_fini(&field_type);
 		return result;
 	}
-
 	/* Copy over the field type into the C-value. */
 	ctyperef_fini(&top->cv_type);
 	memcpy(&top->cv_type, &field_type, sizeof(struct ctyperef));
@@ -1217,7 +1242,8 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 		return DBX_EINTERN;
 	top = &cexpr_stacktop;
 	/* Make sure that the top-element is located in-memory. */
-	if (top->cv_kind != CVALUE_KIND_ADDR)
+	if (top->cv_kind != CVALUE_KIND_ADDR &&
+	    top->cv_kind != CVALUE_KIND_VOID)
 		return DBX_ESYNTAX;
 	/* Construct the pointer-type. */
 	typ = ctype_ptr(&top->cv_type, dbg_current_sizeof_pointer());
@@ -1227,7 +1253,8 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 	ctyperef_fini(&top->cv_type);
 	memset(&top->cv_type, 0, sizeof(top->cv_type));
 	top->cv_type.ct_typ = typ; /* Inherit reference. */
-	top->cv_kind        = CVALUE_KIND_IDATA;
+	if (top->cv_kind == CVALUE_KIND_ADDR)
+		top->cv_kind = CVALUE_KIND_IDATA;
 	return DBX_EOK;
 }
 
@@ -1251,6 +1278,9 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 		return DBX_ESYNTAX;
 	switch (top->cv_kind) {
 
+	case CVALUE_KIND_VOID:
+		goto do_set_type;
+
 	case CVALUE_KIND_IDATA:
 		pointed_to_addr = *(byte_t **)top->cv_idata;
 		break;
@@ -1267,7 +1297,8 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 	top->cv_addr = pointed_to_addr;
 	top->cv_kind = CVALUE_KIND_ADDR;
 	/* Replace the top item's pointer-type with the pointed-to type. */
-	ctypeinfo_fini(&top->cv_type.ct_info); /* inhert:`top->cv_type.ct_typ' */
+do_set_type:
+	ctypeinfo_fini(&top->cv_type.ct_info); /* inhert:`top->cv_type.ct_typ' in `typ' */
 	ctyperef_initcopy(&top->cv_type, &typ->ct_pointer.cp_base);
 	decref(typ);
 	return DBX_EOK;
@@ -1328,12 +1359,16 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 		return DBX_EINTERN; /* Shouldn't happen */
 	top = &cexpr_stacktop;
 	if unlikely(top->cv_kind != CVALUE_KIND_DATA &&
-	             top->cv_kind != CVALUE_KIND_IDATA)
+	            top->cv_kind != CVALUE_KIND_IDATA &&
+	            top->cv_kind != CVALUE_KIND_VOID)
 		return DBX_EINTERN; /* Shouldn't happen */
 	typ  = top->cv_type.ct_typ;
 	data = top->cv_idata;
 	if (top->cv_kind == CVALUE_KIND_DATA)
 		data = top->cv_data;
+	else if (top->cv_kind == CVALUE_KIND_VOID) {
+		data = NULL;
+	}
 	switch (op) {
 
 	case '+':
@@ -1358,21 +1393,25 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 #define CTYPE_KIND_ENUMBIT ((CTYPE_KIND_ENUM8 & ~CTYPE_KIND_SIGNBIT) ^ (CTYPE_KIND_U8 & ~CTYPE_KIND_SIGNBIT))
 			typ->ct_kind &= ~(CTYPE_KIND_SIGNBIT | CTYPE_KIND_ENUMBIT);
 			/* Implement -x as `~(x - 1)' */
-			buffer_dec(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
-			buffer_inv(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
+			if (data) {
+				buffer_dec(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
+				buffer_inv(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
+			}
 			break;
 
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_IEEE754_FLOAT): {
-			__LONGDOUBLE ld;
-			GETFLOAT_BYKIND(typ->ct_kind, data, __LONGDOUBLE, ld, return DBX_EINTERN, return DBX_EFAULT);
-			ld = -ld;
-			SETFLOAT_BYKIND(typ->ct_kind, data, ld, return DBX_EINTERN, return DBX_EFAULT);
-		} break;
+		case CTYPE_KIND_CLASSOF(CTYPE_KIND_IEEE754_FLOAT):
+			if (data) {
+				__LONGDOUBLE ld;
+				GETFLOAT_BYKIND(typ->ct_kind, data, __LONGDOUBLE, ld, return DBX_EINTERN, return DBX_EFAULT);
+				ld = -ld;
+				SETFLOAT_BYKIND(typ->ct_kind, data, ld, return DBX_EINTERN, return DBX_EFAULT);
+			}
+			break;
 
 		default:
 			return DBX_EINTERN;
 		}
-	} break;
+	}	break;
 
 	case '~':
 		if (!CTYPE_KIND_ISINT_OR_BOOL(typ->ct_kind))
@@ -1383,14 +1422,16 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 				dw_debugloc_fini(&typ->ct_enum);
 			typ->ct_kind &= ~(CTYPE_KIND_SIGNBIT | CTYPE_KIND_ENUMBIT);
 		}
-		buffer_inv(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
+		if (data)
+			buffer_inv(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
 		break;
 
 	case '!':
 		result = cexpr_bool();
 		if unlikely(DBX_EISERR(result))
 			return result;
-		cvalue_setbool(top, !result);
+		if (data)
+			cvalue_setbool(top, !result);
 		break;
 
 	default:
@@ -1448,10 +1489,12 @@ again:
 	lhs = &cexpr_stack[cexpr_stacksize - 2];
 	rhs = &cexpr_stack[cexpr_stacksize - 1];
 	if unlikely(lhs->cv_kind != CVALUE_KIND_DATA &&
-	             lhs->cv_kind != CVALUE_KIND_IDATA)
+	            lhs->cv_kind != CVALUE_KIND_IDATA &&
+	            rhs->cv_kind != CVALUE_KIND_VOID)
 		return DBX_EINTERN; /* Shouldn't happen */
 	if unlikely(rhs->cv_kind != CVALUE_KIND_DATA &&
-	             rhs->cv_kind != CVALUE_KIND_IDATA)
+	            rhs->cv_kind != CVALUE_KIND_IDATA &&
+	            rhs->cv_kind != CVALUE_KIND_VOID)
 		return DBX_EINTERN; /* Shouldn't happen */
 	lhs_typ  = lhs->cv_type.ct_typ;
 	rhs_typ  = rhs->cv_type.ct_typ;
@@ -1459,12 +1502,20 @@ again:
 	rhs_data = rhs->cv_idata;
 	if (lhs->cv_kind == CVALUE_KIND_DATA)
 		lhs_data = lhs->cv_data;
+	else if (lhs->cv_kind == CVALUE_KIND_VOID) {
+		lhs_data = NULL;
+	}
 	if (rhs->cv_kind == CVALUE_KIND_DATA)
 		rhs_data = rhs->cv_data;
+	else if (rhs->cv_kind == CVALUE_KIND_VOID) {
+		rhs_data = NULL;
+	}
 	/* Swap operands such that a float always appears left. */
 	if (CTYPE_KIND_ISFLOAT(lhs_typ->ct_kind)) {
 		__LONGDOUBLE lhs_value, rhs_value;
-		if (CTYPE_KIND_ISFLOAT(rhs_typ->ct_kind)) {
+		if (!rhs_data) {
+			rhs_value = 0.0L;
+		} else if (CTYPE_KIND_ISFLOAT(rhs_typ->ct_kind)) {
 			GETFLOAT_BYKIND(rhs_typ->ct_kind, rhs_data, __LONGDOUBLE, rhs_value,
 			                return DBX_EINTERN, return DBX_EFAULT);
 		} else {
@@ -1486,8 +1537,12 @@ again:
 				rhs_value = (__LONGDOUBLE)irhs_value;
 			}
 		}
-		GETFLOAT_BYKIND(lhs_typ->ct_kind, lhs_data, __LONGDOUBLE, lhs_value,
-		                return DBX_EINTERN, return DBX_EFAULT);
+		if (lhs_data) {
+			GETFLOAT_BYKIND(lhs_typ->ct_kind, lhs_data, __LONGDOUBLE, lhs_value,
+			                return DBX_EINTERN, return DBX_EFAULT);
+		} else {
+			lhs_value = 0.0L;
+		}
 		switch (op) {
 
 		case '+':
@@ -1523,7 +1578,8 @@ again:
 			case CTOKEN_TOK_RANGLE_EQUALS: retval = lhs_value >= rhs_value; break;
 			default: __builtin_unreachable();
 			}
-			cvalue_setbool(lhs, retval);
+			if (lhs_data)
+				cvalue_setbool(lhs, retval);
 		}	break;
 
 		case '%':
@@ -1538,8 +1594,10 @@ again:
 			return DBX_EINTERN;
 		}
 		/* Write-back the result. */
-		SETFLOAT_BYKIND(lhs_typ->ct_kind, lhs_data, lhs_value,
-		                return DBX_EINTERN, return DBX_EFAULT);
+		if (lhs_data) {
+			SETFLOAT_BYKIND(lhs_typ->ct_kind, lhs_data, lhs_value,
+			                return DBX_EINTERN, return DBX_EFAULT);
+		}
 		goto done;
 	}
 	if (CTYPE_KIND_ISFLOAT(rhs_typ->ct_kind)) {
@@ -1563,14 +1621,20 @@ swap_operands_and_again:
 		/* Only integer, bool or pointers can be used with pointers. */
 		if (!CTYPE_KIND_ISINT_OR_BOOL_OR_POINTER(rhs_typ->ct_kind))
 			return DBX_ESYNTAX;
-		switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
-		case 1: lhs_value = *(uint8_t *)lhs_data; break;
-		case 2: lhs_value = UNALIGNED_GET16((uint16_t *)lhs_data); break;
-		case 4: lhs_value = UNALIGNED_GET32((uint32_t *)lhs_data); break;
-		case 8: lhs_value = UNALIGNED_GET64((uint64_t *)lhs_data); break;
-		default: return DBX_EINTERN;
+		if (!lhs_data) {
+			lhs_value = 0;
+		} else {
+			switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
+			case 1: lhs_value = *(uint8_t *)lhs_data; break;
+			case 2: lhs_value = UNALIGNED_GET16((uint16_t *)lhs_data); break;
+			case 4: lhs_value = UNALIGNED_GET32((uint32_t *)lhs_data); break;
+			case 8: lhs_value = UNALIGNED_GET64((uint64_t *)lhs_data); break;
+			default: return DBX_EINTERN;
+			}
 		}
-		if (CTYPE_KIND_ISBOOL(rhs_typ->ct_kind)) {
+		if (!rhs_data) {
+			rhs_value = 0;
+		} else if (CTYPE_KIND_ISBOOL(rhs_typ->ct_kind)) {
 			rhs_value = buffer_istrue(rhs_data, CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) ? 1 : 0;
 		} else {
 			switch (CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) {
@@ -1630,6 +1694,8 @@ do_pointer_pointer_op:
 			case CTOKEN_TOK_RANGLE_EQUALS: {
 				/* Handle the case of comparing pointers. */
 				bool retval;
+				if (!lhs_data)
+					goto done;
 				switch (op) {
 				case CTOKEN_TOK_EQUALS_EQUALS: retval = lhs_value == rhs_value; break;
 				case CTOKEN_TOK_XCLAIM_EQUALS: retval = lhs_value != rhs_value; break;
@@ -1686,12 +1752,14 @@ do_pointer_pointer_op:
 			}
 		}
 		/* Write-back the LHS-value. */
-		switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
-		case 1: *(uint8_t *)lhs_data = (uint8_t)lhs_value; break;
-		case 2: UNALIGNED_SET16((uint16_t *)lhs_data, (uint16_t)lhs_value); break;
-		case 4: UNALIGNED_SET32((uint32_t *)lhs_data, (uint32_t)lhs_value); break;
-		case 8: UNALIGNED_SET64((uint64_t *)lhs_data, (uint64_t)lhs_value); break;
-		default: return DBX_EINTERN;
+		if (lhs_data) {
+			switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
+			case 1: *(uint8_t *)lhs_data = (uint8_t)lhs_value; break;
+			case 2: UNALIGNED_SET16((uint16_t *)lhs_data, (uint16_t)lhs_value); break;
+			case 4: UNALIGNED_SET32((uint32_t *)lhs_data, (uint32_t)lhs_value); break;
+			case 8: UNALIGNED_SET64((uint64_t *)lhs_data, (uint64_t)lhs_value); break;
+			default: return DBX_EINTERN;
+			}
 		}
 		goto done;
 	}
@@ -1740,7 +1808,9 @@ do_pointer_pointer_op:
 		uintmax_t lhs_value, rhs_value;
 		bool is_signed = false;
 		/* Load the LHS-value. */
-		if (CTYPE_KIND_ISBOOL(lhs_typ->ct_kind)) {
+		if (!lhs_data) {
+			lhs_value = 0;
+		} else if (CTYPE_KIND_ISBOOL(lhs_typ->ct_kind)) {
 			lhs_value = buffer_istrue(lhs_data, CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) ? 1 : 0;
 		} else {
 			switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
@@ -1763,7 +1833,9 @@ do_pointer_pointer_op:
 			}
 		}
 		/* Load the RHS-value. */
-		if (CTYPE_KIND_ISBOOL(rhs_typ->ct_kind)) {
+		if (!rhs_data) {
+			rhs_value = 0;
+		} else if (CTYPE_KIND_ISBOOL(rhs_typ->ct_kind)) {
 			rhs_value = buffer_istrue(rhs_data, CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) ? 1 : 0;
 		} else {
 			switch (CTYPE_KIND_SIZEOF(rhs_typ->ct_kind)) {
@@ -1796,6 +1868,8 @@ do_pointer_pointer_op:
 		case '^': lhs_value ^= rhs_value; break;
 
 		case '/':
+			if (!lhs_data)
+				break;
 			if unlikely(!rhs_value)
 				return DBX_EDIVZERO;
 			if (is_signed) {
@@ -1805,6 +1879,8 @@ do_pointer_pointer_op:
 			}
 			break;
 		case '%':
+			if (!lhs_data)
+				break;
 			if unlikely(!rhs_value)
 				return DBX_EDIVZERO;
 			if (is_signed) {
@@ -1835,6 +1911,8 @@ do_pointer_pointer_op:
 		case CTOKEN_TOK_RANGLE_EQUALS: {
 			/* Handle generic compare. */
 			bool retval;
+			if (!lhs_data)
+				goto done;
 			if (op == CTOKEN_TOK_EQUALS_EQUALS)
 				retval = lhs_value == rhs_value;
 			else if (op == CTOKEN_TOK_XCLAIM_EQUALS)
@@ -1870,12 +1948,14 @@ do_pointer_pointer_op:
 		}
 
 		/* Write-back the LHS-value. */
-		switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
-		case 1: *(uint8_t *)lhs_data = (uint8_t)lhs_value; break;
-		case 2: UNALIGNED_SET16((uint16_t *)lhs_data, (uint16_t)lhs_value); break;
-		case 4: UNALIGNED_SET32((uint32_t *)lhs_data, (uint32_t)lhs_value); break;
-		case 8: UNALIGNED_SET64((uint64_t *)lhs_data, (uint64_t)lhs_value); break;
-		default: return DBX_EINTERN;
+		if (lhs_data) {
+			switch (CTYPE_KIND_SIZEOF(lhs_typ->ct_kind)) {
+			case 1: *(uint8_t *)lhs_data = (uint8_t)lhs_value; break;
+			case 2: UNALIGNED_SET16((uint16_t *)lhs_data, (uint16_t)lhs_value); break;
+			case 4: UNALIGNED_SET32((uint32_t *)lhs_data, (uint32_t)lhs_value); break;
+			case 8: UNALIGNED_SET64((uint64_t *)lhs_data, (uint64_t)lhs_value); break;
+			default: return DBX_EINTERN;
+			}
 		}
 	} /* Scope... */
 done:

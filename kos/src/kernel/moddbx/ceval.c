@@ -2224,6 +2224,7 @@ yield_and_scan_keyword:
 						if unlikely(integer_type_flags != 0)
 							goto syn;
 						presult->ct_typ = incref(compat_builtin_types[i].bt_type);
+						yield();
 						goto done;
 					}
 				}
@@ -2236,6 +2237,7 @@ yield_and_scan_keyword:
 					if unlikely(integer_type_flags != 0)
 						goto syn;
 					presult->ct_typ = incref(builtin_types[i].bt_type);
+					yield();
 					goto done;
 				}
 			}

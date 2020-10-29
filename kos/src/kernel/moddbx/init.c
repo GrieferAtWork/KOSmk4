@@ -34,7 +34,7 @@
 /**/
 #include "include/ceval.h"
 #include "include/cexpr.h"
-#include "include/cprint.h"
+#include "include/cprinter.h"
 #include "include/csymbol.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
