@@ -214,7 +214,7 @@ KCALL vm_datapart_allocswap(struct vm_datapart *__restrict self)
 	PART_PAGEPTR_T block0_addr;
 	physpagecnt_t block0_size, num_pages;
 	assert(sync_writing(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	assert(self->dp_state == VM_DATAPART_STATE_ABSENT);
 	num_pages   = vm_datapart_numvpages(self);
 	block0_addr = PART_PAGE_MALLOC_PART(1, num_pages, &block0_size);

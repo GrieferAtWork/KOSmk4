@@ -110,6 +110,8 @@
 #define DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX      0x0021 /* ... */
 #define DEBUGINFO_PRINT_FORMAT_ASSIGN_PREFIX    0x0022 /* Prefix for `=' */
 #define DEBUGINFO_PRINT_FORMAT_ASSIGN_SUFFIX    0x0023 /* ... */
+#define DEBUGINFO_PRINT_FORMAT_ATTRIBUTE_PREFIX 0x0024 /* Prefix for `__cdecl', `__attribute__((cdecl))', ... */
+#define DEBUGINFO_PRINT_FORMAT_ATTRIBUTE_SUFFIX 0x0025 /* ... */
 #define DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX   0x0024 /* Prefix for unknown (raw) data */
 #define DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX   0x0025 /* ... */
 #define DEBUGINFO_PRINT_FORMAT_ISPREFIX(x) (!((x) & 1))

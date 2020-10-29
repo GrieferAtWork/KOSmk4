@@ -84,7 +84,7 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 {
 	size_t data_pagesize;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
 	       self->dp_state == VM_DATAPART_STATE_LOCKED);
 	data_pagesize = VM_DATABLOCK_PAGESIZE(self->dp_block);

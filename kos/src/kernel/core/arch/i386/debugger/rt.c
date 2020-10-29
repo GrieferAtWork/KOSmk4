@@ -771,7 +771,9 @@ fully_reset_task_connections:
 	x86_debug_initialize_ps2_keyboard();
 
 	/* Invoke global callbacks. */
+	dbg_active = true; /* Some callbacks require that `dbg_active = true'! */
 	dbg_runhooks(DBG_HOOK_INIT);
+	dbg_active = false;
 }
 
 #ifdef __x86_64__
@@ -1012,7 +1014,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	x86_dbg_initialize_segments(me, mythread);
 
 	/* Invoke global callbacks. */
+	dbg_active = true; /* Some callbacks require that `dbg_active = true'! */
 	dbg_runhooks(DBG_HOOK_FINI);
+	dbg_active = false;
 
 	x86_debug_finalize_ps2_keyboard();
 	dbg_finalize_tty();

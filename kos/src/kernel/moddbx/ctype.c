@@ -409,6 +409,77 @@ DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Un(4), char32_t)
 #undef DEFINE_CTYPE_TRIPLE
 #undef DEFINE_CTYPE
 
+PRIVATE struct ctype *const standalong_ctypes[] = {
+	&ctype_bool,
+	&ctype_ieee754_float,
+	&ctype_ieee754_double,
+	&ctype_ieee854_long_double,
+};
+
+struct ctype_triple {
+	struct ctype *ct_base;
+	struct ctype *ct_ptr;
+	struct ctype *ct_const_ptr;
+#ifdef __ARCH_HAVE_COMPAT
+	struct ctype *ct_compat_ptr;
+	struct ctype *ct_const_compat_ptr;
+#define CTYPE_TRIPLE_INIT(name)                                      \
+	{ &ctype_##name, &ctype_##name##_ptr, &ctype_##name##_const_ptr, \
+	  &ctype_##name##_compat_ptr, &ctype_##name##_const_compat_ptr }
+#else /* __ARCH_HAVE_COMPAT */
+#define CTYPE_TRIPLE_INIT(name) \
+	{ &ctype_##name, &ctype_##name##_ptr, &ctype_##name##_const_ptr }
+#endif /* !__ARCH_HAVE_COMPAT */
+};
+
+PRIVATE struct ctype_triple const builtin_triples[] = {
+	CTYPE_TRIPLE_INIT(void),
+	CTYPE_TRIPLE_INIT(char),
+	CTYPE_TRIPLE_INIT(signed_char),
+	CTYPE_TRIPLE_INIT(unsigned_char),
+	CTYPE_TRIPLE_INIT(short),
+	CTYPE_TRIPLE_INIT(unsigned_short),
+	CTYPE_TRIPLE_INIT(int),
+	CTYPE_TRIPLE_INIT(unsigned_int),
+	CTYPE_TRIPLE_INIT(long),
+	CTYPE_TRIPLE_INIT(unsigned_long),
+	CTYPE_TRIPLE_INIT(long_long),
+	CTYPE_TRIPLE_INIT(unsigned_long_long),
+	CTYPE_TRIPLE_INIT(char16_t),
+	CTYPE_TRIPLE_INIT(char32_t),
+};
+
+
+INTERN void NOTHROW(KCALL reset_builtin_types)(void) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(standalong_ctypes); ++i) {
+		standalong_ctypes[i]->ct_refcnt   = 0x7fff;
+		standalong_ctypes[i]->ct_children = NULL;
+	}
+	for (i = 0; i < COMPILER_LENOF(builtin_triples); ++i) {
+		builtin_triples[i].ct_base->ct_refcnt         = 0x7fff;
+		builtin_triples[i].ct_base->ct_children       = builtin_triples[i].ct_ptr;
+		builtin_triples[i].ct_ptr->ct_refcnt          = 0x7fff;
+		builtin_triples[i].ct_ptr->ct_children        = NULL;
+		builtin_triples[i].ct_ptr->ct_sibling         = builtin_triples[i].ct_const_ptr;
+		builtin_triples[i].ct_const_ptr->ct_refcnt    = 0x7fff;
+		builtin_triples[i].ct_const_ptr->ct_children  = NULL;
+#ifdef __ARCH_HAVE_COMPAT
+		builtin_triples[i].ct_const_ptr->ct_sibling         = builtin_triples[i].ct_compat_ptr;
+		builtin_triples[i].ct_compat_ptr->ct_refcnt         = 0x7fff;
+		builtin_triples[i].ct_compat_ptr->ct_children       = NULL;
+		builtin_triples[i].ct_compat_ptr->ct_sibling        = builtin_triples[i].ct_const_compat_ptr;
+		builtin_triples[i].ct_const_compat_ptr->ct_refcnt   = 0x7fff;
+		builtin_triples[i].ct_const_compat_ptr->ct_children = NULL;
+		builtin_triples[i].ct_const_compat_ptr->ct_sibling  = NULL;
+#else /* __ARCH_HAVE_COMPAT */
+		builtin_triples[i].ct_const_ptr->ct_sibling = NULL;
+#endif /* !__ARCH_HAVE_COMPAT */
+	}
+}
+
+
+
 
 /* Return the appropriate C-type for a given arch-specific register `regno'
  * If no such type exists, return `NULL' instead.
@@ -590,8 +661,7 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
 			di_debuginfo_member_t member;
 			if unlikely(!debuginfo_cu_parser_loadattr_member(&parser, &member))
 				break;
-			if (member.m_name &&
-			    strlen(member.m_name) == namelen &&
+			if (member.m_name && strlen(member.m_name) == namelen &&
 			    memcmp(member.m_name, name, namelen * sizeof(char)) == 0) {
 				dbx_errno_t result;
 				/* Found the requested field! */
@@ -968,9 +1038,6 @@ err_nomem:
 	result = DBX_ENOMEM;
 	goto done;
 }
-
-
-
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

@@ -27,12 +27,14 @@
 
 #include <debugger/debugger.h>
 
+#include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
 
 /**/
 #include "include/ceval.h"
 #include "include/cexpr.h"
+#include "include/cprint.h"
 #include "include/csymbol.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
@@ -49,6 +51,8 @@ DBG_INIT(init) {
 	dbx_heap_init();
 }
 
+INTDEF void NOTHROW(KCALL reset_builtin_types)(void);
+
 DBG_RESET(reset) {
 	csymbol_scopemask           = CSYMBOL_SCOPE_ALL;
 	ceval_comma_is_select2nd    = false;
@@ -64,6 +68,8 @@ DBG_RESET(reset) {
 #endif /* CVALUE_KIND_VOID != 0 */
 	/* Re-initialize the debugger heap-system */
 	dbx_heap_reset();
+	/* Reset pointers within builtin C-types. */
+	reset_builtin_types();
 }
 
 DBG_FINI(fini) {
@@ -108,18 +114,67 @@ DBG_AUTOCOMPLETE(eval, argc, argv, cb, arg,
 	}
 }
 
+PRIVATE ATTR_DBGTEXT ssize_t LIBDEBUGINFO_CC
+locals_format_printer(void *UNUSED(format_arg),
+                      pformatprinter printer, void *arg,
+                      unsigned int format_option) {
+	char const *format;
+	if (DEBUGINFO_PRINT_FORMAT_ISSUFFIX(format_option))
+		format = AC_DEFATTR;
+	else {
+		switch (format_option) {
+
+		case DEBUGINFO_PRINT_FORMAT_KEYWORD_PREFIX:  /* Prefix for `struct', `class', `union', `enum' */
+		case DEBUGINFO_PRINT_FORMAT_MODIFIER_PREFIX: /* Prefix for `const', `volatile', `atomic', `restrict' */
+		case DEBUGINFO_PRINT_FORMAT_BOOL_PREFIX:     /* Prefix for `true' / `false' */
+			format = AC_FG(ANSITTY_CL_AQUA);
+			break;
+
+		case DEBUGINFO_PRINT_FORMAT_STRING_PREFIX:    /* Prefix for `"foobar"' */
+		case DEBUGINFO_PRINT_FORMAT_CHARACTER_PREFIX: /* Prefix for `'f'' */
+			format = AC_FG(ANSITTY_CL_YELLOW);
+			break;
+
+		case DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX: /* Prefix for type names */
+			format = AC_FG(ANSITTY_CL_GREEN);
+			break;
+
+		case DEBUGINFO_PRINT_FORMAT_FIELD_PREFIX:   /* Prefix for `.field_name' (in struct initializers) */
+		case DEBUGINFO_PRINT_FORMAT_VARNAME_PREFIX: /* Prefix for variable names */
+		case DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX: /* Prefix for `1234' */
+		case DEBUGINFO_PRINT_FORMAT_FLOAT_PREFIX:   /* Prefix for `1234.5678' */
+			format = AC_FG(ANSITTY_CL_WHITE);
+			break;
+
+		case DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX: /* Prefix for unknown (raw) data */
+			format = AC_COLOR(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_MAROON);
+			break;
+
+		default:
+			return 0;
+		}
+	}
+	return (*printer)(arg, format, strlen(format));
+}
+
+
+
 DBG_COMMAND_AUTO(eval,
                  "eval expr...\n",
                  argc, argv) {
 	while (argc >= 2) {
 		dbx_errno_t error;
-		dbg_printf("eval: %q\n", argv[1]);
 		cexpr_empty();
 		error = cexpr_pusheval(argv[1]);
 		if (error != DBX_EOK) {
 			dbg_printf("\terror: %d\n", error);
 		} else {
-			/* TODO: Display result */
+			struct cprinter cp;
+			cp.cp_printer = &dbg_printer;
+			cp.cp_format  = &locals_format_printer;
+			ctyperef_printname(&cexpr_stacktop.cv_type, &cp, "var", 3);
+			/* TODO: Display result value. */
+			dbg_putc('\n');
 			cexpr_pop();
 		}
 		--argc;

@@ -188,7 +188,7 @@ NOTHROW(KCALL vm_paged_getfree)(struct vm *__restrict self,
 		mode &= ~VM_GETFREE_ASLR;
 #ifdef VM_GETFREE_VM
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 #endif /* VM_GETFREE_VM */
 	assertf(min_alignment_in_pages != 0, "min_alignment_in_pages must be non-zero");
 	assertf((min_alignment_in_pages & (min_alignment_in_pages - 1)) == 0,

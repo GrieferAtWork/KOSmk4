@@ -433,15 +433,17 @@ PRIVATE WUNUSED struct cvalue *
 NOTHROW(FCALL _cexpr_pushalloc)(void) {
 	size_t alloc_size;
 	struct cvalue *result = cexpr_stack - 1;
-	if (cexpr_stack == cexpr_stack_stub)
+	if (result == cexpr_stack_stub)
 		result = NULL;
-	alloc_size = dbx_malloc_usable_size(cexpr_stack) / sizeof(struct cvalue);
+	alloc_size = dbx_malloc_usable_size(result) / sizeof(struct cvalue);
 	if (cexpr_stacksize >= alloc_size) {
 		result = (struct cvalue *)dbx_realloc(result,
 		                                      (cexpr_stacksize + 2) *
 		                                      sizeof(struct cvalue));
 		if unlikely(!result)
 			goto done;
+		result = (struct cvalue *)memcpy(result, cexpr_stack_stub,
+		                                 sizeof(struct cvalue));
 		cexpr_stack = result + 1;
 	}
 	result += cexpr_stacksize + 1;
@@ -1145,7 +1147,7 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
 	field_size = ctype_sizeof(field_type.ct_typ);
 	/* Make sure that the field is in-bounds of the structure as a whole. */
 	if unlikely(OVERFLOW_UADD(field_offset, field_size, &temp) ||
-	             temp > ctype_sizeof(top->cv_type.ct_typ))
+	            temp > ctype_sizeof(top->cv_type.ct_typ))
 		return DBX_EINTERN;
 	switch (top->cv_kind) {
 
@@ -1249,11 +1251,11 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_deref)(void) {
 		return DBX_ESYNTAX;
 	switch (top->cv_kind) {
 
-	case CVALUE_KIND_DATA:
+	case CVALUE_KIND_IDATA:
 		pointed_to_addr = *(byte_t **)top->cv_idata;
 		break;
 
-	case CVALUE_KIND_IDATA:
+	case CVALUE_KIND_DATA:
 		pointed_to_addr = *(byte_t **)top->cv_data;
 		dbx_free(top->cv_data);
 		break;
@@ -1935,6 +1937,7 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
 	if (result != DBX_EOK)
 		return result;
 	if (csym.cs_kind == CSYMBOL_KIND_EXPR) {
+		/* TODO: Special handling for this_* globals! */
 		result = cexpr_pushexpr(&csym.cs_expr.e_type,
 		                        &csym.cs_expr.e_expr,
 		                        ctype_sizeof(csym.cs_expr.e_type.ct_typ),

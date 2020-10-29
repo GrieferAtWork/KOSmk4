@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/rt.h>
 #include <kernel/iovec.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>

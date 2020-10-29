@@ -29,11 +29,13 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
+#include <kernel/printk.h>
 #include <kernel/vm.h>
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
 
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -402,7 +404,7 @@ NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes) {
 			DBX_STATIC_HEAP_SETPAT(iter, DBX_STATIC_HEAP_PATTERN_FREE, sizeof(*iter));
 		} else {
 			newnode->fr_next = iter->fr_next;
-			newnode->fr_size = iter->fr_size + num_bytes;
+			newnode->fr_size = num_bytes;
 		}
 		*piter = newnode;
 		break;
@@ -410,6 +412,8 @@ NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes) {
 done:
 	return /*DBX_EOK*/;
 internal_error:
+	printk(KERN_ERR "[dbg] dbx_heap_free(%p, %" PRIuSIZ "): Internal error\n",
+	       base, num_bytes);
 	return /*DBX_EINTERN*/;
 }
 
@@ -440,8 +444,8 @@ PRIVATE void KCALL clear_heap(void) {
 		}
 		pred->sh_next = NULL;
 		/* Unmap the node. */
-		node = vm_paged_node_remove(&vm_kernel, iter->sh_node.vn_node.a_vmin);
-		if unlikely(node != &iter->sh_node) {
+		node = vm_paged_node_remove(&vm_kernel, pred->sh_node.vn_node.a_vmin);
+		if unlikely(node != &pred->sh_node) {
 			/* Shouldn't happen... */
 			vm_node_insert(node);
 			break;

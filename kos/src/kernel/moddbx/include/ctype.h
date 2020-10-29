@@ -185,12 +185,14 @@ struct ctype {
 		struct dw_debugloc ct_enum;    /* [valid_if(CTYPE_KIND_ISENUM)] Enum information. Points just
 		                                * past the `DW_TAG_enumeration_type' tag of the surrounding enumerator
 		                                * (scan this region for `DW_TAG_enumerator' child elements). */
+
 		struct {
 			struct dw_debugloc ct_info;   /* Struct information. Points just past the `DW_TAG_structure_type'
 			                               * (or similar) tag of the surrounding structure (scan
 			                               * this region for `DW_TAG_member' child elements). */
 			size_t             ct_sizeof; /* Sizeof() this struct. */
 		} ct_struct; /* [valid_if(CTYPE_KIND_ISSTRUCT)]  */
+
 		struct {
 			struct ctype     *ct_sibling; /* [0..1][valid_if(CTYPE_KIND_HASSIBLING)] Sibling type */
 			REF struct ctype *ct_parent;  /* [0..1][valid_if(CTYPE_KIND_HASSIBLING)] Parent type */
@@ -268,6 +270,7 @@ NOTHROW(FCALL ctype_common)(struct ctype *__restrict a,
  * @param: buflen: The required buffer size to hold `regno' */
 FUNDEF WUNUSED REF struct ctype *
 NOTHROW(FCALL ctype_for_register)(unsigned int regno, size_t buflen);
+
 
 
 /* Builtin types. */
