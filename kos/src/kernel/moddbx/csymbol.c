@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#include <debugger/input.h> /* dbg_awaituser */
 #include <debugger/rt.h>
 
 #include <stddef.h>
@@ -111,11 +112,15 @@ NOTHROW(FCALL enum_cu)(csymbol_enum_callback_t cb, void *arg,
 	unsigned int error;
 	ssize_t temp, result = 0;
 	uintptr_t cu_depth;
+	if (dbg_awaituser())
+		goto done;
 	cu_depth = symdat->csd_parser.dup_child_depth;
 	if (!debuginfo_cu_parser_next(&symdat->csd_parser))
 		goto done;
 again_cu_component:
 	while (symdat->csd_parser.dup_child_depth > cu_depth) {
+		if (dbg_awaituser())
+			goto done;
 		/* Scan components of this CU. */
 		switch (symdat->csd_parser.dup_comp.dic_tag) {
 
@@ -148,6 +153,8 @@ again_cu_component:
 					goto done_subprogram;
 again_subprogram_component:
 				if (symdat->csd_parser.dup_child_depth <= subprogram_depth)
+					goto done_subprogram;
+				if (dbg_awaituser())
 					goto done_subprogram;
 				switch (symdat->csd_parser.dup_comp.dic_tag) {
 
@@ -240,6 +247,10 @@ NOTHROW(FCALL enum_all_cus)(csymbol_enum_callback_t cb, void *arg,
 	                                    di_debug_sections_as_di_debuginfo_cu_parser_sections(&symdat->csd_module->dm_sections),
 	                                    &symdat->csd_parser, abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 		for (;;) {
+			if (dbg_awaituser()) {
+				debuginfo_cu_abbrev_fini(abbrev);
+				return result;
+			}
 			switch (symdat->csd_parser.dup_comp.dic_tag) {
 
 			case DW_TAG_compile_unit:
@@ -264,6 +275,8 @@ next_root:
 		}
 next_cu:
 		debuginfo_cu_abbrev_fini(abbrev);
+		if (dbg_awaituser())
+			break;
 	}
 	return result;
 err:

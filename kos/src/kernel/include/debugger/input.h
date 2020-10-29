@@ -69,6 +69,28 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_shift)(void);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_alt)(void);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_altgr)(void);
 
+
+/* Codes for what kind of input to await. */
+#define DBG_AWAIT_GETC   0 /* Await `dbg_getc()' */
+#define DBG_AWAIT_GETUNI 1 /* Await `dbg_getuni()' */
+#define DBG_AWAIT_GETKEY 2 /* Await `dbg_getkey()' */
+
+/* Begin/end expecting further user-input in the near future.
+ * While user-input is being awaited, `dbg_awaituser()' will
+ * return `true' when `dbg_getc()' would not block.
+ * @param: what: One of `DBG_AWAIT_*' */
+FUNDEF NOBLOCK void NOTHROW(FCALL dbg_awaituser_begin)(unsigned int what);
+FUNDEF NOBLOCK void NOTHROW(FCALL dbg_awaituser_end)(__BOOL force DFL(0));
+
+/* Check if there is pending user-input left to-be processed,
+ * and that the debugger is currently awaiting user-input.
+ * This function should be called from within long-running
+ * functions, and a `true' return value should be interpreted
+ * as a request to stop the function and return to the caller
+ * with some sort of consistent state as soon as possible. */
+FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_awaituser)(void);
+
+
 #endif /* __CC__ */
 
 DECL_END

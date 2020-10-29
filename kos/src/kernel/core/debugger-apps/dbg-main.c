@@ -824,8 +824,12 @@ dbg_main(uintptr_t show_welcome) {
 		size_t argc;
 		intptr_t errorcode;
 		struct dbg_commandhook const *cmd;
-		/* Force-enable render-to-screen. */
 again_readline:
+		/* Force-enable the await-user sub-system. */
+		dbg_awaituser_end(true);
+		dbg_awaituser_begin(DBG_AWAIT_GETC);
+
+		/* Force-enable render-to-screen. */
 		dbg_endupdate(true);
 		/* Add a visual indicator for when the exit state doesn't match the currently
 		 * viewed state (thus informing the user that they need to type `apply' before
@@ -891,7 +895,7 @@ continue_readline:
 
 #ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
 			case DBG_EDITFIELD_RETURN_ESC:
-				/* Re-print while hiding the autocompletion menu. */
+				/* Re-print while hiding the auto completion menu. */
 				should_print_autocomplete = false;
 				goto continue_readline;
 #endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
@@ -966,6 +970,8 @@ continue_readline_noauto:
 			dbg_putc('\n');
 		}
 		dbg_loadcolor();
+		/* Force-disable the await-user sub-system. */
+		dbg_awaituser_end(true);
 		cmdline_backlog_try_appendcurrent();
 		argc = split_cmdline(cmdline, argv, DBG_ARGC_MAX, NULL);
 		if (!argc)

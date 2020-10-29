@@ -1349,6 +1349,79 @@ again:
 }
 
 
+
+/* Amount of times that `dbg_awaituser_begin()' was called. */
+PRIVATE ATTR_DBGBSS unsigned int dbg_awaiting_what  = 0;
+PRIVATE ATTR_DBGBSS unsigned int dbg_awaiting_input = 0;
+
+/* Begin/end expecting further user-input in the near future.
+ * While user-input is being awaited, `dbg_awaituser()' will
+ * return `true' when `dbg_getc()' would not block.
+ * @param: what: One of `DBG_AWAIT_*' */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL dbg_awaituser_begin)(unsigned int what) {
+	++dbg_awaiting_input;
+	if (dbg_awaiting_what < what)
+		dbg_awaiting_what = what;
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL dbg_awaituser_end)(bool force) {
+	--dbg_awaiting_input;
+	if (force)
+		dbg_awaiting_input = 0;
+	if (!dbg_awaiting_input)
+		dbg_awaiting_what = 0;
+}
+
+/* Check if there is pending user-input left to-be processed,
+ * and that the debugger is currently awaiting user-input.
+ * This function should be called from within long-running
+ * functions, and a `true' return value should be interpreted
+ * as a request to stop the function and return to the caller
+ * with some sort of consistent state as soon as possible. */
+PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
+NOTHROW(FCALL dbg_awaituser)(void) {
+	if (!dbg_awaiting_input)
+		return false;
+	switch (dbg_awaiting_what) {
+
+	case DBG_AWAIT_GETKEY:
+		if (ps2_keyboard_buffer_siz)
+			return true;
+		if (dbg_getkey_pending_cnt)
+			return true;
+		break;
+
+	case DBG_AWAIT_GETC:
+		if (dbg_getc_pending_cnt)
+			return true;
+		ATTR_FALLTHROUGH
+	case DBG_AWAIT_GETUNI:
+		if (dbg_getuni_pending_cnt)
+			return true;
+		{
+			/* Check for a pending KEY_DOWN-event. */
+			u16 key;
+again_getkey:
+			key = dbg_getkey_impl(false);
+			if (key) {
+				if (KEY_ISUP(key))
+					goto again_getkey; /* Discard key-up events. */
+				dbg_ungetkey(key);
+				return true;
+			}
+		}
+		break;
+
+	default:
+		break;
+	}
+	return false;
+}
+
+
+
 PRIVATE NOBLOCK ATTR_DBGTEXT bool
 NOTHROW(FCALL ps2_keyboard_assertbyte)(u8 expected) {
 	u8 got;
@@ -1489,6 +1562,8 @@ again:
 	dbg_getkey_pending_cnt = 0;
 	dbg_getuni_pending_cnt = 0;
 	dbg_getc_pending_cnt   = 0;
+	dbg_awaiting_input     = 0;
+	dbg_awaiting_what      = 0;
 	return;
 err_no_ps2:
 	printk(KERN_ERR "[dbg] Keyboard init failed at %d (re-attempt #%u)\n",
