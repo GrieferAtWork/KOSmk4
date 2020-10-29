@@ -862,6 +862,10 @@ continue_readline:
 #ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
 			if (should_print_autocomplete || did_press_tab) {
 				bool badcmd = false;
+				/* Don't allow auto-completion to be aborted
+				 * if we got here because the user pressed TAB! */
+				if (did_press_tab)
+					dbg_awaituser_end(true);
 				cursor_pos = dbg_autocomplete(cursor_pos,
 				                              DBG_MAKECUR(DBG_GETCUR_X(cur) + (cursor_pos -
 				                                                               screen_left),

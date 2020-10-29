@@ -150,6 +150,7 @@ NOTHROW(FCALL cvalue_fini)(struct cvalue *__restrict self) {
 	default:
 		break;
 	}
+	ctyperef_fini(&self->cv_type);
 }
 
 

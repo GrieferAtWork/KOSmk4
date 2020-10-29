@@ -64,19 +64,19 @@ __CXXDECL_BEGIN
 /* Implement pointer difference operators for cases where the first operand is a regular pointer */
 extern "C++" {
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
-template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
-template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T volatile, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
-template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T volatile, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T volatile, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const volatile, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
-template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const volatile, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const volatile, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
-template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
-template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
-template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 }
 
 #if __SIZEOF_POINTER__ != 4

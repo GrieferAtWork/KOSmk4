@@ -609,11 +609,15 @@ NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
 			 *               then we know that the offset should actually be `0' */
 			if (member.m_offset == (uintptr_t)-1 && CTYPE_KIND_STRUCT_ISUNION(self->ct_kind))
 				member.m_offset = 0;
-			/* Enumerate this member. */
-			temp = (*cb)(arg, &member, &parser, mod);
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
+			if (!member.m_name) {
+				/* TODO: Enumerate an inlined struct/union */
+			} else {
+				/* Enumerate this member. */
+				temp = (*cb)(arg, &member, &parser, mod);
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+			}
 		} else {
 			debuginfo_cu_parser_skipattr(&parser);
 		}
@@ -661,18 +665,22 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
 			di_debuginfo_member_t member;
 			if unlikely(!debuginfo_cu_parser_loadattr_member(&parser, &member))
 				break;
-			if (member.m_name && strlen(member.m_name) == namelen &&
-			    memcmp(member.m_name, name, namelen * sizeof(char)) == 0) {
-				dbx_errno_t result;
-				/* Found the requested field! */
-				if (member.m_offset == (uintptr_t)-1)
-					member.m_offset = 0;
-				/* Write-back the field's offset. */
-				*pfield_offset = member.m_offset;
-				/* Load the field's type. */
-				result = ctype_fromdw(mod, &parser, member.m_type, pfield_type);
-				debuginfo_cu_abbrev_fini(&abbrev);
-				return result;
+			if (!member.m_name) {
+				/* TODO: Enumerate an inlined struct/union */
+			} else {
+				if (strlen(member.m_name) == namelen &&
+					memcmp(member.m_name, name, namelen * sizeof(char)) == 0) {
+					dbx_errno_t result;
+					/* Found the requested field! */
+					if (member.m_offset == (uintptr_t)-1)
+						member.m_offset = 0;
+					/* Write-back the field's offset. */
+					*pfield_offset = member.m_offset;
+					/* Load the field's type. */
+					result = ctype_fromdw(mod, &parser, member.m_type, pfield_type);
+					debuginfo_cu_abbrev_fini(&abbrev);
+					return result;
+				}
 			}
 		} else {
 			debuginfo_cu_parser_skipattr(&parser);

@@ -89,7 +89,7 @@ __ATTR_NONNULL((2)) void __NOTHROW(pokesq)(__MEMPORT_T __addr, void const *__buf
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT8_TYPE__
 __NOTHROW_NCX(peekb)(__MEMPORT_T __addr) {
 	__COMPILER_READ_BARRIER();
-	return *(__UINT8_TYPE__ volatile const *)__addr;
+	return *(__UINT8_TYPE__ const volatile *)__addr;
 }
 
 #define peeksb(port, addr, num_bytes) peeksb((__MEMPORT_T)(port), addr, num_bytes)
@@ -99,7 +99,7 @@ __NOTHROW_NCX(peeksb)(__MEMPORT_T __addr,
                       __SIZE_TYPE__ __num_bytes) {
 	__COMPILER_READ_BARRIER();
 	for (; __num_bytes; --__num_bytes, __buf = (__UINT8_TYPE__ *)__buf + 1) {
-		*(__UINT8_TYPE__ *)__buf = *(__UINT8_TYPE__ volatile const *)__addr;
+		*(__UINT8_TYPE__ *)__buf = *(__UINT8_TYPE__ const volatile *)__addr;
 	}
 }
 
@@ -126,7 +126,7 @@ __NOTHROW_NCX(pokesb)(__MEMPORT_T __addr,
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT16_TYPE__
 __NOTHROW_NCX(peekw)(__MEMPORT_T __addr) {
 	__COMPILER_READ_BARRIER();
-	return *(__UINT16_TYPE__ volatile const *)__addr;
+	return *(__UINT16_TYPE__ const volatile *)__addr;
 }
 
 #define peeksw(port, addr, num_words) peeksw((__MEMPORT_T)(port), addr, num_words)
@@ -136,7 +136,7 @@ __NOTHROW_NCX(peeksw)(__MEMPORT_T __addr,
                       __SIZE_TYPE__ __num_words) {
 	__COMPILER_READ_BARRIER();
 	for (; __num_words; --__num_words, __buf = (__UINT16_TYPE__ *)__buf + 1) {
-		*(__UINT16_TYPE__ *)__buf = *(__UINT16_TYPE__ volatile const *)__addr;
+		*(__UINT16_TYPE__ *)__buf = *(__UINT16_TYPE__ const volatile *)__addr;
 	}
 }
 
@@ -164,7 +164,7 @@ __NOTHROW_NCX(pokesw)(__MEMPORT_T __addr,
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT32_TYPE__
 __NOTHROW_NCX(peekl)(__MEMPORT_T __addr) {
 	__COMPILER_READ_BARRIER();
-	return *(__UINT32_TYPE__ volatile const *)__addr;
+	return *(__UINT32_TYPE__ const volatile *)__addr;
 }
 
 #define peeksl(port, addr, num_dwords) peeksl((__MEMPORT_T)(port), addr, num_dwords)
@@ -174,7 +174,7 @@ __NOTHROW_NCX(peeksl)(__MEMPORT_T __addr,
                       __SIZE_TYPE__ __num_dwords) {
 	__COMPILER_READ_BARRIER();
 	for (; __num_dwords; --__num_dwords, __buf = (__UINT32_TYPE__ *)__buf + 1) {
-		*(__UINT32_TYPE__ *)__buf = *(__UINT32_TYPE__ volatile const *)__addr;
+		*(__UINT32_TYPE__ *)__buf = *(__UINT32_TYPE__ const volatile *)__addr;
 	}
 }
 
@@ -202,7 +202,7 @@ __NOTHROW_NCX(pokesl)(__MEMPORT_T __addr,
 __FORCELOCAL __ATTR_ARTIFICIAL __UINT64_TYPE__
 __NOTHROW_NCX(peekq)(__MEMPORT_T __addr) {
 	__COMPILER_READ_BARRIER();
-	return *(__UINT64_TYPE__ volatile const *)__addr;
+	return *(__UINT64_TYPE__ const volatile *)__addr;
 }
 
 #define peeksq(port, addr, num_qwords) peeksq((__MEMPORT_T)(port), addr, num_qwords)
@@ -212,7 +212,7 @@ __NOTHROW_NCX(peeksq)(__MEMPORT_T __addr,
                       __SIZE_TYPE__ __num_qwords) {
 	__COMPILER_READ_BARRIER();
 	for (; __num_qwords; --__num_qwords, __buf = (__UINT64_TYPE__ *)__buf + 1) {
-		*(__UINT64_TYPE__ *)__buf = *(__UINT64_TYPE__ volatile const *)__addr;
+		*(__UINT64_TYPE__ *)__buf = *(__UINT64_TYPE__ const volatile *)__addr;
 	}
 }
 

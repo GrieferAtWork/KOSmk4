@@ -110,7 +110,7 @@ struct keyboard_device
 	size_t                     kd_pendsz;        /* [lock(kd_map_lock)] # of pending bytes in `kd_pendsz' */
 	struct mutex               kd_leds_lock;     /* Lock for updating `kd_leds' */
 	uintptr_t                  kd_leds;          /* [lock(kd_leds)] Set of currently lit LEDs (when modified, `ko_setled' must be called). */
-	XATOMIC_WEAKLYREF(struct tty_device) kb_tty; /* [0..1] Weak reference to a connected TTY (used for encoding keyboard
+	XATOMIC_WEAKLYREF(struct tty_device) kd_tty; /* [0..1] Weak reference to a connected TTY (used for encoding keyboard
 	                                              * input with `ansitty_translate()', when an ansitty is connected) */
 };
 

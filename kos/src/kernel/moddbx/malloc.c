@@ -26,6 +26,8 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#include <debugger/hook.h>
+#include <debugger/output.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
@@ -165,6 +167,7 @@ NOTHROW(FCALL extend_heap)(void) {
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		return false;
 	}
+
 	/* Reserve the associated address range to prevent the kernel
 	 * from re-assigning its address range for other purposes. */
 	last_heap->sh_node.vn_node.a_vmin   = PAGEID_ENCODE((byte_t *)new_heap);
@@ -403,7 +406,7 @@ NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes) {
 			newnode->fr_size = iter->fr_size + num_bytes;
 			DBX_STATIC_HEAP_SETPAT(iter, DBX_STATIC_HEAP_PATTERN_FREE, sizeof(*iter));
 		} else {
-			newnode->fr_next = iter->fr_next;
+			newnode->fr_next = iter;
 			newnode->fr_size = num_bytes;
 		}
 		*piter = newnode;
@@ -534,6 +537,56 @@ PUBLIC void NOTHROW(FCALL dbx_free)(void *ptr) {
 	base = (size_t *)ptr - 1;
 	dbx_heap_free(base, *base + sizeof(size_t));
 }
+
+
+DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
+                  "\tDisplay information about memory usage for the dbx heap\n"
+                  "\t") {
+	size_t total_usedmem;
+	size_t total_freemem    = 0;
+	size_t largest_fragment = 0;
+	size_t num_fragments    = 0;
+	size_t frag_percent;
+	size_t used_percent;
+	size_t free_percent;
+	size_t total_alloc;
+	struct sheap *heap;
+	struct freerange *iter;
+	total_alloc = sizeof(static_heap.sh_heap);
+	for (heap = static_heap.sh_next; heap; heap = heap->sh_next)
+		total_alloc += sizeof(heap->sh_heap);
+	for (iter = freemem; iter; iter = iter->fr_next) {
+		total_freemem += iter->fr_size;
+		if (largest_fragment < iter->fr_size)
+			largest_fragment = iter->fr_size;
+		++num_fragments;
+	}
+	/* Calculate fragmentation percentage as suggested by this:
+	 * https://stackoverflow.com/questions/4586972/how-to-calculate-fragmentation/4587077#4587077
+	 */
+	if (!largest_fragment)
+		frag_percent = 0;
+	else {
+		frag_percent = (size_t)(100 * 100000) -
+		               (size_t)(((u64)largest_fragment * 100 * 100000) / total_freemem);
+	}
+	total_usedmem = total_alloc - total_freemem;
+	used_percent  = (size_t)(((u64)total_usedmem * 100 * 100000) / total_alloc);
+	free_percent  = (size_t)(((u64)total_freemem * 100 * 100000) / total_alloc);
+	dbg_printf("\ttotal_freemem: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%)\n"
+	           "\ttotal_usedmem: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%)\n"
+	           "\ttotal_alloced: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ) " heaps)\n"
+	           "\tlargest_fragm: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ) " fragments)\n"
+	           "\tfragmentation: " AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%\n",
+	           total_freemem, (size_t)(free_percent / 100000), (size_t)(free_percent % 100000),
+	           total_usedmem, (size_t)(used_percent / 100000), (size_t)(used_percent % 100000),
+	           total_alloc, (size_t)(total_alloc / sizeof(static_heap.sh_heap)),
+	           largest_fragment, num_fragments,
+	           (size_t)(frag_percent / 100000),
+	           (size_t)(frag_percent % 100000));
+	return 0;
+}
+
 
 
 

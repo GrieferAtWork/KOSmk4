@@ -183,7 +183,6 @@ DBG_COMMAND_AUTO(eval,
 	return 0;
 }
 
-
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */
 

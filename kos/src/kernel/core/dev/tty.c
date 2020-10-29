@@ -76,7 +76,7 @@ NOTHROW(KCALL tty_device_fini)(struct character_device *__restrict self) {
 	    character_device_isakeyboard((struct character_device *)me->t_ihandle_ptr)) {
 		struct keyboard_device *idev;
 		idev = (struct keyboard_device *)me->t_ihandle_ptr;
-		idev->kb_tty.cmpxch(me, NULL);
+		idev->kd_tty.cmpxch(me, NULL);
 	}
 	if (me->t_ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 	    character_device_isanansitty((struct character_device *)me->t_ohandle_ptr)) {
@@ -395,7 +395,7 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 		 * a CP-specific, encoded byte sequence! */
 		if (ohandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
 		    character_device_isanansitty((struct character_device *)ohandle_ptr))
-			idev->kb_tty.cmpxch(NULL, result);
+			idev->kd_tty.cmpxch(NULL, result);
 	}
 	/* Try to bind the new TTY device to an ANSI TTY output device.
 	 * Note that a single output device may have multiple TTY drivers
