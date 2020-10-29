@@ -33,6 +33,7 @@
 /**/
 #include "include/ceval.h"
 #include "include/cexpr.h"
+#include "include/csymbol.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
 
@@ -49,6 +50,7 @@ DBG_INIT(init) {
 }
 
 DBG_RESET(reset) {
+	csymbol_scopemask           = CSYMBOL_SCOPE_ALL;
 	ceval_comma_is_select2nd    = false;
 	cexpr_readonly              = false;
 	cexpr_typeonly              = false;
@@ -77,12 +79,42 @@ DBG_FINI(fini) {
 }
 
 
-DBG_COMMAND(eval,
-            "eval expr...\n",
-            argc, argv) {
+DBG_AUTOCOMPLETE(eval, argc, argv, cb, arg,
+                 starts_with, starts_with_len) {
+	(void)argc;
+	(void)argv;
+	if (starts_with_len) {
+		struct cparser cp;
+		bool old_cexpr_typeonly;
+		unsigned int old_csymbol_scopemask;
+		size_t old_stacksize;
+		/* Autocomplete sub-elements of the given C-expression. */
+		cparser_init(&cp, starts_with, starts_with_len);
+		cp.c_autocom          = cb;
+		cp.c_autocom_arg      = arg;
+		cp.c_autocom_start    = starts_with;
+		old_stacksize         = cexpr_stacksize;
+		old_cexpr_typeonly    = cexpr_typeonly;
+		old_csymbol_scopemask = csymbol_scopemask;
+		cexpr_typeonly        = true;
+		csymbol_scopemask     = CSYMBOL_SCOPE_LOCAL;
+		cexpr_pushparse(&cp);
+		cexpr_typeonly    = old_cexpr_typeonly;
+		csymbol_scopemask = old_csymbol_scopemask;
+		while (cexpr_stacksize > old_stacksize) {
+			if (cexpr_pop() != DBX_EOK)
+				break;
+		}
+	}
+}
+
+DBG_COMMAND_AUTO(eval,
+                 "eval expr...\n",
+                 argc, argv) {
 	while (argc >= 2) {
 		dbx_errno_t error;
 		dbg_printf("eval: %q\n", argv[1]);
+		cexpr_empty();
 		error = cexpr_pusheval(argv[1]);
 		if (error != DBX_EOK) {
 			dbg_printf("\terror: %d\n", error);

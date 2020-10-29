@@ -186,7 +186,7 @@ next_typ:
 	}
 	/* Create a new sibling. */
 	result = (REF struct ctype *)dbx_malloc(offsetof(struct ctype, ct_function.cf_argv) +
-	                                        (argc * sizeof(struct ctype *)));
+	                                        (argc * sizeof(struct ctyperef)));
 	if unlikely(!result)
 		return NULL;
 	result->ct_refcnt   = 1; /* Returned reference. */
@@ -196,7 +196,7 @@ next_typ:
 	ctyperef_initcopy(&result->ct_function.cf_base, return_type);
 	result->ct_function.cf_argc = argc;
 	memcpy(result->ct_function.cf_argv, argv,
-	       argc, sizeof(struct ctype *));
+	       argc, sizeof(struct ctyperef));
 	for (i = 0; i < argc; ++i) {
 		incref(result->ct_function.cf_argv[i].ct_typ);
 		xincref(result->ct_function.cf_argv[i].ct_info.ci_nameref);
@@ -349,11 +349,12 @@ NOTHROW(FCALL ctype_common)(struct ctype *__restrict a,
 
 /* Builtin types. */
 struct _basic_ctype {
-	uintptr_half_t          ct_refcnt;   /* Reference counter. */
-	uintptr_half_t          ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
-	struct ctype           *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
+	uintptr_half_t ct_refcnt;   /* Reference counter. */
+	uintptr_half_t ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
+	struct ctype  *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
 };
-#define _BASIC_CTYPE_INIT(kind, children) { 1, kind, children }
+#define _BASIC_CTYPE_INIT(kind, children) \
+	{ 0x7fff, kind, children }
 
 struct _pointer_ctype {
 	uintptr_half_t          ct_refcnt;   /* Reference counter. */
@@ -526,8 +527,6 @@ NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
 	                                     &parser, &abbrev, self->ct_struct.ct_info.ddl_di_pos);
 	if unlikely(error != DEBUG_INFO_ERROR_SUCCESS)
 		goto done;
-	if (!debuginfo_cu_parser_nextchild(&parser))
-		goto done;
 	depth = parser.dup_child_depth;
 	do {
 		if (parser.dup_child_depth == depth &&
@@ -583,8 +582,6 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
 	                                     di_debug_sections_as_di_debuginfo_cu_parser_sections(&mod->dm_sections),
 	                                     &parser, &abbrev, self->ct_struct.ct_info.ddl_di_pos);
 	if unlikely(error != DEBUG_INFO_ERROR_SUCCESS)
-		goto done;
-	if (!debuginfo_cu_parser_nextchild(&parser))
 		goto done;
 	depth = parser.dup_child_depth;
 	do {
@@ -867,6 +864,7 @@ got_elem_count:
 								result = DBX_ENOMEM;
 								goto err_fuction_argv;
 							}
+							argv = new_argv;
 						}
 						DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
 							if (attr.dica_name == DW_AT_type)

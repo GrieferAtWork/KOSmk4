@@ -248,6 +248,12 @@ NOTHROW(FCALL cparser_skip)(struct cparser *__restrict self,
 		yield();
 		return DBX_EOK;
 	}
+	if (self->c_autocom) {
+		/* Suggest missing characters. */
+		char name[1];
+		name[0] = (char)expected_tok;
+		cparser_autocomplete(self, name, 1);
+	}
 	return DBX_ESYNTAX; /* Unexpected token */
 }
 
@@ -483,6 +489,71 @@ err_result:
 	return result;
 }
 
+struct autocomplete_symbols_data {
+	struct cparser *self;
+	char const     *name;
+	size_t          namelen;
+	unsigned int    ns;
+};
+
+PRIVATE WUNUSED NONNULL((2)) ssize_t
+NOTHROW(FCALL autocomplete_symbols_callback)(void *arg, struct csymbol_data const *__restrict data) {
+	struct autocomplete_symbols_data *cookie;
+	size_t symbol_namelen;
+	cookie = (struct autocomplete_symbols_data *)arg;
+	if (!csymbol_data_isns(data, cookie->ns))
+		return 0;
+	symbol_namelen = strlen(data->csd_name);
+	if (symbol_namelen <= cookie->namelen)
+		return 0;
+	if (memcmp(data->csd_name, cookie->name, cookie->namelen) != 0)
+		return 0;
+	cparser_autocomplete(cookie->self,
+	                     data->csd_name + cookie->namelen,
+	                     symbol_namelen - cookie->namelen);
+	return 0;
+}
+
+
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL autocomplete_symbols)(struct cparser *__restrict self,
+                                    char const *__restrict name,
+                                    size_t namelen, unsigned int ns) {
+	struct autocomplete_symbols_data data;
+	data.self    = self;
+	data.name    = name;
+	data.namelen = namelen;
+	data.ns      = ns;
+	csymbol_enum(&autocomplete_symbols_callback,
+	             &data, CSYMBOL_SCOPE_ALL);
+}
+
+
+PRIVATE char const misc_expr_keywords[][16] = {
+	"sizeof", "NULL", "nullptr", "true", "false", "__identifier",
+};
+
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
+                                            char const *__restrict name,
+                                            size_t namelen) {
+	if (namelen < (COMPILER_LENOF(misc_expr_keywords[0]) - 1)) {
+		unsigned int i;
+		for (i = 0; i < COMPILER_LENOF(misc_expr_keywords); ++i) {
+			if (memcmp(misc_expr_keywords[i], name, namelen) == 0 &&
+			    misc_expr_keywords[i][namelen] != '\0') {
+				char const *cname_str = misc_expr_keywords[i];
+				size_t cname_len = strlen(cname_str);
+				cparser_autocomplete(self,
+				                     cname_str + namelen,
+				                     cname_len - namelen);
+			}
+		}
+	}
+	autocomplete_symbols(self, name, namelen, CSYMBOL_LOOKUP_ANY);
+}
+
+
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
@@ -697,6 +768,8 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			kwd_str = self->c_tokstart;
 			kwd_len = cparser_toklen(self);
 			result  = cexpr_pushsymbol(kwd_str, kwd_len);
+			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
+				autocomplete_symbols(self, kwd_str, kwd_len, CSYMBOL_LOOKUP_ANY);
 			yield();
 			if (has_paren) {
 				if unlikely(result != DBX_EOK)
@@ -705,9 +778,14 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			}
 		} else {
 			result = cexpr_pushsymbol(kwd_str, kwd_len);
-			if (result == DBX_ENOENT && kwd_len && kwd_str[0] == '$') {
-				/* This might just be a register name... */
-				result = cexpr_pushregister(kwd_str + 1, kwd_len - 1);
+			if (result == DBX_ENOENT) {
+				if (kwd_len && kwd_str[0] == '$') {
+					/* This might just be a register name... */
+					result = cexpr_pushregister(kwd_str + 1, kwd_len - 1);
+					/* TODO: Auto-complete register names. */
+				} else if (self->c_autocom && self->c_tokend == self->c_end) {
+					autocomplete_nontype_symbols(self, kwd_str, kwd_len);
+				}
 			}
 			yield();
 		}
@@ -722,9 +800,55 @@ done:
 	return result;
 }
 
+
+struct autocomplete_struct_data {
+	struct cparser *self;
+	char const     *name;
+	size_t          namelen;
+};
+
+PRIVATE NONNULL((2, 3, 4)) ssize_t
+NOTHROW(KCALL autocomplete_struct_fields_callback)(void *arg,
+                                                   di_debuginfo_member_t const *__restrict member,
+                                                   di_debuginfo_cu_parser_t const *__restrict UNUSED(parser),
+                                                   struct debugmodule *__restrict UNUSED(mod)) {
+	struct autocomplete_struct_data *cookie;
+	size_t member_namelen;
+	cookie         = (struct autocomplete_struct_data *)arg;
+	member_namelen = strlen(member->m_name);
+	if (member_namelen <= cookie->namelen)
+		return 0;
+	if (memcmp(member->m_name, cookie->name, cookie->namelen) != 0)
+		return 0;
+	cparser_autocomplete(cookie->self,
+	                     member->m_name + cookie->namelen,
+	                     member_namelen - cookie->namelen);
+	return 0;
+}
+
+PRIVATE dbx_errno_t
+NOTHROW(KCALL autocomplete_struct_fields)(struct cparser *self,
+                                          char const *name,
+                                          size_t namelen) {
+	struct autocomplete_struct_data data;
+	struct ctype *ct;
+	if unlikely(!cexpr_stacksize)
+		return DBX_EINTERN;
+	ct = cexpr_stacktop.cv_type.ct_typ;
+	if unlikely(!CTYPE_KIND_ISSTRUCT(ct->ct_kind))
+		return DBX_ESYNTAX;
+	data.self    = self;
+	data.name    = name;
+	data.namelen = namelen;
+	ctype_struct_field(ct, &autocomplete_struct_fields_callback, &data);
+	return DBX_ENOENT;
+}
+
+
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
+again:
 	switch (self->c_tok) {
 
 	case CTOKEN_TOK_MINUS_RANGLE:
@@ -733,14 +857,31 @@ NOTHROW(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
 		if unlikely(result != DBX_EOK)
 			goto done;
 		ATTR_FALLTHROUGH
-	case '.':
+	case '.': {
+		char const *kwd_str;
+		size_t kwd_len;
 		/* Field w/o deref */
 		yield();
-		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD)
+		if (self->c_tok != CTOKEN_TOK_KEYWORD) {
+			/* Special case: If we've reached EOF, then still
+			 *               try to auto-complete field names,
+			 *               even if the user hasn't written
+			 *               any part of the name, yet. */
+			if (self->c_tok == CTOKEN_TOK_EOF && self->c_autocom) {
+				result = autocomplete_struct_fields(self, NULL, 0);
+				goto done;
+			}
 			goto syn;
-		result = cexpr_field(self->c_tokstart,
-		                     cparser_toklen(self));
-		break;
+		}
+		kwd_str = self->c_tokstart;
+		kwd_len = cparser_toklen(self);
+		result = cexpr_field(kwd_str, kwd_len);
+		/* Autocomplete struct field names. */
+		if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
+			result = autocomplete_struct_fields(self, kwd_str, kwd_len);
+		yield();
+		goto again;
+	}	break;
 
 	case '[':
 		/* Array expression. */
@@ -755,7 +896,7 @@ NOTHROW(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_deref();
-		break;
+		goto again;
 
 	case CTOKEN_TOK_PLUS_PLUS:
 	case CTOKEN_TOK_MINUS_MINUS: {
@@ -789,6 +930,7 @@ NOTHROW(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_pop();           /* (typeof(value))value */
+		goto again;
 	}	break;
 
 	case '(': {
@@ -808,6 +950,7 @@ NOTHROW(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_call(argc);
+		goto again;
 	}	break;
 
 	default:
@@ -1445,7 +1588,7 @@ done:
  * effective size of the C-expression stack will remain
  * unaltered). NOTE: The given `self' is expected to already
  * point to the first token apart of the expression on entry. */
-PUBLIC WUNUSED NONNULL((1)) dbx_errno_t
+PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushparse)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
@@ -1543,7 +1686,7 @@ err_nomem:
  * @param: maxlen:   The max length of `expr' (actual length is `strnlen(expr, maxlen)')
  * @return: DBX_EOK: Success
  * @return: * :      Error (the effective c-expression-stack-size is unaltered) */
-PUBLIC WUNUSED NONNULL((1)) dbx_errno_t
+PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
                               size_t maxlen) {
 	dbx_errno_t result;
@@ -1902,6 +2045,47 @@ PRIVATE struct builtin_type const compat_builtin_types[] = {
 };
 #endif /* __ARCH_HAVE_COMPAT */
 
+PRIVATE char const misc_type_keywords[][16] = {
+	"int", "short", "char", "long", "signed", "unsigned", "double",
+	"__int8", "__int16", "__int32", "__int64", "typeof",
+	"struct", "union", "class", "enum"
+};
+
+
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL autocomplete_types)(struct cparser *__restrict self,
+                                  char const *__restrict name,
+                                  size_t namelen, unsigned int ns) {
+	unsigned int i;
+	if (namelen < (COMPILER_LENOF(builtin_types[0].bt_name) - 1)) {
+		for (i = 0; i < COMPILER_LENOF(builtin_types); ++i) {
+			if (memcmp(builtin_types[i].bt_name, name, namelen) == 0 &&
+			    builtin_types[i].bt_name[namelen] != '\0') {
+				char const *cname_str = builtin_types[i].bt_name;
+				size_t cname_len = strlen(cname_str);
+				cparser_autocomplete(self,
+				                     cname_str + namelen,
+				                     cname_len - namelen);
+			}
+		}
+	}
+	if (namelen < (COMPILER_LENOF(misc_type_keywords[0]) - 1)) {
+		for (i = 0; i < COMPILER_LENOF(misc_type_keywords); ++i) {
+			if (memcmp(misc_type_keywords[i], name, namelen) == 0 &&
+			    misc_type_keywords[i][namelen] != '\0') {
+				char const *cname_str = misc_type_keywords[i];
+				size_t cname_len = strlen(cname_str);
+				cparser_autocomplete(self,
+				                     cname_str + namelen,
+				                     cname_len - namelen);
+			}
+		}
+	}
+	autocomplete_symbols(self, name, namelen, ns);
+}
+
+
+
 
 PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
 NOTHROW(FCALL ctype_parse_base)(struct cparser *__restrict self,
@@ -1932,7 +2116,7 @@ NOTHROW(FCALL ctype_parse_base)(struct cparser *__restrict self,
 	/* Parse const/volatile flags, and initial attributes. */
 	result = ctype_parse_cv(self, &presult->ct_flags, attrib);
 	if unlikely(result != DBX_EOK)
-		goto err;
+		goto err_nopresult;
 	if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD)
 		goto syn;
 	integer_type_flags = 0;
@@ -1958,7 +2142,7 @@ do_scan_keyword:
 		/* Parse additional attributes before the name. */
 		result = ctype_parse_attrib(self, attrib);
 		if unlikely(result != DBX_EOK)
-			goto err;
+			goto err_nopresult;
 		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD)
 			goto syn;
 		/* Lookup the object name. */
@@ -1966,13 +2150,16 @@ do_scan_keyword:
 		kwd_len = cparser_toklen(self);
 		result = csymbol_lookup(kwd_str, kwd_len, &csym,
 		                        CSYMBOL_SCOPE_ALL, ns);
-		if unlikely(result != DBX_EOK)
-			goto err;
+		if unlikely(result != DBX_EOK) {
+			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
+				autocomplete_symbols(self, kwd_str, kwd_len, ns);
+			goto err_nopresult;
+		}
 		if unlikely(csym.cs_kind != CSYMBOL_KIND_TYPE) {
 			/* Shouldn't happen. */
 			csymbol_fini(&csym);
 			result = DBX_ENOENT;
-			goto err;
+			goto err_nopresult;
 		}
 		presult->ct_typ  = csym.cs_type.ct_typ;  /* Inherit reference */
 		presult->ct_info = csym.cs_type.ct_info; /* Inherit data */
@@ -2108,7 +2295,7 @@ yield_and_scan_keyword:
 			more_flags = presult->ct_flags;
 			result     = parse_typeof(self, presult);
 			if unlikely(result != DBX_EOK)
-				goto err;
+				goto err_nopresult;
 			presult->ct_flags |= more_flags;
 		} else if (integer_type_flags != 0) {
 			/* Complete a segmented integer type. */
@@ -2148,12 +2335,18 @@ yield_and_scan_keyword:
 			result = csymbol_lookup(kwd_str, kwd_len, &csym, CSYMBOL_SCOPE_ALL,
 			                        fail_if_symbol_exists ? CSYMBOL_LOOKUP_ANY
 			                                              : CSYMBOL_LOOKUP_TYPE);
-			if unlikely(result != DBX_EOK)
-				goto err;
+			if unlikely(result != DBX_EOK) {
+				if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end) {
+					autocomplete_types(self, kwd_str, kwd_len,
+					                   fail_if_symbol_exists ? CSYMBOL_LOOKUP_ANY
+					                                         : CSYMBOL_LOOKUP_TYPE);
+				}
+				goto err_nopresult;
+			}
 			if unlikely(csym.cs_kind != CSYMBOL_KIND_TYPE) {
 				csymbol_fini(&csym);
 				result = DBX_ENOENT;
-				goto err;
+				goto err_nopresult;
 			}
 			presult->ct_typ  = csym.cs_type.ct_typ;  /* Inherit reference */
 			presult->ct_info = csym.cs_type.ct_info; /* Inherit data */
@@ -2167,9 +2360,10 @@ done:
 		goto err;
 	return result;
 err:
+	ctyperef_fini(presult);
+err_nopresult:
 	/* Restore the original token. */
 	cparser_yieldat(self, orig_tok);
-	ctyperef_fini(presult);
 	return result;
 syn:
 	return DBX_ESYNTAX;
@@ -2252,6 +2446,7 @@ handle_dots_in_parameter_list:
 						result = DBX_ENOMEM;
 						goto err_fuction_argv;
 					}
+					argv = new_argv;
 				}
 				result = ctype_eval(self, &argv[argc], &argname_start, NULL, false);
 				if unlikely(result != DBX_EOK)

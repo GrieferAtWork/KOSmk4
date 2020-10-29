@@ -143,7 +143,6 @@ again_cu_component:
 					debuginfo_cu_parser_skipattr(&symdat->csd_parser);
 				}
 			}
-			result = true;
 			for (;;) {
 				if (!debuginfo_cu_parser_next(&symdat->csd_parser))
 					goto done_subprogram;
@@ -253,10 +252,11 @@ NOTHROW(FCALL enum_all_cus)(csymbol_enum_callback_t cb, void *arg,
 				if (temp < 0)
 					goto err;
 				result += temp;
-				break;
+				goto next_root;
 
 			default:
 				debuginfo_cu_parser_skipattr(&symdat->csd_parser);
+next_root:
 				if (!debuginfo_cu_parser_next(&symdat->csd_parser))
 					goto next_cu;
 				break;
@@ -271,6 +271,9 @@ err:
 	return temp;
 }
 
+/* Mask for scopes that can be enumerated. */
+PUBLIC unsigned int csymbol_scopemask = 0;
+
 
 /* Enumerate C-symbols from the current point-of-view:
  *   CSYMBOL_SCOPE_CU:   The scope of the current compilation unit
@@ -284,7 +287,7 @@ err:
  * }
  * @return: * : The sum of return values of `cb'
  * @return: <0: The immediate propagation of the first negative return value of `cb' */
-PUBLIC WUNUSED NONNULL((1)) ssize_t
+PUBLIC NONNULL((1)) ssize_t
 NOTHROW(FCALL csymbol_enum)(csymbol_enum_callback_t cb, void *arg,
                             unsigned int scopes) {
 	ssize_t temp, result = 0;
@@ -292,6 +295,7 @@ NOTHROW(FCALL csymbol_enum)(csymbol_enum_callback_t cb, void *arg,
 	di_debuginfo_cu_abbrev_t abbrev;
 	di_debuginfo_ranges_t exclude;
 	symdat.csd_module = NULL;
+	scopes &= csymbol_scopemask;
 	if (scopes & (CSYMBOL_SCOPE_LOCAL | CSYMBOL_SCOPE_CU | CSYMBOL_SCOPE_MOD)) {
 		uintptr_t abs_pc, module_relative_pc;
 		abs_pc            = dbg_getpcreg(DBG_REGLEVEL_VIEW);
@@ -340,6 +344,55 @@ struct csymbol_lookup_data {
 	dbx_errno_t             cld_errno;   /* error */
 };
 
+/* Check if `self' belongs to `ns'
+ * @param: ns: One of `CSYMBOL_LOOKUP_*' */
+PUBLIC WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL csymbol_data_isns)(struct csymbol_data const *__restrict self,
+                                 unsigned int ns) {
+	switch (ns) {
+
+	case CSYMBOL_LOOKUP_TYPE:
+		if (self->csd_symkind != CSYMBOL_KIND_TYPE)
+			goto nope;
+		break;
+
+	case CSYMBOL_LOOKUP_STRUCT:
+		if (self->csd_symkind != CSYMBOL_KIND_TYPE)
+			goto nope;
+		if (self->csd_parser.dup_comp.dic_tag != DW_TAG_structure_type)
+			goto nope;
+		break;
+
+	case CSYMBOL_LOOKUP_UNION:
+		if (self->csd_symkind != CSYMBOL_KIND_TYPE)
+			goto nope;
+		if (self->csd_parser.dup_comp.dic_tag != DW_TAG_union_type)
+			goto nope;
+		break;
+
+	case CSYMBOL_LOOKUP_CLASS:
+		if (self->csd_symkind != CSYMBOL_KIND_TYPE)
+			goto nope;
+		if (self->csd_parser.dup_comp.dic_tag != DW_TAG_class_type)
+			goto nope;
+		break;
+
+	case CSYMBOL_LOOKUP_ENUM:
+		if (self->csd_symkind != CSYMBOL_KIND_TYPE)
+			goto nope;
+		if (self->csd_parser.dup_comp.dic_tag != DW_TAG_enumeration_type)
+			goto nope;
+		break;
+
+	default:
+		break;
+	}
+	return true;
+nope:
+	return false;
+}
+
+
 PRIVATE NONNULL((1, 2)) ssize_t
 NOTHROW(FCALL csymbol_lookup_callback)(void *arg, struct csymbol_data const *__restrict data) {
 	struct csymbol_lookup_data *cookie;
@@ -349,44 +402,8 @@ NOTHROW(FCALL csymbol_lookup_callback)(void *arg, struct csymbol_data const *__r
 	if (memcmp(data->csd_name, cookie->cld_name, cookie->cld_namelen) != 0)
 		return 0;
 	/* Found the symbol! Now check if it has the correct type. */
-	switch (cookie->cld_ns) {
-
-	case CSYMBOL_LOOKUP_TYPE:
-		if (data->csd_symkind != CSYMBOL_KIND_TYPE)
-			return 0;
-		break;
-
-	case CSYMBOL_LOOKUP_STRUCT:
-		if (data->csd_symkind != CSYMBOL_KIND_TYPE)
-			return 0;
-		if (data->csd_parser.dup_comp.dic_tag != DW_TAG_structure_type)
-			return 0;
-		break;
-
-	case CSYMBOL_LOOKUP_UNION:
-		if (data->csd_symkind != CSYMBOL_KIND_TYPE)
-			return 0;
-		if (data->csd_parser.dup_comp.dic_tag != DW_TAG_union_type)
-			return 0;
-		break;
-
-	case CSYMBOL_LOOKUP_CLASS:
-		if (data->csd_symkind != CSYMBOL_KIND_TYPE)
-			return 0;
-		if (data->csd_parser.dup_comp.dic_tag != DW_TAG_class_type)
-			return 0;
-		break;
-
-	case CSYMBOL_LOOKUP_ENUM:
-		if (data->csd_symkind != CSYMBOL_KIND_TYPE)
-			return 0;
-		if (data->csd_parser.dup_comp.dic_tag != DW_TAG_enumeration_type)
-			return 0;
-		break;
-
-	default:
-		break;
-	}
+	if (!csymbol_data_isns(data, cookie->cld_ns))
+		return 0;
 	cookie->cld_errno = csymbol_from_csymbol_data(cookie->cld_result, data);
 	return -1;
 }

@@ -1048,8 +1048,8 @@ again_switch_kind:
 				break;
 
 			case CVALUE_KIND_IEXPR:
-				memcpy(buffer, top->cv_expr.v_ibuffer, buflen);
 				cvalue_cfiexpr_fini(&top->cv_expr.v_expr);
+				memmove(buffer, top->cv_expr.v_ibuffer, buflen);
 				break;
 
 			case CVALUE_KIND_REGISTER:

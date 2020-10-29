@@ -193,7 +193,7 @@ typedef void (DBG_CALL *dbg_autocomplete_cb_t)(void *arg, char const *name, size
 /* Enumerate a list of possible words that may follow after
  * argc+argv by invoking `(*cb)(arg, ...)' for each possibility.
  * @param: starts_with: (optional) When non-NULL (and non-empty), the function
- *                       is allowed to skip enumerating auto-completion options
+ *                       is allowed to only enumerate auto-completion options
  *                       that start with the C-string `starts_with' */
 typedef void (DBG_CALL *dbg_autocomplete_t)(size_t argc, char *argv[],
                                             dbg_autocomplete_cb_t cb, void *arg,

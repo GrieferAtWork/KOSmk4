@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#include <debugger/hook.h>
 #include <kernel/types.h>
 
 /**/
@@ -68,14 +69,28 @@ enum {
 };
 
 struct cparser {
-	unsigned int c_tok;      /* C Token kind. (single-character, or one of `CTOKEN_TOK_*') */
-	char const  *c_tokstart; /* [1..1] Start character of `c_tok' */
-	char const  *c_tokend;   /* [1..1] End character of `c_tok' */
-	char const  *c_end;      /* [1..1][const] End of text to-be parsed (NOTE: must point to a NUL-character!) */
+	unsigned int          c_tok;      /* C Token kind. (single-character, or one of `CTOKEN_TOK_*') */
+	char const           *c_tokstart; /* [1..1] Start character of `c_tok' */
+	char const           *c_tokend;   /* [1..1] End character of `c_tok' */
+	char const           *c_end;      /* [1..1][const] End of text to-be parsed (NOTE: must point to a NUL-character!) */
+	dbg_autocomplete_cb_t c_autocom;  /* [0..1] Auto-completion callback: When `CTOKEN_TOK_EOF' is reached in certain
+	                                   *        positions while parsing an expression, and this callback is NULL, then
+	                                   *        this callback will be invoked with a list of possible continuation
+	                                   *        options. */
+	void                 *c_autocom_arg;   /* [?..?] Cookie for `c_autocom' */
+	char const           *c_autocom_start; /* [1..1][valid_if(c_autocom)] Text start for auto-completion. */
 };
 
-#define cparser_init(self, str, len)                     \
-	((self)->c_end = ((self)->c_tokend = (str)) + (len), \
+/* Try to auto-complete the given parser's expression by appending `str...+=len'
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOMEM: Insufficient memory. */
+FUNDEF NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
+                                    char const *__restrict str, size_t len);
+
+#define cparser_init(self, str, len)                         \
+	((self)->c_end     = ((self)->c_tokend = (str)) + (len), \
+	 (self)->c_autocom = __NULLPTR,                          \
 	 cparser_yield(self))
 
 #define cparser_toklen(self) (size_t)((self)->c_tokend - (self)->c_tokstart)

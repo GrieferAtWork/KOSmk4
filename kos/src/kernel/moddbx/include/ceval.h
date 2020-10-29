@@ -55,13 +55,14 @@ struct cparser;
  */
 DATDEF __BOOL ceval_comma_is_select2nd;
 
+
 /* Parse a C-expression from `self' and push its value
  * onto the C-expression stack, return DBX_EOK on success,
  * and a potential error otherwise (in the later case, the
  * effective size of the C-expression stack will remain
  * unaltered). NOTE: The given `self' is expected to already
  * point to the first token apart of the expression on entry. */
-FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
+FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushparse)(struct cparser *__restrict self);
 
 /* Light-weight wrapper around `cexpr_pushparse()', and also
@@ -70,7 +71,7 @@ NOTHROW(FCALL cexpr_pushparse)(struct cparser *__restrict self);
  * @param: maxlen:   The max length of `expr' (actual length is `strnlen(expr, maxlen)')
  * @return: DBX_EOK: Success
  * @return: * :      Error (the effective c-expression-stack-size is unaltered) */
-FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
+FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
                               size_t maxlen DFL((size_t)-1));
 

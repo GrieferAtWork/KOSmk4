@@ -28,15 +28,51 @@
 #include <debugger/config.h>
 #include <kernel/types.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <ctype.h>
+#include <string.h>
 #include <unicode.h>
 
 /**/
 #include "include/cparser.h"
+#include "include/malloc.h"
 
 #ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
+
+/* Try to auto-complete the given parser's expression by appending `str...+=len'
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOMEM: Insufficient memory. */
+PUBLIC NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
+                                    char const *__restrict str, size_t len) {
+	enum { STACK_LIMIT = 256 };
+	size_t mylen;
+	size_t total_len;
+	char *buffer, *ptr;
+	if (!self->c_autocom)
+		return DBX_EOK; /* Don't need to do anything! */
+	mylen     = (size_t)(self->c_end - self->c_autocom_start);
+	total_len = (mylen + len + 1) * sizeof(char);
+	if (total_len <= STACK_LIMIT) {
+		buffer = (char *)alloca(total_len);
+	} else {
+		buffer = (char *)dbx_malloc(total_len);
+		if unlikely(!buffer)
+			return DBX_ENOMEM;
+	}
+	ptr = buffer;
+	ptr = (char *)mempcpy(ptr, self->c_autocom_start, mylen, sizeof(char));
+	ptr = (char *)mempcpy(ptr, str, len, sizeof(char));
+	*ptr = '\0';
+	/* Invoke the auto-completion callback. */
+	(*self->c_autocom)(self->c_autocom_arg, buffer, (size_t)(ptr - buffer));
+	if (total_len > STACK_LIMIT)
+		dbx_free(buffer);
+	return DBX_EOK;
+}
+
 
 /* Advance the given C-parser to the next token.
  * Parsing starts at `self->c_tokend', and upon return,
@@ -57,7 +93,7 @@ again:
 		return;
 	}
 	ch = unicode_readutf8_n(&iter, end);
-	self->c_tok    = '/';
+	self->c_tok    = ch;
 	self->c_tokend = iter;
 	switch (ch) {
 
@@ -271,13 +307,16 @@ do_integer_or_float:
 			goto again;
 		}
 		if (unicode_issymstrt(ch)) {
+	case '$':
+	case '_':
 			/* Keyword */
 			self->c_tok = CTOKEN_TOK_KEYWORD;
 			do {
 				assert(ch);
 				self->c_tokend = iter;
 				ch = unicode_readutf8_n(&iter, end);
-			} while (unicode_issymcont(ch));
+			} while (unicode_issymcont(ch) ||
+			         ch == '_' || ch == '$');
 			break;
 		}
 		if unlikely(ch >= 256)

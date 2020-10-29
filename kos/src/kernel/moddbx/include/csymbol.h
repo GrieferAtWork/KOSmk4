@@ -82,6 +82,13 @@ FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW(FCALL csymbol_from_csymbol_data)(struct csymbol *__restrict self,
                                          struct csymbol_data const *__restrict data);
 
+/* Check if `self' belongs to `ns'
+ * @param: ns: One of `CSYMBOL_LOOKUP_' */
+FUNDEF WUNUSED NONNULL((1)) __BOOL
+NOTHROW(FCALL csymbol_data_isns)(struct csymbol_data const *__restrict self,
+                                 unsigned int ns);
+
+
 /* Callback for C-symbol enumeration.
  * @return: * : Format-printer-like return value. */
 typedef WUNUSED NONNULL((2)) ssize_t
@@ -99,7 +106,7 @@ typedef WUNUSED NONNULL((2)) ssize_t
  * }
  * @return: * : The sum of return values of `cb'
  * @return: <0: The immediate propagation of the first negative return value of `cb' */
-FUNDEF WUNUSED NONNULL((1)) ssize_t
+FUNDEF NONNULL((1)) ssize_t
 NOTHROW(FCALL csymbol_enum)(csymbol_enum_callback_t cb, void *arg,
                             unsigned int scopes);
 #define CSYMBOL_SCOPE_ALL   0xff /* Enumerate all scopes */
@@ -108,6 +115,10 @@ NOTHROW(FCALL csymbol_enum)(csymbol_enum_callback_t cb, void *arg,
 #define CSYMBOL_SCOPE_MOD   0x04 /* Enumerate the current module */
 #define CSYMBOL_SCOPE_USER  0x08 /* Enumerate user-space modules */
 #define CSYMBOL_SCOPE_KERN  0x10 /* Enumerate kernel-space modules */
+
+/* Mask for scopes that can be enumerated. */
+DATDEF unsigned int csymbol_scopemask;
+
 
 
 /* Lookup a C-symbol, given its name, as well as namespace association.
