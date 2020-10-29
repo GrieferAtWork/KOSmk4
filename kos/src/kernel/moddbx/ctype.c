@@ -383,7 +383,10 @@ struct _pointer_ctype {
 	DEFINE_CTYPE(struct _pointer_ctype, ctype_##name##_const_ptr) = _POINTER_CTYPE_INIT(NULL, NULL, &ctype_##name, CTYPEREF_FLAG_CONST);
 #endif /* !__ARCH_HAVE_COMPAT */
 
-DEFINE_CTYPE(struct _basic_ctype, ctype_bool) = _BASIC_CTYPE_INIT(CTYPE_KIND_BOOL, NULL);
+DEFINE_CTYPE(struct _basic_ctype, ctype_bool)                = _BASIC_CTYPE_INIT(CTYPE_KIND_BOOL, NULL);
+DEFINE_CTYPE(struct _basic_ctype, ctype_ieee754_float)       = _BASIC_CTYPE_INIT(CTYPE_KIND_IEEE754_FLOAT, NULL);
+DEFINE_CTYPE(struct _basic_ctype, ctype_ieee754_double)      = _BASIC_CTYPE_INIT(CTYPE_KIND_IEEE754_DOUBLE, NULL);
+DEFINE_CTYPE(struct _basic_ctype, ctype_ieee854_long_double) = _BASIC_CTYPE_INIT(CTYPE_KIND_IEEE854_LONG_DOUBLE, NULL);
 DEFINE_CTYPE_TRIPLE(CTYPE_KIND_VOID, void)
 #ifdef __CHAR_UNSIGNED__
 DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Un(__SIZEOF_CHAR__), char)
@@ -400,6 +403,8 @@ DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Sn(__SIZEOF_LONG__), long)
 DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Un(__SIZEOF_LONG__), unsigned_long)
 DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Sn(__SIZEOF_LONG_LONG__), long_long)
 DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Un(__SIZEOF_LONG_LONG__), unsigned_long_long)
+DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Un(2), char16_t)
+DEFINE_CTYPE_TRIPLE(CTYPE_KIND_Un(4), char32_t)
 #undef DEFINE_CTYPE_TRIPLE
 #undef DEFINE_CTYPE
 

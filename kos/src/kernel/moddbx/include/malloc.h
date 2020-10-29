@@ -31,6 +31,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#include <kernel/heap.h>
 #include <kernel/types.h>
 
 #include <hybrid/typecore.h>
@@ -38,12 +39,20 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
+/* High-level malloc functions. */
 FUNDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) ATTR_ASSUME_ALIGNED(__SIZEOF_POINTER__) void *
 NOTHROW(FCALL dbx_malloc)(size_t num_bytes);
 FUNDEF WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ASSUME_ALIGNED(__SIZEOF_POINTER__) void *
 NOTHROW(FCALL dbx_realloc)(void *ptr, size_t num_bytes);
 FUNDEF ATTR_PURE WUNUSED size_t NOTHROW(FCALL dbx_malloc_usable_size)(void *ptr);
 FUNDEF void NOTHROW(FCALL dbx_free)(void *ptr);
+
+/* Low-level heap alloc/free functions. */
+FUNDEF WUNUSED struct heapptr NOTHROW(FCALL dbx_heap_alloc)(size_t num_bytes);
+FUNDEF void NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes);
+/* Try to allocate at least `num_bytes' at `addr',
+ * and return the actual amount that was allocated. */
+FUNDEF WUNUSED size_t NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes);
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

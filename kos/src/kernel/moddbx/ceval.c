@@ -24,6 +24,19 @@
 
 /* DeBug eXtensions. */
 
+#include <__crt.h>
+
+#ifndef __CRT_HAVE_strtold
+/* strtold() uses format_scanf() to implement itself. However the kernel
+ * version of that function doesn't include floating-point support. As
+ * such, as the headers to provide us with our own version of format_scanf(),
+ * which _does_ include floating-point support.
+ * (A bit wasteful, since we don't actually use its other features, but
+ * it's the simplest solution to this problem...) */
+#undef __CRT_HAVE_format_scanf
+#undef __CRT_HAVE_format_vscanf
+#endif /* !__CRT_HAVE_strtold */
+
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
@@ -44,6 +57,7 @@
 #include "include/ceval.h"
 #include "include/cexpr.h"
 #include "include/cparser.h"
+#include "include/csymbol.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
 
@@ -478,6 +492,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 	case '(': {
 		/* Check for a C-style cast expression. */
 		struct ctyperef cast_type;
+		yield();
 		result = ctype_eval(self, &cast_type, NULL, NULL, true);
 		if (result == DBX_EOK) {
 			/* Cast-expression */
@@ -529,6 +544,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		}
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 		result = cexpr_pushdata_simple(used_type, &value);
+		yield();
 	}	break;
 
 	case CTOKEN_TOK_FLOAT: {
@@ -571,6 +587,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		} else {
 			result = cexpr_pushdata_simple(used_type, &value);
 		}
+		yield();
 	}	break;
 
 	case CTOKEN_TOK_CHAR: {
@@ -592,6 +609,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		}
 		/* Push as an integer. */
 		result = cexpr_pushint_simple(&ctype_int, value);
+		yield();
 	}	break;
 
 	case CTOKEN_TOK_PLUS_PLUS:
@@ -661,6 +679,12 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		           KWD_CHECK(kwd_str, kwd_len, "nullptr")) {
 			yield();
 			result = cexpr_pushint_simple(&ctype_void_ptr, 0);
+		} else if (KWD_CHECK(kwd_str, kwd_len, "true")) {
+			yield();
+			result = cexpr_pushint_simple(&ctype_bool, 1);
+		} else if (KWD_CHECK(kwd_str, kwd_len, "false")) {
+			yield();
+			result = cexpr_pushint_simple(&ctype_bool, 0);
 		} else if (KWD_CHECK(kwd_str, kwd_len, "__identifier")) {
 			bool has_paren;
 			yield();
@@ -783,7 +807,7 @@ NOTHROW(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
 		result = cparser_skip(self, ')');
 		if unlikely(result != DBX_EOK)
 			goto done;
-		result = cexpr_call_promote(argc);
+		result = cexpr_call(argc);
 	}	break;
 
 	default:
@@ -1833,6 +1857,52 @@ syn:
 	goto done;
 }
 
+
+struct builtin_type {
+	char          bt_name[24]; /* Type name */
+	struct ctype *bt_type;     /* [1..1] Type pointer. */
+};
+
+PRIVATE struct builtin_type const builtin_types[] = {
+	{ "void", &ctype_void },
+	{ "bool", &ctype_bool },
+	{ "_Bool", &ctype_bool },
+	{ "float", &ctype_ieee754_float },
+	{ "wchar_t", &ctype_wchar_t },
+	{ "__wchar_t", &ctype_wchar_t },
+	{ "char8_t", &ctype_char8_t },
+	{ "char16_t", &ctype_char16_t },
+	{ "char32_t", &ctype_char32_t },
+
+	/* Some more "known" types for convenience. */
+	{ "s8",  &ctype_s8  }, { "__s8",  &ctype_s8  }, { "int8_t",   &ctype_s8  }, { "__int8_t",   &ctype_s8  }, { "__INT8_TYPE__",   &ctype_s8  },
+	{ "u8",  &ctype_u8  }, { "__u8",  &ctype_u8  }, { "uint8_t",  &ctype_u8  }, { "__uint8_t",  &ctype_u8  }, { "__UINT8_TYPE__",  &ctype_u8  },
+	{ "s16", &ctype_s16 }, { "__s16", &ctype_s16 }, { "int16_t",  &ctype_s16 }, { "__int16_t",  &ctype_s16 }, { "__INT16_TYPE__",  &ctype_s16 },
+	{ "u16", &ctype_u16 }, { "__u16", &ctype_u16 }, { "uint16_t", &ctype_u16 }, { "__uint16_t", &ctype_u16 }, { "__UINT16_TYPE__", &ctype_u16 },
+	{ "s32", &ctype_s32 }, { "__s32", &ctype_s32 }, { "int32_t",  &ctype_s32 }, { "__int32_t",  &ctype_s32 }, { "__INT32_TYPE__",  &ctype_s32 },
+	{ "u32", &ctype_u32 }, { "__u32", &ctype_u32 }, { "uint32_t", &ctype_u32 }, { "__uint32_t", &ctype_u32 }, { "__UINT32_TYPE__", &ctype_u32 },
+	{ "s64", &ctype_s64 }, { "__s64", &ctype_s64 }, { "int64_t",  &ctype_s64 }, { "__int64_t",  &ctype_s64 }, { "__INT64_TYPE__",  &ctype_s64 },
+	{ "u64", &ctype_u64 }, { "__u64", &ctype_u64 }, { "uint64_t", &ctype_u64 }, { "__uint64_t", &ctype_u64 }, { "__UINT64_TYPE__", &ctype_u64 },
+
+	{ "size_t", &ctype_size_t }, { "__SIZE_TYPE__", &ctype_size_t },
+	{ "ssize_t", &ctype_ssize_t }, { "__SSIZE_TYPE__", &ctype_ssize_t },
+	{ "ptrdiff_t", &ctype_ptrdiff_t }, { "__PTRDIFF_TYPE__", &ctype_ptrdiff_t },
+	{ "intptr_t", &ctype_intptr_t }, { "__INTPTR_TYPE__", &ctype_intptr_t },
+	{ "uintptr_t", &ctype_uintptr_t }, { "__UINTPTR_TYPE__", &ctype_uintptr_t },
+};
+
+#ifdef __ARCH_HAVE_COMPAT
+PRIVATE struct builtin_type const compat_builtin_types[] = {
+	/* Some more "known" types for convenience. */
+	{ "size_t", &ctype_compat_size_t }, { "__SIZE_TYPE__", &ctype_compat_size_t },
+	{ "ssize_t", &ctype_compat_ssize_t }, { "__SSIZE_TYPE__", &ctype_compat_ssize_t },
+	{ "ptrdiff_t", &ctype_compat_ptrdiff_t }, { "__PTRDIFF_TYPE__", &ctype_compat_ptrdiff_t },
+	{ "intptr_t", &ctype_compat_intptr_t }, { "__INTPTR_TYPE__", &ctype_compat_intptr_t },
+	{ "uintptr_t", &ctype_compat_uintptr_t }, { "__UINTPTR_TYPE__", &ctype_compat_uintptr_t },
+};
+#endif /* __ARCH_HAVE_COMPAT */
+
+
 PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
 NOTHROW(FCALL ctype_parse_base)(struct cparser *__restrict self,
                                 /*out:ref*/ struct ctyperef *__restrict presult,
@@ -1873,17 +1943,17 @@ do_scan_keyword:
 	    KWD_CHECK(kwd_str, kwd_len, "union") ||
 	    KWD_CHECK(kwd_str, kwd_len, "class") ||
 	    KWD_CHECK(kwd_str, kwd_len, "enum")) {
-		unsigned int kind;
-		struct ctyperef named_type;
+		unsigned int ns;
+		struct csymbol csym;
 		if unlikely(integer_type_flags)
 			goto syn;
-		kind = kwd_len == 6
-		       ? CTYPE_LOOKUP_KIND_STRUCT
-		       : kwd_len == 4
-		         ? CTYPE_LOOKUP_KIND_ENUM
-		         : kwd_str[0] == 'u'
-		           ? CTYPE_LOOKUP_KIND_UNION
-		           : CTYPE_LOOKUP_KIND_CLASS;
+		ns = kwd_len == 6
+		     ? CSYMBOL_LOOKUP_STRUCT
+		     : kwd_len == 4
+		       ? CSYMBOL_LOOKUP_ENUM
+		       : kwd_str[0] == 'u'
+		         ? CSYMBOL_LOOKUP_UNION
+		         : CSYMBOL_LOOKUP_CLASS;
 		yield();
 		/* Parse additional attributes before the name. */
 		result = ctype_parse_attrib(self, attrib);
@@ -1892,12 +1962,21 @@ do_scan_keyword:
 		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD)
 			goto syn;
 		/* Lookup the object name. */
-		result = ctype_lookup(kwd_str, kwd_len, kind, &named_type, false);
+		kwd_str = self->c_tokstart;
+		kwd_len = cparser_toklen(self);
+		result = csymbol_lookup(kwd_str, kwd_len, &csym,
+		                        CSYMBOL_SCOPE_ALL, ns);
 		if unlikely(result != DBX_EOK)
 			goto err;
-		presult->ct_typ  = named_type.ct_typ;  /* Inherit reference */
-		presult->ct_info = named_type.ct_info; /* Inherit data */
-		presult->ct_flags |= named_type.ct_flags;
+		if unlikely(csym.cs_kind != CSYMBOL_KIND_TYPE) {
+			/* Shouldn't happen. */
+			csymbol_fini(&csym);
+			result = DBX_ENOENT;
+			goto err;
+		}
+		presult->ct_typ  = csym.cs_type.ct_typ;  /* Inherit reference */
+		presult->ct_info = csym.cs_type.ct_info; /* Inherit data */
+		presult->ct_flags |= csym.cs_type.ct_flags;
 	} else if (KWD_CHECK(kwd_str, kwd_len, "int")) {
 		if unlikely(integer_type_flags & BASETYPE_FLAG_INT)
 			goto syn;
@@ -1926,11 +2005,6 @@ yield_and_scan_keyword:
 			goto syn;
 		integer_type_flags |= BASETYPE_FLAG_CHAR;
 		goto yield_and_scan_keyword;
-	} else if (KWD_CHECK(kwd_str, kwd_len, "float")) {
-		if unlikely(integer_type_flags != 0)
-			goto syn;
-		yield();
-		presult->ct_typ = incref(&ctype_ieee754_float);
 	} else if (KWD_CHECK(kwd_str, kwd_len, "double")) {
 		if unlikely(integer_type_flags != 0 &&
 		            integer_type_flags != BASETYPE_FLAG_LONG)
@@ -1951,6 +2025,35 @@ yield_and_scan_keyword:
 		}
 		incref(presult->ct_typ);
 	} else {
+		/* Check for builtin types. */
+		if (kwd_len < COMPILER_LENOF(builtin_types->bt_name)) {
+			unsigned int i;
+#ifdef __ARCH_HAVE_COMPAT
+			if (dbg_current_iscompat()) {
+				for (i = 0; i < COMPILER_LENOF(compat_builtin_types); ++i) {
+					if (compat_builtin_types[i].bt_name[kwd_len] == '\0' &&
+						memcmp(compat_builtin_types[i].bt_name, kwd_str, kwd_len) == 0) {
+						/* Found it! */
+						if unlikely(integer_type_flags != 0)
+							goto syn;
+						presult->ct_typ = incref(compat_builtin_types[i].bt_type);
+						goto done;
+					}
+				}
+			}
+#endif /* __ARCH_HAVE_COMPAT */
+			for (i = 0; i < COMPILER_LENOF(builtin_types); ++i) {
+				if (builtin_types[i].bt_name[kwd_len] == '\0' &&
+				    memcmp(builtin_types[i].bt_name, kwd_str, kwd_len) == 0) {
+					/* Found it! */
+					if unlikely(integer_type_flags != 0)
+						goto syn;
+					presult->ct_typ = incref(builtin_types[i].bt_type);
+					goto done;
+				}
+			}
+		}
+
 		/* Strip leading/trailing underscores */
 		while (kwd_len && kwd_str[0] == '_') {
 			++kwd_str;
@@ -2039,16 +2142,22 @@ yield_and_scan_keyword:
 			incref(presult->ct_typ);
 		} else {
 			/* Fallback: Lookup a typename. */
-			struct ctyperef named_type;
+			struct csymbol csym;
 			kwd_str = self->c_tokstart;
 			kwd_len = cparser_toklen(self);
-			result = ctype_lookup(kwd_str, kwd_len, CTYPE_LOOKUP_KIND_ANY,
-			                      &named_type, fail_if_symbol_exists);
+			result = csymbol_lookup(kwd_str, kwd_len, &csym, CSYMBOL_SCOPE_ALL,
+			                        fail_if_symbol_exists ? CSYMBOL_LOOKUP_ANY
+			                                              : CSYMBOL_LOOKUP_TYPE);
 			if unlikely(result != DBX_EOK)
 				goto err;
-			presult->ct_typ  = named_type.ct_typ;  /* Inherit reference */
-			presult->ct_info = named_type.ct_info; /* Inherit data */
-			presult->ct_flags |= named_type.ct_flags;
+			if unlikely(csym.cs_kind != CSYMBOL_KIND_TYPE) {
+				csymbol_fini(&csym);
+				result = DBX_ENOENT;
+				goto err;
+			}
+			presult->ct_typ  = csym.cs_type.ct_typ;  /* Inherit reference */
+			presult->ct_info = csym.cs_type.ct_info; /* Inherit data */
+			presult->ct_flags |= csym.cs_type.ct_flags;
 		}
 	}
 done:

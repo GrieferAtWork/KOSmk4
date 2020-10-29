@@ -272,6 +272,9 @@ NOTHROW(FCALL ctype_for_register)(unsigned int regno, size_t buflen);
 
 /* Builtin types. */
 DATDEF struct ctype ctype_bool;
+DATDEF struct ctype ctype_ieee754_float;
+DATDEF struct ctype ctype_ieee754_double;
+DATDEF struct ctype ctype_ieee854_long_double;
 DATDEF struct ctype ctype_void;
 DATDEF struct ctype ctype_void_ptr;
 DATDEF struct ctype ctype_void_const_ptr;
@@ -308,9 +311,15 @@ DATDEF struct ctype ctype_long_long_const_ptr;
 DATDEF struct ctype ctype_unsigned_long_long;
 DATDEF struct ctype ctype_unsigned_long_long_ptr;
 DATDEF struct ctype ctype_unsigned_long_long_const_ptr;
-DATDEF struct ctype ctype_ieee754_float;
-DATDEF struct ctype ctype_ieee754_double;
-DATDEF struct ctype ctype_ieee854_long_double;
+DATDEF struct ctype ctype_char16_t;
+DATDEF struct ctype ctype_char16_t_ptr;
+DATDEF struct ctype ctype_char16_t_const_ptr;
+DATDEF struct ctype ctype_char32_t;
+DATDEF struct ctype ctype_char32_t_ptr;
+DATDEF struct ctype ctype_char32_t_const_ptr;
+#define ctype_char8_t           ctype_char
+#define ctype_char8_t_ptr       ctype_char_ptr
+#define ctype_char8_t_const_ptr ctype_char_const_ptr
 
 
 #ifdef __ARCH_HAVE_COMPAT
@@ -338,6 +347,10 @@ DATDEF struct ctype ctype_long_long_compat_ptr;
 DATDEF struct ctype ctype_long_long_const_compat_ptr;
 DATDEF struct ctype ctype_unsigned_long_long_compat_ptr;
 DATDEF struct ctype ctype_unsigned_long_long_const_compat_ptr;
+DATDEF struct ctype ctype_char16_t_compat_ptr;
+DATDEF struct ctype ctype_char16_t_const_compat_ptr;
+DATDEF struct ctype ctype_char32_t_compat_ptr;
+DATDEF struct ctype ctype_char32_t_const_compat_ptr;
 #endif /* __ARCH_HAVE_COMPAT */
 
 
@@ -499,6 +512,27 @@ DATDEF struct ctype ctype_unsigned_long_long_const_compat_ptr;
 #define ctype_intmax_t  ctype_sN(__SIZEOF_INTMAX_T__)
 #define ctype_uintmax_t ctype_uN(__SIZEOF_INTMAX_T__)
 
+#if __SIZEOF_WCHAR_T__ == 4
+#define ctype_wchar_t           ctype_char32_t
+#define ctype_wchar_t_ptr       ctype_char32_t_ptr
+#define ctype_wchar_t_const_ptr ctype_char32_t_const_ptr
+#elif __SIZEOF_WCHAR_T__ == 2
+#define ctype_wchar_t           ctype_char16_t
+#define ctype_wchar_t_ptr       ctype_char16_t_ptr
+#define ctype_wchar_t_const_ptr ctype_char16_t_const_ptr
+#else /* __SIZEOF_WCHAR_T__ == ... */
+#error "Unsupported __SIZEOF_WCHAR_T__"
+#endif /* __SIZEOF_WCHAR_T__ != ... */
+
+#ifdef __ARCH_HAVE_COMPAT
+#define ctype_compat_size_t    ctype_uN(__ARCH_COMPAT_SIZEOF_SIZE_T)
+#define ctype_compat_ssize_t   ctype_sN(__ARCH_COMPAT_SIZEOF_SIZE_T)
+#define ctype_compat_ptrdiff_t ctype_sN(__ARCH_COMPAT_SIZEOF_SIZE_T)
+#define ctype_compat_intptr_t  ctype_sN(__ARCH_COMPAT_SIZEOF_POINTER)
+#define ctype_compat_uintptr_t ctype_uN(__ARCH_COMPAT_SIZEOF_POINTER)
+#endif /* __ARCH_HAVE_COMPAT */
+
+
 
 /* Callback type for `ctype_struct_field_callback_t'
  * @param: arg:    Cookie-argument.
@@ -546,40 +580,6 @@ NOTHROW(FCALL ctype_fromdw)(struct debugmodule *__restrict mod,
                             di_debuginfo_cu_parser_t const *__restrict cu_parser,
                             byte_t const *type_debug_info,
                             /*out*/ struct ctyperef *__restrict presult);
-
-
-/* Find and return the type matching the given `name' and `kind'
- * For this purpose, scan for types matching `name' in debug info
- * at the following locations (in order):
- *   - Known, builtin types (pretty much just everything from <kos/types.h>)
- *   - A function-to-compilation-unit-scoped type
- *   - Any global-scoped type within the current module
- * if (ADDR_ISUSER(CURRENT_PC)) {
- *   - Any global-scoped type within any loaded user-space module
- *   - Any global-scoped type within any loaded kernel-space module
- * } else {
- *   - Any global-scoped type within any loaded kernel-space module
- *   - Any global-scoped type within any loaded user-space module
- * }
- * @param: stop_if_symbol_exists: When `true', stop lookup and return `NULL'
- *                                if the associated scope contains a symbol
- *                                that uses the given `name'
- * @param: kind:  One of `CTYPE_LOOKUP_KIND_*'
- * @return: DBX_EOK:    A reference to a type named `name'
- * @return: DBX_ENOMEM: Insufficient memory
- * @return: DBX_ENOENT: No type matches `name', or `name' is shadowed by
- *                      a symbol, and `stop_if_symbol_exists' was `true' */
-FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL ctype_lookup)(char const *__restrict name, size_t namelen,
-                            unsigned int kind,
-                            /*out*/ struct ctyperef *__restrict result,
-                            __BOOL stop_if_symbol_exists DFL(0));
-#define CTYPE_LOOKUP_KIND_ANY    0 /* Find any kind of type */
-#define CTYPE_LOOKUP_KIND_STRUCT 1 /* Only find struct-types */
-#define CTYPE_LOOKUP_KIND_UNION  2 /* Only find union-types */
-#define CTYPE_LOOKUP_KIND_CLASS  3 /* Only find class-types */
-#define CTYPE_LOOKUP_KIND_ENUM   4 /* Only find enum-types */
-
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

@@ -24,6 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/hook.h>
+#include <debugger/rt.h>
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/driver.h>
@@ -450,7 +451,7 @@ NOTHROW(KCALL vm_set_collect_from_datapart)(struct pointer_set *__restrict vms,
 	size_t result = 0;
 	unsigned int i;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	assert(vms->ps_size == 0);
 	for (i = 0; i < 2; ++i) {
 		for (iter       = i ? self->dp_srefs : self->dp_crefs;
@@ -488,7 +489,7 @@ NOTHROW(KCALL vm_set_collect_from_datapart_crefs)(struct pointer_set *__restrict
 	struct vm_node *iter;
 	size_t result = 0;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	assert(vms->ps_size == 0);
 	for (iter       = self->dp_crefs;
 	     iter; iter = iter->vn_link.ln_next) {
@@ -522,7 +523,7 @@ NOTHROW(KCALL vm_set_collect_from_datapart_srefs_writable)(struct pointer_set *_
 	struct vm_node *iter;
 	size_t result = 0;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	assert(vms->ps_size == 0);
 	for (iter       = self->dp_srefs;
 	     iter; iter = iter->vn_link.ln_next) {
@@ -854,7 +855,7 @@ NOTHROW(KCALL vm_datapart_do_enumdma)(struct vm_datapart *__restrict self,
                                       size_t partrel_start, size_t num_bytes,
                                       struct vm_dmalock *__restrict lock) {
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	assert(num_bytes != 0);
 	assert(partrel_start + num_bytes > partrel_start);
 	assert(partrel_start + num_bytes <= vm_datapart_numbytes(self));
@@ -1481,7 +1482,7 @@ vm_datapart_loadpage(struct vm_datapart *__restrict self,
 	physpage_t result;
 	uintptr_t page_state;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	assertf(self->dp_state == VM_DATAPART_STATE_INCORE ||
 	        self->dp_state == VM_DATAPART_STATE_LOCKED,
 	        "self->dp_state = %" PRIuPTR,
@@ -1701,7 +1702,7 @@ vm_datapart_loaddatapage(struct vm_datapart *__restrict self,
 	physaddr_t result;
 	uintptr_t page_state;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
 	       self->dp_state == VM_DATAPART_STATE_LOCKED);
 	assertf(dpage_offset < vm_datapart_numdpages(self),
@@ -2468,7 +2469,7 @@ NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
 	size_t partrel_minpage;
 	size_t partrel_maxpage;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	/* Search for modified parts within the given range. */
 	part = vm_datablock_findchanged(self->db_parts,
 	                                minpage,
@@ -3312,7 +3313,7 @@ PUBLIC NOBLOCK NONNULL((1)) struct vm_node *
 NOTHROW(KCALL vm_paged_node_remove)(struct vm *__restrict effective_vm, pageid_t page) {
 	struct vm_node *result;
 	assert(sync_writing(effective_vm) || !isshared(effective_vm) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	result = vm_nodetree_remove(&effective_vm->v_tree, page);
 	if likely(result)
 		LLIST_REMOVE(result, vn_byaddr);
@@ -3378,7 +3379,7 @@ PUBLIC NOBLOCK struct vm_node *
 NOTHROW(FCALL vm_getnodeofpageid)(struct vm *__restrict self, pageid_t page) {
 #if 0
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 #endif
 	return vm_nodetree_locate(self->v_tree, page);
 }
@@ -3391,7 +3392,7 @@ NOTHROW(FCALL vm_paged_isused)(struct vm *__restrict self,
                                pageid_t min_page,
                                pageid_t max_page) {
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	return vm_nodetree_rlocate(self->v_tree,
 	                           min_page,
 	                           max_page) != NULL;
@@ -3408,7 +3409,7 @@ NOTHROW(KCALL vm_find_first_node_greater_equal)(struct vm *__restrict self,
                                                 pageid_t min_page_index) {
 	struct vm_node *result;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	for (result = self->v_byaddr; result;
 	     result = result->vn_byaddr.ln_next) {
 		if (vm_node_getminpageid(result) >= min_page_index)
@@ -3426,7 +3427,7 @@ NOTHROW(KCALL vm_find_last_node_lower_equal)(struct vm *__restrict self,
 	struct vm_node *result = NULL;
 	struct vm_node *iter;
 	assert(sync_reading(self) || !isshared(self) ||
-	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1));
+	       (!PREEMPTION_ENABLED() && cpu_online_count <= 1) || dbg_active);
 	for (iter = self->v_byaddr; iter;
 	     iter = iter->vn_byaddr.ln_next) {
 		if (vm_node_getmaxpageid(iter) <= max_page_index)

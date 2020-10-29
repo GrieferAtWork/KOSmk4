@@ -335,15 +335,6 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_store)(void);
  * @return: DBX_EINTERN: The stack does not contain enough elements. */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc);
 
-/* Same as `cexpr_call()', but promote all arguments, as well as
- * the underlying function.
- * @return: DBX_EOK:     Success.
- * @return: DBX_ENOMEM:  Out of memory.
- * @return: DBX_EINTERN: The stack does not contain enough elements. */
-FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_call_promote)(size_t argc);
-
-
-
 /* Push a currently visible symbol, as selected by the code location from
  * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
  * given that symbol's `name'. For this purpose, `name' can be (in order):

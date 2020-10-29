@@ -25,8 +25,7 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h>
-#include <debugger/hook.h>
+#include <debugger/debugger.h>
 
 #include <stddef.h>
 #include <string.h>
@@ -40,6 +39,15 @@
 #ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
+INTDEF void KCALL dbx_heap_init(void);
+INTDEF void KCALL dbx_heap_reset(void);
+INTDEF void KCALL dbx_heap_fini(void);
+
+DBG_INIT(init) {
+	/* Initialize the DBX heap-system. */
+	dbx_heap_init();
+}
+
 DBG_RESET(reset) {
 	ceval_comma_is_select2nd    = false;
 	cexpr_readonly              = false;
@@ -52,7 +60,8 @@ DBG_RESET(reset) {
 #if CVALUE_KIND_VOID != 0
 	cexpr_stack_stub[0].cv_kind = CVALUE_KIND_VOID;
 #endif /* CVALUE_KIND_VOID != 0 */
-	/* TODO: Re-initialize the debugger heap-system */
+	/* Re-initialize the debugger heap-system */
+	dbx_heap_reset();
 }
 
 DBG_FINI(fini) {
@@ -63,8 +72,30 @@ DBG_FINI(fini) {
 		debugmodule_fini(debugmodule_list);
 		debugmodule_list = next;
 	}
-	/* TODO: Free all dynamically allocated heap-pages */
+	/* Free all dynamically allocated heap-pages */
+	dbx_heap_fini();
 }
+
+
+DBG_COMMAND(eval,
+            "eval expr...\n",
+            argc, argv) {
+	while (argc >= 2) {
+		dbx_errno_t error;
+		dbg_printf("eval: %q\n", argv[1]);
+		error = cexpr_pusheval(argv[1]);
+		if (error != DBX_EOK) {
+			dbg_printf("\terror: %d\n", error);
+		} else {
+			/* TODO: Display result */
+			cexpr_pop();
+		}
+		--argc;
+		++argv;
+	}
+	return 0;
+}
+
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

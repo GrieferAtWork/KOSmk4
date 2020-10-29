@@ -43,6 +43,7 @@
 /**/
 #include "include/cexpr.h"
 #include "include/cparser.h"
+#include "include/csymbol.h"
 #include "include/ctype.h"
 #include "include/error.h"
 #include "include/malloc.h"
@@ -1878,6 +1879,86 @@ do_pointer_pointer_op:
 done:
 	return cexpr_pop(); /* Pop `rhs' */
 }
+
+
+
+
+/* Perform an assignment operation between the top 2 stack elements,
+ * where TOP is RHS, and the one before is LHS. When `cexpr_readonly'
+ * is set to `true', then this function fails with `DBX_ERDONLY' */
+PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_store)(void) {
+	/* TODO: Not implemented... */
+	return DBX_ENOMEM;
+}
+
+/* Pop `argc' operands, followed by popping the function to call.
+ * Then, invoke the function and push its return value.
+ * @return: DBX_EOK:     Success.
+ * @return: DBX_ENOMEM:  Out of memory.
+ * @return: DBX_EINTERN: The stack does not contain enough elements. */
+PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
+	/* Not implemented... */
+	(void)argc;
+	return DBX_ENOMEM;
+}
+
+/* Push a currently visible symbol, as selected by the code location from
+ * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
+ * given that symbol's `name'. For this purpose, `name' can be (in order):
+ *   - A function-to-compilation-unit-scoped variable/argument/enum
+ *   - An PUBLIC/INTERN variable from the module containing the current PC
+ * if (ADDR_ISUSER(CURRENT_PC)) {
+ *   - A PUBLIC/INTERN variable from any loaded user-space module
+ *   - A PUBLIC/INTERN variable from any loaded kernel-space module
+ * } else {
+ *   - A PUBLIC/INTERN variable from any loaded kernel-space module
+ *   - A PUBLIC/INTERN variable from any loaded user-space module
+ * }
+ * Note that special handling is done for kernel-space PERxxx variables, which are
+ * automatically linked to the associated address space for `dbg_current', such as
+ * `this_task' automatically being loaded as the equivalent of `this_task@%fs_base'
+ * This detection is done for all PUBLIC/INTERN+KERNEL_CORE symbols starting with
+ * one of the following prefixes:
+ *   - this_*      Addend is `(uintptr_t)dbg_current'
+ *   - thiscpu_*   Addend is `(uintptr_t)dbg_current->t_cpu'
+ *   - thisvm_*    Addend is `(uintptr_t)dbg_current->t_vm'
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOMEM: Insufficient memory.
+ * @return: DBX_ENOENT: No object matches the given `name' */
+PUBLIC NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
+	dbx_errno_t result;
+	struct csymbol csym;
+	result = csymbol_lookup(name, namelen, &csym,
+	                        CSYMBOL_SCOPE_ALL,
+	                        CSYMBOL_LOOKUP_ANY);
+	if (result != DBX_EOK)
+		return result;
+	if (csym.cs_kind == CSYMBOL_KIND_EXPR) {
+		result = cexpr_pushexpr(&csym.cs_expr.e_type,
+		                        &csym.cs_expr.e_expr,
+		                        ctype_sizeof(csym.cs_expr.e_type.ct_typ),
+		                        0);
+	} else {
+		result = DBX_ENOENT;
+	}
+	csymbol_fini(&csym);
+	return result;
+}
+
+/* Push a register with its native typing, given its `name'
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOMEM: Insufficient memory.
+ * @return: DBX_ENOENT: No register matches the given `name' */
+PUBLIC NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen) {
+	unsigned int regno;
+	regno = arch_dbg_regfromname(name, namelen);
+	if (regno == ARCH_REGISTER_NONE)
+		return DBX_ENOENT;
+	return cexpr_pushregister_by_id(regno);
+}
+
 
 
 DECL_END
