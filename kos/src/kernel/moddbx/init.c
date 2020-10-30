@@ -49,6 +49,8 @@ INTDEF void KCALL dbx_heap_fini(void);
 DBG_INIT(init) {
 	/* Initialize the DBX heap-system. */
 	dbx_heap_init();
+	/* Make sure that debug-module-list is empty. */
+	debugmodule_list = NULL;
 }
 
 INTDEF void NOTHROW(KCALL reset_builtin_types)(void);
@@ -66,13 +68,6 @@ DBG_RESET(reset) {
 #if CVALUE_KIND_VOID != 0
 	cexpr_stack_stub[0].cv_kind = CVALUE_KIND_VOID;
 #endif /* CVALUE_KIND_VOID != 0 */
-	/* Re-initialize the debugger heap-system */
-	dbx_heap_reset();
-	/* Reset pointers within builtin C-types. */
-	reset_builtin_types();
-}
-
-DBG_FINI(fini) {
 	/* Drop all external references held by `debugmodule_list' */
 	while (debugmodule_list) {
 		struct debugmodule *next;
@@ -80,6 +75,13 @@ DBG_FINI(fini) {
 		debugmodule_fini(debugmodule_list);
 		debugmodule_list = next;
 	}
+	/* Re-initialize the debugger heap-system */
+	dbx_heap_reset();
+	/* Reset pointers within builtin C-types. */
+	reset_builtin_types();
+}
+
+DBG_FINI(fini) {
 	/* Free all dynamically allocated heap-pages */
 	dbx_heap_fini();
 }

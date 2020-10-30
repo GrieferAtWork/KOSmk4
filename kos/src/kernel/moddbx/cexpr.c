@@ -437,7 +437,7 @@ NOTHROW(FCALL _cexpr_pushalloc)(void) {
 	if (result == cexpr_stack_stub)
 		result = NULL;
 	alloc_size = dbx_malloc_usable_size(result) / sizeof(struct cvalue);
-	if (cexpr_stacksize >= alloc_size) {
+	if ((cexpr_stacksize + 2) > alloc_size) {
 		result = (struct cvalue *)dbx_realloc(result,
 		                                      (cexpr_stacksize + 2) *
 		                                      sizeof(struct cvalue));

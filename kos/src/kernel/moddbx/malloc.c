@@ -28,6 +28,7 @@
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <debugger/output.h>
+#include <kernel/arch/syslog.h>
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
@@ -48,6 +49,18 @@
 
 #ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
+
+#if (defined(__i386__) || defined(__x86_64__)) && 0
+#define DBX_HEAP_TRACEALLOC(min, max)                                \
+	(x86_syslog_printf("\030%%{trace:alloc:dbx:%#p:%#p}", min, max), \
+	 printk(KERN_DEBUG "[dbx] malloc: %p...%p\n", min, max))
+#define DBX_HEAP_TRACEFREE(min, max)                                \
+	(x86_syslog_printf("\030%%{trace:free:dbx:%#p:%#p}", min, max), \
+	 printk(KERN_DEBUG "[dbx] free: %p...%p\n", min, max))
+#else
+#define DBX_HEAP_TRACEALLOC(min, max) (void)0
+#define DBX_HEAP_TRACEFREE(min, max)  (void)0
+#endif
 
 #ifndef DBX_STATIC_HEAPSIZE
 #define DBX_STATIC_HEAPSIZE (64 * 1024) /* 64K */
@@ -238,6 +251,8 @@ again:
 	DBX_STATIC_HEAP_SETPAT(resptr.hp_ptr,
 	                       DBX_STATIC_HEAP_PATTERN_USED,
 	                       resptr.hp_siz);
+	DBX_HEAP_TRACEALLOC((byte_t *)resptr.hp_ptr,
+	                    (byte_t *)resptr.hp_ptr + resptr.hp_siz - 1);
 	return resptr;
 nomem:
 	/* Make sure that the memory request isn't too large to possibly satisfy. */
@@ -366,6 +381,7 @@ NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes) {
 		goto internal_error; /* Not apart of the static heap */
 	if unlikely(static_heap_isfree(base, num_bytes))
 		goto internal_error; /* Already freed */
+	DBX_HEAP_TRACEFREE(base, (byte_t *)base + num_bytes - 1);
 	DBX_STATIC_HEAP_SETPAT(base, DBX_STATIC_HEAP_PATTERN_FREE, num_bytes);
 	piter = &freemem;
 	for (;;) {
@@ -540,8 +556,7 @@ PUBLIC void NOTHROW(FCALL dbx_free)(void *ptr) {
 
 
 DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
-                  "\tDisplay information about memory usage for the dbx heap\n"
-                  "\t") {
+                  "\tDisplay information about memory usage for the dbx heap\n") {
 	size_t total_usedmem;
 	size_t total_freemem    = 0;
 	size_t largest_fragment = 0;

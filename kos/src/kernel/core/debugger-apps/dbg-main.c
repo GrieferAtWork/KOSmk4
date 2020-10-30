@@ -601,8 +601,8 @@ do_print_options:
 		match_count = cookie.cnt.acc_count;
 		cookie.cnt.acc_count = 0;
 		(*autofun)(effective_argc, argv,
-				   &dbg_autocomplete_longestmatch, &cookie.cnt,
-				   cookie.cnt.acc_starts, cookie.cnt.acc_startslen);
+		           &dbg_autocomplete_longestmatch, &cookie.cnt,
+		           cookie.cnt.acc_starts, cookie.cnt.acc_startslen);
 		if unlikely(!cookie.cnt.acc_count)
 			goto done; /* Shouldn't happen... */
 		cookie.prn.acc_match_width = (unsigned int)cookie.cnt.acc_count + 1; /* +1 for spacing between columns */

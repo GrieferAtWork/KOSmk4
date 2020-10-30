@@ -245,8 +245,8 @@ NOTHROW(FCALL ctype_array)(struct ctyperef const *__restrict self,
 
 /* Return a function-type C-type. */
 FUNDEF NONNULL((1)) REF struct ctype *
-NOTHROW(FCALL ctype_function)(struct ctyperef const *__restrict return_type, size_t argc,
-                              struct ctyperef const *__restrict argv, uint16_t cc);
+NOTHROW(FCALL ctype_function)(struct ctyperef const *return_type, size_t argc,
+                              struct ctyperef const *argv, uint16_t cc);
 
 /* Return the actual size of the given C-type. (as per `sizeof()') */
 FUNDEF ATTR_PURE WUNUSED NONNULL((1)) size_t
@@ -254,16 +254,16 @@ NOTHROW(FCALL ctype_sizeof)(struct ctype const *__restrict self);
 
 /* Check if 2 given C-types are equal. */
 FUNDEF ATTR_PURE NONNULL((1, 2)) __BOOL
-NOTHROW(FCALL ctype_equal)(struct ctype const *__restrict a,
-                           struct ctype const *__restrict b);
+NOTHROW(FCALL ctype_equal)(struct ctype const *a,
+                           struct ctype const *b);
 
 /* Return the common type which can be used to represent both `a' and `b'.
  * This common type is the promotion of `a' and `b' if those types are equal,
  * and otherwise is the larger integer type of the two. If neither types are
  * integers, then a common type doesn't exist and `NULL' is returned. */
 FUNDEF WUNUSED NONNULL((1, 2)) REF struct ctype *
-NOTHROW(FCALL ctype_common)(struct ctype *__restrict a,
-                            struct ctype *__restrict b);
+NOTHROW(FCALL ctype_common)(struct ctype *a,
+                            struct ctype *b);
 
 /* Return the appropriate C-type for a given arch-specific register `regno'
  * If no such type exists, return `NULL' instead.

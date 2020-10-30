@@ -158,8 +158,8 @@ NOTHROW(FCALL ctype_array)(struct ctyperef const *__restrict self,
 
 /* Return a function-type C-type. */
 PUBLIC NONNULL((1)) REF struct ctype *
-NOTHROW(FCALL ctype_function)(struct ctyperef const *__restrict return_type, size_t argc,
-                              struct ctyperef const *__restrict argv, uint16_t cc) {
+NOTHROW(FCALL ctype_function)(struct ctyperef const *return_type, size_t argc,
+                              struct ctyperef const *argv, uint16_t cc) {
 	size_t i;
 	REF struct ctype *result;
 	cc |= CTYPE_KIND_FUNCTION;
@@ -235,8 +235,8 @@ NOTHROW(FCALL ctype_sizeof)(struct ctype const *__restrict self) {
 
 /* Check if 2 given C-types are equal. */
 PUBLIC ATTR_PURE NONNULL((1, 2)) bool
-NOTHROW(FCALL ctype_equal)(struct ctype const *__restrict a,
-                           struct ctype const *__restrict b) {
+NOTHROW(FCALL ctype_equal)(struct ctype const *a,
+                           struct ctype const *b) {
 again:
 	if (a == b)
 		return true;
@@ -302,8 +302,8 @@ nope:
  * and otherwise is the larger integer type of the two. If neither types are
  * integers, then a common type doesn't exist and `NULL' is returned. */
 PUBLIC WUNUSED NONNULL((1, 2)) REF struct ctype *
-NOTHROW(FCALL ctype_common)(struct ctype *__restrict a,
-                            struct ctype *__restrict b) {
+NOTHROW(FCALL ctype_common)(struct ctype *a,
+                            struct ctype *b) {
 	uintptr_half_t akind, bkind;
 	akind = a->ct_kind;
 	bkind = b->ct_kind;
