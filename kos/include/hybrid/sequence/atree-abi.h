@@ -18,15 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-#ifndef ATREE_NULL
-#include <stddef.h>
-#endif /* !ATREE_NULL */
-#include <hybrid/compiler.h>
-#include <hybrid/sequence/atree.h>
-#if !defined(ATREE_ASSERT) || \
-    !defined(ATREE_ASSERTF)
-#include <hybrid/__assert.h>
-#endif
+#include "../../__stdinc.h"
+#include "../compiler.h"
+#include "atree.h"
+#if (!defined(ATREE_ASSERT) || !defined(ATREE_ASSERTF))
+#include "../__assert.h"
+#endif /* !ATREE_ASSERT || !ATREE_ASSERTF */
 
 __DECL_BEGIN
 
@@ -58,7 +55,7 @@ struct my_node {
 #define ATREE_CALL /* nothing */
 #endif /* !ATREE_CALL */
 #ifndef ATREE_NULL
-#define ATREE_NULL NULL
+#define ATREE_NULL __NULLPTR
 #endif /* !ATREE_NULL */
 #ifndef ATREE_FUN
 #define ATREE_FUN  PRIVATE

@@ -74,7 +74,7 @@ __DECL_END
 
 #define _OPt(a, op, b, T, PRIt)                                                    \
 	do {                                                                           \
-		T _a = (a), _b = (b);                                                      \
+		T _a = (T)(a), _b = (T)(b);                                                \
 		if (!(_a op _b)) {                                                         \
 			err(1, "fail:%d: " #a " " #op " " #b " (%" PRIt " " #op " %" PRIt ")", \
 			    __LINE__, _a, _b);                                                 \
