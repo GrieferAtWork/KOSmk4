@@ -179,8 +179,7 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 		node = (struct trace_node *)node_ptr.hp_ptr;
 		node->tn_size = node_ptr.hp_siz;
 		/* Fill in the newly allocated node. */
-		node->tn_link.a_vmin = (uintptr_t)result.hp_ptr;
-		node->tn_link.a_vmax = (uintptr_t)result.hp_ptr + result.hp_siz - 1;
+		trace_node_initlink(node, result.hp_ptr, result.hp_siz);
 		node->tn_reach       = gc_version;
 		node->tn_visit       = 0;
 		node->tn_kind        = TRACE_NODE_KIND_MALL;
@@ -284,8 +283,7 @@ do_normal_malloc:
 			node = (struct trace_node *)node_ptr.hp_ptr;
 			node->tn_size = node_ptr.hp_siz;
 			/* Fill in the newly allocated node. */
-			node->tn_link.a_vmin = (uintptr_t)result.hp_ptr;
-			node->tn_link.a_vmax = (uintptr_t)result.hp_ptr + result.hp_siz - 1;
+			trace_node_initlink(node, result.hp_ptr, result.hp_siz);
 			node->tn_reach       = gc_version;
 			node->tn_visit       = 0;
 			node->tn_kind        = TRACE_NODE_KIND_MALL;
@@ -349,8 +347,7 @@ again_nonnull_ptr:
 			node = (struct trace_node *)node_ptr.hp_ptr;
 			node->tn_size = node_ptr.hp_siz;
 			/* Fill in the newly allocated node. */
-			node->tn_link.a_vmin = (uintptr_t)result.hp_ptr;
-			node->tn_link.a_vmax = (uintptr_t)result.hp_ptr + result.hp_siz - 1;
+			trace_node_initlink(node, result.hp_ptr, result.hp_siz);
 			node->tn_reach       = gc_version;
 			node->tn_visit       = 0;
 			node->tn_kind        = TRACE_NODE_KIND_MALL;
@@ -447,10 +444,18 @@ again_nonnull_ptr:
 		num_free = old_user_size - n_bytes;
 		if (num_free >= HEAP_MINSIZE) {
 			u8 node_flags = node->tn_flags;
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+			trace_node_tree_removenode(&nodes, node);
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 			trace_node_tree_remove(&nodes, (uintptr_t)ptr);
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 
 			/* Reduce the effective size of the user-data-block. */
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+			node->tn_link.rb_max -= num_free;
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 			node->tn_link.a_vmax -= num_free;
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 			result.hp_ptr = trace_node_uend(node);
 			new_user_size = old_user_size - num_free;
 			/* Re-initialize the tail. */
@@ -545,16 +550,14 @@ again_remove_node_for_newchunk:
 
 			/* Re-write the contents of the node to fit the new block. */
 			node->tn_flags = flags & __GFP_HEAPMASK; /* Remember the heap bits now used by the allocation. */
-			node->tn_link.a_vmin = (uintptr_t)result.hp_ptr;
-			node->tn_link.a_vmax = (uintptr_t)result.hp_ptr + result.hp_siz - 1;
+			trace_node_initlink(node, result.hp_ptr, result.hp_siz);
 
 			/* This can fail due to other bitset nodes, and we must handle it when that happens! */
 			if unlikely(!trace_node_tree_tryinsert(&nodes, node)) {
 				/* Roll-back: We must restore the old node, then resolve the existing
 				 *            (possibly-bitset) node with which our new node overlaps. */
 				node->tn_flags = extension_flags & __GFP_HEAPMASK;
-				node->tn_link.a_vmin = (uintptr_t)oldblock_base;
-				node->tn_link.a_vmax = (uintptr_t)oldblock_base + oldblock_size - 1;
+				trace_node_initlink(node, oldblock_base, oldblock_size);
 				trace_node_tree_insert(&nodes, node);
 #ifdef DEFINE_X_except
 				TRY {
@@ -610,7 +613,11 @@ again_remove_node_for_oldchunk:
 		}
 		/* The extension was successful (now just to update the node!) */
 		new_user_size = old_user_size + num_allocated;
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+		node->tn_link.rb_max += num_allocated;
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 		node->tn_link.a_vmax += num_allocated;
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 		/* Re-initialize the tail. */
 #if CONFIG_MALL_TAIL_SIZE != 0
 #if (CONFIG_MALL_TAIL_SIZE & 3) == 0
@@ -629,7 +636,11 @@ again_remove_node_for_oldchunk:
 		if unlikely(!trace_node_tree_tryinsert(&nodes, node)) {
 			/* Roll-back: We must restore the old node, then resolve the existing
 			 *            (possibly-bitset) node with which our new node overlaps. */
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+			node->tn_link.rb_max -= num_allocated;
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 			node->tn_link.a_vmax -= num_allocated;
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 			trace_node_tree_insert(&nodes, node);
 #ifdef DEFINE_X_except
 			TRY {

@@ -40,6 +40,7 @@ struct mynode {
 
 DECL_END
 
+#define RBTREE_DEBUG /* Force-enable internal debug assertions. */
 #define RBTREE_WANT_PREV_NEXT_NODE
 #define RBTREE(name) rb_##name
 #define RBTREE_T     struct mynode

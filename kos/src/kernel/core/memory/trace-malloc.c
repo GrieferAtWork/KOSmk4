@@ -32,6 +32,12 @@
 #endif
 
 #ifdef CONFIG_DEBUG_MALLOC
+#undef CONFIG_TRACE_MALLOC_USE_RBTREE
+#if 1
+#define CONFIG_TRACE_MALLOC_USE_RBTREE
+#endif
+
+
 #include <kernel/malloc.h>
 #include <debugger/config.h>
 #include <debugger/hook.h>
@@ -49,7 +55,6 @@
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sequence/atree.h>
 #include <hybrid/sync/atomic-lock.h>
 
 #include <kos/kernel/cpu-state-helpers.h>
@@ -67,6 +72,12 @@
 #include <libunwind/unwind.h>
 
 #include "corebase.h"
+
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+#include <hybrid/sequence/rbtree.h>
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
+#include <hybrid/sequence/atree.h>
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 
 /* The minimum amount of traceback entries that MALL
  * should attempt to include in debug information of
@@ -120,6 +131,10 @@ DECL_BEGIN
 
 #define TRACE_NODE_FLAG_NOLEAK 0x10 /* FLAG: Don't consider this one a leak. */
 #define TRACE_NODE_FLAG_NOWALK 0x20 /* FLAG: Don't search this one's contents for other reachable locations. */
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+#define TRACE_NODE_FLAG_ISRED  0x40 /* Reg flag. */
+#endif /* CONFIG_TRACE_MALLOC_USE_RBTREE */
+
 
 #if ((GFP_NOLEAK >> 8) == TRACE_NODE_FLAG_NOLEAK && \
      (GFP_NOWALK >> 8) == TRACE_NODE_FLAG_NOWALK)
@@ -131,8 +146,19 @@ DECL_BEGIN
 #endif /* !... */
 
 struct trace_node {
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+	RBTREE_NODE_WITH_KEY(struct trace_node, uintptr_t)
+	            tn_link;  /* [const] Trace node link. */
+#define trace_node_initlink(self, base, num_bytes) \
+	((self)->tn_link.rb_min = (uintptr_t)(base),   \
+	 (self)->tn_link.rb_max = (uintptr_t)(base) + (num_bytes)-1)
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 	ATREE_NODE(struct trace_node, uintptr_t)
 	            tn_link;  /* [const] Trace node link. */
+#define trace_node_initlink(self, base, num_bytes) \
+	((self)->tn_link.a_vmin = (uintptr_t)(base),   \
+	 (self)->tn_link.a_vmax = (uintptr_t)(base) + (num_bytes)-1)
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 	size_t      tn_size;  /* [const] Allocated heap size of this TRACE-node. */
 	u8          tn_reach; /* Last leak-check iteration when this node was reached. */
 	u8          tn_visit; /* Last leak-check iteration when this node was visited. */
@@ -147,9 +173,15 @@ struct trace_node {
 /************************************************************************/
 /* LEAK HELPERS                                                         */
 /************************************************************************/
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+#define trace_node_leak_next(self)            ((self)->tn_link.rb_lhs)
+#define trace_node_leak_getxrefs(self)        ((size_t)(self)->tn_link.rb_rhs)
+#define trace_node_leak_setxrefs(self, value) ((self)->tn_link.rb_rhs = (struct trace_node *)(size_t)(value))
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 #define trace_node_leak_next(self)            ((self)->tn_link.a_min)
 #define trace_node_leak_getxrefs(self)        ((size_t)(self)->tn_link.a_max)
 #define trace_node_leak_setxrefs(self, value) ((self)->tn_link.a_max = (struct trace_node *)(size_t)(value))
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 #if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
 #define trace_node_leak_getscan_uminmax(self, scan_umin, scan_umax)        \
 	((self)->tn_kind == TRACE_NODE_KIND_MALL                               \
@@ -167,11 +199,19 @@ struct trace_node {
 /************************************************************************/
 /* GENERIC HELPERS                                                      */
 /************************************************************************/
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+#define trace_node_umin(self)  ((self)->tn_link.rb_min)
+#define trace_node_umax(self)  ((self)->tn_link.rb_max)
+#define trace_node_uaddr(self) ((byte_t *)(self)->tn_link.rb_min)       /* NOTE: This one's always pointer-aligned! */
+#define trace_node_uend(self)  ((byte_t *)((self)->tn_link.rb_max + 1)) /* NOTE: This one's always pointer-aligned! */
+#define trace_node_usize(self) (((self)->tn_link.rb_max - (self)->tn_link.rb_min) + 1)
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 #define trace_node_umin(self)  ((self)->tn_link.a_vmin)
 #define trace_node_umax(self)  ((self)->tn_link.a_vmax)
 #define trace_node_uaddr(self) ((byte_t *)(self)->tn_link.a_vmin)       /* NOTE: This one's always pointer-aligned! */
 #define trace_node_uend(self)  ((byte_t *)((self)->tn_link.a_vmax + 1)) /* NOTE: This one's always pointer-aligned! */
 #define trace_node_usize(self) (((self)->tn_link.a_vmax - (self)->tn_link.a_vmin) + 1)
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 
 
 /************************************************************************/
@@ -258,6 +298,18 @@ NOTHROW(KCALL copy_trace_node_for_tb)(struct trace_node *__restrict copy,
 DECL_END
 
 /* Define the ABI for the address tree used by trace nodes. */
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+#define RBTREE_WANT_RREMOVE
+#define RBTREE_WANT_TRYINSERT
+#define RBTREE(name)           trace_node_tree_##name
+#define RBTREE_T               struct trace_node
+#define RBTREE_Tkey            uintptr_t
+#define RBTREE_GETNODE(self)   (self)->tn_link
+#define RBTREE_ISRED(self)     ((self)->tn_flags & TRACE_NODE_FLAG_ISRED)
+#define RBTREE_SETRED(self)    ((self)->tn_flags |= TRACE_NODE_FLAG_ISRED)
+#define RBTREE_SETBLACK(self)  ((self)->tn_flags &= ~TRACE_NODE_FLAG_ISRED)
+#include <hybrid/sequence/rbtree-abi.h>
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 #define ATREE(x)      trace_node_tree_##x
 #define ATREE_CALL    KCALL
 #define ATREE_NOTHROW NOTHROW
@@ -265,6 +317,7 @@ DECL_END
 #define T             struct trace_node
 #define N_NODEPATH    tn_link
 #include <hybrid/sequence/atree-abi.h>
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 
 DECL_BEGIN
 
@@ -523,7 +576,11 @@ again_while_num_bytes:
 			}
 			/* Truncate the node near its upper end. */
 			uend                 = trace_node_uend(node);
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+			node->tn_link.rb_max = (uintptr_t)base - 1;
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 			node->tn_link.a_vmax = (uintptr_t)base - 1;
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 			base                 = uend;
 			trace_node_tree_insert(&nodes, node);
 			lock_break();
@@ -534,11 +591,19 @@ again_while_num_bytes:
 		if ((uintptr_t)base <= trace_node_umin(node)) {
 			assert((uintptr_t)base == trace_node_umin(node));
 			/* Truncate the node near its lower end. */
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+			assert(endaddr > node->tn_link.rb_min);
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 			assert(endaddr > node->tn_link.a_vmin);
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 			if (node->tn_kind == TRACE_NODE_KIND_BITSET) {
 				size_t bitset_offset, count, dst, src;
 				/* Shift down the bits of the is-traced bitset down by `bitset_offset' */
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+				bitset_offset = (endaddr - node->tn_link.rb_min) / sizeof(void *);
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 				bitset_offset = (endaddr - node->tn_link.a_vmin) / sizeof(void *);
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 				assert(bitset_offset != 0);
 				count = trace_node_bitset_count(node) - bitset_offset;
 				assert(count != 0);
@@ -557,7 +622,11 @@ again_while_num_bytes:
 					++src;
 				}
 			}
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+			node->tn_link.rb_min = endaddr;
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 			node->tn_link.a_vmin = endaddr;
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 			trace_node_tree_insert(&nodes, node);
 			lock_break();
 			break;
@@ -738,6 +807,18 @@ NOTHROW(KCALL kmalloc_validate_walktree)(unsigned int n_skip,
                                          struct trace_node *__restrict node) {
 again:
 	kmalloc_validate_node(n_skip + 1, node);
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+	if (node->tn_link.rb_lhs) {
+		if (node->tn_link.rb_rhs)
+			kmalloc_validate_walktree(n_skip + 1, node->tn_link.rb_rhs);
+		node = node->tn_link.rb_lhs;
+		goto again;
+	}
+	if (node->tn_link.rb_rhs) {
+		node = node->tn_link.rb_rhs;
+		goto again;
+	}
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 	if (node->tn_link.a_min) {
 		if (node->tn_link.a_max)
 			kmalloc_validate_walktree(n_skip + 1, node->tn_link.a_max);
@@ -748,6 +829,7 @@ again:
 		node = node->tn_link.a_max;
 		goto again;
 	}
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 }
 #endif /* CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0 */
 
@@ -1107,6 +1189,18 @@ again:
 		}
 		node->tn_visit = gc_version;
 	}
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+	if (node->tn_link.rb_lhs) {
+		if (node->tn_link.rb_rhs)
+			result += gc_reachable_recursion(node->tn_link.rb_rhs);
+		node = node->tn_link.rb_lhs;
+		goto again;
+	}
+	if (node->tn_link.rb_rhs) {
+		node = node->tn_link.rb_rhs;
+		goto again;
+	}
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 	if (node->tn_link.a_min) {
 		if (node->tn_link.a_max)
 			result += gc_reachable_recursion(node->tn_link.a_max);
@@ -1117,6 +1211,7 @@ again:
 		node = node->tn_link.a_max;
 		goto again;
 	}
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 	return result;
 }
 
@@ -1257,8 +1352,7 @@ gc_gather_unreachable_slab_segment(struct trace_node **__restrict pleaks,
 	                               offsetof(struct trace_node, tn_trace),
 	                               TRACE_HEAP_FLAGS);
 	node = (struct trace_node *)node_ptr.hp_ptr;
-	node->tn_link.a_vmin = (uintptr_t)base;
-	node->tn_link.a_vmax = (uintptr_t)base + num_bytes - 1;
+	trace_node_initlink(node, base, num_bytes);
 	node->tn_size        = node_ptr.hp_siz;
 	node->tn_reach       = gc_version - 1;
 	node->tn_visit       = 0;
@@ -1317,6 +1411,36 @@ gc_gather_unreachable_slabs(struct trace_node **__restrict pleaks) {
 }
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+PRIVATE NOBLOCK ATTR_COLDTEXT void
+NOTHROW(KCALL gc_gather_unreachable_nodes)(struct trace_node *__restrict node,
+                                           struct trace_node **__restrict pleaks) {
+again:
+	if (node->tn_reach != gc_version) {
+		/* This node wasn't reached. (but ignore if the node has the NOLEAK flag set) */
+		if (!(node->tn_flags & TRACE_NODE_FLAG_NOLEAK)) {
+			if (node->tn_link.rb_lhs)
+				gc_gather_unreachable_nodes(node->tn_link.rb_lhs, pleaks);
+			if (node->tn_link.rb_rhs)
+				gc_gather_unreachable_nodes(node->tn_link.rb_rhs, pleaks);
+			trace_node_tree_removenode(&nodes, node);
+			trace_node_leak_next(node) = *pleaks;
+			*pleaks = node;
+			return;
+		}
+	}
+	if (node->tn_link.rb_lhs) {
+		if (node->tn_link.rb_rhs)
+			gc_gather_unreachable_nodes(node->tn_link.rb_rhs, pleaks);
+		node = node->tn_link.rb_lhs;
+		goto again;
+	}
+	if (node->tn_link.rb_rhs) {
+		node = node->tn_link.rb_rhs;
+		goto again;
+	}
+}
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_gather_unreachable_nodes)(struct trace_node **__restrict pnode,
                                            struct trace_node **__restrict pleaks,
@@ -1357,6 +1481,7 @@ again_node:
 		goto again;
 	}
 }
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 
 
 /* Called after having become a super-override */
@@ -1385,9 +1510,13 @@ kmalloc_leaks_gather(void) {
 	
 		/* Gather leaks from trace nodes. */
 		if (nodes) {
+#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+			gc_gather_unreachable_nodes(nodes, &result);
+#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 			gc_gather_unreachable_nodes(&nodes, &result,
 			                            ATREE_SEMI0(uintptr_t),
 			                            ATREE_LEVEL0(uintptr_t));
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 		}
 	}
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -1746,7 +1875,7 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
 	struct trace_node *node, *next;
 	node = (struct trace_node *)leaks;
 	while (node) {
-		next = node->tn_link.a_min;
+		next = trace_node_leak_next(node);
 #if 0 /* Don't free pointed-to data! The user way wish to break into the
        * debugger and inspect leaked memory, but if we free it now, then
        * it'll be gone. After all: we're not trying to implement an actual

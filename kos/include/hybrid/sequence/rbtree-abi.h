@@ -22,7 +22,6 @@
  *       s.a. `https://en.wikipedia.org/wiki/Red%E2%80%93black_tree' */
 
 #include "../../__stdinc.h"
-#include "../__assert.h"
 #include "../typecore.h"
 #include "rbtree.h"
 
@@ -147,12 +146,6 @@ struct my_node {
 #ifndef RBTREE_NOTHROW
 #define RBTREE_NOTHROW __NOTHROW_NCX
 #endif /* !RBTREE_NOTHROW */
-#ifndef RBTREE_ASSERT
-#define RBTREE_ASSERT __hybrid_assert
-#endif /* !RBATREE_ASSERT */
-#ifndef RBTREE_ASSERTF
-#define RBTREE_ASSERTF __hybrid_assertf
-#endif /* !RBTREE_ASSERTF */
 #ifndef RBTREE_ISLHSRED
 #ifdef RBTREE_NULL_IS_IMPLICIT_BLACK
 #define RBTREE_ISLHSRED(node) RBTREE_ISRED(RBTREE_GETLHS(node))
@@ -191,6 +184,14 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
 RBTREE_DECL __ATTR_NONNULL((1, 2)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
                                          RBTREE_T *__restrict node);
+
+#ifdef RBTREE_WANT_TRYINSERT
+/* Same as `RBTREE(insert)', but gracefully fail (by returning `false')
+ * when some other node already exists that is overlapping with `node' */
+RBTREE_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
+RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
+                                            RBTREE_T *__restrict node);
+#endif /* RBTREE_WANT_TRYINSERT */
 
 /* Remove and return the node node for `key'.
  * @return: RBTREE_NULL: No node exists for the given key. */
@@ -239,7 +240,47 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root, RBTREE_Tkey minke
 
 #endif /* !RBTREE_IMPLEMENTATION_ONLY */
 
+
+
+
+
 #ifndef RBTREE_HEADER_ONLY
+
+#ifdef RBTREE_DEBUG
+#undef RBTREE_NDEBUG
+#elif !defined(RBTREE_NDEBUG) && defined(NDEBUG)
+#define RBTREE_NDEBUG
+#elif defined(RBTREE_ASSERT_IS_NOOP)
+#define RBTREE_NDEBUG
+#elif 1 /* Default RB-tree internal debug checks enabled:
+         *   0: Perform debug checks by default (very slot, and add O(N) to pretty much every operation)
+         *   1: Disable internal debug checks by default (operations take their promised lengths of time)
+         */
+#define RBTREE_NDEBUG
+#endif /* !RBTREE_NDEBUG && NDEBUG */
+
+
+#ifdef RBTREE_NDEBUG
+#undef RBTREE_ASSERT
+#undef RBTREE_ASSERTF
+#define RBTREE_ASSERT(expr)       (void)0
+#define RBTREE_ASSERTF(expr, ...) (void)0
+#endif /* RBTREE_NDEBUG */
+
+#ifndef RBTREE_ASSERT
+__DECL_END
+#include "../__assert.h"
+__DECL_BEGIN
+#define RBTREE_ASSERT __hybrid_assert
+#endif /* !RBATREE_ASSERT */
+#ifndef RBTREE_ASSERTF
+__DECL_END
+#include "../__assert.h"
+__DECL_BEGIN
+#define RBTREE_ASSERTF __hybrid_assertf
+#endif /* !RBTREE_ASSERTF */
+
+
 #define _RBTREE_GETSIBLING(self) (RBTREE(_getsibling)(self))
 #ifdef RBTREE_MINKEY_EQ_MAXKEY
 #define _RBTREE_OVERLAPPING(a, b) \
@@ -250,16 +291,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root, RBTREE_Tkey minke
 	 RBTREE_KEY_GR(RBTREE_GETMAXKEY(a), RBTREE_GETMINKEY(b)))
 #endif /* !RBTREE_MINKEY_EQ_MAXKEY */
 
-#if !defined(RBTREE_NDEBUG) && defined(NDEBUG)
-#define RBTREE_NDEBUG
-#endif /* !RBTREE_NDEBUG && NDEBUG */
-
-#undef RBTREE_WANT_INTERNAL_ASSERT
-#if !defined(RBTREE_NDEBUG) && !defined(RBTREE_ASSERT_IS_NOOP)
-#define RBTREE_WANT_INTERNAL_ASSERT
-#endif /* !RBTREE_NDEBUG && !RBTREE_ASSERT_IS_NOOP */
-
-#ifdef RBTREE_WANT_INTERNAL_ASSERT
+#ifndef RBTREE_NDEBUG
 /* @param: cur_black_nodes: The # of black nodes already encountered (excluding self)
  * @param: exp_black_nodes: The # of black nodes expected when NIL is reached.
  *                          For this purpose, the NIL-nodes themself (which are
@@ -314,9 +346,9 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_intern_assert_tree))(RBTREE_T const *root) {
 	/* Verify the entire tree. */
 	(RBTREE(_intern_assert)(root, 0, exp_black_nodes));
 }
-#else /* RBTREE_WANT_INTERNAL_ASSERT */
+#else /* !RBTREE_NDEBUG */
 #define _RBTREE_VALIDATE(root) (void)0
-#endif /* !RBTREE_WANT_INTERNAL_ASSERT */
+#endif /* RBTREE_NDEBUG */
 
 
 __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
@@ -355,10 +387,14 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(locate))(/*nullable*/ RBTREE_T *root,
 	return root;
 }
 
-#if !defined(RBTREE_MINKEY_EQ_MAXKEY) && defined(RBTREE_WANT_RLOCATE)
+#if !defined(RBTREE_MINKEY_EQ_MAXKEY) && (defined(RBTREE_WANT_RLOCATE) || defined(RBTREE_WANT_RREMOVE))
 /* Locate the first node overlapping with the given range.
  * @return: RBTREE_NULL: No node exists within the given range. */
+#ifdef RBTREE_WANT_RLOCATE
 RBTREE_IMPL __ATTR_WUNUSED RBTREE_T *
+#else /* RBTREE_WANT_RLOCATE */
+__PRIVATE __ATTR_WUNUSED RBTREE_T *
+#endif /* !RBTREE_WANT_RLOCATE */
 RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
                                           RBTREE_Tkey minkey,
                                           RBTREE_Tkey maxkey) {
@@ -376,7 +412,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
 	}
 	return root;
 }
-#endif /* !RBTREE_MINKEY_EQ_MAXKEY && RBTREE_WANT_RLOCATE */
+#endif /* !RBTREE_MINKEY_EQ_MAXKEY && (RBTREE_WANT_RLOCATE || RBTREE_WANT_RREMOVE) */
 
 
 /* Have `self' swap positions with its max-child. */
@@ -458,28 +494,11 @@ again:
 	return root;
 }
 
-
-/* Insert the given node into the given tree. The caller must ensure
- * that no already-existing node overlaps with the given `node' */
-RBTREE_IMPL __ATTR_NONNULL((1, 2)) void
-RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
-                                         RBTREE_T *__restrict node) {
-	RBTREE_T *root = *proot;
-	RBTREE_T *parent;
-	_RBTREE_VALIDATE(root);
-	if __unlikely(!root) {
-		/* Special case: First node. (Insert-case: #1) */
-		*proot = node;
-		RBTREE_SETPAR(node, RBTREE_NULL);
-		RBTREE_SETLHS(node, RBTREE_NULL);
-		RBTREE_SETRHS(node, RBTREE_NULL);
-set_node_black_and_return:
-		RBTREE_SETBLACK(node); /* The root node is black. */
-		_RBTREE_VALIDATE(*proot);
-		return;
-	}
-	parent = (RBTREE(_insert_worker)(root, node));
-again_repair_node_impl:
+RBTREE_IMPL __ATTR_NONNULL((1, 2, 3)) void
+RBTREE_NOTHROW(RBTREE_CC RBTREE(_insert_repair))(RBTREE_T **__restrict proot,
+                                                 RBTREE_T *__restrict node,
+                                                 RBTREE_T *__restrict parent) {
+again:
 	RBTREE_ASSERT(RBTREE_ISRED(node));
 	RBTREE_ASSERT(parent != RBTREE_NULL);
 	RBTREE_ASSERT(parent == RBTREE_GETPAR(node));
@@ -518,9 +537,13 @@ again_repair_node_impl:
 			RBTREE_SETRED(node);
 /*again_repair_node:*/
 			parent = RBTREE_GETPAR(node);
-			if (parent == RBTREE_NULL)
-				goto set_node_black_and_return;
-			goto again_repair_node_impl;
+			if (parent == RBTREE_NULL) {
+/*set_node_black_and_return:*/
+				RBTREE_SETBLACK(node); /* The root node is black. */
+				_RBTREE_VALIDATE(*proot);
+				return;
+			}
+			goto again;
 		} else {
 			/* Insert-case: #4 */
 			RBTREE_T *grandparent;
@@ -552,17 +575,90 @@ again_repair_node_impl:
 			RBTREE_SETRED(grandparent);
 
 			/* Update the root node in case it got changed by the rotations above. */
-			if (RBTREE_GETPAR(root)) {
+			if (RBTREE_GETPAR(*proot)) {
 				do {
-					root = RBTREE_GETPAR(root);
-				} while (RBTREE_GETPAR(root));
-				*proot = root;
+					*proot = RBTREE_GETPAR(*proot);
+				} while (RBTREE_GETPAR(*proot));
 			}
 		}
 	}
 	_RBTREE_VALIDATE(*proot);
 }
 
+/* Insert the given node into the given tree. The caller must ensure
+ * that no already-existing node overlaps with the given `node' */
+RBTREE_IMPL __ATTR_NONNULL((1, 2)) void
+RBTREE_NOTHROW(RBTREE_CC RBTREE(insert))(RBTREE_T **__restrict proot,
+                                         RBTREE_T *__restrict node) {
+	RBTREE_T *root = *proot;
+	RBTREE_T *parent;
+	_RBTREE_VALIDATE(root);
+	if __unlikely(!root) {
+		/* Special case: First node. (Insert-case: #1) */
+		*proot = node;
+		RBTREE_SETPAR(node, RBTREE_NULL);
+		RBTREE_SETLHS(node, RBTREE_NULL);
+		RBTREE_SETRHS(node, RBTREE_NULL);
+/*set_node_black_and_return:*/
+		RBTREE_SETBLACK(node); /* The root node is black. */
+		_RBTREE_VALIDATE(*proot);
+		return;
+	}
+	parent = (RBTREE(_insert_worker)(root, node));
+	/* Repair the RB-tree. */
+	(RBTREE(_insert_repair)(proot, node, parent));
+}
+
+
+#ifdef RBTREE_WANT_TRYINSERT
+/* Same as `RBTREE(insert)', but gracefully fail (by returning `false')
+ * when some other node already exists that is overlapping with `node' */
+RBTREE_IMPL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __BOOL
+RBTREE_NOTHROW(RBTREE_CC RBTREE(tryinsert))(RBTREE_T **__restrict proot,
+                                            RBTREE_T *__restrict node) {
+	RBTREE_T *root = *proot;
+	_RBTREE_VALIDATE(root);
+	if __unlikely(!root) {
+		/* Special case: First node. (Insert-case: #1) */
+		*proot = node;
+		RBTREE_SETPAR(node, RBTREE_NULL);
+		RBTREE_SETLHS(node, RBTREE_NULL);
+		RBTREE_SETRHS(node, RBTREE_NULL);
+/*set_node_black_and_return:*/
+		RBTREE_SETBLACK(node); /* The root node is black. */
+		_RBTREE_VALIDATE(*proot);
+		return 1;
+	}
+again:
+	/* Gracefully fail if the given range is already mapped. */
+	if (_RBTREE_OVERLAPPING(root, node))
+		return 0;
+	if (RBTREE_KEY_LO(RBTREE_GETMAXKEY(node), RBTREE_GETMINKEY(root))) {
+		RBTREE_T *nextnode;
+		nextnode = RBTREE_GETLHS(root);
+		if (nextnode != RBTREE_NULL) {
+			root = nextnode;
+			goto again;
+		}
+		RBTREE_SETLHS(root, node);
+	} else {
+		RBTREE_T *nextnode;
+		nextnode = RBTREE_GETRHS(root);
+		if (nextnode != RBTREE_NULL) {
+			root = nextnode;
+			goto again;
+		}
+		RBTREE_SETRHS(root, node);
+	}
+	RBTREE_SETPAR(node, root);
+	RBTREE_SETLHS(node, RBTREE_NULL);
+	RBTREE_SETRHS(node, RBTREE_NULL);
+	RBTREE_SETRED(node);
+	/* Repair the RB-tree. */
+	(RBTREE(_insert_repair)(proot, node, root));
+	return 1;
+}
+#endif /* RBTREE_WANT_TRYINSERT */
 
 __LOCAL __ATTR_NONNULL((1, 2, 3)) void
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_replace))(RBTREE_T **__restrict proot,
@@ -987,11 +1083,9 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(minmaxlocate))(RBTREE_T *root,
 #endif /* RBTREE_WANT_MINMAXLOCATE */
 
 
-#undef RBTREE_NDEBUG
-#undef RBTREE_WANT_INTERNAL_ASSERT
 #undef _RBTREE_OVERLAPPING
-#undef _RBTREE_VALIDATE
 #undef _RBTREE_GETSIBLING
+#undef _RBTREE_VALIDATE
 #endif /* !RBTREE_HEADER_ONLY */
 
 __DECL_END
@@ -999,6 +1093,8 @@ __DECL_END
 #undef RBTREE_IMPLEMENTATION_ONLY
 #undef RBTREE_HEADER_ONLY
 
+#undef RBTREE_DEBUG
+#undef RBTREE_NDEBUG
 #undef RBTREE_NULL
 #undef RBTREE_NULL_IS_IMPLICIT_BLACK
 #undef RBTREE_DECL
@@ -1007,6 +1103,7 @@ __DECL_END
 #undef RBTREE_NOTHROW
 #undef RBTREE_ASSERT
 #undef RBTREE_ASSERTF
+#undef RBTREE_ASSERT_IS_NOOP
 
 #undef RBTREE_MINKEY_EQ_MAXKEY
 
@@ -1039,3 +1136,4 @@ __DECL_END
 #undef RBTREE_WANT_PREV_NEXT_NODE
 #undef RBTREE_WANT_RREMOVE
 #undef RBTREE_WANT_RLOCATE
+#undef RBTREE_WANT_TRYINSERT
