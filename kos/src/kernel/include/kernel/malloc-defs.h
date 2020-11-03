@@ -291,19 +291,11 @@ typedef unsigned int gfp_t;
 #endif
 
 
-#ifdef CONFIG_HEAP_USE_RBTREE
-#ifdef CONFIG_DEBUG_HEAP
-#define SIZEOF_MFREE (__SIZE_C(6) * __SIZEOF_POINTER__ + __SIZE_C(2))
-#else /* CONFIG_DEBUG_HEAP */
-#define SIZEOF_MFREE (__SIZE_C(6) * __SIZEOF_POINTER__ + __SIZE_C(1))
-#endif /* !CONFIG_DEBUG_HEAP */
-#else /* CONFIG_HEAP_USE_RBTREE */
 #ifdef CONFIG_DEBUG_HEAP
 #define SIZEOF_MFREE (__SIZE_C(5) * __SIZEOF_POINTER__ + __SIZE_C(2))
 #else /* CONFIG_DEBUG_HEAP */
 #define SIZEOF_MFREE (__SIZE_C(5) * __SIZEOF_POINTER__ + __SIZE_C(1))
 #endif /* !CONFIG_DEBUG_HEAP */
-#endif /* !CONFIG_HEAP_USE_RBTREE */
 #define HEAP_MINSIZE ((SIZEOF_MFREE + (HEAP_ALIGNMENT - 1)) & ~(HEAP_ALIGNMENT - 1u))
 
 

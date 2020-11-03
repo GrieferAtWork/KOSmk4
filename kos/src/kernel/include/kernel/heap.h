@@ -53,27 +53,27 @@ DECL_BEGIN
 #ifdef __CC__
 
 struct mfree {
-	LLIST_NODE(struct mfree)  mf_lsize;   /* [lock(:h_lock)][sort(ASCENDING(mf_size))] List of free entries ordered by size. */
+	LLIST_NODE(struct mfree)    mf_lsize;   /* [lock(:h_lock)][sort(ASCENDING(mf_size))] List of free entries ordered by size. */
 #ifdef CONFIG_HEAP_USE_RBTREE
-	RBTREE_NODE(struct mfree) mf_laddr;   /* [lock(:h_lock)][sort(ASCENDING(self))] List of free entries ordered by address. */
+	LLRBTREE_NODE(struct mfree) mf_laddr;   /* [lock(:h_lock)][sort(ASCENDING(self))] List of free entries ordered by address. */
 #else /* CONFIG_HEAP_USE_RBTREE */
-	ATREE_XNODE(struct mfree) mf_laddr;   /* [lock(:h_lock)][sort(ASCENDING(self))] List of free entries ordered by address. */
+	ATREE_XNODE(struct mfree)   mf_laddr;   /* [lock(:h_lock)][sort(ASCENDING(self))] List of free entries ordered by address. */
 #endif /* !CONFIG_HEAP_USE_RBTREE */
-	size_t                    mf_size;    /* Size of this block (in bytes; aligned by `HEAP_ALIGNMENT'; including this header) */
-#define MFREE_FUNDEFINED      0x00        /* Memory initialization is undefined.
-                                           * In debug mode, this means that memory is
-                                           * initialized using `DEBUGHEAP_NO_MANS_LAND',
-                                           * with portions that haven't been allocated yet
-                                           * pending initialization for either `DEBUGHEAP_FRESH_MEMORY'
-                                           * or ZERO(0), depending on how they were originally allocated. */
-#define MFREE_FZERO           GFP_CALLOC  /* Memory is ZERO-initialized. */
-#define MFREE_FMASK           MFREE_FZERO /* Mask of known flags. */
+	size_t                      mf_size;    /* Size of this block (in bytes; aligned by `HEAP_ALIGNMENT'; including this header) */
+#define MFREE_FUNDEFINED        0x00        /* Memory initialization is undefined.
+                                             * In debug mode, this means that memory is
+                                             * initialized using `DEBUGHEAP_NO_MANS_LAND',
+                                             * with portions that haven't been allocated yet
+                                             * pending initialization for either `DEBUGHEAP_FRESH_MEMORY'
+                                             * or ZERO(0), depending on how they were originally allocated. */
+#define MFREE_FZERO             GFP_CALLOC  /* Memory is ZERO-initialized. */
+#define MFREE_FMASK             MFREE_FZERO /* Mask of known flags. */
 #ifdef CONFIG_HEAP_USE_RBTREE
-#define MFREE_FRED            0x80        /* This is a red node. */
+#define MFREE_FRED              0x80        /* This is a red node. */
 #endif /* CONFIG_HEAP_USE_RBTREE */
-	u8                        mf_flags;   /* Set of `MFREE_F*' */
+	u8                          mf_flags;   /* Set of `MFREE_F*' */
 #ifdef CONFIG_DEBUG_HEAP
-	u8                        mf_szchk;   /* Checksum for `mf_size' */
+	u8                          mf_szchk;   /* Checksum for `mf_size' */
 #endif /* CONFIG_DEBUG_HEAP */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, mf_data); /* Block data. */
 };

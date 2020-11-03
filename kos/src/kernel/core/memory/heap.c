@@ -53,6 +53,16 @@
 
 /* Define the ABI for the address tree used by heaps. */
 #ifdef CONFIG_HEAP_USE_RBTREE
+/* NOTE: Use left-leaning trees so we only have to keep track of 2 pointers
+ *       relating within the tree-portion of `struct mfree', rather than the
+ *       3 pointers that would be required for normal RB-Trees.
+ *       This 1-pointer difference is quite significant since it affects the
+ *       value of `SIZEOF_MFREE', which in turn determines `HEAP_MINSIZE',
+ *       which is the smallest possible chunk of memory that can be freed.
+ *       Keeping this value as small as possible makes it much easier for
+ *       the heap to serve small requests without having to overallocate
+ *       as often! */
+#define RBTREE_LEFT_LEANING
 #define RBTREE(name)           mfree_tree_##name
 #define RBTREE_T               struct mfree
 #define RBTREE_Tkey            uintptr_t
@@ -393,12 +403,6 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        &iter->mf_flags, MFREE_MIN(iter),
 			        MFREE_MAX(iter), iter->mf_flags);
 #ifdef CONFIG_HEAP_USE_RBTREE
-			assertf(!iter->mf_laddr.rb_par || quick_verify_mfree(iter->mf_laddr.rb_par),
-			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
-			        "Free node at %p...%p has broken parent-pointer to invalid node at %p",
-			        (uintptr_t)&iter->mf_laddr.rb_par,
-			        (uintptr_t)&iter->mf_laddr.rb_par + sizeof(void *) - 1,
-			        MFREE_MIN(iter), MFREE_MAX(iter), iter->mf_laddr.rb_par);
 			assertf(!iter->mf_laddr.rb_lhs || quick_verify_mfree(iter->mf_laddr.rb_lhs),
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
 			        "Free node at %p...%p has broken lhs-pointer to invalid node at %p",

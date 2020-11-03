@@ -299,6 +299,14 @@ DECL_END
 
 /* Define the ABI for the address tree used by trace nodes. */
 #ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
+#if 0 /* Don't use left-leaning RB-trees (for now). Technically we could do this,
+       * and the only thing stopping this from happening is this `#if 0', which
+       * you are free to change to `#if 1'. But since normal RB-trees are just
+       * that tiny bit faster than left-leaning ones when it comes to insert/remove,
+       * we always just use the normal ones, just so we can slightly reduce the
+       * performance impact caused by the trace-malloc sub-system. */
+#define RBTREE_LEFT_LEANING
+#endif
 #define RBTREE_WANT_RREMOVE
 #define RBTREE_WANT_TRYINSERT
 #define RBTREE(name)           trace_node_tree_##name
