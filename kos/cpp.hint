@@ -886,14 +886,26 @@
 #define __CDECLARE_XSC(attr,Treturn,name,param,args) Treturn sys_X##name param;
 #define __CDECLARE_VOID_XSC(attr,name,param,args)    void sys_X##name param;
 
-#define LLIST(T)                  T *
-#define LLIST_NODE(T)             struct { T *ln_next, **ln_pself;  }
-#define SLIST(T)                  T *
-#define SLIST_NODE(T)             struct { T *sn_next; }
-#define ATREE_HEAD(T)             T *
-#define ATREE_NODE(T,Tkey)        struct { T *a_min, *a_max; Tkey a_vmin, a_vmax; }
-#define ATREE_NODE_SINGLE(T,Tkey) struct { T *a_min, *a_max; Tkey a_vaddr; }
-#define ATREE_XNODE(T)            struct { T *a_min, *a_max; }
+#define LLIST(T)                  T*
+#define LLIST_NODE(T)             struct{T *ln_next,**ln_pself;}
+#define SLIST(T)                  T*
+#define SLIST_NODE(T)             struct{T *sn_next;}
+#define ATREE_HEAD(T)             T*
+#define ATREE_NODE(T,Tkey)        struct{T *a_min,*a_max;Tkey a_vmin,a_vmax;}
+#define ATREE_NODE_SINGLE(T,Tkey) struct{T *a_min,*a_max;Tkey a_vaddr;}
+#define ATREE_XNODE(T)            struct{T *a_min,*a_max;}
+#define RBTREE_NODE(T)                 struct{T *rb_par,*rb_lhs,*rb_rhs;}
+#define RBTREE_NODE_WITH_KEY(T,Tkey)   struct{T *rb_par,*rb_lhs,*rb_rhs;Tkey rb_min,rb_max;}
+#define LLRBTREE_NODE(T)               struct{T *rb_lhs,*rb_rhs;}
+#define LLRBTREE_NODE_WITH_KEY(T,Tkey) struct{T *rb_lhs,*rb_rhs;Tkey rb_min,rb_max;}
+#define RBTREE_ROOT(T)   T*
+#define LLRBTREE_ROOT(T) T*
+#define BSEARCH(...) for(;;)
+#define BSEARCH_EX(...) for(;;)
+#define BSEARCHR(...) for(;;)
+#define BSEARCHR_EX(...) for(;;)
+#define BITSET(num_bits) struct{unsigned int _bs_bits[42];}
+
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) \
 	refcnt_t handle_##name##_refcnt(T const *__restrict self) {} \
 	void handle_##name##_incref(T *__restrict self) {} \
@@ -1068,8 +1080,10 @@
 #define ATTR_DBGBSS
 #define DBGSTR
 #define DBG_CALL
-#define DBG_COMMAND(name,...)      intptr_t dbg_command_##name(size_t argc, char *argv[])
-#define DBG_COMMAND_AUTO(name,...) intptr_t dbg_command_##name(size_t argc, char *argv[])
+#define DBG_COMMAND(name,...)            intptr_t dbg_command_##name(size_t argc, char *argv[])
+#define DBG_COMMAND_AUTO(name,...)       intptr_t dbg_command_##name(size_t argc, char *argv[])
+#define DBG_NAMED_COMMAND(name,...)      intptr_t dbg_command_##name(size_t argc, char *argv[])
+#define DBG_NAMED_COMMAND_AUTO(name,...) intptr_t dbg_command_##name(size_t argc, char *argv[])
 #define DBG_INIT(func)  void dbg_init_##func(void)
 #define DBG_RESET(func) void dbg_reset_##func(void)
 #define DBG_FINI(func)  void dbg_fini_##func(void)

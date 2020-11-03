@@ -62,6 +62,7 @@ local badFiles = List({
 	"hybrid/__atomic-libatomic.h",
 	"hybrid/__atomic-msvc.h",
 	"hybrid/sequence/atree-abi.h",
+	"hybrid/sequence/rbtree-abi.h",
 	"hybrid/__pointer-cxx-impl.h",
 	"hybrid/sync/service-lock.h",
 	"asm/os/",
@@ -501,6 +502,7 @@ incdir("");
 #include <hybrid/sequence/bitset.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/list.h>
+#include <hybrid/sequence/rbtree.h>
 #include <hybrid/sequence/vector.h>
 #include <hybrid/struct.h>
 #include <hybrid/sync/atomic-lock.h>
