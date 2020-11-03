@@ -827,6 +827,10 @@ do_unsigned: ATTR_UNUSED;
 				typinfo.t_sizeof = sizeof(char);
 			if (typinfo.t_sizeof == sizeof(char))
 				presult->ct_typ = incref(&ctype_char);
+			else if (typinfo.t_sizeof == sizeof(char16_t))
+				presult->ct_typ = incref(&ctype_char16_t);
+			else if (typinfo.t_sizeof == sizeof(char32_t))
+				presult->ct_typ = incref(&ctype_char32_t);
 			else {
 #ifdef __CHAR_UNSIGNED__
 				goto do_unsigned;

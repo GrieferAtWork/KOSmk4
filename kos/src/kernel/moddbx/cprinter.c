@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#include <kernel/except.h>
 #include <kernel/types.h>
 
 #include <format-printer.h>
@@ -493,6 +494,120 @@ ctype_printname(struct ctype const *__restrict self,
 	ct.ct_typ = (struct ctype *)self;
 	return ctyperef_printname(&ct, printer, varname, varname_len);
 }
+
+
+
+#if 0
+/* Print a human-readable representation of the contents of a given data-buffer,
+ * based on the C-typing of that buffer, which was likely extracted from debug info.
+ * @param: self:           The typing of `buf'
+ * @param: printer:        The printer used to output data.
+ * @param: buf:            The data buffer that should be printed.
+ *                         This should point to a block of `ctype_sizeof(self)' types.
+ * @param: flags:          Printing flags (set of `CTYPE_PRINTVALUE_FLAG_*')
+ * @param: newline_indent: # of SPC (' ') characters to print after every \n-character.
+ *                         Ignored when `CTYPE_PRINTVALUE_FLAG_ONELINE' is given.
+ * @param: newline_tab:    Amount by which to increase `newline_indent' after a line-
+ *                         feed following an open-brace '{' or open-bracket '['.
+ * @param: maxlinelen:     The max line length that should not be exceeded by when
+ *                         placing short struct initializers on the same line.
+ *                         Ignored when `CTYPE_PRINTVALUE_FLAG_NOSHORTLINES' is given.
+ *                         If sufficient space is available, do this:
+ *                         >> {foo: {x: 10, y: 20}}
+ *                         or this:
+ *                         >> {
+ *                         >>     foo: {x: 10, y: 20}
+ *                         >> }
+ *                         Instead of this:
+ *                         >> {
+ *                         >>     foo: {
+ *                         >>         x: 10,
+ *                         >>         y: 20
+ *                         >>     }
+ *                         >> }
+ *                         Note that this limit isn't a guaranty, but only a hint to
+ *                         where */
+PUBLIC NONNULL((1, 2, 3)) ssize_t KCALL
+ctype_printvalue(struct ctype const *__restrict self,
+                 struct cprinter const *__restrict printer,
+                 void const *__restrict buf, unsigned int flags,
+                 size_t firstline_indent, size_t newline_indent,
+                 size_t newline_tab, size_t maxlinelen) {
+	ssize_t temp, result;
+	switch (CTYPE_KIND_CLASSOF(self->ct_kind)) {
+
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_VOID):
+		result = RAWPRINT("(void)0");
+		break;
+
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL): {
+		bool is_nonzero;
+		TRY {
+			is_nonzero = false;
+		} EXCEPT {
+		}
+
+	}	break;
+
+#define CTYPE_KIND_BOOL8                  0x1001
+#define CTYPE_KIND_BOOL16                 0x1002
+#define CTYPE_KIND_BOOL32                 0x1004
+#define CTYPE_KIND_BOOL64                 0x1008
+#define CTYPE_KIND_Sn(sizeof)            (0x2000 | (sizeof))
+#define CTYPE_KIND_S8                     0x2001
+#define CTYPE_KIND_S16                    0x2002
+#define CTYPE_KIND_S32                    0x2004
+#define CTYPE_KIND_S64                    0x2008
+#define CTYPE_KIND_Un(sizeof)            (0x2100 | (sizeof))
+#define CTYPE_KIND_U8                     0x2101
+#define CTYPE_KIND_U16                    0x2102
+#define CTYPE_KIND_U32                    0x2104
+#define CTYPE_KIND_U64                    0x2108
+#define CTYPE_KIND_ENUM8                  0x2201
+#define CTYPE_KIND_ENUM16                 0x2202
+#define CTYPE_KIND_ENUM32                 0x2204
+#define CTYPE_KIND_ENUM64                 0x2208
+#define CTYPE_KIND_IEEE754_FLOAT          0x3004
+#define CTYPE_KIND_IEEE754_DOUBLE         0x3008
+#define CTYPE_KIND_IEEE854_LONG_DOUBLE_12 0x300c
+#define CTYPE_KIND_IEEE854_LONG_DOUBLE_16 0x3010
+#define CTYPE_KIND_STRUCT                 0x4000
+#define CTYPE_KIND_UNION                  0x4100
+#define CTYPE_KIND_PTR32                  0x8004
+#define CTYPE_KIND_PTR64                  0x8008
+#define CTYPE_KIND_ARRAY                  0x9000
+#define CTYPE_KIND_FUNCTION               0xa000
+#define    CTYPE_KIND_FUNPROTO_CCMASK     0x0700 /* == CTYPE_KIND_FLAGMASK */
+#define    CTYPE_KIND_FUNPROTO_VARARGS    0x0800 /* FLAG: var-args function */
+#if defined(__x86_64__) || defined(__i386__)
+#define    CTYPE_KIND_FUNPROTO_CC_CDECL    0x0000
+#define    CTYPE_KIND_FUNPROTO_CC_FASTCALL 0x0100
+#define    CTYPE_KIND_FUNPROTO_CC_STDCALL  0x0200
+#ifdef __x86_64__
+#define    CTYPE_KIND_FUNPROTO_CC_SYSVABI  0x0400
+#define    CTYPE_KIND_FUNPROTO_CC_MSABI    0x0500
+#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT                                                \
+	(__KOS64_IS_CS32BIT(x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) \
+	 ? CTYPE_KIND_FUNPROTO_CC_CDECL                                                      \
+	 : CTYPE_KIND_FUNPROTO_CC_SYSVABI)
+#else /* __x86_64__ */
+#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT  CTYPE_KIND_FUNPROTO_CC_CDECL
+#endif /* !__x86_64__ */
+#else /* __x86_64__ || __i386__ */
+#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT 0x0000
+#endif /* !__x86_64__ && !__i386__ */
+
+	default:
+		break;
+	}
+	return result;
+err:
+	return temp;
+}
+#endif
+
+
+
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

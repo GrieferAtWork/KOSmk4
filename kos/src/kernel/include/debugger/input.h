@@ -70,6 +70,31 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_alt)(void);
 FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_isholding_altgr)(void);
 
 
+
+#if 0 /* TODO */
+/* Accepted debugger IRQ levels. */
+#define DBG_IRQLEVEL_NONE    0 /* Code is never considered to be interrupted. */
+#define DBG_IRQLEVEL_CTRL_C  1 /* An interrupt is present as soon as a \3-byte is pending for `dbg_getc()' */
+#define DBG_IRQLEVEL_KEYDOWN 2 /* An interrupt is present as soon as a key-down event is pending,
+                                * or there is unread data for `dbg_getc()' or `dbg_getuni()' */
+#define DBG_IRQLEVEL_INPUT   3 /* An interrupt is present once any kind of input is pending. */
+
+/* The debugger IRQ level, which can be used to select
+ * which condition is checked for by `dbg_interrupted()'
+ * Must be one of `DBG_IRQLEVEL_*' */
+DATDEF unsigned int dbg_irqlevel;
+
+/* Set to true if the caller is considered to have been
+ * interrupted, as per the current setting of `dbg_irqlevel' */
+DATDEF bool const volatile dbg_interrupted;
+
+/* Try to clear `dbg_interrupted', but keep it turned
+ * on in case the selected IRQ event is still raised.
+ * Alternatively, if the interrupt is no longer raised,
+ * then `dbg_interrupted' is set to `false' */
+DATDEF void NOTHROW(FCALL dbg_update_interrupted)(void);
+#endif
+
 /* Codes for what kind of input to await. */
 #define DBG_AWAIT_GETC   0 /* Await `dbg_getc()' */
 #define DBG_AWAIT_GETUNI 1 /* Await `dbg_getuni()' */

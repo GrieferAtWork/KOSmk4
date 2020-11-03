@@ -862,6 +862,13 @@ again:
 		size_t kwd_len;
 		/* Field w/o deref */
 		yield();
+#if 1 /* Extension: Automatically dereference pointers to access struct fields. */
+		while (CTYPE_KIND_ISPOINTER(cexpr_stacktop.cv_type.ct_typ->ct_kind)) {
+			result = cexpr_deref();
+			if unlikely(result != DBX_EOK)
+				goto done;
+		}
+#endif
 		if (self->c_tok != CTOKEN_TOK_KEYWORD) {
 			/* Special case: If we've reached EOF, then still
 			 *               try to auto-complete field names,
@@ -923,7 +930,7 @@ again:
 		result = cexpr_pushint_simple(typ, 1); /* (typeof(value))value, value, value, 1 */
 		if unlikely(result != DBX_EOK)
 			goto done;
-		result = cexpr_op2(op); /* (typeof(value))value, value, value +- 1 */
+		result = cexpr_op2(op);         /* (typeof(value))value, value, value +- 1 */
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_store();         /* (typeof(value))value, value */
