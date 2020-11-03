@@ -3180,26 +3180,49 @@ PRIVATE ssize_t CC
 print_sigset(pformatprinter printer, void *arg,
              USER UNCHECKED sigset_t const *sigset,
              size_t sigsetsize) {
-	signo_t signo_end;
+	signo_t signo_max;
 	ssize_t temp, result;
-	bool is_first;
+	bool is_first, inverse = false;
 	if (sigsetsize > (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY)
 		sigsetsize = (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY;
-	signo_end = (signo_t)(sigsetsize * NBBY);
-	result = DOPRINT("{" SYNSPACE);
-	if unlikely(result < 0)
-		goto done;
-	is_first = true;
+	signo_max = (signo_t)(sigsetsize * NBBY);
+	if (signo_max >= NSIG)
+		signo_max = NSIG - 1;
 	TRY {
 		signo_t signo;
+		unsigned int count, limit;
 		validate_readable(sigset, sigsetsize);
-		for (signo = 1; signo <= signo_end; ++signo) {
-			if (!sigismember(sigset, signo))
+		/* Check if we should print the inverse of the bitset. */
+		count = 0;
+		limit = (unsigned int)signo_max / 2;
+		for (signo = 1; signo <= signo_max; ++signo) {
+			if (sigismember(sigset, signo)) {
+				if (count >= limit) {
+					inverse = true;
+					break;
+				}
+				++count;
+			}
+		}
+		result = inverse
+		         ? DOPRINT("~{" SYNSPACE)
+		         : DOPRINT("{" SYNSPACE);
+		if unlikely(result < 0)
+			goto done;
+		is_first = true;
+		count    = 0;
+		for (signo = 1; signo <= signo_max; ++signo) {
+			if (!!sigismember(sigset, signo) == inverse)
 				continue;
 			if (!is_first)
 				PRINT("," SYNSPACE2);
+			if (count >= 64) {
+				PRINT("...");
+				break;
+			}
 			is_first = false;
 			DO(print_signo_t(printer, arg, signo));
+			++count;
 		}
 	} EXCEPT {
 		if (!was_thrown(E_SEGFAULT))
