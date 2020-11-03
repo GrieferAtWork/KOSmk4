@@ -46,6 +46,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <string.h>
 
 #include <libdebuginfo/debug_frame.h> /* unwind_fde_scan_df() */

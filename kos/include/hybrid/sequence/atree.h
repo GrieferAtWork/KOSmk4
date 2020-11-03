@@ -22,6 +22,20 @@
 
 #include "../../__stdinc.h"
 
+/* NOTE: The ATREE API is deprecated! From now on, all new code should use the
+ *       RBTREE API, and existing code should be transition to use RBTREEs from
+ *       now on.
+ * The main advantage from this change is a performance boost in pretty much
+ * every usage case, since ATREEs were really only good when it comes to read-
+ * only lookup, but totally failed in terms of insert/removal, which have a
+ * _really_ bad worst case timings (never calculated it properly, but it always
+ * felt like O(N^x) | x>1 for larger N-values)
+ *
+ * Compare this to a guarantied worst-case of O(log(N)) for locate, insert and
+ * delete when using RBTREEs (where ATREEs only managed to get O(log(N)) for
+ * locate), and you've got a much-improved performance for any kind of modification.
+ */
+
 __DECL_BEGIN
 
 /* An key tree is a binary-tree based container designed

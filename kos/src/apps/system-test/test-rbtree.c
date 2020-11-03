@@ -40,12 +40,12 @@ struct mynode {
 
 DECL_END
 
-#define RBTREE_WANT_PREV_NEXT_NODE 1
+#define RBTREE_WANT_PREV_NEXT_NODE
 #define RBTREE(name) rb_##name
 #define RBTREE_T     struct mynode
 #define RBTREE_Tkey  int
 
-#define RBTREE_MINKEY_EQ_MAXKEY 1
+#define RBTREE_MINKEY_EQ_MAXKEY
 #define RBTREE_GETNODE(self)   (self)->n_node
 #define RBTREE_GETMINKEY(self) (self)->n_key
 #define RBTREE_GETMAXKEY(self) (self)->n_key

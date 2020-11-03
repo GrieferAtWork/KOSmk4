@@ -31,6 +31,7 @@
 #include <hybrid/atomic.h>
 
 #include <assert.h>
+#include <stddef.h>
 
 #include "vm-nodeapi.h"
 

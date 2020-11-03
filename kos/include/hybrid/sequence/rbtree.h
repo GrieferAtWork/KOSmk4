@@ -28,8 +28,17 @@
 		T *rb_lhs; /* [0..1] Child node with a key < the one of this node. */ \
 		T *rb_rhs; /* [0..1] Child node with a key > the one of this node. */ \
 	}
-#define RBTREE_ROOT(T) T *
 
+#define RBTREE_NODE_WITH_KEY(T, Tkey)                                           \
+	struct {                                                                    \
+		T   *rb_par; /* [0..1] Parent node, or NULL for the tree-root. */       \
+		T   *rb_lhs; /* [0..1] Child node with a key < the one of this node. */ \
+		T   *rb_rhs; /* [0..1] Child node with a key > the one of this node. */ \
+		Tkey rb_min;                                                            \
+		Tkey rb_max;                                                            \
+	}
+
+#define RBTREE_ROOT(T) T *
 
 
 #endif /* !__GUARD_HYBRID_SEQUENCE_RBTREE_H */
