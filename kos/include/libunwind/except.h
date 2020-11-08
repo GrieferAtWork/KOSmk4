@@ -29,13 +29,14 @@
 /* The KOS kernel uses a different exception ABI that isn't compatible with
  * IA-64, since it doesn't need to ensure binary compatibility with regular C++
  * exceptions, and only needs to support KOS exceptions (<kos/except.h>) */
-#ifndef __KERNEL__
+#if !defined(__KOS__) || !defined(__KERNEL__)
 #include <hybrid/__wordbits.h>
 
 #include <bits/types.h>
 
 #include "eh_frame.h"
 
+#ifdef __KOS__
 /* Exception class for KOS kernel exceptions (exceptions thrown through <kos/except.h>)
  * NOTE: Exceptions of this class behave somewhat different from other
  *       classes, in that unwinding happens (usually) in a single pass:
@@ -57,6 +58,7 @@
  * For more information, see `<kos/except-handler.h>'
  */
 #define _UEC_KERNKOS __ENCODE_INT64('K', 'E', 'R', 'N', 'K', 'O', 'S', '\0')
+#endif /* __KOS__ */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -260,6 +262,6 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_PURE,void *,__NOTHROW_NCX,_Unwind_FindEnclosing
 
 __DECL_END
 #endif /* __CC__ */
-#endif /* !__KERNEL__ */
+#endif /* !__KOS__ || !__KERNEL__ */
 
 #endif /* !_LIBUNWIND_EXCEPT_H */

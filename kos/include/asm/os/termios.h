@@ -24,6 +24,10 @@
 
 #if defined(__KOS__) || defined(__linux__)
 #include <asm/os/kos/termios.h>
+#elif defined(__NetBSD__)
+#include <asm/os/netbsd/termios.h>
+#elif defined(__FreeBSD__)
+#include <asm/os/freebsd/termios.h>
 #endif /* ... */
 
 /* Substitute default values. */

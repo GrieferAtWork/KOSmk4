@@ -17,24 +17,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_OS_TERMIOS_H
-#define _BITS_OS_TERMIOS_H 1
-
-/* File:
- *    <bits/os/termios.h>
- * 
- * Definitions:
- *    - struct termios { ... };
- */
+#ifndef _BITS_OS_NETBSD_TERMIOS_H
+#define _BITS_OS_NETBSD_TERMIOS_H 1
 
 #include <__stdinc.h>
 
-#if defined(__KOS__) || defined(__linux__)
-#include <bits/os/kos/termios.h>
-#elif defined(__NetBSD__)
-#include <bits/os/netbsd/termios.h>
-#elif defined(__FreeBSD__)
-#include <bits/os/freebsd/termios.h>
-#endif /* ... */
+#include <hybrid/typecore.h>
 
-#endif /* !_BITS_OS_TERMIOS_H */
+__DECL_BEGIN
+
+#ifdef __CC__
+typedef __UINT8_TYPE__ cc_t;
+typedef __UINT32_TYPE__ speed_t;
+typedef __UINT32_TYPE__ tcflag_t;
+#endif /* __CC__ */
+
+#define NCCS 20
+#ifdef __CC__
+struct termios {
+	tcflag_t c_iflag;
+	tcflag_t c_oflag;
+	tcflag_t c_cflag;
+	tcflag_t c_lflag;
+	cc_t     c_cc[NCCS];
+	int      c_ispeed;
+	int      c_ospeed;
+};
+#endif /* __CC__ */
+#define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
+#define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
+
+__DECL_END
+
+#endif /* !_BITS_OS_NETBSD_TERMIOS_H */

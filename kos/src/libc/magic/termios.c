@@ -47,6 +47,14 @@
  *   https://ftp.gnu.org/old-gnu/Manuals/glibc-2.2.3/html_node/libc_355.html
  */
 
+#ifndef __VDISABLE
+#define __VDISABLE '\0' /* `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
+#endif /* !__VDISABLE */
+
+#ifndef _POSIX_VDISABLE
+#define _POSIX_VDISABLE __VDISABLE /* `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
+#endif /* !_POSIX_VDISABLE */
+
 
 /* c_cc characters */
 #if !defined(VINTR) && defined(__VINTR)
@@ -100,6 +108,18 @@
 #if !defined(VEOL2) && defined(__VEOL2)
 #define VEOL2    __VEOL2    /* \0: An additional end-of-line character used to flush the canon (by default, only \n is recognized) */
 #endif /* !VEOL2 && __VEOL2 */
+#ifdef __USE_BSD
+#if !defined(VERASE2) && defined(__VERASE2)
+#define VERASE2  __VERASE2 /* ... */
+#endif /* !VERASE2 && __VERASE2 */
+#if !defined(VDSUSP) && defined(__VDSUSP)
+#define VDSUSP  __VDSUSP
+#endif /* !VDSUSP && __VDSUSP */
+#if !defined(VSTATUS) && defined(__VSTATUS)
+#define VSTATUS __VSTATUS
+#endif /* !VSTATUS && __VSTATUS */
+#endif /* __USE_BSD */
+
 
 /* c_iflag bits */
 #if !defined(IGNBRK) && defined(__IGNBRK)
@@ -247,6 +267,11 @@
 #define XTABS       __XTABS  /* ??? */
 #endif /* !XTABS && __XTABS */
 #endif /* __USE_MISC */
+#ifdef __USE_BSD
+#if !defined(ONOEOT) && defined(__ONOEOT)
+#define ONOEOT __ONOEOT
+#endif /* !ONOEOT && __ONOEOT */
+#endif /* __USE_BSD */
 
 /* c_cflag bit meaning */
 #ifdef __USE_MISC
@@ -393,6 +418,19 @@
 #if !defined(B4000000) && defined(__B4000000)
 #define B4000000  __B4000000
 #endif /* !B4000000 && __B4000000 */
+#if !defined(B7200) && defined(__B7200)
+#define B7200 __B7200
+#endif /* !B7200 && __B7200 */
+#if !defined(B14400) && defined(__B14400)
+#define B14400 __B14400
+#endif /* !B14400 && __B14400 */
+#if !defined(B28800) && defined(__B28800)
+#define B28800 __B28800
+#endif /* !B28800 && __B28800 */
+#if !defined(B76800) && defined(__B76800)
+#define B76800 __B76800
+#endif /* !B76800 && __B76800 */
+
 #ifdef __USE_MISC
 #if !defined(CIBAUD) && defined(__CIBAUD)
 #define CIBAUD    __CIBAUD /* input baud rate (not used) */
@@ -404,6 +442,29 @@
 #define CRTSCTS   __CRTSCTS /* flow control */
 #endif /* !CRTSCTS && __CRTSCTS */
 #endif /* __USE_MISC */
+#ifdef __USE_BSD
+#if !defined(CIGNORE) && defined(__CIGNORE)
+#define CIGNORE __CIGNORE
+#endif /* !CIGNORE && __CIGNORE */
+#if !defined(CCTS_OFLOW) && defined(__CCTS_OFLOW)
+#define CCTS_OFLOW __CCTS_OFLOW
+#endif /* !CCTS_OFLOW && __CCTS_OFLOW */
+#if !defined(CRTS_IFLOW) && defined(__CRTS_IFLOW)
+#define CRTS_IFLOW __CRTS_IFLOW
+#endif /* !CRTS_IFLOW && __CRTS_IFLOW */
+#if !defined(CDTR_IFLOW) && defined(__CDTR_IFLOW)
+#define CDTR_IFLOW __CDTR_IFLOW
+#endif /* !CDTR_IFLOW && __CDTR_IFLOW */
+#if !defined(CDSR_OFLOW) && defined(__CDSR_OFLOW)
+#define CDSR_OFLOW __CDSR_OFLOW
+#endif /* !CDSR_OFLOW && __CDSR_OFLOW */
+#if !defined(CCAR_OFLOW) && defined(__CCAR_OFLOW)
+#define CCAR_OFLOW __CCAR_OFLOW
+#endif /* !CCAR_OFLOW && __CCAR_OFLOW */
+#if !defined(CNO_RTSDTR) && defined(__CNO_RTSDTR)
+#define CNO_RTSDTR __CNO_RTSDTR
+#endif /* !CNO_RTSDTR && __CNO_RTSDTR */
+#endif /* __USE_BSD */
 
 /* c_lflag bits */
 #if !defined(ISIG) && defined(__ISIG)
@@ -474,6 +535,15 @@
 #define EXTPROC     __EXTPROC /* Skip handling of: `PARMRK', `ECHO' and `IXON'+`IXANY', as well as `c_cc[*]' */
 #endif /* !EXTPROC && __EXTPROC */
 #endif /* __USE_MISC */
+#if !defined(ALTWERASE) && defined(__ALTWERASE)
+#define ALTWERASE __ALTWERASE
+#endif /* !ALTWERASE && __ALTWERASE */
+#ifdef __USE_BSD
+#if !defined(NOKERNINFO) && defined(__NOKERNINFO)
+#define NOKERNINFO __NOKERNINFO
+#endif /* !NOKERNINFO && __NOKERNINFO */
+#endif /* __USE_BSD */
+
 
 /* tcflow() and TCXONC use these */
 #if !defined(TCOOFF) && defined(__TCOOFF)
@@ -510,6 +580,33 @@
 #if !defined(TCSAFLUSH) && defined(__TCSAFLUSH)
 #define TCSAFLUSH __TCSAFLUSH /* Wait for all unwritten data to be transmitted, then set terminal attributes (s.a. `TCSETAF') */
 #endif /* !TCSAFLUSH && __TCSAFLUSH */
+#ifdef __USE_BSD
+#if defined(TCSASOFT) && defined(__TCSASOFT)
+#define TCSASOFT __TCSASOFT /* Only modify the software state. */
+#endif /* TCSASOFT && !__TCSASOFT */
+#endif /* __USE_BSD */
+
+
+#ifdef __USE_BSD
+#ifndef OXTABS
+#ifdef __OXTABS
+#define OXTABS __OXTABS
+#elif defined(__TAB3)
+#define OXTABS __TAB3
+#endif /* ... */
+#endif /* !OXTABS */
+#if !defined(MDMBUF) && defined(__CCAR_OFLOW)
+#define MDMBUF __CCAR_OFLOW
+#endif /* !MDMBUF && __CCAR_OFLOW */
+#endif /* __USE_BSD */
+
+#if !defined(CDTRCTS) && defined(__CDTRCTS)
+#define CDTRCTS __CDTRCTS
+#endif /* !CDTRCTS && __CDTRCTS */
+#if !defined(CHWFLOW) && defined(__CHWFLOW)
+#define CHWFLOW __CHWFLOW
+#endif /* !CHWFLOW && __CHWFLOW */
+
 
 
 }
@@ -1059,8 +1156,8 @@ __SYSDECL_END
 %#endif /* __CC__ */
 %{
 
-#ifdef __USE_MISC
+#if defined(__USE_MISC) || defined(__USE_BSD)
 #define CCEQ(val, c) ((c) == (val) && (val) != _POSIX_VDISABLE)
-#endif /* __USE_MISC */
+#endif /* __USE_MISC || __USE_BSD */
 
 }
