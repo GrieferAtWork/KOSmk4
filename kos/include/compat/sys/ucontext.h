@@ -28,12 +28,13 @@
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/bits/os/mcontext.h> /* struct compat_mcontext */
 #include <compat/bits/os/ucontext.h> /* struct compat_ucontext */
+#include <compat/bits/types.h>
 
 #ifdef __COMPAT_MCONTEXT_NGREG
 #define COMPAT_NGREG __COMPAT_MCONTEXT_NGREG
 #endif /* __COMPAT_MCONTEXT_NGREG */
 
-#define __SIZEOF_COMPAT_GREG_T__  __ARCH_COMPAT_SIZEOF_REGISTER
+#define __SIZEOF_COMPAT_GREG_T__ __ARCH_COMPAT_SIZEOF_REGISTER
 
 #ifdef __CC__
 __DECL_BEGIN

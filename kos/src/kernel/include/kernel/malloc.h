@@ -440,9 +440,14 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
  * s.a. `heap_validate()' and `heap_validate_all()' */
 FUNDEF NOBLOCK void NOTHROW(KCALL kmalloc_validate)(void);
 
-/* Search for leaked heap memory, and return the total number of leaked blocks.
+/* Search for leaked heap memory, dump them to the system log, and return the
+ * total number of leaked blocks.
  * Note that to do what it does, this function has to temporarily elevate the
- * calling thread to super-override status (s.a. <sched/scheduler.h>) */
+ * calling thread to super-override status (s.a. <sched/scheduler.h>)
+ * This function is the combination of:
+ *     kmalloc_leaks_collect() +
+ *     kmalloc_leaks_print(printer: &syslog_printer, arg: SYSLOG_LEVEL_RAW) +
+ *     kmalloc_leaks_discard() */
 FUNDEF size_t KCALL kmalloc_leaks(void) THROWS(E_WOULDBLOCK);
 
 typedef void *kmalloc_leak_t;
@@ -470,7 +475,7 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks);
 #define kmalloc_leaks()                                   0
 #define kmalloc_leaks_collect()                           __NULLPTR
 #define kmalloc_leaks_print(leaks, printer, arg, pnum_leaks) \
-	(((pnum_leaks) ? (void)*(pnum_leaks) = 0 : (void)), (ssize_t)0)
+	((pnum_leaks) ? (void)(*(pnum_leaks) = 0) : (void)0, (ssize_t)0)
 #define kmalloc_leaks_discard(leaks) (void)0
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss")
@@ -487,12 +492,12 @@ public:
 	NOBLOCK _finally_kfree(void *&p) __CXX_NOEXCEPT: m_ptr(p) {}
 #ifndef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
 	NOBLOCK ~_finally_kfree() __CXX_NOEXCEPT { kfree(m_ptr); }
-#else
+#else /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 	NOBLOCK ~_finally_kfree() __CXX_NOEXCEPT { __os_free(m_ptr); }
-#endif
+#endif /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 };
 __NAMESPACE_INT_END
-}
+} /* extern "C++" */
 #define FINALLY_KFREE(ptr) __NAMESPACE_INT_SYM _finally_kfree __COMPILER_UNIQUE(__fkfptr)(ptr)
 #endif /* __cplusplus */
 

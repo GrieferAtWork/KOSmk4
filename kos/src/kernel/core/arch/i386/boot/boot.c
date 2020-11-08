@@ -407,6 +407,24 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: Add a user-space interface for reading the dmesg backlog, as well
+	 *       as establishing custom, pre-allocated buffers for syslog messages,
+	 *       essentially allowing user-space to register additional syslog sinks.
+	 * Once added, make use of this API to pipe syslog messages written by
+	 * insmod(1) and rmmod(1) to stdout and stderr (based on message severity). */
+
+	/* TODO: Alter all instances where the kernel currently uses <hybrid/sequence/atree.h> to
+	 *       instead make use of <hybrid/sequence/rbtree.h>. Doing this consistently may greatly
+	 *       improve performance throughout the kernel:
+	 *        - block_device_tree
+	 *        - character_device_tree
+	 *        - struct driver::d_eh_frame_cache
+	 *        - struct superblock::s_nodes
+	 *        - struct vm_futex_controller::fc_tree
+	 *        - struct vm::v_tree
+	 *        - struct vm_datablock::db_parts
+	 * TODO: Also make use of RB-trees to implement `struct epoll_controller::ec_list' */
+
 	/* TODO: Add `__USE_ISOC2X' to <features.h> */
 	/* TODO: Add FLT_NORM_MAX, DBL_NORM_MAX and LDBL_NORM_MAX to <float.h> under #ifdef __USE_ISOC2X
 	 *       Also add DEC32_TRUE_MIN, DEC64_TRUE_MIN and DEC128_TRUE_MIN, alongside everything from
@@ -414,8 +432,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       will also have to be adjusted) */
 
 	/* TODO: The kernel->user-space exception/posix-signal system needs a re-write.
-	 *       Right now, way too much of it resides in arch-specific code, and
-	 */
+	 *       Right now, way too much of it resides in arch-specific code, and it's
+	 *       way too hard to understand the actual control-flow! */
 
 	/* TODO: User-space VIO callback functions should only be allowed to
 	 *       throw a white-listed sub-set of exceptions. Or better yet:

@@ -1920,9 +1920,14 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks) {
 
 
 
-/* Search for leaked heap memory, and return the total number of leaked blocks.
+/* Search for leaked heap memory, dump them to the system log, and return the
+ * total number of leaked blocks.
  * Note that to do what it does, this function has to temporarily elevate the
- * calling thread to super-override status (s.a. <sched/scheduler.h>) */
+ * calling thread to super-override status (s.a. <sched/scheduler.h>)
+ * This function is the combination of:
+ *     kmalloc_leaks_collect() +
+ *     kmalloc_leaks_print(printer: &syslog_printer, arg: SYSLOG_LEVEL_RAW) +
+ *     kmalloc_leaks_discard() */
 PUBLIC ATTR_COLDTEXT ATTR_NOINLINE size_t KCALL
 kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 	size_t result;

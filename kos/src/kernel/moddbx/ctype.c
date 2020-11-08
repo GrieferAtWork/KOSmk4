@@ -1051,6 +1051,20 @@ err_nomem:
 	goto done;
 }
 
+/* Lookup the enum-name for a given `value'
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOENT: `self' isn't an enum type.
+ * @return: DBX_ENOENT: No name associated with `value' */
+PUBLIC WUNUSED NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL ctype_enumname)(struct ctype *__restrict self,
+                              /*out*/ struct ctypeenumname *__restrict result,
+                              intmax_t value) {
+	/* TODO */
+}
+
+
+
+
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */
 

@@ -32,8 +32,6 @@
 
 #include <libvio/access.h>
 
-#include "../memory/vm/vm-partapi.h"
-
 #ifdef __INTELLISENSE__
 #undef DEFINE_IO_ASYNC
 #undef DEFINE_IO_READ

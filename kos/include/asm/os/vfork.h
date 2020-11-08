@@ -59,7 +59,7 @@
  *    still run the handler, thinking it's the parent) and consequently
  *    close a file handle that remains open for the parent).
  * >> On KOS this problem is handled differently, such that a thread with
- *    the `TASK_FVFORK' flag set is be handled as though `sigmask_getrd()'
+ *    the `TASK_FVFORK' flag set is handled as though `sigmask_getrd()'
  *    always returned a signal mask identical to `&kernel_sigmask_full'
  * >> As far as semantics go, you can think of `__ARCH_HAVE_SIGBLOCK_VFORK'
  *    like this:
@@ -67,7 +67,7 @@
  *    >> #define vfork_with_sigmask() vfork()
  *    >> #else // __ARCH_HAVE_SIGBLOCK_VFORK
  *    >> // NOTES:
- *    >> //   - `run_after_exec()' can't be implemented in user-space,
+ *    >> //   - `RUN_AFTER_EXEC()' can't be implemented in user-space,
  *    >> //     but like the name would suggest, this is a piece of code
  *    >> //     that is run by the kernel after a successful exec(), but
  *    >> //     before the newly exec'd program first gains control.
@@ -79,9 +79,9 @@
  *    >>    ({                                                   \
  *    >>        sigset_t _nmask, _omask;                         \
  *    >>        pid_t _pid;                                      \
- *    >>        sigemptyset(&_nmask);                            \
- *    >>        sigaddset(SIGKILL, &_nmask);                     \
- *    >>        sigaddset(SIGSTOP, &_nmask);                     \
+ *    >>        sigfillset(&_nmask);                             \
+ *    >>        sigdelset(SIGKILL, &_nmask);                     \
+ *    >>        sigdelset(SIGSTOP, &_nmask);                     \
  *    >>        sigprocmask(SIG_SETMASK, &_nmask, &_omask);      \
  *    >>        _pid = vfork();                                  \
  *    >>        if (_pid == 0) {                                 \

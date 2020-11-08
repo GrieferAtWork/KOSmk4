@@ -71,9 +71,14 @@ NOTHROW(KCALL mutex_tryacquire)(struct mutex *__restrict self) {
 	return true;
 }
 
+/* TODO: `mutex_tryacquire_after_failure()'
+ * Same as `mutex_tryacquire()', but allowed to assume that `m_owner != THIS_TASK'
+ * Also add the same variant for `mutex_acquire()' */
+
+
 /* Same as `mutex_acquire()', but it's unlikely that
  * the lock can be acquired without blocking. */
-#define mutex_acquire_unlikely mutex_acquire
+#define mutex_acquire_unlikely mutex_acquire /* TODO: Implement using connect+test, rather than test+connect+test */
 
 /* Acquire a lock to the given mutex, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.

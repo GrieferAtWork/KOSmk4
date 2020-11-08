@@ -26,44 +26,45 @@
 
 #undef __ARCH_HAVE_COMPAT
 #if 0
-#include <hybrid/typecore.h>
 #include <hybrid/__pointer.h>
+#include <hybrid/typecore.h>
 
-#define __ARCH_HAVE_COMPAT 1
+#define __ARCH_HAVE_COMPAT                            1
 #define __ARCH_COMPAT_FUNCPTR(return, cc, name, args) __HYBRID_FUNCPTRnn(return, cc, name, args)
 #define __ARCH_COMPAT(x)                              x##nn
 
 #define __ARCH_COMPAT_SIZEOF_POINTER nn
-#define __ARCH_COMPAT_PTR(T)        __HYBRID_PTRnn(T)
-#define __ARCH_COMPAT_INTPTR_TYPE   __INTnn_TYPE__
-#define __ARCH_COMPAT_LONGPTR_TYPE  __LONGnn_TYPE__
-#define __ARCH_COMPAT_UINTPTR_TYPE  __UINTnn_TYPE__
-#define __ARCH_COMPAT_ULONGPTR_TYPE __ULONGnn_TYPE__
+#define __ARCH_COMPAT_PTR(T)         __HYBRID_PTRnn(T)
+#define __ARCH_COMPAT_INTPTR_TYPE    __INTnn_TYPE__
+#define __ARCH_COMPAT_LONGPTR_TYPE   __LONGnn_TYPE__
+#define __ARCH_COMPAT_UINTPTR_TYPE   __UINTnn_TYPE__
+#define __ARCH_COMPAT_ULONGPTR_TYPE  __ULONGnn_TYPE__
 
 #define __ARCH_COMPAT_SIZEOF_REGISTER nn
-#define __ARCH_COMPAT_REGISTER_T  __ULONGnn_TYPE__
-#define __ARCH_COMPAT_SREGISTER_T __LONGnn_TYPE__
+#define __ARCH_COMPAT_REGISTER_T      __ULONGnn_TYPE__
+#define __ARCH_COMPAT_SREGISTER_T     __LONGnn_TYPE__
 
-#define __ARCH_COMPAT_SIZEOF_SIZE_T nn
-#define __ARCH_COMPAT_SIZE_T  __ULONGnn_TYPE__
-#define __ARCH_COMPAT_SSIZE_T __LONGnn_TYPE__
-#define __ARCH_COMPAT_PTRDIFF_T __LONGnn_TYPE__
+#define __ARCH_COMPAT_SIZEOF_SIZE_T    nn
+#define __ARCH_COMPAT_SIZEOF_PTRDIFF_T nn
+#define __ARCH_COMPAT_SIZE_T           __ULONGnn_TYPE__
+#define __ARCH_COMPAT_SSIZE_T          __LONGnn_TYPE__
+#define __ARCH_COMPAT_PTRDIFF_T        __LONGnn_TYPE__
 
 #define __ARCH_COMPAT_SIZEOF_SHORT nn
-#define __ARCH_COMPAT_SHORT  __INTnn_TYPE__
-#define __ARCH_COMPAT_USHORT __UINTnn_TYPE__
+#define __ARCH_COMPAT_SHORT        __INTnn_TYPE__
+#define __ARCH_COMPAT_USHORT       __UINTnn_TYPE__
 
 #define __ARCH_COMPAT_SIZEOF_INT nn
-#define __ARCH_COMPAT_INT  __INTnn_TYPE__
-#define __ARCH_COMPAT_UINT __UINTnn_TYPE__
+#define __ARCH_COMPAT_INT        __INTnn_TYPE__
+#define __ARCH_COMPAT_UINT       __UINTnn_TYPE__
 
 #define __ARCH_COMPAT_SIZEOF_LONG nn
-#define __ARCH_COMPAT_LONG  __LONGnn_TYPE__
-#define __ARCH_COMPAT_ULONG __ULONGnn_TYPE__
+#define __ARCH_COMPAT_LONG        __LONGnn_TYPE__
+#define __ARCH_COMPAT_ULONG       __ULONGnn_TYPE__
 
 #define __ARCH_COMPAT_SIZEOF_LLONG nn
-#define __ARCH_COMPAT_LLONG  __LONGnn_TYPE__
-#define __ARCH_COMPAT_ULLONG __ULONGnn_TYPE__
+#define __ARCH_COMPAT_LLONG        __LONGnn_TYPE__
+#define __ARCH_COMPAT_ULLONG       __ULONGnn_TYPE__
 
 #endif
 

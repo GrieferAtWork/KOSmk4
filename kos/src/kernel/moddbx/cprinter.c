@@ -533,72 +533,81 @@ ctype_printvalue(struct ctype const *__restrict self,
                  void const *__restrict buf, unsigned int flags,
                  size_t firstline_indent, size_t newline_indent,
                  size_t newline_tab, size_t maxlinelen) {
-	ssize_t temp, result;
-	switch (CTYPE_KIND_CLASSOF(self->ct_kind)) {
-
-	case CTYPE_KIND_CLASSOF(CTYPE_KIND_VOID):
-		result = RAWPRINT("(void)0");
-		break;
-
-	case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL): {
-		bool is_nonzero;
-		TRY {
-			is_nonzero = false;
-		} EXCEPT {
+	ssize_t temp, result = 0;
+	TRY {
+		switch (CTYPE_KIND_CLASSOF(self->ct_kind)) {
+	
+		case CTYPE_KIND_CLASSOF(CTYPE_KIND_VOID):
+			result = RAWPRINT("(void)0");
+			break;
+	
+		case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL): {
+			bool is_nonzero = false;
+			size_t i;
+			for (i = 0; i < CTYPE_KIND_SIZEOF(self->ct_kind); ++i) {
+				if (((byte_t *)buf)[i] != 0)
+					is_nonzero = true;
+			}
+			result = is_nonzero ? RAWPRINT("true")
+			                    : RAWPRINT("false");
+		}	break;
+	
+		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
+			if (CTYPE_KIND_ISENUM(self->ct_kind)) {
+				ctype_enumname();
+			} else {
+			}
+			break;
+	
+	#define CTYPE_KIND_Sn(sizeof)            (0x2000 | (sizeof))
+	#define CTYPE_KIND_S8                     0x2001
+	#define CTYPE_KIND_S16                    0x2002
+	#define CTYPE_KIND_S32                    0x2004
+	#define CTYPE_KIND_S64                    0x2008
+	#define CTYPE_KIND_Un(sizeof)            (0x2100 | (sizeof))
+	#define CTYPE_KIND_U8                     0x2101
+	#define CTYPE_KIND_U16                    0x2102
+	#define CTYPE_KIND_U32                    0x2104
+	#define CTYPE_KIND_U64                    0x2108
+	#define CTYPE_KIND_ENUM8                  0x2201
+	#define CTYPE_KIND_ENUM16                 0x2202
+	#define CTYPE_KIND_ENUM32                 0x2204
+	#define CTYPE_KIND_ENUM64                 0x2208
+	#define CTYPE_KIND_IEEE754_FLOAT          0x3004
+	#define CTYPE_KIND_IEEE754_DOUBLE         0x3008
+	#define CTYPE_KIND_IEEE854_LONG_DOUBLE_12 0x300c
+	#define CTYPE_KIND_IEEE854_LONG_DOUBLE_16 0x3010
+	#define CTYPE_KIND_STRUCT                 0x4000
+	#define CTYPE_KIND_UNION                  0x4100
+	#define CTYPE_KIND_PTR32                  0x8004
+	#define CTYPE_KIND_PTR64                  0x8008
+	#define CTYPE_KIND_ARRAY                  0x9000
+	#define CTYPE_KIND_FUNCTION               0xa000
+	#define    CTYPE_KIND_FUNPROTO_CCMASK     0x0700 /* == CTYPE_KIND_FLAGMASK */
+	#define    CTYPE_KIND_FUNPROTO_VARARGS    0x0800 /* FLAG: var-args function */
+	#if defined(__x86_64__) || defined(__i386__)
+	#define    CTYPE_KIND_FUNPROTO_CC_CDECL    0x0000
+	#define    CTYPE_KIND_FUNPROTO_CC_FASTCALL 0x0100
+	#define    CTYPE_KIND_FUNPROTO_CC_STDCALL  0x0200
+	#ifdef __x86_64__
+	#define    CTYPE_KIND_FUNPROTO_CC_SYSVABI  0x0400
+	#define    CTYPE_KIND_FUNPROTO_CC_MSABI    0x0500
+	#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT                                                \
+		(__KOS64_IS_CS32BIT(x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) \
+		 ? CTYPE_KIND_FUNPROTO_CC_CDECL                                                      \
+		 : CTYPE_KIND_FUNPROTO_CC_SYSVABI)
+	#else /* __x86_64__ */
+	#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT  CTYPE_KIND_FUNPROTO_CC_CDECL
+	#endif /* !__x86_64__ */
+	#else /* __x86_64__ || __i386__ */
+	#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT 0x0000
+	#endif /* !__x86_64__ && !__i386__ */
+	
+		default:
+			break;
 		}
-
-	}	break;
-
-#define CTYPE_KIND_BOOL8                  0x1001
-#define CTYPE_KIND_BOOL16                 0x1002
-#define CTYPE_KIND_BOOL32                 0x1004
-#define CTYPE_KIND_BOOL64                 0x1008
-#define CTYPE_KIND_Sn(sizeof)            (0x2000 | (sizeof))
-#define CTYPE_KIND_S8                     0x2001
-#define CTYPE_KIND_S16                    0x2002
-#define CTYPE_KIND_S32                    0x2004
-#define CTYPE_KIND_S64                    0x2008
-#define CTYPE_KIND_Un(sizeof)            (0x2100 | (sizeof))
-#define CTYPE_KIND_U8                     0x2101
-#define CTYPE_KIND_U16                    0x2102
-#define CTYPE_KIND_U32                    0x2104
-#define CTYPE_KIND_U64                    0x2108
-#define CTYPE_KIND_ENUM8                  0x2201
-#define CTYPE_KIND_ENUM16                 0x2202
-#define CTYPE_KIND_ENUM32                 0x2204
-#define CTYPE_KIND_ENUM64                 0x2208
-#define CTYPE_KIND_IEEE754_FLOAT          0x3004
-#define CTYPE_KIND_IEEE754_DOUBLE         0x3008
-#define CTYPE_KIND_IEEE854_LONG_DOUBLE_12 0x300c
-#define CTYPE_KIND_IEEE854_LONG_DOUBLE_16 0x3010
-#define CTYPE_KIND_STRUCT                 0x4000
-#define CTYPE_KIND_UNION                  0x4100
-#define CTYPE_KIND_PTR32                  0x8004
-#define CTYPE_KIND_PTR64                  0x8008
-#define CTYPE_KIND_ARRAY                  0x9000
-#define CTYPE_KIND_FUNCTION               0xa000
-#define    CTYPE_KIND_FUNPROTO_CCMASK     0x0700 /* == CTYPE_KIND_FLAGMASK */
-#define    CTYPE_KIND_FUNPROTO_VARARGS    0x0800 /* FLAG: var-args function */
-#if defined(__x86_64__) || defined(__i386__)
-#define    CTYPE_KIND_FUNPROTO_CC_CDECL    0x0000
-#define    CTYPE_KIND_FUNPROTO_CC_FASTCALL 0x0100
-#define    CTYPE_KIND_FUNPROTO_CC_STDCALL  0x0200
-#ifdef __x86_64__
-#define    CTYPE_KIND_FUNPROTO_CC_SYSVABI  0x0400
-#define    CTYPE_KIND_FUNPROTO_CC_MSABI    0x0500
-#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT                                                \
-	(__KOS64_IS_CS32BIT(x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) \
-	 ? CTYPE_KIND_FUNPROTO_CC_CDECL                                                      \
-	 : CTYPE_KIND_FUNPROTO_CC_SYSVABI)
-#else /* __x86_64__ */
-#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT  CTYPE_KIND_FUNPROTO_CC_CDECL
-#endif /* !__x86_64__ */
-#else /* __x86_64__ || __i386__ */
-#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT 0x0000
-#endif /* !__x86_64__ && !__i386__ */
-
-	default:
-		break;
+	} EXCEPT {
+		PRINT("<segfault>");
 	}
 	return result;
 err:

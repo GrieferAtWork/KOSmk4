@@ -72,9 +72,6 @@
 
 #include <libvio/access.h>
 
-#include "../memory/vm/vm-partapi.h"
-
-
 /* Define the ABI for the address tree used by vm. */
 #define ATREE(x)      inode_tree_##x
 #define ATREE_FUN     INTDEF

@@ -1019,7 +1019,7 @@ struct vm_datablock {
 #ifdef LIBVIO_CONFIG_ENABLED
 	struct vio_operators const         *db_vio;    /* [0..1][const] VIO callbacks (or NULL if the datablock doesn't use VIO). */
 #endif /* LIBVIO_CONFIG_ENABLED */
-	REF LLIST(struct vm_datapart)       db_parts;  /* [0..1][lock(db_lock)] The first part of this datablock.
+	REF ATREE_HEAD(struct vm_datapart)  db_parts;  /* [0..1][lock(db_lock)] The first part of this datablock.
 	                                                * NOTE: When set to `VM_DATABLOCK_ANONPARTS', new parts are always
 	                                                *       allocated anonymously, and never added to the actual datablock.
 	                                                * NOTE: Due the process of anonymizing a data block, this field is set

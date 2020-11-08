@@ -430,8 +430,7 @@ typedef __bitwise__ __UINT64_TYPE__ __be64;
 
 /* Special types that may require typedef-s */
 #if __SIZEOF_CADDR_T__ == __SIZEOF_POINTER__
-typedef char *__caddr_t;
-#define __caddr_t __caddr_t
+#define __caddr_t char *
 #else /* __SIZEOF_CADDR_T__ == __SIZEOF_POINTER__ */
 #define __caddr_t __CRT_PRIVATE_ULNG(__SIZEOF_CADDR_T__)
 #endif /* __SIZEOF_CADDR_T__ != __SIZEOF_POINTER__ */
@@ -448,8 +447,7 @@ typedef struct { __INT8_TYPE__  __val[__SIZEOF_FSID_T__]; } __fsid_t;
 #define __fsid_t __fsid_t
 
 #if __SIZEOF_TIMER_T__ == __SIZEOF_POINTER__
-typedef void *__timer_t;
-#define __timer_t __timer_t
+#define __timer_t void *
 #else /* __SIZEOF_TIMER_T__ == __SIZEOF_POINTER__ */
 #define __timer_t __CRT_PRIVATE_ULNG(__SIZEOF_TIMER_T__)
 #endif /* __SIZEOF_TIMER_T__ != __SIZEOF_POINTER__ */

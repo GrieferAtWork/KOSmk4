@@ -34,6 +34,7 @@
 #include <kos/exec/module.h>
 
 #include <ieee754.h>
+#include <stdint.h> /* intmax_t */
 
 #include <libdebuginfo/debug_info.h>
 
@@ -270,6 +271,23 @@ NOTHROW(FCALL ctype_common)(struct ctype *a,
  * @param: buflen: The required buffer size to hold `regno' */
 FUNDEF WUNUSED REF struct ctype *
 NOTHROW(FCALL ctype_for_register)(unsigned int regno, size_t buflen);
+
+struct ctypeenumname {
+	char const             *en_name;    /* [1..1] Name of the enum. */
+	REF struct debugmodule *en_nameref; /* [1..1] Module reference for keeping `en_name' alive. */
+};
+#define ctypeenumname_fini(self) decref((self)->en_nameref)
+
+
+/* Lookup the enum-name for a given `value'
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOENT: `self' isn't an enum type.
+ * @return: DBX_ENOENT: No name associated with `value' */
+FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL ctype_enumname)(struct ctype *__restrict self,
+                              /*out*/ struct ctypeenumname *__restrict result,
+                              intmax_t value);
+
 
 
 
@@ -530,7 +548,7 @@ DATDEF struct ctype ctype_char32_t_const_compat_ptr;
 #ifdef __ARCH_HAVE_COMPAT
 #define ctype_compat_size_t    ctype_uN(__ARCH_COMPAT_SIZEOF_SIZE_T)
 #define ctype_compat_ssize_t   ctype_sN(__ARCH_COMPAT_SIZEOF_SIZE_T)
-#define ctype_compat_ptrdiff_t ctype_sN(__ARCH_COMPAT_SIZEOF_SIZE_T)
+#define ctype_compat_ptrdiff_t ctype_sN(__ARCH_COMPAT_SIZEOF_PTRDIFF_T)
 #define ctype_compat_intptr_t  ctype_sN(__ARCH_COMPAT_SIZEOF_POINTER)
 #define ctype_compat_uintptr_t ctype_uN(__ARCH_COMPAT_SIZEOF_POINTER)
 #endif /* __ARCH_HAVE_COMPAT */

@@ -28,8 +28,6 @@
 
 #include <hybrid/overflow.h>
 
-#include "../memory/vm/vm-partapi.h"
-
 DECL_BEGIN
 
 #ifdef DEFINE_IO_READ

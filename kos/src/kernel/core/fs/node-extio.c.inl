@@ -30,8 +30,6 @@
 
 #include <hybrid/overflow.h>
 
-#include "../memory/vm/vm-partapi.h"
-
 DECL_BEGIN
 
 #if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
