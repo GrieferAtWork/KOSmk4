@@ -19,4 +19,12 @@
  */
 #ifndef ____mbstate_t_defined
 #include <bits/crt/mbstate.h>
+#ifndef ____mbstate_t_defined
+#define ____mbstate_t_defined 1
+#ifdef __CC__
+__DECL_BEGIN
+typedef struct __mbstate __mbstate_t;
+__DECL_END
+#endif /* __CC__ */
+#endif /* !____mbstate_t_defined */
 #endif /* !____mbstate_t_defined */

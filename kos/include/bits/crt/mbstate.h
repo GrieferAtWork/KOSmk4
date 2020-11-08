@@ -29,13 +29,11 @@
 __SYSDECL_BEGIN
 
 #ifdef __CC__
-#ifndef ____mbstate_t_defined
-#define ____mbstate_t_defined 1
-typedef struct __ATTR_PACKED __mbstate {
+struct __ATTR_PACKED __mbstate {
 	/* This structure must not exceed 4 bytes, so we
 	 * can conform to DOS's 4-byte `mbstate_t' structure. */
 	__UINT32_TYPE__  __word;
-} __mbstate_t;
+};
 #define __MBSTATE_ISINIT(x) ((x)->__word == 0)
 #define __MBSTATE_INIT      { 0 }
 
@@ -67,7 +65,6 @@ typedef struct __ATTR_PACKED __mbstate {
 #define __MBSTATE_NBIT_MASK   0xf8000000
 #define __MBSTATE_NBIT_SHFT   27
 #define __MBSTATE_DATA_MASK   0x07ffffff
-#endif /* !____mbstate_t_defined */
 
 #ifdef __USE_KOS
 #ifndef MBSTATE_INIT

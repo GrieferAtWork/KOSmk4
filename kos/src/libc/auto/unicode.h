@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x393c11a8 */
+/* HASH CRC-32:0x136bebf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,10 @@
 
 DECL_BEGIN
 
+#ifndef __mbstate_t_defined
+#define __mbstate_t_defined 1
+typedef struct __mbstate mbstate_t;
+#endif /* !__mbstate_t_defined */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Read a single Unicode character from a given UTF-8 string */
 INTDEF NONNULL((1)) char32_t NOTHROW_NCX(LIBDCALL libd_unicode_readutf8)(char const **__restrict ptext);
@@ -238,26 +242,26 @@ INTDEF ATTR_RETNONNULL NONNULL((1, 2)) char16_t *NOTHROW_NCX(LIBCCALL libc_unico
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, __mbstate_t *__restrict mbs);
+INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, __mbstate_t *__restrict mbs);
+INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, __mbstate_t *__restrict mbs);
+INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, __mbstate_t *__restrict mbs);
+INTDEF NONNULL((1, 2, 4)) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Format printer (compatible with `__pformatprinter') for

@@ -192,6 +192,7 @@ incdir("");
 #include <asm/os/stropts.h>
 #include <asm/os/swap.h>
 #include <asm/os/syslog.h>
+#include <asm/os/termios.h>
 #include <asm/os/timerfd.h>
 #include <asm/os/timex.h>
 #include <asm/os/tty.h>
@@ -953,8 +954,12 @@ incdir("");
 #include <struct.h>
 #include <sys/_default_fcntl.h>
 #include <sys/_intsup.h>
+#include <sys/_iovec.h>
+#include <sys/_null.h>
 #include <sys/_pthreadtypes.h>
 #include <sys/_sigset.h>
+#include <sys/_sockaddr_storage.h>
+#include <sys/_stdarg.h>
 #include <sys/_stdint.h>
 #include <sys/_timespec.h>
 #include <sys/_timeval.h>
@@ -1041,6 +1046,7 @@ incdir("");
 #include <sys/timeb.h>
 #include <sys/timerfd.h>
 #include <sys/times.h>
+#include <sys/timespec.h>
 #include <sys/timex.h>
 #include <sys/ttychars.h>
 #include <sys/ttydefaults.h>

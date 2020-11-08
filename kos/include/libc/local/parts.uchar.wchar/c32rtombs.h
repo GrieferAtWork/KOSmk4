@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa1fc90e */
+/* HASH CRC-32:0x67991e2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,18 +45,18 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_uchar_c32rtomb_defined
 #define __local___localdep_uchar_c32rtomb_defined 1
 #if defined(__CRT_HAVE_wcrtomb) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_KOS$wcrtomb)
-__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs),wcrtomb,(__str,__wc,__mbs))
+__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, struct __mbstate *__mbs),wcrtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_c32rtomb) && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs),c32rtomb,(__str,__wc,__mbs))
+__CREDIRECT(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, struct __mbstate *__mbs),c32rtomb,(__str,__wc,__mbs))
 #elif defined(__CRT_HAVE_KOS$c32rtomb)
-__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs),c32rtomb,(__str,__wc,__mbs))
+__CREDIRECT_KOS(,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_uchar_c32rtomb,(char *__restrict __str, __CHAR32_TYPE__ __wc, struct __mbstate *__mbs),c32rtomb,(__str,__wc,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcrtomb.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_uchar_c32rtomb (*(__SIZE_TYPE__(__LIBKCALL *)(char *__restrict, __CHAR32_TYPE__, __mbstate_t *))&__LIBC_LOCAL_NAME(wcrtomb))
+#define __localdep_uchar_c32rtomb (*(__SIZE_TYPE__(__LIBKCALL *)(char *__restrict, __CHAR32_TYPE__, struct __mbstate *))&__LIBC_LOCAL_NAME(wcrtomb))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/uchar/uchar_c32rtomb.h>
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_uchar_c32rtomb_defined */
 __LOCAL_LIBC(c32rtombs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rtombs))(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs) {
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32rtombs))(char *__dst, __CHAR32_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs) {
 	__SIZE_TYPE__ __result = 0;
 	__CHAR32_TYPE__ const *__src = *__psrc;
 	while (__dstlen) {

@@ -131,7 +131,7 @@ typedef __ssize_t _ssize_t;
 #ifndef __machine_mbstate_t_defined
 #define __machine_mbstate_t_defined 1
 #include <bits/crt/mbstate.h>
-typedef __mbstate_t _mbstate_t;
+typedef struct __mbstate _mbstate_t;
 #endif /* !__machine_mbstate_t_defined */
 
 #ifndef __machine_iconv_t_defined
@@ -144,7 +144,7 @@ typedef void *_iconv_t;
 #define _CLOCK_T_ __clock_t
 #endif /* !__machine_clock_t_defined */
 
-#define	_TIME_T_ __TM_TYPE(time)
+#define _TIME_T_ __TM_TYPE(time)
 typedef __TM_TYPE(time) __time_t;
 
 #ifndef __machine_clockid_t_defined
@@ -164,7 +164,35 @@ typedef __TM_TYPE(time) __time_t;
 typedef int __nl_item;
 typedef __builtin_va_list __va_list;
 
+/* Some more types from BSD */
+typedef __uint32_t __fflags_t;
+typedef __FS_TYPE(ino) __ino_t;
+typedef __pid_t __lwpid_t;
+typedef int __accmode_t;
+typedef __int64_t __rlim_t;
+typedef __fd_t __mqd_t; /* mqd_t */
+typedef int __cpuwhich_t;
+typedef int __cpulevel_t;
+typedef int __cpusetid_t;
+typedef int __ct_rune_t;
+typedef __ct_rune_t __rune_t;
+typedef __WINT_TYPE__ __wint_t;
+/*typedef __CHAR16_TYPE__ __char16_t;*/
+/*typedef __CHAR32_TYPE__ __char32_t;*/
+typedef __MAX_ALIGN_TYPE__ __max_align_t;
+typedef __uint32_t __fixpt_t;
+#ifndef ____mbstate_t_defined
+#define ____mbstate_t_defined 1
+typedef struct __mbstate __mbstate_t;
+#endif /* !____mbstate_t_defined */
+typedef __uintmax_t __rman_res_t;
+typedef __builtin_va_list __gnuc_va_list;
+
 __DECL_END
 #endif /* __CC__ */
+
+#if __SIZEOF_INO_T__ > 4
+#define __INO64 /* 64-bit ino_t */
+#endif /* __SIZEOF_INO_T__ > 4 */
 
 #endif /* !_SYS__TYPES_H */

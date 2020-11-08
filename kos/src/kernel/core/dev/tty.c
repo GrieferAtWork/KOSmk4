@@ -43,12 +43,13 @@
 #include <hybrid/atomic.h>
 
 #include <kos/except/reason/inval.h>
+#include <sys/ioctl.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <stddef.h>
 #include <string.h>
-#include <termios.h> /* For ioctl() commands */
+#include <termios.h>
 
 DECL_BEGIN
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc32fec61 */
+/* HASH CRC-32:0x4ae6b0f9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,42 +54,95 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_cfsetispeed)(struct termios *_
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p, speed_t speed);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Get terminal attributes */
+/* >> tcgetattr(3)
+ * Get terminal attributes */
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_tcgetattr)(fd_t fd, struct termios *__restrict termios_p);
-/* Set terminal attributes
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tcgetattr(3)
+ * Get terminal attributes */
+INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd, struct termios *__restrict termios_p);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> tcsetattr(3)
+ * Set terminal attributes
  * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBDCALL libd_tcsetattr)(fd_t fd, __STDC_INT_AS_UINT_T optional_actions, struct termios const *__restrict termios_p);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tcsetattr(3)
+ * Set terminal attributes
+ * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
+INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd, __STDC_INT_AS_UINT_T optional_actions, struct termios const *__restrict termios_p);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsendbreak)(fd_t fd, int duration);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsendbreak)(fd_t fd, int duration);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_RPC(LIBDCALL libd_tcdrain)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_RPC(LIBCCALL libc_tcdrain)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_tcflush)(fd_t fd, __STDC_INT_AS_UINT_T queue_selector);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_tcflush)(fd_t fd, __STDC_INT_AS_UINT_T queue_selector);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_tcflow)(fd_t fd, __STDC_INT_AS_UINT_T action);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_tcflow)(fd_t fd, __STDC_INT_AS_UINT_T action);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF pid_t NOTHROW_NCX(LIBDCALL libd_tcgetsid)(fd_t fd);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsetsid)(fd_t fd, pid_t pid);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd, pid_t pid);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_cfsetspeed)(struct termios *__restrict termios_p, speed_t speed);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p, speed_t speed);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
+/* >> cfmakeraw(3)
+ * Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
  * This entails the CANON and all control characters being disabled, as well as
  * any sort of input/output text processing no longer taking place. */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_cfmakeraw)(struct termios *__restrict termios_p);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
+/* >> cfmakeraw(3)
+ * Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
  * This entails the CANON and all control characters being disabled, as well as
  * any sort of input/output text processing no longer taking place. */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
+/* >> cfmakesane(3)
+ * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_cfmakesane)(struct termios *__restrict termios_p);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
+/* >> cfmakesane(3)
+ * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p);
 

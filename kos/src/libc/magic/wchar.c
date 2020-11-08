@@ -20,7 +20,7 @@
 
 %[define_ccompat_header("cwchar")]
 
-%[define_replacement(mbstate_t = __mbstate_t)]
+%[define_replacement(mbstate_t = "struct __mbstate")]
 %[define_replacement(wchar_t = __WCHAR_TYPE__)]
 %[define_replacement(wint_t = __WINT_TYPE__)]
 %[define_replacement(WEOF = __WEOF)]
@@ -87,7 +87,7 @@ __SYSDECL_BEGIN
 #ifndef __std_mbstate_t_defined
 #define __std_mbstate_t_defined 1
 __NAMESPACE_STD_BEGIN
-typedef __mbstate_t mbstate_t;
+typedef struct __mbstate mbstate_t;
 __NAMESPACE_STD_END
 #endif /* !__std_mbstate_t_defined */
 

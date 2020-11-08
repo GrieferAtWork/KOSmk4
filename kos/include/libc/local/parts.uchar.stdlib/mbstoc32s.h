@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c0bb4b3 */
+/* HASH CRC-32:0xa12626d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,17 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtoc32,(__CHAR32_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtoc32,(__CHAR32_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
 #elif defined(__CRT_HAVE_KOS$mbsrtowcs)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtoc32,(__CHAR32_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
+__CREDIRECT_KOS(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtoc32,(__CHAR32_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
 #elif __SIZEOF_WCHAR_T__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/mbsrtowcs.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_mbsrtoc32 (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ *__restrict, char const **__restrict, __SIZE_TYPE__, __mbstate_t *))&__LIBC_LOCAL_NAME(mbsrtowcs))
+#define __localdep_mbsrtoc32 (*(__SIZE_TYPE__(__LIBKCALL *)(__CHAR32_TYPE__ *__restrict, char const **__restrict, __SIZE_TYPE__, struct __mbstate *))&__LIBC_LOCAL_NAME(mbsrtowcs))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.uchar.wchar/mbsrtoc32.h>

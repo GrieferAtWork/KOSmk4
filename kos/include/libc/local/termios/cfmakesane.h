@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb5c7532 */
+/* HASH CRC-32:0x806aaed2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,167 +43,168 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_memset */
 #endif /* !__local___localdep_memset_defined */
 __NAMESPACE_LOCAL_END
-#include <sys/ttydefaults.h>
 #include <bits/posix_opt.h>
+#include <asm/os/termios.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
+/* >> cfmakesane(3)
+ * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
 __LOCAL_LIBC(cfmakesane) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfmakesane))(struct termios *__restrict __termios_p) {
 	/* Set sane values. */
 	__localdep_memset(__termios_p, 0, sizeof(*__termios_p));
-#ifdef TTYDEF_CFLAG
-	__termios_p->c_cflag  = TTYDEF_CFLAG;
-#endif /* TTYDEF_CFLAG */
-#ifdef TTYDEF_IFLAG
-	__termios_p->c_iflag  = TTYDEF_IFLAG;
-#endif /* TTYDEF_IFLAG */
-#ifdef TTYDEF_LFLAG
-	__termios_p->c_lflag  = TTYDEF_LFLAG;
-#endif /* TTYDEF_LFLAG */
-#ifdef TTYDEF_OFLAG
-	__termios_p->c_oflag  = TTYDEF_OFLAG;
-#endif /* TTYDEF_OFLAG */
-#ifdef TTYDEF_SPEED
-	__termios_p->c_ispeed = TTYDEF_SPEED;
-	__termios_p->c_ospeed = TTYDEF_SPEED;
-#endif /* TTYDEF_SPEED */
-#ifndef _POSIX_VDISABLE
-#define _POSIX_VDISABLE '\0'
-#endif /* !condition */
-#ifdef VINTR
-#ifdef CINTR
-	__termios_p->c_cc[VINTR] = CINTR;
-#else /* CINTR */
-	__termios_p->c_cc[VINTR] = _POSIX_VDISABLE;
-#endif /* !CINTR */
-#endif /* VINTR */
-#ifdef VQUIT
-#ifdef CQUIT
-	__termios_p->c_cc[VQUIT] = CQUIT;
-#else /* CQUIT */
-	__termios_p->c_cc[VQUIT] = _POSIX_VDISABLE;
-#endif /* !CQUIT */
-#endif /* VQUIT */
-#ifdef VERASE
-#ifdef CERASE
-	__termios_p->c_cc[VERASE] = CERASE;
-#else /* CERASE */
-	__termios_p->c_cc[VERASE] = _POSIX_VDISABLE;
-#endif /* !CERASE */
-#endif /* VERASE */
-#ifdef VKILL
-#ifdef CKILL
-	__termios_p->c_cc[VKILL] = CKILL;
-#else /* CKILL */
-	__termios_p->c_cc[VKILL] = _POSIX_VDISABLE;
-#endif /* !CKILL */
-#endif /* VKILL */
-#ifdef VEOF
-#ifdef CEOF
-	__termios_p->c_cc[VEOF] = CEOF;
-#else /* CEOF */
-	__termios_p->c_cc[VEOF] = _POSIX_VDISABLE;
-#endif /* !CEOF */
-#endif /* VEOF */
-#ifdef VTIME
-#ifdef CTIME
-	__termios_p->c_cc[VTIME] = CTIME;
-#else /* CTIME */
-	__termios_p->c_cc[VTIME] = _POSIX_VDISABLE;
-#endif /* !CTIME */
-#endif /* VTIME */
-#ifdef VMIN
-#ifdef CMIN
-	__termios_p->c_cc[VMIN] = CMIN;
-#else /* CMIN */
-	__termios_p->c_cc[VMIN] = _POSIX_VDISABLE;
-#endif /* !CMIN */
-#endif /* VMIN */
-#ifdef VSWTCH
-#ifdef CSWTCH
-	__termios_p->c_cc[VSWTCH] = CSWTCH;
-#else /* CSWTCH */
-	__termios_p->c_cc[VSWTCH] = _POSIX_VDISABLE;
-#endif /* !CSWTCH */
-#endif /* VSWTCH */
-#ifdef VSTART
-#ifdef CSTART
-	__termios_p->c_cc[VSTART] = CSTART;
-#else /* CSTART */
-	__termios_p->c_cc[VSTART] = _POSIX_VDISABLE;
-#endif /* !CSTART */
-#endif /* VSTART */
-#ifdef VSTOP
-#ifdef CSTOP
-	__termios_p->c_cc[VSTOP] = CSTOP;
-#else /* CSTOP */
-	__termios_p->c_cc[VSTOP] = _POSIX_VDISABLE;
-#endif /* !CSTOP */
-#endif /* VSTOP */
-#ifdef VSUSP
-#ifdef CSUSP
-	__termios_p->c_cc[VSUSP] = CSUSP;
-#else /* CSUSP */
-	__termios_p->c_cc[VSUSP] = _POSIX_VDISABLE;
-#endif /* !CSUSP */
-#endif /* VSUSP */
-#ifdef VEOL
-#ifdef CEOL
-	__termios_p->c_cc[VEOL] = CEOL;
-#else /* CEOL */
-	__termios_p->c_cc[VEOL] = _POSIX_VDISABLE;
-#endif /* !CEOL */
-#endif /* VEOL */
-#ifdef VREPRINT
-#ifdef CREPRINT
-	__termios_p->c_cc[VREPRINT] = CREPRINT;
-#else /* CREPRINT */
-	__termios_p->c_cc[VREPRINT] = _POSIX_VDISABLE;
-#endif /* !CREPRINT */
-#endif /* VREPRINT */
-#ifdef VDISCARD
-#ifdef CDISCARD
-	__termios_p->c_cc[VDISCARD] = CDISCARD;
-#else /* CDISCARD */
-	__termios_p->c_cc[VDISCARD] = _POSIX_VDISABLE;
-#endif /* !CDISCARD */
-#endif /* VDISCARD */
-#ifdef VWERASE
-#ifdef CWERASE
-	__termios_p->c_cc[VWERASE] = CWERASE;
-#else /* CWERASE */
-	__termios_p->c_cc[VWERASE] = _POSIX_VDISABLE;
-#endif /* !CWERASE */
-#endif /* VWERASE */
-#ifdef VLNEXT
-#ifdef CLNEXT
-	__termios_p->c_cc[VLNEXT] = CLNEXT;
-#else /* CLNEXT */
-	__termios_p->c_cc[VLNEXT] = _POSIX_VDISABLE;
-#endif /* !CLNEXT */
-#endif /* VLNEXT */
-#ifdef VEOL2
-#ifdef CEOL2
-	__termios_p->c_cc[VEOL2] = CEOL2;
-#else /* CEOL2 */
-	__termios_p->c_cc[VEOL2] = _POSIX_VDISABLE;
-#endif /* !CEOL2 */
-#endif /* VEOL2 */
-#ifdef VDSUSP
-#ifdef CDSUSP
-	__termios_p->c_cc[VDSUSP] = CDSUSP;
-#else /* CDSUSP */
-	__termios_p->c_cc[VDSUSP] = _POSIX_VDISABLE;
-#endif /* !CDSUSP */
-#endif /* VDSUSP */
-#ifdef VSTATUS
-#ifdef CSTATUS
-	__termios_p->c_cc[VSTATUS] = CSTATUS;
-#else /* CSTATUS */
-	__termios_p->c_cc[VSTATUS] = _POSIX_VDISABLE;
-#endif /* !CSTATUS */
-#endif /* VSTATUS */
+#ifdef __TTYDEF_CFLAG
+	__termios_p->c_cflag  = __TTYDEF_CFLAG;
+#endif /* __TTYDEF_CFLAG */
+#ifdef __TTYDEF_IFLAG
+	__termios_p->c_iflag  = __TTYDEF_IFLAG;
+#endif /* __TTYDEF_IFLAG */
+#ifdef __TTYDEF_LFLAG
+	__termios_p->c_lflag  = __TTYDEF_LFLAG;
+#endif /* __TTYDEF_LFLAG */
+#ifdef __TTYDEF_OFLAG
+	__termios_p->c_oflag  = __TTYDEF_OFLAG;
+#endif /* __TTYDEF_OFLAG */
+#ifdef __TTYDEF_SPEED
+	__termios_p->c_ispeed = __TTYDEF_SPEED;
+	__termios_p->c_ospeed = __TTYDEF_SPEED;
+#endif /* __TTYDEF_SPEED */
+#ifndef __VDISABLE
+#define __VDISABLE '\0'
+#endif /* !__VDISABLE */
+#ifdef __VINTR
+#ifdef __CINTR
+	__termios_p->c_cc[__VINTR] = __CINTR;
+#elif __VDISABLE
+	__termios_p->c_cc[__VINTR] = __VDISABLE;
+#endif /* ... */
+#endif /* __VINTR */
+#ifdef __VQUIT
+#ifdef __CQUIT
+	__termios_p->c_cc[__VQUIT] = __CQUIT;
+#elif __VDISABLE
+	__termios_p->c_cc[__VQUIT] = __VDISABLE;
+#endif /* ... */
+#endif /* __VQUIT */
+#ifdef __VERASE
+#ifdef __CERASE
+	__termios_p->c_cc[__VERASE] = __CERASE;
+#elif __VDISABLE
+	__termios_p->c_cc[__VERASE] = __VDISABLE;
+#endif /* ... */
+#endif /* __VERASE */
+#ifdef __VKILL
+#ifdef __CKILL
+	__termios_p->c_cc[__VKILL] = __CKILL;
+#elif __VDISABLE
+	__termios_p->c_cc[__VKILL] = __VDISABLE;
+#endif /* ... */
+#endif /* __VKILL */
+#ifdef __VEOF
+#ifdef __CEOF
+	__termios_p->c_cc[__VEOF] = __CEOF;
+#elif __VDISABLE
+	__termios_p->c_cc[__VEOF] = __VDISABLE;
+#endif /* ... */
+#endif /* __VEOF */
+#ifdef __VTIME
+#ifdef __CTIME
+	__termios_p->c_cc[__VTIME] = __CTIME;
+#elif __VDISABLE
+	__termios_p->c_cc[__VTIME] = __VDISABLE;
+#endif /* ... */
+#endif /* __VTIME */
+#ifdef __VMIN
+#ifdef __CMIN
+	__termios_p->c_cc[__VMIN] = __CMIN;
+#elif __VDISABLE
+	__termios_p->c_cc[__VMIN] = __VDISABLE;
+#endif /* ... */
+#endif /* __VMIN */
+#ifdef __VSWTCH
+#ifdef __CSWTCH
+	__termios_p->c_cc[__VSWTCH] = __CSWTCH;
+#elif __VDISABLE
+	__termios_p->c_cc[__VSWTCH] = __VDISABLE;
+#endif /* ... */
+#endif /* __VSWTCH */
+#ifdef __VSTART
+#ifdef __CSTART
+	__termios_p->c_cc[__VSTART] = __CSTART;
+#elif __VDISABLE
+	__termios_p->c_cc[__VSTART] = __VDISABLE;
+#endif /* ... */
+#endif /* __VSTART */
+#ifdef __VSTOP
+#ifdef __CSTOP
+	__termios_p->c_cc[__VSTOP] = __CSTOP;
+#elif __VDISABLE
+	__termios_p->c_cc[__VSTOP] = __VDISABLE;
+#endif /* ... */
+#endif /* __VSTOP */
+#ifdef __VSUSP
+#ifdef __CSUSP
+	__termios_p->c_cc[__VSUSP] = __CSUSP;
+#elif __VDISABLE
+	__termios_p->c_cc[__VSUSP] = __VDISABLE;
+#endif /* ... */
+#endif /* __VSUSP */
+#ifdef __VEOL
+#ifdef __CEOL
+	__termios_p->c_cc[__VEOL] = __CEOL;
+#elif __VDISABLE
+	__termios_p->c_cc[__VEOL] = __VDISABLE;
+#endif /* ... */
+#endif /* __VEOL */
+#ifdef __VREPRINT
+#ifdef __CREPRINT
+	__termios_p->c_cc[__VREPRINT] = __CREPRINT;
+#elif __VDISABLE
+	__termios_p->c_cc[__VREPRINT] = __VDISABLE;
+#endif /* ... */
+#endif /* __VREPRINT */
+#ifdef __VDISCARD
+#ifdef __CDISCARD
+	__termios_p->c_cc[__VDISCARD] = __CDISCARD;
+#elif __VDISABLE
+	__termios_p->c_cc[__VDISCARD] = __VDISABLE;
+#endif /* ... */
+#endif /* __VDISCARD */
+#ifdef __VWERASE
+#ifdef __CWERASE
+	__termios_p->c_cc[__VWERASE] = __CWERASE;
+#elif __VDISABLE
+	__termios_p->c_cc[__VWERASE] = __VDISABLE;
+#endif /* ... */
+#endif /* __VWERASE */
+#ifdef __VLNEXT
+#ifdef __CLNEXT
+	__termios_p->c_cc[__VLNEXT] = __CLNEXT;
+#elif __VDISABLE
+	__termios_p->c_cc[__VLNEXT] = __VDISABLE;
+#endif /* ... */
+#endif /* __VLNEXT */
+#ifdef __VEOL2
+#ifdef __CEOL2
+	__termios_p->c_cc[__VEOL2] = __CEOL2;
+#elif __VDISABLE
+	__termios_p->c_cc[__VEOL2] = __VDISABLE;
+#endif /* ... */
+#endif /* __VEOL2 */
+#ifdef __VDSUSP
+#ifdef __CDSUSP
+	__termios_p->c_cc[__VDSUSP] = __CDSUSP;
+#elif __VDISABLE
+	__termios_p->c_cc[__VDSUSP] = __VDISABLE;
+#endif /* ... */
+#endif /* __VDSUSP */
+#ifdef __VSTATUS
+#ifdef __CSTATUS
+	__termios_p->c_cc[__VSTATUS] = __CSTATUS;
+#elif __VDISABLE
+	__termios_p->c_cc[__VSTATUS] = __VDISABLE;
+#endif /* ... */
+#endif /* __VSTATUS */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cfmakesane_defined

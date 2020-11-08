@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e396950 */
+/* HASH CRC-32:0xb411efec */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +18,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_mbstowcs_defined
-#define __local_mbstowcs_defined 1
+#ifndef __local_tcgetsid_defined
+#define __local_tcgetsid_defined 1
 #include <__crt.h>
-#include <hybrid/typecore.h>
+#include <asm/os/tty.h>
+#if defined(__CRT_HAVE_ioctl) && defined(__TIOCGSID)
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mbsrtowcs from wchar */
-#ifndef __local___localdep_mbsrtowcs_defined
-#define __local___localdep_mbsrtowcs_defined 1
-#ifdef __CRT_HAVE_mbsrtowcs
+/* Dependency: ioctl from sys.ioctl */
+#ifndef __local___localdep_ioctl_defined
+#define __local___localdep_ioctl_defined 1
 __NAMESPACE_LOCAL_END
-#include <bits/crt/mbstate.h>
+#include <features.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
-#else /* __CRT_HAVE_mbsrtowcs */
-__NAMESPACE_LOCAL_END
-#include <libc/local/wchar/mbsrtowcs.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_mbsrtowcs __LIBC_LOCAL_NAME(mbsrtowcs)
-#endif /* !__CRT_HAVE_mbsrtowcs */
-#endif /* !__local___localdep_mbsrtowcs_defined */
-__LOCAL_LIBC(mbstowcs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbstowcs))(__WCHAR_TYPE__ *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dstlen) {
-	return __localdep_mbsrtowcs(__dst, (char const **)&__src, __dstlen, __NULLPTR);
+/* Perform the I/O control operation specified by REQUEST on FD.
+ * One argument may follow; its presence and type depend on REQUEST.
+ * Return value depends on REQUEST. Usually -1 indicates error */
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_ioctl,(__fd_t __fd, __ULONGPTR_TYPE__ __request),ioctl,(__fd,__request),__request,1,(void *))
+#endif /* !__local___localdep_ioctl_defined */
+__LOCAL_LIBC(tcgetsid) __pid_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tcgetsid))(__fd_t __fd) {
+	__pid_t __result;
+	if __unlikely(__localdep_ioctl(__fd, __TIOCGSID, &__result) < 0)
+		__result = -1;
+	return __result;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_mbstowcs_defined
-#define __local___localdep_mbstowcs_defined 1
-#define __localdep_mbstowcs __LIBC_LOCAL_NAME(mbstowcs)
-#endif /* !__local___localdep_mbstowcs_defined */
-#endif /* !__local_mbstowcs_defined */
+#ifndef __local___localdep_tcgetsid_defined
+#define __local___localdep_tcgetsid_defined 1
+#define __localdep_tcgetsid __LIBC_LOCAL_NAME(tcgetsid)
+#endif /* !__local___localdep_tcgetsid_defined */
+#else /* __CRT_HAVE_ioctl && __TIOCGSID */
+#undef __local_tcgetsid_defined
+#endif /* !__CRT_HAVE_ioctl || !__TIOCGSID */
+#endif /* !__local_tcgetsid_defined */

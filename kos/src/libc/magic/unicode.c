@@ -32,6 +32,13 @@
 /* /kos/src/libc/hybrid/unicode.c */
 %[declare_kernel_export("unicode_utf8seqlen")]
 
+%(auto_header){
+#ifndef __mbstate_t_defined
+#define __mbstate_t_defined 1
+typedef struct __mbstate mbstate_t;
+#endif /* !__mbstate_t_defined */
+}
+
 
 %{
 #include <features.h>
@@ -1107,7 +1114,7 @@ $char16_t *unicode_32to16([[nonnull]] /*utf-16*/ $char16_t *__restrict utf16_dst
 [[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c8toc16([[nonnull]] $char16_t *__restrict pc16,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
-                        [[nonnull]] __mbstate_t *__restrict mbs) {
+                        [[nonnull]] $mbstate_t *__restrict mbs) {
 	char32_t resch;
 	size_t i;
 	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -1241,7 +1248,7 @@ done:
 [[decl_include("<bits/crt/mbstate.h>")]]
 $size_t unicode_c8toc32([[nonnull]] $char32_t *__restrict pc32,
                         [[nonnull]] /*utf-8*/ char const *__restrict s, $size_t n,
-                        [[nonnull]] __mbstate_t *__restrict mbs) {
+                        [[nonnull]] $mbstate_t *__restrict mbs) {
 	size_t i;
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
@@ -1374,7 +1381,7 @@ $ssize_t format_8to16(/*struct format_8to16_data **/ void *arg,
 	struct __local_format_8to16_data {
 		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
-		__mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		$mbstate_t          fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	char16_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
 	struct __local_format_8to16_data *closure;
@@ -1424,7 +1431,7 @@ $ssize_t format_8to32(/*struct format_8to32_data **/ void *arg,
 	struct __local_format_8to32_data {
 		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
-		__mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		$mbstate_t          fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	char32_t buf[__UNICODE_FORMAT_XTOY_BUFSIZE], *dst = buf;
 	struct __local_format_8to32_data *closure;

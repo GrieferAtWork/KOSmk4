@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x4e396950 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,33 +17,40 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_mbstowcs_defined
-#define __local_mbstowcs_defined 1
-#include <__crt.h>
+#ifndef _SYS__SOCKADDR_STORAGE_H
+#define _SYS__SOCKADDR_STORAGE_H 1
+
+/* API_LEVEL: bsd */
+
+#include <__stdinc.h>
+
+#include <bits/os/sockaddr_storage.h>
+
+#if !defined(_SS_MAXSIZE) && defined(__SIZEOF_SOCKADDR_STORAGE)
+#define _SS_MAXSIZE __SIZEOF_SOCKADDR_STORAGE
+#endif /* !_SS_MAXSIZE && __SIZEOF_SOCKADDR_STORAGE */
+
+#ifndef _SS_ALIGNSIZE
+#ifdef __ALIGNOF_SOCKADDR_STORAGE
+#define _SS_ALIGNSIZE __ALIGNOF_SOCKADDR_STORAGE
+#else /* __ALIGNOF_SOCKADDR_STORAGE */
 #include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-/* Dependency: mbsrtowcs from wchar */
-#ifndef __local___localdep_mbsrtowcs_defined
-#define __local___localdep_mbsrtowcs_defined 1
-#ifdef __CRT_HAVE_mbsrtowcs
-__NAMESPACE_LOCAL_END
-#include <bits/crt/mbstate.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_mbsrtowcs,(__WCHAR_TYPE__ *__restrict __dst, char const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),mbsrtowcs,(__dst,__psrc,__dstlen,__mbs))
-#else /* __CRT_HAVE_mbsrtowcs */
-__NAMESPACE_LOCAL_END
-#include <libc/local/wchar/mbsrtowcs.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_mbsrtowcs __LIBC_LOCAL_NAME(mbsrtowcs)
-#endif /* !__CRT_HAVE_mbsrtowcs */
-#endif /* !__local___localdep_mbsrtowcs_defined */
-__LOCAL_LIBC(mbstowcs) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbstowcs))(__WCHAR_TYPE__ *__restrict __dst, char const *__restrict __src, __SIZE_TYPE__ __dstlen) {
-	return __localdep_mbsrtowcs(__dst, (char const **)&__src, __dstlen, __NULLPTR);
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_mbstowcs_defined
-#define __local___localdep_mbstowcs_defined 1
-#define __localdep_mbstowcs __LIBC_LOCAL_NAME(mbstowcs)
-#endif /* !__local___localdep_mbstowcs_defined */
-#endif /* !__local_mbstowcs_defined */
+#ifndef _SS_ALIGNSIZE
+#define _SS_ALIGNSIZE __SIZEOF_POINTER__
+#endif /* !_SS_ALIGNSIZE */
+#endif /* !__ALIGNOF_SOCKADDR_STORAGE */
+#endif /* !_SS_ALIGNSIZE */
+
+#ifndef _SS_PAD1SIZE
+#ifdef _SS_PADSIZE
+#define _SS_PAD1SIZE _SS_PADSIZE
+#else /* _SS_PADSIZE */
+#define _SS_PAD1SIZE 0
+#endif /* !_SS_PADSIZE */
+#endif /* !_SS_PAD1SIZE */
+
+#ifndef _SS_PAD2SIZE
+#define _SS_PAD2SIZE 0
+#endif /* !_SS_PAD2SIZE */
+
+#endif /* !_SYS__SOCKADDR_STORAGE_H */

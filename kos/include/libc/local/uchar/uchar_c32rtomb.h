@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4a9436a */
+/* HASH CRC-32:0xe4ef02ff */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(uchar_c32rtomb) __SIZE_TYPE__
-__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(uchar_c32rtomb))(char *__restrict __str, __CHAR32_TYPE__ __wc, __mbstate_t *__mbs) {
+__NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(uchar_c32rtomb))(char *__restrict __str, __CHAR32_TYPE__ __wc, struct __mbstate *__mbs) {
 	char *__endptr;
 	__SIZE_TYPE__ __result;
 

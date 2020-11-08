@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85027d9 */
+/* HASH CRC-32:0xf44b16ce */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-__CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
+__CREDIRECT(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),unicode_c8toc16,(__pc16,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc16 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_c8toc16.h>
@@ -57,7 +57,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_8to16))(void *__arg, char cons
 	struct __local_format_8to16_data {
 		__pc16formatprinter __fd_printer;    /* [1..1] Inner printer */
 		void               *__fd_arg;        /* Argument for `fd_printer' */
-		__mbstate_t         __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		struct __mbstate          __fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	__CHAR16_TYPE__ __buf[64], *__dst = __buf;
 	struct __local_format_8to16_data *__closure;

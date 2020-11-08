@@ -32,11 +32,12 @@
 
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/handle.h>
+#include <sys/ioctl.h>
 
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
-#include <termios.h> /* For ioctl() commands */
+#include <termios.h>
 
 #include <libansitty/ansitty.h>
 

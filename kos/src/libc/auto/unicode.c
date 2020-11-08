@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x431bed22 */
+/* HASH CRC-32:0xf626e9f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -724,7 +724,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2, 4)) size_t
 NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16,
                                            char const *__restrict s,
                                            size_t n,
-                                           __mbstate_t *__restrict mbs) {
+                                           mbstate_t *__restrict mbs) {
 	char32_t resch;
 	size_t i;
 	if ((mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -857,7 +857,7 @@ INTERN ATTR_SECTION(".text.crt.unicode.UTF") NONNULL((1, 2, 4)) size_t
 NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32,
                                            char const *__restrict s,
                                            size_t n,
-                                           __mbstate_t *__restrict mbs) {
+                                           mbstate_t *__restrict mbs) {
 	size_t i;
 	for (i = 0; i < n; ++i) {
 		uint32_t state;
@@ -978,7 +978,7 @@ NOTHROW_NCX(LIBCCALL libc_format_8to16)(void *arg,
 	struct __local_format_8to16_data {
 		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
-		__mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		mbstate_t          fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	char16_t buf[64], *dst = buf;
 	struct __local_format_8to16_data *closure;
@@ -1021,7 +1021,7 @@ NOTHROW_NCX(LIBCCALL libc_format_8to32)(void *arg,
 	struct __local_format_8to32_data {
 		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
 		void               *fd_arg;        /* Argument for `fd_printer' */
-		__mbstate_t         fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+		mbstate_t          fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
 	};
 	char32_t buf[64], *dst = buf;
 	struct __local_format_8to32_data *closure;

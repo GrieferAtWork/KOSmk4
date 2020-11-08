@@ -23,7 +23,7 @@
 %[define_replacement(wint_t = __WINT_TYPE__)]
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
-%[define_replacement(mbstate_t = __mbstate_t)]
+%[define_replacement(mbstate_t = "struct __mbstate")]
 %[default:section(".text.crt{|.dos}.unicode.mbr")]
 
 %[declare_known_section(".text.crt{|.dos}.wchar.unicode.convert")]
@@ -42,7 +42,7 @@ __SYSDECL_BEGIN
 #ifndef __std_mbstate_t_defined
 #define __std_mbstate_t_defined 1
 __NAMESPACE_STD_BEGIN
-typedef __mbstate_t mbstate_t;
+typedef struct __mbstate mbstate_t;
 __NAMESPACE_STD_END
 #endif /* !__std_mbstate_t_defined */
 

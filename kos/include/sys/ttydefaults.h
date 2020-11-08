@@ -24,117 +24,111 @@
 
 #include <__stdinc.h>
 
-#include <bits/os/termios.h> /* BRKINT, ISTRIP, ... */
+#include <asm/os/termios.h> /* __BRKINT, __ISTRIP, ... */
 #include <bits/posix_opt.h>  /* _POSIX_VDISABLE */
 
-__SYSDECL_BEGIN
-
-#ifndef ECHOKE
-#define ECHOKE 0x000800 /* If ICANON is also set, KILL is echoed by erasing each character on the line, as specified by ECHOE and ECHOPRT */
-#endif /* !ECHOKE */
-#ifndef ECHOCTL
-#define ECHOCTL 0x000200 /* If ECHO is also set, terminal special characters other than TAB(\t), NL(\n),
-                          * START, and STOP are echoed as ^X, where X is the character with ASCII code
-                          * 0x40 greater than the special character. For example, character 0x08 (BS)
-                          * is echoed as ^H */
-#endif /* !ECHOCTL */
-
 /* Defaults on values for `c_iflag', `c_oflag', `c_cflag' and `c_lflag'. */
-#define TTYDEF_IFLAG                                                                  \
-	(BRKINT /*| ISTRIP /* Don't turn this on by default... - Ever heard of unicode?*/ \
-	 | ICRNL | IMAXBEL | IXON | IXANY | IUTF8 /* Turn on UTF-8 support by default! */)
-#define TTYDEF_OFLAG                                                                 \
-	(OPOST | ONLCR                                                                   \
-	 /*| XTABS /* Not needed (apparently this converts tabs to spaces, though I have \
-	            * no idea how termios should know how many spaces...) */)
-#define TTYDEF_LFLAG                                            \
-	(ECHO | ICANON | ISIG | IEXTEN | ECHOE | ECHOKE | ECHOCTL | \
-	 /* These last two, linux doesn't enable by default,        \
-	  * but I see no reason why one shouldn't! */               \
-	 ECHOK | TOSTOP)
-#define TTYDEF_CFLAG                                                                       \
-	(CREAD | CS8 /* | CS7 /* Get with the times! Characters are now 8-bit! Unicode FTW! */ \
-	 | PARENB | HUPCL)
-#define TTYDEF_SPEED (B9600)
+#if !defined(TTYDEF_IFLAG) && defined(__TTYDEF_IFLAG)
+#define TTYDEF_IFLAG __TTYDEF_IFLAG
+#endif /* !TTYDEF_IFLAG && __TTYDEF_IFLAG */
+#if !defined(TTYDEF_OFLAG) && defined(__TTYDEF_OFLAG)
+#define TTYDEF_OFLAG __TTYDEF_OFLAG
+#endif /* !TTYDEF_OFLAG && __TTYDEF_OFLAG */
+#if !defined(TTYDEF_LFLAG) && defined(__TTYDEF_LFLAG)
+#define TTYDEF_LFLAG __TTYDEF_LFLAG
+#endif /* !TTYDEF_LFLAG && __TTYDEF_LFLAG */
+#if !defined(TTYDEF_CFLAG) && defined(__TTYDEF_CFLAG)
+#define TTYDEF_CFLAG __TTYDEF_CFLAG
+#endif /* !TTYDEF_CFLAG && __TTYDEF_CFLAG */
+
+/* Default TTY speed. */
+#if !defined(TTYDEF_SPEED) && defined(__TTYDEF_SPEED)
+#define TTYDEF_SPEED __TTYDEF_SPEED
+#endif /* !TTYDEF_SPEED && __TTYDEF_SPEED */
+
 
 /* Control Character Defaults */
-#define CTRL(x)     ((x) & 037)
-#ifdef VDISCARD
-#define CDISCARD    CTRL('o') /* VDISCARD (Unsupported) */
-#endif /* VDISCARD */
-#ifdef VDSUSP
-#define CDSUSP      CTRL('y') /* VDSUSP */
-#endif /* VDSUSP */
-#ifdef VEOF
-#define CEOF        CTRL('d') /* VEOF */
-#endif /* VEOF */
-#ifdef VEOL
-#define CEOL        _POSIX_VDISABLE
-#endif /* VEOL */
-#ifdef VEOL2
-#define CEOL2       _POSIX_VDISABLE
-#endif /* VEOL2 */
-#ifdef VERASE
-#define CERASE      CTRL('h') /* VERASE (== 8; == '\b') */
-#endif /* VERASE */
-#ifdef VINTR
-#define CINTR       CTRL('c') /* VINTR */
-#endif /* VINTR */
-#ifdef VKILL
-#define CKILL       CTRL('u') /* VKILL */
-#endif /* VKILL */
-#ifdef VLNEXT
-#define CLNEXT      CTRL('v') /* VLNEXT */
-#endif /* VLNEXT */
-#ifdef VMIN
-#define CMIN        1         /* VMIN */
-#endif /* VMIN */
-#ifdef VQUIT
-#define CQUIT       CTRL('\\')/* VQUIT */
-#endif /* VQUIT */
-#ifdef VREPRINT
-#define CREPRINT    CTRL('r') /* VREPRINT */
-#endif /* VREPRINT */
-#ifdef VSTART
-#define CSTART      CTRL('q') /* VSTART */
-#endif /* VSTART */
-#ifdef VSTATUS
-#define CSTATUS     CTRL('t') /* VSTATUS (Unsupported) */
-#endif /* VSTATUS */
-#ifdef VSTOP
-#define CSTOP       CTRL('s') /* VSTOP */
-#endif /* VSTOP */
-#ifdef VSUSP
-#define CSUSP       CTRL('z') /* VSUSP */
-#endif /* VSUSP */
-#ifdef VSWTCH
-#define CSWTCH      _POSIX_VDISABLE /* VSWTCH */
-#endif /* VSWTCH */
-#ifdef VTIME
-#define CTIME       0         /* VTIME */
-#endif /* VTIME */
-#ifdef VWERASE
-#define CWERASE     CTRL('w') /* VWERASE */
-#endif /* VWERASE */
+#if !defined(CTRL) && defined(__CTRL)
+#define CTRL(x)  __CTRL(x)
+#endif /* !CTRL && __CTRL */
+#if !defined(CDISCARD) && defined(__CDISCARD)
+#define CDISCARD __CDISCARD /* VDISCARD (Unsupported) */
+#endif /* !CDISCARD && __CDISCARD */
+#if !defined(CDSUSP) && defined(__CDSUSP)
+#define CDSUSP   __CDSUSP   /* VDSUSP */
+#endif /* !CDSUSP && __CDSUSP */
+#if !defined(CEOF) && defined(__CEOF)
+#define CEOF     __CEOF     /* VEOF */
+#endif /* !CEOF && __CEOF */
+#if !defined(CEOL) && defined(__CEOL)
+#define CEOL     __CEOL
+#endif /* !CEOL && __CEOL */
+#if !defined(CEOL2) && defined(__CEOL2)
+#define CEOL2    __CEOL2
+#endif /* !CEOL2 && __CEOL2 */
+#if !defined(CERASE) && defined(__CERASE)
+#define CERASE   __CERASE   /* VERASE (== 8; == '\b') */
+#endif /* !CERASE && __CERASE */
+#if !defined(CINTR) && defined(__CINTR)
+#define CINTR    __CINTR    /* VINTR */
+#endif /* !CINTR && __CINTR */
+#if !defined(CKILL) && defined(__CKILL)
+#define CKILL    __CKILL    /* VKILL */
+#endif /* !CKILL && __CKILL */
+#if !defined(CLNEXT) && defined(__CLNEXT)
+#define CLNEXT   __CLNEXT   /* VLNEXT */
+#endif /* !CLNEXT && __CLNEXT */
+#if !defined(CMIN) && defined(__CMIN)
+#define CMIN     __CMIN     /* VMIN */
+#endif /* !CMIN && __CMIN */
+#if !defined(CQUIT) && defined(__CQUIT)
+#define CQUIT    __CQUIT    /* VQUIT */
+#endif /* !CQUIT && __CQUIT */
+#if !defined(CREPRINT) && defined(__CREPRINT)
+#define CREPRINT __CREPRINT /* VREPRINT */
+#endif /* !CREPRINT && __CREPRINT */
+#if !defined(CSTART) && defined(__CSTART)
+#define CSTART   __CSTART   /* VSTART */
+#endif /* !CSTART && __CSTART */
+#if !defined(CSTATUS) && defined(__CSTATUS)
+#define CSTATUS  __CSTATUS  /* VSTATUS (Unsupported) */
+#endif /* !CSTATUS && __CSTATUS */
+#if !defined(CSTOP) && defined(__CSTOP)
+#define CSTOP    __CSTOP    /* VSTOP */
+#endif /* !CSTOP && __CSTOP */
+#if !defined(CSUSP) && defined(__CSUSP)
+#define CSUSP    __CSUSP    /* VSUSP */
+#endif /* !CSUSP && __CSUSP */
+#if !defined(CSWTCH) && defined(__CSWTCH)
+#define CSWTCH   __CSWTCH   /* VSWTCH */
+#endif /* !CSWTCH && __CSWTCH */
+#if !defined(CTIME) && defined(__CTIME)
+#define CTIME    __CTIME    /* VTIME */
+#endif /* !CTIME && __CTIME */
+#if !defined(CWERASE) && defined(__CWERASE)
+#define CWERASE  __CWERASE  /* VWERASE */
+#endif /* !CWERASE && __CWERASE */
 
 /* Some aliases... */
-#ifdef CEOF
-#define CEOT        CEOF
-#endif /* CEOF */
-#ifdef CEOL
-#define CBRK        CEOL
-#endif /* CEOL */
-#ifdef CREPRINT
-#define CRPRNT      CREPRINT
-#endif /* CREPRINT */
-#ifdef CDISCARD
-#define CFLUSH      CDISCARD
-#endif /* CDISCARD */
+#if !defined(CEOT) && defined(__CEOF)
+#define CEOT   __CEOF
+#endif /* !CEOT && __CEOF */
+#if !defined(CBRK) && defined(__CEOL)
+#define CBRK   __CEOL
+#endif /* !CBRK && __CEOL */
+#if !defined(CRPRNT) && defined(__CREPRINT)
+#define CRPRNT __CREPRINT
+#endif /* !CRPRNT && __CREPRINT */
+#if !defined(CFLUSH) && defined(__CDISCARD)
+#define CFLUSH __CDISCARD
+#endif /* !CFLUSH && __CDISCARD */
 
 /* #define TTYDEFCHARS to include an array of default control characters. */
 #ifdef TTYDEFCHARS
 #undef TTYDEFCHARS
+__SYSDECL_BEGIN
 __PRIVATE cc_t ttydefchars[NCCS] = {
+	/* FIXME: This part here is not portable! */
 	/* [VINTR]    = */ CINTR,
 	/* [VQUIT]    = */ CQUIT,
 	/* [VERASE]   = */ CERASE,
@@ -153,9 +147,8 @@ __PRIVATE cc_t ttydefchars[NCCS] = {
 	/* [VLNEXT]   = */ CLNEXT,
 	/* [VEOL2]    = */ CEOL2,
 };
-#endif /* TTYDEFCHARS */
-
 __SYSDECL_END
+#endif /* TTYDEFCHARS */
 
 #endif /* !_SYS_TTYDEFAULTS_H */
 

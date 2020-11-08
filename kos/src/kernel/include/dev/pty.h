@@ -27,9 +27,9 @@
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
 
+#include <bits/os/termio.h>  /* struct winsize */
+#include <bits/os/termios.h> /* struct termios */
 #include <kos/dev.h>
-
-#include <termios.h>
 
 #include <libbuffer/ringbuffer.h>
 

@@ -62,7 +62,6 @@ Add support for *_chk variants (using __builtin_object_size())
 <sys/vtimes.h>
 <sys/soundcard.h>
 <sys/bsdtypes.h>
-<sys/timespec.h>   (For BSD-compat)
 
 <gnu/libc-version.h>
 

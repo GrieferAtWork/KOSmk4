@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1e1c403 */
+/* HASH CRC-32:0xb5d081d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -807,26 +807,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to16, __FORCELOCAL __ATTR_ARTIFICIAL _
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-__CDECLARE(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs),(__pc16,__s,__n,__mbs))
+__CDECLARE(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c8toc16,(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),(__pc16,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc16 */
 #include <libc/local/unicode/unicode_c8toc16.h>
 /* @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c8toc16)(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc16))(__pc16, __s, __n, __mbs); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c8toc16)(__CHAR16_TYPE__ *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc16))(__pc16, __s, __n, __mbs); })
 #endif /* !__CRT_HAVE_unicode_c8toc16 */
 #ifdef __CRT_HAVE_unicode_c8toc32
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-__CDECLARE(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs),(__pc32,__s,__n,__mbs))
+__CDECLARE(__ATTR_NONNULL((1, 2, 4)),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c8toc32,(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs),(__pc32,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc32 */
 #include <libc/local/unicode/unicode_c8toc32.h>
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */
-__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c8toc32)(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc32))(__pc32, __s, __n, __mbs); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c8toc32)(__CHAR32_TYPE__ *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, struct __mbstate *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc32))(__pc32, __s, __n, __mbs); })
 #endif /* !__CRT_HAVE_unicode_c8toc32 */
 
 struct format_8to16_data {

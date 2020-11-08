@@ -50,7 +50,7 @@ DECL_BEGIN
 
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
-typedef __mbstate_t mbstate_t;
+typedef struct __mbstate mbstate_t;
 #endif /* !__mbstate_t_defined */
 
 

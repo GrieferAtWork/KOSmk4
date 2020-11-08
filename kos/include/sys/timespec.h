@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x6c0cfbc8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,34 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_USER_TERMIOS_H
-#define GUARD_LIBC_USER_TERMIOS_H 1
+#ifndef _SYS_TIMESPEC_H
+#define _SYS_TIMESPEC_H 1
 
-#include "../api.h"
-#include "../auto/termios.h"
+/* API_LEVEL: bsd */
 
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <termios.h>
+#include <__stdinc.h>
+#include <features.h>
 
-DECL_BEGIN
+#include <sys/_timespec.h>
+#include <sys/cdefs.h>
 
-#ifndef __KERNEL__
-/* Get terminal attributes */
-INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_tcgetattr)(fd_t fd, struct termios *__restrict termios_p);
-/* Set terminal attributes
- * @param: optional_actions: One of `TCSANOW', `TCSADRAIN' or `TCSAFLUSH' */
-INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_tcsetattr)(fd_t fd, __STDC_INT_AS_UINT_T optional_actions, struct termios const *__restrict termios_p);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsendbreak)(fd_t fd, int duration);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_tcdrain)(fd_t fd);
-/* @param: queue_selector: One of `TCIFLUSH', `TCOFLUSH' or `TCIOFLUSH' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcflush)(fd_t fd, __STDC_INT_AS_UINT_T queue_selector);
-/* @param: action: One of `TCOOFF', `TCOON', `TCIOFF', `TCION' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcflow)(fd_t fd, __STDC_INT_AS_UINT_T action);
-INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd, pid_t pid);
-#endif /* !__KERNEL__ */
+#ifdef __USE_BSD
+#ifndef TIMEVAL_TO_TIMESPEC
+#define TIMEVAL_TO_TIMESPEC(tv, ts) \
+	(void)((ts)->tv_sec = (tv)->tv_sec, (ts)->tv_nsec = (tv)->tv_usec * 1000)
+#endif /* !TIMEVAL_TO_TIMESPEC */
+#ifndef TIMESPEC_TO_TIMEVAL
+#define TIMESPEC_TO_TIMEVAL(tv, ts) \
+	(void)((tv)->tv_sec = (ts)->tv_sec, (tv)->tv_usec = (ts)->tv_nsec / 1000)
+#endif /* !TIMESPEC_TO_TIMEVAL */
+#endif /* __USE_BSD */
 
-DECL_END
+#include <bits/os/itimerspec.h> /* struct itimerspec */
 
-#endif /* !GUARD_LIBC_USER_TERMIOS_H */
+#endif /* !_SYS_TIMESPEC_H */

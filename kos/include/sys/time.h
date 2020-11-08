@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9232be63 */
+/* HASH CRC-32:0x2f0935ed */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -91,8 +91,14 @@ typedef __suseconds_t suseconds_t;
 #endif /* !__suseconds_t_defined */
 
 #ifdef __USE_GNU
-#define TIMEVAL_TO_TIMESPEC(tv, ts) (void)((ts)->tv_sec = (tv)->tv_sec, (ts)->tv_nsec = (tv)->tv_usec * 1000)
-#define TIMESPEC_TO_TIMEVAL(tv, ts) (void)((tv)->tv_sec = (ts)->tv_sec, (tv)->tv_usec = (ts)->tv_nsec / 1000)
+#ifndef TIMEVAL_TO_TIMESPEC
+#define TIMEVAL_TO_TIMESPEC(tv, ts) \
+	(void)((ts)->tv_sec = (tv)->tv_sec, (ts)->tv_nsec = (tv)->tv_usec * 1000)
+#endif /* !TIMEVAL_TO_TIMESPEC */
+#ifndef TIMESPEC_TO_TIMEVAL
+#define TIMESPEC_TO_TIMEVAL(tv, ts) \
+	(void)((tv)->tv_sec = (ts)->tv_sec, (tv)->tv_usec = (ts)->tv_nsec / 1000)
+#endif /* !TIMESPEC_TO_TIMEVAL */
 #endif /* __USE_GNU */
 
 #ifdef __USE_MISC

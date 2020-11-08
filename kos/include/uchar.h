@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f7aaf1d */
+/* HASH CRC-32:0x15226277 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __SYSDECL_BEGIN
 #ifndef __std_mbstate_t_defined
 #define __std_mbstate_t_defined 1
 __NAMESPACE_STD_BEGIN
-typedef __mbstate_t mbstate_t;
+typedef struct __mbstate mbstate_t;
 __NAMESPACE_STD_END
 #endif /* !__std_mbstate_t_defined */
 

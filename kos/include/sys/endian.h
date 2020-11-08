@@ -23,8 +23,13 @@
 #include <__stdinc.h>
 
 #include <hybrid/__byteorder.h>
+#include <hybrid/__byteswap.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/typecore.h>
+
+#include <machine/endian.h>
+#include <sys/_types.h>
+#include <sys/cdefs.h>
 
 #include <endian.h>
 
@@ -108,6 +113,48 @@ __DECL_END
 #endif /* __hybrid_unaligned_setle64 */
 #endif /* !__INTELLISENSE__ */
 #endif /* __CC__ */
+
+
+
+
+
+/************************************************************************/
+/* The following stuff comes from BSD                                   */
+#ifdef __CC__
+#ifndef __uint8_t_defined
+#define __uint8_t_defined 1
+__DECL_BEGIN
+#ifdef __UINT8_TYPE__
+typedef __UINT8_TYPE__ uint8_t;
+#endif /* __UINT8_TYPE__ */
+#ifdef __UINT16_TYPE__
+typedef __UINT16_TYPE__ uint16_t;
+#endif /* __UINT16_TYPE__ */
+#ifdef __UINT32_TYPE__
+typedef __UINT32_TYPE__ uint32_t;
+#endif /* __UINT32_TYPE__ */
+#ifdef __UINT64_TYPE__
+typedef __UINT64_TYPE__ uint64_t;
+#endif /* __UINT64_TYPE__ */
+__DECL_END
+#endif /* !__uint8_t_defined */
+#endif /* __CC__ */
+#define bswap16(x) __hybrid_bswap16(x)
+#define bswap32(x) __hybrid_bswap32(x)
+#define bswap64(x) __hybrid_bswap64(x)
+#define htobe16(x) __hybrid_htobe16(x)
+#define htobe32(x) __hybrid_htobe32(x)
+#define htobe64(x) __hybrid_htobe64(x)
+#define htole16(x) __hybrid_htole16(x)
+#define htole32(x) __hybrid_htole32(x)
+#define htole64(x) __hybrid_htole64(x)
+#define be16toh(x) __hybrid_betoh16(x)
+#define be32toh(x) __hybrid_betoh32(x)
+#define be64toh(x) __hybrid_betoh64(x)
+#define le16toh(x) __hybrid_letoh16(x)
+#define le32toh(x) __hybrid_letoh32(x)
+#define le64toh(x) __hybrid_letoh64(x)
+/************************************************************************/
 
 
 #endif /* !_SYS_ENDIAN_H */

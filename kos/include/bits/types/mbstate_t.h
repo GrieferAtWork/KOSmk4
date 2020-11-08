@@ -29,7 +29,7 @@ __NAMESPACE_STD_USING(mbstate_t)
 #define __mbstate_t_defined 1
 #ifdef __CC__
 __DECL_BEGIN
-typedef __mbstate_t mbstate_t;
+typedef struct __mbstate mbstate_t;
 __DECL_END
 #endif /* __CC__ */
 #endif /* !__mbstate_t_defined */

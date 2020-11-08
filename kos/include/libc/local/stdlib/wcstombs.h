@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee329828 */
+/* HASH CRC-32:0x3b4d6a54 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/mbstate.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, __mbstate_t *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsrtombs,(char *__dst, __WCHAR_TYPE__ const **__restrict __psrc, __SIZE_TYPE__ __dstlen, struct __mbstate *__mbs),wcsrtombs,(__dst,__psrc,__dstlen,__mbs))
 #else /* __CRT_HAVE_wcsrtombs */
 __NAMESPACE_LOCAL_END
 #include <libc/local/wchar/wcsrtombs.h>
