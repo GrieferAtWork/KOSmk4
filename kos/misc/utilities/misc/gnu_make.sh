@@ -78,6 +78,7 @@ if test -z "$PACKAGE_LIBEXECDIR";     then PACKAGE_LIBEXECDIR="${PACKAGE_EPREFIX
 if test -z "$PACKAGE_SYSCONFDIR";     then PACKAGE_SYSCONFDIR="${PACKAGE_PREFIX%/}/etc"; fi
 if test -z "$PACKAGE_SHAREDSTATEDIR"; then PACKAGE_SHAREDSTATEDIR="${PACKAGE_PREFIX%/}/usr/com"; fi
 if test -z "$PACKAGE_LOCALSTATEDIR";  then PACKAGE_LOCALSTATEDIR="${PACKAGE_PREFIX%/}/var"; fi
+if test -z "$PACKAGE_RUNSTATEDIR";    then PACKAGE_RUNSTATEDIR="${PACKAGE_LOCALSTATEDIR}/run"; fi
 if test -z "$PACKAGE_LIBDIR";         then PACKAGE_LIBDIR="${PACKAGE_EPREFIX%/}/$TARGET_LIBPATH"; fi
 if test -z "$PACKAGE_INCLUDEDIR";     then PACKAGE_INCLUDEDIR="${PACKAGE_PREFIX%/}/usr/include"; fi
 if test -z "$PACKAGE_OLDINCLUDEDIR";  then PACKAGE_OLDINCLUDEDIR="$PACKAGE_INCLUDEDIR"; fi
@@ -123,9 +124,19 @@ echo "gnu_make: PACKAGE_URL      '$PACKAGE_URL'"
 #echo "gnu_make: PACKAGE_HOST   '$PACKAGE_HOST'"
 #echo "gnu_make: PACKAGE_TARGET '$PACKAGE_TARGET'"
 
+
 SRCPATH="$KOS_ROOT/binutils/src/$PACKAGE_NAME"
 OPTPATH="$BINUTILS_SYSROOT/opt/$PACKAGE_NAME"
 DESTDIR="$BINUTILS_SYSROOT/opt/${PACKAGE_NAME}-install"
+
+# libtool tends to be buggy when using DESTDIR install, and tries to
+# include host system libraries during linking when it really shouldn't
+# s.a. http://metastatic.org/text/libtool.html
+#
+# As a work-around, don't directly invoke gcc & friends, but use a set of
+# hack-wrappers that will filter out attempts to bind system libraries or
+# headers.
+. "$KOS_MISC/utilities/misc/gcc_hack.sh"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 	if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]; then
@@ -158,13 +169,37 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						exit 1
 					fi
 				fi
-				if ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; then
-					cmd cd "$SRCPATH"
-					cmd automake
+				if ! [ -f "$SRCPATH/configure.ac" ]; then
+					echo "Not a GNU autoconf project (missing file: '$SRCPATH/configure.ac')"
+					exit 1
 				fi
-				if ! [ -f "$SRCPATH/configure" ]; then
-					cmd cd "$SRCPATH"
-					cmd autoconf
+				# Generate missing configure/makefile
+				if ! [ -f "$SRCPATH/configure" ] || \
+					{ ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; }; then
+					# Check for autoconf dependencies of this project
+					ac_requires_xorg=no
+					while IFS= read -r line; do
+						case "$line" in
+
+						*XORG_MACROS_VERSION*)
+							ac_requires_xorg=yes
+							;;
+
+						*) ;;
+						esac
+					done < "$SRCPATH/configure.ac"
+					# Bind xorg-macros
+					if test x"$ac_requires_xorg" != xno; then
+						. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
+					fi
+					if ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; then
+						cmd cd "$SRCPATH"
+						cmd automake
+					fi
+					if ! [ -f "$SRCPATH/configure" ]; then
+						cmd cd "$SRCPATH"
+						cmd autoconf
+					fi
 				fi
 			fi
 			if [ -f "$KOS_PATCHES/$PACKAGE_NAME.patch" ]; then
@@ -208,6 +243,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 					*--sysconfdir=*)     if ! [[ "$CONFIGURE" == *--sysconfdir=*     ]]; then echo "	option: --sysconfdir=$PACKAGE_SYSCONFDIR";         CONFIGURE="$CONFIGURE --sysconfdir=$PACKAGE_SYSCONFDIR"; fi ;;
 					*--sharedstatedir=*) if ! [[ "$CONFIGURE" == *--sharedstatedir=* ]]; then echo "	option: --sharedstatedir=$PACKAGE_SHAREDSTATEDIR"; CONFIGURE="$CONFIGURE --sharedstatedir=$PACKAGE_SHAREDSTATEDIR"; fi ;;
 					*--localstatedir=*)  if ! [[ "$CONFIGURE" == *--localstatedir=*  ]]; then echo "	option: --localstatedir=$PACKAGE_LOCALSTATEDIR";   CONFIGURE="$CONFIGURE --localstatedir=$PACKAGE_LOCALSTATEDIR"; fi ;;
+					*--runstatedir=*)    if ! [[ "$CONFIGURE" == *--runstatedir=*    ]]; then echo "	option: --runstatedir=$PACKAGE_RUNSTATEDIR";       CONFIGURE="$CONFIGURE --runstatedir=$PACKAGE_RUNSTATEDIR"; fi ;;
 					*--libdir=*)         if ! [[ "$CONFIGURE" == *--libdir=*         ]]; then echo "	option: --libdir=$PACKAGE_LIBDIR";                 CONFIGURE="$CONFIGURE --libdir=$PACKAGE_LIBDIR"; fi ;;
 					*--includedir=*)     if ! [[ "$CONFIGURE" == *--includedir=*     ]]; then echo "	option: --includedir=$PACKAGE_INCLUDEDIR";         CONFIGURE="$CONFIGURE --includedir=$PACKAGE_INCLUDEDIR"; fi ;;
 					*--oldincludedir=*)  if ! [[ "$CONFIGURE" == *--oldincludedir=*  ]]; then echo "	option: --oldincludedir=$PACKAGE_OLDINCLUDEDIR";   CONFIGURE="$CONFIGURE --oldincludedir=$PACKAGE_OLDINCLUDEDIR"; fi ;;
@@ -223,6 +259,39 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 					*--psdir=*)          if ! [[ "$CONFIGURE" == *--psdir=*          ]]; then echo "	option: --psdir=$PACKAGE_PSDIR";                   CONFIGURE="$CONFIGURE --psdir=$PACKAGE_PSDIR"; fi ;;
 					*--host=*)           if ! [[ "$CONFIGURE" == *--host=*           ]]; then echo "	option: --host=$PACKAGE_HOST";                     CONFIGURE="$CONFIGURE --host=$PACKAGE_HOST"; fi ;;
 					*--target=*)         if ! [[ "$CONFIGURE" == *--target=*         ]]; then echo "	option: --target=$PACKAGE_TARGET";                 CONFIGURE="$CONFIGURE --target=$PACKAGE_TARGET"; fi ;;
+
+					# System root
+					*--with-sysroot*)
+						if ! [[ "$CONFIGURE" == *--with-sysroot=* ]]; then
+							echo "	option: --with-sysroot=$BINUTILS_SYSROOT";
+							CONFIGURE="$CONFIGURE --with-sysroot=$BINUTILS_SYSROOT";
+						fi
+						;;
+
+					# Name of the host machine
+					*--build=*)
+						if ! [[ "$CONFIGURE" == *--build=* ]]; then
+							if test -z "$PACKAGE_BUILD"; then
+								PACKAGE_BUILD="$(gcc -dumpmachine)"
+							fi
+							echo "	option: --build=$PACKAGE_BUILD";
+							CONFIGURE="$CONFIGURE --build=$PACKAGE_BUILD";
+						fi
+						;;
+
+					# Misc default feature selection
+					*--disable-largefile* | *--enable-largefile*)
+						if ! [[ "$CONFIGURE" == *--enable-largefile* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-largefile* ]]; then
+							if test -z "$PACKAGE_WITHOUT_LARGEFILE"; then
+								echo "	option: --enable-largefile"
+								CONFIGURE="$CONFIGURE --enable-largefile";
+							else
+								echo "	option: --disable-largefile"
+								CONFIGURE="$CONFIGURE --disable-largefile";
+							fi
+						fi
+						;;
 
 					# Misc options
 					*--with-libiconv-prefix* | *--without-libiconv-prefix*)
@@ -284,10 +353,11 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 			fi
 			(
 				export CC="${CROSS_PREFIX}gcc"
-				export CPP="${CROSS_PREFIX}cpp"
-				export CXX="${CROSS_PREFIX}g++"
 				export CFLAGS="-ggdb"
+				export CXX="${CROSS_PREFIX}g++"
 				export CXXFLAGS="-ggdb"
+				export CPP="${CROSS_PREFIX}cpp"
+				export CXXCPP="${CROSS_PREFIX}cpp"
 				cmd bash ../../../src/$PACKAGE_NAME/configure $CONFIGURE
 			) || exit $?
 		fi # if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ];
@@ -296,10 +366,23 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 		> "$OPTPATH/_didmake"
 	fi     # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]
 	cmd cd "$OPTPATH"
+	if ! [ -f "./_didfixla" ]; then
+		# Go though the opt-path in search of *.la files which may contain lines such as
+		#      libdir='/lib'
+		# Such lines we must fix to instead say:
+		#      libdir='/lib'
+		while IFS= read -r line; do
+			echo "line: $line"
+		done < <(find . -type f 2>&1)
+		> "./_didfixla"
+	fi
 	# Don't directly install to $DESTDIR to prevent a successful install
 	# from being detected when "make install" fails, or get interrupted.
 	rm -r "$DESTDIR-temp" > /dev/null 2>&1
-	cmd make -j $MAKE_PARALLEL_COUNT DESTDIR="$DESTDIR-temp" install
+	(
+		export DESTDIR="$DESTDIR-temp"
+		cmd make -j $MAKE_PARALLEL_COUNT DESTDIR="$DESTDIR" install
+	) || exit $?
 	cmd mv "$DESTDIR-temp" "$DESTDIR"
 fi         # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]
 
@@ -385,7 +468,9 @@ while IFS= read -r line; do
 		$PACKAGE_LIBDIR/pkgconfig/*.pc)
 			pc_filename="${line##*/}"
 			dst_filename="$PKG_CONFIG_PATH/$pc_filename"
-			if ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
+			if test x"$MODE_DRYRUN" != xno; then
+				echo "> install_file '$line' '$src_filename'  (pkg_config)"
+			elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
 				echo "Installing pkg_config file $dst_filename"
 				unlink "$dst_filename" > /dev/null 2>&1
 				while IFS= read -r pc_line; do

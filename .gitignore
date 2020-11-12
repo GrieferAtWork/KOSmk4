@@ -74,6 +74,7 @@ __ice__
 
 # These headers are installed by `make_utility.sh ... libdrm`
 /kos/include/libdrm/
+/kos/include/libkms/
 /kos/include/drm/
 /kos/include/drm.h
 /kos/include/libsync.h

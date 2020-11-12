@@ -64,6 +64,8 @@ Add support for *_chk variants (using __builtin_object_size())
 <sys/bsdtypes.h>
 
 <gnu/libc-version.h>
+<mkdev.h>
+<sysmacros.h>
 
 
 Functions:
