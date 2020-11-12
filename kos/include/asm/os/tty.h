@@ -24,6 +24,8 @@
 
 #if defined(__KOS__) || defined(__linux__)
 #include <asm/os/kos/tty.h>
+#elif defined(__solaris__)
+#include <asm/os/solaris/tty.h>
 #endif /* ... */
 
 #endif /* !_ASM_OS_TTY_H */

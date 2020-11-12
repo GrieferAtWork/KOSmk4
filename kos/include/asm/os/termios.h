@@ -28,6 +28,8 @@
 #include <asm/os/netbsd/termios.h>
 #elif defined(__FreeBSD__)
 #include <asm/os/freebsd/termios.h>
+#elif defined(__solaris__)
+#include <asm/os/solaris/termios.h>
 #endif /* ... */
 
 /* Substitute default values. */
