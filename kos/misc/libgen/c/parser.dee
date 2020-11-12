@@ -103,7 +103,7 @@ class CParser {
 		_firstLineOffset    = firstLineOffset;
 		_firstLineColOffset = firstLineColOffset;
 		this.text           = text;
-		this.tokEnd            = start;
+		this.tokEnd         = start;
 		this.end            = end;
 		this.filename       = filename;
 		if (text is CParser) {

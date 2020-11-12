@@ -363,10 +363,10 @@ struct instruction {
 #define OPC_XRM16       '~' /* 16-bit register or memory location prefixed by `*' (requires IF_MODRM) */
 #define OP_XRM16        "~" /* 16-bit register or memory location prefixed by `*' (requires IF_MODRM) */
 
-#define OP_PAX         OP_SHORT "a" /* %ax | %eax | %rax (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
-#define OP_PAX_PCX     OP_SHORT "b" /* %ax, %cx | %eax, %ecx | %rax, %rcx (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
+#define OP_PAX         OP_SHORT "a" /* %ax           | %eax             | %rax             (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
+#define OP_PAX_PCX     OP_SHORT "b" /* %ax, %cx      | %eax, %ecx       | %rax, %rcx       (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
 #define OP_PAX_PCX_PDX OP_SHORT "c" /* %ax, %cx, %dx | %eax, %ecx, %edx | %rax, %rcx, %rdx (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
-#define OP_PSI         OP_SHORT "d" /* %si, %esi, %rsi (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
+#define OP_PSI         OP_SHORT "d" /* %si           | %esi             | %rsi             (same as pointer-size; s.a. `DA86_IS(16|32|64)()') */
 
 
 
@@ -516,11 +516,11 @@ PRIVATE char const longops_repr[_LO_size + 1] = {
 
 /* Encode extended-length opcode representation (for better compression). */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define LONGREPR(n)      { '?', (char)(u8)((n) & 0xff), (char)(u8)(((n) >> 8) & 0xff), 0 }
-#define LONGREPR_B(b, n) { (char)(u8)b, '?', (char)(u8)((n) & 0xff), (char)(u8)(((n) >> 8) & 0xff), 0 }
+#define LONGREPR(n)      { OPC_LONGREPR, (char)(u8)((n) & 0xff), (char)(u8)(((n) >> 8) & 0xff), 0 }
+#define LONGREPR_B(b, n) { (char)(u8)b, OPC_LONGREPR, (char)(u8)((n) & 0xff), (char)(u8)(((n) >> 8) & 0xff), 0 }
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-#define LONGREPR(n)      { '?', (char)(u8)(((n) >> 8) & 0xff), (char)(u8)((n) & 0xff), 0 }
-#define LONGREPR_B(b, n) { (char)(u8)b, '?', (char)(u8)(((n) >> 8) & 0xff), (char)(u8)((n) & 0xff), 0 }
+#define LONGREPR(n)      { OPC_LONGREPR, (char)(u8)(((n) >> 8) & 0xff), (char)(u8)((n) & 0xff), 0 }
+#define LONGREPR_B(b, n) { (char)(u8)b, OPC_LONGREPR, (char)(u8)(((n) >> 8) & 0xff), (char)(u8)((n) & 0xff), 0 }
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 
@@ -1954,9 +1954,7 @@ PRIVATE struct instruction const ops_0f[] = {
 
 	I(0x0e, 0,                "femms"), /* https://sandpile.org/x86/opc_k3d.htm */
 
-	/*[[[virtual:I(0x0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx)]]]*/
-
-	/* TODO: 0x0f0f is an instruction:
+	/* 0x0f0f is an instruction:
 	 * >> I(0x0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx),
 	 * Where OP_U8 is the actual opcode byte.
 	 * Yes, the encoding order here is:
@@ -1964,7 +1962,8 @@ PRIVATE struct instruction const ops_0f[] = {
 	 * Instead of what one would expect as:
 	 *    0F 0F OPCODE MODR/M
 	 * s.a. https://sandpile.org/x86/opc_k3d.htm
-	 */
+	 * s.a. `ops_3dnow' further below. */
+	/*[[[virtual:I(0x0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx)]]]*/
 
 	I(0x10, IF_VEX|IF_MODRM, OP_VEX_B0_LIG(1, 1, 0) "vmovups\t" OP_RMn_xMM OP_RxMM),      /*  VEX.128.0f.WIG 10 /r vmovups xmm1, xmm2/m128
 	                                                                                       *  VEX.256.0f.WIG 10 /r vmovups ymm1, ymm2/m256 */
@@ -5202,9 +5201,9 @@ PRIVATE struct instruction const ops_xop9[] = {
  *    XOP9 D6h     vphadduwd      Vo,Wo
  *    XOP9 D7h     vphadduwq      Vo,Wo
  *    XOP9 DBh     vphaddudq      Vo,Wo
- *    XOP9 E1h     VPHSUBBW       Vo,Wo
- *    XOP9 E2h     VPHSUBWD       Vo,Wo
- *    XOP9 E3h     VPHSUBDQ       Vo,Wo
+ *    XOP9 E1h     vphsubbw       Vo,Wo
+ *    XOP9 E2h     vphsubwd       Vo,Wo
+ *    XOP9 E3h     vphsubdq       Vo,Wo
  */
 
 

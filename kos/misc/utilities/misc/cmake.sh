@@ -1,4 +1,3 @@
-#TEST: require_utility openssl "$PKG_CONFIG_PATH/openssl.pc"
 # Copyright (c) 2019-2020 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

@@ -19,50 +19,34 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+PACKAGE_URL="https://nano-editor.org/dist/v4/nano-4.4.tar.xz"
 
-if [ -z "$VERSION" ]; then VERSION="4.4"; fi
+# Additions configure options
+CONFIGURE=""
+CONFIGURE="$CONFIGURE --enable-largefile"
+CONFIGURE="$CONFIGURE --disable-threads"
+CONFIGURE="$CONFIGURE --disable-nls"
+CONFIGURE="$CONFIGURE --enable-browser"
+CONFIGURE="$CONFIGURE --enable-color"
+CONFIGURE="$CONFIGURE --enable-comment"
+CONFIGURE="$CONFIGURE --enable-extra"
+CONFIGURE="$CONFIGURE --enable-help"
+CONFIGURE="$CONFIGURE --enable-histories"
+CONFIGURE="$CONFIGURE --enable-justify"
+#ONFIGURE="$CONFIGURE --enable-libmagic" # TODO
+CONFIGURE="$CONFIGURE --enable-linenumbers"
+CONFIGURE="$CONFIGURE --enable-mouse"
+CONFIGURE="$CONFIGURE --enable-multibuffer"
+CONFIGURE="$CONFIGURE --enable-nanorc"
+CONFIGURE="$CONFIGURE --enable-operatingdir"
+CONFIGURE="$CONFIGURE --enable-speller"
+CONFIGURE="$CONFIGURE --enable-tabcomp"
+CONFIGURE="$CONFIGURE --enable-wordcomp"
+CONFIGURE="$CONFIGURE --enable-wrapping"
+CONFIGURE="$CONFIGURE --disable-debug"
+CONFIGURE="$CONFIGURE --disable-tiny"
+CONFIGURE="$CONFIGURE --enable-utf8"
 
-SRCPATH="$KOS_ROOT/binutils/src/nano-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/nano-$VERSION"
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/nano" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
-		if ! [ -f "$SRCPATH/configure" ]; then
-			cmd cd "$KOS_ROOT/binutils/src"
-			download_file \
-				"nano-$VERSION.tar.xz" \
-				https://nano-editor.org/dist/v4/nano-$VERSION.tar.xz
-			cmd tar xvf "nano-$VERSION.tar.xz"
-		fi
-		apply_patch \
-			"$SRCPATH" \
-			"$KOS_PATCHES/nano-$VERSION.patch"
-		rm -rf "$OPTPATH" > /dev/null 2>&1
-		cmd mkdir -p "$OPTPATH"
-		cmd cd "$OPTPATH"
-		export CC="${CROSS_PREFIX}gcc"
-		export CPP="${CROSS_PREFIX}cpp"
-		cmd bash ../../../src/nano-$VERSION/configure \
-			--bindir="/bin" \
-			--datarootdir="/usr/share" \
-			--datadir="/usr/share" \
-			--sysconfdir="/etc" \
-			--localstatedir="/var" \
-			--libdir="/usr/$TARGET_LIBPATH" \
-			--includedir="/usr/include" \
-			--oldincludedir="/usr/include" \
-			--infodir="/usr/share/info" \
-			--mandir="/usr/share/man" \
-			--localedir="/usr/share/locale" \
-			--host="$TARGET_NAME-linux-gnu" \
-			--disable-threads \
-			--disable-nls \
-			--with-gnu-ld \
-			--without-libiconv-prefix \
-			--without-libintl-prefix
-	fi
-	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
-fi
-
-install_file /bin/nano "$OPTPATH/src/nano"
+# Nano uses autoconf+automake
+. "$KOS_MISC/utilities/misc/gnu_make.sh"
 

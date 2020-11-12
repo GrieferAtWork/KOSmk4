@@ -162,6 +162,10 @@ fi
 
 PYTHON_EXE="$OPTPATH/python"
 if [ -f "$OPTPATH/python.exe" ]; then
+	# Python outputs its ELF binary file with an .exe extension
+	# when the host is a windows machine (and you're building
+	# python from inside of cygwin)
+	# I'm not kidding. It's an ELF, and not a PE binary...
 	PYTHON_EXE="$OPTPATH/python.exe"
 fi
 
