@@ -47,6 +47,6 @@ CONFIGURE="$CONFIGURE --disable-debug"
 CONFIGURE="$CONFIGURE --disable-tiny"
 CONFIGURE="$CONFIGURE --enable-utf8"
 
-# Nano uses autoconf+automake
+# Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
 

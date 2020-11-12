@@ -18,91 +18,13 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-VERSION="1.0.3"
-SO_VERSION_MAJOR="1"
-SO_VERSION="$SO_VERSION_MAJOR.0.0"
+PACKAGE_URL="https://sourceforge.net/projects/libuuid/files/libuuid-1.0.3.tar.gz"
 
-SRCPATH="$KOS_ROOT/binutils/src/libuuid-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/libuuid-$VERSION"
+# Automatically build+install using autoconf
+. "$KOS_MISC/utilities/misc/gnu_make.sh"
 
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libuuid.so.$SO_VERSION" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
-		if ! [ -f "$SRCPATH/configure" ]; then
-			cmd cd "$KOS_ROOT/binutils/src"
-			download_file \
-				"libuuid-${VERSION}.tar.gz" \
-				"https://sourceforge.net/projects/libuuid/files/libuuid-$VERSION.tar.gz"
-			cmd tar xvf "libuuid-${VERSION}.tar.gz"
-		fi
-		cmd rm -rf "$OPTPATH"
-		cmd mkdir -p "$OPTPATH"
-		cmd cd "$OPTPATH"
-		(
-			export CC="${CROSS_PREFIX}gcc"
-			export CPP="${CROSS_PREFIX}cpp"
-			export CFLAGS="-ggdb"
-			export CXX="${CROSS_PREFIX}g++"
-			export CXXCPP="${CROSS_PREFIX}cpp"
-			export CXXFLAGS="-ggdb"
-			cmd bash ../../../src/libuuid-$VERSION/configure \
-				--prefix="/" \
-				--exec-prefix="/" \
-				--bindir="/bin" \
-				--sbindir="/bin" \
-				--libexecdir="/libexec" \
-				--sysconfdir="/etc" \
-				--sharedstatedir="/usr/com" \
-				--localstatedir="/var" \
-				--libdir="/$TARGET_LIBPATH" \
-				--includedir="/usr/include" \
-				--oldincludedir="/usr/include" \
-				--datarootdir="/usr/share" \
-				--datadir="/usr/share" \
-				--infodir="/usr/share/info" \
-				--localedir="/usr/share/locale" \
-				--mandir="/usr/share/man" \
-				--docdir="/usr/share/doc/libuuid" \
-				--htmldir="/usr/share/doc/libuuid" \
-				--dvidir="/usr/share/doc/libuuid" \
-				--pdfdir="/usr/share/doc/libuuid" \
-				--psdir="/usr/share/doc/libuuid" \
-				--build="$(gcc -dumpmachine)" \
-				--host="$TARGET_NAME-linux-gnu" \
-				--enable-shared \
-				--enable-static \
-				--with-gnu-ld
-		) || exit $?
-	fi
-	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
-fi
-
-# Install libraries
-install_file /$TARGET_LIBPATH/libuuid.so.$SO_VERSION_MAJOR "$OPTPATH/.libs/libuuid.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libuuid.so.$SO_VERSION libuuid.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libuuid.so libuuid.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libuuid.a "$OPTPATH/.libs/libuuid.a"
-
-install_rawfile "$KOS_ROOT/kos/include/uuid/uuid.h" "$SRCPATH/uuid.h"
-
-install_proxy_c_header() {
-	install_rawfile_stdin "$1" <<EOF
-#include "$2"
-EOF
-}
-install_proxy_c_header "$KOS_ROOT/kos/include/uuid.h" "uuid/uuid.h"
-
-# Install the PKG_CONFIG file
-install_rawfile_stdin "$PKG_CONFIG_PATH/uuid.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: uuid
-Description: Universally unique id library
-Version: $VERSION
-Requires:
-Cflags:
-Libs: -luuid
+# Convenience include for programs that wish to
+# directly include <uuid.h> without PKG_CONFIG
+install_rawfile_stdin "$KOS_ROOT/kos/include/uuid.h" <<EOF
+#include "uuid/uuid.h"
 EOF

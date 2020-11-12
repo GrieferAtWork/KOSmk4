@@ -78,7 +78,7 @@ if test -z "$PACKAGE_LIBEXECDIR";     then PACKAGE_LIBEXECDIR="${PACKAGE_EPREFIX
 if test -z "$PACKAGE_SYSCONFDIR";     then PACKAGE_SYSCONFDIR="${PACKAGE_PREFIX%/}/etc"; fi
 if test -z "$PACKAGE_SHAREDSTATEDIR"; then PACKAGE_SHAREDSTATEDIR="${PACKAGE_PREFIX%/}/usr/com"; fi
 if test -z "$PACKAGE_LOCALSTATEDIR";  then PACKAGE_LOCALSTATEDIR="${PACKAGE_PREFIX%/}/var"; fi
-if test -z "$PACKAGE_LIBDIR";         then PACKAGE_LIBDIR="${PACKAGE_EPREFIX%/}/lib"; fi
+if test -z "$PACKAGE_LIBDIR";         then PACKAGE_LIBDIR="${PACKAGE_EPREFIX%/}/$TARGET_LIBPATH"; fi
 if test -z "$PACKAGE_INCLUDEDIR";     then PACKAGE_INCLUDEDIR="${PACKAGE_PREFIX%/}/usr/include"; fi
 if test -z "$PACKAGE_OLDINCLUDEDIR";  then PACKAGE_OLDINCLUDEDIR="$PACKAGE_INCLUDEDIR"; fi
 if test -z "$PACKAGE_DATAROOTDIR";    then PACKAGE_DATAROOTDIR="${PACKAGE_PREFIX%/}/usr/share"; fi
@@ -126,11 +126,8 @@ echo "gnu_make: PACKAGE_URL      '$PACKAGE_URL'"
 SRCPATH="$KOS_ROOT/binutils/src/$PACKAGE_NAME"
 OPTPATH="$BINUTILS_SYSROOT/opt/$PACKAGE_NAME"
 DESTDIR="$BINUTILS_SYSROOT/opt/${PACKAGE_NAME}-install"
-DESTDIR2="$BINUTILS_SYSROOT/opt/${PACKAGE_NAME}-install-temp"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
-	rm -r "$DESTDIR" > /dev/null 2>&1
-	rm -r "$DESTDIR2" > /dev/null 2>&1
 	if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]; then
 		if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 			if ! [ -f "$SRCPATH/configure" ]; then
@@ -161,7 +158,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						exit 1
 					fi
 				fi
-				if ! [ -f "$SRCPATH/Makefile.in" ]; then
+				if ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; then
 					cmd cd "$SRCPATH"
 					cmd automake
 				fi
@@ -199,7 +196,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						echo "	option: $opt"
 					done
 				fi
-				echo "Scanning '$SRCPATH/configure --help' for additional options..."
+				echo "Scanning '$SRCPATH/configure --help' for options..."
 				while IFS= read -r line; do
 					case "$line" in
 					*--prefix=*)         if ! [[ "$CONFIGURE" == *--prefix=*         ]]; then echo "	option: --prefix=$PACKAGE_PREFIX";                 CONFIGURE="$CONFIGURE --prefix=$PACKAGE_PREFIX"; fi ;;
@@ -265,6 +262,22 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					*--enable-shared* | *--disable-shared*)
+						if ! [[ "$CONFIGURE" == *--enable-shared* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-shared* ]]; then
+							echo "	option: --enable-shared"
+							CONFIGURE="$CONFIGURE --enable-shared";
+						fi
+						;;
+
+					*--enable-static* | *--disable-static*)
+						if ! [[ "$CONFIGURE" == *--enable-static* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-static* ]]; then
+							echo "	option: --enable-static"
+							CONFIGURE="$CONFIGURE --enable-static";
+						fi
+						;;
+
 					*) ;;
 					esac
 				done < "$SRCPATH/_configure_help"
@@ -283,8 +296,11 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 		> "$OPTPATH/_didmake"
 	fi     # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]
 	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT DESTDIR="$DESTDIR2" install
-	cmd mv "$DESTDIR2" "$DESTDIR"
+	# Don't directly install to $DESTDIR to prevent a successful install
+	# from being detected when "make install" fails, or get interrupted.
+	rm -r "$DESTDIR-temp" > /dev/null 2>&1
+	cmd make -j $MAKE_PARALLEL_COUNT DESTDIR="$DESTDIR-temp" install
+	cmd mv "$DESTDIR-temp" "$DESTDIR"
 fi         # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]
 
 
@@ -294,6 +310,7 @@ cmd cd "$DESTDIR"
 while IFS= read -r line; do
 	line="${line#.}"
 	if ! test -z "$line"; then
+		src_filename="${DESTDIR}$line"
 		case "$line" in
 
 		# Ignored files (Don't install documentation on disk images (for now))
@@ -302,9 +319,134 @@ while IFS= read -r line; do
 		$PACKAGE_DVIDIR/* | $PACKAGE_PDFDIR/* | $PACKAGE_PSDIR/*)
 			;;
 
+		$PACKAGE_LIBDIR/*.la)
+			# Skip libtool instruction files
+			;;
+
+		$PACKAGE_LIBDIR/*.a)
+			# Don't install static libraries on-disk. - Only install them in the lib-path
+			install_file_nodisk "$line" "$src_filename"
+			;;
+
+		*.so.*)
+			# NOTE: All of the following is a work-around to get shared library symlinks
+			#       working properly, as KOS's disk images currently don't support symbolic
+			#       links due to the fact that they're using FAT
+			dst_path="${line%/*}"
+			src_name="${line##*/}"
+			raw_name="${src_name%.so.*}.so"
+			# Versioned shared libraries are kind-of special:
+			#    lrwxrwxrwx [...] libuuid.so -> libuuid.so.1.0.0
+			#    lrwxrwxrwx [...] libuuid.so.1 -> libuuid.so.1.0.0
+			#    -rwxr-xr-x [...] libuuid.so.1.0.0
+			# Since we're only enumerating regular files, we'll only get here once for "libuuid.so.1.0.0".
+			# To install this file correctly, we must do the following:
+			# $ install_file    /$TARGET_LIBPATH/libuuid.so.1      libuuid.so.1.0.0
+			# $ install_symlink /$TARGET_LIBPATH/libuuid.so.1.0.0  libuuid.so.1
+			# $ install_symlink /$TARGET_LIBPATH/libuuid.so        libuuid.so.1
+			so_name=""
+			while IFS= read -r readelf_line; do
+				if [[ "$readelf_line" == *"Library soname: ["* ]]; then
+					readelf_line="${readelf_line##*Library soname: [}"
+					if [[ "$readelf_line" == *"]"* ]]; then
+						so_name="${readelf_line%]*}"
+					fi
+				fi
+			done < <(readelf -d -W "$src_filename")
+			if test -z "$so_name"; then so_name="$src_name"; fi
+			if [ -L "${DESTDIR}$dst_path/$so_name" ]; then
+				# Install the shared library under its SO_NAME
+				install_file "$dst_path/$so_name" "$src_filename"
+				if [[ "$so_name" != "$src_name" ]]; then
+					install_symlink "$line" "$so_name";
+				fi
+			else
+				# Install the shared library under its original name
+				install_file "$line" "$src_filename"
+			fi
+			if [[ "$so_name" != "$raw_name" ]] && [ -L "${DESTDIR}$dst_path/$raw_name" ]; then
+				# install_symlink /$TARGET_LIBPATH/libuuid.so libuuid.so.1
+				install_symlink "$dst_path/$raw_name" "$so_name"
+			fi
+			;;
+
+		$PACKAGE_INCLUDEDIR/* | $PACKAGE_OLDINCLUDEDIR/*)
+			if [[ "$line" == "$PACKAGE_INCLUDEDIR/"* ]]; then
+				rel_filename="${line:${#PACKAGE_INCLUDEDIR}}"
+			else
+				rel_filename="${line:${#PACKAGE_OLDINCLUDEDIR}}"
+			fi
+			rel_filename="${rel_filename:1}"
+			# Install a 3rd party header file
+			install_rawfile "$KOS_ROOT/kos/include/$rel_filename" "$src_filename"
+			;;
+
+
+		$PACKAGE_LIBDIR/pkgconfig/*.pc)
+			pc_filename="${line##*/}"
+			dst_filename="$PKG_CONFIG_PATH/$pc_filename"
+			if ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
+				echo "Installing pkg_config file $dst_filename"
+				unlink "$dst_filename" > /dev/null 2>&1
+				while IFS= read -r pc_line; do
+					case "$pc_line" in
+
+					prefix=*)      pc_line="prefix=$PACKAGE_PREFIX" ;;
+					exec_prefix=*) pc_line="exec_prefix=$PACKAGE_EPREFIX" ;;
+					libdir=*)      pc_line="libdir=$KOS_ROOT/bin/$TARGET_NAME-kos$PACKAGE_LIBDIR" ;;
+					includedir=*)  pc_line="includedir=$KOS_ROOT/kos/include" ;;
+
+					Cflags:*)
+						pc_line="${pc_line:7}"
+						new_pc_line=""
+						for arg in $pc_line; do
+							case "$arg" in
+							-I\${includedir})
+								arg=""
+								;;
+							-I\${includedir}/*)
+								arg="-I$KOS_ROOT/kos/include/${arg:16}"
+								;;
+							*)
+								;;
+							esac
+							if ! test -z "$arg"; then
+								new_pc_line="$new_pc_line $arg"
+							fi
+						done
+						pc_line="Cflags:$new_pc_line"
+						;;
+
+					Libs:*)
+						pc_line="${pc_line:5}"
+						new_pc_line=""
+						for arg in $pc_line; do
+							case "$arg" in
+							-L\${libdir})
+								arg=""
+								;;
+							*)
+								;;
+							esac
+							if ! test -z "$arg"; then
+								new_pc_line="$new_pc_line $arg"
+							fi
+						done
+						pc_line="Libs:$new_pc_line"
+						;;
+
+					*) ;;
+					esac
+					echo "$pc_line" >> "$dst_filename"
+				done < "$src_filename"
+			else
+				echo "Installing pkg_config file $dst_filename (up to date)"
+			fi
+			;;
+
 		*)
 			# Fallback: Install the file normally
-			install_file $line "${DESTDIR}$line"
+			install_file "$line" "$src_filename"
 		esac
 	fi
 done < <(find . -type f 2>&1)
