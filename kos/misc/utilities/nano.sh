@@ -19,6 +19,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility file       "$PKG_CONFIG_PATH/libmagic.pc"
 PACKAGE_URL="https://nano-editor.org/dist/v4/nano-4.4.tar.xz"
 
 # Additions configure options
@@ -33,7 +34,7 @@ CONFIGURE="$CONFIGURE --enable-extra"
 CONFIGURE="$CONFIGURE --enable-help"
 CONFIGURE="$CONFIGURE --enable-histories"
 CONFIGURE="$CONFIGURE --enable-justify"
-#ONFIGURE="$CONFIGURE --enable-libmagic" # TODO
+CONFIGURE="$CONFIGURE --enable-libmagic"
 CONFIGURE="$CONFIGURE --enable-linenumbers"
 CONFIGURE="$CONFIGURE --enable-mouse"
 CONFIGURE="$CONFIGURE --enable-multibuffer"

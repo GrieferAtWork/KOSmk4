@@ -33,16 +33,16 @@ CONFIGURE="$CONFIGURE --enable-bzlib"
 CONFIGURE="$CONFIGURE --disable-libseccomp"
 
 
-# In order to build the "file" utility, you need install same 
-# Otherwise, you'll end up with an error such as the following:
+# In order to build the "file" utility, you need install same version on
+# the host. Otherwise, you'll end up with an error such as the following:
 # >> Cannot use the installed version of file (5.32) to
 # >> cross-compile file 5.39
 # >> Please install file 5.39 locally first
-GM_HOOK_BEFORE_MAKE=_install_host_version
-_install_host_version() {
+GM_HOOK_BEFORE_MAKE=_ensure_host_has_same_file_version
+_ensure_host_has_same_file_version() {
 	local host_file_version="$(file --version | sed -e s/file-// -e q)"
 	if [[ "$host_file_version" != "$PACKAGE_VERSION" ]]; then
-		echo "Need to built 'file'-package for host in order to cross-compile..."
+		echo "Need to build 'file'-package for host in order to cross-compile..."
 		echo "	Already installed version        '$host_file_version'"
 		echo "	Needed version for cross-compile '$PACKAGE_VERSION'"
 		local BINUTILS_MISC="$KOS_ROOT/binutils/misc"
@@ -52,12 +52,15 @@ _install_host_version() {
 				if ! [ -f "$HOST_FILE_OPTPATH/Makefile" ]; then
 					rm -r "$HOST_FILE_OPTPATH" > /dev/null 2>&1
 					cmd mkdir -p "$HOST_FILE_OPTPATH"
+					# Configure for the host
 					cmd cd "$HOST_FILE_OPTPATH"
 					cmd ../../../src/$PACKAGE_NAME/configure --prefix="$BINUTILS_MISC"
 				fi
+				# Make for the host
 				cmd cd "$HOST_FILE_OPTPATH"
 				cmd make -j $MAKE_PARALLEL_COUNT
 			fi
+			# Install (in `<KOS>/binutils/misc/bin' for the host)
 			cmd cd "$HOST_FILE_OPTPATH"
 			cmd make -j $MAKE_PARALLEL_COUNT install
 		fi

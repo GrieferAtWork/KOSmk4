@@ -527,6 +527,7 @@ EOF
 		cmd make -j $MAKE_PARALLEL_COUNT DESTDIR="$DESTDIR" install
 	) || exit $?
 	${GM_HOOK_AFTER_INSTALL:-:}
+	rm -r "$DESTDIR" > /dev/null 2>&1
 	cmd mv "$DESTDIR-temp" "$DESTDIR"
 fi         # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]
 
