@@ -1,4 +1,60 @@
 
+## 3rd party directories within the KOS source tree:
+
+- `/binutils`
+	- `/binutils/misc`
+		- Sysroot for 3rd programs needed for building KOS components
+		- These programs are build to run on your own machine (i.e. not meant to be run by KOS)
+		- `/binutils/misc/opt/$PACKAGE_NAME`
+			- Intermediate out-of-source build files for packages installed in `$PROJPATH/binutils/misc`
+			- These programs are build to run on your own machine (i.e. not meant to be run by KOS)
+	- `/binutils/$TARGET_CPU-kos`
+		- Sysroot for per-toolchain programs built for the host.
+		- Most notably, the toolchain GCC can be found under `/binutils/$TARGET_CPU-kos/bin/gcc`
+		- `/binutils/$TARGET_CPU-kos/opt/$PACKAGE_NAME`
+			- Intermediate out-of-source build files for 3rd party utilities built for KOS
+		- `/binutils/$TARGET_CPU-kos/opt/$PACKAGE_NAME-install`
+			- Package distribution installation (if needed)
+			- This contains a super-set of files from 3rd party programs that get installed on KOS disk images
+	- `/binutils/src`
+		- Source files and package archives for 3rd party programs
+		- This folder is populated by `make_toolchain.sh` and `make_utility.sh`
+- `/kos/misc`
+	- `/kos/misc/utilities`
+		- A collection of shell-scripts used to install 3rd party programs for execution under KOS
+	- `/kos/misc/patches/$PACKAGE_NAME.patch`
+		- Patches used by scripts in `/kos/misc/utilities`
+		- Where used, these are applied to `/binutils/src/$PACKAGE_NAME`
+- `/bin/$TARGET_CPU-kos-common`
+	- Common folder for 3rd party utilities installed on-disk
+	- Files installed here are (usually) copied from `/binutils/$TARGET_CPU-kos/opt/$PACKAGE_NAME-install`
+- `/bin/$TARGET_CPU-kos-$CONFIG`
+	- Mirror of files found on `/bin/$TARGET_CPU-kos-$CONFIG/disk.img`
+	- Mostly consists of symbolic links to files in `/bin/$TARGET_CPU-kos-common`
+	- Files who's representation depends on how KOS and its system libraries are configured are also found here
+	- This is where files from 3rd party utilities & KOS system files are merged
+- `/bin/$TARGET_CPU-kos-$CONFIG/disk.img`
+	- The actual (FAT) disk image with which KOS is booted
+
+
+As such, when you install a 3rd party utility, it will go through the following files:
+
+- make_utility.sh: `/kos/misc/utilities/my_utility.sh`
+- download: `https://my_url.com/my_utility-1.0.tar.gr`
+	- `/binutils/src/my_utility-1.0.tar.gr`
+- unpack: `/binutils/src/my_utility-1.0`
+- configure: `/binutils/src/my_utility-1.0/configure`
+	- `/binutils/$TARGET_CPU-kos/opt/my_utility-1.0`
+- Make: `/binutils/$TARGET_CPU-kos/opt/my_utility-1.0/Makefile`
+- Make install: `DESTDIR=/binutils/$TARGET_CPU-kos/opt/my_utility-1.0-install`
+- Install package template:
+	- `/bin/$TARGET_CPU-kos-common`
+	- `/bin/$TARGET_CPU-kos-$CONFIG`
+	- mcopy `/bin/$TARGET_CPU-kos-$CONFIG/disk.img`
+
+
+
+
 <a name="X-server"></a>
 ## Experimental utilities for X-server support:
 
@@ -73,11 +129,11 @@ signal 11
 program    pid tid S cpu location
 kernel     0       I #0  C02AA829:scheduler.c:1303:idle_unload_and_switch_to
 Xorg       4       R #0  D4BFECA:sys.socket.c:48:libc___cmsg_nxthdr
-init       1       S #0 
-busybox    2       S #0 
-kernel     0       S #0 
-xclock     6       S #0 
+init       1       S #0
+busybox    2       S #0
+kernel     0       S #0
+xclock     6       S #0
 ???        0       R #1  C02AAE20:scheduler.c:1455:cpu_deepsleep
-xinit      3       S #1 
+xinit      3       S #1
 >
 ```

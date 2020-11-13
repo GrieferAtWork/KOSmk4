@@ -212,7 +212,7 @@ function build(reconfigure: Callable = none, binTargetName: string = none) {
 	KERNEL_BINARY  = TARGET_BINPATH + "/os/kernel.bin";
 
 	/* Configure MTOOLS build steps */
-	toolchain.options[TOOLCHAIN_MTOOLS_EXE]  = HOST_EXE("binutils/build-mtools/mtools");
+	toolchain.options[TOOLCHAIN_MTOOLS_EXE]  = HOST_EXE("binutils/misc/bin/mtools");
 	toolchain.options[TOOLCHAIN_MTOOLS_DISK] = TARGET_BINPATH[1:] + "/disk.img";
 
 	import . as me;

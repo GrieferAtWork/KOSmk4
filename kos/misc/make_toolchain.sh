@@ -194,11 +194,18 @@ download_mtool() {
 
 configure_mtools() {
 	echo "Checking if $MTOOLS_VERSION has been configured"
-	if ! [ -f "$KOS_BINUTILS/build-mtools/Makefile" ]; then
+	if ! [ -f "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION/Makefile" ]; then
 		echo "    Now configuring $MTOOLS_VERSION"
-		cmd mkdir -p "$KOS_BINUTILS/build-mtools"
-		cmd cd "$KOS_BINUTILS/build-mtools"
-		cmd bash "../src/$MTOOLS_VERSION/configure"
+		cmd mkdir -p "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
+		cmd cd "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
+		cmd bash "$KOS_BINUTILS/src/$MTOOLS_VERSION/configure" \
+			--prefix="$KOS_BINUTILS/misc"
+
+		# Work around an issue: mtools forgets to add -liconv when
+		# linking, so prevent it from making use of that struff.
+		cmd [ -f "config.h" ]
+		cmd echo "#undef HAVE_ICONV_H" >> "config.h"
+
 		cmd cd "$KOS_BINUTILS"
 	else
 		echo "    $MTOOLS_VERSION has already been configured"
@@ -207,14 +214,22 @@ configure_mtools() {
 
 build_mtools() {
 	echo "Checking if $MTOOLS_VERSION has been built"
-	if ! [ -f "$KOS_BINUTILS/build-mtools/mtools.exe" ] && \
-	   ! [ -f "$KOS_BINUTILS/build-mtools/mtools" ]; then
-		echo "    Now building $MTOOLS_VERSION"
-		cmd cd "$KOS_BINUTILS/build-mtools"
-		cmd make -j $MAKE_PARALLEL_COUNT
+	if ! [ -f "$KOS_BINUTILS/misc/bin/mtools" ] && \
+	   ! [ -f "$KOS_BINUTILS/misc/bin/mtools.exe" ]; then
+		if ! [ -f "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION/mtools" ] && \
+		   ! [ -f "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION/mtools.exe" ]; then
+			echo "    Now building $MTOOLS_VERSION"
+			cmd cd "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
+			cmd make -j $MAKE_PARALLEL_COUNT
+		else
+			echo "    $MTOOLS_VERSION has already been built"
+		fi
+		echo "    Now installing $MTOOLS_VERSION (to '$KOS_BINUTILS/misc/')"
+		cmd cd "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
+		cmd make -j $MAKE_PARALLEL_COUNT install
 		cmd cd "$KOS_BINUTILS"
 	else
-		echo "    $MTOOLS_VERSION has already been built"
+		echo "    $MTOOLS_VERSION has already been installed"
 	fi
 }
 
