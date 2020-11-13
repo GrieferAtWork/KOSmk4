@@ -142,9 +142,11 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 	if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]; then
 		if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
 			if ! [ -f "$SRCPATH/configure" ]; then
-				if ! [ -f "$SRCPATH/configure.ac" ]; then
-					rm -r "$SRCPATH" > /dev/null 2>&1
-					cmd cd "$(dirname "$SRCPATH")"
+				# Remove $SRCPATH if it's just an empty directory
+				rmdir "$SRCPATH" > /dev/null 2>&1
+				if ! [ -d "$SRCPATH" ]; then
+					BINUTILS_SOURCES="$(dirname "$SRCPATH")"
+					cmd cd "$BINUTILS_SOURCES"
 					# Figure out how to download+unpack the package
 					if [[ "$_PACKAGE_URL_FILENAME" == *.tar* ]]; then
 						# Tar archive. Extract the filename of the file that will be downloaded
@@ -159,19 +161,28 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							fi
 						fi
 						rm -r "./$_PACKAGE_URL_NAME" > /dev/null 2>&1
-						cmd tar xvf "$_PACKAGE_URL_WANTED_FILENAME"
-						if [ "$_PACKAGE_URL_NAME" != "$PACKAGE_NAME" ]; then
-							cmd mv "$_PACKAGE_URL_NAME" "$PACKAGE_NAME"
-						fi
+						cmd mkdir -p "$SRCPATH"
+						cmd tar xvf "$_PACKAGE_URL_WANTED_FILENAME" -C "$SRCPATH"
 					else
 						# Unrecognized package distribution format
 						echo "No known way of extracting files from: '$_PACKAGE_URL_FILENAME'"
 						exit 1
 					fi
 				fi
+				cmd cd "$SRCPATH"
+				# Fix-up doubly-packaged packages
+				while [[ `ls -A | wc -l` == 1 ]]; do
+					subdirname=`ls -A`
+					echo "Fix-up doubly-packed package '$subdirname' -> '${PACKAGE_NAME}'"
+					rm -r "$BINUTILS_SOURCES/.${PACKAGE_NAME}-real" > /dev/null 2>&1
+					cmd mv "$subdirname" "../.${PACKAGE_NAME}-real"
+					cmd cd ".."
+					cmd rmdir "${PACKAGE_NAME}"
+					cmd mv ".${PACKAGE_NAME}-real" "${PACKAGE_NAME}"
+					cmd cd "$SRCPATH"
+				done
 				# (Try to) generate configure (if it's missing)
-				if ! [ -f "$SRCPATH/configure" ] || \
-					{ ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; }; then
+				if ! [ -f "$SRCPATH/configure" ]; then
 					if [ -f "$SRCPATH/configure.ac" ]; then
 						_PACKAGE_AUTOCONF_INPUT="$SRCPATH/configure.ac"
 					elif [ -f "$SRCPATH/configure.in" ]; then
@@ -196,6 +207,8 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 					if test x"$ac_requires_xorg" != xno; then
 						. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
 					fi
+					# Generate all of the missing files.
+					cmd autoreconf -i
 					if ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; then
 						cmd cd "$SRCPATH"
 						cmd automake
@@ -204,11 +217,16 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						cmd cd "$SRCPATH"
 						cmd autoconf
 					fi
+					# Try to converse disk space by getting rid of cache files created by autoreconf.
+					rm -r "$SRCPATH/autom4te.cache" > /dev/null 2>&1
 				fi
 			fi
 			if [ -f "$KOS_PATCHES/$PACKAGE_NAME.patch" ]; then
 				apply_patch "$SRCPATH" "$KOS_PATCHES/$PACKAGE_NAME.patch"
 			fi
+
+			${GM_HOOK_BEFORE_CONFARGS:-:}
+
 			rm -r "$OPTPATH" > /dev/null 2>&1
 			cmd mkdir -p "$OPTPATH"
 			cmd cd "$OPTPATH"
@@ -487,11 +505,16 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 $PACKAGE_CONFIG_SITE
 EOF
 				fi
+				${GM_HOOK_BEFORE_CONFIGURE:-:}
+				cmd cd "$OPTPATH"
 				cmd bash ../../../src/$PACKAGE_NAME/configure $CONFIGURE
 			) || exit $?
+			${GM_HOOK_AFTER_CONFIGURE:-:}
 		fi # if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ];
+		${GM_HOOK_BEFORE_MAKE:-:}
 		cmd cd "$OPTPATH"
 		cmd make -j $MAKE_PARALLEL_COUNT
+		${GM_HOOK_AFTER_MAKE:-:}
 		> "$OPTPATH/_didmake"
 	fi     # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]
 	cmd cd "$OPTPATH"
@@ -500,8 +523,10 @@ EOF
 	rm -r "$DESTDIR-temp" > /dev/null 2>&1
 	(
 		export DESTDIR="$DESTDIR-temp"
+		${GM_HOOK_BEFORE_INSTALL:-:}
 		cmd make -j $MAKE_PARALLEL_COUNT DESTDIR="$DESTDIR" install
 	) || exit $?
+	${GM_HOOK_AFTER_INSTALL:-:}
 	cmd mv "$DESTDIR-temp" "$DESTDIR"
 fi         # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]
 
