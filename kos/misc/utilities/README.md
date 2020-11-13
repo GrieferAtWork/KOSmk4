@@ -37,21 +37,18 @@
 	- The actual (FAT) disk image with which KOS is booted
 
 
-As such, when you install a 3rd party utility, it will go through the following files:
-
-- make_utility.sh: `/kos/misc/utilities/my_utility.sh`
-- download: `https://my_url.com/my_utility-1.0.tar.gr`
-	- `/binutils/src/my_utility-1.0.tar.gr`
-- unpack: `/binutils/src/my_utility-1.0`
-- configure: `/binutils/src/my_utility-1.0/configure`
-	- `/binutils/$TARGET_CPU-kos/opt/my_utility-1.0`
-- Make: `/binutils/$TARGET_CPU-kos/opt/my_utility-1.0/Makefile`
-- Make install: `DESTDIR=/binutils/$TARGET_CPU-kos/opt/my_utility-1.0-install`
-- Install package template:
-	- `/bin/$TARGET_CPU-kos-common`
-	- `/bin/$TARGET_CPU-kos-$CONFIG`
-	- mcopy `/bin/$TARGET_CPU-kos-$CONFIG/disk.img`
-
+As such, when you install a 3rd party package, it will go through the following steps:
+- `/kos/misc/utilities/my_utility.sh`: Your package's install script (called by `make_utility.sh`)
+- `/binutils/src/my_utility-1.0.tar.gz`: downloaded from `https://my_url.com/my_utility-1.0.tar.gr`
+- `/binutils/src/my_utility-1.0`: unpacked from the downloaded file
+- `/binutils/src/my_utility-1.0/configure`: configure (using tools from the KOS toolchain)
+- `/binutils/$TARGET_CPU-kos/opt/my_utility-1.0`: Output path for build files (pwd when `configure` is called)
+- `/binutils/$TARGET_CPU-kos/opt/my_utility-1.0/Makefile`: Build the package (via `make`)
+- `/binutils/$TARGET_CPU-kos/opt/my_utility-1.0-install`: Install the package (via `make DESTDIR=... install`)
+- `/bin/$TARGET_CPU-kos-common`: Copy relevant files from the previous step here
+- `/bin/$TARGET_CPU-kos-$CONFIG`: Create symbolic links to `$TARGET_CPU-kos-common`
+- `/bin/$TARGET_CPU-kos-$CONFIG/disk.img`: Copy files onto KOS disk images (via `mcopy`)
+The last 2 steps are performed for every `$CONFIG`-folder that can be located
 
 
 
