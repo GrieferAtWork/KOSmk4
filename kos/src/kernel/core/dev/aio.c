@@ -369,6 +369,7 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self) {
 	uintptr_t old_status;
+	pflag_t was;
 	do {
 		old_status = ATOMIC_READ(self->am_status);
 		if (old_status & AIO_MULTIHANDLE_STATUS_FAILED)
@@ -388,7 +389,9 @@ NOTHROW(KCALL aio_multihandle_fail)(struct aio_multihandle *__restrict self) {
 		memcpy(&self->am_error, &THIS_EXCEPTION_DATA, sizeof(self->am_error));
 	/* Invoke the completion function. */
 	memcpy(&THIS_EXCEPTION_DATA, &self->am_error, sizeof(self->am_error));
+	was = PREEMPTION_PUSHOFF();
 	(*self->am_func)(self, AIO_COMPLETION_FAILURE);
+	PREEMPTION_POP(was);
 }
 
 
