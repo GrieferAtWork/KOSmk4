@@ -64,7 +64,7 @@ __ice__
 # These headers are installed by `make_utility.sh ... libpng`
 /kos/include/libpng/
 /kos/include/libpng16/
-/kos/include/i386-kos/libpng/
+/kos/include/i386-kos/libpng16/
 /kos/include/png.h
 /kos/include/pngconf.h
 /kos/include/pnglibconf.h

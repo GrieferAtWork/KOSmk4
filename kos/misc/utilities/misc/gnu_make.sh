@@ -366,16 +366,6 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 		> "$OPTPATH/_didmake"
 	fi     # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]
 	cmd cd "$OPTPATH"
-	if ! [ -f "./_didfixla" ]; then
-		# Go though the opt-path in search of *.la files which may contain lines such as
-		#      libdir='/lib'
-		# Such lines we must fix to instead say:
-		#      libdir='/lib'
-		while IFS= read -r line; do
-			echo "line: $line"
-		done < <(find . -type f 2>&1)
-		> "./_didfixla"
-	fi
 	# Don't directly install to $DESTDIR to prevent a successful install
 	# from being detected when "make install" fails, or get interrupted.
 	rm -r "$DESTDIR-temp" > /dev/null 2>&1
@@ -393,6 +383,11 @@ cmd cd "$DESTDIR"
 while IFS= read -r line; do
 	line="${line#.}"
 	if ! test -z "$line"; then
+		if ! test -z "$INSTALL_SKIP"; then
+			if [[ " $INSTALL_SKIP " == *" $line "* ]]; then
+				continue
+			fi
+		fi
 		src_filename="${DESTDIR}$line"
 		case "$line" in
 
@@ -459,9 +454,8 @@ while IFS= read -r line; do
 			else
 				rel_filename="${line:${#PACKAGE_OLDINCLUDEDIR}}"
 			fi
-			rel_filename="${rel_filename:1}"
 			# Install a 3rd party header file
-			install_rawfile "$KOS_ROOT/kos/include/$rel_filename" "$src_filename"
+			install_rawfile "$KOS_ROOT/kos/include$rel_filename" "$src_filename"
 			;;
 
 
@@ -469,7 +463,7 @@ while IFS= read -r line; do
 			pc_filename="${line##*/}"
 			dst_filename="$PKG_CONFIG_PATH/$pc_filename"
 			if test x"$MODE_DRYRUN" != xno; then
-				echo "> install_file '$line' '$src_filename'  (pkg_config)"
+				echo "> pkg_config '$src_filename'"
 			elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
 				echo "Installing pkg_config file $dst_filename"
 				unlink "$dst_filename" > /dev/null 2>&1

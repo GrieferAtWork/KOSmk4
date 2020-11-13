@@ -28,10 +28,10 @@ PACKAGE_URL="https://dri.freedesktop.org/libdrm/libdrm-2.4.100.tar.gz"
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
 
 # Install some additional convenience headers
-for f in "$SRCPATH"/include/drm/*.h; do
-	BASEf="$(basename "$f")"
-	install_rawfile_stdin "$KOS_ROOT/kos/include/libdrm/$BASEf" <<EOF
-#include "../drm/$BASEf"
+for f in "$KOS_ROOT"/kos/include/libdrm/*.h; do
+	name="$(basename "$f")"
+	install_rawfile_stdin "$KOS_ROOT/kos/include/drm/$name" <<EOF
+#include "../libdrm/$name"
 EOF
 done
 
