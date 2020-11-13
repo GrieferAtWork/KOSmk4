@@ -1,5 +1,5 @@
 
-## 3rd party directories within the KOS source tree:
+## KOS source tree locations for utilities
 
 - `/binutils`
 	- `/binutils/misc`
