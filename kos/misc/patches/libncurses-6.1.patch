@@ -1,0 +1,38 @@
+diff -Naur libncurses-6.1-orig/c++/etip.h.in libncurses-6.1/c++/etip.h.in
+--- libncurses-6.1-orig/c++/etip.h.in	2017-06-24 23:57:16.000000000 +0200
++++ libncurses-6.1/c++/etip.h.in	2020-11-13 14:22:08.659841700 +0100
+@@ -340,7 +340,7 @@
+ #  else
+ #     include <iostream.h>
+ #  endif
+-   extern "C" void exit(int);
++#  include <stdlib.h> /* exit */
+ #endif
+ 
+ inline void THROW(const NCursesException *e) {
+diff -Naur libncurses-6.1-orig/include/curses.tail libncurses-6.1/include/curses.tail
+--- libncurses-6.1-orig/include/curses.tail	2016-02-13 17:37:45.000000000 +0100
++++ libncurses-6.1/include/curses.tail	2020-11-13 14:24:19.858378800 +0100
+@@ -173,7 +173,9 @@
+ #define OPTIMIZE_ALL		0xff	/* enable all optimizations (dflt) */
+ #endif
+ 
++#ifndef NCURSES_UNCTRL_H_incl
+ #include <unctrl.h>
++#endif /* !NCURSES_UNCTRL_H_incl */
+ 
+ #ifdef __cplusplus
+ 
+diff -Naur libncurses-6.1-orig/include/unctrl.h.in libncurses-6.1/include/unctrl.h.in
+--- libncurses-6.1-orig/include/unctrl.h.in	2009-04-18 23:00:52.000000000 +0200
++++ libncurses-6.1/include/unctrl.h.in	2020-11-13 14:24:33.549821700 +0100
+@@ -51,7 +51,9 @@
+ extern "C" {
+ #endif
+ 
++#ifndef __NCURSES_H
+ #include <curses.h>
++#endif /* !__NCURSES_H */
+ 
+ #undef unctrl
+ NCURSES_EXPORT(NCURSES_CONST char *) unctrl (chtype);

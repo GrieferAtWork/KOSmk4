@@ -19,81 +19,59 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 
-NCURSES_VERSION_MAJOR="6"
-NCURSES_VERSION="$NCURSES_VERSION_MAJOR.1"
-SRCPATH="$KOS_ROOT/binutils/src/ncurses-$NCURSES_VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/ncurses-$NCURSES_VERSION"
+PACKAGE_NAME=libncurses-6.1
+PACKAGE_URL="ftp://ftp.gnu.org/gnu/ncurses/ncurses-6.1.tar.gz"
 
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/lib/libncursesw.so" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
-		if ! [ -f "$SRCPATH/configure" ]; then
-			cmd cd "$KOS_ROOT/binutils/src"
-			download_file \
-				"ncurses-$NCURSES_VERSION.tar.gz" \
-				ftp://ftp.gnu.org/gnu/ncurses/ncurses-$NCURSES_VERSION.tar.gz
-			cmd tar xvf "ncurses-$NCURSES_VERSION.tar.gz"
-		fi
-		apply_patch "${SRCPATH}" "$KOS_PATCHES/ncurses-$NCURSES_VERSION.patch"
-		rm -rf "$OPTPATH" > /dev/null 2>&1
-		cmd mkdir -p "$OPTPATH"
-		cmd cd "$OPTPATH"
-		export CC="${CROSS_PREFIX}gcc"
-		export CPP="${CROSS_PREFIX}cpp"
-		export CXX="${CROSS_PREFIX}g++"
-		export CFLAGS="-ggdb"
-		export CXXFLAGS="-ggdb"
-		cmd bash ../../../src/ncurses-$NCURSES_VERSION/configure \
-			--bindir="/bin" \
-			--datarootdir="/usr/share" \
-			--datadir="/usr/share" \
-			--sysconfdir="/etc" \
-			--localstatedir="/var" \
-			--libdir="/usr/$TARGET_LIBPATH" \
-			--includedir="$KOS_ROOT/kos/include" \
-			--oldincludedir="$KOS_ROOT/kos/include" \
-			--infodir="/usr/share/info" \
-			--mandir="/usr/share/man" \
-			--host="$TARGET_NAME-linux-gnu" \
-			--enable-widec \
-			--without-ada \
-			--disable-db-install \
-			--without-progs \
-			--without-tack \
-			--without-tests \
-			--without-manpages \
-			--with-shared \
-			--with-normal \
-			--with-debug \
-			--with-cxx-shared \
-			--disable-big-core \
-			--disable-database \
-			--with-fallbacks=xterm,unknown \
-			--enable-const \
-			--enable-ext-mouse \
-			--enable-sigwinch \
-			--disable-stripping
-	fi
-	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
-fi
+CONFIGURE=""
+CONFIGURE="$CONFIGURE --without-ada"
+CONFIGURE="$CONFIGURE --with-cxx"
+CONFIGURE="$CONFIGURE --with-cxx-binding"
+CONFIGURE="$CONFIGURE --disable-db-install"
+CONFIGURE="$CONFIGURE --without-progs"
+CONFIGURE="$CONFIGURE --without-tack"
+CONFIGURE="$CONFIGURE --with-curses-h"
+CONFIGURE="$CONFIGURE --with-cxx-shared"
+CONFIGURE="$CONFIGURE --with-dlsym"
+CONFIGURE="$CONFIGURE --disable-database"
+CONFIGURE="$CONFIGURE --with-fallbacks=xterm,unknown"
+CONFIGURE="$CONFIGURE --disable-big-core"
+CONFIGURE="$CONFIGURE --disable-termcap"
+CONFIGURE="$CONFIGURE --disable-getcap"
+CONFIGURE="$CONFIGURE --disable-getcap-cache"
+CONFIGURE="$CONFIGURE --disable-home-terminfo"
+CONFIGURE="$CONFIGURE --enable-ext-funcs"
+CONFIGURE="$CONFIGURE --enable-sp-funcs"
+CONFIGURE="$CONFIGURE --disable-term-driver"
+CONFIGURE="$CONFIGURE --enable-const"
+CONFIGURE="$CONFIGURE --disable-ext-colors"
+CONFIGURE="$CONFIGURE --enable-ext-mouse"
+CONFIGURE="$CONFIGURE --enable-ext-putwin"
+CONFIGURE="$CONFIGURE --disable-no-padding"
+CONFIGURE="$CONFIGURE --enable-sigwinch"
+CONFIGURE="$CONFIGURE --disable-tcap-names"
+CONFIGURE="$CONFIGURE --without-pthread"
+CONFIGURE="$CONFIGURE --disable-pthreads-eintr"
+CONFIGURE="$CONFIGURE --disable-weak-symbols"
+CONFIGURE="$CONFIGURE --disable-reentrant"
+CONFIGURE="$CONFIGURE --disable-stripping"
+#CONFIGURE="$CONFIGURE --enable-assertions"
 
-install_ncurses_library() {
-	install_file        /$TARGET_LIBPATH/${1}.so.$NCURSES_VERSION_MAJOR "$OPTPATH/lib/${1}.so.$NCURSES_VERSION"
-	install_symlink     /$TARGET_LIBPATH/${1}.so.$NCURSES_VERSION       ${1}.so.$NCURSES_VERSION_MAJOR
-	install_symlink     /$TARGET_LIBPATH/${1}.so                        ${1}.so.$NCURSES_VERSION_MAJOR
-	install_file_nodisk /$TARGET_LIBPATH/${1}.a                         "$OPTPATH/lib/${1}.a"
-	install_file_nodisk /$TARGET_LIBPATH/${1}_g.a                       "$OPTPATH/lib/${1}_g.a"
-}
+INSTALL_SKIP=""
+INSTALL_SKIP="$INSTALL_SKIP /bin/ncurses6-config"
+INSTALL_SKIP="$INSTALL_SKIP /bin/ncursesw6-config"
 
-install_ncurses_library libformw
-install_ncurses_library libmenuw
-install_ncurses_library libncursesw
-install_ncurses_library libpanelw
+# Automatically build+install using autoconf
+. "$KOS_MISC/utilities/misc/gnu_make.sh"
 
+# Install convenience headers and headers that may have been missing
+cmd mkdir -p "$KOS_ROOT/kos/include/ncurses"
 cmd mkdir -p "$KOS_ROOT/kos/include/ncursesw"
 
 install_header_ex() {
 	install_rawfile "$KOS_ROOT/kos/include/$2" "$1"
+	install_rawfile_stdin "$KOS_ROOT/kos/include/ncurses/$2" <<EOF
+#include "../$2"
+EOF
 	install_rawfile_stdin "$KOS_ROOT/kos/include/ncursesw/$2" <<EOF
 #include "../$2"
 EOF
@@ -114,6 +92,9 @@ install_header_ex "$SRCPATH/include/nc_tparm.h" nc_tparm.h
 
 install_rawfile_stdin "$KOS_ROOT/kos/include/ncurses.h" <<EOF
 #include "curses.h"
+EOF
+install_rawfile_stdin "$KOS_ROOT/kos/include/ncurses/ncurses.h" <<EOF
+#include "../curses.h"
 EOF
 install_rawfile_stdin "$KOS_ROOT/kos/include/ncursesw/ncurses.h" <<EOF
 #include "../curses.h"

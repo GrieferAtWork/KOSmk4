@@ -43,6 +43,7 @@ __ice__
 /kos/include/cursesw.h
 /kos/include/cursslk.h
 /kos/include/etip.h
+/kos/include/ncurses/
 /kos/include/ncursesw/
 
 # These headers are installed by `make_utility.sh ... zlib`

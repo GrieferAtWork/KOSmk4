@@ -169,13 +169,17 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						exit 1
 					fi
 				fi
-				if ! [ -f "$SRCPATH/configure.ac" ]; then
-					echo "Not a GNU autoconf project (missing file: '$SRCPATH/configure.ac')"
-					exit 1
-				fi
-				# Generate missing configure/makefile
+				# (Try to) generate configure (if it's missing)
 				if ! [ -f "$SRCPATH/configure" ] || \
 					{ ! [ -f "$SRCPATH/Makefile.in" ] && [ -f "$SRCPATH/Makefile.am" ]; }; then
+					if [ -f "$SRCPATH/configure.ac" ]; then
+						_PACKAGE_AUTOCONF_INPUT="$SRCPATH/configure.ac"
+					elif [ -f "$SRCPATH/configure.in" ]; then
+						_PACKAGE_AUTOCONF_INPUT="$SRCPATH/configure.in"
+					else
+						echo "Not a GNU autoconf project (missing file: 'configure')"
+						exit 1
+					fi
 					# Check for autoconf dependencies of this project
 					ac_requires_xorg=no
 					while IFS= read -r line; do
@@ -268,6 +272,14 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					# Install location
+					*--with-install-prefix*)
+						if ! [[ "$CONFIGURE" == *--with-install-prefix=* ]]; then
+							echo "	option: --with-install-prefix=$DESTDIR-temp"
+							CONFIGURE="$CONFIGURE --with-install-prefix=$DESTDIR-temp"
+						fi
+						;;
+
 					# Name of the host machine
 					*--build=*)
 						if ! [[ "$CONFIGURE" == *--build=* ]]; then
@@ -315,6 +327,19 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							else
 								echo "	option: --with-docs"
 								CONFIGURE="$CONFIGURE --with-docs"
+							fi
+						fi
+						;;
+
+					*--without-manpages* | *--with-manpages*)
+						if ! [[ "$CONFIGURE" == *--with-manpages* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-manpages* ]]; then
+							if test -z "$PACKAGE_WITH_DOCS"; then
+								echo "	option: --without-manpages"
+								CONFIGURE="$CONFIGURE --without-manpages"
+							else
+								echo "	option: --with-manpages"
+								CONFIGURE="$CONFIGURE --with-manpages"
 							fi
 						fi
 						;;
@@ -386,6 +411,62 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						   ! [[ "$CONFIGURE" == *--disable-static* ]]; then
 							echo "	option: --enable-static"
 							CONFIGURE="$CONFIGURE --enable-static"
+						fi
+						;;
+
+					*--with-shared* | *--without-shared*)
+						# Alternate name for --enable-shared
+						if ! [[ "$CONFIGURE" == *--with-shared* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-shared* ]]; then
+							echo "	option: --with-shared"
+							CONFIGURE="$CONFIGURE --with-shared"
+						fi
+						;;
+
+					*--with-normal* | *--without-normal*)
+						# Alternate name for --enable-static
+						if ! [[ "$CONFIGURE" == *--with-normal* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-normal* ]]; then
+							echo "	option: --with-normal"
+							CONFIGURE="$CONFIGURE --with-normal"
+						fi
+						;;
+
+					*--with-debug* | *--without-debug*)
+						# Enable debug features (KOS is still young, so any debug
+						# features offered by hosted applications should be enabled
+						# by default)
+						if ! [[ "$CONFIGURE" == *--with-debug* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-debug* ]]; then
+							echo "	option: --with-debug"
+							CONFIGURE="$CONFIGURE --with-debug"
+						fi
+						;;
+
+					*--with-profile* | *--without-profile*)
+						# Disable profiling features by default
+						if ! [[ "$CONFIGURE" == *--with-profile* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-profile* ]]; then
+							echo "	option: --without-profile"
+							CONFIGURE="$CONFIGURE --without-profile"
+						fi
+						;;
+
+					*--enable-stripping* | *--disable-stripping*)
+						# Prevent debug symbols from being stripped
+						if ! [[ "$CONFIGURE" == *--enable-stripping* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-stripping* ]]; then
+							echo "	option: --enable-stripping"
+							CONFIGURE="$CONFIGURE --enable-stripping"
+						fi
+						;;
+
+					*--enable-pc-files* | *--disable-pc-files*)
+						# Instruct to generate *.pc (PKG_CONFIG) files
+						if ! [[ "$CONFIGURE" == *--enable-pc-files* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-pc-files* ]]; then
+							echo "	option: --enable-pc-files"
+							CONFIGURE="$CONFIGURE --enable-pc-files"
 						fi
 						;;
 
@@ -507,7 +588,7 @@ while IFS= read -r line; do
 			;;
 
 
-		$PACKAGE_LIBDIR/pkgconfig/*.pc)
+		*/pkgconfig/*.pc)
 			pc_filename="${line##*/}"
 			dst_filename="$PKG_CONFIG_PATH/$pc_filename"
 			if test x"$MODE_DRYRUN" != xno; then
