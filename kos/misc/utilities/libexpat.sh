@@ -20,100 +20,21 @@
 
 require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 
-VERSION="2.2.9"
-SO_VERSION_MAJOR="1"
-SO_VERSION="$SO_VERSION_MAJOR.6.11"
+PACKAGE_NAME="libexpat-2.2.9"
+PACKAGE_URL="https://github.com/libexpat/libexpat/releases/download/R_2_2_9/expat-2.2.9.tar.gz"
 
-SRCPATH="$KOS_ROOT/binutils/src/libexpat-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/libexpat-$VERSION"
-
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/lib/.libs/libexpat.so.$SO_VERSION" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
-		if ! [ -f "$SRCPATH/configure" ]; then
-			cmd cd "$KOS_ROOT/binutils/src"
-			cmd rm -rf "expat-$VERSION"
-			cmd rm -rf "libexpat-$VERSION"
-			if ! [ -f "libexpat-$VERSION.tar.gz" ]; then
-				download_file \
-					"expat-$VERSION.tar.gz" \
-					"https://github.com/libexpat/libexpat/releases/download/R_${VERSION//./_}/expat-$VERSION.tar.gz"
-				cmd mv "expat-$VERSION.tar.gz" "libexpat-$VERSION.tar.gz"
-			fi
-			cmd tar xvf "libexpat-$VERSION.tar.gz"
-			cmd mv "expat-$VERSION" "libexpat-$VERSION"
-		fi
-		cmd rm -rf "$OPTPATH"
-		cmd mkdir -p "$OPTPATH"
-		cmd cd "$OPTPATH"
-		(
-			export CC="${CROSS_PREFIX}gcc"
-			export CPP="${CROSS_PREFIX}cpp"
-			export CFLAGS="-ggdb"
-			export CXX="${CROSS_PREFIX}g++"
-			export CXXCPP="${CROSS_PREFIX}cpp"
-			export CXXFLAGS="-ggdb"
-			# configure thinks that mmap isn't working without this :(
-			cat > "$OPTPATH/config.site" <<EOF
+# configure thinks that mmap isn't working without this :(
+PACKAGE_CONFIG_SITE='
 ac_cv_func_mmap_fixed_mapped=yes
-EOF
-			export CONFIG_SITE="$OPTPATH/config.site"
-			cmd bash ../../../src/libexpat-$VERSION/configure \
-				--prefix="/" \
-				--exec-prefix="/" \
-				--bindir="/bin" \
-				--sbindir="/bin" \
-				--libexecdir="/libexec" \
-				--sysconfdir="/etc" \
-				--sharedstatedir="/usr/com" \
-				--localstatedir="/var" \
-				--libdir="/$TARGET_LIBPATH" \
-				--includedir="/usr/include" \
-				--oldincludedir="/usr/include" \
-				--datarootdir="/usr/share" \
-				--datadir="/usr/share" \
-				--infodir="/usr/share/info" \
-				--localedir="/usr/share/locale" \
-				--mandir="/usr/share/man" \
-				--docdir="/usr/share/doc/expat" \
-				--htmldir="/usr/share/doc/expat" \
-				--dvidir="/usr/share/doc/expat" \
-				--pdfdir="/usr/share/doc/expat" \
-				--psdir="/usr/share/doc/expat" \
-				--build="$(gcc -dumpmachine)" \
-				--host="$TARGET_NAME-linux-gnu" \
-				--enable-shared \
-				--enable-static \
-				--with-gnu-ld \
-				--without-examples \
-				--without-tests
-		) || exit $?
-	fi
-	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
-fi
+'
 
-# Install libraries
-install_file /$TARGET_LIBPATH/libexpat.so.$SO_VERSION_MAJOR "$OPTPATH/lib/.libs/libexpat.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libexpat.so.$SO_VERSION libexpat.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libexpat.so libexpat.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libexpat.a "$OPTPATH/lib/.libs/libexpat.a"
+INSTALL_SKIP=""
+INSTALL_SKIP="$INSTALL_SKIP /usr/include/expat_config.h" # Contains arch-specific code
 
-# Install headers
-install_rawfile "$KOS_ROOT/kos/include/expat.h" "$SRCPATH/lib/expat.h"
-install_rawfile "$KOS_ROOT/kos/include/expat_external.h" "$SRCPATH/lib/expat_external.h"
-install_rawfile "$KOS_ROOT/kos/include/$TARGET_INCPATH/expat_config.h" "$OPTPATH/expat_config.h"
+# Automatically build+install using autoconf
+. "$KOS_MISC/utilities/misc/gnu_make.sh"
 
-# Install the PKG_CONFIG file
-install_rawfile_stdin "$PKG_CONFIG_PATH/expat.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: expat
-Version: $VERSION
-Description: expat XML parser
-URL: http://www.libexpat.org
-Libs: -lexpat
-Cflags:
-EOF
+# Install arch-specific headers in a more portable way
+install_rawfile \
+	"$KOS_ROOT/kos/include/$TARGET_INCPATH/expat_config.h" \
+	"$DESTDIR/usr/include/expat_config.h"

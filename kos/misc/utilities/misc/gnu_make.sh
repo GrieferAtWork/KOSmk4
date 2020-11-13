@@ -263,8 +263,8 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 					# System root
 					*--with-sysroot*)
 						if ! [[ "$CONFIGURE" == *--with-sysroot=* ]]; then
-							echo "	option: --with-sysroot=$BINUTILS_SYSROOT";
-							CONFIGURE="$CONFIGURE --with-sysroot=$BINUTILS_SYSROOT";
+							echo "	option: --with-sysroot=$BINUTILS_SYSROOT"
+							CONFIGURE="$CONFIGURE --with-sysroot=$BINUTILS_SYSROOT"
 						fi
 						;;
 
@@ -274,8 +274,8 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							if test -z "$PACKAGE_BUILD"; then
 								PACKAGE_BUILD="$(gcc -dumpmachine)"
 							fi
-							echo "	option: --build=$PACKAGE_BUILD";
-							CONFIGURE="$CONFIGURE --build=$PACKAGE_BUILD";
+							echo "	option: --build=$PACKAGE_BUILD"
+							CONFIGURE="$CONFIGURE --build=$PACKAGE_BUILD"
 						fi
 						;;
 
@@ -285,10 +285,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						   ! [[ "$CONFIGURE" == *--disable-largefile* ]]; then
 							if test -z "$PACKAGE_WITHOUT_LARGEFILE"; then
 								echo "	option: --enable-largefile"
-								CONFIGURE="$CONFIGURE --enable-largefile";
+								CONFIGURE="$CONFIGURE --enable-largefile"
 							else
 								echo "	option: --disable-largefile"
-								CONFIGURE="$CONFIGURE --disable-largefile";
+								CONFIGURE="$CONFIGURE --disable-largefile"
 							fi
 						fi
 						;;
@@ -298,11 +298,40 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						   ! [[ "$CONFIGURE" == *--disable-docs* ]]; then
 							if test -z "$PACKAGE_WITH_DOCS"; then
 								echo "	option: --disable-docs"
-								CONFIGURE="$CONFIGURE --disable-docs";
+								CONFIGURE="$CONFIGURE --disable-docs"
 							else
 								echo "	option: --enable-docs"
-								CONFIGURE="$CONFIGURE --enable-docs";
+								CONFIGURE="$CONFIGURE --enable-docs"
 							fi
+						fi
+						;;
+
+					*--without-docs* | *--with-docs*)
+						if ! [[ "$CONFIGURE" == *--with-docs* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-docs* ]]; then
+							if test -z "$PACKAGE_WITH_DOCS"; then
+								echo "	option: --without-docs"
+								CONFIGURE="$CONFIGURE --without-docs"
+							else
+								echo "	option: --with-docs"
+								CONFIGURE="$CONFIGURE --with-docs"
+							fi
+						fi
+						;;
+
+					*--without-examples* | *--with-examples*)
+						if ! [[ "$CONFIGURE" == *--with-examples* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-examples* ]]; then
+							echo "	option: --without-examples"
+							CONFIGURE="$CONFIGURE --without-examples"
+						fi
+						;;
+
+					*--without-tests* | *--with-tests*)
+						if ! [[ "$CONFIGURE" == *--with-tests* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-tests* ]]; then
+							echo "	option: --without-tests"
+							CONFIGURE="$CONFIGURE --without-tests"
 						fi
 						;;
 
@@ -311,7 +340,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						if ! [[ "$CONFIGURE" == *--with-libiconv-prefix* ]] && \
 						   ! [[ "$CONFIGURE" == *--without-libiconv-prefix* ]]; then
 							echo "	option: --without-libiconv-prefix"
-							CONFIGURE="$CONFIGURE --without-libiconv-prefix";
+							CONFIGURE="$CONFIGURE --without-libiconv-prefix"
 						fi
 						;;
 
@@ -319,7 +348,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						if ! [[ "$CONFIGURE" == *--with-libintl-prefix* ]] && \
 						   ! [[ "$CONFIGURE" == *--without-libintl-prefix* ]]; then
 							echo "	option: --without-libintl-prefix"
-							CONFIGURE="$CONFIGURE --without-libintl-prefix";
+							CONFIGURE="$CONFIGURE --without-libintl-prefix"
 						fi
 						;;
 
@@ -328,10 +357,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						   ! [[ "$CONFIGURE" == *--without-gnu-ld* ]]; then
 							if test -z "$PACKAGE_WITHOUT_GNU_LD"; then
 								echo "	option: --with-gnu-ld"
-								CONFIGURE="$CONFIGURE --with-gnu-ld";
+								CONFIGURE="$CONFIGURE --with-gnu-ld"
 							else
 								echo "	option: --without-gnu-ld"
-								CONFIGURE="$CONFIGURE --without-gnu-ld";
+								CONFIGURE="$CONFIGURE --without-gnu-ld"
 							fi
 						fi
 						;;
@@ -340,7 +369,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						if ! [[ "$CONFIGURE" == *--enable-rpath* ]] && \
 						   ! [[ "$CONFIGURE" == *--disable-rpath* ]]; then
 							echo "	option: --disable-rpath"
-							CONFIGURE="$CONFIGURE --disable-rpath";
+							CONFIGURE="$CONFIGURE --disable-rpath"
 						fi
 						;;
 
@@ -348,7 +377,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						if ! [[ "$CONFIGURE" == *--enable-shared* ]] && \
 						   ! [[ "$CONFIGURE" == *--disable-shared* ]]; then
 							echo "	option: --enable-shared"
-							CONFIGURE="$CONFIGURE --enable-shared";
+							CONFIGURE="$CONFIGURE --enable-shared"
 						fi
 						;;
 
@@ -356,7 +385,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						if ! [[ "$CONFIGURE" == *--enable-static* ]] && \
 						   ! [[ "$CONFIGURE" == *--disable-static* ]]; then
 							echo "	option: --enable-static"
-							CONFIGURE="$CONFIGURE --enable-static";
+							CONFIGURE="$CONFIGURE --enable-static"
 						fi
 						;;
 
@@ -371,6 +400,12 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				export CXXFLAGS="-ggdb"
 				export CPP="${CROSS_PREFIX}cpp"
 				export CXXCPP="${CROSS_PREFIX}cpp"
+				if ! test -z "$PACKAGE_CONFIG_SITE"; then
+					export CONFIG_SITE="$OPTPATH/config.site"
+					cat > "$CONFIG_SITE" <<EOF
+$PACKAGE_CONFIG_SITE
+EOF
+				fi
 				cmd bash ../../../src/$PACKAGE_NAME/configure $CONFIGURE
 			) || exit $?
 		fi # if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ];
