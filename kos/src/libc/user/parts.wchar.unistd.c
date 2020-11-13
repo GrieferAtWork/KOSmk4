@@ -108,28 +108,6 @@ NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd,
 }
 /*[[[end:libd_wttyname_r]]]*/
 
-/*[[[head:libc_wgetlogin,hash:CRC-32=0xd4d820d2]]]*/
-INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED char32_t *
-NOTHROW_NCX(LIBKCALL libc_wgetlogin)(void)
-/*[[[body:libc_wgetlogin]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("wgetlogin"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_wgetlogin]]]*/
-
-/*[[[head:libd_wgetlogin,hash:CRC-32=0xe17f878b]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.unsorted") WUNUSED char16_t *
-NOTHROW_NCX(LIBDCALL libd_wgetlogin)(void)
-/*[[[body:libd_wgetlogin]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("DOS$wgetlogin"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libd_wgetlogin]]]*/
-
 /*[[[head:libc_wpathconf,hash:CRC-32=0xf27f013b]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <asm/crt/confname.h>
@@ -628,33 +606,7 @@ NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
 }
 /*[[[end:libd_wunlinkat]]]*/
 
-/*[[[head:libc_wgetlogin_r,hash:CRC-32=0xb19bb0f9]]]*/
-INTERN ATTR_SECTION(".text.crt.unsorted") NONNULL((1)) int
-NOTHROW_RPC(LIBKCALL libc_wgetlogin_r)(char32_t *name,
-                                       size_t name_len)
-/*[[[body:libc_wgetlogin_r]]]*/
-/*AUTO*/{
-	(void)name;
-	(void)name_len;
-	CRT_UNIMPLEMENTEDF("wgetlogin_r(%p, %Ix)", name, name_len); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_wgetlogin_r]]]*/
 
-/*[[[head:libd_wgetlogin_r,hash:CRC-32=0xc6473cdc]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.unsorted") NONNULL((1)) int
-NOTHROW_RPC(LIBDCALL libd_wgetlogin_r)(char16_t *name,
-                                       size_t name_len)
-/*[[[body:libd_wgetlogin_r]]]*/
-/*AUTO*/{
-	(void)name;
-	(void)name_len;
-	CRT_UNIMPLEMENTEDF("DOS$wgetlogin_r(%p, %Ix)", name, name_len); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libd_wgetlogin_r]]]*/
 
 /*[[[head:libc_wgethostname,hash:CRC-32=0xd1b517c6]]]*/
 /* >> gethostname(3)
@@ -937,52 +889,6 @@ NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path)
 	return result;
 }
 /*[[[end:libd_wchroot]]]*/
-
-/*[[[head:libc_wctermid,hash:CRC-32=0x107f11bb]]]*/
-INTERN ATTR_SECTION(".text.crt.unsorted") char32_t *
-NOTHROW_NCX(LIBKCALL libc_wctermid)(char32_t *s)
-/*[[[body:libc_wctermid]]]*/
-{
-	char32_t *printer_data = s;
-	struct format_8to32_data convert_data;
-	char buf[L_ctermid], *ptr;
-	size_t len;
-	ptr = ctermid(buf);
-	if unlikely(!ptr)
-		return NULL;
-	convert_data.fd_arg        = &printer_data;
-	convert_data.fd_incomplete = 0;
-	convert_data.fd_printer    = &format_c32sprintf_printer;
-	len = strlen(ptr);
-	if unlikely(format_8to32(&convert_data, ptr, len) < 0)
-		return NULL;
-	*printer_data = '\0'; /* NUL-terminate */
-	return s;
-}
-/*[[[end:libc_wctermid]]]*/
-
-/*[[[head:libd_wctermid,hash:CRC-32=0xd79fb817]]]*/
-INTERN ATTR_SECTION(".text.crt.dos.unsorted") char16_t *
-NOTHROW_NCX(LIBDCALL libd_wctermid)(char16_t *s)
-/*[[[body:libd_wctermid]]]*/
-{
-	char16_t *printer_data = s;
-	struct format_8to16_data convert_data;
-	char buf[L_ctermid], *ptr;
-	size_t len;
-	ptr = ctermid(buf);
-	if unlikely(!ptr)
-		return NULL;
-	convert_data.fd_arg        = &printer_data;
-	convert_data.fd_incomplete = 0;
-	convert_data.fd_printer    = &format_c16sprintf_printer;
-	len = strlen(ptr);
-	if unlikely(format_8to16(&convert_data, ptr, len) < 0)
-		return NULL;
-	*printer_data = '\0'; /* NUL-terminate */
-	return s;
-}
-/*[[[end:libd_wctermid]]]*/
 
 /*[[[head:libc_wchown,hash:CRC-32=0x2f331c1b]]]*/
 /* >> chown(2)
@@ -1356,13 +1262,11 @@ NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *path,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x33edbb3b]]]*/
+/*[[[start:exports,hash:CRC-32=0x567100fe]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$wttyname, libd_wttyname);
 DEFINE_PUBLIC_ALIAS(wttyname, libc_wttyname);
 DEFINE_PUBLIC_ALIAS(DOS$wttyname_r, libd_wttyname_r);
 DEFINE_PUBLIC_ALIAS(wttyname_r, libc_wttyname_r);
-DEFINE_PUBLIC_ALIAS(DOS$wgetlogin, libd_wgetlogin);
-DEFINE_PUBLIC_ALIAS(wgetlogin, libc_wgetlogin);
 DEFINE_PUBLIC_ALIAS(DOS$wchown, libd_wchown);
 DEFINE_PUBLIC_ALIAS(wchown, libc_wchown);
 DEFINE_PUBLIC_ALIAS(DOS$wpathconf, libd_wpathconf);
@@ -1411,8 +1315,6 @@ DEFINE_PUBLIC_ALIAS(DOS$wsymlink, libd_wsymlink);
 DEFINE_PUBLIC_ALIAS(wsymlink, libc_wsymlink);
 DEFINE_PUBLIC_ALIAS(DOS$wreadlink, libd_wreadlink);
 DEFINE_PUBLIC_ALIAS(wreadlink, libc_wreadlink);
-DEFINE_PUBLIC_ALIAS(DOS$wgetlogin_r, libd_wgetlogin_r);
-DEFINE_PUBLIC_ALIAS(wgetlogin_r, libc_wgetlogin_r);
 DEFINE_PUBLIC_ALIAS(DOS$wgethostname, libd_wgethostname);
 DEFINE_PUBLIC_ALIAS(wgethostname, libc_wgethostname);
 DEFINE_PUBLIC_ALIAS(DOS$wsetlogin, libd_wsetlogin);
@@ -1425,8 +1327,6 @@ DEFINE_PUBLIC_ALIAS(DOS$wsetdomainname, libd_wsetdomainname);
 DEFINE_PUBLIC_ALIAS(wsetdomainname, libc_wsetdomainname);
 DEFINE_PUBLIC_ALIAS(DOS$wchroot, libd_wchroot);
 DEFINE_PUBLIC_ALIAS(wchroot, libc_wchroot);
-DEFINE_PUBLIC_ALIAS(DOS$wctermid, libd_wctermid);
-DEFINE_PUBLIC_ALIAS(wctermid, libc_wctermid);
 /*[[[end:exports]]]*/
 
 DECL_END

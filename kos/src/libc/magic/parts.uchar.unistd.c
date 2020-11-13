@@ -43,8 +43,8 @@ c16ttyname(*) %{uchar16("wttyname")}
 c32ttyname(*) %{uchar32("wttyname")}
 c16ttyname_r(*) %{uchar16("wttyname_r")}
 c32ttyname_r(*) %{uchar32("wttyname_r")}
-c16getlogin(*) %{uchar16("wgetlogin")}
-c32getlogin(*) %{uchar32("wgetlogin")}
+//c16getlogin(*) %{uchar16("wgetlogin")}
+//c32getlogin(*) %{uchar32("wgetlogin")}
 c16chown(*) %{uchar16("wchown")}
 c32chown(*) %{uchar32("wchown")}
 c16pathconf(*) %{uchar16("wpathconf")}
@@ -126,10 +126,10 @@ c16readlink(*) %{uchar16("wreadlink")}
 c32readlink(*) %{uchar32("wreadlink")}
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
-%#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-c16getlogin_r(*) %{uchar16("wgetlogin_r")}
-c32getlogin_r(*) %{uchar32("wgetlogin_r")}
-%#endif /* __USE_REENTRANT || __USE_POSIX199506 */
+//%#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
+//c16getlogin_r(*) %{uchar16("wgetlogin_r")}
+//c32getlogin_r(*) %{uchar32("wgetlogin_r")}
+//%#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
@@ -154,12 +154,12 @@ c16chroot(*) %{uchar16("wchroot")}
 c32chroot(*) %{uchar32("wchroot")}
 %#endif /* ... */
 
-%
-%#if (defined(_EVERY_SOURCE) || \
-%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-c16ctermid(*) %{uchar16("wctermid")}
-c32ctermid(*) %{uchar32("wctermid")}
-%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+//%
+//%#if (defined(_EVERY_SOURCE) || \
+//%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+//c16ctermid(*) %{uchar16("wctermid")}
+//c32ctermid(*) %{uchar32("wctermid")}
+//%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
 

@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
 
 [[wchar, userimpl]] wttyname(*) %{generate(str2wcs("ttyname"))}
 [[wchar, userimpl]] wttyname_r(*) %{generate(str2wcs("ttyname_r"))}
-[[wchar, userimpl]] wgetlogin(*) %{generate(str2wcs("getlogin"))}
+//[[wchar, userimpl]] wgetlogin(*) %{generate(str2wcs("getlogin"))}
 [[wchar, userimpl]] wchown(*) %{generate(str2wcs("chown"))}
 [[wchar, userimpl]] wpathconf(*) %{generate(str2wcs("pathconf"))}
 [[wchar, userimpl]] wlink(*) %{generate(str2wcs("link"))}
@@ -112,10 +112,10 @@ wtruncate64(*) %{generate(str2wcs("truncate64"))}
 [[wchar, userimpl]] wreadlink(*) %{generate(str2wcs("readlink"))}
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
-%
-%#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-[[wchar, userimpl]] wgetlogin_r(*) %{generate(str2wcs("getlogin_r"))}
-%#endif /* __USE_REENTRANT || __USE_POSIX199506 */
+//%
+//%#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
+//[[wchar, userimpl]] wgetlogin_r(*) %{generate(str2wcs("getlogin_r"))}
+//%#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 %
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
@@ -136,11 +136,11 @@ wtruncate64(*) %{generate(str2wcs("truncate64"))}
 [[wchar, userimpl]] wchroot(*) %{generate(str2wcs("chroot"))}
 %#endif /* ... */
 
-%
-%#if (defined(_EVERY_SOURCE) || \
-%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-[[wchar, userimpl]] wctermid(*) %{generate(str2wcs("ctermid"))}
-%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+//%
+//%#if (defined(_EVERY_SOURCE) || \
+//%     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
+//[[wchar, userimpl]] wctermid(*) %{generate(str2wcs("ctermid"))}
+//%#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 
 

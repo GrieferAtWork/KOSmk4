@@ -1,3 +1,8 @@
+/*[[[magic
+local cflags = options.get("COMPILE.cflags");
+for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno-mmx", "-mno-3dnow", "-mno-avx" })
+	cflags.remove(o);
+]]]*/
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *

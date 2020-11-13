@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59eb722 */
+/* HASH CRC-32:0x861e55a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 #include <kos/types.h>
 #include "../user/unistd.h"
 #include "../user/fcntl.h"
+#include "../user/pwd.h"
 #include "../user/stdlib.h"
 #include "../user/string.h"
 
@@ -218,6 +219,22 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
                                     ...) {
 	__REDIRECT_EXECLE(char, libc_execvpe, file, args)
 }
+/* >> getlogin(3)
+ * Return the login name for the current user, or `NULL' on error.
+ * s.a. `getlogin_r()' and `cuserid()' */
+INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
+NOTHROW_NCX(LIBCCALL libc_getlogin)(void) {
+#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
+	char *result = libc_getenv("LOGNAME");
+	if (!result)
+		result = libc_cuserid(NULL);
+	return result;
+
+
+#else /* __CRT_HAVE_getenv || __LOCAL_environ */
+	return libc_cuserid(NULL);
+#endif /* !__CRT_HAVE_getenv && !__LOCAL_environ */
+}
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 INTERN ATTR_SECTION(".text.crt.system.configuration") ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T
@@ -234,6 +251,41 @@ NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
 	return 256;        /* UINT8_MAX + 1 */
 #endif
 }
+#include <bits/crt/db/passwd.h>
+/* >> getlogin_r(3)
+ * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
+ * s.a. `getlogin()' and `cuserid()' */
+INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
+NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
+                                      size_t name_len) {
+#if defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid)
+	char buf[1024]; /* NSS_BUFLEN_PASSWD */
+	struct passwd pwent, *pwptr;
+#endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
+	char *pwname;
+#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ)
+	pwname = libc_getenv("LOGNAME");
+#if defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid)
+	if (!pwname)
+#endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
+#endif /* __CRT_HAVE_getenv || __LOCAL_environ */
+#if defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid)
+	{
+		if (libc_getpwuid_r(libc_geteuid(), &pwent, buf,
+		               sizeof(buf), &pwptr) ||
+		    pwptr == NULL)
+			return -1;
+		pwname = pwptr->pw_name;
+		if (!pwname)
+			return -1;
+	}
+#endif /* __CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid */
+	if (name_len) {
+		name[name_len - 1] = '\0';
+		libc_strncpy(name, pwname, name_len - 1);
+	}
+	return 0;
+}
 /* Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
  * exchanging the order of even and odd bytes ("123456" --> "214365")
  * When `n_bytes <= 1', don't do anything and return immediately */
@@ -249,6 +301,28 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
 		((byte_t *)to)[n_bytes+0] = a;
 		((byte_t *)to)[n_bytes+1] = b;
 	}
+}
+#include <asm/crt/stdio.h>
+/* >> cuserid(3)
+ * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
+ * that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ * If the actual username is longer than this, it may be truncated, and programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * s.a. `getlogin()' and `getlogin_r()' */
+INTERN ATTR_SECTION(".text.crt.io.tty") char *
+NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s) {
+#ifdef __L_cuserid
+	static char cuserid_buffer[__L_cuserid];
+	if (!s)
+		s = cuserid_buffer;
+	return libc_getlogin_r(s, __L_cuserid) ? NULL : s;
+#else /* __L_cuserid */
+	static char cuserid_buffer[9];
+	if (!s)
+		s = cuserid_buffer;
+	return libc_getlogin_r(s, 9) ? NULL : s;
+#endif /* !__L_cuserid */
 }
 /* Close all file descriptors with indices `>= lowfd' (s.a. `fcntl(F_CLOSEM)') */
 INTERN ATTR_SECTION(".text.crt.bsd.io.access") void
@@ -350,11 +424,14 @@ DEFINE_PUBLIC_ALIAS(DOS$execlpe, libd_execlpe);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_execlpe, libc_execlpe);
 DEFINE_PUBLIC_ALIAS(execlpe, libc_execlpe);
+DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
 DEFINE_PUBLIC_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_ALIAS(getdtablesize, libc_getdtablesize);
+DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
 DEFINE_PUBLIC_ALIAS(_swab, libc_swab);
 DEFINE_PUBLIC_ALIAS(swab, libc_swab);
+DEFINE_PUBLIC_ALIAS(cuserid, libc_cuserid);
 DEFINE_PUBLIC_ALIAS(closefrom, libc_closefrom);
 DEFINE_PUBLIC_ALIAS(fchroot, libc_fchroot);
 DEFINE_PUBLIC_ALIAS(resolvepath, libc_resolvepath);

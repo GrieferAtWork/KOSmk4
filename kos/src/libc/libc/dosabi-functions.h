@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc85a944a */
+/* HASH CRC-32:0x70d72ac2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1306,7 +1306,6 @@ DFUN(".text.crt.dos.FILE.unlocked.write.putc", libd_putchar_unlocked, libc_putch
 DFUN(".text.crt.dos.FILE.locked.utility", libd_flockfile, libc_flockfile, TV, 1, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_funlockfile, libc_funlockfile, TV, 1, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_ftrylockfile, libc_ftrylockfile, TD, 1, TP)
-DFUN(".text.crt.dos.io.tty", libd_cuserid, libc_cuserid, TP, 1, TP)
 DFUN(".text.crt.dos.FILE.locked.access", libd_popen, libc_popen, TP, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.access", libd_pclose, libc_pclose, TD, 1, TP)
 DFUN(".text.crt.dos.FILE.locked.read.getc", libd_getw, libc_getw, TD, 1, TP)
@@ -2387,6 +2386,7 @@ DFUN(".text.crt.dos.heap.utility", libd_sbrk, libc_sbrk, TP, 1, TP)
 DFUN(".text.crt.dos.io.sync", libd_fdatasync, libc_fdatasync, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.string.memory", libd_swab, libc_swab, TV, 3, TP, TP, TD)
 DFUN(".text.crt.dos.io.tty", libd_ctermid, libc_ctermid, TP, 1, TP)
+DFUN(".text.crt.dos.io.tty", libd_cuserid, libc_cuserid, TP, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_ctermid_r, libc_ctermid_r, TP, 1, TP)
 DFUN(".text.crt.dos.system.configuration", libd_sysconf, libc_sysconf, TP, 1, TD)
 DFUN(".text.crt.dos.bsd.io.access", libd_closefrom, libc_closefrom, TV, 1, TIn(__SIZEOF_FD_T__))

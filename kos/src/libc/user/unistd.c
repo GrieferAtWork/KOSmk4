@@ -522,30 +522,7 @@ NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
 }
 /*[[[end:libc_tcsetpgrp]]]*/
 
-/*[[[head:libc_getlogin_r,hash:CRC-32=0xda196cf0]]]*/
-INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
-                                      size_t name_len)
-/*[[[body:libc_getlogin_r]]]*/
-/*AUTO*/{
-	(void)name;
-	(void)name_len;
-	CRT_UNIMPLEMENTEDF("getlogin_r(%q, %Ix)", name, name_len); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_getlogin_r]]]*/
 
-/*[[[head:libc_getlogin,hash:CRC-32=0xa37530ca]]]*/
-INTERN ATTR_SECTION(".text.crt.io.tty") WUNUSED char *
-NOTHROW_NCX(LIBCCALL libc_getlogin)(void)
-/*[[[body:libc_getlogin]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("getlogin"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_getlogin]]]*/
 
 /*[[[head:libc_setlogin,hash:CRC-32=0x9d72f9a]]]*/
 INTERN ATTR_SECTION(".text.crt.io.tty") NONNULL((1)) int
@@ -3609,7 +3586,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbe46c884]]]*/
+/*[[[start:exports,hash:CRC-32=0xe260ca99]]]*/
 DEFINE_PUBLIC_ALIAS(_execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(execve, libc_execve);
 DEFINE_PUBLIC_ALIAS(_getpid, libc_getpid);
@@ -3642,7 +3619,6 @@ DEFINE_PUBLIC_ALIAS(ttyname, libc_ttyname);
 DEFINE_PUBLIC_ALIAS(ttyname_r, libc_ttyname_r);
 DEFINE_PUBLIC_ALIAS(tcgetpgrp, libc_tcgetpgrp);
 DEFINE_PUBLIC_ALIAS(tcsetpgrp, libc_tcsetpgrp);
-DEFINE_PUBLIC_ALIAS(getlogin, libc_getlogin);
 DEFINE_PUBLIC_ALIAS(chown, libc_chown);
 DEFINE_PUBLIC_ALIAS(pathconf, libc_pathconf);
 DEFINE_PUBLIC_ALIAS(link, libc_link);
@@ -3731,7 +3707,6 @@ DEFINE_PUBLIC_ALIAS(setegid, libc_setegid);
 DEFINE_PUBLIC_ALIAS(ttyslot, libc_ttyslot);
 DEFINE_PUBLIC_ALIAS(symlink, libc_symlink);
 DEFINE_PUBLIC_ALIAS(readlink, libc_readlink);
-DEFINE_PUBLIC_ALIAS(getlogin_r, libc_getlogin_r);
 DEFINE_PUBLIC_ALIAS(gethostname, libc_gethostname);
 DEFINE_PUBLIC_ALIAS(setlogin, libc_setlogin);
 DEFINE_PUBLIC_ALIAS(sethostname, libc_sethostname);

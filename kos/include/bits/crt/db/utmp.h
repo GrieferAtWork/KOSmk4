@@ -77,7 +77,7 @@ struct utmp {
 		char           ut_name[UT_NAMESIZE];  /* Username. */
 		char           ut_user[UT_NAMESIZE];  /* Username. */
 	};
-	char               ut_host[UT_HOSTSIZE];    /* Hostname for remote login. */
+	char               ut_host[UT_HOSTSIZE];  /* Hostname for remote login. */
 	struct exit_status ut_exit;        /* Exit status of a process marked as DEAD_PROCESS. */
 	/* The ut_session and ut_tv fields must be the same size when compiled
 	 * 32- and 64-bit.  This allows data files and shared memory to be

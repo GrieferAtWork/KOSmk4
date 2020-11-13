@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4e0db6a */
+/* HASH CRC-32:0xdc95c9a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,16 +78,6 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, cha
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CREDIRECT_KOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32ttyname_r,(__fd_t __fd, char32_t *__buf, size_t __buflen),wttyname_r,(__fd,__buf,__buflen))
-#endif /* ... */
-#if defined(__CRT_HAVE_wgetlogin) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_WUNUSED,char16_t *,__NOTHROW_NCX,c16getlogin,(void),wgetlogin,())
-#elif defined(__CRT_HAVE_DOS$wgetlogin)
-__CREDIRECT_DOS(__ATTR_WUNUSED,char16_t *,__NOTHROW_NCX,c16getlogin,(void),wgetlogin,())
-#endif /* ... */
-#if defined(__CRT_HAVE_wgetlogin) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_WUNUSED,char32_t *,__NOTHROW_NCX,c32getlogin,(void),wgetlogin,())
-#elif defined(__CRT_HAVE_KOS$wgetlogin)
-__CREDIRECT_KOS(__ATTR_WUNUSED,char32_t *,__NOTHROW_NCX,c32getlogin,(void),wgetlogin,())
 #endif /* ... */
 #if defined(__CRT_HAVE_wchown) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> chown(2)
@@ -1128,18 +1118,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32readlink, __FORCELOCAL __ATTR_ARTIFICIAL __AT
 #endif /* ... */
 #endif /* !... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
-#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-#if defined(__CRT_HAVE_wgetlogin_r) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16getlogin_r,(char16_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
-#elif defined(__CRT_HAVE_DOS$wgetlogin_r)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16getlogin_r,(char16_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
-#endif /* ... */
-#if defined(__CRT_HAVE_wgetlogin_r) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32getlogin_r,(char32_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
-#elif defined(__CRT_HAVE_KOS$wgetlogin_r)
-__CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32getlogin_r,(char32_t *__name, size_t __name_len),wgetlogin_r,(__name,__name_len))
-#endif /* ... */
-#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_wgethostname) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
@@ -1252,20 +1230,6 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chroot,(char32_t const *__r
 __CREDIRECT_KOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32chroot,(char32_t const *__restrict __path),wchroot,(__path))
 #endif /* ... */
 #endif /* ... */
-
-#if (defined(_EVERY_SOURCE) || \
-     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-#if defined(__CRT_HAVE_wctermid) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
-__CREDIRECT(,char16_t *,__NOTHROW_NCX,c16ctermid,(char16_t *__s),wctermid,(__s))
-#elif defined(__CRT_HAVE_DOS$wctermid)
-__CREDIRECT_DOS(,char16_t *,__NOTHROW_NCX,c16ctermid,(char16_t *__s),wctermid,(__s))
-#endif /* ... */
-#if defined(__CRT_HAVE_wctermid) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
-__CREDIRECT(,char32_t *,__NOTHROW_NCX,c32ctermid,(char32_t *__s),wctermid,(__s))
-#elif defined(__CRT_HAVE_KOS$wctermid)
-__CREDIRECT_KOS(,char32_t *,__NOTHROW_NCX,c32ctermid,(char32_t *__s),wctermid,(__s))
-#endif /* ... */
-#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #endif /* __CC__ */
 

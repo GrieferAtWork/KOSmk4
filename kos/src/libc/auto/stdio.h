@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab226a75 */
+/* HASH CRC-32:0xab5c0df7 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -367,9 +367,6 @@ INTDEF NONNULL((1)) void NOTHROW_RPC(LIBDCALL libd_flockfile)(FILE *__restrict s
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_funlockfile)(FILE *__restrict stream);
 /* Try to acquire a lock to `STREAM' */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_ftrylockfile)(FILE *__restrict stream);
-/* Return the name of the current user (`getpwuid(geteuid())'), storing
- * that name in `S'. When `S' is NULL, a static buffer is used instead */
-INTDEF char *NOTHROW_NCX(LIBDCALL libd_cuserid)(char *s);
 /* Open and return a new process I/O stream for executing `COMMAND' */
 INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_RPC(LIBDCALL libd_popen)(char const *command, char const *modes);
 /* Close a process I/O file `STREAM' */

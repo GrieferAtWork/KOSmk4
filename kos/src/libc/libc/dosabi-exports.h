@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5039361 */
+/* HASH CRC-32:0xce03cec1 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1665,7 +1665,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_IO_funlockfile, libd_funlockfile);
 DEFINE_PUBLIC_ALIAS(DOS$funlockfile, libd_funlockfile);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_ftrylockfile, libd_ftrylockfile);
 DEFINE_PUBLIC_ALIAS(DOS$ftrylockfile, libd_ftrylockfile);
-DEFINE_PUBLIC_ALIAS(DOS$cuserid, libd_cuserid);
 DEFINE_PUBLIC_ALIAS(DOS$_popen, libd_popen);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_popen, libd_popen);
 DEFINE_PUBLIC_ALIAS(DOS$popen, libd_popen);
@@ -2933,6 +2932,7 @@ DEFINE_PUBLIC_ALIAS(DOS$fdatasync, libd_fdatasync);
 DEFINE_PUBLIC_ALIAS(DOS$_swab, libd_swab);
 DEFINE_PUBLIC_ALIAS(DOS$swab, libd_swab);
 DEFINE_PUBLIC_ALIAS(DOS$ctermid, libd_ctermid);
+DEFINE_PUBLIC_ALIAS(DOS$cuserid, libd_cuserid);
 DEFINE_PUBLIC_ALIAS(DOS$ctermid_r, libd_ctermid_r);
 DEFINE_PUBLIC_ALIAS(DOS$_sysconf, libd_sysconf);
 DEFINE_PUBLIC_ALIAS(DOS$__sysconf, libd_sysconf);

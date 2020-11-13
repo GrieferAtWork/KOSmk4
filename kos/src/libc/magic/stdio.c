@@ -1799,10 +1799,7 @@ int ftrylockfile([[nonnull]] $FILE *__restrict stream);
 
 %
 %#ifdef __USE_XOPEN
-@@Return the name of the current user (`getpwuid(geteuid())'), storing
-@@that name in `S'. When `S' is NULL, a static buffer is used instead
-[[guard]]
-char *cuserid(char *s); /* TODO: Implement inline */
+%[insert:extern(cuserid)]
 %#endif /* Use X/Open, but not issue 6.  */
 
 

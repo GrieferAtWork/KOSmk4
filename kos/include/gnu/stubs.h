@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaced3454 */
+/* HASH CRC-32:0xc8283a09 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,8 +207,6 @@
 #define __stub_getifaddrs
 #define __stub_getipv4sourcefilter
 #define __stub_getloadavg
-#define __stub_getlogin
-#define __stub_getlogin_r
 #define __stub_getmntent
 #define __stub___getmntent_r
 #define __stub_getmntent_r
@@ -507,8 +505,6 @@
 #define __stub_vhangup
 #define __stub_wcsnrtombs
 #define __stub_wfreadlinkat
-#define __stub_wgetlogin
-#define __stub_wgetlogin_r
 #define __stub_wttyname
 #define __stub_wttyname_r
 #define __stub___y0
@@ -551,7 +547,5 @@
 #define __stub_DOS$vfwscanf_unlocked
 #define __stub_DOS$wcsnrtombs
 #define __stub_DOS$wfreadlinkat
-#define __stub_DOS$wgetlogin
-#define __stub_DOS$wgetlogin_r
 #define __stub_DOS$wttyname
 #define __stub_DOS$wttyname_r

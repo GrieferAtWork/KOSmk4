@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cfa1daa */
+/* HASH CRC-32:0x7e4a195e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -175,6 +175,14 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBDCALL libd_tcgetpgrp)(fd_t fd);
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getlogin(3)
+ * Return the login name for the current user, or `NULL' on error.
+ * s.a. `getlogin_r()' and `cuserid()' */
+INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getlogin)(void);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_chown)(char const *file, uid_t owner, gid_t group);
@@ -403,7 +411,18 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_symlink)(char const *link_t
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_readlink)(char const *path, char *buf, size_t buflen);
+/* >> getlogin_r(3)
+ * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
+ * s.a. `getlogin()' and `cuserid()' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_getlogin_r)(char *name, size_t name_len);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> getlogin_r(3)
+ * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
+ * s.a. `getlogin()' and `cuserid()' */
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name, size_t name_len);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_gethostname)(char *name, size_t buflen);
@@ -456,6 +475,26 @@ INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restri
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_ctermid)(char *s);
+/* >> cuserid(3)
+ * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
+ * that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ * If the actual username is longer than this, it may be truncated, and programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * s.a. `getlogin()' and `getlogin_r()' */
+INTDEF char *NOTHROW_NCX(LIBDCALL libd_cuserid)(char *s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> cuserid(3)
+ * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
+ * that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ * If the actual username is longer than this, it may be truncated, and programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * s.a. `getlogin()' and `getlogin_r()' */
+INTDEF char *NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Same as `ctermid', but return `NULL' when `S' is `NULL' */
 INTDEF char *NOTHROW_NCX(LIBDCALL libd_ctermid_r)(char *s);
 /* >> sysconf(2)

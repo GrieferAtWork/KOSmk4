@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77fa3f6a */
+/* HASH CRC-32:0x4433fd22 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,8 +42,6 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wttyname_r)(fd_t fd, char16_t 
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBKCALL libc_wttyname_r)(fd_t fd, char32_t *buf, size_t buflen);
-INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd_wgetlogin)(void);
-INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBKCALL libc_wgetlogin)(void);
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file, uid_t owner, gid_t group);
@@ -222,8 +220,6 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t con
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBKCALL libc_wreadlink)(char32_t const *path, char32_t *buf, size_t buflen);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wgetlogin_r)(char16_t *name, size_t name_len);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wgetlogin_r)(char32_t *name, size_t name_len);
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name, size_t buflen);
@@ -258,8 +254,6 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__res
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBKCALL libc_wchroot)(char32_t const *__restrict path);
-INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd_wctermid)(char16_t *s);
-INTDEF char32_t *NOTHROW_NCX(LIBKCALL libc_wctermid)(char32_t *s);
 #endif /* !__KERNEL__ */
 
 DECL_END

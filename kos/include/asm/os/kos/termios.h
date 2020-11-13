@@ -21,12 +21,13 @@
 #define _ASM_OS_KOS_TERMIOS_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
 
-/* NOTE: Some of the comments are taken from here:
- *   http://man7.org/linux/man-pages/man3/tcflow.3.html
- *   https://ftp.gnu.org/old-gnu/Manuals/glibc-2.2.3/html_node/libc_355.html
- */
+/* Sources for comments:
+ *   - http://man7.org/linux/man-pages/man3/tcflow.3.html
+ *   - https://ftp.gnu.org/old-gnu/Manuals/glibc-2.2.3/html_node/libc_355.html
+ *   - Came up with them myself, or altered them significantly. */
 
 
 /* c_cc characters */
@@ -49,148 +50,185 @@
 #define __VEOL2    16 /* \0: An additional end-of-line character used to flush the canon (by default, only \n is recognized) */
 
 /* c_iflag bits */
-#define __IGNBRK   0x000001 /* break? */
-#define __BRKINT   0x000002 /* break? */
-#define __IGNPAR   0x000004 /* Ignore framing errors and parity errors. */
-#define __PARMRK   0x000008 /* Encode faulty bytes as `\377\0\...' - `\377' is encoded as `\377\377' */
-#define __INPCK    0x000010 /* Enable input parity checking. */
-#define __ISTRIP   0x000020 /* Clear the eighth bit. */
-#define __INLCR    0x000040 /* Translate NL to CR on input. */
-#define __IGNCR    0x000080 /* Ignore carriage return on input. */
-#define __ICRNL    0x000100 /* Translate carriage return to newline on input (unless IGNCR is set). */
-#define __IUCLC    0x000200 /* Map uppercase characters to lowercase on input (requires `IEXTEN'). */
-#define __IXON     0x000400 /* Enable support for `VSTOP' to disable TTY output transmission. */
-#define __IXANY    0x000800 /* Any input character has the behavior of `VSTART' */
-#define __IXOFF    0x001000 /* Status bit for `VSTOP' / `VSTART': Don't transmit pending TTY output until this bit is cleared.
-                             * When set, tty output is instead stored in a secondary buffer (s.a. `TTYIO_OPEND_GETLIMIT' and `TTYIO_OPEND_SETLIMIT') */
-#define __IMAXBEL  0x002000 /* Ring bell when input queue is full (KOS-SPECIFIC: The bell also gets triggered when the queue is empty and a delete character is received) */
-#define __IUTF8    0x004000 /* Input is UTF8 */
-#define __IIOFF    0x100000 /* Status bit for `TCIOFF' / `TCION': When set, redirect input to a secondary buffer. (s.a. `TTYIO_IPEND_GETLIMIT' and `TTYIO_IPEND_SETLIMIT') */
+#define __IGNBRK   __UINT32_C(0x00000001) /* break? */
+#define __BRKINT   __UINT32_C(0x00000002) /* break? */
+#define __IGNPAR   __UINT32_C(0x00000004) /* Ignore framing errors and parity errors. */
+#define __PARMRK   __UINT32_C(0x00000008) /* Encode faulty bytes as `\377\0\...' - `\377' is encoded as `\377\377' */
+#define __INPCK    __UINT32_C(0x00000010) /* Enable input parity checking. */
+#define __ISTRIP   __UINT32_C(0x00000020) /* Clear the eighth bit. */
+#define __INLCR    __UINT32_C(0x00000040) /* Translate NL to CR on input. */
+#define __IGNCR    __UINT32_C(0x00000080) /* Ignore carriage return on input. */
+#define __ICRNL    __UINT32_C(0x00000100) /* Translate carriage return to newline on input (unless IGNCR is set). */
+#define __IUCLC    __UINT32_C(0x00000200) /* Map uppercase characters to lowercase on input (requires `IEXTEN'). */
+#define __IXON     __UINT32_C(0x00000400) /* Enable support for `VSTOP' to disable TTY output transmission. */
+#define __IXANY    __UINT32_C(0x00000800) /* Any input character has the behavior of `VSTART' */
+#define __IXOFF    __UINT32_C(0x00001000) /* Status bit for `VSTOP' / `VSTART': Don't transmit pending TTY output until this bit is cleared.
+                                           * When set, tty output is instead stored in a secondary buffer (s.a. `TTYIO_OPEND_GETLIMIT' and `TTYIO_OPEND_SETLIMIT') */
+#define __IMAXBEL  __UINT32_C(0x00002000) /* Ring bell when input queue is full (KOS-SPECIFIC: The bell also gets triggered when the queue is empty and a delete character is received) */
+#define __IUTF8    __UINT32_C(0x00004000) /* Input is UTF8 */
+/*      __I        __UINT32_C(0x00008000)  * ... */
+/*      __I        __UINT32_C(0x00010000)  * ... */
+/*      __I        __UINT32_C(0x00020000)  * ... */
+/*      __I        __UINT32_C(0x00040000)  * ... */
+/*      __I        __UINT32_C(0x00080000)  * ... */
+#define __IIOFF    __UINT32_C(0x00100000) /* Status bit for `TCIOFF' / `TCION': When set, redirect input to a secondary buffer. (s.a. `TTYIO_IPEND_GETLIMIT' and `TTYIO_IPEND_SETLIMIT') */
+/*      __I        __UINT32_C(0x00200000)  * ... */
+/*      __I        __UINT32_C(0x00400000)  * ... */
+/*      __I        __UINT32_C(0x00800000)  * ... */
+/*      __I        __UINT32_C(0x01000000)  * ... */
+/*      __I        __UINT32_C(0x02000000)  * ... */
+/*      __I        __UINT32_C(0x04000000)  * ... */
+/*      __I        __UINT32_C(0x08000000)  * ... */
+/*      __I        __UINT32_C(0x10000000)  * ... */
+/*      __I        __UINT32_C(0x20000000)  * ... */
+/*      __I        __UINT32_C(0x40000000)  * ... */
+/*      __I        __UINT32_C(0x80000000)  * ... */
 
 /* c_oflag bits */
-#define __OPOST       0x00001 /* Enable implementation-defined output processing */
-#define __OLCUC       0x00002 /* Map lowercase characters to uppercase on output. */
-#define __ONLCR       0x00004 /* Map NL to CR-NL on output. */
-#define __OCRNL       0x00008 /* Map CR to NL on output. (Ignored when `ONLRET' is set) (When combined with `ONLCR', output CR as CRNL) */
-#define __ONOCR       0x00010 /* Don't output CR at column 0. */
-#define __ONLRET      0x00020 /* Don't output CR. */
-#define __OFILL       0x00040 /* ??? */
-#define __OFDEL       0x00080 /* ??? */
-#   define __NLDLY    0x00100 /* ??? */
-#   define   __NL0    0x00000 /* ??? */
-#   define   __NL1    0x00100 /* ??? */
-#   define __CRDLY    0x00600 /* ??? */
-#   define   __CR0    0x00000 /* ??? */
-#   define   __CR1    0x00200 /* ??? */
-#   define   __CR2    0x00400 /* ??? */
-#   define   __CR3    0x00600 /* ??? */
-#   define __TABDLY   0x01800 /* ??? */
-#   define   __TAB0   0x00000 /* ??? */
-#   define   __TAB1   0x00800 /* ??? */
-#   define   __TAB2   0x01000 /* ??? */
-#   define   __TAB3   0x01800 /* ??? */
-#   define __BSDLY    0x02000 /* ??? */
-#   define   __BS0    0x00000 /* ??? */
-#   define   __BS1    0x02000 /* ??? */
-#   define __FFDLY    0x08000 /* ??? */
-#   define   __FF0    0x00000 /* ??? */
-#   define   __FF1    0x08000 /* ??? */
-#define __VTDLY       0x04000 /* ??? */
-#define   __VT0       0x00000 /* ??? */
-#define   __VT1       0x04000 /* ??? */
-#define __XTABS       0x01800 /* ??? */
+#define __OPOST    __UINT32_C(0x00000001) /* Enable implementation-defined output processing */
+#define __OLCUC    __UINT32_C(0x00000002) /* Map lowercase characters to uppercase on output. */
+#define __ONLCR    __UINT32_C(0x00000004) /* Map NL to CR-NL on output. */
+#define __OCRNL    __UINT32_C(0x00000008) /* Map CR to NL on output. (Ignored when `ONLRET' is set) (When combined with `ONLCR', output CR as CRNL) */
+#define __ONOCR    __UINT32_C(0x00000010) /* Don't output CR at column 0. */
+#define __ONLRET   __UINT32_C(0x00000020) /* Don't output CR. */
+#define __OFILL    __UINT32_C(0x00000040) /* ??? */
+#define __OFDEL    __UINT32_C(0x00000080) /* ??? */
+#define __NLDLY    __UINT32_C(0x00000100) /* ??? */
+#define   __NL0    __UINT32_C(0x00000000) /* ??? */
+#define   __NL1    __UINT32_C(0x00000100) /* ??? */
+#define __CRDLY    __UINT32_C(0x00000600) /* ??? */
+#define   __CR0    __UINT32_C(0x00000000) /* ??? */
+#define   __CR1    __UINT32_C(0x00000200) /* ??? */
+#define   __CR2    __UINT32_C(0x00000400) /* ??? */
+#define   __CR3    __UINT32_C(0x00000600) /* ??? */
+#define __TABDLY   __UINT32_C(0x00001800) /* ??? */
+#define   __TAB0   __UINT32_C(0x00000000) /* ??? */
+#define   __TAB1   __UINT32_C(0x00000800) /* ??? */
+#define   __TAB2   __UINT32_C(0x00001000) /* ??? */
+#define   __TAB3   __UINT32_C(0x00001800) /* ??? */
+#define __BSDLY    __UINT32_C(0x00002000) /* ??? */
+#define   __BS0    __UINT32_C(0x00000000) /* ??? */
+#define   __BS1    __UINT32_C(0x00002000) /* ??? */
+#define __FFDLY    __UINT32_C(0x00008000) /* ??? */
+#define   __FF0    __UINT32_C(0x00000000) /* ??? */
+#define   __FF1    __UINT32_C(0x00008000) /* ??? */
+#define __VTDLY    __UINT32_C(0x00004000) /* ??? */
+#define   __VT0    __UINT32_C(0x00000000) /* ??? */
+#define   __VT1    __UINT32_C(0x00004000) /* ??? */
+#define __XTABS    __UINT32_C(0x00001800) /* ??? */
 
 /* c_cflag bit meaning */
-#define __CBAUD     0x100f
-#define __B0        0x0000 /* hang up */
-#define __B50       0x0001
-#define __B75       0x0002
-#define __B110      0x0003
-#define __B134      0x0004
-#define __B150      0x0005
-#define __B200      0x0006
-#define __B300      0x0007
-#define __B600      0x0008
-#define __B1200     0x0009
-#define __B1800     0x000a
-#define __B2400     0x000b
-#define __B4800     0x000c
-#define __B9600     0x000d
-#define __B19200    0x000e
-#define __B38400    0x000f
-#define __EXTA      B19200
-#define __EXTB      B38400
-#define __CSIZE     0x00030
-#define   __CS5     0x00000
-#define   __CS6     0x00010
-#define   __CS7     0x00020
-#define   __CS8     0x00030
-#define __CSTOPB    0x00040
-#define __CREAD     0x00080
-#define __PARENB    0x00100
-#define __PARODD    0x00200
-#define __HUPCL     0x00400
-#define __CLOCAL    0x00800
-#define __CBAUDEX   0x01000
-#define __B57600    0x01001
-#define __B115200   0x01002
-#define __B230400   0x01003
-#define __B460800   0x01004
-#define __B500000   0x01005
-#define __B576000   0x01006
-#define __B921600   0x01007
-#define __B1000000  0x01008
-#define __B1152000  0x01009
-#define __B1500000  0x0100a
-#define __B2000000  0x0100b
-#define __B2500000  0x0100c
-#define __B3000000  0x0100d
-#define __B3500000  0x0100e
-#define __B4000000  0x0100f
-#define __MAX_BAUD  __B4000000
-#define __CIBAUD    0x100f0000 /* input baud rate (not used) */
-#define __CMSPAR    0x40000000 /* mark or space (stick) parity */
-#define __CRTSCTS   0x80000000 /* flow control */
+#define __CBAUD    __UINT32_C(0x0000100f) /* ??? */
+#define __B0       __UINT32_C(0x00000000) /* hang up */
+#define __B50      __UINT32_C(0x00000001) /* ??? */
+#define __B75      __UINT32_C(0x00000002) /* ??? */
+#define __B110     __UINT32_C(0x00000003) /* ??? */
+#define __B134     __UINT32_C(0x00000004) /* ??? */
+#define __B150     __UINT32_C(0x00000005) /* ??? */
+#define __B200     __UINT32_C(0x00000006) /* ??? */
+#define __B300     __UINT32_C(0x00000007) /* ??? */
+#define __B600     __UINT32_C(0x00000008) /* ??? */
+#define __B1200    __UINT32_C(0x00000009) /* ??? */
+#define __B1800    __UINT32_C(0x0000000a) /* ??? */
+#define __B2400    __UINT32_C(0x0000000b) /* ??? */
+#define __B4800    __UINT32_C(0x0000000c) /* ??? */
+#define __B9600    __UINT32_C(0x0000000d) /* ??? */
+#define __B19200   __UINT32_C(0x0000000e) /* ??? */
+#define __B38400   __UINT32_C(0x0000000f) /* ??? */
+#define __EXTA     __B19200               /* ??? */
+#define __EXTB     __B38400               /* ??? */
+#define __CSIZE    __UINT32_C(0x00000030) /* Mask for the character size (in bits) */
+#define   __CS5    __UINT32_C(0x00000000) /* 5-bit characters */
+#define   __CS6    __UINT32_C(0x00000010) /* 6-bit characters */
+#define   __CS7    __UINT32_C(0x00000020) /* 7-bit characters */
+#define   __CS8    __UINT32_C(0x00000030) /* 8-bit characters */
+#define __CSTOPB   __UINT32_C(0x00000040) /* ??? */
+#define __CREAD    __UINT32_C(0x00000080) /* ??? */
+#define __PARENB   __UINT32_C(0x00000100) /* ??? */
+#define __PARODD   __UINT32_C(0x00000200) /* ??? */
+#define __HUPCL    __UINT32_C(0x00000400) /* ??? */
+#define __CLOCAL   __UINT32_C(0x00000800) /* ??? */
+#define __CBAUDEX  __UINT32_C(0x00001000) /* ??? */
+#define __B57600   __UINT32_C(0x00001001) /* ??? */
+#define __B115200  __UINT32_C(0x00001002) /* ??? */
+#define __B230400  __UINT32_C(0x00001003) /* ??? */
+#define __B460800  __UINT32_C(0x00001004) /* ??? */
+#define __B500000  __UINT32_C(0x00001005) /* ??? */
+#define __B576000  __UINT32_C(0x00001006) /* ??? */
+#define __B921600  __UINT32_C(0x00001007) /* ??? */
+#define __B1000000 __UINT32_C(0x00001008) /* ??? */
+#define __B1152000 __UINT32_C(0x00001009) /* ??? */
+#define __B1500000 __UINT32_C(0x0000100a) /* ??? */
+#define __B2000000 __UINT32_C(0x0000100b) /* ??? */
+#define __B2500000 __UINT32_C(0x0000100c) /* ??? */
+#define __B3000000 __UINT32_C(0x0000100d) /* ??? */
+#define __B3500000 __UINT32_C(0x0000100e) /* ??? */
+#define __B4000000 __UINT32_C(0x0000100f) /* ??? */
+#define __MAX_BAUD __B4000000             /* ??? */
+#define __CIBAUD   __UINT32_C(0x100f0000) /* input baud rate (not used) */
+/*                 __UINT32_C(0x00100000)  * ... */
+/*                 __UINT32_C(0x00200000)  * ... */
+/*                 __UINT32_C(0x00400000)  * ... */
+/*                 __UINT32_C(0x00800000)  * ... */
+/*                 __UINT32_C(0x01000000)  * ... */
+/*                 __UINT32_C(0x02000000)  * ... */
+/*                 __UINT32_C(0x04000000)  * ... */
+/*                 __UINT32_C(0x08000000)  * ... */
+/*                 __UINT32_C(0x20000000)  * ... */
+#define __CMSPAR   __UINT32_C(0x40000000) /* mark or space (stick) parity */
+#define __CRTSCTS  __UINT32_C(0x80000000) /* flow control */
 
 /* c_lflag bits */
-#define __ISIG      0x000001 /* When any of the characters INTR, QUIT, SUSP, or DSUSP are received, generate the corresponding signal. */
-#define __ICANON    0x000002 /* Enable canonical mode */
-#define __XCASE     0x000004 /* If ICANON is also set, terminal is uppercase only. Input is converted to lowercase,
-                              * except for characters preceded by \. On output, uppercase characters are preceded
-                              * by \ and lowercase characters are converted to uppercase. */
-#define __ECHO      0x000008 /* Echo input characters */
-#define __ECHOE     0x000010 /* If ICANON is also set, the VERASE character erases the preceding input character, and VWERASE erases the preceding word */
-#define __ECHOK     0x000020 /* If ICANON is also set, the VKILL character erases the current line */
-#define __ECHONL    0x000040 /* If ICANON is also set, echo the NL character even if ECHO is not set
-                              * NOTE: for this purpose, the NL character(s) recognized are '\n', `VEOL' and `VEOL2' */
-#define __NOFLSH    0x000080 /* Disable flushing the input and output queues when generating signals for the INT, QUIT, and SUSP characters */
-#define __TOSTOP    0x000100 /* Send the SIGTTOU signal to the process group of a background process which tries to write to its controlling terminal */
-#define __ECHOCTL   0x000200 /* If ECHO is also set, terminal special characters other than TAB(\t), NL(\n),
-                              * START, and STOP are echoed as ^X, where X is the character with ASCII code
-                              * 0x40 greater than the special character. For example, character 0x08 (BS)
-                              * is echoed as ^H */
-#define __ECHOPRT   0x000400 /* This bit is like ECHOE, enables display of the ERASE character in a way that
-                              * is geared to a hardcopy terminal. When you type the ERASE character, a `\'
-                              * character is printed followed by the first character erased. Typing the
-                              * ERASE character again just prints the next character erased. Then, the
-                              * next time you type a normal character, a `/' character is printed
-                              * before the character echoes. */
-#define __ECHOKE    0x000800 /* If ICANON is also set, KILL is echoed by erasing each character on the line, as specified by ECHOE and ECHOPRT */
-#define __FLUSHO    0x001000 /* Output is being flushed. This flag is toggled by typing the DISCARD character */
-#define __PENDIN    0x004000 /* ??? */
-#define __IEXTEN    0x008000 /* Enable implementation-defined input processing. This flag, as
-                              * well as ICANON must be enabled for the special characters
-                              * EOL2, LNEXT, REPRINT, WERASE to be interpreted, and for the
-                              * IUCLC flag to be effective */
-#define __EXTPROC   0x010000 /* Skip handling of: `PARMRK', `ECHO' and `IXON'+`IXANY', as well as `c_cc[*]' */
-#define __IERASING  0x100000 /* Status bit for `ECHOPRT' */
-#define __IXCASEING 0x200000 /* Status bit for `XCASE' (the previous character was \) */
-#define __IEOFING   0x400000 /* Status bit for a pending `VEOF' character
-                              * When set, the next time input is attempted to be read from the TTY,
-                              * and the operation would have blocked, read(2) instead returns immediately,
-                              * thus indicating an END-OF-FILE within the TTY. (shell programs usually
-                              * interpret this as the user wishing to logout) */
-#define __IESCAPING 0x800000 /* Status bit for `VLNEXT': The next input character is escaped. */
+#define __ISIG      __UINT32_C(0x00000001) /* When any of the characters INTR, QUIT, SUSP, or DSUSP are received, generate the corresponding signal. */
+#define __ICANON    __UINT32_C(0x00000002) /* Enable canonical mode */
+#define __XCASE     __UINT32_C(0x00000004) /* If ICANON is also set, terminal is uppercase only. Input is converted to lowercase,
+                                            * except for characters preceded by \. On output, uppercase characters are preceded
+                                            * by \ and lowercase characters are converted to uppercase. */
+#define __ECHO      __UINT32_C(0x00000008) /* Echo input characters */
+#define __ECHOE     __UINT32_C(0x00000010) /* If ICANON is also set, the VERASE character erases the preceding input character, and VWERASE erases the preceding word */
+#define __ECHOK     __UINT32_C(0x00000020) /* If ICANON is also set, the VKILL character erases the current line */
+#define __ECHONL    __UINT32_C(0x00000040) /* If ICANON is also set, echo the NL character even if ECHO is not set
+                                            * NOTE: for this purpose, the NL character(s) recognized are '\n', `VEOL' and `VEOL2' */
+#define __NOFLSH    __UINT32_C(0x00000080) /* Disable flushing the input and output queues when generating signals for the INT, QUIT, and SUSP characters */
+#define __TOSTOP    __UINT32_C(0x00000100) /* Send the SIGTTOU signal to the process group of a background process which tries to write to its controlling terminal */
+#define __ECHOCTL   __UINT32_C(0x00000200) /* If ECHO is also set, terminal special characters other than TAB(\t), NL(\n),
+                                            * START, and STOP are echoed as ^X, where X is the character with ASCII code
+                                            * 0x40 greater than the special character. For example, character 0x08 (BS)
+                                            * is echoed as ^H */
+#define __ECHOPRT   __UINT32_C(0x00000400) /* This bit is like ECHOE, enables display of the ERASE character in a way that
+                                            * is geared to a hardcopy terminal. When you type the ERASE character, a `\'
+                                            * character is printed followed by the first character erased. Typing the
+                                            * ERASE character again just prints the next character erased. Then, the
+                                            * next time you type a normal character, a `/' character is printed
+                                            * before the character echoes. */
+#define __ECHOKE    __UINT32_C(0x00000800) /* If ICANON is also set, KILL is echoed by erasing each character on the line, as specified by ECHOE and ECHOPRT */
+#define __FLUSHO    __UINT32_C(0x00001000) /* Output is being flushed. This flag is toggled by typing the DISCARD character */
+/*      __          __UINT32_C(0x00002000)  * ... */
+#define __PENDIN    __UINT32_C(0x00004000) /* ??? */
+#define __IEXTEN    __UINT32_C(0x00008000) /* Enable implementation-defined input processing. This flag, as
+                                            * well as ICANON must be enabled for the special characters
+                                            * EOL2, LNEXT, REPRINT, WERASE to be interpreted, and for the
+                                            * IUCLC flag to be effective */
+#define __EXTPROC   __UINT32_C(0x00010000) /* Skip handling of: `PARMRK', `ECHO' and `IXON'+`IXANY', as well as `c_cc[*]' */
+/*      __          __UINT32_C(0x00020000)  * ... */
+/*      __          __UINT32_C(0x00040000)  * ... */
+/*      __          __UINT32_C(0x00080000)  * ... */
+#define __IERASING  __UINT32_C(0x00100000) /* Status bit for `ECHOPRT' */
+#define __IXCASEING __UINT32_C(0x00200000) /* Status bit for `XCASE' (the previous character was \) */
+#define __IEOFING   __UINT32_C(0x00400000) /* Status bit for a pending `VEOF' character
+                                            * When set, the next time input is attempted to be read from the TTY,
+                                            * and the operation would have blocked, read(2) instead returns immediately,
+                                            * thus indicating an END-OF-FILE within the TTY. (shell programs usually
+                                            * interpret this as the user wishing to logout) */
+#define __IESCAPING __UINT32_C(0x00800000) /* Status bit for `VLNEXT': The next input character is escaped. */
+/*      __          __UINT32_C(0x01000000)  * ... */
+/*      __          __UINT32_C(0x02000000)  * ... */
+/*      __          __UINT32_C(0x04000000)  * ... */
+/*      __          __UINT32_C(0x08000000)  * ... */
+/*      __          __UINT32_C(0x10000000)  * ... */
+/*      __          __UINT32_C(0x20000000)  * ... */
+/*      __          __UINT32_C(0x40000000)  * ... */
+/*      __          __UINT32_C(0x80000000)  * ... */
 
 /* tcflow() and TCXONC use these */
 #define __TCOOFF 0 /* Suspends output. */

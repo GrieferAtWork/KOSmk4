@@ -4610,7 +4610,6 @@
 #define __CRT_HAVE_wcswidth
 #define __CRT_HAVE_wcsxfrm
 #define __CRT_HAVE_wcsxfrm_l
-#define __CRT_HAVE_wctermid
 #define __CRT_HAVE_wctob
 #define __CRT_HAVE_wctomb
 #define __CRT_HAVE_wctomb_s
@@ -4637,8 +4636,6 @@
 #define __CRT_HAVE_wgetcwd
 #define __CRT_HAVE_wgetdomainname
 #define __CRT_HAVE_wgethostname
-#define __CRT_HAVE_wgetlogin
-#define __CRT_HAVE_wgetlogin_r
 #define __CRT_HAVE_wildstrcasecmp
 #define __CRT_HAVE_wildstrcasecmp_l
 #define __CRT_HAVE_wildstrcmp
@@ -5130,7 +5127,6 @@
 #define __CRT_HAVE_KOS$wcswidth
 #define __CRT_HAVE_KOS$wcsxfrm
 #define __CRT_HAVE_KOS$wcsxfrm_l
-#define __CRT_HAVE_KOS$wctermid
 #define __CRT_HAVE_KOS$wctomb
 #define __CRT_HAVE_KOS$wctomb_s
 #define __CRT_HAVE_KOS$wcwidth
@@ -5152,8 +5148,6 @@
 #define __CRT_HAVE_KOS$wgetcwd
 #define __CRT_HAVE_KOS$wgetdomainname
 #define __CRT_HAVE_KOS$wgethostname
-#define __CRT_HAVE_KOS$wgetlogin
-#define __CRT_HAVE_KOS$wgetlogin_r
 #define __CRT_HAVE_KOS$wildwcscasecmp
 #define __CRT_HAVE_KOS$wildwcscasecmp_l
 #define __CRT_HAVE_KOS$wildwcscmp
@@ -5629,7 +5623,6 @@
 #define __CRT_HAVE_DOS$wcswidth
 #define __CRT_HAVE_DOS$wcsxfrm
 #define __CRT_HAVE_DOS$wcsxfrm_l
-#define __CRT_HAVE_DOS$wctermid
 #define __CRT_HAVE_DOS$wctomb
 #define __CRT_HAVE_DOS$wctomb_s
 #define __CRT_HAVE_DOS$wcwidth
@@ -5651,8 +5644,6 @@
 #define __CRT_HAVE_DOS$wgetcwd
 #define __CRT_HAVE_DOS$wgetdomainname
 #define __CRT_HAVE_DOS$wgethostname
-#define __CRT_HAVE_DOS$wgetlogin
-#define __CRT_HAVE_DOS$wgetlogin_r
 #define __CRT_HAVE_DOS$wildwcscasecmp
 #define __CRT_HAVE_DOS$wildwcscasecmp_l
 #define __CRT_HAVE_DOS$wildwcscmp

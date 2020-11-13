@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58b3213d */
+/* HASH CRC-32:0xb56e1627 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -796,11 +796,26 @@ __CDECLARE_OPT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,tcgetpgrp,(__fd_t __fd),(__f
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,tcsetpgrp,(__fd_t __fd, __pid_t __pgrp_id),(__fd,__pgrp_id))
-/* ... */
-#if !defined(__getlogin_defined) && defined(__CRT_HAVE_getlogin)
+#ifndef __getlogin_defined
 #define __getlogin_defined 1
+#ifdef __CRT_HAVE_getlogin
+/* >> getlogin(3)
+ * Return the login name for the current user, or `NULL' on error.
+ * s.a. `getlogin_r()' and `cuserid()' */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
-#endif /* !__getlogin_defined && __CRT_HAVE_getlogin */
+#else /* __CRT_HAVE_getlogin */
+#include <libc/local/environ.h>
+#if defined(__CRT_HAVE_cuserid) || defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
+#include <libc/local/unistd/getlogin.h>
+/* >> getlogin(3)
+ * Return the login name for the current user, or `NULL' on error.
+ * s.a. `getlogin_r()' and `cuserid()' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getlogin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL getlogin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getlogin))(); })
+#else /* __CRT_HAVE_cuserid || __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid) */
+#undef __getlogin_defined
+#endif /* !__CRT_HAVE_cuserid && !__CRT_HAVE_getlogin_r && !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || !__CRT_HAVE_geteuid) */
+#endif /* !__CRT_HAVE_getlogin */
+#endif /* !__getlogin_defined */
 #ifdef __CRT_HAVE_chown
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -1946,7 +1961,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(readlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,getlogin_r,(char *__name, size_t __name_len),(__name,__name_len))
+#ifdef __CRT_HAVE_getlogin_r
+/* >> getlogin_r(3)
+ * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
+ * s.a. `getlogin()' and `cuserid()' */
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,getlogin_r,(char *__name, size_t __name_len),(__name,__name_len))
+#else /* __CRT_HAVE_getlogin_r */
+#include <libc/local/environ.h>
+#if defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
+#include <libc/local/unistd/getlogin_r.h>
+/* >> getlogin_r(3)
+ * Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
+ * s.a. `getlogin()' and `cuserid()' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getlogin_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL getlogin_r)(char *__name, size_t __name_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getlogin_r))(__name, __name_len); })
+#endif /* __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid) */
+#endif /* !__CRT_HAVE_getlogin_r */
 #endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
@@ -2189,12 +2218,34 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(swab, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONN
 #define __ctermid_defined 1
 __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
 #endif /* !__ctermid_defined && __CRT_HAVE_ctermid */
-#if !defined(__cuserid_defined) && defined(__CRT_HAVE_cuserid)
+#ifndef __cuserid_defined
 #define __cuserid_defined 1
-/* Return the name of the current user (`getpwuid(geteuid())'), storing
- * that name in `S'. When `S' is NULL, a static buffer is used instead */
+#ifdef __CRT_HAVE_cuserid
+/* >> cuserid(3)
+ * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
+ * that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ * If the actual username is longer than this, it may be truncated, and programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * s.a. `getlogin()' and `getlogin_r()' */
 __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
-#endif /* !__cuserid_defined && __CRT_HAVE_cuserid */
+#else /* __CRT_HAVE_cuserid */
+#include <libc/local/environ.h>
+#if defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
+#include <libc/local/unistd/cuserid.h>
+/* >> cuserid(3)
+ * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
+ * that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ * If the actual username is longer than this, it may be truncated, and programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * s.a. `getlogin()' and `getlogin_r()' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__LIBCCALL cuserid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cuserid))(__s); })
+#else /* __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid) */
+#undef __cuserid_defined
+#endif /* !__CRT_HAVE_getlogin_r && !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || !__CRT_HAVE_geteuid) */
+#endif /* !__CRT_HAVE_cuserid */
+#endif /* !__cuserid_defined */
 #endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 

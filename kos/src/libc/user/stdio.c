@@ -3444,34 +3444,6 @@ NOTHROW_NCX(LIBCCALL libc__set_printf_count_output)(int val)
 }
 /*[[[end:libc__set_printf_count_output]]]*/
 
-PRIVATE ATTR_SECTION(".bss.crt.io.tty.cuserid_buffer") char cuserid_buffer[L_cuserid];
-
-/*[[[head:libc_cuserid,hash:CRC-32=0xe9f2bb0d]]]*/
-/* Return the name of the current user (`getpwuid(geteuid())'), storing
- * that name in `S'. When `S' is NULL, a static buffer is used instead */
-INTERN ATTR_SECTION(".text.crt.io.tty") char *
-NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s)
-/*[[[body:libc_cuserid]]]*/
-{
-	char buf[NSS_BUFLEN_PASSWD];
-	struct passwd pwent, *pwptr;
-	if (getpwuid_r(geteuid(),
-	               &pwent,
-	               buf,
-	               sizeof(buf),
-	               &pwptr) ||
-	    pwptr == NULL) {
-		if (s != NULL)
-			s[0] = '\0';
-		return s;
-	}
-	if (s == NULL)
-		s = cuserid_buffer;
-	s[L_cuserid - 1] = '\0';
-	return strncpy(s, pwptr->pw_name, L_cuserid - 1);
-}
-/*[[[end:libc_cuserid]]]*/
-
 /*[[[head:libc_fdreopen,hash:CRC-32=0xfc32b587]]]*/
 /* Re-open the given `STREAM' as a file-stream for accessing `FD' */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") NONNULL((2, 3)) FILE *
@@ -3603,7 +3575,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb0489bbb]]]*/
+/*[[[start:exports,hash:CRC-32=0x6a8fcd4e]]]*/
 DEFINE_PUBLIC_ALIAS(remove, libc_remove);
 DEFINE_PUBLIC_ALIAS(rename, libc_rename);
 DEFINE_PUBLIC_ALIAS(tmpnam, libc_tmpnam);
@@ -3674,7 +3646,6 @@ DEFINE_PUBLIC_ALIAS(_IO_funlockfile, libc_funlockfile);
 DEFINE_PUBLIC_ALIAS(funlockfile, libc_funlockfile);
 DEFINE_PUBLIC_ALIAS(_IO_ftrylockfile, libc_ftrylockfile);
 DEFINE_PUBLIC_ALIAS(ftrylockfile, libc_ftrylockfile);
-DEFINE_PUBLIC_ALIAS(cuserid, libc_cuserid);
 DEFINE_PUBLIC_ALIAS(_IO_popen, libc_popen);
 DEFINE_PUBLIC_ALIAS(popen, libc_popen);
 DEFINE_PUBLIC_ALIAS(pclose, libc_pclose);

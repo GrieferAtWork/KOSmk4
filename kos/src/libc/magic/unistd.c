@@ -675,9 +675,23 @@ $pid_t tcgetpgrp($fd_t fd);
 [[decl_include("<bits/types.h>")]]
 int tcsetpgrp($fd_t fd, $pid_t pgrp_id);
 
-%/* ... */
-[[wunused, guard]]
-char *getlogin();
+@@>> getlogin(3)
+@@Return the login name for the current user, or `NULL' on error.
+@@s.a. `getlogin_r()' and `cuserid()'
+[[section(".text.crt{|.dos}.io.tty")]]
+[[wunused, guard, requires($has_function(getenv) || $has_function(cuserid))]]
+char *getlogin() {
+@@pp_if $has_function(getenv) && $has_function(cuserid)@@
+	char *result = getenv("LOGNAME");
+	if (!result)
+		result = cuserid(NULL);
+	return result;
+@@pp_elif $has_function(getenv)@@
+	return getenv("LOGNAME");
+@@pp_else@@
+	return cuserid(NULL);
+@@pp_endif@@
+}
 
 %[default:section(".text.crt{|.dos}.fs.modify")]
 
@@ -1755,8 +1769,41 @@ ssize_t readlink([[nonnull]] char const *path,
 
 %
 %#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
+@@>> getlogin_r(3)
+@@Reentrant version of `getlogin()'. May truncate the name if it's longer than `name_len'
+@@s.a. `getlogin()' and `cuserid()'
 [[cp, section(".text.crt{|.dos}.io.tty")]]
-int getlogin_r([[outp(name_len)]] char *name, size_t name_len);
+[[requires($has_function(getenv) || ($has_function(getpwuid_r) && $has_function(geteuid)))]]
+[[impl_include("<bits/crt/db/passwd.h>")]] /* struct passwd */
+int getlogin_r([[outp(name_len)]] char *name, size_t name_len) {
+@@pp_if $has_function(getpwuid_r) && $has_function(geteuid)@@
+	char buf[1024]; /* NSS_BUFLEN_PASSWD */
+	struct passwd pwent, *pwptr;
+@@pp_endif@@
+	char *pwname;
+@@pp_if $has_function(getenv)@@
+	pwname = getenv("LOGNAME");
+@@pp_if $has_function(getpwuid_r) && $has_function(geteuid)@@
+	if (!pwname)
+@@pp_endif@@
+@@pp_endif@@
+@@pp_if $has_function(getpwuid_r) && $has_function(geteuid)@@
+	{
+		if (getpwuid_r(geteuid(), &pwent, buf,
+		               sizeof(buf), &pwptr) ||
+		    pwptr == NULL)
+			return -1;
+		pwname = pwptr->@pw_name@;
+		if (!pwname)
+			return -1;
+	}
+@@pp_endif@@
+	if (name_len) {
+		name[name_len - 1] = '\0';
+		strncpy(name, pwname, name_len - 1);
+	}
+	return 0;
+}
 %#endif /* __USE_REENTRANT || __USE_POSIX199506 */
 
 %
@@ -1969,7 +2016,29 @@ void swab([[nonnull]] void const *__restrict from,
 [[guard, section(".text.crt{|.dos}.io.tty")]]
 char *ctermid(char *s);
 
-%[insert:extern(cuserid)]
+@@>> cuserid(3)
+@@Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
+@@that name in `s'. When `s' is NULL, a static buffer is used instead
+@@When given, `s' must be a buffer of at least `L_cuserid' bytes.
+@@If the actual username is longer than this, it may be truncated, and programs
+@@that wish to support longer usernames should make use of `getlogin_r()' instead.
+@@s.a. `getlogin()' and `getlogin_r()'
+[[section(".text.crt{|.dos}.io.tty")]]
+[[guard, requires_function(getlogin_r)]]
+[[impl_include("<asm/crt/stdio.h>")]] /* __L_cuserid */
+char *cuserid(char *s) {
+@@pp_ifdef __L_cuserid@@
+	static char cuserid_buffer[__L_cuserid];
+	if (!s)
+		s = cuserid_buffer;
+	return getlogin_r(s, __L_cuserid) ? NULL : s;
+@@pp_else@@
+	static char cuserid_buffer[9];
+	if (!s)
+		s = cuserid_buffer;
+	return getlogin_r(s, 9) ? NULL : s;
+@@pp_endif@@
+}
 %#endif /* _EVERY_SOURCE || __USE_SOLARIS || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 

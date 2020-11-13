@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91f64c6a */
+/* HASH CRC-32:0xbb43400a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,19 +43,18 @@
 #endif /* __USE_MISC || __USE_KOS || __USE_BSD */
 
 
-/* NOTE: Some of the comments are taken from here:
- *   http://man7.org/linux/man-pages/man3/tcflow.3.html
- *   https://ftp.gnu.org/old-gnu/Manuals/glibc-2.2.3/html_node/libc_355.html
- */
+/* Sources for comments:
+ *   - http://man7.org/linux/man-pages/man3/tcflow.3.html
+ *   - https://ftp.gnu.org/old-gnu/Manuals/glibc-2.2.3/html_node/libc_355.html
+ *   - Came up with them myself, or altered them significantly. */
 
 #ifndef __VDISABLE
-#define __VDISABLE '\0' /* `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
+#define __VDISABLE '\0' /* `c_cc' member of `struct termios' structure can be disabled by using the value `__VDISABLE'. */
 #endif /* !__VDISABLE */
 
 #ifndef _POSIX_VDISABLE
-#define _POSIX_VDISABLE __VDISABLE /* `c_cc' member of `struct termios' structure can be disabled by using the value _POSIX_VDISABLE. */
+#define _POSIX_VDISABLE __VDISABLE /* `c_cc' member of `struct termios' structure can be disabled by using the value `_POSIX_VDISABLE'. */
 #endif /* !_POSIX_VDISABLE */
-
 
 /* c_cc characters */
 #if !defined(VINTR) && defined(__VINTR)
@@ -197,61 +196,61 @@
 #endif /* !OFDEL && __OFDEL */
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
 #if !defined(NLDLY) && defined(__NLDLY)
-#   define NLDLY    __NLDLY  /* ??? */
+#define NLDLY       __NLDLY  /* ??? */
 #endif /* !NLDLY && __NLDLY */
 #if !defined(NL0) && defined(__NL0)
-#   define   NL0    __NL0    /* ??? */
+#define   NL0       __NL0    /* ??? */
 #endif /* !NL0 && __NL0 */
 #if !defined(NL1) && defined(__NL1)
-#   define   NL1    __NL1    /* ??? */
+#define   NL1       __NL1    /* ??? */
 #endif /* !NL1 && __NL1 */
 #if !defined(CRDLY) && defined(__CRDLY)
-#   define CRDLY    __CRDLY  /* ??? */
+#define CRDLY       __CRDLY  /* ??? */
 #endif /* !CRDLY && __CRDLY */
 #if !defined(CR0) && defined(__CR0)
-#   define   CR0    __CR0    /* ??? */
+#define   CR0       __CR0    /* ??? */
 #endif /* !CR0 && __CR0 */
 #if !defined(CR1) && defined(__CR1)
-#   define   CR1    __CR1    /* ??? */
+#define   CR1       __CR1    /* ??? */
 #endif /* !CR1 && __CR1 */
 #if !defined(CR2) && defined(__CR2)
-#   define   CR2    __CR2    /* ??? */
+#define   CR2       __CR2    /* ??? */
 #endif /* !CR2 && __CR2 */
 #if !defined(CR3) && defined(__CR3)
-#   define   CR3    __CR3    /* ??? */
+#define   CR3       __CR3    /* ??? */
 #endif /* !CR3 && __CR3 */
 #if !defined(TABDLY) && defined(__TABDLY)
-#   define TABDLY   __TABDLY /* ??? */
+#define TABDLY      __TABDLY /* ??? */
 #endif /* !TABDLY && __TABDLY */
 #if !defined(TAB0) && defined(__TAB0)
-#   define   TAB0   __TAB0   /* ??? */
+#define   TAB0      __TAB0   /* ??? */
 #endif /* !TAB0 && __TAB0 */
 #if !defined(TAB1) && defined(__TAB1)
-#   define   TAB1   __TAB1   /* ??? */
+#define   TAB1      __TAB1   /* ??? */
 #endif /* !TAB1 && __TAB1 */
 #if !defined(TAB2) && defined(__TAB2)
-#   define   TAB2   __TAB2   /* ??? */
+#define   TAB2      __TAB2   /* ??? */
 #endif /* !TAB2 && __TAB2 */
 #if !defined(TAB3) && defined(__TAB3)
-#   define   TAB3   __TAB3   /* ??? */
+#define   TAB3      __TAB3   /* ??? */
 #endif /* !TAB3 && __TAB3 */
 #if !defined(BSDLY) && defined(__BSDLY)
-#   define BSDLY    __BSDLY  /* ??? */
+#define BSDLY       __BSDLY  /* ??? */
 #endif /* !BSDLY && __BSDLY */
 #if !defined(BS0) && defined(__BS0)
-#   define   BS0    __BS0    /* ??? */
+#define   BS0       __BS0    /* ??? */
 #endif /* !BS0 && __BS0 */
 #if !defined(BS1) && defined(__BS1)
-#   define   BS1    __BS1    /* ??? */
+#define   BS1       __BS1    /* ??? */
 #endif /* !BS1 && __BS1 */
 #if !defined(FFDLY) && defined(__FFDLY)
-#   define FFDLY    __FFDLY  /* ??? */
+#define FFDLY       __FFDLY  /* ??? */
 #endif /* !FFDLY && __FFDLY */
 #if !defined(FF0) && defined(__FF0)
-#   define   FF0    __FF0    /* ??? */
+#define   FF0       __FF0    /* ??? */
 #endif /* !FF0 && __FF0 */
 #if !defined(FF1) && defined(__FF1)
-#   define   FF1    __FF1    /* ??? */
+#define   FF1       __FF1    /* ??? */
 #endif /* !FF1 && __FF1 */
 #endif /* __USE_MISC || __USE_XOPEN */
 #if !defined(VTDLY) && defined(__VTDLY)
@@ -337,19 +336,19 @@
 #endif /* !EXTB && __EXTB */
 #endif /* __USE_MISC */
 #if !defined(CSIZE) && defined(__CSIZE)
-#define CSIZE     __CSIZE
+#define CSIZE     __CSIZE /* Mask for the character size (in bits) */
 #endif /* !CSIZE && __CSIZE */
 #if !defined(CS5) && defined(__CS5)
-#define   CS5     __CS5
+#define   CS5     __CS5   /* 5-bit characters */
 #endif /* !CS5 && __CS5 */
 #if !defined(CS6) && defined(__CS6)
-#define   CS6     __CS6
+#define   CS6     __CS6   /* 6-bit characters */
 #endif /* !CS6 && __CS6 */
 #if !defined(CS7) && defined(__CS7)
-#define   CS7     __CS7
+#define   CS7     __CS7   /* 7-bit characters */
 #endif /* !CS7 && __CS7 */
 #if !defined(CS8) && defined(__CS8)
-#define   CS8     __CS8
+#define   CS8     __CS8   /* 8-bit characters */
 #endif /* !CS8 && __CS8 */
 #if !defined(CSTOPB) && defined(__CSTOPB)
 #define CSTOPB    __CSTOPB

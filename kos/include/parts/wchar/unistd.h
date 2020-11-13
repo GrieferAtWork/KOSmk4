@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99a2794d */
+/* HASH CRC-32:0x151b6d6a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,6 @@ __CDECLARE_OPT(__ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wttyname,(__fd_t __fd),(__
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 __CDECLARE_OPT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wttyname_r,(__fd_t __fd, wchar_t *__buf, size_t __buflen),(__fd,__buf,__buflen))
-__CDECLARE_OPT(__ATTR_WUNUSED,wchar_t *,__NOTHROW_NCX,wgetlogin,(void),())
 #ifdef __CRT_HAVE_wchown
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
@@ -343,10 +342,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wreadlink, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE_wreadlink */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
-#if defined(__USE_REENTRANT) || defined(__USE_POSIX199506)
-__CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wgetlogin_r,(wchar_t *__name, size_t __name_len),(__name,__name_len))
-#endif /* __USE_REENTRANT || __USE_POSIX199506 */
-
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
@@ -373,11 +368,6 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wsetdomainname,(wchar_t con
  * (usually the process) to a path that was previously address by `PATH' */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wchroot,(wchar_t const *__restrict __path),(__path))
 #endif /* ... */
-
-#if (defined(_EVERY_SOURCE) || \
-     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
-__CDECLARE_OPT(,wchar_t *,__NOTHROW_NCX,wctermid,(wchar_t *__s),(__s))
-#endif /* _EVERY_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 #endif /* __CC__ */
 

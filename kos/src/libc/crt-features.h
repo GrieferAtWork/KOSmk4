@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x396fe419 */
+/* HASH CRC-32:0xee0f1fb9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2797,7 +2797,6 @@
 #define __CRT_HAVE_DOS$wcswidth
 #define __CRT_HAVE_DOS$wcsxfrm
 #define __CRT_HAVE_DOS$wcsxfrm_l
-#define __CRT_HAVE_DOS$wctermid
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$wctob
@@ -2832,8 +2831,6 @@
 #define __CRT_HAVE_DOS$wgetcwd
 #define __CRT_HAVE_DOS$wgetdomainname
 #define __CRT_HAVE_DOS$wgethostname
-#define __CRT_HAVE_DOS$wgetlogin
-#define __CRT_HAVE_DOS$wgetlogin_r
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$wildstrcasecmp
@@ -5871,7 +5868,6 @@
 #define __CRT_HAVE_wcswidth
 #define __CRT_HAVE_wcsxfrm
 #define __CRT_HAVE_wcsxfrm_l
-#define __CRT_HAVE_wctermid
 #define __CRT_HAVE_wctob
 #define __CRT_HAVE_wctomb
 #define __CRT_HAVE_wctomb_s
@@ -5898,8 +5894,6 @@
 #define __CRT_HAVE_wgetcwd
 #define __CRT_HAVE_wgetdomainname
 #define __CRT_HAVE_wgethostname
-#define __CRT_HAVE_wgetlogin
-#define __CRT_HAVE_wgetlogin_r
 #define __CRT_HAVE_wildstrcasecmp
 #define __CRT_HAVE_wildstrcasecmp_l
 #define __CRT_HAVE_wildstrcmp

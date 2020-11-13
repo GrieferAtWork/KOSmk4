@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd689b60 */
+/* HASH CRC-32:0x885eb185 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2280,12 +2280,34 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL __ATTR_ARTIFICIAL char *
 #endif /* __USE_REENTRANT */
 
 #ifdef __USE_XOPEN
-#if !defined(__cuserid_defined) && defined(__CRT_HAVE_cuserid)
+#ifndef __cuserid_defined
 #define __cuserid_defined 1
-/* Return the name of the current user (`getpwuid(geteuid())'), storing
- * that name in `S'. When `S' is NULL, a static buffer is used instead */
+#ifdef __CRT_HAVE_cuserid
+/* >> cuserid(3)
+ * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
+ * that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ * If the actual username is longer than this, it may be truncated, and programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * s.a. `getlogin()' and `getlogin_r()' */
 __CDECLARE(,char *,__NOTHROW_NCX,cuserid,(char *__s),(__s))
-#endif /* !__cuserid_defined && __CRT_HAVE_cuserid */
+#else /* __CRT_HAVE_cuserid */
+#include <libc/local/environ.h>
+#if defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
+#include <libc/local/unistd/cuserid.h>
+/* >> cuserid(3)
+ * Return the name of the current user (`$LOGNAME' or `getpwuid(geteuid())'), storing
+ * that name in `s'. When `s' is NULL, a static buffer is used instead
+ * When given, `s' must be a buffer of at least `L_cuserid' bytes.
+ * If the actual username is longer than this, it may be truncated, and programs
+ * that wish to support longer usernames should make use of `getlogin_r()' instead.
+ * s.a. `getlogin()' and `getlogin_r()' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(cuserid, __FORCELOCAL __ATTR_ARTIFICIAL char *__NOTHROW_NCX(__LIBCCALL cuserid)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cuserid))(__s); })
+#else /* __CRT_HAVE_getlogin_r || __CRT_HAVE_getenv || __LOCAL_environ || (__CRT_HAVE_getpwuid_r && __CRT_HAVE_geteuid) */
+#undef __cuserid_defined
+#endif /* !__CRT_HAVE_getlogin_r && !__CRT_HAVE_getenv && !__LOCAL_environ && (!__CRT_HAVE_getpwuid_r || !__CRT_HAVE_geteuid) */
+#endif /* !__CRT_HAVE_cuserid */
+#endif /* !__cuserid_defined */
 #endif /* Use X/Open, but not issue 6.  */
 
 #ifdef __USE_POSIX2

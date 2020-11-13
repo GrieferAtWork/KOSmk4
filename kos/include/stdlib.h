@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ba852b7 */
+/* HASH CRC-32:0x7bed8ffe */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2303,10 +2303,23 @@ __CREDIRECT(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd
 #undef __getcwd_defined
 #endif /* !... */
 #endif /* !__getcwd_defined */
-#if !defined(__getlogin_defined) && defined(__CRT_HAVE_getlogin)
+#ifndef __getlogin_defined
 #define __getlogin_defined 1
+#ifdef __CRT_HAVE_getlogin
+/* >> getlogin(3)
+ * Return the login name for the current user, or `NULL' on error.
+ * s.a. `getlogin_r()' and `cuserid()' */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,getlogin,(void),())
-#endif /* !__getlogin_defined && __CRT_HAVE_getlogin */
+#elif defined(__CRT_HAVE_cuserid) || defined(__CRT_HAVE_getlogin_r) || defined(__CRT_HAVE_getenv) || defined(__LOCAL_environ) || (defined(__CRT_HAVE_getpwuid_r) && defined(__CRT_HAVE_geteuid))
+#include <libc/local/unistd/getlogin.h>
+/* >> getlogin(3)
+ * Return the login name for the current user, or `NULL' on error.
+ * s.a. `getlogin_r()' and `cuserid()' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(getlogin, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL getlogin)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getlogin))(); })
+#else /* ... */
+#undef __getlogin_defined
+#endif /* !... */
+#endif /* !__getlogin_defined */
 #if !defined(__getpass_defined) && defined(__CRT_HAVE_getpass)
 #define __getpass_defined 1
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,getpass,(char const *__restrict __prompt),(__prompt))

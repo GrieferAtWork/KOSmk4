@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#include <debugger/rt.h>
 #include <kernel/types.h>
 
 #include <hybrid/host.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x587d759e */
+/* HASH CRC-32:0x75b9ff04 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,7 +143,6 @@ INTDEF WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd);
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd, pid_t pgrp_id);
-INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_getlogin)(void);
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_chown)(char const *file, uid_t owner, gid_t group);
@@ -403,7 +402,6 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_t
  *          make use of the buffer in its entirety.
  * When targeting KOS, consider using `freadlinkat(2)' with `AT_READLINK_REQSIZE' */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readlink)(char const *path, char *buf, size_t buflen);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name, size_t name_len);
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name, size_t buflen);
