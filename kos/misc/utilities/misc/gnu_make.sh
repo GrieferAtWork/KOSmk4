@@ -293,6 +293,19 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					*--disable-docs* | *--enable-docs*)
+						if ! [[ "$CONFIGURE" == *--enable-docs* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-docs* ]]; then
+							if test -z "$PACKAGE_WITH_DOCS"; then
+								echo "	option: --disable-docs"
+								CONFIGURE="$CONFIGURE --disable-docs";
+							else
+								echo "	option: --enable-docs"
+								CONFIGURE="$CONFIGURE --enable-docs";
+							fi
+						fi
+						;;
+
 					# Misc options
 					*--with-libiconv-prefix* | *--without-libiconv-prefix*)
 						if ! [[ "$CONFIGURE" == *--with-libiconv-prefix* ]] && \
