@@ -17,13 +17,23 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-# Generate some wrapper scripts for binutils gcc and g++ that
+
+#################################################################
+# Generate some wrapper programs for binutils gcc and g++ that
 # discard any -I and -L arguments that are located outside of
 # the normal "$KOS_ROOT"
 #
 # Additionally, re-define some (environment-)variables:
 #  - $CROSS_PREFIX="${CROSS_PREFIX}hack-"
 #  - $CROSS_COMPILE="$CROSS_PREFIX"
+#
+# Note that when being first built, these wrapper programs will
+# have the KOS source root hard-coded inside of them, meaning
+# that this is yet another place that will prevent you from
+# re-naming the path you've extracted the KOS source tree to
+# after having run some of the contained tools.
+#################################################################
+
 
 # hackgcc_wrapper <name>
 hackgcc_wrapper() {
@@ -58,6 +68,7 @@ hackgcc_symlink() {
 	fi
 }
 
+# Generate symlinks/wrapper programs for all of the toolchain applets.
 hackgcc_symlink addr2line
 hackgcc_symlink ar
 hackgcc_symlink as

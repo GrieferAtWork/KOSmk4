@@ -26,7 +26,7 @@ PACKAGE_GIT_COMMIT="fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6"
 
 CONFIGURE=""
 CONFIGURE="$CONFIGURE --enable-linux-rom-fallback"
-CONFIGURE="$CONFIGURE --with-pciids-path=\"/usr/share/hwdata\""
+CONFIGURE="$CONFIGURE --with-pciids-path=/usr/share/hwdata"
 CONFIGURE="$CONFIGURE --with-zlib"
 
 # Automatically build+install using autoconf

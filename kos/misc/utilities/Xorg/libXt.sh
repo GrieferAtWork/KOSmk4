@@ -23,120 +23,15 @@ require_utility Xorg/libICE    "$PKG_CONFIG_PATH/ice.pc"
 require_utility Xorg/libX11    "$PKG_CONFIG_PATH/x11.pc"
 require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 #equire_utility Xorg/xorgproto "$PKG_CONFIG_PATH/kbproto.pc"
-
 require_program xsltproc
 
-# xorg-macros
-. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
+PACKAGE_URL="https://www.x.org/releases/individual/lib/libXt-1.2.0.tar.gz"
 
-VERSION="1.2.0"
+CONFIGURE=""
+CONFIGURE="$CONFIGURE --enable-xkb"
+CONFIGURE="$CONFIGURE --enable-const"
+CONFIGURE="$CONFIGURE --disable-geo-tattler"
+CONFIGURE="$CONFIGURE --with-appdefaultdir=/usr/share/X11/app-defaults"
 
-SO_VERSION_MAJOR="6"
-SO_VERSION="$SO_VERSION_MAJOR.0.0"
-
-SRCPATH="$KOS_ROOT/binutils/src/Xorg/libXt-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/Xorg/libXt-$VERSION"
-
-# libXt
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libXt.so.$SO_VERSION" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
-		if ! [ -f "$SRCPATH/configure" ]; then
-			cmd mkdir -p "$KOS_ROOT/binutils/src/Xorg"
-			cmd cd "$KOS_ROOT/binutils/src/Xorg"
-			cmd rm -rf "libXt-$VERSION"
-			download_file \
-				"libXt-$VERSION.tar.gz" \
-				"https://www.x.org/releases/individual/lib/libXt-$VERSION.tar.gz"
-			cmd tar xvf "libXt-$VERSION.tar.gz"
-		fi
-		cmd rm -rf "$OPTPATH"
-		cmd mkdir -p "$OPTPATH"
-		cmd cd "$OPTPATH"
-		(
-			export CC="${CROSS_PREFIX}gcc"
-			export CPP="${CROSS_PREFIX}cpp"
-			export CFLAGS="-ggdb"
-			export CXX="${CROSS_PREFIX}g++"
-			export CXXCPP="${CROSS_PREFIX}cpp"
-			export CXXFLAGS="-ggdb"
-			cmd bash "../../../../src/Xorg/libXt-$VERSION/configure" \
-				--prefix="$XORG_CONFIGURE_PREFIX" \
-				--exec-prefix="$XORG_CONFIGURE_EXEC_PREFIX" \
-				--bindir="$XORG_CONFIGURE_BINDIR" \
-				--sbindir="$XORG_CONFIGURE_SBINDIR" \
-				--libexecdir="$XORG_CONFIGURE_LIBEXECDIR" \
-				--sysconfdir="$XORG_CONFIGURE_SYSCONFDIR" \
-				--sharedstatedir="$XORG_CONFIGURE_SHAREDSTATEDIR" \
-				--localstatedir="$XORG_CONFIGURE_LOCALSTATEDIR" \
-				--libdir="$XORG_CONFIGURE_LIBDIR" \
-				--includedir="$XORG_CONFIGURE_INCLUDEDIR" \
-				--oldincludedir="$XORG_CONFIGURE_OLDINCLUDEDIR" \
-				--datarootdir="$XORG_CONFIGURE_DATAROOTDIR" \
-				--datadir="$XORG_CONFIGURE_DATADIR" \
-				--infodir="$XORG_CONFIGURE_INFODIR" \
-				--localedir="$XORG_CONFIGURE_LOCALEDIR" \
-				--mandir="$XORG_CONFIGURE_MANDIR" \
-				--docdir="$XORG_CONFIGURE_DOCDIR_PREFIX/libXt" \
-				--htmldir="$XORG_CONFIGURE_HTMLDIR_PREFIX/libXt" \
-				--dvidir="$XORG_CONFIGURE_DVIDIR_PREFIX/libXt" \
-				--pdfdir="$XORG_CONFIGURE_PDFDIR_PREFIX/libXt" \
-				--psdir="$XORG_CONFIGURE_PSDIR_PREFIX/libXt" \
-				--build="$(gcc -dumpmachine)" \
-				--host="$TARGET_NAME-linux-gnu" \
-				--enable-shared \
-				--enable-static \
-				--disable-malloc0returnsnull \
-				--disable-specs \
-				--enable-xkb \
-				--enable-const \
-				--disable-geo-tattler \
-				--disable-unit-tests \
-				--with-gnu-ld \
-				--without-xmlto \
-				--without-fop \
-				--with-appdefaultdir="$XORG_CONFIGURE_APPDEFAULTDIR"
-		) || exit $?
-	fi
-	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
-fi
-
-# Install libraries
-install_file        /$TARGET_LIBPATH/libXt.so.$SO_VERSION_MAJOR "$OPTPATH/src/.libs/libXt.so.$SO_VERSION"
-install_symlink     /$TARGET_LIBPATH/libXt.so.$SO_VERSION       libXt.so.$SO_VERSION_MAJOR
-install_symlink     /$TARGET_LIBPATH/libXt.so                   libXt.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libXt.a                    "$OPTPATH/src/.libs/libXt.a"
-
-# Install headers
-cmd cd "$OPTPATH/include/X11"
-for FILE in *.h; do
-	install_rawfile \
-		"$KOS_ROOT/kos/include/X11/$FILE" \
-		"$OPTPATH/include/X11/$FILE"
-done
-cmd cd "$SRCPATH/include/X11"
-for FILE in *.h; do
-	install_rawfile \
-		"$KOS_ROOT/kos/include/X11/$FILE" \
-		"$SRCPATH/include/X11/$FILE"
-done
-
-
-# Install the PKG_CONFIG file
-install_rawfile_stdin "$PKG_CONFIG_PATH/xt.pc" <<EOF
-prefix=$XORG_CONFIGURE_PREFIX
-exec_prefix=$XORG_CONFIGURE_EXEC_PREFIX
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-appdefaultdir=$XORG_CONFIGURE_APPDEFAULTDIR
-datarootdir=$XORG_CONFIGURE_DATAROOTDIR
-errordbdir=$XORG_CONFIGURE_DATADIR/X11
-
-Name: Xt
-Description: X Toolkit Library
-Version: $VERSION
-Requires: xproto x11
-Requires.private: ice sm
-Cflags:
-Libs: -lXt
-EOF
+# Automatically build+install using autoconf
+. "$KOS_MISC/utilities/misc/gnu_make.sh"

@@ -91,10 +91,18 @@ if test -z "$PACKAGE_HOST";           then PACKAGE_HOST="$TARGET_NAME-linux-gnu"
 if test -z "$PACKAGE_TARGET";         then PACKAGE_TARGET="$PACKAGE_HOST"; fi
 
 
-echo "gnu_make: PACKAGE_RAWNAME  '$PACKAGE_RAWNAME'"
-echo "gnu_make: PACKAGE_VERSION  '$PACKAGE_VERSION'"
-echo "gnu_make: PACKAGE_NAME     '$PACKAGE_NAME'"
-echo "gnu_make: PACKAGE_URL      '$PACKAGE_URL'"
+echo "gnu_make: PACKAGE_RAWNAME    '$PACKAGE_RAWNAME'"
+echo "gnu_make: PACKAGE_VERSION    '$PACKAGE_VERSION'"
+echo "gnu_make: PACKAGE_NAME       '$PACKAGE_NAME'"
+if ! test -z "$PACKAGE_URL"; then
+	echo "gnu_make: PACKAGE_URL        '$PACKAGE_URL'"
+elif ! test -z "$PACKAGE_GIT_URL"; then
+	echo "gnu_make: PACKAGE_GIT_URL    '$PACKAGE_GIT_URL'"
+	if ! test -z "$PACKAGE_GIT_COMMIT"; then
+		echo "gnu_make: PACKAGE_GIT_COMMIT '$PACKAGE_GIT_COMMIT'"
+	fi
+fi
+
 #echo "gnu_make: PACKAGE_PREFIX         '$PACKAGE_PREFIX'"
 #echo "gnu_make: PACKAGE_EPREFIX        '$PACKAGE_EPREFIX'"
 #echo "gnu_make: PACKAGE_BINDIR         '$PACKAGE_BINDIR'"
@@ -120,9 +128,16 @@ echo "gnu_make: PACKAGE_URL      '$PACKAGE_URL'"
 #echo "gnu_make: PACKAGE_TARGET '$PACKAGE_TARGET'"
 
 
-SRCPATH="$KOS_ROOT/binutils/src/$PACKAGE_NAME"
-OPTPATH="$BINUTILS_SYSROOT/opt/$PACKAGE_NAME"
-DESTDIR="$BINUTILS_SYSROOT/opt/${PACKAGE_NAME}-install"
+_UTILITY_RELPATH=""
+if [[ "$UTILITY_NAME" == */* ]]; then
+	_UTILITY_RELPATH="${UTILITY_NAME%/*}"
+	if ! test -z "$_UTILITY_RELPATH"; then
+		_UTILITY_RELPATH="$_UTILITY_RELPATH/"
+	fi
+fi
+SRCPATH="$KOS_ROOT/binutils/src/${_UTILITY_RELPATH}$PACKAGE_NAME"
+OPTPATH="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}$PACKAGE_NAME"
+DESTDIR="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}${PACKAGE_NAME}-install"
 
 # libtool tends to be buggy when using DESTDIR install, and tries to
 # include host system libraries during linking when it really shouldn't
@@ -253,9 +268,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 			else
 				_CONFHELP="$(bash $SRCPATH/configure --help 2>&1)"
 				# Auto-detect supported, but unset options
-				if ! [ -f "$SRCPATH/_configure_help" ]; then
-					echo "Creating file: '$SRCPATH/_configure_help'"
-					cmd bash "$SRCPATH/configure" --help > "$SRCPATH/_configure_help" 2>&1
+				if ! [ -f "$SRCPATH/._configure_help" ]; then
+					echo "Creating file: '$SRCPATH/._configure_help'"
+					cmd bash "$SRCPATH/configure" --help > "$SRCPATH/._configure_help.temp" 2>&1
+					cmd mv "$SRCPATH/._configure_help.temp" "$SRCPATH/._configure_help"
 				fi
 				if ! test -z "$CONFIGURE"; then
 					echo "Using given \$CONFIGURE options:"
@@ -333,6 +349,29 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					*--enable-malloc0returnsnull* | *--disable-malloc0returnsnull*)
+						# Used by (some) Xorg utilities
+						if ! [[ "$CONFIGURE" == *--enable-malloc0returnsnull* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-malloc0returnsnull* ]]; then
+							echo "	option: --disable-malloc0returnsnull"
+							CONFIGURE="$CONFIGURE --disable-malloc0returnsnull"
+						fi
+						;;
+
+					*--disable-specs* | *--enable-specs*)
+						# Used by Xorg utilities
+						if ! [[ "$CONFIGURE" == *--enable-specs* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-specs* ]]; then
+							if test -z "$PACKAGE_WITH_SPECS"; then
+								echo "	option: --disable-specs"
+								CONFIGURE="$CONFIGURE --disable-specs"
+							else
+								echo "	option: --enable-specs"
+								CONFIGURE="$CONFIGURE --enable-specs"
+							fi
+						fi
+						;;
+
 					*--disable-docs* | *--enable-docs*)
 						if ! [[ "$CONFIGURE" == *--enable-docs* ]] && \
 						   ! [[ "$CONFIGURE" == *--disable-docs* ]]; then
@@ -359,6 +398,19 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					*--disable-devel-docs* | *--enable-devel-docs*)
+						if ! [[ "$CONFIGURE" == *--enable-devel-docs* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-devel-docs* ]]; then
+							if test -z "$PACKAGE_WITH_DOCS"; then
+								echo "	option: --disable-devel-docs"
+								CONFIGURE="$CONFIGURE --disable-devel-docs"
+							else
+								echo "	option: --enable-devel-docs"
+								CONFIGURE="$CONFIGURE --enable-devel-docs"
+							fi
+						fi
+						;;
+
 					*--without-manpages* | *--with-manpages*)
 						if ! [[ "$CONFIGURE" == *--with-manpages* ]] && \
 						   ! [[ "$CONFIGURE" == *--without-manpages* ]]; then
@@ -380,11 +432,67 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					*--without-doxygen* | *--with-doxygen*)
+						if ! [[ "$CONFIGURE" == *--with-doxygen* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-doxygen* ]]; then
+							echo "	option: --without-doxygen"
+							CONFIGURE="$CONFIGURE --without-doxygen"
+						fi
+						;;
+
 					*--without-tests* | *--with-tests*)
 						if ! [[ "$CONFIGURE" == *--with-tests* ]] && \
 						   ! [[ "$CONFIGURE" == *--without-tests* ]]; then
 							echo "	option: --without-tests"
 							CONFIGURE="$CONFIGURE --without-tests"
+						fi
+						;;
+
+					*--disable-tests* | *--enable-tests*)
+						if ! [[ "$CONFIGURE" == *--enable-tests* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-tests* ]]; then
+							echo "	option: --disable-tests"
+							CONFIGURE="$CONFIGURE --disable-tests"
+						fi
+						;;
+
+					*--disable-unit-tests* | *--enable-unit-tests*)
+						if ! [[ "$CONFIGURE" == *--enable-unit-tests* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-unit-tests* ]]; then
+							echo "	option: --disable-unit-tests"
+							CONFIGURE="$CONFIGURE --disable-unit-tests"
+						fi
+						;;
+
+					*--without-xmlto* | *--with-xmlto*)
+						if ! [[ "$CONFIGURE" == *--with-xmlto* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-xmlto* ]]; then
+							echo "	option: --without-xmlto"
+							CONFIGURE="$CONFIGURE --without-xmlto"
+						fi
+						;;
+
+					*--without-fop* | *--with-fop*)
+						if ! [[ "$CONFIGURE" == *--with-fop* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-fop* ]]; then
+							echo "	option: --without-fop"
+							CONFIGURE="$CONFIGURE --without-fop"
+						fi
+						;;
+
+					*--without-lint* | *--with-lint*)
+						if ! [[ "$CONFIGURE" == *--with-lint* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-lint* ]]; then
+							echo "	option: --without-lint"
+							CONFIGURE="$CONFIGURE --without-lint"
+						fi
+						;;
+
+					*--without-launchd* | *--with-launchd*)
+						if ! [[ "$CONFIGURE" == *--with-launchd* ]] && \
+						   ! [[ "$CONFIGURE" == *--without-launchd* ]]; then
+							echo "	option: --without-launchd"
+							CONFIGURE="$CONFIGURE --without-launchd"
 						fi
 						;;
 
@@ -498,9 +606,17 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						fi
 						;;
 
+					*--enable-lint-library* | *--disable-lint-library*)
+						if ! [[ "$CONFIGURE" == *--enable-lint-library* ]] && \
+						   ! [[ "$CONFIGURE" == *--disable-lint-library* ]]; then
+							echo "	option: --disable-lint-library"
+							CONFIGURE="$CONFIGURE --disable-lint-library"
+						fi
+						;;
+
 					*) ;;
 					esac
-				done < "$SRCPATH/_configure_help"
+				done < "$SRCPATH/._configure_help"
 			fi
 			(
 				export CC="${CROSS_PREFIX}gcc"
@@ -517,7 +633,7 @@ EOF
 				fi
 				${GM_HOOK_BEFORE_CONFIGURE:-:}
 				cmd cd "$OPTPATH"
-				cmd bash ../../../src/$PACKAGE_NAME/configure $CONFIGURE
+				cmd bash "$SRCPATH/configure" $CONFIGURE
 			) || exit $?
 			${GM_HOOK_AFTER_CONFIGURE:-:}
 		fi # if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ];

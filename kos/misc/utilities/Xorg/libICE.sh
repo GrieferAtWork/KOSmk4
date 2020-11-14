@@ -21,109 +21,13 @@
 require_utility Xorg/xorgproto "$PKG_CONFIG_PATH/xproto.pc"
 require_utility Xorg/xtrans    "$PKG_CONFIG_PATH/xtrans.pc"
 
-# xorg-macros
-. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
+PACKAGE_URL="https://www.x.org/releases/individual/lib/libICE-1.0.10.tar.gz"
 
-VERSION="1.0.10"
+CONFIGURE=""
+CONFIGURE="$CONFIGURE --enable-unix-transport"
+CONFIGURE="$CONFIGURE --disable-tcp-transport"
+CONFIGURE="$CONFIGURE --disable-ipv6"
+CONFIGURE="$CONFIGURE --enable-local-transport"
 
-SO_VERSION_MAJOR="6"
-SO_VERSION="$SO_VERSION_MAJOR.3.0"
-
-SRCPATH="$KOS_ROOT/binutils/src/Xorg/libICE-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/Xorg/libICE-$VERSION"
-
-require_program xsltproc
-
-# libICE
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libICE.so.$SO_VERSION" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
-		if ! [ -f "$SRCPATH/configure" ]; then
-			cmd mkdir -p "$KOS_ROOT/binutils/src/Xorg"
-			cmd cd "$KOS_ROOT/binutils/src/Xorg"
-			cmd rm -rf "libICE-$VERSION"
-			download_file \
-				"libICE-$VERSION.tar.gz" \
-				"https://www.x.org/releases/individual/lib/libICE-$VERSION.tar.gz"
-			cmd tar xvf "libICE-$VERSION.tar.gz"
-		fi
-		cmd rm -rf "$OPTPATH"
-		cmd mkdir -p "$OPTPATH"
-		cmd cd "$OPTPATH"
-		(
-			export CC="${CROSS_PREFIX}gcc"
-			export CPP="${CROSS_PREFIX}cpp"
-			export CFLAGS="-ggdb"
-			export CXX="${CROSS_PREFIX}g++"
-			export CXXCPP="${CROSS_PREFIX}cpp"
-			export CXXFLAGS="-ggdb"
-			cmd bash "../../../../src/Xorg/libICE-$VERSION/configure" \
-				--prefix="$XORG_CONFIGURE_PREFIX" \
-				--exec-prefix="$XORG_CONFIGURE_EXEC_PREFIX" \
-				--bindir="$XORG_CONFIGURE_BINDIR" \
-				--sbindir="$XORG_CONFIGURE_SBINDIR" \
-				--libexecdir="$XORG_CONFIGURE_LIBEXECDIR" \
-				--sysconfdir="$XORG_CONFIGURE_SYSCONFDIR" \
-				--sharedstatedir="$XORG_CONFIGURE_SHAREDSTATEDIR" \
-				--localstatedir="$XORG_CONFIGURE_LOCALSTATEDIR" \
-				--libdir="$XORG_CONFIGURE_LIBDIR" \
-				--includedir="$XORG_CONFIGURE_INCLUDEDIR" \
-				--oldincludedir="$XORG_CONFIGURE_OLDINCLUDEDIR" \
-				--datarootdir="$XORG_CONFIGURE_DATAROOTDIR" \
-				--datadir="$XORG_CONFIGURE_DATADIR" \
-				--infodir="$XORG_CONFIGURE_INFODIR" \
-				--localedir="$XORG_CONFIGURE_LOCALEDIR" \
-				--mandir="$XORG_CONFIGURE_MANDIR" \
-				--docdir="$XORG_CONFIGURE_DOCDIR_PREFIX/libICE" \
-				--htmldir="$XORG_CONFIGURE_HTMLDIR_PREFIX/libICE" \
-				--dvidir="$XORG_CONFIGURE_DVIDIR_PREFIX/libICE" \
-				--pdfdir="$XORG_CONFIGURE_PDFDIR_PREFIX/libICE" \
-				--psdir="$XORG_CONFIGURE_PSDIR_PREFIX/libICE" \
-				--build="$(gcc -dumpmachine)" \
-				--host="$TARGET_NAME-linux-gnu" \
-				--enable-shared \
-				--enable-static \
-				--disable-docs \
-				--disable-specs \
-				--enable-unix-transport \
-				--disable-tcp-transport \
-				--disable-ipv6 \
-				--enable-local-transport \
-				--disable-lint-library \
-				--with-gnu-ld \
-				--without-xmlto \
-				--without-fop \
-				--without-lint
-		) || exit $?
-	fi
-	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
-fi
-
-# Install libraries
-install_file        /$TARGET_LIBPATH/libICE.so.$SO_VERSION_MAJOR "$OPTPATH/src/.libs/libICE.so.$SO_VERSION"
-install_symlink     /$TARGET_LIBPATH/libICE.so.$SO_VERSION       libICE.so.$SO_VERSION_MAJOR
-install_symlink     /$TARGET_LIBPATH/libICE.so                   libICE.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libICE.a                    "$OPTPATH/src/.libs/libICE.a"
-
-# Install headers
-cmd cd "$SRCPATH/include/X11/ICE"
-for FILE in *.h; do
-	install_rawfile \
-		"$KOS_ROOT/kos/include/X11/ICE/$FILE" \
-		"$SRCPATH/include/X11/ICE/$FILE"
-done
-
-# Install the PKG_CONFIG file
-install_rawfile_stdin "$PKG_CONFIG_PATH/ice.pc" <<EOF
-prefix=$XORG_CONFIGURE_PREFIX
-exec_prefix=$XORG_CONFIGURE_EXEC_PREFIX
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: ICE
-Description: X Inter Client Exchange Library
-Version: $VERSION
-Requires: xproto
-Cflags:
-Libs: -lICE
-EOF
+# Automatically build+install using autoconf
+. "$KOS_MISC/utilities/misc/gnu_make.sh"

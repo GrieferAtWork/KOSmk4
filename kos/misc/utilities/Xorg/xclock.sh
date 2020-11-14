@@ -27,65 +27,11 @@ require_utility Xorg/libXrender  "$PKG_CONFIG_PATH/xrender.pc"
 require_utility Xorg/libXft      "$PKG_CONFIG_PATH/xft.pc"
 require_utility Xorg/libxkbfile  "$PKG_CONFIG_PATH/xkbfile.pc"
 
-# xorg-macros
-. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
+PACKAGE_URL="https://www.x.org/releases/individual/app/xclock-1.0.9.tar.gz"
 
-VERSION="1.0.9"
-SRCPATH="$KOS_ROOT/binutils/src/Xorg/xclock-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/Xorg/xclock-$VERSION"
+CONFIGURE=""
+CONFIGURE="$CONFIGURE --with-xft"
+CONFIGURE="$CONFIGURE --with-xkb"
 
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/xclock" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
-		if ! [ -f "$SRCPATH/configure" ]; then
-			cmd mkdir -p "$KOS_ROOT/binutils/src/Xorg"
-			cmd cd "$KOS_ROOT/binutils/src/Xorg"
-			cmd rm -rf "xclock-$VERSION"
-			download_file \
-				"xclock-$VERSION.tar.gz" \
-				"https://www.x.org/releases/individual/app/xclock-$VERSION.tar.gz"
-			cmd tar xvf "xclock-$VERSION.tar.gz"
-		fi
-		cmd rm -rf "$OPTPATH"
-		cmd mkdir -p "$OPTPATH"
-		cmd cd "$OPTPATH"
-		(
-			export CC="${CROSS_PREFIX}gcc"
-			export CPP="${CROSS_PREFIX}cpp"
-			export CFLAGS="-ggdb"
-			export CXX="${CROSS_PREFIX}g++"
-			export CXXCPP="${CROSS_PREFIX}cpp"
-			export CXXFLAGS="-ggdb"
-			cmd bash "../../../../src/Xorg/xclock-$VERSION/configure" \
-				--prefix="$XORG_CONFIGURE_PREFIX" \
-				--exec-prefix="$XORG_CONFIGURE_EXEC_PREFIX" \
-				--bindir="$XORG_CONFIGURE_BINDIR" \
-				--sbindir="$XORG_CONFIGURE_SBINDIR" \
-				--libexecdir="$XORG_CONFIGURE_LIBEXECDIR" \
-				--sysconfdir="$XORG_CONFIGURE_SYSCONFDIR" \
-				--sharedstatedir="$XORG_CONFIGURE_SHAREDSTATEDIR" \
-				--localstatedir="$XORG_CONFIGURE_LOCALSTATEDIR" \
-				--libdir="$XORG_CONFIGURE_LIBDIR" \
-				--includedir="$XORG_CONFIGURE_INCLUDEDIR" \
-				--oldincludedir="$XORG_CONFIGURE_OLDINCLUDEDIR" \
-				--datarootdir="$XORG_CONFIGURE_DATAROOTDIR" \
-				--datadir="$XORG_CONFIGURE_DATADIR" \
-				--infodir="$XORG_CONFIGURE_INFODIR" \
-				--localedir="$XORG_CONFIGURE_LOCALEDIR" \
-				--mandir="$XORG_CONFIGURE_MANDIR" \
-				--docdir="$XORG_CONFIGURE_DOCDIR_PREFIX/xclock" \
-				--htmldir="$XORG_CONFIGURE_HTMLDIR_PREFIX/xclock" \
-				--dvidir="$XORG_CONFIGURE_DVIDIR_PREFIX/xclock" \
-				--pdfdir="$XORG_CONFIGURE_PDFDIR_PREFIX/xclock" \
-				--psdir="$XORG_CONFIGURE_PSDIR_PREFIX/xclock" \
-				--build="$(gcc -dumpmachine)" \
-				--host="$TARGET_NAME-linux-gnu" \
-				--with-gnu-ld \
-				--with-xft \
-				--with-xkb
-		) || exit $?
-	fi
-	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
-fi
-
-install_file /bin/xclock "$OPTPATH/xclock"
+# Automatically build+install using autoconf
+. "$KOS_MISC/utilities/misc/gnu_make.sh"
