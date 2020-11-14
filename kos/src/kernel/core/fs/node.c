@@ -2403,12 +2403,9 @@ again:
 								if (containing_path->p_cldsize < (containing_path->p_cldmask / 3))
 									path_rehash_smaller_nx(containing_path);
 							}
-							sync_endwrite(removed_path);
 							if (premoved_path)
-								*premoved_path = removed_path;
-							else {
-								decref(removed_path);
-							}
+								*premoved_path = incref(removed_path);
+							sync_endwrite(removed_path);
 						}
 						sync_endwrite(containing_path);
 					}
@@ -2689,8 +2686,10 @@ acquire_sourcedir_writelock:
 								for (; removed_path; removed_path = removed_path->p_dirnext.ln_next) {
 									if (removed_path->p_dirent != source_entry)
 										continue;
-									if (!sync_trywrite(removed_path))
+									if (!sync_trywrite(removed_path)) {
+										incref(removed_path);
 										goto wait_for_removed_path;
+									}
 									if unlikely(removed_path->p_mount != NULL) {
 										/* Cannot rename mounting points. */
 										sync_endwrite(source_path);
@@ -2757,12 +2756,9 @@ acquire_sourcedir_writelock:
 									if (source_path->p_cldsize < (source_path->p_cldmask / 3))
 										path_rehash_smaller_nx(source_path);
 								}
-								sync_endwrite(removed_path);
 								if (premoved_path)
-									*premoved_path = removed_path;
-								else {
-									decref(removed_path);
-								}
+									*premoved_path = incref(removed_path);
+								sync_endwrite(removed_path);
 							}
 							sync_endwrite(source_path);
 						}
@@ -2896,12 +2892,9 @@ acquire_sourcedir_writelock:
 									if (source_path->p_cldsize < (source_path->p_cldmask / 3))
 										path_rehash_smaller_nx(source_path);
 								}
-								sync_endwrite(removed_path);
 								if (premoved_path)
-									*premoved_path = removed_path;
-								else {
-									decref(removed_path);
-								}
+									*premoved_path = incref(removed_path);
+								sync_endwrite(removed_path);
 							}
 							sync_endwrite(source_path);
 						}
@@ -2982,7 +2975,6 @@ wait_for_sourcepath_and_retry_nosuper:
 			sync_endwrite(source_path);
 			goto acquire_sourcedir_writelock;
 wait_for_removed_path:
-			incref(removed_path);
 			superblock_nodeslock_endwrite(source_inode->i_super);
 wait_for_removed_path_nosuper:
 			sync_endwrite(source_path);
