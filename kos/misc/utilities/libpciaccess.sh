@@ -20,111 +20,20 @@
 
 require_utility libzlib "$PKG_CONFIG_PATH/zlib.pc"
 
-# xorg-macros
-. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
+PACKAGE_NAME="libpciaccess-0.16"
+PACKAGE_GIT_URL="https://gitlab.freedesktop.org/xorg/lib/libpciaccess"
+PACKAGE_GIT_COMMIT="fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6"
 
-VERSION="0.16"
-SO_VERSION_MAJOR="0"
-SO_VERSION="$SO_VERSION_MAJOR.11.1"
-COMMIT="fbd1f0fe79ba25b72635f8e36a6c33d7e0ca19f6"
+CONFIGURE=""
+CONFIGURE="$CONFIGURE --enable-linux-rom-fallback"
+CONFIGURE="$CONFIGURE --with-pciids-path=\"/usr/share/hwdata\""
+CONFIGURE="$CONFIGURE --with-zlib"
 
-SRCPATH="$KOS_ROOT/binutils/src/libpciaccess-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/libpciaccess-$VERSION"
+# Automatically build+install using autoconf
+. "$KOS_MISC/utilities/misc/gnu_make.sh"
 
-# libpciaccess
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION" ]; then
-	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
-		if ! [ -f "$SRCPATH/configure" ]; then
-			if ! [ -f "$SRCPATH/configure.ac" ]; then
-				cmd rm -rf "$SRCPATH"
-				cmd cd "$KOS_ROOT/binutils/src"
-				cmd git clone "https://gitlab.freedesktop.org/xorg/lib/libpciaccess"
-				cmd mv "libpciaccess" "libpciaccess-$VERSION"
-				cmd cd "$SRCPATH"
-				cmd git checkout -f "$COMMIT"
-			fi
-			cmd cd "$SRCPATH"
-			apply_patch \
-				"$SRCPATH" \
-				"$KOS_PATCHES/libpciaccess-$VERSION.patch"
-			cmd aclocal
-			cmd autoreconf -i
-			cmd autoconf
-		fi
-		cmd rm -rf "$OPTPATH"
-		cmd mkdir -p "$OPTPATH"
-		cmd cd "$OPTPATH"
-		(
-			export CC="${CROSS_PREFIX}gcc"
-			export CPP="${CROSS_PREFIX}cpp"
-			export CFLAGS="-ggdb"
-			export CXX="${CROSS_PREFIX}g++"
-			export CXXCPP="${CROSS_PREFIX}cpp"
-			export CXXFLAGS="-ggdb"
-			cmd bash "../../../src/libpciaccess-$VERSION/configure" \
-				--prefix="/" \
-				--exec-prefix="/" \
-				--bindir="/bin" \
-				--sbindir="/bin" \
-				--libexecdir="/libexec" \
-				--sysconfdir="/etc" \
-				--sharedstatedir="/usr/com" \
-				--localstatedir="/var" \
-				--runstatedir="/var/run" \
-				--libdir="/$TARGET_LIBPATH" \
-				--includedir="/usr/include" \
-				--oldincludedir="/usr/include" \
-				--datarootdir="/usr/share" \
-				--datadir="/usr/share" \
-				--infodir="/usr/share/info" \
-				--localedir="/usr/share/locale" \
-				--mandir="/usr/share/man" \
-				--docdir="/usr/share/doc/libpciaccess" \
-				--htmldir="/usr/share/doc/libpciaccess" \
-				--dvidir="/usr/share/doc/libpciaccess" \
-				--pdfdir="/usr/share/doc/libpciaccess" \
-				--psdir="/usr/share/doc/libpciaccess" \
-				--build="$(gcc -dumpmachine)" \
-				--host="$TARGET_NAME-linux-gnu" \
-				--enable-shared \
-				--enable-linux-rom-fallback \
-				--with-gnu-ld \
-				--with-pciids-path="/usr/share/hwdata" \
-				--with-zlib
-		) || exit $?
-	fi
-	cmd cd "$OPTPATH"
-	cmd make -j $MAKE_PARALLEL_COUNT
-fi
-
-# Install libraries
-install_file /$TARGET_LIBPATH/libpciaccess.so.$SO_VERSION_MAJOR "$OPTPATH/src/.libs/libpciaccess.so.$SO_VERSION"
-install_symlink /$TARGET_LIBPATH/libpciaccess.so.$SO_VERSION libpciaccess.so.$SO_VERSION_MAJOR
-install_symlink /$TARGET_LIBPATH/libpciaccess.so libpciaccess.so.$SO_VERSION_MAJOR
-install_file_nodisk /$TARGET_LIBPATH/libpciaccess.a "$OPTPATH/src/.libs/libpciaccess.a"
-
-install_file /bin/scanpci "$OPTPATH/scanpci/.libs/scanpci"
-
-# Install headers
-install_rawfile "$KOS_ROOT/kos/include/pciaccess.h" "$SRCPATH/include/pciaccess.h"
-
-# Install the PKG_CONFIG file
-#     The make process above will have already created that file
-#     under "$OPTPATH/pciaccess.pc", however we don't actually want
-#     to use that one since it contains the lines:
-#     >> includedir=/usr/include
-#     >> Cflags: -I${includedir}
-#     Which in combination would cause the ~real~ system include
-#     path to be added to include path, so we need to edit the file
-install_rawfile_stdin "$PKG_CONFIG_PATH/pciaccess.pc" <<EOF
-prefix=/
-exec_prefix=/
-libdir=$KOS_ROOT/bin/$TARGET_NAME-kos/$TARGET_LIBPATH
-includedir=$KOS_ROOT/kos/include
-
-Name: pciaccess
-Description: Library providing generic access to the PCI bus and devices.
-Version: $VERSION
-Cflags:
-Libs: -lpciaccess
-EOF
+# libpci contains a utility program `scanpci' that can be used to list
+# PCI devices attached to the system. By default, this program gets built,
+# but doesn't actually end up being installed automatically.
+# Since I kind-of like that applet, install it manually here.
+install_file /bin/scanpci   "$OPTPATH/scanpci/scanpci"

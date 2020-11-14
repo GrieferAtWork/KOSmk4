@@ -128,7 +128,7 @@ cmd cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
 TARGET_SYSROOT="${KOS_ROOT}/bin/${TARGET_NAME}-kos-common"
 BINUTILS_SYSROOT="${KOS_ROOT}/binutils/${TARGET_NAME}-kos"
-MTOOLS="$KOS_ROOT/binutils/build-mtools/mtools"
+MTOOLS="$KOS_ROOT/binutils/misc/bin/mtools"
 
 if ! [ -d "$TARGET_SYSROOT" ]; then
 	echo "Common system root ${TARGET_SYSROOT} is missing (re-run 'make_toolchain.sh' to fix)"

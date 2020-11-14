@@ -20,11 +20,6 @@
 # Helpers to automate configure+make+install of packages that make
 # use of GNU autoconf+automake
 
-if test -z "$PACKAGE_URL"; then
-	echo "Missing variable: PACKAGE_URL"
-	exit 1
-fi
-
 # Extract the package filename from the URL
 _PACKAGE_URL_FILENAME="${PACKAGE_URL##*/}"
 
@@ -147,26 +142,41 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				if ! [ -d "$SRCPATH" ]; then
 					BINUTILS_SOURCES="$(dirname "$SRCPATH")"
 					cmd cd "$BINUTILS_SOURCES"
-					# Figure out how to download+unpack the package
-					if [[ "$_PACKAGE_URL_FILENAME" == *.tar* ]]; then
-						# Tar archive. Extract the filename of the file that will be downloaded
-						# After downloading, make sure that filename becomes "$PACKAGE_NAME.tar[.gz|.xz|...]"
-						_PACKAGE_URL_NAME="${_PACKAGE_URL_FILENAME%.tar*}"
-						_PACKAGE_URL_FILENAME_EXT=".tar${_PACKAGE_URL_FILENAME#*.tar}"
-						_PACKAGE_URL_WANTED_FILENAME="${PACKAGE_NAME}.tar${_PACKAGE_URL_FILENAME#*.tar}"
-						if ! [ -f "$_PACKAGE_URL_WANTED_FILENAME" ]; then
-							download_file "$_PACKAGE_URL_FILENAME" "$PACKAGE_URL"
-							if [ "$_PACKAGE_URL_WANTED_FILENAME" != "$_PACKAGE_URL_FILENAME" ]; then
-								cmd mv "$_PACKAGE_URL_FILENAME" "$_PACKAGE_URL_WANTED_FILENAME"
+					if ! test -z "$PACKAGE_URL"; then
+						_PACKAGE_URL_FILENAME="${PACKAGE_URL##*/}"
+						# Figure out how to download+unpack the package
+						if [[ "$_PACKAGE_URL_FILENAME" == *.tar* ]]; then
+							# Tar archive. Extract the filename of the file that will be downloaded
+							# After downloading, make sure that filename becomes "$PACKAGE_NAME.tar[.gz|.xz|...]"
+							_PACKAGE_URL_NAME="${_PACKAGE_URL_FILENAME%.tar*}"
+							_PACKAGE_URL_FILENAME_EXT=".tar${_PACKAGE_URL_FILENAME#*.tar}"
+							_PACKAGE_URL_WANTED_FILENAME="${PACKAGE_NAME}.tar${_PACKAGE_URL_FILENAME#*.tar}"
+							if ! [ -f "$_PACKAGE_URL_WANTED_FILENAME" ]; then
+								download_file "$_PACKAGE_URL_FILENAME" "$PACKAGE_URL"
+								if [ "$_PACKAGE_URL_WANTED_FILENAME" != "$_PACKAGE_URL_FILENAME" ]; then
+									cmd mv "$_PACKAGE_URL_FILENAME" "$_PACKAGE_URL_WANTED_FILENAME"
+								fi
 							fi
+							rm -r "./$_PACKAGE_URL_NAME" > /dev/null 2>&1
+							cmd mkdir -p "$SRCPATH"
+							cmd tar xvf "$_PACKAGE_URL_WANTED_FILENAME" -C "$SRCPATH"
+						else
+							# Unrecognized package distribution format
+							echo "No known way of extracting files from: '$_PACKAGE_URL_FILENAME'"
+							exit 1
 						fi
-						rm -r "./$_PACKAGE_URL_NAME" > /dev/null 2>&1
+					elif ! test -z "$PACKAGE_GIT_URL"; then
+						# Figure out the directory name that 
 						cmd mkdir -p "$SRCPATH"
-						cmd tar xvf "$_PACKAGE_URL_WANTED_FILENAME" -C "$SRCPATH"
+						cmd cd "$SRCPATH"
+						cmd git clone "$PACKAGE_GIT_URL"
+						if ! test -z "$PACKAGE_GIT_COMMIT"; then
+							# Checkout the requested git revision
+							cmd cd "$(ls -A)"
+							cmd git checkout -f "$PACKAGE_GIT_COMMIT"
+						fi
 					else
-						# Unrecognized package distribution format
-						echo "No known way of extracting files from: '$_PACKAGE_URL_FILENAME'"
-						exit 1
+						echo "No way of downloading $PACKAGE_NAME"
 					fi
 				fi
 				cmd cd "$SRCPATH"
@@ -202,7 +212,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 
 						*) ;;
 						esac
-					done < "$SRCPATH/configure.ac"
+					done < "$_PACKAGE_AUTOCONF_INPUT"
 					# Bind xorg-macros
 					if test x"$ac_requires_xorg" != xno; then
 						. "$KOS_MISC/utilities/Xorg/misc/xorg-macros.sh"
