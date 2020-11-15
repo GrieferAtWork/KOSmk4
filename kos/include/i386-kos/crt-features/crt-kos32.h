@@ -397,6 +397,7 @@
 #define __CRT_HAVE___getrlimit
 #define __CRT_HAVE___gettimeofday
 #define __CRT_HAVE___gmtime_r
+#define __CRT_HAVE___gnu_basename
 #define __CRT_HAVE___gxx_personality_v0
 #define __CRT_HAVE___h_errno_location
 #define __CRT_HAVE___hypot
@@ -3277,6 +3278,7 @@
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
 #define __CRT_HAVE_strtoq
+#define __CRT_HAVE_strtosigno
 #define __CRT_HAVE_strtou32
 #define __CRT_HAVE_strtou32_l
 #define __CRT_HAVE_strtou64

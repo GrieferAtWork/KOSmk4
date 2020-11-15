@@ -301,7 +301,7 @@ NOTHROW(FCALL buffer_extend)(byte_t *data, size_t old_size,
 	return DBX_EOK;
 }
 
-PRIVATE bool
+PRIVATE ATTR_PURE bool
 NOTHROW(FCALL buffer_istrue)(byte_t const *buf, size_t buflen) {
 	while (buflen) {
 		if (*buf)
@@ -774,7 +774,7 @@ again:
 
 /* Return the actual size of the top element of the C expression stack.
  * If the stack is empty, return `0' instead. (s.a. `ctype_sizeof()') */
-PUBLIC WUNUSED size_t
+PUBLIC ATTR_PURE WUNUSED size_t
 NOTHROW(FCALL cexpr_getsize)(void) {
 	if unlikely(!cexpr_stacksize)
 		return 0;
@@ -1976,6 +1976,7 @@ done:
  * is set to `true', then this function fails with `DBX_ERDONLY' */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_store)(void) {
 	/* TODO: Not implemented... */
+	COMPILER_IMPURE();
 	return DBX_ENOMEM;
 }
 
@@ -1986,6 +1987,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_store)(void) {
  * @return: DBX_EINTERN: The stack does not contain enough elements. */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
 	/* Not implemented... */
+	COMPILER_IMPURE();
 	(void)argc;
 	return DBX_ENOMEM;
 }

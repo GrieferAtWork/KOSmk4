@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce03cec1 */
+/* HASH CRC-32:0xccbf8650 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -543,6 +543,7 @@ DEFINE_PUBLIC_ALIAS(DOS$FDataSync, libd_FDataSync);
 
 /* libgen */
 DEFINE_PUBLIC_ALIAS(DOS$dirname, libd_dirname);
+DEFINE_PUBLIC_ALIAS(DOS$__gnu_basename, libd___xpg_basename);
 DEFINE_PUBLIC_ALIAS(DOS$__xpg_basename, libd___xpg_basename);
 
 /* locale */
@@ -2325,6 +2326,7 @@ DEFINE_PUBLIC_ALIAS(DOS$_strupr_s_l, libd__strupr_s_l);
 DEFINE_PUBLIC_ALIAS(DOS$_strnset_s, libd__strnset_s);
 DEFINE_PUBLIC_ALIAS(DOS$strnstr, libd_strnstr);
 DEFINE_PUBLIC_ALIAS(DOS$strmode, libd_strmode);
+DEFINE_PUBLIC_ALIAS(DOS$strtosigno, libd_strtosigno);
 
 /* stringlist */
 DEFINE_PUBLIC_ALIAS(DOS$sl_add, libd_sl_add);

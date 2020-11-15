@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x509b7b33 */
+/* HASH CRC-32:0xf159b1c0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -149,6 +149,7 @@ DECL_END
 
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(dirname, libc_dirname);
+DEFINE_PUBLIC_ALIAS(__gnu_basename, libc___xpg_basename);
 DEFINE_PUBLIC_ALIAS(__xpg_basename, libc___xpg_basename);
 #endif /* !__KERNEL__ */
 

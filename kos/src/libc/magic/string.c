@@ -5144,24 +5144,24 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__N
 #define @sys_siglist@   __p_sys_siglist()
 #elif defined(__CRT_HAVE_sys_siglist)
 #if defined(__CRT_HAVE__sys_siglist) || !defined(__NO_ASMNAME)
-__LIBC char const *const @_sys_siglist@[@_NSIG@] __ASMNAME("sys_siglist");
+__LIBC char const *const @_sys_siglist@[__NSIG] __ASMNAME("sys_siglist");
 #else /* __CRT_HAVE__sys_siglist || !__NO_ASMNAME */
 #define @_sys_siglist@  @sys_siglist@
 #endif /* !__CRT_HAVE__sys_siglist && __NO_ASMNAME */
-__LIBC char const *const @sys_siglist@[@_NSIG@];
+__LIBC char const *const @sys_siglist@[__NSIG];
 #elif defined(__CRT_HAVE__sys_siglist)
 #ifndef __NO_ASMNAME
-__LIBC char const *const @sys_siglist@[@_NSIG@] __ASMNAME("_sys_siglist");
+__LIBC char const *const @sys_siglist@[__NSIG] __ASMNAME("_sys_siglist");
 #else /* !__NO_ASMNAME */
 #define @sys_siglist@     @_sys_siglist@
 #endif /* __NO_ASMNAME */
-__LIBC char const *const @_sys_siglist@[@_NSIG@];
+__LIBC char const *const @_sys_siglist@[__NSIG];
 #endif /* sys_siglist... */
 #endif /* !___local_sys_siglist_defined */
 )]]
 char const *strsignal_s($signo_t signum) {
 #if defined(__CRT_HAVE___p_sys_siglist) || defined(__CRT_HAVE_sys_siglist) || defined(__CRT_HAVE__sys_siglist)
-	return (unsigned int)signum < @_NSIG@ ? @_sys_siglist@[signum] : NULL;
+	return (unsigned int)signum < __NSIG ? @_sys_siglist@[signum] : NULL;
 #else /* __CRT_HAVE___p_sys_siglist || __CRT_HAVE_sys_siglist || __CRT_HAVE__sys_siglist */
 	char const *result;
 	switch (signum) {
@@ -6935,6 +6935,29 @@ void strmode($mode_t mode, [[nonnull]] char p[12]) {
 }
 
 %#endif /* __USE_BSD */
+
+
+%
+%#ifdef __USE_CYGWIN
+@@>> strtosigno(3)
+@@Return the signal number for a given name.
+@@e.g. `strtosigno("SIGINT") == SIGINT'
+[[wunused, pure, impl_include("<asm/os/signal.h>")]]
+$signo_t strtosigno([[nonnull]] const char *name) {
+	$signo_t i, result = 0;
+	if likely(name) {
+		for (i = 1; i < __NSIG; ++i) {
+			char const *s = strsignal_s(i);
+			if (likely(s) && strcmp(s, name) == 0) {
+				result = i;
+				break;
+			}
+		}
+	}
+	return result;
+}
+%#endif /* __USE_CYGWIN */
+
 
 %(libc_fast){
 #define __libc_PRIVATE_memset1 __libc_memset

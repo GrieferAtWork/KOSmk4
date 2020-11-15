@@ -84,7 +84,7 @@ NOTHROW(FCALL csymbol_from_csymbol_data)(struct csymbol *__restrict self,
 
 /* Check if `self' belongs to `ns'
  * @param: ns: One of `CSYMBOL_LOOKUP_' */
-FUNDEF WUNUSED NONNULL((1)) __BOOL
+FUNDEF ATTR_PURE WUNUSED NONNULL((1)) __BOOL
 NOTHROW(FCALL csymbol_data_isns)(struct csymbol_data const *__restrict self,
                                  unsigned int ns);
 

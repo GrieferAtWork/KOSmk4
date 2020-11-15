@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe21d19cb */
+/* HASH CRC-32:0x26533712 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2231,6 +2231,18 @@ INTDEF NONNULL((2)) void NOTHROW_NCX(LIBDCALL libd_strmode)(mode_t mode, char p[
  *                 //          methods associated with the inode"
  *    p[11] = '\0'; */
 INTDEF NONNULL((2)) void NOTHROW_NCX(LIBCCALL libc_strmode)(mode_t mode, char p[12]);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strtosigno(3)
+ * Return the signal number for a given name.
+ * e.g. `strtosigno("SIGINT") == SIGINT' */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBDCALL libd_strtosigno)(const char *name);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> strtosigno(3)
+ * Return the signal number for a given name.
+ * e.g. `strtosigno("SIGINT") == SIGINT' */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) signo_t NOTHROW_NCX(LIBCCALL libc_strtosigno)(const char *name);
 #endif /* !__KERNEL__ */
 
 DECL_END

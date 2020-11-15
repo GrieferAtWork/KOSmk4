@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee0f1fb9 */
+/* HASH CRC-32:0xcef23ed6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2455,6 +2455,7 @@
 #define __CRT_HAVE_DOS$strtold_l
 #define __CRT_HAVE_DOS$strtoll
 #define __CRT_HAVE_DOS$strtoll_l
+#define __CRT_HAVE_DOS$strtosigno
 #define __CRT_HAVE_DOS$strtou32
 #define __CRT_HAVE_DOS$strtou32_l
 #define __CRT_HAVE_DOS$strtou64
@@ -5521,6 +5522,7 @@
 #define __CRT_HAVE_strtold_l
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
+#define __CRT_HAVE_strtosigno
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strtou32
 #ifndef __KERNEL__

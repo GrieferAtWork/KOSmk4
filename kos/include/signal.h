@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc61419ce */
+/* HASH CRC-32:0xef1533d6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,189 +95,197 @@ __NAMESPACE_STD_USING(signal)
 __SYSDECL_BEGIN
 
 /* Fake signal functions. */
-#ifdef __SIG_ERR
+#if !defined(SIG_ERR) && defined(__SIG_ERR)
 #define SIG_ERR (__CCAST(__sighandler_t)__SIG_ERR) /* Error return. */
-#endif /* __SIG_ERR */
-#ifdef __SIG_DFL
+#endif /* !SIG_ERR && __SIG_ERR */
+#if !defined(SIG_DFL) && defined(__SIG_DFL)
 #define SIG_DFL (__CCAST(__sighandler_t)__SIG_DFL) /* Default action. */
-#endif /* __SIG_DFL */
-#ifdef __SIG_IGN
+#endif /* !SIG_DFL && __SIG_DFL */
+#if !defined(SIG_IGN) && defined(__SIG_IGN)
 #define SIG_IGN (__CCAST(__sighandler_t)__SIG_IGN) /* Ignore signal. */
-#endif /* __SIG_IGN */
+#endif /* !SIG_IGN && __SIG_IGN */
 
 #ifdef __USE_DOS
-#ifdef __SIG_GET
+#if !defined(SIG_GET) && defined(__SIG_GET)
 #define SIG_GET (__CCAST(__sighandler_t)__SIG_GET) /* Only get the current handler (accepted by `signal(2)') */
-#endif /* __SIG_GET */
-#ifdef __SIG_SGE
+#endif /* !SIG_GET && __SIG_GET */
+#if !defined(SIG_SGE) && defined(__SIG_SGE)
 #define SIG_SGE (__CCAST(__sighandler_t)__SIG_SGE) /* Signal gets error. */
-#endif /* __SIG_SGE */
-#ifdef __SIG_ACK
+#endif /* !SIG_SGE && __SIG_SGE */
+#if !defined(SIG_ACK) && defined(__SIG_ACK)
 #define SIG_ACK (__CCAST(__sighandler_t)__SIG_ACK) /* Acknowledge. */
-#endif /* __SIG_ACK */
+#endif /* !SIG_ACK && __SIG_ACK */
 #endif /* __USE_DOS */
 
 #ifdef __USE_UNIX98
-#ifdef __SIG_HOLD
+#if !defined(SIG_HOLD) && defined(__SIG_HOLD)
 #define SIG_HOLD (__CCAST(__sighandler_t)__SIG_HOLD) /* Add signal to hold mask. */
-#endif /* __SIG_HOLD */
+#endif /* !SIG_HOLD && __SIG_HOLD */
 #endif /* __USE_UNIX98 */
 
 #ifdef __USE_KOS
-#ifdef __SIG_TERM
+#if !defined(SIG_TERM) && defined(__SIG_TERM)
 #define SIG_TERM  (__CCAST(__sighandler_t)__SIG_TERM) /* Terminate the receiving process. */
-#endif /* __SIG_TERM */
-#ifdef __SIG_EXIT
+#endif /* !SIG_TERM && __SIG_TERM */
+#if !defined(SIG_EXIT) && defined(__SIG_EXIT)
 #define SIG_EXIT  (__CCAST(__sighandler_t)__SIG_EXIT) /* Terminate the receiving thread. */
-#endif /* __SIG_EXIT */
-#ifdef __SIG_CONT
+#endif /* !SIG_EXIT && __SIG_EXIT */
+#if !defined(SIG_CONT) && defined(__SIG_CONT)
 #define SIG_CONT  (__CCAST(__sighandler_t)__SIG_CONT) /* Continue execution. */
-#endif /* __SIG_CONT */
-#ifdef __SIG_STOP
+#endif /* !SIG_CONT && __SIG_CONT */
+#if !defined(SIG_STOP) && defined(__SIG_STOP)
 #define SIG_STOP  (__CCAST(__sighandler_t)__SIG_STOP) /* Suspend execution. */
-#endif /* __SIG_STOP */
-#ifdef __SIG_CORE
+#endif /* !SIG_STOP && __SIG_STOP */
+#if !defined(SIG_CORE) && defined(__SIG_CORE)
 #define SIG_CORE  (__CCAST(__sighandler_t)__SIG_CORE) /* Create a coredump and terminate. */
-#endif /* __SIG_CORE */
+#endif /* !SIG_CORE && __SIG_CORE */
 #endif /* __USE_KOS */
 
 
 /* Signals numbers. */
-#ifdef __SIGHUP
+#if !defined(SIGHUP) && defined(__SIGHUP)
 #define SIGHUP    __SIGHUP     /* Hangup (POSIX). */
-#endif /* __SIGHUP */
-#ifdef __SIGINT
+#endif /* !SIGHUP && __SIGHUP */
+#if !defined(SIGINT) && defined(__SIGINT)
 #define SIGINT    __SIGINT     /* Interrupt (ANSI). */
-#endif /* __SIGINT */
-#ifdef __SIGQUIT
+#endif /* !SIGINT && __SIGINT */
+#if !defined(SIGQUIT) && defined(__SIGQUIT)
 #define SIGQUIT   __SIGQUIT    /* Quit (POSIX). */
-#endif /* __SIGQUIT */
-#ifdef __SIGILL
+#endif /* !SIGQUIT && __SIGQUIT */
+#if !defined(SIGILL) && defined(__SIGILL)
 #define SIGILL    __SIGILL     /* Illegal instruction (ANSI). */
-#endif /* __SIGILL */
-#ifdef __SIGTRAP
+#endif /* !SIGILL && __SIGILL */
+#if !defined(SIGTRAP) && defined(__SIGTRAP)
 #define SIGTRAP   __SIGTRAP    /* Trace trap (POSIX). */
-#endif /* __SIGTRAP */
-#ifdef __SIGABRT
+#endif /* !SIGTRAP && __SIGTRAP */
+#if !defined(SIGABRT) && defined(__SIGABRT)
 #define SIGABRT   __SIGABRT    /* Abort (ANSI). */
-#endif /* __SIGABRT */
-#ifdef __SIGIOT
+#endif /* !SIGABRT && __SIGABRT */
+#if !defined(SIGIOT) && defined(__SIGIOT)
 #define SIGIOT    __SIGIOT     /* IOT trap (4.2 BSD). */
-#endif /* __SIGIOT */
-#ifdef __SIGBUS
+#endif /* !SIGIOT && __SIGIOT */
+#if !defined(SIGBUS) && defined(__SIGBUS)
 #define SIGBUS    __SIGBUS     /* BUS error (4.2 BSD). */
-#endif /* __SIGBUS */
-#ifdef __SIGFPE
+#endif /* !SIGBUS && __SIGBUS */
+#if !defined(SIGFPE) && defined(__SIGFPE)
 #define SIGFPE    __SIGFPE     /* Floating-point exception (ANSI). */
-#endif /* __SIGFPE */
-#ifdef __SIGKILL
+#endif /* !SIGFPE && __SIGFPE */
+#if !defined(SIGKILL) && defined(__SIGKILL)
 #define SIGKILL   __SIGKILL    /* Kill, unblockable (POSIX). */
-#endif /* __SIGKILL */
-#ifdef __SIGUSR1
+#endif /* !SIGKILL && __SIGKILL */
+#if !defined(SIGUSR1) && defined(__SIGUSR1)
 #define SIGUSR1   __SIGUSR1    /* User-defined signal 1 (POSIX). */
-#endif /* __SIGUSR1 */
-#ifdef __SIGSEGV
+#endif /* !SIGUSR1 && __SIGUSR1 */
+#if !defined(SIGSEGV) && defined(__SIGSEGV)
 #define SIGSEGV   __SIGSEGV    /* Segmentation violation (ANSI). */
-#endif /* __SIGSEGV */
-#ifdef __SIGUSR2
+#endif /* !SIGSEGV && __SIGSEGV */
+#if !defined(SIGUSR2) && defined(__SIGUSR2)
 #define SIGUSR2   __SIGUSR2    /* User-defined signal 2 (POSIX). */
-#endif /* __SIGUSR2 */
-#ifdef __SIGPIPE
+#endif /* !SIGUSR2 && __SIGUSR2 */
+#if !defined(SIGPIPE) && defined(__SIGPIPE)
 #define SIGPIPE   __SIGPIPE    /* Broken pipe (POSIX). */
-#endif /* __SIGPIPE */
-#ifdef __SIGALRM
+#endif /* !SIGPIPE && __SIGPIPE */
+#if !defined(SIGALRM) && defined(__SIGALRM)
 #define SIGALRM   __SIGALRM    /* Alarm clock (POSIX). */
-#endif /* __SIGALRM */
-#ifdef __SIGTERM
+#endif /* !SIGALRM && __SIGALRM */
+#if !defined(SIGTERM) && defined(__SIGTERM)
 #define SIGTERM   __SIGTERM    /* Termination (ANSI). */
-#endif /* __SIGTERM */
-#ifdef __SIGSTKFLT
+#endif /* !SIGTERM && __SIGTERM */
+#if !defined(SIGSTKFLT) && defined(__SIGSTKFLT)
 #define SIGSTKFLT __SIGSTKFLT  /* Stack fault. */
-#endif /* __SIGSTKFLT */
-#ifdef __SIGCHLD
+#endif /* !SIGSTKFLT && __SIGSTKFLT */
+#if !defined(SIGCHLD) && defined(__SIGCHLD)
 #define SIGCHLD   __SIGCHLD    /* Child status has changed (POSIX). */
-#endif /* __SIGCHLD */
-#ifdef __SIGCONT
+#endif /* !SIGCHLD && __SIGCHLD */
+#if !defined(SIGCONT) && defined(__SIGCONT)
 #define SIGCONT   __SIGCONT    /* Continue (POSIX). */
-#endif /* __SIGCONT */
-#ifdef __SIGSTOP
+#endif /* !SIGCONT && __SIGCONT */
+#if !defined(SIGSTOP) && defined(__SIGSTOP)
 #define SIGSTOP   __SIGSTOP    /* Stop, unblockable (POSIX). */
-#endif /* __SIGSTOP */
-#ifdef __SIGTSTP
+#endif /* !SIGSTOP && __SIGSTOP */
+#if !defined(SIGTSTP) && defined(__SIGTSTP)
 #define SIGTSTP   __SIGTSTP    /* Keyboard stop (POSIX). */
-#endif /* __SIGTSTP */
-#ifdef __SIGTTIN
+#endif /* !SIGTSTP && __SIGTSTP */
+#if !defined(SIGTTIN) && defined(__SIGTTIN)
 #define SIGTTIN   __SIGTTIN    /* Background read from tty (POSIX). */
-#endif /* __SIGTTIN */
-#ifdef __SIGTTOU
+#endif /* !SIGTTIN && __SIGTTIN */
+#if !defined(SIGTTOU) && defined(__SIGTTOU)
 #define SIGTTOU   __SIGTTOU    /* Background write to tty (POSIX). */
-#endif /* __SIGTTOU */
-#ifdef __SIGURG
+#endif /* !SIGTTOU && __SIGTTOU */
+#if !defined(SIGURG) && defined(__SIGURG)
 #define SIGURG    __SIGURG     /* Urgent condition on socket (4.2 BSD). */
-#endif /* __SIGURG */
-#ifdef __SIGXCPU
+#endif /* !SIGURG && __SIGURG */
+#if !defined(SIGXCPU) && defined(__SIGXCPU)
 #define SIGXCPU   __SIGXCPU    /* CPU limit exceeded (4.2 BSD). */
-#endif /* __SIGXCPU */
-#ifdef __SIGXFSZ
+#endif /* !SIGXCPU && __SIGXCPU */
+#if !defined(SIGXFSZ) && defined(__SIGXFSZ)
 #define SIGXFSZ   __SIGXFSZ    /* File size limit exceeded (4.2 BSD). */
-#endif /* __SIGXFSZ */
-#ifdef __SIGVTALRM
+#endif /* !SIGXFSZ && __SIGXFSZ */
+#if !defined(SIGVTALRM) && defined(__SIGVTALRM)
 #define SIGVTALRM __SIGVTALRM  /* Virtual alarm clock (4.2 BSD). */
-#endif /* __SIGVTALRM */
-#ifdef __SIGPROF
+#endif /* !SIGVTALRM && __SIGVTALRM */
+#if !defined(SIGPROF) && defined(__SIGPROF)
 #define SIGPROF   __SIGPROF    /* Profiling alarm clock (4.2 BSD). */
-#endif /* __SIGPROF */
-#ifdef __SIGWINCH
+#endif /* !SIGPROF && __SIGPROF */
+#if !defined(SIGWINCH) && defined(__SIGWINCH)
 #define SIGWINCH  __SIGWINCH   /* Window size change (4.3 BSD, Sun). */
-#endif /* __SIGWINCH */
-#ifdef __SIGIO
+#endif /* !SIGWINCH && __SIGWINCH */
+#if !defined(SIGIO) && defined(__SIGIO)
 #define SIGIO     __SIGIO      /* I/O now possible (4.2 BSD). */
-#endif /* __SIGIO */
-#ifdef __SIGPOLL
+#endif /* !SIGIO && __SIGIO */
+#if !defined(SIGPOLL) && defined(__SIGPOLL)
 #define SIGPOLL   __SIGPOLL    /* Pollable event occurred (System V). */
-#endif /* __SIGPOLL */
-#ifdef __SIGPWR
+#endif /* !SIGPOLL && __SIGPOLL */
+#if !defined(SIGPWR) && defined(__SIGPWR)
 #define SIGPWR    __SIGPWR     /* Power failure restart (System V). */
-#endif /* __SIGPWR */
-#ifdef __SIGSYS
+#endif /* !SIGPWR && __SIGPWR */
+#if !defined(SIGSYS) && defined(__SIGSYS)
 #define SIGSYS    __SIGSYS     /* Bad system call. */
-#endif /* __SIGSYS */
-#ifdef __SIGCHLD
+#endif /* !SIGSYS && __SIGSYS */
+#if !defined(SIGCLD) && defined(__SIGCHLD)
 #define SIGCLD    __SIGCHLD    /* Same as SIGCHLD (System V). */
-#endif /* __SIGCHLD */
+#endif /* !SIGCLD && __SIGCHLD */
+#ifndef SIGUNUSED
 #ifdef __SIGUNUSED
 #define SIGUNUSED __SIGUNUSED
 #elif defined(__SIGSYS)
 #define SIGUNUSED __SIGSYS
 #endif /* ... */
+#endif /* !SIGUNUSED */
 
-#ifdef __NSIG
+#if !defined(_NSIG) && defined(__NSIG)
 #define _NSIG __NSIG /* Biggest signal number + 1 (including real-time signals). */
-#endif /* __NSIG */
+#endif /* !_NSIG && __NSIG */
 
 /* These are the hard limits of the kernel.
  * These values should not be used directly at user level. */
+#ifndef SIGRTMIN
 #if defined(__SIGRTMIN) && (!defined(__CRT_HAVE___libc_current_sigrtmin) || !defined(__CC__))
 #define SIGRTMIN __SIGRTMIN
 #else /* __SIGRTMIN && (!__CRT_HAVE___libc_current_sigrtmin || !__CC__) */
 #define SIGRTMIN __libc_current_sigrtmin()
 #endif /* !__SIGRTMIN || (__CRT_HAVE___libc_current_sigrtmin && __CC__) */
+#endif /* !SIGRTMIN */
+#ifndef SIGRTMAX
 #if defined(__SIGRTMAX) && (!defined(__CRT_HAVE___libc_current_sigrtmax) || !defined(__CC__))
 #define SIGRTMAX __SIGRTMAX
 #else /* __SIGRTMAX && (!__CRT_HAVE___libc_current_sigrtmax || !__CC__) */
 #define SIGRTMAX __libc_current_sigrtmax()
 #endif /* !__SIGRTMAX || (__CRT_HAVE___libc_current_sigrtmax && __CC__) */
+#endif /* !SIGRTMAX */
 
 #ifdef __USE_DOS
 /* Define DOS's signal name aliases. */
-#ifdef __SIGBREAK
+#if !defined(SIGBREAK) && defined(__SIGBREAK)
 #define SIGBREAK __SIGBREAK /* Background read from tty (POSIX). */
-#endif /* __SIGBREAK */
+#endif /* !SIGBREAK && __SIGBREAK */
+#ifndef SIGABRT_COMPAT
 #ifdef __SIGABRT_COMPAT
 #define SIGABRT_COMPAT __SIGABRT_COMPAT /* Abort (ANSI). */
 #elif defined(__SIGABRT)
-#define SIGABRT_COMPAT __SIGABRT /* Abort (ANSI). */
+#define SIGABRT_COMPAT __SIGABRT        /* Abort (ANSI). */
 #endif /* ... */
+#endif /* !SIGABRT_COMPAT */
 #endif /* __USE_DOS */
 
 
@@ -285,71 +293,71 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_POSIX
 /* Bits in `sa_flags'. */
-#ifdef __SA_NOCLDSTOP
+#if !defined(SA_NOCLDSTOP) && defined(__SA_NOCLDSTOP)
 #define SA_NOCLDSTOP __SA_NOCLDSTOP /* Don't send SIGCHLD when children stop. */
-#endif /* __SA_NOCLDSTOP */
-#ifdef __SA_NOCLDWAIT
+#endif /* !SA_NOCLDSTOP && __SA_NOCLDSTOP */
+#if !defined(SA_NOCLDWAIT) && defined(__SA_NOCLDWAIT)
 #define SA_NOCLDWAIT __SA_NOCLDWAIT /* Don't create zombie on child death. */
-#endif /* __SA_NOCLDWAIT */
-#ifdef __SA_SIGINFO
+#endif /* !SA_NOCLDWAIT && __SA_NOCLDWAIT */
+#if !defined(SA_SIGINFO) && defined(__SA_SIGINFO)
 #define SA_SIGINFO __SA_SIGINFO /* Invoke signal-catching function with three arguments instead of one. */
-#endif /* __SA_SIGINFO */
+#endif /* !SA_SIGINFO && __SA_SIGINFO */
 
 #ifdef __USE_KOS_KERNEL
-#ifdef __SA_RESTORER
+#if !defined(SA_RESTORER) && defined(__SA_RESTORER)
 #define SA_RESTORER __SA_RESTORER /* A custom signal restore function (`sa_restorer') was given.
                                    * This flag is set by libc, after having filled in the `sa_restorer' field.
                                    * NOTE: On x86, the kernel assumes that this points to a function:
                                    * >> sa_restorer:
                                    * >>     movl   $SYS_sigreturn, %eax
                                    * >>     int    $0x80 */
-#endif /* __SA_RESTORER */
+#endif /* !SA_RESTORER && __SA_RESTORER */
 #endif /* __USE_KOS_KERNEL */
 
 #if defined(__USE_UNIX98) || defined(__USE_MISC)
-#ifdef __SA_ONSTACK
+#if !defined(SA_ONSTACK) && defined(__SA_ONSTACK)
 #define SA_ONSTACK __SA_ONSTACK /* Execute the handler on sigaltstack. */
-#endif /* __SA_ONSTACK */
+#endif /* !SA_ONSTACK && __SA_ONSTACK */
 #endif /* __USE_UNIX98 || __USE_MISC */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-#ifdef __SA_RESTART
+#if !defined(SA_RESTART) && defined(__SA_RESTART)
 #define SA_RESTART __SA_RESTART /* Restart restartable syscall on signal return. */
-#endif /* __SA_RESTART */
-#ifdef __SA_NODEFER
+#endif /* !SA_RESTART && __SA_RESTART */
+#if !defined(SA_NODEFER) && defined(__SA_NODEFER)
 #define SA_NODEFER __SA_NODEFER /* Don't automatically block the signal when its handler is being executed. */
-#endif /* __SA_NODEFER */
-#ifdef __SA_RESETHAND
+#endif /* !SA_NODEFER && __SA_NODEFER */
+#if !defined(SA_RESETHAND) && defined(__SA_RESETHAND)
 #define SA_RESETHAND __SA_RESETHAND /* Reset to SIG_DFL on entry to handler. */
-#endif /* __SA_RESETHAND */
+#endif /* !SA_RESETHAND && __SA_RESETHAND */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 #ifdef __USE_MISC
-#ifdef __SA_INTERRUPT
+#if !defined(SA_INTERRUPT) && defined(__SA_INTERRUPT)
 #define SA_INTERRUPT __SA_INTERRUPT /* Historical no-op. */
-#endif /* __SA_INTERRUPT */
+#endif /* !SA_INTERRUPT && __SA_INTERRUPT */
 /* Some aliases for the SA_ constants. */
-#ifdef __SA_NODEFER
+#if !defined(SA_NOMASK) && defined(__SA_NODEFER)
 #define SA_NOMASK __SA_NODEFER
-#endif /* __SA_NODEFER */
-#ifdef __SA_RESETHAND
+#endif /* !SA_NOMASK && __SA_NODEFER */
+#if !defined(SA_ONESHOT) && defined(__SA_RESETHAND)
 #define SA_ONESHOT __SA_RESETHAND
-#endif /* __SA_RESETHAND */
-#ifdef __SA_ONSTACK
+#endif /* !SA_ONESHOT && __SA_RESETHAND */
+#if !defined(SA_STACK) && defined(__SA_ONSTACK)
 #define SA_STACK __SA_ONSTACK
-#endif /* __SA_ONSTACK */
+#endif /* !SA_STACK && __SA_ONSTACK */
 #endif /* __USE_MISC */
 
 /* Values for the HOW argument to `sigprocmask'. */
-#ifdef __SIG_BLOCK
+#if !defined(SIG_BLOCK) && defined(__SIG_BLOCK)
 #define SIG_BLOCK __SIG_BLOCK /* Block signals. */
-#endif /* __SIG_BLOCK */
-#ifdef __SIG_UNBLOCK
+#endif /* !SIG_BLOCK && __SIG_BLOCK */
+#if !defined(SIG_UNBLOCK) && defined(__SIG_UNBLOCK)
 #define SIG_UNBLOCK __SIG_UNBLOCK /* Unblock signals. */
-#endif /* __SIG_UNBLOCK */
-#ifdef __SIG_SETMASK
+#endif /* !SIG_UNBLOCK && __SIG_UNBLOCK */
+#if !defined(SIG_SETMASK) && defined(__SIG_SETMASK)
 #define SIG_SETMASK __SIG_SETMASK /* Set the set of blocked signals. */
-#endif /* __SIG_SETMASK */
+#endif /* !SIG_SETMASK && __SIG_SETMASK */
 #endif /* __USE_POSIX */
 
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))

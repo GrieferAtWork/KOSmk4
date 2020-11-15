@@ -37,4 +37,9 @@
 #endif /* ... */
 #endif /* !... */
 
+#ifndef __NSIG
+#define __NSIG 1 /* Biggest signal number + 1 (including real-time signals). */
+#endif /* !__NSIG */
+
+
 #endif /* !_ASM_OS_SIGNAL_H */

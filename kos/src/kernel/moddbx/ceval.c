@@ -1715,7 +1715,7 @@ struct ctype_attributes {
 	uint16_t ca_fun_cc; /* Calling convention for functions (one of `CTYPE_KIND_FUNPROTO_CC_*') */
 };
 
-PRIVATE WUNUSED NONNULL((1)) uint16_t
+PRIVATE WUNUSED ATTR_PURE NONNULL((1)) uint16_t
 NOTHROW(FCALL keyword_to_calling_convention)(char const *__restrict kwd_str,
                                              size_t kwd_len) {
 	(void)kwd_str;
@@ -2539,11 +2539,11 @@ err_fuction_argv:
 		/* Parse additional attributes. */
 		result = ctype_parse_attrib(self, attrib);
 		if unlikely(result != DBX_EOK)
-			goto err_fuction_argv;
+			goto done;
 		/* Parse any additional suffixes */
 		result = ctype_parse_inner_suffix(self, presult, attrib);
 		if unlikely(result != DBX_EOK)
-			goto err_fuction_argv;
+			goto done;
 		/* Create the new array type. */
 		new_type = ctype_array(presult, array_length);
 		if unlikely(!new_type)

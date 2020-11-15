@@ -1060,6 +1060,11 @@ NOTHROW(FCALL ctype_enumname)(struct ctype *__restrict self,
                               /*out*/ struct ctypeenumname *__restrict result,
                               intmax_t value) {
 	/* TODO */
+	COMPILER_IMPURE();
+	(void)self;
+	(void)result;
+	(void)value;
+	return DBX_ENOENT;
 }
 
 

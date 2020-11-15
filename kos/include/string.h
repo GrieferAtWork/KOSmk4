@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e938351 */
+/* HASH CRC-32:0x711d6199 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8115,6 +8115,21 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),__NOTHROW_NCX,strmode,(__mode_t __mode, char
 __NAMESPACE_LOCAL_USING_OR_IMPL(strmode, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((2)) void __NOTHROW_NCX(__LIBCCALL strmode)(__mode_t __mode, char __p[12]) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strmode))(__mode, __p); })
 #endif /* !__CRT_HAVE_strmode */
 #endif /* __USE_BSD */
+
+#ifdef __USE_CYGWIN
+#ifdef __CRT_HAVE_strtosigno
+/* >> strtosigno(3)
+ * Return the signal number for a given name.
+ * e.g. `strtosigno("SIGINT") == SIGINT' */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__signo_t,__NOTHROW_NCX,strtosigno,(const char *__name),(__name))
+#else /* __CRT_HAVE_strtosigno */
+#include <libc/local/string/strtosigno.h>
+/* >> strtosigno(3)
+ * Return the signal number for a given name.
+ * e.g. `strtosigno("SIGINT") == SIGINT' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strtosigno, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __signo_t __NOTHROW_NCX(__LIBCCALL strtosigno)(const char *__name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtosigno))(__name); })
+#endif /* !__CRT_HAVE_strtosigno */
+#endif /* __USE_CYGWIN */
 
 #endif /* __CC__ */
 

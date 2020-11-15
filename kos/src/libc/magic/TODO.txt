@@ -72,6 +72,4 @@ Functions:
 	- walkcontext()
 	- getprogname()
 	- setprogname()
-	- <string.h> : [CYGWIN_SPECIFIC] : int strtosigno(char const *name);
-	- `__gnu_basename' (export_alias() for `__xpg_basename')
 

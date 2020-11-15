@@ -113,7 +113,8 @@ fallback:
 @@where if you include both <libgen.h> and <string.h>, you can use the
 @@alternate function from <string.h> by `#undef basename', or calling the
 @@function as `(basename)(...)' (as opposed to `basename(...)')
-[[nonnull]] char *__xpg_basename(char *filename) {
+[[nonnull, export_alias("__gnu_basename")]]
+char *__xpg_basename(char *filename) {
 	char *iter;
 	/* Handle the empty-path case. */
 	if (!filename || !*filename)

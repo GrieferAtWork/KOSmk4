@@ -68,6 +68,7 @@ NOTHROW(FCALL csymbol_from_csymbol_data)(struct csymbol *__restrict self,
 	switch (data->csd_symkind) {
 
 	case CSYMBOL_KIND_NONE:
+		result = DBX_EOK;
 		break;
 
 	case CSYMBOL_KIND_EXPR: {
@@ -359,7 +360,7 @@ struct csymbol_lookup_data {
 
 /* Check if `self' belongs to `ns'
  * @param: ns: One of `CSYMBOL_LOOKUP_*' */
-PUBLIC WUNUSED NONNULL((1)) bool
+PUBLIC ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL csymbol_data_isns)(struct csymbol_data const *__restrict self,
                                  unsigned int ns) {
 	switch (ns) {

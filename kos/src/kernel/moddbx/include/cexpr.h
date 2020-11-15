@@ -221,7 +221,7 @@ FUNDEF WUNUSED byte_t *NOTHROW(FCALL cexpr_getdata)(void);
 
 /* Return the actual size of the top element of the C expression stack.
  * If the stack is empty, return `0' instead. (s.a. `ctype_sizeof()') */
-FUNDEF WUNUSED size_t NOTHROW(FCALL cexpr_getsize)(void);
+FUNDEF ATTR_PURE WUNUSED size_t NOTHROW(FCALL cexpr_getsize)(void);
 
 /* Return the boolean value of the top stack element.
  * When `cexpr_typeonly' is set to true, this function's return value is undefined.

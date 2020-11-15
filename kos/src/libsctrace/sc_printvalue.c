@@ -3181,13 +3181,14 @@ print_sigset(pformatprinter printer, void *arg,
              USER UNCHECKED sigset_t const *sigset,
              size_t sigsetsize) {
 	signo_t signo_max;
-	ssize_t temp, result;
+	ssize_t temp, result = 0;
 	bool is_first, inverse = false;
 	if (sigsetsize > (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY)
 		sigsetsize = (__PRIVATE_MAX_S(__SIZEOF_SIGNO_T__) - 1) / NBBY;
 	signo_max = (signo_t)(sigsetsize * NBBY);
 	if (signo_max >= NSIG)
 		signo_max = NSIG - 1;
+	is_first = true;
 	TRY {
 		signo_t signo;
 		unsigned int count, limit;
@@ -3209,7 +3210,6 @@ print_sigset(pformatprinter printer, void *arg,
 		         : DOPRINT("{" SYNSPACE);
 		if unlikely(result < 0)
 			goto done;
-		is_first = true;
 		count    = 0;
 		for (signo = 1; signo <= signo_max; ++signo) {
 			if (!!sigismember(sigset, signo) == inverse)

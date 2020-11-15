@@ -397,6 +397,7 @@
 #define __CRT_HAVE___getrlimit
 #define __CRT_HAVE___gettimeofday
 #define __CRT_HAVE___gmtime_r
+#define __CRT_HAVE___gnu_basename
 #define __CRT_HAVE___gxx_personality_v0
 #define __CRT_HAVE___h_errno_location
 #define __CRT_HAVE___hypot
@@ -3273,6 +3274,7 @@
 #define __CRT_HAVE_strtoll
 #define __CRT_HAVE_strtoll_l
 #define __CRT_HAVE_strtoq
+#define __CRT_HAVE_strtosigno
 #define __CRT_HAVE_strtou32
 #define __CRT_HAVE_strtou32_l
 #define __CRT_HAVE_strtou64
@@ -4791,6 +4793,7 @@
 #define __CRT_HAVE_KOS$__getrlimit
 #define __CRT_HAVE_KOS$__gettimeofday
 #define __CRT_HAVE_KOS$__gmtime_r
+#define __CRT_HAVE_KOS$__gnu_basename
 #define __CRT_HAVE_KOS$__hypot
 #define __CRT_HAVE_KOS$__hypotf
 #define __CRT_HAVE_KOS$__hypotl
@@ -7472,6 +7475,7 @@
 #define __CRT_HAVE_KOS$strtoll
 #define __CRT_HAVE_KOS$strtoll_l
 #define __CRT_HAVE_KOS$strtoq
+#define __CRT_HAVE_KOS$strtosigno
 #define __CRT_HAVE_KOS$strtou32
 #define __CRT_HAVE_KOS$strtou32_l
 #define __CRT_HAVE_KOS$strtou64
@@ -8173,6 +8177,7 @@
 #define __CRT_HAVE_DOS$__getrlimit
 #define __CRT_HAVE_DOS$__gettimeofday
 #define __CRT_HAVE_DOS$__gmtime_r
+#define __CRT_HAVE_DOS$__gnu_basename
 #define __CRT_HAVE_DOS$__hypot
 #define __CRT_HAVE_DOS$__hypotf
 #define __CRT_HAVE_DOS$__hypotl
@@ -10854,6 +10859,7 @@
 #define __CRT_HAVE_DOS$strtoll
 #define __CRT_HAVE_DOS$strtoll_l
 #define __CRT_HAVE_DOS$strtoq
+#define __CRT_HAVE_DOS$strtosigno
 #define __CRT_HAVE_DOS$strtou32
 #define __CRT_HAVE_DOS$strtou32_l
 #define __CRT_HAVE_DOS$strtou64
