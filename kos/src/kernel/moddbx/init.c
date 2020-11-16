@@ -175,7 +175,10 @@ DBG_COMMAND_AUTO(eval,
 			cp.cp_printer = &dbg_printer;
 			cp.cp_format  = &locals_format_printer;
 			ctyperef_printname(&cexpr_stacktop.cv_type, &cp, "var", 3);
-			/* TODO: Display result value. */
+			/* TODO: Display result value properly. */
+			dbg_printf("\n%$[hex]",
+			           cexpr_getsize(),
+			           cexpr_getdata());
 			dbg_putc('\n');
 			cexpr_pop();
 		}

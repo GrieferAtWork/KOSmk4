@@ -479,8 +479,8 @@ again:
 	return 0;
 }
 
-DBG_COMMAND(eval,
-            "eval EXPR...\n"
+DBG_COMMAND(_eval,
+            "_eval EXPR...\n"
             "\tEvaluate the given expression and print the result\n",
             argc, argv) {
 	--argc;

@@ -84,6 +84,9 @@ int main(int argc, char *argv[], char *envp[]) {
 	(void)envp;
 	syslog(LOG_NOTICE, "[init] Init started\n");
 
+	/* Try to load the debugger extensions drivers. */
+	ksysctl_insmod("dbx", NULL);
+
 	/* Enable system call tracing by loading the sctrace driver. */
 	ksysctl_insmod("sctrace", NULL);
 

@@ -37,7 +37,7 @@ struct ctype;
 struct cparser;
 
 /* Set to true if the `,'-operator should be interpreted as it is in
- * regular C, meaning that it is used to simply select the second operator.
+ * regular C, meaning that it is used to simply select the second operand.
  *
  * When set to `false' (which is the default) then the `,'-operator is used
  * to implement a cast-to-array behavior, where the LHS-operator is then
@@ -84,7 +84,7 @@ NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
  *                        store its location here. If no variable name is defined,
  *                        but this argument is non-NULL, then NULL will be written
  *                        here. When `NULL', a potential variable name will not be
- *                        parsed.
+ *                        parsed, and if present, will result in `DBX_ESYNTAX'.
  * @param: p_varname_len: When non-NULL, store the length of `*p_varname' here, but
  *                        only do so if `p_varname != NULL'. When `p_varname' is given
  *                        as `NULL', then this argument is simply ignored.
