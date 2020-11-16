@@ -148,6 +148,10 @@ locals_format_printer(void *UNUSED(format_arg),
 			format = AC_FG(ANSITTY_CL_WHITE);
 			break;
 
+		case DEBUGINFO_PRINT_FORMAT_CONSTANT_PREFIX:
+			format = AC_FG(ANSITTY_CL_PURPLE);
+			break;
+
 		case DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX: /* Prefix for unknown (raw) data */
 			format = AC_COLOR(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_MAROON);
 			break;
@@ -174,11 +178,11 @@ DBG_COMMAND_AUTO(eval,
 			struct cprinter cp;
 			cp.cp_printer = &dbg_printer;
 			cp.cp_format  = &locals_format_printer;
-			ctyperef_printname(&cexpr_stacktop.cv_type, &cp, "var", 3);
-			/* TODO: Display result value properly. */
-			dbg_printf("\n%$[hex]",
-			           cexpr_getsize(),
-			           cexpr_getdata());
+			ctyperef_printname(&cexpr_stacktop.cv_type, &cp, NULL, 0);
+			dbg_print(":\n");
+			/* Display the value of the expression. */
+			ctype_printvalue(&cexpr_stacktop.cv_type, &cp, cexpr_getdata(),
+			                 CTYPE_PRINTVALUE_FLAG_NORMAL, 0, 0, 2, dbg_screen_width);
 			dbg_putc('\n');
 			cexpr_pop();
 		}

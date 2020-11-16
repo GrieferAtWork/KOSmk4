@@ -61,35 +61,35 @@ ctype_printname(struct ctype const *__restrict self,
 
 /* Print a human-readable representation of the contents of a given data-buffer,
  * based on the C-typing of that buffer, which was likely extracted from debug info.
- * @param: self:           The typing of `buf'
- * @param: printer:        The printer used to output data.
- * @param: buf:            The data buffer that should be printed.
- *                         This should point to a block of `ctype_sizeof(self)' types.
- * @param: flags:          Printing flags (set of `CTYPE_PRINTVALUE_FLAG_*')
- * @param: newline_indent: # of SPC (' ') characters to print after every \n-character.
- *                         Ignored when `CTYPE_PRINTVALUE_FLAG_ONELINE' is given.
- * @param: newline_tab:    Amount by which to increase `newline_indent' after a line-
- *                         feed following an open-brace '{' or open-bracket '['.
- * @param: maxlinelen:     The max line length that should not be exceeded by when
- *                         placing short struct initializers on the same line.
- *                         Ignored when `CTYPE_PRINTVALUE_FLAG_NOSHORTLINES' is given.
- *                         If sufficient space is available, do this:
- *                         >> {foo: {x: 10, y: 20}}
- *                         or this:
- *                         >> {
- *                         >>     foo: {x: 10, y: 20}
- *                         >> }
- *                         Instead of this:
- *                         >> {
- *                         >>     foo: {
- *                         >>         x: 10,
- *                         >>         y: 20
- *                         >>     }
- *                         >> }
- *                         Note that this limit isn't a guaranty, but only a hint to
- *                         where */
+ * @param: self:             The typing of `buf'
+ * @param: printer:          The printer used to output data.
+ * @param: buf:              The data buffer that should be printed.
+ *                           This should point to a block of `ctype_sizeof(self)' types.
+ * @param: flags:            Printing flags (set of `CTYPE_PRINTVALUE_FLAG_*')
+ * @param: firstline_indent: # of SPC (' ') characters already printed on the current line.
+ * @param: newline_indent:   # of SPC (' ') characters to print after every \n-character.
+ *                           Ignored when `CTYPE_PRINTVALUE_FLAG_ONELINE' is given.
+ * @param: newline_tab:      Amount by which to increase `newline_indent' after a line-
+ *                           feed following an open-brace '{' or open-bracket '['.
+ * @param: maxlinelen:       The max line length that should not be exceeded by when
+ *                           placing short struct initializers on the same line.
+ *                           Ignored when `CTYPE_PRINTVALUE_FLAG_NOSHORTLINES' is given.
+ *                           If sufficient space is available, do this:
+ *                           >> {foo: {x: 10, y: 20}}
+ *                           or this:
+ *                           >> {
+ *                           >>     foo: {x: 10, y: 20}
+ *                           >> }
+ *                           Instead of this:
+ *                           >> {
+ *                           >>     foo: {
+ *                           >>         x: 10,
+ *                           >>         y: 20
+ *                           >>     }
+ *                           >> }
+ *                           Note that this limit isn't a guaranty, but only a hint.*/
 FUNDEF NONNULL((1, 2, 3)) ssize_t KCALL
-ctype_printvalue(struct ctype const *__restrict self,
+ctype_printvalue(struct ctyperef const *__restrict self,
                  struct cprinter const *__restrict printer,
                  void const *__restrict buf, unsigned int flags,
                  size_t firstline_indent, size_t newline_indent,
@@ -128,6 +128,7 @@ ctype_printvalue(struct ctype const *__restrict self,
 #define CTYPE_PRINTVALUE_FLAG_NORECURSION        0x0080 /* Don't print fields of recursive structs. Only print fields
                                                          * of a (potential) initial struct as given as `self', but if one
                                                          * of those fields is another structure, print it as `{...}' */
+#define CTYPE_PRINTVALUE_FLAG_INTSUFFIX          0x4000 /* Include integer type suffixes (`u', `ul', `ll', etc...) */
 #define CTYPE_PRINTVALUE_FLAG_FORCEHEX           0x8000 /* Always use hex for everything. When not given, small integer
                                                          * values are instead printed in decimal, and larger numbers are
                                                          * printed in hex, unless at least 3/5thof their decimal representation

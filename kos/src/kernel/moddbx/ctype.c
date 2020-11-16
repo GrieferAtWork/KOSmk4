@@ -581,6 +581,13 @@ PUBLIC NONNULL((1, 2)) ssize_t
 NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
                                   ctype_struct_field_callback_t cb,
                                   void *arg) {
+	/* TODO: If the struct is anonymous in the context of the CU that `self'
+	 *       got loaded from, then we'll be unable to load its fields. In this
+	 *       case, we should instead search for a struct with the same name
+	 *       in a number of different places:
+	 *        - All other CUs of the current module.
+	 *        - All CUs of all other modules from the current address space.
+	 *        - All CUs of all other modules from the other address space. */
 	ssize_t temp, result = 0;
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
@@ -642,6 +649,13 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
                                      char const *__restrict name, size_t namelen,
                                      /*out*/ struct ctyperef *__restrict pfield_type,
                                      /*out*/ ptrdiff_t *__restrict pfield_offset) {
+	/* TODO: If the struct is anonymous in the context of the CU that `self'
+	 *       got loaded from, then we'll be unable to load its fields. In this
+	 *       case, we should instead search for a struct with the same name
+	 *       in a number of different places:
+	 *        - All other CUs of the current module.
+	 *        - All CUs of all other modules from the current address space.
+	 *        - All CUs of all other modules from the other address space. */
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
 	unsigned int error;
@@ -1056,7 +1070,7 @@ err_nomem:
  * @return: DBX_ENOENT: `self' isn't an enum type.
  * @return: DBX_ENOENT: No name associated with `value' */
 PUBLIC WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW(FCALL ctype_enumname)(struct ctype *__restrict self,
+NOTHROW(FCALL ctype_enumname)(struct ctype const *__restrict self,
                               /*out*/ struct ctypeenumname *__restrict result,
                               intmax_t value) {
 	/* TODO */

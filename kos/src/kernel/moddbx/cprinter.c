@@ -26,12 +26,19 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+
 #include <kernel/except.h>
 #include <kernel/types.h>
+
+#include <hybrid/align.h>
+
+#include <sys/param.h>
 
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
 
 /**/
@@ -39,7 +46,6 @@
 #include "include/ctype.h"
 #include "include/malloc.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 
@@ -52,9 +58,10 @@ DECL_BEGIN
 #define P_PRINTER printer->cp_printer
 #define P_ARG     printer->cp_arg
 
-#define RAWPRINT(str) (*P_PRINTER)(P_ARG, str, COMPILER_STRLEN(str))
-#define PRINT(str)    DO(RAWPRINT(str))
-#define PRINTF(...)   DO(format_printf(P_PRINTER, P_ARG, __VA_ARGS__))
+#define RAWPRINT(str)     (*P_PRINTER)(P_ARG, str, COMPILER_STRLEN(str))
+#define PRINT(str)        DO(RAWPRINT(str))
+#define REPEAT(ch, count) DO(format_repeat(P_PRINTER, P_ARG, ch, count))
+#define PRINTF(...)       DO(format_printf(P_PRINTER, P_ARG, __VA_ARGS__))
 #define FORMAT(code)                                                  \
 	do {                                                              \
 		if (printer->cp_format) {                                     \
@@ -496,55 +503,106 @@ ctype_printname(struct ctype const *__restrict self,
 }
 
 
+/* Count the # of times that `ch' appears in `str' */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) size_t
+NOTHROW(FCALL count_characters)(char const *str, size_t len, char ch) {
+	size_t i, result = 0;
+	for (i = 0; i < len; ++i) {
+		if (str[i] == ch)
+			++result;
+	}
+	return result;
+}
 
-#if 0
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL use_decimal_representation)(char const *decimal_repr, size_t len) {
+	/* Check if more than 3/5th of `decimal_repr' use the same digit.
+	 * If so, then the decimal representation should be used. */
+	size_t threshold = (len * 5) / 3;
+	char ch;
+	for (ch = '0'; ch <= '9'; ++ch) {
+		if (count_characters(decimal_repr, len, ch) >= threshold)
+			return true;
+	}
+	return false;
+}
+
+PRIVATE ATTR_CONST WUNUSED char
+NOTHROW(FCALL tohex)(byte_t nibble) {
+	if (nibble <= 9)
+		return '0' + nibble;
+	return 'a' + (nibble - 10);
+}
+
+
+PRIVATE struct cprinter const lenprinter = {
+	/* .cp_printer    = */ &format_length,
+	/* .cp_arg        = */ NULL,
+	/* .cp_format     = */ NULL,
+	/* .cp_format_arg = */ NULL,
+};
+
+
 /* Print a human-readable representation of the contents of a given data-buffer,
  * based on the C-typing of that buffer, which was likely extracted from debug info.
- * @param: self:           The typing of `buf'
- * @param: printer:        The printer used to output data.
- * @param: buf:            The data buffer that should be printed.
- *                         This should point to a block of `ctype_sizeof(self)' types.
- * @param: flags:          Printing flags (set of `CTYPE_PRINTVALUE_FLAG_*')
- * @param: newline_indent: # of SPC (' ') characters to print after every \n-character.
- *                         Ignored when `CTYPE_PRINTVALUE_FLAG_ONELINE' is given.
- * @param: newline_tab:    Amount by which to increase `newline_indent' after a line-
- *                         feed following an open-brace '{' or open-bracket '['.
- * @param: maxlinelen:     The max line length that should not be exceeded by when
- *                         placing short struct initializers on the same line.
- *                         Ignored when `CTYPE_PRINTVALUE_FLAG_NOSHORTLINES' is given.
- *                         If sufficient space is available, do this:
- *                         >> {foo: {x: 10, y: 20}}
- *                         or this:
- *                         >> {
- *                         >>     foo: {x: 10, y: 20}
- *                         >> }
- *                         Instead of this:
- *                         >> {
- *                         >>     foo: {
- *                         >>         x: 10,
- *                         >>         y: 20
- *                         >>     }
- *                         >> }
- *                         Note that this limit isn't a guaranty, but only a hint to
- *                         where */
+ * @param: self:             The typing of `buf'
+ * @param: printer:          The printer used to output data.
+ * @param: buf:              The data buffer that should be printed.
+ *                           This should point to a block of `ctype_sizeof(self)' types.
+ * @param: flags:            Printing flags (set of `CTYPE_PRINTVALUE_FLAG_*')
+ * @param: firstline_indent: # of SPC (' ') characters already printed on the current line.
+ * @param: newline_indent:   # of SPC (' ') characters to print after every \n-character.
+ *                           Ignored when `CTYPE_PRINTVALUE_FLAG_ONELINE' is given.
+ * @param: newline_tab:      Amount by which to increase `newline_indent' after a line-
+ *                           feed following an open-brace '{' or open-bracket '['.
+ * @param: maxlinelen:       The max line length that should not be exceeded by when
+ *                           placing short struct initializers on the same line.
+ *                           Ignored when `CTYPE_PRINTVALUE_FLAG_NOSHORTLINES' is given.
+ *                           If sufficient space is available, do this:
+ *                           >> {foo: {x: 10, y: 20}}
+ *                           or this:
+ *                           >> {
+ *                           >>     foo: {x: 10, y: 20}
+ *                           >> }
+ *                           Instead of this:
+ *                           >> {
+ *                           >>     foo: {
+ *                           >>         x: 10,
+ *                           >>         y: 20
+ *                           >>     }
+ *                           >> }
+ *                           Note that this limit isn't a guaranty, but only a hint.*/
 PUBLIC NONNULL((1, 2, 3)) ssize_t KCALL
-ctype_printvalue(struct ctype const *__restrict self,
+ctype_printvalue(struct ctyperef const *__restrict self,
                  struct cprinter const *__restrict printer,
                  void const *__restrict buf, unsigned int flags,
                  size_t firstline_indent, size_t newline_indent,
                  size_t newline_tab, size_t maxlinelen) {
 	ssize_t temp, result = 0;
+	struct ctype const *me = self->ct_typ;
+	uintptr_half_t kind = me->ct_kind;
 	TRY {
-		switch (CTYPE_KIND_CLASSOF(self->ct_kind)) {
+		switch (CTYPE_KIND_CLASSOF(kind)) {
 	
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_VOID):
-			result = RAWPRINT("(void)0");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
+			PRINT("(");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
+			FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX);
+			PRINT("void");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_SUFFIX);
+			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
+			PRINT(")");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
+			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+			PRINT("0");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 			break;
 	
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL): {
 			bool is_nonzero = false;
 			size_t i;
-			for (i = 0; i < CTYPE_KIND_SIZEOF(self->ct_kind); ++i) {
+			for (i = 0; i < CTYPE_KIND_SIZEOF(kind); ++i) {
 				if (((byte_t *)buf)[i] != 0)
 					is_nonzero = true;
 			}
@@ -552,59 +610,234 @@ ctype_printvalue(struct ctype const *__restrict self,
 			                    : RAWPRINT("false");
 		}	break;
 	
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
-			if (CTYPE_KIND_ISENUM(self->ct_kind)) {
-				ctype_enumname();
-			} else {
+		case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
+			if (!(flags & CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER) &&
+			    CTYPE_KIND_SIZEOF(kind) <= sizeof(void *)) {
+				void *ptr;
+				memset(&ptr, 0, sizeof(ptr));
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+				memcpy(&ptr, buf, CTYPE_KIND_SIZEOF(kind));
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+				memcpy((byte_t *)&ptr + sizeof(ptr) - CTYPE_KIND_SIZEOF(kind),
+				       buf, CTYPE_KIND_SIZEOF(kind));
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+				/* Check for special pointers. */
+				if (ptr == (void *)0) {
+					FORMAT(DEBUGINFO_PRINT_FORMAT_CONSTANT_PREFIX);
+					PRINT("NULL");
+					FORMAT(DEBUGINFO_PRINT_FORMAT_CONSTANT_SUFFIX);
+					break;
+				}
+				/* Check if `ptr' is a text-/data-pointer. */
+				{
+					REF module_t *mod;
+					module_type_var(modtyp);
+					mod = module_ataddr(ptr, modtyp);
+					if (mod) {
+						/* TODO: Try to lookup the name/base-address of a symbol
+						 *       that contains the given `ptr' and is part of `mod' */
+						module_decref(mod, modtyp);
+					}
+				}
+				/* TODO: Check if `ptr' is apart of a file mapping. If it is,
+				 *       print the absolute path the mapped file, as well as
+				 *       the offset into the file, alongside the original pointer:
+				 *       `0x12345678 ("/path/to/file"+offset_into_file)' */
+
+				/* TODO: Check if `ptr' points into kernel heap memory. If it
+				 *       is, then print it as `0x12345678 (heap)' */
+
+				/* TODO: If nothing is mapped where `ptr' points to, then we
+				 *       should print it in a different color (iow: use a custom
+				 *       prefix/suffix pair for unmapped pointers)
+				 * That way, when debugging segmentation faults, it becomes easy
+				 * to stop faulty pointers. */
 			}
-			break;
-	
-	#define CTYPE_KIND_Sn(sizeof)            (0x2000 | (sizeof))
-	#define CTYPE_KIND_S8                     0x2001
-	#define CTYPE_KIND_S16                    0x2002
-	#define CTYPE_KIND_S32                    0x2004
-	#define CTYPE_KIND_S64                    0x2008
-	#define CTYPE_KIND_Un(sizeof)            (0x2100 | (sizeof))
-	#define CTYPE_KIND_U8                     0x2101
-	#define CTYPE_KIND_U16                    0x2102
-	#define CTYPE_KIND_U32                    0x2104
-	#define CTYPE_KIND_U64                    0x2108
-	#define CTYPE_KIND_ENUM8                  0x2201
-	#define CTYPE_KIND_ENUM16                 0x2202
-	#define CTYPE_KIND_ENUM32                 0x2204
-	#define CTYPE_KIND_ENUM64                 0x2208
-	#define CTYPE_KIND_IEEE754_FLOAT          0x3004
-	#define CTYPE_KIND_IEEE754_DOUBLE         0x3008
-	#define CTYPE_KIND_IEEE854_LONG_DOUBLE_12 0x300c
-	#define CTYPE_KIND_IEEE854_LONG_DOUBLE_16 0x3010
-	#define CTYPE_KIND_STRUCT                 0x4000
-	#define CTYPE_KIND_UNION                  0x4100
-	#define CTYPE_KIND_PTR32                  0x8004
-	#define CTYPE_KIND_PTR64                  0x8008
-	#define CTYPE_KIND_ARRAY                  0x9000
-	#define CTYPE_KIND_FUNCTION               0xa000
-	#define    CTYPE_KIND_FUNPROTO_CCMASK     0x0700 /* == CTYPE_KIND_FLAGMASK */
-	#define    CTYPE_KIND_FUNPROTO_VARARGS    0x0800 /* FLAG: var-args function */
-	#if defined(__x86_64__) || defined(__i386__)
-	#define    CTYPE_KIND_FUNPROTO_CC_CDECL    0x0000
-	#define    CTYPE_KIND_FUNPROTO_CC_FASTCALL 0x0100
-	#define    CTYPE_KIND_FUNPROTO_CC_STDCALL  0x0200
-	#ifdef __x86_64__
-	#define    CTYPE_KIND_FUNPROTO_CC_SYSVABI  0x0400
-	#define    CTYPE_KIND_FUNPROTO_CC_MSABI    0x0500
-	#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT                                                \
-		(__KOS64_IS_CS32BIT(x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) \
-		 ? CTYPE_KIND_FUNPROTO_CC_CDECL                                                      \
-		 : CTYPE_KIND_FUNPROTO_CC_SYSVABI)
-	#else /* __x86_64__ */
-	#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT  CTYPE_KIND_FUNPROTO_CC_CDECL
-	#endif /* !__x86_64__ */
-	#else /* __x86_64__ || __i386__ */
-	#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT 0x0000
-	#endif /* !__x86_64__ && !__i386__ */
-	
-		default:
-			break;
+			ATTR_FALLTHROUGH
+		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM): {
+			/* Enum or integer */
+			if (CTYPE_KIND_SIZEOF(kind) <= sizeof(intmax_t)) {
+				union {
+					intmax_t s;
+					uintmax_t u;
+				} value;
+				memset(&value, 0, sizeof(value));
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+				memcpy(&value, buf, CTYPE_KIND_SIZEOF(kind));
+				if (!CTYPE_KIND_INT_ISUNSIGNED(kind)) {
+					/* Check for sign-extension */
+					if (((byte_t *)&value.u)[CTYPE_KIND_SIZEOF(kind) - 1] & 0x80)
+						memset((byte_t *)&value + CTYPE_KIND_SIZEOF(kind), 0xff,
+						       sizeof(value) - CTYPE_KIND_SIZEOF(kind));
+				}
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+				memcpy((byte_t *)&value + sizeof(value) - CTYPE_KIND_SIZEOF(kind),
+				       buf, CTYPE_KIND_SIZEOF(kind));
+				if (!CTYPE_KIND_INT_ISUNSIGNED(kind)) {
+					/* Check for sign-extension */
+					if (((byte_t *)&value.u)[sizeof(value) - CTYPE_KIND_SIZEOF(kind)] & 0x80)
+						memset((byte_t *)&value, 0xff, sizeof(value) - CTYPE_KIND_SIZEOF(kind));
+				}
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+				if (CTYPE_KIND_ISENUM(kind)) {
+					dbx_errno_t error;
+					struct ctypeenumname name;
+					/* Try to lookup an enum constant name. */
+					error = ctype_enumname(me, &name, value.s);
+					if (error == DBX_EOK) {
+						temp = 0;
+						if (printer->cp_format) {
+							temp = (*printer->cp_format)(printer->cp_format_arg,
+							                             printer->cp_printer, printer->cp_arg,
+							                             DEBUGINFO_PRINT_FORMAT_CONSTANT_PREFIX);
+						}
+						if likely(temp >= 0) {
+							result += temp;
+							temp = (*P_PRINTER)(P_ARG, name.en_name, strlen(name.en_name));
+						}
+						ctypeenumname_fini(&name);
+						if unlikely(temp < 0)
+							goto err;
+						result += temp;
+						FORMAT(DEBUGINFO_PRINT_FORMAT_CONSTANT_SUFFIX);
+						break;
+					}
+				}
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+				if (flags & CTYPE_PRINTVALUE_FLAG_FORCEHEX)
+					goto print_integer_value_as_hex;
+				if (!CTYPE_KIND_ISINT(kind))
+					goto print_integer_value_as_hex; /* Always print pointers as HEX */
+				if (!CTYPE_KIND_ISENUM(kind) &&
+				    !CTYPE_KIND_INT_ISUNSIGNED(kind) &&
+				    value.s < 0) {
+					/* Always print negative numbers as decimals. */
+					PRINTF("%" PRIdMAX, value.s);
+				} else {
+					/* Fallback: Print an unsigned integer value, either as decimal, or as hex. */
+					size_t decimal_len;
+					char decimal_repr[CEILDIV(sizeof(value.u) * NBBY, 3) + 1];
+					decimal_len = sprintf(decimal_repr, "%" PRIdMAX, value.u);
+					if (value.u < 255 || use_decimal_representation(decimal_repr, decimal_len)) {
+						DO((*P_PRINTER)(P_ARG, decimal_repr, decimal_len));
+					} else {
+print_integer_value_as_hex:
+						PRINTF("%#" PRIxMAX, value.u);
+					}
+				}
+			} else {
+				/* Value too large to load directly. - Instead, write
+				 * out its contents in HEX, using the native byteorder. */
+				size_t i;
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+				PRINT("0x");
+				for (i = 0; i < CTYPE_KIND_SIZEOF(kind); ++i) {
+					char repr[2];
+					byte_t b;
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+					b = ((byte_t *)buf)[CTYPE_KIND_SIZEOF(kind) - i];
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+					b = ((byte_t *)buf)[i];
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+					repr[0] = tohex(b >> 4);
+					repr[1] = tohex(b & 0xf);
+					DO((*P_PRINTER)(P_ARG, repr, 2));
+				}
+			}
+			if ((flags & CTYPE_PRINTVALUE_FLAG_INTSUFFIX) &&
+			    CTYPE_KIND_ISINT(kind)) {
+				/* Print the proper integer type suffix. */
+				char const *suffix = NULL;
+				if (me == &ctype_unsigned_int) {
+					suffix = "u";
+				} else if (me == &ctype_long) {
+					suffix = "l";
+				} else if (me == &ctype_unsigned_long) {
+					suffix = "ul";
+				} else if (me == &ctype_long_long) {
+					suffix = "ll";
+				} else if (me == &ctype_unsigned_long_long) {
+					suffix = "ull";
+				} else if (CTYPE_KIND_SIZEOF(kind) > sizeof(int)) {
+					/* Generic, fixed-width integer type suffix. */
+					PRINTF("i%s%" PRIuSIZ,
+					       !CTYPE_KIND_ISENUM(kind) &&
+					       CTYPE_KIND_INT_ISUNSIGNED(kind)
+					       ? "u"
+					       : "",
+					       (size_t)CTYPE_KIND_SIZEOF(kind) * NBBY);
+				}
+				if (suffix)
+					DO((*P_PRINTER)(P_ARG, suffix, strlen(suffix)));
+			}
+			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+		}	break;
+
+
+		/* TODO: CTYPE_KIND_STRUCT */
+		/* TODO: CTYPE_KIND_ARRAY */
+
+		default: {
+			size_t i, size;
+			bool do_multiline;
+			/* Fallback: Print as `(TYPE){ BUF[0], BUF[1], ..., BUF[N-1] }' */
+			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
+			PRINT("(");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
+			DO(ctyperef_printname(self, printer, NULL, 0));
+			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
+			PRINT(")");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+			PRINT("{");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+			size = ctype_sizeof(me);
+			if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
+				do_multiline = false;
+			} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
+				do_multiline = true;
+			} else {
+				firstline_indent += (size_t)ctyperef_printname(self, &lenprinter, NULL, 0);
+				firstline_indent += 3;
+				firstline_indent += size * 3;
+				do_multiline = firstline_indent >= maxlinelen;
+			}
+			if (do_multiline) {
+				PRINT("\n");
+				newline_indent += newline_tab;
+				REPEAT(' ', newline_indent); /* Print leading spaces. */
+				firstline_indent = newline_indent;
+			}
+			FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX);
+			for (i = 0;; ++i) {
+				byte_t b = ((byte_t *)buf)[i];
+				PRINTF("%.2" PRIX8, b);
+				if (i >= size - 1)
+					break;
+				if (do_multiline) {
+					firstline_indent += 3;
+					if (firstline_indent >= maxlinelen) {
+						FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX);
+						PRINT("\n");
+						REPEAT(' ', newline_indent); /* Print leading spaces. */
+						FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX);
+						firstline_indent = newline_indent;
+						continue;
+					}
+				}
+				PRINT(" ");
+			}
+			FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX);
+			if (do_multiline) {
+				PRINT("\n");
+				newline_indent -= newline_tab;
+				REPEAT(' ', newline_indent); /* Print leading spaces. */
+				/*firstline_indent = newline_indent;*/
+			}
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+			PRINT("}");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+		}	break;
 		}
 	} EXCEPT {
 		PRINT("<segfault>");
@@ -613,7 +846,6 @@ ctype_printvalue(struct ctype const *__restrict self,
 err:
 	return temp;
 }
-#endif
 
 
 

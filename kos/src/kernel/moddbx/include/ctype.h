@@ -285,7 +285,7 @@ struct ctypeenumname {
  * @return: DBX_ENOENT: `self' isn't an enum type.
  * @return: DBX_ENOENT: No name associated with `value' */
 FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
-NOTHROW(FCALL ctype_enumname)(struct ctype *__restrict self,
+NOTHROW(FCALL ctype_enumname)(struct ctype const *__restrict self,
                               /*out*/ struct ctypeenumname *__restrict result,
                               intmax_t value);
 
