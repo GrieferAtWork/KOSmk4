@@ -722,7 +722,13 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		result = parse_unary(self);
 		if unlikely(result != DBX_EOK)
 			goto done;
-		result = cexpr_op1(op);
+		if (op == '&')
+			result = cexpr_ref();
+		else if (op == '*')
+			result = cexpr_deref();
+		else {
+			result = cexpr_op1(op);
+		}
 	}	break;
 
 	case '%':
