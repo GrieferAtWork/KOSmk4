@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7030140e */
+/* HASH CRC-32:0x59684f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,7 +124,7 @@ typedef struct __posix_spawn_file_actions posix_spawn_file_actions_t;
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 __CDECLARE(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_RPC,posix_fspawn_np,(pid_t *__restrict __pid, __fd_t __execfd, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__execfd,__file_actions,__attrp,___argv,___envp))
 #else /* __CRT_HAVE_posix_fspawn_np */
 #include <asm/os/vfork.h>
@@ -152,7 +152,7 @@ __CDECLARE(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_RPC,posix_fspawn_np,(pi
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_fspawn_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 5, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL posix_fspawn_np)(pid_t *__restrict __pid, __fd_t __execfd, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid, __execfd, __file_actions, __attrp, ___argv, ___envp); })
 #endif /* (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid)) || __CRT_HAVE_posix_spawn */
 #endif /* !__CRT_HAVE_posix_fspawn_np */
@@ -180,7 +180,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_fspawn_np, __FORCELOCAL __ATTR_ARTIFICIAL 
  * @param: argv:         Same as the `argv' accepted by `execve(2)'
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 __CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,posix_spawn,(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP),(__pid,__path,__file_actions,__attrp,___argv,___envp))
 #else /* __CRT_HAVE_posix_spawn */
 #include <asm/os/fcntl.h>
@@ -209,7 +209,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 5, 6)),__errno_t,__NOTHROW_RPC,posix_spawn,(pid
  * @param: argv:         Same as the `argv' accepted by `execve(2)'
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2, 5, 6)) __errno_t __NOTHROW_RPC(__LIBCCALL posix_spawn)(pid_t *__restrict __pid, char const *__restrict __path, posix_spawn_file_actions_t const *__file_actions, posix_spawnattr_t const *__attrp, __TARGV, __TENVP) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn))(__pid, __path, __file_actions, __attrp, ___argv, ___envp); })
 #endif /* (__CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat))) && (__CRT_HAVE_posix_fspawn_np || (__POSIX_SPAWN_USE_KOS && ((__ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork)) || ((__CRT_HAVE_fork || __CRT_HAVE___fork) && (__CRT_HAVE_pipe2 || __CRT_HAVE_pipe || __CRT_HAVE___pipe || __CRT_HAVE__pipe) && __O_CLOEXEC && (__CRT_HAVE_read || __CRT_HAVE__read || __CRT_HAVE___read) && (__CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write) && (__CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close))) && __CRT_HAVE_fexecve && (__CRT_HAVE_waitpid || __CRT_HAVE___waitpid))) */
 #endif /* !__CRT_HAVE_posix_spawn */

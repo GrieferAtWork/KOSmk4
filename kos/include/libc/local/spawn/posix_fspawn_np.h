@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x624cf6e1 */
+/* HASH CRC-32:0xa1be277 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -840,7 +840,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 __LOCAL_LIBC(posix_fspawn_np) __ATTR_NONNULL((1, 5, 6)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict __pid, __fd_t __execfd, struct __posix_spawn_file_actions const *__file_actions, struct __posix_spawnattr const *__attrp, __TARGV, __TENVP) {
 #if defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))
@@ -866,8 +866,15 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 	 * child encountered an error at some point after vfork() already
 	 * succeeded) */
 	__result = __libc_geterrno_or(0);
-	if (__result != 0)
+	if (__result != 0) {
+		if (__child < 0) {
+			/* The vfork() itself failed. */
+			__libc_seterrno(__old_errno);
+			return __result;
+		}
+		/* Something within the child failed after vfork(). */
 		goto __err_join_zombie_child;
+	}
 	/* Restore the old errno */
 	__libc_seterrno(__old_errno);
 	/* Write back the child's PID */
@@ -876,6 +883,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	/* Create a pair of pipes for temporary communication. */
 	if (__localdep_pipe2(__pipes, __O_CLOEXEC)) {
+__err_without_child:
 		__result = __libc_geterrno_or(0);
 		__libc_seterrno(__old_errno);
 		return __result;
@@ -883,6 +891,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_fspawn_np))(__pid_t *__restrict
 	__child = __localdep_fork();
 	if (__child == 0)
 		goto __do_exec;
+	if (__child < 0)
+		goto __err_without_child; /* The fork() itself failed. */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
 	 *        closed and read() returns ZERO(0)) */

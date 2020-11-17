@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e89a2eb */
+/* HASH CRC-32:0xbb1b3aaa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,7 +166,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 __CREDIRECT(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_RPC,__localdep_posix_fspawn_np,(__pid_t *__restrict __pid, __fd_t __execfd, struct __posix_spawn_file_actions const *__file_actions, struct __posix_spawnattr const *__attrp, __TARGV, __TENVP),posix_fspawn_np,(__pid,__execfd,__file_actions,__attrp,___argv,___envp))
 #elif (defined(__POSIX_SPAWN_USE_KOS) && ((defined(__ARCH_HAVE_SHARED_VM_VFORK) && (defined(__CRT_HAVE_vfork) || defined(__CRT_HAVE___vfork))) || ((defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork)) && (defined(__CRT_HAVE_pipe2) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE__pipe)) && defined(__O_CLOEXEC) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)))) && defined(__CRT_HAVE_fexecve) && (defined(__CRT_HAVE_waitpid) || defined(__CRT_HAVE___waitpid))) || defined(__CRT_HAVE_posix_spawn)
 __NAMESPACE_LOCAL_END
@@ -194,7 +194,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 #define __localdep_posix_fspawn_np __LIBC_LOCAL_NAME(posix_fspawn_np)
 #else /* ... */
 #undef __local___localdep_posix_fspawn_np_defined
@@ -225,7 +225,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: argv:         Same as the `argv' accepted by `execve(2)'
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 __LOCAL_LIBC(posix_spawn) __ATTR_NONNULL((1, 2, 5, 6)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(posix_spawn))(__pid_t *__restrict __pid, char const *__restrict __path, struct __posix_spawn_file_actions const *__file_actions, struct __posix_spawnattr const *__attrp, __TARGV, __TENVP) {
 	__fd_t __fd;

@@ -23,7 +23,7 @@
 #include <__crt.h>
 
 
-/* Figure out if we should libc's implementation of posix_spawn()
+/* Figure out if we should use libc's implementation of posix_spawn()
  * If not, we must implement _everything_ in headers! */
 #if !(defined(__CRT_HAVE_posix_spawn) &&                       \
       defined(__CRT_HAVE_posix_spawnp) &&                      \

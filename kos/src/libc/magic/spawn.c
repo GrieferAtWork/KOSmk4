@@ -150,7 +150,7 @@ $errno_t crt_posix_spawn([[nonnull]] pid_t *__restrict pid,
 @@@param: argv:         Same as the `argv' accepted by `fexecve(2)'
 @@@param: envp:         Same as the `envp' accepted by `fexecve(2)'
 @@@return: 0 :          Success. (The child process's PID has been stored in `*pid')
-@@@return: * :          Error errno-code describing the reason of failure
+@@@return: * :          Error (errno-code describing the reason of failure)
 [[argument_names(pid, execfd, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]
 [[impl_include("<bits/os/sigaction.h>", "<libc/errno.h>")]]
@@ -189,8 +189,15 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
 	 * child encountered an error at some point after vfork() already
 	 * succeeded) */
 	result = __libc_geterrno_or(0);
-	if (result != 0)
+	if (result != 0) {
+		if (child < 0) {
+			/* The vfork() itself failed. */
+			__libc_seterrno(old_errno);
+			return result;
+		}
+		/* Something within the child failed after vfork(). */
 		goto err_join_zombie_child;
+	}
 	/* Restore the old errno */
 	__libc_seterrno(old_errno);
 	/* Write back the child's PID */
@@ -199,6 +206,7 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
 @@pp_else@@
 	/* Create a pair of pipes for temporary communication. */
 	if (pipe2(pipes, O_CLOEXEC)) {
+err_without_child:
 		result = __libc_geterrno_or(0);
 		__libc_seterrno(old_errno);
 		return result;
@@ -206,6 +214,8 @@ $errno_t posix_fspawn_np([[nonnull]] pid_t *__restrict pid, $fd_t execfd,
 	child = fork();
 	if (child == 0)
 		goto do_exec;
+	if (child < 0)
+		goto err_without_child; /* The fork() itself failed. */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
 	 *        closed and read() returns ZERO(0)) */
@@ -497,7 +507,7 @@ child_error:
 @@@param: argv:         Same as the `argv' accepted by `execve(2)'
 @@@param: envp:         Same as the `envp' accepted by `execve(2)'
 @@@return: 0 :          Success. (The child process's PID has been stored in `*pid')
-@@@return: * :          Error errno-code describing the reason of failure
+@@@return: * :          Error (errno-code describing the reason of failure)
 [[requires_function(open, posix_fspawn_np), impl_include("<asm/os/oflags.h>")]]
 [[argument_names(pid, path, file_actions, attrp, ___argv, ___envp)]]
 [[cp, decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<features.h>"), decl_prefix(DEFINE_TARGV)]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84eebf90 */
+/* HASH CRC-32:0x4b8e8c9c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ DECL_BEGIN
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -78,7 +78,7 @@ INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_posix_fspawn_np)(pid
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid, fd_t execfd, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -104,7 +104,7 @@ INTDEF NONNULL((1, 5, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid
  * @param: argv:         Same as the `argv' accepted by `execve(2)'
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 INTDEF NONNULL((1, 2, 5, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawn)(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -130,7 +130,7 @@ INTDEF NONNULL((1, 2, 5, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_posix_spawn)(pid_
  * @param: argv:         Same as the `argv' accepted by `execve(2)'
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 INTDEF NONNULL((1, 2, 5, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid, char const *__restrict path, posix_spawn_file_actions_t const *file_actions, posix_spawnattr_t const *attrp, __TARGV, __TENVP);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

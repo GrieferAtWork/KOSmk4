@@ -198,8 +198,8 @@ int sem_getvalue([[nonnull]] sem_t *__restrict sem,
 
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

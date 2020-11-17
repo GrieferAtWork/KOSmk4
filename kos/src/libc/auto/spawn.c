@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3b7ad31 */
+/* HASH CRC-32:0xd3c1b9d5 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ DECL_BEGIN
  * @param: argv:         Same as the `argv' accepted by `fexecve(2)'
  * @param: envp:         Same as the `envp' accepted by `fexecve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1, 5, 6)) errno_t
 NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
                                            fd_t execfd,
@@ -95,8 +95,15 @@ NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
 	 * child encountered an error at some point after vfork() already
 	 * succeeded) */
 	result = __libc_geterrno_or(0);
-	if (result != 0)
+	if (result != 0) {
+		if (child < 0) {
+			/* The vfork() itself failed. */
+			__libc_seterrno(old_errno);
+			return result;
+		}
+		/* Something within the child failed after vfork(). */
 		goto err_join_zombie_child;
+	}
 	/* Restore the old errno */
 	__libc_seterrno(old_errno);
 	/* Write back the child's PID */
@@ -105,6 +112,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
 #else /* __ARCH_HAVE_SHARED_VM_VFORK && (__CRT_HAVE_vfork || __CRT_HAVE___vfork) */
 	/* Create a pair of pipes for temporary communication. */
 	if (libc_pipe2(pipes, O_CLOEXEC)) {
+err_without_child:
 		result = __libc_geterrno_or(0);
 		__libc_seterrno(old_errno);
 		return result;
@@ -112,6 +120,8 @@ NOTHROW_RPC(LIBCCALL libc_posix_fspawn_np)(pid_t *__restrict pid,
 	child = libc_fork();
 	if (child == 0)
 		goto do_exec;
+	if (child < 0)
+		goto err_without_child; /* The fork() itself failed. */
 	/* Read from the communication pipe
 	 * (NOTE: If exec() succeeds, the pipe will be
 	 *        closed and read() returns ZERO(0)) */
@@ -400,7 +410,7 @@ child_error:
  * @param: argv:         Same as the `argv' accepted by `execve(2)'
  * @param: envp:         Same as the `envp' accepted by `execve(2)'
  * @return: 0 :          Success. (The child process's PID has been stored in `*pid')
- * @return: * :          Error errno-code describing the reason of failure */
+ * @return: * :          Error (errno-code describing the reason of failure) */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") NONNULL((1, 2, 5, 6)) errno_t
 NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
                                        char const *__restrict path,

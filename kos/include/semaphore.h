@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3be411a8 */
+/* HASH CRC-32:0x81968924 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,8 +191,8 @@ __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sem_post,(sem_t *__sem),(__
  * Capture a snapshot of how may tickets are available storing that number in `*sval'
  * @return: 0: Success */
 __CDECLARE_OPT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,sem_getvalue,(sem_t *__restrict __sem, __STDC_INT_AS_UINT_T *__restrict __sval),(__sem,__sval))
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SEMAPHORE_H */
