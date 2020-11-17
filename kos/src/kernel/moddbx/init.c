@@ -49,17 +49,17 @@ INTDEF void KCALL dbx_heap_fini(void);
 DBG_INIT(init) {
 	/* Initialize the DBX heap-system. */
 	dbx_heap_init();
-	/* Make sure that debug-module-list is empty. */
+	/* Make sure the debug-module-list is empty. */
 	debugmodule_list = NULL;
 }
 
 INTDEF void NOTHROW(KCALL reset_builtin_types)(void);
 
 DBG_RESET(reset) {
-	csymbol_scopemask           = CSYMBOL_SCOPE_ALL;
-	ceval_comma_is_select2nd    = false;
-	cexpr_readonly              = false;
-	cexpr_typeonly              = false;
+	csymbol_scopemask        = CSYMBOL_SCOPE_ALL;
+	ceval_comma_is_select2nd = false;
+	cexpr_readonly           = false;
+	cexpr_typeonly           = false;
 	/* Set-up `cexpr_stack' that `cexpr_stacktop' could be used. */
 	cexpr_stack     = cexpr_stack_stub + 1;
 	cexpr_stacksize = 0;
@@ -116,7 +116,7 @@ DBG_AUTOCOMPLETE(eval, argc, argv, cb, arg,
 	}
 }
 
-PRIVATE ATTR_DBGTEXT ssize_t LIBDEBUGINFO_CC
+PRIVATE ssize_t LIBDEBUGINFO_CC
 locals_format_printer(void *UNUSED(format_arg),
                       pformatprinter printer, void *arg,
                       unsigned int format_option) {

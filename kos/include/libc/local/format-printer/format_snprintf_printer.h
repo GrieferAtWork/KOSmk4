@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5949827 */
+/* HASH CRC-32:0xedf501d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,11 +40,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Format-printer implementation for printing to a string buffer like `snprintf' would
+/* >> format_snprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
- *       the sum of return values of all calls to `format_snprintf_printer()' */
+ *       the sum of return values of all calls to `format_snprintf_printer(3)' */
 __LOCAL_LIBC(format_snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_snprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	struct __local_format_snprintf_data {

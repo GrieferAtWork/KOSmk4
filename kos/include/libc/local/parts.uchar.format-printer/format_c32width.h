@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26d3c2de */
+/* HASH CRC-32:0xf9c5c9bf */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,9 @@
 #define __local_format_c32width_defined 1
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Returns the width (number of characters; not bytes) of the given unicode string */
+/* >> format_width(3)
+ * Returns the width (number of characters; not bytes) of the given unicode string
+ * The `ARG' argument is ignored, and you may safely pass `NULL' */
 __LOCAL_LIBC(format_c32width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(format_c32width))(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen) {
 

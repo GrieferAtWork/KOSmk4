@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12f8ec57 */
+/* HASH CRC-32:0x9e436a11 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,9 @@
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Always re-return `datalen' and ignore all other arguments */
+/* >> format_length(3)
+ * Always re-return `datalen' and ignore all other arguments
+ * Both the `ARG' and `DATA' arguments are simply ignored */
 __LOCAL_LIBC(format_length) __ATTR_CONST __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_length))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	(void)__arg;

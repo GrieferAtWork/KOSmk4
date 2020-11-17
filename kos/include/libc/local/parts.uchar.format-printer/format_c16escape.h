@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a6bc02a */
+/* HASH CRC-32:0xe504bfdb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_unicode_readutf8_n __LIBC_LOCAL_NAME(unicode_readutf8_n)
 #endif /* !__CRT_HAVE_unicode_readutf8_n */
 #endif /* !__local___localdep_unicode_readutf8_n_defined */
-/* Do C-style escape on the given text, printing it to the given printer.
+/* >> format_escape(3)
+ * Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
  * >> hat a great day.

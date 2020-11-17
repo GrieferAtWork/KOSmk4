@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b022c22 */
+/* HASH CRC-32:0x664a4ba6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,8 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__alloca.h>
 #include <libc/string.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
+/* >> format_repeat(3)
+ * Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __LOCAL_LIBC(format_repeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__

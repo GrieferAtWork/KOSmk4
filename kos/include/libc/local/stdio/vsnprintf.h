@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14e34f09 */
+/* HASH CRC-32:0xd1ad9d9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,21 +31,23 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format-printer implementation for printing to a string buffer like `snprintf' would
+/* >> format_snprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
- *       the sum of return values of all calls to `format_snprintf_printer()' */
+ *       the sum of return values of all calls to `format_snprintf_printer(3)' */
 __COMPILER_REDIRECT(__LIBC,__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,__localdep_format_snprintf_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_snprintf_printer,(__arg,__data,__datalen))
 #else /* __CRT_HAVE_format_snprintf_printer */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_snprintf_printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Format-printer implementation for printing to a string buffer like `snprintf' would
+/* >> format_snprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
- *       the sum of return values of all calls to `format_snprintf_printer()' */
+ *       the sum of return values of all calls to `format_snprintf_printer(3)' */
 #define __localdep_format_snprintf_printer __LIBC_LOCAL_NAME(format_snprintf_printer)
 #endif /* !__CRT_HAVE_format_snprintf_printer */
 #endif /* !__local___localdep_format_snprintf_printer_defined */
@@ -57,13 +59,14 @@ __NAMESPACE_LOCAL_END
 #include <kos/anno.h>
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -143,19 +146,22 @@ __NAMESPACE_LOCAL_BEGIN
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vprintf,(__pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),format_vprintf,(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vprintf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_vprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -235,7 +241,9 @@ __NAMESPACE_LOCAL_BEGIN
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 #define __localdep_format_vprintf __LIBC_LOCAL_NAME(format_vprintf)
 #endif /* !__CRT_HAVE_format_vprintf */
 #endif /* !__local___localdep_format_vprintf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb225d945 */
+/* HASH CRC-32:0x27a759f4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,13 +72,15 @@ typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 
 #ifdef __CRT_HAVE_format_repeat
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
+/* >> format_repeat(3)
+ * Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_repeat,(pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),(__printer,__arg,__ch,__num_repetitions))
 #else /* __CRT_HAVE_format_repeat */
 #include <libc/local/format-printer/format_repeat.h>
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
+/* >> format_repeat(3)
+ * Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_repeat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_repeat)(pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_repeat))(__printer, __arg, __ch, __num_repetitions); })
@@ -94,7 +96,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_repeat, __FORCELOCAL __ATTR_ARTIFICIAL __
 #define FORMAT_ESCAPE_FUPPERHEX 0x0020 /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
 
 #ifdef __CRT_HAVE_format_escape
-/* Do C-style escape on the given text, printing it to the given printer.
+/* >> format_escape(3)
+ * Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
@@ -109,7 +112,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_repeat, __FORCELOCAL __ATTR_ARTIFICIAL __
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_escape,(pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),(__printer,__arg,__text,__textlen,__flags))
 #elif defined(__CRT_HAVE_format_quote)
-/* Do C-style escape on the given text, printing it to the given printer.
+/* >> format_escape(3)
+ * Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
@@ -125,7 +129,8 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_escape,(pformatp
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_escape,(pformatprinter __printer, void *__arg, char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_quote,(__printer,__arg,__text,__textlen,__flags))
 #else /* ... */
 #include <libc/local/format-printer/format_escape.h>
-/* Do C-style escape on the given text, printing it to the given printer.
+/* >> format_escape(3)
+ * Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
@@ -154,27 +159,29 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_escape, __FORCELOCAL __ATTR_ARTIFICIAL __
 #define FORMAT_HEXDUMP_SIZEMASK   0x3000 /* Mask for the dump size. */
 
 #ifdef __CRT_HAVE_format_hexdump
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
+/* >> format_hexdump(3)
+ * Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  The format printer callback
  * @param: DATA:     A pointer to the data that should be dumped
  * @param: SIZE:     The amount of bytes read starting at DATA
  * @param: LINESIZE: The max amount of bytes to include per-line
  *                   HINT: Pass ZERO(0) to use a default size (16)
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,format_hexdump,(pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags),(__printer,__arg,__data,__size,__linesize,__flags))
 #else /* __CRT_HAVE_format_hexdump */
 #include <libc/local/format-printer/format_hexdump.h>
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
+/* >> format_hexdump(3)
+ * Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  The format printer callback
  * @param: DATA:     A pointer to the data that should be dumped
  * @param: SIZE:     The amount of bytes read starting at DATA
  * @param: LINESIZE: The max amount of bytes to include per-line
  *                   HINT: Pass ZERO(0) to use a default size (16)
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_hexdump, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ (__LIBCCALL format_hexdump)(pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_hexdump))(__printer, __arg, __data, __size, __linesize, __flags); })
 #endif /* !__CRT_HAVE_format_hexdump */
 
@@ -182,13 +189,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_hexdump, __FORCELOCAL __ATTR_ARTIFICIAL _
 
 
 #ifdef __CRT_HAVE_format_vprintf
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -268,17 +276,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_hexdump, __FORCELOCAL __ATTR_ARTIFICIAL _
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 __CDECLARE(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,format_vprintf,(pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args),(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vprintf */
 #include <libc/local/format-printer/format_vprintf.h>
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -358,17 +369,20 @@ __CDECLARE(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THRO
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_vprintf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__LIBCCALL format_vprintf)(pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf))(__printer, __arg, __format, __args); })
 #endif /* !__CRT_HAVE_format_vprintf */
 #ifdef __CRT_HAVE_format_printf
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -448,17 +462,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_vprintf, __FORCELOCAL __ATTR_ARTIFICIAL _
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_printf)(pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_printf");
 #else /* __CRT_HAVE_format_printf */
 #include <libc/local/format-printer/format_printf.h>
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -538,7 +555,9 @@ __LIBC __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCA
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_printf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_PRINTF(3, 4) __ATTR_NONNULL((1, 3)) __SSIZE_TYPE__ (__VLIBCCALL format_printf)(pformatprinter __printer, void *__arg, char const *__restrict __format, ...) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_printf))(__printer, __arg, __format, __builtin_va_arg_pack()); })
 #else /* __cplusplus */
@@ -550,7 +569,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_printf, __FORCELOCAL __ATTR_ARTIFICIAL __
 
 
 #ifdef __CRT_HAVE_format_vscanf
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -576,7 +596,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_printf, __FORCELOCAL __ATTR_ARTIFICIAL __
 __CDECLARE(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__THROWING,format_vscanf,(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args),(__pgetc,__pungetc,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vscanf */
 #include <libc/local/format-printer/format_vscanf.h>
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -602,7 +623,8 @@ __CDECLARE(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__TH
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_vscanf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__LIBCCALL format_vscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vscanf))(__pgetc, __pungetc, __arg, __format, __args); })
 #endif /* !__CRT_HAVE_format_vscanf */
 #ifdef __CRT_HAVE_format_scanf
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -628,7 +650,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_vscanf, __FORCELOCAL __ATTR_ARTIFICIAL __
 __LIBC __ATTR_LIBC_SCANF(4, 5) __ATTR_NONNULL((1, 2, 4)) __SSIZE_TYPE__ (__VLIBCCALL format_scanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("format_scanf");
 #else /* __CRT_HAVE_format_scanf */
 #include <libc/local/format-printer/format_scanf.h>
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -661,12 +684,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_scanf, __FORCELOCAL __ATTR_ARTIFICIAL __A
 
 
 #ifdef __CRT_HAVE_format_sprintf_printer
-/* Format-printer implementation for printing to a string buffer like `sprintf' would
+/* >> format_sprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 __LIBC __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_sprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_sprintf_printer");
 #else /* __CRT_HAVE_format_sprintf_printer */
 #include <libc/local/format-printer/format_sprintf_printer.h>
-/* Format-printer implementation for printing to a string buffer like `sprintf' would
+/* >> format_sprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_sprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_sprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_sprintf_printer))(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_sprintf_printer */
@@ -684,38 +709,50 @@ struct format_snprintf_data {
 #define format_snprintf_init(self, buf, bufsize) ((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
 
 #ifdef __CRT_HAVE_format_snprintf_printer
-/* Format-printer implementation for printing to a string buffer like `snprintf' would
+/* >> format_snprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
- *       the sum of return values of all calls to `format_snprintf_printer()' */
+ *       the sum of return values of all calls to `format_snprintf_printer(3)' */
 __LIBC __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_snprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_snprintf_printer");
 #else /* __CRT_HAVE_format_snprintf_printer */
 #include <libc/local/format-printer/format_snprintf_printer.h>
-/* Format-printer implementation for printing to a string buffer like `snprintf' would
+/* >> format_snprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
- *       the sum of return values of all calls to `format_snprintf_printer()' */
+ *       the sum of return values of all calls to `format_snprintf_printer(3)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_snprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_snprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_snprintf_printer))(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_snprintf_printer */
 #ifdef __CRT_HAVE_format_width
-/* Returns the width (number of characters; not bytes) of the given unicode string */
+/* >> format_width(3)
+ * Returns the width (number of characters; not bytes) of the given unicode string
+ * The `ARG' argument is ignored, and you may safely pass `NULL' */
 __LIBC __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_width)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_width");
 #else /* __CRT_HAVE_format_width */
 #include <libc/local/format-printer/format_width.h>
-/* Returns the width (number of characters; not bytes) of the given unicode string */
+/* >> format_width(3)
+ * Returns the width (number of characters; not bytes) of the given unicode string
+ * The `ARG' argument is ignored, and you may safely pass `NULL' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_width, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_width)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_width))(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_width */
 #ifdef __CRT_HAVE_format_length
-/* Always re-return `datalen' and ignore all other arguments */
+/* >> format_length(3)
+ * Always re-return `datalen' and ignore all other arguments
+ * Both the `ARG' and `DATA' arguments are simply ignored */
 __LIBC __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_length)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_length");
 #elif defined(__CRT_HAVE_format_wwidth) && !defined(__KERNEL__)
-/* Always re-return `datalen' and ignore all other arguments */
+/* >> format_length(3)
+ * Always re-return `datalen' and ignore all other arguments
+ * Both the `ARG' and `DATA' arguments are simply ignored */
 __COMPILER_REDIRECT(__LIBC,__ATTR_CONST,__SSIZE_TYPE__,__NOTHROW_NCX,__FORMATPRINTER_CC,format_length,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),format_wwidth,(__arg,__data,__datalen))
 #else /* ... */
 #include <libc/local/format-printer/format_length.h>
-/* Always re-return `datalen' and ignore all other arguments */
+/* >> format_length(3)
+ * Always re-return `datalen' and ignore all other arguments
+ * Both the `ARG' and `DATA' arguments are simply ignored */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_length, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_length)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, __data, __datalen); })
 #endif /* !... */
 
@@ -755,8 +792,9 @@ struct format_aprintf_data {
 #endif /* !NDEBUG */
 
 #ifdef __CRT_HAVE_format_aprintf_pack
-/* Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer()', the aprintf
+/* >> format_aprintf_pack(3)
+ * Pack and finalize a given aprintf format printer
+ * Together with `format_aprintf_printer(3)', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result;
  * >> ssize_t error;
@@ -767,10 +805,11 @@ struct format_aprintf_data {
  * >>     return NULL;
  * >> }
  * >> result = format_aprintf_pack(&p, NULL);
+ * >> // `return' is an malloc()'d string "Hello World"
  * >> return result;
- * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
+ * WARNING: Note that `format_aprintf_pack(3)' is able to return `NULL' as well,
  *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * NOTE:    The caller must destroy the returned string by passing it to `free(3)'
  * @param: pstrlen: When non-NULL, store the length of the constructed string here
  *                  Note that this is the actual length if the constructed string,
  *                  but may differ from `strlen(return)' when NUL characters were
@@ -779,8 +818,9 @@ struct format_aprintf_data {
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,format_aprintf_pack,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),(__self,__pstrlen))
 #else /* __CRT_HAVE_format_aprintf_pack */
 #include <libc/local/format-printer/format_aprintf_pack.h>
-/* Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer()', the aprintf
+/* >> format_aprintf_pack(3)
+ * Pack and finalize a given aprintf format printer
+ * Together with `format_aprintf_printer(3)', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result;
  * >> ssize_t error;
@@ -791,10 +831,11 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  * >>     return NULL;
  * >> }
  * >> result = format_aprintf_pack(&p, NULL);
+ * >> // `return' is an malloc()'d string "Hello World"
  * >> return result;
- * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
+ * WARNING: Note that `format_aprintf_pack(3)' is able to return `NULL' as well,
  *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * NOTE:    The caller must destroy the returned string by passing it to `free(3)'
  * @param: pstrlen: When non-NULL, store the length of the constructed string here
  *                  Note that this is the actual length if the constructed string,
  *                  but may differ from `strlen(return)' when NUL characters were
@@ -803,7 +844,8 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_pack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL format_aprintf_pack)(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_pack))(__self, __pstrlen); })
 #endif /* !__CRT_HAVE_format_aprintf_pack */
 #ifdef __CRT_HAVE_format_aprintf_alloc
-/* Allocate a buffer of `num_chars' characters at the end of `self'
+/* >> format_aprintf_alloc(3)
+ * Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
@@ -811,7 +853,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_pack, __FORCELOCAL __ATTR_ARTIFIC
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,format_aprintf_alloc,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars),(__self,__num_chars))
 #elif defined(__CRT_HAVE_realloc)
 #include <libc/local/format-printer/format_aprintf_alloc.h>
-/* Allocate a buffer of `num_chars' characters at the end of `self'
+/* >> format_aprintf_alloc(3)
+ * Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
@@ -819,12 +862,14 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_alloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL format_aprintf_alloc)(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_alloc))(__self, __num_chars); })
 #endif /* ... */
 #ifdef __CRT_HAVE_format_aprintf_printer
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+/* >> format_aprintf_printer(3)
+ * Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_aprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_aprintf_printer");
 #elif defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
 #include <libc/local/format-printer/format_aprintf_printer.h>
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+/* >> format_aprintf_printer(3)
+ * Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_aprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))(__arg, __data, __datalen); })
 #endif /* ... */

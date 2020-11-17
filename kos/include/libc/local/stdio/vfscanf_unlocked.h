@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2d26724 */
+/* HASH CRC-32:0x679355e3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/format-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -89,7 +90,8 @@ __CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__T
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_vscanf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from

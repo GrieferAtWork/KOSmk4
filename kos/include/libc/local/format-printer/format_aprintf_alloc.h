@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xce86c6da */
+/* HASH CRC-32:0x7c204553 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,7 @@
 #define __local_format_aprintf_alloc_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_realloc
-#ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
-struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
-};
-#endif /* !__format_aprintf_data_defined */
+struct format_aprintf_data;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: realloc from stdlib */
 #ifndef __local___localdep_realloc_defined
@@ -48,8 +41,17 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 #endif /* !__local___localdep_realloc_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/__assert.h>
+#ifndef __format_aprintf_data_defined
+#define __format_aprintf_data_defined 1
+struct format_aprintf_data {
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Allocate a buffer of `num_chars' characters at the end of `self'
+/* >> format_aprintf_alloc(3)
+ * Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'

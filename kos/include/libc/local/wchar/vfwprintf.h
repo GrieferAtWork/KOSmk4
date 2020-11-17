@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d67f5cd */
+/* HASH CRC-32:0x9837c2c8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,13 +55,14 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/wformat-printer.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -141,19 +142,22 @@ __NAMESPACE_LOCAL_BEGIN
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 __CREDIRECT(__ATTR_LIBC_WPRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__THROWING,__localdep_format_vwprintf,(__pwformatprinter __printer, void *__arg, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),format_vwprintf,(__printer,__arg,__format,__args))
 #else /* __CRT_HAVE_format_vwprintf */
 __NAMESPACE_LOCAL_END
 #include <libc/local/parts.wchar.format-printer/format_vwprintf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -233,7 +237,9 @@ __NAMESPACE_LOCAL_BEGIN
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 #define __localdep_format_vwprintf __LIBC_LOCAL_NAME(format_vwprintf)
 #endif /* !__CRT_HAVE_format_vwprintf */
 #endif /* !__local___localdep_format_vwprintf_defined */

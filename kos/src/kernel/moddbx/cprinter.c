@@ -780,7 +780,7 @@ print_integer_value_as_hex:
 		default: {
 			size_t i, size;
 			bool do_multiline;
-			/* Fallback: Print as `(TYPE){ BUF[0], BUF[1], ..., BUF[N-1] }' */
+			/* Fallback: Print as `(TYPE){BUF[0] BUF[1] ... BUF[N-1]}' */
 			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
 			PRINT("(");
 			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);

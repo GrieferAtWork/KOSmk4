@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2057d04b */
+/* HASH CRC-32:0x3b39585d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_vscanf_defined
 #define __local___localdep_format_vscanf_defined 1
 #ifdef __CRT_HAVE_format_vscanf
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -57,7 +58,8 @@ __CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,__T
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_vscanf.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -83,7 +85,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_format_vscanf __LIBC_LOCAL_NAME(format_vscanf)
 #endif /* !__CRT_HAVE_format_vscanf */
 #endif /* !__local___localdep_format_vscanf_defined */
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from

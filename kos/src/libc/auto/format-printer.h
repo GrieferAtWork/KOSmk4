@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb03c3e1 */
+/* HASH CRC-32:0xca3eaa2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,17 +30,20 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
+/* >> format_repeat(3)
+ * Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_repeat)(pformatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
+/* >> format_repeat(3)
+ * Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 INTDEF NONNULL((1)) ssize_t (LIBCCALL libc_format_repeat)(pformatprinter printer, void *arg, char ch, size_t num_repetitions) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Do C-style escape on the given text, printing it to the given printer.
+/* >> format_escape(3)
+ * Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
@@ -55,7 +58,8 @@ INTDEF NONNULL((1)) ssize_t (LIBCCALL libc_format_repeat)(pformatprinter printer
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_escape)(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Do C-style escape on the given text, printing it to the given printer.
+/* >> format_escape(3)
+ * Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
  * >> hat a great day.
@@ -70,35 +74,38 @@ INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_escape)(pformatprinter printer
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 INTDEF NONNULL((1)) ssize_t (LIBCCALL libc_format_escape)(pformatprinter printer, void *arg, char const *__restrict text, size_t textlen, unsigned int flags) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
+/* >> format_hexdump(3)
+ * Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  The format printer callback
  * @param: DATA:     A pointer to the data that should be dumped
  * @param: SIZE:     The amount of bytes read starting at DATA
  * @param: LINESIZE: The max amount of bytes to include per-line
  *                   HINT: Pass ZERO(0) to use a default size (16)
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 INTDEF NONNULL((1)) ssize_t (LIBDCALL libd_format_hexdump)(pformatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
+/* >> format_hexdump(3)
+ * Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  The format printer callback
  * @param: DATA:     A pointer to the data that should be dumped
  * @param: SIZE:     The amount of bytes read starting at DATA
  * @param: LINESIZE: The max amount of bytes to include per-line
  *                   HINT: Pass ZERO(0) to use a default size (16)
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 INTDEF NONNULL((1)) ssize_t (LIBCCALL libc_format_hexdump)(pformatprinter printer, void *arg, void const *__restrict data, size_t size, size_t linesize, unsigned int flags) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -178,16 +185,19 @@ INTDEF NONNULL((1)) ssize_t (LIBCCALL libc_format_hexdump)(pformatprinter printe
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_vprintf)(pformatprinter printer, void *arg, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -267,16 +277,19 @@ INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBDCALL libd_format_vpri
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBCCALL libc_format_vprintf)(pformatprinter printer, void *arg, char const *__restrict format, va_list args) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -356,16 +369,19 @@ INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t (LIBCCALL libc_format_vpri
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t (VLIBDCALL libd_format_printf)(pformatprinter printer, void *arg, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Generic printf implementation
+/* >> format_printf(3), format_vprintf(3)
+ * Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
  * that, when put together, result in the desired formated text.
  *  - `PRINTER' obviously is called with the text parts in their correct order
  *  - If `PRINTER' returns '< 0', the function returns immediately,
- *    yielding that same value. Otherwise, format_printf() returns
+ *    yielding that same value. Otherwise, `format_printf(3)' returns
  *    the sum of all return values from `PRINTER'.
  *  - The strings passed to `PRINTER' may not necessarily be zero-terminated, and
  *    a second argument is passed that indicates the absolute length in characters.
@@ -445,10 +461,13 @@ INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t (VLIBDCALL libd_format_pri
  *  - strdupf:          Output into dynamically allocated heap memory,
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
- *  - ...               There are a _lot_ more... */
+ *  - ...               There are a _lot_ more...
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t (VLIBCCALL libc_format_printf)(pformatprinter printer, void *arg, char const *__restrict format, ...) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -473,7 +492,8 @@ INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t (VLIBCCALL libc_format_pri
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTDEF ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2, 4)) ssize_t (LIBDCALL libd_format_vscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, va_list args) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -498,7 +518,8 @@ INTDEF ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2, 4)) ssize_t (LIBDCALL libd_format_vs
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTDEF ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2, 4)) ssize_t (LIBCCALL libc_format_vscanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, va_list args) THROWS(...);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -523,7 +544,8 @@ INTDEF ATTR_LIBC_SCANF(4, 0) NONNULL((1, 2, 4)) ssize_t (LIBCCALL libc_format_vs
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTDEF ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4)) ssize_t (VLIBDCALL libd_format_scanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from
@@ -547,22 +569,29 @@ INTDEF ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4)) ssize_t (VLIBDCALL libd_format_s
  * @return: * :  The total number of successfully scanned arguments.
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 INTDEF ATTR_LIBC_SCANF(4, 5) NONNULL((1, 2, 4)) ssize_t (VLIBCCALL libc_format_scanf)(pformatgetc pgetc, pformatungetc pungetc, void *arg, char const *__restrict format, ...) THROWS(...);
-/* Format-printer implementation for printing to a string buffer like `sprintf' would
+/* >> format_sprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_sprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
-/* Format-printer implementation for printing to a string buffer like `snprintf' would
+/* >> format_snprintf_printer(3)
+ * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively
- *       the sum of return values of all calls to `format_snprintf_printer()' */
+ *       the sum of return values of all calls to `format_snprintf_printer(3)' */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
-/* Returns the width (number of characters; not bytes) of the given unicode string */
+/* >> format_width(3)
+ * Returns the width (number of characters; not bytes) of the given unicode string
+ * The `ARG' argument is ignored, and you may safely pass `NULL' */
 INTDEF ATTR_PURE NONNULL((2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_width)(void *arg, char const *__restrict data, size_t datalen);
-/* Always re-return `datalen' and ignore all other arguments */
+/* >> format_length(3)
+ * Always re-return `datalen' and ignore all other arguments
+ * Both the `ARG' and `DATA' arguments are simply ignored */
 INTDEF ATTR_CONST ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(void *arg, char const *__restrict data, size_t datalen);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer()', the aprintf
+/* >> format_aprintf_pack(3)
+ * Pack and finalize a given aprintf format printer
+ * Together with `format_aprintf_printer(3)', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result;
  * >> ssize_t error;
@@ -573,10 +602,11 @@ INTDEF ATTR_CONST ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(voi
  * >>     return NULL;
  * >> }
  * >> result = format_aprintf_pack(&p, NULL);
+ * >> // `return' is an malloc()'d string "Hello World"
  * >> return result;
- * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
+ * WARNING: Note that `format_aprintf_pack(3)' is able to return `NULL' as well,
  *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * NOTE:    The caller must destroy the returned string by passing it to `free(3)'
  * @param: pstrlen: When non-NULL, store the length of the constructed string here
  *                  Note that this is the actual length if the constructed string,
  *                  but may differ from `strlen(return)' when NUL characters were
@@ -585,8 +615,9 @@ INTDEF ATTR_CONST ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_length)(voi
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_format_aprintf_pack)(struct format_aprintf_data *__restrict self, size_t *pstrlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer()', the aprintf
+/* >> format_aprintf_pack(3)
+ * Pack and finalize a given aprintf format printer
+ * Together with `format_aprintf_printer(3)', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result;
  * >> ssize_t error;
@@ -597,10 +628,11 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_
  * >>     return NULL;
  * >> }
  * >> result = format_aprintf_pack(&p, NULL);
+ * >> // `return' is an malloc()'d string "Hello World"
  * >> return result;
- * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
+ * WARNING: Note that `format_aprintf_pack(3)' is able to return `NULL' as well,
  *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * NOTE:    The caller must destroy the returned string by passing it to `free(3)'
  * @param: pstrlen: When non-NULL, store the length of the constructed string here
  *                  Note that this is the actual length if the constructed string,
  *                  but may differ from `strlen(return)' when NUL characters were
@@ -609,7 +641,8 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__restrict self, size_t *pstrlen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Allocate a buffer of `num_chars' characters at the end of `self'
+/* >> format_aprintf_alloc(3)
+ * Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
@@ -617,13 +650,15 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1)) char *NOTHROW_
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Allocate a buffer of `num_chars' characters at the end of `self'
+/* >> format_aprintf_alloc(3)
+ * Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
  * @return: NULL: Failed to allocate additional memory */
 INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_alloc)(struct format_aprintf_data *__restrict self, size_t num_chars);
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+/* >> format_aprintf_printer(3)
+ * Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
 INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(__FORMATPRINTER_CC libc_format_aprintf_printer)(void *arg, char const *__restrict data, size_t datalen);
 #endif /* !__KERNEL__ */

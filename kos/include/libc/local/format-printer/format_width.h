@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9f77a12 */
+/* HASH CRC-32:0x934e5a2e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,9 @@
 #include <hybrid/typecore.h>
 #include <libc/local/unicode_utf8seqlen.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Returns the width (number of characters; not bytes) of the given unicode string */
+/* >> format_width(3)
+ * Returns the width (number of characters; not bytes) of the given unicode string
+ * The `ARG' argument is ignored, and you may safely pass `NULL' */
 __LOCAL_LIBC(format_width) __ATTR_PURE __ATTR_NONNULL((2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_width))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
 	__SIZE_TYPE__ __result = 0;

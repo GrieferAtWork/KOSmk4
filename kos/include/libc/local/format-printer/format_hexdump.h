@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf63aefdb */
+/* HASH CRC-32:0x4271cef */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_repeat_defined
 #define __local___localdep_format_repeat_defined 1
 #ifdef __CRT_HAVE_format_repeat
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
+/* >> format_repeat(3)
+ * Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_repeat,(__pformatprinter __printer, void *__arg, char __ch, __SIZE_TYPE__ __num_repetitions),format_repeat,(__printer,__arg,__ch,__num_repetitions))
@@ -37,7 +38,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__THROWING,__localdep_format_repe
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_repeat.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Repeat `CH' a number of `NUM_REPETITIONS' times
+/* >> format_repeat(3)
+ * Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 #define __localdep_format_repeat __LIBC_LOCAL_NAME(format_repeat)
@@ -62,15 +64,16 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__unaligned.h>
 #include <hybrid/byteorder.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Print a hex dump of the given data using the provided format printer
- * @param: PRINTER:  A function called for all quoted portions of the text
+/* >> format_hexdump(3)
+ * Print a hex dump of the given data using the provided format printer
+ * @param: PRINTER:  The format printer callback
  * @param: DATA:     A pointer to the data that should be dumped
  * @param: SIZE:     The amount of bytes read starting at DATA
  * @param: LINESIZE: The max amount of bytes to include per-line
  *                   HINT: Pass ZERO(0) to use a default size (16)
  * @param: FLAGS:    A set of `"FORMAT_HEXDUMP_FLAG_*"'
- * @return: 0: The given data was successfully hex-dumped
- * @return: *: The first non-ZERO(0) return value of PRINTER */
+ * @return: >= 0: The sum of all values returned by `PRINTER'
+ * @return: < 0:  The first negative value ever returned by `PRINTER' (if any) */
 __LOCAL_LIBC(format_hexdump) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_hexdump))(__pformatprinter __printer, void *__arg, void const *__restrict __data, __SIZE_TYPE__ __size, __SIZE_TYPE__ __linesize, unsigned int __flags) __THROWS(...) {
 #ifndef __DECIMALS_SELECTOR

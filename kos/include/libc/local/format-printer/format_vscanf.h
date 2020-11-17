@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a6f9245 */
+/* HASH CRC-32:0xc89b8d2d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,8 @@ __NAMESPACE_LOCAL_END
 #include <parts/printf-config.h>
 #include <bits/math-constants.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Generic scanf implementation
+/* >> format_scanf(3), format_vscanf(3)
+ * Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
  * return should successively yield a character at a time from

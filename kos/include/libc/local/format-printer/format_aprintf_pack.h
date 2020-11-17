@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0a4d053 */
+/* HASH CRC-32:0xa87c2a45 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_format_aprintf_pack_defined
 #define __local_format_aprintf_pack_defined 1
 #include <__crt.h>
+struct format_aprintf_data;
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: malloc from stdlib */
 #ifndef __local___localdep_malloc_defined
@@ -72,8 +73,9 @@ struct format_aprintf_data {
 };
 #endif /* !__format_aprintf_data_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer()', the aprintf
+/* >> format_aprintf_pack(3)
+ * Pack and finalize a given aprintf format printer
+ * Together with `format_aprintf_printer(3)', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result;
  * >> ssize_t error;
@@ -84,10 +86,11 @@ __NAMESPACE_LOCAL_BEGIN
  * >>     return NULL;
  * >> }
  * >> result = format_aprintf_pack(&p, NULL);
+ * >> // `return' is an malloc()'d string "Hello World"
  * >> return result;
- * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
+ * WARNING: Note that `format_aprintf_pack(3)' is able to return `NULL' as well,
  *          but will finalize the given aprintf printer an all cases.
- * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * NOTE:    The caller must destroy the returned string by passing it to `free(3)'
  * @param: pstrlen: When non-NULL, store the length of the constructed string here
  *                  Note that this is the actual length if the constructed string,
  *                  but may differ from `strlen(return)' when NUL characters were

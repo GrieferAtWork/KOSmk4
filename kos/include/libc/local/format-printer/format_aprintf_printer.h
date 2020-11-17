@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58e377e0 */
+/* HASH CRC-32:0xda12d7fa */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_format_aprintf_printer_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc)
+struct format_aprintf_data;
 #include <bits/crt/format-printer.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -29,17 +30,8 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_format_aprintf_alloc_defined
 #define __local___localdep_format_aprintf_alloc_defined 1
 #ifdef __CRT_HAVE_format_aprintf_alloc
-__NAMESPACE_LOCAL_END
-#ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
-struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
-	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ ap_used;  /* Used buffer size */
-};
-#endif /* !__format_aprintf_data_defined */
-__NAMESPACE_LOCAL_BEGIN
-/* Allocate a buffer of `num_chars' characters at the end of `self'
+/* >> format_aprintf_alloc(3)
+ * Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
@@ -49,7 +41,8 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLO
 __NAMESPACE_LOCAL_END
 #include <libc/local/format-printer/format_aprintf_alloc.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Allocate a buffer of `num_chars' characters at the end of `self'
+/* >> format_aprintf_alloc(3)
+ * Allocate a buffer of `num_chars' characters at the end of `self'
  * The returned pointer remains valid until the next time this function is called,
  * the format_aprintf buffer `self' is finalized, or some other function is used
  * to append additional data to the end of `self'
@@ -75,7 +68,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memcpyc __LIBC_LOCAL_NAME(memcpyc)
 #endif /* !__CRT_HAVE_memcpyc */
 #endif /* !__local___localdep_memcpyc_defined */
-/* Print data to a dynamically allocated heap buffer. On error, -1 is returned
+/* >> format_aprintf_printer(3)
+ * Print data to a dynamically allocated heap buffer. On error, -1 is returned
  * This function is intended to be used as a pformatprinter-compatibile printer sink */
 __LOCAL_LIBC(format_aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__FORMATPRINTER_CC __LIBC_LOCAL_NAME(format_aprintf_printer))(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) {
