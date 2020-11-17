@@ -142,8 +142,8 @@ DECL_BEGIN
 
 struct ctype;
 struct ctypeinfo {
-	char const             *ci_name;    /* [0..1] Name of this type (or NULL if anonymous). */
-	REF struct debugmodule *ci_nameref; /* [0..1] Module reference for keeping `ct_name' alive. */
+	char const           *ci_name;    /* [0..1] Name of this type (or NULL if anonymous). */
+	REF struct dw_module *ci_nameref; /* [0..1] Module reference for keeping `ct_name' alive. */
 };
 #define ctypeinfo_equal(a, b) \
 	((a)->ci_name == (b)->ci_name)
@@ -193,7 +193,7 @@ struct ctype {
 			                               * (or similar) tag of the surrounding structure (scan
 			                               * this region for `DW_TAG_member' child elements). */
 			size_t             ct_sizeof; /* Sizeof() this struct. */
-		} ct_struct; /* [valid_if(CTYPE_KIND_ISSTRUCT)]  */
+		} ct_struct; /* [valid_if(CTYPE_KIND_ISSTRUCT)] */
 
 		struct {
 			struct ctype     *ct_sibling; /* [0..1][valid_if(CTYPE_KIND_HASSIBLING)] Sibling type */
@@ -274,8 +274,8 @@ FUNDEF WUNUSED REF struct ctype *
 NOTHROW(FCALL ctype_for_register)(unsigned int regno, size_t buflen);
 
 struct ctypeenumname {
-	char const             *en_name;    /* [1..1] Name of the enum. */
-	REF struct debugmodule *en_nameref; /* [1..1] Module reference for keeping `en_name' alive. */
+	char const           *en_name;    /* [1..1] Name of the enum. */
+	REF struct dw_module *en_nameref; /* [1..1] Module reference for keeping `en_name' alive. */
 };
 #define ctypeenumname_fini(self) decref((self)->en_nameref)
 
@@ -567,7 +567,7 @@ typedef NONNULL((2, 3, 4)) ssize_t
 (KCALL *ctype_struct_field_callback_t)(void *arg,
                                        di_debuginfo_member_t const *__restrict member,
                                        di_debuginfo_cu_parser_t const *__restrict parser,
-                                       struct debugmodule *__restrict mod);
+                                       struct dw_module *__restrict mod);
 
 /* Enumerate/find the fields of a given struct.
  * @param: cb:   Callback to-be invoked for the field.
@@ -598,7 +598,7 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: Debug information was corrupted. */
 FUNDEF WUNUSED NONNULL((1, 2, 4)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw)(struct debugmodule *__restrict mod,
+NOTHROW(FCALL ctype_fromdw)(struct dw_module *__restrict mod,
                             di_debuginfo_cu_parser_t const *__restrict cu_parser,
                             byte_t const *type_debug_info,
                             /*out*/ struct ctyperef *__restrict presult);

@@ -822,7 +822,7 @@ PRIVATE NONNULL((2, 3, 4)) ssize_t
 NOTHROW(KCALL autocomplete_struct_fields_callback)(void *arg,
                                                    di_debuginfo_member_t const *__restrict member,
                                                    di_debuginfo_cu_parser_t const *__restrict UNUSED(parser),
-                                                   struct debugmodule *__restrict UNUSED(mod)) {
+                                                   struct dw_module *__restrict UNUSED(mod)) {
 	struct autocomplete_struct_data *cookie;
 	size_t member_namelen;
 	cookie         = (struct autocomplete_struct_data *)arg;

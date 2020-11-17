@@ -592,7 +592,7 @@ NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
 	unsigned int error;
-	struct debugmodule *mod;
+	struct dw_module *mod;
 	byte_t const *reader;
 	size_t depth;
 	/* Sanity check: we're actually dealing with a struct! */
@@ -659,7 +659,7 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
 	unsigned int error;
-	struct debugmodule *mod;
+	struct dw_module *mod;
 	byte_t const *reader;
 	size_t depth;
 	/* Sanity check: we're actually dealing with a struct! */
@@ -717,7 +717,7 @@ done0:
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: Debug information was corrupted. */
 PUBLIC WUNUSED NONNULL((1, 2, 4)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw)(struct debugmodule *__restrict mod,
+NOTHROW(FCALL ctype_fromdw)(struct dw_module *__restrict mod,
                             di_debuginfo_cu_parser_t const *__restrict cu_parser,
                             byte_t const *type_debug_info,
                             /*out*/ struct ctyperef *__restrict presult) {

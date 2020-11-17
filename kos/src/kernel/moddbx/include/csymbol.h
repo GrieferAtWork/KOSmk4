@@ -61,7 +61,7 @@ NOTHROW(FCALL csymbol_fini)(struct csymbol *__restrict self);
 
 
 struct csymbol_data {
-	REF struct debugmodule     *csd_module;  /* [0..1] The current module. */
+	REF struct dw_module       *csd_module;  /* [0..1] The current module. */
 	di_debuginfo_cu_parser_t    csd_parser;  /* Dwarf debug information parser. */
 	di_debuginfo_compile_unit_t csd_cu;      /* Current compilation unit. */
 	uintptr_t                   csd_symkind; /* Symbol kind (one of `CSYMBOL_KIND_*') */

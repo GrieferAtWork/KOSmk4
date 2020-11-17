@@ -39,6 +39,7 @@ DECL_BEGIN
 #define DBX_ERDONLY  (-5) /* Read-only */
 #define DBX_EINTERN  (-6) /* Internal error */
 #define DBX_EFAULT   (-7) /* Segmentation fault */
+#define DBX_EINTR    (-8) /* Operation interrupted (s.a. `dbg_awaituser()') */
 typedef int dbx_errno_t;
 
 DECL_END

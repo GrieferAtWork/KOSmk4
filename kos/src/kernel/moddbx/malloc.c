@@ -26,6 +26,8 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+
 #include <debugger/hook.h>
 #include <debugger/output.h>
 #include <kernel/arch/syslog.h>
@@ -44,10 +46,10 @@
 #include <string.h>
 
 /**/
+#include "include/dw.h"
 #include "include/error.h"
 #include "include/malloc.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 #if (defined(__i386__) || defined(__x86_64__)) && 0
@@ -257,12 +259,20 @@ again:
 nomem:
 	/* Make sure that the memory request isn't too large to possibly satisfy. */
 	if unlikely(num_bytes > sizeof(static_heap.sh_heap))
-		goto nope;
+		goto nope; /* TODO: `struct cmodsymtab::mst_symv' can easily grow larger than
+		            *       the max amount of memory we can allocate here. As such,
+		            *       `extend_heap()' must be adjusted to make it possible to
+		            *       hand out even larger chunks of memory! */
 	/* Try to allocate a heap extension, but don't
 	 * do so if the kernel's been poisoned. */
 	if (kernel_poisoned())
 		goto nope;
 	if (extend_heap())
+		goto again;
+	/* Try to clear the module cache to make more memory available. */
+	if (dw_module_clearcache(true))
+		goto again;
+	if (dw_module_clearcache(false))
 		goto again;
 nope:
 	resptr.hp_ptr = NULL;

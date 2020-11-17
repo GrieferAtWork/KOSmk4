@@ -313,11 +313,11 @@ NOTHROW(FCALL csymbol_enum)(csymbol_enum_callback_t cb, void *arg,
 	if (scopes & (CSYMBOL_SCOPE_LOCAL | CSYMBOL_SCOPE_CU | CSYMBOL_SCOPE_MOD)) {
 		uintptr_t abs_pc, module_relative_pc;
 		abs_pc            = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-		symdat.csd_module = debugmodule_get_from_pc(abs_pc);
+		symdat.csd_module = dw_module_get_from_pc(abs_pc);
 		if (scopes & (CSYMBOL_SCOPE_LOCAL | CSYMBOL_SCOPE_CU)) {
 			module_relative_pc = abs_pc - module_getloadaddr(symdat.csd_module->dm_module, symdat.csd_module->dm_modtyp);
-			if (debugmodule_loadcu_ex(symdat.csd_module, &symdat.csd_parser, &abbrev,
-			                          &symdat.csd_cu, module_relative_pc) != DBX_EOK)
+			if (dw_module_loadcu_ex(symdat.csd_module, &symdat.csd_parser, &abbrev,
+			                        &symdat.csd_cu, module_relative_pc) != DBX_EOK)
 				goto do_scan_all_cus_of_mod;
 			result = enum_cu(cb, arg, &symdat, module_relative_pc, scopes);
 			debuginfo_cu_abbrev_fini(&abbrev);

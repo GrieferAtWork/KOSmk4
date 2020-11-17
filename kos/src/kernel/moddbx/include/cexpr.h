@@ -37,6 +37,7 @@
 /**/
 #include "cparser.h"
 #include "ctype.h"
+#include "dw.h" /* struct cvalue_cfiexpr_data */
 #include "error.h"
 
 #ifdef CONFIG_HAVE_DEBUGGER
@@ -53,7 +54,7 @@ DECL_BEGIN
 #define CVALUE_KIND_IDATA    6 /* R-value: Value is stored in-line. */
 
 struct cvalue_cfiexpr {
-	REF struct debugmodule *v_module;            /* [0..1] Debug-info for `v_expr' */
+	REF struct dw_module   *v_module;            /* [0..1] Debug-info for `v_expr' */
 	di_debuginfo_location_t v_expr;              /* CFI expression. */
 	di_debuginfo_location_t v_framebase;         /* Frame-base expression. */
 	uintptr_t               v_cu_ranges_startpc; /* == di_debuginfo_compile_unit_t::cu_ranges::r_startpc */
@@ -62,6 +63,7 @@ struct cvalue_cfiexpr {
 	uint8_t                 v_ptrsize;           /* == di_debuginfo_cu_parser_t::dup_ptrsize */
 	void                   *v_objaddr;           /* [0..1] Object address. */
 };
+
 
 #define cvalue_cfiexpr_fini(self) \
 	(xdecref((self)->v_module))

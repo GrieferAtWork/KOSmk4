@@ -179,7 +179,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 		} else {
 			di_debuginfo_compile_unit_t cu;
 			size_t num_accessed_bits;
-			struct debugmodule *mod;
+			struct dw_module *mod;
 			memset(&cu, 0, sizeof(cu));
 			cu.cu_ranges.r_startpc = self->v_cu_ranges_startpc;
 			cu.cu_addr_base        = self->v_cu_addr_base;

@@ -409,7 +409,6 @@ again:
 			return DEBUG_INFO_ERROR_CORRUPT;
 		}
 	}
-	*pdebug_info_reader = result->dup_cu_info_end;
 	if (OVERFLOW_UADD((uintptr_t)reader, temp, (uintptr_t *)&result->dup_cu_info_end) ||
 	    result->dup_cu_info_end > debug_info_end)
 		result->dup_cu_info_end = debug_info_end;
