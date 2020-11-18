@@ -85,7 +85,7 @@ struct cmodsym {
 	                         *
 	                         * Load debug info for this symbol by:
 	                         * >> di_debuginfo_cu_parser_t parser;
-	                         * >> cmodule_parser_from_dip(mod, cmodsym_getdip(sym), &parser);
+	                         * >> cmodule_parser_from_dip(mod, cmodsym_getdip(sym, mod), &parser);
 	                         * >> switch (parser.dup_comp.dic_tag) {
 	                         * >>
 	                         * >> case DW_TAG_structure_type:
@@ -102,25 +102,33 @@ struct cmodsym {
 };
 
 #if __SIZEOF_POINTER__ == 4
-#define CMODSYM_DIP_DIPMASK __UINT32_C(0x0fffffff)
-#define CMODSYM_DIP_NSMASK  __UINT32_C(0xf0000000)
-#define CMODSYM_DIP_NSSHIFT 28
+#define CMODSYM_DIP_DIPMASK __UINT32_C(0x07ffffff)
+#define CMODSYM_DIP_NSMASK  __UINT32_C(0xf8000000)
+#define CMODSYM_DIP_NSSHIFT 27
 #elif __SIZEOF_POINTER__ == 8
-#define CMODSYM_DIP_DIPMASK __UINT64_C(0x0fffffffffffffff)
-#define CMODSYM_DIP_NSMASK  __UINT64_C(0xf000000000000000)
-#define CMODSYM_DIP_NSSHIFT 60
+#define CMODSYM_DIP_DIPMASK __UINT64_C(0x07ffffffffffffff)
+#define CMODSYM_DIP_NSMASK  __UINT64_C(0xf800000000000000)
+#define CMODSYM_DIP_NSSHIFT 59
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported `__SIZEOF_POINTER__'"
 #endif /* __SIZEOF_POINTER__ != ... */
-#define cmodsym_getns(self)  ((self)->cms_dip & CMODSYM_DIP_NSMASK)
-#define cmodsym_getdip(self) ((byte_t const *)((self)->cms_dip & CMODSYM_DIP_DIPMASK))
+#define cmodsym_getdip(self, mod)     ((mod)->cm_sections.ds_debug_info_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK))
+#define cmodsym_makedip(mod, dip, ns) ((uintptr_t)((dip) - (mod)->cm_sections.ds_debug_info_start) | (ns))
+#define cmodsym_getns(self)           ((self)->cms_dip & CMODSYM_DIP_NSMASK)
+#define cmodsym_istype(self)          CMODSYM_DIP_NS_ISTYPE(cmodsym_getns(self))
 
 /* CModSym namespaces. */
 #define CMODSYM_DIP_NS_NORMAL    (__UINTPTR_C(0) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. */
-#define CMODSYM_DIP_NS_STRUCT    (__UINTPTR_C(1) << CMODSYM_DIP_NSSHIFT) /* struct-name-namespace. */
-#define CMODSYM_DIP_NS_UNION     (__UINTPTR_C(2) << CMODSYM_DIP_NSSHIFT) /* union-name-namespace. */
-#define CMODSYM_DIP_NS_ENUM      (__UINTPTR_C(3) << CMODSYM_DIP_NSSHIFT) /* enum-name-namespace. */
-#define CMODSYM_DIP_NS_FCONFLICT (__UINTPTR_C(4) << CMODSYM_DIP_NSSHIFT) /* FLAG: There is another, PER-CU symbol with the same name. */
+#define CMODSYM_DIP_NS_TYPEDEF   (__UINTPTR_C(1) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. (but this one's a type)
+                                                                          * When passed to lookup functions, only consider types
+                                                                          * as suitable symbols, and skip all non-type symbols. */
+#define CMODSYM_DIP_NS_STRUCT    (__UINTPTR_C(2) << CMODSYM_DIP_NSSHIFT) /* struct-name-namespace. */
+#define CMODSYM_DIP_NS_UNION     (__UINTPTR_C(3) << CMODSYM_DIP_NSSHIFT) /* union-name-namespace. */
+#define CMODSYM_DIP_NS_CLASS     (__UINTPTR_C(4) << CMODSYM_DIP_NSSHIFT) /* class-name-namespace. */
+#define CMODSYM_DIP_NS_ENUM      (__UINTPTR_C(5) << CMODSYM_DIP_NSSHIFT) /* enum-name-namespace. */
+#define CMODSYM_DIP_NS_LABEL     (__UINTPTR_C(6) << CMODSYM_DIP_NSSHIFT) /* label-name-namespace. */
+#define CMODSYM_DIP_NS_FCONFLICT (__UINTPTR_C(8) << CMODSYM_DIP_NSSHIFT) /* FLAG: There is another, PER-CU symbol with the same name. */
+#define CMODSYM_DIP_NS_ISTYPE(x) (((x) & ~CMODSYM_DIP_NS_FCONFLICT) != CMODSYM_DIP_NS_NORMAL)
 
 
 
@@ -133,13 +141,13 @@ struct cmodsymtab {
 struct cmodunit {
 	/* CModule CompilationUnit */
 	byte_t const            *cu_di_start; /* [1..1] .debug_info start (s.a. `di_debuginfo_cu_parser_t::dup_cu_info_hdr'). */
-	di_debuginfo_cu_abbrev_t cu_abbrev;   /* DWARF Debug-info abbreviation codes used by this CU. */
 	struct cmodsymtab        cu_symbols;  /* Per-unit symbols (who's names collide with other per-module symbols).
 	                                       * NOTE: `.mst_symv == (struct cmodsym *)-1' if symbols from this CU have
 	                                       *       yet to be loaded. Also note that when symbols are loaded, this
 	                                       *       is done for all CUs, such that one can easily check if symbols
 	                                       *       for a given module have been fully loaded by doing a check
 	                                       * `mod->cm_cuv[mod->cm_cuc-1].cu_symbols.mst_symv != (struct cmodsym *)-1' */
+	di_debuginfo_cu_abbrev_t cu_abbrev;   /* DWARF Debug-info abbreviation codes used by this CU. */
 };
 
 #define cmodunit_di_start(self) ((self)[0].cu_di_start)
@@ -156,6 +164,7 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
                                         struct cmodule const *__restrict mod,
                                         di_debuginfo_cu_parser_t *__restrict result,
                                         byte_t const *dip);
+
 
 struct cmodule {
 	struct cmodule                         **cm_pself;     /* [1..1][1..1] Self-pointer */
@@ -200,7 +209,8 @@ typedef NONNULL((2)) ssize_t
  * >>     cmodule_enum_uservm(dbg_current->t_vm); // Excluding `cmodule_ataddr(pc)'
  * >>     cmodule_enum_drivers();
  * >> }
- * @return: * : pformatprinter-compatible return value. */
+ * @return: * :        pformatprinter-compatible return value.
+ * @return: DBX_EINTR: Operation was interrupted. */
 FUNDEF NONNULL((1)) ssize_t
 NOTHROW(FCALL cmodule_enum)(cmodule_enum_callback_t cb,
                             void *cookie);
@@ -208,18 +218,30 @@ NOTHROW(FCALL cmodule_enum)(cmodule_enum_callback_t cb,
 struct vm;
 
 /* Enumerate all user-space modules mapped within the given vm
- * `self' as CModule objects, and invoke `cb' on each of them. */
+ * `self' as CModule objects, and invoke `cb' on each of them.
+ * @return: * :        pformatprinter-compatible return value.
+ * @return: DBX_EINTR: Operation was interrupted. */
 FUNDEF NONNULL((1, 2)) ssize_t
 NOTHROW(FCALL cmodule_enum_uservm)(struct vm *__restrict self,
                                    cmodule_enum_callback_t cb,
                                    void *cookie);
 
 /* Enumerate all kernel-space drivers as CModule objects, and
- * invoke `cb' on each of them. */
+ * invoke `cb' on each of them.
+ * @return: * :        pformatprinter-compatible return value.
+ * @return: DBX_EINTR: Operation was interrupted. */
 FUNDEF NONNULL((1)) ssize_t
 NOTHROW(FCALL cmodule_enum_drivers)(cmodule_enum_callback_t cb,
                                     void *cookie);
 
+/* Clear the internal cache of pre-loaded CModules (called
+ * from `dbx_heap_alloc()' in an attempt to free memory).
+ * @param: keep_loaded: When true, keep modules descriptors loaded if they
+ *                      are apart of the kernel, or the `dbg_current->t_vm'
+ *                      Otherwise, clear all modules from the cache.
+ * @return: * : The # of modules that actually got destroyed (i.e. removing
+ *              them from the cache caused their refcnt to drop to `0') */
+FUNDEF size_t NOTHROW(FCALL cmodule_clearcache)(__BOOL keep_loaded DFL(0));
 
 /* Lookup or create the CModule for the given `mod:modtype'
  * If the module has already been loaded, return a reference to
@@ -318,6 +340,164 @@ NOTHROW(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict self,
 FUNDEF WUNUSED ATTR_PURE NONNULL((1)) struct cmodunit *
 NOTHROW(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
                                          byte_t const *__restrict dip);
+
+/* Simple wrapper for a pair `REF struct cmodule *mod' + `byte_t const *dip'
+ * that can be used to reference and store arbitrary debug-info objects. */
+struct cmoduledip {
+	REF struct cmodule *cd_mod; /* [1..1] CModule. */
+	byte_t const       *cd_dip; /* [1..1] DIP pointer. */
+};
+#define cmoduledip_fini(self)           decref((self)->cd_mod)
+#define cmoduledip_parser(self, result) cmodule_parser_from_dip((self)->cd_mod, result, (self)->cd_dip)
+
+
+
+
+/************************************************************************/
+/* Mixed global/local symbol enumeration/lookup functions               */
+/************************************************************************/
+
+struct cmodsyminfo {
+	REF struct cmodule         *clv_mod;       /* [1..1] Containing module. */
+	struct cmodunit const      *clv_unit;      /* [0..1] Containing module unit. (if available) */
+	uintptr_t                   clv_modrel_pc; /* [const] Module-relative PC. */
+	struct cmodsym              clv_symbol;    /* Symbol name, namespace, and DIP. */
+	/* From inside of `cmod_symenum_callback_t' callbacks, none of the following
+	 * fields have yet to be initialized when `info_loaded == false'. When this
+	 * is the case, these fields can be loaded lazily via `cmod_symenum_loadinfo()' */
+	di_debuginfo_compile_unit_t clv_cu;        /* Compilation unit debug-info. */
+	di_debuginfo_cu_parser_t    clv_parser;    /* Parser. */
+	union {
+		/* The following are selected based upon `clv_parser.dup_comp.dic_tag' */
+		struct {                                 /* Variable */
+			di_debuginfo_location_t v_framebase; /* Frame-base expression. (from the containing `DW_TAG_subprogram', if any) */
+			di_debuginfo_location_t v_location;  /* Location expression */
+			byte_t const           *v_typeinfo;  /* [0..1] Type information. */
+			void                   *v_objaddr;   /* [0..1] Object address. */
+		} s_var;                                 /* [DW_TAG_variable, DW_TAG_formal_parameter] Variable or parameter. */
+	} clv_data;
+};
+#define cmodsyminfo_istype(self) cmodsym_istype(&(self)->clv_symbol)
+#define cmodsyminfo_getns(self)  cmodsym_getns(&(self)->clv_symbol)
+#define cmodsyminfo_getdip(self) cmodsym_getdip(&(self)->clv_symbol, (self)->clv_mod)
+
+
+/* Lookup information about a local/global symbol matching the given name.
+ * @param: info: [in]  The caller must fill in `clv_mod', `clv_unit' and `clv_modrel_pc'
+ *                     NOTE: If not available, you may fill `clv_mod' and `clv_unit' with
+ *                           `NULL', and leave `clv_modrel_pc' undefined.
+ *               [out] Upon success, all non-[const] fields may have been modified.
+ * @param: name: The symbol name that should be searched for.
+ * @param: ns:   Symbol namespace (one of `CMODSYM_DIP_NS_*')
+ * @return: DBX_EOK:    Success
+ * @return: DBX_ENOENT: No local variable `name' exists at `module_relative_pc'
+ * @return: DBX_EINTR:  Operation was interrupted. */
+FUNDEF NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
+                            char const *__restrict name, size_t namelen,
+                            uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
+
+/* Same as `cmod_syminfo()', but the caller is not required to fill in information
+ * about any symbol at all, which are automatically loaded based on `dbg_current',
+ * as well as `dbg_getpcreg(DBG_REGLEVEL_VIEW)'. However, upon success, the caller
+ * is required to call `cmod_syminfo_local_fini(info)' once returned information
+ * is no longer being used.
+ * @param: ns: Symbol namespace (one of `CMODSYM_DIP_NS_*')
+ * @return: DBX_EOK:    Success
+ * @return: DBX_ENOENT: No local variable `name' exists at `module_relative_pc'
+ * @return: DBX_EINTR:  Operation was interrupted. */
+FUNDEF NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
+                                  char const *__restrict name, size_t namelen,
+                                  uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
+#define cmod_syminfo_local_fini(info) decref((info)->clv_mod)
+
+
+
+
+/* Symbol enumeration callback prototype (see functions below)
+ * NOTE: This callback must not modify `info->clv_parser' before returning.
+ *       If it needs to parsing additional debug information, this must be
+ *       done via a different parser, which may be constructed by doing:
+ *       >> cmodunit_parser_from_dip(info->clv_unit, info->clv_mod, &NEW_PARSER, DIP);
+ * NOTE: This callback must not modify `info->clv_mod' before returning.
+ * NOTE: This callback must not modify `info->clv_unit' before returning,
+ *       unless `info_loaded' was false when then callback was called.
+ * @param: info:        The same info-pointer also passed to `cmod_symenum()',
+ *                      which will have been extended to include additional
+ *                      information about the symbol being enumerated.
+ * @param: info_loaded: Specifies if extended symbol info has already been
+ *                      loaded, or if this info (should it be needed) must be
+ *                      loaded manually via a call to `cmod_symenum_loadinfo()'
+ * @return: * :         pformatprinter-compatible return value. */
+typedef NONNULL((1)) ssize_t
+/*NOTHROW*/ (FCALL *cmod_symenum_callback_t)(struct cmodsyminfo *__restrict info,
+                                             __BOOL info_loaded);
+
+/* To-be called from inside of `cmod_symenum_callback_t' when
+ * `info_loaded == false', and extended symbol information is
+ * needed. */
+FUNDEF NONNULL((1)) void
+NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info);
+
+
+/* Flags for `cmod_symenum:scope' */
+#define CMOD_SYMENUM_SCOPE_FNORMAL    0x0000
+#define CMOD_SYMENUM_SCOPE_FNOLOCAL   0x0001 /* Don't enumerate local variables. */
+#define CMOD_SYMENUM_SCOPE_FNOGLOBAL  0x0002 /* Don't enumerate global variables from the current module. */
+#define CMOD_SYMENUM_SCOPE_FNOFOREIGN 0x0004 /* Don't enumerate global variables from other modules. */
+
+/* From the point of view of `cmod_syminfo()', enumerate all symbols who's names
+ * start with `startswith_name...+=startswith_namelen'. When `startswith_namelen==0',
+ * all symbols are enumerated.
+ * Also note that this function may sporadically stop enumeration before being finished,
+ * even when `cb' didn't indicate a negative return value when `dbg_awaituser()' returns
+ * true, which is handled the same as enumeration completing normally.
+ * NOTE: The `out(undef)' that all non-[const] fields are undefined upon return,
+ *       with the exception of out-of-band fields (if any), who's contents depends
+ *       on what `cb' may or may not have done.
+ * @param: info:  Specifications for where to look for symbols, as well as a cookie-pointer
+ *                that is passed to `cb' during invocation (the caller may embed the symbol
+ *                info descriptor inside of a larger structure which can then be re-accessed
+ *                via `container_of' from inside of `cb', thus allowing additional arguments
+ *                to be passed to the callback function)
+ *                The caller must fill in `clv_mod', `clv_unit' and `clv_modrel_pc' before
+ *                calling this function. If not available, you may fill `clv_mod' and `clv_unit'
+ *                with `NULL', and leave `clv_modrel_pc' undefined.
+ * @param: cb:    Callback to invoke for every symbol found.
+ * @param: ns:    Symbol namespace (one of `CMODSYM_DIP_NS_*')
+ * @param: scope: The scope of symbols that should be enumerated (set of `CMOD_SYMENUM_SCOPE_F*')
+ * @return: * :        pformatprinter-compatible accumulation of return values from `cb'
+ * @return: DBX_EINTR: Operation was interrupted. */
+FUNDEF NONNULL((1, 2)) ssize_t
+NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
+                            cmod_symenum_callback_t cb,
+                            char const *startswith_name,
+                            size_t startswith_namelen,
+                            uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
+                            uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
+
+/* Same as `cmod_symenum()', except this function automatically manages the
+ * input fields of `info' which must normally be filled in by the caller, and
+ * will instead fill them in itself, as well as clean them up afterwards.
+ * NOTE: _DONT_ call `cmod_syminfo_local_fini(info)' after this function returns!
+ *       Any cleanup will have already been done internally by this function!
+ * NOTE: The `in(oob_only)' means that only out-of-band data that is used by `cb'
+ *       must be initialized prior to this function being called.
+ * NOTE: The `out(undef)' that all non-[const] fields are undefined upon return,
+ *       with the exception of out-of-band fields (if any), who's contents depends
+ *       on what `cb' may or may not have done.
+ * @return: * :        pformatprinter-compatible accumulation of return values from `cb'
+ * @return: DBX_EINTR: Operation was interrupted. */
+FUNDEF NONNULL((1, 2)) ssize_t
+NOTHROW(FCALL cmod_symenum_local)(/*in(oob_only)|out(undef)*/ struct cmodsyminfo *__restrict info,
+                                  cmod_symenum_callback_t cb,
+                                  char const *startswith_name,
+                                  size_t startswith_namelen,
+                                  uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL),
+                                  uintptr_t scope DFL(CMOD_SYMENUM_SCOPE_FNORMAL));
+
+
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

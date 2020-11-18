@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/debugger.h>
+#ifdef CONFIG_HAVE_DEBUGGER
 
 #include <format-printer.h>
 #include <stddef.h>
@@ -34,32 +35,33 @@
 /**/
 #include "include/ceval.h"
 #include "include/cexpr.h"
+#include "include/cmodule.h"
 #include "include/cprinter.h"
-#include "include/csymbol.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 INTDEF void KCALL dbx_heap_init(void);
 INTDEF void KCALL dbx_heap_reset(void);
 INTDEF void KCALL dbx_heap_fini(void);
 
-INTDEF REF struct dw_module *dw_module_cache;
+INTDEF struct cmodule *cmodule_list;
+INTDEF REF struct cmodule *cmodule_cache;
+INTDEF NONNULL((1)) void NOTHROW(FCALL cmodule_fini)(struct cmodule *__restrict self);
+
 
 DBG_INIT(init) {
 	/* Initialize the DBX heap-system. */
 	dbx_heap_init();
 	/* Make sure the debug-module-list is empty. */
-	dw_module_list  = NULL;
-	dw_module_cache = NULL;
+	cmodule_list  = NULL;
+	cmodule_cache = NULL;
 }
 
 INTDEF void NOTHROW(KCALL reset_builtin_types)(void);
 
 DBG_RESET(reset) {
-	csymbol_scopemask        = CSYMBOL_SCOPE_ALL;
 	ceval_comma_is_select2nd = false;
 	cexpr_readonly           = false;
 	cexpr_typeonly           = false;
@@ -71,14 +73,14 @@ DBG_RESET(reset) {
 #if CVALUE_KIND_VOID != 0
 	cexpr_stack_stub[0].cv_kind = CVALUE_KIND_VOID;
 #endif /* CVALUE_KIND_VOID != 0 */
-	/* Drop all external references held by `dw_module_list' */
-	while (dw_module_list) {
-		struct dw_module *next;
-		next = dw_module_list->dm_next;
-		dw_module_fini(dw_module_list);
-		dw_module_list = next;
+	/* Drop all external references held by `cmodule_list' */
+	while (cmodule_list) {
+		struct cmodule *next;
+		next = cmodule_list->cm_next;
+		cmodule_fini(cmodule_list);
+		cmodule_list = next;
 	}
-	dw_module_cache = NULL;
+	cmodule_cache = NULL;
 	/* Re-initialize the debugger heap-system */
 	dbx_heap_reset();
 	/* Reset pointers within builtin C-types. */
@@ -98,21 +100,17 @@ DBG_AUTOCOMPLETE(eval, argc, argv, cb, arg,
 	if (starts_with_len) {
 		struct cparser cp;
 		bool old_cexpr_typeonly;
-		unsigned int old_csymbol_scopemask;
 		size_t old_stacksize;
 		/* Autocomplete sub-elements of the given C-expression. */
 		cparser_init(&cp, starts_with, starts_with_len);
-		cp.c_autocom          = cb;
-		cp.c_autocom_arg      = arg;
-		cp.c_autocom_start    = starts_with;
-		old_stacksize         = cexpr_stacksize;
-		old_cexpr_typeonly    = cexpr_typeonly;
-		old_csymbol_scopemask = csymbol_scopemask;
-		cexpr_typeonly        = true;
-		csymbol_scopemask     = CSYMBOL_SCOPE_LOCAL;
+		cp.c_autocom       = cb;
+		cp.c_autocom_arg   = arg;
+		cp.c_autocom_start = starts_with;
+		old_stacksize      = cexpr_stacksize;
+		old_cexpr_typeonly = cexpr_typeonly;
+		cexpr_typeonly     = true;
 		cexpr_pushparse(&cp);
-		cexpr_typeonly    = old_cexpr_typeonly;
-		csymbol_scopemask = old_csymbol_scopemask;
+		cexpr_typeonly = old_cexpr_typeonly;
 		while (cexpr_stacksize > old_stacksize) {
 			if (cexpr_pop() != DBX_EOK)
 				break;

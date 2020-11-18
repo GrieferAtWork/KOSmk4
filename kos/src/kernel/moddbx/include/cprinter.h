@@ -25,6 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
 
 #include <bits/crt/format-printer.h>
 
@@ -34,7 +35,6 @@
 #include "error.h"
 #include "ctype.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 struct cprinter {

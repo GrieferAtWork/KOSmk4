@@ -26,6 +26,8 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+
 #include <debugger/rt.h>
 #include <kernel/types.h>
 
@@ -42,6 +44,7 @@
 #include <libdebuginfo/debug_info.h>
 
 /**/
+#include "include/cmodule.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
 
@@ -50,7 +53,6 @@
 #include <asm/registers-compat.h>
 #endif /* __x86_64__ || __i386__ */
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 PUBLIC NONNULL((1)) void
@@ -61,7 +63,7 @@ NOTHROW(FCALL ctype_destroy)(struct ctype *__restrict self) {
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
 		if (CTYPE_KIND_ISENUM(self->ct_kind)) {
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_STRUCT):
-			dw_debugloc_fini(&self->ct_enum);
+			cmoduledip_fini(&self->ct_enum);
 		}
 		break;
 
@@ -259,7 +261,7 @@ again:
 		goto again;
 
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_STRUCT):
-		if (a->ct_struct.ct_info.ddl_di_pos != b->ct_struct.ct_info.ddl_di_pos)
+		if (a->ct_struct.ct_info.cd_dip != b->ct_struct.ct_info.cd_dip)
 			goto nope;
 		break;
 
@@ -573,14 +575,14 @@ try_pointer_register:
 
 
 /* Enumerate/find the fields of a given struct.
- * @param: cb:   Callback to-be invoked for the field.
- * @param: arg:  Cookie-argument for `cb'
- * @return: * :  The sum of return values of `cb'
- * @return: < 0: A propagated, negative return value of `cb'. */
+ * @param: cb:     Callback to-be invoked for the field.
+ * @param: cookie: Cookie-argument for `cb'
+ * @return: * :    The sum of return values of `cb'
+ * @return: < 0:   A propagated, negative return value of `cb'. */
 PUBLIC NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
-                                  ctype_struct_field_callback_t cb,
-                                  void *arg) {
+NOTHROW(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
+                                       ctype_struct_field_callback_t cb,
+                                       void *cookie) {
 	/* TODO: If the struct is anonymous in the context of the CU that `self'
 	 *       got loaded from, then we'll be unable to load its fields. In this
 	 *       case, we should instead search for a struct with the same name
@@ -590,21 +592,19 @@ NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
 	 *        - All CUs of all other modules from the other address space. */
 	ssize_t temp, result = 0;
 	di_debuginfo_cu_parser_t parser;
-	di_debuginfo_cu_abbrev_t abbrev;
-	unsigned int error;
-	struct dw_module *mod;
-	byte_t const *reader;
+	struct cmodunit *cunit;
 	size_t depth;
 	/* Sanity check: we're actually dealing with a struct! */
 	if unlikely(!CTYPE_KIND_ISSTRUCT(self->ct_kind))
-		goto done0;
-	reader = self->ct_struct.ct_info.ddl_di_hdr;
-	mod    = self->ct_struct.ct_info.ddl_module;
-	error = debuginfo_cu_parser_loadunit(&reader, mod->dm_sections.ds_debug_info_end,
-	                                     di_debug_sections_as_di_debuginfo_cu_parser_sections(&mod->dm_sections),
-	                                     &parser, &abbrev, self->ct_struct.ct_info.ddl_di_pos);
-	if unlikely(error != DEBUG_INFO_ERROR_SUCCESS)
 		goto done;
+	cunit = cmodule_findunit_from_dip(self->ct_struct.ct_info.cd_mod,
+	                                  self->ct_struct.ct_info.cd_dip);
+	if unlikely(!cunit)
+		goto done;
+	cmodunit_parser_from_dip(cunit,
+	                         self->ct_struct.ct_info.cd_mod,
+	                         &parser,
+	                         self->ct_struct.ct_info.cd_dip);
 	depth = parser.dup_child_depth;
 	do {
 		if (parser.dup_child_depth == depth &&
@@ -620,7 +620,9 @@ NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
 				/* TODO: Enumerate an inlined struct/union */
 			} else {
 				/* Enumerate this member. */
-				temp = (*cb)(arg, &member, &parser, mod);
+				temp = (*cb)(cookie, &member, &parser,
+				             self->ct_struct.ct_info.cd_mod,
+				             cunit);
 				if unlikely(temp < 0)
 					goto err;
 				result += temp;
@@ -631,80 +633,61 @@ NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
 	} while (debuginfo_cu_parser_next(&parser) &&
 	         parser.dup_child_depth >= depth);
 done:
-	debuginfo_cu_abbrev_fini(&abbrev);
-done0:
 	return result;
 err:
-	debuginfo_cu_abbrev_fini(&abbrev);
 	return temp;
 }
 
 
+
+struct ctype_struct_getfield_data {
+	char const              *name;
+	size_t                   namelen;
+	/*out*/ struct ctyperef *pfield_type;   /* [1..1] */
+	/*out*/ ptrdiff_t       *pfield_offset; /* [1..1] */
+	dbx_errno_t              error;
+};
+
+PRIVATE NONNULL((2, 3, 4, 5)) ssize_t
+NOTHROW(KCALL ctype_struct_getfield_cb)(void *cookie,
+                                        di_debuginfo_member_t const *__restrict member,
+                                        di_debuginfo_cu_parser_t const *__restrict parser,
+                                        struct cmodule *__restrict mod,
+                                        struct cmodunit *__restrict cu) {
+	struct ctype_struct_getfield_data *arg;
+	arg = (struct ctype_struct_getfield_data *)cookie;
+	if (!member->m_name || unlikely(!member->m_type))
+		return 0;
+	if (strlen(member->m_name) != arg->namelen)
+		return 0;
+	if (memcmp(member->m_name, arg->name, arg->namelen * sizeof(char)) != 0)
+		return 0;
+	/* Write-back results. */
+	*arg->pfield_offset = member->m_offset;
+	// TODO: member->m_bit_size;
+	// TODO: member->m_bit_offset;
+	arg->error = ctype_fromdw(mod, cu, parser, member->m_type, arg->pfield_type);
+	return -1; /* Stop enumeration (we've found what we're looking for) */
+}
+
+
 /* Find a field of a given struct-kind C-type.
- * @return: DBX_EOK:     Success.
- * @return: DBX_ENOENT:  No field with this name.
- * @return: DBX_EINTERN: Debug information is corrupted. */
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOENT: No field with this name. */
 PUBLIC WUNUSED NONNULL((1, 2, 4, 5)) dbx_errno_t
 NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
                                      char const *__restrict name, size_t namelen,
                                      /*out*/ struct ctyperef *__restrict pfield_type,
                                      /*out*/ ptrdiff_t *__restrict pfield_offset) {
-	/* TODO: If the struct is anonymous in the context of the CU that `self'
-	 *       got loaded from, then we'll be unable to load its fields. In this
-	 *       case, we should instead search for a struct with the same name
-	 *       in a number of different places:
-	 *        - All other CUs of the current module.
-	 *        - All CUs of all other modules from the current address space.
-	 *        - All CUs of all other modules from the other address space. */
-	di_debuginfo_cu_parser_t parser;
-	di_debuginfo_cu_abbrev_t abbrev;
-	unsigned int error;
-	struct dw_module *mod;
-	byte_t const *reader;
-	size_t depth;
-	/* Sanity check: we're actually dealing with a struct! */
-	if unlikely(!CTYPE_KIND_ISSTRUCT(self->ct_kind))
-		goto done0;
-	reader = self->ct_struct.ct_info.ddl_di_hdr;
-	mod    = self->ct_struct.ct_info.ddl_module;
-	error = debuginfo_cu_parser_loadunit(&reader, mod->dm_sections.ds_debug_info_end,
-	                                     di_debug_sections_as_di_debuginfo_cu_parser_sections(&mod->dm_sections),
-	                                     &parser, &abbrev, self->ct_struct.ct_info.ddl_di_pos);
-	if unlikely(error != DEBUG_INFO_ERROR_SUCCESS)
-		goto done;
-	depth = parser.dup_child_depth;
-	do {
-		if (parser.dup_child_depth == depth &&
-		    parser.dup_comp.dic_tag == DW_TAG_member) {
-			di_debuginfo_member_t member;
-			if unlikely(!debuginfo_cu_parser_loadattr_member(&parser, &member))
-				break;
-			if (!member.m_name) {
-				/* TODO: Enumerate an inlined struct/union */
-			} else {
-				if (strlen(member.m_name) == namelen &&
-					memcmp(member.m_name, name, namelen * sizeof(char)) == 0) {
-					dbx_errno_t result;
-					/* Found the requested field! */
-					if (member.m_offset == (uintptr_t)-1)
-						member.m_offset = 0;
-					/* Write-back the field's offset. */
-					*pfield_offset = member.m_offset;
-					/* Load the field's type. */
-					result = ctype_fromdw(mod, &parser, member.m_type, pfield_type);
-					debuginfo_cu_abbrev_fini(&abbrev);
-					return result;
-				}
-			}
-		} else {
-			debuginfo_cu_parser_skipattr(&parser);
-		}
-	} while (debuginfo_cu_parser_next(&parser) &&
-	         parser.dup_child_depth >= depth);
-done:
-	debuginfo_cu_abbrev_fini(&abbrev);
-done0:
-	return DBX_ENOENT;
+	struct ctype_struct_getfield_data data;
+	data.name          = name;
+	data.namelen       = namelen;
+	data.pfield_type   = pfield_type;
+	data.pfield_offset = pfield_offset;
+	data.error         = DBX_ENOENT;
+	/* Enumerate fields in search for one matching `name' */
+	ctype_struct_enumfields(self, &ctype_struct_getfield_cb, &data);
+	return data.error;
 }
 
 
@@ -716,10 +699,11 @@ done0:
  * @return: DBX_EOK:     A reference to the associated type.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: Debug information was corrupted. */
-PUBLIC WUNUSED NONNULL((1, 2, 4)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw)(struct dw_module *__restrict mod,
+PUBLIC WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
+NOTHROW(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
+                            struct cmodunit const *__restrict cunit,
                             di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                            byte_t const *type_debug_info,
+                            byte_t const *__restrict type_debug_info,
                             /*out*/ struct ctyperef *__restrict presult) {
 	dbx_errno_t result = DBX_EOK;
 	di_debuginfo_cu_parser_t parser;
@@ -882,7 +866,7 @@ do_unsigned: ATTR_UNUSED;
 			         parser.dup_child_depth >= depth);
 		}
 got_elem_count:
-		result = ctype_fromdw(mod, &parser, typinfo.t_type, &elem_type);
+		result = ctype_fromdw(mod, cunit, &parser, typinfo.t_type, &elem_type);
 		if unlikely(result != DBX_EOK)
 			goto done;
 		presult->ct_flags = elem_type.ct_flags; /* Copy-over type flags from the element type. */
@@ -899,13 +883,12 @@ got_elem_count:
 		result_type = (REF struct ctype *)dbx_malloc(offsetafter(struct ctype, ct_enum));
 		if unlikely(!result_type)
 			goto err_nomem;
-		result_type->ct_refcnt   = 1;
-		result_type->ct_kind     = CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM) | typinfo.t_sizeof;
-		result_type->ct_children = NULL;
-		result_type->ct_enum.ddl_module = incref(mod);
-		result_type->ct_enum.ddl_di_hdr = parser.dup_cu_info_hdr;
-		result_type->ct_enum.ddl_di_pos = parser.dup_cu_info_pos;
-		presult->ct_typ = result_type; /* Inherit reference */
+		result_type->ct_refcnt      = 1;
+		result_type->ct_kind        = CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM) | typinfo.t_sizeof;
+		result_type->ct_children    = NULL;
+		result_type->ct_enum.cd_mod = incref(mod);
+		result_type->ct_enum.cd_dip = parser.dup_cu_info_pos;
+		presult->ct_typ             = result_type; /* Inherit reference */
 	}	break;
 
 	case DW_TAG_pointer_type:
@@ -913,7 +896,7 @@ got_elem_count:
 	case DW_TAG_rvalue_reference_type: {
 		struct ctyperef pointed_to_type;
 		/* Parse the inner type. */
-		result = ctype_fromdw(mod, &parser, typinfo.t_type, &pointed_to_type);
+		result = ctype_fromdw(mod, cunit, &parser, typinfo.t_type, &pointed_to_type);
 		if unlikely(result != DBX_EOK)
 			goto done;
 		presult->ct_flags = CTYPEREF_FLAG_NORMAL;
@@ -935,7 +918,7 @@ got_elem_count:
 			memset(&return_type, 0, sizeof(return_type));
 			return_type.ct_typ = incref(&ctype_int);
 		} else {
-			result = ctype_fromdw(mod, &parser, typinfo.t_type, &return_type);
+			result = ctype_fromdw(mod, cunit, &parser, typinfo.t_type, &return_type);
 			if unlikely(result != DBX_EOK)
 				goto done;
 		}
@@ -971,7 +954,7 @@ got_elem_count:
 							argv[argc].ct_flags = CTYPEREF_FLAG_NORMAL;
 							argv[argc].ct_typ   = incref(&ctype_int);
 						} else {
-							result = ctype_fromdw(mod, &parser, parameter_type_pointer, &argv[argc]);
+							result = ctype_fromdw(mod, cunit, &parser, parameter_type_pointer, &argv[argc]);
 							if unlikely(result != DBX_EOK)
 								goto err_fuction_argv;
 						}
@@ -1015,12 +998,14 @@ err_fuction_argv:
 		struct_type->ct_kind   = CTYPE_KIND_STRUCT;
 		if (parser.dup_comp.dic_tag == DW_TAG_union_type)
 			struct_type->ct_kind = CTYPE_KIND_UNION;
+		/* TODO: When the pointed-to struct type is anonymous, then
+		 *       look through other places if we can locate the actual
+		 *       implementation. */
 		struct_type->ct_children = NULL;
-		struct_type->ct_struct.ct_info.ddl_module = incref(mod);
-		struct_type->ct_struct.ct_info.ddl_di_hdr = parser.dup_cu_info_hdr;
-		struct_type->ct_struct.ct_info.ddl_di_pos = parser.dup_cu_info_pos;
-		struct_type->ct_struct.ct_sizeof          = typinfo.t_sizeof;
-		presult->ct_typ = struct_type; /* Inherit reference */
+		struct_type->ct_struct.ct_info.cd_mod = incref(mod);
+		struct_type->ct_struct.ct_info.cd_dip = parser.dup_cu_info_pos;
+		struct_type->ct_struct.ct_sizeof      = typinfo.t_sizeof;
+		presult->ct_typ                       = struct_type; /* Inherit reference */
 	}	break;
 
 	case DW_TAG_typedef:

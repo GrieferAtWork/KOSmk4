@@ -259,14 +259,13 @@ NOTHROW_NCX(CC abbrev_loadcache)(byte_t const *__restrict ace_data,
 
 
 
-INTERN NONNULL((1, 2)) bool
+PRIVATE NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__restrict self,
+                                                 byte_t const *__restrict abbrev_end,
                                                  di_debuginfo_component_t *__restrict result,
                                                  uintptr_t abbrev_code) {
 #if 0
-	return abbrev_lookup(self->dua_abbrev_start,
-	                                           self->dua_abbrev_end,
-	                                           result, abbrev_code);
+	return abbrev_lookup(self->dua_abbrev, abbrev_end, result, abbrev_code);
 #else
 	size_t i;
 	di_debuginfo_cu_abbrev_cache_entry_t *list;
@@ -292,9 +291,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 				return true;
 			}
 		}
-		cache_pointer = abbrev_findcache(self->dua_abbrev_start,
-		                                 self->dua_abbrev_end,
-		                                 abbrev_code);
+		cache_pointer = abbrev_findcache(self->dua_abbrev, abbrev_end, abbrev_code);
 		if (!cache_pointer)
 			return false;
 		abbrev_loadcache(cache_pointer, result);
@@ -374,9 +371,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 			self->dua_cache_next = 0;
 		}
 do_lookup_for_dynamic_cache:
-		cache_pointer = abbrev_findcache(self->dua_abbrev_start,
-		                                 self->dua_abbrev_end,
-		                                 abbrev_code);
+		cache_pointer = abbrev_findcache(self->dua_abbrev, abbrev_end, abbrev_code);
 		if (!cache_pointer)
 			return false;
 		abbrev_loadcache(cache_pointer, result);
@@ -453,11 +448,10 @@ again:
 		reader += 8;
 	}
 	if unlikely(OVERFLOW_UADD((uintptr_t)sectinfo->cps_debug_abbrev_start, temp,
-	                          (uintptr_t *)&abbrev->dua_abbrev_start) ||
-	            abbrev->dua_abbrev_start >= sectinfo->cps_debug_abbrev_end)
+	                          (uintptr_t *)&abbrev->dua_abbrev) ||
+	            abbrev->dua_abbrev >= sectinfo->cps_debug_abbrev_end)
 		return DEBUG_INFO_ERROR_CORRUPT;
-	abbrev->dua_abbrev_end = sectinfo->cps_debug_abbrev_end;
-	result->dup_addrsize   = *(uint8_t const *)reader; /* address_size */
+	result->dup_addrsize = *(uint8_t const *)reader; /* address_size */
 	reader += 1;
 #if __SIZEOF_POINTER__ > 4
 	if unlikely(result->dup_addrsize != 1 &&
@@ -623,8 +617,8 @@ again:
 	}
 	/* Lookup the associated abbreviation code. */
 	return libdi_debuginfo_cu_abbrev_lookup(self->dup_cu_abbrev,
-	                                        &self->dup_comp,
-	                                        abbrev_code);
+	                                        self->dup_sections->cps_debug_abbrev_end,
+	                                        &self->dup_comp, abbrev_code);
 }
 
 INTERN TEXTSECTION NONNULL((1)) bool

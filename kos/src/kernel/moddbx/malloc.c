@@ -46,7 +46,7 @@
 #include <string.h>
 
 /**/
-#include "include/dw.h"
+#include "include/cmodule.h"
 #include "include/error.h"
 #include "include/malloc.h"
 
@@ -270,9 +270,9 @@ nomem:
 	if (extend_heap())
 		goto again;
 	/* Try to clear the module cache to make more memory available. */
-	if (dw_module_clearcache(true))
+	if (cmodule_clearcache(true))
 		goto again;
-	if (dw_module_clearcache(false))
+	if (cmodule_clearcache(false))
 		goto again;
 nope:
 	resptr.hp_ptr = NULL;

@@ -25,12 +25,13 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+
 #include <kernel/types.h>
 
 /**/
 #include "error.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 struct ctype;
@@ -88,8 +89,6 @@ NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
  * @param: p_varname_len: When non-NULL, store the length of `*p_varname' here, but
  *                        only do so if `p_varname != NULL'. When `p_varname' is given
  *                        as `NULL', then this argument is simply ignored.
- * @param: fail_if_symbol_exists: Fail (with `DBX_ENOENT') if a potential named type
- *                        is shadowed by a named symbol of the same name.
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_ENOENT:  `self' does not refer to a named type.
@@ -97,9 +96,7 @@ NOTHROW(FCALL cexpr_pusheval)(char const *__restrict expr,
 FUNDEF WUNUSED NONNULL((1, 2)) dbx_errno_t
 NOTHROW(FCALL ctype_eval)(struct cparser *__restrict self,
                           /*out:ref*/ struct ctyperef *__restrict presult,
-                          char const **p_varname,
-                          size_t *p_varname_len,
-                          __BOOL fail_if_symbol_exists DFL(0));
+                          char const **p_varname, size_t *p_varname_len);
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

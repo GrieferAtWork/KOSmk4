@@ -25,6 +25,8 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+
 #include <debugger/rt.h>
 #include <kernel/types.h>
 
@@ -44,10 +46,9 @@
 #endif /* __x86_64__ */
 
 /**/
-#include "dw.h"
+#include "cmodule.h"
 #include "error.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 #define CTYPE_KIND_VOID                   0x0001
@@ -142,8 +143,8 @@ DECL_BEGIN
 
 struct ctype;
 struct ctypeinfo {
-	char const           *ci_name;    /* [0..1] Name of this type (or NULL if anonymous). */
-	REF struct dw_module *ci_nameref; /* [0..1] Module reference for keeping `ct_name' alive. */
+	char const         *ci_name;    /* [0..1] Name of this type (or NULL if anonymous). */
+	REF struct cmodule *ci_nameref; /* [0..1] Module reference for keeping `ct_name' alive. */
 };
 #define ctypeinfo_equal(a, b) \
 	((a)->ci_name == (b)->ci_name)
@@ -184,15 +185,15 @@ struct ctype {
 	uintptr_half_t ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
 	struct ctype  *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
 	union {
-		struct dw_debugloc ct_enum;    /* [valid_if(CTYPE_KIND_ISENUM)] Enum information. Points just
-		                                * past the `DW_TAG_enumeration_type' tag of the surrounding enumerator
-		                                * (scan this region for `DW_TAG_enumerator' child elements). */
+		struct cmoduledip ct_enum; /* [valid_if(CTYPE_KIND_ISENUM)] Enum information. Points just
+		                            * past the `DW_TAG_enumeration_type' tag of the surrounding enumerator
+		                            * (scan this region for `DW_TAG_enumerator' child elements). */
 
 		struct {
-			struct dw_debugloc ct_info;   /* Struct information. Points just past the `DW_TAG_structure_type'
-			                               * (or similar) tag of the surrounding structure (scan
-			                               * this region for `DW_TAG_member' child elements). */
-			size_t             ct_sizeof; /* Sizeof() this struct. */
+			struct cmoduledip ct_info;   /* Struct information. Points just past the `DW_TAG_structure_type'
+			                              * (or similar) tag of the surrounding structure (scan
+			                              * this region for `DW_TAG_member' child elements). */
+			size_t            ct_sizeof; /* Sizeof() this struct. */
 		} ct_struct; /* [valid_if(CTYPE_KIND_ISSTRUCT)] */
 
 		struct {
@@ -275,7 +276,7 @@ NOTHROW(FCALL ctype_for_register)(unsigned int regno, size_t buflen);
 
 struct ctypeenumname {
 	char const           *en_name;    /* [1..1] Name of the enum. */
-	REF struct dw_module *en_nameref; /* [1..1] Module reference for keeping `en_name' alive. */
+	REF struct cmodule *en_nameref; /* [1..1] Module reference for keeping `en_name' alive. */
 };
 #define ctypeenumname_fini(self) decref((self)->en_nameref)
 
@@ -557,32 +558,33 @@ DATDEF struct ctype ctype_char32_t_const_compat_ptr;
 
 
 /* Callback type for `ctype_struct_field_callback_t'
- * @param: arg:    Cookie-argument.
+ * @param: cookie: Cookie-argument.
  * @param: member: [1..1] The struct member being enumerated.
  * @param: parser: [1..1] A parser that may be used to load additional debug information.
  * @param: mod:    [1..1] The module containing the struct definition.
+ * @param: cu:     [1..1] The compilation unit containing the struct definition.
  * @return: >= 0: Sum up this value, and continue enumeration.
- * @return: < 0:  Stop enumeration and have `ctype_struct_field()' re-return this value. */
-typedef NONNULL((2, 3, 4)) ssize_t
-(KCALL *ctype_struct_field_callback_t)(void *arg,
-                                       di_debuginfo_member_t const *__restrict member,
-                                       di_debuginfo_cu_parser_t const *__restrict parser,
-                                       struct dw_module *__restrict mod);
+ * @return: < 0:  Stop enumeration and have `ctype_struct_enumfields()' re-return this value. */
+typedef NONNULL((2, 3, 4, 5)) ssize_t
+/*NOTHROW*/ (KCALL *ctype_struct_field_callback_t)(void *cookie,
+                                                   di_debuginfo_member_t const *__restrict member,
+                                                   di_debuginfo_cu_parser_t const *__restrict parser,
+                                                   struct cmodule *__restrict mod,
+                                                   struct cmodunit *__restrict cu);
 
 /* Enumerate/find the fields of a given struct.
- * @param: cb:   Callback to-be invoked for the field.
- * @param: arg:  Cookie-argument for `cb'
- * @return: * :  The sum of return values of `cb'
- * @return: < 0: A propagated, negative return value of `cb'. */
+ * @param: cb:     Callback to-be invoked for the field.
+ * @param: cookie: Cookie-argument for `cb'
+ * @return: * :    The sum of return values of `cb'
+ * @return: < 0:   A propagated, negative return value of `cb'. */
 FUNDEF NONNULL((1, 2)) ssize_t
-NOTHROW(FCALL ctype_struct_field)(struct ctype *__restrict self,
-                                  ctype_struct_field_callback_t cb,
-                                  void *arg);
+NOTHROW(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
+                                       ctype_struct_field_callback_t cb,
+                                       void *cookie);
 
 /* Find a field of a given struct-kind C-type.
- * @return: DBX_EOK:     Success.
- * @return: DBX_ENOENT:  No field with this name.
- * @return: DBX_EINTERN: Debug information is corrupted. */
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOENT: No field with this name. */
 FUNDEF WUNUSED NONNULL((1, 2, 4, 5)) dbx_errno_t
 NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
                                      char const *__restrict name, size_t namelen,
@@ -597,11 +599,15 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
  * @return: DBX_EOK:     A reference to the associated type.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: Debug information was corrupted. */
-FUNDEF WUNUSED NONNULL((1, 2, 4)) dbx_errno_t
-NOTHROW(FCALL ctype_fromdw)(struct dw_module *__restrict mod,
+FUNDEF WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
+NOTHROW(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
+                            struct cmodunit const *__restrict cunit,
                             di_debuginfo_cu_parser_t const *__restrict cu_parser,
-                            byte_t const *type_debug_info,
+                            byte_t const *__restrict type_debug_info,
                             /*out*/ struct ctyperef *__restrict presult);
+#define ctype_from_cmodsyminfo(self, presult)                            \
+	ctype_fromdw((self)->clv_mod, (self)->clv_unit, &(self)->clv_parser, \
+	             cmodsyminfo_getdip(self), presult)
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */

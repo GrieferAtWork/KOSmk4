@@ -25,13 +25,14 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+
 #include <debugger/hook.h>
 #include <kernel/types.h>
 
 /**/
 #include "error.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 enum {

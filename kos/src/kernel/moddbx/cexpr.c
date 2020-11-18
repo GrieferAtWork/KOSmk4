@@ -32,6 +32,8 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+
 #include <debugger/rt.h>
 #include <kernel/types.h>
 
@@ -47,13 +49,12 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 
 /**/
 #include "include/cexpr.h"
+#include "include/cmodule.h"
 #include "include/cparser.h"
-#include "include/csymbol.h"
 #include "include/ctype.h"
 #include "include/error.h"
 #include "include/malloc.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 
@@ -179,7 +180,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 		} else {
 			di_debuginfo_compile_unit_t cu;
 			size_t num_accessed_bits;
-			struct dw_module *mod;
+			struct cmodule *mod;
 			memset(&cu, 0, sizeof(cu));
 			cu.cu_ranges.r_startpc = self->v_cu_ranges_startpc;
 			cu.cu_addr_base        = self->v_cu_addr_base;
@@ -187,17 +188,17 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			mod                    = self->v_module;
 			if (write) {
 				error = debuginfo_location_setvalue(&self->v_expr,
-				                                    di_debug_sections_as_unwind_emulator_sections(&mod->dm_sections),
+				                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
 				                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
 				                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-				                                    pc - module_getloadaddr(mod->dm_module, mod->dm_modtyp),
+				                                    pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
 				                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 				                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 			} else {
 				error = debuginfo_location_getvalue(&self->v_expr,
-				                                    di_debug_sections_as_unwind_emulator_sections(&mod->dm_sections),
+				                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
 				                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-				                                    pc - module_getloadaddr(mod->dm_module, mod->dm_modtyp),
+				                                    pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
 				                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 				                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 			}
@@ -1394,7 +1395,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
 			/* Drop the enum-part and force signed. */
 			if (CTYPE_KIND_ISENUM(typ->ct_kind))
-				dw_debugloc_fini(&typ->ct_enum);
+				cmoduledip_fini(&typ->ct_enum);
 #define CTYPE_KIND_SIGNBIT (CTYPE_KIND_S8 ^ CTYPE_KIND_U8)
 #define CTYPE_KIND_ENUMBIT ((CTYPE_KIND_ENUM8 & ~CTYPE_KIND_SIGNBIT) ^ (CTYPE_KIND_U8 & ~CTYPE_KIND_SIGNBIT))
 			typ->ct_kind &= ~(CTYPE_KIND_SIGNBIT | CTYPE_KIND_ENUMBIT);
@@ -1425,7 +1426,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 		if (CTYPE_KIND_ISINT(typ->ct_kind)) {
 			/* Drop the enum-part and force signed. */
 			if (CTYPE_KIND_ISENUM(typ->ct_kind))
-				dw_debugloc_fini(&typ->ct_enum);
+				cmoduledip_fini(&typ->ct_enum);
 			typ->ct_kind &= ~(CTYPE_KIND_SIGNBIT | CTYPE_KIND_ENUMBIT);
 		}
 		if (data)
@@ -2018,22 +2019,40 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
 	dbx_errno_t result;
-	struct csymbol csym;
-	result = csymbol_lookup(name, namelen, &csym,
-	                        CSYMBOL_SCOPE_ALL,
-	                        CSYMBOL_LOOKUP_ANY);
+	struct cmodsyminfo csym;
+	result = cmod_syminfo_local(&csym, name, namelen, CMODSYM_DIP_NS_NORMAL);
 	if (result != DBX_EOK)
 		return result;
-	if (csym.cs_kind == CSYMBOL_KIND_EXPR) {
-		/* TODO: Special handling for this_* globals! */
-		result = cexpr_pushexpr(&csym.cs_expr.e_type,
-		                        &csym.cs_expr.e_expr,
-		                        ctype_sizeof(csym.cs_expr.e_type.ct_typ),
-		                        0);
+	if (!cmodsyminfo_istype(&csym)) {
+		struct ctyperef symtype;
+		/* Load the type of the variable. */
+		result = ctype_fromdw(csym.clv_mod, csym.clv_unit,
+		                      &csym.clv_parser,
+		                      csym.clv_data.s_var.v_typeinfo,
+		                      &symtype);
+		if likely(result == DBX_EOK) {
+			struct cvalue_cfiexpr expr;
+			/* Fill in the expression for loading the symbol. */
+			expr.v_module            = csym.clv_mod;
+			expr.v_expr              = csym.clv_data.s_var.v_location;
+			expr.v_framebase         = csym.clv_data.s_var.v_framebase;
+			expr.v_cu_ranges_startpc = csym.clv_cu.cu_ranges.r_startpc;
+			expr.v_cu_addr_base      = csym.clv_cu.cu_addr_base;
+			expr.v_addrsize          = csym.clv_parser.dup_addrsize;
+			expr.v_ptrsize           = csym.clv_parser.dup_ptrsize;
+			expr.v_objaddr           = csym.clv_data.s_var.v_objaddr;
+
+			/* TODO: Special handling for this_* globals! */
+			result = cexpr_pushexpr(&symtype,
+			                        &expr,
+			                        ctype_sizeof(symtype.ct_typ),
+			                        0);
+			ctyperef_fini(&symtype);
+		}
 	} else {
 		result = DBX_ENOENT;
 	}
-	csymbol_fini(&csym);
+	cmodsyminfo_istype(&csym);
 	return result;
 }
 
