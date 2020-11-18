@@ -129,13 +129,13 @@ typedef struct di_debuginfo_component_attrib_struct {
 } di_debuginfo_component_attrib_t;
 
 typedef struct di_debuginfo_component_struct {
-	__UINTPTR_HALF_TYPE__                  dic_tag;          /* Component tag (one of `DW_TAG_*'; e.g. `DW_TAG_compile_unit') */
-	__uint8_t                              dic_haschildren;  /* `DW_CHILDREN_yes' if follow-up on this entry is a child */
+	__UINTPTR_HALF_TYPE__                  dic_tag;         /* Component tag (one of `DW_TAG_*'; e.g. `DW_TAG_compile_unit') */
+	__uint8_t                              dic_haschildren; /* `DW_CHILDREN_yes' if follow-up on this entry is a child */
 #if __SIZEOF_POINTER__ >= 4
 	__uint8_t                            __dic_pad[(sizeof(void *) / 2) - 1]; /* ... */
 #endif /* __SIZEOF_POINTER__ >= 4 */
-	di_debuginfo_component_attrib_t const *dic_attrib_start; /* [1..1] Pointer to the list of (attr_name, attr_form) ULEB pairs of this entry */
-	di_debuginfo_component_attrib_t const *dic_attrib_end;   /* [1..1] End of attributes. */
+	di_debuginfo_component_attrib_t const *dic_attrib;      /* [1..1] Pointer to the list of (attr_name, attr_form) ULEB pairs
+	                                                         *        of this entry. This list is terminated by a pair (0, 0). */
 } di_debuginfo_component_t;
 
 typedef struct di_debuginfo_cu_parser_sections_struct {
@@ -156,8 +156,13 @@ typedef struct di_debuginfo_cu_parser_sections_struct {
 } di_debuginfo_cu_parser_sections_t;
 
 typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
-	__uintptr_t              ace_code; /* The abbreviation code (or 0 if this cache entry is unused) */
-	di_debuginfo_component_t ace_comp; /* The cached component. */
+	__uintptr_t     ace_code; /* The abbreviation code (or 0 if this cache entry is unused) */
+	__byte_t const *ace_data; /* [1..1][valid_if(ace_code)] Abbreviation code data.
+	                           * This pointer points into the .debug_info section and should be loaded as:
+	                           * >> byte_t const *reader = ace_data;
+	                           * >> component.dic_tag         = dwarf_decode_uleb128(&reader);
+	                           * >> component.dic_haschildren = *reader++;
+	                           * >> component.dic_attrib      = reader; */
 } di_debuginfo_cu_abbrev_cache_entry_t;
 
 #ifndef CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE
@@ -213,16 +218,15 @@ typedef struct di_debuginfo_location_struct {
  * >>     } while (debuginfo_cu_parser_next(&parser) == DEBUG_INFO_ERROR_SUCCESS);
  * >> }
  */
-#define DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self)                                          \
-	for (__byte_t const *_attr_reader = (__byte_t const *)(self)->dup_comp.dic_attrib_start; \
-	     /*          */ (_attr_reader < (__byte_t const *)(self)->dup_comp.dic_attrib_end && \
-	                     (self)->dup_cu_info_pos < (self)->dup_cu_info_end);                 \
-	     debuginfo_cu_parser_skipform(self, (attr).dica_form))                               \
-		if (((attr).dica_name = dwarf_decode_uleb128((__byte_t const **)&_attr_reader),      \
-		     (attr).dica_form = dwarf_decode_uleb128((__byte_t const **)&_attr_reader), 0))  \
-			;                                                                                \
-		else if (!(attr).dica_name && !(attr).dica_form)                                     \
-			break;                                                                           \
+#define DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self)                                         \
+	for (__byte_t const *_attr_reader = (__byte_t const *)(self)->dup_comp.dic_attrib;      \
+	     (self)->dup_cu_info_pos < (self)->dup_cu_info_end;                                 \
+	     debuginfo_cu_parser_skipform(self, (attr).dica_form))                              \
+		if (((attr).dica_name = dwarf_decode_uleb128((__byte_t const **)&_attr_reader),     \
+		     (attr).dica_form = dwarf_decode_uleb128((__byte_t const **)&_attr_reader), 0)) \
+			;                                                                               \
+		else if (!(attr).dica_name && !(attr).dica_form)                                    \
+			break;                                                                          \
 		else
 
 

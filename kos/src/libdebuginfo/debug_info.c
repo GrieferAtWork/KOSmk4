@@ -192,38 +192,69 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restr
 #endif /* !NDEBUG */
 }
 
-INTERN NONNULL((1, 2)) bool
-NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_do_lookup)(byte_t const *__restrict reader,
-                                                    byte_t const *__restrict abbrev_end,
-                                                    di_debuginfo_component_t *__restrict result,
-                                                    uintptr_t abbrev_code) {
+#if 0
+PRIVATE NONNULL((1, 2)) bool
+NOTHROW_NCX(CC abbrev_lookup)(byte_t const *__restrict reader,
+                              byte_t const *__restrict abbrev_end,
+                              di_debuginfo_component_t *__restrict result,
+                              uintptr_t abbrev_code) {
 	while (reader < abbrev_end) {
 		uintptr_t code, tag;
-		uint8_t has_children;
-		byte_t const *attrib_pointer;
 		uintptr_t attr_name, attr_form;
 		code = dwarf_decode_uleb128((byte_t const **)&reader);
 		if (!code)
 			break;
 		tag = dwarf_decode_uleb128((byte_t const **)&reader);
-		has_children = *(uint8_t const *)reader;
-		reader += 1;
-		attrib_pointer = reader;
+		if (code == abbrev_code) {
+			result->dic_tag         = (uintptr_half_t)tag;
+			result->dic_haschildren = *(uint8_t const *)reader;
+			result->dic_attrib      = (di_debuginfo_component_attrib_t const *)(reader + 1);
+			return true;
+		}
+		reader += 1; /* has_children */
 		while (reader < abbrev_end) {
+			/* Skip attributes of this tag. */
 			attr_name = dwarf_decode_uleb128((byte_t const **)&reader);
 			attr_form = dwarf_decode_uleb128((byte_t const **)&reader);
 			if (!attr_name && !attr_form)
 				break;
 		}
-		if (code == abbrev_code) {
-			result->dic_tag          = (uintptr_half_t)tag;
-			result->dic_haschildren  = has_children;
-			result->dic_attrib_start = (di_debuginfo_component_attrib_t const *)attrib_pointer;
-			result->dic_attrib_end   = (di_debuginfo_component_attrib_t const *)reader;
-			return true;
-		}
 	}
 	return false;
+}
+#endif
+
+PRIVATE WUNUSED NONNULL((1, 2)) byte_t const *
+NOTHROW_NCX(CC abbrev_findcache)(byte_t const *__restrict reader,
+                                 byte_t const *__restrict abbrev_end,
+                                 uintptr_t abbrev_code) {
+	while (reader < abbrev_end) {
+		uintptr_t code;
+		uintptr_t attr_name, attr_form;
+		code = dwarf_decode_uleb128((byte_t const **)&reader);
+		if (!code)
+			break;
+		if (code == abbrev_code)
+			return reader; /* Found it! */
+		dwarf_decode_uleb128((byte_t const **)&reader);
+		reader += 1; /* has_children */
+		while (reader < abbrev_end) {
+			/* Skip attributes of this tag. */
+			attr_name = dwarf_decode_uleb128((byte_t const **)&reader);
+			attr_form = dwarf_decode_uleb128((byte_t const **)&reader);
+			if (!attr_name && !attr_form)
+				break;
+		}
+	}
+	return NULL;
+}
+
+PRIVATE NONNULL((1, 2)) void
+NOTHROW_NCX(CC abbrev_loadcache)(byte_t const *__restrict ace_data,
+                                 di_debuginfo_component_t *__restrict result) {
+	result->dic_tag         = dwarf_decode_uleb128((byte_t const **)&ace_data);
+	result->dic_haschildren = *ace_data++;
+	result->dic_attrib      = (di_debuginfo_component_attrib_t const *)ace_data;
 }
 
 
@@ -233,12 +264,13 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
                                                  di_debuginfo_component_t *__restrict result,
                                                  uintptr_t abbrev_code) {
 #if 0
-	return libdi_debuginfo_cu_abbrev_do_lookup(self->dua_abbrev_start,
+	return abbrev_lookup(self->dua_abbrev_start,
 	                                           self->dua_abbrev_end,
 	                                           result, abbrev_code);
 #else
 	size_t i;
 	di_debuginfo_cu_abbrev_cache_entry_t *list;
+	byte_t const *cache_pointer;
 	list = self->dua_cache_list;
 	if (list == self->dua_stcache ||
 	    list == (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
@@ -247,8 +279,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 			--i;
 			if (self->dua_stcache[i].ace_code == abbrev_code) {
 				/* Found it! */
-				memcpy(result, &self->dua_stcache[i].ace_comp,
-				       sizeof(di_debuginfo_component_t));
+				abbrev_loadcache(self->dua_stcache[i].ace_data, result);
 				return true;
 			}
 		}
@@ -257,15 +288,16 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 			--i;
 			if (self->dua_stcache[i].ace_code == abbrev_code) {
 				/* Found it! */
-				memcpy(result, &self->dua_stcache[i].ace_comp,
-				       sizeof(di_debuginfo_component_t));
+				abbrev_loadcache(self->dua_stcache[i].ace_data, result);
 				return true;
 			}
 		}
-		if (!libdi_debuginfo_cu_abbrev_do_lookup(self->dua_abbrev_start,
-		                                         self->dua_abbrev_end,
-		                                         result, abbrev_code))
+		cache_pointer = abbrev_findcache(self->dua_abbrev_start,
+		                                 self->dua_abbrev_end,
+		                                 abbrev_code);
+		if (!cache_pointer)
 			return false;
+		abbrev_loadcache(cache_pointer, result);
 		if (self->dua_cache_next >= COMPILER_LENOF(self->dua_stcache)) {
 			if (self->dua_cache_size >= COMPILER_LENOF(self->dua_stcache)) {
 				if (list != (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
@@ -292,9 +324,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 			self->dua_cache_next = 0;
 		}
 		self->dua_stcache[self->dua_cache_next].ace_code = abbrev_code;
-		memcpy(&self->dua_stcache[self->dua_cache_next].ace_comp,
-		       result,
-		       sizeof(di_debuginfo_component_t));
+		self->dua_stcache[self->dua_cache_next].ace_data = cache_pointer;
 		++self->dua_cache_next;
 		if (self->dua_cache_size < self->dua_cache_next)
 			self->dua_cache_size = self->dua_cache_next;
@@ -304,8 +334,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 			--i;
 			if (list[i].ace_code == abbrev_code) {
 				/* Found it! */
-				memcpy(result, &list[i].ace_comp,
-				       sizeof(di_debuginfo_component_t));
+				abbrev_loadcache(list[i].ace_data, result);
 				return true;
 			}
 		}
@@ -314,8 +343,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 			--i;
 			if (list[i].ace_code == abbrev_code) {
 				/* Found it! */
-				memcpy(result, &list[i].ace_comp,
-				       sizeof(di_debuginfo_component_t));
+				abbrev_loadcache(list[i].ace_data, result);
 				return true;
 			}
 		}
@@ -346,15 +374,15 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 			self->dua_cache_next = 0;
 		}
 do_lookup_for_dynamic_cache:
-		if (!libdi_debuginfo_cu_abbrev_do_lookup(self->dua_abbrev_start,
-		                                         self->dua_abbrev_end,
-		                                         result, abbrev_code))
+		cache_pointer = abbrev_findcache(self->dua_abbrev_start,
+		                                 self->dua_abbrev_end,
+		                                 abbrev_code);
+		if (!cache_pointer)
 			return false;
+		abbrev_loadcache(cache_pointer, result);
 do_fill_dynamic_cache:
 		list[self->dua_cache_next].ace_code = abbrev_code;
-		memcpy(&list[self->dua_cache_next].ace_comp,
-		       result,
-		       sizeof(di_debuginfo_component_t));
+		list[self->dua_cache_next].ace_data = cache_pointer;
 		++self->dua_cache_next;
 	}
 	return true;
