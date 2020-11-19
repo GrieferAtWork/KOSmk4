@@ -435,6 +435,12 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 				new_result = (REF struct cmodule *)dbx_realloc(result, SIZEOF_CMODULE(cuc_alloc));
 				if unlikely(!new_result) {
 					cuc_alloc = cuc_used + 1;
+					/* FIXME: Because the DBX heap as implemented right now can only allocate
+					 *        heap blocks of a limited max-size, this right here ends up failing
+					 *        for very large programs.
+					 *  - It does work for the kernel core (barely)
+					 *  - But it fails when trying to load /bin/busybox (which just uses too many CUs...)
+					 */
 					new_result = (REF struct cmodule *)dbx_realloc(result, SIZEOF_CMODULE(cuc_alloc));
 					if unlikely(!new_result)
 						goto err_r; /* Out of memory... :( */

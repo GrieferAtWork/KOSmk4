@@ -1659,7 +1659,9 @@ again_after_comma:
 		} else {
 			size_t array_length;
 			void *data;
-			struct ctyperef array_type;
+			struct ctyperef new_array_type;
+			struct ctyperef lhs_elem_type;
+			struct ctype *lhs_operand_type;
 			REF struct ctype *array_pointer_type;
 			bool old_cexpr_typeonly;
 			old_cexpr_typeonly = cexpr_typeonly;
@@ -1701,28 +1703,36 @@ again_after_comma:
 			cexpr_typeonly = old_cexpr_typeonly;
 			if unlikely(result != DBX_EOK)
 				goto done;
-			memset(&array_type, 0, sizeof(array_type));
-			array_type.ct_flags = cexpr_stacktop.cv_type.ct_flags;
-			array_type.ct_typ   = ctype_array(&cexpr_stacktop.cv_type, array_length);
-			if unlikely(!array_type.ct_typ)
+			/* The left operand of the ,-operator must be a pointer or array. */
+			lhs_operand_type = cexpr_stacktop.cv_type.ct_typ;
+			if (CTYPE_KIND_ISARRAY(lhs_operand_type->ct_kind)) {
+				lhs_elem_type.ct_flags = cexpr_stacktop.cv_type.ct_flags;
+				lhs_elem_type.ct_typ   = lhs_operand_type->ct_array.ca_elem;
+				lhs_elem_type.ct_info  = lhs_operand_type->ct_array.ca_eleminfo;
+			} else if (CTYPE_KIND_ISPOINTER(lhs_operand_type->ct_kind)) {
+				memcpy(&lhs_elem_type,
+				       &lhs_operand_type->ct_pointer.cp_base,
+				       sizeof(struct ctyperef));
+			} else {
+				result = DBX_ESYNTAX;
+				goto done;
+			}
+			memset(&new_array_type, 0, sizeof(new_array_type));
+			new_array_type.ct_flags = lhs_elem_type.ct_flags;
+			new_array_type.ct_typ   = ctype_array(&lhs_elem_type, array_length);
+			if unlikely(!new_array_type.ct_typ)
 				goto err_nomem;
-			array_pointer_type = ctype_ptr(&array_type, dbg_current_sizeof_pointer());
-			decref(array_type.ct_typ);
+			array_pointer_type = ctype_ptr(&new_array_type, dbg_current_sizeof_pointer());
+			decref(new_array_type.ct_typ);
 			if unlikely(!array_pointer_type)
 				goto err_nomem;
-			/* And now do the actual ref+cast. */
-			if (CTYPE_KIND_ISARRAY(cexpr_stacktop.cv_type.ct_typ->ct_kind)) {
-				/* Promote arrays to base-pointers, rather than dereference them! */
-				result = cexpr_promote();
-			} else {
-				result = cexpr_ref();
-			}
-			if likely(result == DBX_EOK) {
-				result = cexpr_cast_simple(array_pointer_type);
-				if likely(result == DBX_EOK)
-					result = cexpr_deref();
-			}
+			/* And now do the actual cast. */
+			result = cexpr_cast_simple(array_pointer_type);
 			decref(array_pointer_type);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			/* And finally, deref the result. */
+			result = cexpr_deref();
 		} /* !ceval_comma_is_select2nd */
 	} /* if (self->c_tok == ',') */
 done:
