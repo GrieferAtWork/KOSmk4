@@ -373,11 +373,16 @@ struct cmodsyminfo {
 	union {
 		/* The following are selected based upon `clv_parser.dup_comp.dic_tag' */
 		struct {                                 /* Variable */
-			di_debuginfo_location_t v_framebase; /* Frame-base expression. (from the containing `DW_TAG_subprogram', if any) */
-			di_debuginfo_location_t v_location;  /* Location expression */
+			union {
+				struct {
+					di_debuginfo_location_t v_framebase; /* [valid_if(v_objaddr != _v_objdata)] Frame-base expression. (from the containing `DW_TAG_subprogram', if any) */
+					di_debuginfo_location_t v_location;  /* [valid_if(v_objaddr != _v_objdata)] Location expression */
+				};
+				byte_t _v_objdata[sizeof(di_debuginfo_location_t) * 2]; /* Inline buffer for object data. */
+			};
 			byte_t const           *v_typeinfo;  /* [0..1] Type information. */
 			void                   *v_objaddr;   /* [0..1] Object address. */
-		} s_var;                                 /* [DW_TAG_variable, DW_TAG_formal_parameter] Variable or parameter. */
+		} s_var;                                 /* [!cmodsyminfo_istype] Variable or parameter. */
 	} clv_data;
 };
 #define cmodsyminfo_istype(self) cmodsym_istype(&(self)->clv_symbol)

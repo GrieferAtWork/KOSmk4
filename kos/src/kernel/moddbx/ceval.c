@@ -500,6 +500,7 @@ struct autocomplete_symbols_data {
 	struct cparser    *self;
 	char const        *name;
 	size_t             namelen;
+	bool               allow_types;
 };
 
 PRIVATE WUNUSED NONNULL((1)) ssize_t
@@ -508,7 +509,9 @@ NOTHROW(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restrict info
 	struct autocomplete_symbols_data *cookie;
 	char const *symbol_name;
 	size_t symbol_namelen;
-	cookie         = container_of(info, struct autocomplete_symbols_data, info);
+	cookie = container_of(info, struct autocomplete_symbols_data, info);
+	if (!cookie->allow_types && cmodsyminfo_istype(info))
+		return 0; /* Skip types if we're not allowed to enumerate them. */
 	symbol_name    = info->clv_symbol.cms_name;
 	symbol_namelen = strlen(symbol_name);
 	cparser_autocomplete(cookie->self,
@@ -521,12 +524,14 @@ NOTHROW(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restrict info
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL autocomplete_symbols)(struct cparser *__restrict self,
                                     char const *__restrict name,
-                                    size_t namelen, unsigned int ns) {
+                                    size_t namelen, unsigned int ns,
+                                    bool allow_types) {
 	struct autocomplete_symbols_data data;
 	unsigned int scope;
-	data.self    = self;
-	data.name    = name;
-	data.namelen = namelen;
+	data.self        = self;
+	data.name        = name;
+	data.namelen     = namelen;
+	data.allow_types = allow_types;
 	scope = CMOD_SYMENUM_SCOPE_FNOGLOBAL | CMOD_SYMENUM_SCOPE_FNOFOREIGN;
 	for (;;) {
 		ssize_t count;
@@ -568,7 +573,7 @@ NOTHROW(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
 			}
 		}
 	}
-	autocomplete_symbols(self, name, namelen, CMODSYM_DIP_NS_NORMAL);
+	autocomplete_symbols(self, name, namelen, CMODSYM_DIP_NS_NORMAL, false);
 }
 
 
@@ -800,7 +805,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			kwd_len = cparser_toklen(self);
 			result  = cexpr_pushsymbol(kwd_str, kwd_len);
 			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
-				autocomplete_symbols(self, kwd_str, kwd_len, CMODSYM_DIP_NS_NORMAL);
+				autocomplete_symbols(self, kwd_str, kwd_len, CMODSYM_DIP_NS_NORMAL, false);
 			yield();
 			if (has_paren) {
 				if unlikely(result != DBX_EOK)
@@ -2129,7 +2134,7 @@ NOTHROW(FCALL autocomplete_types)(struct cparser *__restrict self,
 			}
 		}
 	}
-	autocomplete_symbols(self, name, namelen, ns);
+	autocomplete_symbols(self, name, namelen, ns, true);
 }
 
 
@@ -2200,7 +2205,7 @@ do_scan_keyword:
 		result = cmod_syminfo_local(&csym, kwd_str, kwd_len, ns);
 		if unlikely(result != DBX_EOK) {
 			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
-				autocomplete_symbols(self, kwd_str, kwd_len, ns);
+				autocomplete_symbols(self, kwd_str, kwd_len, ns, true);
 			goto err_nopresult;
 		}
 		/* Load the C-type from the symbol we've found. */
@@ -2211,6 +2216,7 @@ do_scan_keyword:
 		presult->ct_typ  = dw_type.ct_typ;  /* Inherit reference */
 		presult->ct_info = dw_type.ct_info; /* Inherit data */
 		presult->ct_flags |= dw_type.ct_flags;
+		yield();
 	} else if (KWD_CHECK(kwd_str, kwd_len, "int")) {
 		if unlikely(integer_type_flags & BASETYPE_FLAG_INT)
 			goto syn;
@@ -2395,6 +2401,7 @@ yield_and_scan_keyword:
 			presult->ct_typ  = dw_type.ct_typ;  /* Inherit reference */
 			presult->ct_info = dw_type.ct_info; /* Inherit data */
 			presult->ct_flags |= dw_type.ct_flags;
+			yield();
 		}
 	}
 done:

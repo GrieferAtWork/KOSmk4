@@ -367,6 +367,29 @@ PUBLIC size_t NOTHROW(FCALL cmodule_clearcache)(bool keep_loaded) {
 }
 
 
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(FCALL cmodule_reloc_units)(struct cmodule *new_addr,
+                                   struct cmodule *old_addr,
+                                   size_t cuc) {
+	size_t i;
+	if (new_addr == old_addr)
+		return;
+	/* When relocating a cmodule causes its base-address to change,
+	 * then we must fix-up the abbreviation cache list pointers of
+	 * already-initialized compilation units.
+	 * Otherwise, (if those pointers referenced the static abbreviation
+	 * cache), those points would still point to the old object position,
+	 * which is no longer valid, as the static cache will have been
+	 * moved as well. */
+	for (i = 0; i < cuc; ++i) {
+		struct cmodunit *new_cu, *old_cu;
+		new_cu = &new_addr->cm_cuv[i];
+		old_cu = &old_addr->cm_cuv[i];
+		if (new_cu->cu_abbrev.dua_cache_list == old_cu->cu_abbrev.dua_stcache)
+			new_cu->cu_abbrev.dua_cache_list = new_cu->cu_abbrev.dua_stcache;
+	}
+}
+
 
 PRIVATE WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
@@ -416,6 +439,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 					if unlikely(!new_result)
 						goto err_r; /* Out of memory... :( */
 				}
+				cmodule_reloc_units(new_result, result, cuc_used);
 				result = new_result;
 			}
 			cu = &result->cm_cuv[cuc_used];
@@ -520,8 +544,10 @@ done_cucs:
 		REF struct cmodule *new_result;
 		/* Release unused memory. */
 		new_result = (REF struct cmodule *)dbx_realloc(result, SIZEOF_CMODULE(cuc_used));
-		if likely(new_result)
+		if likely(new_result) {
+			cmodule_reloc_units(new_result, result, cuc_used);
 			result = new_result;
+		}
 	}
 	/* Fill in misc. fields of result. */
 	result->cm_refcnt = 1;
@@ -767,7 +793,7 @@ again:
 				case DW_AT_abstract_origin: {
 					byte_t const *abstract_origin;
 					/* Load data from the pointed-to location. */
-					if unlikely(!debuginfo_cu_parser_getref(self, attr.dica_form,
+					if unlikely(!debuginfo_cu_parser_getref(&inner_parser, attr.dica_form,
 					                                        &abstract_origin))
 						return;
 					if (dbg_awaituser()) /* Allow the user to break an infinite loop caused by bad debug-info... */
@@ -778,14 +804,14 @@ again:
 
 				case DW_AT_linkage_name:
 					if (!*plinkage_name) {
-						if unlikely(!debuginfo_cu_parser_getstring(self, attr.dica_form, plinkage_name))
+						if unlikely(!debuginfo_cu_parser_getstring(&inner_parser, attr.dica_form, plinkage_name))
 							*plinkage_name = NULL;
 					}
 					break;
 
 				case DW_AT_name:
 					if (!*pname) {
-						if unlikely(!debuginfo_cu_parser_getstring(self, attr.dica_form, pname))
+						if unlikely(!debuginfo_cu_parser_getstring(&inner_parser, attr.dica_form, pname))
 							*pname = NULL;
 					}
 					break;
@@ -1025,36 +1051,6 @@ NOTHROW(FCALL same_namespace)(uintptr_t dip_a, uintptr_t dip_b) {
 	return ns_a == ns_b;
 }
 
-#if 1
-#define VALIDATE_SYMTAB validate_symtab
-PRIVATE NONNULL((1)) void
-NOTHROW(FCALL validate_symtab)(struct cmodsymtab const *__restrict self) {
-	size_t i;
-	if (!self->mst_symc)
-		return;
-#if 1
-	for (i = 1; i < self->mst_symc; ++i)
-		assert(self->mst_symv[i].cms_name[0] != 0);
-#else
-	{
-		char const *prev_name, *next_name;
-		prev_name = self->mst_symv[0].cms_name;
-		for (i = 1; i < self->mst_symc; ++i) {
-			next_name = self->mst_symv[i].cms_name;
-			assertf(strcmp(prev_name, next_name) <= 0,
-			        "prev_name = %q\n"
-			        "next_name = %q\n",
-			        prev_name, next_name);
-			prev_name = next_name;
-		}
-	}
-#endif
-}
-#else
-#define VALIDATE_SYMTAB(self) (void)0
-#endif
-
-
 /* Insert a new symbol at the given index.
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory. */
@@ -1072,7 +1068,6 @@ NOTHROW(FCALL cmodsymtab_insert_symbol)(struct cmodsymtab *__restrict self,
 		size_t new_alloc = syma * 2;
 		if (new_alloc < self->mst_symc + 16)
 			new_alloc = self->mst_symc + 16;
-		validate_symtab(self);
 		new_symtab = (struct cmodsym *)dbx_realloc(self->mst_symv,
 		                                           new_alloc *
 		                                           sizeof(struct cmodsym));
@@ -1087,7 +1082,6 @@ NOTHROW(FCALL cmodsymtab_insert_symbol)(struct cmodsymtab *__restrict self,
 				return DBX_ENOMEM;
 		}
 		self->mst_symv = new_symtab;
-		validate_symtab(self);
 	}
 
 	/* Shift up all already-defined symbols. */
@@ -1102,7 +1096,6 @@ NOTHROW(FCALL cmodsymtab_insert_symbol)(struct cmodsymtab *__restrict self,
 
 	/* Account for the fact that a new symbol got added. */
 	++self->mst_symc;
-	validate_symtab(self);
 
 	/* Indicate success. */
 	return DBX_EOK;
@@ -1216,7 +1209,6 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 				 * Mark the global symbol as such, and add
 				 * the new symbol to the per-CU table. */
 				sym->cms_dip |= CMODSYM_DIP_NS_FCONFLICT;
-				validate_symtab(&self->cm_symbols);
 				/* Add the symbol to the per-CU table. */
 				return cmodsymtab_addsymbol(cu_symtab, name, symbol_dip);
 			}
@@ -1332,7 +1324,6 @@ done:
 	/* Write-back the per-CU symbol table. */
 	self->cu_symbols.mst_symc = percu_symbols.mst_symc;
 	self->cu_symbols.mst_symv = percu_symbols.mst_symv;
-	validate_symtab(&self->cu_symbols);
 	return DBX_EOK;
 err_interrupt:
 	result = DBX_EINTR;
@@ -1388,7 +1379,6 @@ NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self) {
 			if likely(new_symtab)
 				self->cm_symbols.mst_symv = new_symtab;
 		}
-		validate_symtab(&self->cm_symbols);
 	}
 	return result;
 }
@@ -1734,6 +1724,85 @@ NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
 
 
 
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(FCALL loadinfo_location)(di_debuginfo_cu_parser_t const *__restrict parser,
+                                 struct cmodsyminfo *__restrict info,
+                                 uintptr_t form) {
+	if unlikely(!debuginfo_cu_parser_getexpr(parser, form, &info->clv_data.s_var.v_location))
+		memset(&info->clv_data.s_var.v_location, 0, sizeof(info->clv_data.s_var.v_location));
+}
+
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(FCALL loadinfo_const_value)(di_debuginfo_cu_parser_t const *__restrict parser,
+                                    struct cmodsyminfo *__restrict info,
+                                    uintptr_t form) {
+	uintptr_t value;
+	di_debuginfo_block_t block;
+	if (debuginfo_cu_parser_getconst(parser, form, &value)) {
+		info->clv_data.s_var.v_objaddr = info->clv_data.s_var._v_objdata;
+		UNALIGNED_SET((uintptr_t *)info->clv_data.s_var._v_objdata, value);
+	} else if (debuginfo_cu_parser_getblock(parser, form, &block)) {
+		info->clv_data.s_var.v_objaddr = (void *)block.b_addr;
+	} else {
+		printk(KERN_WARNING "[dbx] Unable to decode form %" PRIxPTR " of DW_AT_const_value\n",
+		       form);
+	}
+}
+
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(FCALL loadinfo_type)(di_debuginfo_cu_parser_t const *__restrict parser,
+                             struct cmodsyminfo *__restrict info,
+                             uintptr_t form) {
+	if unlikely(!debuginfo_cu_parser_getref(parser, form, &info->clv_data.s_var.v_typeinfo))
+		info->clv_data.s_var.v_typeinfo = NULL;
+}
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void
+NOTHROW(FCALL loadinfo_specifications)(struct cmodsyminfo *__restrict info,
+                                       byte_t const *__restrict specification) {
+	di_debuginfo_cu_parser_t inner_parser;
+	di_debuginfo_component_attrib_t attr;
+	memcpy(&inner_parser, &info->clv_parser, sizeof(inner_parser));
+	inner_parser.dup_cu_info_pos = specification;
+again:
+	if (debuginfo_cu_parser_next(&inner_parser)) {
+		if (inner_parser.dup_comp.dic_tag == DW_TAG_variable ||
+		    inner_parser.dup_comp.dic_tag == DW_TAG_constant ||
+		    inner_parser.dup_comp.dic_tag == DW_TAG_enumerator) {
+			DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &inner_parser) {
+				switch (attr.dica_name) {
+
+				case DW_AT_abstract_origin: {
+					byte_t const *abstract_origin;
+					/* Load data from the pointed-to location. */
+					if unlikely(!debuginfo_cu_parser_getref(&inner_parser, attr.dica_form,
+					                                        &abstract_origin))
+						return;
+					if (dbg_awaituser()) /* Allow the user to break an infinite loop caused by bad debug-info... */
+						return;
+					inner_parser.dup_cu_info_pos = abstract_origin;
+					goto again;
+				}	break;
+
+				case DW_AT_type:
+					loadinfo_type(&inner_parser, info, attr.dica_form);
+					break;
+
+				case DW_AT_location:
+					loadinfo_location(&inner_parser, info, attr.dica_form);
+					break;
+
+				case DW_AT_const_value:
+					loadinfo_const_value(&inner_parser, info, attr.dica_form);
+					break;
+
+				default:
+					break;
+				}
+			}
+		}
+	}
+}
 
 /* To-be called from inside of `cmod_symenum_callback_t' when
  * `info_loaded == false', and extended symbol information is
@@ -1752,13 +1821,29 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 			return;
 		}
 	}
+
 	/* Load a parser for the symbol's DIP. */
 	cmodunit_parser_from_dip(info->clv_unit,
 	                         info->clv_mod,
 	                         &info->clv_parser,
 	                         NULL);
 
+	/* Load the nearest `DW_TAG_compile_unit' component. */
+	while (info->clv_parser.dup_comp.dic_tag != DW_TAG_compile_unit) {
+		debuginfo_cu_parser_skipattr(&info->clv_parser);
+		if (!debuginfo_cu_parser_next(&info->clv_parser)) {
+			memset(&info->clv_cu, 0, sizeof(info->clv_cu));
+			goto do_load_dip;
+		}
+	}
+
+	/* Load attributes for the associated CU */
+	if (!debuginfo_cu_parser_loadattr_compile_unit(&info->clv_parser,
+	                                               &info->clv_cu))
+		memset(&info->clv_cu, 0, sizeof(info->clv_cu));
+
 	/* Load symbol-specific debug information. */
+do_load_dip:
 	info->clv_parser.dup_cu_info_pos = cmodsyminfo_getdip(info);
 	if (!debuginfo_cu_parser_next(&info->clv_parser)) {
 		/* Fill in a stub/EOF component. */
@@ -1767,20 +1852,57 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 		info->clv_parser.dup_cu_info_pos = info->clv_parser.dup_cu_info_end;
 	}
 
-	switch (info->clv_parser.dup_comp.dic_tag) {
+	/* Load attributes of the pointed-to element to extract var-information. */
+	if (!cmodsyminfo_istype(info)){
+		di_debuginfo_component_attrib_t attr;
+again_attributes:
+		DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &info->clv_parser) {
+			switch (attr.dica_name) {
 
-	case DW_TAG_variable:
-	case DW_TAG_formal_parameter: {
-		/* Load attributes. */
-		di_debuginfo_variable_t attrib;
-		debuginfo_cu_parser_loadattr_variable(&info->clv_parser, &attrib);
-		info->clv_data.s_var.v_location = attrib.v_location;
-		info->clv_data.s_var.v_typeinfo = attrib.v_type;
-	}	break;
+			case DW_AT_abstract_origin: {
+				byte_t const *abstract_origin;
+				if unlikely(!debuginfo_cu_parser_getref(&info->clv_parser, attr.dica_form,
+				                                        &abstract_origin))
+					goto done_attributes;
+				info->clv_parser.dup_cu_info_pos = abstract_origin;
+				if unlikely(!debuginfo_cu_parser_next(&info->clv_parser))
+					goto done_attributes;
+				goto again_attributes;
+			}	break;
 
-	default:
-		break;
+			case DW_AT_location:
+				loadinfo_location(&info->clv_parser, info, attr.dica_form);
+				break;
+
+			case DW_AT_const_value:
+				loadinfo_const_value(&info->clv_parser, info, attr.dica_form);
+				break;
+
+			case DW_AT_type:
+				loadinfo_type(&info->clv_parser, info, attr.dica_form);
+				break;
+
+			case DW_AT_specification: {
+				byte_t const *spec;
+				if likely(debuginfo_cu_parser_getref(&info->clv_parser, attr.dica_form, &spec))
+					loadinfo_specifications(info, spec);
+			}	break;
+
+			case DW_AT_low_pc:
+			case DW_AT_entry_pc: {
+				uintptr_t addr;
+				if likely(debuginfo_cu_parser_getaddr(&info->clv_parser, attr.dica_form,
+				                                      &addr))
+					info->clv_data.s_var.v_objaddr = (void *)addr;
+			}	break;
+
+			default:
+				break;
+			}
+		}
 	}
+done_attributes:
+	;
 }
 
 /* Return non-zero if the name of the given `sym' starts with the given name. */
@@ -1791,13 +1913,14 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 
 /* Enumerate symbols from `self'. When a symbol is encountered that stands in
  * conflict with some other symbol, try to resolve the conflict by looking at
- * the secondary symbol table `info->clv_unit->cu_symbols'. If that table contains
+ * the secondary symbol table `fallback_cu->cu_symbols'. If that table contains
  * another symbol with the same name, then that symbol will be enumerated, instead. */
 PRIVATE NONNULL((1, 2, 3)) ssize_t
 NOTHROW(FCALL cmod_symenum_symtab)(struct cmodsymtab const *__restrict self,
                                    /*in|out(undef)*/ struct cmodsyminfo *__restrict info,
                                    cmod_symenum_callback_t cb, char const *startswith_name,
-                                   size_t startswith_namelen, uintptr_t ns) {
+                                   size_t startswith_namelen, uintptr_t ns,
+                                   struct cmodunit const *fallback_cu) {
 	ssize_t temp, result = 0;
 	size_t enum_lo, enum_hi;
 	size_t index;
@@ -1857,9 +1980,9 @@ NOTHROW(FCALL cmod_symenum_symtab)(struct cmodsymtab const *__restrict self,
 		/* Check if the symbol stands in conflict with something else. */
 		if (cmodsym_getns(sym) & CMODSYM_DIP_NS_FCONFLICT) {
 			/* If we've been given a custom CU, check if it contains another version of this symbol. */
-			if (info->clv_unit) {
+			if (fallback_cu) {
 				struct cmodsym *percu_sym;
-				percu_sym = cmodsymtab_lookup(&info->clv_unit->cu_symbols,
+				percu_sym = cmodsymtab_lookup(&fallback_cu->cu_symbols,
 				                              sym->cms_name,
 				                              strlen(sym->cms_name),
 				                              ns);
@@ -1873,7 +1996,8 @@ NOTHROW(FCALL cmod_symenum_symtab)(struct cmodsymtab const *__restrict self,
 		info->clv_symbol.cms_dip  = sym->cms_dip;
 
 		/* Actually do the enumeration. */
-		temp = (*cb)(info, false);
+		info->clv_unit = NULL; /* We don't know the actual unit at this point! */
+		temp           = (*cb)(info, false);
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
@@ -1889,7 +2013,8 @@ PRIVATE NONNULL((1, 2)) ssize_t
 NOTHROW(FCALL cmod_symenum_globals)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
                                     cmod_symenum_callback_t cb, char const *startswith_name,
                                     size_t startswith_namelen, uintptr_t ns,
-                                    bool *__restrict pdid_encounter_nomem) {
+                                    bool *__restrict pdid_encounter_nomem,
+                                    struct cmodunit const *fallback_cu) {
 	dbx_errno_t error;
 	ssize_t result;
 	/* Make sure that symbols for this module have been loaded. */
@@ -1907,7 +2032,8 @@ NOTHROW(FCALL cmod_symenum_globals)(/*in|out(undef)*/ struct cmodsyminfo *__rest
 	}
 	/* Enumerate symbols from the module's global symbol table. */
 	result = cmod_symenum_symtab(&info->clv_mod->cm_symbols, info, cb,
-	                             startswith_name, startswith_namelen, ns);
+	                             startswith_name, startswith_namelen,
+	                             ns, fallback_cu);
 	return result;
 }
 
@@ -1932,18 +2058,19 @@ NOTHROW(FCALL cmod_symenum_foreign_globals_cb)(void *cookie, struct cmodule *__r
 		/* Select the new module. */
 		xdecref(arg->info->clv_mod);
 		arg->info->clv_mod = incref(mod);
-		/* Indicate that we don't want to enumerate symbols from some specific CU,
-		 * but only those that are globally visible, and don't conflict with each
-		 * other. If this was non-NULL, the pointed-to CU would be used when trying
-		 * to resolve conflicting symbols. */
-		arg->info->clv_unit = NULL;
 		/* Enumerate symbols of this module. */
 		result = cmod_symenum_globals(arg->info,
 		                              arg->cb,
 		                              arg->startswith_name,
 		                              arg->startswith_namelen,
 		                              arg->ns,
-		                              &arg->did_encounter_nomem);
+		                              &arg->did_encounter_nomem,
+		                              /* Indicate that we don't want to enumerate symbols
+		                               * from some specific CU, but only those that are
+		                               * globally visible, and don't conflict with each other.
+		                               * If this was non-NULL, the pointed-to CU would be
+		                               * used when trying to resolve conflicting symbols. */
+		                              NULL);
 	}
 	return result;
 }
@@ -2183,7 +2310,8 @@ NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict inf
 			                            startswith_name,
 			                            startswith_namelen,
 			                            ns,
-			                            &did_encounter_nomem);
+			                            &did_encounter_nomem,
+			                            info->clv_unit);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;

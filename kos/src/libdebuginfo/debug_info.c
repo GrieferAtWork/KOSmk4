@@ -201,10 +201,10 @@ NOTHROW_NCX(CC abbrev_lookup)(byte_t const *__restrict reader,
 	while (reader < abbrev_end) {
 		uintptr_t code, tag;
 		uintptr_t attr_name, attr_form;
-		code = dwarf_decode_uleb128((byte_t const **)&reader);
+		code = dwarf_decode_uleb128(&reader);
 		if (!code)
 			break;
-		tag = dwarf_decode_uleb128((byte_t const **)&reader);
+		tag = dwarf_decode_uleb128(&reader);
 		if (code == abbrev_code) {
 			result->dic_tag         = (uintptr_half_t)tag;
 			result->dic_haschildren = *(uint8_t const *)reader;
@@ -214,8 +214,8 @@ NOTHROW_NCX(CC abbrev_lookup)(byte_t const *__restrict reader,
 		reader += 1; /* has_children */
 		while (reader < abbrev_end) {
 			/* Skip attributes of this tag. */
-			attr_name = dwarf_decode_uleb128((byte_t const **)&reader);
-			attr_form = dwarf_decode_uleb128((byte_t const **)&reader);
+			attr_name = dwarf_decode_uleb128(&reader);
+			attr_form = dwarf_decode_uleb128(&reader);
 			if (!attr_name && !attr_form)
 				break;
 		}
@@ -677,7 +677,8 @@ INTERN_CONST STRINGSECTION char const unknown_string[] = "??" "?";
  *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
- *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc */
+ *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
+ *  - debuginfo_cu_parser_getblock():  DW_FORM_block, DW_FORM_block1, DW_FORM_block2, DW_FORM_block4 */
 INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self,
                                                     uintptr_t form, char const**__restrict presult) {
@@ -721,7 +722,7 @@ decode_form:
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t const **)&reader);
+		form = dwarf_decode_uleb128(&reader);
 		goto decode_form;
 
 	default: break;
@@ -767,7 +768,7 @@ decode_form:
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t const **)&reader);
+		form = dwarf_decode_uleb128(&reader);
 		goto decode_form;
 
 	default: break;
@@ -819,13 +820,13 @@ decode_form:
 		return true;
 
 	case DW_FORM_udata: /* constant */
-		*presult = (uintptr_t)dwarf_decode_uleb128((byte_t const **)&reader);
+		*presult = (uintptr_t)dwarf_decode_uleb128(&reader);
 		return true;
 
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t const **)&reader);
+		form = dwarf_decode_uleb128(&reader);
 		goto decode_form;
 
 	default: break;
@@ -852,7 +853,7 @@ decode_form:
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t const **)&reader);
+		form = dwarf_decode_uleb128(&reader);
 		goto decode_form;
 
 	default: break;
@@ -903,13 +904,13 @@ decode_form:
 		break;
 
 	case DW_FORM_ref_udata:
-		offset = dwarf_decode_uleb128((byte_t const **)&reader);
+		offset = dwarf_decode_uleb128(&reader);
 		break;
 
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			ERROR(err);
-		form = dwarf_decode_uleb128((byte_t const **)&reader);
+		form = dwarf_decode_uleb128(&reader);
 		goto decode_form;
 
 	default:
@@ -970,7 +971,7 @@ decode_form:
 	case DW_FORM_indirect:
 		if unlikely(reader >= self->dup_cu_info_end)
 			break;
-		form = dwarf_decode_uleb128((byte_t const **)&reader);
+		form = dwarf_decode_uleb128(&reader);
 		goto decode_form;
 
 	default: break;
@@ -978,6 +979,63 @@ decode_form:
 err:
 	return false;
 }
+
+INTERN NONNULL((1, 3)) bool
+NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getblock)(di_debuginfo_cu_parser_t const *__restrict self,
+                                                   uintptr_t form,
+                                                   di_debuginfo_block_t *__restrict result) {
+	byte_t const *reader;
+	reader = self->dup_cu_info_pos;
+decode_form:
+	switch (form) {
+
+	case DW_FORM_block: {
+		uintptr_t length;
+		length = dwarf_decode_uleb128(&reader);
+		result->b_addr = reader;
+		result->b_size = length;
+		return true;
+	}	break;
+
+	case DW_FORM_block1: {
+		uint8_t length;
+		length = *(uint8_t const *)reader;
+		reader += 1;
+		result->b_addr = reader;
+		result->b_size = length;
+		return true;
+	}	break;
+
+	case DW_FORM_block2: {
+		uint16_t length;
+		length = UNALIGNED_GET16((uint16_t const *)reader);
+		reader += 2;
+		result->b_addr = reader;
+		result->b_size = length;
+		return true;
+	}	break;
+
+	case DW_FORM_block4: {
+		uint32_t length;
+		length = UNALIGNED_GET32((uint32_t const *)reader);
+		reader += 4;
+		result->b_addr = reader;
+		result->b_size = length;
+		return true;
+	}	break;
+
+	case DW_FORM_indirect:
+		if unlikely(reader >= self->dup_cu_info_end)
+			break;
+		form = dwarf_decode_uleb128(&reader);
+		goto decode_form;
+
+	default: break;
+	}
+err:
+	return false;
+}
+
 
 
 /* Load attributes specific to a certain component:
@@ -3214,6 +3272,7 @@ DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_getconst, libdi_debuginfo_cu_parser_getc
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_getflag, libdi_debuginfo_cu_parser_getflag);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_getref, libdi_debuginfo_cu_parser_getref);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_getexpr, libdi_debuginfo_cu_parser_getexpr);
+DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_getblock, libdi_debuginfo_cu_parser_getblock);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadattr_compile_unit, libdi_debuginfo_cu_parser_loadattr_compile_unit);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadattr_subprogram, libdi_debuginfo_cu_parser_loadattr_subprogram);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadattr_inlined_subroutine, libdi_debuginfo_cu_parser_loadattr_inlined_subroutine);

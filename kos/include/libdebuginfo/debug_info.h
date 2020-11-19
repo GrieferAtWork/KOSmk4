@@ -308,6 +308,11 @@ typedef __ATTR_NONNULL((1)) void (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_SKIPATTR
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_skipattr)(di_debuginfo_cu_parser_t *__restrict self);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
+typedef struct di_debuginfo_block_struct {
+	__byte_t const *b_addr; /* [0..b_size] Block base-pointer */
+	__size_t        b_size; /* Block length (in bytes) */
+} di_debuginfo_block_t;
+
 /* Load the current debug information as an attribute encoded as
  * `form' into a storage class matching the given result-operand.
  *  - debuginfo_cu_parser_getstring(): DW_FORM_strp, DW_FORM_string
@@ -315,20 +320,23 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void __NOTHROW_NCX(LIBDEBUGINFO_CC debugin
  *  - debuginfo_cu_parser_getconst():  DW_FORM_data1, DW_FORM_data2, DW_FORM_data4, DW_FORM_data8, DW_FORM_sdata, DW_FORM_udata, DW_FORM_sec_offset
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
- *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc */
-typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETSTRING)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, char const**__restrict presult);
+ *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc
+ *  - debuginfo_cu_parser_getblock():  DW_FORM_block, DW_FORM_block1, DW_FORM_block2, DW_FORM_block4 */
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETSTRING)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, char const **__restrict presult);
 typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETADDR)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
 typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETCONST)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
 typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETFLAG)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __BOOL *__restrict presult);
 typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETREF)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __byte_t const **__restrict presult);
 typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETEXPR)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_location_t *__restrict result);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_GETBLOCK)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_block_t *__restrict result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, char const**__restrict presult);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, char const **__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getaddr)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getconst)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __uintptr_t *__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getflag)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __BOOL *__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, __byte_t const **__restrict presult);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_location_t *__restrict result);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_getblock)(di_debuginfo_cu_parser_t const *__restrict self, __uintptr_t form, di_debuginfo_block_t *__restrict result);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 

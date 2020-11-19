@@ -186,6 +186,24 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			cu.cu_addr_base        = self->v_cu_addr_base;
 			pc                     = dbg_getpcreg(DBG_REGLEVEL_VIEW);
 			mod                    = self->v_module;
+			/* TODO: DWARF often uses simple expressions such as `DW_OP_addr', which
+			 *       are then resolved immediately to the address of the pointed-to
+			 *       object. However, in this implementation, we don't take advantage
+			 *       of something like this, which would allow us to completely bypass
+			 *       an intermediate buffer.
+			 * This optimization would be fairly simple to implement, as the actual
+			 * copy to the intermediate buffer is done by the line:
+			 * >> result = libuw_unwind_emulator_read_from_piece(&emulator,
+			 * inside of `libuw_debuginfo_location_getvalue()'
+			 *
+			 * Or even more generic, when pushing a CFI expression onto the c-expr
+			 * stack, simply check if all the program does is push an address, in
+			 * which case the push should be converted to use `CVALUE_KIND_ADDR'
+			 *
+			 * Also: There needs to be a function to extract the address (if any)
+			 *       from within a CFI expression, so we can implement stuff like
+			 *       taking the address of such variables. (in `cexpr_ref()')
+			 */
 			if (write) {
 				error = debuginfo_location_setvalue(&self->v_expr,
 				                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
@@ -2031,22 +2049,25 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
 		                      csym.clv_data.s_var.v_typeinfo,
 		                      &symtype);
 		if likely(result == DBX_EOK) {
-			struct cvalue_cfiexpr expr;
-			/* Fill in the expression for loading the symbol. */
-			expr.v_module            = csym.clv_mod;
-			expr.v_expr              = csym.clv_data.s_var.v_location;
-			expr.v_framebase         = csym.clv_data.s_var.v_framebase;
-			expr.v_cu_ranges_startpc = csym.clv_cu.cu_ranges.r_startpc;
-			expr.v_cu_addr_base      = csym.clv_cu.cu_addr_base;
-			expr.v_addrsize          = csym.clv_parser.dup_addrsize;
-			expr.v_ptrsize           = csym.clv_parser.dup_ptrsize;
-			expr.v_objaddr           = csym.clv_data.s_var.v_objaddr;
-
-			/* TODO: Special handling for this_* globals! */
-			result = cexpr_pushexpr(&symtype,
-			                        &expr,
-			                        ctype_sizeof(symtype.ct_typ),
-			                        0);
+			if (csym.clv_data.s_var.v_objaddr == csym.clv_data.s_var._v_objdata) {
+				result = cexpr_pushdata(&symtype, csym.clv_data.s_var.v_objaddr);
+			} else {
+				struct cvalue_cfiexpr expr;
+				/* Fill in the expression for loading the symbol. */
+				expr.v_module            = csym.clv_mod;
+				expr.v_expr              = csym.clv_data.s_var.v_location;
+				expr.v_framebase         = csym.clv_data.s_var.v_framebase;
+				expr.v_cu_ranges_startpc = csym.clv_cu.cu_ranges.r_startpc;
+				expr.v_cu_addr_base      = csym.clv_cu.cu_addr_base;
+				expr.v_addrsize          = csym.clv_parser.dup_addrsize;
+				expr.v_ptrsize           = csym.clv_parser.dup_ptrsize;
+				expr.v_objaddr           = csym.clv_data.s_var.v_objaddr;
+				/* TODO: Special handling for this_* globals! */
+				result = cexpr_pushexpr(&symtype,
+				                        &expr,
+				                        ctype_sizeof(symtype.ct_typ),
+				                        0);
+			}
 			ctyperef_fini(&symtype);
 		}
 	} else {
