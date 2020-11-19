@@ -693,6 +693,25 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
 
 
 
+/* Same as `ctype_fromdw()', but when `type_debug_info' is NULL, fill `*presult' with `ctype_void'. */
+PRIVATE WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
+NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
+                                struct cmodunit const *__restrict cunit,
+                                di_debuginfo_cu_parser_t const *__restrict cu_parser,
+                                byte_t const *type_debug_info,
+                                /*out*/ struct ctyperef *__restrict presult) {
+	dbx_errno_t result;
+	if (!type_debug_info) {
+		memset(presult, 0, sizeof(*presult));
+		presult->ct_typ = incref(&ctype_void);
+		result          = DBX_EOK;
+	} else {
+		result = ctype_fromdw(mod, cunit, cu_parser, type_debug_info, presult);
+	}
+	return result;
+}
+
+
 /* Load a C-type from a given `type_debug_info' which should be
  * loaded with the help of an internal copy made from `cu_parser'.
  * The given `type_debug_info' is a pointer like `di_debuginfo_member_t::m_type'
@@ -897,7 +916,7 @@ got_elem_count:
 	case DW_TAG_rvalue_reference_type: {
 		struct ctyperef pointed_to_type;
 		/* Parse the inner type. */
-		result = ctype_fromdw(mod, cunit, &parser, typinfo.t_type, &pointed_to_type);
+		result = ctype_fromdw_opt(mod, cunit, &parser, typinfo.t_type, &pointed_to_type);
 		if unlikely(result != DBX_EOK)
 			goto done;
 		presult->ct_flags = CTYPEREF_FLAG_NORMAL;
@@ -915,14 +934,9 @@ got_elem_count:
 		size_t argc;
 		uint16_t cc = CTYPE_KIND_FUNPROTO_CC_DEFAULT;
 		/* Load the function return type. */
-		if (!typinfo.t_type) {
-			memset(&return_type, 0, sizeof(return_type));
-			return_type.ct_typ = incref(&ctype_int);
-		} else {
-			result = ctype_fromdw(mod, cunit, &parser, typinfo.t_type, &return_type);
-			if unlikely(result != DBX_EOK)
-				goto done;
-		}
+		result = ctype_fromdw_opt(mod, cunit, &parser, typinfo.t_type, &return_type);
+		if unlikely(result != DBX_EOK)
+			goto done;
 		argv = NULL;
 		argc = 0;
 		if (debuginfo_cu_parser_nextchild(&parser)) {
@@ -999,10 +1013,7 @@ err_fuction_argv:
 		struct_type->ct_kind   = CTYPE_KIND_STRUCT;
 		if (parser.dup_comp.dic_tag == DW_TAG_union_type)
 			struct_type->ct_kind = CTYPE_KIND_UNION;
-		/* TODO: When the pointed-to struct type is anonymous, then
-		 *       look through other places if we can locate the actual
-		 *       implementation. */
-		struct_type->ct_children = NULL;
+		struct_type->ct_children              = NULL;
 		struct_type->ct_struct.ct_info.cd_mod = incref(mod);
 		struct_type->ct_struct.ct_info.cd_dip = parser.dup_cu_info_pos;
 		struct_type->ct_struct.ct_sizeof      = typinfo.t_sizeof;
