@@ -137,6 +137,8 @@ struct cmodsymtab {
 	struct cmodsym *mst_symv; /* [0..mst_symc][owned][lock(WRITE_ONCE)]
 	                           * Vector of symbols (lazily initialized). */
 };
+#define cmodsymtab_syma(self) (dbx_malloc_usable_size((self)->mst_symv) / sizeof(struct cmodsym))
+
 
 struct cmodunit {
 	/* CModule CompilationUnit */
@@ -271,8 +273,9 @@ NOTHROW(FCALL cmodule_current)(void);
  * In this case, the caller is allowed to continue as through that
  * the symbol they were looking for doesn't exist, or no symbols
  * exist at all.
- * @return: DBX_EOK:   Success.
- * @return: DBX_EINTR: Operation was interrupted. */
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOMEM: Insufficient memory.
+ * @return: DBX_EINTR:  Operation was interrupted. */
 FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
 

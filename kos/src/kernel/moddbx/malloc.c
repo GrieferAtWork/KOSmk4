@@ -382,7 +382,7 @@ NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes) {
 	/* Make sure that the given pointer/size pair is in-bounds and valid. */
 	if unlikely(!IS_ALIGNED(num_bytes, sizeof(void *)))
 		goto internal_error;
-	if unlikely(num_bytes <= sizeof(struct freerange)) {
+	if unlikely(num_bytes < sizeof(struct freerange)) {
 		if likely(!num_bytes)
 			goto done;
 		goto internal_error;

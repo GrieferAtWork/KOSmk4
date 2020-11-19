@@ -628,6 +628,7 @@ NOTHROW(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
 				result += temp;
 			}
 		} else {
+			/* TODO: Enumerate members from base-structures (in case of a c++-style derived type) */
 			debuginfo_cu_parser_skipattr(&parser);
 		}
 	} while (debuginfo_cu_parser_next(&parser) &&

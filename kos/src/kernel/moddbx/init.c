@@ -175,7 +175,18 @@ DBG_COMMAND_AUTO(eval,
 		cexpr_empty();
 		error = cexpr_pusheval(argv[1]);
 		if (error != DBX_EOK) {
-			dbg_printf("\terror: %d\n", error);
+			char const *message;
+			message = dbx_strerror(error);
+			dbg_savecolor();
+			dbg_print("\terror: ");
+			dbg_setcolor(ANSITTY_CL_MAROON, ANSITTY_CL_LIGHT_GRAY);
+			if (message) {
+				dbg_print(message);
+			} else {
+				dbg_printf("%d", error);
+			}
+			dbg_loadcolor();
+			dbg_putc('\n');
 		} else {
 			struct cprinter cp;
 			cp.cp_printer = &dbg_printer;

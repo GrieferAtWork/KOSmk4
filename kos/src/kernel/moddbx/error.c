@@ -17,37 +17,59 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODDBX_INCLUDE_ERROR_H
-#define GUARD_MODDBX_INCLUDE_ERROR_H 1
+#ifndef GUARD_MODDBX_INCLUDE_ERROR_C
+#define GUARD_MODDBX_INCLUDE_ERROR_C 1
+#define _KOS_SOURCE 1
 
 /* DeBug eXtensions. */
 
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-
 #ifdef CONFIG_HAVE_DEBUGGER
+
+#include "include/error.h"
+
+#include <stddef.h>
+#include <string.h>
+
 DECL_BEGIN
 
-#define DBX_EISERR(x) ((x) < 0) /* Check for error */
+PRIVATE char const error_messages[] =
+"Success\0"
+"Out of memory\0"
+"Syntax error\0"
+"Divide by zero\0"
+"No such object\0"
+"Read-only\0"
+"Internal error\0"
+"Segmentation fault\0"
+"Operation interrupted\0"
+;
 
-#define DBX_EOK      (0)  /* Success */
-#define DBX_ENOMEM   (-1) /* Out of memory */
-#define DBX_ESYNTAX  (-2) /* Syntax error */
-#define DBX_EDIVZERO (-3) /* Divide by zero */
-#define DBX_ENOENT   (-4) /* No such object */
-#define DBX_ERDONLY  (-5) /* Read-only */
-#define DBX_EINTERN  (-6) /* Internal error */
-#define DBX_EFAULT   (-7) /* Segmentation fault */
-#define DBX_EINTR    (-8) /* Operation interrupted (s.a. `dbg_awaituser()') */
-typedef int dbx_errno_t;
 
 /* Returns the message associated with a given `error'
  * The message is simply the text from the comments above. */
-FUNDEF ATTR_CONST WUNUSED char const *
-NOTHROW(FCALL dbx_strerror)(dbx_errno_t error);
+PUBLIC ATTR_CONST WUNUSED char const *
+NOTHROW(FCALL dbx_strerror)(dbx_errno_t error) {
+	char const *result = NULL;
+	if (error <= 0) {
+		error = -error;
+		result = error_messages;
+		while (error) {
+			if (!*result) {
+				result = NULL;
+				break;
+			}
+			result = strend(result) + 1;
+			--error;
+		}
+	}
+	return result;
+}
+
 
 DECL_END
 #endif /* CONFIG_HAVE_DEBUGGER */
 
-#endif /* !GUARD_MODDBX_INCLUDE_ERROR_H */
+#endif /* !GUARD_MODDBX_INCLUDE_ERROR_C */

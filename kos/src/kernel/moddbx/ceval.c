@@ -914,11 +914,13 @@ again:
 		}
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
-		result = cexpr_field(kwd_str, kwd_len);
+		result  = cexpr_field(kwd_str, kwd_len);
 		/* Autocomplete struct field names. */
 		if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
 			result = autocomplete_struct_fields(self, kwd_str, kwd_len);
 		yield();
+		if unlikely(result != DBX_EOK)
+			goto done;
 		goto again;
 	}	break;
 
@@ -935,6 +937,8 @@ again:
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_deref();
+		if unlikely(result != DBX_EOK)
+			goto done;
 		goto again;
 
 	case CTOKEN_TOK_PLUS_PLUS:
@@ -969,6 +973,8 @@ again:
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_pop();           /* (typeof(value))value */
+		if unlikely(result != DBX_EOK)
+			goto done;
 		goto again;
 	}	break;
 
@@ -989,6 +995,8 @@ again:
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_call(argc);
+		if unlikely(result != DBX_EOK)
+			goto done;
 		goto again;
 	}	break;
 
@@ -1057,7 +1065,8 @@ err_lhs_ptr_type:
 		result = cexpr_deref();                /* *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)&bar) */
 		if unlikely(result != DBX_EOK)
 			goto err_lhs_ptr_type;
-	}	goto again;
+		goto again;
+	}	break;
 
 	default:
 		result = DBX_EOK;

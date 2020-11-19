@@ -721,8 +721,25 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 					if (value.u < 255 || use_decimal_representation(decimal_repr, decimal_len)) {
 						DO((*P_PRINTER)(P_ARG, decimal_repr, decimal_len));
 					} else {
+						char buf[2 + CEILDIV(sizeof(intmax_t) * NBBY, 4)], *ptr;
+						size_t max_digits;
 print_integer_value_as_hex:
-						PRINTF("%#" PRIxMAX, value.u);
+						/* Figure out the max number of digits.
+						 * Without this, negative numbers would always be
+						 * printed with all digits that would be needed to
+						 * represent a uintmax_t with the most significant
+						 * bit set. */
+						max_digits = CEILDIV(CTYPE_KIND_SIZEOF(kind) * NBBY, 4);
+						/* Convert to hex */
+						ptr = COMPILER_ENDOF(buf);
+						while (value.u && max_digits) {
+							*--ptr = tohex(value.u & 0xf);
+							value.u >>= 4;
+							--max_digits;
+						}
+						*--ptr = 'x';
+						*--ptr = '0';
+						DO((*P_PRINTER)(P_ARG, ptr, (size_t)(COMPILER_ENDOF(buf) - ptr)));
 					}
 				}
 			} else {
