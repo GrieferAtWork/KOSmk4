@@ -204,21 +204,39 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			 *       from within a CFI expression, so we can implement stuff like
 			 *       taking the address of such variables. (in `cexpr_ref()')
 			 */
-			if (write) {
-				error = debuginfo_location_setvalue(&self->v_expr,
-				                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
-				                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
-				                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-				                                    pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
-				                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
-				                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
-			} else {
-				error = debuginfo_location_getvalue(&self->v_expr,
-				                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
-				                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-				                                    pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
-				                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
-				                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
+
+			/* Must execute these functions in the context of the VM associated with their module. */
+			{
+				pagedir_phys_t old_pdir;
+				struct vm *required_vm;
+				required_vm = cmodule_vm(mod);
+				old_pdir = pagedir_get();
+				if (old_pdir != required_vm->v_pdir_phys)
+					pagedir_set(required_vm->v_pdir_phys);
+				TRY {
+					if (write) {
+						error = debuginfo_location_setvalue(&self->v_expr,
+						                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
+						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
+						                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
+						                                    pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
+						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
+						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
+					} else {
+						error = debuginfo_location_getvalue(&self->v_expr,
+						                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
+						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
+						                                    pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
+						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
+						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
+					}
+				} EXCEPT {
+					if (old_pdir != required_vm->v_pdir_phys)
+						pagedir_set(old_pdir);
+					RETHROW();
+				}
+				if (old_pdir != required_vm->v_pdir_phys)
+					pagedir_set(old_pdir);
 			}
 		}
 	} EXCEPT {
@@ -743,6 +761,10 @@ again:
 	switch (top->cv_kind) {
 
 	case CVALUE_KIND_ADDR:
+		/* FIXME: This function can return NULL without it being an error!
+		 *        We really have to change its interface, and also enforce
+		 *        that the returned pointer must be accessed through
+		 *        dbg_(read|write)memory, rather than direct access! */
 		result = (byte_t *)top->cv_addr;
 		break;
 

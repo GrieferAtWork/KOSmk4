@@ -191,6 +191,7 @@ struct cmodule {
 #define cmodule_getloadaddr(self)  module_getloadaddr((self)->cm_module, (self)->cm_modtyp)
 #define cmodule_getloadstart(self) module_getloadstart((self)->cm_module, (self)->cm_modtyp)
 #define cmodule_getloadend(self)   module_getloadend((self)->cm_module, (self)->cm_modtyp)
+#define cmodule_vm(self)           module_vm((self)->cm_module, (self)->cm_modtyp)
 
 /* Destroy the given CModule. (called when its reference counter hits `0') */
 FUNDEF NONNULL((1)) void NOTHROW(FCALL cmodule_destroy)(struct cmodule *__restrict self);
