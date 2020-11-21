@@ -1096,6 +1096,20 @@ again_switch_kind:
 			goto again_switch_kind;
 		/* Just inherit the expression buffer. */
 		cvalue_cfiexpr_fini(&top->cv_expr.v_expr);
+		if (top->cv_expr.v_bufoff != 0) {
+			/* Deal with custom buffer-offsets. */
+			size_t datalen = ctype_sizeof(top->cv_type.ct_typ);
+			if (datalen <= sizeof(top->cv_idata)) {
+				memcpy(top->cv_idata, data, datalen);
+				dbx_free(top->cv_expr.v_buffer);
+				top->cv_kind = CVALUE_KIND_IDATA;
+				break;
+			}
+			memmovedown(top->cv_expr.v_buffer, data, datalen);
+			data = dbx_realloc(top->cv_expr.v_buffer, datalen);
+			if unlikely(!data)
+				data = top->cv_expr.v_buffer;
+		}
 		top->cv_kind = CVALUE_KIND_DATA;
 		top->cv_data = (byte_t *)data;
 	}	break;
