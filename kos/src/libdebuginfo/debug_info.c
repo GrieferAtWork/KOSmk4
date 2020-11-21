@@ -1032,7 +1032,7 @@ decode_form:
 
 	default: break;
 	}
-err:
+/*err:*/
 	return false;
 }
 

@@ -775,7 +775,6 @@ again:
 		                                          &def_module);
 		if (def && def != self->ct_struct.ct_info.cd_dip) {
 			/* Remember the new definition. */
-			self->ct_struct.ct_sizeof;
 			decref(self->ct_struct.ct_info.cd_mod);
 			self->ct_struct.ct_info.cd_mod = def_module;
 			self->ct_struct.ct_info.cd_dip = def;

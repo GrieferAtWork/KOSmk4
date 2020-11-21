@@ -33,7 +33,6 @@
 
 #include <hybrid/align.h>
 
-#include <sys/mmio.h>
 #include <sys/param.h>
 
 #include <ctype.h>
@@ -617,22 +616,60 @@ ctype_printcstring(struct cprinter const *__restrict printer,
 	end    = (byte_t const *)buf + len;
 	while (reader < end) {
 		char32_t ch;
-		char buf[UNICODE_UTF8_MAXLEN], *ptr;
+		char unicode_buf[UNICODE_UTF8_MAXLEN], *ptr;
 		switch (kind) {
-		default: /*            */ ch = unicode_readutf8_n((char **)&reader, (char *)end); break;
-		case CSTRING_KIND_CHAR16: ch = unicode_readutf16_n((char16_t **)&reader, (char16_t *)end); break;
-		case CSTRING_KIND_CHAR32: ch = unicode_readutf32_n((char32_t **)&reader, (char32_t *)end); break;
+
+		default: {
+			size_t buflen;
+			char *temp_reader;
+			buflen = (size_t)(end - reader);
+			if (buflen > sizeof(unicode_buf))
+				buflen = sizeof(unicode_buf);
+			if (dbg_readmemory(reader, unicode_buf, buflen) != 0)
+				goto err_segfault;
+			temp_reader = unicode_buf;
+			ch = unicode_readutf8_n((char **)&temp_reader, unicode_buf + buflen);
+			reader += (size_t)(temp_reader - unicode_buf);
+		}	break;
+
+		case CSTRING_KIND_CHAR16: {
+			size_t buflen;
+			char16_t temp_buf[2];
+			char16_t *temp_reader;
+			buflen = (size_t)((char16_t const *)end - (char16_t const *)reader);
+			if (buflen > 2)
+				buflen = 2;
+			if (dbg_readmemory(reader, temp_buf, buflen * sizeof(char16_t)) != 0)
+				goto err_segfault;
+			temp_reader = temp_buf;
+			ch = unicode_readutf16_n((char16_t **)&temp_reader, temp_buf + buflen);
+			reader += (size_t)((byte_t const *)temp_reader - (byte_t const *)temp_buf);
+		}	break;
+
+		case CSTRING_KIND_CHAR32:
+			if (dbg_readmemory(reader, &ch, sizeof(char32_t)) != 0)
+				goto err_segfault;
+			reader += 4;
+			break;
 		}
-		ptr = unicode_writeutf8(buf, ch);
+		ptr = unicode_writeutf8(unicode_buf, ch);
 		DO(format_escape(P_PRINTER, P_ARG,
-		                 buf, (size_t)(ptr - buf),
+		                 unicode_buf, (size_t)(ptr - unicode_buf),
 		                 FORMAT_ESCAPE_FPRINTRAW));
 	}
 	PRINT("\"");
 	FORMAT(DEBUGINFO_PRINT_FORMAT_STRING_SUFFIX);
+done:
 	return result;
 err:
 	return temp;
+err_segfault:
+	PRINT("\"");
+	FORMAT(DEBUGINFO_PRINT_FORMAT_STRING_SUFFIX);
+	FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
+	PRINT("<segfault>");
+	FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
+	goto done;
 }
 
 
@@ -836,6 +873,64 @@ err:
 	return temp;
 }
 
+PRIVATE bool
+NOTHROW(KCALL dbg_strlen)(void const *addr, size_t *__restrict presult) {
+	size_t result = 0;
+	char buf[17];
+	(COMPILER_ENDOF(buf)[-1]) = 0;
+	for (;;) {
+		size_t ok, temp;
+		ok   = sizeof(buf) - dbg_readmemory(addr, buf, sizeof(buf) - sizeof(char));
+		temp = strlen(buf);
+		result += temp;
+		if (temp < ok)
+			break;
+		if (ok < sizeof(buf) - sizeof(char))
+			return false;
+	}
+	*presult = result;
+	return true;
+}
+
+PRIVATE bool
+NOTHROW(KCALL dbg_strlen16)(void const *addr, size_t *__restrict presult) {
+	size_t result = 0;
+	u16 buf[17];
+	(COMPILER_ENDOF(buf)[-1]) = 0;
+	for (;;) {
+		size_t ok, temp;
+		ok   = sizeof(buf) - dbg_readmemory(addr, buf, sizeof(buf) - sizeof(u16));
+		temp = rawmemlenw(buf, 0);
+		result += temp;
+		if (temp < ok)
+			break;
+		if (ok < sizeof(buf) - sizeof(u16))
+			return false;
+	}
+	*presult = result;
+	return true;
+}
+
+PRIVATE bool
+NOTHROW(KCALL dbg_strlen32)(void const *addr, size_t *__restrict presult) {
+	size_t result = 0;
+	u32 buf[17];
+	(COMPILER_ENDOF(buf)[-1]) = 0;
+	for (;;) {
+		size_t ok, temp;
+		ok   = sizeof(buf) - dbg_readmemory(addr, buf, sizeof(buf) - sizeof(u32));
+		temp = rawmemlenl(buf, 0);
+		result += temp;
+		if (temp < ok)
+			break;
+		if (ok < sizeof(buf) - sizeof(u32))
+			return false;
+	}
+	*presult = result;
+	return true;
+}
+
+
 
 
 /* Print a human-readable representation of the contents of a given data-buffer,
@@ -876,514 +971,435 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 	ssize_t temp, result = 0;
 	struct ctype *me = self->ct_typ;
 	uintptr_half_t kind = me->ct_kind;
-	TRY {
-		switch (CTYPE_KIND_CLASSOF(kind)) {
+	switch (CTYPE_KIND_CLASSOF(kind)) {
 	
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_VOID):
-			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
-			PRINT("(");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
-			FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX);
-			PRINT("void");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_SUFFIX);
-			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
-			PRINT(")");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
-			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-			PRINT("0");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
-			break;
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_VOID):
+		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
+		PRINT("(");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
+		FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX);
+		PRINT("void");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_SUFFIX);
+		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
+		PRINT(")");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
+		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+		PRINT("0");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+		break;
 	
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL): {
-			bool is_nonzero = false;
-			size_t i;
-			for (i = 0; i < CTYPE_KIND_SIZEOF(kind); ++i) {
-				if (((byte_t *)buf)[i] != 0)
-					is_nonzero = true;
-			}
-			result = is_nonzero ? RAWPRINT("true")
-			                    : RAWPRINT("false");
-		}	break;
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL): {
+		bool is_nonzero = false;
+		size_t i;
+		for (i = 0; i < CTYPE_KIND_SIZEOF(kind); ++i) {
+			byte_t byte;
+			if unlikely(dbg_readmemory((byte_t const *)buf + i, &byte, 1) != 0)
+				goto err_segfault;
+			if (byte != 0)
+				is_nonzero = true;
+		}
+		result = is_nonzero ? RAWPRINT("true")
+		                    : RAWPRINT("false");
+	}	break;
 	
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
-			if ((CTYPE_KIND_SIZEOF(kind) <= sizeof(void *)) &&
-			    ((flags & (CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER | CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER)) !=
-			    /*     */ (CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER | CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER))) {
-				void *ptr;
-				memset(&ptr, 0, sizeof(ptr));
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
+		if ((CTYPE_KIND_SIZEOF(kind) <= sizeof(void *)) &&
+		    ((flags & (CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER | CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER)) !=
+		    /*     */ (CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER | CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER))) {
+			void *ptr;
+			memset(&ptr, 0, sizeof(ptr));
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-				memcpy(&ptr, buf, CTYPE_KIND_SIZEOF(kind));
+			if unlikely(dbg_readmemory(buf, &ptr, CTYPE_KIND_SIZEOF(kind)) != 0)
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-				memcpy((byte_t *)&ptr + sizeof(ptr) - CTYPE_KIND_SIZEOF(kind),
-				       buf, CTYPE_KIND_SIZEOF(kind));
+			if unlikely(dbg_readmemory(buf, (byte_t *)&ptr + sizeof(ptr) - CTYPE_KIND_SIZEOF(kind),
+			                           CTYPE_KIND_SIZEOF(kind)) != 0)
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
-				/* Check for special pointers. */
-				if (!(flags & CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER) && ptr == (void *)0) {
-					FORMAT(DEBUGINFO_PRINT_FORMAT_CONSTANT_PREFIX);
-					PRINT("NULL");
+			{
+				goto err_segfault;
+			}
+			/* Check for special pointers. */
+			if (!(flags & CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER) && ptr == (void *)0) {
+				FORMAT(DEBUGINFO_PRINT_FORMAT_CONSTANT_PREFIX);
+				PRINT("NULL");
+				FORMAT(DEBUGINFO_PRINT_FORMAT_CONSTANT_SUFFIX);
+				break;
+			}
+			/* Check if we may print this as a string. */
+			if (!(flags & CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER)) {
+				size_t buflen     = 0;
+				unsigned int kind = CSTRING_KIND_INVALID;
+				if (me->ct_pointer.cp_base.ct_typ == &ctype_char) {
+					if (dbg_strlen(ptr, &buflen))
+						kind = CSTRING_KIND_NORMAL;
+				} else if (me->ct_pointer.cp_base.ct_typ == &ctype_char16_t) {
+					if (dbg_strlen16(ptr, &buflen)) {
+						buflen *= 2;
+						kind = CSTRING_KIND_CHAR16;
+					}
+				} else if (me->ct_pointer.cp_base.ct_typ == &ctype_char32_t) {
+					if (dbg_strlen32(ptr, &buflen)) {
+						buflen *= 4;
+						kind = CSTRING_KIND_CHAR32;
+					}
+				}
+				if (kind != CSTRING_KIND_INVALID) {
+					DO(ctype_printcstring(printer, ptr, buflen, kind));
+					break;
+				}
+			}
+			if (!(flags & CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER)) {
+				/* Check if `ptr' is a text-/data-pointer. */
+				{
+					REF module_t *mod;
+					module_type_var(modtyp);
+					mod = module_ataddr(ptr, modtyp);
+					if (mod) {
+						/* TODO: Try to lookup the name/base-address of a symbol
+						 *       that contains the given `ptr' and is part of `mod' */
+						module_decref(mod, modtyp);
+					}
+				}
+				/* TODO: Check if `ptr' is apart of a file mapping. If it is,
+				 *       print the absolute path the mapped file, as well as
+				 *       the offset into the file, alongside the original pointer:
+				 *       `0x12345678 ("/path/to/file"+offset_into_file)' */
+	
+				/* TODO: Check if `ptr' points into kernel heap memory. If it
+				 *       is, then print it as `0x12345678 (heap)' */
+	
+				/* TODO: If nothing is mapped where `ptr' points to, then we
+				 *       should print it in a different color (iow: use a custom
+				 *       prefix/suffix pair for unmapped pointers)
+				 * That way, when debugging segmentation faults, it becomes easy
+				 * to stop faulty pointers. */
+			}
+		}
+		ATTR_FALLTHROUGH
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM): {
+		/* Enum or integer */
+		if (CTYPE_KIND_SIZEOF(kind) <= sizeof(intmax_t)) {
+			union {
+				intmax_t s;
+				uintmax_t u;
+			} value;
+			memset(&value, 0, sizeof(value));
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+			if unlikely(dbg_readmemory(buf, &value, CTYPE_KIND_SIZEOF(kind)) != 0)
+				goto err_segfault;
+			if (!CTYPE_KIND_INT_ISUNSIGNED(kind)) {
+				/* Check for sign-extension */
+				if (((byte_t *)&value.u)[CTYPE_KIND_SIZEOF(kind) - 1] & 0x80)
+					memset((byte_t *)&value + CTYPE_KIND_SIZEOF(kind), 0xff,
+					       sizeof(value) - CTYPE_KIND_SIZEOF(kind));
+			}
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+			if unlikely(dbg_readmemory(buf, (byte_t *)&value + sizeof(value) - CTYPE_KIND_SIZEOF(kind),
+			                           CTYPE_KIND_SIZEOF(kind)) != 0)
+				goto err_segfault;
+			if (!CTYPE_KIND_INT_ISUNSIGNED(kind)) {
+				/* Check for sign-extension */
+				if (((byte_t *)&value.u)[sizeof(value) - CTYPE_KIND_SIZEOF(kind)] & 0x80)
+					memset((byte_t *)&value, 0xff, sizeof(value) - CTYPE_KIND_SIZEOF(kind));
+			}
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+			if (CTYPE_KIND_ISENUM(kind)) {
+				dbx_errno_t error;
+				struct ctypeenumname name;
+				/* Try to lookup an enum constant name. */
+				error = ctype_enumname(me, &name, value.s);
+				if (error == DBX_EOK) {
+					temp = 0;
+					if (printer->cp_format) {
+						temp = (*printer->cp_format)(printer->cp_format_arg,
+						                             printer->cp_printer, printer->cp_arg,
+						                             DEBUGINFO_PRINT_FORMAT_CONSTANT_PREFIX);
+					}
+					if likely(temp >= 0) {
+						result += temp;
+						temp = (*P_PRINTER)(P_ARG, name.en_name, strlen(name.en_name));
+					}
+					ctypeenumname_fini(&name);
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
 					FORMAT(DEBUGINFO_PRINT_FORMAT_CONSTANT_SUFFIX);
 					break;
 				}
-				/* Check if we may print this as a string. */
-				if (!(flags & CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER)) {
-					size_t buflen     = 0;
-					unsigned int kind = CSTRING_KIND_INVALID;
-					TRY {
-						if (me->ct_pointer.cp_base.ct_typ == &ctype_char) {
-							buflen = strlen((char const *)ptr);
-							kind   = CSTRING_KIND_NORMAL;
-						} else if (me->ct_pointer.cp_base.ct_typ == &ctype_char16_t) {
-							buflen = rawmemlenw(ptr, 0) * 2;
-							kind   = CSTRING_KIND_CHAR16;
-						} else if (me->ct_pointer.cp_base.ct_typ == &ctype_char32_t) {
-							buflen = rawmemlenl(ptr, 0) * 4;
-							kind   = CSTRING_KIND_CHAR32;
-						}
-					} EXCEPT {
-					}
-					if (kind != CSTRING_KIND_INVALID) {
-						DO(ctype_printcstring(printer, ptr, buflen, kind));
-						break;
-					}
-				}
-				if (!(flags & CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER)) {
-					/* Check if `ptr' is a text-/data-pointer. */
-					{
-						REF module_t *mod;
-						module_type_var(modtyp);
-						mod = module_ataddr(ptr, modtyp);
-						if (mod) {
-							/* TODO: Try to lookup the name/base-address of a symbol
-							 *       that contains the given `ptr' and is part of `mod' */
-							module_decref(mod, modtyp);
-						}
-					}
-					/* TODO: Check if `ptr' is apart of a file mapping. If it is,
-					 *       print the absolute path the mapped file, as well as
-					 *       the offset into the file, alongside the original pointer:
-					 *       `0x12345678 ("/path/to/file"+offset_into_file)' */
-	
-					/* TODO: Check if `ptr' points into kernel heap memory. If it
-					 *       is, then print it as `0x12345678 (heap)' */
-	
-					/* TODO: If nothing is mapped where `ptr' points to, then we
-					 *       should print it in a different color (iow: use a custom
-					 *       prefix/suffix pair for unmapped pointers)
-					 * That way, when debugging segmentation faults, it becomes easy
-					 * to stop faulty pointers. */
-				}
 			}
-			ATTR_FALLTHROUGH
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM): {
-			/* Enum or integer */
-			if (CTYPE_KIND_SIZEOF(kind) <= sizeof(intmax_t)) {
-				union {
-					intmax_t s;
-					uintmax_t u;
-				} value;
-				memset(&value, 0, sizeof(value));
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-				memcpy(&value, buf, CTYPE_KIND_SIZEOF(kind));
-				if (!CTYPE_KIND_INT_ISUNSIGNED(kind)) {
-					/* Check for sign-extension */
-					if (((byte_t *)&value.u)[CTYPE_KIND_SIZEOF(kind) - 1] & 0x80)
-						memset((byte_t *)&value + CTYPE_KIND_SIZEOF(kind), 0xff,
-						       sizeof(value) - CTYPE_KIND_SIZEOF(kind));
-				}
-#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-				memcpy((byte_t *)&value + sizeof(value) - CTYPE_KIND_SIZEOF(kind),
-				       buf, CTYPE_KIND_SIZEOF(kind));
-				if (!CTYPE_KIND_INT_ISUNSIGNED(kind)) {
-					/* Check for sign-extension */
-					if (((byte_t *)&value.u)[sizeof(value) - CTYPE_KIND_SIZEOF(kind)] & 0x80)
-						memset((byte_t *)&value, 0xff, sizeof(value) - CTYPE_KIND_SIZEOF(kind));
-				}
-#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
-				if (CTYPE_KIND_ISENUM(kind)) {
-					dbx_errno_t error;
-					struct ctypeenumname name;
-					/* Try to lookup an enum constant name. */
-					error = ctype_enumname(me, &name, value.s);
-					if (error == DBX_EOK) {
-						temp = 0;
-						if (printer->cp_format) {
-							temp = (*printer->cp_format)(printer->cp_format_arg,
-							                             printer->cp_printer, printer->cp_arg,
-							                             DEBUGINFO_PRINT_FORMAT_CONSTANT_PREFIX);
-						}
-						if likely(temp >= 0) {
-							result += temp;
-							temp = (*P_PRINTER)(P_ARG, name.en_name, strlen(name.en_name));
-						}
-						ctypeenumname_fini(&name);
-						if unlikely(temp < 0)
-							goto err;
-						result += temp;
-						FORMAT(DEBUGINFO_PRINT_FORMAT_CONSTANT_SUFFIX);
-						break;
-					}
-				}
-				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-				if (flags & CTYPE_PRINTVALUE_FLAG_FORCEHEX)
-					goto print_integer_value_as_hex;
-				if (!CTYPE_KIND_ISINT(kind))
-					goto print_integer_value_as_hex; /* Always print pointers as HEX */
-				if (!CTYPE_KIND_ISENUM(kind) &&
-				    !CTYPE_KIND_INT_ISUNSIGNED(kind) &&
-				    value.s < 0) {
-					/* Always print negative numbers as decimals. */
-					PRINTF("%" PRIdMAX, value.s);
+			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+			if (flags & CTYPE_PRINTVALUE_FLAG_FORCEHEX)
+				goto print_integer_value_as_hex;
+			if (!CTYPE_KIND_ISINT(kind))
+				goto print_integer_value_as_hex; /* Always print pointers as HEX */
+			if (!CTYPE_KIND_ISENUM(kind) &&
+			    !CTYPE_KIND_INT_ISUNSIGNED(kind) &&
+			    value.s < 0) {
+				/* Always print negative numbers as decimals. */
+				PRINTF("%" PRIdMAX, value.s);
+			} else {
+				/* Fallback: Print an unsigned integer value, either as decimal, or as hex. */
+				size_t decimal_len;
+				char decimal_repr[CEILDIV(sizeof(value.u) * NBBY, 3) + 1];
+				decimal_len = sprintf(decimal_repr, "%" PRIdMAX, value.u);
+				if (value.u < 255 || use_decimal_representation(decimal_repr, decimal_len)) {
+					DO((*P_PRINTER)(P_ARG, decimal_repr, decimal_len));
 				} else {
-					/* Fallback: Print an unsigned integer value, either as decimal, or as hex. */
-					size_t decimal_len;
-					char decimal_repr[CEILDIV(sizeof(value.u) * NBBY, 3) + 1];
-					decimal_len = sprintf(decimal_repr, "%" PRIdMAX, value.u);
-					if (value.u < 255 || use_decimal_representation(decimal_repr, decimal_len)) {
-						DO((*P_PRINTER)(P_ARG, decimal_repr, decimal_len));
-					} else {
-						char buf[2 + CEILDIV(sizeof(intmax_t) * NBBY, 4)], *ptr;
-						size_t max_digits;
+					char hexbuf[2 + CEILDIV(sizeof(intmax_t) * NBBY, 4)], *ptr;
+					size_t max_digits;
 print_integer_value_as_hex:
-						/* Figure out the max number of digits.
-						 * Without this, negative numbers would always be
-						 * printed with all digits that would be needed to
-						 * represent a uintmax_t with the most significant
-						 * bit set. */
-						max_digits = CEILDIV(CTYPE_KIND_SIZEOF(kind) * NBBY, 4);
-						/* Convert to hex */
-						ptr = COMPILER_ENDOF(buf);
-						while (value.u && max_digits) {
-							*--ptr = tohex(value.u & 0xf);
-							value.u >>= 4;
-							--max_digits;
-						}
-						*--ptr = 'x';
-						*--ptr = '0';
-						DO((*P_PRINTER)(P_ARG, ptr, (size_t)(COMPILER_ENDOF(buf) - ptr)));
+					/* Figure out the max number of digits.
+					 * Without this, negative numbers would always be
+					 * printed with all digits that would be needed to
+					 * represent a uintmax_t with the most significant
+					 * bit set. */
+					max_digits = CEILDIV(CTYPE_KIND_SIZEOF(kind) * NBBY, 4);
+					/* Convert to hex */
+					ptr = COMPILER_ENDOF(hexbuf);
+					while (value.u && max_digits) {
+						*--ptr = tohex(value.u & 0xf);
+						value.u >>= 4;
+						--max_digits;
 					}
+					*--ptr = 'x';
+					*--ptr = '0';
+					DO((*P_PRINTER)(P_ARG, ptr, (size_t)(COMPILER_ENDOF(hexbuf) - ptr)));
 				}
-			} else {
-				/* Value too large to load directly. - Instead, write
-				 * out its contents in HEX, using the native byteorder. */
-				size_t i;
-				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-				PRINT("0x");
-				for (i = 0; i < CTYPE_KIND_SIZEOF(kind); ++i) {
-					char repr[2];
-					byte_t b;
+			}
+		} else {
+			/* Value too large to load directly. - Instead, write
+			 * out its contents in HEX, using the native byteorder. */
+			size_t i;
+			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+			PRINT("0x");
+			for (i = 0; i < CTYPE_KIND_SIZEOF(kind); ++i) {
+				char repr[2];
+				byte_t b;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-					b = ((byte_t *)buf)[CTYPE_KIND_SIZEOF(kind) - i];
+				if unlikely(dbg_readmemory((byte_t const *)buf + (CTYPE_KIND_SIZEOF(kind) - i), &b, 1) != 0)
+					goto err_segfault;
 #else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
-					b = ((byte_t *)buf)[i];
+				if unlikely(dbg_readmemory((byte_t const *)buf + i, &b, 1) != 0)
+					goto err_segfault;
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
-					repr[0] = tohex(b >> 4);
-					repr[1] = tohex(b & 0xf);
-					DO((*P_PRINTER)(P_ARG, repr, 2));
-				}
+				repr[0] = tohex(b >> 4);
+				repr[1] = tohex(b & 0xf);
+				DO((*P_PRINTER)(P_ARG, repr, 2));
 			}
-			if ((flags & CTYPE_PRINTVALUE_FLAG_INTSUFFIX) &&
-			    CTYPE_KIND_ISINT(kind)) {
-				/* Print the proper integer type suffix. */
-				char const *suffix = NULL;
-				if (me == &ctype_unsigned_int) {
-					suffix = "u";
-				} else if (me == &ctype_long) {
-					suffix = "l";
-				} else if (me == &ctype_unsigned_long) {
-					suffix = "ul";
-				} else if (me == &ctype_long_long) {
-					suffix = "ll";
-				} else if (me == &ctype_unsigned_long_long) {
-					suffix = "ull";
-				} else if (CTYPE_KIND_SIZEOF(kind) > sizeof(int)) {
-					/* Generic, fixed-width integer type suffix. */
-					PRINTF("i%s%" PRIuSIZ,
-					       !CTYPE_KIND_ISENUM(kind) &&
-					       CTYPE_KIND_INT_ISUNSIGNED(kind)
-					       ? "u"
-					       : "",
-					       (size_t)CTYPE_KIND_SIZEOF(kind) * NBBY);
-				}
-				if (suffix)
-					DO((*P_PRINTER)(P_ARG, suffix, strlen(suffix)));
+		}
+		if ((flags & CTYPE_PRINTVALUE_FLAG_INTSUFFIX) &&
+		    CTYPE_KIND_ISINT(kind)) {
+			/* Print the proper integer type suffix. */
+			char const *suffix = NULL;
+			if (me == &ctype_unsigned_int) {
+				suffix = "u";
+			} else if (me == &ctype_long) {
+				suffix = "l";
+			} else if (me == &ctype_unsigned_long) {
+				suffix = "ul";
+			} else if (me == &ctype_long_long) {
+				suffix = "ll";
+			} else if (me == &ctype_unsigned_long_long) {
+				suffix = "ull";
+			} else if (CTYPE_KIND_SIZEOF(kind) > sizeof(int)) {
+				/* Generic, fixed-width integer type suffix. */
+				PRINTF("i%s%" PRIuSIZ,
+				       !CTYPE_KIND_ISENUM(kind) &&
+				       CTYPE_KIND_INT_ISUNSIGNED(kind)
+				       ? "u"
+				       : "",
+				       (size_t)CTYPE_KIND_SIZEOF(kind) * NBBY);
 			}
-			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
-		}	break;
+			if (suffix)
+				DO((*P_PRINTER)(P_ARG, suffix, strlen(suffix)));
+		}
+		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+	}	break;
 
-		case CTYPE_KIND_STRUCT: {
-			bool do_multiline;
-			union {
-				struct ctype_printstruct_ismultiline_data im;
-				struct ctype_printstruct_data ps;
-			} data;
-			unsigned int inner_flags;
-			inner_flags = flags;
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
-			PRINT("{");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
-			++firstline_indent; /* Account for the leading '{' */
-			if (flags & CTYPE_PRINTVALUE_FLAG_NORECURSION)
-				goto do_print_no_recursion_dots_and_rbrace;
-			/* First pass: Figure out if we want multi-line mode. */
-			if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
-				do_multiline = false;
-			} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
-				/* Check if the struct has 0 fields. It this is the
-				 * case, then don't print anything and continue with
-				 * the closing '}' */
-				if (ctype_struct_enumfields(me, &ctype_struct_is_nonempty_callback, &data.im) == 0)
-					goto done_struct;
-				do_multiline = true;
-			} else {
-				data.im.buf              = buf;
-				data.im.flags            = flags;
-				data.im.inner_flags      = inner_flags;
-				data.im.firstline_indent = firstline_indent;
-				data.im.newline_indent   = newline_indent;
-				data.im.newline_tab      = newline_tab;
-				data.im.maxlinelen       = maxlinelen;
-				data.im.out_field_count  = 0;
-				data.im.out_contains_lf  = false;
-				/* Enumerate field for the initial pass. */
-				ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
-				if (!data.im.out_field_count)
-					goto done_struct; /* Empty struct... */
-				do_multiline = data.im.out_contains_lf;
-				if (!do_multiline) {
-					/* Check if the output fits into a single line. */
-					if (data.im.firstline_indent > data.im.maxlinelen) {
-						/* Nope... */
-						do_multiline = true;
-						/* Check if we're allowed to omit the names of fields, and
-						 * if doing so  */
-						if (data.im.out_field_count <= 2 &&
-						    !(flags & (CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS |
-						               CTYPE_PRINTVALUE_FLAG_NOOMITSHORTFIELDS))) {
-							/* Nope. But we're allowed to omit field names, so try to
-							 *       do that in order to fit everything onto a single
-							 *       line. */
-							data.im.flags = flags | CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
-							data.im.firstline_indent = firstline_indent;
-							data.im.out_field_count  = 0;
-							data.im.out_contains_lf  = false;
-							ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
-							if (!data.im.out_contains_lf && data.im.firstline_indent <= maxlinelen) {
-								/* Omit struct field names to save on space, which in
-								 * turn allows us to keep everything on a single line. */
-								inner_flags |= CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
-								do_multiline = false;
-							}
+	case CTYPE_KIND_STRUCT: {
+		bool do_multiline;
+		union {
+			struct ctype_printstruct_ismultiline_data im;
+			struct ctype_printstruct_data ps;
+		} data;
+		unsigned int inner_flags;
+		inner_flags = flags;
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+		PRINT("{");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+		++firstline_indent; /* Account for the leading '{' */
+		if (flags & CTYPE_PRINTVALUE_FLAG_NORECURSION)
+			goto do_print_no_recursion_dots_and_rbrace;
+		/* First pass: Figure out if we want multi-line mode. */
+		if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
+			do_multiline = false;
+		} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
+			/* Check if the struct has 0 fields. It this is the
+			 * case, then don't print anything and continue with
+			 * the closing '}' */
+			if (ctype_struct_enumfields(me, &ctype_struct_is_nonempty_callback, &data.im) == 0)
+				goto done_struct;
+			do_multiline = true;
+		} else {
+			data.im.buf              = buf;
+			data.im.flags            = flags;
+			data.im.inner_flags      = inner_flags;
+			data.im.firstline_indent = firstline_indent;
+			data.im.newline_indent   = newline_indent;
+			data.im.newline_tab      = newline_tab;
+			data.im.maxlinelen       = maxlinelen;
+			data.im.out_field_count  = 0;
+			data.im.out_contains_lf  = false;
+			/* Enumerate field for the initial pass. */
+			ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
+			if (!data.im.out_field_count)
+				goto done_struct; /* Empty struct... */
+			do_multiline = data.im.out_contains_lf;
+			if (!do_multiline) {
+				/* Check if the output fits into a single line. */
+				if (data.im.firstline_indent > data.im.maxlinelen) {
+					/* Nope... */
+					do_multiline = true;
+					/* Check if we're allowed to omit the names of fields, and
+					 * if doing so  */
+					if (data.im.out_field_count <= 2 &&
+					    !(flags & (CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS |
+					               CTYPE_PRINTVALUE_FLAG_NOOMITSHORTFIELDS))) {
+						/* Nope. But we're allowed to omit field names, so try to
+						 *       do that in order to fit everything onto a single
+						 *       line. */
+						data.im.flags = flags | CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
+						data.im.firstline_indent = firstline_indent;
+						data.im.out_field_count  = 0;
+						data.im.out_contains_lf  = false;
+						ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
+						if (!data.im.out_contains_lf && data.im.firstline_indent <= maxlinelen) {
+							/* Omit struct field names to save on space, which in
+							 * turn allows us to keep everything on a single line. */
+							inner_flags |= CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
+							do_multiline = false;
 						}
 					}
 				}
 			}
-			if (do_multiline) {
-				PRINT("\n");
-				newline_indent += newline_tab;
-				REPEAT(' ', newline_indent); /* Print leading spaces. */
-				firstline_indent = newline_indent;
-			}
-			/* Actually print the struct proper. */
-			data.ps.printer          = printer;
-			data.ps.buf              = buf;
-			data.ps.flags            = flags;
-			data.ps.inner_flags      = inner_flags;
-			data.ps.firstline_indent = firstline_indent;
-			data.ps.newline_indent   = newline_indent;
-			data.ps.newline_tab      = newline_tab;
-			data.ps.maxlinelen       = maxlinelen;
-			data.ps.out_field_count  = 0;
-			data.ps.do_multiline     = do_multiline;
-			DO(ctype_struct_enumfields(me, &ctype_printstruct_callback, &data.ps));
-			if (do_multiline) {
-				PRINT("\n");
-				newline_indent -= newline_tab;
-				REPEAT(' ', newline_indent); /* Print leading spaces. */
-				/*firstline_indent = newline_indent;*/
-			}
+		}
+		if (do_multiline) {
+			PRINT("\n");
+			newline_indent += newline_tab;
+			REPEAT(' ', newline_indent); /* Print leading spaces. */
+			firstline_indent = newline_indent;
+		}
+		/* Actually print the struct proper. */
+		data.ps.printer          = printer;
+		data.ps.buf              = buf;
+		data.ps.flags            = flags;
+		data.ps.inner_flags      = inner_flags;
+		data.ps.firstline_indent = firstline_indent;
+		data.ps.newline_indent   = newline_indent;
+		data.ps.newline_tab      = newline_tab;
+		data.ps.maxlinelen       = maxlinelen;
+		data.ps.out_field_count  = 0;
+		data.ps.do_multiline     = do_multiline;
+		DO(ctype_struct_enumfields(me, &ctype_printstruct_callback, &data.ps));
+		if (do_multiline) {
+			PRINT("\n");
+			newline_indent -= newline_tab;
+			REPEAT(' ', newline_indent); /* Print leading spaces. */
+			/*firstline_indent = newline_indent;*/
+		}
 done_struct:
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
-			PRINT("}");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
-		}	break;
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+		PRINT("}");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+	}	break;
 
-		case CTYPE_KIND_ARRAY: {
-			size_t used_length, elem_size;
-			unsigned int string_kind;
-			used_length = me->ct_array.ca_count;
-			string_kind = CSTRING_KIND_INVALID;
-			/* Check if we can print this array as a string. */
-			if (me->ct_array.ca_elem == &ctype_char) {
-				/* Automatically derive length of a VLA */
-				if (!used_length)
-					used_length = strlen((char const *)buf);
-				string_kind = CSTRING_KIND_NORMAL;
-			} else if (me->ct_array.ca_elem == &ctype_char16_t) {
-				if (!used_length)
-					used_length = rawmemlenw(buf, 0);
-				string_kind = CSTRING_KIND_CHAR16;
-			} else if (me->ct_array.ca_elem == &ctype_char32_t) {
-				if (!used_length)
-					used_length = rawmemlenl(buf, 0);
-				string_kind = CSTRING_KIND_CHAR32;
+	case CTYPE_KIND_ARRAY: {
+		size_t used_length, elem_size;
+		unsigned int string_kind;
+		used_length = me->ct_array.ca_count;
+		string_kind = CSTRING_KIND_INVALID;
+		/* Check if we can print this array as a string. */
+		if (me->ct_array.ca_elem == &ctype_char) {
+			/* Automatically derive length of a VLA */
+			if (!used_length && !dbg_strlen(buf, &used_length))
+				goto err_segfault;
+			string_kind = CSTRING_KIND_NORMAL;
+		} else if (me->ct_array.ca_elem == &ctype_char16_t) {
+			if (!used_length && !dbg_strlen16(buf, &used_length))
+				goto err_segfault;
+			string_kind = CSTRING_KIND_CHAR16;
+		} else if (me->ct_array.ca_elem == &ctype_char32_t) {
+			if (!used_length && !dbg_strlen32(buf, &used_length))
+				goto err_segfault;
+			string_kind = CSTRING_KIND_CHAR32;
+		}
+		if (used_length) {
+			/* Make sure that memory from `buf' doesn't fault. */
+			byte_t b;
+			if (dbg_readmemory(buf, &b, 1) != 0)
+				goto err_segfault;
+		}
+		if (string_kind != CSTRING_KIND_INVALID) {
+			size_t buflen = used_length;
+			if (string_kind == CSTRING_KIND_CHAR32)
+				buflen *= 4;
+			else if (string_kind == CSTRING_KIND_CHAR16) {
+				buflen *= 2;
 			}
-			if (used_length)
-				peekb(buf); /* Make sure that memory from `buf' doesn't fault. */
-			if (string_kind != CSTRING_KIND_INVALID) {
-				size_t buflen = used_length;
-				if (string_kind == CSTRING_KIND_CHAR32)
-					buflen *= 4;
-				else if (string_kind == CSTRING_KIND_CHAR16) {
-					buflen *= 2;
-				}
-				/* Print as a string. */
-				DO(ctype_printcstring(printer, buf, buflen, string_kind));
-				break;
-			}
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
-			PRINT("{");
-			elem_size = ctype_sizeof(me->ct_array.ca_elem);
-			if (!used_length || !elem_size) {
-				/* Empty array... */
-			} else {
-				FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
-				if (flags & CTYPE_PRINTVALUE_FLAG_NORECURSION) {
+			/* Print as a string. */
+			DO(ctype_printcstring(printer, buf, buflen, string_kind));
+			break;
+		}
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+		PRINT("{");
+		elem_size = ctype_sizeof(me->ct_array.ca_elem);
+		if (!used_length || !elem_size) {
+			/* Empty array... */
+		} else {
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+			if (flags & CTYPE_PRINTVALUE_FLAG_NORECURSION) {
 do_print_no_recursion_dots_and_rbrace:
-					FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_PREFIX);
-					PRINT("...");
-					FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX);
-				} else {
-					size_t i;
-					bool do_multiline;
-					struct ctyperef elem_type;
-					firstline_indent += 1; /* Account for the leading '{' */
-					memset(&elem_type, 0, sizeof(elem_type));
-					elem_type.ct_flags = self->ct_flags;
-					elem_type.ct_typ   = me->ct_array.ca_elem;
-					elem_type.ct_info  = me->ct_array.ca_eleminfo;
-					if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
-						do_multiline = false;
-					} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
-						do_multiline = true;
-					} else if (used_length <= 1) {
-						/* No point; would just waste space! */
-						do_multiline = false;
-					} else {
-						size_t peek_indent;
-						peek_indent  = firstline_indent;
-						do_multiline = false;
-						/* Automatically determine if we need multi-line. */
-						for (i = 0; i < used_length; ++i) {
-							byte_t const *elem_addr;
-							elem_addr = (byte_t const *)buf + i * elem_size;
-							peek_indent = ctype_printvalue_nextindent(&elem_type, elem_addr,
-							                                          flags, peek_indent,
-							                                          newline_indent, newline_tab,
-							                                          maxlinelen, &do_multiline,
-							                                          true);
-							if (do_multiline)
-								break;
-							peek_indent += 1; /* ',' or '}' */
-							if (i < used_length - 1)
-								peek_indent += 1; /* Space after ',' */
-							if (peek_indent > maxlinelen) {
-								do_multiline = true;
-								break;
-							}
-						}
-					}
-					if (do_multiline) {
-						PRINT("\n");
-						newline_indent += newline_tab;
-						REPEAT(' ', newline_indent); /* Print leading spaces. */
-						firstline_indent = newline_indent;
-					}
-					for (i = 0; i < used_length; ++i) {
-						byte_t const *elem_addr;
-						size_t elem_indent = firstline_indent;
-						elem_addr = (byte_t const *)buf + i * elem_size;
-						if (i != 0)
-							++elem_indent; /* For the leading space */
-						if (do_multiline) {
-							bool contains_newline;
-							/* Check if we must insert a new-line before this element. */
-							contains_newline = false;
-							firstline_indent = ctype_printvalue_nextindent(&elem_type, elem_addr,
-							                                               flags, elem_indent,
-							                                               newline_indent, newline_tab,
-							                                               maxlinelen, &contains_newline,
-							                                               false);
-							if (i < used_length - 1)
-								firstline_indent += 1; /* For the trailing comma */
-							if (i == 0) {
-								/* Never print an additional linefeed before the first element. */
-							} else if (!contains_newline && firstline_indent <= maxlinelen) {
-								PRINT(" "); /* Add a space after the comma of the previous element. */
-							} else {
-								/* Insert a line-feed before the element. */
-								PRINT("\n");
-								REPEAT(' ', newline_indent); /* Print leading spaces. */
-								elem_indent = newline_indent;
-								goto do_calculate_next_indent;
-							}
-						} else {
-							if (i != 0)
-								PRINT(" "); /* Add a space after the comma of the previous element. */
-do_calculate_next_indent:
-							firstline_indent = ctype_printvalue_nextindent(&elem_type, elem_addr,
-							                                               flags, elem_indent,
-							                                               newline_indent, newline_tab,
-							                                               maxlinelen, NULL, false);
-						}
-						/* Recursively print the array element. */
-						DO(ctype_printvalue(&elem_type, printer, elem_addr,
-						                    flags, elem_indent,
-						                    newline_indent, newline_tab,
-						                    maxlinelen));
-						if (i < used_length - 1) {
-							FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_PREFIX);
-							PRINT(",");
-							FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_SUFFIX);
-						}
-					}
-					if (do_multiline) {
-						PRINT("\n");
-						newline_indent -= newline_tab;
-						REPEAT(' ', newline_indent); /* Print leading spaces. */
-						/*firstline_indent = newline_indent;*/
-					}
-				}
-				FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
-			}
-			PRINT("}");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
-		}	break;
-
-		default: {
-			size_t i, size;
-			bool do_multiline;
-			/* Fallback: Print as `(TYPE){BUF[0] BUF[1] ... BUF[N-1]}' */
-			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
-			PRINT("(");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
-			DO(ctyperef_printname(self, printer, NULL, 0));
-			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
-			PRINT(")");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
-			PRINT("{");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
-			size = ctype_sizeof(me);
-			if (size != 0) {
+				FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_PREFIX);
+				PRINT("...");
+				FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX);
+			} else {
+				size_t i;
+				bool do_multiline;
+				struct ctyperef elem_type;
+				firstline_indent += 1; /* Account for the leading '{' */
+				memset(&elem_type, 0, sizeof(elem_type));
+				elem_type.ct_flags = self->ct_flags;
+				elem_type.ct_typ   = me->ct_array.ca_elem;
+				elem_type.ct_info  = me->ct_array.ca_eleminfo;
 				if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
 					do_multiline = false;
 				} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
 					do_multiline = true;
+				} else if (used_length <= 1) {
+					/* No point; would just waste space! */
+					do_multiline = false;
 				} else {
-					firstline_indent += (size_t)ctyperef_printname(self, &lenprinter, NULL, 0);
-					firstline_indent += 3;
-					firstline_indent += size * 3;
-					do_multiline = firstline_indent > maxlinelen;
+					size_t peek_indent;
+					peek_indent  = firstline_indent;
+					do_multiline = false;
+					/* Automatically determine if we need multi-line. */
+					for (i = 0; i < used_length; ++i) {
+						byte_t const *elem_addr;
+						elem_addr = (byte_t const *)buf + i * elem_size;
+						peek_indent = ctype_printvalue_nextindent(&elem_type, elem_addr,
+						                                          flags, peek_indent,
+						                                          newline_indent, newline_tab,
+						                                          maxlinelen, &do_multiline,
+						                                          true);
+						if (do_multiline)
+							break;
+						peek_indent += 1; /* ',' or '}' */
+						if (i < used_length - 1)
+							peek_indent += 1; /* Space after ',' */
+						if (peek_indent > maxlinelen) {
+							do_multiline = true;
+							break;
+						}
+					}
 				}
 				if (do_multiline) {
 					PRINT("\n");
@@ -1391,26 +1407,54 @@ do_calculate_next_indent:
 					REPEAT(' ', newline_indent); /* Print leading spaces. */
 					firstline_indent = newline_indent;
 				}
-				FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX);
-				for (i = 0;; ++i) {
-					byte_t b = ((byte_t *)buf)[i];
-					PRINTF("%.2" PRIX8, b);
-					if (i >= size - 1)
-						break;
+				for (i = 0; i < used_length; ++i) {
+					byte_t const *elem_addr;
+					size_t elem_indent = firstline_indent;
+					elem_addr = (byte_t const *)buf + i * elem_size;
+					if (i != 0)
+						++elem_indent; /* For the leading space */
 					if (do_multiline) {
-						firstline_indent += 3;
-						if (firstline_indent > maxlinelen) {
-							FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX);
+						bool contains_newline;
+						/* Check if we must insert a new-line before this element. */
+						contains_newline = false;
+						firstline_indent = ctype_printvalue_nextindent(&elem_type, elem_addr,
+						                                               flags, elem_indent,
+						                                               newline_indent, newline_tab,
+						                                               maxlinelen, &contains_newline,
+						                                               false);
+						if (i < used_length - 1)
+							firstline_indent += 1; /* For the trailing comma */
+						if (i == 0) {
+							/* Never print an additional linefeed before the first element. */
+						} else if (!contains_newline && firstline_indent <= maxlinelen) {
+							PRINT(" "); /* Add a space after the comma of the previous element. */
+						} else {
+							/* Insert a line-feed before the element. */
 							PRINT("\n");
 							REPEAT(' ', newline_indent); /* Print leading spaces. */
-							FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX);
-							firstline_indent = newline_indent;
-							continue;
+							elem_indent = newline_indent;
+							goto do_calculate_next_indent;
 						}
+					} else {
+						if (i != 0)
+							PRINT(" "); /* Add a space after the comma of the previous element. */
+do_calculate_next_indent:
+						firstline_indent = ctype_printvalue_nextindent(&elem_type, elem_addr,
+						                                               flags, elem_indent,
+						                                               newline_indent, newline_tab,
+						                                               maxlinelen, NULL, false);
 					}
-					PRINT(" ");
+					/* Recursively print the array element. */
+					DO(ctype_printvalue(&elem_type, printer, elem_addr,
+					                    flags, elem_indent,
+					                    newline_indent, newline_tab,
+					                    maxlinelen));
+					if (i < used_length - 1) {
+						FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_PREFIX);
+						PRINT(",");
+						FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_SUFFIX);
+					}
 				}
-				FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX);
 				if (do_multiline) {
 					PRINT("\n");
 					newline_indent -= newline_tab;
@@ -1419,18 +1463,89 @@ do_calculate_next_indent:
 				}
 			}
 			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
-			PRINT("}");
-			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
-		}	break;
 		}
-	} EXCEPT {
-		FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
-		PRINT("<segfault>");
-		FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
+		PRINT("}");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+	}	break;
+
+	default: {
+		size_t i, size;
+		bool do_multiline;
+		/* Fallback: Print as `(TYPE){BUF[0] BUF[1] ... BUF[N-1]}' */
+		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
+		PRINT("(");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
+		DO(ctyperef_printname(self, printer, NULL, 0));
+		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
+		PRINT(")");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+		PRINT("{");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+		size = ctype_sizeof(me);
+		if (size != 0) {
+			if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
+				do_multiline = false;
+			} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
+				do_multiline = true;
+			} else {
+				firstline_indent += (size_t)ctyperef_printname(self, &lenprinter, NULL, 0);
+				firstline_indent += 3;
+				firstline_indent += size * 3;
+				do_multiline = firstline_indent > maxlinelen;
+			}
+			if (do_multiline) {
+				PRINT("\n");
+				newline_indent += newline_tab;
+				REPEAT(' ', newline_indent); /* Print leading spaces. */
+				firstline_indent = newline_indent;
+			}
+			FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX);
+			for (i = 0;; ++i) {
+				byte_t b;
+				if (dbg_readmemory((byte_t const *)buf + i, &b, 1) != 0) {
+					PRINT("??");
+				} else {
+					PRINTF("%.2" PRIX8, b);
+				}
+				if (i >= size - 1)
+					break;
+				if (do_multiline) {
+					firstline_indent += 3;
+					if (firstline_indent > maxlinelen) {
+						FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX);
+						PRINT("\n");
+						REPEAT(' ', newline_indent); /* Print leading spaces. */
+						FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_PREFIX);
+						firstline_indent = newline_indent;
+						continue;
+					}
+				}
+				PRINT(" ");
+			}
+			FORMAT(DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX);
+			if (do_multiline) {
+				PRINT("\n");
+				newline_indent -= newline_tab;
+				REPEAT(' ', newline_indent); /* Print leading spaces. */
+				/*firstline_indent = newline_indent;*/
+			}
+		}
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+		PRINT("}");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+	}	break;
+
 	}
+done:
 	return result;
 err:
 	return temp;
+err_segfault:
+	FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
+	PRINT("<segfault>");
+	FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
+	goto done;
 }
 
 
