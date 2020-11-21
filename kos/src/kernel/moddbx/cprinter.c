@@ -792,6 +792,21 @@ ctype_printstruct_callback(void *cookie,
 	/* Load type information for this member. */
 	if (ctype_fromdw(mod, cu, parser, member->m_type, &member_type) != DBX_EOK)
 		return 0;
+	if (CTYPE_KIND_ISARRAY(member_type.ct_typ->ct_kind) &&
+	    member_type.ct_typ->ct_array.ca_count == 0 && member->m_name) {
+		size_t namelen = strlen(member->m_name);
+		if (namelen >= 2 && member->m_name[namelen - 1] == 'v') {
+			/* TODO: Special handling for variable-length arrays in structures:
+			 * >> struct {
+			 * >>     size_t      my_elemc;
+			 * >>     struct elem my_elemv[];
+			 * >> };
+			 * In this case, we can guess the length of `my_elemv' to be equal
+			 * to `my_elemc', which can could access by-name at this point.
+			 * As such, special handling should be done here in order to print
+			 * the correct # of elements for `my_elemv' */
+		}
+	}
 	/* Print the leading "," */
 	if (arg->out_field_count != 0) {
 		FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_PREFIX);
@@ -1144,6 +1159,8 @@ print_named_pointer(struct ctyperef const *__restrict self,
 						}
 					}
 				}
+				/* TODO: Recursively scan the base-classes of the struct type in
+				 *       search for one that references a known kernel type. */
 			}
 		}
 		/* TODO: Check if `ptr' points into kernel heap memory. If it

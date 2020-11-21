@@ -30,6 +30,7 @@
 
 /**/
 #include <fs/vfs.h>
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/vm/exec.h>
 #include <sched/pid.h>
@@ -58,7 +59,7 @@ DECL_BEGIN
 
 
 PRIVATE NONNULL((1, 3, 4)) ssize_t
-NOTHROW(KCALL task_note)(pformatprinter printer, void *arg,
+NOTHROW(KCALL note_task)(pformatprinter printer, void *arg,
                          KERNEL CHECKED void const *pointer,
                          unsigned int *__restrict pstatus) {
 	ssize_t temp, result = 0;
@@ -110,8 +111,86 @@ badobj:
 	return 0;
 }
 
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_driver)(pformatprinter printer, void *arg,
+                           KERNEL CHECKED void const *pointer,
+                           unsigned int *__restrict pstatus) {
+	struct driver *me = (struct driver *)pointer;
+	char const *driver_name;
+	size_t driver_namelen;
+	TRY {
+		if (me->d_refcnt == 0)
+			goto badobj;
+		if (me->d_weakrefcnt == 0)
+			goto badobj;
+		driver_name = me->d_name;
+		if (!ADDR_ISKERN(driver_name))
+			goto badobj;
+		driver_namelen = strlen(driver_name);
+	} EXCEPT {
+		goto badobj;
+	}
+	return (*printer)(arg, driver_name, driver_namelen);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
+PRIVATE NONNULL((1, 3, 4)) ssize_t
+NOTHROW(KCALL note_driver_section)(pformatprinter printer, void *arg,
+                                   KERNEL CHECKED void const *pointer,
+                                   unsigned int *__restrict pstatus) {
+	struct driver_section *me = (struct driver_section *)pointer;
+	char const *driver_name;
+	size_t driver_namelen;
+	char const *section_name;
+	size_t section_namelen;
+	TRY {
+		struct driver *drv;
+		ElfW(Word) section_name_offset;
+		if (me->ds_refcnt == 0)
+			goto badobj;
+		drv = me->ds_module;
+		if (!ADDR_ISKERN(drv))
+			goto badobj;
+		if (drv->d_refcnt == 0)
+			goto badobj;
+		if (drv->d_weakrefcnt == 0)
+			goto badobj;
+		driver_name = drv->d_name;
+		if (!ADDR_ISKERN(driver_name))
+			goto badobj;
+		driver_namelen = strlen(driver_name);
+		if (me->ds_index >= drv->d_shnum)
+			goto badobj;
+		if (!ADDR_ISKERN(drv->d_shdr))
+			goto badobj;
+		section_name_offset = drv->d_shdr[me->ds_index].sh_name;
+		if (!ADDR_ISKERN(drv->d_shstrtab))
+			goto badobj;
+		if (!ADDR_ISKERN(drv->d_shstrtab_end))
+			goto badobj;
+		if (drv->d_shstrtab_end <= drv->d_shstrtab)
+			goto badobj;
+		if (section_name_offset >= (size_t)(drv->d_shstrtab_end - drv->d_shstrtab))
+			goto badobj;
+		section_name    = drv->d_shstrtab + section_name_offset;
+		section_namelen = strlen(section_name);
+	} EXCEPT {
+		goto badobj;
+	}
+	return format_printf(printer, arg, "%$s!%$s",
+	                     driver_namelen, driver_name,
+	                     section_namelen, section_name);
+badobj:
+	*pstatus = OBNOTE_PRINT_STATUS_BADOBJ;
+	return 0;
+}
+
 PRIVATE struct obnote_entry const notes[] = {
-	{ "task", &task_note }
+	{ "driver", &note_driver },
+	{ "driver_section", &note_driver_section },
+	{ "task", &note_task },
 };
 
 
