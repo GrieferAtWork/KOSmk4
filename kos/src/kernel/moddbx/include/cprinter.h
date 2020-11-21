@@ -128,6 +128,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 #define CTYPE_PRINTVALUE_FLAG_NORECURSION        0x0080 /* Don't print fields of recursive structs. Only print fields
                                                          * of a (potential) initial struct as given as `self', but if one
                                                          * of those fields is another structure, print it as `{...}' */
+#define CTYPE_PRINTVALUE_FLAG_NOARRAYRANGE       0x0100 /* Don't print array range `[lo ... hi] = value' expressions. */
 #define CTYPE_PRINTVALUE_FLAG_INTSUFFIX          0x4000 /* Include integer type suffixes (`u', `ul', `ll', etc...) */
 #define CTYPE_PRINTVALUE_FLAG_FORCEHEX           0x8000 /* Always use hex for everything. When not given, small integer
                                                          * values are instead printed in decimal, and larger numbers are

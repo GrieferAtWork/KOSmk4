@@ -118,6 +118,8 @@
 #define DEBUGINFO_PRINT_FORMAT_CONSTANT_SUFFIX  0x0027 /* ... */
 #define DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX     0x0028 /* Prefix for data-access error messages (e.g. `<segfault>') */
 #define DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX     0x0029 /* ... */
+#define DEBUGINFO_PRINT_FORMAT_TRUEFALSE_PREFIX 0x002a /* Prefix for `true' and `false' */
+#define DEBUGINFO_PRINT_FORMAT_TRUEFALSE_SUFFIX 0x002b /* ... */
 #define DEBUGINFO_PRINT_FORMAT_ISPREFIX(x) (!((x) & 1))
 #define DEBUGINFO_PRINT_FORMAT_ISSUFFIX(x) ((x) & 1)
 

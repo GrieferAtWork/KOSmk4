@@ -43,6 +43,8 @@
 #include <string.h>
 #include <unicode.h>
 
+#include <libdebuginfo/addr2line.h>
+
 /**/
 #include "include/cprinter.h"
 #include "include/ctype.h"
@@ -823,7 +825,17 @@ ctype_printstruct_callback(void *cookie,
 	                                          false);
 	if (arg->out_field_count == 0) {
 		/* Never print an additional linefeed before the first element. */
-	} else if ((!contains_newline && next_indent <= arg->maxlinelen) || !arg->do_multiline) {
+	} else
+#if 1 /* Technically, this version should only be used when there are more
+       * members within the struct after this one (since we'll end up having
+       * to print another trailing "," after our member). However we don't
+       * have an easy way of knowing this ahead of time, so to keep stuff
+       * a bit simpler, we just always check for this case. */
+	if ((!contains_newline && (next_indent + 1) <= arg->maxlinelen) || !arg->do_multiline)
+#else
+	if ((!contains_newline && next_indent <= arg->maxlinelen) || !arg->do_multiline)
+#endif
+	{
 		/* Print the field in-line. */
 		PRINT(" "); /* Add a space after the comma of the previous element. */
 		--prefix_length;
@@ -931,6 +943,114 @@ NOTHROW(KCALL dbg_strlen32)(void const *addr, size_t *__restrict presult) {
 }
 
 
+/* Compare memory for equality.
+ * @return: true:  Memory is equal.
+ * @return: false: Memory is not equal.
+ * @return: false: Accessing memory failed. */
+PRIVATE bool
+NOTHROW(KCALL dbg_eqmemory)(void const *a, void const *b, size_t num_bytes) {
+	byte_t a_buf[64];
+	byte_t b_buf[64];
+	while (num_bytes) {
+		size_t temp;
+		temp = num_bytes;
+		if (temp > sizeof(a_buf))
+			temp = sizeof(a_buf);
+		if (dbg_readmemory(a, a_buf, temp) != 0 ||
+		    dbg_readmemory(b, b_buf, temp) != 0)
+			return false; /* Faulty memory */
+		if (memcmp(a_buf, b_buf, temp) != 0)
+			return false; /* Non-equal memory */
+		a = (byte_t const *)a + temp;
+		b = (byte_t const *)b + temp;
+		num_bytes -= temp;
+	}
+	return true; /* Equal memory */
+}
+
+PRIVATE NONNULL((1)) ssize_t KCALL
+print_a2l_symbol(struct cprinter const *__restrict printer,
+                 char const *__restrict name, uintptr_t offset) {
+	ssize_t temp, result = 0;
+	FORMAT(DEBUGINFO_PRINT_FORMAT_POINTER_PREFIX);
+	PRINT("&");
+	FORMAT(DEBUGINFO_PRINT_FORMAT_POINTER_SUFFIX);
+	FORMAT(DEBUGINFO_PRINT_FORMAT_VARNAME_PREFIX);
+	DO((*P_PRINTER)(P_ARG, name, strlen(name)));
+	if (offset != 0)
+		PRINTF("+%#" PRIxPTR, offset);
+	FORMAT(DEBUGINFO_PRINT_FORMAT_VARNAME_SUFFIX);
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 3)) ssize_t KCALL
+print_named_pointer(struct ctyperef const *__restrict UNUSED(self),
+                    struct cprinter const *__restrict printer,
+                    void const *ptr,
+                    bool *__restrict pdid_print_something) {
+	ssize_t temp, result = 0;
+	/* Check if `ptr' is a text-/data-pointer. */
+	REF module_t *mod;
+	module_type_var(modtyp);
+	mod = module_ataddr(ptr, modtyp);
+	if (mod) {
+		di_addr2line_sections_t sections;
+		di_addr2line_dl_sections_t dl_sections;
+		/* Try to lookup the name/base-address of a symbol
+		 * that contains the given `ptr' and is part of `mod' */
+		if (debug_addr2line_sections_lock(mod, &sections, &dl_sections
+		                                  module_type__arg(modtyp)) == DEBUG_INFO_ERROR_SUCCESS) {
+			di_debug_addr2line_t a2l;
+			uintptr_t module_relative_pc;
+			module_relative_pc = (uintptr_t)ptr - module_getloadaddr(mod, modtyp);
+			if (debug_addr2line(&sections, &a2l, module_relative_pc,
+			                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
+			                    DEBUG_ADDR2LINE_FNORMAL) == DEBUG_INFO_ERROR_SUCCESS) {
+				if (!a2l.al_rawname)
+					a2l.al_rawname = a2l.al_name;
+				if (a2l.al_rawname) {
+					uintptr_t offset;
+					offset = module_relative_pc - a2l.al_symstart;
+					temp   = print_a2l_symbol(printer, a2l.al_rawname, offset);
+					debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
+					module_decref(mod, modtyp);
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+					goto done;
+				}
+			}
+			debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
+		}
+		module_decref(mod, modtyp);
+	}
+
+	/* TODO: Check if `ptr' is apart of a file mapping. If it is,
+	 *       print the absolute path the mapped file, as well as
+	 *       the offset into the file, alongside the original pointer:
+	 *       `0x12345678 ("/path/to/file"+offset_into_file)' */
+
+	/* TODO: Check if `ptr' points into kernel heap memory. If it
+	 *       is, then print it as `0x12345678 (heap)' */
+
+	/* TODO: If nothing is mapped where `ptr' points to, then we
+	 *       should print it in a different color (iow: use a custom
+	 *       prefix/suffix pair for unmapped pointers)
+	 * That way, when debugging segmentation faults, it becomes easy
+	 * to stop faulty pointers. */
+
+	return result;
+done:
+	*pdid_print_something = true;
+	return result;
+err:
+	return temp;
+}
+
+
+
 
 
 /* Print a human-readable representation of the contents of a given data-buffer,
@@ -998,8 +1118,13 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 			if (byte != 0)
 				is_nonzero = true;
 		}
-		result = is_nonzero ? RAWPRINT("true")
-		                    : RAWPRINT("false");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_TRUEFALSE_PREFIX);
+		if (is_nonzero) {
+			PRINT("true");
+		} else {
+			PRINT("false");
+		}
+		FORMAT(DEBUGINFO_PRINT_FORMAT_TRUEFALSE_SUFFIX);
 	}	break;
 	
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
@@ -1048,30 +1173,10 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 				}
 			}
 			if (!(flags & CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER)) {
-				/* Check if `ptr' is a text-/data-pointer. */
-				{
-					REF module_t *mod;
-					module_type_var(modtyp);
-					mod = module_ataddr(ptr, modtyp);
-					if (mod) {
-						/* TODO: Try to lookup the name/base-address of a symbol
-						 *       that contains the given `ptr' and is part of `mod' */
-						module_decref(mod, modtyp);
-					}
-				}
-				/* TODO: Check if `ptr' is apart of a file mapping. If it is,
-				 *       print the absolute path the mapped file, as well as
-				 *       the offset into the file, alongside the original pointer:
-				 *       `0x12345678 ("/path/to/file"+offset_into_file)' */
-	
-				/* TODO: Check if `ptr' points into kernel heap memory. If it
-				 *       is, then print it as `0x12345678 (heap)' */
-	
-				/* TODO: If nothing is mapped where `ptr' points to, then we
-				 *       should print it in a different color (iow: use a custom
-				 *       prefix/suffix pair for unmapped pointers)
-				 * That way, when debugging segmentation faults, it becomes easy
-				 * to stop faulty pointers. */
+				bool did_print_something = false;
+				DO(print_named_pointer(self, printer, ptr, &did_print_something));
+				if (did_print_something)
+					break;
 			}
 		}
 		ATTR_FALLTHROUGH
@@ -1383,8 +1488,43 @@ do_print_no_recursion_dots_and_rbrace:
 					do_multiline = false;
 					/* Automatically determine if we need multi-line. */
 					for (i = 0; i < used_length; ++i) {
+						size_t index_hi;
 						byte_t const *elem_addr;
 						elem_addr = (byte_t const *)buf + i * elem_size;
+						index_hi  = i;
+						if (!(flags & CTYPE_PRINTVALUE_FLAG_NOARRAYRANGE)) {
+							/* Check ahead if upcoming elements are equal to our
+							 * current element, and if they are, check if we can
+							 * save some screen space by compressing output via
+							 * use of `[lo ... hi] = value', instead of having
+							 * to use `value, value, value, ..., value, value' */
+							while (index_hi + 1 < used_length) {
+								byte_t const *next_addr;
+								next_addr = (byte_t const *)buf + (index_hi + 1) * elem_size;
+								if (!dbg_eqmemory(elem_addr, next_addr, elem_size))
+									break;
+								++index_hi;
+							}
+							if (index_hi > i) {
+								size_t range_length, range_prefix;
+								size_t elem_length;
+								range_prefix = COMPILER_STRLEN("[ ... ] = ");
+								range_prefix += (size_t)snprintf(NULL, 0, "%" PRIuSIZ, i);
+								range_prefix += (size_t)snprintf(NULL, 0, "%" PRIuSIZ, index_hi);
+								elem_length = ctype_printvalue(&elem_type, &lenprinter, elem_addr,
+								                               flags | CTYPE_PRINTVALUE_FLAG_ONELINE,
+								                               0, 0, 0, (size_t)-1);
+								range_length = range_prefix + elem_length; /* Account for the element */
+								elem_length += 2;                          /* ", " */
+								elem_length *= (index_hi - i) + 1;         /* Repeat */
+								elem_length -= 2;                          /* Strip tailing ", " */
+								if (elem_length <= range_length)
+									index_hi = i; /* Don't use a range-expression */
+								else {
+									peek_indent += range_prefix;
+								}
+							}
+						}
 						peek_indent = ctype_printvalue_nextindent(&elem_type, elem_addr,
 						                                          flags, peek_indent,
 						                                          newline_indent, newline_tab,
@@ -1393,12 +1533,13 @@ do_print_no_recursion_dots_and_rbrace:
 						if (do_multiline)
 							break;
 						peek_indent += 1; /* ',' or '}' */
-						if (i < used_length - 1)
+						if (index_hi < used_length - 1)
 							peek_indent += 1; /* Space after ',' */
 						if (peek_indent > maxlinelen) {
 							do_multiline = true;
 							break;
 						}
+						i = index_hi;
 					}
 				}
 				if (do_multiline) {
@@ -1410,9 +1551,46 @@ do_print_no_recursion_dots_and_rbrace:
 				for (i = 0; i < used_length; ++i) {
 					byte_t const *elem_addr;
 					size_t elem_indent = firstline_indent;
+					size_t index_hi;
 					elem_addr = (byte_t const *)buf + i * elem_size;
+					index_hi  = i;
 					if (i != 0)
 						++elem_indent; /* For the leading space */
+					if (!(flags & CTYPE_PRINTVALUE_FLAG_NOARRAYRANGE)) {
+						/* Check ahead if upcoming elements are equal to our
+						 * current element, and if they are, check if we can
+						 * save some screen space by compressing output via
+						 * use of `[lo ... hi] = value', instead of having
+						 * to use `value, value, value, ..., value, value' */
+						while (index_hi + 1 < used_length) {
+							byte_t const *next_addr;
+							next_addr = (byte_t const *)buf + (index_hi + 1) * elem_size;
+							if (!dbg_eqmemory(elem_addr, next_addr, elem_size))
+								break;
+							++index_hi;
+						}
+						/* If we're supposed to print multiple elements, check if doing
+						 * so can actually save space. */
+						if (index_hi > i) {
+							size_t range_length, range_prefix;
+							size_t elem_length;
+							range_prefix = COMPILER_STRLEN("[ ... ] = ");
+							range_prefix += (size_t)snprintf(NULL, 0, "%" PRIuSIZ, i);
+							range_prefix += (size_t)snprintf(NULL, 0, "%" PRIuSIZ, index_hi);
+							elem_length = ctype_printvalue(&elem_type, &lenprinter, elem_addr,
+							                               flags | CTYPE_PRINTVALUE_FLAG_ONELINE,
+							                               0, 0, 0, (size_t)-1);
+							range_length = range_prefix + elem_length; /* Account for the element */
+							elem_length += 2;                          /* ", " */
+							elem_length *= (index_hi - i) + 1;         /* Repeat */
+							elem_length -= 2;                          /* Strip tailing ", " */
+							if (elem_length <= range_length)
+								index_hi = i; /* Don't use a range-expression */
+							else {
+								elem_indent += range_prefix;
+							}
+						}
+					}
 					if (do_multiline) {
 						bool contains_newline;
 						/* Check if we must insert a new-line before this element. */
@@ -1422,7 +1600,7 @@ do_print_no_recursion_dots_and_rbrace:
 						                                               newline_indent, newline_tab,
 						                                               maxlinelen, &contains_newline,
 						                                               false);
-						if (i < used_length - 1)
+						if (index_hi < used_length - 1)
 							firstline_indent += 1; /* For the trailing comma */
 						if (i == 0) {
 							/* Never print an additional linefeed before the first element. */
@@ -1433,6 +1611,12 @@ do_print_no_recursion_dots_and_rbrace:
 							PRINT("\n");
 							REPEAT(' ', newline_indent); /* Print leading spaces. */
 							elem_indent = newline_indent;
+							if (i < index_hi) {
+								/* Account for the indent from the prefix. */
+								elem_indent += COMPILER_STRLEN("[ ... ] = ");
+								elem_indent += (size_t)snprintf(NULL, 0, "%" PRIuSIZ, i);
+								elem_indent += (size_t)snprintf(NULL, 0, "%" PRIuSIZ, index_hi);
+							}
 							goto do_calculate_next_indent;
 						}
 					} else {
@@ -1444,16 +1628,37 @@ do_calculate_next_indent:
 						                                               newline_indent, newline_tab,
 						                                               maxlinelen, NULL, false);
 					}
+					if (i < index_hi) {
+						FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_PREFIX);
+						PRINT("[");
+						FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_SUFFIX);
+						FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+						PRINTF("%" PRIuSIZ, i);
+						FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+						FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_PREFIX);
+						PRINT(" ... ");
+						FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX);
+						FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+						PRINTF("%" PRIuSIZ, index_hi);
+						FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+						FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_PREFIX);
+						PRINT("]");
+						FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_SUFFIX);
+						FORMAT(DEBUGINFO_PRINT_FORMAT_ASSIGN_PREFIX);
+						PRINT(" = ");
+						FORMAT(DEBUGINFO_PRINT_FORMAT_ASSIGN_SUFFIX);
+					}
 					/* Recursively print the array element. */
 					DO(ctype_printvalue(&elem_type, printer, elem_addr,
 					                    flags, elem_indent,
 					                    newline_indent, newline_tab,
 					                    maxlinelen));
-					if (i < used_length - 1) {
+					if (index_hi < used_length - 1) {
 						FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_PREFIX);
 						PRINT(",");
 						FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_SUFFIX);
 					}
+					i = index_hi;
 				}
 				if (do_multiline) {
 					PRINT("\n");

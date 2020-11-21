@@ -39,6 +39,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/exec/module.h>
 
 #include <format-printer.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -365,7 +366,7 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 						symbol_offset = (uintptr_t)((byte_t *)symbol_addr -
 						                            (byte_t *)(a2l_info.al_symstart + loadaddr));
 						if (symbol_offset != 0)
-							disasm_printf(self, "+%#Ix", symbol_offset);
+							disasm_printf(self, "+%#" PRIxPTR, symbol_offset);
 						disasm_print(self, ">", 1);
 					} EXCEPT {
 						debug_addr2line_sections_unlock(&dl_sect module_type__arg(symbol_module_type));
