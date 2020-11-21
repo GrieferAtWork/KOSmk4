@@ -293,7 +293,7 @@ NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
 			goto done;
 	}
 	/* Enumerate other modules in the documented order. */
-	if (cmodule_iskern(start_module)) {
+	if (!start_module || cmodule_iskern(start_module)) {
 		temp = cmodule_enum_drivers(cb, cookie);
 		if unlikely(temp < 0)
 			goto err;
@@ -307,7 +307,7 @@ NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
 			goto err;
 		result += temp;
 	}
-	if (!cmodule_iskern(start_module)) {
+	if (start_module && !cmodule_iskern(start_module)) {
 		temp = cmodule_enum_drivers(cb, cookie);
 		if unlikely(temp < 0)
 			goto err;
