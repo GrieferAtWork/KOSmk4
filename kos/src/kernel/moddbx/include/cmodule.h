@@ -192,6 +192,19 @@ struct cmodule {
 #define cmodule_getloadstart(self) module_getloadstart((self)->cm_module, (self)->cm_modtyp)
 #define cmodule_getloadend(self)   module_getloadend((self)->cm_module, (self)->cm_modtyp)
 #define cmodule_vm(self)           module_vm((self)->cm_module, (self)->cm_modtyp)
+#if MODULE_TYPE_COUNT >= 2
+#define cmodule_isuser(self) ((self)->cm_modtyp == MODULE_TYPE_USRMOD)
+#define cmodule_iskern(self) ((self)->cm_modtyp == MODULE_TYPE_DRIVER)
+#elif defined(MODULE_TYPE_DRIVER)
+#define cmodule_iskern(self) 1
+#define cmodule_isuser(self) 0
+#elif defined(MODULE_TYPE_USRMOD)
+#define cmodule_isuser(self) 1
+#define cmodule_iskern(self) 0
+#else /* ... */
+#define cmodule_isuser(self) 0
+#define cmodule_iskern(self) 0
+#endif /* !... */
 
 /* Destroy the given CModule. (called when its reference counter hits `0') */
 FUNDEF NONNULL((1)) void NOTHROW(FCALL cmodule_destroy)(struct cmodule *__restrict self);
@@ -217,6 +230,11 @@ typedef NONNULL((2)) ssize_t
 FUNDEF NONNULL((1)) ssize_t
 NOTHROW(FCALL cmodule_enum)(cmodule_enum_callback_t cb,
                             void *cookie);
+/* Same as `cmodule_enum()', but use `start_module' (if non-NULL) instead of `cmodule_ataddr(pc)' */
+FUNDEF NONNULL((2)) ssize_t
+NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
+                                      cmodule_enum_callback_t cb,
+                                      void *cookie);
 
 struct vm;
 
@@ -319,6 +337,17 @@ FUNDEF WUNUSED NONNULL((1, 3)) struct cmodsym const *
 NOTHROW(FCALL cmodule_getsym_global)(char const *__restrict name, size_t namelen,
                                      REF struct cmodule **__restrict presult_module,
                                      uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
+
+/* Same as `cmodule_getsym_global()', but search for symbols starting with
+ * `start_module', and continuing the search within related modules. For this
+ * purpose, start by searching `start_module' itself, and moving on to other
+ * modules within its address space, before finally search throug modules in
+ * different address spaces. */
+FUNDEF WUNUSED NONNULL((2, 4)) struct cmodsym const *
+NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
+                                       char const *__restrict name, size_t namelen,
+                                       REF struct cmodule **__restrict presult_module,
+                                       uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 
 /* Initialize a debug information CU parser to load debug information for a component

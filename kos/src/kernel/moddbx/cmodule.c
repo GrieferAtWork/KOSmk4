@@ -217,9 +217,19 @@ NOTHROW(FCALL cmodule_enum_drivers_except)(cmodule_enum_callback_t cb,
 	size_t i;
 	ssize_t temp, result = 0;
 	REF struct driver_state *ds;
+	REF struct cmodule *cm;
+	/* Enumerate the kernel core driver. */
+	if (!skipme || skipme->cm_module != (module_t *)&kernel_driver) {
+		cm = cmodule_locate((module_t *)&kernel_driver
+		                    module_type__arg(MODULE_TYPE_DRIVER));
+		if likely(cm)
+			result = (*cb)(cookie, cm);
+		decref(cm);
+		if unlikely(result < 0)
+			goto done;
+	}
 	ds = driver_get_state();
 	for (i = 0; i < ds->ds_count; ++i) {
-		REF struct cmodule *cm;
 		cm = cmodule_locate((module_t *)ds->ds_drivers[i]
 		                    module_type__arg(MODULE_TYPE_DRIVER));
 		if likely(cm) {
@@ -260,17 +270,29 @@ err:
 PUBLIC NONNULL((1)) ssize_t
 NOTHROW(FCALL cmodule_enum)(cmodule_enum_callback_t cb,
                             void *cookie) {
+	ssize_t result;
+	REF struct cmodule *pc_module;
+	void const *pc;
+	pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc_module = cmodule_ataddr(pc);
+	result    = cmodule_enum_with_hint(pc_module, cb, cookie);
+	xdecref(pc_module);
+	return result;
+}
+
+/* Same as `cmodule_enum()', but use `start_module' (if non-NULL) instead of `cmodule_ataddr(pc)' */
+PUBLIC NONNULL((2)) ssize_t
+NOTHROW(FCALL cmodule_enum_with_hint)(struct cmodule *start_module,
+                                      cmodule_enum_callback_t cb,
+                                      void *cookie) {
 	ssize_t temp, result = 0;
-	REF struct cmodule *pcmodule;
-	void *pc = (void *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
-	pcmodule = cmodule_ataddr(pc);
-	if (pcmodule) {
-		result = (*cb)(cookie, pcmodule);
+	if (start_module) {
+		result = (*cb)(cookie, start_module);
 		if (result < 0)
 			goto done;
 	}
 	/* Enumerate other modules in the documented order. */
-	if (ADDR_ISKERN(pc)) {
+	if (cmodule_iskern(start_module)) {
 		temp = cmodule_enum_drivers(cb, cookie);
 		if unlikely(temp < 0)
 			goto err;
@@ -279,24 +301,24 @@ NOTHROW(FCALL cmodule_enum)(cmodule_enum_callback_t cb,
 	/* Enumerate user-space modules. */
 	if (dbg_current && dbg_current->t_self == dbg_current &&
 	    dbg_current->t_vm != NULL && dbg_current->t_vm != &vm_kernel) {
-		temp = cmodule_enum_uservm_except(dbg_current->t_vm, cb, cookie, pcmodule);
+		temp = cmodule_enum_uservm_except(dbg_current->t_vm, cb, cookie, start_module);
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 	}
-	if (!ADDR_ISKERN(pc)) {
+	if (!cmodule_iskern(start_module)) {
 		temp = cmodule_enum_drivers(cb, cookie);
 		if unlikely(temp < 0)
 			goto err;
 		result += temp;
 	}
 done:
-	xdecref(pcmodule);
 	return result;
 err:
 	result = temp;
 	goto done;
 }
+
 
 /* Enumerate all user-space modules mapped within the given vm
  * `self' as CModule objects, and invoke `cb' on each of them.
@@ -839,8 +861,8 @@ again:
 	}
 }
 
-/* Parse the current pointed-to element's attributes in an attempt to
- * figure out if it has a name that should appear in symbol tables.
+/* Parse the currently pointed-to component's attributes in an attempt
+ * to figure out if it has a name that should appear in symbol tables.
  * If it does, then that name is returned. Otherwise, NULL is returned,
  * but attributes for the current component will have still been parsed. */
 PRIVATE NONNULL((1)) char const *
@@ -986,9 +1008,32 @@ again:
 	case DW_TAG_atomic_type:
 		/* Type definitions. Requires:
 		 *  - One of: DW_AT_name
+		 * TODO: Also require some further identification that we
+		 *       can make use of know that the type is complete.
+		 *       e.g. In the case of a struct, require that there
+		 *            be a `DW_AT_byte_size' field. (or better yet:
+		 *            simply ensure that `self->dup_comp.dic_haschildren'
+		 *            is true, meaning that the struct has at least
+		 *            some members defined, though in that case, we
+		 *            must also allow a struct without members, that
+		 *            is derived (c++-style) from another struct)
+		 * Another example would be that `DW_TAG_pointer_type' must
+		 * have a tag `DW_AT_type', which represents the pointed-to
+		 * type.
+		 * NOTE: The DWARF standard specifies that `DW_AT_declaration'
+		 *       should appear in any forward-declaration, however I
+		 *       really don't want to rely on something like that,
+		 *       because I don't like the idea of the compiler having
+		 *       to specify _more_ information to tell me that there
+		 *       is _less_ information, when I can just check if there
+		 *       is the information I'm looking for from the get-go.
 		 */
 		DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
 			switch (attr.dica_name) {
+
+			case DW_AT_declaration:
+				/* Only a declaration; not a definition! */
+				return NULL;
 
 			case DW_AT_abstract_origin:
 				goto do_abstract_origin;
@@ -1494,6 +1539,27 @@ NOTHROW(FCALL cmodule_getsym_global)(char const *__restrict name, size_t namelen
 	data.presult_module = presult_module;
 	data.ns             = ns;
 	cmodule_enum(&cmodule_getsym_global_callback, &data);
+	return data.result;
+}
+
+
+/* Same as `cmodule_getsym_global()', but search for symbols starting with
+ * `start_module', and continuing the search within related modules. For this
+ * purpose, start by searching `start_module' itself, and moving on to other
+ * modules within its address space, before finally search through modules in
+ * different address spaces. */
+PUBLIC WUNUSED NONNULL((2, 4)) struct cmodsym const *
+NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
+                                       char const *__restrict name, size_t namelen,
+                                       REF struct cmodule **__restrict presult_module,
+                                       uintptr_t ns) {
+	struct cmodule_getsym_global_data data;
+	data.result         = NULL;
+	data.name           = name;
+	data.namelen        = namelen;
+	data.presult_module = presult_module;
+	data.ns             = ns;
+	cmodule_enum_with_hint(start_module, &cmodule_getsym_global_callback, &data);
 	return data.result;
 }
 

@@ -1206,7 +1206,7 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
 	struct ctyperef field_type;
 	struct cvalue *top;
 	ptrdiff_t field_offset;
-	size_t field_size, temp;
+	size_t field_size, temp, container_size;
 	if unlikely(!cexpr_stacksize)
 		return DBX_EINTERN;
 	top    = &cexpr_stacktop;
@@ -1219,8 +1219,11 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
 		return result;
 	field_size = ctype_sizeof(field_type.ct_typ);
 	/* Make sure that the field is in-bounds of the structure as a whole. */
-	if unlikely(OVERFLOW_UADD(field_offset, field_size, &temp) ||
-	            temp > ctype_sizeof(top->cv_type.ct_typ))
+	if unlikely(OVERFLOW_UADD(field_offset, field_size, &temp))
+		return DBX_EINTERN;
+	container_size = ctype_sizeof(top->cv_type.ct_typ);
+	/* Allow zero-sized structs, which is indicative of containing a variable-length array. */
+	if unlikely(container_size && temp > container_size)
 		return DBX_EINTERN;
 	switch (top->cv_kind) {
 

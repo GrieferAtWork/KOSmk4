@@ -574,6 +574,173 @@ try_pointer_register:
 
 
 
+
+PRIVATE NONNULL((1, 2)) ssize_t
+NOTHROW(FCALL dw_enumerate_fields)(struct cmodule *__restrict mod,
+                                   byte_t const *__restrict dip,
+                                   ctype_struct_field_callback_t cb,
+                                   void *cookie,
+                                   ptrdiff_t base_offset,
+                                   bool *__restrict pstruct_has_children) {
+	ssize_t temp, result = 0;
+	di_debuginfo_cu_parser_t parser;
+	struct cmodunit *cunit;
+	size_t depth;
+	bool is_union;
+	/* Sanity check: we're actually dealing with a struct! */
+	cunit = cmodule_findunit_from_dip(mod, dip);
+	if unlikely(!cunit)
+		goto done;
+	cmodunit_parser_from_dip(cunit, mod, &parser, dip);
+	if (parser.dup_comp.dic_tag != DW_TAG_class_type &&
+	    parser.dup_comp.dic_tag != DW_TAG_structure_type &&
+	    parser.dup_comp.dic_tag != DW_TAG_union_type &&
+	    parser.dup_comp.dic_tag != DW_TAG_interface_type)
+		goto done;
+	is_union = parser.dup_comp.dic_tag == DW_TAG_union_type;
+	debuginfo_cu_parser_skipattr(&parser);
+	if (!debuginfo_cu_parser_nextchild(&parser))
+		goto done;
+	*pstruct_has_children = true;
+	depth = parser.dup_child_depth;
+	do {
+		if (parser.dup_child_depth == depth) {
+			switch (parser.dup_comp.dic_tag) {
+
+			case DW_TAG_member: {
+				di_debuginfo_member_t member;
+				if unlikely(!debuginfo_cu_parser_loadattr_member(&parser, &member))
+					break;
+				if (member.m_type) {
+					/* Special case: When the offset is unknown, but we're working on a union,
+					 *               then we know that the offset should actually be `0' */
+					if (member.m_offset == (uintptr_t)-1 && is_union)
+						member.m_offset = 0;
+					member.m_offset += base_offset;
+					if (!member.m_name) {
+						/* Enumerate an inlined struct/union */
+						temp = dw_enumerate_fields(mod, member.m_type, cb, cookie,
+						                           member.m_offset,
+						                           pstruct_has_children);
+					} else {
+						/* Enumerate this member. */
+						temp = (*cb)(cookie, &member, &parser, mod, cunit);
+					}
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+				}
+			}	break;
+
+			case DW_TAG_inheritance: {
+				byte_t const *inherited_type = NULL;
+				uintptr_t data_member_location = 0;
+				di_debuginfo_component_attrib_t attr;
+				/* Enumerate members from base-structures (in case of a c++-style derived type)
+				 * NOTE: Dwarf uses `DW_TAG_inheritance' for this purpose, which in turn
+				 *       contains 2 attributes DW_AT_type and DW_AT_data_member_location! */
+				DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
+					switch (attr.dica_name) {
+
+					case DW_AT_type:
+						if unlikely(!debuginfo_cu_parser_getref(&parser, attr.dica_form,
+						                                        &inherited_type))
+							inherited_type = NULL;
+						break;
+
+					case DW_AT_data_member_location:
+						if unlikely(!debuginfo_cu_parser_getconst(&parser, attr.dica_form,
+						                                          &data_member_location))
+							data_member_location = 0;
+						break;
+
+					default:
+						break;
+					}
+				}
+				if (inherited_type != NULL) {
+					data_member_location += base_offset;
+					temp = dw_enumerate_fields(mod, inherited_type,
+					                           cb, cookie,
+					                           data_member_location,
+					                           pstruct_has_children);
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+				}
+			}	break;
+
+			default:
+				debuginfo_cu_parser_skipattr(&parser);
+				break;
+			}
+		} else {
+			debuginfo_cu_parser_skipattr(&parser);
+		}
+	} while (debuginfo_cu_parser_next(&parser) &&
+	         parser.dup_child_depth >= depth);
+done:
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE NONNULL((1, 2)) void
+NOTHROW(FCALL dw_determine_type_size)(struct cmodule *__restrict mod,
+                                      byte_t const *__restrict dip,
+                                      size_t *__restrict ptype_size) {
+	di_debuginfo_cu_parser_t parser;
+	di_debuginfo_component_attrib_t attr;
+	cmodule_parser_from_dip(mod, &parser, dip);
+	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
+		if (attr.dica_name == DW_AT_byte_size) {
+			uintptr_t temp;
+			if (debuginfo_cu_parser_getconst(&parser, attr.dica_form, &temp))
+				*ptype_size = (size_t)temp;
+		}
+	}
+}
+
+/* Try to find the definition of a given struct. */
+PRIVATE NONNULL((1, 2)) byte_t const *
+NOTHROW(FCALL dw_enumerate_find_struct_definition)(struct cmodule *__restrict mod,
+                                                   byte_t const *__restrict dip,
+                                                   /*out*/ REF struct cmodule **__restrict def_module) {
+	di_debuginfo_cu_parser_t parser;
+	di_debuginfo_component_attrib_t attr;
+	char const *name;
+	struct cmodsym const *csym;
+	uintptr_t ns;
+	cmodule_parser_from_dip(mod, &parser, dip);
+	if (parser.dup_comp.dic_tag == DW_TAG_class_type) {
+		ns = CMODSYM_DIP_NS_CLASS;
+	} else if (parser.dup_comp.dic_tag == DW_TAG_structure_type) {
+		ns = CMODSYM_DIP_NS_STRUCT;
+	} else if (parser.dup_comp.dic_tag == DW_TAG_union_type) {
+		ns = CMODSYM_DIP_NS_UNION;
+	} else if (parser.dup_comp.dic_tag == DW_TAG_interface_type) {
+		ns = CMODSYM_DIP_NS_TYPEDEF;
+	} else {
+		return NULL;
+	}
+	name = NULL;
+	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
+		if (attr.dica_name == DW_AT_name) {
+			if (!debuginfo_cu_parser_getstring(&parser, attr.dica_form, &name))
+				name = NULL;
+		}
+	}
+	if (!name)
+		return NULL;
+	/* Now try to find the proper definition of the structure. */
+	csym = cmodule_getsym_withhint(mod, name, strlen(name), def_module, ns);
+	if (!csym)
+		return NULL;
+	/* Found something! */
+	return cmodsym_getdip(csym, *def_module);
+}
+
+
 /* Enumerate/find the fields of a given struct.
  * @param: cb:     Callback to-be invoked for the field.
  * @param: cookie: Cookie-argument for `cb'
@@ -583,60 +750,41 @@ PUBLIC NONNULL((1, 2)) ssize_t
 NOTHROW(FCALL ctype_struct_enumfields)(struct ctype *__restrict self,
                                        ctype_struct_field_callback_t cb,
                                        void *cookie) {
-	/* TODO: If the struct is anonymous in the context of the CU that `self'
-	 *       got loaded from, then we'll be unable to load its fields. In this
-	 *       case, we should instead search for a struct with the same name
-	 *       in a number of different places:
-	 *        - All other CUs of the current module.
-	 *        - All CUs of all other modules from the current address space.
-	 *        - All CUs of all other modules from the other address space. */
-	ssize_t temp, result = 0;
-	di_debuginfo_cu_parser_t parser;
-	struct cmodunit *cunit;
-	size_t depth;
+	ssize_t result;
+	bool struct_has_children;
 	/* Sanity check: we're actually dealing with a struct! */
 	if unlikely(!CTYPE_KIND_ISSTRUCT(self->ct_kind))
-		goto done;
-	cunit = cmodule_findunit_from_dip(self->ct_struct.ct_info.cd_mod,
-	                                  self->ct_struct.ct_info.cd_dip);
-	if unlikely(!cunit)
-		goto done;
-	cmodunit_parser_from_dip(cunit,
-	                         self->ct_struct.ct_info.cd_mod,
-	                         &parser,
-	                         self->ct_struct.ct_info.cd_dip);
-	depth = parser.dup_child_depth;
-	do {
-		if (parser.dup_child_depth == depth &&
-		    parser.dup_comp.dic_tag == DW_TAG_member) {
-			di_debuginfo_member_t member;
-			if unlikely(!debuginfo_cu_parser_loadattr_member(&parser, &member))
-				break;
-			/* Special case: When the offset is unknown, but we're working on a union,
-			 *               then we know that the offset should actually be `0' */
-			if (member.m_offset == (uintptr_t)-1 && CTYPE_KIND_STRUCT_ISUNION(self->ct_kind))
-				member.m_offset = 0;
-			if (!member.m_name) {
-				/* TODO: Enumerate an inlined struct/union */
-			} else {
-				/* Enumerate this member. */
-				temp = (*cb)(cookie, &member, &parser,
-				             self->ct_struct.ct_info.cd_mod,
-				             cunit);
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
-			}
-		} else {
-			/* TODO: Enumerate members from base-structures (in case of a c++-style derived type) */
-			debuginfo_cu_parser_skipattr(&parser);
+		return 0;
+	struct_has_children = false;
+again:
+	result = dw_enumerate_fields(self->ct_struct.ct_info.cd_mod,
+	                             self->ct_struct.ct_info.cd_dip,
+	                             cb, cookie, 0, &struct_has_children);
+	if (!struct_has_children && !result && !self->ct_struct.ct_sizeof) {
+		/* If the struct is anonymous in the context of the CU that `self'
+		 * got loaded from, then we'll be unable to load its fields. In this
+		 * case, we should instead search for a struct with the same name
+		 * in a number of different places:
+		 *  - All other CUs of the current module.
+		 *  - All CUs of all other modules from the current address space.
+		 *  - All CUs of all other modules from the other address space. */
+		byte_t const *def;
+		REF struct cmodule *def_module;
+		def = dw_enumerate_find_struct_definition(self->ct_struct.ct_info.cd_mod,
+		                                          self->ct_struct.ct_info.cd_dip,
+		                                          &def_module);
+		if (def && def != self->ct_struct.ct_info.cd_dip) {
+			/* Remember the new definition. */
+			self->ct_struct.ct_sizeof;
+			decref(self->ct_struct.ct_info.cd_mod);
+			self->ct_struct.ct_info.cd_mod = def_module;
+			self->ct_struct.ct_info.cd_dip = def;
+			dw_determine_type_size(def_module, def, &self->ct_struct.ct_sizeof);
+			struct_has_children = true;
+			goto again;
 		}
-	} while (debuginfo_cu_parser_next(&parser) &&
-	         parser.dup_child_depth >= depth);
-done:
+	}
 	return result;
-err:
-	return temp;
 }
 
 
@@ -907,7 +1055,7 @@ got_elem_count:
 		result_type->ct_kind        = CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM) | typinfo.t_sizeof;
 		result_type->ct_children    = NULL;
 		result_type->ct_enum.cd_mod = incref(mod);
-		result_type->ct_enum.cd_dip = parser.dup_cu_info_pos;
+		result_type->ct_enum.cd_dip = type_debug_info;
 		presult->ct_typ             = result_type; /* Inherit reference */
 	}	break;
 
@@ -1015,7 +1163,7 @@ err_fuction_argv:
 			struct_type->ct_kind = CTYPE_KIND_UNION;
 		struct_type->ct_children              = NULL;
 		struct_type->ct_struct.ct_info.cd_mod = incref(mod);
-		struct_type->ct_struct.ct_info.cd_dip = parser.dup_cu_info_pos;
+		struct_type->ct_struct.ct_info.cd_dip = type_debug_info;
 		struct_type->ct_struct.ct_sizeof      = typinfo.t_sizeof;
 		presult->ct_typ                       = struct_type; /* Inherit reference */
 	}	break;

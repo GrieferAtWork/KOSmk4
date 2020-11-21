@@ -227,7 +227,7 @@
 #define DW_AT_base_types              0x35 /* reference */
 #define DW_AT_calling_convention      0x36 /* constant */
 #define DW_AT_count                   0x37 /* constant, reference */
-#define DW_AT_data_member_location    0x38 /* block, reference */
+#define DW_AT_data_member_location    0x38 /* constant, block, reference */
 #define DW_AT_decl_column             0x39 /* constant */
 #define DW_AT_decl_file               0x3a /* constant */
 #define DW_AT_decl_line               0x3b /* constant */

@@ -652,6 +652,18 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		struct ctype *used_type;
 		char *endp;
 		__IEEE854_LONG_DOUBLE_TYPE__ value;
+		/* FIXME: Because of how libc/local functions are linked (using c++ `inline'),
+		 *        our attempt at using a custom version of format_scanf() doesn't end
+		 *        up working, since the c++ standard requires that functions declared
+		 *        as inline share the same address throughout a program.
+		 *        As such, relocations are generated that will end up bypassing our
+		 *        custom format_scanf() in favor of the one exported from the kernel
+		 *        core, which doesn't include floating-point support....
+		 * I feel like there's no point in trying to make this work. - That would end
+		 * up being _way_ too hacky, so I feel like the best solution would be to just
+		 * copy the relevant code from the implementation of format_scanf() that is
+		 * used for parsing floating-point numbers, paste it here, and call it directly.
+		 */
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
 		value = strtold(self->c_tokstart, &endp);
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
