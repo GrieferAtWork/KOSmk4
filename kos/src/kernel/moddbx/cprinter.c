@@ -1424,7 +1424,9 @@ do_calculate_next_indent:
 		}	break;
 		}
 	} EXCEPT {
+		FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
 		PRINT("<segfault>");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
 	}
 	return result;
 err:

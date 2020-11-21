@@ -116,6 +116,8 @@
 #define DEBUGINFO_PRINT_FORMAT_UNKNOWN_SUFFIX   0x0025 /* ... */
 #define DEBUGINFO_PRINT_FORMAT_CONSTANT_PREFIX  0x0026 /* Prefix for constant names (enums and macros) */
 #define DEBUGINFO_PRINT_FORMAT_CONSTANT_SUFFIX  0x0027 /* ... */
+#define DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX     0x0028 /* Prefix for data-access error messages (e.g. `<segfault>') */
+#define DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX     0x0029 /* ... */
 #define DEBUGINFO_PRINT_FORMAT_ISPREFIX(x) (!((x) & 1))
 #define DEBUGINFO_PRINT_FORMAT_ISSUFFIX(x) ((x) & 1)
 

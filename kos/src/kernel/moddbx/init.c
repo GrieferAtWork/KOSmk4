@@ -161,6 +161,10 @@ locals_format_printer(void *UNUSED(format_arg),
 			format = AC_COLOR(ANSITTY_CL_LIGHT_GRAY, ANSITTY_CL_MAROON);
 			break;
 
+		case DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX: /* Prefix for data-access error messages (e.g. `<segfault>') */
+			format = AC_FG(ANSITTY_CL_RED);
+			break;
+
 		default:
 			return 0;
 		}
