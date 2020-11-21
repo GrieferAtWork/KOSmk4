@@ -226,7 +226,7 @@ NOTHROW(FCALL cmodule_enum_drivers_except)(cmodule_enum_callback_t cb,
 			result = (*cb)(cookie, cm);
 		decref(cm);
 		if unlikely(result < 0)
-			goto done;
+			goto done_nods;
 	}
 	ds = driver_get_state();
 	for (i = 0; i < ds->ds_count; ++i) {
@@ -249,6 +249,7 @@ NOTHROW(FCALL cmodule_enum_drivers_except)(cmodule_enum_callback_t cb,
 	}
 done:
 	decref(ds);
+done_nods:
 	return result;
 err:
 	result = temp;
