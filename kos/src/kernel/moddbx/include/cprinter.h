@@ -88,10 +88,10 @@ ctype_printname(struct ctype const *__restrict self,
  *                           >>     }
  *                           >> }
  *                           Note that this limit isn't a guaranty, but only a hint.*/
-FUNDEF NONNULL((1, 2, 3)) ssize_t KCALL
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
 ctype_printvalue(struct ctyperef const *__restrict self,
                  struct cprinter const *__restrict printer,
-                 void const *__restrict buf, unsigned int flags,
+                 void const *buf, unsigned int flags,
                  size_t firstline_indent, size_t newline_indent,
                  size_t newline_tab, size_t maxlinelen);
 #define CTYPE_PRINTVALUE_FLAG_NORMAL             0x0000 /* Normal flags. */
@@ -100,7 +100,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 #define CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS     0x0004 /* Don't include struct fields. (`{x: 10, y: 20}' becomes `{10, 20}') */
 #define CTYPE_PRINTVALUE_FLAG_NOOMITSHORTFIELDS  0x0008 /* Don't allow field names to be omitted for short structs (this is
                                                          * normally done when the struct has <= 2 fields in total, and an
-                                                         * attempt it made to put it on a single line, but the line would
+                                                         * attempt is made to put it on a single line, but the line would
                                                          * become too long) */
 #define CTYPE_PRINTVALUE_FLAG_CSTYLESTRUCTFIELDS 0x0010 /* Print struct field names as `.name = 42', rather than `name: 42'. */
 #define CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER    0x0020 /* Don't print `char *' or `char const *' types (repeat for `char16_t'
