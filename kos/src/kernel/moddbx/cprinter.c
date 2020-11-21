@@ -28,6 +28,7 @@
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_DEBUGGER
 
+#include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/types.h>
 
@@ -992,45 +993,85 @@ print_named_pointer(struct ctyperef const *__restrict UNUSED(self),
                     bool *__restrict pdid_print_something) {
 	ssize_t temp, result = 0;
 	/* Check if `ptr' is a text-/data-pointer. */
-	REF module_t *mod;
-	module_type_var(modtyp);
-	mod = module_ataddr(ptr, modtyp);
-	if (mod) {
-		di_addr2line_sections_t sections;
-		di_addr2line_dl_sections_t dl_sections;
-		/* Try to lookup the name/base-address of a symbol
-		 * that contains the given `ptr' and is part of `mod' */
-		if (debug_addr2line_sections_lock(mod, &sections, &dl_sections
-		                                  module_type__arg(modtyp)) == DEBUG_INFO_ERROR_SUCCESS) {
-			di_debug_addr2line_t a2l;
-			uintptr_t module_relative_pc;
-			module_relative_pc = (uintptr_t)ptr - module_getloadaddr(mod, modtyp);
-			if (debug_addr2line(&sections, &a2l, module_relative_pc,
-			                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
-			                    DEBUG_ADDR2LINE_FNORMAL) == DEBUG_INFO_ERROR_SUCCESS) {
-				if (!a2l.al_rawname)
-					a2l.al_rawname = a2l.al_name;
-				if (a2l.al_rawname) {
-					uintptr_t offset;
-					offset = module_relative_pc - a2l.al_symstart;
-					temp   = print_a2l_symbol(printer, a2l.al_rawname, offset);
-					debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
-					module_decref(mod, modtyp);
-					if unlikely(temp < 0)
-						goto err;
-					result += temp;
-					goto done;
+	{
+		REF module_t *mod;
+		module_type_var(modtyp);
+		mod = module_ataddr_nx(ptr, modtyp);
+		if (mod) {
+			di_addr2line_sections_t sections;
+			di_addr2line_dl_sections_t dl_sections;
+			/* Try to lookup the name/base-address of a symbol
+			 * that contains the given `ptr' and is part of `mod' */
+			if (debug_addr2line_sections_lock(mod, &sections, &dl_sections
+			                                  module_type__arg(modtyp)) == DEBUG_INFO_ERROR_SUCCESS) {
+				di_debug_addr2line_t a2l;
+				uintptr_t module_relative_pc;
+				module_relative_pc = (uintptr_t)ptr - module_getloadaddr(mod, modtyp);
+				if (debug_addr2line(&sections, &a2l, module_relative_pc,
+				                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
+				                    DEBUG_ADDR2LINE_FNORMAL) == DEBUG_INFO_ERROR_SUCCESS) {
+					if (!a2l.al_rawname)
+						a2l.al_rawname = a2l.al_name;
+					if (a2l.al_rawname) {
+						uintptr_t offset;
+						offset = module_relative_pc - a2l.al_symstart;
+						temp   = print_a2l_symbol(printer, a2l.al_rawname, offset);
+						debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
+						module_decref(mod, modtyp);
+						if unlikely(temp < 0)
+							goto err;
+						result += temp;
+						goto done;
+					}
 				}
+				debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
 			}
-			debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
+			module_decref(mod, modtyp);
 		}
-		module_decref(mod, modtyp);
 	}
 
-	/* TODO: Check if `ptr' is apart of a file mapping. If it is,
-	 *       print the absolute path the mapped file, as well as
-	 *       the offset into the file, alongside the original pointer:
-	 *       `0x12345678 ("/path/to/file"+offset_into_file)' */
+	/* Check if `ptr' is apart of a file mapping. If it is,
+	 * print the absolute path the mapped file, as well as
+	 * the offset into the file, alongside the original pointer:
+	 * `0x12345678 ("/path/to/file"+offset_into_file)' */
+	{
+		struct vm *effective_vm;
+		effective_vm = &vm_kernel;
+		if (ADDR_ISUSER(ptr) && ADDR_ISKERN(dbg_current))
+			effective_vm = dbg_current->t_vm;
+		if (ADDR_ISKERN(effective_vm)) {
+			struct vm_node *node;
+			node = vm_getnodeofaddress(effective_vm, ptr);
+			if (node && node->vn_part && node->vn_fsname) {
+				pos_t mapping_offset;
+				mapping_offset = vm_datapart_startbyte(node->vn_part);
+				mapping_offset += (uintptr_t)ptr - (uintptr_t)vm_node_getstart(node);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+				PRINTF("%#" PRIxPTR, ptr);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+				PRINT(" ");
+				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+				PRINT("(");
+				if (node->vn_fspath) {
+					temp = path_printent(node->vn_fspath,
+					                     node->vn_fsname->de_name,
+					                     node->vn_fsname->de_namelen,
+					                     P_PRINTER, P_ARG);
+				} else {
+					temp = (*P_PRINTER)(P_ARG,
+					                    node->vn_fsname->de_name,
+					                    node->vn_fsname->de_namelen);
+				}
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+				PRINTF("+%" PRIuN(__SIZEOF_POS_T__) ")", mapping_offset);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+				goto done;
+			}
+		}
+	}
+
 
 	/* TODO: Check if `ptr' points into kernel heap memory. If it
 	 *       is, then print it as `0x12345678 (heap)' */

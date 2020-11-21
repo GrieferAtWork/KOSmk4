@@ -120,6 +120,8 @@
 #define DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX     0x0029 /* ... */
 #define DEBUGINFO_PRINT_FORMAT_TRUEFALSE_PREFIX 0x002a /* Prefix for `true' and `false' */
 #define DEBUGINFO_PRINT_FORMAT_TRUEFALSE_SUFFIX 0x002b /* ... */
+#define DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX     0x002c /* Prefix for custom annotation notes. */
+#define DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX     0x002d /* ... */
 #define DEBUGINFO_PRINT_FORMAT_ISPREFIX(x) (!((x) & 1))
 #define DEBUGINFO_PRINT_FORMAT_ISSUFFIX(x) ((x) & 1)
 
