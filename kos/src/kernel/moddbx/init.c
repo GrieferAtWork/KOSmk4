@@ -144,6 +144,9 @@ locals_format_printer(void *UNUSED(format_arg),
 			break;
 
 		case DEBUGINFO_PRINT_FORMAT_FIELD_PREFIX:   /* Prefix for `.field_name' (in struct initializers) */
+			format = AC_FG(ANSITTY_CL_LIGHT_GRAY);
+			break;
+
 		case DEBUGINFO_PRINT_FORMAT_VARNAME_PREFIX: /* Prefix for variable names */
 		case DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX: /* Prefix for `1234' */
 		case DEBUGINFO_PRINT_FORMAT_FLOAT_PREFIX:   /* Prefix for `1234.5678' */

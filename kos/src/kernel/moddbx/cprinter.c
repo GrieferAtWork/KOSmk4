@@ -635,6 +635,209 @@ err:
 	return temp;
 }
 
+
+struct ctype_printstruct_ismultiline_data {
+	void const  *buf;              /* [const] */
+	unsigned int flags;            /* [const] Flags for printing the field */
+	unsigned int inner_flags;      /* [const] Flags for printing the pointed-to object */
+	size_t       firstline_indent; /* [in|out] */
+	size_t       newline_indent;   /* [const] */
+	size_t       newline_tab;      /* [const] */
+	size_t       maxlinelen;       /* [const] */
+	size_t       out_field_count;  /* [out] Increment for every field encountered. */
+	bool         out_contains_lf;  /* [out] Set to true if the output contains line-feeds */
+};
+
+PRIVATE NONNULL((1, 2)) ssize_t KCALL
+ctype_printstruct_ismultiline_callback(void *cookie,
+                                       di_debuginfo_member_t const *__restrict member,
+                                       di_debuginfo_cu_parser_t const *__restrict parser,
+                                       struct cmodule *__restrict mod,
+                                       struct cmodunit *__restrict cu) {
+	struct ctype_printstruct_ismultiline_data *arg;
+	struct ctyperef member_type;
+	byte_t const *member_addr;
+	size_t prefix_length;
+	arg = (struct ctype_printstruct_ismultiline_data *)cookie;
+	member_addr   = (byte_t const *)arg->buf + member->m_offset;
+	prefix_length = 0;
+	/* Load type information for this member. */
+	if (ctype_fromdw(mod, cu, parser, member->m_type, &member_type) != DBX_EOK)
+		return 0;
+	if (arg->out_field_count != 0)
+		prefix_length += 2; /* ", " */
+	if (arg->flags & CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS) {
+		/* Don't print field names. */
+	} else {
+		if likely(member->m_name)
+			prefix_length += strlen(member->m_name);
+		if (arg->flags & CTYPE_PRINTVALUE_FLAG_CSTYLESTRUCTFIELDS) {
+			/* '.name = '
+			 *  ^    ^^^
+			 *  +4 */
+			prefix_length += 4;
+		} else {
+			/* 'name: '
+			 *      ^^
+			 *  +2 */
+			prefix_length += 2;
+		}
+	}
+	arg->firstline_indent += prefix_length;
+	++arg->out_field_count;
+	/* Check if printing this field causes a line-wrap, or exceeds the max line width */
+	arg->firstline_indent = ctype_printvalue_nextindent(&member_type, member_addr,
+	                                                    arg->inner_flags,
+	                                                    arg->firstline_indent,
+	                                                    arg->newline_indent,
+	                                                    arg->newline_tab,
+	                                                    arg->maxlinelen,
+	                                                    &arg->out_contains_lf,
+	                                                    true);
+	ctyperef_fini(&member_type);
+	if (arg->out_contains_lf)
+		return -1;
+	return 1;
+}
+
+PRIVATE NONNULL((1, 2)) ssize_t KCALL
+ctype_struct_is_nonempty_callback(void *UNUSED(cookie),
+                                  di_debuginfo_member_t const *__restrict UNUSED(member),
+                                  di_debuginfo_cu_parser_t const *__restrict UNUSED(parser),
+                                  struct cmodule *__restrict UNUSED(mod),
+                                  struct cmodunit *__restrict UNUSED(cu)) {
+	return -1;
+}
+
+
+
+struct ctype_printstruct_data {
+	struct cprinter const *printer;          /* [const][1..1] */
+	void const            *buf;              /* [const] */
+	unsigned int           flags;            /* [const] Flags for printing the field */
+	unsigned int           inner_flags;      /* [const] Flags for printing the pointed-to object */
+	size_t                 firstline_indent; /* [in|out] */
+	size_t                 newline_indent;   /* [const] */
+	size_t                 newline_tab;      /* [const] */
+	size_t                 maxlinelen;       /* [const] */
+	size_t                 out_field_count;  /* [out] Increment for every field encountered. */
+	bool                   do_multiline;     /* [const] True if printing in multi-line mode. */
+};
+
+PRIVATE NONNULL((1, 2)) ssize_t KCALL
+ctype_printstruct_callback(void *cookie,
+                           di_debuginfo_member_t const *__restrict member,
+                           di_debuginfo_cu_parser_t const *__restrict parser,
+                           struct cmodule *__restrict mod,
+                           struct cmodunit *__restrict cu) {
+	ssize_t temp, result = 0;
+	struct ctype_printstruct_data *arg;
+	struct ctyperef member_type;
+	byte_t const *member_addr;
+	size_t prefix_length, next_indent;
+	size_t elem_indent, name_length;
+	struct cprinter const *printer;
+	bool contains_newline;
+	arg           = (struct ctype_printstruct_data *)cookie;
+	printer       = arg->printer;
+	member_addr   = (byte_t const *)arg->buf + member->m_offset;
+	prefix_length = 0;
+	/* Load type information for this member. */
+	if (ctype_fromdw(mod, cu, parser, member->m_type, &member_type) != DBX_EOK)
+		return 0;
+	/* Print the leading "," */
+	if (arg->out_field_count != 0) {
+		FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_PREFIX);
+		PRINT(",");
+		FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_SUFFIX);
+		arg->firstline_indent += 1; /* "," */
+		++prefix_length;            /* " " (following the ",") */
+	}
+	name_length = 0;
+	if (arg->flags & CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS) {
+		/* Don't print field names. */
+	} else {
+		if likely(member->m_name) {
+			name_length = strlen(member->m_name);
+			prefix_length += name_length;
+			if (arg->flags & CTYPE_PRINTVALUE_FLAG_CSTYLESTRUCTFIELDS) {
+				/* '.name = '
+				 *  ^    ^^^
+				 *  +4 */
+				prefix_length += 4;
+			} else {
+				/* 'name: '
+				 *      ^^
+				 *  +2 */
+				prefix_length += 2;
+			}
+		}
+	}
+	/* Check how this member will end up being printed. */
+	contains_newline = false;
+	elem_indent = arg->firstline_indent + prefix_length;
+	next_indent = ctype_printvalue_nextindent(&member_type, member_addr,
+	                                          arg->inner_flags,
+	                                          elem_indent,
+	                                          arg->newline_indent,
+	                                          arg->newline_tab,
+	                                          arg->maxlinelen,
+	                                          &contains_newline,
+	                                          false);
+	if (arg->out_field_count == 0) {
+		/* Never print an additional linefeed before the first element. */
+	} else if ((!contains_newline && next_indent <= arg->maxlinelen) || !arg->do_multiline) {
+		/* Print the field in-line. */
+		PRINT(" "); /* Add a space after the comma of the previous element. */
+		--prefix_length;
+	} else {
+		--prefix_length; /* Discount the leading ' ' */
+		/* Insert a line-feed before the element. */
+		PRINT("\n");
+		REPEAT(' ', arg->newline_indent); /* Print leading spaces. */
+		elem_indent = arg->newline_indent + prefix_length;
+		next_indent = ctype_printvalue_nextindent(&member_type, member_addr,
+		                                          arg->inner_flags, elem_indent,
+		                                          arg->newline_indent, arg->newline_tab,
+		                                          arg->maxlinelen, NULL, false);
+	}
+	/* Actually print the prefix+member. */
+	if (arg->flags & CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS) {
+		/* Don't print field names. */
+	} else {
+		if likely(member->m_name) {
+			FORMAT(DEBUGINFO_PRINT_FORMAT_FIELD_PREFIX);
+			if (arg->flags & CTYPE_PRINTVALUE_FLAG_CSTYLESTRUCTFIELDS) {
+				PRINT(".");
+				DO((*P_PRINTER)(P_ARG, member->m_name, name_length));
+				FORMAT(DEBUGINFO_PRINT_FORMAT_FIELD_SUFFIX);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_ASSIGN_PREFIX);
+				PRINT(" = ");
+				FORMAT(DEBUGINFO_PRINT_FORMAT_ASSIGN_SUFFIX);
+			} else {
+				DO((*P_PRINTER)(P_ARG, member->m_name, name_length));
+				FORMAT(DEBUGINFO_PRINT_FORMAT_FIELD_SUFFIX);
+				FORMAT(DEBUGINFO_PRINT_FORMAT_ASSIGN_PREFIX);
+				PRINT(": ");
+				FORMAT(DEBUGINFO_PRINT_FORMAT_ASSIGN_SUFFIX);
+			}
+		}
+	}
+	DO(ctype_printvalue(&member_type, arg->printer, member_addr,
+	                    arg->inner_flags, elem_indent,
+	                    arg->newline_indent, arg->newline_tab,
+	                    arg->maxlinelen));
+	ctyperef_fini(&member_type);
+	arg->firstline_indent = next_indent;
+	++arg->out_field_count;
+	return result;
+err:
+	ctyperef_fini(&member_type);
+	return temp;
+}
+
+
+
 /* Print a human-readable representation of the contents of a given data-buffer,
  * based on the C-typing of that buffer, which was likely extracted from debug info.
  * @param: self:             The typing of `buf'
@@ -671,7 +874,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
                  size_t firstline_indent, size_t newline_indent,
                  size_t newline_tab, size_t maxlinelen) {
 	ssize_t temp, result = 0;
-	struct ctype const *me = self->ct_typ;
+	struct ctype *me = self->ct_typ;
 	uintptr_half_t kind = me->ct_kind;
 	TRY {
 		switch (CTYPE_KIND_CLASSOF(kind)) {
@@ -907,7 +1110,102 @@ print_integer_value_as_hex:
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 		}	break;
 
-		/* TODO: CTYPE_KIND_STRUCT */
+		case CTYPE_KIND_STRUCT: {
+			bool do_multiline;
+			union {
+				struct ctype_printstruct_ismultiline_data im;
+				struct ctype_printstruct_data ps;
+			} data;
+			unsigned int inner_flags;
+			inner_flags = flags;
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+			PRINT("{");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+			++firstline_indent; /* Account for the leading '{' */
+			if (flags & CTYPE_PRINTVALUE_FLAG_NORECURSION)
+				goto do_print_no_recursion_dots_and_rbrace;
+			/* First pass: Figure out if we want multi-line mode. */
+			if (flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
+				do_multiline = false;
+			} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
+				/* Check if the struct has 0 fields. It this is the
+				 * case, then don't print anything and continue with
+				 * the closing '}' */
+				if (ctype_struct_enumfields(me, &ctype_struct_is_nonempty_callback, &data.im) == 0)
+					goto done_struct;
+				do_multiline = true;
+			} else {
+				data.im.buf              = buf;
+				data.im.flags            = flags;
+				data.im.inner_flags      = inner_flags;
+				data.im.firstline_indent = firstline_indent;
+				data.im.newline_indent   = newline_indent;
+				data.im.newline_tab      = newline_tab;
+				data.im.maxlinelen       = maxlinelen;
+				data.im.out_field_count  = 0;
+				data.im.out_contains_lf  = false;
+				/* Enumerate field for the initial pass. */
+				ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
+				if (!data.im.out_field_count)
+					goto done_struct; /* Empty struct... */
+				do_multiline = data.im.out_contains_lf;
+				if (!do_multiline) {
+					/* Check if the output fits into a single line. */
+					if (data.im.firstline_indent > data.im.maxlinelen) {
+						/* Nope... */
+						do_multiline = true;
+						/* Check if we're allowed to omit the names of fields, and
+						 * if doing so  */
+						if (data.im.out_field_count <= 2 &&
+						    !(flags & (CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS |
+						               CTYPE_PRINTVALUE_FLAG_NOOMITSHORTFIELDS))) {
+							/* Nope. But we're allowed to omit field names, so try to
+							 *       do that in order to fit everything onto a single
+							 *       line. */
+							data.im.flags = flags | CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
+							data.im.firstline_indent = firstline_indent;
+							data.im.out_field_count  = 0;
+							data.im.out_contains_lf  = false;
+							ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
+							if (!data.im.out_contains_lf && data.im.firstline_indent <= maxlinelen) {
+								/* Omit struct field names to save on space, which in
+								 * turn allows us to keep everything on a single line. */
+								inner_flags |= CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
+								do_multiline = false;
+							}
+						}
+					}
+				}
+			}
+			if (do_multiline) {
+				PRINT("\n");
+				newline_indent += newline_tab;
+				REPEAT(' ', newline_indent); /* Print leading spaces. */
+				firstline_indent = newline_indent;
+			}
+			/* Actually print the struct proper. */
+			data.ps.printer          = printer;
+			data.ps.buf              = buf;
+			data.ps.flags            = flags;
+			data.ps.inner_flags      = inner_flags;
+			data.ps.firstline_indent = firstline_indent;
+			data.ps.newline_indent   = newline_indent;
+			data.ps.newline_tab      = newline_tab;
+			data.ps.maxlinelen       = maxlinelen;
+			data.ps.out_field_count  = 0;
+			data.ps.do_multiline     = do_multiline;
+			DO(ctype_struct_enumfields(me, &ctype_printstruct_callback, &data.ps));
+			if (do_multiline) {
+				PRINT("\n");
+				newline_indent -= newline_tab;
+				REPEAT(' ', newline_indent); /* Print leading spaces. */
+				/*firstline_indent = newline_indent;*/
+			}
+done_struct:
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_PREFIX);
+			PRINT("}");
+			FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
+		}	break;
 
 		case CTYPE_KIND_ARRAY: {
 			size_t used_length, elem_size;
@@ -950,6 +1248,7 @@ print_integer_value_as_hex:
 			} else {
 				FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
 				if (flags & CTYPE_PRINTVALUE_FLAG_NORECURSION) {
+do_print_no_recursion_dots_and_rbrace:
 					FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_PREFIX);
 					PRINT("...");
 					FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX);
@@ -966,6 +1265,9 @@ print_integer_value_as_hex:
 						do_multiline = false;
 					} else if (flags & CTYPE_PRINTVALUE_FLAG_NOSHORTLINES) {
 						do_multiline = true;
+					} else if (used_length <= 1) {
+						/* No point; would just waste space! */
+						do_multiline = false;
 					} else {
 						size_t peek_indent;
 						peek_indent  = firstline_indent;
@@ -1013,9 +1315,10 @@ print_integer_value_as_hex:
 							                                               false);
 							if (i < used_length - 1)
 								firstline_indent += 1; /* For the trailing comma */
-							if (contains_newline || firstline_indent <= maxlinelen) {
-								if (i != 0)
-									PRINT(" "); /* Add a space after the comma of the previous element. */
+							if (i == 0) {
+								/* Never print an additional linefeed before the first element. */
+							} else if (!contains_newline && firstline_indent <= maxlinelen) {
+								PRINT(" "); /* Add a space after the comma of the previous element. */
 							} else {
 								/* Insert a line-feed before the element. */
 								PRINT("\n");
