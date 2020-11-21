@@ -169,6 +169,10 @@ locals_format_printer(void *UNUSED(format_arg),
 			format = AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_GREEN);
 			break;
 
+		case DEBUGINFO_PRINT_FORMAT_BADNOTES_PREFIX: /* Prefix for custom annotation notes. */
+			format = AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_RED);
+			break;
+
 		default:
 			return 0;
 		}

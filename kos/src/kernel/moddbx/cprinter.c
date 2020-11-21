@@ -50,6 +50,13 @@
 #include "include/cprinter.h"
 #include "include/ctype.h"
 #include "include/malloc.h"
+#include "include/obnote.h"
+
+/*For custom pointer-to-object-printers*/
+#include <kernel/vm/exec.h>
+#include <sched/pid.h>
+
+#include <sys/mmio.h>
 
 DECL_BEGIN
 
@@ -986,12 +993,23 @@ err:
 	return temp;
 }
 
+PRIVATE ssize_t FORMATPRINTER_CC
+is_nonempty_printer(void *UNUSED(arg),
+                    char const *__restrict UNUSED(data),
+                    size_t datalen) {
+	return datalen ? -1 : 0;
+}
+
+
+
 PRIVATE ATTR_NOINLINE NONNULL((1, 3)) ssize_t KCALL
-print_named_pointer(struct ctyperef const *__restrict UNUSED(self),
+print_named_pointer(struct ctyperef const *__restrict self,
                     struct cprinter const *__restrict printer,
                     void const *ptr,
                     bool *__restrict pdid_print_something) {
 	ssize_t temp, result = 0;
+	bool is_void_pointer;
+
 	/* Check if `ptr' is a text-/data-pointer. */
 	{
 		REF module_t *mod;
@@ -1039,49 +1057,111 @@ print_named_pointer(struct ctyperef const *__restrict UNUSED(self),
 		effective_vm = &vm_kernel;
 		if (ADDR_ISUSER(ptr) && ADDR_ISKERN(dbg_current))
 			effective_vm = dbg_current->t_vm;
+		is_void_pointer = true;
 		if (ADDR_ISKERN(effective_vm)) {
 			struct vm_node *node;
 			node = vm_getnodeofaddress(effective_vm, ptr);
-			if (node && node->vn_part && node->vn_fsname) {
-				pos_t mapping_offset;
-				mapping_offset = vm_datapart_startbyte(node->vn_part);
-				mapping_offset += (uintptr_t)ptr - (uintptr_t)vm_node_getstart(node);
-				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-				PRINTF("%#" PRIxPTR, ptr);
-				FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
-				PRINT(" ");
-				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
-				PRINT("(");
-				if (node->vn_fspath) {
-					temp = path_printent(node->vn_fspath,
-					                     node->vn_fsname->de_name,
-					                     node->vn_fsname->de_namelen,
-					                     P_PRINTER, P_ARG);
-				} else {
-					temp = (*P_PRINTER)(P_ARG,
-					                    node->vn_fsname->de_name,
-					                    node->vn_fsname->de_namelen);
+			if (node && node->vn_part) {
+				is_void_pointer = false;
+				if (node->vn_fsname) {
+					pos_t mapping_offset;
+					mapping_offset = vm_datapart_startbyte(node->vn_part);
+					mapping_offset += (uintptr_t)ptr - (uintptr_t)vm_node_getstart(node);
+					FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+					PRINTF("%#" PRIxPTR, ptr);
+					FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+					PRINT(" ");
+					FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+					PRINT("(");
+					if (node->vn_fspath) {
+						temp = path_printent(node->vn_fspath,
+						                     node->vn_fsname->de_name,
+						                     node->vn_fsname->de_namelen,
+						                     P_PRINTER, P_ARG);
+					} else {
+						temp = (*P_PRINTER)(P_ARG,
+						                    node->vn_fsname->de_name,
+						                    node->vn_fsname->de_namelen);
+					}
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+					PRINTF("+%" PRIuN(__SIZEOF_POS_T__) ")", mapping_offset);
+					FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+					goto done;
 				}
-				if unlikely(temp < 0)
-					goto err;
-				result += temp;
-				PRINTF("+%" PRIuN(__SIZEOF_POS_T__) ")", mapping_offset);
-				FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
-				goto done;
 			}
 		}
 	}
 
+	if (!is_void_pointer && ADDR_ISKERN(ptr)) {
+		struct ctype *mytype = self->ct_typ;
+		if (CTYPE_KIND_ISPOINTER(mytype->ct_kind)) {
+			struct cmodule *mod;
+			mytype = mytype->ct_pointer.cp_base.ct_typ;
+			if (CTYPE_KIND_ISSTRUCT(mytype->ct_kind)) {
+				mod = mytype->ct_struct.ct_info.cd_mod;
+				if (cmodule_iskern(mod)) {
+					if (mod->cm_module != (REF module_t *)&kernel_driver) {
+						/* If the type was declared by a driver, it may actually
+						 * originate from the kernel core. In this case, try to
+						 * load the pointed-to type. */
+						ctype_struct_enumfields(mytype, &ctype_struct_is_nonempty_callback, NULL);
+						mod = mytype->ct_struct.ct_info.cd_mod;
+					}
+					if (mod->cm_module == (REF module_t *)&kernel_driver) {
+						char const *name;
+						name = ctype_struct_getname(mytype);
+						if (name) {
+							unsigned int status;
+							/* Custom representations of pointers to objects from the kernel core. */
+							status = OBNOTE_PRINT_STATUS_BADNAME;
+							obnote_print(&is_nonempty_printer, NULL, ptr, name, &status);
+							if (status == OBNOTE_PRINT_STATUS_BADOBJ) {
+								/* Bad/Corrupt object */
+								FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
+								PRINTF("%#" PRIxPTR, ptr);
+								FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
+								PRINT(" ");
+								FORMAT(DEBUGINFO_PRINT_FORMAT_BADNOTES_PREFIX);
+								PRINTF("(%s)", name);
+								FORMAT(DEBUGINFO_PRINT_FORMAT_BADNOTES_SUFFIX);
+								goto done;
+							}
+							if (status != OBNOTE_PRINT_STATUS_BADNAME) {
+								/* Print a normal object note. */
+								FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+								PRINTF("%#" PRIxPTR, ptr);
+								FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+								PRINT(" ");
+								FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+								PRINTF("(%s ", name);
+								DO(obnote_print(P_PRINTER, P_ARG, ptr, name, &status));
+								PRINT(")");
+								FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+								goto done;
+							}
+						}
+					}
+				}
+			}
+		}
+		/* TODO: Check if `ptr' points into kernel heap memory. If it
+		 *       is, then print it as `0x12345678 (heap)' */
+	}
 
-	/* TODO: Check if `ptr' points into kernel heap memory. If it
-	 *       is, then print it as `0x12345678 (heap)' */
-
-	/* TODO: If nothing is mapped where `ptr' points to, then we
-	 *       should print it in a different color (iow: use a custom
-	 *       prefix/suffix pair for unmapped pointers)
+	/* If nothing is mapped where `ptr' points to, then we
+	 * should print it in a different color (iow: use a custom
+	 * prefix/suffix pair for unmapped pointers)
+	 *
 	 * That way, when debugging segmentation faults, it becomes easy
 	 * to stop faulty pointers. */
-
+	if (is_void_pointer) {
+		FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
+		PRINTF("%#" PRIxPTR, ptr);
+		FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
+		goto done;
+	}
 	return result;
 done:
 	*pdid_print_something = true;
@@ -1382,7 +1462,7 @@ print_integer_value_as_hex:
 			/* Check if the struct has 0 fields. It this is the
 			 * case, then don't print anything and continue with
 			 * the closing '}' */
-			if (ctype_struct_enumfields(me, &ctype_struct_is_nonempty_callback, &data.im) == 0)
+			if (ctype_struct_enumfields(me, &ctype_struct_is_nonempty_callback, NULL) == 0)
 				goto done_struct;
 			do_multiline = true;
 		} else {

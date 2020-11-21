@@ -593,6 +593,10 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
                                      /*out*/ struct ctyperef *__restrict pfield_type,
                                      /*out*/ ptrdiff_t *__restrict pfield_offset);
 
+/* Return the name of a structure type, or `NULL' if unknown or `self' isn't a struct. */
+FUNDEF WUNUSED NONNULL((1)) char const *
+NOTHROW(FCALL ctype_struct_getname)(struct ctype const *__restrict self);
+
 
 /* Load a C-type from a given `type_debug_info' which should be
  * loaded with the help of an internal copy made from `cu_parser'.

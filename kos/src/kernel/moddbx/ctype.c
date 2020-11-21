@@ -701,6 +701,27 @@ NOTHROW(FCALL dw_determine_type_size)(struct cmodule *__restrict mod,
 	}
 }
 
+/* Return the name of a structure type, or `NULL' if unknown or `self' isn't a struct. */
+PUBLIC WUNUSED NONNULL((1)) char const *
+NOTHROW(FCALL ctype_struct_getname)(struct ctype const *__restrict self) {
+	di_debuginfo_cu_parser_t parser;
+	di_debuginfo_component_attrib_t attr;
+	char const *result;
+	/* Sanity check: we're actually dealing with a struct! */
+	if unlikely(!CTYPE_KIND_ISSTRUCT(self->ct_kind))
+		return NULL;
+	cmodule_parser_from_dip(self->ct_struct.ct_info.cd_mod, &parser,
+	                        self->ct_struct.ct_info.cd_dip);
+	result = NULL;
+	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
+		if (attr.dica_name == DW_AT_name) {
+			if (!debuginfo_cu_parser_getstring(&parser, attr.dica_form, &result))
+				result = NULL;
+		}
+	}
+	return result;
+}
+
 /* Try to find the definition of a given struct. */
 PRIVATE NONNULL((1, 2)) byte_t const *
 NOTHROW(FCALL dw_enumerate_find_struct_definition)(struct cmodule *__restrict mod,

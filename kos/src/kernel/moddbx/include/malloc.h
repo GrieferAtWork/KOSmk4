@@ -31,12 +31,13 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
+#ifdef CONFIG_HAVE_DEBUGGER
+
 #include <kernel/heap.h>
 #include <kernel/types.h>
 
 #include <hybrid/typecore.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
 DECL_BEGIN
 
 /* High-level malloc functions. */
