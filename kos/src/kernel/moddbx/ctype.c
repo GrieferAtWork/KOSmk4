@@ -910,11 +910,8 @@ again:
 		presult->ct_info.ci_name = typinfo.t_name;
 		if (!presult->ct_info.ci_name)
 			presult->ct_info.ci_name = typinfo.t_rawname;
-		if (!presult->ct_info.ci_name)
-			presult->ct_info.ci_name = (char *)-1;
-		else {
+		if (presult->ct_info.ci_name)
 			presult->ct_info.ci_nameref = incref(mod);
-		}
 	}
 	switch (parser.dup_comp.dic_tag) {
 
@@ -1216,10 +1213,12 @@ err_fuction_argv:
 		goto err_corrupt;
 	}
 done:
-	if (presult->ct_info.ci_name == (char const *)-1 || result != DBX_EOK) {
+	if (result != DBX_EOK) {
 		presult->ct_info.ci_name = NULL;
-		xdecref(presult->ct_info.ci_nameref);
-		presult->ct_info.ci_nameref = NULL;
+		if (presult->ct_info.ci_nameref) {
+			decref(presult->ct_info.ci_nameref);
+			presult->ct_info.ci_nameref = NULL;
+		}
 	}
 	return result;
 err_corrupt:
