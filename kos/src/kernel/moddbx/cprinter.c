@@ -321,6 +321,8 @@ ctype_printsuffix_head(struct ctyperef *__restrict self,
 	ssize_t temp, result = 0;
 	struct ctype *typ;
 again:
+	if (self->ct_info.ci_name)
+		goto do_print_varname_suffix;
 	typ = self->ct_typ;
 	switch (CTYPE_KIND_CLASSOF(typ->ct_kind)) {
 
@@ -396,6 +398,7 @@ again:
 		break;
 	}
 	/* Print the variable name. */
+do_print_varname_suffix:
 	if (varname_len) {
 		PRINT(" ");
 do_print_varname_without_space:
@@ -409,15 +412,20 @@ err:
 }
 
 PRIVATE NONNULL((1, 2)) ssize_t KCALL
-ctype_printsuffix_tail(struct ctype const *__restrict self,
+ctype_printsuffix_tail(struct ctyperef const *__restrict self,
                        struct cprinter const *__restrict printer) {
 	ssize_t temp, result = 0;
+	struct ctype *me;
 again:
-	switch (CTYPE_KIND_CLASSOF(self->ct_kind)) {
+	if (self->ct_info.ci_name)
+		goto done;
+	me = self->ct_typ;
+again_me:
+	switch (CTYPE_KIND_CLASSOF(me->ct_kind)) {
 
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR): {
 		struct ctype *inner;
-		inner = self->ct_pointer.cp_base.ct_typ;
+		inner = me->ct_pointer.cp_base.ct_typ;
 		/* Pointer to array or function requires additional parenthesis:
 		 * >> int (*foo)[42];
 		 * >> int (*bar)(int x, int y);
@@ -428,7 +436,7 @@ again:
 			PRINT(")");
 			FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
 		}
-		self = inner;
+		self = &me->ct_pointer.cp_base;
 		goto again;
 	}	break;
 
@@ -437,44 +445,47 @@ again:
 		PRINT("[");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_SUFFIX);
 		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-		PRINTF("%" PRIuSIZ, self->ct_array.ca_count);
+		PRINTF("%" PRIuSIZ, me->ct_array.ca_count);
 		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_PREFIX);
 		PRINT("]");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACKET_SUFFIX);
-		self = self->ct_array.ca_elem;
-		goto again;
+		if (me->ct_array.ca_eleminfo.ci_name)
+			goto done;
+		me = me->ct_array.ca_elem;
+		goto again_me;
 
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_FUNCTION):
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
 		PRINT("(");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
-		if (self->ct_function.cf_argc == 0) {
+		if (me->ct_function.cf_argc == 0) {
 			FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX);
 			PRINT("void");
 			FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_SUFFIX);
 		} else {
 			size_t i;
-			for (i = 0; i < self->ct_function.cf_argc; ++i) {
+			for (i = 0; i < me->ct_function.cf_argc; ++i) {
 				if (i != 0) {
 					FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_PREFIX);
 					PRINT(",");
 					FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_SUFFIX);
 					PRINT(" ");
 				}
-				DO(ctyperef_printname(&self->ct_function.cf_argv[i],
+				DO(ctyperef_printname(&me->ct_function.cf_argv[i],
 				                      printer, NULL, 0));
 			}
 		}
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
 		PRINT(")");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
-		self = self->ct_function.cf_base.ct_typ;
+		self = &me->ct_function.cf_base;
 		goto again;
 
 	default:
 		break;
 	}
+done:
 	return result;
 err:
 	return temp;
@@ -497,7 +508,7 @@ ctyperef_printname(struct ctyperef const *__restrict self,
 	/* Print the type suffix head+tail. */
 	memcpy(&me, self, sizeof(me));
 	DO(ctype_printsuffix_head(&me, printer, varname, varname_len));
-	DO(ctype_printsuffix_tail(self->ct_typ, printer));
+	DO(ctype_printsuffix_tail(self, printer));
 done:
 	return result;
 err:

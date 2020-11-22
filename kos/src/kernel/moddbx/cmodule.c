@@ -2025,7 +2025,7 @@ NOTHROW(FCALL cmod_symenum_symtab)(struct cmodsymtab const *__restrict self,
 		if (symbol_namelen < startswith_namelen) {
 			cmp = memcmp(startswith_name, symbol_name, symbol_namelen * sizeof(char));
 			if (cmp == 0)
-				cmp = -1; /* (startswith_name[symbol_namelen]!=0) < (symbol_name[symbol_namelen]==0) */
+				cmp = 1; /* (startswith_name[symbol_namelen]!=0) > (symbol_name[symbol_namelen]==0) */
 		} else {
 			cmp = memcmp(startswith_name, symbol_name, startswith_namelen * sizeof(char));
 			/* When `cmp == 0' at this point, then we've located a symbol
