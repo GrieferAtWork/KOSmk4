@@ -54,23 +54,23 @@ struct taskpid {
 	 *   - Reference                    - Weak reference
 	 *                                  - Cleared when the task gets destroyed.
 	 *                                    WARNING: May point to a `wasdestroyed()' task! */
-	WEAK refcnt_t                  tp_refcnt;     /* Reference counter. */
-	XATOMIC_WEAKLYREF(struct task) tp_thread;     /* [0..1] The pointed-to task */
-	union wait                     tp_status;     /* [const_if(!tp_thread || wasdestroyed(tp_thread) || tp_thread->t_flags & TASK_FTERMINATING)]
-	                                               * Current thread status / thread exit status. */
-	struct sig                     tp_changed;    /* Signal broadcast when the thread changes state (WSTOPPED, WCONTINUED, WEXITED) */
-	LLIST_NODE(REF struct taskpid) tp_siblings;   /* [0..1][valid_if(tp_thread && !wasdestroyed(tp_thread))]
-	                                               * Chain of sibling tasks:
-	                                               *  - If `tp_thread' is a process-leader:
-	                                               *    - Chain of sibling processes spawned by the parent process of `tp_thread'
-	                                               *  - If `tp_thread' isn't a process-leader (but instead a secondary thread):
-	                                               *    - Chain of sibling threads spawned within the same process
-	                                               *  - In either case, the link may be unbound if `detach()' was called. */
-	REF struct pidns              *tp_pidns;      /* [1..1][const] The associated PID namespace. */
-	upid_t                         tp_pids[1024]; /* [const][tp_pidns->pn_indirection + 1] This task's PIDs within all
-	                                               * of the different PID namespaces that were used to bring it forth.
-	                                               * Usually, this is only 1 (the root PID namespace), which is also the
-	                                               * one who's PID appears in system logs. */
+	WEAK refcnt_t                   tp_refcnt;   /* Reference counter. */
+	XATOMIC_WEAKLYREF(struct task)  tp_thread;   /* [0..1] The pointed-to task */
+	union wait                      tp_status;   /* [const_if(!tp_thread || wasdestroyed(tp_thread) || tp_thread->t_flags & TASK_FTERMINATING)]
+	                                              * Current thread status / thread exit status. */
+	struct sig                      tp_changed;  /* Signal broadcast when the thread changes state (WSTOPPED, WCONTINUED, WEXITED) */
+	LLIST_NODE(REF struct taskpid)  tp_siblings; /* [0..1][valid_if(tp_thread && !wasdestroyed(tp_thread))]
+	                                              * Chain of sibling tasks:
+	                                              *  - If `tp_thread' is a process-leader:
+	                                              *    - Chain of sibling processes spawned by the parent process of `tp_thread'
+	                                              *  - If `tp_thread' isn't a process-leader (but instead a secondary thread):
+	                                              *    - Chain of sibling threads spawned within the same process
+	                                              *  - In either case, the link may be unbound if `detach()' was called. */
+	REF struct pidns               *tp_pidns;    /* [1..1][const] The associated PID namespace. */
+	COMPILER_FLEXIBLE_ARRAY(upid_t, tp_pids);    /* [const][tp_pidns->pn_indirection + 1] This task's PIDs within all
+	                                              * of the different PID namespaces that were used to bring it forth.
+	                                              * Usually, this is only 1 (the root PID namespace), which is also the
+	                                              * one who's PID appears in system logs. */
 };
 
 FUNDEF NOBLOCK NONNULL((1)) void

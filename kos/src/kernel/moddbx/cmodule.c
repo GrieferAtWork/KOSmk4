@@ -933,8 +933,13 @@ again:
 		}
 		if (!result)
 			result = name_attribute;
-		if (features != (DEBUGINFO_VAR_FEATURE_HASTYPE | DEBUGINFO_VAR_FEATURE_HASLOCATION))
-			result = NULL; /* We need a type! */
+		if (features != (DEBUGINFO_VAR_FEATURE_HASTYPE | DEBUGINFO_VAR_FEATURE_HASLOCATION)) {
+			/* TODO: If only the location is missing, check the module's symbol table
+			 *       for the missing object. This is required so we can properly load
+			 *       symbols defined by assembly, and later used by high-level code.
+			 */
+			result = NULL; /* We need a type & location! */
+		}
 		*pns = CMODSYM_DIP_NS_NORMAL;
 	}	break;
 
@@ -1093,7 +1098,7 @@ NOTHROW(FCALL same_namespace)(uintptr_t dip_a, uintptr_t dip_b) {
 	/* Quick check: Is it the same namespace id? */
 	if (ns_a == ns_b)
 		return true;
-	/* The typedef namespace overlap the normal namespace, and is
+	/* The typedef namespace overlaps the normal namespace, and is
 	 * only there to allow one to quickly determine if a symbol
 	 * encodes a type, as opposed to a variable/const/etc. */
 	if (ns_a == CMODSYM_DIP_NS_TYPEDEF)

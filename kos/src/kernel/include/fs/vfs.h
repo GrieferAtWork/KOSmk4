@@ -67,7 +67,8 @@ struct mounted_path {
 	                                          * either within their associated VFS or superblock. */
 };
 
-#define PATH_DEFAULT_MASK  3
+
+#define PATH_DEFAULT_MASK 3
 struct path {
 	WEAK refcnt_t               p_refcnt;  /* Reference counter. */
 	struct vfs                 *p_vfs;     /* [1..1][const][== this == p_path ? this : p_parent->p_vfs]
