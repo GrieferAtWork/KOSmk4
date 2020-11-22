@@ -36,6 +36,7 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 
 #include <debugger/rt.h>
 #include <fs/node.h>
+#include <kernel/panic.h>
 #include <kernel/types.h>
 
 #include <hybrid/overflow.h>
@@ -584,8 +585,15 @@ NOTHROW(FCALL usermod_get_user_tls_base)(struct usermod *__restrict self,
                                          byte_t **__restrict ptls_base) {
 	struct libdl_tls_segment *utls;
 	struct libdl_dlmodule *dlmod;
+
 	/* This only works for ELF modules. */
 	if (!USERMOD_TYPE_ISELF(self->um_modtype))
+		goto nope;
+
+	/* Don't do all of this trickery when the kernel's been poisoned.
+	 * The below code may call-back to (possibly) faulty kernel code
+	 * due to the dependency on `inode_readallk()' */
+	if (kernel_poisoned())
 		goto nope;
 
 	/* This is where it gets really hacky, since we rely on internals
@@ -846,6 +854,7 @@ do_second_pass:
 			                    cexpr_forcewrite) != 0)
 				goto err_fault;
 		}
+		/* Change the value-kind to become a memory reference. */
 		self->cv_kind = CVALUE_KIND_ADDR;
 		self->cv_addr = lvalue;
 	}	break;

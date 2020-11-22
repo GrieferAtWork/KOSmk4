@@ -839,6 +839,11 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		}
 	}	break;
 
+		/* TODO: CTOKEN_TOK_STRING can be implemented by pushing
+		 *       the associated string-value using `CVALUE_KIND_DATA'
+		 *       or `CVALUE_KIND_IDATA', and using `char const[N]' as
+		 *       the type. */
+
 	default:
 		/* Unexpected token... */
 syn:
