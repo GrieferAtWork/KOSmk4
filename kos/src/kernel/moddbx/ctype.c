@@ -313,18 +313,41 @@ NOTHROW(FCALL ctype_common)(struct ctype *a,
 	    (CTYPE_KIND_ISINT(bkind) || CTYPE_KIND_ISBOOL(bkind))) {
 		/* Return the larger of the two types. */
 		if (CTYPE_KIND_SIZEOF(akind) > CTYPE_KIND_SIZEOF(bkind))
-			return incref(a);
+			goto return_a;
 		if (CTYPE_KIND_SIZEOF(akind) < CTYPE_KIND_SIZEOF(bkind))
-			return incref(b);
+			goto return_b;
+		/* Return whichever isn't a boolean. */
+		if (CTYPE_KIND_ISBOOL(bkind))
+			goto return_a;
+		if (CTYPE_KIND_ISBOOL(akind))
+			goto return_b;
 		/* Same type sizes. -> Return the signed of the two types. */
-		if (!CTYPE_KIND_INT_ISUNSIGNED(akind))
-			return incref(a);
-		if (!CTYPE_KIND_INT_ISUNSIGNED(bkind))
-			return incref(b);
-		/* Both types are unsigned. -> Return whichever isn't a boolean. */
-		if (CTYPE_KIND_ISINT(akind))
-			return incref(a);
-		return incref(b);
+		if (!CTYPE_KIND_INT_ISUNSIGNED(akind) && CTYPE_KIND_INT_ISUNSIGNED(bkind))
+			goto return_a;
+		if (!CTYPE_KIND_INT_ISUNSIGNED(bkind) && CTYPE_KIND_INT_ISUNSIGNED(akind))
+			goto return_b;
+		/* Both types are integers, and have the same size and sign.
+		 * Prefer `long long' over `long', `long' over `int', and `int' over `short' */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+		if (a == &ctype_long_long || a == &ctype_unsigned_long_long)
+			goto return_a;
+		if (b == &ctype_long_long || b == &ctype_unsigned_long_long)
+			goto return_b;
+#endif /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
+#if __SIZEOF_INT__ == __SIZEOF_LONG__
+		if (a == &ctype_long || a == &ctype_unsigned_long)
+			goto return_a;
+		if (b == &ctype_long || b == &ctype_unsigned_long)
+			goto return_b;
+#endif /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
+#if __SIZEOF_SHORT__ == __SIZEOF_INT__
+		if (a == &ctype_int || a == &ctype_unsigned_int)
+			goto return_a;
+		if (b == &ctype_int || b == &ctype_unsigned_int)
+			goto return_b;
+#endif /* __SIZEOF_SHORT__ == __SIZEOF_INT__ */
+		/* Fallback: The 2 types seem to be identical, so just return `a' over `b' */
+		goto return_a;
 	}
 	if (ctype_equal(a, b))
 		return incref(a);
@@ -346,6 +369,10 @@ NOTHROW(FCALL ctype_common)(struct ctype *a,
 		}
 	}
 	return NULL;
+return_a:
+	return incref(a);
+return_b:
+	return incref(b);
 }
 
 
