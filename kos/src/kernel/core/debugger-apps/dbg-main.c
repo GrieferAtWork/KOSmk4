@@ -724,7 +724,8 @@ again:
 	avail = DBG_MAXLINE_BACKLOG - cmdline_latest;
 	if (len >= avail) {
 		/* Delete the oldest backlog entry. */
-		size_t oldest_len = strlen(cmdline_backlog);
+		size_t oldest_len;
+		oldest_len = strlen(cmdline_backlog) + 1;
 		memmovedown(cmdline_backlog,
 		            cmdline_backlog + oldest_len,
 		            cmdline_latest - oldest_len,
