@@ -2182,9 +2182,10 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
 		                          &symtype);
 		if (csym.clv_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
 			/* Special case: Must complete `symtype' by loading argument types. */
-			csym.clv_parser.dup_cu_info_pos = cmodsyminfo_getdip(&csym);
 			REF struct ctype *function_type;
+			csym.clv_parser.dup_cu_info_pos = cmodsyminfo_getdip(&csym);
 			if (debuginfo_cu_parser_next(&csym.clv_parser)) {
+				debuginfo_cu_parser_skipattr(&csym.clv_parser);
 				result = ctype_fromdw_subroutine(csym.clv_mod,
 				                                 csym.clv_unit,
 				                                 &csym.clv_parser,

@@ -1156,7 +1156,7 @@ again:
 
 
 
-PRIVATE ATTR_NOINLINE NONNULL((1, 3)) ssize_t KCALL
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4)) ssize_t KCALL
 print_named_pointer(struct ctyperef const *__restrict self,
                     struct cprinter const *__restrict printer,
                     void const *ptr,
@@ -1350,6 +1350,87 @@ err:
 	return temp;
 }
 
+
+
+/* Print a dereferenced function at `ptr'. Printing is first
+ * attempted to be performed by loading the name of the function
+ * at the specified `ptr', and if that fails, or if `ptr' doesn't
+ * point at the exact start of a function, printing will instead
+ * be done as though a function pointer had been given. */
+PRIVATE ATTR_NOINLINE NONNULL((1)) ssize_t KCALL
+print_function(struct ctyperef const *__restrict self,
+               struct cprinter const *__restrict printer,
+               void const *ptr, unsigned int flags,
+               size_t firstline_indent, size_t newline_indent,
+               size_t newline_tab, size_t maxlinelen) {
+	/* Check if `ptr' is a text-/data-pointer. */
+	{
+		REF module_t *mod;
+		module_type_var(modtyp);
+		mod = module_ataddr_nx(ptr, modtyp);
+		if (mod) {
+			uintptr_t module_relative_ptr;
+			di_addr2line_sections_t sections;
+			di_addr2line_dl_sections_t dl_sections;
+			module_relative_ptr = (uintptr_t)ptr - module_getloadaddr(mod, modtyp);
+			/* Try to lookup the name/base-address of a symbol
+			 * that contains the given `ptr' and is part of `mod' */
+			if (debug_addr2line_sections_lock(mod, &sections, &dl_sections
+			                                  module_type__arg(modtyp)) == DEBUG_INFO_ERROR_SUCCESS) {
+				di_debug_addr2line_t a2l;
+				if (debug_addr2line(&sections, &a2l, module_relative_ptr,
+				                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
+				                    DEBUG_ADDR2LINE_FNORMAL) == DEBUG_INFO_ERROR_SUCCESS &&
+				    module_relative_ptr == a2l.al_symstart) {
+					if (!a2l.al_rawname)
+						a2l.al_rawname = a2l.al_name;
+					if (a2l.al_rawname && !*a2l.al_rawname)
+						a2l.al_rawname = NULL;
+					if (a2l.al_rawname) {
+						ssize_t result, temp;
+						/* Print a named type, using the symbol name from debug-info as varname. */
+						result = ctyperef_printname(self, printer,
+						                            a2l.al_rawname,
+						                            strlen(a2l.al_rawname));
+						debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
+						module_decref(mod, modtyp);
+						if likely(result >= 0) {
+							/* Include the function address as a hint. */
+							PRINT(" ");
+							FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+							PRINTF("(%#" PRIxPTR ")", ptr);
+							FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+						}
+						return result;
+err:
+						return temp;
+					}
+				}
+				debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
+			}
+			module_decref(mod, modtyp);
+		} /* if (mod) */
+	} /* Scope */
+
+	/* Fallback: Print as a function pointer */
+	{
+		ssize_t result;
+		struct ctype pointer_type;
+		struct ctyperef pointer_typeref;
+		pointer_type.ct_refcnt   = 0;
+		pointer_type.ct_kind     = CTYPE_KIND_PTR;
+		pointer_type.ct_children = NULL;
+		memcpy(&pointer_type.ct_pointer.cp_base, self, sizeof(struct ctyperef));
+		pointer_type.ct_pointer._cp_sib = NULL;
+		memset(&pointer_typeref, 0, sizeof(pointer_typeref));
+		pointer_typeref.ct_typ = &pointer_type;
+		/* Print the function object at `ptr' as a pointer-to-function. */
+		result = ctype_printvalue(&pointer_typeref, printer, &ptr, flags,
+		                          firstline_indent, newline_indent,
+		                          newline_tab, maxlinelen);
+		return result;
+	} /* Scope */
+}
 
 
 
@@ -1973,6 +2054,15 @@ do_calculate_next_indent:
 		PRINT("}");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_BRACE_SUFFIX);
 	}	break;
+
+	case CTYPE_KIND_FUNCTION:
+		result = print_function(self, printer,
+		                        buf, flags,
+		                        firstline_indent,
+		                        newline_indent,
+		                        newline_tab,
+		                        maxlinelen);
+		break;
 
 	default: {
 		size_t i, size;
