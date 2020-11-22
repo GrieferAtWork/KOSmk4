@@ -115,6 +115,7 @@ split_cmdline(char *__restrict cmdln,
 			            &cmdln[i + 1],
 			            cmdline_len - i,
 			            sizeof(char));
+			cmdln[cmdline_len] = 0;
 			++i;
 			if (i >= cmdline_len) {
 break_incomplete:
@@ -132,6 +133,7 @@ break_incomplete:
 			            &cmdln[i + 1],
 			            cmdline_len - i,
 			            sizeof(char));
+			cmdln[cmdline_len] = 0;
 			while (i < cmdline_len) {
 				ch = cmdln[i];
 				if (ch == '\\') {
@@ -140,6 +142,7 @@ break_incomplete:
 					            &cmdln[i + 1],
 					            cmdline_len - i,
 					            sizeof(char));
+					cmdln[cmdline_len] = 0;
 					++i;
 					if (i >= cmdline_len)
 						goto break_incomplete;
@@ -151,6 +154,7 @@ break_incomplete:
 					            &cmdln[i + 1],
 					            cmdline_len - i,
 					            sizeof(char));
+					cmdln[cmdline_len] = 0;
 					break;
 				}
 				++i;
