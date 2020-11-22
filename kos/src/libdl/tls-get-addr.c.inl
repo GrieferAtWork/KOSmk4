@@ -63,7 +63,7 @@ libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
 	if (self->dm_tlsstoff || unlikely(!self->dm_tlsmsize))
 		return (byte_t *)seg + self->dm_tlsstoff;
 	atomic_rwlock_read(&seg->ts_exlock);
-	extab = dtls_extension_tree_locate(seg->ts_extree, (uintptr_t)self);
+	extab = dtls_extension_tree_locate(seg->ts_extree, self);
 	atomic_rwlock_endread(&seg->ts_exlock);
 	if (extab)
 		return extab->te_data;
@@ -106,7 +106,7 @@ libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
 		                                          data_offset + self->dm_tlsmsize);
 		if unlikely(!extab)
 			goto err_nomem;
-		extab->te_tree.a_vaddr = (uintptr_t)self;
+		extab->te_module = self;
 		/* Initialize the data contents of this extended TLS table. */
 		memset(mempcpy(extab->te_data = (byte_t *)extab + data_offset,
 		               self->dm_tlsinit,
@@ -135,8 +135,7 @@ libdl_dltlsaddr2(DlModule *self, struct tls_segment *seg)
 	atomic_rwlock_write(&seg->ts_exlock);
 	{
 		struct dtls_extension *newtab;
-		newtab = dtls_extension_tree_locate(seg->ts_extree,
-		                                    (uintptr_t)self);
+		newtab = dtls_extension_tree_locate(seg->ts_extree, self);
 		if unlikely(newtab != NULL) {
 			/* Some other thread already allocated the TLS segment for us
 			 * XXX: Can this even happen? (I don't think it can, considering

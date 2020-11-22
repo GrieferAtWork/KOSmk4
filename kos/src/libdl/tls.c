@@ -27,8 +27,8 @@
 /**/
 
 #include <hybrid/minmax.h>
-#include <hybrid/sequence/atree.h>
 #include <hybrid/sequence/list.h>
+#include <hybrid/sequence/rbtree.h>
 
 #include <kos/syscalls.h>
 
@@ -44,31 +44,45 @@ DECL_BEGIN
 struct dtls_extension {
 	/* Tree for mapping TLS extensions data tables to modules.
 		* NOTE: These extension tables are allocated lazily! */
-	ATREE_NODE_SINGLE(struct dtls_extension, uintptr_t) te_tree; /* [lock(:ts_exlock)] NOTE: KEY == DlModule */
-	byte_t                                             *te_data; /* Pointer to the base of TLS data. */
-	/* The actual extension data goes here. */
+	LLRBTREE_NODE(struct dtls_extension) te_tree;   /* [lock(:ts_exlock)] R/B-tree node. */
+	union {
+		DlModule                        *te_module;   /* [0..1][lock(:ts_exlock)] The module itself.
+		                                               * The least significant bit of this is used
+		                                               * to indicate if this leaf is red of black! */
+		uintptr_t                        te_redblack; /* Red/black status bit at bit#0 */
+	};
+	byte_t                              *te_data;   /* [1..1][const] Pointer to the base of TLS data. */
+	/* The actual extension data goes here. (with proper alignment, and pointed-to by `te_data') */
 };
+#define dtls_extension_getmodule(self) ((DlModule *)((self)->te_redblack & ~1))
+
 
 DECL_END
 
-#define ATREE(x)      dtls_extension_tree_##x
-#define ATREE_NOTHROW /* nothing */
-#define Tkey          uintptr_t
-#define T             struct dtls_extension
-#define N_NODEPATH    te_tree
-#define ATREE_SINGLE  1
-#include <hybrid/sequence/atree-abi.h>
+#define RBTREE_LEFT_LEANING    /* Use left-leaning trees */
+#define RBTREE_NOTHROW         /* nothing */
+#define RBTREE(name)           dtls_extension_tree_##name
+#define RBTREE_T               struct dtls_extension
+#define RBTREE_Tkey            DlModule *
+#define RBTREE_NODEPATH        te_tree
+#define RBTREE_GETKEY          dtls_extension_getmodule
+#define RBTREE_ISRED(self)     ((self)->te_redblack & 1)
+#define RBTREE_SETRED(self)    ((self)->te_redblack |= 1)
+#define RBTREE_SETBLACK(self)  ((self)->te_redblack &= ~1)
+#define RBTREE_KEY_LO(a, b)    ((uintptr_t)(a) < (uintptr_t)(b))
+#define RBTREE_KEY_EQ(a, b)    ((uintptr_t)(a) == (uintptr_t)(b))
+#include <hybrid/sequence/rbtree-abi.h>
 
 DECL_BEGIN
 
 /* This is the actual structure that the TLS register (e.g. `%fs.base' / `%gs.base') points to. */
 struct tls_segment {
 	/* Static TLS data goes here (aka. at negative offsets from `ts_self') */
-	struct tls_segment               *ts_self;    /* [1..1][const][== self] Self-pointer
-	                                               * At offset 0; mandaged by ELF, and a good idea in general. */
-	LLIST_NODE(struct tls_segment)    ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
-	struct atomic_rwlock              ts_exlock;  /* Lock for `ts_extree' */
-	ATREE_HEAD(struct dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
+	struct tls_segment                  *ts_self;    /* [1..1][const][== self] Self-pointer
+	                                                  * At offset 0; mandaged by ELF, and a good idea in general. */
+	LLIST_NODE(struct tls_segment)       ts_threads; /* [lock(:static_tls_lock)] Thread entry within `static_tls_list' */
+	struct atomic_rwlock                 ts_exlock;  /* Lock for `ts_extree' */
+	LLRBTREE_ROOT(struct dtls_extension) ts_extree;  /* [0..1][lock(ts_exlock)] TLS extension table. */
 };
 
 STATIC_ASSERT_MSG(offsetof(struct tls_segment, ts_self) == 0,
@@ -104,17 +118,17 @@ again:
 			sys_sched_yield();
 			goto again;
 		}
-		next = dtls_extension_tree_remove(&iter->ts_extree, (uintptr_t)self);
+		next = dtls_extension_tree_remove(&iter->ts_extree, self);
 		atomic_rwlock_endwrite(&iter->ts_exlock);
 		if (next) {
-			next->te_tree.a_min = chain;
-			chain               = next;
+			next->te_tree.rb_lhs = chain;
+			chain                = next;
 		}
 	}
 	atomic_rwlock_endread(&static_tls_lock);
 	/* Free all instances of extension data for this module. */
 	while (chain) {
-		next = chain->te_tree.a_min;
+		next = chain->te_tree.rb_lhs;
 		free(chain);
 		chain = next;
 	}
@@ -186,29 +200,33 @@ err:
 
 PRIVATE NONNULL((1)) void CC
 try_incref_extension_table_modules(struct dtls_extension *__restrict self) {
+	DlModule *mod;
 again:
-	if (!DlModule_TryIncref((DlModule *)self->te_tree.a_vaddr))
-		self->te_tree.a_vaddr = 0;
-	if (self->te_tree.a_min) {
-		if (self->te_tree.a_max)
-			try_incref_extension_table_modules(self->te_tree.a_max);
-		self = self->te_tree.a_min;
+	mod = dtls_extension_getmodule(self);
+	if (mod && !DlModule_TryIncref(mod))
+		self->te_redblack &= 1;
+	if (self->te_tree.rb_lhs) {
+		if (self->te_tree.rb_rhs)
+			try_incref_extension_table_modules(self->te_tree.rb_rhs);
+		self = self->te_tree.rb_lhs;
 		goto again;
 	}
-	if (self->te_tree.a_max) {
-		self = self->te_tree.a_max;
+	if (self->te_tree.rb_rhs) {
+		self = self->te_tree.rb_rhs;
 		goto again;
 	}
 }
 
 PRIVATE NONNULL((1)) void CC
 decref_tls_extension_modules(struct dtls_extension *__restrict self) {
+	DlModule *mod;
 	struct dtls_extension *minptr, *maxptr;
 again:
-	if (self->te_tree.a_vaddr)
-		DlModule_Decref((DlModule *)self->te_tree.a_vaddr);
-	minptr = self->te_tree.a_min;
-	maxptr = self->te_tree.a_max;
+	mod = dtls_extension_getmodule(self);
+	if (mod)
+		DlModule_Decref(mod);
+	minptr = self->te_tree.rb_lhs;
+	maxptr = self->te_tree.rb_rhs;
 	free(self);
 	if (minptr) {
 		if (maxptr)
@@ -224,12 +242,12 @@ again:
 
 PRIVATE NONNULL((1)) void CC
 fini_tls_extension_tables(struct dtls_extension *__restrict self) {
+	DlModule *mod;
 	struct dtls_extension *minptr, *maxptr;
 again:
-	if (self->te_tree.a_vaddr) {
-		DlModule *mod;
+	mod = dtls_extension_getmodule(self);
+	if (mod != NULL) {
 		void (*callback)(void *arg, void *base);
-		mod = (DlModule *)self->te_tree.a_vaddr;
 		callback = mod->dm_tls_fini;
 		if (callback) {
 			TRY {
@@ -242,8 +260,8 @@ again:
 		}
 		DlModule_Decref(mod);
 	}
-	minptr = self->te_tree.a_min;
-	maxptr = self->te_tree.a_max;
+	minptr = self->te_tree.rb_lhs;
+	maxptr = self->te_tree.rb_rhs;
 	free(self);
 	if (minptr) {
 		if (maxptr)
@@ -307,12 +325,12 @@ err_nomem:
 
 PRIVATE NONNULL((1)) void CC
 delete_extension_tables(struct dtls_extension *__restrict self) {
+	DlModule *mod;
 	struct dtls_extension *minptr, *maxptr;
 again:
-	if (self->te_tree.a_vaddr) {
-		DlModule *mod;
+	mod = dtls_extension_getmodule(self);
+	if (mod != NULL) {
 		void (*callback)(void *arg, void *base);
-		mod = (DlModule *)self->te_tree.a_vaddr;
 		callback = mod->dm_tls_fini;
 		if (callback) {
 			TRY {
@@ -324,8 +342,8 @@ again:
 		}
 		DlModule_Decref(mod);
 	}
-	minptr = self->te_tree.a_min;
-	maxptr = self->te_tree.a_max;
+	minptr = self->te_tree.rb_lhs;
+	maxptr = self->te_tree.rb_rhs;
 	free(self);
 	if (minptr) {
 		if (maxptr)
@@ -535,7 +553,7 @@ DlModule_TryGetTLSAddr(DlModule *__restrict self) {
 	if (self->dm_tlsstoff)
 		return (byte_t *)tls + self->dm_tlsstoff;
 	atomic_rwlock_read(&tls->ts_exlock);
-	extab  = dtls_extension_tree_locate(tls->ts_extree, (uintptr_t)self);
+	extab  = dtls_extension_tree_locate(tls->ts_extree, self);
 	result = extab ? extab->te_data : NULL;
 	atomic_rwlock_endread(&tls->ts_exlock);
 	return result;
