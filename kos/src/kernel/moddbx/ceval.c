@@ -1437,20 +1437,23 @@ again:
 				goto done;
 			eval_tt = result > 0;
 		}
-		result  = cexpr_pop();
-		if unlikely(result != DBX_EOK)
-			goto done;
-		if (eval_tt) {
-			/* Only evaluate the true-branch. */
-			result = parse_lor(self);
-		} else {
-			old_cexpr_typeonly = cexpr_typeonly;
-			cexpr_typeonly     = true;
-			result             = parse_cond(self);
-			old_cexpr_typeonly = old_cexpr_typeonly;
+		/* Check for special case: re-use the condition as true-branch. */
+		if (self->c_tok != ':') {
+			result = cexpr_pop();
+			if unlikely(result != DBX_EOK)
+				goto done;
+			if (eval_tt) {
+				/* Only evaluate the true-branch. */
+				result = parse_lor(self);
+			} else {
+				old_cexpr_typeonly = cexpr_typeonly;
+				cexpr_typeonly     = true;
+				result             = parse_cond(self);
+				cexpr_typeonly     = old_cexpr_typeonly;
+			}
+			if unlikely(result != DBX_EOK)
+				goto done;
 		}
-		if unlikely(result != DBX_EOK)
-			goto done;
 		result = cparser_skip(self, ':');
 		if unlikely(result != DBX_EOK)
 			goto done;
@@ -1459,7 +1462,7 @@ again:
 			old_cexpr_typeonly = cexpr_typeonly;
 			cexpr_typeonly     = true;
 			result             = parse_cond(self);
-			old_cexpr_typeonly = old_cexpr_typeonly;
+			cexpr_typeonly     = old_cexpr_typeonly;
 		} else {
 			result = parse_cond(self);
 			if unlikely(result != DBX_EOK)
