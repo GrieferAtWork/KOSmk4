@@ -1670,7 +1670,6 @@ again_after_comma:
 			goto again;
 		} else {
 			size_t array_length;
-			void *data;
 			struct ctyperef new_array_type;
 			struct ctyperef lhs_elem_type;
 			struct ctype *lhs_operand_type;
@@ -1704,12 +1703,17 @@ again_after_comma:
 				cexpr_typeonly = old_cexpr_typeonly;
 				goto done;
 			}
-			data = cexpr_getdata();
-			if unlikely(!data) {
-				cexpr_typeonly = old_cexpr_typeonly;
-				goto err_nomem;
+			{
+				byte_t *data;
+				result = cexpr_getdata(&data);
+				if (likely(result == DBX_EOK) &&
+				    unlikely(dbg_readmemory(data, &array_length, sizeof(size_t)) != 0))
+					result = DBX_EFAULT;
+				if unlikely(result != DBX_EOK) {
+					cexpr_typeonly = old_cexpr_typeonly;
+					goto err_nomem;
+				}
 			}
-			array_length = UNALIGNED_GET((size_t *)data);
 			/* Pop the array-length expression. */
 			result = cexpr_pop();
 			cexpr_typeonly = old_cexpr_typeonly;
@@ -2582,13 +2586,14 @@ err_fuction_argv:
 		if likely(result == DBX_EOK) {
 			result = cexpr_cast_simple(&ctype_size_t);
 			if likely(result == DBX_EOK) {
-				void *data;
-				data = cexpr_getdata();
-				if unlikely(!data)
-					result = DBX_ENOMEM;
-				else {
-					array_length = UNALIGNED_GET((size_t *)data);
-					result = cparser_skip(self, ']');
+				byte_t *data;
+				result = cexpr_getdata(&data);
+				if likely(result == DBX_EOK) {
+					if unlikely(dbg_readmemory(data, &array_length, sizeof(array_length)) != 0)
+						result = DBX_EFAULT;
+					else {
+						result = cparser_skip(self, ']');
+					}
 				}
 			}
 		}

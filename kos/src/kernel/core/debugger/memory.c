@@ -40,6 +40,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/align.h>
 
+#include <alloca.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -186,6 +187,82 @@ again_memcpy_nopf:
 	}
 	return error;
 }
+
+PUBLIC size_t
+NOTHROW(KCALL dbg_setmemory)(void *addr, byte_t byte,
+                             size_t num_bytes, bool force) {
+	byte_t *buf;
+	size_t buflen = num_bytes;
+	if (buflen > 128)
+		buflen = 128;
+	buf = (byte_t *)alloca(buflen);
+	memset(buf, byte, buflen);
+	while (num_bytes) {
+		size_t temp, error;
+		temp = num_bytes;
+		/* Limit the # of bytes written at once based on the local buffer size. */
+		if (temp > buflen)
+			temp = buflen;
+		/* Account for what we intend to write. */
+		num_bytes -= temp;
+		/* Do the actual write. */
+		error = dbg_writememory(addr, buf, temp, force);
+		/* Account of write errors. */
+		if unlikely(error != 0)
+			return num_bytes + error;
+		/* Advance the destination pointer. */
+		addr = (byte_t *)addr + temp;
+	}
+	return 0;
+}
+
+/* Move memory from `src', and write it back to `dst' */
+PUBLIC size_t
+NOTHROW(KCALL dbg_movememory)(void *dst, void const *src,
+                              size_t num_bytes, bool force) {
+	byte_t *buf;
+	size_t buflen = num_bytes;
+	if (buflen > 128)
+		buflen = 128;
+	buf = (byte_t *)alloca(buflen);
+	if (dst <= src) {
+		while (num_bytes) {
+			size_t temp, error;
+			temp = num_bytes;
+			if (temp > buflen)
+				temp = buflen;
+			num_bytes -= temp;
+			error = dbg_readmemory(src, buf, temp);
+			if unlikely(error != 0)
+				return num_bytes + error;
+			error = dbg_writememory(dst, buf, temp, force);
+			if unlikely(error != 0)
+				return num_bytes + error;
+			dst = (byte_t *)dst + temp;
+			src = (byte_t *)src + temp;
+		}
+	} else {
+		src = (byte_t *)src + num_bytes;
+		dst = (byte_t *)dst + num_bytes;
+		while (num_bytes) {
+			size_t temp, error;
+			temp = num_bytes;
+			if (temp > buflen)
+				temp = buflen;
+			dst = (byte_t *)dst - temp;
+			src = (byte_t *)src - temp;
+			num_bytes -= temp;
+			error = dbg_readmemory(src, buf, temp);
+			if unlikely(error != 0)
+				return num_bytes + error;
+			error = dbg_writememory(dst, buf, temp, force);
+			if unlikely(error != 0)
+				return num_bytes + error;
+		}
+	}
+	return 0;
+}
+
 
 
 DECL_END

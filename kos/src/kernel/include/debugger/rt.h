@@ -174,6 +174,11 @@ FUNDEF ATTR_PURE WUNUSED bool NOTHROW(KCALL dbg_verifypagedir)(pagedir_phys_t pd
  * @return: * : The number of trailing bytes that could not be copied. */
 FUNDEF size_t NOTHROW(KCALL dbg_readmemory)(void const *addr, void *__restrict buf, size_t num_bytes);
 FUNDEF size_t NOTHROW(KCALL dbg_writememory)(void *addr, void const *__restrict buf, size_t num_bytes, bool force);
+FUNDEF size_t NOTHROW(KCALL dbg_setmemory)(void *addr, byte_t byte, size_t num_bytes, bool force);
+/* Move memory from `src', and write it back to `dst' */
+FUNDEF size_t NOTHROW(KCALL dbg_movememory)(void *dst, void const *src, size_t num_bytes, bool force);
+#define dbg_movememorydown dbg_movememory
+#define dbg_movememoryup   dbg_movememory
 
 /* Apply changes made to `DBG_REGLEVEL_VIEW' onto `DBG_REGLEVEL_ORIG'. */
 FUNDEF void NOTHROW(FCALL dbg_applyview)(void);

@@ -65,6 +65,7 @@ DBG_RESET(reset) {
 	ceval_comma_is_select2nd = false;
 	cexpr_readonly           = false;
 	cexpr_typeonly           = false;
+	cexpr_forcewrite         = false;
 	/* Set-up `cexpr_stack' that `cexpr_stacktop' could be used. */
 	cexpr_stack     = cexpr_stack_stub + 1;
 	cexpr_stacksize = 0;
@@ -187,8 +188,11 @@ DBG_COMMAND_AUTO(eval,
                  argc, argv) {
 	while (argc >= 2) {
 		dbx_errno_t error;
+		byte_t *data;
 		cexpr_empty();
 		error = cexpr_pusheval(argv[1]);
+		if (error == DBX_EOK)
+			error = cexpr_getdata(&data);
 		if (error != DBX_EOK) {
 			char const *message;
 			message = dbx_strerror(error);
@@ -209,8 +213,9 @@ DBG_COMMAND_AUTO(eval,
 			ctyperef_printname(&cexpr_stacktop.cv_type, &cp, NULL, 0);
 			dbg_print(":\n");
 			/* Display the value of the expression. */
-			ctype_printvalue(&cexpr_stacktop.cv_type, &cp, cexpr_getdata(),
-			                 CTYPE_PRINTVALUE_FLAG_NORMAL, 0, 0, 2, dbg_screen_width);
+			ctype_printvalue(&cexpr_stacktop.cv_type, &cp, data,
+			                 CTYPE_PRINTVALUE_FLAG_NORMAL,
+			                 0, 0, 2, dbg_screen_width);
 			dbg_putc('\n');
 			cexpr_pop();
 		}

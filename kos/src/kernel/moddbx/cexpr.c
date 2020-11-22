@@ -40,6 +40,7 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -58,63 +59,108 @@ for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno
 DECL_BEGIN
 
 
-#define _GETFLOAT(T, addr, Tresult, result)    \
-	do {                                       \
-		T _temp;                               \
-		memcpy(&_temp, (addr), sizeof(_temp)); \
-		(result) = (Tresult)_temp;             \
+#define _GETFLOAT(T, addr, Tresult, result, handle_fault)     \
+	do {                                                      \
+		T _temp;                                              \
+		if (dbg_readmemory(addr, &_temp, sizeof(_temp)) != 0) \
+			handle_fault;                                     \
+		(result) = (Tresult)_temp;                            \
 	}	__WHILE0
-#define _SETFLOAT(T, addr, value)              \
-	do {                                       \
-		T _temp = (T)(value);                  \
-		memcpy((addr), &_temp, sizeof(_temp)); \
+#define _SETFLOAT(T, addr, value, handle_fault)                                  \
+	do {                                                                         \
+		T _temp = (T)(value);                                                    \
+		if (dbg_writememory(addr, &_temp, sizeof(_temp), cexpr_forcewrite) != 0) \
+			handle_fault;                                                        \
 	}	__WHILE0
 
-#define GETFLOAT_IEEE754_FLOAT(addr, Tresult, result)       _GETFLOAT(__IEEE754_FLOAT_TYPE__, addr, Tresult, result)
-#define SETFLOAT_IEEE754_FLOAT(addr, value)                 _SETFLOAT(__IEEE754_FLOAT_TYPE__, addr, value)
-#define GETFLOAT_IEEE754_DOUBLE(addr, Tresult, result)      _GETFLOAT(__IEEE754_DOUBLE_TYPE__, addr, Tresult, result)
-#define SETFLOAT_IEEE754_DOUBLE(addr, value)                _SETFLOAT(__IEEE754_DOUBLE_TYPE__, addr, value)
-#define GETFLOAT_IEEE854_LONG_DOUBLE(addr, Tresult, result) _GETFLOAT(__IEEE854_LONG_DOUBLE_TYPE__, addr, Tresult, result)
-#define SETFLOAT_IEEE854_LONG_DOUBLE(addr, value)           _SETFLOAT(__IEEE854_LONG_DOUBLE_TYPE__, addr, value)
+#define _GETFLOAT_NOFAULT(T, addr, Tresult, result) \
+	do {                                            \
+		T _temp;                                    \
+		memcpy(&_temp, addr, sizeof(_temp));        \
+		(result) = (Tresult)_temp;                  \
+	}	__WHILE0
+#define _SETFLOAT_NOFAULT(T, addr, value)                      \
+	do {                                                       \
+		T _temp = (T)(value);                                  \
+		memcpy(addr, &_temp, sizeof(_temp), cexpr_forcewrite); \
+	}	__WHILE0
+
+#define GETFLOAT_IEEE754_FLOAT(addr, Tresult, result, handle_fault)       _GETFLOAT(__IEEE754_FLOAT_TYPE__, addr, Tresult, result, handle_fault)
+#define SETFLOAT_IEEE754_FLOAT(addr, value, handle_fault)                 _SETFLOAT(__IEEE754_FLOAT_TYPE__, addr, value, handle_fault)
+#define GETFLOAT_IEEE754_DOUBLE(addr, Tresult, result, handle_fault)      _GETFLOAT(__IEEE754_DOUBLE_TYPE__, addr, Tresult, result, handle_fault)
+#define SETFLOAT_IEEE754_DOUBLE(addr, value, handle_fault)                _SETFLOAT(__IEEE754_DOUBLE_TYPE__, addr, value, handle_fault)
+#define GETFLOAT_IEEE854_LONG_DOUBLE(addr, Tresult, result, handle_fault) _GETFLOAT(__IEEE854_LONG_DOUBLE_TYPE__, addr, Tresult, result, handle_fault)
+#define SETFLOAT_IEEE854_LONG_DOUBLE(addr, value, handle_fault)           _SETFLOAT(__IEEE854_LONG_DOUBLE_TYPE__, addr, value, handle_fault)
+
+#define GETFLOAT_IEEE754_FLOAT_NOFAULT(addr, Tresult, result)       _GETFLOAT_NOFAULT(__IEEE754_FLOAT_TYPE__, addr, Tresult, result)
+#define SETFLOAT_IEEE754_FLOAT_NOFAULT(addr, value)                 _SETFLOAT_NOFAULT(__IEEE754_FLOAT_TYPE__, addr, value)
+#define GETFLOAT_IEEE754_DOUBLE_NOFAULT(addr, Tresult, result)      _GETFLOAT_NOFAULT(__IEEE754_DOUBLE_TYPE__, addr, Tresult, result)
+#define SETFLOAT_IEEE754_DOUBLE_NOFAULT(addr, value)                _SETFLOAT_NOFAULT(__IEEE754_DOUBLE_TYPE__, addr, value)
+#define GETFLOAT_IEEE854_LONG_DOUBLE_NOFAULT(addr, Tresult, result) _GETFLOAT_NOFAULT(__IEEE854_LONG_DOUBLE_TYPE__, addr, Tresult, result)
+#define SETFLOAT_IEEE854_LONG_DOUBLE_NOFAULT(addr, value)           _SETFLOAT_NOFAULT(__IEEE854_LONG_DOUBLE_TYPE__, addr, value)
 
 #define GETFLOAT_BYKIND(kind, addr, Tresult, result, handle_bad_kind, handle_fault) \
 	do {                                                                            \
-		TRY {                                                                       \
-			switch (kind) {                                                         \
-			case CTYPE_KIND_IEEE754_FLOAT:                                          \
-				GETFLOAT_IEEE754_FLOAT(addr, Tresult, result);                      \
-				break;                                                              \
-			case CTYPE_KIND_IEEE754_DOUBLE:                                         \
-				GETFLOAT_IEEE754_DOUBLE(addr, Tresult, result);                     \
-				break;                                                              \
-			case CTYPE_KIND_IEEE854_LONG_DOUBLE:                                    \
-				GETFLOAT_IEEE854_LONG_DOUBLE(addr, Tresult, result);                \
-				break;                                                              \
-			default: handle_bad_kind;                                               \
-			}                                                                       \
-		} EXCEPT {                                                                  \
-			handle_fault;                                                           \
+		switch (kind) {                                                             \
+		case CTYPE_KIND_IEEE754_FLOAT:                                              \
+			GETFLOAT_IEEE754_FLOAT(addr, Tresult, result, handle_fault);            \
+			break;                                                                  \
+		case CTYPE_KIND_IEEE754_DOUBLE:                                             \
+			GETFLOAT_IEEE754_DOUBLE(addr, Tresult, result, handle_fault);           \
+			break;                                                                  \
+		case CTYPE_KIND_IEEE854_LONG_DOUBLE:                                        \
+			GETFLOAT_IEEE854_LONG_DOUBLE(addr, Tresult, result, handle_fault);      \
+			break;                                                                  \
+		default: handle_bad_kind;                                                   \
 		}                                                                           \
 	}	__WHILE0
 
 #define SETFLOAT_BYKIND(kind, addr, value, handle_bad_kind, handle_fault) \
 	do {                                                                  \
-		TRY {                                                             \
-			switch (kind) {                                               \
-			case CTYPE_KIND_IEEE754_FLOAT:                                \
-				SETFLOAT_IEEE754_FLOAT(addr, value);                      \
-				break;                                                    \
-			case CTYPE_KIND_IEEE754_DOUBLE:                               \
-				SETFLOAT_IEEE754_DOUBLE(addr, value);                     \
-				break;                                                    \
-			case CTYPE_KIND_IEEE854_LONG_DOUBLE:                          \
-				SETFLOAT_IEEE854_LONG_DOUBLE(addr, value);                \
-				break;                                                    \
-			default: handle_bad_kind;                                     \
-			}                                                             \
-		} EXCEPT {                                                        \
-			handle_fault;                                                 \
+		switch (kind) {                                                   \
+		case CTYPE_KIND_IEEE754_FLOAT:                                    \
+			SETFLOAT_IEEE754_FLOAT(addr, value, handle_fault);            \
+			break;                                                        \
+		case CTYPE_KIND_IEEE754_DOUBLE:                                   \
+			SETFLOAT_IEEE754_DOUBLE(addr, value, handle_fault);           \
+			break;                                                        \
+		case CTYPE_KIND_IEEE854_LONG_DOUBLE:                              \
+			SETFLOAT_IEEE854_LONG_DOUBLE(addr, value, handle_fault);      \
+			break;                                                        \
+		default: handle_bad_kind;                                         \
 		}                                                                 \
+	}	__WHILE0
+
+#define GETFLOAT_BYKIND_NOFAULT(kind, addr, Tresult, result, handle_bad_kind) \
+	do {                                                                      \
+		switch (kind) {                                                       \
+		case CTYPE_KIND_IEEE754_FLOAT:                                        \
+			GETFLOAT_IEEE754_FLOAT_NOFAULT(addr, Tresult, result);            \
+			break;                                                            \
+		case CTYPE_KIND_IEEE754_DOUBLE:                                       \
+			GETFLOAT_IEEE754_DOUBLE_NOFAULT(addr, Tresult, result);           \
+			break;                                                            \
+		case CTYPE_KIND_IEEE854_LONG_DOUBLE:                                  \
+			GETFLOAT_IEEE854_LONG_DOUBLE_NOFAULT(addr, Tresult, result);      \
+			break;                                                            \
+		default: handle_bad_kind;                                             \
+		}                                                                     \
+	}	__WHILE0
+
+#define SETFLOAT_BYKIND_NOFAULT(kind, addr, value, handle_bad_kind) \
+	do {                                                            \
+		switch (kind) {                                             \
+		case CTYPE_KIND_IEEE754_FLOAT:                              \
+			SETFLOAT_IEEE754_FLOAT_NOFAULT(addr, value);            \
+			break;                                                  \
+		case CTYPE_KIND_IEEE754_DOUBLE:                             \
+			SETFLOAT_IEEE754_DOUBLE_NOFAULT(addr, value);           \
+			break;                                                  \
+		case CTYPE_KIND_IEEE854_LONG_DOUBLE:                        \
+			SETFLOAT_IEEE854_LONG_DOUBLE_NOFAULT(addr, value);      \
+			break;                                                  \
+		default: handle_bad_kind;                                   \
+		}                                                           \
 	}	__WHILE0
 
 
@@ -135,6 +181,11 @@ PUBLIC bool cexpr_readonly = false;
  * the purpose of auto-completion of struct member names
  * and the like. */
 PUBLIC bool cexpr_typeonly = false;
+
+/* Set to true if memory writes should be forced.
+ * This is the 4'th argument is calls to dbg_writememory()
+ * Defaults to `false' */
+PUBLIC bool cexpr_forcewrite = false;
 
 
 /* Finalize the given C-value. */
@@ -172,7 +223,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 	TRY {
 		if (!self->v_expr.l_expr && !self->v_expr.l_llist) {
 			size_t copy_error;
-			copy_error = write ? dbg_writememory(self->v_objaddr, buf, buflen, false)
+			copy_error = write ? dbg_writememory(self->v_objaddr, buf, buflen, cexpr_forcewrite)
 			                   : dbg_readmemory(self->v_objaddr, buf, buflen);
 			error = UNWIND_SUCCESS;
 			if unlikely(copy_error)
@@ -296,61 +347,90 @@ NOTHROW(FCALL cvalue_rw_expr)(struct cvalue *__restrict self,
 PRIVATE dbx_errno_t
 NOTHROW(FCALL buffer_extend)(byte_t *data, size_t old_size,
                              size_t new_size, bool sign_extend) {
-	TRY {
-		if (new_size > old_size) {
-			uint8_t sign;
-			sign = 0x00;
-			if (sign_extend) {
-				/* Check if we should sign-extend. */
+	if (new_size > old_size) {
+		uint8_t sign;
+		sign = 0x00;
+		if (sign_extend) {
+			/* Check if we should sign-extend. */
+			byte_t b;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-				if (data[old_size - 1] & 0x80)
-					sign = 0xff;
+			if (dbg_readmemory(&data[old_size - 1], &b, 1) != 0)
+				goto err_fault;
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-				if (data[0] & 0x80)
-					sign = 0xff;
+			if (dbg_readmemory(&data[0], &b, 1) != 0)
+				goto err_fault;
 #else /* __BYTE_ORDER__ == ... */
 #error "Unsupported __BYTE_ORDER__"
 #endif /* __BYTE_ORDER__ != ... */
-			}
-			/* Zero-/sign-extend the pointed-to data. */
-#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-			memset(&data[old_size], sign, new_size - old_size);
-#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-			memmoveup(&data[new_size - old_size],
-			          &data[0], old_size);
-			memset(&data[0], sign, new_size - old_size);
-#else /* __BYTE_ORDER__ == ... */
-#error "Unsupported __BYTE_ORDER__"
-#endif /* __BYTE_ORDER__ != ... */
-		} else {
-#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-			/* Truncate the value */
-			if (new_size < old_size) {
-				memmovedown((byte_t *)data,
-				            (byte_t *)data + (old_size - new_size),
-				            new_size);
-			}
-#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+			if (b & 0x80)
+				sign = 0xff;
 		}
-	} EXCEPT {
-		return DBX_EFAULT;
+		/* Zero-/sign-extend the pointed-to data. */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+		if (dbg_setmemory(&data[old_size], sign,
+		                  new_size - old_size,
+		                  cexpr_forcewrite) != 0)
+			goto err_fault;
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		if (dbg_movememoryup(&data[new_size - old_size],
+		                     &data[0], old_size,
+		                     cexpr_forcewrite) != 0)
+			goto err_fault;
+		if (dbg_setmemory(&data[0], sign,
+		                  new_size - old_size,
+		                  cexpr_forcewrite) != 0)
+			goto err_fault;
+#else /* __BYTE_ORDER__ == ... */
+#error "Unsupported __BYTE_ORDER__"
+#endif /* __BYTE_ORDER__ != ... */
+	} else {
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		/* Truncate the value */
+		if (new_size < old_size) {
+			if (dbg_movememorydown((byte_t *)data,
+			                       (byte_t *)data + (old_size - new_size),
+			                       new_size, cexpr_forcewrite) != 0)
+				goto err_fault;
+		}
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 	}
 	return DBX_EOK;
+err_fault:
+	return DBX_EFAULT;
 }
 
-PRIVATE ATTR_PURE bool
-NOTHROW(FCALL buffer_istrue)(byte_t const *buf, size_t buflen) {
-	while (buflen) {
-		if (*buf)
-			return true;
-		--buflen;
-		++buf;
+/* @return: 1:          Buffer contains a non-zero byte.
+ * @return: 0:          Buffer is empty, or contains only zero bytes.
+ * @return: DBX_EFAULT: Buffer is faulty. */
+PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED dbx_errno_t
+NOTHROW(FCALL buffer_istrue)(void const *addr, size_t num_bytes) {
+	byte_t *buf;
+	size_t buflen;
+	buflen = num_bytes;
+	if (buflen > 128)
+		buflen = 128;
+	buf = (byte_t *)alloca(buflen);
+	while (num_bytes) {
+		size_t i, temp;
+		temp = num_bytes;
+		if (temp > buflen)
+			temp = buflen;
+		if (dbg_readmemory(addr, buf, temp) != 0)
+			goto err_fault;
+		for (i = 0; i < temp; ++i) {
+			if (buf[i] != 0)
+				return 1;
+		}
+		num_bytes -= temp;
+		addr = (byte_t *)addr + temp;
 	}
-	return false;
+	return 0;
+err_fault:
+	return DBX_EFAULT;
 }
 
 PRIVATE void
-NOTHROW(FCALL buffer_inv)(byte_t *buf, size_t buflen) {
+NOTHROW(FCALL buffer_inv_nofault)(byte_t *buf, size_t buflen) {
 	while (buflen) {
 		*buf ^= 0xff;
 		--buflen;
@@ -359,7 +439,7 @@ NOTHROW(FCALL buffer_inv)(byte_t *buf, size_t buflen) {
 }
 
 PRIVATE void
-NOTHROW(FCALL buffer_dec)(byte_t *buf, size_t buflen) {
+NOTHROW(FCALL buffer_dec_nofault)(byte_t *buf, size_t buflen) {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	while (buflen) {
 		if (--*buf != 0xff)
@@ -747,70 +827,75 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n) {
 
 
 /* Return a pointer to the data associated with the top expression stack element.
- * If the stack is empty, or an intermediate buffer is required for storing data,
- * and that buffer could not be allocated, return NULL instead.
- * When `cexpr_typeonly' is set to true, this function always returns `NULL' */
-PUBLIC WUNUSED byte_t *
-NOTHROW(FCALL cexpr_getdata)(void) {
-	byte_t *result;
+ * If the stack is empty or `cexpr_typeonly' is `true', write-back a NULL pointer.
+ * WARNING: The pointer written back to `*presult' may point to arbitrary
+ *          user- or out-of-vm memory, meaning that it must be accessed
+ *          through use of `dbg_(read|write)memory'!
+ * @return: DBX_EOK:     Success.
+ * @return: DBX_ENOMEM:  Insufficient memory to allocate an intermediate buffer.
+ * @return: DBX_EFAULT:  A CFI expression caused a memory fault.
+ * @return: DBX_EINTERN: Internal error. */
+FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_getdata)(byte_t **__restrict presult) {
 	struct cvalue *top;
-	if unlikely(!cexpr_stacksize)
-		return NULL;
+	if unlikely(!cexpr_stacksize) {
+nodata:
+		*presult = NULL;
+		return DBX_EOK;
+	}
 	top = &cexpr_stacktop;
 again:
 	switch (top->cv_kind) {
 
 	case CVALUE_KIND_ADDR:
-		/* FIXME: This function can return NULL without it being an error!
-		 *        We really have to change its interface, and also enforce
-		 *        that the returned pointer must be accessed through
-		 *        dbg_(read|write)memory, rather than direct access! */
-		result = (byte_t *)top->cv_addr;
+		/* This right here can cause an arbitrary pointer to be written back! */
+		*presult = (byte_t *)top->cv_addr;
 		break;
 
 	case CVALUE_KIND_DATA:
-		result = top->cv_data;
+		*presult = top->cv_data;
 		break;
 
 	case CVALUE_KIND_IDATA:
-		result = top->cv_idata;
+		*presult = top->cv_idata;
 		break;
 
 	case CVALUE_KIND_EXPR: {
 		size_t bufavail;
-		result = (byte_t *)top->cv_expr.v_buffer;
+		*presult = (byte_t *)top->cv_expr.v_buffer;
 		/* Lazily load a CFI expression. */
-		if (!result) {
-			if (cvalue_rw_expr(top, false) == DBX_EOK)
+		if (!*presult) {
+			dbx_errno_t error;
+			error = cvalue_rw_expr(top, false);
+			if (error == DBX_EOK)
 				goto again;
-			return NULL;
+			return error;
 		}
 		/* Assert that sufficient space is available for the type in use.
 		 * If less space is available, return NULL to prevent writing past
 		 * the end of the internal buffer for expressions.
 		 * Note though, that this really shouldn't happen... */
 		if (OVERFLOW_USUB(top->cv_expr.v_buflen, top->cv_expr.v_bufoff, &bufavail))
-			return NULL;
+			return DBX_EINTERN;
 		if (bufavail < ctype_sizeof(top->cv_type.ct_typ))
-			return NULL;
+			return DBX_EINTERN;
 		/* Adjust the buffer pointer for the expression-base-offset.
 		 * This is used (e.g.) for accessing struct-through-CFI fields. */
-		result += top->cv_expr.v_bufoff;
+		*presult += top->cv_expr.v_bufoff;
 	}	break;
 
 	case CVALUE_KIND_IEXPR:
-		result = top->cv_expr.v_ibuffer + top->cv_expr.v_bufoff;
+		*presult = top->cv_expr.v_ibuffer + top->cv_expr.v_bufoff;
 		break;
 
 	case CVALUE_KIND_REGISTER:
-		result = top->cv_register.r_ibuffer;
+		*presult = top->cv_register.r_ibuffer;
 		break;
 
 	default:
-		result = NULL;
-		break;
+		goto nodata;
 	}
-	return result;
+	return DBX_EOK;
 }
 
 /* Return the actual size of the top element of the C expression stack.
@@ -830,65 +915,69 @@ NOTHROW(FCALL cexpr_getsize)(void) {
  * @return: DBX_EINTERN: The stack is empty.
  * @return: DBX_ESYNTAX: The top stack element cannot be cast to bool. */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_bool)(void) {
+	dbx_errno_t error;
 	struct ctype *ct;
 	byte_t *data;
 	size_t datalen;
 	if unlikely(!cexpr_stacksize)
 		return DBX_EINTERN;
-	ct      = cexpr_stacktop.cv_type.ct_typ;
-	data    = cexpr_getdata();
+	if (cexpr_stacktop.cv_kind == CVALUE_KIND_VOID)
+		return 0;
+	ct    = cexpr_stacktop.cv_type.ct_typ;
+	error = cexpr_getdata(&data);
+	if unlikely(error != DBX_EOK)
+		return error;
 	datalen = cexpr_getsize();
-	if (!data && cexpr_stacktop.cv_kind != CVALUE_KIND_VOID)
-		return DBX_ENOMEM;
-	TRY {
-		switch (CTYPE_KIND_CLASSOF(ct->ct_kind)) {
+	switch (CTYPE_KIND_CLASSOF(ct->ct_kind)) {
 
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL):
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_FUNCTION):
+		/* This behaves like pointer-to-function */
+		return data != NULL;
+
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL):
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
 do_check_for_non_zero_byte:
-			if (data && buffer_istrue(data, datalen))
+		return buffer_istrue(data, datalen);
+
+	case CTYPE_KIND_CLASSOF(CTYPE_KIND_IEEE754_FLOAT):
+		switch (ct->ct_kind) {
+	
+		case CTYPE_KIND_IEEE754_FLOAT: {
+			float f;
+			if (dbg_readmemory(data, &f, sizeof(f)) != 0)
+				goto err_fault;
+			if (f != 0.0f)
 				return 1;
-			break;
-
-		case CTYPE_KIND_CLASSOF(CTYPE_KIND_IEEE754_FLOAT):
-			if (data) {
-				switch (ct->ct_kind) {
+		}	break;
 	
-				case CTYPE_KIND_IEEE754_FLOAT: {
-					float f;
-					memcpy(&f, data, sizeof(f));
-					if (f != 0.0f)
-						return 1;
-				}	break;
+		case CTYPE_KIND_IEEE754_DOUBLE: {
+			double d;
+			if (dbg_readmemory(data, &d, sizeof(d)) != 0)
+				goto err_fault;
+			if (d != 0.0)
+				return 1;
+		}	break;
 	
-				case CTYPE_KIND_IEEE754_DOUBLE: {
-					double d;
-					memcpy(&d, data, sizeof(d));
-					if (d != 0.0)
-						return 1;
-				}	break;
+		case CTYPE_KIND_IEEE854_LONG_DOUBLE: {
+			__LONGDOUBLE ld;
+			if (dbg_readmemory(data, &ld, sizeof(ld)) != 0)
+				goto err_fault;
+			if (ld != 0.0l)
+				return 1;
+		}	break;
 	
-				case CTYPE_KIND_IEEE854_LONG_DOUBLE: {
-					__LONGDOUBLE ld;
-					memcpy(&ld, data, sizeof(ld));
-					if (ld != 0.0l)
-						return 1;
-				}	break;
-	
-				default:
-					goto do_check_for_non_zero_byte;
-				}
-			}
-			break;
-
 		default:
-			return DBX_ESYNTAX;
+			goto do_check_for_non_zero_byte;
 		}
-	} EXCEPT {
-		return DBX_EFAULT;
+		break;
+
+	default:
+		return DBX_ESYNTAX;
 	}
 	return 0; /* false */
+err_fault:
+	return DBX_EFAULT;
 }
 
 /* Cast the stack-top element to `typ'.
@@ -933,15 +1022,16 @@ again:
 			/* Cast between floating-point types. */
 			if (top->cv_kind != CVALUE_KIND_VOID) {
 				__LONGDOUBLE value;
-				GETFLOAT_BYKIND(old_typ->ct_kind, data, __LONGDOUBLE, value, return DBX_EINTERN, return DBX_EFAULT);
-				SETFLOAT_BYKIND(new_typ->ct_kind, data, value, return DBX_EINTERN, return DBX_EFAULT);
+				GETFLOAT_BYKIND_NOFAULT(old_typ->ct_kind, data, __LONGDOUBLE, value, return DBX_EINTERN);
+				SETFLOAT_BYKIND_NOFAULT(new_typ->ct_kind, data, value, return DBX_EINTERN);
 			}
 		} else {
 			intmax_t floatval = 0;
 			/* Re-push the float value as an integer */
 			if (top->cv_kind != CVALUE_KIND_VOID) {
-				GETFLOAT_BYKIND(old_typ->ct_kind, data, intmax_t, floatval,
-				                return DBX_EINTERN, return DBX_EFAULT);
+				GETFLOAT_BYKIND_NOFAULT(old_typ->ct_kind, data,
+				                        intmax_t, floatval,
+				                        return DBX_EINTERN);
 			}
 			result = cexpr_pop();
 			if unlikely(result != DBX_EOK)
@@ -963,24 +1053,19 @@ again:
 			uintmax_t value;
 			if (top->cv_kind == CVALUE_KIND_VOID)
 				goto set_new_type;
-			TRY {
-				switch (CTYPE_KIND_SIZEOF(old_typ->ct_kind)) {
-				case 1: value = *(uint8_t *)data; break;
-				case 2: value = UNALIGNED_GET16((uint16_t *)data); break;
-				case 4: value = UNALIGNED_GET32((uint32_t *)data); break;
-				case 8: value = UNALIGNED_GET64((uint64_t *)data); break;
-				default:
-					return DBX_EINTERN;
-				}
-			} EXCEPT {
-				return DBX_EFAULT;
+			switch (CTYPE_KIND_SIZEOF(old_typ->ct_kind)) {
+			case 1: value = *(uint8_t *)data; break;
+			case 2: value = UNALIGNED_GET16((uint16_t *)data); break;
+			case 4: value = UNALIGNED_GET32((uint32_t *)data); break;
+			case 8: value = UNALIGNED_GET64((uint64_t *)data); break;
+			default: return DBX_EINTERN;
 			}
 			if (CTYPE_KIND_CLASSOF(old_typ->ct_kind) ==
 			    CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL))
 				value = !!value;
 			/* Write-back the integer value as a float. */
-			SETFLOAT_BYKIND(new_typ->ct_kind, data, value,
-			                return DBX_EINTERN, return DBX_EFAULT);
+			SETFLOAT_BYKIND_NOFAULT(new_typ->ct_kind, data, value,
+			                        return DBX_EINTERN);
 			goto set_new_type;
 		}	break;
 
@@ -1089,9 +1174,10 @@ again_switch_kind:
 		break;
 
 	case CVALUE_KIND_EXPR: {
-		void *data = cexpr_getdata();
-		if unlikely(!data)
-			return DBX_ENOMEM;
+		byte_t *data;
+		result = cexpr_getdata(&data);
+		if unlikely(result != DBX_EOK)
+			return result;
 		if (top->cv_kind != CVALUE_KIND_EXPR)
 			goto again_switch_kind;
 		/* Just inherit the expression buffer. */
@@ -1106,9 +1192,9 @@ again_switch_kind:
 				break;
 			}
 			memmovedown(top->cv_expr.v_buffer, data, datalen);
-			data = dbx_realloc(top->cv_expr.v_buffer, datalen);
+			data = (byte_t *)dbx_realloc(top->cv_expr.v_buffer, datalen);
 			if unlikely(!data)
-				data = top->cv_expr.v_buffer;
+				data = (byte_t *)top->cv_expr.v_buffer;
 		}
 		top->cv_kind = CVALUE_KIND_DATA;
 		top->cv_data = (byte_t *)data;
@@ -1130,29 +1216,30 @@ again_switch_kind:
 				return DBX_ENOMEM;
 		}
 		result = DBX_EOK;
-		TRY {
-			switch (top->cv_kind) {
+		switch (top->cv_kind) {
 
-			case CVALUE_KIND_ADDR:
-				memcpy(buffer, top->cv_addr, buflen);
-				break;
+		case CVALUE_KIND_ADDR:
+			if (dbg_readmemory(buffer, top->cv_addr, buflen) != 0)
+				goto err_fault;
+			break;
 
-			case CVALUE_KIND_IEXPR:
-				cvalue_cfiexpr_fini(&top->cv_expr.v_expr);
-				memmove(buffer, top->cv_expr.v_ibuffer, buflen);
-				break;
+		case CVALUE_KIND_IEXPR:
+			cvalue_cfiexpr_fini(&top->cv_expr.v_expr);
+			memmove(buffer, top->cv_expr.v_ibuffer, buflen);
+			break;
 
-			case CVALUE_KIND_REGISTER:
-				memcpy(buffer, top->cv_register.r_ibuffer, buflen);
-				break;
+		case CVALUE_KIND_REGISTER:
+			memcpy(buffer, top->cv_register.r_ibuffer, buflen);
+			break;
 
-			default:
-				__builtin_unreachable();
-			}
-		} EXCEPT {
-			result = DBX_EFAULT;
+		default:
+			__builtin_unreachable();
 		}
 		if unlikely(result != DBX_EOK) {
+			__IF0 {
+err_fault:
+				result = DBX_EFAULT;
+			}
 			if (newkind == CVALUE_KIND_DATA)
 				dbx_free(buffer);
 			return result;
@@ -1458,17 +1545,20 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 			typ->ct_kind &= ~(CTYPE_KIND_SIGNBIT | CTYPE_KIND_ENUMBIT);
 			/* Implement -x as `~(x - 1)' */
 			if (data) {
-				buffer_dec(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
-				buffer_inv(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
+				buffer_dec_nofault(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
+				buffer_inv_nofault(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
 			}
 			break;
 
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_IEEE754_FLOAT):
 			if (data) {
 				__LONGDOUBLE ld;
-				GETFLOAT_BYKIND(typ->ct_kind, data, __LONGDOUBLE, ld, return DBX_EINTERN, return DBX_EFAULT);
+				GETFLOAT_BYKIND_NOFAULT(typ->ct_kind, data,
+				                        __LONGDOUBLE, ld,
+				                        return DBX_EINTERN);
 				ld = -ld;
-				SETFLOAT_BYKIND(typ->ct_kind, data, ld, return DBX_EINTERN, return DBX_EFAULT);
+				SETFLOAT_BYKIND_NOFAULT(typ->ct_kind, data, ld,
+				                        return DBX_EINTERN);
 			}
 			break;
 
@@ -1487,7 +1577,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 			typ->ct_kind &= ~(CTYPE_KIND_SIGNBIT | CTYPE_KIND_ENUMBIT);
 		}
 		if (data)
-			buffer_inv(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
+			buffer_inv_nofault(data, CTYPE_KIND_SIZEOF(typ->ct_kind));
 		break;
 
 	case '!':
@@ -1580,8 +1670,9 @@ again:
 		if (!rhs_data) {
 			rhs_value = 0.0L;
 		} else if (CTYPE_KIND_ISFLOAT(rhs_typ->ct_kind)) {
-			GETFLOAT_BYKIND(rhs_typ->ct_kind, rhs_data, __LONGDOUBLE, rhs_value,
-			                return DBX_EINTERN, return DBX_EFAULT);
+			GETFLOAT_BYKIND_NOFAULT(rhs_typ->ct_kind, rhs_data,
+			                        __LONGDOUBLE, rhs_value,
+			                        return DBX_EINTERN);
 		} else {
 			if (!CTYPE_KIND_ISINT_OR_BOOL(rhs_typ->ct_kind))
 				return DBX_ESYNTAX;
@@ -1602,8 +1693,9 @@ again:
 			}
 		}
 		if (lhs_data) {
-			GETFLOAT_BYKIND(lhs_typ->ct_kind, lhs_data, __LONGDOUBLE, lhs_value,
-			                return DBX_EINTERN, return DBX_EFAULT);
+			GETFLOAT_BYKIND_NOFAULT(lhs_typ->ct_kind, lhs_data,
+			                        __LONGDOUBLE, lhs_value,
+			                        return DBX_EINTERN);
 		} else {
 			lhs_value = 0.0L;
 		}
@@ -1659,8 +1751,9 @@ again:
 		}
 		/* Write-back the result. */
 		if (lhs_data) {
-			SETFLOAT_BYKIND(lhs_typ->ct_kind, lhs_data, lhs_value,
-			                return DBX_EINTERN, return DBX_EFAULT);
+			SETFLOAT_BYKIND_NOFAULT(lhs_typ->ct_kind,
+			                        lhs_data, lhs_value,
+			                        return DBX_EINTERN);
 		}
 		goto done;
 	}

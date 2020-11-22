@@ -153,6 +153,11 @@ DATDEF __BOOL cexpr_readonly;
  * and the like. */
 DATDEF __BOOL cexpr_typeonly;
 
+/* Set to true if memory writes should be forced.
+ * This is the 4'th argument is calls to dbg_writememory()
+ * Defaults to `false' */
+DATDEF __BOOL cexpr_forcewrite;
+
 
 /* Push an element into the C-expression stack.
  * @return: DBX_EOK:    Success.
@@ -217,10 +222,16 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_lrot)(unsigned int n);
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_rrot)(unsigned int n);
 
 /* Return a pointer to the data associated with the top expression stack element.
- * If the stack is empty, or an intermediate buffer is required for storing data,
- * and that buffer could not be allocated, return NULL instead.
- * When `cexpr_typeonly' is set to true, this function always returns `NULL' */
-FUNDEF WUNUSED byte_t *NOTHROW(FCALL cexpr_getdata)(void);
+ * If the stack is empty or `cexpr_typeonly' is `true', write-back a NULL pointer.
+ * WARNING: The pointer written back to `*presult' may point to arbitrary
+ *          user- or out-of-vm memory, meaning that it must be accessed
+ *          through use of `dbg_(read|write)memory'!
+ * @return: DBX_EOK:     Success.
+ * @return: DBX_ENOMEM:  Insufficient memory to allocate an intermediate buffer.
+ * @return: DBX_EFAULT:  A CFI expression caused a memory fault.
+ * @return: DBX_EINTERN: Internal error. */
+FUNDEF WUNUSED NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_getdata)(byte_t **__restrict presult);
 
 /* Return the actual size of the top element of the C expression stack.
  * If the stack is empty, return `0' instead. (s.a. `ctype_sizeof()') */
