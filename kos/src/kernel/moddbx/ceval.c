@@ -254,7 +254,7 @@ NOTHROW(FCALL cparser_skip)(struct cparser *__restrict self,
 		yield();
 		return DBX_EOK;
 	}
-	if (self->c_autocom) {
+	if (self->c_autocom && self->c_tokend == self->c_end) {
 		/* Suggest missing characters. */
 		char name[1];
 		name[0] = (char)expected_tok;
@@ -2454,6 +2454,7 @@ NOTHROW(FCALL ctype_parse_inner_prefix)(struct cparser *__restrict self,
                                         /*in:ref|out:ref*/ struct ctyperef *__restrict presult,
                                         struct ctype_attributes *__restrict attrib) {
 	dbx_errno_t result;
+again:
 	switch (self->c_tok) {
 
 	case '*': {
@@ -2470,6 +2471,9 @@ NOTHROW(FCALL ctype_parse_inner_prefix)(struct cparser *__restrict self,
 		yield();
 		/* Parse additional const/volatile modifiers */
 		result = ctype_parse_cv(self, &presult->ct_flags, attrib);
+		if unlikely(result != DBX_EOK)
+			goto done;
+		goto again;
 	}	break;
 
 	default:
