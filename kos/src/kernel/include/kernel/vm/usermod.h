@@ -196,6 +196,10 @@ NOTHROW(KCALL usermod_section_lock_nx)(struct usermod *__restrict self,
                                        USER CHECKED char const *name,
                                        unsigned int flags);
 
+/* Lazily load section headers. */
+FUNDEF NONNULL((1)) void KCALL usermod_load_elf_shdr(struct usermod *__restrict self);
+FUNDEF NONNULL((1)) void KCALL usermod_load_elf_shstrtab(struct usermod *__restrict self);
+
 
 /* Find the user-space module that resides at the given address.
  * NOTE: After the kernel has been poisoned, this function can no longer be used

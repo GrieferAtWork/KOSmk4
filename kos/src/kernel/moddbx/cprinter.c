@@ -1044,6 +1044,117 @@ is_nonempty_printer(void *UNUSED(arg),
 }
 
 
+/* Try to determine the name of the section that `module_relative_addr'
+ * is apart of, and return that name, whilst storing the offset into
+ * that section in `*psection_relative_addr'
+ * If the section cannot be determined, return `NULL' instead. */
+PRIVATE NONNULL((2, 3)) char const *
+NOTHROW(KCALL get_name_and_offset_of_containing_sections)(uintptr_t module_relative_addr,
+                                                          uintptr_t *__restrict psection_relative_addr,
+                                                          module_t *__restrict mod
+                                                          module_type__param(modtyp)) {
+	TRY {
+		bool allow_section_end_pointers;
+		allow_section_end_pointers = false;
+again:
+#ifdef CONFIG_HAVE_USERMOD
+		if (modtyp == MODULE_TYPE_USRMOD) {
+			struct usermod *um;
+			um = (struct usermod *)mod;
+			if (USERMOD_TYPE_ISELF(um->um_modtype)) {
+				uint16_t i;
+				usermod_load_elf_shdr(um);
+				for (i = 0; i < um->um_elf.ue_shnum; ++i) {
+					char *shstrtab;
+					uintptr_t sh_flags, sh_addr, sh_size;
+					uintptr_t sh_name;
+					size_t shstrtab_size;
+#ifdef USERMOD_TYPE_ELF32
+					if (USERMOD_TYPE_ISELF32(um->um_modtype)) {
+						sh_flags = um->um_elf.ue_shdr32[i].sh_flags;
+						sh_addr  = um->um_elf.ue_shdr32[i].sh_addr;
+						sh_size  = um->um_elf.ue_shdr32[i].sh_size;
+						sh_name  = um->um_elf.ue_shdr32[i].sh_name;
+					} else
+#endif /* USERMOD_TYPE_ELF32 */
+#ifdef USERMOD_TYPE_ELF64
+					if (USERMOD_TYPE_ISELF64(um->um_modtype)) {
+						sh_flags = um->um_elf.ue_shdr64[i].sh_flags;
+						sh_addr  = um->um_elf.ue_shdr64[i].sh_addr;
+						sh_size  = um->um_elf.ue_shdr64[i].sh_size;
+						sh_name  = um->um_elf.ue_shdr64[i].sh_name;
+					} else
+#endif /* USERMOD_TYPE_ELF64 */
+					{
+						continue;
+					}
+					if (!(sh_flags & SHF_ALLOC))
+						continue; /* Section isn't allocated, so this one can't be it. */
+					if (module_relative_addr < sh_addr)
+						continue;
+					if (module_relative_addr >= sh_addr + sh_size) {
+						if (!allow_section_end_pointers)
+							continue;
+						if (module_relative_addr > sh_addr + sh_size)
+							continue;
+					}
+					/* Found it! */
+					usermod_load_elf_shstrtab(um);
+					shstrtab = um->um_elf.ue_shstrtab;
+					if unlikely(!shstrtab)
+						break;
+					shstrtab_size = kmalloc_usable_size(shstrtab);
+					if unlikely(sh_name >= shstrtab_size)
+						break;
+					shstrtab += sh_name;
+					*psection_relative_addr = module_relative_addr - sh_addr;
+					return shstrtab;
+				}
+			}
+		} else
+#endif /* CONFIG_HAVE_USERMOD */
+		{
+			struct driver *d;
+			ElfW(Shdr) const *shdrs;
+			d     = (struct driver *)mod;
+			shdrs = driver_getshdrs(d);
+			if likely(shdrs) {
+				ElfW(Half) i;
+				for (i = 0; i < d->d_shnum; ++i) {
+					char const *shstrtab;
+					if (!(shdrs[i].sh_flags & SHF_ALLOC))
+						continue; /* Section isn't allocated, so this one can't be it. */
+					if (module_relative_addr < shdrs[i].sh_addr)
+						continue;
+					if (module_relative_addr >= shdrs[i].sh_addr + shdrs[i].sh_size) {
+						if (!allow_section_end_pointers)
+							continue;
+						if (module_relative_addr > shdrs[i].sh_addr + shdrs[i].sh_size)
+							continue;
+					}
+					/* Found it! */
+					shstrtab = driver_getshstrtab(d);
+					if unlikely(!shstrtab)
+						break;
+					shstrtab += shdrs[i].sh_name;
+					if unlikely(shstrtab < d->d_shstrtab ||
+					            shstrtab >= d->d_shstrtab_end)
+						break;
+					*psection_relative_addr = module_relative_addr - shdrs[i].sh_addr;
+					return shstrtab;
+				}
+			}
+		}
+		if (!allow_section_end_pointers) {
+			allow_section_end_pointers = true;
+			goto again;
+		}
+	} EXCEPT {
+	}
+	return NULL;
+}
+
+
 
 PRIVATE ATTR_NOINLINE NONNULL((1, 3)) ssize_t KCALL
 print_named_pointer(struct ctyperef const *__restrict self,
@@ -1059,23 +1170,25 @@ print_named_pointer(struct ctyperef const *__restrict self,
 		module_type_var(modtyp);
 		mod = module_ataddr_nx(ptr, modtyp);
 		if (mod) {
+			uintptr_t module_relative_ptr;
 			di_addr2line_sections_t sections;
 			di_addr2line_dl_sections_t dl_sections;
+			module_relative_ptr = (uintptr_t)ptr - module_getloadaddr(mod, modtyp);
 			/* Try to lookup the name/base-address of a symbol
 			 * that contains the given `ptr' and is part of `mod' */
 			if (debug_addr2line_sections_lock(mod, &sections, &dl_sections
 			                                  module_type__arg(modtyp)) == DEBUG_INFO_ERROR_SUCCESS) {
 				di_debug_addr2line_t a2l;
-				uintptr_t module_relative_pc;
-				module_relative_pc = (uintptr_t)ptr - module_getloadaddr(mod, modtyp);
-				if (debug_addr2line(&sections, &a2l, module_relative_pc,
+				if (debug_addr2line(&sections, &a2l, module_relative_ptr,
 				                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
 				                    DEBUG_ADDR2LINE_FNORMAL) == DEBUG_INFO_ERROR_SUCCESS) {
 					if (!a2l.al_rawname)
 						a2l.al_rawname = a2l.al_name;
+					if (a2l.al_rawname && !*a2l.al_rawname)
+						a2l.al_rawname = NULL;
 					if (a2l.al_rawname) {
 						uintptr_t offset;
-						offset = module_relative_pc - a2l.al_symstart;
+						offset = module_relative_ptr - a2l.al_symstart;
 						temp = print_a2l_symbol(printer, ptr, a2l.al_rawname,
 						                        offset, mod module_type__arg(modtyp));
 						debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
@@ -1087,6 +1200,27 @@ print_named_pointer(struct ctyperef const *__restrict self,
 					}
 				}
 				debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
+			}
+			/* We know that the pointer (should) be located in one of the module's
+			 * sections. As such, try to check if we can determine the section that
+			 * the point points into, so we can print a hint:
+			 * >> 0x12345678 (libc.so!.text+54321) */
+			{
+				char const *section_name;
+				uintptr_t section_offset;
+				section_name = get_name_and_offset_of_containing_sections(module_relative_ptr,
+				                                                          &section_offset,
+				                                                          mod module_type__arg(modtyp));
+				if (section_name != NULL) {
+					temp = print_a2l_symbol(printer, ptr,
+					                        section_name, section_offset,
+					                        mod module_type__arg(modtyp));
+					module_decref(mod, modtyp);
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+					goto done;
+				}
 			}
 			module_decref(mod, modtyp);
 		}

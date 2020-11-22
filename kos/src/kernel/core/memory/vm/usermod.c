@@ -225,7 +225,7 @@ NOTHROW(FCALL usermod_destroy)(struct usermod *__restrict self) {
 
 
 /* Lazily load section headers. */
-PRIVATE NONNULL((1)) void KCALL
+PUBLIC NONNULL((1)) void KCALL
 usermod_load_elf_shdr(struct usermod *__restrict self) {
 	void *shdrs;
 	size_t shdrs_size;
@@ -258,7 +258,7 @@ usermod_load_elf_shdr(struct usermod *__restrict self) {
 }
 
 /* Lazily load section headers. */
-PRIVATE NONNULL((1)) void KCALL
+PUBLIC NONNULL((1)) void KCALL
 usermod_load_elf_shstrtab(struct usermod *__restrict self) {
 	char *shstrtab;
 	size_t shstrtab_size;
