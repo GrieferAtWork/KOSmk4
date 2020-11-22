@@ -344,7 +344,7 @@ NOTHROW(FCALL cvalue_rw_expr)(struct cvalue *__restrict self,
 }
 
 /* Sign- or zero-extend a given buffer. */
-PRIVATE dbx_errno_t
+PRIVATE WUNUSED dbx_errno_t
 NOTHROW(FCALL buffer_extend)(byte_t *data, size_t old_size,
                              size_t new_size, bool sign_extend) {
 	if (new_size > old_size) {
@@ -607,10 +607,10 @@ NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
 	ctyperef_initcopy(&valp->cv_type, typ);
 	if (cexpr_typeonly) {
 		valp->cv_kind = CVALUE_KIND_VOID;
-	} else if (expr->v_objaddr && !expr->v_expr.l_expr && !expr->v_expr.l_llist) {
+	} else if (/*expr->v_objaddr &&*/ !expr->v_expr.l_expr && !expr->v_expr.l_llist) {
 		/* Special case: non-CFI object-address expression. */
 		valp->cv_kind = CVALUE_KIND_ADDR;
-		valp->cv_addr = (byte_t *)expr->v_objaddr + buflen;
+		valp->cv_addr = (byte_t *)expr->v_objaddr + bufoff;
 	} else {
 		cvalue_cfiexpr_initcopy(&valp->cv_expr.v_expr, expr);
 		valp->cv_kind          = CVALUE_KIND_EXPR;
@@ -1219,7 +1219,7 @@ again_switch_kind:
 		switch (top->cv_kind) {
 
 		case CVALUE_KIND_ADDR:
-			if (dbg_readmemory(buffer, top->cv_addr, buflen) != 0)
+			if (dbg_readmemory(top->cv_addr, buffer, buflen) != 0)
 				goto err_fault;
 			break;
 
@@ -2176,10 +2176,33 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
 	if (!cmodsyminfo_istype(&csym)) {
 		struct ctyperef symtype;
 		/* Load the type of the variable. */
-		result = ctype_fromdw(csym.clv_mod, csym.clv_unit,
-		                      &csym.clv_parser,
-		                      csym.clv_data.s_var.v_typeinfo,
-		                      &symtype);
+		result = ctype_fromdw_opt(csym.clv_mod, csym.clv_unit,
+		                          &csym.clv_parser,
+		                          csym.clv_data.s_var.v_typeinfo,
+		                          &symtype);
+		if (csym.clv_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
+			/* Special case: Must complete `symtype' by loading argument types. */
+			csym.clv_parser.dup_cu_info_pos = cmodsyminfo_getdip(&csym);
+			REF struct ctype *function_type;
+			if (debuginfo_cu_parser_next(&csym.clv_parser)) {
+				result = ctype_fromdw_subroutine(csym.clv_mod,
+				                                 csym.clv_unit,
+				                                 &csym.clv_parser,
+				                                 &function_type,
+				                                 &symtype);
+			} else {
+				/* Fallback:  */
+				function_type = ctype_function(&symtype, 0, NULL,
+				                               CTYPE_KIND_FUNPROTO_VARARGS);
+				if unlikely(!function_type)
+					result = DBX_ENOMEM;
+			}
+			ctyperef_fini(&symtype);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			memset(&symtype, 0, sizeof(symtype));
+			symtype.ct_typ = function_type; /* Inherit reference */
+		}
 		if likely(result == DBX_EOK) {
 			if (csym.clv_data.s_var.v_objaddr == csym.clv_data.s_var._v_objdata) {
 				result = cexpr_pushdata(&symtype, csym.clv_data.s_var.v_objaddr);
@@ -2205,6 +2228,7 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
 	} else {
 		result = DBX_ENOENT;
 	}
+done:
 	cmodsyminfo_istype(&csym);
 	return result;
 }

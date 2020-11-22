@@ -611,6 +611,24 @@ NOTHROW(FCALL ctype_fromdw)(struct cmodule *__restrict mod,
                             di_debuginfo_cu_parser_t const *__restrict cu_parser,
                             byte_t const *__restrict type_debug_info,
                             /*out*/ struct ctyperef *__restrict presult);
+
+/* Same as `ctype_fromdw()', but when `type_debug_info'
+ * is NULL, fill `*presult' with `ctype_void'. */
+FUNDEF WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
+NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
+                                struct cmodunit const *__restrict cunit,
+                                di_debuginfo_cu_parser_t const *__restrict cu_parser,
+                                byte_t const *type_debug_info,
+                                /*out*/ struct ctyperef *__restrict presult);
+
+/* Parse the parameters of a subroutine or subroutine type. */
+FUNDEF WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
+NOTHROW(FCALL ctype_fromdw_subroutine)(struct cmodule *__restrict mod,
+                                       struct cmodunit const *__restrict cunit,
+                                       di_debuginfo_cu_parser_t *__restrict parser,
+                                       /*out*/ REF struct ctype **__restrict presult,
+                                       /*in*/ struct ctyperef const *__restrict return_type);
+
 #define ctype_from_cmodsyminfo(self, presult)                            \
 	ctype_fromdw((self)->clv_mod, (self)->clv_unit, &(self)->clv_parser, \
 	             cmodsyminfo_getdip(self), presult)

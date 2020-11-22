@@ -888,8 +888,9 @@ NOTHROW(FCALL ctype_struct_getfield)(struct ctype *__restrict self,
 
 
 
-/* Same as `ctype_fromdw()', but when `type_debug_info' is NULL, fill `*presult' with `ctype_void'. */
-PRIVATE WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
+/* Same as `ctype_fromdw()', but when `type_debug_info'
+ * is NULL, fill `*presult' with `ctype_void'. */
+PUBLIC WUNUSED NONNULL((1, 2, 3, 5)) dbx_errno_t
 NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
                                 struct cmodunit const *__restrict cunit,
                                 di_debuginfo_cu_parser_t const *__restrict cu_parser,
@@ -903,6 +904,76 @@ NOTHROW(FCALL ctype_fromdw_opt)(struct cmodule *__restrict mod,
 	} else {
 		result = ctype_fromdw(mod, cunit, cu_parser, type_debug_info, presult);
 	}
+	return result;
+}
+
+
+PUBLIC WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
+NOTHROW(FCALL ctype_fromdw_subroutine)(struct cmodule *__restrict mod,
+                                       struct cmodunit const *__restrict cunit,
+                                       di_debuginfo_cu_parser_t *__restrict parser,
+                                       /*out*/ REF struct ctype **__restrict presult,
+                                       /*in*/ struct ctyperef const *__restrict return_type) {
+	dbx_errno_t result;
+	struct ctyperef *argv;
+	size_t argc;
+	uint16_t cc = CTYPE_KIND_FUNPROTO_CC_DEFAULT;
+	argv = NULL;
+	argc = 0;
+	if (debuginfo_cu_parser_nextchild(parser)) {
+		/* Load function argument types. */
+		size_t depth = parser->dup_child_depth;
+		do {
+			if (parser->dup_child_depth == depth &&
+			    (parser->dup_comp.dic_tag == DW_TAG_formal_parameter ||
+			     parser->dup_comp.dic_tag == DW_TAG_unspecified_parameters)) {
+				if (parser->dup_comp.dic_tag == DW_TAG_unspecified_parameters) {
+					cc |= CTYPE_KIND_FUNPROTO_VARARGS;
+				} else {
+					byte_t const *parameter_type_pointer = NULL;
+					di_debuginfo_component_attrib_t attr;
+					if ((argc + 1) > dbx_malloc_usable_size(argv) / sizeof(struct ctyperef)) {
+						struct ctyperef *new_argv;
+						new_argv = (struct ctyperef *)dbx_realloc(argv, (argc + 1) * sizeof(struct ctyperef));
+						if unlikely(!new_argv) {
+							result = DBX_ENOMEM;
+							goto done_fuction_argv;
+						}
+						argv = new_argv;
+					}
+					DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, parser) {
+						if (attr.dica_name == DW_AT_type)
+							debuginfo_cu_parser_getref(parser, attr.dica_form, &parameter_type_pointer);
+					}
+					if (!parameter_type_pointer) {
+						ctypeinfo_init(&argv[argc].ct_info);
+						argv[argc].ct_flags = CTYPEREF_FLAG_NORMAL;
+						argv[argc].ct_typ   = incref(&ctype_int);
+					} else {
+						result = ctype_fromdw(mod, cunit, parser, parameter_type_pointer, &argv[argc]);
+						if unlikely(result != DBX_EOK)
+							goto done_fuction_argv;
+					}
+					++argc;
+				}
+			} else {
+				debuginfo_cu_parser_skipattr(parser);
+			}
+		} while (debuginfo_cu_parser_next(parser) &&
+		         parser->dup_child_depth >= depth);
+	}
+	/* Form the actual function type. */
+	result   = DBX_EOK;
+	*presult = ctype_function(return_type, argc, argv, cc);
+	if unlikely(!*presult)
+		result = DBX_ENOMEM;
+done_fuction_argv:
+	while (argc) {
+		--argc;
+		ctyperef_fini(&argv[argc]);
+	}
+	dbx_free(argv);
+/*done:*/
 	return result;
 }
 
@@ -1122,75 +1193,16 @@ got_elem_count:
 
 	case DW_TAG_subroutine_type: {
 		struct ctyperef return_type;
-		struct ctyperef *argv;
-		size_t argc;
-		uint16_t cc = CTYPE_KIND_FUNPROTO_CC_DEFAULT;
 		/* Load the function return type. */
 		result = ctype_fromdw_opt(mod, cunit, &parser, typinfo.t_type, &return_type);
 		if unlikely(result != DBX_EOK)
 			goto done;
-		argv = NULL;
-		argc = 0;
-		if (debuginfo_cu_parser_nextchild(&parser)) {
-			/* Load function argument types. */
-			size_t depth = parser.dup_child_depth;
-			do {
-				if (parser.dup_child_depth == depth &&
-				    (parser.dup_comp.dic_tag == DW_TAG_formal_parameter ||
-				     parser.dup_comp.dic_tag == DW_TAG_unspecified_parameters)) {
-					if (parser.dup_comp.dic_tag == DW_TAG_unspecified_parameters) {
-						cc |= CTYPE_KIND_FUNPROTO_VARARGS;
-					} else {
-						byte_t const *parameter_type_pointer = NULL;
-						di_debuginfo_component_attrib_t attr;
-						if ((argc + 1) > dbx_malloc_usable_size(argv) / sizeof(struct ctyperef)) {
-							struct ctyperef *new_argv;
-							new_argv = (struct ctyperef *)dbx_realloc(argv, (argc + 1) * sizeof(struct ctyperef));
-							if unlikely(!new_argv) {
-								result = DBX_ENOMEM;
-								goto err_fuction_argv;
-							}
-							argv = new_argv;
-						}
-						DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
-							if (attr.dica_name == DW_AT_type)
-								debuginfo_cu_parser_getref(&parser, attr.dica_form, &parameter_type_pointer);
-						}
-						if (!parameter_type_pointer) {
-							ctypeinfo_init(&argv[argc].ct_info);
-							argv[argc].ct_flags = CTYPEREF_FLAG_NORMAL;
-							argv[argc].ct_typ   = incref(&ctype_int);
-						} else {
-							result = ctype_fromdw(mod, cunit, &parser, parameter_type_pointer, &argv[argc]);
-							if unlikely(result != DBX_EOK)
-								goto err_fuction_argv;
-						}
-						++argc;
-					}
-				} else {
-					debuginfo_cu_parser_skipattr(&parser);
-				}
-			} while (debuginfo_cu_parser_next(&parser) &&
-			         parser.dup_child_depth >= depth);
-		}
-		/* Form the actual function type. */
-		presult->ct_typ = ctype_function(&return_type, argc, argv, cc);
-		if unlikely(!presult->ct_typ) {
-			result = DBX_ENOMEM;
-err_fuction_argv:
-			while (argc) {
-				--argc;
-				ctyperef_fini(&argv[argc]);
-			}
-			dbx_free(argv);
-			goto done;
-		}
-		while (argc) {
-			--argc;
-			ctyperef_fini(&argv[argc]);
-		}
-		dbx_free(argv);
+		result = ctype_fromdw_subroutine(mod, cunit, &parser,
+		                                 &presult->ct_typ,
+		                                 &return_type);
 		ctyperef_fini(&return_type);
+		if unlikely(result != DBX_EOK)
+			goto done;
 	}	break;
 
 	case DW_TAG_class_type:

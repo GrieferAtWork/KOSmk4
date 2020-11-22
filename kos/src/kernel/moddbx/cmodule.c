@@ -895,9 +895,15 @@ again:
 			case DW_AT_abstract_origin:
 				goto do_abstract_origin;
 
+			case DW_AT_sibling:
 			case DW_AT_specification: {
 				byte_t const *specification;
 				if (debuginfo_cu_parser_getref(self, attr.dica_form, &specification)) {
+					/* Only load the pointed-to name if we don't already have one. */
+					if (result && !name_attribute)
+						name_attribute = result;
+					if (name_attribute && !result)
+						result = name_attribute;
 					parse_variable_specifications(self, specification,
 					                              &result, &name_attribute,
 					                              &features);
@@ -1846,7 +1852,8 @@ again:
 	if (debuginfo_cu_parser_next(&inner_parser)) {
 		if (inner_parser.dup_comp.dic_tag == DW_TAG_variable ||
 		    inner_parser.dup_comp.dic_tag == DW_TAG_constant ||
-		    inner_parser.dup_comp.dic_tag == DW_TAG_enumerator) {
+		    inner_parser.dup_comp.dic_tag == DW_TAG_enumerator ||
+		    inner_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
 			DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &inner_parser) {
 				switch (attr.dica_name) {
 
@@ -1960,6 +1967,7 @@ again_attributes:
 				loadinfo_type(&info->clv_parser, info, attr.dica_form);
 				break;
 
+			case DW_AT_sibling:
 			case DW_AT_specification: {
 				byte_t const *spec;
 				if likely(debuginfo_cu_parser_getref(&info->clv_parser, attr.dica_form, &spec))

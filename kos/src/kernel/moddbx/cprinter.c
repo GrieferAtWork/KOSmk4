@@ -993,16 +993,44 @@ NOTHROW(KCALL dbg_eqmemory)(void const *a, void const *b, size_t num_bytes) {
 
 PRIVATE NONNULL((1)) ssize_t KCALL
 print_a2l_symbol(struct cprinter const *__restrict printer,
-                 char const *__restrict name, uintptr_t offset) {
+                 void const *ptr, char const *__restrict name,
+                 uintptr_t offset, module_t *__restrict mod
+                 module_type__param(modtyp)) {
 	ssize_t temp, result = 0;
-	FORMAT(DEBUGINFO_PRINT_FORMAT_POINTER_PREFIX);
-	PRINT("&");
-	FORMAT(DEBUGINFO_PRINT_FORMAT_POINTER_SUFFIX);
-	FORMAT(DEBUGINFO_PRINT_FORMAT_VARNAME_PREFIX);
+	FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+	PRINTF("%#" PRIxPTR, ptr);
+	FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+	PRINT(" ");
+	FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+	PRINT("(");
+#ifdef CONFIG_HAVE_USERMOD
+	if (modtyp == MODULE_TYPE_USRMOD) {
+		if (mod->m_usrmod.um_fsname) {
+			u16 namelen;
+			namelen = mod->m_usrmod.um_fsname->de_namelen;
+			if (namelen > 16)
+				namelen = 16;
+			DO((*P_PRINTER)(P_ARG, mod->m_usrmod.um_fsname->de_name, namelen));
+		} else {
+			DO((*P_PRINTER)(P_ARG, "?", 3));
+		}
+	} else
+#endif /* CONFIG_HAVE_USERMOD */
+	{
+		size_t namelen;
+		char const *name;
+		name    = ((struct driver *)mod)->d_name;
+		namelen = strlen(name);
+		if (namelen > 16)
+			namelen = 16;
+		DO((*P_PRINTER)(P_ARG, name, namelen));
+	}
+	PRINT("!");
 	DO((*P_PRINTER)(P_ARG, name, strlen(name)));
 	if (offset != 0)
 		PRINTF("+%#" PRIxPTR, offset);
-	FORMAT(DEBUGINFO_PRINT_FORMAT_VARNAME_SUFFIX);
+	PRINT(")");
+	FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
 	return result;
 err:
 	return temp;
@@ -1048,7 +1076,8 @@ print_named_pointer(struct ctyperef const *__restrict self,
 					if (a2l.al_rawname) {
 						uintptr_t offset;
 						offset = module_relative_pc - a2l.al_symstart;
-						temp   = print_a2l_symbol(printer, a2l.al_rawname, offset);
+						temp = print_a2l_symbol(printer, ptr, a2l.al_rawname,
+						                        offset, mod module_type__arg(modtyp));
 						debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
 						module_decref(mod, modtyp);
 						if unlikely(temp < 0)
