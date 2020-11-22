@@ -1052,7 +1052,18 @@ again:
 		struct ctyperef lhs_ptr_type;
 		/* >> foo@bar
 		 * Same as:
-		 * >> *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar) */
+		 * >> *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar)
+		 *
+		 * Intended for ATTR_PERxxx variables within the kernel:
+		 * >> this_connections@caller
+		 * Where `caller' is presumably a local variable `struct task *caller'.
+		 * This will then resolve to print information about the pet-task
+		 * variable `this_connections', as viewed by `caller'
+		 *
+		 * TODO: The 2 operands should be interchangeable, so-long as
+		 *       at most one of them is a pointer. When both, or neither
+		 *       is a pointer, only then should this operator result in
+		 *       a DBX_ESYNTAX error. */
 		if (CTYPE_KIND_ISARRAY(cexpr_stacktop.cv_type.ct_typ->ct_kind)) {
 			result = cexpr_promote();
 		} else {

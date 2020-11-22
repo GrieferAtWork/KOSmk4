@@ -2162,6 +2162,7 @@ NOTHROW(FCALL cvalue_setptrdiff_t)(struct cvalue *__restrict self,
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: The stack is empty or invalid `op'.
+ * @return: DBX_EINTERN: `op' is not one of the above constants.
  * @return: DBX_ESYNTAX: `op' not allowed here. */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 	dbx_errno_t result;
@@ -2259,7 +2260,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 	return DBX_EOK;
 }
 
-/* Perform a unary operation `op' on the top 2 C expression stack elements.
+/* Perform a binary operation `op' on the top 2 C expression stack elements.
  * As far as operands go, STACK.TOP is RHS and STACK.TOP-1 is LHS (meaning
  * that LHS must be pushed first, and RHS second)
  * NOTE: This function automatically performs type promotions.
@@ -2282,8 +2283,9 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
  *             CTOKEN_TOK_RANGLE_EQUALS: Greater-or-equal
  * @return: DBX_EOK:      Success.
  * @return: DBX_ENOMEM:   Out of memory.
- * @return: DBX_EDIVZERO: `op' is `/' or `%' and 
+ * @return: DBX_EDIVZERO: `op' is `/' or `%' and the rhs-operand is equal to 0
  * @return: DBX_EINTERN:  The stack contains less than 2 elements or invalid `op'.
+ * @return: DBX_EINTERN:  `op' is not one of the above constants.
  * @return: DBX_ESYNTAX:  `op' not allowed for its operands. */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op2)(unsigned int op) {
 	dbx_errno_t result;
