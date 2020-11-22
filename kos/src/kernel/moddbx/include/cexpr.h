@@ -292,6 +292,7 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name, size_t namelen);
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_ESYNTAX: Operation not allowed.
+ * @return: DBX_ENOADDR: Cannot take address of optimized variable.
  * @return: DBX_EINTERN: The C expression stack is empty. */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_ref)(void);   /* Implements `&' */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_deref)(void); /* Implements `*' */

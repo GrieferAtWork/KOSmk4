@@ -211,6 +211,124 @@ NOTHROW(FCALL cvalue_fini)(struct cvalue *__restrict self) {
 }
 
 
+/* Try to convert a `CVALUE_KIND_EXPR' or `CVALUE_KIND_IEXPR'
+ * expression into a `CVALUE_KIND_ADDR' object, such that
+ * its address may be taken, and data can be accessed without
+ * having to use an intermediate buffer.
+ * @return: DBX_EOK: Success (`self' has become `CVALUE_KIND_ADDR')
+ * @return: DBX_EOK: Not possible (`self' remains unchanged) */
+PRIVATE ATTR_NOINLINE NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
+	unwind_ste_t ste_top;
+	unwind_emulator_t emulator;
+	size_t expr_length;
+	void const *pc;
+	uintptr_t module_relative_pc;
+	unsigned int result;
+	struct cmodule *mod;
+	di_debuginfo_compile_unit_t cu;
+	byte_t temp_buffer[1];
+
+	/* Sanity check: are we actually dealing with a CFI expression? */
+	if (self->cv_kind != CVALUE_KIND_EXPR &&
+	    self->cv_kind != CVALUE_KIND_IEXPR)
+		goto done;
+	memset(&emulator, 0, sizeof(emulator));
+	memset(&cu, 0, sizeof(cu));
+	pc  = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	mod = self->cv_expr.v_expr.v_module;
+	/* Select the proper function. */
+	module_relative_pc = (uintptr_t)pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp);
+	emulator.ue_pc = debuginfo_location_select(&self->cv_expr.v_expr.v_expr,
+	                                           self->cv_expr.v_expr.v_cu_ranges_startpc,
+	                                           module_relative_pc,
+	                                           self->cv_expr.v_expr.v_addrsize,
+	                                           &expr_length);
+	if unlikely(!emulator.ue_pc)
+		goto done;
+	cu.cu_ranges.r_startpc         = self->cv_expr.v_expr.v_cu_ranges_startpc;
+	cu.cu_addr_base                = self->cv_expr.v_expr.v_cu_addr_base;
+	emulator.ue_pc_start           = emulator.ue_pc;
+	emulator.ue_pc_end             = emulator.ue_pc + expr_length;
+	emulator.ue_sectinfo           = di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections);
+	emulator.ue_regget             = &dbg_getreg;
+	emulator.ue_regget_arg         = (void *)(uintptr_t)DBG_REGLEVEL_VIEW;
+	emulator.ue_framebase          = &self->cv_expr.v_expr.v_framebase;
+	emulator.ue_objaddr            = self->cv_expr.v_expr.v_objaddr;
+	emulator.ue_bjmprem            = UNWIND_EMULATOR_BJMPREM_DEFAULT;
+	emulator.ue_addrsize           = self->cv_expr.v_expr.v_addrsize;
+	emulator.ue_ptrsize            = self->cv_expr.v_expr.v_ptrsize;
+	emulator.ue_piecebuf           = temp_buffer; /* Needed to detect `ue_piecebits' below */
+	emulator.ue_piecesiz           = sizeof(temp_buffer);
+	emulator.ue_cu                 = &cu;
+	emulator.ue_module_relative_pc = module_relative_pc;
+	/* Execute the emulator. */
+	result = unwind_emulator_exec_autostack(&emulator, NULL, &ste_top, NULL);
+#if 0 /* No stack-entry location. */
+	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE)
+		goto done;
+#endif
+	if (result != UNWIND_SUCCESS)
+		goto done; /* Ignore all errors... */
+	if unlikely(emulator.ue_piecebits != 0)
+		goto done; /* The value isn't continuous (and so its address cannot be taken) */
+	/* Switch on what was left in the stack-top entry to
+	 * determine if we can extract an absolute address. */
+	switch (ste_top.s_type) {
+
+		/* NOTE: The reason why specifically these 4 types of stack-values
+		 *       can be dereferenced can be traced back to the documentation
+		 *       of these constants in "<libunwind/cfi.h>", following the line
+		 *       """Effective return values (after indirection) are:""""
+		 * If you compare this list with it, you will see that this is the list
+		 * of expressions that are dereferenced during evaluation, meaning that
+		 * internally they always first evaluate to an address. */
+	case UNWIND_STE_CONSTANT:
+	case UNWIND_STE_REGISTER:
+	case UNWIND_STE_RO_LVALUE:
+	case UNWIND_STE_RW_LVALUE: {
+		byte_t *lvalue;
+		lvalue = ste_top.s_lvalue;
+		if (ste_top.s_type == UNWIND_STE_REGISTER) {
+			/* Convert to l-value */
+			union {
+				uintptr_t p;
+				byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+			} regval;
+			if unlikely(!dbg_getreg((void *)(uintptr_t)DBG_REGLEVEL_VIEW, ste_top.s_register, regval.buf))
+				goto done;
+			lvalue = (byte_t *)regval.p + ste_top.s_regoffset;
+		}
+		/* Got it! The address can now be found in `lvalue'
+		 * However, we must still write-back any unwritten modifications,
+		 * even though there really shouldn't be any at this point. */
+		if (self->cv_kind == CVALUE_KIND_EXPR) {
+			if (self->cv_expr.v_buffer) {
+				if (dbg_writememory(lvalue, self->cv_expr.v_buffer,
+				                    self->cv_expr.v_buflen,
+				                    cexpr_forcewrite) != 0)
+					goto err_fault;
+				dbx_free(self->cv_expr.v_buffer);
+			}
+		} else {
+			if (dbg_writememory(lvalue, self->cv_expr.v_ibuffer,
+			                    self->cv_expr.v_buflen,
+			                    cexpr_forcewrite) != 0)
+				goto err_fault;
+		}
+		self->cv_kind = CVALUE_KIND_ADDR;
+		self->cv_addr = lvalue;
+	}	break;
+
+	default:
+		break;
+	}
+done:
+	return DBX_EOK;
+err_fault:
+	return DBX_EFAULT;
+}
+
 /* Read/write the value of the given CFI expression to/from buf.
  * @return: DBX_EOK:     Success.
  * @return: DBX_EFAULT:  Faulty memory location accessed.
@@ -218,7 +336,6 @@ NOTHROW(FCALL cvalue_fini)(struct cvalue *__restrict self) {
 PUBLIC NONNULL((1, 2)) dbx_errno_t
 NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict self,
                                         void *buf, size_t buflen, bool write) {
-	uintptr_t pc;
 	unsigned int error;
 	TRY {
 		if (!self->v_expr.l_expr && !self->v_expr.l_llist) {
@@ -229,14 +346,15 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			if unlikely(copy_error)
 				error = UNWIND_SEGFAULT;
 		} else {
+			void const *pc;
 			di_debuginfo_compile_unit_t cu;
 			size_t num_accessed_bits;
 			struct cmodule *mod;
 			memset(&cu, 0, sizeof(cu));
 			cu.cu_ranges.r_startpc = self->v_cu_ranges_startpc;
 			cu.cu_addr_base        = self->v_cu_addr_base;
-			pc                     = dbg_getpcreg(DBG_REGLEVEL_VIEW);
-			mod                    = self->v_module;
+			pc  = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+			mod = self->v_module;
 			/* TODO: DWARF often uses simple expressions such as `DW_OP_addr', which
 			 *       are then resolved immediately to the address of the pointed-to
 			 *       object. However, in this implementation, we don't take advantage
@@ -270,14 +388,14 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 						                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
 						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
 						                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-						                                    pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
+						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 					} else {
 						error = debuginfo_location_getvalue(&self->v_expr,
 						                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
 						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
-						                                    pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
+						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 					}
@@ -866,6 +984,12 @@ again:
 		/* Lazily load a CFI expression. */
 		if (!*presult) {
 			dbx_errno_t error;
+			/* Try to load the address of the CFI expression. */
+			error = cexpr_cfi_to_address(top);
+			if unlikely(error != DBX_EOK)
+				return error;
+			if (top->cv_kind != CVALUE_KIND_EXPR)
+				goto again;
 			error = cvalue_rw_expr(top, false);
 			if (error == DBX_EOK)
 				goto again;
@@ -1282,7 +1406,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_promote)(void) {
 		return DBX_EINTERN; /* Shouldn't happen */
 	top = &cexpr_stacktop;
 	if unlikely(top->cv_kind != CVALUE_KIND_DATA &&
-	             top->cv_kind != CVALUE_KIND_IDATA)
+	            top->cv_kind != CVALUE_KIND_IDATA)
 		return DBX_EINTERN; /* Shouldn't happen */
 	old_type = top->cv_type.ct_typ;
 	if (CTYPE_KIND_ISINT_OR_BOOL(old_type->ct_kind) &&
@@ -1382,6 +1506,7 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
  * @return: DBX_EOK:     Success.
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_ESYNTAX: Operation not allowed.
+ * @return: DBX_ENOADDR: Cannot take address of optimized variable.
  * @return: DBX_EINTERN: The C expression stack is empty. */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 	struct cvalue *top;
@@ -1392,10 +1517,24 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 	if unlikely(!cexpr_stacksize)
 		return DBX_EINTERN;
 	top = &cexpr_stacktop;
+	/* Try to load the address of a CFI expression. */
+	if (top->cv_kind == CVALUE_KIND_EXPR ||
+	    top->cv_kind == CVALUE_KIND_IEXPR) {
+		dbx_errno_t error;
+		error = cexpr_cfi_to_address(top);
+		if unlikely(error != DBX_EOK)
+			return error;
+	}
 	/* Make sure that the top-element is located in-memory. */
 	if (top->cv_kind != CVALUE_KIND_ADDR &&
-	    top->cv_kind != CVALUE_KIND_VOID)
+	    top->cv_kind != CVALUE_KIND_VOID) {
+		/* Return a special error when we can't
+		 * take the address of a CFI expression. */
+		if (top->cv_kind == CVALUE_KIND_EXPR ||
+		    top->cv_kind == CVALUE_KIND_IEXPR)
+			return DBX_ENOADDR;
 		return DBX_ESYNTAX;
+	}
 	/* Construct the pointer-type. */
 	typ = ctype_ptr(&top->cv_type, dbg_current_sizeof_pointer());
 	if unlikely(!typ)
@@ -2137,7 +2276,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_store)(void) {
  * @return: DBX_ENOMEM:  Out of memory.
  * @return: DBX_EINTERN: The stack does not contain enough elements. */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
-	/* Not implemented... */
+	/* TODO: Not implemented... */
 	COMPILER_IMPURE();
 	(void)argc;
 	return DBX_ENOMEM;

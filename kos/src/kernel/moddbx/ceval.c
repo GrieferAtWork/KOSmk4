@@ -1047,7 +1047,7 @@ again:
 		struct ctyperef lhs_ptr_type;
 		/* >> foo@bar
 		 * Same as:
-		 * >> *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)&bar) */
+		 * >> *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar) */
 		if (CTYPE_KIND_ISARRAY(cexpr_stacktop.cv_type.ct_typ->ct_kind)) {
 			result = cexpr_promote();
 		} else {
@@ -1063,23 +1063,20 @@ err_lhs_ptr_type:
 			goto done;
 		}
 		yield();
-		result = parse_unary(self);
+		result = parse_unary(self);            /* (uintptr_t)&foo, bar */
 		if unlikely(result != DBX_EOK)
 			goto err_lhs_ptr_type;
-		result = cexpr_ref();                  /* (uintptr_t)&foo, &bar */
+		result = cexpr_cast_simple(&ctype_uintptr_t); /* (uintptr_t)&foo, (uintptr_t)bar */
 		if unlikely(result != DBX_EOK)
 			goto err_lhs_ptr_type;
-		result = cexpr_cast_simple(&ctype_uintptr_t); /* (uintptr_t)&foo, (uintptr_t)&bar */
+		result = cexpr_op2('+');               /* (uintptr_t)&foo + (uintptr_t)bar */
 		if unlikely(result != DBX_EOK)
 			goto err_lhs_ptr_type;
-		result = cexpr_op2('+');               /* (uintptr_t)&foo + (uintptr_t)&bar */
-		if unlikely(result != DBX_EOK)
-			goto err_lhs_ptr_type;
-		result = cexpr_cast(&lhs_ptr_type);    /* (typeof(foo) *)((uintptr_t)&foo + (uintptr_t)&bar) */
+		result = cexpr_cast(&lhs_ptr_type);    /* (typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar) */
 		ctyperef_fini(&lhs_ptr_type);
 		if unlikely(result != DBX_EOK)
 			goto done;
-		result = cexpr_deref();                /* *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)&bar) */
+		result = cexpr_deref();                /* *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar) */
 		if unlikely(result != DBX_EOK)
 			goto err_lhs_ptr_type;
 		goto again;
