@@ -713,15 +713,9 @@ ctype_printstruct_ismultiline_callback(void *cookie,
                                        struct cmodule *__restrict mod,
                                        struct cmodunit *__restrict cu) {
 	struct ctype_printstruct_ismultiline_data *arg;
-	struct ctyperef member_type;
-	byte_t const *member_addr;
 	size_t prefix_length;
 	arg = (struct ctype_printstruct_ismultiline_data *)cookie;
-	member_addr   = (byte_t const *)arg->buf + member->m_offset;
 	prefix_length = 0;
-	/* Load type information for this member. */
-	if (ctype_fromdw(mod, cu, parser, member->m_type, &member_type) != DBX_EOK)
-		return 0;
 	if (arg->out_field_count != 0)
 		prefix_length += 2; /* ", " */
 	if (arg->flags & CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS) {
@@ -743,18 +737,28 @@ ctype_printstruct_ismultiline_callback(void *cookie,
 	}
 	arg->firstline_indent += prefix_length;
 	++arg->out_field_count;
-	/* Check if printing this field causes a line-wrap, or exceeds the max line width */
-	arg->firstline_indent = ctype_printvalue_nextindent(&member_type, member_addr,
-	                                                    arg->inner_flags,
-	                                                    arg->firstline_indent,
-	                                                    arg->newline_indent,
-	                                                    arg->newline_tab,
-	                                                    arg->maxlinelen,
-	                                                    &arg->out_contains_lf,
-	                                                    true);
-	ctyperef_fini(&member_type);
+	if (arg->firstline_indent >= arg->maxlinelen) {
+		arg->out_contains_lf = true;
+	} else {
+		struct ctyperef member_type;
+		byte_t const *member_addr;
+		/* Load type information for this member. */
+		if (ctype_fromdw(mod, cu, parser, member->m_type, &member_type) != DBX_EOK)
+			return 0;
+		/* Check if printing this field causes a line-wrap, or exceeds the max line width */
+		member_addr           = (byte_t const *)arg->buf + member->m_offset;
+		arg->firstline_indent = ctype_printvalue_nextindent(&member_type, member_addr,
+		                                                    arg->inner_flags,
+		                                                    arg->firstline_indent,
+		                                                    arg->newline_indent,
+		                                                    arg->newline_tab,
+		                                                    arg->maxlinelen,
+		                                                    &arg->out_contains_lf,
+		                                                    true);
+		ctyperef_fini(&member_type);
+	}
 	if (arg->out_contains_lf)
-		return -1;
+		return -1; /* Stop enumeration */
 	return 1;
 }
 
@@ -846,6 +850,11 @@ ctype_printstruct_callback(void *cookie,
 			}
 		}
 	}
+	if (arg->flags & CTYPE_PRINTVALUE_FLAG_ONELINE) {
+		elem_indent = 0;
+		next_indent = 0;
+		goto do_print_space_and_field;
+	}
 	/* Check how this member will end up being printed. */
 	contains_newline = false;
 	elem_indent = arg->firstline_indent + prefix_length;
@@ -871,18 +880,28 @@ ctype_printstruct_callback(void *cookie,
 #endif
 	{
 		/* Print the field in-line. */
+do_print_space_and_field:
 		PRINT(" "); /* Add a space after the comma of the previous element. */
-		--prefix_length;
+		/*--prefix_length;*/
 	} else {
+		size_t maybe_next_indent;
 		--prefix_length; /* Discount the leading ' ' */
 		/* Insert a line-feed before the element. */
 		PRINT("\n");
 		REPEAT(' ', arg->newline_indent); /* Print leading spaces. */
 		elem_indent = arg->newline_indent + prefix_length;
-		next_indent = ctype_printvalue_nextindent(&member_type, member_addr,
-		                                          arg->inner_flags, elem_indent,
-		                                          arg->newline_indent, arg->newline_tab,
-		                                          arg->maxlinelen, NULL, false);
+		/* With the lowered indent, check if we can now print the member without
+		 * any line-feeds, and if so, use that new indent for the rest of the
+		 * struct. */
+		contains_newline = false;
+		maybe_next_indent = ctype_printvalue_nextindent(&member_type, member_addr,
+		                                                arg->inner_flags, elem_indent,
+		                                                arg->newline_indent, arg->newline_tab,
+		                                                arg->maxlinelen,
+		                                                &contains_newline,
+		                                                true);
+		if (!contains_newline)
+			next_indent = maybe_next_indent;
 	}
 	/* Actually print the prefix+member. */
 	if (arg->flags & CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS) {
@@ -1503,6 +1522,22 @@ ctype_printvalue(struct ctyperef const *__restrict self,
                  void const *buf, unsigned int flags,
                  size_t firstline_indent, size_t newline_indent,
                  size_t newline_tab, size_t maxlinelen) {
+	/* TODO: This function is insanely inefficient for deeply nested
+	 *       structures such as printing libc's `current' (the main
+	 *       problem being its `struct exception_info')
+	 * Solution:
+	 *       Use a virtual printer that is limited by the number of characters
+	 *       it is is allowed to print. If one tries to print more than that
+	 *       amount, it will simply error out. On error, we know that a line-feed
+	 *       needs to be inserted, and on success, we can just use its return
+	 *       value as the additional indentation that will be active after the
+	 *       associated component is printed in-line.
+	 *       Additionally, when doing these checks we can always just pass the
+	 *       `CTYPE_PRINTVALUE_FLAG_ONELINE' flag during the recursive calls to
+	 *       `ctype_printvalue()', since we only care if the next element can
+	 *       be printed without any line-feeds, and without overflowing the
+	 *       horiontal display area.
+	 */
 	ssize_t temp, result = 0;
 	struct ctype *me = self->ct_typ;
 	uintptr_half_t kind = me->ct_kind;
@@ -1776,7 +1811,8 @@ print_integer_value_as_hex:
 			do_multiline = data.im.out_contains_lf;
 			if (!do_multiline) {
 				/* Check if the output fits into a single line. */
-				if (data.im.firstline_indent > data.im.maxlinelen) {
+				/* NOTE: +1 for the trailing '}' that is always required. */
+				if ((data.im.firstline_indent + 1) > data.im.maxlinelen) {
 					/* Nope... */
 					do_multiline = true;
 					/* Check if we're allowed to omit the names of fields, and
@@ -1792,10 +1828,11 @@ print_integer_value_as_hex:
 						data.im.out_field_count  = 0;
 						data.im.out_contains_lf  = false;
 						ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
-						if (!data.im.out_contains_lf && data.im.firstline_indent <= maxlinelen) {
+						/* NOTE: +1 for the trailing '}' that is always required. */
+						if (!data.im.out_contains_lf && (data.im.firstline_indent + 1) <= maxlinelen) {
 							/* Omit struct field names to save on space, which in
 							 * turn allows us to keep everything on a single line. */
-							inner_flags |= CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
+							flags |= CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
 							do_multiline = false;
 						}
 					}
