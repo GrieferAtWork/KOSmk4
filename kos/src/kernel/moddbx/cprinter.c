@@ -1023,7 +1023,7 @@ print_a2l_symbol(struct cprinter const *__restrict printer,
 				namelen = 16;
 			DO((*P_PRINTER)(P_ARG, mod->m_usrmod.um_fsname->de_name, namelen));
 		} else {
-			DO((*P_PRINTER)(P_ARG, "?", 3));
+			DO((*P_PRINTER)(P_ARG, "?", 1));
 		}
 	} else
 #endif /* CONFIG_HAVE_USERMOD */
@@ -1405,10 +1405,33 @@ print_function(struct ctyperef const *__restrict self,
 						debug_addr2line_sections_unlock(&dl_sections module_type__arg(modtyp));
 						module_decref(mod, modtyp);
 						if likely(result >= 0) {
-							/* Include the function address as a hint. */
+							/* Include the function module and address as a hint. */
 							PRINT(" ");
 							FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
-							PRINTF("(%#" PRIxPTR ")", ptr);
+							PRINT("(");
+#ifdef CONFIG_HAVE_USERMOD
+							if (modtyp == MODULE_TYPE_USRMOD) {
+								if (mod->m_usrmod.um_fsname) {
+									u16 namelen;
+									namelen = mod->m_usrmod.um_fsname->de_namelen;
+									if (namelen > 16)
+										namelen = 16;
+									DO((*P_PRINTER)(P_ARG, mod->m_usrmod.um_fsname->de_name, namelen));
+								} else {
+									DO((*P_PRINTER)(P_ARG, "?", 1));
+								}
+							} else
+#endif /* CONFIG_HAVE_USERMOD */
+							{
+								size_t namelen;
+								char const *name;
+								name    = ((struct driver *)mod)->d_name;
+								namelen = strlen(name);
+								if (namelen > 16)
+									namelen = 16;
+								DO((*P_PRINTER)(P_ARG, name, namelen));
+							}
+							PRINTF("!%#" PRIxPTR ")", ptr);
 							FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
 						}
 						return result;
