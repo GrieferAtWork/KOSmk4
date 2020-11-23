@@ -84,6 +84,8 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- ![dbg_disasm.png](kos/misc/gallery/dbg_disasm.png)
 		- View and modify memory via a hex editor
 			- ![dbg_hex.png](kos/misc/gallery/dbg_hex.png)
+		- Evaluate C-style expressions on local variables using a fully featured C expression compiler with over 512Kib of code dedicated to evaluating expressions.
+			- ![dbg_eval.png](kos/misc/gallery/dbg_eval.png)
 	- GDB support
 		- QEMU features a builtin gdb server, that is supported for debugging the core itself
 			- This feature can be used via `deemon magic.dee --emulator=qemu --gdb=emulator`
@@ -251,7 +253,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- `int 80h`
 		- With linux ABI compatibility
 	- `lcall $7, $0` (as required by SysV)
-		- As a KOS exception, you can also use `lcall $7, $<sysno>` instead of having to use `%eax`
+		- As a KOS extension, you can also use `lcall $7, $<sysno>` instead of having to use `%eax`
 	- `sysenter`
 		- This one isn't compatible with linux's ABI
 	- `syscall`
@@ -278,7 +280,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- pci
 		- Required for detecting IDE ports
 	- ide (ata)
-		- Support for DMA, LBA48 and LBA28 addressing (preferring DMA)
+		- Support for DMA, LBA48, LBA28 and CHS addressing (preferring DMA)
 			- This is real DMA support I might note, as in "Hey, IDE. Copy sector 123 to memory location XYZ and tell me when your done"
 	- USB
 		- controllers
@@ -289,7 +291,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- fat
 		- Support for fat12, fat16 and fat32
 		- Support for writing to files
-		- Support for creating/removing files and directories
+		- Support for creating/renaming/removing files and directories
 	- apic/lapic
 	- acpi (detected, but tables aren't actually being parsed)
 	- iso9660
@@ -311,25 +313,26 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- `open()`, `openat()`
 			- `[p]read()`, `[p]write()`, `lseek()`
 			- `[f]realpath[at]()`
-			- ... (many, __many__, __MANY__ more!)
+			- ... (many, __many__, __MANY__ more! (Just take a look at `/kos/include`))
 		- TTY support (with job control; aka. `SIGTTIN` and `SIGTTOU`)
 		- File-descriptor based handle management
 			- Allows for 2 modes of execution
 				- Linear mode (all file descriptors indices have low values)
 				- hash-table (file descriptors can have arbitrarily great values)
+					- Means you're allowed to `dup2(1, 0x7fff1234)`
 - Various custom libraries for different sub-systems
 	- <a name="libansitty"></a>libansitty (user/kernel)
 		- Implement [ANSI tty escape code](https://en.wikipedia.org/wiki/ANSI_escape_code) processing (`\e[0m`)
-		- Written to closely follow what is done by xterm, it is able to host `libcurses` in xterm-mode (s.a. `$PROJPATH/kos/misc/make_utility.sh i386 ncurses`)
+		- Written to closely follow what is done by xterm, it is able to host `libcurses` in xterm-mode (s.a. `$PROJPATH/kos/misc/make_utility.sh i386 ncurses`) and run `nano`
 	- libbuffer (user/kernel)
-		- Implement line/ring buffers used for implementing `pipe()` and terminal canon buffers
+		- Implement line/ring/packet buffers used for implementing `pipe()` and terminal canon buffers, as well as sockets
 	- libc (user/kernel-limited)
 		- Home-made and optimized to minimize the number of necessary startup relocations
-			- Have you ever done `readelf -r /lib/i386-linux-gnu/libc.so.6`?
+			- Have you ever done `readelf -rW /lib/i386-linux-gnu/libc.so.6`?
 			- Do you realize that every single one of the lines your terminal just got spammed with will slow down the startup of any program you run on your system?
-				- Even with lazy symbol resolving, rtld has to perform 1 write to memory for every relocation it finds
-			- Well... Doing the same with my `libc.so`, I'm counting around 35 relocations (But mine still has all the same functionality, with almost 100% API-compatibility, and at least 95% ABI-compatibility)
-		- Enourmous support for practically everything also found in GLIBc (plus some KOS exceptions)
+				- Even with lazy symbol resolving, rtld has to perform 1 write to memory for every relocation it finds during startup
+			- Well... Doing the same with my `libc.so`, I'm counting 14 relocations (But mine still has all the same functionality, with almost 100% API-compatibility, and at least 95% ABI-compatibility). And that's not even mentioning all of the extensions found in KOS's libc, but missing from glibc.
+		- Enourmous support for practically everything also found in GLIBc (plus some KOS exceptions, plus a larger number of extensions from other platforms such as BSD or Solaris)
 		- Of note is the fact that the KOS system headers aren't dependent on KOS's particular libc implementation
 			- The system headers will automatically try to detect libc features and substitute anything that isn't supported with inline functions to provide KOS-specific extensions such as `strend()` in a truely portable (as in: not bound to KOS) manner
 		- Dedicated assembly for fast implementations for `memcpy()` and friends
