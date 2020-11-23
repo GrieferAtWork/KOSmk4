@@ -969,7 +969,11 @@ err_lhs_ptr_type:
 		/* Field w/o deref */
 		yield();
 #if 1 /* Extension: Automatically dereference pointers to access struct fields. */
-		while (CTYPE_KIND_ISPOINTER(cexpr_stacktop.cv_type.ct_typ->ct_kind)) {
+		for (;;) {
+			uintptr_half_t kind;
+			kind = cexpr_stacktop.cv_type.ct_typ->ct_kind;
+			if (!CTYPE_KIND_ISARRAY_OR_POINTER(kind))
+				break;
 			result = cexpr_deref();
 			if unlikely(result != DBX_EOK)
 				goto done;
