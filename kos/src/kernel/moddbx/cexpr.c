@@ -782,13 +782,14 @@ do_second_pass:
 	/* Select the proper function. */
 	module_relative_pc = (uintptr_t)pc;
 	if (mod) {
-		module_relative_pc -= module_getloadaddr(mod->cm_module, mod->cm_modtyp);
+		emulator.ue_sectinfo   = di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections);
+		emulator.ue_addroffset = module_getloadaddr(mod->cm_module, mod->cm_modtyp);
+		module_relative_pc -= emulator.ue_addroffset;
 		emulator.ue_pc = debuginfo_location_select(&self->cv_expr.v_expr.v_expr,
 		                                           self->cv_expr.v_expr.v_cu_ranges_startpc,
 		                                           module_relative_pc,
 		                                           self->cv_expr.v_expr.v_addrsize,
 		                                           &expr_length);
-		emulator.ue_sectinfo = di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections);
 	} else {
 		emulator.ue_pc = self->cv_expr.v_expr.v_expr.l_expr;
 	}
@@ -963,6 +964,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
 						                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
 						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
+						                                    module_getloadaddr(mod->cm_module, mod->cm_modtyp),
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 					} else {
@@ -970,6 +972,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 						                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
 						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
 						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp),
+						                                    module_getloadaddr(mod->cm_module, mod->cm_modtyp),
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 					}

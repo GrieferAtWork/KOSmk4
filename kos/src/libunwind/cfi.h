@@ -96,6 +96,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  *                                  - CU->cu_addr_base
  * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
  *                                the appropriate expression within a location list.
+ * @param: MODULE_ADDROFFSET:     The load address of the associated module. (addend for DW_OP_addr)
  * @param: BUF:                   Source/target buffer containing the value read from,
  *                                or written to the location expression.
  * @param: BUFSIZE:               Size of the given `BUF' in bytes.
@@ -112,23 +113,23 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `BUFSIZE' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `MODULE_RELATIVE_PC' */
-INTDEF NONNULL((1, 3, 7, 9)) unsigned int CC
+INTDEF NONNULL((1, 3, 8, 10)) unsigned int CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
                                   struct di_debuginfo_compile_unit_struct const *cu,
-                                  uintptr_t module_relative_pc,
+                                  uintptr_t module_relative_pc, uintptr_t module_addroffset,
                                   void *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
                                   void const *objaddr, uint8_t addrsize, uint8_t ptrsize);
-INTDEF NONNULL((1, 3, 5, 9, 11)) unsigned int CC
+INTDEF NONNULL((1, 3, 5, 10, 12)) unsigned int CC
 libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
                                   unwind_setreg_t regset, void *regset_arg,
                                   struct di_debuginfo_compile_unit_struct const *cu,
-                                  uintptr_t module_relative_pc,
+                                  uintptr_t module_relative_pc, uintptr_t module_addroffset,
                                   void const *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_read_bits,
                                   di_debuginfo_location_t const *frame_base_expression,

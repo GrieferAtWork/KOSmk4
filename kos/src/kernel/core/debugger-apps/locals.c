@@ -97,6 +97,8 @@ locals_format_printer(void *UNUSED(format_arg),
 	return (*printer)(arg, format, strlen(format));
 }
 
+PRIVATE uintptr_t _locals_current_module_loadaddr;
+
 
 /* @return: * : UNWIND_* */
 PRIVATE ATTR_DBGTEXT ATTR_NOINLINE unsigned int LIBDEBUGINFO_CC
@@ -124,6 +126,7 @@ do_print_local(void *UNUSED(arg),
 	                                    (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
 	                                    cu,
 	                                    module_relative_pc,
+	                                    _locals_current_module_loadaddr,
 	                                    value_buffer,
 	                                    bufsize,
 	                                    &num_bits,
@@ -240,7 +243,8 @@ enum_locals_at_with_debug_sections_impl(void const *absolute_pc,
 	debug_sections_lock(mod, &sections, &dl_sections
 	                    module_type__arg(module_type));
 	TRY {
-		module_relative_pc = (uintptr_t)absolute_pc - module_getloadaddr(mod, module_type);
+		_locals_current_module_loadaddr = module_getloadaddr(mod, module_type);
+		module_relative_pc = (uintptr_t)absolute_pc - _locals_current_module_loadaddr;
 		/* Enumerate variables with debug sections. */
 		result = debuginfo_enum_locals(di_debug_sections_as_di_enum_locals_sections(&sections),
 		                               module_relative_pc,

@@ -621,6 +621,8 @@ typedef struct unwind_emulator_struct {
 	di_debuginfo_location_t const
 	                       *ue_framebase;          /* [0..1][const] Frame base expression (for use with `DW_OP_fbreg').
 	                                                * Set to NULL to consider `DW_OP_fbreg' as an illegal instruction. */
+	__uintptr_t             ue_addroffset;         /* [const] Offset added to the value of `DW_OP_addr'. For .eh_frame, this should be `0', but
+	                                                *         for all other purposes, this should be the loadaddr of the associated module. */
 	void                   *ue_objaddr;            /* [0..1][const] Object address value (for use with `DW_OP_push_object_address').
 	                                                * Set to NULL to consider `DW_OP_push_object_address' as an illegal instruction. */
 	__uint32_t              ue_bjmprem;            /* Number of remaining allowed backwards-jumps (used to prevent infinite loops,
@@ -734,6 +736,7 @@ struct di_debuginfo_compile_unit_struct;
  *                                  - CU->cu_addr_base
  * @param: MODULE_RELATIVE_PC:    The module-relative program counter, to-be used to select
  *                                the appropriate expression within a location list.
+ * @param: MODULE_ADDROFFSET:     The load address of the associated module. (addend for DW_OP_addr)
  * @param: BUF:                   Source/target buffer containing the value read from,
  *                                or written to the location expression.
  * @param: BUFSIZE:               Size of the given `BUF' in bytes.
@@ -750,45 +753,49 @@ struct di_debuginfo_compile_unit_struct;
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `BUFSIZE' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `MODULE_RELATIVE_PC' */
-typedef __ATTR_NONNULL((1, 3, 7, 9)) unsigned int
+typedef __ATTR_NONNULL((1, 3, 8, 10)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_GETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
                                              struct di_debuginfo_compile_unit_struct const *__cu,
                                              __uintptr_t __module_relative_pc,
+                                             __uintptr_t __module_addroffset,
                                              void *__restrict __buf, __size_t __bufsize,
                                              __size_t *__restrict __pnum_written_bits,
                                              di_debuginfo_location_t const *__frame_base_expression,
                                              void const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
-typedef __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int
+typedef __ATTR_NONNULL((1, 3, 5, 10, 12)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_SETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
                                              unwind_setreg_t __regset, void *__regset_arg,
                                              struct di_debuginfo_compile_unit_struct const *__cu,
                                              __uintptr_t __module_relative_pc,
+                                             __uintptr_t __module_addroffset,
                                              void const *__restrict __buf, __size_t __bufsize,
                                              __size_t *__restrict __pnum_read_bits,
                                              di_debuginfo_location_t const *__frame_base_expression,
                                              void *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 7, 9)) unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 8, 10)) unsigned int LIBUNWIND_CC
 debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,
                             unwind_getreg_t __regget, void *__regget_arg,
                             struct di_debuginfo_compile_unit_struct const *__cu,
                             __uintptr_t __module_relative_pc,
+                            __uintptr_t __module_addroffset,
                             void *__restrict __buf, __size_t __bufsize,
                             __size_t *__restrict __pnum_written_bits,
                             di_debuginfo_location_t const *__frame_base_expression,
                             void const *__objaddr, __uint8_t __addrsize, __uint8_t __ptrsize);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5, 10, 12)) unsigned int LIBUNWIND_CC
 debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,
                             unwind_getreg_t __regget, void *__regget_arg,
                             unwind_setreg_t __regset, void *__regset_arg,
                             struct di_debuginfo_compile_unit_struct const *__cu,
                             __uintptr_t __module_relative_pc,
+                            __uintptr_t __module_addroffset,
                             void const *__restrict __buf, __size_t __bufsize,
                             __size_t *__restrict __pnum_read_bits,
                             di_debuginfo_location_t const *__frame_base_expression,
