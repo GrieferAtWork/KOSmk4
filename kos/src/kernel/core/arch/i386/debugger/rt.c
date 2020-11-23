@@ -969,6 +969,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	/* Reset the debugger TTY */
 	dbg_reset_tty();
 
+	/* Re-enable managed memory access. */
+	dbg_memory_managed = true;
+
 	/* Invoke global callbacks. */
 	dbg_runhooks(DBG_HOOK_RESET);
 

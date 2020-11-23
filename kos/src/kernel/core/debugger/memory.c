@@ -34,6 +34,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/hook.h>
 #include <debugger/rt.h>
 #include <kernel/paging.h>
+#include <kernel/panic.h>
 #include <kernel/vm.h>
 #include <kernel/vm/nopf.h>
 #include <kernel/vm/phys.h>
@@ -75,26 +76,34 @@ NOTHROW(KCALL dbg_verifypagedir)(pagedir_phys_t pdir) {
 
 
 
-#ifdef __INTELLISENSE__
-#define PAGEDIR_P_BEGIN(self) do
-#define PAGEDIR_P_END(self)   __WHILE0
-#else /* __INTELLISENSE__ */
-#define PAGEDIR_P_BEGIN(self)                                 \
-	do {                                                      \
-		pagedir_phys_t _old_pdir;                         \
-		pflag_t _p_was = PREEMPTION_PUSHOFF();                \
-		assert(IS_ALIGNED((uintptr_t)(self), PAGEDIR_ALIGN)); \
-		_old_pdir = pagedir_get();                            \
-		if (_old_pdir != (self))                              \
-			pagedir_set(self);                                \
-		do
-#define PAGEDIR_P_END(self)         \
-		__WHILE0;                   \
-		if (_old_pdir != (self))    \
-			pagedir_set(_old_pdir); \
-		PREEMPTION_POP(_p_was);     \
-	} __WHILE0
-#endif /* !__INTELLISENSE__ */
+
+/* [default(true)]
+ * Allow managed memory access to be performed by `dbg_(read|write)memory'
+ * and friends. What this means is that (so-long as the kernel hasn't been
+ * poisoned, and this field is set to `true' (which is is during a debugger
+ * reset)) the below functions can be used to load lazy memory mappings,
+ * and initiate the regular copy-on-write semantics expected by high-level
+ * memory access, and as would also be done if the access was being done
+ * directly, rather than through the below functions.
+ * This in turn is mainly useful when debugging user-space programs, where
+ * this functionality allows one to view memory that hasn't been accessed
+ * by the user-space program, yet, or was at one point off-loaded into swap
+ * memory. But note that this field is ignored once the kernel has been
+ * poisoned, as this kind of functionality may cause the debugger memory
+ * primitives to call into possibly faulty kernel code (such as possibly
+ * faulty disk drivers).
+ * Also note that VIO memory is _never_ dispatched while in debugger mode,
+ * not even when accessed directly. Instead, any VIO region will instead
+ * result in a SEGFAULT, with the exception of the userkern segment, which
+ * simply acts as though it didn't exist, allowing pass-through access to
+ * the actual kernel (meaning that when passed a kernel-space address, then
+ * the below functions will instead read/write memory to/from kernel-space) */
+PUBLIC ATTR_DBGBSS bool dbg_memory_managed = false;
+
+#define ALLOW_MANAGED_MEMORY_ACCESS() \
+	(dbg_memory_managed && !kernel_poisoned())
+
+
 
 
 /* Get/set memory in the context of `dbg_current'
@@ -107,16 +116,80 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
                               void *__restrict buf,
                               size_t num_bytes) {
 	size_t error;
-	pagedir_phys_t pdir;
-	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes))
-		return memcpy_nopf(buf, addr, num_bytes);
-	pdir = dbg_getpagedir();
-	if (!dbg_verifypagedir(pdir))
-		return num_bytes;
-	PAGEDIR_P_BEGINUSE(pdir) {
+	if (!num_bytes)
+		return 0; /* Nothing to do here. */
+	/* NOTE: If the kernel hasn't been poisoned yet, we should
+	 *       try to access memory normally, so-long as we're
+	 *       not dealing with VIO memory.
+	 *       Otherwise, debugging user-space programs becomes a
+	 *       chore since we'd be unable to load lazy memory
+	 *       mappings that havn't been accessed, yet. */
+	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes)) {
 		error = memcpy_nopf(buf, addr, num_bytes);
+		if (unlikely(error != 0) && ALLOW_MANAGED_MEMORY_ACCESS()) {
+			size_t ok = num_bytes - error;
+			TRY {
+				memcpy((byte_t *)buf + ok,
+				       (byte_t const *)addr + ok,
+				       error);
+				error = 0;
+			} EXCEPT {
+			}
+		}
+	} else {
+		pagedir_phys_t pdir;
+		pdir = dbg_getpagedir();
+		if (!dbg_verifypagedir(pdir))
+			return num_bytes;
+		/* Leave interrupts unchanged, since we don't have to worry
+		 * about being preempted by another thread. (and if we are,
+		 * it's up to that thread to properly preserve the pagedir
+		 * register, even if it's different from what's used by our
+		 * current VM)
+		 * This is one of the advantages of being in debug-mode.
+		 * Note also that we need to keep preemption enabled in order
+		 * for the `memcpy()' below to be able to load unmapped pages
+		 * from disk, which can likely only be done as a blocking
+		 * operation.
+		 * Also note that if that blocking operation fails, the user
+		 * 
+		 */
+		PAGEDIR_P_BEGINUSE_KEEP_PR(pdir) {
+			error = memcpy_nopf(buf, addr, num_bytes);
+			if (unlikely(error != 0) && ALLOW_MANAGED_MEMORY_ACCESS()) {
+				struct vm *old_vm, *new_vm;
+				size_t ok;
+				TRY {
+					/* Re-validate in case the memcpy_nopf() above
+					 * changed something about dbg_current, or its fields. */
+					if unlikely(!ADDR_ISKERN(dbg_current))
+						goto done_nopanic_copy;
+					new_vm = dbg_current->t_vm;
+					if unlikely(!ADDR_ISKERN(new_vm))
+						goto done_nopanic_copy;
+					if (new_vm->v_pdir_phys != pdir)
+						goto done_nopanic_copy;
+				} EXCEPT {
+					goto done_nopanic_copy;
+				}
+				old_vm = THIS_VM;
+				ok     = num_bytes - error;
+				PERTASK_SET(this_vm, dbg_current->t_vm);
+				TRY {
+					memcpy((byte_t *)buf + ok,
+					       (byte_t const *)addr + ok,
+					       error);
+					/* If the memcpy() doesn't fail, then there isn't an error. */
+					error = 0;
+				} EXCEPT {
+				}
+				PERTASK_SET(this_vm, old_vm);
+			}
+done_nopanic_copy:
+			;
+		}
+		PAGEDIR_P_ENDUSE_KEEP_PR(pdir);
 	}
-	PAGEDIR_P_ENDUSE(pdir);
 	return error;
 }
 
@@ -128,29 +201,47 @@ NOTHROW(KCALL dbg_writememory)(void *addr,
 	pagedir_phys_t pdir;
 	if (!num_bytes)
 		return 0; /* Nothing to do here. */
+	/* NOTE: If the kernel hasn't been poisoned yet, we should
+	 *       try to access memory normally, so-long as we're
+	 *       not dealing with VIO memory.
+	 *       Otherwise, debugging user-space programs becomes a
+	 *       chore since we'd be unable to load lazy memory
+	 *       mappings that havn't been accessed, yet. */
 	if (ADDRRANGE_ISKERN(addr, (byte_t *)addr + num_bytes)) {
 again_memcpy_nopf_kernel:
 		error = memcpy_nopf(addr, buf, num_bytes);
-		if (error != 0 && force) {
-			size_t okcount;
-			okcount   = num_bytes - error;
-			addr      = (byte_t *)addr + okcount;
-			buf       = (byte_t *)buf + okcount;
-			num_bytes = error;
-			if (pagedir_ismapped(addr)) {
-				physaddr_t phys;
-				size_t copybytes;
-				phys      = pagedir_translate(addr);
-				copybytes = PAGESIZE - ((uintptr_t)addr & PAGEMASK);
-				if (copybytes > num_bytes)
-					copybytes = num_bytes;
-				vm_copytophys(phys, buf, copybytes);
-				if (copybytes >= num_bytes)
-					return 0; /* Managed to copy everything */
-				addr      = (byte_t *)addr + copybytes;
-				buf       = (byte_t *)buf + copybytes;
-				num_bytes -= copybytes;
-				goto again_memcpy_nopf_kernel;
+		if (error != 0) {
+			if (ALLOW_MANAGED_MEMORY_ACCESS()) {
+				size_t ok = num_bytes - error;
+				TRY {
+					memcpy((byte_t *)buf + ok,
+					       (byte_t const *)addr + ok,
+					       error);
+					return 0;
+				} EXCEPT {
+				}
+			}
+			if (force) {
+				size_t ok;
+				ok        = num_bytes - error;
+				addr      = (byte_t *)addr + ok;
+				buf       = (byte_t *)buf + ok;
+				num_bytes = error;
+				if (pagedir_ismapped(addr)) {
+					physaddr_t phys;
+					size_t copybytes;
+					phys      = pagedir_translate(addr);
+					copybytes = PAGESIZE - ((uintptr_t)addr & PAGEMASK);
+					if (copybytes > num_bytes)
+						copybytes = num_bytes;
+					vm_copytophys(phys, buf, copybytes);
+					if (copybytes >= num_bytes)
+						return 0; /* Managed to copy everything */
+					addr      = (byte_t *)addr + copybytes;
+					buf       = (byte_t *)buf + copybytes;
+					num_bytes -= copybytes;
+					goto again_memcpy_nopf_kernel;
+				}
 			}
 		}
 		return error;
@@ -158,33 +249,65 @@ again_memcpy_nopf_kernel:
 	pdir = dbg_getpagedir();
 	if (!dbg_verifypagedir(pdir))
 		return num_bytes;
+	PAGEDIR_P_BEGINUSE_KEEP_PR(pdir) {
 again_memcpy_nopf:
-	PAGEDIR_P_BEGINUSE(pdir) {
 		error = memcpy_nopf(addr, buf, num_bytes);
-	}
-	PAGEDIR_P_ENDUSE(pdir);
-	if (error != 0 && force) {
-		size_t okcount;
-		okcount   = num_bytes - error;
-		addr      = (byte_t *)addr + okcount;
-		buf       = (byte_t *)buf + okcount;
-		num_bytes = error;
-		if (pagedir_ismapped_p(pdir, addr)) {
-			physaddr_t phys;
-			size_t copybytes;
-			phys      = pagedir_translate_p(pdir, addr);
-			copybytes = PAGESIZE - ((uintptr_t)addr & PAGEMASK);
-			if (copybytes > num_bytes)
-				copybytes = num_bytes;
-			vm_copytophys(phys, buf, copybytes);
-			if (copybytes >= num_bytes)
-				return 0; /* Managed to copy everything */
-			addr      = (byte_t *)addr + copybytes;
-			buf       = (byte_t *)buf + copybytes;
-			num_bytes -= copybytes;
-			goto again_memcpy_nopf;
+		if (error != 0) {
+			if (ALLOW_MANAGED_MEMORY_ACCESS()) {
+				struct vm *old_vm, *new_vm;
+				size_t ok;
+				TRY {
+					/* Re-validate in case the memcpy_nopf() above
+					 * changed something about dbg_current, or its fields. */
+					if unlikely(!ADDR_ISKERN(dbg_current))
+						goto done_nopanic_copy;
+					new_vm = dbg_current->t_vm;
+					if unlikely(!ADDR_ISKERN(new_vm))
+						goto done_nopanic_copy;
+					if (new_vm->v_pdir_phys != pdir)
+						goto done_nopanic_copy;
+				} EXCEPT {
+					goto done_nopanic_copy;
+				}
+				old_vm = THIS_VM;
+				ok     = num_bytes - error;
+				PERTASK_SET(this_vm, dbg_current->t_vm);
+				TRY {
+					memcpy((byte_t *)buf + ok,
+					       (byte_t const *)addr + ok,
+					       error);
+					/* If the memcpy() doesn't fail, then there isn't an error. */
+					error = 0;
+				} EXCEPT {
+				}
+				PERTASK_SET(this_vm, old_vm);
+			}
+done_nopanic_copy:
+			if (force) {
+				size_t ok;
+				ok        = num_bytes - error;
+				addr      = (byte_t *)addr + ok;
+				buf       = (byte_t *)buf + ok;
+				num_bytes = error;
+				if (pagedir_ismapped(addr)) {
+					physaddr_t phys;
+					size_t copybytes;
+					phys      = pagedir_translate(addr);
+					copybytes = PAGESIZE - ((uintptr_t)addr & PAGEMASK);
+					if (copybytes > num_bytes)
+						copybytes = num_bytes;
+					vm_copytophys(phys, buf, copybytes);
+					if (copybytes >= num_bytes)
+						return 0; /* Managed to copy everything */
+					addr      = (byte_t *)addr + copybytes;
+					buf       = (byte_t *)buf + copybytes;
+					num_bytes -= copybytes;
+					goto again_memcpy_nopf;
+				}
+			}
 		}
 	}
+	PAGEDIR_P_ENDUSE_KEEP_PR(pdir);
 	return error;
 }
 

@@ -245,12 +245,14 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(pagedir_phys
 /* Temporarily switch to a different page directory `self'
  * @param: self: The page directory to switch to (of type `pagedir_phys_t') */
 #ifdef __INTELLISENSE__
-#define PAGEDIR_P_BEGINUSE(self) do
-#define PAGEDIR_P_ENDUSE(self)   __WHILE0
+#define PAGEDIR_P_BEGINUSE(self)         do
+#define PAGEDIR_P_ENDUSE(self)           __WHILE0
+#define PAGEDIR_P_BEGINUSE_KEEP_PR(self) do
+#define PAGEDIR_P_ENDUSE_KEEP_PR(self)   __WHILE0
 #else /* __INTELLISENSE__ */
 #define PAGEDIR_P_BEGINUSE(self)                              \
 	do {                                                      \
-		pagedir_phys_t _old_pdir;                         \
+		pagedir_phys_t _old_pdir;                             \
 		pflag_t _p_was = PREEMPTION_PUSHOFF();                \
 		assert(IS_ALIGNED((uintptr_t)(self), PAGEDIR_ALIGN)); \
 		_old_pdir = pagedir_get();                            \
@@ -262,6 +264,19 @@ FUNDEF NOBLOCK void NOTHROW(KCALL pagedir_unmap_userspace_nosync_p)(pagedir_phys
 		if (_old_pdir != (self))    \
 			pagedir_set(_old_pdir); \
 		PREEMPTION_POP(_p_was);     \
+	} __WHILE0
+#define PAGEDIR_P_BEGINUSE_KEEP_PR(self)                      \
+	do {                                                      \
+		pagedir_phys_t _old_pdir;                             \
+		assert(IS_ALIGNED((uintptr_t)(self), PAGEDIR_ALIGN)); \
+		_old_pdir = pagedir_get();                            \
+		if (_old_pdir != (self))                              \
+			pagedir_set(self);                                \
+		do
+#define PAGEDIR_P_ENDUSE_KEEP_PR(self) \
+		__WHILE0;                      \
+		if (_old_pdir != (self))       \
+			pagedir_set(_old_pdir);    \
 	} __WHILE0
 #endif /* !__INTELLISENSE__ */
 
