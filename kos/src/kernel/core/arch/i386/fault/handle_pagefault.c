@@ -23,6 +23,7 @@
 
 #include <kernel/compiler.h>
 
+#include <debugger/rt.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/malloc.h>
@@ -753,6 +754,15 @@ do_handle_iob_node_access:
 					struct vio_emulate_args args;
 					COMPILER_READ_BARRIER();
 					sync_endread(effective_vm);
+#ifdef CONFIG_HAVE_DEBUGGER
+					/* Don't dispatch VIO while in debugger-mode. Doing so would open
+					 * up all kinds of loopholes by which properly-working debug APIs
+					 * could shoot themselves in the leg by accidentally accessing
+					 * VIO with a faulty implementation, or user-driven VIO, which
+					 * would cause the debugger to hang itself... */
+					if (dbg_active)
+						goto decref_part_and_pop_connections_and_throw_segfault;
+#endif /* CONFIG_HAVE_DEBUGGER */
 					/* VIO Emulation */
 					sync_read(part);
 					args.vea_args.va_block        = incref(part->dp_block);
@@ -762,6 +772,9 @@ do_handle_iob_node_access:
 					args.vea_args.va_ops = args.vea_args.va_block->db_vio;
 					if unlikely(!args.vea_args.va_ops) {
 						decref_unlikely(args.vea_args.va_block);
+#ifdef CONFIG_HAVE_DEBUGGER
+decref_part_and_pop_connections_and_throw_segfault:
+#endif /* CONFIG_HAVE_DEBUGGER */
 						decref_unlikely(part);
 						goto pop_connections_and_throw_segfault;
 					}
