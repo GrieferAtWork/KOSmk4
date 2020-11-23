@@ -43,6 +43,7 @@
 #include <sys/ioctl.h>
 
 #include <malloc.h>
+#include <pty.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
