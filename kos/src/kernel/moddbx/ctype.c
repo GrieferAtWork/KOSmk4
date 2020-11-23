@@ -1254,27 +1254,34 @@ got_elem_count:
 
 	case DW_TAG_typedef:
 		type_debug_info = typinfo.t_type;
+again_opt:
+		/* Optional, since `typedef void MY_VOID;' is something you're allowed to do! */
+		if (!type_debug_info) {
+			presult->ct_typ = incref(&ctype_void);
+			break;
+		}
 		goto again;
 
 	case DW_TAG_const_type:
 		presult->ct_flags |= CTYPEREF_FLAG_CONST;
 		type_debug_info = typinfo.t_type;
-		goto again;
+		goto again_opt; /* Optional, since `void const' is allowed (and often used in e.g. `void const *') */
 
 	case DW_TAG_volatile_type:
 		presult->ct_flags |= CTYPEREF_FLAG_VOLATILE;
 		type_debug_info = typinfo.t_type;
-		goto again;
+		goto again_opt; /* Optional, since `void volatile' is allowed (and often used in e.g. `void volatile*') */
 
 	case DW_TAG_restrict_type:
 		presult->ct_flags |= CTYPEREF_FLAG_RESTRICT;
 		type_debug_info = typinfo.t_type;
-		goto again;
+		goto again; /* `restrict' must reference a pointer type, so the type field can't be optional,
+		             * since its absene would mean `void restrict', which doesn't make any sense. */
 
 	case DW_TAG_atomic_type:
 		presult->ct_flags |= CTYPEREF_FLAG_ATOMIC;
 		type_debug_info = typinfo.t_type;
-		goto again;
+		goto again; /* Just like with `restrict', `void atomic' doesn't make any sense. */
 
 	default:
 		goto err_corrupt;
