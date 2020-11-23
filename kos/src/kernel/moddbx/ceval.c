@@ -586,7 +586,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		 *       if it isn't, then we mustn't try to parse a type here.
 		 * Consider this:
 		 *       "(stat + 5)"
-		 * Since `struct stat' is a thing, we'd parser the type, only
+		 * Since `struct stat' is a thing, we'd parse the type, only
 		 * to later notice that `stat', the function was supposed to
 		 * be used. */
 		result = ctype_eval(self, &cast_type, NULL, NULL);
@@ -822,12 +822,43 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			}
 		} else {
 			yield();
+			/* TODO: if (self->c_tok == '*') {
+			 *           ...
+			 *       }
+			 * Only when the '*' is the last token, or is followed by one of ) ] } , ;
+			 * When used, take all variables as they would be enumerated by the
+			 * below `autocomplete_nontype_symbols' and push them on to the expression
+			 * stack. Then, pack all of them together within a pseudo-struct object
+			 * that contains all of them alongside their values, allowing the user
+			 * to quickly list the values of a collection of variables, based on the
+			 * common trait of all of the variables having the same, common prefix:
+			 * >> eval thiscpu_x86_apic_emutsc_*
+			 *
+			 * This would then print the values of all global variables
+			 * `thiscpu_x86_apic_emutsc_*', which would look somthing like:
+			 * >> {
+			 * >>   thiscpu_x86_apic_emutsc_tscbase: 0x14afd85306,
+			 * >>   thiscpu_x86_apic_emutsc_prev_current: 0x2cce63f6,
+			 * >>   thiscpu_x86_apic_emutsc_mindistance: 0x9ec13,
+			 * >>   thiscpu_x86_apic_emutsc_initial_shifted: 0x7fffffff80,
+			 * >>   thiscpu_x86_apic_emutsc_initial: 0xffffffff,
+			 * >>   thiscpu_x86_apic_emutsc_early_interrupt: false,
+			 * >>   thiscpu_x86_apic_emutsc_divide: 7,
+			 * >>   thiscpu_x86_apic_emutsc_deadline: 0xffffffffffffffff,
+			 * >>   thiscpu_x86_apic_emutsc_cmpxch_delay: 200,
+			 * >> }
+			 *
+			 * The list of variables used should match those enumerated by auto-completion
+			 * exactly, so it should be obvious to the user which variables would be printed
+			 * by using this trick!
+			 */
+
+
 			/* NOTE: Only add automatic symbol offsets when this symbol isn't
 			 *       already being used within an explicit symbol-offset expression.
 			 * As such:
 			 * >> this_cred          (evaluate to this_cred@dbg_current)
-			 * >> this_cred@caller   (evaluate to this_cred@caller)
-			 */
+			 * >> this_cred@caller   (evaluate to this_cred@caller) */
 			result = cexpr_pushsymbol(kwd_str, kwd_len, self->c_tok != '@');
 			if (result == DBX_ENOENT) {
 				if (kwd_len && kwd_str[0] == '$') {

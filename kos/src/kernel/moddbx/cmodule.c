@@ -1977,9 +1977,8 @@ again_attributes:
 			case DW_AT_low_pc:
 			case DW_AT_entry_pc: {
 				uintptr_t addr;
-				if likely(debuginfo_cu_parser_getaddr(&info->clv_parser, attr.dica_form,
-				                                      &addr))
-					info->clv_data.s_var.v_objaddr = (void *)addr;
+				if likely(debuginfo_cu_parser_getaddr(&info->clv_parser, attr.dica_form, &addr))
+					info->clv_data.s_var.v_objaddr = (void *)(addr + cmodule_getloadaddr(info->clv_mod));
 			}	break;
 
 			default:
