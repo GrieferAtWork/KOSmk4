@@ -52,7 +52,6 @@ INTDEF void LIBCCALL initialize_libunwind(void); /* From `../libc/except.c' */
 
 PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_getreg_lcpustate") PUNWIND_GETREG_LCPUSTATE pdyn_unwind_getreg_lcpustate = NULL;
 PRIVATE SECTION_DEBUG_BSS("pdyn_unwind_setreg_lcpustate") PUNWIND_SETREG_LCPUSTATE pdyn_unwind_setreg_lcpustate = NULL;
-PRIVATE SECTION_DEBUG_STRING("name_unwind") char const name_unwind[] = "unwind";
 PRIVATE SECTION_DEBUG_STRING("name_unwind_getreg_lcpustate") char const name_unwind_getreg_lcpustate[] = "unwind_getreg_lcpustate";
 PRIVATE SECTION_DEBUG_STRING("name_unwind_setreg_lcpustate") char const name_unwind_setreg_lcpustate[] = "unwind_setreg_lcpustate";
 
