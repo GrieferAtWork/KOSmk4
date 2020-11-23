@@ -1175,6 +1175,60 @@ print_named_pointer(struct ctyperef const *__restrict self,
 	ssize_t temp, result = 0;
 	bool is_void_pointer;
 
+	if (ADDR_ISKERN(ptr)) {
+		struct ctype *mytype = self->ct_typ;
+		if (CTYPE_KIND_ISPOINTER(mytype->ct_kind)) {
+			struct cmodule *mod;
+			mytype = mytype->ct_pointer.cp_base.ct_typ;
+			if (CTYPE_KIND_ISSTRUCT(mytype->ct_kind)) {
+				mod = mytype->ct_struct.ct_info.cd_mod;
+				if (cmodule_iskern(mod)) {
+					if (mod->cm_module != (REF module_t *)&kernel_driver) {
+						/* If the type was declared by a driver, it may actually
+						 * originate from the kernel core. In this case, try to
+						 * load the pointed-to type. */
+						ctype_struct_enumfields(mytype, &ctype_struct_is_nonempty_callback, NULL);
+						mod = mytype->ct_struct.ct_info.cd_mod;
+					}
+					if (mod->cm_module == (REF module_t *)&kernel_driver) {
+						char const *name;
+						name = ctype_struct_getname(mytype);
+						if (name) {
+							unsigned int status;
+							/* Custom representations of pointers to objects from the kernel core. */
+							status = OBNOTE_PRINT_STATUS_BADNAME;
+							obnote_print(&is_nonempty_printer, NULL, ptr, name, &status);
+							if (status == OBNOTE_PRINT_STATUS_BADOBJ) {
+								/* Bad/Corrupt object */
+								FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
+								PRINTF("%#" PRIxPTR, ptr);
+								FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
+								PRINT(" ");
+								FORMAT(DEBUGINFO_PRINT_FORMAT_BADNOTES_PREFIX);
+								PRINTF("(%s)", name);
+								FORMAT(DEBUGINFO_PRINT_FORMAT_BADNOTES_SUFFIX);
+								goto done;
+							}
+							if (status == OBNOTE_PRINT_STATUS_SUCCESS) {
+								/* Print a normal object note. */
+								FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
+								PRINTF("%#" PRIxPTR, ptr);
+								FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
+								PRINT(" ");
+								FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
+								PRINTF("(%s ", name);
+								DO(obnote_print(P_PRINTER, P_ARG, ptr, name, &status));
+								PRINT(")");
+								FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
+								goto done;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	/* Check if `ptr' is a text-/data-pointer. */
 	{
 		REF module_t *mod;
@@ -1283,63 +1337,8 @@ print_named_pointer(struct ctyperef const *__restrict self,
 		}
 	}
 
-	if (!is_void_pointer && ADDR_ISKERN(ptr)) {
-		struct ctype *mytype = self->ct_typ;
-		if (CTYPE_KIND_ISPOINTER(mytype->ct_kind)) {
-			struct cmodule *mod;
-			mytype = mytype->ct_pointer.cp_base.ct_typ;
-			if (CTYPE_KIND_ISSTRUCT(mytype->ct_kind)) {
-				mod = mytype->ct_struct.ct_info.cd_mod;
-				if (cmodule_iskern(mod)) {
-					if (mod->cm_module != (REF module_t *)&kernel_driver) {
-						/* If the type was declared by a driver, it may actually
-						 * originate from the kernel core. In this case, try to
-						 * load the pointed-to type. */
-						ctype_struct_enumfields(mytype, &ctype_struct_is_nonempty_callback, NULL);
-						mod = mytype->ct_struct.ct_info.cd_mod;
-					}
-					if (mod->cm_module == (REF module_t *)&kernel_driver) {
-						char const *name;
-						name = ctype_struct_getname(mytype);
-						if (name) {
-							unsigned int status;
-							/* Custom representations of pointers to objects from the kernel core. */
-							status = OBNOTE_PRINT_STATUS_BADNAME;
-							obnote_print(&is_nonempty_printer, NULL, ptr, name, &status);
-							if (status == OBNOTE_PRINT_STATUS_BADOBJ) {
-								/* Bad/Corrupt object */
-								FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_PREFIX);
-								PRINTF("%#" PRIxPTR, ptr);
-								FORMAT(DEBUGINFO_PRINT_FORMAT_ERROR_SUFFIX);
-								PRINT(" ");
-								FORMAT(DEBUGINFO_PRINT_FORMAT_BADNOTES_PREFIX);
-								PRINTF("(%s)", name);
-								FORMAT(DEBUGINFO_PRINT_FORMAT_BADNOTES_SUFFIX);
-								goto done;
-							}
-							if (status != OBNOTE_PRINT_STATUS_BADNAME) {
-								/* Print a normal object note. */
-								FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-								PRINTF("%#" PRIxPTR, ptr);
-								FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
-								PRINT(" ");
-								FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_PREFIX);
-								PRINTF("(%s ", name);
-								DO(obnote_print(P_PRINTER, P_ARG, ptr, name, &status));
-								PRINT(")");
-								FORMAT(DEBUGINFO_PRINT_FORMAT_NOTES_SUFFIX);
-								goto done;
-							}
-						}
-					}
-				}
-				/* TODO: Recursively scan the base-classes of the struct type in
-				 *       search for one that references a known kernel type. */
-			}
-		}
-		/* TODO: Check if `ptr' points into kernel heap memory. If it
-		 *       is, then print it as `0x12345678 (heap)' */
-	}
+	/* TODO: Check if `ptr' points into kernel heap memory. If it
+	 *       is, then print it as `0x12345678 (heap)' */
 
 	/* If nothing is mapped where `ptr' points to, then we
 	 * should print it in a different color (iow: use a custom
