@@ -84,7 +84,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- ![dbg_disasm.png](kos/misc/gallery/dbg_disasm.png)
 		- View and modify memory via a hex editor
 			- ![dbg_hex.png](kos/misc/gallery/dbg_hex.png)
-		- Evaluate C-style expressions on local variables using a fully featured C expression compiler with over 512Kib of code dedicated to evaluating expressions.
+		- Evaluate C-style expressions on local/global variables using a fully featured C expression compiler with over 512Kib of code dedicated to evaluating expressions.
 			- ![dbg_eval.png](kos/misc/gallery/dbg_eval.png)
 	- GDB support
 		- QEMU features a builtin gdb server, that is supported for debugging the core itself
