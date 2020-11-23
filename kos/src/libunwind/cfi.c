@@ -657,7 +657,21 @@ again_switch_opcode:
 			} else {
 				value = (uintptr_t)*(uint8_t *)pc;
 			}
-			value += self->ue_addroffset; /* Include the module loadaddr. */
+
+			/* To quote a comment found within the GDB source tree:
+			 * """
+			 *   Some versions of GCC emit DW_OP_addr before
+			 *   DW_OP_GNU_push_tls_address.  In this case the value is an
+			 *   index, not an address.  We don't support things like
+			 *   branching between the address and the TLS op.
+			 * """
+			 * So just mirror what it does, and don't include the module
+			 * offset when the next opcode is `DW_OP_GNU_push_tls_address' */
+			if (pc < self->ue_pc_end && *pc == DW_OP_GNU_push_tls_address) {
+				/* ... */
+			} else {
+				value += self->ue_addroffset; /* Include the module loadaddr. */
+			}
 			pc += self->ue_addrsize;
 			self->ue_stack[stacksz].s_type   = UNWIND_STE_CONSTANT;
 			self->ue_stack[stacksz].s_uconst = value;
