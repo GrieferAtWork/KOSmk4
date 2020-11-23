@@ -1987,7 +1987,8 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_promote)(void) {
 		return DBX_EINTERN; /* Shouldn't happen */
 	top = &cexpr_stacktop;
 	if unlikely(top->cv_kind != CVALUE_KIND_DATA &&
-	            top->cv_kind != CVALUE_KIND_IDATA)
+	            top->cv_kind != CVALUE_KIND_IDATA &&
+	            top->cv_kind != CVALUE_KIND_VOID)
 		return DBX_EINTERN; /* Shouldn't happen */
 	old_type = top->cv_type.ct_typ;
 	if (CTYPE_KIND_ISINT_OR_BOOL(old_type->ct_kind) &&
