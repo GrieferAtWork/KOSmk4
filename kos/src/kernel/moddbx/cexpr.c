@@ -1846,6 +1846,13 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rvalue)(void) {
 		STATIC_ASSERT_MSG(offsetof(struct cvalue, cv_addr) == offsetof(struct cvalue, cv_idata),
 		                  "This is required so we don't have to copy the old address into the "
 		                  "new inline-data field");
+		/* Try to load the address of a CFI expression. */
+		if (top->cv_kind == CVALUE_KIND_EXPR ||
+		    top->cv_kind == CVALUE_KIND_IEXPR) {
+			result = cexpr_cfi_to_address(top);
+			if unlikely(result != DBX_EOK)
+				return result;
+		}
 		/* Check if the address of the top-element can be taken. */
 		if (top->cv_kind != CVALUE_KIND_ADDR &&
 		    top->cv_kind != CVALUE_KIND_VOID)
