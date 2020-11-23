@@ -120,25 +120,20 @@ NOTHROW(FCALL cexpr_pushparse_inner)(struct cparser *__restrict self) {
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self);
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW(FCALL parse_unary_suffix)(struct cparser *__restrict self);
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW(FCALL parse_unary)(struct cparser *__restrict self);
-#define parse_unary_suffix_check(tok)                \
-	((tok) == '[' || (tok) == '(' || (tok) == '.' || \
-	 (tok) == CTOKEN_TOK_MINUS_RANGLE ||             \
-	 (tok) == CTOKEN_TOK_PLUS_PLUS ||                \
+#define parse_unary_suffix_check(tok)    \
+	((tok) == '[' || (tok) == '(' ||     \
+	 (tok) == '.' || (tok) == '@' ||     \
+	 (tok) == CTOKEN_TOK_MINUS_RANGLE || \
+	 (tok) == CTOKEN_TOK_PLUS_PLUS ||    \
 	 (tok) == CTOKEN_TOK_MINUS_MINUS)
 #define parse_unary_suffix_CASE   \
 	case '[':                     \
 	case '(':                     \
 	case '.':                     \
+	case '@':                     \
 	case CTOKEN_TOK_MINUS_RANGLE: \
 	case CTOKEN_TOK_PLUS_PLUS:    \
 	case CTOKEN_TOK_MINUS_MINUS
-
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW(FCALL parse_at_suffix)(struct cparser *__restrict self);
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW(FCALL parse_at)(struct cparser *__restrict self);
-#define parse_at_suffix_check(tok) \
-	((tok) == '@')
-#define parse_at_suffix_CASE \
-	case '@'
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW(FCALL parse_prod_suffix)(struct cparser *__restrict self);
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW(FCALL parse_prod)(struct cparser *__restrict self);
@@ -905,6 +900,56 @@ NOTHROW(FCALL parse_unary_suffix)(struct cparser *__restrict self) {
 again:
 	switch (self->c_tok) {
 
+	case '@': {
+		struct ctyperef lhs_ptr_type;
+		/* >> foo@bar
+		 * Same as:
+		 * >> *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar)
+		 *
+		 * Intended for ATTR_PERxxx variables within the kernel:
+		 * >> this_connections@caller
+		 * Where `caller' is presumably a local variable `struct task *caller'.
+		 * This will then resolve to print information about the pet-task
+		 * variable `this_connections', as viewed by `caller'
+		 *
+		 * TODO: The 2 operands should be interchangeable, so-long as
+		 *       at most one of them is a pointer. When both, or neither
+		 *       is a pointer, only then should this operator result in
+		 *       a DBX_ESYNTAX error. */
+		if (CTYPE_KIND_ISARRAY(cexpr_stacktop.cv_type.ct_typ->ct_kind)) {
+			result = cexpr_promote();
+		} else {
+			result = cexpr_ref();
+		}
+		if unlikely(result != DBX_EOK)
+			goto done;
+		ctyperef_initcopy(&lhs_ptr_type, &cexpr_stacktop.cv_type);
+		result = cexpr_cast_simple(&ctype_uintptr_t);
+		if unlikely(result != DBX_EOK) {
+err_lhs_ptr_type:
+			ctyperef_fini(&lhs_ptr_type);
+			goto done;
+		}
+		yield();
+		result = parse_unary(self);            /* (uintptr_t)&foo, bar */
+		if unlikely(result != DBX_EOK)
+			goto err_lhs_ptr_type;
+		result = cexpr_cast_simple(&ctype_uintptr_t); /* (uintptr_t)&foo, (uintptr_t)bar */
+		if unlikely(result != DBX_EOK)
+			goto err_lhs_ptr_type;
+		result = cexpr_op2('+');               /* (uintptr_t)&foo + (uintptr_t)bar */
+		if unlikely(result != DBX_EOK)
+			goto err_lhs_ptr_type;
+		result = cexpr_cast(&lhs_ptr_type);    /* (typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar) */
+		ctyperef_fini(&lhs_ptr_type);
+		if unlikely(result != DBX_EOK)
+			goto done;
+		result = cexpr_deref();                /* *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar) */
+		if unlikely(result != DBX_EOK)
+			goto err_lhs_ptr_type;
+		goto again;
+	}	break;
+
 	case CTOKEN_TOK_MINUS_RANGLE:
 		/* C-struct deref+field. */
 		result = cexpr_deref();
@@ -1043,70 +1088,6 @@ NOTHROW(FCALL parse_unary)(struct cparser *__restrict self) {
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL parse_at_suffix)(struct cparser *__restrict self) {
-	dbx_errno_t result;
-again:
-	switch (self->c_tok) {
-
-	case '@': {
-		struct ctyperef lhs_ptr_type;
-		/* >> foo@bar
-		 * Same as:
-		 * >> *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar)
-		 *
-		 * Intended for ATTR_PERxxx variables within the kernel:
-		 * >> this_connections@caller
-		 * Where `caller' is presumably a local variable `struct task *caller'.
-		 * This will then resolve to print information about the pet-task
-		 * variable `this_connections', as viewed by `caller'
-		 *
-		 * TODO: The 2 operands should be interchangeable, so-long as
-		 *       at most one of them is a pointer. When both, or neither
-		 *       is a pointer, only then should this operator result in
-		 *       a DBX_ESYNTAX error. */
-		if (CTYPE_KIND_ISARRAY(cexpr_stacktop.cv_type.ct_typ->ct_kind)) {
-			result = cexpr_promote();
-		} else {
-			result = cexpr_ref();
-		}
-		if unlikely(result != DBX_EOK)
-			goto done;
-		ctyperef_initcopy(&lhs_ptr_type, &cexpr_stacktop.cv_type);
-		result = cexpr_cast_simple(&ctype_uintptr_t);
-		if unlikely(result != DBX_EOK) {
-err_lhs_ptr_type:
-			ctyperef_fini(&lhs_ptr_type);
-			goto done;
-		}
-		yield();
-		result = parse_unary(self);            /* (uintptr_t)&foo, bar */
-		if unlikely(result != DBX_EOK)
-			goto err_lhs_ptr_type;
-		result = cexpr_cast_simple(&ctype_uintptr_t); /* (uintptr_t)&foo, (uintptr_t)bar */
-		if unlikely(result != DBX_EOK)
-			goto err_lhs_ptr_type;
-		result = cexpr_op2('+');               /* (uintptr_t)&foo + (uintptr_t)bar */
-		if unlikely(result != DBX_EOK)
-			goto err_lhs_ptr_type;
-		result = cexpr_cast(&lhs_ptr_type);    /* (typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar) */
-		ctyperef_fini(&lhs_ptr_type);
-		if unlikely(result != DBX_EOK)
-			goto done;
-		result = cexpr_deref();                /* *(typeof(foo) *)((uintptr_t)&foo + (uintptr_t)bar) */
-		if unlikely(result != DBX_EOK)
-			goto err_lhs_ptr_type;
-		goto again;
-	}	break;
-
-	default:
-		result = DBX_EOK;
-		break;
-	}
-done:
-	return result;
-}
-
-PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL parse_prod_suffix)(struct cparser *__restrict self) {
 	dbx_errno_t result;
 again:
@@ -1118,7 +1099,7 @@ again:
 		unsigned int op;
 		op = self->c_tok;
 		yield();
-		result = parse_at(self);
+		result = parse_unary(self);
 		if unlikely(result != DBX_EOK)
 			goto done;
 		result = cexpr_op2(op);
@@ -1600,8 +1581,7 @@ done:
 			result = parse_##name##_suffix(self);                               \
 		return result;                                                          \
 	}
-DEFINE_INTERPOS_PARSER(at, unary)
-DEFINE_INTERPOS_PARSER(prod, at)
+DEFINE_INTERPOS_PARSER(prod, unary)
 DEFINE_INTERPOS_PARSER(sum, prod)
 DEFINE_INTERPOS_PARSER(shift, sum)
 DEFINE_INTERPOS_PARSER(cmp, shift)
@@ -1636,7 +1616,6 @@ NOTHROW(FCALL parse_assign)(struct cparser *__restrict self) {
 			if unlikely (result != DBX_EOK)             \
 				goto done;                              \
 		}
-		PARSE_CASE_CHECK(at)
 		PARSE_CASE_CHECK(prod)
 		PARSE_CASE_CHECK(sum)
 		PARSE_CASE_CHECK(shift)
