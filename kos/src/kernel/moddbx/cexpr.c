@@ -723,6 +723,33 @@ nope:
 }
 #endif /* CONFIG_HAVE_USERMOD */
 
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) dbx_errno_t FCALL
+cexpr_cfi_set_address(struct cvalue *__restrict self,
+                      USER void *__restrict addr) {
+	/* We must still write-back any unwritten modifications,
+	 * even though there really shouldn't be any at this point.  */
+	if (self->cv_kind == CVALUE_KIND_EXPR) {
+		if (self->cv_expr.v_buffer) {
+			if (dbg_writememory(addr, self->cv_expr.v_buffer,
+			                    self->cv_expr.v_buflen,
+			                    cexpr_forcewrite) != 0)
+				goto err_fault;
+			dbx_free(self->cv_expr.v_buffer);
+		}
+	} else {
+		if (dbg_writememory(addr, self->cv_expr.v_ibuffer,
+		                    self->cv_expr.v_buflen,
+		                    cexpr_forcewrite) != 0)
+			goto err_fault;
+	}
+	/* Change the value-kind to become a memory reference. */
+	self->cv_kind = CVALUE_KIND_ADDR;
+	self->cv_addr = addr;
+	return DBX_EOK;
+err_fault:
+	return DBX_EFAULT;
+}
+
 /* Try to convert a `CVALUE_KIND_EXPR' or `CVALUE_KIND_IEXPR'
  * expression into a `CVALUE_KIND_ADDR' object, such that
  * its address may be taken, and data can be accessed without
@@ -730,25 +757,20 @@ nope:
  * @return: DBX_EOK:    Success (`self' has become `CVALUE_KIND_ADDR')
  * @return: DBX_EOK:    Not possible (`self' remains unchanged)
  * @return: DBX_EFAULT: Segmentation fault. */
-PRIVATE ATTR_NOINLINE NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
+PRIVATE ATTR_NOINLINE NONNULL((1)) dbx_errno_t FCALL
+cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
+                          struct cmodule *mod) {
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
 	void const *pc;
 	uintptr_t module_relative_pc;
 	unsigned int result;
-	struct cmodule *mod;
 	di_debuginfo_compile_unit_t cu;
 	byte_t temp_buffer[1];
 #ifdef CONFIG_HAVE_USERMOD
 	bool second_pass;
 #endif /* CONFIG_HAVE_USERMOD */
-
-	/* Sanity check: are we actually dealing with a CFI expression? */
-	if (self->cv_kind != CVALUE_KIND_EXPR &&
-	    self->cv_kind != CVALUE_KIND_IEXPR)
-		goto done;
 	memset(&emulator, 0, sizeof(emulator));
 #ifdef CONFIG_HAVE_USERMOD
 	emulator.ue_tlsbase = (byte_t *)-1; /* Lazily calculate so we can detect if this was used. */
@@ -756,22 +778,26 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 do_second_pass:
 #endif /* CONFIG_HAVE_USERMOD */
 	memset(&cu, 0, sizeof(cu));
-	pc  = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
-	mod = self->cv_expr.v_expr.v_module;
+	pc = (void const *)dbg_getpcreg(DBG_REGLEVEL_VIEW);
 	/* Select the proper function. */
-	module_relative_pc = (uintptr_t)pc - module_getloadaddr(mod->cm_module, mod->cm_modtyp);
-	emulator.ue_pc = debuginfo_location_select(&self->cv_expr.v_expr.v_expr,
-	                                           self->cv_expr.v_expr.v_cu_ranges_startpc,
-	                                           module_relative_pc,
-	                                           self->cv_expr.v_expr.v_addrsize,
-	                                           &expr_length);
+	module_relative_pc = (uintptr_t)pc;
+	if (mod) {
+		module_relative_pc -= module_getloadaddr(mod->cm_module, mod->cm_modtyp);
+		emulator.ue_pc = debuginfo_location_select(&self->cv_expr.v_expr.v_expr,
+		                                           self->cv_expr.v_expr.v_cu_ranges_startpc,
+		                                           module_relative_pc,
+		                                           self->cv_expr.v_expr.v_addrsize,
+		                                           &expr_length);
+		emulator.ue_sectinfo = di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections);
+	} else {
+		emulator.ue_pc = self->cv_expr.v_expr.v_expr.l_expr;
+	}
 	if unlikely(!emulator.ue_pc)
 		goto done;
 	cu.cu_ranges.r_startpc         = self->cv_expr.v_expr.v_cu_ranges_startpc;
 	cu.cu_addr_base                = self->cv_expr.v_expr.v_cu_addr_base;
 	emulator.ue_pc_start           = emulator.ue_pc;
 	emulator.ue_pc_end             = emulator.ue_pc + expr_length;
-	emulator.ue_sectinfo           = di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections);
 	emulator.ue_regget             = &dbg_getreg;
 	emulator.ue_regget_arg         = (void *)(uintptr_t)DBG_REGLEVEL_VIEW;
 	emulator.ue_framebase          = &self->cv_expr.v_expr.v_framebase;
@@ -814,7 +840,7 @@ do_second_pass:
 		 * If it was, then we must repeat the expression with the proper
 		 * TLS address, since the one calculated by libunwind only works
 		 * for the kernel core and drivers (but not for userspace) */
-		if (emulator.ue_tlsbase != (byte_t *)-1 &&
+		if (emulator.ue_tlsbase != (byte_t *)-1 && mod &&
 		    mod->cm_modtyp == MODULE_TYPE_USRMOD && !second_pass) {
 			bool ok;
 			/* Calculate the TLS-base address for `mod' in the context of `dbg_current' */
@@ -837,26 +863,8 @@ do_second_pass:
 				goto done;
 			lvalue = (byte_t *)regval.p + ste_top.s_regoffset;
 		}
-		/* Got it! The address can now be found in `lvalue'
-		 * However, we must still write-back any unwritten modifications,
-		 * even though there really shouldn't be any at this point. */
-		if (self->cv_kind == CVALUE_KIND_EXPR) {
-			if (self->cv_expr.v_buffer) {
-				if (dbg_writememory(lvalue, self->cv_expr.v_buffer,
-				                    self->cv_expr.v_buflen,
-				                    cexpr_forcewrite) != 0)
-					goto err_fault;
-				dbx_free(self->cv_expr.v_buffer);
-			}
-		} else {
-			if (dbg_writememory(lvalue, self->cv_expr.v_ibuffer,
-			                    self->cv_expr.v_buflen,
-			                    cexpr_forcewrite) != 0)
-				goto err_fault;
-		}
-		/* Change the value-kind to become a memory reference. */
-		self->cv_kind = CVALUE_KIND_ADDR;
-		self->cv_addr = lvalue;
+		/* Got it! The address can now be found in `lvalue' */
+		return cexpr_cfi_set_address(self, lvalue);
 	}	break;
 
 	default:
@@ -864,9 +872,47 @@ do_second_pass:
 	}
 done:
 	return DBX_EOK;
-err_fault:
-	return DBX_EFAULT;
 }
+
+PRIVATE ATTR_NOINLINE NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
+	dbx_errno_t result;
+	pagedir_phys_t old_pdir, req_pdir;
+	struct cmodule *mod;
+	/* Sanity check: are we actually dealing with a CFI expression? */
+	if (self->cv_kind != CVALUE_KIND_EXPR &&
+	    self->cv_kind != CVALUE_KIND_IEXPR)
+		return DBX_EOK;
+	if (!self->cv_expr.v_expr.v_expr.l_expr &&
+	    !self->cv_expr.v_expr.v_expr.l_llist) {
+		/* Special case: We're already been given the address.
+		 *               it's `self->cv_expr.v_expr.v_objaddr' */
+		return cexpr_cfi_set_address(self, self->cv_expr.v_expr.v_objaddr);
+	}
+	old_pdir = pagedir_get();
+	req_pdir = old_pdir;
+	mod      = self->cv_expr.v_expr.v_module;
+	if (mod)
+		req_pdir = cmodule_vm(mod)->v_pdir_phys;
+	/* This must run in the context of `cmodule_vm(mod)' */
+	if (old_pdir != req_pdir) {
+		if unlikely(!dbg_verifypagedir(req_pdir))
+			return DBX_EFAULT;
+		pagedir_set(req_pdir);
+	}
+	TRY {
+		/* Do the actual work. */
+		result = cexpr_cfi_to_address_impl(self, mod);
+	} EXCEPT {
+		/* Exceptions thrown in this function currently crash the kernel.
+		 * Instead, they should be handled by returning DBX_EFAULT! */
+		result = DBX_EFAULT;
+	}
+	if (old_pdir != req_pdir)
+		pagedir_set(old_pdir);
+	return result;
+}
+
 
 /* Read/write the value of the given CFI expression to/from buf.
  * @return: DBX_EOK:     Success.
@@ -896,12 +942,14 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			mod = self->v_module;
 			/* Must execute these functions in the context of the VM associated with their module. */
 			{
-				pagedir_phys_t old_pdir;
-				struct vm *required_vm;
-				required_vm = cmodule_vm(mod);
+				pagedir_phys_t old_pdir, req_pdir;
 				old_pdir = pagedir_get();
-				if (old_pdir != required_vm->v_pdir_phys)
-					pagedir_set(required_vm->v_pdir_phys);
+				req_pdir = cmodule_vm(mod)->v_pdir_phys;
+				if (old_pdir != req_pdir) {
+					if unlikely(!dbg_verifypagedir(req_pdir))
+						return DBX_EFAULT;
+					pagedir_set(req_pdir);
+				}
 				TRY {
 #ifdef CONFIG_HAVE_USERMOD
 					/* TODO: Proper user-space support for `unwind_emulator_t::ue_tlsbase'
@@ -926,11 +974,11 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 					}
 				} EXCEPT {
-					if (old_pdir != required_vm->v_pdir_phys)
+					if (old_pdir != req_pdir)
 						pagedir_set(old_pdir);
 					RETHROW();
 				}
-				if (old_pdir != required_vm->v_pdir_phys)
+				if (old_pdir != req_pdir)
 					pagedir_set(old_pdir);
 			}
 		}
