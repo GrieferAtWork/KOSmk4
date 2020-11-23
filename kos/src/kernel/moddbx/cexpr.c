@@ -2882,7 +2882,8 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No object matches the given `name' */
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
+NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
+                                bool automatic_symbol_addend) {
 	dbx_errno_t result;
 	struct cmodsyminfo csym;
 	result = cmod_syminfo_local(&csym, name, namelen, CMODSYM_DIP_NS_NORMAL);
@@ -2933,19 +2934,75 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen) {
 				expr.v_addrsize          = csym.clv_parser.dup_addrsize;
 				expr.v_ptrsize           = csym.clv_parser.dup_ptrsize;
 				expr.v_objaddr           = csym.clv_data.s_var.v_objaddr;
-				/* TODO: Special handling for this_* globals! */
 				result = cexpr_pushexpr(&symtype,
 				                        &expr,
 				                        ctype_sizeof(symtype.ct_typ),
 				                        0);
+				/* Do special handling for this[|vm|cpu]_* globals from the kernel core!
+				 * When accessed, automatically include an addend to the relevant object
+				 * in relation to dbg_current, such that the user can directly reference
+				 * these objects without having to manually sym@object them.
+				 *
+				 * Note however that this is in normal code, this is only done when the
+				 * symbol doesn't already appear in an @-expression (i.e. isn't followed
+				 * by an @-token) or within __identifier, meaning that:
+				 *   - `&__identifier(this_cred)' == `&__identifier(this_cred)'
+				 *   - `this_cred'                == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current)'
+				 *   - `this_cred@foo'            == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)foo)'
+				 *   - `(this_cred)@foo'          == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current + (uintptr_t)foo)'
+				 */
+				if (likely(result == DBX_EOK) && automatic_symbol_addend && !cexpr_typeonly &&
+				    csym.clv_mod && csym.clv_mod->cm_module == (module_t *)&kernel_driver &&
+				    namelen >= 5 && memcmp(name, "this", 4 * sizeof(char)) == 0 &&
+				    !CTYPE_KIND_ISFUNCTION(symtype.ct_typ->ct_kind)) {
+					uintptr_t addend;
+					if (name[4] == '_') {
+						REF struct ctype *symtype_ptr;
+						addend = (uintptr_t)dbg_current;
+do_increase_addend:
+						/* Offset by the given addend, essentially doing `this_foo@dbg_current' */
+						result = cexpr_ref();
+						if unlikely(result != DBX_EOK)
+							goto done_symtype;
+						result = cexpr_cast_simple(&ctype_uintptr_t);
+						if unlikely(result != DBX_EOK)
+							goto done_symtype;
+						result = cexpr_pushint_simple(&ctype_uintptr_t, addend);
+						if unlikely(result != DBX_EOK)
+							goto done_symtype;
+						result = cexpr_op2('+');
+						if unlikely(result != DBX_EOK)
+							goto done_symtype;
+						symtype_ptr = ctype_ptr(&symtype, dbg_current_sizeof_pointer());
+						if unlikely(!symtype_ptr) {
+							result = DBX_ENOMEM;
+							goto done_symtype;
+						}
+						result = cexpr_cast_simple(symtype_ptr);
+						decref(symtype_ptr);
+						if unlikely(result != DBX_EOK)
+							goto done_symtype;
+						result = cexpr_deref();
+					} else if (namelen >= 7 && name[4] == 'v' &&
+					           name[5] == 'm' && name[6] == '_') {
+						addend = (uintptr_t)dbg_current->t_vm;
+						goto do_increase_addend;
+					} else if (namelen >= 8 && name[4] == 'c' &&
+					           name[5] == 'p' && name[6] == 'u' &&
+					           name[7] == '_') {
+						addend = (uintptr_t)dbg_current->t_cpu;
+						goto do_increase_addend;
+					}
+				}
 			}
+done_symtype:
 			ctyperef_fini(&symtype);
 		}
 	} else {
 		result = DBX_ENOENT;
 	}
 done:
-	cmodsyminfo_istype(&csym);
+	cmod_syminfo_local_fini(&csym);
 	return result;
 }
 

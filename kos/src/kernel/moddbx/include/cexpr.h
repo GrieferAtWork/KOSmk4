@@ -372,11 +372,14 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc);
  *   - this_*      Addend is `(uintptr_t)dbg_current'
  *   - thiscpu_*   Addend is `(uintptr_t)dbg_current->t_cpu'
  *   - thisvm_*    Addend is `(uintptr_t)dbg_current->t_vm'
+ * @param: automatic_symbol_addend: When set to `false', do include automatic symbol
+ *                                  addend for special this_* namespaces (s.a. above)
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No object matches the given `name' */
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen);
+NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
+                                __BOOL automatic_symbol_addend DFL(1));
 
 /* Push a register with its native typing, given its `name'
  * @return: DBX_EOK:    Success.

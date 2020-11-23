@@ -810,7 +810,8 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			/* Pure symbol lookup. */
 			kwd_str = self->c_tokstart;
 			kwd_len = cparser_toklen(self);
-			result  = cexpr_pushsymbol(kwd_str, kwd_len);
+			/* NOTE: Don't enable automtic symbol offsets within __identifier()! */
+			result = cexpr_pushsymbol(kwd_str, kwd_len, false);
 			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
 				autocomplete_symbols(self, kwd_str, kwd_len, CMODSYM_DIP_NS_NORMAL, false);
 			yield();
@@ -820,17 +821,23 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 				result = cparser_skip(self, ')');
 			}
 		} else {
-			result = cexpr_pushsymbol(kwd_str, kwd_len);
+			yield();
+			/* NOTE: Only add automatic symbol offsets when this symbol isn't
+			 *       already being used within an explicit symbol-offset expression.
+			 * As such:
+			 * >> this_cred          (evaluate to this_cred@dbg_current)
+			 * >> this_cred@caller   (evaluate to this_cred@caller)
+			 */
+			result = cexpr_pushsymbol(kwd_str, kwd_len, self->c_tok != '@');
 			if (result == DBX_ENOENT) {
 				if (kwd_len && kwd_str[0] == '$') {
 					/* This might just be a register name... */
 					result = cexpr_pushregister(kwd_str + 1, kwd_len - 1);
 					/* TODO: Auto-complete register names. */
-				} else if (self->c_autocom && self->c_tokend == self->c_end) {
+				} else if (self->c_autocom && (kwd_str + kwd_len) == self->c_end) {
 					autocomplete_nontype_symbols(self, kwd_str, kwd_len);
 				}
 			}
-			yield();
 		}
 	}	break;
 
