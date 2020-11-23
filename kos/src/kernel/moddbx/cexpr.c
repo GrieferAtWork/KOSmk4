@@ -2983,15 +2983,33 @@ do_increase_addend:
 						if unlikely(result != DBX_EOK)
 							goto done_symtype;
 						result = cexpr_deref();
-					} else if (namelen >= 7 && name[4] == 'v' &&
-					           name[5] == 'm' && name[6] == '_') {
-						addend = (uintptr_t)dbg_current->t_vm;
-						goto do_increase_addend;
-					} else if (namelen >= 8 && name[4] == 'c' &&
-					           name[5] == 'p' && name[6] == 'u' &&
-					           name[7] == '_') {
-						addend = (uintptr_t)dbg_current->t_cpu;
-						goto do_increase_addend;
+					} else {
+						/* Guard against bad memory accesses when `dbg_current'
+						 * has become corrupt for whatever reason. */
+						TRY {
+							if (namelen >= 7 && name[4] == 'v' &&
+							    name[5] == 'm' && name[6] == '_') {
+								if unlikely(!ADDR_ISKERN(dbg_current))
+									goto err_fefault_symtype;
+								addend = (uintptr_t)dbg_current->t_vm;
+								goto do_increase_addend;
+							}
+							if (namelen >= 8 && name[4] == 'c' &&
+							    name[5] == 'p' && name[6] == 'u' &&
+							    name[7] == '_') {
+								if unlikely(!ADDR_ISKERN(dbg_current))
+									goto err_fefault_symtype;
+								addend = (uintptr_t)dbg_current->t_cpu;
+								goto do_increase_addend;
+							}
+						} EXCEPT {
+							goto err_fefault_symtype;
+						}
+						__IF0 {
+err_fefault_symtype:
+							result = DBX_EFAULT;
+							goto done_symtype;
+						}
 					}
 				}
 			}
