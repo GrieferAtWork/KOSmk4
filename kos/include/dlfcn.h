@@ -652,10 +652,10 @@ __NOTHROW_NCX(__DLFCN_CC dltlsfreeseg)(void *__ptr);
 #ifdef __CRT_HAVE_dltlsalloc
 __IMPDEF __ATTR_WUNUSED void *
 __NOTHROW_NCX(__DLFCN_CC dltlsalloc)(__size_t __num_bytes, __size_t __min_alignment,
-                                       void const *__template_data, __size_t __template_size,
-                                       void (__LIBCCALL *__perthread_init)(void *__arg, void *__base),
-                                       void (__LIBCCALL *__perthread_fini)(void *__arg, void *__base),
-                                       void *__perthread_callback_arg);
+                                     void const *__template_data, __size_t __template_size,
+                                     void (__LIBCCALL *__perthread_init)(void *__arg, void *__base),
+                                     void (__LIBCCALL *__perthread_fini)(void *__arg, void *__base),
+                                     void *__perthread_callback_arg);
 #endif /* __CRT_HAVE_dltlsalloc */
 
 /* Free a TLS segment previously allocated with `dltlsalloc' */

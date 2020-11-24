@@ -297,21 +297,6 @@ typedef union {
 #define ElfV_field(self, um_modtype, name) ((self).e64.name)
 #endif /* ... */
 
-#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
-#define UM_ELF_IFELSE(um32, um64)                     \
-	do {                                              \
-		if (USERMOD_TYPE_ISELF32(self->um_modtype)) { \
-			um32;                                     \
-		} else {                                      \
-			um64;                                     \
-		}                                             \
-	}	__WHILE0
-#elif defined(USERMOD_TYPE_ELF32)
-#define UM_ELF_IFELSE(um32, um64) do { um32; } __WHILE0
-#elif defined(USERMOD_TYPE_ELF64)
-#define UM_ELF_IFELSE(um32, um64) do { um64; } __WHILE0
-#endif /* ... */
-
 /* Member indices (to-be multipled by the pointer-size) libdl internals */
 #define STRUCT_dlmodule_INDEXOF_dm_loadaddr             0
 #define STRUCT_dlmodule_INDEXOF_dm_filename             1
@@ -345,18 +330,31 @@ PRIVATE NONNULL((1, 2)) bool
 NOTHROW(FCALL usermod_getpointer)(struct usermod *__restrict self,
                                   USER void *address,
                                   void **__restrict presult) {
-	(void)self;
-	UM_ELF_IFELSE({
+#if defined(USERMOD_TYPE_ELF32) && defined(USERMOD_TYPE_ELF64)
+	if (USERMOD_TYPE_ISELF32(self->um_modtype)) {
 		uint32_t p32;
 		if (dbg_readmemory(address, &p32, 4) != 0)
 			goto err;
 		*presult = (void *)(uintptr_t)p32;
-	}, {
+	} else {
 		uint64_t p64;
 		if (dbg_readmemory(address, &p64, 8) != 0)
 			goto err;
 		*presult = (void *)(uintptr_t)p64;
-	});
+	}
+#elif defined(USERMOD_TYPE_ELF32)
+	uint32_t p32;
+	(void)self;
+	if (dbg_readmemory(address, &p32, 4) != 0)
+		goto err;
+	*presult = (void *)(uintptr_t)p32;
+#elif defined(USERMOD_TYPE_ELF64)
+	uint64_t p64;
+	(void)self;
+	if (dbg_readmemory(address, &p64, 8) != 0)
+		goto err;
+	*presult = (void *)(uintptr_t)p64;
+#endif /* ... */
 	return true;
 err:
 	return false;

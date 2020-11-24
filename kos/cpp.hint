@@ -905,6 +905,7 @@
 #define BSEARCHR(...) for(;;)
 #define BSEARCHR_EX(...) for(;;)
 #define BITSET(num_bits) struct{unsigned int _bs_bits[42];}
+#define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
 
 #define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) \
 	refcnt_t handle_##name##_refcnt(T const *__restrict self) {} \

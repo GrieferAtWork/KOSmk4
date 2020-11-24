@@ -91,6 +91,24 @@ NOTHROW_NCX(LIBCCALL libc_getrlimit)(__rlimit_resource_t resource,
 }
 /*[[[end:libc_getrlimit]]]*/
 
+/*[[[head:libc_getrlimit64,hash:CRC-32=0x5c0be554]]]*/
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_getrlimit64, libc_getrlimit);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
+NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
+                                       struct rlimit64 *rlimits)
+/*[[[body:libc_getrlimit64]]]*/
+/*AUTO*/{
+	(void)resource;
+	(void)rlimits;
+	CRT_UNIMPLEMENTEDF("getrlimit64(%x, %p)", resource, rlimits); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_getrlimit64]]]*/
+
 /*[[[head:libc_setrlimit,hash:CRC-32=0xb036c656]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
 NOTHROW_NCX(LIBCCALL libc_setrlimit)(__rlimit_resource_t resource,
@@ -102,6 +120,24 @@ NOTHROW_NCX(LIBCCALL libc_setrlimit)(__rlimit_resource_t resource,
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_setrlimit]]]*/
+
+/*[[[head:libc_setrlimit64,hash:CRC-32=0xf3067f92]]]*/
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_setrlimit64, libc_setrlimit);
+#else /* MAGIC:alias */
+INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
+NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
+                                       struct rlimit64 const *rlimits)
+/*[[[body:libc_setrlimit64]]]*/
+/*AUTO*/{
+	(void)resource;
+	(void)rlimits;
+	CRT_UNIMPLEMENTEDF("setrlimit64(%x, %p)", resource, rlimits); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+#endif /* MAGIC:alias */
+/*[[[end:libc_setrlimit64]]]*/
 
 /*[[[head:libc_getrusage,hash:CRC-32=0x5c034eb8]]]*/
 INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
@@ -161,42 +197,6 @@ NOTHROW_NCX(LIBCCALL libc_setpriority)(__priority_which_t which,
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_setpriority]]]*/
-
-/*[[[head:libc_getrlimit64,hash:CRC-32=0x5c0be554]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_getrlimit64, libc_getrlimit);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
-NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
-                                       struct rlimit64 *rlimits)
-/*[[[body:libc_getrlimit64]]]*/
-/*AUTO*/{
-	(void)resource;
-	(void)rlimits;
-	CRT_UNIMPLEMENTEDF("getrlimit64(%x, %p)", resource, rlimits); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_getrlimit64]]]*/
-
-/*[[[head:libc_setrlimit64,hash:CRC-32=0xf3067f92]]]*/
-#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
-DEFINE_INTERN_ALIAS(libc_setrlimit64, libc_setrlimit);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.sched.resource") NONNULL((2)) int
-NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
-                                       struct rlimit64 const *rlimits)
-/*[[[body:libc_setrlimit64]]]*/
-/*AUTO*/{
-	(void)resource;
-	(void)rlimits;
-	CRT_UNIMPLEMENTEDF("setrlimit64(%x, %p)", resource, rlimits); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_setrlimit64]]]*/
 
 /*[[[end:implementation]]]*/
 
