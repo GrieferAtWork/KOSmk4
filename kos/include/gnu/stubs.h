@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81363768 */
+/* HASH CRC-32:0xfc034c62 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -373,11 +373,6 @@
 #define __stub_pthread_barrier_init
 #define __stub_pthread_barrier_wait
 #define __stub_pthread_getcpuclockid
-#define __stub_tss_get
-#define __stub_pthread_getspecific
-#define __stub_pthread_key_create
-#define __stub_tss_delete
-#define __stub_pthread_key_delete
 #define __stub_pthread_mutex_consistent_np
 #define __stub_pthread_mutex_consistent
 #define __stub_pthread_mutex_getprioceiling
@@ -395,7 +390,6 @@
 #define __stub_pthread_rwlock_wrlock
 #define __stub_pthread_setcancelstate
 #define __stub_pthread_setcanceltype
-#define __stub_pthread_setspecific
 #define __stub_ptsname_r
 #define __stub_putgrent
 #define __stub_putmsg

@@ -3037,6 +3037,148 @@ NOTHROW_RPC(LIBCCALL libc_pthread_barrier_wait)(pthread_barrier_t *barrier)
 /* pthread_key_t                                                        */
 /************************************************************************/
 
+/* [0..1][0..tls_count][owned] Vector TLS destructors.
+ * A NULL-entry indicates a slot that was previously allocated, but has become available. */
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") __pthread_destr_function_t *tls_dtors = NULL;
+
+/* Max allocated TLS key, plus 1. This describes the length of `tls_dtors' */
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") size_t tls_count = 0;
+
+/* Lock for accessing `tls_dtors' and `tls_count' */
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock tls_lock = ATOMIC_RWLOCK_INIT;
+
+/* [0..1][lock(WRITE_ONCE)] TLS segment (from libdl's `dltlsalloc()')
+ * that is used for representing and storing TLS values on a per-thread basis.
+ * Technically, we could get rid of this right here, and put all of the TLS
+ * stuff into `current', but since KOS already supports static TLS declaration,
+ * aka `ATTR_THREAD' (which is actually the _very_ _much_ preferred method of
+ * allocating TLS memory), anything that is written to be more or less optimized
+ * for a platform like KOS shouldn't even have to make use of this.
+ * As such, don't put more stuff into `current', and use dynamic TLS allocations
+ * for implementing pthread-based TLS variables. */
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") void *tls_handle = NULL;
+
+struct pthread_tls_segment {
+	/* This is the structure that is pointed-to by instance of `tls_handle'
+	 * Note that this structure exists on a per-thread basis! */
+	size_t  pts_alloc;      /* Allocated TLS value-vector size. */
+	void  **pts_values;     /* [?..?][0..pts_alloc] Vector of TLS values. */
+	void   *pts_static[32]; /* Initial (static) vector for holding the first N keys.
+	                         * This vector gets allocated by libdl and is here so
+	                         * we don't waste too much memory (since TLS segments
+	                         * allocated by `dltlsalloc()' have quite a lot of
+	                         * overhead) */
+};
+
+PRIVATE void __LIBCCALL
+pthread_tls_segment_init(void *UNUSED(arg), void *base) {
+	struct pthread_tls_segment *me;
+	me = (struct pthread_tls_segment *)base;
+	me->pts_values = me->pts_static;
+	me->pts_alloc  = COMPILER_LENOF(me->pts_static);
+}
+
+PRIVATE void __LIBCCALL
+pthread_tls_segment_fini(void *UNUSED(arg), void *base) {
+	struct pthread_tls_segment *me;
+	size_t i;
+	me = (struct pthread_tls_segment *)base;
+	for (i = 0; i < me->pts_alloc; ++i) {
+		void *tls_value;
+		tls_value = me->pts_values[i];
+		if (tls_value != NULL) {
+			__pthread_destr_function_t dtor = NULL;
+			atomic_rwlock_read(&tls_lock);
+			if likely(i < tls_count)
+				dtor = tls_dtors[i];
+			atomic_rwlock_endread(&tls_lock);
+			/* Invoke the TLS destructor for non-NULL values. */
+			if (dtor)
+				(*dtor)(tls_value);
+		}
+	}
+	/* Free a dynamically allocated TLS extension. */
+	if (me->pts_values != me->pts_static)
+		free(me->pts_values);
+}
+
+/* Return the pthread TLS-segment for the calling thread,
+ * allocating it, as well as `tls_handle' if necessary.
+ * @return: NULL: Insufficient memory. */
+PRIVATE WUNUSED struct pthread_tls_segment *
+NOTHROW_NCX(LIBCCALL get_pthread_tls_segment)(void) {
+	void *result;
+	void *handle = ATOMIC_READ(tls_handle);
+	if unlikely(!handle) {
+		void *real_handle;
+		/* Allocate on first access. */
+		handle = dltlsalloc(/* num_bytes:              */ sizeof(struct pthread_tls_segment),
+		                    /* min_alignment:          */ alignof(struct pthread_tls_segment),
+		                    /* template_data:          */ NULL,
+		                    /* template_size:          */ 0,
+		                    /* perthread_init:         */ &pthread_tls_segment_init,
+		                    /* perthread_fini:         */ &pthread_tls_segment_fini,
+		                    /* perthread_callback_arg: */ NULL);
+		if unlikely(!handle)
+			return NULL;
+		/* Remember the handle. */
+		real_handle = ATOMIC_CMPXCH_VAL(tls_handle, NULL, handle);
+		if unlikely(real_handle != NULL) {
+			dltlsfree(handle);
+			handle = real_handle;
+		}
+	}
+	/* Now load the segment for the calling thread. */
+	result = dltlsaddr(handle);
+	/* And return its address. */
+	return (struct pthread_tls_segment *)result;
+}
+
+/* Return a pointer to the TLS slot described by `id'
+ * within the calling thread's pthread-tls-segment.
+ * If TLS descriptors, or the associated slot had yet
+ * to be allocated, try allocate them now, but return
+ * `NULL' if doing so failed due to lack of memory.
+ * NOTE: It is up to the caller to ensure that `id' is
+ *       a valid id before calling this function. Because
+ *       if it wasn't a valid id beforehand, it will kind-
+ *       of become one (at least for the calling thread)
+ *       once this function returns! */
+PRIVATE WUNUSED void **
+NOTHROW_NCX(LIBCCALL get_pthread_tls_slot)(size_t id) {
+	struct pthread_tls_segment *self;
+	self = get_pthread_tls_segment();
+	if unlikely(!self)
+		return NULL;
+	if unlikely(id >= self->pts_alloc) {
+		void *old_base, *new_base;
+		/* Must allocate more memory. */
+		old_base = self->pts_values;
+		if (old_base == self->pts_static)
+			old_base = NULL;
+		/* Use recalloc(), so we automatically zero-initialize newly
+		 * allocated slots. */
+		new_base = recalloc(old_base, id + 1, sizeof(void *));
+		if unlikely(!new_base)
+			return NULL;
+		/* If the old base was the static vector, then we must
+		 * manually copy over old TLS values. */
+		if (old_base == self->pts_static) {
+			memcpy(new_base, self->pts_static,
+			       self->pts_alloc, sizeof(void *));
+		}
+		/* Write-back updated TLS values. */
+		self->pts_alloc  = id + 1;
+		self->pts_values = (void **)new_base;
+	}
+	/* Return the pointer to the appropriate slot. */
+	return &self->pts_values[id];
+}
+
+/* No-op destructor used to mark TLS-slots without custom destructors as in-use. */
+PRIVATE void __LIBKCALL noop_dtor(void *UNUSED(value)) {
+}
+
 /*[[[head:libc_pthread_key_create,hash:CRC-32=0x23da4f7d]]]*/
 /* Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
@@ -3050,11 +3192,67 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
                                               __pthread_destr_function_t destr_function)
 /*[[[body:libc_pthread_key_create]]]*/
-/*AUTO*/{
-	(void)key;
-	(void)destr_function;
-	CRT_UNIMPLEMENTEDF("pthread_key_create(%p, %p)", key, destr_function); /* TODO */
-	return ENOSYS;
+{
+	size_t i, avail, count;
+	if (!destr_function)
+		destr_function = &noop_dtor;
+again:
+	atomic_rwlock_write(&tls_lock);
+	count = ATOMIC_READ(tls_count);
+	/* Check if we can re-use a previously freed slot. */
+	for (i = 0; i < count; ++i) {
+		if (tls_dtors[i] == NULL)
+			goto use_ith_slot; /* Re-use this slot! */
+	}
+	/* Check if we must increase the allocated size of the TLS-destructor-vector. */
+	avail = malloc_usable_size(tls_dtors) / sizeof(__pthread_destr_function_t);
+	if (count >= avail) {
+		__pthread_destr_function_t *old_destructors;
+		__pthread_destr_function_t *new_destructors;
+		atomic_rwlock_endwrite(&tls_lock);
+
+		/* Allocate a new (slightly larger) TLS destructor vector.
+		 * Note that we mustn't hold `tls_lock' in here, since that
+		 * could lead to a dead-lock depending on how malloc() is
+		 * implemented.
+		 * After all: `tls_lock' is an _atomic_ lock, so we have to
+		 *            make a real effort to always hold it for the
+		 *            least amount of time possible. */
+		new_destructors = (__pthread_destr_function_t *)malloc(count + 1,
+		                                                       sizeof(__pthread_destr_function_t));
+
+		/* Check if the allocation was ok. */
+		if unlikely(!new_destructors)
+			return ENOMEM;
+
+		atomic_rwlock_write(&tls_lock);
+		/* Make sure that the TLS count didn't change in the mean time. */
+		if (ATOMIC_READ(tls_count) != count) {
+			atomic_rwlock_endwrite(&tls_lock);
+			free(new_destructors);
+			goto again;
+		}
+
+		/* Copy over old destructors. */
+		old_destructors = tls_dtors;
+		memcpy(new_destructors, old_destructors,
+		       count, sizeof(__pthread_destr_function_t));
+
+		/* Set the new destructors vector as active. */
+		tls_dtors = new_destructors;
+		atomic_rwlock_endwrite(&tls_lock);
+
+		/* Free the old TLS destructors vector. */
+		free(old_destructors);
+		goto again;
+	}
+	/* Simply append the new TLS slot at the end.
+	 * Note that i == count from above! */
+use_ith_slot:
+	tls_dtors[i] = destr_function;
+	atomic_rwlock_endwrite(&tls_lock);
+	*key = (pthread_key_t)i;
+	return EOK;
 }
 /*[[[end:libc_pthread_key_create]]]*/
 
@@ -3064,10 +3262,38 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key,
 INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 /*[[[body:libc_pthread_key_delete]]]*/
-/*AUTO*/{
-	(void)key;
-	CRT_UNIMPLEMENTEDF("pthread_key_delete(%" PRIxN(__SIZEOF_PTHREAD_KEY_T) ")", key); /* TODO */
-	return ENOSYS;
+{
+	errno_t result = EOK;
+	atomic_rwlock_write(&tls_lock);
+	if unlikely((size_t)key >= tls_count || tls_dtors[(size_t)key] == NULL) {
+		/* Bad key! */
+		result = EINVAL;
+	} else {
+		/* Delete the destructor of key, thus deallocating it. */
+		tls_dtors[(size_t)key] = NULL;
+		/* Truncate the total count of allocated keys, if possible. */
+		if ((size_t)key == tls_count - 1) {
+			while (tls_count && !tls_dtors[tls_count - 1])
+				--tls_count;
+			/* Special case: If all TLS keys have been destroyed, free the destructor-vector. */
+			if (!tls_count) {
+				__pthread_destr_function_t *old_dtors;
+				old_dtors = tls_dtors;
+				tls_dtors = NULL;
+				atomic_rwlock_endwrite(&tls_lock);
+				free(old_dtors);
+				goto done;
+			} else {
+				/* XXX: >> tls_dtors = realloc_nonblock(tls_dtors,
+				 *      >>                              tls_count,
+				 *      >>                              sizeof(__pthread_destr_function_t));
+				 */
+			}
+		}
+	}
+	atomic_rwlock_endwrite(&tls_lock);
+done:
+	return result;
 }
 /*[[[end:libc_pthread_key_delete]]]*/
 
@@ -3078,11 +3304,23 @@ NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED void *
 NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 /*[[[body:libc_pthread_getspecific]]]*/
-/*AUTO*/{
-	(void)key;
-	CRT_UNIMPLEMENTEDF("pthread_getspecific(%" PRIxN(__SIZEOF_PTHREAD_KEY_T) ")", key); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+{
+	void *result = NULL;
+	/* Verify that `key' is actually valid. */
+	atomic_rwlock_read(&tls_lock);
+	if unlikely((size_t)key >= tls_count || tls_dtors[(size_t)key] == NULL) {
+		atomic_rwlock_endread(&tls_lock);
+		/* Bad key! */
+	} else {
+		void **slot;
+		atomic_rwlock_endread(&tls_lock);
+		/* Lookup the slot for `key' */
+		slot = get_pthread_tls_slot((size_t)key);
+		/* Load the value of `slot' */
+		if (slot)
+			result = *slot;
+	}
+	return result;
 }
 /*[[[end:libc_pthread_getspecific]]]*/
 
@@ -3095,11 +3333,23 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
                                                void const *pointer)
 /*[[[body:libc_pthread_setspecific]]]*/
-/*AUTO*/{
-	(void)key;
-	(void)pointer;
-	CRT_UNIMPLEMENTEDF("pthread_setspecific(%" PRIxN(__SIZEOF_PTHREAD_KEY_T) ", %p)", key, pointer); /* TODO */
-	return ENOSYS;
+{
+	void **slot;
+	/* Verify that `key' is actually valid. */
+	atomic_rwlock_read(&tls_lock);
+	if unlikely((size_t)key >= tls_count || tls_dtors[(size_t)key] == NULL) {
+		atomic_rwlock_endread(&tls_lock);
+		/* Bad key! */
+		return EINVAL;
+	}
+	atomic_rwlock_endread(&tls_lock);
+	/* Lookup the slot for `key' */
+	slot = get_pthread_tls_slot((size_t)key);
+	if (!slot)
+		return ENOMEM;
+	/* Write the value to the slot. */
+	*slot = (void *)pointer;
+	return EOK;
 }
 /*[[[end:libc_pthread_setspecific]]]*/
 
