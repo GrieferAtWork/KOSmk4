@@ -1043,6 +1043,19 @@ again:
 		case DW_ATE_boolean:
 			if (!typinfo.t_sizeof || typinfo.t_sizeof == sizeof(bool)) {
 				presult->ct_typ = incref(&ctype_bool);
+				/* Keep a bit of consistency, and discard boolean types
+				 * that have been named as `_Bool'. This happens when a
+				 * program written in C uses <stdbool.h>, and we filter
+				 * out this kind of thing, so that `cprinter.c' will print
+				 * all conforming boolean types as `bool' */
+				if (presult->ct_info.ci_name &&
+				    strcmp(presult->ct_info.ci_name, "_Bool") == 0) {
+					presult->ct_info.ci_name = NULL;
+					if (presult->ct_info.ci_nameref) {
+						decref(presult->ct_info.ci_nameref);
+						presult->ct_info.ci_nameref = NULL;
+					}
+				}
 			} else {
 				REF struct ctype *ct;
 				ct = (REF struct ctype *)dbx_malloc(sizeof(struct _basic_ctype));
