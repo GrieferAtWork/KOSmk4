@@ -1679,6 +1679,10 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 		ATTR_FALLTHROUGH
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM): {
 		/* Enum or integer */
+		/* TODO: Certain integer types should be printed alongside custom
+		 *       object hints, such as `fd_t', which should include the
+		 *       associated text from `readlink /proc/self/fd/$FD`, if
+		 *       any. */
 		if (CTYPE_KIND_SIZEOF(kind) <= sizeof(intmax_t)) {
 			union {
 				intmax_t s;

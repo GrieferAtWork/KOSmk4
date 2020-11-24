@@ -40,6 +40,7 @@
 #include <hybrid/unaligned.h>
 
 #include <assert.h>
+#include <ctype.h>
 #include <inttypes.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -1287,6 +1288,26 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 }
 
 
+/* Check if `name' is a valid symbol name. */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) bool
+NOTHROW(FCALL is_a_valid_symbol_name)(char const *__restrict name) {
+	char ch = *name;
+	if (!isalpha(ch) && ch != '_' && ch != '$')
+		goto nope;
+	++name;
+	for (;;) {
+		ch = *name;
+		if (!ch)
+			break;
+		if (!isalnum(ch) && ch != '_' && ch != '$')
+			goto nope;
+		++name;
+	}
+	return true;
+nope:
+	return false;
+}
+
 /* Load DW symbols from the given unit `self'
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
@@ -1326,7 +1347,7 @@ NOTHROW(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 				if (dbg_awaituser())
 					goto err_interrupt;
 				symbol_name = parse_symbol_name_for_object(&parser, &ns, false);
-				if (symbol_name && *symbol_name) {
+				if (symbol_name && is_a_valid_symbol_name(symbol_name)) {
 					/* Register this symbol. */
 					result = cmodule_addsymbol(mod, &percu_symbols, symbol_name, dip, ns);
 					if unlikely(result != DBX_EOK)
