@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3227686c */
+/* HASH CRC-32:0xb722bd39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,7 +118,6 @@ INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t di
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname, char const *val, int replace);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
 INTDEF WUNUSED fd_t NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname);
 /* Returns the name of the PTY slave (Pseudo TTY slave)

@@ -1491,17 +1491,6 @@ NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd)
 }
 /*[[[end:libc_grantpt]]]*/
 
-/*[[[head:libc_unlockpt,hash:CRC-32=0x861f28fa]]]*/
-INTERN ATTR_SECTION(".text.crt.io.tty") int
-NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd)
-/*[[[body:libc_unlockpt]]]*/
-/*AUTO*/{
-	(void)fd;
-	CRT_UNIMPLEMENTEDF("unlockpt(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_unlockpt]]]*/
 
 
 /*[[[head:libc_posix_openpt,hash:CRC-32=0x9f0949e1]]]*/
@@ -2205,7 +2194,7 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x829e71a]]]*/
+/*[[[start:exports,hash:CRC-32=0x6a7d2e74]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -2257,7 +2246,6 @@ DEFINE_PUBLIC_ALIAS(frealpathat, libc_frealpathat);
 DEFINE_PUBLIC_ALIAS(setenv, libc_setenv);
 DEFINE_PUBLIC_ALIAS(unsetenv, libc_unsetenv);
 DEFINE_PUBLIC_ALIAS(grantpt, libc_grantpt);
-DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
 DEFINE_PUBLIC_ALIAS(posix_openpt, libc_posix_openpt);
 DEFINE_PUBLIC_ALIAS(__secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);

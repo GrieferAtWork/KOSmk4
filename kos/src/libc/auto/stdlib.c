@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x808914c9 */
+/* HASH CRC-32:0x427daec0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 #include "format-printer.h"
 #include "../user/stdio.h"
 #include "../user/string.h"
+#include "../user/sys.ioctl.h"
 #include "../user/sys.stat.h"
 #include "../user/sys.time.h"
 #include "unicode.h"
@@ -1115,6 +1116,13 @@ NOTHROW_RPC(LIBCCALL libc_mkdtemp)(char *template_) {
 	if (libc_system_mktemp(1, template_, 0, 0) )
 		template_ = NULL;
 	return template_;
+}
+INTERN ATTR_SECTION(".text.crt.io.tty") int
+NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd) {
+	int action = 0;
+	if (libc_ioctl(fd, __TIOCSPTLCK, &action))
+		return -1;
+	return 0;
 }
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated with the master descriptor `FD' */
@@ -3608,6 +3616,7 @@ DEFINE_PUBLIC_ALIAS(getsubopt, libc_getsubopt);
 DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp);
 DEFINE_PUBLIC_ALIAS(mkstemp, libc_mkstemp);
 DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
+DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
 DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
 DEFINE_PUBLIC_ALIAS(_strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_ALIAS(__strtol_l, libc_strtol_l);

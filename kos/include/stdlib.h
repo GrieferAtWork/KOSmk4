@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ff453a2 */
+/* HASH CRC-32:0xf5f93e89 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1987,7 +1987,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mkdtemp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,setkey,(char const *__key),(__key))
 #endif /* !__setkey_defined && __CRT_HAVE_setkey */
 __CDECLARE_OPT(,int,__NOTHROW_NCX,grantpt,(__fd_t __fd),(__fd))
-__CDECLARE_OPT(,int,__NOTHROW_NCX,unlockpt,(__fd_t __fd),(__fd))
+#ifdef __CRT_HAVE_unlockpt
+__CDECLARE(,int,__NOTHROW_NCX,unlockpt,(__fd_t __fd),(__fd))
+#else /* __CRT_HAVE_unlockpt */
+#include <asm/os/tty.h>
+#if defined(__CRT_HAVE_ioctl) && defined(__TIOCSPTLCK)
+#include <libc/local/stdlib/unlockpt.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(unlockpt, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL unlockpt)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unlockpt))(__fd); })
+#endif /* __CRT_HAVE_ioctl && __TIOCSPTLCK */
+#endif /* !__CRT_HAVE_unlockpt */
 #ifdef __CRT_HAVE_ptsname
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated with the master descriptor `FD' */

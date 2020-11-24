@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7218a67c */
+/* HASH CRC-32:0x81363768 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -484,7 +484,6 @@
 #define __stub_ttyslot
 #define __stub_tzset
 #define __stub_ulckpwdf
-#define __stub_unlockpt
 #define __stub_updwtmp
 #define __stub_updwtmpx
 #define __stub___uselocale

@@ -1778,7 +1778,14 @@ char *mkdtemp([[nonnull]] char *template_) {
 int grantpt($fd_t fd);
 
 [[decl_include("<bits/types.h>")]]
-int unlockpt($fd_t fd);
+[[requires_include("<asm/os/tty.h>")]]
+[[requires($has_function(ioctl) && defined(__TIOCSPTLCK))]]
+int unlockpt($fd_t fd) {
+	int action = 0;
+	if (ioctl(fd, __TIOCSPTLCK, &action))
+		return -1;
+	return 0;
+}
 
 @@Returns the name of the PTY slave (Pseudo TTY slave)
 @@associated with the master descriptor `FD'
