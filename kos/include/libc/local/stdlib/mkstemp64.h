@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ca81ddf */
+/* HASH CRC-32:0x270c0904 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,36 +21,42 @@
 #ifndef __local_mkstemp64_defined
 #define __local_mkstemp64_defined 1
 #include <__crt.h>
-#if defined(__CRT_HAVE_mkstemp) || defined(__CRT_HAVE_mkstemp64) || defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
+#include <asm/os/fcntl.h>
+#if defined(__CRT_HAVE_mkstemps64) || (defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)) || defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Dependency: mkstemp from stdlib */
-#ifndef __local___localdep_mkstemp_defined
-#define __local___localdep_mkstemp_defined 1
-#if defined(__CRT_HAVE_mkstemp64) && defined(__USE_FILE_OFFSET64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_mkstemp,(char *__template_),mkstemp64,(__template_))
-#elif defined(__CRT_HAVE_mkstemp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_mkstemp,(char *__template_),mkstemp,(__template_))
-#elif defined(__CRT_HAVE_mkstemp64)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_mkstemp,(char *__template_),mkstemp64,(__template_))
-#elif defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
+/* Dependency: mkstemps64 from stdlib */
+#ifndef __local___localdep_mkstemps64_defined
+#define __local___localdep_mkstemps64_defined 1
+#ifdef __CRT_HAVE_mkstemps64
 __NAMESPACE_LOCAL_END
-#include <libc/local/stdlib/mkstemp.h>
+#include <features.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_mkstemp __LIBC_LOCAL_NAME(mkstemp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps64,(__template_,__suffixlen))
+#elif defined(__CRT_HAVE_mkstemps) && (!defined(__O_LARGEFILE) || !__O_LARGEFILE)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_mkstemps64,(char *__template_, __STDC_INT_AS_SIZE_T __suffixlen),mkstemps,(__template_,__suffixlen))
+#elif defined(__CRT_HAVE_mkostemps) || defined(__CRT_HAVE_mkostemps64) || defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+__NAMESPACE_LOCAL_END
+#include <libc/local/stdlib/mkstemps64.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_mkstemps64 __LIBC_LOCAL_NAME(mkstemps64)
 #else /* ... */
-#undef __local___localdep_mkstemp_defined
+#undef __local___localdep_mkstemps64_defined
 #endif /* !... */
-#endif /* !__local___localdep_mkstemp_defined */
-__LOCAL_LIBC(mkstemp64) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkstemp64))(char *__template_) {
-	return __localdep_mkstemp(__template_);
+#endif /* !__local___localdep_mkstemps64_defined */
+__LOCAL_LIBC(mkstemp64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mkstemp64))(char *__template_) {
+	return __localdep_mkstemps64(__template_, 0);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_mkstemp64_defined
 #define __local___localdep_mkstemp64_defined 1
 #define __localdep_mkstemp64 __LIBC_LOCAL_NAME(mkstemp64)
 #endif /* !__local___localdep_mkstemp64_defined */
-#else /* __CRT_HAVE_mkstemp || __CRT_HAVE_mkstemp64 || __CRT_HAVE_mktemp || __CRT_HAVE__mktemp || __CRT_HAVE___mktemp */
+#else /* __CRT_HAVE_mkstemps64 || (__CRT_HAVE_mkstemps && (!__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_mkostemps || __CRT_HAVE_mkostemps64 || __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
 #undef __local_mkstemp64_defined
-#endif /* !__CRT_HAVE_mkstemp && !__CRT_HAVE_mkstemp64 && !__CRT_HAVE_mktemp && !__CRT_HAVE__mktemp && !__CRT_HAVE___mktemp */
+#endif /* !__CRT_HAVE_mkstemps64 && (!__CRT_HAVE_mkstemps || (__O_LARGEFILE && __O_LARGEFILE)) && !__CRT_HAVE_mkostemps && !__CRT_HAVE_mkostemps64 && !__CRT_HAVE_open64 && !__CRT_HAVE___open64 && !__CRT_HAVE_open && !__CRT_HAVE__open && !__CRT_HAVE___open && (!__AT_FDCWD || (!__CRT_HAVE_openat64 && !__CRT_HAVE_openat)) */
 #endif /* !__local_mkstemp64_defined */

@@ -55,6 +55,7 @@
 #include <hybrid/typecore.h>
 
 #include <asm/crt/stdlib.h>
+#include <asm/os/oflags.h> /* __O_LARGEFILE */
 #include <asm/os/stdlib.h>
 #include <bits/types.h>
 #include <kos/anno.h>
@@ -1373,9 +1374,22 @@ int on_exit([[nonnull]] __on_exit_func_t func, void *arg);
 int clearenv();
 
 %[default:section(".text.crt{|.dos}.fs.utility")]
-[[wunused]]
+
+@@>> mkstemps(3), mkstemps64(3)
+@@Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+@@`suffixlen' more characters that are left alone), which must be filled with
+@@all 'X'-characters before the call (else errno=EINVAL + return -1), with
+@@random characters such that the filename described by `TEMPLATE' will not
+@@already exists. Then, create a new file with `O_RDWR' and return the file
+@@descriptor of that file.
+@@@param: suffixlen: The # of trailing characters to-be ignored
+@@                   after the required 6 trailing 'X'-characters.
+[[wunused, decl_include("<features.h>", "<bits/types.h>")]]
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemps64")]]
-int mkstemps([[nonnull]] char *template_, int suffixlen);
+[[wunused, export_alias("mkstemps64"), requires_function(mkostemps)]]
+$fd_t mkstemps([[nonnull]] char *template_, __STDC_INT_AS_SIZE_T suffixlen) {
+	return mkostemps(template_, suffixlen, 0);
+}
 
 [[wunused, ATTR_PURE]]
 [[section(".text.crt{|.dos}.utility.locale")]]
@@ -1389,8 +1403,11 @@ int rpmatch([[nonnull]] char const *response) {
 }
 
 %#ifdef __USE_LARGEFILE64
-[[alias("mkstemps"), wunused, largefile64_variant_of(mkstemps)]]
-int mkstemps64([[nonnull]] char *template_, int suffixlen);
+[[alias("mkstemps64"), nocrt, largefile64_variant_of(mkstemps)]]
+[[wunused, requires_function(mkostemps64), decl_include("<features.h>", "<bits/types.h>")]]
+$fd_t mkstemps64([[nonnull]] char *template_, __STDC_INT_AS_SIZE_T suffixlen) {
+	return mkostemps64(template_, suffixlen, 0);
+}
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_MISC */
 
@@ -1615,8 +1632,23 @@ int unsetenv([[nonnull]] char const *varname) {
 %#if (defined(__USE_MISC) || \
 %     (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8)))
 %[default:section(".text.crt{|.dos}.fs.utility")]
+
+@@>> mktemp(3)
+@@Badly designed version of `mkstemp' that won't actually create
+@@the temporary file, meaning that by the time the caller tries to
+@@create the file themselves, another process may have already
+@@created it.
+@@Also: when no temporary filename can be created, rather than
+@@      returning something sensible like `NULL', this function
+@@      will instead set `TEMPLATE' to an empty string, and still
+@@      re-return it like it would if everything had worked!
 [[guard, alias("_mktemp"), export_alias("__mktemp")]]
-char *mktemp([[nonnull]] char *template_);
+[[requires(($has_function(open) || $has_function(stat)) && $has_function(system_mktemp))]]
+[[nonnull]] char *mktemp([[nonnull]] char *template_) {
+	if (system_mktemp(2, template_, 0, 0) )
+		*template_ = 0;
+	return template_;
+}
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) */
 
 
@@ -1697,27 +1729,45 @@ int getsubopt([[nonnull]] char **__restrict optionp,
 }
 
 %[default:section(".text.crt{|.dos}.fs.utility")]
-[[wunused, alias("mkstemp64")]]
+
+@@>> mkstemp(3), mkstemp64(3)
+@@Replace the last 6 characters of `TEMPLATE', which must be filled with
+@@all 'X'-characters before the call (else errno=EINVAL + return -1),
+@@with random characters such that the filename described by `TEMPLATE'
+@@will not already exists. Then, create a new file with `O_RDWR' and return
+@@the file descriptor of that file.
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkstemp64")]]
-[[userimpl, requires_function(mktemp)]]
-int mkstemp([[nonnull]] char *template_) {
-	return mktemp(template_) ? 0 : -1;
+[[cp, wunused, export_alias("mkstemp64"), requires_function(mkstemps)]]
+[[decl_include("<bits/types.h>")]]
+$fd_t mkstemp([[nonnull]] char *template_) {
+	return mkstemps(template_, 0);
 }
 
 %#ifdef __USE_LARGEFILE64
-[[wunused, alias("mkstemp64")]]
-[[userimpl, requires_function(mkstemp)]]
-[[largefile64_variant_of(mkstemp)]]
-int mkstemp64([[nonnull]] char *template_) {
-	return mkstemp(template_);
+[[cp, alias("mkstemp64"), nocrt, alt_variant_of(mkstemp)]]
+[[wunused, requires_function(mkstemps64)]]
+[[decl_include("<bits/types.h>")]]
+$fd_t mkstemp64([[nonnull]] char *template_) {
+	return mkstemps64(template_, 0);
 }
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 %
 %#ifdef __USE_XOPEN2K8
-[[wunused, guard, alias("_mktemp")]]
-char *mkdtemp([[nonnull]] char *template_);
+@@>> mkdtemp(3)
+@@Replace the last 6 characters of `TEMPLATE', which must be filled with
+@@all 'X'-characters before the call (else errno=EINVAL + return -1),
+@@with random characters such that the pathname described by `TEMPLATE'
+@@will not already exists. Then, create a new directory with `mode=0700',
+@@and re-return `template_' to indicate success.
+@@On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined.
+[[cp, wunused, requires_function(mkdir, system_mktemp)]]
+char *mkdtemp([[nonnull]] char *template_) {
+	if (system_mktemp(1, template_, 0, 0) )
+		template_ = NULL;
+	return template_;
+}
 %#endif /* __USE_XOPEN2K8 */
 
 %
@@ -1860,20 +1910,258 @@ int getpt();
 char *canonicalize_file_name([[nonnull]] char const *filename);
 
 %[default:section(".text.crt{|.dos}.fs.utility")]
+
+@@>> mkostemp(3), mkostemp64(3)
+@@Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+@@`suffixlen' more characters that are left alone), which must be filled with
+@@all 'X'-characters before the call (else errno=EINVAL + return -1), with
+@@random characters such that the filename described by `TEMPLATE' will not
+@@already exists. Then, create a new file with `O_RDWR | flags' and return the file
+@@descriptor of that file.
+@@@param: flags: Additional flags to pass to `open(2)',
+@@               but `O_ACCMODE' is always set to `O_RDWR'
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemp64")]]
-[[cp, wunused, alias("mkostemp64")]]
-int mkostemp([[nonnull]] char *template_, int flags);
+[[wunused, export_alias("mkostemp64"), requires_function(mkostemps)]]
+[[decl_include("<bits/types.h>")]]
+$fd_t mkostemp([[nonnull]] char *template_, $oflag_t flags) {
+	return mkostemps(template_, 0, flags);
+}
 
 [[if(defined(__USE_FILE_OFFSET64)), preferred_alias("mkostemps64")]]
-[[cp, wunused, alias("mkostemps64")]]
-int mkostemps([[nonnull]] char *template_, int suffixlen, int flags);
+[[wunused, export_alias("mkostemps64")]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
+[[requires_function(open, system_mktemp)]]
+$fd_t mkostemps([[nonnull]] char *template_,
+                __STDC_INT_AS_SIZE_T suffixlen,
+                $oflag_t flags) {
+	return system_mktemp(0, template_, suffixlen, flags);
+}
+
+@@Internal implementation for creating temporary files.
+@@@param: what: Select what kind of temporary object to create.
+@@                 `0': Create a temporary file. (The handle of that file will be returned)
+@@                      Creating mode used is 0600
+@@                      This mode is only recognized when `$has_function(open)'
+@@                 `1': Create a temporary directory. (0 is returned on success)
+@@                      Creating mode used is 0700
+@@                      This mode is only recognized when `$has_function(mkdir)'
+@@                      NOTE: `flags' is ignored in this mode
+@@                 `2': Braindead `mktemp(3)'-mode: Like `0', but don't actually create the
+@@                      file. Instead, return `0' on success
+@@                      This mode is only recognized when `$has_function(open) || $has_function(stat)'
+@@                      NOTE: `flags' is ignored in this mode
+[[cp, static, wunused]]
+[[impl_include("<libc/errno.h>")]]
+[[impl_include("<asm/os/oflags.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]] /* __TMP_MAX */
+[[impl_include("<bits/os/timeval.h>")]]
+[[impl_include("<bits/os/stat.h>")]]
+[[impl_include("<hybrid/__overflow.h>")]]
+$fd_t system_mktemp(unsigned int what, [[nonnull]] char *template_,
+                    __STDC_INT_AS_SIZE_T suffixlen, $oflag_t flags) {
+	/* Selection of random letters which may appear as replacements for XXXXXX
+	 * For this purpose, only use lower-case letters, as well as digits.
+	 * We could also use upper-case letters, but that may not work correctly
+	 * depending on the calling process running in DOS-mode, or flags containing
+	 * O_DOSPATH... */
+	static char const letters[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+#define NUM_LETTERS 36
+	char *xloc = strend(template_) - (suffixlen + 6);
+	uint32_t seed, overflow;
+	size_t i, attempt;
+	fd_t result;
+	/* Verify the validity of the input template. */
+	if unlikely(xloc < template_ || memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
+@@pp_ifdef EINVAL@@
+		return __libc_seterrno(EINVAL);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	/* Calculate an initial, random seed.
+	 * For this purpose, try to make use of:
+	 *   - gettimeofday()
+	 *   - gettid() or getpid()
+	 *   - rand() */
+	attempt = 0;
+again:
+	{
+@@pp_if $has_function(gettimeofday64) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__@@
+		struct timeval64 tv;
+		if (gettimeofday64(&tv, NULL) == 0) {
+			seed = (uint32_t)(tv.@tv_sec@) ^
+			       (uint32_t)(tv.@tv_sec@ >> 32) ^
+			       (uint32_t)(tv.@tv_usec@ << 12); /* The max value is 0xf423f, so shift
+			                                        * that to become `0xf423f000', thus
+			                                        * filling in the upper bits of `seed' */
+		} else
+@@pp_elif $has_function(gettimeofday)@@
+		struct timeval tv;
+		if (gettimeofday(&tv, NULL) == 0) {
+			seed = (uint32_t)(tv.@tv_sec@) ^
+@@pp_if __SIZEOF_TIME_T__ > 4@@
+			       (uint32_t)(tv.@tv_sec@ >> 32) ^
+@@pp_endif@@
+			       (uint32_t)(tv.@tv_usec@ << 12); /* The max value is 0xf423f, so shift
+			                                        * that to become `0xf423f000', thus
+			                                        * filling in the upper bits of `seed' */
+		} else
+@@pp_endif@@
+		{
+			uint32_t sum;
+@@pp_ifdef __RAND_MAX@@
+#define LIBC_RAND_MAX __RAND_MAX
+@@pp_else@@
+#define LIBC_RAND_MAX 0x7fff
+@@pp_endif@@
+			seed = sum = 0;
+			/* Generate at least 32 bits of random data. */
+			do {
+				seed *= LIBC_RAND_MAX;
+				seed += (uint32_t)rand();
+			} while (!__hybrid_overflow_uadd(sum, LIBC_RAND_MAX, &sum));
+#undef LIBC_RAND_MAX
+		}
+	}
+@@pp_if $has_function(gettid)@@
+	seed ^= gettid();
+@@pp_elif $has_function(getpid)@@
+	seed ^= getpid();
+@@pp_endif@@
+
+	/* Using the seed, generate some initial random data.
+	 * We've generated 32 bits of entropy above, and with
+	 * a total of 6 characters to generate from a pool of
+	 * 36 letters each, this 5.333(rep) bits per digit. */
+	overflow = seed >> 30;
+	for (i = 0; i < 6; ++i) {
+		unsigned int digit;
+	    digit = seed & 0x1f;                      /* digit in 0-31 */
+		digit += overflow & ((1 << (i & 3)) - 1); /* Add a random addend between 0-7 */
+		/* Right now, digit in 0-38. But because we're using 2 addend, `0' is less
+		 * likely than the other digits. As such, subtract a bit if we're not at 0
+		 * already. */
+		if (digit)
+			--digit;
+		if (digit)
+			--digit;
+		/* Now, digit in 0-36, but 36 itself would still be invalid. */
+		if (digit > 35)
+			digit = 35;
+		/* All right! we've got the digit. */
+		xloc[i] = letters[digit];
+		seed >>= 5;
+	}
+
+	/* Try to create/test the file/directory. */
+	(void)flags;
+	switch (what) {
+
+@@pp_if $has_function(open)@@
+	case 0: {
+@@pp_ifdef O_RDWR@@
+@@pp_ifdef O_ACCMODE@@
+		flags &= ~O_ACCMODE;
+@@pp_endif@@
+		flags |= O_RDWR;
+@@pp_endif@@
+@@pp_ifdef O_CREAT@@
+		flags |= O_CREAT;
+@@pp_endif@@
+@@pp_ifdef O_EXCL@@
+		flags |= O_EXCL;
+@@pp_endif@@
+		result = open(template_, flags, 0600);
+	}	break;
+@@pp_endif@@
+
+@@pp_if $has_function(mkdir)@@
+	case 1:
+		result = mkdir(template_, 0700);
+		break;
+@@pp_endif@@
+
+@@pp_if $has_function(open) || $has_function(stat)@@
+	case 2: {
+@@pp_if $has_function(stat)@@
+		struct stat st;
+		result = -stat(template_, &st);
+@@pp_else@@
+		result = open(template_,
+@@pp_ifdef O_RDONLY@@
+		              O_RDONLY
+@@pp_elif defined(O_RDWR)@@
+		              O_RDWR
+@@pp_elif defined(O_WRONLY)@@
+		              O_WRONLY
+@@pp_else@@
+		              0
+@@pp_endif@@
+		              ,
+		              0600);
+		if (result < 0) {
+			/* File doesn't already exist. */
+			result = 0;
+		} else {
+			/* File does already exist. */
+@@pp_if $has_function(close)@@
+			close(result);
+@@pp_endif@@
+@@pp_ifdef EEXIST@@
+			result = __libc_seterrno(EEXIST);
+@@pp_else@@
+			result = __libc_seterrno(1);
+@@pp_endif@@
+#define NEED_do_try_again
+			goto do_try_again;
+		}
+@@pp_endif@@
+	}	break;
+@@pp_endif@@
+
+	default: __builtin_unreachable();
+	}
+	if (result == -1) {
+		/* Only re-attempt if the error was that the file already existed. */
+@@pp_if defined(__libc_geterrno) && defined(EEXIST)@@
+		if (__libc_geterrno() == EEXIST)
+@@pp_endif@@
+		{
+@@pp_ifdef NEED_do_try_again@@
+#undef NEED_do_try_again
+do_try_again:
+@@pp_endif@@
+			/* Limit the max # of attempts */
+@@pp_ifdef __TMP_MAX@@
+			if (attempt < __TMP_MAX)
+@@pp_else@@
+			if (attempt < 238328)
+@@pp_endif@@
+			{
+				++attempt;
+				goto again;
+			}
+		}
+	}
+	return result;
+}
+
 
 %#ifdef __USE_LARGEFILE64
-[[cp, wunused, largefile64_variant_of(mkostemp)]]
-int mkostemp64([[nonnull]] char *template_, int flags);
+[[alias("mkostemp64"), nocrt, largefile64_variant_of(mkostemp)]]
+[[wunused, requires_function(mkostemps64), decl_include("<bits/types.h>")]]
+$fd_t mkostemp64([[nonnull]] char *template_, $oflag_t flags) {
+	return mkostemps64(template_, 0, flags);
+}
 
-[[cp, wunused, largefile64_variant_of(mkostemps)]]
-int mkostemps64([[nonnull]] char *template_, int suffixlen, int flags);
+[[wunused, alias("mkostemps64"), nocrt, largefile64_variant_of(mkostemps)]]
+[[requires_function(mkostemps), decl_include("<features.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/oflags.h>")]]
+$fd_t mkostemps64([[nonnull]] char *template_,
+                  __STDC_INT_AS_SIZE_T suffixlen,
+                  $oflag_t flags) {
+	return mkostemps(template_, suffixlen, flags | __O_LARGEFILE);
+}
 %#endif /* __USE_LARGEFILE64 */
 %#endif /* __USE_GNU */
 

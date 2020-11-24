@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccbf8650 */
+/* HASH CRC-32:0x5d580bc6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1862,9 +1862,9 @@ DEFINE_PUBLIC_ALIAS(DOS$srandom_r, libd_srandom_r);
 DEFINE_PUBLIC_ALIAS(DOS$initstate_r, libd_initstate_r);
 DEFINE_PUBLIC_ALIAS(DOS$setstate_r, libd_setstate_r);
 DEFINE_PUBLIC_ALIAS(DOS$on_exit, libd_on_exit);
+DEFINE_PUBLIC_ALIAS(DOS$mkstemps64, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemps, libd_mkstemps);
 DEFINE_PUBLIC_ALIAS(DOS$rpmatch, libd_rpmatch);
-DEFINE_PUBLIC_ALIAS(DOS$mkstemps64, libd_mkstemps64);
 DEFINE_PUBLIC_ALIAS(DOS$rand_r, libd_rand_r);
 DEFINE_PUBLIC_ALIAS(DOS$getloadavg, libd_getloadavg);
 DEFINE_PUBLIC_ALIAS(DOS$erand48, libd_erand48);
@@ -1893,8 +1893,8 @@ DEFINE_PUBLIC_ALIAS(DOS$ecvt, libd_ecvt);
 DEFINE_PUBLIC_ALIAS(DOS$_ecvt, libd_fcvt);
 DEFINE_PUBLIC_ALIAS(DOS$fcvt, libd_fcvt);
 DEFINE_PUBLIC_ALIAS(DOS$getsubopt, libd_getsubopt);
+DEFINE_PUBLIC_ALIAS(DOS$mkstemp64, libd_mkstemp);
 DEFINE_PUBLIC_ALIAS(DOS$mkstemp, libd_mkstemp);
-DEFINE_PUBLIC_ALIAS(DOS$mkstemp64, libd_mkstemp64);
 DEFINE_PUBLIC_ALIAS(DOS$mkdtemp, libd_mkdtemp);
 DEFINE_PUBLIC_ALIAS(DOS$grantpt, libd_grantpt);
 DEFINE_PUBLIC_ALIAS(DOS$unlockpt, libd_unlockpt);
@@ -1925,10 +1925,10 @@ DEFINE_PUBLIC_ALIAS(DOS$__secure_getenv, libd_secure_getenv);
 DEFINE_PUBLIC_ALIAS(DOS$secure_getenv, libd_secure_getenv);
 DEFINE_PUBLIC_ALIAS(DOS$ptsname_r, libd_ptsname_r);
 DEFINE_PUBLIC_ALIAS(DOS$canonicalize_file_name, libd_canonicalize_file_name);
+DEFINE_PUBLIC_ALIAS(DOS$mkostemp64, libd_mkostemp);
 DEFINE_PUBLIC_ALIAS(DOS$mkostemp, libd_mkostemp);
+DEFINE_PUBLIC_ALIAS(DOS$mkostemps64, libd_mkostemps);
 DEFINE_PUBLIC_ALIAS(DOS$mkostemps, libd_mkostemps);
-DEFINE_PUBLIC_ALIAS(DOS$mkostemp64, libd_mkostemp64);
-DEFINE_PUBLIC_ALIAS(DOS$mkostemps64, libd_mkostemps64);
 DEFINE_PUBLIC_ALIAS(DOS$reallocf, libd_reallocf);
 DEFINE_PUBLIC_ALIAS(DOS$recallocarray, libd_recallocarray);
 DEFINE_PUBLIC_ALIAS(DOS$freezero, libd_freezero);

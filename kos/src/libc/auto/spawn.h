@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b8e8c9c */
+/* HASH CRC-32:0xe031ddc0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -376,12 +376,6 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_d
  * Finalize the given spawn-file-actions object `file_actions'
  * @return: 0 : Success */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Helper functions for allocating an a new file-spawn action entry */
-INTDEF WUNUSED NONNULL((1)) struct __spawn_action *NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_alloc)(posix_spawn_file_actions_t *__restrict file_actions);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* Helper functions for allocating an a new file-spawn action entry */
 INTDEF WUNUSED NONNULL((1)) struct __spawn_action *NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_alloc)(posix_spawn_file_actions_t *__restrict file_actions);
 #endif /* !__KERNEL__ */

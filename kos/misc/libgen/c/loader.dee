@@ -1004,6 +1004,7 @@ class FunctionFeatures {
 			guard            = false;
 			crt_noSelfImport = true;
 			crt_noSelfExport = true;
+			crt_noDosWrapper = true; /* Can be re-enabled if ~really~ needed... */
 			goto oneword_nocond;
 
 		case "nocrt":

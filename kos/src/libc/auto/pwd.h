@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42507299 */
+/* HASH CRC-32:0xa314e08e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,20 +112,6 @@ INTDEF NONNULL((1, 2, 3, 4, 6)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwnam_r)(F
  * @return: 0 : (*result == NULL) No entry for `name'
  * @return: * : Error (one of `E*' from `<errno.h>') */
 INTDEF NONNULL((1, 2, 3, 4, 6)) errno_t NOTHROW_RPC(LIBCCALL libc_fgetpwnam_r)(FILE *__restrict stream, const char *__restrict name, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Filtered read from `stream'
- * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
- * @param: filtered_name: When not `NULL', require this username
- * @return: 0 :     Success (`*result' is made to point at `resultbuf')
- * @return: ENOENT: The last entry has already been read, or no entry matches the given `filtered_*'
- *                  Note that in this case, `errno' will have not been changed
- * @return: ERANGE: The given `buflen' is too small (pass a larger value and try again)
- *                  Note that in this case, `errno' will have also been set to `ERANGE'
- * @return: * :     Error (one of `E*' from `<errno.h>') */
-INTDEF NONNULL((1, 2, 3, 5)) errno_t NOTHROW_RPC(LIBDCALL libd_fgetpwfiltered_r)(FILE *__restrict stream, struct passwd *__restrict resultbuf, char *__restrict buffer, size_t buflen, struct passwd **__restrict result, uid_t filtered_uid, char const *filtered_name);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* Filtered read from `stream'
  * @param: filtered_uid:  When not equal to `(uid_t)-1', require this UID
  * @param: filtered_name: When not `NULL', require this username

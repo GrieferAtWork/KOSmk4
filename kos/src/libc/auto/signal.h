@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa277a172 */
+/* HASH CRC-32:0x8b0f8538 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -397,7 +397,6 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss, struct sigst
  * @return: 0:  Success
  * @return: -1: Error (s.a. `errno') */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_sigaltstack)(struct sigaltstack const *ss, struct sigaltstack *oss);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_set_single_signal_action)(int sig, int how);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF int NOTHROW_NCX(LIBCCALL libc_set_single_signal_action)(int sig, int how);

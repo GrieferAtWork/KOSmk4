@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5e1d259 */
+/* HASH CRC-32:0xec0c6c92 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -277,14 +277,36 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_srandom_r)(unsigned int seed, 
 INTDEF NONNULL((2, 4)) int NOTHROW_NCX(LIBDCALL libd_initstate_r)(unsigned int seed, char *__restrict statebuf, size_t statelen, struct random_data *__restrict buf);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setstate_r)(char *__restrict statebuf, struct random_data *__restrict buf);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_on_exit)(__on_exit_func_t func, void *arg);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mkstemps)(char *template_, int suffixlen);
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `TEMPLATE' will not
+ * already exists. Then, create a new file with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The # of trailing characters to-be ignored
+ *                    after the required 6 trailing 'X'-characters. */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkstemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `TEMPLATE' will not
+ * already exists. Then, create a new file with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The # of trailing characters to-be ignored
+ *                    after the required 6 trailing 'X'-characters. */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_rpmatch)(char const *response);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mkstemps64)(char *template_, int suffixlen);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_rand_r)(unsigned int *__restrict pseed);
 INTDEF int NOTHROW_RPC(LIBDCALL libd_getloadavg)(double loadavg[], __STDC_INT_AS_SIZE_T nelem);
 INTDEF NONNULL((1)) double NOTHROW_NCX(LIBDCALL libd_erand48)(unsigned short xsubi[3]);
@@ -339,7 +361,30 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBDCALL libd_frealpath4)(fd_t fd, char *resolv
 INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBDCALL libd_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t buflen, atflag_t flags);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname, char const *val, int replace);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname);
-INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_mktemp)(char *template_);
+/* >> mktemp(3)
+ * Badly designed version of `mkstemp' that won't actually create
+ * the temporary file, meaning that by the time the caller tries to
+ * create the file themselves, another process may have already
+ * created it.
+ * Also: when no temporary filename can be created, rather than
+ *       returning something sensible like `NULL', this function
+ *       will instead set `TEMPLATE' to an empty string, and still
+ *       re-return it like it would if everything had worked! */
+INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_mktemp)(char *template_);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mktemp(3)
+ * Badly designed version of `mkstemp' that won't actually create
+ * the temporary file, meaning that by the time the caller tries to
+ * create the file themselves, another process may have already
+ * created it.
+ * Also: when no temporary filename can be created, rather than
+ *       returning something sensible like `NULL', this function
+ *       will instead set `TEMPLATE' to an empty string, and still
+ *       re-return it like it would if everything had worked! */
+INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF WUNUSED NONNULL((3, 4)) char *NOTHROW_NCX(LIBDCALL libd_ecvt)(double val, int ndigit, int *__restrict decptr, int *__restrict sign);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -358,9 +403,44 @@ INTDEF WUNUSED NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBDCALL libd_getsubopt)(char 
 INTDEF WUNUSED NONNULL((1, 2, 3)) int NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp, char *const *__restrict tokens, char **__restrict valuep);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mkstemp)(char *template_);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_mkstemp64)(char *template_);
-INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_mkdtemp)(char *template_);
+/* >> mkstemp(3), mkstemp64(3)
+ * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1),
+ * with random characters such that the filename described by `TEMPLATE'
+ * will not already exists. Then, create a new file with `O_RDWR' and return
+ * the file descriptor of that file. */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBDCALL libd_mkstemp)(char *template_);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mkstemp(3), mkstemp64(3)
+ * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1),
+ * with random characters such that the filename described by `TEMPLATE'
+ * will not already exists. Then, create a new file with `O_RDWR' and return
+ * the file descriptor of that file. */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> mkdtemp(3)
+ * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1),
+ * with random characters such that the pathname described by `TEMPLATE'
+ * will not already exists. Then, create a new directory with `mode=0700',
+ * and re-return `template_' to indicate success.
+ * On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined. */
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_mkdtemp)(char *template_);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mkdtemp(3)
+ * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1),
+ * with random characters such that the pathname described by `TEMPLATE'
+ * will not already exists. Then, create a new directory with `mode=0700',
+ * and re-return `template_' to indicate success.
+ * On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined. */
+INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_mkdtemp)(char *template_);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF int NOTHROW_NCX(LIBDCALL libd_grantpt)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBDCALL libd_unlockpt)(fd_t fd);
 /* Returns the name of the PTY slave (Pseudo TTY slave)
@@ -423,10 +503,50 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd, char *buf,
 /* Return the result of `realpath(filename)' as a `malloc()'-allocated buffer
  * Upon error, `NULL' is returned instead */
 INTDEF ATTR_MALLOC WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBDCALL libd_canonicalize_file_name)(char const *filename);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mkostemp)(char *template_, int flags);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mkostemps)(char *template_, int suffixlen, int flags);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mkostemp64)(char *template_, int flags);
-INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mkostemps64)(char *template_, int suffixlen, int flags);
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `TEMPLATE' will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional flags to pass to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkostemp)(char *template_, oflag_t flags);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `TEMPLATE' will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional flags to pass to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkostemp)(char *template_, oflag_t flags);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBDCALL libd_mkostemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen, oflag_t flags);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF WUNUSED NONNULL((1)) fd_t NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *template_, __STDC_INT_AS_SIZE_T suffixlen, oflag_t flags);
+/* Internal implementation for creating temporary files.
+ * @param: what: Select what kind of temporary object to create.
+ *                  `0': Create a temporary file. (The handle of that file will be returned)
+ *                       Creating mode used is 0600
+ *                       This mode is only recognized when `$has_function(open)'
+ *                  `1': Create a temporary directory. (0 is returned on success)
+ *                       Creating mode used is 0700
+ *                       This mode is only recognized when `$has_function(mkdir)'
+ *                       NOTE: `flags' is ignored in this mode
+ *                  `2': Braindead `mktemp(3)'-mode: Like `0', but don't actually create the
+ *                       file. Instead, return `0' on success
+ *                       This mode is only recognized when `$has_function(open) || $has_function(stat)'
+ *                       NOTE: `flags' is ignored in this mode */
+INTDEF WUNUSED NONNULL((2)) fd_t NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what, char *template_, __STDC_INT_AS_SIZE_T suffixlen, oflag_t flags);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBDCALL libd_reallocf)(void *mallptr, size_t num_bytes);
 /* Same as `recallocv(mallptr, new_elem_count, elem_size)', but also ensure that
  * when `mallptr != NULL', memory pointed to by the old `mallptr...+=old_elem_count*elem_size'

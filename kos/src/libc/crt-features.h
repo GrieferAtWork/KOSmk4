@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcef23ed6 */
+/* HASH CRC-32:0x6d768a81 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -891,7 +891,6 @@
 #define __CRT_HAVE_DOS$fgetpos_unlocked
 #define __CRT_HAVE_DOS$fgetpwent
 #define __CRT_HAVE_DOS$fgetpwent_r
-#define __CRT_HAVE_DOS$fgetpwfiltered_r
 #define __CRT_HAVE_DOS$fgetpwnam_r
 #define __CRT_HAVE_DOS$fgetpwuid_r
 #define __CRT_HAVE_DOS$fgets
@@ -1717,13 +1716,9 @@
 #define __CRT_HAVE_DOS$mknod
 #define __CRT_HAVE_DOS$mknodat
 #define __CRT_HAVE_DOS$mkostemp
-#define __CRT_HAVE_DOS$mkostemp64
 #define __CRT_HAVE_DOS$mkostemps
-#define __CRT_HAVE_DOS$mkostemps64
 #define __CRT_HAVE_DOS$mkstemp
-#define __CRT_HAVE_DOS$mkstemp64
 #define __CRT_HAVE_DOS$mkstemps
-#define __CRT_HAVE_DOS$mkstemps64
 #define __CRT_HAVE_DOS$mktemp
 #define __CRT_HAVE_DOS$mktime
 #define __CRT_HAVE_DOS$mktime64
@@ -1834,7 +1829,6 @@
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_adddup2
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addopen
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_addtcsetpgrp_np
-#define __CRT_HAVE_DOS$posix_spawn_file_actions_alloc
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_destroy
 #define __CRT_HAVE_DOS$posix_spawn_file_actions_init
 #define __CRT_HAVE_DOS$posix_spawnattr_destroy
@@ -2199,7 +2193,6 @@
 #define __CRT_HAVE_DOS$sendmsg
 #define __CRT_HAVE_DOS$sendto
 #define __CRT_HAVE_DOS$set_exception_handler
-#define __CRT_HAVE_DOS$set_single_signal_action
 #define __CRT_HAVE_DOS$setbuf
 #define __CRT_HAVE_DOS$setbuffer
 #define __CRT_HAVE_DOS$setdomainname
@@ -4755,13 +4748,9 @@
 #define __CRT_HAVE_mknod
 #define __CRT_HAVE_mknodat
 #define __CRT_HAVE_mkostemp
-#define __CRT_HAVE_mkostemp64
 #define __CRT_HAVE_mkostemps
-#define __CRT_HAVE_mkostemps64
 #define __CRT_HAVE_mkstemp
-#define __CRT_HAVE_mkstemp64
 #define __CRT_HAVE_mkstemps
-#define __CRT_HAVE_mkstemps64
 #define __CRT_HAVE_mktemp
 #define __CRT_HAVE_mktime
 #define __CRT_HAVE_mktime64
@@ -5561,6 +5550,7 @@
 #define __CRT_HAVE_syslog
 #define __CRT_HAVE_syslog_printer
 #define __CRT_HAVE_system
+#define __CRT_HAVE_system_mktemp
 #define __CRT_HAVE_sysv_signal
 #define __CRT_HAVE_tan
 #define __CRT_HAVE_tanf

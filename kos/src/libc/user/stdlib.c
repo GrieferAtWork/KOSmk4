@@ -1110,38 +1110,8 @@ NOTHROW_NCX(LIBCCALL libc_setstate_r)(char *__restrict statebuf,
 }
 /*[[[end:libc_setstate_r]]]*/
 
-/*[[[head:libc_mkstemps,hash:CRC-32=0xfd5623f5]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_,
-                                    int suffixlen)
-/*[[[body:libc_mkstemps]]]*/
-/*AUTO*/{
-	(void)template_;
-	(void)suffixlen;
-	CRT_UNIMPLEMENTEDF("mkstemps(%q, %x)", template_, suffixlen); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_mkstemps]]]*/
 
 
-/*[[[head:libc_mkstemps64,hash:CRC-32=0xdfb71f3]]]*/
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
-DEFINE_INTERN_ALIAS(libc_mkstemps64, libc_mkstemps);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_mkstemps64)(char *template_,
-                                      int suffixlen)
-/*[[[body:libc_mkstemps64]]]*/
-/*AUTO*/{
-	(void)template_;
-	(void)suffixlen;
-	CRT_UNIMPLEMENTEDF("mkstemps64(%q, %x)", template_, suffixlen); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_mkstemps64]]]*/
 
 /*[[[head:libc_getloadavg,hash:CRC-32=0x5e8ab693]]]*/
 INTERN ATTR_SECTION(".text.crt.system.utility") int
@@ -1509,53 +1479,6 @@ done:
 }
 /*[[[end:libc_frealpathat]]]*/
 
-/*[[[head:libc_mktemp,hash:CRC-32=0x4ab0ffae]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.utility") NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_)
-/*[[[body:libc_mktemp]]]*/
-/*AUTO*/{
-	(void)template_;
-	CRT_UNIMPLEMENTEDF("mktemp(%q)", template_); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_mktemp]]]*/
-
-/*[[[head:libc_mkstemp,hash:CRC-32=0x3fc81c66]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_mkstemp)(char *template_)
-/*[[[body:libc_mkstemp]]]*/
-/*AUTO*/{
-	return mktemp(template_) ? 0 : -1;
-}
-/*[[[end:libc_mkstemp]]]*/
-
-/*[[[head:libc_mkstemp64,hash:CRC-32=0xe2385956]]]*/
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
-DEFINE_INTERN_ALIAS(libc_mkstemp64, libc_mkstemp);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_mkstemp64)(char *template_)
-/*[[[body:libc_mkstemp64]]]*/
-/*AUTO*/{
-	return mkstemp(template_);
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_mkstemp64]]]*/
-
-/*[[[head:libc_mkdtemp,hash:CRC-32=0xeb048757]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
-NOTHROW_NCX(LIBCCALL libc_mkdtemp)(char *template_)
-/*[[[body:libc_mkdtemp]]]*/
-/*AUTO*/{
-	(void)template_;
-	CRT_UNIMPLEMENTEDF("mkdtemp(%q)", template_); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:libc_mkdtemp]]]*/
-
-
 /*[[[head:libc_grantpt,hash:CRC-32=0xd1e26f46]]]*/
 INTERN ATTR_SECTION(".text.crt.io.tty") int
 NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd)
@@ -1632,74 +1555,6 @@ NOTHROW_RPC(LIBCCALL libc_canonicalize_file_name)(char const *filename)
 	return realpath(filename, NULL);
 }
 /*[[[end:libc_canonicalize_file_name]]]*/
-
-/*[[[head:libc_mkostemp,hash:CRC-32=0xebe47ea3]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_mkostemp)(char *template_,
-                                    int flags)
-/*[[[body:libc_mkostemp]]]*/
-/*AUTO*/{
-	(void)template_;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("mkostemp(%q, %x)", template_, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_mkostemp]]]*/
-
-/*[[[head:libc_mkostemps,hash:CRC-32=0x4ddfea24]]]*/
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_mkostemps)(char *template_,
-                                     int suffixlen,
-                                     int flags)
-/*[[[body:libc_mkostemps]]]*/
-/*AUTO*/{
-	(void)template_;
-	(void)suffixlen;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("mkostemps(%q, %x, %x)", template_, suffixlen, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_mkostemps]]]*/
-
-/*[[[head:libc_mkostemp64,hash:CRC-32=0xf1a2db9f]]]*/
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
-DEFINE_INTERN_ALIAS(libc_mkostemp64, libc_mkostemp);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_mkostemp64)(char *template_,
-                                      int flags)
-/*[[[body:libc_mkostemp64]]]*/
-/*AUTO*/{
-	(void)template_;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("mkostemp64(%q, %x)", template_, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_mkostemp64]]]*/
-
-/*[[[head:libc_mkostemps64,hash:CRC-32=0x4e38af15]]]*/
-#if !defined(__O_LARGEFILE) || !__O_LARGEFILE
-DEFINE_INTERN_ALIAS(libc_mkostemps64, libc_mkostemps);
-#else /* MAGIC:alias */
-INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) int
-NOTHROW_RPC(LIBCCALL libc_mkostemps64)(char *template_,
-                                       int suffixlen,
-                                       int flags)
-/*[[[body:libc_mkostemps64]]]*/
-/*AUTO*/{
-	(void)template_;
-	(void)suffixlen;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("mkostemps64(%q, %x, %x)", template_, suffixlen, flags); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-#endif /* MAGIC:alias */
-/*[[[end:libc_mkostemps64]]]*/
 
 /*[[[skip:libc_malloc]]]*/
 /*[[[skip:libc_free]]]*/
@@ -2350,7 +2205,7 @@ NOTHROW_NCX(LIBCCALL libc_freezero)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xb2d7137f]]]*/
+/*[[[start:exports,hash:CRC-32=0x829e71a]]]*/
 DEFINE_PUBLIC_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_ALIAS(system, libc_system);
 DEFINE_PUBLIC_ALIAS(exit, libc_exit);
@@ -2376,8 +2231,6 @@ DEFINE_PUBLIC_ALIAS(initstate_r, libc_initstate_r);
 DEFINE_PUBLIC_ALIAS(setstate_r, libc_setstate_r);
 DEFINE_PUBLIC_ALIAS(on_exit, libc_on_exit);
 DEFINE_PUBLIC_ALIAS(clearenv, libc_clearenv);
-DEFINE_PUBLIC_ALIAS(mkstemps, libc_mkstemps);
-DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps64);
 DEFINE_PUBLIC_ALIAS(rand_r, libc_rand_r);
 DEFINE_PUBLIC_ALIAS(getloadavg, libc_getloadavg);
 DEFINE_PUBLIC_ALIAS(drand48, libc_drand48);
@@ -2403,11 +2256,6 @@ DEFINE_PUBLIC_ALIAS(frealpath4, libc_frealpath4);
 DEFINE_PUBLIC_ALIAS(frealpathat, libc_frealpathat);
 DEFINE_PUBLIC_ALIAS(setenv, libc_setenv);
 DEFINE_PUBLIC_ALIAS(unsetenv, libc_unsetenv);
-DEFINE_PUBLIC_ALIAS(__mktemp, libc_mktemp);
-DEFINE_PUBLIC_ALIAS(mktemp, libc_mktemp);
-DEFINE_PUBLIC_ALIAS(mkstemp, libc_mkstemp);
-DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp64);
-DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_ALIAS(grantpt, libc_grantpt);
 DEFINE_PUBLIC_ALIAS(unlockpt, libc_unlockpt);
 DEFINE_PUBLIC_ALIAS(posix_openpt, libc_posix_openpt);
@@ -2416,10 +2264,6 @@ DEFINE_PUBLIC_ALIAS(secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_ALIAS(ptsname_r, libc_ptsname_r);
 DEFINE_PUBLIC_ALIAS(getpt, libc_getpt);
 DEFINE_PUBLIC_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);
-DEFINE_PUBLIC_ALIAS(mkostemp, libc_mkostemp);
-DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
-DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp64);
-DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps64);
 DEFINE_PUBLIC_ALIAS(reallocf, libc_reallocf);
 DEFINE_PUBLIC_ALIAS(recallocarray, libc_recallocarray);
 DEFINE_PUBLIC_ALIAS(freezero, libc_freezero);

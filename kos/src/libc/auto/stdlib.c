@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a6d2416 */
+/* HASH CRC-32:0x8112bef9 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,10 @@
 #include "format-printer.h"
 #include "../user/stdio.h"
 #include "../user/string.h"
+#include "../user/sys.stat.h"
+#include "../user/sys.time.h"
 #include "unicode.h"
+#include "../user/unistd.h"
 #include "../user/wchar.h"
 
 DECL_BEGIN
@@ -990,6 +993,20 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
 		return NULL;
 	return qcvt_buffer;
 }
+/* >> mkstemps(3), mkstemps64(3)
+ * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `TEMPLATE' will not
+ * already exists. Then, create a new file with `O_RDWR' and return the file
+ * descriptor of that file.
+ * @param: suffixlen: The # of trailing characters to-be ignored
+ *                    after the required 6 trailing 'X'-characters. */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_,
+                                    __STDC_INT_AS_SIZE_T suffixlen) {
+	return libc_mkostemps(template_, suffixlen, 0);
+}
 INTERN ATTR_SECTION(".text.crt.utility.locale") ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 	char c = response[0];
@@ -998,6 +1015,21 @@ NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response) {
 	if (c == 'y' || c == 'Y')
 		return 1;
 	return -1;
+}
+/* >> mktemp(3)
+ * Badly designed version of `mkstemp' that won't actually create
+ * the temporary file, meaning that by the time the caller tries to
+ * create the file themselves, another process may have already
+ * created it.
+ * Also: when no temporary filename can be created, rather than
+ *       returning something sensible like `NULL', this function
+ *       will instead set `TEMPLATE' to an empty string, and still
+ *       re-return it like it would if everything had worked! */
+INTERN ATTR_SECTION(".text.crt.fs.utility") ATTR_RETNONNULL NONNULL((1)) char *
+NOTHROW_NCX(LIBCCALL libc_mktemp)(char *template_) {
+	if (libc_system_mktemp(2, template_, 0, 0) )
+		*template_ = 0;
+	return template_;
 }
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED NONNULL((3, 4)) char *
 NOTHROW_NCX(LIBCCALL libc_ecvt)(double val,
@@ -1060,6 +1092,29 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
 	/* Not found (return the whole `name[=value]' string) */
 	*valuep = option;
 	return -1;
+}
+/* >> mkstemp(3), mkstemp64(3)
+ * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1),
+ * with random characters such that the filename described by `TEMPLATE'
+ * will not already exists. Then, create a new file with `O_RDWR' and return
+ * the file descriptor of that file. */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+NOTHROW_RPC(LIBCCALL libc_mkstemp)(char *template_) {
+	return libc_mkstemps(template_, 0);
+}
+/* >> mkdtemp(3)
+ * Replace the last 6 characters of `TEMPLATE', which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1),
+ * with random characters such that the pathname described by `TEMPLATE'
+ * will not already exists. Then, create a new directory with `mode=0700',
+ * and re-return `template_' to indicate success.
+ * On error, `NULL' will be returned, and the contents of `TEMPLATE' are undefined. */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) char *
+NOTHROW_RPC(LIBCCALL libc_mkdtemp)(char *template_) {
+	if (libc_system_mktemp(1, template_, 0, 0) )
+		template_ = NULL;
+	return template_;
 }
 /* Returns the name of the PTY slave (Pseudo TTY slave)
  * associated with the master descriptor `FD' */
@@ -1151,6 +1206,236 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 	return libc_strtold(nptr, endptr);
 }
 #endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
+/* >> mkostemp(3), mkostemp64(3)
+ * Replace the last 6 characters of `TEMPLATE' (which are followed by exactly
+ * `suffixlen' more characters that are left alone), which must be filled with
+ * all 'X'-characters before the call (else errno=EINVAL + return -1), with
+ * random characters such that the filename described by `TEMPLATE' will not
+ * already exists. Then, create a new file with `O_RDWR | flags' and return the file
+ * descriptor of that file.
+ * @param: flags: Additional flags to pass to `open(2)',
+ *                but `O_ACCMODE' is always set to `O_RDWR' */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_mkostemp)(char *template_,
+                                    oflag_t flags) {
+	return libc_mkostemps(template_, 0, flags);
+}
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((1)) fd_t
+NOTHROW_NCX(LIBCCALL libc_mkostemps)(char *template_,
+                                     __STDC_INT_AS_SIZE_T suffixlen,
+                                     oflag_t flags) {
+	return libc_system_mktemp(0, template_, suffixlen, flags);
+}
+#include <libc/errno.h>
+#include <asm/os/oflags.h>
+#include <asm/crt/stdio.h>
+#include <bits/os/timeval.h>
+#include <bits/os/stat.h>
+#include <hybrid/__overflow.h>
+/* Internal implementation for creating temporary files.
+ * @param: what: Select what kind of temporary object to create.
+ *                  `0': Create a temporary file. (The handle of that file will be returned)
+ *                       Creating mode used is 0600
+ *                       This mode is only recognized when `$has_function(open)'
+ *                  `1': Create a temporary directory. (0 is returned on success)
+ *                       Creating mode used is 0700
+ *                       This mode is only recognized when `$has_function(mkdir)'
+ *                       NOTE: `flags' is ignored in this mode
+ *                  `2': Braindead `mktemp(3)'-mode: Like `0', but don't actually create the
+ *                       file. Instead, return `0' on success
+ *                       This mode is only recognized when `$has_function(open) || $has_function(stat)'
+ *                       NOTE: `flags' is ignored in this mode */
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED NONNULL((2)) fd_t
+NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
+                                         char *template_,
+                                         __STDC_INT_AS_SIZE_T suffixlen,
+                                         oflag_t flags) {
+	/* Selection of random letters which may appear as replacements for XXXXXX
+	 * For this purpose, only use lower-case letters, as well as digits.
+	 * We could also use upper-case letters, but that may not work correctly
+	 * depending on the calling process running in DOS-mode, or flags containing
+	 * O_DOSPATH... */
+	static char const letters[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+#define NUM_LETTERS 36
+	char *xloc = libc_strend(template_) - (suffixlen + 6);
+	uint32_t seed, overflow;
+	size_t i, attempt;
+	fd_t result;
+	/* Verify the validity of the input template. */
+	if unlikely(xloc < template_ || libc_memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
+#ifdef EINVAL
+		return __libc_seterrno(EINVAL);
+#else /* EINVAL */
+		return __libc_seterrno(1);
+#endif /* !EINVAL */
+	}
+	/* Calculate an initial, random seed.
+	 * For this purpose, try to make use of:
+	 *   - gettimeofday()
+	 *   - gettid() or getpid()
+	 *   - rand() */
+	attempt = 0;
+again:
+	{
+#if (defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)) && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__
+		struct timeval64 tv;
+		if (libc_gettimeofday64(&tv, NULL) == 0) {
+			seed = (uint32_t)(tv.tv_sec) ^
+			       (uint32_t)(tv.tv_sec >> 32) ^
+			       (uint32_t)(tv.tv_usec << 12); /* The max value is 0xf423f, so shift
+			                                        * that to become `0xf423f000', thus
+			                                        * filling in the upper bits of `seed' */
+		} else
+#elif defined(__CRT_HAVE_gettimeofday64) || defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
+		struct timeval tv;
+		if (libc_gettimeofday(&tv, NULL) == 0) {
+			seed = (uint32_t)(tv.tv_sec) ^
+#if __SIZEOF_TIME_T__ > 4
+			       (uint32_t)(tv.tv_sec >> 32) ^
+#endif /* __SIZEOF_TIME_T__ > 4 */
+			       (uint32_t)(tv.tv_usec << 12); /* The max value is 0xf423f, so shift
+			                                        * that to become `0xf423f000', thus
+			                                        * filling in the upper bits of `seed' */
+		} else
+#endif /* ... */
+		{
+			uint32_t sum;
+#ifdef __RAND_MAX
+#define LIBC_RAND_MAX __RAND_MAX
+#else /* __RAND_MAX */
+#define LIBC_RAND_MAX 0x7fff
+#endif /* !__RAND_MAX */
+			seed = sum = 0;
+			/* Generate at least 32 bits of random data. */
+			do {
+				seed *= LIBC_RAND_MAX;
+				seed += (uint32_t)libc_rand();
+			} while (!__hybrid_overflow_uadd(sum, LIBC_RAND_MAX, &sum));
+#undef LIBC_RAND_MAX
+		}
+	}
+#ifdef __CRT_HAVE_gettid
+	seed ^= libc_gettid();
+#elif defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid)
+	seed ^= libc_getpid();
+#endif /* ... */
+
+	/* Using the seed, generate some initial random data.
+	 * We've generated 32 bits of entropy above, and with
+	 * a total of 6 characters to generate from a pool of
+	 * 36 letters each, this 5.333(rep) bits per digit. */
+	overflow = seed >> 30;
+	for (i = 0; i < 6; ++i) {
+		unsigned int digit;
+	    digit = seed & 0x1f;                      /* digit in 0-31 */
+		digit += overflow & ((1 << (i & 3)) - 1); /* Add a random addend between 0-7 */
+		/* Right now, digit in 0-38. But because we're using 2 addend, `0' is less
+		 * likely than the other digits. As such, subtract a bit if we're not at 0
+		 * already. */
+		if (digit)
+			--digit;
+		if (digit)
+			--digit;
+		/* Now, digit in 0-36, but 36 itself would still be invalid. */
+		if (digit > 35)
+			digit = 35;
+		/* All right! we've got the digit. */
+		xloc[i] = letters[digit];
+		seed >>= 5;
+	}
+
+	/* Try to create/test the file/directory. */
+	(void)flags;
+	switch (what) {
+
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))
+	case 0: {
+#ifdef O_RDWR
+#ifdef O_ACCMODE
+		flags &= ~O_ACCMODE;
+#endif /* O_ACCMODE */
+		flags |= O_RDWR;
+#endif /* O_RDWR */
+#ifdef O_CREAT
+		flags |= O_CREAT;
+#endif /* O_CREAT */
+#ifdef O_EXCL
+		flags |= O_EXCL;
+#endif /* O_EXCL */
+		result = libc_open(template_, flags, 0600);
+	}	break;
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) */
+
+#if defined(__CRT_HAVE_mkdir) || (defined(__CRT_DOS_PRIMARY) && defined(__CRT_HAVE__mkdir))
+	case 1:
+		result = libc_mkdir(template_, 0700);
+		break;
+#endif /* __CRT_HAVE_mkdir || (__CRT_DOS_PRIMARY && __CRT_HAVE__mkdir) */
+
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat))) || (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64))
+	case 2: {
+#if (defined(__CRT_HAVE_kstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__stat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__stati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__stat32) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_stat) && !defined(__USE_FILE_OFFSET64))
+		struct stat st;
+		result = -stat(template_, &st);
+#else /* (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_stat && !__USE_FILE_OFFSET64) */
+		result = libc_open(template_,
+#ifdef O_RDONLY
+		              O_RDONLY
+#elif defined(O_RDWR)
+		              O_RDWR
+#elif defined(O_WRONLY)
+		              O_WRONLY
+#else /* ... */
+		              0
+#endif /* !... */
+		              ,
+		              0600);
+		if (result < 0) {
+			/* File doesn't already exist. */
+			result = 0;
+		} else {
+			/* File does already exist. */
+#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
+			libc_close(result);
+#endif /* __CRT_HAVE_close || __CRT_HAVE__close || __CRT_HAVE___close */
+#ifdef EEXIST
+			result = __libc_seterrno(EEXIST);
+#else /* EEXIST */
+			result = __libc_seterrno(1);
+#endif /* !EEXIST */
+#define NEED_do_try_again
+			goto do_try_again;
+		}
+#endif /* (!__CRT_HAVE_kstat || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE_kstat64 || !__CRT_KOS_PRIMARY) && (!__CRT_HAVE__stat64 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stat64i32 || !__CRT_DOS_PRIMARY || !__USE_TIME_BITS64) && (!__CRT_HAVE__stati64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32i64 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE__stat || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE__stat32 || !__CRT_DOS_PRIMARY || __USE_TIME_BITS64 || __USE_FILE_OFFSET64) && (!__CRT_HAVE_stat64 || !__USE_FILE_OFFSET64) && (!__CRT_HAVE_stat || __USE_FILE_OFFSET64) */
+	}	break;
+#endif /* __CRT_HAVE_open64 || __CRT_HAVE___open64 || __CRT_HAVE_open || __CRT_HAVE__open || __CRT_HAVE___open || (__AT_FDCWD && (__CRT_HAVE_openat64 || __CRT_HAVE_openat)) || (__CRT_HAVE_kstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__stat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__stati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && __USE_FILE_OFFSET64) || (__CRT_HAVE__stat && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE__stat32 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64 && !__USE_FILE_OFFSET64) || (__CRT_HAVE_stat64 && __USE_FILE_OFFSET64) || (__CRT_HAVE_stat && !__USE_FILE_OFFSET64) */
+
+	default: __builtin_unreachable();
+	}
+	if (result == -1) {
+		/* Only re-attempt if the error was that the file already existed. */
+#if defined(__libc_geterrno) && defined(EEXIST)
+		if (__libc_geterrno() == EEXIST)
+#endif /* __libc_geterrno && EEXIST */
+		{
+#ifdef NEED_do_try_again
+#undef NEED_do_try_again
+do_try_again:
+#endif /* NEED_do_try_again */
+			/* Limit the max # of attempts */
+#ifdef __TMP_MAX
+			if (attempt < __TMP_MAX)
+#else /* __TMP_MAX */
+			if (attempt < 238328)
+#endif /* !__TMP_MAX */
+			{
+				++attempt;
+				goto again;
+			}
+		}
+	}
+	return result;
+}
 #include <libc/local/program_invocation_name.h>
 /* Returns the absolute filename of the main executable (s.a. `program_invocation_name') */
 INTERN ATTR_SECTION(".text.crt.solaris") ATTR_CONST WUNUSED char const *
@@ -3310,12 +3595,19 @@ DEFINE_PUBLIC_ALIAS(_ecvt, libc_qecvt);
 DEFINE_PUBLIC_ALIAS(qecvt, libc_qecvt);
 DEFINE_PUBLIC_ALIAS(_fcvt, libc_qfcvt);
 DEFINE_PUBLIC_ALIAS(qfcvt, libc_qfcvt);
+DEFINE_PUBLIC_ALIAS(mkstemps64, libc_mkstemps);
+DEFINE_PUBLIC_ALIAS(mkstemps, libc_mkstemps);
 DEFINE_PUBLIC_ALIAS(rpmatch, libc_rpmatch);
+DEFINE_PUBLIC_ALIAS(__mktemp, libc_mktemp);
+DEFINE_PUBLIC_ALIAS(mktemp, libc_mktemp);
 DEFINE_PUBLIC_ALIAS(_ecvt, libc_ecvt);
 DEFINE_PUBLIC_ALIAS(ecvt, libc_ecvt);
 DEFINE_PUBLIC_ALIAS(_ecvt, libc_fcvt);
 DEFINE_PUBLIC_ALIAS(fcvt, libc_fcvt);
 DEFINE_PUBLIC_ALIAS(getsubopt, libc_getsubopt);
+DEFINE_PUBLIC_ALIAS(mkstemp64, libc_mkstemp);
+DEFINE_PUBLIC_ALIAS(mkstemp, libc_mkstemp);
+DEFINE_PUBLIC_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_ALIAS(ptsname, libc_ptsname);
 DEFINE_PUBLIC_ALIAS(_strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_ALIAS(__strtol_l, libc_strtol_l);
@@ -3338,6 +3630,10 @@ DEFINE_PUBLIC_ALIAS(strtof_l, libc_strtof_l);
 DEFINE_PUBLIC_ALIAS(_strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_ALIAS(strtold_l, libc_strtold_l);
+DEFINE_PUBLIC_ALIAS(mkostemp64, libc_mkostemp);
+DEFINE_PUBLIC_ALIAS(mkostemp, libc_mkostemp);
+DEFINE_PUBLIC_ALIAS(mkostemps64, libc_mkostemps);
+DEFINE_PUBLIC_ALIAS(mkostemps, libc_mkostemps);
 DEFINE_PUBLIC_ALIAS(getexecname, libc_getexecname);
 DEFINE_PUBLIC_ALIAS(fdwalk, libc_fdwalk);
 DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);

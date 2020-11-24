@@ -45,7 +45,11 @@
 #define __O_DSYNC           0x0001000 /* ??? */
 #define __O_ASYNC           0x0002000 /* ??? */
 #define __O_DIRECT          0x0004000 /* ??? */
+#if defined(__KOS__) && !defined(__KERNEL__)
+#define __O_LARGEFILE       0         /* Ignored... (set to `0' so programs can detect that it's ignored with the preprocessor) */
+#else /* __KOS__ */
 #define __O_LARGEFILE       0x0008000 /* Ignored... */
+#endif /* !__KOS__ */
 #define __O_DIRECTORY       0x0010000 /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
                                        * path component of an open() system call turns out to be something other than a directory. */
 #define __O_NOFOLLOW        0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the

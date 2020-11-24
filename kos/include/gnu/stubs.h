@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8283a09 */
+/* HASH CRC-32:0x7218a67c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,15 +343,6 @@
 #define __stub_lrand48
 #define __stub_lrand48_r
 #define __stub_mbsnrtowcs
-#define __stub_mkdtemp
-#define __stub_mkostemp
-#define __stub_mkostemp64
-#define __stub_mkostemps
-#define __stub_mkostemps64
-#define __stub_mkstemps
-#define __stub_mkstemps64
-#define __stub___mktemp
-#define __stub_mktemp
 #define __stub_mrand48
 #define __stub_mrand48_r
 #define __stub_msgctl
