@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x729c0175 */
+/* HASH CRC-32:0xf35fda7e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@ DEFINE_INTERN_ALIAS(libc_popcount, libc_popcount32);
 DEFINE_INTERN_ALIAS(libc_popcount, libc_popcount64);
 #elif !defined(LIBC_ARCH_HAVE_POPCOUNT)
 #include <hybrid/__bit.h>
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED unsigned int
 NOTHROW(LIBCCALL libc_popcount)(unsigned int i) {
 	return __hybrid_popcount(i);
@@ -48,8 +48,8 @@ DEFINE_INTERN_ALIAS(libc_popcountl, libc_popcount32);
 DEFINE_INTERN_ALIAS(libc_popcountl, libc_popcount64);
 #elif !defined(LIBC_ARCH_HAVE_POPCOUNTL)
 #include <hybrid/__bit.h>
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED unsigned int
 NOTHROW(LIBCCALL libc_popcountl)(unsigned long i) {
 	return __hybrid_popcount(i);
@@ -61,8 +61,8 @@ DEFINE_INTERN_ALIAS(libc_popcountll, libc_popcount32);
 DEFINE_INTERN_ALIAS(libc_popcountll, libc_popcount64);
 #elif !defined(LIBC_ARCH_HAVE_POPCOUNTLL)
 #include <hybrid/__bit.h>
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED unsigned int
 NOTHROW(LIBCCALL libc_popcountll)(__ULONGLONG i) {
 	return __hybrid_popcount(i);
@@ -70,8 +70,8 @@ NOTHROW(LIBCCALL libc_popcountll)(__ULONGLONG i) {
 #endif /* ... */
 #ifndef LIBC_ARCH_HAVE_POPCOUNT32
 #include <hybrid/__bit.h>
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED unsigned int
 NOTHROW(LIBCCALL libc_popcount32)(uint32_t i) {
 	return __hybrid_popcount(i);
@@ -79,8 +79,8 @@ NOTHROW(LIBCCALL libc_popcount32)(uint32_t i) {
 #endif /* !LIBC_ARCH_HAVE_POPCOUNT32 */
 #ifndef LIBC_ARCH_HAVE_POPCOUNT64
 #include <hybrid/__bit.h>
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED unsigned int
 NOTHROW(LIBCCALL libc_popcount64)(uint64_t i) {
 	return __hybrid_popcount(i);

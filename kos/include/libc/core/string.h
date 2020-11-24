@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bce8bb */
+/* HASH CRC-32:0xb9ae0e7a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,54 +31,63 @@ __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_memcpy
 #include <hybrid/typecore.h>
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 #include <libc/local/string/memcpy.h>
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
 #endif /* !__CRT_HAVE_memcpy */
 #ifdef __CRT_HAVE_memmove
 #include <hybrid/typecore.h>
-/* Move memory between potentially overlapping memory blocks.
+/* >> memmove(3)
+ * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_core_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memmove */
 #include <libc/local/string/memmove.h>
-/* Move memory between potentially overlapping memory blocks.
+/* >> memmove(3)
+ * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove))
 #endif /* !__CRT_HAVE_memmove */
 #ifdef __CRT_HAVE_memset
 #include <hybrid/typecore.h>
-/* Fill memory with a given byte
+/* >> memset(3)
+ * Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
 #else /* __CRT_HAVE_memset */
 #include <libc/local/string/memset.h>
-/* Fill memory with a given byte
+/* >> memset(3)
+ * Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
 #endif /* !__CRT_HAVE_memset */
 #ifdef __CRT_HAVE_memcmp
 #include <hybrid/typecore.h>
-/* Compare memory buffers and return the difference of the first non-matching byte
+/* >> memcmp(3)
+ * Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_bcmp)
 #include <hybrid/typecore.h>
-/* Compare memory buffers and return the difference of the first non-matching byte
+/* >> memcmp(3)
+ * Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
 #else /* ... */
 #include <libc/local/string/memcmp.h>
-/* Compare memory buffers and return the difference of the first non-matching byte
+/* >> memcmp(3)
+ * Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
@@ -86,55 +95,70 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #endif /* !... */
 #ifdef __CRT_HAVE_memchr
 #include <hybrid/typecore.h>
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* >> memchr(3)
+ * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
+ * Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_core_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
 #else /* __CRT_HAVE_memchr */
 #include <libc/local/string/memchr.h>
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* >> memchr(3)
+ * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
+ * Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_core_memchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memchr))
 #endif /* !__CRT_HAVE_memchr */
 #ifdef __CRT_HAVE_strlen
 #include <hybrid/typecore.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+/* >> strlen(3)
+ * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* __CRT_HAVE_strlen */
 #include <libc/local/string/strlen.h>
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+/* >> strlen(3)
+ * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 #define __libc_core_strlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlen))
 #endif /* !__CRT_HAVE_strlen */
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+/* >> strchr(3)
+ * Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_core_strchr,(char const *__restrict __haystack, int __needle),strchr,{ return __builtin_strchr(__haystack, __needle); })
 #elif defined(__CRT_HAVE_strchr)
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+/* >> strchr(3)
+ * Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__libc_core_strchr,(char const *__restrict __haystack, int __needle),strchr,(__haystack,__needle))
 #else /* ... */
 #include <libc/local/string/strchr.h>
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+/* >> strchr(3)
+ * Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 #define __libc_core_strchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strchr))
 #endif /* !... */
 #if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+/* >> strcmp(3)
+ * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
 #elif defined(__CRT_HAVE_strcmp)
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+/* >> strcmp(3)
+ * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_core_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
 #else /* ... */
 #include <libc/local/string/strcmp.h>
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+/* >> strcmp(3)
+ * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_core_strcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcmp))
 #endif /* !... */
 #if __has_builtin(__builtin_strnlen) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strnlen)
 #include <hybrid/typecore.h>
-/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+/* >> strnlen(3)
+ * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_strnlen,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnlen,{ return __builtin_strnlen(__string, __maxlen); })
 #elif defined(__CRT_HAVE_strnlen)
 #include <hybrid/typecore.h>
-/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+/* >> strnlen(3)
+ * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__libc_core_strnlen,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnlen,(__string,__maxlen))
 #else /* ... */
 #include <libc/local/string/strnlen.h>
-/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+/* >> strnlen(3)
+ * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 #define __libc_core_strnlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnlen))
 #endif /* !... */
 #ifdef __CRT_HAVE_memrchr

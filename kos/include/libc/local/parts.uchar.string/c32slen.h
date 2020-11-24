@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcee9abe9 */
+/* HASH CRC-32:0xb924060c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c32send __LIBC_LOCAL_NAME(c32send)
 #endif /* !... */
 #endif /* !__local___localdep_c32send_defined */
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+/* >> strlen(3)
+ * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __LOCAL_LIBC(c32slen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32slen))(__CHAR32_TYPE__ const *__restrict __string) {
 	return (__SIZE_TYPE__)(__localdep_c32send(__string) - __string);

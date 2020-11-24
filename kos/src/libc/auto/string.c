@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46fe5628 */
+/* HASH CRC-32:0x9f6eaa7b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,8 @@
 DECL_BEGIN
 
 #ifndef LIBC_ARCH_HAVE_MEMCPY
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_memcpy)(void *__restrict dst,
@@ -46,7 +47,8 @@ NOTHROW_NCX(LIBCCALL libc_memcpy)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCPY */
 #ifndef LIBC_ARCH_HAVE_MEMMOVE
-/* Move memory between potentially overlapping memory blocks.
+/* >> memmove(3)
+ * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) void *
 NOTHROW_NCX(LIBCCALL libc_memmove)(void *dst,
@@ -69,7 +71,8 @@ NOTHROW_NCX(LIBCCALL libc_memmove)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVE */
 #ifndef LIBC_ARCH_HAVE_MEMSET
-/* Fill memory with a given byte
+/* >> memset(3)
+ * Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memset)(void *__restrict dst,
@@ -82,7 +85,8 @@ NOTHROW_NCX(LIBCCALL libc_memset)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMSET */
 #ifndef LIBC_ARCH_HAVE_MEMCMP
-/* Compare memory buffers and return the difference of the first non-matching byte
+/* >> memcmp(3)
+ * Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
@@ -100,7 +104,9 @@ NOTHROW_NCX(LIBCCALL libc_memcmp)(void const *s1,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMP */
 #ifndef LIBC_ARCH_HAVE_MEMCHR
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* >> memchr(3)
+ * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
+ * Return `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_memchr)(void const *__restrict haystack,
                                   int needle,
@@ -114,14 +120,16 @@ NOTHROW_NCX(LIBCCALL libc_memchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCHR */
 #ifndef LIBC_ARCH_HAVE_STRLEN
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+/* >> strlen(3)
+ * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_strlen)(char const *__restrict string) {
 	return (size_t)(libc_strend(string) - string);
 }
 #endif /* !LIBC_ARCH_HAVE_STRLEN */
 #ifndef LIBC_ARCH_HAVE_STRCHR
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+/* >> strchr(3)
+ * Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strchr)(char const *__restrict haystack,
                                   int needle) {
@@ -133,7 +141,8 @@ NOTHROW_NCX(LIBCCALL libc_strchr)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRCHR */
 #ifndef LIBC_ARCH_HAVE_STRRCHR
-/* Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+/* >> strrchr(3)
+ * Return the pointer of the last instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strrchr)(char const *__restrict haystack,
                                    int needle) {
@@ -146,7 +155,8 @@ NOTHROW_NCX(LIBCCALL libc_strrchr)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRRCHR */
 #ifndef LIBC_ARCH_HAVE_STRCMP
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+/* >> strcmp(3)
+ * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strcmp)(char const *s1,
                                   char const *s2) {
@@ -160,7 +170,8 @@ NOTHROW_NCX(LIBCCALL libc_strcmp)(char const *s1,
 #endif /* !LIBC_ARCH_HAVE_STRCMP */
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STRNCMP
-/* Same as `strcmp', but compare at most `MAXLEN' characters from either string */
+/* >> strncmp(3)
+ * Same as `strcmp', but compare at most `MAXLEN' characters from either string */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strncmp)(char const *s1,
                                    char const *s2,
@@ -176,7 +187,8 @@ NOTHROW_NCX(LIBCCALL libc_strncmp)(char const *s1,
 }
 #endif /* !LIBC_ARCH_HAVE_STRNCMP */
 #ifndef LIBC_ARCH_HAVE_STRSTR
-/* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
+/* >> strstr(3)
+ * Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
  * If no such needle exists, return `NULL' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_strstr)(char const *haystack,
@@ -200,13 +212,22 @@ miss:
 }
 #endif /* !LIBC_ARCH_HAVE_STRSTR */
 #ifndef LIBC_ARCH_HAVE_STRCPY
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
-NOTHROW_NCX(LIBCCALL libc_strcpy)(char *__restrict buf,
+NOTHROW_NCX(LIBCCALL libc_strcpy)(char *__restrict dst,
                                   char const *__restrict src) {
-	return (char *)libc_memcpy(buf, src, (libc_strlen(src) + 1) * sizeof(char));
+	return (char *)libc_memcpy(dst, src, (libc_strlen(src) + 1) * sizeof(char));
 }
 #endif /* !LIBC_ARCH_HAVE_STRCPY */
 #ifndef LIBC_ARCH_HAVE_STRNCPY
+/* >> strncpy(3)
+ * Always write exactly `buflen' characters to `buf'. As far as
+ * space for doing so is available, up to the `strlen(src)' of
+ * the first characters are copied from `src'. All remaining
+ * characters are always set to '\0'. Always re-returns `buf' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_strncpy)(char *__restrict buf,
                                    char const *__restrict src,
@@ -218,19 +239,26 @@ NOTHROW_NCX(LIBCCALL libc_strncpy)(char *__restrict buf,
 }
 #endif /* !LIBC_ARCH_HAVE_STRNCPY */
 #ifndef LIBC_ARCH_HAVE_STRCAT
+/* >> strcat(3)
+ * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * append it at the end of `dst', or more precisely copy to `strend(dst)'
+ * Always re-returns `dst' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
-NOTHROW_NCX(LIBCCALL libc_strcat)(char *__restrict buf,
+NOTHROW_NCX(LIBCCALL libc_strcat)(char *__restrict dst,
                                   char const *__restrict src) {
-	libc_memcpy(libc_strend(buf), src, (libc_strlen(src) + 1) * sizeof(char));
-	return buf;
+	libc_memcpy(libc_strend(dst), src, (libc_strlen(src) + 1) * sizeof(char));
+	return dst;
 }
 #endif /* !LIBC_ARCH_HAVE_STRCAT */
 #ifndef LIBC_ARCH_HAVE_STRNCAT
+/* >> strncat(3)
+ * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
+ * characters to `strend(buf)', and always re-return `buf'. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_strncat)(char *__restrict buf,
                                    char const *__restrict src,
-                                   size_t buflen) {
-	size_t srclen = libc_strnlen(src, buflen);
+                                   size_t max_srclen) {
+	size_t srclen = libc_strnlen(src, max_srclen);
 	char *dst = libc_strend(buf);
 	libc_memcpy(dst, src, srclen * sizeof(char));
 	dst[srclen] = '\0';
@@ -239,6 +267,10 @@ NOTHROW_NCX(LIBCCALL libc_strncat)(char *__restrict buf,
 #endif /* !LIBC_ARCH_HAVE_STRNCAT */
 #ifndef LIBC_ARCH_HAVE_STRCSPN
 #include <hybrid/typecore.h>
+/* >> strcspn(3)
+ * Return the offset from `haystack' to the first
+ * character for which `strchr(reject, CH) != NULL'.
+ * If no such character exists, return `strlen(haystack)' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack,
                                    char const *reject) {
@@ -249,6 +281,10 @@ NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRCSPN */
 #ifndef LIBC_ARCH_HAVE_STRSPN
+/* >> strspn(3)
+ * Return the offset from `haystack' to the first
+ * character for which `strchr(reject, CH) == NULL'.
+ * If no such character exists, return `strlen(haystack)' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) size_t
 NOTHROW_NCX(LIBCCALL libc_strspn)(char const *haystack,
                                   char const *accept) {
@@ -259,6 +295,9 @@ NOTHROW_NCX(LIBCCALL libc_strspn)(char const *haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRSPN */
 #ifndef LIBC_ARCH_HAVE_STRPBRK
+/* >> strpbrk(3)
+ * Return a pointer to the first character from `haystack' with `strchr(*return, accept) != NULL'
+ * If no such character exists, return `NULL' instead. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_strpbrk)(char const *haystack,
                                    char const *accept) {
@@ -332,7 +371,8 @@ NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
 }
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_STRNLEN
-/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+/* >> strnlen(3)
+ * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1)) size_t
 NOTHROW_NCX(LIBCCALL libc_strnlen)(char const *__restrict string,
                                    size_t maxlen) {
@@ -341,7 +381,8 @@ NOTHROW_NCX(LIBCCALL libc_strnlen)(char const *__restrict string,
 #endif /* !LIBC_ARCH_HAVE_STRNLEN */
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STPCPY
-/* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
+/* >> stpcpy(3)
+ * Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_stpcpy)(char *__restrict buf,
                                   char const *__restrict src) {
@@ -349,6 +390,7 @@ NOTHROW_NCX(LIBCCALL libc_stpcpy)(char *__restrict buf,
 }
 #endif /* !LIBC_ARCH_HAVE_STPCPY */
 #ifndef LIBC_ARCH_HAVE_STPNCPY
+/* >> stpncpy(3) */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_stpncpy)(char *__restrict buf,
                                    char const *__restrict src,

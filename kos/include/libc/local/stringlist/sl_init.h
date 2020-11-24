@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c5ef109 */
+/* HASH CRC-32:0x455b948 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,8 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
-/* Allocates and returns a new StringList object. Upon error, `NULL' is returned */
+/* >> sl_init(3)
+ * Allocates and returns a new StringList object. Upon error, `NULL' is returned */
 __LOCAL_LIBC(sl_init) __ATTR_WUNUSED struct _stringlist *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sl_init))(void) {
 	struct _stringlist *__result;

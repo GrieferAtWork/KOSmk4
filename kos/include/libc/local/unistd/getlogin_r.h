@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84b20c40 */
+/* HASH CRC-32:0xea1af653 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,16 +68,31 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 5)),__errno_t,__NOTHROW_RPC,__localdep_getpwui
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strncpy(3)
+ * Always write exactly `buflen' characters to `buf'. As far as
+ * space for doing so is available, up to the `strlen(src)' of
+ * the first characters are copied from `src'. All remaining
+ * characters are always set to '\0'. Always re-returns `buf' */
 __CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,{ return __builtin_strncpy(__buf, __src, __buflen); })
 #elif defined(__CRT_HAVE_strncpy)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strncpy(3)
+ * Always write exactly `buflen' characters to `buf'. As far as
+ * space for doing so is available, up to the `strlen(src)' of
+ * the first characters are copied from `src'. All remaining
+ * characters are always set to '\0'. Always re-returns `buf' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,(__buf,__src,__buflen))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strncpy.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strncpy(3)
+ * Always write exactly `buflen' characters to `buf'. As far as
+ * space for doing so is available, up to the `strlen(src)' of
+ * the first characters are copied from `src'. All remaining
+ * characters are always set to '\0'. Always re-returns `buf' */
 #define __localdep_strncpy __LIBC_LOCAL_NAME(strncpy)
 #endif /* !... */
 #endif /* !__local___localdep_strncpy_defined */

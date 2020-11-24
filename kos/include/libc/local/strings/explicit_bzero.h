@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9210427 */
+/* HASH CRC-32:0xbc6b6eae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
 #endif /* !... */
 #endif /* !__local___localdep_bzero_defined */
-/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+/* >> explicit_bzero(3)
+ * Same as `bzero(buf, num_bytes)', however compilers will not optimize
  * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */

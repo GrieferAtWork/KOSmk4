@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26662b95 */
+/* HASH CRC-32:0xec0cc20e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,13 +26,25 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcspn_defined
 #define __local___localdep_strcspn_defined 1
 #if __has_builtin(__builtin_strcspn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcspn)
+/* >> strcspn(3)
+ * Return the offset from `haystack' to the first
+ * character for which `strchr(reject, CH) != NULL'.
+ * If no such character exists, return `strlen(haystack)' */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strcspn,(char const *__haystack, char const *__reject),strcspn,{ return __builtin_strcspn(__haystack, __reject); })
 #elif defined(__CRT_HAVE_strcspn)
+/* >> strcspn(3)
+ * Return the offset from `haystack' to the first
+ * character for which `strchr(reject, CH) != NULL'.
+ * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strcspn,(char const *__haystack, char const *__reject),strcspn,(__haystack,__reject))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcspn.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strcspn(3)
+ * Return the offset from `haystack' to the first
+ * character for which `strchr(reject, CH) != NULL'.
+ * If no such character exists, return `strlen(haystack)' */
 #define __localdep_strcspn __LIBC_LOCAL_NAME(strcspn)
 #endif /* !... */
 #endif /* !__local___localdep_strcspn_defined */
@@ -43,16 +55,28 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strspn(3)
+ * Return the offset from `haystack' to the first
+ * character for which `strchr(reject, CH) == NULL'.
+ * If no such character exists, return `strlen(haystack)' */
 __CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strspn,(char const *__haystack, char const *__accept),strspn,{ return __builtin_strspn(__haystack, __accept); })
 #elif defined(__CRT_HAVE_strspn)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strspn(3)
+ * Return the offset from `haystack' to the first
+ * character for which `strchr(reject, CH) == NULL'.
+ * If no such character exists, return `strlen(haystack)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strspn,(char const *__haystack, char const *__accept),strspn,(__haystack,__accept))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strspn.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strspn(3)
+ * Return the offset from `haystack' to the first
+ * character for which `strchr(reject, CH) == NULL'.
+ * If no such character exists, return `strlen(haystack)' */
 #define __localdep_strspn __LIBC_LOCAL_NAME(strspn)
 #endif /* !... */
 #endif /* !__local___localdep_strspn_defined */

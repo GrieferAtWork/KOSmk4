@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f0691c3 */
+/* HASH CRC-32:0xf73145ab */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,53 +30,53 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBDCALL libd_popcount)(unsigned int i);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBCCALL libc_popcount)(unsigned int i);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBDCALL libd_popcountl)(unsigned long i);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBCCALL libc_popcountl)(unsigned long i);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBDCALL libd_popcountll)(__ULONGLONG i);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBCCALL libc_popcountll)(__ULONGLONG i);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBDCALL libd_popcount32)(uint32_t i);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBCCALL libc_popcount32)(uint32_t i);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBDCALL libd_popcount64)(uint64_t i);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 INTDEF ATTR_CONST WUNUSED unsigned int NOTHROW(LIBCCALL libc_popcount64)(uint64_t i);
 #endif /* !__KERNEL__ */
 

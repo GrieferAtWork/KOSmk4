@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4a7d406 */
+/* HASH CRC-32:0x8a791aba */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,63 +31,79 @@
 #include "core/string.h"
 
 #ifdef __fast_memcpy_defined
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
 #else /* __fast_memcpy_defined */
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_memcpy __libc_core_memcpy
 #endif /* !__fast_memcpy_defined */
 #ifdef __fast_memmove_defined
-/* Move memory between potentially overlapping memory blocks.
+/* >> memmove(3)
+ * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_memmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))
 #else /* __fast_memmove_defined */
-/* Move memory between potentially overlapping memory blocks.
+/* >> memmove(3)
+ * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __libc_memmove __libc_core_memmove
 #endif /* !__fast_memmove_defined */
 #ifdef __fast_memset_defined
-/* Fill memory with a given byte
+/* >> memset(3)
+ * Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __libc_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
 #else /* __fast_memset_defined */
-/* Fill memory with a given byte
+/* >> memset(3)
+ * Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __libc_memset __libc_core_memset
 #endif /* !__fast_memset_defined */
 #ifdef __fast_memcmp_defined
-/* Compare memory buffers and return the difference of the first non-matching byte
+/* >> memcmp(3)
+ * Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __libc_memcmp (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))
 #else /* __fast_memcmp_defined */
-/* Compare memory buffers and return the difference of the first non-matching byte
+/* >> memcmp(3)
+ * Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __libc_memcmp __libc_core_memcmp
 #endif /* !__fast_memcmp_defined */
 #ifdef __fast_memchr_defined
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* >> memchr(3)
+ * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
+ * Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memchr (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchr))
 #else /* __fast_memchr_defined */
-/* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
+/* >> memchr(3)
+ * Ascendingly search for `NEEDLE', starting at `HAYSTACK'.
+ * Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memchr __libc_core_memchr
 #endif /* !__fast_memchr_defined */
 #if defined(__LIBC_BIND_OPTIMIZATIONS) && !defined(__NO_builtin_constant_p) && (__has_builtin(__builtin_strlen) && defined(__CRT_HAVE_strlen))
 #define __libc_strlen(string) (__builtin_constant_p(string) ? __builtin_strlen(string) : __libc_core_strlen(string))
 #else /* __LIBC_BIND_OPTIMIZATIONS && !__NO_builtin_constant_p && __builtin_strlen && __CRT_HAVE_strlen */
-/* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
+/* >> strlen(3)
+ * Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 #define __libc_strlen __libc_core_strlen
 #endif /* !__LIBC_BIND_OPTIMIZATIONS || __NO_builtin_constant_p || !__builtin_strlen || !__CRT_HAVE_strlen */
-/* Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
+/* >> strchr(3)
+ * Return the pointer of the first instance of `NEEDLE', or `NULL' if `NEEDLE' wasn't found. */
 #define __libc_strchr __libc_core_strchr
-/* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
+/* >> strcmp(3)
+ * Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
 #define __libc_strcmp __libc_core_strcmp
-/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+/* >> strnlen(3)
+ * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 #define __libc_strnlen __libc_core_strnlen
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK + N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrchr __libc_core_memrchr

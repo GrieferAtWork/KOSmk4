@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d2d7761 */
+/* HASH CRC-32:0xa5de6f35 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strnend __LIBC_LOCAL_NAME(strnend)
 #endif /* !__CRT_HAVE_strnend */
 #endif /* !__local___localdep_strnend_defined */
-/* Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
+/* >> strnlen(3)
+ * Same as `strlen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __LOCAL_LIBC(strnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnlen))(char const *__restrict __string, __SIZE_TYPE__ __maxlen) {
 	return (__SIZE_TYPE__)(__localdep_strnend(__string, __maxlen) - __string);

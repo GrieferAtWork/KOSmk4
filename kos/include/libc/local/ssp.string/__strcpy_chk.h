@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a885c8e */
+/* HASH CRC-32:0x27b267be */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,25 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcpy_defined
 #define __local___localdep_strcpy_defined 1
 #if __has_builtin(__builtin_strcpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcpy)
-__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __buf, char const *__restrict __src),strcpy,{ return __builtin_strcpy(__buf, __src); })
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
+__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __dst, char const *__restrict __src),strcpy,{ return __builtin_strcpy(__dst, __src); })
 #elif defined(__CRT_HAVE_strcpy)
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __buf, char const *__restrict __src),strcpy,(__buf,__src))
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcpy,(char *__restrict __dst, char const *__restrict __src),strcpy,(__dst,__src))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcpy.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strcpy(3)
+ * Copy a NUL-terminated string `str' to `dst', and re-return `dst'.
+ * The exact # of characters copied is `strlen(src) + 1' (+1 because
+ * the trailing NUL-character is also copied) */
 #define __localdep_strcpy __LIBC_LOCAL_NAME(strcpy)
 #endif /* !... */
 #endif /* !__local___localdep_strcpy_defined */

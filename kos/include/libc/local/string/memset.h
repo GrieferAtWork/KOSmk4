@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd591a93a */
+/* HASH CRC-32:0x781a6b4f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,8 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Fill memory with a given byte
+/* >> memset(3)
+ * Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 __LOCAL_LIBC(memset) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memset))(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b0a7a5b */
+/* HASH CRC-32:0x8d4734b0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,8 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 #undef __local___localdep_free_defined
 #endif /* !... */
 #endif /* !__local___localdep_free_defined */
-/* Free a given string list. When `ALL' is non-zero, all contained
+/* >> sl_free(3)
+ * Free a given string list. When `ALL' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also
  * be `free(3)'ed. */
 __LOCAL_LIBC(sl_free) void

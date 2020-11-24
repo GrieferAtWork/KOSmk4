@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ef98157 */
+/* HASH CRC-32:0x6f1a3820 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,8 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
+/* >> strstr(3)
+ * Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
  * If no such needle exists, return `NULL' */
 __LOCAL_LIBC(wcsstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsstr))(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__needle) {

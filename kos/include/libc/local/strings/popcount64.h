@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bab31ae */
+/* HASH CRC-32:0x30c3199d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,8 +23,8 @@
 #include <__crt.h>
 #include <hybrid/__bit.h>
 __NAMESPACE_LOCAL_BEGIN
-/* POPulationCOUNT
- * Return the number of 1-bits in `i' */
+/* >> popcount(3), popcountl(3), popcountll(3), popcount32(3), popcount64(3)
+ * POPulationCOUNT. Return the number of 1-bits in `i' */
 __LOCAL_LIBC(popcount64) __ATTR_CONST __ATTR_WUNUSED unsigned int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(popcount64))(__UINT64_TYPE__ __i) {
 	return __hybrid_popcount(__i);

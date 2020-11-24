@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fce7bdc */
+/* HASH CRC-32:0x962e9972 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,19 +49,22 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_explicit_bzero_defined
 #define __local___localdep_explicit_bzero_defined 1
 #ifdef __CRT_HAVE_bzero
-/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+/* >> explicit_bzero(3)
+ * Same as `bzero(buf, num_bytes)', however compilers will not optimize
  * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __num_bytes),bzero,(__buf,__num_bytes))
 #elif defined(__CRT_HAVE_explicit_bzero)
-/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+/* >> explicit_bzero(3)
+ * Same as `bzero(buf, num_bytes)', however compilers will not optimize
  * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__buf,__num_bytes))
 #elif defined(__CRT_HAVE___bzero)
-/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+/* >> explicit_bzero(3)
+ * Same as `bzero(buf, num_bytes)', however compilers will not optimize
  * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
@@ -70,7 +73,8 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_explicit_bzero,(void *__buf, __SIZE_T
 __NAMESPACE_LOCAL_END
 #include <libc/local/strings/explicit_bzero.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Same as `bzero(buf, num_bytes)', however compilers will not optimize
+/* >> explicit_bzero(3)
+ * Same as `bzero(buf, num_bytes)', however compilers will not optimize
  * away uses of this function when they (think) that clearing the memory
  * wouldn't have any visible side-effects (though those side-effects
  * may be a security-concious application trying to wipe sensitive data) */
@@ -123,14 +127,16 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_ma
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memcpy */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Copy memory between non-overlapping memory blocks.
+/* >> memcpy(3)
+ * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
 #endif /* !__CRT_HAVE_memcpy */

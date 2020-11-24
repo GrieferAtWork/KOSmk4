@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98f22c7b */
+/* HASH CRC-32:0xc5a7efd2 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,54 +30,63 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Allocates and returns a new StringList object. Upon error, `NULL' is returned */
+/* >> sl_init(3)
+ * Allocates and returns a new StringList object. Upon error, `NULL' is returned */
 INTDEF WUNUSED struct _stringlist *NOTHROW_NCX(LIBCCALL libc_sl_init)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Append a given `NAME' to `SL'. `NAME' is considered
+/* >> sl_add(3)
+ * Append a given `NAME' to `SL'. `NAME' is considered
  * inherited if the StringList is destroyed with `1' */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_sl_add)(struct _stringlist *sl, char *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Append a given `NAME' to `SL'. `NAME' is considered
+/* >> sl_add(3)
+ * Append a given `NAME' to `SL'. `NAME' is considered
  * inherited if the StringList is destroyed with `1' */
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl, char *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Free a given string list. When `ALL' is non-zero, all contained
+/* >> sl_free(3)
+ * Free a given string list. When `ALL' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also
  * be `free(3)'ed. */
 INTDEF void NOTHROW_NCX(LIBDCALL libd_sl_free)(struct _stringlist *sl, int all);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Free a given string list. When `ALL' is non-zero, all contained
+/* >> sl_free(3)
+ * Free a given string list. When `ALL' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also
  * be `free(3)'ed. */
 INTDEF void NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl, int all);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Search for `NAME' within the given StringList. Upon success,
+/* >> sl_find(3)
+ * Search for `NAME' within the given StringList. Upon success,
  * return a pointer to the equivalent string within `SL' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
  * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
 INTDEF ATTR_PURE NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Search for `NAME' within the given StringList. Upon success,
+/* >> sl_find(3)
+ * Search for `NAME' within the given StringList. Upon success,
  * return a pointer to the equivalent string within `SL' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
  * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
 INTDEF ATTR_PURE NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl, char const *name);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Remove an entry `name' from `sl'
+/* >> sl_delete(3)
+ * Remove an entry `name' from `sl'
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
  * @return: -1: No string equal to `name' was found in `sl' */
 INTDEF WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_sl_delete)(struct _stringlist *sl, char const *name, int freeit);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Remove an entry `name' from `sl'
+/* >> sl_delete(3)
+ * Remove an entry `name' from `sl'
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
  * @return: -1: No string equal to `name' was found in `sl' */

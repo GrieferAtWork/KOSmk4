@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b490038 */
+/* HASH CRC-32:0x9a2bb2d0 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Allocates and returns a new StringList object. Upon error, `NULL' is returned */
+/* >> sl_init(3)
+ * Allocates and returns a new StringList object. Upon error, `NULL' is returned */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") WUNUSED struct _stringlist *
 NOTHROW_NCX(LIBCCALL libc_sl_init)(void) {
 	struct _stringlist *result;
@@ -47,7 +48,8 @@ NOTHROW_NCX(LIBCCALL libc_sl_init)(void) {
 	}
 	return result;
 }
-/* Append a given `NAME' to `SL'. `NAME' is considered
+/* >> sl_add(3)
+ * Append a given `NAME' to `SL'. `NAME' is considered
  * inherited if the StringList is destroyed with `1' */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl,
@@ -66,7 +68,8 @@ NOTHROW_NCX(LIBCCALL libc_sl_add)(struct _stringlist *sl,
 	++sl->sl_cur;
 	return 0;
 }
-/* Free a given string list. When `ALL' is non-zero, all contained
+/* >> sl_free(3)
+ * Free a given string list. When `ALL' is non-zero, all contained
  * string pointers (as previously added with `sl_add()') will also
  * be `free(3)'ed. */
 INTERN ATTR_SECTION(".text.crt.bsd.stringlist") void
@@ -84,7 +87,8 @@ NOTHROW_NCX(LIBCCALL libc_sl_free)(struct _stringlist *sl,
 	}
 	libc_free(sl);
 }
-/* Search for `NAME' within the given StringList. Upon success,
+/* >> sl_find(3)
+ * Search for `NAME' within the given StringList. Upon success,
  * return a pointer to the equivalent string within `SL' (i.e. the
  * pointer originally passed to `sl_add()' to insert that string).
  * If `SL' doesn't contain an equivalent string, return `NULL' instead. */
@@ -99,7 +103,8 @@ NOTHROW_NCX(LIBCCALL libc_sl_find)(struct _stringlist __KOS_FIXED_CONST *sl,
 	}
 	return NULL;
 }
-/* Remove an entry `name' from `sl'
+/* >> sl_delete(3)
+ * Remove an entry `name' from `sl'
  * When `freeit' is non-zero, a removed string is deallocated using `free(3)'
  * @return: 0:  Successfully removed a string equal to `name'
  * @return: -1: No string equal to `name' was found in `sl' */

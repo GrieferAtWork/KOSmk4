@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xadf0b1cb */
+/* HASH CRC-32:0xfa7086bb */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,25 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_strcat_defined
 #define __local___localdep_strcat_defined 1
 #if __has_builtin(__builtin_strcat) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcat)
-__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __buf, char const *__restrict __src),strcat,{ return __builtin_strcat(__buf, __src); })
+/* >> strcat(3)
+ * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * append it at the end of `dst', or more precisely copy to `strend(dst)'
+ * Always re-returns `dst' */
+__CEIREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __dst, char const *__restrict __src),strcat,{ return __builtin_strcat(__dst, __src); })
 #elif defined(__CRT_HAVE_strcat)
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __buf, char const *__restrict __src),strcat,(__buf,__src))
+/* >> strcat(3)
+ * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * append it at the end of `dst', or more precisely copy to `strend(dst)'
+ * Always re-returns `dst' */
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strcat,(char *__restrict __dst, char const *__restrict __src),strcat,(__dst,__src))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/strcat.h>
 __NAMESPACE_LOCAL_BEGIN
+/* >> strcat(3)
+ * Same as `strcpy(3)', but rather than copying `src' ontop of `dst',
+ * append it at the end of `dst', or more precisely copy to `strend(dst)'
+ * Always re-returns `dst' */
 #define __localdep_strcat __LIBC_LOCAL_NAME(strcat)
 #endif /* !... */
 #endif /* !__local___localdep_strcat_defined */

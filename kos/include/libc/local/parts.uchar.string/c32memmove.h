@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x174cc54c */
+/* HASH CRC-32:0xd02091ae */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_memmove_defined
 #define __local___localdep_memmove_defined 1
 #ifdef __CRT_HAVE_memmove
-/* Move memory between potentially overlapping memory blocks.
+/* >> memmove(3)
+ * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* __CRT_HAVE_memmove */
 __NAMESPACE_LOCAL_END
 #include <libc/local/string/memmove.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Move memory between potentially overlapping memory blocks.
+/* >> memmove(3)
+ * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmove __LIBC_LOCAL_NAME(memmove)
 #endif /* !__CRT_HAVE_memmove */

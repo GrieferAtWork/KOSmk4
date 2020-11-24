@@ -25,9 +25,8 @@
 #include <features.h>
 #include <sys/types.h>
 
-__SYSDECL_BEGIN
-
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 #ifndef ___stringlist_defined
 #define ___stringlist_defined 1
@@ -52,6 +51,7 @@ typedef struct @_stringlist@ {
 )]
 
 
+@@>> sl_init(3)
 @@Allocates and returns a new StringList object. Upon error, `NULL' is returned
 [[wunused, decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
 [[requires_function(malloc, free)]]
@@ -71,6 +71,7 @@ struct _stringlist *sl_init() {
 }
 
 
+@@>> sl_add(3)
 @@Append a given `NAME' to `SL'. `NAME' is considered
 @@inherited if the StringList is destroyed with `1'
 [[decl_include("<hybrid/typecore.h>"), decl_prefix(DEFINE_STRINGLIST)]]
@@ -91,6 +92,7 @@ int sl_add([[nonnull]] struct _stringlist *sl, [[nonnull]] char *name) {
 	return 0;
 }
 
+@@>> sl_free(3)
 @@Free a given string list. When `ALL' is non-zero, all contained
 @@string pointers (as previously added with `sl_add()') will also
 @@be `free(3)'ed.
@@ -112,6 +114,7 @@ void sl_free([[nullable]] struct _stringlist *sl, int all) {
 
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
+@@>> sl_find(3)
 @@Search for `NAME' within the given StringList. Upon success,
 @@return a pointer to the equivalent string within `SL' (i.e. the
 @@pointer originally passed to `sl_add()' to insert that string).
@@ -130,6 +133,7 @@ void sl_free([[nullable]] struct _stringlist *sl, int all) {
 }
 
 %#ifdef __USE_BSD
+@@>> sl_delete(3)
 @@Remove an entry `name' from `sl'
 @@When `freeit' is non-zero, a removed string is deallocated using `free(3)'
 @@@return: 0:  Successfully removed a string equal to `name'
@@ -162,8 +166,8 @@ int sl_delete([[nonnull]] struct _stringlist *sl,
 %#endif /* __USE_BSD */
 
 %{
-#endif /* __CC__ */
 
 __SYSDECL_END
+#endif /* __CC__ */
 
 }
