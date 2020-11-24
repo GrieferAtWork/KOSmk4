@@ -127,8 +127,8 @@ err:
 }
 
 struct builtin_type_name {
-	char          btn_name[24]; /* Name */
-	struct ctype *btn_type;     /* [1..1] Type. */
+	char          btn_name[CEIL_ALIGN(20, sizeof(void *))]; /* Name */
+	struct ctype *btn_type;                                 /* [1..1] Type. */
 };
 
 PRIVATE struct builtin_type_name const builtin_type_names[] = {
@@ -611,6 +611,53 @@ PRIVATE struct cprinter const lenprinter = {
 	/* .cp_format     = */ NULL,
 	/* .cp_format_arg = */ NULL,
 };
+
+
+#if 0 /* TODO */
+PRIVATE ssize_t FORMATPRINTER_CC
+vprinter_callback(/*size_t **/ void *arg,
+                  /*utf-8*/ char const *__restrict UNUSED(data),
+                  size_t datalen) {
+	size_t *premaining_length;
+	premaining_length = (size_t *)arg;
+	if (datalen > *premaining_length)
+		return -1; /* Text would become too long. */
+	*premaining_length -= datalen;
+	return 0;
+}
+
+
+/* Check if it would be possible to print `buf' in-line,
+ * such that `indent+INLINE_LENGTH <= maxlinelen'. If this
+ * cannot be done, then return -1. Otherwise, return the
+ * result of `indent+INLINE_LENGTH', that is: the new
+ * indent of the inline-printed value. */
+PRIVATE NONNULL((1, 2)) ssize_t KCALL
+ctype_printvalue_inline(struct ctyperef const *__restrict self,
+                        void const *buf, unsigned int flags,
+                        size_t indent, size_t maxlinelen) {
+	struct cprinter vprinter;
+	size_t remaining;
+	ssize_t error;
+	if unlikely(indent >= maxlinelen)
+		return -1; /* Never possible. */
+	remaining = maxlinelen - indent;
+	vprinter.cp_printer    = &vprinter_callback;
+	vprinter.cp_arg        = &remaining;
+	vprinter.cp_format     = NULL;
+	vprinter.cp_format_arg = NULL;
+	/* Try to print everything on a single line. */
+	error = ctype_printvalue(self, &vprinter, buf,
+	                         flags | CTYPE_PRINTVALUE_FLAG_ONELINE,
+	                         0, 0, 0, 0);
+	if (error >= 0)
+		error = (ssize_t)(maxlinelen - remaining);
+	return error;
+}
+#endif
+
+
+
 
 
 

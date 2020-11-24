@@ -53,22 +53,22 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint
 
 /* Dump the given debug information in a human-readable format to `printer'
  * >>  {
- * >>   void *m = dlopen(LIBDEBUGINFO_LIBRARY_NAME,RTLD_LOCAL);
- * >> #define LOAD(T,x) T x; *(void **)&x = dlsym(m,#x); assertf(x,"Error: %s",dlerror());
- * >>   LOAD(PDEBUG_REPR_DUMP,debug_repr_dump)
+ * >>   void *m = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
+ * >> #define LOAD(T, x) T x; *(void **)&x = dlsym(m, #x); assertf(x, "Error: %s", dlerror());
+ * >>   LOAD(PDEBUG_REPR_DUMP, debug_repr_dump)
  * >>   struct dl_section *debug_info   = dllocksection(dlgetmodule("c"), ".debug_info");
  * >>   struct dl_section *debug_abbrev = dllocksection(dlgetmodule("c"), ".debug_abbrev");
  * >>   struct dl_section *debug_loc    = dllocksection(dlgetmodule("c"), ".debug_loc");
  * >>   struct dl_section *debug_str    = dllocksection(dlgetmodule("c"), ".debug_str");
  * >>   debug_repr_dump(&file_printer, stdout,
- * >>                   (byte_t *)(debug_info ? debug_info->ds_data : NULL),
- * >>                   (byte_t *)(debug_info ? debug_info->ds_data + debug_info->ds_size : 0),
- * >>                   (byte_t *)(debug_abbrev ? debug_abbrev->ds_data : NULL),
- * >>                   (byte_t *)(debug_abbrev ? debug_abbrev->ds_data + debug_abbrev->ds_size : 0),
- * >>                   (byte_t *)(debug_str ? debug_str->ds_data : NULL),
- * >>                   (byte_t *)(debug_str ? debug_str->ds_data + debug_str->ds_size : 0),
- * >>                   (byte_t *)(debug_loc ? debug_loc->ds_data : NULL),
- * >>                   (byte_t *)(debug_loc ? debug_loc->ds_data + debug_loc->ds_size : 0));
+ * >>                   (byte_t const *)(debug_info ? debug_info->ds_data : NULL),
+ * >>                   (byte_t const *)(debug_info ? debug_info->ds_data + debug_info->ds_size : 0),
+ * >>                   (byte_t const *)(debug_abbrev ? debug_abbrev->ds_data : NULL),
+ * >>                   (byte_t const *)(debug_abbrev ? debug_abbrev->ds_data + debug_abbrev->ds_size : 0),
+ * >>                   (byte_t const *)(debug_str ? debug_str->ds_data : NULL),
+ * >>                   (byte_t const *)(debug_str ? debug_str->ds_data + debug_str->ds_size : 0),
+ * >>                   (byte_t const *)(debug_loc ? debug_loc->ds_data : NULL),
+ * >>                   (byte_t const *)(debug_loc ? debug_loc->ds_data + debug_loc->ds_size : 0));
  * >>  }
 */
 INTDEF NONNULL((1)) ssize_t CC

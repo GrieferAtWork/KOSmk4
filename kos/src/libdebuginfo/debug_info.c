@@ -1563,7 +1563,9 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser
 			break;
 
 		case DW_AT_data_member_location:
-			/* TODO: `DW_AT_data_member_location' can also be an expression! */
+			/* NOTE: Normally, `DW_AT_data_member_location' can also be an expression,
+			 *       however in the case of struct members, we're pretty safe to assume
+			 *       that this shouldn't ~normally~ happen... */
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
 			                                                &result->m_offset))
 				ERROR(err);

@@ -437,6 +437,7 @@
 #define DW_FORM_ref_sig8     0x20 /* reference */
 /*      DW_FORM_             0x21  * ... */
 /*      DW_FORM_             ....  * ... */
+/* TODO: This list (DW_FORM_*) is incomplete! */
 
 
 /* NOTE: Taken form `http://www.dwarfstd.org/doc/DWARF4.pdf' (Figure 13. Encoding attribute values) */

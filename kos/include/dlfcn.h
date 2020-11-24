@@ -720,11 +720,11 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
                                      unsigned int __cmd,
                                      ...);
 
-#define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `HANDLE' should be any valid module handle, or `NULL',
-                                             * and all other arguments are ignored; always returns `NULL', but doesn't set an error */
-#define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `HANDLE' should be any valid
-                                             * module handle, or alternatively `NULL' for the root application, and all other
-                                             * arguments are ignored. Always returns `NULL', but doesn't set an error */
+#define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `HANDLE' is ignored but should be any valid module handle, or `NULL',
+                                             * and all other arguments are also ignored; always returns `NULL', but doesn't set an error */
+#define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `HANDLE' is ignored but should be any
+                                             * valid module handle, or `NULL', and all other arguments are also ignored.
+                                             * Always returns `NULL', but doesn't set an error */
 #define DLAUXCTRL_ADD_FINALIZER      0xd103 /* Register a dynamic finalizer callback for `HANDLE':
                                              * >> CALLBACK = va_arg(void(__DLFCN_CC *)(void *));
                                              * >> ARG      = va_arg(void *);
@@ -753,7 +753,7 @@ __NOTHROW_NCX(__DLFCN_VCC dlauxctrl)(void *__handle,
 #define DLAUXCTRL_ELF_GET_PHDR       0xef01 /* [size_t *pcount [0..1]] Returns the module's vector of program headers (`ElfW(Phdr) *') */
 #define DLAUXCTRL_ELF_GET_SHDR       0xef02 /* [size_t *pcount [0..1]] Returns the module's vector of section headers (`ElfW(Shdr) *') */
 #define DLAUXCTRL_ELF_GET_DYN        0xef03 /* [size_t *pcount [0..1]] Returns the module's vector of dynamic tags (`ElfW(Dyn) *') */
-#define DLAUXCTRL_ELF_GET_DYNSYM     0xef04 /* [size_t *pcount [0..1]] Returns the module's vector of dynamic symbol table (`ElfW(Sym) *')
+#define DLAUXCTRL_ELF_GET_DYNSYM     0xef04 /* [size_t *pcount [0..1]] Returns the module's dynamic symbol table (`ElfW(Sym) *')
                                              * If the number of symbols is unknown, `(size_t)-1' written to `*pcount'. */
 #define DLAUXCTRL_ELF_GET_DYNSTR     0xef05 /* Returns the module's dynamic string table (`char const *') */
 #define DLAUXCTRL_ELF_GET_SHSTRTAB   0xef06 /* Returns the module's section header name string table (`char const *') */

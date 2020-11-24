@@ -825,7 +825,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			/* TODO: if (self->c_tok == '*') {
 			 *           ...
 			 *       }
-			 * Only when the '*' is the last token, or is followed by one of ) ] } , ;
+			 * Only when the '*' is the last token, or is followed by one of ) ] } , ; :
 			 * When used, take all variables as they would be enumerated by the
 			 * below `autocomplete_nontype_symbols' and push them on to the expression
 			 * stack. Then, pack all of them together within a pseudo-struct object
@@ -1613,6 +1613,43 @@ do_assign:
 done:
 	return result;
 }
+
+
+/* TODO: Add another top-level operator ":" that comes even before "=", and can
+ *       be used as a sort-of with-statement, where the left-hand-side can be
+ *       used to specify a struct- or pointer-to-struct expression, where members
+ *       of that struct can be used directly, as though they were local variables:
+ * >> eval current_driver_state.m_pointer:ds_drivers,ds_count
+ * Same as:
+ * >> eval current_driver_state.m_pointer.ds_drivers,current_driver_state.m_pointer.ds_count
+ *
+ * As far as semantics go, this would simply be parsed as
+ *     <parse_assign> ':' <parse_collon>
+ * where the <parse_assign> has to result in the aforementioned struct,
+ * or pointer-to-struct typing, and <parse_collon> is the recursive part,
+ * meaning that an expression `foo:bar:baz' is parsed as `foo:(bar:(baz))'.
+ *
+ * The members of the left-hand-side are only visible for the duration of the
+ * evaluation of the right-hand-side, and would supersede even local variables
+ * as far as scoping goes. If the left-hand-side expression is another collon-
+ * expression, struct fields are made available recursively:
+ *     foo:bar:baz
+ * Evaluate to the first match from (in this order):
+ *     #1: HAS_FIELD($GLOBALS["foo"], "bar")
+ *            ? $GLOBALS["foo"].bar.baz
+ *            : $GLOBALS["bar"].baz
+ *     #2: $GLOBALS["foo"].baz
+ *     #3: $GLOBALS["baz"]
+ *
+ * Additionally, multiple such statements can be chained, where symbols from
+ * those that are further to the right supersede symbols exposed by ones from
+ * earlier.
+ *
+ * This operator also interacts with `symbols_prefix*', such that an expression:
+ * >> foo*:bar
+ * will evaluation to an arbitrary member "bar" found in a structure who's
+ * name starts with "foo"
+ */
 
 #define DEFINE_INTERPOS_PARSER(name, inner_name)                                \
 	PRIVATE WUNUSED NONNULL((1)) dbx_errno_t                                    \
