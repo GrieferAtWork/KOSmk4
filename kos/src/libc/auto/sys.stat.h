@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c1c09a8 */
+/* HASH CRC-32:0x45996d5e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fmkdirat)(fd_t dirfd, char con
 /* @param flags: Set of `0 | AT_DOSPATH' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fmknodat)(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_mkfifo)(char const *fifoname, mode_t mode);
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_fchmodat)(fd_t dirfd, char const *filename, mode_t mode, atflag_t flags);
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_mkdirat)(fd_t dirfd, char const *pathname, mode_t mode);
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_mkfifoat)(fd_t dirfd, char const *fifoname, mode_t mode);

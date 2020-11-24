@@ -43,9 +43,11 @@ typedef __TM_TYPE(time) time_t;
 };
 
 [[doc_alias("ftime"), ignore, nocrt, alias("ftime")]]
+[[decl_include("<bits/os/timeb.h>")]]
 int crt_ftime32([[nonnull]] struct $timeb32 *timebuf);
 
 [[doc_alias("ftime"), ignore, nocrt, alias("ftime64")]]
+[[decl_include("<bits/os/timeb.h>")]]
 int crt_ftime64([[nonnull]] struct $timeb64 *timebuf);
 
 %#ifdef __USE_DOS
@@ -57,19 +59,24 @@ typedef int errno_t;
 }
 
 [[doc_alias("ftime"), ignore, nocrt, alias("_ftime32")]]
+[[decl_include("<bits/os/timeb.h>")]]
 void crt_dos_ftime32([[nonnull]] struct $timeb32 *timebuf);
 
 [[doc_alias("ftime"), ignore, nocrt, alias("_ftime64")]]
+[[decl_include("<bits/os/timeb.h>")]]
 void crt_dos_ftime64([[nonnull]] struct $timeb64 *timebuf);
 
 [[doc_alias("ftime"), ignore, nocrt, alias("_ftime32_s")]]
-errno_t crt_ftime32_s([[nonnull]] struct $timeb32 *timebuf);
+[[decl_include("<bits/os/timeb.h>", "<bits/types.h>")]]
+$errno_t crt_ftime32_s([[nonnull]] struct $timeb32 *timebuf);
 
 [[doc_alias("ftime"), ignore, nocrt, alias("_ftime64_s")]]
-errno_t crt_ftime64_s([[nonnull]] struct $timeb64 *timebuf);
+[[decl_include("<bits/os/timeb.h>", "<bits/types.h>")]]
+$errno_t crt_ftime64_s([[nonnull]] struct $timeb64 *timebuf);
 
 
 
+[[decl_include("<bits/os/timeb.h>")]]
 [[userimpl, doc_alias("ftime")]]
 [[requires($has_function(crt_ftime32_s) || $has_function(crt_ftime32) ||
            $has_function(crt_dos_ftime64) || $has_function(crt_ftime64_s) ||
@@ -106,6 +113,7 @@ void _ftime32([[nonnull]] struct $timeb32 *timebuf) {
 @@pp_endif@@
 }
 
+[[decl_include("<bits/os/timeb.h>")]]
 [[userimpl, doc_alias("ftime"), time64_variant_of(_ftime32)]]
 [[requires($has_function(crt_ftime64_s) || $has_function(crt_ftime64) ||
            $has_function(crt_dos_ftime32) || $has_function(crt_ftime32_s) ||
@@ -142,6 +150,7 @@ void _ftime64([[nonnull]] struct $timeb64 *timebuf) {
 @@pp_endif@@
 }
 
+[[decl_include("<bits/os/timeb.h>", "<bits/types.h>")]]
 [[doc_alias("ftime")]]
 [[requires($has_function(crt_ftime32) || $has_function(crt_ftime64_s) ||
            $has_function(crt_ftime64) || $has_function(crt_dos_ftime32) ||
@@ -179,6 +188,7 @@ errno_t _ftime32_s([[nonnull]] struct $timeb32 *timebuf) {
 @@pp_endif@@
 }
 
+[[decl_include("<bits/os/timeb.h>", "<bits/types.h>")]]
 [[doc_alias("ftime"), time64_variant_of(_ftime32_s)]]
 [[requires($has_function(crt_ftime64) || $has_function(crt_ftime32_s) ||
            $has_function(crt_ftime32) || $has_function(crt_dos_ftime64) ||
@@ -223,6 +233,7 @@ errno_t _ftime64_s([[nonnull]] struct $timeb64 *timebuf) {
 %
 %
 @@Fill in TIMEBUF with information about the current time
+[[decl_include("<bits/os/timeb.h>")]]
 [[no_crt_self_import]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("ftime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("ftime")]]
@@ -318,6 +329,7 @@ int ftime([[nonnull]] struct timeb *timebuf) {
 
 %
 %#ifdef __USE_TIME64
+[[decl_include("<bits/os/timeb.h>")]]
 [[doc_alias("ftime"), time64_variant_of(ftime)]]
 [[requires($has_function(crt_ftime64_s) || $has_function(crt_dos_ftime64) ||
            $has_function(crt_ftime32) || $has_function(crt_ftime32_s) ||

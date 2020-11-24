@@ -2084,8 +2084,8 @@ again:
 @@pp_if $has_function(open) || $has_function(stat)@@
 	case 2: {
 @@pp_if $has_function(stat)@@
-		struct stat st;
-		result = -stat(template_, &st);
+		struct @stat@ st;
+		result = stat(template_, &st);
 @@pp_else@@
 		result = open(template_,
 @@pp_ifdef O_RDONLY@@
@@ -2099,12 +2099,13 @@ again:
 @@pp_endif@@
 		              ,
 		              0600);
+@@pp_endif@@
 		if (result < 0) {
 			/* File doesn't already exist. */
 			result = 0;
 		} else {
 			/* File does already exist. */
-@@pp_if $has_function(close)@@
+@@pp_if !$has_function(stat) && $has_function(close)@@
 			close(result);
 @@pp_endif@@
 @@pp_ifdef EEXIST@@
@@ -2115,7 +2116,6 @@ again:
 #define NEED_do_try_again
 			goto do_try_again;
 		}
-@@pp_endif@@
 	}	break;
 @@pp_endif@@
 

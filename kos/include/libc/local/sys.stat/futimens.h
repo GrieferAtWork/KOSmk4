@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc600158e */
+/* HASH CRC-32:0x80630918 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_futimens_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_futimens64) || defined(__CRT_HAVE_futimens)
+#include <bits/os/timespec.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: futimens32 from sys.stat */
 #if !defined(__local___localdep_futimens32_defined) && defined(__CRT_HAVE_futimens)

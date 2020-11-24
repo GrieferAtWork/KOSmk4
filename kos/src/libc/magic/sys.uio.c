@@ -72,10 +72,10 @@ ssize_t process_vm_readv($pid_t pid,
 @@@param: flags: Must be `0'
 @@@return: * :   The actual number of written bytes
 [[cp, decl_include("<bits/os/iovec.h>", "<bits/types.h>")]]
-process_vm_writev:($pid_t pid,
-                   [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
-                   [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
-                   $ulongptr_t flags) -> ssize_t;
+ssize_t process_vm_writev($pid_t pid,
+                          [[inp_opt(liovcnt)]] struct iovec const *local_iov, $ulongptr_t liovcnt,
+                          [[inp_opt(riovcnt)]] struct iovec const *remote_iov, $ulongptr_t riovcnt,
+                          $ulongptr_t flags);
 %#endif /* __USE_GNU */
 
 %

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fffd7b5 */
+/* HASH CRC-32:0x35399fa3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/os/kos/utsname.h>
-
-__SYSDECL_BEGIN
+#include <bits/os/utsname.h>
 
 /* Note that SVID assumes all members have the same size. */
 #ifdef __USE_MISC
@@ -39,12 +37,12 @@ __SYSDECL_BEGIN
 #endif /* __USE_MISC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 /* Put information about the system in NAME */
 __CDECLARE_OPT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),(__name))
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 #endif /* !_SYS_UTSNAME_H */

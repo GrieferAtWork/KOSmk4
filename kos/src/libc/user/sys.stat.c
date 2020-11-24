@@ -581,8 +581,8 @@ NOTHROW_RPC(LIBCCALL libc_mkfifo)(char const *fifoname,
 }
 /*[[[end:libc_mkfifo]]]*/
 
-/*[[[head:libc_fchmodat,hash:CRC-32=0x11161263]]]*/
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+/*[[[head:libc_fchmodat,hash:CRC-32=0x26083bb4]]]*/
+/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 INTERN ATTR_SECTION(".text.crt.fs.modify") NONNULL((2)) int
 NOTHROW_RPC(LIBCCALL libc_fchmodat)(fd_t dirfd,
                                     char const *filename,

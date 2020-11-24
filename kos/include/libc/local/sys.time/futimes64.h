@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbcd1e0 */
+/* HASH CRC-32:0x6af4c20b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_futimes64_defined 1
 #include <__crt.h>
 #ifdef __CRT_HAVE_futimes
+#include <bits/os/timeval.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: futimes32 from sys.time */
 #ifndef __local___localdep_futimes32_defined

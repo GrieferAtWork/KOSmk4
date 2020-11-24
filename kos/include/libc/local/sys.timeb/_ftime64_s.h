@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd58b0e7f */
+/* HASH CRC-32:0x114e4a3f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local__ftime64_s_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE__ftime32)
+#include <bits/os/timeb.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: crt_dos_ftime32 from sys.timeb */
 #if !defined(__local___localdep_crt_dos_ftime32_defined) && defined(__CRT_HAVE__ftime32)

@@ -22,9 +22,7 @@
 
 %{
 #include <features.h>
-#include <bits/os/kos/utsname.h>
-
-__SYSDECL_BEGIN
+#include <bits/os/utsname.h>
 
 /* Note that SVID assumes all members have the same size. */
 #ifdef __USE_MISC
@@ -32,17 +30,17 @@ __SYSDECL_BEGIN
 #endif /* __USE_MISC */
 
 #ifdef __CC__
+__SYSDECL_BEGIN
 
 }
 
 @@Put information about the system in NAME
-[[decl_include("<bits/os/kos/utsname.h>")]]
+[[decl_include("<bits/os/utsname.h>")]]
 int uname([[nonnull]] struct utsname *name);
 
 %{
 
-#endif /* __CC__ */
-
 __SYSDECL_END
+#endif /* __CC__ */
 
 }

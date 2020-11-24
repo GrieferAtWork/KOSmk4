@@ -101,22 +101,24 @@ enum {
 }
 
 
-[[decl_include("<features.h>")]]
+[[decl_include("<features.h>", "<bits/types.h>", "<bits/os/itimerspec.h>")]]
 [[doc_alias("timerfd_settime"), ignore, nocrt, alias("timerfd_settime")]]
 int timerfd_settime32($fd_t ufd, __STDC_INT_AS_UINT_T flags,
                       [[nonnull]] struct $itimerspec32 const *utmr,
                       [[nullable]] struct $itimerspec32 *otmr);
 
+[[decl_include("<bits/types.h>", "<bits/os/itimerspec.h>")]]
 [[doc_alias("timerfd_gettime"), ignore, nocrt, alias("timerfd_gettime")]]
 int timerfd_gettime32($fd_t ufd, [[nonnull]] struct $itimerspec32 *__restrict otmr);
 
 
 @@@param: flags: Set of `0 | TFD_NONBLOCK | TFD_CLOEXEC | TFD_CLOFORK'
-[[nothrow, decl_include("<features.h>")]]
+[[nothrow, decl_include("<features.h>", "<bits/types.h>")]]
 $fd_t timerfd_create(clockid_t clock_id, __STDC_INT_AS_UINT_T flags);
 
 @@@param: flags: Set of `0 | TFD_TIMER_ABSTIME'
 [[no_crt_self_import, decl_include("<features.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/itimerspec.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timerfd_settime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timerfd_settime")]]
 [[userimpl, requires($has_function(timerfd_settime32) || $has_function(timerfd_settime64))]]
@@ -157,6 +159,7 @@ int timerfd_settime($fd_t ufd, __STDC_INT_AS_UINT_T flags,
 }
 
 [[no_crt_self_import]]
+[[decl_include("<bits/types.h>", "<bits/os/itimerspec.h>")]]
 [[if(defined(__USE_TIME_BITS64)), preferred_alias("timerfd_gettime64")]]
 [[if(!defined(__USE_TIME_BITS64)), preferred_alias("timerfd_gettime")]]
 [[userimpl, requires($has_function(timerfd_gettime32) || $has_function(timerfd_gettime64))]]
@@ -189,6 +192,7 @@ int timerfd_gettime($fd_t ufd, [[nonnull]] struct itimerspec *__restrict otmr) {
 %#ifdef __USE_TIME64
 
 [[decl_include("<features.h>")]]
+[[decl_include("<bits/types.h>", "<bits/os/itimerspec.h>")]]
 [[doc_alias("timerfd_settime"), time64_variant_of(timerfd_settime)]]
 [[userimpl, requires_function(timerfd_settime32)]]
 int timerfd_settime64($fd_t ufd, __STDC_INT_AS_UINT_T flags,
@@ -210,6 +214,7 @@ int timerfd_settime64($fd_t ufd, __STDC_INT_AS_UINT_T flags,
 	return result;
 }
 
+[[decl_include("<bits/types.h>", "<bits/os/itimerspec.h>")]]
 [[doc_alias("timerfd_gettime"), time64_variant_of(timerfd_gettime)]]
 [[userimpl, requires_function(timerfd_gettime32)]]
 int timerfd_gettime64($fd_t ufd, [[nonnull]] struct itimerspec64 *__restrict otmr) {

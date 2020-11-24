@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bf2af */
+/* HASH CRC-32:0x82fc3d1d */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ INTDEF NONNULL((2)) void (LIBDCALL libd_FMkdirAt)(fd_t dirfd, char const *pathna
 /* @param flags: Set of `0 | AT_DOSPATH' */
 INTDEF NONNULL((2)) void (LIBDCALL libd_FMknodAt)(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) THROWS(...);
 INTDEF NONNULL((1)) void (LIBDCALL libd_Mkfifo)(char const *fifoname, mode_t mode) THROWS(...);
-/* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
+/* @param flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
 INTDEF NONNULL((2)) void (LIBDCALL libd_FChmodAt)(fd_t dirfd, char const *filename, mode_t mode, atflag_t flags) THROWS(...);
 INTDEF NONNULL((2)) void (LIBDCALL libd_MkdirAt)(fd_t dirfd, char const *pathname, mode_t mode) THROWS(...);
 INTDEF NONNULL((2)) void (LIBDCALL libd_MkfifoAt)(fd_t dirfd, char const *fifoname, mode_t mode) THROWS(...);

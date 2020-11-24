@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59e68e53 */
+/* HASH CRC-32:0x9d7cda59 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,8 @@
 #define __local_futimesat_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_futimesat64) || defined(__CRT_HAVE_futimesat)
+#include <bits/os/timeval.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: futimesat32 from sys.time */
 #if !defined(__local___localdep_futimesat32_defined) && defined(__CRT_HAVE_futimesat)

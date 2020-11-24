@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1f1a479 */
+/* HASH CRC-32:0x3183a29c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_ftime_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64)
+#include <bits/os/timeb.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: crt_dos_ftime32 from sys.timeb */
 #if !defined(__local___localdep_crt_dos_ftime32_defined) && defined(__CRT_HAVE__ftime32)
@@ -44,6 +45,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_ftime32,(struct
 /* Dependency: crt_ftime32_s from sys.timeb */
 #if !defined(__local___localdep_crt_ftime32_s_defined) && defined(__CRT_HAVE__ftime32_s)
 #define __local___localdep_crt_ftime32_s_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_crt_ftime32_s,(struct __timeb32 *__timebuf),_ftime32_s,(__timebuf))
 #endif /* !__local___localdep_crt_ftime32_s_defined && __CRT_HAVE__ftime32_s */
@@ -56,6 +60,9 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_crt_ftime64,(struct
 /* Dependency: crt_ftime64_s from sys.timeb */
 #if !defined(__local___localdep_crt_ftime64_s_defined) && defined(__CRT_HAVE__ftime64_s)
 #define __local___localdep_crt_ftime64_s_defined 1
+__NAMESPACE_LOCAL_END
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
 /* Fill in TIMEBUF with information about the current time */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_crt_ftime64_s,(struct __timeb64 *__timebuf),_ftime64_s,(__timebuf))
 #endif /* !__local___localdep_crt_ftime64_s_defined && __CRT_HAVE__ftime64_s */

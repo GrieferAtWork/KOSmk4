@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc458a593 */
+/* HASH CRC-32:0xeed8fc81 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_getitimer_defined 1
 #include <__crt.h>
 #if defined(__CRT_HAVE_getitimer64) || defined(__CRT_HAVE_getitimer)
+#include <bits/os/itimerval.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Dependency: getitimer32 from sys.time */
 #if !defined(__local___localdep_getitimer32_defined) && defined(__CRT_HAVE_getitimer)

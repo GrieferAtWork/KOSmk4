@@ -194,12 +194,15 @@ __SYSDECL_BEGIN
 }
 
 [[ignore, nocrt, alias("adjtimex", "__adjtimex")]]
+[[decl_include("<bits/os/timex.h>")]]
 int adjtimex32([[nonnull]] struct $timex32 *__restrict __ntx);
 
 [[ignore, nocrt, alias("ntp_gettimex")]]
+[[decl_include("<bits/crt/ntptimeval.h>")]]
 int ntp_gettime32([[nonnull]] struct $ntptimeval32 *__restrict ntv);
 
 [[ignore, nocrt, alias("ntp_adjtime")]]
+[[decl_include("<bits/os/timex.h>")]]
 int ntp_adjtime32([[nonnull]] struct $timex32 *__restrict tntx);
 
 
