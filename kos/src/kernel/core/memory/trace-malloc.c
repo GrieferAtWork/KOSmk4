@@ -1420,26 +1420,24 @@ gc_gather_unreachable_slabs(struct trace_node **__restrict pleaks) {
 #endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 
 #ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
-PRIVATE NOBLOCK ATTR_COLDTEXT void
+PRIVATE NOBLOCK ATTR_COLDTEXT bool
 NOTHROW(KCALL gc_gather_unreachable_nodes)(struct trace_node *__restrict node,
                                            struct trace_node **__restrict pleaks) {
 again:
 	if (node->tn_reach != gc_version) {
 		/* This node wasn't reached. (but ignore if the node has the NOLEAK flag set) */
 		if (!(node->tn_flags & TRACE_NODE_FLAG_NOLEAK)) {
-			if (node->tn_link.rb_lhs)
-				gc_gather_unreachable_nodes(node->tn_link.rb_lhs, pleaks);
-			if (node->tn_link.rb_rhs)
-				gc_gather_unreachable_nodes(node->tn_link.rb_rhs, pleaks);
 			trace_node_tree_removenode(&nodes, node);
 			trace_node_leak_next(node) = *pleaks;
 			*pleaks = node;
-			return;
+			return true;
 		}
 	}
 	if (node->tn_link.rb_lhs) {
-		if (node->tn_link.rb_rhs)
-			gc_gather_unreachable_nodes(node->tn_link.rb_rhs, pleaks);
+		if (node->tn_link.rb_rhs) {
+			if (gc_gather_unreachable_nodes(node->tn_link.rb_rhs, pleaks))
+				return true;
+		}
 		node = node->tn_link.rb_lhs;
 		goto again;
 	}
@@ -1447,6 +1445,7 @@ again:
 		node = node->tn_link.rb_rhs;
 		goto again;
 	}
+	return false;
 }
 #else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
 PRIVATE NOBLOCK ATTR_COLDTEXT void
@@ -1517,15 +1516,22 @@ kmalloc_leaks_gather(void) {
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	
 		/* Gather leaks from trace nodes. */
-		if (nodes) {
 #ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
-			gc_gather_unreachable_nodes(nodes, &result);
+		/* Because of how removing nodes from an RB-tree works, the act
+		 * of removing a node may cause the tree structure to be altered,
+		 * such that we'll be unable to hit all (potentially leaked)
+		 * nodes during a single pass. As such, we must keep on scanning
+		 * the tree until it's become empty (unlikely) or until we no
+		 * longer find any more leaks. */
+		while (nodes && gc_gather_unreachable_nodes(nodes, &result))
+			;
 #else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
+		if (nodes) {
 			gc_gather_unreachable_nodes(&nodes, &result,
 			                            ATREE_SEMI0(uintptr_t),
 			                            ATREE_LEVEL0(uintptr_t));
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 		}
+#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 	}
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	EXCEPT {
