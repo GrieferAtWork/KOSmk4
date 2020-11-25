@@ -245,6 +245,14 @@ local limits = {
 local longestPosixNameLength    = limits.each[2].length > ...;
 local longestPosixMinimumLength = (for (local x: limits) x[2] ? #x[3] : 0) > ...;
 
+function escapedNameOf(name) {
+	return {
+		"THREAD_KEYS_MAX"              : "__PTHREAD_KEYS_MAX",
+		"THREAD_DESTRUCTOR_ITERATIONS" : "__PTHREAD_DESTRUCTOR_ITERATIONS",
+		"THREAD_THREADS_MAX"           : "__PTHREAD_THREADS_MAX",
+	}.get(name, "__" + name);
+}
+
 print("/" "* Posix-mandated minimum limits. *" "/");
 for (local none, none, posixName, posixMinimum, doc: limits) {
 	if (!posixName)
@@ -259,11 +267,11 @@ print;
 print;
 print("/" "* Substitute unknown system/crt limits. *" "/");
 for (local none, name, posixName, posixMinimum, doc: limits) {
-	print("#ifndef __", name);
-	print("#define __", name, " ",
+	print("#ifndef ", escapedNameOf(name));
+	print("#define ", escapedNameOf(name), " ",
 		posixName ? posixName : posixMinimum,
 		" /" "* ", doc, " *" "/");
-	print("#endif /" "* !__", name, " *" "/");
+	print("#endif /" "* !", escapedNameOf(name), " *" "/");
 }
 print;
 print;
@@ -272,12 +280,12 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 	print();
 	print("/" "* ", doc, " *" "/");
 	print("#ifndef ", name);
-	print("#if __", name, " != -1");
-	print("#define ", name, " __", name);
+	print("#if ", escapedNameOf(name), " != -1");
+	print("#define ", name, " ", escapedNameOf(name));
 	if (alwaysUseMinimum) {
-		print("#else /" "* __", name, " != -1 *" "/");
+		print("#else /" "* ", escapedNameOf(name), " != -1 *" "/");
 		print("#define ", name, " ", posixName ? posixName : posixMinimum);
-		print("#endif /" "* __", name, " == -1 *" "/");
+		print("#endif /" "* ", escapedNameOf(name), " == -1 *" "/");
 	} else {
 		print("#elif defined(__USE_ALL_LIMITS)");
 		print("#define ", name, " ", posixName ? posixName : posixMinimum);
@@ -461,15 +469,15 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #ifndef __CLOCKRES_MIN
 #define __CLOCKRES_MIN _POSIX_CLOCKRES_MIN /* Maximum clock resolution in nanoseconds. */
 #endif /* !__CLOCKRES_MIN */
-#ifndef __THREAD_KEYS_MAX
-#define __THREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX /* The # of data keys per process. */
-#endif /* !__THREAD_KEYS_MAX */
-#ifndef __THREAD_DESTRUCTOR_ITERATIONS
-#define __THREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS /* Controlling the iterations of destructors for thread-specific data. */
-#endif /* !__THREAD_DESTRUCTOR_ITERATIONS */
-#ifndef __THREAD_THREADS_MAX
-#define __THREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX /* The # of threads per process. */
-#endif /* !__THREAD_THREADS_MAX */
+#ifndef __PTHREAD_KEYS_MAX
+#define __PTHREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX /* The # of data keys per process. */
+#endif /* !__PTHREAD_KEYS_MAX */
+#ifndef __PTHREAD_DESTRUCTOR_ITERATIONS
+#define __PTHREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS /* Controlling the iterations of destructors for thread-specific data. */
+#endif /* !__PTHREAD_DESTRUCTOR_ITERATIONS */
+#ifndef __PTHREAD_THREADS_MAX
+#define __PTHREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX /* The # of threads per process. */
+#endif /* !__PTHREAD_THREADS_MAX */
 
 
 /* Actual implementation limits. */
@@ -737,8 +745,8 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* The # of data keys per process. */
 #ifndef THREAD_KEYS_MAX
-#if __THREAD_KEYS_MAX != -1
-#define THREAD_KEYS_MAX __THREAD_KEYS_MAX
+#if __PTHREAD_KEYS_MAX != -1
+#define THREAD_KEYS_MAX __PTHREAD_KEYS_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define THREAD_KEYS_MAX _POSIX_THREAD_KEYS_MAX
 #endif /* ... */
@@ -746,8 +754,8 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* Controlling the iterations of destructors for thread-specific data. */
 #ifndef THREAD_DESTRUCTOR_ITERATIONS
-#if __THREAD_DESTRUCTOR_ITERATIONS != -1
-#define THREAD_DESTRUCTOR_ITERATIONS __THREAD_DESTRUCTOR_ITERATIONS
+#if __PTHREAD_DESTRUCTOR_ITERATIONS != -1
+#define THREAD_DESTRUCTOR_ITERATIONS __PTHREAD_DESTRUCTOR_ITERATIONS
 #elif defined(__USE_ALL_LIMITS)
 #define THREAD_DESTRUCTOR_ITERATIONS _POSIX_THREAD_DESTRUCTOR_ITERATIONS
 #endif /* ... */
@@ -755,8 +763,8 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 /* The # of threads per process. */
 #ifndef THREAD_THREADS_MAX
-#if __THREAD_THREADS_MAX != -1
-#define THREAD_THREADS_MAX __THREAD_THREADS_MAX
+#if __PTHREAD_THREADS_MAX != -1
+#define THREAD_THREADS_MAX __PTHREAD_THREADS_MAX
 #elif defined(__USE_ALL_LIMITS)
 #define THREAD_THREADS_MAX _POSIX_THREAD_THREADS_MAX
 #endif /* ... */

@@ -3081,23 +3081,33 @@ pthread_tls_segment_init(void *UNUSED(arg), void *base) {
 PRIVATE void __LIBCCALL
 pthread_tls_segment_fini(void *UNUSED(arg), void *base) {
 	struct pthread_tls_segment *me;
-	size_t i;
-	me = (struct pthread_tls_segment *)base;
-	for (i = 0; i < me->pts_alloc; ++i) {
-		void *tls_value;
-		tls_value = me->pts_values[i];
-		if (tls_value != NULL) {
-			__pthread_destr_function_t dtor = NULL;
-			atomic_rwlock_read(&tls_lock);
-			if likely(i < tls_count)
-				dtor = tls_dtors[i];
-			atomic_rwlock_endread(&tls_lock);
-			/* Invoke the TLS destructor for non-NULL values. */
-			if (dtor)
-				(*dtor)(tls_value);
+	size_t i, attempt = 0;
+	bool found_some;
+	do {
+		found_some = false;
+		me = (struct pthread_tls_segment *)base;
+		for (i = 0; i < me->pts_alloc; ++i) {
+			void *tls_value;
+			tls_value = me->pts_values[i];
+			if (tls_value != NULL) {
+				__pthread_destr_function_t dtor;
+				me->pts_values[i] = NULL;
+				dtor              = NULL;
+				atomic_rwlock_read(&tls_lock);
+				if likely(i < tls_count)
+					dtor = tls_dtors[i];
+				atomic_rwlock_endread(&tls_lock);
+				/* Invoke the TLS destructor for non-NULL values. */
+				if (dtor) {
+					(*dtor)(tls_value);
+					found_some = true;
+				}
+			}
 		}
-	}
-	/* Free a dynamically allocated TLS extension. */
+		++attempt;
+	} while (found_some &&
+	         attempt < PTHREAD_DESTRUCTOR_ITERATIONS);
+	/* Free a dynamically allocated TLS data-vector. */
 	if (me->pts_values != me->pts_static)
 		free(me->pts_values);
 }
