@@ -658,9 +658,9 @@ __NOTHROW_NCX(__DLFCN_CC dltlsalloc)(__size_t __num_bytes, __size_t __min_alignm
                                      void *__perthread_callback_arg);
 #endif /* __CRT_HAVE_dltlsalloc */
 
-/* Free a TLS segment previously allocated with `dltlsalloc' */
+/* Free a TLS segment previously allocated with `dltlsalloc()' */
 #ifdef __CRT_HAVE_dltlsfree
-__IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__IMPDEF __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__DLFCN_CC dltlsfree)(void *__tls_handle);
 #endif /* __CRT_HAVE_dltlsfree */
 

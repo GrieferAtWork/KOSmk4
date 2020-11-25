@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb670ebb8 */
+/* HASH CRC-32:0x7b02d735 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -476,14 +476,18 @@ INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_barrierattr_setpsh
  * @return: ENOMEM: Insufficient memory to create the key */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_key_create)(pthread_key_t *key, __pthread_destr_function_t destr_function);
 /* Destroy KEY
- * @return: EOK: Success */
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key' */
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key);
 /* Return current value of the thread-specific data slot identified by KEY
  * @return: * :   The value currently associated with `key' in the calling thread
- * @return: NULL: The current value is `NULL', or no value has been bound, yet */
+ * @return: NULL: The current value is `NULL'
+ * @return: NULL: No value has been bound, yet
+ * @return: NULL: Invalid `key' */
 INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key);
 /* Store POINTER in the thread-specific data slot identified by KEY
  * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-NULL, `key' had yet to be allowed for the
  *                  calling thread, and an attempt to allocate it just now failed */
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key, void const *pointer);

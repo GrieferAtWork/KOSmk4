@@ -222,15 +222,8 @@ NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 		 * to write into our TID address field (since we're freeing
 		 * the associated structure right now). */
 		sys_set_tid_address(NULL);
-#if 1 /* Same as code below, but a bit smaller. */
-		/* Free our own TLS segment. */
-		dltlsfreeseg(RD_TLS_BASE_REGISTER());
-#else
-		/* Make sure that our TLS pointer was initialized. */
-		if (!me->pt_tls)
-			me->pt_tls = RD_TLS_BASE_REGISTER();
+		/* Destroy our thread. */
 		destroy(me);
-#endif
 	}
 }
 
@@ -3044,6 +3037,9 @@ PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") __pthread_destr_function_t *tls_d
 /* Max allocated TLS key, plus 1. This describes the length of `tls_dtors' */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") size_t tls_count = 0;
 
+#define tls_keyok(key) ((size_t)(key) < tls_count && tls_dtors[(size_t)(key)] != NULL)
+
+
 /* Lock for accessing `tls_dtors' and `tls_count' */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") struct atomic_rwlock tls_lock = ATOMIC_RWLOCK_INIT;
 
@@ -3266,16 +3262,17 @@ use_ith_slot:
 }
 /*[[[end:libc_pthread_key_create]]]*/
 
-/*[[[head:libc_pthread_key_delete,hash:CRC-32=0x4c9f546c]]]*/
+/*[[[head:libc_pthread_key_delete,hash:CRC-32=0x1f4b5674]]]*/
 /* Destroy KEY
- * @return: EOK: Success */
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key' */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_key_delete)(pthread_key_t key)
 /*[[[body:libc_pthread_key_delete]]]*/
 {
 	errno_t result = EOK;
 	atomic_rwlock_write(&tls_lock);
-	if unlikely((size_t)key >= tls_count || tls_dtors[(size_t)key] == NULL) {
+	if unlikely(!tls_keyok(key)) {
 		/* Bad key! */
 		result = EINVAL;
 	} else {
@@ -3307,10 +3304,12 @@ done:
 }
 /*[[[end:libc_pthread_key_delete]]]*/
 
-/*[[[head:libc_pthread_getspecific,hash:CRC-32=0xbf764dff]]]*/
+/*[[[head:libc_pthread_getspecific,hash:CRC-32=0x120f378f]]]*/
 /* Return current value of the thread-specific data slot identified by KEY
  * @return: * :   The value currently associated with `key' in the calling thread
- * @return: NULL: The current value is `NULL', or no value has been bound, yet */
+ * @return: NULL: The current value is `NULL'
+ * @return: NULL: No value has been bound, yet
+ * @return: NULL: Invalid `key' */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED void *
 NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 /*[[[body:libc_pthread_getspecific]]]*/
@@ -3318,7 +3317,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 	void *result = NULL;
 	/* Verify that `key' is actually valid. */
 	atomic_rwlock_read(&tls_lock);
-	if unlikely((size_t)key >= tls_count || tls_dtors[(size_t)key] == NULL) {
+	if unlikely(!tls_keyok(key)) {
 		atomic_rwlock_endread(&tls_lock);
 		/* Bad key! */
 	} else {
@@ -3334,9 +3333,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecific)(pthread_key_t key)
 }
 /*[[[end:libc_pthread_getspecific]]]*/
 
-/*[[[head:libc_pthread_setspecific,hash:CRC-32=0x35e8a87]]]*/
+/*[[[head:libc_pthread_setspecific,hash:CRC-32=0x2ae28ca0]]]*/
 /* Store POINTER in the thread-specific data slot identified by KEY
  * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-NULL, `key' had yet to be allowed for the
  *                  calling thread, and an attempt to allocate it just now failed */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") errno_t
@@ -3347,7 +3347,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setspecific)(pthread_key_t key,
 	void **slot;
 	/* Verify that `key' is actually valid. */
 	atomic_rwlock_read(&tls_lock);
-	if unlikely((size_t)key >= tls_count || tls_dtors[(size_t)key] == NULL) {
+	if unlikely(!tls_keyok(key)) {
 		atomic_rwlock_endread(&tls_lock);
 		/* Bad key! */
 		return EINVAL;

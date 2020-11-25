@@ -512,7 +512,7 @@ err:
 
 
 /* Free a TLS segment previously allocated with `dltlsalloc()' */
-INTERN WUNUSED NONNULL((1)) int DLFCN_CC
+INTERN NONNULL((1)) int DLFCN_CC
 libdl_dltlsfree(DlModule *self) {
 	if unlikely(!DL_VERIFY_MODULE_HANDLE(self))
 		goto err_nullmodule;

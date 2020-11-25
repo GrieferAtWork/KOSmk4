@@ -387,7 +387,7 @@ libdl_dltlsalloc(size_t num_bytes, size_t min_alignment,
                  void *perthread_callback_arg);
 
 /* Free a TLS segment previously allocated with `dltlsalloc()' */
-INTDEF WUNUSED NONNULL((1)) int DLFCN_CC libdl_dltlsfree(DlModule *self);
+INTDEF NONNULL((1)) int DLFCN_CC libdl_dltlsfree(DlModule *self);
 
 #ifndef __DLFCN_DLTLSADDR_CC
 #define __DLFCN_DLTLSADDR_CC  __DLFCN_CC

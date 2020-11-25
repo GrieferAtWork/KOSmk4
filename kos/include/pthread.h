@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x212017d6 */
+/* HASH CRC-32:0x96687249 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1732,26 +1732,33 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 __CDECLARE_OPT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,pthread_key_create,(pthread_key_t *__key, __pthread_destr_function_t __destr_function),(__key,__destr_function))
 #ifdef __CRT_HAVE_pthread_key_delete
 /* Destroy KEY
- * @return: EOK: Success */
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key' */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),(__key))
 #elif defined(__CRT_HAVE_tss_delete)
 /* Destroy KEY
- * @return: EOK: Success */
+ * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key' */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),tss_delete,(__key))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_getspecific
 /* Return current value of the thread-specific data slot identified by KEY
  * @return: * :   The value currently associated with `key' in the calling thread
- * @return: NULL: The current value is `NULL', or no value has been bound, yet */
+ * @return: NULL: The current value is `NULL'
+ * @return: NULL: No value has been bound, yet
+ * @return: NULL: Invalid `key' */
 __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),(__key))
 #elif defined(__CRT_HAVE_tss_get)
 /* Return current value of the thread-specific data slot identified by KEY
  * @return: * :   The value currently associated with `key' in the calling thread
- * @return: NULL: The current value is `NULL', or no value has been bound, yet */
+ * @return: NULL: The current value is `NULL'
+ * @return: NULL: No value has been bound, yet
+ * @return: NULL: Invalid `key' */
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),tss_get,(__key))
 #endif /* ... */
 /* Store POINTER in the thread-specific data slot identified by KEY
  * @return: EOK:    Success
+ * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-NULL, `key' had yet to be allowed for the
  *                  calling thread, and an attempt to allocate it just now failed */
 __CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setspecific,(pthread_key_t __key, void const *__pointer),(__key,__pointer))

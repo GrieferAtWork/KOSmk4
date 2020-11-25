@@ -2008,20 +2008,24 @@ $errno_t pthread_key_create([[nonnull]] pthread_key_t *key,
                             [[nullable]] __pthread_destr_function_t destr_function);
 
 @@Destroy KEY
-@@@return: EOK: Success
+@@@return: EOK:    Success
+@@@return: EINVAL: Invalid `key'
 [[export_alias("tss_delete")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_key_delete(pthread_key_t key);
 
 @@Return current value of the thread-specific data slot identified by KEY
 @@@return: * :   The value currently associated with `key' in the calling thread
-@@@return: NULL: The current value is `NULL', or no value has been bound, yet
+@@@return: NULL: The current value is `NULL'
+@@@return: NULL: No value has been bound, yet
+@@@return: NULL: Invalid `key'
 [[wunused, export_alias("tss_get")]]
 [[decl_include("<bits/crt/pthreadtypes.h>")]]
 void *pthread_getspecific(pthread_key_t key);
 
 @@Store POINTER in the thread-specific data slot identified by KEY
 @@@return: EOK:    Success
+@@@return: EINVAL: Invalid `key'
 @@@return: ENOMEM: `pointer' is non-NULL, `key' had yet to be allowed for the
 @@                 calling thread, and an attempt to allocate it just now failed
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
