@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8d34f63 */
+/* HASH CRC-32:0xe5e0e2cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
+/* >> pthread_detach(3)
+ * Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
  * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it
  * @return: EOK: Success */

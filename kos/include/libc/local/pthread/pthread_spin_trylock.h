@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee5ece8 */
+/* HASH CRC-32:0x2656a0e3 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,8 @@
 #include <hybrid/__atomic.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Try to lock spinlock LOCK
+/* >> pthread_spin_trylock(3)
+ * Try to lock spinlock LOCK
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
 __LOCAL_LIBC(pthread_spin_trylock) __ATTR_WUNUSED __ATTR_NONNULL((1)) __errno_t

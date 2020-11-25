@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb56e1627 */
+/* HASH CRC-32:0x914b0b2a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2258,7 +2258,8 @@ typedef void (__LIBKCALL *__pthread_atfork_func_t)(void);
 
 #if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined 1
-/* Install handlers to be called when a new process is created with FORK.
+/* >> pthread_atfork(3)
+ * Install handlers to be called when a new process is created with FORK.
  * The PREPARE handler is called in the parent process just before performing
  * FORK. The PARENT handler is called in the parent process just after FORK.
  * The CHILD handler is called in the child process. Each of the three

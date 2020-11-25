@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c451cb9 */
+/* HASH CRC-32:0x90537023 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/os/cpu_set.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Restrict the calling thread to only run on the first `n' cpus
+/* >> pthread_set_num_processors_np(3)
+ * Restrict the calling thread to only run on the first `n' cpus
  * @return: EOK:    Success
  * @return: EINVAL: `n' was specified as less than `1'
  * @return: * :     Same as `errno' after a call to `sched_setaffinity(2)' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x283b6132 */
+/* HASH CRC-32:0xa35dbe28 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_exit from pthread */
 #ifndef __local___localdep_pthread_exit_defined
 #define __local___localdep_pthread_exit_defined 1
-/* Terminate calling thread.
+/* >> pthread_exit(3)
+ * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
 __CREDIRECT_VOID(__ATTR_NORETURN,__THROWING,__localdep_pthread_exit,(void *__retval),pthread_exit,(__retval))
 #endif /* !__local___localdep_pthread_exit_defined */

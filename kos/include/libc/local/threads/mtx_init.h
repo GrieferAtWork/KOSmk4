@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45447803 */
+/* HASH CRC-32:0x6b93aeee */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Initialize a mutex
+/* >> pthread_mutex_init(3)
+ * Initialize a mutex
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_init,(__pthread_mutex_t *__mutex, __pthread_mutexattr_t const *__mutexattr),pthread_mutex_init,(__mutex,__mutexattr))
 #endif /* !__local___localdep_pthread_mutex_init_defined */
@@ -43,7 +44,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Destroy mutex attribute object ATTR
+/* >> pthread_mutexattr_destroy(3)
+ * Destroy mutex attribute object ATTR
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutexattr_destroy,(__pthread_mutexattr_t *__attr),pthread_mutexattr_destroy,(__attr))
 #endif /* !__local___localdep_pthread_mutexattr_destroy_defined && __CRT_HAVE_pthread_mutexattr_destroy */
@@ -54,7 +56,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Initialize mutex attribute object ATTR with default attributes (kind is PTHREAD_MUTEX_TIMED_NP)
+/* >> pthread_mutexattr_init(3)
+ * Initialize mutex attribute object ATTR with default attributes (kind is PTHREAD_MUTEX_TIMED_NP)
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutexattr_init,(__pthread_mutexattr_t *__attr),pthread_mutexattr_init,(__attr))
 #endif /* !__local___localdep_pthread_mutexattr_init_defined && __CRT_HAVE_pthread_mutexattr_init */
@@ -65,7 +68,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
+/* >> pthread_mutexattr_settype(3)
+ * Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
  * PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or PTHREAD_MUTEX_DEFAULT)
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */

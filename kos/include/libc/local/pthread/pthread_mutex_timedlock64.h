@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f4762d3 */
+/* HASH CRC-32:0x4011107c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,15 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_mutex_timedlock32 from pthread */
 #ifndef __local___localdep_pthread_mutex_timedlock32_defined
 #define __local___localdep_pthread_mutex_timedlock32_defined 1
-/* Wait until lock becomes available, or specified time passes
+/* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
+ * Wait until lock becomes available, or specified time passes
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock32,(__pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
 #endif /* !__local___localdep_pthread_mutex_timedlock32_defined */
-/* Wait until lock becomes available, or specified time passes
+/* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
+ * Wait until lock becomes available, or specified time passes
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */

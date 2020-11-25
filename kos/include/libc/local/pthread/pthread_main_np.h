@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52d1e735 */
+/* HASH CRC-32:0x65e6e4d8 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_getpid,(voi
  * THIS_THREAD->PID */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW,__localdep_gettid,(void),gettid,())
 #endif /* !__local___localdep_gettid_defined */
-/* Returns 1 if the calling thread is the main() thread (i.e. the
+/* >> pthread_main_np(3)
+ * Returns 1 if the calling thread is the main() thread (i.e. the
  * thread that was started by the kernel in order to execute the
  * calling program), and 0 otherwise. Additionally, -1 is returned
  * if the calling thread "hasn't been initialized", though this

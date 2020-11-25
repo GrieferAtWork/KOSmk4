@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62b2b7b3 */
+/* HASH CRC-32:0xe1eb6f39 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,8 @@ __NAMESPACE_LOCAL_END
 typedef void *(__LIBKCALL *__pthread_start_routine_t)(void *);
 #endif /* !____pthread_start_routine_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-/* Create a new thread, starting with execution of START-ROUTINE
+/* >> pthread_create(3)
+ * Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD
  * @return: EOK:    Success

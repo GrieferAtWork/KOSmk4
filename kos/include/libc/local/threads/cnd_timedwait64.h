@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c783c48 */
+/* HASH CRC-32:0xb267367b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wait for condition variable COND to be signaled or broadcast until
+/* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
+ * Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970).
@@ -46,7 +47,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wait for condition variable COND to be signaled or broadcast until
+/* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
+ * Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970).
@@ -58,7 +60,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__l
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_cond_timedwait64.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wait for condition variable COND to be signaled or broadcast until
+/* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
+ * Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970).

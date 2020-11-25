@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3eed95ff */
+/* HASH CRC-32:0xa57b0601 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* Compare two thread identifiers
+/* >> pthread_equal(3)
+ * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_CONST int
@@ -42,7 +43,8 @@ NOTHROW(LIBCCALL libc_pthread_equal)(pthread_t thr1,
 #include <asm/crt/pthreadvalues.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
-/* Guarantee that the initialization function INIT_ROUTINE will be called
+/* >> pthread_once(3)
+ * Guarantee that the initialization function INIT_ROUTINE will be called
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT.
@@ -79,7 +81,8 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
 		(*frame->__cancel_routine)(frame->__cancel_arg);
 }
 #include <hybrid/__atomic.h>
-/* Initialize the spinlock LOCK. If PSHARED is nonzero the
+/* >> pthread_spin_init(3)
+ * Initialize the spinlock LOCK. If PSHARED is nonzero the
  * spinlock can be shared between different processes
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
@@ -89,7 +92,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
 	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELAXED);
 	return 0;
 }
-/* Destroy the spinlock LOCK
+/* >> pthread_spin_destroy(3)
+ * Destroy the spinlock LOCK
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
@@ -99,7 +103,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
-/* Wait until spinlock LOCK is retrieved
+/* >> pthread_spin_lock(3)
+ * Wait until spinlock LOCK is retrieved
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
@@ -109,7 +114,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 #include <libc/errno.h>
-/* Try to lock spinlock LOCK
+/* >> pthread_spin_trylock(3)
+ * Try to lock spinlock LOCK
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED NONNULL((1)) errno_t
@@ -127,7 +133,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 #endif /* !... */
 }
 #include <hybrid/__atomic.h>
-/* Release spinlock LOCK
+/* >> pthread_spin_unlock(3)
+ * Release spinlock LOCK
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
@@ -135,7 +142,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
 	return 0;
 }
 #include <bits/os/cpu_set.h>
-/* @return: * : The number of cpus that the calling thread is able to run on */
+/* >> pthread_num_processors_np(3)
+ * @return: * : The number of cpus that the calling thread is able to run on */
 INTERN ATTR_SECTION(".text.crt.sched.pthread_ext") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
 	cpu_set_t cset;
@@ -145,7 +153,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_num_processors_np)(void) {
 }
 #include <bits/os/cpu_set.h>
 #include <libc/errno.h>
-/* Restrict the calling thread to only run on the first `n' cpus
+/* >> pthread_set_num_processors_np(3)
+ * Restrict the calling thread to only run on the first `n' cpus
  * @return: EOK:    Success
  * @return: EINVAL: `n' was specified as less than `1'
  * @return: * :     Same as `errno' after a call to `sched_setaffinity(2)' */
@@ -170,7 +179,8 @@ NOTHROW_NCX(LIBCCALL libc_pthread_set_num_processors_np)(int n) {
 		result = __libc_geterrno_or(1);
 	return result;
 }
-/* Returns 1 if the calling thread is the main() thread (i.e. the
+/* >> pthread_main_np(3)
+ * Returns 1 if the calling thread is the main() thread (i.e. the
  * thread that was started by the kernel in order to execute the
  * calling program), and 0 otherwise. Additionally, -1 is returned
  * if the calling thread "hasn't been initialized", though this

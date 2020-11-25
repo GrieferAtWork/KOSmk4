@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x332c4273 */
+/* HASH CRC-32:0x732a9bbd */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Initialize condition variable COND using attributes
+/* >> pthread_cond_init(3)
+ * Initialize condition variable COND using attributes
  * ATTR, or use the default values if later is NULL
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_init,(__pthread_cond_t *__restrict __cond, __pthread_condattr_t const *__restrict __cond_attr),pthread_cond_init,(__cond,__cond_attr))

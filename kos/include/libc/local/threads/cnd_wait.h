@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9293e09b */
+/* HASH CRC-32:0x94db1172 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Wait for condition variable COND to be signaled or broadcast.
+/* >> pthread_cond_wait(3)
+ * Wait for condition variable COND to be signaled or broadcast.
  * MUTEX is assumed to be locked before.
  * @return: EOK: Success */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_wait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex),pthread_cond_wait,(__cond,__mutex))

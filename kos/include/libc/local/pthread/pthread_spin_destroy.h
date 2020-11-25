@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdff43c99 */
+/* HASH CRC-32:0x60ad5296 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,8 @@
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Destroy the spinlock LOCK
+/* >> pthread_spin_destroy(3)
+ * Destroy the spinlock LOCK
  * @return: EOK: Success */
 __LOCAL_LIBC(pthread_spin_destroy) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_destroy))(__pthread_spinlock_t *__lock) {

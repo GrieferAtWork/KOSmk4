@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51390739 */
+/* HASH CRC-32:0x80df5321 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,8 @@ typedef void (__LIBKCALL *__pthread_destr_function_t)(void *);
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Create a key value identifying a location in the thread-specific
+/* >> pthread_key_create(3)
+ * Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
  * area. DESTR_FUNCTION, if non-NULL, is called with the value
  * associated to that key when the key is destroyed.

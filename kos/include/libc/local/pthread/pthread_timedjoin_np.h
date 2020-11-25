@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb19b95c1 */
+/* HASH CRC-32:0xd69515de */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_timedjoin32_np from pthread */
 #if !defined(__local___localdep_pthread_timedjoin32_np_defined) && defined(__CRT_HAVE_pthread_timedjoin_np)
 #define __local___localdep_pthread_timedjoin32_np_defined 1
-/* Make calling thread wait for termination of the thread THREAD, but only
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL.
  * @return: EOK:       Success
@@ -41,7 +42,8 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthrea
 #ifndef __local___localdep_pthread_timedjoin64_np_defined
 #define __local___localdep_pthread_timedjoin64_np_defined 1
 #ifdef __CRT_HAVE_pthread_timedjoin64_np
-/* Make calling thread wait for termination of the thread THREAD, but only
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL.
  * @return: EOK:       Success
@@ -49,7 +51,8 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin32_np,(__pthrea
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthread_t __pthread, void **__thread_return, struct __timespec64 const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-/* Make calling thread wait for termination of the thread THREAD, but only
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL.
  * @return: EOK:       Success
@@ -60,7 +63,8 @@ __CREDIRECT(,__errno_t,__NOTHROW_RPC,__localdep_pthread_timedjoin64_np,(__pthrea
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_timedjoin64_np.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Make calling thread wait for termination of the thread THREAD, but only
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL.
  * @return: EOK:       Success
@@ -71,7 +75,8 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_pthread_timedjoin64_np_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_timedjoin64_np_defined */
-/* Make calling thread wait for termination of the thread THREAD, but only
+/* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
+ * Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL.
  * @return: EOK:       Success

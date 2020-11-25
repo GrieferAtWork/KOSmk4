@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x721d531f */
+/* HASH CRC-32:0x81fd18cc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Store POINTER in the thread-specific data slot identified by KEY
+/* >> pthread_setspecific(3)
+ * Store POINTER in the thread-specific data slot identified by KEY
  * @return: EOK:    Success
  * @return: EINVAL: Invalid `key'
  * @return: ENOMEM: `pointer' is non-NULL, `key' had yet to be allowed for the

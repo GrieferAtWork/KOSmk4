@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe535780 */
+/* HASH CRC-32:0x64ada658 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,17 +194,20 @@ __CDECLARE(,int,__NOTHROW_NCX,thrd_create,(thrd_t *__thr, thrd_start_t __func, v
 __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_create, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL thrd_create)(thrd_t *__thr, thrd_start_t __func, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(thrd_create))(__thr, __func, __arg); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
-/* Compare two thread identifiers
+/* >> pthread_equal(3)
+ * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
 __CEIREDIRECT(,int,__NOTHROW_NCX,thrd_equal,(thrd_t __thr1, thrd_t __thr2),pthread_equal,{ return __thr1 == __thr2; })
 #elif defined(__CRT_HAVE_thrd_equal)
-/* Compare two thread identifiers
+/* >> pthread_equal(3)
+ * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
 __CEIDECLARE(,int,__NOTHROW_NCX,thrd_equal,(thrd_t __thr1, thrd_t __thr2),{ return __thr1 == __thr2; })
 #else /* ... */
-/* Compare two thread identifiers
+/* >> pthread_equal(3)
+ * Compare two thread identifiers
  * @return: 0 : Given threads are non-equal
  * @return: * : Given threads are equal */
 __LOCAL int __NOTHROW_NCX(__LIBCCALL thrd_equal)(thrd_t __thr1, thrd_t __thr2) { return __thr1 == __thr2; }

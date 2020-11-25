@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b29ec8f */
+/* HASH CRC-32:0xbe34a51a */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,8 @@
 #include <bits/crt/pthreadtypes.h>
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Initialize the spinlock LOCK. If PSHARED is nonzero the
+/* >> pthread_spin_init(3)
+ * Initialize the spinlock LOCK. If PSHARED is nonzero the
  * spinlock can be shared between different processes
  * @return: EOK: Success */
 __LOCAL_LIBC(pthread_spin_init) __ATTR_NONNULL((1)) __errno_t

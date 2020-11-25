@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb327fcfa */
+/* HASH CRC-32:0x1d8a2c3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,8 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Make calling thread wait for termination of the thread THREAD. The
+/* >> pthread_join(3)
+ * Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
  * is not NULL
  * @return: EOK: Success */

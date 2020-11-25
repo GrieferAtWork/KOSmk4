@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x282f8725 */
+/* HASH CRC-32:0xbebc9b95 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,11 +81,13 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_kill,(__pthread_t __pthr
 #ifndef __local___localdep_pthread_self_defined
 #define __local___localdep_pthread_self_defined 1
 #ifdef __CRT_HAVE_pthread_self
-/* Obtain the identifier of the current thread
+/* >> pthread_self(3)
+ * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
 __CREDIRECT(__ATTR_CONST,__pthread_t,__NOTHROW,__localdep_pthread_self,(void),pthread_self,())
 #elif defined(__CRT_HAVE_thrd_current)
-/* Obtain the identifier of the current thread
+/* >> pthread_self(3)
+ * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
 __CREDIRECT(__ATTR_CONST,__pthread_t,__NOTHROW,__localdep_pthread_self,(void),thrd_current,())
 #else /* ... */

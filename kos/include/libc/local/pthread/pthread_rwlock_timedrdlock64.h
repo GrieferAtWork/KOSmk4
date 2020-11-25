@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ae004e9 */
+/* HASH CRC-32:0x89bfccbc */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,13 +29,15 @@ __NAMESPACE_LOCAL_BEGIN
 /* Dependency: pthread_rwlock_timedrdlock32 from pthread */
 #ifndef __local___localdep_pthread_rwlock_timedrdlock32_defined
 #define __local___localdep_pthread_rwlock_timedrdlock32_defined 1
-/* Try to acquire read lock for RWLOCK or return after specfied time
+/* >> pthread_rwlock_timedrdlock(3)
+ * Try to acquire read lock for RWLOCK or return after specfied time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_RPC,__localdep_pthread_rwlock_timedrdlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
 #endif /* !__local___localdep_pthread_rwlock_timedrdlock32_defined */
-/* Try to acquire read lock for RWLOCK or return after specfied time
+/* >> pthread_rwlock_timedrdlock(3)
+ * Try to acquire read lock for RWLOCK or return after specfied time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */

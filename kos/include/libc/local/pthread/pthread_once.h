@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49869044 */
+/* HASH CRC-32:0x1320d688 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,8 @@ typedef void (__LIBKCALL *__pthread_once_routine_t)(void);
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
 __NAMESPACE_LOCAL_BEGIN
-/* Guarantee that the initialization function INIT_ROUTINE will be called
+/* >> pthread_once(3)
+ * Guarantee that the initialization function INIT_ROUTINE will be called
  * only once, even if pthread_once is executed several times with the
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT.
