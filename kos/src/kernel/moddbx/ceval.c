@@ -823,7 +823,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			bool want_after;
 			struct ctyperef t;
 			REF struct ctype *t_ptr;
-			want_after = (kwd_len == COMPILER_STRLEN("offsetater") ||
+			want_after = (kwd_len == COMPILER_STRLEN("offsetafter") ||
 			              kwd_len == COMPILER_STRLEN("__COMPILER_OFFSETAFTER"));
 			result     = cparser_skip(self, '(');
 			if unlikely(result != DBX_EOK)
@@ -856,7 +856,7 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			if unlikely(result != DBX_EOK)
 				goto done;
 			if (want_after) {
-				/* Just add +1 */
+				/* Just add +1 (which will be multiplied by `ctype_sizeof(<TOP_TYPE_DEREF>)') */
 				result = cexpr_pushint_simple(&ctype_uintptr_t, 1);
 				if unlikely(result != DBX_EOK)
 					goto done;
