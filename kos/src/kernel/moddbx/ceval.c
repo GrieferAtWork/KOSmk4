@@ -243,6 +243,20 @@ PRIVATE WUNUSED NONNULL((1)) dbx_errno_t NOTHROW(FCALL parse_assign)(struct cpar
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cparser_require)(struct cparser *__restrict self,
+                               unsigned int expected_tok) {
+	if likely(self->c_tok == expected_tok)
+		return DBX_EOK;
+	if (self->c_autocom && self->c_tokend == self->c_end) {
+		/* Suggest missing characters. */
+		char name[1];
+		name[0] = (char)expected_tok;
+		cparser_autocomplete(self, name, 1);
+	}
+	return DBX_ESYNTAX; /* Unexpected token */
+}
+
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cparser_skip)(struct cparser *__restrict self,
                             unsigned int expected_tok) {
 	if likely(self->c_tok == expected_tok) {
@@ -548,7 +562,9 @@ NOTHROW(FCALL autocomplete_symbols)(struct cparser *__restrict self,
 
 
 PRIVATE char const misc_expr_keywords[][16] = {
-	"sizeof", "NULL", "nullptr", "true", "false", "__identifier",
+	"sizeof", "NULL", "nullptr", "true", "false",
+	"__identifier", "offsetof", "offsetafter",
+	"container_of"
 };
 
 PRIVATE NONNULL((1)) void
@@ -779,10 +795,10 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 		size_t kwd_len;
 		kwd_str = self->c_tokstart;
 		kwd_len = cparser_toklen(self);
+		yield();
 		if (KWD_CHECK(kwd_str, kwd_len, "sizeof")) {
 			struct ctyperef ct;
 			size_t sizeval;
-			yield();
 			result = parse_typeof(self, &ct);
 			if unlikely(result != DBX_EOK)
 				goto done;
@@ -790,18 +806,133 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 			ctyperef_fini(&ct);
 			result = cexpr_pushint_simple(&ctype_size_t, sizeval);
 		} else if (KWD_CHECK(kwd_str, kwd_len, "NULL") ||
-		           KWD_CHECK(kwd_str, kwd_len, "nullptr")) {
-			yield();
+		           KWD_CHECK(kwd_str, kwd_len, "nullptr") ||
+		           KWD_CHECK(kwd_str, kwd_len, "__NULLPTR")) {
 			result = cexpr_pushint_simple(&ctype_void_ptr, 0);
 		} else if (KWD_CHECK(kwd_str, kwd_len, "true")) {
-			yield();
 			result = cexpr_pushint_simple(&ctype_bool, 1);
 		} else if (KWD_CHECK(kwd_str, kwd_len, "false")) {
-			yield();
 			result = cexpr_pushint_simple(&ctype_bool, 0);
+		} else if (KWD_CHECK(kwd_str, kwd_len, "offsetof") ||
+		           KWD_CHECK(kwd_str, kwd_len, "offsetafter") ||
+		           KWD_CHECK(kwd_str, kwd_len, "__builtin_offsetof") ||
+		           KWD_CHECK(kwd_str, kwd_len, "__COMPILER_OFFSETAFTER")) {
+			/* For simplicity, and correctness, literally implement offsetof()
+			 * as its generic macro implementation:
+			 * >> #define offsetof(T, m) (size_t)&((T *)0)->m */
+			bool want_after;
+			struct ctyperef t;
+			REF struct ctype *t_ptr;
+			want_after = (kwd_len == COMPILER_STRLEN("offsetater") ||
+			              kwd_len == COMPILER_STRLEN("__COMPILER_OFFSETAFTER"));
+			result     = cparser_skip(self, '(');
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = ctype_eval(self, &t, NULL, NULL);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			t_ptr = ctype_ptr(&t, dbg_current_sizeof_pointer());
+			ctyperef_fini(&t);
+			if unlikely(!t_ptr)
+				goto err_nomem;
+			result = cexpr_pushint_simple(t_ptr, 0);
+			decref(t_ptr);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			/* NOTE: Also accept '.' and '::' instead of the ',' before the
+			 * member expression, but don't tell auto-completion about this. */
+			if (self->c_tok != '.' && self->c_tok != CTOKEN_TOK_COLON_COLON) {
+				result = cparser_require(self, ',');
+				if unlikely(result != DBX_EOK)
+					goto done;
+			}
+			/* Simply parse any valid integer suffix expression,
+			 * but act as though the ',' was actually a '->' */
+			self->c_tok = CTOKEN_TOK_MINUS_RANGLE;
+			result      = parse_unary_suffix(self);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cexpr_ref();
+			if unlikely(result != DBX_EOK)
+				goto done;
+			if (want_after) {
+				/* Just add +1 */
+				result = cexpr_pushint_simple(&ctype_uintptr_t, 1);
+				if unlikely(result != DBX_EOK)
+					goto done;
+				result = cexpr_op2('+');
+				if unlikely(result != DBX_EOK)
+					goto done;
+			}
+			result = cexpr_cast_simple(&ctype_size_t);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cparser_skip(self, ')');
+		} else if (KWD_CHECK(kwd_str, kwd_len, "container_of") ||
+		           KWD_CHECK(kwd_str, kwd_len, "__COMPILER_CONTAINER_OF")) {
+			/* For simplicity, and correctness, literally implement container_of()
+			 * as its generic macro implementation:
+			 * >> #define container_of(p, T, m) (T *)((uintptr_t)(p) - offsetof(T, m))
+			 * or fully expanded:
+			 * >> #define container_of(p, T, m) (T *)((uintptr_t)(p) - (size_t)&((T *)0)->m) */
+			struct ctyperef t;
+			REF struct ctype *t_ptr;
+			result = cparser_skip(self, '(');
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = parse_nocomma(self);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cexpr_cast_simple(&ctype_uintptr_t);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cparser_skip(self, ',');
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = ctype_eval(self, &t, NULL, NULL);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			t_ptr = ctype_ptr(&t, dbg_current_sizeof_pointer());
+			ctyperef_fini(&t);
+			if unlikely(!t_ptr)
+				goto err_nomem;
+			result = cexpr_pushint_simple(t_ptr, 0);
+			if unlikely(result != DBX_EOK) {
+done_container_of_t_ptr:
+				decref(t_ptr);
+				goto done;
+			}
+			/* NOTE: Also accept '.' and '::' instead of the ',' before the
+			 * member expression, but don't tell auto-completion about this. */
+			if (self->c_tok != '.' && self->c_tok != CTOKEN_TOK_COLON_COLON) {
+				result = cparser_require(self, ',');
+				if unlikely(result != DBX_EOK)
+					goto done_container_of_t_ptr;
+			}
+			/* Simply parse any valid integer suffix expression,
+			 * but act as though the ',' was actually a '->' */
+			self->c_tok = CTOKEN_TOK_MINUS_RANGLE;
+			result      = parse_unary_suffix(self);
+			if unlikely(result != DBX_EOK)
+				goto done_container_of_t_ptr;
+			result = cexpr_ref();
+			if unlikely(result != DBX_EOK)
+				goto done_container_of_t_ptr;
+			result = cexpr_cast_simple(&ctype_size_t);
+			if unlikely(result != DBX_EOK)
+				goto done_container_of_t_ptr;
+			/* Add together p + offset */
+			result = cexpr_op2('+');
+			if unlikely(result != DBX_EOK)
+				goto done_container_of_t_ptr;
+			/* Cast the result back to `t_ptr' */
+			result = cexpr_cast_simple(t_ptr);
+			decref(t_ptr);
+			if unlikely(result != DBX_EOK)
+				goto done;
+			result = cparser_skip(self, ')');
 		} else if (KWD_CHECK(kwd_str, kwd_len, "__identifier")) {
 			bool has_paren;
-			yield();
 			has_paren = self->c_tok == '(';
 			if (has_paren)
 				yield();
@@ -821,7 +952,6 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 				result = cparser_skip(self, ')');
 			}
 		} else {
-			yield();
 			/* TODO: if (self->c_tok == '*') {
 			 *           ...
 			 *       }
@@ -884,6 +1014,9 @@ syn:
 	}
 done:
 	return result;
+err_nomem:
+	result = DBX_ENOMEM;
+	goto done;
 }
 
 
