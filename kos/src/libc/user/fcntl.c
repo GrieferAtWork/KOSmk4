@@ -92,36 +92,36 @@ NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename,
                                  ...)
 /*[[[body:libd_open]]]*/
 {
+#ifdef __NR_open
 	fd_t result;
 	oflag_t kos_oflags;
 	va_list args;
 	kos_oflags = oflag_dos2kos(oflags);
 	va_start(args, oflags);
-#ifdef __NR_open
 	result = sys_open(filename,
 	                  kos_oflags,
 	                  va_arg(args, mode_t));
-#else /* __NR_open */
-	result = sys_openat(AT_FDCWD,
-	                    filename,
-	                    kos_oflags,
-	                    va_arg(args, mode_t));
-#endif /* !__NR_open */
 	va_end(args);
-	if unlikely(E_ISERR(result)) {
-		libc_seterrno(-result);
-		return -1;
-	}
+	if unlikely(E_ISERR(result))
+		return libc_seterrno(-result);
 	if (!(oflags & DOS_O_OBTAIN_DIR)) {
 		/* Make sure that the opened file isn't a directory. */
 		struct stat st;
 		if (E_ISOK(sys_kfstat(result, &st)) && S_ISDIR(st.st_mode)) {
 			sys_close(result);
-			libc_seterrno(EISDIR);
-			return -1;
+			return libc_seterrno(EISDIR);
 		}
 	}
 	return result;
+#else /* __NR_open */
+	va_list args;
+	mode_t mode;
+	va_start(args, oflags);
+	mode = va_arg(args, mode_t);
+	va_end(args);
+	return libd_openat(AT_FDCWD, filename,
+	                   oflags, mode);
+#endif /* !__NR_open */
 }
 /*[[[end:libd_open]]]*/
 
@@ -214,12 +214,26 @@ NOTHROW_RPC(VLIBDCALL libd_openat)(fd_t dirfd,
                                    ...)
 /*[[[body:libd_openat]]]*/
 {
-	(void)dirfd;
-	(void)filename;
-	(void)oflags;
-	CRT_UNIMPLEMENTED("DOS$openat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	fd_t result;
+	oflag_t kos_oflags;
+	va_list args;
+	kos_oflags = oflag_dos2kos(oflags);
+	va_start(args, oflags);
+	result = sys_openat(dirfd, filename,
+	                    kos_oflags,
+	                    va_arg(args, mode_t));
+	va_end(args);
+	if unlikely(E_ISERR(result))
+		return libc_seterrno(-result);
+	if (!(oflags & DOS_O_OBTAIN_DIR)) {
+		/* Make sure that the opened file isn't a directory. */
+		struct stat st;
+		if (E_ISOK(sys_kfstat(result, &st)) && S_ISDIR(st.st_mode)) {
+			sys_close(result);
+			return libc_seterrno(EISDIR);
+		}
+	}
+	return result;
 }
 /*[[[end:libd_openat]]]*/
 

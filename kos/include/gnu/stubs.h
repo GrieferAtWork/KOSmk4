@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc034c62 */
+/* HASH CRC-32:0x20bca6da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -520,7 +520,6 @@
 #define __stub_DOS$_wtmpnam_s
 #define __stub_DOS$mbsnrtowcs
 #define __stub_DOS$open_wmemstream
-#define __stub_DOS$openat
 #ifndef __LIBCCALL_IS_LIBDCALL
 #define __stub_DOS$semctl
 #define __stub_DOS$strfmon

@@ -224,9 +224,9 @@ err_tempname_filename:
 				/* Another process may currently be creating the same semaphore
 				 * in the same way as we are trying to. On the other hand, that
 				 * other process may have terminated/crashed before it finished,
-				 * the the remaining file that we're seeing is just a left-over...
+				 * and the remaining file that we're seeing is just a left-over...
 				 *
-				 * Handle this case by given that potential other process some
+				 * Handle this case by giving that potential other process some
 				 * time to finish, and if the file still exists after this delay,
 				 * forceably remove it to deal with problematic processes. */
 				ts.tv_sec  = 0;
@@ -267,9 +267,9 @@ err_tempname_filename:
 					goto again_open_or_create;
 				}
 				if (error == ENOENT) {
-					/* Race condition: We took too long to create the semaphore, and other thread
+					/* Race condition: We took too long to create the semaphore, and another thread
 					 * got bored while waiting for us. Wait (a bit longer than they did) for them
-					 * to craete the semaphore, and try again. */
+					 * to create the semaphore, and try again. */
 					struct timespec ts;
 					ts.tv_sec  = 0;
 					ts.tv_nsec = 250000000; /* 1/4th of a second. */
@@ -379,7 +379,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
 		}
 		/* Wait until `SEM_COUNT_MASK' becomes non-zero. */
 		error = futex_waitwhile_exactbits(&sem->s_count,
-		                                  SEM_WAITERS_FLAG,
+		                                  SEM_COUNT_MASK,
 		                                  0);
 		if (error < 0)
 			return error;
@@ -421,7 +421,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
 		error = lfutex(&sem->s_count,
 		               LFUTEX_WAIT_WHILE_BITMASK |
 		               LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME,
-		               (lfutex_t)SEM_WAITERS_FLAG,
+		               (lfutex_t)SEM_COUNT_MASK,
 		               abstime, (lfutex_t)0);
 		if (error < 0)
 			return error;
@@ -466,7 +466,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem,
 		error = lfutex64(&sem->s_count,
 		                 LFUTEX_WAIT_WHILE_BITMASK |
 		                 LFUTEX_WAIT_FLAG_TIMEOUT_REALTIME,
-		                 (lfutex_t)SEM_WAITERS_FLAG,
+		                 (lfutex_t)SEM_COUNT_MASK,
 		                 abstime, (lfutex_t)0);
 		if (error < 0)
 			return error;
