@@ -31,6 +31,7 @@
 #include <hybrid/typecore.h>
 
 #include <kos/exec/module.h>
+#include <kos/refcnt-nonatomic.h>
 
 #include <libdebuginfo/debug_info.h>
 
@@ -208,7 +209,7 @@ struct cmodule {
 
 /* Destroy the given CModule. (called when its reference counter hits `0') */
 FUNDEF NONNULL((1)) void NOTHROW(FCALL cmodule_destroy)(struct cmodule *__restrict self);
-DEFINE_REFCOUNT_FUNCTIONS(struct cmodule, cm_refcnt, cmodule_destroy) /* TODO: Define non-atomic refcnt functions! */
+__DEFINE_NONATOMIC_REFCNT_FUNCTIONS(struct cmodule, cm_refcnt, cmodule_destroy)
 
 /* Callback for `cmodule_enum()'
  * @return: * : pformatprinter-compatible return value. */
