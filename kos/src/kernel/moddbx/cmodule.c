@@ -1382,9 +1382,13 @@ NOTHROW(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
  * Returns `false' is no address information is available (which may be the
  * case when the associated symbol is actually a constant), or the address
  * cannot be calculated right now (i.e. the associated symbol is a TLS variable)
- * @return: true:  Address was calculated and was stored in `*pmodule_relative_addr'
- * @return: false: Address could not be calculated. */
-PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) bool
+ * @return: * : One of `CMODULE_EVALUATE_SYMBOL_ADDRESS_*' */
+#define CMODULE_EVALUATE_SYMBOL_ADDRESS_SUCCESS 0 /* Success (address was stored in `*pmodule_relative_addr') */
+#define CMODULE_EVALUATE_SYMBOL_ADDRESS_NOADDR  1 /* Object doesn't have an address, or address calculation is too complex */
+#define CMODULE_EVALUATE_SYMBOL_ADDRESS_EXTERN  2 /* Object doesn't have an address (according to .debug_info), but
+                                                   * is declared as externally visible, meaning that its address
+                                                   * should be taken from some other source (such as .symtab) */
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) unsigned int
 NOTHROW(FCALL cmodule_evaluate_symbol_address)(struct cmodule const *__restrict self,
                                                struct cmodunit const *__restrict cu,
                                                byte_t const *__restrict dip,
@@ -1392,6 +1396,7 @@ NOTHROW(FCALL cmodule_evaluate_symbol_address)(struct cmodule const *__restrict 
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_component_attrib_t attr;
 	byte_t const *referenced_component;
+	bool is_external = false;
 
 	/* Load a parser for the given `dip'. */
 again:
@@ -1411,15 +1416,18 @@ again:
 				referenced_component = NULL;
 			break;
 
-		case DW_AT_const_value:
-			/* Welp... It's a constant... */
-			goto nope;
+		case DW_AT_external:
+			if (!debuginfo_cu_parser_getflag(&parser, attr.dica_form, &is_external))
+				goto nope;
+			break;
 
 		case DW_AT_low_pc:
 		case DW_AT_entry_pc:
 			/* Directly load the encoded address constant. */
-			return debuginfo_cu_parser_getaddr(&parser, attr.dica_form,
-			                                   pmodule_relative_addr);
+			if (debuginfo_cu_parser_getaddr(&parser, attr.dica_form,
+			                                pmodule_relative_addr))
+				return CMODULE_EVALUATE_SYMBOL_ADDRESS_SUCCESS;
+			return CMODULE_EVALUATE_SYMBOL_ADDRESS_NOADDR;
 
 		case DW_AT_location: {
 			/* Alright, so here we have an actual location expression. However, as complicated
@@ -1456,7 +1464,7 @@ again:
 			} else {
 				goto nope;
 			}
-			return true;
+			return CMODULE_EVALUATE_SYMBOL_ADDRESS_SUCCESS;
 		}	break;
 
 		default:
@@ -1472,8 +1480,10 @@ again:
 		dip = referenced_component;
 		goto again;
 	}
+	if (is_external)
+		return CMODULE_EVALUATE_SYMBOL_ADDRESS_EXTERN;
 nope:
-	return false; /* Cannot load the actual symbol address! */
+	return CMODULE_EVALUATE_SYMBOL_ADDRESS_NOADDR; /* Cannot load the actual symbol address! */
 }
 
 
@@ -1542,6 +1552,8 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 						CLinkerSymbol const *sip;
 						uintptr_t dip_modrel_symaddr;
 						uintptr_t sip_modrel_symaddr;
+						unsigned int address_status;
+
 						/* This is where it gets complicated, because we must decide on how
 						 * we want to merge .debug_info with .symtab for a specific symbol:
 						 *   - if we don't have location info (!has_location_information)
@@ -1553,15 +1565,17 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 						 *     the exact location:
 						 *       - If we fail to calculate it, the location isn't an address, or
 						 *         the location's address differs from what .symtab is saying,
-						 *         then we must add the symbol as a per-CU override and mark,
-						 *         and mark the global symbol as standing in conflict (i.e.
-						 *         just do what we'd normally do at this point)
-						 *       - If location information match up, then we know that the 2
+						 *         then we must add the symbol as a per-CU override, and mark
+						 *         the global symbol as standing in conflict (i.e. just do what
+						 *         we'd normally do at this point)
+						 *       - If location informations match up, then we know that the 2
 						 *         symbols reference the same entity, and we must forget about
 						 *         ever having seen the symbol in .symtab */
+
 						sip = cmodsym_getsip(sym, self);
 						if (!has_location_information) {
-							/* Created a mixed information symbol. */
+							/* Create a mixed information symbol. */
+create_mixed_symbol:
 							return cmodule_make_symbol_mixed(self, sym, dip, sip);
 						}
 						/* Load the module-relative symbol-address `sip' */
@@ -1575,9 +1589,63 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 							goto fallback_insert_possible_collision;
 						}
 
+						/* Must deal with special case: gcc generates debug information that appears
+						 *                              somewhat inconsistent with it self for `libc'.
+						 *  - On the one hand, the following can be found in libc's .debug_info:
+						 *    ```
+						 *    <2><74389>: Abbrev Number: 33 (DW_TAG_variable)
+						 *       <7438a>   DW_AT_name        : (indirect string, offset: 0x18916): __libm_Q
+						 *       <7438e>   DW_AT_decl_file   : 15
+						 *       <7438f>   DW_AT_decl_line   : 215
+						 *       <74390>   DW_AT_decl_column : 1
+						 *       <74391>   DW_AT_type        : <0x75bed>
+						 *       <74395>   DW_AT_external    : 1
+						 *       <74395>   DW_AT_declaration : 1
+						 *       <74395>   DW_AT_const_value : 48 byte block: 0 0 0 0 0 0 f0 3f f4 10 11 11 11 11 a1 bf 85 55 fe 19 a0 1 5a 3f b7 db aa 9e 19 ce 14 bf 39 52 e6 86 ca cf d0 3e 2d c3 9 6e b7 fd 8a be 
+						 *    ```
+						 *    That's fine and all. It's `__libm_tiny' is a constant without any address,
+						 *    and our parser is able to correctly load it and everything.
+						 *
+						 *  - However, there's also this entry from `.symtab':
+						 *    ```
+						 *    1425: 0009fd60    48 OBJECT  LOCAL  DEFAULT    4 __libm_Q
+						 *    ```
+						 *    And suddenly, the symbol `__libm_Q' is no longer a constant, but actually
+						 *    has an address ????
+						 *
+						 * -> This in turn causes the below code to consider the .debug_info version of __libm_Q
+						 *    as a per-CU override for the initial declaration taken from .symtab, which then
+						 *    results in the per-module global version of __libm_Q to remain loaded without any
+						 *    type information, also causing any reference to the symbol to first go to the
+						 *    global version, which then results in:
+						 *    ```
+						 *    !> eval __libm_Q
+						 *    void:
+						 *    (void)0
+						 *    !> eval &__libm_Q
+						 *    void *:
+						 *    0xde1ed60 (libc.so!__libm_Q)
+						 *    ```
+						 *
+						 * The solution chosen here is to interpret the combination of the `DW_AT_external'
+						 * tag with `DW_AT_const_value' as special behavior to construct a mixed symbol.
+						 * After all: `DW_AT_external' means that the symbol (should) be visible in other CUs,
+						 *            also meaning that such a symbol could never be considered as per-CU, also
+						 *            meaning that the symbol _must_ represent the symbol of the same name found
+						 *            inside of the .symtab section.
+						 */
+
 						/* Evaluate the location expression from `dip' */
-						if (!cmodule_evaluate_symbol_address(self, cu, dip, &dip_modrel_symaddr))
+						address_status = cmodule_evaluate_symbol_address(self, cu, dip, &dip_modrel_symaddr);
+						if (address_status == CMODULE_EVALUATE_SYMBOL_ADDRESS_NOADDR)
 							goto fallback_insert_possible_collision;
+
+						/* When `DW_AT_external' appeared, then create a mixed symbol, since this debug-info
+						 * entry is referencing a symbol that would be visible from other CUs, and the stuff
+						 * we've loaded from .symtab is used to indicate the same!
+						 * For more information, see the explaination with `__libm_Q' as example above. */
+						if (address_status == CMODULE_EVALUATE_SYMBOL_ADDRESS_EXTERN)
+							goto create_mixed_symbol;
 
 						/* Compare the location from `dip' with sip->[...].st_value */
 						if (sip_modrel_symaddr != dip_modrel_symaddr)
@@ -2401,7 +2469,8 @@ NOTHROW(FCALL loadinfo_type)(di_debuginfo_cu_parser_t const *__restrict parser,
 
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) void
 NOTHROW(FCALL loadinfo_specifications)(struct cmodsyminfo *__restrict info,
-                                       byte_t const *__restrict specification) {
+                                       byte_t const *__restrict specification,
+                                       bool has_object_address) {
 	di_debuginfo_cu_parser_t inner_parser;
 	di_debuginfo_component_attrib_t attr;
 	memcpy(&inner_parser, &info->clv_parser, sizeof(inner_parser));
@@ -2432,11 +2501,13 @@ again:
 					break;
 
 				case DW_AT_location:
-					loadinfo_location(&inner_parser, info, attr.dica_form);
+					if (!has_object_address)
+						loadinfo_location(&inner_parser, info, attr.dica_form);
 					break;
 
 				case DW_AT_const_value:
-					loadinfo_const_value(&inner_parser, info, attr.dica_form);
+					if (!has_object_address)
+						loadinfo_const_value(&inner_parser, info, attr.dica_form);
 					break;
 
 				default:
@@ -2630,6 +2701,7 @@ done:
  * needed. */
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
+	bool has_object_address;
 	info->clv_dip = NULL;
 	if (cmodsyminfo_isdip(info)) {
 		info->clv_dip = cmodsyminfo_getdip(info);
@@ -2637,6 +2709,7 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 		info->clv_dip = cmodsyminfo_getmip(info)->ms_dip;
 	}
 	memset(&info->clv_data, 0, sizeof(info->clv_data));
+	has_object_address = false;
 	if (cmodsyminfo_ismip(info) || cmodsyminfo_issip(info)) {
 		CLinkerSymbol const *psymbol;
 		uintptr_t symbol_addr;
@@ -2655,6 +2728,7 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 		} else {
 			goto no_sip_addr;
 		}
+		has_object_address             = true;
 		info->clv_data.s_var.v_objaddr = (void *)(cmodule_getloadaddr(info->clv_mod) +
 		                                          symbol_addr);
 		/* Try to load the CU by looking at the symbol address. */
@@ -2696,7 +2770,7 @@ no_unit:
 	                                               &info->clv_cu))
 		memset(&info->clv_cu, 0, sizeof(info->clv_cu));
 
-	if (!info->clv_dip && (cmodsyminfo_ismip(info) || cmodsyminfo_issip(info))) {
+	if (!info->clv_dip && has_object_address) {
 		/* The symbol being pushed originates from some module's .symtab,
 		 * but we were unable to find any debug information relating to
 		 * this symbol while parsing .debug_info.
@@ -2760,11 +2834,13 @@ again_attributes:
 			}	break;
 
 			case DW_AT_location:
-				loadinfo_location(&info->clv_parser, info, attr.dica_form);
+				if (!has_object_address)
+					loadinfo_location(&info->clv_parser, info, attr.dica_form);
 				break;
 
 			case DW_AT_const_value:
-				loadinfo_const_value(&info->clv_parser, info, attr.dica_form);
+				if (!has_object_address)
+					loadinfo_const_value(&info->clv_parser, info, attr.dica_form);
 				break;
 
 			case DW_AT_type:
@@ -2775,15 +2851,17 @@ again_attributes:
 			case DW_AT_specification: {
 				byte_t const *spec;
 				if likely(debuginfo_cu_parser_getref(&info->clv_parser, attr.dica_form, &spec))
-					loadinfo_specifications(info, spec);
+					loadinfo_specifications(info, spec, has_object_address);
 			}	break;
 
 			case DW_AT_low_pc:
-			case DW_AT_entry_pc: {
-				uintptr_t addr;
-				if likely(debuginfo_cu_parser_getaddr(&info->clv_parser, attr.dica_form, &addr))
-					info->clv_data.s_var.v_objaddr = (void *)(addr + cmodule_getloadaddr(info->clv_mod));
-			}	break;
+			case DW_AT_entry_pc:
+				if (!has_object_address) {
+					uintptr_t addr;
+					if likely(debuginfo_cu_parser_getaddr(&info->clv_parser, attr.dica_form, &addr))
+						info->clv_data.s_var.v_objaddr = (void *)(addr + cmodule_getloadaddr(info->clv_mod));
+				}
+				break;
 
 			default:
 				break;
