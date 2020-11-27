@@ -229,6 +229,11 @@ struct cmodsym {
 #define CMODSYM_DIP_NS_ISSIP(x)    (((x) & ~CMODSYM_DIP_NS_FCONFLICT) == CMODSYM_DIP_NS_SYMTAB)
 #define CMODSYM_DIP_NS_ISMIP(x)    (((x) & ~CMODSYM_DIP_NS_FCONFLICT) == CMODSYM_DIP_NS_MIXED)
 
+/* Special value which may be passed as `ns' argument to functions below.
+ * When given, don't accept type symbols, and only enumerate/return symbols
+ * that aren't types. */
+#define CMODSYM_DIP_NS_NONTYPE CMODSYM_DIP_NS_SYMTAB
+
 
 
 struct cmodsymtab {

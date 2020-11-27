@@ -689,9 +689,13 @@ NOTHROW(FCALL want_symbol)(struct cmodsym const *__restrict self, uintptr_t ns) 
 		/* Accept anything */
 		return true;
 
+	case CMODSYM_DIP_NS_NONTYPE:
+		/* Accept anything that isn't a type */
+		return !CMODSYM_DIP_NS_ISTYPE(symbol_ns);
+
 	case CMODSYM_DIP_NS_TYPEDEF:
 		/* Accept anything that is a type */
-		return symbol_ns != CMODSYM_DIP_NS_NORMAL;
+		return CMODSYM_DIP_NS_ISTYPE(symbol_ns);
 
 	default:
 		break;
@@ -713,6 +717,7 @@ NOTHROW(FCALL prefer_symbol)(struct cmodsym *__restrict a,
 
 	case CMODSYM_DIP_NS_NORMAL:
 	case CMODSYM_DIP_NS_SYMTAB:
+	case CMODSYM_DIP_NS_MIXED:
 		/* Prefer normal (non-type) symbols. */
 		if (CMODSYM_DIP_NS_ISNORMAL(a_ns) && !CMODSYM_DIP_NS_ISNORMAL(b_ns))
 			return a;

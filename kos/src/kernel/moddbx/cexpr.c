@@ -2896,7 +2896,7 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
                                 bool automatic_symbol_addend) {
 	dbx_errno_t result;
 	struct cmodsyminfo csym;
-	result = cmod_syminfo_local(&csym, name, namelen, CMODSYM_DIP_NS_NORMAL);
+	result = cmod_syminfo_local(&csym, name, namelen, CMODSYM_DIP_NS_NONTYPE);
 	if (result != DBX_EOK)
 		return result;
 	if (!cmodsyminfo_istype(&csym)) {
