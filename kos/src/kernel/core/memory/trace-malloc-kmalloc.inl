@@ -444,18 +444,10 @@ again_nonnull_ptr:
 		num_free = old_user_size - n_bytes;
 		if (num_free >= HEAP_MINSIZE) {
 			u8 node_flags = node->tn_flags;
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 			trace_node_tree_removenode(&nodes, node);
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-			trace_node_tree_remove(&nodes, (uintptr_t)ptr);
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 
 			/* Reduce the effective size of the user-data-block. */
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 			node->tn_link.rb_max -= num_free;
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-			node->tn_link.a_vmax -= num_free;
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 			result.hp_ptr = trace_node_uend(node);
 			new_user_size = old_user_size - num_free;
 			/* Re-initialize the tail. */
@@ -613,11 +605,7 @@ again_remove_node_for_oldchunk:
 		}
 		/* The extension was successful (now just to update the node!) */
 		new_user_size = old_user_size + num_allocated;
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 		node->tn_link.rb_max += num_allocated;
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-		node->tn_link.a_vmax += num_allocated;
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 		/* Re-initialize the tail. */
 #if CONFIG_MALL_TAIL_SIZE != 0
 #if (CONFIG_MALL_TAIL_SIZE & 3) == 0
@@ -636,11 +624,7 @@ again_remove_node_for_oldchunk:
 		if unlikely(!trace_node_tree_tryinsert(&nodes, node)) {
 			/* Roll-back: We must restore the old node, then resolve the existing
 			 *            (possibly-bitset) node with which our new node overlaps. */
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 			node->tn_link.rb_max -= num_allocated;
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-			node->tn_link.a_vmax -= num_allocated;
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 			trace_node_tree_insert(&nodes, node);
 #ifdef DEFINE_X_except
 			TRY {

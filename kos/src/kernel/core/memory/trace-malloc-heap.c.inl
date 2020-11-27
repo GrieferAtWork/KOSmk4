@@ -204,11 +204,7 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 			goto success;
 		}
 		/* Must shift-down the is-traced bits of `oldnode' */
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 		src   = ((overlap_max + 1) - oldnode->tn_link.rb_min) / sizeof(void *);
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-		src   = ((overlap_max + 1) - oldnode->tn_link.a_vmin) / sizeof(void *);
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 		count = ((trace_node_umax(oldnode) /*+1*/) - (overlap_max /*+1*/)) / sizeof(void *);
 		for (i = 0; i < count; ++i) {
 			if (trace_node_bitset_bitget(oldnode, src)) {
@@ -219,18 +215,10 @@ NOTHROW(FCALL insert_trace_node_resolve_nx)(uintptr_t umin, uintptr_t umax,
 			++src;
 		}
 		/* Truncate `oldnode' in the front */
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 		oldnode->tn_link.rb_min = overlap_max + 1;
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-		oldnode->tn_link.a_vmin = overlap_max + 1;
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 	} else if (overlap_max == trace_node_umax(oldnode)) {
 		/* Truncate `oldnode' in the back */
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 		oldnode->tn_link.rb_max = overlap_min - 1;
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-		oldnode->tn_link.a_vmax = overlap_min - 1;
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 	} else {
 		struct trace_node *lo_node, *hi_node;
 		uintptr_t lo_node_min, lo_node_max;
@@ -379,17 +367,10 @@ again_free_node_ptr:
 		}
 
 		/* Setup the min/max bounds of the lo/hi nodes. */
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 		lo_node->tn_link.rb_min = lo_node_min;
 		lo_node->tn_link.rb_max = lo_node_max;
 		hi_node->tn_link.rb_min = hi_node_min;
 		hi_node->tn_link.rb_max = hi_node_max;
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-		lo_node->tn_link.a_vmin = lo_node_min;
-		lo_node->tn_link.a_vmax = lo_node_max;
-		hi_node->tn_link.a_vmin = hi_node_min;
-		hi_node->tn_link.a_vmax = hi_node_max;
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 
 		/* And finally, re-insert both the lo- and hi-nodes */
 		trace_node_tree_insert(&nodes, lo_node);
@@ -498,13 +479,8 @@ NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
 #endif /* DEFINE_X_noexcept */
 	node = (struct trace_node *)node_ptr.hp_ptr;
 	/* Initialize the node. */
-#ifdef CONFIG_TRACE_MALLOC_USE_RBTREE
 	node->tn_link.rb_min = (uintptr_t)umin;
 	node->tn_link.rb_max = (uintptr_t)uend - 1;
-#else /* CONFIG_TRACE_MALLOC_USE_RBTREE */
-	node->tn_link.a_vmin = (uintptr_t)umin;
-	node->tn_link.a_vmax = (uintptr_t)uend - 1;
-#endif /* !CONFIG_TRACE_MALLOC_USE_RBTREE */
 	node->tn_size        = node_ptr.hp_siz;
 	node->tn_reach       = gc_version;
 	node->tn_visit       = 0;
