@@ -271,9 +271,9 @@ ProcFS_PerProc_RegularRo_FlexRead(struct inode *__restrict self,
 }
 
 PRIVATE NONNULL((1)) size_t KCALL
-ProcFS_SingleTon_DynamicSymlink_Readlink(struct symlink_node *__restrict self,
-                                         USER CHECKED /*utf-8*/ char *buf,
-                                         size_t bufsize)
+ProcFS_PerProc_DynamicSymlink_Readlink(struct symlink_node *__restrict self,
+                                       USER CHECKED /*utf-8*/ char *buf,
+                                       size_t bufsize)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	PROCFS_SYMLINK_READLINK data;
 	data = (PROCFS_SYMLINK_READLINK)self->i_fsdata;
@@ -401,7 +401,7 @@ INTERN struct inode_type ProcFS_PerProc_DynamicSymlink_Type = {
 	{
 		.it_symlink = {
 			/* .sl_readlink = */ NULL,
-			/* .sl_readlink = */ &ProcFS_SingleTon_DynamicSymlink_Readlink,
+			/* .sl_readlink = */ &ProcFS_PerProc_DynamicSymlink_Readlink,
 		}
 	}
 };

@@ -36,6 +36,7 @@
 
 #include <format-printer.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -86,7 +87,7 @@ NOTHROW(KCALL ProcFS_SubStringPrinter)(void *arg,
 		memcpy(closure->ssp_buf, data, closure->ssp_size, sizeof(char));
 		closure->ssp_buf += closure->ssp_size;
 		closure->ssp_size = 0;
-		return __SSIZE_MIN__; /* Stop printing (we've gotten everything) */
+		return SSIZE_MIN; /* Stop printing (we've gotten everything) */
 	}
 	/* Print everything */
 	memcpy(closure->ssp_buf, data, datalen, sizeof(char));

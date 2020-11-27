@@ -205,6 +205,12 @@
 #define SSIZE_MAX __SSIZE_MAX__
 #endif /* !SSIZE_MAX */
 
+#ifdef __USE_KOS
+#ifndef SSIZE_MIN
+#define SSIZE_MIN __SSIZE_MIN__
+#endif /* !SSIZE_MIN */
+#endif /* __USE_KOS */
+
 /*[[[deemon
 @@List of (alwaysUseMinimum, name, posixName, posixMinimum, doc)
 local limits = {

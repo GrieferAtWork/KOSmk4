@@ -1671,6 +1671,11 @@ fallback_insert_possible_collision:
 					                 * HINT: Type symbols are cheaty and claim to have location
 					                 *       info, so we don't need a special them for them here. */
 				}
+				/* TODO: If the new symbol has the `DW_AT_external' flag set, then
+				 *       _it_ must become the globally visible symbol, replacing the
+				 *       existing symbol, which must be moved into _its_ associated
+				 *       CU, instead. */
+
 				/* It's a collision!
 				 * Mark the global symbol as such, and add
 				 * the new symbol to the per-CU table. */
@@ -3112,7 +3117,7 @@ again_subprogram_component:
 				case DW_TAG_formal_parameter: {
 					di_debuginfo_variable_t var;
 					/* Check if the caller actually wants us to enumerate local variables. */
-					if (ns != CMODSYM_DIP_NS_NORMAL)
+					if (ns >= CMODSYM_DIP_NS_TYPEDEF)
 						goto skip_in_cu_tag_attr;
 					if (debuginfo_cu_parser_loadattr_variable(&info->clv_parser, &var)) {
 						if (!var.v_rawname)

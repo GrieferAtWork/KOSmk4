@@ -49,6 +49,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <limits.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,7 +103,7 @@ NOTHROW(KCALL GDB_OffsetAndLengthPrinter)(void *arg, char const *__restrict data
 		memcpy(closure->ol_buf, data, closure->ol_size);
 		closure->ol_buf += closure->ol_size;
 		closure->ol_size = 0;
-		return __SSIZE_MIN__; /* Stop printing (we've gotten everything) */
+		return SSIZE_MIN; /* Stop printing (we've gotten everything) */
 	}
 	/* Print everything */
 	memcpy(closure->ol_buf, data, datalen);
@@ -2011,7 +2012,7 @@ send_empty:
 			} else {
 				ERROR(unknown);
 			}
-			if (error == __SSIZE_MIN__) {
+			if (error == SSIZE_MIN) {
 				*o = 'm'; /* There is more data... */
 				o = dst.ol_buf;
 			} else if (error < 0) {
