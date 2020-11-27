@@ -621,6 +621,32 @@ again:
 	                                        &self->dup_comp, abbrev_code);
 }
 
+/* Same as `libdi_debuginfo_cu_parser_next()', but store a pointer to the
+ * debug information start location of the next componet within `*pdip' */
+INTERN TEXTSECTION NONNULL((1, 2)) bool
+NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self,
+                                                        byte_t const **__restrict pdip) {
+	uintptr_t abbrev_code;
+	if (self->dup_comp.dic_haschildren != DW_CHILDREN_no)
+		++self->dup_child_depth;
+again:
+	if (self->dup_cu_info_pos >= self->dup_cu_info_end)
+		return false; /* EOF */
+	/* DWARF 7.5.2: Each debugging information entry begins with an unsigned
+	 * LEB128 number containing the abbreviation code for the entry */
+	*pdip       = self->dup_cu_info_pos;
+	abbrev_code = dwarf_decode_uleb128(&self->dup_cu_info_pos);
+	if (!abbrev_code) {
+		if (self->dup_child_depth)
+			--self->dup_child_depth;
+		goto again; /* Ignored */
+	}
+	/* Lookup the associated abbreviation code. */
+	return libdi_debuginfo_cu_abbrev_lookup(self->dup_cu_abbrev,
+	                                        self->dup_sections->cps_debug_abbrev_end,
+	                                        &self->dup_comp, abbrev_code);
+}
+
 INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_debuginfo_cu_parser_t *__restrict self) {
 	if (!self->dup_comp.dic_haschildren)
@@ -3264,6 +3290,7 @@ DEFINE_PUBLIC_ALIAS(debuginfo_cu_abbrev_fini, libdi_debuginfo_cu_abbrev_fini);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadunit, libdi_debuginfo_cu_parser_loadunit);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_skipform, libdi_debuginfo_cu_parser_skipform);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_next, libdi_debuginfo_cu_parser_next);
+DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_next_with_dip, libdi_debuginfo_cu_parser_next_with_dip);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_nextchild, libdi_debuginfo_cu_parser_nextchild);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_nextsibling, libdi_debuginfo_cu_parser_nextsibling);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_nextparent, libdi_debuginfo_cu_parser_nextparent);

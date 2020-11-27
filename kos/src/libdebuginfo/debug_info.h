@@ -80,6 +80,10 @@ INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_
 INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *__restrict self);
 INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self);
 
+/* Same as `libdi_debuginfo_cu_parser_next()', but store a pointer to the
+ * debug information start location of the next componet within `*pdip' */
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self, byte_t const **__restrict pdip);
+
 /* Skip the attributes of the current component (must be called if not
  * parsed explicitly prior to the next call to `debuginfo_cu_parser_next*') */
 INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_debuginfo_cu_parser_t *__restrict self);

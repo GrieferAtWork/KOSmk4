@@ -309,6 +309,18 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debug
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
+/* Same as `libdi_debuginfo_cu_parser_next()', but store a pointer to the
+ * debug information start location of the next componet within `*pdip' */
+typedef __ATTR_NONNULL((1, 2)) __BOOL
+/*__NOTHROW_NCX*/ (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_NEXT_WITH_DIP)(di_debuginfo_cu_parser_t *__restrict self,
+                                                                        __byte_t const **__restrict pdip);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) __BOOL
+__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_next_with_dip)(di_debuginfo_cu_parser_t *__restrict self,
+                                                                 __byte_t const **__restrict pdip);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
+
 /* Skip the attributes of the current component (must be called if not
  * parsed explicitly prior to the next call to `debuginfo_cu_parser_next*') */
 typedef __ATTR_NONNULL((1)) void (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_SKIPATTR)(di_debuginfo_cu_parser_t *__restrict self);

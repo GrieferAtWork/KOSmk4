@@ -2867,6 +2867,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
 	return DBX_ENOMEM;
 }
 
+
 /* Push a currently visible symbol, as selected by the code location from
  * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
  * given that symbol's `name'. For this purpose, `name' can be (in order):
@@ -2900,39 +2901,6 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 		return result;
 	if (!cmodsyminfo_istype(&csym)) {
 		struct ctyperef symtype;
-		if (!csym.clv_data.s_var.v_typeinfo && cmodsyminfo_issip(&csym)) {
-			/* The symbol being pushed originates from some module's .symtab,
-			 * but we were unable to find any debug information relating to
-			 * this symbol while parsing .debug_info.
-			 *
-			 * However, that doesn't mean that the module doesn't have some
-			 * other name by which `csym' can be addressed. After all: we _do_
-			 * have the address of the symbol (csym.clv_data.s_var.v_objaddr),
-			 * so we know that it exists.
-			 *
-			 * This can happen if we're supposed to push a library symbol that
-			 * had been defined via something like `DEFINE_PUBLIC_ALIAS()', in
-			 * which case no dedicated debug information for that symbol would
-			 * have been created, and, so-long as the library didn't end up
-			 * directly using its own exported symbol (and only ever used its
-			 * private name for the same symbol), we wouldn't know what kind of
-			 * object we're dealing with.
-			 *
-			 * However, that isn't to say that we can't find out. After all:
-			 * we do have an address which we can use to perform a reverse
-			 * symbol lookup (akin to addr2line, only this time we use it to
-			 * do an `addr2typeinfo')
-			 *
-			 * This special case is required to load proper type information for
-			 * pretty much all symbols exposed by the user-space `libc.so', which
-			 * makes extensive use of `DEFINE_PUBLIC_ALIAS(symbol, libc_symbol)'
-			 * to expose `libc_symbol' as `symbol', where we would know about both
-			 * symbols at this point, though the caller originally made a request
-			 * to `symbol', and .debug_info only contains mentions of `libc_symbol' */
-
-			/* TODO: Do the reverse addr2line lookup! */
-		}
-
 		/* Load the type of the variable. */
 		result = ctype_fromdw_opt(csym.clv_mod, csym.clv_unit,
 		                          &csym.clv_parser,
@@ -2941,14 +2909,8 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 		if (csym.clv_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
 			/* Special case: Must complete `symtype' by loading argument types. */
 			REF struct ctype *function_type;
-			if (cmodsyminfo_isdip(&csym)) {
-				csym.clv_parser.dup_cu_info_pos = cmodsyminfo_getdip(&csym);
-			} else if (cmodsyminfo_ismip(&csym)) {
-				csym.clv_parser.dup_cu_info_pos = cmodsyminfo_getmip(&csym)->ms_dip;
-			} else {
-				goto fallback_function_type;
-			}
-			if (debuginfo_cu_parser_next(&csym.clv_parser)) {
+			csym.clv_parser.dup_cu_info_pos = csym.clv_dip;
+			if (csym.clv_parser.dup_cu_info_pos && debuginfo_cu_parser_next(&csym.clv_parser)) {
 				debuginfo_cu_parser_skipattr(&csym.clv_parser);
 				result = ctype_fromdw_subroutine(csym.clv_mod,
 				                                 csym.clv_unit,
@@ -2957,7 +2919,6 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 				                                 &symtype);
 			} else {
 				/* Fallback */
-fallback_function_type:
 				function_type = ctype_function(&symtype, 0, NULL,
 				                               CTYPE_KIND_FUNPROTO_VARARGS);
 				if unlikely(!function_type)

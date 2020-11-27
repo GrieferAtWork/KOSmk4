@@ -487,6 +487,7 @@ struct cmodsyminfo {
 	 * is the case, these fields can be loaded lazily via `cmod_symenum_loadinfo()' */
 	di_debuginfo_compile_unit_t clv_cu;        /* Compilation unit debug-info. */
 	di_debuginfo_cu_parser_t    clv_parser;    /* Parser. */
+	byte_t const               *clv_dip;       /* [0..1] Debug information pointer. */
 	union {
 		/* The following are selected based upon `clv_parser.dup_comp.dic_tag' */
 		struct {                                 /* Variable */
@@ -510,6 +511,7 @@ struct cmodsyminfo {
 #define cmodsyminfo_getdip(self) cmodsym_getdip(&(self)->clv_symbol, (self)->clv_mod)
 #define cmodsyminfo_getsip(self) cmodsym_getsip(&(self)->clv_symbol, (self)->clv_mod)
 #define cmodsyminfo_getmip(self) cmodsym_getmip(&(self)->clv_symbol, (self)->clv_mod)
+
 
 
 /* Lookup information about a local/global symbol matching the given name.

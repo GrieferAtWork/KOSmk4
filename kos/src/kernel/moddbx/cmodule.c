@@ -1674,8 +1674,7 @@ NOTHROW(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 					 * variables _are_ actually loaded as globals. (unlike symbols
 					 * defined within the bounds of other components, which we
 					 * consider to have local scoping) */
-					dip = parser.dup_cu_info_pos;
-					if (!debuginfo_cu_parser_next(&parser))
+					if (!debuginfo_cu_parser_next_with_dip(&parser, &dip))
 						goto done;
 					break;
 
@@ -1686,8 +1685,7 @@ NOTHROW(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 					size_t wanted_depth;
 					wanted_depth = parser.dup_child_depth;
 					for (;;) {
-						dip = parser.dup_cu_info_pos;
-						if (!debuginfo_cu_parser_next(&parser))
+						if (!debuginfo_cu_parser_next_with_dip(&parser, &dip))
 							goto done;
 						if (parser.dup_child_depth <= wanted_depth)
 							break;
@@ -2398,20 +2396,195 @@ again:
 	}
 }
 
+
+/* Parse attributes of the currently selected component to figure out
+ * if that object is located at the given `module_relative_addr'. If
+ * it is, then immediately stop parsing and return `true'. Otherwise,
+ * parse all attributes and eventually return `false' */
+PRIVATE NONNULL((1)) bool
+NOTHROW(FCALL parser_check_object_has_address)(di_debuginfo_cu_parser_t *__restrict parser,
+                                               uintptr_t module_relative_addr) {
+	byte_t const *referenced_component;
+	di_debuginfo_cu_parser_t _inner_parser;
+	di_debuginfo_component_attrib_t attr;
+again:
+	referenced_component = NULL;
+	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, parser) {
+		switch (attr.dica_name) {
+
+		case DW_AT_abstract_origin:
+		case DW_AT_sibling:
+		case DW_AT_specification:
+			if (!debuginfo_cu_parser_getref(parser, attr.dica_form,
+			                                &referenced_component))
+				referenced_component = NULL;
+			break;
+
+		case DW_AT_low_pc:
+		case DW_AT_entry_pc: {
+			uintptr_t module_relative_component_addr;
+			/* Directly load the encoded address constant. */
+			if (debuginfo_cu_parser_getaddr(parser, attr.dica_form,
+				                            &module_relative_component_addr) &&
+				module_relative_component_addr == module_relative_addr)
+				return true; /* Found it! */
+		}	break;
+
+		case DW_AT_location: {
+			/* Alright, so here we have an actual location expression. However, as complicated
+			 * at that may appear at first glance, it all essentially boils down to only a single
+			 * instruction, as we're not allowed to have address evaluation rely on any outside
+			 * factors, such as register states.
+			 * With this in mind, only 1-instruction expressions like the following are accepted:
+			 *   >> DW_OP_addr 0x12345678
+			 * Since this is the only way by which the module's load-address would normally end
+			 * up being added to the calculated address. Furthermore, the DWARF specs explicitly
+			 * mention that only location expression in this form can appear in its version of
+			 * a symbol name table (DWARF5 .debug_names, which we don't support because DWARF5
+			 * is a mess of wastefully encoded debug information, and gcc still likes to generate
+			 * DWARF4 by default)
+			 *
+			 * So in conclusion: Check that we're dealing with a 5/9-byte instruction where the
+			 * first byte is the opcode of `DW_OP_addr' */
+			di_debuginfo_location_t loc;
+			uintptr_t module_relative_component_addr;
+			size_t length;
+			if unlikely(!debuginfo_cu_parser_getexpr(parser, attr.dica_form, &loc))
+				break;
+			if (!loc.l_expr || loc.l_llist)
+				break;
+			length = (size_t)dwarf_decode_uleb128(&loc.l_expr);
+			if (length != ((size_t)1 + parser->dup_addrsize))
+				break;
+			if (*loc.l_expr != DW_OP_addr)
+				break;
+			++loc.l_expr;
+			if (parser->dup_addrsize == 4) {
+				module_relative_component_addr = (uintptr_t)UNALIGNED_GET32((uint32_t *)loc.l_expr);
+			} else if (parser->dup_addrsize == 8) {
+				module_relative_component_addr = (uintptr_t)UNALIGNED_GET64((uint64_t *)loc.l_expr);
+			} else {
+				break;
+			}
+			if (module_relative_component_addr == module_relative_addr)
+				return true; /* Found it! */
+		}	break;
+
+		default:
+			break;
+		}
+	}
+	if (referenced_component) {
+		/* Maybe we can find what we're looking for in here... */
+		if (dbg_awaituser()) /* Allow the user to break an infinite loop caused by bad debug-info... */
+			goto done;
+		if (parser != &_inner_parser) {
+			memcpy(&_inner_parser, parser, sizeof(*parser));
+			parser = &_inner_parser;
+		}
+		parser->dup_cu_info_pos = referenced_component;
+		if (debuginfo_cu_parser_next(&_inner_parser))
+			goto again;
+	}
+done:
+	return false;
+}
+
+
+/* Scan (using the already-initialized parser of `info') the current CU
+ * for a symbol that has a starting address equal to `module_relative_addr'
+ * Once found, store information about that symbol in `info->clv_data'
+ * If found, return the DIP for that object. Otherwise, return `NULL' */
+PRIVATE NONNULL((1)) byte_t const *
+NOTHROW(FCALL cmod_symenum_search_for_address)(struct cmodsyminfo *__restrict info,
+                                               uintptr_t module_relative_addr) {
+	for (;;) {
+		byte_t const *dip;
+		size_t cu_depth;
+		/* Load the initial compile-unit container-tag. */
+		cu_depth = info->clv_parser.dup_child_depth;
+		dip      = info->clv_parser.dup_cu_info_pos;
+		/* Scan the elements of the compilation-unit. */
+		if (debuginfo_cu_parser_nextchild(&info->clv_parser)) {
+			do {
+				if (dbg_awaituser())
+					goto done;
+				/* Restrict address lookup search to components that could feasibly be addressable. */
+				if (info->clv_parser.dup_comp.dic_tag == DW_TAG_subprogram ||
+				    info->clv_parser.dup_comp.dic_tag == DW_TAG_label ||
+				    info->clv_parser.dup_comp.dic_tag == DW_TAG_variable ||
+				    info->clv_parser.dup_comp.dic_tag == DW_TAG_constant ||
+				    info->clv_parser.dup_comp.dic_tag == DW_TAG_enumerator) {
+					/* Parse attributes of the current component to check if this
+					 * component points at an object that matches the given address. */
+					if (parser_check_object_has_address(&info->clv_parser, module_relative_addr))
+						return dip; /* Found it! */
+				} else {
+					debuginfo_cu_parser_skipattr(&info->clv_parser);
+				}
+				switch (info->clv_parser.dup_comp.dic_tag) {
+
+				case DW_TAG_enumeration_type:
+				case DW_TAG_namespace:
+					/* Allow looking inside of these tags for other global names.
+					 * This special distinction is required since these types of
+					 * variables _are_ actually loaded as globals. (unlike symbols
+					 * defined within the bounds of other components, which we
+					 * consider to have local scoping) */
+					if (!debuginfo_cu_parser_next_with_dip(&info->clv_parser, &dip))
+						goto done;
+					break;
+
+				default: {
+					/* Scan ahead to the next component at our current level.
+					 * This way, we don't accidentally load local variables
+					 * as though they were globals. */
+					size_t wanted_depth;
+					wanted_depth = info->clv_parser.dup_child_depth;
+					for (;;) {
+						if (!debuginfo_cu_parser_next_with_dip(&info->clv_parser, &dip))
+							goto done;
+						if (info->clv_parser.dup_child_depth <= wanted_depth)
+							break;
+						/* Skip attributes of this tag. */
+						debuginfo_cu_parser_skipattr(&info->clv_parser);
+						if (dbg_awaituser())
+							goto done;
+					}
+				}	break;
+
+				}
+			} while (info->clv_parser.dup_child_depth >= cu_depth);
+		}
+		for (;;) {
+			debuginfo_cu_parser_skipattr(&info->clv_parser);
+			if (info->clv_parser.dup_comp.dic_tag == DW_TAG_compile_unit)
+				break;
+			if (!debuginfo_cu_parser_next(&info->clv_parser))
+				goto done;
+			if (dbg_awaituser())
+				goto done;
+		}
+	}
+done:
+	return NULL;
+}
+
 /* To-be called from inside of `cmod_symenum_callback_t' when
  * `info_loaded == false', and extended symbol information is
  * needed. */
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
-	byte_t const *dip = NULL;
+	info->clv_dip = NULL;
 	if (cmodsyminfo_isdip(info)) {
-		dip = cmodsyminfo_getdip(info);
+		info->clv_dip = cmodsyminfo_getdip(info);
 	} else if (cmodsyminfo_ismip(info)) {
-		dip = cmodsyminfo_getmip(info)->ms_dip;
+		info->clv_dip = cmodsyminfo_getmip(info)->ms_dip;
 	}
 	memset(&info->clv_data, 0, sizeof(info->clv_data));
 	if (cmodsyminfo_ismip(info) || cmodsyminfo_issip(info)) {
 		ElfV_Sym const *psymbol;
+		uintptr_t symbol_addr;
 		if (cmodsyminfo_ismip(info)) {
 			psymbol = cmodsyminfo_getmip(info)->ms_sip;
 		} else {
@@ -2419,16 +2592,23 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 		}
 		/* Load the object address from .symtab */
 		if (info->clv_mod->cm_sections.ds_symtab_ent == sizeof(Elf32_Sym)) {
-			info->clv_data.s_var.v_objaddr = (void *)(cmodule_getloadaddr(info->clv_mod) + (uintptr_t)psymbol->e32.st_value);
+			symbol_addr = (uintptr_t)psymbol->e32.st_value;
 		} else if (info->clv_mod->cm_sections.ds_symtab_ent == sizeof(Elf64_Sym)) {
-			info->clv_data.s_var.v_objaddr = (void *)(cmodule_getloadaddr(info->clv_mod) + (uintptr_t)psymbol->e64.st_value);
+			symbol_addr = (uintptr_t)psymbol->e64.st_value;
+		} else {
+			goto no_sip_addr;
 		}
+		info->clv_data.s_var.v_objaddr = (void *)(cmodule_getloadaddr(info->clv_mod) + symbol_addr);
+		/* Try to load the CU by looking at the symbol address. */
+		if (!info->clv_unit)
+			info->clv_unit = cmodule_findunit_from_pc(info->clv_mod, symbol_addr);
 	}
+no_sip_addr:
 	if (!info->clv_unit) {
-		if (!dip)
+		if (!info->clv_dip)
 			goto no_unit;
 		/* Lookup the appropriate compilation unit. */
-		info->clv_unit = cmodule_findunit_from_dip(info->clv_mod, dip);
+		info->clv_unit = cmodule_findunit_from_dip(info->clv_mod, info->clv_dip);
 		if unlikely(!info->clv_unit) {
 no_unit:
 			/* Shouldn't happen... (fill in stub-data) */
@@ -2458,10 +2638,45 @@ no_unit:
 	                                               &info->clv_cu))
 		memset(&info->clv_cu, 0, sizeof(info->clv_cu));
 
-	/* Load symbol-specific debug information. */
+	if (!info->clv_dip && (cmodsyminfo_ismip(info) || cmodsyminfo_issip(info))) {
+		/* The symbol being pushed originates from some module's .symtab,
+		 * but we were unable to find any debug information relating to
+		 * this symbol while parsing .debug_info.
+		 *
+		 * However, that doesn't mean that the module doesn't have some
+		 * other name by which `csym' can be addressed. After all: we _do_
+		 * have the address of the symbol (csym.clv_data.s_var.v_objaddr),
+		 * so we know that it exists.
+		 *
+		 * This can happen if we're supposed to push a library symbol that
+		 * had been defined via something like `DEFINE_PUBLIC_ALIAS()', in
+		 * which case no dedicated debug information for that symbol would
+		 * have been created, and, so-long as the library didn't end up
+		 * directly using its own exported symbol (and only ever used its
+		 * private name for the same symbol), we wouldn't know what kind of
+		 * object we're dealing with.
+		 *
+		 * However, that isn't to say that we can't find out. After all:
+		 * we do have an address which we can use to perform a reverse
+		 * symbol lookup (akin to addr2line, only this time we use it to
+		 * do an `addr2typeinfo')
+		 *
+		 * This special case is required to load proper type information for
+		 * pretty much all symbols exposed by the user-space `libc.so', which
+		 * makes extensive use of `DEFINE_PUBLIC_ALIAS(symbol, libc_symbol)'
+		 * to expose `libc_symbol' as `symbol', where we would know about both
+		 * symbols at this point, though the caller originally made a request
+		 * to `symbol', and .debug_info only contains mentions of `libc_symbol' */
+		uintptr_t module_relative_addr;
+		module_relative_addr = (uintptr_t)info->clv_data.s_var.v_objaddr -
+		                       cmodule_getloadaddr(info->clv_mod);
+		info->clv_dip = cmod_symenum_search_for_address(info, module_relative_addr);
+	}
+
 do_load_dip:
-	info->clv_parser.dup_cu_info_pos = dip;
-	if (!dip || !debuginfo_cu_parser_next(&info->clv_parser)) {
+	/* Load symbol-specific debug information. */
+	info->clv_parser.dup_cu_info_pos = info->clv_dip;
+	if (!info->clv_dip || !debuginfo_cu_parser_next(&info->clv_parser)) {
 		/* Fill in a stub/EOF component. */
 		info->clv_parser.dup_comp.dic_tag         = 0; /* DW_TAG_... */
 		info->clv_parser.dup_comp.dic_haschildren = DW_CHILDREN_no;
@@ -2734,8 +2949,7 @@ again_cu_component:
 			}
 			for (;;) {
 				byte_t const *dip;
-				dip = info->clv_parser.dup_cu_info_pos;
-				if (!debuginfo_cu_parser_next(&info->clv_parser))
+				if (!debuginfo_cu_parser_next_with_dip(&info->clv_parser, &dip))
 					goto done_subprogram;
 again_subprogram_component:
 				if (info->clv_parser.dup_child_depth <= subprogram_depth)
@@ -2795,8 +3009,7 @@ again_subprogram_component:
 							uintptr_t block_depth;
 							block_depth = info->clv_parser.dup_child_depth;
 							for (;;) {
-								dip = info->clv_parser.dup_cu_info_pos;
-								if (!debuginfo_cu_parser_next(&info->clv_parser))
+								if (!debuginfo_cu_parser_next_with_dip(&info->clv_parser, &dip))
 									goto done;
 								if (info->clv_parser.dup_child_depth <= block_depth)
 									goto again_subprogram_component;
