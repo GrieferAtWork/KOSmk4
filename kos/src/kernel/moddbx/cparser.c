@@ -81,7 +81,7 @@ NOTHROW(FCALL cparser_autocomplete)(struct cparser const *__restrict self,
  * following the initial `c_tokend' */
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL cparser_yield)(struct cparser *__restrict self) {
-	uint32_t ch;
+	char32_t ch;
 	char const *iter, *end;
 	iter = self->c_tokend;
 	end  = self->c_end;
@@ -99,7 +99,7 @@ again:
 
 	case '\'':
 	case '\"': {
-		uint32_t endch = ch;
+		char32_t endch = ch;
 		do {
 			ch = unicode_readutf8_n(&iter, end);
 		} while (ch != endch && !unicode_islf(ch) && iter < end);
