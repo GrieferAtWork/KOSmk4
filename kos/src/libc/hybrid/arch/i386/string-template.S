@@ -70,15 +70,15 @@
 #define ENTER_Pdi_Psi_Pcx  \
 	pushl_cfi_r %edi;      \
 	pushl_cfi_r %esi;      \
-	movl   12(%esp), %esi; \
-	movl   16(%esp), %edi; \
+	movl   12(%esp), %edi; \
+	movl   16(%esp), %esi; \
 	movl   20(%esp), %ecx
 #define LEAVE_Pdi_Psi_Pcx \
 	popl_cfi_r %esi;      \
 	popl_cfi_r %edi
 #define ENTER_Pdi_Pcx     \
 	pushl_cfi_r %edi;     \
-	movl   8(%esp), %esi; \
+	movl   8(%esp), %edi; \
 	movl   12(%esp), %ecx
 #define LEAVE_Pdi_Pcx \
 	popl_cfi_r %edi
@@ -185,16 +185,16 @@
 BEGIN_MEMFUNC(memcmp)
 	ENTER_Pdi_Psi_Pcx
 	BEGIN_CLD
-	/* Compare DS:PSI (lhs) with ES:PDI (rhs) */
+	/* Compare DS:PSI (rhs) with ES:PDI (lhs) */
 	xorP   %Pax, %Pax  /* result = 0; // HINT: This also forces %eflags into a je=1 state to
 	                    *             //       handle %Pcx==0 (where cmps won't update %eflags) */
 	repe   I(cmps)     /* Do the actual compare */
-	/* jb -> return -1; */
-	/* ja -> return 1;  */
+	/* jb -> return 1;  */
+	/* ja -> return -1; */
 	/* je -> return 0;  */
-	seta   %al         /* result = (result & 0xffffffffffffff00) | ((lhs > rhs) ? 1 : 0); */
+	setb   %al         /* result = (result & 0xffffffffffffff00) | ((rhs < lhs) ? 1 : 0); */
 	movP   $(-1), %Pcx
-	cmovbP %Pcx, %Pax  /* if (lhs < rhs) result = -1; */
+	cmovaP %Pcx, %Pax  /* if (rhs > lhs) result = -1; */
 	END_CLD
 	LEAVE_Pdi_Psi_Pcx
 	RET(12)
