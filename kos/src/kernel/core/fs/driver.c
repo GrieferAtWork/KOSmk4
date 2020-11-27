@@ -2363,12 +2363,12 @@ struct kernel_syment {
 	u32         ds_hash; /* Symbol hash (s.a. `elf_symhash()') */
 };
 struct kernel_symtab {
-	uintptr_t            ds_mask;       /* Hash mask. */
-	struct kernel_syment ds_list[1024]; /* Symbol map. */
+	uintptr_t                                     ds_mask;  /* Hash mask. */
+	COMPILER_FLEXIBLE_ARRAY(struct kernel_syment, ds_list); /* Symbol map. */
 };
 
 /* The kernel symbol table (containing everything marked as PUBLIC) */
-INTDEF struct kernel_symtab kernel_symbol_table;
+extern struct kernel_symtab kernel_symbol_table;
 
 
 

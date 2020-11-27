@@ -92,10 +92,33 @@ DECL_BEGIN
 
 
 
+/* Internal structures for used by `kernel_symbol_table'
+ * Stolen from `/kos/kernel/core/fs/driver.c' */
+struct kernel_syment {
+	char const *ks_name; /* [0..1] Symbol name (NULL for sentinel) */
+	void       *ks_addr; /* Symbol address */
+	u32         ds_size; /* Symbol size */
+	u32         ds_hash; /* Symbol hash (s.a. `elf_symhash()') */
+};
+struct kernel_symtab {
+	uintptr_t                                     ds_mask;  /* Hash mask. */
+	COMPILER_FLEXIBLE_ARRAY(struct kernel_syment, ds_list); /* Symbol map. */
+};
+/* The kernel symbol table (containing everything marked as PUBLIC) */
+DATDEF struct kernel_symtab kernel_symbol_table;
+
+
 typedef union {
-	Elf32_Sym e32;
-	Elf64_Sym e64;
-} ElfV_Sym;
+	struct kernel_syment cls_kern;  /* [valid_if(:cm_module == &kernel_driver)]
+	                                 * NOTE: In this case, SIP offsets are relative to `&kernel_symbol_table',
+	                                 *       and `cm_sections.ds_symtab_start == &kernel_symbol_table' */
+	Elf32_Sym            cls_elf32; /* [valid_if(:cm_sections.ds_symtab_ent == sizeof(Elf32_Sym))] */
+	Elf64_Sym            cls_elf64; /* [valid_if(:cm_sections.ds_symtab_ent == sizeof(Elf64_Sym))] */
+} CLinkerSymbol;
+#define CLinkerSymbol_IsKern(mod)  ((mod)->cm_module == (module_t *)&kernel_driver)
+#define CLinkerSymbol_IsElf32(mod) ((mod)->cm_sections.ds_symtab_ent == sizeof(Elf32_Sym))
+#define CLinkerSymbol_IsElf64(mod) ((mod)->cm_sections.ds_symtab_ent == sizeof(Elf64_Sym))
+
 
 struct cmodsym {
 	/* Module symbols are cached in 1+N sorted vectors (where N is the number of CUs)
@@ -173,7 +196,7 @@ struct cmodsym {
  *       dip = DebugInfoPointer   (offset into .debug_info)
  *       mip = MixedInfoPointer   (offset into MODULE.cm_mixed.mss_symv) */
 #define cmodsym_getdip(self, mod)     ((mod)->cm_sections.ds_debug_info_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK))
-#define cmodsym_getsip(self, mod)     ((ElfV_Sym const *)((mod)->cm_sections.ds_symtab_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
+#define cmodsym_getsip(self, mod)     ((CLinkerSymbol const *)((mod)->cm_sections.ds_symtab_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
 #define cmodsym_getmip(self, mod)     ((struct cmodmixsym const *)((byte_t const *)(mod)->cm_mixed.mss_symv + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
 #define cmodsym_makedip(mod, dip, ns) ((uintptr_t)((dip) - (mod)->cm_sections.ds_debug_info_start) | (ns))
 #define cmodsym_makesip(mod, sip)     ((uintptr_t)((sip) - (mod)->cm_sections.ds_symtab_start) | CMODSYM_DIP_NS_SYMTAB)
@@ -216,8 +239,8 @@ struct cmodsymtab {
 #define cmodsymtab_syma(self) (dbx_malloc_usable_size((self)->mst_symv) / sizeof(struct cmodsym))
 
 struct cmodmixsym {
-	byte_t   const *ms_dip; /* [1..1] Absolute pointer (apart of .debug_info) for debug information. */
-	ElfV_Sym const *ms_sip; /* [1..1] Absolute pointer (apart of .symtab/.dynsym) for address information. */
+	byte_t        const *ms_dip; /* [1..1] Absolute pointer (apart of .debug_info) for debug information. */
+	CLinkerSymbol const *ms_sip; /* [1..1] Absolute pointer (apart of .symtab/.dynsym) for address information. */
 };
 
 struct cmodmixsymtab {
