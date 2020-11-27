@@ -1383,7 +1383,7 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(unsigned int id) {
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
 		return DBX_ENOMEM;
-	buflen = arch_dbg_setregbyid(DBG_REGLEVEL_VIEW, id,
+	buflen = arch_dbg_getregbyid(DBG_REGLEVEL_VIEW, id,
 	                             valp->cv_register.r_ibuffer,
 	                             sizeof(valp->cv_register.r_ibuffer));
 	if unlikely(buflen > sizeof(valp->cv_register.r_ibuffer))
@@ -1394,8 +1394,9 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(unsigned int id) {
 	if unlikely(!valp->cv_type.ct_typ)
 		return DBX_EINTERN; /* Internal error */
 	ctypeinfo_init(&valp->cv_type.ct_info);
-	valp->cv_type.ct_flags = CTYPEREF_FLAG_NORMAL;
-	valp->cv_kind          = CVALUE_KIND_REGISTER;
+	valp->cv_type.ct_flags    = CTYPEREF_FLAG_NORMAL;
+	valp->cv_kind             = CVALUE_KIND_REGISTER;
+	valp->cv_register.r_regid = id;
 	if (cexpr_typeonly)
 		valp->cv_kind = CVALUE_KIND_VOID;
 	++cexpr_stacksize;

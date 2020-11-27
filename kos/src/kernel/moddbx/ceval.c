@@ -587,6 +587,15 @@ NOTHROW(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
 	autocomplete_symbols(self, name, namelen, CMODSYM_DIP_NS_NORMAL, false);
 }
 
+PRIVATE NONNULL((1)) void
+NOTHROW(FCALL autocomplete_register_name)(struct cparser *__restrict self,
+                                          char const *__restrict name,
+                                          size_t namelen) {
+	/* TODO: auto-complete register names that start with the given `name...+=namelen' */
+	(void)self;
+	(void)name;
+	(void)namelen;
+}
 
 
 PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
@@ -783,10 +792,19 @@ NOTHROW(FCALL parse_unary_prefix)(struct cparser *__restrict self) {
 	case '$': {
 		/* Register expression. */
 		yield();
-		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD)
+		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD) {
+			if (self->c_autocom && self->c_tok == CTOKEN_TOK_EOF)
+				autocomplete_register_name(self, NULL, 0);
 			goto syn;
+		}
 		result = cexpr_pushregister(self->c_tokstart,
 		                            cparser_toklen(self));
+		if unlikely(result != DBX_EOK) {
+			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
+				autocomplete_register_name(self, self->c_tokstart, cparser_toklen(self));
+			goto done;
+		}
+		yield();
 	}	break;
 
 	case CTOKEN_TOK_KEYWORD: {
@@ -993,8 +1011,10 @@ done_container_of_t_ptr:
 			if (result == DBX_ENOENT) {
 				if (kwd_len && kwd_str[0] == '$') {
 					/* This might just be a register name... */
-					result = cexpr_pushregister(kwd_str + 1, kwd_len - 1);
-					/* TODO: Auto-complete register names. */
+					++kwd_str, --kwd_len;
+					result = cexpr_pushregister(kwd_str, kwd_len);
+					if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
+						autocomplete_register_name(self, kwd_str, kwd_len);
 				} else if (self->c_autocom && (kwd_str + kwd_len) == self->c_end) {
 					autocomplete_nontype_symbols(self, kwd_str, kwd_len);
 				}
