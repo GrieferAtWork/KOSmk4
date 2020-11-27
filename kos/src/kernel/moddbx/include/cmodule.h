@@ -40,6 +40,62 @@
 
 DECL_BEGIN
 
+/*
+ * Module symbols come in 1 of 3 forms:
+ *
+ *  - Pure .debug_info variable/function  (cmodsym_isdip)
+ *     - Use `cmodunit_parser_from_dip()' and `cmodsym_getdip()'
+ *       to init a parser for loading debug information.
+ *     - Address/value information for the symbol (unless it's a type)
+ *       can also be found by parsing debug information and interpreting
+ *       its tags:
+ *         - DW_AT_low_pc
+ *         - DW_AT_entry_pc
+ *         - DW_AT_const_value
+ *         - DW_AT_location
+ *         - DW_AT_sibling or DW_AT_specification (pointing to one of the above)
+ *
+ *  - Pure .symtab symbol  (cmodsym_issip)
+ *     - This symbol has no debug information attached to it (gdb would
+ *       call this type of symbol a "text variable"). However, it does
+ *       have an address, as well as a name, meaning that there is at
+ *       least ~some~ useful information to this symbol.
+ *     - This kind of symbol only appears if scanning of .debug_info does
+ *       not reveal any additional information in regards to a symbol of
+ *       the same name. If a symbol with the same name is found during
+ *       loading of debug information, 1 of 4 things happens:
+ *         - If the symbol from .debug_info has no type information,
+ *           then the .debug_info entry for the symbol is ignored
+ *         - If the symbol from .debug_info has type, but no location
+ *           information, then the symbol becomes a mixed symbol which
+ *           is represented as CMODSYM_DIP_NS_MIXED, where type info
+ *           for the symbol originates from .debug_info, but address
+ *           information originates from .symtab
+ *         - If the symbol from .debug_info has a type and a location,
+ *           that location is (attempted to be) evaluated.
+ *           If the location isn't an address, the address cannot be
+ *           calculated (e.g. because it's TLS), or if its address differs
+ *           from the symbol's address from .symtab, then the symbol
+ *           from .debug_info is added to the current per-CU symbol
+ *           table, and the original .symtab symbol is marked with
+ *           `CMODSYM_DIP_NS_FCONFLICT'
+ *         - If the address from .debug_info could be evaluated, and that
+ *           address matches the symbol's address from .symtab, then the
+ *           symbol entry simply becomes a normal `CMODSYM_DIP_NS_NORMAL',
+ *           since all relevant information can be loaded from .debug_info
+ *
+ *  - Mixed .debug_info/.symtab symbol  (cmodsym_ismip)
+ *     - Like described above, this type of symbol pulls its information
+ *       from the combination of type information from .debug_info, and
+ *       address information from .symtab
+ */
+
+
+
+typedef union {
+	Elf32_Sym e32;
+	Elf64_Sym e64;
+} ElfV_Sym;
 
 struct cmodsym {
 	/* Module symbols are cached in 1+N sorted vectors (where N is the number of CUs)
@@ -113,23 +169,42 @@ struct cmodsym {
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported `__SIZEOF_POINTER__'"
 #endif /* __SIZEOF_POINTER__ != ... */
+/* NOTE: sip = SymbolInfoPointer  (offset to Elf(32|64)_Sym in .symtab or .dynsym)
+ *       dip = DebugInfoPointer   (offset into .debug_info)
+ *       mip = MixedInfoPointer   (offset into MODULE.cm_mixed.mss_symv) */
 #define cmodsym_getdip(self, mod)     ((mod)->cm_sections.ds_debug_info_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK))
+#define cmodsym_getsip(self, mod)     ((ElfV_Sym const *)((mod)->cm_sections.ds_symtab_start + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
+#define cmodsym_getmip(self, mod)     ((struct cmodmixsym const *)((byte_t const *)(mod)->cm_mixed.mss_symv + ((self)->cms_dip & CMODSYM_DIP_DIPMASK)))
 #define cmodsym_makedip(mod, dip, ns) ((uintptr_t)((dip) - (mod)->cm_sections.ds_debug_info_start) | (ns))
+#define cmodsym_makesip(mod, sip)     ((uintptr_t)((sip) - (mod)->cm_sections.ds_symtab_start) | CMODSYM_DIP_NS_SYMTAB)
+#define cmodsym_makemip(mod, mip)     ((uintptr_t)((byte_t const *)(mip) - (byte_t const *)(mod)->cm_mixed.mss_symv) | CMODSYM_DIP_NS_MIXED)
 #define cmodsym_getns(self)           ((self)->cms_dip & CMODSYM_DIP_NSMASK)
 #define cmodsym_istype(self)          CMODSYM_DIP_NS_ISTYPE(cmodsym_getns(self))
+#define cmodsym_isdip(self)           CMODSYM_DIP_NS_ISDIP(cmodsym_getns(self))
+#define cmodsym_issip(self)           CMODSYM_DIP_NS_ISSIP(cmodsym_getns(self))
+#define cmodsym_ismip(self)           CMODSYM_DIP_NS_ISMIP(cmodsym_getns(self))
 
 /* CModSym namespaces. */
-#define CMODSYM_DIP_NS_NORMAL    (__UINTPTR_C(0) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. */
-#define CMODSYM_DIP_NS_TYPEDEF   (__UINTPTR_C(1) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. (but this one's a type)
+#define CMODSYM_DIP_NS_SYMTAB    (__UINTPTR_C(0) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. (but this one comes from `.symtab') */
+#define CMODSYM_DIP_NS_MIXED     (__UINTPTR_C(1) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. (but this one is a mixed `.symtab' / `.debug_info' symbol)
+                                                                          * Note that this type of symbol can only appear in the per-module, global symbol
+                                                                          * table, but not in the per-CU symbol tables. However, it can still stand in conflict
+                                                                          * with other per-CU symbols. */
+#define CMODSYM_DIP_NS_NORMAL    (__UINTPTR_C(2) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. */
+#define CMODSYM_DIP_NS_TYPEDEF   (__UINTPTR_C(3) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. (but this one's a type)
                                                                           * When passed to lookup functions, only consider types
                                                                           * as suitable symbols, and skip all non-type symbols. */
-#define CMODSYM_DIP_NS_STRUCT    (__UINTPTR_C(2) << CMODSYM_DIP_NSSHIFT) /* struct-name-namespace. */
-#define CMODSYM_DIP_NS_UNION     (__UINTPTR_C(3) << CMODSYM_DIP_NSSHIFT) /* union-name-namespace. */
-#define CMODSYM_DIP_NS_CLASS     (__UINTPTR_C(4) << CMODSYM_DIP_NSSHIFT) /* class-name-namespace. */
-#define CMODSYM_DIP_NS_ENUM      (__UINTPTR_C(5) << CMODSYM_DIP_NSSHIFT) /* enum-name-namespace. */
-#define CMODSYM_DIP_NS_LABEL     (__UINTPTR_C(6) << CMODSYM_DIP_NSSHIFT) /* label-name-namespace. */
+#define CMODSYM_DIP_NS_STRUCT    (__UINTPTR_C(4) << CMODSYM_DIP_NSSHIFT) /* struct-name-namespace. */
+#define CMODSYM_DIP_NS_UNION     (__UINTPTR_C(5) << CMODSYM_DIP_NSSHIFT) /* union-name-namespace. */
+#define CMODSYM_DIP_NS_CLASS     (__UINTPTR_C(6) << CMODSYM_DIP_NSSHIFT) /* class-name-namespace. */
+#define CMODSYM_DIP_NS_ENUM      (__UINTPTR_C(7) << CMODSYM_DIP_NSSHIFT) /* enum-name-namespace. */
 #define CMODSYM_DIP_NS_FCONFLICT (__UINTPTR_C(8) << CMODSYM_DIP_NSSHIFT) /* FLAG: There is another, PER-CU symbol with the same name. */
-#define CMODSYM_DIP_NS_ISTYPE(x) (((x) & ~CMODSYM_DIP_NS_FCONFLICT) != CMODSYM_DIP_NS_NORMAL)
+#define CMODSYM_DIP_NS_ISTYPE(x)   (((x) & ~CMODSYM_DIP_NS_FCONFLICT) >= CMODSYM_DIP_NS_TYPEDEF)
+#define CMODSYM_DIP_NS_ISNORMAL(x) ((x) <= CMODSYM_DIP_NS_SYMTAB)
+#define CMODSYM_DIP_NS_ISGLOBAL(x) ((x) <= CMODSYM_DIP_NS_TYPEDEF)
+#define CMODSYM_DIP_NS_ISDIP(x)    (((x) & ~CMODSYM_DIP_NS_FCONFLICT) >= CMODSYM_DIP_NS_NORMAL)
+#define CMODSYM_DIP_NS_ISSIP(x)    (((x) & ~CMODSYM_DIP_NS_FCONFLICT) == CMODSYM_DIP_NS_SYMTAB)
+#define CMODSYM_DIP_NS_ISMIP(x)    (((x) & ~CMODSYM_DIP_NS_FCONFLICT) == CMODSYM_DIP_NS_MIXED)
 
 
 
@@ -139,6 +214,17 @@ struct cmodsymtab {
 	                           * Vector of symbols (lazily initialized). */
 };
 #define cmodsymtab_syma(self) (dbx_malloc_usable_size((self)->mst_symv) / sizeof(struct cmodsym))
+
+struct cmodmixsym {
+	byte_t   const *ms_dip; /* [1..1] Absolute pointer (apart of .debug_info) for debug information. */
+	ElfV_Sym const *ms_sip; /* [1..1] Absolute pointer (apart of .symtab/.dynsym) for address information. */
+};
+
+struct cmodmixsymtab {
+	size_t             mss_symc; /* # of mixed symbols in use. */
+	struct cmodmixsym *mss_symv; /* [0..1][owned] Mixed symbol information.
+	                              * NOTE: This list is sorted ascendingly by `ms_dip' */
+};
 
 
 struct cmodunit {
@@ -183,6 +269,7 @@ struct cmodule {
 	di_debug_sections_t                      cm_sections; /* [const] Debug section mappings. */
 	di_debug_dl_sections_t                   cm_sectrefs; /* [const] Debug section references. */
 	struct cmodsymtab                        cm_symbols;  /* Per-module debug symbol. */
+	struct cmodmixsymtab                     cm_mixed;    /* Information about mixed symbols. */
 	size_t                                   cm_cuc;      /* [const] # of compilation units. */
 	COMPILER_FLEXIBLE_ARRAY(struct cmodunit, cm_cuv);     /* Complication units. (sorted by `cu_di_start')
 	                                                       * Note that `cm_cuv[cm_cuc]' exists only partially, such
@@ -350,7 +437,6 @@ NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
                                        REF struct cmodule **__restrict presult_module,
                                        uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
-
 /* Initialize a debug information CU parser to load debug information for a component
  * located at `dip' within the `.debug_info' mapping of `self'. For this
  * purpose, this function will locate the CU that contains `dip', and proceed
@@ -417,8 +503,13 @@ struct cmodsyminfo {
 	} clv_data;
 };
 #define cmodsyminfo_istype(self) cmodsym_istype(&(self)->clv_symbol)
+#define cmodsyminfo_isdip(self)  cmodsym_isdip(&(self)->clv_symbol)
+#define cmodsyminfo_issip(self)  cmodsym_issip(&(self)->clv_symbol)
+#define cmodsyminfo_ismip(self)  cmodsym_ismip(&(self)->clv_symbol)
 #define cmodsyminfo_getns(self)  cmodsym_getns(&(self)->clv_symbol)
 #define cmodsyminfo_getdip(self) cmodsym_getdip(&(self)->clv_symbol, (self)->clv_mod)
+#define cmodsyminfo_getsip(self) cmodsym_getsip(&(self)->clv_symbol, (self)->clv_mod)
+#define cmodsyminfo_getmip(self) cmodsym_getmip(&(self)->clv_symbol, (self)->clv_mod)
 
 
 /* Lookup information about a local/global symbol matching the given name.

@@ -86,17 +86,24 @@ DECL_BEGIN
 struct sheap {
 	struct sheap  *sh_next; /* [0..1] Next heap. */
 	struct vm_node sh_node; /* [valid_if(sh_next)] VM node for allocating another heap. */
-	byte_t sh_heap[DBX_STATIC_HEAPSIZE - /* Heap data. */
-	               (sizeof(struct sheap *) +
-	                sizeof(struct vm_node))];
+	size_t         sh_size; /* Heap size (== runtime_sizeof(*self)). */
+	byte_t         sh_heap[DBX_STATIC_HEAPSIZE - /* Heap data. */
+	                       (sizeof(struct sheap *) +
+	                        sizeof(struct vm_node) +
+	                        sizeof(size_t))];
 };
+
+#define sheap_heapsize(self) ((self)->sh_size - offsetof(struct sheap, sh_heap))
 
 /* Free a given static-heap extension. */
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL sheap_free)(struct sheap *__restrict self) {
 	unsigned int i;
-	STATIC_ASSERT(IS_ALIGNED(sizeof(*self), PAGESIZE));
-	for (i = 0; i < sizeof(*self) / PAGESIZE; ++i) {
+	size_t size;
+	size = self->sh_size;
+	if unlikely(!IS_ALIGNED(size, PAGESIZE))
+		return; /* Shouldn't happen... */
+	for (i = 0; i < size / PAGESIZE; ++i) {
 		physaddr_t phys;
 		byte_t *vaddr = (byte_t *)self + i * PAGESIZE;
 		if (!pagedir_ismapped(vaddr))
@@ -105,7 +112,7 @@ NOTHROW(FCALL sheap_free)(struct sheap *__restrict self) {
 		pagedir_unmap(vaddr, PAGESIZE);
 		page_freeone(physaddr2page(phys));
 	}
-	pagedir_sync(self, sizeof(*self));
+	pagedir_sync(self, size);
 }
 
 
@@ -156,29 +163,34 @@ fail:
 
 
 PRIVATE bool
-NOTHROW(FCALL extend_heap)(void) {
+NOTHROW(FCALL extend_heap)(size_t min_size) {
 	struct sheap *last_heap;
 	struct sheap *new_heap;
+	if (!min_size)
+		min_size = 1;
+	min_size += offsetof(struct sheap, sh_heap);
+	min_size  = CEIL_ALIGN(min_size, DBX_STATIC_HEAPSIZE);
+	min_size  = CEIL_ALIGN(min_size, PAGESIZE);
 	last_heap = &static_heap;
 	while (last_heap->sh_next)
 		last_heap = last_heap->sh_next;
 	new_heap = (struct sheap *)vm_getfree(&vm_kernel,
 	                                      HINT_GETADDR(KERNEL_VMHINT_TEMPORARY),
-	                                      sizeof(struct sheap), PAGESIZE,
+	                                      min_size, PAGESIZE,
 	                                      HINT_GETMODE(KERNEL_VMHINT_TEMPORARY));
 	if (new_heap == (struct sheap *)VM_GETFREE_ERROR)
 		return false;
 
 	/* Prepare the address range for mappings. */
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-	if (!pagedir_prepare_map(new_heap, sizeof(struct sheap)))
+	if (!pagedir_prepare_map(new_heap, min_size))
 		return false;
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 	/* Allocate the backing physical memory. */
-	if (!allocate_physical_memory(new_heap, sizeof(struct sheap))) {
+	if (!allocate_physical_memory(new_heap, min_size)) {
 #ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
-		pagedir_unprepare_map(new_heap, sizeof(struct sheap));
+		pagedir_unprepare_map(new_heap, min_size);
 #endif /* ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		return false;
 	}
@@ -186,7 +198,7 @@ NOTHROW(FCALL extend_heap)(void) {
 	/* Reserve the associated address range to prevent the kernel
 	 * from re-assigning its address range for other purposes. */
 	last_heap->sh_node.vn_node.a_vmin   = PAGEID_ENCODE((byte_t *)new_heap);
-	last_heap->sh_node.vn_node.a_vmax   = PAGEID_ENCODE((byte_t *)new_heap + sizeof(struct sheap)) - 1;
+	last_heap->sh_node.vn_node.a_vmax   = PAGEID_ENCODE((byte_t *)new_heap + min_size - 1);
 	last_heap->sh_node.vn_prot          = VM_PROT_READ | VM_PROT_WRITE;
 	last_heap->sh_node.vn_flags         = VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_NOMERGE;
 	last_heap->sh_node.vn_vm            = &vm_kernel;
@@ -200,16 +212,19 @@ NOTHROW(FCALL extend_heap)(void) {
 	vm_node_insert(&last_heap->sh_node);
 	/* Remember the new heap. */
 	new_heap->sh_next  = NULL;
+	new_heap->sh_size  = min_size;
 	last_heap->sh_next = new_heap;
 	/* Register the new heap's body as free heap memory. */
 	{
 		struct freerange *fr;
+		size_t freesize;
+		freesize = min_size - offsetof(struct sheap, sh_heap);
 		DBX_STATIC_HEAP_SETPAT(new_heap->sh_heap,
 		                       DBX_STATIC_HEAP_PATTERN_FREE,
-		                       sizeof(new_heap->sh_heap));
-		fr = (struct freerange *)new_heap->sh_heap;
+		                       freesize);
+		fr          = (struct freerange *)new_heap->sh_heap;
 		fr->fr_next = freemem;
-		fr->fr_size = sizeof(new_heap->sh_heap);
+		fr->fr_size = freesize;
 		freemem     = fr;
 	}
 	return true;
@@ -257,17 +272,11 @@ again:
 	                    (byte_t *)resptr.hp_ptr + resptr.hp_siz - 1);
 	return resptr;
 nomem:
-	/* Make sure that the memory request isn't too large to possibly satisfy. */
-	if unlikely(num_bytes > sizeof(static_heap.sh_heap))
-		goto nope; /* TODO: `struct cmodsymtab::mst_symv' can easily grow larger than
-		            *       the max amount of memory we can allocate here. As such,
-		            *       `extend_heap()' must be adjusted to make it possible to
-		            *       hand out even larger chunks of memory! */
 	/* Try to allocate a heap extension, but don't
 	 * do so if the kernel's been poisoned. */
 	if (kernel_poisoned())
 		goto nope;
-	if (extend_heap())
+	if (extend_heap(num_bytes))
 		goto again;
 	/* Try to clear the module cache to make more memory available. */
 	if (cmodule_clearcache(true))
@@ -367,7 +376,7 @@ NOTHROW(KCALL static_heap_contains)(void *base, size_t num_bytes) {
 		if ((byte_t *)base >= iter->sh_heap) {
 			uintptr_t endptr;
 			if (!OVERFLOW_UADD((uintptr_t)base, num_bytes, &endptr) &&
-			    endptr <= (uintptr_t)COMPILER_ENDOF(iter->sh_heap))
+			    endptr <= (uintptr_t)iter + iter->sh_size)
 				return true;
 		}
 	} while ((iter = iter->sh_next) != NULL);
@@ -450,6 +459,7 @@ internal_error:
 PRIVATE void KCALL reset_heap(void) {
 	/* Reset the static heap. */
 	static_heap.sh_next = NULL;
+	static_heap.sh_size = sizeof(static_heap);
 	DBX_STATIC_HEAP_SETPAT(static_heap.sh_heap,
 	                       DBX_STATIC_HEAP_PATTERN_FREE,
 	                       sizeof(static_heap.sh_heap));
@@ -575,11 +585,15 @@ DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
 	size_t used_percent;
 	size_t free_percent;
 	size_t total_alloc;
+	size_t num_heaps;
 	struct sheap *heap;
 	struct freerange *iter;
 	total_alloc = sizeof(static_heap.sh_heap);
-	for (heap = static_heap.sh_next; heap; heap = heap->sh_next)
-		total_alloc += sizeof(heap->sh_heap);
+	num_heaps   = 1;
+	for (heap = static_heap.sh_next; heap; heap = heap->sh_next) {
+		total_alloc += sheap_heapsize(heap);
+		++num_heaps;
+	}
 	for (iter = freemem; iter; iter = iter->fr_next) {
 		total_freemem += iter->fr_size;
 		if (largest_fragment < iter->fr_size)
@@ -605,7 +619,7 @@ DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
 	           "\tfragmentation: " AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%\n",
 	           total_freemem, (size_t)(free_percent / 100000), (size_t)(free_percent % 100000),
 	           total_usedmem, (size_t)(used_percent / 100000), (size_t)(used_percent % 100000),
-	           total_alloc, (size_t)(total_alloc / sizeof(static_heap.sh_heap)),
+	           total_alloc, num_heaps,
 	           largest_fragment, num_fragments,
 	           (size_t)(frag_percent / 100000),
 	           (size_t)(frag_percent % 100000));

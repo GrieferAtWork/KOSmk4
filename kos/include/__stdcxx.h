@@ -102,7 +102,7 @@
 #if (__has_feature(defaulted_functions) ||                     \
      (defined(_MSC_FULL_VER) && _MSC_FULL_VER >= 180020827) || \
      (__GCC_VERSION_NUM >= 40400 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)))
-#define __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS 1
+#define __COMPILER_HAVE_CXX_DEFAULT_FUNCTIONS
 #define __CXX_DEFAULT_CTOR(T)                    T() = default
 #define __CXX_DEFAULT_DTOR(T)                    ~T() = default
 #define __CXX_DEFAULT_COPY(T, other, ...)        T(T const &) = default

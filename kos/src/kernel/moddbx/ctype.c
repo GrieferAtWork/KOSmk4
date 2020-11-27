@@ -784,6 +784,12 @@ NOTHROW(FCALL dw_enumerate_find_struct_definition)(struct cmodule *__restrict mo
 	csym = cmodule_getsym_withhint(mod, name, strlen(name), def_module, ns);
 	if (!csym)
 		return NULL;
+	if unlikely(!cmodsym_istype(csym)) {
+		/* Shouldn't happen... */
+		decref(*def_module);
+		*def_module = NULL;
+		return NULL;
+	}
 	/* Found something! */
 	return cmodsym_getdip(csym, *def_module);
 }

@@ -55,6 +55,7 @@
 
 DECL_BEGIN
 
+
 /* Initialize a debug information CU parser from a given CModule CompilationUnit
  * @param: dip: A pointer to the first component to load, or `NULL' to simply load
  *              the first component following the start of the associated CU descriptor.
@@ -139,6 +140,8 @@ NOTHROW(FCALL cmodule_fini)(struct cmodule *__restrict self) {
 	cmodsymtab_fini(&self->cm_symbols);
 	for (i = 0; i < self->cm_cuc; ++i)
 		cmodunit_fini(&self->cm_cuv[i]);
+	/* Free mixed symbol information. */
+	dbx_free(self->cm_mixed.mss_symv);
 }
 
 /* Destroy the given CModule. (called when its reference counter hits `0') */
@@ -588,6 +591,8 @@ done_cucs:
 	result->cm_module           = mod; /* Inherit reference */
 	result->cm_symbols.mst_symc = 0;
 	result->cm_symbols.mst_symv = NULL;
+	result->cm_mixed.mss_symc   = 0;
+	result->cm_mixed.mss_symv   = NULL;
 	result->cm_cuc              = cuc_used;
 done:
 	return result;
@@ -692,10 +697,11 @@ NOTHROW(FCALL prefer_symbol)(struct cmodsym *__restrict a,
 	switch (ns) {
 
 	case CMODSYM_DIP_NS_NORMAL:
+	case CMODSYM_DIP_NS_SYMTAB:
 		/* Prefer normal (non-type) symbols. */
-		if (a_ns == CMODSYM_DIP_NS_NORMAL && b_ns != CMODSYM_DIP_NS_NORMAL)
+		if (CMODSYM_DIP_NS_ISNORMAL(a_ns) && !CMODSYM_DIP_NS_ISNORMAL(b_ns))
 			return a;
-		if (b_ns == CMODSYM_DIP_NS_NORMAL && a_ns != CMODSYM_DIP_NS_NORMAL)
+		if (CMODSYM_DIP_NS_ISNORMAL(b_ns) && !CMODSYM_DIP_NS_ISNORMAL(a_ns))
 			return b;
 		break;
 
@@ -781,20 +787,23 @@ NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 
 
 
-PRIVATE NONNULL((1)) char const *
+PRIVATE NONNULL((1, 2, 4)) char const *
 NOTHROW(FCALL parse_symbol_name_for_object)(di_debuginfo_cu_parser_t *__restrict self,
                                             uintptr_t *__restrict pns,
-                                            bool reuse_parser);
+                                            bool reuse_parser,
+                                            bool *__restrict phas_location_information);
 PRIVATE ATTR_NOINLINE NONNULL((1)) char const *
 NOTHROW(FCALL parse_symbol_name_for_object_r)(di_debuginfo_cu_parser_t *__restrict self,
                                               byte_t const *__restrict abstract_origin,
-                                              uintptr_t *__restrict pns) {
+                                              uintptr_t *__restrict pns,
+                                              bool *__restrict phas_location_information) {
 	di_debuginfo_cu_parser_t inner_parser;
 	memcpy(&inner_parser, self, sizeof(inner_parser));
 	inner_parser.dup_cu_info_pos = abstract_origin;
 	if (!debuginfo_cu_parser_next(&inner_parser))
 		return NULL;
-	return parse_symbol_name_for_object(&inner_parser, pns, true);
+	return parse_symbol_name_for_object(&inner_parser, pns, true,
+	                                    phas_location_information);
 }
 
 
@@ -867,10 +876,11 @@ again:
  * to figure out if it has a name that should appear in symbol tables.
  * If it does, then that name is returned. Otherwise, NULL is returned,
  * but attributes for the current component will have still been parsed. */
-PRIVATE NONNULL((1)) char const *
+PRIVATE NONNULL((1, 2, 4)) char const *
 NOTHROW(FCALL parse_symbol_name_for_object)(di_debuginfo_cu_parser_t *__restrict self,
                                             uintptr_t *__restrict pns,
-                                            bool reuse_parser) {
+                                            bool reuse_parser,
+                                            bool *__restrict phas_location_information) {
 	di_debuginfo_component_attrib_t attr;
 	char const *result = NULL;
 again:
@@ -940,8 +950,11 @@ again:
 		}
 		if (!result)
 			result = name_attribute;
-		if (features != (DEBUGINFO_VAR_FEATURE_HASTYPE | DEBUGINFO_VAR_FEATURE_HASLOCATION))
-			result = NULL; /* We need a type & location! */
+		if (!(features & DEBUGINFO_VAR_FEATURE_HASTYPE))
+			result = NULL; /* We always need a type! */
+		else {
+			*phas_location_information = (features & DEBUGINFO_VAR_FEATURE_HASLOCATION) != 0;
+		}
 		*pns = CMODSYM_DIP_NS_NORMAL;
 	}	break;
 
@@ -952,7 +965,7 @@ again:
 		 *  - One of: DW_AT_low_pc, DW_AT_entry_pc
 		 */
 		char const *name_attribute = NULL;
-		bool has_pc_attribute      = false;
+		*phas_location_information = false;
 		DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
 			switch (attr.dica_name) {
 
@@ -975,7 +988,7 @@ again:
 
 			case DW_AT_low_pc:
 			case DW_AT_entry_pc:
-				has_pc_attribute = true;
+				*phas_location_information = true;
 				break;
 
 			default:
@@ -984,8 +997,6 @@ again:
 		}
 		if (!result)
 			result = name_attribute;
-		if (!has_pc_attribute)
-			result = NULL; /* We need some way of addressing the symbol. */
 		*pns = CMODSYM_DIP_NS_NORMAL;
 	}	break;
 
@@ -1064,6 +1075,7 @@ again:
 		case DW_TAG_union_type: /*      */ *pns = CMODSYM_DIP_NS_UNION; break;
 		default: /*                     */ *pns = CMODSYM_DIP_NS_TYPEDEF; break;
 		}
+		*phas_location_information = true; /* Prevent problems down-stream */
 		break;
 
 	default:
@@ -1085,7 +1097,8 @@ do_abstract_origin:
 			self->dup_cu_info_pos = abstract_origin;
 			goto again;
 		}
-		return parse_symbol_name_for_object_r(self, abstract_origin, pns);
+		return parse_symbol_name_for_object_r(self, abstract_origin, pns,
+		                                      phas_location_information);
 	}
 }
 
@@ -1103,9 +1116,9 @@ NOTHROW(FCALL same_namespace)(uintptr_t dip_a, uintptr_t dip_b) {
 	/* The typedef namespace overlaps the normal namespace, and is
 	 * only there to allow one to quickly determine if a symbol
 	 * encodes a type, as opposed to a variable/const/etc. */
-	if (ns_a == CMODSYM_DIP_NS_TYPEDEF)
+	if (CMODSYM_DIP_NS_ISGLOBAL(ns_a))
 		ns_a = CMODSYM_DIP_NS_NORMAL;
-	if (ns_b == CMODSYM_DIP_NS_TYPEDEF)
+	if (CMODSYM_DIP_NS_ISGLOBAL(ns_b))
 		ns_b = CMODSYM_DIP_NS_NORMAL;
 	return ns_a == ns_b;
 }
@@ -1217,16 +1230,244 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 	return cmodsymtab_insert_symbol(self, index, name, symbol_dip);
 }
 
+
+/* Add an addend of `sizeof(struct cmodmixsym)' to every symbol's data-offset
+ * from the given symbol table that has `CMODSYM_DIP_NS_MIXED' typing, and
+ * uses an (old) symbol offset that is `>= offset_of_index' */
+PRIVATE WUNUSED NONNULL((1)) void
+NOTHROW(FCALL cmodule_relocate_mip_symbols_below)(struct cmodsymtab *__restrict self,
+                                                  uintptr_t offset_of_index) {
+	size_t i;
+	for (i = 0; i < self->mst_symc; ++i) {
+		struct cmodsym *sym;
+		sym = &self->mst_symv[i];
+		if (cmodsym_ismip(sym)) {
+			uintptr_t offset;
+			offset = sym->cms_dip & CMODSYM_DIP_DIPMASK;
+			if (offset >= offset_of_index)
+				sym->cms_dip += sizeof(struct cmodmixsym);
+		}
+	}
+}
+
+
+/* Turn `sym' into a mixed .debug_info/.symtab symbol
+ * encoding `dip' and `sip' as information pointers.
+ * @return: DBX_EOK:    Success.
+ * @return: DBX_ENOMEM: Insufficient memory. */
+PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL cmodule_make_symbol_mixed)(struct cmodule *__restrict self,
+                                         struct cmodsym *__restrict sym,
+                                         byte_t const *__restrict dip,
+                                         ElfV_Sym const *__restrict sip) {
+	size_t index, alloc;
+	struct cmodmixsym *mixed;
+	/* First up: Because we may have been re-started, we must check
+	 *           if the mixed symbol table may already contain our
+	 *           entry. Doing so is normally fairly straight forward,
+	 *           since our caller usually scans .debug_info from the
+	 *           front to the back, meaning that usually we're always
+	 *           given `dip' values greater than any previous ones.
+	 * Technically, not even the act of interrupting and re-starting
+	 * symbol loading should change anything about this fact, since
+	 * our function only gets called once for any symbol (so-long as
+	 * we eventually indicate success to our caller), but just to be
+	 * save about everything, also include handling for when `dip' is
+	 * greater than any pre-existing MIP's DIP-field. */
+	index = self->cm_mixed.mss_symc;
+	if (index != 0) {
+		mixed = &self->cm_mixed.mss_symv[index - 1];
+		if unlikely(dip <= mixed->ms_dip) {
+			/* Very unlikely: Must either insert somewhere in the middle,
+			 * or there already is another MIP with the same DIP. */
+			size_t lo, hi;
+			lo = 0;
+			hi = index;
+			for (;;) {
+				index = (lo + hi) / 2;
+				if (lo >= hi)
+					break;
+				mixed = &self->cm_mixed.mss_symv[index];
+				if (dip < mixed->ms_dip) {
+					hi = index;
+				} else if (dip > mixed->ms_dip) {
+					lo = index + 1;
+				} else if (sip < mixed->ms_sip) {
+					hi = index;
+				} else if (sip > mixed->ms_sip) {
+					lo = index + 1;
+				} else {
+					/* Same field... (just re-use...) */
+					sym->cms_dip = cmodsym_makemip(self, mixed);
+					return DBX_EOK;
+				}
+			}
+		}
+	}
+
+	/* Check if we need more memory to hold the complete mixed symbol table. */
+	alloc = dbx_malloc_usable_size(self->cm_mixed.mss_symv) / sizeof(struct cmodmixsym);
+	if (self->cm_mixed.mss_symc >= alloc) {
+		/* Must allocate more space for mixed symbol information. */
+		struct cmodmixsym *new_mixtab;
+		size_t new_alloc = alloc * 2;
+		if (new_alloc < 16)
+			new_alloc = 16;
+		new_mixtab = (struct cmodmixsym *)dbx_realloc(self->cm_mixed.mss_symv,
+		                                              new_alloc *
+		                                              sizeof(struct cmodmixsym));
+		if unlikely(!new_mixtab) {
+			new_alloc  = self->cm_mixed.mss_symc + 1;
+			new_mixtab = (struct cmodmixsym *)dbx_realloc(self->cm_mixed.mss_symv,
+			                                              new_alloc *
+			                                              sizeof(struct cmodmixsym));
+			if unlikely(!new_mixtab)
+				return DBX_ENOMEM;
+		}
+		self->cm_mixed.mss_symv = new_mixtab;
+	}
+
+	/* Insert the new mixed symbol at `index' */
+	if unlikely(index < self->cm_mixed.mss_symc) {
+		/* Move up pre-existing symbols. */
+		memmoveup(&self->cm_mixed.mss_symv[index + 1],
+		          &self->cm_mixed.mss_symv[index],
+		          self->cm_mixed.mss_symc - index,
+		          sizeof(struct cmodmixsym));
+		/* Relocate already-in-use MIP pointers from
+		 * the module's global symbol table. */
+		cmodule_relocate_mip_symbols_below(&self->cm_symbols,
+		                                   index *
+		                                   sizeof(struct cmodmixsym));
+	}
+
+	/* Fill in the new symbol. */
+	mixed = &self->cm_mixed.mss_symv[index];
+	mixed->ms_dip = dip;
+	mixed->ms_sip = sip;
+
+	/* Fill in the data-field of the symbol */
+	sym->cms_dip = cmodsym_makemip(self, mixed);
+
+	/* Account the of 1 additional mixed-symbol that we now have. */
+	++self->cm_mixed.mss_symc;
+
+	return DBX_EOK;
+}
+
+
+/* Try to evaluate the address of the symbol pointed-to by `dip'.
+ * Address information is taken from `.debug_info', as pointed-to by `dip'
+ * Returns `false' is no address information is available (which may be the
+ * case when the associated symbol is actually a constant), or the address
+ * cannot be calculated right now (i.e. the associated symbol is a TLS variable)
+ * @return: true:  Address was calculated and was stored in `*pmodule_relative_addr'
+ * @return: false: Address could not be calculated. */
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) bool
+NOTHROW(FCALL cmodule_evaluate_symbol_address)(struct cmodule const *__restrict self,
+                                               struct cmodunit const *__restrict cu,
+                                               byte_t const *__restrict dip,
+                                               uintptr_t *__restrict pmodule_relative_addr) {
+	di_debuginfo_cu_parser_t parser;
+	di_debuginfo_component_attrib_t attr;
+	byte_t const *referenced_component;
+
+	/* Load a parser for the given `dip'. */
+again:
+	cmodunit_parser_from_dip(cu, self, &parser, dip);
+
+	/* Scan debug information attributes for something
+	 * that can tell us where the symbol is located at. */
+	referenced_component = NULL;
+	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
+		switch (attr.dica_name) {
+
+		case DW_AT_abstract_origin:
+		case DW_AT_sibling:
+		case DW_AT_specification:
+			if (!debuginfo_cu_parser_getref(&parser, attr.dica_form,
+			                                &referenced_component))
+				referenced_component = NULL;
+			break;
+
+		case DW_AT_const_value:
+			/* Welp... It's a constant... */
+			goto nope;
+
+		case DW_AT_low_pc:
+		case DW_AT_entry_pc:
+			/* Directly load the encoded address constant. */
+			return debuginfo_cu_parser_getaddr(&parser, attr.dica_form,
+			                                   pmodule_relative_addr);
+
+		case DW_AT_location: {
+			/* Alright, so here we have an actual location expression. However, as complicated
+			 * at that may appear at first glance, it all essentially boils down to only a single
+			 * instruction, as we're not allowed to have address evaluation rely on any outside
+			 * factors, such as register states.
+			 * With this in mind, only 1-instruction expressions like the following are accepted:
+			 *   >> DW_OP_addr 0x12345678
+			 * Since this is the only way by which the module's load-address would normally end
+			 * up being added to the calculated address. Furthermore, the DWARF specs explicitly
+			 * mention that only location expression in this form can appear in its version of
+			 * a symbol name table (DWARF5 .debug_names, which we don't support because DWARF5
+			 * is a mess of wastefully encoded debug information, and gcc still likes to generate
+			 * DWARF4 by default)
+			 *
+			 * So in conclusion: Check that we're dealing with a 5/9-byte instruction where the
+			 * first byte is the opcode of `DW_OP_addr' */
+			di_debuginfo_location_t loc;
+			size_t length;
+			if unlikely(!debuginfo_cu_parser_getexpr(&parser, attr.dica_form, &loc))
+				goto nope;
+			if (!loc.l_expr || loc.l_llist)
+				goto nope;
+			length = (size_t)dwarf_decode_uleb128(&loc.l_expr);
+			if (length != ((size_t)1 + parser.dup_addrsize))
+				goto nope;
+			if (*loc.l_expr != DW_OP_addr)
+				goto nope;
+			++loc.l_expr;
+			if (parser.dup_addrsize == 4) {
+				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET32((uint32_t *)loc.l_expr);
+			} else if (parser.dup_addrsize == 8) {
+				*pmodule_relative_addr = (uintptr_t)UNALIGNED_GET64((uint64_t *)loc.l_expr);
+			} else {
+				goto nope;
+			}
+			return true;
+		}	break;
+
+		default:
+			break;
+		}
+	}
+	if (referenced_component) {
+		if (dip == referenced_component)
+			goto nope;
+		/* Maybe we can find what we're looking for in here... */
+		if (dbg_awaituser()) /* Allow the user to break an infinite loop caused by bad debug-info... */
+			goto nope;
+		dip = referenced_component;
+		goto again;
+	}
+nope:
+	return false; /* Cannot load the actual symbol address! */
+}
+
+
 /* Register a symbol. If the symbol had already been registered,
  * then don't do anything (and return DBX_EOK).
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory. */
-PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4, 5)) dbx_errno_t
 NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
                                  struct cmodsymtab *__restrict cu_symtab,
+                                 struct cmodunit *__restrict cu,
                                  char const *__restrict name,
                                  byte_t const *__restrict dip,
-                                 uintptr_t ns) {
+                                 uintptr_t ns,
+                                 bool has_location_information) {
 	uintptr_t symbol_dip;
 	size_t lo, hi, index;
 	/* Construct the encoded DIP value for the symbol. */
@@ -1264,6 +1505,76 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 				 * We can determine the later by comparing DIP values. */
 				if (sym->cms_dip == symbol_dip)
 					return DBX_EOK; /* Same dip -> Redefinition (ignore silently) */
+				if (ns == CMODSYM_DIP_NS_NORMAL) {
+					if (cmodsym_ismip(sym)) {
+						/* Already a mixed symbol... In this case, check if the debug
+						 * information pointer of the pre-existing mixed symbol matches
+						 * the pointer given to us by our caller.
+						 *
+						 * This can happen due to the symbol loading process getting
+						 * interrupted, and being restarted at a later point in time. */
+						struct cmodmixsym const *mip;
+						mip = cmodsym_getmip(sym, self);
+						if (mip->ms_dip == dip)
+							return DBX_EOK; /* Same dip -> Redefinition (ignore silently) */
+					} else if (cmodsym_issip(sym) && ns == CMODSYM_DIP_NS_NORMAL) {
+						ElfV_Sym const *sip;
+						uintptr_t dip_modrel_symaddr;
+						uintptr_t sip_modrel_symaddr;
+						/* This is where it gets complicated, because we must decide on how
+						 * we want to merge .debug_info with .symtab for a specific symbol:
+						 *   - if we don't have location info (!has_location_information)
+						 *     then behavior is fairly straight-forward, as we simply have
+						 *     to convert the symbol into `CMODSYM_DIP_NS_MIXED', at which
+						 *     point it will pull type info from .debug_info, and location
+						 *     info from .symtab
+						 *   - If we do have location information, then we must try to calculate
+						 *     the exact location:
+						 *       - If we fail to calculate it, the location isn't an address, or
+						 *         the location's address differs from what .symtab is saying,
+						 *         then we must add the symbol as a per-CU override and mark,
+						 *         and mark the global symbol as standing in conflict (i.e.
+						 *         just do what we'd normally do at this point)
+						 *       - If location information match up, then we know that the 2
+						 *         symbols reference the same entity, and we must forget about
+						 *         ever having seen the symbol in .symtab */
+						sip = cmodsym_getsip(sym, self);
+						if (!has_location_information) {
+							/* Created a mixed information symbol. */
+							return cmodule_make_symbol_mixed(self, sym, dip, sip);
+						}
+						/* Load the module-relative symbol-address `sip' */
+						if (self->cm_sections.ds_symtab_ent == sizeof(Elf32_Sym)) {
+							sip_modrel_symaddr = (uintptr_t)sip->e32.st_value;
+						} else if (self->cm_sections.ds_symtab_ent == sizeof(Elf64_Sym)) {
+							sip_modrel_symaddr = (uintptr_t)sip->e64.st_value;
+						} else {
+							goto fallback_insert_possible_collision;
+						}
+
+						/* Evaluate the location expression from `dip' */
+						if (!cmodule_evaluate_symbol_address(self, cu, dip, &dip_modrel_symaddr))
+							goto fallback_insert_possible_collision;
+
+						/* Compare the location from `dip' with sip->[...].st_value */
+						if (sip_modrel_symaddr != dip_modrel_symaddr)
+							goto fallback_insert_possible_collision;
+
+						/* We've found the .debug_info entry for a symbol which we've previously
+						 * only found inside of .symtab! Since the .debug_info entry contains the
+						 * same location information as the info from .symtab, but in addition to
+						 * this also contains type information, simply replace the SYMTAB-symbol
+						 * with its DEBUG_INFO-equivalent. */
+						sym->cms_dip = symbol_dip;
+						return DBX_EOK;
+					}
+				}
+fallback_insert_possible_collision:
+				if (!has_location_information) {
+					return DBX_EOK; /* Without any location info, don't add this symbol!
+					                 * HINT: Type symbols are cheaty and claim to have location
+					                 *       info, so we don't need a special them for them here. */
+				}
 				/* It's a collision!
 				 * Mark the global symbol as such, and add
 				 * the new symbol to the per-CU table. */
@@ -1278,6 +1589,8 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 			break;
 		}
 	}
+	if (!has_location_information)
+		return DBX_EOK; /* Without any location inf, don't add this symbol! */
 	/* Simply insert the new symbol into the global symbol table under `index' */
 	return cmodsymtab_insert_symbol(&self->cm_symbols, index, name, symbol_dip);
 }
@@ -1339,12 +1652,16 @@ NOTHROW(FCALL cmodunit_loadsyms)(struct cmodunit *__restrict self,
 			do {
 				uintptr_t ns;
 				char const *symbol_name;
+				bool has_location_information;
 				if (dbg_awaituser())
 					goto err_interrupt;
-				symbol_name = parse_symbol_name_for_object(&parser, &ns, false);
+				symbol_name = parse_symbol_name_for_object(&parser, &ns, false,
+				                                           &has_location_information);
 				if (symbol_name && is_a_valid_symbol_name(symbol_name)) {
 					/* Register this symbol. */
-					result = cmodule_addsymbol(mod, &percu_symbols, symbol_name, dip, ns);
+					result = cmodule_addsymbol(mod, &percu_symbols, self,
+					                           symbol_name, dip, ns,
+					                           has_location_information);
 					if unlikely(result != DBX_EOK)
 						goto err;
 				}
@@ -1413,6 +1730,158 @@ err:
 	return result;
 }
 
+PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
+NOTHROW(FCALL cmodule_append_symtab_symbol)(struct cmodule const *__restrict self,
+                                            struct cmodsymtab *__restrict symtab,
+                                            uintptr_t symtab_symbol_offset,
+                                            uintptr_t strtab_name_offset) {
+	char const *name;
+	dbx_errno_t result = DBX_EOK;
+	/* Construct the actual symbol name. */
+	name = (char const *)(self->cm_sections.ds_strtab_start +
+	                      strtab_name_offset);
+	/* Verify that the name is in-bounds. */
+	if unlikely((byte_t const *)name < self->cm_sections.ds_strtab_start ||
+	            (byte_t const *)name >= self->cm_sections.ds_strtab_end)
+		goto done;
+	/* Verify that the name is a valid symbol identifier. */
+	if (!is_a_valid_symbol_name(name))
+		goto done;
+	/* All right! Let's add this symbol!
+	 * Note that for this purpose, we use the `CMODSYM_DIP_NS_SYMTAB'
+	 * namespace, thus indicating that the symbol data offset points
+	 * into the module's .symtab. */
+	result = cmodsymtab_addsymbol(symtab, name,
+	                              CMODSYM_DIP_NS_SYMTAB |
+	                              symtab_symbol_offset);
+done:
+	return result;
+}
+
+/* Check if we care about symbol of type `typ' (one of `STT_*') */
+PRIVATE ATTR_CONST WUNUSED bool
+NOTHROW(FCALL cmodule_symtab_want_symbol_type)(unsigned int typ) {
+	return typ == STT_OBJECT ||
+	       typ == STT_FUNC;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
+NOTHROW(FCALL cmodule_load_symtab_sym32)(struct cmodule const *__restrict self,
+                                         struct cmodsymtab *__restrict symtab,
+                                         Elf32_Sym const *__restrict sym) {
+	dbx_errno_t result = DBX_EOK;
+	/* Check if we care about this symbol. */
+	if (sym->st_shndx == SHN_UNDEF)
+		goto done;
+	if (!cmodule_symtab_want_symbol_type(ELF32_ST_TYPE(sym->st_info)))
+		goto done;
+	/* Actually add the symbol. */
+	result = cmodule_append_symtab_symbol(self, symtab,
+	                                      (byte_t const *)sym - self->cm_sections.ds_symtab_start,
+	                                      sym->st_name);
+done:
+	return result;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
+NOTHROW(FCALL cmodule_load_symtab_sym64)(struct cmodule const *__restrict self,
+                                         struct cmodsymtab *__restrict symtab,
+                                         Elf64_Sym const *__restrict sym) {
+	dbx_errno_t result = DBX_EOK;
+	/* Check if we care about this symbol. */
+	if (sym->st_shndx == SHN_UNDEF)
+		goto done;
+	if (!cmodule_symtab_want_symbol_type(ELF64_ST_TYPE(sym->st_info)))
+		goto done;
+	/* Actually add the symbol. */
+	result = cmodule_append_symtab_symbol(self, symtab,
+	                                      (byte_t const *)sym - self->cm_sections.ds_symtab_start,
+	                                      sym->st_name);
+done:
+	return result;
+}
+
+/* Load symbols from the module's .dynsym section, where associated
+ * debug information is then generated by cross-referencing addresses
+ * of dynamic symbols with addresses of symbols loaded above.
+ *
+ * This is required to properly deal with symbols exported by DEFINE_PUBLIC_ALIAS(),
+ * since those symbols have PUBLIC names different from INTERNal names.
+ * Also: Any symbol we find that doesn't have any associated debug information
+ *       should still be exposed as though it had void-typing (which is normally
+ *       impossible)
+ *
+ * As such, debug information for dynamic symbols can be loaded lazily as
+ * needed, so the initial loading of these symbols would still be rather
+ * quick.
+ *
+ * NOTE: As far as encoding of these symbols goes, we could make use of a
+ *       separate namespace ID `CMODSYM_DIP_NS_DYNSYM' that overlaps with
+ *       `CMODSYM_DIP_NS_NORMAL', similar to `CMODSYM_DIP_NS_TYPEDEF', thus
+ *       making it possible to identify these modules.
+ *       The remainder of the DIP pointer could then be an offset into the
+ *       module's `.dynsym' section, towards the correct `Elf[32|64]_Sym'
+ *       structure, and the name field would be a pointer into the .dynstr
+ *       section.
+ * NOTE: .symtab and .strtab is loaded/scanned similarly, and is actually
+ *       preferred over .dynsym (though only the former may be available if
+ *       the module had been stripped of debug information)
+ *
+ * NOTE: This kind of symbol scanning must be done before loading .debug_info
+ *       symbol data, such that references to symbols without any location
+ *       information can automatically have their location substituted by
+ *       info from .dynsym and .symtab! */
+PRIVATE WUNUSED NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cmodule_load_symtab_symbols)(struct cmodule *__restrict self) {
+	dbx_errno_t error;
+	struct cmodsymtab symtab;
+	/* Quick check: Do we even have a .symtab / .strtab section?, and
+	 *              if so: do we recognize the .symtab entity size? */
+	if (self->cm_sections.ds_symtab_start >= self->cm_sections.ds_symtab_end)
+		goto done; /* No .symtab / .dynsym */
+	if (self->cm_sections.ds_strtab_start >= self->cm_sections.ds_strtab_end)
+		goto done; /* No .strtab / .dynstr */
+	symtab.mst_symc = 0;
+	symtab.mst_symv = NULL;
+	if (self->cm_sections.ds_symtab_ent == sizeof(Elf32_Sym)) {
+		Elf32_Sym const *iter, *end;
+		iter = (Elf32_Sym const *)self->cm_sections.ds_symtab_start;
+		end  = (Elf32_Sym const *)(self->cm_sections.ds_symtab_end - (sizeof(Elf32_Sym) - 1));
+		for (; iter < end; ++iter) {
+			error = cmodule_load_symtab_sym32(self, &symtab, iter);
+			if unlikely(error != DBX_EOK)
+				goto err;
+			if (dbg_awaituser())
+				goto err_intr;
+		}
+	} else if (self->cm_sections.ds_symtab_ent == sizeof(Elf64_Sym)) {
+		Elf64_Sym const *iter, *end;
+		iter = (Elf64_Sym const *)self->cm_sections.ds_symtab_start;
+		end  = (Elf64_Sym const *)(self->cm_sections.ds_symtab_end - (sizeof(Elf64_Sym) - 1));
+		for (; iter < end; ++iter) {
+			error = cmodule_load_symtab_sym64(self, &symtab, iter);
+			if unlikely(error != DBX_EOK)
+				goto err;
+			if (dbg_awaituser())
+				goto err_intr;
+		}
+	}
+	/* Write-back the initial symbol table of .symtab symbols.
+	 * NOTE: We do this after having fully loaded .symtab for symbols,
+	 * so-as to allow `dbg_awaituser()' to interrupt the process before
+	 * it would be finished. */
+	self->cm_symbols.mst_symc = symtab.mst_symc;
+	self->cm_symbols.mst_symv = symtab.mst_symv; /* Inherit data */
+done:
+	return DBX_EOK;
+err_intr:
+	error = DBX_EINTR;
+err:
+	dbx_free(symtab.mst_symv);
+	return error;
+}
+
+
 /* Load debug symbols for the give CModule. Since doing this may
  * take quite a while, this function is equipped to make use of
  * `dbg_awaituser()' to allow it to be interrupted prior to being
@@ -1433,31 +1902,15 @@ NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self) {
 		/* Everything's already loaded! */
 	} else {
 		size_t i;
-		/* TODO: Load symbols from the module's .dynsym section, where associated
-		 *       debug information is then generated by cross-referencing addresses
-		 *       of dynamic symbols with addresses of symbols loaded above.
-		 * This is required to properly deal with symbols exported by DEFINE_PUBLIC_ALIAS(),
-		 * since those symbols have PUBLIC names different from INTERNal names.
-		 * Also: Any symbol we find that doesn't have any associated debug information
-		 *       should still be exposed as though it had void-typing (which is normally
-		 *       impossible)
-		 * As such, debug information for dynamic symbols can be loaded lazily as
-		 * needed, so the initial loading of these symbols would still be rather
-		 * quick.
-		 * NOTE: As far as encoding of these symbols goes, we could make use of a
-		 *       separate namespace ID `CMODSYM_DIP_NS_DYNSYM' that overlaps with
-		 *       `CMODSYM_DIP_NS_NORMAL', similar to `CMODSYM_DIP_NS_TYPEDEF', thus
-		 *       making it possible to identify these modules.
-		 *       The remainder of the DIP pointer could then be an offset into the
-		 *       module's `.dynsym' section, towards the correct `Elf[32|64]_Sym'
-		 *       structure, and the name field would be a pointer into the .dynstr
-		 *       section.
-		 * NOTE: .symtab and .strtab should also be loaded/scanned similarly!
-		 *
-		 * NOTE: This kind of symbol scanning should be done before loading .debug_info
-		 *       symbol data, such that references to symbols without any location
-		 *       information can automatically have their location substituted by
-		 *       info from .dynsym and .symtab! */
+		if (!self->cm_symbols.mst_symc) {
+			/* No symbols have been loaded, yet.
+			 * With this in mind, try to load typeless symbol data from .symtab
+			 * first, so we can unify that information with additional data from
+			 * .debug_info down below. */
+			result = cmodule_load_symtab_symbols(self);
+			if unlikely(result != DBX_EOK)
+				goto done;
+		}
 		for (i = 0; i < self->cm_cuc; ++i) {
 			struct cmodunit *cu;
 			cu = &self->cm_cuv[i];
@@ -1483,7 +1936,22 @@ NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self) {
 			if likely(new_symtab)
 				self->cm_symbols.mst_symv = new_symtab;
 		}
+		/* Also try to release unused memory from the mixed symbol table. */
+		if unlikely(!self->cm_mixed.mss_symc) {
+			if (self->cm_mixed.mss_symv) {
+				dbx_free(self->cm_mixed.mss_symv);
+				self->cm_mixed.mss_symv = NULL;
+			}
+		} else {
+			struct cmodmixsym *new_mixtab;
+			new_mixtab = (struct cmodmixsym *)dbx_realloc(self->cm_mixed.mss_symv,
+			                                              self->cm_mixed.mss_symc *
+			                                              sizeof(struct cmodmixsym));
+			if likely(new_mixtab)
+				self->cm_mixed.mss_symv = new_mixtab;
+		}
 	}
+done:
 	return result;
 }
 
@@ -1935,12 +2403,34 @@ again:
  * needed. */
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
+	byte_t const *dip = NULL;
+	if (cmodsyminfo_isdip(info)) {
+		dip = cmodsyminfo_getdip(info);
+	} else if (cmodsyminfo_ismip(info)) {
+		dip = cmodsyminfo_getmip(info)->ms_dip;
+	}
 	memset(&info->clv_data, 0, sizeof(info->clv_data));
+	if (cmodsyminfo_ismip(info) || cmodsyminfo_issip(info)) {
+		ElfV_Sym const *psymbol;
+		if (cmodsyminfo_ismip(info)) {
+			psymbol = cmodsyminfo_getmip(info)->ms_sip;
+		} else {
+			psymbol = cmodsyminfo_getsip(info);
+		}
+		/* Load the object address from .symtab */
+		if (info->clv_mod->cm_sections.ds_symtab_ent == sizeof(Elf32_Sym)) {
+			info->clv_data.s_var.v_objaddr = (void *)(cmodule_getloadaddr(info->clv_mod) + (uintptr_t)psymbol->e32.st_value);
+		} else if (info->clv_mod->cm_sections.ds_symtab_ent == sizeof(Elf64_Sym)) {
+			info->clv_data.s_var.v_objaddr = (void *)(cmodule_getloadaddr(info->clv_mod) + (uintptr_t)psymbol->e64.st_value);
+		}
+	}
 	if (!info->clv_unit) {
+		if (!dip)
+			goto no_unit;
 		/* Lookup the appropriate compilation unit. */
-		info->clv_unit = cmodule_findunit_from_dip(info->clv_mod,
-		                                           cmodsyminfo_getdip(info));
+		info->clv_unit = cmodule_findunit_from_dip(info->clv_mod, dip);
 		if unlikely(!info->clv_unit) {
+no_unit:
 			/* Shouldn't happen... (fill in stub-data) */
 			memset(&info->clv_cu, 0, sizeof(info->clv_cu));
 			memset(&info->clv_parser, 0, sizeof(info->clv_parser));
@@ -1970,8 +2460,8 @@ NOTHROW(FCALL cmod_symenum_loadinfo)(struct cmodsyminfo *__restrict info) {
 
 	/* Load symbol-specific debug information. */
 do_load_dip:
-	info->clv_parser.dup_cu_info_pos = cmodsyminfo_getdip(info);
-	if (!debuginfo_cu_parser_next(&info->clv_parser)) {
+	info->clv_parser.dup_cu_info_pos = dip;
+	if (!dip || !debuginfo_cu_parser_next(&info->clv_parser)) {
 		/* Fill in a stub/EOF component. */
 		info->clv_parser.dup_comp.dic_tag         = 0; /* DW_TAG_... */
 		info->clv_parser.dup_comp.dic_haschildren = DW_CHILDREN_no;
