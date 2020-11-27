@@ -357,7 +357,7 @@ NOTHROW(KCALL krealloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 
 
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 #ifdef __CC__
 
 /* Trace a given address range `base...+=num_bytes' for the purposes
@@ -464,7 +464,7 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks);
 
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss.mall.untracked")
-#else /* CONFIG_DEBUG_MALLOC */
+#else /* CONFIG_TRACE_MALLOC */
 #ifdef __CC__
 #define kmalloc_trace(base, num_bytes, flags, tb_skip)    (base)
 #define kmalloc_trace_nx(base, num_bytes, flags, tb_skip) (base)
@@ -479,7 +479,7 @@ NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t leaks);
 #define kmalloc_leaks_discard(leaks) (void)0
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss")
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 
 
 #ifdef __cplusplus

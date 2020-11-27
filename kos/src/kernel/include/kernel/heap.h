@@ -237,7 +237,7 @@ FUNDEF WUNUSED NONNULL((1)) struct heapptr NOTHROW(KCALL __os_heap_realign_nx)(s
  *        though `GFP_NOMAP'  has been passed.
  * NOTE:  The `*_traced' family of functions will automatically call `mall_trace' / `mall_untrace'
  *        in order to register / unregister the data blocks as a MALL GC search data block.
- *        When building without `CONFIG_DEBUG_MALLOC', they are aliasing the regular versions.
+ *        When building without `CONFIG_TRACE_MALLOC', they are aliasing the regular versions.
  * @param: flags: Set of `GFP_*' flags used for allocation.
  * @throw: E_BADALLOC:    Failed to allocate memory.
  * @throw: E_WOULDBLOCK: `GFP_NOMAP' was specified and new memory would have had to be mapped.

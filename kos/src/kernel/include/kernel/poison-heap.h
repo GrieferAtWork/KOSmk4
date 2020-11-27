@@ -114,7 +114,7 @@
  *   - kmalloc_usable_size
  *   - kfree
  *   - kffree
- * #ifdef CONFIG_DEBUG_MALLOC
+ * #ifdef CONFIG_TRACE_MALLOC
  *   - mall_dump_leaks
  *   - mall_trace
  *   - mall_validate_padding
@@ -139,11 +139,11 @@
 #define __PH_IF_DEBUG_HEAP(x) /* nothing */
 #endif /* !CONFIG_DEBUG_HEAP */
 
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 #define __PH_IF_DEBUG_MALLOC(x) x
-#else /* CONFIG_DEBUG_MALLOC */
+#else /* CONFIG_TRACE_MALLOC */
 #define __PH_IF_DEBUG_MALLOC(x) /* nothing */
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 #define __PH_IF_USE_SLAB_ALLOCATORS(x) x
@@ -237,12 +237,15 @@
 	bind_func(kmalloc_usable_size, /*  */ ph_kmalloc_usable_size)                            \
 	bind_void(kfree, /*                */ ph_kfree, 1)                                       \
 	bind_void(kffree, /*               */ ph_kffree, 2)                                      \
-	__PH_IF_DEBUG_MALLOC(bind_zero(mall_dump_leaks, /*      */ ph_mall_dump_leaks, 1))       \
-	__PH_IF_DEBUG_MALLOC(bind_func(mall_trace, /*           */ ph_mall_trace))               \
-	__PH_IF_DEBUG_MALLOC(bind_void(mall_validate_padding, /**/ ph_mall_validate_padding, 0)) \
-	__PH_IF_DEBUG_MALLOC(bind_void(mall_print_traceback, /* */ ph_mall_print_traceback, 2))  \
-	__PH_IF_DEBUG_MALLOC(bind_void(mall_untrace, /*         */ ph_mall_untrace, 2))          \
-	__PH_IF_DEBUG_MALLOC(bind_void(mall_untrace_n, /*       */ ph_mall_untrace_n, 3))
+	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_validate, /*     */ ph_kmalloc_validate, 0))      \
+	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_leaks, /*        */ ph_kmalloc_leaks, 0))         \
+	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_leaks_collect, /**/ ph_kmalloc_leaks_collect, 0)) \
+	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_leaks_print, /*  */ ph_kmalloc_leaks_print, 4))   \
+	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_leaks_discard, /**/ ph_kmalloc_leaks_discard, 1)) \
+	__PH_IF_DEBUG_MALLOC(bind_func(kmalloc_trace_nx, /*     */ ph_kmalloc_trace_nx))         \
+	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_untrace, /*      */ ph_kmalloc_untrace, 1))       \
+	__PH_IF_DEBUG_MALLOC(bind_void(kmalloc_untrace_n, /*    */ ph_kmalloc_untrace_n, 2))     \
+	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_traceback, /*    */ ph_kmalloc_traceback, 4))
 
 #ifdef __CC__
 #ifdef CONFIG_BUILDING_KERNEL_CORE

@@ -27,7 +27,7 @@ DECL_BEGIN
 //#define CONFIG_NO_DEBUG_HEAP             1
 //#define CONFIG_NO_HEAP_RANDOMIZE_OFFSETS 1
 //#define CONFIG_NO_HEAP_TRACE_DANGLE      1
-//#define CONFIG_NO_DEBUG_MALLOC           1
+//#define CONFIG_NO_TRACE_MALLOC           1
 
 
 /* Enable heap memory pre-initialization, as well as special
@@ -157,14 +157,14 @@ DECL_BEGIN
  *     Alternatively, `mall_validate_padding()' or the user-space kernel
  *     control command `KERNEL_CONTROL_DBG_CHECK_PADDING' can be used to
  *     verify this ~padding~ for all allocated data blocks. */
-#ifndef CONFIG_DEBUG_MALLOC
-#if !defined(CONFIG_NO_DEBUG_MALLOC) && !defined(NDEBUG)
-#define CONFIG_DEBUG_MALLOC 1
-#elif !defined(CONFIG_NO_DEBUG_MALLOC)
-#define CONFIG_NO_DEBUG_MALLOC 1
+#ifndef CONFIG_TRACE_MALLOC
+#if !defined(CONFIG_NO_TRACE_MALLOC) && !defined(NDEBUG)
+#define CONFIG_TRACE_MALLOC 1
+#elif !defined(CONFIG_NO_TRACE_MALLOC)
+#define CONFIG_NO_TRACE_MALLOC 1
 #endif
-#elif defined(CONFIG_NO_DEBUG_MALLOC)
-#undef CONFIG_DEBUG_MALLOC
+#elif defined(CONFIG_NO_TRACE_MALLOC)
+#undef CONFIG_TRACE_MALLOC
 #endif
 
 
@@ -271,15 +271,15 @@ typedef unsigned int gfp_t;
 	 GFP_NOSWAP | GFP_NOCLRC | GFP_VCBASE)
 
 
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 #define GFP_NOLEAK  0x1000 /* Don't consider the datablock a leak, even if it cannot be reached. */
 #define GFP_NOWALK  0x2000 /* When searching for memory leaks, don't search the datablock for
                             * pointers that may point to other heap-blocks. */
-#else /* CONFIG_DEBUG_MALLOC */
+#else /* CONFIG_TRACE_MALLOC */
 #define GFP_NOLEAK  0x0000 /* Don't consider the datablock a leak, even if it cannot be reached. */
 #define GFP_NOWALK  0x0000 /* When searching for memory leaks, don't search the datablock for
                             * pointers that may point to other heap-blocks. */
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 
 
 

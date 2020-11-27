@@ -97,18 +97,18 @@ struct slab {
 #define PRIVATE_SLAB_SEGMENT_COUNT(segment_size) \
 	((PAGESIZE - 4 * __SIZEOF_POINTER__) / (segment_size))
 
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 #define SLAB_SEGMENT_STATUS_FREE  0 /* Segment is free. */
 #define SLAB_SEGMENT_STATUS_ALLOC 1 /* Segment is allocated. */
 #define SLAB_SEGMENT_STATUS_REACH 3 /* Segment is reachable. */
 #define SLAB_SEGMENT_STATUS_MASK  3 /* Mask of bits */
 #define SLAB_SEGMENT_STATUS_BITS  2 /* # of status bits per slab. */
-#else /* CONFIG_DEBUG_MALLOC */
+#else /* CONFIG_TRACE_MALLOC */
 #define SLAB_SEGMENT_STATUS_FREE  0 /* Segment is free. */
 #define SLAB_SEGMENT_STATUS_ALLOC 1 /* Segment is allocated. */
 #define SLAB_SEGMENT_STATUS_MASK  3 /* Mask of bits */
 #define SLAB_SEGMENT_STATUS_BITS  1 /* # of status bits per slab. */
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 
 /* Return a base-pointer to the status-bitset of `self' */
 #define _SLAB_SEGMENT_STATUS_BITSET(self) ((uintptr_t *)((struct slab *)(self) + 1))
@@ -228,9 +228,9 @@ struct slab_descriptor {
 	/* Data descriptor for some fixed-length-segment slab. */
 	struct atomic_lock             sd_lock; /* Lock for this slab descriptor. */
 	struct slab                   *sd_free; /* [0..1][lock(sd_lock)] Chain of partially free slab pages. */
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 	struct slab                   *sd_used; /* [0..1][lock(sd_lock)] Chain of fully allocated slab pages. */
-#endif /* CONFIG_DEBUG_MALLOC */
+#endif /* CONFIG_TRACE_MALLOC */
 	WEAK struct slab_pending_free *sd_pend; /* [0..1] Chain of pending free segments. */
 };
 #endif /* CONFIG_BUILDING_KERNEL_CORE */

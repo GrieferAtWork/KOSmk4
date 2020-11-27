@@ -58,7 +58,7 @@ DECL_BEGIN
 
 
 /* Size = *(size_t)((byte_t *)ptr - HEAP_USABLE_SIZE_OFFSET) & HEAP_USABLE_SIZE_MASK; */
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 #ifndef CONFIG_MALL_PREFIX_SIZE
 #define CONFIG_MALL_PREFIX_SIZE (__SIZEOF_SIZE_T__)
 #endif /* !CONFIG_MALL_PREFIX_SIZE */
@@ -422,18 +422,23 @@ INTDEF size_t NOTHROW(KCALL ph_kmalloc_usable_size)(void *ptr);
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_kfree)(void *ptr);
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_kffree)(void *ptr, gfp_t flags);
 #endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#ifdef CONFIG_DEBUG_MALLOC
-INTDEF ATTR_RETNONNULL void *KCALL ph_mall_trace(void *base, size_t num_bytes, gfp_t flags);
+#ifdef CONFIG_TRACE_MALLOC
+INTDEF ATTR_CONST WUNUSED ATTR_RETNONNULL void *
+NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t num_bytes,
+                                   gfp_t gfp, unsigned int tb_skip);
 #ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
-INTDEF ATTR_CONST size_t KCALL ph_mall_dump_leaks(gfp_t flags);
+INTDEF ATTR_CONST size_t KCALL ph_kmalloc_leaks(void);
+INTDEF ATTR_CONST kmalloc_leak_t KCALL ph_kmalloc_leaks_collect(void);
+INTDEF ATTR_CONST ssize_t KCALL ph_kmalloc_leaks_print(kmalloc_leak_t leaks, __pformatprinter printer, void *arg, size_t *pnum_leaks);
+INTDEF ATTR_CONST size_t KCALL ph_kmalloc_traceback(void *ptr, /*out*/ void **tb, size_t buflen, pid_t *p_alloc_roottid);
 #endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
 #ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
-INTDEF ATTR_CONST void NOTHROW(KCALL ph_mall_validate_padding)(void);
-INTDEF ATTR_CONST void NOTHROW(KCALL ph_mall_print_traceback)(void *ptr, gfp_t flags);
-INTDEF ATTR_CONST void NOTHROW(KCALL ph_mall_untrace)(void *ptr, gfp_t flags);
-INTDEF ATTR_CONST void NOTHROW(KCALL ph_mall_untrace_n)(void *ptr, size_t num_bytes, gfp_t flags);
+INTDEF void NOTHROW(KCALL ph_kmalloc_validate)(void);
+INTDEF void NOTHROW(KCALL ph_kmalloc_leaks_discard)(kmalloc_leak_t leaks);
+INTDEF void NOTHROW(KCALL ph_kmalloc_untrace)(void *ptr);
+INTDEF void NOTHROW(KCALL ph_kmalloc_untrace_n)(void *ptr, size_t num_bytes);
 #endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 
 
 
@@ -733,42 +738,63 @@ NOTHROW(KCALL ph_kffree)(void *UNUSED(ptr), gfp_t UNUSED(flags)) {
 }
 #endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
 
-#ifdef CONFIG_DEBUG_MALLOC
-INTERN ATTR_CONST ATTR_COLDTEXT ATTR_RETNONNULL void *KCALL
-ph_mall_trace(void *base, size_t UNUSED(num_bytes),
-              gfp_t UNUSED(flags)) {
+#ifdef CONFIG_TRACE_MALLOC
+INTERN ATTR_CONST WUNUSED ATTR_RETNONNULL void *
+NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
+                                   gfp_t UNUSED(gfp), unsigned int UNUSED(tb_skip)) {
 	return base;
 }
 
 #ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
-INTERN ATTR_CONST ATTR_COLDTEXT size_t KCALL
-ph_mall_dump_leaks(gfp_t UNUSED(flags)) {
+INTERN ATTR_COLDTEXT ATTR_CONST size_t KCALL
+ph_kmalloc_leaks(void) {
+	return 0;
+}
+
+INTERN ATTR_COLDTEXT ATTR_CONST kmalloc_leak_t KCALL
+ph_kmalloc_leaks_collect(void) {
+	return NULL;
+}
+
+INTERN ATTR_COLDTEXT ATTR_CONST ssize_t KCALL
+ph_kmalloc_leaks_print(kmalloc_leak_t UNUSED(leaks),
+                       __pformatprinter UNUSED(printer),
+                       void *UNUSED(arg),
+                       size_t *UNUSED(pnum_leaks)) {
+	return 0;
+}
+
+INTERN ATTR_COLDTEXT ATTR_CONST size_t KCALL
+ph_kmalloc_traceback(void *UNUSED(ptr),
+                     /*out*/ void **UNUSED(tb),
+                     size_t UNUSED(buflen),
+                     pid_t *UNUSED(p_alloc_roottid)) {
 	return 0;
 }
 #endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
 
 #ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
-INTERN ATTR_CONST ATTR_COLDTEXT void
-NOTHROW(KCALL ph_mall_validate_padding)(void) {
+INTERN ATTR_COLDTEXT void
+NOTHROW(KCALL ph_kmalloc_validate)(void) {
 	/* no-op */
 }
 
-INTERN ATTR_CONST ATTR_COLDTEXT void
-NOTHROW(KCALL ph_mall_print_traceback)(void *UNUSED(ptr), gfp_t UNUSED(flags)) {
+INTERN ATTR_COLDTEXT void
+NOTHROW(KCALL ph_kmalloc_leaks_discard)(kmalloc_leak_t UNUSED(leaks)) {
 	/* no-op */
 }
 
-INTERN ATTR_CONST ATTR_COLDTEXT void
-NOTHROW(KCALL ph_mall_untrace)(void *UNUSED(ptr), gfp_t UNUSED(flags)) {
+INTERN ATTR_COLDTEXT void
+NOTHROW(KCALL ph_kmalloc_untrace)(void *UNUSED(ptr)) {
 	/* no-op */
 }
 
-INTERN ATTR_CONST ATTR_COLDTEXT void
-NOTHROW(KCALL ph_mall_untrace_n)(void *UNUSED(ptr), size_t UNUSED(num_bytes), gfp_t UNUSED(flags)) {
+INTERN ATTR_COLDTEXT void
+NOTHROW(KCALL ph_kmalloc_untrace_n)(void *UNUSED(ptr), size_t UNUSED(num_bytes)) {
 	/* no-op */
 }
 #endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 
 
 DECL_END

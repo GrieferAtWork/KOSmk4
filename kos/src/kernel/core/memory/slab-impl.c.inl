@@ -40,9 +40,9 @@ DECL_BEGIN
 INTERN struct slab_descriptor DESC = {
 	/* .sd_lock = */ ATOMIC_LOCK_INIT,
 	/* .sd_free = */ NULL,
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 	/* .sd_used = */ NULL,
-#endif /* CONFIG_DEBUG_MALLOC */
+#endif /* CONFIG_TRACE_MALLOC */
 	/* .sd_pend = */ NULL
 };
 
@@ -80,11 +80,11 @@ NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
 		slab_freepage(self);
 	} else if (self->s_free == 1) {
 		/* Slab was fully allocated, but became partially allocated. */
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 		/* Unlink from `sd_used' */
 		if ((*self->s_pself = self->s_next) != NULL)
 			self->s_next->s_pself = self->s_pself;
-#endif /* CONFIG_DEBUG_MALLOC */
+#endif /* CONFIG_TRACE_MALLOC */
 		/* Insert into `DESC.sd_free' */
 		if ((self->s_next = DESC.sd_free) != NULL) {
 			assert(DESC.sd_free->s_pself == &DESC.sd_free);
@@ -207,17 +207,17 @@ again:
 				DESC.sd_free = result_page->s_next;
 				if (DESC.sd_free)
 					DESC.sd_free->s_pself = &DESC.sd_free;
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 				if ((result_page->s_next = DESC.sd_used) != NULL)
 					DESC.sd_used->s_pself = &result_page->s_next;
 				result_page->s_pself = &DESC.sd_used;
 				DESC.sd_used         = result_page;
-#else /* CONFIG_DEBUG_MALLOC */
+#else /* CONFIG_TRACE_MALLOC */
 				result_page->s_pself = NULL;
 #ifndef NDEBUG
 				memset(&result_page->s_next, 0xcc, sizeof(result_page->s_next));
 #endif /* !NDEBUG */
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 			}
 			FUNC(slab_endwrite)();
 #ifdef CONFIG_DEBUG_HEAP
@@ -295,9 +295,9 @@ PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 FUNC(slab_kmalloc)(gfp_t flags) {
 	/* Try to allocate from slab memory */
 	void *result;
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 	/* XXX: When `GFP_NOLEAK / GFP_NOWALK' are given, never allocate slab memory? */
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 	result = FUNC(slab_malloc)(flags);
 	if likely(result)
 		return result;
@@ -311,9 +311,9 @@ PUBLIC ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL FUNC(slab_kmalloc_nx))(gfp_t flags) {
 	/* Try to allocate from slab memory */
 	void *result;
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 	/* XXX: When `GFP_NOLEAK / GFP_NOWALK' are given, never allocate slab memory? */
-#endif /* !CONFIG_DEBUG_MALLOC */
+#endif /* !CONFIG_TRACE_MALLOC */
 	result = FUNC(slab_malloc)(flags);
 	if likely(result)
 		return result;

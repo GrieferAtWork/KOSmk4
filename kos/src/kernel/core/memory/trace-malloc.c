@@ -28,10 +28,10 @@
 #include <kernel/malloc-defs.h>
 
 #if 0 /* Quick toggle to disable debug_malloc (and use the weak definitions from `malloc.c'). */
-#undef CONFIG_DEBUG_MALLOC
+#undef CONFIG_TRACE_MALLOC
 #endif
 
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 #undef CONFIG_TRACE_MALLOC_USE_RBTREE
 #if 1
 #define CONFIG_TRACE_MALLOC_USE_RBTREE
@@ -2298,6 +2298,6 @@ DECL_END
 #include "trace-malloc-heap.c.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* CONFIG_DEBUG_MALLOC */
+#endif /* CONFIG_TRACE_MALLOC */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_TRACE_MALLOC_C */

@@ -29,7 +29,7 @@
 
 #include <stddef.h>
 
-#if defined(CONFIG_DEBUG_MALLOC) || defined(CONFIG_DEBUG_HEAP)
+#if defined(CONFIG_TRACE_MALLOC) || defined(CONFIG_DEBUG_HEAP)
 DECL_BEGIN
 
 PRIVATE ATTR_FREETEXT void KCALL inject_jmp(void *from, void *to) {
@@ -92,6 +92,6 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_disable_debug_malloc,
 
 DECL_END
 
-#endif /* CONFIG_DEBUG_MALLOC || CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_TRACE_MALLOC || CONFIG_DEBUG_HEAP */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUG_MALLOC_C */

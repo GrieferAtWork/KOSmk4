@@ -571,9 +571,9 @@ INTDEF kernel_system_clearcache_t __kernel_system_clearcaches_start[];
 INTDEF kernel_system_clearcache_t __kernel_system_clearcaches_end[];
 
 
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 INTDEF ATTR_WEAK struct heap trace_heap;
-#endif /* CONFIG_DEBUG_MALLOC */
+#endif /* CONFIG_TRACE_MALLOC */
 
 
 /* Called as part of `system_clearcaches()': Trim standard kernel heaps.
@@ -585,13 +585,13 @@ PUBLIC NOBLOCK size_t NOTHROW(KCALL system_trimheaps)(void) {
 		if (OVERFLOW_UADD(result, temp, &result))
 			result = (size_t)-1;
 	}
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 	if (&trace_heap) {
 		temp = heap_trim(&trace_heap, 0);
 		if (OVERFLOW_UADD(result, temp, &result))
 			result = (size_t)-1;
 	}
-#endif /* CONFIG_DEBUG_MALLOC */
+#endif /* CONFIG_TRACE_MALLOC */
 	return result;
 }
 

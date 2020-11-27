@@ -143,36 +143,55 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 }
 
 
-/* Weakly define mall's debug functions are no-ops. */
-PUBLIC ATTR_WEAK ATTR_CONST NOBLOCK_IF(flags &GFP_ATOMIC) size_t
-KCALL mall_dump_leaks(gfp_t UNUSED(flags)) {
+PUBLIC ATTR_WEAK NOBLOCK void
+NOTHROW(KCALL kmalloc_validate)(void) {
+}
+
+PUBLIC ATTR_WEAK size_t KCALL
+kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
+	return 0;
+}
+
+PUBLIC ATTR_WEAK kmalloc_leak_t KCALL
+kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
+	return NULL;
+}
+
+PUBLIC ATTR_WEAK ssize_t KCALL
+kmalloc_leaks_print(kmalloc_leak_t UNUSED(leaks),
+                    __pformatprinter UNUSED(printer),
+                    void *UNUSED(arg),
+                    size_t *UNUSED(pnum_leaks)) {
 	return 0;
 }
 
 PUBLIC ATTR_WEAK NOBLOCK void
-NOTHROW(KCALL mall_validate_padding)(void) {
+NOTHROW(KCALL kmalloc_leaks_discard)(kmalloc_leak_t UNUSED(leaks)) {
 }
 
-PUBLIC ATTR_WEAK ATTR_CONST NOBLOCK_IF(flags &GFP_ATOMIC) void *
-NOTHROW(KCALL mall_trace_nx)(void *base,
-                             size_t UNUSED(num_bytes),
-                             gfp_t UNUSED(flags)) {
+PUBLIC ATTR_WEAK ATTR_CONST NOBLOCK_IF(gfp & GFP_ATOMIC) WUNUSED void *
+NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
+                                gfp_t UNUSED(gfp), unsigned int UNUSED(tb_skip)) {
 	return base;
 }
 
-PUBLIC ATTR_WEAK NOBLOCK_IF(flags &GFP_ATOMIC) void
-NOTHROW(KCALL mall_untrace)(void *UNUSED(ptr),
-                            gfp_t UNUSED(flags)) {
+PUBLIC NOBLOCK ATTR_WEAK ATTR_CONST void
+NOTHROW(KCALL kmalloc_untrace)(void *UNUSED(ptr)) {
 }
 
-PUBLIC ATTR_WEAK NOBLOCK_IF(flags &GFP_ATOMIC) void
-NOTHROW(KCALL mall_untrace_n)(void *UNUSED(ptr),
-                              size_t UNUSED(num_bytes),
-                              gfp_t UNUSED(flags)) {
+PUBLIC NOBLOCK ATTR_WEAK ATTR_CONST void
+NOTHROW(KCALL kmalloc_untrace_n)(void *UNUSED(ptr), size_t UNUSED(num_bytes)) {
 }
 
-DEFINE_PUBLIC_WEAK_ALIAS(mall_trace, mall_trace_nx);
-DEFINE_PUBLIC_WEAK_ALIAS(mall_print_traceback, mall_untrace);
+PUBLIC NOBLOCK ATTR_WEAK ATTR_CONST size_t
+NOTHROW(KCALL kmalloc_traceback)(void *UNUSED(ptr),
+                                 /*out*/ void **UNUSED(tb),
+                                 size_t UNUSED(buflen),
+                                 pid_t *UNUSED(p_alloc_roottid)) {
+	return 0;
+}
+
+DEFINE_PUBLIC_WEAK_ALIAS(kmalloc_trace, kmalloc_trace_nx);
 
 #ifndef CONFIG_USE_SLAB_ALLOCATORS
 DEFINE_PUBLIC_WEAK_ALIAS(kmalloc_noslab, kmalloc);

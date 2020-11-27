@@ -35,9 +35,9 @@
 /* The debug-malloc GC checker needs a way of enumerating
  * fully allocated corebase pages, and not just those that
  * still contain unallocated slots! */
-#ifdef CONFIG_DEBUG_MALLOC
+#ifdef CONFIG_TRACE_MALLOC
 #define CONFIG_COREBASE_HAVE_FULLPAGES 1
-#endif /* CONFIG_DEBUG_MALLOC */
+#endif /* CONFIG_TRACE_MALLOC */
 
 
 DECL_BEGIN
