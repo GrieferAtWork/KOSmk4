@@ -2915,6 +2915,24 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 			 * information to complete what we couldn't find earlier! */
 		}
 
+		if (!csym.clv_data.s_var.v_typeinfo && cmodsyminfo_issip(&csym)) {
+			/* TODO: If we weren't able to figure out the proper typing for
+			 *       the symbol (and it may not even have any proper typing),
+			 *       then try to induce its type from information taken from
+			 *       the symbol's Elf(32|64)_Sym entry.
+			 * Using that entry, we can:
+			 *   - Determine if it's a function, and if it is:
+			 *     Use `void(...)' as type (i.e. void-return+varargs)
+			 *   - Figure out the symbol's size. and select an appropriate
+			 *     integer type based on that knowledge:
+			 *      - If the size is the same as that of a pointer, assume that it's a pointer
+			 *      - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
+			 *      - Otherwise, interpret as an array of byte_t-s.
+			 *   - Additionally, if the symbol it part of a non-writable
+			 *     section, add a `const' qualifier to the symbol's type.
+			 */
+		}
+
 		/* Load the type of the variable. */
 		result = ctype_fromdw_opt(csym.clv_mod, csym.clv_unit,
 		                          &csym.clv_parser,
