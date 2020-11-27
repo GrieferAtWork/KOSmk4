@@ -239,14 +239,14 @@ struct cmodunit {
 	di_debuginfo_cu_abbrev_t cu_abbrev;   /* DWARF Debug-info abbreviation codes used by this CU. */
 };
 
-#define cmodunit_di_start(self) ((self)[0].cu_di_start)
-#define cmodunit_di_end(self)   ((self)[1].cu_di_start) /* One unit ends where the next one begins. */
+#define cmodunit_di_start(self)  ((self)[0].cu_di_start)
+#define cmodunit_di_maxend(self) ((self)[1].cu_di_start) /* One unit has to end before the next one begins. */
 
 /* Initialize a debug information CU parser from a given CModule CompilationUnit
  * @param: dip: A pointer to the first component to load, or `NULL' to simply load
  *              the first component following the start of the associated CU descriptor.
  *              When non-NULL, this pointer must be located somewhere between
- *              `cmodunit_di_start(self)' and `cmodunit_di_end(self)'.
+ *              `cmodunit_di_start(self)' and `cmodunit_di_maxend(self)'.
  *              If it isn't, then the parser will be initialized to always indicate EOF. */
 FUNDEF NONNULL((1, 2, 3)) void
 NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,

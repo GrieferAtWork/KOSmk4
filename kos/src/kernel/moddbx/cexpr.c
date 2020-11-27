@@ -2901,6 +2901,20 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 		return result;
 	if (!cmodsyminfo_istype(&csym)) {
 		struct ctyperef symtype;
+		if (!csym.clv_data.s_var.v_typeinfo && cmodsyminfo_issip(&csym)) {
+			/* XXX: This right here can happen if a symbol appears in a module's
+			 *      symbol table, but doesn't actually end up appearing within
+			 *      the module's .debug_info, not even as some kind of alias created
+			 *      by something like `DEFINE_PUBLIC_ALIAS()'.
+			 * In this case, check if `csym' is part of the _public_ symbol table
+			 * of its associated module (i.e. `.dynsym'), and if so: search through
+			 * loaded modules that claim dependencies on that module. Then, look
+			 * through the debug information of those modules in search of one that
+			 * makes a reference to an external symbol of the same name, and if we
+			 * manage to find such a reference, then we can make use of its type
+			 * information to complete what we couldn't find earlier! */
+		}
+
 		/* Load the type of the variable. */
 		result = ctype_fromdw_opt(csym.clv_mod, csym.clv_unit,
 		                          &csym.clv_parser,

@@ -60,7 +60,7 @@ DECL_BEGIN
  * @param: dip: A pointer to the first component to load, or `NULL' to simply load
  *              the first component following the start of the associated CU descriptor.
  *              When non-NULL, this pointer must be located somewhere between
- *              `cmodunit_di_start(self)' and `cmodunit_di_end(self)'.
+ *              `cmodunit_di_start(self)' and `cmodunit_di_maxend(self)'.
  *              If it isn't, then the parser will be initialized to always indicate EOF. */
 PUBLIC NONNULL((1, 2, 3)) void
 NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
@@ -80,10 +80,16 @@ NOTHROW(FCALL cmodunit_parser_from_dip)(struct cmodunit const *__restrict self,
 		 * In the 64-bit DWARF format, an initial length field is 96 bits in size, and has two parts:
 		 *  - The first 32-bits have the value 0xffffffff.
 		 *  - The following 64-bits contain the actual length represented as an unsigned 64-bit integer. */
+		temp = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); /* unit_length */
 		result->dup_ptrsize = 8;
 		reader += 8;
 	}
-	result->dup_cu_info_end = cmodunit_di_end(self);
+	/* Calculate the end-pointer for this CU, but limit by the max end of the CU. */
+	if (OVERFLOW_UADD((uintptr_t)result->dup_cu_info_hdr, temp,
+	                  (uintptr_t *)&result->dup_cu_info_end) ||
+		result->dup_cu_info_end > cmodunit_di_maxend(self))
+		result->dup_cu_info_end = cmodunit_di_maxend(self);
+
 	result->dup_version = UNALIGNED_GET16((uint16_t const *)reader); /* version */
 	reader += 2;
 	temp = UNALIGNED_GET32((uint32_t const *)reader); /* debug_abbrev_offset */
@@ -550,7 +556,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 			parser.dup_sections    = di_debug_sections_as_di_debuginfo_cu_parser_sections(&result->cm_sections);
 			parser.dup_cu_abbrev   = &cu->cu_abbrev;
 			parser.dup_cu_info_hdr = cmodunit_di_start(cu);
-			parser.dup_cu_info_end = cmodunit_di_end(cu);
+			parser.dup_cu_info_end = cmodunit_di_maxend(cu);
 			parser.dup_cu_info_pos = reader;
 			parser.dup_child_depth = 0;
 			/* Ignore CUs for which we can't load any initial component. */
@@ -882,8 +888,10 @@ NOTHROW(FCALL parse_symbol_name_for_object)(di_debuginfo_cu_parser_t *__restrict
                                             bool reuse_parser,
                                             bool *__restrict phas_location_information) {
 	di_debuginfo_component_attrib_t attr;
+	byte_t const *attrib_pos;
 	char const *result = NULL;
 again:
+	attrib_pos = self->dup_cu_info_pos;
 	switch (self->dup_comp.dic_tag) {
 
 	case DW_TAG_variable:
@@ -1096,6 +1104,10 @@ do_abstract_origin:
 		if (reuse_parser) {
 			self->dup_cu_info_pos = abstract_origin;
 			goto again;
+		} else {
+			/* Make sure that the original parser is exited correctly. */
+			self->dup_cu_info_pos = attrib_pos;
+			debuginfo_cu_parser_skipattr(self);
 		}
 		return parse_symbol_name_for_object_r(self, abstract_origin, pns,
 		                                      phas_location_information);
@@ -2183,7 +2195,7 @@ NOTHROW(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
 		result = &self->cm_cuv[index];
 		if (dip < cmodunit_di_start(result))
 			hi = index;
-		else if (dip > cmodunit_di_end(result))
+		else if (dip > cmodunit_di_maxend(result))
 			lo = index + 1;
 		else {
 			/* Found it! */
@@ -2407,6 +2419,8 @@ NOTHROW(FCALL parser_check_object_has_address)(di_debuginfo_cu_parser_t *__restr
 	byte_t const *referenced_component;
 	di_debuginfo_cu_parser_t _inner_parser;
 	di_debuginfo_component_attrib_t attr;
+	bool has_location;
+	has_location = false;
 again:
 	referenced_component = NULL;
 	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, parser) {
@@ -2428,6 +2442,7 @@ again:
 				                            &module_relative_component_addr) &&
 				module_relative_component_addr == module_relative_addr)
 				return true; /* Found it! */
+			has_location = true;
 		}	break;
 
 		case DW_AT_location: {
@@ -2468,13 +2483,14 @@ again:
 			}
 			if (module_relative_component_addr == module_relative_addr)
 				return true; /* Found it! */
+			has_location = true;
 		}	break;
 
 		default:
 			break;
 		}
 	}
-	if (referenced_component) {
+	if (referenced_component && !has_location) {
 		/* Maybe we can find what we're looking for in here... */
 		if (dbg_awaituser()) /* Allow the user to break an infinite loop caused by bad debug-info... */
 			goto done;
@@ -2907,21 +2923,30 @@ NOTHROW(FCALL cmod_symenum_foreign_globals_cb)(void *cookie, struct cmodule *__r
 }
 
 
-/* Enumerate local variables from the currently loaded CU */
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
+/* Enumerate local variables from the currently loaded CU
+ * @return: DBX_EOK:     Success (local were enumerated)
+ * @return: DBX_ENOENT:  Function containing `info->clv_modrel_pc' not found.
+ *                       In this case, a component has been selected (without
+ *                       it's attributes being parsed) that is located outside
+ *                       the depth-scope set when this function was originally
+ *                       called.
+ * @return: DBX_EINTR:   Operation was interrupted.
+ * @return: DBX_EINTERN: Internal error. */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 6)) dbx_errno_t
 NOTHROW(FCALL cmod_symenum_locals_from_cu)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
                                            cmod_symenum_callback_t cb, char const *startswith_name,
-                                           size_t startswith_namelen, uintptr_t ns) {
+                                           size_t startswith_namelen, uintptr_t ns,
+                                           ssize_t *__restrict presult) {
 	unsigned int error;
 	ssize_t temp, result = 0;
 	uintptr_t cu_depth;
 	cu_depth = info->clv_parser.dup_child_depth;
 	if (!debuginfo_cu_parser_next(&info->clv_parser))
-		goto done;
+		goto err_intern;
 again_cu_component:
 	while (info->clv_parser.dup_child_depth > cu_depth) {
 		if (dbg_awaituser())
-			goto done;
+			goto err_intr;
 		/* Scan components of this CU. */
 		switch (info->clv_parser.dup_comp.dic_tag) {
 
@@ -2941,7 +2966,7 @@ again_cu_component:
 				/* Must be apart of a different sub-program. */
 				for (;;) {
 					if (!debuginfo_cu_parser_next(&info->clv_parser))
-						goto done;
+						goto err_intern;
 					if (info->clv_parser.dup_child_depth <= subprogram_depth)
 						goto again_cu_component;
 					debuginfo_cu_parser_skipattr(&info->clv_parser);
@@ -2986,7 +3011,7 @@ again_subprogram_component:
 								/* Actually enumerate this variable. */
 								temp = (*cb)(info, true);
 								if unlikely(temp < 0)
-									goto err;
+									goto err_callback_temp;
 								result += temp;
 							}
 						}
@@ -3010,7 +3035,7 @@ again_subprogram_component:
 							block_depth = info->clv_parser.dup_child_depth;
 							for (;;) {
 								if (!debuginfo_cu_parser_next_with_dip(&info->clv_parser, &dip))
-									goto done;
+									goto err_intern;
 								if (info->clv_parser.dup_child_depth <= block_depth)
 									goto again_subprogram_component;
 								debuginfo_cu_parser_skipattr(&info->clv_parser);
@@ -3029,7 +3054,8 @@ skip_in_cu_tag_attr:
 				}
 			}
 done_subprogram:
-			goto done;
+			*presult = result;
+			return DBX_EOK;
 		}	break;
 
 		default:
@@ -3037,14 +3063,18 @@ generic_cu_child:
 			debuginfo_cu_parser_skipattr(&info->clv_parser);
 /*next_cu_component:*/
 			if (!debuginfo_cu_parser_next(&info->clv_parser))
-				goto done;
+				goto err_intern;
 			break;
 		}
 	}
-done:
-	return result;
-err:
-	return temp;
+	return DBX_ENOENT;
+err_callback_temp:
+	*presult = temp;
+	return DBX_EOK;
+err_intern:
+	return DBX_EINTERN;
+err_intr:
+	return DBX_EINTR;
 }
 
 
@@ -3053,34 +3083,41 @@ PRIVATE ATTR_NOINLINE NONNULL((1, 2)) ssize_t
 NOTHROW(FCALL cmod_symenum_locals)(/*in|out(undef)*/ struct cmodsyminfo *__restrict info,
                                    cmod_symenum_callback_t cb, char const *startswith_name,
                                    size_t startswith_namelen, uintptr_t ns) {
-	ssize_t temp, result = 0;
+	ssize_t result = 0;
 	/* Initialize the parser. */
 	cmodunit_parser_from_dip(info->clv_unit, info->clv_mod, &info->clv_parser, NULL);
 again:
 	if (dbg_awaituser()) {
+do_set_interrupted:
 		result = DBX_EINTR;
 	} else {
 		switch (info->clv_parser.dup_comp.dic_tag) {
 	
-		case DW_TAG_compile_unit:
+		case DW_TAG_compile_unit: {
+			dbx_errno_t error;
 			/* Load attributes for this CU. */
 			if (!debuginfo_cu_parser_loadattr_compile_unit(&info->clv_parser,
 			                                               &info->clv_cu))
 				break;
 			info->clv_parser.dup_comp.dic_tag = 0; /* Prevent infinite recursion on error. */
 			/* Enumerate with information from this CU. */
-			temp = cmod_symenum_locals_from_cu(info, cb,
-			                                   startswith_name,
-			                                   startswith_namelen,
-			                                   ns);
-			if unlikely(temp < 0)
-				goto err;
-			result += temp;
-			/* Check for secondary CUs (although those really shouldn't exist...) */
-			goto again;
+			error = cmod_symenum_locals_from_cu(info, cb,
+			                                    startswith_name,
+			                                    startswith_namelen,
+			                                    ns, &result);
+			if (error == DBX_EOK)
+				break;
+			if (error == DBX_EINTR)
+				goto do_set_interrupted;
+			if (error == DBX_ENOENT) {
+				/* Check for secondary CUs (although those really shouldn't exist...) */
+				goto skip_attributes_and_parse_next;
+			}
+		}	break;
 	
 		default:
 			/* Skip unexpected components. */
+skip_attributes_and_parse_next:
 			debuginfo_cu_parser_skipattr(&info->clv_parser);
 			if (debuginfo_cu_parser_next(&info->clv_parser))
 				goto again;
@@ -3088,8 +3125,6 @@ again:
 		}
 	}
 	return result;
-err:
-	return temp;
 }
 
 
