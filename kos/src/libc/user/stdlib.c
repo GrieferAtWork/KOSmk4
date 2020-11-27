@@ -794,6 +794,9 @@ INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func)
 /*[[[body:libc_atexit]]]*/
 {
+	/* TODO: Instead of this right here, we should register `func'
+	 *       for invocation when `dlgethandle(func)' is closed!
+	 *       s.a. `DLAUXCTRL_ADD_FINALIZER' */
 	return on_exit(&libc_atexit_wrapper, (void *)func);
 }
 /*[[[end:libc_atexit]]]*/
