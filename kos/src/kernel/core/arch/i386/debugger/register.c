@@ -1061,7 +1061,7 @@ NOTHROW(KCALL x86_dbg_getregbyidp)(unsigned int level,
 	if (!reqlen || reqlen > sizeof(result))
 		return 0; /* Shouldn't happen... */
 	if (reqlen < sizeof(result))
-		memset((byte_t *)result + reqlen, 0, sizeof(result) - reqlen);
+		memset((byte_t *)&result + reqlen, 0, sizeof(result) - reqlen);
 	return result;
 }
 
