@@ -147,17 +147,17 @@ PUBLIC ATTR_WEAK NOBLOCK void
 NOTHROW(KCALL kmalloc_validate)(void) {
 }
 
-PUBLIC ATTR_WEAK size_t KCALL
+PUBLIC ATTR_WEAK ATTR_CONST size_t KCALL
 kmalloc_leaks(void) THROWS(E_WOULDBLOCK) {
 	return 0;
 }
 
-PUBLIC ATTR_WEAK kmalloc_leak_t KCALL
+PUBLIC ATTR_WEAK ATTR_CONST kmalloc_leak_t KCALL
 kmalloc_leaks_collect(void) THROWS(E_WOULDBLOCK) {
 	return NULL;
 }
 
-PUBLIC ATTR_WEAK ssize_t KCALL
+PUBLIC ATTR_WEAK ATTR_CONST ssize_t KCALL
 kmalloc_leaks_print(kmalloc_leak_t UNUSED(leaks),
                     __pformatprinter UNUSED(printer),
                     void *UNUSED(arg),

@@ -478,20 +478,20 @@ extern "C++" {
 
 #if !defined(__INTELLISENSE__) || (!defined(__USE_KOS) && !defined(__USE_KOS_KERNEL))
 template<class __T>
-__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1))
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))
 typename __REFCNT_METHODS(__T)::__PRIVATE_REFCNT_NAME(refcnt_t)
 __REFCNT_NOTHROW(__REFCNT_CC getrefcnt)(__T const *__restrict __self) {
 	return (__REFCNT_METHODS(__T)::__PRIVATE_REFCNT_NAME(getrefcnt))(__self);
 }
 
 template<class __T>
-__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __BOOL
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __REFCNT_NOTHROW(__REFCNT_CC isshared)(__T const *__restrict __self) {
 	return (__REFCNT_METHODS(__T)::__PRIVATE_REFCNT_NAME(getrefcnt))(__self) > 1;
 }
 
 template<class __T>
-__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __BOOL
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __REFCNT_NOTHROW(__REFCNT_CC wasdestroyed)(__T const *__restrict __self) {
 	return (__REFCNT_METHODS(__T)::__PRIVATE_REFCNT_NAME(getrefcnt))(__self) == 0;
 }
@@ -577,20 +577,20 @@ __REFCNT_NOTHROW(__REFCNT_CC xdecref_unlikely)(__T *__self) {
 
 
 template<class __T>
-__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1))
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1))
 typename __WEAKREFCNT_METHODS(__T)::__PRIVATE_REFCNT_NAME(refcnt_t)
 __REFCNT_NOTHROW(__REFCNT_CC getweakrefcnt)(__T const *__restrict __self) {
 	return (__WEAKREFCNT_METHODS(__T)::__PRIVATE_REFCNT_NAME(getrefcnt))(__self);
 }
 
 template<class __T>
-__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __BOOL
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __REFCNT_NOTHROW(__REFCNT_CC isweakshared)(__T const *__restrict __self) {
 	return (__WEAKREFCNT_METHODS(__T)::__PRIVATE_REFCNT_NAME(getrefcnt))(__self) > 1;
 }
 
 template<class __T>
-__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __BOOL
+__FORCELOCAL __ATTR_ARTIFICIAL __NOBLOCK __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL
 __REFCNT_NOTHROW(__REFCNT_CC wasweakdestroyed)(__T const *__restrict __self) {
 	return (__WEAKREFCNT_METHODS(__T)::__PRIVATE_REFCNT_NAME(getrefcnt))(__self) == 0;
 }

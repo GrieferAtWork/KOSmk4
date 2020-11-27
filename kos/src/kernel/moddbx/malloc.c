@@ -361,7 +361,7 @@ nope:
 
 
 /* Check if any part of the given address range was already freed. */
-PRIVATE bool
+PRIVATE ATTR_PURE WUNUSED bool
 NOTHROW(KCALL static_heap_isfree)(void *base, size_t num_bytes) {
 	struct freerange *iter = freemem;
 	while (iter && (byte_t *)base >= (byte_t *)freerange_end(iter))
@@ -369,7 +369,7 @@ NOTHROW(KCALL static_heap_isfree)(void *base, size_t num_bytes) {
 	return iter && ((byte_t *)base + num_bytes) > (byte_t *)iter;
 }
 
-PRIVATE bool
+PRIVATE ATTR_PURE WUNUSED bool
 NOTHROW(KCALL static_heap_contains)(void *base, size_t num_bytes) {
 	struct sheap *iter = &static_heap;
 	do {

@@ -220,25 +220,25 @@ __CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_Resume_
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_DeleteException,(struct _Unwind_Exception *__restrict __exception_object),(__exception_object))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_DeleteException */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetGR)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetGR,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int __index),(__context,__index))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetGR,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int __index),(__context,__index))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetGR */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_SetGR)
 __CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetGR,(struct _Unwind_Context *__restrict __context, int __index, __uintptr_t __value),(__context,__index,__value))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_SetGR */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetIP)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIP,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIP,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetIP */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_SetIP)
 __CDECLARE_VOID(__ATTR_LEAF __ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_SetIP,(struct _Unwind_Context *__restrict __context, __uintptr_t __value),(__context,__value))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_SetIP */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetLanguageSpecificData)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetLanguageSpecificData,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetLanguageSpecificData,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetLanguageSpecificData */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetRegionStart)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetRegionStart,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetRegionStart,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetRegionStart */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetIPInfo)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIPInfo,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int *__restrict __p_ip_before_insn),(__context,__p_ip_before_insn))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__uintptr_t,__NOTHROW_NCX,_Unwind_GetIPInfo,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context, int *__restrict __p_ip_before_insn),(__context,__p_ip_before_insn))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetIPInfo */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_ForcedUnwind)
 __CDECLARE(__ATTR_NONNULL((1, 2)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_ForcedUnwind,(struct _Unwind_Exception *__restrict __exception_object, _Unwind_Stop_Fn __stop, void *__stop_arg),(__exception_object,__stop,__stop_arg))
@@ -247,16 +247,16 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_Forc
 __CDECLARE(__ATTR_NONNULL((1)),_Unwind_Reason_Code,__NOTHROW_NCX,_Unwind_Backtrace,(_Unwind_Trace_Fn __func, void *__arg),(__func,__arg))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_Backtrace */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetCFA)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Word,__NOTHROW_NCX,_Unwind_GetCFA,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Word,__NOTHROW_NCX,_Unwind_GetCFA,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetCFA */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetDataRelBase)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetDataRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetDataRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetDataRelBase */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_GetTextRelBase)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetTextRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_NCX,_Unwind_GetTextRelBase,(struct _Unwind_Context __KOS_FIXED_CONST *__restrict __context),(__context))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_GetTextRelBase */
 #if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_FindEnclosingFunction)
-__CDECLARE(__ATTR_WUNUSED __ATTR_PURE,void *,__NOTHROW_NCX,_Unwind_FindEnclosingFunction,(void *__pc),(__pc))
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,void *,__NOTHROW_NCX,_Unwind_FindEnclosingFunction,(void *__pc),(__pc))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_FindEnclosingFunction */
 
 

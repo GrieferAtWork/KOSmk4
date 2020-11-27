@@ -735,7 +735,7 @@ NOTHROW(FCALL prefer_symbol)(struct cmodsym *__restrict a,
 }
 
 /* Lookup the given `name' within `self' */
-PRIVATE WUNUSED NONNULL((1, 2)) struct cmodsym *
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) struct cmodsym *
 NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
                                  char const *__restrict name, size_t namelen,
                                  uintptr_t ns) {

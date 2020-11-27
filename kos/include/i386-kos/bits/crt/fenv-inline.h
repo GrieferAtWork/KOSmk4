@@ -119,7 +119,7 @@ __NOTHROW_NCX(__inline_fegetenv)(struct __fenv_struct *__restrict __envp) {
 	}
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_PURE __UINT16_TYPE__
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __UINT16_TYPE__
 __NOTHROW(__inline_fegetexcept)(void) {
 	return __fstcw() & FE_ALL_EXCEPT;
 }

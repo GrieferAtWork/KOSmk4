@@ -79,6 +79,7 @@ NOTHROW(KCALL syscall_emulate_r_personality)(struct unwind_fde_struct *__restric
 	sc_info = (struct rpc_syscall_info *)(state->kcs_gpregs.gp_edi + 4);
 #endif /* !__x86_64__ */
 	return_cpustate = (struct icpustate *)(sc_info + 1);
+	COMPILER_IMPURE(); /* Suppress incorrect -Wsuggest-attribute=pure */
 	x86_userexcept_unwind_i(return_cpustate, sc_info);
 }
 

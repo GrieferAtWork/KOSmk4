@@ -533,7 +533,7 @@ NOTHROW(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restrict info
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL autocomplete_symbols)(struct cparser *__restrict self,
                                     char const *__restrict name,
-                                    size_t namelen, unsigned int ns,
+                                    size_t namelen, uintptr_t ns,
                                     bool allow_types) {
 	struct autocomplete_symbols_data data;
 	unsigned int scope;
@@ -2341,7 +2341,7 @@ PRIVATE char const misc_type_keywords[][16] = {
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL autocomplete_types)(struct cparser *__restrict self,
                                   char const *__restrict name,
-                                  size_t namelen, unsigned int ns) {
+                                  size_t namelen, uintptr_t ns) {
 	unsigned int i;
 	if (namelen < (COMPILER_LENOF(builtin_types[0].bt_name) - 1)) {
 		for (i = 0; i < COMPILER_LENOF(builtin_types); ++i) {
@@ -2412,7 +2412,7 @@ do_scan_keyword:
 	    KWD_CHECK(kwd_str, kwd_len, "union") ||
 	    KWD_CHECK(kwd_str, kwd_len, "class") ||
 	    KWD_CHECK(kwd_str, kwd_len, "enum")) {
-		unsigned int ns;
+		uintptr_t ns;
 		struct cmodsyminfo csym;
 		struct ctyperef dw_type;
 		if unlikely(integer_type_flags)

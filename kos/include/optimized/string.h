@@ -3309,7 +3309,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempset))(/*aligned(1)*/ void *__restrict __dst,
 
 #ifndef __fast_memchr_defined
 #define __fast_memchr_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*aligned(1)*/ void *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchr))(/*aligned(1)*/ void const *__restrict __haystack,
                                         int __needle, __SIZE_TYPE__ __n_bytes) {
 	if __untraced(__builtin_constant_p(__n_bytes)) {
@@ -3353,7 +3353,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memchr))(/*aligned(1)*/ void const *__restrict __
 
 #ifndef __fast_memchrw_defined
 #define __fast_memchrw_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*aligned(2)*/ __UINT16_TYPE__ *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrw))(/*aligned(2)*/ void const *__restrict __haystack,
                                          __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
 	if __untraced(__builtin_constant_p(__n_words)) {
@@ -3397,7 +3397,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memchrw))(/*aligned(2)*/ void const *__restrict _
 
 #ifndef __fast_memchrl_defined
 #define __fast_memchrl_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*aligned(4)*/ __UINT32_TYPE__ *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrl))(/*aligned(4)*/ void const *__restrict __haystack,
                                          __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) {
 	if __untraced(__builtin_constant_p(__n_dwords)) {
@@ -3441,7 +3441,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memchrl))(/*aligned(4)*/ void const *__restrict _
 
 #ifndef __fast_memchrq_defined
 #define __fast_memchrq_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*aligned(8)*/ __UINT64_TYPE__ *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memchrq))(/*aligned(8)*/ void const *__restrict __haystack,
                                          __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	if __untraced(__builtin_constant_p(__n_qwords)) {
@@ -3487,7 +3487,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memchrq))(/*aligned(8)*/ void const *__restrict _
 
 #ifndef __fast_memrchr_defined
 #define __fast_memrchr_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*aligned(1)*/ void *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(1)*/ void *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchr))(/*aligned(1)*/ void const *__restrict __haystack,
                                          int __needle, __SIZE_TYPE__ __n_bytes) {
 	if __untraced(__builtin_constant_p(__n_bytes)) {
@@ -3519,7 +3519,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchr))(/*aligned(1)*/ void const *__restrict _
 
 #ifndef __fast_memrchrw_defined
 #define __fast_memrchrw_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*aligned(2)*/ __UINT16_TYPE__ *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(2)*/ __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrw))(/*aligned(2)*/ void const *__restrict __haystack,
                                           __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words) {
 	if __untraced(__builtin_constant_p(__n_words)) {
@@ -3551,7 +3551,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrw))(/*aligned(2)*/ void const *__restrict 
 
 #ifndef __fast_memrchrl_defined
 #define __fast_memrchrl_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*aligned(4)*/ __UINT32_TYPE__ *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(4)*/ __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrl))(/*aligned(4)*/ void const *__restrict __haystack,
                                           __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords) {
 	if __untraced(__builtin_constant_p(__n_dwords)) {
@@ -3583,7 +3583,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrl))(/*aligned(4)*/ void const *__restrict 
 
 #ifndef __fast_memrchrq_defined
 #define __fast_memrchrq_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) /*aligned(8)*/ __UINT64_TYPE__ *
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) /*aligned(8)*/ __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrq))(/*aligned(8)*/ void const *__restrict __haystack,
                                           __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords) {
 	if __untraced(__builtin_constant_p(__n_qwords)) {
@@ -3618,7 +3618,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrq))(/*aligned(8)*/ void const *__restrict 
 #ifndef __fast_memcmp_defined
 #define __fast_memcmp_defined 1
 #include <hybrid/byteorder.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) int
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __s1,
                                         /*aligned(1)*/ void const *__restrict __s2,
                                         __SIZE_TYPE__ __n_bytes) {
@@ -3969,7 +3969,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __
 #ifndef __fast_memcmpw_defined
 #define __fast_memcmpw_defined 1
 #include <hybrid/byteorder.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __INT16_TYPE__
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT16_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *__restrict __s1,
                                          /*aligned(2)*/ void const *__restrict __s2,
                                          __SIZE_TYPE__ __n_words) {
@@ -4184,7 +4184,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *__restrict _
 #ifndef __fast_memcmpl_defined
 #define __fast_memcmpl_defined 1
 #include <hybrid/byteorder.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __INT32_TYPE__
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *__restrict __s1,
                                          /*aligned(4)*/ void const *__restrict __s2,
                                          __SIZE_TYPE__ __n_dwords) {
@@ -4333,7 +4333,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *__restrict _
 #ifndef __fast_memcmpq_defined
 #define __fast_memcmpq_defined 1
 #include <hybrid/byteorder.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __INT64_TYPE__
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *__restrict __s1,
                                          /*aligned(8)*/ void const *__restrict __s2,
                                          __SIZE_TYPE__ __n_qwords) {

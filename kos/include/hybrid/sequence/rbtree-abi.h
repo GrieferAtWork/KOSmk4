@@ -114,14 +114,14 @@ __DECL_BEGIN
 
 /* Locate the node for the given key.
  * @return: RBTREE_NULL: No node exists for the given key. */
-RBTREE_DECL __ATTR_WUNUSED __ATTR_PURE RBTREE_T *
+RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(locate))(/*nullable*/ RBTREE_T *root,
                                          RBTREE_Tkey key);
 
 #if !defined(RBTREE_MINKEY_EQ_MAXKEY) && defined(RBTREE_WANT_RLOCATE)
 /* Locate the first node overlapping with the given range.
  * @return: RBTREE_NULL: No node exists within the given range. */
-RBTREE_DECL __ATTR_WUNUSED __ATTR_PURE RBTREE_T *
+RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
                                           RBTREE_Tkey minkey,
                                           RBTREE_Tkey maxkey);
@@ -164,12 +164,12 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(removenode))(RBTREE_T **__restrict proot,
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 /* Return the next node with a key-range located below `node'
  * If no such node exists, return `RBTREE_NULL' instead. */
-RBTREE_DECL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) RBTREE_T *
+RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node);
 
 /* Return the next node with a key-range located above `node'
  * If no such node exists, return `RBTREE_NULL' instead. */
-RBTREE_DECL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) RBTREE_T *
+RBTREE_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node);
 #endif /* RBTREE_WANT_PREV_NEXT_NODE */
 
@@ -430,7 +430,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_intern_assert_tree))(RBTREE_T const *root) {
 
 #ifndef RBTREE_LEFT_LEANING
 #define _RBTREE_GETSIBLING(self) (RBTREE(_getsibling)(self))
-__LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
+__LOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(_getsibling))(RBTREE_T *__restrict self) {
 	RBTREE_T *parent = RBTREE_GETPAR(self);
 	RBTREE_T *sibling;
@@ -449,7 +449,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(_getsibling))(RBTREE_T *__restrict self) {
 
 /* Locate the node for the given key.
  * @return: RBTREE_NULL: No node exists for the given key. */
-RBTREE_IMPL __ATTR_WUNUSED __ATTR_PURE RBTREE_T *
+RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(locate))(/*nullable*/ RBTREE_T *root,
                                          RBTREE_Tkey key) {
 	_RBTREE_VALIDATE(root);
@@ -471,9 +471,9 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(locate))(/*nullable*/ RBTREE_T *root,
 /* Locate the first node overlapping with the given range.
  * @return: RBTREE_NULL: No node exists within the given range. */
 #ifdef RBTREE_WANT_RLOCATE
-RBTREE_IMPL __ATTR_WUNUSED __ATTR_PURE RBTREE_T *
+RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED RBTREE_T *
 #else /* RBTREE_WANT_RLOCATE */
-__PRIVATE __ATTR_WUNUSED __ATTR_PURE RBTREE_T *
+__PRIVATE __ATTR_PURE __ATTR_WUNUSED RBTREE_T *
 #endif /* !RBTREE_WANT_RLOCATE */
 RBTREE_NOTHROW(RBTREE_CC RBTREE(rlocate))(/*nullable*/ RBTREE_T *root,
                                           RBTREE_Tkey minkey,
@@ -1333,7 +1333,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(rremove))(RBTREE_T **__restrict proot,
 #ifdef RBTREE_WANT_PREV_NEXT_NODE
 /* Return the next node with a key-range located below `node'
  * If no such node exists, return `RBTREE_NULL' instead. */
-RBTREE_IMPL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) RBTREE_T *
+RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node) {
 	RBTREE_T *result;
 	/* NOTE: Because RBTREEs are self-balancing, we should be able to
@@ -1363,7 +1363,7 @@ RBTREE_NOTHROW(RBTREE_CC RBTREE(prevnode))(RBTREE_T const *__restrict node) {
 
 /* Return the next node with a key-range located above `node'
  * If no such node exists, return `RBTREE_NULL' instead. */
-RBTREE_IMPL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) RBTREE_T *
+RBTREE_IMPL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) RBTREE_T *
 RBTREE_NOTHROW(RBTREE_CC RBTREE(nextnode))(RBTREE_T const *__restrict node) {
 	RBTREE_T *result;
 	/* NOTE: Because RBTREEs are self-balancing, we should be able to

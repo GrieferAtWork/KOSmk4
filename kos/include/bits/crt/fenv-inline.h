@@ -47,7 +47,7 @@ __NOTHROW_NCX(__inline_fegetenv)(struct __fenv_struct *__restrict __envp) {
 	__hybrid_assertion_failed("Not implemented: fegetenv()");
 }
 
-__LOCAL __ATTR_WUNUSED __ATTR_PURE int
+__LOCAL __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__inline_fegetexcept)(void) {
 	__hybrid_assertion_failed("Not implemented: fegetexcept()");
 	return 0;

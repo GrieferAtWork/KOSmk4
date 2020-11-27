@@ -188,7 +188,7 @@ __NOTHROW(__LIBC_FAST_NAME(fedisableexcept))(int __excepts) {
 #ifndef __fast_fegetexcept_defined
 #if !defined(__CRT_HAVE_fegetexcept) || defined(__WANT_FENV_INLINE)
 #define __fast_fegetexcept_defined 1
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_PURE int
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW(__LIBC_FAST_NAME(fegetexcept))(void) {
 	return __inline_fegetexcept();
 }

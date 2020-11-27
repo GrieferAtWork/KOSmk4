@@ -42,7 +42,7 @@ typedef __ATTR_WUNUSED __ATTR_PURE_P __ATTR_NONNULL((1, 2)) __byte_t const *
                                      __size_t symtab_entsize,
                                      __uintptr_t module_relative_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) __byte_t const *
+LIBDEBUGINFO_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __byte_t const *
 __NOTHROW_NCX(LIBDEBUGINFO_CC symtab_scantable)(__byte_t const *__restrict symtab_start,
                                                 __byte_t const *__restrict symtab_end,
                                                 __size_t symtab_entsize,
