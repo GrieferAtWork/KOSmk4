@@ -81,6 +81,7 @@
 #include <libcfientry/entry_value.h>
 #ifdef __KERNEL__
 #include <kernel/driver.h>
+#include <kernel/panic.h>
 #else /* __KERNEL__ */
 #include <dlfcn.h>
 #endif /* !__KERNEL__ */
@@ -649,6 +650,9 @@ PRIVATE PCFIENTRY_RUN_UNWIND_EMULATOR pdyn_cfientry_run_unwind_emulator = NULL;
 
 PRIVATE bool CC load_libcfientry(void) {
 #ifdef __KERNEL__
+	/* Don't load a new driver if the kernel's been poisoned... */
+	if (kernel_poisoned())
+		return false;
 	NESTED_TRY
 #endif /* __KERNEL__ */
 	{

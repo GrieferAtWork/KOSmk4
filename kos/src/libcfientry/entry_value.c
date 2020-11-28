@@ -83,6 +83,43 @@ NOTHROW_NCX(CC libcfientry_getreg)(/*struct cfientry **/ void const *arg,
 }
 
 
+/* Convert a stack entry from:
+ *    - UNWIND_STE_REGISTER    -> UNWIND_STE_CONSTANT
+ *    - UNWIND_STE_REGPOINTER  -> UNWIND_STE_STACKVALUE
+ * Other types of stack-entries are left alone.
+ */
+PRIVATE NONNULL((1, 2)) unsigned int
+NOTHROW_NCX(CC make_register_value_to_rvalue)(unwind_emulator_t *__restrict self,
+                                              unwind_ste_t *__restrict ste) {
+	union {
+		uintptr_t p;
+		byte_t buf[CFI_UNWIND_REGISTER_MAXSIZE];
+	} regval;
+	switch (ste->s_type) {
+
+	case UNWIND_STE_REGISTER:
+	case UNWIND_STE_REGPOINTER: {
+		if unlikely(!(*self->ue_regget)(self->ue_regget_arg, ste->s_register, regval.buf))
+			goto err_invalid_register;
+		/* Convert the stack-entry. */
+		if (ste->s_type == UNWIND_STE_REGISTER) {
+			ste->s_uconst = regval.p + ste->s_regoffset;
+			ste->s_type   = UNWIND_STE_CONSTANT;
+		} else {
+			ste->s_uconst = regval.p;
+			ste->s_type   = UNWIND_STE_STACKVALUE;
+		}
+	}	break;
+
+	default:
+		break;
+	}
+	return UNWIND_SUCCESS;
+err_invalid_register:
+	return UNWIND_INVALID_REGISTER;
+}
+
+
 /* Run a sequence of DW_OP_* instructions where any register access is
  * dispatched through `cfientry_getreg'. After this, any stack-value
  * left on the internal stack of `self' that was pushed by the given
@@ -128,6 +165,7 @@ NOTHROW_NCX(CC libcfientry_run_unwind_emulator)(unwind_emulator_t *__restrict se
 	uint8_t saved_piecewrite;
 	byte_t *saved_piecebuf;
 	size_t saved_piecesiz, saved_piecebits;
+	size_t old_stacksize;
 
 	/* Initialize the cfientry controller. */
 	ce.ce_regget     = self->ue_regget;
@@ -159,11 +197,24 @@ NOTHROW_NCX(CC libcfientry_run_unwind_emulator)(unwind_emulator_t *__restrict se
 	self->ue_piecebuf   = NULL;
 	self->ue_piecesiz   = 0;
 	self->ue_piecebits  = 0;
+	old_stacksize = self->ue_stacksz;
 
 	/* And invoke the emulator proper, which is now re-directed
 	 * to dispatch register accesses using `libcfientry_getreg'
 	 * from above. */
 	result = unwind_emulator_exec(self);
+
+	/* Convert all newly pushed register values into r-values! */
+	if (result == UNWIND_SUCCESS && self->ue_stacksz > old_stacksize) {
+		size_t i;
+		for (i = old_stacksize; i < self->ue_stacksz; ++i) {
+			unwind_ste_t *ste;
+			ste    = &self->ue_stack[i];
+			result = make_register_value_to_rvalue(self, ste);
+			if unlikely(result != UNWIND_SUCCESS)
+				break;
+		}
+	}
 
 	/* Restore the old emulator state. */
 	self->ue_pc         = saved_pc;
@@ -177,8 +228,6 @@ NOTHROW_NCX(CC libcfientry_run_unwind_emulator)(unwind_emulator_t *__restrict se
 	self->ue_piecebuf   = saved_piecebuf;
 	self->ue_piecesiz   = saved_piecesiz;
 	self->ue_piecebits  = saved_piecebits;
-
-	/* TODO: Convert all newly pushed register values into r-values! */
 
 	/* Finalize the cfientry controller. */
 	libcfientry_fini(&ce);
