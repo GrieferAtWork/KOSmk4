@@ -226,7 +226,6 @@ did_update_x86_64_kernel:
 	}
 	local cmdline = options.get(opt.CMDLINE);
 	if (cmdline) {
-		print "QEMU_CMDLINE",repr(cmdline);
 		qemu_arguments.append("-append");
 		qemu_arguments.append(cmdline);
 	}
@@ -240,6 +239,7 @@ did_update_x86_64_kernel:
 		enableMonitorCommands.start();
 	try {
 		w.close();
+		/* XXX: Wait until qemu has opened up the port for the GDB stub! */
 		magic.onEmulatorStarted();
 		common.processKosDebugOutput(
 			r: r,
