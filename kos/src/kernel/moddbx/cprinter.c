@@ -460,6 +460,8 @@ again_me:
 		PRINT("(");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_SUFFIX);
 		if (me->ct_function.cf_argc == 0) {
+			if (me->ct_kind & CTYPE_KIND_FUNPROTO_VARARGS)
+				goto do_print_dots;
 			FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX);
 			PRINT("void");
 			FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_SUFFIX);
@@ -474,6 +476,18 @@ again_me:
 				}
 				DO(ctyperef_printname(&me->ct_function.cf_argv[i],
 				                      printer, NULL, 0));
+			}
+			if (me->ct_kind & CTYPE_KIND_FUNPROTO_VARARGS) {
+				if (me->ct_function.cf_argc != 0) {
+					FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_PREFIX);
+					PRINT(",");
+					FORMAT(DEBUGINFO_PRINT_FORMAT_COMMA_SUFFIX);
+					PRINT(" ");
+do_print_dots:
+					FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_PREFIX);
+					PRINT("...");
+					FORMAT(DEBUGINFO_PRINT_FORMAT_DOTS_SUFFIX);
+				}
 			}
 		}
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
