@@ -427,7 +427,7 @@ NOTHROW(FCALL usermod_scan_rela_for_DlModule)(struct usermod *__restrict self,
                                               struct libdl_dlmodule **__restrict presult,
                                               USER ElfV_Rela const *base, size_t count) {
 	size_t sizeof_rel;
-	sizeof_rel = ElfV_sizeof(Rel, self->um_modtype);
+	sizeof_rel = ElfV_sizeof(Rela, self->um_modtype);
 	for (; count; --count) {
 		ElfV_Rela field;
 		if (dbg_readmemory(base, &field, sizeof_rel) != 0)

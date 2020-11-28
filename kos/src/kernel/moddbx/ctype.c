@@ -1087,86 +1087,102 @@ again:
 			break;
 
 		case DW_ATE_signed:
-#ifdef __CHAR_UNSIGNED__
-		case DW_ATE_signed_char:
-#endif /* __CHAR_UNSIGNED__ */
-do_signed: ATTR_UNUSED;
-			if (!typinfo.t_sizeof)
-				typinfo.t_sizeof = sizeof(int);
-			if (typinfo.t_sizeof == 1)
-				presult->ct_typ = incref(&ctype_s8);
-			else if (typinfo.t_sizeof == 2)
-				presult->ct_typ = incref(&ctype_s16);
-			else if (typinfo.t_sizeof == 4)
-				presult->ct_typ = incref(&ctype_s32);
-			else if (typinfo.t_sizeof == 8)
-				presult->ct_typ = incref(&ctype_s64);
-			else {
-				goto err_corrupt;
-			}
-			break;
-
 		case DW_ATE_unsigned:
-#ifndef __CHAR_UNSIGNED__
-		case DW_ATE_unsigned_char:
-#endif /* !__CHAR_UNSIGNED__ */
-do_unsigned: ATTR_UNUSED;
-			if (!typinfo.t_sizeof)
-				typinfo.t_sizeof = sizeof(int);
-			if (typinfo.t_sizeof == 1)
-				presult->ct_typ = incref(&ctype_u8);
-			else if (typinfo.t_sizeof == 2)
-				presult->ct_typ = incref(&ctype_u16);
-			else if (typinfo.t_sizeof == 4)
-				presult->ct_typ = incref(&ctype_u32);
-			else if (typinfo.t_sizeof == 8)
-				presult->ct_typ = incref(&ctype_u64);
-			else {
-				goto err_corrupt;
+			if (!typinfo.t_name)
+				typinfo.t_name = typinfo.t_rawname;
+			if (typinfo.t_name) {
+				if (strcmp(typinfo.t_name, "char") == 0) {
+					if (!typinfo.t_sizeof)
+						typinfo.t_sizeof = sizeof(char);
+					goto do_character;
+				}
+				if (strcmp(typinfo.t_name, "wchar_t") == 0) {
+					if (!typinfo.t_sizeof)
+						typinfo.t_sizeof = sizeof(wchar_t);
+					goto do_character;
+				}
+				if (strcmp(typinfo.t_name, "char16_t") == 0) {
+					if (!typinfo.t_sizeof)
+						typinfo.t_sizeof = sizeof(char16_t);
+					goto do_character;
+				}
+				if (strcmp(typinfo.t_name, "char32_t") == 0) {
+					if (!typinfo.t_sizeof)
+						typinfo.t_sizeof = sizeof(char32_t);
+					goto do_character;
+				}
+			}
+			if (typinfo.t_encoding == DW_ATE_signed) {
+do_signed:
+				if (typinfo.t_sizeof == 1)
+					presult->ct_typ = incref(&ctype_s8);
+				else if (typinfo.t_sizeof == 2)
+					presult->ct_typ = incref(&ctype_s16);
+				else if (typinfo.t_sizeof == 4)
+					presult->ct_typ = incref(&ctype_s32);
+				else if (typinfo.t_sizeof == 8)
+					presult->ct_typ = incref(&ctype_s64);
+				else {
+					goto err_corrupt;
+				}
+			} else {
+do_unsigned:
+				if (!typinfo.t_sizeof)
+					typinfo.t_sizeof = sizeof(int);
+				if (typinfo.t_sizeof == 1) {
+					presult->ct_typ = incref(&ctype_u8);
+				} else if (typinfo.t_sizeof == 2) {
+					presult->ct_typ = incref(&ctype_u16);
+				} else if (typinfo.t_sizeof == 4) {
+					presult->ct_typ = incref(&ctype_u32);
+				} else if (typinfo.t_sizeof == 8) {
+					presult->ct_typ = incref(&ctype_u64);
+				} else {
+					goto err_corrupt;
+				}
 			}
 			break;
 
-#ifdef __CHAR_UNSIGNED__
-#define DO_MAYBE_SIGNED_FOR_CHAR do_unsigned
 		case DW_ATE_unsigned_char:
-#else /* __CHAR_UNSIGNED__ */
-#define DO_MAYBE_SIGNED_FOR_CHAR do_signed
 		case DW_ATE_signed_char:
-#endif /* !__CHAR_UNSIGNED__ */
 		case DW_ATE_UTF:
 			if (!typinfo.t_sizeof)
 				typinfo.t_sizeof = sizeof(char);
-			if (typinfo.t_sizeof == sizeof(char)) {
-				if (!typinfo.t_name)
-					typinfo.t_name = typinfo.t_rawname;
-				/* The only way to differentiate between `signed char' and `char'
-				 * in debug information (which we need to do, since we only allow
-				 * `char *' to be printed as strings, but leave `signed char *'
-				 * alone), is to look at the name field of the type:
-				 * ```
-				 * <1><xxx>: Abbrev Number: xxx (DW_TAG_base_type)
-				 *    <xxx>   DW_AT_byte_size   : 1
-				 *    <xxx>   DW_AT_encoding    : 6	(signed char)
-				 *    <xxx>   DW_AT_name        : (indirect string, offset: xxx): char
-				 * <1><xxx>: Abbrev Number: xxx (DW_TAG_base_type)
-				 *    <xxx>   DW_AT_byte_size   : 1
-				 *    <xxx>   DW_AT_encoding    : 6	(signed char)
-				 *    <xxx>   DW_AT_name        : (indirect string, offset: xxx): signed char
-				 * ```
-				 */
-				if (typinfo.t_encoding != DW_ATE_UTF &&
-				    typinfo.t_name && strcmp(typinfo.t_name, "char") != 0)
-					goto DO_MAYBE_SIGNED_FOR_CHAR;
-				presult->ct_typ = incref(&ctype_char);
-			} else if (typinfo.t_sizeof == sizeof(char16_t)) {
-				presult->ct_typ = incref(&ctype_char16_t);
-			} else if (typinfo.t_sizeof == sizeof(char32_t)) {
-				presult->ct_typ = incref(&ctype_char32_t);
-			} else {
-				goto DO_MAYBE_SIGNED_FOR_CHAR;
+			if (!typinfo.t_name)
+				typinfo.t_name = typinfo.t_rawname;
+			/* The only way to differentiate between `signed char' and `char'
+			 * in debug information (which we need to do, since we only allow
+			 * `char *' to be printed as strings, but leave `signed char *'
+			 * alone), is to look at the name field of the type:
+			 * ```
+			 * <1><xxx>: Abbrev Number: xxx (DW_TAG_base_type)
+			 *    <xxx>   DW_AT_byte_size   : 1
+			 *    <xxx>   DW_AT_encoding    : 6	(signed char)
+			 *    <xxx>   DW_AT_name        : (indirect string, offset: xxx): char
+			 * <1><xxx>: Abbrev Number: xxx (DW_TAG_base_type)
+			 *    <xxx>   DW_AT_byte_size   : 1
+			 *    <xxx>   DW_AT_encoding    : 6	(signed char)
+			 *    <xxx>   DW_AT_name        : (indirect string, offset: xxx): signed char
+			 * ```
+			 */
+			if (typinfo.t_encoding == DW_ATE_UTF ||
+			    (typinfo.t_name && strcmp(typinfo.t_name, "char") == 0)) {
+do_character:
+				if (typinfo.t_sizeof == sizeof(char)) {
+					presult->ct_typ = incref(&ctype_char);
+					break;
+				} else if (typinfo.t_sizeof == sizeof(char16_t)) {
+					presult->ct_typ = incref(&ctype_char16_t);
+					break;
+				} else if (typinfo.t_sizeof == sizeof(char32_t)) {
+					presult->ct_typ = incref(&ctype_char32_t);
+					break;
+				}
 			}
-#undef DO_MAYBE_SIGNED_FOR_CHAR
-			break;
+			if (typinfo.t_encoding == DW_ATE_signed_char ||
+			    typinfo.t_encoding == DW_ATE_signed)
+				goto do_signed;
+			goto do_unsigned;
 
 		default:
 			break;

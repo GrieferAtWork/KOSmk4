@@ -1006,7 +1006,8 @@ NOTHROW(KCALL dbg_strlen)(void const *addr, size_t *__restrict presult) {
 	(COMPILER_ENDOF(buf)[-1]) = 0;
 	for (;;) {
 		size_t ok, temp;
-		ok   = sizeof(buf) - dbg_readmemory(addr, buf, sizeof(buf) - sizeof(char));
+		ok = (sizeof(buf) - sizeof(char)) -
+		     dbg_readmemory(addr, buf, sizeof(buf) - sizeof(char));
 		temp = strlen(buf);
 		result += temp;
 		if (temp < ok)
@@ -1025,7 +1026,8 @@ NOTHROW(KCALL dbg_strlen16)(void const *addr, size_t *__restrict presult) {
 	(COMPILER_ENDOF(buf)[-1]) = 0;
 	for (;;) {
 		size_t ok, temp;
-		ok   = sizeof(buf) - dbg_readmemory(addr, buf, sizeof(buf) - sizeof(u16));
+		ok = (sizeof(buf) - sizeof(u16)) -
+		     dbg_readmemory(addr, buf, sizeof(buf) - sizeof(u16));
 		temp = rawmemlenw(buf, 0);
 		result += temp;
 		if (temp < ok)
@@ -1044,7 +1046,8 @@ NOTHROW(KCALL dbg_strlen32)(void const *addr, size_t *__restrict presult) {
 	(COMPILER_ENDOF(buf)[-1]) = 0;
 	for (;;) {
 		size_t ok, temp;
-		ok   = sizeof(buf) - dbg_readmemory(addr, buf, sizeof(buf) - sizeof(u32));
+		ok = (sizeof(buf) - sizeof(u32)) -
+		     dbg_readmemory(addr, buf, sizeof(buf) - sizeof(u32));
 		temp = rawmemlenl(buf, 0);
 		result += temp;
 		if (temp < ok)

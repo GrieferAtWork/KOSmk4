@@ -1241,8 +1241,10 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 				if (!same_namespace(sym->cms_dip, symbol_dip))
 					continue; /* Different namespace. */
 				/* Symbol re-definition (this shouldn't happen...) */
+#if 0
 				printk(KERN_WARNING "[dbx] per-cu symbol re-definition of %q (found at %p and %p)\n",
 					   name, sym->cms_dip, symbol_dip);
+#endif
 				return DBX_EOK;
 			}
 			/* No collision (we're dealing with differing namespace)
