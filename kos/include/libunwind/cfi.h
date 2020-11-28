@@ -638,7 +638,7 @@ typedef struct unwind_emulator_struct {
 	__size_t                ue_piecebits;          /* [<= sm_piecesiz * 8] Number of _BITS_ within the `sm_piecebuf' buffer that are in use. */
 	__uintptr_t             ue_call_frame_cfa;     /* [0..1] Lazily calculated value for the call-frame-CFA of the given register state.
 	                                                * When set to ZERO(0), this value is calculated as-needed, using:
-	                                                *  - unwind_fde_scan(ue_eh_frame_start,ue_eh_frame_end,...)
+	                                                *  - unwind_fde_scan(ue_eh_frame_start, ue_eh_frame_end, ...)
 	                                                *  - unwind_fde_exec(...) */
 	struct di_debuginfo_compile_unit_struct const
 	                       *ue_cu;                 /* [0..1][const] The associated CU (when non-NULL, fields that may be used

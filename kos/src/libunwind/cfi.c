@@ -70,6 +70,23 @@
 #endif /* !__KERNEL__ */
 
 
+#undef CONFIG_SUPPORT_CFI_ENTRY_VALUE
+#if 1
+#define CONFIG_SUPPORT_CFI_ENTRY_VALUE 1
+#endif
+
+#ifdef CONFIG_SUPPORT_CFI_ENTRY_VALUE
+#include <hybrid/atomic.h>
+
+#include <libcfientry/entry_value.h>
+#ifdef __KERNEL__
+#include <kernel/driver.h>
+#else /* __KERNEL__ */
+#include <dlfcn.h>
+#endif /* !__KERNEL__ */
+#endif /* CONFIG_SUPPORT_CFI_ENTRY_VALUE */
+
+
 DECL_BEGIN
 
 PRIVATE WUNUSED NONNULL((2)) bool
@@ -605,6 +622,88 @@ err_invalid_register:
 err_illegal_instruction:
 	return UNWIND_EMULATOR_ILLEGAL_INSTRUCTION;
 }
+
+
+#ifdef CONFIG_SUPPORT_CFI_ENTRY_VALUE
+
+#ifdef __KERNEL__
+#undef LIBCFIENTRY_LIBRARY_NAME
+#define LIBCFIENTRY_LIBRARY_NAME "cfientry"
+#define LIBRARY_T                REF struct driver
+#define LOADLIBRARY(name)        driver_insmod(name)
+#define FREELIBRARY(lib)         decref(lib)
+#define GETSYMBOL(lib, name)     driver_symbol(lib, name)
+#else /* __KERNEL__ */
+#define LIBRARY_T            void
+#define LOADLIBRARY(name)    dlopen(name, RTLD_GLOBAL)
+#define FREELIBRARY(lib)     dlclose(lib)
+#define GETSYMBOL(lib, name) dlsym(lib, name)
+#endif /* !__KERNEL__ */
+
+
+/* XXX: The way that this hook is designed in kernel-space makes it
+ *      impossible for the user to manually rmmod(1) the `modcfientry'
+ *      once it's been loaded! */
+PRIVATE LIBRARY_T *libcfientry = NULL;
+PRIVATE PCFIENTRY_RUN_UNWIND_EMULATOR pdyn_cfientry_run_unwind_emulator = NULL;
+
+PRIVATE bool CC load_libcfientry(void) {
+#ifdef __KERNEL__
+	NESTED_TRY
+#endif /* __KERNEL__ */
+	{
+		LIBRARY_T *lib, *real_lib;
+		lib = LOADLIBRARY(LIBCFIENTRY_LIBRARY_NAME);
+#ifndef __KERNEL__
+		if unlikely(!lib)
+			return false;
+#endif /* !__KERNEL__ */
+		real_lib = ATOMIC_CMPXCH_VAL(libcfientry, NULL, lib);
+		if unlikely(real_lib != NULL) {
+			FREELIBRARY(lib);
+			lib = real_lib;
+		}
+		/* Try to load the 1 symbol we need from the library. */
+		*(void **)&pdyn_cfientry_run_unwind_emulator = GETSYMBOL(lib, "cfientry_run_unwind_emulator");
+	}
+#ifdef __KERNEL__
+	EXCEPT {
+		return false;
+	}
+#endif /* __KERNEL__ */
+	return likely(pdyn_cfientry_run_unwind_emulator != NULL);
+}
+
+PRIVATE NONNULL((1)) unsigned int CC
+dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
+	unsigned int result;
+	uintptr_t length;
+	byte_t const *start_pc, *end_pc;
+	length   = dwarf_decode_uleb128(&self->ue_pc);
+	start_pc = self->ue_pc;
+	end_pc   = self->ue_pc + length;
+	/* Verify that the PC value fits into the current program bounds. */
+	if unlikely(start_pc > end_pc ||
+	            end_pc < self->ue_pc_start ||
+	            end_pc > self->ue_pc_end)
+		return UNWIND_EMULATOR_ILLEGAL_INSTRUCTION;
+	self->ue_pc = end_pc; /* Set-up the return-pc for later. */
+
+	/* Ensure that libcfientry has been loaded. */
+	if (!pdyn_cfientry_run_unwind_emulator) {
+		if unlikely(!load_libcfientry()) {
+			/* If we can't get libcfientry to load, act like we
+			 * don't know the `DW_OP_entry_value' instruction. */
+			return UNWIND_EMULATOR_UNKNOWN_INSTRUCTION;
+		}
+	}
+
+	/* Dispatch the call to its own library. */
+	result = (*pdyn_cfientry_run_unwind_emulator)(self, start_pc, end_pc);
+	return result;
+}
+#endif /* CONFIG_SUPPORT_CFI_ENTRY_VALUE */
+
 
 
 /* Execute the CFI expression loaded into the given unwind-emulator `SELF'.
@@ -1491,6 +1590,24 @@ do_read_bit_pieces:
 			++stacksz;
 		}	break;
 
+#ifdef CONFIG_SUPPORT_CFI_ENTRY_VALUE
+		CASE(DW_OP_entry_value)
+		CASE(DW_OP_GNU_entry_value) {
+			unsigned int error;
+			self->ue_pc      = pc;
+			self->ue_stacksz = stacksz;
+			/* Dispatch the instruction. */
+			error = dispatch_DW_OP_entry_value(self);
+			if unlikely(error != UNWIND_SUCCESS) {
+				self->ue_pc      = pc - 1;
+				self->ue_stacksz = stacksz;
+				return error;
+			}
+			pc      = self->ue_pc;
+			stacksz = self->ue_stacksz;
+		}	break;
+#endif /* CONFIG_SUPPORT_CFI_ENTRY_VALUE */
+
 		default:
 			ERRORF(err_unknown_instruction, "opcode = %#.2I8x (%p/%p/%p/%Iu)\n%$[hex]\n",
 			       opcode, pc - 1, self->ue_pc_start, self->ue_pc_end,
@@ -1899,7 +2016,12 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 		dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		break;
 
-	case DW_OP_implicit_value: {
+	case DW_OP_implicit_value:
+#ifdef CONFIG_SUPPORT_CFI_ENTRY_VALUE
+	case DW_OP_entry_value:
+	case DW_OP_GNU_entry_value:
+#endif /* CONFIG_SUPPORT_CFI_ENTRY_VALUE */
+	{
 		dwarf_uleb128_t size;
 		size = dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		unwind_pc += size;

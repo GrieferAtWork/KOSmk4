@@ -108,6 +108,7 @@ BEGIN
 
 //	DEFINE_SIMPLE_ARCH_LIBRARY("libstdc++")
 	DEFINE_SIMPLE_ARCH_LIBRARY("libunwind", USELIB("libdl"))
+	DEFINE_SIMPLE_ARCH_LIBRARY("libcfientry", USELIB("libunwind") USELIB("libdl"))
 	DEFINE_SIMPLE_ARCH_LIBRARY("librpc")
 	DEFINE_SIMPLE_ARCH_LIBRARY("libregdump", USELIB("libdl"))
 	DEFINE_SIMPLE_ARCH_LIBRARY("libcpustate")

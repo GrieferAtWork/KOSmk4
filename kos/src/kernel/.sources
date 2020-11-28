@@ -94,31 +94,35 @@ BEGIN
 //			"-fPIC", /* Not needed, and would produce slower code... */
 		})
 
-#define DEFINE_SIMPLE_DRIVER(name, ...)                    \
+#define DEFINE_SIMPLE_DRIVER_EX(source_prefix, name, ...)  \
 		BEGIN GROUP("mod." name) { COMPILE, LINK, MCOPY }; \
 			SET_OUTPUT("/os/drivers/" name)                \
 			LD_FLAGS({ "-soname=" name })                  \
-			SOURCE({ "mod" name "/" "*.c" })               \
+			SOURCE({ source_prefix name "/" "*.c" })       \
 			__VA_ARGS__                                    \
 		END
-#define DEFINE_SIMPLE_ARCH_DRIVER(name)                         \
-		BEGIN GROUP("mod." name) { COMPILE };                   \
-			SET_LANGUAGE("assembler-with-cpp")                  \
-			SOURCE({ "mod" name "/arch/" + XARCH_ASMFILES })    \
-		END                                                     \
-		BEGIN GROUP("mod." name) { COMPILE };                   \
-			SOURCE({ "mod" name "/" "*.c" })                    \
-			SOURCE({ "mod" name "/arch/" + XARCH + "/" "*.c" }) \
-		END                                                     \
-		BEGIN GROUP("mod." name) { LINK, MCOPY };               \
-			SET_OUTPUT("/os/drivers/" name)                     \
-			LD_FLAGS({ "-soname=" name })                       \
-			SOURCE({                                            \
-				"mod" name "/" "*.c",                           \
-				"mod" name "/arch/" + XARCH + "/" "*.c",        \
-				"mod" name "/arch/" + XARCH_ASMFILES,           \
-			})                                                  \
+#define DEFINE_SIMPLE_ARCH_DRIVER_EX(source_prefix, name)               \
+		BEGIN GROUP("mod." name) { COMPILE };                           \
+			SET_LANGUAGE("assembler-with-cpp")                          \
+			SOURCE({ source_prefix name "/arch/" + XARCH_ASMFILES })    \
+		END                                                             \
+		BEGIN GROUP("mod." name) { COMPILE };                           \
+			SOURCE({ source_prefix name "/" "*.c" })                    \
+			SOURCE({ source_prefix name "/arch/" + XARCH + "/" "*.c" }) \
+		END                                                             \
+		BEGIN GROUP("mod." name) { LINK, MCOPY };                       \
+			SET_OUTPUT("/os/drivers/" name)                             \
+			LD_FLAGS({ "-soname=" name })                               \
+			SOURCE({                                                    \
+				source_prefix name "/" "*.c",                           \
+				source_prefix name "/arch/" + XARCH + "/" "*.c",        \
+				source_prefix name "/arch/" + XARCH_ASMFILES,           \
+			})                                                          \
 		END
+#define DEFINE_SIMPLE_DRIVER(name, ...)         DEFINE_SIMPLE_DRIVER_EX("mod", name, __VA_ARGS__)
+#define DEFINE_SIMPLE_DRIVER_LIBRARY(name, ...) DEFINE_SIMPLE_DRIVER_EX("../lib", name, __VA_ARGS__)
+#define DEFINE_SIMPLE_ARCH_DRIVER(name)         DEFINE_SIMPLE_ARCH_DRIVER_EX("mod", name)
+#define DEFINE_SIMPLE_ARCH_DRIVER_LIBRARY(name) DEFINE_SIMPLE_ARCH_DRIVER_EX("../lib", name)
 
 		DEFINE_SIMPLE_DRIVER("ext2fs")
 		DEFINE_SIMPLE_DRIVER("iso9660")
@@ -129,6 +133,7 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("usb-hid", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
+		DEFINE_SIMPLE_ARCH_DRIVER_LIBRARY("cfientry")
 		DEFINE_SIMPLE_DRIVER("dbx") /* DeBug eXtensions */
 
 		if (TARGET_ARCH in ["i386", "x86_64"]) {
