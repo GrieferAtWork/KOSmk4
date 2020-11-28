@@ -35,8 +35,28 @@
  * So... Add the second slash manually to work around that. */
 #define __ASM_ARG(x)     \x
 #endif /* !__TPP_VERSION__ */
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#ifdef __PREPROCESSOR_HAVE_STR
 #define __ASM_LINE2(...) #__VA_ARGS__ "\n\t"
+#else /* __PREPROCESSOR_HAVE_STR */
+#define __ASM_LINE2(...) "__VA_ARGS__" "\n\t"
+#endif /* !__PREPROCESSOR_HAVE_STR */
 #define __ASM_L(...)     __ASM_LINE2(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#ifdef __PREPROCESSOR_HAVE_STR
+#define __ASM_LINE2(line...) #line "\n\t"
+#else /* __PREPROCESSOR_HAVE_STR */
+#define __ASM_LINE2(line...) "line" "\n\t"
+#endif /* !__PREPROCESSOR_HAVE_STR */
+#define __ASM_L(line...)     __ASM_LINE2(line)
+#else /* ... */
+#ifdef __PREPROCESSOR_HAVE_STR
+#define __ASM_LINE2(line) #line "\n\t"
+#else /* __PREPROCESSOR_HAVE_STR */
+#define __ASM_LINE2(line) "line" "\n\t"
+#endif /* !__PREPROCESSOR_HAVE_STR */
+#define __ASM_L(line)     __ASM_LINE2(line)
+#endif /* !... */
 #elif defined(__INTELLISENSE__)
 #define __ASM_BEGIN      /* nothing */
 #define __ASM_END        /* nothing */
@@ -46,13 +66,25 @@
 #define __ASM_BEGIN      /* nothing */
 #define __ASM_END        /* nothing */
 #define __ASM_ARG(x)     x
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __ASM_L(...)     __VA_ARGS__ ;
-#else
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __ASM_L(line...) line ;
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define __ASM_L(line)    line ;
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#else /* ... */
 #define __ASM_BEGIN      /* nothing */
 #define __ASM_END        /* nothing */
 #define __ASM_ARG(x)     /* nothing */
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __ASM_L(...)     /* nothing */
-#endif
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __ASM_L(line...) /* nothing */
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define __ASM_L(line)    /* nothing */
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#endif /* !... */
 
 
 #endif /* !__GUARD_HYBRID___ASM_H */

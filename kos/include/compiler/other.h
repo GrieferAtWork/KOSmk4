@@ -17,6 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef __PP_STR
+#include "pp-generic.h"
+#endif /* !__PP_STR */
 
 #ifdef __ASSEMBLY__
 #if __ASSEMBLY__+0 == 0
@@ -264,7 +267,11 @@
 #define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
 #define __NO_builtin_choose_expr
 #define __NO_builtin_types_compatible_p
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __builtin_types_compatible_p(...)
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define __builtin_types_compatible_p(T1,T2)
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #undef __builtin_assume_has_sideeffects
 #define __builtin_assume(x)     /* nothing */
 #define __builtin_unreachable() /* nothing */

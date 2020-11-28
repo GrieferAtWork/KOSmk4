@@ -21,9 +21,14 @@
 #include "../__stdinc.h"
 #ifndef __CC__
 #define __assertion_failed(expr_str)                            /* nothing */
-#define __assertion_failedf(expr_str, ...)                      /* nothing */
 #define __assertion_failed_at(expr_str, file, line, func)       /* nothing */
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __assertion_failedf(expr_str, ...)                      /* nothing */
 #define __assertion_failedf_at(expr_str, file, line, func, ...) /* nothing */
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_failedf(expr_str, format...)                      /* nothing */
+#define __assertion_failedf_at(expr_str, file, line, func, format...) /* nothing */
+#endif /* ... */
 #else /* !__CC__ */
 #include "../features.h"
 #include "../__crt.h"
@@ -112,20 +117,40 @@ __LIBC __ATTR_COLD __BOOL (__VLIBCCALL __acheck)(char const *__expr, char const 
 
 #ifdef __CRT_HAVE___acheckf
 __LIBC __ATTR_COLD __BOOL (__VLIBCCALL __acheckf)(char const *__expr, char const *__file, unsigned int __line, char const *__func, char const *__format, ...) __CASMNAME_SAME("__acheckf");
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __assertion_checkf(expr_str, ...)                      (__NAMESPACE_INT_SYM __acheckf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), __VA_ARGS__)
 #define __assertion_checkf_at(expr_str, file, line, func, ...) (__NAMESPACE_INT_SYM __acheckf)(expr_str, file, line, func, __VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_checkf(expr_str, format...)                      (__NAMESPACE_INT_SYM __acheckf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), format)
+#define __assertion_checkf_at(expr_str, file, line, func, format...) (__NAMESPACE_INT_SYM __acheckf)(expr_str, file, line, func, format)
+#endif /* ... */
 #elif defined(__assertion_check)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __assertion_checkf(expr_str, ...)                      __assertion_check(expr_str)
 #define __assertion_checkf_at(expr_str, file, line, func, ...) __assertion_check_at(expr_str, file, line, func)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_checkf(expr_str, format...)                      __assertion_check(expr_str)
+#define __assertion_checkf_at(expr_str, file, line, func, format...) __assertion_check_at(expr_str, file, line, func)
+#endif /* ... */
 #endif /* __CRT_HAVE___acheckf */
 
 #ifdef __CRT_HAVE___afailf
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__VLIBCCALL __afailf)(char const *__expr, char const *__file, unsigned int __line, char const *__func, char const *__format, ...) __CASMNAME_SAME("__afailf");
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __assertion_failedf(expr_str, ...)                      (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), __VA_ARGS__)
 #define __assertion_failedf_at(expr_str, file, line, func, ...) (__NAMESPACE_INT_SYM __afailf)(expr_str, file, line, func, __VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_failedf(expr_str, format...)                      (__NAMESPACE_INT_SYM __afailf)(expr_str, __FILE__, __LINE__, __builtin_FUNCTION(), format)
+#define __assertion_failedf_at(expr_str, file, line, func, format...) (__NAMESPACE_INT_SYM __afailf)(expr_str, file, line, func, format)
+#endif /* ... */
 #else /* __CRT_HAVE___afailf */
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __assertion_failedf(expr_str, ...)                      __assertion_failed(expr_str)
 #define __assertion_failedf_at(expr_str, file, line, func, ...) __assertion_failed_at(expr_str, file, line, func)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertion_failedf(expr_str, format...)                      __assertion_failed(expr_str)
+#define __assertion_failedf_at(expr_str, file, line, func, format...) __assertion_failed_at(expr_str, file, line, func)
+#endif /* ... */
 #endif /* !__CRT_HAVE___afailf */
 
 __NAMESPACE_INT_END

@@ -31,7 +31,7 @@ __SYSDECL_BEGIN
 typedef __locale_t locale_t;
 #endif /* !__locale_t_defined */
 #ifdef __USE_DOS
-//typedef __locale_t __locale_t; /* ??? */
+/*typedef __locale_t __locale_t; * ??? */
 #endif /* __USE_DOS */
 #endif /* __CC__ */
 

@@ -127,8 +127,8 @@
 
 #define DECL_BEGIN          __DECL_BEGIN
 #define DECL_END            __DECL_END
-//#define SYSDECL_BEGIN     __SYSDECL_BEGIN /* Not defined to discourage use in anything but system headers. */
-//#define SYSDECL_END       __SYSDECL_END
+/*#define SYSDECL_BEGIN     __SYSDECL_BEGIN * Not defined to discourage use in anything but system headers. */
+/*#define SYSDECL_END       __SYSDECL_END*/
 #define ASMNAME             __ASMNAME
 #define XBLOCK              __XBLOCK
 #define XRETURN             __XRETURN
@@ -159,17 +159,17 @@
 #define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __COMPILER_REDIRECT_WSUPPRESS_BEGIN __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code) __REDIRECT_WSUPPRESS_END
 #define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __COMPILER_REDIRECT_WSUPPRESS_BEGIN __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code) __REDIRECT_WSUPPRESS_END
 #else /* __REDIRECT_WSUPPRESS_BEGIN */
-#define REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)
-#define REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)
-#define VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)
-#define VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)
-#define VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
-#define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
-#define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)
-#define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)
+#define REDIRECT        __COMPILER_REDIRECT
+#define REDIRECT_VOID   __COMPILER_REDIRECT_VOID
+#define VREDIRECT       __COMPILER_VREDIRECT
+#define VREDIRECT_VOID  __COMPILER_VREDIRECT_VOID
+#define VFREDIRECT      __COMPILER_VFREDIRECT
+#define VFREDIRECT_VOID __COMPILER_VFREDIRECT_VOID
+#define XREDIRECT       __COMPILER_XREDIRECT
+#define XREDIRECT_VOID  __COMPILER_XREDIRECT_VOID
 #endif /* !__REDIRECT_WSUPPRESS_BEGIN */
-#define EIDECLARE(attr,Treturn,nothrow,cc,name,param,...)          __COMPILER_EIDECLARE(attr,Treturn,nothrow,cc,name,param,__VA_ARGS__)
-#define EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,...) __COMPILER_EIREDIRECT(attr,Treturn,nothrow,cc,name,param,asmname,__VA_ARGS__)
+#define EIDECLARE  __COMPILER_EIDECLARE
+#define EIREDIRECT __COMPILER_EIREDIRECT
 
 /* Preprocessor macros */
 #define PP_PRIVATE_STR  __PP_PRIVATE_STR

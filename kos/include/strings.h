@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79e213ad */
+/* HASH CRC-32:0xc449bf3c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,9 @@
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
@@ -375,7 +378,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,explicit_bzero,(void *__buf, size_t __num_bytes)
 __NAMESPACE_LOCAL_USING_OR_IMPL(explicit_bzero, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBCCALL explicit_bzero)(void *__buf, size_t __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(explicit_bzero))(__buf, __num_bytes); })
 #endif /* !... */
 #endif /* __USE_KOS || __USE_GNU || __USE_BSD */
-#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads! */
 #ifdef __USE_MISC
 #undef __PRIVATE_bzero_3
@@ -390,9 +393,13 @@ __SYSDECL_BEGIN
 #endif /* !__USE_KOS */
 #define __PRIVATE_bzero_3   (bzero)
 #undef bzero
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define bzero(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (args))(args)
+#endif /* ... */
 #endif /* __USE_MISC */
-#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS && __HYBRID_PP_VA_OVERLOAD */
 
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K8) || defined(__USE_XOPEN2K8XSI)
 #ifndef __ffs_defined

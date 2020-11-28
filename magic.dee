@@ -392,6 +392,25 @@ function main(argv: {string...}) {
 					CONFIG_EMULATOR_USED = none;
 					break;
 
+				case "--lint":
+					options.setdefault(OPT_COMPILE_SECONDARY, [])
+						.append("lint=" + value);
+					/* Configure clang-tidy macros and options. */
+					{
+						local mac = options.setdefault(OPT_COMPILE_MACROS, Dict());
+						mac["__KOS__"] = "1";
+						mac["__ELF__"] = "1";
+						if (TARGET_ARCH !is bound)
+							loadMissingSettings();
+						mac["__" + TARGET_ARCH + "__"] = "1";
+					}
+					options.setdefault(OPT_COMPILE_LINT_ARGS, []).extend({
+						"-Ikos/include/i386-kos", /* FIXME: Don't hardcode here! */
+						"-Ikos/include",
+					});
+					CONFIG_EMULATOR_USED = none;
+					break;
+
 				default:
 					goto _err_unknown_argument;
 				}

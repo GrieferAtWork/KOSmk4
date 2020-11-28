@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8580a166 */
+/* HASH CRC-32:0x52aea46c */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -243,11 +243,16 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROW_CC error_throw)(error_cod
 /* Throw an exception and load `argc' pointers from varargs */
 __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_code_t __code, unsigned int ___argc, ...) __THROWS(...) __CASMNAME_SAME("error_thrown");
 #endif /* !__error_thrown_defined && __CRT_HAVE_error_thrown */
+#ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code
 #define __PRIVATE_THROW_PACKAGE_CODE2       ERROR_CODE
 #define __PRIVATE_THROW_PACKAGE_CODEN2(n)   __PRIVATE_THROW_PACKAGE_CODE##n
 #define __PRIVATE_THROW_PACKAGE_CODEN(n)    __PRIVATE_THROW_PACKAGE_CODEN2(n)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __PRIVATE_THROW_PACKAGE_CODE(...)   __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __PRIVATE_THROW_PACKAGE_CODE(args...) __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(args))(args)
+#endif /* ... */
 
 #ifdef __error_throw_defined
 #define __PRIVATE_THROW1(code) error_throw(__PRIVATE_THROW_PACKAGE_CODE code)
@@ -266,7 +271,12 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_c
 #endif /* __error_thrown_defined */
 #define __PRIVATE_THROW_N2(n) __PRIVATE_THROW##n
 #define __PRIVATE_THROW_N(n)  __PRIVATE_THROW_N2(n)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define THROW(...)            __PRIVATE_THROW_N(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define THROW(args...)        __PRIVATE_THROW_N(__HYBRID_PP_VA_NARGS(args))(args)
+#endif /* ... */
+#endif /* __HYBRID_PP_VA_NARGS */
 #endif /* !THROW */
 
 #ifndef was_thrown
@@ -283,11 +293,17 @@ __LIBC __ATTR_COLD __ATTR_NORETURN void (__ERROR_THROWN_CC error_thrown)(error_c
 #ifndef __PRIVATE_WAS_THROWN_PACKAGE_CODE2
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE2(class, subclass) __arch_error_code_eq(ERROR_CODE(class, subclass))
 #endif /* !__PRIVATE_WAS_THROWN_PACKAGE_CODE2 */
+#ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)              __PRIVATE_WAS_THROWN_PACKAGE_CODE##n
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN(n)               __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE(...)              __PRIVATE_WAS_THROWN_PACKAGE_CODEX(__PRIVATE_WAS_THROWN_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __PRIVATE_WAS_THROWN_PACKAGE_CODE(args...)          __PRIVATE_WAS_THROWN_PACKAGE_CODEX(__PRIVATE_WAS_THROWN_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(args))(args))
+#endif /* ... */
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEX(x)               x
 #define was_thrown(code)                                    __PRIVATE_WAS_THROWN_PACKAGE_CODE code
+#endif /* __HYBRID_PP_VA_NARGS */
 #endif /* !was_thrown */
 #endif /* !__INTELLISENSE__ */
 #if !defined(__error_nesting_begin_defined) && defined(__CRT_HAVE_error_nesting_begin)

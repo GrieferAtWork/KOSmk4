@@ -52,7 +52,11 @@ __NAMESPACE_INT_END
 #endif /* __assertion_failedf */
 #endif /* !NDEBUG */
 #ifndef __hybrid_assertf
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __hybrid_assertf(expr, ...) __hybrid_assert(expr)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __hybrid_assertf(expr, format...) __hybrid_assert(expr)
+#endif /* ... */
 #endif /* !__hybrid_assertf */
 #endif /* !__hybrid_assert */
 
@@ -60,7 +64,11 @@ __NAMESPACE_INT_END
 #define __hybrid_assertion_failed(message) __hybrid_assert(!message)
 #endif /* !__hybrid_assertion_failed */
 #ifndef __hybrid_assertion_failedf
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __hybrid_assertion_failedf(message, ...) __hybrid_assertf(!message, __VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __hybrid_assertion_failedf(message, format...) __hybrid_assertf(!message, format)
+#endif /* ... */
 #endif /* !__hybrid_assertion_failedf */
 
 

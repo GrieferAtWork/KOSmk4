@@ -144,10 +144,10 @@
 #define __PRIVATE_IUTF8   0
 #endif /* !__IUTF8 */
 #endif /* !__PRIVATE_IUTF8 */
-#define __TTYDEF_IFLAG                                                          \
-	(/* ISTRIP | /* Don't turn this on by default... - Ever heard of unicode?*/ \
-	 __PRIVATE_BRKINT | __PRIVATE_ICRNL | __PRIVATE_IMAXBEL |                   \
-	 __PRIVATE_IXON | __PRIVATE_IXANY |                                         \
+#define __TTYDEF_IFLAG                                                         \
+	(/* ISTRIP | * Don't turn this on by default... - Ever heard of unicode?*/ \
+	 __PRIVATE_BRKINT | __PRIVATE_ICRNL | __PRIVATE_IMAXBEL |                  \
+	 __PRIVATE_IXON | __PRIVATE_IXANY |                                        \
 	 __PRIVATE_IUTF8 /* Turn on UTF-8 support by default! */)
 #endif /* !__TTYDEF_IFLAG */
 
@@ -166,10 +166,10 @@
 #define __PRIVATE_ONLCR   0
 #endif /* !__ONLCR */
 #endif /* !__PRIVATE_ONLCR */
-#define __TTYDEF_OFLAG                                                               \
-	(__PRIVATE_OPOST | __PRIVATE_ONLCR                                               \
-	 /*| XTABS /* Not needed (apparently this converts tabs to spaces, though I have \
-	            * no idea how termios should know how many spaces...) */)
+#define __TTYDEF_OFLAG                                                              \
+	(__PRIVATE_OPOST | __PRIVATE_ONLCR                                              \
+	 /*| XTABS * Not needed (apparently this converts tabs to spaces, though I have \
+	           * no idea how termios should know how many spaces...) */)
 #endif /* !__TTYDEF_OFLAG */
 
 #ifndef __TTYDEF_LFLAG
@@ -275,7 +275,7 @@
 #endif /* !__PRIVATE_HUPCL */
 #define __TTYDEF_CFLAG                                      \
 	(__PRIVATE_CREAD | __PRIVATE_PARENB | __PRIVATE_HUPCL | \
-	 __PRIVATE_CS8 /* | CS7 /* Get with the times! Characters are now 8-bit! Unicode FTW! */)
+	 __PRIVATE_CS8 /* | CS7 * Get with the times! Characters are now 8-bit! Unicode FTW! */)
 #endif /* !__TTYDEF_CFLAG */
 
 

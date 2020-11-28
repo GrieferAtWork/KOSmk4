@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68f81f3c */
+/* HASH CRC-32:0xd18cd1da */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6372,7 +6372,7 @@ __NOTHROW_NCX(__mstrndupa_init)(void *__buf, char const *__restrict __string, __
 /* Without X-blocks, it's impossible to prevent multiple evaluations of the `string' argument... */
 #define mstrdupa(string) \
 	__mstrdupa_init(__malloca((__NAMESPACE_STD_SYM strlen(string) + 1) * sizeof(char)), string)
-#define strndupa(string, maxlen) \
+#define mstrndupa(string, maxlen) \
 	__mstrndupa_init(__malloca((__NAMESPACE_STD_SYM strnlen(string, maxlen) + 1) * sizeof(char)), string, maxlen)
 #else /* __NO_XBLOCK */
 #ifdef __malloca_mayfail
@@ -8227,7 +8227,7 @@ __NOTHROW_NCX(__strndupa_init)(void *__restrict __buf, char const *__restrict __
 #endif /* __USE_GNU && __hybrid_alloca */
 
 
-#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads:
  * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
  * >> void *memcpy(void *dst, void const *src, size_t elem_count, size_t elem_size);
@@ -8260,7 +8260,11 @@ __SYSDECL_BEGIN
 #endif /* !__USE_KOS */
 #define __PRIVATE_bzero_3   (bzero)
 #undef bzero
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define bzero(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (args))(args)
+#endif /* ... */
 #endif /* __USE_MISC */
 #ifdef __USE_KOS
 #define __PRIVATE_memcpy_4  memcpyc
@@ -8282,12 +8286,21 @@ __SYSDECL_BEGIN
 #define __PRIVATE_memmove_3 (memmove)
 #undef memcpy
 #undef memmove
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define memcpy(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__)
 #define memmove(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define memcpy(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (args))(args)
+#define memmove(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (args))(args)
+#endif /* ... */
 #ifdef __USE_GNU
 #define __PRIVATE_mempcpy_3 (mempcpy)
 #undef mempcpy
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define mempcpy(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempcpy_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define mempcpy(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempcpy_, (args))(args)
+#endif /* ... */
 #endif /* __USE_GNU */
 #ifdef __USE_KOS
 #define __PRIVATE_mempmove_4     mempmovec
@@ -8305,13 +8318,21 @@ __SYSDECL_BEGIN
 #undef mempmovedown
 #undef memmoveup
 #undef memmovedown
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define mempmove(...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmove_, (__VA_ARGS__))(__VA_ARGS__)
 #define mempmoveup(...)   __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmoveup_, (__VA_ARGS__))(__VA_ARGS__)
 #define mempmovedown(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmovedown_, (__VA_ARGS__))(__VA_ARGS__)
 #define memmoveup(...)    __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmoveup_, (__VA_ARGS__))(__VA_ARGS__)
 #define memmovedown(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmovedown_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define mempmove(args...)     __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmove_, (args))(args)
+#define mempmoveup(args...)   __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmoveup_, (args))(args)
+#define mempmovedown(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_mempmovedown_, (args))(args)
+#define memmoveup(args...)    __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmoveup_, (args))(args)
+#define memmovedown(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmovedown_, (args))(args)
+#endif /* ... */
 #endif /* __USE_KOS */
-#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS && __HYBRID_PP_VA_OVERLOAD */
 
 
 #if defined(__USE_BSD) || defined(__USE_KOS)

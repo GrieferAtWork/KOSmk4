@@ -33,16 +33,11 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#define __LIBM_LOCAL_DECLARE_BEGIN __NAMESPACE_LOCAL_BEGIN
-#define __LIBM_LOCAL_DECLARE_END   __NAMESPACE_LOCAL_END
-#define __LIBM_LOCAL_DECLARE(T, name, value) \
-	__LOCAL_LIBC_CONST_DATA(libm_##name)     \
-	T const __libm_##name = value;
-#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n, ...) \
-	__LOCAL_LIBC_CONST_DATA(libm_##name)            \
-	T const __libm_##name[n] = __VA_ARGS__;
-#define __LIBM_LOCAL_VALUE(name) \
-	__NAMESPACE_LOCAL_SYM __libm_##name
+#define __LIBM_LOCAL_DECLARE_BEGIN             __NAMESPACE_LOCAL_BEGIN
+#define __LIBM_LOCAL_DECLARE_END               __NAMESPACE_LOCAL_END
+#define __LIBM_LOCAL_DECLARE(T, name, value)   __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name = value;
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) __LOCAL_LIBC_CONST_DATA(libm_##name) T const __libm_##name[n] = 
+#define __LIBM_LOCAL_VALUE(name)               __NAMESPACE_LOCAL_SYM __libm_##name
 
 /* NOTE: Heavy modifications were made to the original fdlibm! */
 /*
@@ -58,7 +53,7 @@ __DECL_BEGIN
 
 #ifdef __IEEE754_FLOAT_TYPE__
 
-//#define __LIBM_HIGH_ORDER_BIT_IS_SET_FOR_SNAN 1 /* ??? */
+/*#define __LIBM_HIGH_ORDER_BIT_IS_SET_FOR_SNAN 1 * ??? */
 
 #ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
 #define __LIBM_FLT_UWORD_IS_FINITE(x)   1
@@ -331,11 +326,11 @@ typedef union {
 
 __DECL_END
 #else /* __CC__ */
-#define __LIBM_LOCAL_DECLARE_BEGIN                  /* nothing */
-#define __LIBM_LOCAL_DECLARE_END                    /* nothing */
-#define __LIBM_LOCAL_DECLARE(T, name, value)        /* nothing */
-#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n, ...) /* nothing */
-#define __LIBM_LOCAL_VALUE(name)                    /* nothing */
+#define __LIBM_LOCAL_DECLARE_BEGIN             /* nothing */
+#define __LIBM_LOCAL_DECLARE_END               /* nothing */
+#define __LIBM_LOCAL_DECLARE(T, name, value)   /* nothing */
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) /* nothing */
+#define __LIBM_LOCAL_VALUE(name)               /* nothing */
 #endif /* !__CC__ */
 
 /* double __LIBM_MATHFUN(KEYWORD name, double x) */

@@ -17,6 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef __PP_STR
+#include "pp-generic.h"
+#endif /* !__PP_STR */
+
 #ifndef __option
 #define __option(x) 0
 #endif /* !__option */
@@ -94,7 +98,13 @@
 
 #if !__has_builtin(__builtin_types_compatible_p)
 #define __NO_builtin_types_compatible_p
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __builtin_types_compatible_p(...) 1
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __builtin_types_compatible_p(types...) 1
+#else /* ... */
+#define __builtin_types_compatible_p(T1, T2) 1
+#endif /* !... */
 #endif /* !__has_builtin(__builtin_types_compatible_p) */
 
 #ifdef __STDC__
@@ -239,11 +249,22 @@
 #elif defined(noreturn)
 #define __ATTR_NORETURN_IS_NORETURN
 #define __ATTR_NORETURN noreturn
-#elif (!defined(__KOS_SYSTEM_HEADERS__) && \
-       (defined(__NO_has_include) || __has_include(<stdnoreturn.h>))
+#elif !defined(__KOS_SYSTEM_HEADERS__)
+#ifdef __NO_has_include
 #include <stdnoreturn.h>
 #define __ATTR_NORETURN_IS_NORETURN
 #define __ATTR_NORETURN noreturn
+#else /* __NO_has_include */
+#if __has_include(<stdnoreturn.h>)
+#include <stdnoreturn.h>
+#define __ATTR_NORETURN_IS_NORETURN
+#define __ATTR_NORETURN noreturn
+#endif /* __has_include(<stdnoreturn.h>) */
+#endif /* !__NO_has_include */
+#ifndef __ATTR_NORETURN
+#define __NO_ATTR_NORETURN
+#define __ATTR_NORETURN /* Nothing */
+#endif /* !__ATTR_NORETURN */
 #else /* ... */
 #define __NO_ATTR_NORETURN
 #define __ATTR_NORETURN /* Nothing */
@@ -675,7 +696,13 @@
 #define __XRETURN /* Nothing */
 #else /* ... */
 #define __NO_XBLOCK
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __XBLOCK(...) do __VA_ARGS__ while(0)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __XBLOCK(expr...) do expr while(0)
+#else /* ... */
+#define __XBLOCK(expr) do expr while(0)
+#endif /* !... */
 #define __XRETURN /* Nothing */
 #endif /* !... */
 
@@ -689,10 +716,22 @@
 
 #if defined(__INTELLISENSE__)
 #elif defined(__TPP_VERSION__) || defined(__STDC__)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __pragma(...) _Pragma(#__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __pragma(command...) _Pragma(#command)
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define __pragma(command) _Pragma(#command)
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #else /* ... */
 #define __NO_pragma
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __pragma(...) /* Nothing */
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __pragma(command...) /* Nothing */
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define __pragma(command) /* Nothing */
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #endif /* !... */
 
 #if !__has_builtin(__builtin_assume)
@@ -805,7 +844,13 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 
 #if !__has_builtin(__builtin_prefetch)
 #define __NO_builtin_prefetch   1
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __builtin_prefetch(...) (void)0
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __builtin_prefetch(addr...) (void)0
+#else /* __PREPROCESSOR_HAVE_VA_ARGS */
+#define __builtin_prefetch(addr) (void)0
+#endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #endif /* !__builtin_prefetch */
 
 #ifndef __INTELLISENSE__

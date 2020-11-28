@@ -86,6 +86,13 @@
 #include <parts/waitmacros.h>
 #endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
+#if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
+#include <hybrid/__overflow.h>
+#ifndef __cplusplus
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__cplusplus */
+#endif /* __USE_KOS && __USE_STRING_OVERLOADS */
+
 __SYSDECL_BEGIN
 
 #ifdef __RAND_MAX
@@ -2216,34 +2223,50 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 %} /* extern "C++" */
 %[insert:function(realloc = reallocarray, externLinkageOverride: "C++")]
 %[insert:function(recalloc = recallocv, externLinkageOverride: "C++")]
-%#else /* __cplusplus */
+%#elif defined(__HYBRID_PP_VA_OVERLOAD)
 %{
 #ifdef __malloc_defined
 #define __PRIVATE_malloc_1 (malloc)
 #define __PRIVATE_malloc_2 __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallocv)
 #undef malloc
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define malloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloc_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define malloc(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_malloc_, (args))(args)
+#endif /* ... */
 #endif /* __malloc_defined */
 #ifdef __calloc_defined
 #define __PRIVATE_calloc_1(num_bytes) (calloc)(1, num_bytes)
 #define __PRIVATE_calloc_2            (calloc)
 #undef calloc
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define calloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloc_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define calloc(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_calloc_, (args))(args)
+#endif /* ... */
 #endif /* __calloc_defined */
 #if defined(__realloc_defined) && defined(__reallocarray_defined)
 #define __PRIVATE_realloc_2 (realloc)
 #define __PRIVATE_realloc_3 (reallocarray)
 #undef realloc
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define realloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_realloc_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define realloc(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_realloc_, (args))(args)
+#endif /* ... */
 #endif /* __realloc_defined && __reallocarray_defined */
 #if defined(__recalloc_defined) && defined(__recallocv_defined)
 #define __PRIVATE_recalloc_2 (recalloc)
 #define __PRIVATE_recalloc_3 (recallocv)
 #undef recalloc
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define recalloc(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_recalloc_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define recalloc(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_recalloc_, (args))(args)
+#endif /* ... */
 #endif /* __recalloc_defined && __recallocv_defined */
 }
-%#endif /* !__cplusplus */
+%#endif /* ... */
 %#endif /* !__MALLOC_OVERLOADS_DEFINED */
 %#endif /* __USE_STRING_OVERLOADS */
 %#endif /* __USE_KOS */

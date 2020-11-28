@@ -678,11 +678,11 @@
 #define __LOCAL_LIBC_DATA(name)
 #define __LOCAL_LIBC_CONST_DATA(name)
 
-#define __LIBM_LOCAL_DECLARE_BEGIN                  namespace __local_imp {
-#define __LIBM_LOCAL_DECLARE_END                    }
-#define __LIBM_LOCAL_DECLARE(T, name, value)        T const __libm_##name;
-#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n, ...) T const __libm_##name[n];
-#define __LIBM_LOCAL_VALUE(name)                    ::__local_imp::__libm_##name
+#define __LIBM_LOCAL_DECLARE_BEGIN             namespace __local_imp {
+#define __LIBM_LOCAL_DECLARE_END               }
+#define __LIBM_LOCAL_DECLARE(T, name, value)   T const __libm_##name;
+#define __LIBM_LOCAL_DECLARE_ARRAY(T, name, n) T const __libm_##name[n] =
+#define __LIBM_LOCAL_VALUE(name)               ::__local_imp::__libm_##name
 
 
 #define __ATTR_LIBC_PRINTF(a,b)

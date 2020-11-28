@@ -37,6 +37,11 @@
 #define __hybrid_max_c(...) __builtin_max(__VA_ARGS__)
 #define __hybrid_min(...)   __builtin_min(__VA_ARGS__)
 #define __hybrid_max(...)   __builtin_max(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __hybrid_min_c(args...) __builtin_min(args)
+#define __hybrid_max_c(args...) __builtin_max(args)
+#define __hybrid_min(args...)   __builtin_min(args)
+#define __hybrid_max(args...)   __builtin_max(args)
 #else /* __PREPROCESSOR_HAVE_VA_ARGS */
 #define __hybrid_min_c __builtin_min
 #define __hybrid_max_c __builtin_max
@@ -208,16 +213,24 @@ for (local name: ["__hybrid_min", "__hybrid_max", "__hybrid_min_c", "__hybrid_ma
 
 #ifndef __hybrid_min
 #ifdef __HYBRID_PP_VA_OVERLOAD
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __hybrid_min_c(...) __HYBRID_PP_VA_OVERLOAD(__hybrid_min_c, (__VA_ARGS__))(__VA_ARGS__)
 #define __hybrid_max_c(...) __HYBRID_PP_VA_OVERLOAD(__hybrid_max_c, (__VA_ARGS__))(__VA_ARGS__)
 #define __hybrid_min(...)   __HYBRID_PP_VA_OVERLOAD(__hybrid_min, (__VA_ARGS__))(__VA_ARGS__)
 #define __hybrid_max(...)   __HYBRID_PP_VA_OVERLOAD(__hybrid_max, (__VA_ARGS__))(__VA_ARGS__)
-#else /* __HYBRID_PP_VA_OVERLOAD */
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __hybrid_min_c(args...) __HYBRID_PP_VA_OVERLOAD(__hybrid_min_c, (args))(args)
+#define __hybrid_max_c(args...) __HYBRID_PP_VA_OVERLOAD(__hybrid_max_c, (args))(args)
+#define __hybrid_min(args...)   __HYBRID_PP_VA_OVERLOAD(__hybrid_min, (args))(args)
+#define __hybrid_max(args...)   __HYBRID_PP_VA_OVERLOAD(__hybrid_max, (args))(args)
+#endif /* ... */
+#endif /* __HYBRID_PP_VA_OVERLOAD */
+#ifndef __hybrid_min
 #define __hybrid_min_c __hybrid_min_c2
 #define __hybrid_max_c __hybrid_max_c2
 #define __hybrid_min   __hybrid_min2
 #define __hybrid_max   __hybrid_max2
-#endif /* !__HYBRID_PP_VA_OVERLOAD */
+#endif /* !__hybrid_min */
 #endif /* !__hybrid_min */
 
 #endif /* !__GUARD_HYBRID___MINMAX_H */

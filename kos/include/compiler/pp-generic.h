@@ -19,7 +19,11 @@
  */
 
 
-#if (1 || defined(_MSC_VER) || defined(__GNUC__) ||          \
+#if defined(__LCLINT__)
+#define __PREPROCESSOR_HAVE_CAT           /* #define CAT(a, b) a##b */
+#define __PREPROCESSOR_HAVE_STR           /* #define STR(x) #x */
+#define __PREPROCESSOR_HAVE_NAMED_VA_ARGS /* #define FOO(a...) */
+#elif (1 || defined(_MSC_VER) || defined(__GNUC__) ||          \
      defined(__TPP_VERSION__) || defined(__DCC_VERSION__) || \
      defined(__DEEMON__))
 #define __PREPROCESSOR_HAVE_CAT     /* #define CAT(a, b) a##b */
@@ -40,6 +44,9 @@
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __PP_PRIVATE_STR(...) #__VA_ARGS__
 #define __PP_STR(...)         __PP_PRIVATE_STR(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __PP_PRIVATE_STR(str...) #str
+#define __PP_STR(str...)         __PP_PRIVATE_STR(str)
 #else /* ... */
 #define __PP_PRIVATE_STR(x) #x
 #define __PP_STR(x)         __PP_PRIVATE_STR(x)

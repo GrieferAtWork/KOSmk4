@@ -21,6 +21,7 @@
 #define _I386_KOS_KOS_ASM_SYSCALL_H 1
 
 #include <__stdinc.h>
+#ifndef __LCLINT__
 #include <__crt.h>
 
 #define __X86_SYSCALL_EXISTS_PLACEHOLDER_0    ,
@@ -42,7 +43,6 @@
 #include <asm/syscalls.h>
 #endif /* !__NRFEAT_DEFINED_SYSCALL_REGISTER_COUNT */
 #define __CRT_HAVE_SC(name) __X86_SYSCALL_EXISTS(__NRRC_##name)
-
 
 #ifdef __KERNEL__
 #include <hybrid/host.h>
@@ -430,5 +430,6 @@ __SYSDECL_END
 #endif /* __CC__ */
 #endif /* __WANT_INLINE_SYSCALLS */
 #endif /* !__KERNEL__ */
+#endif /* !__LCLINT__ */
 
 #endif /* !_I386_KOS_KOS_ASM_SYSCALL_H */

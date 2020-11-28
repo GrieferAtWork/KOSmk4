@@ -42,6 +42,7 @@
 #define __NOPREEMPT     /* Annotation for functions that may only be called with preemption disabled. */
 #define __NOCONNECT     /* Annotation for functions which may only be called when the calling
                          * thread isn't already connected to a signal. (only affects kernel-space) */
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __THROWS(...)   /* Annotation for the set of error codes/classes/sub-classes that may be thrown by a function.
                          * You may include `...' as a possible error code to indicate that the function
                          * is also allowed to throw any other kind of exception, usually indicative of
@@ -53,6 +54,9 @@
                          * meaning that technically speaking, `E_SEGFAULT' would also imply `...').
                          * Any function that isn't `__NOTHROW()' is still always allowed to throw any error
                          * that isn't apart of the `__THROWS()' set. */
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __THROWS(e...)  /* ... */
+#endif /* ... */
 #define __THROWING      /* Use in place of __NOTHROW() for the same effect as `__THROWS(...)' */
 
 

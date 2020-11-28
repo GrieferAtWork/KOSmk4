@@ -1387,11 +1387,16 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 
 
 %{
+#ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_THROW_PACKAGE_CODE1(code) code
 #define __PRIVATE_THROW_PACKAGE_CODE2       ERROR_CODE
 #define __PRIVATE_THROW_PACKAGE_CODEN2(n)   __PRIVATE_THROW_PACKAGE_CODE##n
 #define __PRIVATE_THROW_PACKAGE_CODEN(n)    __PRIVATE_THROW_PACKAGE_CODEN2(n)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __PRIVATE_THROW_PACKAGE_CODE(...)   __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __PRIVATE_THROW_PACKAGE_CODE(args...) __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(args))(args)
+#endif /* ... */
 
 #ifdef __error_throw_defined
 #define __PRIVATE_THROW1(code) error_throw(__PRIVATE_THROW_PACKAGE_CODE code)
@@ -1410,7 +1415,12 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 #endif /* __error_thrown_defined */
 #define __PRIVATE_THROW_N2(n) __PRIVATE_THROW##n
 #define __PRIVATE_THROW_N(n)  __PRIVATE_THROW_N2(n)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define THROW(...)            __PRIVATE_THROW_N(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define THROW(args...)        __PRIVATE_THROW_N(__HYBRID_PP_VA_NARGS(args))(args)
+#endif /* ... */
+#endif /* __HYBRID_PP_VA_NARGS */
 #endif /* !THROW */
 
 #ifndef was_thrown
@@ -1427,11 +1437,17 @@ void error_thrown(error_code_t code, unsigned int _argc, ...);
 #ifndef __PRIVATE_WAS_THROWN_PACKAGE_CODE2
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE2(class, subclass) __arch_error_code_eq(ERROR_CODE(class, subclass))
 #endif /* !__PRIVATE_WAS_THROWN_PACKAGE_CODE2 */
+#ifdef __HYBRID_PP_VA_NARGS
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)              __PRIVATE_WAS_THROWN_PACKAGE_CODE##n
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEN(n)               __PRIVATE_WAS_THROWN_PACKAGE_CODEN2(n)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODE(...)              __PRIVATE_WAS_THROWN_PACKAGE_CODEX(__PRIVATE_WAS_THROWN_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(__VA_ARGS__))(__VA_ARGS__))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __PRIVATE_WAS_THROWN_PACKAGE_CODE(args...)          __PRIVATE_WAS_THROWN_PACKAGE_CODEX(__PRIVATE_WAS_THROWN_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(args))(args))
+#endif /* ... */
 #define __PRIVATE_WAS_THROWN_PACKAGE_CODEX(x)               x
 #define was_thrown(code)                                    __PRIVATE_WAS_THROWN_PACKAGE_CODE code
+#endif /* __HYBRID_PP_VA_NARGS */
 #endif /* !was_thrown */
 }
 

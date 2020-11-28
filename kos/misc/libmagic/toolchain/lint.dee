@@ -1,0 +1,215 @@
+/* Copyright (c) 2019-2020 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2020 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from ..libmagic;
+import * from ..steps.c;
+import * from .gcc;
+import ipc;
+import fs;
+
+function printCurrentLocation(location: (string, string, string | none), text: string) {
+	print(location[0], "(", location[1]),;
+	if (location[2] !is none)
+		print(",", location[2]),;
+	print(") : "),;
+	local lowerText = text.lower();
+	if ("error" in lowerText) {
+		print("error : "),;
+	} else if ("warning" in lowerText) {
+		print("warning : "),;
+	} else if ("not parseable" in lowerText) {
+		print("error : "),;
+	} else if ("invalid character" in lowerText) {
+		print("error : "),;
+	} else if ("already defined" in lowerText) {
+		print("warning : "),;
+	} else if ("to ignore" in lowerText) {
+		print("warning : "),;
+	} else if ("have incompatible types" in lowerText) {
+		print("warning : "),;
+	} else if ("arrow access field of non-struct or union" in lowerText) {
+		print("warning : "),;
+	} else if ("passed storage" in lowerText && "not completely" in lowerText) {
+		print("warning : "),;
+	} else if ("declared with inconsistent type" in lowerText) {
+		print("warning : "),;
+	}
+	print(". ".join(text.strip().splitlines(false)));
+}
+
+function joinLintAndTeeOutputIntoLioFile(
+		lintProc: ipc.Process,
+		lioFile: string,
+		lintStdout: ipc.Pipe,
+		FORMAT_ERRORS: bool) {
+	local teeBuffer;
+	try {
+		teeBuffer = File.Writer();
+		lintStdout = File.Buffer(lintStdout, "ro,c,none");
+		local currentLocation: (string, string, string | none) | none = none;
+		local currentLocationText: File | none = none;
+		
+		for (local l: lintStdout) {
+			teeBuffer.write(l);
+			local strippedLine = l.strip();
+			if (strippedLine.startswith("Splint "))
+				continue;
+			if (!strippedLine)
+				continue;
+			if (FORMAT_ERRORS) {
+				if (strippedLine.startswith("In file included from ")) {
+					try {
+						local filename, line = strippedLine.scanf("In file included from %[^:]:%[^,:]")...;
+						print normalizeFilenameForLog(filename.decode("utf-8")),;
+						print "(",;
+						print line.strip().rstrip(","),;
+						print "): In file included from here...";
+						continue;
+					} catch (...) {
+					}
+				} else if (l.startswith("     ") && strippedLine.startswith("from ")) {
+					try {
+						local filename, line = strippedLine.scanf("from %[^:]:%[^:]")...;
+						print normalizeFilenameForLog(filename.decode("utf-8")),;
+						print "(",;
+						print line.rstrip().rstrip(",").rstrip(),;
+						print "): ... Which was included here";
+						continue;
+					} catch (...) {
+					}
+				}
+				if (!l.startswith(" ")) {
+					/* Check if this is a location prefix. */
+					try {
+						local filename, line, col;
+						try {
+							filename, line, col = strippedLine.scanf("%[^:]:%[^:]:%[^]")...;
+						} catch (...) {
+							filename, line = strippedLine.scanf("%[^:]:%[^]")...;
+							col = none;
+						}
+						if (currentLocationText !is none)
+							printCurrentLocation(currentLocation, currentLocationText.string);
+						local tail = "";
+						if (col !is none && ":" in col) {
+							col, none, tail = col.partition(":")...;
+						} else if (col is none && ":" in line) {
+							line, none, tail = line.partition(":")...;
+						}
+						currentLocation = (
+							normalizeFilenameForLog(filename.decode("utf-8")),
+							line.strip(":").strip(),
+							col.strip(":").strip()
+						);
+						currentLocationText = File.Writer();
+						if (tail)
+							currentLocationText << tail.strip() << "\n";
+						continue;
+					} catch (...) {
+					}
+				} else if (currentLocationText !is none) {
+					currentLocationText << strippedLine << "\n";
+					continue;
+				}
+				if (currentLocationText !is none) {
+					printCurrentLocation(currentLocation, currentLocationText.string);
+					currentLocation = none;
+					currentLocationText = none;
+				}
+				print l.rstrip();
+			} else {
+				print l,;
+			}
+		}
+		if (currentLocationText !is none)
+			printCurrentLocation(currentLocation, currentLocationText.string);
+		lintStdout.close();
+	} catch (...) {
+		lintProc.terminate(1);
+		throw;
+	}
+	/* Join the lint process, and check its exit code. */
+	joinProcess(lintProc);
+	/* If lint didn't exit with an error status code,
+	 * write its entire stdout output into the liout file. */
+	with (local fp = File.open(lioFile, "wb"))
+		fp << teeBuffer.string;
+}
+
+function shouldRunLint(step: BoundStep, options: {string: Object}): bool {
+	local language = options.get(OPT_COMPILE_LANGUAGE);
+	if (language is none)
+		language = getLanguageFromExtension(fs.extof(step.userData));
+	return language in ["c", "c++"];
+}
+
+function createLintProcess(
+		step:         BoundStep,
+		toolchain:    Toolchain,
+		options:      {string: Object},
+		srcFile:      string,           /* "kos/src/kernel/core/arch/i386/boot/boot.c" */
+		lioFile:      string,           /* "build/i386-kos-nOD/kernel/kos.src.kernel.core.arch.i386.boot.boot.c.liout" */
+		depFile:      string,           /* "build/i386-kos-nOD/kernel/kos.src.kernel.core.arch.i386.boot.boot.c.MF" */
+		ccFlags:      {string...},      /* options.get(OPT_COMPILE_CCFLAGS) */
+		ppFlags:      {string...},      /* options.get(OPT_COMPILE_PPFLAGS) */
+		language:     string,           /* "c" */
+		incPath:      string,           /* { "kos/src/kernel/include/i386-kos", "kos/src/kernel/include" } */
+		macros:       {string: string}, /* { "__KOS__" : "1" } */
+		lintExe:      string            /* /path/to/lint.exe */
+		): Waitable {
+	if (language is none)
+		language = getLanguageFromExtension(fs.extof(srcFile));
+	local args = List(options.get(OPT_COMPILE_LINT_ARGS));
+	if (incPath) {
+		local len = #args;
+		for (local x: incPath)
+			args.insert(len, "-I" + x);
+	}
+	args.extend({
+		/* Ignore some warnings by default */
+		"-fixedformalarray", /* Yes! I _do_ want to use arrays in parameters! (readability???) */
+		"-usedef",           /* Causes wrong warnings in asm/intrin.h */
+		"-paramuse",         /* Causes wrong warnings in asm/intrin.h */
+		"+boolint",          /* Yes: allow use of 0/1 as boolean constants! */
+	});
+	if (macros)
+		args.extend(constructMacroDefinitions(macros));
+	local proc = ipc.Process(lintExe, { args..., srcFile });
+	local r, w = ipc.Pipe.new()...;
+	proc.stdout = w;
+	proc.stderr = w;
+	if (toolchain.config.VERBOSE)
+		print "Exec", repr proc.cmdline;
+	proc.start();
+	local thr;
+	try {
+		w.close();
+		thr = Thread(joinLintAndTeeOutputIntoLioFile, (
+			proc, lioFile, r, toolchain.config.FORMAT_ERRORS));
+		thr.start();
+	} catch (...) {
+		proc.terminate(1);
+		throw;
+	}
+	return WaitableJoin(thr);
+}
+
+

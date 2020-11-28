@@ -30,6 +30,7 @@
 #elif defined(__USE_KOS) || defined(__USE_ISOCXX17)
 /* Emulate `static_assert()' such that the message becomes optional. */
 #include <hybrid/pp/__va_nargs.h>
+#ifdef __HYBRID_PP_VA_OVERLOAD
 #define __PRIVATE_static_assert_1(a) __STATIC_ASSERT(a)
 #define __PRIVATE_static_assert_2(a, msg) __STATIC_ASSERT_MSG(a, msg)
 #define __PRIVATE_static_assert_3(a, b, msg) __STATIC_ASSERT_MSG((a, b), msg)
@@ -39,7 +40,16 @@
 #define __PRIVATE_static_assert_7(a, b, c, d, e, f, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f), msg)
 #define __PRIVATE_static_assert_8(a, b, c, d, e, f, g, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f, g), msg)
 #define __PRIVATE_static_assert_9(a, b, c, d, e, f, g, h, msg) __STATIC_ASSERT_MSG((a, b, c, d, e, f, g, h), msg)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define static_assert(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_static_assert_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define static_assert(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_static_assert_, (args))(args)
+#else /* ... */
+#define static_assert __STATIC_ASSERT_MSG
+#endif /* !... */
+#else /* __HYBRID_PP_VA_OVERLOAD */
+#define static_assert __STATIC_ASSERT_MSG
+#endif /* !__HYBRID_PP_VA_OVERLOAD */
 #elif (__has_feature(cxx_static_assert) ||                                                                \
        (defined(__cpp_static_assert) && __cpp_static_assert + 0 != 0) ||                                  \
        (__GCC_VERSION_NUM >= 40300 && (defined(__GXX_EXPERIMENTAL_CXX0X__) || __cplusplus >= 201103L)) || \
@@ -110,31 +120,54 @@
 #define __do_assert(expr, expr_str)        __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; }))
 #define __do_assert0(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failed(expr_str), 0)))
 #define __do_asserta(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; }))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __do_assertf(expr, expr_str, ...)  __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; }))
 #define __do_assert0f(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
 #define __do_assertaf(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; }))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __do_assertf(expr, expr_str, format...)  __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, format)); (void)0; }))
+#define __do_assert0f(expr, expr_str, format...) __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, format), 0)))
+#define __do_assertaf(expr, expr_str, format...) __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, format)); (void)0; }))
+#endif /* ... */
 #else /* __NO_builtin_expect */
 #define __do_assert(expr, expr_str)        __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_check(expr_str)); (void)0; }))
 #define __do_assert0(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0)))
 #define __do_asserta(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_check(expr_str)); (void)0; }))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __do_assertf(expr, expr_str, ...)  __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; }))
 #define __do_assert0f(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
 #define __do_assertaf(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; }))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __do_assertf(expr, expr_str, format...)  __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, format)); (void)0; }))
+#define __do_assert0f(expr, expr_str, format...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, format), 0)))
+#define __do_assertaf(expr, expr_str, format...) __do_cassert_wrapper(expr, expr_str, __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, format)); (void)0; }))
+#endif /* ... */
 #endif /* !__NO_builtin_expect */
 #else /* __USE_KOS_KERNEL */
 #ifdef __NO_builtin_expect
 #define __do_assert(expr, expr_str)        __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failed(expr_str), 0)))
 #define __do_assert0(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failed(expr_str), 0)))
 #define __do_asserta(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failed(expr_str), 0)))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __do_assertf(expr, expr_str, ...)  __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
 #define __do_assertaf(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __do_assertf(expr, expr_str, format...)  __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, format), 0)))
+#define __do_assertaf(expr, expr_str, format...) __do_cassert_wrapper(expr, expr_str, (void)(!!(expr) || (__assertion_failedf(expr_str, format), 0)))
+#endif /* ... */
 #else /* __NO_builtin_expect */
 #define __do_assert(expr, expr_str)        __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0)))
 #define __do_assert0(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0)))
 #define __do_asserta(expr, expr_str)       __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0)))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __do_assertf(expr, expr_str, ...)  __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
 #define __do_assert0f(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
 #define __do_assertaf(expr, expr_str, ...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0)))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __do_assertf(expr, expr_str, format...)  __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, format), 0)))
+#define __do_assert0f(expr, expr_str, format...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, format), 0)))
+#define __do_assertaf(expr, expr_str, format...) __do_cassert_wrapper(expr, expr_str, (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, format), 0)))
+#endif /* ... */
 #endif /* !__NO_builtin_expect */
 #endif /* !__USE_KOS_KERNEL */
 #else /* __do_cassert_wrapper */
@@ -143,31 +176,54 @@
 #define __do_assert(expr, expr_str)        __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; })
 #define __do_assert0(expr, expr_str)       (void)(!!(expr) || (__assertion_failed(expr_str), 0))
 #define __do_asserta(expr, expr_str)       __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_check(expr_str)); (void)0; })
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __do_assertf(expr, expr_str, ...)  __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; })
 #define __do_assert0f(expr, expr_str, ...) (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
 #define __do_assertaf(expr, expr_str, ...) __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; })
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __do_assertf(expr, expr_str, format...)  __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, format)); (void)0; })
+#define __do_assert0f(expr, expr_str, format...) (void)(!!(expr) || (__assertion_failedf(expr_str, format), 0))
+#define __do_assertaf(expr, expr_str, format...) __XBLOCK({ do if __untraced(expr) break; while __untraced(__assertion_checkf(expr_str, format)); (void)0; })
+#endif /* ... */
 #else /* __NO_builtin_expect */
 #define __do_assert(expr, expr_str)        __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_check(expr_str)); (void)0; })
 #define __do_assert0(expr, expr_str)       (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0))
 #define __do_asserta(expr, expr_str)       __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_check(expr_str)); (void)0; })
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __do_assertf(expr, expr_str, ...)  __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; })
 #define __do_assert0f(expr, expr_str, ...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
 #define __do_assertaf(expr, expr_str, ...) __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, __VA_ARGS__)); (void)0; })
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __do_assertf(expr, expr_str, format...)  __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, format)); (void)0; })
+#define __do_assert0f(expr, expr_str, format...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, format), 0))
+#define __do_assertaf(expr, expr_str, format...) __XBLOCK({ do if __untraced(__builtin_expect(!!(expr), 1)) break; while __untraced(__assertion_checkf(expr_str, format)); (void)0; })
+#endif /* ... */
 #endif /* !__NO_builtin_expect */
 #else /* __USE_KOS_KERNEL */
 #ifdef __NO_builtin_expect
 #define __do_assert(expr, expr_str)        (void)(!!(expr) || (__assertion_failed(expr_str), 0))
 #define __do_assert0(expr, expr_str)       (void)(!!(expr) || (__assertion_failed(expr_str), 0))
 #define __do_asserta(expr, expr_str)       (void)(!!(expr) || (__assertion_failed(expr_str), 0))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __do_assertf(expr, expr_str, ...)  (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
 #define __do_assertaf(expr, expr_str, ...) (void)(!!(expr) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __do_assertf(expr, expr_str, format...)  (void)(!!(expr) || (__assertion_failedf(expr_str, format), 0))
+#define __do_assertaf(expr, expr_str, format...) (void)(!!(expr) || (__assertion_failedf(expr_str, format), 0))
+#endif /* ... */
 #else /* __NO_builtin_expect */
 #define __do_assert(expr, expr_str)        (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0))
 #define __do_assert0(expr, expr_str)       (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0))
 #define __do_asserta(expr, expr_str)       (void)(__builtin_expect(!!(expr), 1) || (__assertion_failed(expr_str), 0))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __do_assertf(expr, expr_str, ...)  (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
 #define __do_assert0f(expr, expr_str, ...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
 #define __do_assertaf(expr, expr_str, ...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, __VA_ARGS__), 0))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __do_assertf(expr, expr_str, format...)  (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, format), 0))
+#define __do_assert0f(expr, expr_str, format...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, format), 0))
+#define __do_assertaf(expr, expr_str, format...) (void)(__builtin_expect(!!(expr), 1) || (__assertion_failedf(expr_str, format), 0))
+#endif /* ... */
 #endif /* !__NO_builtin_expect */
 #endif /* !__USE_KOS_KERNEL */
 #endif /* !__do_cassert_wrapper */

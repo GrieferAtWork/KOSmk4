@@ -23,6 +23,9 @@
 #ifdef __USE_XOPEN2K8
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#include <hybrid/pp/__va_nargs.h>
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
 }%[insert:prefix(
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
@@ -98,7 +101,7 @@ void explicit_bzero(void *buf, size_t num_bytes) {
 
 
 %{
-#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+#if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads! */
 #ifdef __USE_MISC
 #undef __PRIVATE_bzero_3
@@ -113,9 +116,13 @@ __SYSDECL_BEGIN
 #endif /* !__USE_KOS */
 #define __PRIVATE_bzero_3   (bzero)
 #undef bzero
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define bzero(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (args))(args)
+#endif /* ... */
 #endif /* __USE_MISC */
-#endif /* !__cplusplus && __USE_STRING_OVERLOADS */
+#endif /* !__cplusplus && __USE_STRING_OVERLOADS && __HYBRID_PP_VA_OVERLOAD */
 }
 
 %

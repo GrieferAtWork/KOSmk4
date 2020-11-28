@@ -68,6 +68,9 @@ final global OPT_COMPILE_CLANG_TIDY_ARGS: string = "COMPILE.clang-tidy.args";
 @@Option: {string...}
 @@Additional arguments to pass as compiler arguments to clang-tidy
 final global OPT_COMPILE_CLANG_TIDY_CC_ARGS: string = "COMPILE.clang-tidy.args.cc";
+@@Option: {string...}
+@@Additional arguments to pass to lint
+final global OPT_COMPILE_LINT_ARGS: string = "COMPILE.lint.args";
 @@Option: string
 @@Override for the output location of the object file
 @@NOTE: When set, only a single object file may be created by COMPILE
@@ -290,6 +293,7 @@ final local function COMPILE_split(self: BoundStep): {BoundStep...} {
 }
 
 global _saved_clang_tidy_module;
+global _saved_lint_module;
 final local function COMPILE_run(self: BoundStep): {Waitable...} {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
@@ -364,6 +368,26 @@ final local function COMPILE_run(self: BoundStep): {Waitable...} {
 				);
 			}
 		}
+		if (x.startswith("lint=")) {
+			if (_saved_lint_module !is bound)
+				_saved_lint_module = import("..toolchain.lint");
+			if (_saved_lint_module.shouldRunLint(self, options)) {
+				yield _saved_lint_module.createLintProcess(
+					step:         self,
+					toolchain:    toolchain,
+					options:      options,
+					srcFile:      srcFile,
+					lioFile:      config.getBuildArtifact(group, srcFile, ".liout"),
+					depFile:      config.getDependencyFilename(group, srcFile),
+					ccFlags:      options.get(OPT_COMPILE_CCFLAGS),
+					ppFlags:      options.get(OPT_COMPILE_PPFLAGS),
+					language:     options.get(OPT_COMPILE_LANGUAGE),
+					incPath:      group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
+					macros:       options.get(OPT_COMPILE_MACROS),
+					lintExe:      x[5:]
+				);
+			}
+		}
 	}
 }
 
@@ -416,6 +440,12 @@ final local function COMPILE_getProducedFiles(self: BoundStep): {string...} {
 			if (_saved_clang_tidy_module.shouldRunClangTidy(self, options))
 				yield config.getBuildArtifact(group, srcFile, ".ctout");
 		}
+		if (x.startswith("lint=")) {
+			if (_saved_lint_module !is bound)
+				_saved_lint_module = import("..toolchain.lint");
+			if (_saved_lint_module.shouldRunLint(self, options))
+				yield config.getBuildArtifact(group, srcFile, ".liout");
+		}
 	}
 }
 final local function COMPILE_getProducedOutputFiles(self: BoundStep): {string...} {
@@ -440,6 +470,12 @@ final local function COMPILE_getProducedOutputFiles(self: BoundStep): {string...
 				_saved_clang_tidy_module = import("..toolchain.clang_tidy");
 			if (_saved_clang_tidy_module.shouldRunClangTidy(self, options))
 				yield config.getBuildArtifact(group, srcFile, ".ctout");
+		}
+		if (x.startswith("lint=")) {
+			if (_saved_lint_module !is bound)
+				_saved_lint_module = import("..toolchain.lint");
+			if (_saved_lint_module.shouldRunLint(self, options))
+				yield config.getBuildArtifact(group, srcFile, ".liout");
 		}
 	}
 }

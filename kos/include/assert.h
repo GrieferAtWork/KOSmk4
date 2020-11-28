@@ -52,59 +52,106 @@
 #endif /* __USE_KOS */
 #elif defined(NDEBUG)
 #ifdef __NO_builtin_assume
-#define assert(expr)          (void)0
-#define __assert0(expr)       (void)0
-#define __asserta(expr)       (void)0
+#define assert(expr)    (void)0
+#define __assert0(expr) (void)0
+#define __asserta(expr) (void)0
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __assertf(expr, ...)  (void)0
 #define __assertaf(expr, ...) (void)0
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertf(expr, format...)  (void)0
+#define __assertaf(expr, format...) (void)0
+#endif /* ... */
 #ifdef __USE_KOS
-#define assert0(expr)         (void)0
-#define asserta(expr)         (void)0
-#define assertf(expr, ...)    (void)0
-#define assertaf(expr, ...)   (void)0
-#define assert_failed(...)    __builtin_unreachable()
+#define assert0(expr) (void)0
+#define asserta(expr) (void)0
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define assertf(expr, ...)  (void)0
+#define assertaf(expr, ...) (void)0
+#define assert_failed(...)  __builtin_unreachable()
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define assertf(expr, format...)  (void)0
+#define assertaf(expr, format...) (void)0
+#define assert_failed(format...)  __builtin_unreachable()
+#endif /* ... */
 #endif /* __USE_KOS */
 #else /* __NO_builtin_assume */
 #if defined(CONFIG_ASSERT_ASSUME_EVERYTHING) || defined(ASSERT_ASSUME_EVERYTHING)
-#define assert(expr)          __builtin_assume(!!(expr))
-#define __assert0(expr)       __builtin_assume(!!(expr))
-#define __assertf(expr, ...)  __builtin_assume(!!(expr))
+#define assert(expr)         __builtin_assume(!!(expr))
+#define __assert0(expr)      __builtin_assume(!!(expr))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __assertf(expr, ...) __builtin_assume(!!(expr))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertf(expr, format...) __builtin_assume(!!(expr))
+#endif /* ... */
 #ifdef __USE_KOS
-#define assert0(expr)         __builtin_assume(!!(expr))
-#define assertf(expr, ...)    __builtin_assume(!!(expr))
+#define assert0(expr)      __builtin_assume(!!(expr))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define assertf(expr, ...) __builtin_assume(!!(expr))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define assertf(expr, format...) __builtin_assume(!!(expr))
+#endif /* ... */
 #endif /* __USE_KOS */
 #else /* CONFIG_ASSERT_ASSUME_EVERYTHING || ASSERT_ASSUME_EVERYTHING */
-#define assert(expr)          (void)0
-#define __assert0(expr)       (void)0
-#define __assertf(expr, ...)  (void)0
+#define assert(expr)    (void)0
+#define __assert0(expr) (void)0
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define __assertf(expr, ...) (void)0
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertf(expr, format...) (void)0
+#endif /* ... */
 #ifdef __USE_KOS
-#define assert0(expr)         (void)0
-#define assertf(expr, ...)    (void)0
+#define assert0(expr) (void)0
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define assertf(expr, ...) (void)0
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define assertf(expr, format...) (void)0
+#endif /* ... */
 #endif /* __USE_KOS */
 #endif /* !CONFIG_ASSERT_ASSUME_EVERYTHING && !ASSERT_ASSUME_EVERYTHING */
-#define __asserta(expr)       __builtin_assume(!!(expr))
+#define __asserta(expr) __builtin_assume(!!(expr))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __assertaf(expr, ...) __builtin_assume(!!(expr))
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertaf(expr, format...) __builtin_assume(!!(expr))
+#endif /* ... */
 #ifdef __USE_KOS
-#define asserta(expr)         __builtin_assume(!!(expr))
-#define assertaf(expr, ...)   __builtin_assume(!!(expr))
-#define assert_failed(...)    __builtin_unreachable()
+#define asserta(expr) __builtin_assume(!!(expr))
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define assertaf(expr, ...) __builtin_assume(!!(expr))
+#define assert_failed(...)  __builtin_unreachable()
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define assertaf(expr, format...) __builtin_assume(!!(expr))
+#define assert_failed(format...)  __builtin_unreachable()
+#endif /* ... */
 #endif /* __USE_KOS */
 #endif /* !__NO_builtin_assume */
 #else /* NDEBUG */
 #ifndef __do_assert
 #include "parts/assert.h"
 #endif /* !__do_assert */
-#define assert(expr)          __do_assert(expr, #expr)
-#define __assert0(expr)       __do_assert0(expr, #expr)
-#define __asserta(expr)       __do_asserta(expr, #expr)
+#define assert(expr)    __do_assert(expr, #expr)
+#define __assert0(expr) __do_assert0(expr, #expr)
+#define __asserta(expr) __do_asserta(expr, #expr)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __assertf(expr, ...)  __do_assertf(expr, #expr, __VA_ARGS__)
 #define __assertaf(expr, ...) __do_assertaf(expr, #expr, __VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define __assertf(expr, format...)  __do_assertf(expr, #expr, format)
+#define __assertaf(expr, format...) __do_assertaf(expr, #expr, format)
+#endif /* ... */
 #ifdef __USE_KOS
-#define assert0(expr)         __do_assert0(expr, #expr)
-#define asserta(expr)         __do_asserta(expr, #expr)
-#define assertf(expr, ...)    __do_assertf(expr, #expr, __VA_ARGS__)
-#define assertaf(expr, ...)   __do_assertaf(expr, #expr, __VA_ARGS__)
-#define assert_failed(...)    __assertion_failedf(__NULLPTR, __VA_ARGS__)
+#define assert0(expr) __do_assert0(expr, #expr)
+#define asserta(expr) __do_asserta(expr, #expr)
+#ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define assertf(expr, ...)  __do_assertf(expr, #expr, __VA_ARGS__)
+#define assertaf(expr, ...) __do_assertaf(expr, #expr, __VA_ARGS__)
+#define assert_failed(...)  __assertion_failedf(__NULLPTR, __VA_ARGS__)
+#elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define assertf(expr, format...)  __do_assertf(expr, #expr, format)
+#define assertaf(expr, format...) __do_assertaf(expr, #expr, format)
+#define assert_failed(format...)  __assertion_failedf(__NULLPTR, format)
+#endif /* ... */
 #endif /* __USE_KOS */
 #endif /* !NDEBUG */
 
