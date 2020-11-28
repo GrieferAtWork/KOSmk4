@@ -1597,13 +1597,13 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 	 *       `CTYPE_PRINTVALUE_FLAG_ONELINE' flag during the recursive calls to
 	 *       `ctype_printvalue()', since we only care if the next element can
 	 *       be printed without any line-feeds, and without overflowing the
-	 *       horiontal display area.
+	 *       horizontal display area.
 	 */
 	ssize_t temp, result = 0;
 	struct ctype *me = self->ct_typ;
 	uintptr_half_t kind = me->ct_kind;
 	switch (CTYPE_KIND_CLASSOF(kind)) {
-	
+
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_VOID):
 		FORMAT(DEBUGINFO_PRINT_FORMAT_PAREN_PREFIX);
 		PRINT("(");
@@ -1618,7 +1618,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 		PRINT("0");
 		FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 		break;
-	
+
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL): {
 		bool is_nonzero = false;
 		size_t i;
@@ -1637,7 +1637,9 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 		}
 		FORMAT(DEBUGINFO_PRINT_FORMAT_TRUEFALSE_SUFFIX);
 	}	break;
-	
+
+	/* TODO: CTYPE_KIND_IEEE754_FLOAT */
+
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
 		if ((CTYPE_KIND_SIZEOF(kind) <= sizeof(void *)) &&
 		    ((flags & (CTYPE_PRINTVALUE_FLAG_NOSTRINGPOINTER | CTYPE_PRINTVALUE_FLAG_NONAMEDPOINTER)) !=
@@ -1880,14 +1882,12 @@ print_integer_value_as_hex:
 				if ((data.im.firstline_indent + 1) > data.im.maxlinelen) {
 					/* Nope... */
 					do_multiline = true;
-					/* Check if we're allowed to omit the names of fields, and
-					 * if doing so  */
+					/* Check if we're allowed to omit the names of fields */
 					if (data.im.out_field_count <= 2 &&
 					    !(flags & (CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS |
 					               CTYPE_PRINTVALUE_FLAG_NOOMITSHORTFIELDS))) {
-						/* Nope. But we're allowed to omit field names, so try to
-						 *       do that in order to fit everything onto a single
-						 *       line. */
+						/* We're allowed to omit field names, so try to do that
+						 * in order to fit everything onto a single line. */
 						data.im.flags = flags | CTYPE_PRINTVALUE_FLAG_NOSTRUCTFIELDS;
 						data.im.firstline_indent = firstline_indent;
 						data.im.out_field_count  = 0;

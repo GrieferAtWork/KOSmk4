@@ -225,11 +225,14 @@
 #endif /* __clang__ || !__DARWIN_NO_LONG_LONG */
 /* For whatever reason, g++ refuses to allow trivially
  * constructible+copyable+etc. classes within unnamed structs:
- *     https://stackoverflow.com/questions/39069799/rules-for-anonymous-aggregates */
-#if !defined(__cplusplus) || defined(__INTELLISENSE__)
+ *     https://stackoverflow.com/questions/39069799/rules-for-anonymous-aggregates
+ * So be careful when using them, and use `__COMPILER_HAVE_TRANSPARENT_NONCLASS'
+ * to test for this special case. */
+#define __COMPILER_HAVE_TRANSPARENT_NONCLASS
+#if 1
 #define __COMPILER_HAVE_TRANSPARENT_STRUCT
 #define __COMPILER_HAVE_TRANSPARENT_UNION
-#endif /* !__cplusplus || __INTELLISENSE__ */
+#endif
 #endif /* __CC__ */
 #ifdef __cplusplus
 #define __COMPILER_ASM_BUFFER(T, s, p) (*(T(*)[s])(p))

@@ -71,52 +71,57 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifdef _sigev_data
+#define __PRIVATE_WAS_DEFINED__sigev_data
+#endif /* _sigev_data */
+#undef _sigev_data
+#undef _sigev_tid
+#undef sigev_notify_function
+#undef sigev_notify_attributes
+
 union __pthread_attr;
 struct __sigeventx32 /*[NAME(sigeventx32)][PREFIX(sigev_)]*/ {
 	union __sigvalx32 sigev_value;
 	__INT32_TYPE__    sigev_signo;
 	__INT32_TYPE__    sigev_notify;
 #if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-     defined(__COMPILER_HAVE_TRANSPARENT_UNION))
-#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION) &&  \
+     defined(__HYBRID_PTR32_IN_TRANSPARENT_STRUCT))
 	union {
-#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
-	union {
-		__UINT32_TYPE__ _sigev_data[(__SIGEVX32_MAX_SIZE - 12) / 4];
-		__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
-		                             * TID (pid_t) of the thread to receive the signal. */
-		struct {
-			__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sigev_notify_function,(union __sigvalx32 __val)); /* Function to start. */
-			__HYBRID_PTR32(union __pthread_attr)   sigev_notify_attributes;                          /* Thread attributes. */
+		union {
+			__UINT32_TYPE__ _sigev_data[(__SIGEVX32_MAX_SIZE - 12) / 4];
+			__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
+			                             * TID (pid_t) of the thread to receive the signal. */
+			struct {
+				__HYBRID_FUNCPTR32(void, __ATTR_CDECL, sigev_notify_function,(union __sigvalx32 __val)); /* Function to start. */
+				__HYBRID_PTR32(union __pthread_attr)   sigev_notify_attributes;                          /* Thread attributes. */
+			};
 		};
+#endif /* Transparent struct/union */
+		union {
+			__UINT32_TYPE__ _data[(__SIGEVX32_MAX_SIZE - 12) / 4];
+			__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
+			                       * TID (pid_t) of the thread to receive the signal. */
+			struct {
+				__HYBRID_FUNCPTR32(void, __ATTR_CDECL, _function,(union __sigvalx32 __val)); /* Function to start. */
+				__HYBRID_PTR32(union __pthread_attr)   _attribute;                           /* Thread attributes. */
+			} _sigev_thread;
+		} _sigev_un;
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION) &&  \
+     defined(__HYBRID_PTR32_IN_TRANSPARENT_STRUCT))
 	};
-#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
-	union {
-		__UINT32_TYPE__ _data[(__SIGEVX32_MAX_SIZE - 12) / 4];
-		__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
-		                       * TID (pid_t) of the thread to receive the signal. */
-		struct {
-			__HYBRID_FUNCPTR32(void, __ATTR_CDECL, _function,(union __sigvalx32 __val)); /* Function to start. */
-			__HYBRID_PTR32(union __pthread_attr)   _attribute;                           /* Thread attributes. */
-		} _sigev_thread;
-	} _sigev_un;
-	};
-#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
-#else /* __COMPILER_HAVE_TRANSPARENT_STRUCT && __COMPILER_HAVE_TRANSPARENT_UNION */
-	union {
-		__UINT32_TYPE__ _data[(__SIGEVX32_MAX_SIZE - 12) / 4];
-		__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
-		                       * TID (pid_t) of the thread to receive the signal. */
-		struct {
-			__HYBRID_FUNCPTR32(void, __ATTR_CDECL, _function,(union __sigvalx32 __val)); /* Function to start. */
-			__HYBRID_PTR32(union __pthread_attr)   _attribute;                           /* Thread attributes. */
-		} _sigev_thread;
-	} _sigev_un;
+#endif /* ... */
+#if (defined(__PRIVATE_WAS_DEFINED__sigev_data) ||   \
+     !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) || \
+     !defined(__COMPILER_HAVE_TRANSPARENT_UNION) ||  \
+     !defined(__HYBRID_PTR32_IN_TRANSPARENT_STRUCT))
+#undef __PRIVATE_WAS_DEFINED__sigev_data
 #define _sigev_data             _sigev_un._data
 #define _sigev_tid              _sigev_un._tid
 #define sigev_notify_function   _sigev_un._sigev_thread._function
 #define sigev_notify_attributes _sigev_un._sigev_thread._attribute
-#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT || !__COMPILER_HAVE_TRANSPARENT_UNION */
+#endif /* ... */
 };
 
 __DECL_END

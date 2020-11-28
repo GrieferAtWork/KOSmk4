@@ -33,6 +33,8 @@
 #define __HYBRID_PTR32(T) T *__ptr32
 #define __HYBRID_PTR64(T) T *__ptr64
 #endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
+#define __HYBRID_PTR32_IN_TRANSPARENT_STRUCT
+#define __HYBRID_PTR64_IN_TRANSPARENT_STRUCT
 #elif defined(__cplusplus)
 /* Use C++ features to implement fixed-length pointer types. */
 
@@ -80,6 +82,9 @@ template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T 
 }
 
 #if __SIZEOF_POINTER__ != 4
+#ifndef __COMPILER_HAVE_TRANSPARENT_NONCLASS
+#define __HYBRID_PTR32_IN_TRANSPARENT_STRUCT
+#endif /* !__COMPILER_HAVE_TRANSPARENT_NONCLASS */
 #define __HYBRID_FUNCPTR32(return, cc, name, args) __HYBRID_PTR32(return (cc *)args) name
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_USING
 /* Try to use `template using' in order to prevent `__HYBRID_PTR32()' from containing
@@ -101,6 +106,7 @@ __NAMESPACE_INT_END
 #endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #endif /* !__COMPILER_HAVE_CXX_TEMPLATE_USING */
 #else /* __SIZEOF_POINTER__ != 4 */
+#define __HYBRID_PTR32_IN_TRANSPARENT_STRUCT
 #define __HYBRID_FUNCPTR32(return, cc, name, args) return (cc *name)args
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __HYBRID_PTR32(...) __VA_ARGS__ *
@@ -110,6 +116,9 @@ __NAMESPACE_INT_END
 #endif /* __SIZEOF_POINTER__ == 4 */
 
 #if __SIZEOF_POINTER__ != 8
+#ifndef __COMPILER_HAVE_TRANSPARENT_NONCLASS
+#define __HYBRID_PTR64_IN_TRANSPARENT_STRUCT
+#endif /* !__COMPILER_HAVE_TRANSPARENT_NONCLASS */
 #define __HYBRID_FUNCPTR64(return, cc, name, args) __HYBRID_PTR64(return (cc *)args) name
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_USING
 /* Try to use `template using' in order to prevent `__HYBRID_PTR64()' from containing
@@ -131,6 +140,7 @@ __NAMESPACE_INT_END
 #endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
 #endif /* !__COMPILER_HAVE_CXX_TEMPLATE_USING */
 #else /* __SIZEOF_POINTER__ != 8 */
+#define __HYBRID_PTR64_IN_TRANSPARENT_STRUCT
 #define __HYBRID_FUNCPTR64(return, cc, name, args) return (cc *name)args
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
 #define __HYBRID_PTR64(...) __VA_ARGS__ *
@@ -147,6 +157,8 @@ __CXXDECL_END
  *           of proper width. */
 #include "typecore.h"
 
+#define __HYBRID_PTR32_IN_TRANSPARENT_STRUCT
+#define __HYBRID_PTR64_IN_TRANSPARENT_STRUCT
 #if __SIZEOF_POINTER__ == 4
 #define __HYBRID_FUNCPTR32(return, cc, name, args) return (cc *name)args
 #define __HYBRID_FUNCPTR64(return, cc, name, args) __ULONG64_TYPE__ name

@@ -111,112 +111,139 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifdef _si_data
+#define __PRIVATE_WAS_DEFINED__si_data
+#endif /* _si_data */
+#undef _si_data
+#undef __sig_si_pid
+#undef __sig_si_uid
+#undef __sig_si_sigval
+#undef __cld_si_pid
+#undef __cld_si_uid
+#undef si_pid
+#undef si_uid
+#undef si_timerid
+#undef si_overrun
+#undef si_status
+#undef si_utime
+#undef si_stime
+#undef si_value
+#undef si_int
+#undef si_ptr
+#undef si_addr
+#undef si_addr_lsb
+#undef si_lower
+#undef si_upper
+#undef si_band
+#undef si_fd
+#undef si_call_addr
+#undef si_syscall
+#undef si_arch
 struct __siginfox32_struct /*[NAME(siginfox32)][PREFIX(si_)]*/ {
 	__INT32_TYPE__ si_signo; /* Signal number. */
 	__INT32_TYPE__ si_errno; /* If non-zero, an errno value associated with this signal, as defined in <errno.h>. */
 	__INT32_TYPE__ si_code;  /* Signal code. */
-#if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-	defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION) &&  \
+     defined(__HYBRID_PTR32_IN_TRANSPARENT_STRUCT))
 	union {
-#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
-	union {
-		__INT32_TYPE__ _si_data[(__SIX32_MAX_SIZE / 4) - 3];
-		struct { /* kill(). */
-			__UINT32_TYPE__  si_pid; /* Sending process ID. */
-			__UINT32_TYPE__  si_uid; /* Real user ID of sending process. */
-		};
-		struct { /* POSIX.1b timers. */
-			__INT32_TYPE__ si_timerid; /* Timer ID. */
-			__INT32_TYPE__ si_overrun; /* Overrun count. */
-			union {
-				union __sigvalx32    si_value;   /* Signal value. */
-				__INT32_TYPE__       si_int;
-				__HYBRID_PTR32(void) si_ptr;
+		union {
+			__INT32_TYPE__ _si_data[(__SIX32_MAX_SIZE / 4) - 3];
+			struct { /* kill(). */
+				__UINT32_TYPE__  si_pid; /* Sending process ID. */
+				__UINT32_TYPE__  si_uid; /* Real user ID of sending process. */
+			};
+			struct { /* POSIX.1b timers. */
+				__INT32_TYPE__ si_timerid; /* Timer ID. */
+				__INT32_TYPE__ si_overrun; /* Overrun count. */
+				union {
+					union __sigvalx32    si_value;   /* Signal value. */
+					__INT32_TYPE__       si_int;
+					__HYBRID_PTR32(void) si_ptr;
+				};
+			};
+			struct { /* POSIX.1b signals. */
+				__INT32_TYPE__    __sig_si_pid;    /* Sending process ID. */
+				__UINT32_TYPE__   __sig_si_uid;    /* Real user ID of sending process. */
+				union __sigvalx32 __sig_si_sigval; /* Signal value. */
+			};
+			struct { /* SIGCHLD. */
+				__INT32_TYPE__   __cld_si_pid;    /* Which child. */
+				__UINT32_TYPE__  __cld_si_uid;    /* Real user ID of sending process. */
+				__INT32_TYPE__     si_status;     /* Exit value or signal. */
+				__UINT32_TYPE__    si_utime;
+				__UINT32_TYPE__    si_stime;
+			};
+			struct { /* SIGILL, SIGFPE, SIGSEGV, SIGBUS. */
+				__HYBRID_PTR32(void) si_addr;     /* Faulting insn/memory ref. */
+				__INT16_TYPE__       si_addr_lsb; /* Valid LSB of the reported address. */
+				__INT16_TYPE__     __si_pad2[1];
+				__HYBRID_PTR32(void) si_lower;
+				__HYBRID_PTR32(void) si_upper;
+			};
+			struct { /* SIGPOLL. */
+				__LONG32_TYPE__  si_band; /* Band event for SIGPOLL. */
+				__INT32_TYPE__   si_fd;
+			};
+			struct { /* SIGSYS. */
+				__HYBRID_PTR32(void) si_call_addr; /* Calling user insn. */
+				__INT32_TYPE__       si_syscall;   /* Triggering system call number. */
+				__UINT32_TYPE__      si_arch;      /* AUDIT_ARCH_* of syscall. */
 			};
 		};
-		struct { /* POSIX.1b signals. */
-			__INT32_TYPE__    __sig_si_pid;    /* Sending process ID. */
-			__UINT32_TYPE__   __sig_si_uid;    /* Real user ID of sending process. */
-			union __sigvalx32 __sig_si_sigval; /* Signal value. */
-		};
-		struct { /* SIGCHLD. */
-			__INT32_TYPE__   __cld_si_pid;    /* Which child. */
-			__UINT32_TYPE__  __cld_si_uid;    /* Real user ID of sending process. */
-			__INT32_TYPE__     si_status;     /* Exit value or signal. */
-			__UINT32_TYPE__    si_utime;
-			__UINT32_TYPE__    si_stime;
-		};
-		struct { /* SIGILL, SIGFPE, SIGSEGV, SIGBUS. */
-			__HYBRID_PTR32(void) si_addr;     /* Faulting insn/memory ref. */
-			__INT16_TYPE__       si_addr_lsb; /* Valid LSB of the reported address. */
-			__INT16_TYPE__     __si_pad2[1];
-			__HYBRID_PTR32(void) si_lower;
-			__HYBRID_PTR32(void) si_upper;
-		};
-		struct { /* SIGPOLL. */
-			__LONG32_TYPE__  si_band; /* Band event for SIGPOLL. */
-			__INT32_TYPE__   si_fd;
-		};
-		struct { /* SIGSYS. */
-			__HYBRID_PTR32(void) si_call_addr; /* Calling user insn. */
-			__INT32_TYPE__       si_syscall;   /* Triggering system call number. */
-			__UINT32_TYPE__      si_arch;      /* AUDIT_ARCH_* of syscall. */
-		};
-	};
 #endif /* Transparent struct/union */
-#if !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) || \
-	!defined(__COMPILER_HAVE_TRANSPARENT_UNION) || \
-	!defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
-	union {
-		__INT32_TYPE__ _data[(__SIX32_MAX_SIZE / 4) - 3];
-		struct { /* kill(). */
-			__INT32_TYPE__  _si_pid; /* Sending process ID. */
-			__UINT32_TYPE__ _si_uid; /* Real user ID of sending process. */
-		} _kill;
-		struct { /* POSIX.1b timers. */
-			__INT32_TYPE__   _si_tid;     /* Timer ID. */
-			__INT32_TYPE__   _si_overrun; /* Overrun count. */
-			union __sigvalx32 si_sigval;  /* Signal value. */
-		} _timer;
-		struct { /* POSIX.1b signals. */
-			__INT32_TYPE__   _si_pid;    /* Sending process ID. */
-			__UINT32_TYPE__  _si_uid;    /* Real user ID of sending process. */
-			union __sigvalx32 si_sigval; /* Signal value. */
-		} _rt;
-		struct { /* SIGCHLD. */
-			__INT32_TYPE__  _si_pid;    /* Which child. */
-			__UINT32_TYPE__ _si_uid;    /* Real user ID of sending process. */
-			__INT32_TYPE__  _si_status; /* Exit value or signal. */
-			__UINT32_TYPE__ _si_utime;
-			__UINT32_TYPE__ _si_stime;
-		} _sigchld;
-		struct { /* SIGILL, SIGFPE, SIGSEGV, SIGBUS. */
-			__HYBRID_PTR32(void) _si_addr;     /* Faulting insn/memory ref. */
-			__INT16_TYPE__       _si_addr_lsb; /* Valid LSB of the reported address. */
-			__INT16_TYPE__      __si_pad2[1];
-			struct {
-				__HYBRID_PTR32(void) _lower;
-				__HYBRID_PTR32(void) _upper;
-			} si_addr_bnd;
-		} _sigfault;
-		struct { /* SIGPOLL. */
-			__LONG32_TYPE__  _si_band; /* Band event for SIGPOLL. */
-			__INT32_TYPE__   _si_fd;
-		} _sigpoll;
-		struct { /* SIGSYS. */
-			__HYBRID_PTR32(void) _call_addr; /* Calling user insn. */
-			__INT32_TYPE__       _syscall;   /* Triggering system call number. */
-			__UINT32_TYPE__      _arch;      /* AUDIT_ARCH_* of syscall. */
-		} _sigsys;
-	} _sifields;
-#endif /* ... */
-#if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
-	defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C)
+		union {
+			__INT32_TYPE__ _data[(__SIX32_MAX_SIZE / 4) - 3];
+			struct { /* kill(). */
+				__INT32_TYPE__  _si_pid; /* Sending process ID. */
+				__UINT32_TYPE__ _si_uid; /* Real user ID of sending process. */
+			} _kill;
+			struct { /* POSIX.1b timers. */
+				__INT32_TYPE__   _si_tid;     /* Timer ID. */
+				__INT32_TYPE__   _si_overrun; /* Overrun count. */
+				union __sigvalx32 si_sigval;  /* Signal value. */
+			} _timer;
+			struct { /* POSIX.1b signals. */
+				__INT32_TYPE__   _si_pid;    /* Sending process ID. */
+				__UINT32_TYPE__  _si_uid;    /* Real user ID of sending process. */
+				union __sigvalx32 si_sigval; /* Signal value. */
+			} _rt;
+			struct { /* SIGCHLD. */
+				__INT32_TYPE__  _si_pid;    /* Which child. */
+				__UINT32_TYPE__ _si_uid;    /* Real user ID of sending process. */
+				__INT32_TYPE__  _si_status; /* Exit value or signal. */
+				__UINT32_TYPE__ _si_utime;
+				__UINT32_TYPE__ _si_stime;
+			} _sigchld;
+			struct { /* SIGILL, SIGFPE, SIGSEGV, SIGBUS. */
+				__HYBRID_PTR32(void) _si_addr;     /* Faulting insn/memory ref. */
+				__INT16_TYPE__       _si_addr_lsb; /* Valid LSB of the reported address. */
+				__INT16_TYPE__      __si_pad2[1];
+				struct {
+					__HYBRID_PTR32(void) _lower;
+					__HYBRID_PTR32(void) _upper;
+				} si_addr_bnd;
+			} _sigfault;
+			struct { /* SIGPOLL. */
+				__LONG32_TYPE__  _si_band; /* Band event for SIGPOLL. */
+				__INT32_TYPE__   _si_fd;
+			} _sigpoll;
+			struct { /* SIGSYS. */
+				__HYBRID_PTR32(void) _call_addr; /* Calling user insn. */
+				__INT32_TYPE__       _syscall;   /* Triggering system call number. */
+				__UINT32_TYPE__      _arch;      /* AUDIT_ARCH_* of syscall. */
+			} _sigsys;
+		} _sifields;
+#if (defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
+     defined(__COMPILER_HAVE_TRANSPARENT_UNION) &&  \
+     defined(__HYBRID_PTR32_IN_TRANSPARENT_STRUCT))
 	};
-#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_TYPES_C */
-#else
+#endif /* ... */
+#if (defined(__PRIVATE_WAS_DEFINED__si_data) ||      \
+     !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) || \
+     !defined(__COMPILER_HAVE_TRANSPARENT_UNION) ||  \
+     !defined(__HYBRID_PTR32_IN_TRANSPARENT_STRUCT))
+#undef __PRIVATE_WAS_DEFINED__si_data
 #define _si_data        _sifields._data
 #define __sig_si_pid    _sifields._rt._si_pid
 #define __sig_si_uid    _sifields._rt._si_uid
@@ -242,7 +269,7 @@ struct __siginfox32_struct /*[NAME(siginfox32)][PREFIX(si_)]*/ {
 #define si_call_addr    _sifields._sigsys._call_addr
 #define si_syscall      _sifields._sigsys._syscall
 #define si_arch         _sifields._sigsys._arch
-#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+#endif /* ... */
 };
 
 __DECL_END
