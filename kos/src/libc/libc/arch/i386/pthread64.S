@@ -43,7 +43,7 @@ INTERN_FUNCTION(libc_handle)
 	 * with a module handle pointer by libdl.
 	 * Note that this is a KOS-specific implementation detail. As far
 	 * as the standard is concerned, libdl is allowed to make up some
-	 * arbitrary module index for those 4 bytes, however KOS's libdl
+	 * arbitrary module index for those 8 bytes, however KOS's libdl
 	 * simply re-uses the regular module handle for this purpose,
 	 * meaning that we can simply (ab-)use that fact to quickly get a
 	 * handle for libc itself. */

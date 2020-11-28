@@ -664,7 +664,7 @@
 #endif /* !E_NET_HOST_UNREACHABLE */
 #ifndef E_NET_ADDRESS_IN_USE
 #define E_NET_ADDRESS_IN_USE                      (E_NET_ERROR, 0x0002) /* [errno(EADDRINUSE), msg("The specified address is already in use")]
-                                                                         * [fld(context: unsigned int, "The context under which the address is already in use")] */
+                                                                         * [fld(context: unsigned int, "The context under which the address is already in use (one of `E_NET_ADDRESS_IN_USE_CONTEXT_*')")] */
 #endif /* !E_NET_ADDRESS_IN_USE */
 #ifndef E_NET_MESSAGE_TOO_LONG
 #define E_NET_MESSAGE_TOO_LONG                    (E_NET_ERROR, 0x0003) /* [errno(EMSGSIZE), msg("The given message is too long")]

@@ -407,6 +407,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: Re-enable `__COMPILER_HAVE_TRANSPARENT_*' for gcc and add type-specific
+	 *       work-arounds for those cases where we'll end up with error/warnings.
+	 * Debug information greatly suffers / is inflated when transparent struct/unions
+	 * aren't being made use of. By enabling these options, we can greatly improve
+	 * the representation of system structures, such as `struct exception_data'! */
+
 	/* TODO: Add a user-space interface for reading the dmesg backlog, as well
 	 *       as establishing custom, pre-allocated buffers for syslog messages,
 	 *       essentially allowing user-space to register additional syslog sinks.

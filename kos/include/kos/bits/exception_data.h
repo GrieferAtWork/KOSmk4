@@ -467,7 +467,7 @@ struct exception_net_error_data {
 #undef ne_message_too_long
 
 		struct {
-			__syscall_ulong_t /*unsigned int*/ iu_context; /* The context under which the address is already in use */
+			__syscall_ulong_t /*unsigned int*/ iu_context; /* The context under which the address is already in use (one of `E_NET_ADDRESS_IN_USE_CONTEXT_*') */
 		} ne_address_in_use; /* E_NET_ADDRESS_IN_USE */
 
 		struct {

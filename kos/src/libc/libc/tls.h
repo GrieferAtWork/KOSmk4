@@ -47,7 +47,7 @@ INTDEF ATTR_THREAD struct pthread current;
 #ifdef LIBC_ARCH_HAVE_LIBC_HANDLE
 INTDEF WUNUSED ATTR_CONST ATTR_RETNONNULL void *NOTHROW(LIBCCALL libc_handle)(void);
 #else /* LIBC_ARCH_HAVE_LIBC_HANDLE */
-#define libc_handle() dlgethandle((void *)&libc_get_dltlsaddr2, DLGETHANDLE_FNORMAL)
+#define libc_handle() dlgethandle((void *)&libc_get_dlgethandle, DLGETHANDLE_FNORMAL)
 #endif /* !LIBC_ARCH_HAVE_LIBC_HANDLE */
 
 /* Return a pointer to `current', given a tls_segment

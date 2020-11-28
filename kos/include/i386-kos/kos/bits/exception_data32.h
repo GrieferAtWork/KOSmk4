@@ -532,7 +532,7 @@ struct __exception_net_error_data32 {
 #undef ne_message_too_long
 
 		struct {
-			__UINT32_TYPE__ /*unsigned int*/ iu_context; /* The context under which the address is already in use */
+			__UINT32_TYPE__ /*unsigned int*/ iu_context; /* The context under which the address is already in use (one of `E_NET_ADDRESS_IN_USE_CONTEXT_*') */
 		} ne_address_in_use; /* E_NET_ADDRESS_IN_USE */
 
 		struct {
