@@ -97,8 +97,8 @@ DECL_BEGIN
 struct kernel_syment {
 	char const *ks_name; /* [0..1] Symbol name (NULL for sentinel) */
 	void       *ks_addr; /* Symbol address */
-	u32         ds_size; /* Symbol size */
-	u32         ds_hash; /* Symbol hash (s.a. `elf_symhash()') */
+	u32         ks_size; /* Symbol size */
+	u32         ks_hash; /* Symbol hash (s.a. `elf_symhash()') */
 };
 struct kernel_symtab {
 	uintptr_t                                     ds_mask;  /* Hash mask. */

@@ -631,13 +631,13 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 
 
 /* How to extract and insert information held in the st_info field. */
-#define ELF32_ST_BIND(val)              (((unsigned char) (val)) >> 4)
-#define ELF32_ST_TYPE(val)              ((val) & 0xf)
+#define ELF32_ST_BIND(st_info)          (((unsigned char) (st_info)) >> 4)
+#define ELF32_ST_TYPE(st_info)          ((st_info) & 0xf)
 #define ELF32_ST_INFO(bind, type)       (((bind) << 4) + ((type) & 0xf))
 
 /* Both Elf32_Sym and Elf64_Sym use the same one-byte st_info field. */
-#define ELF64_ST_BIND(val)              ELF32_ST_BIND(val)
-#define ELF64_ST_TYPE(val)              ELF32_ST_TYPE(val)
+#define ELF64_ST_BIND(st_info)          ELF32_ST_BIND(st_info)
+#define ELF64_ST_TYPE(st_info)          ELF32_ST_TYPE(st_info)
 #define ELF64_ST_INFO(bind, type)       ELF32_ST_INFO(bind, type)
 
 /* Legal values for ST_BIND subfield of st_info (symbol binding). */

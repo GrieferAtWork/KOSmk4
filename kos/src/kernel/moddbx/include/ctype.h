@@ -380,6 +380,7 @@ DATDEF struct ctype ctype_char32_t_const_compat_ptr;
 #endif /* __ARCH_HAVE_COMPAT */
 
 
+
 #define SIZEOF_CTYPE_IEEE754_FLOAT  4
 #define SIZEOF_CTYPE_IEEE754_DOUBLE 8
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
@@ -537,6 +538,7 @@ DATDEF struct ctype ctype_char32_t_const_compat_ptr;
 #define ctype_uintptr_t ctype_uN(__SIZEOF_POINTER__)
 #define ctype_intmax_t  ctype_sN(__SIZEOF_INTMAX_T__)
 #define ctype_uintmax_t ctype_uN(__SIZEOF_INTMAX_T__)
+#define ctype_byte_t    ctype_u8
 
 #if __SIZEOF_WCHAR_T__ == 4
 #define ctype_wchar_t           ctype_char32_t

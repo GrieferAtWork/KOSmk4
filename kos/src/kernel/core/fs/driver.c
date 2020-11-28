@@ -2359,8 +2359,8 @@ driver_special_symbol(struct driver *__restrict self,
 struct kernel_syment {
 	char const *ks_name; /* [0..1] Symbol name (NULL for sentinel) */
 	void       *ks_addr; /* Symbol address */
-	u32         ds_size; /* Symbol size */
-	u32         ds_hash; /* Symbol hash (s.a. `elf_symhash()') */
+	u32         ks_size; /* Symbol size */
+	u32         ks_hash; /* Symbol hash (s.a. `elf_symhash()') */
 };
 struct kernel_symtab {
 	uintptr_t                                     ds_mask;  /* Hash mask. */
@@ -2389,7 +2389,7 @@ kernel_symbol(/*in*/USER CHECKED char const *name,
 		index = i & kernel_symbol_table.ds_mask;
 		if (!kernel_symbol_table.ds_list[index].ks_name)
 			break; /* Sentinel */
-		if (kernel_symbol_table.ds_list[index].ds_hash != hash)
+		if (kernel_symbol_table.ds_list[index].ks_hash != hash)
 			continue; /* Different hash */
 		if (strcmp(kernel_symbol_table.ds_list[index].ks_name, name) != 0)
 			continue; /* Different name */
@@ -2397,7 +2397,7 @@ kernel_symbol(/*in*/USER CHECKED char const *name,
 		if (psymbol_addr)
 			*psymbol_addr = kernel_symbol_table.ds_list[index].ks_addr;
 		if (psymbol_size)
-			*psymbol_size = kernel_symbol_table.ds_list[index].ds_size;
+			*psymbol_size = kernel_symbol_table.ds_list[index].ks_size;
 		return true;
 	}
 	return false;
@@ -2413,14 +2413,14 @@ NOTHROW(KCALL kernel_symbol_at)(uintptr_t addr,
 		if (kernel_symbol_table.ds_list[i].ks_addr > (void *)addr)
 			continue;
 		end = (uintptr_t)kernel_symbol_table.ds_list[i].ks_addr +
-		      kernel_symbol_table.ds_list[i].ds_size;
+		      kernel_symbol_table.ds_list[i].ks_size;
 		if (addr >= end)
 			continue;
 		/* Found it! */
 		if (psymbol_addr)
 			*psymbol_addr = (uintptr_t)kernel_symbol_table.ds_list[i].ks_addr;
 		if (psymbol_size)
-			*psymbol_size = kernel_symbol_table.ds_list[i].ds_size;
+			*psymbol_size = kernel_symbol_table.ds_list[i].ks_size;
 		return kernel_symbol_table.ds_list[i].ks_name;
 	}
 	return NULL;

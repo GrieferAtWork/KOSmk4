@@ -2937,10 +2937,11 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 		}
 
 		if (!csym.clv_data.s_var.v_typeinfo && cmodsyminfo_issip(&csym)) {
-			/* TODO: If we weren't able to figure out the proper typing for
-			 *       the symbol (and it may not even have any proper typing),
-			 *       then try to induce its type from information taken from
-			 *       the symbol's Elf(32|64)_Sym entry.
+			/* If we weren't able to figure out the proper typing for
+			 * the symbol (and it may not even have any proper typing),
+			 * then try to induce its type from information taken from
+			 * the symbol's Elf(32|64)_Sym entry.
+			 *
 			 * Using that entry, we can:
 			 *   - Determine if it's a function, and if it is:
 			 *     Use `void(...)' as type (i.e. void-return+varargs)
@@ -2948,12 +2949,50 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 			 *     integer type based on that knowledge:
 			 *      - If the size is the same as that of a pointer, assume that it's a pointer
 			 *      - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
-			 *      - Otherwise, interpret as an array of byte_t-s.
-			 *   - Additionally, if the symbol it part of a non-writable
-			 *     section, add a `const' qualifier to the symbol's type.
-			 */
+			 *      - Otherwise, interpret as an array of byte_t-s. */
+			CLinkerSymbol const *sip;
+			unsigned char st_info;
+			size_t st_size;
+			sip = cmodsyminfo_getsip(&csym);
+			if (CLinkerSymbol_IsElf32(csym.clv_mod)) {
+				st_info = sip->cls_elf32.st_info;
+				st_size = sip->cls_elf32.st_size;
+			} else if (CLinkerSymbol_IsElf64(csym.clv_mod)) {
+				st_info = sip->cls_elf64.st_info;
+				st_size = sip->cls_elf64.st_size;
+			} else {
+				goto fallback_load_opt_type;
+			}
+			memset(&symtype, 0, sizeof(symtype));
+			if (ELF32_ST_TYPE(st_info) == STT_FUNC) {
+				symtype.ct_typ = &ctype_int;
+				symtype.ct_typ = ctype_function(&symtype, 0, NULL,
+				                                CTYPE_KIND_FUNPROTO_VARARGS);
+				if unlikely(!symtype.ct_typ)
+					goto err_csym_nomem;
+			} else if (ELF32_ST_TYPE(st_info) == STT_OBJECT) {
+				if (st_size == dbg_current_sizeof_pointer()) {
+					symtype.ct_typ = incref(&ctype_void_ptr);
+				} else if (st_size == 1) {
+					symtype.ct_typ = incref(&ctype_u8);
+				} else if (st_size == 2) {
+					symtype.ct_typ = incref(&ctype_u16);
+				} else if (st_size == 4) {
+					symtype.ct_typ = incref(&ctype_u32);
+				} else if (st_size == 8) {
+					symtype.ct_typ = incref(&ctype_u64);
+				} else {
+					symtype.ct_typ = &ctype_byte_t;
+					symtype.ct_typ = ctype_array(&symtype, st_size);
+					if unlikely(!symtype.ct_typ)
+						goto err_csym_nomem;
+				}
+			} else {
+				goto fallback_load_opt_type;
+			}
+			goto got_symbol_type;
 		}
-
+fallback_load_opt_type:
 		/* Load the type of the variable. */
 		result = ctype_fromdw_opt(csym.clv_mod, csym.clv_unit,
 		                          &csym.clv_parser,
@@ -2984,6 +3023,7 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 			symtype.ct_typ = function_type; /* Inherit reference */
 		}
 		if likely(result == DBX_EOK) {
+got_symbol_type:
 			if (csym.clv_data.s_var.v_objaddr == csym.clv_data.s_var._v_objdata) {
 				result = cexpr_pushdata(&symtype, csym.clv_data.s_var.v_objaddr);
 			} else {
@@ -3086,6 +3126,9 @@ done_symtype:
 done:
 	cmod_syminfo_local_fini(&csym);
 	return result;
+err_csym_nomem:
+	result = DBX_ENOMEM;
+	goto done;
 }
 
 /* Push a register with its native typing, given its `name'
