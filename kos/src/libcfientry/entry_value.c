@@ -74,6 +74,48 @@ NOTHROW_NCX(CC libcfientry_getreg)(/*struct cfientry **/ void const *arg,
                                    unwind_regno_t dw_regno,
                                    void *__restrict dst) {
 	struct cfientry *self;
+	/* TODO: Apparently, DWARF _does_ actually have meta-data for figuring out
+	 *       what was originally passed in a function call:
+	 *       DW_TAG_call_site (DW_TAG_GNU_call_site)
+	 *           DW_AT_call_data_value
+	 *           DW_AT_GNU_call_site_value
+	 *           DW_AT_GNU_call_site_data_value
+	 *           DW_AT_GNU_call_site_target
+	 *           DW_AT_GNU_call_site_target_clobbered
+	 *       ...
+	 * So we really should firstly try to make use of this stuff before moving
+	 * on to the hard-core, arch-specific instruction decoding (though we should
+	 * still do the later if this fails, just so we can also support use-cases
+	 * such as re-constructing the arguments passed to main(), which couldn't
+	 * be reconstructed from debug info, since main() is called from assembly
+	 * without any debug information meta-data!
+	 *
+	 * Honestly, the more I think about it, the idea of interpreting low-level
+	 * assembly seems kind-of like a bad idea. I feel like it'd be much better
+	 * to just get rid of this library once again, and just do proper parsing
+	 * of call-site parameters in libdebuginfo, and just have libunwind call
+	 * an API from that library when the need arises.
+	 *
+	 * UGH! Why doesn't the DWARF standard make mention of call-site debug
+	 *      information in its description of DW_OP_entry_value!?!?!
+	 * It was that description that lead me to believe I had to guess all of
+	 * this stuff by looking at call-site assembly. - If you're wondering,
+	 * here's the relevant excerpt from the specs:
+	 * """
+	 * The values needed to evaluate DW_OP_entry_value could be obtained in
+	 * several ways.
+	 * The consumer could suspend execution on entry to the subprogram, record
+	 * values needed by DW_OP_entry_value expressions within the subprogram,
+	 * and then continue; when evaluating DW_OP_entry_value, the consumer would
+	 * use these recorded values rather than the current values. Or, when
+	 * evaluating DW_OP_entry_value, the consumer could virtually unwind using
+	 * the Call Frame Information (see Section 6.4 on page 171) to recover register
+	 * values that might have been clobbered since the subprogram entry point.
+	 * """
+	 *
+	 * When in actuality, the _real_ answer to solving this problem can
+	 * be found under "3.4 Call Site Entries and Parameters"
+	 */
 	self = (struct cfientry *)arg;
 	(void)self;     /* TODO */
 	(void)dw_regno; /* TODO */
@@ -110,6 +152,9 @@ NOTHROW_NCX(CC make_register_value_to_rvalue)(unwind_emulator_t *__restrict self
 			ste->s_type   = UNWIND_STE_STACKVALUE;
 		}
 	}	break;
+
+	// XXX: UNWIND_STE_CONSTANT: Dereference memory which the caller may have pushed?
+	// XXX: UNWIND_STE_REGISTER: Dereference memory which the caller may have pushed?
 
 	default:
 		break;
