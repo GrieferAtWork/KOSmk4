@@ -1065,13 +1065,14 @@ decode_form:
 
 
 /* Load attributes specific to a certain component:
- *   - debuginfo_cu_parser_loadattr_compile_unit():       DW_TAG_compile_unit
- *   - debuginfo_cu_parser_loadattr_subprogram():         DW_TAG_subprogram
- *   - debuginfo_cu_parser_loadattr_inlined_subroutine(): DW_TAG_inlined_subroutine
- *   - debuginfo_cu_parser_loadattr_lexical_block():      DW_TAG_lexical_block, DW_TAG_try_block, DW_TAG_catch_block
- *   - debuginfo_cu_parser_loadattr_type():               DW_TAG_*_type
- *   - debuginfo_cu_parser_loadattr_member():             DW_TAG_member
- *   - debuginfo_cu_parser_loadattr_variable():           DW_TAG_variable, DW_TAG_formal_parameter
+ *   - debuginfo_cu_parser_loadattr_compile_unit():        DW_TAG_compile_unit
+ *   - debuginfo_cu_parser_loadattr_compile_unit_simple(): DW_TAG_compile_unit
+ *   - debuginfo_cu_parser_loadattr_subprogram():          DW_TAG_subprogram
+ *   - debuginfo_cu_parser_loadattr_inlined_subroutine():  DW_TAG_inlined_subroutine
+ *   - debuginfo_cu_parser_loadattr_lexical_block():       DW_TAG_lexical_block, DW_TAG_try_block, DW_TAG_catch_block
+ *   - debuginfo_cu_parser_loadattr_type():                DW_TAG_*_type
+ *   - debuginfo_cu_parser_loadattr_member():              DW_TAG_member
+ *   - debuginfo_cu_parser_loadattr_variable():            DW_TAG_variable, DW_TAG_formal_parameter
  * @return: true:  Successfully loaded the component attributes.
  * @return: false: Corrupted/incomplete attributes. */
 INTERN TEXTSECTION NONNULL((1, 2)) bool
@@ -1126,6 +1127,56 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_
 			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
 			                                                &result->cu_stmt_list))
 				ERROR(err);
+			break;
+
+		case DW_AT_addr_base:
+		case DW_AT_GNU_addr_base:
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->cu_addr_base))
+				ERROR(err);
+			break;
+
+		default: break;
+		}
+	}
+	if (high_pc_is_relative)
+		result->cu_ranges.r_endpc += result->cu_ranges.r_startpc;
+	return true;
+err:
+	return false;
+}
+
+INTERN TEXTSECTION NONNULL((1, 2)) bool
+NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit_simple)(di_debuginfo_cu_parser_t *__restrict self,
+                                                                       di_debuginfo_compile_unit_simple_t *__restrict result) {
+	di_debuginfo_component_attrib_t attr;
+	bool high_pc_is_relative          = false;
+	result->cu_ranges.r_ranges_offset = (uintptr_t)-1;
+	result->cu_ranges.r_startpc       = (uintptr_t)-1;
+	result->cu_ranges.r_endpc         = 0;
+	result->cu_addr_base              = 0;
+	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
+		switch (attr.dica_name) {
+
+		case DW_AT_ranges:
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &result->cu_ranges.r_ranges_offset))
+				ERROR(err);
+			break;
+
+		case DW_AT_low_pc:
+			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form,
+			                                               &result->cu_ranges.r_startpc))
+				ERROR(err);
+			break;
+
+		case DW_AT_high_pc:
+			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &result->cu_ranges.r_endpc)) {
+				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+				                                                &result->cu_ranges.r_endpc))
+					ERROR(err);
+				high_pc_is_relative = true;
+			}
 			break;
 
 		case DW_AT_addr_base:
@@ -3169,16 +3220,16 @@ INTERN_CONST STRINGSECTION char const secname_eh_frame[]    = ".eh_frame";
 INTERN_CONST STRINGSECTION char const secname_debug_frame[] = ".debug_frame";
 INTERN_CONST STRINGSECTION char const secname_debug_addr[]  = ".debug_addr";
 INTERN_CONST STRINGSECTION char const secname_debug_loc[]   = ".debug_loc";
-INTDEF STRINGSECTION char const secname_debug_line[];
-INTDEF STRINGSECTION char const secname_debug_info[];
-INTDEF STRINGSECTION char const secname_debug_abbrev[];
-INTDEF STRINGSECTION char const secname_debug_aranges[];
-INTDEF STRINGSECTION char const secname_debug_str[];
-INTDEF STRINGSECTION char const secname_debug_ranges[];
-INTDEF STRINGSECTION char const secname_symtab[];
-INTDEF STRINGSECTION char const secname_strtab[];
-INTDEF STRINGSECTION char const secname_dynsym[];
-INTDEF STRINGSECTION char const secname_dynstr[];
+INTDEF char const secname_debug_line[];
+INTDEF char const secname_debug_info[];
+INTDEF char const secname_debug_abbrev[];
+INTDEF char const secname_debug_aranges[];
+INTDEF char const secname_debug_str[];
+INTDEF char const secname_debug_ranges[];
+INTDEF char const secname_symtab[];
+INTDEF char const secname_strtab[];
+INTDEF char const secname_dynsym[];
+INTDEF char const secname_dynstr[];
 
 INTERN NONNULL((2, 3)) void
 NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
@@ -3303,6 +3354,7 @@ DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_getref, libdi_debuginfo_cu_parser_getref
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_getexpr, libdi_debuginfo_cu_parser_getexpr);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_getblock, libdi_debuginfo_cu_parser_getblock);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadattr_compile_unit, libdi_debuginfo_cu_parser_loadattr_compile_unit);
+DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadattr_compile_unit_simple, libdi_debuginfo_cu_parser_loadattr_compile_unit_simple);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadattr_subprogram, libdi_debuginfo_cu_parser_loadattr_subprogram);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadattr_inlined_subroutine, libdi_debuginfo_cu_parser_loadattr_inlined_subroutine);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadattr_lexical_block, libdi_debuginfo_cu_parser_loadattr_lexical_block);

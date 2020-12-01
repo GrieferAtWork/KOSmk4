@@ -764,7 +764,7 @@ cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
 	void const *pc;
 	uintptr_t module_relative_pc;
 	unsigned int result;
-	di_debuginfo_compile_unit_t cu;
+	di_debuginfo_compile_unit_simple_t cu;
 	byte_t temp_buffer[1];
 #ifdef CONFIG_HAVE_USERMOD
 	bool second_pass;
@@ -931,7 +931,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 				error = UNWIND_SEGFAULT;
 		} else {
 			void const *pc;
-			di_debuginfo_compile_unit_t cu;
+			di_debuginfo_compile_unit_simple_t cu;
 			size_t num_accessed_bits;
 			struct cmodule *mod;
 			memset(&cu, 0, sizeof(cu));
@@ -966,26 +966,6 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
 						                                    self->v_objaddr, self->v_addrsize, self->v_ptrsize);
 					} else {
-						/* TODO: Must add support for `DW_OP_GNU_entry_value', which currently
-						 *       prevent accessing to `argv' in x86_64-OD /bin/init:main
-						 * That's the one that allows CFI to access a register as it would have
-						 * been when the containing function was initially called.
-						 * NOTE: Apparently, `DW_OP_GNU_entry_value' is meant to be recovered by
-						 *       unwinding to the caller, and re-constructing arguments they may
-						 *       have passed to the function being called, thus allowing one to
-						 *       (possibly) re-construct function arguments.
-						 * I think that the only ~real~ way of (kind-of) doing this is to go up
-						 * one stack-frame and try to inspect the actual machine-assembly that
-						 * was (probably) used to set-up the function call...
-						 *
-						 * Only problem here is that this sort of thing will get exponentially
-						 * complex, since there's not any real way of doing this, and all ways
-						 * that there are would only ever center around special cases...
-						 *
-						 * (I don't think such a thing exists, but check if there isn't some
-						 *  debug information that can be used to construct arguments as they
-						 *  get passed in function calls...)
-						 */
 						error = debuginfo_location_getvalue(&self->v_expr,
 						                                    di_debug_sections_as_unwind_emulator_sections(&mod->cm_sections),
 						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,

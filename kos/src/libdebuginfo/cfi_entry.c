@@ -30,7 +30,10 @@
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/unaligned.h>
 
+#include <kos/except.h>
+#include <kos/exec/module.h>
 #include <kos/types.h>
+#include <sys/param.h>
 
 #include <alloca.h>
 #include <stddef.h>
@@ -40,6 +43,8 @@
 #include <libunwind/cfi.h>
 
 #include "cfi_entry.h"
+#include "debug_aranges.h"
+#include "debug_info.h"
 #include "unwind.h"
 
 DECL_BEGIN
@@ -63,10 +68,16 @@ done:
 	return lu;
 }
 
-PRIVATE PUNWIND_EMULATOR_EXEC /*   */ pdyn_unwind_emulator_exec    = NULL;
-PRIVATE PUNWIND_INSTRUCTION_SUCC /**/ pdyn_unwind_instruction_succ = NULL;
-#define unwind_emulator_exec    (*pdyn_unwind_emulator_exec)
-#define unwind_instruction_succ (*pdyn_unwind_instruction_succ)
+PRIVATE PUNWIND_EMULATOR_EXEC /*     */ pdyn_unwind_emulator_exec           = NULL;
+PRIVATE PUNWIND_EMULATOR_EXEC_AUTOSTACK pdyn_unwind_emulator_exec_autostack = NULL;
+PRIVATE PUNWIND_INSTRUCTION_SUCC /*  */ pdyn_unwind_instruction_succ        = NULL;
+PRIVATE PDEBUGINFO_LOCATION_SELECT /**/ pdyn_debuginfo_location_select      = NULL;
+PRIVATE PUNWIND_STE_READ /*          */ pdyn_unwind_ste_read                = NULL;
+#define unwind_emulator_exec           (*pdyn_unwind_emulator_exec)
+#define unwind_emulator_exec_autostack (*pdyn_unwind_emulator_exec_autostack)
+#define unwind_instruction_succ        (*pdyn_unwind_instruction_succ)
+#define debuginfo_location_select      (*pdyn_debuginfo_location_select)
+#define unwind_ste_read                (*pdyn_unwind_ste_read)
 
 PRIVATE bool CC load_libunwind(void) {
 	void *lu;
@@ -82,7 +93,10 @@ PRIVATE bool CC load_libunwind(void) {
 		goto nope
 
 	/* Lazily load functions from libunwind. */
+	LOAD(pdyn_unwind_ste_read, "unwind_ste_read");
+	LOAD(pdyn_debuginfo_location_select, "debuginfo_location_select");
 	LOAD(pdyn_unwind_instruction_succ, "unwind_instruction_succ");
+	LOAD(pdyn_unwind_emulator_exec_autostack, "unwind_emulator_exec_autostack");
 	COMPILER_BARRIER();
 	LOAD(pdyn_unwind_emulator_exec, "unwind_emulator_exec");
 
@@ -97,8 +111,38 @@ nope:
 
 struct unwind_register {
 	unwind_regno_t ur_regno;                             /* Register number. */
-	byte_t         ur_data[CFI_UNWIND_REGISTER_MAXSIZE]; /* Unwind register data. */
+	union {
+		byte_t     ur_data[CFI_UNWIND_REGISTER_MAXSIZE]; /* Unwind register data. */
+		uintptr_t  ur_word;                              /* Unwind register data word. */
+	};
 };
+
+struct cfientry_sections {
+	/*BEGIN:compat(unwind_emulator_sections_t)*/
+	__byte_t const *ds_eh_frame_start;      /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' start */
+	__byte_t const *ds_eh_frame_end;        /* [0..1][valid_if(:ce_s_eh_frame)] `.eh_frame' end */
+	__byte_t const *ds_debug_frame_start;   /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' start */
+	__byte_t const *ds_debug_frame_end;     /* [0..1][valid_if(:ce_s_debug_frame)] `.debug_frame' end */
+	__byte_t const *ds_debug_addr_start;    /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
+	__byte_t const *ds_debug_addr_end;      /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
+	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t const *ds_debug_loc_start;     /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
+	__byte_t const *ds_debug_loc_end;       /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
+	__byte_t const *ds_debug_abbrev_start;  /* [0..1][const] `.debug_abbrev' start */
+	__byte_t const *ds_debug_abbrev_end;    /* [0..1][const] `.debug_abbrev' end */
+	__byte_t const *ds_debug_info_start;    /* [0..1][const] `.debug_info' start */
+	__byte_t const *ds_debug_info_end;      /* [0..1][const] `.debug_info' end */
+	/*END:compat(unwind_emulator_sections_t)*/
+	__byte_t const *ds_debug_str_start;     /* [0..0][const] Always NULL */
+	__byte_t const *ds_debug_str_end;       /* [0..0][const] Always NULL */
+	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t const *ds_debug_aranges_start; /* [0..1][const] `.debug_aranges' start */
+	__byte_t const *ds_debug_aranges_end;   /* [0..1][const] `.debug_aranges' end */
+	__byte_t const *ds_debug_ranges_start;  /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
+	__byte_t const *ds_debug_ranges_end;    /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
+};
+#define cfientry_sections_as_unwind_emulator_sections_t(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_start)
+#define cfientry_sections_as_di_debuginfo_cu_parser_sections_t(self) ((di_debuginfo_cu_parser_sections_t *)&(self)->ds_debug_loc_start)
 
 struct cfientry {
 	unwind_getreg_t ce_regget;     /* [1..1][const] Callback for reading out the value of a register.
@@ -112,6 +156,25 @@ struct cfientry {
 		void const *ce_regget_arg;  /* [?..?][const] Argument passed to `ce_regget'. */
 		size_t     _ce_unwind_rega; /* # of allocated slots in `ce_unwind_regv' (used during start-up) */
 	};
+	unwind_emulator_t                 *ce_emulator;              /* [1..1][const] The instruction emulator that is being used. */
+	REF module_t                      *ce_module;                /* [0..1][lock(WRITE_ONCE)] The module associated with the PC-register from `ce_unwind_regv' */
+	module_type_var                   (ce_modtyp);               /* [valid_if(ce_module)][const] Module type for `ce_module' */
+	uintptr_t                          ce_modrelpc;              /* [valid_if(ce_module)][const] Module-relative PC-offset (of the PC-register from `ce_unwind_regv') */
+	REF module_section_t              *ce_s_eh_frame;            /* [0..1][valid_if(ce_module)] The .eh_frame section of `ce_module' */
+	REF module_section_t              *ce_s_debug_frame;         /* [0..1][valid_if(ce_module)] The .debug_frame section of `ce_module' */
+	REF module_section_t              *ce_s_debug_addr;          /* [0..1][valid_if(ce_module)] The .debug_addr section of `ce_module' */
+	REF module_section_t              *ce_s_debug_loc;           /* [0..1][valid_if(ce_module)] The .debug_loc section of `ce_module' */
+	REF module_section_t              *ce_s_debug_abbrev;        /* [1..1][valid_if(ce_module)][const] The .debug_abbrev section of `ce_module' */
+	REF module_section_t              *ce_s_debug_info;          /* [1..1][valid_if(ce_module)][const] The .debug_info section of `ce_module' */
+	REF module_section_t              *ce_s_debug_aranges;       /* [0..1][valid_if(ce_module)][const] The .debug_info section of `ce_module' */
+	REF module_section_t              *ce_s_debug_ranges;        /* [0..1][valid_if(ce_module)] The .debug_info section of `ce_module' */
+	struct cfientry_sections           ce_sections;              /* [valid_if(ce_module)] Mappings for relevant .debug_* sections.
+	                                                              * Note that the mapping for `cps_debug_loc_start' is loaded lazily, and on a as-needed basis. */
+	di_debuginfo_cu_abbrev_t           ce_abbrev;                /* [valid_if(ce_module)] Debug-info abbreviation information. */
+	di_debuginfo_cu_parser_t           ce_parser;                /* [valid_if(ce_module)] Debug-info parser. */
+	di_debuginfo_location_t            ce_subprogram_frame_base; /* [valid_if(ce_module)] Frame base expression of the sub-program containing `ce_modrelpc'. */
+	di_debuginfo_compile_unit_simple_t cr_cu;                    /* [valid_if(ce_module)] Information on the containing compilation unit information. */
+
 	/* Unwind register information: These descriptors override register values
 	 * for the purpose of masking registers with new values as they'd appear at
 	 * the respective call-sites following a call to `unwind(3)'
@@ -127,7 +190,7 @@ struct cfientry {
 	 *     as part of the `ce_unwind_regv' vector. If it's inside, use that value.
 	 *   - If the register cannot be found, scan .debug_info for call-site parameter
 	 *     information on that register, and (if found) use that info.
-	 *   - Memory accesses are always dispatched by searching for call-site paramter
+	 *   - Memory accesses are always dispatched by searching for call-site parameter
 	 *     information. */
 	size_t                                          ce_unwind_regc;  /* # of register overrides found. */
 	COMPILER_FLEXIBLE_ARRAY(struct unwind_register, ce_unwind_regv); /* [ce_unwind_regc] Vector of register overrides.
@@ -135,10 +198,48 @@ struct cfientry {
 	                                                                  * an entry's `ur_regno', meaning you can use bsearch
 	                                                                  * to find a specific entry within. */
 };
+#define cfientry_as_unwind_emulator_sections_t(self)        cfientry_sections_as_unwind_emulator_sections_t(&(self)->ce_sections)
+#define cfientry_as_di_debuginfo_cu_parser_sections_t(self) cfientry_sections_as_di_debuginfo_cu_parser_sections_t(&(self)->ce_sections)
+
 #define cfientry_alloc(unwind_rega)                                        \
 	((struct cfientry *)alloca(offsetof(struct cfientry, ce_unwind_regv) + \
 	                           (unwind_rega) *                             \
 	                           sizeof(struct unwind_register)))
+
+/* Finalize the given cfientry controller. */
+PRIVATE NONNULL((1)) void
+NOTHROW_NCX(CC cfientry_fini)(struct cfientry *__restrict self) {
+	if (self->ce_module && self->ce_module != (REF module_t *)-1) {
+		if (self->ce_s_eh_frame != (REF module_section_t *)-1)
+			module_section_xdecref(self->ce_s_eh_frame, self->ce_modtyp);
+		if (self->ce_s_debug_frame != (REF module_section_t *)-1)
+			module_section_xdecref(self->ce_s_debug_frame, self->ce_modtyp);
+		if (self->ce_s_debug_addr != (REF module_section_t *)-1)
+			module_section_xdecref(self->ce_s_debug_addr, self->ce_modtyp);
+		if (self->ce_s_debug_loc != (REF module_section_t *)-1)
+			module_section_xdecref(self->ce_s_debug_loc, self->ce_modtyp);
+		module_section_decref(self->ce_s_debug_abbrev, self->ce_modtyp);
+		module_section_decref(self->ce_s_debug_info, self->ce_modtyp);
+		module_section_xdecref(self->ce_s_debug_aranges, self->ce_modtyp);
+		if (self->ce_s_debug_ranges != (REF module_section_t *)-1)
+			module_section_xdecref(self->ce_s_debug_ranges, self->ce_modtyp);
+		module_decref(self->ce_module, self->ce_modtyp);
+		libdi_debuginfo_cu_abbrev_fini(&self->ce_abbrev);
+	}
+}
+
+/* Lookup the register override entry for `dw_regno'
+ * If no such entry exists, return `NULL' */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) struct unwind_register *
+NOTHROW_NCX(CC find_register)(struct cfientry *__restrict self,
+                              unwind_regno_t dw_regno) {
+	size_t i;
+	/* Check if the register can be found as part of unwind information. */
+	BSEARCH(i, self->ce_unwind_regv, self->ce_unwind_regc, .ur_regno, dw_regno) {
+		return &self->ce_unwind_regv[i];
+	}
+	return NULL;
+}
 
 /* Read the contents of a register after unwinding. When the value of `dw_regno'
  * wasn't specified by unwind information, then return its contents as they are
@@ -164,6 +265,502 @@ NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *
 	return (*self->ce_regget)(self->ce_regget_arg, dw_regno, dst);
 }
 
+INTDEF char const secname_debug_aranges[];
+INTDEF char const secname_debug_info[];
+INTDEF char const secname_debug_abbrev[];
+INTDEF char const secname_debug_loc[];
+INTDEF char const secname_debug_ranges[];
+INTDEF char const secname_eh_frame[];
+INTDEF char const secname_debug_frame[];
+INTDEF char const secname_debug_addr[];
+
+#define LOAD_SECTION(sect, module_type, lv_start, lv_end)                             \
+	do {                                                                              \
+		size_t size;                                                                  \
+		(lv_start) = (byte_t const *)module_section_inflate(sect, module_type, size); \
+		(lv_end)   = (lv_start) + size;                                               \
+	}	__WHILE0
+
+
+/* Bind the .debug_ranges section. */
+PRIVATE void
+NOTHROW_NCX(CC cfientry_bind_debug_ranges)(struct cfientry *__restrict self) {
+	if (self->ce_s_debug_ranges)
+		return;
+	self->ce_s_debug_ranges = module_locksection(self->ce_module, self->ce_modtyp,
+	                                             secname_debug_ranges, MODULE_LOCKSECTION_FNORMAL);
+	if (!self->ce_s_debug_ranges) {
+		self->ce_s_debug_ranges = (REF module_section_t *)-1;
+		return;
+	}
+	LOAD_SECTION(self->ce_s_debug_ranges,
+	             self->ce_modtyp,
+	             self->ce_sections.ds_debug_ranges_start,
+	             self->ce_sections.ds_debug_ranges_end);
+}
+
+/* Parse attributes of `self' in order to fill in `range'
+ * Optionally, also parse frame-base location information.
+ * @return: * : One of `DEBUG_INFO_ERROR_*' */
+PRIVATE NONNULL((1, 2)) unsigned int
+NOTHROW_NCX(CC parse_attributes_for_ranges)(di_debuginfo_cu_parser_t *__restrict self,
+                                            di_debuginfo_ranges_t *__restrict range,
+                                            di_debuginfo_location_t *pframe_base) {
+	di_debuginfo_component_attrib_t attr;
+	unsigned int error       = DEBUG_INFO_ERROR_NOFRAME;
+	bool high_pc_is_relative = false;
+	range->r_ranges_offset   = (uintptr_t)-1;
+	range->r_startpc         = (uintptr_t)-1;
+	range->r_endpc           = 0;
+	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
+		switch (attr.dica_name) {
+
+		case DW_AT_ranges:
+			if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+			                                                &range->r_ranges_offset))
+				ERROR(err);
+			error = DEBUG_INFO_ERROR_SUCCESS;
+			break;
+
+		case DW_AT_low_pc:
+			if unlikely(!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form,
+			                                               &range->r_startpc))
+				ERROR(err);
+			error = DEBUG_INFO_ERROR_SUCCESS;
+			break;
+
+		case DW_AT_high_pc:
+			if (!libdi_debuginfo_cu_parser_getaddr(self, attr.dica_form, &range->r_endpc)) {
+				if unlikely(!libdi_debuginfo_cu_parser_getconst(self, attr.dica_form,
+				                                                &range->r_endpc))
+					ERROR(err);
+				high_pc_is_relative = true;
+			}
+			error = DEBUG_INFO_ERROR_SUCCESS;
+			break;
+
+		case DW_AT_frame_base:
+			if (pframe_base) {
+				if unlikely(!libdi_debuginfo_cu_parser_getexpr(self, attr.dica_form, pframe_base))
+					ERROR(err);
+			}
+			break;
+
+		default: break;
+		}
+	}
+	if (high_pc_is_relative)
+		range->r_endpc += range->r_startpc;
+	return error;
+err:
+	return DEBUG_INFO_ERROR_CORRUPT;
+}
+
+
+/* Try to locate the relevant `DW_TAG_GNU_call_site' component,
+ * where the caller has already loaded up the parser to point
+ * at the initial DW_TAG_compile_unit element of the (probably)
+ * correct CU.
+ * @return: * : One of `CFIENTRY_LOCATE_CALLSITE_*' */
+#define CFIENTRY_LOCATE_CALLSITE_SUCCESS                 0 /* Success */
+#define CFIENTRY_LOCATE_CALLSITE_FUNCTION_NOT_FOUND      1 /* Containing function not found in this CU */
+#define CFIENTRY_LOCATE_CALLSITE_NO_CALLSITE_IN_FUNCTION 2 /* No relevant `DW_TAG_GNU_call_site' within the containing function */
+PRIVATE NONNULL((1)) unsigned int
+NOTHROW_NCX(CC cfientry_locate_callsite)(struct cfientry *__restrict self,
+                                         bool assume_correct_cu) {
+	size_t cu_depth;
+	unsigned int error;
+	/* Scan ahead to the first DW_TAG_compile_unit component. */
+	for (;;) {
+		if (self->ce_parser.dup_comp.dic_tag == DW_TAG_compile_unit) {
+			/* Check if this is the correct CU, or if what we're looking for might be elsewhere. */
+			if (libdi_debuginfo_cu_parser_loadattr_compile_unit_simple(&self->ce_parser,
+			                                                           &self->cr_cu)) {
+				if (assume_correct_cu)
+					break;
+				if (self->cr_cu.cu_ranges.r_ranges_offset != (uintptr_t)-1)
+					cfientry_bind_debug_ranges(self);
+				error = debuginfo_ranges_contains(&self->cr_cu.cu_ranges, &self->ce_parser,
+				                                  self->cr_cu.cu_ranges.r_startpc,
+				                                  self->ce_modrelpc,
+				                                  self->ce_sections.ds_debug_ranges_start,
+				                                  self->ce_sections.ds_debug_ranges_end);
+				if (error != DEBUG_INFO_ERROR_SUCCESS)
+					ERROR(err_function_not_found);
+				break;
+			}
+			ERROR(err_function_not_found);
+		}
+		libdi_debuginfo_cu_parser_skipattr(&self->ce_parser);
+		if (!libdi_debuginfo_cu_parser_next(&self->ce_parser))
+			ERROR(err_function_not_found);
+	}
+	cu_depth = self->ce_parser.dup_child_depth;
+	if (!libdi_debuginfo_cu_parser_nextchild(&self->ce_parser))
+		ERROR(err_function_not_found);
+
+	/* At this point, we know that we (should be) within the correct CU.
+	 * With this in mind, scan for DW_TAG_subprogram entries, and check
+	 * for one that contains the module-relative-pc we're looking for. */
+	while (self->ce_parser.dup_child_depth > cu_depth) {
+		if (self->ce_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
+			/* Parse attributes of the sub-program */
+			di_debuginfo_ranges_t ranges;
+			self->ce_subprogram_frame_base.l_expr  = NULL;
+			self->ce_subprogram_frame_base.l_llist = NULL;
+			error = parse_attributes_for_ranges(&self->ce_parser, &ranges,
+			                                    &self->ce_subprogram_frame_base);
+			if (error == DEBUG_INFO_ERROR_SUCCESS) {
+				/* Check if this might be the function we're looking for. */
+				if (ranges.r_ranges_offset != (uintptr_t)-1)
+					cfientry_bind_debug_ranges(self);
+				error = debuginfo_ranges_contains(&ranges, &self->ce_parser,
+				                                  ranges.r_startpc,
+				                                  self->ce_modrelpc,
+				                                  self->ce_sections.ds_debug_ranges_start,
+				                                  self->ce_sections.ds_debug_ranges_end);
+				if (error == DEBUG_INFO_ERROR_SUCCESS) {
+					size_t sp_element_depth;
+					/* Found the relevant containing function! */
+					if (!libdi_debuginfo_cu_parser_nextchild(&self->ce_parser))
+						ERROR(err_no_callsite_in_function);
+					sp_element_depth = self->ce_parser.dup_child_depth;
+					/* Search for `DW_TAG_GNU_call_site' entries. */
+					while (self->ce_parser.dup_child_depth >= sp_element_depth) {
+						if (self->ce_parser.dup_comp.dic_tag == DW_TAG_GNU_call_site ||
+						    self->ce_parser.dup_comp.dic_tag == DW_TAG_call_site) {
+							uintptr_t low_pc;
+							di_debuginfo_component_attrib_t attr;
+							low_pc = (uintptr_t)-1;
+							DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &self->ce_parser) {
+								if (attr.dica_name == DW_AT_low_pc) {
+									if unlikely(!libdi_debuginfo_cu_parser_getaddr(&self->ce_parser,
+									                                               attr.dica_form,
+									                                               &low_pc))
+										ERROR(err_no_callsite_in_function);
+								}
+							}
+							if (low_pc == self->ce_modrelpc)
+								return CFIENTRY_LOCATE_CALLSITE_SUCCESS; /* Found it! */
+						} else {
+							libdi_debuginfo_cu_parser_skipattr(&self->ce_parser);
+						}
+						if (!libdi_debuginfo_cu_parser_next(&self->ce_parser))
+							break;
+					}
+err_no_callsite_in_function:
+					return CFIENTRY_LOCATE_CALLSITE_NO_CALLSITE_IN_FUNCTION;
+				}
+			}
+			if (error != DEBUG_INFO_ERROR_NOFRAME)
+				ERROR(err_function_not_found);
+		} else {
+			libdi_debuginfo_cu_parser_skipattr(&self->ce_parser);
+		}
+		if (!libdi_debuginfo_cu_parser_next(&self->ce_parser))
+			break;
+	}
+err_function_not_found:
+	return CFIENTRY_LOCATE_CALLSITE_FUNCTION_NOT_FOUND;
+}
+
+/* Try to load module information for `self', as well as bind basic sections:
+ *   - ce_s_debug_aranges
+ *   - ce_s_debug_info
+ *   - ce_s_debug_abbrev
+ * Also map each of these sections into memory, filling in section range pointers.
+ * Sections that can't be loaded are simply set to `NULL'.
+ *
+ * Finally, initialize and navigate the debug information parser to point
+ * after the attributes of `DW_TAG_GNU_call_site' component that represents
+ * the expected return address, meaning that the caller may then proceed
+ * to load child-DW_TAG_GNU_call_site_parameter components by saving the
+ * current parser position for later, and calling
+ * `libdi_debuginfo_cu_parser_nextchild()' in order to load the first of a
+ * variable number of should-be `DW_TAG_GNU_call_site_parameter'-components. */
+PRIVATE NONNULL((1)) bool
+NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
+	struct unwind_register *pc_register;
+
+	if (self->ce_module)
+		return self->ce_module != (REF module_t *)-1; /* Already loaded, or cannot be loaded! */
+	/* Lookup an override for the PC register. */
+	pc_register = find_register(self, CFI_UNWIND_REGISTER_PC);
+	if unlikely(!pc_register)
+		goto fail;
+	self->ce_module = module_ataddr_nx((void const *)pc_register->ur_word, self->ce_modtyp);
+	if unlikely(!self->ce_module)
+		goto fail;
+	/* Fill in data that becomes valid once a module's been loaded. */
+	self->ce_modrelpc = pc_register->ur_word - module_getloadaddr(self->ce_module, self->ce_modtyp);
+#define lock_section(name)                               \
+	module_locksection(self->ce_module, self->ce_modtyp, \
+	                   name, MODULE_LOCKSECTION_FNORMAL)
+	self->ce_s_debug_info = lock_section(secname_debug_info);
+	if unlikely(!self->ce_s_debug_info) /* We absolutely _need_ the .debug_info section! */
+		goto fail_module;
+	self->ce_s_debug_abbrev = lock_section(secname_debug_abbrev);
+	if unlikely(!self->ce_s_debug_abbrev) /* We absolutely _need_ the .debug_abbrev section! */
+		goto fail_module_debug_info;
+	self->ce_s_debug_aranges = lock_section(secname_debug_aranges);
+#undef lock_section
+	self->ce_s_eh_frame     = NULL; /* Loaded lazily. */
+	self->ce_s_debug_frame  = NULL; /* Loaded lazily. */
+	self->ce_s_debug_addr   = NULL; /* Loaded lazily. */
+	self->ce_s_debug_loc    = NULL; /* Loaded lazily. */
+	self->ce_s_debug_ranges = NULL; /* Loaded lazily. */
+	memset(&self->ce_sections, 0, sizeof(self->ce_sections));
+	/* Bind sections. */
+	if (self->ce_s_debug_aranges) {
+		LOAD_SECTION(self->ce_s_debug_aranges,
+		             self->ce_modtyp,
+		             self->ce_sections.ds_debug_aranges_start,
+		             self->ce_sections.ds_debug_aranges_end);
+	}
+	LOAD_SECTION(self->ce_s_debug_abbrev,
+	             self->ce_modtyp,
+	             self->ce_sections.ds_debug_abbrev_start,
+	             self->ce_sections.ds_debug_abbrev_end);
+	LOAD_SECTION(self->ce_s_debug_info,
+	             self->ce_modtyp,
+	             self->ce_sections.ds_debug_info_start,
+	             self->ce_sections.ds_debug_info_end);
+	/* Find the proper compilation-unit for `self->ce_modrelpc' */
+	{
+		unsigned int error;
+		uintptr_t debuginfo_cu_offset;
+		byte_t const *reader;
+		error = libdi_debugaranges_locate(self->ce_sections.ds_debug_aranges_start,
+		                                  self->ce_sections.ds_debug_aranges_end,
+		                                  &debuginfo_cu_offset,
+		                                  self->ce_modrelpc);
+		if (error == DEBUG_INFO_ERROR_SUCCESS) {
+			/* Load the relevant CU */
+			reader = self->ce_sections.ds_debug_info_start + debuginfo_cu_offset;
+
+			/* Load the relevant CU. */
+			error = libdi_debuginfo_cu_parser_loadunit(&reader, self->ce_sections.ds_debug_info_end,
+			                                           cfientry_as_di_debuginfo_cu_parser_sections_t(self),
+			                                           &self->ce_parser,
+			                                           &self->ce_abbrev,
+			                                           NULL);
+			if unlikely(error != DEBUG_INFO_ERROR_SUCCESS)
+				goto fail_module_sections;
+
+			/* Load the relevant call-site. */
+			error = cfientry_locate_callsite(self, true);
+			if unlikely(error != CFIENTRY_LOCATE_CALLSITE_SUCCESS)
+				goto fail_module_sections;
+		} else {
+			/* This can happen if the .debug_aranges section is missing.
+			 * In this case, scan _all_ CUs for the call-site function. */
+			reader = self->ce_sections.ds_debug_info_start;
+			for (;;) {
+				error = libdi_debuginfo_cu_parser_loadunit(&reader, self->ce_sections.ds_debug_info_end,
+				                                           cfientry_as_di_debuginfo_cu_parser_sections_t(self),
+				                                           &self->ce_parser,
+				                                           &self->ce_abbrev,
+				                                           NULL);
+				if (error != DEBUG_INFO_ERROR_SUCCESS)
+					goto fail_module_sections;
+				/* Load the relevant call-site. */
+				error = cfientry_locate_callsite(self, false);
+				if unlikely(error == CFIENTRY_LOCATE_CALLSITE_SUCCESS)
+					break; /* Found it! */
+				if unlikely(error == CFIENTRY_LOCATE_CALLSITE_NO_CALLSITE_IN_FUNCTION)
+					goto fail_module_sections; /* There isn't any call-site information */
+			}
+		}
+	}
+	return true;
+fail_module_sections:
+	module_section_xdecref(self->ce_s_debug_aranges, self->ce_modtyp);
+	module_section_decref(self->ce_s_debug_abbrev, self->ce_modtyp);
+fail_module_debug_info:
+	module_section_decref(self->ce_s_debug_info, self->ce_modtyp);
+fail_module:
+	module_decref(self->ce_module, self->ce_modtyp);
+fail:
+	self->ce_module = (REF module_t *)-1;
+	return false;
+}
+
+/* Check if the given `expr' is a simple push-register instruction for `dw_regno' */
+PRIVATE WUNUSED ATTR_PURE NONNULL((1, 2)) bool
+NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__restrict self,
+                                                         di_debuginfo_location_t const *__restrict loc,
+                                                         unwind_regno_t dw_regno) {
+	size_t length;
+	byte_t const *expr;
+	expr = debuginfo_location_select(loc, self->cr_cu.cu_ranges.r_startpc,
+	                                 self->ce_modrelpc,
+	                                 self->ce_parser.dup_addrsize, &length);
+	if unlikely(!expr)
+		return false;
+	switch (length) {
+
+	case 0:
+		break;
+
+	case 1: {
+		/* Check for DW_OP_regXX */
+		uint8_t opcode;
+		opcode = expr[0];
+		return opcode == DW_OP_reg0 + dw_regno;
+	}	break;
+
+	default: {
+		/* case length >= 2: */
+		uint8_t opcode;
+		opcode = expr[0];
+		if (opcode == DW_OP_regx) {
+			unwind_regno_t expr_regno;
+			byte_t const *reader = expr + 1;
+			expr_regno = dwarf_decode_uleb128((byte_t const **)&reader);
+			if (reader == expr + length) { /* Ensure that this is the only instruction! */
+				return expr_regno == dw_regno;
+			}
+		}
+	}	break;
+
+	}
+	return false;
+}
+
+PRIVATE NONNULL((1, 3)) bool
+NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
+                                     unwind_regno_t dw_regno,
+                                     void *__restrict dst);
+
+/* @param: deref_expression_result: When true, dereference the expression result, and
+ *                                  copy the pointed-to memory contents into `dst' */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4)) unsigned int
+NOTHROW_NCX(LIBUNWIND_CC evaluate_call_site_expression)(struct cfientry *__restrict self,
+                                                        di_debuginfo_location_t const *__restrict location,
+                                                        unwind_regno_t dw_regno, void *__restrict dst,
+                                                        bool deref_expression_result) {
+	unwind_emulator_t emulator;
+	size_t expr_length;
+	byte_t const *expr;
+	byte_t const *expr_end;
+	unsigned int error;
+	/* Select the proper expression. */
+	expr = debuginfo_location_select(location,
+	                                 self->cr_cu.cu_ranges.r_startpc,
+	                                 self->ce_modrelpc,
+	                                 self->ce_parser.dup_addrsize,
+	                                 &expr_length);
+	if unlikely(!expr)
+		return UNWIND_NO_FRAME;
+	expr_end = expr + expr_length;
+	if unlikely(expr >= expr_end)
+		return UNWIND_NO_FRAME;
+	if unlikely(expr < self->ce_sections.ds_debug_info_start)
+		return UNWIND_NO_FRAME;
+
+	/* Construct an emulator for execution of the call-site-expression. */
+again_runexpr:
+	emulator.ue_pc                 = expr;
+	emulator.ue_pc_start           = expr;
+	emulator.ue_pc_end             = expr_end;
+	emulator.ue_sectinfo           = cfientry_as_unwind_emulator_sections_t(self);
+	emulator.ue_regget             = &after_unwind_getreg;
+	emulator.ue_regset             = NULL;
+	emulator.ue_regget_arg         = self;
+	/*ulator.ue_regset_arg         = NULL;*/ /* Unused */
+	emulator.ue_framebase          = &self->ce_subprogram_frame_base;
+	emulator.ue_addroffset         = module_getloadaddr(self->ce_module, self->ce_modtyp);
+	emulator.ue_objaddr            = NULL;
+	emulator.ue_bjmprem            = UNWIND_EMULATOR_BJMPREM_DEFAULT;
+	emulator.ue_addrsize           = self->ce_parser.dup_addrsize;
+	emulator.ue_ptrsize            = self->ce_parser.dup_ptrsize;
+	emulator.ue_piecewrite         = 0;
+	emulator.ue_piecebuf           = (byte_t *)dst;
+	emulator.ue_piecesiz           = CFI_REGISTER_SIZE(dw_regno);
+	emulator.ue_piecebits          = 0;
+	emulator.ue_call_frame_cfa     = 0;
+	emulator.ue_cu                 = &self->cr_cu;
+	emulator.ue_module_relative_pc = self->ce_modrelpc;
+	emulator.ue_tlsbase            = (byte_t *)-1;
+
+	/* Execute the expression. */
+	if (deref_expression_result) {
+		uintptr_t top;
+		emulator.ue_piecesiz = 0;
+		error = unwind_emulator_exec_autostack(&emulator, NULL, NULL, &top);
+		if (error == UNWIND_SUCCESS) {
+			NESTED_TRY {
+				memcpy(dst, (void const *)top, CFI_REGISTER_SIZE(dw_regno));
+			} EXCEPT {
+				return UNWIND_SEGFAULT;
+			}
+			return UNWIND_SUCCESS;
+		}
+	} else {
+		unwind_ste_t top;
+		memset(dst, 0, emulator.ue_piecesiz);
+		error = unwind_emulator_exec_autostack(&emulator, NULL, &top, NULL);
+		if (error == UNWIND_EMULATOR_NO_RETURN_VALUE)
+			return UNWIND_SUCCESS;
+		if (error == UNWIND_SUCCESS) {
+			error = unwind_ste_read(&top, &after_unwind_getreg, self, dst,
+			                        (emulator.ue_piecesiz * NBBY) - emulator.ue_piecebits,
+			                        emulator.ue_piecebits, 0);
+			if (error == UNWIND_SUCCESS)
+				return UNWIND_SUCCESS;
+		}
+	}
+	if unlikely(error == UNWIND_EMULATOR_UNKNOWN_INSTRUCTION ||
+	            error == UNWIND_EMULATOR_INVALID_FUNCTION ||
+	            error == UNWIND_EMULATOR_NO_CFA) {
+		/* Check if we might fix the problem by loading some missing section. */
+		if (!self->ce_s_eh_frame && !self->ce_s_debug_frame &&
+		    !self->ce_s_debug_addr && !self->ce_s_debug_loc) {
+#define lock_section(name)                                       \
+			module_locksection(self->ce_module, self->ce_modtyp, \
+			                   name, MODULE_LOCKSECTION_FNORMAL)
+			self->ce_s_eh_frame    = lock_section(secname_eh_frame);
+			self->ce_s_debug_frame = lock_section(secname_debug_frame);
+			self->ce_s_debug_addr  = lock_section(secname_debug_addr);
+			self->ce_s_debug_loc   = lock_section(secname_debug_loc);
+#undef lock_section
+			if (!self->ce_s_eh_frame)
+				self->ce_s_eh_frame = (REF module_section_t *)-1;
+			else {
+				LOAD_SECTION(self->ce_s_eh_frame,
+				             self->ce_modtyp,
+				             self->ce_sections.ds_eh_frame_start,
+				             self->ce_sections.ds_eh_frame_end);
+			}
+			if (!self->ce_s_debug_frame)
+				self->ce_s_debug_frame = (REF module_section_t *)-1;
+			else {
+				LOAD_SECTION(self->ce_s_debug_frame,
+				             self->ce_modtyp,
+				             self->ce_sections.ds_debug_frame_start,
+				             self->ce_sections.ds_debug_frame_end);
+			}
+			if (!self->ce_s_debug_addr)
+				self->ce_s_debug_addr = (REF module_section_t *)-1;
+			else {
+				LOAD_SECTION(self->ce_s_debug_addr,
+				             self->ce_modtyp,
+				             self->ce_sections.ds_debug_addr_start,
+				             self->ce_sections.ds_debug_addr_end);
+			}
+			if (!self->ce_s_debug_loc)
+				self->ce_s_debug_loc = (REF module_section_t *)-1;
+			else {
+				LOAD_SECTION(self->ce_s_debug_loc,
+				             self->ce_modtyp,
+				             self->ce_sections.ds_debug_loc_start,
+				             self->ce_sections.ds_debug_loc_end);
+			}
+			goto again_runexpr;
+		}
+	}
+	return error;
+}
 
 PRIVATE NONNULL((1, 3)) bool
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
@@ -171,6 +768,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
                                      void *__restrict dst) {
 	struct cfientry *self;
 	size_t i;
+	byte_t const *saved_dip;
 	self = (struct cfientry *)arg;
 
 	/* First up: Check if the register can be found as part of unwind information.
@@ -187,23 +785,74 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	 * if we can find information about the requested register as part
 	 * of call-site parameter information. */
 
-	/* TODO:
-	 *  #1: Lazily load .debug_info (and related sections) for the module
-	 *      currently loaded at `CFI_UNWIND_REGISTER_PC' (which be the
-	 *      value of one of the entries of `ce_unwind_regv')
-	 *  #2: Search for the DW_TAG_subprogram entry containing the call-site
-	 *      program counter, and scan that component for `DW_TAG_GNU_call_site'
-	 *      with a `DW_AT_location'-attribute that matches the register
-	 *      expression currently being described by `dw_regno'.
-	 *      Once found, load a different attribute `DW_AT_GNU_call_site_value'
-	 *      from that same `DW_TAG_GNU_call_site'-component, which then contains
-	 *      a CFI-expression that can be evaluated in order to calculate the
-	 *      value that the requested register had at the time of the current
-	 *      function being called.
-	 *      NOTE: Register access from inside of this expression is performed
-	 *            through use of `after_unwind_getreg()'. */
-	(void)&after_unwind_getreg;
-
+	/* #1: Lazily load .debug_info (and related sections) for the module
+	 *     currently loaded at `CFI_UNWIND_REGISTER_PC' (which be the
+	 *     value of one of the entries of `ce_unwind_regv')
+	 * #2: Search for the DW_TAG_subprogram entry containing the call-site
+	 *     program counter, and scan that component for `DW_TAG_GNU_call_site'
+	 *     with a `DW_AT_location'-attribute that matches the register
+	 *     expression currently being described by `dw_regno'.
+	 *     Once found, load a different attribute `DW_AT_GNU_call_site_value'
+	 *     from that same `DW_TAG_GNU_call_site'-component, which then contains
+	 *     a CFI-expression that can be evaluated in order to calculate the
+	 *     value that the requested register had at the time of the current
+	 *     function being called.
+	 *     NOTE: Register access from inside of this expression is performed
+	 *           through use of `after_unwind_getreg()'. */
+	if (!cfientry_loadmodule(self))
+		return false; /* Load module information */
+	saved_dip = self->ce_parser.dup_cu_info_pos;
+	/* Scan the call-site we've discovered for `DW_TAG_GNU_call_site_parameter' children */
+	if (libdi_debuginfo_cu_parser_nextchild(&self->ce_parser)) {
+		size_t callsite_depth = self->ce_parser.dup_child_depth;
+		while (self->ce_parser.dup_child_depth >= callsite_depth) {
+			if (self->ce_parser.dup_comp.dic_tag == DW_TAG_GNU_call_site_parameter ||
+			    self->ce_parser.dup_comp.dic_tag == DW_TAG_call_site_parameter) {
+				di_debuginfo_component_attrib_t attr;
+				di_debuginfo_location_t location, call_site_value;
+				bool deref_result       = false;
+				location.l_expr         = NULL;
+				location.l_llist        = NULL;
+				call_site_value.l_expr  = NULL;
+				call_site_value.l_llist = NULL;
+				DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &self->ce_parser) {
+					if (attr.dica_name == DW_AT_location) {
+						if unlikely(!libdi_debuginfo_cu_parser_getexpr(&self->ce_parser, attr.dica_form,
+						                                               &location))
+							ERROR(err);
+					} else if (attr.dica_name == DW_AT_GNU_call_site_value ||
+					           attr.dica_name == DW_AT_call_value) {
+						if unlikely(!libdi_debuginfo_cu_parser_getexpr(&self->ce_parser, attr.dica_form,
+						                                               &call_site_value))
+							ERROR(err);
+						deref_result = false;
+					} else if (attr.dica_name == DW_AT_GNU_call_site_data_value ||
+					           attr.dica_name == DW_AT_call_data_value) {
+						if unlikely(!libdi_debuginfo_cu_parser_getexpr(&self->ce_parser, attr.dica_form,
+						                                               &call_site_value))
+							ERROR(err);
+						deref_result = true;
+					}
+				}
+				/* Check if `location' references the register that we're looking for. */
+				if (is_cfi_expression_a_simple_register_push(self, &location, dw_regno)) {
+					unsigned int error;
+					self->ce_parser.dup_cu_info_pos = saved_dip;
+					/* Found it! -> Evaluate the call-site-value expression,
+					 * and write the expression result into the `dst' buffer. */
+					error = evaluate_call_site_expression(self, &call_site_value,
+					                                      dw_regno, dst, deref_result);
+					return error == UNWIND_SUCCESS;
+				}
+			} else {
+				libdi_debuginfo_cu_parser_skipattr(&self->ce_parser);
+			}
+			if (!libdi_debuginfo_cu_parser_next(&self->ce_parser))
+				break;
+		}
+	}
+err:
+	self->ce_parser.dup_cu_info_pos = saved_dip;
 	return false;
 }
 
@@ -344,11 +993,13 @@ NOTHROW_NCX(CC run_entry_value_emulator)(unwind_emulator_t *__restrict self,
 		goto done;
 	}
 
-	/* Fill in the calle-register accessor callback of `ce' */
+	/* Fill in the callee-register accessor callback of `ce' */
 	ce->ce_regget     = self->ue_regget;
 	ce->ce_regget_arg = self->ue_regget_arg;
+	ce->ce_emulator   = self;
+	ce->ce_module     = NULL;
 
-	/* Re-configure `self' for executino. */
+	/* Re-configure `self' for execution. */
 	old_stacksize       = self->ue_stacksz;
 	self->ue_regget     = &cfi_getreg;
 	self->ue_regget_arg = ce;
@@ -367,6 +1018,9 @@ NOTHROW_NCX(CC run_entry_value_emulator)(unwind_emulator_t *__restrict self,
 				break;
 		}
 	}
+
+	/* Finalize the CFI-entry controller. */
+	cfientry_fini(ce);
 
 	/* Restore the old configuration of `self' */
 	self->ue_regget     = ce->ce_regget;

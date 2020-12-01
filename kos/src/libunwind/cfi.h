@@ -79,6 +79,33 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
                                                 uint8_t addrsize,
                                                 size_t *__restrict pexpr_length);
 
+/* Read/write bit-wise data to/from an unwind stack-entry location.
+ * @param: SELF:           The unwind STE-element to/from which to read/write.
+ * @param: REGGET:         Register getter.
+ * @param: REGGET_ARG:     Register getter argument.
+ * @param: REGSET:         Register setter.
+ * @param: REGSET_ARG:     Register setter argument.
+ * @param: DST:            Destination memory buffer.
+ * @param: SRC:            Source memory buffer.
+ * @param: NUM_BITS:       The # of bits to read/write to/from `DST' or `SRC'
+ * @param: SRC_LEFT_SHIFT: The # of leading bits to leave unchanged in the source.
+ * @param: DST_LEFT_SHIFT: The # of leading bits to leave unchanged in the destination.
+ * @return: UNWIND_SUCCESS:                      Success.
+ * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `SELF'
+ * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `SELF'
+ * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
+INTDEF NONNULL((1, 2, 4)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self,
+                                      unwind_getreg_t regget, void const *regget_arg,
+                                      void *__restrict dst, size_t num_bits,
+                                      unsigned int dst_left_shift, unsigned int src_left_shift);
+INTDEF NONNULL((1, 2, 6)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self,
+                                       /*[1..1]*/ unwind_getreg_t regget, void const *regget_arg,
+                                       /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
+                                       void const *__restrict src, size_t num_bits,
+                                       unsigned int dst_left_shift, unsigned int src_left_shift);
+
 
 /* Read/Write the value associated with a given debuginfo location descriptor.
  * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
@@ -117,7 +144,7 @@ INTDEF NONNULL((1, 3, 8, 10)) unsigned int CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
-                                  struct di_debuginfo_compile_unit_struct const *cu,
+                                  struct di_debuginfo_compile_unit_simple_struct const *cu,
                                   uintptr_t module_relative_pc, uintptr_t module_addroffset,
                                   void *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_written_bits,
@@ -128,7 +155,7 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
                                   unwind_setreg_t regset, void *regset_arg,
-                                  struct di_debuginfo_compile_unit_struct const *cu,
+                                  struct di_debuginfo_compile_unit_simple_struct const *cu,
                                   uintptr_t module_relative_pc, uintptr_t module_addroffset,
                                   void const *__restrict buf, size_t bufsize,
                                   size_t *__restrict pnum_read_bits,

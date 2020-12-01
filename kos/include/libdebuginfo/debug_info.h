@@ -190,7 +190,7 @@ typedef struct di_debuginfo_cu_abbrev_struct {
 
 typedef struct di_debuginfo_cu_parser_struct {
 	di_debuginfo_cu_parser_sections_t const
-	                         *dup_sections;    /* [0..1][const] Section information. */
+	                         *dup_sections;    /* [1..1][const] Section information. */
 	di_debuginfo_cu_abbrev_t *dup_cu_abbrev;   /* [1..1][const] Abbreviation code controller. */
 	__byte_t const           *dup_cu_info_hdr; /* [1..1][const] Address of the debug information header (in .debug_info). */
 	__byte_t const           *dup_cu_info_end; /* [1..1][const] End address of debug information data (in .debug_info). */
@@ -657,6 +657,8 @@ typedef struct di_debuginfo_compile_unit_struct {
 	 * >> // Usually, these are definition components for types and the like, which
 	 * >> // are referred to by other components found previously.
 	 */
+	di_debuginfo_ranges_t cu_ranges;    /* List of debug ranges associated with addresses apart of this CU. */
+	__uintptr_t           cu_addr_base; /* Base address for `DW_OP_addrx' offsets (s.a. `DW_AT_addr_base') */
 	__uintptr_t           cu_stmt_list; /* Offset into `.debug_line' (to-be used with `debugline_loadunit')
 	                                     * to this CU's address-to-line data blob.
 	                                     * If unknown, set to `(__uintptr_t)-1' (but always assume undefined
@@ -664,9 +666,14 @@ typedef struct di_debuginfo_compile_unit_struct {
 	char const           *cu_name;      /* [0..1] Name of the compilation unit. */
 	char const           *cu_comp_dir;  /* [0..1] Path to the compiler base directory (prepended before filenames,
 	                                     * this is essentially the getcwd() of the compiler when the CU was assembled). */
+} di_debuginfo_compile_unit_t;
+#define di_debuginfo_compile_unit_as_simple(self) ((di_debuginfo_compile_unit_simple_t *)&(self)->cu_ranges)
+
+typedef struct di_debuginfo_compile_unit_simple_struct {
+	/* For `DW_TAG_compile_unit' (simplified) */
 	di_debuginfo_ranges_t cu_ranges;    /* List of debug ranges associated with addresses apart of this CU. */
 	__uintptr_t           cu_addr_base; /* Base address for `DW_OP_addrx' offsets (s.a. `DW_AT_addr_base') */
-} di_debuginfo_compile_unit_t;
+} di_debuginfo_compile_unit_simple_t;
 
 typedef struct di_debuginfo_subprogram_struct {
 	/* For `DW_TAG_subprogram' */
@@ -753,16 +760,18 @@ typedef struct di_debuginfo_variable_struct {
 } di_debuginfo_variable_t;
 
 /* Load attributes specific to a certain component:
- *   - debuginfo_cu_parser_loadattr_compile_unit():       DW_TAG_compile_unit
- *   - debuginfo_cu_parser_loadattr_subprogram():         DW_TAG_subprogram
- *   - debuginfo_cu_parser_loadattr_inlined_subroutine(): DW_TAG_inlined_subroutine
- *   - debuginfo_cu_parser_loadattr_lexical_block():      DW_TAG_lexical_block, DW_TAG_try_block, DW_TAG_catch_block
- *   - debuginfo_cu_parser_loadattr_type():               DW_TAG_*_type
- *   - debuginfo_cu_parser_loadattr_member():             DW_TAG_member
- *   - debuginfo_cu_parser_loadattr_variable():           DW_TAG_variable, DW_TAG_formal_parameter
+ *   - debuginfo_cu_parser_loadattr_compile_unit():        DW_TAG_compile_unit
+ *   - debuginfo_cu_parser_loadattr_compile_unit_simple(): DW_TAG_compile_unit
+ *   - debuginfo_cu_parser_loadattr_subprogram():          DW_TAG_subprogram
+ *   - debuginfo_cu_parser_loadattr_inlined_subroutine():  DW_TAG_inlined_subroutine
+ *   - debuginfo_cu_parser_loadattr_lexical_block():       DW_TAG_lexical_block, DW_TAG_try_block, DW_TAG_catch_block
+ *   - debuginfo_cu_parser_loadattr_type():                DW_TAG_*_type
+ *   - debuginfo_cu_parser_loadattr_member():              DW_TAG_member
+ *   - debuginfo_cu_parser_loadattr_variable():            DW_TAG_variable, DW_TAG_formal_parameter
  * @return: true:  Successfully loaded the component attributes.
  * @return: false: Corrupted/incomplete attributes. */
 typedef __ATTR_NONNULL((1, 2)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADATTR_COMPILE_UNIT)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_compile_unit_t *__restrict result);
+typedef __ATTR_NONNULL((1, 2)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADATTR_COMPILE_UNIT_SIMPLE)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_compile_unit_simple_t *__restrict result);
 typedef __ATTR_NONNULL((1, 2)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADATTR_SUBPROGRAM)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_subprogram_t *__restrict result);
 typedef __ATTR_NONNULL((1, 2)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADATTR_INLINED_SUBROUTINE)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_inlined_subroutine_t *__restrict result);
 typedef __ATTR_NONNULL((1, 2)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADATTR_LEXICAL_BLOCK)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_lexical_block_t *__restrict result);
@@ -771,6 +780,7 @@ typedef __ATTR_NONNULL((1, 2)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOA
 typedef __ATTR_NONNULL((1, 2)) __BOOL (LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADATTR_VARIABLE)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_variable_t *__restrict result);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_compile_unit_t *__restrict result);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadattr_compile_unit_simple)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_compile_unit_simple_t *__restrict result);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_subprogram_t *__restrict result);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadattr_inlined_subroutine)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_inlined_subroutine_t *__restrict result);
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadattr_lexical_block)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_lexical_block_t *__restrict result);

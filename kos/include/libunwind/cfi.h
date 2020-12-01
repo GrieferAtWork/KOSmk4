@@ -604,7 +604,7 @@ typedef struct di_debuginfo_location_struct {
 } di_debuginfo_location_t;
 #endif /* !__di_debuginfo_location_t_defined */
 
-struct di_debuginfo_compile_unit_struct;
+struct di_debuginfo_compile_unit_simple_struct;
 typedef struct unwind_emulator_struct {
 	unwind_ste_t           *ue_stack;              /* [0..ue_stacksz|ALLOC(ue_stackmax)][const] Value stack for the emulator. */
 	__size_t                ue_stacksz;            /* Currently used stack size. */
@@ -640,7 +640,7 @@ typedef struct unwind_emulator_struct {
 	                                                * When set to ZERO(0), this value is calculated as-needed, using:
 	                                                *  - unwind_fde_scan(ue_eh_frame_start, ue_eh_frame_end, ...)
 	                                                *  - unwind_fde_exec(...) */
-	struct di_debuginfo_compile_unit_struct const
+	struct di_debuginfo_compile_unit_simple_struct const
 	                       *ue_cu;                 /* [0..1][const] The associated CU (when non-NULL, fields that may be used
 	                                                * are listed in the documentation of `debuginfo_location_getvalue()') */
 	__uintptr_t             ue_module_relative_pc; /* [const] Module-relative program counter position (used for selecting callbacks within expression lists) */
@@ -684,6 +684,47 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict __self,
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
+/* Read/write bit-wise data to/from an unwind stack-entry location.
+ * @param: SELF:           The unwind STE-element to/from which to read/write.
+ * @param: REGGET:         Register getter.
+ * @param: REGGET_ARG:     Register getter argument.
+ * @param: REGSET:         Register setter.
+ * @param: REGSET_ARG:     Register setter argument.
+ * @param: DST:            Destination memory buffer.
+ * @param: SRC:            Source memory buffer.
+ * @param: NUM_BITS:       The # of bits to read/write to/from `DST' or `SRC'
+ * @param: SRC_LEFT_SHIFT: The # of leading bits to leave unchanged in the source.
+ * @param: DST_LEFT_SHIFT: The # of leading bits to leave unchanged in the destination.
+ * @return: UNWIND_SUCCESS:                      Success.
+ * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `SELF'
+ * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `SELF'
+ * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
+typedef __ATTR_NONNULL((1, 2, 4)) unsigned int
+/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_READ)(unwind_ste_t const *__restrict __self,
+                                                   unwind_getreg_t __regget, void const *__regget_arg,
+                                                   void *__restrict __dst, __size_t __num_bits,
+                                                   unsigned int __dst_left_shift, unsigned int __src_left_shift);
+typedef __ATTR_NONNULL((1, 2, 4, 6)) unsigned int
+/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_WRITE)(unwind_ste_t const *__restrict __self,
+                                                    /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
+                                                    /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
+                                                    void const *__restrict __src, __size_t __num_bits,
+                                                    unsigned int __dst_left_shift, unsigned int __src_left_shift);
+#ifdef LIBUNWIND_WANT_PROTOTYPES
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int
+__NOTHROW_NCX(LIBUNWIND_CC unwind_ste_read)(unwind_ste_t const *__restrict __self,
+                                            unwind_getreg_t __regget, void const *__regget_arg,
+                                            void *__restrict __dst, __size_t __num_bits,
+                                            unsigned int __dst_left_shift, unsigned int __src_left_shift);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 6)) unsigned int
+__NOTHROW_NCX(LIBUNWIND_CC unwind_ste_write)(unwind_ste_t const *__restrict __self,
+                                             /*[1..1]*/ unwind_getreg_t __regget, void const *__regget_arg,
+                                             /*[0..1]*/ unwind_setreg_t __regset, void *__regset_arg,
+                                             void const *__restrict __src, __size_t __num_bits,
+                                             unsigned int __dst_left_shift, unsigned int __src_left_shift);
+#endif /* LIBUNWIND_WANT_PROTOTYPES */
+
+
 /* Return a pointer to the next unwind instruction following `UNWIND_PC'
  * -> Useful for dumping unwind instruction without having to take care
  *    of handling all possible instruction (after all: CFI has a CISC
@@ -719,7 +760,7 @@ __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t co
 
 
 
-struct di_debuginfo_compile_unit_struct;
+struct di_debuginfo_compile_unit_simple_struct;
 /* Read/Write the value associated with a given debuginfo location descriptor.
  * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)
  * @param: SECTINFO:              Emulator section information (to-be filled in by the caller)
@@ -757,7 +798,7 @@ typedef __ATTR_NONNULL((1, 3, 8, 10)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_GETVALUE)(di_debuginfo_location_t const *__restrict __self,
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
-                                             struct di_debuginfo_compile_unit_struct const *__cu,
+                                             struct di_debuginfo_compile_unit_simple_struct const *__cu,
                                              __uintptr_t __module_relative_pc,
                                              __uintptr_t __module_addroffset,
                                              void *__restrict __buf, __size_t __bufsize,
@@ -769,7 +810,7 @@ typedef __ATTR_NONNULL((1, 3, 5, 10, 12)) unsigned int
                                              unwind_emulator_sections_t const *__sectinfo,
                                              unwind_getreg_t __regget, void *__regget_arg,
                                              unwind_setreg_t __regset, void *__regset_arg,
-                                             struct di_debuginfo_compile_unit_struct const *__cu,
+                                             struct di_debuginfo_compile_unit_simple_struct const *__cu,
                                              __uintptr_t __module_relative_pc,
                                              __uintptr_t __module_addroffset,
                                              void const *__restrict __buf, __size_t __bufsize,
@@ -781,7 +822,7 @@ LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 8, 10)) unsigned int LIBUNWIND_CC
 debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,
                             unwind_getreg_t __regget, void *__regget_arg,
-                            struct di_debuginfo_compile_unit_struct const *__cu,
+                            struct di_debuginfo_compile_unit_simple_struct const *__cu,
                             __uintptr_t __module_relative_pc,
                             __uintptr_t __module_addroffset,
                             void *__restrict __buf, __size_t __bufsize,
@@ -793,7 +834,7 @@ debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict __self,
                             unwind_emulator_sections_t const *__sectinfo,
                             unwind_getreg_t __regget, void *__regget_arg,
                             unwind_setreg_t __regset, void *__regset_arg,
-                            struct di_debuginfo_compile_unit_struct const *__cu,
+                            struct di_debuginfo_compile_unit_simple_struct const *__cu,
                             __uintptr_t __module_relative_pc,
                             __uintptr_t __module_addroffset,
                             void const *__restrict __buf, __size_t __bufsize,

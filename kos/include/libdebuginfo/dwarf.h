@@ -161,12 +161,41 @@
 #define DW_TAG_type_unit              0x41
 #define DW_TAG_rvalue_reference_type  0x42
 #define DW_TAG_template_alias         0x43
-/*      DW_TAG_                       0x44 */
-/*      DW_TAG_                       0x45 */
-/*      DW_TAG_                       0x46 */
+#define DW_TAG_coarray_type           0x44
+#define DW_TAG_generic_subrange       0x45
+#define DW_TAG_dynamic_type           0x46
 #define DW_TAG_atomic_type            0x47
+#define DW_TAG_call_site              0x48
+#define DW_TAG_call_site_parameter    0x49
+#define DW_TAG_skeleton_unit          0x4a
+#define DW_TAG_immutable_type         0x4b
+/*      DW_TAG_                       0x4c */
+/*      DW_TAG_                       0x4d */
+/*      DW_TAG_                       0x4e */
+/*      DW_TAG_                       0x4f */
+/*      DW_TAG_                       ... */
 #define DW_TAG_lo_user                0x4080
 #define DW_TAG_hi_user                0xffff
+/* Extension tags */
+#define DW_TAG_MIPS_loop                   0x4081
+#define DW_TAG_HP_array_descriptor         0x4090
+#define DW_TAG_HP_Bliss_field              0x4091
+#define DW_TAG_HP_Bliss_field_set          0x4092
+#define DW_TAG_format_label                0x4101
+#define DW_TAG_function_template           0x4102
+#define DW_TAG_class_template              0x4103
+#define DW_TAG_GNU_BINCL                   0x4104
+#define DW_TAG_GNU_EINCL                   0x4105
+#define DW_TAG_GNU_template_template_param 0x4106
+#define DW_TAG_GNU_template_parameter_pack 0x4107
+#define DW_TAG_GNU_formal_parameter_pack   0x4108
+#define DW_TAG_GNU_call_site               0x4109
+#define DW_TAG_GNU_call_site_parameter     0x410a
+#define DW_TAG_upc_shared_type             0x8765
+#define DW_TAG_upc_strict_type             0x8766
+#define DW_TAG_upc_relaxed_type            0x8767
+#define DW_TAG_PGI_kanji_type              0xa000
+#define DW_TAG_PGI_interface_block         0xa020
 
 #define DW_CHILDREN_no  0
 #define DW_CHILDREN_yes 1
@@ -300,7 +329,19 @@
 #define DW_AT_call_value              0x7e /* exprloc */
 #define DW_AT_call_origin             0x7f /* exprloc */
 #define DW_AT_call_parameter          0x80 /* reference */
-/*      DW_AT_                        0x81  * ... */
+#define DW_AT_call_pc                 0x81 /* ??? */
+#define DW_AT_call_tail_call          0x82 /* ??? */
+#define DW_AT_call_target             0x83 /* ??? */
+#define DW_AT_call_target_clobbered   0x84 /* ??? */
+#define DW_AT_call_data_location      0x85 /* ??? */
+#define DW_AT_call_data_value         0x86 /* ??? */
+#define DW_AT_noreturn                0x87 /* ??? */
+#define DW_AT_alignment               0x88 /* ??? */
+#define DW_AT_export_symbols          0x89 /* ??? */
+#define DW_AT_deleted                 0x8a /* ??? */
+#define DW_AT_defaulted               0x8b /* ??? */
+#define DW_AT_loclists_base           0x8c /* ??? */
+/*      DW_AT_                        0x8d  * ... */
 /*      DW_AT_                        ....  * ... */
 #define DW_AT_lo_user                 0x2000 /* - */
 #define DW_AT_hi_user                 0x3fff /* - */
