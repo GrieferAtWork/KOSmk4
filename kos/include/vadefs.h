@@ -28,6 +28,7 @@
 #endif /* !_INC_CRTDEFS */
 #endif /* __USE_DOS */
 
+#ifdef __CC__
 __DECL_BEGIN
 
 #ifndef __va_list_defined
@@ -51,5 +52,6 @@ typedef __builtin_va_list va_list;
 #define _crt_va_copy(dst_ap, src_ap) __builtin_va_copy(dst_ap, src_ap)
 
 __DECL_END
+#endif /* __CC__ */
 
 #endif /* !_VADEFS_H */

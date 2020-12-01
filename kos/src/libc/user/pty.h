@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x813182b8 */
+/* HASH CRC-32:0xab65ebd6 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 /* >> openpty(2)
  * Create a new ptty (psuedo tty), storing the handles for the
  * master/slave adapters in `*amaster' and `*aslave'. Additionally,
- * the caller may specific the initial terminial settings `termp'
+ * the caller may specific the initial terminal settings `termp'
  * and window size `winp', as well as a location where the kernel
  * should store the filename of the PTY master socket (as already
  * returned in `*amaster'). Note that the max length of this filename

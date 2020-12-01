@@ -42,7 +42,7 @@ struct winsize;
 @@>> openpty(2)
 @@Create a new ptty (psuedo tty), storing the handles for the
 @@master/slave adapters in `*amaster' and `*aslave'. Additionally,
-@@the caller may specific the initial terminial settings `termp'
+@@the caller may specific the initial terminal settings `termp'
 @@and window size `winp', as well as a location where the kernel
 @@should store the filename of the PTY master socket (as already
 @@returned in `*amaster'). Note that the max length of this filename

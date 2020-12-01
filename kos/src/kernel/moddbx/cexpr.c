@@ -2973,17 +2973,17 @@ NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
 			} else if (ELF32_ST_TYPE(st_info) == STT_OBJECT) {
 				if (st_size == dbg_current_sizeof_pointer()) {
 					symtype.ct_typ = incref(&ctype_void_ptr);
-				} else if (st_size == 1) {
-					symtype.ct_typ = incref(&ctype_u8);
-				} else if (st_size == 2) {
-					symtype.ct_typ = incref(&ctype_u16);
-				} else if (st_size == 4) {
-					symtype.ct_typ = incref(&ctype_u32);
-				} else if (st_size == 8) {
-					symtype.ct_typ = incref(&ctype_u64);
 				} else {
-					symtype.ct_typ = &ctype_byte_t;
-					symtype.ct_typ = ctype_array(&symtype, st_size);
+					switch (st_size) {
+					case 1: symtype.ct_typ = incref(&ctype_u8); break;
+					case 2: symtype.ct_typ = incref(&ctype_u16); break;
+					case 4: symtype.ct_typ = incref(&ctype_u32); break;
+					case 8: symtype.ct_typ = incref(&ctype_u64); break;
+					default:
+						symtype.ct_typ = &ctype_byte_t;
+						symtype.ct_typ = ctype_array(&symtype, st_size);
+						break;
+					}
 					if unlikely(!symtype.ct_typ)
 						goto err_csym_nomem;
 				}

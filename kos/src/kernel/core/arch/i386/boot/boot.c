@@ -407,6 +407,12 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       icpustate_getpc(state),
 	       icpustate_getsp(state));
 
+	/* TODO: Add an arch-specific <asm/signed-shift.h> file to contain a set of feature
+	 *       test macros that specify how the signed >>-operator behaves:
+	 *        Behavior #1: Signed divide (iow. the sign-bit is copied)
+	 *        Behavior #2: Unsigned divide (iow. the same as the unsigned >>-operator)
+	 */
+
 	/* TODO: Add a user-space interface for reading the dmesg backlog, as well
 	 *       as establishing custom, pre-allocated buffers for syslog messages,
 	 *       essentially allowing user-space to register additional syslog sinks.
