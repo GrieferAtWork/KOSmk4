@@ -2250,16 +2250,16 @@ NOTHROW(FCALL cmodule_findunit_from_pc_fallback)(struct cmodule const *__restric
 	for (i = 0; i < self->cm_cuc; ++i) {
 		unsigned int error;
 		di_debuginfo_cu_parser_t parser;
-		di_debuginfo_compile_unit_t cu;
+		di_debuginfo_compile_unit_simple_t cu;
 		cmodunit_parser_from_dip(&self->cm_cuv[i], self, &parser, NULL);
 		/* Find the nearest CU. */
-		if (parser.dup_comp.dic_tag != DW_TAG_compile_unit) {
+		while (parser.dup_comp.dic_tag != DW_TAG_compile_unit) {
 			debuginfo_cu_parser_skipattr(&parser);
 			if (!debuginfo_cu_parser_next(&parser))
 				goto next_cu;
 		}
 		/* Load attributes of this CU. */
-		if (!debuginfo_cu_parser_loadattr_compile_unit(&parser, &cu))
+		if (!debuginfo_cu_parser_loadattr_compile_unit_simple(&parser, &cu))
 			goto next_cu;
 		/* Check if the given `module_relative_pc' is contained by this CU. */
 		error = debuginfo_ranges_contains(&cu.cu_ranges, &parser,
@@ -2291,11 +2291,14 @@ NOTHROW(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict self,
 		if (error == DEBUG_INFO_ERROR_SUCCESS) {
 			byte_t const *cu_start;
 			cu_start = self->cm_sections.ds_debug_info_start + debuginfo_cu_offset;
-			result = cmodule_findunit_from_dip(self, cu_start);
+			result   = cmodule_findunit_from_dip(self, cu_start);
+			if (result != NULL)
+				goto done;
 		}
 	}
 	/* Fallback */
 	result = cmodule_findunit_from_pc_fallback(self, module_relative_pc);
+done:
 	return result;
 }
 
@@ -2314,7 +2317,7 @@ NOTHROW(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
 		result = &self->cm_cuv[index];
 		if (dip < cmodunit_di_start(result))
 			hi = index;
-		else if (dip > cmodunit_di_maxend(result))
+		else if (dip >= cmodunit_di_maxend(result))
 			lo = index + 1;
 		else {
 			/* Found it! */
