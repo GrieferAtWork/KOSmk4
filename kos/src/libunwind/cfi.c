@@ -427,6 +427,52 @@ copy_bits(void *__restrict dst_base, unsigned int dst_bit_offset,
 	}
 }
 
+/* Load the effective l-value address of `SELF' into `*PADDR':
+ *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
+ *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
+ *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset
+ *   UNWIND_STE_REGPOINTER:   Write-back REGISTER[s_register]       (NOTE: Technically, this case isn't allowed)
+ *   UNWIND_STE_RW_LVALUE:    Write-back s_lvalue
+ *   UNWIND_STE_RO_LVALUE:    Write-back s_lvalue
+ * @return: UNWIND_SUCCESS:                      Success.
+ * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `SELF'
+ * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `SELF' */
+INTERN NONNULL((1, 2, 4)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
+                                      unwind_getreg_t regget, void const *regget_arg,
+                                      void **__restrict paddr) {
+	switch (self->s_type) {
+
+	case UNWIND_STE_REGISTER:
+	case UNWIND_STE_REGPOINTER: {
+		union {
+			uintptr_t word;
+			byte_t data[CFI_UNWIND_REGISTER_MAXSIZE];
+		} regval;
+		if unlikely(!(*regget)(regget_arg, self->s_register, regval.data))
+			ERROR(err_invalid_register);
+		if (self->s_type == UNWIND_STE_REGISTER)
+			regval.word += self->s_regoffset;
+		*paddr = (void *)regval.word;
+	}	break;
+
+	case UNWIND_STE_CONSTANT:
+	case UNWIND_STE_STACKVALUE:
+	case UNWIND_STE_RW_LVALUE:
+	case UNWIND_STE_RO_LVALUE:
+		*paddr = (void *)self->s_uconst;
+		break;
+
+	default:
+		goto err_illegal_instruction;
+	}
+	return UNWIND_SUCCESS;
+err_invalid_register:
+	return UNWIND_INVALID_REGISTER;
+err_illegal_instruction:
+	return UNWIND_EMULATOR_ILLEGAL_INSTRUCTION;
+}
+
 /* Read/write bit-wise data to/from an unwind stack-entry location.
  * @param: SELF:           The unwind STE-element to/from which to read/write.
  * @param: REGGET:         Register getter.
@@ -613,7 +659,31 @@ err_not_writable:
 	return UNWIND_EMULATOR_NOT_WRITABLE;
 }
 
-/* Do the equivalent of `WRITE_BITS(*ADDR_OF(str))' */
+/* Do the equivalent of `READ_BITS(*ADDR_OF(ste))' */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
+libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
+                                      unwind_ste_t const *__restrict ste,
+                                      uintptr_t num_bits,
+                                      unsigned int target_left_shift) {
+	unsigned int result;
+	if unlikely(((self->ue_piecebits + num_bits + NBBY - 1) / NBBY) > self->ue_piecesiz)
+		ERROR(err_buffer_too_small);
+	result = libuw_unwind_ste_read(ste,
+	                               self->ue_regget,
+	                               self->ue_regget_arg,
+	                               self->ue_piecebuf,
+	                               num_bits,
+	                               self->ue_piecebits,
+	                               target_left_shift);
+	if (result == UNWIND_SUCCESS)
+		self->ue_piecebits += num_bits; /* Update the number of consumed piece bits. */
+	return result;
+err_buffer_too_small:
+	return UNWIND_EMULATOR_BUFFER_TOO_SMALL;
+}
+
+
+/* Do the equivalent of `WRITE_BITS(*ADDR_OF(ste))' */
 PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *__restrict ste,
@@ -631,30 +701,6 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 	                                num_bits,
 	                                target_left_shift,
 	                                self->ue_piecebits);
-	if (result == UNWIND_SUCCESS)
-		self->ue_piecebits += num_bits; /* Update the number of consumed piece bits. */
-	return result;
-err_buffer_too_small:
-	return UNWIND_EMULATOR_BUFFER_TOO_SMALL;
-}
-
-
-/* Do the equivalent of `READ_BITS(*ADDR_OF(str))' */
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
-libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
-                                      unwind_ste_t const *__restrict ste,
-                                      uintptr_t num_bits,
-                                      unsigned int target_left_shift) {
-	unsigned int result;
-	if unlikely(((self->ue_piecebits + num_bits + NBBY - 1) / NBBY) > self->ue_piecesiz)
-		ERROR(err_buffer_too_small);
-	result = libuw_unwind_ste_read(ste,
-	                               self->ue_regget,
-	                               self->ue_regget_arg,
-	                               self->ue_piecebuf,
-	                               num_bits,
-	                               self->ue_piecebits,
-	                               target_left_shift);
 	if (result == UNWIND_SUCCESS)
 		self->ue_piecebits += num_bits; /* Update the number of consumed piece bits. */
 	return result;
@@ -2269,6 +2315,7 @@ err_no_function:
 DEFINE_PUBLIC_ALIAS(unwind_emulator_exec, libuw_unwind_emulator_exec);
 DEFINE_PUBLIC_ALIAS(unwind_emulator_exec_autostack, libuw_unwind_emulator_exec_autostack);
 DEFINE_PUBLIC_ALIAS(unwind_instruction_succ, libuw_unwind_instruction_succ);
+DEFINE_PUBLIC_ALIAS(unwind_ste_addr, libuw_unwind_ste_addr);
 DEFINE_PUBLIC_ALIAS(unwind_ste_read, libuw_unwind_ste_read);
 DEFINE_PUBLIC_ALIAS(unwind_ste_write, libuw_unwind_ste_write);
 DEFINE_PUBLIC_ALIAS(debuginfo_location_select, libuw_debuginfo_location_select);

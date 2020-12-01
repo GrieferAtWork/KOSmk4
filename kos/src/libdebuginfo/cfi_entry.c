@@ -72,11 +72,13 @@ PRIVATE PUNWIND_EMULATOR_EXEC /*     */ pdyn_unwind_emulator_exec           = NU
 PRIVATE PUNWIND_EMULATOR_EXEC_AUTOSTACK pdyn_unwind_emulator_exec_autostack = NULL;
 PRIVATE PUNWIND_INSTRUCTION_SUCC /*  */ pdyn_unwind_instruction_succ        = NULL;
 PRIVATE PDEBUGINFO_LOCATION_SELECT /**/ pdyn_debuginfo_location_select      = NULL;
+PRIVATE PUNWIND_STE_ADDR /*          */ pdyn_unwind_ste_addr                = NULL;
 PRIVATE PUNWIND_STE_READ /*          */ pdyn_unwind_ste_read                = NULL;
 #define unwind_emulator_exec           (*pdyn_unwind_emulator_exec)
 #define unwind_emulator_exec_autostack (*pdyn_unwind_emulator_exec_autostack)
 #define unwind_instruction_succ        (*pdyn_unwind_instruction_succ)
 #define debuginfo_location_select      (*pdyn_debuginfo_location_select)
+#define unwind_ste_addr                (*pdyn_unwind_ste_addr)
 #define unwind_ste_read                (*pdyn_unwind_ste_read)
 
 PRIVATE bool CC load_libunwind(void) {
@@ -94,6 +96,7 @@ PRIVATE bool CC load_libunwind(void) {
 
 	/* Lazily load functions from libunwind. */
 	LOAD(pdyn_unwind_ste_read, "unwind_ste_read");
+	LOAD(pdyn_unwind_ste_addr, "unwind_ste_addr");
 	LOAD(pdyn_debuginfo_location_select, "debuginfo_location_select");
 	LOAD(pdyn_unwind_instruction_succ, "unwind_instruction_succ");
 	LOAD(pdyn_unwind_emulator_exec_autostack, "unwind_emulator_exec_autostack");
@@ -585,6 +588,13 @@ fail:
 	return false;
 }
 
+#ifdef __GNUC__
+/* GCC claims that "length" in th below function is uninitialized, when
+ * clearly it is very much getting initialized by `debuginfo_location_select()' */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* __GNUC__ */
+
 /* Check if the given `expr' is a simple push-register instruction for `dw_regno' */
 PRIVATE WUNUSED ATTR_PURE NONNULL((1, 2)) bool
 NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__restrict self,
@@ -627,10 +637,56 @@ NOTHROW_NCX(CC is_cfi_expression_a_simple_register_push)(struct cfientry *__rest
 	return false;
 }
 
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
+
+
 PRIVATE NONNULL((1, 3)) bool
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
                                      unwind_regno_t dw_regno,
                                      void *__restrict dst);
+
+PRIVATE NONNULL((1, 3)) void CC
+copy_bits(void *__restrict dst_base, unsigned int dst_bit_offset,
+          void const *__restrict src_base, unsigned int src_bit_offset,
+          size_t num_bits) {
+	while (num_bits) {
+		byte_t remaining, src_value, remaining_temp;
+		src_base = (byte_t const *)src_base + (src_bit_offset / NBBY);
+		src_bit_offset %= NBBY;
+		remaining = NBBY - src_bit_offset;
+		if (remaining > num_bits)
+			remaining = num_bits;
+		src_value      = *(byte_t const *)src_base >> src_bit_offset;
+		remaining_temp = remaining;
+		while (remaining_temp) {
+			byte_t avail, dst_value;
+			dst_base = (byte_t *)dst_base + (dst_bit_offset / NBBY);
+			dst_bit_offset %= NBBY;
+			avail = NBBY - dst_bit_offset;
+			if (avail > remaining_temp)
+				avail = remaining_temp;
+			dst_value = *(byte_t *)dst_base;
+			dst_value &= ~(((1 << avail) - 1) << dst_bit_offset);
+			dst_value |= (src_value & ((1 << avail) - 1)) << dst_bit_offset;
+			*(byte_t *)dst_base = dst_value;
+			dst_bit_offset += avail;
+			remaining_temp -= avail;
+			src_value >>= avail;
+		}
+		src_bit_offset += remaining;
+		num_bits -= remaining;
+	}
+}
+
+
+#ifdef __GNUC__
+/* GCC claims that "expr_length" in th below function is uninitialized, when
+ * clearly it is very much getting initialized by `debuginfo_location_select()' */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif /* __GNUC__ */
 
 /* @param: deref_expression_result: When true, dereference the expression result, and
  *                                  copy the pointed-to memory contents into `dst' */
@@ -643,6 +699,7 @@ NOTHROW_NCX(LIBUNWIND_CC evaluate_call_site_expression)(struct cfientry *__restr
 	size_t expr_length;
 	byte_t const *expr;
 	byte_t const *expr_end;
+	unwind_ste_t top;
 	unsigned int error;
 	/* Select the proper expression. */
 	expr = debuginfo_location_select(location,
@@ -682,38 +739,41 @@ again_runexpr:
 	emulator.ue_cu                 = &self->cr_cu;
 	emulator.ue_module_relative_pc = self->ce_modrelpc;
 	emulator.ue_tlsbase            = (byte_t *)-1;
+	memset(dst, 0, emulator.ue_piecesiz);
+	if (deref_expression_result)
+		emulator.ue_piecesiz = 0;
 
 	/* Execute the expression. */
-	if (deref_expression_result) {
-		uintptr_t top;
-		emulator.ue_piecesiz = 0;
-		error = unwind_emulator_exec_autostack(&emulator, NULL, NULL, &top);
-		if (error == UNWIND_SUCCESS) {
-			NESTED_TRY {
-				memcpy(dst, (void const *)top, CFI_REGISTER_SIZE(dw_regno));
-			} EXCEPT {
-				return UNWIND_SEGFAULT;
-			}
-			return UNWIND_SUCCESS;
-		}
-	} else {
-		unwind_ste_t top;
-		memset(dst, 0, emulator.ue_piecesiz);
-		error = unwind_emulator_exec_autostack(&emulator, NULL, &top, NULL);
-		if (error == UNWIND_EMULATOR_NO_RETURN_VALUE)
-			return UNWIND_SUCCESS;
-		if (error == UNWIND_SUCCESS) {
+	error = unwind_emulator_exec_autostack(&emulator, NULL, &top, NULL);
+	if (error == UNWIND_SUCCESS) {
+		size_t missing_bits;
+		missing_bits = (emulator.ue_piecesiz * NBBY) - emulator.ue_piecebits;
+		if (deref_expression_result) {
+			/* Read from the pointed-to memory location of stack-top to fill in the rest. */
 			error = unwind_ste_read(&top, &after_unwind_getreg, self, dst,
-			                        (emulator.ue_piecesiz * NBBY) - emulator.ue_piecebits,
-			                        emulator.ue_piecebits, 0);
-			if (error == UNWIND_SUCCESS)
+			                        missing_bits, emulator.ue_piecebits, 0);
+		} else {
+			void *addr;
+			error = unwind_ste_addr(&top, &after_unwind_getreg, self, &addr);
+			if (error == UNWIND_SUCCESS) {
+				/* Load missing bits with from the address itself (but don't deref it!) */
+				if (missing_bits > sizeof(addr) * NBBY)
+					missing_bits = sizeof(addr) * NBBY;
+				copy_bits(dst, emulator.ue_piecebits, &addr, 0, missing_bits);
 				return UNWIND_SUCCESS;
+			}
 		}
+		return error;
+	} else if (error == UNWIND_EMULATOR_NO_RETURN_VALUE && !deref_expression_result) {
+		/* If we're not supposed to deref the result, it's OK if the
+		 * expression didn't leave anything within the top stack-element. */
+		return  UNWIND_SUCCESS;
 	}
+
+	/* Check if we might be able to fix the error by loading some missing section. */
 	if unlikely(error == UNWIND_EMULATOR_UNKNOWN_INSTRUCTION ||
 	            error == UNWIND_EMULATOR_INVALID_FUNCTION ||
 	            error == UNWIND_EMULATOR_NO_CFA) {
-		/* Check if we might fix the problem by loading some missing section. */
 		if (!self->ce_s_eh_frame && !self->ce_s_debug_frame &&
 		    !self->ce_s_debug_addr && !self->ce_s_debug_loc) {
 #define lock_section(name)                                       \
@@ -761,6 +821,11 @@ again_runexpr:
 	}
 	return error;
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
+
 
 PRIVATE NONNULL((1, 3)) bool
 NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,

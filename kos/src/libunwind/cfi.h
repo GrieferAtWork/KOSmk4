@@ -79,6 +79,21 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
                                                 uint8_t addrsize,
                                                 size_t *__restrict pexpr_length);
 
+/* Load the effective l-value address of `SELF' into `*PADDR':
+ *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
+ *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
+ *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset
+ *   UNWIND_STE_REGPOINTER:   Write-back REGISTER[s_register]       (NOTE: Technically, this case isn't allowed)
+ *   UNWIND_STE_RW_LVALUE:    Write-back s_lvalue
+ *   UNWIND_STE_RO_LVALUE:    Write-back s_lvalue
+ * @return: UNWIND_SUCCESS:                      Success.
+ * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `SELF'
+ * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `SELF' */
+INTDEF NONNULL((1, 2, 4)) unsigned int
+NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
+                                      unwind_getreg_t regget, void const *regget_arg,
+                                      void **__restrict paddr);
+
 /* Read/write bit-wise data to/from an unwind stack-entry location.
  * @param: SELF:           The unwind STE-element to/from which to read/write.
  * @param: REGGET:         Register getter.
@@ -105,7 +120,6 @@ NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self,
                                        /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
                                        void const *__restrict src, size_t num_bits,
                                        unsigned int dst_left_shift, unsigned int src_left_shift);
-
 
 /* Read/Write the value associated with a given debuginfo location descriptor.
  * @param: SELF:                  The debug info location descriptor (s.a. libdebuginfo.so)

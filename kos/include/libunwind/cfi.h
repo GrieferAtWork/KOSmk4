@@ -522,8 +522,8 @@
  *   UNWIND_STE_STACKVALUE:   s_uconst or s_sconst
  *   UNWIND_STE_REGISTER:     REGISTER[s_register] + s_regoffset
  *   UNWIND_STE_REGPOINTER:   &REGISTER[s_register]              // Register map address (can only be dereferenced)
- *   UNWIND_STE_RW_LVALUE:    *(byte_t(*)[s_lsize])s_lvalue
- *   UNWIND_STE_RO_LVALUE:    *(byte_t(*)[s_lsize])s_lvalue
+ *   UNWIND_STE_RW_LVALUE:    (byte_t(*)[s_lsize])s_lvalue
+ *   UNWIND_STE_RO_LVALUE:    (byte_t(*)[s_lsize])s_lvalue
  *
  * Effective return values (after indirection) are:
  *   UNWIND_STE_CONSTANT:     result = *(<unspecified> *)s_uconst
@@ -681,6 +681,28 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict __self,
                                unwind_ste_t const *__pentry_stack_top,
                                unwind_ste_t *__pexit_stack_top,
                                __uintptr_t *__pexit_stack_top_const);
+#endif /* LIBUNWIND_WANT_PROTOTYPES */
+
+
+/* Load the effective l-value address of `SELF' into `*PADDR':
+ *   UNWIND_STE_CONSTANT:     Write-back s_uconst or s_sconst
+ *   UNWIND_STE_STACKVALUE:   Write-back s_uconst or s_sconst
+ *   UNWIND_STE_REGISTER:     Write-back REGISTER[s_register] + s_regoffset
+ *   UNWIND_STE_REGPOINTER:   Write-back REGISTER[s_register]       (NOTE: Technically, this case isn't allowed)
+ *   UNWIND_STE_RW_LVALUE:    Write-back s_lvalue
+ *   UNWIND_STE_RO_LVALUE:    Write-back s_lvalue
+ * @return: UNWIND_SUCCESS:                      Success.
+ * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `SELF'
+ * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `SELF' */
+typedef __ATTR_NONNULL((1, 2, 4)) unsigned int
+/*__NOTHROW_NCX*/ (LIBUNWIND_CC *PUNWIND_STE_ADDR)(unwind_ste_t const *__restrict __self,
+                                                   unwind_getreg_t __regget, void const *__regget_arg,
+                                                   void **__restrict __paddr);
+#ifdef LIBUNWIND_WANT_PROTOTYPES
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int
+__NOTHROW_NCX(LIBUNWIND_CC unwind_ste_addr)(unwind_ste_t const *__restrict __self,
+                                            unwind_getreg_t __regget, void const *__regget_arg,
+                                            void **__restrict __paddr);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 
