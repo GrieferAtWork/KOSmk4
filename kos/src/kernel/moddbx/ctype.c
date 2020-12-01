@@ -1026,6 +1026,10 @@ again:
 	case DW_TAG_base_type:
 		switch (typinfo.t_encoding) {
 
+		case DW_ATE_void:
+			presult->ct_typ = incref(&ctype_void);
+			break;
+
 		case DW_ATE_address:
 			if (!typinfo.t_sizeof)
 				typinfo.t_sizeof = dbg_current_sizeof_pointer();
@@ -1189,7 +1193,7 @@ do_character:
 			goto do_unsigned;
 
 		default:
-			break;
+			goto err_corrupt;
 		}
 		break;
 
