@@ -1108,12 +1108,6 @@ done:
  *        - ue_regget     (Register access is dispatched to register states as they were on function entry)
  *        - ue_regget_arg (*ditto*)
  *        - ue_regset     (Temporarily set to NULL to prevent register writes)
- *        - ue_objaddr    (Temporarily set to NULL; the specs even state that `DW_OP_push_object_address'
- *                         isn't allowed inside of entry-value expressions)
- *        - ue_piecewrite (Set to `0' to indicate that data is only to be read)
- *        - ue_piecebuf   (*ditto*)
- *        - ue_piecesiz   (*ditto*)
- *        - ue_piecebits  (*ditto*)
  *       ... before returning, regardless of what ends up being returned.
  *
  * @return: UNWIND_SUCCESS:          ...
@@ -1130,11 +1124,6 @@ NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(unwind_emulator_t *__re
 	byte_t const *saved_pc_start;
 	byte_t const *saved_pc_end;
 	unwind_setreg_t saved_regset;
-	void *saved_objaddr;
-	uint8_t saved_piecewrite;
-	byte_t *saved_piecebuf;
-	size_t saved_piecesiz;
-	size_t saved_piecebits;
 
 #ifndef __KERNEL__
 	/* Ensure that we've loaded the necessary symbols from libunwind.so */
@@ -1143,26 +1132,16 @@ NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(unwind_emulator_t *__re
 #endif /* !__KERNEL__ */
 
 	/* Preserve the old emulator state. */
-	saved_pc         = self->ue_pc;
-	saved_pc_start   = self->ue_pc_start;
-	saved_pc_end     = self->ue_pc_end;
-	saved_regset     = self->ue_regset;
-	saved_objaddr    = self->ue_objaddr;
-	saved_piecewrite = self->ue_piecewrite;
-	saved_piecebuf   = self->ue_piecebuf;
-	saved_piecesiz   = self->ue_piecesiz;
-	saved_piecebits  = self->ue_piecebits;
+	saved_pc       = self->ue_pc;
+	saved_pc_start = self->ue_pc_start;
+	saved_pc_end   = self->ue_pc_end;
+	saved_regset   = self->ue_regset;
 
 	/* Set-up the emulator to do our bidding. */
-	self->ue_pc         = cfi_start_pc;
-	self->ue_pc_start   = cfi_start_pc;
-	self->ue_pc_end     = cfi_end_pc;
-	self->ue_regset     = NULL;
-	self->ue_objaddr    = NULL;
-	self->ue_piecewrite = 0;
-	self->ue_piecebuf   = NULL;
-	self->ue_piecesiz   = 0;
-	self->ue_piecebits  = 0;
+	self->ue_pc       = cfi_start_pc;
+	self->ue_pc_start = cfi_start_pc;
+	self->ue_pc_end   = cfi_end_pc;
+	self->ue_regset   = NULL; /* Prevent register writes */
 
 	/* And invoke the emulator proper, which is now re-directed
 	 * to dispatch register accesses using `libcfientry_getreg'
@@ -1177,15 +1156,10 @@ NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(unwind_emulator_t *__re
 	}
 
 	/* Restore the old emulator state. */
-	self->ue_pc         = saved_pc;
-	self->ue_pc_start   = saved_pc_start;
-	self->ue_pc_end     = saved_pc_end;
-	self->ue_regset     = saved_regset;
-	self->ue_objaddr    = saved_objaddr;
-	self->ue_piecewrite = saved_piecewrite;
-	self->ue_piecebuf   = saved_piecebuf;
-	self->ue_piecesiz   = saved_piecesiz;
-	self->ue_piecebits  = saved_piecebits;
+	self->ue_pc       = saved_pc;
+	self->ue_pc_start = saved_pc_start;
+	self->ue_pc_end   = saved_pc_end;
+	self->ue_regset   = saved_regset;
 
 	return result;
 }

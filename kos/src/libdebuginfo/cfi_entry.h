@@ -46,12 +46,6 @@ DECL_BEGIN
  *        - ue_regget     (Register access is dispatched to register states as they were on function entry)
  *        - ue_regget_arg (*ditto*)
  *        - ue_regset     (Temporarily set to NULL to prevent register writes)
- *        - ue_objaddr    (Temporarily set to NULL; the specs even state that `DW_OP_push_object_address'
- *                         isn't allowed inside of entry-value expressions)
- *        - ue_piecewrite (Set to `0' to indicate that data is only to be read)
- *        - ue_piecebuf   (*ditto*)
- *        - ue_piecesiz   (*ditto*)
- *        - ue_piecebits  (*ditto*)
  *       ... before returning, regardless of what ends up being returned.
  *
  * @return: UNWIND_SUCCESS:          ...
