@@ -27,6 +27,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/byteorder.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
@@ -42,6 +43,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libdebuginfo/cfi_entry.h>
 #include <libdebuginfo/debug_frame.h>
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/dwarf.h>
@@ -68,25 +70,6 @@
 #else /* __KERNEL__ */
 #define WAS_SEGFAULT_THROWN() was_thrown(E_SEGFAULT)
 #endif /* !__KERNEL__ */
-
-
-#undef CONFIG_SUPPORT_CFI_ENTRY_VALUE
-#if 1
-#define CONFIG_SUPPORT_CFI_ENTRY_VALUE 1
-#endif
-
-#ifdef CONFIG_SUPPORT_CFI_ENTRY_VALUE
-#include <hybrid/atomic.h>
-
-#include <libcfientry/entry_value.h>
-#ifdef __KERNEL__
-#include <kernel/driver.h>
-#include <kernel/panic.h>
-#else /* __KERNEL__ */
-#include <dlfcn.h>
-#endif /* !__KERNEL__ */
-#endif /* CONFIG_SUPPORT_CFI_ENTRY_VALUE */
-
 
 DECL_BEGIN
 
@@ -156,21 +139,23 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes) {
 
 
 #ifndef __KERNEL__
-PRIVATE void *pdyn_libdebuginfo                                         = NULL;
-PRIVATE PDEBUGINFO_CU_ABBREV_FINI     pdyn_debuginfo_cu_abbrev_fini     = NULL;
-PRIVATE PDEBUGINFO_CU_PARSER_LOADUNIT pdyn_debuginfo_cu_parser_loadunit = NULL;
-PRIVATE PDEBUGINFO_CU_PARSER_SKIPFORM pdyn_debuginfo_cu_parser_skipform = NULL;
-PRIVATE PDEBUGINFO_CU_PARSER_GETEXPR  pdyn_debuginfo_cu_parser_getexpr  = NULL;
-PRIVATE PUNWIND_FDE_SCAN_DF           pdyn_unwind_fde_scan_df           = NULL;
-#define debuginfo_cu_abbrev_fini      (*pdyn_debuginfo_cu_abbrev_fini)
-#define debuginfo_cu_parser_loadunit  (*pdyn_debuginfo_cu_parser_loadunit)
-#define debuginfo_cu_parser_skipform  (*pdyn_debuginfo_cu_parser_skipform)
-#define debuginfo_cu_parser_getexpr   (*pdyn_debuginfo_cu_parser_getexpr)
-#define unwind_fde_scan_df            (*pdyn_unwind_fde_scan_df)
+PRIVATE void *pdyn_libdebuginfo                                                     = NULL;
+PRIVATE PDEBUGINFO_CU_ABBREV_FINI /*     */ pdyn_debuginfo_cu_abbrev_fini           = NULL;
+PRIVATE PDEBUGINFO_CU_PARSER_LOADUNIT /* */ pdyn_debuginfo_cu_parser_loadunit       = NULL;
+PRIVATE PDEBUGINFO_CU_PARSER_SKIPFORM /* */ pdyn_debuginfo_cu_parser_skipform       = NULL;
+PRIVATE PDEBUGINFO_CU_PARSER_GETEXPR /*  */ pdyn_debuginfo_cu_parser_getexpr        = NULL;
+PRIVATE PDEBUGINFO_RUN_ENTRY_VALUE_EMULATOR pdyn_debuginfo_run_entry_value_emulator = NULL;
+PRIVATE PUNWIND_FDE_SCAN_DF /*           */ pdyn_unwind_fde_scan_df                 = NULL;
+#define debuginfo_cu_abbrev_fini           (*pdyn_debuginfo_cu_abbrev_fini)
+#define debuginfo_cu_parser_loadunit       (*pdyn_debuginfo_cu_parser_loadunit)
+#define debuginfo_cu_parser_skipform       (*pdyn_debuginfo_cu_parser_skipform)
+#define debuginfo_cu_parser_getexpr        (*pdyn_debuginfo_cu_parser_getexpr)
+#define debuginfo_run_entry_value_emulator (*pdyn_debuginfo_run_entry_value_emulator)
+#define unwind_fde_scan_df                 (*pdyn_unwind_fde_scan_df)
 
 PRIVATE __attribute__((__destructor__))
 void libuw_unload_libdebuginfo(void) {
-	/* pdyn_libdebuginfo.so was loaded by us, unload it when our library gets destroyed. */
+	/* libdebuginfo.so was loaded by us, unload it when our library gets destroyed. */
 	if (pdyn_libdebuginfo && pdyn_libdebuginfo != (void *)-1)
 		dlclose(pdyn_libdebuginfo);
 }
@@ -184,6 +169,9 @@ again:
 	pdyn_libdebuginfo = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
 	if (!pdyn_libdebuginfo)
 		goto err;
+	*(void **)&pdyn_debuginfo_run_entry_value_emulator  = dlsym(pdyn_libdebuginfo, "debuginfo_run_entry_value_emulator");
+	if unlikely(!pdyn_debuginfo_run_entry_value_emulator)
+		goto err_close;
 	*(void **)&pdyn_debuginfo_cu_parser_getexpr  = dlsym(pdyn_libdebuginfo, "debuginfo_cu_parser_getexpr");
 	if unlikely(!pdyn_debuginfo_cu_parser_getexpr)
 		goto err_close;
@@ -285,7 +273,7 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 	if unlikely(!self->ue_sectinfo)
 		ERROR(err_invalid_function);
 #ifndef __KERNEL__
-	/* Lazily load pdyn_libdebuginfo.so, so we can parser the .debug_info section */
+	/* Lazily load libdebuginfo.so, so we can parser the .debug_info section */
 	if (!pdyn_debuginfo_cu_abbrev_fini && unlikely(libuw_load_libdebuginfo()))
 		ERROR(err_invalid_function);
 	COMPILER_READ_BARRIER();
@@ -370,7 +358,7 @@ libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 		    self->ue_sectinfo->ues_debug_frame_end)
 			goto err_no_cfa;
 #ifndef __KERNEL__
-		/* Lazily load pdyn_libdebuginfo.so, so we can parser the .debug_info section */
+		/* Lazily load libdebuginfo.so, so we can parser the .debug_info section */
 		if (!pdyn_debuginfo_cu_abbrev_fini && unlikely(libuw_load_libdebuginfo()))
 			goto err_no_cfa;;
 #endif /* !__KERNEL__ */
@@ -625,59 +613,6 @@ err_illegal_instruction:
 }
 
 
-#ifdef CONFIG_SUPPORT_CFI_ENTRY_VALUE
-
-#ifdef __KERNEL__
-#undef LIBCFIENTRY_LIBRARY_NAME
-#define LIBCFIENTRY_LIBRARY_NAME "cfientry"
-#define LIBRARY_T                REF struct driver
-#define LOADLIBRARY(name)        driver_insmod(name)
-#define FREELIBRARY(lib)         decref(lib)
-#define GETSYMBOL(lib, name)     driver_symbol(lib, name)
-#else /* __KERNEL__ */
-#define LIBRARY_T            void
-#define LOADLIBRARY(name)    dlopen(name, RTLD_GLOBAL)
-#define FREELIBRARY(lib)     dlclose(lib)
-#define GETSYMBOL(lib, name) dlsym(lib, name)
-#endif /* !__KERNEL__ */
-
-
-/* XXX: The way that this hook is designed in kernel-space makes it
- *      impossible for the user to manually rmmod(1) the `modcfientry'
- *      once it's been loaded! */
-PRIVATE LIBRARY_T *libcfientry = NULL;
-PRIVATE PCFIENTRY_RUN_UNWIND_EMULATOR pdyn_cfientry_run_unwind_emulator = NULL;
-
-PRIVATE bool CC load_libcfientry(void) {
-#ifdef __KERNEL__
-	/* Don't load a new driver if the kernel's been poisoned... */
-	if (kernel_poisoned())
-		return false;
-	NESTED_TRY
-#endif /* __KERNEL__ */
-	{
-		LIBRARY_T *lib, *real_lib;
-		lib = LOADLIBRARY(LIBCFIENTRY_LIBRARY_NAME);
-#ifndef __KERNEL__
-		if unlikely(!lib)
-			return false;
-#endif /* !__KERNEL__ */
-		real_lib = ATOMIC_CMPXCH_VAL(libcfientry, NULL, lib);
-		if unlikely(real_lib != NULL) {
-			FREELIBRARY(lib);
-			lib = real_lib;
-		}
-		/* Try to load the 1 symbol we need from the library. */
-		*(void **)&pdyn_cfientry_run_unwind_emulator = GETSYMBOL(lib, "cfientry_run_unwind_emulator");
-	}
-#ifdef __KERNEL__
-	EXCEPT {
-		return false;
-	}
-#endif /* __KERNEL__ */
-	return likely(pdyn_cfientry_run_unwind_emulator != NULL);
-}
-
 PRIVATE NONNULL((1)) unsigned int CC
 dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
 	unsigned int result;
@@ -693,20 +628,20 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
 		return UNWIND_EMULATOR_ILLEGAL_INSTRUCTION;
 	self->ue_pc = end_pc; /* Set-up the return-pc for later. */
 
-	/* Ensure that libcfientry has been loaded. */
-	if (!pdyn_cfientry_run_unwind_emulator) {
-		if unlikely(!load_libcfientry()) {
-			/* If we can't get libcfientry to load, act like we
-			 * don't know the `DW_OP_entry_value' instruction. */
-			return UNWIND_EMULATOR_UNKNOWN_INSTRUCTION;
-		}
+#ifndef __KERNEL__
+	/* Lazily load libdebuginfo.so */
+	if (!pdyn_debuginfo_run_entry_value_emulator &&
+	    unlikely(libuw_load_libdebuginfo())) {
+		/* If we can't get libdebuginfo.so to load, act like
+		 * we don't know the `DW_OP_entry_value' instruction. */
+		return UNWIND_EMULATOR_UNKNOWN_INSTRUCTION;
 	}
+#endif /* !__KERNEL__ */
 
-	/* Dispatch the call to its own library. */
-	result = (*pdyn_cfientry_run_unwind_emulator)(self, start_pc, end_pc);
+	/* Dispatch the call into libdebuginfo. */
+	result = debuginfo_run_entry_value_emulator(self, start_pc, end_pc);
 	return result;
 }
-#endif /* CONFIG_SUPPORT_CFI_ENTRY_VALUE */
 
 
 
@@ -1594,7 +1529,6 @@ do_read_bit_pieces:
 			++stacksz;
 		}	break;
 
-#ifdef CONFIG_SUPPORT_CFI_ENTRY_VALUE
 		CASE(DW_OP_entry_value)
 		CASE(DW_OP_GNU_entry_value) {
 			unsigned int error;
@@ -1610,7 +1544,6 @@ do_read_bit_pieces:
 			pc      = self->ue_pc;
 			stacksz = self->ue_stacksz;
 		}	break;
-#endif /* CONFIG_SUPPORT_CFI_ENTRY_VALUE */
 
 		default:
 			ERRORF(err_unknown_instruction, "opcode = %#.2I8x (%p/%p/%p/%Iu)\n%$[hex]\n",
@@ -2021,11 +1954,8 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc
 		break;
 
 	case DW_OP_implicit_value:
-#ifdef CONFIG_SUPPORT_CFI_ENTRY_VALUE
 	case DW_OP_entry_value:
-	case DW_OP_GNU_entry_value:
-#endif /* CONFIG_SUPPORT_CFI_ENTRY_VALUE */
-	{
+	case DW_OP_GNU_entry_value: {
 		dwarf_uleb128_t size;
 		size = dwarf_decode_uleb128((byte_t const **)&unwind_pc);
 		unwind_pc += size;

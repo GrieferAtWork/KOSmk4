@@ -25,26 +25,26 @@
 
 #if defined(__i386__) && !defined(__x86_64__)
 #define LIBDEBUGINFO_CC __ATTR_STDCALL
-#else
+#else /* ... */
 #define LIBDEBUGINFO_CC /* nothing */
-#endif
+#endif /* !... */
 
 /* Feature test macro: `LIBUNWIND_CC' and `LIBDEBUGINFO_CC' are the same. */
 #define LIBDEBUGINFO_CC_IS_LIBUNWIND_CC 1
 
-#if !defined(LIBDEBUGINFO_WANT_PROTOTYPES) && \
-     defined(__KOS__) && defined(__KERNEL__)
+#if (!defined(LIBDEBUGINFO_WANT_PROTOTYPES) && \
+     defined(__KOS__) && defined(__KERNEL__))
 #define LIBDEBUGINFO_WANT_PROTOTYPES 1
-#endif
+#endif /* ... */
 
-#if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
-#define LIBDEBUGINFO_DECL  __PUBDEF
+#if (defined(__KOS__) && defined(__KERNEL__) && \
+     defined(CONFIG_BUILDING_KERNEL_CORE))
+#define LIBDEBUGINFO_DECL __PUBDEF
 #elif defined(__LIBDEBUGINFO_STATIC)
-#define LIBDEBUGINFO_DECL  __INTDEF
-#else
-#define LIBDEBUGINFO_DECL  __IMPDEF
-#endif
+#define LIBDEBUGINFO_DECL __INTDEF
+#else /* ... */
+#define LIBDEBUGINFO_DECL __IMPDEF
+#endif /* !... */
 
 /* Library name for use with `dlopen()' */
 #define LIBDEBUGINFO_LIBRARY_NAME "libdebuginfo.so"

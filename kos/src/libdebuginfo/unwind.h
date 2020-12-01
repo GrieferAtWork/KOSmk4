@@ -29,8 +29,26 @@
 
 #include <libdebuginfo/unwind.h>
 
+/* Figure out if unwind_for_debug() has already been defined externally somehow. */
+#undef HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE
+#undef HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO
+#ifdef __KERNEL__
+#ifdef CONFIG_HAVE_USERMOD
+#define HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE 1 /* Define in `memory/vm/usermod.c' */
+#elif defined(LIBDEBUGINFO_CC_IS_LIBUNWIND_CC)
+#define HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO 1 /* Define in `libunwind/unwind.c' */
+#endif /* ... */
+#endif /* __KERNEL__ */
+
+#undef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
+#if (defined(HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE) || \
+     defined(HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO))
+#define HAVE_UNWIND_FOR_DEBUG_EXTERNALLY 1
+#endif /* ... */
+
 DECL_BEGIN
 
+#ifndef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
 /* Same as the regular unwind(3) (from libunwind.so), however (if configured),
  * this one also handles the case where `ABSOLUTE_PC' points into user-space,
  * allowing user-space text locations to be correctly unwound.
@@ -52,8 +70,17 @@ INTDEF NONNULL((2, 4)) unsigned int CC
 libdi_unwind_for_debug(void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg);
+#endif /* !HAVE_UNWIND_FOR_DEBUG_EXTERNALLY */
 
+#ifdef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
+extern NONNULL((2, 4)) unsigned int CC
+libdi_unwind_for_debug(void const *absolute_pc,
+                       unwind_getreg_t reg_getter, void const *reg_getter_arg,
+                       unwind_setreg_t reg_setter, void *reg_setter_arg)
+	ASMNAME("unwind_for_debug");
+#endif /* HAVE_UNWIND_FOR_DEBUG_EXTERNALLY */
 
 DECL_END
+
 
 #endif /* !GUARD_LIBDEBUGINFO_UNWIND_H */

@@ -39,23 +39,6 @@
 #define REF __REF
 #endif /* !REF */
 
-/* Figure out if unwind_for_debug() has already been defined externally somehow. */
-#undef HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE
-#undef HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO
-#ifdef __KERNEL__
-#ifdef CONFIG_HAVE_USERMOD
-#define HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE 1 /* Define in `memory/vm/usermod.c' */
-#elif defined(LIBDEBUGINFO_CC_IS_LIBUNWIND_CC)
-#define HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO 1 /* Define in `libunwind/unwind.c' */
-#endif /* ... */
-#endif /* __KERNEL__ */
-
-#undef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
-#if (defined(HAVE_UNWIND_FOR_DEBUG_IN_KERNL_CORE) || \
-     defined(HAVE_UNWIND_FOR_DEBUG_IN_LIBUNWIND_SO))
-#define HAVE_UNWIND_FOR_DEBUG_EXTERNALLY 1
-#endif /* ... */
-
 #ifndef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
 #include <hybrid/atomic.h>
 
@@ -68,7 +51,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-PRIVATE void *libunwind = NULL;
 PRIVATE PUNWIND /*          */ pdyn_unwind           = NULL;
 PRIVATE PUNWIND_FDE_EXEC /* */ pdyn_unwind_fde_exec  = NULL;
 PRIVATE PUNWIND_CFA_APPLY /**/ pdyn_unwind_cfa_apply = NULL;
@@ -76,23 +58,15 @@ PRIVATE PUNWIND_CFA_APPLY /**/ pdyn_unwind_cfa_apply = NULL;
 #define unwind_fde_exec  (*pdyn_unwind_fde_exec)
 #define unwind_cfa_apply (*pdyn_unwind_cfa_apply)
 
+INTDEF WUNUSED void *CC dlopen_libunwind(void); /* from "cfi_entry.c" */
 PRIVATE bool CC load_libunwind(void) {
 	void *lu;
 	if (pdyn_unwind)
 		return true;
 	COMPILER_BARRIER();
-	lu = ATOMIC_READ(libunwind);
-	if (!lu) {
-		void *real_lu;
-		lu = dlopen(LIBUNWIND_LIBRARY_NAME, RTLD_LOCAL);
-		if unlikely(!lu)
-			goto nope;
-		real_lu = ATOMIC_CMPXCH_VAL(libunwind, NULL, lu);
-		if unlikely(real_lu) {
-			dlclose(lu);
-			lu = real_lu;
-		}
-	}
+	lu = dlopen_libunwind();
+	if unlikely(!lu)
+		goto nope;
 	COMPILER_BARRIER();
 #define LOAD(ptr, name)                               \
 	if ((*(void **)&(ptr) = dlsym(lu, name)) == NULL) \

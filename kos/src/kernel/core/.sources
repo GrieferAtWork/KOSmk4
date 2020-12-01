@@ -101,6 +101,8 @@ BEGIN
 		/* Required for: disk I/O */
 		"../modide/*.c",
 
+		"../moddbx/*.c", /* TODO: Remove me */
+
 		/* Pull in the actual kernel sources */
 		"debugger/*.c",
 		"debugger-apps/*.c",

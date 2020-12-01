@@ -133,7 +133,6 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("usb-hid", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
-		DEFINE_SIMPLE_ARCH_DRIVER_LIBRARY("cfientry")
 		DEFINE_SIMPLE_DRIVER("dbx") /* DeBug eXtensions */
 
 		if (TARGET_ARCH in ["i386", "x86_64"]) {
