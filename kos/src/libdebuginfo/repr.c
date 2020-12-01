@@ -102,55 +102,87 @@ for (local prefix, values: ns)
 	printStrendNDatabase(prefix, values, attr: "REPR_RODATASECTION");
 ]]]*/
 #define GETBASE_DW_TAG(result, index) \
-	(((index) <= 0x47) ? ((result) = repr_DW_TAG_0h, true) : false)
+	(((index) <= 0x4b) ? ((result) = repr_DW_TAG_0h, true) : \
+	 ((index) >= 0x4081 && (index) <= 0x4092) ? ((index) -= 0x4081, (result) = repr_DW_TAG_4081h, true) : \
+	 ((index) >= 0x4101 && (index) <= 0x410a) ? ((index) -= 0x4101, (result) = repr_DW_TAG_4101h, true) : \
+	 ((index) >= 0x8765 && (index) <= 0x8767) ? ((index) -= 0x8765, (result) = repr_DW_TAG_8765h, true) : \
+	 ((index) == 0xa000) ? ((index) = 0, (result) = repr_DW_TAG_a000h, true) : \
+	 ((index) == 0xa020) ? ((index) = 0, (result) = repr_DW_TAG_a020h, true) : false)
 PRIVATE REPR_RODATASECTION char const repr_DW_TAG_0h[] =
-"\0array_type\0class_type\0entry_point\0enumeration_type\0formal_param"
-"eter\0\0\0imported_declaration\0\0label\0lexical_block\0\0member\0\0pointe"
-"r_type\0reference_type\0compile_unit\0string_type\0structure_type\0\0s"
-"ubroutine_type\0typedef\0union_type\0unspecified_parameters\0variant"
-"\0common_block\0common_inclusion\0inheritance\0inlined_subroutine\0mo"
-"dule\0ptr_to_member_type\0set_type\0subrange_type\0with_stmt\0access_"
-"declaration\0base_type\0catch_block\0const_type\0constant\0enumerator"
-"\0file_type\0friend\0namelist\0namelist_item\0packed_type\0subprogram\0"
-"template_type_param\0template_value_param\0thrown_type\0try_block\0v"
-"ariant_part\0variable\0volatile_type\0dwarf_procedure\0restrict_type"
-"\0interface_type\0namespace\0imported_module\0unspecified_type\0parti"
-"al_unit\0imported_unit\0\0condition\0shared_type\0type_unit\0rvalue_re"
-"ference_type\0template_alias\0\0\0\0atomic_type";
+"padding\0array_type\0class_type\0entry_point\0enumeration_type\0forma"
+"l_parameter\0\0\0imported_declaration\0\0label\0lexical_block\0\0member\0"
+"\0pointer_type\0reference_type\0compile_unit\0string_type\0structure_"
+"type\0\0subroutine_type\0typedef\0union_type\0unspecified_parameters\0"
+"variant\0common_block\0common_inclusion\0inheritance\0inlined_subrou"
+"tine\0module\0ptr_to_member_type\0set_type\0subrange_type\0with_stmt\0"
+"access_declaration\0base_type\0catch_block\0const_type\0constant\0enu"
+"merator\0file_type\0friend\0namelist\0namelist_item\0packed_type\0subp"
+"rogram\0template_type_param\0template_value_param\0thrown_type\0try_"
+"block\0variant_part\0variable\0volatile_type\0dwarf_procedure\0restri"
+"ct_type\0interface_type\0namespace\0imported_module\0unspecified_typ"
+"e\0partial_unit\0imported_unit\0\0condition\0shared_type\0type_unit\0rv"
+"alue_reference_type\0template_alias\0coarray_type\0generic_subrange"
+"\0dynamic_type\0atomic_type\0call_site\0call_site_parameter\0skeleton"
+"_unit\0immutable_type";
+PRIVATE REPR_RODATASECTION char const repr_DW_TAG_4081h[] =
+"MIPS_loop\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0HP_array_descriptor\0HP_Bliss_field\0HP_Bl"
+"iss_field_set";
+PRIVATE REPR_RODATASECTION char const repr_DW_TAG_4101h[] =
+"format_label\0function_template\0class_template\0GNU_BINCL\0GNU_EINC"
+"L\0GNU_template_template_param\0GNU_template_parameter_pack\0GNU_fo"
+"rmal_parameter_pack\0GNU_call_site\0GNU_call_site_parameter";
+PRIVATE REPR_RODATASECTION char const repr_DW_TAG_8765h[] =
+"upc_shared_type\0upc_strict_type\0upc_relaxed_type";
+PRIVATE REPR_RODATASECTION char const repr_DW_TAG_a000h[] =
+"PGI_kanji_type";
+PRIVATE REPR_RODATASECTION char const repr_DW_TAG_a020h[] =
+"PGI_interface_block";
 
 #define GETBASE_DW_AT(result, index) \
-	(((index) <= 0x87) ? ((result) = repr_DW_AT_0h, true) : \
-	 ((index) >= 0x2001 && (index) <= 0x2011) ? ((index) -= 0x2001, (result) = repr_DW_AT_2001h, true) : \
-	 ((index) >= 0x2101 && (index) <= 0x2135) ? ((index) -= 0x2101, (result) = repr_DW_AT_2101h, true) : false)
+	(((index) <= 0x8c) ? ((result) = repr_DW_AT_0h, true) : \
+	 ((index) >= 0x2000 && (index) <= 0x2029) ? ((index) -= 0x2000, (result) = repr_DW_AT_2000h, true) : \
+	 ((index) >= 0x2101 && (index) <= 0x2138) ? ((index) -= 0x2101, (result) = repr_DW_AT_2101h, true) : \
+	 ((index) == 0x2201) ? ((index) = 0, (result) = repr_DW_AT_2201h, true) : \
+	 ((index) >= 0x2301 && (index) <= 0x2305) ? ((index) -= 0x2301, (result) = repr_DW_AT_2301h, true) : \
+	 ((index) == 0x3210) ? ((index) = 0, (result) = repr_DW_AT_3210h, true) : \
+	 ((index) >= 0x3a00 && (index) <= 0x3a02) ? ((index) -= 0x3a00, (result) = repr_DW_AT_3a00h, true) : \
+	 ((index) >= 0x3fe1 && (index) <= 0x3fed) ? ((index) -= 0x3fe1, (result) = repr_DW_AT_3fe1h, true) : false)
 PRIVATE REPR_RODATASECTION char const repr_DW_AT_0h[] =
-"\0sibling\0location\0name\0\0\0\0\0\0ordering\0\0byte_size\0bit_offset\0bit_s"
-"ize\0\0\0stmt_list\0low_pc\0high_pc\0language\0\0discr\0discr_value\0visib"
-"ility\0import\0string_length\0common_reference\0comp_dir\0const_value"
-"\0containing_type\0default_value\0\0inline\0is_optional\0lower_bound\0\0"
-"\0producer\0\0prototyped\0\0\0return_addr\0\0start_scope\0\0stride_size\0up"
-"per_bound\0\0abstract_origin\0accessibility\0address_class\0artificia"
-"l\0base_types\0calling_convention\0count\0data_member_location\0decl_"
-"column\0decl_file\0decl_line\0declaration\0discr_list\0encoding\0exter"
-"nal\0frame_base\0friend\0identifier_case\0macro_info\0namelist_item\0p"
-"riority\0segment\0specification\0static_link\0type\0use_location\0vari"
-"able_parameter\0virtuality\0vtable_elem_location\0allocated\0associa"
-"ted\0data_location\0byte_stride\0entry_pc\0use_UTF8\0extension\0ranges"
-"\0trampoline\0call_column\0call_file\0call_line\0description\0binary_s"
-"cale\0decimal_scale\0small\0decimal_sign\0digit_count\0picture_string"
-"\0mutable\0threads_scaled\0explicit\0object_pointer\0endianity\0elemen"
-"tal\0pure\0recursive\0signature\0main_subprogram\0data_bit_offset\0con"
-"st_expr\0enum_class\0linkage_name\0string_length_bit_size\0string_le"
-"ngth_byte_size\0rank\0str_offsets_base\0addr_base\0rnglists_base\0\0dw"
-"o_name\0reference\0rvalue_reference\0macros\0call_all_calls\0call_all"
-"_source_calls\0call_all_tail_calls\0call_return_pc\0call_value\0call"
-"_origin\0call_parameter\0\0\0\0\0\0\0noreturn";
-PRIVATE REPR_RODATASECTION char const repr_DW_AT_2001h[] =
-"MIPS_fde\0MIPS_loop_begin\0MIPS_tail_loop_begin\0MIPS_epilog_begin\0"
-"MIPS_loop_unroll_factor\0MIPS_software_pipeline_depth\0MIPS_linkag"
-"e_name\0MIPS_stride\0MIPS_abstract_name\0MIPS_clone_origin\0MIPS_has"
-"_inlines\0MIPS_stride_byte\0MIPS_stride_elem\0MIPS_ptr_dopetype\0MIP"
-"S_allocatable_dopetype\0MIPS_assumed_shape_dopetype\0MIPS_assumed_"
-"size";
+"\0sibling\0location\0name\0\0\0\0\0\0ordering\0subscr_data\0byte_size\0bit_o"
+"ffset\0bit_size\0\0element_list\0stmt_list\0low_pc\0high_pc\0language\0m"
+"ember\0discr\0discr_value\0visibility\0import\0string_length\0common_r"
+"eference\0comp_dir\0const_value\0containing_type\0default_value\0\0inl"
+"ine\0is_optional\0lower_bound\0\0\0producer\0\0prototyped\0\0\0return_addr"
+"\0\0start_scope\0\0stride_size\0upper_bound\0\0abstract_origin\0accessib"
+"ility\0address_class\0artificial\0base_types\0calling_convention\0cou"
+"nt\0data_member_location\0decl_column\0decl_file\0decl_line\0declarat"
+"ion\0discr_list\0encoding\0external\0frame_base\0friend\0identifier_ca"
+"se\0macro_info\0namelist_item\0priority\0segment\0specification\0stati"
+"c_link\0type\0use_location\0variable_parameter\0virtuality\0vtable_el"
+"em_location\0allocated\0associated\0data_location\0byte_stride\0entry"
+"_pc\0use_UTF8\0extension\0ranges\0trampoline\0call_column\0call_file\0c"
+"all_line\0description\0binary_scale\0decimal_scale\0small\0decimal_si"
+"gn\0digit_count\0picture_string\0mutable\0threads_scaled\0explicit\0ob"
+"ject_pointer\0endianity\0elemental\0pure\0recursive\0signature\0main_s"
+"ubprogram\0data_bit_offset\0const_expr\0enum_class\0linkage_name\0str"
+"ing_length_bit_size\0string_length_byte_size\0rank\0str_offsets_bas"
+"e\0addr_base\0rnglists_base\0\0dwo_name\0reference\0rvalue_reference\0m"
+"acros\0call_all_calls\0call_all_source_calls\0call_all_tail_calls\0c"
+"all_return_pc\0call_value\0call_origin\0call_parameter\0call_pc\0call"
+"_tail_call\0call_target\0call_target_clobbered\0call_data_location\0"
+"call_data_value\0noreturn\0alignment\0export_symbols\0deleted\0defaul"
+"ted\0loclists_base";
+PRIVATE REPR_RODATASECTION char const repr_DW_AT_2000h[] =
+"HP_block_index\0HP_unmodifiable\0MIPS_loop_begin\0MIPS_tail_loop_be"
+"gin\0MIPS_epilog_begin\0HP_prologue\0MIPS_software_pipeline_depth\0M"
+"IPS_linkage_name\0HP_epilogue\0MIPS_abstract_name\0MIPS_clone_origi"
+"n\0MIPS_has_inlines\0MIPS_stride_byte\0MIPS_stride_elem\0MIPS_ptr_do"
+"petype\0MIPS_allocatable_dopetype\0HP_actuals_stmt_list\0HP_proc_pe"
+"r_section\0HP_raw_data_ptr\0HP_pass_by_reference\0HP_opt_level\0HP_p"
+"rof_version_id\0HP_opt_flags\0HP_cold_region_low_pc\0HP_cold_region"
+"_high_pc\0HP_all_variables_modifiable\0HP_linkage_name\0HP_prof_fla"
+"gs\0\0\0\0HP_unit_name\0HP_unit_size\0HP_widened_byte_size\0HP_definiti"
+"on_points\0HP_default_location\0\0\0\0\0\0HP_is_result_param";
 PRIVATE REPR_RODATASECTION char const repr_DW_AT_2101h[] =
 "sf_names\0src_info\0mac_info\0src_coords\0body_begin\0body_end\0GNU_ve"
 "ctor\0GNU_guarded_by\0GNU_pt_guarded_by\0GNU_guarded\0GNU_pt_guarded"
@@ -160,25 +192,55 @@ PRIVATE REPR_RODATASECTION char const repr_DW_AT_2101h[] =
 "arget_clobbered\0GNU_tail_call\0GNU_all_tail_call_sites\0GNU_all_ca"
 "ll_sites\0GNU_all_source_call_sites\0GNU_macros\0GNU_deleted\0\0\0\0\0\0\0"
 "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0GNU_dwo_name\0GNU_dwo_id\0GNU_ranges_base\0GNU_addr_"
-"base\0GNU_pubnames\0GNU_pubtypes";
+"base\0GNU_pubnames\0GNU_pubtypes\0GNU_discriminator\0GNU_locviews\0GN"
+"U_entry_view";
+PRIVATE REPR_RODATASECTION char const repr_DW_AT_2201h[] =
+"VMS_rtnbeg_pd_address";
+PRIVATE REPR_RODATASECTION char const repr_DW_AT_2301h[] =
+"use_GNAT_descriptive_type\0GNAT_descriptive_type\0GNU_numerator\0GN"
+"U_denominator\0GNU_bias";
+PRIVATE REPR_RODATASECTION char const repr_DW_AT_3210h[] =
+"upc_threads_scaled";
+PRIVATE REPR_RODATASECTION char const repr_DW_AT_3a00h[] =
+"PGI_lbase\0PGI_soffset\0PGI_lstride";
+PRIVATE REPR_RODATASECTION char const repr_DW_AT_3fe1h[] =
+"APPLE_optimized\0APPLE_flags\0APPLE_isa\0APPLE_block\0APPLE_major_ru"
+"ntime_vers\0APPLE_runtime_class\0APPLE_omit_frame_ptr\0APPLE_proper"
+"ty_name\0APPLE_property_getter\0APPLE_property_setter\0APPLE_proper"
+"ty_attribute\0APPLE_objc_complete_type\0APPLE_property";
 
 #define GETBASE_DW_FORM(result, index) \
-	(((index) <= 0x20) ? ((result) = repr_DW_FORM_0h, true) : false)
+	(((index) <= 0x2c) ? ((result) = repr_DW_FORM_0h, true) : \
+	 ((index) >= 0x1f01 && (index) <= 0x1f02) ? ((index) -= 0x1f01, (result) = repr_DW_FORM_1f01h, true) : \
+	 ((index) >= 0x1f20 && (index) <= 0x1f21) ? ((index) -= 0x1f20, (result) = repr_DW_FORM_1f20h, true) : false)
 PRIVATE REPR_RODATASECTION char const repr_DW_FORM_0h[] =
 "\0addr\0\0block2\0block4\0data2\0data4\0data8\0string\0block\0block1\0data1"
 "\0flag\0sdata\0strp\0udata\0ref_addr\0ref1\0ref2\0ref4\0ref8\0ref_udata\0in"
-"direct\0sec_offset\0exprloc\0flag_present\0\0\0\0\0\0\0ref_sig8";
+"direct\0sec_offset\0exprloc\0flag_present\0strx\0addrx\0ref_sup4\0strp_"
+"sup\0data16\0line_strp\0ref_sig8\0implicit_const\0loclistx\0rnglistx\0r"
+"ef_sup8\0strx1\0strx2\0strx3\0strx4\0addrx1\0addrx2\0addrx3\0addrx4";
+PRIVATE REPR_RODATASECTION char const repr_DW_FORM_1f01h[] =
+"GNU_addr_index\0GNU_str_index";
+PRIVATE REPR_RODATASECTION char const repr_DW_FORM_1f20h[] =
+"GNU_ref_alt\0GNU_strp_alt";
 
 #define GETBASE_DW_ATE(result, index) \
-	(((index) <= 0x10) ? ((result) = repr_DW_ATE_0h, true) : false)
+	(((index) <= 0x12) ? ((result) = repr_DW_ATE_0h, true) : \
+	 ((index) >= 0x80 && (index) <= 0x90) ? ((index) -= 0x80, (result) = repr_DW_ATE_80h, true) : false)
 PRIVATE REPR_RODATASECTION char const repr_DW_ATE_0h[] =
-"\0address\0boolean\0complex_float\0float\0signed\0signed_char\0unsigned"
-"\0unsigned_char\0imaginary_float\0packed_decimal\0numeric_string\0edi"
-"ted\0signed_fixed\0unsigned_fixed\0decimal_float\0UTF";
+"void\0address\0boolean\0complex_float\0float\0signed\0signed_char\0unsi"
+"gned\0unsigned_char\0imaginary_float\0packed_decimal\0numeric_string"
+"\0edited\0signed_fixed\0unsigned_fixed\0decimal_float\0UTF\0UCS\0ASCII";
+PRIVATE REPR_RODATASECTION char const repr_DW_ATE_80h[] =
+"HP_float80\0HP_complex_float80\0HP_float128\0HP_complex_float128\0HP"
+"_floathpintel\0HP_imaginary_float80\0HP_imaginary_float128\0\0HP_VAX"
+"_float\0HP_VAX_float_d\0HP_packed_decimal\0HP_zoned_decimal\0HP_edit"
+"ed\0HP_signed_fixed\0HP_unsigned_fixed\0HP_VAX_complex_float\0HP_VAX"
+"_complex_float_d";
 
 #define GETBASE_DW_OP(result, index) \
 	(((index) <= 0xa9) ? ((result) = repr_DW_OP_0h, true) : \
-	 ((index) >= 0xe0 && (index) <= 0xfc) ? ((index) -= 0xe0, (result) = repr_DW_OP_e0h, true) : false)
+	 ((index) >= 0xe0 && (index) <= 0xfd) ? ((index) -= 0xe0, (result) = repr_DW_OP_e0h, true) : false)
 PRIVATE REPR_RODATASECTION char const repr_DW_OP_0h[] =
 "\0\0\0addr\0\0\0deref\0\0const1u\0const1s\0const2u\0const2s\0const4u\0const4s"
 "\0const8u\0const8s\0constu\0consts\0dup\0drop\0over\0pick\0swap\0rot\0xdere"
@@ -198,11 +260,12 @@ PRIVATE REPR_RODATASECTION char const repr_DW_OP_0h[] =
 "value\0implicit_pointer\0addrx\0constx\0entry_value\0const_type\0regva"
 "l_type\0deref_type\0xderef_type\0convert\0reinterpret";
 PRIVATE REPR_RODATASECTION char const repr_DW_OP_e0h[] =
-"GNU_push_tls_address\0HP_is_value\0HP_fltconst4\0HP_fltconst8\0HP_mo"
-"d_range\0HP_unmod_range\0HP_tls\0\0\0\0\0\0\0\0\0\0GNU_uninit\0GNU_encoded_ad"
-"dr\0GNU_implicit_pointer\0GNU_entry_value\0GNU_const_type\0GNU_regva"
-"l_type\0GNU_deref_type\0GNU_convert\0PGI_omp_thread_num\0GNU_reinter"
-"pret\0GNU_parameter_ref\0GNU_addr_index\0GNU_const_index";
+"HP_unknown\0HP_is_value\0HP_fltconst4\0HP_fltconst8\0HP_mod_range\0HP"
+"_unmod_range\0HP_tls\0\0\0\0AARCH64_operation\0\0\0\0\0\0GNU_uninit\0GNU_enc"
+"oded_addr\0GNU_implicit_pointer\0GNU_entry_value\0GNU_const_type\0GN"
+"U_regval_type\0GNU_deref_type\0GNU_convert\0PGI_omp_thread_num\0GNU_"
+"reinterpret\0GNU_parameter_ref\0GNU_addr_index\0GNU_const_index\0GNU"
+"_variable_value";
 
 #define GETBASE_DW_CFA(result, index) \
 	(((index) <= 0x40) ? ((result) = repr_DW_CFA_0h, true) : \
@@ -213,9 +276,10 @@ PRIVATE REPR_RODATASECTION char const repr_DW_CFA_0h[] =
 "ed\0restore_extended\0undefined\0same_value\0register\0remember_state"
 "\0restore_state\0def_cfa\0def_cfa_register\0def_cfa_offset\0def_cfa_e"
 "xpression\0expression\0offset_extended_sf\0def_cfa_sf\0def_cfa_offse"
-"t_sf\0val_offset\0val_offset_sf\0val_expression\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"
-"\0\0\0\0GNU_args_size\0GNU_negative_offset_extended\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0a"
-"dvance_loc";
+"t_sf\0val_offset\0val_offset_sf\0val_expression\0\0\0\0\0\0\0MIPS_advance_"
+"loc8\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0AARCH64_negate_ra_state\0GNU_args_size\0GNU_ne"
+"gative_offset_extended\0\0\0\0\0\0\0\0\0KOS_startcapsule\0KOS_endcapsule\0\0"
+"\0\0\0\0\0advance_loc";
 PRIVATE REPR_RODATASECTION char const repr_DW_CFA_80h[] =
 "offset";
 PRIVATE REPR_RODATASECTION char const repr_DW_CFA_c0h[] =
@@ -396,6 +460,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 				case DW_FORM_data2:
 				case DW_FORM_data4:
 				case DW_FORM_data8:
+				case DW_FORM_data16:
 				case DW_FORM_sdata:
 				case DW_FORM_udata:
 				case DW_FORM_sec_offset: {

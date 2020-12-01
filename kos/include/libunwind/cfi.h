@@ -280,6 +280,7 @@
 
 /* DW Opcode extensions. */
 #define DW_OP_GNU_push_tls_address 0xe0 /* [+0]   PUSH(ADDRESS(POP() + sm_tlsbase))   (Alias for `DW_OP_form_tls_address') */
+#define DW_OP_HP_unknown           0xe0 /* ??? */
 #define DW_OP_HP_is_value          0xe1 /* <Not supported> */
 #define DW_OP_HP_fltconst4         0xe2 /* <Not supported> */
 #define DW_OP_HP_fltconst8         0xe3 /* <Not supported> */
@@ -289,6 +290,7 @@
 /*      DW_OP_                     0xe7  * ... */
 /*      DW_OP_                     0xe8  * ... */
 /*      DW_OP_                     0xe9  * ... */
+#define DW_OP_AARCH64_operation    0xea /* ??? */
 /*      DW_OP_                     0xea  * ... */
 /*      DW_OP_                     0xeb  * ... */
 /*      DW_OP_                     0xec  * ... */
@@ -308,9 +310,11 @@
 #define DW_OP_GNU_parameter_ref    0xfa /* <Not supported> */
 #define DW_OP_GNU_addr_index       0xfb /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc)))  (alias for `DW_OP_addrx') */
 #define DW_OP_GNU_const_index      0xfc /* [+*]   PUSH(*(uintptr_t *)(ues_debug_addr_start + ue_cu->cu_addr_base + dwarf_decode_uleb128(&pc)))  (alias for `DW_OP_addrx') */
+#define DW_OP_GNU_variable_value   0xfd /* ??? */
 /*      DW_OP_                     0xfd  * ... */
 /*      DW_OP_                     0xfe  * ... */
 /*      DW_OP_                     0xff  * ... */
+
 
 /* Call Frame Information (section 6.4.1) */
 #define DW_CFA_register_rule_undefined      0 /* Register has an undefined after unwinding */
@@ -395,18 +399,21 @@
 /*      DW_CFA_                             0x3f  * ... */
 #define DW_CFA_hi_user                      0x3f /* Last extension/custom opcode */
 
+
+
+
 /* Behavior/use for `DW_CFA_KOS_startcapsule' / `DW_CFA_KOS_endcapsule'
  *
  * As already stated, these instructions only have special meaning when used in
  * functions that also contain a landing pad (similar to how `DW_CFA_GNU_args_size'
  * also only finds special use in such functions)
  *
- * When used, these instructions form "capsules" of that can be used to define
- * ranges of CFI instructions that should be executed for the purpose of unwinding,
- * both during normal unwinding of a function, as well as when unwinding in the
- * context of jumping to a different location within the same function for the
- * purpose of executing an exception handler. As such, the following is done
- * prior to jumping to any landing pad:
+ * When used, these instructions form "capsules" that can be used to define ranges
+ * of CFI instructions that should be executed for the purpose of unwinding, both
+ * during normal unwinding of a function, as well as when unwinding in the context
+ * of jumping to a different location within the same function for the purpose of
+ * executing an exception handler. As such, the following is done prior to jumping
+ * to any landing pad:
  *
  * >> src_capsule = FIND_INNERMOST_CAPSULE(EXCEPTION_PC);
  * >> if (!src_capsule) {
@@ -427,9 +434,10 @@
  * >>         while (last_capsule->parent !in PARENTS_OF(dst_capsule))
  * >>             last_capsule = last_capsule->parent;
  * >>     }
- * >>     
+ * >>
  * >>     // Construct unwinding rules for CFA instrumentation between
- * >>     // last_capsule->dw_cfa_start  (Which points at the byte in .eh_frame after the capsule's `DW_CFA_KOS_startcapsule')
+ * >>     // last_capsule->dw_cfa_start  (Which points at the byte in .eh_frame after the
+ * >>     //                              capsule's `DW_CFA_KOS_startcapsule' opcode byte)
  * >>     // and whatever location marks the end of `EXCEPTION_PC'.
  * >>     // During this construction of rules, the `DW_CFA_KOS_startcapsule'/`DW_CFA_KOS_endcapsule'
  * >>     // opcodes once again behave identical to `DW_CFA_remember_state'/`DW_CFA_restore_state'
@@ -448,7 +456,13 @@
  * >>     movq   $SYS_pipe, %rax
  * >>     std
  * >> .cfi_startcapsule
- * >> .cfi_escape 0x16, 0x31, 0x07, 0x90, 0x31, 0x0a, 0x00, 0x04, 0x20, 0x1a  // %rflags.DF = 0
+ * >> .cfi_escape DW_CFA_val_expression               // %rflags.DF = 0
+ * >> .cfi_escape CFI_X86_64_UNWIND_REGISTER_RFLAGS
+ * >> .cfi_escape 7
+ * >> .cfi_escape DW_OP_regx, CFI_X86_64_UNWIND_REGISTER_RFLAGS
+ * >> .cfi_escape DW_OP_const2u, EFLAGS_DF & 0xff, EFLAGS_DF >> 8
+ * >> .cfi_escape DW_OP_not
+ * >> .cfi_escape DW_OP_and
  * >>     syscall
  * >>     cld
  * >> .cfi_endcapsule
@@ -509,8 +523,11 @@
  *  - As far as other tools should be concerned, `.cfi_startcapsule' and `.cfi_endcapsule'
  *    are just aliases for `.cfi_remember_state' and `.cfi_restore_state'
  *  - For compatibility, `DW_CFA_GNU_args_size' instrumentation is not affected by capsules.
- *  - CFI capsules are not allowed to be used inside of initialization text (f_inittext),
- *    but only inside of eval-text (f_evaltext)
+ *    As such, using capsules to alter the value of the stack-pointer while a non-zero value
+ *    for `DW_CFA_GNU_args_size' is in effect results in weak undefined behavior (that is: it
+ *    is undefined in which order capsule/DW_CFA_GNU_args_size adjustments are performed)
+ *  - CFI capsules may not to used inside of initialization text (f_inittext), but can only
+ *    appear inside of eval-text (f_evaltext)
  *
  */
 

@@ -32,6 +32,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/byteorder.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 #include <hybrid/unaligned.h>
@@ -565,6 +566,10 @@ decode_form:
 		self->dup_cu_info_pos += 8;
 		break;
 
+	case DW_FORM_data16:
+		self->dup_cu_info_pos += 16;
+		break;
+
 	case DW_FORM_sdata:
 		dwarf_decode_sleb128((byte_t const **)&self->dup_cu_info_pos);
 		break;
@@ -838,8 +843,21 @@ decode_form:
 		return true;
 
 	case DW_FORM_data8: /* constant */
+#if !defined(UNALIGNED_GET128) && (__BYTE_ORDER__ == ___ORDER_LITTLE_ENDIAN__)
+	case DW_FORM_data16: /* constant */
+#endif /* !UNALIGNED_GET128 && __BYTE_ORDER__ == ___ORDER_LITTLE_ENDIAN__ */
 		*presult = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader);
 		return true;
+
+#ifdef UNALIGNED_GET128
+	case DW_FORM_data16: /* constant */
+		*presult = (uintptr_t)UNALIGNED_GET128((__UINT128_TYPE__ const *)reader);
+		return true;
+#elif __BYTE_ORDER__ == ___ORDER_BIG_ENDIAN__
+	case DW_FORM_data16: /* constant */
+		*presult = UNALIGNED_GET((uintptr_t const *)((byte_t const *)reader + 16 - sizeof(uintptr_t)));
+		return true;
+#endif /* !UNALIGNED_GET128 */
 
 	case DW_FORM_sdata: /* constant */
 		*presult = (uintptr_t)dwarf_decode_sleb128((byte_t const **)&reader);
@@ -2495,7 +2513,9 @@ generic_print_address:
 
 		case DW_ATE_signed_char:
 		case DW_ATE_unsigned_char:
-		case DW_ATE_UTF: {
+		case DW_ATE_UTF:
+		case DW_ATE_UCS:
+		case DW_ATE_ASCII: {
 			uint64_t value;
 			if (datasize >= 8) {
 				value = (uint64_t)UNALIGNED_GET64((uint64_t *)data);

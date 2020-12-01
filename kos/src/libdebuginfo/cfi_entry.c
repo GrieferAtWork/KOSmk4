@@ -430,8 +430,7 @@ NOTHROW_NCX(CC cfientry_locate_callsite)(struct cfientry *__restrict self,
 					sp_element_depth = self->ce_parser.dup_child_depth;
 					/* Search for `DW_TAG_GNU_call_site' entries. */
 					while (self->ce_parser.dup_child_depth >= sp_element_depth) {
-						if (self->ce_parser.dup_comp.dic_tag == DW_TAG_GNU_call_site ||
-						    self->ce_parser.dup_comp.dic_tag == DW_TAG_call_site) {
+						if (DW_IS_TAG_call_site(self->ce_parser.dup_comp.dic_tag)) {
 							uintptr_t low_pc;
 							di_debuginfo_component_attrib_t attr;
 							low_pc = (uintptr_t)-1;
@@ -871,8 +870,7 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	if (libdi_debuginfo_cu_parser_nextchild(&self->ce_parser)) {
 		size_t callsite_depth = self->ce_parser.dup_child_depth;
 		while (self->ce_parser.dup_child_depth >= callsite_depth) {
-			if (self->ce_parser.dup_comp.dic_tag == DW_TAG_GNU_call_site_parameter ||
-			    self->ce_parser.dup_comp.dic_tag == DW_TAG_call_site_parameter) {
+			if (DW_IS_TAG_call_site_parameter(self->ce_parser.dup_comp.dic_tag)) {
 				di_debuginfo_component_attrib_t attr;
 				di_debuginfo_location_t location, call_site_value;
 				bool deref_result       = false;

@@ -93,7 +93,9 @@
 #define DW_LNE_HP_SFC_set_listing_line 2
 #define DW_LNE_HP_SFC_associate        3
 
-/*      DW_TAG_                       0x00 */
+
+/* DWARF .debug_info component tags. */
+#define DW_TAG_padding                0x00 /* - */
 #define DW_TAG_array_type             0x01
 #define DW_TAG_class_type             0x02
 #define DW_TAG_entry_point            0x03
@@ -176,6 +178,7 @@
 /*      DW_TAG_                       ... */
 #define DW_TAG_lo_user                0x4080
 #define DW_TAG_hi_user                0xffff
+
 /* Extension tags */
 #define DW_TAG_MIPS_loop                   0x4081
 #define DW_TAG_HP_array_descriptor         0x4090
@@ -189,17 +192,33 @@
 #define DW_TAG_GNU_template_template_param 0x4106
 #define DW_TAG_GNU_template_parameter_pack 0x4107
 #define DW_TAG_GNU_formal_parameter_pack   0x4108
-#define DW_TAG_GNU_call_site               0x4109
-#define DW_TAG_GNU_call_site_parameter     0x410a
+#define DW_TAG_GNU_call_site               0x4109 /* (alias: DW_TAG_call_site) */
+#define DW_TAG_GNU_call_site_parameter     0x410a /* (alias: DW_TAG_call_site_parameter) */
 #define DW_TAG_upc_shared_type             0x8765
 #define DW_TAG_upc_strict_type             0x8766
 #define DW_TAG_upc_relaxed_type            0x8767
 #define DW_TAG_PGI_kanji_type              0xa000
 #define DW_TAG_PGI_interface_block         0xa020
 
+/* Helpers for testing or casing for certain tags and aliases. */
+#define DW_IS_TAG_call_site(tag)      \
+	((tag) == DW_TAG_GNU_call_site || \
+	 (tag) == DW_TAG_call_site)
+#define DW_CASE_TAG_call_site  \
+	case DW_TAG_GNU_call_site: \
+	case DW_TAG_call_site
+#define DW_IS_TAG_call_site_parameter(tag)      \
+	((tag) == DW_TAG_GNU_call_site_parameter || \
+	 (tag) == DW_TAG_call_site_parameter)
+#define DW_CASE_TAG_call_site_parameter  \
+	case DW_TAG_GNU_call_site_parameter: \
+	case DW_TAG_call_site_parameter
+
+/* Possible values for `di_debuginfo_component_t::dic_haschildren' */
 #define DW_CHILDREN_no  0
 #define DW_CHILDREN_yes 1
 
+/* DWARF .debug_info component attribute names. */
 /*      DW_AT_                        0x00  * ... */
 #define DW_AT_sibling                 0x01 /* reference */
 #define DW_AT_location                0x02 /* block, constant */
@@ -210,17 +229,19 @@
 /*      DW_AT_                        0x07  * ... */
 /*      DW_AT_                        0x08  * ... */
 #define DW_AT_ordering                0x09 /* constant */
+#define DW_AT_subscr_data             0x0a /* ??? */
 /*      DW_AT_                        0x0a  * ... */
 #define DW_AT_byte_size               0x0b /* constant */
 #define DW_AT_bit_offset              0x0c /* constant */
 #define DW_AT_bit_size                0x0d /* constant */
 /*      DW_AT_                        0x0e  * ... */
 /*      DW_AT_                        0x0f  * ... */
+#define DW_AT_element_list            0x0f /* ??? */
 #define DW_AT_stmt_list               0x10 /* constant */
 #define DW_AT_low_pc                  0x11 /* address */
 #define DW_AT_high_pc                 0x12 /* address, constant */
 #define DW_AT_language                0x13 /* constant */
-/*      DW_AT_                        0x14  * ... */
+#define DW_AT_member                  0x14 /* ??? */
 #define DW_AT_discr                   0x15 /* reference */
 #define DW_AT_discr_value             0x16 /* constant */
 #define DW_AT_visibility              0x17 /* constant */
@@ -246,6 +267,7 @@
 /*      DW_AT_                        0x2b  * ... */
 #define DW_AT_start_scope             0x2c /* constant */
 /*      DW_AT_                        0x2d  * ... */
+#define DW_AT_bit_stride              0x2e /* constant (alias: DW_AT_stride_size) */
 #define DW_AT_stride_size             0x2e /* constant */
 #define DW_AT_upper_bound             0x2f /* constant, reference */
 /*      DW_AT_                        0x30  * ... */
@@ -268,6 +290,7 @@
 #define DW_AT_friend                  0x41 /* reference */
 #define DW_AT_identifier_case         0x42 /* constant */
 #define DW_AT_macro_info              0x43 /* constant */
+#define DW_AT_namelist_items          0x44 /* block (alias: DW_AT_namelist_item) */
 #define DW_AT_namelist_item           0x44 /* block */
 #define DW_AT_priority                0x45 /* reference */
 #define DW_AT_segment                 0x46 /* block, constant */
@@ -335,7 +358,7 @@
 #define DW_AT_call_target_clobbered   0x84 /* ??? */
 #define DW_AT_call_data_location      0x85 /* ??? */
 #define DW_AT_call_data_value         0x86 /* ??? */
-#define DW_AT_noreturn                0x87 /* ??? */
+#define DW_AT_noreturn                0x87 /* flag */
 #define DW_AT_alignment               0x88 /* ??? */
 #define DW_AT_export_symbols          0x89 /* ??? */
 #define DW_AT_deleted                 0x8a /* ??? */
@@ -346,57 +369,104 @@
 #define DW_AT_lo_user                 0x2000 /* - */
 #define DW_AT_hi_user                 0x3fff /* - */
 
-
-#define DW_AT_noreturn                       0x87   /* Identifies a subprogram that does not return to its caller, DWARFv5             GCC5             Constant only */
-#define DW_AT_MIPS_fde                       0x2001 /* subprogram tag attribute, offset into .debug_frame section, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_loop_begin                0x2002 /* Never implemented, mips_extensions             Nothing             Constant only */
-#define DW_AT_MIPS_tail_loop_begin           0x2003 /* Never implemented, mips_extensions             Nothing             Constant only */
-#define DW_AT_MIPS_epilog_begin              0x2004 /* Never implemented, mips_extensions             Nothing             Constant only */
-#define DW_AT_MIPS_loop_unroll_factor        0x2005 /* Never implemented, mips_extensions             Nothing             Constant only */
-#define DW_AT_MIPS_software_pipeline_depth   0x2006 /* Never implemented, mips_extensions             Nothing             Constant only */
-#define DW_AT_MIPS_linkage_name              0x2007 /* Same as DWARF4 DW_AT_linkage_name             GCC             Constant only */
-#define DW_AT_MIPS_stride                    0x2008 /* F90 array stride, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_abstract_name             0x2009 /* name of inlined_subroutine with abstract root in other CU, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_clone_origin              0x200a /* name of non-specialed version of cloned subroutine, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_has_inlines               0x200b /* hint for inlined subroutines under subprogram DIE, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_stride_byte               0x200c /* F90 array stride, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_stride_elem               0x200d /* F90 array stride, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_ptr_dopetype              0x200e /* F90 Dope Vector, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_allocatable_dopetype      0x200f /* F90 Dope Vector, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_assumed_shape_dopetype    0x2010 /* F90 Dope Vector, mips_extensions             Unknown             Constant only */
-#define DW_AT_MIPS_assumed_size              0x2011 /* F90 arrays, mips_extensions             Unknown             Constant only */
-#define DW_AT_sf_names                       0x2101 /* DWARF1 only?             Unknown             Constant only */
-#define DW_AT_src_info                       0x2102 /* DWARF1 only?             Unknown             Constant only */
-#define DW_AT_mac_info                       0x2103 /* DWARF1 only?             Unknown             Constant only */
-#define DW_AT_src_coords                     0x2104 /* DWARF1 only?             Unknown             Constant only */
-#define DW_AT_body_begin                     0x2105 /* DWARF1 only?             Unknown             Constant only */
-#define DW_AT_body_end                       0x2106 /* DWARF1 only?             Unknown             Constant only */
-#define DW_AT_GNU_vector                     0x2107 /* ppc/ppc64 Altivec return value             GCC             dwfl_module_return_value_location */
-#define DW_AT_GNU_guarded_by                 0x2108 /* GNU ThreadSafetyAnnotations             Not implemented             Constant only */
-#define DW_AT_GNU_pt_guarded_by              0x2109 /* GNU ThreadSafetyAnnotations             Not implemented             Constant only */
-#define DW_AT_GNU_guarded                    0x210a /* GNU ThreadSafetyAnnotations             Not implemented             Constant only */
-#define DW_AT_GNU_pt_guarded                 0x210b /* GNU ThreadSafetyAnnotations             Not implemented             Constant only */
-#define DW_AT_GNU_locks_excluded             0x210c /* GNU ThreadSafetyAnnotations             Not implemented             Constant only */
-#define DW_AT_GNU_exclusive_locks_required   0x210d /* GNU ThreadSafetyAnnotations             Not implemented             Constant only */
-#define DW_AT_GNU_shared_locks_required      0x210e /* GNU ThreadSafetyAnnotations             Not implemented             Constant only */
-#define DW_AT_GNU_odr_signature              0x210f /* link-time ODR checking part of GNU DwarfSeparateTypeInfo             GCC             Constant only */
-#define DW_AT_GNU_template_name              0x2110 /* GNU Template Parms and DWARF5 proposal             G++             Constant only */
-#define DW_AT_GNU_call_site_value            0x2111 /* GNU call site DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_call_site_data_value       0x2112 /* GNU call site DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_call_site_target           0x2113 /* GNU call site DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_call_site_target_clobbered 0x2114 /* GNU call site DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_tail_call                  0x2115 /* GNU call site DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_all_tail_call_sites        0x2116 /* GNU call site DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_all_call_sites             0x2117 /* GNU call site DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_all_source_call_sites      0x2118 /* GNU call site DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_macros                     0x2119 /* GNU .debug_macro DWARF5 proposal             GCC             Recognized in readelf */
-#define DW_AT_GNU_deleted                    0x211a /* Attribute added for C++11 deleted special member functions (= delete;)             G++             Constant only */
-#define DW_AT_GNU_dwo_name                   0x2130 /* GNU Fission DWARF5 proposal             Unknown             No support */
-#define DW_AT_GNU_dwo_id                     0x2131 /* GNU Fission DWARF5 proposal             Unknown             No support */
-#define DW_AT_GNU_ranges_base                0x2132 /* GNU Fission DWARF5 proposal             Unknown             No support */
-#define DW_AT_GNU_addr_base                  0x2133 /* GNU Fission DWARF5 proposal             Unknown             No support */
-#define DW_AT_GNU_pubnames                   0x2134 /* GNU Fission DWARF5 proposal             GCC             No support */
-#define DW_AT_GNU_pubtypes                   0x2135 /* GNU Fission DWARF5 proposal             GCC             No support  */
+/* Extensions. */
+#define DW_AT_HP_block_index                 0x2000 /* ??? */
+#define DW_AT_MIPS_fde                       0x2001 /* ??? */
+#define DW_AT_HP_unmodifiable                0x2001 /* ??? */
+#define DW_AT_MIPS_loop_begin                0x2002 /* ??? */
+#define DW_AT_MIPS_tail_loop_begin           0x2003 /* ??? */
+#define DW_AT_MIPS_epilog_begin              0x2004 /* ??? */
+#define DW_AT_MIPS_loop_unroll_factor        0x2005 /* ??? */
+#define DW_AT_HP_prologue                    0x2005 /* ??? */
+#define DW_AT_MIPS_software_pipeline_depth   0x2006 /* ??? */
+#define DW_AT_MIPS_linkage_name              0x2007 /* ??? */
+#define DW_AT_MIPS_stride                    0x2008 /* ??? */
+#define DW_AT_HP_epilogue                    0x2008 /* ??? */
+#define DW_AT_MIPS_abstract_name             0x2009 /* ??? */
+#define DW_AT_MIPS_clone_origin              0x200a /* ??? */
+#define DW_AT_MIPS_has_inlines               0x200b /* ??? */
+#define DW_AT_MIPS_stride_byte               0x200c /* ??? */
+#define DW_AT_MIPS_stride_elem               0x200d /* ??? */
+#define DW_AT_MIPS_ptr_dopetype              0x200e /* ??? */
+#define DW_AT_MIPS_allocatable_dopetype      0x200f /* ??? */
+#define DW_AT_MIPS_assumed_shape_dopetype    0x2010 /* ??? */
+#define DW_AT_HP_actuals_stmt_list           0x2010 /* ??? */
+#define DW_AT_MIPS_assumed_size              0x2011 /* ??? */
+#define DW_AT_HP_proc_per_section            0x2011 /* ??? */
+#define DW_AT_HP_raw_data_ptr                0x2012 /* ??? */
+#define DW_AT_HP_pass_by_reference           0x2013 /* ??? */
+#define DW_AT_HP_opt_level                   0x2014 /* ??? */
+#define DW_AT_HP_prof_version_id             0x2015 /* ??? */
+#define DW_AT_HP_opt_flags                   0x2016 /* ??? */
+#define DW_AT_HP_cold_region_low_pc          0x2017 /* ??? */
+#define DW_AT_HP_cold_region_high_pc         0x2018 /* ??? */
+#define DW_AT_HP_all_variables_modifiable    0x2019 /* ??? */
+#define DW_AT_HP_linkage_name                0x201a /* ??? */
+#define DW_AT_HP_prof_flags                  0x201b /* ??? */
+#define DW_AT_HP_unit_name                   0x201f /* ??? */
+#define DW_AT_HP_unit_size                   0x2020 /* ??? */
+#define DW_AT_HP_widened_byte_size           0x2021 /* ??? */
+#define DW_AT_HP_definition_points           0x2022 /* ??? */
+#define DW_AT_HP_default_location            0x2023 /* ??? */
+#define DW_AT_HP_is_result_param             0x2029 /* ??? */
+#define DW_AT_sf_names                       0x2101 /* ??? */
+#define DW_AT_src_info                       0x2102 /* ??? */
+#define DW_AT_mac_info                       0x2103 /* ??? */
+#define DW_AT_src_coords                     0x2104 /* ??? */
+#define DW_AT_body_begin                     0x2105 /* ??? */
+#define DW_AT_body_end                       0x2106 /* ??? */
+#define DW_AT_GNU_vector                     0x2107 /* ??? */
+#define DW_AT_GNU_guarded_by                 0x2108 /* ??? */
+#define DW_AT_GNU_pt_guarded_by              0x2109 /* ??? */
+#define DW_AT_GNU_guarded                    0x210a /* ??? */
+#define DW_AT_GNU_pt_guarded                 0x210b /* ??? */
+#define DW_AT_GNU_locks_excluded             0x210c /* ??? */
+#define DW_AT_GNU_exclusive_locks_required   0x210d /* ??? */
+#define DW_AT_GNU_shared_locks_required      0x210e /* ??? */
+#define DW_AT_GNU_odr_signature              0x210f /* ??? */
+#define DW_AT_GNU_template_name              0x2110 /* ??? */
+#define DW_AT_GNU_call_site_value            0x2111 /* exprloc  (same as `DW_AT_call_value') */
+#define DW_AT_GNU_call_site_data_value       0x2112 /* exprloc  (same as `DW_AT_call_data_value') */
+#define DW_AT_GNU_call_site_target           0x2113 /* ??? */
+#define DW_AT_GNU_call_site_target_clobbered 0x2114 /* ??? */
+#define DW_AT_GNU_tail_call                  0x2115 /* ??? */
+#define DW_AT_GNU_all_tail_call_sites        0x2116 /* ??? */
+#define DW_AT_GNU_all_call_sites             0x2117 /* ??? */
+#define DW_AT_GNU_all_source_call_sites      0x2118 /* ??? */
+#define DW_AT_GNU_macros                     0x2119 /* ??? */
+#define DW_AT_GNU_deleted                    0x211a /* ??? */
+#define DW_AT_GNU_dwo_name                   0x2130 /* ??? */
+#define DW_AT_GNU_dwo_id                     0x2131 /* ??? */
+#define DW_AT_GNU_ranges_base                0x2132 /* ??? */
+#define DW_AT_GNU_addr_base                  0x2133 /* ??? */
+#define DW_AT_GNU_pubnames                   0x2134 /* ??? */
+#define DW_AT_GNU_pubtypes                   0x2135 /* ??? */
+#define DW_AT_GNU_discriminator              0x2136 /* ??? */
+#define DW_AT_GNU_locviews                   0x2137 /* ??? */
+#define DW_AT_GNU_entry_view                 0x2138 /* ??? */
+#define DW_AT_VMS_rtnbeg_pd_address          0x2201 /* ??? */
+#define DW_AT_use_GNAT_descriptive_type      0x2301 /* ??? */
+#define DW_AT_GNAT_descriptive_type          0x2302 /* ??? */
+#define DW_AT_GNU_numerator                  0x2303 /* ??? */
+#define DW_AT_GNU_denominator                0x2304 /* ??? */
+#define DW_AT_GNU_bias                       0x2305 /* ??? */
+#define DW_AT_upc_threads_scaled             0x3210 /* ??? */
+#define DW_AT_PGI_lbase                      0x3a00 /* ??? */
+#define DW_AT_PGI_soffset                    0x3a01 /* ??? */
+#define DW_AT_PGI_lstride                    0x3a02 /* ??? */
+#define DW_AT_APPLE_optimized                0x3fe1 /* ??? */
+#define DW_AT_APPLE_flags                    0x3fe2 /* ??? */
+#define DW_AT_APPLE_isa                      0x3fe3 /* ??? */
+#define DW_AT_APPLE_block                    0x3fe4 /* ??? */
+#define DW_AT_APPLE_major_runtime_vers       0x3fe5 /* ??? */
+#define DW_AT_APPLE_runtime_class            0x3fe6 /* ??? */
+#define DW_AT_APPLE_omit_frame_ptr           0x3fe7 /* ??? */
+#define DW_AT_APPLE_property_name            0x3fe8 /* ??? */
+#define DW_AT_APPLE_property_getter          0x3fe9 /* ??? */
+#define DW_AT_APPLE_property_setter          0x3fea /* ??? */
+#define DW_AT_APPLE_property_attribute       0x3feb /* ??? */
+#define DW_AT_APPLE_objc_complete_type       0x3fec /* ??? */
+#define DW_AT_APPLE_property                 0x3fed /* ??? */
 
 
 /*      DW_LANG_                0x0000 */
@@ -449,61 +519,103 @@
 #define DW_LANG_Upc             0x8765
 
 
-/*      DW_FORM_             0x00  * ... */
-#define DW_FORM_addr         0x01 /* address */
-/*      DW_FORM_             0x02  * ... */
-#define DW_FORM_block2       0x03 /* block */
-#define DW_FORM_block4       0x04 /* block */
-#define DW_FORM_data2        0x05 /* constant */
-#define DW_FORM_data4        0x06 /* constant */
-#define DW_FORM_data8        0x07 /* constant */
-#define DW_FORM_string       0x08 /* string */
-#define DW_FORM_block        0x09 /* block */
-#define DW_FORM_block1       0x0a /* block */
-#define DW_FORM_data1        0x0b /* constant */
-#define DW_FORM_flag         0x0c /* flag */
-#define DW_FORM_sdata        0x0d /* constant */
-#define DW_FORM_strp         0x0e /* string */
-#define DW_FORM_udata        0x0f /* constant */
-#define DW_FORM_ref_addr     0x10 /* reference */
-#define DW_FORM_ref1         0x11 /* reference */
-#define DW_FORM_ref2         0x12 /* reference */
-#define DW_FORM_ref4         0x13 /* reference */
-#define DW_FORM_ref8         0x14 /* reference */
-#define DW_FORM_ref_udata    0x15 /* reference */
-#define DW_FORM_indirect     0x16 /* (see section 7.5.3) */
-#define DW_FORM_sec_offset   0x17 /* lineptr, loclistptr, macptr, rangelistptr, addrptr, stroffsetsptr, rnglistsptr */
-#define DW_FORM_exprloc      0x18 /* exprloc */
-#define DW_FORM_flag_present 0x19 /* flag */
-#define DW_FORM_ref_sig8     0x20 /* reference */
-/*      DW_FORM_             0x21  * ... */
-/*      DW_FORM_             ....  * ... */
-/* TODO: This list (DW_FORM_*) is incomplete! */
+/*      DW_FORM_               0x00  * ... */
+#define DW_FORM_addr           0x01 /* address */
+/*      DW_FORM_               0x02  * ... */
+#define DW_FORM_block2         0x03 /* block */
+#define DW_FORM_block4         0x04 /* block */
+#define DW_FORM_data2          0x05 /* constant */
+#define DW_FORM_data4          0x06 /* constant */
+#define DW_FORM_data8          0x07 /* constant */
+#define DW_FORM_string         0x08 /* string */
+#define DW_FORM_block          0x09 /* block */
+#define DW_FORM_block1         0x0a /* block */
+#define DW_FORM_data1          0x0b /* constant */
+#define DW_FORM_flag           0x0c /* flag */
+#define DW_FORM_sdata          0x0d /* constant */
+#define DW_FORM_strp           0x0e /* string */
+#define DW_FORM_udata          0x0f /* constant */
+#define DW_FORM_ref_addr       0x10 /* reference */
+#define DW_FORM_ref1           0x11 /* reference */
+#define DW_FORM_ref2           0x12 /* reference */
+#define DW_FORM_ref4           0x13 /* reference */
+#define DW_FORM_ref8           0x14 /* reference */
+#define DW_FORM_ref_udata      0x15 /* reference */
+#define DW_FORM_indirect       0x16 /* (see section 7.5.3) */
+#define DW_FORM_sec_offset     0x17 /* lineptr, loclistptr, macptr, rangelistptr, addrptr, stroffsetsptr, rnglistsptr */
+#define DW_FORM_exprloc        0x18 /* exprloc */
+#define DW_FORM_flag_present   0x19 /* flag */
+#define DW_FORM_strx           0x1a /* ??? */
+#define DW_FORM_addrx          0x1b /* ??? */
+#define DW_FORM_ref_sup4       0x1c /* ??? */
+#define DW_FORM_strp_sup       0x1d /* ??? */
+#define DW_FORM_data16         0x1e /* constant */
+#define DW_FORM_line_strp      0x1f /* ??? */
+#define DW_FORM_ref_sig8       0x20 /* reference */
+#define DW_FORM_implicit_const 0x21 /* ??? */
+#define DW_FORM_loclistx       0x22 /* ??? */
+#define DW_FORM_rnglistx       0x23 /* ??? */
+#define DW_FORM_ref_sup8       0x24 /* ??? */
+#define DW_FORM_strx1          0x25 /* ??? */
+#define DW_FORM_strx2          0x26 /* ??? */
+#define DW_FORM_strx3          0x27 /* ??? */
+#define DW_FORM_strx4          0x28 /* ??? */
+#define DW_FORM_addrx1         0x29 /* ??? */
+#define DW_FORM_addrx2         0x2a /* ??? */
+#define DW_FORM_addrx3         0x2b /* ??? */
+#define DW_FORM_addrx4         0x2c /* ??? */
+/*      DW_FORM_               0x2d  * ... */
+/*      DW_FORM_               0x2e  * ... */
+/*      DW_FORM_               0x2f  * ... */
+/*      DW_FORM_               ....  * ... */
+#define DW_FORM_GNU_addr_index 0x1f01 /* ??? */
+#define DW_FORM_GNU_str_index  0x1f02 /* ??? */
+#define DW_FORM_GNU_ref_alt    0x1f20 /* ??? */
+#define DW_FORM_GNU_strp_alt   0x1f21 /* ??? */
 
 
 /* NOTE: Taken form `http://www.dwarfstd.org/doc/DWARF4.pdf' (Figure 13. Encoding attribute values) */
-/*      DW_ATE_                      0x00  * ... */
-#define DW_ATE_address               0x01 /* linear machine address */
-#define DW_ATE_boolean               0x02 /* true or false */
-#define DW_ATE_complex_float         0x03 /* complex binary floating-point number */
-#define DW_ATE_float                 0x04 /* binary floating-point number */
-#define DW_ATE_signed                0x05 /* signed binary integer */
-#define DW_ATE_signed_char           0x06 /* signed character */
-#define DW_ATE_unsigned              0x07 /* unsigned binary integer */
-#define DW_ATE_unsigned_char         0x08 /* unsigned character */
-#define DW_ATE_imaginary_float       0x09 /* imaginary binary floating-point number */
-#define DW_ATE_packed_decimal        0x0a /* packed decimal */
-#define DW_ATE_numeric_string        0x0b /* numeric string */
-#define DW_ATE_edited                0x0c /* edited string */
-#define DW_ATE_signed_fixed          0x0d /* signed fixed-point scaled integer */
-#define DW_ATE_unsigned_fixed        0x0e /* unsigned fixed-point scaled integer */
-#define DW_ATE_decimal_float         0x0f /* decimal floating-point number */
-#define DW_ATE_UTF                   0x10 /* Unicode character */
-/*      DW_ATE_                      0x11  * ... */
-/*      DW_ATE_                      ....  * ... */
-/*      DW_ATE_                      0x7f  * ... */
-#define DW_ATE_lo_user               0x80
-#define DW_ATE_hi_user               0xff
+#define DW_ATE_void                   0x00 /* Nothing */
+#define DW_ATE_address                0x01 /* linear machine address */
+#define DW_ATE_boolean                0x02 /* true or false */
+#define DW_ATE_complex_float          0x03 /* complex binary floating-point number */
+#define DW_ATE_float                  0x04 /* binary floating-point number */
+#define DW_ATE_signed                 0x05 /* signed binary integer */
+#define DW_ATE_signed_char            0x06 /* signed character */
+#define DW_ATE_unsigned               0x07 /* unsigned binary integer */
+#define DW_ATE_unsigned_char          0x08 /* unsigned character */
+#define DW_ATE_imaginary_float        0x09 /* imaginary binary floating-point number */
+#define DW_ATE_packed_decimal         0x0a /* packed decimal */
+#define DW_ATE_numeric_string         0x0b /* numeric string */
+#define DW_ATE_edited                 0x0c /* edited string */
+#define DW_ATE_signed_fixed           0x0d /* signed fixed-point scaled integer */
+#define DW_ATE_unsigned_fixed         0x0e /* unsigned fixed-point scaled integer */
+#define DW_ATE_decimal_float          0x0f /* decimal floating-point number */
+#define DW_ATE_UTF                    0x10 /* Unicode character */
+#define DW_ATE_UCS                    0x11 /* USC character */
+#define DW_ATE_ASCII                  0x12 /* Ascii character */
+/*      DW_ATE_                       0x13  * ... */
+/*      DW_ATE_                       ....  * ... */
+/*      DW_ATE_                       0x7f  * ... */
+#define DW_ATE_lo_user                0x80
+#define DW_ATE_HP_float80             0x80 /* 80-bit floating-point number. */
+#define DW_ATE_HP_complex_float80     0x81 /* 80-bit floating-point complex number. */
+#define DW_ATE_HP_float128            0x82 /* 128-bit floating-point number. */
+#define DW_ATE_HP_complex_float128    0x83 /* 128-bit floating-point complex number. */
+#define DW_ATE_HP_floathpintel        0x84 /* 82-bit IA64 floating-point number. */
+#define DW_ATE_HP_imaginary_float80   0x85 /* 80-bit floating-point imaginary number. */
+#define DW_ATE_HP_imaginary_float128  0x86 /* 128-bit floating-point imaginary number. */
+#define DW_ATE_HP_VAX_float           0x88 /* ??? */
+#define DW_ATE_HP_VAX_float_d         0x89 /* ??? */
+#define DW_ATE_HP_packed_decimal      0x8a /* ??? */
+#define DW_ATE_HP_zoned_decimal       0x8b /* ??? */
+#define DW_ATE_HP_edited              0x8c /* ??? */
+#define DW_ATE_HP_signed_fixed        0x8d /* ??? */
+#define DW_ATE_HP_unsigned_fixed      0x8e /* ??? */
+#define DW_ATE_HP_VAX_complex_float   0x8f /* ??? */
+#define DW_ATE_HP_VAX_complex_float_d 0x90 /* ??? */
+#define DW_ATE_hi_user                0xff
+
 
 /* Absolute pointer encoding formats */
 #define DW_EH_PE_absptr   0x00
@@ -525,7 +637,6 @@
 /* Special */
 #define DW_EH_PE_omit     0xff /* Omit the pointer. */
 #define DW_EH_PE_indirect 0x80 /* FLAG */
-
 
 
 #ifdef __CC__

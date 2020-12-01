@@ -1146,6 +1146,8 @@ do_unsigned:
 		case DW_ATE_unsigned_char:
 		case DW_ATE_signed_char:
 		case DW_ATE_UTF:
+		case DW_ATE_UCS:
+		case DW_ATE_ASCII:
 			if (!typinfo.t_sizeof)
 				typinfo.t_sizeof = sizeof(char);
 			if (!typinfo.t_name)
@@ -1166,6 +1168,8 @@ do_unsigned:
 			 * ```
 			 */
 			if (typinfo.t_encoding == DW_ATE_UTF ||
+			    typinfo.t_encoding == DW_ATE_UCS ||
+			    typinfo.t_encoding == DW_ATE_ASCII ||
 			    (typinfo.t_name && strcmp(typinfo.t_name, "char") == 0)) {
 do_character:
 				if (typinfo.t_sizeof == sizeof(char)) {
