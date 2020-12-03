@@ -1010,10 +1010,11 @@ NOTHROW(KCALL dbg_strlen)(void const *addr, size_t *__restrict presult) {
 		     dbg_readmemory(addr, buf, sizeof(buf) - sizeof(char));
 		temp = strlen(buf);
 		result += temp;
-		if (temp < ok)
+		if (temp < ok * sizeof(char))
 			break;
 		if (ok < sizeof(buf) - sizeof(char))
 			return false;
+		addr = (byte_t const *)addr + ok;
 	}
 	*presult = result;
 	return true;
@@ -1030,10 +1031,11 @@ NOTHROW(KCALL dbg_strlen16)(void const *addr, size_t *__restrict presult) {
 		     dbg_readmemory(addr, buf, sizeof(buf) - sizeof(u16));
 		temp = rawmemlenw(buf, 0);
 		result += temp;
-		if (temp < ok)
+		if (temp < ok * sizeof(u16))
 			break;
 		if (ok < sizeof(buf) - sizeof(u16))
 			return false;
+		addr = (byte_t const *)addr + ok;
 	}
 	*presult = result;
 	return true;
@@ -1050,10 +1052,11 @@ NOTHROW(KCALL dbg_strlen32)(void const *addr, size_t *__restrict presult) {
 		     dbg_readmemory(addr, buf, sizeof(buf) - sizeof(u32));
 		temp = rawmemlenl(buf, 0);
 		result += temp;
-		if (temp < ok)
+		if (temp < ok * sizeof(u32))
 			break;
 		if (ok < sizeof(buf) - sizeof(u32))
 			return false;
+		addr = (byte_t const *)addr + ok;
 	}
 	*presult = result;
 	return true;
