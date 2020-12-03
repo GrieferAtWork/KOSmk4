@@ -476,13 +476,7 @@ NOTHROW(FCALL cmodule_create)(module_t *__restrict mod
 				cuc_alloc  = cuc_used + 16;
 				new_result = (REF struct cmodule *)dbx_realloc(result, SIZEOF_CMODULE(cuc_alloc));
 				if unlikely(!new_result) {
-					cuc_alloc = cuc_used + 1;
-					/* FIXME: Because the DBX heap as implemented right now can only allocate
-					 *        heap blocks of a limited max-size, this right here ends up failing
-					 *        for very large programs.
-					 *  - It does work for the kernel core (barely)
-					 *  - But it fails when trying to load /bin/busybox (which just uses too many CUs...)
-					 */
+					cuc_alloc  = cuc_used + 1;
 					new_result = (REF struct cmodule *)dbx_realloc(result, SIZEOF_CMODULE(cuc_alloc));
 					if unlikely(!new_result)
 						goto err_r; /* Out of memory... :( */
@@ -740,8 +734,16 @@ NOTHROW(FCALL prefer_symbol)(struct cmodsym *__restrict a,
 }
 
 /* Lookup the given `name' within `self' */
+#ifdef CMODSYM_NAME_NEEDS_MODULE
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2, 3)) struct cmodsym *
+#else /* CMODSYM_NAME_NEEDS_MODULE */
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) struct cmodsym *
+#define cmodsymtab_lookup(self, mod, name, namlen, ns) cmodsymtab_lookup(self, name, namlen, ns)
+#endif /* !CMODSYM_NAME_NEEDS_MODULE */
 NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
+#ifdef CMODSYM_NAME_NEEDS_MODULE
+                                 struct cmodule const *__restrict mod,
+#endif /* CMODSYM_NAME_NEEDS_MODULE */
                                  char const *__restrict name, size_t namelen,
                                  uintptr_t ns) {
 	struct cmodsym *result;
@@ -750,17 +752,11 @@ NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 	while (lo < hi) {
 		size_t index;
 		int cmp;
+		char const *symname;
 		index  = (lo + hi) / 2;
 		result = &self->mst_symv[index];
-		/* FIXME: compare right here assumes that `name...+=namelen'
-		 *        does not contain any NUL characters!
-		 * -> There really needs to be a function `strcmpl(a, b, blen)'
-		 *    that ensures `strlen(a) == blen && memcmp(a, b, blen) == 0',
-		 *    but still returns -1,0,+1 like memcmp(), while assuming that
-		 *    any character from b outside of b...+=blen is equal to NUL. */
-		cmp = memcmp(name, result->cms_name, namelen * sizeof(char));
-		if (cmp == 0 && result->cms_name[namelen] != 0)
-			cmp = -1; /* key < symbol */
+		symname = cmodsym_name(result, mod);
+		cmp     = strcmpz(name, symname, namelen);
 		if (cmp < 0) {
 			hi = index;
 		} else if (cmp > 0) {
@@ -771,16 +767,14 @@ NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 			/* Deal with multiple symbols of the same name by looking at `ns'!
 			 * Note that right now, other symbols with the same name may both
 			 * be located before and after `result'! */
-			char const *symname;
 			struct cmodsym *match_min, *match_max, *iter;
 			/* Walk forward/backwards until we find a symbol of a different name. */
-			symname   = result->cms_name;
 			match_min = match_max = result;
 			while (match_min > self->mst_symv &&
-			       strcmp(match_min[-1].cms_name, symname) == 0)
+			       strcmp(cmodsym_name(&match_min[-1], mod), symname) == 0)
 				--match_min;
 			while (match_max < &self->mst_symv[self->mst_symc - 1] &&
-			       strcmp(match_max[1].cms_name, symname) == 0)
+			       strcmp(cmodsym_name(&match_max[1], mod), symname) == 0)
 				++match_max;
 
 			result = NULL;
@@ -1207,8 +1201,17 @@ NOTHROW(FCALL cmodsymtab_insert_symbol)(struct cmodsymtab *__restrict self,
  * how debug information is parsed.
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory. */
+#ifdef CMODSYM_NAME_NEEDS_MODULE
+PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
+#else /* CMODSYM_NAME_NEEDS_MODULE */
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
+#define cmodsymtab_addsymbol(self, mod, name, symbol_dip) \
+	cmodsymtab_addsymbol(self, name, symbol_dip)
+#endif /* !CMODSYM_NAME_NEEDS_MODULE */
 NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
+#ifdef CMODSYM_NAME_NEEDS_MODULE
+                                    struct cmodule const *__restrict mod,
+#endif /* CMODSYM_NAME_NEEDS_MODULE */
                                     char const *__restrict name,
                                     uintptr_t symbol_dip) {
 	size_t lo, hi, index;
@@ -1217,11 +1220,13 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 	for (;;) {
 		int cmp;
 		struct cmodsym const *sym;
+		char const *symname;
 		index = (lo + hi) / 2;
 		if (lo >= hi)
 			break;
-		sym = &self->mst_symv[index];
-		cmp = strcmp(name, sym->cms_name);
+		sym     = &self->mst_symv[index];
+		symname = cmodsym_name(sym, mod);
+		cmp     = strcmp(name, symname);
 		if (cmp < 0) {
 			hi = index;
 		} else if (cmp > 0) {
@@ -1230,10 +1235,11 @@ NOTHROW(FCALL cmodsymtab_addsymbol)(struct cmodsymtab *__restrict self,
 			/* Found a possible conflict. For this purpose,
 			 * determine the range of symbols that share `name' */
 			lo = hi = index;
-			while (lo > 0 && strcmp(self->mst_symv[lo - 1].cms_name, name) == 0)
+			while (lo > 0 &&
+			       strcmp(cmodsym_name(&self->mst_symv[lo - 1], mod), name) == 0)
 				--lo;
 			while (hi < self->mst_symc - 1 &&
-			       strcmp(self->mst_symv[hi + 1].cms_name, name) == 0)
+			       strcmp(cmodsym_name(&self->mst_symv[hi + 1], mod), name) == 0)
 				++hi;
 			/* Check of one of the pre-existing symbols uses the same namespace as we do. */
 			for (index = lo; index <= hi; ++index) {
@@ -1516,11 +1522,13 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 	for (;;) {
 		int cmp;
 		struct cmodsym *sym;
+		char const *symname;
 		index = (lo + hi) / 2;
 		if (lo >= hi)
 			break;
-		sym = &self->cm_symbols.mst_symv[index];
-		cmp = strcmp(name, sym->cms_name);
+		sym     = &self->cm_symbols.mst_symv[index];
+		symname = cmodsym_name(sym, self);
+		cmp     = strcmp(name, symname);
 		if (cmp < 0) {
 			hi = index;
 		} else if (cmp > 0) {
@@ -1529,10 +1537,10 @@ NOTHROW(FCALL cmodule_addsymbol)(struct cmodule *__restrict self,
 			/* Found a possible conflict. For this purpose,
 			 * determine the range of symbols that share `name' */
 			lo = hi = index;
-			while (lo > 0 && strcmp(self->cm_symbols.mst_symv[lo - 1].cms_name, name) == 0)
+			while (lo > 0 && strcmp(cmodsym_name(&self->cm_symbols.mst_symv[lo - 1], self), name) == 0)
 				--lo;
 			while (hi < self->cm_symbols.mst_symc - 1 &&
-			       strcmp(self->cm_symbols.mst_symv[hi + 1].cms_name, name) == 0)
+			       strcmp(cmodsym_name(&self->cm_symbols.mst_symv[hi + 1], self), name) == 0)
 				++hi;
 			/* Check of one of the pre-existing symbols uses the same namespace as we do. */
 			for (index = lo; index <= hi; ++index) {
@@ -1683,7 +1691,7 @@ fallback_insert_possible_collision:
 				 * the new symbol to the per-CU table. */
 				sym->cms_dip |= CMODSYM_DIP_NS_FCONFLICT;
 				/* Add the symbol to the per-CU table. */
-				return cmodsymtab_addsymbol(cu_symtab, name, symbol_dip);
+				return cmodsymtab_addsymbol(cu_symtab, self, name, symbol_dip);
 			}
 			/* No collision (we're dealing with differing namespace)
 			 * As such, simply insert the new symbol at the end of the list
@@ -1852,7 +1860,7 @@ NOTHROW(FCALL cmodule_append_symtab_symbol)(struct cmodule const *__restrict sel
 	 * Note that for this purpose, we use the `CMODSYM_DIP_NS_SYMTAB'
 	 * namespace, thus indicating that the symbol data offset points
 	 * into the module's .symtab. */
-	result = cmodsymtab_addsymbol(symtab, name,
+	result = cmodsymtab_addsymbol(symtab, self, name,
 	                              CMODSYM_DIP_NS_SYMTAB |
 	                              symtab_symbol_offset);
 done:
@@ -1902,15 +1910,24 @@ done:
 	return result;
 }
 
+#ifdef CMODSYM_NAME_NEEDS_MODULE
+PRIVATE WUNUSED NONNULL((1, 2, 3)) dbx_errno_t
+#else /* CMODSYM_NAME_NEEDS_MODULE */
 PRIVATE WUNUSED NONNULL((1, 2)) dbx_errno_t
+#define cmodule_load_symtab_kern(symtab, mod, sym) \
+	cmodule_load_symtab_kern(symtab, sym)
+#endif /* !CMODSYM_NAME_NEEDS_MODULE */
 NOTHROW(FCALL cmodule_load_symtab_kern)(struct cmodsymtab *__restrict symtab,
+#ifdef CMODSYM_NAME_NEEDS_MODULE
+                                        struct cmodule *__restrict mod,
+#endif /* CMODSYM_NAME_NEEDS_MODULE */
                                         struct kernel_syment const *__restrict sym) {
 	uintptr_t symtab_offset;
 	char const *name = sym->ks_name;
 	if (!name)
 		return DBX_EOK; /* Unused entry. */
 	symtab_offset = (uintptr_t)sym - (uintptr_t)&kernel_symbol_table;
-	return cmodsymtab_addsymbol(symtab, sym->ks_name,
+	return cmodsymtab_addsymbol(symtab, mod, sym->ks_name,
 	                            CMODSYM_DIP_NS_SYMTAB |
 	                            symtab_offset);
 }
@@ -1957,7 +1974,7 @@ NOTHROW(FCALL cmodule_load_symtab_symbols)(struct cmodule *__restrict self) {
 	if (CLinkerSymbol_IsKern(self)) {
 		size_t i;
 		for (i = 0; i <= kernel_symbol_table.ds_mask; ++i) {
-			error = cmodule_load_symtab_kern(&symtab,
+			error = cmodule_load_symtab_kern(&symtab, self,
 			                                 &kernel_symbol_table.ds_list[i]);
 			if unlikely(error != DBX_EOK)
 				goto err;
@@ -2116,7 +2133,7 @@ NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
 		return NULL;
 
 	/* Now check the per-module (global) symbol table for `name' */
-	result = cmodsymtab_lookup(&self->cm_symbols, name, namelen, ns);
+	result = cmodsymtab_lookup(&self->cm_symbols, self, name, namelen, ns);
 
 	/* Check if the symbol we've found is in conflict with other,
 	 * per-CU symbols. If this is the case, then we must lookup the symbol
@@ -2133,7 +2150,7 @@ NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
 			cu = cmodule_findunit_from_pc(self, module_relative_pc);
 			if (cu != NULL) {
 				struct cmodsym const *cu_symbol;
-				cu_symbol = cmodsymtab_lookup(&cu->cu_symbols, name, namelen, ns);
+				cu_symbol = cmodsymtab_lookup(&cu->cu_symbols, self, name, namelen, ns);
 				if (cu_symbol != NULL)
 					return cu_symbol;
 			}
@@ -2354,7 +2371,7 @@ NOTHROW(FCALL cmodsyminfo_lookup_cb)(struct cmodsyminfo *__restrict info,
                                      bool info_loaded) {
 	struct cmodsyminfo_lookup_data *arg;
 	arg = container_of(info, struct cmodsyminfo_lookup_data, info);
-	if (strlen(info->clv_symbol.cms_name) != arg->namelen)
+	if (strlen(cmodsyminfo_name(info)) != arg->namelen)
 		return 0; /* Not actually our symbol. - it's name just starts with our name as prefix. */
 	/* Found it! - Make sure that extended symbol information has been loaded. */
 	if (!info_loaded)
@@ -2888,17 +2905,15 @@ done_attributes:
 }
 
 /* Return non-zero if the name of the given `sym' starts with the given name. */
-#define cmodsym_name_startswith(sym, startswith_name, startswith_namelen) \
-	(strlen((sym)->cms_name) >= (startswith_namelen) &&                   \
-	 memcmp((sym)->cms_name, startswith_name, (startswith_namelen) * sizeof(char)) == 0)
-
+#define cmodsym_name_startswith(sym, mod, startswith_name, startswith_namelen) \
+	(strstartcmpz(cmodsym_name(sym, mod), startswith_name, startswith_namelen) == 0)
 
 /* Enumerate symbols from `self'. When a symbol is encountered that stands in
  * conflict with some other symbol, try to resolve the conflict by looking at
  * the secondary symbol table `fallback_cu->cu_symbols'. If that table contains
  * another symbol with the same name, then that symbol will be enumerated, instead. */
 PRIVATE NONNULL((1, 2, 3)) ssize_t
-NOTHROW(FCALL cmod_symenum_symtab)(struct cmodsymtab const *__restrict self,
+NOTHROW(FCALL cmod_symenum_symtab)(struct cmodule const *__restrict self,
                                    /*in|out(undef)*/ struct cmodsyminfo *__restrict info,
                                    cmod_symenum_callback_t cb, char const *startswith_name,
                                    size_t startswith_namelen, uintptr_t ns,
@@ -2907,53 +2922,41 @@ NOTHROW(FCALL cmod_symenum_symtab)(struct cmodsymtab const *__restrict self,
 	size_t enum_lo, enum_hi;
 	size_t index;
 	enum_lo = 0;
-	enum_hi = self->mst_symc;
+	enum_hi = self->cm_symbols.mst_symc;
 	/* Do a binary search to narrow down the range of symbols that should be enumerated. */
 	for (;;) {
 		char const *symbol_name;
-		size_t symbol_namelen;
 		int cmp;
 		if (enum_lo >= enum_hi)
 			goto done;
-		index          = (enum_lo + enum_hi) / 2;
-		symbol_name    = self->mst_symv[index].cms_name;
-		symbol_namelen = strlen(symbol_name);
-		if (symbol_namelen < startswith_namelen) {
-			cmp = memcmp(startswith_name, symbol_name, symbol_namelen * sizeof(char));
-			if (cmp == 0)
-				cmp = 1; /* (startswith_name[symbol_namelen]!=0) > (symbol_name[symbol_namelen]==0) */
-		} else {
-			cmp = memcmp(startswith_name, symbol_name, startswith_namelen * sizeof(char));
-			/* When `cmp == 0' at this point, then we've located a symbol
-			 * that starts with the given `startswith_name' string! */
-		}
-		if (cmp < 0) {
+		index       = (enum_lo + enum_hi) / 2;
+		symbol_name = cmodsym_name(&self->cm_symbols.mst_symv[index], self);
+		cmp         = strstartcmpz(symbol_name, startswith_name, startswith_namelen);
+		if (cmp > 0) {
 			enum_hi = index;
-		} else if (cmp > 0) {
+		} else if (cmp < 0) {
 			enum_lo = index + 1;
 		} else {
-			/* Found some symbol `self->mst_symv[index]' that matches our starts-with pattern. */
+			/* Found some symbol `self->cm_symbols.mst_symv[index]' that matches our starts-with pattern. */
 			break;
 		}
 	}
 	/* Go backwards/forwards until we find the last symbol that matches our starts-with pattern. */
 	enum_lo = enum_hi = index;
 	while (enum_lo > 0 &&
-	       cmodsym_name_startswith(&self->mst_symv[enum_lo - 1],
-	                               startswith_name,
-	                               startswith_namelen))
+	       cmodsym_name_startswith(&self->cm_symbols.mst_symv[enum_lo - 1],
+	                               mod, startswith_name, startswith_namelen))
 		--enum_lo;
-	while (enum_hi < self->mst_symc - 1 &&
-	       cmodsym_name_startswith(&self->mst_symv[enum_hi + 1],
-	                               startswith_name,
-	                               startswith_namelen))
+	while (enum_hi < self->cm_symbols.mst_symc - 1 &&
+	       cmodsym_name_startswith(&self->cm_symbols.mst_symv[enum_hi + 1],
+	                               mod, startswith_name, startswith_namelen))
 		++enum_hi;
 	/* At this point, we've narrowed down the range of symbols to enumerate
 	 * to those found at indices [enum_lo, enum_hi] (inclusively)
 	 * Now to actually enumerate them! */
 	for (index = enum_lo; index <= enum_hi; ++index) {
 		struct cmodsym *sym;
-		sym = &self->mst_symv[index];
+		sym = &self->cm_symbols.mst_symv[index];
 
 		/* Check if we're actually supposed to enumerate this symbol. */
 		if (!want_symbol(sym, ns))
@@ -2964,9 +2967,11 @@ NOTHROW(FCALL cmod_symenum_symtab)(struct cmodsymtab const *__restrict self,
 			/* If we've been given a custom CU, check if it contains another version of this symbol. */
 			if (fallback_cu) {
 				struct cmodsym *percu_sym;
+				char const *symbol_name = cmodsym_name(sym, self);
 				percu_sym = cmodsymtab_lookup(&fallback_cu->cu_symbols,
-				                              sym->cms_name,
-				                              strlen(sym->cms_name),
+				                              self,
+				                              symbol_name,
+				                              strlen(symbol_name),
 				                              ns);
 				if (percu_sym != NULL)
 					sym = percu_sym; /* Use this symbol instead! */
@@ -3013,7 +3018,7 @@ NOTHROW(FCALL cmod_symenum_globals)(/*in|out(undef)*/ struct cmodsyminfo *__rest
 		return error;
 	}
 	/* Enumerate symbols from the module's global symbol table. */
-	result = cmod_symenum_symtab(&info->clv_mod->cm_symbols, info, cb,
+	result = cmod_symenum_symtab(info->clv_mod, info, cb,
 	                             startswith_name, startswith_namelen,
 	                             ns, fallback_cu);
 	return result;
@@ -3127,28 +3132,23 @@ again_subprogram_component:
 					if (debuginfo_cu_parser_loadattr_variable(&info->clv_parser, &var)) {
 						if (!var.v_rawname)
 							var.v_rawname = var.v_name;
-						/* Only enumerate symbols that actually have a name! */
-						if (var.v_rawname) {
-							/* Check if the selected variable name matches our starts-with pattern. */
-							size_t varname_len;
-							varname_len = strlen(var.v_rawname);
-							if (varname_len >= startswith_namelen &&
-							    memcmp(var.v_rawname, startswith_name,
-							           startswith_namelen * sizeof(char)) == 0) {
-								/* Fill symbol information. */
-								info->clv_symbol.cms_name = var.v_rawname;
-								info->clv_symbol.cms_dip  = cmodsym_makedip(info->clv_mod, dip, CMODSYM_DIP_NS_NORMAL);
-								info->clv_data.s_var.v_framebase = sp.sp_frame_base;
-								info->clv_data.s_var.v_location  = var.v_location;
-								info->clv_data.s_var.v_typeinfo  = var.v_type;
-								info->clv_data.s_var.v_objaddr   = NULL;
+						/* Only enumerate symbols that actually have a name, and only those
+						 * where the selected variable name matches our starts-with pattern. */
+						if (var.v_rawname &&
+						    strstartcmpz(var.v_rawname, startswith_name, startswith_namelen) == 0) {
+							/* Fill symbol information. */
+							info->clv_symbol.cms_name = var.v_rawname;
+							info->clv_symbol.cms_dip  = cmodsym_makedip(info->clv_mod, dip, CMODSYM_DIP_NS_NORMAL);
+							info->clv_data.s_var.v_framebase = sp.sp_frame_base;
+							info->clv_data.s_var.v_location  = var.v_location;
+							info->clv_data.s_var.v_typeinfo  = var.v_type;
+							info->clv_data.s_var.v_objaddr   = NULL;
 	
-								/* Actually enumerate this variable. */
-								temp = (*cb)(info, true);
-								if unlikely(temp < 0)
-									goto err_callback_temp;
-								result += temp;
-							}
+							/* Actually enumerate this variable. */
+							temp = (*cb)(info, true);
+							if unlikely(temp < 0)
+								goto err_callback_temp;
+							result += temp;
 						}
 					}
 				}	break;

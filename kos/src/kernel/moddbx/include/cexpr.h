@@ -378,8 +378,11 @@ FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc);
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No object matches the given `name' */
 FUNDEF NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
+NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
                                 __BOOL automatic_symbol_addend DFL(1));
+FUNDEF NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namelen,
+                                      __BOOL automatic_symbol_addend DFL(1));
 
 /* Push a register with its native typing, given its `name'
  * @return: DBX_EOK:    Success.

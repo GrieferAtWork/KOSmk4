@@ -2893,153 +2893,151 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_call)(size_t argc) {
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No object matches the given `name' */
 PUBLIC NONNULL((1)) dbx_errno_t
-NOTHROW(FCALL cexpr_pushsymbol)(char const *__restrict name, size_t namelen,
+NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
                                 bool automatic_symbol_addend) {
 	dbx_errno_t result;
-	struct cmodsyminfo csym;
-	result = cmod_syminfo_local(&csym, name, namelen, CMODSYM_DIP_NS_NONTYPE);
-	if (result != DBX_EOK)
-		return result;
-	if (!cmodsyminfo_istype(&csym)) {
-		struct ctyperef symtype;
-		if (!csym.clv_data.s_var.v_typeinfo && cmodsyminfo_issip(&csym)) {
-			/* XXX: This right here can happen if a symbol appears in a module's
-			 *      symbol table, but doesn't actually end up appearing within
-			 *      the module's .debug_info, not even as some kind of alias created
-			 *      by something like `DEFINE_PUBLIC_ALIAS()'.
-			 * In this case, check if `csym' is part of the _public_ symbol table
-			 * of its associated module (i.e. `.dynsym'), and if so: search through
-			 * loaded modules that claim dependencies on that module. Then, look
-			 * through the debug information of those modules in search of one that
-			 * makes a reference to an external symbol of the same name, and if we
-			 * manage to find such a reference, then we can make use of its type
-			 * information to complete what we couldn't find earlier! */
-		}
+	struct ctyperef symtype;
+	if (cmodsyminfo_istype(sym))
+		return DBX_ENOENT;
+	if (!sym->clv_data.s_var.v_typeinfo && cmodsyminfo_issip(sym)) {
+		/* XXX: This right here can happen if a symbol appears in a module's
+		 *      symbol table, but doesn't actually end up appearing within
+		 *      the module's .debug_info, not even as some kind of alias created
+		 *      by something like `DEFINE_PUBLIC_ALIAS()'.
+		 * In this case, check if `sym' is part of the _public_ symbol table
+		 * of its associated module (i.e. `.dynsym'), and if so: search through
+		 * loaded modules that claim dependencies on that module. Then, look
+		 * through the debug information of those modules in search of one that
+		 * makes a reference to an external symbol of the same name, and if we
+		 * manage to find such a reference, then we can make use of its type
+		 * information to complete what we couldn't find earlier! */
+	}
 
-		if (!csym.clv_data.s_var.v_typeinfo && cmodsyminfo_issip(&csym)) {
-			/* If we weren't able to figure out the proper typing for
-			 * the symbol (and it may not even have any proper typing),
-			 * then try to induce its type from information taken from
-			 * the symbol's Elf(32|64)_Sym entry.
-			 *
-			 * Using that entry, we can:
-			 *   - Determine if it's a function, and if it is:
-			 *     Use `void(...)' as type (i.e. void-return+varargs)
-			 *   - Figure out the symbol's size. and select an appropriate
-			 *     integer type based on that knowledge:
-			 *      - If the size is the same as that of a pointer, assume that it's a pointer
-			 *      - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
-			 *      - Otherwise, interpret as an array of byte_t-s. */
-			CLinkerSymbol const *sip;
-			unsigned char st_info;
-			size_t st_size;
-			sip = cmodsyminfo_getsip(&csym);
-			if (CLinkerSymbol_IsElf32(csym.clv_mod)) {
-				st_info = sip->cls_elf32.st_info;
-				st_size = sip->cls_elf32.st_size;
-			} else if (CLinkerSymbol_IsElf64(csym.clv_mod)) {
-				st_info = sip->cls_elf64.st_info;
-				st_size = sip->cls_elf64.st_size;
+	if (!sym->clv_data.s_var.v_typeinfo && cmodsyminfo_issip(sym)) {
+		/* If we weren't able to figure out the proper typing for
+		 * the symbol (and it may not even have any proper typing),
+		 * then try to induce its type from information taken from
+		 * the symbol's Elf(32|64)_Sym entry.
+		 *
+		 * Using that entry, we can:
+		 *   - Determine if it's a function, and if it is:
+		 *     Use `void(...)' as type (i.e. void-return+varargs)
+		 *   - Figure out the symbol's size. and select an appropriate
+		 *     integer type based on that knowledge:
+		 *      - If the size is the same as that of a pointer, assume that it's a pointer
+		 *      - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
+		 *      - Otherwise, interpret as an array of byte_t-s. */
+		CLinkerSymbol const *sip;
+		unsigned char st_info;
+		size_t st_size;
+		sip = cmodsyminfo_getsip(sym);
+		if (CLinkerSymbol_IsElf32(sym->clv_mod)) {
+			st_info = sip->cls_elf32.st_info;
+			st_size = sip->cls_elf32.st_size;
+		} else if (CLinkerSymbol_IsElf64(sym->clv_mod)) {
+			st_info = sip->cls_elf64.st_info;
+			st_size = sip->cls_elf64.st_size;
+		} else {
+			goto fallback_load_opt_type;
+		}
+		memset(&symtype, 0, sizeof(symtype));
+		if (ELF32_ST_TYPE(st_info) == STT_FUNC) {
+			symtype.ct_typ = &ctype_int;
+			symtype.ct_typ = ctype_function(&symtype, 0, NULL,
+			                                CTYPE_KIND_FUNPROTO_VARARGS);
+			if unlikely(!symtype.ct_typ)
+				goto err_csym_nomem;
+		} else if (ELF32_ST_TYPE(st_info) == STT_OBJECT) {
+			if (st_size == dbg_current_sizeof_pointer()) {
+				symtype.ct_typ = incref(&ctype_void_ptr);
 			} else {
-				goto fallback_load_opt_type;
-			}
-			memset(&symtype, 0, sizeof(symtype));
-			if (ELF32_ST_TYPE(st_info) == STT_FUNC) {
-				symtype.ct_typ = &ctype_int;
-				symtype.ct_typ = ctype_function(&symtype, 0, NULL,
-				                                CTYPE_KIND_FUNPROTO_VARARGS);
+				switch (st_size) {
+				case 1: symtype.ct_typ = incref(&ctype_u8); break;
+				case 2: symtype.ct_typ = incref(&ctype_u16); break;
+				case 4: symtype.ct_typ = incref(&ctype_u32); break;
+				case 8: symtype.ct_typ = incref(&ctype_u64); break;
+				default:
+					symtype.ct_typ = &ctype_byte_t;
+					symtype.ct_typ = ctype_array(&symtype, st_size);
+					break;
+				}
 				if unlikely(!symtype.ct_typ)
 					goto err_csym_nomem;
-			} else if (ELF32_ST_TYPE(st_info) == STT_OBJECT) {
-				if (st_size == dbg_current_sizeof_pointer()) {
-					symtype.ct_typ = incref(&ctype_void_ptr);
-				} else {
-					switch (st_size) {
-					case 1: symtype.ct_typ = incref(&ctype_u8); break;
-					case 2: symtype.ct_typ = incref(&ctype_u16); break;
-					case 4: symtype.ct_typ = incref(&ctype_u32); break;
-					case 8: symtype.ct_typ = incref(&ctype_u64); break;
-					default:
-						symtype.ct_typ = &ctype_byte_t;
-						symtype.ct_typ = ctype_array(&symtype, st_size);
-						break;
-					}
-					if unlikely(!symtype.ct_typ)
-						goto err_csym_nomem;
-				}
-			} else {
-				goto fallback_load_opt_type;
 			}
-			goto got_symbol_type;
+		} else {
+			goto fallback_load_opt_type;
 		}
+		goto got_symbol_type;
+	}
 fallback_load_opt_type:
-		/* Load the type of the variable. */
-		result = ctype_fromdw_opt(csym.clv_mod, csym.clv_unit,
-		                          &csym.clv_parser,
-		                          csym.clv_data.s_var.v_typeinfo,
-		                          &symtype);
-		if (csym.clv_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
-			/* Special case: Must complete `symtype' by loading argument types. */
-			REF struct ctype *function_type;
-			csym.clv_parser.dup_cu_info_pos = csym.clv_dip;
-			if (csym.clv_parser.dup_cu_info_pos && debuginfo_cu_parser_next(&csym.clv_parser)) {
-				debuginfo_cu_parser_skipattr(&csym.clv_parser);
-				result = ctype_fromdw_subroutine(csym.clv_mod,
-				                                 csym.clv_unit,
-				                                 &csym.clv_parser,
-				                                 &function_type,
-				                                 &symtype);
-			} else {
-				/* Fallback */
-				function_type = ctype_function(&symtype, 0, NULL,
-				                               CTYPE_KIND_FUNPROTO_VARARGS);
-				if unlikely(!function_type)
-					result = DBX_ENOMEM;
-			}
-			ctyperef_fini(&symtype);
-			if unlikely(result != DBX_EOK)
-				goto done;
-			memset(&symtype, 0, sizeof(symtype));
-			symtype.ct_typ = function_type; /* Inherit reference */
+	/* Load the type of the variable. */
+	result = ctype_fromdw_opt(sym->clv_mod, sym->clv_unit,
+	                          &sym->clv_parser,
+	                          sym->clv_data.s_var.v_typeinfo,
+	                          &symtype);
+	if (sym->clv_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
+		/* Special case: Must complete `symtype' by loading argument types. */
+		REF struct ctype *function_type;
+		sym->clv_parser.dup_cu_info_pos = sym->clv_dip;
+		if (sym->clv_parser.dup_cu_info_pos && debuginfo_cu_parser_next(&sym->clv_parser)) {
+			debuginfo_cu_parser_skipattr(&sym->clv_parser);
+			result = ctype_fromdw_subroutine(sym->clv_mod,
+			                                 sym->clv_unit,
+			                                 &sym->clv_parser,
+			                                 &function_type,
+			                                 &symtype);
+		} else {
+			/* Fallback */
+			function_type = ctype_function(&symtype, 0, NULL,
+			                               CTYPE_KIND_FUNPROTO_VARARGS);
+			if unlikely(!function_type)
+				result = DBX_ENOMEM;
 		}
-		if likely(result == DBX_EOK) {
+		ctyperef_fini(&symtype);
+		if unlikely(result != DBX_EOK)
+			goto done;
+		memset(&symtype, 0, sizeof(symtype));
+		symtype.ct_typ = function_type; /* Inherit reference */
+	}
+	if likely(result == DBX_EOK) {
 got_symbol_type:
-			if (csym.clv_data.s_var.v_objaddr == csym.clv_data.s_var._v_objdata) {
-				result = cexpr_pushdata(&symtype, csym.clv_data.s_var.v_objaddr);
-			} else {
-				struct cvalue_cfiexpr expr;
-				/* Fill in the expression for loading the symbol. */
-				expr.v_module            = csym.clv_mod;
-				expr.v_expr              = csym.clv_data.s_var.v_location;
-				expr.v_framebase         = csym.clv_data.s_var.v_framebase;
-				expr.v_cu_ranges_startpc = csym.clv_cu.cu_ranges.r_startpc;
-				expr.v_cu_addr_base      = csym.clv_cu.cu_addr_base;
-				expr.v_addrsize          = csym.clv_parser.dup_addrsize;
-				expr.v_ptrsize           = csym.clv_parser.dup_ptrsize;
-				expr.v_objaddr           = csym.clv_data.s_var.v_objaddr;
-				/* Push the symbol expression. */
-				result = cexpr_pushexpr(&symtype,
-				                        &expr,
-				                        ctype_sizeof(symtype.ct_typ),
-				                        0);
-				/* Do special handling for this[|vm|cpu]_* globals from the kernel core!
-				 * When accessed, automatically include an addend to the relevant object
-				 * in relation to dbg_current, such that the user can directly reference
-				 * these objects without having to manually sym@object them.
-				 *
-				 * Note however that this is in normal code, this is only done when the
-				 * symbol doesn't already appear in an @-expression (i.e. isn't followed
-				 * by an @-token) or within __identifier, meaning that:
-				 *   - `&__identifier(this_cred)' == `&__identifier(this_cred)'
-				 *   - `this_cred'                == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current)'
-				 *   - `this_cred@foo'            == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)foo)'
-				 *   - `(this_cred)@foo'          == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current + (uintptr_t)foo)'
-				 */
-				if (likely(result == DBX_EOK) && automatic_symbol_addend && !cexpr_typeonly &&
-				    csym.clv_mod && csym.clv_mod->cm_module == (module_t *)&kernel_driver &&
-				    namelen >= 5 && memcmp(name, "this", 4 * sizeof(char)) == 0 &&
-				    !CTYPE_KIND_ISFUNCTION(symtype.ct_typ->ct_kind)) {
-					uintptr_t addend;
+		if (sym->clv_data.s_var.v_objaddr == sym->clv_data.s_var._v_objdata) {
+			result = cexpr_pushdata(&symtype, sym->clv_data.s_var.v_objaddr);
+		} else {
+			struct cvalue_cfiexpr expr;
+			/* Fill in the expression for loading the symbol. */
+			expr.v_module            = sym->clv_mod;
+			expr.v_expr              = sym->clv_data.s_var.v_location;
+			expr.v_framebase         = sym->clv_data.s_var.v_framebase;
+			expr.v_cu_ranges_startpc = sym->clv_cu.cu_ranges.r_startpc;
+			expr.v_cu_addr_base      = sym->clv_cu.cu_addr_base;
+			expr.v_addrsize          = sym->clv_parser.dup_addrsize;
+			expr.v_ptrsize           = sym->clv_parser.dup_ptrsize;
+			expr.v_objaddr           = sym->clv_data.s_var.v_objaddr;
+			/* Push the symbol expression. */
+			result = cexpr_pushexpr(&symtype,
+			                        &expr,
+			                        ctype_sizeof(symtype.ct_typ),
+			                        0);
+			/* Do special handling for this[|vm|cpu]_* globals from the kernel core!
+			 * When accessed, automatically include an addend to the relevant object
+			 * in relation to dbg_current, such that the user can directly reference
+			 * these objects without having to manually sym@object them.
+			 *
+			 * Note however that this is in normal code, this is only done when the
+			 * symbol doesn't already appear in an @-expression (i.e. isn't followed
+			 * by an @-token) or within __identifier, meaning that:
+			 *   - `&__identifier(this_cred)' == `&__identifier(this_cred)'
+			 *   - `this_cred'                == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current)'
+			 *   - `this_cred@foo'            == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)foo)'
+			 *   - `(this_cred)@foo'          == `*(typeof(this_cred) *)((uintptr_t)&__identifier(this_cred) + (uintptr_t)dbg_current + (uintptr_t)foo)'
+			 */
+			if (likely(result == DBX_EOK) && automatic_symbol_addend && !cexpr_typeonly &&
+			    sym->clv_mod && sym->clv_mod->cm_module == (module_t *)&kernel_driver &&
+			    !CTYPE_KIND_ISFUNCTION(symtype.ct_typ->ct_kind)) {
+				uintptr_t addend;
+				char const *name = cmodsyminfo_name(sym);
+				if (name && memcmp(name, "this", 4 * sizeof(char)) == 0) {
 					if (name[4] == '_') {
 						REF struct ctype *symtype_ptr;
 						addend = (uintptr_t)dbg_current;
@@ -3071,16 +3069,14 @@ do_increase_addend:
 						/* Guard against bad memory accesses when `dbg_current'
 						 * has become corrupt for whatever reason. */
 						TRY {
-							if (namelen >= 7 && name[4] == 'v' &&
-							    name[5] == 'm' && name[6] == '_') {
+							if (name[4] == 'v' && name[5] == 'm' && name[6] == '_') {
 								if unlikely(!ADDR_ISKERN(dbg_current))
 									goto err_fefault_symtype;
 								addend = (uintptr_t)dbg_current->t_vm;
 								goto do_increase_addend;
 							}
-							if (namelen >= 8 && name[4] == 'c' &&
-							    name[5] == 'p' && name[6] == 'u' &&
-							    name[7] == '_') {
+							if (name[4] == 'c' && name[5] == 'p' &&
+							    name[6] == 'u' && name[7] == '_') {
 								if unlikely(!ADDR_ISKERN(dbg_current))
 									goto err_fefault_symtype;
 								addend = (uintptr_t)dbg_current->t_cpu;
@@ -3089,27 +3085,38 @@ do_increase_addend:
 						} EXCEPT {
 							goto err_fefault_symtype;
 						}
-						__IF0 {
-err_fefault_symtype:
-							result = DBX_EFAULT;
-							goto done_symtype;
-						}
 					}
 				}
 			}
-done_symtype:
-			ctyperef_fini(&symtype);
 		}
-	} else {
-		result = DBX_ENOENT;
+done_symtype:
+		ctyperef_fini(&symtype);
 	}
 done:
-	cmod_syminfo_local_fini(&csym);
 	return result;
 err_csym_nomem:
 	result = DBX_ENOMEM;
 	goto done;
+err_fefault_symtype:
+	result = DBX_EFAULT;
+	goto done_symtype;
 }
+
+PUBLIC NONNULL((1)) dbx_errno_t
+NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namelen,
+                                       bool automatic_symbol_addend) {
+	dbx_errno_t result;
+	struct cmodsyminfo csym;
+	result = cmod_syminfo_local(&csym, name, namelen,
+	                            CMODSYM_DIP_NS_NONTYPE);
+	if (result != DBX_EOK)
+		return result;
+	result = cexpr_pushsymbol(&csym, automatic_symbol_addend);
+	cmod_syminfo_local_fini(&csym);
+	return result;
+}
+
+
 
 /* Push a register with its native typing, given its `name'
  * @return: DBX_EOK:    Success.

@@ -6177,7 +6177,88 @@ memrevq:([[nonnull]] void *__restrict base, $size_t n_qwords) -> [[== base]] $ui
 %#endif /* __UINT64_TYPE__ */
 %#endif /* __USE_STRING_BWLQ */
 
+@@>> strcmpz(3)
+@@Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
+@@Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+@@> char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
+@@> *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
+@@> return strcmp(lhs, dup);
+[[kernel, wunused, pure]]
+int strcmpz([[nonnull]] char const *lhs,
+            [[nonnull]] char const *rhs, size_t rhs_len) {
+	char c1, c2;
+	do {
+		c1 = *lhs++;
+		if (!rhs_len--) {
+			/* Once RHS reaches the end of the string,
+			 * compare the last character of LHS with `NUL' */
+			return (int)((unsigned char)c1 - '\0');
+		}
+		c2 = *rhs++;
+		if unlikely(c1 != c2)
+			return (int)((unsigned char)c1 - (unsigned char)c2);
+	} while (c1);
+	return 0;
+}
+
+@@>> strstartcmp(3)
+@@Compare the first `strnlen(str, strlen(startswith_str))' characters of
+@@`str' with `startswith_str', returning the usual >0, <0, ==0.
+[[kernel, wunused, pure]]
+int strstartcmp([[nonnull]] char const *str,
+                [[nonnull]] char const *startswith) {
+	char c1, c2;
+	do {
+		c2 = *startswith++;
+		if (!c2) {
+			/* When the end of the RHS-string is reached, then we
+			 * know that `str' has `startswith' as a leading
+			 * prefix. */
+			return 0;
+		}
+		c1 = *str++;
+		if unlikely(c1 != c2)
+			return (int)((unsigned char)c1 - (unsigned char)c2);
+	} while (c1);
+	/* The given `str' has a length less than `strlen(startswith)', meaning
+	 * that we're expected to return the result of a compare `NUL - NON_NUL',
+	 * which means we must return -1. Note that the NON_NUL is kind-of
+	 * assumed here, since `startswith' may contain only NUL characters
+	 * from here on out, however that is both unlikely, wouldn't even make
+	 * much sense. */
+	return -1;
+}
+
+@@>> strstartcmpz(3)
+@@Compare the first `strnlen(str, startswith_len)' characters of
+@@`str' with `startswith', returning the usual >0, <0, ==0.
+[[kernel, wunused, pure]]
+int strstartcmpz([[nonnull]] char const *str,
+                 [[nonnull]] char const *startswith,
+                 size_t startswith_len) {
+	char c1, c2;
+	do {
+		if (!startswith_len--) {
+			/* When the end of the RHS-string is reached, then we
+			 * know that `str' has `startswith' as a leading
+			 * prefix. */
+			return 0;
+		}
+		c1 = *str++;
+		c2 = *startswith++;
+		if unlikely(c1 != c2)
+			return (int)((unsigned char)c1 - (unsigned char)c2);
+	} while (c1);
+	/* The given `str' has a length less than `startswith_len', meaning
+	 * that we're expected to return the result of a compare `NUL - NON_NUL',
+	 * which means we must return -1. Note that the NON_NUL is kind-of
+	 * assumed here, since `startswith' may contain only NUL characters
+	 * from here on out, however that is both unlikely, wouldn't even make
+	 * much sense. */
+	return -1;
+}
 %#endif /* __USE_KOS */
+
 %
 %
 %#if defined(__USE_KOS) || defined(__USE_DOS)
@@ -6813,6 +6894,7 @@ __SYSDECL_BEGIN
 }
 %#if defined(__USE_BSD) || defined(__USE_KOS)
 
+@@>> strnstr(3)
 @@Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
 @@If found, return a pointer to its location within `str', else return `NULL'
 @@This function originates from BSD, but is also provided as a KOS extension

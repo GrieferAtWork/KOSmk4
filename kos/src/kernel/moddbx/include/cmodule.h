@@ -206,6 +206,8 @@ struct cmodsym {
 #define cmodsym_isdip(self)           CMODSYM_DIP_NS_ISDIP(cmodsym_getns(self))
 #define cmodsym_issip(self)           CMODSYM_DIP_NS_ISSIP(cmodsym_getns(self))
 #define cmodsym_ismip(self)           CMODSYM_DIP_NS_ISMIP(cmodsym_getns(self))
+#define cmodsym_name(self, mod)       ((self)->cms_name)
+#undef CMODSYM_NAME_NEEDS_MODULE
 
 /* CModSym namespaces. */
 #define CMODSYM_DIP_NS_SYMTAB    (__UINTPTR_C(0) << CMODSYM_DIP_NSSHIFT) /* Normal (global) namespace. (but this one comes from `.symtab') */
@@ -539,6 +541,7 @@ struct cmodsyminfo {
 #define cmodsyminfo_getdip(self) cmodsym_getdip(&(self)->clv_symbol, (self)->clv_mod)
 #define cmodsyminfo_getsip(self) cmodsym_getsip(&(self)->clv_symbol, (self)->clv_mod)
 #define cmodsyminfo_getmip(self) cmodsym_getmip(&(self)->clv_symbol, (self)->clv_mod)
+#define cmodsyminfo_name(self)   cmodsym_name(&(self)->clv_symbol, (self)->clv_mod)
 
 
 

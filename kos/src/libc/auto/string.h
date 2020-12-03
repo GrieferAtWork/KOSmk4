@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2668cf2 */
+/* HASH CRC-32:0x421d76ea */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2141,6 +2141,42 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBDCALL lib
 INTDEF ATTR_LEAF ATTR_RETNONNULL NONNULL((1)) uint64_t *NOTHROW_NCX(LIBCCALL libc_memrevq)(void *__restrict base, size_t n_qwords);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strcmpz(3)
+ * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
+ * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
+ * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
+ * > return strcmp(lhs, dup); */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strcmpz)(char const *lhs, char const *rhs, size_t rhs_len);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strcmpz(3)
+ * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
+ * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
+ * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
+ * > return strcmp(lhs, dup); */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strcmpz)(char const *lhs, char const *rhs, size_t rhs_len);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strstartcmp(3)
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters of
+ * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strstartcmp)(char const *str, char const *startswith);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strstartcmp(3)
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters of
+ * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strstartcmp)(char const *str, char const *startswith);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strstartcmpz(3)
+ * Compare the first `strnlen(str, startswith_len)' characters of
+ * `str' with `startswith', returning the usual >0, <0, ==0. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strstartcmpz)(char const *str, char const *startswith, size_t startswith_len);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strstartcmpz(3)
+ * Compare the first `strnlen(str, startswith_len)' characters of
+ * `str' with `startswith', returning the usual >0, <0, ==0. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str, char const *startswith, size_t startswith_len);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBDCALL libd_strlwr)(char *__restrict str);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -2255,13 +2291,15 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__strnset_s)(char *__restrict buf, size_
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf, size_t buflen, int ch, size_t maxlen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBDCALL libd_strnstr)(char const *haystack, char const *needle, size_t haystack_maxlen);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 INTDEF ATTR_PURE WUNUSED NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strnstr)(char const *haystack, char const *needle, size_t haystack_maxlen);

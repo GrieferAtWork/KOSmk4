@@ -518,7 +518,7 @@ NOTHROW(FCALL autocomplete_symbols_callback)(struct cmodsyminfo *__restrict info
 	char const *symbol_name;
 	size_t symbol_namelen;
 	cookie         = container_of(info, struct autocomplete_symbols_data, info);
-	symbol_name    = info->clv_symbol.cms_name;
+	symbol_name    = cmodsyminfo_name(info);
 	symbol_namelen = strlen(symbol_name);
 	cparser_autocomplete(cookie->self,
 	                     symbol_name + cookie->namelen,
@@ -955,7 +955,7 @@ done_container_of_t_ptr:
 			kwd_str = self->c_tokstart;
 			kwd_len = cparser_toklen(self);
 			/* NOTE: Don't enable automtic symbol offsets within __identifier()! */
-			result = cexpr_pushsymbol(kwd_str, kwd_len, false);
+			result = cexpr_pushsymbol_byname(kwd_str, kwd_len, false);
 			if (result == DBX_ENOENT && self->c_autocom && self->c_tokend == self->c_end)
 				autocomplete_symbols(self, kwd_str, kwd_len, CMODSYM_DIP_NS_NONTYPE);
 			yield();
@@ -1002,7 +1002,7 @@ done_container_of_t_ptr:
 			 * As such:
 			 * >> this_cred          (evaluate to this_cred@dbg_current)
 			 * >> this_cred@caller   (evaluate to this_cred@caller) */
-			result = cexpr_pushsymbol(kwd_str, kwd_len, self->c_tok != '@');
+			result = cexpr_pushsymbol_byname(kwd_str, kwd_len, self->c_tok != '@');
 			if (result == DBX_ENOENT) {
 				if (kwd_len && kwd_str[0] == '$') {
 					/* This might just be a register name... */
@@ -1053,7 +1053,8 @@ NOTHROW(KCALL autocomplete_struct_fields_callback)(void *arg,
 	member_namelen = strlen(member->m_name);
 	if (member_namelen <= cookie->namelen)
 		return 0;
-	if (memcmp(member->m_name, cookie->name, cookie->namelen) != 0)
+	if (memcmp(member->m_name, cookie->name,
+	           cookie->namelen * sizeof(char)) != 0)
 		return 0;
 	cparser_autocomplete(cookie->self,
 	                     member->m_name + cookie->namelen,

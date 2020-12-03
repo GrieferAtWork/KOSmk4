@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe928073 */
+/* HASH CRC-32:0xb39b424 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,39 +18,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_strnstr_defined
-#define __local_strnstr_defined 1
+#ifndef __local_strcmpz_defined
+#define __local_strcmpz_defined 1
 #include <__crt.h>
-#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-/* >> strnstr(3)
- * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
- * If found, return a pointer to its location within `str', else return `NULL'
- * This function originates from BSD, but is also provided as a KOS extension */
-__LOCAL_LIBC(strnstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnstr))(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) {
-	char __ch, __needle_start = *__needle++;
-	while (__haystack_maxlen-- && (__ch = *__haystack++) != '\0') {
-		if (__ch == __needle_start) {
-			char const *__hay2, *__ned_iter;
-			__SIZE_TYPE__ __maxlen2;
-			__hay2     = __haystack;
-			__ned_iter = __needle;
-			__maxlen2  = __haystack_maxlen;
-			while ((__ch = *__ned_iter++) != '\0') {
-				if (!__maxlen2-- || *__hay2++ != __ch)
-					goto __miss;
-			}
-			return (char *)__haystack - 1;
+/* >> strcmpz(3)
+ * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
+ * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
+ * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
+ * > return strcmp(lhs, dup); */
+__LOCAL_LIBC(strcmpz) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcmpz))(char const *__lhs, char const *__rhs, __SIZE_TYPE__ __rhs_len) {
+	char __c1, __c2;
+	do {
+		__c1 = *__lhs++;
+		if (!__rhs_len--) {
+			/* Once RHS reaches the end of the string,
+			 * compare the last character of LHS with `NUL' */
+			return (int)((unsigned char)__c1 - '\0');
 		}
-__miss:
-		;
-	}
-	return __NULLPTR;
+		__c2 = *__rhs++;
+		if __unlikely(__c1 != __c2)
+			return (int)((unsigned char)__c1 - (unsigned char)__c2);
+	} while (__c1);
+	return 0;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_strnstr_defined
-#define __local___localdep_strnstr_defined 1
-#define __localdep_strnstr __LIBC_LOCAL_NAME(strnstr)
-#endif /* !__local___localdep_strnstr_defined */
-#endif /* !__local_strnstr_defined */
+#ifndef __local___localdep_strcmpz_defined
+#define __local___localdep_strcmpz_defined 1
+#define __localdep_strcmpz __LIBC_LOCAL_NAME(strcmpz)
+#endif /* !__local___localdep_strcmpz_defined */
+#endif /* !__local_strcmpz_defined */

@@ -860,9 +860,7 @@ NOTHROW(KCALL ctype_struct_getfield_cb)(void *cookie,
 	arg = (struct ctype_struct_getfield_data *)cookie;
 	if (!member->m_name || unlikely(!member->m_type))
 		return 0;
-	if (strlen(member->m_name) != arg->namelen)
-		return 0;
-	if (memcmp(member->m_name, arg->name, arg->namelen * sizeof(char)) != 0)
+	if (strcmpz(member->m_name, arg->name, arg->namelen) != 0)
 		return 0;
 	/* Write-back results. */
 	*arg->pfield_offset = member->m_offset;

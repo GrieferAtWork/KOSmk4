@@ -3191,6 +3191,7 @@
 #define __CRT_HAVE_strchrnul
 #define __CRT_HAVE_strcmp
 #define __CRT_HAVE_strcmpi
+#define __CRT_HAVE_strcmpz
 #define __CRT_HAVE_strcoll
 #define __CRT_HAVE_strcoll_l
 #define __CRT_HAVE_strcpy
@@ -3259,6 +3260,8 @@
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strsignal_s
 #define __CRT_HAVE_strspn
+#define __CRT_HAVE_strstartcmp
+#define __CRT_HAVE_strstartcmpz
 #define __CRT_HAVE_strstr
 #define __CRT_HAVE_strto32
 #define __CRT_HAVE_strto32_l

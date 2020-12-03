@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd18cd1da */
+/* HASH CRC-32:0xcf3f289f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6712,6 +6712,48 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memrevq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_L
 #endif /* !__CRT_HAVE_memrevq */
 #endif /* __UINT64_TYPE__ */
 #endif /* __USE_STRING_BWLQ */
+#ifdef __CRT_HAVE_strcmpz
+/* >> strcmpz(3)
+ * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
+ * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
+ * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
+ * > return strcmp(lhs, dup); */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcmpz,(char const *__lhs, char const *__rhs, size_t __rhs_len),(__lhs,__rhs,__rhs_len))
+#else /* __CRT_HAVE_strcmpz */
+#include <libc/local/string/strcmpz.h>
+/* >> strcmpz(3)
+ * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
+ * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
+ * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
+ * > return strcmp(lhs, dup); */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strcmpz, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strcmpz)(char const *__lhs, char const *__rhs, size_t __rhs_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcmpz))(__lhs, __rhs, __rhs_len); })
+#endif /* !__CRT_HAVE_strcmpz */
+#ifdef __CRT_HAVE_strstartcmp
+/* >> strstartcmp(3)
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters of
+ * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strstartcmp,(char const *__str, char const *__startswith),(__str,__startswith))
+#else /* __CRT_HAVE_strstartcmp */
+#include <libc/local/string/strstartcmp.h>
+/* >> strstartcmp(3)
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters of
+ * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strstartcmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strstartcmp)(char const *__str, char const *__startswith) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstartcmp))(__str, __startswith); })
+#endif /* !__CRT_HAVE_strstartcmp */
+#ifdef __CRT_HAVE_strstartcmpz
+/* >> strstartcmpz(3)
+ * Compare the first `strnlen(str, startswith_len)' characters of
+ * `str' with `startswith', returning the usual >0, <0, ==0. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strstartcmpz,(char const *__str, char const *__startswith, size_t __startswith_len),(__str,__startswith,__startswith_len))
+#else /* __CRT_HAVE_strstartcmpz */
+#include <libc/local/string/strstartcmpz.h>
+/* >> strstartcmpz(3)
+ * Compare the first `strnlen(str, startswith_len)' characters of
+ * `str' with `startswith', returning the usual >0, <0, ==0. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strstartcmpz, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strstartcmpz)(char const *__str, char const *__startswith, size_t __startswith_len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstartcmpz))(__str, __startswith, __startswith_len); })
+#endif /* !__CRT_HAVE_strstartcmpz */
 #endif /* __USE_KOS */
 
 
@@ -8339,17 +8381,20 @@ __SYSDECL_BEGIN
 #ifdef __CRT_HAVE_strnstr
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen),strnstr,(__haystack,__needle,__haystack_maxlen))
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen),strnstr,(__haystack,__needle,__haystack_maxlen))
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strnstr,(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen),(__haystack,__needle,__haystack_maxlen))
@@ -8358,17 +8403,20 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NC
 #include <libc/local/string/strnstr.h>
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
 extern "C++" {
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char *__haystack, char *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char const *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); }
 } /* extern "C++" */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 __NAMESPACE_LOCAL_USING_OR_IMPL(strnstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL strnstr)(char const *__haystack, char const *__needle, __SIZE_TYPE__ __haystack_maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnstr))(__haystack, __needle, __haystack_maxlen); })

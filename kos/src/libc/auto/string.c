@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f6eaa7b */
+/* HASH CRC-32:0x86697288 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3794,6 +3794,87 @@ NOTHROW_NCX(LIBCCALL libc_memrevq)(void *__restrict base,
 	}
 	return (u64 *)base;
 }
+#endif /* !__KERNEL__ */
+/* >> strcmpz(3)
+ * Similar to `strcmp(3)', but the given `rhs' string mustn't necessarily be NUL-terminated.
+ * Instead, that string's length is fixed at `rhs_len', and the compare is equivalent to:
+ * > char *dup = (char *)malloc((rhs_len + 1) * sizeof(char));
+ * > *(char *)mempcpy(dup, rhs, rhs_len, sizeof(char)) = '\0';
+ * > return strcmp(lhs, dup); */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_strcmpz)(char const *lhs,
+                                   char const *rhs,
+                                   size_t rhs_len) {
+	char c1, c2;
+	do {
+		c1 = *lhs++;
+		if (!rhs_len--) {
+			/* Once RHS reaches the end of the string,
+			 * compare the last character of LHS with `NUL' */
+			return (int)((unsigned char)c1 - '\0');
+		}
+		c2 = *rhs++;
+		if unlikely(c1 != c2)
+			return (int)((unsigned char)c1 - (unsigned char)c2);
+	} while (c1);
+	return 0;
+}
+/* >> strstartcmp(3)
+ * Compare the first `strnlen(str, strlen(startswith_str))' characters of
+ * `str' with `startswith_str', returning the usual >0, <0, ==0. */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_strstartcmp)(char const *str,
+                                       char const *startswith) {
+	char c1, c2;
+	do {
+		c2 = *startswith++;
+		if (!c2) {
+			/* When the end of the RHS-string is reached, then we
+			 * know that `str' has `startswith' as a leading
+			 * prefix. */
+			return 0;
+		}
+		c1 = *str++;
+		if unlikely(c1 != c2)
+			return (int)((unsigned char)c1 - (unsigned char)c2);
+	} while (c1);
+	/* The given `str' has a length less than `strlen(startswith)', meaning
+	 * that we're expected to return the result of a compare `NUL - NON_NUL',
+	 * which means we must return -1. Note that the NON_NUL is kind-of
+	 * assumed here, since `startswith' may contain only NUL characters
+	 * from here on out, however that is both unlikely, wouldn't even make
+	 * much sense. */
+	return -1;
+}
+/* >> strstartcmpz(3)
+ * Compare the first `strnlen(str, startswith_len)' characters of
+ * `str' with `startswith', returning the usual >0, <0, ==0. */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str,
+                                        char const *startswith,
+                                        size_t startswith_len) {
+	char c1, c2;
+	do {
+		if (!startswith_len--) {
+			/* When the end of the RHS-string is reached, then we
+			 * know that `str' has `startswith' as a leading
+			 * prefix. */
+			return 0;
+		}
+		c1 = *str++;
+		c2 = *startswith++;
+		if unlikely(c1 != c2)
+			return (int)((unsigned char)c1 - (unsigned char)c2);
+	} while (c1);
+	/* The given `str' has a length less than `startswith_len', meaning
+	 * that we're expected to return the result of a compare `NUL - NON_NUL',
+	 * which means we must return -1. Note that the NON_NUL is kind-of
+	 * assumed here, since `startswith' may contain only NUL characters
+	 * from here on out, however that is both unlikely, wouldn't even make
+	 * much sense. */
+	return -1;
+}
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL libc_strlwr)(char *__restrict str) {
 	char *iter, ch;
@@ -4127,7 +4208,8 @@ NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf,
 	__libc_memsetc(iter, 0, remaining, __SIZEOF_CHAR__);
 	return 0;
 }
-/* Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
+/* >> strnstr(3)
+ * Search for `needle...+=strlen(needle)' within `haystack...+=strnlen(haystack, haystack_maxlen)'
  * If found, return a pointer to its location within `str', else return `NULL'
  * This function originates from BSD, but is also provided as a KOS extension */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED NONNULL((1, 2)) char *
@@ -5041,6 +5123,11 @@ DEFINE_PUBLIC_ALIAS(memrev, libc_memrev);
 DEFINE_PUBLIC_ALIAS(memrevw, libc_memrevw);
 DEFINE_PUBLIC_ALIAS(memrevl, libc_memrevl);
 DEFINE_PUBLIC_ALIAS(memrevq, libc_memrevq);
+#endif /* !__KERNEL__ */
+DEFINE_PUBLIC_ALIAS(strcmpz, libc_strcmpz);
+DEFINE_PUBLIC_ALIAS(strstartcmp, libc_strstartcmp);
+DEFINE_PUBLIC_ALIAS(strstartcmpz, libc_strstartcmpz);
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(_strlwr, libc_strlwr);
 DEFINE_PUBLIC_ALIAS(strlwr, libc_strlwr);
 DEFINE_PUBLIC_ALIAS(_strupr, libc_strupr);

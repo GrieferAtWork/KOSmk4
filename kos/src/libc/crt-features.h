@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c1cae7e */
+/* HASH CRC-32:0x63841c2b */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2354,6 +2354,7 @@
 #define __CRT_HAVE_DOS$strchr
 #define __CRT_HAVE_DOS$strchrnul
 #define __CRT_HAVE_DOS$strcmp
+#define __CRT_HAVE_DOS$strcmpz
 #define __CRT_HAVE_DOS$strcoll
 #define __CRT_HAVE_DOS$strcoll_l
 #define __CRT_HAVE_DOS$strcpy
@@ -2431,6 +2432,8 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$strspn
+#define __CRT_HAVE_DOS$strstartcmp
+#define __CRT_HAVE_DOS$strstartcmpz
 #define __CRT_HAVE_DOS$strstr
 #define __CRT_HAVE_DOS$strto32
 #define __CRT_HAVE_DOS$strto32_l
@@ -5418,6 +5421,7 @@
 #define __CRT_HAVE_strchr
 #define __CRT_HAVE_strchrnul
 #define __CRT_HAVE_strcmp
+#define __CRT_HAVE_strcmpz
 #ifndef __KERNEL__
 #define __CRT_HAVE_strcoll
 #define __CRT_HAVE_strcoll_l
@@ -5492,6 +5496,10 @@
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strsignal_s
 #define __CRT_HAVE_strspn
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE_strstartcmp
+#define __CRT_HAVE_strstartcmpz
+#ifndef __KERNEL__
 #define __CRT_HAVE_strstr
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strto32

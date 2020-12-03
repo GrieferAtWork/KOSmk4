@@ -3187,6 +3187,7 @@
 #define __CRT_HAVE_strchrnul
 #define __CRT_HAVE_strcmp
 #define __CRT_HAVE_strcmpi
+#define __CRT_HAVE_strcmpz
 #define __CRT_HAVE_strcoll
 #define __CRT_HAVE_strcoll_l
 #define __CRT_HAVE_strcpy
@@ -3255,6 +3256,8 @@
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strsignal_s
 #define __CRT_HAVE_strspn
+#define __CRT_HAVE_strstartcmp
+#define __CRT_HAVE_strstartcmpz
 #define __CRT_HAVE_strstr
 #define __CRT_HAVE_strto32
 #define __CRT_HAVE_strto32_l
@@ -7390,6 +7393,7 @@
 #define __CRT_HAVE_KOS$strchrnul
 #define __CRT_HAVE_KOS$strcmp
 #define __CRT_HAVE_KOS$strcmpi
+#define __CRT_HAVE_KOS$strcmpz
 #define __CRT_HAVE_KOS$strcoll
 #define __CRT_HAVE_KOS$strcoll_l
 #define __CRT_HAVE_KOS$strcpy
@@ -7458,6 +7462,8 @@
 #define __CRT_HAVE_KOS$strsignal
 #define __CRT_HAVE_KOS$strsignal_s
 #define __CRT_HAVE_KOS$strspn
+#define __CRT_HAVE_KOS$strstartcmp
+#define __CRT_HAVE_KOS$strstartcmpz
 #define __CRT_HAVE_KOS$strstr
 #define __CRT_HAVE_KOS$strto32
 #define __CRT_HAVE_KOS$strto32_l
@@ -10776,6 +10782,7 @@
 #define __CRT_HAVE_DOS$strchrnul
 #define __CRT_HAVE_DOS$strcmp
 #define __CRT_HAVE_DOS$strcmpi
+#define __CRT_HAVE_DOS$strcmpz
 #define __CRT_HAVE_DOS$strcoll
 #define __CRT_HAVE_DOS$strcoll_l
 #define __CRT_HAVE_DOS$strcpy
@@ -10844,6 +10851,8 @@
 #define __CRT_HAVE_DOS$strsignal
 #define __CRT_HAVE_DOS$strsignal_s
 #define __CRT_HAVE_DOS$strspn
+#define __CRT_HAVE_DOS$strstartcmp
+#define __CRT_HAVE_DOS$strstartcmpz
 #define __CRT_HAVE_DOS$strstr
 #define __CRT_HAVE_DOS$strto32
 #define __CRT_HAVE_DOS$strto32_l
