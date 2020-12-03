@@ -328,7 +328,7 @@ class TraceController {
 @@>> CloseHandle(hGDB);
 @@Output written with this method will appear unfiltered in the Output window
 @@in such a way that click-to-go-to-source is possible!
-@@NOTE: I've also tested what happens when GDB exists while we still have
+@@NOTE: I've also tested what happens when GDB exits while we still have
 @@      a handle to its standard output handle. - It behaves normally, in
 @@      that Visual Studio appears to wait for GDB to terminate, and simply
 @@      ignores anyone else still having an open handle to GDB's old stdout

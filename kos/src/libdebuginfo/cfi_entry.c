@@ -588,7 +588,7 @@ fail:
 }
 
 #ifdef __GNUC__
-/* GCC claims that "length" in th below function is uninitialized, when
+/* GCC claims that "length" in the below function is uninitialized, when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -681,7 +681,7 @@ copy_bits(void *__restrict dst_base, unsigned int dst_bit_offset,
 
 
 #ifdef __GNUC__
-/* GCC claims that "expr_length" in th below function is uninitialized, when
+/* GCC claims that "expr_length" in the below function is uninitialized, when
  * clearly it is very much getting initialized by `debuginfo_location_select()' */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -745,21 +745,21 @@ again_runexpr:
 	/* Execute the expression. */
 	error = unwind_emulator_exec_autostack(&emulator, NULL, &top, NULL);
 	if (error == UNWIND_SUCCESS) {
-		size_t missing_bits;
-		missing_bits = (emulator.ue_piecesiz * NBBY) - emulator.ue_piecebits;
 		if (deref_expression_result) {
 			/* Read from the pointed-to memory location of stack-top to fill in the rest. */
 			error = unwind_ste_read(&top, &after_unwind_getreg, self, dst,
-			                        missing_bits, emulator.ue_piecebits, 0);
+			                        CFI_REGISTER_SIZE(dw_regno) * NBBY,
+			                        emulator.ue_piecebits, 0);
 		} else {
 			void *addr;
 			error = unwind_ste_addr(&top, &after_unwind_getreg, self, &addr);
 			if (error == UNWIND_SUCCESS) {
 				/* Load missing bits with from the address itself (but don't deref it!) */
+				size_t missing_bits;
+				missing_bits = (emulator.ue_piecesiz * NBBY) - emulator.ue_piecebits;
 				if (missing_bits > sizeof(addr) * NBBY)
 					missing_bits = sizeof(addr) * NBBY;
 				copy_bits(dst, emulator.ue_piecebits, &addr, 0, missing_bits);
-				return UNWIND_SUCCESS;
 			}
 		}
 		return error;
@@ -850,8 +850,8 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 	 * of call-site parameter information. */
 
 	/* #1: Lazily load .debug_info (and related sections) for the module
-	 *     currently loaded at `CFI_UNWIND_REGISTER_PC' (which be the
-	 *     value of one of the entries of `ce_unwind_regv')
+	 *     currently loaded at `CFI_UNWIND_REGISTER_PC' (which should be
+	 *     the value of one of the entries of `ce_unwind_regv')
 	 * #2: Search for the DW_TAG_subprogram entry containing the call-site
 	 *     program counter, and scan that component for `DW_TAG_GNU_call_site'
 	 *     with a `DW_AT_location'-attribute that matches the register
@@ -1143,9 +1143,7 @@ NOTHROW_NCX(CC libdi_debuginfo_run_entry_value_emulator)(unwind_emulator_t *__re
 	self->ue_pc_end   = cfi_end_pc;
 	self->ue_regset   = NULL; /* Prevent register writes */
 
-	/* And invoke the emulator proper, which is now re-directed
-	 * to dispatch register accesses using `libcfientry_getreg'
-	 * from above. */
+	/* And invoke the emulator proper. */
 	{
 		size_t req_unwind_rega = 8; /* XXX: Allow for an arch-specific hint for this value! */
 		for (;;) {
