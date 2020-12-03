@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20bca6da */
+/* HASH CRC-32:0xa62f989f */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -367,7 +367,6 @@
 #define __stub_posix_fallocate64
 #define __stub_posix_openpt
 #define __stub_psiginfo
-#define __stub_psignal
 #define __stub_pthread_atfork
 #define __stub_pthread_barrier_destroy
 #define __stub_pthread_barrier_init

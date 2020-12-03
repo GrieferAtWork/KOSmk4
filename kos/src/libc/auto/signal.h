@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b0f8538 */
+/* HASH CRC-32:0x6f4a03d4 */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -365,7 +365,20 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_killpg)(pid_t pgrp, signo_t signo);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp, signo_t signo);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> psignal(3)
+ * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
 INTDEF void NOTHROW_NCX(LIBDCALL libd_psignal)(signo_t signo, char const *s);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> psignal(3)
+ * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo, char const *s);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> psiginfo(3)
+ * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBDCALL libd_psiginfo)(siginfo_t const *pinfo, char const *s);
 /* >> siginterrupt(3)
  * Set the `SA_RESTART' of the already-established signal handler for `signo',

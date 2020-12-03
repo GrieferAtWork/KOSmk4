@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ae0d899 */
+/* HASH CRC-32:0x9108f82e */
 /* Copyright (c) 2019-2020 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/signal.h"
+#include "../user/stdio.h"
 #include "../user/string.h"
 
 DECL_BEGIN
@@ -258,6 +259,21 @@ NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp,
                                   signo_t signo) {
 	return libc_kill(-pgrp, signo);
 }
+/* >> psignal(3)
+ * Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+ * When `s' is `NULL' or an empty string, omit the leading "%s: " from the format. */
+INTERN ATTR_SECTION(".text.crt.sched.signal") void
+NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo,
+                                   char const *s) {
+	char const *signam = libc_strsignal_s(signo);
+	if (s && *s)
+		libc_fprintf(stderr, "%s: ", s);
+	if (signam) {
+		libc_fprintf(stderr, "%s\n", signam);
+	} else {
+		libc_fprintf(stderr, "Unknown signal %d\n", signo);
+	}
+}
 #include <bits/os/sigstack.h>
 /* >> sigstack(2)
  * Deprecated, and slightly different version of `sigaltstack(2)'
@@ -398,6 +414,7 @@ DEFINE_PUBLIC_ALIAS(sigorset, libc_sigorset);
 DEFINE_PUBLIC_ALIAS(signandset, libc_signandset);
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(killpg, libc_killpg);
+DEFINE_PUBLIC_ALIAS(psignal, libc_psignal);
 DEFINE_PUBLIC_ALIAS(sigstack, libc_sigstack);
 DEFINE_PUBLIC_ALIAS(sighold, libc_sighold);
 DEFINE_PUBLIC_ALIAS(sigrelse, libc_sigrelse);

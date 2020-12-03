@@ -838,20 +838,10 @@ NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t pid,
 }
 /*[[[end:libc_tgsigqueueinfo]]]*/
 
-/*[[[head:libc_psignal,hash:CRC-32=0x40b58e8a]]]*/
-INTERN ATTR_SECTION(".text.crt.sched.signal") void
-NOTHROW_NCX(LIBCCALL libc_psignal)(signo_t signo,
-                                   char const *s)
-/*[[[body:libc_psignal]]]*/
-/*AUTO*/{
-	(void)signo;
-	(void)s;
-	CRT_UNIMPLEMENTEDF("psignal(%" PRIxN(__SIZEOF_SIGNO_T__) ", %q)", signo, s); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_psignal]]]*/
 
-/*[[[head:libc_psiginfo,hash:CRC-32=0xd85c4a47]]]*/
+/*[[[head:libc_psiginfo,hash:CRC-32=0x8d98a19b]]]*/
+/* >> psiginfo(3)
+ * Similar to `psignal(3)', but instead print extended signal information from `*pinfo' */
 INTERN ATTR_SECTION(".text.crt.sched.signal") NONNULL((1)) void
 NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
                                     char const *s)
@@ -989,7 +979,7 @@ DEFINE_INTERN_ALIAS(libd_gsignal, libd_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x158f17ec]]]*/
+/*[[[start:exports,hash:CRC-32=0x6b820bb0]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
@@ -1024,7 +1014,6 @@ DEFINE_PUBLIC_ALIAS(sigqueue, libc_sigqueue);
 DEFINE_PUBLIC_ALIAS(sigtimedwait64, libc_sigtimedwait64);
 DEFINE_PUBLIC_ALIAS(sigqueueinfo, libc_sigqueueinfo);
 DEFINE_PUBLIC_ALIAS(tgsigqueueinfo, libc_tgsigqueueinfo);
-DEFINE_PUBLIC_ALIAS(psignal, libc_psignal);
 DEFINE_PUBLIC_ALIAS(psiginfo, libc_psiginfo);
 DEFINE_PUBLIC_ALIAS(siginterrupt, libc_siginterrupt);
 DEFINE_PUBLIC_ALIAS(sigaltstack, libc_sigaltstack);

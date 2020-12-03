@@ -1813,9 +1813,25 @@ int killpg($pid_t pgrp, $signo_t signo) {
 
 %
 %#ifdef __USE_XOPEN2K8
+@@>> psignal(3)
+@@Same as `fprintf(stderr, "%s: %s\n", s, strsignal_s(signo) ?: strdupf("Unknown signal %d", signo))'
+@@When `s' is `NULL' or an empty string, omit the leading "%s: " from the format.
 [[decl_include("<bits/types.h>")]]
-void psignal($signo_t signo, [[nullable]] char const *s);
+[[requires_include("<__crt.h>", "<libc/errno.h>")]]
+[[requires(!defined(__NO_STDSTREAMS) && $has_function(fprintf))]]
+void psignal($signo_t signo, [[nullable]] char const *s) {
+	char const *signam = strsignal_s(signo);
+	if (s && *s)
+		fprintf(stderr, "%s: ", s);
+	if (signam) {
+		fprintf(stderr, "%s\n", signam);
+	} else {
+		fprintf(stderr, "Unknown signal %d\n", signo);
+	}
+}
 
+@@>> psiginfo(3)
+@@Similar to `psignal(3)', but instead print extended signal information from `*pinfo'
 [[decl_include("<bits/os/siginfo.h>")]]
 void psiginfo([[nonnull]] siginfo_t const *pinfo,
               [[nullable]] char const *s);
